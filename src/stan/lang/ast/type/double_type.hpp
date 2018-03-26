@@ -23,7 +23,7 @@ namespace stan {
       /**
        * Construct a double type with the specified data-only variable flag.
        *
-       * @param bool data-only flag
+       * @param is_data true when var is specified data-only
        */
       double_type(bool is_data);  // NOLINT(runtime/explicit)
 

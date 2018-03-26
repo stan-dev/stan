@@ -21,7 +21,7 @@ namespace stan {
      *
      * @param[in] bare_type variable type
      * @param[in] cpp_type_str generated cpp type
-     * @param[in] number of array dimensions
+     * @param[in] ar_dims of array dimensions
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */

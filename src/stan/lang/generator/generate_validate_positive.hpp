@@ -26,9 +26,9 @@ namespace stan {
      * <br/> generate_set_param_ranges - parameter variables
      *
 
-     * @param[in] name construct name
-     * @param[in] expression dimension size
-     * @param[in] indents indentation level
+     * @param[in] name variable name
+     * @param[in] expr dim size expression
+     * @param[in] indent indentation level
      * @param[in,out] o output stream for generated code
      */
     void generate_validate_positive(const std::string& name,

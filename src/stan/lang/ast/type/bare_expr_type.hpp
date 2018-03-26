@@ -113,7 +113,7 @@ struct bare_expr_type {
    *
    * @param type local variable type
    */
-  bare_expr_type(const bare_t& var_type_);  // NOLINT(runtime/explicit)
+  bare_expr_type(const bare_t& type);  // NOLINT(runtime/explicit)
 
   /**
    * Return true if the specified bare type is the same as

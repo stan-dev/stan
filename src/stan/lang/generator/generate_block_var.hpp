@@ -22,6 +22,7 @@ namespace stan {
      * other than member variables and parameters.
      *
      * @param[in] var_decl block variable
+     * @param[in] type_str scalar real type string
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */

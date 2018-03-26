@@ -48,7 +48,7 @@ struct local_var_decl : public var_decl {
    * name, type, and definition.
    *
    * @param name variable name
-   * @param tyep variable type
+   * @param type variable type
    * @param def definition
    */
   local_var_decl(const std::string& name, const local_var_type& type,

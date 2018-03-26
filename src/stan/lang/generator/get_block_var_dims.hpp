@@ -16,7 +16,7 @@ namespace stan {
      * matrix row / row_vector / vector length (if matrix/vec type),
      * array dim N through array dim 1
      *
-     * @param[in] var_decl block_var_decl
+     * @param[in] decl block_var_decl
      */
     std::vector<expression>
     get_block_var_dims(const block_var_decl decl) {

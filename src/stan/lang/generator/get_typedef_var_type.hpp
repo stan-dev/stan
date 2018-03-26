@@ -12,7 +12,7 @@ namespace stan {
      *   typdefs come from `lib/stan_math/prim/mat/fun/typedefs.hpp`
      *   vectors and matrices of double (appropriate for data, not params)
      *
-     * @param[in] bare_expr_type bare_type
+     * @param[in] bare_type bare_type
      */
     std::string
     get_typedef_var_type(const bare_expr_type bare_type) {

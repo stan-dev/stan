@@ -49,7 +49,7 @@ struct block_var_decl : public var_decl {
    * name, type, and definition.
    *
    * @param name variable name
-   * @param tyep variable type
+   * @param type variable type
    * @param def definition
    */
   block_var_decl(const std::string& name, const block_var_type& type,

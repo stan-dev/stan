@@ -25,7 +25,7 @@ namespace stan {
      * indices change fastest.  Therefore loops must be constructed:
      * (col) (row) (array-dim-N) ... (array-dim-1)
      *
-     * @param[in] vs data block variable declarations
+     * @param[in] var_decl block variable declaration
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */

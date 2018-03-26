@@ -25,7 +25,7 @@ namespace stan {
      * @param[in] cpp_type_str generated cpp type
      * @param[in] ar_lens vector of sizes for each array dimension
      * @param[in] arg1 expression for size of first dim of vec/matrix (or nil)
-     * @param[in] arg1 expression for size of second dim of matrix (or nil)
+     * @param[in] arg2 expression for size of second dim of matrix (or nil)
      * @param[in,out] o stream for generating
      */
     void

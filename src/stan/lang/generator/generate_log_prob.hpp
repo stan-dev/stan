@@ -22,7 +22,7 @@ namespace stan {
      * Generate the log_prob method for the model class for the
      * specified program on the specified stream.
      *
-     * @param p program
+     * @param prog program node of ast
      * @param o stream for generating
      */
     void generate_log_prob(const program& prog, std::ostream& o) {

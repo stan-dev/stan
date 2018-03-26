@@ -15,7 +15,7 @@ namespace stan {
      * and vector/matrix number of rows, columns to the specified stream
      * at the specified level of indentation.
      *
-     * @param[in] decl variable declaration
+     * @param[in] var_decl variable declaration
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */

@@ -46,67 +46,67 @@ struct local_var_type {
   /**
    * Construct a local var type
    *
-   * @param type local variable type raw variant type.
+   * @param x local variable type raw variant type.
    */
-  local_var_type(const local_var_type& type);  // NOLINT(runtime/explicit)
+  local_var_type(const local_var_type& x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a local var type with the specified type.
    *
-   * @param type local variable type
+   * @param x local variable type
    */
-  local_var_type(const ill_formed_type& type);  // NOLINT(runtime/explicit)
+  local_var_type(const ill_formed_type& x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a local var type with the specified type.
    *
-   * @param type local variable type
+   * @param x local variable type
    */
-  local_var_type(const double_type& type);  // NOLINT(runtime/explicit)
+  local_var_type(const double_type& x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a local var type with the specified type.
    *
-   * @param type local variable type
+   * @param x local variable type
    */
 
-  local_var_type(const int_type& type);  // NOLINT(runtime/explicit)
+  local_var_type(const int_type& x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a local var type with the specified type.
    *
-   * @param type local variable type
+   * @param x local variable type
    */
-  local_var_type(const matrix_local_type& type);  // NOLINT(runtime/explicit)
+  local_var_type(const matrix_local_type& x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a local var type with the specified type.
    *
-   * @param type local variable type
+   * @param x local variable type
    */
   local_var_type(
-      const row_vector_local_type& type);  // NOLINT(runtime/explicit)
+      const row_vector_local_type& x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a local var type with the specified type.
    *
-   * @param type local variable type
+   * @param x local variable type
    */
-  local_var_type(const vector_local_type& type);  // NOLINT(runtime/explicit)
+  local_var_type(const vector_local_type& x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a local var type with the specified type.
    *
-   * @param type local variable type
+   * @param x local variable type
    */
-  local_var_type(const local_array_type& type);  // NOLINT(runtime/explicit)
+  local_var_type(const local_array_type& x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a local var type with the specified type.
    *
-   * @param type local variable type
+   * @param x local variable type
    */
-  local_var_type(const local_t& var_type_);  // NOLINT(runtime/explicit)
+  local_var_type(const local_t& x);  // NOLINT(runtime/explicit)
 
   /**
    * Returns expression for length of vector types or

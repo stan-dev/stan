@@ -23,7 +23,7 @@ namespace stan {
       /**
        * Construct a vector type with the specified data-only variable flag.
        *
-       * @param bool data-only flag
+       * @param is_data true when var is specified data-only
        */
       vector_type(bool is_data);  // NOLINT(runtime/explicit)
 

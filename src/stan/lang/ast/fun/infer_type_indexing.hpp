@@ -10,9 +10,9 @@ namespace stan {
      * Return the expression type resulting from indexing the
      * specified expression with the specified number of indexes. 
      *
-     * @param bare_type var or expression type being indexed
+     * @param e type of the variable being indexed
      * @param num_indexes number of indexes provided
-     * @return expression type of indexed expression
+     * @return bare_expr_type of indexed expression
      */
     bare_expr_type infer_type_indexing(const bare_expr_type& e,
                                        size_t num_indexes);

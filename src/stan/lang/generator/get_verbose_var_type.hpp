@@ -9,7 +9,7 @@ namespace stan {
     /**
      * Return type string for variable type.
      *
-     * @param[in] bare_expr_type bare_type
+     * @param[in] bare_type expression type
      */
     std::string
     get_verbose_var_type(const bare_expr_type bare_type) {
