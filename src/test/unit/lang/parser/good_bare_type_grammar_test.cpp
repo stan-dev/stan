@@ -8,12 +8,17 @@
 #include <iostream>
 
 TEST(Parser, parse_void) {
-  std::string input("void");
+  std::string input("functions {\n"
+                    "  void fun() {\n"
+                    "    print(\"foo\");\n"
+                    "  }\n"
+                    "}");
   bool pass = false;
   std::stringstream msgs;
-  stan::lang::bare_expr_type bet;
-  bet = parse_bare_type(input, pass, msgs);
-
+  std::vector<stan::lang::function_decl_def> fns;
+  fns = parse_functions(input, pass, msgs);
+  stan::lang::bare_expr_type bet = fns[0].return_type_;
+                    
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
   EXPECT_TRUE(bet.is_void_type());
@@ -24,11 +29,17 @@ TEST(Parser, parse_void) {
 }
 
 TEST(Parser, parse_int) {
-  std::string input("int");
+  std::string input("functions {\n"
+                    "  int fun() {\n"
+                    "    int foo = 1;\n"
+                    "    return foo;\n"
+                    "  }\n"
+                    "}");
   bool pass = false;
   std::stringstream msgs;
-  stan::lang::bare_expr_type bet;
-  bet = parse_bare_type(input, pass, msgs);
+  std::vector<stan::lang::function_decl_def> fns;
+  fns = parse_functions(input, pass, msgs);
+  stan::lang::bare_expr_type bet = fns[0].return_type_;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -40,11 +51,17 @@ TEST(Parser, parse_int) {
 }
 
 TEST(Parser, parse_double) {
-  std::string input("real");
+  std::string input("functions {\n"
+                    "  real fun() {\n"
+                    "    real foo = 1.0;\n"
+                    "    return foo;\n"
+                    "  }\n"
+                    "}");
   bool pass = false;
   std::stringstream msgs;
-  stan::lang::bare_expr_type bet;
-  bet = parse_bare_type(input, pass, msgs);
+  std::vector<stan::lang::function_decl_def> fns;
+  fns = parse_functions(input, pass, msgs);
+  stan::lang::bare_expr_type bet = fns[0].return_type_;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -56,11 +73,17 @@ TEST(Parser, parse_double) {
 }
 
 TEST(Parser, parse_vector) {
-  std::string input("vector");
+  std::string input("functions {\n"
+                    "  vector fun() {\n"
+                    "    vector[2] foo;\n"
+                    "    return foo;\n"
+                    "  }\n"
+                    "}");
   bool pass = false;
   std::stringstream msgs;
-  stan::lang::bare_expr_type bet;
-  bet = parse_bare_type(input, pass, msgs);
+  std::vector<stan::lang::function_decl_def> fns;
+  fns = parse_functions(input, pass, msgs);
+  stan::lang::bare_expr_type bet = fns[0].return_type_;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -72,11 +95,17 @@ TEST(Parser, parse_vector) {
 }
 
 TEST(Parser, parse_row_vector) {
-  std::string input("row_vector");
+  std::string input("functions {\n"
+                    "  row_vector fun() {\n"
+                    "    row_vector[2] foo;\n"
+                    "    return foo;\n"
+                    "  }\n"
+                    "}");
   bool pass = false;
   std::stringstream msgs;
-  stan::lang::bare_expr_type bet;
-  bet = parse_bare_type(input, pass, msgs);
+  std::vector<stan::lang::function_decl_def> fns;
+  fns = parse_functions(input, pass, msgs);
+  stan::lang::bare_expr_type bet = fns[0].return_type_;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -88,11 +117,17 @@ TEST(Parser, parse_row_vector) {
 }
 
 TEST(Parser, parse_matrix) {
-  std::string input("matrix");
+  std::string input("functions {\n"
+                    "  matrix fun() {\n"
+                    "    matrix[2,2] foo;\n"
+                    "    return foo;\n"
+                    "  }\n"
+                    "}");
   bool pass = false;
   std::stringstream msgs;
-  stan::lang::bare_expr_type bet;
-  bet = parse_bare_type(input, pass, msgs);
+  std::vector<stan::lang::function_decl_def> fns;
+  fns = parse_functions(input, pass, msgs);
+  stan::lang::bare_expr_type bet = fns[0].return_type_;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -104,11 +139,17 @@ TEST(Parser, parse_matrix) {
 }
 
 TEST(Parser, parse_matrix_1d_array) {
-  std::string input("matrix[]");
+  std::string input("functions {\n"
+                    "  matrix[ ] fun() {\n"
+                    "    matrix[2,2] foo[2];\n"
+                    "    return foo;\n"
+                    "  }\n"
+                    "}");
   bool pass = false;
   std::stringstream msgs;
-  stan::lang::bare_expr_type bet;
-  bet = parse_bare_type(input, pass, msgs);
+  std::vector<stan::lang::function_decl_def> fns;
+  fns = parse_functions(input, pass, msgs);
+  stan::lang::bare_expr_type bet = fns[0].return_type_;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
@@ -123,11 +164,17 @@ TEST(Parser, parse_matrix_1d_array) {
 }
 
 TEST(Parser, parse_matrix_2d_array) {
-  std::string input("matrix[,]");
+  std::string input("functions {\n"
+                    "  matrix[ , ] fun() {\n"
+                    "    matrix[2,2] foo[2,2];\n"
+                    "    return foo;\n"
+                    "  }\n"
+                    "}");
   bool pass = false;
   std::stringstream msgs;
-  stan::lang::bare_expr_type bet;
-  bet = parse_bare_type(input, pass, msgs);
+  std::vector<stan::lang::function_decl_def> fns;
+  fns = parse_functions(input, pass, msgs);
+  stan::lang::bare_expr_type bet = fns[0].return_type_;
 
   EXPECT_TRUE(pass);
   EXPECT_EQ(msgs.str(), std::string());
