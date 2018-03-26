@@ -4,6 +4,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <ostream>
+#include <vector>
 
 namespace stan {
   namespace lang {
@@ -38,7 +39,6 @@ namespace stan {
      * @param[in,out] o stream for generating
      */
     void generate_dims_method(const program& prog, std::ostream& o) {
-
       o << EOL << INDENT
         << "void get_dims(std::vector<std::vector<size_t> >& dimss__) const {"
         << EOL;

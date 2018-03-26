@@ -137,11 +137,10 @@ namespace stan {
         .is_double_type();
     }
 
-    //TODO:  mm - allows arrays of int and double types?
     bool is_univariate(const bare_expr_type& et) {
       return et.num_dims() == 0
-        && (et.base().is_int_type()
-            || et.base().is_double_type());
+        && (et.is_int_type()
+            || et.is_double_type());
     }
 
     bool can_assign_to_lhs_var(const std::string& lhs_var_name,
@@ -180,7 +179,6 @@ namespace stan {
                         const std::string& name,
                         const std::string& stmt_type,
                         std::ostream& error_msgs) {
-
       if (lhs_type.num_dims() != rhs_expr.bare_type().num_dims()
           || lhs_type.array_dims() != rhs_expr.bare_type().array_dims()
           ) {
@@ -194,7 +192,7 @@ namespace stan {
                    << "." << std::endl;
         return false;
       }
-      
+
       // allow int -> double promotion, even in arrays
       bool types_compatible =
         (lhs_type.base() == rhs_expr.bare_type().base()
@@ -418,7 +416,8 @@ namespace stan {
     void validate_non_void_arg_function::operator()(bare_expr_type& arg_type,
                                                     const scope& var_scope,
                                                     bool& pass,
-                                                    std::ostream& error_msgs) const {
+                                                    std::ostream& error_msgs)
+      const {
       if (var_scope.program_block() == data_origin)
         arg_type.set_is_data();
       pass = !arg_type.is_void_type();
@@ -703,7 +702,8 @@ namespace stan {
       const {
       var_scope = scope(var_scope.program_block(), true);
       // generated log_prob code has vector called "params_r__"
-      vm.add("params_r__", var_decl("params_r__", vector_type()), parameter_origin);
+      vm.add("params_r__", var_decl("params_r__", vector_type()),
+             parameter_origin);
     }
     boost::phoenix::function<set_fun_params_scope> set_fun_params_scope_f;
 
@@ -968,13 +968,6 @@ namespace stan {
     void validate_assgn::operator()(const assgn& a, bool& pass,
                                     const variable_map& vm,
                                     std::ostream& error_msgs) const {
-      // std::cout << "validate_assgn"
-      //           << " var: " << a.lhs_var_.name_
-      //           << " type: " << a.lhs_var_.type_
-      //           << " idxs: " << a.idxs_.size()
-      //           << " rhs type: " << a.rhs_.bare_type()
-      //           << std::endl;
-
       // validate var exists
       std::string name = a.lhs_var_.name_;
       if (!vm.exists(name)) {
@@ -987,8 +980,6 @@ namespace stan {
 
       expression lhs_expr = expression(a.lhs_var_);
       bare_expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
-
-      //      std::cout << "lhs indexed_type " << lhs_type << std::endl;
 
       if (lhs_type.is_ill_formed_type()) {
         error_msgs << "Left-hand side indexing incompatible with variable."
@@ -1032,7 +1023,7 @@ namespace stan {
         return;
       }
       a.var_type_ = vm.get_bare_type(name);
-        
+
       bare_expr_type inferred_lhs_type
         = infer_var_dims_type(a.var_type_, a.var_dims_);
 
@@ -1181,7 +1172,6 @@ namespace stan {
       arg_types.push_back(s.expr_.bare_type());
       for (size_t i = 0; i < s.dist_.args_.size(); ++i) {
         arg_types.push_back(s.dist_.args_[i].bare_type());
-        //        std::cout << "arg " << i << " type: " << s.dist_.args_[i].bare_type() << std::endl;
       }
 
       std::string function_name(s.dist_.family_);
@@ -1431,7 +1421,8 @@ namespace stan {
     }
     boost::phoenix::function<expression_as_statement> expression_as_statement_f;
 
-    void unscope_locals::operator()(const std::vector<local_var_decl>& var_decls,
+    void unscope_locals::operator()(const std::vector<local_var_decl>&
+                                    var_decls,
                                     variable_map& vm) const {
       for (size_t i = 0; i < var_decls.size(); ++i)
         vm.remove(var_decls[i].name());
@@ -1490,7 +1481,8 @@ namespace stan {
       pass = expr.bare_type().is_array_type();
       if (!pass) {
         error_msgs << "Error: loop variable must be array type."
-                   << " variable type=\"" << expr.bare_type() << "\"" << std::endl;
+                   << " variable type=\"" << expr.bare_type() << "\""
+                   << std::endl;
         return;
       }
       vm.add(name,
@@ -1609,7 +1601,7 @@ namespace stan {
     }
     boost::phoenix::function<add_literal_string>
     add_literal_string_f;
-    
+
     template <typename T, typename I>
     void add_line_number::operator()(T& line,
                                      const I& begin,
@@ -1655,7 +1647,6 @@ namespace stan {
     boost::phoenix::function<deprecated_integrate_ode>
     deprecated_integrate_ode_f;
 
-    // TODO:mitzi  resolve data_only flag issue w/r/t function_sigs and solvers
     template <class T>
     void validate_integrate_ode_non_control_args(const T& ode_fun,
                                                  const variable_map& var_map,
@@ -1666,7 +1657,7 @@ namespace stan {
       // ode_integrator requires function with signature:
       // (real, real[ ], real[ ], data real[ ], data int[ ]): real[ ]"
 
-      // TODO:mitzi  names indicate status, but not flagged as data_only
+      // TODO(mitzi)  names indicate status, but not flagged as data_only
       // instantiate ode fn arg types
       double_type t_double;
       bare_expr_type t_ar_double(bare_array_type(t_double, 1));
@@ -1896,17 +1887,19 @@ namespace stan {
         pass = false;
       }
       if (alg_fun.x_r_.bare_type() != t_ar_double) {
-        error_msgs << "Fourth argument to algebra_solver must have type: real[ ]"
-                   << ";  found type = "
-                   << alg_fun.x_r_.bare_type()
-                   << ". " << std::endl;
+        error_msgs
+          << "Fourth argument to algebra_solver must have type: real[ ]"
+          << ";  found type = "
+          << alg_fun.x_r_.bare_type()
+          << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.x_i_.bare_type() != t_ar_int) {
-        error_msgs << "Fifth argument to algebra_solver must have type: int[ ]"
-                   << ";  found type = "
-                   << alg_fun.x_i_.bare_type()
-                   << ". " << std::endl;
+        error_msgs
+          << "Fifth argument to algebra_solver must have type: int[ ]"
+          << ";  found type = "
+          << alg_fun.x_i_.bare_type()
+          << ". " << std::endl;
         pass = false;
       }
 
@@ -2001,7 +1994,6 @@ namespace stan {
       bare_expr_type t_ar_double(bare_array_type(t_double, 1));
       bare_expr_type t_2d_ar_double(bare_array_type(t_double, 2));
       bare_expr_type t_ar_vector(bare_array_type(t_vector, 1));
-      
       bare_expr_type shared_params_type(t_vector);
       bare_expr_type job_params_type(t_vector);
       bare_expr_type job_data_r_type(t_ar_double);
@@ -2222,9 +2214,9 @@ namespace stan {
       for (size_t i = 1; i < array_expr.args_.size(); ++i) {
         bare_expr_type e_next(array_expr.args_[i].bare_type());
         if (e_first != e_next) {
-          if (e_first.is_primitive() && e_next.is_primitive())
+          if (e_first.is_primitive() && e_next.is_primitive()) {
             e_first = double_type();
-          else {
+          } else {
             error_msgs << "Expressions for elements of array must have"
                        << " the same or promotable types; found"
                        << " first element type=" << e_first
@@ -2533,11 +2525,7 @@ namespace stan {
                  bool& pass, std::ostream& error_msgs) const {
       index_op iop(expression, dimss);
       int expr_dims = expression.total_dims();
-      //      std::cout << " expr_dims " << expr_dims << std::endl;
-
       int index_dims = num_dimss(dimss);
-      //      std::cout << " index_dims " << index_dims << std::endl;
-
       if (expr_dims < index_dims) {
         error_msgs << "Indexed expression must have at least as many"
                    << " dimensions as number of indexes supplied: "
@@ -2954,7 +2942,6 @@ namespace stan {
     void validate_identifier::operator()(const std::string& identifier,
                                          bool& pass,
                                          std::stringstream& error_msgs) const {
-      //      std::cout << "validate_identifier, name: " << identifier << std::endl;
       int len = identifier.size();
       if (len >= 2
           && identifier[len-1] == '_'
@@ -3043,7 +3030,8 @@ namespace stan {
       pass = only_data_dimensions;
       return;
     }
-    boost::phoenix::function<validate_int_data_only_expr> validate_int_data_only_expr_f;
+    boost::phoenix::function<validate_int_data_only_expr>
+    validate_int_data_only_expr_f;
 
     void set_double_range_lower::operator()(range& range,
                                             const expression& expr,
@@ -3075,7 +3063,6 @@ namespace stan {
                                         const expression& def,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
-      //      std::cout << "validate_array_block_var_decl" << std::endl;
       if (dims.size() == 0) {
         error_msgs << "Array type requires at least 1 dimension,"
                    << " none found" << std::endl;
@@ -3093,8 +3080,6 @@ namespace stan {
       stan::lang::block_array_type bat(el_type, dims);
       block_var_decl result(name, bat, def);
       var_decl_result = result;
-      // std::cout << "validate_array_block_var_decl, " << var_decl_result.name()
-      //           << " type: " << var_decl_result.type() << std::endl;
     }
     boost::phoenix::function<validate_array_block_var_decl>
     validate_array_block_var_decl_f;
@@ -3130,7 +3115,7 @@ namespace stan {
     }
     boost::phoenix::function<validate_single_local_var_decl>
     validate_single_local_var_decl_f;
-                                                      
+
     void validate_array_local_var_decl::operator()(
                                         local_var_decl& var_decl_result,
                                         const local_var_type& el_type,
@@ -3139,7 +3124,6 @@ namespace stan {
                                         const expression& def,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
-      //      std::cout << "validate_array_local_var, name: " << name << std::endl;
       if (dims.size() == 0) {
         error_msgs << "Array type requires at least 1 dimension,"
                    << " none found" << std::endl;
@@ -3157,18 +3141,15 @@ namespace stan {
       stan::lang::local_array_type bat(el_type, dims);
       local_var_decl result(name, bat, def);
       var_decl_result = result;
-      // std::cout << "validate_array_local_var_decl, " << var_decl_result.name()
-      //           << " type: " << var_decl_result.type() << std::endl;
     }
     boost::phoenix::function<validate_array_local_var_decl>
     validate_array_local_var_decl_f;
-                                                      
+
     void validate_fun_arg_var::operator()(var_decl& var_decl_result,
                                       const bare_expr_type& bare_type,
                                       const std::string& name,
                                       bool& pass,
                                       std::ostream& error_msgs) const {
-      //      std::cout << "validate_fun_arg_var" << std::endl;
       if (bare_type.is_ill_formed_type()) {
         error_msgs << "Function argument is ill formed,"
                    << " name="
@@ -3179,12 +3160,10 @@ namespace stan {
       }
       stan::lang::var_decl vd(name, bare_type);
       var_decl_result = vd;
-      // std::cout << "validate_fun_arg_var, " << var_decl_result.name()
-      //           << " type: " << var_decl_result.type() << std::endl;
     }
     boost::phoenix::function<validate_fun_arg_var>
     validate_fun_arg_var_f;
-                                                      
+
     void validate_bare_type_is_data::operator()(
                                        bare_expr_type& bare_type,
                                        scope& scope,
@@ -3192,8 +3171,9 @@ namespace stan {
                                        std::ostream& error_msgs) const {
       if (bare_type.is_int_type()) {
           pass = false;
-          error_msgs << "Data qualifier cannot be applied to variable of type int"
-                     << std::endl;      
+          error_msgs
+            << "Data qualifier cannot be applied to variable of type int"
+            << std::endl;
           return;
       }
       if (scope.program_block() == data_origin)
@@ -3201,14 +3181,13 @@ namespace stan {
     }
     boost::phoenix::function<validate_bare_type_is_data>
     validate_bare_type_is_data_f;
-                                                      
+
     void validate_bare_type::operator()(
                                         bare_expr_type& bare_type_result,
                                         const bare_expr_type& el_type,
                                         const size_t& num_dims,
                                         bool& pass,
                                         std::ostream& error_msgs) const {
-      //      std::cout << "validate_bare_type" << std::endl;
       if (el_type.is_ill_formed_type()) {
         error_msgs << "Ill-formed bare type" << std::endl;
         pass = false;
@@ -3217,8 +3196,6 @@ namespace stan {
       pass = true;
       if (num_dims == 0) {
         bare_type_result = el_type;
-        // std::cout << "validate_bare_type"
-        //           << " type: " << bare_type_result << std::endl;
         return;
       }
       stan::lang::bare_array_type bat(el_type);
@@ -3227,8 +3204,6 @@ namespace stan {
         bat = bare_array_type(cur_type);
       }
       bare_type_result = bat;
-      // std::cout << "validate_bare_type"
-      //           << " type: " << bare_type_result << std::endl;
     }
     boost::phoenix::function<validate_bare_type>
     validate_bare_type_f;
@@ -3239,17 +3214,6 @@ namespace stan {
                                    const scope& var_scope,
                                    std::ostream& error_msgs) const {
       pass = false;
-      // std::cout << "add_to_var_map_f,"
-      //           << " var decl name: " << decl.name()
-      //           << " type: " << decl.type()
-      //           << " bare_type: " << decl.bare_type()
-      //           << " type.bare_type: " << decl.type().bare_type()
-      //           << " begin_line_: " << decl.begin_line_
-      //           << " end_line_: " << decl.end_line_
-      //           << " scope: " << var_scope.program_block()
-      //           << " scope.is_local_ " << var_scope.is_local()
-      //           << std::endl;
-
       if (vm.exists(decl.name())) {
         var_decl prev_decl = vm.get(decl.name());
         error_msgs << "Duplicate declaration of variable, name="
@@ -3257,12 +3221,12 @@ namespace stan {
 
         error_msgs << "; attempt to redeclare as "
                    << decl.bare_type()
-                   << " in "; 
+                   << " in ";
         print_scope(error_msgs, var_scope);
 
         error_msgs << "; previously declared as "
                    << prev_decl.bare_type()
-                   << " in "; 
+                   << " in ";
         print_scope(error_msgs, vm.get_scope(decl.name()));
 
         error_msgs << std::endl;
@@ -3282,7 +3246,7 @@ namespace stan {
       var_decl bare_decl(decl.name(),
                          decl.type().bare_type(),
                          decl.def());
-      
+
       vm.add(decl.name(), bare_decl, var_scope);
       pass = true;
     }

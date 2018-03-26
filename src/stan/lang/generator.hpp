@@ -18,8 +18,6 @@
 #include <stan/lang/generator/generate_validate_tparam_inits.hpp>
 #include <stan/lang/generator/generate_validate_var_decl.hpp>
 #include <stan/lang/generator/generate_validate_var_dims.hpp>
-#include <stan/lang/generator/generate_param_names_array.hpp>
-
 
 #include <stan/lang/generator/get_typedef_var_type.hpp>
 #include <stan/lang/generator/get_verbose_var_type.hpp>

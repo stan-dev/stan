@@ -35,16 +35,14 @@ parameters {
 transformed parameters {
   vector[2] theta_p;
   
-// TODO:mitzi doc says y must be a parameter!
-//  theta_p = algebra_solver(algebra_system, x, y, dat, dat_int);
-//  theta_p = algebra_solver(algebra_system, x, y, dat, dat_int, 0.01, 0.01, 10);
+  theta_p = algebra_solver(algebra_system, x, y, dat, dat_int);
+  theta_p = algebra_solver(algebra_system, x, y, dat, dat_int, 0.01, 0.01, 10);
   
   theta_p = algebra_solver(algebra_system, x, y_p, dat, dat_int);
   theta_p = algebra_solver(algebra_system, x, y_p, dat, dat_int, 0.01, 0.01, 10);
 
-// TODO:mitzi doc says y must be a parameter!
-//  theta_p = algebra_solver(algebra_system, x_p, y, dat, dat_int);
-//  theta_p = algebra_solver(algebra_system, x_p, y, dat, dat_int, 0.01, 0.01, 10);
+  theta_p = algebra_solver(algebra_system, x_p, y, dat, dat_int);
+  theta_p = algebra_solver(algebra_system, x_p, y, dat, dat_int, 0.01, 0.01, 10);
 
   theta_p = algebra_solver(algebra_system, x_p, y_p, dat, dat_int);
   theta_p = algebra_solver(algebra_system, x_p, y_p, dat, dat_int, 0.01, 0.01, 10);

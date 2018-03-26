@@ -45,7 +45,7 @@ namespace stan {
         o_ << num_str;
       }
 
-      void operator()(const double_literal& x) const { 
+      void operator()(const double_literal& x) const {
         o_ << x.string_;
         if (x.string_.find_first_of("eE.") == std::string::npos)
         o_ << ".0";  // trailing 0 to ensure C++ makes it a double
@@ -63,7 +63,7 @@ namespace stan {
         generate_bare_type(x.args_[0].bare_type(),
                            ssRealType.str(), ssArrayElType);
 
-        // TODO:mizi do we need static cast? L58-60, L68
+        // TODO(mitzi): do we need static cast? L58-60, L68
         o_ << "static_cast<"
            << ssArrayType.str()
            << " >(stan::math::array_builder<"

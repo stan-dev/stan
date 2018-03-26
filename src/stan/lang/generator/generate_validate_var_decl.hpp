@@ -9,6 +9,7 @@
 #include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_var_idx_array_dims.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {
@@ -26,7 +27,6 @@ namespace stan {
      */
     void generate_validate_var_decl(const block_var_decl decl,
                                     int indent, std::ostream& o) {
-
       std::string var_name(decl.name());
       std::vector<expression> ar_lens(decl.type().array_lens());
       // unfold array type to get array element info
@@ -65,9 +65,9 @@ namespace stan {
         generate_indent(indent + ar_lens.size(), o);
         o << "stan::math::check_";
         // kludge - inconsistent naming specialized cholesky_factor types
-        if (btype.name() == "cholesky_factor_cov") 
+        if (btype.name() == "cholesky_factor_cov")
           o << "cholesky_factor";
-        else 
+        else
           o << btype.name();
         o << "(function__, \"" << var_name;
         write_var_idx_array_dims(ar_lens.size(), o);

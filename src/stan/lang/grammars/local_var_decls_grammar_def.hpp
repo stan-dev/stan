@@ -11,10 +11,6 @@
 #include <string>
 #include <vector>
 
-// TODO:mitzi  need to pass in scope as _r1
-// scope registered in var map same as enclosing scope
-// needed to maintain distinction between reals (data) and params.
-
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::local_var_decl,
                            (stan::lang::local_var_type, type_)
                            (std::string, name_)
@@ -35,8 +31,9 @@ namespace stan {
   namespace lang {
 
     template <typename Iterator>
-    local_var_decls_grammar<Iterator>::local_var_decls_grammar(variable_map& var_map,
-                                                               std::stringstream& error_msgs)
+    local_var_decls_grammar<Iterator>::local_var_decls_grammar(
+                                       variable_map& var_map,
+                                       std::stringstream& error_msgs)
       : local_var_decls_grammar::base_type(local_var_decls_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
@@ -59,7 +56,7 @@ namespace stan {
 
       using boost::phoenix::begin;
       using boost::phoenix::end;
-      
+
       local_var_decls_r.name("variable declarations");
       local_var_decls_r
         %=  *(local_var_decl_r(_r1));
@@ -71,7 +68,7 @@ namespace stan {
             | raw[single_local_var_decl_r(_r1)[assign_lhs_f(_val, _1)]]
                [add_line_number_f(_val, begin(_1), end(_1))]
             )
-        > eps  
+        > eps
         [add_to_var_map_f(_val, boost::phoenix::ref(var_map_), _pass, _r1,
                           boost::phoenix::ref(error_msgs_)),
          validate_definition_f(_r1, _val, _pass,
@@ -95,7 +92,7 @@ namespace stan {
            > eps
            [validate_single_local_var_decl_f(_val, _pass,
                                              boost::phoenix::ref(error_msgs_))];
-      
+
       local_element_type_r.name("local var element type declaration");
       local_element_type_r
         %= (local_int_type_r(_r1)
@@ -103,7 +100,7 @@ namespace stan {
             | local_vector_type_r(_r1)
             | local_row_vector_type_r(_r1)
             | local_matrix_type_r(_r1));
-      
+
       local_int_type_r.name("integer type");
       local_int_type_r
         %= (lit("int")

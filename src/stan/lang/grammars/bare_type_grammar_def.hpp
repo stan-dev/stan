@@ -30,7 +30,7 @@ namespace stan {
       bare_type_r = (type_identifier_r
                      >> bare_dims_r)
                     [validate_bare_type_f(_val, _1, _2, _pass,
-                                                boost::phoenix::ref(error_msgs_))];
+                                          boost::phoenix::ref(error_msgs_))];
 
       type_identifier_r.name("bare type identifier\n"
                 "  legal values: void, int, real, vector, row_vector, matrix");

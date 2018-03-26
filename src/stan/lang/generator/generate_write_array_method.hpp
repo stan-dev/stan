@@ -44,12 +44,13 @@ namespace stan {
 
       o << INDENT2 << "vars__.resize(0);" << EOL;
       o << INDENT2
-        << "stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);" << EOL;
+        << "stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);"
+        << EOL;
       o << INDENT2 << "static const char* function__ = \""
         << model_name << "_namespace::write_array\";" << EOL;
       generate_void_statement("function__", 2, o);
       o << EOL;
-      
+
       generate_comment("read-transform, write parameters", 2, o);
       generate_read_transform_params(prog.parameter_decl_, 2, o);
 
@@ -68,7 +69,8 @@ namespace stan {
         generate_comment("declare and define transformed parameters", 2, o);
         for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
           generate_indent(3, o);
-          o << "current_statement_begin__ = " <<  prog.derived_decl_.first[i].begin_line_ << ";"
+          o << "current_statement_begin__ = "
+            <<  prog.derived_decl_.first[i].begin_line_ << ";"
             << EOL;
           generate_block_var(prog.derived_decl_.first[i], "double", 3, o);
           o << EOL;
@@ -112,7 +114,8 @@ namespace stan {
         generate_comment("declare and define generated quantities", 4, o);
         for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i) {
           generate_indent(4, o);
-          o << "current_statement_begin__ = " <<  prog.generated_decl_.first[i].begin_line_ << ";"
+          o << "current_statement_begin__ = "
+            <<  prog.generated_decl_.first[i].begin_line_ << ";"
             << EOL;
           generate_block_var(prog.generated_decl_.first[i], "double", 3, o);
           o << EOL;

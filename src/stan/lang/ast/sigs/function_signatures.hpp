@@ -286,7 +286,8 @@ namespace stan {
        * arguments and distribution's support
        */
       template<typename T>
-      bare_expr_type rng_return_type(const bare_expr_type& t, const bare_expr_type& u);
+      bare_expr_type rng_return_type(const bare_expr_type& t,
+                                     const bare_expr_type& u);
 
       /**
        * Determine the return type of distributions' RNG function

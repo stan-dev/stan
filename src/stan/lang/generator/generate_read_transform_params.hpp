@@ -13,6 +13,7 @@
 #include <stan/lang/generator/write_var_idx_all_dims.hpp>
 #include <ostream>
 #include <string>
+#include <vector>
 
 namespace stan {
   namespace lang {
@@ -46,18 +47,19 @@ namespace stan {
 
         } else {
           o << ";" << EOL;
-          
-          write_nested_resize_loop_begin(var_name, vtype.array_lens(), indent, o);
+
+          write_nested_resize_loop_begin(var_name, vtype.array_lens(),
+                                         indent, o);
           generate_indent(indent + vtype.array_dims(), o);
           o << var_name;
           write_resize_var_idx(vtype.array_dims(), o);
-          o << ".push_back(in__." 
+          o << ".push_back(in__."
             << write_constraints_fn(el_type, "constrain")
             << "));" << EOL;
           write_end_loop(vtype.array_dims(), indent, o);
         }
-       
-        // write to vars__ in col-major 
+
+        // write to vars__ in col-major
         write_begin_all_dims_col_maj_loop(vs[i], true, indent, o);
 
         generate_indent(indent + vtype.num_dims(), o);
@@ -65,13 +67,13 @@ namespace stan {
         write_var_idx_all_dims(vtype.array_dims(),
                                vtype.num_dims() - vtype.array_dims(), o);
         o << ");" << EOL;
-          
+
         write_end_loop(vtype.num_dims(), indent, o);
 
         o << EOL;
       }
     }
-    
+
   }
 }
 #endif

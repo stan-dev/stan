@@ -7,6 +7,7 @@
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_validate_positive.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {
@@ -44,7 +45,8 @@ namespace stan {
 
         generate_indent(indent, o);
         o << "num_params_r__ += ";
-        generate_expression(var_decls[i].type().params_total(), NOT_USER_FACING, o);
+        generate_expression(var_decls[i].type().params_total(),
+                            NOT_USER_FACING, o);
         o << ";" << EOL;
       }
     }
@@ -54,4 +56,3 @@ namespace stan {
   }
 }
 #endif
-

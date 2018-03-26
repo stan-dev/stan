@@ -24,105 +24,105 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
-    
-    struct write_expression_vis : public boost::static_visitor<std::string> {
-      /**
-       * Construct a visitor.
-       */
-      write_expression_vis();
+namespace lang {
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const nil& e) const;
+struct write_expression_vis : public boost::static_visitor<std::string> {
+  /**
+   * Construct a visitor.
+   */
+  write_expression_vis();
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const int_literal& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const nil& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const double_literal& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const int_literal& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const array_expr& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const double_literal& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const matrix_expr& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const array_expr& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const row_vector_expr& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const matrix_expr& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const variable& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const row_vector_expr& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const fun& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const variable& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const integrate_ode& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const fun& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const integrate_ode_control& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const integrate_ode& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const algebra_solver& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const integrate_ode_control& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const algebra_solver_control& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const algebra_solver& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const map_rect& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const algebra_solver_control& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const index_op& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const map_rect& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const index_op_sliced& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const index_op& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const conditional_op& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const index_op_sliced& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const binary_op& e) const;
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const conditional_op& e) const;
 
-      /**
-       * Return string representation for expression.
-       */
-      std::string operator()(const unary_op& e) const;
-    };
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const binary_op& e) const;
 
-  }
-}
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const unary_op& e) const;
+};
+
+}  // namespace lang
+}  // namespace stan
 #endif

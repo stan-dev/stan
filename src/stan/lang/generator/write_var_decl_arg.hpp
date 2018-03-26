@@ -5,8 +5,9 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/get_verbose_var_type.hpp>
-#include <string>
 #include <ostream>
+#include <string>
+#include <vector>
 
 namespace stan {
   namespace lang {
@@ -33,10 +34,9 @@ namespace stan {
                        const std::vector<expression>& ar_lens,
                        const expression& arg1,
                        const expression& arg2,
-                       std::ostream& o){
-
-      bool ends_with_angle = 
-        cpp_type_str.at(cpp_type_str.length()-1) == '>';
+                       std::ostream& o) {
+      bool ends_with_angle
+        = cpp_type_str.at(cpp_type_str.length()-1) == '>';
 
       // innermost element initialization
       std::stringstream base_init;
@@ -66,17 +66,17 @@ namespace stan {
       for (size_t i = 0; i < ar_lens.size(); ++i) {
         o << "(";
         generate_expression(ar_lens[i], NOT_USER_FACING, o);
-        o << ", "; 
+        o << ", ";
         for (int j = 0; j < ct; ++j)
-          o << "vector<" ;
+          o << "vector<";
         o << cpp_type_str;
         for (int j = 0; j < ct; ++j) {
           if (j > 0 || ends_with_angle)
-            o << " "; // maybe not needed for c++11
-          o << ">" ;
+            o << " ";  // maybe not needed for c++11
+          o << ">";
         }
         --ct;
-      }      
+      }
       o << base_init.str();
       for (size_t i = 0; i < ar_lens.size(); ++i)
         o << ")";

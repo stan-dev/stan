@@ -29,11 +29,11 @@ namespace stan {
       if (btype.bare_type().is_double_type())
         ss << "scalar";
       // kludge - inconsistent naming specialized cholesky_factor types
-      else if (btype.name() == "cholesky_factor_cov") 
+      else if (btype.name() == "cholesky_factor_cov")
         ss << "cholesky_factor";
       else if (btype.name() == "cholesky_factor_corr")
         ss << "cholesky_corr";
-      else 
+      else
         ss << btype.name();
 
       if (btype.has_def_bounds()) {

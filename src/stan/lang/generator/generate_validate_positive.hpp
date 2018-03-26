@@ -34,7 +34,6 @@ namespace stan {
     void generate_validate_positive(const std::string& name,
                                     const expression& expr,
                                     int indent, std::ostream& o) {
-
       generate_indent(indent, o);
       o << "validate_non_negative_index(\"" << name << "\", ";
       generate_quoted_expression(expr, o);

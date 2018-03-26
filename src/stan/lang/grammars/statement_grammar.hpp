@@ -187,8 +187,8 @@ namespace stan {
       statement_sub_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<std::vector<local_var_decl>,
-                                                        scope>,
+             boost::spirit::qi::locals<std::vector<local_var_decl>,
+                                       scope>,
                               statements(scope, bool),
                               whitespace_grammar<Iterator> >
       statement_seq_r;

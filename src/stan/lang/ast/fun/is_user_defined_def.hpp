@@ -16,20 +16,17 @@ namespace stan {
     bool is_user_defined(const std::string& name,
                          const std::vector<expression>& args) {
       std::vector<bare_expr_type> arg_types;
-      for (size_t i = 0; i <  args.size(); ++i)
+      for (size_t i = 0; i < args.size(); ++i)
         arg_types.push_back(args[i].bare_type());
       function_signature_t sig;
-      int matches
-        = function_signatures::instance()
-        .get_signature_matches(name, arg_types, sig);
-      //TODO:mitzi trace matches != 1
+      int matches = function_signatures::instance().get_signature_matches(
+                                                    name, arg_types, sig);
       if (matches != 1)
-        return false;  //TODO:mitzi throw exception?
-      std::pair<std::string, function_signature_t>
-        name_sig(name, sig);
+        return false;
+      std::pair<std::string, function_signature_t> name_sig(name, sig);
       return function_signatures::instance().is_user_defined(name_sig);
     }
 
-  }
-}
+  }  // namespace lang
+}  // namespace stan
 #endif

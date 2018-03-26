@@ -19,137 +19,138 @@
 #include <boost/variant/static_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Visitor to get base type from array type.
-     */
-    struct block_array_base_type_vis : public boost::static_visitor<block_var_type> {
-      /**
-       * Construct a visitor.
-       */
-      block_array_base_type_vis();
+/**
+ * Visitor to get base type from array type.
+ */
+struct block_array_base_type_vis
+    : public boost::static_visitor<block_var_type> {
+  /**
+   * Construct a visitor.
+   */
+  block_array_base_type_vis();
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return base type
-       */
-      block_var_type operator()(const block_array_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return base type
+   */
+  block_var_type operator()(const block_array_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const cholesky_factor_corr_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const cholesky_factor_corr_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const cholesky_factor_cov_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const cholesky_factor_cov_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const corr_matrix_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const corr_matrix_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const cov_matrix_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const cov_matrix_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const double_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const double_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const ill_formed_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const ill_formed_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const int_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const int_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const matrix_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const matrix_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const ordered_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const ordered_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const positive_ordered_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const positive_ordered_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const row_vector_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const row_vector_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const simplex_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const simplex_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const unit_vector_block_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const unit_vector_block_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      block_var_type operator()(const vector_block_type& x) const;
-    };
-  }
-}
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  block_var_type operator()(const vector_block_type& x) const;
+};
+}  // namespace lang
+}  // namespace stan
 #endif

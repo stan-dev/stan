@@ -4,6 +4,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/generate_validate_positive.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {

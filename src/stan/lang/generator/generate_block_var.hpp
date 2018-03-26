@@ -28,7 +28,6 @@ namespace stan {
     void generate_block_var(const block_var_decl& var_decl,
                              const std::string& type_str,
                              int indent, std::ostream& o) {
-
       std::string var_name(var_decl.name());
       if (var_decl.type().num_dims() > 0)
         generate_validate_var_dims(var_decl, indent, o);
@@ -42,10 +41,10 @@ namespace stan {
       } else {
         generate_initializer(var_decl.type(), type_str, o);
         o << ";" << EOL;
-      }        
-
+      }
       generate_indent(indent, o);
-      o << "stan::math::initialize(" << var_decl.name() << ", DUMMY_VAR__);" << EOL;
+      o << "stan::math::initialize(" << var_decl.name() << ", DUMMY_VAR__);"
+        << EOL;
 
       generate_indent(indent, o);
       o << "stan::math::fill(" << var_decl.name() << ", DUMMY_VAR__);" << EOL;
@@ -58,8 +57,7 @@ namespace stan {
         generate_expression(var_decl.def(), NOT_USER_FACING, o);
         o << ");" << EOL;
       }
-    }        
-
+    }
   }
 }
 #endif

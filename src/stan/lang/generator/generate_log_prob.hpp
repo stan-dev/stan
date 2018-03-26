@@ -52,13 +52,14 @@ namespace stan {
 
       generate_try(2, o);
       generate_indent(3, o);
-      o << "stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);" << EOL;
-      o << EOL;
+      o << "stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);"
+        << EOL << EOL;
 
       generate_comment("model parameters", 3, o);
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i) {
         generate_indent(3, o);
-        o << "current_statement_begin__ = " <<  prog.parameter_decl_[i].begin_line_ << ";"
+        o << "current_statement_begin__ = "
+          <<  prog.parameter_decl_[i].begin_line_ << ";"
           << EOL;
         generate_param_var(prog.parameter_decl_[i], gen_local_vars, 3, o);
         o << EOL;
@@ -68,19 +69,21 @@ namespace stan {
         generate_comment("transformed parameters", 3, o);
         for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
           generate_indent(3, o);
-          o << "current_statement_begin__ = " <<  prog.derived_decl_.first[i].begin_line_ << ";"
+          o << "current_statement_begin__ = "
+            <<  prog.derived_decl_.first[i].begin_line_ << ";"
             << EOL;
-          generate_block_var(prog.derived_decl_.first[i], "local_scalar_t__", 3, o);
+          generate_block_var(prog.derived_decl_.first[i], "local_scalar_t__",
+                             3, o);
           o << EOL;
         }
       }
-      
+
       if (prog.derived_decl_.second.size() > 0) {
         generate_comment("transformed parameters block statements", 3, o);
         generate_statements(prog.derived_decl_.second, 3, o);
         o << EOL;
       }
-      
+
       if (prog.derived_decl_.first.size() > 0) {
         generate_comment("validate transformed parameters", 3, o);
         o << INDENT3
@@ -103,7 +106,7 @@ namespace stan {
           }
         }
         o << EOL;
-      }      
+      }
 
       generate_comment("model body", 3, o);
       generate_statement(prog.statement_, 3, o);

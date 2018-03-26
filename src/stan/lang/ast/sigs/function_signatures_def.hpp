@@ -202,13 +202,13 @@ namespace stan {
 
     void function_signatures::add_unary_vectorized(const::std::string&
                                                    name) {
-
       // note:  vectorized functions always return elements of type real;
       //        integer elements are promoted to real elements
       add(name, bare_expr_type(double_type()), bare_expr_type(int_type()));
       add(name, bare_expr_type(double_type()), bare_expr_type(double_type()));
       add(name, bare_expr_type(vector_type()), bare_expr_type(vector_type()));
-      add(name, bare_expr_type(row_vector_type()), bare_expr_type(row_vector_type()));
+      add(name, bare_expr_type(row_vector_type()),
+          bare_expr_type(row_vector_type()));
       add(name, bare_expr_type(matrix_type()), bare_expr_type(matrix_type()));
 
       int_type tInt;
@@ -257,7 +257,8 @@ namespace stan {
     }
 
     template<typename T>
-    bare_expr_type function_signatures::rng_return_type(const bare_expr_type& t) {
+    bare_expr_type
+    function_signatures::rng_return_type(const bare_expr_type& t) {
       T return_type;
       return t.is_primitive() ?
         bare_expr_type(return_type) :
@@ -270,7 +271,8 @@ namespace stan {
                             const bare_expr_type& u) {
       T return_type;
       return t.is_primitive() && u.is_primitive()
-        ? bare_expr_type(return_type) : bare_expr_type(bare_array_type(return_type, 1));
+        ? bare_expr_type(return_type)
+        : bare_expr_type(bare_array_type(return_type, 1));
     }
 
     template<typename T>
@@ -302,8 +304,8 @@ namespace stan {
     }
 
     int function_signatures::get_signature_matches(const std::string& name,
-                                                   const std::vector<bare_expr_type>& args,
-                                                   function_signature_t& signature) {
+                             const std::vector<bare_expr_type>& args,
+                             function_signature_t& signature) {
       if (!has_key(name)) return 0;
       std::vector<function_signature_t> signatures = sigs_map_[name];
       size_t min_promotions = std::numeric_limits<size_t>::max();
@@ -410,9 +412,9 @@ namespace stan {
     }
 
     bare_expr_type function_signatures::get_result_type(const std::string& name,
-                                                   const std::vector<bare_expr_type>& args,
-                                                   std::ostream& error_msgs,
-                                                   bool sampling_error_style) {
+                                        const std::vector<bare_expr_type>& args,
+                                        std::ostream& error_msgs,
+                                        bool sampling_error_style) {
       std::vector<function_signature_t> signatures = sigs_map_[name];
       size_t match_index = 0;
       size_t min_promotions = std::numeric_limits<size_t>::max();

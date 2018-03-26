@@ -5,6 +5,7 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_var_constructor.hpp>
+#include <string>
 #include <ostream>
 #include <vector>
 
@@ -23,7 +24,6 @@ namespace stan {
      */
     void generate_data_var_ctor(const block_var_decl& var_decl,
                                 int indent, std::ostream& o) {
-
       std::string var_name(var_decl.name());
       block_var_type btype = (var_decl.type());
       if (btype.is_array_type())

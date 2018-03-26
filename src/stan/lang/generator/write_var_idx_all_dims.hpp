@@ -21,7 +21,6 @@ namespace stan {
     void write_var_idx_all_dims(size_t num_ar_dims,
                                 size_t num_args,
                                 std::ostream& o) {
-
       for (size_t i = 0; i < num_ar_dims; ++i)
         o << "[k_" << i << "__]";
 

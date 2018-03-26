@@ -31,7 +31,6 @@ namespace stan {
      */
     void generate_data_var_init(const block_var_decl& var_decl,
                                 int indent, std::ostream& o) {
-
       // setup - name, type, and var shape
       std::string var_name(var_decl.name());
       block_var_type vtype = (var_decl.type());
@@ -44,10 +43,11 @@ namespace stan {
         vals = "vals_i";
 
       generate_indent(indent, o);
-      o << vals << "__ = context__." << vals << "(\"" << var_name << "\");" << EOL;
+      o << vals << "__ = context__." << vals
+        << "(\"" << var_name << "\");" << EOL;
       generate_indent(indent, o);
       o << "pos__ = 0;" << EOL;
-      
+
       write_begin_all_dims_col_maj_loop(var_decl, true, indent, o);
 
       // innermost loop stmt: update pos__
@@ -58,7 +58,7 @@ namespace stan {
       o << " = " << vals << "__[pos__++]; " << EOL;
 
       write_end_loop(vtype.num_dims(), indent, o);
-    }        
+    }
 
   }
 }

@@ -83,7 +83,8 @@ namespace stan {
       /**
        * Transformed parameters block.
        */
-      std::pair<std::vector<block_var_decl>, std::vector<statement> > derived_decl_;
+      std::pair<std::vector<block_var_decl>,
+                std::vector<statement> > derived_decl_;
 
       /**
        * Model block.
@@ -93,7 +94,8 @@ namespace stan {
       /**
        * Generated quantities block.
        */
-      std::pair<std::vector<block_var_decl>, std::vector<statement> > generated_decl_;
+      std::pair<std::vector<block_var_decl>,
+                std::vector<statement> > generated_decl_;
     };
 
   }

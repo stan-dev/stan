@@ -13,19 +13,19 @@ namespace stan {
      */
     std::string
     get_verbose_var_type(const bare_expr_type bare_type) {
-
       bare_expr_type bt(bare_type);
       if (bt.is_array_type())
         bt = bt.array_contains();
-      
+
       if (bt.is_matrix_type()) {
-        return "Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>";
+        return
+          "Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, Eigen::Dynamic>";
       } else if (bt.is_row_vector_type()) {
         return "Eigen::Matrix<local_scalar_t__, 1, Eigen::Dynamic>";
       } else if (bt.is_vector_type()) {
         return "Eigen::Matrix<local_scalar_t__, Eigen::Dynamic, 1>";
       } else if (bt.is_double_type()) {
-        return "local_scalar_t__";   // gets typedef'd in ctor, log_prob methods
+        return "local_scalar_t__";
       } else if (bt.is_int_type()) {
         return "int";
       }

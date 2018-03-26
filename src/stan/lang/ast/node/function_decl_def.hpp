@@ -32,7 +32,8 @@ namespace stan {
        * @param[in] body function body
        * 
        */
-      function_decl_def(const bare_expr_type& return_type, const std::string& name,
+      function_decl_def(const bare_expr_type& return_type,
+                        const std::string& name,
                         const std::vector<var_decl>& arg_decls,
                         const statement& body);
 

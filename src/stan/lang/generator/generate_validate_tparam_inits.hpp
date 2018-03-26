@@ -14,8 +14,6 @@
 namespace stan {
   namespace lang {
 
-    // check initialization
-    
     /**
      * Generate code to validate the specified variable declaration
      * using the specified indentation level and stream.
@@ -28,9 +26,8 @@ namespace stan {
      */
     void generate_validate_tparam_inits(const block_var_decl decl,
                                         int indent, std::ostream& o) {
-
       write_begin_all_dims_row_maj_loop(decl, true, indent, o);
-      
+
       // innermost loop stmt: do check, throw exception
       generate_indent(indent + decl.bare_type().num_dims(), o);
       o << "if (stan::math::is_uninitialized(" << decl.name();
@@ -43,12 +40,13 @@ namespace stan {
       o << "std::stringstream msg__;" << EOL;
 
       generate_indent(indent + decl.bare_type().num_dims() + 1, o);
-      o << "msg__ << \"Undefined transformed parameter: " << decl.name() << "\"";
+      o << "msg__ << \"Undefined transformed parameter: " << decl.name()
+        << "\"";
       write_var_idx_all_dims_msg(decl.bare_type().array_dims(),
-                    decl.bare_type().num_dims() - decl.bare_type().array_dims(),
+            decl.bare_type().num_dims() - decl.bare_type().array_dims(),
                     o);
       o << ";" << EOL;
-      
+
       generate_indent(indent + decl.bare_type().num_dims() + 1, o);
       o << "stan::lang::rethrow_located("
         << "std::runtime_error(std::string(\"Error initializing variable "
@@ -58,7 +56,7 @@ namespace stan {
 
       generate_indent(indent + decl.bare_type().num_dims(), o);
       o << "}" << EOL;
-      
+
       write_end_loop(decl.bare_type().num_dims(), indent, o);
     }
   }

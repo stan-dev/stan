@@ -66,8 +66,9 @@ namespace stan {
   namespace lang {
 
     template <typename Iterator>
-    block_var_decls_grammar<Iterator>::block_var_decls_grammar(variable_map& var_map,
-                                                               std::stringstream& error_msgs)
+    block_var_decls_grammar<Iterator>::block_var_decls_grammar(
+                                       variable_map& var_map,
+                                       std::stringstream& error_msgs)
       : block_var_decls_grammar::base_type(var_decls_r),
         var_map_(var_map),
         error_msgs_(error_msgs),
@@ -103,7 +104,7 @@ namespace stan {
           | raw[single_var_decl_r(_r1)[assign_lhs_f(_val, _1)]]
                [add_line_number_f(_val, begin(_1), end(_1))]
             )
-        > eps  
+        > eps
         [add_to_var_map_f(_val, boost::phoenix::ref(var_map_), _pass, _r1,
                          boost::phoenix::ref(error_msgs_)),
          validate_definition_f(_r1, _val, _pass,
@@ -128,7 +129,7 @@ namespace stan {
            > eps
            [validate_single_block_var_decl_f(_val, _pass,
                                              boost::phoenix::ref(error_msgs_))];
-      
+
       element_type_r.name("block var element type declaration");
       element_type_r
         %= (int_type_r(_r1)
@@ -144,7 +145,7 @@ namespace stan {
             | cov_matrix_type_r(_r1)
             | cholesky_factor_corr_type_r(_r1)
             | cholesky_factor_cov_type_r(_r1));
-      
+
       int_type_r.name("integer type");
       int_type_r
         %= (lit("int")

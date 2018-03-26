@@ -7,53 +7,53 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    struct expresssion;
+struct expresssion;
 
-    /**
-     * Structure to hold an array expression.
-     */
-    struct array_expr {
-      /**
-       * Sequence of expressions for array values.
-       */
-      std::vector<expression> args_;
+/**
+ * Structure to hold an array expression.
+ */
+struct array_expr {
+  /**
+   * Sequence of expressions for array values.
+   */
+  std::vector<expression> args_;
 
-      /**
-       * Type of array.
-       */
-      bare_expr_type type_;
-      
-      /**
-       * True if there is a variable within any of the expressions
-       * that is a parameter, transformed parameter, or non-integer
-       * local variable.
-       */
-      bool has_var_;
+  /**
+   * Type of array.
+   */
+  bare_expr_type type_;
 
-      /**
-       * Scope of this array expression.
-       *
-       */
-      scope array_expr_scope_;
+  /**
+   * True if there is a variable within any of the expressions
+   * that is a parameter, transformed parameter, or non-integer
+   * local variable.
+   */
+  bool has_var_;
 
-      /**
-       * Construct a default array expression.
-       */
-      array_expr();
+  /**
+   * Scope of this array expression.
+   *
+   */
+  scope array_expr_scope_;
 
-      /**
-       * Construct an array expression from the specified sequence of
-       * expressions.
-       * Note:  0-length array expression not allowed; args vector
-       * must have at least 1 element.
-       *
-       * @param args non-empty vector of array expression elements. 
-       */
-      explicit array_expr(const std::vector<expression>& args);
-    };
+  /**
+   * Construct a default array expression.
+   */
+  array_expr();
 
-  }
-}
+  /**
+   * Construct an array expression from the specified sequence of
+   * expressions.
+   * Note:  0-length array expression not allowed; args vector
+   * must have at least 1 element.
+   *
+   * @param args non-empty vector of array expression elements.
+   */
+  explicit array_expr(const std::vector<expression>& args);
+};
+
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -15,7 +15,8 @@ namespace stan {
      * @param[in,out] o stream for generating
      */
     void generate_typedefs(std::ostream& o) {
-      generate_typedef("Eigen::Matrix<double, Eigen::Dynamic, 1>", "vector_d", o);
+      generate_typedef("Eigen::Matrix<double, Eigen::Dynamic, 1>",
+                       "vector_d", o);
       generate_typedef("Eigen::Matrix<double, 1, Eigen::Dynamic>",
                        "row_vector_d", o);
       generate_typedef("Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>",

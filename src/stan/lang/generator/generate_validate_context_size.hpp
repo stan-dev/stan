@@ -28,7 +28,6 @@ namespace stan {
                                         const std::string& stage,
                                         size_t indent,
                                         std::ostream& o) {
-
       std::string var_name(var_decl.name());
       block_var_type btype = (var_decl.type());
       if (btype.is_array_type())

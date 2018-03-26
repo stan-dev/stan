@@ -82,13 +82,14 @@ namespace stan {
     void generate_constructor(const program& prog,
                               const std::string& model_name, std::ostream& o) {
       generate_method_begin(model_name, o);
-      
+
       generate_try(2, o);
       generate_comment("initialize data block variables from context__", 3, o);
       // todo:  bundle into single function
       for (size_t i = 0; i < prog.data_decl_.size(); ++i) {
         generate_indent(3, o);
-        o << "current_statement_begin__ = " <<  prog.data_decl_[i].begin_line_ << ";"
+        o << "current_statement_begin__ = "
+          <<  prog.data_decl_[i].begin_line_ << ";"
           << EOL;
         generate_validate_var_dims(prog.data_decl_[i], 3, o);
         generate_validate_context_size(prog.data_decl_[i],

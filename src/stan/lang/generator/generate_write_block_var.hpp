@@ -28,7 +28,7 @@ namespace stan {
             var_decl.type().num_dims() - var_decl.type().array_dims(), o);
       o << ");" << EOL;
       write_end_loop(var_decl.type().num_dims(), indent, o);
-    }        
+    }
 
   }
 }

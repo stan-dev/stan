@@ -8,6 +8,7 @@
 #include <stan/lang/generator/write_var_decl_arg.hpp>
 #include <stan/lang/generator/write_var_decl_type.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {
@@ -25,8 +26,8 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o stream for generating
      */
-    void generate_local_var_decl_inits(const std::vector<local_var_decl>& vs, int indent,
-                                  std::ostream& o) {
+    void generate_local_var_decl_inits(const std::vector<local_var_decl>& vs,
+                                       int indent, std::ostream& o) {
       for (size_t i = 0; i < vs.size(); ++i) {
         generate_indent(indent, o);
         o << "current_statement_begin__ = " <<  vs[i].begin_line_ << ";"
@@ -45,7 +46,7 @@ namespace stan {
         for (int i = 1; i < ar_dims; ++i)
           generate_validate_positive(var_name, ar_lens[i], indent, o);
 
-        // declare 
+        // declare
         write_var_decl_type(ltype.bare_type(), cpp_type_str,
                             ar_dims, indent, o);
         o << " " << var_name;

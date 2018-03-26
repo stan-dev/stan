@@ -11,73 +11,74 @@
 #include <boost/variant/static_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Visitor to get base type from array type.
-     */
-    struct local_array_base_type_vis : public boost::static_visitor<local_var_type> {
-      /**
-       * Construct a visitor.
-       */
-      local_array_base_type_vis();
+/**
+ * Visitor to get base type from array type.
+ */
+struct local_array_base_type_vis
+    : public boost::static_visitor<local_var_type> {
+  /**
+   * Construct a visitor.
+   */
+  local_array_base_type_vis();
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return base type
-       */
-      local_var_type operator()(const local_array_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return base type
+   */
+  local_var_type operator()(const local_array_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      local_var_type operator()(const double_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  local_var_type operator()(const double_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      local_var_type operator()(const ill_formed_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  local_var_type operator()(const ill_formed_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      local_var_type operator()(const int_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  local_var_type operator()(const int_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      local_var_type operator()(const matrix_local_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  local_var_type operator()(const matrix_local_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      local_var_type operator()(const row_vector_local_type& x) const;
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  local_var_type operator()(const row_vector_local_type& x) const;
 
-      /**
-       * Return base type held by array type.
-       *
-       * @param x type
-       * @return ill_formed_type
-       */
-      local_var_type operator()(const vector_local_type& x) const;
-    };
-  }
-}
+  /**
+   * Return base type held by array type.
+   *
+   * @param x type
+   * @return ill_formed_type
+   */
+  local_var_type operator()(const vector_local_type& x) const;
+};
+}  // namespace lang
+}  // namespace stan
 #endif

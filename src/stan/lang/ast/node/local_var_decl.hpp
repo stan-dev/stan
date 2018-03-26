@@ -7,94 +7,90 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Structure to hold a local variable declaration.
-     * Local variables have specified sizes.
-     */
-    struct local_var_decl : public var_decl {
+/**
+ * Structure to hold a local variable declaration.
+ * Local variables have specified sizes.
+ */
+struct local_var_decl : public var_decl {
+  /**
+   * The line in the source code where the declaration begins.
+   */
+  std::size_t begin_line_;
 
-      /**
-       * The line in the source code where the declaration begins.
-       */
-      std::size_t begin_line_;
+  /**
+   * The line in the source code where the declaration ends.
+   */
+  std::size_t end_line_;
 
-      /**
-       * The line in the source code where the declaration ends.
-       */
-      std::size_t end_line_;
+  /**
+   * Type-specific sizes.
+   */
+  local_var_type type_;
 
-      /**
-       * Type-specific sizes.
-       */
-      local_var_type type_;
+  /**
+   * Construct a default variable declaration.
+   */
+  local_var_decl();
 
-      /**
-       * Construct a default variable declaration.
-       */
-      local_var_decl();
+  /**
+   * Construct a local variable declaration with the specified
+   * name and type.
+   *
+   * @param name variable name
+   * @param type variable type
+   */
+  local_var_decl(const std::string& name, const local_var_type& type);
 
-      /**
-       * Construct a local variable declaration with the specified
-       * name and type.
-       *
-       * @param name variable name
-       * @param type variable type
-       */
-      local_var_decl(const std::string& name,
-                     const local_var_type& type);
+  /**
+   * Construct a local variable declaration with the specified
+   * name, type, and definition.
+   *
+   * @param name variable name
+   * @param tyep variable type
+   * @param def definition
+   */
+  local_var_decl(const std::string& name, const local_var_type& type,
+                 const expression& def);
 
-      /**
-       * Construct a local variable declaration with the specified
-       * name, type, and definition.
-       *
-       * @param name variable name
-       * @param tyep variable type
-       * @param def definition
-       */
-      local_var_decl(const std::string& name,
-                     const local_var_type& type,
-                     const expression& def);
+  /**
+   * Return the variable declaration's bare expr type.
+   *
+   * @return the bare expr type
+   */
+  bare_expr_type bare_type() const;
 
+  /**
+   * Return the variable declaration's definition.
+   *
+   * @return expression definition for this variable
+   */
+  expression def() const;
 
-      /**
-       * Return the variable declaration's bare expr type.
-       *
-       * @return the bare expr type
-       */
-      bare_expr_type bare_type() const;
+  /**
+   * Return true if variable declaration contains a definition.
+   *
+   * @return bool indicating has or doesn't have definition
+   */
+  bool has_def() const;
 
-      /**
-       * Return the variable declaration's definition.
-       *
-       * @return expression definition for this variable
-       */
-      expression def() const;
+  /**
+   * Return the variable declaration's name.
+   *
+   * @return name of variable
+   */
+  std::string name() const;
 
-      /**
-       * Return true if variable declaration contains a definition.
-       *
-       * @return bool indicating has or doesn't have definition
-       */
-      bool has_def() const;
+  /**
+   * Return the variable declaration's local_var_type
+   * which contains size specifications.
+   *
+   * @return local_var_type
+   */
+  local_var_type type() const;
+};
 
-      /**
-       * Return the variable declaration's name.
-       *
-       * @return name of variable
-       */
-      std::string name() const;
-
-      /**
-       * Return the variable declaration's local_var_type
-       * which contains size specifications.
-       *
-       * @return local_var_type
-       */
-      local_var_type type() const;
-    };
-
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

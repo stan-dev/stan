@@ -327,7 +327,8 @@ namespace stan {
                       bool& pass,
                       std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<validate_fun_arg_var> validate_fun_arg_var_f;
+    extern
+    boost::phoenix::function<validate_fun_arg_var> validate_fun_arg_var_f;
 
     // called from: indexes_grammar
     struct set_omni_idx : public phoenix_functor_unary {
@@ -469,8 +470,8 @@ namespace stan {
 
     // called from: statement_grammar
     struct unscope_locals : public phoenix_functor_binary {
-      void operator()(const std::vector<local_var_decl>& var_decls, variable_map& vm)
-        const;
+      void operator()(const std::vector<local_var_decl>& var_decls,
+                      variable_map& vm) const;
     };
     extern boost::phoenix::function<unscope_locals> unscope_locals_f;
 
@@ -899,7 +900,6 @@ namespace stan {
     };
     extern boost::phoenix::function<set_int_range_upper> set_int_range_upper_f;
 
-    // TODO:mitzi - need validate int rule elsewhere?
     struct validate_int_data_only_expr : public phoenix_functor_quaternary {
       void operator()(const expression& expr, bool& pass, variable_map& var_map,
                       std::stringstream& error_msgs)

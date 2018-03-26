@@ -23,142 +23,141 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
-    
-    struct expression_bare_type_vis : public boost::static_visitor<bare_expr_type> {
-      /**
-       * Construct a visitor.
-       */
-      expression_bare_type_vis();
+namespace lang {
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const nil& e) const;
+struct expression_bare_type_vis : public boost::static_visitor<bare_expr_type> {
+  /**
+   * Construct a visitor.
+   */
+  expression_bare_type_vis();
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const int_literal& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const nil& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const double_literal& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const int_literal& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const array_expr& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const double_literal& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const matrix_expr& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const array_expr& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const row_vector_expr& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const matrix_expr& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const variable& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const row_vector_expr& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const fun& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const variable& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const integrate_ode& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const fun& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const integrate_ode_control& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const integrate_ode& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const algebra_solver& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const integrate_ode_control& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const algebra_solver_control& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const algebra_solver& e) const;
 
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const algebra_solver_control& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const map_rect& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const map_rect& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const index_op& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const index_op& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const index_op_sliced& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const index_op_sliced& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const conditional_op& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const conditional_op& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const binary_op& e) const;
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const binary_op& e) const;
 
-      /**
-       * Return the bare_expr_type corresponding to this expression
-       *
-       * @return bare expression type
-       */
-      bare_expr_type operator()(const unary_op& e) const;
-    };
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const unary_op& e) const;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

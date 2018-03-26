@@ -5,15 +5,15 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    size_t num_index_op_dims(const std::vector<std::vector<expression> >& dimss) {
-      size_t total = 0U;
-      for (size_t i = 0; i < dimss.size(); ++i)
-        total += dimss[i].size();
-      return total;
-    }
-
-  }
+size_t num_index_op_dims(const std::vector<std::vector<expression> >& dimss) {
+  size_t total = 0U;
+  for (size_t i = 0; i < dimss.size(); ++i)
+    total += dimss[i].size();
+  return total;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

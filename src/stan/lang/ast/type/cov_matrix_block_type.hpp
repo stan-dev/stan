@@ -4,36 +4,36 @@
 #include <stan/lang/ast/node/expression.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Covariance matrix block var type.
-     */
-    struct cov_matrix_block_type {
-      /**
-       * Number of rows and columns
-       */
-      expression K_;
+/**
+ * Covariance matrix block var type.
+ */
+struct cov_matrix_block_type {
+  /**
+   * Number of rows and columns
+   */
+  expression K_;
 
-      /**
-       * Construct a block var type with default values.
-       */
-      cov_matrix_block_type();
+  /**
+   * Construct a block var type with default values.
+   */
+  cov_matrix_block_type();
 
-      /**
-       * Construct a block var type with specified values.
-       * Size should be int expression - constructor doesn't check.
-       *
-       * @param K cov matrix size
-       */
-      cov_matrix_block_type(const expression& K);
+  /**
+   * Construct a block var type with specified values.
+   * Size should be int expression - constructor doesn't check.
+   *
+   * @param K cov matrix size
+   */
+  cov_matrix_block_type(const expression& K);  // NOLINT(runtime/explicit)
 
-      /**
-       * Get K (cov matrix num rows, columns)
-       */
-      expression K() const;
-    };
+  /**
+   * Get K (cov matrix num rows, columns)
+   */
+  expression K() const;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

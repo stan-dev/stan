@@ -6,6 +6,7 @@
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {

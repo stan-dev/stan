@@ -4,13 +4,12 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
-    ordered_block_type::ordered_block_type() : K_(nil()) { }
-    
-    ordered_block_type::ordered_block_type(const expression& K)
-      : K_(K) { }
+namespace lang {
+ordered_block_type::ordered_block_type() : K_(nil()) {}
 
-    expression ordered_block_type::K() const { return K_; }
-  }
-}
+ordered_block_type::ordered_block_type(const expression& K) : K_(K) {}
+
+expression ordered_block_type::K() const { return K_; }
+}  // namespace lang
+}  // namespace stan
 #endif

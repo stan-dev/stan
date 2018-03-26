@@ -24,7 +24,6 @@ namespace stan {
     void generate_initializer(const T& var_type,
                               const std::string& scalar_t_name,
                               std::ostream& o) {
-
       std::vector<expression> ar_dim_sizes = var_type.array_lens();
       bare_expr_type bare_type = var_type.array_element_type().bare_type();
       expression arg1 = var_type.arg1();
@@ -49,7 +48,7 @@ namespace stan {
         generate_expression(arg1.expr_, NOT_USER_FACING, o);
         if (!is_nil(arg2)) {
           o << ", ";
-          generate_expression(arg2.expr_, NOT_USER_FACING,o);
+          generate_expression(arg2.expr_, NOT_USER_FACING, o);
         }
       } else {
         o << "0";

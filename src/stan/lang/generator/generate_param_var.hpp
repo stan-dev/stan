@@ -30,7 +30,6 @@ namespace stan {
     void generate_param_var(const block_var_decl& var_decl,
                             bool gen_decl_stmt,
                             int indent, std::ostream& o) {
-
       // setup - name, type, and var shape
       std::string var_name(var_decl.name());
       std::vector<expression> dims(var_decl.type().array_lens());
@@ -42,8 +41,8 @@ namespace stan {
       std::string constrain_str = write_constraints_fn(btype, "constrain");
       std::string lp_arg("lp__)");
       if (btype.has_def_bounds() || !btype.bare_type().is_double_type())
-        lp_arg= ", lp__)";
-      
+        lp_arg = ", lp__)";
+
       // declare
       if (gen_decl_stmt) {
         generate_indent(indent, o);
@@ -53,7 +52,7 @@ namespace stan {
 
       // init
       write_nested_resize_loop_begin(var_name, dims, indent, o);
-      
+
       // innermost loop stmt: read in param, apply jacobian
       generate_indent(indent + dims.size(), o);
       o << "if (jacobian__)" << EOL;
@@ -63,8 +62,7 @@ namespace stan {
         o << var_name;
         write_resize_var_idx(dims.size(), o);
         o << ".push_back(in__." << constrain_str << lp_arg << ");" << EOL;
-      }
-      else {
+      } else {
         o << var_name << " = in__." << constrain_str << lp_arg << ";" << EOL;
       }
 
@@ -76,13 +74,12 @@ namespace stan {
         o << var_name;
         write_resize_var_idx(dims.size(), o);
         o << ".push_back(in__." << constrain_str << "));" << EOL;
-      }
-      else {
+      } else {
         o << var_name << " = in__." << constrain_str << ");" << EOL;
       }
-      
+
       write_end_loop(dims.size(), indent, o);
-    }        
+    }
 
   }
 }

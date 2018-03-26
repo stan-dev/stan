@@ -26,7 +26,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::program,
                            function_decl_defs_)
                           (std::vector<stan::lang::block_var_decl>, data_decl_)
                           (DUMMY_STRUCT::type, derived_data_decl_)
-                          (std::vector<stan::lang::block_var_decl>, parameter_decl_)
+                          (std::vector<stan::lang::block_var_decl>,
+                           parameter_decl_)
                           (DUMMY_STRUCT::type, derived_decl_)
                           (stan::lang::statement, statement_)
                           (DUMMY_STRUCT::type, generated_decl_) )

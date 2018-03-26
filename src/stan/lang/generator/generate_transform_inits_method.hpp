@@ -9,7 +9,6 @@
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_validate_context_size.hpp>
 #include <stan/lang/generator/generate_validate_var_dims.hpp>
-#include <stan/lang/generator/write_constraints_fn.hpp>
 #include <stan/lang/generator/write_begin_all_dims_col_maj_loop.hpp>
 #include <stan/lang/generator/write_begin_array_dims_loop.hpp>
 #include <stan/lang/generator/write_constraints_fn.hpp>
@@ -43,7 +42,7 @@ namespace stan {
       o << INDENT << "                     std::ostream* pstream__) const {"
         << EOL;
       o << INDENT2 << "stan::io::writer<double> "
-        << "writer__(params_r__, params_i__);"        
+        << "writer__(params_r__, params_i__);"
         << EOL;
 
       o << INDENT2 << "size_t pos__;" << EOL;
@@ -80,7 +79,7 @@ namespace stan {
       o << INDENT << "    params_r(i) = params_r_vec[i];" << EOL;
       o << INDENT << "}" << EOL2;
     }
-    
+
     /**
      * Generate the <code>transform_inits</code> method for the
      * specified parameter variable declarations to the specified stream.
@@ -94,7 +93,7 @@ namespace stan {
 
       generate_method_begin(o);
       o << EOL;
-      
+
       for (size_t i = 0; i < vs.size(); ++i) {
         std::string var_name(vs[i].name());
         block_var_type vtype = vs[i].type();
@@ -102,7 +101,6 @@ namespace stan {
         if (el_type.is_array_type())
           el_type = el_type.array_contains();
 
-        // TODO:mitzi : generate runtime error?
         // parser should prevent this from happening
         // avoid generating code that won't compile - flag/ignore int params
         if (vs[i].bare_type().is_int_type()) {
@@ -133,7 +131,7 @@ namespace stan {
           << var_name << "\");" << EOL;
         generate_indent(indent, o);
         o << "pos__ = 0U;" << EOL;
-        
+
         // validate dims, match against input sizes
         generate_validate_var_dims(vs[i], indent, o);
         generate_validate_context_size(vs[i], "parameter initialization",
@@ -148,7 +146,7 @@ namespace stan {
         } else {
           generate_initializer(vs[i].type(), "double", o);
           o << ";" << EOL;
-        }        
+        }
 
         // fill vals_r__ loop
         write_begin_all_dims_col_maj_loop(vs[i], true, indent, o);
@@ -164,10 +162,10 @@ namespace stan {
         write_begin_array_dims_loop(vs[i], true, indent, o);
         generate_indent(indent + vtype.array_dims(), o);
         o << "try {" << EOL;
-        
+
         generate_indent(indent + vtype.array_dims() + 1, o);
         o << "writer__." << write_constraints_fn(el_type, "unconstrain");
-        if (vs[i].type().has_def_bounds()) 
+        if (vs[i].type().has_def_bounds())
           o << ", ";
         o << var_name;
         write_var_idx_array_dims(vtype.array_dims(), o);

@@ -27,7 +27,7 @@ namespace stan {
         generate_validate_var_decl(var_decl, indent, o);
         o << EOL;
       }
-    }        
+    }
 
   }
 }

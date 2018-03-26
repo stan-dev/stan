@@ -30,10 +30,9 @@ namespace stan {
                         const std::string& cpp_type_str,
                         int ar_dims,
                         int indent,
-                        std::ostream& o){
-
-      bool ends_with_angle = 
-        cpp_type_str.at(cpp_type_str.length()-1) == '>';
+                        std::ostream& o) {
+      bool ends_with_angle
+        = cpp_type_str.at(cpp_type_str.length()-1) == '>';
 
       for (int i = 0; i < indent; ++i)
         o << INDENT;

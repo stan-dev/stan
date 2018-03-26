@@ -8,7 +8,7 @@ namespace stan {
   namespace lang {
     /**
      * Return cpp type name or typedef used for bare_expr_type.
-     * NOTE: (26/02/2018) 
+     * NOTE: (26/02/2018)
      *   typdefs come from `lib/stan_math/prim/mat/fun/typedefs.hpp`
      *   vectors and matrices of double (appropriate for data, not params)
      *
@@ -19,7 +19,7 @@ namespace stan {
       bare_expr_type bt(bare_type);
       if (bt.is_array_type())
         bt = bt.array_contains();
-      
+
       if (bt.is_matrix_type()) {
         return "matrix_d";
       } else if (bt.is_row_vector_type()) {
