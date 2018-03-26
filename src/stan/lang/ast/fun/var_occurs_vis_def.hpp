@@ -70,6 +70,10 @@ namespace stan {
       return false;  // no refs persist out of algebra_solver_control() call
     }
 
+    bool var_occurs_vis::operator()(const map_rect& e) const {
+      return false;  // no refs persist out of map_rect() call
+    }
+
     bool var_occurs_vis::operator()(const index_op& e) const {
       // refs only persist out of expression, not indexes
       return boost::apply_visitor(*this, e.expr_.expr_);

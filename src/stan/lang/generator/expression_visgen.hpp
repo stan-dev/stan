@@ -220,6 +220,20 @@ namespace stan {
         o_ << ")";
       }
 
+      void operator()(const map_rect& fx) const {
+        o_ << "map_rect";
+        o_ << "<" << fx.call_id_ << ", " << fx.fun_name_ << "_functor__>";
+        o_ << "(";
+        generate_expression(fx.shared_params_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.job_params_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.job_data_r_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.job_data_i_, NOT_USER_FACING, o_);
+        o_ << ", pstream__)";
+      }
+
       void operator()(const fun& fx) const {
         // first test if short-circuit op (binary && and || applied to
         // primitives; overloads are eager, not short-circuiting)
