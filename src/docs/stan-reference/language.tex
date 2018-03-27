@@ -2654,6 +2654,84 @@ example, \code{row\_vector~*~vector} returns a value of type
 \code{real}, which is declared in the function documentation and index
 as \code{real~operator*(row\_vector,vector)}.
 
+\section{Higher-Order Functions}
+
+There are several expression constructions in Stan that act as
+higher-order functions.%
+%
+\footnote{Interanlly, they are implemented as their own expression
+  types because Stan doesn't have object-level functional types
+  (yet).}
+%
+The higher-order functions and the signature of their argument
+functions are listed in \reffigure{higher-order-functions}.
+%
+\begin{figure}
+\small
+\begin{tabular}{r||c|c|c|}
+{\slshape function} & {\slshape unrestricted arguments} & {\slshape data arguments} & {\slshape return type}
+\\ \hline \hline
+\code{algebra\_solver}
+& \code{vector, vector}
+& \code{real[], int[]}
+& \code{vector}
+\\[2pt]
+\code{integrate\_ode\_{\slshape{X}}}
+& \code{real, real[], real[]}
+& \code{real[], int[]}
+& \code{real[]}
+\\[2pt]
+\code{map\_rect}
+& \code{vector, vector}
+& \code{real[], int[]}
+& \code{vector}
+\end{tabular}
+\caption{\small\it Higher-order functions in Stan with their argument
+  function types.  The first group of arguments has no restrictions.
+  The second group of arguments, consisting of a real and integer
+  array in all cases, must be expressions involving only data and
+  literals.}\label{higher-order-functions.figure}
+\end{figure}
+%
+For example, the rectangular mapping function might be used in the
+following way to compute the log likelihood of a hierarchical model.
+%
+\begin{stancode}
+functions {
+  vector foo_ll(vector phi, vector theta, real[] x_r, int[] x_i) {
+    ...
+...
+vector[11] phi;
+vector[2] thetas[N];
+real x_rs[N, 5];
+real x_is[N, 0];
+...
+target += sum(map_rect(foo_ll, phi, thetas, x_rs, x_is));
+\end{stancode}
+%
+The function argument is \code{foo}, the name of the user-defined
+function;  as shown in \reffigure{higher-order-functions}, \code{foo}
+takes two vectors, a real array, and an integer array as arguments and
+returns a vector.
+
+\subsection{Functions Passed by Reference}
+
+The function argument to higher-order functions is always passed as
+the first argument.  This function argument must be provided as the
+name of a user-defined or built-in function.  No quotes are
+necessary.
+
+\subsection{Data-Restricted Arguments}
+
+Some of the arguments to higher-order functions are restricted to
+data.  This means they must be expressions containing only data
+variables, transformed data variables, or literals;  the may contain
+arbitrary functions applied to data variables or literals, but must
+not contain parameters, transformed parameters, or local variables
+from any block other than transformed data.
+
+For user-defined functions the qualifier \code{data} may be prepended
+to the type to restrict the argument to data-only variables.
 
 
 \section{Chain Rule and Derivatives}

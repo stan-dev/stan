@@ -89,6 +89,7 @@
 #include <stan/lang/ast/node/integrate_ode_control_def.hpp>
 #include <stan/lang/ast/node/lb_idx_def.hpp>
 #include <stan/lang/ast/node/lub_idx_def.hpp>
+#include <stan/lang/ast/node/map_rect_def.hpp>
 #include <stan/lang/ast/node/matrix_var_decl_def.hpp>
 #include <stan/lang/ast/node/multi_idx_def.hpp>
 #include <stan/lang/ast/node/omni_idx_def.hpp>
