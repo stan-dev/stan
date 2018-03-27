@@ -51,28 +51,28 @@ add_binary("atan2");
 add_unary_vectorized("atanh");
 for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j) {
-    add("bernoulli_ccdf_log", expr_type(double_type()), int_vector_types[i], 
+    add("bernoulli_ccdf_log", expr_type(double_type()), int_vector_types[i],
 	vector_types[j]);
-    add("bernoulli_cdf", expr_type(double_type()), int_vector_types[i], 
+    add("bernoulli_cdf", expr_type(double_type()), int_vector_types[i],
 	vector_types[j]);
-    add("bernoulli_cdf_log", expr_type(double_type()), int_vector_types[i], 
+    add("bernoulli_cdf_log", expr_type(double_type()), int_vector_types[i],
 	vector_types[j]);
-    add("bernoulli_log", expr_type(double_type()), int_vector_types[i], 
+    add("bernoulli_log", expr_type(double_type()), int_vector_types[i],
 	vector_types[j]);
-    add("bernoulli_lccdf", expr_type(double_type()), int_vector_types[i], 
+    add("bernoulli_lccdf", expr_type(double_type()), int_vector_types[i],
 	vector_types[j]);
-    add("bernoulli_lcdf", expr_type(double_type()), int_vector_types[i], 
+    add("bernoulli_lcdf", expr_type(double_type()), int_vector_types[i],
 	vector_types[j]);
-    add("bernoulli_lpmf", expr_type(double_type()), int_vector_types[i], 
+    add("bernoulli_lpmf", expr_type(double_type()), int_vector_types[i],
 	vector_types[j]);
   }
 add("bernoulli_rng", expr_type(int_type()), expr_type(double_type()));
 add("bernoulli_logit_rng", expr_type(int_type()), expr_type(double_type()));
 for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j) {
-    add("bernoulli_logit_log", expr_type(double_type()), int_vector_types[i], 
+    add("bernoulli_logit_log", expr_type(double_type()), int_vector_types[i],
 	vector_types[j]);
-    add("bernoulli_logit_lpmf", expr_type(double_type()), int_vector_types[i], 
+    add("bernoulli_logit_lpmf", expr_type(double_type()), int_vector_types[i],
 	vector_types[j]);
   }
 add("bessel_first_kind", expr_type(double_type()), expr_type(int_type()), expr_type(double_type()));
@@ -128,19 +128,19 @@ add("binary_log_loss", expr_type(double_type()), expr_type(int_type()), expr_typ
 for (size_t i = 0; i < int_vector_types.size(); ++i) {
   for (size_t j = 0; j < int_vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
-      add("binomial_ccdf_log", expr_type(double_type()), 
+      add("binomial_ccdf_log", expr_type(double_type()),
           int_vector_types[i], int_vector_types[j], vector_types[k]);
-      add("binomial_cdf", expr_type(double_type()), 
+      add("binomial_cdf", expr_type(double_type()),
           int_vector_types[i], int_vector_types[j], vector_types[k]);
-      add("binomial_cdf_log", expr_type(double_type()), 
+      add("binomial_cdf_log", expr_type(double_type()),
           int_vector_types[i], int_vector_types[j], vector_types[k]);
-      add("binomial_log", expr_type(double_type()), 
+      add("binomial_log", expr_type(double_type()),
           int_vector_types[i], int_vector_types[j], vector_types[k]);
-      add("binomial_lccdf", expr_type(double_type()), 
+      add("binomial_lccdf", expr_type(double_type()),
           int_vector_types[i], int_vector_types[j], vector_types[k]);
-      add("binomial_lcdf", expr_type(double_type()), 
+      add("binomial_lcdf", expr_type(double_type()),
           int_vector_types[i], int_vector_types[j], vector_types[k]);
-      add("binomial_lpmf", expr_type(double_type()), 
+      add("binomial_lpmf", expr_type(double_type()),
           int_vector_types[i], int_vector_types[j], vector_types[k]);
     }
   }
@@ -150,9 +150,9 @@ add_binary("binomial_coefficient_log");
 for (size_t i = 0; i < int_vector_types.size(); ++i) {
   for (size_t j = 0; j < int_vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
-      add("binomial_logit_log", expr_type(double_type()), 
+      add("binomial_logit_log", expr_type(double_type()),
           int_vector_types[i], int_vector_types[j], vector_types[k]);
-      add("binomial_logit_lpmf", expr_type(double_type()), 
+      add("binomial_logit_lpmf", expr_type(double_type()),
           int_vector_types[i], int_vector_types[j], vector_types[k]);
     }
   }
@@ -374,7 +374,7 @@ add_binary("fmod");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
-        add("frechet_ccdf_log", expr_type(double_type()), vector_types[i], 
+        add("frechet_ccdf_log", expr_type(double_type()), vector_types[i],
 	    vector_types[j], vector_types[k]);
         add("frechet_cdf", expr_type(double_type()), vector_types[i],
 	    vector_types[j], vector_types[k]);
@@ -382,7 +382,7 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
 	    vector_types[j], vector_types[k]);
         add("frechet_log", expr_type(double_type()), vector_types[i],
 	    vector_types[j], vector_types[k]);
-        add("frechet_lccdf", expr_type(double_type()), vector_types[i], 
+        add("frechet_lccdf", expr_type(double_type()), vector_types[i],
 	    vector_types[j], vector_types[k]);
         add("frechet_lcdf", expr_type(double_type()), vector_types[i],
 	    vector_types[j], vector_types[k]);
@@ -711,39 +711,39 @@ add("multiply_lower_tri_self_transpose", expr_type(matrix_type()), expr_type(mat
 for (size_t i = 0; i < int_vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
-      add("neg_binomial_ccdf_log", expr_type(double_type()), 
+      add("neg_binomial_ccdf_log", expr_type(double_type()),
           int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_cdf", expr_type(double_type()), 
+      add("neg_binomial_cdf", expr_type(double_type()),
           int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_cdf_log", expr_type(double_type()), 
+      add("neg_binomial_cdf_log", expr_type(double_type()),
           int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_log", expr_type(double_type()), 
+      add("neg_binomial_log", expr_type(double_type()),
           int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_lccdf", expr_type(double_type()), 
+      add("neg_binomial_lccdf", expr_type(double_type()),
           int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_lcdf", expr_type(double_type()), 
+      add("neg_binomial_lcdf", expr_type(double_type()),
           int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_lpmf", expr_type(double_type()), 
-          int_vector_types[i], vector_types[j], vector_types[k]);
-
-      add("neg_binomial_2_ccdf_log", expr_type(double_type()), 
-          int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_2_cdf", expr_type(double_type()), 
-          int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_2_cdf_log", expr_type(double_type()), 
-          int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_2_log", expr_type(double_type()), 
-          int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_2_lccdf", expr_type(double_type()), 
-          int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_2_lcdf", expr_type(double_type()), 
-          int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_2_lpmf", expr_type(double_type()), 
+      add("neg_binomial_lpmf", expr_type(double_type()),
           int_vector_types[i], vector_types[j], vector_types[k]);
 
-      add("neg_binomial_2_log_log", expr_type(double_type()), 
+      add("neg_binomial_2_ccdf_log", expr_type(double_type()),
           int_vector_types[i], vector_types[j], vector_types[k]);
-      add("neg_binomial_2_log_lpmf", expr_type(double_type()), 
+      add("neg_binomial_2_cdf", expr_type(double_type()),
+          int_vector_types[i], vector_types[j], vector_types[k]);
+      add("neg_binomial_2_cdf_log", expr_type(double_type()),
+          int_vector_types[i], vector_types[j], vector_types[k]);
+      add("neg_binomial_2_log", expr_type(double_type()),
+          int_vector_types[i], vector_types[j], vector_types[k]);
+      add("neg_binomial_2_lccdf", expr_type(double_type()),
+          int_vector_types[i], vector_types[j], vector_types[k]);
+      add("neg_binomial_2_lcdf", expr_type(double_type()),
+          int_vector_types[i], vector_types[j], vector_types[k]);
+      add("neg_binomial_2_lpmf", expr_type(double_type()),
+          int_vector_types[i], vector_types[j], vector_types[k]);
+
+      add("neg_binomial_2_log_log", expr_type(double_type()),
+          int_vector_types[i], vector_types[j], vector_types[k]);
+      add("neg_binomial_2_log_lpmf", expr_type(double_type()),
           int_vector_types[i], vector_types[j], vector_types[k]);
     }
   }
