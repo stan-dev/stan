@@ -65,7 +65,7 @@ namespace stan {
 
       o << "std::ostream* pstream__";
       if (parameter_defaults) {
-        o << " = 0";
+        o << " = nullptr";
       }
 
       o << ")";
