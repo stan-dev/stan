@@ -94,8 +94,7 @@ pipeline {
             }
             post {
                 always {
-                    warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
-                    warnings consoleParsers: [[parserName: 'math-dependencies']], canRunOnFailed: true
+                    warnings consoleParsers: [[parserName: 'CppLint'], [parserName: 'math-dependencies']], canRunOnFailed: true, unstableTotalAll: '0'
                     deleteDir()
                 }
             }
@@ -176,8 +175,7 @@ pipeline {
     post {
         always {
             node("osx || linux") {
-                warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+                warnings consoleParsers: [[parserName: 'Clang (LLVM based)'], [parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true, unstableTotalAll: '0'
             }
         }
         success {
