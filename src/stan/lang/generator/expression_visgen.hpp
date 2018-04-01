@@ -58,9 +58,8 @@ namespace stan {
         std::stringstream ssArrayType;
         generate_bare_type(x.type_, ssRealType.str(), ssArrayType);
 
-        // vector x.args_ must have at least 1 element
         std::stringstream ssArrayElType;
-        generate_bare_type(x.args_[0].bare_type(),
+        generate_bare_type(x.type_.array_element_type(),
                            ssRealType.str(), ssArrayElType);
 
         // TODO(mitzi): do we need static cast? L58-60, L68
