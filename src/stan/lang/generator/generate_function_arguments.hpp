@@ -5,6 +5,7 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_arg_decl.hpp>
 #include <boost/lexical_cast.hpp>
+#include <cstddef>
 #include <ostream>
 #include <string>
 
