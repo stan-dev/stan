@@ -3701,7 +3701,7 @@ The arguments to the algebraic solver are as follows:
   The arguments represent (1) unknowns, (2) parameters, (3) real data, and
   (4) integer data, and the return value contains the value of the algebraic
   function, which goes to 0 when we plug in the solution to the algebraic system,
-\item \farg{y\_guess}: initia guess for the solution, type \code{vector},
+\item \farg{y\_guess}: initial guess for the solution, type \code{vector},
 \item \farg{theta}: parameters only, type \code{vector},
 \item \farg{x\_r}: real data only, type \code{real[]}, and
 \item \farg{x\_i}: integer data only, type \code{int[]}.
@@ -3944,7 +3944,7 @@ shard being evaluated.  The arguments to the mapped function are:
 %
 All input for the mapped function must be packed into these sequences
 and all output from the mapped function must be packed into a single
-vector.  The vector of output from each mapped function is concatented
+vector.  The vector of output from each mapped function is concatenated
 into the final result.
 
 \subsection{Rectangular Map}
