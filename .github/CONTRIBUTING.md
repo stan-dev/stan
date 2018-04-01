@@ -1,5 +1,7 @@
 ## Contributing Code
 
+Start here: [Introduction to Stan for New Developers](https://github.com/stan-dev/stan/wiki/Introduction-to-Stan-for-New-Developers)
+
 The instructions for contributors including the Git process, the testing process, and the Stan coding standards, see the top-level Wiki:
 
 * [Stan Developer Process](https://github.com/stan-dev/stan/wiki)

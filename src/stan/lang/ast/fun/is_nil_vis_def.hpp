@@ -50,6 +50,10 @@ namespace stan {
       return false;
     }
 
+    bool is_nil_vis::operator()(const map_rect& /* x */) const {
+      return false;
+    }
+
     bool is_nil_vis::operator()(const fun& /* x */) const {
       return false;
     }

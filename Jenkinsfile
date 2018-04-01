@@ -1,18 +1,22 @@
+@Library('StanUtils')
+import org.stan.Utils
+
+def utils = new org.stan.Utils()
+
 def setupCC(failOnError = true) {
     errorStr = failOnError ? "-Werror " : ""
-    "echo CC=${env.CXX} ${errorStr}> make/local"
+    writeFile(file: "make/local", text: "CC=${env.CXX} ${errorStr}")
 }
 
-def setup(String pr, Boolean failOnError = true) {
+def setup(String pr) {
     script = """
         make math-revert
         make clean-all
         git clean -xffd
-        ${setupCC(failOnError)}
     """
     if (pr != '')  {
         prNumber = pr.tokenize('-').last()
-        script += """ 
+        script += """
             cd lib/stan_math
             git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
             git checkout refs/remotes/origin/pr/${prNumber}/merge
@@ -30,35 +34,23 @@ def mailBuildResults(String label, additionalEmails='') {
     )
 }
 
-def runTests(String testPath) {
-    "runTests.py -j${env.PARALLEL} ${testPath} || echo ${testPath} failed"
+def runTests(String testPath, Boolean separateMakeStep=true) {
+    if (separateMakeStep) {
+        sh "./runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+    }
+    try { sh "./runTests.py -j${env.PARALLEL} ${testPath}" }
+    finally { junit 'test/**/*.xml' }
 }
 
-def updateUpstream(String upstreamRepo) {
-    if (env.BRANCH_NAME == 'develop') {
-        node('master') {
-            retry(3) {
-                checkout([$class: 'GitSCM',
-                        branches: [[name: '*/develop']],
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions: [[$class: 'SubmoduleOption',
-                                    disableSubmodules: false,
-                                    parentCredentials: false,
-                                    recursiveSubmodules: true,
-                                    reference: '',
-                                    trackingSubmodules: false]],
-                        submoduleCfg: [],
-                        userRemoteConfigs: [[url: 'git@github.com:stan-dev/cmdstan.git',
-                                           credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b'
-                ]]])
-            }
-            sh """
-                curl -O https://raw.githubusercontent.com/stan-dev/ci-scripts/master/jenkins/create-${upstreamRepo}-pull-request.sh
-                sh create-${upstreamRepo}-pull-request.sh
-            """
-            deleteDir()
-        }
-    }
+def runTestsWin(String testPath) {
+    bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+    try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
+    finally { junit 'test/**/*.xml' }
+}
+
+def deleteDirWin() {
+    bat "attrib -r -s /s /d"
+    deleteDir()
 }
 
 pipeline {
@@ -72,6 +64,18 @@ pipeline {
     }
     options { skipDefaultCheckout() }
     stages {
+        stage('Kill previous builds') {
+            when {
+                not { branch 'develop' }
+                not { branch 'master' }
+                not { branch 'downstream tests' }
+            }
+            steps {
+                script {
+                    utils.killOldBuilds()
+                }
+            }
+        }
         stage('Linting & Doc checks') {
             agent any
             steps {
@@ -79,62 +83,64 @@ pipeline {
                     retry(3) { checkout scm }
                     sh setup(params.math_pr)
                     stash 'StanSetup'
+                    setupCC()
                     parallel(
                         CppLint: { sh "make cpplint" },
-                        documentation: { sh 'make doxygen' },
-                        manual: { sh 'make manual' },
-                        headers: { sh "make -j${env.PARALLEL} test-headers" },
-                        failFast: true
+                        Documentation: { sh 'make doxygen' },
+                        Manual: { sh "make manual" },
+                        Headers: { sh "make -j${env.PARALLEL} test-headers" }
                     )
                 }
             }
-            post { always { deleteDir() } }
+            post {
+                always {
+                    warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+                    warnings consoleParsers: [[parserName: 'math-dependencies']], canRunOnFailed: true
+                    deleteDir()
+                }
+            }
         }
         stage('Tests') {
-            failFast true
             parallel {
                 stage('Windows Unit') {
                     agent { label 'windows' }
                     steps {
+                        deleteDirWin()
                         unstash 'StanSetup'
-                        bat setupCC(false)
-                        bat runTests("src/test/unit")
-                        retry(2) { junit 'test/unit/**/*.xml' }
+                        setupCC(false)
+                        runTestsWin("src/test/unit")
                     }
-                    post { always { deleteDir() } }
+                    post { always { deleteDirWin() } }
                 }
-                stage('Windows Headers') { 
+                stage('Windows Headers') {
                     agent { label 'windows' }
                     steps {
+                        deleteDirWin()
                         unstash 'StanSetup'
-                        bat setupCC()
+                        setupCC()
                         bat "make -j${env.PARALLEL} test-headers"
                     }
-                    post { always { deleteDir() } }
+                    post { always { deleteDirWin() } }
                 }
-                stage('Unit') { 
+                stage('Unit') {
                     agent any
                     steps {
                         unstash 'StanSetup'
-                        sh setupCC(false)
-                        sh "./" + runTests("src/test/unit")
-                        retry(2) { junit 'test/unit/**/*.xml' }
+                        setupCC(false)
+                        runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
                 }
                 stage('Integration') {
                     agent any
-                    steps { 
+                    steps {
                         unstash 'StanSetup'
-                        sh setupCC()
-                        sh "./" + runTests("src/test/integration")
-                        retry(2) { junit 'test/integration/*.xml' }
+                        setupCC()
+                        runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
                 }
                 stage('Upstream CmdStan tests') {
-                    // These will only execute when we're running against the
-                    // live PR build, not on other branches
                     when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
                     steps {
                         build(job: "CmdStan/${params.cmdstan_pr}",
@@ -148,11 +154,11 @@ pipeline {
             agent { label 'gelman-group-mac' }
             steps {
                 unstash 'StanSetup'
-                sh setupCC()
+                setupCC()
                 sh """
                     ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance
-                    RScript ../../src/test/performance/plot_performance.R 
+                    RScript ../../src/test/performance/plot_performance.R
                 """
             }
             post {
@@ -169,14 +175,13 @@ pipeline {
     }
     post {
         always {
-            node('master') {
-                warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+            node("osx || linux") {
                 warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
                 warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
             }
         }
         success {
-            updateUpstream('cmdstan')
+            script { utils.updateUpstream(env,'cmdstan') }
             mailBuildResults("SUCCESSFUL")
         }
         unstable { mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") }

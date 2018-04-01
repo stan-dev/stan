@@ -90,16 +90,18 @@ pseudorandom number generator (PRNG) with the suffix \code{\_rng}.
 For example, the function \code{normal\_rng(real, real)} accepts two
 real arguments, an unconstrained location $\mu$ and positive scale
 $\sigma > 0$, and returns an unconstrained pseudorandom value drawn
-from $\distro{Normal}(\mu,\sigma)$.
+from $\distro{Normal}(\mu,\sigma)$.  There are also vectorized forms
+of random number generators which return more than one random variate
+at a time.
 
-\subsection{Generated Quantities Only}
+\subsection{Restricted to Generated Quantities}
 
 Unlike regular functions, the PRNG functions may only be used in the
 generated quantities block.
 
-\subsection{Not Vectorized}
+\subsection{Limited Vectorization}
 
-Unlike the probability functions, the PRNG functions are not
+Unlike the probability functions, only some of the PRNG functions are
 vectorized.
 
 
@@ -161,9 +163,11 @@ and \code{normal\_lccdf(y | mu,~sigma)} is defined by
 
 \noindent
 Stan's univariate log probability functions, including the log density
-functions, log mass functions, log CDFs, and log CCDFs, all support vectorized
-function application, with results defined to be the sum of the
-elementwise application of the function.
+functions, log mass functions, log CDFs, and log CCDFs, all support
+vectorized function application, with results defined to be the sum of
+the elementwise application of the function.  Some of the PRNG
+functions support vectorization, see
+\refsection{prng-vectorization} for more details.
 
 In all cases, matrix operations are at least as fast and usually
 faster than loops and vectorized log probability functions are faster
@@ -198,7 +202,7 @@ The normal probability function is specified with the signature
 normal_lpdf(reals | reals, reals);
 \end{stancode}
 %
-The pseudo-type \code{reals} is used to indicate that an argument
+The pseudotype \code{reals} is used to indicate that an argument
 position may be vectorized.  Argument positions declared as
 \code{reals} may be filled with a real, a one-dimensional array, a
 vector, or a row-vector.  If there is more than one array or vector
@@ -221,11 +225,11 @@ vectors or column vectors.
 
 \subsubsection{Vectorized Integer Arguments}
 
-The pseudo-type \code{ints} is used for vectorized integer arguments.
+The pseudotype \code{ints} is used for vectorized integer arguments.
 Where it appears either an integer or array of integers may be used.
 
 
-\subsection{Evaluating Vectorized Functions}
+\subsection{Evaluating Vectorized Log Probability Functions}
 
 The result of a vectorized log probability function is equivalent to
 the sum of the evaluations on each element.  Any non-vector argument,
@@ -258,7 +262,64 @@ for (n in 1:N)
   y[n] ~ normal(mu[n], sigma);
 \end{stancode}
 
+\subsection{Evaluating Vectorized PRNG Functions}\label{prng-vectorization.section}
 
+Some PRNG functions accept sequences as well as scalars as arguments.
+Such functions are indicated by argument pseudotypes \code{reals}
+or \code{ints}.  In cases of sequence arguments, the output will also
+be a sequence.  For example, the following is allowed in the generated
+quantities block.
+
+\begin{stancode}
+vector[3] mu = ...;
+real x[3] = normal_rng(mu, 3);
+\end{stancode}
+
+
+\subsubsection{Argument types}
+
+In the case of PRNG functions, arguments marked \code{ints} may be
+integers or integer arrays, whereas arguments marked \code{reals} may
+be integers or reals, integer or real arrays, vectors, or row
+vectors.
+%
+\begin{center}
+\begin{tabular}{r|l}
+{\slshape pseudotype} & {\slshape allowable PRNG arguments}
+\\ \hline
+\code{ints} & \code{int}, \, \code{int[]}
+\\
+\code{reals} & \code{int}, \, \code{int[]}, \, \code{real}, \,
+               \code{real[]}, \, \code{vector}, \, \code{row\_vector}
+\end{tabular}
+\end{center}
+
+\subsubsection{Dimension matching}
+
+In general, if there are multiple non-scalar arguments, they must all
+have the same dimensions, but need not have the same type.  For
+example, the \code{normal\_rng} function may be called with one vector
+argument and one real array argument as long as they have the same
+number of elements.
+%
+\begin{stancode}
+vector[3] mu = ...;
+real sigma[3] = ...;
+real x[3] = normal_rng(mu, sigma);
+\end{stancode}
+%
+
+\subsubsection{Return type}
+
+The result of a vectorized PRNG function depends on the size of the
+arguments and the distribution's support.  If all arguments are
+scalars, then the return type is a scalar.  If there are any
+non-scalar arguments, the return type is a real array (\code{real[]})
+matching the size of any of the non-scalar arguments, as all
+non-scalar arguments must have matching size.  Discrete distributions
+return \code{ints} and continuous distributions return \code{reals},
+each of appropriate size.  The symbol \code{R} denotes such a return
+type.
 
 \chapter{Binary Distributions}
 
@@ -686,13 +747,58 @@ $\mbox{logit}^{-1}(\infty) = 1$.
 \subsubsection{Stan Functions}
 
 \begin{description}
-  \fitem{real}{ordered\_logistic\_lpmf}{int \farg{k} \textbar\ real \farg{eta},
-    vector \farg{c}}{The log ordered logistic probability mass of
-    \farg{k} given linear predictor \farg{eta} and cutpoints
-    \farg{c}.}
-%
+  \fitem{real}{ordered\_logistic\_lpmf}{ints \farg{k} \textbar\ vector \farg{eta},
+    vectors \farg{c}}{The log ordered logistic probability mass of
+    \farg{k} given linear predictors \farg{eta}, and cutpoints \farg{c}.}
+
 \fitem{int}{ordered\_logistic\_rng}{real \farg{eta}, vector \farg{c}}{Generate
   an ordered logistic variate with linear predictor \farg{eta} and cutpoints
+    \farg{c}; may only be used in generated quantities block}
+\end{description}
+
+\section{Ordered Probit Distribution}
+
+\subsubsection{Probability Mass Function}
+
+If $K \in \nats$ with $K > 2$, $c \in \reals^{K-1}$ such that $c_k <
+c_{k+1}$ for $k \in \setlist{1,\ldots,K-2}$, and $\eta \in \reals$, then for $k \in
+\setlist{1,\ldots,K}$,
+\[
+\distro{OrderedProbit}(k|\eta,c)
+=
+\left\{
+\begin{array}{ll}
+1 - \Phi(\eta - c_1) & \mbox{if } k = 1,
+\\[4pt]
+\Phi(\eta - c_{k-1}) - \Phi(\eta -
+c_{k})
+
+& \mbox{if } 1 < k < K, \mbox{and}
+\\[4pt]
+\Phi(\eta - c_{K-1}) - 0
+& \mbox{if } k = K.
+\end{array}
+\right.
+\]
+%
+The $k=K$ case is written with the redundant subtraction of zero to
+illustrate the parallelism of the cases; the $k=1$ and $k=K$ edge
+cases can be subsumed into the general definition by setting $c_0 =
+-\infty$ and $c_K = +\infty$ with $\Phi(-\infty) = 0$ and
+$\Phi(\infty) = 1$.
+
+\pitemdisc{k}{ordered\_probit}{eta, c}
+
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+  \fitem{real}{ordered\_probit\_lpmf}{ints \farg{k} \textbar\ vector \farg{eta},
+    vectors \farg{c}}{The log ordered probit probability mass of
+    \farg{k} given linear predictors \farg{eta}, and cutpoints \farg{c}.}
+%
+\fitem{int}{ordered\_probit\_rng}{real \farg{eta}, vector \farg{c}}{Generate
+  an ordered probit variate with linear predictor \farg{eta} and cutpoints
     \farg{c}; may only be used in generated quantities block}
 \end{description}
 
@@ -1072,9 +1178,11 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \end{description}
 %
 \begin{description}
-\fitem{real}{normal\_rng}{real \farg{mu},  real \farg{sigma}}{Generate a normal
-  variate with location \farg{mu} and scale \farg{sigma}; may only be used in
-  generated quantities block}
+  \fitem{R}{normal\_rng}{reals \farg{mu}, reals \farg{sigma}}{Generate
+    a normal variate with location \farg{mu} and scale \farg{sigma};
+    may only be used in generated quantities block.  For a description
+    of argument and return types, see
+    \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1120,10 +1228,12 @@ If $\mu \in \reals$, $\sigma \in \posreals$, and $\lambda \in
 \end{description}
 %
 \begin{description}
-\fitem{real}{exp\_mod\_normal\_rng}{real \farg{mu}, real \farg{sigma},
-real \farg{lambda}}{Generate a exponentially modified normal variate
-with location \farg{mu}, scale \farg{sigma}, and shape \farg{lambda};
-may only be used in generated quantities block}
+  \fitem{R}{exp\_mod\_normal\_rng}{reals \farg{mu}, reals
+    \farg{sigma}, reals \farg{lambda}}{Generate a exponentially
+    modified normal variate with location \farg{mu}, scale
+    \farg{sigma}, and shape \farg{lambda}; may only be used in
+    generated quantities block.  For a description of argument and
+    return types, see \refsection{prng-vectorization}.}
 \end{description}
 
 \section{Skew Normal Distribution}
@@ -1172,10 +1282,11 @@ then for $y \in \reals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{skew\_normal\_rng}{real \farg{xi}, real \farg{omega},
-  real \farg{alpha}}{Generate a skew normal variate with location
-  \farg{xi}, scale \farg{omega}, and shape \farg{alpha}; may only be used in
-  generated quantities block}
+  \fitem{R}{skew\_normal\_rng}{reals \farg{xi}, reals \farg{omega},
+    real \farg{alpha}}{Generate a skew normal variate with location
+    \farg{xi}, scale \farg{omega}, and shape \farg{alpha}; may only be
+    used in generated quantities block.  For a description of argument
+    and return types, see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1228,10 +1339,11 @@ then for $y \in \reals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{student\_t\_rng}{real \farg{nu}, real \farg{mu}, real
-  \farg{sigma}}{Generate a Student-$t$ variate with degrees of freedom
-\farg{nu}, location \farg{mu}, and scale \farg{sigma}; may only be used in
-  generated quantities block}
+  \fitem{R}{student\_t\_rng}{reals \farg{nu}, reals \farg{mu}, reals
+    \farg{sigma}}{Generate a Student-$t$ variate with degrees of
+    freedom \farg{nu}, location \farg{mu}, and scale \farg{sigma}; may
+    only be used in generated quantities block. For a description of
+    argument and return types, see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1274,9 +1386,11 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in \reals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{cauchy\_rng}{real \farg{mu}, real \farg{sigma}}{Generate a Cauchy
-  variate with location \farg{mu} and scale \farg{sigma}; may only be used in
-  generated quantities block}
+  \fitem{R}{cauchy\_rng}{reals \farg{mu}, reals \farg{sigma}}{Generate
+    a Cauchy variate with location \farg{mu} and scale \farg{sigma};
+    may only be used in generated quantities block.  For a description
+    of argument and return types, see
+    \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1341,10 +1455,11 @@ function of \farg{y} given location \farg{mu} and scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
-\fitem{real}{double\_exponential\_rng}{real \farg{mu}, real
-  \farg{sigma}}{Generate a double exponential variate with location
-  \farg{mu} and scale \farg{sigma}; may only be used in generated
-  quantities block}
+  \fitem{R}{double\_exponential\_rng}{reals \farg{mu}, reals
+    \farg{sigma}}{Generate a double exponential variate with location
+    \farg{mu} and scale \farg{sigma}; may only be used in generated
+    quantities block.  For a description of argument and return types,
+    see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1389,9 +1504,11 @@ location \farg{mu} and scale \farg{sigma}}
 \end{description}
 %
 \begin{description}
-\fitem{real}{logistic\_rng}{real \farg{mu}, real
-  \farg{sigma}}{Generate a logistic variate with location \farg{mu}
-  and scale \farg{sigma}; may only be used in generated quantities block}
+  \fitem{R}{logistic\_rng}{reals \farg{mu}, reals
+    \farg{sigma}}{Generate a logistic variate with location \farg{mu}
+    and scale \farg{sigma}; may only be used in generated quantities
+    block.  For a description of argument and return types, see
+    \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1432,9 +1549,11 @@ If $\mu \in \reals$ and $\beta \in \posreals$, then for $y \in \reals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{gumbel\_rng}{real \farg{mu}, real
-  \farg{beta}}{Generate a gumbel variate with location \farg{mu}
-  and scale \farg{beta}; may only be used in generated quantities block}
+  \fitem{R}{gumbel\_rng}{reals \farg{mu}, reals \farg{beta}}{Generate
+    a gumbel variate with location \farg{mu} and scale \farg{beta};
+    may only be used in generated quantities block.  For a description
+    of argument and return types, see
+    \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1489,9 +1608,11 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \end{description}
 %
 \begin{description}
-\fitem{real}{lognormal\_rng}{real \farg{mu}, real
-  \farg{beta}}{Generate a lognormal variate with location \farg{mu}
-  and scale \farg{sigma}; may only be used in generated quantities block}
+  \fitem{R}{lognormal\_rng}{reals \farg{mu}, reals
+    \farg{beta}}{Generate a lognormal variate with location \farg{mu}
+    and scale \farg{sigma}; may only be used in generated quantities
+    block.  For a description of argument and return types, see
+    \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1535,9 +1656,10 @@ y^{\nu/2 - 1}
 \end{description}
 %
 \begin{description}
-\fitem{real}{chi\_square\_rng}{real \farg{nu}}{Generate a Chi-square
-  variate with degrees of freedom \farg{nu}; may only be used in
-  generated quantities block}
+  \fitem{R}{chi\_square\_rng}{reals \farg{nu}}{Generate a Chi-square
+    variate with degrees of freedom \farg{nu}; may only be used in
+    generated quantities block. For a description of argument and
+    return types, see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1583,9 +1705,11 @@ y^{-\nu/2 - 1}
 \end{description}
 %
 \begin{description}
-\fitem{real}{inv\_chi\_square\_rng}{real \farg{nu}}{Generate an
-  inverse Chi-squared variate with degrees of freedom \farg{nu};
-may only be used in generated quantities block}
+  \fitem{R}{inv\_chi\_square\_rng}{reals \farg{nu}}{Generate an
+    inverse Chi-squared variate with degrees of freedom \farg{nu}; may
+    only be used in generated quantities block.  For a description of
+    argument and return types, see \refsection{prng-vectorization}.}
+
 \end{description}
 
 
@@ -1644,10 +1768,11 @@ y^{-(\nu/2 + 1)}
 \end{description}
 %
 \begin{description}
-\fitem{real}{scaled\_inv\_chi\_square\_rng}{real \farg{nu}, real
+\fitem{R}{scaled\_inv\_chi\_square\_rng}{reals \farg{nu}, reals
   \farg{sigma}}{Generate a scaled inverse Chi-squared variate with degrees
 of freedom \farg{nu} and scale \farg{sigma}; may only be used in generated
-quantities block}
+quantities block.   For a description of argument and return types,
+see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1686,9 +1811,10 @@ If $\beta \in \posreals$, then for $y \in \posreals$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{exponential\_rng}{real \farg{beta}}{Generate an
-  exponential variate with inverse scale \farg{beta}; may only be used in
-  generated quantities block}
+  \fitem{R}{exponential\_rng}{reals \farg{beta}}{Generate an
+    exponential variate with inverse scale \farg{beta}; may only be
+    used in generated quantities block.  For a description of argument
+    and return types, see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1733,10 +1859,11 @@ y^{\alpha - 1}
 \end{description}
 %
 \begin{description}
-\fitem{real}{gamma\_rng}{real \farg{alpha}, real
-  \farg{beta}}{Generate a gamma variate with shape
-  \farg{alpha} and inverse scale \farg{beta}; may only be used in generated
-quantities block}
+  \fitem{R}{gamma\_rng}{reals \farg{alpha}, reals
+    \farg{beta}}{Generate a gamma variate with shape \farg{alpha} and
+    inverse scale \farg{beta}; may only be used in generated
+    quantities block.  For a description of argument and return types,
+    see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1782,10 +1909,11 @@ y^{-(\alpha + 1)}
 \end{description}
 %
 \begin{description}
-\fitem{real}{inv\_gamma\_rng}{real \farg{alpha}, real
-  \farg{beta}}{Generate an inverse gamma variate with shape
-  \farg{alpha} and scale \farg{beta}; may only be used in generated
-quantities block}
+  \fitem{R}{inv\_gamma\_rng}{reals \farg{alpha}, reals
+    \farg{beta}}{Generate an inverse gamma variate with shape
+    \farg{alpha} and scale \farg{beta}; may only be used in generated
+    quantities block.  For a description of argument and return types,
+    see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1833,10 +1961,11 @@ then $Y^{-1} \propto \distro{Frechet}(\alpha,\sigma^{-1})$.
 \end{description}
 %
 \begin{description}
-\fitem{real}{weibull\_rng}{real \farg{alpha}, real
-  \farg{sigma}}{Generate a weibull variate with shape
-  \farg{alpha} and scale \farg{sigma}; may only be used in generated
-quantities block}
+  \fitem{R}{weibull\_rng}{reals \farg{alpha}, reals
+    \farg{sigma}}{Generate a weibull variate with shape \farg{alpha}
+    and scale \farg{sigma}; may only be used in generated quantities
+    block. For a description of argument and return types, see
+    \refsection{prng-vectorization}.}
 \end{description}
 
 \section{Fr\'{e}chet Distribution}
@@ -1883,10 +2012,11 @@ then $Y^{-1} \propto \distro{Weibull}(\alpha,\sigma^{-1})$.
 \end{description}
 %
 \begin{description}
-\fitem{real}{frechet\_rng}{real \farg{alpha}, real
-  \farg{sigma}}{Generate an Fr\'{e}chet variate with shape
-  \farg{alpha} and scale \farg{sigma}; may only be used in generated
-quantities block}
+  \fitem{R}{frechet\_rng}{reals \farg{alpha}, reals
+    \farg{sigma}}{Generate an Fr\'{e}chet variate with shape
+    \farg{alpha} and scale \farg{sigma}; may only be used in generated
+    quantities block.  For a description of argument and return types,
+    see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1925,10 +2055,10 @@ non-negative real numbers.
 \end{description}
 %
 \begin{description}
-\fitem{real}{rayleigh\_rng}{real
-  \farg{sigma}}{Generate a Rayleigh variate with scale
-  \farg{sigma}; may only be used in generated
-quantities block}
+  \fitem{R}{rayleigh\_rng}{reals \farg{sigma}}{Generate a Rayleigh
+    variate with scale \farg{sigma}; may only be used in generated
+    quantities block. For a description of argument and return types,
+    see \refsection{prng-vectorization}.}
 \end{description}
 
 \section{Wiener Diffusion Model Distributions}
@@ -2020,10 +2150,11 @@ $y \in \posreals$ with $y \geq y_{\mbox{\footnotesize\rm min}}$,
 \end{description}
 %
 \begin{description}
-\fitem{real}{pareto\_rng}{real \farg{y\_min}, real
+\fitem{R}{pareto\_rng}{reals \farg{y\_min}, reals
   \farg{alpha}}{Generate a Pareto variate with positive minimum value
   \farg{y\_min} and shape \farg{alpha}; may only be used in generated
-  quantities block}
+  quantities block.  For a description of argument and return types,
+    see \refsection{prng-vectorization}.}
 \end{description}
 
 \section{Pareto Type 2 Distribution}
@@ -2065,10 +2196,12 @@ Note that the Lomax distribution is a Pareto Type 2 distribution with $\mu=0$.
 \end{description}
 %
 \begin{description}
-\fitem{real}{pareto\_type\_2\_rng}{real \farg{mu}, real \farg{lambda}, real
-  \farg{alpha}}{Generate a Pareto Type 2 variate with location
-  \farg{mu}, scale \farg{lambda}, and shape \farg{alpha}; may only be used in generated
-  quantities block}
+  \fitem{R}{pareto\_type\_2\_rng}{reals \farg{mu}, reals
+    \farg{lambda}, reals \farg{alpha}}{Generate a Pareto Type 2
+    variate with location \farg{mu}, scale \farg{lambda}, and shape
+    \farg{alpha}; may only be used in generated quantities block.  For
+    a description of argument and return types, see
+    \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -2131,10 +2264,11 @@ distribution requires strictly positive parameters, $\alpha, \beta >
 \end{description}
 %
 \begin{description}
-\fitem{real}{beta\_rng}{real \farg{alpha}, real
-  \farg{beta}}{Generate a beta variate with positive prior successes (plus one)
+  \fitem{R}{beta\_rng}{reals \farg{alpha}, reals \farg{beta}}{Generate
+    a beta variate with positive prior successes (plus one)
     \farg{alpha} and prior failures (plus one) \farg{beta}; may only
-    be used in generated quantities block}
+    be used in generated quantities block.  For a description of
+    argument and return types, see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -2186,16 +2320,20 @@ around the mean $\mu$.
 \subsubsection{Stan Functions}
 
 \begin{description}
-  \fitem{real}{von\_mises\_lpdf}{reals \farg{y} \textbar\ reals \farg{mu}, reals
-    \farg{kappa}}{The log of the von mises density of \farg{y} given
-    location \farg{mu} and scale \farg{kappa}}
+  \fitem{R}{von\_mises\_lpdf}{reals \farg{y} \textbar\ reals
+    \farg{mu}, reals \farg{kappa}}{The log of the von mises density of
+    \farg{y} given location \farg{mu} and scale \farg{kappa}.  For a
+    description of argument and return types, see
+    \refsection{prng-vectorization}.}
 \end{description}
 
 \begin{description}
-  \fitem{real}{von\_mises\_rng}{reals \farg{mu}, reals
-    \farg{kappa}}{Generate a Von Mises variate with location
-  \farg{mu} and scale \farg{kappa} (i.e. returns values in the interval $[(\mu \mod 2\pi)-\pi,(\mu \mod 2\pi)+\pi]$); may only
-    be used in generated quantities block}
+  \fitem{R}{von\_mises\_rng}{reals \farg{mu}, reals
+    \farg{kappa}}{Generate a Von Mises variate with location \farg{mu}
+    and scale \farg{kappa} (i.e. returns values in the interval
+    $[(\mu \mod 2\pi)-\pi,(\mu \mod 2\pi)+\pi]$); may only be used in
+    generated quantities block.  For a description of argument and
+    return types, see \refsection{prng-vectorization}.}
 \end{description}
 \subsubsection{Numerical Stability}
 
