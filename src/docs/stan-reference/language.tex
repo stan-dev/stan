@@ -2659,7 +2659,7 @@ as \code{real~operator*(row\_vector,vector)}.
 There are several expression constructions in Stan that act as
 higher-order functions.%
 %
-\footnote{Interanlly, they are implemented as their own expression
+\footnote{Internally, they are implemented as their own expression
   types because Stan doesn't have object-level functional types
   (yet).}
 %
@@ -2841,7 +2841,7 @@ statement consisting only of a semicolon.
 
 \section{Statement Block Contexts}
 
-The data and parameters blocks do not allow statments of any kind
+The data and parameters blocks do not allow statements of any kind
 because these blocks are solely used to declare the data variables for
 input and the parameter variables for sampling.  All other blocks
 allow statements.  In these blocks, both variable declarations and
@@ -3716,7 +3716,7 @@ For arrays, vectors and row-vectors \code{ys}, the loop variable \code{y}
 traverses the elements of \code{ys} in order and for matrices \code{ys}
 it traverses the elements of \code{ys} in column-major order
 (top-to-bottom, left-to-right).
-In partcular, note the difference between looping over a matrix of type \code{matrix[N, M]} and a nested array of type \code{real[N, M]}.
+In particular, note the difference between looping over a matrix of type \code{matrix[N, M]} and a nested array of type \code{real[N, M]}.
 In the latter case, the loop variable \code{y} denotes an array of type \code{real[M]}
 rather than a single value of type \code{real} which would be its denotation
 in the former case.
