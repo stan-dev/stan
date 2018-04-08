@@ -223,7 +223,7 @@ namespace stan {
               break;
             }
             if (!found_path)
-              throw std::runtime_error("could not find include file");
+              throw std::runtime_error("could not find include file: " + line);
           } else {
             ++concat_line_num;
             program_ << line;
