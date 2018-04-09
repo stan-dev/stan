@@ -21,12 +21,16 @@ namespace stan {
     std::vector<expression>
     get_block_var_dims(const block_var_decl decl) {
       std::vector<expression> dims;
-      if (decl.type().bare_type().is_matrix_type()) {
-        dims.push_back(decl.type().arg2());
-        dims.push_back(decl.type().arg1());
-      } else if (decl.type().bare_type().is_row_vector_type()
-                 || decl.type().bare_type().is_vector_type()) {
-        dims.push_back(decl.type().arg1());
+
+      block_var_type bt = decl.type();
+      if (bt.is_array_type())
+        bt = bt.array_contains();
+      if (bt.bare_type().is_matrix_type()) {
+        dims.push_back(bt.arg2());
+        dims.push_back(bt.arg1());
+      } else if (bt.bare_type().is_row_vector_type()
+                 || bt.bare_type().is_vector_type()) {
+        dims.push_back(bt.arg1());
       }
       std::vector<expression> ar_lens = decl.type().array_lens();
       for (size_t i = ar_lens.size(); i-- > 0; ) {

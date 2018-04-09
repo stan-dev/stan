@@ -4,7 +4,6 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_param_names_array.hpp>
-#include <stan/lang/generator/get_block_var_dims.hpp>
 #include <ostream>
 #include <vector>
 
