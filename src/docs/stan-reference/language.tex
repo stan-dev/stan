@@ -39,12 +39,12 @@ also be written in whatever character set is convenient.
 
 Stan allows one file to be included within another file with the
 following syntax.  For example, suppose the file
-\code{std-normal.stan} defines the standard normal log probability
+\code{my-std-normal.stan} defines the standard normal log probability
 density function (up to an additive constant).
 %
 \begin{stancode}
 functions {
-  real std_normal_lpdf(vector y) {
+  real my_std_normal_lpdf(vector y) {
     return -0.5 * y' * y;
   }
 }
@@ -54,22 +54,22 @@ Suppose we also have a file containing a Stan program with an include
 statement.
 %
 \begin{stancode}
-#include std-normal.stan
+#include my-std-normal.stan
 parameters {
   real y;
 }
 model {
-  y ~ std_normal();
+  y ~ my_std_normal();
 }
 \end{stancode}
 %
 This Stan program behaves as if the contents of the file
-\code{std-normal.stan} replace the line with the \code{\#include}
+\code{my-std-normal.stan} replace the line with the \code{\#include}
 statement, behaving as if a single Stan program were provided.
 %
 \begin{stancode}
 functions {
-  real std_normal_lpdf(vector y) {
+  real my_std_normal_lpdf(vector y) {
     return -0.5 * y' * y;
   }
 }
@@ -77,7 +77,7 @@ parameters {
   real y;
 }
 model {
-  y ~ std_normal();
+  y ~ my_std_normal();
 }
 \end{stancode}
 %
