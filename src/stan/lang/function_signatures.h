@@ -1160,8 +1160,8 @@ add_nullary("sqrt2");
 add_unary_vectorized("square");
 for (size_t i = 0; i < vector_types.size(); ++i) 
 {
-  add("std_normal_log", expr_type(double_type()), vector_types[i]);
-  add("std_normal_lpdf", expr_type(double_type()), vector_types[i]);
+  add("std_normal_log", bare_expr_type(double_type()), vector_types[i]);
+  add("std_normal_lpdf", bare_expr_type(double_type()), vector_types[i]);
 }
 add_unary("step");
 for (size_t i = 0; i < vector_types.size(); ++i) {

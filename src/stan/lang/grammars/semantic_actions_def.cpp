@@ -609,7 +609,7 @@ namespace stan {
       }
 
       if (ends_with("_lpdf", decl.name_)
-          && arg_types[0].is_int_type()) {
+          && arg_types[0].base().is_int_type()) {
         error_msgs << "Parse Error.  Probability density functions require"
                    << " real variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
@@ -617,7 +617,7 @@ namespace stan {
         return;
       }
       if (ends_with("_lpmf", decl.name_)
-          && !arg_types[0].is_int_type()) {
+          && !arg_types[0].base().is_int_type()) {
         error_msgs << "Parse Error.  Probability mass functions require"
                    << " integer variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
@@ -652,7 +652,7 @@ namespace stan {
         pass = false;
         return;
       }
-      bare_expr_type variate_type = decl.arg_decls_[0].bare_type();
+      bare_expr_type variate_type = decl.arg_decls_[0].bare_type().base();
       if (ends_with("_lpdf", decl.name_)
           && variate_type.is_int_type()) {
         error_msgs << "Parse Error.  Probability density functions require"
@@ -1692,13 +1692,13 @@ namespace stan {
       if (ode_fun.y0_.bare_type() != t_ar_double) {
         error_msgs << "Second argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: real"
+                   << " must have type: real[ ]"
                    << "; found type = "
                    << ode_fun.y0_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
-      if (!ode_fun.t0_.bare_type().is_double_type()) {
+      if (!ode_fun.t0_.bare_type().is_primitive()) {
         error_msgs << "Third argument to "
                    << ode_fun.integration_function_name_
                    << " must have type: real"
@@ -3234,7 +3234,7 @@ namespace stan {
         return;
       }
       if (var_scope.par_or_tpar()
-          && decl.bare_type().is_int_type()) {
+          && decl.bare_type().base().is_int_type()) {
         error_msgs << "Parameters or transformed parameters"
                    << " cannot be integer or integer array; "
                    << " found int variable declaration, name="
