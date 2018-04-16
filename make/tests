@@ -189,7 +189,8 @@ src/test/unit/lang/stanc_helper_test.cpp: change-file-permissions
 # Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
 ##
 src/test/performance/logistic_test.cpp: src/test/test-models/performance/logistic.hpp
-src/test/unit/lang/generator_test.cpp: src/test/test-models/good/lang/test_lp.hpp
+src/test/unit/lang/generator/ast_nodes_test.cpp: src/test/test-models/good/lang/test_lp.hpp
+src/test/unit/lang/generator/log_prob_test.cpp: src/test/test-models/good/lang/test_lp.hpp
 src/test/unit/lang/parser_generator_test.cpp: $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 src/test/unit/io/random_var_context_test.cpp: src/test/test-models/good/services/test_lp.hpp
 src/test/unit/lang/parser/functions_standalone_instantiate_test.cpp: src/test/test-models/good-standalone-functions/basic.hpp src/test/test-models/good-standalone-functions/special_functions.hpp src/test/test-models/good-standalone-functions/integrate.hpp
