@@ -1169,7 +1169,7 @@ translated and scaled coefficients; see
 \begin{stancode}
 functions {
   vector center_lp(vector beta_raw, real mu, real sigma) {
-    beta_raw ~ normal(0, 1);
+    beta_raw ~ std_normal();
     sigma ~ cauchy(0, 5);
     mu ~ cauchy(0, 2.5);
     return sigma * beta_raw + mu;
@@ -3112,7 +3112,7 @@ parameters {
   vector[2] beta;
 }
 model {
-  beta ~ normal(0, 1);
+  beta ~ std_normal();
   y ~ bernoulli_logit(beta[1] + beta[2] * to_vector(x));
 }
 \end{stancode}
@@ -3154,7 +3154,7 @@ parameters {
   vector[2] beta;
 }
 model {
-  beta ~ normal(0, 1);
+  beta ~ std_normal();
   target += sum(map_rect(lr, beta, theta, xs, ys));
 }
 \end{stancode}
@@ -3602,6 +3602,7 @@ the fixed prior with a hierarchical prior such as \code{normal(mu,
   sigma)}, where \code{mu} and \code{sigma} are new parameters, with
 their own hyperpriors.
 
+
 \section{Avoiding Validation}
 
 Stan validates all of its data structure constraints.  For example,
@@ -3737,8 +3738,8 @@ transformed parameters {
   x = exp(y/2) * x_raw;
 }
 model {
-  y_raw ~ normal(0, 1); // implies y ~ normal(0, 3)
-  x_raw ~ normal(0, 1); // implies x ~ normal(0, exp(y/2))
+  y_raw ~ std_normal(); // implies y ~ normal(0, 3)
+  x_raw ~ std_normal(); // implies x ~ normal(0, exp(y/2))
 }
 \end{stancode}
 %
@@ -3928,7 +3929,7 @@ model {
   real half_nu;
   half_nu = 0.5 * nu;
   tau ~ gamma(half_nu, half_nu);
-  alpha ~ normal(0, 1);
+  alpha ~ std_normal();
   ...
 \end{stancode}
 %
@@ -4004,7 +4005,7 @@ transformed parameters {
   // implies: beta ~ normal(mu_beta, sigma_beta)
   beta = mu_beta + sigma_beta * beta_raw;
 model {
-  beta_raw ~ normal(0, 1);
+  beta_raw ~ std_normal();
   ...
 \end{stancode}
 %
@@ -4100,7 +4101,7 @@ transformed parameters {
   beta = mu + L * alpha;
 }
 model {
-  alpha ~ normal(0, 1);
+  alpha ~ std_normal();
   // implies: beta ~ multi_normal(mu, Sigma)
   ...
 \end{stancode}
@@ -4145,7 +4146,7 @@ transformed parameters {
 }
 model {
   sigma ~ cauchy(0, 5);
-  alpha ~ normal(0, 1);
+  alpha ~ std_normal();
   // implies: beta ~ multi_normal(mu,
   //  diag_matrix(sigma) * L * L' * diag_matrix(sigma)))
   ...
@@ -4210,7 +4211,7 @@ model {
   for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
 
-  z ~ normal(0, 1);
+  z ~ std_normal();
   // implies: L * A * A' * L' ~ wishart(nu, L * L')
   y ~ multi_normal_cholesky(mu, L * A);
   ...
@@ -4278,7 +4279,7 @@ model {
   for (i in 1:K)
     c[i] ~ chi_square(nu - i + 1);
 
-  z ~ normal(0, 1); // implies: crossprod(A_inv_L_inv) ~
+  z ~ std_normal(); // implies: crossprod(A_inv_L_inv) ~
   // inv_wishart(nu, L_inv' * L_inv)
   ...
 \end{stancode}
@@ -4307,7 +4308,7 @@ transformed parameters {
 }
 model {
   for (k in 1:K)
-    z[k] ~ normal(0, 1);
+    z[k] ~ std_normal();
   // implies: rho ~ dirichlet(0.5 * beta * ones)
   ...
 \end{stancode}
@@ -4573,6 +4574,7 @@ the data; if the sizes are very small, the simple vectorization may be
 faster, but for moderate to large sized groups, the full expansion
 should be faster.
 
+
 \section{Exploiting Sufficient Statistics}
 
 In some cases, models can be recoded to exploit sufficient statistics
@@ -4658,7 +4660,6 @@ Then the sum can be replaced with \code{a\_b[ii[n], jj[n]]}.
 
 \section{Exploiting Conjugacy}
 
-
 Continuing the model from the previous section, the conjugacy of the
 beta prior and binomial sampling distribution allow the model to be
 further optimized to the following equivalent form.
@@ -4669,6 +4670,7 @@ further optimized to the following equivalent form.
 %
 To make the model even more efficient, a transformed data variable
 defined to be \code{sum(y)} could be used in the place of \code{sum(y)}.
+
 
 \section{Standardizing Predictors and Outputs}
 
@@ -4889,6 +4891,25 @@ the transformed model, to
 \begin{stancode}
     y_std ~ normal(alpha_std + beta_std * x_std, sigma_std);
 \end{stancode}
+
+\subsection{Standard Normal Distribution}
+
+For many applications on the standard scale, normal distributions with
+location zero and scale one will be used.  In these cases, it is more
+efficient to use
+%
+\begin{stancode}
+y ~ std_normal();
+\end{stancode}
+%
+than to use
+%
+\begin{stancode}
+y ~ normal(0, 1);
+\end{stancode}
+%
+because the subtraction of the location and division by the scale
+cancel, as does subtracting the log of the scale.
 
 \section{Using Map-Reduce}
 

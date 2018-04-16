@@ -179,14 +179,27 @@
 \begin{description}
 \item {\tt \farg{#1} \textasciitilde\ {\bfseries #2}(\farg{#3});}
   \\
-  Increment log probability with {\tt #2\_#4(\farg{#1} \textbar\ \farg{#3})},
+  Increment target log probability density with {\tt #2\_#4(\farg{#1} \textbar\ \farg{#3})},
   dropping constant additive terms; \refsection{sampling-statements}
   explains sampling statements.%
 \index{{\tt\bfseries #2 }!sampling statement|hyperpage}
 \end{description}}
 
+\newcommand{\pitemTwoImpl}[3]{\subsubsection{Sampling Statement}
+\begin{description}
+\item {\tt \farg{#1} \textasciitilde\ {\bfseries #2}();}
+  \\
+  Increment target log probability density with {\tt #2\_#3(\farg{#1})},
+  dropping constant additive terms; \refsection{sampling-statements}
+  explains sampling statements.%
+\index{{\tt\bfseries #2 }!sampling statement|hyperpage}
+\end{description}}
+
+
 \newcommand{\pitem}[3]{\pitemImpl{#1}{#2}{#3}{lpdf}}
 \newcommand{\pitemdisc}[3]{\pitemImpl{#1}{#2}{#3}{lpmf}}
+
+\newcommand{\pitemTwo}[2]{\pitemTwoImpl{#1}{#2}{lpmf}}
 
 \newcommand{\indentarrow}{ \rotatebox[origin=c]{180}{\ensuremath{\Lsh}} }
 
@@ -227,4 +240,3 @@
 \raggedbottom
 
 \sloppy % no line overruns
-
