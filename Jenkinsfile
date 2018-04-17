@@ -140,6 +140,15 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
+                stage('g++ Integration Tests') {
+                    agent { label 'gcc' }
+                    steps {
+                        unstash 'StanSetup'
+                        writeFile(file: "make/local", text: "CC=${GCC}")
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
                 stage('Upstream CmdStan tests') {
                     when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
                     steps {
