@@ -46,7 +46,7 @@ data {
 }
 transformed data {
   real log_unif;
-  log_unif <- -log(T);  // log p(s)
+  log_unif = -log(T);  // log p(s)
 }
 parameters {
   real<lower=0> e;    // before change disaster rate
@@ -54,10 +54,10 @@ parameters {
 }
 transformed parameters {
   vector[T] lp;
-  lp <- rep_vector(log_unif, T);
+  lp = rep_vector(log_unif, T);
   for (s in 1:T)
     for (t in 1:T)
-      lp[s] <- lp[s] + poisson_log(D[t], if_else(t < s, e, l));
+      lp[s] = lp[s] + poisson_lpmf(D[t] | t < s ? e : l);
 }
 model {
   // prior
@@ -65,9 +65,9 @@ model {
   l ~ exponential(r_l);
 
   // likelihood
-  increment_log_prob(log_sum_exp(lp));
-}    
+  target += log_sum_exp(lp);
+}
 generated quantities {
   int<lower=1,upper=T> s;
-  s <- categorical_rng(softmax(lp));
+  s = categorical_rng(softmax(lp));
 }
