@@ -500,7 +500,7 @@ TEST(io_reader_writer, cholesky_factor_roundtrip) {
 
   EXPECT_EQ(6U,reader.available());
 
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(3,3));
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_cov_constrain(3,3));
   EXPECT_EQ(3,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(9,L.size());
@@ -530,7 +530,7 @@ TEST(io_reader_writer, cholesky_factor_roundtrip_asymmetric) {
 
   EXPECT_EQ(9U,reader.available());
 
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(4,3));
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_cov_constrain(4,3));
   EXPECT_EQ(4,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(12,L.size());
