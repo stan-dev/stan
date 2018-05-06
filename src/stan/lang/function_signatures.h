@@ -1332,4 +1332,5 @@ add("lgp_newton_solver", expr_type(vector_type()), expr_type(vector_type()), exp
     int_vector_types[1], int_vector_types[1]);
 
 add("lgp_newton_solver", expr_type(vector_type()), expr_type(vector_type()), expr_type(double_type()),
-    int_vector_types[1], int_vector_types[1], base_types[1], base_types[0]);
+    int_vector_types[1], int_vector_types[1], base_types[1], base_types[0],
+    base_types[0]);
