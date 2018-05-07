@@ -1166,8 +1166,8 @@ The model itself is as follows.
 
 \begin{stancode}
 model {
-  alpha ~ normal(0, 1);         // informative true prior
-  beta ~ normal(0, 1);          // informative true prior
+  alpha ~ std_normal();         // informative true prior
+  beta ~ std_normal();          // informative true prior
   delta ~ normal(0.75, 1);      // informative true prior
   for (n in 1:N)
     y[n] ~ bernoulli_logit(alpha[jj[n]] - beta[kk[n]] + delta);
@@ -1230,7 +1230,7 @@ The parameters should be clearer after the model definition.
 %
 \begin{stancode}
 model {
-  alpha ~ normal(0, 1);
+  alpha ~ std_normal();
   beta ~ normal(0, sigma_beta);
   gamma ~ lognormal(0, sigma_gamma);
   mu_beta ~ cauchy(0, 5);
@@ -1637,7 +1637,7 @@ transformed parameters {
   beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
-  to_vector(z) ~ normal(0, 1);
+  to_vector(z) ~ std_normal();
   L_Omega ~ lkj_corr_cholesky(2);
   ...
 \end{stancode}
@@ -1694,7 +1694,7 @@ transformed parameters {
   beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
 }
 model {
-  to_vector(z) ~ normal(0, 1);
+  to_vector(z) ~ std_normal();
   L_Omega ~ lkj_corr_cholesky(2);
   to_vector(gamma) ~ normal(0, 5);
   y ~ normal(rows_dot_product(beta[jj] , x), sigma);
@@ -1718,7 +1718,7 @@ This model also reparameterizes the prior scale \code{tau} to avoid potential pr
 %                  + diag_pre_multiply(sigma_Sigma,L_Sigma) * z);
 %   ...
 % model {
-%   to_vector(z) ~ normal(0, 1);
+%   to_vector(z) ~ std_normal();
 %   gamma ~ normal(0, 5);
 %   sigma_Sigma ~ cauchy(0, 2.5);
 %   L_Sigma ~ lkj_corr_cholesky(3);
@@ -2836,7 +2836,7 @@ single vectorized unit normal sampling statement.
 \begin{stancode}
 model {
   ...
-  h_std ~ normal(0, 1);
+  h_std ~ std_normal();
 \end{stancode}
 %
 Although the original model can take hundreds and sometimes thousands
@@ -6266,7 +6266,7 @@ transformed parameters {
 model {
   // prior
   for (k in 1:K)
-    mu[k] ~ normal(0, 1);
+    mu[k] ~ std_normal();
 
   // likelihood
   for (n in 1:N)
@@ -7084,7 +7084,7 @@ parameters {
   vector[N] eta;
 }
 model {
-  eta ~ normal(0, 1);
+  eta ~ std_normal();
 }
 generated quantities {
   vector[N] y;
@@ -7178,8 +7178,8 @@ model {
   L_K = cholesky_decompose(K);
 
   rho ~ inv_gamma(5, 5);
-  alpha ~ normal(0, 1);
-  sigma ~ normal(0, 1);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
 
   y ~ multi_normal_cholesky(mu, L_K);
 }
@@ -7247,9 +7247,9 @@ model {
   }
 
   rho ~ inv_gamma(5, 5);
-  alpha ~ normal(0, 1);
-  sigma ~ normal(0, 1);
-  eta ~ normal(0, 1);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
+  eta ~ std_normal();
 
   y ~ normal(f, sigma);
 }
@@ -7298,9 +7298,9 @@ parameters {
 model {
 ...
   rho ~ inv_gamma(5, 5);
-  alpha ~ normal(0, 1);
-  a ~ normal(0, 1);
-  eta ~ normal(0, 1);
+  alpha ~ std_normal();
+  a ~ std_normal();
+  eta ~ std_normal();
 
   y ~ poisson_log(a + f);
 }
@@ -7418,9 +7418,9 @@ model {
   }
 
   rho ~ inv_gamma(5, 5);
-  alpha ~ normal(0, 1);
-  sigma ~ normal(0, 1);
-  eta ~ normal(0, 1);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
+  eta ~ std_normal();
 
   y ~ normal(f, sigma);
 }
@@ -7599,9 +7599,9 @@ transformed parameters {
 }
 model {
   rho ~ inv_gamma(5, 5);
-  alpha ~ normal(0, 1);
-  sigma ~ normal(0, 1);
-  eta ~ normal(0, 1);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
+  eta ~ std_normal();
 
   y1 ~ normal(f[1:N1], sigma);
 }
@@ -7684,9 +7684,9 @@ transformed parameters {
 }
 model {
   rho ~ inv_gamma(5, 5);
-  alpha ~ normal(0, 1);
-  a ~ normal(0, 1);
-  eta ~ normal(0, 1);
+  alpha ~ std_normal();
+  a ~ std_normal();
+  eta ~ std_normal();
 
   z1 ~ bernoulli_logit(a + f[1:N1]);
 }
@@ -7804,8 +7804,8 @@ model {
   }
 
   rho ~ inv_gamma(5, 5);
-  alpha ~ normal(0, 1);
-  sigma ~ normal(0, 1);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
 
   y1 ~ multi_normal_cholesky(mu, L_K);
 }
@@ -7910,10 +7910,10 @@ model {
   }
 
   rho ~ inv_gamma(5, 5);
-  alpha ~ normal(0, 1);
-  sigma ~ normal(0, 1);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
   L_Omega ~ lkj_corr_cholesky(3);
-  to_vector(eta) ~ normal(0, 1);
+  to_vector(eta) ~ std_normal();
 
   to_vector(y) ~ normal(to_vector(f), sigma);
 }
@@ -8575,8 +8575,8 @@ parameters {
 model {
   real y_hat[T,2];
   sigma ~ cauchy(0, 2.5);
-  theta ~ normal(0, 1);
-  y0 ~ normal(0, 1);
+  theta ~ std_normal();
+  y0 ~ std_normal();
   y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
   for (t in 1:T)
     y[t] ~ normal(y_hat[t], sigma);

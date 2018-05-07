@@ -39,12 +39,12 @@ also be written in whatever character set is convenient.
 
 Stan allows one file to be included within another file with the
 following syntax.  For example, suppose the file
-\code{std-normal.stan} defines the standard normal log probability
+\code{my-std-normal.stan} defines the standard normal log probability
 density function (up to an additive constant).
 %
 \begin{stancode}
 functions {
-  real std_normal_lpdf(vector y) {
+  real my_std_normal_lpdf(vector y) {
     return -0.5 * y' * y;
   }
 }
@@ -54,22 +54,22 @@ Suppose we also have a file containing a Stan program with an include
 statement.
 %
 \begin{stancode}
-#include std-normal.stan
+#include my-std-normal.stan
 parameters {
   real y;
 }
 model {
-  y ~ std_normal();
+  y ~ my_std_normal();
 }
 \end{stancode}
 %
 This Stan program behaves as if the contents of the file
-\code{std-normal.stan} replace the line with the \code{\#include}
+\code{my-std-normal.stan} replace the line with the \code{\#include}
 statement, behaving as if a single Stan program were provided.
 %
 \begin{stancode}
 functions {
-  real std_normal_lpdf(vector y) {
+  real my_std_normal_lpdf(vector y) {
     return -0.5 * y' * y;
   }
 }
@@ -77,7 +77,7 @@ parameters {
   real y;
 }
 model {
-  y ~ std_normal();
+  y ~ my_std_normal();
 }
 \end{stancode}
 %
@@ -2659,7 +2659,7 @@ as \code{real~operator*(row\_vector,vector)}.
 There are several expression constructions in Stan that act as
 higher-order functions.%
 %
-\footnote{Interanlly, they are implemented as their own expression
+\footnote{Internally, they are implemented as their own expression
   types because Stan doesn't have object-level functional types
   (yet).}
 %
@@ -2841,7 +2841,7 @@ statement consisting only of a semicolon.
 
 \section{Statement Block Contexts}
 
-The data and parameters blocks do not allow statments of any kind
+The data and parameters blocks do not allow statements of any kind
 because these blocks are solely used to declare the data variables for
 input and the parameter variables for sampling.  All other blocks
 allow statements.  In these blocks, both variable declarations and
@@ -3716,7 +3716,7 @@ For arrays, vectors and row-vectors \code{ys}, the loop variable \code{y}
 traverses the elements of \code{ys} in order and for matrices \code{ys}
 it traverses the elements of \code{ys} in column-major order
 (top-to-bottom, left-to-right).
-In partcular, note the difference between looping over a matrix of type \code{matrix[N, M]} and a nested array of type \code{real[N, M]}.
+In particular, note the difference between looping over a matrix of type \code{matrix[N, M]} and a nested array of type \code{real[N, M]}.
 In the latter case, the loop variable \code{y} denotes an array of type \code{real[M]}
 rather than a single value of type \code{real} which would be its denotation
 in the former case.

@@ -254,7 +254,7 @@ namespace stan {
 
       algebra_solver_r.name("expression");
       algebra_solver_r
-        %= lit("algebra_solver")
+        %= (lit("algebra_solver") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > identifier_r          // 1) system function name (function only)
         > lit(',')
@@ -271,7 +271,7 @@ namespace stan {
 
       map_rect_r.name("map_rect");
       map_rect_r
-          %= lit("map_rect")
+          %= (lit("map_rect") >> no_skip[!char_("a-zA-Z0-9_")])
           > lit('(')
           > identifier_r          // 1) mapped function name
           > lit(',')

@@ -1186,6 +1186,46 @@ If $\mu \in \reals$ and $\sigma \in \posreals$, then for $y \in
 \end{description}
 
 
+\subsection{Standard Normal Distribution}
+
+The standard normal distribution is so-called because its parameters
+are the units for their respective operations---the location (mean) is zero
+and the scale (standard deviation) one.  The standard normal is
+parameter free and the unit parameters allow considerable
+simplification of the expression for the density.
+\[
+\distro{StdNormal}(y)
+\ = \
+\distro{Normal}(y \mid 0, 1)
+\ = \
+\frac{1}{\sqrt{2 \pi}}
+\,
+\exp \left( \frac{-y^2}{2} \right)\!.
+\]
+Up to a proportion on the log scale, where Stan computes,
+\[
+\log \distro{Normal}(y \mid 0, 1)
+\ = \
+\frac{-y^2}{2} + \mathrm{const}.
+\]
+With no logarithm, no subtraction, and no division by a parameter, the
+standard normal log density is much more efficient to compute than the
+normal log density with constant location $0$ and scale $1$.
+
+\subsubsection{Stan Functions}
+
+Only the log probabilty density function is available for the standard
+normal distribution; for other functions, use the \code{normal\_}
+versions with parameters $\mu = 0$ and $\sigma = 1$.
+
+\begin{description}
+\fitem{real}{std\_normal\_lpdf}{reals \farg{y}}{The standard normal
+  (location zero, scale one) log probability density of \farg{y}.}
+\end{description}
+
+
+\pitemTwo{y}{std\_normal}
+
 \section{Exponentially Modified Normal Distribution}
 
 \subsubsection{Probability Density Function}

@@ -87,7 +87,8 @@ namespace stan {
      * @param[in] reader trace of how program was included from files
      */
     inline void rethrow_located(const std::exception& e, int line,
-                                const io::program_reader& reader) {
+                                const io::program_reader& reader =
+                                  stan::io::program_reader()) {
       using std::bad_alloc;          // -> exception
       using std::bad_cast;           // -> exception
       using std::bad_exception;      // -> exception
