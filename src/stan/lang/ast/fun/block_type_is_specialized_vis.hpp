@@ -1,7 +1,6 @@
 #ifndef STAN_LANG_AST_FUN_BLOCK_TYPE_IS_SPECIALIZED_VIS_HPP
 #define STAN_LANG_AST_FUN_BLOCK_TYPE_IS_SPECIALIZED_VIS_HPP
 
-#include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_corr_block_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_cov_block_type.hpp>
@@ -23,7 +22,8 @@ namespace stan {
   namespace lang {
 
     /**
-     * Visitor to check if block_var_type is specialized vector or matrix type.
+     * Visitor to check for specialized block_var_type, i.e.,
+     * wrapped type is not one of int, real, vector, row_vector, matrix, or ill-formed.
      */
     struct block_type_is_specialized_vis : public boost::static_visitor<bool> {
       /**

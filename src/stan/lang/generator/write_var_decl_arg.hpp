@@ -68,7 +68,7 @@ namespace stan {
         generate_expression(ar_lens[i], NOT_USER_FACING, o);
         o << ", ";
         for (int j = 0; j < ct; ++j)
-          o << "vector<";
+          o << "std::vector<";
         o << cpp_type_str;
         for (int j = 0; j < ct; ++j) {
           if (j > 0 || ends_with_angle)

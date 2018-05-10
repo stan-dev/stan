@@ -38,7 +38,7 @@ namespace stan {
         for (int i = 0; i < indent; ++i)
           o << INDENT;
         for (int i = 0; i < ar_dims; ++i)
-          o << "vector<";
+          o << "std::vector<";
         o << typedef_var_type;
         if (ar_dims > 0)
           o << ">";

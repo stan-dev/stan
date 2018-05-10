@@ -8,27 +8,14 @@ namespace stan {
 namespace lang {
 bare_type_vis::bare_type_vis() {}
 
+
+  
 bare_expr_type bare_type_vis::operator()(const block_array_type& x) const {
-  // create innermost element type, then embed in bare_array_type.
-  bare_expr_type bare_base = x.contains().bare_type();
-  bare_array_type tmp(bare_base);
-  bare_expr_type bare_array = bare_expr_type(tmp);
-  for (int i = 0; i < x.dims() - 1; ++i) {
-    tmp = bare_array_type(bare_array);
-    bare_array = bare_expr_type(tmp);
-  }
-  return bare_array;
+  return bare_array_type(x.contains().bare_type(), x.dims());
 }
 
 bare_expr_type bare_type_vis::operator()(const local_array_type& x) const {
-  bare_expr_type bare_base = x.contains().bare_type();
-  bare_array_type tmp(bare_base);
-  bare_expr_type bare_array = bare_expr_type(tmp);
-  for (int i = 0; i < x.dims() - 1; ++i) {
-    tmp = bare_array_type(bare_array);
-    bare_array = bare_expr_type(tmp);
-  }
-  return bare_array;
+  return bare_array_type(x.contains().bare_type(), x.dims());
 }
 
 bare_expr_type bare_type_vis::operator()(

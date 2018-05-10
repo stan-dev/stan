@@ -27,56 +27,56 @@ namespace stan {
        *
        * @param x type
        */
-      void operator()(bare_array_type& x);
+      void operator()(bare_array_type& x) const;
 
       /**
        * Set `is_data_` flag to true.
        *
        * @param x type
        */
-      void operator()(double_type& x);
+      void operator()(double_type& x) const;
 
       /**
        * Do nothing.
        *
        * @param x type
        */
-      void operator()(ill_formed_type& x);
+      void operator()(ill_formed_type& x) const;
 
       /**
        * Set `is_data_` flag to true.
        *
        * @param x type
        */
-      void operator()(int_type& x);
+      void operator()(int_type& x) const;
 
       /**
        * Set `is_data_` flag to true.
        *
        * @param x type
        */
-      void operator()(matrix_type& x);
+      void operator()(matrix_type& x) const;
 
       /**
        * Set `is_data_` flag to true.
        *
        * @param x type
        */
-      void operator()(row_vector_type& x);
+      void operator()(row_vector_type& x) const;
 
       /**
        * Set `is_data_` flag to true.
        *
        * @param x type
        */
-      void operator()(vector_type& x);
+      void operator()(vector_type& x) const;
 
       /**
        * Do nothing.
        *
        * @param x type
        */
-      void operator()(void_type& x);
+      void operator()(void_type& x) const;
     };
   }
 }

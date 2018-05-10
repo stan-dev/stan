@@ -29,7 +29,7 @@ namespace stan {
       o << EOL;
       o << INDENT << "template <bool propto__, bool jacobian__, typename T__>"
         << EOL;
-      o << INDENT << "T__ log_prob(vector<T__>& params_r__," << EOL;
+      o << INDENT << "T__ log_prob(std::vector<T__>& params_r__," << EOL;
       o << INDENT << "             std::vector<int>& params_i__," << EOL;
       o << INDENT << "             std::ostream* pstream__ = 0) const {"
         << EOL2;

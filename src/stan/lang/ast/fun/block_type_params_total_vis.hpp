@@ -17,7 +17,6 @@
 #include <stan/lang/ast/type/simplex_block_type.hpp>
 #include <stan/lang/ast/type/unit_vector_block_type.hpp>
 #include <stan/lang/ast/type/vector_block_type.hpp>
-#include <boost/variant/static_visitor.hpp>
 
 namespace stan {
 namespace lang {

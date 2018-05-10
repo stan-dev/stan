@@ -14,7 +14,9 @@ namespace stan {
   namespace lang {
 
     /**
-     * Visitor to get order id string for variant bare_expr_type.
+     * Visitor to get a string which describes type wrapped by variant bare_expr_type.
+     * Ordering is ill-formed < void < primitive < vector < matrix < array.
+     * Array type ids constructed recursively.
      */
     struct bare_type_order_id_vis : public boost::static_visitor<std::string> {
       /**

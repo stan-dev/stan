@@ -39,7 +39,7 @@ namespace stan {
         el_type = el_type.array_contains();
 
       std::string vals("vals_r");
-      if (vtype.bare_type().is_int_type())
+      if (vtype.bare_type().base().is_int_type())
         vals = "vals_i";
 
       generate_indent(indent, o);
