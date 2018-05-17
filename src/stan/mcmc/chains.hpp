@@ -180,14 +180,15 @@ namespace stan {
         using math::index_type;
         typedef typename index_type<vector<double> >::type idx_t;
 
-        std::vector<double> ac;
-        std::vector<double> sample(x.size());
-        for (int i = 0; i < x.size(); i++)
+        size_t N = x.size();
+        std::vector<double> ac(N);
+        std::vector<double> sample(N);
+        for (int i = 0; i < N; i++)
           sample[i] = x(i);
         math::autocorrelation(sample, ac);
 
-        Eigen::VectorXd ac2(ac.size());
-        for (idx_t i = 0; i < ac.size(); i++)
+        Eigen::VectorXd ac2(N);
+        for (idx_t i = 0; i < N; i++)
           ac2(i) = ac[i];
         return ac2;
       }
@@ -197,14 +198,15 @@ namespace stan {
         using math::index_type;
         typedef typename index_type<vector<double> >::type idx_t;
 
-        std::vector<double> ac;
-        std::vector<double> sample(x.size());
-        for (int i = 0; i < x.size(); i++)
+        size_t N = x.size();
+        std::vector<double> ac(N);
+        std::vector<double> sample(N);
+        for (int i = 0; i < N; i++)
           sample[i] = x(i);
         math::autocovariance(sample, ac);
 
-        Eigen::VectorXd ac2(ac.size());
-        for (idx_t i = 0; i < ac.size(); i++)
+        Eigen::VectorXd ac2(N);
+        for (idx_t i = 0; i < N; i++)
           ac2(i) = ac[i];
         return ac2;
       }
