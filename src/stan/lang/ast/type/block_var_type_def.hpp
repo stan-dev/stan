@@ -1,9 +1,37 @@
 #ifndef STAN_LANG_AST_BLOCK_VAR_TYPE_DEF_HPP
 #define STAN_LANG_AST_BLOCK_VAR_TYPE_DEF_HPP
 
-#include <stan/lang/ast.hpp>
+#include <stan/lang/ast/type/block_array_type.hpp>
+#include <stan/lang/ast/type/cholesky_factor_corr_block_type.hpp>
+#include <stan/lang/ast/type/cholesky_factor_cov_block_type.hpp>
+#include <stan/lang/ast/type/corr_matrix_block_type.hpp>
+#include <stan/lang/ast/type/cov_matrix_block_type.hpp>
+#include <stan/lang/ast/type/double_block_type.hpp>
+#include <stan/lang/ast/type/ill_formed_type.hpp>
+#include <stan/lang/ast/type/int_block_type.hpp>
+#include <stan/lang/ast/type/matrix_block_type.hpp>
+#include <stan/lang/ast/type/ordered_block_type.hpp>
+#include <stan/lang/ast/type/positive_ordered_block_type.hpp>
+#include <stan/lang/ast/type/row_vector_block_type.hpp>
+#include <stan/lang/ast/type/simplex_block_type.hpp>
+#include <stan/lang/ast/type/unit_vector_block_type.hpp>
+#include <stan/lang/ast/type/vector_block_type.hpp>
+
+#include <stan/lang/ast/fun/bare_type_vis.hpp>
+#include <stan/lang/ast/fun/block_type_bounds_vis.hpp>
+#include <stan/lang/ast/fun/block_type_is_specialized_vis.hpp>
+#include <stan/lang/ast/fun/block_type_params_total_vis.hpp>
+#include <stan/lang/ast/fun/var_type_arg1_vis.hpp>
+#include <stan/lang/ast/fun/var_type_arg2_vis.hpp>
+#include <stan/lang/ast/fun/var_type_name_vis.hpp>
+#include <stan/lang/ast/fun/write_block_var_type.hpp>
+
+#include <ostream>
 #include <string>
 #include <vector>
+
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/get.hpp>
 
 namespace stan {
 namespace lang {
@@ -61,28 +89,43 @@ expression block_var_type::arg2() const {
 }
 
 block_var_type block_var_type::array_contains() const {
-  block_array_base_type_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::block_array_type>(&var_type_)) {
+    block_array_type vt = boost::get<stan::lang::block_array_type>(var_type_);
+    return vt.contains();
+  }
+  return ill_formed_type();
 }
 
 int block_var_type::array_dims() const {
-  block_array_dims_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::block_array_type>(&var_type_)) {
+    block_array_type vt = boost::get<stan::lang::block_array_type>(var_type_);
+    return vt.dims();
+  }
+  return 0;
 }
 
 block_var_type block_var_type::array_element_type() const {
-  block_array_element_type_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::block_array_type>(&var_type_)) {
+    block_array_type vt = boost::get<stan::lang::block_array_type>(var_type_);
+    return vt.element_type();
+  }
+  return ill_formed_type();
 }
 
 expression block_var_type::array_len() const {
-  var_type_array_len_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::block_array_type>(&var_type_)) {
+    block_array_type vt = boost::get<stan::lang::block_array_type>(var_type_);
+    return vt.array_len();
+  }
+  return expression(nil());
 }
 
 std::vector<expression> block_var_type::array_lens() const {
-  var_type_array_lens_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::block_array_type>(&var_type_)) {
+    block_array_type vt = boost::get<stan::lang::block_array_type>(var_type_);
+    return vt.array_lens();
+  }
+  return std::vector<expression>();
 }
 
 bare_expr_type block_var_type::bare_type() const {
@@ -96,8 +139,9 @@ range block_var_type::bounds() const {
 }
 
 bool block_var_type::is_array_type() const {
-  is_array_type_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::block_array_type>(&var_type_))
+    return true;
+  return false;
 }
 
 bool block_var_type::is_specialized() const {
@@ -106,8 +150,9 @@ bool block_var_type::is_specialized() const {
 }
 
 bool block_var_type::has_def_bounds() const {
-  block_type_has_def_bounds_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (this->bounds().has_low() || this->bounds().has_high())
+    return true;
+  return false;
 }
 
 std::string block_var_type::name() const {
@@ -116,8 +161,7 @@ std::string block_var_type::name() const {
 }
 
 int block_var_type::num_dims() const {
-  total_dims_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  return this->bare_type().num_dims();
 }
 
 expression block_var_type::params_total() const {

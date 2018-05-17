@@ -27,10 +27,10 @@ struct ordered_block_type {
    *
    * @param K size
    */
-  ordered_block_type(const expression& K);  // NOLINT(runtime/explicit)
+  explicit ordered_block_type(const expression& K);
 
   /**
-   * Get K (num rows, cols).
+   * Get K (num cols).
    */
   expression K() const;
 };

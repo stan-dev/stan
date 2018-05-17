@@ -33,7 +33,7 @@ struct bare_array_type {
    *
    * @param el_type element type
    */
-  bare_array_type(const bare_expr_type& el_type);  // NOLINT(runtime/explicit)
+  explicit bare_array_type(const bare_expr_type& el_type);
 
   /**
    * Construct a bare array type with the specified element type

@@ -9,9 +9,11 @@ namespace stan {
     struct bare_expr_type;
 
     /**
-     * Int and double types promote (sic) to same;
-     * all other types cannot be promoted to double, therfore
-     * will return ill_formed_type.
+     * Primitive types are scalar `int` or `double`.
+     * Single primitive type promotes (sic) to itself,
+     * i.e., `int` promotes to `int`, `double` promotes to `double`.
+     * Cannont promote non-primitive types to `int` or `double` so
+     * function returns `ill_formed_type` for all other types.
      *
      * @param et expression type
      * @return promoted expression type
@@ -19,10 +21,12 @@ namespace stan {
     bare_expr_type promote_primitive(const bare_expr_type& et);
 
     /**
-     * For args pair (int_type, double_type), returns double_type;
-     * pair (int_type, int_type) returns int_type (no promotion),
-     * pair (double_type, double_type) returns double_type (no promotion),
-     * for all other combinations, return ill_formed_type.
+     * Promote pair of primitive types to `double` type when appropriate.
+     * Pair (`int`, `double`) or (`double`, `int`) promotes to `double`.
+     * Pair (`int`, `int`) promotes (sic) to `int`, likewise,
+     * pair (`double`, `double`) promotes (sic) to `double`.
+     * All other possible argument pairs have at least one non-primitive type,
+     * therefore function returns `ill_formed_type`.
      *
      * @param et1 first expression type
      * @param et2 second expression type

@@ -25,7 +25,7 @@ struct double_block_type {
    *
    * @param bounds variable upper and/or lower bounds
    */
-  double_block_type(const range& bounds);  // NOLINT(runtime/explicit)
+  explicit double_block_type(const range& bounds);
 
   /**
    * Get bounds constraints.

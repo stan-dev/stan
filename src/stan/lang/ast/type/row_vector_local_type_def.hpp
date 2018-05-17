@@ -4,13 +4,13 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
-    row_vector_local_type::row_vector_local_type() : N_(nil()) { }
+namespace lang {
+row_vector_local_type::row_vector_local_type(const expression& N) : N_(N) {}
 
-    row_vector_local_type::row_vector_local_type(const expression& N)
-      : N_(N) { }
+row_vector_local_type::row_vector_local_type()
+  : row_vector_local_type(nil()) {}
 
-    expression row_vector_local_type::N() const { return N_; }
-  }
-}
+expression row_vector_local_type::N() const { return N_; }
+}  // namespace lang
+}  // namespace stan
 #endif

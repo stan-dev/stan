@@ -11,18 +11,17 @@
 #include <stan/lang/ast/type/vector_type.hpp>
 #include <stan/lang/ast/type/void_type.hpp>
 
-#include <stan/lang/ast/fun/bare_array_base_type_vis.hpp>
-#include <stan/lang/ast/fun/bare_array_dims_vis.hpp>
-#include <stan/lang/ast/fun/bare_array_element_type_vis.hpp>
 #include <stan/lang/ast/fun/bare_type_is_data_vis.hpp>
 #include <stan/lang/ast/fun/bare_type_order_id_vis.hpp>
 #include <stan/lang/ast/fun/bare_type_set_is_data_vis.hpp>
+#include <stan/lang/ast/fun/bare_type_total_dims_vis.hpp>
 #include <stan/lang/ast/fun/bare_type_vis.hpp>
-#include <stan/lang/ast/fun/is_array_type_vis.hpp>
-#include <stan/lang/ast/fun/total_dims_vis.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type.hpp>
 #include <ostream>
 #include <string>
+
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/get.hpp>
 
 namespace stan {
 namespace lang {
@@ -58,31 +57,42 @@ bare_expr_type::bare_expr_type(const bare_array_type& x)
     : bare_type_(bare_array_type(x.element_type_)) {}
 
 bare_expr_type bare_expr_type::array_element_type() const {
-  bare_array_element_type_vis vis;
-  return boost::apply_visitor(vis, bare_type_);
+  if (boost::get<stan::lang::bare_array_type>(&bare_type_)) {
+    bare_array_type bat = boost::get<stan::lang::bare_array_type>(bare_type_);
+    return bat.element_type_;
+  }
+  return ill_formed_type();
+
 }
 
 bare_expr_type bare_expr_type::array_contains() const {
-  bare_array_base_type_vis vis;
-  return boost::apply_visitor(vis, bare_type_);
+  if (boost::get<stan::lang::bare_array_type>(&bare_type_)) {
+    bare_array_type bat = boost::get<stan::lang::bare_array_type>(bare_type_);
+    return bat.contains();
+  }
+  return ill_formed_type();
 }
 
 int bare_expr_type::array_dims() const {
-  bare_array_dims_vis vis;
-  return boost::apply_visitor(vis, bare_type_);
+  if (boost::get<stan::lang::bare_array_type>(&bare_type_)) {
+    bare_array_type bat = boost::get<stan::lang::bare_array_type>(bare_type_);
+    return bat.dims();
+  }
+  return 0;
 }
 
 bare_expr_type bare_expr_type::base() const {
-  is_array_type_vis is_array_vis;
-  bare_array_base_type_vis get_base_vis;
-  if (boost::apply_visitor(is_array_vis, bare_type_))
-    return boost::apply_visitor(get_base_vis, bare_type_);
+  if (boost::get<stan::lang::bare_array_type>(&bare_type_)) {
+    bare_array_type bat = boost::get<stan::lang::bare_array_type>(bare_type_);
+    return bat.contains();
+  }
   return bare_type_;
 }
 
 bool bare_expr_type::is_array_type() const {
-  is_array_type_vis vis;
-  return boost::apply_visitor(vis, bare_type_);
+  if (boost::get<stan::lang::bare_array_type>(&bare_type_))
+    return true;
+  return false;
 }
 
 bool bare_expr_type::is_data() const {
@@ -123,7 +133,7 @@ bool bare_expr_type::is_void_type() const {
 }
 
 int bare_expr_type::num_dims() const {
-  total_dims_vis vis;
+  bare_type_total_dims_vis vis;
   return boost::apply_visitor(vis, bare_type_);
 }
 
@@ -139,36 +149,34 @@ void bare_expr_type::set_is_data() {
 
 bool bare_expr_type::operator==(const bare_expr_type& bare_type) const {
   return order_id() == bare_type.order_id();
-  //        && this->is_data() == bare_type.is_data();
 }
 
 bool bare_expr_type::operator!=(const bare_expr_type& bare_type) const {
   return order_id() != bare_type.order_id();
-  //        || this->is_data() != bare_type.is_data();
 }
 
 bool bare_expr_type::operator<(const bare_expr_type& bare_type) const {
-  if (this->is_data() == bare_type.is_data())
+  if (is_data() == bare_type.is_data())
     return order_id() < bare_type.order_id();
-  return this->is_data() < bare_type.is_data();
+  return is_data() < bare_type.is_data();
 }
 
 bool bare_expr_type::operator>(const bare_expr_type& bare_type) const {
-  if (this->is_data() == bare_type.is_data())
+  if (is_data() == bare_type.is_data())
     return order_id() > bare_type.order_id();
-  return this->is_data() > bare_type.is_data();
+  return is_data() > bare_type.is_data();
 }
 
 bool bare_expr_type::operator<=(const bare_expr_type& bare_type) const {
-  if (this->is_data() == bare_type.is_data())
+  if (is_data() == bare_type.is_data())
     return order_id() <= bare_type.order_id();
-  return this->is_data() <= bare_type.is_data();
+  return is_data() <= bare_type.is_data();
 }
 
 bool bare_expr_type::operator>=(const bare_expr_type& bare_type) const {
-  if (this->is_data() == bare_type.is_data())
+  if (is_data() == bare_type.is_data())
     return order_id() >= bare_type.order_id();
-  return this->is_data() >= bare_type.is_data();
+  return is_data() >= bare_type.is_data();
 }
 
 std::ostream& operator<<(std::ostream& o, const bare_expr_type& bare_type) {

@@ -26,10 +26,10 @@ struct positive_ordered_block_type {
    *
    * @param K size
    */
-  positive_ordered_block_type(const expression& K);  // NOLINT(runtime/explicit)
+  explicit positive_ordered_block_type(const expression& K);
 
   /**
-   * Get K (num rows, cols).
+   * Get K (num cols).
    */
   expression K() const;
 };

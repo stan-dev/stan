@@ -8,7 +8,7 @@ namespace stan {
   namespace lang {
 
     std::ostream& write_bare_expr_type(std::ostream& o, bare_expr_type type) {
-      if (type.is_array_type()) {
+      if (type.array_dims() > 0) {
         int commas = type.array_dims() - 1;
         o << type.array_contains();
         o << "[ ";

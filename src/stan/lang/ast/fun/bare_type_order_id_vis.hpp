@@ -8,6 +8,7 @@
 #include <stan/lang/ast/type/matrix_type.hpp>
 #include <stan/lang/ast/type/row_vector_type.hpp>
 #include <stan/lang/ast/type/vector_type.hpp>
+#include <stan/lang/ast/type/void_type.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <string>
 namespace stan {
@@ -24,69 +25,9 @@ namespace stan {
        */
       bare_type_order_id_vis();
 
-      /**
-       * Return identity string for this type.
-       *
-       * @param x type
-       * @return identity string
-       */
-      std::string operator()(const bare_array_type& x) const;
+      template <typename T>
+      std::string operator()(const T& x) const;
 
-      /**
-       * Return identity string for this type.
-       *
-       * @param x type
-       * @return identity string
-       */
-      std::string operator()(const double_type& x) const;
-
-      /**
-       * Return identity string for this type.
-       *
-       * @param x type
-       * @return identity string
-       */
-      std::string operator()(const ill_formed_type& x) const;
-
-      /**
-       * Return identity string for this type.
-       *
-       * @param x type
-       * @return identity string
-       */
-      std::string operator()(const int_type& x) const;
-
-      /**
-       * Return identity string for this type.
-       *
-       * @param x type
-       * @return identity string
-       */
-      std::string operator()(const matrix_type& x) const;
-
-      /**
-       * Return identity string for this type.
-       *
-       * @param x type
-       * @return identity string
-       */
-      std::string operator()(const row_vector_type& x) const;
-
-      /**
-       * Return identity string for this type.
-       *
-       * @param x type
-       * @return identity string
-       */
-      std::string operator()(const vector_type& x) const;
-
-      /**
-       * Return identity string for this type.
-       *
-       * @param x type
-       * @return identity string
-       */
-      std::string operator()(const void_type& x) const;
     };
   }
 }

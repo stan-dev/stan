@@ -76,7 +76,9 @@ TEST(generateExpression, array_expr) {
   elements.push_back(e1);
   elements.push_back(e1);
   elements.push_back(e1);
-  stan::lang::array_expr ar1(elements);
+  stan::lang::array_expr ar1;
+  ar1.args_ = elements;
+  ar1.type_ = stan::lang::bare_array_type(stan::lang::double_type());
   stan::lang::expression e2 = ar1;
 
   generate_expression(e2, user_facing, msgs);

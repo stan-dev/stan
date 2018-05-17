@@ -47,7 +47,12 @@ namespace stan {
       } else {
         ss << "_" << fn_name << "(";
       }
-      if (!(fn_name.compare("constrain") == 0)) return ss.str();
+
+      if ((fn_name.compare("unconstrain") == 0)) {
+        if (btype.has_def_bounds())
+          ss << ", ";
+        return ss.str();
+      }
 
       if (!is_nil(btype.arg1())) {
         if (btype.has_def_bounds())

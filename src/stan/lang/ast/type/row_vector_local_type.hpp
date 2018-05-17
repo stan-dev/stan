@@ -22,14 +22,14 @@ struct row_vector_local_type {
 
   /**
    * Construct a local var type with specified values.
-   * Length should be int expression - constructor doesn't check.
+   * Arg `N` should be int expression - constructor doesn't check.
    *
-   * @param N vector length
+   * @param N num columns for row vector
    */
-  row_vector_local_type(const expression& N);  // NOLINT(runtime/explicit)
+  explicit row_vector_local_type(const expression& N);
 
   /**
-   * Get N (vector length).
+   * Get N (num cols).
    */
   expression N() const;
 };

@@ -8,36 +8,25 @@
 namespace stan {
 namespace lang {
 
-block_var_decl::block_var_decl() : type_(ill_formed_type()) {
-  this->name_ = "";
-  this->bare_type_ = ill_formed_type();
-  this->def_ = nil();
-}
+block_var_decl::block_var_decl() : var_decl("", ill_formed_type(), nil()),
+                                   type_(ill_formed_type()) { }
 
 block_var_decl::block_var_decl(const std::string& name,
                                const block_var_type& type)
-    : type_(type) {
-  this->name_ = name;
-  this->bare_type_ = type.bare_type();
-  this->def_ = nil();
-}
+  : var_decl(name, type.bare_type(), nil()), type_(type) { }
 
 block_var_decl::block_var_decl(const std::string& name,
                                const block_var_type& type,
                                const expression& def)
-    : type_(type) {
-  this->name_ = name;
-  this->bare_type_ = type.bare_type();
-  this->def_ = def;
-}
+  : var_decl(name, type.bare_type(), def), type_(type) { }
 
 bare_expr_type block_var_decl::bare_type() const { return type_.bare_type(); }
 
-expression block_var_decl::def() const { return this->def_; }
+expression block_var_decl::def() const { return def_; }
 
-bool block_var_decl::has_def() const { return !is_nil(this->def_); }
+bool block_var_decl::has_def() const { return !is_nil(def_); }
 
-std::string block_var_decl::name() const { return this->name_; }
+std::string block_var_decl::name() const { return name_; }
 
 block_var_type block_var_decl::type() const { return type_; }
 

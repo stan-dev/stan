@@ -26,10 +26,6 @@ bare_expr_type indexed_type(const expression& e, const std::vector<idx>& idxs) {
   if (idxs.size() == 0)
     return e.bare_type();
 
-  // cannot index primitive type
-  if (e.bare_type().num_dims() == 0)
-    return ill_formed_type();
-
   // cannot have more indexes than there are dimensions, even if they're multi
   int idx_sz = idxs.size();
   if (idx_sz > e.bare_type().num_dims())

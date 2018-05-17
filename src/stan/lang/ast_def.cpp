@@ -40,37 +40,24 @@
 #include <stan/lang/ast/type/vector_type_def.hpp>
 #include <stan/lang/ast/type/void_type_def.hpp>
 
-#include <stan/lang/ast/fun/bare_array_base_type_vis_def.hpp>
-#include <stan/lang/ast/fun/bare_array_dims_vis_def.hpp>
-#include <stan/lang/ast/fun/bare_array_element_type_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_is_data_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_order_id_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_set_is_data_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_vis_def.hpp>
-#include <stan/lang/ast/fun/block_array_base_type_vis_def.hpp>
-#include <stan/lang/ast/fun/block_array_dims_vis_def.hpp>
-#include <stan/lang/ast/fun/block_array_element_type_vis_def.hpp>
+#include <stan/lang/ast/fun/bare_type_total_dims_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_bounds_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_is_specialized_vis_def.hpp>
-#include <stan/lang/ast/fun/block_type_has_def_bounds_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_params_total_vis_def.hpp>
 #include <stan/lang/ast/fun/expression_bare_type_vis_def.hpp>
-#include <stan/lang/ast/fun/is_array_type_vis_def.hpp>
 #include <stan/lang/ast/fun/is_nil_def.hpp>
 #include <stan/lang/ast/fun/is_nil_vis_def.hpp>
-#include <stan/lang/ast/fun/local_array_base_type_vis_def.hpp>
-#include <stan/lang/ast/fun/local_array_dims_vis_def.hpp>
-#include <stan/lang/ast/fun/local_array_element_type_vis_def.hpp>
-#include <stan/lang/ast/fun/total_dims_vis_def.hpp>
-
 #include <stan/lang/ast/fun/var_type_arg1_vis_def.hpp>
 #include <stan/lang/ast/fun/var_type_arg2_vis_def.hpp>
-#include <stan/lang/ast/fun/var_type_array_len_vis_def.hpp>
-#include <stan/lang/ast/fun/var_type_array_lens_vis_def.hpp>
 #include <stan/lang/ast/fun/var_type_name_vis_def.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type_def.hpp>
 #include <stan/lang/ast/fun/write_block_var_type_def.hpp>
 #include <stan/lang/ast/fun/write_expression_vis_def.hpp>
+#include <stan/lang/ast/fun/write_idx_vis_def.hpp>
 
 #include <stan/lang/ast/fun/ends_with_def.hpp>
 #include <stan/lang/ast/fun/fun_name_exists_def.hpp>

@@ -24,12 +24,12 @@ struct vector_local_type {
    * Construct a local var type with specified values.
    * Length should be int expression - constructor doesn't check.
    *
-   * @param N vector length
+   * @param N num rows
    */
-  vector_local_type(const expression& N);  // NOLINT(runtime/explicit)
+  explicit vector_local_type(const expression& N);
 
   /**
-   * Get N (vector length).
+   * Get N (num rows).
    */
   expression N() const;
 };

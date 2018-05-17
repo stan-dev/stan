@@ -22,14 +22,13 @@ struct simplex_block_type {
 
   /**
    * Construct a block var type with specified values.
-   * Size should be int expression - constructor doesn't check.
    *
-   * @param K simplex length
+   * @param K num columns for simplex
    */
-  simplex_block_type(const expression& K);  // NOLINT(runtime/explicit)
+  explicit simplex_block_type(const expression& K);
 
   /**
-   * Get K (simplex length).
+   * Get K (num columns)
    */
   expression K() const;
 };

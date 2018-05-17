@@ -7,12 +7,12 @@
 namespace stan {
   namespace lang {
 
-    vector_type::vector_type() : is_data_(false) { }
-
     vector_type::vector_type(bool is_data) : is_data_(is_data) { }
 
+    vector_type::vector_type() : vector_type(false) { }
+
     std::string vector_type::oid() const {
-      return std::string("04_vector_type");
+      return "04_vector_type";
     }
   }
 }

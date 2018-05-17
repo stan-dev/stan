@@ -8,26 +8,17 @@
 namespace stan {
 namespace lang {
 
-bare_array_type::bare_array_type()
-    : element_type_(ill_formed_type()), is_data_(false) {}
+bare_expr_type to_element_type(const bare_expr_type& el_type, size_t num_dims) {
+  if (num_dims == 0)
+    return ill_formed_type();
+  if (el_type.is_ill_formed_type())
+    return ill_formed_type();
+  if (el_type.is_array_type())
+    return ill_formed_type();
+  if (num_dims == 1)
+    return el_type;
 
-bare_array_type::bare_array_type(const bare_expr_type& el_type)
-    : element_type_(el_type), is_data_(el_type.is_data()) {}
-
-bare_array_type::bare_array_type(const bare_expr_type& el_type,
-                                 size_t num_dims) {
-  if (num_dims == 0 || el_type.is_ill_formed_type()
-      || el_type.is_array_type()) {
-    element_type_ = ill_formed_type();
-    is_data_ = false;
-    return;
-  }
   // build single or nested array
-  if (num_dims == 1) {
-    element_type_ = el_type;
-    is_data_ = el_type.is_data();
-    return;
-  }
   bare_array_type bat(el_type);
   bat.is_data_ = el_type.is_data();
   bare_expr_type bet(bat);
@@ -36,9 +27,19 @@ bare_array_type::bare_array_type(const bare_expr_type& el_type,
     bat = bare_array_type(bet);
     bat.is_data_ = bet.is_data();
   }
-  element_type_ = bet;
-  is_data_ = bet.is_data();
+  return bet;
 }
+
+bare_array_type::bare_array_type()
+    : element_type_(ill_formed_type()), is_data_(false) {}
+
+bare_array_type::bare_array_type(const bare_expr_type& el_type)
+    : element_type_(el_type), is_data_(el_type.is_data()) {}
+
+bare_array_type::bare_array_type(const bare_expr_type& el_type,
+                                 size_t num_dims)
+  : element_type_(to_element_type(el_type, num_dims)),
+    is_data_(el_type.is_data()) {}
 
 bare_expr_type bare_array_type::contains() const {
   bare_expr_type cur_type(element_type_);

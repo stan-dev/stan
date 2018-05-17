@@ -30,7 +30,10 @@ namespace stan {
   namespace lang {
 
     /**
-     * Visitor to get num cols from matrix types.
+     * Visitor to get num cols from square and rect matrix types,
+     * returns nil expression otherwise.
+     * Note: square matrix types have single dimension
+     * that is returned as value for both `arg1` and `arg2`.
      */
     struct var_type_arg2_vis :
       public boost::static_visitor<expression> {

@@ -5,9 +5,9 @@
 
 namespace stan {
 namespace lang {
-ordered_block_type::ordered_block_type() : K_(nil()) {}
-
 ordered_block_type::ordered_block_type(const expression& K) : K_(K) {}
+
+ordered_block_type::ordered_block_type() : ordered_block_type(nil()) {}
 
 expression ordered_block_type::K() const { return K_; }
 }  // namespace lang

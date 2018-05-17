@@ -8,43 +8,42 @@
 #include <stan/lang/ast/type/matrix_type.hpp>
 #include <stan/lang/ast/type/row_vector_type.hpp>
 #include <stan/lang/ast/type/vector_type.hpp>
+#include <stan/lang/ast/type/void_type.hpp>
 #include <string>
 
 namespace stan {
-namespace lang {
-bare_type_order_id_vis::bare_type_order_id_vis() {}
+  namespace lang {
+    bare_type_order_id_vis::bare_type_order_id_vis() {}
 
-std::string bare_type_order_id_vis::operator()(const bare_array_type& x) const {
-  return x.oid();
-}
+    template <typename T>
+    std::string bare_type_order_id_vis::operator()(const T& x) const {
+      return x.oid();
+    }
 
-std::string bare_type_order_id_vis::operator()(const double_type& x) const {
-  return x.oid();
-}
+    template std::string
+    bare_type_order_id_vis::operator()(const bare_array_type&) const;
 
-std::string bare_type_order_id_vis::operator()(const ill_formed_type& x) const {
-  return x.oid();
-}
+    template std::string
+    bare_type_order_id_vis::operator()(const double_type&) const;
 
-std::string bare_type_order_id_vis::operator()(const int_type& x) const {
-  return x.oid();
-}
+    template std::string
+    bare_type_order_id_vis::operator()(const ill_formed_type&) const;
 
-std::string bare_type_order_id_vis::operator()(const matrix_type& x) const {
-  return x.oid();
-}
+    template std::string
+    bare_type_order_id_vis::operator()(const int_type&) const;
 
-std::string bare_type_order_id_vis::operator()(const row_vector_type& x) const {
-  return x.oid();
-}
+    template std::string
+    bare_type_order_id_vis::operator()(const matrix_type&) const;
 
-std::string bare_type_order_id_vis::operator()(const vector_type& x) const {
-  return x.oid();
-}
+    template std::string
+    bare_type_order_id_vis::operator()(const row_vector_type&) const;
 
-std::string bare_type_order_id_vis::operator()(const void_type& x) const {
-  return x.oid();
-}
-}  // namespace lang
+    template std::string
+    bare_type_order_id_vis::operator()(const vector_type&) const;
+
+    template std::string
+    bare_type_order_id_vis::operator()(const void_type&) const;
+
+  }  // namespace lang
 }  // namespace stan
 #endif

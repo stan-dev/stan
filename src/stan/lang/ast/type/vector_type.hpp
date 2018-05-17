@@ -25,7 +25,7 @@ namespace stan {
        *
        * @param is_data true when var is specified data-only
        */
-      vector_type(bool is_data);  // NOLINT(runtime/explicit)
+      explicit vector_type(bool is_data);
 
       /**
        * Returns identity string for this type.

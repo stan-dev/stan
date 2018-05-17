@@ -26,6 +26,9 @@
 namespace stan {
 namespace lang {
 
+/**
+ * Visitor to format expression for parser error messages.
+ */
 struct write_expression_vis : public boost::static_visitor<std::string> {
   /**
    * Construct a visitor.

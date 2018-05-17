@@ -10,7 +10,7 @@ namespace stan {
     ill_formed_type::ill_formed_type() : is_data_(false) { }
 
     std::string ill_formed_type::oid() const {
-      return std::string("00_ill_formed_type");
+      return "00_ill_formed_type";
     }
   }
 }

@@ -26,7 +26,7 @@ struct corr_matrix_block_type {
    *
    * @param K corr matrix size
    */
-  corr_matrix_block_type(const expression& K);  // NOLINT(runtime/explicit)
+  explicit corr_matrix_block_type(const expression& K);
 
   /**
    * Get K (corr matrix num rows, columns)

@@ -6,51 +6,31 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    local_var_decl::local_var_decl()
-      : type_(ill_formed_type()) {
-      this->name_ = "";
-      this->bare_type_ = ill_formed_type();
-      this->def_ = nil();
-    }
+local_var_decl::local_var_decl()
+    : var_decl("", ill_formed_type(), nil()), type_(ill_formed_type()) {}
 
-    local_var_decl::local_var_decl(const std::string& name,
-                                   const local_var_type& type)
-      : type_(type) {
-      this->name_ = name;
-      this->bare_type_ = type.bare_type();
-      this->def_ = nil();
-    }
+local_var_decl::local_var_decl(const std::string& name,
+                               const local_var_type& type)
+  : var_decl(name, type.bare_type(), nil()), type_(type) {}
 
-    local_var_decl::local_var_decl(const std::string& name,
-                                   const local_var_type& type,
-                                   const expression& def)
-      : type_(type) {
-      this->name_ = name;
-      this->bare_type_ = type.bare_type();
-      this->def_ = def;
-    }
+local_var_decl::local_var_decl(const std::string& name,
+                               const local_var_type& type,
+                               const expression& def)
+    : var_decl(name, type.bare_type(), def), type_(type) {}
 
-    bare_expr_type local_var_decl::bare_type() const {
-      return this->type_.bare_type();
-    }
-
-    expression local_var_decl::def() const {
-      return this->def_;
-    }
-
-    bool local_var_decl::has_def() const {
-      return !is_nil(this->def_);
-    }
-
-    std::string local_var_decl::name() const {
-      return this->name_;
-    }
-
-    local_var_type local_var_decl::type() const {
-      return type_;
-    }
-  }
+bare_expr_type local_var_decl::bare_type() const {
+  return type_.bare_type();
 }
+
+expression local_var_decl::def() const { return def_; }
+
+bool local_var_decl::has_def() const { return !is_nil(def_); }
+
+std::string local_var_decl::name() const { return name_; }
+
+local_var_type local_var_decl::type() const { return type_; }
+}  // namespace lang
+}  // namespace stan
 #endif

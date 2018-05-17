@@ -30,7 +30,8 @@ namespace stan {
   namespace lang {
 
     /**
-     * Visitor to get vector length/num rows from vector, matrix types.
+     * Visitor to get vector length/num rows from vector, matrix types,
+     * returns nil expression otherwise.
      */
     struct var_type_arg1_vis :
       public boost::static_visitor<expression> {

@@ -165,8 +165,6 @@ namespace stan {
 
         generate_indent(indent + vtype.array_dims() + 1, o);
         o << "writer__." << write_constraints_fn(el_type, "unconstrain");
-        if (vs[i].type().has_def_bounds())
-          o << ", ";
         o << var_name;
         write_var_idx_array_dims(vtype.array_dims(), o);
         o << ");" << EOL;

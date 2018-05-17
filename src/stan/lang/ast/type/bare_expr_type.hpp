@@ -65,12 +65,12 @@ struct bare_expr_type {
    * @param type bare type
    */
   bare_expr_type(const double_type& type);  // NOLINT(runtime/explicit)
+
   /**
    * Construct a bare type with the specified type.
    *
    * @param type bare type
    */
-
   bare_expr_type(const int_type& type);  // NOLINT(runtime/explicit)
 
   /**
@@ -109,9 +109,9 @@ struct bare_expr_type {
   bare_expr_type(const bare_array_type& type);  // NOLINT(runtime/explicit)
 
   /**
-   * Construct a local var type with the specified type.
+   * Construct a bare type with the specified type.
    *
-   * @param type local variable type
+   * @param type bare type
    */
   bare_expr_type(const bare_t& type);  // NOLINT(runtime/explicit)
 

@@ -42,16 +42,6 @@ struct array_expr {
    * Construct a default array expression.
    */
   array_expr();
-
-  /**
-   * Construct an array expression from the specified sequence of
-   * expressions.
-   * Note:  0-length array expression not allowed; args vector
-   * must have at least 1 element.
-   *
-   * @param args non-empty vector of array expression elements.
-   */
-  explicit array_expr(const std::vector<expression>& args);
 };
 
 }  // namespace lang

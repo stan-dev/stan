@@ -42,7 +42,7 @@ namespace stan {
       range bounds() const;
 
       /**
-       * Get N (num cols).
+       * Get N (num rows).
        */
       expression N() const;
     };

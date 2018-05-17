@@ -4,14 +4,12 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
+cov_matrix_block_type::cov_matrix_block_type(const expression& K) : K_(K) {}
 
-    cov_matrix_block_type::cov_matrix_block_type() : K_(nil()) { }
+cov_matrix_block_type::cov_matrix_block_type() : cov_matrix_block_type(nil()) {}
 
-    cov_matrix_block_type::cov_matrix_block_type(const expression& K)
-      : K_(K) { }
-
-    expression cov_matrix_block_type::K() const { return K_; }
-  }
-}
+expression cov_matrix_block_type::K() const { return K_; }
+}  // namespace lang
+}  // namespace stan
 #endif

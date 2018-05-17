@@ -8,7 +8,7 @@ namespace stan {
 
     std::ostream& write_block_var_type(std::ostream& o, block_var_type type) {
       block_var_type el_type = type;
-      if (type.is_array_type()) {
+      if (type.array_dims() > 0) {
         o << type.array_dims()
           << "-dim array of "
           << type.array_contains().name();

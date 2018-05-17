@@ -26,7 +26,7 @@ struct cov_matrix_block_type {
    *
    * @param K cov matrix size
    */
-  cov_matrix_block_type(const expression& K);  // NOLINT(runtime/explicit)
+  explicit cov_matrix_block_type(const expression& K);
 
   /**
    * Get K (cov matrix num rows, columns)

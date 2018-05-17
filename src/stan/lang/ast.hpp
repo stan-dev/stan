@@ -37,37 +37,24 @@
 #include <stan/lang/ast/type/vector_type.hpp>
 #include <stan/lang/ast/type/void_type.hpp>
 
-#include <stan/lang/ast/fun/bare_array_base_type_vis.hpp>
-#include <stan/lang/ast/fun/bare_array_dims_vis.hpp>
-#include <stan/lang/ast/fun/bare_array_element_type_vis.hpp>
 #include <stan/lang/ast/fun/bare_type_is_data_vis.hpp>
 #include <stan/lang/ast/fun/bare_type_order_id_vis.hpp>
 #include <stan/lang/ast/fun/bare_type_set_is_data_vis.hpp>
+#include <stan/lang/ast/fun/bare_type_total_dims_vis.hpp>
 #include <stan/lang/ast/fun/bare_type_vis.hpp>
-#include <stan/lang/ast/fun/block_array_base_type_vis.hpp>
-#include <stan/lang/ast/fun/block_array_dims_vis.hpp>
-#include <stan/lang/ast/fun/block_array_element_type_vis.hpp>
 #include <stan/lang/ast/fun/block_type_bounds_vis.hpp>
 #include <stan/lang/ast/fun/block_type_is_specialized_vis.hpp>
-#include <stan/lang/ast/fun/block_type_has_def_bounds_vis.hpp>
 #include <stan/lang/ast/fun/block_type_params_total_vis.hpp>
 #include <stan/lang/ast/fun/expression_bare_type_vis.hpp>
-#include <stan/lang/ast/fun/is_array_type_vis.hpp>
 #include <stan/lang/ast/fun/is_nil.hpp>
 #include <stan/lang/ast/fun/is_nil_vis.hpp>
-#include <stan/lang/ast/fun/local_array_base_type_vis.hpp>
-#include <stan/lang/ast/fun/local_array_dims_vis.hpp>
-#include <stan/lang/ast/fun/local_array_element_type_vis.hpp>
-#include <stan/lang/ast/fun/total_dims_vis.hpp>
-
 #include <stan/lang/ast/fun/var_type_arg1_vis.hpp>
 #include <stan/lang/ast/fun/var_type_arg2_vis.hpp>
-#include <stan/lang/ast/fun/var_type_array_len_vis.hpp>
-#include <stan/lang/ast/fun/var_type_array_lens_vis.hpp>
 #include <stan/lang/ast/fun/var_type_name_vis.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type.hpp>
 #include <stan/lang/ast/fun/write_block_var_type.hpp>
 #include <stan/lang/ast/fun/write_expression_vis.hpp>
+#include <stan/lang/ast/fun/write_idx_vis.hpp>
 
 #include <stan/lang/ast/fun/has_non_param_var_vis.hpp>
 #include <stan/lang/ast/fun/has_prob_fun_suffix.hpp>

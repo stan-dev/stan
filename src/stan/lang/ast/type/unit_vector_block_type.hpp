@@ -24,12 +24,12 @@ struct unit_vector_block_type {
    * Construct a block var type with specified values.
    * Size should be int expression - constructor doesn't check.
    *
-   * @param K size
+   * @param K number of columns
    */
-  unit_vector_block_type(const expression& K);  // NOLINT(runtime/explicit)
+  explicit unit_vector_block_type(const expression& K);
 
   /**
-   * Get K (vector length).
+   * Get K (num cols).
    */
   expression K() const;
 };

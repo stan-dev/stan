@@ -239,7 +239,7 @@ TEST(bareExprType, createCopyDataType2) {
 }
 
 TEST(bareExprType, createCopyArrayDataType) {
-  bare_array_type tDataArrayInt(int_type(true), 2);
+  bare_array_type tDataArrayInt(bare_expr_type(int_type(true)), 2);
   bare_expr_type x(tDataArrayInt);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_TRUE(x.is_data());
@@ -261,8 +261,7 @@ TEST(bareExprType, createCopyArrayDataType) {
 }
 
 TEST(bareExprType, createArray) {
-  int_type tInt;
-  bare_array_type d1(tInt);
+  bare_array_type d1(bare_expr_type(int_type(false)));
   bare_expr_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
@@ -274,7 +273,7 @@ TEST(bareExprType, createArray) {
 }
 
 TEST(bareExprType, createArrayData) {
-  bare_array_type d1(int_type(true));
+  bare_array_type d1(bare_expr_type(int_type(true)));
   bare_expr_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
@@ -286,8 +285,8 @@ TEST(bareExprType, createArrayData) {
 }
 
 TEST(bareExprType, createArrayData2) {
-  int_type tInt;
-  bare_expr_type betInt(tInt);
+  int_type int_type;
+  bare_expr_type betInt(int_type);
   betInt.set_is_data();
   EXPECT_TRUE(betInt.is_data());
   bare_array_type d1(betInt);

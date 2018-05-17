@@ -1,9 +1,27 @@
 #ifndef STAN_LANG_AST_LOCAL_VAR_TYPE_DEF_HPP
 #define STAN_LANG_AST_LOCAL_VAR_TYPE_DEF_HPP
 
-#include <stan/lang/ast.hpp>
+#include <stan/lang/ast/type/local_array_type.hpp>
+#include <stan/lang/ast/type/double_type.hpp>
+#include <stan/lang/ast/type/ill_formed_type.hpp>
+#include <stan/lang/ast/type/int_type.hpp>
+#include <stan/lang/ast/type/matrix_local_type.hpp>
+#include <stan/lang/ast/type/row_vector_local_type.hpp>
+#include <stan/lang/ast/type/vector_local_type.hpp>
+
+#include <stan/lang/ast/fun/bare_type_vis.hpp>
+#include <stan/lang/ast/fun/var_type_arg1_vis.hpp>
+#include <stan/lang/ast/fun/var_type_arg2_vis.hpp>
+#include <stan/lang/ast/fun/var_type_name_vis.hpp>
+#include <stan/lang/ast/fun/write_bare_expr_type.hpp>
+
+#include <ostream>
 #include <string>
 #include <vector>
+
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/get.hpp>
+
 
 namespace stan {
 namespace lang {
@@ -40,28 +58,43 @@ expression local_var_type::arg2() const {
 }
 
 local_var_type local_var_type::array_contains() const {
-  local_array_base_type_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::local_array_type>(&var_type_)) {
+    local_array_type vt = boost::get<stan::lang::local_array_type>(var_type_);
+    return vt.contains();
+  }
+  return ill_formed_type();
 }
 
 int local_var_type::array_dims() const {
-  local_array_dims_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::local_array_type>(&var_type_)) {
+    local_array_type vt = boost::get<stan::lang::local_array_type>(var_type_);
+    return vt.dims();
+  }
+  return 0;
 }
 
 local_var_type local_var_type::array_element_type() const {
-  local_array_element_type_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::local_array_type>(&var_type_)) {
+    local_array_type vt = boost::get<stan::lang::local_array_type>(var_type_);
+    return vt.element_type();
+  }
+  return ill_formed_type();
 }
 
 expression local_var_type::array_len() const {
-  var_type_array_len_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::local_array_type>(&var_type_)) {
+    local_array_type vt = boost::get<stan::lang::local_array_type>(var_type_);
+    return vt.array_len();
+  }
+  return expression(nil());
 }
 
 std::vector<expression> local_var_type::array_lens() const {
-  var_type_array_lens_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  if (boost::get<stan::lang::local_array_type>(&var_type_)) {
+    local_array_type vt = boost::get<stan::lang::local_array_type>(var_type_);
+    return vt.array_lens();
+  }
+  return std::vector<expression>();
 }
 
 bare_expr_type local_var_type::bare_type() const {
@@ -70,7 +103,9 @@ bare_expr_type local_var_type::bare_type() const {
 }
 
 bool local_var_type::is_array_type() const {
-  return boost::apply_visitor(is_array_type_vis(), var_type_);
+  if (boost::get<stan::lang::local_array_type>(&var_type_))
+    return true;
+  return false;
 }
 
 std::string local_var_type::name() const {
@@ -79,8 +114,7 @@ std::string local_var_type::name() const {
 }
 
 int local_var_type::num_dims() const {
-  total_dims_vis vis;
-  return boost::apply_visitor(vis, var_type_);
+  return this->bare_type().num_dims();
 }
 
 std::ostream& operator<<(std::ostream& o, const local_var_type& var_type) {

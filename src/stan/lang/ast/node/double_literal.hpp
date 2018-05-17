@@ -5,40 +5,40 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Node for holding a double literal.
-     */
-    struct double_literal {
-      /**
-       * Value of literal.
-       */
-      double val_;
+/**
+ * Node for holding a double literal.
+ */
+struct double_literal {
+  /**
+   * Value of literal.
+   */
+  double val_;
 
-      /**
-       * String representation.
-       */
-      std::string string_;
+  /**
+   * String representation.
+   */
+  std::string string_;
 
-      /**
-       * Expression type.
-       */
-      bare_expr_type type_;
+  /**
+   * Expression type.
+   */
+  bare_expr_type type_;
 
-      /**
-       * Default constructor for double literal.
-       */
-      double_literal();
+  /**
+   * Default constructor for double literal.
+   */
+  double_literal();
 
-      /**
-       * Construct a double literal with the specified value.
-       *
-       * @param val value of literal
-       */
-      explicit double_literal(double val);
-    };
+  /**
+   * Construct a double literal with the specified value.
+   *
+   * @param val value of literal
+   */
+  explicit double_literal(double val);
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

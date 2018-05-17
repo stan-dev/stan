@@ -1,7 +1,27 @@
 #ifndef STAN_LANG_AST_NODE_EXPRESSION_DEF_HPP
 #define STAN_LANG_AST_NODE_EXPRESSION_DEF_HPP
 
-#include <stan/lang/ast.hpp>
+
+#include <stan/lang/ast/nil.hpp>
+#include <stan/lang/ast/node/int_literal.hpp>
+#include <stan/lang/ast/node/double_literal.hpp>
+#include <stan/lang/ast/node/array_expr.hpp>
+#include <stan/lang/ast/node/matrix_expr.hpp>
+#include <stan/lang/ast/node/row_vector_expr.hpp>
+#include <stan/lang/ast/node/variable.hpp>
+#include <stan/lang/ast/node/fun.hpp>
+#include <stan/lang/ast/node/integrate_ode.hpp>
+#include <stan/lang/ast/node/integrate_ode_control.hpp>
+#include <stan/lang/ast/node/algebra_solver.hpp>
+#include <stan/lang/ast/node/algebra_solver_control.hpp>
+#include <stan/lang/ast/node/map_rect.hpp>
+#include <stan/lang/ast/node/index_op.hpp>
+#include <stan/lang/ast/node/index_op_sliced.hpp>
+#include <stan/lang/ast/node/conditional_op.hpp>
+#include <stan/lang/ast/node/binary_op.hpp>
+#include <stan/lang/ast/node/unary_op.hpp>
+
+#include <boost/variant/apply_visitor.hpp>
 #include <string>
 
 namespace stan {

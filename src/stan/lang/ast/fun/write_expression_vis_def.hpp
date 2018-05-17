@@ -150,10 +150,13 @@ std::string write_expression_vis::operator()(const index_op& e) const {
 
 std::string write_expression_vis::operator()(const index_op_sliced& e) const {
   std::stringstream ss;
-  ss << e.expr_.to_string();
+  ss << e.expr_.to_string() << "[";
   for (size_t i = 0; i < e.idxs_.size(); ++i) {
-    ss << "[ ]";
+    if (i > 0)
+      ss << ", ";
+    ss << e.idxs_[i].to_string();
   }
+  ss << "]";
   return ss.str();
 }
 
