@@ -1,0 +1,143 @@
+
+.serif {
+  font-family: "Lucida Bright", Times Roman, Palatino, "Book Antiqua", georgia, serif;
+}
+.sans-serif {
+  font-family: Gill Sans, Calibri, Verdana, sans-serif;
+}
+.monospace {
+  font-family: "Lucida Console", Consolas, "Liberation Mono", Menlo, Monaco, Courier, monospace;
+}
+
+p.caption {
+  color: #888;
+  margin-top: 10px;
+  font-style: italic;
+  font-size: 80%;
+  text-align: left;
+}
+
+p code {
+  white-space: inherit;
+}
+
+pre {
+  word-break: normal;
+  word-wrap: normal;
+}
+pre code {
+  white-space: inherit;
+}
+
+.header-section-number {
+  font-weight: 400;
+  margin-right: 0.25em;
+}
+.header-section-number::after {
+  content: ".";
+  font-weight: 400;
+}
+.chapter a b {
+  font-weight: 400;
+  margin-right: 0.15em
+}
+.chapter a b::after {
+  content: ". ";
+}
+.book .book-body .page-wrapper .page-inner section.normal h1 {
+  font-size: 250%;
+  font-style: oblique;
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 0.5em 0;
+}
+.book .book-body .page-wrapper .page-inner section.normal h2 {
+  font-size: 150%;
+  font-style: oblique;
+  font-weight: 400;
+  color: #444;
+  margin: 1.5em 0 0.35em 0;
+}
+.book .book-body .page-wrapper .page-inner section.normal h3 {
+  font-size: 125%;
+  font-style: oblique;
+  margin: 1.25em 0 0.35em 0;
+  font-weight: 500;
+}
+.book .book-body .page-wrapper .page-inner section.normal h4 {
+  font-size: 100%;
+  font-style: oblique;
+  margin: 1.25em 0 0 0;
+  font-weight: 500;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal em {
+  font-style: normal;
+  font-weight: normal;
+}
+.book .book-body .page-wrapper .page-inner section.normal strong {
+  font-style: italic;
+  font-weight: normal;
+  margin-right: 0.5em;
+}
+
+div .definition {
+  font-style: italic;
+  font-weight: normal;
+}
+div .definition strong {
+  font-style: normal;
+  font-weight: normal;
+}
+div .definition em {
+  font-style: normal;
+  font-weight: normal;
+}
+
+div .example {
+  font-style: normal;
+  font-weight: normal;
+  margin-left: 2em;
+}
+div .example strong {
+  font-style: italic;
+  font-weight: normal;
+}
+div .example em {
+  font-style: italic;
+  font-weight: normal;
+}
+.example .example strong {
+  font-style: italic;
+  margin-left: -2em;
+}
+.book .book-body .body-inner .page-wrapper .page-inner section div div div div.example {
+  font-size: 100%;
+}
+.book .book-body .body-inner.page-wrapper .page-inner section div div div.example {
+  font-size: 100%;
+}
+
+.book .book-header h1 {
+  opacity: 1;
+  text-align: center;
+}
+
+#header .title {
+  font-family: Gill Sans, Calibri, Verdana, sans-serif;
+  margin-bottom: -0.5em;
+  font-size: 300%;
+  font-weight: 600;
+  line-height: 1.1;
+}
+#header h4.author {
+  font-family: Gill Sans, Calibri, Verdana, sans-serif;
+  color: #333;
+  font-size: 200%;
+  margin-bottom: -0.75em;
+}
+#header h4.date {
+  font-family: Gill Sans, Calibri, Verdana, sans-serif;
+  color: #333;
+  font-size: 125%;
+}
