@@ -3,7 +3,7 @@ book_filename: "stan-reference.Rmd"
 rmd_files: ["cover.Rmd", "encoding.Rmd", "includes.Rmd", "comments.Rmd",  
             "whitespace.Rmd", "data_types.Rmd", "expressions.Rmd",  
             "statements.Rmd", "blocks.Rmd", "user-functions.Rmd",   
-            "execution.Rmd"]
+            "execution.Rmd", "transforms.Rmd"]
 language:
   ui:
     chapter_name: ""
