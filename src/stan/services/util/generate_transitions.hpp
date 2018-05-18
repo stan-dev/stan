@@ -2,10 +2,13 @@
 #define STAN_SERVICES_UTIL_GENERATE_TRANSITIONS_HPP
 
 #include <stan/callbacks/writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <string>
+#include <fstream>
 
 namespace stan {
   namespace services {
@@ -47,6 +50,15 @@ namespace stan {
                                 Model& model, RNG& base_rng,
                                 callbacks::interrupt& callback,
                                 callbacks::logger& logger) {
+
+        std::ofstream divergences_stream("divergences.csv");
+        callbacks::stream_writer divergences_stream_writer(divergences_stream,"#");
+        std::osstream divergences_diag_ignored();
+        callbacks::stream_writer divergences_diag_ignored_writer(d2,"#");
+        util::mcmc_writer* divergence_writer = new util::mcmc_writer(
+          divergences_stream_writer,divergences_diag_ignored_writer,logger);
+        divergence_writer->write_sample_names(init_s, sampler, model);
+
         for (int m = 0; m < num_iterations; ++m) {
           callback();
 
@@ -68,7 +80,7 @@ namespace stan {
             logger.info(message);
           }
 
-          init_s = sampler.transition(init_s, logger);
+          init_s = sampler.transition(init_s, logger, divergence_writer);
 
           if (save && ((m % num_thin) == 0)) {
             mcmc_writer.write_sample_params(base_rng, init_s, sampler, model);

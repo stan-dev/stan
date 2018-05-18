@@ -6,6 +6,7 @@
 #include <stan/math/prim/scal.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <stan/services/util/mcmc_writer.hpp>
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -72,7 +73,8 @@ namespace stan {
       double get_max_delta() { return this->max_deltaH_; }
 
       sample
-      transition(sample& init_sample, callbacks::logger& logger) {
+      transition(sample& init_sample, callbacks::logger& logger,
+                      stan::services::util::mcmc_writer* divergence_writer) {
         // Initialize the algorithm
         this->sample_stepsize();
 
@@ -115,7 +117,7 @@ namespace stan {
                            p_sharp_dummy, p_sharp_plus, rho_subtree,
                            H0, 1, n_leapfrog,
                            log_sum_weight_subtree, sum_metro_prob,
-                           logger);
+                           logger, divergence_writer);
             z_plus.ps_point::operator=(this->z_);
           } else {
             this->z_.ps_point::operator=(z_minus);
@@ -124,7 +126,7 @@ namespace stan {
                            p_sharp_dummy, p_sharp_minus, rho_subtree,
                            H0, -1, n_leapfrog,
                            log_sum_weight_subtree, sum_metro_prob,
-                           logger);
+                           logger, divergence_writer);
             z_minus.ps_point::operator=(this->z_);
           }
 
@@ -209,7 +211,8 @@ namespace stan {
                       Eigen::VectorXd& rho,
                       double H0, double sign, int& n_leapfrog,
                       double& log_sum_weight, double& sum_metro_prob,
-                      callbacks::logger& logger) {
+                      callbacks::logger& logger,
+                      stan::services::util::mcmc_writer* divergence_writer) {
         // Base case
         if (depth == 0) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
@@ -221,7 +224,13 @@ namespace stan {
           if (boost::math::isnan(h))
             h = std::numeric_limits<double>::infinity();
 
-          if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
+          if ((h - H0) > this->max_deltaH_) {
+            if(divergence_writer != 0) {
+              sample diverg_s(this->z_.q, -this->z_.V, 0);
+              divergence_writer->write_sample_params(this->rand_int_, diverg_s, *this, this->hamiltonian_.model_);
+            }
+            this->divergent_ = true;
+          }
 
           log_sum_weight = math::log_sum_exp(log_sum_weight, H0 - h);
 
@@ -250,7 +259,8 @@ namespace stan {
                        p_sharp_left, p_sharp_dummy, rho_left,
                        H0, sign, n_leapfrog,
                        log_sum_weight_left, sum_metro_prob,
-                       logger);
+                       logger,
+                       divergence_writer);
 
         if (!valid_left) return false;
 
@@ -265,7 +275,8 @@ namespace stan {
                        p_sharp_dummy, p_sharp_right, rho_right,
                        H0, sign, n_leapfrog,
                        log_sum_weight_right, sum_metro_prob,
-                       logger);
+                       logger,
+                       divergence_writer);
 
         if (!valid_right) return false;
 

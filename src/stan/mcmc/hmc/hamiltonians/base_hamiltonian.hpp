@@ -83,8 +83,8 @@ namespace stan {
         update_potential_gradient(z, logger);
       }
 
-    protected:
       const Model& model_;
+    protected:
 
       void write_error_msg_(const std::exception& e,
                             callbacks::logger& logger) {
