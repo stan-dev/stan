@@ -1,7 +1,9 @@
 new_session: no
 book_filename: "stan-reference.Rmd"
 rmd_files: ["cover.Rmd", "encoding.Rmd", "includes.Rmd", "comments.Rmd",  
-            "whitespace.Rmd", "data_types.Rmd", "expressions.Rmd"]
+            "whitespace.Rmd", "data_types.Rmd", "expressions.Rmd",  
+            "statements.Rmd", "blocks.Rmd", "user-functions.Rmd",   
+            "execution.Rmd"]
 language:
   ui:
     chapter_name: ""
