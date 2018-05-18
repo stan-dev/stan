@@ -9,6 +9,7 @@
 #include <stan/services/util/mcmc_writer.hpp>
 #include <string>
 #include <fstream>
+#include <sstream>
 
 namespace stan {
   namespace services {
@@ -53,8 +54,8 @@ namespace stan {
 
         std::ofstream divergences_stream("divergences.csv");
         callbacks::stream_writer divergences_stream_writer(divergences_stream,"#");
-        std::osstream divergences_diag_ignored();
-        callbacks::stream_writer divergences_diag_ignored_writer(d2,"#");
+        std::ostringstream divergences_diag_ignored;
+        callbacks::stream_writer divergences_diag_ignored_writer(divergences_diag_ignored,"#");
         util::mcmc_writer* divergence_writer = new util::mcmc_writer(
           divergences_stream_writer,divergences_diag_ignored_writer,logger);
         divergence_writer->write_sample_names(init_s, sampler, model);
