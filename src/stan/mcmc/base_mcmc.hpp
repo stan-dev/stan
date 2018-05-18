@@ -21,7 +21,7 @@ namespace stan {
 
       virtual sample
       transition(sample& init_sample, callbacks::logger& logger,
-                      stan::services::util::mcmc_writer* divergence_writer = 0) = 0;
+                      stan::services::util::mcmc_writer* divergence_writer) = 0;
 
       virtual void get_sampler_param_names(std::vector<std::string>& names) {}
 

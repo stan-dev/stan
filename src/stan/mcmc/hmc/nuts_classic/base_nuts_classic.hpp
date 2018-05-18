@@ -57,7 +57,8 @@ namespace stan {
       double get_max_delta() { return this->max_delta_; }
 
       sample
-      transition(sample& init_sample, callbacks::logger& logger) {
+      transition(sample& init_sample, callbacks::logger& logger,
+                      stan::services::util::mcmc_writer*) {
         // Initialize the algorithm
         this->sample_stepsize();
 
