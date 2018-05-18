@@ -13,7 +13,8 @@ namespace stan {
       fixed_param_sampler() { }
 
       sample
-      transition(sample& init_sample, callbacks::logger& logger) {
+      transition(sample& init_sample, callbacks::logger& logger,
+                      stan::services::util::mcmc_writer* ) {
         return init_sample;
       }
     };

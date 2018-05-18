@@ -40,7 +40,8 @@ namespace stan {
       }
 
       sample
-      transition(sample& init_sample, callbacks::logger& logger) {
+      transition(sample& init_sample, callbacks::logger& logger,
+                      stan::services::util::mcmc_writer* ) {
         this->sample_stepsize();
 
         this->seed(init_sample.cont_params());
