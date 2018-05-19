@@ -1,11 +1,24 @@
-new_session: no
-book_filename: "stan-reference.Rmd"
-rmd_files: ["cover.Rmd", "encoding.Rmd", "includes.Rmd", "comments.Rmd",  
-            "whitespace.Rmd", "data_types.Rmd", "expressions.Rmd",  
-            "statements.Rmd", "blocks.Rmd", "user-functions.Rmd",   
-            "execution.Rmd", "transforms.Rmd"]
-language:
-  ui:
-    chapter_name: ""
+new_session: yes
+
+rmd_files: [ 
+ "index.Rmd", 
+
+ "encoding.Rmd",
+ "includes.Rmd",
+ "comments.Rmd",
+ "whitespace.Rmd",
+
+ "data_types.Rmd",
+ "expressions.Rmd",
+ "statements.Rmd",
+ "blocks.Rmd",
+ "user-functions.Rmd",   
+
+ "execution.Rmd",
+
+ "transforms.Rmd"
+]
+
 before_chapter_script: "_common.R"
+
 delete_merged_file: TRUE

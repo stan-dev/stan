@@ -8,16 +8,15 @@ bookdown::gitbook:
       size: 3
     toc:
       collapse: section
-      scroll_highlight: no
-      depth: 0
       before: |
-        <li style="font-size:125%; font-weight:400; line-height:1.4"><a href="section.html">Stan Language Reference</a></li>
+        <li style="font-size:125%; font-weight:400; line-height:1.4; margin: 0.5em 0 0 1em">Stan Language Reference</li>
       after: null
-    sharing:
-      facebook: no
-      twitter: no
-      google: no
-      weibo: no
-      instapper: no
-      vk: no
-      all: []
+    edit:
+      link: https://github.com/stan-dev/stan/edit/master/%s
+      text: "Edit"
+    sharing: no
+
+bookdown::pdf_book:
+  latex_engine: "pdflatex"
+  includes:
+    in_header: header.tex

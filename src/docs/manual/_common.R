@@ -3,7 +3,7 @@ library(rstan)
 
 set.seed(10101010)
 
-options(digits = 2)
+options(digits = 3)
 
 printf <- function(pattern, ...) {
   cat(sprintf(pattern, ...))

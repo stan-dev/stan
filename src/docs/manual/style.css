@@ -1,6 +1,6 @@
 
 .serif {
-  font-family: "Lucida Bright", Times Roman, Palatino, "Book Antiqua", georgia, serif;
+  font-family: "Lucida Bright", Palatino, "Book Antiqua", georgia, serif;
 }
 .sans-serif {
   font-family: Gill Sans, Calibri, Verdana, sans-serif;
@@ -45,40 +45,42 @@ pre code {
   content: ". ";
 }
 .book .book-body .page-wrapper .page-inner section.normal h1 {
-  font-size: 250%;
-  font-style: oblique;
-  font-weight: 500;
-  color: #333;
-  margin: 0 0 0.5em 0;
+  font-size: 200%;
+  font-weight: bold;
+  margin: 1em 0 0.5em 0;
 }
 .book .book-body .page-wrapper .page-inner section.normal h2 {
-  font-size: 150%;
-  font-style: oblique;
-  font-weight: 400;
-  color: #444;
+  font-size: 140%;
+  font-weight: bold;
+  font-style: normal;
   margin: 1.5em 0 0.35em 0;
 }
 .book .book-body .page-wrapper .page-inner section.normal h3 {
-  font-size: 125%;
-  font-style: oblique;
+  font-size: 110%;
+  font-weight: bold;
+  font-style: normal;
   margin: 1.25em 0 0.35em 0;
-  font-weight: 500;
 }
 .book .book-body .page-wrapper .page-inner section.normal h4 {
-  font-size: 100%;
+  font-size: 110%;
+  font-weight: normal;
   font-style: oblique;
   margin: 1.25em 0 0 0;
-  font-weight: 500;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal {
+    font-family: "Lucida Bright", Palatino, serif;
+    color: #000;
 }
 
 .book .book-body .page-wrapper .page-inner section.normal em {
-  font-style: normal;
-  font-weight: normal;
-}
-.book .book-body .page-wrapper .page-inner section.normal strong {
   font-style: italic;
   font-weight: normal;
-  margin-right: 0.5em;
+  margin-right: 0.25em;
+}
+.book .book-body .page-wrapper .page-inner section.normal strong {
+  font-style: normal;
+  font-weight: bold;
 }
 
 div .definition {
@@ -124,20 +126,21 @@ div .example em {
 }
 
 #header .title {
-  font-family: Gill Sans, Calibri, Verdana, sans-serif;
   margin-bottom: -0.5em;
-  font-size: 300%;
-  font-weight: 600;
+  font-size: 250%;
+  font-weight: bold;
+  color: #444;
   line-height: 1.1;
 }
 #header h4.author {
-  font-family: Gill Sans, Calibri, Verdana, sans-serif;
-  color: #333;
-  font-size: 200%;
-  margin-bottom: -0.75em;
+  color: #111;
+  font-size: 150%;
+  margin-bottom: -0.25em;
+  font-style: normal;
 }
 #header h4.date {
-  font-family: Gill Sans, Calibri, Verdana, sans-serif;
   color: #333;
   font-size: 125%;
+  font-style: normal;
+  margin-bottom: 4em;
 }

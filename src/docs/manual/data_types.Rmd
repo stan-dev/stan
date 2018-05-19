@@ -1164,7 +1164,7 @@ matrix[3, 2] a = 0.5 * (b + c);
 
 assigns the matrix variable `a` to half of the sum of `b`
 and `c`.  The only requirement on `b` and `c` is that
-the expression `b~+~c` be of type `matrix`.  For example,
+the expression `b + c` be of type `matrix`.  For example,
 `b` could be of type `matrix` and `c` of type
 `real`, because adding a matrix to a scalar produces a matrix,
 and the multiplying by a scalar produces another matrix.

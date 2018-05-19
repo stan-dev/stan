@@ -384,8 +384,7 @@ operation, written using an apostrophe (`'`) is also supported
 for vectors, row vectors, and matrices.  Return types for matrix
 operations are the smallest types that can be statically guaranteed to
 contain the result.  The full set of allowable input types and
-corresponding return types is detailed in
-[chapter](#matrix-operations.chapter)
+corresponding return types is detailed in the list of functions.
 
 For example, if `y` and `mu` are variables of type
 `vector` and `Sigma` is a variable of type `matrix`,
@@ -462,7 +461,7 @@ tabular form in [figure](#operator-precedence).
 
  Op.| Prec. | Assoc. | Placement |Description
 :--:|------:|:------:|:----------|:----------
-`?~:` | 10 | right | ternary infix | conditional
+`? ~ :` | 10 | right | ternary infix | conditional
 `||` | 9 | left | binary infix | logical or
 `&&` | 8 | left | binary infix | logical and
 `==` | 7 | left | binary infix | equality
@@ -1153,12 +1152,15 @@ optimizer inputs; this option is available in both Stan and RStan
 make a comparison to the built-in automatic differentiation).
 
 For example, compiling the above model to an executable
-`sqrt-x-minus-x`, the test can be run as
+`sqrt-x-minus-x` in CmdStan, the test can be run as
 
-\begin{Verbatim}
+```
 > ./sqrt-x-minus-x diagnose test=gradient
-\end{Verbatim}
-\begin{Verbatim}[fontsize=\small]
+```
+
+which produces
+
+```
 ...
 TEST GRADIENT MODE
 
@@ -1166,7 +1168,7 @@ TEST GRADIENT MODE
 
  param idx           value           model     finite diff           error
          0       -0.887393             nan               0             nan
-\end{Verbatim}
+```
 
 Even though finite differences calculates the right gradient of 0,
 automatic differentiation follows the chain rule and produces a
