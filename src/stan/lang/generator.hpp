@@ -100,6 +100,7 @@
 #include <stan/lang/generator/generate_quoted_expression.hpp>
 #include <stan/lang/generator/generate_quoted_string.hpp>
 #include <stan/lang/generator/generate_real_var_type.hpp>
+#include <stan/lang/generator/generate_register_mpi.hpp>
 #include <stan/lang/generator/generate_set_param_ranges.hpp>
 #include <stan/lang/generator/generate_statement.hpp>
 #include <stan/lang/generator/generate_statements.hpp>
