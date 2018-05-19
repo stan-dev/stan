@@ -183,7 +183,7 @@ namespace stan {
         size_t N = x.size();
         std::vector<double> ac(N);
         std::vector<double> sample(N);
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
           sample[i] = x(i);
         math::autocorrelation(sample, ac);
 
@@ -201,7 +201,7 @@ namespace stan {
         size_t N = x.size();
         std::vector<double> ac(N);
         std::vector<double> sample(N);
-        for (int i = 0; i < N; i++)
+        for (size_t i = 0; i < N; i++)
           sample[i] = x(i);
         math::autocovariance(sample, ac);
 
@@ -304,64 +304,16 @@ namespace stan {
        */
       double effective_sample_size(const std::vector<const double*>& chains,
                                    int num_draws) const {
-        int num_chains = chains.size();
+        size_t num_chains = chains.size();
+        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(num_chains);
 
-        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> autocov(num_chains);
-        Eigen::VectorXd chain_mean(num_chains);
-        Eigen::VectorXd chain_var(num_chains);
-        for (int chain = 0; chain < num_chains; ++chain) {
-          math::autocovariance<double>(Eigen::Map<const Eigen::VectorXd>
-                                       (&chains[chain][0], num_draws),
-                                       autocov(chain));
+        for (size_t chain = 0; chain < num_chains; ++chain) {
+          Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1> >chain_map
+            (&chains[chain][0], num_draws);
+          samples(chain) = chain_map;
         }
 
-        for (int chain = 0; chain < num_chains; ++chain) {
-          double n_kept_samples = num_kept_samples(chain);
-          chain_mean(chain) =
-            (Eigen::Map<const Eigen::VectorXd>(&chains[chain][0],
-                                               num_draws)).mean();
-          chain_var(chain) = autocov(chain)(0) * n_kept_samples
-            / (n_kept_samples - 1);
-        }
-
-        double mean_var = chain_var.mean();
-        double var_plus = mean_var * (num_draws - 1) / num_draws;
-        if (num_chains > 1)
-          var_plus += variance(chain_mean);
-        Eigen::VectorXd rho_hat(num_draws);
-        rho_hat.setZero();
-        Eigen::VectorXd acov(num_chains);
-        for (int chain = 0; chain < num_chains; ++chain) \
-          acov(chain) = autocov(chain)(1);
-        double rho_hat_even = 1;
-        double rho_hat_odd = 1 - (mean_var - acov.mean()) / var_plus;
-        rho_hat(1) = rho_hat_odd;
-        // Geyer's initial positive sequence
-        int max_time = 1;
-        for (int t = 1;
-             (t < (num_draws - 2) && (rho_hat_even + rho_hat_odd) >= 0);
-             t += 2) {
-          for (int chain = 0; chain < num_chains; ++chain)
-            acov(chain) = autocov(chain)(t + 1);
-          rho_hat_even = 1 - (mean_var - acov.mean()) / var_plus;
-          for (int chain = 0; chain < num_chains; ++chain)
-            acov(chain) = autocov(chain)(t + 2);
-          rho_hat_odd = 1 - (mean_var - acov.mean()) / var_plus;
-          if ((rho_hat_even + rho_hat_odd) >= 0) {
-            rho_hat(t + 1) = rho_hat_even;
-            rho_hat(t + 2) = rho_hat_odd;
-          }
-          max_time = t + 2;
-        }
-        // Geyer's initial monotone sequence
-        for (int t = 3; t <= max_time - 2; t += 2) {
-          if (rho_hat(t + 1) + rho_hat(t + 2) >
-              rho_hat(t - 1) + rho_hat(t)) {
-            rho_hat(t + 1) = (rho_hat(t - 1) + rho_hat(t)) / 2;
-            rho_hat(t + 2) = rho_hat(t + 1);
-          }
-        }
-        return num_chains * num_draws / (1 + 2 * rho_hat.sum());
+        return effective_sample_size(samples);
       }
 
       /**
