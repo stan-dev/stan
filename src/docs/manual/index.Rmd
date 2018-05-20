@@ -7,7 +7,7 @@ output: bookdown::gitbook
 documentclass: book
 bibliography: [../bibtex/all.bib]
 biblio-style: apalike
-fontsize: 11pt
+fontsize: 10pt
 monofont: "Lucida Console"
 link-citations: yes
 description: "Stan reference manual specifying the syntax and semantics of the Stan programming language." 
@@ -20,6 +20,15 @@ description: "Stan reference manual specifying the syntax and semantics of the S
 
 This is the official reference manual specifying the syntax and
 informal operational syntax of the Stan programming language.
+
+
+## Copyright {-}
+
+All contents of this manual are copyrighted by the Stan Development
+Team.  Exact attribution of material is available through GitHub.
+
+
+## Licensing {-}
 
 The manual is licensed under the CC-BY ND version 3.0
 license.  The code included in the manual is licensed under

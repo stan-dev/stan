@@ -30,46 +30,23 @@ pre code {
 }
 
 .header-section-number {
-  font-weight: 400;
+  font-weight: bold;
   margin-right: 0.25em;
 }
 .header-section-number::after {
   content: ".";
-  font-weight: 400;
+  font-weight: bold;
 }
 .chapter a b {
-  font-weight: 400;
+  font-weight: bold;
   margin-right: 0.15em
 }
 .chapter a b::after {
   content: ". ";
 }
-.book .book-body .page-wrapper .page-inner section.normal h1 {
-  font-size: 200%;
-  font-weight: bold;
-  margin: 1em 0 0.5em 0;
-}
-.book .book-body .page-wrapper .page-inner section.normal h2 {
-  font-size: 140%;
-  font-weight: bold;
-  font-style: normal;
-  margin: 1.5em 0 0.35em 0;
-}
-.book .book-body .page-wrapper .page-inner section.normal h3 {
-  font-size: 110%;
-  font-weight: bold;
-  font-style: normal;
-  margin: 1.25em 0 0.35em 0;
-}
-.book .book-body .page-wrapper .page-inner section.normal h4 {
-  font-size: 110%;
-  font-weight: normal;
-  font-style: oblique;
-  margin: 1.25em 0 0 0;
-}
-
 .book .book-body .page-wrapper .page-inner section.normal {
     font-family: "Lucida Bright", Palatino, serif;
+    font-weight: normal;
     color: #000;
 }
 
@@ -120,27 +97,58 @@ div .example em {
   font-size: 100%;
 }
 
+.book .book-body .page-wrapper .page-inner section.normal h1 {
+  font-size: 175%;
+  font-weight: bold;
+  margin: 1em 0 0.5em 0;
+}
+.book .book-body .page-wrapper .page-inner section.normal h2 {
+  font-size: 120%;
+  font-weight: bold;
+  font-style: normal;
+  margin: 1.5em 0 0.35em 0;
+}
+.book .book-body .page-wrapper .page-inner section.normal h3 {
+  font-size: 100%;
+  font-weight: bold;
+  font-style: normal;
+  margin: 1.25em 0 0.35em 0;
+}
+.book .book-body .page-wrapper .page-inner section.normal h4 {
+  font-size: 100%;
+  font-weight: normal;
+  font-style: oblique;
+  margin: 1.25em 0 0 0;
+}
+
 .book .book-header h1 {
   opacity: 1;
   text-align: center;
 }
 
 #header .title {
-  margin-bottom: -0.5em;
+  margin-bottom: -0.6em;
   font-size: 250%;
   font-weight: bold;
-  color: #444;
   line-height: 1.1;
 }
 #header h4.author {
-  color: #111;
-  font-size: 150%;
-  margin-bottom: -0.25em;
-  font-style: normal;
+  font-size: 175%;
+  margin-bottom: -0.75em;
+}
+#header h4.author em {
+    font-style: normal;
+}
+#header h4.author strong {
+    font-style: normal;
 }
 #header h4.date {
-  color: #333;
-  font-size: 125%;
-  font-style: normal;
-  margin-bottom: 4em;
+  font-size: 150%;
+  margin-bottom: 3em;
+}
+#header h4.date em {
+    font-style: normal;
+}
+#header h4.date strong {
+    font-style: normal;
 }

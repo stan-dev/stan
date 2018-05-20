@@ -699,7 +699,6 @@ $$
 w_{i,j} =
 \left\{
 \begin{array}{cl}
-
 0 & \mbox{if } i > j,
 \\
 1 & \mbox{if } 1 = i = j,
@@ -723,7 +722,6 @@ $$
 w_{i,j} =
 \left\{
 \begin{array}{cl}
-
 0 & \mbox{if } i > j,
 \\
 1 & \mbox{if } 1 = i = j,
@@ -1159,7 +1157,7 @@ its diagonal entries, of which there is one for each $(i,j)$ pair,
 
 $$
 \left| \, \mbox{det} \, J \, \right|
-  \ = \ \mathlarger{\prod}_{i > j} \left| \frac{d}{dz_{i,j}} x_{i,j} \right|,
+  \ = \ \prod_{i > j} \left| \frac{d}{dz_{i,j}} x_{i,j} \right|,
 $$
 
 where
@@ -1175,9 +1173,9 @@ $$
 p_Y(y)
 = p_X(f^{-1}(y))
   \ \
-  \mathlarger{\prod}_{n < \binom{K}{2}} \frac{1}{(\cosh y)^2}
+  \prod_{n < \binom{K}{2}} \frac{1}{(\cosh y)^2}
   \ \
-  \mathlarger{\prod}_{i > j} \left( 1 - \sum_{j' < j} x_{i,j'}^2
+  \prod_{i > j} \left( 1 - \sum_{j' < j} x_{i,j'}^2
   \right)^{1/2},
 $$
 
