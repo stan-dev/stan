@@ -16,11 +16,10 @@ description: "Stan reference manual specifying the syntax and semantics of the S
 
 <br />
 
-# About this Manual {-}
+# About {-}
 
 This is the official reference manual specifying the syntax and
-informal operational syntax of the Stan programming language.
-
+informal operational syntax of the Stan programming language. 
 
 ## Copyright {-}
 
@@ -30,9 +29,11 @@ Team.  Exact attribution of material is available through GitHub.
 
 ## Licensing {-}
 
-The manual is licensed under the CC-BY ND version 3.0
-license.  The code included in the manual is licensed under
-the BSD 3-clause license.
+The text content of this manual is licensed under the CC-BY ND version
+3.0 license.
+
+The computer code included in the manual is licensed under the BSD
+3-clause license.
 
 
 ## Web resources {-}
@@ -40,15 +41,15 @@ the BSD 3-clause license.
 Stan is an open-source software project, resources for which are
 hosted on various web sites:
 
-* [Stan web site](http://mc-stan.org/): links to
+* [**Stan web site**](http://mc-stan.org/): &nbsp; links to
 the official Stan releases, source code, installation instructions,
 and full documentation, including the latest version of this reference manual.
 
-* [Stan forum](http://discourse.mc-stan.org): message board
+* [**Stan forum**](http://discourse.mc-stan.org): &nbsp; message board
 for interacting with the developers and other users about
 all things related to Stan.
 
-* [Stan GitHub organization](https://github.com/stan-dev/stan):
+* [**Stan GitHub organization**](https://github.com/stan-dev/stan): &nbsp;
 source version control for the core Stan source code and manuals.
 
 <br />

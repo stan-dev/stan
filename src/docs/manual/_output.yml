@@ -1,11 +1,11 @@
 bookdown::gitbook:
-  css: style.css
+  css: stan-manual.css
   config:
     search: yes
     fontsettings:
       theme: white
       family: serif
-      size: 3
+      size: 2
     toc:
       collapse: section
       before: |
@@ -15,7 +15,6 @@ bookdown::gitbook:
       link: https://github.com/stan-dev/stan/edit/master/%s
       text: "Edit"
     sharing: no
-
 bookdown::pdf_book:
   latex_engine: "pdflatex"
   includes:

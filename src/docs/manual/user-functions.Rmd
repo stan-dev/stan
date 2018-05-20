@@ -135,8 +135,8 @@ optimization.
 
 ## Function Bodies {#function-bodies.section}
 
-The body of a function is bounded by curly braces (`\{` and
-`\`}).  The body may contain local variable declarations at the
+The body of a function is between an open curly brace (`{`) and
+close curly brace (`}`).  The body may contain local variable declarations at the
 top of the function body's block and these scope the same way as local
 variables used in any other statement block.
 
@@ -215,9 +215,9 @@ the log of the density or mass function it defines.
 Within function definition bodies, the parameters may be used like any
 other variable.  But the parameters are constant in the sense that
 they can't be assigned to (i.e., can't appear on the left side of an
-assignment (`=`) statement.  In other words, their value remains
+assignment (`=`) statement)<.  In other words, their value remains
 constant throughout the function body.  Attempting to assign a value
-to a function parameter value will raise a compile-time error.^[Despite being declared constant and appearing to have a pass-by-value syntax in Stan, the implementation of the language passes function arguments by constant reference in C++.}
+to a function parameter value will raise a compile-time error.^[Despite being declared constant and appearing to have a pass-by-value syntax in Stan, the implementation of the language passes function arguments by constant reference in C++.]
 
 Local variables may be declared at the top of the function block and
 scope as usual.

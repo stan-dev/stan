@@ -1,6 +1,6 @@
 
 .serif {
-  font-family: "Lucida Bright", Palatino, "Book Antiqua", georgia, serif;
+  font-family: Georgia, "Lucida Bright", Palatino, "Book Antiqua", georgia, serif;
 }
 .sans-serif {
   font-family: Gill Sans, Calibri, Verdana, sans-serif;
@@ -103,21 +103,21 @@ div .example em {
   margin: 1em 0 0.5em 0;
 }
 .book .book-body .page-wrapper .page-inner section.normal h2 {
-  font-size: 120%;
+  font-size: 125%;
   font-weight: bold;
   font-style: normal;
   margin: 1.5em 0 0.35em 0;
 }
 .book .book-body .page-wrapper .page-inner section.normal h3 {
-  font-size: 100%;
+  font-size: 110%;
   font-weight: bold;
   font-style: normal;
   margin: 1.25em 0 0.35em 0;
 }
 .book .book-body .page-wrapper .page-inner section.normal h4 {
   font-size: 100%;
-  font-weight: normal;
-  font-style: oblique;
+  font-weight: bold;
+  font-style: normal;
   margin: 1.25em 0 0 0;
 }
 
@@ -127,7 +127,7 @@ div .example em {
 }
 
 #header .title {
-  margin-bottom: -0.6em;
+  margin-bottom: -0.75em;
   font-size: 250%;
   font-weight: bold;
   line-height: 1.1;
@@ -152,3 +152,24 @@ div .example em {
 #header h4.date strong {
     font-style: normal;
 }
+
+.book .book-body .page-wrapper .page-inner section.normal code {
+    font-size: 85%;
+    background-color: #FFF;
+    padding: 0;
+    margin: 0;
+}
+.book .book-body .page-wrapper .page-inner section.normal code:before {
+    content: none;
+}
+.book .book-body .page-wrapper .page-inner section.normal code:after {
+    content: none;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal pre {
+    font-size: 100%;
+    background-color: #FFF;
+    margin: 0 0 1em 1.5em;
+    padding: 0;
+}
+

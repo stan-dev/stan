@@ -210,13 +210,11 @@ matrix[3,2] m1 = [ [ 1, 2 ], [ 3, 4 ], [5, 6 ] ];
 Any expression denoting a row vector can be used in a matrix expression.
 For example, the following code is valid:
 
-
 ```stan
 vector[2] vX = [ 1, 10 ]';
 row_vector[2] vY = [ 100, 1000 ];
 matrix[3,2] m2 = [ vX', vY, [ 1, 2 ]  ];
 ```
-
 
 #### No empty vector or matrix expressions 
 
@@ -235,7 +233,6 @@ define small arrays in a single line, as follows.
 ```stan
 int a[3] = { 1, 10, 100 };
 ```
-
 
 The values may be compound expressions, so it is legal to write
 `{ 2 * 3, 1 + 4 }`. It is also possible to write two dimensional
@@ -350,8 +347,8 @@ Now the types match and the assignment is allowed.
 Any expression wrapped in parentheses is also an expression. Like in
 C++, but unlike in R, only the round parentheses, `(` and
 `)`, are allowed.  The square brackets `[` and `]` are
-reserved for array indexing and the curly braces `\{` and
-`\`} for grouping statements.
+reserved for array indexing and the curly braces `{` and
+`}` for grouping statements.
 
 With parentheses it is possible to explicitly group subexpressions
 with operators.  Without parentheses, the expression `1 + 2 * 3`
