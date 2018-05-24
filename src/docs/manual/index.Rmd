@@ -6,11 +6,11 @@ site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
 bibliography: [../bibtex/all.bib]
-biblio-style: apalike
+biblio-style: "apalike"
+link-citations: true
 fontsize: 10pt
 monofont: "Lucida Console"
-link-citations: yes
-description: "Stan reference manual specifying the syntax and semantics of the Stan programming language." 
+description: "Stan reference manual specifying the syntax and semantics of the Stan programming language."
 ---
 
 
@@ -19,7 +19,7 @@ description: "Stan reference manual specifying the syntax and semantics of the S
 # About {-}
 
 This is the official reference manual specifying the syntax and
-informal operational syntax of the Stan programming language. 
+informal operational syntax of the Stan programming language.
 
 ## Copyright {-}
 
@@ -57,6 +57,3 @@ source version control for the core Stan source code and manuals.
 <center>
 ![](img/logo_tm.png)
 </center>
-
-
-

@@ -1,4 +1,4 @@
-# Modeling Language Syntax
+# Language Syntax
 
 \noindent
 This chapter defines the basic syntax of the Stan modeling language
@@ -10,7 +10,7 @@ associativity.
 ## BNF Grammars
 
 
-### Syntactic conventions
+### Syntactic conventions {-}
 
 In the following \BNF grammars, literal strings are indicated in
 single quotes (\Verb|'|).  Grammar non-terminals are unquoted strings.
@@ -23,7 +23,7 @@ postfixed, curly-braced number indicates a fixed number of repetitions;
 e.g., `A{6}` is equivalent to a sequence of six copies of `A`.
 
 
-### Programs
+### Programs {-}
 
 ```
 program ::=
@@ -51,7 +51,7 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 ```
 
 
-### Function declarations and definitions
+### Function declarations and definitions {-}
 
 ```
 function_decl ::=
@@ -70,7 +70,7 @@ unsized_dims ::= '['  ','*  ']'
 ```
 
 
-### Variable declarations and compound definitions
+### Variable declarations and compound definitions {-}
 
 ```
 var_decl ::= var_type variable ?dims ?('=' expression) ';'
@@ -105,7 +105,7 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 ```
 
 
-### Expressions
+### Expressions {-}
 
 ```
 expressions ::= expression % ','
@@ -126,11 +126,11 @@ expression ::=
       '(' function_literal (',' expression){6|9} ')'
   | integrate_ode_bdf
       '(' function_literal (',' expression){6|9} ')'
-  | algebra_solver 
+  | algebra_solver
       '('function_literal (',' expression){4|7} ')'
   | '(' expression ')'
 
-index ::= 
+index ::=
     expression
   | expression ':'
   | ':' expression
@@ -148,7 +148,7 @@ function_literal ::= identifier
 ```
 
 
-### Statements
+### Statements {-}
 
 ```
 statement ::= atomic_statement | nested_statement
@@ -182,7 +182,7 @@ nested_statement ::=
      ('else' 'if' '(' expression ')' statement)*
      ?('else' statement)
   | 'while' '(' expression ')' statement
-  | 'for' '(' identifier 'in' expression ':' expression ')'  
+  | 'for' '(' identifier 'in' expression ':' expression ')'
       statement
   | 'for' '(' identifier 'in' expression ')' statement
   | '{' var_decl* statement+ '}'
@@ -193,7 +193,7 @@ nested_statement ::=
 ## Extra-Grammatical Constraints
 
 
-### Type constraints
+### Type constraints {-}
 
 A well-formed Stan program must satisfy the type constraints imposed
 by functions and distributions.  For example, the binomial
@@ -204,7 +204,7 @@ parsing with an error message indicating the location of the problem.
 For information on argument types, see \refpart{built-in-functions}.
 
 
-### Operator precedence and associativity
+### Operator precedence and associativity {-}
 
 In the Stan grammar provided in this chapter, the expression `1
   + 2 * 3` has two parses.  As described in
@@ -213,7 +213,7 @@ meaning $1 + (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on
 operator precedences and associativities.
 
 
-### Typing of compound declaration and definition
+### Typing of compound declaration and definition {-}
 
 In a compound variable declaration and definition, the type of the
 right-hand side expression must be assignable to the variable being
@@ -223,7 +223,7 @@ in the transformed data, transformed parameters, and generated
 quantities blocks.
 
 
-### Typing of array expressions
+### Typing of array expressions {-}
 
 The types of expressions used for elements in array expressions
 (\Verb|'{' expressions '}'|) must all be of the same type or a mixture
@@ -231,20 +231,20 @@ of `int` and `real` types (in which case the result is
 promoted to be of type `real`).
 
 
-### Forms of numbers
+### Forms of numbers {-}
 
 Integer literals longer than one digit may not start with 0 and real
 literals cannot consist of only a period or only an exponent.
 
 
-### Conditional arguments
+### Conditional arguments {-}
 
 Both the conditional if-then-else statement and while-loop statement
 require the expression denoting the condition to be a primitive type,
 integer or real.
 
 
-### For loop containers
+### For loop containers {-}
 
 The for loop statement requires that we specify in addition to the
 loop identifier, either a range consisting of two expressions
@@ -253,31 +253,31 @@ a container.  The loop variable will be of type integer in the former case
 and of the contained type in the latter case.  Furthermore, the loop
 variable must not be in scope (i.e., there is no masking of variables).
 
-### Print arguments
+### Print arguments {-}
 
 The arguments to a print statement cannot be void.
 
 
-### Only break and continue in loops
+### Only break and continue in loops {-}
 
 The `break` and `continue` statements may only be used
 within the body of a for-loop or while-loop.
 
 
-### PRNG function locations
+### PRNG function locations {-}
 
 Functions ending in `_rng` may only be called in the transformed
 data and generated quantities block, and within the bodies of
 user-defined functions with names ending in `_rng`.
 
 
-### Probability function naming
+### Probability function naming {-}
 
 A probability function literal must have one of the following
 suffixes: `_lpdf`, `_lpmf`, `_lcdf`, or `_lccdf`.
 
 
-### Algebraic solver argument types and origins
+### Algebraic solver argument types and origins {-}
 
 The `algebra_solver` function may be used without control
 parameters; in this case
@@ -292,19 +292,19 @@ parameters; in this case
 * the fourth and fifth arguments must be expressions
 containing only variables originating from the data or transformed
 data blocks.
- 
+
 The `algebra_solver` function may accept three additional arguments,
 which like the second, fourth, and fifth arguments, must be expressions free
 of parameter references. The final free arguments must be assignable to types
 `real`, `real`, and `int`, respectively.
 
 
-### ODE solver argument types and origins
+### ODE solver argument types and origins {-}
 
 The `integrate_ode`, `integrate_ode_rk45`, and
 `integrate_ode_bdf` functions may be used without control
 parameters;  in this case
- 
+
 * its first argument to refer to a function with signature
 `(real, real[], real[], real[], int[]) : real[]`,
 
@@ -323,7 +323,7 @@ references.  The final three arguments must be assignable to types
 `real`, `real`, and `int`, respectively.
 
 
-### Indexes
+### Indexes {-}
 
 Standalone expressions used as indexes must denote either an integer
 (`int`) or an integer array (`int[]`).  Expressions

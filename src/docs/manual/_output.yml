@@ -12,7 +12,7 @@ bookdown::gitbook:
         <li style="font-size:125%; font-weight:400; line-height:1.4; margin: 0.5em 0 0 1em">Stan Language Reference</li>
       after: null
     edit:
-      link: https://github.com/stan-dev/stan/edit/master/%s
+      link: https://github.com/stan-dev/stan/edit/develop/%s
       text: "Edit"
     sharing: no
 bookdown::pdf_book:

@@ -29,7 +29,7 @@ different types at different points in the program or in different
 invocations of the program.
 
 
-## Overview of Data Types 
+## Overview of Data Types
 
 
 Arguments for built-in and user-defined functions and local variables
@@ -42,18 +42,18 @@ types of their arguments, including array dimensionality, but not for
 sizes or constraints.  Of course, functions often check constraints as
 part of their behavior.
 
-### Primitive Types 
+### Primitive Types {-}
 
 Stan provides two primitive data types, `real` for continuous
 values and `int` for integer values.
 
-### Vector and Matrix Types 
+### Vector and Matrix Types {-}
 
 Stan provides three matrix-based data types, `vector` for column
 vectors, `row_vector` for row vectors, and `matrix` for
 matrices.
 
-### Array Types 
+### Array Types {-}
 
 Any type (including the constrained types discussed in the next
 section) can be made into an array type by declaring array arguments.
@@ -68,7 +68,7 @@ declares `x` to be a one-dimensional array of size 10 containing
 real values, and declares `m` to be a two-dimensional array of
 size $6 \times 7$ containing values that are $3 \times 3$ matrices.
 
-### Constrained Data Types 
+### Constrained Data Types {-}
 
 Declarations of variables other than local variables may be provided
 with constraints.  These constraints are not part of the underlying
@@ -111,7 +111,9 @@ ranging over all of $\mathbb{R}^n$).
 It is worth calling out the most important aspect of constrained data
 types:
 
-> The model must have support (non-zero density, equivalently finite log density) at every value of the parameters that meets their declared constraints.
+<div style="margin:0 2em 0 2em">
+*The model must have support (non-zero density, equivalently finite log density) at parameter values that satisfy the declared constraints.*
+</div>
 
 If this condition is violated with parameter values that satisfy
 declared constraints but do not have finite log density, then the
@@ -127,7 +129,7 @@ Unfortunately, the lovely mathematical abstraction of integers and
 real numbers is only partially supported by finite-precision computer
 arithmetic.
 
-### Integers 
+### Integers {-}
 
 Stan uses 32-bit (4-byte) integers for all of its integer
 representations.  The maximum value that can be represented
@@ -142,7 +144,7 @@ Integer arithmetic works in the expected way for addition,
 subtraction, and multiplication, but rounds the result of division
 (see [section](#int-arithmetic.section) for more information).
 
-### Reals 
+### Reals {-}
 
 Stan uses 64-bit (8-byte) floating point representations of real
 numbers.  Stan roughly^[Stan compiles integers to `int` and reals to `double` types in C++.  Precise details of rounding will depend on the compiler and hardware architecture on which the code is run.]
@@ -162,7 +164,7 @@ value for error conditions, (2) positive infinity for overflow, and
 (3) negative infinity for overflow.  The behavior of these special
 numbers follows standard IEEE 754 behavior.
 
-#### Not-a-number 
+#### Not-a-number {-}
 
 The not-a-number value propagates.  If an argument to a real-valued
 function is not-a-number, it either rejects (an exception in the
@@ -170,7 +172,7 @@ underlying C++) or returns not-a-number itself.  For boolean-valued
 comparison operators, if one of the arguments is not-a-number, the
 return value is always zero (i.e., false).
 
-#### Infinite values 
+#### Infinite values {-}
 
 Positive infinity is greater than all numbers other than itself and
 not-a-number; negative infinity is similarly smaller.  Adding an
@@ -187,7 +189,7 @@ are infinite, making these boundary conditions less useful than they
 may appear at first.
 
 
-### Promoting Integers to Reals 
+### Promoting Integers to Reals {-}
 
 Stan automatically promotes integer values to real values if
 necessary, but does not automatically demote real values to integers.
@@ -203,14 +205,14 @@ representation.  This operation is not without overhead and should
 thus be avoided where possible.
 
 
-## Univariate Data Types and Variable Declarations 
+## Univariate Data Types and Variable Declarations
 
 All variables used in a Stan program must have an explicitly declared
 data type.  The form of a declaration includes the type and the name
 of a variable.  This section covers univariate types, the next section
 vector and matrix types, and the following section array types.
 
-### Unconstrained Integer 
+### Unconstrained Integer {-}
 
 Unconstrained integers are declared using the `int` keyword.
 For example, the variable `N` is declared to be an integer as follows.
@@ -220,7 +222,7 @@ int N;
 ```
 
 
-### Constrained Integer 
+### Constrained Integer {-}
 
 Integer data types may be constrained to allow values only in a
 specified interval by providing a lower bound, an upper bound, or
@@ -242,7 +244,7 @@ int<lower=0,upper=1> cond;
 ```
 
 
-### Unconstrained Real 
+### Unconstrained Real {-}
 
 Unconstrained real variables are declared using the keyword
 `real`, The following example declares `theta` to be an
@@ -253,7 +255,7 @@ real theta;
 ```
 
 
-### Constrained Real 
+### Constrained Real {-}
 
 Real variables may be bounded using the same syntax as integers.  In
 theory (that is, with arbitrary-precision arithmetic), the bounds on
@@ -282,7 +284,7 @@ real<lower=-1,upper=1> rho;
 ```
 
 
-#### Infinite Constraints 
+#### Infinite Constraints {-}
 
 Lower bounds that are negative infinity or upper bounds that are
 positive infinity are ignored.  Stan provides constants
@@ -291,7 +293,7 @@ be used for this purpose, or they may be read as data in the dump
 format.
 
 
-### Expressions as Bounds 
+### Expressions as Bounds {-}
 
 Bounds for integer or real variables may be arbitrary expressions.
 The only requirement is that they only include variables that have
@@ -334,7 +336,7 @@ ranging between the minimum and maximum value of `y`.  As shown
 in the example code, the functions `min()` and `max()` may
 be applied to containers such as arrays.
 
-### Declaring Optional Variables 
+### Declaring Optional Variables {-}
 
 A variable may be declared with a size that depends on a boolean
 constant.  For example, consider the definition of `alpha` in the
@@ -364,7 +366,7 @@ models based on the data provided as input.  This strategy is used
 extensively in the implementation of the RStanArm package (see
 \url{http://mc-stan.org/users/interfaces/rstanarm}).
 
-## Vector and Matrix Data Types 
+## Vector and Matrix Data Types
 
 Stan provides three types of container objects: arrays, vectors, and
 matrices. Vectors and matrices are more limited kinds of data
@@ -393,7 +395,7 @@ are restricted to `real` values.^[This may change if Stan is called upon to do c
 
 
 
-### Indexing from 1 
+### Indexing from 1 {-}
 
 Vectors and matrices, as well as arrays, are indexed starting from one
 in Stan.  This follows the convention in statistics and linear
@@ -402,7 +404,7 @@ packages R, MATLAB, BUGS, and JAGS.  General computer programming
 languages, on the other hand, such as C++ and Python, index arrays
 starting from zero.
 
-### Vectors 
+### Vectors {-}
 
 Vectors in Stan are column vectors; see the next subsection for
 information on row vectors.  Vectors are declared with a size (i.e., a
@@ -421,7 +423,7 @@ vector<lower=0>[3] u;
 ```
 
 
-### Unit Simplexes 
+### Unit Simplexes {-}
 
 A unit simplex is a vector with non-negative values whose entries sum
 to 1.  For instance, $(0.2,0.3,0.4,0.1)^{\top}$ is a unit 4-simplex.
@@ -452,7 +454,7 @@ initialization or custom initialization if there are informative
 priors for some parameters.
 
 
-### Unit Vectors 
+### Unit Vectors {-}
 
 A unit vector is a vector with a norm of one.  For instance,
 $(0.5,0.5,0.5,0.5)^{\top}$ is a unit 4-vector.
@@ -472,7 +474,7 @@ unit vectors, this is only done up to a statically specified accuracy
 threshold $\epsilon$ to account for errors arising from floating-point
 imprecision.
 
-### Ordered Vectors 
+### Ordered Vectors {-}
 
 An ordered vector type in Stan represents a vector whose entries are
 sorted in ascending order.  For instance, $(-1.3,2.7,2.71)^{\top}$ is
@@ -492,7 +494,7 @@ Constraints will be checked after executing the block in which the
 variables were declared.
 
 
-### Positive, Ordered Vectors 
+### Positive, Ordered Vectors {-}
 
 There is also a positive, ordered vector type which operates similarly
 to ordered vectors, but all entries are constrained to be positive.
@@ -509,7 +511,7 @@ may be assigned to other vectors and other vectors may be assigned to them.
 Constraints will be checked after executing the block in which the
 variables were declared.
 
-### Row Vectors 
+### Row Vectors {-}
 
 Row vectors are declared with the keyword `row_vector`.
 Like (column) vectors, they are declared with a size.  For example,
@@ -530,7 +532,7 @@ Row vectors may not be assigned to column vectors, nor may column
 vectors be assigned to row vectors.  If assignments are required, they
 may be accommodated through the transposition operator.
 
-### Matrices 
+### Matrices {-}
 
 Matrices are declared with the keyword `matrix` along with a
 number of rows and number of columns.  For example,
@@ -553,7 +555,7 @@ matrix<upper=0>[3, 4] B;
 ```
 
 
-#### Assigning to Rows of a Matrix 
+#### Assigning to Rows of a Matrix {-}
 
 Rows of a matrix can be assigned by indexing the left-hand side of an
 assignment statement. For example, this is possible.
@@ -576,7 +578,7 @@ assignment to `a[1]` does not affect `b`, nor does an
 assignment to `b` affect `a`.
 
 
-### Correlation Matrices 
+### Correlation Matrices {-}
 
 Matrix variables may be constrained to represent correlation matrices.
 A matrix is a correlation matrix if it is symmetric and positive
@@ -593,7 +595,7 @@ declares `Sigma` to be a $3 \times 3$ correlation matrix.
 Correlation matrices may be assigned to other matrices, including
 unconstrained matrices, if their dimensions match, and vice-versa.
 
-### Cholesky Factors of Correlation Matrices 
+### Cholesky Factors of Correlation Matrices {-}
 
 Matrix variables may be constrained to represent the Cholesky factors
 of a correlation matrix.
@@ -615,7 +617,7 @@ cholesky_factor_corr[K] L;
 declares `L` to be a Cholesky factor for a `K` by `K`
 correlation matrix.
 
-### Covariance Matrices 
+### Covariance Matrices {-}
 
 Matrix variables may be constrained to represent covariance matrices.
 A matrix is a covariance matrix if it is symmetric and positive
@@ -629,7 +631,7 @@ cov_matrix[K] Omega;
 declares `Omega` to be a $K \times K$ covariance matrix, where
 $K$ is the value of the data variable `K`.
 
-### Cholesky Factors of Covariance Matrices 
+### Cholesky Factors of Covariance Matrices {-}
 
 Matrix variables may be constrained to represent the Cholesky factors
 of a covariance matrix.  This is often more convenient or more
@@ -653,7 +655,7 @@ In general, two dimensions may be declared, with the above being equal to
 type `cholesky_factor_cov[M, N]` may be used for the general
 $M \times N$.
 
-### Assigning Constrained Variables 
+### Assigning Constrained Variables {-}
 
 Constrained variables of all types may be assigned to other variables
 of the same unconstrained type and vice-versa.  Matching is interpreted strictly
@@ -672,7 +674,7 @@ attempt may be made to assign a matrix of one dimensionality to a
 matrix of mismatching dimensionality.
 
 
-### Expressions as Size Declarations 
+### Expressions as Size Declarations {-}
 
 Variables may be declared with sizes given by expressions.  Such
 expressions are constrained to only contain data or transformed data
@@ -689,7 +691,7 @@ transformed parameters {
   // ...
 ```
 
-### Accessing Vector and Matrix Elements 
+### Accessing Vector and Matrix Elements {-}
 
 If `v` is a column vector or row vector, then `v[2]` is the
 second element in the vector.  If `m` is a matrix, then
@@ -713,12 +715,12 @@ row of `m`.  Thus it is possible to write `m[2][3]` instead
 of `m[2, 3]` to access the third element in the second row.  When
 given a choice, the form `m[2, 3]` is preferred.
 
-#### Array index style {#array-index-style.footnote}
+#### Array index style {#array-index-style.footnote} {-}
 
 The form `m[2, 3]` is more efficient because it does not require the creation and use of an intermediate expression template for `m[2]`.  In later versions, explicit calls to `m[2][3]` may be optimized to be as efficient as `m[2, 3]` by the Stan compiler.
 
 
-### Size Declaration Restrictions 
+### Size Declaration Restrictions {-}
 
 An integer expression is used to pick out the sizes of vectors,
 matrices, and arrays.  For instance, we can declare a vector of size
@@ -752,7 +754,7 @@ a convenient shorthand for `a[m][n]`.
 Vectors, matrices, and arrays are not assignable to one another, even
 if their dimensions are identical.
 
-### Declaring Array Variables 
+### Declaring Array Variables {-}
 
 Arrays are declared by enclosing the dimensions in square brackets
 following the name of the variable.
@@ -802,7 +804,7 @@ cholesky_factor_cov[5, 6] mu[2, 3, 4];
 of a $2 \times 3 \times 4$ array of $5 \times 6$ Cholesky factors of
 covariance matrices.
 
-### Accessing Array Elements and Subarrays 
+### Accessing Array Elements and Subarrays {-}
 
 If `x` is a 1-dimensional array of length 5, then `x[1]` is
 the first element in the array and `x[5]` is the last.  For a $3
@@ -818,7 +820,7 @@ may be used instead of `y[3, 1]` to access the value of the first
 column of the third row of `y`.  The form `y[3, 1]` is the
 preferred form (see [note](#array-index-style.section) in this chapter).
 
-### Assigning 
+### Assigning {-}
 
 Subarrays may be manipulated and assigned just like any other
 variables.  Similar to the behavior of matrices, Stan allows blocks
@@ -837,7 +839,7 @@ z = y[3];  // z == w[5][4][3] == w[5, 4, 3]
 
 
 
-### Arrays of Matrices and Vectors 
+### Arrays of Matrices and Vectors {-}
 
 Arrays of vectors and matrices are accessed in the same way as arrays
 of doubles.  Consider the following vector and scalar declarations.
@@ -892,7 +894,7 @@ As shown, the result `f[2]` of supplying a single index to a
 matrix is the indexed row, here row 2 of matrix `f`.
 
 
-### Partial Array Assignment 
+### Partial Array Assignment {-}
 
 Subarrays of arrays may be assigned by indexing on the left-hand side
 of an assignment statement.  For example, the following is legal.
@@ -913,7 +915,7 @@ Partial array assignment also works for arrays of matrices, vectors,
 and row vectors.
 
 
-### Mixing Array, Vector, and Matrix Types 
+### Mixing Array, Vector, and Matrix Types {-}
 
 Arrays, row vectors, column vectors and matrices are not
 interchangeable in Stan.  Thus a variable of any one of these
@@ -923,7 +925,7 @@ follows the assignment rules).
 
 
 
-#### Mixing Vectors and Arrays 
+#### Mixing Vectors and Arrays {-}
 
 For example, vectors cannot be assigned to arrays or vice-versa.
 
@@ -938,7 +940,7 @@ a = c; // illegal assignment of row vector to array
 c = a; // illegal assignment of array to row vector
 ```
 
-#### Mixing Row and Column Vectors 
+#### Mixing Row and Column Vectors {-}
 
 It is not even legal to assign row vectors to column vectors or vice
 versa.
@@ -951,7 +953,7 @@ c = b; // illegal assignment of column vector to row vector
 ```
 
 
-#### Mixing Matrices and Arrays 
+#### Mixing Matrices and Arrays {-}
 
 The same holds for matrices, where 2-dimensional arrays may not be
 assigned to matrices or vice-versa.
@@ -965,7 +967,7 @@ b = a;  // illegal assignment of array to matrix
 ```
 
 
-#### Mixing Matrices and Vectors 
+#### Mixing Matrices and Vectors {-}
 
 A $1 \times N$ matrix cannot be assigned a row vector or
 vice versa.
@@ -988,14 +990,14 @@ a = b;  // illegal assignment of column vector to matrix
 b = a;  // illegal assignment of matrix to column vector
 ```
 
-### Size Declaration Restrictions 
+### Size Declaration Restrictions {-}
 
 An integer expression is used to pick out the sizes of arrays.  The
 same restrictions as for vector and matrix sizes apply, namely that
 the size is declared with an integer-denoting expression that does not
 contain any parameters, transformed parameters, or generated quantities.
 
-### Size Zero Arrays 
+### Size Zero Arrays {-}
 
 If any of an array's dimensions is size zero, the entire array will be
 of size zero.  That is, if we declare
@@ -1020,12 +1022,12 @@ undefined.  The array will behave at run time as if it's a $0 \times
 $0 \times 0$ matrix, not a $0 \times 3$ matrix.
 
 
-## Variable Types vs.Constraints and Sizes 
+## Variable Types vs.Constraints and Sizes
 
 The type information associated with a variable only contains the
 underlying type and dimensionality of the variable.
 
-### Type Information Excludes Sizes 
+### Type Information Excludes Sizes {-}
 
 The size associated with a given variable is not part of its data
 type.  For example, declaring a variable using
@@ -1037,7 +1039,7 @@ declares the variable `a` to be an array.  The fact that it was
 declared to have size 3 is part of its declaration, but not part of
 its underlying type.
 
-#### When are Sizes Checked? 
+#### When are Sizes Checked? {-}
 
 Sizes are determined dynamically (at run time) and thus cannot be
 type-checked statically when the program is compiled.  As a result,
@@ -1047,7 +1049,7 @@ will cause a run-time error.  Similarly, multiplying an $N
 \times M$ by a $J \times K$ matrix will raise a run-time error if $M
 \neq J$.
 
-### Type Information Excludes Constraints 
+### Type Information Excludes Constraints {-}
 
 Like sizes, constraints are not treated as part of a variable's type
 in Stan when it comes to the compile-time check of operations it may
@@ -1059,7 +1061,7 @@ and vice-versa.
 Similarly, a bounded real may be assigned to an unconstrained real and
 vice-versa.
 
-#### When are Function Argument Constraints Checked? 
+#### When are Function Argument Constraints Checked? {-}
 
 For arguments to functions, constraints are sometimes, but not always
 checked when the function is called.  Exclusions include C++ standard
@@ -1067,7 +1069,7 @@ library functions.  All probability functions and cumulative
 distribution functions check that their arguments are appropriate at
 run time as the function is called.
 
-#### When are Declared Variable Constraints Checked? 
+#### When are Declared Variable Constraints Checked? {-}
 
 For data variables, constraints are checked after the variable is read
 from a data file or other source.  For transformed data variables, the
@@ -1089,7 +1091,7 @@ For generated quantities, constraints are enforced after the
 statements in the generated quantities block have executed.
 
 
-### Type Naming Notation 
+### Type Naming Notation {-}
 
 In order to refer to data types, it is convenient to have a way to
 refer to them.  The type naming notation outlined in this section is
@@ -1105,7 +1107,7 @@ available for indexing.  Similarly, `vector[ , ]` is the type of a
 two-dimensional array of vectors.
 
 
-## Compound Variable Declaration and Definition 
+## Compound Variable Declaration and Definition
 
 Stan allows assignable variables to be declared and defined in a
 single statement.  Assignable variables are
@@ -1125,7 +1127,7 @@ int N = 5;
 declares the variable `N` to be an integer scalar type and at the
 same time defines it to be the value of the expression `5`.
 
-### Assignment Typing 
+### Assignment Typing {-}
 
 The type of the expression on the right-hand side of the assignment
 must be assignable to the type of the variable being declared.  For
@@ -1153,7 +1155,7 @@ statement to be well formed.  The sizes of matrices are not part of
 their static typing and cannot be validated until run time.
 
 
-### Right-Hand Side Expressions 
+### Right-Hand Side Expressions {-}
 
 The right-hand side may be any expression which has a type which is
 assignable to the variable being declared.  For example,
@@ -1175,7 +1177,7 @@ otherwise expressible as simple expressions (e.g., iterative or
 recursive algorithms).
 
 
-### Scope within Expressions 
+### Scope within Expressions {-}
 
 Any variable that is in scope and any function that is available in
 the block in which the compound declaration and definition appears may

@@ -36,7 +36,7 @@ The rest of the chapter details the transforms used by Stan.
 
 
 
-### Univariate Changes of Variables
+### Univariate Changes of Variables {-}
 
 Suppose $X$ is one dimensional and $f: \mathrm{supp}(X) \rightarrow
 \mathbb{R}$ is a one-to-one, monotonic function with a differentiable
@@ -53,7 +53,7 @@ scale of the transformed variable changes with respect to the
 underlying variable.
 
 
-### Multivariate Changes of Variables
+### Multivariate Changes of Variables {-}
 
 The multivariate generalization of an absolute derivative is a
 Jacobian, or more fully the absolute value of the determinant of the
@@ -113,7 +113,7 @@ variable.
 
 Stan uses a logarithmic transform for lower and upper bounds.
 
-### Lower Bound Transform}
+### Lower Bound Transform {-}
 
 If a variable $X$ is declared to have lower bound $a$, it is
 transformed to an unbounded variable $Y$, where
@@ -122,7 +122,7 @@ $$
 Y = \log(X - a).
 $$
 
-### Lower Bound Inverse Transform
+### Lower Bound Inverse Transform {-}
 
 The inverse of the lower-bound transform maps an unbounded
 variable $Y$ to a variable $X$ that is bounded below by $a$ by
@@ -131,7 +131,7 @@ $$
 X = \exp(Y) + a.
 $$
 
-### Absolute Derivative of the Lower Bound Inverse Transform
+### Absolute Derivative of the Lower Bound Inverse Transform {-}
 
 The absolute derivative of the inverse transform is
 
@@ -155,7 +155,7 @@ $$
 Stan uses a negated logarithmic transform for upper bounds.
 
 
-### Upper Bound Transform
+### Upper Bound Transform {-}
 
 If a variable $X$ is declared to have an upper bound $b$, it is
 transformed to the unbounded variable $Y$ by
@@ -165,7 +165,7 @@ Y = \log(b - X).
 $$
 
 
-### Upper Bound Inverse Transform
+### Upper Bound Inverse Transform {-}
 
 The inverse of the upper bound transform converts the unbounded
 variable $Y$ to the variable $X$ bounded above by $b$ through
@@ -175,7 +175,7 @@ X = b - \exp(Y).
 $$
 
 
-### Absolute Derivative of the Upper Bound Inverse Transform
+### Absolute Derivative of the Upper Bound Inverse Transform {-}
 
 The absolute derivative of the inverse of the upper bound transform is
 
@@ -200,7 +200,7 @@ $$
 For lower and upper-bounded variables, Stan uses a scaled and
 translated log-odds transform.
 
-### Log Odds and the Logistic Sigmoid}
+### Log Odds and the Logistic Sigmoid {-}
 
 The log-odds function is defined for $u \in (0,1)$ by
 
@@ -222,7 +222,7 @@ $$
 = \mathrm{logit}^{-1}(y) \cdot \left( 1 - \mathrm{logit}^{-1}(y) \right).
 $$
 
-### Lower and Upper Bounds Transform
+### Lower and Upper Bounds Transform {-}
 
 For variables constrained to be in the open interval $(a, b)$, Stan
 uses a scaled and translated log-odds transform.  If variable $X$ is
@@ -234,7 +234,7 @@ Y = \mathrm{logit} \left( \frac{X - a}{b - a} \right).
 $$
 
 
-### Lower and Upper Bounds Inverse Transform
+### Lower and Upper Bounds Inverse Transform {-}
 
 The inverse of this transform is
 
@@ -243,7 +243,7 @@ X = a + (b - a) \cdot \mathrm{logit}^{-1}(Y).
 $$
 
 
-### Absolute Derivative of the Lower and Upper Bounds Inverse Transform
+### Absolute Derivative of the Lower and Upper Bounds Inverse Transform {-}
 
 The absolute derivative of the inverse transform is given by
 
@@ -291,7 +291,7 @@ $$
 for $k \in \{ 1, \ldots, K-1 \}$.
 
 
-### Ordered Transform
+### Ordered Transform {-}
 
 Stan's transform follows the constraint directly.  It maps an
 increasing vector $x \in \mathbb{R}^{K}$ to an unconstrained vector $y \in
@@ -309,7 +309,7 @@ x_1 & \mbox{if } k = 1, \mbox{ and}
 \right.
 $$
 
-### Ordered Inverse Transform
+### Ordered Inverse Transform {-}
 
 The inverse transform for an unconstrained $y \in \mathbb{R}^K$ to an
 ordered sequence $x \in \mathbb{R}^K$ is defined by the recursion
@@ -332,7 +332,7 @@ $$
 x_k = y_1 + \sum_{k'=2}^k \exp(y_{k'}).
 $$
 
-### Absolute Jacobian Determinant of the Ordered Inverse Transform
+### Absolute Jacobian Determinant of the Ordered Inverse Transform {-}
 
 The Jacobian of the inverse transform $f^{-1}$ is lower triangular,
 with diagonal elements for $1 \leq k \leq K$ of
@@ -409,7 +409,7 @@ x_K = 1 - \sum_{k=1}^{K-1} x_k.
 $$
 
 
-### Unit Simplex Inverse Transform
+### Unit Simplex Inverse Transform {-}
 
 Stan's unit simplex inverse transform may be understood using the
 following stick-breaking metaphor.^[For an alternative derivation of the same transform using
@@ -459,7 +459,7 @@ $$
 x_K = 1 - \sum_{k=1}^{K-1} x_k.
 $$
 
-### Absolute Jacobian Determinant of the Unit-Simplex Inverse Transform
+### Absolute Jacobian Determinant of the Unit-Simplex Inverse Transform {-}
 
 The Jacobian $J$ of the inverse transform $f^{-1}$ is
 lower-triangular, with diagonal entries
@@ -541,7 +541,7 @@ function need only be evaluated once for each unconstrained parameter
 $y_k$; everything else is just basic arithmetic that can be computed
 incrementally along with the transform.
 
-### Unit Simplex Transform
+### Unit Simplex Transform {-}
 
 The transform $Y = f(X)$ can be derived by reversing the stages of the
 inverse transform.  Working backwards, given the break proportions
@@ -580,7 +580,7 @@ $$
 $$
 
 
-### Unit Vector Inverse Transform
+### Unit Vector Inverse Transform {-}
 
 Stan divides an unconstrained vector $y \in \mathbb{R}^{n}$ by its norm,
 $\Vert y \Vert = \sqrt{y^\top y}$, to obtain a unit vector $x$,
@@ -603,7 +603,7 @@ because there are points arbitrarily far away from each other in
 $\mathbb{R}^n$ that map to identical points in $S^{n-1}$.
 
 
-#### Warning: undefined at zero!
+#### Warning: undefined at zero! {-}
 
 The above mapping from $\mathbb{R}^n$ to $S^n$ is not defined at zero.
 While this point outcome has measure zero during sampling, and may
@@ -612,7 +612,7 @@ vector parameters cannot be initialized at zero.  A simple workaround
 is to initialize from a very small interval around zero, which is an
 option built into all of the Stan interfaces.
 
-### Absolute Jacobian Determinant of the Unit Vector Inverse Transform
+### Absolute Jacobian Determinant of the Unit Vector Inverse Transform {-}
 
 The Jacobian matrix relating the input vector $y$ to the output vector
 $x$ is singular because $x^\top x = 1$ for any non-zero input vector
@@ -650,7 +650,7 @@ To deal with this rather complicated constraint, Stan implements the
 transform of @LewandowskiKurowickaJoe:2009.  The number of free
 parameters required to specify a $K \times K$ correlation matrix is $\binom{K}{2}$.
 
-### Correlation Matrix Inverse Transform
+### Correlation Matrix Inverse Transform {-}
 
 It is easiest to specify the inverse, going from its $\binom{K}{2}$
 parameter basis to a correlation matrix.  The basis will actually be
@@ -750,7 +750,7 @@ $$
  = \prod_{1 \leq i < j \leq K} (1 - z_{i,j}^2),
 $$
 
-### Absolute Jacobian Determinant of the Correlation Matrix Inverse Transform
+### Absolute Jacobian Determinant of the Correlation Matrix Inverse Transform {-}
 
 From the inverse of equation 11 in [@LewandowskiKurowickaJoe:2009],
 the absolute Jacobian determinant is
@@ -761,7 +761,7 @@ $$
 \frac{\partial \tanh z_{i,j}}{\partial y_{i,j}}
 $$
 
-### Correlation Matrix Transform
+### Correlation Matrix Transform {-}
 
 The correlation transform is defined by reversing the steps of the
 inverse transform defined in the previous section.
@@ -815,7 +815,7 @@ requires $K + \binom{K}{2}$ free parameters to specify a $K \times K$
 covariance matrix.
 
 
-### Covariance Matrix Transform
+### Covariance Matrix Transform {-}
 
 Stan's covariance transform is based on a Cholesky decomposition
 composed with a log transform of the positive-constrained diagonal
@@ -850,7 +850,7 @@ z_{m,n} & \mbox{if } m > n.
 \right.
 $$
 
-### Covariance Matrix Inverse Transform
+### Covariance Matrix Inverse Transform {-}
 
 The inverse transform reverses the two steps of the transform.
 Given an unconstrained lower-triangular $K \times K$ matrix $y$, the
@@ -877,7 +877,7 @@ $$
 x = z \, z^{\top}.
 $$
 
-### Absolute Jacobian Determinant of the Covariance Matrix Inverse Transform
+### Absolute Jacobian Determinant of the Covariance Matrix Inverse Transform {-}
 
 The Jacobian is the product of the Jacobians of the exponential
 transform from the unconstrained lower-triangular matrix $y$ to matrix
@@ -966,7 +966,7 @@ if $M = N$.
 A Cholesky factor of a covariance matrix requires $N + \binom{N}{2} +
 (M - N)N$ unconstrained parameters.
 
-### Cholesky Factor of Covariance Matrix Transform
+### Cholesky Factor of Covariance Matrix Transform {-}
 
 Stan's Cholesky factor transform only requires the first step of the
 covariance matrix transform, namely log transforming the positive
@@ -988,7 +988,7 @@ x_{m,n} & \mbox{if } m > n.
 \right.
 $$
 
-### Cholesky Factor of Covariance Matrix Inverse Transform
+### Cholesky Factor of Covariance Matrix Inverse Transform {-}
 
 The inverse transform need only invert the logarithm with an
 exponentiation.  If $y$ is the unconstrained matrix representation,
@@ -1007,7 +1007,7 @@ y_{m,n} & \mbox{if } m > n.
 \right.
 $$
 
-### Absolute Jacobian Determinant of Cholesky Factor Inverse Transform
+### Absolute Jacobian Determinant of Cholesky Factor Inverse Transform {-}
 
 The transform has a diagonal Jacobian matrix, the absolute determinant
 of which is
@@ -1049,7 +1049,7 @@ be calculated from the off-diagonal elements, so that a Cholesky
 factor for a $K \times K$ correlation matrix requires only
 $\binom{K}{2}$ unconstrained parameters.
 
-### Cholesky Factor of Correlation Matrix Inverse Transform
+### Cholesky Factor of Correlation Matrix Inverse Transform {-}
 
 It is easiest to start with the inverse transform from the $\binom{K}{2}$ unconstrained parameters $y$ to the $K \times K$ lower-triangular Cholesky factor $x$.  The inverse transform is based on the hyperbolic tangent function, $\tanh$, which satisfies $\tanh(x) \in (-1,1)$.  Here it will function like an inverse logit with a sign to pick out the direction of an underlying canonical partial correlation; see the [section on correlation matrix transforms](#correlation-matrix-transform.section) for more information on the relation between canonical partial correlations and the Cholesky factors of correlation matrices.
 
@@ -1115,7 +1115,7 @@ $z_{i,j}$ of the remaining length for the row that it consumes. The
 diagonal entries $x_{i,i}$ get any leftover length from earlier
 entries in their row.  The above-diagonal entries are zero.
 
-### Cholesky Factor of Correlation Matrix Transform
+### Cholesky Factor of Correlation Matrix Transform {-}
 
 Suppose $x$ is a $K \times K$ Cholesky factor for some correlation
 matrix.  The first step of the transform reconstructs the intermediate
@@ -1137,7 +1137,7 @@ y
 $$
 
 
-### Absolute Jacobian Determinant of Inverse Transform
+### Absolute Jacobian Determinant of Inverse Transform {-}
 
 The Jacobian of the full transform is the product of the Jacobians of
 its component transforms.

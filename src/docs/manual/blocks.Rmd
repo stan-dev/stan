@@ -6,7 +6,7 @@ A Stan program is organized into a sequence of named blocks, the
 bodies of which consist of variable declarations, followed in the case
 of some blocks with statements.
 
-## Overview of Stan's Program Blocks 
+## Overview of Stan's Program Blocks
 
 The full set of named program blocks is exemplified in the following
 skeletal Stan program.
@@ -48,7 +48,7 @@ based on parameters, data, and optionally (pseudo) random number
 generation.
 
 
-### Optionality and Ordering 
+### Optionality and Ordering {-}
 
 All of the blocks are optional.  A consequence of this is that the
 empty string is a valid Stan program, although it will trigger a
@@ -58,7 +58,7 @@ above.  Within each block, both declarations and statements are
 optional, subject to the  restriction that the declarations come
 before the statements.
 
-### Variable Scope 
+### Variable Scope {-}
 
 The variables declared in each block have scope over all subsequent
 statements.  Thus a variable declared in the transformed data block
@@ -74,7 +74,7 @@ Variables declared as function parameters have scope only within that
 function definition's body, and may not be assigned to (they are
 constant).
 
-### Function Scope 
+### Function Scope {-}
 
 Functions defined in the function block may be used in any appropriate
 block.  Most functions can be used in any block and applied to a
@@ -90,7 +90,7 @@ model); such functions are suffixed with `_lp`.
 Density functions defined in the program may be used in sampling
 statements.
 
-### Automatic Variable Definitions 
+### Automatic Variable Definitions {-}
 
 The variables declared in the `data` and `parameters` block
 are treated differently than other variables in that they are
@@ -106,7 +106,7 @@ typically a file or a designated R data structure.  In each case, the
 parameters are instantiated to the values for which the model defines
 a log probability function.
 
-### Transformed Variables 
+### Transformed Variables {-}
 
 The `transformed data` and `transformed parameters` block
 behave similarly to each other.  Both allow new variables to be
@@ -129,7 +129,7 @@ evaluated once per leapfrog step.  Transformed parameters are then
 declared and their defining statements executed once per leapfrog
 step.
 
-### Generated Quantities 
+### Generated Quantities {-}
 
 The generated quantity variables are defined once per sample after all
 the leapfrog steps have been completed.  These may be random
@@ -137,12 +137,10 @@ quantities, so the block must be rerun even if the Metropolis
 adjustment of HMC or NUTS rejects the update proposal.
 
 
-### Variable Read, Write, and Definition Summary 
+### Variable Read, Write, and Definition Summary {-}
 
 A table summarizing the point at which variables are read, written, and
 defined is given in the [block actions table](#block-actions-table).
-
-----
 
 **Block Actions Table.** <a id="block-actions-table"></a>
 *The read, write, transform, and evaluate actions and
@@ -156,7 +154,7 @@ applied once per chain.*
 :---------|:-------------:|:-------------------
 `data` | no | read / chain
 `transformed data` | yes | evaluate / chain
-`parameters` | no | inv. transform, Jacobian / leapfrog 
+`parameters` | no | inv. transform, Jacobian / leapfrog
 &nbsp; | &nbsp; | inv. transform, write / sample
 `transformed parameters` | yes | evaluate / leapfrog
 &nbsp; | &nbsp; | write / sample
@@ -165,12 +163,8 @@ applied once per chain.*
 &nbsp; | &nbsp; | write / sample
 `\slshape (initialization)` | n/a | read, transform / chain
 
-----
-
-----
-
-<a id="where-to-declare-table"></a>
-**Variable Declaration Table.** &nbsp; *This table indicates where variables that are not basic
+**Variable Declaration Table.** <a id="where-to-declare-table"></a>
+*This table indicates where variables that are not basic
 data or parameters should be declared, based on whether it is
 defined in terms of parameters, whether it is used in the log
 probability function defined in the model block, and whether it is
@@ -178,33 +172,35 @@ printed.  The two lines marked with asterisks ($*$) should not be
 used as there is no need to print a variable every iteration that
 does not depend on the value of any parameters.*
 
-  depends on params  | used in log prob  |  saved  |  declare in
-:-------------------:|:-----------------:|:-------:|:-----------
-$+$ | $+$ | $+$ | `transformed parameters`
-$+$ | $+$ | $-$ | {\it local in}\ `model`
-$+$ | $-$ | $-$ | {\it local in}\ `generated quantities`
-$+$ | $-$ | $+$ | `generated quantities`
-$-$ | $-$ | $+$ | `generated quantities`$^*$
-$-$ | $\pm$ | $-$ | {\it local in}\ `transformed data`
-$-$ | $+$ | $+$ | `transformed data` {\it and}\ `generated quantities`$^*$
-
-----
-
+  param depend  |  in target  |  save  |  declare in
+:--------------:|:-----------:|:------:|:-----------
+ + | + | + | `transformed parameters`
+ + | + | - | `model` (local)
+ + | - | + | `generated quantities`
+ + | - | - | `generated quantities` (local)
+ - | + | + | `transformed data` &nbsp; *and* `generated quantities`
+ - | + | - | `transformed data`
+ - | - | + | `generated quantities`
+ - | - | - | `transformed data` (local)
 
 Another way to look at the variables is in terms of their function.
 To decide which variable to use, consult the charts in
-the [variable table](#variable-flowchart).  The last line has no
+the [variable declaration table](#where-to-declare-table).  The last line has no
 corresponding location, as there is no need to print a variable
-every iteration that does not depend on parameters.^[It is possible to print a variable every iteration that does not depend on parameters---just define it (or redefine it if it is transformed data) in the `generated quantities` block.{#print-var-no-param.footnote}]
+every iteration that does not depend on parameters.^[It is possible to print a variable every iteration that does not depend on parameters---just define it (or redefine it if it is transformed data) in the `generated quantities` block.]
 
 The rest of this chapter provides full details on when and how the
 variables and statements in each block are executed.
 
 
 
-## Statistical Variable Taxonomy 
+## Statistical Variable Taxonomy
 
-  variable kind     declaration block
+**Statistical Variable Taxonomy Table** <a id="variable-kinds-table"></a>
+*Variables of the kind indicated in the left column must be declared
+in one of the blocks declared in the right column.*
+
+  variable kind  |   declaration block
 :----------------|:---------------------
 constants | `data`, `transformed data`
 unmodeled data | `data`, `transformed data`
@@ -214,10 +210,6 @@ modeled parameters | `parameters`, `transformed parameters`
 unmodeled parameters | `data`, `transformed data`
 derived quantities | `transformed data`, `transformed parameters`, `generated quantities`
 loop indices | loop statement
-
-Table: Variables of the kind indicated in the left column must
- be declared in one of the blocks declared in the right
- column.{#variable-kinds.figure}
 
 Page 366 of [@GelmanHill:2007] provides a taxonomy of the kinds of
 variables used in Bayesian models.  The [table of kinds of variables](#variable-kinds.figure)
@@ -325,23 +317,23 @@ Finally, the variable `n` is used as a loop index in the
 The rest of this chapter will lay out the details of each block in
 order, starting with the `data` block in this section.
 
-### Variable Reads and Transformations 
+### Variable Reads and Transformations {-}
 
 The `data` block is for the declaration of variables that are
 read in as data.  With the current model executable, each Markov chain
 of draws will be executed in a different process, and each such
-process will read the data exactly once.^[With multiple threads, or even running chains sequentially in a single thread, data could be read only once per set of chains. Stan was designed to be thread safe and future versions will provide a multithreading option for Markov chains.{#thread.footnote}]
+process will read the data exactly once.^[With multiple threads, or even running chains sequentially in a single thread, data could be read only once per set of chains. Stan was designed to be thread safe and future versions will provide a multithreading option for Markov chains.]
 
 
 Data variables are not transformed in any way.  The format for data
 files or data in memory depends on the interface; see the user's
 guides and interface documentation for PyStan, RStan, and CmdStan for details.
 
-### Statements 
+### Statements {-}
 
 The `data` block does not allow statements.
 
-### Variable Constraint Checking 
+### Variable Constraint Checking {-}
 
 Each variable's value is validated against its declaration as it is
 read.  For example, if a variable `sigma` is declared as
@@ -356,7 +348,7 @@ compound data structure will also raise an error.
 The `transformed data` block is for declaring and defining
 variables that do not need to be changed when running the program.
 
-### Variable Reads and Transformations 
+### Variable Reads and Transformations {-}
 
 For the `transformed data` block, variables are all declared in
 the variable declarations and defined in the statements.  There is no
@@ -365,7 +357,7 @@ reading from external sources and no transformations performed.
 Variables declared in the `data` block may be used to declare
 transformed variables.
 
-### Statements 
+### Statements {-}
 
 The statements in a `transformed data` block are used to define
 (provide values for) variables declared in the `transformed data`
@@ -379,14 +371,14 @@ chain.
 Variables declared in the `data` block may be used in statements
 in the `transformed data` block.
 
-#### Restriction on Operations in `transformed data`
+#### Restriction on Operations in `transformed data` {-}
 
 The statements in the transformed data block are designed to be
 executed once and have a deterministic result.  Therefore, log
 probability is not accumulated and sampling statements may not be
 used.  Random number generating functions are also prohibited.
 
-### Variable Constraint Checking 
+### Variable Constraint Checking {-}
 
 Any constraints on variables declared in the `transformed data`
 block are checked after the statements are executed.  If any defined
@@ -413,12 +405,12 @@ variables in a Stan program at each leapfrog step within the
 HMC or NUTS samplers, and a bit more computation along with writes
 involved for saving the parameter values corresponding to a sample.
 
-### Constraining Inverse Transform 
+### Constraining Inverse Transform {-}
 
 Stan's two samplers, standard Hamiltonian Monte Carlo (HMC) and the
 adaptive No-U-Turn sampler (NUTS), are most easily (and often most
 effectively) implemented over a multivariate probability density that
-has support on all of $\reals^n$.  To do this, the parameters
+has support on all of $\mathbb{R}^n$.  To do this, the parameters
 defined in the `parameters` block must be transformed so they are
 unconstrained.
 
@@ -447,7 +439,7 @@ to the order of the variables defined in the `parameters` program
 block.  The details of the specific transformations are provided in
 the [variable transforms chapter](#variable-transforms).
 
-### Gradient Calculation 
+### Gradient Calculation {-}
 
 Hamiltonian Monte Carlo requires the gradient of the (unnormalized)
 log probability function with respect to the unconstrained parameters
@@ -465,7 +457,7 @@ The amount of work done by the sampler does depend on the number of
 unconstrained parameters, but this is usually dwarfed by the gradient
 calculations.
 
-### Writing Draws 
+### Writing Draws {-}
 
 In the basic Stan compiled program, there is a file to which the
 values of variables are written for each draw.  The constrained
@@ -488,7 +480,7 @@ data should be declared and defined in the transformed data block.
 Defining such quantities in the transformed parameters block is legal,
 but much less efficient than defining them as transformed data.
 
-### Constraints are for Error Checking 
+### Constraints are for Error Checking {-}
 
 Like the constraints on data, the constraints on transformed
 parameters is meant to catch programming errors as well as convey
@@ -541,7 +533,7 @@ Parameter estimates, predictions, statistics, and event probabilities
 calculated directly using plug-in estimates.  Stan automatically
 provides full Bayesian inference by producing draws from the
 posterior distribution of any calculated event probabilities,
-predictions, or statistics.  
+predictions, or statistics.
 
 Within the generated quantities block, the values of all other variables
 declared in earlier program blocks (other than local variables) are

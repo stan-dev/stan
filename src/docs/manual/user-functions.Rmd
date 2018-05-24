@@ -43,13 +43,13 @@ different sequences of argument types.
 
 All function arguments are mandatory---there are no default values.
 
-### Functions as Expressions 
+### Functions as Expressions {-}
 
 Functions with non-void return types are called just like any other
 built-in function in Stan---they are applied to appropriately typed
 arguments to produce an expression, which has a value when executed.
 
-### Functions as Statements 
+### Functions as Statements {-}
 
 Functions with void return types may be applied to arguments and used
 as statements.  These act like sampling statements or print
@@ -57,7 +57,7 @@ statements.  Such uses are only appropriate for functions that act
 through side effects, such as incrementing the log probability
 accumulator, printing, or raising exceptions.
 
-### Probability Functions in Sampling Statements 
+### Probability Functions in Sampling Statements {-}
 
 Functions whose name ends in `_lpdf` or `_lpmf` (density
 and mass functions) may be used as probability functions and may be
@@ -65,7 +65,7 @@ used in place of parameterized distributions on the right-hand-side of
 sampling statements.  There is no restriction on where such functions
 may be used.
 
-### Restrictions on Placement 
+### Restrictions on Placement {-}
 
 Functions of certain types are restricted on scope of usage.
 Functions whose names end in `_lp` assume access to the log
@@ -90,7 +90,7 @@ The type `void` may not be used as an argument type, only a
 return type for a function with side effects.
 
 
-### Base Variable Type Declaration 
+### Base Variable Type Declaration {-}
 
 The base variable types are `integer`, `real`,
 `vector`, `row_vector`, and `matrix`.  No lower-bound
@@ -98,7 +98,7 @@ or upper-bound constraints are allowed (e.g., `real<lower=0>` is
 illegal).  Specialized types are also not allowed (e.g.,
 `simplex` is illegal) .
 
-### Dimensionality Declaration 
+### Dimensionality Declaration {-} 
 
 Arguments and return types may be arrays, and these are indicated with
 optional brackets and commas as would be used for indexing.  For
@@ -116,7 +116,7 @@ dimensions.  The type declaration `matrix[ , ] b` specifies that
 `b` is a two-dimensional array of matrices, for a total of four
 indexing dimensions, with `b[1, 1, 1, 1]` picking out a real value.
 
-### Dimensionality Checks and Exceptions 
+### Dimensionality Checks and Exceptions {-}
 
 Function argument and return types are not themselves checked for
 dimensionality.  A matrix of any size may be passed in as a matrix
@@ -144,7 +144,7 @@ The only restrictions on statements in function bodies are external,
 and determine whether the log probability accumulator or random
 number generators are available;  see the rest of this section for details.
 
-### Random Number Generating Functions 
+### Random Number Generating Functions {-} 
 
 Functions that call random number generating functions in their bodies
 must have a name that ends in `_rng`; attempts to use
@@ -157,7 +157,7 @@ quantities block and transformed data block, or within the bodies of
 user-defined functions ending in `_rng`.  An attempt to use such
 a function elsewhere results in a compile-time error.
 
-### Log Probability Access in Functions 
+### Log Probability Access in Functions {-} 
 
 Functions that include sampling statements or log probability
 increment statements must have a name that ends in `_lp`.
@@ -171,7 +171,7 @@ accessible, namely the transformed parameters and model blocks.  An
 attempt to use such a function elsewhere results in a compile-time
 error.
 
-### Defining Probability Functions for Sampling Statements 
+### Defining Probability Functions for Sampling Statements {-}
 
 Functions whose names end in `_lpdf` and `_lpmf` (density
 and mass functions) can be used as probability functions in sampling
@@ -232,7 +232,7 @@ the function, a compile-time error is raised.
 Void functions may use `return` only without an argument, but
 return statements are not mandatory.
 
-### Return Guarantee Required 
+### Return Guarantee Required {-}
 
 Unlike C++, Stan enforces a syntactic guarantee for non-void
 functions that ensures control will leave a non-void function through
@@ -300,14 +300,14 @@ return as its final statement.
 
 ## Void Functions as Statements 
 
-### Void Functions 
+### Void Functions {-}
 
 A function can be declared without a return value by using `void`
 in place of a return type.  Note that the type `void` may only be
 used as a return type---arguments may not be declared to be of type
 `void`.
 
-### Usage as Statement 
+### Usage as Statement {-}
 
 A void function may be used as a statement after the function is
 declared;  see the [section on forward declarations](#forward-declarations.section) for rules on declaration.
@@ -316,7 +316,7 @@ Because there is no return, such a usage is only for side effects,
 such as incrementing the log probability function, printing, or
 raising an error.
 
-### Special Return Statements 
+### Special Return Statements {-}
 
 In a return statement within a void function's definition, the
 `return` keyword is followed immediately by a semicolon
@@ -353,7 +353,7 @@ once.  If there is a declaration, there must be a definition.  These
 rules together ensure that all the declared functions are eventually
 defined.
 
-### Recursive Functions 
+### Recursive Functions {-}
 
 Forward declarations allow the definition of self-recursive or
 mutually recursive functions.  For instance, consider the following

@@ -7,7 +7,7 @@ must consist of only ASCII alpha-numeric characters and the underscore
 character.  All arithmetic operators and punctuation must be coded in
 ASCII.
 
-### Compatibility with Latin-1 and UTF-8
+### Compatibility with Latin-1 and UTF-8 {-}
 
 The UTF-8 encoding of Unicode and the Latin-1 (ISO-8859-1) encoding
 share the first 128 code points with ASCII and thus cannot be
