@@ -1,7 +1,4 @@
-
-
 # Statements
-
 
 The blocks of a Stan program  are made up of
 variable declarations and statements; see the [blocks chapter](#blocks) for
@@ -18,6 +15,7 @@ constructed by using assignment statements.  Statements may be grouped
 into sequences and into for-each loops.  In addition, Stan allows
 local variables to be declared in blocks and also allows an empty
 statement consisting only of a semicolon.
+
 
 ## Statement Block Contexts
 
@@ -39,7 +37,9 @@ assignment statement evaluates the expression on the right-hand side
 and assigns it to the (indexed) variable on the left-hand side.
 An example of a simple assignment is as follows.^[In versions of Stan before 2.17.1, the operator `<-` was used for assignment rather than using the equal sign `=`.  The old operator `<-` is now deprecated and will print a warning. In the future, it will be removed.]
 
-`n = 0;`
+```stan
+n = 0;
+```
 
 Executing this statement assigns the value of the expression `0`,
 which is the integer zero, to the variable `n`.  For an assignment
@@ -64,7 +64,9 @@ Because the right-hand side is evaluated first, it is possible to
 increment a variable in Stan just as in C++ and other programming
 languages by writing
 
-`n = n + 1;`
+```stan
+n = n + 1;
+```
 
 Such self assignments are not allowed in BUGS, because they induce a
 cycle into the directed graphical model.
@@ -73,7 +75,9 @@ The left-hand side of an assignment may contain indices for array,
 matrix, or vector data structures.  For instance, if `Sigma` is
 of type `matrix`, then
 
-`Sigma[1, 1] = 1.0;`
+```stan
+Sigma[1, 1] = 1.0;
+```
 
 sets the value in the first column of the first row of `Sigma` to one.
 
@@ -120,10 +124,8 @@ The expressions that are legal left-hand sides of assignment
 statements are known as ``lvalues.''  In Stan, there are only two
 kinds of legal lvalues,
 
-
 * a variable, or
 * a variable with one or more indices.
-
 
 To be used as an lvalue, an indexed variable must have at least as
 many dimensions as the number of indices provided.  An array of real
@@ -138,6 +140,7 @@ than the number of dimensions of the variable, meaning that the right
 hand side must itself be multidimensional to match the remaining
 dimensions.
 
+
 ### Multiple Indexes {-}
 
 Multiple indexes, as described in the
@@ -146,6 +149,7 @@ left-hand side of assignments.  Indexing on the left side works
 exactly as it does for expressions, with multiple indexes preserving
 index positions and single indexes reducing them.    The type on the
 left side must still match the type on the right side.
+
 
 #### Aliasing {-}
 
@@ -214,7 +218,8 @@ operations are listed in the [compound arithmetic/assignment table](#compound-ar
 are also listed in the index prefaced by `operator`, e.g.,
 `operator+=`.
 
-**Compound Arithmetic/Assignment Table** <a id="compound-arithmetic-assign-table"></a>
+**Compound Arithmetic/Assignment Table**
+<a id="compound-arithmetic-assign-table"></a>
 *Stan allows compound arithmetic and assignment
 statements of the forms listed in the table above.  The compound
 form is legal whenever the corresponding long form would be legal
@@ -292,6 +297,7 @@ depend on the parameters.  This is convenient because often the
 normalizing constant $Z$ is either time-consuming to compute or
 intractable to evaluate.
 
+
 #### Relation to compound addition and assignment {-}
 
 The increment log density statement looks syntactically like compound
@@ -317,6 +323,7 @@ The `target += ...` statement accepts an argument in place of
 vectors, row vectors, matrices, and arrays of any dimensionality,
 including arrays of vectors and matrices.   For container arguments,
 their sum will be added to the total log density.
+
 
 ### Accessing the Log Density {-}
 
@@ -371,10 +378,10 @@ mass function is used,
 target += dist_lpmf(y | theta1, ..., thetaN);
 ```
 
-
 This will be well formed if and only if `dist_lpdf(y | theta1,
   ..., thetaN)` or `dist_lpmf(y | theta1, ..., thetaN)` is a
 well-formed expression of type `real`.
+
 
 ### Log Probability Increment vs.Sampling Statement {-}
 
@@ -439,6 +446,7 @@ target += - log(fabs(y));
 Stan supports truncating distributions with lower bounds, upper
 bounds, or both.
 
+
 #### Truncating with lower and upper bounds {-}
 
 A probability density function $p(x)$ for a continuous distribution
@@ -453,10 +461,12 @@ $$
 
 A probability mass function $p(x)$ for a discrete distribution may be
 truncated to the closed interval $[a, b]$ by
+
 $$
 p_{[a, b]}(x) = \frac{p(x)}
                   {\sum_{u = a}^b p(u)}.
 $$
+
 
 #### Truncating with a lower bound {-}
 
@@ -476,6 +486,7 @@ $$
 p_{[a, \infty]}(x) = \frac{p(x)}
                   {\sum_{a <= u} p(u)}.
 $$
+
 
 #### Truncating with an upper bound {-}
 
@@ -506,14 +517,18 @@ probability that $X \leq x$,
 $$
 F_X(x) = \mathrm{Pr}[X \leq x].
 $$
+
 The upper-case variable $X$ is the random variable whereas the
 lower-case variable $x$ is just an ordinary bound variable.  For
 continuous random variables, the definition of the cdf works out to
+
 $$
 F_X(x) \ = \ \int_{-\infty}^{x} p_X(u) \, du,
 $$
+
 For discrete variables, the cdf is defined to include the upper bound
 given by the argument,
+
 $$
 F_X(x) = \sum_{u \leq x} p_X(u).
 $$
@@ -523,30 +538,34 @@ $$
 
 The complementary cumulative distribution function (ccdf) in both the
 continuous and discrete cases is given by
+
 $$
 F^C_X(x)
 \ = \ \mathrm{Pr}[X > x]
 \ = \ 1 - F_X(x).
 $$
+
 Unlike the cdf, the ccdf is exclusive of the bound, hence the event
 $X > x$ rather than the cdf's event $X \leq x$.
 
 For continuous distributions, the ccdf works out to
+
 $$
 F^C_X(x)
 \ = \ 1 - \int_{-\infty}^x p_X(u) \, du
 \ = \ \int_x^{\infty} p_X(u) \, du.
 $$
+
 The lower boundary can be included in the integration bounds because
 it is a single point on a line and hence has no probability mass.
 For the discrete case, the lower bound must be excluded in the
 summation explicitly by summing over $u > x$,
+
 $$
 F^C_X(x)
 \ = \ 1 - \sum_{u \leq x} p_X(u)
 \ = \ \sum_{u > x} p_X(u).
 $$
-
 
 Cumulative distribution functions provide the necessary integral
 calculations to define truncated distributions.  For truncation with
@@ -563,10 +582,12 @@ $$
 For discrete distributions, a slightly more complicated form is
 required to explicitly insert the lower truncation point, which is
 otherwise excluded from $F_X(b) - F_X(a)$,
+
 $$
 p_{[a,b]}(x) = \frac{p_X(x)}
                   {F_X(b) - F_X(a) + p_X(a)}.
 $$
+
 
 #### Truncation with lower and upper bounds in Stan {-}
 
@@ -624,8 +645,8 @@ else
                                       poisson_lcdf(2 | 3.7)));
 ```
 
-Recall that `log_sum_exp(a, b)` is just the arithmetically
-stable form of `log(exp(a) + exp(b))`.
+Recall that `log_sum_exp(a, b)` is just the arithmetically stable form
+of `log(exp(a) + exp(b))`.
 
 
 #### Truncation with lower bounds in Stan {-}
@@ -706,6 +727,7 @@ else
   target += -poisson_lcdf(10 | 3.7);
 ```
 
+
 #### Cumulative distributions must be defined {-}
 
 In all cases, the truncation is only well formed if the appropriate
@@ -724,12 +746,14 @@ For continuous distributions, truncation points must be expressions of
 type `int` or `real`.  For discrete distributions, truncation
 points must be expressions of type `int`.
 
+
 #### Variates outside of truncation bounds {-}
 
 For a truncated sampling statement, if the value sampled is not within
 the bounds specified by the truncation expression, the result is zero
 probability and the entire statement adds $-\infty$ to the total log
 probability, which in turn results in the sample being rejected.
+
 
 #### Vectorizing Truncated Distributions {-}
 
@@ -739,12 +763,10 @@ with truncation.
 
 ## For Loops
 
-Suppose
-`N` is a variable of type `int`, `y` is a
-one-dimensional array of type `real[]`, and `mu` and
-`sigma` are variables of type `real`.  Furthermore, suppose
-that `n` has not been defined as a variable. Then the following
-is a well-formed for-loop statement.
+Suppose `N` is a variable of type `int`, `y` is a one-dimensional
+array of type `real[]`, and `mu` and `sigma` are variables of type
+`real`.  Furthermore, suppose that `n` has not been defined as a
+variable. Then the following is a well-formed for-loop statement.
 
 ```stan
 for (n in 1:N) {
@@ -755,6 +777,7 @@ for (n in 1:N) {
 The loop variable is `n`, the loop bounds are the values in the
 range `1:N`, and the body is the statement following the
 loop bounds.
+
 
 ### Loop Variable Typing and Scope {-}
 
@@ -767,6 +790,7 @@ will cause the body of the for loop to be executed with `n` equal
 to 2, 3, 4, and 5, in order.  The variable and bound `for (n in
   5:2)` will not execute anything because there are no integers
 greater than or equal to 5 and less than or equal to 2.
+
 
 ### Order Sensitivity and Repeated Variables {-}
 
@@ -785,7 +809,11 @@ Such reassignment is not permitted in BUGS.  In BUGS, for loops are
 declarative, defining plates in directed graphical model notation,
 which can be thought of as repeated substructures in the graphical
 model.  Therefore, it is illegal in BUGS or JAGS to have a for loop
-that repeatedly reassigns a value to a variable.^[A programming idiom in BUGS code simulates a local variable by replacing `theta` in the above example with `theta[n]`, effectively creating `N` different variables, `theta[1]`, ..., `theta[N]`.  Of course, this is not a hack if the value of `theta[n]` is required for all `n`.]
+that repeatedly reassigns a value to a variable.^[A programming idiom
+in BUGS code simulates a local variable by replacing `theta` in the
+above example with `theta[n]`, effectively creating `N` different
+variables, `theta[1]`, ..., `theta[N]`.  Of course, this is not a hack
+if the value of `theta[n]` is required for all `n`.]
 
 In Stan, assignments are executed in the order they are encountered.
 As a consequence, the following Stan program has a very different
@@ -804,8 +832,7 @@ first loop iteration (otherwise behavior is undefined), and then each
 loop uses the assignment from the previous iteration.
 
 Stan loops may be used to accumulate values.  Thus it is possible to
-sum the values of an array directly using code such as the
-following.
+sum the values of an array directly using code such as the following.
 
 ```stan
 total = 0.0;
@@ -832,30 +859,55 @@ for (n in 1:100) {
 }
 ```
 
+
 ## Foreach Loops
 
-Similarly, the `for` keyword can be used to iterate over containers
-(arrays, vectors, row-vectors or matrices). For instance, suppose
-`ys` is a container with elements of type `T` and that
-`z` is a variable of type `T`. Then the following is a
-well-formed for-loop statement, which sets all elements of `ys`
-equal to `z`.
+A second form of for loops allows iteration over elements of
+containers.  If `ys` is an expression denoting a container (vector,
+row vector, matrix, or array) with elements of type `T`, then the
+following is a well-formed foreach statement.
 
-```stan
+```
 for (y in ys) {
-  y = z;
+  ... do something with y ...
 }
 ```
 
-Note, in particular, that we can assign to the loop variable `y`.
-For arrays, vectors and row-vectors `ys`, the loop variable `y`
-traverses the elements of `ys` in order and for matrices `ys`
-it traverses the elements of `ys` in column-major order
-(top-to-bottom, left-to-right).
-In particular, note the difference between looping over a matrix of type `matrix[N, M]` and a nested array of type `real[N, M]`.
-In the latter case, the loop variable `y` denotes an array of type `real[M]`
-rather than a single value of type `real` which would be its denotation
-in the former case.
+The order in which elements of `ys` are visited is defined for container types as follows.
+
+* `vector`, `row_vector`: elements visited in order, `y` is of type `double`
+
+* `matrix`: elements visited in column-major order, `y` is of type `double`
+
+* `T[]`: elements visited in order, `y` is of type `T`.
+
+Consequently, if `ys` is a two dimensional array `real[ , ]`, `y` will
+be a one-dimensional array of real values (type `real[]`).  If 'ys` is
+a matrix, then `y` will be a real value (type `real`).  To loop over
+all values of a two-dimensional array using foreach statements would
+require a doubly-nested loop,
+
+```
+real yss[2, 3];
+for (ys in yss)
+  for (y in ys)
+    ... do something with y ...
+```
+
+whereas a matrix can be looped over in one foreach statement
+
+```
+matrix[2, 3] yss;
+for (y in yss)
+   ... do something with y...
+```
+
+In both cases, the loop variable `y` is of type `real.  The elements
+of the matrix are visited in column-major order (e.g., `y[1, 1]`,
+`y[2, 1]`, `y[1, 2]`, ..., `y[2, 3]`), whereas the elements of the
+two-dimensionl array are visited in row-major order (e.g., `y[1, 1]`,
+`y[1, 2]`, `y[1, 3]`, `y[2, 1]`, ..., `y[2, 3]`).
+
 
 ## Conditional Statements
 
@@ -888,6 +940,7 @@ statement finishes execution.  If none of the conditions evaluates to
 a non-zero value and there is a final else clause, its statement is
 executed.
 
+
 ## While Statements
 
 Stan supports standard while loops using the same syntax as C++.  The
@@ -907,6 +960,11 @@ terminates and control moves to the position after the loop.  If the
 loop's condition evaluates to a true (non-zero) value, the body statement is
 executed, then the whole loop is executed again.  Thus the loop is
 continually executed as long as the condition evaluates to a true value.
+
+The rest of the body of a while loop may be skipped using a
+`continue`.  The loop will be exited with a `break` statement.  See
+the [section on continue and break
+statements](#break-continue-statements) for more details.
 
 
 ## Statement Blocks and Local Variable Declarations
@@ -1006,12 +1064,16 @@ for (m in 1:M) {
 The compiler will flag the second declaration of `theta` with a
 message that it is already defined.
 
+
 ### No Constraints on Local Variables {-}
 
 Local variables may not have constraints on their declaration.  The
 only types that may be used are
 
-> `int`, `real`, `vector[K]`, `row_vector[K]`, and `matrix[M, N]`.
+```
+int, real, vector[K], row_vector[K], matrix[M, N].
+```
+
 
 ### Blocks within Blocks {-}
 
@@ -1036,7 +1098,8 @@ defines its own local block implicitly over the statement following it
 in which the loop variable is defined.  As far as Stan is concerned,
 these two uses of `n` are unrelated.
 
-## Break and Continue Statements
+
+## Break and Continue Statements <a id="break-continue-statements"></a>
 
 The one-token statements `continue` and `break` may be used
 within loops to alter control flow;  `continue` causes the next
@@ -1050,6 +1113,7 @@ Although these control statements may seem undesirable because of
 their goto-like behavior, their judicious use can greatly improve
 readability by reducing the level of nesting or eliminating bookkeeping
 inside loops.
+
 
 ### Break Statements {-}
 
@@ -1066,7 +1130,7 @@ while (1) {
 }
 ```
 
-The `while~(1)` loop is a ``forever'' loop, because `1` is
+The `while~(1)` loop is a "forever" loop, because `1` is
 the true value, so the test always succeeds.  Within the loop, if the
 value of `n` is less than 0, the loop terminates, otherwise it
 executes `foo(n)` and then decrements `n`.  The statement
@@ -1081,6 +1145,7 @@ while (n >= 0) {
 
 This case is simply illustrative of the behavior; it is not a case
 where a `break` simplifies the loop.
+
 
 ### Continue Statements {-}
 
@@ -1123,6 +1188,7 @@ require the same level of nesting for code that's not excluded.  When
 there are several such exclusion conditions, the break or continue
 versions tend to be much easier to read.
 
+
 ### Breaking and Continuing Nested Loops {-}
 
 If there is a loop nested within a loop, a `break` or
@@ -1153,6 +1219,7 @@ shown above or within nested statements.  The break and continue
 statements jump past any control structure other than while-loops and
 for-loops.
 
+
 ## Print Statements {#print-statements.section}
 
 Stan provides print statements that can print literal strings and the
@@ -1168,6 +1235,7 @@ The print statement will execute every time the body of the loop does.
 Each time the loop body is executed, it will print the string ``loop iteration:
 '' (with the trailing space), followed by the value of the expression
 `n`, followed by a new line.
+
 
 ### Print Content {-}
 
@@ -1216,11 +1284,13 @@ u[1] = [1, 4]
 u[2] = [9, 16]
 ```
 
+
 ### Non-void Input {-}
 
 The input type to a print function cannot be void.  In particular, it
 can't be the result of a user-defined void function.  All other types
 are allowed as arguments to the print function.
+
 
 ### Print Frequency {-}
 
@@ -1228,6 +1298,7 @@ Printing for a print statement happens every time it is executed.  The
 `transformed data` block is executed once per chain, the
 `transformed parameter` and `model` blocks once per leapfrog
 step, and the `generated quantities` block once per iteration.
+
 
 ### String Literals {-}
 
@@ -1237,7 +1308,12 @@ the space character or any visible ASCII character, with the exception
 of the backslash character (`\`) and double quote character
 (`"`).  The full list of visible ASCII characters is as follows,
 
-> <code>a b c d e f g h i j k l m n o p q r s t u v w x y z A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 0 1 2 3 4 5 6 7 8 9 0 ~ @ # &#36; &#96; ^ &amp; * _ ' - + = { } [ ] ( ) < > | / ! ? . , ; :</code>
+```
+a b c d e f g h i j k l m n o p q r s t u v w x y z
+A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+0 1 2 3 4 5 6 7 8 9 0 { } [ ] ( ) < >
+~ @ # $ ` ^ & * _ ' - + =  | / ! ? . , ; :
+```
 
 
 ### Debug by `print` {-}

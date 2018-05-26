@@ -74,10 +74,8 @@ div .example em {
   font-size: 100%;
 }
 
-
-
 .book .book-body .page-wrapper .page-inner section.normal {
-    font-family: "Lucida Bright", Garamond, Times Roman, Palatino, serif;
+    font-family: Palatino, Garamond, "Lucida Bright", Garamond, Palatino, Times Roman, serif;
     font-weight: normal;
     color: #000;
     line-height: 1.5;
@@ -95,7 +93,7 @@ div .example em {
 .book .book-body .page-wrapper .page-inner section.normal code {
     font-family: "Lucida Console", Monaco, Menlo, monospaced;
     font-size: 85%;
-    background-color: #FFF;
+    background-color: #EEF;
     padding: 0;
     margin: 0;
 }
@@ -110,6 +108,7 @@ div .example em {
     font-family: "Lucida Console", Monaco, Menlo, monospaced;
     font-size: 97%;
     background-color: #FFF;
+    margin-left: 2em;
     margin-below: 0.6em;
     margin-above: -0.3em;
     padding: 0;

@@ -8,7 +8,7 @@ documentclass: book
 bibliography: [../bibtex/all.bib]
 biblio-style: "apalike"
 link-citations: true
-fontsize: 10pt
+fontsize: 11pt
 monofont: "Lucida Console"
 description: "Stan reference manual specifying the syntax and semantics of the Stan programming language."
 ---
