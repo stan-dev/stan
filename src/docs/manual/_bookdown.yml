@@ -1,24 +1,24 @@
 new_session: yes
 
-rmd_files: [ 
- "index.Rmd", 
+rmd_files: [
+ "index.Rmd",
 
  "encoding.Rmd",
  "includes.Rmd",
  "comments.Rmd",
  "whitespace.Rmd",
 
- "data_types.Rmd",
+ "types.Rmd",
  "expressions.Rmd",
  "statements.Rmd",
  "blocks.Rmd",
- "user-functions.Rmd",   
+ "user-functions.Rmd",
 
  "execution.Rmd",
 
  "transforms.Rmd",
 
-  "bnf.Rmd"
+ "syntax.Rmd"
 ]
 
 before_chapter_script: "_common.R"

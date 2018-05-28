@@ -81,21 +81,6 @@ Sigma[1, 1] = 1.0;
 
 sets the value in the first column of the first row of `Sigma` to one.
 
-Assignments can involve complex objects of any type.  If `Sigma`
-and `Omega` are matrices and `sigma` is a vector, then the
-following assignment statement, in which the expression and variable
-are both of type `matrix`, is well formed.
-
-```stan
-Sigma
-  = diag_matrix(sigma)
-     * Omega
-     * diag_matrix(sigma);
-```
-
-This example also illustrates the preferred form of splitting a
-complex assignment statement and its expression across lines.
-
 Assignments to subcomponents of larger multi-variate data structures
 are supported by Stan.  For example, `a` is an array of type
 `real[ , ]` and `b` is an array of type `real[]`, then
@@ -121,7 +106,7 @@ Y[2] = x;
 ### Lvalue Summary {-}
 
 The expressions that are legal left-hand sides of assignment
-statements are known as ``lvalues.''  In Stan, there are only two
+statements are known as "lvalues."  In Stan, there are only two
 kinds of legal lvalues,
 
 * a variable, or
@@ -159,7 +144,8 @@ arising from he right-hand side changing in the middle of an
 assignment statement's execution.
 
 
-### Compound Arithmetic and Assignment Statement  {-} {#compound-arithmetic-assignment.section}
+### Compound Arithmetic and Assignment Statement  {-}
+<a id="compound-arithmetic-assignment.section"></a>
 
 Stan's arithmetic operators may be used in compound arithmetic
 and assignment operations.  For example, consider the following
@@ -218,7 +204,7 @@ operations are listed in the [compound arithmetic/assignment table](#compound-ar
 are also listed in the index prefaced by `operator`, e.g.,
 `operator+=`.
 
-**Compound Arithmetic/Assignment Table**
+**Compound Arithmetic/Assignment Table.**
 <a id="compound-arithmetic-assign-table"></a>
 *Stan allows compound arithmetic and assignment
 statements of the forms listed in the table above.  The compound
@@ -226,7 +212,7 @@ form is legal whenever the corresponding long form would be legal
 and it has the same effect.*
 
  operation  |   compound  |   unfolded
------------:|:------------|:-------------
+:-----------|:------------|:-------------
 addition | `x += y` | `x = x + y`
 subtraction | `x -= y` | `x = x - y`
 multiplication | `x *= y` | `x = x * y`
@@ -1232,9 +1218,9 @@ for (n in 1:N) { print("loop iteration: ", n); ... }
 ```
 
 The print statement will execute every time the body of the loop does.
-Each time the loop body is executed, it will print the string ``loop iteration:
-'' (with the trailing space), followed by the value of the expression
-`n`, followed by a new line.
+Each time the loop body is executed, it will print the string "loop
+iteration: " (with the trailing space), followed by the value of the
+expression `n`, followed by a new line.
 
 
 ### Print Content {-}
@@ -1312,7 +1298,7 @@ of the backslash character (`\`) and double quote character
 a b c d e f g h i j k l m n o p q r s t u v w x y z
 A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 0 1 2 3 4 5 6 7 8 9 0 { } [ ] ( ) < >
-~ @ # $ ` ^ & * _ ' - + =  | / ! ? . , ; :
+~ @ # $ ` ^ & * _ ' - + = | / ! ? . , ; :
 ```
 
 
@@ -1341,6 +1327,7 @@ value of the log probability accumulator before and after each
 sampling statement, it's possible to isolate where the log probability
 becomes ill-defined (i.e., becomes not-a-number).
 
+
 ## Reject Statements {#reject-statements.section}
 
 The Stan `reject` statement provides a mechanism to
@@ -1360,6 +1347,7 @@ if (x < 0)
   reject("x must not be negative; found x=", x);
 ```
 
+
 ### Behavior of Reject Statements {-}
 
 Reject statements have the same behavior as exceptions thrown by
@@ -1371,6 +1359,7 @@ the rejection occurs.
 In all cases of rejection, the interface accessing the Stan
 program should print the arguments to the reject statement.
 
+
 #### Rejections in Functions {-}
 
 Rejections in user-defined functions are just passed to the
@@ -1378,6 +1367,7 @@ calling function or program block.  Reject statements can be used in
 functions to validate the function arguments, allowing user-defined
 functions to fully emulate built-in function behavior.  It is better
 to find out earlier rather than later when there is a problem.
+
 
 #### Fatal Exception Contexts {-}
 
@@ -1456,9 +1446,9 @@ region of the parameter space where the complicated inequalities are
 satisfied. But we don't generally know what value the prior integrates
 to, so we can't increment the log probability function to compensate.
 
-Even if this adjustment to a proper probability model may seem like
-``no big deal'' in particular models where the amount of truncated
-posterior density is negligible or constant, we can't sample from that
-truncated posterior efficiently.  Programs need to use one-to-one
-mappings that guarantee the constraints are satisfied and only use
-reject statements to raise errors or help with debugging.
+Even if this adjustment to a proper probability model may seem minor
+in particular models where the amount of truncated posterior density
+is negligible or constant, we can't sample from that truncated
+posterior efficiently.  Programs need to use one-to-one mappings that
+guarantee the constraints are satisfied and only use reject statements
+to raise errors or help with debugging.

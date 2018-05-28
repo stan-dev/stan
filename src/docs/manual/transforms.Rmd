@@ -35,7 +35,6 @@ probability density function of $Y$ for well-behaved transforms $f$.
 The rest of the chapter details the transforms used by Stan.
 
 
-
 ### Univariate Changes of Variables {-}
 
 Suppose $X$ is one dimensional and $f: \mathrm{supp}(X) \rightarrow
@@ -109,9 +108,11 @@ values.  Diagonal matrices, a simple form of triangular matrix, arise
 if each transformed variable only depends on a single untransformed
 variable.
 
+
 ## Lower Bounded Scalar {#lower-bound-transform.section}
 
 Stan uses a logarithmic transform for lower and upper bounds.
+
 
 ### Lower Bound Transform {-}
 
@@ -122,6 +123,7 @@ $$
 Y = \log(X - a).
 $$
 
+
 ### Lower Bound Inverse Transform {-}
 
 The inverse of the lower-bound transform maps an unbounded
@@ -130,6 +132,7 @@ variable $Y$ to a variable $X$ that is bounded below by $a$ by
 $$
 X = \exp(Y) + a.
 $$
+
 
 ### Absolute Derivative of the Lower Bound Inverse Transform {-}
 
@@ -153,6 +156,7 @@ $$
 ## Upper Bounded Scalar
 
 Stan uses a negated logarithmic transform for upper bounds.
+
 
 
 ### Upper Bound Transform {-}
@@ -221,6 +225,7 @@ $$
 \frac{d}{dy} \mathrm{logit}^{-1}(y)
 = \mathrm{logit}^{-1}(y) \cdot \left( 1 - \mathrm{logit}^{-1}(y) \right).
 $$
+
 
 ### Lower and Upper Bounds Transform {-}
 
@@ -309,6 +314,7 @@ x_1 & \mbox{if } k = 1, \mbox{ and}
 \right.
 $$
 
+
 ### Ordered Inverse Transform {-}
 
 The inverse transform for an unconstrained $y \in \mathbb{R}^K$ to an
@@ -331,6 +337,7 @@ $x_k$ can also be expressed iteratively as
 $$
 x_k = y_1 + \sum_{k'=2}^k \exp(y_{k'}).
 $$
+
 
 ### Absolute Jacobian Determinant of the Ordered Inverse Transform {-}
 
@@ -412,10 +419,20 @@ $$
 ### Unit Simplex Inverse Transform {-}
 
 Stan's unit simplex inverse transform may be understood using the
-following stick-breaking metaphor.^[For an alternative derivation of the same transform using
-  hyperspherical coordinates, see [@Betancourt:2010].]
+following stick-breaking metaphor.^[For an alternative derivation of the same transform using hyperspherical coordinates, see [@Betancourt:2010].]
 
->  Take a stick of unit length (i.e., length 1).  Break a piece off and label it as $x_1$, and set it aside.  Next, break a piece off what's left, label it $x_2$, and set it aside.  Continue doing this until you have broken off $K-1$ pieces labeled $(x_1,\ldots,x_{K-1})$.  Label what's left of the original stick $x_K$.  The vector $x = (x_1,\ldots,x_{K})$ is obviously a unit simplex because each piece has non-negative length and the sum of their lengths is 1.
+1.  Take a stick of unit length (i.e., length 1).
+2.  Break a piece off and label it as $x_1$, and set it aside, keeping
+what's left.
+3.  Next, break a piece off what's left, label it $x_2$, and set it
+aside, keeping what's left.
+4.  Continue breaking off pieces of what's left, labeling them, and
+setting them aside for pieces $x_3,\ldots,x_{K-1}$.
+5.  Label what's left $x_K$.
+
+The resulting vector $x = [x_1,\ldots,x_{K}]^{\top}$ is a unit
+simplex because each piece has non-negative length and the sum of
+the stick lengths is one by construction.
 
 This full inverse mapping requires the breaks to be represented as the
 fraction in $(0,1)$ of the original stick that is broken off.  These
@@ -458,6 +475,7 @@ piece of the original stick,
 $$
 x_K = 1 - \sum_{k=1}^{K-1} x_k.
 $$
+
 
 ### Absolute Jacobian Determinant of the Unit-Simplex Inverse Transform {-}
 
@@ -541,6 +559,7 @@ function need only be evaluated once for each unconstrained parameter
 $y_k$; everything else is just basic arithmetic that can be computed
 incrementally along with the transform.
 
+
 ### Unit Simplex Transform {-}
 
 The transform $Y = f(X)$ can be derived by reversing the stages of the
@@ -566,6 +585,7 @@ z_k
        {1 - \sum_{k' = 1}^{k-1} x_{k'}}
 .
 $$
+
 
 ## Unit Vector {#unit-vector.section}
 
@@ -612,6 +632,7 @@ vector parameters cannot be initialized at zero.  A simple workaround
 is to initialize from a very small interval around zero, which is an
 option built into all of the Stan interfaces.
 
+
 ### Absolute Jacobian Determinant of the Unit Vector Inverse Transform {-}
 
 The Jacobian matrix relating the input vector $y$ to the output vector
@@ -623,6 +644,7 @@ well-defined but $r$ is arbitrary, so we set $r = 1$. In this case,
 the determinant of the Jacobian is proportional to $-\frac{1}{2} y^\top y$,
 which is the kernel of a standard multivariate normal distribution
 with $n$ independent dimensions.
+
 
 ## Correlation Matrices {#correlation-matrix-transform.section}
 
@@ -649,6 +671,7 @@ $$
 To deal with this rather complicated constraint, Stan implements the
 transform of @LewandowskiKurowickaJoe:2009.  The number of free
 parameters required to specify a $K \times K$ correlation matrix is $\binom{K}{2}$.
+
 
 ### Correlation Matrix Inverse Transform {-}
 
@@ -750,6 +773,7 @@ $$
  = \prod_{1 \leq i < j \leq K} (1 - z_{i,j}^2),
 $$
 
+
 ### Absolute Jacobian Determinant of the Correlation Matrix Inverse Transform {-}
 
 From the inverse of equation 11 in [@LewandowskiKurowickaJoe:2009],
@@ -760,6 +784,7 @@ $$
 \times \prod_{i=1}^{K-1}\prod_{j=i+1}^K
 \frac{\partial \tanh z_{i,j}}{\partial y_{i,j}}
 $$
+
 
 ### Correlation Matrix Transform {-}
 
@@ -774,7 +799,6 @@ decomposition,
 $$
 w = \mbox{chol}(x).
 $$
-
 
 The next step from the Cholesky factor $w$ back to the array $z$ of
 canonical partial correlations (CPCs) is simplified by the ordering of the elements in the
@@ -850,6 +874,7 @@ z_{m,n} & \mbox{if } m > n.
 \right.
 $$
 
+
 ### Covariance Matrix Inverse Transform {-}
 
 The inverse transform reverses the two steps of the transform.
@@ -876,6 +901,7 @@ taking
 $$
 x = z \, z^{\top}.
 $$
+
 
 ### Absolute Jacobian Determinant of the Covariance Matrix Inverse Transform {-}
 
@@ -949,7 +975,8 @@ $$
 p_Y(y) = p_X(f^{-1}(y)) \ 2^K \ \prod_{k=1}^K z_{k,k}^{K-k+2}.
 $$
 
-## Cholesky Factors of Covariance Matrices}
+
+## Cholesky Factors of Covariance Matrices
 
 An $M \times M$ covariance matrix $\Sigma$ can be Cholesky factored to
 a lower triangular matrix $L$ such that $L\,L^{\top} = \Sigma$.  If
@@ -965,6 +992,7 @@ if $M = N$.
 
 A Cholesky factor of a covariance matrix requires $N + \binom{N}{2} +
 (M - N)N$ unconstrained parameters.
+
 
 ### Cholesky Factor of Covariance Matrix Transform {-}
 
@@ -988,6 +1016,7 @@ x_{m,n} & \mbox{if } m > n.
 \right.
 $$
 
+
 ### Cholesky Factor of Covariance Matrix Inverse Transform {-}
 
 The inverse transform need only invert the logarithm with an
@@ -1006,6 +1035,7 @@ y_{m,n} & \mbox{if } m > n.
 \end{array}
 \right.
 $$
+
 
 ### Absolute Jacobian Determinant of Cholesky Factor Inverse Transform {-}
 
@@ -1031,7 +1061,8 @@ $$
 p_Y(y) = p_X(f^{-1}(y)) \prod_{N=1}^N x_{n,n}.
 $$
 
-## Cholesky Factors of Correlation Matrices}
+
+## Cholesky Factors of Correlation Matrices
 
 A $K \times K$ correlation matrix $\Omega$ is positive definite and
 has a unit diagonal.  Because it is positive definite, it can be
@@ -1048,6 +1079,7 @@ length and positivity constraint allow the diagonal elements of $L$ to
 be calculated from the off-diagonal elements, so that a Cholesky
 factor for a $K \times K$ correlation matrix requires only
 $\binom{K}{2}$ unconstrained parameters.
+
 
 ### Cholesky Factor of Correlation Matrix Inverse Transform {-}
 
@@ -1115,6 +1147,7 @@ $z_{i,j}$ of the remaining length for the row that it consumes. The
 diagonal entries $x_{i,i}$ get any leftover length from earlier
 entries in their row.  The above-diagonal entries are zero.
 
+
 ### Cholesky Factor of Correlation Matrix Transform {-}
 
 Suppose $x$ is a $K \times K$ Cholesky factor for some correlation
@@ -1125,8 +1158,7 @@ $$
 z_{i,j} = \frac{x_{i,j}}{\sqrt{1 - \sum_{j' < j}x_{i,j'}^2}}.
 $$
 
-The mapping from the resulting $z$ to $y$ inverts
-$\tanh$,
+The mapping from the resulting $z$ to $y$ inverts $\tanh$,
 
 $$
 y
@@ -1147,7 +1179,6 @@ First, for the inverse transform $z = \tanh y$, the derivative is
 $$
 \frac{d}{dy} \tanh y = \frac{1}{(\cosh y)^2}.
 $$
-
 
 Second, for the inverse transform of $z$ to $x$, the resulting
 Jacobian matrix $J$ is of dimension $\binom{K}{2} \times

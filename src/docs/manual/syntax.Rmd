@@ -1,6 +1,5 @@
 # Language Syntax
 
-\noindent
 This chapter defines the basic syntax of the Stan modeling language
 using a Backus-Naur form (BNF) grammar plus extra-grammatical
 constraints on function typing and operator precedence and
@@ -8,7 +7,6 @@ associativity.
 
 
 ## BNF Grammars
-
 
 ### Syntactic conventions {-}
 
@@ -253,6 +251,7 @@ a container.  The loop variable will be of type integer in the former case
 and of the contained type in the latter case.  Furthermore, the loop
 variable must not be in scope (i.e., there is no masking of variables).
 
+
 ### Print arguments {-}
 
 The arguments to a print statement cannot be void.
@@ -281,7 +280,6 @@ suffixes: `_lpdf`, `_lpmf`, `_lcdf`, or `_lccdf`.
 
 The `algebra_solver` function may be used without control
 parameters; in this case
-
 
 * its first argument refers to a function with signature
 `( vector,  vector, real[], int[]) : vector`,

@@ -8,16 +8,19 @@ p.caption {
 
 p code {
   white-space: inherit;
+  background-color: inherit;
 }
 
 pre {
   word-break: normal;
   word-wrap: normal;
+  background-color: inherit;
 }
 pre code {
     white-space: inherit;
     margin: 0;
     padding: 0;
+    background-color: inherit;
 }
 
 .header-section-number {
@@ -75,7 +78,7 @@ div .example em {
 }
 
 .book .book-body .page-wrapper .page-inner section.normal {
-    font-family: Palatino, Garamond, "Lucida Bright", Garamond, Palatino, Times Roman, serif;
+    font-family: "Lucida Bright", Garamond, Palatino, Times Roman, serif;
     font-weight: normal;
     color: #000;
     line-height: 1.5;
@@ -93,9 +96,9 @@ div .example em {
 .book .book-body .page-wrapper .page-inner section.normal code {
     font-family: "Lucida Console", Monaco, Menlo, monospaced;
     font-size: 85%;
-    background-color: #EEF;
     padding: 0;
     margin: 0;
+    background-color: inherit;
 }
 .book .book-body .page-wrapper .page-inner section.normal code:before {
     content: none;
@@ -106,8 +109,8 @@ div .example em {
 
 .book .book-body .page-wrapper .page-inner section.normal pre {
     font-family: "Lucida Console", Monaco, Menlo, monospaced;
-    font-size: 97%;
     background-color: #FFF;
+    font-size: 100%;
     margin-left: 2em;
     margin-below: 0.6em;
     margin-above: -0.3em;
@@ -144,7 +147,7 @@ div .example em {
 }
 
 #header .title {
-  margin-bottom: -0.5em;
+  margin-bottom: -0.6em;
   font-size: 250%;
   font-weight: bold;
 }
@@ -159,8 +162,9 @@ div .example em {
     font-style: normal;
 }
 #header h4.date {
-  font-size: 150%;
+  font-size: 125%;
   margin-bottom: 3em;
+  margin-top: 1em;
 }
 #header h4.date em {
     font-style: normal;
@@ -176,4 +180,21 @@ html body div div.book-summary nav ul.summary li.chapter {
 
 html body div div.book-summary nav ul.summary li.chapter a b {
   font-weight: normal;
+}
+
+table thead tr.header th {
+    font-style: italic;
+    font-weight: normal;
+}
+.book .book-body .page-wrapper .page-inner section.normal table tr:nth-child(2n) {
+    background-color: #FFF;
+}
+.book .book-body .page-wrapper table tbody tr.odd {
+    background-color: #FFF;
+}
+.book .book-body .page-wrapper table tbody tr.even {
+    background-color: #FFF;
+}
+.book .book-body .page-wrapper .page-inner section.normal table th {
+    font-weight: 300;
 }

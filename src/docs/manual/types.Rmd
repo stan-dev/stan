@@ -11,15 +11,15 @@ statistical languages such as R or BUGS.
 The motivation for strong, static typing is threefold.
 
 
-* Strong typing forces the programmer's intent to be declared with
+1. Strong typing forces the programmer's intent to be declared with
   the variable, making programs easier to comprehend and hence easier
   to debug and maintain.
-* Strong typing allows programming errors relative to the declared
+2. Strong typing allows programming errors relative to the declared
   intent to be caught sooner (at compile time) rather than later (at
   run time).  The Stan compiler (called through an interface such as
   CmdStan, RStan, or PyStan) will flag any type errors and indicate
   the offending expressions quickly when the program is compiled.
-* Constrained types will catch runtime data, initialization, and
+3. Constrained types will catch runtime data, initialization, and
   intermediate value errors as soon as they occur rather than allowing
   them to propagate and potentially pollute final results.
 
@@ -123,7 +123,7 @@ Metropolis rejection, or biased draws due to inability to explore
 the tails of the distribution.
 
 
-## Primitive Numerical Data Types {#numerical-data-types.section
+## Primitive Numerical Data Types {#numerical-data-types.section}
 
 Unfortunately, the lovely mathematical abstraction of integers and
 real numbers is only partially supported by finite-precision computer
@@ -426,7 +426,7 @@ vector<lower=0>[3] u;
 ### Unit Simplexes {-}
 
 A unit simplex is a vector with non-negative values whose entries sum
-to 1.  For instance, $(0.2,0.3,0.4,0.1)^{\top}$ is a unit 4-simplex.
+to 1.  For instance, $[0.2,0.3,0.4,0.1]^{\top}$ is a unit 4-simplex.
 Unit simplexes are most often used as parameters in categorical
 or multinomial distributions, and they are also the sampled variate in
 a Dirichlet distribution.  Simplexes are declared with their full
@@ -456,12 +456,11 @@ priors for some parameters.
 
 ### Unit Vectors {-}
 
-A unit vector is a vector with a norm of one.  For instance,
-$(0.5,0.5,0.5,0.5)^{\top}$ is a unit 4-vector.
-Unit vectors are sometimes used in directional statistics.
-Unit vectors are declared with their full
-dimensionality.  For instance, `theta` is declared to
-be a unit $5$-vector by
+A unit vector is a vector with a norm of one.  For instance, $[0.5,
+0.5, 0.5, 0.5]^{\top}$ is a unit 4-vector.  Unit vectors are sometimes
+used in directional statistics.  Unit vectors are declared with their
+full dimensionality.  For instance, `theta` is declared to be a unit
+$5$-vector by
 
 ```stan
 unit_vector[5] theta;
@@ -793,9 +792,8 @@ elements.  Arrays may also contain matrices.  The example
 matrix[7, 2] mu[15, 12];
 ```
 
-declares a 15 by 12 array of $7 \times 2$ matrices.
-Any of the constrained types may also be used in arrays, as in the
-declaration
+declares a 15 by 12 array of $7 \times 2$ matrices.  Any of the
+constrained types may also be used in arrays, as in the declaration
 
 ```stan
 cholesky_factor_cov[5, 6] mu[2, 3, 4];
@@ -1098,13 +1096,13 @@ refer to them.  The type naming notation outlined in this section is
 not part of the Stan programming language, but rather a convention
 adopted in this document to enable a concise description of a type.
 
-Because size information is not part of a data type, data
-types will be written without size information.  For instance,
-`real[]` is the type of one-dimensional array of reals and
-`matrix` is the type of matrices.  The three-dimensional integer
-array type is written as `int[ ,  ,]`, indicating the number slots
-available for indexing.  Similarly, `vector[ , ]` is the type of a
-two-dimensional array of vectors.
+Because size information is not part of a data type, data types will
+be written without size information.  For instance, `real[]` is the
+type of one-dimensional array of reals and `matrix` is the type of
+matrices.  The three-dimensional integer array type is written as
+`int[ , ,]`, indicating the number slots available for indexing.
+Similarly, `vector[ , ]` is the type of a two-dimensional array of
+vectors.
 
 
 ## Compound Variable Declaration and Definition
@@ -1137,11 +1135,11 @@ example, it is legal to have
 real sum = 0;
 ```
 
-even though `0` is of type `int` and `sum` is of type
-`real`, because integer-typed scalar expressions can be assigned
-to real-valued scalar variables.  In all other cases, the type of the
-expression on the right-hand side of the assignment must be identical
-to the type of the variable being declared.
+even though `0` is of type `int` and `sum` is of type `real`, because
+integer-typed scalar expressions can be assigned to real-valued scalar
+variables.  In all other cases, the type of the expression on the
+right-hand side of the assignment must be identical to the type of the
+variable being declared.
 
 Any type may be assigned.  For example,
 
@@ -1149,10 +1147,10 @@ Any type may be assigned.  For example,
 matrix[3, 2] a = b;
 ```
 
-declares a matrix variable `a` and assigns it to the value of
-`b`, which must be of type `matrix` for the compound
-statement to be well formed.  The sizes of matrices are not part of
-their static typing and cannot be validated until run time.
+declares a matrix variable `a` and assigns it to the value of `b`,
+which must be of type `matrix` for the compound statement to be well
+formed.  The sizes of matrices are not part of their static typing and
+cannot be validated until run time.
 
 
 ### Right-Hand Side Expressions {-}
@@ -1164,11 +1162,10 @@ assignable to the variable being declared.  For example,
 matrix[3, 2] a = 0.5 * (b + c);
 ```
 
-assigns the matrix variable `a` to half of the sum of `b`
-and `c`.  The only requirement on `b` and `c` is that
-the expression `b + c` be of type `matrix`.  For example,
-`b` could be of type `matrix` and `c` of type
-`real`, because adding a matrix to a scalar produces a matrix,
+assigns the matrix variable `a` to half of the sum of `b` and `c`.
+The only requirement on `b` and `c` is that the expression `b + c` be
+of type `matrix`.  For example, `b` could be of type `matrix` and `c`
+of type `real`, because adding a matrix to a scalar produces a matrix,
 and the multiplying by a scalar produces another matrix.
 
 The right-hand side expression can be a call to a user defined

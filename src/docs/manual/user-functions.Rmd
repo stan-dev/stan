@@ -1,11 +1,11 @@
 # User-Defined Functions {#functions.chapter}
 
-
 Stan allows users to define their own functions.  The basic syntax is
 a simplified version of that used in C and C++.  This chapter
 specifies how functions are declared, defined, and used in Stan.
 
-## Function-Definition Block 
+
+## Function-Definition Block
 
 User-defined functions appear in a special function-definition block
 before all of the other program blocks.
@@ -23,7 +23,8 @@ to the condition that a function must be declared before it is used.
 Forward declarations are allowed in order to support recursive
 functions.
 
-## Function Names 
+
+## Function Names
 
 The rules for function naming and function-argument naming are the
 same as for other variables; see the [section on variables](#variables.section) for more
@@ -39,15 +40,18 @@ and `sigma`, but that is not part of the declaration.  Two
 user-defined functions may *not* have the same name even if they have
 different sequences of argument types.
 
-## Calling Functions 
+
+## Calling Functions
 
 All function arguments are mandatory---there are no default values.
+
 
 ### Functions as Expressions {-}
 
 Functions with non-void return types are called just like any other
 built-in function in Stan---they are applied to appropriately typed
 arguments to produce an expression, which has a value when executed.
+
 
 ### Functions as Statements {-}
 
@@ -57,6 +61,7 @@ statements.  Such uses are only appropriate for functions that act
 through side effects, such as incrementing the log probability
 accumulator, printing, or raising exceptions.
 
+
 ### Probability Functions in Sampling Statements {-}
 
 Functions whose name ends in `_lpdf` or `_lpmf` (density
@@ -64,6 +69,7 @@ and mass functions) may be used as probability functions and may be
 used in place of parameterized distributions on the right-hand-side of
 sampling statements.  There is no restriction on where such functions
 may be used.
+
 
 ### Restrictions on Placement {-}
 
@@ -77,7 +83,8 @@ within user-defined functions ending in `_rng`.  See
 the [section on function bodies](#function-bodies.section) for more information on these two special
 types of function.
 
-## Unsized Argument Types 
+
+## Unsized Argument Types
 
 Stan's functions all have declared types for both arguments and
 returned value.  As with built-in functions, user-defined functions are
@@ -98,7 +105,8 @@ or upper-bound constraints are allowed (e.g., `real<lower=0>` is
 illegal).  Specialized types are also not allowed (e.g.,
 `simplex` is illegal) .
 
-### Dimensionality Declaration {-} 
+
+### Dimensionality Declaration {-}
 
 Arguments and return types may be arrays, and these are indicated with
 optional brackets and commas as would be used for indexing.  For
@@ -115,6 +123,7 @@ two indexing dimensions, so that `a[1]` is a row vector and
 dimensions.  The type declaration `matrix[ , ] b` specifies that
 `b` is a two-dimensional array of matrices, for a total of four
 indexing dimensions, with `b[1, 1, 1, 1]` picking out a real value.
+
 
 ### Dimensionality Checks and Exceptions {-}
 
@@ -133,6 +142,7 @@ return type mismatches are simply passed on;  this typically results
 in a warning message and rejection of a proposal during sampling or
 optimization.
 
+
 ## Function Bodies {#function-bodies.section}
 
 The body of a function is between an open curly brace (`{`) and
@@ -144,7 +154,8 @@ The only restrictions on statements in function bodies are external,
 and determine whether the log probability accumulator or random
 number generators are available;  see the rest of this section for details.
 
-### Random Number Generating Functions {-} 
+
+### Random Number Generating Functions {-}
 
 Functions that call random number generating functions in their bodies
 must have a name that ends in `_rng`; attempts to use
@@ -157,7 +168,8 @@ quantities block and transformed data block, or within the bodies of
 user-defined functions ending in `_rng`.  An attempt to use such
 a function elsewhere results in a compile-time error.
 
-### Log Probability Access in Functions {-} 
+
+### Log Probability Access in Functions {-}
 
 Functions that include sampling statements or log probability
 increment statements must have a name that ends in `_lp`.
@@ -170,6 +182,7 @@ may only be used in blocks where the log probability accumulator is
 accessible, namely the transformed parameters and model blocks.  An
 attempt to use such a function elsewhere results in a compile-time
 error.
+
 
 ### Defining Probability Functions for Sampling Statements {-}
 
@@ -210,7 +223,7 @@ A function that is going to be accessed as distributions must return
 the log of the density or mass function it defines.
 
 
-## Parameters are Constant 
+## Parameters are Constant
 
 Within function definition bodies, the parameters may be used like any
 other variable.  But the parameters are constant in the sense that
@@ -221,6 +234,7 @@ to a function parameter value will raise a compile-time error.^[Despite being de
 
 Local variables may be declared at the top of the function block and
 scope as usual.
+
 
 ## Return Value {#function-returns.section}
 
@@ -242,19 +256,15 @@ functions must have a return statement as the last statement in their
 body.  This notion of last is defined recursively in terms of
 statements that qualify as bodies for functions.  The base case is that
 
-
 * a return statement qualifies,
 
-
 and the recursive cases are that
-
 
 * a sequence of statements qualifies if its last statement
   qualifies,
 * a for loop or while loop qualifies if its body qualifies, and
 * a conditional statement qualifies if it has a default else
   clause and all of its body statements qualify.
-
 
 These rules disqualify
 
@@ -265,8 +275,7 @@ real foo(real x) {
 }
 ```
 
-because there is no default `else` clause, and
-disqualify
+because there is no default `else` clause, and disqualify
 
 ```stan
 real foo(real x) {
@@ -298,7 +307,7 @@ because there's a default else clause and each condition body has
 return as its final statement.
 
 
-## Void Functions as Statements 
+## Void Functions as Statements
 
 ### Void Functions {-}
 
@@ -306,6 +315,7 @@ A function can be declared without a return value by using `void`
 in place of a return type.  Note that the type `void` may only be
 used as a return type---arguments may not be declared to be of type
 `void`.
+
 
 ### Usage as Statement {-}
 
@@ -315,6 +325,7 @@ declared;  see the [section on forward declarations](#forward-declarations.secti
 Because there is no return, such a usage is only for side effects,
 such as incrementing the log probability function, printing, or
 raising an error.
+
 
 ### Special Return Statements {-}
 
@@ -344,7 +355,6 @@ real unit_normal_lpdf(real y) {
 }
 ```
 
-
 A user-defined Stan function may be declared and then later defined,
 or just defined without being declared.  No other combination of
 declaration and definition is legal, so that, for instance, a function
@@ -352,6 +362,7 @@ may not be declared more than once, nor may it be defined more than
 once.  If there is a declaration, there must be a definition.  These
 rules together ensure that all the declared functions are eventually
 defined.
+
 
 ### Recursive Functions {-}
 

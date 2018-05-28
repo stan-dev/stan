@@ -1,10 +1,9 @@
-
 # Program Blocks {#blocks.chapter}
-
 
 A Stan program is organized into a sequence of named blocks, the
 bodies of which consist of variable declarations, followed in the case
 of some blocks with statements.
+
 
 ## Overview of Stan's Program Blocks
 
@@ -58,6 +57,7 @@ above.  Within each block, both declarations and statements are
 optional, subject to the  restriction that the declarations come
 before the statements.
 
+
 ### Variable Scope {-}
 
 The variables declared in each block have scope over all subsequent
@@ -73,6 +73,7 @@ block, it must be declared as a transformed parameter.
 Variables declared as function parameters have scope only within that
 function definition's body, and may not be assigned to (they are
 constant).
+
 
 ### Function Scope {-}
 
@@ -90,6 +91,7 @@ model); such functions are suffixed with `_lp`.
 Density functions defined in the program may be used in sampling
 statements.
 
+
 ### Automatic Variable Definitions {-}
 
 The variables declared in the `data` and `parameters` block
@@ -105,6 +107,7 @@ values may be provided through an external input source, which is also
 typically a file or a designated R data structure.  In each case, the
 parameters are instantiated to the values for which the model defines
 a log probability function.
+
 
 ### Transformed Variables {-}
 
@@ -129,6 +132,7 @@ evaluated once per leapfrog step.  Transformed parameters are then
 declared and their defining statements executed once per leapfrog
 step.
 
+
 ### Generated Quantities {-}
 
 The generated quantity variables are defined once per sample after all
@@ -142,7 +146,8 @@ adjustment of HMC or NUTS rejects the update proposal.
 A table summarizing the point at which variables are read, written, and
 defined is given in the [block actions table](#block-actions-table).
 
-**Block Actions Table.** <a id="block-actions-table"></a>
+**Block Actions Table.**
+<a id="block-actions-table"></a>
 *The read, write, transform, and evaluate actions and
 periodicities listed in the last column correspond to the Stan
 program blocks in the first column.  The middle column indicates
@@ -163,7 +168,8 @@ applied once per chain.*
 &nbsp; | &nbsp; | write / sample
 `\slshape (initialization)` | n/a | read, transform / chain
 
-**Variable Declaration Table.** <a id="where-to-declare-table"></a>
+**Variable Declaration Table.**
+<a id="where-to-declare-table"></a>
 *This table indicates where variables that are not basic
 data or parameters should be declared, based on whether it is
 defined in terms of parameters, whether it is used in the log
@@ -184,24 +190,24 @@ does not depend on the value of any parameters.*
  - | - | - | `transformed data` (local)
 
 Another way to look at the variables is in terms of their function.
-To decide which variable to use, consult the charts in
-the [variable declaration table](#where-to-declare-table).  The last line has no
-corresponding location, as there is no need to print a variable
-every iteration that does not depend on parameters.^[It is possible to print a variable every iteration that does not depend on parameters---just define it (or redefine it if it is transformed data) in the `generated quantities` block.]
+To decide which variable to use, consult the charts in the [variable
+declaration table](#where-to-declare-table).  The last line has no
+corresponding location, as there is no need to print a variable every
+iteration that does not depend on parameters.^[It is possible to print a variable every iteration that does not depend on parameters---just define it (or redefine it if it is transformed data) in the `generated quantities` block.]
 
 The rest of this chapter provides full details on when and how the
 variables and statements in each block are executed.
 
 
-
 ## Statistical Variable Taxonomy
 
-**Statistical Variable Taxonomy Table** <a id="variable-kinds-table"></a>
+**Statistical Variable Taxonomy Table.**
+<a id="variable-kinds-table"></a>
 *Variables of the kind indicated in the left column must be declared
 in one of the blocks declared in the right column.*
 
-  variable kind  |   declaration block
-:----------------|:---------------------
+  variable kind    |    declaration block
+------------------:|:-----------------------
 constants | `data`, `transformed data`
 unmodeled data | `data`, `transformed data`
 modeled data | `data`, `transformed data`
@@ -212,10 +218,10 @@ derived quantities | `transformed data`, `transformed parameters`, `generated qu
 loop indices | loop statement
 
 Page 366 of [@GelmanHill:2007] provides a taxonomy of the kinds of
-variables used in Bayesian models.  The [table of kinds of variables](#variable-kinds.figure)
-contains
-Gelman and Hill's taxonomy along with a missing-data kind along with
-the corresponding locations of declarations and definitions in Stan.
+variables used in Bayesian models.  The [table of kinds of
+variables](#variable-kinds.figure) contains Gelman and Hill's taxonomy
+along with a missing-data kind along with the corresponding locations
+of declarations and definitions in Stan.
 
 Constants can be built into a model as literals, data variables, or
 as transformed data variables.  If specified as variables, their
@@ -317,6 +323,7 @@ Finally, the variable `n` is used as a loop index in the
 The rest of this chapter will lay out the details of each block in
 order, starting with the `data` block in this section.
 
+
 ### Variable Reads and Transformations {-}
 
 The `data` block is for the declaration of variables that are
@@ -329,9 +336,11 @@ Data variables are not transformed in any way.  The format for data
 files or data in memory depends on the interface; see the user's
 guides and interface documentation for PyStan, RStan, and CmdStan for details.
 
+
 ### Statements {-}
 
 The `data` block does not allow statements.
+
 
 ### Variable Constraint Checking {-}
 
@@ -348,6 +357,7 @@ compound data structure will also raise an error.
 The `transformed data` block is for declaring and defining
 variables that do not need to be changed when running the program.
 
+
 ### Variable Reads and Transformations {-}
 
 For the `transformed data` block, variables are all declared in
@@ -356,6 +366,7 @@ reading from external sources and no transformations performed.
 
 Variables declared in the `data` block may be used to declare
 transformed variables.
+
 
 ### Statements {-}
 
@@ -371,12 +382,14 @@ chain.
 Variables declared in the `data` block may be used in statements
 in the `transformed data` block.
 
+
 #### Restriction on Operations in `transformed data` {-}
 
 The statements in the transformed data block are designed to be
 executed once and have a deterministic result.  Therefore, log
 probability is not accumulated and sampling statements may not be
 used.  Random number generating functions are also prohibited.
+
 
 ### Variable Constraint Checking {-}
 
@@ -404,6 +417,7 @@ There is a substantial amount of computation involved for parameter
 variables in a Stan program at each leapfrog step within the
 HMC or NUTS samplers, and a bit more computation along with writes
 involved for saving the parameter values corresponding to a sample.
+
 
 ### Constraining Inverse Transform {-}
 
@@ -439,6 +453,7 @@ to the order of the variables defined in the `parameters` program
 block.  The details of the specific transformations are provided in
 the [variable transforms chapter](#variable-transforms).
 
+
 ### Gradient Calculation {-}
 
 Hamiltonian Monte Carlo requires the gradient of the (unnormalized)
@@ -456,6 +471,7 @@ includes the expressions added from the transforms' Jacobians.
 The amount of work done by the sampler does depend on the number of
 unconstrained parameters, but this is usually dwarfed by the gradient
 calculations.
+
 
 ### Writing Draws {-}
 
@@ -480,6 +496,7 @@ data should be declared and defined in the transformed data block.
 Defining such quantities in the transformed parameters block is legal,
 but much less efficient than defining them as transformed data.
 
+
 ### Constraints are for Error Checking {-}
 
 Like the constraints on data, the constraints on transformed
@@ -491,7 +508,6 @@ will be rejected.  This can cause Stan's algorithms to hang or
 to devolve to random walks.  It is not intended to be a way to enforce
 ad hoc constraints in Stan programs.   See the [section on reject statements](#reject-statements)
 for further discussion of the behavior of reject statements.
-
 
 
 ## Program Block: `model`

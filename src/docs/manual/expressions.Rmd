@@ -1,6 +1,5 @@
 # Expressions
 
-
 An expression is the syntactic unit in a Stan program that denotes a
 value.  Every expression in a well-formed Stan program has a type that
 is determined statically (at compile time), based only on the type of
@@ -11,10 +10,12 @@ will report the location of the problem.
 This chapter covers the syntax, typing, and usage of the various forms
 of expressions in Stan.
 
+
 ## Numeric Literals
 
 The simplest form of expression is a literal that denotes a primitive
 numerical value.
+
 
 ### Integer Literals {-}
 
@@ -35,6 +36,7 @@ integer values (see [section](#numerical-data-types.section)).
 Integer literals may not contain decimal points (`.`).  Thus the
 expressions `1.` and `1.0` are of type `real` and may
 not be used where a value of type `int` is required.
+
 
 ### Real Literals {-}
 
@@ -65,9 +67,9 @@ letter (`a--z` and `A--Z`) and may not end with two underscores
 
 Examples of legal variable identifiers are as follows.
 
-<span style="margin:0 2em 0 2em">
-`a`, `a3`, `a_3`, `Sigma`, `my_cpp_style_variable`, `myCamelCaseVariable`
-</span>
+```
+a, a3, a_3, Sigma, my_cpp_style_variable, myCamelCaseVariable
+```
 
 Unlike in R and BUGS, variable identifiers in Stan may not contain
 a period character.
@@ -93,10 +95,12 @@ model specification.  For example, if the model is in file
 `bin/stanc`.  With user-specified model names, variables cannot
 match the model.
 
+
 #### User-Defined Function Names {-}
 
 User-defined function names cannot be used as a variable within the
 model.
+
 
 #### Reserved Words from Stan Language {-}
 
@@ -104,22 +108,22 @@ The following list contains reserved words for Stan's programming
 language.  Not all of these features are implemented in Stan yet, but
 the tokens are reserved for future use.
 
-<span style="margin:0 2em 0 2em">
-`for`, `in`, `while`, `repeat`, `until`, `if`, `then`, `else`, `true`, `false`
-</span>
+```
+for, in, while, repeat, until, if, then, else, true, false
+```
 
 Variables should not be named after types, either, and thus may not be
 any of the following.
 
-<span style="margin:0 2em 0 2em">
-`int`, `real`, `vector`, `simplex`, `unit_vector`, `ordered`, `positive_ordered`, `row_vector`, `matrix`, `cholesky_factor_corr`, `cholesky_factor_cov`, `corr_matrix`, `cov_matrix`.
-</span>
+```
+int, real, vector, simplex, unit_vector, ordered, positive_ordered, row_vector, matrix, cholesky_factor_corr, cholesky_factor_cov, corr_matrix, cov_matrix.
+```
 
 Variable names will {\it not}conflict with the following block identifiers,
 
-<span style="margin:0 2em 0 2em">
-`functions`, `model`, `data`, `parameters`, `quantities`, `transformed`, `generated`
-</span>
+```
+functions, model, data, parameters, quantities, transformed, generated
+```
 
 
 #### Reserved Names from Stan Implementation {-}
@@ -127,9 +131,10 @@ Variable names will {\it not}conflict with the following block identifiers,
 Some variable names are reserved because they are used within
 Stan's C++ implementation.  These are
 
-<span style="margin:0 2em 0 2em">
-`var`, `fvar`, `STAN_MAJOR`, `STAN_MINOR`, `STAN_PATCH`, `STAN_MATH_MAJOR`, `STAN_MATH_MINOR`, `STAN_MATH_PATCH`
-</span>
+```
+var, fvar, STAN_MAJOR, STAN_MINOR, STAN_PATCH, STAN_MATH_MAJOR, STAN_MATH_MINOR, STAN_MATH_PATCH
+```
+
 
 #### Reserved Function and Distribution Names {-}
 
@@ -138,10 +143,9 @@ other than constants.  Thus a variable may not be named `logit`
 or `add`, but it may be named `pi` or `e`.
 
 Variable names will also conflict with the names of distributions
-suffixed with `_lpdf`, `_lpmf`, `_lcdf`, and
-`_lccdf`, `_cdf`, and `_ccdf`, such as
-`normal_lcdf_log`; this also holds for the deprecated forms
-`_log`, `_cdf_log`, and `_ccdf_log`,
+suffixed with `_lpdf`, `_lpmf`, `_lcdf`, and `_lccdf`, `_cdf`, and
+`_ccdf`, such as `normal_lcdf_log`; this also holds for the deprecated
+forms `_log`, `_cdf_log`, and `_ccdf_log`,
 
 Using any of these variable names causes the `stanc` translator
 to halt and report the name and location of the variable causing the
@@ -153,20 +157,20 @@ conflict.
 Finally, variable names, including the names of models, should not
 conflict with any of the C++ keywords.
 
-<span style="margin:0 2em 0 2em">
-`alignas`, `alignof`, `and`, `and_eq`, `asm`, `auto`, `bitand`, `bitor`, `bool`, `break`, `case`, `catch`, `char`, `char16_t`, `char32_t`, `class`, `compl`, `const`, `constexpr`, `const_cast`, `continue`, `decltype`, `default`, `delete`, `do`, `double`, `dynamic_cast`, `else`, `enum`, `explicit`, `export`, `extern`, `false`, `float`, `for`, `friend`, `goto`, `if`, `inline`, `int`, `long`, `mutable`, `namespace`, `new`, `noexcept`, `not`, `not_eq`, `nullptr`, `operator`, `or`, `or_eq`, `private`, `protected`, `public`, `register`, `reinterpret_cast`, `return`, `short`, `signed`, `sizeof`, `static`, `static_assert`, `static_cast`, `struct`, `switch`, `template`, `this`, `thread_local`, `throw`, `true`, `try`, `typedef`, `typeid`, `typename`, `union`, `unsigned`, `using`, `virtual`, `void`, `volatile`, `wchar_t`, `while`, `xor`, `xor_eq`
-</span>
+```
+alignas, alignof, and, and_eq, asm, auto, bitand, bitor, bool, break, case, catch, char, char16_t, char32_t, class, compl, const, constexpr, const_cast, continue, decltype, default, delete, do, double, dynamic_cast, else, enum, explicit, export, extern, false, float, for, friend, goto, if, inline, int, long, mutable, namespace, new, noexcept, not, not_eq, nullptr, operator, or, or_eq, private, protected, public, register, reinterpret_cast, return, short, signed, sizeof, static, static_assert, static_cast, struct, switch, template, this, thread_local, throw, true, try, typedef, typeid, typename, union, unsigned, using, virtual, void, volatile, wchar_t, while, xor, xor_eq
+```
 
 
 ### Legal Characters {-}
 
-The legal variable characters have the same ASCII code points in the
-range 0--127 as in Unicode, as shown in the [identifier characters table](#identifier-characters-table).
+The legal characters for variable identifiers are given in the
+[identifier characters table](#identifier-characters-table).
 
 **Identifier Characters Table.** <a id="identifier-characters-table"></a>
 *The alpanumeric characters and underscore in base ASCII are the only legal characters in Stan identifiers.*
 
- Characters |  ASCII (Unicode) Code Points
+ characters |  ASCII code points
 :----------:|:-----------------------------:
 `a -- z`    | 97 -- 122
 `A -- Z`    | 65 --  90
@@ -175,7 +179,10 @@ range 0--127 as in Unicode, as shown in the [identifier characters table](#ident
 
 Although not the most expressive character set, ASCII is the most
 portable and least prone to corruption through improper character
-encodings or decodings.
+encodings or decodings.  Sticking to this range of ASCII makes Stan
+compatible with Latin-1 or UTF-8 encodings of these characters, which
+are byte-for-byte identical to ASCII.
+
 
 #### Comments Allow ASCII-Compatible Encoding {-}
 
@@ -191,6 +198,7 @@ matrices can be constructed via a sequence of expressions
 enclosed in either curly braces for arrays, or square brackets for
 vectors and matrices.
 
+
 ### Vector Expressions {-}
 
 Square brackets may be wrapped around a sequence of comma separated
@@ -201,17 +209,16 @@ Applying the transpose operator to a row vector expression produces
 a vector expression.
 This syntax provides a way declare and define small vectors a single line, as follows.
 
-
 ```stan
 row_vector[2] rv2=  [ 1, 2 ];
 vector[3] v3 = [ 3, 4, 5 ]';
 ```
 
-
 The vector expression values may be compound expressions
 or variable names,  so it is legal to write
 `[ 2 * 3, 1 + 4]`  or `[ x, y ]`, providing that `x`
 and `y` are primitive variables.
+
 
 ### Matrix Expressions {-}
 
@@ -220,11 +227,9 @@ around a sequence of comma separated row vector expressions.
 This syntax provides a way declare and define a matrix in a single
 line, as follows.
 
-
 ```stan
 matrix[3,2] m1 = [ [ 1, 2 ], [ 3, 4 ], [5, 6 ] ];
 ```
-
 
 Any expression denoting a row vector can be used in a matrix expression.
 For example, the following code is valid:
@@ -235,11 +240,13 @@ row_vector[2] vY = [ 100, 1000 ];
 matrix[3,2] m2 = [ vX', vY, [ 1, 2 ]  ];
 ```
 
+
 #### No empty vector or matrix expressions {-}
 
 The empty expression `[ ]` is ambiguous and therefore is not
 allowed and similarly expressions such as `[ [ ] ]` or
 `[ [ ], [ ] ]` are not allowed.
+
 
 ### Array Expressions {-}
 
@@ -391,9 +398,15 @@ negation for integer and real-valued expressions.  For example,
 assuming `n` and `m` are integer variables and `x` and
 `y` real variables, the following expressions are legal.
 
-<span style="margin:0 2em 0 2em">
-`3.0 + 0.14`, `-15`, `2 * 3 + 1`, `(x - y) / 2.0`, `(n * (n + 1)) / 2`, `x / n`, `m % n`
-</span>
+```
+3.0 + 0.14
+-15
+2 * 3 + 1
+(x - y) / 2.0
+(n * (n + 1)) / 2
+x / n
+m % n
+```
 
 The negation, addition, subtraction, and multiplication operations are
 extended to matrices, vectors, and row vectors.  The transpose
@@ -403,17 +416,17 @@ operations are the smallest types that can be statically guaranteed to
 contain the result.  The full set of allowable input types and
 corresponding return types is detailed in the list of functions.
 
-For example, if `y` and `mu` are variables of type
-`vector` and `Sigma` is a variable of type `matrix`,
-then `(y - mu)' * Sigma * (y - mu)` is a well-formed expression of type `real`.  The type of the
+For example, if `y` and `mu` are variables of type `vector` and
+`Sigma` is a variable of type `matrix`, then `(y - mu)' * Sigma * (y -
+mu)` is a well-formed expression of type `real`.  The type of the
 complete expression is inferred working outward from the
-subexpressions.  The subexpression(s) `y - mu` are of type
-`vector` because the variables `y` and `mu` are of type
-`vector`.  The transpose of this expression, the subexpression
-`(y - mu)'` is of type `row_vector`.  Multiplication is
-left associative and transpose has higher precedence than
-multiplication, so the above expression is equivalent to the following
-fully specified form `(((y - mu)') * Sigma) * (y - mu)`.
+subexpressions.  The subexpression(s) `y - mu` are of type `vector`
+because the variables `y` and `mu` are of type `vector`.  The
+transpose of this expression, the subexpression `(y - mu)'` is of type
+`row_vector`.  Multiplication is left associative and transpose has
+higher precedence than multiplication, so the above expression is
+equivalent to the following fully specified form `(((y - mu)') *
+Sigma) * (y - mu)`.
 
 The type of subexpression `(y - mu)' * Sigma` is inferred to be
 `row_vector`, being the result of multiplying a row vector by a
@@ -451,9 +464,15 @@ a real-value.  For example, assuming `n` and `m` are integer
 variables and `x` and `y` real variables, the following
 expressions are legal.
 
-<span style="margin:0 2em 0 2em">
-`3 ^ 2`, `3.0 ^ -2`, `3.0 ^ 0.14`, `x ^ n`, `n ^ x`, `n ^ m`, `x ^ y`
-</span>
+```
+3 ^ 2
+3.0 ^ -2
+3.0 ^ 0.14
+x ^ n
+n ^ x
+n ^ m
+x ^ y
+```
 
 Exponentiation is right associative, so the expression `2 ^ 3 ^ 4`
 is equivalent to the fully specified form `2 ^ (3 ^ 4)`.
@@ -466,18 +485,18 @@ syntax such as array indexing and function application is given in
 tabular form in the [operator precedence table](#operator-precedence-table).
 
 **Operator Precedence Table.** <a id="operator-precedence-table"></a>
-*Stan's unary, binary, and ternary
+<span style="font-style:oblique">Stan's unary, binary, and ternary
 operators, with their precedences, associativities, place in an
 expression, and a description.  The last two lines list the precedence
 of function application and array, matrix, and vector indexing. The
 operators are listed in order of precedence, from least tightly
 binding to most tightly binding.  The full set of legal arguments and
 corresponding result types are provided in the function documentation
-for the operators (i.e., `operator*(int,int):int` indicates the
+for the operators (i.e.,* `operator*(int,int):int` *indicates the
 application of the multiplication operator to two integers, which
 returns an integer).  Parentheses may be used to group expressions
 explicitly rather than relying on precedence and
-associativity.*
+associativity.</span>
 
  Op.| Prec. | Assoc. | Placement |Description
 :--:|------:|:------:|:----------|:----------
@@ -528,6 +547,7 @@ For integer and reals, `-n ^ 3` is interpreted as `-(n ^ 3)`.
 
 
 ## Conditional Operator {#conditional-operator.section}
+
 
 ### Conditional Operator Syntax {-}
 
@@ -595,6 +615,7 @@ evaluates to false (i.e., zero).  In the example above, the value
 `b` is returned if the condition evaluates to a non-zero value
 and `c` is returned if the condition evaluates to zero.
 
+
 #### Lazy Evaluation of Results {-}
 
 The key property of the conditional operator that makes it so useful
@@ -604,6 +625,7 @@ not like a typical function that evaluates its argument expressions
 eagerly in order to pass their values to the function.  As usual, the
 saving is mostly in the derivatives that do not get computed rather
 than the unnecessary function evaluation itself.
+
 
 #### Promotion to Parameter {-}
 
@@ -658,6 +680,7 @@ Multiple subscripts may be provided within a single pair of square
 brackets.  If `x` is of type `real[ , ]`, a two-dimensional
 array, then `x[2,501]` is of type `real`.
 
+
 ### Accessing Subarrays {-}
 
 The subscripting operator also returns subarrays of arrays.  For
@@ -666,11 +689,13 @@ is of type `real[ , ]`, and `x[2,3]` is of type
 `real[]`.  As a result, the expressions `x[2,3]` and
 `x[2][3]` have the same meaning.
 
+
 ### Accessing Matrix Rows {-}
 
 If `Sigma` is a variable of type `matrix`, then
 `Sigma[1]` denotes the first row of `Sigma` and has the
 type `row_vector`.
+
 
 ### Mixing Array and Vector/Matrix Indexes {-}
 
@@ -686,6 +711,7 @@ the third row of the matrix denoted by `m[1,2]`.  Finally,
 `m[1,2,3,4]` is of type `real` and denotes the value in the
 third row and fourth column of the matrix that is found at the first
 row and second column of the array `m`.
+
 
 ## Multiple Indexing and Range Indexing {#language-multi-indexing.section}
 
@@ -789,7 +815,9 @@ Each function has a type signature which determines the allowable type
 of its arguments and its return type.  For instance, the function
 signature for the logarithm function can be expressed as
 
-`real log(real);`
+```
+real log(real);
+```
 
 and the signature for the `lmultiply` function is
 
@@ -812,12 +840,14 @@ types.  This restriction also makes it possible to infer the type of a
 function expression compositionally by only examining the type of its
 subexpressions.
 
+
 ### Constants {-}
 
 Constants in Stan are nothing more than nullary (no-argument)
 functions.  For instance, the mathematical constants $\pi$ and $e$ are
 represented as nullary functions named `pi()` and `e()`.
 See the [built-in constants section](#built-in-constants.section) for a list of built-in constants.
+
 
 ### Type Promotion and Function Resolution {-}
 
@@ -830,9 +860,10 @@ of type promotions.
 For example, consider a situation in which the following two function
 signatures have been registered for `foo`.
 
-`real foo(real,real);`
-
-`int foo(int,int);`
+```
+real foo(real,real);
+int foo(int,int);
+```
 
 The use of `foo` in the expression `foo(1.0,1.0)` resolves
 to `foo(real,real)`, and thus the expression `foo(1.0,1.0)`
@@ -856,9 +887,10 @@ expression remains ambiguous.  For example, consider a situation in
 which there are exactly two functions named `bar` with the
 following signatures.
 
-`real bar(real,int);`
-
-`real bar(int,real);`
+```
+real bar(real,int);
+real bar(int,real);
+```
 
 With these signatures, the expression `bar(1.0,1)` and
 `bar(1,1.0)` resolve to the first and second of the above
@@ -873,6 +905,7 @@ If there is not a unique function requiring fewer promotions than all
 others, as with `bar(1,1)` given the two declarations above,
 the Stan compiler will flag the expression as illegal.
 
+
 ### Random-Number Generating Functions {-}
 
 For most of the distributions supported by Stan, there is a
@@ -882,6 +915,7 @@ For example, a univariate normal random number can be generated by
 `normal_rng(0,1)`;  only the parameters of the distribution,
 here a location (0) and scale (1) are specified because the variate is
 generated.
+
 
 #### Random-Number Generators Locations {-}
 
@@ -895,6 +929,7 @@ This allows the random number generating functions to be used for
 simulation in general, and for Bayesian posterior predictive checking
 in particular.
 
+
 #### Posterior Predictive Checking {-}
 
 Posterior predictive checks typically use the parameters of the model
@@ -905,20 +940,20 @@ the actual data in order to assess the suitability of the model; see
 Chapter 6 of [@GelmanEtAl:2013] for more information on
 posterior predictive checks.
 
+
 ## Type Inference
 
 Stan is strongly statically typed, meaning that the implementation
 type of an expression can be resolved at compile time.
 
+
 ### Implementation Types {-}
 
 The primitive implementation types for Stan are
 
-`int`,
-`real`,
-`vector`,
-`row_vector`, and
-`matrix`.
+```
+int, real, vector, row_vector,  matrix.
+```
 
 Every basic declared type corresponds to a primitive type;  see the
 [primitive type table](#primitive-type-table) for the mapping from types to their
@@ -931,8 +966,8 @@ primitive types.
   result types declared in terms of primitive types plus array
   dimensionality.*
 
-type      |   primitive type
-:-----------:|:------------------:
+   type     |   primitive type
+:-----------|:------------------
 `int` | `int`
 `real` | `real`
 `matrix` | `matrix`
@@ -969,6 +1004,7 @@ The matrix `a` is indexed as `a[i, j, k, m, n]` with the array
 indices first, followed by the matrix indices, with `a[i, j, k]`
 being a matrix and `a[i, j, k, m]` being a row vector.
 
+
 ### Type Inference Rules {-}
 
 Stan's type inference rules define the implementation type of an
@@ -976,10 +1012,12 @@ expression based on a background set of variable declarations.  The
 rules work bottom up from primitive literal and variable expressions
 to complex expressions.
 
+
 #### Literals {-}
 
 An integer literal expression such as `42` is of type `int`.
 Real literals such as `42.0` are of type `real`.
+
 
 #### Variables {-}
 
@@ -991,25 +1029,24 @@ There is always a unique declaration for each variable in each scope
 because Stan prohibits the redeclaration of an already-declared
 variables.^[Languages such as C++ and R allow the declaration of a variable of a given name in a narrower scope to hide (take precedence over for evaluation) a variable defined in a containing scope.]
 
+
 #### Indexing {-}
 
-If `x` is an expression of total dimensionality greater than or
-equal to $N$, then the type of expression `e[i1, ..., iN]` is the
-same as that of `e[i1]...[iN]`, so it suffices to define the type
-of a singly-indexed function.  Suppose `e` is an expression and
-`i` is an expression of primitive type `int`.  Then
+If `x` is an expression of total dimensionality greater than or equal
+to $N$, then the type of expression `e[i1, ..., iN]` is the same as
+that of `e[i1]...[iN]`, so it suffices to define the type of a
+singly-indexed function.  Suppose `e` is an expression and `i` is an
+expression of primitive type `int`.  Then
 
+* if `e` is an expression of array dimensionality $K > 0$, then `e[i]`
+  has array dimensionality $K-1$ and the same primitive implementation
+  type as `e`,
 
-* if `e` is an expression of array dimensionality $K > 0$,
-  then `e[i]` has array dimensionality $K-1$ and the same
-  primitive implementation type as `e`,
+* if `e` has implementation type `vector` or `row_vector` of array
+  dimensionality 0, then `e[i]` has implementation type `real`, and
 
-* if `e` has implementation type `vector` or
-  `row_vector` of array dimensionality 0, then `e[i]` has
-  implementation type `real`, and
-
-* if `e` has implementation type `matrix`, then
-  `e[i]` has type `row_vector`.
+* if `e` has implementation type `matrix`, then `e[i]` has type
+  `row_vector`.
 
 
 #### Function Application {-}
@@ -1034,6 +1071,7 @@ example, `row_vector~*~vector` returns a value of type
 `real`, which is declared in the function documentation and index
 as `real~operator*(row_vector,vector)`.
 
+
 ## Higher-Order Functions
 
 There are several expression constructions in Stan that act as
@@ -1043,7 +1081,8 @@ The higher-order functions and the signature of their argument
 functions are listed in the [higher-order functions
 table](#higher-order-functions-table).
 
-**Higher-order Functions Table.** <a id="higher-order-functions-table"></a>
+**Higher-order Functions Table.**
+<a id="higher-order-functions-table"></a>
 *Higher-order functions in Stan with their argument
 function types.  The first group of arguments has no restrictions.
 The second group of arguments, consisting of a real and integer
@@ -1077,12 +1116,14 @@ function;  as shown in the [higher-order functions table](#higher-order-function
 takes two vectors, a real array, and an integer array as arguments and
 returns a vector.
 
+
 ### Functions Passed by Reference {-}
 
 The function argument to higher-order functions is always passed as
 the first argument.  This function argument must be provided as the
 name of a user-defined or built-in function.  No quotes are
 necessary.
+
 
 ### Data-Restricted Arguments {-}
 
@@ -1097,12 +1138,14 @@ For user-defined functions the qualifier `data` may be prepended
 to the type to restrict the argument to data-only variables.
 
 
+
 ## Chain Rule and Derivatives
 
 Derivatives of the log probability function defined by a model are
 used in several ways by Stan.  The Hamiltonian Monte Carlo samplers,
 including NUTS, use gradients to guide updates.  The BFGS optimizers
 also use gradients to guide search for posterior modes.
+
 
 ### Errors Due to Chain Rule {-}
 
@@ -1132,7 +1175,8 @@ and it would seem the model should produce unit normal draws for
   x)` causes a problem for derivatives.  The cause is the mechanistic
 evaluation of the chain rule,
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 \frac{d}{dx} \sqrt{x - x}
 & = &
 \frac{1}{2 \sqrt{x - x}} \times \frac{d}{dx} (x - x)
@@ -1144,7 +1188,8 @@ evaluation of the chain rule,
 \infty \times 0
 \\[4pt]
 & = & \mathrm{NaN}.
-\end{eqnarray*}
+\end{array}
+$$
 
 Rather than the $x - x$ canceling out, it introduces a 0 into the
 numerator and denominator of the chain-rule evaluation.
@@ -1153,6 +1198,7 @@ The only way to avoid this kind problem is to be careful to do the
 necessary algebraic reductions as part of the model and not introduce
 expressions like `sqrt(x - x)` for which the chain rule produces
 not-a-number values.
+
 
 ### Diagnosing Problems with Derivatives {-}
 
