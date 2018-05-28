@@ -807,7 +807,7 @@ real binormal_cdf(real z1, real z2, real rho) {
 
 \noindent
 This chapter explains functions from a user perspective with examples;
-see \refchapter{functions} for the full specification.  User-defined
+see the language reference for a full specification.  User-defined
 functions allow computations to be encapsulated into a single named
 unit and invoked elsewhere by name.  Similarly, functions allow
 complex procedures to be broken down into more understandable
@@ -869,8 +869,7 @@ Return statements, such as the one on the last line of the definition
 of \code{relative\_diff} above, are only allowed in the bodies of
 function definitions.  Return statements may appear anywhere in a
 function, but functions with non-void return types must end in a
-return statement; see \refsection{function-returns} for details on how
-this is enforced.
+return statement.
 
 \subsection{Reject Statements}
 
@@ -930,8 +929,7 @@ Metropolis sense.%
 In generated quantities, rejections cause execution to halt because
 there is no way to recover and generate the remaining parameters, so
 extra care should be taken in calling functions in the generated
-quantities block.  See \refsection{reject-statements} for full
-details about the reject statement.
+quantities block.
 
 \subsection{Type Declarations for Functions}
 

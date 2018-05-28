@@ -4244,9 +4244,61 @@ model {
 %
 The \code{log\_sum\_exp(lp1,lp2)} function adds the log probabilities
 on the linear scale; it is defined to be equal to \code{log(exp(lp1) +
-  exp(lp2))}, but is more arithmetically stable and faster.  This
-could also be written using the conditional operator; see
-\refsection{conditional-operator}.
+  exp(lp2))}, but is more arithmetically stable and faster.  
+
+\subsubsection{Optimizing the zero-inflated Poisson model}
+
+The code given above to compute the zero-inflated Poisson 
+redundantly calculates all of the Bernoulli terms and also
+\code{poisson\_lpmf(0 | lambda)} every time the first condition
+body executes.  The use of the redundant terms is conditioned on
+\code{y}, which is known when the data is read in.  This allows
+the transformed data block to be used to compute some more convenient
+terms for expressing the log density each iteration.  
+
+The number of zero cases is computed and handled separately.
+Then the nonzero cases are collected into their own array for
+vectorization.  The number of zeros is required to declare
+\code{y\_nonzero}, so it must be computed in a function.
+%
+\begin{stancode}
+functions {
+  int num_zeros(int[] y) { 
+    int sum = 0;
+    for (n in 1:size(y))
+      sum += (y[n] == 0);
+    return sum;
+  }
+}
+...
+transformed data {
+  int<lower = 0> N_zero = num_zeros(y);
+  int<lower = 1> y_nonzero[N - N_zero];
+  int N_nonzero = 0;
+  for (n in 1:N) {
+    if (y[n] == 0) continue;
+    N_nonzero += 1;
+    y_nonzero[N_nonzero] = y[n];
+  }
+}
+...
+model {
+  ...
+   target
+     += N_zero
+          * log_sum_exp(bernoulli_lpmf(1 | theta),
+                        bernoulli_lpmf(0 | theta)
+                          + poisson_lpmf(0 | lambda));
+   target += N_nonzero * bernoulli_lpmf(0 | theta);
+   target += poisson_lpmf(y_nonzero | lambda);
+...
+\end{stancode}
+%
+The boundary conditions of all zeros and no zero outcomes is handled
+appropriately;  in the vectorized case, if \code{y\_nonzero} is empty,
+\code{N\_nonzero} will be zero, and the last two target increment
+terms will add zeros.
+
 
 \subsection{Hurdle Models}
 
