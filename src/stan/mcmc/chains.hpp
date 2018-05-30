@@ -177,14 +177,14 @@ namespace stan {
 
       static Eigen::VectorXd autocorrelation(const Eigen::VectorXd& x) {
         using std::vector;
-        using stan::math::index_type;
+        using math::index_type;
         typedef typename index_type<vector<double> >::type idx_t;
 
         std::vector<double> ac;
         std::vector<double> sample(x.size());
         for (int i = 0; i < x.size(); i++)
           sample[i] = x(i);
-        stan::math::autocorrelation(sample, ac);
+        math::autocorrelation(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
         for (idx_t i = 0; i < ac.size(); i++)
@@ -194,14 +194,14 @@ namespace stan {
 
       static Eigen::VectorXd autocovariance(const Eigen::VectorXd& x) {
         using std::vector;
-        using stan::math::index_type;
+        using math::index_type;
         typedef typename index_type<vector<double> >::type idx_t;
 
         std::vector<double> ac;
         std::vector<double> sample(x.size());
         for (int i = 0; i < x.size(); i++)
           sample[i] = x(i);
-        stan::math::autocovariance(sample, ac);
+        math::autocovariance(sample, ac);
 
         Eigen::VectorXd ac2(ac.size());
         for (idx_t i = 0; i < ac.size(); i++)
@@ -239,7 +239,7 @@ namespace stan {
 
         Eigen::Matrix<Eigen::VectorXd, Dynamic, 1> acov(chains);
         for (int chain = 0; chain < chains; chain++) {
-          acov(chain) = autocovariance(samples(chain));
+          math::autocovariance<double>(samples(chain), acov(chain));
         }
 
         Eigen::VectorXd chain_mean(chains);
@@ -290,6 +290,32 @@ namespace stan {
         double ess = chains * n_samples;
         ess /= (1 + 2 * rho_hat_t.sum());
         return ess;
+      }
+
+      /**
+       * Returns the effective sample size for the specified parameter
+       * across all kept samples.
+       *
+       * See more details in Stan reference manual section "Effective
+       * Sample Size". http://mc-stan.org/users/documentation
+       *
+       * Current implementation assumes chains are all of equal size.
+       *
+       * @param std::vector stores pointers to arrays of chains
+       * @return effective sample size for the specified parameter
+       */
+      double effective_sample_size(const std::vector<const double*>& chains,
+                                   int num_draws) const {
+        size_t num_chains = chains.size();
+        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(num_chains);
+
+        for (size_t chain = 0; chain < num_chains; ++chain) {
+          Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1> >
+            sample(&chains[chain][0], num_draws);
+          samples(chain) = sample;
+        }
+
+        return effective_sample_size(samples);
       }
 
       /**
@@ -347,7 +373,7 @@ namespace stan {
           param_names_(i) = param_names[i];
       }
 
-      explicit chains(const stan::io::stan_csv& stan_csv)
+      explicit chains(const io::stan_csv& stan_csv)
         : param_names_(stan_csv.header) {
         if (stan_csv.samples.rows() > 0)
           add(stan_csv);
@@ -479,7 +505,7 @@ namespace stan {
         add(sample_copy);
       }
 
-      void add(const stan::io::stan_csv& stan_csv) {
+      void add(const io::stan_csv& stan_csv) {
         if (stan_csv.header.size() != num_params())
           throw std::invalid_argument("add(stan_csv): number of columns in"
                                       " sample does not match chains");
@@ -699,6 +725,17 @@ namespace stan {
 
       double effective_sample_size(const std::string& name) const {
         return effective_sample_size(index(name));
+      }
+
+      double effective_sample_size_new(const int index) const {
+        Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1>
+          samples(num_chains());
+        std::vector<const double*> chains;
+        for (int chain = 0; chain < num_chains(); ++chain) {
+          samples(chain) = this->samples(chain, index);
+          chains.push_back(&samples(chain)(0));
+        }
+        return effective_sample_size(chains, samples(0).size());
       }
 
       double split_potential_scale_reduction(const int index) const {
