@@ -55,8 +55,8 @@ namespace stan {
       }
       for (int i = 0; i < t.array_dims(); ++i) {
         if (i > 0 || is_template_type)
-          o << " ";
-        o << ">";
+          o << ' ';
+        o << '>';
       }
     }
 
