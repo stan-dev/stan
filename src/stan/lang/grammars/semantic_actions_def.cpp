@@ -2012,12 +2012,14 @@ namespace stan {
       // test data is data only
       if (has_var(mr.job_data_r_, var_map)) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fourth argment to map_rect must be data only" << std::endl;
+        error_msgs << "fourth argment to map_rect must be data only"
+                   << std::endl;
         pass = false;
       }
       if (has_var(mr.job_data_i_, var_map)) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fifth argument to map_rect must be data only" << std::endl;
+        error_msgs << "fifth argument to map_rect must be data only"
+                   << std::endl;
         pass = false;
       }
 
