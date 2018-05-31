@@ -1,7 +1,7 @@
 functions {
-  vector lr_rng(vector beta, vector theta, real[] x, int[] y) {
-    int draw = bernoulli_rng(inv_logit(sum(beta[1] + to_vector(x) * beta[2])));
-    return [ draw ]';
+  vector lr_lp(vector beta, vector theta, real[] x, int[] y) {
+    real lp = bernoulli_logit_lpmf(y | beta[1] + to_vector(x) * beta[2]);
+    return [lp]';
   }
 }
 data {
@@ -18,6 +18,6 @@ transformed data {
 parameters {
   vector[2] beta;
 }
-transformed parameters {
-  vector[12] bar = map_rect(lr_rng, beta, theta, xs, ys);
+model {
+  target += sum(map_rect(lr_lp, beta, theta, xs, ys));
 }
