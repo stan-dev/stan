@@ -1,0 +1,25 @@
+    // nested foreach (vector)
+    while (1) {
+      vector[2] vs;
+      for (v in vs) {
+        v = 0;
+        break;
+      }
+      for (v in vs) {
+        v = 3.2;
+        continue;
+      }
+    }
+
+    // nested foreach (rowvector)
+    while (1) {
+      row_vector[2] vs;
+      for (v in vs) {
+        v = 0;
+        break;
+      }
+      for (v in vs) {
+        v = 3.2;
+        continue;
+      }
+    }
