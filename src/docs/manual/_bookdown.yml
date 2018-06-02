@@ -18,7 +18,9 @@ rmd_files: [
 
  "transforms.Rmd",
 
- "syntax.Rmd"
+ "syntax.Rmd",
+
+ "references.Rmd"
 ]
 
 before_chapter_script: "_common.R"

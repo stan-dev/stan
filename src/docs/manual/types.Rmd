@@ -378,7 +378,7 @@ matrix is a different kind of object in Stan than a $3 \times 4$
 array.
 
 The intention of using matrix types is to call out their usage in the
-code.  There are three situations in Stan where {\it only} vectors and
+code.  There are three situations in Stan where *only* vectors and
 matrices may be used,
 
 
@@ -546,7 +546,7 @@ declares `A` to be a $3 \times 3$ matrix and `B` to be a $M
 variables `M` and `N` must be declared as integers in either
 the data or transformed data block and before the matrix declaration.
 
-Matrices may also be declared with constraints, as in this ($3 \times $4)
+Matrices may also be declared with constraints, as in this ($3 \times 4$)
 matrix of non-positive values.
 
 ```stan

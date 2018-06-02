@@ -292,6 +292,6 @@ forms, that is the form that is used in the model definitions.
 
 In the executable form of a Stan models, parameters, transformed
 parameters, and generated quantities are written to a file in
-comma-separated value (\acronym{csv}) notation with a header defining
+comma-separated value (CSV) notation with a header defining
 the names of the parameters (including indices for multivariate
 parameters).^[In the R version of Stan, the values may either be written to a CSV file or directly back to R's memory.]
