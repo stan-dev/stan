@@ -8,7 +8,7 @@ documentclass: book
 bibliography: [../bibtex/all.bib]
 biblio-style: "apalike"
 link-citations: true
-fontsize: 11pt
+fontsize: 10pt
 cover-image: img/logo_tm.png
 url: 'http\://mc-stan.org/'
 github-repo: stan-dev/stan
