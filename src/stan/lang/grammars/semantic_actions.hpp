@@ -408,13 +408,32 @@ namespace stan {
     validate_void_return_allowed_f;
 
     // called from: statement_grammar
-    struct validate_lhs_var_assgn : public phoenix_functor_senary {
+    struct validate_lhs_var_assgn_silent : public phoenix_functor_senary {
       void operator()(const std::string& name, const scope& var_scope,
                       variable& v, bool& pass, const variable_map& vm,
                       std::ostream& error_msgs) const;
     };
+    extern boost::phoenix::function<validate_lhs_var_assgn_silent>
+    validate_lhs_var_assgn_silent_f;
+
+    // called from: statement_grammar
+    struct validate_lhs_var_assgn : public phoenix_functor_quinary {
+      void operator()(assgn& a, const scope& var_scope,
+                      bool& pass, const variable_map& vm,
+                      std::ostream& error_msgs) const;
+    };
     extern boost::phoenix::function<validate_lhs_var_assgn>
     validate_lhs_var_assgn_f;
+
+    // called from: statement_grammar
+    struct validate_lhs_var_assignment : public phoenix_functor_quinary {
+      void operator()(variable_dims& v,
+                      const scope& var_scope,
+                      bool& pass, const variable_map& vm,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_lhs_var_assignment>
+    validate_lhs_var_assignment_f;
 
     // called from: statement_grammar
     struct validate_assgn : public phoenix_functor_quaternary {

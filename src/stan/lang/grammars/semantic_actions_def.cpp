@@ -140,17 +140,23 @@ namespace stan {
             || et.base_type_.is_double_type());
     }
 
+
     bool can_assign_to_lhs_var(const std::string& lhs_var_name,
                                const scope& var_scope,
                                const variable_map& vm,
                                std::ostream& error_msgs) {
-      // validate scope matches declaration scope
+      if (!vm.exists(lhs_var_name)) {
+        error_msgs << "Unknown variable in assignment"
+                   << "; lhs variable=" << lhs_var_name
+                   << std::endl;
+        return false;
+      }
       scope lhs_origin = vm.get_scope(lhs_var_name);
-      if (lhs_origin.program_block() != var_scope.program_block()) {
-        error_msgs << "Cannot assign to variable outside of declaration block"
-                   << "; left-hand-side variable origin=";
-        print_scope(error_msgs, lhs_origin);
-        error_msgs << std::endl;
+      // enforce constancy of loop variables
+      if (lhs_origin.program_block() == loop_identifier_origin) {
+        error_msgs << "Loop variable " << lhs_var_name 
+                   << " cannot be used on left side of assignment statement."
+                   << std::endl;
         return false;
       }
       // enforce constancy of function args
@@ -159,6 +165,13 @@ namespace stan {
                    << std::endl
                    << "Use local variables instead."
                    << std::endl;
+        return false;
+      }
+      if (lhs_origin.program_block() != var_scope.program_block()) {
+        error_msgs << "Cannot assign to variable outside of declaration block"
+                   << "; left-hand-side variable origin=";
+        print_scope(error_msgs, lhs_origin);
+        error_msgs << std::endl;
         return false;
       }
       return true;
@@ -272,6 +285,7 @@ namespace stan {
                          const std::vector<std::vector<expression> >&) const;
     template void assign_lhs::operator()(fun&, const fun&) const;
     template void assign_lhs::operator()(variable&, const variable&) const;
+    template void assign_lhs::operator()(variable_dims&, const variable_dims&) const;
     template void assign_lhs::operator()(base_expr_type&,
                                          const base_expr_type&) const;
 
@@ -949,42 +963,66 @@ namespace stan {
     boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
-    void validate_lhs_var_assgn::operator()(const std::string& name,
-                                       const scope& var_scope,
-                                       variable& v,  bool& pass,
-                                       const variable_map& vm,
-                                       std::ostream& error_msgs) const {
-      // validate existence
+    void validate_lhs_var_assgn::operator()(assgn& a,
+                                            const scope& var_scope,
+                                            bool& pass,
+                                            const variable_map& vm,
+                                            std::ostream& error_msgs) const {
+
+      std::string name = a.lhs_var_.name_;
+      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
+        pass = false;
+        return;
+      }
+    }
+    boost::phoenix::function<validate_lhs_var_assgn>
+    validate_lhs_var_assgn_f;
+
+    void validate_lhs_var_assignment::operator()(variable_dims& v,
+                                                 const scope& var_scope,
+                                                 bool& pass,
+                                                 const variable_map& vm,
+                                                 std::ostream& error_msgs) const {
+      std::string name = v.name_;
+      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
+        pass = false;
+        return;
+      }
+    }
+    boost::phoenix::function<validate_lhs_var_assignment>
+    validate_lhs_var_assignment_f;
+    
+    void validate_lhs_var_assgn_silent::operator()(const std::string& name,
+                                                   const scope& var_scope,
+                                                   variable& v, bool& pass,
+                                                   const variable_map& vm,
+                                                   std::ostream& error_msgs) const {
+      // check lhs, fail silently
       if (!vm.exists(name)) {
-        // fail silently, allow backtracking
         pass = false;
         return;
       }
-      // validate scope matches declaration scope
       scope lhs_origin = vm.get_scope(name);
-      if (lhs_origin.program_block() != var_scope.program_block()) {
+      if ((lhs_origin.program_block() != var_scope.program_block())
+          || (!lhs_origin.is_local() && lhs_origin.fun())
+          ||(lhs_origin.program_block() == loop_identifier_origin)) {
         pass = false;
         return;
       }
+      // instantiate variable for ast
       v = variable(name);
       v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
       pass = true;
     }
-    boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
+    boost::phoenix::function<validate_lhs_var_assgn_silent>
+
+    validate_lhs_var_assgn_silent_f;
 
     void validate_assgn::operator()(const assgn& a, bool& pass,
                                     const variable_map& vm,
                                     std::ostream& error_msgs) const {
       // validate var exists
       std::string name = a.lhs_var_.name_;
-      if (!vm.exists(name)) {
-        error_msgs << "Unknown variable in assignment"
-                   << "; lhs variable=" << name
-                   << std::endl;
-        pass = false;
-        return;
-      }
-
       expression lhs_expr = expression(a.lhs_var_);
       expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
       if (lhs_type.is_ill_formed()) {
@@ -1015,17 +1053,6 @@ namespace stan {
                                          bool& pass, const variable_map& vm,
                                          std::ostream& error_msgs) const {
       std::string name = a.var_dims_.name_;
-      if (!vm.exists(name)) {
-        error_msgs << "Unknown variable in assignment"
-                   << "; lhs variable=" << name
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
-        pass = false;
-        return;
-      }
       a.var_type_ = vm.get(name);
       expr_type inferred_lhs_type
         = infer_var_dims_type(a.var_type_, a.var_dims_);
@@ -1055,17 +1082,6 @@ namespace stan {
                                          bool& pass, variable_map& vm,
                                          std::ostream& error_msgs) const {
       std::string name = ca.var_dims_.name_;
-      if (!vm.exists(name)) {
-        error_msgs << "Unknown variable in compound assignment"
-                   << "; lhs variable=" << name
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
-        pass = false;
-        return;
-      }
       ca.var_type_ = vm.get(name);
       expr_type inferred_lhs_type
         = infer_var_dims_type(ca.var_type_, ca.var_dims_);
@@ -1391,6 +1407,10 @@ namespace stan {
                                      const stan::lang::expression& expr,
                                      std::stringstream& error_msgs) const {
       static const bool user_facing = true;
+      if (error_msgs.str().size() > 0) {
+        pass = false;
+        return;
+      }
       if (!(expr.expression_type().type().is_void_type())) {
         error_msgs << "Illegal statement beginning with non-void"
                    << " expression parsed as"
@@ -1403,14 +1423,14 @@ namespace stan {
                    << "  * Assignment statements only allow variables"
                    << " (with optional indexes) on the left;"
                    << std::endl
-                   << "    if you see an outer function logical_lt (<)"
-                   << " with negated (-) second argument,"
-                   << std::endl
-                   << "    it indicates an assignment statement A <- B"
-                   << " with illegal left"
-                   << std::endl
-                   << "    side A parsed as expression (A < (-B))."
-                   << std::endl
+          //                   << "    if you see an outer function logical_lt (<)"
+          //                   << " with negated (-) second argument,"
+          //                   << std::endl
+          //                   << "    it indicates an assignment statement A <- B"
+          //                   << " with illegal left"
+          //                   << std::endl
+          //                   << "    side A parsed as expression (A < (-B))."
+          //                   << std::endl
                    << "  * Sampling statements allow arbitrary"
                    << " value-denoting expressions on the left."
                    << std::endl
@@ -1484,7 +1504,7 @@ namespace stan {
         std::vector<expression> dimvector(numdims - 1);
         vm.add(name, base_var_decl(name, dimvector,
                                    expr.expression_type().type()),
-               scope(var_scope.program_block(), true));
+               scope(loop_identifier_origin, true));
       }
     }
     boost::phoenix::function<add_array_loop_identifier>
@@ -1510,7 +1530,7 @@ namespace stan {
       } else {
         vm.add(name, base_var_decl(name, std::vector<expression>(),
                                    double_type()),
-               scope(var_scope.program_block(), true));
+               scope(loop_identifier_origin, true));
       }
     }
     boost::phoenix::function<add_matrix_loop_identifier>

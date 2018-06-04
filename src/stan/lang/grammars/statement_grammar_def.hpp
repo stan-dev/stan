@@ -298,12 +298,15 @@ namespace stan {
       // this one comes before assgn_r to deal with simple assignment
       assignment_r.name("variable assignment by expression");
       assignment_r
-        %= var_lhs_r(_r1)
+        %= var_lhs_r(_r1)[assign_lhs_f(_a, _1)]
         >> assignment_operator_r
-        > expression_rhs_r(_r1)
-          [validate_assignment_f(_val, _r1, _pass,
-                                 boost::phoenix::ref(var_map_),
-                                 boost::phoenix::ref(error_msgs_))]
+        > (eps[validate_lhs_var_assignment_f(_a, _r1, _pass,
+                                             boost::phoenix::ref(var_map_),
+                                             boost::phoenix::ref(error_msgs_))]
+           > expression_rhs_r(_r1)
+           [validate_assignment_f(_val, _r1, _pass,
+                                  boost::phoenix::ref(var_map_),
+                                  boost::phoenix::ref(error_msgs_))])
         > lit(';');
 
       // _r1 = var scope
@@ -316,7 +319,10 @@ namespace stan {
             | string("/=")
             | string(".*=")
             | string("./="))
-        >> expression_rhs_r(_r1)
+        >> (eps[validate_lhs_var_assignment_f(_a, _r1, _pass,
+                                             boost::phoenix::ref(var_map_),
+                                             boost::phoenix::ref(error_msgs_))]
+            > expression_rhs_r(_r1))
            [validate_compound_assignment_f(_val, _r1, _pass,
                                            boost::phoenix::ref(var_map_),
                                            boost::phoenix::ref(error_msgs_))]
@@ -328,7 +334,10 @@ namespace stan {
         %= var_r(_r1)
         >> indexes_g(_r1)
         >> assignment_operator_r
-        >> (eps > expression_rhs_r(_r1))
+        >> (eps[validate_lhs_var_assgn_f(_val, _r1, _pass,
+                                         boost::phoenix::ref(var_map_),
+                                         boost::phoenix::ref(error_msgs_))]
+            > expression_rhs_r(_r1))
            [validate_assgn_f(_val, _pass,
                              boost::phoenix::ref(var_map_),
                              boost::phoenix::ref(error_msgs_))]
@@ -344,7 +353,7 @@ namespace stan {
       var_r.name("variable for left-hand side of assignment");
       var_r
         = identifier_r
-          [validate_lhs_var_assgn_f(_1, _r1, _val,  _pass,
+          [validate_lhs_var_assgn_silent_f(_1, _r1, _val,  _pass,
                                     boost::phoenix::ref(var_map_),
                                     boost::phoenix::ref(error_msgs_))];
 

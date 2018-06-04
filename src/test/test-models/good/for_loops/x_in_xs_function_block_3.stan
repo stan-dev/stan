@@ -1,8 +1,8 @@
 functions {
   int foo(int a) {
-    int vs[2];
+    int vs[2,3];
     int y;
-    for (v in vs) v = 3;
+    for (v in vs[1]) y = 3;
     return 0;
   }
 }
