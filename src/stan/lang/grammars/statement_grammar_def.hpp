@@ -131,8 +131,8 @@ namespace stan {
         | statement_2_g(_r1, _r2)                   // key "if"
         | print_statement_r(_r1)                    // key "print"
         | reject_statement_r(_r1)                   // key "reject"
-        | return_statement_r(_r1)                   // key "return"
         | void_return_statement_r(_r1)              // key "return"
+        | return_statement_r(_r1)                   // key "return"
         | assignment_r(_r1)                         // lvalue "=" or "<-"
         | compound_assignment_r(_r1)                // lvalue "+=" or "-="
         | assgn_r(_r1)                              // var[idxs] <- expr
@@ -422,19 +422,23 @@ namespace stan {
         > lit(']');
 
       // _r1 = var scope
-      return_statement_r.name("return statement");
-      return_statement_r
-        %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
-        >> expression_g(_r1)
-        >> lit(';') [validate_return_allowed_f(_r1, _pass,
-                                     boost::phoenix::ref(error_msgs_))];
-
-      // _r1 = var scope
       void_return_statement_r.name("void return statement");
       void_return_statement_r
         = lit("return") [set_void_return_f(_val)]
         >> lit(';') [validate_void_return_allowed_f(_r1, _pass,
                                           boost::phoenix::ref(error_msgs_))];
+
+      // _r1 = var scope
+      return_statement_r.name("return statement");
+      return_statement_r
+        %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
+        > (expression_g(_r1)
+           | (eps[non_void_return_msg_f(_r1, _pass,
+                                        boost::phoenix::ref(error_msgs_))]
+              > expression_g(_r1)))
+        > lit(';') [validate_return_allowed_f(_r1, _pass,
+                                     boost::phoenix::ref(error_msgs_))];
+
 
       no_op_statement_r.name("no op statement");
       no_op_statement_r

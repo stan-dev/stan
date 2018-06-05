@@ -944,8 +944,28 @@ namespace stan {
     boost::phoenix::function<deprecate_old_assignment_op>
     deprecate_old_assignment_op_f;
 
+    void non_void_return_msg::operator()(scope var_scope, bool& pass,
+                                         std::ostream& error_msgs) const {
+      pass = false;
+      if (var_scope.non_void_fun()) {
+        error_msgs << "Non-void function must return expression"
+                   << " of specified return type."
+                   << std::endl;
+        return;
+      }
+      error_msgs << "Return statement only allowed from function bodies."
+                 << std::endl;
+    }
+    boost::phoenix::function<non_void_return_msg> non_void_return_msg_f;
+
     void validate_return_allowed::operator()(scope var_scope, bool& pass,
                                              std::ostream& error_msgs) const {
+      if (var_scope.void_fun()) {
+        error_msgs << "Void function cannot return a value."
+                   << std::endl;
+        pass = false;
+        return;
+      }
       if (!var_scope.non_void_fun()) {
         error_msgs << "Returns only allowed from function bodies."
                    << std::endl;

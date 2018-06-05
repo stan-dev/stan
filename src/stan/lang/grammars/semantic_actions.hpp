@@ -392,6 +392,14 @@ namespace stan {
     deprecate_old_assignment_op_f;
 
     // called from: statement_grammar
+    struct non_void_return_msg : public phoenix_functor_ternary {
+      void operator()(scope var_scope, bool& pass, std::ostream& error_msgs)
+        const;
+    };
+    extern boost::phoenix::function<non_void_return_msg>
+    non_void_return_msg_f;
+    
+    // called from: statement_grammar
     struct validate_return_allowed : public phoenix_functor_ternary {
       void operator()(scope var_scope, bool& pass, std::ostream& error_msgs)
         const;
