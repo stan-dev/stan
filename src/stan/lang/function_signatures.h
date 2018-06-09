@@ -666,6 +666,7 @@ for (const auto& t : all_vector_types) {
  }
 add_nullary("machine_precision");
 add("matrix_exp", expr_type(matrix_type()), expr_type(matrix_type()));
+add("matrix_exp", expr_type(matrix_type()), expr_type(matrix_type()), expr_type(matrix_type()), expr_type(double_type()));
 add("max", expr_type(int_type()), expr_type(int_type(), 1));
 add("max", expr_type(double_type()), expr_type(double_type(), 1));
 add("max", expr_type(double_type()), expr_type(vector_type()));
