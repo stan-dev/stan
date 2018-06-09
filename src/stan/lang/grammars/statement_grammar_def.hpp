@@ -133,7 +133,6 @@ namespace stan {
         | reject_statement_r(_r1)                   // key "reject"
         | void_return_statement_r(_r1)              // key "return"
         | return_statement_r(_r1)                   // key "return"
-        | assignment_r(_r1)                         // lvalue "=" or "<-"
         | compound_assignment_r(_r1)                // lvalue "+=" or "-="
         | assgn_r(_r1)                              // var[idxs] <- expr
         | sample_r(_r1)                             // expression "~"
@@ -300,20 +299,6 @@ namespace stan {
            [validate_int_expr_no_error_msgs_f(_1, _pass,
                                      boost::phoenix::ref(error_msgs_))];
 
-      // _r1 = var scope
-      // this one comes before assgn_r to deal with simple assignment
-      assignment_r.name("variable assignment by expression");
-      assignment_r
-        %= var_lhs_r(_r1)[assign_lhs_f(_a, _1)]
-        >> assignment_operator_r
-        > (eps[validate_lhs_var_assignment_f(_a, _r1, _pass,
-                                             boost::phoenix::ref(var_map_),
-                                             boost::phoenix::ref(error_msgs_))]
-           > expression_rhs_r(_r1)
-           [validate_assignment_f(_val, _r1, _pass,
-                                  boost::phoenix::ref(var_map_),
-                                  boost::phoenix::ref(error_msgs_))])
-        > lit(';');
 
       // _r1 = var scope
       compound_assignment_r.name("variable compound op-equals by expression");
@@ -337,8 +322,10 @@ namespace stan {
       // _r1 = var scope
       assgn_r.name("indexed variable assginment statement");
       assgn_r
-        %= var_r(_r1)
-        >> indexes_g(_r1)
+        %= identifier_r[set_lhs_var_assgn_f(_val, _1, _pass,
+                                            boost::phoenix::ref(var_map_),
+                                            boost::phoenix::ref(error_msgs_))]
+        >> opt_idxs_r(_r1)
         >> assignment_operator_r
         >> (eps[validate_lhs_var_assgn_f(_val, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
@@ -355,13 +342,6 @@ namespace stan {
            [deprecate_old_assignment_op_f(boost::phoenix::ref(error_msgs_))]
         | (lit("=") >> no_skip[!char_("=")]);
 
-      // _r1 = var scope
-      var_r.name("variable for left-hand side of assignment");
-      var_r
-        = identifier_r
-          [validate_lhs_var_assgn_silent_f(_1, _r1, _val,  _pass,
-                                    boost::phoenix::ref(var_map_),
-                                    boost::phoenix::ref(error_msgs_))];
 
       // separate rule for name on expectation failure
       // _r1 = var scope
@@ -381,14 +361,24 @@ namespace stan {
         %=  *dims_r(_r1);
 
       // _r1 = var scope
-      dims_r.name("array dimensions");
       // uses silent test because errors will be reported in sliced rules
+      dims_r.name("array dimensions");
       dims_r
         %= lit('[')
         >> (expression_g(_r1)[validate_int_expr_silent_f(_1, _pass)] % ',')
         >> lit(']');
 
-      // inherited  _r1 = var scope
+      // _r1 = var scope
+      opt_idxs_r.name("array indexes (optional)");
+      opt_idxs_r
+        %=  *idxs_r(_r1);
+
+      idxs_r.name("array indexes");
+      idxs_r
+        %= indexes_g(_r1);
+
+
+      // _r1 = var scope
       sample_r.name("distribution of expression");
       sample_r
         %= (expression_g(_r1)

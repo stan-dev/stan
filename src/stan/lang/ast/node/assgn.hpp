@@ -19,7 +19,7 @@ namespace stan {
       assgn();
 
       /**
-       * Constrcut an assignment statement with the specified
+       * Construct an assignment statement with the specified
        * variable, indexing, and right-hand side expression.
        *
        * @param[in] lhs_var variable being assigned

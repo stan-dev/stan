@@ -183,20 +183,24 @@ namespace stan {
       }
 
       void operator()(const assgn& y) const {
+        // use stan::math::asign for non-indexed lhs vars
+        // use stan::model::asign for indexed lhs vars
         generate_indent(indent_, o_);
-        o_ << "stan::model::assign(";
+        if (y.idxs_.size() == 0) {
+          o_ << "stan::math::assign(";
+          generate_expression(y.lhs_var_, NOT_USER_FACING, o_);
+          o_ << ", ";
+        } else {
+          o_ << "stan::model::assign(";
+          generate_expression(y.lhs_var_, NOT_USER_FACING, o_);
+          o_ << ", " << EOL;
 
-        expression var_expr(y.lhs_var_);
-        generate_expression(var_expr, NOT_USER_FACING, o_);
-        o_ << ", "
-           << EOL;
+          generate_indent(indent_ + 3, o_);
+          generate_idxs(y.idxs_, o_);
+          o_ << ", " << EOL;
+          generate_indent(indent_ + 3, o_);
+        }
 
-        generate_indent(indent_ + 3, o_);
-        generate_idxs(y.idxs_, o_);
-        o_ << ", "
-           << EOL;
-
-        generate_indent(indent_ + 3, o_);
         if (y.lhs_var_occurs_on_rhs()) {
           o_ << "stan::model::deep_copy(";
           generate_expression(y.rhs_, NOT_USER_FACING, o_);
@@ -205,15 +209,19 @@ namespace stan {
           generate_expression(y.rhs_, NOT_USER_FACING, o_);
         }
 
-        o_ << ", "
-           << EOL;
-        generate_indent(indent_ + 3, o_);
-        o_ << '"'
-           << "assigning variable "
-           << y.lhs_var_.name_
-           << '"';
-        o_ << ");"
-           << EOL;
+        if (y.idxs_.size() == 0) {
+          o_ << ");" << EOL;
+        } else {
+          o_ << ", "
+             << EOL;
+          generate_indent(indent_ + 3, o_);
+          o_ << '"'
+             << "assigning variable "
+             << y.lhs_var_.name_
+             << '"';
+          o_ << ");"
+             << EOL;
+        }
       }
 
       void operator()(const expression& x) const {

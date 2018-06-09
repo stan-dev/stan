@@ -992,28 +992,13 @@ namespace stan {
     boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
-    void validate_lhs_var_assgn::operator()(assgn& a,
-                                            const scope& var_scope,
-                                            bool& pass,
-                                            const variable_map& vm,
-                                            std::ostream& error_msgs) const {
-      std::string name = a.lhs_var_.name_;
-      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
-        pass = false;
-        return;
-      }
-    }
-    boost::phoenix::function<validate_lhs_var_assgn>
-    validate_lhs_var_assgn_f;
-
     void validate_lhs_var_assignment::operator()(variable_dims& v,
                                                  const scope& var_scope,
                                                  bool& pass,
                                                  const variable_map& vm,
                                                  std::ostream& error_msgs)
       const {
-      std::string name = v.name_;
-      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
+      if (!can_assign_to_lhs_var(v.name_, var_scope, vm, error_msgs)) {
         pass = false;
         return;
       }
@@ -1021,32 +1006,35 @@ namespace stan {
     boost::phoenix::function<validate_lhs_var_assignment>
     validate_lhs_var_assignment_f;
 
-    void validate_lhs_var_assgn_silent::operator()(const std::string& name,
-                                                   const scope& var_scope,
-                                                   variable& v, bool& pass,
-                                                   const variable_map& vm,
-                                                   std::ostream& error_msgs)
-      const {
-      if (!vm.exists(name)) {
+    void validate_lhs_var_assgn::operator()(assgn& a, 
+                                            const scope& var_scope,
+                                            bool& pass, const variable_map& vm,
+                                            std::ostream& error_msgs) const {
+      std::string name(a.lhs_var_.name_);
+      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
         pass = false;
         return;
       }
-      scope lhs_origin = vm.get_scope(name);
-      if ((lhs_origin.program_block() != var_scope.program_block())
-          || (!lhs_origin.is_local() && lhs_origin.fun())
-          ||(lhs_origin.program_block() == loop_identifier_origin)) {
-        pass = false;
-        return;
-      }
-      // instantiate variable for ast
-      v = variable(name);
-      v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
-      pass = true;
+      a.lhs_var_.set_type(vm.get_base_type(name), vm.get_num_dims(name));
     }
-    boost::phoenix::function<validate_lhs_var_assgn_silent>
+    boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
 
-    validate_lhs_var_assgn_silent_f;
 
+
+    void set_lhs_var_assgn::operator()(assgn& a, const std::string& name,
+                                       bool& pass, const variable_map& vm,
+                                       std::ostream& error_msgs) const {
+      if (!vm.exists(name)) {
+        error_msgs << "Unknown variable: " << name << std::endl;
+        pass = false;
+        return;
+      }
+      variable v(name);
+      a.lhs_var_ = v;
+    }
+    boost::phoenix::function<set_lhs_var_assgn> set_lhs_var_assgn_f;
+
+    
     void validate_assgn::operator()(const assgn& a, bool& pass,
                                     const variable_map& vm,
                                     std::ostream& error_msgs) const {
