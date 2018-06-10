@@ -10,6 +10,7 @@
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <stan/lang/generator/visgen.hpp>
 #include <boost/algorithm/string.hpp>
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -132,61 +133,27 @@ namespace stan {
       void operator()(const nil& /*x*/) const { }
 
       void operator()(const compound_assignment& x) const {
-        std::string op = boost::algorithm::erase_last_copy(x.op_, "=");
-        generate_indent(indent_, o_);
-        o_ << "stan::math::assign(";
-        generate_indexed_expr<true>(x.var_dims_.name_,
-                                    x.var_dims_.dims_,
-                                    x.var_type_.base_type_,
-                                    x.var_type_.dims_.size(),
-                                    false,
-                                    o_);
-        o_ << ", ";
-        if (x.op_name_.size() == 0) {
-          o_ << "(";
-          generate_indexed_expr<false>(x.var_dims_.name_,
-                                      x.var_dims_.dims_,
-                                      x.var_type_.base_type_,
-                                      x.var_type_.dims_.size(),
-                                      false,
-                                      o_);
-          o_ << " " << x.op_ << " ";
-          generate_expression(x.expr_, NOT_USER_FACING, o_);
-          o_ << ")";
-        } else {
-          o_ << x.op_name_ << "(";
-          generate_indexed_expr<false>(x.var_dims_.name_,
-                                      x.var_dims_.dims_,
-                                      x.var_type_.base_type_,
-                                      x.var_type_.dims_.size(),
-                                      false,
-                                      o_);
-          o_ << ", ";
-          generate_expression(x.expr_, NOT_USER_FACING, o_);
-          o_ << ")";
-        }
-        o_ << ");" << EOL;
+        std::cout << "generate compound_assignment statment"
+                  << " (shouldn't happen)" << std::endl;
       }
 
       void operator()(const assignment& x) const {
-        generate_indent(indent_, o_);
-        o_ << "stan::math::assign(";
-        generate_indexed_expr<true>(x.var_dims_.name_,
-                                    x.var_dims_.dims_,
-                                    x.var_type_.base_type_,
-                                    x.var_type_.dims_.size(),
-                                    false,
-                                    o_);
-        o_ << ", ";
-        generate_expression(x.expr_, NOT_USER_FACING, o_);
-        o_ << ");" << EOL;
+        std::cout << "generate assignment statment"
+                  << " (shouldn't happen)" << std::endl;
       }
 
       void operator()(const assgn& y) const {
-        // use stan::math::asign for non-indexed lhs vars
-        // use stan::model::asign for indexed lhs vars
+        // use stan::math::asign when no idxs (lhs_simple)
+        // use stan::model::asign when indexed (!lhs_simple)
+        bool lhs_simple = y.idxs_.size() == 0;
+
+        bool assign_simple = y.is_simple_assignment();
+        // need expr for rhs in compound operator-assign
+        index_op_sliced lhs_expr(y.lhs_var_, y.idxs_);
+        lhs_expr.infer_type();
+          
         generate_indent(indent_, o_);
-        if (y.idxs_.size() == 0) {
+        if (lhs_simple) {
           o_ << "stan::math::assign(";
           generate_expression(y.lhs_var_, NOT_USER_FACING, o_);
           o_ << ", ";
@@ -201,12 +168,28 @@ namespace stan {
           generate_indent(indent_ + 3, o_);
         }
 
-        if (y.lhs_var_occurs_on_rhs()) {
-          o_ << "stan::model::deep_copy(";
-          generate_expression(y.rhs_, NOT_USER_FACING, o_);
-          o_ << ")";
+        if (assign_simple) {
+          if (y.lhs_var_occurs_on_rhs()) {
+            o_ << "stan::model::deep_copy(";
+            generate_expression(y.rhs_, NOT_USER_FACING, o_);
+            o_ << ")";
+          } else {
+            generate_expression(y.rhs_, NOT_USER_FACING, o_);
+          }
         } else {
-          generate_expression(y.rhs_, NOT_USER_FACING, o_);
+          if (y.op_name_.size() == 0) {
+            o_ << "(";
+            generate_expression(lhs_expr, NOT_USER_FACING, o_);
+            o_ << " " << y.op_ << " ";
+            generate_expression(y.rhs_, NOT_USER_FACING, o_);
+            o_ << ")";
+          } else {
+            o_ << y.op_name_ << "(";
+            generate_expression(lhs_expr, NOT_USER_FACING, o_);
+            o_ << ", ";
+            generate_expression(y.rhs_, NOT_USER_FACING, o_);
+            o_ << ")";
+          }            
         }
 
         if (y.idxs_.size() == 0) {

@@ -165,7 +165,7 @@ TEST(langParserStatementGrammar, plusEqualsBad) {
   test_throws("compound-assign/plus_equals_bad_var_lhs2",
               "Cannot assign to variable outside of declaration block");
   test_throws("compound-assign/plus_equals_bad_lhs_idxs",
-              "Too many indexes for variable");
+              "Left-hand side indexing incompatible with variable");
   test_throws("compound-assign/plus_equals_bad_var_rhs",
               "does not exist");
   test_throws("compound-assign/plus_equals_type_mismatch",

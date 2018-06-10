@@ -33,26 +33,14 @@ namespace stan {
       indexes_grammar<Iterator> indexes_g;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<variable_dims>,
-                              compound_assignment(scope),
-                              whitespace_grammar<Iterator> >
-      compound_assignment_r;
-
-      boost::spirit::qi::rule<Iterator,
                               assgn(scope),
                               whitespace_grammar<Iterator> >
       assgn_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::unused_type,
+                              std::string(),
                               whitespace_grammar<Iterator> >
       assignment_operator_r;
-
-      boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(scope),
-                              whitespace_grammar<Iterator> >
-      dims_r;
-
 
       boost::spirit::qi::rule<Iterator,
                               distribution(scope),
@@ -151,11 +139,6 @@ namespace stan {
       no_op_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(scope),
-                              whitespace_grammar<Iterator> >
-      opt_dims_r;
-
-      boost::spirit::qi::rule<Iterator,
                               std::vector<idx>(scope),
                               whitespace_grammar<Iterator> >
       opt_idxs_r;
@@ -196,11 +179,6 @@ namespace stan {
                               variable(scope),
                               whitespace_grammar<Iterator> >
       var_r;
-
-      boost::spirit::qi::rule<Iterator,
-                              variable_dims(scope),
-                              whitespace_grammar<Iterator> >
-      var_lhs_r;
 
       boost::spirit::qi::rule<Iterator,
                               expression(scope),
