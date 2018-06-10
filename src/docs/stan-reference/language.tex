@@ -2764,7 +2764,7 @@ Algebraically, the sampling statement in the model could be reduced to
   x ~ normal(0, 1);
 \end{stancode}
 %
-and it would seem the model should produce unit normal draws for
+and it would seem the model should produce standard normal draws for
 \code{x}.  But rather than canceling, the expression \code{sqrt(x -
   x)} causes a problem for derivatives.  The cause is the mechanistic
 evaluation of the chain rule,
@@ -3095,7 +3095,7 @@ The keyword \code{target} here is actually not a variable, and may not
 be accessed as such (though see below on how to access the value of
 target through a special function).
 
-In this example, the unnormalized log probability of a unit normal
+In this example, the unnormalized log probability of a standard normal
 variable $y$ is added to the total log probability.  In the general
 case, the argument can be any expression.%
 %
@@ -3109,7 +3109,7 @@ case, the argument can be any expression.%
   required for automatic differentiation.}
 
 An entire Stan model can be implemented this way.  For instance, the
-following model will draw a single variable according to a unit normal
+following model will draw a single variable according to a standard normal
 probability.
 %
 \begin{stancode}
@@ -3426,7 +3426,7 @@ p_{[a,b]}(x) = \frac{p_X(x)}
 \subsubsection{Truncation with lower and upper bounds in Stan}
 
 Stan allows probability functions to be truncated.  For example, a
-truncated unit normal distributions restricted to $[-0.5, 2.1]$
+truncated standard normal distributions restricted to $[-0.5, 2.1]$
 can be coded with the following sampling statement.
 %
 \begin{stancode}

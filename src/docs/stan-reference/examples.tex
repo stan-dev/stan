@@ -526,7 +526,7 @@ For binary outcomes, either of the closely related logistic or probit
 regression models may be used.  These generalized linear models vary
 only in the link function they use to map linear predictions in
 $(-\infty,\infty)$ to probability values in $(0,1)$.  Their respective
-link functions, the logistic function and the unit normal cumulative distribution
+link functions, the logistic function and the standard normal cumulative distribution
 function, are both sigmoid functions (i.e., they are both {\it S}-shaped).
 
 A logistic regression model with one predictor and an intercept is coded as
@@ -601,7 +601,7 @@ typically written as
 \Phi(x) = \int_{-\infty}^x \distro{Normal}(y|0,1) \, dy.
 \]
 %
-The cumulative unit normal distribution function $\Phi$ is implemented
+The cumulative standard normal distribution function $\Phi$ is implemented
 in Stan as the function \code{Phi}.  The probit regression model
 may be coded in Stan by replacing the logistic model's sampling
 statement with the following.
@@ -611,7 +611,7 @@ statement with the following.
         y[n] ~ bernoulli(Phi(alpha + beta * x[n]));
 \end{stancode}
 %
-A fast approximation to the cumulative unit normal distribution function
+A fast approximation to the cumulative standard normal distribution function
 $\Phi$ is implemented in Stan as the function \code{Phi\_approx}.  The
 approximate probit regression model may be coded with the following.
 %
@@ -1252,7 +1252,7 @@ questions are not unheard of, but they tend to be eliminated from most
 testing situations where an IRT model would be applied.
 
 The model is parameterized here with student abilities \code{alpha}
-being given a unit normal prior.  This is to identify both the scale
+being given a standard normal prior.  This is to identify both the scale
 and the location of the parameters, both of which would be
 unidentified otherwise; see \refchapter{problematic-posteriors} for
 further discussion of identifiability. The difficulty and
@@ -1311,9 +1311,9 @@ float in terms of both scale and location.  See
 \refsection{collinearity} for a simple example of the problems this
 poses for estimation.
 
-The non-identifiability is resolved by providing a unit normal (i.e.,
+The non-identifiability is resolved by providing a standard normal (i.e.,
 $\distro{Normal}(0,1)$) prior on one group of coefficients, such as
-the student abilities.  With a unit normal prior on the student
+the student abilities.  With a standard normal prior on the student
 abilities, the IRT model is identified in that the posterior will
 produce a group of estimates for student ability parameters that have
 a sample mean of close to zero and a sample variance of close to one.
@@ -1669,7 +1669,7 @@ diag_pre_multiply(a, b) = diag_matrix(a) * b
 \end{stancode}
 %
 The new variable \code{z} is declared as a matrix, the entries of
-which are given independent unit normal priors; the \code{to\_vector}
+which are given independent standard normal priors; the \code{to\_vector}
 operation turns the matrix into a vector so that it can be used as a
 vectorized argument to the univariate normal density.  Multiplying the
 Cholesky factor of the covariance matrix by \code{z} and adding the
@@ -2831,7 +2831,7 @@ final loop adds in the moving average so that \code{h[2]} through
 
 As a final improvement, the sampling statement for \code{h[1]} and
 loop for sampling \code{h[2]} to \code{h[T]} are replaced with a
-single vectorized unit normal sampling statement.
+single vectorized standard normal sampling statement.
 %
 \begin{stancode}
 model {
@@ -3690,7 +3690,7 @@ probability of
 = 1 - \Phi\left(\frac{y - \mu}{\sigma}\right),
 \]
 %
-where $\Phi()$ is the unit normal cumulative distribution function.
+where $\Phi()$ is the standard normal cumulative distribution function.
 With $M$ censored observations, the total probability on the log scale
 is
 \[
@@ -3817,7 +3817,8 @@ p_Y(y | \lambda, \mu, \sigma)
 \sum_{k=1}^K \lambda_k \, \distro{Normal}(y \, | \, \mu_k, \sigma_k).
 \]
 
-\section{Log Sum of Exponentials: Linear Sums on the Log Scale}
+
+\subsection{Log Sum of Exponentials: Linear Sums on the Log Scale}
 
 The log sum of exponentials function is used to define mixtures on the
 log scale.  It is defined for two inputs by
@@ -3879,7 +3880,7 @@ The log probability term is derived by taking
 \end{eqnarray*}
 %
 
-\subsubsection{Dropping uniform mixture ratios}
+\subsection{Dropping uniform mixture ratios}
 
 If a two-component mixture has a mixing ratio of 0.5, then the mixing
 ratios can be dropped, because
@@ -3922,6 +3923,51 @@ additive constant in the first place.  There is nothing specific to
 the normal distribution here; constants may always be dropped from the
 target.
 
+
+\subsection{Recovering posterior mixture proportions}
+
+The posterior $p(z_n \mid y_n, \mu, \sigma)$ over the mixture indicator $z_n
+\in 1:K$ is often of interest as $p(z_n = k \mid y, \mu, \sigma)$ is the
+posterior probability that that observation $y_n$ was generated by
+mixture component $k$.  The posterior can be computed via Bayes's rule,
+\[
+\begin{array}{rcl}
+p(z_n = k \mid y_n, \mu, \sigma, \lambda)
+& \propto &
+p(y_n \mid z_n = k, \mu, \sigma) \cdot p(z_n = k \mid \lambda)
+\\[4pt]
+& = &
+\mathsf{Normal}(y_n \mid \mu_k, \sigma_k) \cdot \lambda_k.
+\end{array}
+\]
+
+The normalization can be done via summation, because $z_n \in 1{:}K$ only
+takes on finitely many values.  In detail,
+\[
+p(z_n = k \mid y_n, \mu, \sigma, \lambda)
+\ = \
+\frac{p(y_n \mid z_n = k, \mu, \sigma) \cdot p(z_n = k \mid \lambda)}
+     {\sum_{k' = 1}^K p(y_n \mid z_n = k', \mu, \sigma)
+                    \cdot p(z_n = k' \mid \lambda)}.
+\]
+
+On the log scale, the normalized probability is computed as
+\[
+\begin{array}{l}
+\log p(z_n = k \mid y_n, \mu, \sigma, \lambda)
+\\[6pt] { } \hspace*{12pt} \ = \
+\begin{array}[t]{l}
+\log p(y_n \mid z_n = k, \mu, \sigma)
+\ + \ \log p(z_n = k \mid \lambda)
+\\[2pt]
+\ - \ \mathrm{log\_sum\_exp}_{k' = 1}^K
+        \log p(y_n \mid z_n = k', \mu, \sigma)
+        + \log p(z_n = k' \mid \lambda).
+\end{array}
+\end{array}
+\]
+This can be coded up directly in Stan; the change-point model in
+\refsection{change-point} provides an example.
 
 \subsection{Estimating Parameters of a Mixture}
 
@@ -4851,7 +4897,7 @@ Standard optimization algorithms, including expectation maximization
 maximum likelihood estimation algorithms.  Such derivations provide
 exactly the marginalization needed for coding the model in Stan.
 
-\section{Change Point Models}
+\section{Change Point Models}\label{change-point.section}
 
 The first example is a model of coal mining disasters in the U.K.\
 for the years 1851--1962.%
@@ -6274,7 +6320,7 @@ model {
 }
 \end{stancode}
 %
-There is an independent unit normal prior on the centroid parameters;
+There is an independent standard normal prior on the centroid parameters;
 this prior could be swapped with other priors, or even a hierarchical
 model to fit an overall problem scale and location.
 
@@ -7046,8 +7092,8 @@ multivariate model is in the distance calculation.
 \subsection{Cholesky Factored and Transformed Implementation}
 
 A more efficient implementation of the simulation model can be
-coded in Stan by relocating, rescaling and rotating an isotropic unit
-normal variate.  Suppose $\eta$ is an an isotropic unit normal variate
+coded in Stan by relocating, rescaling and rotating an isotropic standard
+normal variate.  Suppose $\eta$ is an an isotropic standard normal variate
 \[
 \eta \sim \distro{Normal}({\bf 0}, {\bf 1}),
 \]
@@ -7070,7 +7116,7 @@ This model has the same data declarations for \code{N} and \code{x},
 and the same transformed data definitions of \code{mu} and
 \code{K} as the previous model, with the addition of a transformed
 data variable for the Cholesky decomposition.  The parameters change
-to the raw parameters sampled from an isotropic unit normal, and the
+to the raw parameters sampled from an isotropic standard normal, and the
 actual samples are defined as generated quantities.
 %
 \begin{stancode}
@@ -7096,7 +7142,7 @@ The Cholesky decomposition is only computed once, after the data is
 loaded and the covariance matrix \code{K} computed.  The isotropic
 normal distribution for \code{eta} is specified as a vectorized
 univariate distribution for efficiency; this specifies that each
-\code{eta[n]} has an independent unit normal distribution.  The sampled
+\code{eta[n]} has an independent standard normal distribution.  The sampled
 vector \code{y} is then defined as a generated quantity using a direct
 encoding of the transform described above.
 
@@ -7964,6 +8010,27 @@ the value of \code{x} will be constrained to be a vector of size
 on how a parameter constrained to be a unit-vector is transformed to
 unconstrained space for use in Stan's algorithms.
 
+{\it Warning:} An extra term gets added to the log density to ensure
+the distribution on unit vectors is proper.  This is not a problem in
+practice, but it may lead to misunderstandings of the target log
+density output (\code{lp\_\_} in some interfaces).  The underlying
+source of the problem is that a unit vector of size $K$ has only
+$K - 1$ degrees of freedom.  But there is no way to map those $K - 1$
+degrees of freedom continuously to $\mathbb{R}^N$---for example, the
+circle can't be mapped continuously to a line so the limits work out,
+nor can a sphere be mapped to a plane.  A workaround is needed
+instead.  Stan's unit vector transform uses $K$ unconstrained
+variables, then projects down to the unit hypersphere.  Even though
+the hypersphere is compact, the result would be an improper
+distribution.  To ensure the unit vector distribution is proper, each
+unconstrained variable is given a ``Jacobian'' adjustment equal to an
+independent standard normal distribution.  Effectively, each dimension is
+drawn standard normal, then they are together projected down to the
+hypersphere to produce a unit vector.  The result is a proper uniform
+distribution over the hypersphere.
+
+
+
 \section{Circles, Spheres, and Hyperspheres}
 
 An $n$-sphere, written $S^{n}$, is defined as the set of $(n +
@@ -8045,6 +8112,46 @@ R_{\theta}
 Given a two-dimensional vector $x$, $R_{\theta} \, x$ is the rotation
 of $x$ (around the origin) by $\theta$ degrees.
 
+\subsection{Unit vector type}
+
+In Stan, unit vectors in $K$ dimensions are declared as
+%
+\begin{stancode}
+unit_vector[K] alpha;
+\end{stancode}
+%
+A unit vector has length one (meaning the sum of squared values is
+one, not that its number of elements is one).
+
+\subsection{Angles from unit vectors}
+
+Angles can be calculated from unit vectors.  For example, a random
+variable \code{theta} representing an angle in $(-\pi, \pi)$ radians
+can be declared as a two-dimensional unit vector then transformed to
+an angle.
+%
+\begin{stancode}
+parameters {
+  unit_vector[2] xy;
+
+transformed parameters {
+  real<lower = -pi(), upper = pi> theta = atan2(xy[2], xy[1]);
+\end{stancode}
+%
+If the distribution of $(x, y)$ is uniform over a circle, then the
+distribution of $\arctan \frac{y}{x}$ is uniform over $(-\pi, pi]$.
+
+It might be tempting to try to just declare theta directly as a
+parameter with the lower and upper bound constraint as given above.
+The drawback to this approach is that the values $-\pi$ and $\pi$ are
+at $-\infty$ and $\infty$ on the unconstrained scale, which can
+produce multimodal posterior distribtions when the true distribution
+on the circle is unimodal.
+
+With a little additional work on the trigonometric front, the same
+conversion back to angles may be accomplished in more dimensions.
+
+
 \section{Circular Representations of Days and Years}
 
 A 24-hour clock naturally represents the progression of time through
@@ -8057,6 +8164,8 @@ In human affairs, temporal effects often arise by convention.  These
 can be modeled directly with ad-hoc predictors for holidays and
 weekends, or with data normalization back to natural scales for
 daylight savings time.
+
+
 
 \chapter{Solving Algebraic Equations}\label{algebra-solver.chapter}
 
@@ -8595,7 +8704,7 @@ observations is given in \reffigure{sho-both}.  Compared to the
 simulation model in \reffigure{sho-sim}, the model to estimate
 parameters uses the \code{integrate\_ode} function in the model block
 rather than the generated quantities block.  There are Cauchy priors on the
-measurement error scales \code{sigma} and unit normal priors on the
+measurement error scales \code{sigma} and standard normal priors on the
 components of parameter array \code{theta} and initial state parameter
 array \code{y0}.  The solutions to the ODE are then assigned to an
 array \code{y\_hat}, which is then used as the location in the

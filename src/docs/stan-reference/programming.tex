@@ -194,7 +194,7 @@ the strength of the prior mean measured in number of prior observations.
 
 \subsection{Transforming Unconstrained Priors: Probit and Logit}
 
-If the variable $u$ has a  distribution, then
+If the variable $u$ has a $\distro{Uniform}(0, 1)$ distribution, then
 $\mbox{logit}(u)$ is distributed as $\distro{Logistic}(0, 1)$.  This
 is because inverse logit is the cumulative distribution function (cdf)
 for the logistic distribution, so that the logit function itself is
@@ -438,7 +438,7 @@ log(y) ~ normal(mu, sigma);
 or as an increment to the log probability function, as in
 %
 \begin{stancode}
-target += normal_lpmf(log(y) | mu, sigma);
+target += normal_lpdf(log(y) | mu, sigma);
 \end{stancode}
 
 \subsubsection{Gamma and Inverse Gamma Distribution}\label{jacobian-adjustment.section}
@@ -1205,7 +1205,7 @@ user-defined functions ending in \code{\_rng}.
 For example, the following function generates an $N \times K$ data
 matrix, the first column of which is filled with 1 values for the
 intercept and the remaining entries of which have values drawn
-from a unit normal PRNG.
+from a standard normal PRNG.
 %
 \begin{stancode}
 matrix predictors_rng(int N, int K) {
@@ -1260,7 +1260,7 @@ Probability functions are distinguished in Stan by names ending in
 \code{\_lpdf} for density functions and \code{\_lpmf} for mass
 functions; in both cases, they must have \code{real} return types.
 
-Suppose a model uses several unit normal distributions, for which
+Suppose a model uses several standard normal distributions, for which
 there is not a specific overloaded density nor defaults in Stan.  So
 rather than writing out the location of 0 and scale of 1 for all of
 them, a new density function may be defined and reused.
@@ -1711,12 +1711,12 @@ minimizes $\log \distro{Normal}(\lambda_1|0,\tau) + \log
 \includegraphics[height=1.45in]{img/one-param-identified.png}
 \vspace*{-.1in}
 \caption{\small\it Posteriors for two intercept parameterization
-  without prior, two intercept parameterization with unit normal
+  without prior, two intercept parameterization with standard normal
   prior, and one intercept reparameterization without prior.  For all
   three cases, the posterior is plotted for 100 data points drawn from
-  a unit normal. Left) The two intercept parameterization leads to an
+  a standard normal. Left) The two intercept parameterization leads to an
   improper prior with a ridge extending infinitely to the northwest
-  and southeast.  Middle) Adding a unit normal prior for the
+  and southeast.  Middle) Adding a standard normal prior for the
   intercepts results in a proper posterior.  Right) The single
   intercept parameterization with no prior also has a proper posterior.}%
 \label{non-identifiable-density.figure}
@@ -2598,7 +2598,7 @@ With multiple indexing, this can be coded in one line, leading to more
 efficient vectorized code.
 %
 \begin{stancode}
-y ~ normal( rows_dot_product(alpha[ii] + beta[ii] , x), sigma);
+y ~ normal(alpha[ii] + rows_dot_product(beta[ii], x), sigma);
 \end{stancode}
 %
 This latter version is equivalent in speed to the clunky assignment to
@@ -3744,10 +3744,10 @@ model {
 \end{stancode}
 %
 In this second model, the parameters \Verb|x_raw| and \Verb|y_raw| are
-sampled as independent unit normals, which is easy for Stan.  These
+sampled as independent standard normals, which is easy for Stan.  These
 are then transformed into samples from the funnel.  In this case, the
 same transform may be used to define Monte Carlo samples directly
-based on independent unit normal samples; Markov chain Monte Carlo
+based on independent standard normal samples; Markov chain Monte Carlo
 methods are not necessary. If such a reparameterization were used in
 Stan code, it is useful to provide a comment indicating what the
 distribution for the parameter implies for the distribution of the

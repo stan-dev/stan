@@ -984,16 +984,17 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitemUnaryVec{atan}{principal arc (inverse) tangent (in radians) of \farg{x}}{
+  \fitemUnaryVec{atan}{principal arc (inverse) tangent (in radians) of
+    \farg{x}, with values from $-\pi$ to $\pi$}{
     \[
     \mbox{\code{atan}}(x) = \arctan(x)
     \]}
   %
-  \fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
-    Returns the principal arc (inverse) tangent (in radians) of \farg{x} divided
-    by \farg{y}.
+  \fitem{real}{atan2}{real \farg{y}, real \farg{x}}{
+    Returns the principal arc (inverse) tangent (in radians) of \farg{y} divided
+    by \farg{x},
     \[
-    \mbox{\code{atan2}}(x,y) = \arctan\left(\frac{x}{y}\right)
+    \mbox{\code{atan2}}(y, x) = \arctan\left(\frac{y}{x}\right)
     \]}
   %
 \end{description}
@@ -1083,7 +1084,7 @@ commonly used as a link function (see \refsection{Phi-function}).
 
 \subsection{Normal Cumulative Distribution Functions}
 
-The error function erf is related to the unit normal cumulative
+The error function erf is related to the standard normal cumulative
 distribution function $\Phi$ by scaling.  See
 \refsection{normal-distribution} for the general normal cumulative
 distribution function (and its complement).
@@ -1100,9 +1101,9 @@ distribution function (and its complement).
     \mbox{\code{erfc}}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
     \]}
   %
-  \fitemUnaryVecSort{Phi}{unit normal cumulative distribution function of \farg{x}}{
+  \fitemUnaryVecSort{Phi}{standard normal cumulative distribution function of \farg{x}}{
     \[
-    \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
+    \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{x} e^{-t^2/2} dt
     \]}{phi}
   %
   \fitemUnaryVec{inv\_Phi}{standard normal inverse cumulative distribution function of \farg{p}, otherwise known as the quantile function}{
