@@ -934,12 +934,15 @@ namespace stan {
     }
     boost::phoenix::function<add_conditional_body> add_conditional_body_f;
 
-    void deprecate_old_assignment_op::operator()(std::ostream& error_msgs)
+    void deprecate_old_assignment_op::operator()(std::string& op,
+                                                 std::ostream& error_msgs)
       const {
       error_msgs << "Warning (non-fatal): assignment operator <- deprecated"
                  << " in the Stan language;"
                  << " use = instead."
                  << std::endl;
+      std::string eq("=");
+      op = eq;
     }
     boost::phoenix::function<deprecate_old_assignment_op>
     deprecate_old_assignment_op_f;
@@ -994,60 +997,33 @@ namespace stan {
 
     void validate_lhs_var_assgn::operator()(assgn& a,
                                             const scope& var_scope,
-                                            bool& pass,
-                                            const variable_map& vm,
+                                            bool& pass, const variable_map& vm,
                                             std::ostream& error_msgs) const {
-      std::string name = a.lhs_var_.name_;
+      std::string name(a.lhs_var_.name_);
       if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
         pass = false;
         return;
       }
+      a.lhs_var_.set_type(vm.get_base_type(name), vm.get_num_dims(name));
     }
-    boost::phoenix::function<validate_lhs_var_assgn>
-    validate_lhs_var_assgn_f;
+    boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
 
-    void validate_lhs_var_assignment::operator()(variable_dims& v,
-                                                 const scope& var_scope,
-                                                 bool& pass,
-                                                 const variable_map& vm,
-                                                 std::ostream& error_msgs)
-      const {
-      std::string name = v.name_;
-      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
-        pass = false;
-        return;
-      }
-    }
-    boost::phoenix::function<validate_lhs_var_assignment>
-    validate_lhs_var_assignment_f;
 
-    void validate_lhs_var_assgn_silent::operator()(const std::string& name,
-                                                   const scope& var_scope,
-                                                   variable& v, bool& pass,
-                                                   const variable_map& vm,
-                                                   std::ostream& error_msgs)
-      const {
+
+    void set_lhs_var_assgn::operator()(assgn& a, const std::string& name,
+                                       bool& pass, const variable_map& vm,
+                                       std::ostream& error_msgs) const {
       if (!vm.exists(name)) {
+        error_msgs << "Unknown variable: " << name << std::endl;
         pass = false;
         return;
       }
-      scope lhs_origin = vm.get_scope(name);
-      if ((lhs_origin.program_block() != var_scope.program_block())
-          || (!lhs_origin.is_local() && lhs_origin.fun())
-          ||(lhs_origin.program_block() == loop_identifier_origin)) {
-        pass = false;
-        return;
-      }
-      // instantiate variable for ast
-      v = variable(name);
-      v.set_type(vm.get_base_type(name), vm.get_num_dims(name));
-      pass = true;
+      variable v(name);
+      a.lhs_var_ = v;
     }
-    boost::phoenix::function<validate_lhs_var_assgn_silent>
+    boost::phoenix::function<set_lhs_var_assgn> set_lhs_var_assgn_f;
 
-    validate_lhs_var_assgn_silent_f;
-
-    void validate_assgn::operator()(const assgn& a, bool& pass,
+    void validate_assgn::operator()(assgn& a, bool& pass,
                                     const variable_map& vm,
                                     std::ostream& error_msgs) const {
       // validate var exists
@@ -1060,158 +1036,110 @@ namespace stan {
         pass = false;
         return;
       }
-      if (!has_same_shape(lhs_type, a.rhs_, name, "assignment", error_msgs)) {
-        pass = false;
-        return;
-      }
-      if (a.lhs_var_occurs_on_rhs()) {
-        // this only requires a warning --- a deep copy will be made
-        error_msgs << "Warning: left-hand side variable"
-                   << " (name=" << name << ")"
-                   << " occurs on right-hand side of assignment, causing"
-                   << " inefficient deep copy to avoid aliasing."
-                   << std::endl;
-      }
-
-      pass = true;
-    }
-    boost::phoenix::function<validate_assgn> validate_assgn_f;
-
-    void validate_assignment::operator()(assignment& a,
-                                         const scope& var_scope,
-                                         bool& pass, const variable_map& vm,
-                                         std::ostream& error_msgs) const {
-      std::string name = a.var_dims_.name_;
-      a.var_type_ = vm.get(name);
-      expr_type inferred_lhs_type
-        = infer_var_dims_type(a.var_type_, a.var_dims_);
-      if (inferred_lhs_type.is_ill_formed()) {
-        error_msgs << "Too many indexes for variable"
-                   << "; variable name = "
-                   << name
-                   << "; num dimensions given = "
-                   << a.var_dims_.dims_.size()
-                   << "; variable array dimensions = "
-                   << a.var_type_.dims_.size()
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      if (!has_same_shape(inferred_lhs_type, a.expr_, name,
-                          "assignment", error_msgs)) {
-        pass = false;
-        return;
-      }
-      pass = true;
-    }
-    boost::phoenix::function<validate_assignment> validate_assignment_f;
-
-    void validate_compound_assignment::operator()(compound_assignment& ca,
-                                         const scope& var_scope,
-                                         bool& pass, variable_map& vm,
-                                         std::ostream& error_msgs) const {
-      std::string name = ca.var_dims_.name_;
-      ca.var_type_ = vm.get(name);
-      expr_type inferred_lhs_type
-        = infer_var_dims_type(ca.var_type_, ca.var_dims_);
-      int lhs_num_dims = ca.var_type_.dims_.size();
-      int lhs_num_idxs = ca.var_dims_.dims_.size();
-
-      if (inferred_lhs_type.is_ill_formed()) {
-        error_msgs << "Too many indexes for variable"
-                   << "; variable name = " << name
-                   << "; specified indexes = " << lhs_num_idxs
-                   << "; variable array dimensions = " << lhs_num_dims
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      // no compound assign for array types  (std::vector)
-      std::string op_equals = ca.op_;
-      ca.op_ = op_equals.substr(0, op_equals.size()-1);
-      if (inferred_lhs_type.num_dims() > 0) {
-        error_msgs << "Cannot apply operator '" << op_equals
-                   << "' to array variable; variable name = "
-                   << name
-                   << ".";
-        error_msgs << std::endl;
-        pass = false;
-        return;
-      }
-
-      expr_type lhs_type = inferred_lhs_type.type();
-      expr_type rhs_type = ca.expr_.expression_type();
-      if (lhs_type.is_primitive()
-          && boost::algorithm::starts_with(ca.op_, ".")) {
-        error_msgs << "Cannot apply element-wise operation to scalar"
-                   << "; compound operator is: " << op_equals
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      if (lhs_type.is_primitive()
-          && rhs_type.is_primitive()
-          && (lhs_type.type().is_double_type() || lhs_type == rhs_type)) {
-        // done checking <prim> <op>= <prim>
+      if (a.is_simple_assignment()) {
+        if (!has_same_shape(lhs_type, a.rhs_, name, "assignment", error_msgs)) {
+          pass = false;
+          return;
+        }
+        if (a.lhs_var_occurs_on_rhs()) {
+          // this only requires a warning --- a deep copy will be made
+          error_msgs << "Warning: left-hand side variable"
+                     << " (name=" << name << ")"
+                     << " occurs on right-hand side of assignment, causing"
+                     << " inefficient deep copy to avoid aliasing."
+                     << std::endl;
+        }
         pass = true;
         return;
-      }
+      } else {
+        // compound operator-assignment
+        std::string op_equals = a.op_;
+        a.op_ = op_equals.substr(0, op_equals.size()-1);
 
-      bool types_compatible =
-        // container types allow infix and element-wise operations
-        // when lhs and rhs are same shape, and broadcast operations
-        // when rhs is double and lhs is vector, row_vector, or matrix
-        (lhs_type == rhs_type
-         || (lhs_type.type().is_vector_type()
-             && rhs_type.type().is_double_type())
-         || (lhs_type.type().is_row_vector_type()
-             && rhs_type.type().is_double_type())
-         || (lhs_type.type().is_row_vector_type()
-             && rhs_type.type().is_matrix_type())
-         || (lhs_type.type().is_matrix_type()
-             && rhs_type.type().is_double_type()));
-      if (!types_compatible) {
-        error_msgs << "Cannot apply operator '" << op_equals
-                   << "' to operands;"
-                   << " left-hand side type = " << lhs_type
-                   << "; right-hand side type=" << rhs_type
-                   << std::endl;
-        pass = false;
-        return;
+        if (lhs_type.num_dims() > 0) {
+          error_msgs << "Cannot apply operator '" << op_equals
+                     << "' to array variable; variable name = "
+                     << name
+                     << ".";
+          error_msgs << std::endl;
+          pass = false;
+          return;
+        }
+
+        expr_type lhs_base_type = lhs_type.type();
+        expr_type rhs_type = a.rhs_.expression_type();
+        if (lhs_base_type.is_primitive()
+            && boost::algorithm::starts_with(a.op_, ".")) {
+          error_msgs << "Cannot apply element-wise operation to scalar"
+                     << "; compound operator is: " << op_equals
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        if (lhs_base_type.is_primitive()
+            && rhs_type.is_primitive()
+            && (lhs_base_type.type().is_double_type()
+                || lhs_base_type == rhs_type)) {
+          pass = true;
+          return;
+        }
+
+        bool types_compatible =
+          // container types allow infix and element-wise operations
+          // when lhs and rhs are same shape, and broadcast operations
+          // when rhs is double and lhs is vector, row_vector, or matrix
+          (lhs_base_type == rhs_type
+           || (lhs_base_type.type().is_vector_type()
+               && rhs_type.type().is_double_type())
+           || (lhs_base_type.type().is_row_vector_type()
+               && rhs_type.type().is_double_type())
+           || (lhs_base_type.type().is_row_vector_type()
+               && rhs_type.type().is_matrix_type())
+           || (lhs_base_type.type().is_matrix_type()
+               && rhs_type.type().is_double_type()));
+        if (!types_compatible) {
+          error_msgs << "Cannot apply operator '" << op_equals
+                     << "' to operands;"
+                     << " left-hand side type = " << lhs_base_type
+                     << "; right-hand side type=" << rhs_type
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        std::string op_name;
+        if (a.op_ == "+") {
+          op_name = "add";
+        } else if (a.op_ == "-") {
+          op_name = "subtract";
+        } else if (a.op_ == "*") {
+          op_name = "multiply";
+        } else if (a.op_ == "/") {
+          op_name = "divide";
+        } else if (a.op_ == "./") {
+          op_name = "elt_divide";
+        } else if (a.op_ == ".*") {
+          op_name = "elt_multiply";
+        }
+        // check that "lhs <op> rhs" is valid stan::math function sig
+        std::vector<function_arg_type> arg_types;
+        arg_types.push_back(function_arg_type(lhs_base_type));
+        arg_types.push_back(function_arg_type(rhs_type));
+        function_signature_t op_equals_sig(lhs_base_type, arg_types);
+        if (!function_signatures::instance().is_defined(op_name,
+                                                        op_equals_sig)) {
+          error_msgs << "Cannot apply operator '" << op_equals
+                     << "' to operands;"
+                     << " left-hand side type = " << lhs_base_type
+                     << "; right-hand side type=" << rhs_type
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        a.op_name_ = op_name;
+        pass = true;
       }
-      std::string op_name;
-      if (ca.op_ == "+") {
-        op_name = "add";
-      } else if (ca.op_ == "-") {
-        op_name = "subtract";
-      } else if (ca.op_ == "*") {
-        op_name = "multiply";
-      } else if (ca.op_ == "/") {
-        op_name = "divide";
-      } else if (ca.op_ == "./") {
-        op_name = "elt_divide";
-      } else if (ca.op_ == ".*") {
-        op_name = "elt_multiply";
-      }
-      // check that "lhs <op> rhs" is valid stan::math function sig
-      std::vector<function_arg_type> arg_types;
-      arg_types.push_back(function_arg_type(lhs_type));
-      arg_types.push_back(function_arg_type(rhs_type));
-      function_signature_t op_equals_sig(lhs_type, arg_types);
-      if (!function_signatures::instance().is_defined(op_name, op_equals_sig)) {
-        error_msgs << "Cannot apply operator '" << op_equals
-                   << "' to operands;"
-                   << " left-hand side type = " << lhs_type
-                   << "; right-hand side type=" << rhs_type
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      ca.op_name_ = op_name;
-      pass = true;
     }
-    boost::phoenix::function<validate_compound_assignment>
-    validate_compound_assignment_f;
+    boost::phoenix::function<validate_assgn> validate_assgn_f;
 
     void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,

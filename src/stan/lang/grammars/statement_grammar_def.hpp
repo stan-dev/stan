@@ -18,20 +18,8 @@
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::assgn,
                           (stan::lang::variable, lhs_var_)
                           (std::vector<stan::lang::idx>, idxs_)
-                          (stan::lang::expression, rhs_) )
-
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::assignment,
-                          (stan::lang::variable_dims, var_dims_)
-                          (stan::lang::expression, expr_) )
-
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::compound_assignment,
-                          (stan::lang::variable_dims, var_dims_)
                           (std::string, op_)
-                          (stan::lang::expression, expr_) )
-
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::variable_dims,
-                          (std::string, name_)
-                          (std::vector<stan::lang::expression>, dims_) )
+                          (stan::lang::expression, rhs_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::distribution,
                           (std::string, family_)
@@ -133,9 +121,7 @@ namespace stan {
         | reject_statement_r(_r1)                   // key "reject"
         | void_return_statement_r(_r1)              // key "return"
         | return_statement_r(_r1)                   // key "return"
-        | assignment_r(_r1)                         // lvalue "=" or "<-"
-        | compound_assignment_r(_r1)                // lvalue "+=" or "-="
-        | assgn_r(_r1)                              // var[idxs] <- expr
+        | assgn_r(_r1)                              // var[idxs] = expr
         | sample_r(_r1)                             // expression "~"
         | expression_g(_r1)                         // expression
         [expression_as_statement_f(_pass, _1,
@@ -301,44 +287,12 @@ namespace stan {
                                      boost::phoenix::ref(error_msgs_))];
 
       // _r1 = var scope
-      // this one comes before assgn_r to deal with simple assignment
-      assignment_r.name("variable assignment by expression");
-      assignment_r
-        %= var_lhs_r(_r1)[assign_lhs_f(_a, _1)]
-        >> assignment_operator_r
-        > (eps[validate_lhs_var_assignment_f(_a, _r1, _pass,
-                                             boost::phoenix::ref(var_map_),
-                                             boost::phoenix::ref(error_msgs_))]
-           > expression_rhs_r(_r1)
-           [validate_assignment_f(_val, _r1, _pass,
-                                  boost::phoenix::ref(var_map_),
-                                  boost::phoenix::ref(error_msgs_))])
-        > lit(';');
-
-      // _r1 = var scope
-      compound_assignment_r.name("variable compound op-equals by expression");
-      compound_assignment_r
-        %= var_lhs_r(_r1)[assign_lhs_f(_a, _1)]
-        >> (string("+=")
-            | string("-=")
-            | string("*=")
-            | string("/=")
-            | string(".*=")
-            | string("./="))
-        >> (eps[validate_lhs_var_assignment_f(_a, _r1, _pass,
-                                             boost::phoenix::ref(var_map_),
-                                             boost::phoenix::ref(error_msgs_))]
-            > expression_rhs_r(_r1))
-           [validate_compound_assignment_f(_val, _r1, _pass,
-                                           boost::phoenix::ref(var_map_),
-                                           boost::phoenix::ref(error_msgs_))]
-        > lit(';');
-
-      // _r1 = var scope
-      assgn_r.name("indexed variable assginment statement");
+      assgn_r.name("assignment statement");
       assgn_r
-        %= var_r(_r1)
-        >> indexes_g(_r1)
+        %= identifier_r[set_lhs_var_assgn_f(_val, _1, _pass,
+                                            boost::phoenix::ref(var_map_),
+                                            boost::phoenix::ref(error_msgs_))]
+        >> opt_idxs_r(_r1)
         >> assignment_operator_r
         >> (eps[validate_lhs_var_assgn_f(_val, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
@@ -351,17 +305,16 @@ namespace stan {
 
       assignment_operator_r.name("assignment operator");
       assignment_operator_r
-        %= lit("<-")
-           [deprecate_old_assignment_op_f(boost::phoenix::ref(error_msgs_))]
-        | (lit("=") >> no_skip[!char_("=")]);
-
-      // _r1 = var scope
-      var_r.name("variable for left-hand side of assignment");
-      var_r
-        = identifier_r
-          [validate_lhs_var_assgn_silent_f(_1, _r1, _val,  _pass,
-                                    boost::phoenix::ref(var_map_),
-                                    boost::phoenix::ref(error_msgs_))];
+        %= (string("=") >> no_skip[!char_("=")])
+        | string("+=")
+        | string("-=")
+        | string("*=")
+        | string("/=")
+        | string(".*=")
+        | string("./=")
+        | string("<-")
+          [deprecate_old_assignment_op_f(_val,
+                                         boost::phoenix::ref(error_msgs_))];
 
       // separate rule for name on expectation failure
       // _r1 = var scope
@@ -370,25 +323,15 @@ namespace stan {
         %= expression_g(_r1);
 
       // _r1 = var scope
-      var_lhs_r.name("variable and array dimensions");
-      var_lhs_r
-        %= identifier_r
-        >> opt_dims_r(_r1);
+      opt_idxs_r.name("array indexes (optional)");
+      opt_idxs_r
+        %=  *idxs_r(_r1);
+
+      idxs_r.name("array indexes");
+      idxs_r
+        %= indexes_g(_r1);
 
       // _r1 = var scope
-      opt_dims_r.name("array dimensions (optional)");
-      opt_dims_r
-        %=  *dims_r(_r1);
-
-      // _r1 = var scope
-      dims_r.name("array dimensions");
-      // uses silent test because errors will be reported in sliced rules
-      dims_r
-        %= lit('[')
-        >> (expression_g(_r1)[validate_int_expr_silent_f(_1, _pass)] % ',')
-        >> lit(']');
-
-      // inherited  _r1 = var scope
       sample_r.name("distribution of expression");
       sample_r
         %= (expression_g(_r1)

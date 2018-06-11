@@ -385,8 +385,8 @@ namespace stan {
     add_conditional_body_f;
 
     // called from: statement_grammar
-    struct deprecate_old_assignment_op : public phoenix_functor_unary {
-      void operator()(std::ostream& error_msgs) const;
+    struct deprecate_old_assignment_op : public phoenix_functor_binary {
+      void operator()(std::string& op, std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<deprecate_old_assignment_op>
     deprecate_old_assignment_op_f;
@@ -416,13 +416,12 @@ namespace stan {
     validate_void_return_allowed_f;
 
     // called from: statement_grammar
-    struct validate_lhs_var_assgn_silent : public phoenix_functor_senary {
-      void operator()(const std::string& name, const scope& var_scope,
-                      variable& v, bool& pass, const variable_map& vm,
-                      std::ostream& error_msgs) const;
+    struct set_lhs_var_assgn : public phoenix_functor_quinary {
+      void operator()(assgn& a, const std::string& name, bool& pass,
+                      const variable_map& vm, std::ostream& error_msgs) const;
     };
-    extern boost::phoenix::function<validate_lhs_var_assgn_silent>
-    validate_lhs_var_assgn_silent_f;
+    extern boost::phoenix::function<set_lhs_var_assgn>
+    set_lhs_var_assgn_f;
 
     // called from: statement_grammar
     struct validate_lhs_var_assgn : public phoenix_functor_quinary {
@@ -434,40 +433,12 @@ namespace stan {
     validate_lhs_var_assgn_f;
 
     // called from: statement_grammar
-    struct validate_lhs_var_assignment : public phoenix_functor_quinary {
-      void operator()(variable_dims& v,
-                      const scope& var_scope,
-                      bool& pass, const variable_map& vm,
-                      std::ostream& error_msgs) const;
-    };
-    extern boost::phoenix::function<validate_lhs_var_assignment>
-    validate_lhs_var_assignment_f;
-
-    // called from: statement_grammar
     struct validate_assgn : public phoenix_functor_quaternary {
-      void operator()(const assgn& a, bool& pass,
+      void operator()(assgn& a, bool& pass,
                       const variable_map& vm, std::ostream& error_msgs)
         const;
     };
     extern boost::phoenix::function<validate_assgn> validate_assgn_f;
-
-    // called from: statement_grammar
-    struct validate_assignment : public phoenix_functor_quinary {
-      void operator()(assignment& a, const scope& var_scope,
-                      bool& pass, const variable_map& vm,
-                      std::ostream& error_msgs) const;
-    };
-    extern boost::phoenix::function<validate_assignment>
-    validate_assignment_f;
-
-    // called from: statement_grammar
-    struct validate_compound_assignment : public phoenix_functor_quinary {
-      void operator()(compound_assignment& a, const scope& var_scope,
-                      bool& pass, variable_map& vm, std::ostream& error_msgs)
-        const;
-    };
-    extern boost::phoenix::function<validate_compound_assignment>
-    validate_compound_assignment_f;
 
     // called from: statement_grammar
     struct validate_sample : public phoenix_functor_quaternary {
