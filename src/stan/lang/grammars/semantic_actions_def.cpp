@@ -934,7 +934,8 @@ namespace stan {
     }
     boost::phoenix::function<add_conditional_body> add_conditional_body_f;
 
-    void deprecate_old_assignment_op::operator()(std::string& op, std::ostream& error_msgs)
+    void deprecate_old_assignment_op::operator()(std::string& op,
+                                                 std::ostream& error_msgs)
       const {
       error_msgs << "Warning (non-fatal): assignment operator <- deprecated"
                  << " in the Stan language;"
@@ -994,7 +995,7 @@ namespace stan {
     boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
-    void validate_lhs_var_assgn::operator()(assgn& a, 
+    void validate_lhs_var_assgn::operator()(assgn& a,
                                             const scope& var_scope,
                                             bool& pass, const variable_map& vm,
                                             std::ostream& error_msgs) const {
@@ -1021,7 +1022,7 @@ namespace stan {
       a.lhs_var_ = v;
     }
     boost::phoenix::function<set_lhs_var_assgn> set_lhs_var_assgn_f;
-    
+
     void validate_assgn::operator()(assgn& a, bool& pass,
                                     const variable_map& vm,
                                     std::ostream& error_msgs) const {
@@ -1050,10 +1051,11 @@ namespace stan {
         }
         pass = true;
         return;
-      } else { // compound operator-assignment
-        // no compound assign for array types
+      } else {
+        // compound operator-assignment
         std::string op_equals = a.op_;
         a.op_ = op_equals.substr(0, op_equals.size()-1);
+
         if (lhs_type.num_dims() > 0) {
           error_msgs << "Cannot apply operator '" << op_equals
                      << "' to array variable; variable name = "
@@ -1076,8 +1078,8 @@ namespace stan {
         }
         if (lhs_base_type.is_primitive()
             && rhs_type.is_primitive()
-            && (lhs_base_type.type().is_double_type() || lhs_base_type == rhs_type)) {
-          // done checking <prim> <op>= <prim>
+            && (lhs_base_type.type().is_double_type()
+                || lhs_base_type == rhs_type)) {
           pass = true;
           return;
         }
@@ -1123,7 +1125,8 @@ namespace stan {
         arg_types.push_back(function_arg_type(lhs_base_type));
         arg_types.push_back(function_arg_type(rhs_type));
         function_signature_t op_equals_sig(lhs_base_type, arg_types);
-        if (!function_signatures::instance().is_defined(op_name, op_equals_sig)) {
+        if (!function_signatures::instance().is_defined(op_name,
+                                                        op_equals_sig)) {
           error_msgs << "Cannot apply operator '" << op_equals
                      << "' to operands;"
                      << " left-hand side type = " << lhs_base_type

@@ -417,7 +417,7 @@ namespace stan {
 
     // called from: statement_grammar
     struct set_lhs_var_assgn : public phoenix_functor_quinary {
-      void operator()(assgn& a, const std::string& name, bool& pass, 
+      void operator()(assgn& a, const std::string& name, bool& pass,
                       const variable_map& vm, std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<set_lhs_var_assgn>

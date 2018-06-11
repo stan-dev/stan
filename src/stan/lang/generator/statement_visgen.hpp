@@ -132,16 +132,6 @@ namespace stan {
 
       void operator()(const nil& /*x*/) const { }
 
-      void operator()(const compound_assignment& x) const {
-        std::cout << "generate compound_assignment statment"
-                  << " (shouldn't happen)" << std::endl;
-      }
-
-      void operator()(const assignment& x) const {
-        std::cout << "generate assignment statment"
-                  << " (shouldn't happen)" << std::endl;
-      }
-
       void operator()(const assgn& y) const {
         // use stan::math::asign when no idxs (lhs_simple)
         // use stan::model::asign when indexed (!lhs_simple)
@@ -151,7 +141,7 @@ namespace stan {
         // need expr for rhs in compound operator-assign
         index_op_sliced lhs_expr(y.lhs_var_, y.idxs_);
         lhs_expr.infer_type();
-          
+
         generate_indent(indent_, o_);
         if (lhs_simple) {
           o_ << "stan::math::assign(";
@@ -189,7 +179,7 @@ namespace stan {
             o_ << ", ";
             generate_expression(y.rhs_, NOT_USER_FACING, o_);
             o_ << ")";
-          }            
+          }
         }
 
         if (y.idxs_.size() == 0) {

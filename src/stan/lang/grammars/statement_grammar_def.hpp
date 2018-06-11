@@ -286,23 +286,8 @@ namespace stan {
            [validate_int_expr_no_error_msgs_f(_1, _pass,
                                      boost::phoenix::ref(error_msgs_))];
 
-
       // _r1 = var scope
-      // compound_assignment_r.name("variable compound op-equals by expression");
-      // compound_assignment_r
-      //   %= var_lhs_r(_r1)[assign_lhs_f(_a, _1)]
-      //   >> (
-      //   >> (eps[validate_lhs_var_assignment_f(_a, _r1, _pass,
-      //                                        boost::phoenix::ref(var_map_),
-      //                                        boost::phoenix::ref(error_msgs_))]
-      //       > expression_rhs_r(_r1))
-      //      [validate_compound_assignment_f(_val, _r1, _pass,
-      //                                      boost::phoenix::ref(var_map_),
-      //                                      boost::phoenix::ref(error_msgs_))]
-      //   > lit(';');
-
-      // _r1 = var scope
-      assgn_r.name("indexed variable assginment statement");
+      assgn_r.name("assignment statement");
       assgn_r
         %= identifier_r[set_lhs_var_assgn_f(_val, _1, _pass,
                                             boost::phoenix::ref(var_map_),
