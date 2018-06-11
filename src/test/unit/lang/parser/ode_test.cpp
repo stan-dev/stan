@@ -119,3 +119,49 @@ TEST(lang_parser, integrate_ode_bdf_control_bad) {
   test_throws("ode/bad_x_var_type_bdf_control",
       "sixth argument to integrate_ode_bdf (real data) must be data only");
 }
+
+TEST(lang_parser, integrate_ode_adams_bad) {
+  test_throws("ode/adams/bad_adams_control_function_return",
+      "first argument to integrate_ode_adams must be the name of a function with signature");
+  test_throws("ode/adams/bad_fun_type",
+      "first argument to integrate_ode_adams must be the name of a function with signature");
+  test_throws("ode/adams/bad_y_type",
+              "second argument to integrate_ode_adams must have type real[]");
+  test_throws("ode/adams/bad_t_type",
+          "third argument to integrate_ode_adams must have type real or int");
+  test_throws("ode/adams/bad_ts_type",
+              "fourth argument to integrate_ode_adams must have type real[]");
+  test_throws("ode/adams/bad_theta_type",
+              "fifth argument to integrate_ode_adams must have type real[]");
+  test_throws("ode/adams/bad_x_type",
+              "sixth argument to integrate_ode_adams must have type real[]");
+  test_throws("ode/adams/bad_x_int_type",
+              "seventh argument to integrate_ode_adams must have type int[]");
+  test_throws("ode/adams/bad_t0_var_type",
+      "third argument to integrate_ode_adams (initial times) must be data only");
+  test_throws("ode/adams/bad_x_var_type",
+      "sixth argument to integrate_ode_adams (real data) must be data only");
+}
+
+TEST(lang_parser, integrate_ode_adams_control_bad) {
+  test_throws("ode/adams/bad_fun_type_control",
+      "first argument to integrate_ode_adams must be the name of a function with signature");
+  test_throws("ode/adams/bad_y_type_control",
+              "second argument to integrate_ode_adams must have type real[]");
+  test_throws("ode/adams/bad_t_type_control",
+          "third argument to integrate_ode_adams must have type real or int");
+  test_throws("ode/adams/bad_ts_type_control",
+              "fourth argument to integrate_ode_adams must have type real[]");
+  test_throws("ode/adams/bad_theta_type_control",
+              "fifth argument to integrate_ode_adams must have type real[]");
+  test_throws("ode/adams/bad_x_type_control",
+              "sixth argument to integrate_ode_adams must have type real[]");
+  test_throws("ode/adams/bad_x_int_type_control",
+              "seventh argument to integrate_ode_adams must have type int[]");
+  test_throws("ode/adams/bad_t0_var_type_control",
+      "third argument to integrate_ode_adams (initial times) must be data only");
+  test_throws("ode/adams/bad_ts_var_type_control",
+    "fourth argument to integrate_ode_adams (solution times) must be data only");
+  test_throws("ode/adams/bad_x_var_type_adams_control",
+      "sixth argument to integrate_ode_adams (real data) must be data only");
+}
