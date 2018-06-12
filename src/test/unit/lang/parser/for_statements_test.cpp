@@ -38,5 +38,9 @@ TEST(langParserForLoop, BadLoopVarAssign) {
   "Loop variable v cannot be used on left side of assignment statement");
   test_throws("for_loops/assign_to_loop_var5",
   "Loop variable v cannot be used on left side of assignment statement");
+  test_throws("for_loops/assign_to_loop_var6",
+  "Loop variable v cannot be used on left side of assignment statement");
+  test_throws("for_loops/assign_to_loop_var7",
+  "Loop variable v cannot be used on left side of assignment statement");
 }
 

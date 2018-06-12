@@ -416,10 +416,9 @@ namespace stan {
     validate_void_return_allowed_f;
 
     // called from: statement_grammar
-    struct validate_lhs_var_assgn_silent : public phoenix_functor_senary {
+    struct validate_lhs_var_assgn_silent : public phoenix_functor_quinary {
       void operator()(const std::string& name, const scope& var_scope,
-                      variable& v, bool& pass, const variable_map& vm,
-                      std::ostream& error_msgs) const;
+                      variable& v, bool& pass, const variable_map& vm) const;
     };
     extern boost::phoenix::function<validate_lhs_var_assgn_silent>
     validate_lhs_var_assgn_silent_f;
@@ -505,11 +504,11 @@ namespace stan {
     extern boost::phoenix::function<add_while_body> add_while_body_f;
 
     // called from: statement_grammar
-    struct add_loop_identifier : public phoenix_functor_senary {
+    struct add_loop_identifier : public phoenix_functor_quinary {
       void operator()(const std::string& name,
                       std::string& name_local,
                       const scope& var_scope,
-                      bool& pass, variable_map& vm,
+                      variable_map& vm,
                       std::stringstream& error_msgs) const;
     };
     extern boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
