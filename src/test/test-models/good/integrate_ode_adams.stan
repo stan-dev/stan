@@ -25,12 +25,10 @@ parameters {
 }
 model {
   real y_hat[T,2];
-  y_hat = integrate_ode_adams(sho, y0_d, t0, ts, theta_d, x, x_int);
   y_hat = integrate_ode_adams(sho, y0_d, t0, ts, theta_p, x, x_int);
   y_hat = integrate_ode_adams(sho, y0_p, t0, ts, theta_d, x, x_int);
   y_hat = integrate_ode_adams(sho, y0_p, t0, ts, theta_p, x, x_int);
 
-  y_hat = integrate_ode_adams(sho, y0_d, t0, ts, theta_d, x, x_int, 1e-10, 1e-10, 1e8);
   y_hat = integrate_ode_adams(sho, y0_d, t0, ts, theta_p, x, x_int, 1e-10, 1e-10, 1e8);
   y_hat = integrate_ode_adams(sho, y0_p, t0, ts, theta_d, x, x_int, 1e-10, 1e-10, 1e8);
   y_hat = integrate_ode_adams(sho, y0_p, t0, ts, theta_p, x, x_int, 1e-10, 1e-10, 1e8);
