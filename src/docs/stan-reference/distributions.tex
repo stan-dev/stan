@@ -139,7 +139,7 @@ probability function.  For instance, \code{normal\_cdf(y,~mu,~sigma)}
 is defined by
 %
 \[
-\int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \ \mathrm{d}y.
+\int_{-\infty}^y \distro{Normal}(y \, | \, \mu, \sigma) \ \mathrm{d}y.
 \]
 %
 There are also log forms of the CDF and CCDF for most univariate
@@ -147,14 +147,14 @@ distributions.  For example, \code{normal\_lcdf(y~|~mu,~sigma)} is
 defined by
 %
 \[
-\log \left( \int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \
+\log \left( \int_{-\infty}^y \distro{Normal}(y \, | \, \mu, \sigma) \
   \mathrm{d}y \right)
 \]
 %
 and \code{normal\_lccdf(y | mu,~sigma)} is defined by
 %
 \[
-\log \left( 1 - \int_0^y \distro{Normal}(y \, | \, \mu, \sigma) \
+\log \left( 1 - \int_{-\infty}^y \distro{Normal}(y \, | \, \mu, \sigma) \
   \mathrm{d}y \right).
 \]
 
@@ -642,7 +642,7 @@ then for $n \in \setlist{\max(0,N-b),\ldots,\min(a,N)}$,
 \end{description}
 %
 \begin{description}
-\fitem{int}{hypergeometric\_rng}{int \farg{N}, real \farg{a}, real
+\fitem{int}{hypergeometric\_rng}{int \farg{N}, int \farg{a}, int2
    \farg{b}}{Generate a hypergeometric variate with \farg{N} trials, total
     success count of \farg{a}, and total failure count of \farg{b}; may only
     be used in generated quantities block}
@@ -2101,27 +2101,27 @@ non-negative real numbers.
     see \refsection{prng-vectorization}.}
 \end{description}
 
-\section{Wiener Diffusion Model Distributions}
+\section{Wiener First Passage Time Distribution}
 
 \subsubsection{Probability Density Function}
 
 If $\alpha \in \posreals$, $\tau \in \posreals$, $\beta \in [0, 1]$
-and $\delta \in \reals$, then for $y \in (0, \tau)$,
+and $\delta \in \reals$, then for $y > \tau$,
 %
 \[
 \distro{Wiener}(y|\alpha, \tau, \beta, \delta)
 =
-\frac{\alpha}{(y-\tau)^3/2}
+\frac{\alpha^3}{(y-\tau)^{3/2}}
 %
 \exp \! \left(- \delta \alpha \beta - \frac{\delta^2(y-\tau)}{2}\right)
 %
 \sum_{k = - \infty}^{\infty} (2k + \beta)
 %
-\phi \! \left(\frac{2k + \alpha \beta}{\sqrt{y - \tau}}\right)
+\phi \! \left(\frac{2k \alpha + \beta}{\sqrt{y - \tau}}\right)
 \]
 %
-where $\phi(x)$ denotes the standard normal density function
-\citep{Blurton2012}.
+where $\phi(x)$ denotes the standard normal density function;  see
+\citep{Feller1968, NavarroFuss2009}.
 
 \pitem{y}{wiener}{alpha, tau, beta, delta}
 
@@ -2138,13 +2138,14 @@ where $\phi(x)$ denotes the standard normal density function
 \subsubsection{Boundaries}
 
 Stan returns the first passage time of the accumulation process
-over the upper boundary only. Therefore, one needs to calculate:
+over the upper boundary only. To get the result for the lower
+boundary, use
+%
 \[
-\distro{wiener}(y|\alpha, \tau, 1 - \beta, - \delta).
+\distro{wiener}(y | \alpha, \tau, 1 - \beta, - \delta)
 \]
-
-To get the result for the lower
-boundary. For more details, see the appendix of
+%
+For more details, see the appendix of
 \citet{Vandekerckhove-Wabersich:2014}.
 
 \chapter{Positive Lower-Bounded Probabilities}
@@ -2838,6 +2839,68 @@ $\theta \in \mbox{$K$-simplex}$,
 $\theta_i = 0$ or $\theta_i = 1$, then the probability is 0 and the log
 probability is $-\infty$.  Similarly, the distribution requires
 strictly positive parameters, with $\alpha_i > 0$ for each $i$.
+
+\subsubsection{Meaning of Dirichlet Parameters}
+
+A symmetric Dirichlet prior is $[\alpha, \ldots, \alpha]^{\top}$.  To
+code this in Stan,
+
+\begin{stancode}
+data {
+  int<lower = 1> K;
+  real<lower = 0> alpha;
+}
+generated quantities {
+  vector[K] theta = dirichlet_rng(rep_vector(alpha, K));
+}
+\end{stancode}
+
+Taking $K = 10$, here are the first five draws for
+$\alpha = 0.001$.
+For $\alpha = 1$, the distribution is uniform over simplexes.
+%
+\begin{stancode}
+1) 0.17 0.05 0.07 0.17 0.03 0.13 0.03 0.03 0.27 0.05
+2) 0.08 0.02 0.12 0.07 0.52 0.01 0.07 0.04 0.01 0.06
+3) 0.02 0.03 0.22 0.29 0.17 0.10 0.09 0.00 0.05 0.03
+4) 0.04 0.03 0.21 0.13 0.04 0.01 0.10 0.04 0.22 0.18
+5) 0.11 0.22 0.02 0.01 0.06 0.18 0.33 0.04 0.01 0.01
+\end{stancode}
+%
+That does not mean it's uniform over the marginal probabilities of
+each element.  As the size of the simplex grows, the marginal draws
+become more and more concentrated below (not around) $1/K$.  When one
+component of the simplex is large, the others must all be relatively
+small to compensate.  For example, in a uniform distribution on
+$10$-simplexes, the probability that a component is greater than the
+mean of $1/10$ is only 39\%.  Most of the posterior marginal
+probability mass for each component is in the interval $(0, 0.1)$.
+
+When the $\alpha$ value is small, the draws gravitate to the corners
+of the simplex.  Here are the first five draws for $\alpha = 0.001$.
+%
+\begin{stancode}
+1) 3e-203 0e+00 2e-298 9e-106 1e+000 0e+00 0e+000 1e-047 0e+00 4e-279
+2) 1e+000 0e+00 5e-279 2e-014 1e-275 0e+00 3e-285 9e-147 0e+00 0e+000
+3) 1e-308 0e+00 1e-213 0e+000 0e+000 8e-75 0e+000 1e+000 4e-58 7e-112
+4) 6e-166 5e-65 3e-068 3e-147 0e+000 1e+00 3e-249 0e+000 0e+00 0e+000
+5) 2e-091 0e+00 0e+000 0e+000 1e-060 0e+00 4e-312 1e+000 0e+00 0e+000
+\end{stancode}
+%
+Each row denotes a draw.  Each draw has a single value that rounds to
+one and other values that are very close to zero or rounded down to
+zero.
+
+%
+As $\alpha$ increases, the draws become increasingly uniform.  For $\alpha = 1000$,
+%
+\begin{stancode}
+1) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
+2) 0.10 0.10 0.09 0.10 0.10 0.10 0.11 0.10 0.10 0.10
+3) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
+4) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
+5) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
+\end{stancode}
 
 
 \pitem{theta}{dirichlet}{alpha}

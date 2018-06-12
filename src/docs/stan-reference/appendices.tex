@@ -117,7 +117,7 @@ you can look for similar structures in these examples.
 
 \begin{itemize}
 \item \BUGS is interpreted; Stan is compiled in two steps, first a
-  model is is translated to templated C++ and then to a
+  model is translated to templated C++ and then to a
   platform-specific executable.  Stan, unlike \BUGS, allows the user
   to directly program in C++, but we do not describe how to do this in
   this Stan manual (see the getting started with \Cpp section of
@@ -886,77 +886,6 @@ adds 1 to the array dimension and a matrix adds 2.  That is, the type
 index positions: three for the array, one for the row of the matrix
 and one for the column.
 
-\chapter{Warning and Error Messages}\label{error-messages.appendix}
-
-\noindent
-This appendix details the specific error messages returned by the
-underlying Stan engine.  The individual Stan interfaces (RStan,
-PyStan, CmdStan) also return error or warning messages in some
-circumstances.
-
-\section{Warnings vs.\ Errors}
-
-The messages returned by Stan come in two flavors, warnings and
-errors.  Error messages arise when a fatal problem occurs under the
-hood from which there is no way to recover.  Warning messages arise
-in circumstances from which the underlying program can continue to
-operate.
-
-An example warning message is an informational message about
-ill-formed input to an underlying function, which results in a
-Metropolis rejection during sampling or a reduction in step size for
-optimization, without causing a fatal error.  An example error message
-is when either sampling or optimization cannot find a region of
-non-zero probability or when a program being parsed is ill formed.
-When an error arises, whatever program is running cannot continue and
-the entire execution must halt.
-
-\section{Parsing and Compilation}
-
-Both warning messages and error messages may arise during parsing.  If
-a Stan program parses successfully, it should compile in \Cpp as
-well.  If it does not compile, there is an underlying bug in Stan's
-parser and \Cpp code generator.
-
-\begin{itemize}
-\item {\it Jacobian may be necessary.}  This message arises when the
-  parser cannot verify that the left-hand side of a sampling statement
-  is a linear function of a parameter.  If it is not a linear function
-  of the parameters, a Jacobian adjustment must be applied.  See
-  \refchapter{change-of-variables} for more information on how to
-  adjust for the Jacobian of a non-linear transform
-\end{itemize}
-
-
-\section{Initialization}
-
-\begin{itemize}
-\item {\it vanishing density.} This message arises when there is a
-  problem with initialization not providing a finite log probability.
-%
-\end{itemize}
-
-\section{Function Evaluation}
-
-\begin{itemize}
-\item {\it informational message.}  This message shows up during
-  sampling when there is a rejected sample due to an underlying issue
-  with input to an underlying function (including probably functions
-  and sampling statements).  This is a {\it warning}\, message, not an
-  error message.  If it only appears at the beginning of warmup in
-  MCMC or during early iterations of optimization, it indicates that
-  adaptation has not yet found appropriate scales for the parameters
-  and an appropriate overall stepsize.  This causes problem like
-  overflow or underflow and thus causes illegal inputs to be passed to
-  functions.  Even if this message persists during sampling, the
-  Metropolis acceptance step will account for the problem and the
-  parameter values being evaluated will be rejected.  This can lead to
-  inefficiency in the best case and lack of ability to make progress
-  in the worst case.  In cases where the message persists, it is worth
-  investigating the arithmetic stability of the Stan program.  There
-  are several tips in this manual and in the user group about how to
-  rewrite problematic programs.
-\end{itemize}
 
 \chapter{Deprecated Features}\label{deprecated-features.appendix}
 
