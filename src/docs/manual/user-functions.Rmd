@@ -84,7 +84,7 @@ the [section on function bodies](#function-bodies.section) for more information 
 types of function.
 
 
-## Unsized Argument Types
+## Argument Types and Qualifiers
 
 Stan's functions all have declared types for both arguments and
 returned value.  As with built-in functions, user-defined functions are
@@ -141,6 +141,29 @@ Any errors raised by calls to functions inside user functions or
 return type mismatches are simply passed on;  this typically results
 in a warning message and rejection of a proposal during sampling or
 optimization.
+
+### Data-only Qualifiers {-}
+
+Some of Stan's built-in functions, like the differential equation
+solvers, have arguments that must be data.  Such data-only arguments
+must be expressions involving only data, transformed data, and
+generated quantity variables.
+
+In user-defined functions, the qualifier `data` may be placed before
+an argument type declaration to indicate that the argument must be
+data only.  For example,
+
+```
+real foo(data real x) {
+  return x^2;
+}
+```
+
+requires the argument `x` to be data only.
+
+Declaring an argument data only allows type inference to proceed in
+the body of the function so that, for example, the variable may be
+used as a data-only argument to a built-in function.
 
 
 ## Function Bodies {#function-bodies.section}

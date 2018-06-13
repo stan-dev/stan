@@ -297,9 +297,9 @@ format.
 
 Bounds for integer or real variables may be arbitrary expressions.
 The only requirement is that they only include variables that have
-been defined before the declaration.  If the bounds themselves are
-parameters, the behind-the-scenes variable transform accounts for them
-in the log Jacobian.
+been declared (though not necessarily defined) before the declaration.
+If the bounds themselves are parameters, the behind-the-scenes
+variable transform accounts for them in the log Jacobian.
 
 For example, it is acceptable to have the
 following declarations.
@@ -335,6 +335,31 @@ This declares a positive integer data variable `N`, an array
 ranging between the minimum and maximum value of `y`.  As shown
 in the example code, the functions `min()` and `max()` may
 be applied to containers such as arrays.
+
+A more subtle case involves declarations of parameters or transformed
+paramerrs based on parameters declared previously.  For example, the
+following program will work as intended.
+
+```
+parameters {
+  real a;
+  real<lower = a> b;  // enforces a < b
+}
+transformed parameters {
+  real c;
+  real<lower = c> d;
+  c = a;
+  d = b;
+}
+```
+
+The parameters instance works because all parameters are defined
+externally before the block is executed.  The transformed parameters
+case works even though `c` isn't defined at the point it is used,
+because constraints on transformed parameters are only validated at
+the end of the block.  Data variables work like parameter variables,
+whereas transformed data and generated quantity variables work like
+transformed parameter variables.
 
 ### Declaring Optional Variables {-}
 
@@ -569,12 +594,27 @@ a[1] = b;
 This copies the values from row vector `b` to `a[1]`, which
 is the first row of the matrix `a`.  If the number of columns in
 `a` is not the same as the size of `b`, a run-time error is
-raised;  the number of rows of `a` is `N`, which is also the
-size of `b`.
+raised;  the number of columns of `a` is `N`, which is also the
+number of columns of `b`.
 
 Assignment works by copying values in Stan.  That means any subsequent
 assignment to `a[1]` does not affect `b`, nor does an
 assignment to `b` affect `a`.
+
+
+### Covariance Matrices {-}
+
+Matrix variables may be constrained to represent covariance matrices.
+A matrix is a covariance matrix if it is symmetric and positive
+definite.  Like correlation matrices, covariance matrices only need a
+single dimension in their declaration.  For instance,
+
+```stan
+cov_matrix[K] Omega;
+```
+
+declares `Omega` to be a $K \times K$ covariance matrix, where
+$K$ is the value of the data variable `K`.
 
 
 ### Correlation Matrices {-}
@@ -594,6 +634,36 @@ declares `Sigma` to be a $3 \times 3$ correlation matrix.
 Correlation matrices may be assigned to other matrices, including
 unconstrained matrices, if their dimensions match, and vice-versa.
 
+
+### Cholesky Factors of Covariance Matrices {-}
+
+Matrix variables may be constrained to represent the Cholesky factors
+of a covariance matrix.  This is often more convenient or more
+efficient than representing covariance matrices directly.
+
+A Cholesky factor $L$ is an $M \times N$ lower-triangular matrix (if
+$m < n$ then $L[m, n] =0$) with a strictly positive diagonal ($L[k, k]
+> 0$) and $M \geq N$.  If $L$ is a Cholesky factor, then $\Sigma = L
+\, L^{\top}$ is a covariance matrix (i.e., it is positive definite).
+The mapping between positive definite matrixes and their Cholesky
+factors is bijective---every covariance matrix has a unique Cholesky
+factorization.
+
+The typical case of a square Cholesky factor may be declared with a
+single dimension,
+
+```stan
+cholesky_factor_cov[4] L;
+```
+
+#### Cholesky factors of positive semi-definite matrices {-}
+
+In general, two dimensions may be declared, with the above being equal to
+`cholesky_factor_cov[4, 4]`.  The
+type `cholesky_factor_cov[M, N]` may be used for the general
+$M \times N$ case to produce positive semi-definite matrices of rank $M$.
+
+
 ### Cholesky Factors of Correlation Matrices {-}
 
 Matrix variables may be constrained to represent the Cholesky factors
@@ -606,53 +676,13 @@ Cholesky factor for a correlation matrix, then $L\,L^{\top}$ is a
 correlation matrix (i.e., symmetric positive definite with a unit
 diagonal).
 
-A declaration such as
-follows.
+To declare the variable `L` to be a `K` by `K` Cholesky factor of a
+correlation matrix, the following code may be used.
 
 ```stan
 cholesky_factor_corr[K] L;
 ```
 
-declares `L` to be a Cholesky factor for a `K` by `K`
-correlation matrix.
-
-### Covariance Matrices {-}
-
-Matrix variables may be constrained to represent covariance matrices.
-A matrix is a covariance matrix if it is symmetric and positive
-definite.  Like correlation matrices, covariance matrices only need a
-single dimension in their declaration.  For instance,
-
-```stan
-cov_matrix[K] Omega;
-```
-
-declares `Omega` to be a $K \times K$ covariance matrix, where
-$K$ is the value of the data variable `K`.
-
-### Cholesky Factors of Covariance Matrices {-}
-
-Matrix variables may be constrained to represent the Cholesky factors
-of a covariance matrix.  This is often more convenient or more
-efficient than representing covariance matrices directly.
-
-A Cholesky factor $L$ is an $M \times N$ lower-triangular matrix (if
-$m < n$ then $L[m, n] =0$) with a strictly positive diagonal ($L[k, k]
-> 0$) and $M \geq N$.  If $L$ is a Cholesky factor, then $\Sigma = L
-\, L^{\top}$ is a covariance matrix.  Furthermore, every covariance
-matrix has a Cholesky factorization.
-
-The typical case of a square Cholesky factor may be declared with a
-single dimension,
-
-```stan
-cholesky_factor_cov[4] L;
-```
-
-In general, two dimensions may be declared, with the above being equal to
-`cholesky_factor_cov[4, 4]`.  The
-type `cholesky_factor_cov[M, N]` may be used for the general
-$M \times N$.
 
 ### Assigning Constrained Variables {-}
 
@@ -907,7 +937,7 @@ x[1,1] = z;
 ```
 
 The sizes must match.  Here, `x[1]` is a `J` by `K`
-array, as is is `y`.
+array, as is `y`.
 
 Partial array assignment also works for arrays of matrices, vectors,
 and row vectors.

@@ -684,7 +684,7 @@ parameter basis to a correlation matrix.  The basis will actually be
 broken down into two steps.  To start, suppose $y$ is a vector
 containing $\binom{K}{2}$ unconstrained values.  These are first
 transformed via the bijective function $\tanh : \mathbb{R} \rightarrow
-(0,1)$
+(-1, 1)$
 
 $$
 \tanh x = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
@@ -787,7 +787,7 @@ the absolute Jacobian determinant is
 $$
 \sqrt{\prod_{i=1}^{K-1}\prod_{j=i+1}^K \left(1-z_{i,j}^2\right)^{K-i-1}} \
 \times \prod_{i=1}^{K-1}\prod_{j=i+1}^K
-\frac{\partial \tanh z_{i,j}}{\partial y_{i,j}}
+\frac{\partial z_{i,j}}{\partial y_{i,j}}
 $$
 
 
@@ -819,7 +819,7 @@ w_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
 \\
 {w_{i,j}}
 \
-\prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,j}^2 \right)^{-2}
+\prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,j}^2 \right)^{-1/2}
 & \mbox{if } 1 < i < j.
 \end{array}
 \right.

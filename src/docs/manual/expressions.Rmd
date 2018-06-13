@@ -110,7 +110,7 @@ the tokens are reserved for future use.
 
 ```
 for, in, while, repeat, until, if, then, else,
-true, false
+true, false, target
 ```
 
 Variables should not be named after types, either, and thus may not be
@@ -451,11 +451,11 @@ The type of subexpression `(y - mu)' * Sigma` is inferred to be
 matrix.  The whole expression's type is thus the type of a row vector
 multiplied by a (column) vector, which produces a `real` value.
 
-Stan provides elementwise matrix division and multiplication
-operations, `a~.*~b` and `a~./b`.  These provide a shorthand
-to replace loops, but are not intrinsically more efficient than a
-version programmed with an elementwise calculations and assignments in
-a loop.  For example, given declarations,
+Stan provides elementwise matrix multiplication (e.g., `a .* b`) and
+division (e.g., `a ./ b`) operations.  These provide a shorthand to
+replace loops, but are not intrinsically more efficient than a version
+programmed with an elementwise calculations and assignments in a loop.
+For example, given declarations,
 
 ```stan
 vector[N] a;
@@ -1076,7 +1076,7 @@ for `f` given `e1` through `eN`.  Recall that a
 function signature is a declaration of the argument types and the
 result type.
 
-In looking up functions, binary operators like `real~*~real` are
+In looking up functions, binary operators like `real * real` are
 defined as `operator*(real,real)` in the documentation and index.
 
 In matching a function definition, arguments of type `int` may be
@@ -1085,9 +1085,9 @@ promotion in [the function application section](#function-application) for an ex
 specification of Stan's integer-to-real type-promotion rule).
 
 In general, matrix operations return the lowest inferable type.  For
-example, `row_vector~*~vector` returns a value of type
+example, `row_vector * vector` returns a value of type
 `real`, which is declared in the function documentation and index
-as `real~operator*(row_vector,vector)`.
+as `real operator*(row_vector,vector)`.
 
 
 ## Higher-Order Functions
