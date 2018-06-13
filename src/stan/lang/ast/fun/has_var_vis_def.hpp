@@ -47,7 +47,7 @@ namespace stan {
     bool has_var_vis::operator()(const variable& e) const {
       scope var_scope = var_map_.get_scope(e.name_);
       return var_scope.par_or_tpar()
-        || (var_scope.is_local() && e.type_.base_type_ != INT_T);
+        || (var_scope.local_allows_var() && !e.type_.base_type_.is_int_type());
     }
 
     bool has_var_vis::operator()(const fun& e) const {
@@ -77,6 +77,12 @@ namespace stan {
     bool has_var_vis::operator()(const algebra_solver_control& e) const {
       // only theta may contain vars
       return boost::apply_visitor(*this, e.theta_.expr_);
+    }
+
+    bool has_var_vis::operator()(const map_rect& e) const {
+      // only shared and job params may contain vars
+      return boost::apply_visitor(*this, e.shared_params_.expr_)
+          || boost::apply_visitor(*this, e.job_params_.expr_);
     }
 
     bool has_var_vis::operator()(const index_op& e) const {

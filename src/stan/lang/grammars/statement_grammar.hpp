@@ -92,6 +92,17 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       for_statement_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<std::string>,
+                              for_array_statement(scope),
+                              whitespace_grammar<Iterator> >
+      for_array_statement_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<std::string>,
+                              for_matrix_statement(scope),
+                              whitespace_grammar<Iterator> >
+      for_matrix_statement_r;
 
       boost::spirit::qi::rule<Iterator,
                               while_statement(scope),

@@ -1,10 +1,17 @@
 #ifndef STAN_LANG_AST_HPP
 #define STAN_LANG_AST_HPP
 
-#include <stan/lang/ast/base_expr_type.hpp>
-#include <stan/lang/ast/expr_type.hpp>
 #include <stan/lang/ast/nil.hpp>
 #include <stan/lang/ast/origin_block.hpp>
+#include <stan/lang/ast/double_type.hpp>
+#include <stan/lang/ast/ill_formed_type.hpp>
+#include <stan/lang/ast/int_type.hpp>
+#include <stan/lang/ast/matrix_type.hpp>
+#include <stan/lang/ast/row_vector_type.hpp>
+#include <stan/lang/ast/vector_type.hpp>
+#include <stan/lang/ast/void_type.hpp>
+#include <stan/lang/ast/base_expr_type.hpp>
+#include <stan/lang/ast/expr_type.hpp>
 #include <stan/lang/ast/scope.hpp>
 #include <stan/lang/ast/variable_map.hpp>
 
@@ -47,6 +54,7 @@
 #include <stan/lang/ast/fun/is_user_defined.hpp>
 #include <stan/lang/ast/fun/is_user_defined_prob_function.hpp>
 #include <stan/lang/ast/fun/operator_stream_expr_type.hpp>
+#include <stan/lang/ast/fun/operator_stream_function_arg_type.hpp>
 #include <stan/lang/ast/fun/print_scope.hpp>
 #include <stan/lang/ast/fun/promote_primitive.hpp>
 #include <stan/lang/ast/fun/returns_type.hpp>
@@ -55,6 +63,7 @@
 
 #include <stan/lang/ast/sigs/function_signature_t.hpp>
 #include <stan/lang/ast/sigs/function_signatures.hpp>
+#include <stan/lang/ast/sigs/function_arg_type.hpp>
 
 #include <stan/lang/ast/node/algebra_solver.hpp>
 #include <stan/lang/ast/node/algebra_solver_control.hpp>
@@ -78,6 +87,8 @@
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/expression_type_vis.hpp>
 #include <stan/lang/ast/node/for_statement.hpp>
+#include <stan/lang/ast/node/for_array_statement.hpp>
+#include <stan/lang/ast/node/for_matrix_statement.hpp>
 #include <stan/lang/ast/node/fun.hpp>
 #include <stan/lang/ast/node/function_decl_def.hpp>
 #include <stan/lang/ast/node/function_decl_defs.hpp>
@@ -91,6 +102,7 @@
 #include <stan/lang/ast/node/int_var_decl.hpp>
 #include <stan/lang/ast/node/lb_idx.hpp>
 #include <stan/lang/ast/node/lub_idx.hpp>
+#include <stan/lang/ast/node/map_rect.hpp>
 #include <stan/lang/ast/node/matrix_var_decl.hpp>
 #include <stan/lang/ast/node/multi_idx.hpp>
 #include <stan/lang/ast/node/no_op_statement.hpp>

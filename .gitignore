@@ -25,6 +25,9 @@
 *~
 \#*#
 
+# temporary vim files
+*.swp
+
 # depedencies files
 *.d
 *.hpp.d.*

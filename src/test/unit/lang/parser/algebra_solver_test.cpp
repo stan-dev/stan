@@ -17,8 +17,6 @@ TEST(lang_parser, algebra_solver_bad) {
   test_throws("algebra_solver/bad_x_i_type",
               "fifth argument to algebra_solver must have type int[]");
 
-  test_throws("algebra_solver/bad_y_var_type",
-              "second argument to algebra_solver (initial guess) must be data only");
   test_throws("algebra_solver/bad_x_r_var_type",
               "fourth argument to algebra_solver (real data) must be data only");
 }
@@ -35,8 +33,6 @@ TEST(lang_parser, algebra_solver_control_bad) {
   test_throws("algebra_solver/bad_x_i_type_control",
               "fifth argument to algebra_solver must have type int[]");
 
-  test_throws("algebra_solver/bad_y_var_type_control",
-              "second argument to algebra_solver (initial guess) must be data only");
   test_throws("algebra_solver/bad_x_r_var_type_control",
               "fourth argument to algebra_solver (real data) must be data only");
 }

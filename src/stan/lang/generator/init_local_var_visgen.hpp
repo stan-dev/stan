@@ -17,8 +17,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     /**
      * Visitor to initialize local variables.
      */
@@ -34,26 +32,18 @@ namespace stan {
       const bool declare_vars_;
 
       /**
-       * Flag indicating if generation is in a variable context.
-       */
-      const bool is_var_context_;
-
-      /**
        * Construct a visitor for initializing local variables with
        * flags indicating whether variables need to be declared and if
        * generation is in a variable context, writing to the specified
        * stream.
        *
        * @param[in] declare_vars true if variables need to be declared
-       * @param[in] is_var_context true if generation is in a
-       * variable context
        * @param[in] indent indentation level
        * @param[in,out] o stream for generating
        */
-      explicit init_local_var_visgen(bool declare_vars, bool is_var_context,
-                                     size_t indent, std::ostream& o)
-        : visgen(o), indent_(indent), declare_vars_(declare_vars),
-          is_var_context_(is_var_context) {  }
+      explicit init_local_var_visgen(bool declare_vars, size_t indent,
+                                     std::ostream& o)
+        : visgen(o), indent_(indent), declare_vars_(declare_vars) { }
 
       void generate_initialize_array(const std::string& var_type,
                                  const std::string& read_type,
@@ -79,7 +69,7 @@ namespace stan {
           o_ << name << " = in__." << read_type  << "_constrain(";
           for (size_t j = 0; j < read_args.size(); ++j) {
             if (j > 0) o_ << ",";
-            generate_expression(read_args[j], o_);
+            generate_expression(read_args[j], NOT_USER_FACING, o_);
           }
           if (read_args.size() > 0)
             o_ << ",";
@@ -94,7 +84,7 @@ namespace stan {
           o_ << name << " = in__." << read_type  << "_constrain(";
           for (size_t j = 0; j < read_args.size(); ++j) {
             if (j > 0) o_ << ",";
-            generate_expression(read_args[j], o_);
+            generate_expression(read_args[j], NOT_USER_FACING, o_);
           }
           o_ << ");" << EOL;
 
@@ -104,7 +94,7 @@ namespace stan {
           for (size_t i = 0; i < dims.size(); ++i) {
             generate_indent(indent_ + i, o_);
             o_ << "size_t dim_"  << name << "_" << i << "__ = ";
-            generate_expression(dims[i], o_);
+            generate_expression(dims[i], NOT_USER_FACING, o_);
             o_ << ";" << EOL;
 
             if (i < dims.size() - 1) {
@@ -137,7 +127,7 @@ namespace stan {
                  << read_type << "_constrain(";
               for (size_t j = 0; j < read_args.size(); ++j) {
                 if (j > 0) o_ << ",";
-                generate_expression(read_args[j], o_);
+                generate_expression(read_args[j], NOT_USER_FACING, o_);
               }
               if (read_args.size() > 0)
                 o_ << ",";
@@ -153,7 +143,7 @@ namespace stan {
                  << read_type << "_constrain(";
               for (size_t j = 0; j < read_args.size(); ++j) {
                 if (j > 0) o_ << ",";
-                generate_expression(read_args[j], o_);
+                generate_expression(read_args[j], NOT_USER_FACING, o_);
               }
               o_ << "));" << EOL;
             }
@@ -200,8 +190,7 @@ namespace stan {
 
       void operator()(const double_var_decl& x) const {
         std::vector<expression> read_args;
-        generate_initialize_array_bounded(x,
-                                          is_var_context_ ? "T__" : "double",
+        generate_initialize_array_bounded(x, "local_scalar_t__",
                                           "scalar", read_args);
       }
 
@@ -209,20 +198,16 @@ namespace stan {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
         generate_initialize_array_bounded(x,
-                                  is_var_context_
-                                  ? "Eigen::Matrix<T__,Eigen::Dynamic,1> "
-                                  : "vector_d",
-                                  "vector", read_args);
+                            "Eigen::Matrix<local_scalar_t__,Eigen::Dynamic,1> ",
+                            "vector", read_args);
       }
 
       void operator()(const row_vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.N_);
         generate_initialize_array_bounded(x,
-                                      is_var_context_
-                                      ? "Eigen::Matrix<T__,1,Eigen::Dynamic> "
-                                      : "row_vector_d",
-                                      "row_vector", read_args);
+                            "Eigen::Matrix<local_scalar_t__,1,Eigen::Dynamic> ",
+                            "row_vector", read_args);
       }
 
       void operator()(const matrix_var_decl& x) const {
@@ -230,45 +215,40 @@ namespace stan {
         read_args.push_back(x.M_);
         read_args.push_back(x.N_);
         generate_initialize_array_bounded(x,
-                          is_var_context_
-                          ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
-                          : "matrix_d",
-                          "matrix", read_args);
+                 "Eigen::Matrix<local_scalar_t__,"
+                 "Eigen::Dynamic,Eigen::Dynamic> ",
+                 "matrix", read_args);
       }
 
       void operator()(const unit_vector_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_context_
-                                  ? "Eigen::Matrix<T__,Eigen::Dynamic,1> "
-                                  : "vector_d",
+        generate_initialize_array("Eigen::Matrix<local_scalar_t__,"
+                                  "Eigen::Dynamic,1> ",
                                   "unit_vector", read_args, x.name_, x.dims_);
       }
 
       void operator()(const simplex_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_context_
-                                  ? "Eigen::Matrix<T__,Eigen::Dynamic,1> "
-                                  : "vector_d",
+        generate_initialize_array("Eigen::Matrix<local_scalar_t__,"
+                                  "Eigen::Dynamic,1> ",
                                   "simplex", read_args, x.name_, x.dims_);
       }
 
       void operator()(const ordered_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_context_
-                                  ? "Eigen::Matrix<T__,Eigen::Dynamic,1> "
-                                  : "vector_d",
+        generate_initialize_array("Eigen::Matrix<local_scalar_t__,"
+                                  "Eigen::Dynamic,1> ",
                                   "ordered", read_args, x.name_, x.dims_);
       }
 
       void operator()(const positive_ordered_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_context_
-                                  ? "Eigen::Matrix<T__,Eigen::Dynamic,1> "
-                                  : "vector_d",
+        generate_initialize_array("Eigen::Matrix<local_scalar_t__,"
+                                  "Eigen::Dynamic,1> ",
                                   "positive_ordered",
                                   read_args, x.name_, x.dims_);
       }
@@ -277,39 +257,34 @@ namespace stan {
         std::vector<expression> read_args;
         read_args.push_back(x.M_);
         read_args.push_back(x.N_);
-        generate_initialize_array(is_var_context_
-                                  ? "Eigen::Matrix"
-                                    "<T__,Eigen::Dynamic,Eigen::Dynamic> "
-                                  : "matrix_d",
-                                    "cholesky_factor",
+        generate_initialize_array("Eigen::Matrix<local_scalar_t__,"
+                                  "Eigen::Dynamic,Eigen::Dynamic> ",
+                                  "cholesky_factor",
                                   read_args, x.name_, x.dims_);
       }
 
       void operator()(const cholesky_corr_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_context_
-                          ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
-                          : "matrix_d",
-                          "cholesky_corr", read_args, x.name_, x.dims_);
+        generate_initialize_array("Eigen::Matrix<local_scalar_t__,"
+                                  "Eigen::Dynamic,Eigen::Dynamic> ",
+                                  "cholesky_corr", read_args, x.name_, x.dims_);
       }
 
       void operator()(const cov_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_context_
-                          ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
-                          : "matrix_d",
-                          "cov_matrix", read_args, x.name_, x.dims_);
+        generate_initialize_array("Eigen::Matrix<local_scalar_t__,"
+                                  "Eigen::Dynamic,Eigen::Dynamic> ",
+                                  "cov_matrix", read_args, x.name_, x.dims_);
       }
 
       void operator()(const corr_matrix_var_decl& x) const {
         std::vector<expression> read_args;
         read_args.push_back(x.K_);
-        generate_initialize_array(is_var_context_
-                    ? "Eigen::Matrix<T__,Eigen::Dynamic,Eigen::Dynamic> "
-                    : "matrix_d",
-                    "corr_matrix", read_args, x.name_, x.dims_);
+        generate_initialize_array("Eigen::Matrix<local_scalar_t__,"
+                                  "Eigen::Dynamic,Eigen::Dynamic> ",
+                                  "corr_matrix", read_args, x.name_, x.dims_);
       }
     };
 

@@ -177,6 +177,10 @@ TEST(lang_parser, skew_normal_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/skew_normal/skew_normal_log_4");
 }
 
+TEST(lang_parser, std_normal_distribution_function_signatures) {
+  test_parsable("function-signatures/distributions/univariate/continuous/std_normal/std_normal_log");
+}
+
 TEST(lang_parser, student_t_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_ccdf_log_1");
   test_parsable("function-signatures/distributions/univariate/continuous/student_t/student_t_ccdf_log_2");
@@ -225,6 +229,10 @@ TEST(lang_parser, multinomial_distribution_function_signatures) {
 
 TEST(lang_parser, ordered_logistic_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/multivariate/discrete/ordered_logistic/ordered_logistic_log");
+}
+
+TEST(lang_parser, ordered_probit_distribution_function_signatures) {
+  test_parsable("function-signatures/distributions/multivariate/discrete/ordered_probit/ordered_probit_log");
 }
 
 TEST(lang_parser, dirichlet_distribution_function_signatures) {

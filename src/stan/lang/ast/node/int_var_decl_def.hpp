@@ -8,12 +8,12 @@
 namespace stan {
   namespace lang {
 
-    int_var_decl::int_var_decl() : base_var_decl(INT_T) { }
+    int_var_decl::int_var_decl() : base_var_decl(int_type()) { }
 
     int_var_decl::int_var_decl(const range& range, const std::string& name,
                                const std::vector<expression>& dims,
                                const expression& def)
-      : base_var_decl(name, dims, INT_T, def), range_(range) { }
+      : base_var_decl(name, dims, int_type(), def), range_(range) { }
 
   }
 }

@@ -2,7 +2,15 @@
 #define STAN_LANG_AST_EXPR_TYPE_HPP
 
 #include <stan/lang/ast/base_expr_type.hpp>
+#include <stan/lang/ast/double_type.hpp>
+#include <stan/lang/ast/ill_formed_type.hpp>
+#include <stan/lang/ast/int_type.hpp>
+#include <stan/lang/ast/matrix_type.hpp>
+#include <stan/lang/ast/row_vector_type.hpp>
+#include <stan/lang/ast/vector_type.hpp>
+#include <stan/lang/ast/void_type.hpp>
 #include <cstddef>
+#include <ostream>
 
 namespace stan {
   namespace lang {
@@ -33,7 +41,7 @@ namespace stan {
        *
        * @param base_type base type
        */
-      expr_type(const base_expr_type base_type);  // NOLINT(runtime/explicit)
+      expr_type(const base_expr_type& base_type);  // NOLINT(runtime/explicit)
 
       /**
        * Construct an expression type with the specified base type and
@@ -42,7 +50,7 @@ namespace stan {
        * @param base_type base type
        * @param num_dims number of dimensions
        */
-      expr_type(const base_expr_type base_type,
+      expr_type(const base_expr_type& base_type,
                 std::size_t num_dims);
 
       /**
@@ -159,6 +167,17 @@ namespace stan {
        */
       std::size_t num_dims() const;
     };
+
+    /**
+     * Stream a user-readable version of the expression type to the
+     * specified output stream, returning the speicifed argument
+     * output stream to allow chaining.
+     *
+     * @param o output stream
+     * @param et expression type
+     * @return argument output stream
+     */
+    std::ostream& operator<<(std::ostream& o, const expr_type& et);
 
   }
 }

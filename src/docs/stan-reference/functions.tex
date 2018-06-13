@@ -2,20 +2,24 @@
 
 \chapter{Void Functions}
 
+\noindent
 Stan does not technically support functions that do not return values.
 It does support two types of statements that look like functions, one
-for incrementing log probabilities and one for printing.
-Documentation on these functions is included here for completeness.
-The special keyword \code{void} is used for the return type of void
-functions.
+for printing and one for rejecting outputs.  Documentation on these
+functions is included here for completeness.  The special keyword
+\code{void} is used for the return type of void functions, because
+they behave like variadic functions with void return type, even though
+they are special kinds of statements.
 
-\section{Print}
+Although \code{print} and \code{reject} appear to have the syntax of
+functions, they are actually special kinds of statements with slightly
+different form and behavior than other functions.  First, they are the
+constructs that allow a variable number of arguments.  Second, they
+are the the only constructs to accept string literals (e.g.,
+\code{"hello world"}) as arguments.  Third, they have no effect on the
+log density function and operate solely through side effects.
 
-The \code{print} statement is unique among Stan's syntactic constructs
-in two ways.  First, it is the only function-like construct that
-allows a variable number of arguments.  Second, it is the only
-function-like construct to accept string literals (e.g., \code{"hello
-  world"}) as arguments.
+\section{Print ``Function''}
 
 Printing has no effect on the model's log probability function.  Its
 sole purpose is the side effect (i.e., an effect not represented in a
@@ -26,7 +30,7 @@ or the R console in RStan).
 \begin{description}
   \fitem{void}{print}{T1 \farg{x1},..., TN \farg{xN}}{Print the values
     denoted by the arguments \farg{x1} through \farg{xN} on the
-    standard output stream.  There are no spaces between items in the
+    output message stream.  There are no spaces between items in the
     print, but a line feed (LF; Unicode U+000A; \Cpp literal
     \code{'\textbackslash{n}'}) is inserted at the end of the printed
     line.  The types \code{T1} through \code{TN} can be any of Stan's
@@ -37,6 +41,28 @@ or the R console in RStan).
 The full behavior of the \code{print} statement with examples is
 documented in \refsection{print-statements}.
 
+\section{Reject ``Function''}
+
+The reject statement has the same syntax as the print statement,
+accepting an arbitrary number of arguments of any type (including
+string literals).   The effect of executing a reject statement is to
+throw an exception internally that terminates the current iteration
+with a rejection (the behavior of which will depend on the algorithmic
+context in which it occurs).
+%
+\begin{description}
+  \fitem{void}{reject}{T1 \farg{x1},..., TN \farg{xN}}{Reject the
+    current iteration and print the values denoted by the arguments
+    \farg{x1} through \farg{xN} on the output message stream.  There
+    are no spaces between items in the print, but a line feed (LF;
+    Unicode U+000A; \Cpp literal \code{'\textbackslash{n}'}) is
+    inserted at the end of the printed line.  The types \code{T1}
+    through \code{TN} can be any of Stan's built-in numerical types or
+    double quoted strings of ASCII characters.}
+\end{description}
+%
+The full behavior of the \code{print} statement with examples is
+documented in \refsection{reject-statements}.
 
 \chapter{Integer-Valued Basic Functions}
 
@@ -71,12 +97,13 @@ result is rounded down.  For example, \code{1~/~2} evaluates to 0 and
 
 If one of the integer arguments to division is negative, the latest
 \Cpp specification (\Cpp{11}), requires rounding toward zero.  This
-would have \code{-1~/~2} evaluate to 0 and \code{-7~/~2} evaluate to
-3.  Before the \Cpp{11} specification, the behavior was platform
-dependent, allowing rounding up or down.  All compilers recent enough
-to be able to deal with Stan's templating should follow the \Cpp{11}
-specification, but it may be worth testing if you are not sure and
-plan to use integer division with negative values.
+would have \code{1~/~2} and \code{-1~/~2} evaluate to 0, \code{-7~/~2}
+evaluate to -3, and \code{7~/~2} evaluate to 3.  Before the \Cpp{11}
+specification, the behavior was platform dependent, allowing rounding
+up or down.  All compilers recent enough to be able to deal with
+Stan's templating should follow the \Cpp{11} specification, but it may
+be worth testing if you are not sure and plan to use integer division
+with negative values.
 
 Unlike floating point division, where \code{1.0~/~0.0} produces the
 special positive infinite value, integer division by zero, as in
@@ -91,7 +118,10 @@ divide-by-zero does not occur.
 Operators are described using the \Cpp syntax.  For instance, the
 binary operator of addition, written \code{X + Y}, would have the
 Stan signature \code{int operator+(int,int)} indicating it takes
-two real arguments and returns a real value.
+two real arguments and returns a real value.  As noted previously, the
+value of integer division is platform-dependent when rounding is
+platform dependent before C++11;  the descriptions below provide the
+C++11 definition.
 
 \begin{description}
 %
@@ -119,12 +149,19 @@ The product of the factors \farg{x} and \farg{y}
 \fitem{int}{operator/}{int \farg{x}, int \farg{y}}{
 The integer quotient of the dividend \farg{x} and divisor \farg{y}
 \[
-\mbox{\code{operator/}}(x,y) = \lfloor x / y \rfloor
+\mbox{\code{operator/}}(x,y) =
+\begin{cases}
+\lfloor x / y \rfloor & \mbox{if } x / y \geq 0
+\\
+- \lfloor \mathrm{floor}(-x / y) \rfloor & \mbox{if } x / y < 0.
+\end{cases}
 \]
 }
 %
 \fitem{int}{operator\%}{int \farg{x}, int \farg{y}}{\farg{x} modulo
-  \farg{y}, which is the remainder after dividing \farg{x} by \farg{y},
+  \farg{y}, which is the positive remainder after dividing \farg{x} by
+  \farg{y}.  If both \farg{x} and \farg{y} are non-negative, so is the
+  result; otherwise, the sign of the result is platform dependent.
 \[
 \mbox{\code{operator\%}}(x, y)
 \ = \ x \ \mbox{mod} \ y
@@ -162,14 +199,16 @@ This is a no-op.
 \fitemnobody{int}{int\_step}{int \farg{x}}
 %
 \fitem{int}{int\_step}{real \farg{x}}{
-  Returns the integer step, or Heaviside, function of \farg{x}.
+  Returns the step function of \farg{x} as an integer,
   \[
   \mbox{int\_step}(x) =
   \begin{cases}
-    0 & \mbox{if } x \leq 0 \\
-    1 & \mbox{if } x > 0
+    1 & \mbox{if } x > 0 \\
+    0 & \mbox{if } x \leq 0 \mathrm{ or } x \mathrm{ is } Nan
   \end{cases}
-  \]}
+  \]
+{\it Warning:} \code{int\_step(0)} and \code{int\_step(NaN)} return 0
+whereas \code{step(0)} and \code{step(NaN)} return 1.}
 %
 \end{description}
 %
@@ -577,11 +616,13 @@ are primarily provided for compatibility with BUGS and JAGS.
     \[
     \mbox{step}(x) =
     \begin{cases}
-      1 & \mbox{if } x > 0   \\
-      0 & \mbox{otherwise}
+      0 & \mbox{if } x < 0   \\
+      1 & \mbox{otherwise}
     \end{cases}
-    \]}
-  %
+    \]
+{\it Warning:} \code{int\_step(0)} and \code{int\_step(NaN)} return 0
+whereas \code{step(0)} and \code{step(NaN)} return 1.}
+%
 \end{description}
 %
 The step function is often used in BUGS to perform conditional
@@ -954,16 +995,17 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitemUnaryVec{atan}{principal arc (inverse) tangent (in radians) of \farg{x}}{
+  \fitemUnaryVec{atan}{principal arc (inverse) tangent (in radians) of
+    \farg{x}, with values from $-\pi$ to $\pi$}{
     \[
     \mbox{\code{atan}}(x) = \arctan(x)
     \]}
   %
-  \fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
-    Returns the principal arc (inverse) tangent (in radians) of \farg{x} divided
-    by \farg{y}.
+  \fitem{real}{atan2}{real \farg{y}, real \farg{x}}{
+    Returns the principal arc (inverse) tangent (in radians) of \farg{y} divided
+    by \farg{x},
     \[
-    \mbox{\code{atan2}}(x,y) = \arctan\left(\frac{x}{y}\right)
+    \mbox{\code{atan2}}(y, x) = \arctan\left(\frac{y}{x}\right)
     \]}
   %
 \end{description}
@@ -1053,7 +1095,7 @@ commonly used as a link function (see \refsection{Phi-function}).
 
 \subsection{Normal Cumulative Distribution Functions}
 
-The error function erf is related to the unit normal cumulative
+The error function erf is related to the standard normal cumulative
 distribution function $\Phi$ by scaling.  See
 \refsection{normal-distribution} for the general normal cumulative
 distribution function (and its complement).
@@ -1070,9 +1112,9 @@ distribution function (and its complement).
     \mbox{\code{erfc}}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
     \]}
   %
-  \fitemUnaryVecSort{Phi}{unit normal cumulative distribution function of \farg{x}}{
+  \fitemUnaryVecSort{Phi}{standard normal cumulative distribution function of \farg{x}}{
     \[
-    \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
+    \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{x} e^{-t^2/2} dt
     \]}{phi}
   %
   \fitemUnaryVec{inv\_Phi}{standard normal inverse cumulative distribution function of \farg{p}, otherwise known as the quantile function}{
@@ -1531,16 +1573,16 @@ with respect to the combination operation (min, max, sum, or product).
 \subsection{Minimum and Maximum}
 
 \begin{description}
-\fitem{real}{min}{real \farg{x}[]}{
+\fitem{real}{min}{real[] \farg{x}}{
 The minimum value in \farg{x}, or $+\infty$ if \farg{x} is size 0.}
 %
-\fitem{int}{min}{int \farg{x}[]}{
+\fitem{int}{min}{int[] \farg{x}}{
 The minimum value in \farg{x}, or error if \farg{x} is size 0.}
 %
-\fitem{real}{max}{real \farg{x}[]}{
+\fitem{real}{max}{real[] \farg{x}}{
 The maximum value in \farg{x}, or $-\infty$ if \farg{x} is size 0.}
 %
-\fitem{int}{max}{int \farg{x}[]}{
+\fitem{int}{max}{int[] \farg{x}}{
 The maximum value in \farg{x}, or error if \farg{x} is size 0.}
 %
 \end{description}
@@ -1549,7 +1591,7 @@ The maximum value in \farg{x}, or error if \farg{x} is size 0.}
 
 \begin{description}
 %
-\fitem{int}{sum}{int \farg{x}[]}{
+\fitem{int}{sum}{int[] \farg{x}}{
 The sum of the elements in \farg{x}, defined for $x$ of size $N$ by
 \[
 \mbox{\code{sum}}(x)
@@ -1562,13 +1604,13 @@ The sum of the elements in \farg{x}, defined for $x$ of size $N$ by
 \]
 }
 %
-\fitem{real}{sum}{real \farg{x}[]}{
+\fitem{real}{sum}{real[] \farg{x}}{
 The sum of the elements in \farg{x}; see definition above.}
 %
-\fitem{real}{prod}{real \farg{x}[]}{
+\fitem{real}{prod}{real[] \farg{x}}{
 The product of the elements in \farg{x}, or 1 if \farg{x} is size 0.}
 %
-\fitem{real}{prod}{int \farg{x}[]}{
+\fitem{real}{prod}{int[] \farg{x}}{
 The product of the elements in \farg{x},
 \[
 \mbox{\code{product}}(x) =
@@ -1580,7 +1622,7 @@ The product of the elements in \farg{x},
 \]
 }
 %
-\fitem{real}{log\_sum\_exp}{real \farg{x}[]}{
+\fitem{real}{log\_sum\_exp}{real[] \farg{x}}{
 The natural logarithm of the sum of the exponentials of the elements
 in \farg{x}, or $-\infty$ if the array is empty.}
 \end{description}
@@ -1603,7 +1645,7 @@ The sample deviation is defined as the square root of the
 sample deviation, but is not unbiased.
 
 \begin{description}
-\fitem{real}{mean}{real \farg{x}[]}{
+\fitem{real}{mean}{real[] \farg{x}}{
 The sample mean of the elements in \farg{x}.
 For an array $x$ of size
 $N > 0$,
@@ -1617,7 +1659,7 @@ $N > 0$,
 It is an error to the call the mean function with an array of size $0$.
 }
 %
-\fitem{real}{variance}{real \farg{x}[]}{
+\fitem{real}{variance}{real[] \farg{x}}{
 The sample variance of the elements in \farg{x}. For $N > 0$,
 \[
 \mbox{\code{variance}}(x)
@@ -1632,7 +1674,7 @@ The sample variance of the elements in \farg{x}. For $N > 0$,
 It is an error to call the \code{variance} function with an array of size 0.
 }
 %
-\fitem{real}{sd}{real \farg{x}[]}{The sample standard deviation of
+\fitem{real}{sd}{real[] \farg{x}}{The sample standard deviation of
 elements in \farg{x}.
 \[
 \mbox{sd}(x)
@@ -1683,12 +1725,12 @@ where \code{N} is the size of \farg{x} and \farg{y}.  It is an error
 to call \code{squared\_distance} with arguments of unequal size.}
 %
 \fitem{real}{squared\_distance}{vector \farg{x}, row\_vector
-  \farg{y}[]}{The squared Euclidean distance between \farg{x} and \farg{y}}
+ [] \farg{y}}{The squared Euclidean distance between \farg{x} and \farg{y}}
 %
 \fitem{real}{squared\_distance}{row\_vector \farg{x}, vector
-  \farg{y}[]}{The squared Euclidean distance between \farg{x} and \farg{y}}
+ [] \farg{y}}{The squared Euclidean distance between \farg{x} and \farg{y}}
 %
-\fitem{real}{squared\_distance}{row\_vector \farg{x}, row\_vector \farg{y}[]}{The Euclidean
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, row\_vector[] \farg{y}}{The Euclidean
   distance between \farg{x} and \farg{y}}
 %
 \end{description}
@@ -1743,7 +1785,6 @@ used to extract the dimensions of vectors and matrices.
   total number of elements contained.  For example, if \code{x} is of
   type \code{real[4,3]} then \code{size(x)} is 4.}
 \end{description}
-
 
 \section{Array Broadcasting}\label{array-broadcasting.section}
 
@@ -1818,6 +1859,29 @@ equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
 \code{k} in \code{1:4}, \code{m} in \code{1:5}, and \code{n} in
 \code{1:6}.
 
+%
+\section{Array Concatenation}\label{array-concatenation.section}
+
+\begin{description}
+\fitem{T}{append\_array}{T \farg{x}, T \farg{y}}{
+  Return the concatenation of two arrays in the order of the arguments.
+  T must be an N-dimensional array of any Stan type (with a maximum N of 7). All
+  dimensions but the first must match. }
+\end{description}
+%
+For example, the following code appends two three dimensional arrays of matrices
+together. Note that all dimensions except the first match. Any mismatches will
+cause an error to be thrown.
+%
+\begin{stancode}
+matrix[4, 6] x1[2, 1, 7];
+matrix[4, 6] x2[3, 1, 7];
+matrix[4, 6] x3[5, 1, 7];
+// ...
+x3 = append_array(x1, x2);
+\end{stancode}
+%
+
 \section{Sorting functions}\label{sorting-functions.section}
 
 Sorting can be used to sort values or the indices of those values in
@@ -1878,7 +1942,6 @@ Number of components of \farg{v} less than \farg{v[s]}}
 
 
 \chapter{Matrix Operations}\label{matrix-operations.chapter}
-\noindent
 
 \section{Integer-Valued Matrix Size Functions}
 %
@@ -2976,11 +3039,14 @@ It is almost never a good idea to use matrix inverses directly because
 they are both inefficient and arithmetically unstable compared to the
 alternatives.  Rather than inverting a matrix \code{m} and
 post-multiplying by a vector or matrix \code{a}, as in
-\code{inv(m)~*~a}, it is better to code this using matrix division, as
+\code{inverse(m)~*~a}, it is better to code this using matrix division, as
 in \code{m~\textbackslash~a}.  The pre-multiplication case is similar,
-with \code{b~*~inv(m)} being more efficiently coded as as
-\code{a~/~m}.  There are also useful special cases for triangular and
+with \code{b~*~inverse(m)} being more efficiently coded as as
+\code{b~/~m}.  There are also useful special cases for triangular and
 symmetric, positive-definite matrices that use more efficient solvers.
+
+{\it Warning:}  The function \code{inv(m)} is the elementwise inverse
+function, which returns \code{1 / m[i, j]} for each element.
 
 \begin{description}
 %
@@ -3283,8 +3349,9 @@ sparse matrix.
 
 \chapter{Mixed Operations}\label{mixed-operations.chapter}
 
-\noindent These functions perform conversions between Stan containers
-matrix, vector, row vector and arrays.
+\noindent
+These functions perform conversions between Stan containers matrix,
+vector, row vector and arrays.
 
 \begin{description}
 %
@@ -3424,128 +3491,14 @@ one-dimensional array in row-major order.}
 %
 \end{description}
 
-\chapter{Algebraic Equation Solver}
-\label{functions-algebraic-solver.chapter}
-
-Stan provides a built-in algebraic equation solver. Although it 
-looks like other function applications, the algebraic solver is
-special in two ways.
-
-First, the algebraic solver is a higher-order function, i.e. it takes
-another function as one of its arguments. The only other functions
-in Stan which share this feature are the ordinary differential equation
-solvers (see section~\ref{functions-ode-solver.chapter}). Ordinary Stan
-functions do not allow functions as arguments.
-
-Second, some of the arguments of the algebraic solvers are restricted
-to data only expressions. These expressions must not contain variables
-other than those declared in the data or transformed data blocks. Ordinary
-Stan functions place no restriction on the origin of variables in their argument
-expressions.
-
-\section{Specifying an Algebraic Equation as a Function}
-\label{functions-algebra-function.section}
-
-An algebraic system is specified as an ordinary function in Stan within the
-function block. The algebraic system function must have this signature:
-%
-\begin{stancode}
-real[] algebra_system(real[] y, real[] theta,
-                      real[] x_r, int[] x_i)
-\end{stancode}
-%
-The algebraic system function should return the value of the algebraic
-function which goes to 0, when we plug in the solution to the algebraic
-system.
-
-The argument of this function are:
-\begin{itemize}
-\item \farg{unknown}, the unknowns we wish to solve for
-\item \farg{theta}, parameter values used to evaluate the algebraic system
-\item \farg{x\_r}, data values used to evaluate the algebraic system
-\item \farg{x\_i}, integer data used to evaluate the algebraic system
-\end{itemize}
-
-The algebraic system function separates parameter values, \farg{theta},
-from data values, \farg{x\_r}, for efficiency in computing the gradients
-of the algebraic system.
-
-\section{Call to the Algebraic Solver}
-
-\begin{description}
-%
-   \fitemthreelines{real[~]}{algebra\_solver}%
-                  {function \farg{algebra\_system}}%
-                  {real[] \farg{y\_guess}}%
-                  {real \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
-                  {Solves the algebraic system, given an initial guess,
-                    using the Powell Hybrid algorithm.}
-                   
-\fitemfourlines{real[~]}{algebra\_solver}%
-                  {function \farg{algebra\_system}}%
-                  {real[] \farg{y\_guess}}%
-                  {real \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
-                  {real \farg{rel\_tol}, real \farg{f\_tol}, int \farg{max\_steps}}%
-                  {Solves the algebraic system, given an initial guess,
-                    using the Powell Hybrid algorithm.}
-%
-\end{description}
-
-
-\subsection{Arguments to the Algebraic Solver}
-
-The arguments to the algebraic solver are as follows:
-%
-\begin{enumerate}
-\item \farg{algebra\_system}: function literal referring to a function
-  specifying the system of algebraic equations with signature described
-  in \refsection{functions-algebra-function}:
-  \begin{quote}
-    (real[], real[], real[], int[]):real[]
-  \end{quote}
-  The arguments represent (1) unknown, (2) parameters, (3) real data, and
-  (4) integer data, and the return value contains the value of the algebraic
-  function, which goes to 0 when we plug in the solution to the algebraic system,
-\item \farg{y\_guess}: initia guess for the solution, type \code{real[]},
-\item \farg{theta}: parameters, type \code{real[]},
-\item \farg{x\_r}: real data, type \code{real[]}, data only, and
-\item \farg{x\_i}: parameters, type \code{int[]}, data only.
-\end{enumerate}
-
-For more fine-grained control of the algebraic solver, these parameters can also
-be provided:
-%
-\begin{enumerate}
-  \addtocounter{enumi}{5}
-  \item \farg{rel\_tol}: relative tolerance for the algebraic solver, type \code{real}, data only,
-  \item \farg{function\_tol}: function tolerance for the algebraic solver, type \code{real}, data only,
-  \item \farg{max\_num\_steps}: maximum number of steps to take in the algebraic solver, type \code{int}, data only.
-\end{enumerate}
-
-\subsection{Return Value}
-The return value for the algebraic solver is an array of type \code{real[]}, with values
-which, when plugged in as the \code{unknowns} make the algebraic function go to 0.
-
-\subsection{Sizes and Parallel Arrays}
-Certain sizes have to be consistent. The initial guess, return value of the solver, and
-return value of the algebraic function must all be the same size. 
-
-The parameters, real data, and integer data will be passed from the solver directly to the
-system function. 
-
-\subsection{Example}
-
-An example of Stan code with a system definition and solver call is shown
-in \refchapter{algebra-solver.chapter}.
-
-
 
 \chapter{Compound Arithmetic and Assignment}
 
+\noindent
 The compound arithmetic and assignment operations are coded directly
 as statements, as described in
 \refsection{compound-arithmetic-assignment}.  They allow statements of
-the form 
+the form
 %
 \begin{stancode}
 x = x op y;
@@ -3673,10 +3626,148 @@ operations are as follows.
     y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
 \end{description}
 
+\chapter{Higher-Order Functions}
+
+\noindent
+Stan provides a few higher-order functions that act on other
+functions.  In all cases, the function arguments to the higher-order
+functions are defined as functions within the Stan language and passed
+by name to the higher-order functions.
 
 
-\chapter{Ordinary Differential Equation Solvers}
-\label{functions-ode-solver.chapter}
+\section{Algebraic Equation Solver}%
+\label{functions-algebraic-solver.section}
+
+Stan provides a built-in algebraic equation solver. Although it looks
+like other function applications, the algebraic solver is special in
+two ways.
+
+First, the algebraic solver is a higher-order function, i.e. it takes
+another function as one of its arguments. The only other functions
+in Stan which share this feature are the ordinary differential equation
+solvers (see \refsection{functions-ode-solver}). Ordinary Stan
+functions do not allow functions as arguments.
+
+Second, some of the arguments of the algebraic solvers are restricted
+to data only expressions. These expressions must not contain variables
+other than those declared in the data or transformed data blocks. Ordinary
+Stan functions place no restriction on the origin of variables in their argument
+expressions.
+
+\subsection{Specifying an Algebraic Equation as a Function}
+
+An algebraic system is specified as an ordinary function in Stan within the
+function block. The algebraic system function must have this signature:
+%
+\begin{stancode}
+vector algebra_system(vector y, vector theta,
+                      real[] x_r, int[] x_i)
+\end{stancode}
+%
+The algebraic system function should return the value of the algebraic
+function which goes to 0, when we plug in the solution to the algebraic
+system.
+
+The argument of this function are:
+\begin{itemize}
+\item \farg{y}, the unknowns we wish to solve for
+\item \farg{theta}, parameter values used to evaluate the algebraic system
+\item \farg{x\_r}, data values used to evaluate the algebraic system
+\item \farg{x\_i}, integer data used to evaluate the algebraic system
+\end{itemize}
+
+The algebraic system function separates parameter values, \farg{theta},
+from data values, \farg{x\_r}, for efficiency in computing the gradients
+of the algebraic system.
+
+\subsection{Call to the Algebraic Solver}
+
+\begin{description}
+%
+   \fitemthreelines{vector}{algebra\_solver}%
+                  {function \farg{algebra\_system}}%
+                  {vector \farg{y\_guess}}%
+                  {vector \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {Solves the algebraic system, given an initial guess,
+                    using the Powell hybrid algorithm.}
+
+\fitemfourlines{vector}{algebra\_solver}%
+                  {function \farg{algebra\_system}}%
+                  {vector \farg{y\_guess}}%
+                  {vector \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {real \farg{rel\_tol}, real \farg{f\_tol}, int \farg{max\_steps}}%
+                  {Solves the algebraic system, given an initial guess,
+                    using the Powell hybrid algorithm with additional control
+                    parameters for the solver.}
+%
+\end{description}
+
+
+\subsubsection{Arguments to the Algebraic Solver}
+
+The arguments to the algebraic solver are as follows:
+%
+\begin{enumerate}
+\item \farg{algebra\_system}: function literal referring to a function
+  specifying the system of algebraic equations with signature
+  \begin{quote}
+    (vector, vector, real[], int[]):vector
+  \end{quote}
+  The arguments represent (1) unknowns, (2) parameters, (3) real data, and
+  (4) integer data, and the return value contains the value of the algebraic
+  function, which goes to 0 when we plug in the solution to the algebraic system,
+\item \farg{y\_guess}: initial guess for the solution, type \code{vector},
+\item \farg{theta}: parameters only, type \code{vector},
+\item \farg{x\_r}: real data only, type \code{real[]}, and
+\item \farg{x\_i}: integer data only, type \code{int[]}.
+\end{enumerate}
+
+For more fine-grained control of the algebraic solver, these parameters can also
+be provided:
+%
+\begin{enumerate}
+  \addtocounter{enumi}{5}
+  \item \farg{rel\_tol}: relative tolerance for the algebraic solver, type \code{real}, data only,
+  \item \farg{function\_tol}: function tolerance for the algebraic solver, type \code{real}, data only,
+  \item \farg{max\_num\_steps}: maximum number of steps to take in the algebraic solver, type \code{int}, data only.
+\end{enumerate}
+
+\subsubsection{Return value}
+
+The return value for the algebraic solver is an object of type \code{vector}, with values
+which, when plugged in as \code{y} make the algebraic function go to 0.
+
+\subsubsection{Sizes and parallel arrays}
+
+Certain sizes have to be consistent. The initial guess, return value of the solver, and
+return value of the algebraic function must all be the same size.
+
+The parameters, real data, and integer data will be passed from the solver directly to the
+system function.
+
+\subsubsection{Algorithmic details}
+
+The algebraic solver uses the Powell hybrid method \citep{Powell:1970}, which
+in turn uses first-order derivatives. The
+Stan code builds on the implementation of the hybrid solver in the
+unsupported module for nonlinear optimization problems of the Eigen library
+\citep{Eigen:2013}. This solver is in turn based on the algorithm developed
+for the package MINPACK-1 \citep{minpack:1980}.
+
+The Jacobian of the solution with respect to auxiliary parameters is computed
+using the implicit function theorem. Intermediate Jacobians (of the the algebraic
+function's output with respect to the unknowns \farg{y} and with respect to the
+auxiliary parameters \farg{theta}) are computed using Stan's automatic
+differentiation.
+
+\subsubsection{Example}
+
+An example of Stan code with a system definition and solver call is shown
+in \refchapter{algebra-solver}.
+
+
+\section{Ordinary Differential Equation Solvers}%
+\label{functions-ode-solver.section}
 
 Stan provides built-in ordinary differential equation (ODE) solvers.
 Although they look like function applications, the ODE solvers are
@@ -3693,7 +3784,7 @@ other than those declared in the data or transformed data blocks.
 Ordinary Stan functions place no restriction on the origin of variables
 in their argument expressions.
 
-\section{Specifying an Ordinary Differential Equation as a Function}
+\subsection{Specifying an Ordinary Differential Equation as a Function}%
 \label{functions-ode-function.section}
 
 A system of ODEs is specified as an ordinary function in Stan within
@@ -3723,7 +3814,7 @@ The ODE system function separates parameter values, \farg{theta}, from
 data values, \farg{x\_r}, for efficiency in computing the gradients of
 the ODE.
 
-\section{Non-Stiff Solver}
+\subsection{Non-Stiff Solver}
 
 \begin{description}
   %
@@ -3754,14 +3845,14 @@ the ODE.
 \end{description}
 
 
-\section{Stiff Solver}
+\subsection{Stiff Solver}
 
 \begin{description}
   %
   \fitemthreelines{real[]}{integrate\_ode\_bdf}%
                   {function \farg{ode}, real[] \farg{initial\_state}}%
                   {real \farg{initial\_time}, real[] \farg{times}}%
-                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {real[] \farg{theta}, data real[] \farg{x\_r}, data int[] \farg{x\_i}}%
                   {Solves the ODE system for the times provided using the backward
                     differentiation formula (BDF) method with the implementation from
                     CVODES.}
@@ -3769,56 +3860,59 @@ the ODE.
  \fitemfourlines{real[]}{integrate\_ode\_bdf}%
                 {function \farg{ode}, real[] \farg{initial\_state}}%
                 {real \farg{initial\_time}, real[] \farg{times}}%
-                {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
-                {real \farg{rel\_tol}, real \farg{abs\_tol}, int \farg{max\_num\_steps}}%
+                {real[] \farg{theta}, data real[] \farg{x\_r}, data int[] \farg{x\_i}}%
+                {data real \farg{rel\_tol}, data real \farg{abs\_tol},
+                  dta int \farg{max\_num\_steps}}%
                 {Solves the ODE system for the times provided using the backward
                   differentiation formula (BDF) method with the implementation from
                   CVODES with additional control parameters for the CVODES solver.}
   %
 \end{description}
 
-\subsection{Arguments to the ODE Solvers}
+\subsection{Arguments to the ODE solvers}
 
-The arguments to the ODE solvers are as follows:
+The arguments to the ODE solvers in both the stiff and non-stiff cases
+are as follows.
 %
 \begin{enumerate}
 \item \farg{ode}: function literal referring to a function specifying
   the system of differential equations with signature described in
   \refsection{functions-ode-function}:
   \begin{quote}
-    (real,real[],real[],real[],int[]):real[]
+    (real, real[], real[], data real[], data int[]):real[]
   \end{quote}
   The arguments represent (1) time, (2) system state, (3) parameters,
   (4) real data, and (5) integer data, and the return value contains the
   derivatives with respect to time of the state,
 \item \farg{initial\_state}: initial state, type \code{real[]},
-\item \farg{initial\_time}: initial time, type \code{int} or \code{real}, data only,
-\item \farg{times}: solution times, type \code{real[]}, data only,
+\item \farg{initial\_time}: initial time, type \code{int}
+  or \code{real},
+\item \farg{times}: solution times, type \code{real[]},
 \item \farg{theta}: parameters, type \code{real[]},
-\item \farg{x\_r}: real data, type \code{real[]}, data only, and
-\item \farg{x\_i}: integer data, type \code{int[]}, data only.
+\item \code{data} \farg{x\_r}: real data, type \code{real[]}, data only, and
+\item \code{data} \farg{x\_i}: integer data, type \code{int[]}, data only.
 \end{enumerate}
 
 For more fine-grained control of the ODE solvers, these parameters can
 also be provided:
 \begin{enumerate}
   \addtocounter{enumi}{7}
-\item \farg{rel\_tol}: relative tolerance for the ODE
+\item \code{data} \farg{rel\_tol}: relative tolerance for the ODE
   solver, type \code{real}, data only,
-\item \farg{abs\_tol}: absolute tolerance for the ODE
+\item \code{data} \farg{abs\_tol}: absolute tolerance for the ODE
   solver, type \code{real}, data only, and
-\item \farg{max\_num\_steps}: maximum number of steps to take in the
+\item \code{data} \farg{max\_num\_steps}: maximum number of steps to take in the
   ODE solver, type \code{int}, data only.
 \end{enumerate}
 %
 
-\subsection{Return Values}
+\subsubsection{Return values}
 
 The return value for the ODE solvers is an array of type
 \code{real[,]}, with values consisting of solutions at the specified
 times.
 
-\subsection{Sizes and Parallel Arrays}
+\subsubsection{Sizes and parallel arrays}
 
 The sizes must match, and in particular, the following groups are of
 the same size:
@@ -3833,11 +3927,59 @@ the same size:
 \end{itemize}
 %
 
-\subsection{Example}
+\subsubsection{Example}
 
 An example of a complete Stan program with a system definition and
 solver call is shown for data simulation in \reffigure{sho-sim} and
 estimation in \reffigure{sho-both}.
 
 
+\section{Higher-Order Map}\label{functions-map.section}
 
+Stan provides a higher-order map function.  This allows map-reduce
+functionality to be coded in Stan as described in
+\refchapter{map-reduce}.
+
+\subsection{Specifying the Mapped Function}
+
+The function being mapped must have a signature identical to that of
+the function \code{f} in the following declaration.
+%
+\begin{stancode}
+vector f(vector phi, vector theta,
+         data real[] x_r, data int[] x_i);
+\end{stancode}
+%
+The map function returns the sequence of results for the particular
+shard being evaluated.  The arguments to the mapped function are:
+%
+\begin{itemize}
+\item \farg{phi}, the sequence of parameters shared across shards
+\item \farg{theta}, the sequence of parameters specific to this shard
+\item \farg{x\_r}, sequence of real-valued data
+\item \farg{x\_i}, sequence of integer data
+\end{itemize}
+%
+All input for the mapped function must be packed into these sequences
+and all output from the mapped function must be packed into a single
+vector.  The vector of output from each mapped function is concatenated
+into the final result.
+
+\subsection{Rectangular Map}
+
+The rectangular map function operates on rectangular (not ragged) data
+structures, with parallel data structures for job-specific parameters,
+job-specific real data, and job-specific integer data.
+
+\begin{description}
+\fitemtwolines{vector}{map\_rect}{F \farg{f}, vector \farg{phi}, vector[] \farg{theta},
+  data real[,] \farg{x\_r}}{data int[,] \farg{x\_i}}{Return the concatenation of
+  the results of applying the function \farg{f}, of type
+  \code{(vector, vector, real[], int[]):vector} elementwise, i.e.,
+  \code{\farg{f}(\farg{phi}, \farg{theta}[n], \farg{x\_r}[n],
+    \farg{x\_i}[n])} for each \code{n} in \code{1:N}, where \code{N}
+  is the size of the parallel arrays of job-specific/local parameters
+  \code{theta}, real data \code{x\_r}, and integer data \code{x\_r}.
+  The shared/global parameters \code{phi} are passed to each
+  invocation of \code{f}.}
+\end{description}

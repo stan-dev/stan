@@ -235,7 +235,8 @@ void expect_match(const std::string& model_name,
   std::string cpp_out = cpp_out_stream.str();
   file_stream.close();
   EXPECT_TRUE(count_matches(target, cpp_out) > 0)
-    << "looking for: " << target;
+      << "looking for: " << target << std::endl
+      << "found: " << cpp_out << std::endl;
 }
 
 /**
@@ -255,4 +256,3 @@ void test_num_warnings(const std::string& model_name,
     << "looking for: " << warning_msg;
 }
 #endif
-

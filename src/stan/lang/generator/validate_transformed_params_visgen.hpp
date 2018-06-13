@@ -12,8 +12,6 @@
 namespace stan {
   namespace lang {
 
-    void generate_expression(const expression& e, std::ostream& o);
-
     /**
      * Visitor for generating code to validate transformed
      * parameters.
@@ -45,7 +43,7 @@ namespace stan {
         for (size_t k = 0; k < dims.size(); ++k) {
           generate_indent(indent_ + k, o_);
           o_ << "for (int i" << k << "__ = 0; i" << k << "__ < ";
-          generate_expression(dims[k], o_);
+          generate_expression(dims[k], NOT_USER_FACING, o_);
           o_ << "; ++i" << k << "__) {" << EOL;
         }
 

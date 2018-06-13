@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
+#include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/var_resizing_visgen.hpp>
 #include <stan/lang/generator/var_size_validating_visgen.hpp>
@@ -12,8 +13,6 @@
 
 namespace stan {
   namespace lang {
-
-    void generate_expression(const expression& e, std::ostream& o);
 
     // FIXME(carpenter): factor repeated code into functions
 
@@ -66,7 +65,7 @@ namespace stan {
           size_t dim = dims.size() - dim_up - 1U;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_"
@@ -98,7 +97,7 @@ namespace stan {
           size_t dim = dims.size() - dim_up - 1U;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -127,7 +126,7 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_i_vec_lim__ = ";
-        generate_expression(x.M_, o_);
+        generate_expression(x.M_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
@@ -138,7 +137,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -169,7 +168,7 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_i_vec_lim__ = ";
-        generate_expression(x.N_, o_);
+        generate_expression(x.N_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
@@ -180,7 +179,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -211,7 +210,7 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_i_vec_lim__ = ";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
@@ -222,7 +221,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -253,7 +252,7 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_i_vec_lim__ = ";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
@@ -264,7 +263,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -295,7 +294,7 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_i_vec_lim__ = ";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
@@ -306,7 +305,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -337,7 +336,7 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_i_vec_lim__ = ";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "i_vec__ = 0; " << "i_vec__ < "
@@ -348,7 +347,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -380,11 +379,11 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_m_mat_lim__ = ";
-        generate_expression(x.M_, o_);
+        generate_expression(x.M_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_n_mat_lim__ = ";
-        generate_expression(x.N_, o_);
+        generate_expression(x.N_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < "
@@ -398,7 +397,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -431,7 +430,7 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_k_mat_lim__ = ";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < " << x.name_
@@ -445,7 +444,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -479,11 +478,11 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_m_mat_lim__ = ";
-        generate_expression(x.M_, o_);
+        generate_expression(x.M_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_n_mat_lim__ = ";
-        generate_expression(x.N_, o_);
+        generate_expression(x.N_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < "
@@ -497,7 +496,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -531,11 +530,11 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_m_mat_lim__ = ";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_n_mat_lim__ = ";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < "
@@ -549,7 +548,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "
@@ -583,7 +582,7 @@ namespace stan {
         o_ << "pos__ = 0;" << EOL;
         generate_indent(indent_, o_);
         o_ << "size_t " << x.name_ << "_k_mat_lim__ = ";
-        generate_expression(x.K_, o_);
+        generate_expression(x.K_, NOT_USER_FACING, o_);
         o_ << ";" << EOL;
         generate_indent(indent_, o_);
         o_ << "for (size_t " << "n_mat__ = 0; " << "n_mat__ < "
@@ -597,7 +596,7 @@ namespace stan {
           ++indentation;
           generate_indent(indentation, o_);
           o_ << "size_t " << x.name_ << "_limit_" << dim << "__ = ";
-          generate_expression(dims[dim], o_);
+          generate_expression(dims[dim], NOT_USER_FACING, o_);
           o_ << ";" << EOL;
           generate_indent(indentation, o_);
           o_ << "for (size_t i_" << dim << "__ = 0; i_" << dim << "__ < "

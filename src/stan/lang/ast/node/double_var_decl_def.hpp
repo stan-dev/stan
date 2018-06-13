@@ -8,13 +8,13 @@
 namespace stan {
   namespace lang {
 
-    double_var_decl::double_var_decl() : base_var_decl(DOUBLE_T) { }
+    double_var_decl::double_var_decl() : base_var_decl(double_type()) { }
 
     double_var_decl::double_var_decl(const range& range,
                                      const std::string& name,
                                      const std::vector<expression>& dims,
                                      const expression& def)
-      : base_var_decl(name, dims, DOUBLE_T, def), range_(range) { }
+      : base_var_decl(name, dims, double_type(), def), range_(range) { }
 
   }
 }

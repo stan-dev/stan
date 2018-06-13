@@ -27,14 +27,14 @@ namespace stan {
      * @param allow_undefined true if permits undefined functions
      * @param filename name of file or other source from which input
      *   stream was derived
-     * @param include_paths array of names of included files
+     * @param include_paths array of paths to search for included files
      * @return <code>false</code> if code could not be generated due
      *   to syntax error in the Stan model; <code>true</code>
      *   otherwise.
      */
     bool compile(std::ostream* msgs, std::istream& in, std::ostream& out,
                  const std::string& name, const bool allow_undefined = false,
-                 const std::string& filename = "unkown file name",
+                 const std::string& filename = "unknown file name",
                  const std::vector<std::string>& include_paths
                   = std::vector<std::string>()) {
       io::program_reader reader(in, filename, include_paths);

@@ -33,7 +33,7 @@ namespace stan {
       int num_open_brackets = 1;
       int num_generated_params = 0;
       for (size_t i = 0; i < num_args; ++i) {
-        if (fun.arg_decls_[i].arg_type_.base_type_ != INT_T) {
+        if (!fun.arg_decls_[i].arg_type_.base_type_.is_int_type()) {
           if (num_generated_params > 0)
             ss << ", ";
           // break into blocks of 4 and apply promotion recursively

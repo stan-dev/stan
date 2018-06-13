@@ -13,7 +13,7 @@ namespace stan {
     /**
      * Return the type of the expression indexed by the generalized
      * index sequence.  Return a type with base type
-     * <code>ILL_FORMED_T</code> if there are too many indexes.
+     * <code>ill_formed_type</code> if there are too many indexes.
      *
      * @param[in] e Expression being indexed.
      * @param[in] idxs Index sequence.

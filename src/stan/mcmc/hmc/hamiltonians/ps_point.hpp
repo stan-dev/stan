@@ -73,7 +73,7 @@ namespace stan {
        *
        * @param writer writer callback
        */
-      virtual void
+      virtual inline void
       write_metric(stan::callbacks::writer& writer) {}
 
     protected:

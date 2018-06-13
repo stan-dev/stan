@@ -9,29 +9,42 @@ and comment syntax for the Stan language.
 
 \section{Character Encoding}
 
-\subsection{Stan Program}
+\subsection{Content}
 
-The content of a Stan program must be coded in ASCII.  Extended
-character sets such as UTF-8 encoded Unicode may not be used for
-identifiers or other text in a program.
+The content of a Stan program must be coded in ASCII.  All identifiers
+must consist of only ASCII alpha-numeric characters and the underscore
+character.  All arithmetic operators and punctuation must be coded in
+ASCII.
+
+\subsubsection{Compatibility with Latin-1 and UTF-8}
+
+The UTF-8 encoding of Unicode and the Latin-1 (ISO-8859-1) encoding
+share the first 128 code points with ASCII and thus cannot be
+distinguished from ASCII.  That means you can set editors, etc., to
+use UTF-8 or Latin-1 (or the other Latin-n variants) without worrying
+that the content of a Stan program will be destroyed.
 
 \subsection{Comments}
 
-The content of comments is ignored by the language compiler and may be
-written using any character encoding (e.g., ASCII, UTF-8, Latin1,
-Big5).  The comment delimiters themselves must be coded in ASCII.
+Any bytes on a line after a line-comment sequence (\code{//} or
+\Verb|#|) are ignored up until the ASCII newline character
+(\Verb|\n|).  They may thus be written in any character encoding which
+is convenient.
 
+Any content after a block comment open sequence in ASCII (\code{/*})
+up to the closing block comment (\code{*/}) is ignored, and thus may
+also be written in whatever character set is convenient.
 
 \section{Includes}\label{includes.section}
 
 Stan allows one file to be included within another file with the
 following syntax.  For example, suppose the file
-\code{std-normal.stan} defines the standard normal log probability
+\code{my-std-normal.stan} defines the standard normal log probability
 density function (up to an additive constant).
 %
 \begin{stancode}
 functions {
-  real std_normal_lpdf(vector y) {
+  real my_std_normal_lpdf(vector y) {
     return -0.5 * y' * y;
   }
 }
@@ -41,22 +54,22 @@ Suppose we also have a file containing a Stan program with an include
 statement.
 %
 \begin{stancode}
-#include std-normal.stan
+#include my-std-normal.stan
 parameters {
   real y;
 }
 model {
-  y ~ std_normal();
+  y ~ my_std_normal();
 }
 \end{stancode}
 %
 This Stan program behaves as if the contents of the file
-\code{std-normal.stan} replace the line with the \code{\#include}
+\code{my-std-normal.stan} replace the line with the \code{\#include}
 statement, behaving as if a single Stan program were provided.
 %
 \begin{stancode}
 functions {
-  real std_normal_lpdf(vector y) {
+  real my_std_normal_lpdf(vector y) {
     return -0.5 * y' * y;
   }
 }
@@ -64,7 +77,7 @@ parameters {
   real y;
 }
 model {
-  y ~ std_normal();
+  y ~ my_std_normal();
 }
 \end{stancode}
 %
@@ -185,7 +198,6 @@ invocations of the program.
 
 \section{Overview of Data Types}
 
-%%%
 Arguments for built-in and user-defined functions and local variables
 are required to be basic data types, meaning an unconstrained
 primitive, vector, or matrix type or an array of such.
@@ -281,7 +293,7 @@ If this condition is violated with parameter values that satisfy
 declared constraints but do not have finite log density, then the
 samplers and optimizers may have any of a number of pathologies
 including just getting stuck, failure to initialize, excessive
-Metropolis rejection, or biased samples due to inability to explore
+Metropolis rejection, or biased draws due to inability to explore
 the tails of the distribution.
 
 
@@ -464,12 +476,11 @@ format.
 
 Bounds for integer or real variables may be arbitrary expressions.
 The only requirement is that they only include variables that have
-been defined before the declaration.  If the bounds themselves are
-parameters, the behind-the-scenes variable transform accounts for them
-in the log Jacobian.
+been declared (though not necessarily defined) before the declaration.
+If the bounds themselves are parameters, the behind-the-scenes
+variable transform accounts for them in the log Jacobian.
 
-For example, it is acceptable to have the
-following declarations.
+For example, it is acceptable to have the following declarations.
 %
 \begin{stancode}
 data {
@@ -502,6 +513,62 @@ This declares a positive integer data variable \code{N}, an array
 ranging between the minimum and maximum value of \code{y}.  As shown
 in the example code, the functions \code{min()} and \code{max()} may
 be applied to containers such as arrays.
+
+A more subtle case involves declarations of parameters or transformed
+paramerrs based on parameters declared previously.  For example, the
+following program will work as intended.
+%
+\begin{stancode}
+parameters {
+  real a;
+  real<lower = a> b;  // enforces a < b
+}
+transformed parameters {
+  real c;
+  real<lower = c> d;
+  c = a;
+  d = b;
+}
+\end{stancode}
+%
+The parameters instance works because all parameters are defined
+externally before the block is executed.  The transformed parameters
+case works even though \code{c} isn't defined at the point it is used,
+because constraints on transformed parameters are only validated at
+the end of the block.  Data variables work like parameter variables,
+whereas transformed data and generated quantity variables work like
+transformed parameter variables.
+
+
+\subsection{Declaring Optional Variables}
+
+A variable may be declared with a size that depends on a boolean
+constant.  For example, consider the definition of \code{alpha} in the
+following program fragment.
+%
+\begin{stancode}
+data {
+  int<lower = 0, upper = 1> include_alpha;
+  ...
+parameters {
+  vector[include_alpha ? N : 0] alpha;
+\end{stancode}
+%
+If \code{include\_alpha} is true, the model will include the vector
+\code{alpha};  if the flag is false, the model will not include
+\code{alpha} (technically, it will include \code{alpha} of size 0,
+which means it won't contain any values and won't be included in any
+output).
+
+This technique is not just useful for containers.  If the value of
+\code{N} is set to 1, then the vector \code{alpha} will contain a
+single element and thus \code{alpha[1]} behaves like an optional
+scalar, the existence of which is controlled by \code{include\_alpha}.
+
+This coding pattern allows a single Stan program to define different
+models based on the data provided as input.  This strategy is used
+extensively in the implementation of the RStanArm package (see
+\url{http://mc-stan.org/users/interfaces/rstanarm}).
 
 \section{Vector and Matrix Data Types}
 
@@ -655,8 +722,8 @@ The variable \code{d} is declared as a positive, ordered 5-vector by
 positive_ordered[5] d;
 \end{stancode}
 %
-Like ordered vectors, after their declaration positive ordered vectors
-assigned to other vectors and other vectors may be assigned to them.
+Like ordered vectors, after their declaration, positive ordered vectors
+may be assigned to other vectors and other vectors may be assigned to them.
 Constraints will be checked after executing the block in which the
 variables were declared.
 
@@ -719,13 +786,26 @@ a[1] = b;
 This copies the values from row vector \code{b} to \code{a[1]}, which
 is the first row of the matrix \code{a}.  If the number of columns in
 \code{a} is not the same as the size of \code{b}, a run-time error is
-raised;  the number of rows of \code{a} is \code{N}, which is also the
-size of \code{b}.
+raised;  the number of columns of \code{a} is \code{N}, which is also the
+number of rows of \code{b}.
 
 Assignment works by copying values in Stan.  That means any subsequent
 assignment to \code{a[1]} does not affect \code{b}, nor does an
 assignment to \code{b} affect \code{a}.
 
+\subsection{Covariance Matrices}
+
+Matrix variables may be constrained to represent covariance matrices.
+A matrix is a covariance matrix if it is symmetric and positive
+definite.  Like correlation matrices, covariance matrices only need a
+single dimension in their declaration.  For instance,
+%
+\begin{stancode}
+cov_matrix[K] Omega;
+\end{stancode}
+%
+declares \code{Omega} to be a $K \times K$ covariance matrix, where
+$K$ is the value of the data variable \code{K}.
 
 \subsection{Correlation Matrices}
 
@@ -744,42 +824,6 @@ declares \code{Sigma} to be a $3 \times 3$ correlation matrix.
 Correlation matrices may be assigned to other matrices, including
 unconstrained matrices, if their dimensions match, and vice-versa.
 
-\subsection{Cholesky Factors of Correlation Matrices}
-
-Matrix variables may be constrained to represent the Cholesky factors
-of a correlation matrix.
-
-A Cholesky factor for a correlation matrix $L$ is a $K \times K$
-lower-triangular matrix with positive diagonal entries and rows that
-are of length 1 (i.e., $\sum_{n=1}^K L_{m,n}^2 = 1$).  If $L$ is a
-Cholesky factor for a correlation matrix, then $L\,L^{\top}$ is a
-correlation matrix (i.e., symmetric positive definite with a unit
-diagonal).
-
-A declaration such as
-follows.
-%
-\begin{stancode}
-cholesky_factor_corr[K] L;
-\end{stancode}
-%
-declares \code{L} to be a Cholesky factor for a \code{K} by \code{K}
-correlation matrix.
-
-\subsection{Covariance Matrices}
-
-Matrix variables may be constrained to represent covariance matrices.
-A matrix is a covariance matrix if it is symmetric and positive
-definite.  Like correlation matrices, covariance matrices only need a
-single dimension in their declaration.  For instance,
-%
-\begin{stancode}
-cov_matrix[K] Omega;
-\end{stancode}
-%
-declares \code{Omega} to be a $K \times K$ covariance matrix, where
-$K$ is the value of the data variable \code{K}.
-
 \subsection{Cholesky Factors of Covariance Matrices}
 
 Matrix variables may be constrained to represent the Cholesky factors
@@ -787,10 +831,12 @@ of a covariance matrix.  This is often more convenient or more
 efficient than representing covariance matrices directly.
 
 A Cholesky factor $L$ is an $M \times N$ lower-triangular matrix (if
-$m < n$ then $L[m, n] =0$) with a strictly positive diagonal ($L[k, k]
-> 0$) and $M \geq N$.  If $L$ is a Cholesky factor, then $\Sigma = L
-\, L^{\top}$ is a covariance matrix.  Furthermore, every covariance
-matrix has a Cholesky factorization.
+$m < n$ then $L[m, n] =0$) with a strictly positive diagonal
+($L[k, k] > 0$) and $M \geq N$.  If $L$ is a Cholesky factor, then
+$\Sigma = L \, L^{\top}$ is a covariance matrix (i.e., it is positive
+definite).  The mapping between positive definite matrixes and their
+Cholesky factors is bijective---every covariance matrix has a unique
+Cholesky factorization.
 
 The typical case of a square Cholesky factor may be declared with a
 single dimension,
@@ -799,10 +845,36 @@ single dimension,
 cholesky_factor_cov[4] L;
 \end{stancode}
 %
-In general, two dimensions may be declared, with the above being equal to
-\code{cholesky\_factor\_cov[4,~4]}.  The
-type \code{cholesky\_factor\_cov[M,~N]} may be used for the general
-$M \times N$.
+In general, two dimensions may be declared, with the above being equal
+to \code{cholesky\_factor\_cov[4,~4]}.
+
+\subsubsection{Cholesky factors of positive semi-definite matrices}
+
+The type \code{cholesky\_factor\_cov[M,~N]} may be used for the
+general $M \times N$ case, which will produce lower triangular
+matrices leading to positive semi-definite matrices of rank $M$.
+
+
+\subsection{Cholesky Factors of Correlation Matrices}
+
+Matrix variables may be constrained to represent the Cholesky factors
+of a correlation matrix.
+
+A Cholesky factor for a correlation matrix $\Omega$ is a $K \times K$
+lower-triangular matrix $L$ with positive diagonal entries and rows
+that are of Euclidean length 1 (i.e., $\sum_{n=1}^K L_{m,n}^2 = 1$).
+If $L$ is a Cholesky factor for a correlation matrix, then
+$\Omega = L \, L^{\top}$ is a correlation matrix (i.e., it is
+symmetric positive definite with a unit diagonal).
+
+To declare the variable \code{L} to be a \code{K} by \code{K} Cholesky
+factor of a correlation matrix, the following code may be used.
+%
+\begin{stancode}
+cholesky_factor_corr[K] L;
+\end{stancode}
+
+
 
 \subsection{Assigning Constrained Variables}
 
@@ -1061,7 +1133,7 @@ x[1,1] = z;
 \end{stancode}
 %
 The sizes must match.  Here, \code{x[1]} is a \code{J} by \code{K}
-array, as is is \code{y}.
+array, as is \code{y}.
 
 Partial array assignment also works for arrays of matrices, vectors,
 and row vectors.
@@ -1378,17 +1450,18 @@ not be used where a value of type \code{int} is required.
 
 A number written with a period or with scientific notation is assigned
 to a the continuous numeric type \code{real}.  Real literals are
-written in base 10 with a period (\code{.}) as a separator.  Examples
+written in base 10 with a period (\code{.}) as a separator and
+optionally an exponent with optional sign.  Examples
 of well-formed real literals include the following.
 %
 \begin{quote}
 \code{0.0}, \ \code{1.0}, \ \code{3.14}, \ \code{-217.9387}, \
-\code{2.7e3}, \ \code{-2E-5}
+\code{2.7e3}, \ \code{-2E-5}, \ \code{1.23e+3}.
 \end{quote}
 %
 The notation \code{e} or \code{E} followed by a positive or negative
 integer denotes a power of 10 to multiply.  For instance, \code{2.7e3}
-denotes $2.7 \times 10^3$ and \code{-2E-5} denotes $-2 \times
+and \code{2.7e+3} denote $2.7 \times 10^3$, whereas \code{-2E-5} denotes $-2 \times
 10^{-5}$.
 
 
@@ -1455,7 +1528,8 @@ the tokens are reserved for future use.
 \code{then},
 \code{else},
 \code{true},
-\code{false}
+\code{false},
+\code{target}
 \end{quote}
 %
 Variables should not be named after types, either, and thus may not be
@@ -1902,11 +1976,11 @@ The type of subexpression \code{(y - mu)' * Sigma} is inferred to be
 matrix.  The whole expression's type is thus the type of a row vector
 multiplied by a (column) vector, which produces a \code{real} value.
 
-Stan provides elementwise matrix division and multiplication
-operations, \code{a~.*~b} and \code{a~./b}.  These provide a shorthand
-to replace loops, but are not intrinsically more efficient than a
-version programmed with an elementwise calculations and assignments in
-a loop.  For example, given declarations,
+Stan provides elementwise matrix multiplication (e.g., \code{a~.*~b})
+and division (e.g., \code{a~./b}).  These provide a shorthand to
+replace loops, but are not intrinsically more efficient than a version
+programmed with an elementwise calculations and assignments in a loop.
+For example, given declarations,
 %
 \begin{stancode}
 vector[N] a;
@@ -2610,6 +2684,72 @@ example, \code{row\_vector~*~vector} returns a value of type
 \code{real}, which is declared in the function documentation and index
 as \code{real~operator*(row\_vector,vector)}.
 
+\section{Higher-Order Functions}
+
+There are several expression constructions in Stan that act as
+higher-order functions.%
+%
+\footnote{Internally, they are implemented as their own expression
+  types because Stan doesn't have object-level functional types
+  (yet).}
+%
+The higher-order functions and the signature of their argument
+functions are listed in \reffigure{higher-order-functions}.
+%
+\begin{figure}
+\small
+\begin{tabular}{r||c|c|c|}
+{\slshape function} & {\slshape unrestricted arguments} & {\slshape data arguments} & {\slshape return type}
+\\ \hline \hline
+\code{algebra\_solver}
+& \code{vector, vector}
+& \code{real[], int[]}
+& \code{vector}
+\\[2pt]
+\code{integrate\_ode\_{\slshape{X}}}
+& \code{real, real[], real[]}
+& \code{real[], int[]}
+& \code{real[]}
+\\[2pt]
+\code{map\_rect}
+& \code{vector, vector}
+& \code{real[], int[]}
+& \code{vector}
+\end{tabular}
+\caption{\small\it Higher-order functions in Stan with their argument
+  function types.  The first group of arguments has no restrictions.
+  The second group of arguments, consisting of a real and integer
+  array in all cases, must be expressions involving only data and
+  literals.}\label{higher-order-functions.figure}
+\end{figure}
+%
+For example, the rectangular mapping function might be used in the
+following way to compute the log likelihood of a hierarchical model.
+%
+\begin{stancode}
+functions {
+  vector foo_ll(vector phi, vector theta, real[] x_r, int[] x_i) {
+    ...
+...
+vector[11] phi;
+vector[2] thetas[N];
+real x_rs[N, 5];
+real x_is[N, 0];
+...
+target += sum(map_rect(foo_ll, phi, thetas, x_rs, x_is));
+\end{stancode}
+%
+The function argument is \code{foo}, the name of the user-defined
+function;  as shown in \reffigure{higher-order-functions}, \code{foo}
+takes two vectors, a real array, and an integer array as arguments and
+returns a vector.
+
+\subsection{Functions Passed by Reference}
+
+The function argument to higher-order functions is always passed as
+the first argument.  This function argument must be provided as the
+name of a user-defined or built-in function.  No quotes are
+necessary.
 
 
 \section{Chain Rule and Derivatives}
@@ -2642,7 +2782,7 @@ Algebraically, the sampling statement in the model could be reduced to
   x ~ normal(0, 1);
 \end{stancode}
 %
-and it would seem the model should produce unit normal samples for
+and it would seem the model should produce standard normal draws for
 \code{x}.  But rather than canceling, the expression \code{sqrt(x -
   x)} causes a problem for derivatives.  The cause is the mechanistic
 evaluation of the chain rule,
@@ -2717,6 +2857,17 @@ into sequences and into for-each loops.  In addition, Stan allows
 local variables to be declared in blocks and also allows an empty
 statement consisting only of a semicolon.
 
+\section{Statement Block Contexts}
+
+The data and parameters blocks do not allow statements of any kind
+because these blocks are solely used to declare the data variables for
+input and the parameter variables for sampling.  All other blocks
+allow statements.  In these blocks, both variable declarations and
+statements are allowed.  The first statement that is not a variable
+declaration ends the list of block variable declarations.  See
+\refchapter{blocks} for more information about the block structure of
+Stan programs.
+
 
 \section{Assignment Statement}\label{assignment-statement.section}
 
@@ -2726,7 +2877,7 @@ assignment statement evaluates the expression on the right-hand side
 and assigns it to the (indexed) variable on the left-hand side.  An
 example of a simple assignment is as follows.%
 %
-\footnote{In versions of Stan before 2.16.0, the operator \code{<-} was
+\footnote{In versions of Stan before 2.17.1, the operator \code{<-} was
   used for assignment rather than using the equal sign \code{=}.  The
   old operator \code{<-} is now deprecated and will print a warning.
   In the future, it will be removed.}
@@ -2899,7 +3050,7 @@ x[3] += 2;
 As a further example, consider
 %
 \begin{stancode}
-matirx[M, M] x;
+matrix[M, M] x;
 vector[M] y;
 real z;
 x *= x;  // OK, (x * x) is a matrix
@@ -2962,7 +3113,7 @@ The keyword \code{target} here is actually not a variable, and may not
 be accessed as such (though see below on how to access the value of
 target through a special function).
 
-In this example, the unnormalized log probability of a unit normal
+In this example, the unnormalized log probability of a standard normal
 variable $y$ is added to the total log probability.  In the general
 case, the argument can be any expression.%
 %
@@ -2976,7 +3127,7 @@ case, the argument can be any expression.%
   required for automatic differentiation.}
 
 An entire Stan model can be implemented this way.  For instance, the
-following model will draw a single variable according to a unit normal
+following model will draw a single variable according to a standard normal
 probability.
 %
 \begin{stancode}
@@ -3293,7 +3444,7 @@ p_{[a,b]}(x) = \frac{p_X(x)}
 \subsubsection{Truncation with lower and upper bounds in Stan}
 
 Stan allows probability functions to be truncated.  For example, a
-truncated unit normal distributions restricted to $[-0.5, 2.1]$
+truncated standard normal distributions restricted to $[-0.5, 2.1]$
 can be coded with the following sampling statement.
 %
 \begin{stancode}
@@ -3562,6 +3713,31 @@ for (n in 1:100) {
   y += y * epsilon;
 }
 \end{stancode}
+
+\section{Foreach Loops}
+
+Similarly, the \code{for} keyword can be used to iterate over containers
+(arrays, vectors, row-vectors or matrices). For instance, suppose
+\code{ys} is a container with elements of type \code{T} and that
+\code{z} is a variable of type \code{T}. Then the following is a
+well-formed for-loop statement, which sets all elements of \code{ys}
+equal to \code{z}.
+%
+\begin{stancode}
+for (y in ys) {
+  y = z;
+}
+\end{stancode}
+%
+Note, in particular, that we can assign to the loop variable \code{y}.
+For arrays, vectors and row-vectors \code{ys}, the loop variable \code{y}
+traverses the elements of \code{ys} in order and for matrices \code{ys}
+it traverses the elements of \code{ys} in column-major order
+(top-to-bottom, left-to-right).
+In particular, note the difference between looping over a matrix of type \code{matrix[N, M]} and a nested array of type \code{real[N, M]}.
+In the latter case, the loop variable \code{y} denotes an array of type \code{real[M]}
+rather than a single value of type \code{real} which would be its denotation
+in the former case.
 
 \section{Conditional Statements}
 
@@ -3989,8 +4165,7 @@ becomes ill-defined (i.e., becomes not-a-number).
 
 The Stan \code{reject} statement provides a mechanism to
 report errors or problematic values encountered during program
-execution and either halt processing or reject samples or optimization
-iterations.
+execution and either halt processing or reject iterations.
 
 Like the \code{print} statement, the reject statement accepts
 any number of quoted string literals or Stan expressions as arguments.
@@ -4225,7 +4400,7 @@ declared and then defined through a sequence of statements.  Because
 variables scope over every statement that follows them, transformed
 data variables may be defined in terms of the data variables.
 
-Before generating any samples, data variables are read in, then the
+Before generating any draws, data variables are read in, then the
 transformed data variables are declared and the associated statements
 executed to define them.  This means the statements in the transformed
 data block are only ever evaluated once.%
@@ -4481,7 +4656,7 @@ order, starting with the \code{data} block in this section.
 
 The \code{data} block is for the declaration of variables that are
 read in as data.  With the current model executable, each Markov chain
-of samples will be executed in a different process, and each such
+of draws will be executed in a different process, and each such
 process will read the data exactly once.%
 %
 \footnote{With multiple threads, or even running chains sequentially
@@ -4622,14 +4797,14 @@ The amount of work done by the sampler does depend on the number of
 unconstrained parameters, but this is usually dwarfed by the gradient
 calculations.
 
-\subsection{Writing Samples}
+\subsection{Writing Draws}
 
-In the basic Stan compiled program, the values of variables are
-written to a file for each sample.  The constrained versions of the
-variables are written, again in the order they are defined in the
-\code{parameters} block.  In order to do this, the transformed
-parameter, model, and generated quantities statements must be
-executed.
+In the basic Stan compiled program, there is a file to which the
+values of variables are written for each draw.  The constrained
+versions of the variables are written in the order they are
+defined in the \code{parameters} block.  In order to do this, the
+transformed parameter, model, and generated quantities statements must
+also be executed.
 
 
 \section{Program Block: \code{transformed parameters}}
@@ -4638,7 +4813,7 @@ The \code{transformed parameters} program block consists of optional
 variable declarations followed by statements.  After the statements
 are executed, the constraints on the transformed parameters are
 validated.  Any variable declared as a transformed parameter is part
-of the output produced for samples.
+of the output produced for draws.
 
 Any variable that is defined wholly in terms of data or transformed
 data should be declared and defined in the transformed data block.
@@ -4696,9 +4871,9 @@ generated quantities block are
 \item calculating log likelihoods, deviances, etc.\ for model comparison.
 \end{itemize}
 %
-Forward samples, event probabilities and statistics may all be
+Parameter estimates, predictions, statistics, and event probabilities
 calculated directly using plug-in estimates.  Stan automatically
-provides full Bayesian inference by producing samples from the
+provides full Bayesian inference by producing draws from the
 posterior distribution of any calculated event probabilities,
 predictions, or statistics.  See \refchapter{bayesian} for more
 information on Bayesian inference.
@@ -4799,7 +4974,7 @@ within user-defined functions ending in \code{\_rng}.  See
 \refsection{function-bodies} for more information on these two special
 types of function.
 
-\section{Unsized Argument Types}
+\section{Argument Types and Qualifiers}
 
 Stan's functions all have declared types for both arguments and
 returned value.  As with built-in functions, user-defined functions are
@@ -4854,6 +5029,29 @@ Any errors raised by calls to functions inside user functions or
 return type mismatches are simply passed on;  this typically results
 in a warning message and rejection of a proposal during sampling or
 optimization.
+
+\subsection{Qualifying Data-only Arguments}
+
+Some of Stan's built-in functions, like the differential equation
+solvers, have arguments that must be data.  Such data-only arguments
+must be expressions involving only data, transformed data, and
+generated quantity variables.
+
+In user-defined functions, the qualifier \code{data} may be placed before
+an argument type declaration to indicate that the argument must be
+data only.  For example,
+
+\begin{stancode}
+real foo(data real x) {
+  return x^2;
+}
+\end{stancode}
+
+requires the argument \code{x} to be data only.
+
+Declaring an argument data only allows type inference to proceed in
+the body of the function so that, for example, the variable may be
+used as a data-only argument to a built-in function.
 
 \section{Function Bodies}\label{function-bodies.section}
 
@@ -5312,7 +5510,7 @@ account for the majority of the cycles consumed by a Stan program.
 \subsection{Metropolis Accept/Reject}
 
 A standard Metropolis accept/reject step is required to retain detailed
-balance and ensure samples are marginally distributed according to the
+balance and ensure draws are marginally distributed according to the
 probability function defined by the model.  This Metropolis adjustment
 is based on comparing log probabilities, here defined by the
 Hamiltonian, which is the sum of the potential (negative log
@@ -5350,7 +5548,7 @@ for sampling.
 Variational inference also runs similar to sampling. It begins by reading the
 data and initializing the algorithm. The initial variational approximation is a
 random draw from the standard normal distribution in the unconstrained
-(real-coordinate) space. Again, similar to sampling, it outputs samples from the
+(real-coordinate) space. Again, similar to sampling, it outputs draws from the
 approximate posterior once the algorithm has decided that it has converged.
 Thus, the tools we use for analyzing the result of Stan's sampling routines can
 also be used for variational inference.
@@ -5368,8 +5566,8 @@ probabilities.
 
 \section{Output}
 
-For each final sample (not counting samples during warmup or samples
-that are thinned), there is an output stage of writing the samples.
+For each final draw (not counting draws during warmup or draws
+that are thinned), there is an output stage of writing the draw.
 
 \subsection{Generated Quantities}
 
