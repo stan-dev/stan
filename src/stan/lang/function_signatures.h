@@ -674,6 +674,7 @@ for (const auto& t : all_vector_types) {
  }
 add_nullary("machine_precision");
 add("matrix_exp", expr_type(matrix_type()), expr_type(matrix_type()));
+add("matrix_exp_multiply", expr_type(matrix_type()), expr_type(matrix_type()), expr_type(matrix_type()));
 add("max", expr_type(int_type()), expr_type(int_type(), 1));
 add("max", expr_type(double_type()), expr_type(double_type(), 1));
 add("max", expr_type(double_type()), expr_type(vector_type()));
@@ -1040,6 +1041,7 @@ add("rows_dot_product", expr_type(vector_type()), expr_type(matrix_type()), expr
 add("rows_dot_self", expr_type(vector_type()), expr_type(vector_type()));
 add("rows_dot_self", expr_type(vector_type()), expr_type(row_vector_type()));
 add("rows_dot_self", expr_type(vector_type()), expr_type(matrix_type()));
+add("scale_matrix_exp_multiply", expr_type(matrix_type()), expr_type(double_type()), expr_type(matrix_type()), expr_type(matrix_type()));
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
