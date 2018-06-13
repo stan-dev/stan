@@ -91,12 +91,13 @@ result is rounded down.  For example, \code{1~/~2} evaluates to 0 and
 
 If one of the integer arguments to division is negative, the latest
 \Cpp specification (\Cpp{11}), requires rounding toward zero.  This
-would have \code{-1~/~2} evaluate to 0 and \code{-7~/~2} evaluate to
-3.  Before the \Cpp{11} specification, the behavior was platform
-dependent, allowing rounding up or down.  All compilers recent enough
-to be able to deal with Stan's templating should follow the \Cpp{11}
-specification, but it may be worth testing if you are not sure and
-plan to use integer division with negative values.
+would have \code{1~/~2} and \code{-1~/~2} evaluate to 0, \code{-7~/~2}
+evaluate to -3, and \code{7~/~2} evaluate to 3.  Before the \Cpp{11}
+specification, the behavior was platform dependent, allowing rounding
+up or down.  All compilers recent enough to be able to deal with
+Stan's templating should follow the \Cpp{11} specification, but it may
+be worth testing if you are not sure and plan to use integer division
+with negative values.
 
 Unlike floating point division, where \code{1.0~/~0.0} produces the
 special positive infinite value, integer division by zero, as in
@@ -111,7 +112,10 @@ divide-by-zero does not occur.
 Operators are described using the \Cpp syntax.  For instance, the
 binary operator of addition, written \code{X + Y}, would have the
 Stan signature \code{int operator+(int,int)} indicating it takes
-two real arguments and returns a real value.
+two real arguments and returns a real value.  As noted previously, the
+value of integer division is platform-dependent when rounding is
+platform dependent before C++11;  the descriptions below provide the
+C++11 definition.
 
 \begin{description}
 %
@@ -139,12 +143,19 @@ The product of the factors \farg{x} and \farg{y}
 \fitem{int}{operator/}{int \farg{x}, int \farg{y}}{
 The integer quotient of the dividend \farg{x} and divisor \farg{y}
 \[
-\mbox{\code{operator/}}(x,y) = \lfloor x / y \rfloor
+\mbox{\code{operator/}}(x,y) =
+\begin{cases}
+\lfloor x / y \rfloor & \mbox{if } x / y \geq 0
+\\
+- \lfloor \mathrm{floor}(-x / y) \rfloor & \mbox{if } x / y < 0.
+\end{cases}
 \]
 }
 %
 \fitem{int}{operator\%}{int \farg{x}, int \farg{y}}{\farg{x} modulo
-  \farg{y}, which is the remainder after dividing \farg{x} by \farg{y},
+  \farg{y}, which is the positive remainder after dividing \farg{x} by
+  \farg{y}.  If both \farg{x} and \farg{y} are non-negative, so is the
+  result; otherwise, the sign of the result is platform dependent.
 \[
 \mbox{\code{operator\%}}(x, y)
 \ = \ x \ \mbox{mod} \ y
@@ -978,16 +989,17 @@ of these in the future, but as of now, there is no good workaround.
     \end{cases}
     \]}
   %
-  \fitemUnaryVec{atan}{principal arc (inverse) tangent (in radians) of \farg{x}}{
+  \fitemUnaryVec{atan}{principal arc (inverse) tangent (in radians) of
+    \farg{x}, with values from $-\pi$ to $\pi$}{
     \[
     \mbox{\code{atan}}(x) = \arctan(x)
     \]}
   %
-  \fitem{real}{atan2}{real \farg{x}, real \farg{y}}{
-    Returns the principal arc (inverse) tangent (in radians) of \farg{x} divided
-    by \farg{y}.
+  \fitem{real}{atan2}{real \farg{y}, real \farg{x}}{
+    Returns the principal arc (inverse) tangent (in radians) of \farg{y} divided
+    by \farg{x},
     \[
-    \mbox{\code{atan2}}(x,y) = \arctan\left(\frac{x}{y}\right)
+    \mbox{\code{atan2}}(y, x) = \arctan\left(\frac{y}{x}\right)
     \]}
   %
 \end{description}
@@ -1077,7 +1089,7 @@ commonly used as a link function (see \refsection{Phi-function}).
 
 \subsection{Normal Cumulative Distribution Functions}
 
-The error function erf is related to the unit normal cumulative
+The error function erf is related to the standard normal cumulative
 distribution function $\Phi$ by scaling.  See
 \refsection{normal-distribution} for the general normal cumulative
 distribution function (and its complement).
@@ -1094,9 +1106,9 @@ distribution function (and its complement).
     \mbox{\code{erfc}}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
     \]}
   %
-  \fitemUnaryVecSort{Phi}{unit normal cumulative distribution function of \farg{x}}{
+  \fitemUnaryVecSort{Phi}{standard normal cumulative distribution function of \farg{x}}{
     \[
-    \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{0}^{x} e^{-t^2/2} dt
+    \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{x} e^{-t^2/2} dt
     \]}{phi}
   %
   \fitemUnaryVec{inv\_Phi}{standard normal inverse cumulative distribution function of \farg{p}, otherwise known as the quantile function}{
@@ -3021,11 +3033,14 @@ It is almost never a good idea to use matrix inverses directly because
 they are both inefficient and arithmetically unstable compared to the
 alternatives.  Rather than inverting a matrix \code{m} and
 post-multiplying by a vector or matrix \code{a}, as in
-\code{inv(m)~*~a}, it is better to code this using matrix division, as
+\code{inverse(m)~*~a}, it is better to code this using matrix division, as
 in \code{m~\textbackslash~a}.  The pre-multiplication case is similar,
-with \code{b~*~inv(m)} being more efficiently coded as as
-\code{a~/~m}.  There are also useful special cases for triangular and
+with \code{b~*~inverse(m)} being more efficiently coded as as
+\code{b~/~m}.  There are also useful special cases for triangular and
 symmetric, positive-definite matrices that use more efficient solvers.
+
+{\it Warning:}  The function \code{inv(m)} is the elementwise inverse
+function, which returns \code{1 / m[i, j]} for each element.
 
 \begin{description}
 %
@@ -3831,7 +3846,7 @@ the ODE.
   \fitemthreelines{real[]}{integrate\_ode\_bdf}%
                   {function \farg{ode}, real[] \farg{initial\_state}}%
                   {real \farg{initial\_time}, real[] \farg{times}}%
-                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {real[] \farg{theta}, data real[] \farg{x\_r}, data int[] \farg{x\_i}}%
                   {Solves the ODE system for the times provided using the backward
                     differentiation formula (BDF) method with the implementation from
                     CVODES.}
@@ -3839,45 +3854,48 @@ the ODE.
  \fitemfourlines{real[]}{integrate\_ode\_bdf}%
                 {function \farg{ode}, real[] \farg{initial\_state}}%
                 {real \farg{initial\_time}, real[] \farg{times}}%
-                {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
-                {real \farg{rel\_tol}, real \farg{abs\_tol}, int \farg{max\_num\_steps}}%
+                {real[] \farg{theta}, data real[] \farg{x\_r}, data int[] \farg{x\_i}}%
+                {data real \farg{rel\_tol}, data real \farg{abs\_tol},
+                  dta int \farg{max\_num\_steps}}%
                 {Solves the ODE system for the times provided using the backward
                   differentiation formula (BDF) method with the implementation from
                   CVODES with additional control parameters for the CVODES solver.}
   %
 \end{description}
 
-\subsubsection{Arguments to the ODE solvers}
+\subsection{Arguments to the ODE solvers}
 
-The arguments to the ODE solvers are as follows:
+The arguments to the ODE solvers in both the stiff and non-stiff cases
+are as follows.
 %
 \begin{enumerate}
 \item \farg{ode}: function literal referring to a function specifying
   the system of differential equations with signature described in
   \refsection{functions-ode-function}:
   \begin{quote}
-    (real,real[],real[],real[],int[]):real[]
+    (real, real[], real[], data real[], data int[]):real[]
   \end{quote}
   The arguments represent (1) time, (2) system state, (3) parameters,
   (4) real data, and (5) integer data, and the return value contains the
   derivatives with respect to time of the state,
 \item \farg{initial\_state}: initial state, type \code{real[]},
-\item \farg{initial\_time}: initial time, type \code{int} or \code{real}, data only,
-\item \farg{times}: solution times, type \code{real[]}, data only,
+\item \farg{initial\_time}: initial time, type \code{int}
+  or \code{real},
+\item \farg{times}: solution times, type \code{real[]},
 \item \farg{theta}: parameters, type \code{real[]},
-\item \farg{x\_r}: real data, type \code{real[]}, data only, and
-\item \farg{x\_i}: integer data, type \code{int[]}, data only.
+\item \code{data} \farg{x\_r}: real data, type \code{real[]}, data only, and
+\item \code{data} \farg{x\_i}: integer data, type \code{int[]}, data only.
 \end{enumerate}
 
 For more fine-grained control of the ODE solvers, these parameters can
 also be provided:
 \begin{enumerate}
   \addtocounter{enumi}{7}
-\item \farg{rel\_tol}: relative tolerance for the ODE
+\item \code{data} \farg{rel\_tol}: relative tolerance for the ODE
   solver, type \code{real}, data only,
-\item \farg{abs\_tol}: absolute tolerance for the ODE
+\item \code{data} \farg{abs\_tol}: absolute tolerance for the ODE
   solver, type \code{real}, data only, and
-\item \farg{max\_num\_steps}: maximum number of steps to take in the
+\item \code{data} \farg{max\_num\_steps}: maximum number of steps to take in the
   ODE solver, type \code{int}, data only.
 \end{enumerate}
 %

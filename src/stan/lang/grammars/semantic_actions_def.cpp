@@ -1625,8 +1625,14 @@ namespace stan {
     void deprecated_integrate_ode::operator()(std::ostream& error_msgs)
       const {
       error_msgs << "Warning: the integrate_ode() function is deprecated"
-             << " in the Stan language; use integrate_ode_rk45() [non-stiff]"
-             << " or integrate_ode_bdf() [stiff] instead."
+             << " in the Stan language; use the following functions"
+             << " instead.\n"
+             << " integrate_ode_rk45()"
+             << " [explicit, order 5, for non-stiff problems]\n"
+             << " integrate_ode_adams()"
+             << " [implicit, up to order 12, for non-stiff problems]\n"
+             << " integrate_ode_bdf()"
+             << " [implicit, up to order 5, for stiff problems]."
              << std::endl;
     }
     boost::phoenix::function<deprecated_integrate_ode>

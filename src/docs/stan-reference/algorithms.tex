@@ -522,7 +522,7 @@ algorithm and a proof of detailed balance, see
 
 NUTS generates a proposal by starting at an initial position
 determined by the parameters drawn in the last iteration. It then
-generates an independent unit-normal random momentum vector. It then
+generates an independent  standard normal random momentum vector. It then
 evolves the initial system both forwards and backwards in time to form
 a balanced binary tree. At each iteration of the NUTS algorithm the
 tree depth is increased by one, doubling the number of leapfrog steps
@@ -1360,7 +1360,7 @@ x = \frac{y}{\Vert y \Vert}.
 %
 
 To generate a unit vector, Stan generates points at random in
-$\reals^n$ with independent unit normal distributions, which are then
+$\reals^n$ with independent standard normal distributions, which are then
 standardized by dividing by their Euclidean length.
 \cite{Marsaglia:1972} showed this generates points uniformly at random
 on $S^{n-1}$.  That is, if we draw $y_n \sim \distro{Normal}(0, 1)$
@@ -1423,7 +1423,7 @@ parameter basis to a correlation matrix.  The basis will actually be
 broken down into two steps.  To start, suppose $y$ is a vector
 containing $\binom{K}{2}$ unconstrained values.  These are first
 transformed via the bijective function $\tanh : \reals \rightarrow
-(0,1)$
+(-1,1)$
 %
 \[
 \tanh x = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
@@ -1526,7 +1526,7 @@ the absolute Jacobian determinant is
 \[
 \sqrt{\prod_{i=1}^{K-1}\prod_{j=i+1}^K \left(1-z_{i,j}^2\right)^{K-i-1}} \
 \times \prod_{i=1}^{K-1}\prod_{j=i+1}^K
-\frac{\partial \tanh z_{i,j}}{\partial y_{i,j}}
+\frac{\partial z_{i,j}}{\partial y_{i,j}}
 \]
 \subsection{Correlation Matrix Transform}
 
@@ -1556,7 +1556,7 @@ w_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
 \\[8pt]
 {w_{i,j}}
 \
-\prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,j}^2 \right)^{-2}
+\prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,j}^2 \right)^{-1/2}
 & \mbox{if } 1 < i < j.
 \end{array}
 \right.
