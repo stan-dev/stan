@@ -150,7 +150,7 @@ TEST_F(ServicesSampleHmcNutsDiagE, output_regression) {
   int num_samples = 400;
   int num_thin = 5;
   bool save_warmup = true;
-  int refresh = 0;
+  int refresh = 5;
   double stepsize = 0.1;
   double stepsize_jitter = 0;
   int max_depth = 8;
