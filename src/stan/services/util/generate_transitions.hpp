@@ -5,6 +5,7 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
+#include <time.h>
 #include <string>
 
 namespace stan {
@@ -47,13 +48,13 @@ namespace stan {
                                 Model& model, RNG& base_rng,
                                 callbacks::interrupt& callback,
                                 callbacks::logger& logger) {
+        time_t last_time;
+        time(&last_time);
         for (int m = 0; m < num_iterations; ++m) {
           callback();
-
-          if (refresh > 0
-              && (start + m + 1 == finish
-                  || m == 0
-                  || (m + 1) % refresh == 0)) {
+          time_t now;
+          time(&now);
+          if (refresh > 0 && difftime(now, last_time) > refresh) {
             int it_print_width
               = std::ceil(std::log10(static_cast<double>(finish)));
             std::stringstream message;
@@ -66,6 +67,7 @@ namespace stan {
             message << (warmup ? " (Warmup)" : " (Sampling)");
 
             logger.info(message);
+            time(&last_time);
           }
 
           init_s = sampler.transition(init_s, logger);

@@ -74,10 +74,13 @@ namespace stan {
         util::generate_transitions(sampler, num_samples, 0, num_samples,
                                    num_thin, refresh, true, false, writer,
                                    s, model, rng, interrupt, logger);
-        clock_t end = clock();
+        if (refresh > 0) {
+          clock_t end = clock();
 
-        double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-        writer.write_timing(0.0, sampleDeltaT);
+          double sampleDeltaT = static_cast<double>(end - start)
+                              / CLOCKS_PER_SEC;
+          writer.write_timing(0.0, sampleDeltaT);
+        }
 
         return error_codes::OK;
       }

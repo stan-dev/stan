@@ -86,11 +86,13 @@ namespace stan {
                                    writer,
                                    s, model, rng,
                                    interrupt, logger);
-        end = clock();
-        double sample_delta_t
-          = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+        if (refresh > 0) {
+          end = clock();
+          double sample_delta_t
+            = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
-        writer.write_timing(warm_delta_t, sample_delta_t);
+          writer.write_timing(warm_delta_t, sample_delta_t);
+        }
       }
     }
   }
