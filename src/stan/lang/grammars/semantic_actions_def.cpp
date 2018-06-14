@@ -1364,10 +1364,6 @@ namespace stan {
                                      const stan::lang::expression& expr,
                                      std::stringstream& error_msgs) const {
       static const bool user_facing = true;
-      // if (error_msgs.str().size() > 0) {
-      //   pass = false;
-      //   return;
-      // }
       if (!(expr.expression_type().type().is_void_type())) {
         error_msgs << "Illegal statement beginning with non-void"
                    << " expression parsed as"
@@ -1423,9 +1419,8 @@ namespace stan {
     void add_loop_identifier::operator()(const std::string& name,
                                          std::string& name_local,
                                          const scope& var_scope,
-                                         bool& pass, variable_map& vm,
+                                         variable_map& vm,
                                          std::stringstream& error_msgs) const {
-      pass = true;
       vm.add(name, base_var_decl(name, std::vector<expression>(), int_type()),
              scope(var_scope.program_block(), true));
     }
@@ -1437,7 +1432,6 @@ namespace stan {
                    const scope& var_scope,
                    bool& pass, variable_map& vm,
                    std::stringstream& error_msgs) const {
-      pass = true;
       int numdims = expr.expression_type().num_dims();
       if (!(numdims > 0)) {
         pass = false;
@@ -1446,6 +1440,7 @@ namespace stan {
         vm.add(name, base_var_decl(name, dimvector,
                                    expr.expression_type().type()),
                scope(loop_identifier_origin, true));
+        pass = true;
       }
     }
     boost::phoenix::function<add_array_loop_identifier>
@@ -1457,7 +1452,6 @@ namespace stan {
                    const scope& var_scope,
                    bool& pass, variable_map& vm,
                    std::stringstream& error_msgs) const {
-      pass = true;
       if (!(expr.expression_type().num_dims() == 0)
           || !(expr.expression_type().type().is_matrix_type()
                || expr.expression_type().type().is_vector_type()
@@ -1469,6 +1463,7 @@ namespace stan {
         vm.add(name, base_var_decl(name, std::vector<expression>(),
                                    double_type()),
                scope(loop_identifier_origin, true));
+        pass = true;
       }
     }
     boost::phoenix::function<add_matrix_loop_identifier>
@@ -1595,8 +1590,14 @@ namespace stan {
     void deprecated_integrate_ode::operator()(std::ostream& error_msgs)
       const {
       error_msgs << "Warning: the integrate_ode() function is deprecated"
-             << " in the Stan language; use integrate_ode_rk45() [non-stiff]"
-             << " or integrate_ode_bdf() [stiff] instead."
+             << " in the Stan language; use the following functions"
+             << " instead.\n"
+             << " integrate_ode_rk45()"
+             << " [explicit, order 5, for non-stiff problems]\n"
+             << " integrate_ode_adams()"
+             << " [implicit, up to order 12, for non-stiff problems]\n"
+             << " integrate_ode_bdf()"
+             << " [implicit, up to order 5, for stiff problems]."
              << std::endl;
     }
     boost::phoenix::function<deprecated_integrate_ode>

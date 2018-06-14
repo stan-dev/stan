@@ -197,9 +197,9 @@ namespace stan {
         >> lit("in")
         >> (range_r(_r1)
             > lit(')'))
-        >> (eps[add_loop_identifier_f(_a, _a, _r1, _pass,
-                                         boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
+        >> (eps[add_loop_identifier_f(_a, _a, _r1,
+                                      boost::phoenix::ref(var_map_),
+                                      boost::phoenix::ref(error_msgs_))]
             > statement_r(_r1, true))
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
@@ -229,7 +229,7 @@ namespace stan {
       for_matrix_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        >> identifier_r[store_loop_identifier_f(_1, _a, _pass,
+        > identifier_r[store_loop_identifier_f(_1, _a, _pass,
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
         > lit("in")
@@ -298,9 +298,9 @@ namespace stan {
                                          boost::phoenix::ref(var_map_),
                                          boost::phoenix::ref(error_msgs_))]
             > expression_rhs_r(_r1))
-           [validate_assgn_f(_val, _pass,
-                             boost::phoenix::ref(var_map_),
-                             boost::phoenix::ref(error_msgs_))]
+              [validate_assgn_f(_val, _pass,
+                                boost::phoenix::ref(var_map_),
+                                boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       assignment_operator_r.name("assignment operator");
@@ -316,7 +316,6 @@ namespace stan {
           [deprecate_old_assignment_op_f(_val,
                                          boost::phoenix::ref(error_msgs_))];
 
-      // separate rule for name on expectation failure
       // _r1 = var scope
       expression_rhs_r.name("expression assignable to left-hand side");
       expression_rhs_r

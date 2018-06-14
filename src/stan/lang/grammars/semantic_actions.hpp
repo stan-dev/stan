@@ -476,11 +476,11 @@ namespace stan {
     extern boost::phoenix::function<add_while_body> add_while_body_f;
 
     // called from: statement_grammar
-    struct add_loop_identifier : public phoenix_functor_senary {
+    struct add_loop_identifier : public phoenix_functor_quinary {
       void operator()(const std::string& name,
                       std::string& name_local,
                       const scope& var_scope,
-                      bool& pass, variable_map& vm,
+                      variable_map& vm,
                       std::stringstream& error_msgs) const;
     };
     extern boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;

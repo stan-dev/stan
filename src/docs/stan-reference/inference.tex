@@ -601,7 +601,7 @@ appropriate padding; see \citep{Geyer:2011} for more detail on using
 FFT for autocorrelation calculations.
 %
 The autocorrelation estimates $\hat{\rho}_{t,m}$ at lag $t$ from
-multiple chains $m \in (1,\ldots,M)$ are combined with within-sample variance estimate $W$ 
+multiple chains $m \in (1,\ldots,M)$ are combined with within-sample variance estimate $W$
 and multi-chain variance estimate
 $\widehat{\mbox{var}}^{+}$ introduced in the previous section to compute the combined autocorrelation at lag $t$ as
 \[
@@ -621,7 +621,7 @@ guaranteed to be positive, monotone and convex modulo estimator noise
 \citep{Geyer:1992, Geyer:2011}.  Stan uses Geyer's initial monotone
 sequence criterion. The effective sample size estimator is defined as
 \[
-\hat{N}_{\mbox{\scriptsize eff}}
+\hat{N}_{\mathrm{eff}}
 =
 \frac{MN}
      {\hat{\tau}},
@@ -636,6 +636,42 @@ positive sequence estimators is obtained by choosing the largest $m$
 such that $\hat{P}_{t'}>0, \quad t' = 1,\ldots,m$. The initial monotone
 sequence is obtained by further reducing $\hat{P}_{t'}$ to the minimum
 of the preceding ones so that the estimated sequence is monotone.
+
+\subsection{Estimation of MCMC Standard Error}
+
+The posterior standard deviation of a parameter $\theta_n$ conditioned
+on observed data $y$ is just the standard deviation of the posterior
+density $p(\theta_n | y)$.  This is estimated by the standard
+deviation of the combined posterior draws across chains,
+\[
+\hat{\sigma}_n = \mathrm{sd}(\theta^{(1)}_n, \ldots, \theta^{(m)}_n).
+\]
+
+The previous section showed how to estimate $N_{\mathrm{eff}}$ for a
+parameter $\theta_n$ based on multiple chains of posterior draws.
+
+The mean of the posterior draws of $\theta_n$
+\[
+\hat{\theta}_n = \mathrm{mean}(\theta^{(1)}_n, \ldots,
+\theta^{(m)}_n)
+\]
+is treated as an estimator of the true posterior mean,
+\[
+\mathbb{E}[\theta_n \mid y]
+\ = \
+\int_{-\infty}^{\infty}
+\, \theta \, p(\theta | y) \, \mathrm{d}\theta_n,
+\]
+based the observed data $y$.
+
+The standard error for the estimator $\hat{\theta}_n$ is given by the
+posterior standard deviation divided by the square root of the
+effective sample size.  This standard error is itself estimated as
+$\hat{\sigma}_n / \sqrt{N_{\mathrm{eff}}}$.  The smaller the standard
+error, the closer the estimate $\hat{\theta}_n$ is expected to be to
+the true value.  This is just the MCMC central limit theorem applied
+to an estimator; see \citep{Geyer:2011} for more details of the MCMC
+central limit theorem.
 
 
 \subsection{Thinning Samples}
@@ -1252,15 +1288,16 @@ even where posterior means do not, as in the Cauchy distribution.
 \chapter{Variational Inference}\label{vi-advanced.chapter}
 
 \noindent
-Stan implements an automatic variational inference algorithm that leverages
-the transformations from \refchapter{variable-transforms}.
+Stan implements an automatic variational inference algorithm based on
+transforming variables to the unconstrained scale and using a normal
+approximating distribution.
 
-Classical variational inference algorithms are difficult to
-derive. We must first define the family of approximating
-densities, and then calculate model-specific quantities relative
-to that family to solve the variational optimization problem.  Both
-steps require expert knowledge.  The resulting algorithm is tied to
-both the model and the chosen approximation.
+Classical variational inference algorithms are difficult to derive. We
+must first define the family of approximating densities, and then
+calculate model-specific quantities relative to that family to solve
+the variational optimization problem.  Both steps require expert
+knowledge.  The resulting algorithm is tied to both the model and the
+chosen approximation.
 
 We begin by briefly describing the classical variational inference framework.
 For a thorough exposition, please refer to
@@ -1373,4 +1410,3 @@ The variational objective (ELBO) that we maximize is,
 where we plug in the analytic form for the Gaussian entropy and drop all terms
 that do not depend on $\phi$. We discuss how we perform the maximization in
 \refchapter{vi-algorithms}.
-
