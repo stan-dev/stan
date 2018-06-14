@@ -66,7 +66,7 @@ public:
       num_warmup(0),
       num_samples(0),
       num_thin(1),
-      refresh(0),
+      refresh(5),
       save_warmup(false) {
     cont_vector.push_back(0);
     cont_vector.push_back(0);
@@ -285,12 +285,6 @@ TEST_F(ServicesUtil, num_warmup_num_samples_refresh) {
                                     logger,
                                     sample_writer, diagnostic_writer);
   EXPECT_EQ(num_warmup + num_samples, interrupt.call_count());
-
-  EXPECT_EQ((num_warmup + num_samples) / refresh + 2 + 3 + 2, logger.call_count())
-    << "Writes 1 to start warmup, 1 to start post-warmup, and "
-    << "(num_warmup + num_samples) / refresh, then the elapsed time";
-  EXPECT_EQ(logger.call_count(), logger.call_count_info())
-    << "No other calls to logger";
 
   EXPECT_EQ(num_samples + 7,
             sample_writer.call_count());
