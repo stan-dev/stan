@@ -480,8 +480,7 @@ namespace stan {
       void operator()(const std::string& name,
                       std::string& name_local,
                       const scope& var_scope,
-                      variable_map& vm,
-                      std::stringstream& error_msgs) const;
+                      variable_map& vm) const;
     };
     extern boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 

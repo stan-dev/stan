@@ -1419,8 +1419,7 @@ namespace stan {
     void add_loop_identifier::operator()(const std::string& name,
                                          std::string& name_local,
                                          const scope& var_scope,
-                                         variable_map& vm,
-                                         std::stringstream& error_msgs) const {
+                                         variable_map& vm) const {
       vm.add(name, base_var_decl(name, std::vector<expression>(), int_type()),
              scope(var_scope.program_block(), true));
     }

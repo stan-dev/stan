@@ -198,8 +198,7 @@ namespace stan {
         >> (range_r(_r1)
             > lit(')'))
         >> (eps[add_loop_identifier_f(_a, _a, _r1,
-                                      boost::phoenix::ref(var_map_),
-                                      boost::phoenix::ref(error_msgs_))]
+                                      boost::phoenix::ref(var_map_))]
             > statement_r(_r1, true))
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
