@@ -149,7 +149,7 @@ TEST_F(ServicesSamplesFixedParam, output_regression) {
   double init_radius = 0;
   int num_iterations = 10;
 
-  int refresh = 0;
+  int refresh = 5;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
