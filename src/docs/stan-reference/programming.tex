@@ -194,7 +194,7 @@ the strength of the prior mean measured in number of prior observations.
 
 \subsection{Transforming Unconstrained Priors: Probit and Logit}
 
-If the variable $u$ has a  distribution, then
+If the variable $u$ has a $\distro{Uniform}(0, 1)$ distribution, then
 $\mbox{logit}(u)$ is distributed as $\distro{Logistic}(0, 1)$.  This
 is because inverse logit is the cumulative distribution function (cdf)
 for the logistic distribution, so that the logit function itself is
@@ -438,7 +438,7 @@ log(y) ~ normal(mu, sigma);
 or as an increment to the log probability function, as in
 %
 \begin{stancode}
-target += normal_lpmf(log(y) | mu, sigma);
+target += normal_lpdf(log(y) | mu, sigma);
 \end{stancode}
 
 \subsubsection{Gamma and Inverse Gamma Distribution}\label{jacobian-adjustment.section}
@@ -591,8 +591,7 @@ parameters {
   vector[N] alpha_raw;
   ...
 transformed parameters {
-  vector[N] alpha;
-  alpha = L + exp(my_vec_raw);
+  vector[N] alpha = L + exp(alpha_raw);
   ...
 model {
   target += sum(alpha_raw);  // log Jacobian
@@ -1205,7 +1204,7 @@ user-defined functions ending in \code{\_rng}.
 For example, the following function generates an $N \times K$ data
 matrix, the first column of which is filled with 1 values for the
 intercept and the remaining entries of which have values drawn
-from a unit normal PRNG.
+from a standard normal PRNG.
 %
 \begin{stancode}
 matrix predictors_rng(int N, int K) {
@@ -1260,7 +1259,7 @@ Probability functions are distinguished in Stan by names ending in
 \code{\_lpdf} for density functions and \code{\_lpmf} for mass
 functions; in both cases, they must have \code{real} return types.
 
-Suppose a model uses several unit normal distributions, for which
+Suppose a model uses several standard normal distributions, for which
 there is not a specific overloaded density nor defaults in Stan.  So
 rather than writing out the location of 0 and scale of 1 for all of
 them, a new density function may be defined and reused.
@@ -1445,6 +1444,133 @@ following conditional clause.
       return a;
 \end{stancode}
 
+
+\section{Truncated Random Number Generation}
+
+\subsection{Generation with Inverse CDFs}
+
+To generate random numbers, it is often sufficient to invert their
+cumulative distribution functions.  This is built into many of the
+random number generators.  For example, to generate a standard
+logistic variate, first generate a uniform variate
+$u \sim \mathsf{Uniform}(0, 1)$, then run through the inverse
+cumulative distribution function, $y = \mathrm{logit}(u)$.  If this
+were not already built in as \code{logistic\_rng(0, 1)}, it could be
+coded in Stan directly as
+%
+\begin{stancode}
+real standard_logistic_rng() {
+  real u = uniform_rng(0, 1);
+  real y = logit(u);
+  return y;
+}
+\end{stancode}
+%
+
+Following the same pattern, a standard normal RNG could be coded as
+%
+\begin{stancode}
+real standard_normal_rng() {
+  real u = uniform_rng(0, 1);
+  real y = Phi(u);
+  return y;
+}
+\end{stancode}
+%
+
+In order to generate non-standard variates of the location-scale
+variety, the variate is scaled by the scale parameter and shifted by
+the location parameter.  For example, to generate
+$\mathsf{Normal}(\mu, \sigma)$ variates, it is enough to generate a
+uniform variate $u \sim \mathsf{Uniform}(0, 1)$, then convert to a
+standard normal variate, $z = \Phi(u)$, where
+$\Phi$ is the inverse cumulative distribution function for the
+standard normal, and then finally, scale and translate, $y = \mu +
+\sigma \cdot z$.  In code,
+%
+\begin{stancode}
+real my_normal_rng(real mu, real sigma) {
+  real u = uniform_rng(0, 1);
+  real z = Phi(u);
+  real y = mu + sigma * z;
+  return y;
+}
+\end{stancode}
+%
+A robust version of this function would test that the arguments are
+finite and that \code{sigma} is non-negative, e.g.,
+%
+\begin{stancode}
+  if (is_nan(mu) || is_infinite(mu))
+    reject("my_normal_rng: mu must be finite; ",
+           "found mu = ", mu);
+  if (is_nan(sigma) || is_infinite(sigma) || sigma < 0)
+    reject("my_normal_rng: sigma must be finite and non-negative; ",
+           "found sigma = ", sigma);
+\end{stancode}
+
+\subsection{Truncated variate generation}
+
+Often truncated uniform variates are needed, as in survival analysis
+when a time of death is censored beyond the end of the observations.
+To generate a truncated random variate, the cumulative distribution is
+used to find the truncation point in the inverse CDF, a uniform
+variate is generated in range, and then the inverse CDF translates it
+back.
+
+\subsubsection{Truncating below}
+
+For example, the following code generates a
+$\mathsf{Weibull}(\alpha, \sigma)$ variate truncated below at a time $t$,%
+%
+\footnote{The original code and impetus for including this in the
+  manual came from the Stan forums post
+  \url{http://discourse.mc-stan.org/t/rng-for-truncated-distributions/3122/7};
+  by user \code{lcomm}, who also explained truncation above and below.}
+%
+\begin{stancode}
+real weibull_lb_rng(real alpha, real sigma, real t) {
+  real p = weibull_cdf(lt, alpha, sigma);   // cdf for lb
+  real u = uniform_rng(p, 1);               // unif in bounds
+  real y = sigma * (-log1m(u))^inv(alpha);  // inverse cdf
+  return y;
+}
+\end{stancode}
+
+\subsubsection{Truncating above and below}
+
+If there is a lower bound and upper bound, then the CDF trick is used
+twice to find a lower and upper bound.  For example, to generate a
+$\mathsf{Normal}(\mu, \sigma)$ truncated to a region $(a, b)$, the
+following code suffices,
+%
+\begin{stancode}
+real normal_lub_rng(real mu, real sigma, real lb, real ub) {
+  real p_lb = normal_cdf(lb, mu, sigma);
+  real p_ub = normal_cdf(ub, mu, sigma);
+  real u = uniform_rng(p_lb, p_ub);
+  real y = mu + sigma * Phi(u);
+  return y;
+}
+\end{stancode}
+%
+To make this more robust, all variables shold be tested for
+finiteness, \code{sigma} should be tested for positiveness, and
+\code{lb} and \code{ub} should be tested to ensure the upper bound is
+greater than the lower bound.  While it may be tempting to compress
+lines, the variable names serve as a kind of chunking of operations
+and naming for readability;  compare the multiple statement version
+above with the single statement
+%
+\begin{stancode}
+  return mu + sigma * Phi(uniform_rng(normal_cdf(lb, mu, sigma),
+                                      normal_cdf(ub, mu, sigma)));
+\end{stancode}
+%
+for readability.  The names like \code{p} indicate probabilities, and
+\code{p\_lb} and \code{p\_ub} indicate the probabilities of the
+bounds.  The variable \code{u} is clearly named as a uniform variate,
+and \code{y} is used to denote the variate being generated itself.
 
 
 \chapter{Problematic Posteriors}\label{problematic-posteriors.chapter}%
@@ -1711,12 +1837,12 @@ minimizes $\log \distro{Normal}(\lambda_1|0,\tau) + \log
 \includegraphics[height=1.45in]{img/one-param-identified.png}
 \vspace*{-.1in}
 \caption{\small\it Posteriors for two intercept parameterization
-  without prior, two intercept parameterization with unit normal
+  without prior, two intercept parameterization with standard normal
   prior, and one intercept reparameterization without prior.  For all
   three cases, the posterior is plotted for 100 data points drawn from
-  a unit normal. Left) The two intercept parameterization leads to an
+  a standard normal. Left) The two intercept parameterization leads to an
   improper prior with a ridge extending infinitely to the northwest
-  and southeast.  Middle) Adding a unit normal prior for the
+  and southeast.  Middle) Adding a standard normal prior for the
   intercepts results in a proper posterior.  Right) The single
   intercept parameterization with no prior also has a proper posterior.}%
 \label{non-identifiable-density.figure}
@@ -2598,7 +2724,7 @@ With multiple indexing, this can be coded in one line, leading to more
 efficient vectorized code.
 %
 \begin{stancode}
-y ~ normal( rows_dot_product(alpha[ii] + beta[ii] , x), sigma);
+y ~ normal(alpha[ii] + rows_dot_product(beta[ii], x), sigma);
 \end{stancode}
 %
 This latter version is equivalent in speed to the clunky assignment to
@@ -3744,10 +3870,10 @@ model {
 \end{stancode}
 %
 In this second model, the parameters \Verb|x_raw| and \Verb|y_raw| are
-sampled as independent unit normals, which is easy for Stan.  These
+sampled as independent standard normals, which is easy for Stan.  These
 are then transformed into samples from the funnel.  In this case, the
 same transform may be used to define Monte Carlo samples directly
-based on independent unit normal samples; Markov chain Monte Carlo
+based on independent standard normal samples; Markov chain Monte Carlo
 methods are not necessary. If such a reparameterization were used in
 Stan code, it is useful to provide a comment indicating what the
 distribution for the parameter implies for the distribution of the
@@ -3868,15 +3994,15 @@ Because $\tau$ is precision, $\tau^{-\frac{1}{2}}$ is the scale
 The marginal distribution of $\beta$ when you integrate out $\tau$ is
 $\mbox{\sf Student-t}(\nu, 0, 1)$, i.e.,
 \[
-\mbox{\sf Student-t}(\beta | \nu,0,1).
+\mbox{\sf Student-t}(\beta | \nu, 0, 1).
 =
 \int_0^{\infty}
 \,
-\mbox{\sf Normal}(\beta | 0, 1 / \tau^{-\frac{1}{2}})
+\mbox{\sf Normal}(\beta | 0, \tau^{-0.5})
 \times
 \mbox{\sf Gamma}(\tau | \nu/2, \nu/2)
 \
-d\tau.
+\mathrm{d} \tau.
 \]
 %
 

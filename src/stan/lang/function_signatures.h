@@ -584,6 +584,14 @@ add("log_determinant", expr_type(double_type()), expr_type(matrix_type()));
 add_binary("log_diff_exp");
 add_binary("log_falling_factorial");
 add_ternary("log_mix");
+for (size_t i = 1; i < vector_types.size(); ++i) {
+  add("log_mix", expr_type(double_type()), vector_types[i], expr_type(double_type(), 1));
+  for (size_t j = 0; j < 2; ++j) {
+    for (size_t k = 2; k < 4; ++k) {
+      add("log_mix", expr_type(double_type()), vector_types[i], expr_type(base_types[k], j));
+    }
+  }
+}
 add_binary("log_rising_factorial");
 add_unary_vectorized("log_inv_logit");
 add("log_softmax", expr_type(vector_type()), expr_type(vector_type()));
