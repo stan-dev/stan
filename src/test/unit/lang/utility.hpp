@@ -131,6 +131,14 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
   std::stringstream msgs;
   try {
     is_parsable_folder(model_name, "bad", &msgs);
+    if (msgs.str().length() > 0)
+      FAIL() << std::endl << "*********************************" << std::endl
+             << "model name=" << model_name << std::endl
+             << "*** no exception thrown by parser" << std::endl
+             << "*** parser msgs: msgs.str()=" << msgs.str() << std::endl
+             << "*** expected: error_msg=" << error_msg << std::endl
+             << "*********************************" << std::endl
+             << std::endl;
   } catch (const std::invalid_argument& e) {
     if (std::string(e.what()).find(error_msg) == std::string::npos
         && msgs.str().find(error_msg) == std::string::npos) {

@@ -31,6 +31,8 @@ namespace stan {
         o << "void function argument '_lp' suffixed";
       else if (var_scope.program_block() == void_function_argument_origin_rng)
         o << "void function argument '_rng' suffixed";
+      else if (var_scope.program_block() == loop_identifier_origin)
+        o << "loop identifier";
       else
         o << "UNKNOWN ORIGIN=" << var_scope.program_block();
     }

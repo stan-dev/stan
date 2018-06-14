@@ -131,8 +131,8 @@ namespace stan {
         | statement_2_g(_r1, _r2)                   // key "if"
         | print_statement_r(_r1)                    // key "print"
         | reject_statement_r(_r1)                   // key "reject"
-        | return_statement_r(_r1)                   // key "return"
         | void_return_statement_r(_r1)              // key "return"
+        | return_statement_r(_r1)                   // key "return"
         | assignment_r(_r1)                         // lvalue "=" or "<-"
         | compound_assignment_r(_r1)                // lvalue "+=" or "-="
         | assgn_r(_r1)                              // var[idxs] <- expr
@@ -205,24 +205,28 @@ namespace stan {
         %= lit("for")
         >> no_skip[!char_("a-zA-Z0-9_")]
         >> lit('(')
-        >> identifier_r[store_loop_identifier_f(_1, _a)]
+        >> identifier_r[store_loop_identifier_f(_1, _a, _pass,
+                                         boost::phoenix::ref(var_map_),
+                                         boost::phoenix::ref(error_msgs_))]
         >> lit("in")
         >> (range_r(_r1)
             > lit(')'))
-        >> (eps[add_loop_identifier_f(_a, _a, _r1, _pass,
-                                         boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
+        >> (eps[add_loop_identifier_f(_a, _a, _r1,
+                                      boost::phoenix::ref(var_map_),
+                                      boost::phoenix::ref(error_msgs_))]
             > statement_r(_r1, true))
         > eps
         [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
-      for_array_statement_r.name("for (array) statement");
+      for_array_statement_r.name("for statement, loop over array");
       for_array_statement_r
         %= lit("for")
         >> no_skip[!char_("a-zA-Z0-9_")]
         >> lit('(')
-        >> identifier_r[store_loop_identifier_f(_1, _a)]
+        >> identifier_r[store_loop_identifier_f(_1, _a, _pass,
+                                         boost::phoenix::ref(var_map_),
+                                         boost::phoenix::ref(error_msgs_))]
         >> lit("in")
         >> (expression_rhs_r(_r1)[add_array_loop_identifier_f(_1, _a, _r1,
                                          _pass,
@@ -235,11 +239,13 @@ namespace stan {
            [remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
 
       // _r1 = var scope
-      for_matrix_statement_r.name("for (matrix/vector/rowvector) statement");
+      for_matrix_statement_r.name("for statement, loop over vector or matrix");
       for_matrix_statement_r
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
-        > identifier_r[store_loop_identifier_f(_1, _a)]
+        > identifier_r[store_loop_identifier_f(_1, _a, _pass,
+                                         boost::phoenix::ref(var_map_),
+                                         boost::phoenix::ref(error_msgs_))]
         > lit("in")
         > expression_rhs_r(_r1)[add_matrix_loop_identifier_f(_1, _a, _r1, _pass,
                                          boost::phoenix::ref(var_map_),
@@ -298,28 +304,34 @@ namespace stan {
       // this one comes before assgn_r to deal with simple assignment
       assignment_r.name("variable assignment by expression");
       assignment_r
-        %= var_lhs_r(_r1)
+        %= var_lhs_r(_r1)[assign_lhs_f(_a, _1)]
         >> assignment_operator_r
-        > expression_rhs_r(_r1)
-          [validate_assignment_f(_val, _r1, _pass,
-                                 boost::phoenix::ref(var_map_),
-                                 boost::phoenix::ref(error_msgs_))]
+        > (eps[validate_lhs_var_assignment_f(_a, _r1, _pass,
+                                             boost::phoenix::ref(var_map_),
+                                             boost::phoenix::ref(error_msgs_))]
+           > expression_rhs_r(_r1)
+           [validate_assignment_f(_val, _r1, _pass,
+                                  boost::phoenix::ref(var_map_),
+                                  boost::phoenix::ref(error_msgs_))])
         > lit(';');
 
       // _r1 = var scope
       compound_assignment_r.name("variable compound op-equals by expression");
       compound_assignment_r
-        %= var_lhs_r(_r1)
+        %= var_lhs_r(_r1)[assign_lhs_f(_a, _1)]
         >> (string("+=")
             | string("-=")
             | string("*=")
             | string("/=")
             | string(".*=")
             | string("./="))
-        >> expression_rhs_r(_r1)
-           [validate_compound_assignment_f(_val, _r1, _pass,
-                                           boost::phoenix::ref(var_map_),
-                                           boost::phoenix::ref(error_msgs_))]
+        >> (eps[validate_lhs_var_assignment_f(_a, _r1, _pass,
+                                              boost::phoenix::ref(var_map_),
+                                              boost::phoenix::ref(error_msgs_))]
+            > expression_rhs_r(_r1))
+              [validate_compound_assignment_f(_val, _r1, _pass,
+                                              boost::phoenix::ref(var_map_),
+                                              boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       // _r1 = var scope
@@ -328,10 +340,13 @@ namespace stan {
         %= var_r(_r1)
         >> indexes_g(_r1)
         >> assignment_operator_r
-        >> (eps > expression_rhs_r(_r1))
-           [validate_assgn_f(_val, _pass,
-                             boost::phoenix::ref(var_map_),
-                             boost::phoenix::ref(error_msgs_))]
+        >> (eps[validate_lhs_var_assgn_f(_val, _r1, _pass,
+                                         boost::phoenix::ref(var_map_),
+                                         boost::phoenix::ref(error_msgs_))]
+            > expression_rhs_r(_r1))
+              [validate_assgn_f(_val, _pass,
+                                boost::phoenix::ref(var_map_),
+                                boost::phoenix::ref(error_msgs_))]
         > lit(';');
 
       assignment_operator_r.name("assignment operator");
@@ -344,11 +359,9 @@ namespace stan {
       var_r.name("variable for left-hand side of assignment");
       var_r
         = identifier_r
-          [validate_lhs_var_assgn_f(_1, _r1, _val,  _pass,
-                                    boost::phoenix::ref(var_map_),
-                                    boost::phoenix::ref(error_msgs_))];
+          [validate_lhs_var_assgn_silent_f(_1, _r1, _val,  _pass,
+                                           boost::phoenix::ref(var_map_))];
 
-      // separate rule for name on expectation failure
       // _r1 = var scope
       expression_rhs_r.name("expression assignable to left-hand side");
       expression_rhs_r
@@ -407,19 +420,23 @@ namespace stan {
         > lit(']');
 
       // _r1 = var scope
-      return_statement_r.name("return statement");
-      return_statement_r
-        %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
-        >> expression_g(_r1)
-        >> lit(';') [validate_return_allowed_f(_r1, _pass,
-                                     boost::phoenix::ref(error_msgs_))];
-
-      // _r1 = var scope
       void_return_statement_r.name("void return statement");
       void_return_statement_r
         = lit("return") [set_void_return_f(_val)]
         >> lit(';') [validate_void_return_allowed_f(_r1, _pass,
                                           boost::phoenix::ref(error_msgs_))];
+
+      // _r1 = var scope
+      return_statement_r.name("return statement");
+      return_statement_r
+        %= (lit("return") >> no_skip[!char_("a-zA-Z0-9_")])
+        > (expression_g(_r1)
+           | (eps[non_void_return_msg_f(_r1, _pass,
+                                        boost::phoenix::ref(error_msgs_))]
+              > expression_g(_r1)))
+        > lit(';') [validate_return_allowed_f(_r1, _pass,
+                                     boost::phoenix::ref(error_msgs_))];
+
 
       no_op_statement_r.name("no op statement");
       no_op_statement_r

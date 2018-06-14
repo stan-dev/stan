@@ -13,13 +13,13 @@ TEST(langParserStatement2Grammar, addConditionalCondition) {
 TEST(langParserStatementGrammar, validateIntExpr2) {
   test_parsable("validate_int_expr2_good");
   test_throws("validate_int_expr2_bad1",
-              "loop must be over container or range");
+              "Loop must be over container or range");
   test_throws("validate_int_expr2_bad2",
-              "loop must be over container or range");
+              "Loop must be over container or range");
   test_throws("validate_int_expr2_bad3",
               "dimension declaration requires expression denoting integer");
   test_throws("validate_int_expr2_bad4",
-              "loop must be over container or range");
+              "Loop must be over container or range");
 }
 
 TEST(langParserStatementGrammar, validateAllowSample) {
@@ -126,11 +126,9 @@ TEST(langParserStatementGrammar, targetFunGetLpDeprecated) {
 
 TEST(langParserStatementGrammar, removeLpDoubleUnderscore) {
   test_throws("lp-error",
-              "ERROR (fatal):  Use of lp__ is no longer supported.");
+              "Error (fatal):  Use of lp__ is no longer supported.");
   test_throws("lp-error",
               "  Use target += ... statement to increment log density.");
-  test_throws("lp-error",
-              "  Use target() function to get log density.");
 }
 
 TEST(langParserStatementGrammar, plusEqualsGood) {
