@@ -1417,7 +1417,6 @@ namespace stan {
     boost::phoenix::function<add_while_body> add_while_body_f;
 
     void add_loop_identifier::operator()(const std::string& name,
-                                         std::string& name_local,
                                          const scope& var_scope,
                                          variable_map& vm) const {
       vm.add(name, base_var_decl(name, std::vector<expression>(), int_type()),
@@ -1429,8 +1428,7 @@ namespace stan {
       ::operator()(const stan::lang::expression& expr,
                    std::string& name,
                    const scope& var_scope,
-                   bool& pass, variable_map& vm,
-                   std::stringstream& error_msgs) const {
+                   bool& pass, variable_map& vm) const {
       int numdims = expr.expression_type().num_dims();
       if (!(numdims > 0)) {
         pass = false;

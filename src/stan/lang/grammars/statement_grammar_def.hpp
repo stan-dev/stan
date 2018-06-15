@@ -197,7 +197,7 @@ namespace stan {
         >> lit("in")
         >> (range_r(_r1)
             > lit(')'))
-        >> (eps[add_loop_identifier_f(_a, _a, _r1,
+        >> (eps[add_loop_identifier_f(_a, _r1,
                                       boost::phoenix::ref(var_map_))]
             > statement_r(_r1, true))
         > eps
@@ -215,8 +215,7 @@ namespace stan {
         >> lit("in")
         >> (expression_rhs_r(_r1)[add_array_loop_identifier_f(_1, _a, _r1,
                                          _pass,
-                                         boost::phoenix::ref(var_map_),
-                                         boost::phoenix::ref(error_msgs_))]
+                                         boost::phoenix::ref(var_map_))]
             > lit(')'))
         >> (eps
             > statement_r(_r1, true))
