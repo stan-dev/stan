@@ -23,8 +23,8 @@ namespace stan {
        * @param[in] finish end iteration number used for printing messages
        * @param[in] num_thin when save is true, a draw will be written to the
        *   mcmc_writer every num_thin iterations
-       * @param[in] refresh number of iterations to print a message. If
-       *   refresh is zero, iteration number messages will not be printed
+       * @param[in] refresh number of seconds between progress messages. If
+       *   refresh is zero, no messages will be printed
        * @param[in] save if save is true, the transitions will be written
        *   to the mcmc_writer. If false, transitions will not be written
        * @param[in] warmup indicates whether these transitions are warmup. Used
