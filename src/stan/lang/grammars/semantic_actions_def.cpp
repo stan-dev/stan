@@ -83,6 +83,10 @@ namespace stan {
         || ends_with("_lcdf", s) || ends_with("_lccdf", s);
     }
 
+    bool has_rng_lp_suffix(const std::string& s) {
+      return ends_with("_lp", s) || ends_with("_rng", s);
+    }
+
     void replace_suffix(const std::string& old_suffix,
                         const std::string& new_suffix, fun& f) {
       if (!ends_with(old_suffix, f.name_)) return;
@@ -1986,6 +1990,13 @@ namespace stan {
             bool& pass, std::ostream& error_msgs) const {
       pass = true;
 
+      if (has_rng_lp_suffix(mr.fun_name_)) {
+        error_msgs << "mapped function cannot be an _rng or _lp function,"
+                   << " found function name: "
+                   << mr.fun_name_ << std::endl;
+        pass = false;
+      }
+
       // mapped function signature
       // vector f(vector param_shared, vector param_local,
       //          real[] data_r, int[] data_i)
@@ -2006,14 +2017,15 @@ namespace stan {
           .is_defined(mr.fun_name_, mapped_fun_signature)) {
         error_msgs << "first argument to map_rect"
                    << " must be the name of a function with signature"
-                   << " (vector, vector, real[], int[]) : vector";
+                   << " (vector, vector, real[], int[]) : vector" << std::endl;
         pass = false;
       }
 
       // validate parameter and data argument shapes
       if (mr.shared_params_.expression_type() != shared_params_type) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "second argument to map_rect must be of type vector";
+        error_msgs << "second argument to map_rect must be of type vector"
+                   << std::endl;
         pass = false;
       }
       // one more array dim for args other than shared params
@@ -2021,35 +2033,38 @@ namespace stan {
       if (mr.job_params_.expression_type() != job_paramss_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "third argument to map_rect must be of type vector[]"
-                   << " (array of vectors)";
+                   << " (array of vectors)" << std::endl;
         pass = false;
       }
       expr_type job_data_rs_type(double_type(), 2);
       if (mr.job_data_r_.expression_type() != job_data_rs_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "fourth argument to map_rect must be of type real[ , ]"
-                   << " (two dimensional array of reals)";
+                   << " (two dimensional array of reals)" << std::endl;
         pass = false;
       }
       expr_type job_data_is_type(int_type(), 2);
       if (mr.job_data_i_.expression_type() != job_data_is_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "fifth argument to map_rect must be of type int[ , ]"
-                   << " (two dimensional array of integers)";
+                   << " (two dimensional array of integers)" << std::endl;
         pass = false;
       }
 
       // test data is data only
       if (has_var(mr.job_data_r_, var_map)) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fourth argment to map_rect must be data only";
+        error_msgs << "fourth argment to map_rect must be data only"
+                   << std::endl;
         pass = false;
       }
       if (has_var(mr.job_data_i_, var_map)) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fifth argument to map_rect must be data only";
+        error_msgs << "fifth argument to map_rect must be data only"
+                   << std::endl;
         pass = false;
       }
+
       if (pass)
         mr.register_id();
     }
