@@ -69,7 +69,7 @@ struct map_rect {
    * Copy constructor using the member variables of the specified
    * object to construct a copy.
    *
-   * @paramp[in] mr rectangular map to copy
+   * @param[in] mr rectangular map to copy
    */
   map_rect(const map_rect& mr);
 
@@ -79,7 +79,7 @@ struct map_rect {
    * copy constructor are defined to avoid incrementing the call
    * identifier accidentally.
    *
-   * @paramp[in] mr rectangular map to assign
+   * @param[in] mr rectangular map to assign
    * @return a reference to this object
    */
   map_rect& operator=(const map_rect& mr);
