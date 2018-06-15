@@ -198,3 +198,8 @@ TEST(langParserStatementGrammar, eltOpEqualsBad) {
   test_throws("compound-assign/elt_divide_equals_prim",
               "Cannot apply element-wise operation to scalar");
 }
+
+TEST(langParserStatementGrammar, noCloseBrace) {
+  test_throws("expect_statement_seq_close_brace",
+              "missing close");
+}              
