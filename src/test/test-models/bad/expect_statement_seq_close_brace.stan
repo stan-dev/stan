@@ -3,5 +3,3 @@ parameters {
 }
 model {
   y ~ normal(0,1);
-
-
