@@ -3007,6 +3007,20 @@ e^A = \sum_{n=0}^{\infty} \dfrac{A^n}{n!}
 \fitem{matrix}{matrix\_exp}{matrix \farg{A}}{
 The matrix exponential of \farg{A}}
 %
+
+%
+\fitem{matrix}{matrix\_exp\_multiply}{matrix \farg{A}, matrix \farg{B}}{
+The multiplication of matrix exponential of \farg{A} and
+matrix \farg{B}; algebraically equivalent to the less efficient form
+\code{matrix\_exp(\farg{A}) * \farg{B}}.}
+%
+
+%
+\fitem{matrix}{scale\_matrix\_exp\_multiply}{real \farg{t}, matrix \farg{A}, matrix \farg{B}}{
+The multiplication of matrix exponential of \farg{t}\farg{A} and
+matrix \farg{B}; algebraically equivalent to the less efficient form
+\code{matrix\_exp(\farg{t}\farg{A}) * \farg{B}}.}
+%
 \end{description}
 
 
