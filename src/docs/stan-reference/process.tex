@@ -91,11 +91,8 @@ vs. unconstrained matrix) and sizes.
 
 A large part of readability is consistency.  Particularly in naming
 and layout.  Not only of programs themselves, but the directories and
-files in which they're stored.
-
-Readability of code is not just about comments (see
-Section~\refsection{comments-programming} for commenting
-recommendations and syntax in Stan).
+files in which they're stored.  Readability of code is not just about
+comments---it is also about naming and organization for readability.
 
 It is surprising how often the solution to a debugging or design
 problem occurs when trying to explain enough about the problem to
@@ -194,8 +191,7 @@ will print ``1 + 1 = 2'' followed by a new line.
 
 Print statements may be used anywhere other statements may be used,
 but their behavior in terms of frequency depends on how often the
-block they are in is evaluated.  See \refsection{print-statements} for
-more information on the syntax and evaluation of print statements.
+block they are in is evaluated. 
 
 
 
@@ -216,12 +212,13 @@ a way as to make the documentation unnecessary.
 
 \subsection{Comment Styles in Stan}
 
-Stan supports \Cpp-style comments; see \refsection{comments} for full
-details.  The recommended style is to use line-based comments for
-short comments on the code or to comment out one or more
-lines of code.  Bracketed comments are then reserved for long
-documentation comments.  The reason for this convention is that
-bracketed comments cannot be wrapped inside of bracketed comments.
+Stan supports \Cpp-style comments with \code{//} for line comments and
+\code{/*} and \code{*/} as block comment wrappers.  The recommended
+style is to use line-based comments for short comments on the code or
+to comment out one or more lines of code.  Bracketed comments are then
+reserved for long documentation comments.  The reason for this
+convention is that bracketed comments cannot be wrapped inside of
+bracketed comments.
 
 \subsection{What Not to Comment}
 
@@ -1041,8 +1038,9 @@ The preferred style for operators minimizes parentheses.  This reduces
 clutter in code that can actually make it harder to read expressions.
 For example, the expression \code{a~+~b~*~c} is preferred to the
 equivalent \code{a~+~(b~*~c)} or \code{(a~+~(b~*~c))}.  The operator
-precedences and associativities are given in
-\reffigure{operator-precedence}.
+precedences and associativities follow those of pretty much every
+programming language including Fortran, C++, R, and Python;  full 
+details are provided in the reference manual.
 
 Similarly, comparison operators can usually be written with minimal
 bracketing, with the form \code{y[n] > 0 || x[n] != 0} preferred to

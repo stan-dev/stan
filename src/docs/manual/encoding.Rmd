@@ -1,0 +1,27 @@
+# Character Encoding
+
+## Content Characters
+
+The content of a Stan program must be coded in ASCII.  All identifiers
+must consist of only ASCII alpha-numeric characters and the underscore
+character.  All arithmetic operators and punctuation must be coded in
+ASCII.
+
+### Compatibility with Latin-1 and UTF-8 {-}
+
+The UTF-8 encoding of Unicode and the Latin-1 (ISO-8859-1) encoding
+share the first 128 code points with ASCII and thus cannot be
+distinguished from ASCII.  That means you can set editors, etc., to
+use UTF-8 or Latin-1 (or the other Latin-n variants) without worrying
+that the content of a Stan program will be destroyed.
+
+## Comment Characters
+
+Any bytes on a line after a line-comment sequence (`//` or
+`#`) are ignored up until the ASCII newline character
+(`\n`).  They may thus be written in any character encoding which
+is convenient.
+
+Any content after a block comment open sequence in ASCII (`/*`)
+up to the closing block comment (`*/`) is ignored, and thus may
+also be written in whatever character set is convenient.

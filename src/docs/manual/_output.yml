@@ -1,0 +1,21 @@
+bookdown::gitbook:
+  css: stan-manual.css
+  config:
+    search: yes
+    fontsettings:
+      theme: white
+      family: serif
+      size: 2
+    toc:
+      collapse: section
+      before: |
+        <li style="font-size:125%; font-weight:400; line-height:1.4; margin: 0.5em 0 0 1em">Stan Language Reference</li>
+      after: null
+    edit:
+      link: https://github.com/stan-dev/stan/edit/develop/%s
+      text: "Edit"
+    sharing: no
+bookdown::pdf_book:
+  latex_engine: "pdflatex"
+  includes:
+    in_header: header.tex

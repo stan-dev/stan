@@ -37,9 +37,6 @@ or the R console in RStan).
     built-in numerical types or double quoted strings of ASCII
     characters.}
 \end{description}
-%
-The full behavior of the \code{print} statement with examples is
-documented in \refsection{print-statements}.
 
 \section{Reject ``Function''}
 
@@ -60,9 +57,6 @@ context in which it occurs).
     through \code{TN} can be any of Stan's built-in numerical types or
     double quoted strings of ASCII characters.}
 \end{description}
-%
-The full behavior of the \code{print} statement with examples is
-documented in \refsection{reject-statements}.
 
 \chapter{Integer-Valued Basic Functions}
 
@@ -453,7 +447,7 @@ Like C++, BUGS, and R, Stan uses 0 to encode false, and 1 to encode
 true.  Stan supports the usual boolean comparison operations and
 boolean operators.  These all have the same syntax and precedence as
 in \Cpp; for the full list of operators and precedences, see
-\reffigure{operator-precedence}.
+the reference manual.
 
 
 \subsection{Comparison Operators}
@@ -2578,11 +2572,11 @@ of matrix \farg{x}}
 \end{description}
 
 The \code{row} function is special in that it may be used as an lvalue
-in an assignment statement; for more information on assignment, see
-\refsection{assignment-statement}.  The row function is also special
-in that the indexing notation \code{x[m]} is just an alternative way
-of writing \code{row(x,m)}.  The \code{col} function may {\it not}\, be
-used as an lvalue, nor is there an indexing based shorthand for it.
+in an assignment statement (i.e., something to which a value may be
+assigned).  The row function is also special in that the indexing
+notation \code{x[m]} is just an alternative way of writing
+\code{row(x,m)}.  The \code{col} function may {\it not}\, be used as
+an lvalue, nor is there an indexing based shorthand for it.
 
 
 \subsection{Block Operations}
@@ -3509,21 +3503,21 @@ one-dimensional array in row-major order.}
 \chapter{Compound Arithmetic and Assignment}
 
 \noindent
-The compound arithmetic and assignment operations are coded directly
-as statements, as described in
-\refsection{compound-arithmetic-assignment}.  They allow statements of
-the form
+Compound arithmetic and assignment statements combine an arithmetic
+operation and assignment,
 %
 \begin{stancode}
 x = x op y;
 \end{stancode}
 %
-with the compound form
+replacing them with the compound form
 %
 \begin{stancode}
 x op= y;
 \end{stancode}
 %
+For example, \code{x = x + 1} may be replaced with \code{x += 1}.
+
 The signatures of the supported compound arithmetic and assignment
 operations are as follows.
 
