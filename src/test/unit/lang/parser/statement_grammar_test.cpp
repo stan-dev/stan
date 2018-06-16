@@ -201,5 +201,5 @@ TEST(langParserStatementGrammar, eltOpEqualsBad) {
 
 TEST(langParserStatementGrammar, noCloseBrace) {
   test_throws("expect_statement_seq_close_brace",
-              "missing close");
+              "Missing \'}\' at end of statements block.");
 }              

@@ -147,8 +147,9 @@ namespace stan {
         %= lit('{')
         > eps[reset_var_scope_f(_b, _r1)]
         > local_var_decls_r(_b)[assign_lhs_f(_a, _1)]
-        > *statement_r(_b, _r2)
-        > lit('}')
+        > +statement_r(_b, _r2)
+        > eps[missing_close_brace_f(_pass, boost::phoenix::ref(error_msgs_))]
+          | lit('}') 
         > eps[unscope_locals_f(_a, boost::phoenix::ref(var_map_))];
 
       local_var_decls_r
