@@ -285,9 +285,7 @@ prior on $(0,\infty)$, $q(\sigma) = c$ (we use $q$ because the
 work on the log scale and provide $\log \sigma$ a uniform prior on
 $(-\infty,\infty)$, $q(\log \sigma) = c$.  These work out to be
 different priors on $\sigma$ due to the Jacobian adjustment necessary
-for the log transform; see \refsection{change-of-variables} for more
-information on changes of variables and their requisite Jacobian
-adjustments.
+for the log transform.
 
 Stan automatically applies the necessary Jacobian adjustment for
 variables declared with constraints to ensure a uniform density on the
@@ -3451,8 +3449,8 @@ warning from the parser, which is not smart enough to do the code
 analysis to infer that the transform is linear).  It would not be at
 all convenient to place a prior on the full covariance matrix \code{L
   * L'}, because that would require a Jacobian adjustment; the exact
-adjustment is provided in the subsection of
-\refsection{change-of-variables} devoted to covariance matrices.
+adjustment is detailed in the reference manual.
+
 
 \section{Missing Multivariate Data}
 
@@ -5430,10 +5428,10 @@ $C$ animals recaptured.  Implementing this lower bound is necessary to
 ensure sampling and optimization can be carried out in an
 unconstrained manner with unbounded support for parameters on the
 transformed (unconstrained) space.  The lower bound in the declaration
-for $C$ implies a variable transform $f : (C-R+M,\infty) \rightarrow
-(-\infty,+\infty)$ defined by $f(N) = \log(N - (C - R + M))$; see
-\refsection{lower-bound-transform} for more information on the
-transform used for variables declared with a lower bound.
+for $C$ implies a variable transform
+$f : (C-R+M,\infty) \rightarrow (-\infty,+\infty)$ defined by
+$f(N) = \log(N - (C - R + M))$; the reference manual contains full
+details of all constrained parameter transforms.
 
 \subsection{Cormack-Jolly-Seber with Discrete Parameter}
 
@@ -8120,9 +8118,8 @@ unit_vector[K] x;
 \end{stancode}
 %
 the value of \code{x} will be constrained to be a vector of size
-\code{K} with unit length.  \refsection{unit-vector} provides details
-on how a parameter constrained to be a unit-vector is transformed to
-unconstrained space for use in Stan's algorithms.
+\code{K} with unit length;  the reference manual chapter on
+constrained parameter transforms provides precise definitions.  
 
 {\it Warning:} An extra term gets added to the log density to ensure
 the distribution on unit vectors is proper.  This is not a problem in
@@ -8190,8 +8187,9 @@ The problem with this mapping is that it's many to one; any point
 lying on a vector out of the origin is projected to the same point on
 the surface of the sphere.  \cite{Marsaglia:1972} introduced an
 auxiliary variable interpretation of this mapping that provides the
-desired properties of uniformity; see \refsection{unit-vector} for
-details.
+desired properties of uniformity; the reference manual contains the
+precise definitions used in the chapter on constrained parameter
+transforms.
 
 
 \subsubsection{Warning: undefined at zero!}

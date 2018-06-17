@@ -668,9 +668,7 @@ initialization provides reasonable variable initializations for most
 parameters, such as 0 for unconstrained parameters, 1 for parameters
 constrained to be positive, 0.5 for variables to constrained to lie
 between 0 and 1, a symmetric (uniform) vector for simplexes, unit
-matrices for both correlation and covariance matrices, and so on. See
-\refchapter{variable-transforms} for full details of the
-transformations.
+matrices for both correlation and covariance matrices, and so on.
 
 
 \subsubsection{System Random Initialization}
@@ -678,10 +676,9 @@ transformations.
 Random initialization by default initializes the parameter values with
 values drawn at random from a $\distro{Uniform}(-2,2)$ distribution.
 Alternatively, a value other than 2 may be specified for the absolute
-bounds. These values are on the unconstrained scale, and are inverse
-transformed back to satisfy the constraints declared for parameters.
-See \refchapter{variable-transforms} for a complete description of the
-transforms used.
+bounds. These values are on the unconstrained scale, so must be
+inverse transformed back to satisfy the constraints declared for
+parameters.
 
 Because zero is chosen to be a reasonable default initial value for
 most parameters, the interval around zero provides a fairly diffuse
@@ -1032,15 +1029,15 @@ define it. For example, an $N \times N$ correlation matrix, requires
 $\binom{N}{2}$ unconstrained parameters. The
 transformations from constrained to unconstrained parameters are based
 on the constraints in the parameter declarations and described in
-detail in \refchapter{variable-transforms}.
+the reference manual chapter on transforms.
 
 \subsection{Includes Jacobian}
 
 The log density includes the Jacobian adjustment implied by the
-constraints declared on variables; see
-\refchapter{variable-transforms} for full details. The Jacobian
-adjustment will be turned off if optimization is used in practice, but
-there is as of yet no way to turn it off in diagnostic mode.
+constraints declared on variables.  The Jacobian adjustment for
+constrained parameter transforms will be turned off if optimization is
+used in practice, but there is as of yet no way to turn it off in
+diagnostic mode.
 
 \section{Configuration Options}
 

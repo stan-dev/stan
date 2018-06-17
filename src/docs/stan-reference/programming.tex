@@ -359,9 +359,7 @@ univariate changes of variables must be monotonic and differentiable
 everywhere in their support.
 
 For univariate changes of variables, the resulting probability must be
-scaled by the absolute derivative of the transform (see
-\refsection{change-of-variables} for more precise definitions of
-univariate changes of variables).
+scaled by the absolute derivative of the transform.
 
 In the case of log normals, if $y$'s logarithm is normal with mean
 $\mu$ and deviation $\sigma$, then the distribution of $y$ is given by
@@ -498,11 +496,9 @@ transform, which in this case is
 \subsection{Multivariate Changes of Variables}
 
 In the case of a multivariate transform, the log of the Jacobian of
-the transform must be added to the log probability accumulator (see
-the subsection of \refsection{change-of-variables} on multivariate
-changes of variables for more precise definitions of multivariate
-transforms and Jacobians).  In Stan, this can be coded as follows in
-the general case where the Jacobian is not a full matrix.
+the transform must be added to the log probability accumulator.  In
+Stan, this can be coded as follows in the general case where the
+Jacobian is not a full matrix.
 %
 \begin{stancode}
 parameters {
@@ -548,9 +544,10 @@ transformed parameters {
 
 Stan only allows a single lower and upper bound to be declared in the
 constraints for a container data type.  But suppose we have a vector
-of parameters and a vector of lower bounds?  Then the transforms and
-Jacobians (all of which are described in
-\refchapter{variable-transforms}) have to be calculated in Stan.
+of parameters and a vector of lower bounds?  Then the transforms are
+calculated and their log Jacobians added to the log density accumulator;
+the Jacobian calculations are described in detail in the reference
+manual chapter on constrained parameter transforms.
 
 \subsection{Varying Lower Bounds}
 
@@ -599,11 +596,11 @@ model {
 \end{stancode}
 %
 The adjustment in the the log Jacobian determinant of the transform
-mapping $\alpha_{\mathrm{raw}}$ to $\alpha = L +
-\exp(\alpha_{\mathrm{raw}})$.  The details are simple in this case
-because the Jacobian is diagonal; see
-\refsection{lower-bound-transform} for details.  Here $L$ can even be
-a vector containing parameters that don't depend on
+mapping $\alpha_{\mathrm{raw}}$ to
+$\alpha = L + \exp(\alpha_{\mathrm{raw}})$.  The details are simple in
+this case because the Jacobian is diagonal; see the reference manual
+chapter on constrained parameter transforms for full details.  Here
+$L$ can even be a vector containing parameters that don't depend on
 $\alpha_{\mathrm{raw}}$; if the bounds do depend on
 $\alpha_{\mathrm{raw}}$ then a revised Jacobian needs to be calculated
 taking into account the dependencies.
@@ -722,9 +719,7 @@ sample properly.%
   \code{y} to be of type \code{real<lower=-1,upper=1>}, the inverse logit
   transform is applied to the unconstrained variable and its log
   absolute derivative added to the log probability.  The resulting
-  distribution on the logit-transformed \code{y} is well behaved.  See
-  \refchapter{variable-transforms} for more information on the
-  transforms used by Stan.}
+  distribution on the logit-transformed \code{y} is well behaved.}
 
 \subsection{Exponential distribution}
 
@@ -1786,9 +1781,10 @@ The many-to-one nature of $\mbox{softmax}(\alpha)$ is typically
 mitigated by pinning a component of $\alpha$, for instance fixing
 $\alpha_K = 0$.  The resulting mapping is one-to-one from $K-1$
 unconstrained parameters to a $K$-simplex.  This is roughly how
-simplex-constrained parameters are defined in Stan; see
-\refsection{simplex-transform} for a precise definition.  The Stan
-code for creating a simplex from a $K-1$-vector can be written as
+simplex-constrained parameters are defined in Stan; see the reference
+manual chapter on constrained parameter transforms for a precise
+definition.  The Stan code for creating a simplex from a $K-1$-vector
+can be written as
 %
 \begin{stancode}
 vector softmax_id(vector alpha) {
@@ -2075,8 +2071,7 @@ to $(-\infty,\infty)$.  The boundaries at 0 and 1 are pushed out to
 $-\infty$ and $\infty$ respectively.  The Jacobian adjustment that
 Stan automatically applies ensures the unconstrained density is
 proper.  The adjustment for the particular case of $(0,1)$ is $\log
-\mbox{logit}^{-1}(\phi) + \log \mbox{logit}(1 - \phi)$; see
-\refsection{logit-transform-jacobian} for the derivation.
+\mbox{logit}^{-1}(\phi) + \log \mbox{logit}(1 - \phi)$.
 
 There are two problems that still arise, though.  The first is that if
 the posterior mass for $\phi$ is near one of the boundaries, the
