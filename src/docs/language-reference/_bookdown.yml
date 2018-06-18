@@ -20,7 +20,10 @@ rmd_files: [
 
  "syntax.Rmd",
 
- "hmc.Rmd",
+ "mcmc.Rmd",
+ "optimization.Rmd",
+ "variational.Rmd",
+ "diagnostic.Rmd"
 
  "references.Rmd"
 ]
