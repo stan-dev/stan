@@ -7,7 +7,7 @@ VERSION_STRING := $(STAN_MAJOR).$(STAN_MINOR).$(STAN_PATCH)
 
 doc: manual language-manual
 
-manual: $(STAN)src/docs/stan-reference/stan-reference.pdf $(STAN)src/docs/stan-reference/stan-functions.txt
+manual: $(STAN)src/docs/stan-reference/stan-reference.pdf $(STAN)src/docs/functions-reference/functions-reference.pdf $(STAN)src/docs/stan-reference/stan-functions.txt
 	@mkdir -p doc/
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING)$(suffix $(artifact));)
 

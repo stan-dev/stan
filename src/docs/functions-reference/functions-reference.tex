@@ -13,21 +13,19 @@
 \frontmatter
 \include{title}
 \tableofcontents
-\include{preface}
+\include{about}
+
 \newcounter{savepage}
 \setcounter{savepage}{\arabic{page} + 1}
 
 \mainmatter
 \setcounter{page}{\thesavepage}
-\include{introduction}
-\include{examples}
-\include{programming}
-\include{inference}
-\include{algorithms}
-\include{process}
+\include{functions}
+\include{distributions}
+
 
 \appendix
-\include{appendices}
+\include{math}
 \include{references}
 \titlespacing{\chapter}{0pt}{-4pt}{24pt}{}
 {\footnotesize

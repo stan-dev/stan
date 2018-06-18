@@ -1055,8 +1055,7 @@ of these in the future, but as of now, there is no good workaround.
 \section{Link Functions}\label{link-functions.section}
 
 The following functions are commonly used as link functions in
-generalized linear models (see
-\refsection{logistic-probit-regression}).  The function $\Phi$ is also
+generalized linear models.  The function $\Phi$ is also
 commonly used as a link function (see \refsection{Phi-function}).
 %
 \begin{description}
@@ -3225,8 +3224,7 @@ Because of this speedup and space savings, it may even be useful to
 read in a dense matrix and convert it to a sparse matrix before
 multiplying it by a vector.  This chapter covers a very specific form
 of sparsity consisting of a sparse matrix multiplied by a dense
-vector; for more general coding strategies for sparse data structures
-within Stan, see \refchapter{sparse-ragged}.
+vector.
 
 \section{Compressed Row Storage}\label{CSR.section}
 
@@ -3768,11 +3766,6 @@ function's output with respect to the unknowns \farg{y} and with respect to the
 auxiliary parameters \farg{theta}) are computed using Stan's automatic
 differentiation.
 
-\subsubsection{Example}
-
-An example of Stan code with a system definition and solver call is shown
-in \refchapter{algebra-solver}.
-
 
 \section{Ordinary Differential Equation Solvers}%
 \label{functions-ode-solver.section}
@@ -3935,18 +3928,10 @@ the same size:
 \end{itemize}
 %
 
-\subsubsection{Example}
-
-An example of a complete Stan program with a system definition and
-solver call is shown for data simulation in \reffigure{sho-sim} and
-estimation in \reffigure{sho-both}.
-
-
 \section{Higher-Order Map}\label{functions-map.section}
 
 Stan provides a higher-order map function.  This allows map-reduce
-functionality to be coded in Stan as described in
-\refchapter{map-reduce}.
+functionality to be coded in Stan as described in the user's guide.
 
 \subsection{Specifying the Mapped Function}
 
