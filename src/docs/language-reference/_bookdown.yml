@@ -20,6 +20,8 @@ rmd_files: [
 
  "syntax.Rmd",
 
+ "hmc.Rmd",
+
  "references.Rmd"
 ]
 
