@@ -560,13 +560,6 @@ namespace stan {
     deprecate_increment_log_prob_f;
 
     // called from: statement_grammar
-    struct missing_close_brace : public phoenix_functor_binary {
-      void operator()(bool& pass, std::stringstream& error_msgs) const;
-    };
-    extern boost::phoenix::function<missing_close_brace>
-    missing_close_brace_f;
-
-    // called from: statement_grammar
     struct validate_allow_sample : public phoenix_functor_ternary {
       void operator()(const scope& var_scope, bool& pass,
                       std::stringstream& error_msgs) const;

@@ -196,9 +196,10 @@ namespace stan {
           if (line.empty()) {
             // ends initial out of loop start event
             if (!is_nested) {
-              // pad line number by 2 for spirit::qi line_pos_iterator
+              // pad end concat_line_num of outermost file in order to properly
+              // report end-of-file parse error - else trace throws exception
               history_.push_back(preproc_event(concat_line_num + 2,
-                                               line_num, "end", path));
+                                               line_num - 1, "end", path));
             } else {
               history_.push_back(preproc_event(concat_line_num,
                                                line_num - 1, "end", path));

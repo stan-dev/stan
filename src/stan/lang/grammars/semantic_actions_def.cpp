@@ -1606,14 +1606,6 @@ namespace stan {
     boost::phoenix::function<deprecate_increment_log_prob>
     deprecate_increment_log_prob_f;
 
-    // called from: statement_grammar
-    void missing_close_brace::operator()(bool& pass,
-                                         std::stringstream& error_msgs) const {
-      pass = false;
-      error_msgs << "Missing \'}\' at end of statements block.";
-    }
-    boost::phoenix::function<missing_close_brace> missing_close_brace_f;
-
     void validate_allow_sample::operator()(const scope& var_scope,
                                            bool& pass,
                                            std::stringstream& error_msgs)
