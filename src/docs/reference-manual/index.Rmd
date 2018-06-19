@@ -1,5 +1,5 @@
 ---
-title: "Stan Language Reference"
+title: "Stan Reference Manual"
 author: "Stan Development Team"
 date: "Version 2.18 (May 2018)"
 site: bookdown::bookdown_site
@@ -20,8 +20,7 @@ description: "Stan reference manual specifying the syntax and semantics of the S
 
 <img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225"></img>
 
-This is the official reference manual for the syntax and operational
-semantics of the Stan programming language.
+This is the official reference manual for the Stan programming language, inference algorithms, and posterior analysis tools.
 
 ## Web resources {-}
 

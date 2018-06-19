@@ -23,7 +23,7 @@ rmd_files: [
  "mcmc.Rmd",
  "optimization.Rmd",
  "variational.Rmd",
- "diagnostic.Rmd"
+ "diagnostics.Rmd",
 
  "references.Rmd"
 ]

@@ -1,22 +1,21 @@
-.PHONY: manual $(STAN)src/docs/stan-reference/stan-reference.tex $(STAN)src/docs/stan-reference/stan-functions.txt
+.PHONY: reference-manual $(STAN)src/docs/users-guide/users-guide.tex $(STAN)src/docs/functions/stan-functions.txt
 
 STAN_MAJOR := $(shell grep "\#define STAN_MAJOR" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_MAJOR \(.*\)/\1/')
 STAN_MINOR := $(shell grep "\#define STAN_MINOR" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_MINOR \(.*\)/\1/')
 STAN_PATCH := $(shell grep "\#define STAN_PATCH" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_PATCH \(.*\)/\1/')
 VERSION_STRING := $(STAN_MAJOR).$(STAN_MINOR).$(STAN_PATCH)
 
-doc: manual language-manual
+doc: users-guide reference-manual
 
-manual: $(STAN)src/docs/stan-reference/stan-reference.pdf $(STAN)src/docs/functions-reference/functions-reference.pdf $(STAN)src/docs/stan-reference/stan-functions.txt
+users-guide: $(STAN)src/docs/users-guide/users-guide.pdf $(STAN)src/docs/functions/functions-reference.pdf $(STAN)src/docs/functions/stan-functions.txt
 	@mkdir -p doc/
 	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING)$(suffix $(artifact));)
 
-
-$(STAN)src/docs/stan-reference/stan-functions.txt: $(STAN)src/docs/stan-reference/stan-reference.pdf
+$(STAN)src/docs/functions/stan-functions.txt: $(STAN)src/docs/functions/functions-reference.pdf
 	@echo '  building $@'
 	@echo '# This file is semicolon delimited' > $@
 	@echo 'StanFunction; Arguments; ReturnType; Page' >> $@
-	@sed 's/^\\indexentry{{\\tt  \\bfseries //g' $(STAN)src/docs/stan-reference/stan-reference.idx | \
+	@sed 's/^\\indexentry{{\\tt  \\bfseries //g' $(STAN)src/docs/functions/functions-reference.idx | \
 	sed 's/ }!{\\tt  /;/g' | \
 	sed 's/{\\tt  \\slshape  //g' | \
 	sed 's/:.*T}\[.*\]}/;T\[\]/g' | \
@@ -45,15 +44,23 @@ MANUAL_FLAGS=
 %.pdf: %.tex
 	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
 
-language-manual: doc/manual/index.html src/docs/manual/_book/_main.pdf
+reference-manual: $(STAN)doc/reference-manual-$(VERSION_STRING).pdf $(STAN)doc/reference-manual/index.html 
 
-doc/manual/index.html:
-	cd src/docs/manual; Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::gitbook')"
-	mkdir -p doc/stan-language-$(VERSION_STRING)
-	mv src/docs/manual/_book/* doc/stan-language-$(VERSION_STRING)
+$(STAN)doc/reference-manual-$(VERSION_STRING).pdf: $(STAN)src/docs/reference-manual/*.Rmd $(STAN)src/docs/reference-manual/*.yml $(STAN)src/docs/reference-manual/*.R $(STAN)src/docs/reference-manual/*.css $(STAN)src/docs/reference-manual/*.tex
+	cd $(STAN)src/docs/reference-manual; Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::pdf_book')"
+	mkdir -p $(STAN)doc
+	mv src/docs/reference-manual/_book/_main.pdf doc/reference-manual-$(VERSION_STRING).pdf
 
-src/docs/manual/_book/_main.pdf: 
-	cd src/docs/manual; Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::pdf_book')"
-	mkdir -p doc/manual
-	mv src/docs/manual/_book/_main.pdf doc/manual/stan-language-$(VERSION_STRING).pdf
+$(STAN)doc/reference-manual/index.html:  $(STAN)src/docs/reference-manual/*.Rmd $(STAN)src/docs/reference-manual/*.yml $(STAN)src/docs/reference-manual/*.R $(STAN)src/docs/reference-manual/*.css $(STAN)src/docs/reference-manual/*.tex
+	cd $(STAN)src/docs/reference-manual; Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::gitbook')"
+	mkdir -p $(STAN)doc/reference-manual
+	mv $(STAN)src/docs/reference-manual/_book/* $(STAN)doc/reference-manual
 
+clean-manual:
+	rm -rf $(STAN)doc
+	cd $(STAN)src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+	rm -rf $(STAN)src/docs/functions/functions-reference.pdf
+	rm -rf $(STAN)src/docs/functions/stan-functions.txt
+	rm -rf $(STAN)src/docs/users-guide/users-guide.pdf
+	rm -rf $(STAN)src/docs/reference-manual/_book/
+	rm -rf $(STAN)src/docs/reference-manual/_main.rds
