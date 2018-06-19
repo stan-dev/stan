@@ -2456,19 +2456,18 @@ namespace stan {
     void add_expression_dimss::operator()(expression& expression,
                  std::vector<std::vector<stan::lang::expression> >& dimss,
                  bool& pass, std::ostream& error_msgs) const {
-      index_op iop(expression, dimss);
       int expr_dims = expression.total_dims();
       int index_dims = num_dimss(dimss);
       if (expr_dims < index_dims) {
-        error_msgs << "Indexed expression must have at least as many"
-                   << " dimensions as number of indexes supplied: "
-                   << std::endl
-                   << "    indexed expression dimensionality = " << expr_dims
-                   << "; indexes supplied = " << dimss.size()
+        error_msgs << "Too many indexes, expression dimensions="
+                   << expr_dims
+                   << ", indexes found="
+                   << index_dims
                    << std::endl;
         pass = false;
         return;
       }
+      index_op iop(expression, dimss);
       iop.infer_type();
       if (iop.type_.is_ill_formed()) {
         error_msgs << "Indexed expression must have at least as many"
