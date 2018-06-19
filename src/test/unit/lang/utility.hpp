@@ -21,13 +21,6 @@
 #include <exception>
 #include <stdexcept>
 
-stan::io::program_reader create_stub_reader() {
-  stan::io::program_reader r;
-  r.add_event(0, 0, "start", "utility-stub.stan");
-  r.add_event(500, 500, "end", "utility-stub.stan");
-  return r;
-}
-
 /** extract model name from filepath name
  * @param file_name  Name off model file
  */
@@ -65,9 +58,12 @@ bool is_parsable(const std::string& file_name,
     return false;
   }
   std::string model_name = file_name_to_model_name(file_name);
-  stan::io::program_reader reader = create_stub_reader();
+  std::vector<std::string> search_path;
+  stan::io::program_reader reader(fs, file_name, search_path);
+  std::string s = reader.program();
+  std::stringstream ss(s);
   bool parsable
-    = stan::lang::parse(msgs, fs, model_name, reader, prog, allow_undefined);
+    = stan::lang::parse(msgs, ss, model_name, reader, prog, allow_undefined);
   return parsable;
 }
 
@@ -198,12 +194,14 @@ void test_warning(const std::string& model_name,
 }
 
 std::string model_to_cpp(const std::string& model_text) {
-  std::string model_name = "foo";
+  std::string model_name = "unnamed_unit_test";
   std::stringstream ss(model_text);
   std::stringstream msgs;
   stan::lang::program prog;
-
-  stan::io::program_reader reader = create_stub_reader();
+  stan::io::program_reader reader;
+  // fake reader history - model is parseable, no includes
+  reader.add_event(0, 0, "start", "unnamed_unit_test");
+  reader.add_event(500, 500, "end", "unnamed_unit_test");
   bool parsable = stan::lang::parse(&msgs, ss, model_name, reader, prog);
   EXPECT_TRUE(parsable);
 
