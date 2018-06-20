@@ -26,6 +26,8 @@ rmd_files: [
  "variational.Rmd",
  "diagnostics.Rmd",
 
+ "reproducibility.Rmd", 
+
  "licenses.Rmd",
 
  "references.Rmd"
