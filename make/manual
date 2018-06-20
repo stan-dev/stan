@@ -1,4 +1,4 @@
-.PHONY: reference-manual $(STAN)src/docs/users-guide/users-guide.tex $(STAN)src/docs/functions/stan-functions.txt
+.PHONY: reference-manual users-guide $(STAN)src/docs/users-guide/users-guide.tex $(STAN)src/docs/functions/stan-functions.txt
 
 STAN_MAJOR := $(shell grep "\#define STAN_MAJOR" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_MAJOR \(.*\)/\1/')
 STAN_MINOR := $(shell grep "\#define STAN_MINOR" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_MINOR \(.*\)/\1/')

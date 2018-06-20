@@ -15,15 +15,17 @@ rmd_files: [
  "user-functions.Rmd",
 
  "execution.Rmd",
-
  "transforms.Rmd",
 
  "syntax.Rmd",
+ "deprecations.Rmd",
 
  "mcmc.Rmd",
  "optimization.Rmd",
  "variational.Rmd",
  "diagnostics.Rmd",
+
+ "licenses.Rmd",
 
  "references.Rmd"
 ]
