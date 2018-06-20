@@ -78,7 +78,7 @@ div .example em {
 }
 
 .book .book-body .page-wrapper .page-inner section.normal {
-    font-family: "Lucida Bright", Garamond, Palatino, Times Roman, serif;
+    font-family: Georgia, Times Roman, serif;
     font-weight: normal;
     color: #000;
     line-height: 1.5;

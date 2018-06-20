@@ -21,6 +21,7 @@ rmd_files: [
  "deprecations.Rmd",
 
  "mcmc.Rmd",
+ "analysis.Rmd",
  "optimization.Rmd",
  "variational.Rmd",
  "diagnostics.Rmd",

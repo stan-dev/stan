@@ -45,7 +45,6 @@ target += u;
 
 ## `lp__` Variable
 
-
 *Deprecated*: The variable `lp__` is available wherever log density
 increment statements are allowed (`target~+=` and `~` shorthand
 statements).
