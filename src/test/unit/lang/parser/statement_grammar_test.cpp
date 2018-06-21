@@ -198,3 +198,25 @@ TEST(langParserStatementGrammar, eltOpEqualsBad) {
   test_throws("compound-assign/elt_divide_equals_prim",
               "Cannot apply element-wise operation to scalar");
 }
+
+TEST(langParserStatementGrammar, noCloseBrace) {
+  test_throws("expect_statement_seq_close_brace",
+              "PARSER EXPECTED: \"}\"");
+}              
+
+TEST(langParserStatementGrammar, noCloseBrace_2) {
+  test_throws("expect_statement_seq_close_brace_2",
+              "PARSER EXPECTED: \"}\"");
+}              
+
+TEST(langParserStatementGrammar, noCloseBrace_3) {
+  test_throws("expect_statement_seq_close_brace_3",
+              "Unexpected open block, missing close block \"}\""
+              " before keyword");
+}
+
+TEST(langParserStatementGrammar, noCloseBrace_4) {
+  test_throws("expect_statement_seq_close_brace_4",
+              "\'}\' to close variable declarations");
+}
+
