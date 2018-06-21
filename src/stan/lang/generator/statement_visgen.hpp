@@ -182,7 +182,7 @@ namespace stan {
           }
         }
 
-        if (y.idxs_.size() == 0) {
+        if (lhs_simple) {
           o_ << ");" << EOL;
         } else {
           o_ << ", "

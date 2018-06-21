@@ -1084,28 +1084,6 @@ namespace stan {
           return;
         }
 
-        bool types_compatible =
-          // container types allow infix and element-wise operations
-          // when lhs and rhs are same shape, and broadcast operations
-          // when rhs is double and lhs is vector, row_vector, or matrix
-          (lhs_base_type == rhs_type
-           || (lhs_base_type.type().is_vector_type()
-               && rhs_type.type().is_double_type())
-           || (lhs_base_type.type().is_row_vector_type()
-               && rhs_type.type().is_double_type())
-           || (lhs_base_type.type().is_row_vector_type()
-               && rhs_type.type().is_matrix_type())
-           || (lhs_base_type.type().is_matrix_type()
-               && rhs_type.type().is_double_type()));
-        if (!types_compatible) {
-          error_msgs << "Cannot apply operator '" << op_equals
-                     << "' to operands;"
-                     << " left-hand side type = " << lhs_base_type
-                     << "; right-hand side type=" << rhs_type
-                     << std::endl;
-          pass = false;
-          return;
-        }
         std::string op_name;
         if (a.op_ == "+") {
           op_name = "add";
