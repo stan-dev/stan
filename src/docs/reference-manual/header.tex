@@ -15,19 +15,19 @@
   \linespread{1.03}
 }
 
-\usepackage[titles]{tocloft}
-% \setlength{\cftbeforechapskip}{0em}
-\setlength{\cftbeforesecskip}{3pt}
-\renewcommand{\cftchapfont}{\normalsize\rm\bfseries}
-\renewcommand{\cftchappagefont}{\normalsize\rm}
-% \renewcommand{\cftchapaftersnum}{.}
-% \renewcommand{\cftchapaftersnumb}{\hspace*{4pt}}
-% \renewcommand{\cftsecaftersnum}{.}
-\renewcommand{\cftsecaftersnumb}{\hspace*{8pt}}
+\usepackage{titlesec}
+\titleformat{\chapter}{\bfseries\LARGE}{\thechapter.}{1.5pc}{}{}
+\titlespacing{\chapter}{0pt}{0pt}{12pt}
+\titleformat{\section}{\bfseries\large}{\thesection.}{1em}{}
+\titlespacing{\section}{0pt}{6pt}{0pt}
+\titleformat{\subsection}{\bfseries}{}{0em}{}
+\titlespacing{\subsection}{0pt}{6pt}{0pt}
+\titleformat{\subsubsection}{\slshape}{}{0em}{}
+\titlespacing{\subsection}{0pt}{6pt}{0pt}
 
-\usepackage{xcolor}
-\definecolor{linkcolor}{RGB}{0,0,128}
-\usepackage[pagebackref,pdfpagelabels,plainpages=false,hypertexnames=true,colorlinks=true,linkcolor=linkcolor,anchorcolor=linkcolor,citecolor=linkcolor,filecolor=linkcolor,menucolor=linkcolor,runcolor=linkcolor,urlcolor=linkcolor,pdfborder={0 0 0}]{hyperref}
+% \usepackage{xcolor}
+% %\definecolor{linkcolor}{RGB}{0,0,128}
+% \usepackage[pagebackref,pdfpagelabels,plainpages=false,hypertexnames=true,colorlinks=true,linkcolor=linkcolor,anchorcolor=linkcolor,citecolor=linkcolor,filecolor=linkcolor,menucolor=linkcolor,runcolor=linkcolor,urlcolor=linkcolor,pdfborder={0 0 0}]{hyperref}
 
 \setlength{\paperwidth}{6in}
 \setlength{\paperheight}{8in}

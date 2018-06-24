@@ -128,7 +128,7 @@ div .example em {
 }
 
 .book .book-body .page-wrapper .page-inner section.normal h1 {
-    font-size: 175%;
+    font-size: 200%;
     font-weight: bold;
     color: #a80018;
     margin: 0 0 0.5em 0;
@@ -136,14 +136,14 @@ div .example em {
 .book .book-body .page-wrapper .page-inner section.normal h2 {
     font-size: 120%;
     font-weight: bold;
-    color: #a80018;
+    color: #990017;
     font-style: normal;
     margin: 1em 0 0.5em 0;
 }
 .book .book-body .page-wrapper .page-inner section.normal h3 {
     font-size: 100%;
     font-weight: bold;
-    color: #600018;
+    color: #800013;
     font-style: normal;
     margin: 0.75em 0 0.25em 0;
 }
@@ -151,7 +151,7 @@ div .example em {
     font-size: 100%;
     font-weight: normal;
     font-style: italic;
-    color: #600018;
+    color: #800013;
     margin: 0.75em 0 0.5em 0;
 }
 
@@ -163,35 +163,35 @@ div .example em {
 #header .title {
     margin-bottom: -0.6em;
     font-size: 250%;
-    color: #600018;
+    color: #800013;
     font-weight: bold;
 }
 #header h4.author {
     font-size: 175%;
-    color: #600018;
+    color: #800013;
     margin-bottom: 0;
 }
 #header h4.author em {
     font-style: normal;
-    color: #600018;
+    color: #800013;
 }
 #header h4.author strong {
     font-style: normal;
-    color: #600018;
+    color: #800013;
 }
 #header h4.date {
     font-size: 125%;
-    color: #600018;
+    color: #66000f;
     margin-bottom: 3em;
     margin-top: 1em;
 }
 #header h4.date em {
     font-style: normal;
-    color: #600018;
+    color: #66000f;
 }
 #header h4.date strong {
     font-style: normal;
-    color: #600018;
+    color: #66000f;
 }
 
 html body div div.book-summary nav ul.summary li.chapter {
