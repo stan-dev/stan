@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
   fig.show = "hold"
 )
 ```
-# MCMC Sampling {#hmc.chapter}
+# MCMC Sampling {#hmc.chapter} 
 
 This chapter presents the two Markov chain Monte Carlo (MCMC)
 algorithms used in Stan, the Hamiltonian Monte Carlo (HMC) algorithm

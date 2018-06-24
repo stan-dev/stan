@@ -124,9 +124,9 @@ div .example em {
     margin: 0 0 0.5em 0;
 }
 .book .book-body .page-wrapper .page-inner section.normal h2 {
-    font-size: 110%;
+    font-size: 120%;
     font-weight: bold;
-    color: #333;
+    color: #444;
     font-style: normal;
     margin: 1em 0 0.5em 0;
 }

@@ -17,7 +17,7 @@ fontsize: 10pt
 monofont: "Lucida Console"
 ---
 
-# About {-}
+# <i>About</i> {-}
 
 <img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225" alt="Stan logo" />
 

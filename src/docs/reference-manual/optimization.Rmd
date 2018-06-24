@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 ```
 
 
-# Optimization Algorithms {#optimization-algorithms.chapter}
+# Optimization {#optimization-algorithms.chapter}
 
 Stan provides optimization algorithms which find modes of the density
 specified by a Stan program. Such modes may be used as parameter

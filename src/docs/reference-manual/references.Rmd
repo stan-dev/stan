@@ -21,4 +21,4 @@ knitr::opts_chunk$set(
   fig.show = "hold"
 )
 ```
-# References {-}
+# <i>References</i> {-}

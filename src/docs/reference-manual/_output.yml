@@ -6,8 +6,6 @@ bookdown::gitbook:
       theme: white
       family: serif
       size: 2
-    toolbar:
-      position: static
     search: no
     sharing: null
     toc:
