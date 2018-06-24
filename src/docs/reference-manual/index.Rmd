@@ -1,26 +1,32 @@
 ---
+knit: "bookdown::render_book"
 title: "Stan Reference Manual"
 author: "Stan Development Team"
-date: "Version 2.18 (May 2018)"
+date: "Version 2.18 (July 2018)"
+description: "Stan reference manual specifying the syntax and semantics of the Stan programming language."
+url: 'http\://mc-stan.org/users/documentation'
 site: bookdown::bookdown_site
-output: bookdown::gitbook
+github-repo: stan-dev/stan
+twitter-handle: mc-stan
+cover-image: img/logo_tm.png
 documentclass: book
 bibliography: [../bibtex/all.bib]
-biblio-style: "apalike"
-link-citations: true
+biblio-style: apalike
+link-citations: yes
 fontsize: 10pt
-cover-image: img/logo_tm.png
-url: 'http\://mc-stan.org/'
-github-repo: stan-dev/stan
 monofont: "Lucida Console"
-description: "Stan reference manual specifying the syntax and semantics of the Stan programming language."
 ---
 
 # About {-}
 
-<img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225"></img>
+<img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225" alt="Stan logo" />
 
-This is the official reference manual for the Stan programming language, inference algorithms, and posterior analysis tools.
+This is the official reference manual for Stan's
+
+* programming language,
+* inference algorithms, and
+* posterior analysis tools.
+
 
 ## Web resources {-}
 
@@ -29,19 +35,23 @@ hosted on various web sites:
 
 * [**Stan web site**](http://mc-stan.org/): links to
 the official Stan releases, source code, installation instructions,
-and full documentation, including the latest version of this reference manual.
+and full documentation, including the latest version of this manual.
 
 * [**Stan forum**](http://discourse.mc-stan.org): message board
-for interacting with the developers and other users about
-all things related to Stan.
+for questions, discussion, and announcements related to Stan for
+both users and developers.
 
 * [**Stan GitHub organization**](https://github.com/stan-dev/stan):
-version controlled source for code and documentation.
+version controlled code and document repositories, issue trackers for
+bug reports and feature requests, code review, and wikis for
+all of Stan's source code, documentation, and web pages.
 
 
-## Copyright {-}
+## Copyright and Trademarks {-}
 
 * Copyright 2011--2018, Stan Development Team and their assignees.
+
+* The Stan name and logo are registered trademarks of NumFOCUS.
 
 
 ## Licensing {-}
@@ -49,3 +59,5 @@ version controlled source for code and documentation.
 * *Text content:*  released under the [CC-BY ND 4.0 license](https://creativecommons.org/licenses/by-nd/4.0/legalcode).
 
 * *Computer code:*  released under the [BSD 3-clause license](https://opensource.org/licenses/BSD-3-Clause).
+
+* *Logo:*  see the [Stan logo usage guidelines](http://mc-stan.org/about/logo/).

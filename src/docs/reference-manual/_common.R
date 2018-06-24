@@ -1,7 +1,7 @@
 library(ggplot2)
 library(rstan)
 
-set.seed(10101010)
+set.seed(123454321)
 
 options(digits = 3)
 

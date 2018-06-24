@@ -14,11 +14,11 @@ rmd_files: [
  "blocks.Rmd",
  "user-functions.Rmd",
 
- "execution.Rmd",
  "transforms.Rmd",
 
  "syntax.Rmd",
- "deprecations.Rmd",
+
+ "execution.Rmd",
 
  "mcmc.Rmd",
  "analysis.Rmd",
@@ -29,6 +29,8 @@ rmd_files: [
  "reproducibility.Rmd", 
 
  "licenses.Rmd",
+
+ "deprecations.Rmd",
 
  "references.Rmd"
 ]

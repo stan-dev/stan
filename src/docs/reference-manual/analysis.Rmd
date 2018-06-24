@@ -1,9 +1,42 @@
-# MCMC and Posterior Analysis {#analysis.chapter}
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Posterior Analysis {#analysis.chapter}
 
 Stan uses Markov chain Monte Carlo (MCMC) techniques to generate
-samples from the posterior distribution for inference.  Markov chain
-Monte Carlo (MCMC) methods were developed for situations in which it
-is not straightforward to make independent draws @Metropolis:1953.
+samples from the posterior distribution for full Bayesian inference.
+Markov chain Monte Carlo (MCMC) methods were developed for situations
+in which it is not straightforward to make independent draws
+@Metropolis:1953.
+
+In addition to providing point estimates, Stan's optimization algorithm
+provides a Laplace approximation from which it is easy to draw
+random values.  Stan's variational inference algorithm provides
+draws from the variational approximation to the posterior.  Both
+of these outputs may be analyzed just as any other MCMC output,
+despite the fact that it is atually independent draws.
+
+## Markov Chains
 
 A *Markov chain* is a sequence of random variables $\theta^{(1)},
 \theta^{(2)},\ldots$ where each variable is conditionally independent

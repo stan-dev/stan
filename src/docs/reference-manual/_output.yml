@@ -1,20 +1,25 @@
 bookdown::gitbook:
+  toc_depth: 1
   css: stan-manual.css
   config:
-    search: yes
     fontsettings:
       theme: white
       family: serif
       size: 2
+    toolbar:
+      position: static
+    search: no
+    sharing: null
     toc:
       collapse: section
+      scroll_highlight: yes
       before: |
-        <li style="font-size:125%; font-weight:400; line-height:1.4; margin: 0.5em 0 0 1em">Stan Language Reference</li>
+        <li style="font-size:110%; font-weight:400; font-family: Verdana, Helvetica, sans; line-height:1.4; margin: 0.5em 0 0 1em">Stan Reference Manual</li>
       after: null
+    download: ["pdf"]
     edit:
-      link: https://github.com/stan-dev/stan/edit/develop/%s
+      link: https://github.com/stan-dev/stan/edit/develop/src/docs/reference-manual/%s
       text: "Edit"
-    sharing: no
 bookdown::pdf_book:
   latex_engine: "pdflatex"
   includes:

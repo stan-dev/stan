@@ -1,4 +1,27 @@
-# Markov Chain Monte Carlo Sampling {#hmc.chapter}
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# MCMC Sampling {#hmc.chapter}
 
 This chapter presents the two Markov chain Monte Carlo (MCMC)
 algorithms used in Stan, the Hamiltonian Monte Carlo (HMC) algorithm
@@ -278,24 +301,9 @@ intervals (II), and a final fast adaptation interval (III). For HMC,
 both the fast and slow intervals are used for adapting the step size,
 while the slow intervals are used for learning the (co)variance
 necessitated by the metric. Iteration numbering starts at 1 on the
-left side of the figure and increases to the right.$
+left side of the figure and increases to the right.*
 
-$$
-\setlength{\unitlength}{0.005in}
-\centering
-\begin{picture}(1000, 200)
-\footnotesize
-\put(25, 20) { \framebox(75, 200)[c]{I} }
-\put(100, 20) { \framebox(25, 200)[c]{II} }
-\put(125, 20) { \framebox(50, 200)[c]{II} }
-\put(175, 20) { \framebox(100, 200)[c]{II} }
-\put(275, 20) { \framebox(200, 200)[c]{II} }
-\put(475, 20) { \framebox(400, 200)[c]{II} }
-\put(875, 20) { \framebox(50, 200)[c]{III} }
-\put(25, 20) { \vector(1, 0){950} }
-\put(800, -10) { \makebox(200, 20)[l]{{\small Iteration}} }
-\end{picture}
-$$
+![](img/warmup-epochs.png)
 
 When adaptation is engaged (it may be turned off by fixing a step size
 and mass matrix), the warmup period is split into three stages, as
