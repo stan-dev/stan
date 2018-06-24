@@ -18,7 +18,7 @@ monofont: "Lucida Console"
 subparagraph: yes
 ---
 
-# <i style="color:#a80018;">About</i> {-}
+# <i style="font-size: 110%; padding:1.5em 0 0 0; color:#990017;">Overview</i> {-}
 
 <img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225" alt="Stan logo" />
 
@@ -28,7 +28,9 @@ This is the official reference manual for Stan's
 * inference algorithms, and
 * posterior analysis tools.
 
-There is a separate user's guide for example models and programming techniques, and a separate installation and getting started guide for each interface.
+There is a separate reference for the built-in functions, a user's
+guide for example models and programming techniques, and a separate
+installation and getting started guide for each interface.
 
 ## Web resources {-}
 
@@ -38,7 +40,8 @@ hosted on various web sites:
 * [Stan web site](http://mc-stan.org/): links to
 the official Stan releases, source code, installation instructions,
 and full documentation, including the latest version of this manual,
-the user's guide and the getting started guide for each interface.
+the user's guide and the getting started guide for each interface,
+tutorials, case studies, and reference materials for developers.
 
 * [Stan forum](http://discourse.mc-stan.org): message board
 for questions, discussion, and announcements related to Stan for
@@ -59,8 +62,8 @@ all of Stan's source code, documentation, and web pages.
 
 ## Licensing {-}
 
-* *Text content:*  [CC-BY ND 4.0 license](https://creativecommons.org/licenses/by-nd/4.0/legalcode).
+* *Text content:*  [CC-BY ND 4.0 license](https://creativecommons.org/licenses/by-nd/4.0/legalcode)
 
-* *Computer code:*  [BSD 3-clause license](https://opensource.org/licenses/BSD-3-Clause).
+* *Computer code:*  [BSD 3-clause license](https://opensource.org/licenses/BSD-3-Clause)
 
-* *Logo:*  [Stan logo usage guidelines](http://mc-stan.org/about/logo/).
+* *Logo:*  [Stan logo usage guidelines](http://mc-stan.org/about/logo/)
