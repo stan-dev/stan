@@ -198,7 +198,6 @@ invocations of the program.
 
 \section{Overview of Data Types}
 
-%%%
 Arguments for built-in and user-defined functions and local variables
 are required to be basic data types, meaning an unconstrained
 primitive, vector, or matrix type or an array of such.
@@ -477,12 +476,11 @@ format.
 
 Bounds for integer or real variables may be arbitrary expressions.
 The only requirement is that they only include variables that have
-been defined before the declaration.  If the bounds themselves are
-parameters, the behind-the-scenes variable transform accounts for them
-in the log Jacobian.
+been declared (though not necessarily defined) before the declaration.
+If the bounds themselves are parameters, the behind-the-scenes
+variable transform accounts for them in the log Jacobian.
 
-For example, it is acceptable to have the
-following declarations.
+For example, it is acceptable to have the following declarations.
 %
 \begin{stancode}
 data {
@@ -515,6 +513,32 @@ This declares a positive integer data variable \code{N}, an array
 ranging between the minimum and maximum value of \code{y}.  As shown
 in the example code, the functions \code{min()} and \code{max()} may
 be applied to containers such as arrays.
+
+A more subtle case involves declarations of parameters or transformed
+paramerrs based on parameters declared previously.  For example, the
+following program will work as intended.
+%
+\begin{stancode}
+parameters {
+  real a;
+  real<lower = a> b;  // enforces a < b
+}
+transformed parameters {
+  real c;
+  real<lower = c> d;
+  c = a;
+  d = b;
+}
+\end{stancode}
+%
+The parameters instance works because all parameters are defined
+externally before the block is executed.  The transformed parameters
+case works even though \code{c} isn't defined at the point it is used,
+because constraints on transformed parameters are only validated at
+the end of the block.  Data variables work like parameter variables,
+whereas transformed data and generated quantity variables work like
+transformed parameter variables.
+
 
 \subsection{Declaring Optional Variables}
 
@@ -762,13 +786,26 @@ a[1] = b;
 This copies the values from row vector \code{b} to \code{a[1]}, which
 is the first row of the matrix \code{a}.  If the number of columns in
 \code{a} is not the same as the size of \code{b}, a run-time error is
-raised;  the number of rows of \code{a} is \code{N}, which is also the
-size of \code{b}.
+raised;  the number of columns of \code{a} is \code{N}, which is also the
+number of rows of \code{b}.
 
 Assignment works by copying values in Stan.  That means any subsequent
 assignment to \code{a[1]} does not affect \code{b}, nor does an
 assignment to \code{b} affect \code{a}.
 
+\subsection{Covariance Matrices}
+
+Matrix variables may be constrained to represent covariance matrices.
+A matrix is a covariance matrix if it is symmetric and positive
+definite.  Like correlation matrices, covariance matrices only need a
+single dimension in their declaration.  For instance,
+%
+\begin{stancode}
+cov_matrix[K] Omega;
+\end{stancode}
+%
+declares \code{Omega} to be a $K \times K$ covariance matrix, where
+$K$ is the value of the data variable \code{K}.
 
 \subsection{Correlation Matrices}
 
@@ -787,42 +824,6 @@ declares \code{Sigma} to be a $3 \times 3$ correlation matrix.
 Correlation matrices may be assigned to other matrices, including
 unconstrained matrices, if their dimensions match, and vice-versa.
 
-\subsection{Cholesky Factors of Correlation Matrices}
-
-Matrix variables may be constrained to represent the Cholesky factors
-of a correlation matrix.
-
-A Cholesky factor for a correlation matrix $L$ is a $K \times K$
-lower-triangular matrix with positive diagonal entries and rows that
-are of length 1 (i.e., $\sum_{n=1}^K L_{m,n}^2 = 1$).  If $L$ is a
-Cholesky factor for a correlation matrix, then $L\,L^{\top}$ is a
-correlation matrix (i.e., symmetric positive definite with a unit
-diagonal).
-
-A declaration such as
-follows.
-%
-\begin{stancode}
-cholesky_factor_corr[K] L;
-\end{stancode}
-%
-declares \code{L} to be a Cholesky factor for a \code{K} by \code{K}
-correlation matrix.
-
-\subsection{Covariance Matrices}
-
-Matrix variables may be constrained to represent covariance matrices.
-A matrix is a covariance matrix if it is symmetric and positive
-definite.  Like correlation matrices, covariance matrices only need a
-single dimension in their declaration.  For instance,
-%
-\begin{stancode}
-cov_matrix[K] Omega;
-\end{stancode}
-%
-declares \code{Omega} to be a $K \times K$ covariance matrix, where
-$K$ is the value of the data variable \code{K}.
-
 \subsection{Cholesky Factors of Covariance Matrices}
 
 Matrix variables may be constrained to represent the Cholesky factors
@@ -830,10 +831,12 @@ of a covariance matrix.  This is often more convenient or more
 efficient than representing covariance matrices directly.
 
 A Cholesky factor $L$ is an $M \times N$ lower-triangular matrix (if
-$m < n$ then $L[m, n] =0$) with a strictly positive diagonal ($L[k, k]
-> 0$) and $M \geq N$.  If $L$ is a Cholesky factor, then $\Sigma = L
-\, L^{\top}$ is a covariance matrix.  Furthermore, every covariance
-matrix has a Cholesky factorization.
+$m < n$ then $L[m, n] =0$) with a strictly positive diagonal
+($L[k, k] > 0$) and $M \geq N$.  If $L$ is a Cholesky factor, then
+$\Sigma = L \, L^{\top}$ is a covariance matrix (i.e., it is positive
+definite).  The mapping between positive definite matrixes and their
+Cholesky factors is bijective---every covariance matrix has a unique
+Cholesky factorization.
 
 The typical case of a square Cholesky factor may be declared with a
 single dimension,
@@ -842,10 +845,36 @@ single dimension,
 cholesky_factor_cov[4] L;
 \end{stancode}
 %
-In general, two dimensions may be declared, with the above being equal to
-\code{cholesky\_factor\_cov[4,~4]}.  The
-type \code{cholesky\_factor\_cov[M,~N]} may be used for the general
-$M \times N$.
+In general, two dimensions may be declared, with the above being equal
+to \code{cholesky\_factor\_cov[4,~4]}.
+
+\subsubsection{Cholesky factors of positive semi-definite matrices}
+
+The type \code{cholesky\_factor\_cov[M,~N]} may be used for the
+general $M \times N$ case, which will produce lower triangular
+matrices leading to positive semi-definite matrices of rank $M$.
+
+
+\subsection{Cholesky Factors of Correlation Matrices}
+
+Matrix variables may be constrained to represent the Cholesky factors
+of a correlation matrix.
+
+A Cholesky factor for a correlation matrix $\Omega$ is a $K \times K$
+lower-triangular matrix $L$ with positive diagonal entries and rows
+that are of Euclidean length 1 (i.e., $\sum_{n=1}^K L_{m,n}^2 = 1$).
+If $L$ is a Cholesky factor for a correlation matrix, then
+$\Omega = L \, L^{\top}$ is a correlation matrix (i.e., it is
+symmetric positive definite with a unit diagonal).
+
+To declare the variable \code{L} to be a \code{K} by \code{K} Cholesky
+factor of a correlation matrix, the following code may be used.
+%
+\begin{stancode}
+cholesky_factor_corr[K] L;
+\end{stancode}
+
+
 
 \subsection{Assigning Constrained Variables}
 
@@ -1104,7 +1133,7 @@ x[1,1] = z;
 \end{stancode}
 %
 The sizes must match.  Here, \code{x[1]} is a \code{J} by \code{K}
-array, as is is \code{y}.
+array, as is \code{y}.
 
 Partial array assignment also works for arrays of matrices, vectors,
 and row vectors.
@@ -1499,7 +1528,8 @@ the tokens are reserved for future use.
 \code{then},
 \code{else},
 \code{true},
-\code{false}
+\code{false},
+\code{target}
 \end{quote}
 %
 Variables should not be named after types, either, and thus may not be
@@ -1946,11 +1976,11 @@ The type of subexpression \code{(y - mu)' * Sigma} is inferred to be
 matrix.  The whole expression's type is thus the type of a row vector
 multiplied by a (column) vector, which produces a \code{real} value.
 
-Stan provides elementwise matrix division and multiplication
-operations, \code{a~.*~b} and \code{a~./b}.  These provide a shorthand
-to replace loops, but are not intrinsically more efficient than a
-version programmed with an elementwise calculations and assignments in
-a loop.  For example, given declarations,
+Stan provides elementwise matrix multiplication (e.g., \code{a~.*~b})
+and division (e.g., \code{a~./b}).  These provide a shorthand to
+replace loops, but are not intrinsically more efficient than a version
+programmed with an elementwise calculations and assignments in a loop.
+For example, given declarations,
 %
 \begin{stancode}
 vector[N] a;
@@ -2721,18 +2751,6 @@ the first argument.  This function argument must be provided as the
 name of a user-defined or built-in function.  No quotes are
 necessary.
 
-\subsection{Data-Restricted Arguments}
-
-Some of the arguments to higher-order functions are restricted to
-data.  This means they must be expressions containing only data
-variables, transformed data variables, or literals;  the may contain
-arbitrary functions applied to data variables or literals, but must
-not contain parameters, transformed parameters, or local variables
-from any block other than transformed data.
-
-For user-defined functions the qualifier \code{data} may be prepended
-to the type to restrict the argument to data-only variables.
-
 
 \section{Chain Rule and Derivatives}
 
@@ -2764,7 +2782,7 @@ Algebraically, the sampling statement in the model could be reduced to
   x ~ normal(0, 1);
 \end{stancode}
 %
-and it would seem the model should produce unit normal draws for
+and it would seem the model should produce standard normal draws for
 \code{x}.  But rather than canceling, the expression \code{sqrt(x -
   x)} causes a problem for derivatives.  The cause is the mechanistic
 evaluation of the chain rule,
@@ -3095,7 +3113,7 @@ The keyword \code{target} here is actually not a variable, and may not
 be accessed as such (though see below on how to access the value of
 target through a special function).
 
-In this example, the unnormalized log probability of a unit normal
+In this example, the unnormalized log probability of a standard normal
 variable $y$ is added to the total log probability.  In the general
 case, the argument can be any expression.%
 %
@@ -3109,7 +3127,7 @@ case, the argument can be any expression.%
   required for automatic differentiation.}
 
 An entire Stan model can be implemented this way.  For instance, the
-following model will draw a single variable according to a unit normal
+following model will draw a single variable according to a standard normal
 probability.
 %
 \begin{stancode}
@@ -3426,7 +3444,7 @@ p_{[a,b]}(x) = \frac{p_X(x)}
 \subsubsection{Truncation with lower and upper bounds in Stan}
 
 Stan allows probability functions to be truncated.  For example, a
-truncated unit normal distributions restricted to $[-0.5, 2.1]$
+truncated standard normal distributions restricted to $[-0.5, 2.1]$
 can be coded with the following sampling statement.
 %
 \begin{stancode}
@@ -4956,7 +4974,7 @@ within user-defined functions ending in \code{\_rng}.  See
 \refsection{function-bodies} for more information on these two special
 types of function.
 
-\section{Unsized Argument Types}
+\section{Argument Types and Qualifiers}
 
 Stan's functions all have declared types for both arguments and
 returned value.  As with built-in functions, user-defined functions are
@@ -5011,6 +5029,29 @@ Any errors raised by calls to functions inside user functions or
 return type mismatches are simply passed on;  this typically results
 in a warning message and rejection of a proposal during sampling or
 optimization.
+
+\subsection{Qualifying Data-only Arguments}
+
+Some of Stan's built-in functions, like the differential equation
+solvers, have arguments that must be data.  Such data-only arguments
+must be expressions involving only data, transformed data, and
+generated quantity variables.
+
+In user-defined functions, the qualifier \code{data} may be placed before
+an argument type declaration to indicate that the argument must be
+data only.  For example,
+
+\begin{stancode}
+real foo(data real x) {
+  return x^2;
+}
+\end{stancode}
+
+requires the argument \code{x} to be data only.
+
+Declaring an argument data only allows type inference to proceed in
+the body of the function so that, for example, the variable may be
+used as a data-only argument to a built-in function.
 
 \section{Function Bodies}\label{function-bodies.section}
 
