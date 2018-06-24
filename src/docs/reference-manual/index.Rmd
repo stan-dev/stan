@@ -17,7 +17,7 @@ fontsize: 10pt
 monofont: "Lucida Console"
 ---
 
-# <i>About</i> {-}
+# <i style="color:#a80018;">About</i> {-}
 
 <img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225" alt="Stan logo" />
 
@@ -33,15 +33,15 @@ This is the official reference manual for Stan's
 Stan is an open-source software project, resources for which are
 hosted on various web sites:
 
-* [**Stan web site**](http://mc-stan.org/): links to
+* [Stan web site](http://mc-stan.org/): links to
 the official Stan releases, source code, installation instructions,
 and full documentation, including the latest version of this manual.
 
-* [**Stan forum**](http://discourse.mc-stan.org): message board
+* [Stan forum](http://discourse.mc-stan.org): message board
 for questions, discussion, and announcements related to Stan for
 both users and developers.
 
-* [**Stan GitHub organization**](https://github.com/stan-dev/stan):
+* [Stan GitHub organization](https://github.com/stan-dev/stan):
 version controlled code and document repositories, issue trackers for
 bug reports and feature requests, code review, and wikis for
 all of Stan's source code, documentation, and web pages.

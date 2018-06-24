@@ -1,3 +1,6 @@
+a {
+    color: yellow;
+}
 p.caption {
     color: #888;
     margin-top: 10px;
@@ -39,6 +42,13 @@ pre code {
     content: ". ";
 }
 
+
+.book .book-body .page-wrapper .page-inner section.normal a {
+    color: #0645AD;
+}
+.book .book-body .page-wrapper .page-inner section.normal a:visited {
+    color: #0B0080;
+}
 
 div .definition {
     font-style: italic;
@@ -120,20 +130,20 @@ div .example em {
 .book .book-body .page-wrapper .page-inner section.normal h1 {
     font-size: 175%;
     font-weight: bold;
-    color: #444;
+    color: #a80018;
     margin: 0 0 0.5em 0;
 }
 .book .book-body .page-wrapper .page-inner section.normal h2 {
     font-size: 120%;
     font-weight: bold;
-    color: #444;
+    color: #a80018;
     font-style: normal;
     margin: 1em 0 0.5em 0;
 }
 .book .book-body .page-wrapper .page-inner section.normal h3 {
     font-size: 100%;
     font-weight: bold;
-    color: #111;
+    color: #600018;
     font-style: normal;
     margin: 0.75em 0 0.25em 0;
 }
@@ -141,6 +151,7 @@ div .example em {
     font-size: 100%;
     font-weight: normal;
     font-style: italic;
+    color: #600018;
     margin: 0.75em 0 0.5em 0;
 }
 
@@ -152,35 +163,35 @@ div .example em {
 #header .title {
     margin-bottom: -0.6em;
     font-size: 250%;
-    color: #444;
+    color: #600018;
     font-weight: bold;
 }
 #header h4.author {
     font-size: 175%;
-    color: #444;
+    color: #600018;
     margin-bottom: 0;
 }
 #header h4.author em {
     font-style: normal;
-    color: #444;
+    color: #600018;
 }
 #header h4.author strong {
     font-style: normal;
-    color: #444;
+    color: #600018;
 }
 #header h4.date {
     font-size: 125%;
-    color: #222;
+    color: #600018;
     margin-bottom: 3em;
     margin-top: 1em;
 }
 #header h4.date em {
     font-style: normal;
-    color: #222;
+    color: #600018;
 }
 #header h4.date strong {
     font-style: normal;
-    color: #222;
+    color: #600018;
 }
 
 html body div div.book-summary nav ul.summary li.chapter {
