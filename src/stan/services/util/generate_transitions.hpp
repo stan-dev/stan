@@ -23,8 +23,9 @@ namespace stan {
        * @param[in] finish end iteration number used for printing messages
        * @param[in] num_thin when save is true, a draw will be written to the
        *   mcmc_writer every num_thin iterations
-       * @param[in] refresh number of seconds between progress messages. If
-       *   refresh is zero, no messages will be printed
+       * @param[in] refresh initial number of seconds between progress messages.
+       *   If refresh is zero, no messages will be printed. If refresh is
+       *   positive, then it gets doubled locally after each progres report.
        * @param[in] save if save is true, the transitions will be written
        *   to the mcmc_writer. If false, transitions will not be written
        * @param[in] warmup indicates whether these transitions are warmup. Used
@@ -50,11 +51,14 @@ namespace stan {
                                 callbacks::logger& logger) {
         time_t last_time;
         time(&last_time);
+        double refresh_local = refresh;
+        int last_iter = 0;
         for (int m = 0; m < num_iterations; ++m) {
           callback();
           time_t now;
           time(&now);
-          if (refresh > 0 && difftime(now, last_time) > refresh) {
+          int time_diff = difftime(now, last_time);
+          if (refresh > 0 && time_diff > refresh_local) {
             int it_print_width
               = std::ceil(std::log10(static_cast<double>(finish)));
             std::stringstream message;
@@ -65,9 +69,15 @@ namespace stan {
                     << static_cast<int>( (100.0 * (start + m + 1)) / finish )
                     << "%] ";
             message << (warmup ? " (Warmup)" : " (Sampling)");
-
+            message << " Time left: " << std::setw(4)
+                    << (num_iterations - m)
+                     / (60.0 * (m - last_iter) / time_diff)
+                    << " min";
             logger.info(message);
+
             time(&last_time);
+            last_iter = m;
+            refresh_local *= 2;
           }
 
           init_s = sampler.transition(init_s, logger);
