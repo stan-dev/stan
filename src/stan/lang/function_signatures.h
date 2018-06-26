@@ -332,6 +332,8 @@ add("eigenvalues_sym", expr_type(vector_type()), expr_type(matrix_type()));
 add("eigenvectors_sym", expr_type(matrix_type()), expr_type(matrix_type()));
 add("qr_Q", expr_type(matrix_type()), expr_type(matrix_type()));
 add("qr_R", expr_type(matrix_type()), expr_type(matrix_type()));
+add("qr_thin_Q", expr_type(matrix_type()), expr_type(matrix_type()));
+add("qr_thin_R", expr_type(matrix_type()), expr_type(matrix_type()));
 add("elt_divide", expr_type(vector_type()), expr_type(vector_type()), expr_type(vector_type()));
 add("elt_divide", expr_type(row_vector_type()), expr_type(row_vector_type()), expr_type(row_vector_type()));
 add("elt_divide", expr_type(matrix_type()), expr_type(matrix_type()), expr_type(matrix_type()));

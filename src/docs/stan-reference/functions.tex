@@ -3119,6 +3119,15 @@ eigenvalues of 0).
 
 \begin{description}
 %
+\fitem{matrix}{qr\_thin\_Q}{matrix \farg{A}}{
+The orthogonal matrix in the thin QR decomposition of \farg{A}, which
+implies that the resulting matrix is the same dimensions as as \farg{A}}
+%
+\fitem{matrix}{qr\_thin\_R}{matrix \farg{A}}{
+  The upper triangular matrix in the thin QR decomposition of \farg{A},
+  which implies that the resulting matrix has the same dimensions as
+  \farg{A} has columns}
+%
 \fitem{matrix}{qr\_Q}{matrix \farg{A}}{
 The orthogonal matrix in the fat QR decomposition of \farg{A}, which
 implies that the resulting matrix is square with the same number of
@@ -3131,15 +3140,21 @@ rows as \farg{A}}
 %
 \end{description}
 %
+The thin QR decomposition is generally preferable and will consume much
+less memory when the input matrix is large than will the fat QR 
+decomposition. Both versions of the decomposition represent the input
+matrix as
+\[
+A = Q \, R.
+\]
 Multiplying a column of an orthogonal matrix by $-1$ still results in
 an orthogonal matrix, and you can multiply the corresponding row of
 the upper trapezoidal matrix by $-1$ without changing the product. Thus,
 Stan adopts the normalization that the diagonal elements of the upper
 trapezoidal matrix are strictly positive and the columns of the
-orthogonal matrix are reflected if necessary. The input matrix $A$ need
-not be square but must have at least as many rows as it has columns.
-Also, this QR decomposition algorithm does not utilize pivoting and
-thus is fast but may be numerically unstable.
+orthogonal matrix are reflected if necessary. Also, these QR 
+decomposition algorithms do not utilize pivoting and thus may be 
+numerically unstable on input matrices that have less than full rank.
 
 \subsubsection{Cholesky Decomposition}
 
