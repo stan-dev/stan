@@ -87,12 +87,7 @@ pipeline {
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
-                        Manuals: {
-                            sh """
-                                R -e 'install.packages("bookdown", repos="http://cran.us.r-project.org")'
-                            """
-                            sh "make doc"
-                        },
+                        Manuals: { sh "make doc" },
                         Headers: { sh "make -j${env.PARALLEL} test-headers" }
                     )
                 }
