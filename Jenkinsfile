@@ -86,8 +86,8 @@ pipeline {
                     setupCC()
                     parallel(
                         CppLint: { sh "make cpplint" },
-                        Documentation: { sh 'make doxygen' },
-                        Manual: { sh "make manual" },
+                        API_docs: { sh 'make doxygen' },
+                        Manuals: { sh "make doc" },
                         Headers: { sh "make -j${env.PARALLEL} test-headers" }
                     )
                 }
