@@ -77,7 +77,7 @@ pipeline {
             }
         }
         stage('Linting & Doc checks') {
-            agent any
+            agent { label 'linux' }
             steps {
                 script {
                     retry(3) { checkout scm }
@@ -88,7 +88,6 @@ pipeline {
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
                         Manuals: { sh "make doc" },
-                        Headers: { sh "make -j${env.PARALLEL} test-headers" }
                     )
                 }
             }
@@ -112,15 +111,15 @@ pipeline {
                     }
                     post { always { deleteDirWin() } }
                 }
-                stage('Windows Headers') {
-                    agent { label 'windows' }
+                stage('Headers') {
+                    agent any
                     steps {
-                        deleteDirWin()
+                        deleteDir()
                         unstash 'StanSetup'
                         setupCC()
-                        bat "make -j${env.PARALLEL} test-headers"
+                        sh "make -j${env.PARALLEL} test-headers"
                     }
-                    post { always { deleteDirWin() } }
+                    post { always { deleteDir() } }
                 }
                 stage('Unit') {
                     agent any
