@@ -22,15 +22,17 @@ subparagraph: yes
 
 <img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225" alt="Stan logo" />
 
-This is the official reference manual for Stan's
+This is the official reference manual for Stan's *programming
+language* for coding probability models, *inference algorithms* for
+fitting models and making predictions, and *posterior analysis* tools
+for evaluating the results.  This manual applies to all Stan
+inteferfaces.
 
-* programming language,
-* inference algorithms, and
-* posterior analysis tools.
-
-There is a separate reference for the built-in functions, a user's
-guide for example models and programming techniques, and a separate
-installation and getting started guide for each interface.
+There are two additional interface-neutral manuals, a *Functions
+Reference* listing all the built-in functions and their signatures,
+and a *User's Guide* providing examples and programming techniques.
+There is also a separate installation and getting started guide for
+each interface.
 
 ## Web resources {-}
 
@@ -53,7 +55,7 @@ bug reports and feature requests, code review, and wikis; includes
 all of Stan's source code, documentation, and web pages.
 
 
-## Copyright and Trademarks {-}
+## Copyright and Trademark {-}
 
 * Copyright 2011--2018, Stan Development Team and their assignees.
 

@@ -59,7 +59,8 @@ $(STAN)doc/reference-manual/index.html:  $(STAN)src/docs/reference-manual/*.Rmd 
 
 clean-manual:
 	rm -rf $(STAN)doc
-	cd $(STAN)src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
+	cd $(STAN)src/docs/users-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa *.fdb_latexmk *.fls
+	cd $(STAN)src/docs/functions; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa *.fdb_latexmk *.fls
 	rm -rf $(STAN)src/docs/functions/functions-reference.pdf
 	rm -rf $(STAN)src/docs/functions/stan-functions.txt
 	rm -rf $(STAN)src/docs/users-guide/users-guide.pdf
