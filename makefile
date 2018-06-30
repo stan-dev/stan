@@ -153,7 +153,7 @@ endif
 ##
 
 .PHONY: docs
-docs: manual doxygen
+docs: doc doxygen
 
 ##
 # Clean up.
