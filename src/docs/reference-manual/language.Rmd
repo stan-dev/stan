@@ -1,4 +1,4 @@
-# <i style="font-size: 110%; padding:1.5em 0 0 0; color:#990017;">Language</i> {-}
+# <i style="font-size: 110%; color:#990017;">Language</i> {-}
 
 This part of the manual lays of the specification of the Stan
 programming language.  The language is responsible for defining a log

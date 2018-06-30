@@ -22,4 +22,4 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <i style="font-size: 110%; padding:1.5em 0 0 0; color:#990017;">References</i> {-}
+# <i style="font-size: 110%; color:#990017;">References</i> {-}
