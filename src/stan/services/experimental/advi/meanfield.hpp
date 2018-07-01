@@ -69,7 +69,9 @@ namespace stan {
                                logger, init_writer);
 
           std::vector<std::string> names;
-          names.push_back("lp__");
+          names.push_back("log_p");
+          names.push_back("log_q");
+
           model.constrained_param_names(names, true, true);
           parameter_writer(names);
 

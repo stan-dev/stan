@@ -506,6 +506,8 @@ namespace stan {
                                    logger, diagnostic_writer);
 
         // Write mean of posterior approximation on first output line
+        // I suggest removing this so called "posterior mean" block   for it is the dirct transforation of posterior mean (i.e., not the posterior mean of the real parameters).   The mean and sd of real coordinate space will be extracted a few lines below.--Yuling
+            
         cont_params_ = variational.mean();
         std::vector<double> cont_vector(cont_params_.size());
         for (int i = 0; i < cont_params_.size(); ++i)
@@ -518,9 +520,10 @@ namespace stan {
                            true, true, &msg);
         if (msg.str().length() > 0)
           logger.info(msg);
-        values.insert(values.begin(), 0);
+        values.insert(values.begin(), 0);  //  the first line of log_p
+        values.insert(values.begin(), 0);  //  the first line of log_q
         parameter_writer(values);
-
+ 
         // Draw more samples from posterior and write on subsequent lines
         logger.info("");
         std::stringstream ss;
@@ -528,22 +531,28 @@ namespace stan {
            << n_posterior_samples_
            << " from the approximate posterior... ";
         logger.info(ss);
-
+            
+        double log_p=0;
+        double log_q=0;
+            
+        // Draw posterior samples. log_q is the log normal densities.
         for (int n = 0; n < n_posterior_samples_; ++n) {
-          variational.sample(rng_, cont_params_);
+          variational.sample_lp(rng_, cont_params_, log_q);
           for (int i = 0; i < cont_params_.size(); ++i) {
             cont_vector.at(i) = cont_params_(i);
           }
           std::stringstream msg2;
-          model_.write_array(rng_, cont_vector, disc_vector, values,
-                             true, true, &msg2);
+          model_.write_array(rng_, cont_vector, disc_vector, values, true, true, &msg2);
+          //  log_p: Log probability in the unconstrained space
+          log_p = model_.template log_prob<false, true>(cont_params_, &msg2);
           if (msg2.str().length() > 0)
             logger.info(msg2);
-          values.insert(values.begin(), 0);
+          values.insert(values.begin(), log_p);
+          values.insert(values.begin()+1, log_q);
           parameter_writer(values);
         }
         logger.info("COMPLETED.");
-
+    
         return stan::services::error_codes::OK;
       }
 
