@@ -3135,13 +3135,13 @@ rows as \farg{A}}
 %
 \fitem{matrix}{qr\_R}{matrix \farg{A}}{
   The upper trapezoidal matrix in the fat QR decomposition of \farg{A},
-  which implies that the resulting matrix has the same dimensions as
-  \farg{A}}
+  which implies that the resulting matrix will be square with the same 
+  dimensions as \farg{A}}
 %
 \end{description}
 %
-The thin QR decomposition is generally preferable and will consume much
-less memory when the input matrix is large than will the fat QR 
+The thin QR decomposition is always preferable because it will consume
+much less memory when the input matrix is large than will the fat QR 
 decomposition. Both versions of the decomposition represent the input
 matrix as
 \[
