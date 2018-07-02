@@ -645,15 +645,16 @@ var_type ::= 'int' range_constraint
 
 range_constraint ::= ?('<' range '>')
 
-range ::= 'lower' '=' expression ',' 'upper' = expression
-        | 'lower' '=' expression
-        | 'upper' '=' expression
+range ::= 'lower' '=' range_expression ',' 'upper' = range_expression
+        | 'lower' '=' range_expression
+        | 'upper' '=' range_expression
 
 dims ::= '['  expressions ']'
 
 variable ::= identifier
 
 identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
+
 \end{Verbatim}
 }
 
@@ -663,35 +664,55 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 \small
 \begin{Verbatim}[fontsize=\small]
 expressions ::= expression % ','
-expression ::= real_literal
-             | variable
-             | '{' expressions '}'
-             | expression `?` expression `:` expression
+
+expression ::= expression `?` expression `:` expression
              | expression infixOp expression
              | prefixOp expression
              | expression postfixOp
-             | expression '[' indexes ']'
-             | function_literal '(' ?expressions ')'
-             | function_literal '(' expression ?('|' expression % ',') ')'
-             | integrate_ode '(' function_literal (',' expression){6} ')'
-             | integrate_ode_rk45
-               '(' function_literal (',' expression){6|9} ')'
-             | integrate_ode_bdf
-               '(' function_literal (',' expression){6|9} ')'
-             | algebra_solver
-             '('function_literal (',' expression){4|7} ')'
-             | '(' expression ')'
+             | common_expression
+
+range_expression ::= range_expression mathInfixOp range_expression
+                   | prefixOp range_expression
+                   | range_expression postfixOp
+                   | range_expression '[' indexes ']'
+                   | common_expression
+
+common_expression ::= real_literal
+                    | variable
+                    | '{' expressions '}'
+                    | function_literal '(' ?expressions ')'
+                    | function_literal '(' expression ?('|' expression % ',') ')'
+                    | integrate_ode '(' function_literal (',' expression){6} ')'
+                    | integrate_ode_rk45
+                      '(' function_literal (',' expression){6|9} ')'
+                    | integrate_ode_bdf
+                      '(' function_literal (',' expression){6|9} ')'
+                    | algebra_solver
+                    '('function_literal (',' expression){4|7} ')'
+                    | '(' expression ')'
+
+prefixOp ::= '!' | '-' | '+' | '^'
+
+postfixOp ::= '\\''
+
+infixOp ::= mathInfixOp | logicalInfixOp
+
+mathInfixOp ::= ('+' | '-' | '*' | '/' | '%' | '\\' | '.*' | './')
+
+logicalInfixOp :: ('||' | '&&' | '==' | '!=' | '<' | '>' | '<=' | '>=')
 
 index ::= ?(expression | expression ':' | ':' expression
-            | expression ':' expression)
+        | expression ':' expression)
 
 indexes ::= index % ','
 
-integer_literal ::= 0 | [1-9] [0-9]*
+integer_literal ::= [0-9]+
 
-real_literal ::= integer_literal ?('.' [0-9]*) ?exp_literal
+real_literal ::= integer_literal '.' [0-9]* ?exp_literal
+               | '.' [0-9]+ ?exp_literal
+               | integer_literal exp_literal
 
-exp_literal ::= ('e' | 'E') integer_literal
+exp_literal ::= ('e' | 'E') ?('+' | '-') integer_literal
 
 function_literal ::= identifier
 \end{Verbatim}
@@ -705,8 +726,8 @@ function_literal ::= identifier
 statement ::= atomic_statement | nested_statement
 
 atomic_statement ::= atomic_statement_body ';'
-atomic_statement_body
-::=  lhs assignment_op expression
+
+atomic_statement_body ::=  lhs assignment_op expression
    | expression '~' identifier '(' expressions ')' ?truncation
    | function_literal '(' expressions ')'
    | 'increment_log_prob' '(' expression ')'
@@ -724,7 +745,7 @@ string_literal ::= '"' char* '"'
 
 truncation ::= 'T' '[' ?expression ',' ?expression ']'
 
-lhs ::= identifier ?('[' indexes ']')
+lhs ::= identifier ('[' indexes ']')*
 
 nested_statement
 ::=
