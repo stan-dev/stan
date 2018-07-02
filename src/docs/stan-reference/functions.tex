@@ -3121,12 +3121,12 @@ eigenvalues of 0).
 %
 \fitem{matrix}{qr\_thin\_Q}{matrix \farg{A}}{
 The orthogonal matrix in the thin QR decomposition of \farg{A}, which
-implies that the resulting matrix is the same dimensions as as \farg{A}}
+implies that the resulting matrix has the same dimensions as \farg{A}}
 %
 \fitem{matrix}{qr\_thin\_R}{matrix \farg{A}}{
   The upper triangular matrix in the thin QR decomposition of \farg{A},
-  which implies that the resulting matrix has the same dimensions as
-  \farg{A} has columns}
+  which implies that the resulting matrix is square with the same
+  number of columns as \farg{A}}
 %
 \fitem{matrix}{qr\_Q}{matrix \farg{A}}{
 The orthogonal matrix in the fat QR decomposition of \farg{A}, which
@@ -3136,7 +3136,7 @@ rows as \farg{A}}
 \fitem{matrix}{qr\_R}{matrix \farg{A}}{
   The upper trapezoidal matrix in the fat QR decomposition of \farg{A},
   which implies that the resulting matrix will be square with the same 
-  dimensions as \farg{A}}
+  number of rows as \farg{A}}
 %
 \end{description}
 %
