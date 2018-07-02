@@ -671,7 +671,7 @@ expression ::= expression `?` expression `:` expression
              | expression postfixOp
              | common_expression
 
-range_expression ::= range_expression mathInfixOp range_expression
+range_expression ::= range_expression arithmeticInfixOp range_expression
                    | prefixOp range_expression
                    | range_expression postfixOp
                    | range_expression '[' indexes ']'
@@ -691,15 +691,15 @@ common_expression ::= real_literal
                     '('function_literal (',' expression){4|7} ')'
                     | '(' expression ')'
 
-prefixOp ::= '!' | '-' | '+' | '^'
+prefixOp ::= ('!' | '-' | '+' | '^')
 
-postfixOp ::= '\\''
+postfixOp ::= '\''
 
-infixOp ::= mathInfixOp | logicalInfixOp
+infixOp ::= arithmeticInfixOp | logicalInfixOp
 
-mathInfixOp ::= ('+' | '-' | '*' | '/' | '%' | '\\' | '.*' | './')
+arithmeticInfixOp ::= ('+' | '-' | '*' | '/' | '%' | '\' | '.*' | './')
 
-logicalInfixOp :: ('||' | '&&' | '==' | '!=' | '<' | '>' | '<=' | '>=')
+logicalInfixOp :: ('||' | '&&' | '==' | '!=' | '<' | '<=' | '>' | '>=')
 
 index ::= ?(expression | expression ':' | ':' expression
         | expression ':' expression)
