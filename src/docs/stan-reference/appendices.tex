@@ -590,7 +590,7 @@ e.g., \code{A\{6\}} is equivalent to a sequence of six copies of \code{A}.
 
 {\small
 \begin{Verbatim}
-program ::= ?functions ?data ?tdata ?params ?tparams model ?generated
+program ::= ?functions ?data ?tdata ?params ?tparams ?model ?generated
 
 functions ::= 'functions' function_decls
 data ::= 'data' var_decls
@@ -680,6 +680,7 @@ range_expression ::= range_expression arithmeticInfixOp range_expression
 common_expression ::= real_literal
                     | variable
                     | '{' expressions '}'
+                    | '[' expressions ']'
                     | function_literal '(' ?expressions ')'
                     | function_literal '(' expression ?('|' expression % ',') ')'
                     | integrate_ode '(' function_literal (',' expression){6} ')'
@@ -688,7 +689,7 @@ common_expression ::= real_literal
                     | integrate_ode_bdf
                       '(' function_literal (',' expression){6|9} ')'
                     | algebra_solver
-                    '('function_literal (',' expression){4|7} ')'
+                    '(' function_literal (',' expression){4|7} ')'
                     | '(' expression ')'
 
 prefixOp ::= ('!' | '-' | '+' | '^')
