@@ -19,7 +19,7 @@ help:
 ##
 # Library locations
 ##
-STAN ?= 
+STAN ?=
 MATH ?= lib/stan_math/
 
 -include $(MATH)make/default_compiler_options
@@ -174,7 +174,7 @@ clean-deps:
 	@echo '  removing dependency files'
 	$(shell find . -type f -name '*.d' -exec rm {} +)
 
-clean-all: clean clean-manual clean-deps clean-libraries
+clean-all: clean clean-docs clean-deps clean-libraries
 	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
