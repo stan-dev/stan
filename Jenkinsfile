@@ -59,7 +59,7 @@ pipeline {
         string(defaultValue: '', name: 'math_pr', description: "Leave blank "
                 + "unless testing against a specific math repo pull request, "
                 + "e.g. PR-640.")
-        string(defaultValue: 'downstream tests', name: 'cmdstan_pr',
+        string(defaultValue: 'downstream_tests', name: 'cmdstan_pr',
           description: 'PR to test CmdStan upstream against e.g. PR-630')
     }
     options { skipDefaultCheckout() }
@@ -68,7 +68,7 @@ pipeline {
             when {
                 not { branch 'develop' }
                 not { branch 'master' }
-                not { branch 'downstream tests' }
+                not { branch 'downstream_tests' }
             }
             steps {
                 script {
