@@ -165,11 +165,11 @@ $x$ is a $N \times K$ matrix, and $\beta$ is a $K$-vector of coefficients.
 Presuming $N \geq K$, we can exploit the fact that any design matrix, $x$
 can be decomposed using the thin QR decomposition into an orthogonal matrix
 $Q$ and an upper-triangular matrix $R$, i.e. $x = Q R$. See \ref{QR-decomposition}
-for more information on the QR decomposition but note that \code{qr\_Q} and
-\code{qr\_R} implement the fat QR decomposition so here we thin it by including
-only $K$ columns in $Q$ and $K$ rows in $R$. Also, in practice, it is best to
-write $x = Q^\ast R^\ast$ where $Q^\ast = Q \times \sqrt{n - 1}$ and
-$R^\ast = \frac{1}{\sqrt{n - 1}} R$. Thus, we can equivalently write
+for more information on the thin QR decomposition. Note that the columns of $x$
+should each have a mean of zero and no constant column. Also, in practice, it 
+is best to write $x = Q^\ast R^\ast$ where $Q^\ast = Q \times s$
+and $R^\ast = \frac{1}{s} R$, where $s$ is some scale factor such as
+$\sqrt{N - 1.0}$ or $R_{K,K}$. Thus, we can equivalently write
 $\eta = x \beta = Q R \beta = Q^\ast R^\ast \beta$. If we let
 $\theta = R^\ast \beta$, then we have $\eta = Q^\ast \theta$ and
 $\beta = R^{\ast^{-1}} \theta$. In that case, the previous Stan program becomes
@@ -178,17 +178,15 @@ $\beta = R^{\ast^{-1}} \theta$. In that case, the previous Stan program becomes
 data {
   int<lower=0> N;   // number of data items
   int<lower=0> K;   // number of predictors
-  matrix[N, K] x;   // predictor matrix
+  matrix[N, K] x;   // predictor matrix with centered columns!
   vector[N] y;      // outcome vector
 }
 transformed data {
-  matrix[N, K] Q_ast;
-  matrix[K, K] R_ast;
-  matrix[K, K] R_ast_inverse;
-  // thin and scale the QR decomposition
-  Q_ast = qr_Q(x)[, 1:K] * sqrt(N - 1);
-  R_ast = qr_R(x)[1:K, ] / sqrt(N - 1);
-  R_ast_inverse = inverse(R_ast);
+  matrix[K, K] R = qr_thin_R(x);
+  real s = sqrt(N - 1.0); // or N or R[K, K] or another number
+  matrix[K, K] R_ast = R / s;
+  matrix[N, K] Q_ast = qr_thin_Q(x) * s;
+  matrix[K, K] R_ast_inverse = inverse(R_ast);
 }
 parameters {
   real alpha;           // intercept
@@ -197,10 +195,10 @@ parameters {
 }
 model {
   y ~ normal(Q_ast * theta + alpha, sigma);  // likelihood
+  // priors
 }
 generated quantities {
-  vector[K] beta;
-  beta = R_ast_inverse * theta; // coefficients on x
+  vector[K] beta = R_ast_inverse * theta; // coefficients on x
 }
 \end{stancode}
 %
@@ -219,20 +217,19 @@ reasoning is threefold:
   of $x$ generally do not. Thus, a Hamiltonian Monte Carlo algorithm
   can move around the parameter space with a smaller number of larger
   steps
-\item Since the covariance matrix for the columns of $Q\ast$ is an
-  identity matrix, $\theta$ typically has a reasonable scale if the
+\item Since the covariance matrix for the columns of $Q\ast$ is proportional
+  to an identity matrix, $\theta$ typically has a reasonable scale if the
   units of $y$ are also reasonable. This also helps HMC move
   efficiently without compromising numerical accuracy.
 \end{enumerate}
 %
 Consequently, this QR reparameterization is recommended for linear and
 generalized linear models in Stan whenever $K > 1$ and you do not have
-an informative prior on the \emph{location} of $\beta$. It can also be
-worthwhile to subtract the mean from each column of $x$ before
-obtaining the QR decomposition, which does not affect the posterior
-distribution of $\theta$ or $\beta$ but does affect $\alpha$ and
-allows you to interpret $\alpha$ as the expectation of $y$ in a linear
-model.
+an informative prior on the \emph{location} of $\beta$. Subtracting the 
+mean from each column of $x$ before obtaining the QR decomposition, does 
+not affect the posterior distribution of $\theta$ or $\beta$ but does 
+affect $\alpha$ and allows you to interpret $\alpha$ as the expectation of 
+$y$ in a linear model for an average observation.
 
 \section{Priors for Coefficients and Scales}\label{regression-priors.section}
 
