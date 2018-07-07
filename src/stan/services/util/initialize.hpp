@@ -85,31 +85,40 @@ std::vector<double> initialize(Model& model,
   int MAX_INIT_TRIES = is_fully_initialized || init_zero ? 1 : 100;
   int num_init_tries = 0;
   for (; num_init_tries < MAX_INIT_TRIES; num_init_tries++) {
-    stan::io::random_var_context
-        random_context(model, rng, init_radius, init_zero);
+    std::stringstream msg;
+    try {
+      stan::io::random_var_context
+          random_context(model, rng, init_radius, init_zero);
 
-    if (!any_initialized) {
-      unconstrained = random_context.get_unconstrained();
-    } else {
-      stan::io::chained_var_context context(init, random_context);
+      if (!any_initialized) {
+        unconstrained = random_context.get_unconstrained();
+      } else {
+        stan::io::chained_var_context context(init, random_context);
 
-      std::stringstream msg;
-      try {
         model.transform_inits(context,
                               disc_vector,
                               unconstrained,
                               &msg);
-      } catch (const std::exception& e) {
-        if (msg.str().length() > 0)
-          logger.info(msg);
-        logger.info(e.what());
-        throw;
       }
+    } catch (std::domain_error& e) {
       if (msg.str().length() > 0)
         logger.info(msg);
+      logger.info("Rejecting initial value:");
+      logger.info("  Error evaluating the log probability"
+                  " at the initial value.");
+      logger.info(e.what());
+      continue;
+    } catch (std::exception& e) {
+      if (msg.str().length() > 0)
+        logger.info(msg);
+      logger.info("Unrecoverable error evaluating the log probability"
+                  " at the initial value.");
+      logger.info(e.what());
+      throw;
     }
+
+    msg.str("");
     double log_prob(0);
-    std::stringstream msg;
     try {
       log_prob = model.template log_prob<false, true>
                  (unconstrained, disc_vector, &msg);
