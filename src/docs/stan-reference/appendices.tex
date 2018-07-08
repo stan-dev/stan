@@ -610,12 +610,12 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 {
 \small
 \begin{Verbatim}[fontsize=\small]
-function_decl ::= unsized_return_type identifier '(' unsized_types ')'
-                 statement
+function_decl ::= return_type identifier '(' parameter_decl % ',' ')'
+                  statement
 
-unsized_return_type ::= 'void' | unsized_type
-unsized_type ::= (basic_type ?unsized_dims)
-unsized_types ::= unsized_type % ','
+return_type ::= 'void' | unsized_type
+parameter_decl ::= ?'data' unsized_type identifier
+unsized_type ::= basic_type ?unsized_dims
 basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
 unsized_dims ::= '['  ','*  ']'
 \end{Verbatim}
