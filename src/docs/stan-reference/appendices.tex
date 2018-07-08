@@ -597,9 +597,8 @@ data ::= 'data' var_decls
 tdata ::= 'transformed data' var_decls_statements
 params ::= 'parameters' var_decls
 tparams ::= 'transformed parameters' var_decls_statements
-model ::= 'model' statement
+model ::= 'model' var_decls_statements
 generated ::= 'generated quantities' var_decls_statements
-
 function_decls ::= '{' function_decl* '}'
 var_decls ::= '{' var_decl* '}'
 var_decls_statements ::= '{' var_decl* statement* '}'
