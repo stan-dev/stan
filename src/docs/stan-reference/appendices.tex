@@ -725,19 +725,17 @@ function_literal ::= identifier
 \begin{Verbatim}[fontsize=\small]
 statement ::= atomic_statement | nested_statement
 
-atomic_statement ::= atomic_statement_body ';'
-
-atomic_statement_body ::=  lhs assignment_op expression
-   | expression '~' identifier '(' expressions ')' ?truncation
-   | function_literal '(' expressions ')'
-   | 'increment_log_prob' '(' expression ')'
-   | 'target' '+=' expression
-   | 'break'
-   | 'continue'
-   | 'print' '(' (expression | string_literal) % ',' ')'
-   | 'reject' '(' (expression | string_literal) % ',' ')'
-   | 'return' expression
-   | ''
+atomic_statement ::=  lhs assignment_op expression ';'
+   | expression '~' identifier '(' expressions ')' ?truncation ';'
+   | function_literal '(' expressions ')' ';'
+   | 'increment_log_prob' '(' expression ')' ';'
+   | 'target' '+=' expression ';'
+   | 'break' ';'
+   | 'continue' ';'
+   | 'print' '(' (expression | string_literal) % ',' ')' ';'
+   | 'reject' '(' (expression | string_literal) % ',' ')' ';'
+   | 'return' expression ';'
+   | ';'
 
 assignment_op ::= '<-' | '=' | '+=' | '-=' | '*=' | '/=' | '.*=' | '/*='
 
