@@ -164,10 +164,12 @@ pipeline {
             }
         }
         success {
-            script { utils.updateUpstream(env,'cmdstan') }
-            utils.mailBuildResults("SUCCESSFUL")
+            script {
+                utils.updateUpstream(env,'cmdstan')
+                utils.mailBuildResults("SUCCESSFUL")
+            }
         }
-        unstable { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") }
-        failure { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") }
+        unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
+        failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
     }
 }
