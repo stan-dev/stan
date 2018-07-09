@@ -83,7 +83,7 @@ TEST(langParserTermGrammar, logicalNegateExprFun) {
 
 TEST(langParserTermGrammar, addExpressionDimssFun) {
   test_throws("validate_add_expression_dimss_bad",
-              "Indexed expression must have at least as many dimensions");
+              "Too many indexes");
   test_parsable("validate_add_expression_dimss_good");
 }
 

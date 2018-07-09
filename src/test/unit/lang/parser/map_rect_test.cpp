@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/lang/utility.hpp>
 
+
 TEST(langParserMapRect, good) {
   test_parsable("map_rect");
   expect_match("map_rect", "map_rect<");
@@ -41,4 +42,14 @@ TEST(langParserMapRect, badDataRealConst) {
 TEST(langParserMapRect, badDataIntConst) {
   test_throws("map_rect/bad_data_int_const",
               "fifth argument to map_rect must be data only");
+}
+
+TEST(langParserMapRect, badRngFn) {
+  test_throws("map_rect/bad_rng_fn",
+              "mapped function cannot be an _rng or _lp function");
+}
+
+TEST(langParserMapRect, badLpFn) {
+   test_throws("map_rect/bad_lp_fn",
+               "mapped function cannot be an _rng or _lp function");
 }

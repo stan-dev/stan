@@ -184,7 +184,8 @@ namespace stan {
       integrate_ode_control_r.name("expression");
       integrate_ode_control_r
         %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
-             | (string("integrate_ode_bdf") >> no_skip[!char_("a-zA-Z0-9_")]) )
+             | (string("integrate_ode_bdf") >> no_skip[!char_("a-zA-Z0-9_")])
+             | (string("integrate_ode_adams") >> no_skip[!char_("a-zA-Z0-9_")]))
         >> lit('(')              // >> allows backtracking to non-control
         >> identifier_r          // 1) system function name (function only)
         >> lit(',')
@@ -214,6 +215,7 @@ namespace stan {
       integrate_ode_r
         %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
              | (string("integrate_ode_bdf") >> no_skip[!char_("a-zA-Z0-9_")])
+             | (string("integrate_ode_adams") >> no_skip[!char_("a-zA-Z0-9_")])
              | (string("integrate_ode") >> no_skip[!char_("a-zA-Z0-9_")])
                [deprecated_integrate_ode_f(boost::phoenix::ref(error_msgs_))] )
         > lit('(')

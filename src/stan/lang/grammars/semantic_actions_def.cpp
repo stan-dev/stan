@@ -86,6 +86,10 @@ namespace stan {
         || ends_with("_lcdf", s) || ends_with("_lccdf", s);
     }
 
+    bool has_rng_lp_suffix(const std::string& s) {
+      return ends_with("_lp", s) || ends_with("_rng", s);
+    }
+
     void replace_suffix(const std::string& old_suffix,
                         const std::string& new_suffix, fun& f) {
       if (!ends_with(old_suffix, f.name_)) return;
@@ -143,17 +147,31 @@ namespace stan {
             || et.is_double_type());
     }
 
+
     bool can_assign_to_lhs_var(const std::string& lhs_var_name,
                                const scope& var_scope,
                                const variable_map& vm,
                                std::ostream& error_msgs) {
-      // validate scope matches declaration scope
+      if (lhs_var_name == std::string("lp__")) {
+        error_msgs << std::endl
+                   << "Error (fatal):  Use of lp__ is no longer supported."
+                   << std::endl
+                   << "  Use target += ... statement to increment log density."
+                   << std::endl;
+        return false;
+      }
+      if (!vm.exists(lhs_var_name)) {
+        error_msgs << "Unknown variable in assignment"
+                   << "; lhs variable=" << lhs_var_name
+                   << std::endl;
+        return false;
+      }
       scope lhs_origin = vm.get_scope(lhs_var_name);
-      if (lhs_origin.program_block() != var_scope.program_block()) {
-        error_msgs << "Cannot assign to variable outside of declaration block"
-                   << "; left-hand-side variable origin=";
-        print_scope(error_msgs, lhs_origin);
-        error_msgs << "." << std::endl;
+      // enforce constancy of loop variables
+      if (lhs_origin.program_block() == loop_identifier_origin) {
+        error_msgs << "Loop variable " << lhs_var_name
+                   << " cannot be used on left side of assignment statement."
+                   << std::endl;
         return false;
       }
       // enforce constancy of function args
@@ -162,6 +180,13 @@ namespace stan {
                    << std::endl
                    << "Use local variables instead."
                    << std::endl;
+        return false;
+      }
+      if (lhs_origin.program_block() != var_scope.program_block()) {
+        error_msgs << "Cannot assign to variable outside of declaration block"
+                   << "; left-hand-side variable origin=";
+        print_scope(error_msgs, lhs_origin);
+        error_msgs << std::endl;
         return false;
       }
       return true;
@@ -904,18 +929,41 @@ namespace stan {
     }
     boost::phoenix::function<add_conditional_body> add_conditional_body_f;
 
-    void deprecate_old_assignment_op::operator()(std::ostream& error_msgs)
+    void deprecate_old_assignment_op::operator()(std::string& op,
+                                                 std::ostream& error_msgs)
       const {
       error_msgs << "Warning (non-fatal): assignment operator <- deprecated"
                  << " in the Stan language;"
                  << " use = instead."
                  << std::endl;
+      std::string eq("=");
+      op = eq;
     }
     boost::phoenix::function<deprecate_old_assignment_op>
     deprecate_old_assignment_op_f;
 
+    void non_void_return_msg::operator()(scope var_scope, bool& pass,
+                                         std::ostream& error_msgs) const {
+      pass = false;
+      if (var_scope.non_void_fun()) {
+        error_msgs << "Non-void function must return expression"
+                   << " of specified return type."
+                   << std::endl;
+        return;
+      }
+      error_msgs << "Return statement only allowed from function bodies."
+                 << std::endl;
+    }
+    boost::phoenix::function<non_void_return_msg> non_void_return_msg_f;
+
     void validate_return_allowed::operator()(scope var_scope, bool& pass,
                                              std::ostream& error_msgs) const {
+      if (var_scope.void_fun()) {
+        error_msgs << "Void function cannot return a value."
+                   << std::endl;
+        pass = false;
+        return;
+      }
       if (!var_scope.non_void_fun()) {
         error_msgs << "Returns only allowed from function bodies."
                    << std::endl;
@@ -942,20 +990,26 @@ namespace stan {
     boost::phoenix::function<validate_void_return_allowed>
     validate_void_return_allowed_f;
 
-    void validate_lhs_var_assgn::operator()(const std::string& name,
-                                       const scope& var_scope,
-                                       variable& v,  bool& pass,
-                                       const variable_map& vm,
-                                       std::ostream& error_msgs) const {
-      // validate existence
-      if (!vm.exists(name)) {
-        // fail silently, allow backtracking
+    void validate_lhs_var_assgn::operator()(assgn& a,
+                                            const scope& var_scope,
+                                            bool& pass, const variable_map& vm,
+                                            std::ostream& error_msgs) const {
+      std::string name(a.lhs_var_.name_);
+      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
         pass = false;
         return;
       }
-      // validate scope matches declaration scope
-      scope lhs_origin = vm.get_scope(name);
-      if (lhs_origin.program_block() != var_scope.program_block()) {
+      a.lhs_var_.set_type(vm.get_base_type(name), vm.get_num_dims(name));
+    }
+    boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
+
+
+
+    void set_lhs_var_assgn::operator()(assgn& a, const std::string& name,
+                                       bool& pass, const variable_map& vm,
+                                       std::ostream& error_msgs) const {
+      if (!vm.exists(name)) {
+        error_msgs << "Unknown variable: " << name << std::endl;
         pass = false;
         return;
       }
@@ -963,21 +1017,13 @@ namespace stan {
       v.set_type(vm.get_bare_type(name));
       pass = true;
     }
-    boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
+    boost::phoenix::function<set_lhs_var_assgn> set_lhs_var_assgn_f;
 
-    void validate_assgn::operator()(const assgn& a, bool& pass,
+    void validate_assgn::operator()(assgn& a, bool& pass,
                                     const variable_map& vm,
                                     std::ostream& error_msgs) const {
       // validate var exists
       std::string name = a.lhs_var_.name_;
-      if (!vm.exists(name)) {
-        error_msgs << "Unknown variable in assignment"
-                   << "; lhs variable=" << name
-                   << std::endl;
-        pass = false;
-        return;
-      }
-
       expression lhs_expr = expression(a.lhs_var_);
       bare_expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
 
@@ -987,183 +1033,87 @@ namespace stan {
         pass = false;
         return;
       }
-      // call to has_same_shape is not correct.... not taking into account idxs
-      if (!has_same_shape(lhs_type, a.rhs_, name, "assignment", error_msgs)) {
-        pass = false;
-        return;
-      }
-      if (a.lhs_var_occurs_on_rhs()) {
-        // this only requires a warning --- a deep copy will be made
-        error_msgs << "Warning: left-hand side variable"
-                   << " (name=" << name << ")"
-                   << " occurs on right-hand side of assignment, causing"
-                   << " inefficient deep copy to avoid aliasing."
-                   << std::endl;
-      }
-
-      pass = true;
-    }
-    boost::phoenix::function<validate_assgn> validate_assgn_f;
-
-    void validate_assignment::operator()(assignment& a,
-                                         const scope& var_scope,
-                                         bool& pass, const variable_map& vm,
-                                         std::ostream& error_msgs) const {
-      std::string name = a.var_dims_.name_;
-      if (!vm.exists(name)) {
-        error_msgs << "Unknown variable in assignment"
-                   << "; lhs variable=" << name
-                   << std::endl;
-        pass = false;
-        return;
-      }
-
-      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
-        pass = false;
-        return;
-      }
-      a.var_type_ = vm.get_bare_type(name);
-
-      bare_expr_type inferred_lhs_type
-        = infer_var_dims_type(a.var_type_, a.var_dims_);
-
-      if (inferred_lhs_type.is_ill_formed_type()) {
-        error_msgs << "Too many indexes for variable"
-                   << "; variable name = "
-                   << name
-                   << "; num dimensions given = "
-                   << a.var_dims_.dims_.size()
-                   << "; variable total dimensions = "
-                   << a.var_type_.num_dims()
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      if (!has_same_shape(inferred_lhs_type, a.expr_, name,
-                          "assignment", error_msgs)) {
-        pass = false;
-        return;
-      }
-      pass = true;
-    }
-    boost::phoenix::function<validate_assignment> validate_assignment_f;
-
-    void validate_compound_assignment::operator()(compound_assignment& ca,
-                                         const scope& var_scope,
-                                         bool& pass, variable_map& vm,
-                                         std::ostream& error_msgs) const {
-      std::string name = ca.var_dims_.name_;
-      if (!vm.exists(name)) {
-        error_msgs << "Unknown variable in compound assignment"
-                   << "; lhs variable=" << name
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      if (!can_assign_to_lhs_var(name, var_scope, vm, error_msgs)) {
-        pass = false;
-        return;
-      }
-      ca.var_type_ = vm.get_bare_type(name);
-      bare_expr_type inferred_lhs_type
-        = infer_var_dims_type(ca.var_type_, ca.var_dims_);
-      int lhs_num_dims = ca.var_type_.num_dims();
-      int lhs_num_idxs = ca.var_dims_.dims_.size();
-
-      if (inferred_lhs_type.is_ill_formed_type()) {
-        error_msgs << "Too many indexes for variable"
-                   << "; variable name = " << name
-                   << "; specified indexes = " << lhs_num_idxs
-                   << "; variable total dimensions = " << lhs_num_dims
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      // no compound assign for array types  (std::vector)
-      std::string op_equals = ca.op_;
-      ca.op_ = op_equals.substr(0, op_equals.size()-1);
-      if (inferred_lhs_type.array_dims() > 0) {
-        error_msgs << "Cannot apply operator '" << op_equals
-                   << "' to array variable; variable name = "
-                   << name
-                   << ".";
-        error_msgs << std::endl;
-        pass = false;
-        return;
-      }
-
-      bare_expr_type rhs_type = ca.expr_.bare_type();
-      if (inferred_lhs_type.is_primitive()
-          && boost::algorithm::starts_with(ca.op_, ".")) {
-        error_msgs << "Cannot apply element-wise operation to scalar"
-                   << "; compound operator is: " << op_equals
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      if (inferred_lhs_type.is_primitive()
-          && rhs_type.is_primitive()
-          && (inferred_lhs_type.is_double_type()
-              || inferred_lhs_type == rhs_type)) {
+      if (a.is_simple_assignment()) {
+        if (!has_same_shape(lhs_type, a.rhs_, name, "assignment", error_msgs)) {
+          pass = false;
+          return;
+        }
+        if (a.lhs_var_occurs_on_rhs()) {
+          // this only requires a warning --- a deep copy will be made
+          error_msgs << "Warning: left-hand side variable"
+                     << " (name=" << name << ")"
+                     << " occurs on right-hand side of assignment, causing"
+                     << " inefficient deep copy to avoid aliasing."
+                     << std::endl;
+        }
         pass = true;
         return;
-      }
+      } else {
+        // compound operator-assignment
+        std::string op_equals = a.op_;
+        a.op_ = op_equals.substr(0, op_equals.size()-1);
 
-      bool types_compatible =
-        // container types allow infix and element-wise operations
-        // when lhs and rhs are same shape, and broadcast operations
-        // when rhs is double and lhs is vector, row_vector, or matrix
-        (inferred_lhs_type == rhs_type
-         || (inferred_lhs_type.is_vector_type()
-             && rhs_type.is_double_type())
-         || (inferred_lhs_type.is_row_vector_type()
-             && rhs_type.is_double_type())
-         || (inferred_lhs_type.is_row_vector_type()
-             && rhs_type.is_matrix_type())
-         || (inferred_lhs_type.is_matrix_type()
-             && rhs_type.is_double_type()));
-      if (!types_compatible) {
-        error_msgs << "Cannot apply operator '" << op_equals
-                   << "' to operands;"
-                   << " left-hand side type = " << inferred_lhs_type
-                   << "; right-hand side type=" << rhs_type
-                   << std::endl;
-        pass = false;
-        return;
+        if (lhs_type.num_dims() > 0) {
+          error_msgs << "Cannot apply operator '" << op_equals
+                     << "' to array variable; variable name = "
+                     << name
+                     << ".";
+          error_msgs << std::endl;
+          pass = false;
+          return;
+        }
+
+        bare_expr_type rhs_type = a.rhs_.bare_type();
+        if (lhs_type.is_primitive()
+            && boost::algorithm::starts_with(a.op_, ".")) {
+          error_msgs << "Cannot apply element-wise operation to scalar"
+                     << "; compound operator is: " << op_equals
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        if (lhs_type.is_primitive()
+            && rhs_type.is_primitive()
+            && (lhs_type.baxe().is_double_type()
+                || lhs_base_type == rhs_type)) {
+          pass = true;
+          return;
+        }
+
+        std::string op_name;
+        if (a.op_ == "+") {
+          op_name = "add";
+        } else if (a.op_ == "-") {
+          op_name = "subtract";
+        } else if (a.op_ == "*") {
+          op_name = "multiply";
+        } else if (a.op_ == "/") {
+          op_name = "divide";
+        } else if (a.op_ == "./") {
+          op_name = "elt_divide";
+        } else if (a.op_ == ".*") {
+          op_name = "elt_multiply";
+        }
+        // check that "lhs <op> rhs" is valid stan::math function sig
+        std::vector<function_arg_type> arg_types;
+        arg_types.push_back(function_arg_type(lhs_tpe));
+        arg_types.push_back(function_arg_type(rhs_type));
+        function_signature_t op_equals_sig(lhs_type, arg_types);
+        if (!function_signatures::instance().is_defined(op_name,
+                                                        op_equals_sig)) {
+          error_msgs << "Cannot apply operator '" << op_equals
+                     << "' to operands;"
+                     << " left-hand side type = " << lhs_type
+                     << "; right-hand side type=" << rhs_type
+                     << std::endl;
+          pass = false;
+          return;
+        }
+        a.op_name_ = op_name;
+        pass = true;
       }
-      std::string op_name;
-      if (ca.op_ == "+") {
-        op_name = "add";
-      } else if (ca.op_ == "-") {
-        op_name = "subtract";
-      } else if (ca.op_ == "*") {
-        op_name = "multiply";
-      } else if (ca.op_ == "/") {
-        op_name = "divide";
-      } else if (ca.op_ == "./") {
-        op_name = "elt_divide";
-      } else if (ca.op_ == ".*") {
-        op_name = "elt_multiply";
-      }
-      // check that "lhs <op> rhs" is valid stan::math function sig
-      std::vector<bare_expr_type> arg_types;
-      arg_types.push_back(inferred_lhs_type);
-      arg_types.push_back(rhs_type);
-      function_signature_t op_equals_sig(inferred_lhs_type, arg_types);
-      if (!function_signatures::instance().is_defined(op_name, op_equals_sig)) {
-        error_msgs << "Cannot apply operator '" << op_equals
-                   << "' to operands;"
-                   << " left-hand side type = " << inferred_lhs_type
-                   << "; right-hand side type=" << rhs_type
-                   << std::endl;
-        pass = false;
-        return;
-      }
-      ca.op_name_ = op_name;
-      pass = true;
     }
-    boost::phoenix::function<validate_compound_assignment>
-    validate_compound_assignment_f;
+    boost::phoenix::function<validate_assgn> validate_assgn_f;
 
     void validate_sample::operator()(sample& s,
                                      const variable_map& var_map, bool& pass,
@@ -1181,7 +1131,7 @@ namespace stan {
 
       if (internal_function_name.size() == 0) {
         pass = false;
-        error_msgs << "Error: couldn't find distribution named "
+        error_msgs << "Unknown distribution name: "
                    << function_name << std::endl;
         return;
       }
@@ -1400,14 +1350,6 @@ namespace stan {
                    << "  * Assignment statements only allow variables"
                    << " (with optional indexes) on the left;"
                    << std::endl
-                   << "    if you see an outer function logical_lt (<)"
-                   << " with negated (-) second argument,"
-                   << std::endl
-                   << "    it indicates an assignment statement A <- B"
-                   << " with illegal left"
-                   << std::endl
-                   << "    side A parsed as expression (A < (-B))."
-                   << std::endl
                    << "  * Sampling statements allow arbitrary"
                    << " value-denoting expressions on the left."
                    << std::endl
@@ -1450,19 +1392,10 @@ namespace stan {
     boost::phoenix::function<add_while_body> add_while_body_f;
 
     void add_loop_identifier::operator()(const std::string& name,
-                                         std::string& name_local,
                                          const scope& var_scope,
-                                         bool& pass, variable_map& vm,
-                                         std::stringstream& error_msgs) const {
-      name_local = name;
-      pass = !vm.exists(name);
-      if (!pass)
-        error_msgs << "Error: loop variable already declared."
-                   << " variable name=\"" << name << "\"" << std::endl;
-      else
-        // loop over range, loop var type is int
-        vm.add(name, var_decl(name, int_type()),
-               scope(var_scope.program_block(), true));
+                                         variable_map& vm) const {
+      vm.add(name, base_var_decl(name, std::vector<expression>(), int_type()),
+             scope(var_scope.program_block(), true));
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
@@ -1470,14 +1403,7 @@ namespace stan {
       ::operator()(const stan::lang::expression& expr,
                    std::string& name,
                    const scope& var_scope,
-                   bool& pass, variable_map& vm,
-                   std::stringstream& error_msgs) const {
-      pass = !(vm.exists(name));
-      if (!pass) {
-        error_msgs << "Error: loop variable already declared."
-                   << " variable name=\"" << name << "\"" << std::endl;
-        return;
-      }
+                   bool& pass, variable_map& vm) const {
       pass = expr.bare_type().is_array_type();
       if (!pass) {
         error_msgs << "Error: loop variable must be array type."
@@ -1498,18 +1424,17 @@ namespace stan {
                    const scope& var_scope,
                    bool& pass, variable_map& vm,
                    std::stringstream& error_msgs) const {
-      pass = !(vm.exists(name));
-      if (!pass) {
-        error_msgs << "Error: loop variable already declared."
-                   << " variable name=\"" << name << "\"" << std::endl;
-        return;
-      }
       pass = expr.bare_type().num_dims() > 0
              && !(expr.bare_type().is_array_type());
       if (!pass) {
         error_msgs << "Error: loop must be over container or range."
                    << std::endl;
         return;
+      } else {
+        vm.add(name, base_var_decl(name, std::vector<expression>(),
+                                   double_type()),
+               scope(loop_identifier_origin, true));
+        pass = true;
       }
       // loop over elements of vec/rowvec/matrix, loop var type is double
       vm.add(name, var_decl(name, double_type()),
@@ -1519,8 +1444,20 @@ namespace stan {
     add_matrix_loop_identifier_f;
 
     void store_loop_identifier::operator()(const std::string& name,
-                                           std::string& name_local) const {
-      name_local = name;
+                                           std::string& name_local,
+                                           bool& pass, variable_map& vm,
+                                           std::stringstream& error_msgs)
+      const {
+      pass = !(vm.exists(name));
+      if (!pass) {
+        // avoid repeated error message due to backtracking
+        if (error_msgs.str().find("Loop variable already declared.")
+            == std::string::npos)
+          error_msgs << "Loop variable already declared."
+                     << " variable name=\"" << name << "\"" << std::endl;
+      } else {
+          name_local = name;
+      }
     }
     boost::phoenix::function<store_loop_identifier> store_loop_identifier_f;
 
@@ -1640,8 +1577,14 @@ namespace stan {
     void deprecated_integrate_ode::operator()(std::ostream& error_msgs)
       const {
       error_msgs << "Warning: the integrate_ode() function is deprecated"
-             << " in the Stan language; use integrate_ode_rk45() [non-stiff]"
-             << " or integrate_ode_bdf() [stiff] instead."
+             << " in the Stan language; use the following functions"
+             << " instead.\n"
+             << " integrate_ode_rk45()"
+             << " [explicit, order 5, for non-stiff problems]\n"
+             << " integrate_ode_adams()"
+             << " [implicit, up to order 12, for non-stiff problems]\n"
+             << " integrate_ode_bdf()"
+             << " [implicit, up to order 5, for stiff problems]."
              << std::endl;
     }
     boost::phoenix::function<deprecated_integrate_ode>
@@ -1983,6 +1926,13 @@ namespace stan {
             bool& pass, std::ostream& error_msgs) const {
       pass = true;
 
+      if (has_rng_lp_suffix(mr.fun_name_)) {
+        error_msgs << "mapped function cannot be an _rng or _lp function,"
+                   << " found function name: "
+                   << mr.fun_name_ << std::endl;
+        pass = false;
+      }
+
       // mapped function signature
       // vector f(vector param_shared, vector param_local,
       //          real[] data_r, int[] data_i)
@@ -2011,21 +1961,31 @@ namespace stan {
           .is_defined(mr.fun_name_, mapped_fun_signature)) {
         error_msgs << "first argument to map_rect"
                    << " must be the name of a function with signature"
+<<<<<<< HEAD
                    << " (vector, vector, real[ ], int[ ]) : vector";
+=======
+                   << " (vector, vector, real[], int[]) : vector" << std::endl;
+>>>>>>> bf248025163a2a982202088631e113615a287d10
         pass = false;
       }
 
       // shared parameters - vector
       if (mr.shared_params_.bare_type() != shared_params_type) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "second argument to map_rect must be of type vector";
+        error_msgs << "second argument to map_rect must be of type vector"
+                   << std::endl;
         pass = false;
       }
       // job-specific parameters - array of vectors (array elts map to arg2)
       if (mr.job_params_.bare_type() != t_ar_vector) {
         if (!pass) error_msgs << ";  ";
+<<<<<<< HEAD
         error_msgs << "third argument to map_rect must be of type vector[ ]"
                    << " (array of vectors)";
+=======
+        error_msgs << "third argument to map_rect must be of type vector[]"
+                   << " (array of vectors)" << std::endl;
+>>>>>>> bf248025163a2a982202088631e113615a287d10
         pass = false;
       }
       // job-specific real data - 2-d array of double (array elts map to arg3)
@@ -2033,7 +1993,7 @@ namespace stan {
       if (mr.job_data_r_.bare_type() != job_data_rs_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "fourth argument to map_rect must be of type real[ , ]"
-                   << " (two dimensional array of reals)";
+                   << " (two dimensional array of reals)" << std::endl;
         pass = false;
       }
       // job-specific int data - 2-d array of int (array elts map to arg4)
@@ -2041,21 +2001,24 @@ namespace stan {
       if (mr.job_data_i_.bare_type() != job_data_is_type) {
         if (!pass) error_msgs << ";  ";
         error_msgs << "fifth argument to map_rect must be of type int[ , ]"
-                   << " (two dimensional array of integers)";
+                   << " (two dimensional array of integers)" << std::endl;
         pass = false;
       }
 
       // test data is data only
       if (has_var(mr.job_data_r_, var_map)) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fourth argment to map_rect must be data only";
+        error_msgs << "fourth argment to map_rect must be data only"
+                   << std::endl;
         pass = false;
       }
       if (has_var(mr.job_data_i_, var_map)) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fifth argument to map_rect must be data only";
+        error_msgs << "fifth argument to map_rect must be data only"
+                   << std::endl;
         pass = false;
       }
+
       if (pass)
         mr.register_id();
     }
@@ -2132,7 +2095,11 @@ namespace stan {
 
       if (has_rng_suffix(fun.name_)) {
         if (!(var_scope.allows_rng())) {
+<<<<<<< HEAD
           error_msgs << "Error: random number generators only allowed in"
+=======
+          error_msgs << "Random number generators only allowed in"
+>>>>>>> bf248025163a2a982202088631e113615a287d10
                      << " transformed data block, generated quantities block"
                      << " or user-defined functions with names ending in _rng"
                      << "; found function=" << fun.name_ << " in block=";
@@ -2523,20 +2490,24 @@ namespace stan {
     void add_expression_dimss::operator()(expression& expression,
                  std::vector<std::vector<stan::lang::expression> >& dimss,
                  bool& pass, std::ostream& error_msgs) const {
-      index_op iop(expression, dimss);
       int expr_dims = expression.total_dims();
       int index_dims = num_dimss(dimss);
       if (expr_dims < index_dims) {
-        error_msgs << "Indexed expression must have at least as many"
-                   << " dimensions as number of indexes supplied: "
-                   << std::endl
-                   << "    indexed expression dimensionality = " << expr_dims
-                   << "; indexes supplied = " << dimss.size()
+        error_msgs << "Too many indexes, expression dimensions="
+                   << expr_dims
+                   << ", indexes found="
+                   << index_dims
                    << std::endl;
         pass = false;
         return;
       }
+<<<<<<< HEAD
       if (iop.type_.is_ill_formed_type()) {
+=======
+      index_op iop(expression, dimss);
+      iop.infer_type();
+      if (iop.type_.is_ill_formed()) {
+>>>>>>> bf248025163a2a982202088631e113615a287d10
         error_msgs << "Indexed expression must have at least as many"
                    << " dimensions as number of indexes supplied."
                    << std::endl;
@@ -2564,13 +2535,30 @@ namespace stan {
         return;
       } else if (name == std::string("params_r__")) {
         error_msgs << std::endl << "Warning:" << std::endl
+<<<<<<< HEAD
                    << " Direct access to params_r__ yields an inconsistent"
+=======
+                   << "  Direct access to params_r__ yields an inconsistent"
+>>>>>>> bf248025163a2a982202088631e113615a287d10
                    << " statistical model in isolation and no guarantee is"
                    << " made that this model will yield valid inferences."
                    << std::endl
                    << "  Moreover, access to params_r__ is unsupported"
                    << " and the variable may be removed without notice."
                    << std::endl;
+      } else if (name == std::string("data")
+                 || name == std::string("generated")
+                 || name == std::string("model")
+                 || name == std::string("parameters")
+                 || name == std::string("transformed")) {
+        error_msgs << std::endl
+                   << "Unexpected open block, missing close block \"}\""
+                   << " before keyword \""
+                   << name
+                   << "\"."
+                   << std::endl;
+        pass = false;
+        return;
       }
       pass = vm.exists(name);
       if (pass) {
@@ -3269,7 +3257,7 @@ namespace stan {
                                       std::ostream& error_msgs) const {
       pass = in_loop;
       if (!pass)
-        error_msgs << "Error: break and continue statements are only allowed"
+        error_msgs << "Break and continue statements are only allowed"
                    << " in the body of a for-loop or while-loop."
                    << std::endl;
     }
