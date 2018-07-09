@@ -215,6 +215,14 @@ TEST(lang_parser, qr_R_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/qr_R");
 }
 
+TEST(lang_parser, qr_thin_Q_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/qr_thin_Q");
+}
+
+TEST(lang_parser, qr_thin_R_matrix_function_signatures) {
+  test_parsable("function-signatures/math/matrix/qr_thin_R");
+}
+
 TEST(lang_parser, quad_form_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/quad_form");
 }
