@@ -7,6 +7,7 @@ before_script:
   - echo ${CXX}
   - ${CXX} --version
   - echo "CC=$CXX" > make/local
+  - echo "CXXFLAGS+=$CXXFLAGS" >> make/local
 
 linux_clang: &linux_clang
   os: linux
@@ -31,22 +32,23 @@ matrix:
   include:
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8"
+          # For Travis's Ubuntu 14.04, the libstdc++ is broken with clang
+        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/callbacks src/test/unit/io"
           PARALLEL=2
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8"
+        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
           TESTFOLDER=src/test/unit/lang
           PARALLEL=2
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8"
+        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/mcmc src/test/unit/model src/test/unit/optimization"
           PARALLEL=2
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8"
+        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/services src/test/unit/variational src/test/unit/version_test.cpp"
           PARALLEL=2
     - <<: *linux_gcc
