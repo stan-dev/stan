@@ -57,7 +57,7 @@ $(STAN)doc/reference-manual/index.html:  $(STAN)src/docs/reference-manual/*.Rmd 
 	mkdir -p $(STAN)doc/reference-manual
 	mv -f $(STAN)src/docs/reference-manual/_book/* $(STAN)doc/reference-manual
 
-clean-manual:
+clean-docs:
 	rm -rf $(STAN)doc
 	cd $(STAN)src/docs/users-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa *.fdb_latexmk *.fls
 	cd $(STAN)src/docs/functions; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa *.fdb_latexmk *.fls
