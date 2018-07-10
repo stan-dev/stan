@@ -87,7 +87,8 @@ std::vector<double> initialize(Model& model,
 
   bool is_initialized_with_zero = init_radius == 0.0;
 
-  int MAX_INIT_TRIES = is_fully_initialized || is_initialized_with_zero ? 1 : 100;
+  int MAX_INIT_TRIES = is_fully_initialized || is_initialized_with_zero
+                       ? 1 : 100;
   int num_init_tries = 0;
   for (; num_init_tries < MAX_INIT_TRIES; num_init_tries++) {
     std::stringstream msg;
