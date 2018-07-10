@@ -7,6 +7,7 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/model/log_prob_grad.hpp>
+#include <stan/math/prim/arr/fun/sum.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -157,7 +158,6 @@ std::vector<double> initialize(Model& model,
     }
     std::stringstream log_prob_msg;
     std::vector<double> gradient;
-    bool gradient_ok = true;
     clock_t start_check = clock();
     try {
       // we evaluate this with propto=true since we're
@@ -177,15 +177,14 @@ std::vector<double> initialize(Model& model,
     if (log_prob_msg.str().length() > 0)
       logger.info(log_prob_msg);
 
-    for (size_t i = 0; i < gradient.size(); ++i) {
-      if (gradient_ok && !boost::math::isfinite(gradient[i])) {
-        logger.info("Rejecting initial value:");
-        logger.info("  Gradient evaluated at the initial value"
-                    " is not finite.");
-        logger.info("  Stan can't start sampling from this"
-                    " initial value.");
-        gradient_ok = false;
-      }
+    bool gradient_ok = boost::math::isfinite(stan::math::sum(gradient));
+
+    if (!gradient_ok) {
+      logger.info("Rejecting initial value:");
+      logger.info("  Gradient evaluated at the initial value"
+                  " is not finite.");
+      logger.info("  Stan can't start sampling from this"
+                  " initial value.");
     }
     if (gradient_ok && print_timing) {
       logger.info("");
@@ -203,27 +202,24 @@ std::vector<double> initialize(Model& model,
       logger.info("");
       logger.info("");
     }
-    if (gradient_ok)
-      break;
-  }
-
-  if (num_init_tries == MAX_INIT_TRIES) {
-    if (!is_fully_initialized && !is_initialized_with_zero) {
-      logger.info("");
-      std::stringstream msg;
-      msg << "Initialization between (-" << init_radius
-          << ", " << init_radius << ") failed after"
-          << " " << MAX_INIT_TRIES <<  " attempts. ";
-      logger.info(msg);
-      logger.info(" Try specifying initial values,"
-                  " reducing ranges of constrained values,"
-                  " or reparameterizing the model.");
+    if (gradient_ok) {
+      init_writer(unconstrained);
+      return unconstrained;
     }
-    throw std::domain_error("Initialization failed.");
   }
 
-  init_writer(unconstrained);
-  return unconstrained;
+  if (!is_initialized_with_zero) {
+    logger.info("");
+    std::stringstream msg;
+    msg << "Initialization between (-" << init_radius
+        << ", " << init_radius << ") failed after"
+        << " " << MAX_INIT_TRIES <<  " attempts. ";
+    logger.info(msg);
+    logger.info(" Try specifying initial values,"
+                " reducing ranges of constrained values,"
+                " or reparameterizing the model.");
+  }
+  throw std::domain_error("Initialization failed.");
 }
 
 }

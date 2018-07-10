@@ -47,22 +47,20 @@ TEST_F(ServicesUtilInitialize, radius_zero__print_false) {
   EXPECT_EQ(params[1], init.vector_double_values()[0][1]);
 }
 
-TEST_F(ServicesUtilInitialize, radius_zero__print_true) {
+TEST_F(ServicesUtilInitialize, radius_zero__initialize_with_Jacobian) {
   std::vector<double> params;
 
   double init_radius = 0;
-  bool print_timing = true;
-  params = stan::services::util::initialize(model, empty_context, rng,
-                                            init_radius, print_timing,
-                                            logger, init);
+  bool print_timing = false;
+  params = stan::services::util::initialize<false>(model, empty_context, rng,
+                                                   init_radius, print_timing,
+                                                   logger, init);
   ASSERT_EQ(model.num_params_r(), params.size())
       << "2 parameters";
   EXPECT_FLOAT_EQ(0, params[0]);
   EXPECT_FLOAT_EQ(0, params[1]);
 
-  EXPECT_EQ(6, logger.call_count());
-  EXPECT_EQ(6, logger.call_count_info());
-  EXPECT_EQ(1, logger.find_info("Gradient evaluation"));
+  EXPECT_EQ(0, logger.call_count());
   ASSERT_EQ(1, init.vector_double_values().size());
   ASSERT_EQ(2, init.vector_double_values()[0].size());
   EXPECT_EQ(params[0], init.vector_double_values()[0][0]);
