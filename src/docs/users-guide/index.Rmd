@@ -1,0 +1,89 @@
+---
+knit: "bookdown::render_book"
+title: "Stan User's Guide"
+author: "Stan Development Team"
+date: "Version 2.18 (August 2018)"
+description: "Stan user's guide with examples and programming techniques."
+url: 'http\://mc-stan.org/users/documentation'
+site: bookdown::bookdown_site
+github-repo: stan-dev/stan
+twitter-handle: mc-stan
+cover-image: img/logo_tm.png
+documentclass: book
+bibliography: [../bibtex/all.bib]
+biblio-style: apalike
+link-citations: yes
+fontsize: 10pt
+monofont: "Lucida Console"
+subparagraph: yes
+---
+
+# <i style="font-size: 110%; padding:1.5em 0 0 0; color:#990017;">Overview</i> {-}
+
+<img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225" alt="Stan logo" />
+
+This is the official user's guide for Stan.  It provides example
+models and programming techniques for coding statistical models in Stan.
+
+In addition to this user's guide, there are two reference manuals for
+the Stan language and algorithms.  The *Stan Reference Manual*
+specifies the Stan programming language and inference algorithms. The
+*Stan Functions Reference* specifies the functions built into the Stan
+programming language.
+
+There is also a separate installation and getting started guide for
+each of the Stan interfaces (R, Python, Julia, Stata, MATLAB, and
+Mathematica, and command line).
+
+
+## Web Resources {-}
+
+Stan is an open-source software project, resources for which are
+hosted on various web sites:
+
+The [Stan Web Site](http://mc-stan.org/) organizes all of the resources
+for the Stan project for users and developers.  It contains links to
+the official Stan releases, source code, installation instructions,
+and full documentation, including the latest version of this manual,
+the user's guide and the getting started guide for each interface,
+tutorials, case studies, and reference materials for developers.
+
+The [Stan Forums](http://discourse.mc-stan.org) provide structured
+message boards for questions, discussion, and announcements related to
+Stan for both users and developers.
+
+The [Stan GitHub Organization](https://github.com/stan-dev) hosts all
+of Stan's code, documentation, wikis, and web site, as well as the
+issue trackers for bug reports and feature requests and interactive
+code review for pull requests.
+
+## Acknowledgements {-}
+
+The Stan project could not exit without developers, users, and
+funding.  Stan is a highly collaborative project.  The individual
+contributions of the Stan developers to code is tracked through GitHub
+and to the design conversation in the Wikis and forums.
+
+Users have made extensive contributions to documentation in the way
+of case studies, tutorials and even books.  They have also reported
+numerous bugs in both the code and documentation.
+
+Stan has been funded through grants for Stan and its developers,
+through in-kind donations in the form of companies contributing
+developer time to Stan and individuals contributing their own time to
+Stan, and through donations to the open-source scientific software
+non-profit NumFOCUS.  For details of direct funding for the project,
+see the web site and project pages of the Stan developers.
+
+
+## Copyright, Trademark, and Licensing {-}
+
+The user's guide is copyright 2011--2018, Stan Development Team and
+their assignees.  The user's guide text content is distributed under the
+[CC-BY ND 4.0 license](https://creativecommons.org/licenses/by-nd/4.0/legalcode).
+The user's guide compuer code is distributed under the [BSD 3-clause
+license](https://opensource.org/licenses/BSD-3-Clause).
+
+The Stan name and logo are registered trademarks of NumFOCUS.  Use of
+the Stan name and logo are governed by the [Stan logo usage
+guidelines](http://mc-stan.org/about/logo/).
