@@ -7,7 +7,6 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/model/log_prob_grad.hpp>
-#include <limits>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -38,9 +37,14 @@ namespace util {
  * parameters that are valid or it hits <code>MAX_INIT_TRIES =
  * 100</code> (hard-coded).
  *
- * Valid initialization is defined as a finite, non-NaN value
- * for the evaluation of the log probability and all its
+ * Valid initialization is defined as a finite, non-NaN value for the
+ * evaluation of the log probability density function and all its
  * gradients.
+ *
+ * @tparam Jacobian indicates whether to include the Jacobian term when
+ *   evaluating the log density function
+ * @tparam Model the type of the model class
+ * @tparam RNG the type of the random number generator
  *
  * @param[in] model the model
  * @param[in] init a var_context with initial values
@@ -59,7 +63,7 @@ namespace util {
  *   std::domain_error)
  * @return valid unconstrained parameters for the model
  */
-template <class Model, class RNG>
+template <bool Jacobian = true, class Model, class RNG>
 std::vector<double> initialize(Model& model,
                                stan::io::var_context& init,
                                RNG& rng,
@@ -80,15 +84,15 @@ std::vector<double> initialize(Model& model,
     any_initialized |= init.contains_r(param_names[n]);
   }
 
-  bool init_zero = init_radius <= std::numeric_limits<double>::min();
+  bool is_initialized_with_zero = init_radius == 0.0;
 
-  int MAX_INIT_TRIES = is_fully_initialized || init_zero ? 1 : 100;
+  int MAX_INIT_TRIES = is_fully_initialized || is_initialized_with_zero ? 1 : 100;
   int num_init_tries = 0;
   for (; num_init_tries < MAX_INIT_TRIES; num_init_tries++) {
     std::stringstream msg;
     try {
       stan::io::random_var_context
-          random_context(model, rng, init_radius, init_zero);
+          random_context(model, rng, init_radius, is_initialized_with_zero);
 
       if (!any_initialized) {
         unconstrained = random_context.get_unconstrained();
@@ -120,7 +124,10 @@ std::vector<double> initialize(Model& model,
     msg.str("");
     double log_prob(0);
     try {
-      log_prob = model.template log_prob<false, true>
+      // we evaluate the log_prob function with propto=false
+      // because we're evaluating with `double` as the type of
+      // the parameters.
+      log_prob = model.template log_prob<false, Jacobian>
                  (unconstrained, disc_vector, &msg);
       if (msg.str().length() > 0)
         logger.info(msg);
@@ -153,7 +160,9 @@ std::vector<double> initialize(Model& model,
     bool gradient_ok = true;
     clock_t start_check = clock();
     try {
-      log_prob = stan::model::log_prob_grad<true, true>
+      // we evaluate this with propto=true since we're
+      // evaluating with autodiff variables
+      log_prob = stan::model::log_prob_grad<true, Jacobian>
                  (model, unconstrained, disc_vector,
                   gradient, &log_prob_msg);
     } catch (const std::exception& e) {
@@ -199,7 +208,7 @@ std::vector<double> initialize(Model& model,
   }
 
   if (num_init_tries == MAX_INIT_TRIES) {
-    if (!is_fully_initialized && !init_zero) {
+    if (!is_fully_initialized && !is_initialized_with_zero) {
       logger.info("");
       std::stringstream msg;
       msg << "Initialization between (-" << init_radius
