@@ -83,6 +83,7 @@
 #include <stan/lang/ast/node/index_op_sliced_def.hpp>
 #include <stan/lang/ast/node/int_literal_def.hpp>
 #include <stan/lang/ast/node/int_var_decl_def.hpp>
+#include <stan/lang/ast/node/integrate_1d_def.hpp>
 #include <stan/lang/ast/node/integrate_ode_def.hpp>
 #include <stan/lang/ast/node/integrate_ode_control_def.hpp>
 #include <stan/lang/ast/node/lb_idx_def.hpp>

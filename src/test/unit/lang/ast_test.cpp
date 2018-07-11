@@ -1143,3 +1143,33 @@ TEST(StanLangAst, MapRect) {
   int_literal lit4 = boost::polymorphic_get<int_literal>(mr.job_data_i_.expr_);
   EXPECT_EQ(4, lit4.val_);
 }
+
+expression int_to_expr(int n) {
+  int_literal x(n);
+  expression e(x);
+  return e;
+}
+
+int expr_to_int(const expression& e) {
+  return boost::polymorphic_get<int_literal>(e.expr_).val_;
+}
+
+TEST(StanLangAst, integrate1d) {
+  using stan::lang::integrate_1d;
+  using stan::lang::expression;
+  using std::vector;
+
+  integrate_1d a;
+
+  vector<expression> e;
+  for (int i = 0; i < 6; ++i)
+    e.push_back(int_to_expr(i));
+  integrate_1d b("foo", e[0], e[1], e[2], e[3], e[4], e[5]);
+  EXPECT_EQ(std::string("foo"), b.function_name_);
+  EXPECT_EQ(0, expr_to_int(b.lb_));
+  EXPECT_EQ(1, expr_to_int(b.ub_));
+  EXPECT_EQ(2, expr_to_int(b.theta_));
+  EXPECT_EQ(3, expr_to_int(b.x_r_));
+  EXPECT_EQ(4, expr_to_int(b.x_i_));
+  EXPECT_EQ(5, expr_to_int(b.rel_tol_));
+}

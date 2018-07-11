@@ -7,8 +7,6 @@
 namespace stan {
   namespace lang {
 
-    struct expression;
-
     /**
      * Structure for integrate diff eq statement.
      */
@@ -60,7 +58,7 @@ namespace stan {
 
       /**
        * Construct an integrate ODE node with the specified
-       * components. 
+       * components.
        *
        * @param integration_function_name name of integrator
        * @param system_function_name name of ODE system
