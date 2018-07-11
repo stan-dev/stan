@@ -107,6 +107,15 @@ namespace stan {
        * @param e expression
        * @return true if expression contains a non-data variable
        */
+      bool operator()(const integrate_1d& e) const;
+
+      /**
+       * Return true if the specified expression contains a non-data
+       * variable.
+       *
+       * @param e expression
+       * @return true if expression contains a non-data variable
+       */
       bool operator()(const integrate_ode& e) const;
 
       /**

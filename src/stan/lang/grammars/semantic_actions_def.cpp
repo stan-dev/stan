@@ -266,6 +266,8 @@ namespace stan {
     template void assign_lhs::operator()(expression&, const double_literal&)
       const;
     template void assign_lhs::operator()(expression&, const int_literal&) const;
+    template void assign_lhs::operator()(expression&, const integrate_1d&)
+      const;
     template void assign_lhs::operator()(expression&, const integrate_ode&)
       const;
     template void assign_lhs::operator()(expression&,
@@ -2681,6 +2683,11 @@ namespace stan {
         error_msgs_ << std::endl;
       }
       return is_data;
+    }
+    bool data_only_expression::operator()(const integrate_1d& x) const {
+      return boost::apply_visitor(*this, x.lb_.expr_)
+        && boost::apply_visitor(*this, x.ub_.expr_)
+        && boost::apply_visitor(*this, x.theta_.expr_);
     }
     bool data_only_expression::operator()(const integrate_ode& x) const {
       return boost::apply_visitor(*this, x.y0_.expr_)

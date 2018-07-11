@@ -15,6 +15,7 @@ namespace stan {
     struct row_vector_expr;
     struct variable;
     struct fun;
+    struct integrate_1d;
     struct integrate_ode;
     struct integrate_ode_control;
     struct algebra_solver;
@@ -39,6 +40,7 @@ namespace stan {
       expr_type operator()(const row_vector_expr& e) const;
       expr_type operator()(const variable& e) const;
       expr_type operator()(const fun& e) const;
+      expr_type operator()(const integrate_1d& e) const;
       expr_type operator()(const integrate_ode& e) const;
       expr_type operator()(const integrate_ode_control& e) const;
       expr_type operator()(const algebra_solver& e) const;

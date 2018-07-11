@@ -111,6 +111,11 @@ namespace stan {
       map_rect_r;
 
       boost::spirit::qi::rule<Iterator,
+                              integrate_1d(scope),
+                              whitespace_grammar<Iterator> >
+      integrate_1d_r;
+
+      boost::spirit::qi::rule<Iterator,
                               std::string(),
                               whitespace_grammar<Iterator> >
       identifier_r;

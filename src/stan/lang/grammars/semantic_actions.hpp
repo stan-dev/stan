@@ -809,6 +809,7 @@ namespace stan {
       bool operator()(const matrix_expr& x) const;
       bool operator()(const row_vector_expr& x) const;
       bool operator()(const variable& x) const;
+      bool operator()(const integrate_1d& x) const;
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_control& x) const;
       bool operator()(const algebra_solver& x) const;
