@@ -1,0 +1,192 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Reproducibility {#reproducibility.chapter}
+
+Floating point operations on modern computers are notoriously
+difficult to replicate because the fundamental arithmetic operations,
+right down to the IEEE 754 encoding level, are not fully specified.
+The primary problem is that the precision of operations varies across
+different hardware platforms and software implementations.
+
+Stan is designed to allow full reproducibility.  However, this is only
+possible up to the external constraints imposed by floating point
+arithmetic.
+
+Stan results will only be exactly reproducible if *all* of the following
+components are *identical*:
+
+*  Stan version
+*  Stan interface (RStan, PyStan, CmdStan) and version, plus version
+  of interface language (R, Python, shell)
+*  versions of included libraries (Boost and Eigen)
+*  operating system version
+*  computer hardware including CPU, motherboard and memory
+*  C++ compiler, including version, compiler flags, and linked libraries
+*  same configuration of call to Stan, including random seed, chain
+  ID, initialization and data
+
+It doesn't matter if you use a stable release version of Stan or the
+version with a particular Git hash tag.  The same goes for all of the
+interfaces, compilers, and so on.  The point is that if any of
+these moving parts changes in some way, floating point results may
+change.
+
+Concretely, if you compile a single Stan program using the same
+CmdStan code base, but changed the optimization flag (`-O3` vs. `-O2`
+or `-O0`), the two programs may not return the identical stream of
+results.  Thus it is very hard to guarantee reproducibility on
+externally managed hardware, like in a cluster or even a desktop
+managed by an IT department or with automatic updates turned on.
+
+If, however, you compiled a Stan program today using one set of flags,
+took the computer away from the internet and didn't allow it to update
+anything, then came back in a decade and recompiled the Stan program
+in the same way, you should get the same results.
+
+The data needs to be the same down to the bit level. For example, if
+you are running in RStan, Rcpp handles the conversion between R's
+floating point numbers and C++ doubles. If Rcpp changes the conversion
+process or use different types, the results are not guaranteed to be
+the same down to the bit level.
+
+The compiler and compiler settings can also be an issue.  There is a
+nice discussion of the issues and how to control reproducibility in
+Intel's proprietary compiler by @CordenKreitzer:2014.
+
+

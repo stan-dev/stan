@@ -385,11 +385,19 @@ namespace stan {
     add_conditional_body_f;
 
     // called from: statement_grammar
-    struct deprecate_old_assignment_op : public phoenix_functor_unary {
-      void operator()(std::ostream& error_msgs) const;
+    struct deprecate_old_assignment_op : public phoenix_functor_binary {
+      void operator()(std::string& op, std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<deprecate_old_assignment_op>
     deprecate_old_assignment_op_f;
+
+    // called from: statement_grammar
+    struct non_void_return_msg : public phoenix_functor_ternary {
+      void operator()(scope var_scope, bool& pass, std::ostream& error_msgs)
+        const;
+    };
+    extern boost::phoenix::function<non_void_return_msg>
+    non_void_return_msg_f;
 
     // called from: statement_grammar
     struct validate_return_allowed : public phoenix_functor_ternary {
@@ -408,9 +416,17 @@ namespace stan {
     validate_void_return_allowed_f;
 
     // called from: statement_grammar
-    struct validate_lhs_var_assgn : public phoenix_functor_senary {
-      void operator()(const std::string& name, const scope& var_scope,
-                      variable& v, bool& pass, const variable_map& vm,
+    struct set_lhs_var_assgn : public phoenix_functor_quinary {
+      void operator()(assgn& a, const std::string& name, bool& pass,
+                      const variable_map& vm, std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<set_lhs_var_assgn>
+    set_lhs_var_assgn_f;
+
+    // called from: statement_grammar
+    struct validate_lhs_var_assgn : public phoenix_functor_quinary {
+      void operator()(assgn& a, const scope& var_scope,
+                      bool& pass, const variable_map& vm,
                       std::ostream& error_msgs) const;
     };
     extern boost::phoenix::function<validate_lhs_var_assgn>
@@ -418,29 +434,11 @@ namespace stan {
 
     // called from: statement_grammar
     struct validate_assgn : public phoenix_functor_quaternary {
-      void operator()(const assgn& a, bool& pass,
+      void operator()(assgn& a, bool& pass,
                       const variable_map& vm, std::ostream& error_msgs)
         const;
     };
     extern boost::phoenix::function<validate_assgn> validate_assgn_f;
-
-    // called from: statement_grammar
-    struct validate_assignment : public phoenix_functor_quinary {
-      void operator()(assignment& a, const scope& var_scope,
-                      bool& pass, const variable_map& vm,
-                      std::ostream& error_msgs) const;
-    };
-    extern boost::phoenix::function<validate_assignment>
-    validate_assignment_f;
-
-    // called from: statement_grammar
-    struct validate_compound_assignment : public phoenix_functor_quinary {
-      void operator()(compound_assignment& a, const scope& var_scope,
-                      bool& pass, variable_map& vm, std::ostream& error_msgs)
-        const;
-    };
-    extern boost::phoenix::function<validate_compound_assignment>
-    validate_compound_assignment_f;
 
     // called from: statement_grammar
     struct validate_sample : public phoenix_functor_quaternary {
@@ -478,22 +476,19 @@ namespace stan {
     extern boost::phoenix::function<add_while_body> add_while_body_f;
 
     // called from: statement_grammar
-    struct add_loop_identifier : public phoenix_functor_senary {
+    struct add_loop_identifier : public phoenix_functor_ternary {
       void operator()(const std::string& name,
-                      std::string& name_local,
                       const scope& var_scope,
-                      bool& pass, variable_map& vm,
-                      std::stringstream& error_msgs) const;
+                      variable_map& vm) const;
     };
     extern boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
     // called from: statement_grammar
-    struct add_array_loop_identifier : public phoenix_functor_senary {
+    struct add_array_loop_identifier : public phoenix_functor_quinary {
       void operator()(const stan::lang::expression& expr,
                       std::string& name,
                       const scope& var_scope,
-                      bool& pass, variable_map& vm,
-                      std::stringstream& error_msgs) const;
+                      bool& pass, variable_map& vm) const;
     };
     extern boost::phoenix::function<add_array_loop_identifier>
       add_array_loop_identifier_f;
@@ -510,9 +505,11 @@ namespace stan {
       add_matrix_loop_identifier_f;
 
     // called from: statement_grammar
-    struct store_loop_identifier : public phoenix_functor_binary {
+    struct store_loop_identifier : public phoenix_functor_quinary {
       void operator()(const std::string& name,
-                      std::string& name_local) const;
+                      std::string& name_local,
+                      bool& pass, variable_map& vm,
+                      std::stringstream& error_msgs) const;
     };
     extern boost::phoenix::function<store_loop_identifier>
       store_loop_identifier_f;

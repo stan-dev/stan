@@ -1,0 +1,207 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Licenses and Dependencies {#licensing.appendix}
+
+Stan and its dependent libraries, are distributed under generous,
+freedom-respecting licenses approved by the [Open Source
+Initiative](http://opensource.org).
+
+In particular, the licenses for Stan and its dependent libraries have
+no ``copyleft'' provisions requiring applications of Stan to be
+open source if they are redistributed.
+
+This chapter specifies the licenses for the libraries on which Stan's
+math library, language, and algorithms depend.  The last tool
+mentioned, Google Test, is only used for testing and is not needed to
+run Stan.
+
+## Stan License
+
+Stan is distributed under
+
+* [BSD 3-clause license (BSD New)](http://www.opensource.org/licenses/BSD-3-Clause)}
+
+The copyright holder of each contribution is the developer or his or
+her assignee.^[Universities or companies often own the copyright of computer programs developed by their employees.]
+
+
+## Boost License
+
+Stan uses the Boost library for template metaprograms, traits
+programs, the parser, and various numerical libraries for special
+functions, probability functions, and random number generators.  Boost
+is distributed under the
+
+* [Boost Software License version 1.0](http://www.opensource.org/licenses/BSL-1.0)
+
+The copyright for each Boost package is held by its developers or
+their assignees.
+
+
+## Eigen License
+
+Stan uses the Eigen library for matrix arithmetic and linear algebra.
+Eigen is distributed under the 
+
+* [Mozilla Public License, version 2](http://opensource.org/licenses/mpl-2.0)
+
+The copyright of Eigen is owned jointly by its developers or their
+assignees.
+
+
+## SUNDIALS License
+
+Stan uses the SUNDIALS package for solving differential equations.
+SUNDIALS is distributed under the
+
+* [BSD 3-clause license (BSD New)](http://www.opensource.org/licenses/BSD-3-Clause)}
+
+The copyright of SUNDIALS is owned by Lawrence Livermore National
+Security Lab.
+
+
+## Google Test License
+
+Stan uses Google Test for unit testing; it is not required to compile
+or execute models.  Google Test is distributed under the
+
+* [BSD 3-clause license (BSD New)](http://www.opensource.org/licenses/BSD-3-Clause)}
+
+The copyright of Google Test is owned by Google, Inc.
+
