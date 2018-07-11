@@ -344,6 +344,8 @@ add("eigenvalues_sym", expr_type(vector_type()), expr_type(matrix_type()));
 add("eigenvectors_sym", expr_type(matrix_type()), expr_type(matrix_type()));
 add("qr_Q", expr_type(matrix_type()), expr_type(matrix_type()));
 add("qr_R", expr_type(matrix_type()), expr_type(matrix_type()));
+add("qr_thin_Q", expr_type(matrix_type()), expr_type(matrix_type()));
+add("qr_thin_R", expr_type(matrix_type()), expr_type(matrix_type()));
 add("elt_divide", expr_type(vector_type()), expr_type(vector_type()), expr_type(vector_type()));
 add("elt_divide", expr_type(row_vector_type()), expr_type(row_vector_type()), expr_type(row_vector_type()));
 add("elt_divide", expr_type(matrix_type()), expr_type(matrix_type()), expr_type(matrix_type()));
@@ -596,6 +598,14 @@ add("log_determinant", expr_type(double_type()), expr_type(matrix_type()));
 add_binary("log_diff_exp");
 add_binary("log_falling_factorial");
 add_ternary("log_mix");
+for (size_t i = 1; i < vector_types.size(); ++i) {
+  add("log_mix", expr_type(double_type()), vector_types[i], expr_type(double_type(), 1));
+  for (size_t j = 0; j < 2; ++j) {
+    for (size_t k = 2; k < 4; ++k) {
+      add("log_mix", expr_type(double_type()), vector_types[i], expr_type(base_types[k], j));
+    }
+  }
+}
 add_binary("log_rising_factorial");
 add_unary_vectorized("log_inv_logit");
 add("log_softmax", expr_type(vector_type()), expr_type(vector_type()));
@@ -678,6 +688,7 @@ for (const auto& t : all_vector_types) {
  }
 add_nullary("machine_precision");
 add("matrix_exp", expr_type(matrix_type()), expr_type(matrix_type()));
+add("matrix_exp_multiply", expr_type(matrix_type()), expr_type(matrix_type()), expr_type(matrix_type()));
 add("max", expr_type(int_type()), expr_type(int_type(), 1));
 add("max", expr_type(double_type()), expr_type(double_type(), 1));
 add("max", expr_type(double_type()), expr_type(vector_type()));
@@ -1066,6 +1077,7 @@ add("rows_dot_product", expr_type(vector_type()), expr_type(matrix_type()), expr
 add("rows_dot_self", expr_type(vector_type()), expr_type(vector_type()));
 add("rows_dot_self", expr_type(vector_type()), expr_type(row_vector_type()));
 add("rows_dot_self", expr_type(vector_type()), expr_type(matrix_type()));
+add("scale_matrix_exp_multiply", expr_type(matrix_type()), expr_type(double_type()), expr_type(matrix_type()), expr_type(matrix_type()));
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {

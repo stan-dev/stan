@@ -1,0 +1,435 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Program Execution
+
+This chapter provides a sketch of how a compiled Stan model is
+executed using sampling.  Optimization shares the same data reading
+and initialization steps, but then does optimization rather than sampling.
+
+This sketch is elaborated in the following chapters of this part,
+which cover variable declarations, expressions, statements, and blocks
+in more detail.
+
+
+## Reading and Transforming Data
+
+The reading and transforming data steps are the same for sampling,
+optimization and diagnostics.
+
+
+### Read Data {-}
+
+The first step of execution is to read data into memory.   Data may be
+read in through file (in CmdStan) or through memory (RStan and
+PyStan);  see their respective manuals for details.^[The C++ code underlying Stan is flexible enough to allow data to be read from memory or file.  Calls from R, for instance, can be configured to read data from file or directly from R's memory.]
+
+All of the variables declared in the `data` block will be read.
+If a variable cannot be read, the program will halt with a message
+indicating which data variable is missing.
+
+After each variable is read, if it has a declared constraint, the
+constraint is validated.  For example, if a variable `N` is
+declared as `int<lower=0>`, after `N` is read, it will be tested
+to make sure it is greater than or equal to zero.  If a variable
+violates its declared constraint, the program will halt with a warning
+message indicating which variable contains an illegal value, the value
+that was read, and the constraint that was declared.
+
+
+### Define Transformed Data {-}
+
+After data is read into the model, the transformed data variable
+statements are executed in order to define the transformed data
+variables.  As the statements execute, declared constraints on
+variables are not enforced.
+
+Transformed data variables are initialized with real values set to
+`NaN` and integer values set to the smallest integer (large
+absolute value negative number).
+
+After the statements are executed, all declared constraints on
+transformed data variables are validated.  If the validation fails,
+execution halts and the variable's name, value and constraints are
+displayed.
+
+
+## Initialization
+
+Initialization is the same for sampling, optimization, and diagnosis
+
+
+### User-Supplied Initial Values {-}
+
+If there are user-supplied initial values for parameters, these are
+read using the same input mechanism and same file format as data
+reads.  Any constraints declared on the parameters are validated for
+the initial values.  If a variable's value violates its declared
+constraint, the program halts and a diagnostic message is printed.
+
+After being read, initial values are transformed to unconstrained
+values that will be used to initialize the sampler.
+
+
+#### Boundary Values are Problematic {-}
+
+Because of the way Stan defines its transforms from the constrained to
+the unconstrained space, initializing parameters on the boundaries of
+their constraints is usually problematic.  For instance, with a
+constraint
+
+```stan
+parameters {
+  real<lower=0,upper=1> theta;
+  // ...
+}
+```
+
+an initial value of 0 for `theta` leads to an unconstrained value
+of $-\infty$, whereas a value of 1 leads to an unconstrained value of
+$+\infty$.  While this will be inverse transformed back correctly
+given the behavior of floating point arithmetic, the Jacobian will be
+infinite and the log probability function will fail and raise an
+exception.
+
+
+### Random Initial Values {-}
+
+If there are no user-supplied initial values, the default
+initialization strategy is to initialize the unconstrained parameters
+directly with values drawn uniformly from the interval $(-2,2)$.  The
+bounds of this initialization can be changed but it is always
+symmetric around 0. The value of 0 is special in that it represents
+the median of the initialization.  An unconstrained value of 0
+corresponds to different parameter values depending on the constraints
+declared on the parameters.
+
+An unconstrained real does not involve any transform, so an initial
+value of 0 for the unconstrained parameters is also a value of 0 for
+the constrained parameters.
+
+For parameters that are bounded below at 0, the initial value of 0 on
+the unconstrained scale corresponds to $\exp(0) = 1$ on the
+constrained scale.  A value of -2 corresponds to $\exp(-2) = .13$ and
+a value of 2 corresponds to $\exp(2) = 7.4$.
+
+For parameters bounded above and below, the initial value of 0 on the
+unconstrained scale corresponds to a value at the midpoint of the
+constraint interval.  For probability parameters, bounded below by 0
+and above by 1, the transform is the inverse logit, so that an initial
+unconstrained value of 0 corresponds to a constrained value of 0.5, -2
+corresponds to 0.12 and 2 to 0.88.  Bounds other than 0 and 1 are
+just scaled and translated.
+
+Simplexes with initial values of 0 on the unconstrained basis
+correspond to symmetric values on the constrained values (i.e., each
+value is $1/K$ in a $K$-simplex).
+
+Cholesky factors for positive-definite matrices are initialized to 1
+on the diagonal and 0 elsewhere;  this is because the diagonal is log
+transformed and the below-diagonal values are unconstrained.
+
+The initial values for other parameters can be determined from the
+transform that is applied.  The transforms are all described in full
+detail in the [chapter on variable transforms](#variable-transforms.chapter).
+
+
+### Zero Initial Values {-}
+
+The initial values may all be set to 0 on the unconstrained scale.
+This can be helpful for diagnosis, and may also be a good starting
+point for sampling.  Once a model is running, multiple chains with
+more diffuse starting points can help diagnose problems with
+convergence; see the user's guide for more information on
+convergence monitoring.
+
+
+## Sampling
+
+Sampling is based on simulating the Hamiltonian of a particle with a
+starting position equal to the current parameter values and an initial
+momentum (kinetic energy) generated randomly.  The potential energy at
+work on the particle is taken to be the negative log (unnormalized) total
+probability function defined by the model.  In the usual approach to
+implementing HMC, the Hamiltonian dynamics of the particle is
+simulated using the leapfrog integrator, which discretizes the smooth
+path of the particle into a number of small time steps called leapfrog
+steps.
+
+
+### Leapfrog Steps {-}
+
+For each leapfrog step, the negative log probability function and its
+gradient need to be evaluated at the position corresponding to the
+current parameter values (a more detailed sketch is provided in the
+next section).  These are used to update the momentum based on the
+gradient and the position based on the momentum.
+
+For simple models, only a few leapfrog steps with large step sizes are
+needed.  For models with complex posterior geometries, many small
+leapfrog steps may be needed to accurately model the path of the
+parameters.
+
+If the user specifies the number of leapfrog steps (i.e., chooses to
+use standard HMC), that number of leapfrog steps are simulated.  If
+the user has not specified the number of leapfrog steps, the No-U-Turn
+sampler (NUTS) will determine the number of leapfrog steps adaptively
+[@Hoffman-Gelman:2011], [@Hoffman-Gelman:2014].
+
+
+### Log Probability and Gradient Calculation {-}
+
+During each leapfrog step, the log probability function and its
+gradient must be calculated.  This is where most of the time in the
+Stan algorithm is spent.  This log probability function, which is
+used by the sampling algorithm, is defined over the unconstrained
+parameters.
+
+The first step of the calculation requires the inverse transform of
+the unconstrained parameter values back to the constrained parameters
+in terms of which the model is defined.  There is no error checking
+required because the inverse transform is a total function on every point
+in whose range satisfies the constraints.
+
+Because the probability statements in the model are defined in terms
+of constrained parameters, the log Jacobian of the inverse transform
+must be added to the accumulated log probability.
+
+Next, the transformed parameter statements are executed.  After they
+complete, any constraints declared for the transformed parameters are
+checked.  If the constraints are violated, the model will halt with a
+diagnostic error message.
+
+The final step in the log probability function calculation is to
+execute the statements defined in the model block.
+
+As the log probability function executes, it accumulates an in-memory
+representation of the expression tree used to calculate the log
+probability.  This includes all of the transformed parameter
+operations and all of the Jacobian adjustments.  This tree is then
+used to evaluate the gradients by propagating partial derivatives
+backward along the expression graph.  The gradient calculations
+account for the majority of the cycles consumed by a Stan program.
+
+
+### Metropolis Accept/Reject {-}
+
+A standard Metropolis accept/reject step is required to retain detailed
+balance and ensure draws are marginally distributed according to the
+probability function defined by the model.  This Metropolis adjustment
+is based on comparing log probabilities, here defined by the
+Hamiltonian, which is the sum of the potential (negative log
+probability) and kinetic (squared momentum) energies.  In theory, the
+Hamiltonian is invariant over the path of the particle and rejection
+should never occur.  In practice, the probability of rejection is
+determined by the accuracy of the leapfrog approximation to the true
+trajectory of the parameters.
+
+If step sizes are small, very few updates will be rejected, but many
+steps will be required to move the same distance.  If step sizes are
+large, more updates will be rejected, but fewer steps will be required
+to move the same distance.  Thus a balance between effort and
+rejection rate is required.  If the user has not specified a step
+size, Stan will tune the step size during warmup sampling to achieve
+a desired rejection rate (thus balancing rejection versus number of
+steps).
+
+If the proposal is accepted, the parameters are updated to their new
+values.  Otherwise, the sample is the current set of parameter values.
+
+
+## Optimization
+
+Optimization runs very much like sampling in that it starts by reading
+the data and then initializing parameters.  Unlike sampling, it
+produces a deterministic output which requires no further analysis
+other than to verify that the optimizer itself converged to a
+posterior mode.  The output for optimization is also similar to that
+for sampling.
+
+
+## Variational Inference
+
+Variational inference also runs similar to sampling. It begins by reading the
+data and initializing the algorithm. The initial variational approximation is a
+random draw from the standard normal distribution in the unconstrained
+(real-coordinate) space. Again, similar to sampling, it outputs draws from the
+approximate posterior once the algorithm has decided that it has converged.
+Thus, the tools we use for analyzing the result of Stan's sampling routines can
+also be used for variational inference.
+
+
+
+## Model Diagnostics
+
+Model diagnostics are like sampling and optimization in that they
+depend on a model's data being read and its parameters being
+initialized.  The user's guides for the interfaces (RStan, PyStan,
+CmdStan) provide more details on the diagnostics available; as of Stan
+2.0, that's just gradients on the unconstrained scale and log
+probabilities.
+
+## Output
+
+For each final draw (not counting draws during warmup or draws
+that are thinned), there is an output stage of writing the draw.
+
+### Generated Quantities {-}
+
+Before generating any output, the statements in the generated quantities
+block are executed.  This can be used for any forward simulation based
+on parameters of the model.  Or it may be used to transform parameters
+to an appropriate form for output.
+
+After the generated quantities statements execute, the constraints
+declared on generated quantities variables are validated.   If these
+constraints are violated, the program will terminate with a diagnostic message.
+
+### Write {-}
+
+The final step is to write the actual values.  The values of all
+variables declared as parameters, transformed parameters, or generated
+quantities are written.  Local variables are not written, nor is the
+data or transformed data.  All values are written in their constrained
+forms, that is the form that is used in the model definitions.
+
+In the executable form of a Stan models, parameters, transformed
+parameters, and generated quantities are written to a file in
+comma-separated value (CSV) notation with a header defining
+the names of the parameters (including indices for multivariate
+parameters).^[In the R version of Stan, the values may either be written to a CSV file or directly back to R's memory.]

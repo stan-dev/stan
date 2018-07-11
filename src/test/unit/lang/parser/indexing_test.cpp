@@ -24,7 +24,7 @@ TEST(LangGrammarsIndexing, goodOmni3) {
 }
 TEST(LangGrammarsIndexing, badRealIdx) {
   test_throws("real_idx",
-              "ERROR:  Container index must be integer; found type=real");
+              "Container index must be integer; found type=real");
   test_throws("real_idx",
           "PARSER EXPECTED: <one or more container indexes followed by ']'>");
 }

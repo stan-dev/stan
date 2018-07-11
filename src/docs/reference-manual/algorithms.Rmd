@@ -1,0 +1,4 @@
+# <i style="font-size: 110%; color:#990017;">Algorithms</i> {-}
+
+This part of the manual specifies the inference algorithms and posterior
+inference tools.

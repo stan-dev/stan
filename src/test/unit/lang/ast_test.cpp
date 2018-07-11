@@ -721,8 +721,9 @@ TEST(langAst, assgn) {
   stan::lang::uni_idx ui(e_int3);
   stan::lang::idx idx0(ui);
   is.push_back(idx0);
+  std::string op("=");
   stan::lang::expression e(stan::lang::int_literal(3));
-  stan::lang::assgn a(v, is, e);
+  stan::lang::assgn a(v, is, op, e);
   // retrieve indexes
   EXPECT_EQ(1, a.idxs_.size());
   // retrieve LHS variable
@@ -1028,32 +1029,33 @@ TEST(langAst, lhsVarOccursOnRhs) {
   stan::lang::uni_idx ui(e_int3);
   stan::lang::idx idx0(ui);
   is.push_back(idx0);
+  std::string op("=");
   stan::lang::expression e(stan::lang::int_literal(3));
-  stan::lang::assgn a(v, is, e);
+  stan::lang::assgn a(v, is, op, e);
   EXPECT_FALSE(a.lhs_var_occurs_on_rhs());
 
   std::vector<stan::lang::idx> is2;
-  stan::lang::assgn a2(v, is2, v);
+  stan::lang::assgn a2(v, is2, op, v);
   EXPECT_TRUE(a2.lhs_var_occurs_on_rhs());
 
   stan::lang::unary_op uo('+', v);
-  stan::lang::assgn a3(v, is2, uo);
+  stan::lang::assgn a3(v, is2, op, uo);
   EXPECT_TRUE(a3.lhs_var_occurs_on_rhs());
 
   stan::lang::binary_op bo(v, "-", e_int3);
-  stan::lang::assgn a4(v, is2, bo);
+  stan::lang::assgn a4(v, is2, op, bo);
   EXPECT_TRUE(a4.lhs_var_occurs_on_rhs());
 
   stan::lang::binary_op bo2(e_int3, "*", e_int3);
-  stan::lang::assgn a5(v, is2, bo2);
+  stan::lang::assgn a5(v, is2, op, bo2);
   EXPECT_FALSE(a5.lhs_var_occurs_on_rhs());
 
   stan::lang::binary_op bo3(e_int3, "*", bo);
-  stan::lang::assgn a6(v, is2, bo3);
+  stan::lang::assgn a6(v, is2, op, bo3);
   EXPECT_TRUE(a6.lhs_var_occurs_on_rhs());
 
   stan::lang::index_op_sliced ios(v, is2);
-  stan::lang::assgn a7(v, is2, ios);
+  stan::lang::assgn a7(v, is2, op, ios);
   EXPECT_TRUE(a7.lhs_var_occurs_on_rhs());
 }
 
