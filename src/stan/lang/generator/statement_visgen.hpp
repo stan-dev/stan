@@ -133,43 +133,21 @@ namespace stan {
       void operator()(const nil& /*x*/) const { }
 
       void operator()(const assgn& y) const {
-        // use stan::math::asign when no idxs (lhs_simple)
-        // use stan::model::asign when indexed (!lhs_simple)
         bool lhs_simple = y.idxs_.size() == 0;
-
         bool assign_simple = y.is_simple_assignment();
-        // need expr for rhs in compound operator-assign
+
+        // need expr for y for compound operator-assign
         index_op_sliced lhs_expr(y.lhs_var_, y.idxs_);
         lhs_expr.infer_type();
 
         generate_indent(indent_, o_);
-        o_ << "stan::math::assign(";
-        generate_indexed_expr<true>(x.var_dims_.name_,
-                                    x.var_dims_.dims_,
-                                    x.var_type_.base(),
-                                    x.var_type_.array_dims(),
-                                    false,
-                                    o_);
-        o_ << ", ";
-        if (x.op_name_.size() == 0) {
-          o_ << "(";
-          generate_indexed_expr<false>(x.var_dims_.name_,
-                                       x.var_dims_.dims_,
-                                       x.var_type_.base(),
-                                       x.var_type_.array_dims(),
-                                       false,
-                                       o_);
-          o_ << " " << x.op_ << " ";
-          generate_expression(x.expr_, NOT_USER_FACING, o_);
-          o_ << ")";
-        } else {
-          o_ << x.op_name_ << "(";
-          generate_indexed_expr<false>(x.var_dims_.name_,
-                                       x.var_dims_.dims_,
-                                       x.var_type_.base(),
-                                       x.var_type_.array_dims(),
-                                       false,
-                                       o_);
+
+        // use stan::math::assign when no idxs (lhs_simple)
+        // use stan::model::assign when indexed (!lhs_simple)
+        // generate method, arg(s) for lhs
+        if (lhs_simple) {
+          o_ << "stan::math::assign(";
+          generate_expression(y.lhs_var_, NOT_USER_FACING, o_);
           o_ << ", ";
         } else {
           o_ << "stan::model::assign(";
@@ -181,7 +159,7 @@ namespace stan {
           o_ << ", " << EOL;
           generate_indent(indent_ + 3, o_);
         }
-
+        // generate arg for rhs
         if (assign_simple) {
           if (y.lhs_var_occurs_on_rhs()) {
             o_ << "stan::model::deep_copy(";
@@ -205,7 +183,7 @@ namespace stan {
             o_ << ")";
           }
         }
-
+        // close method
         if (lhs_simple) {
           o_ << ");" << EOL;
         } else {

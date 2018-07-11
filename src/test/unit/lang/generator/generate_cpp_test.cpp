@@ -10,7 +10,11 @@ TEST(lang, generate_cpp) {
   std::string model_name = "m";
   std::stringstream output;
 
-  stan::io::program_reader reader = create_stub_reader();
+  stan::io::program_reader reader;
+  // fake reader history - no stan program, just AST
+  reader.add_event(0, 0, "start", "generator-test");
+  reader.add_event(500, 500, "end", "generator-test");
+
   stan::lang::generate_cpp(prog, model_name, reader.history(), output);
   std::string output_str = output.str();
 

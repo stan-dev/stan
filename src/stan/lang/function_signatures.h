@@ -9,7 +9,7 @@ bare_types.push_back(matrix_type());
 
 std::vector<bare_expr_type> vector_types;
 vector_types.push_back(double_type());  // scalar
-vector_types.push_back(bare_array_type(double_type()));  // std vector
+vector_types.push_back(bare_array_type(double_type(), 1));  // std vector
 vector_types.push_back(vector_type());  // Eigen vector
 vector_types.push_back(row_vector_type());  // Eigen row vector
 
@@ -593,15 +593,14 @@ add_unary_vectorized("log2");
 add("log_determinant", bare_expr_type(double_type()), bare_expr_type(matrix_type()));
 add_binary("log_diff_exp");
 add_binary("log_falling_factorial");
-add_ternary("log_mix");
+add_ternary("log_mix");    // adds fn over double, double, double
 for (size_t i = 1; i < vector_types.size(); ++i) {
-  add("log_mix", expr_type(double_type()), vector_types[i], expr_type(double_type(), 1));
-  for (size_t j = 0; j < 2; ++j) {
-    for (size_t k = 2; k < 4; ++k) {
-      add("log_mix", expr_type(double_type()), vector_types[i], expr_type(base_types[k], j));
-    }
+  for (size_t j = 1; j < vector_types.size(); ++j) {
+    add("log_mix", bare_expr_type(double_type()), bare_expr_type(vector_types[i]), bare_expr_type(vector_types[j]));
   }
-}
+  add("log_mix", bare_expr_type(double_type()), bare_expr_type(vector_types[i]), bare_expr_type(bare_array_type(vector_type(), 1)));
+  add("log_mix", bare_expr_type(double_type()), bare_expr_type(vector_types[i]), bare_expr_type(bare_array_type(row_vector_type(), 1)));
+ }
 add_binary("log_rising_factorial");
 add_unary_vectorized("log_inv_logit");
 add("log_softmax", bare_expr_type(vector_type()), bare_expr_type(vector_type()));

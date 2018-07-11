@@ -15,6 +15,7 @@
 
 #include <test/unit/util.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <fstream>
 #include <istream>
@@ -119,15 +120,18 @@ void test_parsable_standalone_functions(const std::string& model_name) {
   }
 }
 
-/** test that model with specified name in folder "bad" throws
+/** Test that model with specified name in folder "bad" throws
  * an exception containing the second arg as a substring
  * when model not found, will fail with misleading message.
+ * Case insensitive string comparison.
  *
  * @param model_name Name of model to parse
  * @param msg Substring of error message expected.
  */
 void test_throws(const std::string& model_name, const std::string& error_msg) {
   std::stringstream msgs;
+  std::string found_lc = boost::algorithm::to_lower_copy(msgs.str());
+  std::string expected_lc = boost::algorithm::to_lower_copy(error_msg);
   bool pass = false;
   try {
     is_parsable_folder(model_name, "bad", &msgs);
@@ -140,8 +144,9 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
              << "*********************************" << std::endl
              << std::endl;
   } catch (const std::invalid_argument& e) {
-    if (std::string(e.what()).find(error_msg) == std::string::npos
-        && msgs.str().find(error_msg) == std::string::npos) {
+    std::string what_lc = boost::algorithm::to_lower_copy(std::string(e.what()));
+    if (what_lc.find(expected_lc) == std::string::npos
+        && found_lc.find(expected_lc) == std::string::npos) {
       FAIL() << std::endl << "*********************************" << std::endl
              << "model name=" << model_name << std::endl
              << "*** EXPECTED: error_msg=" << error_msg << std::endl

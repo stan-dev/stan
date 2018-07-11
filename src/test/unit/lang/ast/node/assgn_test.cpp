@@ -27,8 +27,9 @@ TEST(langAst, assgn) {
   uni_idx ui(e_int3);
   idx idx0(ui);
   is.push_back(idx0);
+  std::string op("=");
   expression e(int_literal(3));
-  assgn a(v, is, e);
+  assgn a(v, is, op, e);
   // retrieve indexes
   EXPECT_EQ(1, a.idxs_.size());
   // retrieve LHS variable
@@ -48,31 +49,32 @@ TEST(langAst, lhsVarOccursOnRhs) {
   uni_idx ui(e_int3);
   idx idx0(ui);
   is.push_back(idx0);
+  std::string op("=");
   expression e(int_literal(3));
-  assgn a(v, is, e);
+  assgn a(v, is, op, e);
   EXPECT_FALSE(a.lhs_var_occurs_on_rhs());
 
   std::vector<idx> is2;
-  assgn a2(v, is2, v);
+  assgn a2(v, is2, op, v);
   EXPECT_TRUE(a2.lhs_var_occurs_on_rhs());
 
   unary_op uo('+', v);
-  assgn a3(v, is2, uo);
+  assgn a3(v, is2, op, uo);
   EXPECT_TRUE(a3.lhs_var_occurs_on_rhs());
 
   binary_op bo(v, "-", e_int3);
-  assgn a4(v, is2, bo);
+  assgn a4(v, is2, op, bo);
   EXPECT_TRUE(a4.lhs_var_occurs_on_rhs());
 
   binary_op bo2(e_int3, "*", e_int3);
-  assgn a5(v, is2, bo2);
+  assgn a5(v, is2, op, bo2);
   EXPECT_FALSE(a5.lhs_var_occurs_on_rhs());
 
   binary_op bo3(e_int3, "*", bo);
-  assgn a6(v, is2, bo3);
+  assgn a6(v, is2, op, bo3);
   EXPECT_TRUE(a6.lhs_var_occurs_on_rhs());
 
   index_op_sliced ios(v, is2);
-  assgn a7(v, is2, ios);
+  assgn a7(v, is2, op, ios);
   EXPECT_TRUE(a7.lhs_var_occurs_on_rhs());
 }

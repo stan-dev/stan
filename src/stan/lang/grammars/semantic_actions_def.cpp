@@ -775,26 +775,10 @@ namespace stan {
     boost::phoenix::function<validate_int_expr_silent>
     validate_int_expr_silent_f;
 
-    void validate_int_expression_warn::operator()(const expression & e,
-                                                  bool& pass,
-                                                  std::ostream& error_msgs)
-      const {
-      if (!e.bare_type().is_int_type()) {
-        error_msgs << "Error: indexes must be expressions of integer type."
-                   << " found type = ";
-        write_bare_expr_type(error_msgs, e.bare_type());
-        error_msgs << '.' << std::endl;
-      }
-      pass = e.bare_type().is_int_type();
-    }
-    boost::phoenix::function<validate_int_expression_warn>
-    validate_int_expression_warn_f;
-
-
     void validate_ints_expression::operator()(const expression& e, bool& pass,
                                               std::ostream& error_msgs) const {
       if (!e.bare_type().base().is_int_type()) {
-        error_msgs << "Error: container index must be integer; found type="
+        error_msgs << "Container index must be integer; found type="
                    << e.bare_type() << std::endl;
         pass = false;
         return;
@@ -999,7 +983,7 @@ namespace stan {
         pass = false;
         return;
       }
-      a.lhs_var_.set_type(vm.get_base_type(name), vm.get_num_dims(name));
+      a.lhs_var_.set_type(vm.get_bare_type(name));
     }
     boost::phoenix::function<validate_lhs_var_assgn> validate_lhs_var_assgn_f;
 
@@ -1013,8 +997,8 @@ namespace stan {
         pass = false;
         return;
       }
-      v = variable(name);
-      v.set_type(vm.get_bare_type(name));
+      a.lhs_var_ = variable(name);
+      a.lhs_var_.set_type(vm.get_bare_type(name));
       pass = true;
     }
     boost::phoenix::function<set_lhs_var_assgn> set_lhs_var_assgn_f;
@@ -1022,7 +1006,7 @@ namespace stan {
     void validate_assgn::operator()(assgn& a, bool& pass,
                                     const variable_map& vm,
                                     std::ostream& error_msgs) const {
-      // validate var exists
+      // validate lhs name + idxs
       std::string name = a.lhs_var_.name_;
       expression lhs_expr = expression(a.lhs_var_);
       bare_expr_type lhs_type = indexed_type(lhs_expr, a.idxs_);
@@ -1053,7 +1037,7 @@ namespace stan {
         std::string op_equals = a.op_;
         a.op_ = op_equals.substr(0, op_equals.size()-1);
 
-        if (lhs_type.num_dims() > 0) {
+        if (lhs_type.array_dims() > 0) {
           error_msgs << "Cannot apply operator '" << op_equals
                      << "' to array variable; variable name = "
                      << name
@@ -1074,8 +1058,8 @@ namespace stan {
         }
         if (lhs_type.is_primitive()
             && rhs_type.is_primitive()
-            && (lhs_type.baxe().is_double_type()
-                || lhs_base_type == rhs_type)) {
+            && (lhs_type.base().is_double_type()
+                || lhs_type == rhs_type)) {
           pass = true;
           return;
         }
@@ -1095,9 +1079,9 @@ namespace stan {
           op_name = "elt_multiply";
         }
         // check that "lhs <op> rhs" is valid stan::math function sig
-        std::vector<function_arg_type> arg_types;
-        arg_types.push_back(function_arg_type(lhs_tpe));
-        arg_types.push_back(function_arg_type(rhs_type));
+        std::vector<bare_expr_type> arg_types;
+        arg_types.push_back(bare_expr_type(lhs_type));
+        arg_types.push_back(bare_expr_type(rhs_type));
         function_signature_t op_equals_sig(lhs_type, arg_types);
         if (!function_signatures::instance().is_defined(op_name,
                                                         op_equals_sig)) {
@@ -1394,8 +1378,8 @@ namespace stan {
     void add_loop_identifier::operator()(const std::string& name,
                                          const scope& var_scope,
                                          variable_map& vm) const {
-      vm.add(name, base_var_decl(name, std::vector<expression>(), int_type()),
-             scope(var_scope.program_block(), true));
+      vm.add(name, var_decl(name, int_type()),
+             scope(loop_identifier_origin, true));
     }
     boost::phoenix::function<add_loop_identifier> add_loop_identifier_f;
 
@@ -1405,15 +1389,10 @@ namespace stan {
                    const scope& var_scope,
                    bool& pass, variable_map& vm) const {
       pass = expr.bare_type().is_array_type();
-      if (!pass) {
-        error_msgs << "Error: loop variable must be array type."
-                   << " variable type=\"" << expr.bare_type() << "\""
-                   << std::endl;
-        return;
-      }
-      vm.add(name,
-             var_decl(name, expr.bare_type().array_element_type()),
-             scope(var_scope.program_block(), true));
+      if (pass)
+        vm.add(name,
+               var_decl(name, expr.bare_type().array_element_type()),
+               scope(loop_identifier_origin, true));
     }
     boost::phoenix::function<add_array_loop_identifier>
       add_array_loop_identifier_f;
@@ -1427,18 +1406,14 @@ namespace stan {
       pass = expr.bare_type().num_dims() > 0
              && !(expr.bare_type().is_array_type());
       if (!pass) {
-        error_msgs << "Error: loop must be over container or range."
+        error_msgs << "Loop must be over container or range."
                    << std::endl;
         return;
       } else {
-        vm.add(name, base_var_decl(name, std::vector<expression>(),
-                                   double_type()),
+        vm.add(name, var_decl(name, double_type()),
                scope(loop_identifier_origin, true));
         pass = true;
       }
-      // loop over elements of vec/rowvec/matrix, loop var type is double
-      vm.add(name, var_decl(name, double_type()),
-             scope(var_scope.program_block(), true));
     }
     boost::phoenix::function<add_matrix_loop_identifier>
     add_matrix_loop_identifier_f;
@@ -1480,19 +1455,6 @@ namespace stan {
       pass = true;
     }
     boost::phoenix::function<validate_int_expr> validate_int_expr_f;
-
-    void validate_int_expr_no_error_msgs::operator()(const expression& expr,
-                                            bool& pass,
-                                            std::stringstream& error_msgs)
-      const {
-      if (!expr.bare_type().is_int_type()) {
-        pass = false;
-        return;
-      }
-      pass = true;
-    }
-    boost::phoenix::function<validate_int_expr_no_error_msgs>
-      validate_int_expr_no_error_msgs_f;
 
     void deprecate_increment_log_prob::operator()(
                                        std::stringstream& error_msgs) const {
@@ -1597,7 +1559,7 @@ namespace stan {
                                                  std::ostream& error_msgs) {
       pass = true;
 
-      // ode_integrator requires function with signature:
+      // ode_integrator requires function with signature
       // (real, real[ ], real[ ], data real[ ], data int[ ]): real[ ]"
 
       // TODO(mitzi)  names indicate status, but not flagged as data_only
@@ -1623,7 +1585,7 @@ namespace stan {
         error_msgs << "Wrong signature for function "
                    << ode_fun.integration_function_name_
                    << "; first argument must be "
-                   << "the name of a function with signature:"
+                   << "the name of a function with signature"
                    << " (real, real[ ], real[ ], data real[ ], data int[ ]):"
                    << " real[ ]." << std::endl;
         pass = false;
@@ -1635,7 +1597,7 @@ namespace stan {
       if (ode_fun.y0_.bare_type() != t_ar_double) {
         error_msgs << "Second argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: real[ ]"
+                   << " must have type real[ ]"
                    << "; found type = "
                    << ode_fun.y0_.bare_type()
                    << ". " << std::endl;
@@ -1644,7 +1606,7 @@ namespace stan {
       if (!ode_fun.t0_.bare_type().is_primitive()) {
         error_msgs << "Third argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: real"
+                   << " must have type real"
                    << ";  found type = "
                    << ode_fun.t0_.bare_type()
                    << ". " << std::endl;
@@ -1653,7 +1615,7 @@ namespace stan {
       if (ode_fun.ts_.bare_type() != t_ar_double) {
         error_msgs << "Fourth argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: real[ ]"
+                   << " must have type real[ ]"
                    << ";  found type = "
                    << ode_fun.ts_.bare_type()
                    << ". " << std::endl;
@@ -1662,7 +1624,7 @@ namespace stan {
       if (ode_fun.theta_.bare_type() != t_ar_double) {
         error_msgs << "Fifth argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: real[ ]"
+                   << " must have type real[ ]"
                    << ";  found type = "
                    << ode_fun.theta_.bare_type()
                    << ". " << std::endl;
@@ -1671,7 +1633,7 @@ namespace stan {
       if (ode_fun.x_.bare_type() != t_ar_double_data) {
         error_msgs << "Sixth argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: data real[ ]"
+                   << " must have type data real[ ]"
                    << ";  found type = "
                    << ode_fun.x_.bare_type()
                    << ". " << std::endl;
@@ -1680,7 +1642,7 @@ namespace stan {
       if (ode_fun.x_int_.bare_type() != t_ar_int_data) {
         error_msgs << "Seventh argument to "
                    << ode_fun.integration_function_name_
-                   << " must have type: data int[ ]"
+                   << " must have type data int[ ]"
                    << ";  found type = "
                    << ode_fun.x_int_.bare_type()
                    << ". " << std::endl;
@@ -1808,7 +1770,7 @@ namespace stan {
         error_msgs << "Wrong signature for function "
                    << alg_fun.system_function_name_
                    << "; first argument to algebra_solver"
-                   << " must be a function with signature:"
+                   << " must be a function with signature"
                    << " (vector, vector, real[ ], int[ ]) : vector."
                    << std::endl;
         pass = false;
@@ -1816,31 +1778,31 @@ namespace stan {
 
       // check solver function arg types
       if (alg_fun.y_.bare_type() != t_vector) {
-        error_msgs << "Second argument to algebra_solver must have type: vector"
-                   << "; found type = "
+        error_msgs << "Second argument to algebra_solver must have type vector"
+                   << "; found type= "
                    << alg_fun.y_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.theta_.bare_type() != t_vector) {
-        error_msgs << "Third argument to algebra_solver must have type: vector"
-                   << ";  found type = "
+        error_msgs << "Third argument to algebra_solver must have type vector"
+                   << ";  found type= "
                    << alg_fun.theta_.bare_type()
                    << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.x_r_.bare_type() != t_ar_double) {
         error_msgs
-          << "Fourth argument to algebra_solver must have type: real[ ]"
-          << ";  found type = "
+          << "Fourth argument to algebra_solver must have type real[ ]"
+          << ";  found type= "
           << alg_fun.x_r_.bare_type()
           << ". " << std::endl;
         pass = false;
       }
       if (alg_fun.x_i_.bare_type() != t_ar_int) {
         error_msgs
-          << "Fifth argument to algebra_solver must have type: int[ ]"
-          << ";  found type = "
+          << "Fifth argument to algebra_solver must have type int[ ]"
+          << ";  found type= "
           << alg_fun.x_i_.bare_type()
           << ". " << std::endl;
         pass = false;
@@ -1927,7 +1889,7 @@ namespace stan {
       pass = true;
 
       if (has_rng_lp_suffix(mr.fun_name_)) {
-        error_msgs << "mapped function cannot be an _rng or _lp function,"
+        error_msgs << "Mapped function cannot be an _rng or _lp function,"
                    << " found function name: "
                    << mr.fun_name_ << std::endl;
         pass = false;
@@ -1959,62 +1921,53 @@ namespace stan {
       // validate mapped function signature
       if (!function_signatures::instance()
           .is_defined(mr.fun_name_, mapped_fun_signature)) {
-        error_msgs << "first argument to map_rect"
+        error_msgs << "First argument to map_rect"
                    << " must be the name of a function with signature"
-<<<<<<< HEAD
-                   << " (vector, vector, real[ ], int[ ]) : vector";
-=======
-                   << " (vector, vector, real[], int[]) : vector" << std::endl;
->>>>>>> bf248025163a2a982202088631e113615a287d10
+                   << " (vector, vector, real[ ], int[ ]) : vector." << std::endl;
         pass = false;
       }
 
       // shared parameters - vector
       if (mr.shared_params_.bare_type() != shared_params_type) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "second argument to map_rect must be of type vector"
+        error_msgs << "Second argument to map_rect must be of type vector."
                    << std::endl;
         pass = false;
       }
       // job-specific parameters - array of vectors (array elts map to arg2)
       if (mr.job_params_.bare_type() != t_ar_vector) {
         if (!pass) error_msgs << ";  ";
-<<<<<<< HEAD
-        error_msgs << "third argument to map_rect must be of type vector[ ]"
-                   << " (array of vectors)";
-=======
-        error_msgs << "third argument to map_rect must be of type vector[]"
-                   << " (array of vectors)" << std::endl;
->>>>>>> bf248025163a2a982202088631e113615a287d10
+        error_msgs << "Third argument to map_rect must be of type vector[ ]"
+                   << " (array of vectors)." << std::endl;
         pass = false;
       }
       // job-specific real data - 2-d array of double (array elts map to arg3)
       bare_expr_type job_data_rs_type(t_2d_ar_double);
       if (mr.job_data_r_.bare_type() != job_data_rs_type) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fourth argument to map_rect must be of type real[ , ]"
-                   << " (two dimensional array of reals)" << std::endl;
+        error_msgs << "Fourth argument to map_rect must be of type real[ , ]"
+                   << " (two dimensional array of reals)." << std::endl;
         pass = false;
       }
       // job-specific int data - 2-d array of int (array elts map to arg4)
       bare_expr_type job_data_is_type(t_2d_ar_int);
       if (mr.job_data_i_.bare_type() != job_data_is_type) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fifth argument to map_rect must be of type int[ , ]"
-                   << " (two dimensional array of integers)" << std::endl;
+        error_msgs << "Fifth argument to map_rect must be of type int[ , ]"
+                   << " (two dimensional array of integers)." << std::endl;
         pass = false;
       }
 
       // test data is data only
       if (has_var(mr.job_data_r_, var_map)) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fourth argment to map_rect must be data only"
+        error_msgs << "Fourth argment to map_rect must be data only."
                    << std::endl;
         pass = false;
       }
       if (has_var(mr.job_data_i_, var_map)) {
         if (!pass) error_msgs << ";  ";
-        error_msgs << "fifth argument to map_rect must be data only"
+        error_msgs << "Fifth argument to map_rect must be data only."
                    << std::endl;
         pass = false;
       }
@@ -2095,11 +2048,7 @@ namespace stan {
 
       if (has_rng_suffix(fun.name_)) {
         if (!(var_scope.allows_rng())) {
-<<<<<<< HEAD
-          error_msgs << "Error: random number generators only allowed in"
-=======
           error_msgs << "Random number generators only allowed in"
->>>>>>> bf248025163a2a982202088631e113615a287d10
                      << " transformed data block, generated quantities block"
                      << " or user-defined functions with names ending in _rng"
                      << "; found function=" << fun.name_ << " in block=";
@@ -2501,13 +2450,9 @@ namespace stan {
         pass = false;
         return;
       }
-<<<<<<< HEAD
-      if (iop.type_.is_ill_formed_type()) {
-=======
       index_op iop(expression, dimss);
       iop.infer_type();
-      if (iop.type_.is_ill_formed()) {
->>>>>>> bf248025163a2a982202088631e113615a287d10
+      if (iop.type_.is_ill_formed_type()) {
         error_msgs << "Indexed expression must have at least as many"
                    << " dimensions as number of indexes supplied."
                    << std::endl;
@@ -2535,11 +2480,7 @@ namespace stan {
         return;
       } else if (name == std::string("params_r__")) {
         error_msgs << std::endl << "Warning:" << std::endl
-<<<<<<< HEAD
                    << " Direct access to params_r__ yields an inconsistent"
-=======
-                   << "  Direct access to params_r__ yields an inconsistent"
->>>>>>> bf248025163a2a982202088631e113615a287d10
                    << " statistical model in isolation and no guarantee is"
                    << " made that this model will yield valid inferences."
                    << std::endl
@@ -2720,9 +2661,9 @@ namespace stan {
         || (decl_type == def_type);
       if (!types_compatible) {
         error_msgs << "Variable definition base type mismatch,"
-                   << " variable declared as base type: ";
+                   << " variable declared as base type ";
         write_bare_expr_type(error_msgs, decl_type);
-        error_msgs << " variable definition has base: ";
+        error_msgs << " variable definition has base type ";
         write_bare_expr_type(error_msgs, def_type);
         pass = false;
       }

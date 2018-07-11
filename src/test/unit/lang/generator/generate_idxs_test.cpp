@@ -53,7 +53,7 @@ TEST(langGenerator, slicedAssigns) {
   is.push_back(idx1);
 
   stan::lang::expression e(stan::lang::int_literal(3));
-  stan::lang::assgn a(v, is, e);
+  stan::lang::assgn a(v, is, "=", e);
   stan::lang::statement s(a);
   s.begin_line_ = 12U;
   s.end_line_ = 14U;

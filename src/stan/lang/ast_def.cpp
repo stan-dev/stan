@@ -106,8 +106,6 @@
 #include <stan/lang/ast/node/assgn_def.hpp>
 #include <stan/lang/ast/node/binary_op_def.hpp>
 #include <stan/lang/ast/node/break_continue_statement_def.hpp>
-#include <stan/lang/ast/node/cholesky_factor_var_decl_def.hpp>
-#include <stan/lang/ast/node/cholesky_corr_var_decl_def.hpp>
 #include <stan/lang/ast/node/conditional_op_def.hpp>
 #include <stan/lang/ast/node/conditional_statement_def.hpp>
 #include <stan/lang/ast/node/double_literal_def.hpp>
