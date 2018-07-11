@@ -27,7 +27,6 @@ namespace stan {
 
       template <typename T>
       std::string operator()(const T& x) const;
-
     };
   }
 }

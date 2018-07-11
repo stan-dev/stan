@@ -31,7 +31,7 @@
 namespace stan {
 namespace lang {
 bare_type_vis::bare_type_vis() {}
-  
+
 bare_expr_type bare_type_vis::operator()(const block_array_type& x) const {
   return bare_array_type(x.contains().bare_type(), x.dims());
 }

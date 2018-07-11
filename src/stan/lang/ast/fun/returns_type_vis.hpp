@@ -39,7 +39,8 @@ namespace stan {
        * @param[in, out] error_msgs stream to which error messages are
        * written 
        */
-      returns_type_vis(const bare_expr_type& return_type, std::ostream& error_msgs);
+      returns_type_vis(const bare_expr_type& return_type,
+                       std::ostream& error_msgs);
 
       /**
        * Return true if the specified statement is a return statement

@@ -1923,7 +1923,8 @@ namespace stan {
           .is_defined(mr.fun_name_, mapped_fun_signature)) {
         error_msgs << "First argument to map_rect"
                    << " must be the name of a function with signature"
-                   << " (vector, vector, real[ ], int[ ]) : vector." << std::endl;
+                   << " (vector, vector, real[ ], int[ ]) : vector."
+                   << std::endl;
         pass = false;
       }
 

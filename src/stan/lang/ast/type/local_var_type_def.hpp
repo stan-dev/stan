@@ -15,13 +15,12 @@
 #include <stan/lang/ast/fun/var_type_name_vis.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type.hpp>
 
-#include <ostream>
-#include <string>
-#include <vector>
-
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
 
+#include <ostream>
+#include <string>
+#include <vector>
 
 namespace stan {
 namespace lang {

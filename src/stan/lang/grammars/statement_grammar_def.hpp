@@ -214,8 +214,8 @@ namespace stan {
                                          boost::phoenix::ref(error_msgs_))]
         >> lit("in")
         >> (expression_rhs_r(_r1)[add_array_loop_identifier_f(_1, _a, _r1,
-                                                              _pass,
-                                                              boost::phoenix::ref(var_map_))]
+                                                _pass,
+                                                boost::phoenix::ref(var_map_))]
             > lit(')'))
         >> (eps
             > statement_r(_r1, true))
@@ -228,13 +228,13 @@ namespace stan {
         %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('(')
         > identifier_r[store_loop_identifier_f(_1, _a, _pass,
-                                               boost::phoenix::ref(var_map_),
-                                               boost::phoenix::ref(error_msgs_))]
+                                            boost::phoenix::ref(var_map_),
+                                            boost::phoenix::ref(error_msgs_))]
         > lit("in")
         > expression_rhs_r(_r1)[add_matrix_loop_identifier_f(_1, _a, _r1,
-                                                             _pass,
-                                                             boost::phoenix::ref(var_map_),
-                                                             boost::phoenix::ref(error_msgs_))]
+                                          _pass,
+                                          boost::phoenix::ref(var_map_),
+                                          boost::phoenix::ref(error_msgs_))]
 
         > lit(')')
         > statement_r(_r1, true)

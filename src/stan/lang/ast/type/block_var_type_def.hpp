@@ -26,12 +26,12 @@
 #include <stan/lang/ast/fun/var_type_name_vis.hpp>
 #include <stan/lang/ast/fun/write_block_var_type.hpp>
 
+#include <boost/variant/apply_visitor.hpp>
+#include <boost/variant/get.hpp>
+
 #include <ostream>
 #include <string>
 #include <vector>
-
-#include <boost/variant/apply_visitor.hpp>
-#include <boost/variant/get.hpp>
 
 namespace stan {
 namespace lang {

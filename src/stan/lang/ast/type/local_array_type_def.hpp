@@ -14,7 +14,6 @@ local_array_type::local_array_type(const local_var_type& el_type,
 local_array_type::local_array_type()
     : local_array_type(ill_formed_type(), nil()) {}
 
-  
 local_array_type::local_array_type(const local_var_type& el_type,
                                    const std::vector<expression>& lens)
   : element_type_(el_type), array_len_(lens[0]) {
@@ -24,7 +23,7 @@ local_array_type::local_array_type(const local_var_type& el_type,
   if (lens.size() == 0) {
     element_type_ = ill_formed_type();
     return;
-  } 
+  }
   local_array_type tmp(el_type, lens[lens.size() - 1]);
   for (size_t i = lens.size() - 2; i > 0; --i) {
     tmp = local_array_type(tmp, lens[i]);

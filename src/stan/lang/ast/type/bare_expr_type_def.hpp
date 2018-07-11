@@ -17,11 +17,12 @@
 #include <stan/lang/ast/fun/bare_type_total_dims_vis.hpp>
 #include <stan/lang/ast/fun/bare_type_vis.hpp>
 #include <stan/lang/ast/fun/write_bare_expr_type.hpp>
-#include <ostream>
-#include <string>
 
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>
+
+#include <ostream>
+#include <string>
 
 namespace stan {
 namespace lang {
@@ -62,7 +63,6 @@ bare_expr_type bare_expr_type::array_element_type() const {
     return bat.element_type_;
   }
   return ill_formed_type();
-
 }
 
 bare_expr_type bare_expr_type::array_contains() const {
