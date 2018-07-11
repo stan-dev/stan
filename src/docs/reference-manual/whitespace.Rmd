@@ -1,0 +1,54 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Whitespace 
+
+## Whitespace Characters 
+
+The whitespace characters (and their ASCII code points) are the space
+(0x20), tab (0x09), carriage return (0x0D), and line feed (0x0A).
+
+## Whitespace Neutrality 
+
+Stan treats all whitespace characters identically.  Specifically,
+there is no significance to indentation, to tabs, to carriage returns
+or line feeds, or to any vertical alignment of text.  Any whitespace
+character is exchangeable with any other.  
+
+Other than for readability, the number of whitespaces is also
+irrelevant.  One or more whitespace characters of any type are
+treated identically by the parser.
+
+
+## Whitespace Location 
+
+Zero or more whitespace characters may be placed between symbols in a
+Stan program.  For example, zero or more whitespace characters of any
+variety may be included before and after a binary operation such as
+`a * b`, before a statement-ending semicolon, around parentheses
+or brackets, before or after commas separating function arguments,
+etc.
+
+Identifiers and literals may not be separated by whitespace.  Thus it
+is not legal to write the number `10000` as `10 000` or to
+write the identifier `normal_lpdf` as `normal _ lpdf`.
