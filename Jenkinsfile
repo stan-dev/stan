@@ -44,6 +44,8 @@ def deleteDirWin() {
     deleteDir()
 }
 
+String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
+
 pipeline {
     agent none
     parameters {
@@ -127,9 +129,9 @@ pipeline {
         stage('Upstream CmdStan tests') {
             when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
             steps {
-                build(job: "CmdStan/${params.cmdstan_pr}",
+                build(job: "CmdStan/${cmdstan_pr()}",
                       parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
-                                    string(name: 'math_pr', value: params.math_pr)])
+                                   string(name: 'math_pr', value: params.math_pr)])
             }
         }
         stage('Performance') {
