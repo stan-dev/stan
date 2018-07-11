@@ -313,7 +313,10 @@ namespace stan {
           > lit(',')
           > expression_g(_r1)     // 6) integer data
           > lit(',')
-          > expression_g(_r1);    // 6) relative tolerance
+          > expression_g(_r1)     // 7) relative tolerance
+          > lit(')')
+          [validate_integrate_1d_f(_val, boost::phoenix::ref(var_map_),
+                                   _pass, boost::phoenix::ref(error_msgs_))];
 
       factor_r.name("expression");
       factor_r =

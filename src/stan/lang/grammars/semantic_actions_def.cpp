@@ -1891,6 +1891,112 @@ namespace stan {
     boost::phoenix::function<validate_algebra_solver_control>
     validate_algebra_solver_control_f;
 
+    void validate_integrate_1d::operator()(
+            integrate_1d& fx, const variable_map& var_map,
+            bool& pass, std::ostream& error_msgs) const {
+      pass = true;
+
+      // (1) name of function to integrate
+      if (has_rng_lp_suffix(fx.function_name_)) {
+        error_msgs << "integrated function may not be an _rng or _lp function,"
+                   << " found function name: "
+                   << fx.function_name_ << std::endl;
+        pass = false;
+      }
+      expr_type sys_result_type(double_type(), 0);
+      std::vector<function_arg_type> sys_arg_types;
+      sys_arg_types.push_back(function_arg_type(expr_type(double_type(), 0)));
+      sys_arg_types.push_back(function_arg_type(expr_type(double_type(), 0)));
+      sys_arg_types.push_back(function_arg_type(expr_type(double_type(), 1)));
+      sys_arg_types.push_back(function_arg_type(expr_type(double_type(), 1)));
+      sys_arg_types.push_back(function_arg_type(expr_type(int_type(), 1)));
+      function_signature_t system_signature(sys_result_type, sys_arg_types);
+      if (!function_signatures::instance()
+          .is_defined(fx.function_name_, system_signature)) {
+        pass = false;
+        error_msgs << "first argument to integrate_1d"
+                   << " must be the name of a function with signature"
+                   << " (real, real, real[], real[], int[]) : real "
+                   << std::endl;
+      }
+
+      // (2) lower bound of integration
+      if (!fx.lb_.expression_type().is_primitive()) {
+        pass = false;
+        error_msgs << "second argument to integrate_1d, the lower bound of"
+                   << " integration, must have type int or real;"
+                   << " found type = " << fx.lb_.expression_type() << "."
+                   << std::endl;
+      }
+
+      // (3) lower bound of integration
+      if (!fx.ub_.expression_type().is_primitive()) {
+        pass = false;
+        error_msgs << "third argument to integrate_1d, the upper bound of"
+                   << " integration, must have type int or real;"
+                   << " found type = " << fx.ub_.expression_type() << "."
+                   << std::endl;
+      }
+
+      // (4) parameters
+      if (fx.theta_.expression_type() != expr_type(double_type(), 1)) {
+        pass = false;
+        error_msgs << "fourth argument to integrate_1d, the parameters,"
+                   << " must have type real[];"
+                   << " found type = " << fx.theta_.expression_type() << "."
+                   << std::endl;
+      }
+
+      // (5) real data
+      if (fx.x_r_.expression_type() != expr_type(double_type(), 1)) {
+        pass = false;
+        error_msgs << "fifth argument to integrate_1d, the real data,"
+                   << " must have type real[]; found type = "
+                   << fx.x_r_.expression_type() << "." << std::endl;
+      }
+
+      // (6) int data
+      if (fx.x_i_.expression_type() != expr_type(int_type(), 1)) {
+        pass = false;
+        error_msgs << "sixth argument to integrate_1d, the integer data,"
+                   << " must have type int[]; found type = "
+                   << fx.x_i_.expression_type() << "." << std::endl;
+      }
+
+      // (7) relative tolerance
+      if (!fx.rel_tol_.expression_type().is_primitive()) {
+        pass = false;
+        error_msgs << "seventh argument to integrate_1d, relative tolerance,"
+                   << " must be of type int or real;  found type = "
+                   << fx.rel_tol_.expression_type() << "." << std::endl;
+      }
+
+
+      // test data-only variables do not have parameters (int locals OK)
+      if (has_var(fx.x_r_, var_map)) {
+        pass = false;
+        error_msgs << "fifth argument to integrate_1d, the real data,"
+                   << "must be data only and not reference parameters."
+                   << std::endl;
+      }
+      if (has_var(fx.rel_tol_, var_map)) {
+        pass = false;
+        error_msgs << "seventh argument to integrate_1d, relative tolerance,"
+                   << "must be data only and not reference parameters."
+                   << std::endl;
+      }
+    }
+    boost::phoenix::function<validate_integrate_1d>
+    validate_integrate_1d_f;
+
+
+
+
+
+
+
+
+
     void validate_map_rect::operator()(
             map_rect& mr, const variable_map& var_map,
             bool& pass, std::ostream& error_msgs) const {
