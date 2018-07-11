@@ -246,10 +246,9 @@ namespace stan {
         generate_expression(fx.x_r_, user_facing_, o_);
         o_ << ", ";
         generate_expression(fx.x_i_, user_facing_, o_);
-        o_ << ", ";
+        o_ << ", *pstream__, ";
         generate_expression(fx.rel_tol_, user_facing_, o_);
-        o_ << ", ";
-        o_ << ", pstream__)";
+        o_ << ")";
       }
 
       void operator()(const fun& fx) const {
