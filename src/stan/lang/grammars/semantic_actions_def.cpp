@@ -1976,26 +1976,18 @@ namespace stan {
       if (has_var(fx.x_r_, var_map)) {
         pass = false;
         error_msgs << "fifth argument to integrate_1d, the real data,"
-                   << "must be data only and not reference parameters."
+                   << " must be data only and not reference parameters."
                    << std::endl;
       }
       if (has_var(fx.rel_tol_, var_map)) {
         pass = false;
         error_msgs << "seventh argument to integrate_1d, relative tolerance,"
-                   << "must be data only and not reference parameters."
+                   << " must be data only and not reference parameters."
                    << std::endl;
       }
     }
     boost::phoenix::function<validate_integrate_1d>
     validate_integrate_1d_f;
-
-
-
-
-
-
-
-
 
     void validate_map_rect::operator()(
             map_rect& mr, const variable_map& var_map,
