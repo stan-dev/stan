@@ -70,13 +70,11 @@
 #include <stan/lang/ast/node/arg_decl.hpp>
 #include <stan/lang/ast/node/array_expr.hpp>
 #include <stan/lang/ast/node/assgn.hpp>
-#include <stan/lang/ast/node/assignment.hpp>
 #include <stan/lang/ast/node/base_var_decl.hpp>
 #include <stan/lang/ast/node/binary_op.hpp>
 #include <stan/lang/ast/node/break_continue_statement.hpp>
 #include <stan/lang/ast/node/cholesky_corr_var_decl.hpp>
 #include <stan/lang/ast/node/cholesky_factor_var_decl.hpp>
-#include <stan/lang/ast/node/compound_assignment.hpp>
 #include <stan/lang/ast/node/conditional_op.hpp>
 #include <stan/lang/ast/node/conditional_statement.hpp>
 #include <stan/lang/ast/node/corr_matrix_var_decl.hpp>

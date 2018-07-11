@@ -28,7 +28,7 @@ parameters {
 
 transformed parameters {
   vector[2] y_s_p;
-  theta_p = algebra_solver(algebra_system, y, theta_p, x_r_p, x_i, 0.01, 0.01, 10);
+  y_s_p = algebra_solver(algebra_system, y, theta_p, x_r_p, x_i, 0.01, 0.01, 10);
 }
 
 model {
