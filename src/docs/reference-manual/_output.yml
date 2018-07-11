@@ -1,0 +1,26 @@
+bookdown::gitbook:
+  toc_depth: 1
+  css: stan-manual.css
+  config:
+    search: no
+    sharing: null
+    download: null
+    edit: null
+    toolbar:
+      position: static
+    fontsettings:
+      theme: white
+      family: serif
+      size: 2
+    toc:
+      collapse: section
+      scroll_highlight: yes
+      before: |
+        <li style="font-size:110%; font-weight:400; font-family: Verdana, Helvetica, sans; line-height:1.4; margin: 0.5em 0 0 1em">Stan Reference Manual</li>
+      after: null
+
+subparagraph: yes
+bookdown::pdf_book:
+  latex_engine: "pdflatex"
+  includes:
+    in_header: header.tex

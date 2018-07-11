@@ -1,0 +1,629 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Posterior Analysis {#analysis.chapter}
+
+Stan uses Markov chain Monte Carlo (MCMC) techniques to generate
+samples from the posterior distribution for full Bayesian inference.
+Markov chain Monte Carlo (MCMC) methods were developed for situations
+in which it is not straightforward to make independent draws
+@Metropolis:1953.
+
+In addition to providing point estimates, Stan's optimization algorithm
+provides a Laplace approximation from which it is easy to draw
+random values.  Stan's variational inference algorithm provides
+draws from the variational approximation to the posterior.  Both
+of these outputs may be analyzed just as any other MCMC output,
+despite the fact that it is atually independent draws.
+
+## Markov Chains
+
+A *Markov chain* is a sequence of random variables $\theta^{(1)},
+\theta^{(2)},\ldots$ where each variable is conditionally independent
+of all other variables given the value of the previous value.  Thus if
+$\theta = \theta^{(1)}, \theta^{(2)},\ldots, \theta^{(N)}$, then
+
+$$
+p(\theta) = p(\theta^{(1)}) \prod_{n=2}^N p(\theta^{(n)}|\theta^{(n-1)}).
+$$
+
+Stan uses Hamiltonian Monte Carlo to generate a next state in a manner
+described in the [Hamiltonian Monte Carlo chapter](#hmc.chapter).
+
+The Markov chains Stan and other MCMC samplers generate are *ergodic*
+in the sense required by the Markov chain central limit theorem,
+meaning roughly that there is a reasonable chance of reaching
+one value of $\theta$ from another.  The Markov chains are also
+*stationary*, meaning that the transition probabilities do not change at
+different positions in the chain, so that for $n, n' \geq 0$, the
+probability function $p(\theta^{(n+1)}|\theta^{(n)})$ is the same as
+$p(\theta^{(n'+1)}|\theta^{(n')})$ (following the convention of
+overloading random and bound variables and picking out a probability
+function by its arguments).
+
+Stationary Markov chains have an *equilibrium distribution* on states
+in which each has the same marginal probability function, so that
+$p(\theta^{(n)})$ is the same probability function as
+$p(\theta^{(n+1)})$.  In Stan, this equilibrium distribution
+$p(\theta^{(n)})$ is the target density $p(\theta)$ defined by a Stan
+program, which is typically a proper Bayesian posterior density
+$p(\theta | y)$ defined on the log scale up to a constant.
+
+Using MCMC methods introduces two difficulties that are not faced by
+independent sample Monte Carlo methods.  The first problem is
+determining when a randomly initialized Markov chain has converged to
+its equilibrium distribution.  The second problem is that the draws
+from a Markov chain may be correlated or even anti-correlated, and
+thus the central limit theorem's bound on estimation error no longer
+applies.  These problems are addressed in the next two sections.
+
+Stan's posterior analysis tools compute a number of summary
+statistics, estimates, and diagnostics for Markov chain Monte Carlo
+(MCMC) samples.  Stan's estimators and diagnostics are more robust in
+the face of non-convergence, antithetical sampling, and long-term
+Markov chain correlations than most of the other tools available.  The
+algorithms Stan uses to achieve this are described in this chapter.
+
+
+## Convergence
+
+By definition, a Markov chain generates samples from the target
+distribution only after it has converged to equilibrium (i.e.,
+equilibrium is defined as being achieved when $p(\theta^{(n)})$ is the
+target density).  The following point cannot be expressed strongly
+enough:
+
+* In theory, *convergence is only guaranteed asymptotically* as the
+number of draws grows without bound.
+
+* In practice, *diagnostics must be applied to monitor convergence*
+for the finite number of draws actually available.
+
+
+## Notation for samples, chains, and draws
+
+To establish basic notation, suppose a target Bayesian posterior
+density $p(\theta | y)$ given real-valued vectors of parameters
+$\theta$ and real- and discrete-valued data $y$.^[Using vectors simplifies high level exposition at the expense of collapsing structure.] 
+
+An MCMC *sample* consists of a set of a sequence of $M$ Markov chains,
+each consisting of an ordered sequence of $N$ *draws* from the
+posterior.^[The structure is assumed to be rectangular;  in the
+future, this needs to be generalized to ragged samples.]  The sample
+thus consists of $M \times N$ draws from the posterior.
+
+
+### Potential Scale Reduction
+
+One way to monitor whether a chain has converged to the equilibrium
+distribution is to compare its behavior to other randomly initialized
+chains.  This is the motivation for the @GelmanRubin:1992 potential
+scale reduction statistic, $\hat{R}$.  The $\hat{R}$ statistic
+measures the ratio of the average variance of samples within each
+chain to the variance of the pooled samples across chains; if all
+chains are at equilibrium, these will be the same and $\hat{R}$ will
+be one.  If the chains have not converged to a common distribution,
+the $\hat{R}$ statistic will be greater than one.
+
+Gelman and Rubin's recommendation is that the independent Markov
+chains be initialized with diffuse starting values for the parameters
+and sampled until all values for $\hat{R}$ are below 1.1.  Stan
+allows users to specify initial values for parameters and it is also
+able to draw diffuse random initializations automatically satisfying
+the declared parameter constraints.
+
+The $\hat{R}$ statistic is defined for a set of $M$ Markov chains,
+$\theta_m$, each of which has $N$ samples $\theta^{(n)}_m$.  The
+*between-chain variance* estimate is
+
+$$
+B
+=
+\frac{N}{M-1}
+\,
+\sum_{m=1}^M (\bar{\theta}^{(\bullet)}_{m}
+                - \bar{\theta}^{(\bullet)}_{\bullet})^2,
+$$
+
+where
+
+$$
+\bar{\theta}_m^{(\bullet)}
+= \frac{1}{N} \sum_{n = 1}^N \theta_m^{(n)}
+$$
+
+and
+
+$$
+\bar{\theta}^{(\bullet)}_{\bullet}
+= \frac{1}{M} \, \sum_{m=1}^M \bar{\theta}_m^{(\bullet)}.
+$$
+
+The *within-chain variance* is averaged over the chains,
+
+$$
+W = \frac{1}{M} \, \sum_{m=1}^M s_m^2,
+$$
+
+where
+
+$$
+s_m^2
+=
+\frac{1}{N-1}
+\, \sum_{n=1}^N (\theta^{(n)}_m - \bar{\theta}^{(\bullet)}_m)^2.
+$$
+
+The *variance estimator* is a mixture of the within-chain and
+cross-chain sample variances,
+
+$$
+\widehat{\mbox{var}}^{+}\!(\theta|y)
+= \frac{N-1}{N}\, W \, + \, \frac{1}{N} \, B.
+$$
+
+Finally, the *potential scale reduction statistic* is defined by
+
+$$
+\hat{R}
+\, = \,
+\sqrt{\frac{\widehat{\mbox{var}}^{+}\!(\theta|y)}{W}}.
+$$
+
+
+### Split R-hat for Detecting Non-Stationarity
+
+Before Stan calculating the potential-scale-reduction statistic
+$\hat{R}$, each chain is split into two halves.  This provides an
+additional means to detect non-stationarity in the individual chains.
+If one chain involves gradually increasing values and one involves
+gradually decreasing values, they have not mixed well, but they can
+have $\hat{R}$ values near unity.  In this case, splitting each chain
+into two parts leads to $\hat{R}$ values substantially greater than 1
+because the first half of each chain has not mixed with the second
+half.
+
+
+### Convergence is Global
+
+A question that often arises is whether it is acceptable to monitor
+convergence of only a subset of the parameters or generated
+quantities.  The short answer is "no," but this is elaborated
+further in this section.
+
+For example, consider the value `lp__`, which is the log posterior
+density (up to a constant).^[The `lp__` value also represents the
+potential energy in the Hamiltonian system and is rate bounded by the
+randomly supplied kinetic energy each iteration, which follows a
+Chi-square distribution in the number of parameters.]
+
+It is thus a mistake to declare convergence in any practical sense if
+`lp__` has not converged, because different chains are really in
+different parts of the space.  Yet measuring convergence for `lp__` is
+particularly tricky, as noted below.
+
+
+#### Asymptotics and transience vs. equilibrium
+
+Markov chain convergence is a global property in the sense that it
+does not depend on the choice of function of the parameters that is
+monitored.  There is no hard cutoff between pre-convergence
+"transience" and post-convergence "equilibrium."  What happens is
+that as the number of states in the chain approaches infinity, the
+distribution of possible states in the chain approaches the target
+distribution and in that limit the expected value of the Monte Carlo
+estimator of any integrable function converges to the true
+expectation. There is nothing like warmup here, because in the limit,
+the effects of initial state are completely washed out.
+
+
+#### Multivariate convergence of functions
+
+The $\hat{R}$ statistic considers the composition of a Markov chain
+and a function, and if the Markov chain has converged then each Markov
+chain and function composition will have converged. Multivariate
+functions converge when all of their margins have converged by the
+Cramer-Wold theorem.
+
+The transformation from unconstrained space to constrained space is
+just another function, so does not effect convergence.
+
+Different functions may have different autocorrelations, but if the
+Markov chain has equilibrated then all Markov chain plus function
+compositions should be consistent with convergence. Formally, any
+function that appears inconsistent is of concern and although it would
+be unreasonable to test every function, `lp__` and other
+measured quantities should at least be consistent.
+
+The obvious difference in `lp__` is that it tends to vary
+quickly with position and is consequently susceptible to outliers.
+
+
+#### Finite numbers of states
+
+The question is what happens for finite numbers of states? If we can
+prove a strong geometric ergodicity property (which depends on the
+sampler and the target distribution), then one can show that there
+exists a finite time after which the chain forgets its initial state
+with a large probability. This is both the autocorrelation time and
+the warmup time.  But even if you can show it exists and is finite
+(which is nigh impossible) you can't compute an actual value
+analytically.
+
+So what we do in practice is hope that the finite number of draws is
+large enough for the expectations to be reasonably accurate. Removing
+warmup iterations improves the accuracy of the expectations but there
+is no guarantee that removing any finite number of samples will be
+enough.
+
+
+#### Why inconsistent R-hat?
+
+Firstly, as noted above, for any finite number of draws, there will
+always be some residual effect of the initial state, which typically
+manifests as some small (or large if the autocorrelation time is huge)
+probability of having a large outlier. Functions robust to such
+outliers (say, quantiles) will appear more stable and have better
+$\hat{R}$. Functions vulnerable to such outliers may show fragility.
+
+Secondly, use of the $\hat{R}$ statistic makes very strong
+assumptions. In particular, it assumes that the functions being
+considered are Gaussian or it only uses the first two moments and
+assumes some kind of independence.  The point is that strong
+assumptions are made that do not always hold. In particular, the
+distribution for the log posterior density (`lp__`) almost
+never looks Gaussian, instead it features long tails that can lead to
+large $\hat{R}$ even in the large $N$ limit.  Tweaks to $\hat{R}$,
+such as using quantiles in place of raw values, have the flavor of
+making the samples of interest more Gaussian and hence the $\hat{R}$
+statistic more accurate.
+
+
+#### Final words on convergence monitoring
+
+"Convergence" is a global property and holds for all integrable
+functions at once, but employing the $\hat{R}$ statistic requires
+additional assumptions and thus may not work for all functions equally
+well.
+
+Note that if you just compare the expectations between chains then we
+can rely on the Markov chain asymptotics for Gaussian distributions
+and can apply the standard tests.
+
+
+## Effective Sample Size {#effective-sample-size.section}
+
+The second technical difficulty posed by MCMC methods is that the
+samples will typically be autocorrelated (or anticorrelated) within a
+chain.  This increases the uncertainty of the estimation of posterior
+quantities of interest, such as means, variances, or quantiles; see
+@Geyer:2011.
+
+Stan estimates an effective sample size for each parameter, which
+plays the role in the Markov chain Monte Carlo central limit theorem
+(MCMC CLT) as the number of independent draws plays in the standard
+central limit theorem (CLT).
+
+Unlike most packages, the particular calculations used by Stan follow
+those for split-$\hat{R}$, which involve both cross-chain (mean) and
+within-chain calculations (autocorrelation); see @GelmanEtAl:2013.
+
+
+### Definition of Effective Sample Size
+
+The amount by which autocorrelation within the chains increases
+uncertainty in estimates can be measured by effective sample size (ESS).
+Given independent samples, the central limit theorem
+bounds uncertainty in estimates based on the number of samples $N$.
+Given dependent samples, the number of independent samples is replaced
+with the effective sample size $N_{\mathrm{eff}}$, which is
+the number of independent samples with the same estimation power as
+the $N$ autocorrelated samples.  For example, estimation error is
+proportional to $1 / \sqrt{N_{\mathrm{eff}}}$ rather than
+$1/\sqrt{N}$.
+
+The effective sample size of a sequence is defined in terms of the
+autocorrelations within the sequence at different lags.  The
+autocorrelation $\rho_t$ at lag $t \geq 0$ for a chain with joint
+probability function $p(\theta)$ with mean $\mu$ and variance
+$\sigma^2$ is defined to be
+
+$$
+\rho_t
+=
+\frac{1}{\sigma^2} \, \int_{\Theta} (\theta^{(n)} - \mu)
+(\theta^{(n+t)} - \mu) \, p(\theta) \, d\theta.
+$$
+
+This is the correlation between the two chains offset by $t$ positions
+(i.e., a lag in time-series terminology).  Because we know
+$\theta^{(n)}$ and $\theta^{(n+t)}$ have the same marginal
+distribution in an MCMC setting, multiplying the two difference terms
+and reducing yields
+
+$$
+\rho_t
+= \frac{1}{\sigma^2}
+\, \int_{\Theta}
+      \theta^{(n)} \, \theta^{(n+t)} \, p(\theta)
+   \, d\theta.
+$$
+
+The effective sample size of $N$ samples generated by a process with
+autocorrelations $\rho_t$ is defined by
+$$
+N_{\mathrm{eff}}
+\ = \
+\frac{N}{\sum_{t = -\infty}^{\infty} \rho_t}
+\ = \
+\frac{N}{1 + 2 \sum_{t = 1}^{\infty} \rho_t}.
+$$
+
+Effective sample size $N_{\mathrm{eff}}$ can be larger than $N$ in
+case of antithetic Markov chains, which have negative autocorrelations
+on odd lags. The no-U-turn sampling (NUTS) algorithm used in Stan can
+produce $N_{\mathrm{eff}}>N$ for parameters which have close to
+Gaussian posterior and little dependency on other parameters.
+
+
+### Estimation of Effective Sample Size
+
+In practice, the probability function in question cannot be tractably
+integrated and thus the autocorrelation cannot be calculated, nor the
+effective sample size.  Instead, these quantities must be estimated
+from the samples themselves.  The rest of this section describes a
+autocorrelations and split-$\hat{R}$ based effective sample
+size estimator, based on multiple chains. As before, each chain
+$\theta_m$ will be assumed to be of length $N$.
+
+Stan carries out the autocorrelation computations for all lags
+simultaneously using Eigen's fast Fourier transform (FFT) package with
+appropriate padding; see @Geyer:2011 for more detail on using FFT for
+autocorrelation calculations.  The autocorrelation estimates
+$\hat{\rho}_{t,m}$ at lag $t$ from multiple chains $m \in
+(1,\ldots,M)$ are combined with within-sample variance estimate $W$
+and multi-chain variance estimate $\widehat{\mbox{var}}^{+}$
+introduced in the previous section to compute the combined
+autocorrelation at lag $t$ as
+
+$$
+\hat{\rho}_t
+= 1 - \frac{\displaystyle W
+              - \textstyle \frac{1}{M}\sum_{m=1}^M \hat{\rho}_{t,m}}
+	    {\widehat{\mbox{var}}^{+}}.
+$$
+
+If the chains have not converged, the variance estimator
+$\widehat{\mbox{var}}^{+}$ will overestimate variance, leading to an
+overestimate of autocorrelation and an underestimate effective sample
+size.
+
+Because of the noise in the correlation estimates $\hat{\rho}_t$ as
+$t$ increases, a typical truncated sum of $\hat{\rho}_t$ is used.
+Negative autocorrelations may occur only on odd lags and by summing
+over pairs starting from lag 0, the paired autocorrelation is
+guaranteed to be positive, monotone and convex modulo estimator noise
+@Geyer:1992, @Geyer:2011.  Stan uses Geyer's initial monotone
+sequence criterion. The effective sample size estimator is defined as
+
+$$
+\hat{N}_{\mathrm{eff}} = \frac{M \cdot N}{\hat{\tau}},
+$$
+
+where
+
+$$
+\hat{\tau} = 1 + 2 \sum_{t=1}^{2m+1} \hat{\rho}_t = -1 + 2 \sum_{t'=0}^{m} \hat{P}_{t'},
+$$
+
+where $\hat{P}_{t'}=\hat{\rho}_{2t'}+\hat{\rho}_{2t'+1}$. Initial
+positive sequence estimators is obtained by choosing the largest $m$
+such that $\hat{P}_{t'}>0, \quad t' = 1,\ldots,m$. The initial monotone
+sequence is obtained by further reducing $\hat{P}_{t'}$ to the minimum
+of the preceding ones so that the estimated sequence is monotone.
+
+
+### Estimation of MCMC Standard Error
+
+The posterior standard deviation of a parameter $\theta_n$ conditioned
+on observed data $y$ is just the standard deviation of the posterior
+density $p(\theta_n | y)$.  This is estimated by the standard
+deviation of the combined posterior draws across chains,
+
+$$
+\hat{\sigma}_n = \mathrm{sd}(\theta^{(1)}_n, \ldots, \theta^{(m)}_n).
+$$
+
+The previous section showed how to estimate $N_{\mathrm{eff}}$ for a
+parameter $\theta_n$ based on multiple chains of posterior draws.
+
+The mean of the posterior draws of $\theta_n$
+$$
+\hat{\theta}_n
+= \mathrm{mean}(\theta^{(1)}_n, \ldots, \theta^{(m)}_n)
+$$
+
+is treated as an estimator of the true posterior mean,
+
+$$
+\mathbb{E}[\theta_n \mid y]
+\ = \
+\int_{-\infty}^{\infty}
+    \, \theta \, p(\theta | y)
+\, \mathrm{d}\theta_n,
+$$
+
+based the observed data $y$.
+
+The standard error for the estimator $\hat{\theta}_n$ is given by the
+posterior standard deviation divided by the square root of the
+effective sample size.  This standard error is itself estimated as
+$\hat{\sigma}_n / \sqrt{N_{\mathrm{eff}}}$.  The smaller the standard
+error, the closer the estimate $\hat{\theta}_n$ is expected to be to
+the true value.  This is just the MCMC CLT applied to an estimator;
+see @Geyer:2011 for more details of the MCMC central limit theorem.
+
+
+### Thinning Samples
+
+In the typical situation, the autocorrelation, $\rho_t$, decreases as
+the lag, $t$, increases.  When this happens, thinning the samples will
+reduce the autocorrelation.
+
+For instance, consider generating one thousand posterior draws in one
+of the following two ways.
+
+* Generate 1000 draws after convergence and save all of them.
+
+* Generate 10,000 draws after convergence and save every tenth draw.
+
+Even though both produce a sample consisting one thousand draws, the
+second approach with thinning can produce a higher effective sample
+size.  That's because the autocorrelation $\rho_t$ for the thinned
+sequence is equivalent to $\rho_{10t}$ in the unthinned sequence, so
+the sum of the autocorrelations will be lower and thus the effective
+sample size higher.
+
+Now contrast the second approach above with the unthinned alternative,
+
+* Generate 10,000 draws after convergence and save every draw.
+
+This will have a higher effective sample than the thinned sample
+consisting of every tenth drawn.  Therefore, it should be emphasized
+that *the only reason to thin a sample is to reduce memory
+requirements*.
