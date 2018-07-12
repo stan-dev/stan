@@ -2536,6 +2536,21 @@ covariance matrix and call \code{multi\_normal\_cholesky\_rng};  see \refsection
   \farg{Sigma}}{Generate a multivariate normal variate with location
   \farg{mu} and covariance matrix \farg{Sigma}; may only be used in
 generated quantities block}
+%
+\fitem{vector}{multi\_normal\_rng}{row\_vector \farg{mu}, matrix
+  \farg{Sigma}}{Generate a multivariate normal variate with location
+  \farg{mu} and covariance matrix \farg{Sigma}; may only be used in
+generated quantities block}
+%
+\fitem{vectors}{multi\_normal\_rng}{vectors \farg{mu}, matrix
+  \farg{Sigma}}{Generate an array of multivariate normal variates with locations
+  \farg{mu} and covariance matrix \farg{Sigma}; may only be used in
+generated quantities block}
+%
+\fitem{vectors}{multi\_normal\_rng}{row\_vectors \farg{mu}, matrix
+  \farg{Sigma}}{Generate an array of multivariate normal variates with locations
+  \farg{mu} and covariance matrix \farg{Sigma}; may only be used in
+generated quantities block}
 \end{description}
 
 
@@ -2629,6 +2644,21 @@ positive-definite matrix, the probability functions will raise errors.
 \begin{description}
 \fitem{vector}{multi\_normal\_cholesky\_rng}{vector \farg{mu}, matrix
   \farg{L}}{Generate a multivariate normal variate with location
+  \farg{mu} and lower-triangular Cholesky factor of the covariance
+  matrix \farg{L}; may only be used in generated quantities block}
+%
+\fitem{vector}{multi\_normal\_cholesky\_rng}{row\_vector \farg{mu}, matrix
+  \farg{L}}{Generate a multivariate normal variate with location
+  \farg{mu} and lower-triangular Cholesky factor of the covariance
+  matrix \farg{L}; may only be used in generated quantities block}
+%
+\fitem{vectors}{multi\_normal\_cholesky\_rng}{vectors \farg{mu}, matrix
+  \farg{L}}{Generate an array of multivariate normal variates with locations
+  \farg{mu} and lower-triangular Cholesky factor of the covariance
+  matrix \farg{L}; may only be used in generated quantities block}
+%
+\fitem{vectors}{multi\_normal\_cholesky\_rng}{row\_vectors \farg{mu}, matrix
+  \farg{L}}{Generate an array of multivariate normal variates with locations
   \farg{mu} and lower-triangular Cholesky factor of the covariance
   matrix \farg{L}; may only be used in generated quantities block}
 \end{description}
@@ -2763,6 +2793,21 @@ $y \in \reals^K$,
 \fitem{vector}{multi\_student\_t\_rng}{real \farg{nu}, vector \farg{mu}, matrix
   \farg{Sigma}}{Generate a multivariate Student-$t$ variate with degrees
   of freedom \farg{nu}, location \farg{mu}, and scale matrix \farg{Sigma};
+may only be used in generated quantities block}
+%
+\fitem{vector}{multi\_student\_t\_rng}{real \farg{nu}, row\_vector \farg{mu}, matrix
+  \farg{Sigma}}{Generate a multivariate Student-$t$ variate with degrees
+  of freedom \farg{nu}, location \farg{mu}, and scale matrix \farg{Sigma};
+may only be used in generated quantities block}
+%
+\fitem{vectors}{multi\_student\_t\_rng}{real \farg{nu}, vectors \farg{mu}, matrix
+  \farg{Sigma}}{Generate an array of multivariate Student-$t$ variates with degrees
+  of freedom \farg{nu}, locations \farg{mu}, and scale matrix \farg{Sigma};
+may only be used in generated quantities block}
+%
+\fitem{vectors}{multi\_student\_t\_rng}{real \farg{nu}, row\_vectors \farg{mu}, matrix
+  \farg{Sigma}}{Generate an array of multivariate Student-$t$ variates with degrees
+  of freedom \farg{nu}, locations \farg{mu}, and scale matrix \farg{Sigma};
 may only be used in generated quantities block}
 \end{description}
 
