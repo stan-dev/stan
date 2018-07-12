@@ -488,9 +488,11 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
 \end{description}
 %
 \begin{description}
-\fitem{int}{binomial\_rng}{int \farg{N}, real \farg{theta}}{Generate a binomial
+\fitem{R}{binomial\_rng}{ints \farg{N}, reals \farg{theta}}{Generate a binomial
   variate with \farg{N} trials and chance of success \farg{theta}; may only be used in
-  generated quantities block}
+  generated quantities block.  For a description of argument and
+  return types, see \refsection{prng-vectorization}.
+}
 \end{description}
 
 
