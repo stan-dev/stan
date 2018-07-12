@@ -74,7 +74,9 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
     add("bernoulli_lpmf", bare_expr_type(double_type()), int_vector_types[i], 
 	vector_types[j]);
   }
-add("bernoulli_rng", bare_expr_type(int_type()), bare_expr_type(double_type()));
+for (const auto& t : all_vector_types) {
+  add("bernoulli_rng", rng_return_type<int_type>(t), t);
+ }
 add("bernoulli_logit_rng", bare_expr_type(int_type()), bare_expr_type(double_type()));
 for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j) {
@@ -110,7 +112,13 @@ for (size_t i = 0; i < int_vector_types.size(); i++)
             int_vector_types[i], int_vector_types[j],
 	    vector_types[k], vector_types[l]);
       }
-add("beta_binomial_rng", bare_expr_type(int_type()), bare_expr_type(int_type()), bare_expr_type(double_type()), bare_expr_type(double_type()));
+for (const auto& t : int_vector_types) {
+  for (const auto& u : all_vector_types) {
+    for (const auto& v : all_vector_types) {
+      add("beta_binomial_rng", rng_return_type<int_type>(t, u, v), t, u, v);
+    }
+  }
+ }
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
@@ -156,8 +164,12 @@ for (size_t i = 0; i < int_vector_types.size(); ++i) {
           int_vector_types[i], int_vector_types[j], vector_types[k]);
     }
   }
+}
+for (const auto& t : int_vector_types) {
+  for (const auto& u : all_vector_types) {
+    add("binomial_rng", rng_return_type<int_type>(t, u), t, u);
+  }
  }
-add("binomial_rng", bare_expr_type(int_type()), bare_expr_type(int_type()), bare_expr_type(double_type()));
 add_binary("binomial_coefficient_log");
 for (size_t i = 0; i < int_vector_types.size(); ++i) {
   for (size_t j = 0; j < int_vector_types.size(); ++j) {
@@ -765,9 +777,15 @@ add("multi_gp_cholesky_lpdf", bare_expr_type(double_type()), bare_expr_type(matr
     }
   }
 }
-add("multi_normal_rng", bare_expr_type(vector_type()), bare_expr_type(vector_type()), bare_expr_type(matrix_type()));
-add("multi_normal_cholesky_rng", bare_expr_type(vector_type()), bare_expr_type(vector_type()), bare_expr_type(matrix_type()));
-add("multi_student_t_rng", bare_expr_type(vector_type()), bare_expr_type(double_type()), bare_expr_type(vector_type()), bare_expr_type(matrix_type()));
+for (const auto& t : all_vector_types) {
+  add("multi_normal_rng", rng_return_type<double_type>(t), t, bare_expr_type(matrix_type()));
+ }
+for (const auto& t : all_vector_types) {
+  add("multi_normal_cholesky_rng", rng_return_type<double_type>(t), t, bare_expr_type(matrix_type()));
+ }
+for (const auto& t : all_vector_types) {
+  add("multi_student_t_rng", rng_return_type<double_type>(t), bare_expr_type(double_type()), t, bare_expr_type(matrix_type()));
+ }
 add("multinomial_log", bare_expr_type(double_type()), bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(vector_type()));
 add("multinomial_lpmf", bare_expr_type(double_type()), bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(vector_type()));
 add("multinomial_rng", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(vector_type()), bare_expr_type(int_type()));
@@ -824,10 +842,22 @@ for (size_t i = 0; i < int_vector_types.size(); ++i) {
           int_vector_types[i], vector_types[j], vector_types[k]);
     }
   }
+}
+for (const auto& t : all_vector_types) {
+  for (const auto& u : all_vector_types) {
+    add("neg_binomial_rng", rng_return_type<int_type>(t, u), t, u);
+  }
  }
-add("neg_binomial_rng", bare_expr_type(int_type()), bare_expr_type(double_type()), bare_expr_type(double_type()));
-add("neg_binomial_2_rng", bare_expr_type(int_type()), bare_expr_type(double_type()), bare_expr_type(double_type()));
-add("neg_binomial_2_log_rng", bare_expr_type(int_type()), bare_expr_type(double_type()), bare_expr_type(double_type()));
+for (const auto& t : all_vector_types) {
+  for (const auto& u : all_vector_types) {
+    add("neg_binomial_2_rng", rng_return_type<int_type>(t, u), t, u);
+  }
+ }
+for (const auto& t : all_vector_types) {
+  for (const auto& u : all_vector_types) {
+    add("neg_binomial_2_log_rng", rng_return_type<int_type>(t, u), t, u);
+  }
+ }
 add_nullary("negative_infinity");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
@@ -983,8 +1013,10 @@ for (size_t i = 0; i < int_vector_types.size(); ++i) {
     add("poisson_lpmf", bare_expr_type(double_type()), int_vector_types[i],
         vector_types[j]);
   }
+}
+for (const auto& t : all_vector_types) {
+  add("poisson_rng", rng_return_type<int_type>(t), t);
  }
-add("poisson_rng", bare_expr_type(int_type()), bare_expr_type(double_type()));
 for (size_t i = 0; i < int_vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     add("poisson_log_log", bare_expr_type(double_type()), int_vector_types[i],
@@ -992,8 +1024,10 @@ for (size_t i = 0; i < int_vector_types.size(); ++i) {
     add("poisson_log_lpmf", bare_expr_type(double_type()), int_vector_types[i],
         vector_types[j]);
   }
+}
+for (const auto& t : all_vector_types) {
+  add("poisson_log_rng", rng_return_type<int_type>(t), t);
  }
-add("poisson_log_rng", bare_expr_type(int_type()), bare_expr_type(double_type()));
 add_nullary("positive_infinity");
 add_binary("pow");
 add("prod", bare_expr_type(int_type()), bare_expr_type(bare_array_type(int_type(), 1)));
@@ -1169,7 +1203,7 @@ add("squared_distance", bare_expr_type(double_type()), bare_expr_type(row_vector
 add_unary_vectorized("sqrt");
 add_nullary("sqrt2");
 add_unary_vectorized("square");
-for (size_t i = 0; i < vector_types.size(); ++i) 
+for (size_t i = 0; i < vector_types.size(); ++i)
 {
   add("std_normal_log", bare_expr_type(double_type()), vector_types[i]);
   add("std_normal_lpdf", bare_expr_type(double_type()), vector_types[i]);
@@ -1298,7 +1332,11 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
     }
   }
  }
-add_binary("uniform_rng");
+for (const auto& t : all_vector_types) {
+  for (const auto& u : all_vector_types) {
+    add("uniform_rng", rng_return_type<double_type>(t, u), t, u);
+  }
+ }
 add("variance", bare_expr_type(double_type()), bare_expr_type(bare_array_type(double_type(), 1)));
 add("variance", bare_expr_type(double_type()), bare_expr_type(vector_type()));
 add("variance", bare_expr_type(double_type()), bare_expr_type(row_vector_type()));
@@ -1312,8 +1350,12 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
           vector_types[i], vector_types[j], vector_types[k]);
     }
   }
+}
+for (const auto& t : all_vector_types) {
+  for (const auto& u : all_vector_types) {
+    add("von_mises_rng", rng_return_type<double_type>(t, u), t, u);
+  }
  }
-add_binary("von_mises_rng");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {
