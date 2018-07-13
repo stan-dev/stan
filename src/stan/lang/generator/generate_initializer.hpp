@@ -4,7 +4,6 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_bare_type.hpp>
-#include <stan/lang/generator/generate_eigen_index_expression.hpp>
 #include <ostream>
 #include <string>
 #include <vector>

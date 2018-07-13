@@ -62,7 +62,6 @@ namespace stan {
         generate_bare_type(x.type_.array_element_type(),
                            ssRealType.str(), ssArrayElType);
 
-        // TODO(mitzi): do we need static cast? L58-60, L68
         o_ << "static_cast<"
            << ssArrayType.str()
            << " >(stan::math::array_builder<"

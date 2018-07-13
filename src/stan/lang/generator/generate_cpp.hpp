@@ -55,7 +55,6 @@ namespace stan {
       generate_includes(o);
       generate_namespace_start(model_name, o);
       generate_usings(o);
-      //      generate_typedefs(o);  // provided via stan::math
       generate_globals(o);
       generate_program_reader_fun(history, o);
       generate_functions(prog.function_decl_defs_, o);
@@ -65,8 +64,6 @@ namespace stan {
       generate_public_decl(o);
       generate_constructor(prog, model_name, o);
       generate_destructor(model_name, o);
-      // put back if ever need integer params
-      // generate_set_param_ranges(prog.parameter_decl_, o);
       generate_transform_inits_method(prog.parameter_decl_, o);
       generate_log_prob(prog, o);
       generate_param_names_method(prog, o);

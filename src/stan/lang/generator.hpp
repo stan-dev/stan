@@ -44,7 +44,6 @@
 #include <stan/lang/generator/generate_data_var_init.hpp>
 #include <stan/lang/generator/generate_destructor.hpp>
 #include <stan/lang/generator/generate_dims_method.hpp>
-#include <stan/lang/generator/generate_eigen_index_expression.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_function.hpp>
 #include <stan/lang/generator/generate_function_arguments.hpp>
