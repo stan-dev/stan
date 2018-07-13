@@ -135,7 +135,7 @@ pipeline {
             }
         }
         stage('Performance') {
-            agent { label 'gelman-group-mac' }
+            agent { label 'master' }
             steps {
                 unstash 'StanSetup'
                 setupCC()
