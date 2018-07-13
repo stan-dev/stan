@@ -12,8 +12,11 @@ generated quantities {
   vector[3] theta;
   vector[3] alpha;
   row_vector[3] nu;
+  row_vector[3] nu_array[3];
   vector[3] v;
+  vector[3] v_array[3];
   vector[3] mu;
+  vector[3] mu_array[3];
   matrix[3,3] Sigma;
   matrix[3,3] L;
   int ns[3];
@@ -1699,32 +1702,20 @@ generated quantities {
 
   theta = dirichlet_rng(alpha);
   
-  x = multi_normal_rng(alpha, Sigma);
-  x = multi_normal_rng(nu, Sigma);
-  x = multi_normal_rng(ns, Sigma);
-  x = multi_normal_rng(u, Sigma);
-  z = multi_normal_rng(3, Sigma);
-  z = multi_normal_rng(3.5, Sigma);
-  
-  x = multi_normal_cholesky_rng(alpha, L);
-  x = multi_normal_cholesky_rng(nu, L);
-  x = multi_normal_cholesky_rng(ns, L);
-  x = multi_normal_cholesky_rng(u, L);
-  z = multi_normal_cholesky_rng(3, L);
-  z = multi_normal_cholesky_rng(3.5, L);
+  v = multi_normal_rng(mu, Sigma);
+  v = multi_normal_rng(nu, Sigma);
+  v_array = multi_normal_rng(mu_array, Sigma);
+  v_array = multi_normal_rng(nu_array, Sigma);
 
-  x = multi_student_t_rng(3, alpha, Sigma);
-  x = multi_student_t_rng(3, nu, Sigma);
-  x = multi_student_t_rng(3, ns, Sigma);
-  x = multi_student_t_rng(3, u, Sigma);
-  z = multi_student_t_rng(3, 3, Sigma);
-  z = multi_student_t_rng(3, 3.5, Sigma);
-  x = multi_student_t_rng(3.5, alpha, Sigma);
-  x = multi_student_t_rng(3.5, nu, Sigma);
-  x = multi_student_t_rng(3.5, ns, Sigma);
-  x = multi_student_t_rng(3.5, u, Sigma);
-  z = multi_student_t_rng(3.5, 3, Sigma);
-  z = multi_student_t_rng(3.5, 3.5, Sigma);
+  v = multi_normal_cholesky_rng(mu, Sigma);
+  v = multi_normal_cholesky_rng(nu, Sigma);
+  v_array = multi_normal_cholesky_rng(mu_array, Sigma);
+  v_array = multi_normal_cholesky_rng(nu_array, Sigma);
+
+  v = multi_student_t_rng(3.0, mu, Sigma);
+  v = multi_student_t_rng(3.0, nu, Sigma);
+  v_array = multi_student_t_rng(3.0, mu_array, Sigma);
+  v_array = multi_student_t_rng(3.0, nu_array, Sigma);
   
   // v = multi_normal_prec_rng(mu,Sigma);
   Sigma = wishart_rng(3.0,Sigma);
