@@ -777,15 +777,21 @@ add("multi_gp_cholesky_lpdf", bare_expr_type(double_type()), bare_expr_type(matr
     }
   }
 }
-for (const auto& t : all_vector_types) {
-  add("multi_normal_rng", rng_return_type<double_type>(t), t, bare_expr_type(matrix_type()));
- }
-for (const auto& t : all_vector_types) {
-  add("multi_normal_cholesky_rng", rng_return_type<double_type>(t), t, bare_expr_type(matrix_type()));
- }
-for (const auto& t : all_vector_types) {
-  add("multi_student_t_rng", rng_return_type<double_type>(t), bare_expr_type(double_type()), t, bare_expr_type(matrix_type()));
- }
+add("multi_normal_rng", bare_expr_type(vector_type()), bare_expr_type(vector_type()), bare_expr_type(matrix_type()));
+add("multi_normal_rng", bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(matrix_type()));
+add("multi_normal_rng", bare_expr_type(vector_type()), bare_expr_type(row_vector_type()), bare_expr_type(matrix_type()));
+add("multi_normal_rng", bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(row_bare_array_type(vector_type(), 1)), bare_expr_type(matrix_type()));
+
+add("multi_normal_cholesky_rng", bare_expr_type(vector_type()), bare_expr_type(vector_type()), bare_expr_type(matrix_type()));
+add("multi_normal_cholesky_rng", bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(matrix_type()));
+add("multi_normal_cholesky_rng", bare_expr_type(vector_type()), bare_expr_type(row_vector_type()), bare_expr_type(matrix_type()));
+add("multi_normal_cholesky_rng", bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(row_bare_array_type(vector_type(), 1)), bare_expr_type(matrix_type()));
+
+add("multi_student_t_rng", bare_expr_type(vector_type()), bare_expr_type(double_type()), bare_expr_type(vector_type()), bare_expr_type(matrix_type()));
+add("multi_student_t_rng", bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(double_type()), bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(matrix_type()));
+add("multi_student_t_rng", bare_expr_type(vector_type()), bare_expr_type(double_type()), bare_expr_type(row_vector_type()), bare_expr_type(matrix_type()));
+add("multi_student_t_rng", bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(double_type()), bare_expr_type(row_bare_array_type(vector_type(), 1)), bare_expr_type(matrix_type()));
+
 add("multinomial_log", bare_expr_type(double_type()), bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(vector_type()));
 add("multinomial_lpmf", bare_expr_type(double_type()), bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(vector_type()));
 add("multinomial_rng", bare_expr_type(bare_array_type(int_type(), 1)), bare_expr_type(vector_type()), bare_expr_type(int_type()));
