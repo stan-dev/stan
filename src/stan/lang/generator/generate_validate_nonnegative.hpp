@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_GENERATOR_GENERATE_VALIDATE_POSITIVE_HPP
-#define STAN_LANG_GENERATOR_GENERATE_VALIDATE_POSITIVE_HPP
+#ifndef STAN_LANG_GENERATOR_GENERATE_VALIDATE_NONNEGATIVE_HPP
+#define STAN_LANG_GENERATOR_GENERATE_VALIDATE_NONNEGATIVE_HPP
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
@@ -31,9 +31,9 @@ namespace stan {
      * @param[in] indent indentation level
      * @param[in,out] o output stream for generated code
      */
-    void generate_validate_positive(const std::string& name,
-                                    const expression& expr,
-                                    int indent, std::ostream& o) {
+    void generate_validate_nonnegative(const std::string& name,
+                                       const expression& expr,
+                                       int indent, std::ostream& o) {
       generate_indent(indent, o);
       o << "validate_non_negative_index(\"" << name << "\", ";
       generate_quoted_expression(expr, o);

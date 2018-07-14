@@ -19,7 +19,6 @@ namespace stan {
      * @param[in,out] o stream for generating
      */
     template <typename T>
-
     void generate_initializer(const T& var_type,
                               const std::string& scalar_t_name,
                               std::ostream& o) {
@@ -58,15 +57,6 @@ namespace stan {
       for (size_t i = 0; i < ar_dim_sizes.size(); ++i)
         o << ")";
     }
-
-    template void generate_initializer(const block_var_type&,
-                                       const std::string& scalar_t_name,
-                                       std::ostream& o);
-
-    template void generate_initializer(const local_var_type&,
-                                       const std::string& scalar_t_name,
-                                       std::ostream& o);
-
   }
 }
 #endif

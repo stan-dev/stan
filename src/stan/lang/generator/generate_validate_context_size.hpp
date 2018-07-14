@@ -5,7 +5,7 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/generate_validate_positive.hpp>
+#include <stan/lang/generator/generate_validate_nonnegative.hpp>
 #include <stan/lang/generator/get_typedef_var_type.hpp>
 #include <ostream>
 #include <string>

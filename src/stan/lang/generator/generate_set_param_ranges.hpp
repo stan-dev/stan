@@ -5,7 +5,7 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/generate_validate_positive.hpp>
+#include <stan/lang/generator/generate_validate_nonnegative.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -41,7 +41,7 @@ namespace stan {
         std::string var_name(var_decls[i].name());
         std::vector<expression> ar_lens(var_decls[i].type().array_lens());
         for (size_t i = 0; i < ar_lens.size(); ++i)
-          generate_validate_positive(var_name, ar_lens[i], indent, o);
+          generate_validate_nonnegative(var_name, ar_lens[i], indent, o);
 
         generate_indent(indent, o);
         o << "num_params_r__ += ";

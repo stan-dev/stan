@@ -7,7 +7,6 @@
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/statement_visgen.hpp>
 #include <boost/variant/apply_visitor.hpp>
-#include <iostream>
 #include <ostream>
 
 namespace stan {

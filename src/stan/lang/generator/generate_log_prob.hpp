@@ -53,7 +53,7 @@ namespace stan {
       generate_try(2, o);
       generate_indent(3, o);
       o << "stan::io::reader<local_scalar_t__> in__(params_r__, params_i__);"
-        << EOL << EOL;
+        << EOL2;
 
       generate_comment("model parameters", 3, o);
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i) {

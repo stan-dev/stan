@@ -98,7 +98,7 @@
 #include <stan/lang/generator/generate_usings.hpp>
 #include <stan/lang/generator/generate_validate_block_var.hpp>
 #include <stan/lang/generator/generate_validate_context_size.hpp>
-#include <stan/lang/generator/generate_validate_positive.hpp>
+#include <stan/lang/generator/generate_validate_nonnegative.hpp>
 #include <stan/lang/generator/generate_validate_tparam_inits.hpp>
 #include <stan/lang/generator/generate_validate_var_decl.hpp>
 #include <stan/lang/generator/generate_validate_var_dims.hpp>

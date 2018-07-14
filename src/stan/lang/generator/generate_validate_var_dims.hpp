@@ -2,7 +2,7 @@
 #define STAN_LANG_GENERATOR_GENERATE_VALIDATE_VAR_DIMS_HPP
 
 #include <stan/lang/ast.hpp>
-#include <stan/lang/generator/generate_validate_positive.hpp>
+#include <stan/lang/generator/generate_validate_nonnegative.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -31,13 +31,13 @@ namespace stan {
       std::vector<expression> ar_var_dims = var_decl.type().array_lens();
 
       if (!is_nil(arg1))
-        generate_validate_positive(name, arg1, indent, o);
+        generate_validate_nonnegative(name, arg1, indent, o);
 
       if (!is_nil(arg2))
-        generate_validate_positive(name, arg2, indent, o);
+        generate_validate_nonnegative(name, arg2, indent, o);
 
       for (size_t i = 0; i < ar_var_dims.size(); ++i)
-        generate_validate_positive(name, ar_var_dims[i], indent, o);
+        generate_validate_nonnegative(name, ar_var_dims[i], indent, o);
     }
 
   }

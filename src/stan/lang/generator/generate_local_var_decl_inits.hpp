@@ -4,7 +4,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/generate_validate_positive.hpp>
+#include <stan/lang/generator/generate_validate_nonnegative.hpp>
 #include <stan/lang/generator/write_var_decl_arg.hpp>
 #include <stan/lang/generator/write_var_decl_type.hpp>
 #include <ostream>
@@ -37,14 +37,13 @@ namespace stan {
         std::vector<expression> ar_lens(vs[i].type().array_lens());
         std::string var_name(vs[i].name());
         // unfold array type to get array element info
-        local_var_type ltype = (vs[i].type());
-        if (ltype.is_array_type())
-          ltype = ltype.array_contains();
+        local_var_type ltype = vs[i].type().is_array_type() ?
+          vs[i].type().array_contains() : vs[i].type();
         std::string cpp_type_str = get_verbose_var_type(ltype.bare_type());
 
         // validate dimensions before declaration
         for (int i = 1; i < ar_dims; ++i)
-          generate_validate_positive(var_name, ar_lens[i], indent, o);
+          generate_validate_nonnegative(var_name, ar_lens[i], indent, o);
 
         // declare
         write_var_decl_type(ltype.bare_type(), cpp_type_str,
@@ -56,13 +55,12 @@ namespace stan {
 
         // fill
         generate_indent(indent, o);
-        if (ltype.bare_type().is_int_type()) {
-          o << "stan::math::fill(" << var_name
-            << ", std::numeric_limits<int>::min());"
-            << EOL;
-        } else {
-          o << "stan::math::fill(" << var_name << ", DUMMY_VAR__);" << EOL;
-        }
+        o << "stan::math::fill(" << var_name << ", ";
+        if (ltype.bare_type().is_int_type())
+          o << "std::numeric_limits<int>::min()";
+        else
+          o << "DUMMY_VAR__";
+        o << ");" << EOL;
 
         // define
         if (vs[i].has_def()) {
