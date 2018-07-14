@@ -12,25 +12,313 @@ generated quantities {
   vector[3] theta;
   vector[3] alpha;
   row_vector[3] nu;
+  row_vector[3] nu_array[3];
   vector[3] v;
+  vector[3] v_array[3];
   vector[3] mu;
+  vector[3] mu_array[3];
   matrix[3,3] Sigma;
   matrix[3,3] L;
   int ns[3];
+  int N[3];
 
-  n = bernoulli_rng(0.5);
   n = bernoulli_logit_rng(0.0);
-  n = binomial_rng(15,0.3);
-  // n = binomial_logit_rng(15,-1.2);
-  n = beta_binomial_rng(42, 0.3, 1.9);
-  n = hypergeometric_rng(5,4,9);
-  n = neg_binomial_rng(1.2,3.9);
-  n = neg_binomial_2_rng(1.2,3.9);
-  n = neg_binomial_2_log_rng(1.2,3.9);
-  n = ordered_logistic_rng(1.9,theta);
-  n = poisson_rng(2.7);
-  n = poisson_log_rng(2.7);
+  
+  N = binomial_rng(ns, alpha);
+  N = binomial_rng(ns, nu);
+  N = binomial_rng(ns, ns);
+  N = binomial_rng(ns, u);
+  N = binomial_rng(ns, 3);
+  N = binomial_rng(ns, 3.5);
+  N = binomial_rng(3, alpha);
+  N = binomial_rng(3, nu);
+  N = binomial_rng(3, ns);
+  N = binomial_rng(3, u);
+  n = binomial_rng(3, 3);
+  n = binomial_rng(3, 3.5);
 
+  N = neg_binomial_2_log_rng(alpha, alpha);
+  N = neg_binomial_2_log_rng(alpha, nu);
+  N = neg_binomial_2_log_rng(alpha, ns);
+  N = neg_binomial_2_log_rng(alpha, u);
+  N = neg_binomial_2_log_rng(alpha, 3);
+  N = neg_binomial_2_log_rng(alpha, 3.5);
+  N = neg_binomial_2_log_rng(nu, alpha);
+  N = neg_binomial_2_log_rng(nu, nu);
+  N = neg_binomial_2_log_rng(nu, ns);
+  N = neg_binomial_2_log_rng(nu, u);
+  N = neg_binomial_2_log_rng(nu, 3);
+  N = neg_binomial_2_log_rng(nu, 3.5);
+  N = neg_binomial_2_log_rng(ns, alpha);
+  N = neg_binomial_2_log_rng(ns, nu);
+  N = neg_binomial_2_log_rng(ns, ns);
+  N = neg_binomial_2_log_rng(ns, u);
+  N = neg_binomial_2_log_rng(ns, 3);
+  N = neg_binomial_2_log_rng(ns, 3.5);
+  N = neg_binomial_2_log_rng(u, alpha);
+  N = neg_binomial_2_log_rng(u, nu);
+  N = neg_binomial_2_log_rng(u, ns);
+  N = neg_binomial_2_log_rng(u, u);
+  N = neg_binomial_2_log_rng(u, 3);
+  N = neg_binomial_2_log_rng(u, 3.5);
+  N = neg_binomial_2_log_rng(3, alpha);
+  N = neg_binomial_2_log_rng(3, nu);
+  N = neg_binomial_2_log_rng(3, ns);
+  N = neg_binomial_2_log_rng(3, u);
+  n = neg_binomial_2_log_rng(3, 3);
+  n = neg_binomial_2_log_rng(3, 3.5);
+  N = neg_binomial_2_log_rng(3.5, alpha);
+  N = neg_binomial_2_log_rng(3.5, nu);
+  N = neg_binomial_2_log_rng(3.5, ns);
+  N = neg_binomial_2_log_rng(3.5, u);
+  n = neg_binomial_2_log_rng(3.5, 3);
+  n = neg_binomial_2_log_rng(3.5, 3.5);
+  N = neg_binomial_2_rng(alpha, alpha);
+  N = neg_binomial_2_rng(alpha, nu);
+  N = neg_binomial_2_rng(alpha, ns);
+  N = neg_binomial_2_rng(alpha, u);
+  N = neg_binomial_2_rng(alpha, 3);
+  N = neg_binomial_2_rng(alpha, 3.5);
+  N = neg_binomial_2_rng(nu, alpha);
+  N = neg_binomial_2_rng(nu, nu);
+  N = neg_binomial_2_rng(nu, ns);
+  N = neg_binomial_2_rng(nu, u);
+  N = neg_binomial_2_rng(nu, 3);
+  N = neg_binomial_2_rng(nu, 3.5);
+  N = neg_binomial_2_rng(ns, alpha);
+  N = neg_binomial_2_rng(ns, nu);
+  N = neg_binomial_2_rng(ns, ns);
+  N = neg_binomial_2_rng(ns, u);
+  N = neg_binomial_2_rng(ns, 3);
+  N = neg_binomial_2_rng(ns, 3.5);
+  N = neg_binomial_2_rng(u, alpha);
+  N = neg_binomial_2_rng(u, nu);
+  N = neg_binomial_2_rng(u, ns);
+  N = neg_binomial_2_rng(u, u);
+  N = neg_binomial_2_rng(u, 3);
+  N = neg_binomial_2_rng(u, 3.5);
+  N = neg_binomial_2_rng(3, alpha);
+  N = neg_binomial_2_rng(3, nu);
+  N = neg_binomial_2_rng(3, ns);
+  N = neg_binomial_2_rng(3, u);
+  n = neg_binomial_2_rng(3, 3);
+  n = neg_binomial_2_rng(3, 3.5);
+  N = neg_binomial_2_rng(3.5, alpha);
+  N = neg_binomial_2_rng(3.5, nu);
+  N = neg_binomial_2_rng(3.5, ns);
+  N = neg_binomial_2_rng(3.5, u);
+  n = neg_binomial_2_rng(3.5, 3);
+  n = neg_binomial_2_rng(3.5, 3.5);
+  N = neg_binomial_rng(alpha, alpha);
+  N = neg_binomial_rng(alpha, nu);
+  N = neg_binomial_rng(alpha, ns);
+  N = neg_binomial_rng(alpha, u);
+  N = neg_binomial_rng(alpha, 3);
+  N = neg_binomial_rng(alpha, 3.5);
+  N = neg_binomial_rng(nu, alpha);
+  N = neg_binomial_rng(nu, nu);
+  N = neg_binomial_rng(nu, ns);
+  N = neg_binomial_rng(nu, u);
+  N = neg_binomial_rng(nu, 3);
+  N = neg_binomial_rng(nu, 3.5);
+  N = neg_binomial_rng(ns, alpha);
+  N = neg_binomial_rng(ns, nu);
+  N = neg_binomial_rng(ns, ns);
+  N = neg_binomial_rng(ns, u);
+  N = neg_binomial_rng(ns, 3);
+  N = neg_binomial_rng(ns, 3.5);
+  N = neg_binomial_rng(u, alpha);
+  N = neg_binomial_rng(u, nu);
+  N = neg_binomial_rng(u, ns);
+  N = neg_binomial_rng(u, u);
+  N = neg_binomial_rng(u, 3);
+  N = neg_binomial_rng(u, 3.5);
+  N = neg_binomial_rng(3, alpha);
+  N = neg_binomial_rng(3, nu);
+  N = neg_binomial_rng(3, ns);
+  N = neg_binomial_rng(3, u);
+  n = neg_binomial_rng(3, 3);
+  n = neg_binomial_rng(3, 3.5);
+  N = neg_binomial_rng(3.5, alpha);
+  N = neg_binomial_rng(3.5, nu);
+  N = neg_binomial_rng(3.5, ns);
+  N = neg_binomial_rng(3.5, u);
+  n = neg_binomial_rng(3.5, 3);
+  n = neg_binomial_rng(3.5, 3.5);
+
+  x = uniform_rng(alpha, alpha);
+  x = uniform_rng(alpha, nu);
+  x = uniform_rng(alpha, ns);
+  x = uniform_rng(alpha, u);
+  x = uniform_rng(alpha, 3);
+  x = uniform_rng(alpha, 3.5);
+  x = uniform_rng(nu, alpha);
+  x = uniform_rng(nu, nu);
+  x = uniform_rng(nu, ns);
+  x = uniform_rng(nu, u);
+  x = uniform_rng(nu, 3);
+  x = uniform_rng(nu, 3.5);
+  x = uniform_rng(ns, alpha);
+  x = uniform_rng(ns, nu);
+  x = uniform_rng(ns, ns);
+  x = uniform_rng(ns, u);
+  x = uniform_rng(ns, 3);
+  x = uniform_rng(ns, 3.5);
+  x = uniform_rng(u, alpha);
+  x = uniform_rng(u, nu);
+  x = uniform_rng(u, ns);
+  x = uniform_rng(u, u);
+  x = uniform_rng(u, 3);
+  x = uniform_rng(u, 3.5);
+  x = uniform_rng(3, alpha);
+  x = uniform_rng(3, nu);
+  x = uniform_rng(3, ns);
+  x = uniform_rng(3, u);
+  z = uniform_rng(3, 3);
+  z = uniform_rng(3, 3.5);
+  x = uniform_rng(3.5, alpha);
+  x = uniform_rng(3.5, nu);
+  x = uniform_rng(3.5, ns);
+  x = uniform_rng(3.5, u);
+  z = uniform_rng(3.5, 3);
+  z = uniform_rng(3.5, 3.5);
+
+  x = von_mises_rng(alpha, alpha);
+  x = von_mises_rng(alpha, nu);
+  x = von_mises_rng(alpha, ns);
+  x = von_mises_rng(alpha, u);
+  x = von_mises_rng(alpha, 3);
+  x = von_mises_rng(alpha, 3.5);
+  x = von_mises_rng(nu, alpha);
+  x = von_mises_rng(nu, nu);
+  x = von_mises_rng(nu, ns);
+  x = von_mises_rng(nu, u);
+  x = von_mises_rng(nu, 3);
+  x = von_mises_rng(nu, 3.5);
+  x = von_mises_rng(ns, alpha);
+  x = von_mises_rng(ns, nu);
+  x = von_mises_rng(ns, ns);
+  x = von_mises_rng(ns, u);
+  x = von_mises_rng(ns, 3);
+  x = von_mises_rng(ns, 3.5);
+  x = von_mises_rng(u, alpha);
+  x = von_mises_rng(u, nu);
+  x = von_mises_rng(u, ns);
+  x = von_mises_rng(u, u);
+  x = von_mises_rng(u, 3);
+  x = von_mises_rng(u, 3.5);
+  x = von_mises_rng(3, alpha);
+  x = von_mises_rng(3, nu);
+  x = von_mises_rng(3, ns);
+  x = von_mises_rng(3, u);
+  z = von_mises_rng(3, 3);
+  z = von_mises_rng(3, 3.5);
+  x = von_mises_rng(3.5, alpha);
+  x = von_mises_rng(3.5, nu);
+  x = von_mises_rng(3.5, ns);
+  x = von_mises_rng(3.5, u);
+  z = von_mises_rng(3.5, 3);
+  z = von_mises_rng(3.5, 3.5);
+
+  // n = binomial_logit_rng(15,-1.2);
+  
+  N = beta_binomial_rng(ns, alpha, alpha);
+  N = beta_binomial_rng(ns, alpha, nu);
+  N = beta_binomial_rng(ns, alpha, ns);
+  N = beta_binomial_rng(ns, alpha, u);
+  N = beta_binomial_rng(ns, alpha, 3);
+  N = beta_binomial_rng(ns, alpha, 3.5);
+  N = beta_binomial_rng(ns, nu, alpha);
+  N = beta_binomial_rng(ns, nu, nu);
+  N = beta_binomial_rng(ns, nu, ns);
+  N = beta_binomial_rng(ns, nu, u);
+  N = beta_binomial_rng(ns, nu, 3);
+  N = beta_binomial_rng(ns, nu, 3.5);
+  N = beta_binomial_rng(ns, ns, alpha);
+  N = beta_binomial_rng(ns, ns, nu);
+  N = beta_binomial_rng(ns, ns, ns);
+  N = beta_binomial_rng(ns, ns, u);
+  N = beta_binomial_rng(ns, ns, 3);
+  N = beta_binomial_rng(ns, ns, 3.5);
+  N = beta_binomial_rng(ns, u, alpha);
+  N = beta_binomial_rng(ns, u, nu);
+  N = beta_binomial_rng(ns, u, ns);
+  N = beta_binomial_rng(ns, u, u);
+  N = beta_binomial_rng(ns, u, 3);
+  N = beta_binomial_rng(ns, u, 3.5);
+  N = beta_binomial_rng(ns, 3, alpha);
+  N = beta_binomial_rng(ns, 3, nu);
+  N = beta_binomial_rng(ns, 3, ns);
+  N = beta_binomial_rng(ns, 3, u);
+  N = beta_binomial_rng(ns, 3, 3);
+  N = beta_binomial_rng(ns, 3, 3.5);
+  N = beta_binomial_rng(ns, 3.5, alpha);
+  N = beta_binomial_rng(ns, 3.5, nu);
+  N = beta_binomial_rng(ns, 3.5, ns);
+  N = beta_binomial_rng(ns, 3.5, u);
+  N = beta_binomial_rng(ns, 3.5, 3);
+  N = beta_binomial_rng(ns, 3.5, 3.5);
+  N = beta_binomial_rng(3, alpha, alpha);
+  N = beta_binomial_rng(3, alpha, nu);
+  N = beta_binomial_rng(3, alpha, ns);
+  N = beta_binomial_rng(3, alpha, u);
+  N = beta_binomial_rng(3, alpha, 3);
+  N = beta_binomial_rng(3, alpha, 3.5);
+  N = beta_binomial_rng(3, nu, alpha);
+  N = beta_binomial_rng(3, nu, nu);
+  N = beta_binomial_rng(3, nu, ns);
+  N = beta_binomial_rng(3, nu, u);
+  N = beta_binomial_rng(3, nu, 3);
+  N = beta_binomial_rng(3, nu, 3.5);
+  N = beta_binomial_rng(3, ns, alpha);
+  N = beta_binomial_rng(3, ns, nu);
+  N = beta_binomial_rng(3, ns, ns);
+  N = beta_binomial_rng(3, ns, u);
+  N = beta_binomial_rng(3, ns, 3);
+  N = beta_binomial_rng(3, ns, 3.5);
+  N = beta_binomial_rng(3, u, alpha);
+  N = beta_binomial_rng(3, u, nu);
+  N = beta_binomial_rng(3, u, ns);
+  N = beta_binomial_rng(3, u, u);
+  N = beta_binomial_rng(3, u, 3);
+  N = beta_binomial_rng(3, u, 3.5);
+  N = beta_binomial_rng(3, 3, alpha);
+  N = beta_binomial_rng(3, 3, nu);
+  N = beta_binomial_rng(3, 3, ns);
+  N = beta_binomial_rng(3, 3, u);
+  n = beta_binomial_rng(3, 3, 3);
+  n = beta_binomial_rng(3, 3, 3.5);
+  N = beta_binomial_rng(3, 3.5, alpha);
+  N = beta_binomial_rng(3, 3.5, nu);
+  N = beta_binomial_rng(3, 3.5, ns);
+  N = beta_binomial_rng(3, 3.5, u);
+  n = beta_binomial_rng(3, 3.5, 3);
+  n = beta_binomial_rng(3, 3.5, 3.5);
+
+  n = hypergeometric_rng(5,4,9);
+  n = ordered_logistic_rng(1.9,theta);
+
+  N = bernoulli_rng(alpha);
+  N = bernoulli_rng(nu);
+  N = bernoulli_rng(ns);
+  N = bernoulli_rng(u);
+  n = bernoulli_rng(3);
+  n = bernoulli_rng(3.5);
+  
+  N = poisson_rng(alpha);
+  N = poisson_rng(nu);
+  N = poisson_rng(ns);
+  N = poisson_rng(u);
+  n = poisson_rng(3);
+  n = poisson_rng(3.5);
+  
+  N = poisson_log_rng(alpha);
+  N = poisson_log_rng(nu);
+  N = poisson_log_rng(ns);
+  N = poisson_log_rng(u);
+  n = poisson_log_rng(3);
+  n = poisson_log_rng(3.5);
+  
   n = categorical_rng(theta);
   n = categorical_logit_rng(theta);
   ns = multinomial_rng(theta,20);
@@ -41,18 +329,21 @@ generated quantities {
   x = chi_square_rng(u);
   z = chi_square_rng(3);
   z = chi_square_rng(3.5);
+  
   x = inv_chi_square_rng(alpha);
   x = inv_chi_square_rng(nu);
   x = inv_chi_square_rng(ns);
   x = inv_chi_square_rng(u);
   z = inv_chi_square_rng(3);
   z = inv_chi_square_rng(3.5);
+  
   x = exponential_rng(alpha);
   x = exponential_rng(nu);
   x = exponential_rng(ns);
   x = exponential_rng(u);
   z = exponential_rng(3);
   z = exponential_rng(3.5);
+  
   x = rayleigh_rng(alpha);
   x = rayleigh_rng(nu);
   x = rayleigh_rng(ns);
@@ -96,6 +387,7 @@ generated quantities {
   x = beta_rng(0.35, u);
   z = beta_rng(0.35, 0.3);
   z = beta_rng(0.35, 0.35);
+  
   x = normal_rng(alpha, alpha);
   x = normal_rng(alpha, nu);
   x = normal_rng(alpha, ns);
@@ -132,6 +424,7 @@ generated quantities {
   x = normal_rng(3.5, u);
   z = normal_rng(3.5, 3);
   z = normal_rng(3.5, 3.5);
+  
   x = cauchy_rng(alpha, alpha);
   x = cauchy_rng(alpha, nu);
   x = cauchy_rng(alpha, ns);
@@ -168,6 +461,7 @@ generated quantities {
   x = cauchy_rng(3.5, u);
   z = cauchy_rng(3.5, 3);
   z = cauchy_rng(3.5, 3.5);
+  
   x = double_exponential_rng(alpha, alpha);
   x = double_exponential_rng(alpha, nu);
   x = double_exponential_rng(alpha, ns);
@@ -204,6 +498,7 @@ generated quantities {
   x = double_exponential_rng(3.5, u);
   z = double_exponential_rng(3.5, 3);
   z = double_exponential_rng(3.5, 3.5);
+  
   x = logistic_rng(alpha, alpha);
   x = logistic_rng(alpha, nu);
   x = logistic_rng(alpha, ns);
@@ -240,6 +535,7 @@ generated quantities {
   x = logistic_rng(3.5, u);
   z = logistic_rng(3.5, 3);
   z = logistic_rng(3.5, 3.5);
+  
   x = gumbel_rng(alpha, alpha);
   x = gumbel_rng(alpha, nu);
   x = gumbel_rng(alpha, ns);
@@ -276,6 +572,7 @@ generated quantities {
   x = gumbel_rng(3.5, u);
   z = gumbel_rng(3.5, 3);
   z = gumbel_rng(3.5, 3.5);
+  
   x = lognormal_rng(alpha, alpha);
   x = lognormal_rng(alpha, nu);
   x = lognormal_rng(alpha, ns);
@@ -312,6 +609,7 @@ generated quantities {
   x = lognormal_rng(3.5, u);
   z = lognormal_rng(3.5, 3);
   z = lognormal_rng(3.5, 3.5);
+  
   x = scaled_inv_chi_square_rng(alpha, alpha);
   x = scaled_inv_chi_square_rng(alpha, nu);
   x = scaled_inv_chi_square_rng(alpha, ns);
@@ -348,6 +646,7 @@ generated quantities {
   x = scaled_inv_chi_square_rng(3.5, u);
   z = scaled_inv_chi_square_rng(3.5, 3);
   z = scaled_inv_chi_square_rng(3.5, 3.5);
+  
   x = gamma_rng(alpha, alpha);
   x = gamma_rng(alpha, nu);
   x = gamma_rng(alpha, ns);
@@ -384,6 +683,7 @@ generated quantities {
   x = gamma_rng(3.5, u);
   z = gamma_rng(3.5, 3);
   z = gamma_rng(3.5, 3.5);
+  
   x = inv_gamma_rng(alpha, alpha);
   x = inv_gamma_rng(alpha, nu);
   x = inv_gamma_rng(alpha, ns);
@@ -420,6 +720,7 @@ generated quantities {
   x = inv_gamma_rng(3.5, u);
   z = inv_gamma_rng(3.5, 3);
   z = inv_gamma_rng(3.5, 3.5);
+  
   x = weibull_rng(alpha, alpha);
   x = weibull_rng(alpha, nu);
   x = weibull_rng(alpha, ns);
@@ -456,6 +757,7 @@ generated quantities {
   x = weibull_rng(3.5, u);
   z = weibull_rng(3.5, 3);
   z = weibull_rng(3.5, 3.5);
+  
   x = frechet_rng(alpha, alpha);
   x = frechet_rng(alpha, nu);
   x = frechet_rng(alpha, ns);
@@ -492,6 +794,7 @@ generated quantities {
   x = frechet_rng(3.5, u);
   z = frechet_rng(3.5, 3);
   z = frechet_rng(3.5, 3.5);
+  
   x = pareto_rng(alpha, alpha);
   x = pareto_rng(alpha, nu);
   x = pareto_rng(alpha, ns);
@@ -745,6 +1048,7 @@ generated quantities {
   x = exp_mod_normal_rng(3.5, 3.5, u);
   z = exp_mod_normal_rng(3.5, 3.5, 3);
   z = exp_mod_normal_rng(3.5, 3.5, 3.5);
+  
   x = pareto_type_2_rng(alpha, alpha, alpha);
   x = pareto_type_2_rng(alpha, alpha, nu);
   x = pareto_type_2_rng(alpha, alpha, ns);
@@ -961,6 +1265,7 @@ generated quantities {
   x = pareto_type_2_rng(3.5, 3.5, u);
   z = pareto_type_2_rng(3.5, 3.5, 3);
   z = pareto_type_2_rng(3.5, 3.5, 3.5);
+  
   x = skew_normal_rng(alpha, alpha, alpha);
   x = skew_normal_rng(alpha, alpha, nu);
   x = skew_normal_rng(alpha, alpha, ns);
@@ -1177,6 +1482,7 @@ generated quantities {
   x = skew_normal_rng(3.5, 3.5, u);
   z = skew_normal_rng(3.5, 3.5, 3);
   z = skew_normal_rng(3.5, 3.5, 3.5);
+  
   x = student_t_rng(alpha, alpha, alpha);
   x = student_t_rng(alpha, alpha, nu);
   x = student_t_rng(alpha, alpha, ns);
@@ -1395,17 +1701,26 @@ generated quantities {
   z = student_t_rng(3.5, 3.5, 3.5);
 
   theta = dirichlet_rng(alpha);
-  v = multi_normal_rng(mu,Sigma);
+  
+  v = multi_normal_rng(mu, Sigma);
+  v = multi_normal_rng(nu, Sigma);
+  v_array = multi_normal_rng(mu_array, Sigma);
+  v_array = multi_normal_rng(nu_array, Sigma);
+
+  v = multi_normal_cholesky_rng(mu, Sigma);
+  v = multi_normal_cholesky_rng(nu, Sigma);
+  v_array = multi_normal_cholesky_rng(mu_array, Sigma);
+  v_array = multi_normal_cholesky_rng(nu_array, Sigma);
+
+  v = multi_student_t_rng(3.0, mu, Sigma);
+  v = multi_student_t_rng(3.0, nu, Sigma);
+  v_array = multi_student_t_rng(3.0, mu_array, Sigma);
+  v_array = multi_student_t_rng(3.0, nu_array, Sigma);
+  
   // v = multi_normal_prec_rng(mu,Sigma);
-  v = multi_normal_cholesky_rng(mu,L);
-  v = multi_student_t_rng(3.0,mu,Sigma);
   Sigma = wishart_rng(3.0,Sigma);
   Sigma = inv_wishart_rng(3.0,Sigma);
   Sigma = lkj_corr_rng(3,2.5);
   L = lkj_corr_cholesky_rng(3,3.0);
   // DEPRECATE:  Sigma = lkj_cov_rng(Sigma, mu, alpha, 2.0);
-
-
-
-
 }

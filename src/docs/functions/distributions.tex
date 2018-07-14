@@ -312,13 +312,13 @@ real x[3] = normal_rng(mu, sigma);
 
 The result of a vectorized PRNG function depends on the size of the
 arguments and the distribution's support.  If all arguments are
-scalars, then the return type is a scalar.  If there are any
-non-scalar arguments, the return type is a real array (\code{real[]})
-matching the size of any of the non-scalar arguments, as all
-non-scalar arguments must have matching size.  Discrete distributions
-return \code{ints} and continuous distributions return \code{reals},
-each of appropriate size.  The symbol \code{R} denotes such a return
-type.
+scalars, then the return type is a scalar.  For a continuous
+distribution, if there are any non-scalar arguments, the return type
+is a real array (\code{real[]}) matching the size of any of the
+non-scalar arguments, as all non-scalar arguments must have matching
+size.  Discrete distributions return \code{ints} and continuous
+distributions return \code{reals}, each of appropriate size.  The
+symbol \code{R} denotes such a return type.
 
 \chapter{Binary Distributions}
 
@@ -373,9 +373,10 @@ If $\theta \in [0,1]$, then for $y \in \setlist{0,1}$,
 \end{description}
 %
 \begin{description}
-\fitem{int}{bernoulli\_rng}{real \farg{theta}}{Generate a Bernoulli
-  variate with chance of success \farg{theta}; may only be used in
-  generated quantities block}
+  \fitem{R}{bernoulli\_rng}{reals \farg{theta}}{Generate a Bernoulli
+    variate with chance of success \farg{theta}; may only be used in
+    generated quantities block.  For a description of argument and
+    return types, see \refsection{prng-vectorization}.}
 \end{description}
 
 \section{Bernoulli Distribution, Logit Parameterization}\label{bernoulli-logit-distribution.section}
@@ -487,9 +488,11 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
 \end{description}
 %
 \begin{description}
-\fitem{int}{binomial\_rng}{int \farg{N}, real \farg{theta}}{Generate a binomial
+\fitem{R}{binomial\_rng}{ints \farg{N}, reals \farg{theta}}{Generate a binomial
   variate with \farg{N} trials and chance of success \farg{theta}; may only be used in
-  generated quantities block}
+  generated quantities block.  For a description of argument and
+  return types, see \refsection{prng-vectorization}.
+}
 \end{description}
 
 
@@ -603,10 +606,12 @@ where the beta function $\Betafun(u,v)$ is defined for $u \in
 \end{description}
 %
 \begin{description}
-\fitem{int}{beta\_binomial\_rng}{int \farg{N}, real \farg{alpha}, real
-   \farg{beta}}{Generate a beta-binomial variate with \farg{N} trials, prior
-   success count (plus one) of \farg{alpha}, and prior failure count (plus
-   one) of \farg{beta}; may only be used in generated quantities block}
+  \fitem{R}{beta\_binomial\_rng}{ints \farg{N}, reals \farg{alpha},
+    reals \farg{beta}}{Generate a beta-binomial variate with \farg{N}
+    trials, prior success count (plus one) of \farg{alpha}, and prior
+    failure count (plus one) of \farg{beta}; may only be used in
+    generated quantities block.  For a description of argument and
+    return types, see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -889,10 +894,12 @@ The mean and variance of a random variable $y \sim
    complementary cumulative distribution function of \farg{n}
    given shape \farg{alpha} and inverse scale \farg{beta}}
 %
-\fitem{int}{neg\_binomial\_rng}{real \farg{alpha}, real \farg{beta}}{Generate a
-  negative binomial variate with shape \farg{alpha} and inverse scale
-\farg{beta}; may only be used in generated quantities block. \farg{alpha} $/$ \farg{beta}
-must be less than $2 ^ {29}$}
+ \fitem{R}{neg\_binomial\_rng}{reals \farg{alpha}, reals
+   \farg{beta}}{Generate a negative binomial variate with shape
+   \farg{alpha} and inverse scale \farg{beta}; may only be used in
+   generated quantities block. \farg{alpha} $/$ \farg{beta} must be
+   less than $2 ^ {29}$.  For a description of argument and return
+   types, see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -957,11 +964,11 @@ $\mu^2$.
    complementary cumulative distribution function of \farg{n}
    given location \farg{mu} and precision \farg{phi}.}
 %
-\fitem{int}{neg\_binomial\_2\_rng}{real \farg{mu}, real \farg{phi}}{
-  Generate a negative binomial variate with location
-  \farg{mu} and precision \farg{phi}; may only be used in
-  generated quantities block.
-  \farg{mu} must be less than $2 ^ {29}$.}
+ \fitem{R}{neg\_binomial\_2\_rng}{reals \farg{mu}, reals \farg{phi}}{
+   Generate a negative binomial variate with location \farg{mu} and
+   precision \farg{phi}; may only be used in generated quantities
+   block.  \farg{mu} must be less than $2 ^ {29}$.  For a description
+   of argument and return types, see \refsection{prng-vectorization}.}
 %
 \end{description}
 
@@ -993,10 +1000,13 @@ for it.
     inverse overdispersion control \farg{phi}. This is especially
     useful for log-linear negative binomial regressions.}
 %
-\fitem{int}{neg\_binomial\_2\_log\_rng}{real \farg{eta}, real \farg{phi}}{
-  Generate a negative binomial variate with log-location \farg{eta}
-  and inverse overdispersion control \farg{phi}; may only be used in generated
-  quantities block. \farg{eta} must be less than $29 \log 2$.}
+  \fitem{R}{neg\_binomial\_2\_log\_rng}{reals \farg{eta}, reals
+    \farg{phi}}{ Generate a negative binomial variate with
+    log-location \farg{eta} and inverse overdispersion control
+    \farg{phi}; may only be used in generated quantities
+    block. \farg{eta} must be less than $29 \log 2$.  For a
+    description of argument and return types, see
+    \refsection{prng-vectorization}.}
 %
 \end{description}
 
@@ -1032,9 +1042,11 @@ If $\lambda \in \posreals$, then for $n \in \nats$,
 \fitem{real}{poisson\_lccdf}{ints \farg{n} \textbar\ reals \farg{lambda}}{The log of the
   Poisson complementary cumulative distribution function of \farg{n} given rate \farg{lambda}}
 %
-\fitem{int}{poisson\_rng}{real \farg{lambda}}{Generate a Poisson variate with
-  rate \farg{lambda}; may only be used in generated quantities block. \farg{lambda} must be
-less than $2^{30}$.}
+\fitem{R}{poisson\_rng}{reals \farg{lambda}}{Generate a Poisson
+  variate with rate \farg{lambda}; may only be used in generated
+  quantities block. \farg{lambda} must be less than $2^{30}$.  For a
+  description of argument and return types, see
+  \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -1066,9 +1078,11 @@ If $\alpha \in \reals$, then for $n \in \nats$,
 \fitem{real}{poisson\_log\_lpmf}{ints \farg{n} \textbar\ reals \farg{alpha}}{The
   log Poisson probability mass of \farg{n} given log rate \farg{alpha}}
 %
-\fitem{int}{poisson\_log\_rng}{real \farg{alpha}}{Generate a Poisson variate with
-log rate \farg{alpha}; may only be used in generated quantities block. \farg{alpha} must
-be less than $30 \log 2$}
+\fitem{R}{poisson\_log\_rng}{reals \farg{alpha}}{Generate a Poisson
+  variate with log rate \farg{alpha}; may only be used in generated
+  quantities block. \farg{alpha} must be less than $30 \log 2$.  For a
+  description of argument and return types, see
+  \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -2441,10 +2455,11 @@ If $\alpha \in \reals$ and $\beta \in (\alpha,\infty)$, then for $y
 \end{description}
 %
 \begin{description}
-\fitem{real}{uniform\_rng}{real \farg{alpha}, real
-  \farg{beta}}{Generate a uniform variate with lower bound
-  \farg{alpha} and upper bound \farg{beta}; may only
-    be used in generated quantities block}
+  \fitem{R}{uniform\_rng}{reals \farg{alpha}, reals
+    \farg{beta}}{Generate a uniform variate with lower bound
+    \farg{alpha} and upper bound \farg{beta}; may only be used in
+    generated quantities block.  For a description of argument and
+    return types, see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -2521,6 +2536,21 @@ covariance matrix and call \code{multi\_normal\_cholesky\_rng};  see \refsection
 \begin{description}
 \fitem{vector}{multi\_normal\_rng}{vector \farg{mu}, matrix
   \farg{Sigma}}{Generate a multivariate normal variate with location
+  \farg{mu} and covariance matrix \farg{Sigma}; may only be used in
+generated quantities block}
+%
+\fitem{vector}{multi\_normal\_rng}{row\_vector \farg{mu}, matrix
+  \farg{Sigma}}{Generate a multivariate normal variate with location
+  \farg{mu} and covariance matrix \farg{Sigma}; may only be used in
+generated quantities block}
+%
+\fitem{vectors}{multi\_normal\_rng}{vectors \farg{mu}, matrix
+  \farg{Sigma}}{Generate an array of multivariate normal variates with locations
+  \farg{mu} and covariance matrix \farg{Sigma}; may only be used in
+generated quantities block}
+%
+\fitem{vectors}{multi\_normal\_rng}{row\_vectors \farg{mu}, matrix
+  \farg{Sigma}}{Generate an array of multivariate normal variates with locations
   \farg{mu} and covariance matrix \farg{Sigma}; may only be used in
 generated quantities block}
 \end{description}
@@ -2616,6 +2646,21 @@ positive-definite matrix, the probability functions will raise errors.
 \begin{description}
 \fitem{vector}{multi\_normal\_cholesky\_rng}{vector \farg{mu}, matrix
   \farg{L}}{Generate a multivariate normal variate with location
+  \farg{mu} and lower-triangular Cholesky factor of the covariance
+  matrix \farg{L}; may only be used in generated quantities block}
+%
+\fitem{vector}{multi\_normal\_cholesky\_rng}{row\_vector \farg{mu}, matrix
+  \farg{L}}{Generate a multivariate normal variate with location
+  \farg{mu} and lower-triangular Cholesky factor of the covariance
+  matrix \farg{L}; may only be used in generated quantities block}
+%
+\fitem{vectors}{multi\_normal\_cholesky\_rng}{vectors \farg{mu}, matrix
+  \farg{L}}{Generate an array of multivariate normal variates with locations
+  \farg{mu} and lower-triangular Cholesky factor of the covariance
+  matrix \farg{L}; may only be used in generated quantities block}
+%
+\fitem{vectors}{multi\_normal\_cholesky\_rng}{row\_vectors \farg{mu}, matrix
+  \farg{L}}{Generate an array of multivariate normal variates with locations
   \farg{mu} and lower-triangular Cholesky factor of the covariance
   matrix \farg{L}; may only be used in generated quantities block}
 \end{description}
@@ -2750,6 +2795,21 @@ $y \in \reals^K$,
 \fitem{vector}{multi\_student\_t\_rng}{real \farg{nu}, vector \farg{mu}, matrix
   \farg{Sigma}}{Generate a multivariate Student-$t$ variate with degrees
   of freedom \farg{nu}, location \farg{mu}, and scale matrix \farg{Sigma};
+may only be used in generated quantities block}
+%
+\fitem{vector}{multi\_student\_t\_rng}{real \farg{nu}, row\_vector \farg{mu}, matrix
+  \farg{Sigma}}{Generate a multivariate Student-$t$ variate with degrees
+  of freedom \farg{nu}, location \farg{mu}, and scale matrix \farg{Sigma};
+may only be used in generated quantities block}
+%
+\fitem{vectors}{multi\_student\_t\_rng}{real \farg{nu}, vectors \farg{mu}, matrix
+  \farg{Sigma}}{Generate an array of multivariate Student-$t$ variates with degrees
+  of freedom \farg{nu}, locations \farg{mu}, and scale matrix \farg{Sigma};
+may only be used in generated quantities block}
+%
+\fitem{vectors}{multi\_student\_t\_rng}{real \farg{nu}, row\_vectors \farg{mu}, matrix
+  \farg{Sigma}}{Generate an array of multivariate Student-$t$ variates with degrees
+  of freedom \farg{nu}, locations \farg{mu}, and scale matrix \farg{Sigma};
 may only be used in generated quantities block}
 \end{description}
 
