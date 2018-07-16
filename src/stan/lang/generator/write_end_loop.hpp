@@ -1,7 +1,6 @@
 #ifndef STAN_LANG_GENERATOR_WRITE_END_LOOP_HPP
 #define STAN_LANG_GENERATOR_WRITE_END_LOOP_HPP
 
-#include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <ostream>

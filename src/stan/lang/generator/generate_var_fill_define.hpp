@@ -21,10 +21,7 @@ namespace stan {
      */
     void generate_var_fill_define(const block_var_decl& var_decl,
                                   int indent, std::ostream& o) {
-      // unfold array type to get array element info
-      block_var_type btype = var_decl.type();
-      if (btype.is_array_type())
-        btype = btype.array_contains();
+      block_var_type btype = var_decl.type().innermost_type();
 
       // fill
       generate_indent(indent, o);

@@ -23,13 +23,9 @@ namespace stan {
                               const std::string& scalar_t_name,
                               std::ostream& o) {
       std::vector<expression> ar_dim_sizes = var_type.array_lens();
-      bare_expr_type bare_type = var_type.array_element_type().bare_type();
+      bare_expr_type bare_type = var_type.array_element_type().bare_type().innermost_type();
       expression arg1 = var_type.arg1();
       expression arg2 = var_type.arg2();
-      if (var_type.is_array_type()) {
-        arg1 = var_type.array_contains().arg1();
-        arg2 = var_type.array_contains().arg2();
-      }
 
       // size of each array dimension (adds open paren)
       for (size_t i = 0; i < ar_dim_sizes.size(); ++i) {

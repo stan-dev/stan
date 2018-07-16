@@ -15,7 +15,6 @@ namespace stan {
      */
     void write_resize_var_idx(size_t num_ar_dims,
                               std::ostream& o) {
-      if (num_ar_dims == 1) return;
       for (size_t i = 0; i < num_ar_dims - 1; ++i)
         o << "[d_" << i << "__]";
     }

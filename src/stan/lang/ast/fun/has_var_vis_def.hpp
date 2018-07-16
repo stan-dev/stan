@@ -40,7 +40,7 @@ bool has_var_vis::operator()(const variable& e) const {
   scope var_scope = var_map_.get_scope(e.name_);
   return var_scope.par_or_tpar()
          || (var_scope.local_allows_var()
-             && !(e.type_.base().is_int_type()));
+             && !(e.type_.innermost_type().is_int_type()));
 }
 
 bool has_var_vis::operator()(const fun& e) const {

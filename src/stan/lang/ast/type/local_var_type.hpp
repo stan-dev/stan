@@ -155,6 +155,12 @@ struct local_var_type {
   bare_expr_type bare_type() const;
 
   /**
+   * If array type, returns innermost type,
+   * otherwise returns this type.
+   */
+  local_var_type innermost_type() const;
+
+  /**
    * Returns true if `var_type_` is `local_array_type`, false otherwise.
    */
   bool is_array_type() const;

@@ -191,7 +191,7 @@ struct bare_expr_type {
    * If array type, returns bare_expr_type of innermost type,
    * otherwise returns this type.
    */
-  bare_expr_type base() const;
+  bare_expr_type innermost_type() const;
 
   /**
    * Returns true if `bare_type_` is `bare_array_type`, false otherwise.

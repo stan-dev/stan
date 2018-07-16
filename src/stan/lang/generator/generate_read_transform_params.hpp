@@ -30,9 +30,7 @@ namespace stan {
       for (size_t i = 0; i < vs.size(); ++i) {
         std::string var_name(vs[i].name());
         block_var_type vtype = vs[i].type();
-        block_var_type el_type = vs[i].type();
-        if (el_type.is_array_type())
-          el_type = el_type.array_contains();
+        block_var_type el_type = vs[i].type().innermost_type();
 
         // declare
         generate_indent(indent, o);

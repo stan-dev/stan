@@ -81,7 +81,7 @@ int bare_expr_type::array_dims() const {
   return 0;
 }
 
-bare_expr_type bare_expr_type::base() const {
+bare_expr_type bare_expr_type::innermost_type() const {
   if (boost::get<stan::lang::bare_array_type>(&bare_type_)) {
     bare_array_type bat = boost::get<stan::lang::bare_array_type>(bare_type_);
     return bat.contains();

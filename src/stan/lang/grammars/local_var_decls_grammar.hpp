@@ -11,7 +11,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <utility>
 
 namespace stan {
   namespace lang {

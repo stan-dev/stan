@@ -100,6 +100,15 @@ bare_expr_type local_var_type::bare_type() const {
   bare_type_vis vis;
   return boost::apply_visitor(vis, var_type_);
 }
+  
+local_var_type local_var_type::innermost_type() const {
+  if (boost::get<stan::lang::local_array_type>(&var_type_)) {
+    local_array_type vt = boost::get<stan::lang::local_array_type>(var_type_);
+    return vt.contains();
+  }
+  return var_type_;
+}
+
 
 bool local_var_type::is_array_type() const {
   if (boost::get<stan::lang::local_array_type>(&var_type_))

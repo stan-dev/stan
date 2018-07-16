@@ -220,15 +220,15 @@ namespace stan {
 
       // allow int -> double promotion, even in arrays
       bool types_compatible =
-        (lhs_type.base() == rhs_expr.bare_type().base()
-         || (lhs_type.base().is_double_type()
-             && rhs_expr.bare_type().base().is_int_type()));
+        (lhs_type.innermost_type() == rhs_expr.bare_type().innermost_type()
+         || (lhs_type.innermost_type().is_double_type()
+             && rhs_expr.bare_type().innermost_type().is_int_type()));
       if (!types_compatible) {
         error_msgs << "Base type mismatch in " << stmt_type
                    << "; variable name = " << name
-                   << ", base type = " << lhs_type.base()
+                   << ", base type = " << lhs_type.innermost_type()
                    << "; right-hand side base type = "
-                   << rhs_expr.bare_type().base()
+                   << rhs_expr.bare_type().innermost_type()
                    << "." << std::endl;
         return false;
       }
@@ -634,7 +634,7 @@ namespace stan {
       }
 
       if (ends_with("_lpdf", decl.name_)
-          && arg_types[0].base().is_int_type()) {
+          && arg_types[0].innermost_type().is_int_type()) {
         error_msgs << "Parse Error.  Probability density functions require"
                    << " real variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
@@ -642,7 +642,7 @@ namespace stan {
         return;
       }
       if (ends_with("_lpmf", decl.name_)
-          && !arg_types[0].base().is_int_type()) {
+          && !arg_types[0].innermost_type().is_int_type()) {
         error_msgs << "Parse Error.  Probability mass functions require"
                    << " integer variates (first argument)."
                    << " Found type = " << arg_types[0] << std::endl;
@@ -677,7 +677,7 @@ namespace stan {
         pass = false;
         return;
       }
-      bare_expr_type variate_type = decl.arg_decls_[0].bare_type().base();
+      bare_expr_type variate_type = decl.arg_decls_[0].bare_type().innermost_type();
       if (ends_with("_lpdf", decl.name_)
           && variate_type.is_int_type()) {
         error_msgs << "Parse Error.  Probability density functions require"
@@ -777,7 +777,7 @@ namespace stan {
 
     void validate_ints_expression::operator()(const expression& e, bool& pass,
                                               std::ostream& error_msgs) const {
-      if (!e.bare_type().base().is_int_type()) {
+      if (!e.bare_type().innermost_type().is_int_type()) {
         error_msgs << "Container index must be integer; found type="
                    << e.bare_type() << std::endl;
         pass = false;
@@ -1058,7 +1058,7 @@ namespace stan {
         }
         if (lhs_type.is_primitive()
             && rhs_type.is_primitive()
-            && (lhs_type.base().is_double_type()
+            && (lhs_type.innermost_type().is_double_type()
                 || lhs_type == rhs_type)) {
           pass = true;
           return;
@@ -3164,7 +3164,7 @@ namespace stan {
         return;
       }
       if (var_scope.par_or_tpar()
-          && decl.bare_type().base().is_int_type()) {
+          && decl.bare_type().innermost_type().is_int_type()) {
         error_msgs << "Parameters or transformed parameters"
                    << " cannot be integer or integer array; "
                    << " found int variable declaration, name="

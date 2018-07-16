@@ -33,13 +33,11 @@ namespace stan {
                                 int indent, std::ostream& o) {
       // setup - name, type, and var shape
       std::string var_name(var_decl.name());
-      block_var_type vtype = (var_decl.type());
-      block_var_type el_type = (var_decl.type());
-      if (el_type.is_array_type())
-        el_type = el_type.array_contains();
+      block_var_type vtype = var_decl.type();
+      block_var_type el_type = var_decl.type().innermost_type();
 
       std::string vals("vals_r");
-      if (vtype.bare_type().base().is_int_type())
+      if (vtype.bare_type().innermost_type().is_int_type())
         vals = "vals_i";
 
       generate_indent(indent, o);

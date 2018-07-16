@@ -22,9 +22,7 @@ namespace stan {
     get_block_var_dims(const block_var_decl decl) {
       std::vector<expression> dims;
 
-      block_var_type bt = decl.type();
-      if (bt.is_array_type())
-        bt = bt.array_contains();
+      block_var_type bt = decl.type().innermost_type();
       if (bt.bare_type().is_matrix_type()) {
         dims.push_back(bt.arg2());
         dims.push_back(bt.arg1());

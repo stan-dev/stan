@@ -236,9 +236,21 @@ struct block_var_type {
   range bounds() const;
 
   /**
+   * Returns true if there are specified upper and/or lower bounds
+   * for this type (contained type for arrays), false otherwise.
+   */
+  bool has_def_bounds() const;
+
+  /**
    * Returns true if `var_type_` is `block_array_type`, false otherwise.
    */
   bool is_array_type() const;
+
+  /**
+   * Returns true if `var_type_` has either specified bounds or
+   * is a specialized vector or matrix type.
+   */
+  bool is_constrained() const;
 
   /**
    * Returns true if `var_type_` is a specialized vector or matrix type.
@@ -247,10 +259,10 @@ struct block_var_type {
   bool is_specialized() const;
 
   /**
-   * Returns true if there are specified upper and/or lower bounds
-   * for this type (contained type for arrays), false otherwise.
+   * If array type, returns innermost type,
+   * otherwise returns this type.
    */
-  bool has_def_bounds() const;
+  block_var_type innermost_type() const;
 
   /**
    * Returns Stan language type name.

@@ -40,9 +40,9 @@ bare_expr_type indexed_type(const expression& e, const std::vector<idx>& idxs) {
       array_dims--;
   }
   if (i == idx_sz && array_dims == 0)
-    return e.bare_type().base();
+    return e.bare_type().innermost_type();
   if (i == idx_sz)
-    return bare_array_type(e.bare_type().base(), array_dims);
+    return bare_array_type(e.bare_type().innermost_type(), array_dims);
 
   // index into vector/matrix
   size_t num_args = e.bare_type().num_dims() - e.bare_type().array_dims();
@@ -51,7 +51,7 @@ bare_expr_type indexed_type(const expression& e, const std::vector<idx>& idxs) {
     if (!is_multi_index(idxs[i]))
       arg_slots[j] = 1;
   }
-  // base type is vector/row_vector
+  // innermost type is vector/row_vector
   if (arg_slots.size() == 1 && arg_slots[0] == 1) {
     if (array_dims > 0)
       return bare_array_type(double_type(), array_dims);
@@ -59,10 +59,10 @@ bare_expr_type indexed_type(const expression& e, const std::vector<idx>& idxs) {
   }
   if (arg_slots.size() == 1) {
     if (array_dims > 0)
-      return bare_array_type(e.bare_type().base(), array_dims);
-    return e.bare_type().base();
+      return bare_array_type(e.bare_type().innermost_type(), array_dims);
+    return e.bare_type().innermost_type();
   }
-  // base type is matrix
+  // innermost type is matrix
   if (arg_slots[0] == 1 && arg_slots[1] == 1) {
     if (array_dims > 0)
       return bare_array_type(double_type(), array_dims);

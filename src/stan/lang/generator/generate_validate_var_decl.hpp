@@ -29,11 +29,8 @@ namespace stan {
                                     int indent, std::ostream& o) {
       std::string var_name(decl.name());
       std::vector<expression> ar_lens(decl.type().array_lens());
-      // unfold array type to get array element info
-      block_var_type btype = (decl.type());
-      if (btype.is_array_type())
-        btype = btype.array_contains();
 
+      block_var_type btype = decl.type().innermost_type();
       if (btype.has_def_bounds()) {
         range bounds = btype.bounds();
         write_begin_array_dims_loop(decl, true, indent, o);

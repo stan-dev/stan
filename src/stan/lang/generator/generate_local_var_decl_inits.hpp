@@ -37,8 +37,7 @@ namespace stan {
         std::vector<expression> ar_lens(vs[i].type().array_lens());
         std::string var_name(vs[i].name());
         // unfold array type to get array element info
-        local_var_type ltype = vs[i].type().is_array_type() ?
-          vs[i].type().array_contains() : vs[i].type();
+        local_var_type ltype = vs[i].type().innermost_type();
         std::string cpp_type_str = get_verbose_var_type(ltype.bare_type());
 
         // validate dimensions before declaration

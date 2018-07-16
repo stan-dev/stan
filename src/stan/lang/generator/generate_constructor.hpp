@@ -119,8 +119,7 @@ namespace stan {
       generate_comment("validate transformed data", 3, o);
       // todo:  bundle into single function
       for (size_t i = 0; i < prog.derived_data_decl_.first.size(); ++i) {
-        if (prog.derived_data_decl_.first[i].type().has_def_bounds()
-            || prog.derived_data_decl_.first[i].type().is_specialized()) {
+        if (prog.derived_data_decl_.first[i].type().is_constrained()) {
           generate_indent(3, o);
           o << "current_statement_begin__ = "
             <<  prog.derived_data_decl_.first[i].begin_line_ << ";" << EOL;

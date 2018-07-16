@@ -34,11 +34,9 @@ namespace stan {
       std::string var_name(var_decl.name());
       std::vector<expression> dims(var_decl.type().array_lens());
 
-      block_var_type btype = (var_decl.type());
-      if (btype.is_array_type())
-        btype = btype.array_contains();
-
+      block_var_type btype = var_decl.type().innermost_type();
       std::string constrain_str = write_constraints_fn(btype, "constrain");
+      // lp__ is single or last arg to write_constraints_fn
       std::string lp_arg("lp__)");
       if (btype.has_def_bounds() || !btype.bare_type().is_double_type())
         lp_arg = ", lp__)";

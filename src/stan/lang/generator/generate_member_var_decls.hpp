@@ -27,11 +27,8 @@ namespace stan {
                                    int indent, std::ostream& o) {
       for (size_t i = 0; i < vs.size(); ++i) {
         generate_indent(indent, o);
-        // unfold array type to get array element info
         std::string var_name(vs[i].name());
-        block_var_type btype = (vs[i].type());
-        if (btype.is_array_type())
-          btype = btype.array_contains();
+        block_var_type btype = vs[i].type().innermost_type();
         std::string typedef_var_type = get_typedef_var_type(btype.bare_type());
         int ar_dims = vs[i].type().array_dims();
 

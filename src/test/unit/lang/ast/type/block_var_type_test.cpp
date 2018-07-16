@@ -37,6 +37,7 @@ TEST(blockVarType, createIllFormed) {
   block_var_type x(tIll);
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_EQ(x.num_dims(), 0);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -55,6 +56,7 @@ TEST(blockVarType, createInt) {
   EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 0);
   EXPECT_FALSE(x.has_def_bounds());
+  EXPECT_FALSE(x.is_constrained());
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), 0);
   expression len = x.array_len();
@@ -72,6 +74,7 @@ TEST(blockVarType, createIntBounded) {
   int_block_type tInt(r1);
   block_var_type x(tInt);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_TRUE(x.is_constrained());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 0);
@@ -89,6 +92,7 @@ TEST(blockVarType, createDouble) {
   block_var_type x(tDouble);
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_EQ(x.num_dims(), 0);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -104,6 +108,7 @@ TEST(blockVarType, createDoubleBounded) {
   double_block_type tDouble(r1);
   block_var_type x(tDouble);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_TRUE(x.is_constrained());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 0);
@@ -121,6 +126,7 @@ TEST(blockVarType, createDoubleBounded2) {
   double_block_type tDouble(r1);
   block_var_type x(tDouble);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_TRUE(x.is_constrained());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 0);
 
@@ -137,6 +143,7 @@ TEST(blockVarType, createVector) {
   block_var_type x(tVector);
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_EQ(x.num_dims(), 1);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -153,6 +160,7 @@ TEST(blockVarType, createVectorBoundedSized) {
   vector_block_type tVector(r1, N);
   block_var_type x(tVector);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_TRUE(x.is_constrained());
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
@@ -171,6 +179,7 @@ TEST(blockVarType, createRowVector) {
   block_var_type x(tRowVector);
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_EQ(x.num_dims(), 1);
 
   std::vector<expression> array_lens = x.array_lens();
@@ -187,6 +196,7 @@ TEST(blockVarType, createRowVectorBoundedSized) {
   row_vector_block_type tRowVector(r1, N);
   block_var_type x(tRowVector);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_TRUE(x.is_constrained());
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
@@ -205,6 +215,7 @@ TEST(blockVarType, createMatrixDefault) {
   EXPECT_TRUE(x.arg1().bare_type().is_ill_formed_type());
   EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
   EXPECT_FALSE(x.has_def_bounds());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
   EXPECT_EQ(x.num_dims(), 2);
@@ -224,6 +235,7 @@ TEST(blockVarType, createMatrixBoundedSized) {
   matrix_block_type tMatrix(r1, M, N);
   block_var_type x(tMatrix);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_TRUE(x.is_constrained());
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_int_type());
   EXPECT_FALSE(x.is_array_type());
@@ -245,6 +257,7 @@ TEST(blockVarType, createCopy) {
   EXPECT_EQ(y.num_dims(), 0);
   EXPECT_FALSE(y.is_array_type());
   EXPECT_FALSE(x.is_specialized());
+  EXPECT_FALSE(x.is_constrained());
 
   std::stringstream ss;
   write_bare_expr_type(ss, y.bare_type());
@@ -258,6 +271,7 @@ TEST(blockVarType, createArray) {
   block_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_EQ(x.num_dims(), 1);
   expression array_len = x.array_len();
 
@@ -440,6 +454,7 @@ TEST(blockVarType, create2DArrayInt) {
   EXPECT_TRUE(y.is_array_type());
   EXPECT_TRUE(y.array_contains().bare_type().is_int_type());
   EXPECT_TRUE(y.array_contains().has_def_bounds());
+  EXPECT_TRUE(y.array_contains().is_constrained());
   EXPECT_EQ(y.array_dims(), 2);
 
   std::vector<expression> lens = y.array_lens();

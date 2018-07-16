@@ -43,7 +43,7 @@ TEST(langAst, multiIdx) {
   stan::lang::expression e(v);
   stan::lang::multi_idx i(e);
   // test proper type storage and retrieval
-  EXPECT_EQ(bare_expr_type(int_type()), i.idxs_.bare_type().base());
+  EXPECT_EQ(bare_expr_type(int_type()), i.idxs_.bare_type().innermost_type());
   EXPECT_EQ(1, i.idxs_.bare_type().num_dims());
   // test allow construction
   EXPECT_NO_THROW(stan::lang::idx(i));

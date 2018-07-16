@@ -270,7 +270,7 @@ TEST(astExpression, idx_sliced_all_multi) {
   stan::lang::expression e3 = i_op_slice;
   EXPECT_TRUE(e3.bare_type().num_dims() == 5);
   EXPECT_TRUE(e3.bare_type().array_dims() == 3);
-  EXPECT_TRUE(e3.bare_type().base().is_matrix_type());
+  EXPECT_TRUE(e3.bare_type().innermost_type().is_matrix_type());
 }
 
 TEST(astExpression, index_sliced_2) {
@@ -300,7 +300,7 @@ TEST(astExpression, index_sliced_2) {
   
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 2);
-  EXPECT_TRUE(e4.bare_type().base().is_int_type());
+  EXPECT_TRUE(e4.bare_type().innermost_type().is_int_type());
 }
 
 TEST(astExpression, index_sliced_3) {
@@ -331,7 +331,7 @@ TEST(astExpression, index_sliced_3) {
   // 3 indexes, reduce vector to double : e.g. [1:5, 1:5, 3]  2-d array of double
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 2);
-  EXPECT_TRUE(e4.bare_type().base().is_double_type());
+  EXPECT_TRUE(e4.bare_type().innermost_type().is_double_type());
 }
 
 TEST(astExpression, index_sliced_4) {
@@ -362,7 +362,7 @@ TEST(astExpression, index_sliced_4) {
   stan::lang::expression e4 = i_op_slice;
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 1);
-  EXPECT_TRUE(e4.bare_type().base().is_vector_type());
+  EXPECT_TRUE(e4.bare_type().innermost_type().is_vector_type());
 }
 
 TEST(astExpression, index_sliced_5) {
@@ -394,7 +394,7 @@ TEST(astExpression, index_sliced_5) {
   stan::lang::expression e4 = i_op_slice;
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 0);
-  EXPECT_TRUE(e4.bare_type().base().is_matrix_type());
+  EXPECT_TRUE(e4.bare_type().innermost_type().is_matrix_type());
 }
 
 TEST(astExpression, index_sliced_6) {
@@ -425,7 +425,7 @@ TEST(astExpression, index_sliced_6) {
   stan::lang::expression e4 = i_op_slice;
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 1);
-  EXPECT_TRUE(e4.bare_type().base().is_row_vector_type());
+  EXPECT_TRUE(e4.bare_type().innermost_type().is_row_vector_type());
 }
 
 TEST(astExpression, print_index_sliced) {

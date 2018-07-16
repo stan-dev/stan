@@ -40,8 +40,8 @@ namespace stan {
         << "local_scalar_t__ DUMMY_VAR__"
         << "(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
-      o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
-        << EOL2;
+      generate_void_statement("DUMMY_VAR__",2,o);
+      o << EOL;
 
       o << INDENT2 << "T__ lp__(0.0);"
         << EOL;
@@ -89,14 +89,11 @@ namespace stan {
         o << INDENT3
           << "const char* function__ = \"validate transformed params\";"
           << EOL;
-        o << INDENT3
-          << "(void) function__;  // dummy to suppress unused var warning"
-          << EOL;
+        generate_void_statement("function__", 3, o);
         o << EOL;
 
         for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
-          if (prog.derived_decl_.first[i].type().has_def_bounds()
-              || prog.derived_decl_.first[i].type().is_specialized()) {
+          if (prog.derived_decl_.first[i].type().is_constrained()) {
             generate_indent(3, o);
             o << "current_statement_begin__ = "
               <<  prog.derived_decl_.first[i].begin_line_ << ";" << EOL;

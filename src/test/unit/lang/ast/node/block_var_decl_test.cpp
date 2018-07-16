@@ -582,5 +582,6 @@ TEST(langAst, baseVarDecl) {
   EXPECT_EQ(1, bvd.bare_type().num_dims());
   EXPECT_EQ(stan::lang::expression(stan::lang::int_literal(0)).bare_type(),
             bvd.type().array_lens().at(0).bare_type());
-  EXPECT_EQ(stan::lang::bare_expr_type(stan::lang::int_type()), bvd.bare_type().base());
+  EXPECT_EQ(stan::lang::bare_expr_type(stan::lang::int_type()),
+            bvd.bare_type().innermost_type());
 }

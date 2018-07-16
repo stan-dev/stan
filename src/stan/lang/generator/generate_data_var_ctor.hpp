@@ -25,10 +25,7 @@ namespace stan {
     void generate_data_var_ctor(const block_var_decl& var_decl,
                                 int indent, std::ostream& o) {
       std::string var_name(var_decl.name());
-      block_var_type btype = (var_decl.type());
-      if (btype.is_array_type())
-        btype = btype.array_contains();
-
+      block_var_type btype = var_decl.type().innermost_type();
       generate_indent(indent, o);
       o << var_name << " = ";
       if (var_decl.bare_type().is_int_type()) {

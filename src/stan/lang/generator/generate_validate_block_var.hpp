@@ -19,11 +19,8 @@ namespace stan {
      */
     void generate_validate_block_var(const block_var_decl& var_decl,
                                      int indent, std::ostream& o) {
-      block_var_type vtype = var_decl.type();
-      if (vtype.is_array_type())
-        vtype = vtype.array_contains();
-      if (vtype.has_def_bounds()
-          || vtype.is_specialized()) {
+      block_var_type vtype = var_decl.type().innermost_type();
+      if (vtype.is_constrained()) {
         generate_validate_var_decl(var_decl, indent, o);
         o << EOL;
       }

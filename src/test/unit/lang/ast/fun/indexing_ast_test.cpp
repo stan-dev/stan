@@ -39,7 +39,7 @@ void test_recover(bare_expr_type base_et_expected,
     v.set_type(bare_array_type(base_et, num_dims));
   stan::lang::expression e(v);
   bare_expr_type et = indexed_type(e, idxs);
-  EXPECT_EQ(base_et_expected, et.base());
+  EXPECT_EQ(base_et_expected, et.innermost_type());
   EXPECT_EQ(num_dims_expected, et.array_dims());
 }
 
@@ -313,6 +313,6 @@ TEST(langAst, indexOpSliced) {
   ios.expr_ = v;
   ios.idxs_ = idxs;
   ios.infer_type();
-  EXPECT_EQ(bare_expr_type(double_type()), ios.type_.base());
+  EXPECT_EQ(bare_expr_type(double_type()), ios.type_.innermost_type());
   EXPECT_EQ(1U, ios.type_.array_dims());
 }

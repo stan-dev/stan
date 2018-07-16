@@ -95,21 +95,21 @@ namespace stan {
 
       local_element_type_r.name("local var element type declaration");
       local_element_type_r
-        %= (local_int_type_r(_r1)
-            | local_double_type_r(_r1)
-            | local_vector_type_r(_r1)
-            | local_row_vector_type_r(_r1)
-            | local_matrix_type_r(_r1));
+        %= local_int_type_r(_r1)
+           | local_double_type_r(_r1)
+           | local_vector_type_r(_r1)
+           | local_row_vector_type_r(_r1)
+           | local_matrix_type_r(_r1);
 
       local_int_type_r.name("integer type");
       local_int_type_r
-        %= (lit("int")
-            >> no_skip[!char_("a-zA-Z0-9_")]);
+        %= lit("int")
+            >> no_skip[!char_("a-zA-Z0-9_")];
 
       local_double_type_r.name("real type");
       local_double_type_r
-        %= (lit("real")
-            >> no_skip[!char_("a-zA-Z0-9_")]);
+        %= lit("real")
+            >> no_skip[!char_("a-zA-Z0-9_")];
 
       local_vector_type_r.name("vector type");
       local_vector_type_r

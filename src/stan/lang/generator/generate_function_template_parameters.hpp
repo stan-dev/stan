@@ -29,8 +29,8 @@ namespace stan {
           continuing_tps = true;
         }
         for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
-          // no template parameter for int-based args
-          if (!fun.arg_decls_[i].bare_type().base().is_int_type()) {
+          // no template parameter for int based args
+          if (!fun.arg_decls_[i].bare_type().innermost_type().is_int_type()) {
             if (continuing_tps)
               out << ", ";
             out << "typename T" << i << "__";

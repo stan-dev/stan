@@ -141,9 +141,9 @@ TEST(lang_ast, bare_expr_type_compare_ops) {
 
 TEST(lang_ast, bare_expr_type_base) {
   EXPECT_EQ(bare_expr_type(double_type()),
-            bare_expr_type(bare_array_type(double_type(), 3)).base());
+            bare_expr_type(bare_array_type(double_type(), 3)).innermost_type());
   EXPECT_NE(bare_expr_type(double_type()),
-            bare_expr_type(bare_array_type(vector_type(), 2)).base());
+            bare_expr_type(bare_array_type(vector_type(), 2)).innermost_type());
 }
 
 void testTotalDims(int expected_total_dims,

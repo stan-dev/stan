@@ -138,21 +138,33 @@ range block_var_type::bounds() const {
   return boost::apply_visitor(vis, var_type_);
 }
 
+bool block_var_type::has_def_bounds() const {
+  if (this->bounds().has_low() || this->bounds().has_high())
+    return true;
+  return false;
+}
+  
+block_var_type block_var_type::innermost_type() const {
+  if (boost::get<stan::lang::block_array_type>(&var_type_)) {
+    block_array_type vt = boost::get<stan::lang::block_array_type>(var_type_);
+    return vt.contains();
+  }
+  return var_type_;
+}
+  
 bool block_var_type::is_array_type() const {
   if (boost::get<stan::lang::block_array_type>(&var_type_))
     return true;
   return false;
 }
 
+bool block_var_type::is_constrained() const {
+  return has_def_bounds() || is_specialized();
+}
+
 bool block_var_type::is_specialized() const {
   block_type_is_specialized_vis vis;
   return boost::apply_visitor(vis, var_type_);
-}
-
-bool block_var_type::has_def_bounds() const {
-  if (this->bounds().has_low() || this->bounds().has_high())
-    return true;
-  return false;
 }
 
 std::string block_var_type::name() const {

@@ -36,7 +36,7 @@ namespace stan {
                        const expression& arg2,
                        std::ostream& o) {
       bool ends_with_angle
-        = cpp_type_str.at(cpp_type_str.length()-1) == '>';
+        = cpp_type_str[cpp_type_str.length()-1] == '>';
 
       // innermost element initialization
       std::stringstream base_init;
@@ -63,7 +63,7 @@ namespace stan {
       // for array dimensions, init for each dimension is:
       // <size dim-n>, (n-1) nested vectors of cpp_decl_type
       int ct = ar_lens.size() - 1;  // tracks nesting
-      for (size_t i = 0; i < ar_lens.size(); ++i) {
+      for (size_t i = 0; i < ar_lens.size(); ++i, --ct) {
         o << "(";
         generate_expression(ar_lens[i], NOT_USER_FACING, o);
         o << ", ";
@@ -75,7 +75,6 @@ namespace stan {
             o << " ";  // maybe not needed for c++11
           o << ">";
         }
-        --ct;
       }
       o << base_init.str();
       for (size_t i = 0; i < ar_lens.size(); ++i)

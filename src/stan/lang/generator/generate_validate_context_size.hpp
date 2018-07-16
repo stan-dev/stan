@@ -29,9 +29,7 @@ namespace stan {
                                         size_t indent,
                                         std::ostream& o) {
       std::string var_name(var_decl.name());
-      block_var_type btype = (var_decl.type());
-      if (btype.is_array_type())
-        btype = btype.array_contains();
+      block_var_type btype = var_decl.type().innermost_type();
 
       std::vector<expression> array_dim_sizes = var_decl.type().array_lens();
       expression arg1 = btype.arg1();
