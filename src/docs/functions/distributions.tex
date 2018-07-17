@@ -417,9 +417,11 @@ If $\alpha \in \reals$, then for $c \in \setlist{0,1}$,
 \end{description}
 %
 \begin{description}
-\fitem{int}{bernoulli\_logit\_rng}{real \farg{alpha}}{Generate a Bernoulli
-  variate with chance of success $\mbox{logit}^{-1}(\alpha)$; may only be used in
-  generated quantities block}
+  \fitem{R}{bernoulli\_logit\_rng}{reals \farg{alpha}}{Generate a
+    Bernoulli variate with chance of success
+    $\mbox{logit}^{-1}(\alpha)$; may only be used in generated
+    quantities block.  For a description of argument and return types,
+    see \refsection{prng-vectorization}.}
 \end{description}
 
 
@@ -488,11 +490,11 @@ Suppose $N \in \nats$ and $\theta \in [0,1]$, and $n \in
 \end{description}
 %
 \begin{description}
-\fitem{R}{binomial\_rng}{ints \farg{N}, reals \farg{theta}}{Generate a binomial
-  variate with \farg{N} trials and chance of success \farg{theta}; may only be used in
-  generated quantities block.  For a description of argument and
-  return types, see \refsection{prng-vectorization}.
-}
+  \fitem{R}{binomial\_rng}{ints \farg{N}, reals \farg{theta}}{Generate
+    a binomial variate with \farg{N} trials and chance of success
+    \farg{theta}; may only be used in generated quantities block.  For
+    a description of argument and return types, see
+    \refsection{prng-vectorization}.  }
 \end{description}
 
 
