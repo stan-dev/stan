@@ -1,12 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_IDX_DEF_HPP
 #define STAN_LANG_AST_NODE_IDX_DEF_HPP
 
-#include <stan/lang/ast/node/lb_idx.hpp>
-#include <stan/lang/ast/node/lub_idx.hpp>
-#include <stan/lang/ast/node/multi_idx.hpp>
-#include <stan/lang/ast/node/omni_idx.hpp>
-#include <stan/lang/ast/node/ub_idx.hpp>
-#include <stan/lang/ast/node/uni_idx.hpp>
+#include <stan/lang/ast.hpp>
 #include <boost/variant/apply_visitor.hpp>
 #include <string>
 

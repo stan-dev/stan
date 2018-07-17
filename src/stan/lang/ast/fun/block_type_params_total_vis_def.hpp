@@ -1,9 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_BLOCK_TYPE_PARAMS_TOTAL_VIS_DEF_HPP
 #define STAN_LANG_AST_FUN_BLOCK_TYPE_PARAMS_TOTAL_VIS_DEF_HPP
 
-#include <stan/lang/ast/fun/block_type_params_total_vis.hpp>
-#include <stan/lang/ast/node/expression.hpp>
-#include <stan/lang/ast/node/int_literal.hpp>
+#include <stan/lang/ast.hpp>
 #include <vector>
 
 namespace stan {

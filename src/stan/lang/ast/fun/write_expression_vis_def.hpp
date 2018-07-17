@@ -3,7 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <boost/lexical_cast.hpp>
-#include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
 

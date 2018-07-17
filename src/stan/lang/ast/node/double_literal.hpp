@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <string>
+#include <cstddef>
 
 namespace stan {
 namespace lang {

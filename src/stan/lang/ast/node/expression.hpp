@@ -5,12 +5,13 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <cstddef>
 
 namespace stan {
   namespace lang {
 
-    struct nil;
     struct bare_expr_type;
+    struct nil;
     struct int_literal;
     struct double_literal;
     struct array_expr;

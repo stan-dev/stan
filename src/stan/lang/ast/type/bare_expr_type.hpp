@@ -5,6 +5,7 @@
 #include <boost/variant/recursive_variant.hpp>
 #include <string>
 #include <ostream>
+#include <cstddef>
 
 namespace stan {
 namespace lang {

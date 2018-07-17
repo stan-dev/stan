@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_NODE_INT_LITERAL_HPP
 
 #include <stan/lang/ast/type/bare_expr_type.hpp>
+#include <cstddef>
 
 namespace stan {
   namespace lang {

@@ -8,6 +8,7 @@
 #include <boost/spirit/include/qi.hpp>
 #include <boost/phoenix/phoenix.hpp>
 #include <boost/version.hpp>
+#include <sstream>
 #include <set>
 #include <string>
 #include <vector>

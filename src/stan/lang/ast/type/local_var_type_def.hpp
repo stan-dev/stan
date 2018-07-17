@@ -1,19 +1,7 @@
 #ifndef STAN_LANG_AST_LOCAL_VAR_TYPE_DEF_HPP
 #define STAN_LANG_AST_LOCAL_VAR_TYPE_DEF_HPP
 
-#include <stan/lang/ast/type/local_array_type.hpp>
-#include <stan/lang/ast/type/double_type.hpp>
-#include <stan/lang/ast/type/ill_formed_type.hpp>
-#include <stan/lang/ast/type/int_type.hpp>
-#include <stan/lang/ast/type/matrix_local_type.hpp>
-#include <stan/lang/ast/type/row_vector_local_type.hpp>
-#include <stan/lang/ast/type/vector_local_type.hpp>
-
-#include <stan/lang/ast/fun/bare_type_vis.hpp>
-#include <stan/lang/ast/fun/var_type_arg1_vis.hpp>
-#include <stan/lang/ast/fun/var_type_arg2_vis.hpp>
-#include <stan/lang/ast/fun/var_type_name_vis.hpp>
-#include <stan/lang/ast/fun/write_bare_expr_type.hpp>
+#include <stan/lang/ast.hpp>
 
 #include <boost/variant/apply_visitor.hpp>
 #include <boost/variant/get.hpp>

@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_FUN_BLOCK_TYPE_PARAMS_TOTAL_VIS_HPP
 
 #include <stan/lang/ast/node/range.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_corr_block_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_cov_block_type.hpp>

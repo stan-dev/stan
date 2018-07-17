@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_NUM_INDEX_OP_DIMS_DEF_HPP
 #define STAN_LANG_AST_FUN_NUM_INDEX_OP_DIMS_DEF_HPP
 
-#include <stan/lang/ast/node/expression.hpp>
+#include <stan/lang/ast.hpp>
 #include <vector>
 
 namespace stan {

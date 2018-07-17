@@ -2,7 +2,8 @@
 #define STAN_LANG_AST_FUN_HAS_VAR_VIS_DEF_HPP
 
 #include <stan/lang/ast.hpp>
-#include <iostream>
+#include <boost/variant/apply_visitor.hpp>
+
 
 namespace stan {
 namespace lang {
