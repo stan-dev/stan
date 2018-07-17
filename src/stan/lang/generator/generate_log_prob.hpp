@@ -40,7 +40,7 @@ namespace stan {
         << "local_scalar_t__ DUMMY_VAR__"
         << "(std::numeric_limits<double>::quiet_NaN());"
         << EOL;
-      generate_void_statement("DUMMY_VAR__",2,o);
+      generate_void_statement("DUMMY_VAR__", 2, o);
       o << EOL;
 
       o << INDENT2 << "T__ lp__(0.0);"

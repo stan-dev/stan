@@ -120,7 +120,7 @@ bool block_var_type::has_def_bounds() const {
     return true;
   return false;
 }
-  
+
 block_var_type block_var_type::innermost_type() const {
   if (boost::get<stan::lang::block_array_type>(&var_type_)) {
     block_array_type vt = boost::get<stan::lang::block_array_type>(var_type_);
@@ -128,7 +128,7 @@ block_var_type block_var_type::innermost_type() const {
   }
   return var_type_;
 }
-  
+
 bool block_var_type::is_array_type() const {
   if (boost::get<stan::lang::block_array_type>(&var_type_))
     return true;

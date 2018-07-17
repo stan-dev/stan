@@ -23,7 +23,8 @@ namespace stan {
                               const std::string& scalar_t_name,
                               std::ostream& o) {
       std::vector<expression> ar_dim_sizes = var_type.array_lens();
-      bare_expr_type bare_type = var_type.array_element_type().bare_type().innermost_type();
+      bare_expr_type bare_type =
+        var_type.array_element_type().bare_type().innermost_type();
       expression arg1 = var_type.arg1();
       expression arg2 = var_type.arg2();
 

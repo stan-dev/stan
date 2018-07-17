@@ -677,7 +677,8 @@ namespace stan {
         pass = false;
         return;
       }
-      bare_expr_type variate_type = decl.arg_decls_[0].bare_type().innermost_type();
+      bare_expr_type variate_type =
+        decl.arg_decls_[0].bare_type().innermost_type();
       if (ends_with("_lpdf", decl.name_)
           && variate_type.is_int_type()) {
         error_msgs << "Parse Error.  Probability density functions require"
