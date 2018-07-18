@@ -127,5 +127,5 @@ is the first one that is found in the sequence.
 
 ### Slashes in include paths
 
-If there is not a final `/` or `\\` in the path, a `/` will be
+If there is not a final `/` or `\` in the path, a `/` will be
 appended between the path and the included file name.
