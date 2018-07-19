@@ -70,7 +70,7 @@ pipeline {
             }
         }
         stage('Linting & Doc checks') {
-            agent { label 'linux' }
+            agent any
             steps {
                 script {
                     retry(3) { checkout scm }
@@ -80,14 +80,12 @@ pipeline {
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
-                        Manuals: { sh "make doc" },
                     )
                 }
             }
             post {
                 always {
                     warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
-                    warnings consoleParsers: [[parserName: 'math-dependencies']], canRunOnFailed: true
                     deleteDir()
                 }
             }
