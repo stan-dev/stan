@@ -1,0 +1,16 @@
+version: 2.0
+jobs:
+  docs:
+    docker:
+      - image: 0xcaff/bookdown
+    steps:
+      - checkout
+      - run: make doc
+      - store_artifacts:
+          path: doc
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - docs
