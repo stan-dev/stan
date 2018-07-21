@@ -1,9 +1,9 @@
 # Model Building as Software Development
 
 Developing a statistical model in Stan means writing a Stan program
-and is thus a kind of software development process.  Developing
+and is thus a form of software development.  Developing
 software is hard.  Very hard.  So many things can go wrong because
-there are so many moving parts and combinations of parts.
+there are so many moving parts which need to be carefully synchronized.
 
 Software development practices are designed to mitigate the problems
 caused by the inherent complexity of writing computer programs.
@@ -27,7 +27,15 @@ independently and then automatically merged.
 
 ## Make it Reproducible
 
-Rather than entering commands on the command-line when running models (or entering commands directly into an interactive programming language like R or Python), try writing scripts to run the data through the models and produce whatever posterior analysis you need.  Scripts can be written for the shell, R, or Python.  Whatever language a script is in, it should be self contained and not depend on global variables having been set, other data being read in, etc.  Most projects do not have long-term reproducibility needs, so be careful to choose the right tooling for the job at hand.^[To guarantee bit-level reproducibility, and often even just to get a program to run, everything from hardware to the operating system to every piece of software and setting must be reproduced.]
+Rather than entering commands on the command-line when running models
+(or entering commands directly into an interactive programming
+language like R or Python), try writing scripts to run the data
+through the models and produce whatever posterior analysis you need.
+Scripts can be written for the shell, R, or Python.  Whatever language
+a script is in, it should be self contained and not depend on global
+variables having been set, other data being read in, etc.  Most
+projects do not have long-term reproducibility needs, so be careful to
+choose the right tooling for the job at hand.^[To guarantee bit-level reproducibility, and often even just to get a program to run, everything from hardware to the operating system to every piece of software and setting must be reproduced.]
 
 
 ## Scripts are Good Documentation {-}
@@ -151,6 +159,7 @@ Each print statement is followed by a new line.  The specific ASCII
 character(s) generated to create a new line are platform specific.
 
 Arbitrary expressions can be used.  For example, the statement
+
 ```
 print("1+1=", 1+1);
 ```
@@ -163,7 +172,7 @@ block they are in is evaluated.
 
 
 
-## Comments \label{comments-programming.section}
+## Comments {#comments-programming.section}
 
 ### Code Never Lies {-}
 
@@ -249,9 +258,8 @@ example of a conventional style for large comment blocks.
  * -----------------------------------------------------
  * Copyright: Joe Schmoe  <joe@schmoe.com>
  * Date:  19 September 2012
- * License: GPLv3
+ * License: MIT License
  */
-
 data {
   // ...
 ```
@@ -262,7 +270,12 @@ information in comments is that they can easily get out of synch with
 the reality of the code.  A misleading comment or one that is wrong is
 worse than no comment at all!
 
-\part{Example Models}\label{example-models.part}
+# {-}
+
+# <span style="padding: 5em 0 0 0"><i style="font-size: 110%; font-weight: 500; color:#990017;">I. Example Models</i></span> {- #example-models.part}
+
+This section of the user's guide surveys a range of example models,
+with the goal of illustrating how to code them efficiently in Stan.
 
 
 # Regression Models
@@ -323,6 +336,7 @@ The sampling statement in the previous model is vectorized, with
 
 ```
   y ~ normal(alpha + beta * x, sigma);
+```
 
 providing the same model as the unvectorized version,
 
@@ -375,7 +389,7 @@ and `beta` a $K$-vector of coefficients, so `x * beta` is an
 $N$-vector of predictions, one for each of the $N$ data items.  These
 predictions line up with the outcomes in the $N$-vector `y`, so
 the entire model may be written using matrix arithmetic as shown.  It
-would be possible to include a column of 1 values in `x` and
+would be possible to include a column of ones the data matrix `x` and
 remove the `alpha` parameter.
 
 The sampling statement in the model above is just a more efficient,
@@ -411,7 +425,7 @@ singled out because there's one fewer multiplications; it should not
 make that much of a difference to speed, though, so the choice should
 be based on clarity.
 
-## The QR Reparameterization \label{QR-reparameterization.section}
+## The QR Reparameterization {#QR-reparameterization.section}
 
 In the previous example, the linear predictor can be written as
 $\eta = x \beta$, where $\eta$ is a $N$-vector of predictions,
@@ -419,8 +433,8 @@ $x$ is a $N \times K$ matrix, and $\beta$ is a $K$-vector of coefficients.
 Presuming $N \geq K$, we can exploit the fact that any design matrix, $x$
 can be decomposed using the thin QR decomposition into an orthogonal matrix
 $Q$ and an upper-triangular matrix $R$, i.e. $x = Q R$. See \ref{QR-decomposition}
-for more information on the QR decomposition but note that `qr\_Q` and
-`qr\_R` implement the fat QR decomposition so here we thin it by including
+for more information on the QR decomposition but note that `qr_Q` and
+`qr_R` implement the fat QR decomposition so here we thin it by including
 only $K$ columns in $Q$ and $K$ rows in $R$. Also, in practice, it is best to
 write $x = Q^\ast R^\ast$ where $Q^\ast = Q \times \sqrt{n - 1}$ and
 $R^\ast = \frac{1}{\sqrt{n - 1}} R$. Thus, we can equivalently write
@@ -482,14 +496,14 @@ reasoning is threefold:
 
 Consequently, this QR reparameterization is recommended for linear and
 generalized linear models in Stan whenever $K > 1$ and you do not have
-an informative prior on the \emph{location} of $\beta$. It can also be
+an informative prior on the location of $\beta$. It can also be
 worthwhile to subtract the mean from each column of $x$ before
 obtaining the QR decomposition, which does not affect the posterior
 distribution of $\theta$ or $\beta$ but does affect $\alpha$ and
 allows you to interpret $\alpha$ as the expectation of $y$ in a linear
 model.
 
-## Priors for Coefficients and Scales\label{regression-priors.section}
+## Priors for Coefficients and Scales {#regression-priors.section}
 
 This section describes the choices available for modeling priors for
 regression coefficients and scales.  Priors for univariate parameters
@@ -500,7 +514,7 @@ discussion of priors used to identify models in
 \refsection{priors-for-identification}.
 
 However, as described in \refsection{QR-reparameterization}, if you do
-not have an informative prior on the \emph{location} of the regression
+not have an informative prior on the *location* of the regression
 coefficients, then you are better off reparameterizing your model so
 that the regression coefficients are a generated quantity. In that case,
 it usually does not matter very much what prior is used on on the
@@ -759,7 +773,7 @@ model {
 
 The degrees of freedom constant `nu` is specified as data.
 
-## Logistic and Probit Regression\label{logistic-probit-regression.section}
+## Logistic and Probit Regression {#logistic-probit-regression.section}
 
 For binary outcomes, either of the closely related logistic or probit
 regression models may be used.  These generalized linear models vary
@@ -851,7 +865,7 @@ statement with the following.
 ```
 
 A fast approximation to the cumulative standard normal distribution function
-$\Phi$ is implemented in Stan as the function `Phi\_approx`.  The
+$\Phi$ is implemented in Stan as the function `Phi_approx`.  The
 approximate probit regression model may be coded with the following.
 
 
@@ -859,7 +873,7 @@ approximate probit regression model may be coded with the following.
         y[n] ~ bernoulli(Phi_approx(alpha + beta * x[n]));
 ```
 
-## Multi-Logit Regression\label{multi-logit.section}
+## Multi-Logit Regression {#multi-logit.section}
 
 Multiple outcome forms of logistic regression can be coded directly in
 Stan.  For instance, suppose there are $K$ possible outcomes for each
@@ -903,7 +917,7 @@ used above is equivalent to writing
 
 See \refsection{softmax} for a definition of the softmax function and
 \refsection{categorical-distribution} for a full definition of
-`categorical\_logit`.
+`categorical_logit`.
 
 
 #### Constraints on Data Declarations {-}
@@ -969,7 +983,7 @@ transformed data {
 }
 ```
 
-which can then be appended to `beta\_row` to produce the
+which can then be appended to `beta_row` to produce the
 coefficient matrix `beta`,
 
 ```
@@ -980,8 +994,8 @@ transformed parameters {
 ```
 
 See \refsection{matrix-broadcast} for a definition of
-`rep\_row\_vector` and \refsection{matrix-concatenation} for a
-definition of `append\_row`.
+`rep_row_vector` and \refsection{matrix-concatenation} for a
+definition of `append_row`.
 
 This is not quite the same model as using $K$-vectors as parameters,
 because now the prior only applies to $(K-1)$-vectors.  In practice,
@@ -1019,15 +1033,15 @@ transformed parameters {
   ...
 ```
 
-Placing a prior on `beta\_raw` in this parameterization leads to
+Placing a prior on `beta_raw` in this parameterization leads to
 a subtly different posterior than that resulting from the same prior
 on `beta` in the original parameterization without the
 sum-to-zero constraint.  Most notably, a simple prior on each
-component of `beta\_raw` produces different results than putting
+component of `beta_raw` produces different results than putting
 the same prior on each component of an unconstrained $K$-vector
 `beta`.  For example, providing a $\mathsf{Normal}(0,5)$ prior
 on `beta` will produce a different posterior mode than placing
-the same prior on `beta\_raw`.
+the same prior on `beta_raw`.
 
 #### Marginal distribution of sum-to-zero components {-}
 
@@ -1096,15 +1110,15 @@ transformed parameters {
 ```
 
 Here `inv(K)` is just a short way to write `1.0~/~K`.  Given
-that `beta\_raw` sums to 1 because it is a simplex, the
+that `beta_raw` sums to 1 because it is a simplex, the
 elementwise subtraction of `inv(K)` is guaranteed to sum to zero.
 Because the magnitude of the elements of the simplex is bounded, a
 scaling factor is required to provide `beta` with $K$ degrees of
 freedom necessary to take on every possible value that sums to zero.
 
 With this parameterization, a Dirichlet prior can be placed on
-`beta\_raw`, perhaps uniform, and another prior put on
-`beta\_scale`, typically for "shrinkage."
+`beta_raw`, perhaps uniform, and another prior put on
+`beta_scale`, typically for "shrinkage."
 
 
 ### Soft Centering {-}
@@ -1118,12 +1132,12 @@ another vector $\alpha$ being transformed to $\alpha - c$, as in the
 IRT models).  This is another way of achieving a symmetric prior.
 
 
-## Ordered Logistic and Probit Regression\label{ordered-logistic.section}
+## Ordered Logistic and Probit Regression {#ordered-logistic.section}
 
-Ordered regression for an outcome $y_n \in \setlist{1,\ldots, k}$ with
-predictors $x_n \in \reals^D$ is determined by a single coefficient
-vector $\beta \in \reals^D$ along with a sequence of cutpoints $c \in
-\reals^{K-1}$ sorted so that $c_d < c_{d+1}$.  The discrete output is
+Ordered regression for an outcome $y_n \in \{ 1,\ldots, k \}$ with
+predictors $x_n \in \mathbb{R}^D$ is determined by a single coefficient
+vector $\beta \in \mathbb{R}^D$ along with a sequence of cutpoints $c \in
+\mathbb{R}^{K-1}$ sorted so that $c_d < c_{d+1}$.  The discrete output is
 $k$ if the linear predictor $x_n \beta$ falls between $c_{k-1}$ and
 $c_k$, assuming $c_0 = -\infty$ and $c_K = \infty$.  The noise term is
 fixed by the form of regression, with examples for ordered logistic
@@ -1133,7 +1147,7 @@ and ordered probit models.
 
 The ordered logistic model can be coded in Stan using the
 `ordered` data type for the cutpoints and the built-in
-`ordered\_logistic` distribution.
+`ordered_logistic` distribution.
 
 
 ```
@@ -1167,7 +1181,7 @@ the probability is needed only up to a proportion.
 #### Ordered Probit {-}
 
 An ordered probit model could be coded in exactly the same way by
-swapping the cumulative logistic (`inv\_logit`) for the cumulative
+swapping the cumulative logistic (`inv_logit`) for the cumulative
 normal (`Phi`).
 
 
@@ -1198,7 +1212,7 @@ model {
 ```
 
 The logistic model could also be coded this way by replacing
-`Phi` with `inv\_logit`, though the built-in encoding based
+`Phi` with `inv_logit`, though the built-in encoding based
 on the softmax transform is more efficient and more numerically
 stable.  A small efficiency gain could be achieved by computing the
 values `Phi(eta - c[k])` once and storing them for re-use.
@@ -1216,12 +1230,12 @@ other levels.  A hierarchical model is an intermediate solution where
 the degree of pooling is determined by the data and a prior on the
 amount of pooling.
 
-Suppose each binary outcome $y_n \in \setlist{0,1}$ has an associated
-level, $ll_n \in \setlist{1,\ldots,L}$.  Each outcome will also have
-an associated predictor vector $x_n \in \reals^D$.  Each level $l$
-gets its own coefficient vector $\beta_l \in \reals^D$.  The
+Suppose each binary outcome $y_n \in \{ 0, 1 \}$ has an associated
+level, $ll_n \in \{ 1,\ldots,L \}$.  Each outcome will also have
+an associated predictor vector $x_n \in \mathbb{R}^D$.  Each level $l$
+gets its own coefficient vector $\beta_l \in \mathbb{R}^D$.  The
 hierarchical structure involves drawing the coefficients $\beta_{l,d}
-\in \reals$ from a prior that is also estimated with the data.  This
+\in \mathbb{R}$ from a prior that is also estimated with the data.  This
 hierarchically estimated prior determines the amount of pooling.  If
 the data in each level are very similar, strong pooling will be
 reflected in low hierarchical variance.  If the data in the levels are
@@ -1301,7 +1315,7 @@ Bernoulli,
 ```
 
 See \refsection{bernoulli-logit-distribution} for a definition of
-`bernoulli\_logit`.
+`bernoulli_logit`.
 
 Unlike in R or BUGS, loops, array access and assignments are fast in
 Stan because they are translated directly to C++.  In most cases, the
@@ -1321,7 +1335,7 @@ the original formulation as a loop over a sampling statement.
 ```
 
 The brackets introduce a new scope for the local variable
-`x\_beta\_ll`; alternatively, the variable may be declared at the
+`x_beta_ll`; alternatively, the variable may be declared at the
 top of the model block.
 
 In some cases, such as the above, the local variable assignment leads
@@ -1331,7 +1345,7 @@ the model and only work on optimizations when the simpler formulation
 has been debugged.
 
 
-## Hierarchical Priors\label{hierarchical-priors.section}
+## Hierarchical Priors {#hierarchical-priors.section}
 
 Priors on priors, also known as "hyperpriors," should be treated the
 same way as priors on lower-level parameters in that as much prior
@@ -1341,14 +1355,14 @@ care must be taken to ensure the posterior is both proper and not
 overly sensitive either statistically or computationally to wide tails
 in the priors.
 
-### Boundary-Avoiding Priors for MLE in Hierarchical Models {-}\label{bound-avoid-priors.subsection}
+### Boundary-Avoiding Priors for MLE in Hierarchical Models {-} {#bound-avoid-priors.subsection}
 
 The fundamental problem with maximum likelihood estimation (MLE) in
 the hierarchical model setting is that as the hierarchical variance
 drops and the values cluster around the hierarchical mean, the overall
 density grows without bound.  As an illustration, consider a simple
 hierarchical linear regression (with fixed prior mean) of $y_n \in
-\reals$ on $x_n \in \reals^K$, formulated as
+\mathbb{R}$ on $x_n \in \mathbb{R}^K$, formulated as
 
 \begin{eqnarray*}
 y_n & \sim & \mathsf{Normal}(x_n \beta, \sigma)
@@ -1379,7 +1393,7 @@ $$
 for a reasonably large value of $A$, such as $A = 10$.
 
 
-## Item-Response Theory Models\label{item-response-models.section}
+## Item-Response Theory Models {#item-response-models.section}
 
 Item-response theory (IRT) models the situation in which a number of
 students each answer one or more of a group of test questions.  The
@@ -1457,8 +1471,8 @@ model {
 
 This model uses the logit-parameterized Bernoulli distribution, where
 $$
-`bernoulli\_logit`(y|\alpha) =
-`bernoulli`(y|\mbox{logit}^{-1}(\alpha)).
+\mathtt{bernoulli\_logit}(y|\alpha) =
+\mathtt{bernoulli}(y|\mbox{logit}^{-1}(\alpha)).
 $$
 
 The key to understanding it is the term inside the
@@ -1580,7 +1594,7 @@ declarations.
 
 
 
-## Priors for Identifiability\label{priors-for-identification.section}
+## Priors for Identifiability {#priors-for-identification.section}
 
 ### Location and Scale Invariance {-}
 
@@ -1631,7 +1645,7 @@ well-behaved sampling.
 
 
 
-## Multivariate Priors for Hierarchical Models\label{multivariate-hierarchical-priors.section}
+## Multivariate Priors for Hierarchical Models {#multivariate-hierarchical-priors.section}
 
 In hierarchical regression models (and other situations), several
 individual-level variables may be assigned hierarchical priors.  For
@@ -2462,7 +2476,7 @@ well, the simulated $\tilde{y}$ will look like the actual data $y$.
 
 
 
-# Time-Series Models \label{time-series.chapter}
+# Time-Series Models  {#time-series.chapter}
 
 
 Times series data come arranged in temporal order.  This chapter
@@ -2473,7 +2487,7 @@ as autoregressive and moving average models, and hidden Markov models.
 also be used for time-series (and spatial) data.
 
 
-## Autoregressive Models\label{autoregressive.section}
+## Autoregressive Models {#autoregressive.section}
 
 A first-order autoregressive model (AR(1)) with normal noise takes
 each point $y_n$ in a sequence $y$ to be generated according to
@@ -3085,7 +3099,7 @@ improved, which results in higher effective sample sizes per
 iteration.  Finally, each iteration runs in roughly a quarter of the
 time of the original iterations.
 
-## Hidden Markov Models\label{hmms.section}
+## Hidden Markov Models {#hmms.section}
 
 A hidden Markov model (HMM) generates a sequence of $T$ output
 variables $y_t$ conditioned on a parallel sequence of latent
@@ -3449,7 +3463,7 @@ less efficient because the data observations would be promoted and
 have needless derivatives calculated.
 
 
-## Partially Known Parameters\label{partially-known-parameters.section}
+## Partially Known Parameters {#partially-known-parameters.section}
 
 In some situations, such as when a multivariate probability function
 has partially observed outcomes or parameters, it will be necessary to
@@ -3706,7 +3720,7 @@ momentum).
 Data in which measurements have been truncated or censored can be
 coded in Stan following their respective probability models.
 
-## Truncated Distributions\label{truncation.section}
+## Truncated Distributions {#truncation.section}
 
 Truncation in Stan is restricted to univariate distributions for which
 the corresponding log cumulative distribution function (cdf) and log
@@ -3714,7 +3728,7 @@ complementary cumulative distribution (ccdf) functions are available.
 See the reference manual section on truncated distributions for more
 information on truncated distributions, cdfs, and ccdfs.
 
-## Truncated Data\label{truncated-data.section}
+## Truncated Data {#truncated-data.section}
 
 Truncated data is data for which measurements are only reported if
 they fall above a lower bound, below an upper bound, or between a
@@ -3959,7 +3973,7 @@ model {
 
 
 
-# Finite Mixtures \label{mixture-modeling.chapter}
+# Finite Mixtures  {#mixture-modeling.chapter}
 
 
 Finite mixture models of an outcome assume that the outcome is drawn
@@ -3971,7 +3985,7 @@ described in the following sections.  Mixture models may be used
 directly for modeling data with multimodal distributions, or they may
 be used as priors for other parameters.
 
-## Relation to Clustering\label{clustering-mixture.section}
+## Relation to Clustering {#clustering-mixture.section}
 
 Clustering models, as discussed in \refchapter{clustering}, are just a
 particular class of mixture models that have been widely applied to
@@ -3988,11 +4002,11 @@ mixture model.
 One way to parameterize a mixture model is with a latent categorical
 variable indicating which mixture component was responsible for the
 outcome. For example, consider $K$ normal distributions with locations
-$\mu_k \in \reals$ and scales $\sigma_k \in (0,\infty)$.  Now consider
+$\mu_k \in \mathbb{R}$ and scales $\sigma_k \in (0,\infty)$.  Now consider
 mixing them in proportion $\lambda$, where $\lambda_k \geq 0$ and
 $\sum_{k=1}^K \lambda_k = 1$ (i.e., $\lambda$ lies in the unit $K$-simplex).
 For each outcome $y_n$ there is a latent variable $z_n$ in
-$\setlist{1,\ldots,K}$ with a categorical distribution parameterized
+$\{ 1,\ldots,K \}$ with a categorical distribution parameterized
 by $\lambda$,
 
 $$
@@ -4294,7 +4308,7 @@ p(y \, | \, \lambda, \mu, \sigma)
 $$
 
 
-## Inferences Supported by Mixtures\label{mixture-inference.section}
+## Inferences Supported by Mixtures {#mixture-inference.section}
 
 In many mixture models, the mixture components are underlyingly
 exchangeable in the model and thus not identifiable.  This arises if
@@ -4428,7 +4442,7 @@ term inside the integral as a generated quantity.  As with predictive
 likelihood, working in expectation is more statistically efficient than
 sampling.
 
-## Zero-Inflated and Hurdle Models\label{zero-inflated.section}
+## Zero-Inflated and Hurdle Models {#zero-inflated.section}
 
 Zero-inflated and hurdle models both provide mixtures of a Poisson and
 Bernoulli probability mass function to allow more flexibility in
@@ -5095,7 +5109,7 @@ directly in a regression model for the per-trial treatment effects
 $\theta_j$.
 
 
-# Latent Discrete Parameters \label{latent-discrete.chapter}
+# Latent Discrete Parameters  {#latent-discrete.chapter}
 
 
 Stan does not support sampling discrete parameters.  So it is not
@@ -5109,7 +5123,7 @@ latent discrete parameters.  The next chapter,
 \refchapter{clustering}, on clustering models, considers further
 models involving latent discrete parameters.
 
-## The Benefits of Marginalization\label{rao-blackwell.section}
+## The Benefits of Marginalization {#rao-blackwell.section}
 
 Although it requires some algebra on the joint probability function,
 a pleasant byproduct of the required calculations is the posterior
@@ -5125,7 +5139,7 @@ Standard optimization algorithms, including expectation maximization
 maximum likelihood estimation algorithms.  Such derivations provide
 exactly the marginalization needed for coding the model in Stan.
 
-## Change Point Models\label{change-point.section}
+## Change Point Models {#change-point.section}
 
 The first example is a model of coal mining disasters in the U.K.\
 for the years 1851--1962.^[The original source of the data is @Jarret:1979, which itself is a note correcting an earlier data collection.]
@@ -5280,8 +5294,9 @@ model {
   `D[t]` have one rate, `e`, before the change point and a
   different rate, `l`, after the change point.  The change point
   itself, `s`, is marginalized out as described in the
-  text.}\label{change-point-model.figure}
+  text.}
 \end{figure}
+id:change-point-model.figure
 
 Although the model in \reffigure{change-point-model} is easy to
 understand, the doubly nested loop used for `s` and `t` is
@@ -5389,8 +5404,8 @@ default MCMC implementation is shown in
   the right on the linear scale; note the narrower range of years in
   the right-hand plot resulting from sampling. The posterior mean of
   $s$ is roughly 1891.}
-\label{change-point-posterior.figure}
 \end{figure}
+id:change-point-posterior.figure
 
 
 
@@ -5522,8 +5537,8 @@ model {
 estimator for population size based on data from a one-step
 mark-recapture study.  The lower bound on $N$ is necessary to
 efficiently eliminate impossible values.}
-\label{lincoln-petersen-model.figure}
 \end{figure}
+id:lincoln-petersen-model.figure
 
 The probabilistic variant of the Lincoln-Petersen estimator can be
 directly coded in Stan as shown in \reffigure{lincoln-petersen-model}.
@@ -5715,9 +5730,9 @@ generated quantities {
 \caption{\small\it A Stan program for the Cormack-Jolly-Seber
   mark-recapture model that considers counts of individuals with
   observation histories of being observed or not in three capture
-  periods.}\label{cjs-history.figure}
+  periods.}
 \end{figure}
-
+id:cjs-history.figure
 
 #### Identifiability {-}
 
@@ -6167,8 +6182,8 @@ model {
   accuracy) model of @DawidSkene:1979. The model marginalizes
   out the discrete parameter $z$, storing the unnormalized conditional
   probability $\log q(z_i=k|\theta,\pi)$ in\ `log\_q\_z[i,~k]`.}
-\label{dawid-skene-model.figure}
 \end{figure}
+id:dawid-skene-model.figure
 
 The Stan model converges quickly and mixes well using NUTS starting at
 diffuse initial points, unlike the equivalent model implemented with
@@ -6191,7 +6206,7 @@ be averaged across the iterations to provide the posterior probability
 distribution over each $z_i$.
 
 
-# Sparse and Ragged Data Structures \label{sparse-ragged.chapter}
+# Sparse and Ragged Data Structures  {#sparse-ragged.chapter}
 
 
 Stan does not directly support either sparse or ragged data
@@ -6265,8 +6280,9 @@ $jj$ & $kk$ & $y$
   same sparse matrix $y$ that can be used directly in Stan.  The first
   two columns, $jj$ and $kk$, denote the indexes and the final column,
   $y$, the value.  For example, the fifth row of the database-like
-  data structure on the right indicates that $y_{2,4} = 1$.}\label{sparse-data.figure}
+  data structure on the right indicates that $y_{2,4} = 1$.}
 \end{figure}
+id:sparse-data.figure
 
 When not every student is given every question, the dense array coding
 will no longer work, because Stan does not support undefined values.
@@ -6303,7 +6319,7 @@ In the situation where there are no missing values, the two model
 formulations produce exactly the same log posterior density.
 
 
-## Ragged Data Structures\label{ragged-data-structs.section}
+## Ragged Data Structures {#ragged-data-structs.section}
 
 Ragged arrays are arrays that are not rectangular, but have different
 sized entries.  This kind of structure crops up when there are
@@ -6341,9 +6357,9 @@ $s  =  \{ 3 \ \ 2 \ \ 4 \}$
   using a single vector $y$ to hold all the values and a separate
   array of integers $s$ to hold the group row sizes.  In this
   example, $y_1 = z_{1:3}$, $y_2 =
-  z_{4:5}$, and $y_3 = z_{6:9}$.}\label{ragged-data.figure}
+  z_{4:5}$, and $y_3 = z_{6:9}$.}
 \end{figure}
-
+id:ragged-data.figure
 
 Suppose the model is a very simple varying intercept model, which,
 using vectorized notation, would yield a likelihood
@@ -6383,7 +6399,7 @@ This coding allows for efficient vectorization, which is worth the
 copy cost entailed by the `segment()` vector slicing operation.
 
 
-# Clustering Models \label{clustering.chapter}
+# Clustering Models  {#clustering.chapter}
 
 
 Unsupervised methods for organizing data into groups are collectively
@@ -6410,7 +6426,7 @@ allocation is a mixed-membership multinomial mixture.
 
 $K$-means clustering is a method of clustering data represented as
 $D$-dimensional vectors.  Specifically, there will be $N$ items to be
-clustered, each represented as a vector $y_n \in \reals^D$.  In the
+clustered, each represented as a vector $y_n \in \mathbb{R}^D$.  In the
 ``soft" version of $K$-means, the assignments to clusters will be
 probabilistic.
 
@@ -7042,7 +7058,7 @@ a slight concentration around diagonal covariance matrices with scales
 determined by the prior on `sigma`.
 
 
-# Gaussian Processes \label{gaussian-processes.chapter}
+# Gaussian Processes  {#gaussian-processes.chapter}
 
 
 Gaussian processes are continuous stochastic processes and thus may be
@@ -7089,17 +7105,17 @@ only touches on some basic models.  For more information, see
 ## Gaussian Process Regression
 
 The data for a multivariate Gaussian process regression consists of a
-series of $N$ inputs $x_1,\ldots,x_N \in \reals^D$ paired with outputs
-$y_1,\ldots,y_N \in \reals$.  The defining feature of Gaussian
+series of $N$ inputs $x_1,\ldots,x_N \in \mathbb{R}^D$ paired with outputs
+$y_1,\ldots,y_N \in \mathbb{R}$.  The defining feature of Gaussian
 processes is that the probability of a finite number of outputs $y$
 conditioned on their inputs $x$ is Gaussian:
 $$
 y \sim \mathsf{MultiNormal}(m(x), K(x | \theta)),
 $$
 where $m(x)$ is an $N$-vector and $K(x | \theta)$ is an $N \times N$
-covariance matrix.  The mean function $m : \reals^{N \times D}
-\rightarrow \reals^{N}$ can be anything, but the covariance function
-$K : \reals^{N \times D} \rightarrow \reals^{N \times N}$ must produce
+covariance matrix.  The mean function $m : \mathbb{R}^{N \times D}
+\rightarrow \mathbb{R}^{N}$ can be anything, but the covariance function
+$K : \mathbb{R}^{N \times D} \rightarrow \mathbb{R}^{N \times N}$ must produce
 a positive-definite matrix for any input $x$.^[Gaussian processes can be extended to covariance functions producing positive semi-definite matrices, but Stan does not support inference in the resulting models because the resulting distribution does not have unconstrained support.]
 
 A popular covariance function, which will be used in the implementations later
@@ -7137,12 +7153,12 @@ to ensure the positive definiteness of the resulting matrix in the case of
 two identical inputs $x_i = x_j$.  In statistical terms, $\sigma$ is
 the scale of the noise term in the regression.
 
-The hyperparameter $\rho$ is the \emph{length-scale}, and corresponds to the
+The hyperparameter $\rho$ is the *length-scale*, and corresponds to the
 frequency of the functions represented by the Gaussian process prior with
 respect to the domain. Values of $\rho$ closer to zero lead the GP to represent
 high-frequency functions, whereas larger values of $\rho$ lead to low-frequency
-functions. The hyperparameter $\alpha$ is the \emph{marginal standard
-deviation}. It controls the magnitude of the range of the function represented
+functions. The hyperparameter $\alpha$ is the *marginal standard
+deviation*. It controls the magnitude of the range of the function represented
 by the GP. If you were to take the standard deviation of many draws from the GP
 $f_1$ prior at a single input $x$ conditional on one value of $\alpha$ one
 would recover $\alpha$.
@@ -7312,7 +7328,7 @@ univariate distribution for efficiency; this specifies that each
 vector `y` is then defined as a generated quantity using a direct
 encoding of the transform described above.
 
-## Fitting a Gaussian Process\label{fit-gp.section}
+## Fitting a Gaussian Process {#fit-gp.section}
 
 ### GP with a normal outcome {-}
 
@@ -7518,7 +7534,7 @@ model {
 #### Logistic Gaussian Process Regression {-}
 
 For binary classification problems, the observed outputs $z_n \in
-\setlist{0,1}$ are binary.  These outputs are modeled using a Gaussian
+\{ 0,1 \}$ are binary.  These outputs are modeled using a Gaussian
 process with (unobserved) outputs $y_n$ through the logistic link,
 $$
 z_n \sim \mathsf{Bernoulli}(\mbox{logit}^{-1}(y_n)),
@@ -7550,7 +7566,7 @@ model {
 
 ### Automatic Relevance Determination {-}
 
-If we have multivariate inputs $x \in \reals^D$, the squared exponential
+If we have multivariate inputs $x \in \mathbb{R}^D$, the squared exponential
 covariance function can be further generalized by fitting a scale
 parameter $\rho_d$ for each dimension $d$,
 $$
@@ -7635,7 +7651,7 @@ model {
 ```
 
 
-### Priors for Gaussian Process Parameters {-}\label{priors-gp.section}
+### Priors for Gaussian Process Parameters {-} {#priors-gp.section}
 
 Formulating priors for GP hyperparameters requires the analyst to consider the
 inherent statistical properties of a GP, the GP's purpose in the model, and the
@@ -7666,7 +7682,7 @@ If our model consists of only the GP, i.e.:
 \begin{align*}
   f & \sim \mathsf{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\
   y_i & \sim \mathsf{Normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
-  & x \in \reals^{N \times D}, \, f \in \reals^N
+  & x \in \mathbb{R}^{N \times D}, \, f \in \mathbb{R}^N
 \end{align*}
 
 we likely don't need constraints beyond penalizing small
@@ -7689,8 +7705,8 @@ GP, i.e.:
 \begin{align*}
   f & \sim \mathsf{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
   \sim \mathsf{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
-  \in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \reals^D,\, x \in \reals^{N
-  \times D},\, f \in \reals^N
+  \in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \mathbb{R}^D,\, x \in \mathbb{R}^{N
+  \times D},\, f \in \mathbb{R}^N
 \end{align*}
 
 we'll likely want to constrain large length-scales as well.  A length scale
@@ -7706,7 +7722,7 @@ Gaussian distribution:
 \begin{align*}
   f(x | a, b, p) & = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
   / x)/2) \\
-  & x, a, b \in \reals^{+}, \, p \in \mathbb{Z}
+  & x, a, b \in \mathbb{R}^{+}, \, p \in \mathbb{Z}
 \end{align*}
 
 which has an inverse gamma left tail if $p \leq 0$ and an inverse Gaussian
@@ -8024,12 +8040,12 @@ generated quantities {
 
 ### Multiple-output Gaussian processes {-}
 
-Suppose we have observations $y_i \in \reals^M$ observed at
-$x_i \in \reals^K$. One can model the data like so:
+Suppose we have observations $y_i \in \mathbb{R}^M$ observed at
+$x_i \in \mathbb{R}^K$. One can model the data like so:
 \begin{align*}
   y_i & \sim \mathsf{MultiNormal}(f(x_i), \mathbf{I}_M \sigma^2) \\
   f(x) & \sim \mathsf{GP}(m(x), K(x | \theta, \phi)) \\
-  K(x & | \theta) \in \reals^{M \times M}, \, f(x), \, m(x) \in \reals^M
+  K(x & | \theta) \in \mathbb{R}^{M \times M}, \, f(x), \, m(x) \in \mathbb{R}^M
 \end{align*}
 where the $K(x, x^\prime | \theta, \phi)_{[m, m^\prime]}$ entry defines the
 covariance between $f_m(x)$ and $f_{m^\prime}(x^\prime)(x)$. This construction
@@ -8041,7 +8057,7 @@ then our finite dimensional generative model for the above is:
 \begin{align*}
   f & \sim \mathsf{MatrixNormal}(m(x), K(x | \alpha, \rho), C(\phi)) \\
   y_{i, m} & \sim \mathsf{Normal}(f_{i,m}, \sigma) \\
-  f & \in \reals^{N \times M}
+  f & \in \mathbb{R}^{N \times M}
 \end{align*}
 where $K(x | \alpha, \rho)$ is the exponentiated quadratic kernel we've used
 throughout this chapter, and $C(\phi)$ is a positive-definite matrix,
@@ -8065,13 +8081,13 @@ we constrain $\text{trace}(C) = 1$. Otherwise, we can multiply $\alpha$ by a sca
 $C$ by $1/d$ and our likelihood will not change.
 
 We can generate a random variable $f$ from a \mathsf{MatrixNormal} density in
-$\reals^{N \times M}$ using the following algorithm:
+$\mathbb{R}^{N \times M}$ using the following algorithm:
 
 \begin{align*}
   \eta_{i,j} & \sim \mathsf{Normal}(0, 1) \, \forall i,j \\
   f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
   f & \sim \mathsf{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
-  \eta & \in \reals^{N \times M} \\
+  \eta & \in \mathbb{R}^{N \times M} \\
   L_C(\phi) & = \text{cholesky\_decompose}(C(\phi)) \\
   L_{K(x | 1.0, \rho)} & = \text{cholesky\_decompose}(K(x | 1.0, \rho))
 \end{align*}
@@ -8147,7 +8163,7 @@ two dimensions, sphere in three dimensions).
 
 ## Unit Vectors
 
-The length of a vector $x \in \reals^K$ is given by
+The length of a vector $x \in \mathbb{R}^K$ is given by
 $$
 \Vert x \Vert
 \ = \ \sqrt{x^{\top}\,x}
@@ -8192,15 +8208,15 @@ distribution over the hypersphere.
 An $n$-sphere, written $S^{n}$, is defined as the set of $(n +
 1)$-dimensional unit vectors,
 $$
-S^{n} = \{ x \in \reals^{n+1} \, : \, \Vert x \Vert = 1 \}.
+S^{n} = \{ x \in \mathbb{R}^{n+1} \, : \, \Vert x \Vert = 1 \}.
 $$
 
 Even though $S^n$ is made up of points in $(n+1)$ dimensions, it is
 only an $n$-dimensional manifold.  For example, $S^2$ is defined as a
-set of points in $\reals^3$, but each such point may be described
+set of points in $\mathbb{R}^3$, but each such point may be described
 uniquely by a latitude and longitude.  Geometrically, the surface
-defined by $S^2$ in $\reals^3$ behaves locally like a plane, i.e.,
-$\reals^2$.  However, the overall shape of $S^2$ is not like a plane
+defined by $S^2$ in $\mathbb{R}^3$ behaves locally like a plane, i.e.,
+$\mathbb{R}^2$.  However, the overall shape of $S^2$ is not like a plane
 in that is compact (i.e., there is a maximum distance between points).
 If you set off around the globe in a "straight line" (i.e., a
 geodesic), you wind up back where you started eventually; that is why
@@ -8208,7 +8224,7 @@ the geodesics on the sphere ($S^2$) are called "great circles," and
 why we need to use some clever representations to do circular or
 spherical statistics.
 
-Even though $S^{n-1}$ behaves locally like $\reals^{n-1}$, there is no
+Even though $S^{n-1}$ behaves locally like $\mathbb{R}^{n-1}$, there is no
 way to smoothly map between them. For example, because
 latitude and longitude work on a modular basis (wrapping at $2\pi$
 radians in natural units), they do not produce a smooth map.
@@ -8219,9 +8235,9 @@ compact in that the distance between any two points is bounded.
 
 ## Transforming to Unconstrained Parameters
 
-Stan (inverse) transforms arbitrary points in $\reals^{K+1}$ to points
+Stan (inverse) transforms arbitrary points in $\mathbb{R}^{K+1}$ to points
 in $S^K$ using the auxiliary variable approach of
-@Marsaglia:1972.  A point $y \in \reals^K$ is transformed to a
+@Marsaglia:1972.  A point $y \in \mathbb{R}^K$ is transformed to a
 point $x \in S^{K-1}$ by
 
 $$
@@ -8239,7 +8255,7 @@ transforms.
 
 #### Warning: undefined at zero! {-}
 
-The above mapping from $\reals^n$ to $S^n$ is not defined at zero.
+The above mapping from $\mathbb{R}^n$ to $S^n$ is not defined at zero.
 While this point outcome has measure zero during sampling, and may
 thus be ignored, it is the default initialization point and thus unit
 vector parameters cannot be initialized at zero.  A simple workaround
@@ -8324,7 +8340,7 @@ daylight savings time.
 
 
 
-# Solving Algebraic Equations \label{algebra-solver.chapter}
+# Solving Algebraic Equations  {#algebra-solver.chapter}
 
 
 Stan provides a built-in mechanism for specifying and solving systems
@@ -8346,7 +8362,7 @@ As an illustrative example, we consider a nonlinear system of two equations
 with two unknowns. Our goal is to simultaneously solve all equations for
 $y_1$ and $y_2$, such that the vector $z$ goes to 0.
 
-\begin{eqnarray}\label{algebra.equation}
+\begin{eqnarray} {#algebra.equation}
   \begin{aligned}
   z_1 &= y_1 - \theta_1 \\
   z_2 &= y_1 y_2 + \theta_2 \\
@@ -8461,7 +8477,7 @@ On the other hand, a system may not have a solution (for a given point in the pa
 space). In that case, the solver will not converge to a solution. When the solver fails to
 do so, the current metropolis proposal gets rejected.
 
-## Control Parameters for the Algebraic Solver\label{algebra-control.section}
+## Control Parameters for the Algebraic Solver {#algebra-control.section}
 
 The call to the algebraic solver shown above uses the default control settings. The solver
 allows three additional parameters, all of which must be supplied if any of them is
@@ -8503,7 +8519,7 @@ current metropolis proposal gets rejected. Users will see a  warning message sta
 maximum number of steps has been exceeded.
 
 
-# Solving Differential Equations \label{ode-solver.chapter}
+# Solving Differential Equations  {#ode-solver.chapter}
 
 
 Stan provides a built-in mechanism for specifying and solving systems
@@ -8535,11 +8551,12 @@ The system state will be a pair $y = (y_1, y_2)$ representing position
 and momentum (i.e., a point in phase space).  The change in the system
 with respect to time is given by the following differential equations.^[This example is drawn from the documentation for the Boost Numeric Odeint library @AhnertMulansky:2011, which Stan uses to implement the `rk45` solver.]
 
-\begin{equation}\label{ode-sho.equation}
+$$
 \frac{d}{dt} y_1 = y_2
 \hspace*{0.5in}
 \frac{d}{dt} y_2 = -y_1 - \theta y_2
-\end{equation}
+$$
+id:ode-sho.equation
 
 The state equations implicitly define the system state at a given time
 as a function of an initial state, elapsed time since the initial
@@ -8629,25 +8646,30 @@ The solution to $\frac{d}{dt} y = ay$ is $y = y_0e^{at}$, where the constant
 $y_0$ is determined by boundary conditions. We can extend this solution
 to the vector case:
 
-\begin{equation}\label{ode.linODEs}
+$$
 \frac{d}{dt}y = A y
-\end{equation}
+$$
+id:ode.linODEs
 
 where $y$ is now a vector of length $n$ and $A$ is an $n$ by $n$ matrix. The
 solution is then given by:
-\begin{equation}\label{ode.linOEs.sln}
+
+$$
 y = e^{tA}y_0
-\end{equation}
+$$
+id:ode.linOEs.sln
+
 where the matrix exponential is formally defined by the convergent power series:
 
-\begin{equation}\label{ode.matrix_exp.def}
+$$
 e^{tA} = \sum_{n=0}^{\infty} \dfrac{tA^n}{n!} = I + tA + \frac{t^2A^2}{2!} + ...
-\end{equation}
+$$
+id:ode.matrix_exp.def
 
 We can apply this technique to the simple harmonic oscillator example, by
 setting
 
-\begin{equation}\label{ode.sho_matrix}
+$$
   y = \left[\begin{array}{c}
         y_1 \\
         y_2 \\
@@ -8656,12 +8678,13 @@ setting
 	0 & 1 \\
 	-1 & -\theta \\
 	\end{array}\right]
-\end{equation}
+$$
+id:ode.sho_matrix
 
 The Stan model to simulate noisy observations using a matrix exponential function
 is given by \reffigure{sho-sim-me}. Note that because we are performing matrix
 operations, we declare `y0` and `y\_hat` as vectors, instead of using arrays,
-as in the previous example code (\reffigure{sho-sim}). \\
+as in the previous example code (\reffigure{sho-sim}).
 
 In general, computing a matrix exponential will be more efficient than using a numerical
 solver. We can however only apply this technique to systems of \underline{linear} ODEs.
@@ -8697,9 +8720,9 @@ generated quantities {
   The generated quantities block is used to solve the ODE for the specified
   times and then add random measurement error, producing observations
   `y\_hat`. Because the ODEs are linear, we can use the `matrix\_exp`
-  function to solve the system. }\label{sho-sim-me.figure}
+  function to solve the system. }
 \end{figure}
-
+id:sho-sim-me.figure
 
 ## Measurement Error Models
 
@@ -8724,8 +8747,8 @@ $y_2(t)$).  A plot of such measurements is shown in
   parameter $\theta=0.15$ and initial condition $y(t=0) = (1,0)$ with
   additional independent\ $\mathsf{Normal}(0,0.1)$ measurement error
   in both dimensions.}
-\label{sho-trajectory.figure}
 \end{figure}
+id:sho-trajectory.figure
 
 
 
@@ -8778,8 +8801,9 @@ generated quantities {
   `t0` and observation times `ts`. The generated quantities
   block is used to solve the ODE for the specified times and then add
   random measurement error, producing observations `y\_hat`.
-  Because the system is not stiff, the `rk45` solver is used.}\label{sho-sim.figure}
+  Because the system is not stiff, the `rk45` solver is used.}
 \end{figure}
+id:sho-sim.figure
 
 This program illustrates the way in which the ODE solver is called in
 a Stan program,
@@ -8862,8 +8886,9 @@ model {
 \caption{\small\it Stan program to estimate unknown initial conditions
   `y0` and system parameter `theta` for the simple harmonic
   oscillator with independent normal measurement
-  error.}\label{sho-both.figure}
+  error.}
 \end{figure}
+id:sho-both.figure
 
 A Stan program that can be used to estimate both the initial state and
 parameter value for the simple harmonic oscillator given noisy
@@ -8893,7 +8918,7 @@ observed data points for times $t = 1, ..., 10$ is sufficient to
 reliably estimate the ODE parameter, initial state, and noise scales.
 
 
-## Stiff ODEs\label{stiff-ode.section}
+## Stiff ODEs {#stiff-ode.section}
 
 A stiff system of ordinary differential equations can be roughly
 characterized as systems presenting numerical difficulties for
@@ -8969,10 +8994,15 @@ warmup.  With the non-stiff solver, this may result in jumping into a
 stiff region of the parameter space, which would require a very small
 step size and very many steps to satisfy even modest tolerances.
 
-\part{Programming Techniques}\label{programming-techniques.part}
+
+# <i style="font-size: 110%; color:#990017;">II. Programming Techniques</i> {-} {#programming-techniques.part}
+
+This part of the manual surveys general programming techniques in
+Stan that are useful across a range of different model types.
 
 
-# Reparameterization and Change of Variables \label{change-of-variables.chapter}
+
+# Reparameterization and Change of Variables  {#change-of-variables.chapter}
 
 
 As with BUGS, Stan supports a direct encoding of reparameterizations.
@@ -8981,12 +9011,12 @@ log probability accumulator with the log Jacobian of the transform.
 
 ## Theoretical and Practical Background
 
-A Bayesian posterior is technically a probability \emph{measure},
+A Bayesian posterior is technically a probability *measure*,
 which is a parameterization-invariant, abstract mathematical object.^[This is in contrast to (penalized) maximum likelihood estimates, which are not parameterization invariant.]
 
 Stan's modeling language, on the other hand, defines a probability
-\emph{density}, which is a non-unique, parameterization-dependent
-function in $\reals^N \rightarrow \reals^{+}$.  In practice, this
+*density*, which is a non-unique, parameterization-dependent
+function in $\mathbb{R}^N \rightarrow \mathbb{R}^{+}$.  In practice, this
 means a given model can be represented different ways in Stan, and
 different representations have different computational performances.
 
@@ -8994,7 +9024,7 @@ As pointed out by @Gelman:2004 in a paper discussing the
 relation between parameterizations and Bayesian modeling, a change of
 parameterization often carries with it suggestions of how the model
 might change, because we tend to use certain natural classes of prior
-distributions.  Thus, it's not \emph{just}\ that we have a fixed
+distributions.  Thus, it's not *just* that we have a fixed
 distribution that we want to sample from, with reparameterizations
 being computational aids.  In addition, once we reparameterize and add
 prior information, the model itself typically changes, often in useful
@@ -9351,7 +9381,7 @@ or as an increment to the log probability function, as in
 target += normal_lpdf(log(y) | mu, sigma);
 ```
 
-#### Gamma and Inverse Gamma Distribution {-}\label{jacobian-adjustment.section}
+#### Gamma and Inverse Gamma Distribution {-} {#jacobian-adjustment.section}
 
 Like the log normal, the inverse gamma distribution is a distribution
 of variables whose inverse has a gamma distribution.  This section
@@ -9545,7 +9575,7 @@ otherwise a Jacobian would be required when multiplying by $U - L$.
 
 
 
-# Custom Probability Functions \label{custom-probability-functions.chapter}
+# Custom Probability Functions  {#custom-probability-functions.chapter}
 
 
 Custom distributions may also be implemented directly within Stan's
@@ -9560,7 +9590,7 @@ examples.
 A simple example is the triangle distribution,
 whose density is shaped like an isosceles triangle with corners at
 specified bounds and height determined by the constraint that a
-density integrate to 1.  If $\alpha \in \reals$ and $\beta \in \reals$
+density integrate to 1.  If $\alpha \in \mathbb{R}$ and $\beta \in \mathbb{R}$
 are the bounds, with $\alpha < \beta$, then $y \in (\alpha,\beta)$ has
 a density defined as follows.
 $$
@@ -9609,7 +9639,7 @@ it would produce arithmetic exceptions at run time when the sampler
 explored values of `y` outside of $(-1,1)$.
 
 Now suppose the log probability function were extended to all of
-$\reals$ as follows by defining the probability to be `log(0.0)`,
+$\mathbb{R}$ as follows by defining the probability to be `log(0.0)`,
 i.e., $-\infty$, for values outside of $(-1,1)$.
 
 ```
@@ -9698,7 +9728,7 @@ real binormal_cdf(real z1, real z2, real rho) {
 ```
 
 
-# User-Defined Functions \label{functions-programming.chapter}
+# User-Defined Functions  {#functions-programming.chapter}
 
 
 This chapter explains functions from a user perspective with examples;
@@ -9710,7 +9740,7 @@ components.  Writing modular code using descriptively named functions
 is easier to understand than a monolithic program, even if the latter
 is heavily commented.^[The main problem with comments is that they can be misleading, either due to misunderstandings on the programmer's part or because the program's behavior is modified after the comment is written.  The program always behaves the way the code is written, which is why refactoring complex code into understandable units is preferable to simply adding comments.]
 
-## Basic Functions\label{basic-functions.section}
+## Basic Functions {#basic-functions.section}
 
 Here's an example of a skeletal Stan program with a user-defined
 relative difference function employed in the generated quantities
@@ -9902,8 +9932,9 @@ quantities block.
   dimensions `matrix[K,~K]` types. Stan also allows arrays of any
   of these types, with slightly different declarations for function
   arguments and return types and variables.
-}\label{constrained-types.figure}
+}
 \end{figure}
+id:constrained-types.figure
 
 Function argument and return types for vector and matrix types
 are not declared with their sizes, unlike type declarations for variables.
@@ -10190,7 +10221,7 @@ that it is not possible to define two different functions with the
 same name, even if they have different signatures.
 
 
-## Documenting Functions\label{documenting-functions.section}
+## Documenting Functions {#documenting-functions.section}
 
 Functions will ideally be documented at their interface level.  The
 Stan style guide for function documentation follows the same format as
@@ -10440,7 +10471,7 @@ bounds.  The variable `u` is clearly named as a uniform variate,
 and `y` is used to denote the variate being generated itself.
 
 
-# Problematic Posteriors \label{problematic-posteriors.chapter}
+# Problematic Posteriors  {#problematic-posteriors.chapter}
 
 
 Mathematically speaking, with a proper posterior, one can do Bayesian
@@ -10454,7 +10485,7 @@ create problematic posterior inferences, either in general for
 Bayesian inference or in practice for Stan.
 
 
-## Collinearity of Predictors in Regressions\label{collinearity.section}
+## Collinearity of Predictors in Regressions {#collinearity.section}
 
 This section discusses problems related to the classical notion of
 identifiability, which lead to ridges in the posterior density and
@@ -10698,8 +10729,8 @@ minimizes $\log \mathsf{Normal}(\lambda_1|0,\tau) + \log
   and southeast.  Middle) Adding a standard normal prior for the
   intercepts results in a proper posterior.  Right) The single
   intercept parameterization with no prior also has a proper posterior.}
-\label{non-identifiable-density.figure}
 \end{figure}
+id:non-identifiable-density.figure
 
 The addition of a prior to the two intercepts model is shown in the
 middle plot in \reffigure{non-identifiable-density}.  The plot on
@@ -10748,7 +10779,7 @@ chosen that is either informative or weakly informative based on prior
 knowledge of the problem.
 
 
-## Label Switching in Mixture Models\label{label-switching-problematic.section}
+## Label Switching in Mixture Models {#label-switching-problematic.section}
 
 Where collinearity in regression models can lead to infinitely many
 posterior maxima, swapping components in a mixture model leads to
@@ -11134,8 +11165,8 @@ sigma            1.0  1.6e-03   0.071   9.3e-01   1.0   1.2   2094    27321    1
   value $\mu=0$ is within the 90% posterior intervals in all three models.
 
 }
-\label{non-identified-stan-fits.figure}
 \end{figure}
+id:non-identified-stan-fits.figure
 
 
 ### Examples: Fits in Stan {-}
@@ -11296,7 +11327,7 @@ the error.  All of Stan's containers check the sizes of all indexes.
 
 
 
-## Data Type and Indexing Efficiency\label{indexingefficiency.section}
+## Data Type and Indexing Efficiency {#indexingefficiency.section}
 
 The underlying matrix and linear algebra operations are implemented in
 terms of data types from the Eigen C++ library.  By having vectors
@@ -11437,7 +11468,7 @@ copying.
 ### Memory Locality {-}
 
 CPUs on computers bring in memory in blocks through layers of caches.
-Fetching from memory is \emph{much}\ slower than performing arithmetic
+Fetching from memory is *much* slower than performing arithmetic
 operations.  The only way to make container operations fast is to
 respect memory locality and access elements that are close together in
 memory sequentially in the program.
@@ -11547,7 +11578,7 @@ define subseqeunt values;  in the sliced expression assigning to
 the left-hand side.
 
 
-# Multiple Indexing and Range Indexing \label{multi-indexing.chapter}
+# Multiple Indexing and Range Indexing  {#multi-indexing.chapter}
 
 
 Stan allows multiple indexes to be provided for containers (i.e.,
@@ -11968,7 +11999,7 @@ entries known to be positive.
 
 
 
-# Map-Reduce \label{map-reduce.chapter}
+# Map-Reduce  {#map-reduce.chapter}
 
 
 Map-reduce allows large calculations (e.g., log likelihoods) to be
@@ -12365,7 +12396,7 @@ to convert it back to a usable form based on the input, because there
 is no way to directly return sizes or a ragged structure.
 
 
-# Optimizing Stan Code for Efficiency \label{optimization.chapter}
+# Optimizing Stan Code for Efficiency  {#optimization.chapter}
 
 
 This chapter provides a grab bag of techniques for optimizing Stan
@@ -12597,7 +12628,7 @@ model {
 Now the only validation is carried out by the multivariate normal.
 
 
-## Reparameterization\label{reparameterization.section}
+## Reparameterization {#reparameterization.section}
 
 Stan's sampler can be slow in sampling from distributions with
 difficult posterior geometries.  One way to speed up such models is
@@ -12633,8 +12664,9 @@ parameters in the prior.
   the displayed area as would be expected given the density.  The samples are
   consistent with the marginal density $p(y) =
   \mathsf{Normal}(y|0,3)$, which has mean 0 and standard deviation
-  3.}\label{funnel.figure}
+  3.}
 \end{figure}
+id:funnel.figure
 
 @Neal:2003 defines a distribution that exemplifies the
 difficulties of sampling from some hierarchical models.  Neal's
@@ -12725,13 +12757,13 @@ function.
 Suppose a random variable of interest $X$ has a Cauchy distribution
 with location $\mu$ and scale $\tau$, so that $X \sim
 \mathsf{Cauchy}(\mu,\tau)$.  The variable $X$ has a cumulative
-distribution function $F_X:\reals \rightarrow (0,1)$ defined by
+distribution function $F_X:\mathbb{R} \rightarrow (0,1)$ defined by
 $$
 F_X(x) = \frac{1}{\pi} \arctan \left( \frac{x - \mu}{\tau} \right) +
 \frac{1}{2}.
 $$
 The inverse of the cumulative distribution function,
-$F_X^{-1}:(0,1) \rightarrow \reals$, is thus
+$F_X^{-1}:(0,1) \rightarrow \mathbb{R}$, is thus
 
 $$
 F^{-1}_X(y) = \mu + \tau \tan \left( \pi \left( y - \frac{1}{2} \right) \right).
@@ -13862,9 +13894,15 @@ reduced memory overhead leads to increased memory locality and faster
 execution.  The Jacobians are all computed with local memory and their
 outputs stored contiguously in memory.
 
-\part{Inference}
+# <i style="font-size: 110%; color:#990017;">III. Inference</i> {-}
 
-# Bayesian Data Analysis \label{bayesian.chapter}
+This section of the model provides an overview of statistical inference
+supported by Stan, including full Bayes, maximum posterior modes, and
+variational approximations.  It also covers the posterior analysis
+calculations such as $\hat{R}$ for convergence monitoring and effective
+sample size calculations.
+
+# Bayesian Data Analysis  {#bayesian.chapter}
 
 
 @GelmanEtAl:2013 provide the following
@@ -14044,7 +14082,7 @@ quantities block.
 
 
 
-# Penalized Maximum Likelihood Point Estimation \label{mle.chapter}
+# Penalized Maximum Likelihood Point Estimation  {#mle.chapter}
 
 
 This chapter defines the workhorses of non-Bayesian estimation,
@@ -14062,7 +14100,7 @@ posterior modes.  Stan's Markov chain Monte Carlo samplers can be used
 to implement point inference in Bayesian models based on posterior
 means or medians.
 
-## Maximum Likelihood Estimation\label{mle.section}
+## Maximum Likelihood Estimation {#mle.section}
 
 Given a likelihood function $p(y|\theta)$ and a fixed data vector $y$,
 the maximum likelihood estimate (MLE) is the parameter vector $\hat{\theta}$
@@ -14201,7 +14239,7 @@ likelihood and minimizing the penalty.  Penalization is sometimes
 called "regularization."
 
 
-### Examples {-}\label{penalized-mle-examples}
+### Examples {-} {#penalized-mle-examples}
 
 #### Ridge Regression {-}
 
@@ -14378,7 +14416,7 @@ estimates toward population means; see
 to the hierarchical models commonly employed in Bayesian statistics.
 
 
-## Estimation Error, Bias, and Variance\label{estimation-bias.section}
+## Estimation Error, Bias, and Variance {#estimation-bias.section}
 
 An estimate $\hat{\theta}$ depends on the particular data $y$ and
 either the log likelihood function, $\log p(y|\theta)$, penalized log
@@ -14619,7 +14657,7 @@ even where posterior means do not, as in the Cauchy distribution.
 
 
 
-# Variational Inference \label{vi-advanced.chapter}
+# Variational Inference  {#vi-advanced.chapter}
 
 
 Stan implements an automatic variational inference algorithm based on
@@ -14745,8 +14783,7 @@ where we plug in the analytic form for the Gaussian entropy and drop all terms
 that do not depend on $\phi$. We discuss how we perform the maximization in
 \refchapter{vi-algorithms}.
 
-\part*{Appendices}
-\addcontentsline{toc}{part}{Appendices}
+# <i style="font-size: 110%; color:#990017;">Appendices</i> {-}
 
 
 # Stan Program Style Guide
@@ -15109,7 +15146,7 @@ There should be spaces around binary operators.  For instance, use
 
 ### Breaking Expressions across Lines {-}
 
-Sometimes expressions are too long to fit on a single line.  In that case, the recommended form is to break \emph{before} an operator,^[This is the usual convention in both typesetting and other programming languages. Neither R nor BUGS allows breaks before an operator because they allow newlines to signal the end of an expression or statement.]  aligning the operator to indicate scoping.  For example, use the following form (though not the content; inverting matrices is almost always a bad idea).
+Sometimes expressions are too long to fit on a single line.  In that case, the recommended form is to break *before* an operator,^[This is the usual convention in both typesetting and other programming languages. Neither R nor BUGS allows breaks before an operator because they allow newlines to signal the end of an expression or statement.]  aligning the operator to indicate scoping.  For example, use the following form (though not the content; inverting matrices is almost always a bad idea).
 
 ```
 target += (y - mu)' * inv(Sigma) * (y - mu);
@@ -15152,7 +15189,7 @@ followed by a line-feed (LF) character.
 
 
 
-# Stan for Users of BUGS \label{stan-for-bugs.appendix}
+# Stan for Users of BUGS  {#stan-for-bugs.appendix}
 
 From the outside, Stan and BUGS^[Except where otherwise noted, we use "BUGS" to refer to WinBUGS, OpenBUGS, and JAGS, indiscriminately.]
 are similar --- they use statistically-themed modeling languages
@@ -15273,8 +15310,8 @@ sample out of hand as if it had zero probability.
   to the restrictions it places on derivative works.  Stan is licensed
   under the much more liberal new BSD license.
 * Like WinBUGS, OpenBUGS and JAGS, Stan can be run directly from
-  the command line or through R (Python and MATLAB interfaces are in
-  the works)
+  the command line or through common analytics platforms like R,
+  Python, Julia, MATLAB, Mathematica, and the command line.
 * Like OpenBUGS and JAGS, Stan can be run on Linux, Mac, and
   Windows platforms.
 
@@ -15514,7 +15551,7 @@ model { }
 ```
 
 * Although parameters in Stan models may have improper priors, we
-  do not want improper \emph{posterior} distributions, as we are trying to
+  do not want improper *posterior* distributions, as we are trying to
   use these distributions for Bayesian inference.  There is no general
   way to check if a posterior distribution is improper.  But if all
   the priors are proper, the posterior will be proper also.
@@ -15525,8 +15562,8 @@ y ~ normal(0,1);
 y ~ normal(2,3);
 ```
 
-The second line here does \emph{not} simply overwrite the first;
-rather, \emph{both} statements contribute to the density function that
+The second line here does *not* simply overwrite the first;
+rather, *both* statements contribute to the density function that
 is evaluated.  The above two lines have the effect of including the
 product, $\mathsf{Norm}(y|0,1) \times \mathsf{Norm}(y|2,3)$, into the
 density function.
@@ -15538,7 +15575,7 @@ y ~ normal(0.8*x, sigma);
 ```
 
 At first, this might look like a joint normal distribution with a
-correlation of 0.8.  But it is not.  The above are \emph{not}
+correlation of 0.8.  But it is not.  The above are *not*
 interpreted as conditional entities; rather, they are factors in the
 joint density.  Multiplying them gives, $\mathsf{Norm}(x|0.8y,\sigma)
 \times \mathsf{Norm}(y|0.8x,\sigma)$, which is what it is (you can
@@ -15594,3 +15631,5 @@ conditionals have regressions with slope 0.8.
   which you can access via the user's mailing list and the developer's
   mailing list; see the [Stan web site](http://mc-stan.org) for information on
   subscribing and posting and to look at archives.
+
+# <i style="font-size: 110%; color:#990017;">References</i> {-}
