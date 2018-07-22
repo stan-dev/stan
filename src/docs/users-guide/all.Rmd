@@ -2537,7 +2537,7 @@ Times series data come arranged in temporal order.  This chapter
 presents two kinds of time series models, regression-like models such
 as autoregressive and moving average models, and hidden Markov models.
 
-The [Gaussian processes chapter](gaussian-processes.chapter) presents
+The [Gaussian processes chapter](#gaussian-processes.chapter) presents
 Gaussian processes, which may also be used for time-series (and
 spatial) data.
 
@@ -3605,16 +3605,16 @@ model {
 }
 ```
 
-The index arrays `ii_obs` and `ii_mis` contain the indexes
-into the final array `y` of the observed data (coded as a data
-vector `y_obs`) and the missing data (coded as a parameter
-vector `y_mis`).  See \refchapter{time-series} for further
-discussion of time-series model and specifically
-\refsection{autoregressive} for an explanation of the vectorization
-for `y` as well as an explanation of how to convert this example
-to a full AR(1) model.  To ensure `y[1]` has a proper posterior
-in case it is missing, we have given it an explicit, albeit broad,
-prior.
+The index arrays `ii_obs` and `ii_mis` contain the indexes into the
+final array `y` of the observed data (coded as a data vector `y_obs`)
+and the missing data (coded as a parameter vector `y_mis`).  See the
+[time series chapter](#time-series.chapter) for further discussion of
+time-series model and specifically the [autoregression
+section](autoregressive.section) for an explanation of the
+vectorization for `y` as well as an explanation of how to convert this
+example to a full AR(1) model.  To ensure `y[1]` has a proper
+posterior in case it is missing, we have given it an explicit, albeit
+broad, prior.
 
 Another potential application would be filling the
 columns of a data matrix of predictors for which some predictors are
@@ -3626,11 +3626,12 @@ same way, as in
   x[N_mis_2, 2] = x_mis_2;
 ```
 
-where the relevant variables are all hard coded with index `2`
-because Stan doesn't support ragged arrays.  These could all be packed
-into a single array with more fiddly indexing that slices out vectors
-from longer vectors (see \refsection{ragged-data-structs} for a
-general discussion of coding ragged data structures in Stan).
+where the relevant variables are all hard coded with index `2` because
+Stan doesn't support ragged arrays.  These could all be packed into a
+single array with more fiddly indexing that slices out vectors from
+longer vectors (see the [ragged data structures
+section](#ragged-data-structs.section) for a general discussion of
+coding ragged data structures in Stan).
 
 ## Loading matrix for factor analysis
 
@@ -4044,14 +4045,14 @@ be used as priors for other parameters.
 
 ## Relation to Clustering {#clustering-mixture.section}
 
-Clustering models, as discussed in \refchapter{clustering}, are just a
-particular class of mixture models that have been widely applied to
-clustering in the engineering and machine-learning literature.  The
-normal mixture model discussed in this chapter reappears in
-multivariate form as the statistical basis for the $K$-means
-algorithm;  the latent Dirichlet allocation model, usually applied to
-clustering problems, can be viewed as a mixed-membership multinomial
-mixture model.
+Clustering models, as discussed in the [clustering
+chapter](#clustering.chapter), are just a particular class of mixture
+models that have been widely applied to clustering in the engineering
+and machine-learning literature.  The normal mixture model discussed
+in this chapter reappears in multivariate form as the statistical
+basis for the $K$-means algorithm; the latent Dirichlet allocation
+model, usually applied to clustering problems, can be viewed as a
+mixed-membership multinomial mixture model.
 
 
 ## Latent Discrete Parameterization
@@ -4230,23 +4231,14 @@ p(z_n = k \mid y_n, \mu, \sigma, \lambda)
                     \cdot p(z_n = k' \mid \lambda)}.
 $$
 
-On the log scale, the normalized probability is computed as
-$$
-\begin{array}{l}
-\log p(z_n = k \mid y_n, \mu, \sigma, \lambda)
-\\[6pt] { } \hspace*{12pt} \ = \
-\begin{array}[t]{l}
-\log p(y_n \mid z_n = k, \mu, \sigma)
-\ + \ \log p(z_n = k \mid \lambda)
-\\[2pt]
-\ - \ \mathrm{log\_sum\_exp}_{k' = 1}^K
-        \log p(y_n \mid z_n = k', \mu, \sigma)
-        + \log p(z_n = k' \mid \lambda).
-\end{array}
-\end{array}
-$$
-This can be coded up directly in Stan; the change-point model in
-\refsection{change-point} provides an example.
+On the log scale, the normalized probability is computed as $$
+\begin{array}{l} \log p(z_n = k \mid y_n, \mu, \sigma, \lambda)
+\\[6pt] { } \hspace*{12pt} \ = \ \begin{array}[t]{l} \log p(y_n \mid
+z_n = k, \mu, \sigma) \ + \ \log p(z_n = k \mid \lambda) \\[2pt] \ - \
+\mathrm{log\_sum\_exp}_{k' = 1}^K \log p(y_n \mid z_n = k', \mu,
+\sigma) + \log p(z_n = k' \mid \lambda).  \end{array} \end{array} $$
+This can be coded up directly in Stan; the change-point model in the
+[change point section](#change-point.section) provides an example.
 
 ### Estimating Parameters of a Mixture {-}
 
@@ -4658,11 +4650,12 @@ program in Stan, as it does not require an explicit mixture.
 ```
 
 The Bernoulli statements are just shorthand for adding $\log \theta$
-and $\log (1 - \theta)$ to the log density.  The `T[1,]` after
-the Poisson indicates that it is truncated below at 1; see
-\refsection{truncation} for more about truncation and
-\refsection{poisson} for the specifics of the Poisson CDF.  The net
-effect is equivalent to the direct definition of the log likelihood.
+and $\log (1 - \theta)$ to the log density.  The `T[1,]` after the
+Poisson indicates that it is truncated below at 1; see the [truncation
+section](#truncation.section) for more about truncation and the
+[Poisson regresison section](#poisson.section) for the specifics of
+the Poisson CDF.  The net effect is equivalent to the direct
+definition of the log likelihood.
 
 ```
    if (y[n] == 0)
@@ -5076,9 +5069,9 @@ $$
 }.
 $$
 
-The log odds and standard errors can be defined in a
-transformed parameter block, though care must be taken not to use
-integer division (see \refsection{int-arithmetic}).
+The log odds and standard errors can be defined in a transformed
+parameter block, though care must be taken not to use integer
+division.^[When dividing two integers, the result type is an integer and rounding will ensue if the result is not exact.  See the discussion of primitive arithmetic types in the reference manual for more information.]
 
 ```
 transformed data {
@@ -5182,8 +5175,8 @@ possible to code many models that involve bounded discrete
 parameters by marginalizing out the discrete parameters.^[The computations are similar to those involved in expectation maximization (EM) algorithms @dempster-et-al:1977.]
 
 This chapter shows how to code several widely-used models involving
-latent discrete parameters.  The next chapter,
-\refchapter{clustering}, on clustering models, considers further
+latent discrete parameters.  The next chapter, the [clustering
+chapter](#clustering.chapter), on clustering models, considers further
 models involving latent discrete parameters.
 
 ## The Benefits of Marginalization {#rao-blackwell.section}
@@ -6284,18 +6277,20 @@ distribution over each $z_i$.
 
 Stan does not directly support either sparse or ragged data
 structures, though both can be accommodated with some programming
-effort.  \refchapter{sparse-matrices} introduces a special-purpose
-sparse matrix times dense vector multiplication, which should be used
-where applicable;  this chapter covers more general data structures.
+effort.  The [sparse matrices chapter](#sparse-matrices.chapter)
+introduces a special-purpose sparse matrix times dense vector
+multiplication, which should be used where applicable; this chapter
+covers more general data structures.
 
 ## Sparse Data Structures
 
 Coding sparse data structures is as easy as moving from a matrix-like
 data structure to a database-like data structure.  For example,
-consider the coding of sparse data for the IRT models discussed in
-\refsection{item-response-models}.  There are $J$ students and $K$
-questions, and if every student answers every question, then it is
-practical to declare the data as a $J \times K$ array of answers.
+consider the coding of sparse data for the IRT models discussed in the
+[item-response model section](#item-response-models.section).  There
+are $J$ students and $K$ questions, and if every student answers every
+question, then it is practical to declare the data as a $J \times K$
+array of answers.
 
 ```
 data {
@@ -6484,16 +6479,16 @@ a form of clustering which may be supervised.  These models are
 typically expressed using discrete parameters for cluster assignments.
 Nevertheless, they can be implemented in Stan like any other mixture
 model by marginalizing out the discrete parameters (see
-\refchapter{mixture-modeling}).
+the [mixture modeling chapter](#mixture-modeling.chapter)).
 
 ## Relation to Finite Mixture Models
 
-As mentioned in \refsection{clustering-mixture}, clustering models and
-finite mixture models are really just two sides of the same coin.  The
-``soft" $K$-means model described in the next section is a normal
-mixture model (with varying assumptions about covariance in higher
-dimensions leading to variants of $K$-means).  Latent Dirichlet
-allocation is a mixed-membership multinomial mixture.
+As mentioned in the [clustering section](#clustering-mixture.section),
+clustering models and finite mixture models are really just two sides
+of the same coin.  The ``soft" $K$-means model described in the next
+section is a normal mixture model (with varying assumptions about
+covariance in higher dimensions leading to variants of $K$-means).
+Latent Dirichlet allocation is a mixed-membership multinomial mixture.
 
 ## Soft $K$-Means
 
@@ -6602,12 +6597,12 @@ There is an independent standard normal prior on the centroid parameters;
 this prior could be swapped with other priors, or even a hierarchical
 model to fit an overall problem scale and location.
 
-The only parameter is `mu`, where `mu[k]` is the centroid
-for cluster $k$.  The transformed parameters `soft_z[n]` contain
-the log of the unnormalized cluster assignment probabilities.  The
-vector `soft_z[n]` can be converted back to a normalized simplex
-using the softmax function (see \refsection{softmax}), either
-externally or within the model's generated quantities block.
+The only parameter is `mu`, where `mu[k]` is the centroid for cluster
+$k$.  The transformed parameters `soft_z[n]` contain the log of the
+unnormalized cluster assignment probabilities.  The vector `soft_z[n]`
+can be converted back to a normalized simplex using the softmax
+function (see the functions reference manual), either externally or
+within the model's generated quantities block.
 
 ### Generalizing Soft $K$-Means {-}
 
@@ -6636,7 +6631,8 @@ Two problems make it pretty much impossible to perform full Bayesian
 inference for clustering models, the lack of parameter identifiability
 and the extreme multimodality of the posteriors.  There is additional
 discussion related to the non-identifiability due to label switching
-in \refsection{label-switching-problematic}.
+in the [label switching
+section](#label-switching-problematic.section).
 
 ### Non-Identifiability {-}
 
@@ -7439,14 +7435,16 @@ both models in Stan. The former model will be referred to as the latent
 variable GP, while the latter will be called the marginal likelihood
 GP.
 
-The hyperparameters controlling the covariance function of a Gaussian process
-can be fit by assigning them priors, like we have in the generative models
-above, and then computing the posterior distribution of the hyperparameters
-given observed data. The priors on the parameters should be defined
-based on prior knowledge of the scale of the output values ($\alpha$), the
-scale of the output noise ($\sigma$), and the scale at which distances are
-measured among inputs ($\rho$). See \refsection{priors-gp} for more information
-about how to specify appropriate priors for the hyperparameters.
+The hyperparameters controlling the covariance function of a Gaussian
+process can be fit by assigning them priors, like we have in the
+generative models above, and then computing the posterior distribution
+of the hyperparameters given observed data. The priors on the
+parameters should be defined based on prior knowledge of the scale of
+the output values ($\alpha$), the scale of the output noise
+($\sigma$), and the scale at which distances are measured among inputs
+($\rho$). See the [Gaussian process priors
+section](#priors-gp.section) for more information about how to specify
+appropriate priors for the hyperparameters.
 
 The Stan program implementing the marginal likelihood GP is shown below. The
 program is similar to the Stan programs that implement the simulation GPs
@@ -8423,8 +8421,8 @@ daylight savings time.
 
 Stan provides a built-in mechanism for specifying and solving systems
 of algebraic equations, using the Powell hybrid method @Powell:1970.
-The function signatures for Stan's algebraic solver can be found in
-\refsection{functions-algebraic-solver}.
+The function signatures for Stan's algebraic solver aref ully
+described in the algebraic solver section of the reference manual.
 
 Solving any system of algebraic equations can be translated into a root-finding
 problem, that is, given a function $f$, we wish to find $y$ such that
@@ -8452,11 +8450,12 @@ $$
 
 ## Coding an Algebraic System
 
-A system of algebraic equations is coded directly in Stan as a function with a
-strictly specified signature. For example, the nonlinear system given by
-\refequation{algebra} can be coded using the following function
-in Stan (see \refchapter{functions-programming} for
-more information on coding user-defined functions).
+A system of algebraic equations is coded directly in Stan as a
+function with a strictly specified signature. For example, the
+nonlinear system given by \refequation{algebra} can be coded using the
+following function in Stan (see the [user-defined functions
+section](#functions-programming) for more information on coding
+user-defined functions).
 
 ```
 vector system(vector y,        // unknowns
@@ -8507,10 +8506,12 @@ whether the solver converges or not. If the solver does not converge, the metrop
 proposal gets rejected and a warning message, stating no acceptable solution was
 found, is issued.
 
-The solver has three tuning parameters to determine convergence: the relative tolerance,
-the function tolerance, and the maximum number of steps. Their default values are respectively
-`1e-10` ($10^{-10}$), `1e-6` ($10^{-6}$), and `1e3` ($10^3$). Their
-behavior is explained in \refsection{algebra-control}.
+The solver has three tuning parameters to determine convergence: the
+relative tolerance, the function tolerance, and the maximum number of
+steps. Their default values are respectively `1e-10` ($10^{-10}$),
+`1e-6` ($10^{-6}$), and `1e3` ($10^3$). Their behavior is explained in
+the section about [algebraic solvers with control
+parameters](#algebra-control.section).
 
 The following code returns the solution to our nonlinear algebraic system:
 
@@ -8587,7 +8588,8 @@ individual element of the vector contribute to the norm.
 
 Smaller relative tolerances produce more accurate solutions but require more computational time.
 
-#### Sensitivity Analysis {-} \ \\
+#### Sensitivity Analysis {-}
+
 The tolerances should be set low enough that setting them lower does not change the
 statistical properties of posterior samples generated by the Stan program.
 
@@ -8615,11 +8617,11 @@ for stiff systems.
   [@CohenHindmarsh:1996; SerbanHindmarsh:2005]
 
 
-For a discussion of stiff ODE systems, see \refsection{stiff-ode}.  In
-a nutshell, the stiff solvers are slower, but more robust;  how much
-so depends on the system and the region of parameter space.
-The function signatures for Stan's ODE solvers can be found in
-\refsection{functions-ode-solver}.
+For a discussion of stiff ODE systems, see the [stiff ODE
+section](#stiff-ode.section).  In a nutshell, the stiff solvers are
+slower, but more robust; how much so depends on the system and the
+region of parameter space.  The function signatures for Stan's ODE
+solvers can be found in the reference manual section on ODE solvers.
 
 
 ## Example: Simple Harmonic Oscillator
@@ -8654,8 +8656,9 @@ sequence of times $t_0 < t_1 < t_2 < \cdots$.
 A system of ODEs is coded directly in Stan as a function with a
 strictly specified signature.  For example, the simple harmonic
 oscillator given in \refequation{ode-sho}, can be coded using the
-following function in Stan (see \refchapter{functions-programming} for
-more information on coding user-defined functions).
+following function in Stan (see the [user-defined functions
+chapter](#functions-programming.chapter) for more information on coding
+user-defined functions).
 
 ```
 real[] sho(real t,        // time
@@ -9408,7 +9411,7 @@ In Stan, the change of variables can be applied in the sampling
 statement.  To adjust for the curvature, the log probability
 accumulator is incremented with the log absolute derivative of the
 transform.  The lognormal distribution can thus be implemented
-directly in Stan as follows.^[This example is for illustrative purposes only; the recommended way to implement the lognormal distribution in Stan is with the built-in `lognormal` probability function (see \refsection{lognormal}).]
+directly in Stan as follows.^[This example is for illustrative purposes only; the recommended way to implement the lognormal distribution in Stan is with the built-in `lognormal` probability function; see the functions reference manual for details.]
 
 ```
 parameters {
@@ -10089,14 +10092,13 @@ This qualifier should be used when writing functions that call the
 built-in ordinary differential equation (ODE) solvers, algebraic
 solvers, or map functions.  These higher-order functions have strictly
 specified signatures where some arguments of are data only
-expressions. (See \refchapter{ode-solver},
-\refsection{functions-ode-solver}, and
-\refsection{functions-algebraic-solver},for details.)  When writing a
-function which calls the ODE or algebraic solver, arguments to that
-function which are passed into the call to the solver, either directly
-or indirectly, should have the `data` prefix qualifier.  This
-allows for compile-time type checking and increases overall program
-understandability.
+expressions. (See the [ODE solver chapter](#ode-solver.chapter) for
+more usage details and the functions reference manual for full
+definitions.)  When writing a function which calls the ODE or
+algebraic solver, arguments to that function which are passed into the
+call to the solver, either directly or indirectly, should have the
+`data` prefix qualifier.  This allows for compile-time type checking
+and increases overall program understandability.
 
 
 
@@ -10150,8 +10152,9 @@ the transformed parameters and model blocks.
 
 Here is an example of a function to assign standard normal priors to a
 vector of coefficients, along with a center and scale, and return the
-translated and scaled coefficients; see
-\refsection{reparameterization} for more information on centering.
+translated and scaled coefficients; see the [reparameterization
+section](#reparameterization.section) for more information on
+efficient non-centered parameterizations
 
 ```
 functions {
@@ -10705,9 +10708,8 @@ $$
 \theta_K = 1 - \sum_{k=1}^{K-1} \theta_k.
 $$
 
-The softmax function (see \refsection{softmax}) maps a $K$-vector
-$\alpha$ of linear predictors to a $K$-simplex $\theta =
-\mbox{softmax}(\alpha)$ by defining
+The softmax function maps a $K$-vector $\alpha$ of linear predictors
+to a $K$-simplex $\theta = \mbox{softmax}(\alpha)$ by defining
 
 $$
 \theta_k = \frac{\exp(\alpha_k)}{\sum_{k'=1}^K \exp(\alpha_k')}.
@@ -11112,7 +11114,7 @@ and JAGS, although still unable to properly sample from such an
 improper posterior, behaves quite differently in practice than the
 Hamiltonian Monte Carlo sampling performed by Stan when faced with an
 example such as the two intercept model discussed in
-\refsection{collinearity} and illustrated in
+the [collinearity section](#collinearity.section) and illustrated in
 \reffigure{non-identifiable-density}.
 
 ### Gibbs Sampling {-}
@@ -11260,7 +11262,7 @@ weakly identified models, we fit three models with increasing degrees
 of identification of their parameters.  The posteriors for these
 models is illustrated in \reffigure{non-identifiable-density}.  The
 first model is the unidentified model with two location parameters and
-no priors discussed in \refsection{collinearity}.
+no priors discussed in the [collinearity section](#collinearity.section).
 
 ```
 data {
@@ -11617,10 +11619,11 @@ array will provide memory locality across the "rows."
 There is no automatic conversion among matrices, vectors, and arrays
 in Stan.  But there are a wide range of conversion functions to
 convert a matrix into a vector, or a multi-dimensional array into a
-one-dimensional array, or convert a vector to an array.  See
-\refchapter{mixed-operations} for complete details on the available conversion
-operators as well as \refchapter{multi-indexing} for some
-reshaping operations involving multiple indexing and range indexing.
+one-dimensional array, or convert a vector to an array.  See the
+section on mixed matrix and array operations in the functions
+reference manual for a complete list of conversion operators and the
+[multi-indexing chapter](#multi-indexing.chapter) for some reshaping
+operations involving multiple indexing and range indexing.
 
 
 ## Aliasing in Stan Containers
@@ -12644,8 +12647,8 @@ Improving statistical efficiency is achieved by reparameterizing the
 model so that the same result may be calculated using a density or
 penalized maximum likelihood that is better conditioned.  Again, see
 the example of reparameterizing Neal's funnel in \reffigure{funnel}
-for an example, and also the examples in
-\refchapter{change-of-variables}.
+for an example, and also the examples in the
+[change of variables chapter](#change-of-variables.chapter).
 
 One has to be careful in using change-of-variables reparameterizations
 when using maximum likelihood estimation, because they can change the
@@ -13555,14 +13558,14 @@ The variables are all declared as either matrix or vector types.
 The result of the matrix-vector multiplication `x * beta` in the
 model block is a vector of the same length as `y`.
 
-The probability function documentation in \refpart{built-in-functions}
-indicates which of Stan's probability functions support
-vectorization; see \refsection{prob-vectorization} for more
-information.  Vectorized probability functions accept either vector or
-scalar inputs for all arguments, with the only restriction being that
-all vector arguments are the same dimensionality.  In the example
-above, `y` is a vector of size `N`, `x * beta` is a
-vector of size `N`, and `1` is a scalar.
+The probability function documentation in the function reference
+manual indicates which of Stan's probability functions support
+vectorization; see the function reference manual for full details.
+Vectorized probability functions accept either vector or scalar inputs
+for all arguments, with the only restriction being that all vector
+arguments are the same dimensionality.  In the example above, `y` is a
+vector of size `N`, `x * beta` is a vector of size `N`, and `1` is a
+scalar.
 
 ### Reshaping Data for Vectorization {-}
 
@@ -13950,9 +13953,9 @@ cancel, as does subtracting the log of the scale.
 ## Using Map-Reduce
 
 The map-reduce operation, even without multi-core MPI support, can be
-used to make programs more scalable and also more efficient.   See
-\refchapter{map-reduce} for more information on implementing
-map-reduce operations.
+used to make programs more scalable and also more efficient.  See the
+[map-reduce chapter](#map-reduce.chapter) for more information on
+implementing map-reduce operations.
 
 Map-reduce allows greater scalability because only the Jacobian of the
 mapped function for each shard is stored.  The Jacobian consists of
@@ -14187,8 +14190,9 @@ $$
 ### Existence of Maximum Likelihood Estimates {-}
 
 Because not all functions have unique maximum values, maximum
-likelihood estimates are not guaranteed to exist.  As discussed in
-\refchapter{problematic-posteriors}, this situation can arise when
+likelihood estimates are not guaranteed to exist.  As discussed in the
+[problematic postriors chapter](#problematic-posteriors.chapter), this
+situation can arise when
 
 
 * there is more than one point that maximizes the likelihood function,
@@ -14283,11 +14287,11 @@ Running Stan's optimizer on this model produces the MLE for the linear
 regression by directly minimizing the sum of squared errors and using
 that to define the noise scale as a generated quantity.
 
-By replacing `N` with `N-1` in the denominator of the
-definition of `sigma_squared`, the more commonly supplied
-unbiased estimate of $\sigma^2$ can be calculated; see
-\refsection{estimation-bias} for a definition of estimation bias and a
-discussion of estimating variance.
+By replacing `N` with `N-1` in the denominator of the definition of
+`sigma_squared`, the more commonly supplied unbiased estimate of
+$\sigma^2$ can be calculated; see the [estimation bias
+section](#estimation-bias.section) for a definition and a discussion
+of estimating variance.
 
 
 
@@ -14632,8 +14636,9 @@ When it exists, $\hat{\theta}$ maximizes the posterior density of the
 parameters given the data.  The posterior mode is sometimes called the
 ``maximum a posteriori" (MAP) estimate.
 
-As discussed in \refchapter{problematic-posteriors} and
-\refsection{mle}, a unique posterior mode might not
+As discussed in the [problematic posteriors
+chapter](#problematic-posteriors.chapter) and the [maximum likelihood
+section](#mle.section), a unique posterior mode might not
 exist---there may be no value that maximizes the posterior mode or
 there may be more than one.  In these cases, the posterior mode
 estimate is undefined.  Stan's optimizer, like most optimizers, will
@@ -14851,8 +14856,8 @@ $$
   \sum_{k=1}^K \log \sigma_k,
 $$
 where we plug in the analytic form for the Gaussian entropy and drop all terms
-that do not depend on $\phi$. We discuss how we perform the maximization in
-\refchapter{vi-algorithms}.
+that do not depend on $\phi$.  The algorithm used for optimization is
+described in the Stan reference manual chapter on variational inference.
 
 # <i style="font-size: 110%; color:#990017;">Appendices</i> {-}
 
@@ -15134,7 +15139,8 @@ The function starts a new line, under the type.  The arguments are
 aligned under each other.
 
 Function documentation should follow the Javadoc and Doxygen styles.
-Here's an example repeated from \refsection{documenting-functions}.
+Here's an example repeated from the [documenting functions
+section](#documenting-functions.section).
 
 ```
 /**
@@ -15540,7 +15546,7 @@ language section of this manual.
 * Stan supports general conditional statements using a standard
   if-else syntax.  For example, a zero-inflated (or -deflated) Poisson
   mixture model is defined using the if-else syntax as described in
-  \refsection{zero-inflated}.
+  the [zero inflation section](#zero-inflated.section).
 
 * Stan supports general while loops using a standard syntax.
 While loops give Stan full Turing equivalent computational power.
@@ -15570,11 +15576,7 @@ model {
     }
 }
 ```
-
-
-
-
-
+<
 
 ## Some Differences in the Statistical Models that are Allowed
 
