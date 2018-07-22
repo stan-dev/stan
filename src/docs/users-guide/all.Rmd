@@ -271,8 +271,7 @@ the reality of the code.  A misleading comment or one that is wrong is
 worse than no comment at all!
 
 # {-}
-
-# <span style="padding: 5em 0 0 0"><i style="font-size: 110%; font-weight: 500; color:#990017;">I. Example Models</i></span> {- #example-models.part}
+# <i style="font-size: 110%; color:#990017;">I. Example Models</i></span> {- #example-models.part}
 
 This section of the user's guide surveys a range of example models,
 with the goal of illustrating how to code them efficiently in Stan.
@@ -330,7 +329,7 @@ outcome `y[n]`.  The intercept and slope parameters are
 distributed noise term with scale `sigma`.  This model has
 improper priors for the two regression coefficients.
 
-### Matrix Notation and Vectorization {-}
+### Matrix Notation and Vectorization {- #vectorization-section}
 
 The sampling statement in the previous model is vectorized, with
 
@@ -348,11 +347,11 @@ providing the same model as the unvectorized version,
 In addition to being more concise, the vectorized form is much faster.^[Unlike in Python and R, which are interpreted, Stan is translated to C++ and compiled, so loops and assignment statements are fast.  Vectorized code is faster in Stan because (a) the expression tree used to compute derivatives can be simplified, leading to fewer virtual function calls, and (b) computations that would be repeated in the looping version, such as `log(sigma)` in the above model, will be computed once and reused.]
 
 In general, Stan allows the arguments to distributions such as
-`normal` to be vectors.  If any of the other arguments are
-vectors or arrays, they have to be the same size.  If any of the other
-arguments is a scalar, it is reused for each vector entry.  See
-\refsection{vectorization} for more information on vectorization of
-probability functions.
+`normal` to be vectors.  If any of the other arguments are vectors or
+arrays, they have to be the same size.  If any of the other arguments
+is a scalar, it is reused for each vector entry.  See [the
+vectorization section](#vectorization-section) for more information on
+vectorization of probability functions.
 
 The other reason this works is that Stan's arithmetic operators are
 overloaded to perform matrix arithmetic on matrices.  In this case,
@@ -427,20 +426,22 @@ be based on clarity.
 
 ## The QR Reparameterization {#QR-reparameterization.section}
 
-In the previous example, the linear predictor can be written as
-$\eta = x \beta$, where $\eta$ is a $N$-vector of predictions,
-$x$ is a $N \times K$ matrix, and $\beta$ is a $K$-vector of coefficients.
-Presuming $N \geq K$, we can exploit the fact that any design matrix, $x$
-can be decomposed using the thin QR decomposition into an orthogonal matrix
-$Q$ and an upper-triangular matrix $R$, i.e. $x = Q R$. See \ref{QR-decomposition}
-for more information on the QR decomposition but note that `qr_Q` and
-`qr_R` implement the fat QR decomposition so here we thin it by including
-only $K$ columns in $Q$ and $K$ rows in $R$. Also, in practice, it is best to
-write $x = Q^\ast R^\ast$ where $Q^\ast = Q \times \sqrt{n - 1}$ and
-$R^\ast = \frac{1}{\sqrt{n - 1}} R$. Thus, we can equivalently write
-$\eta = x \beta = Q R \beta = Q^\ast R^\ast \beta$. If we let
-$\theta = R^\ast \beta$, then we have $\eta = Q^\ast \theta$ and
-$\beta = R^{\ast^{-1}} \theta$. In that case, the previous Stan program becomes
+In the previous example, the linear predictor can be written as $\eta
+= x \beta$, where $\eta$ is a $N$-vector of predictions, $x$ is a $N
+\times K$ matrix, and $\beta$ is a $K$-vector of coefficients.
+Presuming $N \geq K$, we can exploit the fact that any design matrix,
+$x$ can be decomposed using the thin QR decomposition into an
+orthogonal matrix $Q$ and an upper-triangular matrix $R$, i.e. $x = Q
+R$.  See the reference manual for a definition of the QR-decoposition.
+The functions `qr_Q` and `qr_R` implement the fat QR decomposition so
+here we thin it by including only $K$ columns in $Q$ and $K$ rows in
+$R$ (see the reference manual for more information on the `qr_Q` and
+`qr_R` functions). Also, in practice, it is best to write $x = Q^\ast
+R^\ast$ where $Q^\ast = Q \times \sqrt{n - 1}$ and $R^\ast =
+\frac{1}{\sqrt{n - 1}} R$. Thus, we can equivalently write $\eta = x
+\beta = Q R \beta = Q^\ast R^\ast \beta$. If we let $\theta = R^\ast
+\beta$, then we have $\eta = Q^\ast \theta$ and $\beta = R^{\ast^{-1}}
+\theta$. In that case, the previous Stan program becomes
 
 ```
 data {
@@ -506,20 +507,19 @@ model.
 ## Priors for Coefficients and Scales {#regression-priors.section}
 
 This section describes the choices available for modeling priors for
-regression coefficients and scales.  Priors for univariate parameters
-in hierarchical models are discussed in
-\refsection{hierarchical-priors} and multivariate parameters in
-\refsection{multivariate-hierarchical-priors}. There is also a
-discussion of priors used to identify models in
-\refsection{priors-for-identification}.
+regression coefficients and scales.  Later sections discuss [univariate
+hierarchical priors](#hierarchical-priors.section) and [multivariate
+hierarchical priors](#multivariate-hierarchical-priors.section), as well
+as [priors used to identify models](#priors-for-identification.section).
 
-However, as described in \refsection{QR-reparameterization}, if you do
-not have an informative prior on the *location* of the regression
-coefficients, then you are better off reparameterizing your model so
-that the regression coefficients are a generated quantity. In that case,
-it usually does not matter very much what prior is used on on the
-reparameterized regression coefficients and almost any weakly informative
-prior that scales with the outcome will do.
+However, as described in [QR-reparameterization
+section](#QR-reparameterization.section), if you do not have an
+informative prior on the *location* of the regression coefficients,
+then you are better off reparameterizing your model so that the
+regression coefficients are a generated quantity. In that case, it
+usually does not matter very much what prior is used on on the
+reparameterized regression coefficients and almost any weakly
+informative prior that scales with the outcome will do.
 
 ### Background Reading {-}
 
@@ -711,7 +711,8 @@ to a boundary.  This will not only cause computational problems, it
 indicates a problem with the way the model is formulated.  In such
 cases, the interval should be widened to see where the parameter fits
 without such constraints, or boundary-avoid priors should be used (see
-\refsection{hierarchical-priors}.)
+the [hierarchical priors section](#hierarchical-priors.section).)
+
 
 ### Fat-Tailed Priors and "Default" Priors {-}
 
@@ -824,7 +825,7 @@ the Bernoulli distribution, which is defined by
 $$
 \mathsf{BernoulliLogit}(y|\alpha)
 =
-\mathsf{Bernoulli}(y | \mbox{logit}^{-1}(\alpha)).
+\mathsf{Bernoulli}(y \mid \mbox{logit}^{-1}(\alpha)).
 $$
 
 The formulation is also vectorized in the sense that `alpha` and
@@ -850,6 +851,7 @@ for (n in 1:N)
 Other link functions may be used in the same way.  For example, probit
 regression uses the cumulative normal distribution function, which is
 typically written as
+
 $$
 \Phi(x) = \int_{-\infty}^x \mathsf{Normal}(y|0,1) \, dy.
 $$
@@ -864,9 +866,11 @@ statement with the following.
         y[n] ~ bernoulli(Phi(alpha + beta * x[n]));
 ```
 
-A fast approximation to the cumulative standard normal distribution function
-$\Phi$ is implemented in Stan as the function `Phi_approx`.  The
-approximate probit regression model may be coded with the following.
+A fast approximation to the cumulative standard normal distribution
+function $\Phi$ is implemented in Stan as the function
+`Phi_approx`.^[The `Phi_approx` function is a rescaled version of the inverse logit function, so while the scale is roughly the same $\Phi$, the tails do not match.]
+The approximate probit regression model may
+be coded with the following.
 
 
 ```
@@ -903,10 +907,26 @@ model {
 }
 ```
 
-The matrix multiplication is pulled out to define a local variable for
-all of the predictors.   Then the prior on `beta` is coded in
-vectorized form.    Then, the categorical is expressed on the log-odds
-(logit) scale; an equivalent form without the matrix multiplication
+The prior on `beta` is coded in vectorized form.  As of Stan 2.18, the
+categorical-logit distribution is not vectorized for parameter
+arguments, so the loop is required.  The matrix multiplication is
+pulled out to define a local variable for all of the predictors for
+efficiency.  Like the Bernoulli-logit, the categorical-logit
+distribution applies softmax internally to convert an arbitrary vector
+to a simplex,
+
+$$
+\mathsf{CategoricalLogit}(y \mid \alpha)
+\ = \
+\mathsf{Categorical}(y \mid \mathsf{softmax}(\alpha)),
+$$
+
+where
+
+
+$$
+\mathrm{softmax}(u) = \mathrm{exp}(u) / \mathrm{sum}(\mathrm{exp}(u)).
+$$
 
 The categorical distribution with log-odds (logit) scaled parameters
 used above is equivalent to writing
@@ -915,9 +935,6 @@ used above is equivalent to writing
     y[n] ~ categorical(softmax(x[n] * beta));
 ```
 
-See \refsection{softmax} for a definition of the softmax function and
-\refsection{categorical-distribution} for a full definition of
-`categorical_logit`.
 
 
 #### Constraints on Data Declarations {-}
@@ -963,9 +980,10 @@ of its input, the model is typically only identified if there is a
 suitable prior on the coefficients.
 
 An alternative is to use $(K-1)$-vectors by fixing one of them to be
-zero. \refsection{partially-known-parameters} discusses how to mix
+zero. The [partially known parameters
+section](#partially-known-parameters.section) discusses how to mix
 constants and parameters in a vector.  In the multi-logit case, the
-parameter block would be redefined to use $(K-1)$-vectors
+parameter block would be redefined to use $(K - 1)$-vectors
 
 ```
 parameters {
@@ -1306,16 +1324,13 @@ tradeoffs among arrays, vectors, and matrices.
 This model can be further sped up and at the same time made more
 arithmetically stable by replacing the application of inverse-logit
 inside the Bernoulli distribution with the logit-parameterized
-Bernoulli,
+Bernoulli,^[The Bernoulli-logit distribution builds in the log link function, taking $$\mathsf{BernoulliLogit}(y \mid \alpha) = \mathsf{Bernoulli}(y \mid \mathrm{logit}^{-1}(\alpha)).$$]
 
 
 ```
   for (n in 1:N)
     y[n] ~ bernoulli_logit(x[n] * beta[ll[n]]);
 ```
-
-See \refsection{bernoulli-logit-distribution} for a definition of
-`bernoulli_logit`.
 
 Unlike in R or BUGS, loops, array access and assignments are fast in
 Stan because they are translated directly to C++.  In most cases, the
@@ -1364,13 +1379,15 @@ density grows without bound.  As an illustration, consider a simple
 hierarchical linear regression (with fixed prior mean) of $y_n \in
 \mathbb{R}$ on $x_n \in \mathbb{R}^K$, formulated as
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 y_n & \sim & \mathsf{Normal}(x_n \beta, \sigma)
-((((([3pt]
+\\[3pt]
 \beta_k & \sim & \mathsf{Normal}(0,\tau)
-((((([3pt]
+\\[3pt]
 \tau & \sim & \mathsf{Cauchy}(0,2.5)
-\end{eqnarray*}
+\end{array}
+$$
 
 In this case, as $\tau \rightarrow 0$ and $\beta_k \rightarrow 0$, the
 posterior density
@@ -1470,13 +1487,15 @@ model {
 ```
 
 This model uses the logit-parameterized Bernoulli distribution, where
+
 $$
-\mathtt{bernoulli\_logit}(y|\alpha) =
-\mathtt{bernoulli}(y|\mbox{logit}^{-1}(\alpha)).
+\mathsf{BernoulliLogit}(y \mid \alpha)
+\ = \
+\mathsf{Bernoulli}(y \mid \mbox{logit}^{-1}(\alpha)).
 $$
 
 The key to understanding it is the term inside the
-`bernoulli\_logit` distribution, from which it follows that
+`bernoulli_logit` distribution, from which it follows that
 $$
 \mbox{Pr}[y_n = 1] = \mbox{logit}^{-1}(\alpha_{jj[n]} - \beta_{kk[n]}
 + \delta).
@@ -1513,9 +1532,9 @@ parameters are declared as follows.
 ```
 parameters {
   real mu_beta;                // mean question difficulty
-  real alpha[J];               // ability for j - mean
-  real beta[K];                // difficulty for k
-  real<lower=0> gamma[K];      // discrimination of k
+  vector[J] alpha;             // ability for j - mean
+  vector[K] beta;              // difficulty for k
+  vector<lower=0>[K] gamma;    // discrimination of k
   real<lower=0> sigma_beta;    // scale of difficulties
   real<lower=0> sigma_gamma;   // scale of log discrimination
 }
@@ -1531,13 +1550,29 @@ model {
   mu_beta ~ cauchy(0, 5);
   sigma_beta ~ cauchy(0, 5);
   sigma_gamma ~ cauchy(0, 5);
-  for (n in 1:N)
-    y[n] ~ bernoulli_logit(gamma[kk[n]]
-                           * (alpha[jj[n]] - (beta[kk[n]] + mu_beta)));
+  y ~ bernoulli_logit(gamma[kk] .* (alpha[jj] - (beta[kk] + mu_beta)));
 }
 ```
 
-This is similar to the 1PL model, with the additional parameter
+The `std_normal` function is used here, defined by
+
+$$
+\mathsf{StdNormal}(y)
+\ = \
+\mathsf{Normal}(y \mid 0, 1).
+$$
+
+The sampling statement is also vectorized using elementwise
+multiplication;  it is equivalent to
+
+```
+for (n in 1:N)
+  y[n] ~ bernoulli_logit(gamma[kk[n]]
+                         * (alpha[jj[n]] - (beta[kk[n]] + mu_beta));
+```
+
+
+The 2PL model is similar to the 1PL model, with the additional parameter
 `gamma[k]` modeling how discriminative question `k` is.  If
 `gamma[k]` is greater than 1, responses are more attenuated with
 less chance of getting a question right at random.  The parameter
@@ -1564,7 +1599,7 @@ The point is that the `alpha` determines the scale and location
 and `beta` and `gamma` are allowed to float.
 
 The `beta` parameter is here given a non-centered
-parameterization, with parameter `mu\_beta` serving as the mean
+parameterization, with parameter `mu_beta` serving as the mean
 `beta` location. An alternative would've been to take:
 
 ```
@@ -1581,10 +1616,10 @@ Non-centered parameterizations tend to be more efficient in
 hierarchical models; see \refsection{reparameterization} for more
 information on non-centered reparameterizations.
 
-The intercept term `mu\_beta` can't itself be modeled
+The intercept term `mu_beta` can't itself be modeled
 hierarchically, so it is given a weakly informative
 $\mathsf{Cauchy}(0,5)$ prior.  Similarly, the scale terms,
-`sigma\_beta`, and `sigma\_gamma`, are given half-Cauchy
+`sigma_beta`, and `sigma_gamma`, are given half-Cauchy
 priors.  As mentioned earlier, the scale and location for `alpha`
 are fixed to ensure identifiability.  The truncation in the
 half-Cauchy prior is implicit; explicit truncation is not necessary
@@ -1832,12 +1867,12 @@ a quadratic form in the code
 because the correlation matrix `Omega` and scale vector
 `tau` are more natural to inspect in the output; to output
 `Sigma`, define it as a transformed parameter.  The function
-`quad\_form\_diag` is defined so that
-`quad\_form\_diag(Sigma,~tau)` is equivalent to
-`diag\_matrix(tau) * Sigma * diag\_matrix(tau)`, where
-`diag\_matrix(tau)` returns the matrix with `tau` on the
+`quad_form_diag` is defined so that
+`quad_form_diag(Sigma, tau)` is equivalent to
+`diag_matrix(tau) * Sigma * diag_matrix(tau)`, where
+`diag_matrix(tau)` returns the matrix with `tau` on the
 diagonal and zeroes off diagonal; the version using
-`quad\_form\_diag` should be faster.  See
+`quad_form_diag` should be faster.  See
 \refsection{matrix-arithmetic-operators} for more information on
 specialized matrix operations.
 
@@ -1862,7 +1897,7 @@ with the vectorized form:
 ```
 
 The outer brackets create a local scope in which to define the
-variable `x\_beta\_jj`, which is then filled in a loop and used
+variable `x_beta_jj`, which is then filled in a loop and used
 to define a vectorized sampling statement.  The reason this is such a
 big win is that it allows us to take the log of sigma only once and it
 greatly reduces the size of the resulting expression graph by packing
@@ -1889,7 +1924,7 @@ this fails because it breaks the vectorization of sampling for
 
 which requires `beta` to be an array of vectors.  Both
 vectorizations are important, so the best solution is to just use the
-loop above, because `rows\_dot\_product` cannot do much
+loop above, because `rows_dot_product` cannot do much
 optimization in and of itself because there are no shared computations.
 
 The code in the Stan program above also builds up an array of vectors
@@ -1906,7 +1941,7 @@ need to be solved and differentiated.
   }
 ```
 
-In this example, the covariance matrix `Sigma\_beta` is defined
+In this example, the covariance matrix `Sigma_beta` is defined
 as a local variable so as not to have to repeat the quadratic form
 computation $J$ times.  This vectorization can be combined with the
 Cholesky-factor optimization in the next section.
@@ -1943,7 +1978,7 @@ model {
 
 The data variable `u` was originally an array of vectors, which
 is efficient for access; here it is redeclared as a matrix in order to
-use it in matrix arithmetic.  The new parameter `L\_Omega` is
+use it in matrix arithmetic.  The new parameter `L_Omega` is
 the Cholesky factor of the original correlation matrix `Omega`,
 so that
 
@@ -1968,7 +2003,7 @@ diag_pre_multiply(a, b) = diag_matrix(a) * b
 ```
 
 The new variable `z` is declared as a matrix, the entries of
-which are given independent standard normal priors; the `to\_vector`
+which are given independent standard normal priors; the `to_vector`
 operation turns the matrix into a vector so that it can be used as a
 vectorized argument to the univariate normal density.  Multiplying the
 Cholesky factor of the covariance matrix by `z` and adding the
@@ -2000,7 +2035,7 @@ model {
 }
 ```
 
-This model also reparameterizes the prior scale `tau` to avoid potential problems with the heavy tails of the Cauchy distribution. The statement `tau\_unif ~ uniform(0,pi()/2)` can be omitted from the model block because stan increments the log posterior for parameters with uniform priors without it.
+This model also reparameterizes the prior scale `tau` to avoid potential problems with the heavy tails of the Cauchy distribution. The statement `tau_unif ~ uniform(0,pi()/2)` can be omitted from the model block because stan increments the log posterior for parameters with uniform priors without it.
 
 ## Prediction, Forecasting, and Backcasting
 
@@ -2020,11 +2055,11 @@ example above, using `y` for the `N` observations and
 model for observations are exactly the same as before.
 
 To make predictions, we need to be given the number of predictions,
-`N\_new`, and their predictor matrix, `x\_new`.  The
-predictions themselves are modeled as a parameter `y\_new`.  The
+`N_new`, and their predictor matrix, `x_new`.  The
+predictions themselves are modeled as a parameter `y_new`.  The
 model statement for the predictions is exactly the same as for the
-observations, with the new outcome vector `y\_new` and prediction
-matrix `x\_new`.
+observations, with the new outcome vector `y_new` and prediction
+matrix `x_new`.
 
 ```
 data {
@@ -2074,7 +2109,7 @@ generated quantities {
 }
 ```
 
-Now the data is just as before, but the parameter `y\_new` is now
+Now the data is just as before, but the parameter `y_new` is now
 declared as a generated quantity, and the prediction model is
 removed from the model and replaced by a pseudo-random draw from a
 normal distribution.
@@ -2115,11 +2150,13 @@ independent errors [@Zellner:1962; @Greene:2011].
 
 The model is easy to write down as a regression,
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
  y_n & = & x_n \, \beta + \epsilon_n
-((((([4pt]
+\\[4pt]
  \epsilon_n & \sim & \mathsf{MultiNormal}(0, \Sigma)
-\end{eqnarray*}
+\end{array}
+$$
 
 where $x_n$ is a $J$-row-vector of predictors ($x$ is an $(N \times
 J)$-matrix), $y_n$ is a $K$-vector of observations, $\beta$ is a $(K
@@ -2205,11 +2242,13 @@ false, 1 for true).  The values for the observations $y_n$ are based
 on latent values $z_n$ drawn from a seemingly unrelated regression
 model (see the previous section),
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
  z_n & = & x_n \, \beta + \epsilon_n
-((((([4pt]
+\\[4pt]
  \epsilon_n & \sim & \mathsf{MultiNormal}(0, \Sigma)
-\end{eqnarray*}
+\end{array}
+$$
 
 These are then put through the step function to produce a $K$-vector $z_n$
 of boolean values with elements defined by
@@ -2306,7 +2345,7 @@ transformed data {
 }
 ```
 
-The variables `N\_pos` and `N\_neg` are set to the number of
+The variables `N_pos` and `N_neg` are set to the number of
 true (1) and number of false (0) observations in `y`.  The loop
 then fills in the sequence of indexes for the positive and negative
 values in four arrays.
@@ -2323,7 +2362,7 @@ parameters {
 ```
 
 These include the regression coefficients `beta` and the Cholesky
-factor of the correlation matrix, `L\_Omega`.  This time there is
+factor of the correlation matrix, `L_Omega`.  This time there is
 no scaling because the covariance matrix has unit scale (i.e., it is a
 correlation matrix;  see above).
 
@@ -2440,9 +2479,9 @@ generated quantities {
 }
 ```
 
-Given observed predictors $x$ and outcomes $y$, `y\_tilde` will
+Given observed predictors $x$ and outcomes $y$, `y_tilde` will
 be drawn according to $p(\tilde{y} \, | \, \tilde{x}, y, x)$.  This
-means that, for example, the posterior mean for `y\_tilde` is the
+means that, for example, the posterior mean for `y_tilde` is the
 estimate of the outcome that minimizes expected square error
 (conditioned on the data and model, of course).
 
@@ -2624,15 +2663,17 @@ The ARCH(1) model is typically presented as the following sequence of
 equations, where $r_t$ is the observed return at time point $t$
 and $\mu$, $\alpha_0$, and $\alpha_1$ are unknown regression coefficient parameters.
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 r_t & = & \mu + a_t
-((((([2pt]
+\\[2pt]
 a_t & = & \sigma_t \epsilon_t
-((((([2pt]
+\\[2pt]
 \epsilon_t & \sim & \mathsf{Normal}(0,1)
-((((([2pt]
+\\[2pt]
 \sigma^2_t & = & \alpha_0 + \alpha_1 a_{t-1}^2
-\end{eqnarray*}
+\end{array}
+$$
 
 In order to ensure the noise terms $\sigma^2_t$ are positive, the
 scale coefficients are constrained to be positive, $\alpha_0, \alpha_1
@@ -3050,7 +3091,7 @@ This speeds up the iterations, but does not change the effective
 sample size because the underlying parameterization and log
 probability function have not changed.  Mixing is improved by by
 reparameterizing in terms of a standardized volatility, then
-rescaling.  This requires a standardized parameter `h\_std` to be
+rescaling.  This requires a standardized parameter `h_std` to be
 declared instead of `h`.
 ```
 parameters {
@@ -3071,7 +3112,7 @@ transformed parameters {
 }
 ```
 
-The first assignment rescales `h\_std` to have a
+The first assignment rescales `h_std` to have a
 $\mathsf{Normal}(0,\sigma)$ distribution and temporarily assigns it to
 `h`.  The second assignment rescales `h[1]` so that its
 prior differs from that of `h[2]` through `h[T]`.  The next
@@ -3319,7 +3360,7 @@ the latent state at time `t-1` being `j`, plus the log
 transition probability from state `j` at time `t-1` to state
 `k` at time `t`, plus the log probability of the output
 `u[t]` being generated by state `k`.  The
-`log\_sum\_exp` operation just multiplies the probabilities for
+`log_sum_exp` operation just multiplies the probabilities for
 each prior state `j` on the log scale in an arithmetically stable
 way.
 
@@ -3338,8 +3379,8 @@ observed output $u$.
 
 The Viterbi algorithm can be coded in Stan in the generated quantities
 block as follows.  The predictions here is the most likely state
-sequence `y\_star[1], ..., y\_star[T\_unsup]` underlying the
-array of observations `u[1], ..., u[T\_unsup]`.  Because this
+sequence `y_star[1], ..., y_star[T_unsup]` underlying the
+array of observations `u[1], ..., u[T_unsup]`.  Because this
 sequence is determined from the transition probabilities
 `theta` and emission probabilities `phi`, it may be
 different from sample to sample in the posterior.
@@ -3380,12 +3421,12 @@ generated quantities {
 ```
 
 The bracketed block is used to make the three variables
-`back\_ptr`, `best\_logp`, and `best\_total\_logp`
-local so they will not be output.  The variable `y\_star` will
+`back_ptr`, `best_logp`, and `best_total_logp`
+local so they will not be output.  The variable `y_star` will
 hold the label sequence with the highest probability given the input
 sequence `u`.  Unlike the forward algorithm, where the
 intermediate quantities were total probability, here they consist of
-the maximum probability `best\_logp[t,~k]` for the sequence up to
+the maximum probability `best_logp[t,~k]` for the sequence up to
 time `t` with final output category `k` for time `t`,
 along with a backpointer to the source of the link.  Following the
 backpointers from the best final log probability for the final time
@@ -3453,9 +3494,9 @@ model {
 ```
 
 The number of observed and missing data points are coded as data with
-non-negative integer variables `N\_obs` and `N\_mis`.  The
-observed data is provided as an array data variable `y\_obs`.
-The missing data is coded as an array parameter, `y\_mis`.  The
+non-negative integer variables `N_obs` and `N_mis`.  The
+observed data is provided as an array data variable `y_obs`.
+The missing data is coded as an array parameter, `y_mis`.  The
 ordinary parameters being estimated, the location `mu` and scale
 `sigma`, are also coded as parameters.  The model is vectorized
 on the observed and missing data; combining them in this case would be
@@ -3548,10 +3589,10 @@ model {
 }
 ```
 
-The index arrays `ii\_obs` and `ii\_mis` contain the indexes
+The index arrays `ii_obs` and `ii_mis` contain the indexes
 into the final array `y` of the observed data (coded as a data
-vector `y\_obs`) and the missing data (coded as a parameter
-vector `y\_mis`).  See \refchapter{time-series} for further
+vector `y_obs`) and the missing data (coded as a parameter
+vector `y_mis`).  See \refchapter{time-series} for further
 discussion of time-series model and specifically
 \refsection{autoregressive} for an explanation of the vectorization
 for `y` as well as an explanation of how to convert this example
@@ -3611,9 +3652,9 @@ transformed parameters {
 }
 ```
 
-It is most convenient to place a prior directly on `L\_lower`.
+It is most convenient to place a prior directly on `L_lower`.
 An alternative would be a prior for the full Cholesky factor `L`,
-because the transform from `L\_lower` to `L` is just the
+because the transform from `L_lower` to `L` is just the
 identity and thus does not require a Jacobian adjustment (despite the
 warning from the parser, which is not smart enough to do the code
 analysis to infer that the transform is linear).  It would not be at
@@ -3630,7 +3671,7 @@ outcome are missin^[Note that this is not the same as missing components of a mu
 As an example, we'll consider the bivariate distribution, which is
 easily marginalized.  The coding here is brute force, representing
 both an array of vector observations `y` and a boolean array
-`y\_observed` to indicate which values were observed (others can
+`y_observed` to indicate which values were observed (others can
 have dummy values in the input).
 
 ```
@@ -3889,9 +3930,9 @@ model {
 }
 ```
 
-Because the censored data array `y\_cens` is declared to be a parameter, it
+Because the censored data array `y_cens` is declared to be a parameter, it
 will be sampled along with the location and scale parameters `mu`
-and `sigma`.  Because the censored data array `y\_cens` is
+and `sigma`.  Because the censored data array `y_cens` is
 declared to have values of type `real<lower=U>`, all imputed values
 for censored data will be greater than `U`.  The imputed censored
 data affects the location and scale parameters through the last
@@ -3916,11 +3957,11 @@ is
 $$
 \log \prod_{m=1}^M \mbox{Pr}[y_m > U]
 = \log \left( 1 - \Phi\left(\frac{y - \mu}{\sigma}\right)\right)^{M}
-= M \, `normal\_lccdf`(y | \mu, \sigma),
+= M \, `normal_lccdf`(y | \mu, \sigma),
 $$
 
-where `normal\_lccdf` is the log of complementary CDF
-(Stan provides `<distr>\_lccdf` for each distribution
+where `normal_lccdf` is the log of complementary CDF
+(Stan provides `<distr>_lccdf` for each distribution
 implemented in Stan).
 
 The following right-censored model assumes
@@ -3943,12 +3984,12 @@ model {
 }
 ```
 
-For the observed values in `y\_obs`, the normal sampling model is
+For the observed values in `y_obs`, the normal sampling model is
 used without truncation.  The log probability is directly incremented
 using the calculated log cumulative normal probability of the censored
 data items.
 
-For the left-censored data the CDF (`normal\_lcdf`) has to be
+For the left-censored data the CDF (`normal_lcdf`) has to be
 used instead of complementary CDF.  If the censoring point variable
 (`L`) is unknown, its declaration should be moved from the data
 to the parameters block.
@@ -4044,14 +4085,14 @@ The log sum of exponentials function is used to define mixtures on the
 log scale.  It is defined for two inputs by
 
 $$
-\mbox{log\_sum\_exp}(a, b) = \log (\exp(a) + \exp(b)).
+\mbox{log_sum_exp}(a, b) = \log (\exp(a) + \exp(b)).
 $$
 
 If $a$ and $b$ are probabilities on the log scale, then $\exp(a) +
 \exp(b)$ is their sum on the linear scale, and the outer log converts
-the result back to the log scale; to summarize, log\_sum\_exp does
+the result back to the log scale; to summarize, log_sum_exp does
 linear addition on the log scale.   The reason to use Stan's built-in
-log\_sum\_exp function is that it can prevent underflow and overflow
+`log_sum_exp`  function is that it can prevent underflow and overflow
 in the exponentiation, by calculating the result as
 
 $$
@@ -4060,15 +4101,15 @@ $$
   + \log \left( \exp(a - c) + \exp(b - c) \right),
 $$
 
-where $c = \max(a, b)$.
-In this evaluation, one of the terms, $a - c$ or $b -
-c$, is zero and the other is negative, thus eliminating the
-possibility of overflow or underflow in the leading term and eking the
-most arithmetic precision possible out of the operation.
+where $c = \max(a, b)$.  In this evaluation, one of the terms, $a - c$
+or $b - c$, is zero and the other is negative, thus eliminating the
+possibility of overflow or underflow in the leading term while
+extracting the most arithmetic precision possible by pulling the
+`max(a, b)` out of the log-exp round trip.
 
-For example, the mixture of $`Normal`(-1,2)$ and
-$`Normal`(3,1)$ with mixing proportion $\lambda =
-(0.3,0.7)^{\top}$ can be implemented in Stan as follows.
+For example, the mixture of $\mathsf{Normal}(-1, 2)$ with
+$\mathsf{Normal}(3, 1)$, with mixing proportion $\lambda =
+[0.3,0.7]^{\top}$, can be implemented in Stan as follows.
 
 ```
 parameters {
@@ -4082,22 +4123,24 @@ model {
 
 The log probability term is derived by taking
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 \log p_Y(y | \lambda,\mu,\sigma) & = & \log\!\left( 0.3 \times \mathsf{Normal}(y|-1,2) \, + \,
   0.7 \times
   \mathsf{Normal}(y|3,1) \, \right)
-((((([2pt]
+\\[2pt]
 & = & \log(\hspace*{-5pt} \begin{array}[t]{l}
                  \exp(\log(0.3 \times \mathsf{Normal}(y|-1,2))) \\
                  + \exp(\log(0.7 \times \mathsf{Normal}(y|3,1))) \ )
               \end{array}
-((((([2pt]
+\\[2pt]
 & = & \mbox{log\_sum\_exp}(\hspace*{-5pt}\begin{array}[t]{l}
                          \log(0.3) + \log \mathsf{Normal}(y|-1,2),
                          \\
                          \log(0.7) + \log \mathsf{Normal}(y|3,1) \ ).
                        \end{array}
-\end{eqnarray*}
+\end{array}
+$$
 
 
 ### Dropping uniform mixture ratios {-}
@@ -4155,7 +4198,7 @@ $$
 p(z_n = k \mid y_n, \mu, \sigma, \lambda)
 & \propto &
 p(y_n \mid z_n = k, \mu, \sigma) \cdot p(z_n = k \mid \lambda)
-((((([4pt]
+\\[4pt]
 & = &
 \mathsf{Normal}(y_n \mid \mu_k, \sigma_k) \cdot \lambda_k.
 \end{array}
@@ -4175,11 +4218,11 @@ On the log scale, the normalized probability is computed as
 $$
 \begin{array}{l}
 \log p(z_n = k \mid y_n, \mu, \sigma, \lambda)
-((((([6pt] { } \hspace*{12pt} \ = \
+\\[6pt] { } \hspace*{12pt} \ = \
 \begin{array}[t]{l}
 \log p(y_n \mid z_n = k, \mu, \sigma)
 \ + \ \log p(z_n = k \mid \lambda)
-((((([2pt]
+\\[2pt]
 \ - \ \mathrm{log\_sum\_exp}_{k' = 1}^K
         \log p(y_n \mid z_n = k', \mu, \sigma)
         + \log p(z_n = k' \mid \lambda).
@@ -4332,11 +4375,13 @@ As an example, consider the normal mixture from the previous section,
 which provides an exchangeable prior on the pairs of parameters
 $(\mu_1, \sigma_1)$ and $(\mu_2, \sigma_2)$,
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 \mu_1, \mu_2 & \sim & \mathsf{Normal}(0, 10)
-((((([8pt]
+\\[8pt]
 \sigma_1, \sigma_2 & \sim & \mathsf{HalfNormal}(0, 10)
-\end{eqnarray*}
+\end{array}
+$$
 
 The prior on the mixture ratio is uniform,
 
@@ -4408,9 +4453,9 @@ generated quantities {
 It is a bit of a bother afterwards, because the logarithm function
 isn't linear and hence doesn't distribute through averages (Jensen's
 inequality shows which way the inequality goes).  The right thing to
-do is to apply `log\_sum\_exp` of the posterior draws of
-`log\_p\_y\_tilde`.  The average log predictive density is then
-given by subtracting `log(N\_new)`.
+do is to apply `log_sum_exp` of the posterior draws of
+`log_p_y_tilde`.  The average log predictive density is then
+given by subtracting `log(N_new)`.
 
 
 #### Clustering and similarity {-}
@@ -4474,7 +4519,7 @@ p(y_n|\theta,\lambda)
 \left\{
 \begin{array}{ll}
 \theta + (1 - \theta) \times \mathsf{Poisson}(0|\lambda) & \mbox{ if } y_n = 0, \mbox{ and}
-((((([3pt]
+\\[3pt]
 (1-\theta) \times \mathsf{Poisson}(y_n|\lambda) & \mbox{ if } y_n > 0.
 \end{array}
 \right.
@@ -4504,7 +4549,7 @@ model {
 }
 ```
 
-The `log\_sum\_exp(lp1,lp2)` function adds the log probabilities
+The `log_sum_exp(lp1,lp2)` function adds the log probabilities
 on the linear scale; it is defined to be equal to `log(exp(lp1) +
   exp(lp2))`, but is more arithmetically stable and faster.
 
@@ -4512,7 +4557,7 @@ on the linear scale; it is defined to be equal to `log(exp(lp1) +
 
 The code given above to compute the zero-inflated Poisson
 redundantly calculates all of the Bernoulli terms and also
-`poisson\_lpmf(0 | lambda)` every time the first condition
+`poisson_lpmf(0 | lambda)` every time the first condition
 body executes.  The use of the redundant terms is conditioned on
 `y`, which is known when the data is read in.  This allows
 the transformed data block to be used to compute some more convenient
@@ -4521,7 +4566,7 @@ terms for expressing the log density each iteration.
 The number of zero cases is computed and handled separately.
 Then the nonzero cases are collected into their own array for
 vectorization.  The number of zeros is required to declare
-`y\_nonzero`, so it must be computed in a function.
+`y_nonzero`, so it must be computed in a function.
 
 ```
 functions {
@@ -4557,8 +4602,8 @@ model {
 ```
 
 The boundary conditions of all zeros and no zero outcomes is handled
-appropriately;  in the vectorized case, if `y\_nonzero` is empty,
-`N\_nonzero` will be zero, and the last two target increment
+appropriately;  in the vectorized case, if `y_nonzero` is empty,
+`N_nonzero` will be zero, and the last two target increment
 terms will add zeros.
 
 
@@ -4803,9 +4848,9 @@ model {
 The regression coefficients `alpha` and `beta` and
 regression noise scale `sigma` are the same as before, but now
 `x` is declared as a parameter rather than as data.  The data is
-now `x\_meas`, which is a measurement of the true `x` value
+now `x_meas`, which is a measurement of the true `x` value
 with noise scale `tau`.  The model then specifies that the
-measurement error for `x\_meas[n]` given true value `x[n]`
+measurement error for `x_meas[n]` given true value `x[n]`
 is normal with deviation `tau`.  Furthermore, the true values
 `x` are given a hierarchical prior here.
 
@@ -4837,7 +4882,7 @@ Exercise 3.5(b) from @GelmanEtAl:2013 provides an example.
   weights, rounded to the nearest pound, of 10, 10, 12, 11, 9.  Assume
   the unrounded measurements are normally distributed with a
   noninformative prior distribution on $\mu$ and $\sigma^2$.
-  ((((([4pt]
+  \\[4pt]
   (b) \ Give the correct posterior distribution for $(\mu, \sigma^2)$,
   treating the measurements as rounded.
 \end{quote}
@@ -4874,11 +4919,12 @@ $$
 The posterior after observing $y = (10, 10, 12, 11, 9)$ can be
 calculated by Bayes's rule as
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 p(\mu, \sigma^2 \, | \, y)
 & \propto &
 p(\mu, \sigma^2) \ p(y \, | \, \mu, \sigma^2)
-((((([6pt]
+\\[6pt]
 &  \propto &
 \frac{1}{\sigma^2}
 \
@@ -4888,7 +4934,8 @@ p(\mu, \sigma^2) \ p(y \, | \, \mu, \sigma^2)
 -
 \Phi\!\left(\frac{y_n - 0.5 - \mu}{\sigma}\right)
 \right).
-\end{eqnarray*}
+\end{array}
+$$
 
 
 The Stan code simply follows the mathematical definition, providing an
@@ -4978,7 +5025,7 @@ myocardial infarction under a treatment of beta blockers
 
 #### Data {-}
 
-The clinical data consists of $J$ trials, each with $n^t$ treatment cases, $n^c$ control cases, $r^t$ successful outcomes among those treated and $r^c$ successful outcomes among those in the control group.  This data can be declared in Stan as follows.^[Stan's integer constraints are not powerful enough to express the constraint that $\mbox{\code{r\_t[j]}} \leq \mbox{\code{n\_t[j]}}$, but this constraint could be checked in the transformed data block.]
+The clinical data consists of $J$ trials, each with $n^t$ treatment cases, $n^c$ control cases, $r^t$ successful outcomes among those treated and $r^c$ successful outcomes among those in the control group.  This data can be declared in Stan as follows.^[Stan's integer constraints are not powerful enough to express the constraint that $\mbox{\code{r_t[j]}} \leq \mbox{\code{n_t[j]}}$, but this constraint could be checked in the transformed data block.]
 
 ```
 data {
@@ -5152,7 +5199,8 @@ for the years 1851--1962.^[The original source of the data is @Jarret:1979, whic
 and @te ($l$), tat change at a given point in time $s$.  The
 full model expressed using a latent discrete parameter $s$ is
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 e & \sim & \mathsf{Exponential}(r_e)
 \\
 l & \sim & \mathsf{Exponential}(r_l)
@@ -5160,7 +5208,8 @@ l & \sim & \mathsf{Exponential}(r_l)
 s & \sim & \mathsf{Uniform}(1, T)
 \\
 D_t & \sim & \mathsf{Poisson}(t < s \ ? \ e \ : \ l)
-\end{eqnarray*}
+\end{array}
+$$
 
 The last line uses the conditional operator (also known as the ternary
 operator), which is borrowed from C and related languages.  The
@@ -5189,52 +5238,58 @@ marginalized out to produce a model defining the log of the
 probability function $p(e,l,D_t)$.  The full joint probability factors
 as
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 p(e,l,s,D)
 & = & p(e) \, p(l) \, p(s) \, p(D | s, e, l)
-((((([3pt]
+\\[3pt]
 & = &
 \begin{array}[t]{l}
 \mathsf{Exponential}(e|r_e) \ \mathsf{Exponential}(l|r_l) \
 \mathsf{Uniform}(s|1, T)
-((((([3pt]
+\\[3pt]
 \prod_{t=1}^T \mathsf{Poisson}(D_t | t < s \ ? \ e \ : \ l),
 \end{array}
-\end{eqnarray*}
+$$
+
 
 To marginalize, an alternative factorization into prior and likelihood
 is used,
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 p(e,l,D) & = & p(e,l) \, p(D|e,l),
-\end{eqnarray*}
+\end{array}
+$$
 
 where the likelihood is defined by marginalizing $s$ as
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 p(D | e,l)
 & = &
 \sum_{s=1}^T p(s, D | e,l)
-((((([3pt]
+\\[3pt]
 & = &
 \sum_{s=1}^T p(s) p(D | s,e,l)
-((((([3pt]
+\\[3pt]
 & = &
 \sum_{s=1}^T \mathsf{Uniform}(s | 1,T)
 \, \prod_{t=1}^T \mathsf{Poisson}(D_t | t < s \ ? \ e \ : \ l)
-\end{eqnarray*}
+\end{array}
+$$
 
 Stan operates on the log scale and thus requires the log likelihood,
 
 $$
 \log p(D | e,l)
-((((([3pt]
+\\[3pt]
 \mbox{ } \ \ = \
 \mbox{log\_sum\_exp}_{s=1}^T
 \begin{array}[t]{l}
 \big(
  \log \mathsf{Uniform}(s \, | \, 1, T)
-((((([3pt]
+\\[3pt]
 {} \hspace*{4pt} + \sum_{t=1}^T \log \mathsf{Poisson}(D_t \, | \, t < s \ ?
 \ e \ : \ l) \big),
 \end{array}
@@ -5248,7 +5303,7 @@ $$
 $$
 
 The log sum of exponents function allows the model to be coded
-directly in Stan using the built-in function `log\_sum\_exp`,
+directly in Stan using the built-in function `log_sum_exp`,
 which provides both arithmetic stability and efficiency for mixture
 model calculations.
 
@@ -5330,9 +5385,9 @@ data is about 20 times faster;  the improvement will be greater for
 larger `T`.
 
 The key to understanding Wiklendt's dynamic programming version is to
-see that `head(lp\_e)` holds the forward values, whereas
-`lp\_l[T + 1] - head(lp\_l, T)` holds the backward values; the
-clever use of subtraction allows `lp\_l` to be accumulated
+see that `head(lp_e)` holds the forward values, whereas
+`lp_l[T + 1] - head(lp_l, T)` holds the backward values; the
+clever use of subtraction allows `lp_l` to be accumulated
 naturally in the forward direction.
 
 
@@ -5363,14 +5418,16 @@ Averaging over iterations provides an unnormalized probability
 estimate of the change point being $s$ (see below for the normalizing
 constant),
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 p(s | D)
 & \propto &
 q(s | D)
-((((([3pt]
+\\[3pt]
 & = &
 \frac{1}{M} \sum_{m=1}^{M} \exp(`lp`[m,s]).
-\end{eqnarray*}
+\end{array}
+$$
 
 where $\mbox{lp}[m,s]$ represents the value of `lp` in
 posterior draw $m$ for change point $s$.  By averaging over draws,
@@ -5464,7 +5521,7 @@ for (s1 in 1:T)
 ```
 
 The matrix can then be converted back to a vector using
-`to\_vector` before being passed to `log\_sum\_exp`.
+`to_vector` before being passed to `log_sum_exp`.
 
 ## Mark-Recapture Models
 
@@ -5631,7 +5688,7 @@ $$
 \begin{cases}
 1
 & \mbox{if } t = T
-((((([3pt]
+\\[3pt]
 (1 - \phi_t) + \phi_t (1 - p_{t+1}) \chi_{t+1}
 & \mbox{ if } t < T
 \end{cases}
@@ -5818,9 +5875,9 @@ transformed data {
 }
 ```
 
-The transformed data block also defines `n\_captured[t]`, which is
+The transformed data block also defines `n_captured[t]`, which is
 the total number of captures at time `t`.  The variable
-`n\_captured` is defined as a vector instead of an integer array
+`n_captured` is defined as a vector instead of an integer array
 so that it can be used in an elementwise vector operation in the generated
 quantities block to model the population estimates at each time point.
 
@@ -5840,7 +5897,7 @@ transformed parameters {
 }
 ```
 
-The definition of `prob\_uncaptured`, from the functions block,
+The definition of `prob_uncaptured`, from the functions block,
 is
 
 ```
@@ -6123,7 +6180,7 @@ probability function on the log scale,
 $$
 \begin{array}{l}
 \mbox{ } \ \log p(y | \theta, \pi)
-((((([3pt]
+\\[3pt]
 \mbox{ } \  = \
 \sum_{i=1}^I \log \left( \sum_{k=1}^K \exp
   \left( \log \mathsf{Categorical}(z_i | \pi)
@@ -6132,7 +6189,7 @@ $$
   \right) \right),
 \end{array}
 $$
-which can be directly coded using Stan's built-in `log\_sum\_exp`
+which can be directly coded using Stan's built-in `log_sum_exp`
 function.
 
 
@@ -6181,7 +6238,7 @@ model {
 \caption{\small\it Stan program for the rating (or diagnostic
   accuracy) model of @DawidSkene:1979. The model marginalizes
   out the discrete parameter $z$, storing the unnormalized conditional
-  probability $\log q(z_i=k|\theta,\pi)$ in\ `log\_q\_z[i,~k]`.}
+  probability $\log q(z_i=k|\theta,\pi)$ in\ `log_q_z[i,~k]`.}
 \end{figure}
 id:dawid-skene-model.figure
 
@@ -6196,11 +6253,11 @@ as the expectation maximization (EM) algorithm of
 
 #### Inference for the True Category {-}
 
-The quantity `log\_q\_z[i]` is defined as a transformed
+The quantity `log_q_z[i]` is defined as a transformed
 parameter.  It encodes the (unnormalized) log of $p(z_i | \theta,
 \pi)$.  Each iteration provides a value conditioned on that
 iteration's values for $\theta$ and $\pi$.  Applying the softmax
-function to `log\_q\_z[i]` provides a simplex corresponding to
+function to `log_q_z[i]` provides a simplex corresponding to
 the probability mass function of $z_i$ in the posterior.   These may
 be averaged across the iterations to provide the posterior probability
 distribution over each $z_i$.
@@ -6337,16 +6394,16 @@ has a different number of observations.
 \begin{center}
 \begin{minipage}[c]{0.35\textwidth}
 $y_1 =  \left[1.3 \ \ 2.4 \ \ 0.9\right]$
-((((([3pt]
+\\[3pt]
 $y_2 = \left[-1.8 \ \ -0.1\right]$
-((((([3pt]
+\\[3pt]
 $y_3 = \left[12.9 \ \ 18.7 \ \ 42.9 \ \ 4.7\right]$
 \end{minipage}
 \ \ \
 \begin{minipage}[c]{0.60\textwidth}
 $z = [1.3 \ \ 2.4 \ \ 0.9 \ \ -1.8 \ \ -0.1 \ \ 12.9 \ \ 18.7 \ \ 42.9
 \ \ 4.7]$
-((((([3pt]
+\\[3pt]
 $s  =  \{ 3 \ \ 2 \ \ 4 \}$
 \end{minipage}
 \end{center}
@@ -6530,9 +6587,9 @@ this prior could be swapped with other priors, or even a hierarchical
 model to fit an overall problem scale and location.
 
 The only parameter is `mu`, where `mu[k]` is the centroid
-for cluster $k$.  The transformed parameters `soft\_z[n]` contain
+for cluster $k$.  The transformed parameters `soft_z[n]` contain
 the log of the unnormalized cluster assignment probabilities.  The
-vector `soft\_z[n]` can be converted back to a normalized simplex
+vector `soft_z[n]` can be converted back to a normalized simplex
 using the softmax function (see \refsection{softmax}), either
 externally or within the model's generated quantities block.
 
@@ -6570,7 +6627,7 @@ in \refsection{label-switching-problematic}.
 Cluster assignments are not identified --- permuting the cluster mean
 vectors `mu` leads to a model with identical likelihoods.  For
 instance, permuting the first two indexes in `mu` and the first
-two indexes in each `soft\_z[n]` leads to an identical likelihood
+two indexes in each `soft_z[n]` leads to an identical likelihood
 (and prior).
 
 The lack of identifiability means that the cluster parameters
@@ -6731,13 +6788,13 @@ likelihood is now computed as the marginal document probability
 $$
 \begin{array}{l}
 \log p(w_{m,1},\ldots,w_{m,N_m}|\theta,\phi)
-((((([2pt]
+\\[2pt]
 \ \ \ = \
 \log \sum_{k=1}^K
 \left( \mathsf{Categorical}(k|\theta)
         \times \prod_{n=1}^{N_m} \mathsf{Categorical}(w_{m,n}|\phi_k)
 \right)
-((((([6pt]
+\\[6pt]
 \ \ \ = \
 \log \sum_{k=1}^K \exp \left(
 \log \mathsf{Categorical}(k|\theta)
@@ -6746,7 +6803,7 @@ $$
 \end{array}
 $$
 
-The last step shows how the `log\_sum\_exp` function can be used
+The last step shows how the `log_sum_exp` function can be used
 to stabilize the numerical calculation and return a result on the log
 scale.
 
@@ -6872,42 +6929,47 @@ to calculate the marginal distribution over the continuous parameters
 by summing out the discrete parameters as in other mixture models.
 The marginal posterior of the topic and word variables is
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 p(\theta,\phi|w,\alpha,\beta)
 & \propto &
 p(\theta|\alpha) \times p(\phi|\beta) \times p(w|\theta,\phi)
-((((([4pt]
+\\[4pt]
 & = &
 \prod_{m=1}^M p(\theta_m|\alpha)
 \times
 \prod_{k=1}^K p(\phi_k|\beta)
 \times
 \prod_{m=1}^M \prod_{n=1}^{M[n]} p(w_{m,n}|\theta_m,\phi).
-\end{eqnarray*}
+\end{array}
+$$
 
 The inner word-probability term is defined by summing out the
 topic assignments,
-\begin{eqnarray*}
+
+$$
+\begin{array}{rcl}
 p(w_{m,n}|\theta_m,\phi)
 & = &
 \sum_{z=1}^K p(z,w_{m,n}|\theta_m,\phi).
-((((([4pt]
+\\[4pt]
 & = &
 \sum_{z=1}^K p(z|\theta_m) \times p(w_{m,n}|\phi_z).
-\end{eqnarray*}
+\end{array}
+$$
 
 Plugging the distributions in and converting to the log scale provides a
 formula that can be implemented directly in Stan,
 $$
 \begin{array}{l}
 \log p(\theta,\phi|w,\alpha,\beta)
-((((([6pt]
+\\[6pt]
 { } \ \
 \begin{array}{l}
 { } = \sum_{m=1}^M \log \mathsf{Dirichlet}(\theta_m|\alpha)
 \ + \
 \sum_{k=1}^K \log \mathsf{Dirichlet}(\phi_k|\beta)
-((((([6pt]
+\\[6pt]
 { } \ \ \ \ \
 + \sum_{m=1}^M \sum_{n=1}^{N[m]} \log \left(
 \sum_{z=1}^K
@@ -7422,7 +7484,7 @@ hyperparameters, allowing us to learn the hyperparameters.
 
 We have used the Cholesky parameterized \mathsf{MultiNormal} rather than the
 standard \mathsf{MultiNormal} because it allows us to the
-`cholesky\_decompose` function which has been optimized for both small and
+`cholesky_decompose` function which has been optimized for both small and
 large matrices. When working with small matrices the differences in
 computational speed between the two approaches will not be noticeable, but for
 larger matrices ($N \gtrsim 100$) the Cholesky decomposition version will be
@@ -7500,7 +7562,7 @@ discrete data models.
 #### Poisson GP {-}
 
 If we want to model count data, we can remove the $\sigma$ parameter, and use
-`poisson\_log`, which implements a log link, for our likelihood rather
+`poisson_log`, which implements a log link, for our likelihood rather
 than `normal`. We can also add an overall mean parameter, $a$, which
 will account for the marginal expected value for $y$. We do this because we
 cannot center count data like we would for normally distributed data.
@@ -7595,7 +7657,7 @@ modeled hierarchically.
 The implementation of automatic relevance determination in Stan is
 straightforward, though it currently requires the user to directly code the
 covariance matrix. We'll write a function to generate the Cholesky of the
-covariance matrix called `L\_cov\_exp\_quad\_ARD`.
+covariance matrix called `L_cov_exp_quad_ARD`.
 
 
 ```
@@ -7689,7 +7751,7 @@ we likely don't need constraints beyond penalizing small
 length-scales.  We'd like to allow the GP prior to represent both
 high-frequency and low-frequency functions, so our prior should put
 non-negligible mass on both sets of functions.  In this case, an
-inverse gamma, `inv\_gamma\_lpdf` in Stan’s language, will work
+inverse gamma, `inv_gamma_lpdf` in Stan’s language, will work
 well as it has a sharp left tail that puts negligible mass on
 infinitesimal length-scales, but a generous right tail, allowing for
 large length-scales. Inverse gamma priors will avoid infinitesimal length-scales
@@ -7949,7 +8011,7 @@ elements in $x$ and $\tilde{x}$ are never the same.
 This Stan code below uses the analytic form of the posterior and provides
 sampling of the resulting multivariate normal through the Cholesky
 decomposition. The data declaration is the same as for the latent variable
-example, but we've defined a function called `gp\_pred\_rng` which will
+example, but we've defined a function called `gp_pred_rng` which will
 generate a draw from the posterior predictive mean conditioned on observed data
 `y1`. The code uses a Cholesky decomposition in triangular solves in order
 to cut down on the the number of matrix-matrix multiplications when computing
@@ -8185,7 +8247,7 @@ constrained parameter transforms provides precise definitions.
 {\it Warning:} An extra term gets added to the log density to ensure
 the distribution on unit vectors is proper.  This is not a problem in
 practice, but it may lead to misunderstandings of the target log
-density output (`lp\_\_` in some interfaces).  The underlying
+density output (`lp__` in some interfaces).  The underlying
 source of the problem is that a unit vector of size $K$ has only
 $K - 1$ degrees of freedom.  But there is no way to map those $K - 1$
 degrees of freedom continuously to $\mathbb{R}^N$---for example, the
@@ -8362,12 +8424,14 @@ As an illustrative example, we consider a nonlinear system of two equations
 with two unknowns. Our goal is to simultaneously solve all equations for
 $y_1$ and $y_2$, such that the vector $z$ goes to 0.
 
-\begin{eqnarray} {#algebra.equation}
+$$
+\begin{array}{rcl}
   \begin{aligned}
   z_1 &= y_1 - \theta_1 \\
   z_2 &= y_1 y_2 + \theta_2 \\
-  \end{aligned}
-\end{eqnarray}
+\end{array}
+$$
+
 
 
 ## Coding an Algebraic System
@@ -8392,7 +8456,7 @@ vector system(vector y,        // unknowns
 
 The function takes the unknowns we wish to solve for in `y` (a
 vector), the system parameters in `theta` (a vector), the real
-data in `x\_r` (a real array) and the integer data in `x\_i`
+data in `x_r` (a real array) and the integer data in `x_i`
 (an integer array). The system function returns the value of the
 function (a vector), for which we want to compute the roots. Our
 example does not use real or integer data. Nevertheless, these unused
@@ -8452,11 +8516,11 @@ transformed parameters {
 which returns $y = \{3, -2\}$.
 
 ### Data versus Parameters {-}
-The arguments for the real data `x\_r` and
-the integer data `x\_i` must be expressions that only involve data or
+The arguments for the real data `x_r` and
+the integer data `x_i` must be expressions that only involve data or
 transformed data variables. `theta`, on the other hand,
 must only involve parameters. Note there are no restrictions on the initial guess,
-`y\_guess`, which may be a data or a parameter vector.
+`y_guess`, which may be a data or a parameter vector.
 
 ### Length of the Algebraic Function and of the Vector of Unknowns {-}
 The Jacobian of the solution with respect to the parameters is computed
@@ -8592,8 +8656,8 @@ real[] sho(real t,        // time
 
 The function takes in a time `t` (a real value), a a system state
 `y` (real array), system parameters `theta` (a real array),
-along with real data in variable `x\_r` (a real array) and
-integer data in variable `x\_i` (an integer array).  The system
+along with real data in variable `x_r` (a real array) and
+integer data in variable `x_i` (an integer array).  The system
 function returns the array of derivatives of the system state with
 respect to time, evaluated at time `t` and state `y`.  The
 simple harmonic oscillator coded here does not have time-sensitive
@@ -8636,7 +8700,7 @@ else
 Stan's ODE solvers require the initial time argument to be a constant
 (i.e., a function of data or transformed data variables and
 constants).  This means that, in general, there's no way to use the
-`integrate\_ode` function to accept a parameter for the initial
+`integrate_ode` function to accept a parameter for the initial
 time and thus no way in general to estimate the initial time of an ODE
 system from measurements.
 
@@ -8683,7 +8747,7 @@ id:ode.sho_matrix
 
 The Stan model to simulate noisy observations using a matrix exponential function
 is given by \reffigure{sho-sim-me}. Note that because we are performing matrix
-operations, we declare `y0` and `y\_hat` as vectors, instead of using arrays,
+operations, we declare `y0` and `y_hat` as vectors, instead of using arrays,
 as in the previous example code (\reffigure{sho-sim}).
 
 In general, computing a matrix exponential will be more efficient than using a numerical
@@ -8719,7 +8783,7 @@ generated quantities {
   state `y0` are read in as data along  observation times `ts`.
   The generated quantities block is used to solve the ODE for the specified
   times and then add random measurement error, producing observations
-  `y\_hat`. Because the ODEs are linear, we can use the `matrix\_exp`
+  `y_hat`. Because the ODEs are linear, we can use the `matrix_exp`
   function to solve the system. }
 \end{figure}
 id:sho-sim-me.figure
@@ -8800,7 +8864,7 @@ generated quantities {
   state `y0` are read in as data along with the initial time
   `t0` and observation times `ts`. The generated quantities
   block is used to solve the ODE for the specified times and then add
-  random measurement error, producing observations `y\_hat`.
+  random measurement error, producing observations `y_hat`.
   Because the system is not stiff, the `rk45` solver is used.}
 \end{figure}
 id:sho-sim.figure
@@ -8815,13 +8879,13 @@ y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);
 This assigns the solutions to the system defined by function
 `sho`, given initial state `y0`, initial time `t0`,
 requested solution times `ts`, parameters `theta`, real data
-`x`, and integer data `x\_int`.  The call explicitly
+`x`, and integer data `x_int`.  The call explicitly
 specifies the Runge-Kutta solver (for non-stiff systems).
 
 Here, the ODE solver is called in the generated quantities block to
-provide a $10 \times 2$ array of solutions `y\_hat` to
+provide a $10 \times 2$ array of solutions `y_hat` to
 which measurement error is added using the normal pseudo-random number
-generating function `normal\_rng`.  The number of rows in the
+generating function `normal_rng`.  The number of rows in the
 solution array is the same as the size of `ts`, the requested
 solution times.
 
@@ -8829,7 +8893,7 @@ solution times.
 
 Unlike other functions, the integration functions for ODEs are limited
 as to the origins of variables in their arguments.  In particular, the
-time `t`, real data `x`, and integer data `x\_int` must
+time `t`, real data `x`, and integer data `x_int` must
 be expressions that only involve data or transformed data variables.
 The initial state `y` or the parameters `theta` are the only
 arguments which may involve parameters.
@@ -8894,12 +8958,12 @@ A Stan program that can be used to estimate both the initial state and
 parameter value for the simple harmonic oscillator given noisy
 observations is given in \reffigure{sho-both}.  Compared to the
 simulation model in \reffigure{sho-sim}, the model to estimate
-parameters uses the `integrate\_ode` function in the model block
+parameters uses the `integrate_ode` function in the model block
 rather than the generated quantities block.  There are Cauchy priors on the
 measurement error scales `sigma` and standard normal priors on the
 components of parameter array `theta` and initial state parameter
 array `y0`.  The solutions to the ODE are then assigned to an
-array `y\_hat`, which is then used as the location in the
+array `y_hat`, which is then used as the location in the
 observation noise model as follows.
 
 ```
@@ -9235,10 +9299,10 @@ model {
 ...
 ```
 
-In this model, an unconstrained parameter `theta\_raw` gets a
+In this model, an unconstrained parameter `theta_raw` gets a
 logistic prior, and then the transformed parameter `theta` is
-defined to be the inverse logit of `theta\_raw`.  In this
-parameterization, `inv\_logit(mu)` is the mean of the implied
+defined to be the inverse logit of `theta_raw`.  In this
+parameterization, `inv_logit(mu)` is the mean of the implied
 prior on `theta`.  The prior distribution on `theta` will be
 flat if `sigma` is one and `mu` is zero, and will be
 U-shaped if `sigma` is larger than one and bell shaped if
@@ -9279,7 +9343,7 @@ model {
 The multivariate normal is used for convenience and efficiency with
 its Cholesky-factor parameterization.  Now the mean is controlled by
 `softmax(mu)`, but we have additional control of covariance
-through `L\_Sigma` at the expense of having on the order of $K^2$
+through `L_Sigma` at the expense of having on the order of $K^2$
 parameters in the prior rather than order $K$.  If no covariance is
 desired, the number of parameters can be reduced back to $K$ using a
 vectorized normal distribution as follows.
@@ -9388,7 +9452,7 @@ of variables whose inverse has a gamma distribution.  This section
 contrasts two approaches, first with a transform, then with a change
 of variables.
 
-The transform based approach to sampling `y\_inv` with an inverse
+The transform based approach to sampling `y_inv` with an inverse
 gamma distribution can be coded as follows.
 
 ```
@@ -9404,7 +9468,7 @@ model {
 }
 ```
 
-The change-of-variables approach to sampling `y\_inv` with an
+The change-of-variables approach to sampling `y_inv` with an
 inverse gamma distribution can be coded as follows.
 
 ```
@@ -9566,7 +9630,7 @@ transformed parameters {
   vector[N] alpha = L + (U - L) .* alpha_raw;
 ```
 
-The expression `U - L` is multiplied by `alpha\_raw`
+The expression `U - L` is multiplied by `alpha_raw`
 elementwise to produce a vector of variables in $(0, U-L)$, then
 adding $L$ results in a variable ranging between $(L, U)$.
 
@@ -9763,7 +9827,7 @@ generated quantities {
 }
 ```
 
-The function is named `relative\_diff`, and is declared to have
+The function is named `relative_diff`, and is declared to have
 two real-valued arguments and return a real-valued result.   It is
 used the same way a built-in function would be used in the generated
 quantities block.
@@ -9784,7 +9848,7 @@ would be used.
 ### Return Statements {-}
 
 Return statements, such as the one on the last line of the definition
-of `relative\_diff` above, are only allowed in the bodies of
+of `relative_diff` above, are only allowed in the bodies of
 function definitions.  Return statements may appear anywhere in a
 function, but functions with non-void return types must end in a
 return statement.
@@ -9821,10 +9885,10 @@ The negation of the positive test is important, because it also
 catches the case where `x` is a not-a-number value.  If the
 condition had been coded as `(x~<~0)` it would not catch the
 not-a-number case, though it could be written as
-`(x~<~0~||~is\_nan(x))`.  The positive infinite case is allowed
+`(x~<~0~||~is_nan(x))`.  The positive infinite case is allowed
 through, but could also be checked with the \Verb/is_inf(x)/ function.
 The square root function does not itself reject, but some downstream
-consumer of `dbl\_sqrt(-2)` would be likely to raise an error, at
+consumer of `dbl_sqrt(-2)` would be likely to raise an error, at
 which point the origin of the illegal input requires detective work.
 Or even worse, as Matt Simpson pointed out in the GitHub comments, the
 function could go into an infinite loop if it starts with an infinite
@@ -9879,24 +9943,24 @@ quantities block.
 & &  `vector<upper=U>[N]`
 \\
 & &  `vector<lower=L,upper=U>[N]`
-((((([4pt]
+\\[4pt]
 & & `simplex[N]`
 \\
 & & `ordered[N]`
 \\
-& & `positive\_ordered[N]`
+& & `positive_ordered[N]`
 \\
-& & `unit\_vector[N]`
+& & `unit_vector[N]`
 
 \\ \hline
 
-`row\_vector`
-& `row\_vector[M]`
-& `row\_vector<lower=L>[M]`
+`row_vector`
+& `row_vector[M]`
+& `row_vector<lower=L>[M]`
 \\
-& &  `row\_vector<upper=U>[M]`
+& &  `row_vector<upper=U>[M]`
 \\
-& &  `row\_vector<lower=L,upper=U>[M]`
+& &  `row_vector<lower=L,upper=U>[M]`
 
 \\ \hline
 
@@ -9907,14 +9971,14 @@ quantities block.
 & &  `matrix<upper=U>[M,~N]`
 \\
 & &  `matrix<lower=L,upper=U>[M,~N]`
-((((([4pt]
-& & `cov\_matrix[K]`
+\\[4pt]
+& & `cov_matrix[K]`
 \\
-& & `corr\_matrix[K]`
+& & `corr_matrix[K]`
 \\
-& & `cholesky\_factor\_cov[K]`
+& & `cholesky_factor_cov[K]`
 \\
-& & `cholesky\_factor\_corr[K]`
+& & `cholesky_factor_corr[K]`
 \end{tabular}
 \end{center}
 \caption{\small\it The leftmost column is a list of the unconstrained
@@ -9926,9 +9990,9 @@ quantities block.
   corresponding lefthand column basic type.  At runtime, dimensions
   are checked for consistency for all variables; containers of any
   sizes may be assigned to function arguments.  The constrained matrix
-  types `cov\_matrix[K]`, `corr\_matrix[K]`,
-  `cholesky\_factor\_cov[K]`, and
-  `cholesky\_factor\_corr[K]` are only assignable to matrices of
+  types `cov_matrix[K]`, `corr_matrix[K]`,
+  `cholesky_factor_cov[K]`, and
+  `cholesky_factor_corr[K]` are only assignable to matrices of
   dimensions `matrix[K,~K]` types. Stan also allows arrays of any
   of these types, with slightly different declarations for function
   arguments and return types and variables.
@@ -10063,7 +10127,7 @@ transformed parameters {
 
 ## Functions Accessing the Log Probability  Accumulator
 
-Functions whose names end in `\_lp` are allowed to use sampling
+Functions whose names end in `_lp` are allowed to use sampling
 statements and `target~+=` statements; other
 functions are not.  Because of this access, their use is restricted to
 the transformed parameters and model blocks.
@@ -10099,15 +10163,15 @@ transformed parameters {
 ## Functions Acting as Random Number Generators
 
 A user-specified function can be declared to act as a (pseudo) random
-number generator (PRNG) by giving it a name that ends in `\_rng`.
-Giving a function a name that ends in `\_rng` allows it to access
+number generator (PRNG) by giving it a name that ends in `_rng`.
+Giving a function a name that ends in `_rng` allows it to access
 built-in functions and user-defined functions that end in
-`\_rng`, which includes all the built-in PRNG functions.  Only
-functions ending in `\_rng` are able access the built-in PRNG
-functions.  The use of functions ending in `\_rng` must therefore
+`_rng`, which includes all the built-in PRNG functions.  Only
+functions ending in `_rng` are able access the built-in PRNG
+functions.  The use of functions ending in `_rng` must therefore
 be restricted to transformed data and generated quantities blocks like
 other PRNG functions; they may also be used in the bodies of other
-user-defined functions ending in `\_rng`.
+user-defined functions ending in `_rng`.
 
 For example, the following function generates an $N \times K$ data
 matrix, the first column of which is filled with 1 values for the
@@ -10159,12 +10223,12 @@ generated quantities {
 
 A more sophisticated simulation might fit a multivariate normal to the
 predictors `x` and use the resulting parameters to generate
-multivariate normal draws for `x\_sim`.
+multivariate normal draws for `x_sim`.
 
 ## User-Defined Probability Functions
 
 Probability functions are distinguished in Stan by names ending in
-`\_lpdf` for density functions and `\_lpmf` for mass
+`_lpdf` for density functions and `_lpmf` for mass
 functions; in both cases, they must have `real` return types.
 
 Suppose a model uses several standard normal distributions, for which
@@ -10186,11 +10250,11 @@ model {
 }
 ```
 
-The ability to use the `unit\_normal` function as a density is
-keyed off its name ending in `\_lpdf` (names ending in
-`\_lpmf` for probability mass functions work the same way).
+The ability to use the `unit_normal` function as a density is
+keyed off its name ending in `_lpdf` (names ending in
+`_lpmf` for probability mass functions work the same way).
 
-In general, if `foo\_lpdf` is defined to consume $N + 1$
+In general, if `foo_lpdf` is defined to consume $N + 1$
 arguments, then
 
 ```
@@ -10203,15 +10267,15 @@ can be used as shorthand for
 target += foo_lpdf(y | theta1, ..., thetaN);
 ```
 
-As with the built-in functions, the suffix `\_lpdf` is dropped and
+As with the built-in functions, the suffix `_lpdf` is dropped and
 the first argument moves to the left of the sampling symbol (\Verb|~|)
 in the sampling statement.
 
-Functions ending in `\_lpmf` (for probability mass functions),
+Functions ending in `_lpmf` (for probability mass functions),
 behave exactly the same way.  The difference is that the first
-argument of a density function (`\_lpdf`) must be continuous (not
+argument of a density function (`_lpdf`) must be continuous (not
 an integer or integer array), whereas the first argument of a mass
-function (`\_lpmf`) must be discrete (integer or integer array).
+function (`_lpmf`) must be discrete (integer or integer array).
 
 
 ## Overloading Functions
@@ -10277,8 +10341,8 @@ as part of the Stan language, so there is no need to document them.
 ## Summary of Function Types
 
 Functions may have a void or non-void return type and they may or may
-not have one of the special suffixes, `\_lpdf`, `\_lpmf`,
-`\_lp`, or `\_rng`.
+not have one of the special suffixes, `_lpdf`, `_lpmf`,
+`_lp`, or `_rng`.
 
 ### Void vs. Non-Void Return {-}
 
@@ -10292,19 +10356,19 @@ arguments of a type that matches the declared return type.
 
 ### Suffixed or Non-Suffixed {-}
 
-Only functions ending in `\_lpmf` or `\_lpdf` and with
+Only functions ending in `_lpmf` or `_lpdf` and with
 return type `real` may be used as probability functions in
 sampling statements.
 
-Only functions ending in `\_lp` may access the log probability
+Only functions ending in `_lp` may access the log probability
 accumulator through sampling statements or `target~+=`
 statements.  Such functions may only be used in the transformed
 parameters or model blocks.
 
-Only functions ending in `\_rng` may access the built-in
+Only functions ending in `_rng` may access the built-in
 pseudo-random number generators.  Such functions may only be used in
 the generated quantities block or transformed data block, or in the
-bodies of other user-defined functions ending in `\_rng`.
+bodies of other user-defined functions ending in `_rng`.
 
 
 ## Recursive Functions
@@ -10318,7 +10382,7 @@ A^n
 =
 \begin{cases}
 \ \mbox{I} & \mbox{if } n = 0, \mbox{ and}
-((((([3pt]
+\\[3pt]
 \ A \, A^{n-1} & \mbox{if } n > 0.
 \end{cases}
 $$
@@ -10338,7 +10402,7 @@ directly translated to a recursive function definition.
 ```
 
 The forward declaration of the function signature before it is defined
-is necessary so that the embedded use of `matrix\_pow` is
+is necessary so that the embedded use of `matrix_pow` is
 well-defined when it is encountered.  It would be more efficient to
 not allow the recursion to go all the way to the base case, adding the
 following conditional clause.
@@ -10359,7 +10423,7 @@ random number generators.  For example, to generate a standard
 logistic variate, first generate a uniform variate
 $u \sim \mathsf{Uniform}(0, 1)$, then run through the inverse
 cumulative distribution function, $y = \mathrm{logit}(u)$.  If this
-were not already built in as `logistic\_rng(0, 1)`, it could be
+were not already built in as `logistic_rng(0, 1)`, it could be
 coded in Stan directly as
 
 ```
@@ -10466,7 +10530,7 @@ above with the single statement
 ```
 
 for readability.  The names like `p` indicate probabilities, and
-`p\_lb` and `p\_ub` indicate the probabilities of the
+`p_lb` and `p_ub` indicate the probabilities of the
 bounds.  The variable `u` is clearly named as a uniform variate,
 and `y` is used to denote the variate being generated itself.
 
@@ -10935,14 +10999,16 @@ unbounded as $\phi \rightarrow 0$ and $\phi \rightarrow 1$. Similarly,
 a Bernoulli likelihood model coupled with a "weak" beta prior, leads
 to a posterior
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 p(\phi|y)
 & \propto & \textstyle
 \mathsf{Beta}(\phi|0.5,0.5) \times \prod_{n=1}^N \mathsf{Bernoulli}(y_n|\phi)
-((((([4pt]
+\\[4pt]
 & = &\textstyle
 \mathsf{Beta}(\phi \, | \, 0.5 + \sum_{n=1}^N y_n, \ \ 0.5 + N - \sum_{n=1}^N y_n).
-\end{eqnarray*}
+\end{array}
+$$
 
 If $N = 9$ and each $y_n = 1$, the posterior is
 $\mathsf{Beta}(\phi|9.5,0,5)$.  This posterior is unbounded as $\phi
@@ -11043,16 +11109,18 @@ posterior properly.
 Consider what happens with initial values $\lambda_1^{(0)}, \lambda_2^{(0)}$.
 Gibbs sampling proceeds in iteration $m$ by drawing
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 \lambda_1^{(m)}
 & \sim & p(\lambda_1 \, | \, \lambda_2^{(m-1)}, \, \sigma^{(m-1)}, \, y)
-((((([6pt]
+\\[6pt]
 \lambda_2^{(m)}
 & \sim & p(\lambda_2 \, | \, \lambda_1^{(m)}, \, \sigma^{(m-1)}, \, y)
-((((([6pt]
+\\[6pt]
 \sigma^{(m)}
 & \sim & p(\sigma \, | \, \lambda_1^{(m)}, \, \lambda_2^{(m)}, \, y).
-\end{eqnarray*}
+\end{array}
+$$
 
 Now consider the draw for $\lambda_1$ (the draw for $\lambda_2$ is
 symmetric), which is conjugate in this model and thus can be done very
@@ -11228,7 +11296,7 @@ sampler with max tree depth of 10). The results are shown in
 outputs are the following.
 
 
-* As indicated by `R\_hat` column, all parameters have
+* As indicated by `R_hat` column, all parameters have
   converged other than $\lambda_1$ and $\lambda_2$ in the
   non-identified model.
 \item
@@ -11266,7 +11334,7 @@ matrix, vector, and array data structures provided by Stan.
 ## Basic Motivation
 
 Stan provides two basic scalar types, `int` and `real`, and
-three basic linear algebra types, `vector`, `row\_vector`,
+three basic linear algebra types, `vector`, `row_vector`,
 and `matrix`.  Then Stan allows arrays to be of any dimension and
 contain any type of element (though that type must be declared and
 must be the same for all elements).
@@ -12040,13 +12108,13 @@ vector map_rect((vector, vector, real[], int[]):vector f,
                 data real[ , ] x_rs, data int[ , ] x_is);
 ```
 
-The arrays `thetas` of parametrs, `x\_rs` of real data, and
-`x\_is` of integer data have the suffix "`s`" to indicate they
+The arrays `thetas` of parametrs, `x_rs` of real data, and
+`x_is` of integer data have the suffix "`s`" to indicate they
 are arrays.  These arrays must all be the same size, as they will be
 mapped in parallel by the function `f`.  The value of `phi`
 is reused in each mapped operation.
 
-The `\_rect` suffix in the name arises because the data
+The `_rect` suffix in the name arises because the data
 structures it takes as arguments are rectangular.  In order to deal
 with ragged inputs, ragged inputs must be padded out to recangular
 form.
@@ -12075,7 +12143,7 @@ raggedly.
 Stan's map function applies the function `f` to the shared
 parameters along with one element each of the job parameters, real
 data, and integer data arrays.  Each of the arguments `theta`,
-`x\_r`, and `x\_i` must be arrays of the same size.  If the
+`x_r`, and `x_i` must be arrays of the same size.  If the
 arrays are all size `N`, the result is defined as follows.
 
 ```
@@ -12085,7 +12153,7 @@ map_rect(f, phi, thetas, xs, ns)
 ```
 
 The dot operators in the notation above are meant to indicate
-concatenation (implemented as `append\_row` in Stan).  The output
+concatenation (implemented as `append_row` in Stan).  The output
 of each application of `f` is a vector, and the sequence of
 `N` vectors is concatenated together to return a single vector.
 
@@ -12121,7 +12189,7 @@ is not required by the map function but is just used here for
 simplicity, (b) represents the predictors as a real array even though
 it needs to be used as a vector, and (c) represents the regression
 coefficients (intercept and slope) as a vector even though they're
-used individually.  The `bernoulli\_logit` distribution is used
+used individually.  The `bernoulli_logit` distribution is used
 because the argument is on the logit scale---it implicitly applies the
 inverse logit function to map the argument to a probability.
 
@@ -12274,7 +12342,7 @@ must be arrays of the same size.
 The mapped implementation requires a function to be mapped.  The
 following function evaluates both the likelihood for the data observed
 for a group as well as the prior for the group-specific parameters
-(the name `bl\_glm` derives from the fact that it's a generalized
+(the name `bl_glm` derives from the fact that it's a generalized
 linear model with a Bernoulli likelihood and logistic link function).
 
 ```
@@ -12290,8 +12358,8 @@ functions {
 }
 ```
 
-The shared parameter `mu\_sigma` contains the locations
-(`mu\_sigma[1:2]`) and scales (`mu\_sigma[3:4]`) of the
+The shared parameter `mu_sigma` contains the locations
+(`mu_sigma[1:2]`) and scales (`mu_sigma[3:4]`) of the
 priors, which are extracted in the first two lines of the program.
 The variable `lp` is assigned the log density of the prior on
 `beta`.  The vector `beta` is of size two, as are the
@@ -12333,8 +12401,8 @@ transformed data {
 
 The integer `J` is set to the number of observations per group.^[This makes the very strong assumption that each group has the same number of observations!]
 
-The real data array `x\_r` holds the predictors and the integer
-data array `x\_i` holds the outcomes.  The grouped data arrays
+The real data array `x_r` holds the predictors and the integer
+data array `x_i` holds the outcomes.  The grouped data arrays
 are constructed by slicing the predictor vector `x` (and
 converting it to an array) and slicing the outcome array `y`.
 
@@ -12371,7 +12439,7 @@ block.
 
 The previous examples included rectangular data structures and single
 outputs.  Despite the name, this is not technically required by
-`map\_rect`.
+`map_rect`.
 
 ### Ragged Inputs {-}
 
@@ -12385,10 +12453,10 @@ of data points.
 ### Ragged Outputs {-}
 
 The output of each mapped function is concatenated to produce the
-output of `map\_rect`.  When every shard returns a singleton
+output of `map_rect`.  When every shard returns a singleton
 (size one) array, the result is the same size as the number of shards
 and is easy to deal with downstream.  If functions return longer
-arrays, they can still be structured using the `to\_matrix`
+arrays, they can still be structured using the `to_matrix`
 function if they are rectangular.
 
 If the outputs are of varying sizes, then there will have to be some way
@@ -12789,7 +12857,7 @@ model {
 
 This declaration of `beta` as a parameter may be replaced with a
 transformed parameter `beta` defined in terms of a
-uniform-distributed parameter `beta\_unif`.
+uniform-distributed parameter `beta_unif`.
 
 ```
 parameters {
@@ -12813,15 +12881,15 @@ themselves be parameters.  The variable `beta` could also be
 defined as a local variable if it does not need to be included in the
 sampler's output.
 
-The uniform distribution on `beta\_unif` is defined explicitly in
+The uniform distribution on `beta_unif` is defined explicitly in
 the model block, but it could be safely removed from the program
 without changing sampling behavior.  This is because $\log
 \mathsf{Uniform}(\beta_{\mathrm{unif}}|-\pi/2,\pi/2) =
 -\log \pi$ is a constant and Stan only
 needs the total log probability up to an additive constant.  Stan will spend
-some time checking that that `beta\_unif` is between
+some time checking that that `beta_unif` is between
 `-pi()/2` and `pi()/2`, but this condition is guaranteed by
-the constraints in the declaration of `beta\_unif`.
+the constraints in the declaration of `beta_unif`.
 
 ### Reparameterizing a Student-t Distribution {-}
 
@@ -13612,7 +13680,7 @@ store its value and reuse the local variable.
 
 Another case that may not be so obvious is with two multilevel
 parameters, say `a[ii[n]] + b[jj[n]]`.  If `a` and `b`
-are small (i.e., do not have many levels), then a table `a\_b` of
+are small (i.e., do not have many levels), then a table `a_b` of
 their sums can be created, with
 
 ```
@@ -13622,7 +13690,7 @@ for (i in 1:size(a))
     a_b[i, j] = a[i] + b[j];
 ```
 
-Then the sum can be replaced with `a\_b[ii[n], jj[n]]`.
+Then the sum can be replaced with `a_b[ii[n], jj[n]]`.
 
 
 ## Exploiting Conjugacy
@@ -13769,10 +13837,11 @@ $$
 $$
 The original parameters can be recovered with a little algebra,
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 y_n
 & = & \mbox{z}_y^{-1}(\mbox{z}_y(y_n))
-((((([4pt]
+\\[4pt]
 & = &
 \mbox{z}_y^{-1}
 \left(
@@ -13780,7 +13849,7 @@ y_n
 + \beta' \mbox{z}_x(x_n)
 + \epsilon_n'
 \right)
-((((([4pt]
+\\[4pt]
 & = &
 \mbox{z}_y^{-1}
 \left(
@@ -13791,7 +13860,7 @@ y_n
     \right)
 + \epsilon_n'
 \right)
-((((([4pt]
+\\[4pt]
 & = &
 \mbox{sd}(y)
 \left(
@@ -13803,7 +13872,7 @@ y_n
 + \epsilon_n'
 \right)
 + \bar{y}
-((((([4pt]
+\\[4pt]
 & = &
 \left(
   \mbox{sd}(y)
@@ -13817,7 +13886,8 @@ y_n
       \beta' \frac{\mbox{\small sd}(y)}{\mbox{\small sd}(x)}
   \right) x_n
 + \mbox{sd}(y) \epsilon'_n,
-\end{eqnarray*}
+\end{array}
+$$
 
 from which the original scale parameter values can be read off,
 $$
@@ -13994,18 +14064,18 @@ $$
 \begin{array}{rcll}
 p(\theta|y)  & =  & \displaystyle \frac{p(\theta,y)}{p(y)}
 & \mbox{{} \ \ \ \ \ [definition of  conditional probability]}
-((((([16pt]
+\\[16pt]
 & = & \displaystyle \frac{p(y|\theta) \, p(\theta)}{p(y)}
 & \mbox{{} \ \ \ \ \ [chain rule]}
-((((([16pt]
+\\[16pt]
 & = & \displaystyle \frac{p(y|\theta) \, p(\theta)}
                         {\int_{\Theta} p(y,\theta) \, d\theta}
 & \mbox{{} \ \ \ \ \ [law of total probability]}
-((((([16pt]
+\\[16pt]
 & = & \displaystyle \frac{p(y|\theta) \, p(\theta)}
                         {\int_{\Theta} p(y|\theta) \, p(\theta) \, d\theta}
 & \mbox{{} \ \ \ \ \ [chain rule]}
-((((([16pt]
+\\[16pt]
 & \propto & \displaystyle p(y|\theta) \, p(\theta)
 & \mbox{{} \ \ \ \ \ [$y$ is fixed]}
 \end{array}
@@ -14215,7 +14285,7 @@ regression by directly minimizing the sum of squared errors and using
 that to define the noise scale as a generated quantity.
 
 By replacing `N` with `N-1` in the denominator of the
-definition of `sigma\_squared`, the more commonly supplied
+definition of `sigma_squared`, the more commonly supplied
 unbiased estimate of $\sigma^2$ can be calculated; see
 \refsection{estimation-bias} for a definition of estimation bias and a
 discussion of estimating variance.
@@ -14403,7 +14473,7 @@ generated quantities {
 
 The error scale also needs to be calculated in the generated
 quantities block based on the elastic net coefficients
-`beta\_elastic\_net`.
+`beta_elastic_net`.
 
 
 #### Other Penalized Regressions {-}
@@ -14579,14 +14649,16 @@ p(\theta|y) = \frac{p(y|\theta) \, p(\theta)}{p(y)},
 $$
 ensures that
 
-\begin{eqnarray*}
+$$
+\begin{array}{rcl}
 \mbox{argmax}_{\theta} \ p(\theta|y)
 & = &
 \mbox{argmax}_{\theta} \ \frac{p(y|\theta) \, p(\theta)}{p(y)}
-((((([6pt]
+\\[6pt]
 & = &
 \mbox{argmax}_{\theta} \ p(y|\theta) \, p(\theta),
-\end{eqnarray*}
+\end{array}
+$$
 
 and the positiveness of densities and the strict monotonicity of log
 ensure that
@@ -15277,7 +15349,7 @@ mu = a + b * x;
 The direct translation to the imperative language of C++ code
 highlights the potential error of using `mu` in the first
 statement.
-((((([8pt]
+\\[8pt]
 To trap these kinds of errors, variables are initialized to the
 special not-a-number (`NaN`) value.  If `NaN` is passed to a
 log probability function, it will raise a domain exception, which will
@@ -15353,7 +15425,7 @@ There's a semicolon after the model statement but not after the
 brackets indicating the body of the for loop.
 
 * Another C thing: In Stan, variables can have names constructed
-  using letters, numbers, and the underscore (`\_`) symbol, but
+  using letters, numbers, and the underscore (`_`) symbol, but
   nothing else (and a variable name cannot begin with a number).
   BUGS variables can also include the dot, or period (`.`) symbol.
 
@@ -15407,7 +15479,7 @@ executed in order, so `total` is overwritten in each step.
   are used for error checking.  For parameters, the constraints
   are critical to sampling as they determine the geometry over which
   the Hamiltonian is simulated.
-  ((((([6pt]
+  \\[6pt]
   Variables can be declared as data, transformed data, parameters, transformed
   parameters, or generated quantities.  They can also be declared as
   local variables within blocks.  For more information, see
@@ -15443,7 +15515,7 @@ vector[K] theta[J];
 
 Then `theta[j]` is an expression denoting a `K`-vector and
 may be used in the code just like any other vector variable.
-((((([6pt]
+\\[6pt]
 An alternative encoding would be with a two-dimensional array, as in
 ```
 real theta[J,K];
@@ -15451,7 +15523,7 @@ real theta[J,K];
 
 The vector version can have some advantages, both in convenience and
 in computational speed for some operations.
-((((([6pt]
+\\[6pt]
 A third encoding would use a matrix:
 
 ```
@@ -15567,7 +15639,7 @@ rather, *both* statements contribute to the density function that
 is evaluated.  The above two lines have the effect of including the
 product, $\mathsf{Norm}(y|0,1) \times \mathsf{Norm}(y|2,3)$, into the
 density function.
-((((([6pt]
+\\[6pt]
 For a perhaps more confusing example, consider the following two lines in a Stan model:
 ```
 x ~ normal(0.8*y, sigma);
