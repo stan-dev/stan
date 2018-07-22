@@ -125,7 +125,8 @@ pipeline {
             post { always { deleteDir() } }
         }
         stage('Upstream CmdStan tests') {
-            when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
+            when { expression { env.BRANCH_NAME ==~ /PR-\d+/ ||
+                                env.BRANCH_NAME == "downstream_tests" } }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
                       parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
