@@ -1011,9 +1011,12 @@ transformed parameters {
 }
 ```
 
-See \refsection{matrix-broadcast} for a definition of
-`rep_row_vector` and \refsection{matrix-concatenation} for a
-definition of `append_row`.
+The `rep_row_vector(0, D)` call creates a row vector of size `D` with
+all entries set to zero.  The derived matrix `beta` is then defined to
+be the result of appending the row-vector `zeros` as a new row at the
+end of `beta_raw`;  the row vector `zeros` is defined as transformed
+data so that it doesn't need to be constructed from scratch each time
+it is used.
 
 This is not quite the same model as using $K$-vectors as parameters,
 because now the prior only applies to $(K-1)$-vectors.  In practice,
@@ -1031,9 +1034,11 @@ $$
 $$
 
 Such a parameter vector may be used to identify a multi-logit
-regression parameter vector (see \refsection{multi-logit}), or may be
-used for ability or difficulty parameters (but not both) in an IRT
-model (see \refsection{item-response-models}).
+regression parameter vector (see the [multi-logit
+section](#multi-logit.section) for details), or may be used for
+ability or difficulty parameters (but not both) in an IRT model (see
+the [item-response model section](item-response-models.section) for
+details).
 
 
 ### $K-1$ Degrees of Freedom {-}
@@ -1293,8 +1298,8 @@ prior on $(0,\infty)$ because of its declaration with a lower-bound
 constraint of zero.  Stan allows improper priors as long as the
 posterior is proper.  Nevertheless, it is usually helpful to have
 informative or at least weakly informative priors for all parameters;
-see \refsection{regression-priors} for recommendations on priors for
-regression coefficients and scales.
+see the [regression priors section](#regression-priors.section) for
+recommendations on priors for regression coefficients and scales.
 
 #### Optimizing the Model {-}
 
@@ -1315,11 +1320,11 @@ The first optimization vectorizes the for-loop over `D` as
 ```
 
 The declaration of `beta` as an array of vectors means that the
-expression `beta[l]` denotes a vector.  Although `beta`
-could have been declared as a matrix, an array of vectors (or a
-two-dimensional array) is more efficient for accessing rows; see
-\refsection{indexingefficiency} for more information on the efficiency
-tradeoffs among arrays, vectors, and matrices.
+expression `beta[l]` denotes a vector.  Although `beta` could have
+been declared as a matrix, an array of vectors (or a two-dimensional
+array) is more efficient for accessing rows; see the [indexing
+efficiency section](#indexing-efficiency.section) for more information
+on the efficiency tradeoffs among arrays, vectors, and matrices.
 
 This model can be further sped up and at the same time made more
 arithmetically stable by replacing the application of inverse-logit
@@ -1390,12 +1395,9 @@ y_n & \sim & \mathsf{Normal}(x_n \beta, \sigma)
 $$
 
 In this case, as $\tau \rightarrow 0$ and $\beta_k \rightarrow 0$, the
-posterior density
-$$
-p(\beta,\tau,\sigma|y,x) \propto p(y|x,\beta,\tau,\sigma)
-$$
-grows without bound.  There is a plot of a Neal's funnel density in
-\reffigure{funnel}, which has similar behavior.
+posterior density $$ p(\beta,\tau,\sigma|y,x) \propto
+p(y|x,\beta,\tau,\sigma) $$ grows without bound.  See the [plot of
+Neal's funnel density](#funnel.figure), which has similar behavior.
 
 There is obviously no MLE estimate for $\beta,\tau,\sigma$ in such a
 case, and therefore the model must be modified if posterior modes are
@@ -1581,14 +1583,15 @@ being questions that are easier for students of lesser ability;  such
 questions are not unheard of, but they tend to be eliminated from most
 testing situations where an IRT model would be applied.
 
-The model is parameterized here with student abilities `alpha`
-being given a standard normal prior.  This is to identify both the scale
-and the location of the parameters, both of which would be
-unidentified otherwise; see \refchapter{problematic-posteriors} for
-further discussion of identifiability. The difficulty and
-discrimination parameters `beta` and `gamma` then have
-varying scales given hierarchically in this model.  They could also be
-given weakly informative non-hierarchical priors, such as
+The model is parameterized here with student abilities `alpha` being
+given a standard normal prior.  This is to identify both the scale and
+the location of the parameters, both of which would be unidentified
+otherwise; see the [problematic posteriors
+chapter](#problematic-posteriors.chapter) for further discussion of
+identifiability. The difficulty and discrimination parameters `beta`
+and `gamma` then have varying scales given hierarchically in this
+model.  They could also be given weakly informative non-hierarchical
+priors, such as
 
 ```
   beta ~ normal(0, 5);
@@ -1613,8 +1616,9 @@ and
 ```
 
 Non-centered parameterizations tend to be more efficient in
-hierarchical models; see \refsection{reparameterization} for more
-information on non-centered reparameterizations.
+hierarchical models; see the [reparameterization
+section](#reparameterization.section) for more information on
+non-centered reparameterizations.
 
 The intercept term `mu_beta` can't itself be modeled
 hierarchically, so it is given a weakly informative
@@ -1637,9 +1641,9 @@ One application of (hierarchical) priors is to identify the scale
 and/or location of a group of parameters. For example, in the IRT
 models discussed in the previous section, there is both a location and
 scale non-identifiability.  With uniform priors, the posteriors will
-float in terms of both scale and location.  See
-\refsection{collinearity} for a simple example of the problems this
-poses for estimation.
+float in terms of both scale and location.  See the [collinearity
+section](#collinearity.section) for a simple example of the problems
+this poses for estimation.
 
 The non-identifiability is resolved by providing a standard normal (i.e.,
 $\mathsf{Normal}(0,1)$) prior on one group of coefficients, such as
@@ -1748,7 +1752,7 @@ $\mu_k$.
 For the prior on the covariance matrix, Gelman and Hill suggest using
 a scaled inverse Wishart.  That choice was motivated primarily by
 convenience as it is conjugate to the multivariate likelihood function
-and thus simplifies Gibbs sampling.
+and thus simplifies Gibbs sampling
 
 In Stan, there is no restriction to conjugacy for multivariate priors,
 and we in fact recommend a slightly different approach.  Like Gelman
@@ -1783,25 +1787,37 @@ coefficients, the components of $\tau$ itself (perhaps excluding the
 intercept) may themselves be given a hierarchical prior.
 
 Our final recommendation is to give the correlation matrix $\Omega$ an
-LKJ prior with shape $\nu \geq 1$,
+LKJ prior with shape $\eta \geq 1$,^[The prior is named for Lewandowski, Kurowicka, and Joe, as it was derived by inverting the random correlation matrix generation strategy of @LewandowskiKurowickaJoe:2009.]
+
 $$
-\Omega \sim \mathsf{LKJCorr}(\nu).
+\Omega \sim \mathsf{LKJCorr}(\eta).
 $$
-The LKJ correlation distribution is defined in
-\refsection{lkj-correlation}, but the basic idea for modeling is that
-as $\nu$ increases, the prior increasingly concentrates around the
-unit correlation matrix (i.e., favors less correlation among the
-components of $\beta_{j}$).  At $\nu = 1$, the LKJ correlation
-distribution reduces to the identity distribution over correlation
-matrices.  Despite being the identity over correlation matrices, the
+
+The LKJ correlation distribution is defined by
+
+$$
+\mathsf{LkjCorr}(\Sigma \mid \eta)
+\ \propto \
+\mathsf{det}(\Sigma)^{\eta - 1}.
+$$
+
+The basic behavior of the LKJ correlation distribution is similar to
+that of a beta distribution.  For $\eta = 1$, the result is a uniform
+distribution.  Despite being the identity over correlation matrices, the
 marginal distribution over the entries in that matrix (i.e., the
 correlations) is not uniform between -1 and 1.  Rather, it
 concentrates around zero as the dimensionality increases due to the
-complex constraints.  The LKJ prior may thus be used to control the
-expected amount of correlation among the parameters $\beta_j$.
-For a discussion of decomposing a covariance prior into a prior on
-correlation matrices and an independent prior on scales, see
-@barnard-mcculloch-meng:2000.
+complex constraints.
+
+For $\eta > 1$, the density increasingly concentrates
+mass around the unit matrix, i.e., favoring less correlation.  For
+$\eta < 1$, it increasingly concentrates mass in the other direction,
+i.e., favoring more correlation.
+
+The LKJ prior may thus be used to control the expected amount of
+correlation among the parameters $\beta_j$.  For a discussion of
+decomposing a covariance prior into a prior on correlation matrices
+and an independent prior on scales, see @barnard-mcculloch-meng:2000.
 
 #### Group-Level Predictors for Prior Mean {-}
 
@@ -1862,19 +1878,16 @@ model {
 }
 ```
 
-The hyperprior covariance matrix is defined implicitly through the
-a quadratic form in the code
-because the correlation matrix `Omega` and scale vector
-`tau` are more natural to inspect in the output; to output
-`Sigma`, define it as a transformed parameter.  The function
-`quad_form_diag` is defined so that
-`quad_form_diag(Sigma, tau)` is equivalent to
-`diag_matrix(tau) * Sigma * diag_matrix(tau)`, where
-`diag_matrix(tau)` returns the matrix with `tau` on the
-diagonal and zeroes off diagonal; the version using
-`quad_form_diag` should be faster.  See
-\refsection{matrix-arithmetic-operators} for more information on
-specialized matrix operations.
+The hyperprior covariance matrix is defined implicitly through the a
+quadratic form in the code because the correlation matrix `Omega` and
+scale vector `tau` are more natural to inspect in the output; to
+output `Sigma`, define it as a transformed parameter.  The function
+`quad_form_diag` is defined so that `quad_form_diag(Sigma, tau)` is
+equivalent to `diag_matrix(tau) * Sigma * diag_matrix(tau)`, where
+`diag_matrix(tau)` returns the matrix with `tau` on the diagonal and
+zeroes off diagonal; the version using `quad_form_diag` should be
+faster.  For details on these and other matrix arithmtic operators and
+functions, see the function reference manual.
 
 #### Optimization through Vectorization {-}
 
@@ -2191,11 +2204,12 @@ model {
 For efficiency, the multivariate normal is vectorized by precomputing
 the array of mean vectors and sharing the same covariance matrix.
 
-Following the advice in \refsection{multivariate-hierarchical-priors},
-we will place a weakly informative normal prior on the regression
-coefficients, an LKJ prior on the correlations and a half-Cauchy prior
-on standard deviations.  The covariance structure is parameterized in
-terms of Cholesky factors for efficiency and arithmetic stability.
+Following the advice in the [multivariate hierarchical priors
+section](multivariate-hierarchical-priors.section), we will place a
+weakly informative normal prior on the regression coefficients, an LKJ
+prior on the correlations and a half-Cauchy prior on standard
+deviations.  The covariance structure is parameterized in terms of
+Cholesky factors for efficiency and arithmetic stability.
 
 ```
 ...
@@ -2419,9 +2433,10 @@ regressions in the previous section.
 The main application of pseudorandom number generator (PRNGs) is for
 posterior inference, including prediction and posterior predictive
 checks.  They can also be used for pure data simulation, which is like
-a posterior predictive check with no conditioning.  See
-\refsection{distributions-prng} for a description of their syntax and
-the scope of their usage.
+a posterior predictive check with no conditioning.  See the function
+reference manual for a complete description of the syntax and usage of
+pseudorandom number generators.
+
 
 ### Prediction {-}
 
@@ -2522,8 +2537,9 @@ Times series data come arranged in temporal order.  This chapter
 presents two kinds of time series models, regression-like models such
 as autoregressive and moving average models, and hidden Markov models.
 
-\refchapter{gaussian-processes} presents Gaussian processes, which may
-also be used for time-series (and spatial) data.
+The [Gaussian processes chapter](gaussian-processes.chapter) presents
+Gaussian processes, which may also be used for time-series (and
+spatial) data.
 
 
 ## Autoregressive Models {#autoregressive.section}
@@ -9714,7 +9730,7 @@ With the constraint on `y` in place, this is just a less
 efficient, slower, and less arithmetically stable version of the
 original program.  But if the constraint on `y` is removed,
 the model will compile and run without arithmetic errors, but will not
-sample properly.^[The problem is the (extremely!) light tails of the triangle distribution.  The standard \HMC and \NUTS samplers can't get into the corners of the triangle properly.  Because the Stan code declares `y` to be of type `real<lower=-1,upper=1>`, the inverse logit transform is applied to the unconstrained variable and its log absolute derivative added to the log probability.  The resulting distribution on the logit-transformed `y` is well behaved.]
+sample properly.^[The problem is the (extremely!) light tails of the triangle distribution.  The standard HMC and NUTS samplers can't get into the corners of the triangle properly.  Because the Stan code declares `y` to be of type `real<lower=-1,upper=1>`, the inverse logit transform is applied to the unconstrained variable and its log absolute derivative added to the log probability.  The resulting distribution on the logit-transformed `y` is well behaved.]
 
 ### Exponential distribution {-}
 
@@ -11395,7 +11411,7 @@ the error.  All of Stan's containers check the sizes of all indexes.
 
 
 
-## Data Type and Indexing Efficiency {#indexingefficiency.section}
+## Data Type and Indexing Efficiency {#indexing-efficiency.section}
 
 The underlying matrix and linear algebra operations are implemented in
 terms of data types from the Eigen C++ library.  By having vectors
@@ -12714,35 +12730,11 @@ This reparameterization is helpful when there is not much data,
 because it separates the hierarchical parameters and lower-level
 parameters in the prior.
 
-\begin{figure}[t]
-\vspace*{-6pt}
-\begin{center}
-\includegraphics[height=2in]{img/funnel.png}
-\includegraphics[height=2in]{img/funnel-fit.png}
-\end{center}
-\vspace*{-18pt}
-\caption{\small\it Neal's Funnel.  (Left) The marginal density of
-  Neal's funnel for the upper-level variable $y$ and one lower-level
-  variable $x_1$ (see the text for the formula).  The blue region has
-  log density greater than -8, the yellow region density greater than
-  -16, and the gray background a density less than -16.
-  (Right) 4000 draws from a run of Stan's
-  sampler with default settings.  Both plots are restricted to the
-  shown window of $x_1$ and $y$ values; some draws fell outside of
-  the displayed area as would be expected given the density.  The samples are
-  consistent with the marginal density $p(y) =
-  \mathsf{Normal}(y|0,3)$, which has mean 0 and standard deviation
-  3.}
-\end{figure}
-id:funnel.figure
-
-@Neal:2003 defines a distribution that exemplifies the
-difficulties of sampling from some hierarchical models.  Neal's
-example is fairly extreme, but can be trivially reparameterized in
-such a way as to make sampling straightforward.
-
-Neal's example has support for $y \in
-\mathbb{R}$ and  $x \in \mathbb{R}^9$ with density
+@Neal:2003 defines a distribution that exemplifies the difficulties of
+sampling from some hierarchical models.  Neal's example is fairly
+extreme, but can be trivially reparameterized in such a way as to make
+sampling straightforward.  Neal's example has support for $y \in
+\mathbb{R}$ and $x \in \mathbb{R}^9$ with density
 
 $$
 p(y,x) = \mathsf{Normal}(y|0,3) \times \prod_{n=1}^9
@@ -12752,7 +12744,11 @@ $$
 The probability contours are shaped like ten-dimensional funnels.  The
 funnel's neck is particularly sharp because of the exponential
 function applied to $y$.  A plot of the log marginal density of $y$
-and the first dimension $x_1$ is shown in \reffigure{funnel}.
+and the first dimension $x_1$ is shown in the following plot.
+
+![The marginal density of Neal's funnel for the upper-level variable $y$ and one lower-level variable $x_1$ (see the text for the formula).  The blue region has log density greater than -8, the yellow region density greater than -16, and the gray background a density less than -16.](img/funnel.png)
+id:funnel.figure
+
 
 The funnel can be implemented directly in Stan as follows.
 
@@ -12772,7 +12768,10 @@ the neck of the funnel, where $y$ is small and thus $x$ is constrained
 to be near 0.  This is due to the fact that the density's scale
 changes with $y$, so that a step size that works well in the body will
 be too large for the neck and a step size that works in the neck will be
-very inefficient in the body.
+very inefficient in the body.  This can be seen in the following plot.
+
+![4000 draws from a run of Stan's sampler with default settings.  Both
+  plots are restricted to the shown window of $x_1$ and $y$ values; some draws fell outside of the displayed area as would be expected given the density.  The samples are consistent with the marginal density $p(y) = \mathsf{Normal}(y|0,3)$, which has mean 0 and standard deviation 3.](img/funnel-fit.png)
 
 In this particular instance, because the analytic form of the density
 from which samples are drawn is known, the model can be converted to
@@ -15288,8 +15287,8 @@ you can look for similar structures in these examples.
   this Stan manual (see the getting started with C++ section of
   \url{http://mc-stan.org} for more information on using Stan directly
   from C++).
-* BUGS performs \MCMC updating one scalar parameter at a time
-  (with some exceptions such as \JAGS's implementation of regression
+* BUGS performs MCMC updating one scalar parameter at a time
+  (with some exceptions such as JAGS's implementation of regression
   and generalized linear models and some conjugate multivariate
   parameters), using conditional distributions (Gibbs sampling) where
   possible and otherwise using adaptive rejection sampling, slice
@@ -15303,7 +15302,7 @@ you can look for similar structures in these examples.
   of requiring the computation of the entire log density at each step.
 * BUGS tunes its adaptive jumping (if necessary) during its
   warmup phase (traditionally referred to as "burn-in").  Stan uses
-  its warmup phase to tune the no-U-turn sampler (\NUTS).
+  its warmup phase to tune the no-U-turn sampler (NUTS).
 * The BUGS modeling language is not directly executable.  Rather,
   BUGS parses its model to determine the posterior density and then
   decides on a sampling scheme.  In contrast, the statements in a Stan
@@ -15360,7 +15359,7 @@ sample out of hand as if it had zero probability.
   compute the gradient of the log density (up to a proportion).
   Gradients are required during the Hamiltonian dynamics simulations
   within the leapfrog algorithm of the Hamiltonian Monte Carlo and
-  \NUTS samplers.  BUGS computes the log density but not its
+  NUTS samplers.  BUGS computes the log density but not its
   gradient.
 * Both BUGS and Stan are semi-automatic in that they run by
   themselves with no outside tuning required. Nevertheless, the user
