@@ -45,6 +45,7 @@ def deleteDirWin() {
 }
 
 String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
+String stanBranchName() {(env.BRANCH_NAME == "downstream_tests") ? 'develop' : env.BRANCH_NAME }
 
 pipeline {
     agent none
@@ -129,7 +130,7 @@ pipeline {
                                 env.BRANCH_NAME == "downstream_tests" } }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
-                      parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
+                      parameters: [string(name: 'stan_pr', value: stanBranchName()),
                                    string(name: 'math_pr', value: params.math_pr)])
             }
         }
