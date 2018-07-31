@@ -3,7 +3,7 @@
 
 void verify_bad_rng(const std::string& model_name) {
   test_throws(model_name,
-              "ERROR: random number generators only allowed in"
+              "Random number generators only allowed in"
               " transformed data block, generated quantities block"
               " or user-defined functions with names ending in _rng");
 }

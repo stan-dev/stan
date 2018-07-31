@@ -3,5 +3,5 @@
 
 TEST(langParser, printVoidBad) {
   test_throws("print-void", 
-              "ERROR:  expected printable (non-void) expression.");
+              "Error: expected printable (non-void) expression.");
 }

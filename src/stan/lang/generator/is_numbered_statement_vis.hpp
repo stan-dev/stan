@@ -23,11 +23,7 @@ namespace stan {
 
       bool operator()(const nil& st) const { return false; }
 
-      bool operator()(const assignment& st) const { return true; }
-
       bool operator()(const assgn& st) const { return true; }
-
-      bool operator()(const compound_assignment& st) const { return true; }
 
       bool operator()(const sample& st) const { return true; }
 

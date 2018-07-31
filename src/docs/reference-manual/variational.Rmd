@@ -1,0 +1,195 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+
+# Variational Inference {#vi-algorithms.chapter}
+
+Stan implements an automatic variational inference algorithm, called
+Automatic Differentiation Variational Inference (ADVI)
+@Kucukelbir:2015. In this chapter, we describe the specifics of
+how ADVI maximizes the variational objective.
+
+
+## Stochastic Gradient Ascent
+
+ADVI optimizes the ELBO in the real-coordinate space using stochastic
+gradient ascent. We obtain noisy (yet unbiased) gradients of the
+variational objective using automatic differentiation and Monte Carlo
+integration. The algorithm ascends these gradients using an adaptive
+stepsize sequence. We evaluate the ELBO also using Monte Carlo
+integration and measure convergence similar to the relative tolerance
+scheme in Stan's optimization feature.
+
+
+### Monte Carlo Approximation of the ELBO {-}
+
+ADVI uses Monte Carlo integration to approximate the variational
+objective function, the ELBO. The number of draws used to
+approximate the ELBO is denoted by `elbo_samples`. We
+recommend a default value of $100$, as we only evaluate the ELBO every
+`eval_elbo` iterations, which also defaults to $100$.
+
+
+### Monte Carlo Approximation of the Gradients {-}
+
+ADVI uses Monte Carlo integration to approximate the gradients of the
+ELBO. The number of draws used to approximate the gradients is
+denoted by `grad_samples`. We recommend a default value of
+$1$, as this is the most efficient. It also a very noisy estimate of
+the gradient, but stochastic gradient ascent is capable of following
+such gradients.
+
+
+### Adaptive Stepsize Sequence {-}
+
+ADVI uses a finite-memory version of adaGrad @Duchi:2011. This
+has a single parameter that we expose, denoted `eta`. We now
+have a warmup adaptation phase that selects a good value for
+`eta`. The procedure does a heuristic search over `eta`
+values that span 5 orders of magnitude.
+
+
+### Assessing Convergence {-}
+
+ADVI tracks the progression of the ELBO through the stochastic
+optimization. Specifically, ADVI heuristically determines a rolling
+window over which it computes the average and the median change of the
+ELBO. Should either number fall below a threshold, denoted by
+`tol_rel_obj`, we consider the algorithm to have converged. The change
+in ELBO is calculated the same way as in Stan's optimization module.
+

@@ -25,15 +25,6 @@ def setup(String pr) {
     return script
 }
 
-def mailBuildResults(String label, additionalEmails='') {
-    emailext (
-        subject: "[StanJenkins] ${label}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-        body: """${label}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]': Check console output at ${env.BUILD_URL}""",
-        recipientProviders: [[$class: 'RequesterRecipientProvider']],
-        to: "${env.CHANGE_AUTHOR_EMAIL}, ${additionalEmails}"
-    )
-}
-
 def runTests(String testPath, Boolean separateMakeStep=true) {
     if (separateMakeStep) {
         sh "./runTests.py -j${env.PARALLEL} ${testPath} --make-only"
@@ -53,13 +44,15 @@ def deleteDirWin() {
     deleteDir()
 }
 
+String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
+
 pipeline {
     agent none
     parameters {
         string(defaultValue: '', name: 'math_pr', description: "Leave blank "
                 + "unless testing against a specific math repo pull request, "
                 + "e.g. PR-640.")
-        string(defaultValue: 'downstream tests', name: 'cmdstan_pr',
+        string(defaultValue: 'downstream_tests', name: 'cmdstan_pr',
           description: 'PR to test CmdStan upstream against e.g. PR-630')
     }
     options { skipDefaultCheckout() }
@@ -68,7 +61,7 @@ pipeline {
             when {
                 not { branch 'develop' }
                 not { branch 'master' }
-                not { branch 'downstream tests' }
+                not { branch 'downstream_tests' }
             }
             steps {
                 script {
@@ -77,7 +70,7 @@ pipeline {
             }
         }
         stage('Linting & Doc checks') {
-            agent any
+            agent { label 'linux' }
             steps {
                 script {
                     retry(3) { checkout scm }
@@ -86,9 +79,8 @@ pipeline {
                     setupCC()
                     parallel(
                         CppLint: { sh "make cpplint" },
-                        Documentation: { sh 'make doxygen' },
-                        Manual: { sh "make manual" },
-                        Headers: { sh "make -j${env.PARALLEL} test-headers" }
+                        API_docs: { sh 'make doxygen' },
+                        Manuals: { sh "make doc" },
                     )
                 }
             }
@@ -100,25 +92,17 @@ pipeline {
                 }
             }
         }
-        stage('Tests') {
+        stage('Unit tests') {
             parallel {
-                stage('Windows Unit') {
+                stage('Windows Headers & Unit') {
                     agent { label 'windows' }
                     steps {
                         deleteDirWin()
-                        unstash 'StanSetup'
-                        setupCC(false)
-                        runTestsWin("src/test/unit")
-                    }
-                    post { always { deleteDirWin() } }
-                }
-                stage('Windows Headers') {
-                    agent { label 'windows' }
-                    steps {
-                        deleteDirWin()
-                        unstash 'StanSetup'
-                        setupCC()
-                        bat "make -j${env.PARALLEL} test-headers"
+                            unstash 'StanSetup'
+                            setupCC()
+                            bat "make -j${env.PARALLEL} test-headers"
+                            setupCC(false)
+                            runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
                 }
@@ -131,27 +115,27 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
-                stage('Integration') {
-                    agent any
-                    steps {
-                        unstash 'StanSetup'
-                        setupCC()
-                        runTests("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Upstream CmdStan tests') {
-                    when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
-                    steps {
-                        build(job: "CmdStan/${params.cmdstan_pr}",
-                              parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
-                                           string(name: 'math_pr', value: params.math_pr)])
-                    }
-                }
+            }
+        }
+        stage('Integration') {
+            agent any
+            steps {
+                unstash 'StanSetup'
+                setupCC()
+                runTests("src/test/integration", separateMakeStep=false)
+            }
+            post { always { deleteDir() } }
+        }
+        stage('Upstream CmdStan tests') {
+            when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
+            steps {
+                build(job: "CmdStan/${cmdstan_pr()}",
+                      parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
+                                   string(name: 'math_pr', value: params.math_pr)])
             }
         }
         stage('Performance') {
-            agent { label 'gelman-group-mac' }
+            agent { label 'master' }
             steps {
                 unstash 'StanSetup'
                 setupCC()
@@ -181,10 +165,12 @@ pipeline {
             }
         }
         success {
-            script { utils.updateUpstream(env,'cmdstan') }
-            mailBuildResults("SUCCESSFUL")
+            script {
+                utils.updateUpstream(env,'cmdstan')
+                utils.mailBuildResults("SUCCESSFUL")
+            }
         }
-        unstable { mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") }
-        failure { mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") }
+        unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
+        failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
     }
 }

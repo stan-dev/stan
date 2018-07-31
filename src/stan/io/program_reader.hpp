@@ -5,6 +5,7 @@
 #include <stan/io/starts_with.hpp>
 #include <cstdio>
 #include <istream>
+#include <iostream>
 #include <fstream>
 #include <set>
 #include <sstream>
@@ -184,7 +185,7 @@ namespace stan {
 
       void read(std::istream& in, const std::string& path,
                 const std::vector<std::string>& search_path,
-                int& concat_line_num,
+                int& concat_line_num, bool is_nested,
                 std::set<std::string>& visited_paths) {
         if (visited_paths.find(path) != visited_paths.end())
           return;  // avoids recursive visitation
@@ -194,8 +195,15 @@ namespace stan {
           std::string line = read_line(in);
           if (line.empty()) {
             // ends initial out of loop start event
-            history_.push_back(preproc_event(concat_line_num, line_num - 1,
-                                             "end", path));
+            if (!is_nested) {
+              // pad end concat_line_num of outermost file in order to properly
+              // report end-of-file parse error - else trace throws exception
+              history_.push_back(preproc_event(concat_line_num + 2,
+                                               line_num - 1, "end", path));
+            } else {
+              history_.push_back(preproc_event(concat_line_num,
+                                               line_num - 1, "end", path));
+            }
             break;
           } else if (starts_with("#include ", line)) {
             std::string incl_path = include_path(line);
@@ -210,7 +218,7 @@ namespace stan {
                 continue;
               }
               try {
-                read(include_in, incl_path, search_path, concat_line_num,
+                read(include_in, incl_path, search_path, concat_line_num, true,
                      visited_paths);
               } catch (...) {
                 include_in.close();
@@ -253,7 +261,7 @@ namespace stan {
                 const std::vector<std::string>& search_path,
                 int& concat_line_num) {
         std::set<std::string> visited_paths;
-        read(in, path, search_path, concat_line_num, visited_paths);
+        read(in, path, search_path, concat_line_num, false, visited_paths);
       }
     };
 

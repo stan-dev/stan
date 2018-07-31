@@ -162,3 +162,27 @@ TEST(parserFunctions, badProbFunSuffix) {
   test_throws("bad_prob_fun_suffix",
               "Probability function must end in _lpdf or _lpmf");
 }
+
+TEST(parserFunctions, voidFunReturn) {
+  test_throws("functions-bad23",
+              "Void returns only allowed from function bodies "
+              "of void return type.");
+}
+
+TEST(parserFunctions, nonVoidFunReturn) {
+  test_throws("functions-bad24",
+              "Void function cannot return a value.");
+}
+
+TEST(parserFunctions, incompleteReturnStmt) {
+  test_throws("functions-bad25",
+              "Non-void function must return expression "
+              "of specified return type.");
+}
+
+
+TEST(parserFunctions, returnNoSemi) {
+  test_throws("functions-bad26",
+              "PARSER EXPECTED: \";\"");
+}
+

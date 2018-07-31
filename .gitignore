@@ -56,3 +56,5 @@ stan.kdev4
 
 # local make include
 /make/local
+
+*.gch

@@ -16,9 +16,9 @@ TEST(langParserExpressionGrammarDef, conditionalOp) {
 }
 
 TEST(langParserExpressionGrammarDef, conditionalOpBad1) {
-  test_throws("validate_conditional_op_bad-1","condition in ternary expression");
+  test_throws("validate_conditional_op_bad-1","Condition in ternary expression");
 }
 
 TEST(langParserExpressionGrammarDef, conditionalOpBad2) {
-  test_throws("validate_conditional_op_bad-2","base type mismatch");
+  test_throws("validate_conditional_op_bad-2","Base type mismatch");
 }
