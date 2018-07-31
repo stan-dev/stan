@@ -590,16 +590,15 @@ e.g., \code{A\{6\}} is equivalent to a sequence of six copies of \code{A}.
 
 {\small
 \begin{Verbatim}
-program ::= ?functions ?data ?tdata ?params ?tparams model ?generated
+program ::= ?functions ?data ?tdata ?params ?tparams ?model ?generated
 
 functions ::= 'functions' function_decls
 data ::= 'data' var_decls
 tdata ::= 'transformed data' var_decls_statements
 params ::= 'parameters' var_decls
 tparams ::= 'transformed parameters' var_decls_statements
-model ::= 'model' statement
+model ::= 'model' var_decls_statements
 generated ::= 'generated quantities' var_decls_statements
-
 function_decls ::= '{' function_decl* '}'
 var_decls ::= '{' var_decl* '}'
 var_decls_statements ::= '{' var_decl* statement* '}'
@@ -611,12 +610,12 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 {
 \small
 \begin{Verbatim}[fontsize=\small]
-function_decl ::= unsized_return_type identifier '(' unsized_types ')'
-                 statement
+function_decl ::= return_type identifier '(' parameter_decl % ',' ')'
+                  statement
 
-unsized_return_type ::= 'void' | unsized_type
-unsized_type ::= (basic_type ?unsized_dims)
-unsized_types ::= unsized_type % ','
+return_type ::= 'void' | unsized_type
+parameter_decl ::= ?'data' unsized_type identifier
+unsized_type ::= basic_type ?unsized_dims
 basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
 unsized_dims ::= '['  ','*  ']'
 \end{Verbatim}
@@ -645,15 +644,16 @@ var_type ::= 'int' range_constraint
 
 range_constraint ::= ?('<' range '>')
 
-range ::= 'lower' '=' expression ',' 'upper' = expression
-        | 'lower' '=' expression
-        | 'upper' '=' expression
+range ::= 'lower' '=' range_expression ',' 'upper' = range_expression
+        | 'lower' '=' range_expression
+        | 'upper' '=' range_expression
 
 dims ::= '['  expressions ']'
 
 variable ::= identifier
 
 identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
+
 \end{Verbatim}
 }
 
@@ -663,35 +663,56 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 \small
 \begin{Verbatim}[fontsize=\small]
 expressions ::= expression % ','
-expression ::= real_literal
-             | variable
-             | '{' expressions '}'
-             | expression `?` expression `:` expression
+
+expression ::= expression `?` expression `:` expression
              | expression infixOp expression
              | prefixOp expression
              | expression postfixOp
-             | expression '[' indexes ']'
-             | function_literal '(' ?expressions ')'
-             | function_literal '(' expression ?('|' expression % ',') ')'
-             | integrate_ode '(' function_literal (',' expression){6} ')'
-             | integrate_ode_rk45
-               '(' function_literal (',' expression){6|9} ')'
-             | integrate_ode_bdf
-               '(' function_literal (',' expression){6|9} ')'
-             | algebra_solver
-             '('function_literal (',' expression){4|7} ')'
-             | '(' expression ')'
+             | common_expression
+
+range_expression ::= range_expression arithmeticInfixOp range_expression
+                   | prefixOp range_expression
+                   | range_expression postfixOp
+                   | range_expression '[' indexes ']'
+                   | common_expression
+
+common_expression ::= real_literal
+                    | variable
+                    | '{' expressions '}'
+                    | '[' expressions ']'
+                    | function_literal '(' ?expressions ')'
+                    | function_literal '(' expression ?('|' expression % ',') ')'
+                    | integrate_ode '(' function_literal (',' expression){6} ')'
+                    | integrate_ode_rk45
+                      '(' function_literal (',' expression){6|9} ')'
+                    | integrate_ode_bdf
+                      '(' function_literal (',' expression){6|9} ')'
+                    | algebra_solver
+                    '(' function_literal (',' expression){4|7} ')'
+                    | '(' expression ')'
+
+prefixOp ::= ('!' | '-' | '+' | '^')
+
+postfixOp ::= '\''
+
+infixOp ::= arithmeticInfixOp | logicalInfixOp
+
+arithmeticInfixOp ::= ('+' | '-' | '*' | '/' | '%' | '\' | '.*' | './')
+
+logicalInfixOp :: ('||' | '&&' | '==' | '!=' | '<' | '<=' | '>' | '>=')
 
 index ::= ?(expression | expression ':' | ':' expression
-            | expression ':' expression)
+        | expression ':' expression)
 
 indexes ::= index % ','
 
-integer_literal ::= 0 | [1-9] [0-9]*
+integer_literal ::= [0-9]+
 
-real_literal ::= integer_literal ?('.' [0-9]*) ?exp_literal
+real_literal ::= integer_literal '.' [0-9]* ?exp_literal
+               | '.' [0-9]+ ?exp_literal
+               | integer_literal exp_literal
 
-exp_literal ::= ('e' | 'E') integer_literal
+exp_literal ::= ('e' | 'E') ?('+' | '-') integer_literal
 
 function_literal ::= identifier
 \end{Verbatim}
@@ -704,19 +725,17 @@ function_literal ::= identifier
 \begin{Verbatim}[fontsize=\small]
 statement ::= atomic_statement | nested_statement
 
-atomic_statement ::= atomic_statement_body ';'
-atomic_statement_body
-::=  lhs assignment_op expression
-   | expression '~' identifier '(' expressions ')' ?truncation
-   | function_literal '(' expressions ')'
-   | 'increment_log_prob' '(' expression ')'
-   | 'target' '+=' expression
-   | 'break'
-   | 'continue'
-   | 'print' '(' (expression | string_literal) % ',' ')'
-   | 'reject' '(' (expression | string_literal) % ',' ')'
-   | 'return' expression
-   | ''
+atomic_statement ::=  lhs assignment_op expression ';'
+   | expression '~' identifier '(' expressions ')' ?truncation ';'
+   | function_literal '(' expressions ')' ';'
+   | 'increment_log_prob' '(' expression ')' ';'
+   | 'target' '+=' expression ';'
+   | 'break' ';'
+   | 'continue' ';'
+   | 'print' '(' (expression | string_literal) % ',' ')' ';'
+   | 'reject' '(' (expression | string_literal) % ',' ')' ';'
+   | 'return' expression ';'
+   | ';'
 
 assignment_op ::= '<-' | '=' | '+=' | '-=' | '*=' | '/=' | '.*=' | '/*='
 
@@ -724,7 +743,7 @@ string_literal ::= '"' char* '"'
 
 truncation ::= 'T' '[' ?expression ',' ?expression ']'
 
-lhs ::= identifier ?('[' indexes ']')
+lhs ::= identifier ('[' indexes ']')*
 
 nested_statement
 ::=

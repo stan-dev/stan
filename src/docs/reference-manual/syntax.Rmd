@@ -1,0 +1,468 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Language Syntax
+
+This chapter defines the basic syntax of the Stan modeling language
+using a Backus-Naur form (BNF) grammar plus extra-grammatical
+constraints on function typing and operator precedence and
+associativity.
+
+
+## BNF Grammars
+
+### Syntactic conventions {-}
+
+In the following BNF grammars, literal strings are indicated in
+single quotes (`'`).  Grammar non-terminals are unquoted strings.
+A prefix question mark (`?A`) indicates optionality of `A`.
+A postfixed Kleene star (`A*`) indicates zero or more occurrences
+of `A`.  The notation `A % B`, following the Boost Spirit
+parser library's notation, is shorthand for `?(A (B A)*)`, i.e.,
+any number of `A` (including zero), separated by `B`.  A
+postfixed, curly-braced number indicates a fixed number of repetitions;
+e.g., `A{6}` is equivalent to a sequence of six copies of `A`.
+
+
+### Programs {-}
+
+```
+program ::= ?functions ?data ?tdata ?params ?tparams ?model ?generated
+
+functions ::= 'functions' function_decls
+data ::= 'data' var_decls
+tdata ::= 'transformed data' var_decls_statements
+params ::= 'parameters' var_decls
+tparams ::= 'transformed parameters' var_decls_statements
+model ::= 'model' var_decls_statements
+generated ::= 'generated quantities' var_decls_statements
+function_decls ::= '{' function_decl* '}'
+var_decls ::= '{' var_decl* '}'
+var_decls_statements ::= '{' var_decl* statement* '}'
+```
+
+
+### Function declarations and definitions {-}
+
+
+```
+function_decl ::= return_type identifier '(' parameter_decl % ',' ')'
+                  statement
+
+return_type ::= 'void' | unsized_type
+parameter_decl ::= ?'data' unsized_type identifier
+unsized_type ::= basic_type ?unsized_dims
+basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
+unsized_dims ::= '['  ','*  ']'
+```
+
+ ### Variable declarations and compound definitions {-}
+
+```
+var_decl ::= var_type variable ?dims ?('=' expression) ';'
+
+var_type ::= 'int' range_constraint
+           | 'real' range_constraint
+           | 'vector' range_constraint '[' expression ']'
+           | 'ordered' '[' expression ']'
+           | 'positive_ordered' '[' expression ']'
+           | 'simplex' '[' expression ']'
+           | 'unit_vector' '[' expression ']'
+           | 'row_vector' range_constraint '[' expression ']'
+           | 'matrix' range_constraint '[' expression ',' expression ']'
+           | 'cholesky_factor_corr' '[' expression ']'
+           | 'cholesky_factor_cov' '[' expression ?(',' expression) ']'
+           | 'corr_matrix' '[' expression ']'
+           | 'cov_matrix' '[' expression ']'
+
+range_constraint ::= ?('<' range '>')
+
+range ::= 'lower' '=' range_expression ',' 'upper' = range_expression
+        | 'lower' '=' range_expression
+        | 'upper' '=' range_expression
+
+dims ::= '['  expressions ']'
+
+variable ::= identifier
+
+identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
+```
+
+
+### Expressions {-}
+
+```
+expressions ::= expression % ','
+
+expression ::= expression `?` expression `:` expression
+             | expression infixOp expression
+             | prefixOp expression
+             | expression postfixOp
+             | common_expression
+
+range_expression ::= range_expression arithmeticInfixOp range_expression
+                   | prefixOp range_expression
+                   | range_expression postfixOp
+                   | range_expression '[' indexes ']'
+                   | common_expression
+
+common_expression ::= real_literal
+                    | variable
+                    | '{' expressions '}'
+                    | '[' expressions ']'
+                    | function_literal '(' ?expressions ')'
+                    | function_literal '(' expression ?('|' expression % ',') ')'
+                    | integrate_ode '(' function_literal (',' expression){6} ')'
+                    | integrate_ode_rk45
+                      '(' function_literal (',' expression){6|9} ')'
+                    | integrate_ode_bdf
+                      '(' function_literal (',' expression){6|9} ')'
+                    | algebra_solver
+                    '(' function_literal (',' expression){4|7} ')'
+                    | '(' expression ')'
+
+prefixOp ::= ('!' | '-' | '+' | '^')
+
+postfixOp ::= '\''
+
+infixOp ::= arithmeticInfixOp | logicalInfixOp
+
+arithmeticInfixOp ::= ('+' | '-' | '*' | '/' | '%' | '\' | '.*' | './')
+
+logicalInfixOp :: ('||' | '&&' | '==' | '!=' | '<' | '<=' | '>' | '>=')
+
+index ::= ?(expression | expression ':' | ':' expression
+        | expression ':' expression)
+
+indexes ::= index % ','
+
+integer_literal ::= [0-9]+
+
+real_literal ::= integer_literal '.' [0-9]* ?exp_literal
+               | '.' [0-9]+ ?exp_literal
+               | integer_literal exp_literal
+
+exp_literal ::= ('e' | 'E') ?('+' | '-') integer_literal
+
+function_literal ::= identifier
+```
+
+
+### Statements {-}
+
+```
+statement ::= atomic_statement | nested_statement
+
+atomic_statement ::=  lhs assignment_op expression ';'
+   | expression '~' identifier '(' expressions ')' ?truncation ';'
+   | function_literal '(' expressions ')' ';'
+   | 'increment_log_prob' '(' expression ')' ';'
+   | 'target' '+=' expression ';'
+   | 'break' ';'
+   | 'continue' ';'
+   | 'print' '(' (expression | string_literal) % ',' ')' ';'
+   | 'reject' '(' (expression | string_literal) % ',' ')' ';'
+   | 'return' expression ';'
+   | ';'
+
+assignment_op ::= '<-' | '=' | '+=' | '-=' | '*=' | '/=' | '.*=' | '/*='
+
+string_literal ::= '"' char* '"'
+
+truncation ::= 'T' '[' ?expression ',' ?expression ']'
+
+lhs ::= identifier ('[' indexes ']')*
+
+nested_statement
+::=
+  | 'if' '(' expression ')' statement
+    ('else' 'if' '(' expression ')' statement)*
+    ?('else' statement)
+  | 'while' '(' expression ')' statement
+  | 'for' '(' identifier 'in' expression ':' expression ')' statement
+  | 'for' '(' identifier 'in' expression ')' statement
+  | '{' var_decl* statement+ '}'
+```
+
+
+## Extra-Grammatical Constraints
+
+
+### Type constraints {-}
+
+A well-formed Stan program must satisfy the type constraints imposed
+by functions and distributions.  For example, the binomial
+distribution requires an integer total count parameter and integer
+variate and when truncated would require integer truncation points.
+If these constraints are violated, the program will be rejected during
+parsing with an error message indicating the location of the problem.
+
+
+### Operator precedence and associativity {-}
+
+In the Stan grammar provided in this chapter, the expression `1 + 2 *
+3` has two parses.  As described in the [operator precedence
+table](#operator-precedence-table), Stan disambiguates between the meaning $1
++ (2 \times 3)$ and the meaning $(1 + 2) \times 3$ based on operator
+precedences and associativities.
+
+
+### Typing of compound declaration and definition {-}
+
+In a compound variable declaration and definition, the type of the
+right-hand side expression must be assignable to the variable being
+declared.  The assignability constraint restricts compound
+declarations and definitions to local variables and variables declared
+in the transformed data, transformed parameters, and generated
+quantities blocks.
+
+
+### Typing of array expressions {-}
+
+The types of expressions used for elements in array expressions
+(`'{' expressions '}'`) must all be of the same type or a mixture
+of `int` and `real` types (in which case the result is
+promoted to be of type `real`).
+
+
+### Forms of numbers {-}
+
+Integer literals longer than one digit may not start with 0 and real
+literals cannot consist of only a period or only an exponent.
+
+
+### Conditional arguments {-}
+
+Both the conditional if-then-else statement and while-loop statement
+require the expression denoting the condition to be a primitive type,
+integer or real.
+
+
+### For loop containers {-}
+
+The for loop statement requires that we specify in addition to the
+loop identifier, either a range consisting of two expressions
+denoting an integer, separated by ':', or a single expression denoting
+a container.  The loop variable will be of type integer in the former case
+and of the contained type in the latter case.  Furthermore, the loop
+variable must not be in scope (i.e., there is no masking of variables).
+
+
+### Print arguments {-}
+
+The arguments to a print statement cannot be void.
+
+
+### Only break and continue in loops {-}
+
+The `break` and `continue` statements may only be used
+within the body of a for-loop or while-loop.
+
+
+### PRNG function locations {-}
+
+Functions ending in `_rng` may only be called in the transformed
+data and generated quantities block, and within the bodies of
+user-defined functions with names ending in `_rng`.
+
+
+### Probability function naming {-}
+
+A probability function literal must have one of the following
+suffixes: `_lpdf`, `_lpmf`, `_lcdf`, or `_lccdf`.
+
+
+### Algebraic solver argument types and origins {-}
+
+The `algebra_solver` function may be used without control
+parameters; in this case
+
+* its first argument refers to a function with signature
+`( vector,  vector, real[], int[]) : vector`,
+
+* the remaining four arguments must be assignable to types
+`vector`, `vector`, `real[]`, `int[]`,  respectively and
+
+* the fourth and fifth arguments must be expressions
+containing only variables originating from the data or transformed
+data blocks.
+
+The `algebra_solver` function may accept three additional arguments,
+which like the second, fourth, and fifth arguments, must be expressions free
+of parameter references. The final free arguments must be assignable to types
+`real`, `real`, and `int`, respectively.
+
+
+### ODE solver argument types and origins {-}
+
+The `integrate_ode`, `integrate_ode_rk45`, and
+`integrate_ode_bdf` functions may be used without control
+parameters;  in this case
+
+* its first argument to refer to a function with signature
+`(real, real[], real[], real[], int[]) : real[]`,
+
+* the remaining six arguments must assignable to types
+`real[]`, `real`, `real[]`, `real[]`, `real[]`, and `int[]`,
+respectively, and
+
+* the third, fourth, and sixth arguments must be expressions not
+containing any variables not originating in the data or transformed
+data blocks.
+
+The `integrate_ode_rk45` and `integrate_ode_bdf`
+functions may accept three additional arguments, which like the third,
+fourth, and sixth arguments, must be expressions free of parameter
+references.  The final three arguments must be assignable to types
+`real`, `real`, and `int`, respectively.
+
+
+### Indexes {-}
+
+Standalone expressions used as indexes must denote either an integer
+(`int`) or an integer array (`int[]`).  Expressions
+participating in range indexes (e.g., `a` and `b` in
+`a : b`) must denote integers (`int`).
+
+A second condition is that there not be more indexes provided than
+dimensions of the underlying expression (in general) or variable (on
+the left side of assignments) being indexed.  A vector or row vector
+adds 1 to the array dimension and a matrix adds 2.  That is, the type
+`matrix[ , , ]`, a three-dimensional array of matrices, has five
+index positions: three for the array, one for the row of the matrix
+and one for the column.

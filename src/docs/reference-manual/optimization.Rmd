@@ -1,0 +1,300 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+
+
+# Optimization {#optimization-algorithms.chapter}
+
+Stan provides optimization algorithms which find modes of the density
+specified by a Stan program. Such modes may be used as parameter
+estimates or as the basis of approximations to a Bayesian posterior.
+
+Stan provides three different optimizers, a Newton optimizer, and two
+related quasi-Newton algorithms, BFGS and L-BFGS; see
+@NocedalWright:2006 for thorough description and analysis of
+all of these algorithms. The L-BFGS algorithm is the default
+optimizer. Newton's method is the least efficient of the three, but
+has the advantage of setting its own stepsize.
+
+## General Configuration
+
+All of the optimizers are iterative and allow the maximum number of
+iterations to be specified;  the default maximum number of iterations
+is 2000.
+
+All of the optimizers are able to stream intermediate output reporting
+on their progress.  Whether or not to save the intermediate iterations
+and stream progress is configurable.
+
+## BFGS and L-BFGS Configuration
+
+### Convergence Monitoring {-}
+
+Convergence monitoring in (L-)BFGS is controlled by a number of
+tolerance values, any one of which being satisfied causes the
+algorithm to terminate with a solution. Any of the convergence tests
+can be disabled by setting its corresponding tolerance parameter to
+zero.  The tests for convergence are as follows.
+
+#### Parameter Convergence {-}
+
+The parameters $\theta_i$ in iteration $i$ are considered to have
+converged with respect to tolerance `tol_param` if
+
+$$
+|| \theta_{i} - \theta_{i-1} || < \mathtt{tol\_param}.
+$$
+
+
+#### Density Convergence {-}
+
+The (unnormalized) log density
+$\log p(\theta_{i}|y)$ for the parameters $\theta_i$ in iteration $i$
+given data $y$ is considered to have converged with
+respect to tolerance `tol_obj` if
+
+$$
+\left| \log p(\theta_{i}|y) - \log p(\theta_{i-1}|y) \right| <
+\mathtt{tol\_obj}.
+$$
+
+The log density is considered to have converged to within
+relative tolerance `tol_rel_obj` if
+
+$$
+\frac{\left| \log p(\theta_{i}|y) - \log p(\theta_{i-1}|y) \right|}{\
+  \max\left(\left| \log p(\theta_{i}|y)\right|,\left| \log
+      p(\theta_{i-1}|y)\right|,1.0\right)}
+ < \mathtt{tol\_rel\_obj} * \epsilon.
+$$
+
+
+
+#### Gradient Convergence {-}
+
+The gradient is considered to have converged to 0 relative to a
+specified tolerance `tol_grad` if
+
+$$
+|| g_{i} || < \mathtt{tol\_grad},
+$$
+where $\nabla_{\theta}$ is the gradient operator with respect to
+$\theta$ and $g_{i} = \nabla_{\theta} \log p(\theta | y)$ is the gradient at
+iteration $i$ evaluated at $\theta^{(i)}$, the value on the $i$-th posterior iteration.
+
+The gradient is considered to have converged to 0 relative to a
+specified relative tolerance
+`tol_rel_grad` if
+
+$$
+\frac{g_{i}^T \hat{H}_{i}^{-1} g_{i} }{ \max\left(\left|\log
+p(\theta_{i}|y)\right|,1.0\right) }
+\ < \
+\mathtt{tol\_rel\_grad} * \epsilon,
+$$
+
+where $\hat{H}_{i}$ is the estimate of the Hessian at iteration $i$,
+$|u|$ is the absolute value (L1 norm) of $u$, $||u||$ is the vector
+length (L2 norm) of $u$, and $\epsilon \approx 2e-16$ is machine
+precision.
+
+
+### Initial Step Size {-}
+
+The initial step size parameter $\alpha$ for BFGS-style optimizers may
+be specified. If the first iteration takes a long time (and requires a
+lot of function evaluations) initialize $\alpha$ to be the roughly
+equal to the $\alpha$ used in that first iteration. The default value
+is intentionally small, 0.001, which is reasonable for many problems
+but might be too large or too small depending on the objective
+function and initialization. Being too big or too small just means
+that the first iteration will take longer (i.e., require more gradient
+evaluations) before the line search finds a good step length. It's not
+a critical parameter, but for optimizing the same model multiple times
+(as you tweak things or with different data), being able to tune
+$\alpha$ can save some real time.
+
+
+### L-BFGS History Size {-}
+
+L-BFGS has a command-line argument which controls the size of the
+history it uses to approximate the Hessian. The value should be less than
+the dimensionality of the parameter space and, in general, relatively
+small values (5--10) are sufficient; the default value is 5.
+
+If L-BFGS performs poorly but BFGS performs well, consider increasing
+the history size. Increasing history size will increase the
+memory usage, although this is unlikely to be an issue for typical
+Stan models.
+
+
+## General Configuration Options
+
+The general configuration options for optimization are the same as
+those for MCMC.
+
+
+## Writing Models for Optimization
+
+### Constrained vs. Unconstrained Parameters {-}
+
+For constrained optimization problems, for instance, with a standard
+deviation parameter $\sigma$ constrained so that $\sigma > 0$, it can
+be much more efficient to declare a parameter `sigma` with no
+constraints.  This allows the optimizer to easily get close to 0
+without having to tend toward $-\infty$ on the $\log \sigma$ scale.
+
+The Jacobian adjustment is not an issue for posterior modes, because
+Stan turns off the built-in Jacobian adjustments for optimization.
+
+With unconstrained parameterizations of parameters with constrained
+support, it is important to provide a custom initialization that is
+within the support.  For example, declaring a vector
+
+```
+vector[M] sigma;
+```
+
+and using the default random initialization which is
+$\mathsf{Uniform}(-2, 2)$ on the unconstrained scale means that there
+is only a $2^{-M}$ chance that the initialization will be within
+support.
+
+For any given optimization problem, it is probably worthwhile trying
+the program both ways, with and without the constraint, to see which
+one is more efficient.

@@ -1,0 +1,544 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# User-Defined Functions {#functions.chapter}
+
+Stan allows users to define their own functions.  The basic syntax is
+a simplified version of that used in C and C++.  This chapter
+specifies how functions are declared, defined, and used in Stan.
+
+
+## Function-Definition Block
+
+User-defined functions appear in a special function-definition block
+before all of the other program blocks.
+
+```stan
+functions {
+   // ... function declarations and definitions ...
+}
+data {
+  // ...
+```
+
+Function definitions and declarations may appear in any order, subject
+to the condition that a function must be declared before it is used.
+Forward declarations are allowed in order to support recursive
+functions.
+
+
+## Function Names
+
+The rules for function naming and function-argument naming are the
+same as for other variables; see the [section on variables](#variables.section) for more
+information on valid identifiers.  For example,
+
+```stan
+real foo(real mu, real sigma);
+```
+
+declares a function named `foo` with two argument variables of
+types `real` and `real`.  The arguments are named `mu`
+and `sigma`, but that is not part of the declaration.  Two
+user-defined functions may *not* have the same name even if they have
+different sequences of argument types.
+
+
+## Calling Functions
+
+All function arguments are mandatory---there are no default values.
+
+
+### Functions as Expressions {-}
+
+Functions with non-void return types are called just like any other
+built-in function in Stan---they are applied to appropriately typed
+arguments to produce an expression, which has a value when executed.
+
+
+### Functions as Statements {-}
+
+Functions with void return types may be applied to arguments and used
+as statements.  These act like sampling statements or print
+statements.  Such uses are only appropriate for functions that act
+through side effects, such as incrementing the log probability
+accumulator, printing, or raising exceptions.
+
+
+### Probability Functions in Sampling Statements {-}
+
+Functions whose name ends in `_lpdf` or `_lpmf` (density
+and mass functions) may be used as probability functions and may be
+used in place of parameterized distributions on the right-hand-side of
+sampling statements.  There is no restriction on where such functions
+may be used.
+
+
+### Restrictions on Placement {-}
+
+Functions of certain types are restricted on scope of usage.
+Functions whose names end in `_lp` assume access to the log
+probability accumulator and are only available in the transformed
+parameter and model blocks.  Functions whose names end in `_rng`
+assume access to the random number generator and may only be used
+within the generated quantities block, transformed data block, and
+within user-defined functions ending in `_rng`.  See
+the [section on function bodies](#function-bodies.section) for more information on these two special
+types of function.
+
+
+## Argument Types and Qualifiers
+
+Stan's functions all have declared types for both arguments and
+returned value.  As with built-in functions, user-defined functions are
+only declared for base argument type and dimensionality.  This
+requires a different syntax than for declaring other variables.  The
+choice of language was made so that return types and argument types
+could use the same declaration syntax.
+
+The type `void` may not be used as an argument type, only a
+return type for a function with side effects.
+
+
+### Base Variable Type Declaration {-}
+
+The base variable types are `integer`, `real`,
+`vector`, `row_vector`, and `matrix`.  No lower-bound
+or upper-bound constraints are allowed (e.g., `real<lower=0>` is
+illegal).  Specialized types are also not allowed (e.g.,
+`simplex` is illegal) .
+
+
+### Dimensionality Declaration {-}
+
+Arguments and return types may be arrays, and these are indicated with
+optional brackets and commas as would be used for indexing.  For
+example, `int` denotes a single integer argument or return,
+whereas `real[ ]` indicates a one-dimensional array of reals,
+`real[ , ]` a two-dimensional array and `real[ , , ]` a
+three-dimensional array; whitespace is optional, as usual.
+
+The dimensions for vectors and matrices are not included, so that
+`matrix` is the type of a single matrix argument or return type.
+Thus if a variable is declared as `matrix a`, then `a` has
+two indexing dimensions, so that `a[1]` is a row vector and
+`a[1, 1]` a real value.  Matrices implicitly have two indexing
+dimensions.  The type declaration `matrix[ , ] b` specifies that
+`b` is a two-dimensional array of matrices, for a total of four
+indexing dimensions, with `b[1, 1, 1, 1]` picking out a real value.
+
+
+### Dimensionality Checks and Exceptions {-}
+
+Function argument and return types are not themselves checked for
+dimensionality.  A matrix of any size may be passed in as a matrix
+argument.  Nevertheless, a user-defined function might call a function
+(such as a multivariate normal density) that itself does
+dimensionality checks.
+
+Dimensions of function return values will be checked if they're
+assigned to a previously declared variable.  They may also be checked
+if they are used as the argument to a function.
+
+Any errors raised by calls to functions inside user functions or
+return type mismatches are simply passed on;  this typically results
+in a warning message and rejection of a proposal during sampling or
+optimization.
+
+### Data-only Qualifiers {-}
+
+Some of Stan's built-in functions, like the differential equation
+solvers, have arguments that must be data.  Such data-only arguments
+must be expressions involving only data, transformed data, and
+generated quantity variables.
+
+In user-defined functions, the qualifier `data` may be placed before
+an argument type declaration to indicate that the argument must be
+data only.  For example,
+
+```
+real foo(data real x) {
+  return x^2;
+}
+```
+
+requires the argument `x` to be data only.
+
+Declaring an argument data only allows type inference to proceed in
+the body of the function so that, for example, the variable may be
+used as a data-only argument to a built-in function.
+
+
+## Function Bodies {#function-bodies.section}
+
+The body of a function is between an open curly brace (`{`) and
+close curly brace (`}`).  The body may contain local variable declarations at the
+top of the function body's block and these scope the same way as local
+variables used in any other statement block.
+
+The only restrictions on statements in function bodies are external,
+and determine whether the log probability accumulator or random
+number generators are available;  see the rest of this section for details.
+
+
+### Random Number Generating Functions {-}
+
+Functions that call random number generating functions in their bodies
+must have a name that ends in `_rng`; attempts to use
+random-number generators in other functions leads to a compile-time
+error.
+
+Like other random number generating functions, user-defined functions
+with names that end in `_rng` may be used only in the generated
+quantities block and transformed data block, or within the bodies of
+user-defined functions ending in `_rng`.  An attempt to use such
+a function elsewhere results in a compile-time error.
+
+
+### Log Probability Access in Functions {-}
+
+Functions that include sampling statements or log probability
+increment statements must have a name that ends in `_lp`.
+Attempts to use sampling statements or increment log probability
+statements in other functions leads to a compile-time error.
+
+Like the target log density increment statement and sampling
+statements, user-defined functions with names that end in `_lp`
+may only be used in blocks where the log probability accumulator is
+accessible, namely the transformed parameters and model blocks.  An
+attempt to use such a function elsewhere results in a compile-time
+error.
+
+
+### Defining Probability Functions for Sampling Statements {-}
+
+Functions whose names end in `_lpdf` and `_lpmf` (density
+and mass functions) can be used as probability functions in sampling
+statements.  As with the built-in functions, the first argument will
+appear on the left of the sampling statement operator (`~`) in
+the sampling statement and the other arguments follow.  For example,
+suppose a function returning the log of the density of `y` given
+parameter `theta` allows the use of the sampling statement is
+defined as follows.
+
+```stan
+real foo_lpdf(real y, vector theta) { ... }
+```
+
+Note that for function definitions, the comma is used rather than the
+vertical bar.  Then the shorthand
+
+```stan
+z ~ foo(phi);
+```
+
+will have exactly the same effect
+
+```stan
+target += foo_lpdf(z | phi);
+```
+
+Unlike built-in probability functions, user-defined
+probability functions like the example `foo` above will not
+automatically drop constant terms.
+
+The same syntax and shorthand works for log probability mass functions
+with suffixes `_lpmf`.
+
+A function that is going to be accessed as distributions must return
+the log of the density or mass function it defines.
+
+
+## Parameters are Constant
+
+Within function definition bodies, the parameters may be used like any
+other variable.  But the parameters are constant in the sense that
+they can't be assigned to (i.e., can't appear on the left side of an
+assignment (`=`) statement)<.  In other words, their value remains
+constant throughout the function body.  Attempting to assign a value
+to a function parameter value will raise a compile-time error.^[Despite being declared constant and appearing to have a pass-by-value syntax in Stan, the implementation of the language passes function arguments by constant reference in C++.]
+
+Local variables may be declared at the top of the function block and
+scope as usual.
+
+
+## Return Value {#function-returns.section}
+
+Non-void functions must have a return statement that returns an
+appropriately typed expression.   If the expression in a return
+statement does not have the same type as the return type declared for
+the function, a compile-time error is raised.
+
+Void functions may use `return` only without an argument, but
+return statements are not mandatory.
+
+### Return Guarantee Required {-}
+
+Unlike C++, Stan enforces a syntactic guarantee for non-void
+functions that ensures control will leave a non-void function through
+an appropriately typed return statement or because an exception is
+raised in the execution of the function.  To enforce this condition,
+functions must have a return statement as the last statement in their
+body.  This notion of last is defined recursively in terms of
+statements that qualify as bodies for functions.  The base case is that
+
+* a return statement qualifies,
+
+and the recursive cases are that
+
+* a sequence of statements qualifies if its last statement
+  qualifies,
+* a for loop or while loop qualifies if its body qualifies, and
+* a conditional statement qualifies if it has a default else
+  clause and all of its body statements qualify.
+
+These rules disqualify
+
+```stan
+real foo(real x) {
+  if (x > 2) return 1.0;
+  else if (x <= 2) return -1.0;
+}
+```
+
+because there is no default `else` clause, and disqualify
+
+```stan
+real foo(real x) {
+  real y;
+  y = x;
+  while (x < 10) {
+    if (x > 0) return x;
+    y = x / 2;
+  }
+}
+```
+
+because the return statement is not the last statement in the while
+loop.  A bogus dummy return could be placed after the while loop in
+this case.  The rules for returns allow
+
+```stan
+real log_fancy(real x) {
+  if (x < 1e-30)
+    return x;
+  else if (x < 1e-14)
+    return x * x;
+  else
+    return log(x);
+}
+```
+
+because there's a default else clause and each condition body has
+return as its final statement.
+
+
+## Void Functions as Statements
+
+### Void Functions {-}
+
+A function can be declared without a return value by using `void`
+in place of a return type.  Note that the type `void` may only be
+used as a return type---arguments may not be declared to be of type
+`void`.
+
+
+### Usage as Statement {-}
+
+A void function may be used as a statement after the function is
+declared;  see the [section on forward declarations](#forward-declarations.section) for rules on declaration.
+
+Because there is no return, such a usage is only for side effects,
+such as incrementing the log probability function, printing, or
+raising an error.
+
+
+### Special Return Statements {-}
+
+In a return statement within a void function's definition, the
+`return` keyword is followed immediately by a semicolon
+(`;`) rather than by the expression whose value is returned.
+
+
+## Declarations {#forward-declarations.section}
+
+In general, functions must be declared before they are used.  Stan
+supports forward declarations, which look like function definitions
+without bodies.  For example,
+
+```stan
+real unit_normal_lpdf(real y);
+```
+
+declares a function named `unit_normal_log` that consumes a
+single real-valued input and produces a real-valued output.  A
+function definition with a body simultaneously declares and defines
+the named function, as in
+
+```stan
+real unit_normal_lpdf(real y) {
+  return -0.5 * square(y);
+}
+```
+
+A user-defined Stan function may be declared and then later defined,
+or just defined without being declared.  No other combination of
+declaration and definition is legal, so that, for instance, a function
+may not be declared more than once, nor may it be defined more than
+once.  If there is a declaration, there must be a definition.  These
+rules together ensure that all the declared functions are eventually
+defined.
+
+
+### Recursive Functions {-}
+
+Forward declarations allow the definition of self-recursive or
+mutually recursive functions.  For instance, consider the following
+code to compute Fibonacci numbers.
+
+```stan
+int fib(int n);
+
+int fib(int n) {
+  if (n < 2) return n;
+  else return fib(n-1) + fib(n-2);
+}
+```
+
+Without the forward declaration in the first line, the body of the
+definition would not compile.

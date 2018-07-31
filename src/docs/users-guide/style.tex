@@ -1,0 +1,416 @@
+
+\chapter{Stan Program Style Guide}
+
+\noindent
+This chapter describes the preferred style for laying out Stan
+models. These are not rules of the language, but simply
+recommendations for laying out programs in a text editor.  Although
+these recommendations may seem arbitrary, they are similar to those of
+many teams for many programming languages.  Like rules for typesetting
+text, the goal is to achieve readability without wasting white space
+either vertically or horizontally.
+
+\section{Choose a Consistent Style}
+
+The most important point of style is consistency.  Consistent coding
+style makes it easier to read not only a single program, but multiple
+programs.  So when departing from this style guide, the number one
+recommendation is to do so consistently.
+
+\section{Line Length}
+
+Line lengths should not exceed 80 characters.%
+%
+\footnote{Even 80 characters may be too many for rendering in print;
+  for instance, in this manual, the number of code characters that fit
+  on a line is about 65.}
+%
+This is a typical recommendation for many programming language style
+guides because it makes it easier to lay out text edit windows side by
+side and to view the code on the web without wrapping, easier to view
+diffs from version control, etc.  About the only thing that is
+sacrificed is laying out expressions on a single line.
+
+\section{File Extensions}
+
+The recommended file extension for Stan model files is \code{.stan}.
+For Stan data dump files, the recommended extension is \code{.R}, or
+more informatively, \code{.data.R}.
+
+\section{Variable Naming}
+
+The recommended variable naming is to follow C/\Cpp naming
+conventions, in which variables are lowercase, with the underscore
+character (\Verb|_|) used as a separator.  Thus it is preferred to use
+\Verb|sigma_y|, rather than the run together \Verb|sigmay|, camel-case
+\Verb|sigmaY|, or capitalized camel-case \Verb|SigmaY|.  Even matrix
+variables should be lowercased.
+
+The exception to the lowercasing recommendation, which also follows
+the C/\Cpp conventions, is for size constants, for which the
+recommended form is a single uppercase letter.  The reason for this is
+that it allows the loop variables to match.  So loops over the indices of
+an $M \times N$ matrix $a$ would look as follows.
+%
+\begin{stancode}
+for (m in 1:M)
+  for (n in 1:N)
+     a[m,n] = ...
+\end{stancode}
+
+
+\section{Local Variable Scope}
+
+Declaring local variables in the block in which they are used aids in
+understanding programs because it cuts down on the amount of text
+scanning or memory required to reunite the declaration and definition.
+
+The following Stan program corresponds to a direct translation of a
+BUGS model, which uses a different element of \code{mu} in each
+iteration.
+%
+\begin{stancode}
+model {
+  real mu[N];
+  for (n in 1:N) {
+    mu[n] = alpha * x[n] + beta;
+    y[n] ~ normal(mu[n],sigma);
+  }
+}
+\end{stancode}
+%
+Because variables can be reused in Stan and because they should be
+declared locally for clarity, this model should be recoded as follows.
+%
+\begin{stancode}
+model {
+  for (n in 1:N) {
+    real mu;
+    mu = alpha * x[n] + beta;
+    y[n] ~ normal(mu,sigma);
+  }
+}
+\end{stancode}
+%
+The local variable can be eliminated altogether, as follows.
+%
+\begin{stancode}
+model {
+  for (n in 1:N)
+    y[n] ~ normal(alpha * x[n] + beta, sigma);
+}
+\end{stancode}
+%
+There is unlikely to be any measurable efficiency difference
+between the last two implementations, but both should be a bit
+more efficient than the BUGS translation.
+
+\subsubsection{Scope of Compound Structures with Componentwise Assignment}
+
+In the case of local variables for compound structures, such as
+arrays, vectors, or matrices, if they are built up component by
+component rather than in large chunks, it can be more efficient to
+declare a local variable for the structure outside of the block
+in which it is used.  This allows it to be allocated once and then
+reused.
+%
+\begin{stancode}
+model {
+  vector[K] mu;
+  for (n in 1:N) {
+    for (k in 1:K)
+      mu[k] = ...;
+    y[n] ~ multi_normal(mu,Sigma);
+}
+\end{stancode}
+%
+In this case, the vector \code{mu} will be allocated
+outside of both loops, and used a total of \code{N} times.
+
+\section{Parentheses and Brackets}
+
+\subsection{Optional Parentheses for Single-Statement Blocks}
+
+Single-statement blocks can be rendered in one of two ways.  The fully
+explicit bracketed way is as follows.
+%
+\begin{stancode}
+for (n in 1:N) {
+  y[n] ~ normal(mu,1);
+}
+\end{stancode}
+%
+The following statement without brackets has the same effect.
+%
+\begin{stancode}
+for (n in 1:N)
+  y[n] ~ normal(mu,1);
+\end{stancode}
+%
+Single-statement blocks can also be written on a single line, as
+in the following example.
+%
+\begin{stancode}
+for (n in 1:N) y[n] ~ normal(mu,1);
+\end{stancode}
+%
+These can be much harder to read than the first example. Only use this
+style if the statement is very simple, as in this example.  Unless
+there are many similar cases, it's almost always clearer to put
+each sampling statement on its own line.
+
+Conditional and looping statements may also be written without brackets.
+
+The use of for loops without brackets can be dangerous.  For instance,
+consider this program.
+%
+\begin{stancode}
+for (n in 1:N)
+  z[n] ~ normal(nu,1);
+  y[n] ~ normal(mu,1);
+\end{stancode}
+%
+Because Stan ignores whitespace and the parser completes a statement
+as eagerly as possible (just as in C++), the previous program is
+equivalent to the following program.
+%
+\begin{stancode}
+for (n in 1:N) {
+  z[n] ~ normal(nu,1);
+}
+y[n] ~ normal(mu,1);
+\end{stancode}
+%
+
+
+\subsection{Parentheses in Nested Operator Expressions}
+
+The preferred style for operators minimizes parentheses.  This reduces
+clutter in code that can actually make it harder to read expressions.
+For example, the expression \code{a~+~b~*~c} is preferred to the
+equivalent \code{a~+~(b~*~c)} or \code{(a~+~(b~*~c))}.  The operator
+precedences and associativities follow those of pretty much every
+programming language including Fortran, C++, R, and Python;  full
+details are provided in the reference manual.
+
+Similarly, comparison operators can usually be written with minimal
+bracketing, with the form \code{y[n] > 0 || x[n] != 0} preferred to
+the bracketed form \code{(y[n] > 0) || (x[n] != 0)}.
+
+\subsection{No Open Brackets on Own Line}
+
+Vertical space is valuable as it controls how much of a program you
+can see.  The preferred Stan style is as shown in the previous
+section, not as follows.
+%
+\begin{stancode}
+for (n in 1:N)
+{
+  y[n] ~ normal(mu,1);
+}
+\end{stancode}
+%
+This also goes for parameters blocks, transformed data blocks,
+which should look as follows.
+%
+\begin{stancode}
+transformed parameters {
+  real sigma;
+  ...
+}
+\end{stancode}
+%
+
+
+\section{Conditionals}
+
+Stan supports the full \Cpp-style conditional syntax,
+allowing real or integer values to act as conditions, as follows.
+%
+\begin{stancode}
+real x;
+...
+if (x) {
+   // executes if x not equal to 0
+   ...
+}
+\end{stancode}
+%
+
+\subsection{Explicit Comparisons of Non-Boolean Conditions}
+
+The preferred form is to write the condition out explicitly for
+integer or real values that are not produced as the result of a
+comparison or boolean operation, as follows.
+%
+\begin{stancode}
+if (x != 0) ...
+\end{stancode}
+
+
+\section{Functions}
+
+Functions are laid out the same way as in languages such as Java and
+\Cpp.  For example,
+%
+\begin{stancode}
+real foo(real x, real y) {
+  return sqrt(x * log(y));
+}
+\end{stancode}
+%
+The return type is flush left, the parentheses for the arguments are
+adjacent to the arguments and function name, and there is a space
+after the comma for arguments after the first.  The open curly brace
+for the body is on the same line as the function name, following the
+layout of loops and conditionals.  The body itself is indented; here
+we use two spaces.  The close curly brace appears on its own line.
+%
+If function names or argument lists are long, they can be
+written as
+%
+\begin{stancode}
+matrix
+function_to_do_some_hairy_algebra(matrix thingamabob,
+                                  vector doohickey2) {
+  ...body...
+}
+\end{stancode}
+%
+The function starts a new line, under the type.  The arguments are
+aligned under each other.
+
+Function documentation should follow the Javadoc and Doxygen styles.
+Here's an example repeated from \refsection{documenting-functions}.
+%
+\begin{stancode}
+/**
+ * Return a data matrix of specified size with rows
+ * corresponding to items and the first column filled
+ * with the value 1 to represent the intercept and the
+ * remaining columns randomly filled with unit-normal draws.
+ *
+ * @param N Number of rows correspond to data items
+ * @param K Number of predictors, counting the intercept, per
+ *          item.
+ * @return Simulated predictor matrix.
+ */
+matrix predictors_rng(int N, int K) {
+  ...
+\end{stancode}
+%
+The open comment is \code{/**}, asterisks are aligned below the first
+asterisk of the open comment, and the end comment \code{*/} is also
+aligned on the asterisk.  The tags \code{@param} and \code{@return}
+are used to label function arguments (i.e., parameters) and return
+values.
+
+\section{White Space}
+
+Stan allows spaces between elements of a program.  The white space
+characters allowed in Stan programs include the space (ASCII
+\code{0x20}), line feed (ASCII \code{0x0A}), carriage return
+(\code{0x0D}), and tab (\code{0x09}).  Stan treats all whitespace
+characters interchangeably, with any sequence of whitespace characters
+being syntactically equivalent to a single space character.
+Nevertheless, effective use of whitespace is the key to good program
+layout.
+
+
+\subsection{Line Breaks Between Statements and Declarations}
+
+It is dispreferred to have multiple statements or declarations on the
+same line, as in the following example.
+%
+\begin{stancode}
+transformed parameters {
+  real mu_centered;  real sigma;
+  mu = (mu_raw - mean_mu_raw);    sigma = pow(tau,-2);
+}
+\end{stancode}
+%
+These should be broken into four separate lines.
+
+\subsection{No Tabs}
+
+Stan programs should not contain tab characters.  They are legal and
+may be used anywhere other whitespace occurs.  Using tabs to layout a
+program is highly unportable because the number of spaces
+represented by a single tab character varies depending on which
+program is doing the rendering and how it is configured.
+
+\subsection{Two-Character Indents}
+
+Stan has standardized on two space characters of indentation, which is
+the standard convention for C/C++ code.  Another sensible choice is
+four spaces, which is the convention for Java and Python.  Just be
+consistent.
+
+\subsection{Space Between \code{if} and Condition}
+
+Use a space after \code{if}s.  For instance, use \code{if (x < y) ...}, not
+\code{if(x < y) ...}.
+
+\subsection{No Space For Function Calls}
+
+There is no space between a function name and the function it applies
+to.  For instance, use \code{normal(0,1)}, not \code{normal (0,1)}.
+
+\subsection{Spaces Around Operators}
+
+There should be spaces around binary operators.  For instance, use
+\code{y[1]~=~x}, not \code{y[1]=x}, use \code{(x~+~y)~*~z} not
+\code{(x+y)*z}.
+
+\subsection{Breaking Expressions across Lines}
+
+Sometimes expressions are too long to fit on a single line.  In that
+case, the recommended form is to break \emph{before} an operator,%
+%
+\footnote{This is the usual convention in both typesetting and other
+  programming languages. Neither R nor BUGS allows breaks before an
+  operator because they allow newlines to signal the end of an
+  expression or statement.}
+%
+aligning the operator to indicate scoping.  For example, use the
+following form (though not the content; inverting matrices is almost
+always a bad idea).
+%
+\begin{stancode}
+target += (y - mu)' * inv(Sigma) * (y - mu);
+\end{stancode}
+%
+Here, the multiplication operator (\code{*}) is aligned to clearly
+signal the multiplicands in the product.
+
+For function arguments, break after a comma and line the next
+argument up underneath as follows.
+%
+\begin{stancode}
+y[n] ~ normal(alpha + beta * x + gamma * y,
+              pow(tau,-0.5));
+\end{stancode}
+%
+
+\subsection{Optional Spaces after Commas}
+
+Optionally use spaces after commas in function arguments for clarity.
+For example, \code{normal(alpha * x[n] + beta,sigma)} can also be
+written as \code{normal(alpha~*~x[n]~+~beta,~sigma)}.
+
+
+
+\subsection{Unix Newlines}
+
+Wherever possible, Stan programs should use a single line feed
+character to separate lines.  All of the Stan developers (so far, at
+least) work on Unix-like operating systems and using a standard
+newline makes the programs easier for us to read and share.
+
+\subsubsection{Platform Specificity of Newlines}
+
+Newlines are signaled in Unix-like operating systems such as Linux and
+Mac OS X with a single line-feed (LF) character (ASCII code point
+\code{0x0A}).  Newlines are signaled in Windows using two characters,
+a carriage return (CR) character (ASCII code point \code{0x0D})
+followed by a line-feed (LF) character.
