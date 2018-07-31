@@ -23,7 +23,12 @@ generated quantities {
   int N[3];
 
   n = bernoulli_logit_rng(0.0);
-  
+  N = bernoulli_logit_rng(alpha);
+  N = bernoulli_logit_rng(nu);
+  N = bernoulli_logit_rng(ns);
+  N = bernoulli_logit_rng(u);
+  n = bernoulli_logit_rng(3);
+
   N = binomial_rng(ns, alpha);
   N = binomial_rng(ns, nu);
   N = binomial_rng(ns, ns);

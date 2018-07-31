@@ -77,7 +77,9 @@ for (size_t i = 0; i < int_vector_types.size(); ++i)
 for (const auto& t : all_vector_types) {
   add("bernoulli_rng", rng_return_type<int_type>(t), t);
  }
-add("bernoulli_logit_rng", expr_type(int_type()), expr_type(double_type()));
+for (const auto& t : all_vector_types) {
+  add("bernoulli_logit_rng", rng_return_type<int_type>(t), t);
+ }
 for (size_t i = 0; i < int_vector_types.size(); ++i)
   for (size_t j = 0; j < vector_types.size(); ++j) {
     add("bernoulli_logit_log", expr_type(double_type()), int_vector_types[i],
