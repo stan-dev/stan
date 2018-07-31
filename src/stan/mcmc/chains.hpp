@@ -624,7 +624,6 @@ namespace stan {
         return effective_sample_size(index(name));
       }
 
-
       double split_potential_scale_reduction(const int index) const {
         Eigen::Matrix<Eigen::VectorXd, Dynamic, 1>
           samples(num_chains());
