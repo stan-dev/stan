@@ -99,6 +99,7 @@ namespace stan {
         generate_validate_var_decl(prog.data_decl_[i], 3, o);
         o << EOL;
       }
+      o << EOL;
 
       generate_comment("initialize transformed data variables", 3, o);
       // todo:  bundle into single function
