@@ -34,15 +34,6 @@ namespace stan {
       generate_bare_type(var_decl.bare_type(), scalar_t_name, o);
       generate_initializer(var_decl.type(), scalar_t_name, o);
     }
-
-    template void generate_var_constructor(const block_var_decl&,
-                                           const std::string& scalar_t_name,
-                                           std::ostream& o);
-
-    template void generate_var_constructor(const local_var_decl&,
-                                           const std::string& scalar_t_name,
-                                           std::ostream& o);
-
   }
 }
 #endif

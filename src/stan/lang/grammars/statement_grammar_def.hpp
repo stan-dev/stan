@@ -133,7 +133,7 @@ namespace stan {
         %= lit('{')
         > eps[reset_var_scope_f(_b, _r1)]
         > local_var_decls_r(_b)[assign_lhs_f(_a, _1)]
-        > *statement_r(_b, _r2)[trace_f("statement_seq_r, statement_r")]
+        > *statement_r(_b, _r2)
         > lit('}')
         > eps[unscope_locals_f(_a, boost::phoenix::ref(var_map_))];
 

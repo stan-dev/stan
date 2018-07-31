@@ -104,7 +104,7 @@ namespace stan {
       boost::spirit::qi::rule<Iterator,
                               expression(scope),
                               whitespace_grammar<Iterator> >
-      local_int_data_expr_r;
+      local_int_expr_r;
 
       boost::spirit::qi::rule<Iterator,
                               std::vector<expression>(scope),

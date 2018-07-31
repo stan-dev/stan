@@ -128,13 +128,13 @@ namespace stan {
         %= (lit("matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > lit('[')
-        > local_int_data_expr_r(_r1)
+        > local_int_expr_r(_r1)
         > lit(',')
-        > local_int_data_expr_r(_r1)
+        > local_int_expr_r(_r1)
         > lit(']');
 
       local_dims_r.name("array dimensions");
-      local_dims_r %= lit('[') > (local_int_data_expr_r(_r1) % ',') > lit(']');
+      local_dims_r %= lit('[') > (local_int_expr_r(_r1) % ',') > lit(']');
 
       local_opt_def_r.name("variable definition (optional)");
       local_opt_def_r %= -local_def_r(_r1);
@@ -143,11 +143,11 @@ namespace stan {
       local_def_r %= lit('=') > expression_g(_r1);
 
       local_dim1_r.name("vector length declaration:"
-                  " data-only integer expression in square brackets");
-      local_dim1_r %= lit('[') > local_int_data_expr_r(_r1) > lit(']');
+                  " integer expression in square brackets");
+      local_dim1_r %= lit('[') > local_int_expr_r(_r1) > lit(']');
 
-      local_int_data_expr_r.name("data-only integer expression");
-      local_int_data_expr_r
+      local_int_expr_r.name("integer expression");
+      local_int_expr_r
         %= expression_g(_r1)
            [validate_int_expr_f(_1, _pass,
                                 boost::phoenix::ref(error_msgs_))];

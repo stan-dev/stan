@@ -823,13 +823,6 @@ namespace stan {
     extern boost::phoenix::function<add_literal_string>
     add_literal_string_f;
 
-    struct validate_decl : public phoenix_functor_quaternary {
-      void operator()(const bool& declaration_ok, const var_decl& var_decl,
-                      bool& pass, std::stringstream& error_msgs) const;
-    };
-    extern boost::phoenix::function<validate_decl>
-    validate_decl_f;
-
     struct validate_definition : public phoenix_functor_quaternary {
       template <typename T>
       void operator()(const scope& var_scope, const T& var_decl,
@@ -921,16 +914,6 @@ namespace stan {
     };
     extern boost::phoenix::function<validate_bare_type>
     validate_bare_type_f;
-
-    struct validate_bare_type_is_data : public phoenix_functor_quaternary {
-      void operator()(bare_expr_type& fun_arg_type,
-                      scope& scope,
-                      bool& pass,
-                      std::ostream& error_msgs)
-        const;
-    };
-    extern boost::phoenix::function<validate_bare_type_is_data>
-    validate_bare_type_is_data_f;
 
     struct validate_array_block_var_decl : public phoenix_functor_septenary {
       void operator()(block_var_decl& var_decl_result,

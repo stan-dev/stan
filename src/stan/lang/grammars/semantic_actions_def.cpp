@@ -728,6 +728,7 @@ namespace stan {
       const {
       var_scope = scope(var_scope.program_block(), true);
       // generated log_prob code has vector called "params_r__"
+      // hidden way to get unconstrained params from model
       vm.add("params_r__", var_decl("params_r__", vector_type()),
              parameter_origin);
     }
@@ -795,7 +796,7 @@ namespace stan {
         return;
       }
       if (e.bare_type().num_dims() == 0) {
-        // need integer array expression here, but nothing else to report
+        // not an array expression, fail and backtrack
         pass = false;
         return;
       }
@@ -2622,19 +2623,6 @@ namespace stan {
       return boost::apply_visitor(*this, x.subject.expr_);
     }
 
-    void validate_decl::operator()(const bool& declaration_ok,
-                                   const var_decl& var_decl,
-                                   bool& pass,
-                                   std::stringstream& error_msgs)
-      const {
-      pass = declaration_ok;
-      if (!pass) {
-        error_msgs << "Problem with declaration." << std::endl;
-      }
-    }
-    boost::phoenix::function<validate_decl>
-    validate_decl_f;
-
     template <typename T>
     void validate_definition::operator()(const scope& var_scope,
                                          const T& var_decl,
@@ -2655,12 +2643,12 @@ namespace stan {
       bare_expr_type def_type = var_decl.def().bare_type();
 
       bool types_compatible
-        = (decl_type.is_primitive()
-           && def_type.is_primitive()
-           && (decl_type == def_type
-               || (decl_type.is_double_type()
-                   && def_type.is_int_type())))
-        || (decl_type == def_type);
+        = (decl_type == def_type)
+        || (decl_type.is_primitive()
+            && def_type.is_primitive()
+            && decl_type.is_double_type()
+            && def_type.is_int_type());
+
       if (!types_compatible) {
         error_msgs << "Variable definition base type mismatch,"
                    << " variable declared as base type ";
@@ -3095,24 +3083,6 @@ namespace stan {
     boost::phoenix::function<validate_fun_arg_var>
     validate_fun_arg_var_f;
 
-    void validate_bare_type_is_data::operator()(
-                                       bare_expr_type& bare_type,
-                                       scope& scope,
-                                       bool& pass,
-                                       std::ostream& error_msgs) const {
-      if (bare_type.is_int_type()) {
-          pass = false;
-          error_msgs
-            << "Data qualifier cannot be applied to variable of type int"
-            << std::endl;
-          return;
-      }
-      if (scope.program_block() == data_origin)
-        bare_type.set_is_data();
-    }
-    boost::phoenix::function<validate_bare_type_is_data>
-    validate_bare_type_is_data_f;
-
     void validate_bare_type::operator()(
                                         bare_expr_type& bare_type_result,
                                         const bare_expr_type& el_type,
@@ -3244,11 +3214,13 @@ namespace stan {
     }
     boost::phoenix::function<reset_var_scope> reset_var_scope_f;
 
+    // only used to debug grammars
     void trace::operator()(const std::string& msg) const {
       //      std::cout << msg << std::endl;
     }
     boost::phoenix::function<trace> trace_f;
 
+    // only used to debug grammars
     void trace_pass::operator()(const std::string& msg,
                                  const bool& pass) const {
       //      std::cout << msg << " pass? " << pass << std::endl;
