@@ -821,10 +821,10 @@ TEST_F(McmcChains,blocker_effective_sample_size) {
   chains.add(blocker2);
 
   EXPECT_NO_THROW(chains.effective_sample_size(1))
-    << "calling chain.effective_sample_size(index = 1).";
+    << "calling chains.effective_sample_size(index = 1).";
 
   EXPECT_NO_THROW(chains.effective_sample_size(chains.param_name(1)))
-    << "calling chain.effective_sample_size(chains.param_name(index = 1))";
+    << "calling chains.effective_sample_size(chains.param_name(index = 1))";
 }
 
 TEST_F(McmcChains,blocker_split_potential_scale_reduction) {

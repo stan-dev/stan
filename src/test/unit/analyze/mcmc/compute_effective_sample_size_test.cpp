@@ -132,4 +132,10 @@ TEST_F(ComputeEss,chains_compute_effective_sample_size) {
       << "n_effective for index: " << index << ", parameter: "
       << chains.param_name(index);
   }
+
+  for (int index = 0; index < chains.num_params(); index++) {
+    std::string name = chains.param_name(index);
+    ASSERT_EQ(chains.effective_sample_size(index),
+              chains.effective_sample_size(name));
+  }
 }
