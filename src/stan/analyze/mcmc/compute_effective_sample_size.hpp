@@ -22,8 +22,7 @@ namespace stan {
      * @param std::vector stores sizes of chains
      * @return effective sample size for the specified parameter
      */
-    template<typename T>
-    double compute_effective_sample_size(std::vector<T> draws,
+    double compute_effective_sample_size(std::vector<const double*> draws,
                                          std::vector<size_t> sizes) {
       size_t num_chains = sizes.size();
 
@@ -85,8 +84,8 @@ namespace stan {
       return num_chains * num_draws / (1 + 2 * rho_hat_s.sum());
     }
 
-    template<typename T>
-    double compute_effective_sample_size(std::vector<T> draws, size_t size) {
+    double compute_effective_sample_size(std::vector<const double*> draws,
+                                         size_t size) {
       size_t num_chains = draws.size();
       std::vector<size_t> sizes(num_chains, size);
       return compute_effective_sample_size(draws, sizes);

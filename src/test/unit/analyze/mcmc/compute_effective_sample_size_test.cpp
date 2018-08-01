@@ -45,7 +45,7 @@ TEST_F(ComputeEss,compute_effective_sample_size) {
   // for any interface *without* access to chains class
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1>
     samples(chains.num_chains());
-  std::vector<double*> draws(chains.num_chains());
+  std::vector<const double*> draws(chains.num_chains());
   std::vector<size_t> sizes(chains.num_chains());
   for (int index = 4; index < chains.num_params(); index++) {
     for (int chain = 0; chain < chains.num_chains(); ++chain) {
@@ -85,7 +85,7 @@ TEST_F(ComputeEss,compute_effective_sample_size_convenience) {
 
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1>
     samples(chains.num_chains());
-  std::vector<double*> draws(chains.num_chains());
+  std::vector<const double*> draws(chains.num_chains());
   std::vector<size_t> sizes(chains.num_chains());
   for (int index = 4; index < chains.num_params(); index++) {
     for (int chain = 0; chain < chains.num_chains(); ++chain) {
