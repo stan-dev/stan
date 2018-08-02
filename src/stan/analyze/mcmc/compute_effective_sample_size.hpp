@@ -24,18 +24,18 @@ namespace stan {
      */
     double compute_effective_sample_size(std::vector<const double*> draws,
                                          std::vector<size_t> sizes) {
-      size_t num_chains = sizes.size();
+      int num_chains = sizes.size();
 
       // need to generalize to each jagged draws per chain
       size_t num_draws = sizes[0];
-      for (size_t chain = 1; chain < num_chains; ++chain) {
+      for (int chain = 1; chain < num_chains; ++chain) {
         num_draws = std::min(num_draws, sizes[chain]);
       }
 
       Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
       Eigen::VectorXd chain_mean(num_chains);
       Eigen::VectorXd chain_var(num_chains);
-      for (size_t chain = 0; chain < num_chains; ++chain) {
+      for (int chain = 0; chain < num_chains; ++chain) {
         Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
           draw(draws[chain], sizes[chain]);
         math::autocovariance<double>(draw, acov(chain));
@@ -50,20 +50,20 @@ namespace stan {
       Eigen::VectorXd rho_hat_s(num_draws);
       rho_hat_s.setZero();
       Eigen::VectorXd acov_s(num_chains);
-      for (size_t chain = 0; chain < num_chains; ++chain)
+      for (int chain = 0; chain < num_chains; ++chain)
         acov_s(chain) = acov(chain)(1);
       double rho_hat_even = 1;
       double rho_hat_odd = 1 - (mean_var - acov_s.mean()) / var_plus;
       rho_hat_s(1) = rho_hat_odd;
       // Geyer's initial positive sequence
-      size_t max_s = 1;
+      int max_s = 1;
       for (size_t s = 1;
            (s < (num_draws - 2) && (rho_hat_even + rho_hat_odd) >= 0);
            s += 2) {
-        for (size_t chain = 0; chain < num_chains; ++chain)
+        for (int chain = 0; chain < num_chains; ++chain)
           acov_s(chain) = acov(chain)(s + 1);
         rho_hat_even = 1 - (mean_var - acov_s.mean()) / var_plus;
-        for (size_t chain = 0; chain < num_chains; ++chain)
+        for (int chain = 0; chain < num_chains; ++chain)
           acov_s(chain) = acov(chain)(s + 2);
         rho_hat_odd = 1 - (mean_var - acov_s.mean()) / var_plus;
         if ((rho_hat_even + rho_hat_odd) >= 0) {
@@ -73,7 +73,7 @@ namespace stan {
         max_s = s + 2;
       }
       // Geyer's initial monotone sequence
-      for (size_t s = 3; s <= max_s - 2; s += 2) {
+      for (int s = 3; s <= max_s - 2; s += 2) {
         if (rho_hat_s(s + 1) + rho_hat_s(s + 2) >
             rho_hat_s(s - 1) + rho_hat_s(s)) {
           rho_hat_s(s + 1) = (rho_hat_s(s - 1) + rho_hat_s(s)) / 2;
@@ -86,7 +86,7 @@ namespace stan {
 
     double compute_effective_sample_size(std::vector<const double*> draws,
                                          size_t size) {
-      size_t num_chains = draws.size();
+      int num_chains = draws.size();
       std::vector<size_t> sizes(num_chains, size);
       return compute_effective_sample_size(draws, sizes);
     }
