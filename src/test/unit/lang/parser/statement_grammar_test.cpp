@@ -5,9 +5,9 @@
 TEST(langParserStatement2Grammar, addConditionalCondition) {
   test_parsable("conditional_condition_good");
   test_throws("conditional_condition_bad_1",
-              "conditions in if-else");
+              "Conditions in if-else");
   test_throws("conditional_condition_bad_2",
-              "conditions in if-else");
+              "Conditions in if-else");
 }
 
 TEST(langParserStatementGrammar, validateIntExpr2) {
@@ -17,7 +17,7 @@ TEST(langParserStatementGrammar, validateIntExpr2) {
   test_throws("validate_int_expr2_bad2",
               "Loop must be over container or range");
   test_throws("validate_int_expr2_bad3",
-              "dimension declaration requires expression denoting integer");
+              "Dimension declaration requires expression denoting integer");
   test_throws("validate_int_expr2_bad4",
               "Loop must be over container or range");
 }
@@ -37,7 +37,7 @@ TEST(langParserStatementGrammar, targetIncrement) {
 
 TEST(langParserStatementGrammar, targetReserved) {
   test_throws("target-reserved",
-              "variable identifier (name) may not be reserved word");
+              "Variable identifier (name) may not be reserved word");
   test_throws("target-reserved",
               "found identifier=target");
 }

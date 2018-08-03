@@ -17,16 +17,17 @@
 
 // hack to pass pair into macro below to adapt; in namespace to hide
 struct DUMMY_STRUCT {
-  typedef std::pair<std::vector<stan::lang::var_decl>,
+  typedef std::pair<std::vector<stan::lang::block_var_decl>,
                     std::vector<stan::lang::statement> > type;
 };
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::program,
                           (std::vector<stan::lang::function_decl_def>,
                            function_decl_defs_)
-                          (std::vector<stan::lang::var_decl>, data_decl_)
+                          (std::vector<stan::lang::block_var_decl>, data_decl_)
                           (DUMMY_STRUCT::type, derived_data_decl_)
-                          (std::vector<stan::lang::var_decl>, parameter_decl_)
+                          (std::vector<stan::lang::block_var_decl>,
+                           parameter_decl_)
                           (DUMMY_STRUCT::type, derived_decl_)
                           (stan::lang::statement, statement_)
                           (DUMMY_STRUCT::type, generated_decl_) )
@@ -46,7 +47,7 @@ namespace stan {
           var_map_(),
           error_msgs_(),
           expression_g(var_map_, error_msgs_),
-          var_decls_g(var_map_, error_msgs_),
+          block_var_decls_g(var_map_, error_msgs_),
           statement_g(var_map_, error_msgs_),
           functions_g(var_map_, error_msgs_, allow_undefined) {
         using boost::spirit::qi::eps;
@@ -59,7 +60,7 @@ namespace stan {
         using boost::spirit::qi::labels::_a;
 
         // add model_name to var_map with special origin
-        var_map_.add(model_name, base_var_decl(),
+        var_map_.add(model_name, var_decl(),
                      scope(model_name_origin, true));
 
         program_r.name("program");
@@ -110,7 +111,7 @@ namespace stan {
           %= (lit("data")
               > lit('{'))
           > eps[set_var_scope_f(_a, data_origin)]
-          >  var_decls_g(true, _a)
+          >  block_var_decls_g(_a)
           > end_var_decls_r;
 
         derived_data_var_decls_r.name("transformed data block");
@@ -119,7 +120,7 @@ namespace stan {
                >> lit("data"))
               > lit('{'))
           > eps[set_var_scope_f(_a, transformed_data_origin)]
-          > var_decls_g(true, _a)
+          > block_var_decls_g(_a)
           > ((statement_g(_a, false)
               > *statement_g(_a, false)
               > end_var_definitions_r)
@@ -131,7 +132,7 @@ namespace stan {
           %= (lit("parameters")
               > lit('{'))
           > eps[set_var_scope_f(_a, parameter_origin)]
-          > var_decls_g(true, _a)
+          > block_var_decls_g(_a)
           > end_var_decls_r;
 
         derived_var_decls_r.name("derived variable declarations");
@@ -140,7 +141,7 @@ namespace stan {
               > lit("parameters")
               > lit('{'))
           > eps[set_var_scope_f(_a, transformed_parameter_origin)]
-          > var_decls_g(true, _a)
+          > block_var_decls_g(_a)
           > *statement_g(_a, false)
           > end_var_decls_statements_r;
 
@@ -150,7 +151,7 @@ namespace stan {
               > lit("quantities")
               > lit('{'))
           > eps[set_var_scope_f(_a, derived_origin)]
-          > var_decls_g(true, _a)
+          > block_var_decls_g(_a)
           > *statement_g(_a, false)
           > end_var_decls_statements_r;
 
