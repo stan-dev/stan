@@ -1,14 +1,16 @@
 #ifndef STAN_LANG_AST_NODE_EXPRESSION_HPP
 #define STAN_LANG_AST_NODE_EXPRESSION_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
 #include <boost/variant/recursive_variant.hpp>
+#include <ostream>
 #include <string>
 #include <vector>
+#include <cstddef>
 
 namespace stan {
   namespace lang {
 
+    struct bare_expr_type;
     struct nil;
     struct int_literal;
     struct double_literal;
@@ -36,12 +38,12 @@ namespace stan {
                              boost::recursive_wrapper<matrix_expr>,
                              boost::recursive_wrapper<row_vector_expr>,
                              boost::recursive_wrapper<variable>,
+                             boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<integrate_ode_control>,
                              boost::recursive_wrapper<algebra_solver>,
                              boost::recursive_wrapper<algebra_solver_control>,
                              boost::recursive_wrapper<map_rect>,
-                             boost::recursive_wrapper<fun>,
                              boost::recursive_wrapper<index_op>,
                              boost::recursive_wrapper<index_op_sliced>,
                              boost::recursive_wrapper<conditional_op>,
@@ -72,8 +74,9 @@ namespace stan {
       expression(const unary_op& expr);  // NOLINT(runtime/explicit)
       expression(const expression_t& expr_);  // NOLINT(runtime/explicit)
 
-      expr_type expression_type() const;
+      bare_expr_type bare_type() const;
       int total_dims() const;
+      std::string to_string() const;
 
       expression& operator+=(const expression& rhs);
       expression& operator-=(const expression& rhs);

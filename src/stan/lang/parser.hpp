@@ -67,8 +67,9 @@ namespace stan {
         std::stringstream msg;
         std::string diagnostics = prog_grammar.error_msgs_.str();
         if (out && is_nonempty(diagnostics))
-          msg << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:" << std::endl
-              << std::endl << diagnostics;
+          msg << "SYNTAX ERROR, MESSAGE(S) FROM PARSER:"
+              << std::endl
+              << diagnostics;
         if (out) {
           std::stringstream ss;
           ss << e.what_;
@@ -98,9 +99,9 @@ namespace stan {
         if (!consumed_all_input) {
           std::basic_stringstream<char> unparsed_non_ws;
           unparsed_non_ws << boost::make_iterator_range(fwd_begin, fwd_end);
-          msg << "PARSER EXPECTED: whitespace to end of file."
+          msg << "PARSER FAILED TO PARSE INPUT COMPLETELY"
               << std::endl
-              << "FOUND AT line "
+              << "STOPPED AT LINE "
               << get_line(fwd_begin)
               << ": "
               << std::endl

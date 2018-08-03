@@ -8,6 +8,7 @@
 #include <stan/lang/ast/node/ub_idx.hpp>
 #include <stan/lang/ast/node/uni_idx.hpp>
 #include <boost/variant/recursive_variant.hpp>
+#include <string>
 
 namespace stan {
   namespace lang {
@@ -75,6 +76,8 @@ namespace stan {
        *@param i index
        */
       idx(const lub_idx& i);  // NOLINT(runtime/explicit)
+
+      std::string to_string() const;
 
       /**
        * The index variant object.
