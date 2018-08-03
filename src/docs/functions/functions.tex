@@ -1,0 +1,3993 @@
+\part{Built-In Functions}\label{built-in-functions.part}
+
+\chapter{Void Functions}
+
+\noindent
+Stan does not technically support functions that do not return values.
+It does support two types of statements that look like functions, one
+for printing and one for rejecting outputs.  Documentation on these
+functions is included here for completeness.  The special keyword
+\code{void} is used for the return type of void functions, because
+they behave like variadic functions with void return type, even though
+they are special kinds of statements.
+
+Although \code{print} and \code{reject} appear to have the syntax of
+functions, they are actually special kinds of statements with slightly
+different form and behavior than other functions.  First, they are the
+constructs that allow a variable number of arguments.  Second, they
+are the the only constructs to accept string literals (e.g.,
+\code{"hello world"}) as arguments.  Third, they have no effect on the
+log density function and operate solely through side effects.
+
+\section{Print ``Function''}
+
+Printing has no effect on the model's log probability function.  Its
+sole purpose is the side effect (i.e., an effect not represented in a
+return value) of arguments being printed to whatever the standard
+output stream is connected to (e.g., the terminal in command-line Stan
+or the R console in RStan).
+%
+\begin{description}
+  \fitem{void}{print}{T1 \farg{x1},..., TN \farg{xN}}{Print the values
+    denoted by the arguments \farg{x1} through \farg{xN} on the
+    output message stream.  There are no spaces between items in the
+    print, but a line feed (LF; Unicode U+000A; \Cpp literal
+    \code{'\textbackslash{n}'}) is inserted at the end of the printed
+    line.  The types \code{T1} through \code{TN} can be any of Stan's
+    built-in numerical types or double quoted strings of ASCII
+    characters.}
+\end{description}
+
+\section{Reject ``Function''}
+
+The reject statement has the same syntax as the print statement,
+accepting an arbitrary number of arguments of any type (including
+string literals).   The effect of executing a reject statement is to
+throw an exception internally that terminates the current iteration
+with a rejection (the behavior of which will depend on the algorithmic
+context in which it occurs).
+%
+\begin{description}
+  \fitem{void}{reject}{T1 \farg{x1},..., TN \farg{xN}}{Reject the
+    current iteration and print the values denoted by the arguments
+    \farg{x1} through \farg{xN} on the output message stream.  There
+    are no spaces between items in the print, but a line feed (LF;
+    Unicode U+000A; \Cpp literal \code{'\textbackslash{n}'}) is
+    inserted at the end of the printed line.  The types \code{T1}
+    through \code{TN} can be any of Stan's built-in numerical types or
+    double quoted strings of ASCII characters.}
+\end{description}
+
+\chapter{Integer-Valued Basic Functions}
+
+\noindent
+This chapter describes Stan's built-in function that take various
+types of arguments and return results of type integer.
+
+
+\section{Integer-Valued Arithmetic Operators}\label{int-arithmetic.section}
+
+Stan's arithmetic is based on standard double-precision \Cpp integer and
+floating-point arithmetic.  If the arguments to an arithmetic operator
+are both integers, as in \code{2~+~2}, integer arithmetic is used.  If
+one argument is an integer and the other a floating-point value, as in
+\code{2.0~+~2} and \code{2~+~2.0}, then the integer is promoted to a floating
+point value and floating-point arithmetic is used.
+
+Integer arithmetic behaves slightly differently than floating point
+arithmetic.  The first difference is how overflow is treated.  If the
+sum or product of two integers overflows the maximum integer
+representable, the result is an undesirable wraparound behavior at the
+bit level.  If the integers were first promoted to real numbers, they
+would not overflow a floating-point representation.  There are no
+extra checks in Stan to flag overflows, so it is up to the user to
+make sure it does not occur.
+
+Secondly, because the set of integers is not closed under division and
+there is no special infinite value for integers, integer division
+implicitly rounds the result.  If both arguments are positive, the
+result is rounded down.  For example, \code{1~/~2} evaluates to 0 and
+\code{5~/~3} evaluates to 1.
+
+If one of the integer arguments to division is negative, the latest
+\Cpp specification (\Cpp{11}), requires rounding toward zero.  This
+would have \code{1~/~2} and \code{-1~/~2} evaluate to 0, \code{-7~/~2}
+evaluate to -3, and \code{7~/~2} evaluate to 3.  Before the \Cpp{11}
+specification, the behavior was platform dependent, allowing rounding
+up or down.  All compilers recent enough to be able to deal with
+Stan's templating should follow the \Cpp{11} specification, but it may
+be worth testing if you are not sure and plan to use integer division
+with negative values.
+
+Unlike floating point division, where \code{1.0~/~0.0} produces the
+special positive infinite value, integer division by zero, as in
+\code{1~/~0}, has undefined behavior in the \Cpp standard.  For
+example, the \clang compiler on Mac OS X returns 3764, whereas the
+\gpp compiler throws an exception and aborts the program with a
+warning.  As with overflow, it is up to the user to make sure integer
+divide-by-zero does not occur.
+
+\subsection{Binary Infix Operators}
+
+Operators are described using the \Cpp syntax.  For instance, the
+binary operator of addition, written \code{X + Y}, would have the
+Stan signature \code{int operator+(int,int)} indicating it takes
+two real arguments and returns a real value.  As noted previously, the
+value of integer division is platform-dependent when rounding is
+platform dependent before C++11;  the descriptions below provide the
+C++11 definition.
+
+\begin{description}
+%
+\fitem{int}{operator+}{int \farg{x}, int \farg{y}}{
+The sum of the addends \farg{x} and \farg{y}
+\[
+\mbox{\code{operator+}}(x,y) = (x + y)
+\]
+}
+%
+\fitem{int}{operator-}{int \farg{x}, int \farg{y}}{
+The difference between the minuend \farg{x} and subtrahend \farg{y}
+\[
+\mbox{\code{operator-}}(x,y) = (x - y)
+\]
+}
+%
+\fitem{int}{operator*}{int \farg{x}, int \farg{y}}{
+The product of the factors \farg{x} and \farg{y}
+\[
+\mbox{\code{operator*}}(x,y) = (x \times y)
+\]
+}
+%
+\fitem{int}{operator/}{int \farg{x}, int \farg{y}}{
+The integer quotient of the dividend \farg{x} and divisor \farg{y}
+\[
+\mbox{\code{operator/}}(x,y) =
+\begin{cases}
+\lfloor x / y \rfloor & \mbox{if } x / y \geq 0
+\\
+- \lfloor \mathrm{floor}(-x / y) \rfloor & \mbox{if } x / y < 0.
+\end{cases}
+\]
+}
+%
+\fitem{int}{operator\%}{int \farg{x}, int \farg{y}}{\farg{x} modulo
+  \farg{y}, which is the positive remainder after dividing \farg{x} by
+  \farg{y}.  If both \farg{x} and \farg{y} are non-negative, so is the
+  result; otherwise, the sign of the result is platform dependent.
+\[
+\mbox{\code{operator\%}}(x, y)
+\ = \ x \ \mbox{mod} \ y
+\ = \ x - y * \lfloor x / y \rfloor
+\]
+}
+%
+\end{description}
+
+\subsection{Unary Prefix Operators}
+
+\begin{description}
+\fitem{int}{operator-}{int \farg{x}}{
+The negation of the subtrahend \farg{x}
+\[
+\mbox{\code{operator-}}(x) = -x
+}
+\]
+%
+\fitem{int}{operator+}{int \farg{x}}{
+This is a no-op.
+\[
+\mbox{\code{operator+}}(x) = x
+\]
+}
+\end{description}
+
+\section{Absolute Functions}
+
+\begin{description}
+%
+  \fitemUnaryVec{abs}{absolute value of \farg{x}}{
+  \[\mbox{abs}(x) = |x|\]}
+%
+\fitemnobody{int}{int\_step}{int \farg{x}}
+%
+\fitem{int}{int\_step}{real \farg{x}}{
+  Returns the step function of \farg{x} as an integer,
+  \[
+  \mbox{int\_step}(x) =
+  \begin{cases}
+    1 & \mbox{if } x > 0 \\
+    0 & \mbox{if } x \leq 0 \mathrm{ or } x \mathrm{ is } Nan
+  \end{cases}
+  \]
+{\it Warning:} \code{int\_step(0)} and \code{int\_step(NaN)} return 0
+whereas \code{step(0)} and \code{step(NaN)} return 1.}
+%
+\end{description}
+%
+See the warning in \refsection{step-functions} about the dangers of
+step functions applied to anything other than data.
+
+\section{Bound Functions}
+%
+\begin{description}
+  \fitem{int}{min}{int \farg{x}, int \farg{y}}{
+    Returns the minimum of \farg{x} and \farg{y}.
+    \[
+    \mbox{min}(x, y) =
+    \begin{cases}
+      x & \mbox{if } x < y\\
+      y & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{int}{max}{int \farg{x}, int \farg{y}}{
+    Returns the maximum of \farg{x} and \farg{y}.
+    \[
+    \mbox{max}(x, y) =
+    \begin{cases}
+      x & \mbox{if } x > y\\
+      y & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+\end{description}
+
+
+\chapter{Real-Valued Basic Functions}
+
+\noindent
+This chapter describes built-in functions that take zero or more real
+or integer arguments and return real values.
+
+\section{Vectorization of Real-Valued Functions}\label{fun-vectorization.section}
+
+Although listed in this chapter, many of Stan's built-in functions are
+vectorized so that they may be applied to any argument type.  The
+vectorized form of these functions is not any faster than writing an
+explicit loop that iterates over the elements applying the
+function---it's just easier to read and write and less error prone.
+
+\subsection{Unary Function Vectorization}
+
+Many of Stan's unary functions can be applied to any argument type.
+For example, the exponential function, \code{exp}, can be applied to
+\code{real} arguments or arrays of \code{real} arguments.  Other than
+for integer arguments, the result type is the same as the argument
+type, including dimensionality and size.  Integer arguments are first
+promoted to real values, but the result will still have the same
+dimensionality and size as the argument.
+
+\subsubsection{Real and real array arguments}
+
+When applied to a simple real value, the result is a real value.  When
+applied to arrays, vectorized functions like \code{exp()} are defined
+elementwise.  For example,
+%
+\begin{stancode}
+// declare some variables for arguments
+real x0;
+real x1[5];
+real x2[4, 7];
+...
+// declare some variables for results
+real y0;
+real y1[5];
+real y2[4, 7];
+...
+// calculate and assign results
+y0 = exp(x0);
+y1 = exp(x1);
+y2 = exp(x2);
+\end{stancode}
+%
+When \code{exp} is applied to an array, it applies elementwise.  For
+example, the statement above,
+%
+\begin{stancode}
+y2 = exp(x2);
+\end{stancode}
+%
+produces the same result for \code{y2} as the explicit loop
+%
+\begin{stancode}
+for (i in 1:4)
+  for (j in 1:7)
+    y2[i, j] = exp(x2[i, j]);
+\end{stancode}
+%
+
+\subsubsection{Vector and matrix arguments}
+
+Vectorized functions also apply elementwise to vectors and matrices.
+For example,
+%
+\begin{stancode}
+vector[5] xv;
+row_vector[7] xrv;
+matrix[10, 20] xm;
+...
+vector[5] yv;
+row_vector[7] yrv;
+matrix[10, 20] ym;
+
+yv = exp(xv);
+yrv = exp(xrv);
+ym = exp(xm);
+\end{stancode}
+%
+
+Arrays of vectors and matrices work the same way.  For example,
+%
+\begin{stancode}
+matrix[17, 93] u[12];
+...
+matrix[17, 93] z[12];
+...
+z = exp(u);
+\end{stancode}
+%
+After this has been executed, \code{z[i,~j,~k]} will be equal to
+\code{exp(u[i,~j,~k])}.
+
+
+\subsubsection{Integer and integer array arguments}
+
+Integer arguments are promoted to real values in vectorized unary
+functions.  Thus if \code{n} is of type \code{int}, \code{exp(n)} is of
+type \code{real}.  Arrays work the same way, so that if \code{n2} is a
+one dimensional array of integers, then \code{exp(n2)} will be a
+one-dimensional array of reals with the same number of elements as
+\code{n2}.  For example,
+%
+\begin{stancode}
+int n1[23];
+...
+real z1[23];
+...
+z1 = exp(n1);
+\end{stancode}
+%
+It would be illegal to try to assign \code{exp(n1)} to an array of
+integers; the return type is a real array.
+
+
+\section{Mathematical Constants}\label{built-in-constants.section}
+
+Constants are represented as functions with no arguments and must be
+called as such.  For instance, the mathematical constant $\pi$ must be
+written in a Stan program as \code{pi()}.
+
+%
+\begin{description}
+%
+\fitem{real}{pi}{}{
+  $\pi$, the ratio of a circle's circumference to its diameter}
+%
+\fitem{real}{e}{}{
+ $e$, the base of the natural logarithm}
+%
+\fitem{real}{sqrt2}{}{
+The square root of 2}
+%
+\fitem{real}{log2}{}{
+The natural logarithm of 2}
+%
+\fitem{real}{log10}{}{
+The natural logarithm of 10}
+%
+\end{description}
+
+\section{Special Values}
+
+\begin{description}
+\fitem{real}{not\_a\_number}{}{
+Not-a-number, a special non-finite real value returned to signal an error}
+%
+\fitem{real}{positive\_infinity}{}{
+ Positive infinity, a special non-finite real value larger than all
+  finite numbers}
+%
+\fitem{real}{negative\_infinity}{}{
+ Negative infinity, a special non-finite real value smaller than all
+  finite numbers}
+%
+\fitem{real}{machine\_precision}{}{
+The smallest number $x$ such that $(x + 1) \neq 1$ in floating-point
+arithmetic on the current hardware platform}
+%
+\end{description}
+
+
+\section{Log Probability Function}\label{get-lp.section}
+
+The basic purpose of a Stan program is to compute a log probability
+function and its derivatives.  The log probability function in a Stan
+model outputs the log density on the unconstrained scale.  A log
+probability accumulator starts at zero and is then incremented in
+various ways by a Stan program.  The variables are first transformed
+from unconstrained to constrained, and the log Jacobian determinant
+added to the log probability accumulator.  Then the model block is
+executed on the constrained parameters, with each sampling statement
+(\Verb|~|) and log probability increment statement
+(\code{increment\_log\_prob}) adding to the accumulator.  At the end
+of the model block execution, the value of the log probability
+accumulator is the log probability value returned by the Stan program.
+
+Stan provides a special built-in function \code{target()} that takes no
+arguments and returns the current value of the log probability
+accumulator.%
+%
+\footnote{This function used to be called \code{get\_lp()}, but that
+  name has been deprecated; using it will print a warning.  The
+  function \code{get\_lp()} will be removed in a future release.}
+
+This function is primarily useful for debugging purposes, where for
+instance, it may be used with a print statement to display the log
+probability accumulator at various stages of execution to see where it
+becomes ill defined.
+
+\begin{description}
+  \fitem{real}{target}{}{
+    Returns the current value of the log probability
+    accumulator.}
+  \fitem{real}{get\_lp}{}{
+    Returns the current value of the log probability
+    accumulator; {\bfseries deprecated:} --- use \code{target()} instead).}
+\end{description}
+
+Both \code{target} and the deprecated \code{get\_lp} act like other
+functions ending in \code{\_lp}, meaning that they may only may only
+be used in the model block.
+
+\section{Logical Functions}
+
+Like C++, BUGS, and R, Stan uses 0 to encode false, and 1 to encode
+true.  Stan supports the usual boolean comparison operations and
+boolean operators.  These all have the same syntax and precedence as
+in \Cpp; for the full list of operators and precedences, see
+the reference manual.
+
+
+\subsection{Comparison Operators}
+
+All comparison operators return boolean values, either 0 or 1.  Each
+operator has two signatures, one for integer comparisons and one for
+floating-point comparisons.  Comparing an integer and real value is
+carried out by first promoting the integer value.
+%
+\begin{description}
+  %
+  \fitemnobody{int}{operator<}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator<}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is less than \farg{y} and 0 otherwise.
+    \[
+    \mbox{\code{operator<}}(x,y)
+    =
+    \begin{cases}
+      1 & \text{if $x < y$} \\
+      0 & \text{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemnobody{int}{operator<=}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator<=}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is less than or equal \farg{y} and 0 otherwise.
+    \[
+    \mbox{\code{operator<=}}(x,y)
+    = \begin{cases}
+        1 & \text{if $x \leq y$} \\
+        0 & \text{otherwise}
+      \end{cases}
+    \]}
+  %
+  \fitemnobody{int}{operator>}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator>}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is greater than \farg{y} and 0 otherwise.
+    \[
+    \mbox{\code{operator>}}
+    =
+    \begin{cases}
+      1 & \text{if $x > y$} \\
+      0 & \text{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemnobody{int}{operator>=}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator>=}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is greater than or equal to \farg{y}
+    and 0 otherwise.
+    \[
+    \mbox{\code{operator>=}}
+    =
+    \begin{cases}
+      1 & \text{if $x \geq y$} \\
+      0 & \text{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemnobody{int}{operator{==}}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator{==}}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is equal to \farg{y} and 0 otherwise.
+    \[
+    \mbox{\code{operator==}}(x,y) =
+    \begin{cases}
+      1 & \text{if $x = y$} \\
+      0 & \text{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemindexnobody{int}{operator!=}{int \farg{x}, int \farg{y}}{operator"!"=}
+  \fitemindex{int}{operator!=}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is not equal to \farg{y} and 0 otherwise.
+    \[
+    \mbox{\code{operator!=}}(x,y)
+    =
+    \begin{cases}
+      1 & \text{if $x \neq y$} \\
+      0 & \text{otherwise}
+    \end{cases}
+    \]}{operator"!"=}
+  %
+\end{description}
+
+
+\subsection{Boolean Operators}
+
+Boolean operators return either 0 for false or 1 for true.  Inputs may
+be any real or integer values, with non-zero values being treated as
+true and zero values treated as false.  These operators have the usual
+precedences, with negation (not) binding the most tightly, conjunction
+the next and disjunction the weakest; all of the operators bind more
+tightly than the comparisons.  Thus an expression such as
+\code{!a~\&\&~b} is interpreted as \code{(!a)~\&\&~b}, and
+\code{a~<~b~||~c~>=~d~\&\&~e~!=~f} as
+\code{(a~<~b)~||~(((c~>=~d)~\&\&~(e~!=~f)))}.
+%
+\begin{description}
+  %
+  \fitemindexnobody{int}{operator!}{int \farg{x}}{operator"!}
+  \fitemindex{int}{operator!}{real \farg{x}}{
+    Returns 1 if \farg{x} is zero and 0 otherwise.
+    \[
+    \mbox{\code{operator!}}(x)
+    =
+    \begin{cases}
+      0 & \text{if $x \neq 0$} \\
+      1 & \text{if $x = 0$}
+    \end{cases}
+    \]}{operator"!}
+  %
+  \fitemnobody{int}{operator{\&\&}}{int \farg{x}, int \farg{y}}
+  \fitem{int}{operator{\&\&}}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is unequal to 0 and \farg{y} is unequal to 0.
+    \[
+    \mbox{\code{operator\&\&}}(x,y)
+    =
+    \begin{cases}
+      1 & \text{if $x \neq 0$} \text{ and } y \neq 0\\
+      0 & \text{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemindexnobody{int}{operator||}{int \farg{x}, int \farg{y}}{operator"|"|}
+  \fitemindex{int}{operator||}{real \farg{x}, real \farg{y}}{
+    Returns 1 if \farg{x} is unequal to 0 or \farg{y} is unequal to 0.
+    \[
+    \mbox{\code{operator||}}(x,y) =
+    \begin{cases}
+      1 & \text{if $x \neq 0$} \textrm{ or } y \neq 0\\
+      0 & \text{otherwise}
+    \end{cases}
+    \]
+  }{operator"|"|}
+  %
+\end{description}
+
+
+\subsubsection{Boolean Operator Short Circuiting}
+
+Like in \Cpp, the boolean operators \Verb/&&/ and \Verb/||/ and are
+implemented to short circuit directly to a return value after
+evaluating the first argument if it is sufficient to resolve the
+result.  In evaluating \code{a~||~b}, if \code{a} evaluates to a value
+other than zero, the expression returns the value 1 without evaluating
+the expression \code{b}.  Similarly, evaluating \code{a~\&\&~b} first
+evaluates \code{a}, and if the result is zero, returns 0 without
+evaluating \code{b}.
+
+
+\subsection{Logical Functions}
+
+The logical functions introduce conditional behavior functionally and
+are primarily provided for compatibility with BUGS and JAGS.
+%
+\begin{description}
+  %
+  \fitem{real}{step}{real \farg{x}}{
+    Returns 1 if \farg{x} is positive and 0 otherwise.
+    \[
+    \mbox{step}(x) =
+    \begin{cases}
+      0 & \mbox{if } x < 0   \\
+      1 & \mbox{otherwise}
+    \end{cases}
+    \]
+{\it Warning:} \code{int\_step(0)} and \code{int\_step(NaN)} return 0
+whereas \code{step(0)} and \code{step(NaN)} return 1.}
+%
+\end{description}
+%
+The step function is often used in BUGS to perform conditional
+operations.  For instance, \code{step(a\,-\,b)} evaluates to 1 if
+\code{a} is greater than \code{b} and evaluates to 0 otherwise.
+\code{step} is a step-like functions; see the warning in
+\refsection{step-functions} applied to expressions dependent on
+parameters.
+
+
+\begin{description}
+  %
+  \fitem{int}{is\_inf}{real \farg{x}}{
+    Returns \farg{1} if \farg{x} is infinite (positive or negative) and \farg{0} otherwise.
+  }
+  %
+\end{description}
+%
+\begin{description}
+  %
+  \fitem{int}{is\_nan}{real \farg{x}}{
+    Returns \farg{1} if \farg{x} is NaN and \farg{0} otherwise.
+  }
+  %
+\end{description}
+%
+Care must be taken because both of these indicator functions are
+step-like and thus can cause discontinuities in gradients when applied
+to parameters; see \refsection{step-functions} for details.
+
+\section{Real-Valued Arithmetic Operators}\label{real-valued-arithmetic-operators.section}
+
+The arithmetic operators are presented using \Cpp notation.  For
+instance \code{operator+(x,y)} refers to the binary addition operator
+and \code{operator-(x)} to the unary negation operator.  In Stan
+programs, these are written using the usual infix and prefix notations
+as \code{x~+~y} and \code{-x}, respectively.
+
+\subsection{Binary Infix Operators}
+
+\begin{description}
+  %
+  \fitem{real}{operator+}{real \farg{x}, real \farg{y}}{
+    Returns the sum of \farg{x} and \farg{y}.
+    \[
+    (x + y) = \mbox{\code{operator+}}(x,y) = x+y
+    \]}
+  %
+  \fitem{real}{operator-}{real \farg{x}, real \farg{y}}{
+    Returns the difference between \farg{x} and \farg{y}.
+    \[
+    (x - y) = \mbox{operator-}(x,y) = x - y
+    \]}
+  %
+  \fitem{real}{operator*}{real \farg{x}, real \farg{y}}{
+    Returns the product of \farg{x} and \farg{y}.
+    \[
+    (x * y) = \mbox{operator*}(x,y) = xy
+    \]}
+  %
+  \fitem{real}{operator/}{real \farg{x}, real \farg{y}}{
+    Returns the quotient of \farg{x} and \farg{y}.
+    \[
+    (x / y) = \mbox{operator/}(x,y) = \frac{x}{y}
+    \]}
+  %
+  \fitem{real}{operator\textasciicircum}{real \farg{x}, real \farg{y}}{
+    Return \farg{x} raised to the power of \farg{y}.
+    \[
+    (x\mbox{\textasciicircum}y)
+    = \mbox{operator\textasciicircum}(x,y) = x^y
+    \]}
+  %
+\end{description}
+
+\subsection{Unary Prefix Operators}
+
+\begin{description}
+  %
+  \fitem{real}{operator-}{real \farg{x}}{
+    Returns the negation of the subtrahend \farg{x}.
+    \[
+    \mbox{\code{operator-}}(x) = (-x)
+    \]}
+  %
+  \fitem{real}{operator+}{real \farg{x}}{
+    Returns the value of \farg{x}.
+    \[
+    \mbox{\code{operator+}}(x) = x
+    \]}
+\end{description}
+
+
+\section{Step-like Functions}\label{step-functions.section}
+
+{\it {\bf Warning:} These functions can seriously hinder sampling and
+  optimization efficiency for gradient-based methods (e.g., NUTS, HMC,
+  BFGS) if applied to parameters (including transformed parameters and
+  local variables in the transformed parameters or model block).  The
+  problem is that they break gradients due to discontinuities coupled with
+  zero gradients elsewhere.  They do not hinder sampling when used in the
+  data, transformed data, or generated quantities blocks.}
+
+\subsection{Absolute Value Functions}
+
+\begin{description}
+%
+
+  \fitemUnaryVec{fabs}{absolute value of \farg{x}}{
+    \[
+    \mbox{\code{abs}}(x) = |x|
+    \]
+    See the warning at start of \refsection{step-functions} for
+    application to parameters.
+  }
+  %
+
+  \fitem{real}{abs}{real \farg{x}}{ Returns the absolute value of
+    \farg{x}, defined by
+    \[
+    \mbox{\code{abs}}(x) = |x|
+    \]
+    See the warning at start of \refsection{step-functions} for
+    application to parameters.
+  }
+  \fitem{int}{abs}{int \farg{x}}{ Returns the absolute value of
+    \farg{x}, defined by
+    \[
+    \mbox{\code{abs}}(x) = |x|
+    \]
+  }
+  %
+  \fitem{real}{fdim}{real \farg{x}, real \farg{y}}{
+    Returns the positive difference between \farg{x} and \farg{y},
+    which is \farg{x} - \farg{y} if \farg{x} is greater than \farg{y}
+    and 0 otherwise;
+    see warning at start of \refsection{step-functions}.
+    \[
+    \mbox{\code{fdim}}(x,y) =
+    \begin{cases}
+      x-y & \mbox{if } x \geq y \\
+      0 & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+\end{description}
+
+\subsection{Bounds Functions}
+
+\begin{description}
+  %
+  \fitem{real}{fmin}{real \farg{x}, real \farg{y}}{
+    Returns the minimum of \farg{x} and \farg{y}\,;
+    see warning at start of \refsection{step-functions}.
+    \[
+    \mbox{\code{fmin}}(x,y) =
+    \begin{cases}
+      x & \mbox{if } x \leq y \\
+      y & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{fmax}{real \farg{x}, real \farg{y}}{
+    Returns the maximum of \farg{x} and \farg{y}\,;
+    see warning at start of \refsection{step-functions}.
+    \[
+    \mbox{\code{fmax}}(x,y) =
+    \begin{cases}
+      x & \mbox{if } x \geq y \\
+      y & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+\end{description}
+
+
+\subsection{Arithmetic Functions}
+%
+\begin{description}
+  %
+  \fitem{real}{fmod}{real \farg{x}, real \farg{y}}{
+    Returns the real value remainder after dividing \farg{x} by \farg{y}\,;
+    see warning at start of \refsection{step-functions}.
+    \[
+    \mbox{\code{fmod}}(x,y) = x - \left\lfloor \frac{x}{y} \right\rfloor \, y
+    \]
+  The operator $\lfloor u \rfloor$ is the floor operation; see below.}
+  %
+\end{description}
+
+
+\subsection{Rounding Functions}
+
+{\it Warning:}\ Rounding functions convert real values to integers.
+Because the output is an integer, any gradient information resulting
+from functions applied to the integer is not passed to the real value
+it was derived from.  With MCMC sampling using HMC or NUTS, the MCMC
+acceptance procedure will correct for any error due to poor gradient
+calculations, but the result is likely to be reduced acceptance
+probabilities and less efficient sampling.
+
+The rounding functions cannot be used as indices to arrays because
+they return real values.  Stan may introduce integer-valued versions
+of these in the future, but as of now, there is no good workaround.
+
+\begin{description}
+  %
+  \fitemUnaryVec{floor}{floor of \farg{x}, which is the largest integer less than or equal to \farg{x}, converted to a real value; see warning at start of \refsection{step-functions}}{
+    \[
+    \mbox{\code{floor}}(x) = \lfloor x \rfloor
+    \]}
+  %
+  \fitemUnaryVec{ceil}{ceiling of \farg{x}, which is the smallest integer greater than or equal to \farg{x}, converted to a real value; see warning at start of \refsection{step-functions}}{
+    \[
+    \mbox{\code{ceil}}(x) = \lceil x\rceil
+    \]}
+  %
+  \fitemUnaryVec{round}{nearest integer to \farg{x}, converted to a real value; see warning at start of \refsection{step-functions}}{
+    \[
+    \mbox{\code{round}}(x) =
+    \begin{cases}
+      \lceil x \rceil & \mbox{if } x-\lfloor x\rfloor \geq 0.5 \\
+      \lfloor x \rfloor & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{trunc}{integer nearest to but no larger in magnitude than \farg{x}, converted to a double value; see warning at start of \refsection{step-functions}}{
+    \[
+    \mbox{\code{trunc}}(x) = \lfloor x \rfloor
+    \]
+  Note that this function is redundant with \code{floor}.}
+  %
+\end{description}
+
+
+\section{Power and Logarithm Functions}
+%
+\begin{description}
+  %
+  \fitemUnaryVec{sqrt}{square root of \farg{x}}{
+    \[
+    \mbox{\code{sqrt}}(x) =
+    \begin{cases}
+      \sqrt{x} & \mbox{if } x\geq 0\\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{cbrt}{cube root of \farg{x}}{
+    \[
+    \mbox{\code{cbrt}}(x) = \sqrt[3]{x}
+    \]}
+  %
+  \fitemUnaryVec{square}{square of \farg{x}}{
+    \[
+    \mbox{\code{square}}(x) = x^2
+    \]}
+  %
+  \fitemUnaryVec{exp}{natural exponential of \farg{x}}{
+    \[
+    \mbox{\code{exp}}(x) \ = \ \exp(x)
+    \ = \ e^x
+    \]}
+  %
+  \fitemUnaryVec{exp2}{base-2 exponential of \farg{x}}{
+    \[
+    \mbox{\code{exp2}}(x) = 2^x
+    \]}
+  %
+  \fitemUnaryVec{log}{natural logarithm of \farg{x}}{
+    \[
+    \mbox{\code{log}}(x) = \log x =
+    \begin{cases}
+      \log_{e}(x) & \mbox{if } x \geq 0 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{log2}{base-2 logarithm of \farg{x}}{
+    \[
+    \mbox{\code{log2}}(x) =
+    \begin{cases}
+      \log_2(x) & \mbox{if } x\geq 0 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{log10}{base-10 logarithm of \farg{x}}{
+    \[
+    \mbox{\code{log10}}(x) =
+    \begin{cases}
+      \log_{10}(x) & \mbox{if } x \geq 0 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{pow}{real \farg{x}, real \farg{y}}{
+    Returns \farg{x} raised to the power of \farg{y}.
+    \[
+    \mbox{\code{pow}}(x,y) = x^y
+    \]}
+  %
+  \fitemUnaryVec{inv}{inverse of \farg{x}}{
+    \[
+    \mbox{\code{inv}}(x) = \frac{1}{x}
+    \]}
+  %
+  \fitemUnaryVec{inv\_sqrt}{inverse of the square root of \farg{x}}{
+    \[
+    \mbox{\code{inv\_sqrt}}(x) =
+    \begin{cases}
+      \frac{1}{\sqrt{x}} & \mbox{if } x \geq 0 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{inv\_square}{inverse of the square of \farg{x}}{
+    \[
+    \mbox{\code{inv\_square}}(x) = \frac{1}{x^2}
+    \]}
+  %
+\end{description}
+
+
+\section{Trigonometric Functions}
+%
+\begin{description}
+  %
+  \fitem{real}{hypot}{real \farg{x}, real \farg{y}}{
+    Returns the length of the hypotenuse of a right triangle with sides of
+    length \farg{x} and \farg{y}.
+    \[
+    \mbox{\code{hypot}}(x,y) =
+    \begin{cases}
+      \sqrt{x^2+y^2} & \mbox{if } x,y\geq 0 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{cos}{cosine of the angle \farg{x} (in radians)}{
+    \[
+    \mbox{\code{cos}}(x) = \cos(x)
+    \]}
+  %
+  \fitemUnaryVec{sin}{sine of the angle \farg{x} (in radians)}{
+    \[
+    \mbox{\code{sin}}(x) = \sin(x)
+    \]}
+  %
+  \fitemUnaryVec{tan}{tangent of the angle \farg{x} (in radians)}{
+    \[
+    \mbox{tan}(x) = \tan(x)
+    \]}
+  %
+  \fitemUnaryVec{acos}{principal arc (inverse) cosine (in radians) of \farg{x}}{
+    \[
+    \mbox{\code{acos}}(x) =
+    \begin{cases}
+      \arccos(x) & \mbox{if } -1\leq x\leq 1 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{asin}{principal arc (inverse) sine (in radians) of \farg{x}}{
+    \[
+    \mbox{\code{asin}}(x) =
+    \begin{cases}
+      \arcsin(x) & \mbox{if } -1\leq x\leq 1 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{atan}{principal arc (inverse) tangent (in radians) of
+    \farg{x}, with values from $-\pi$ to $\pi$}{
+    \[
+    \mbox{\code{atan}}(x) = \arctan(x)
+    \]}
+  %
+  \fitem{real}{atan2}{real \farg{y}, real \farg{x}}{
+    Returns the principal arc (inverse) tangent (in radians) of \farg{y} divided
+    by \farg{x},
+    \[
+    \mbox{\code{atan2}}(y, x) = \arctan\left(\frac{y}{x}\right)
+    \]}
+  %
+\end{description}
+
+
+\section{Hyperbolic Trigonometric Functions}
+%
+\begin{description}
+  %
+  \fitemUnaryVec{cosh}{hyperbolic cosine of \farg{x} (in radians)}{
+    \[
+    \mbox{\code{cosh}}(x) = \cosh(x)
+    \]}
+  %
+  \fitemUnaryVec{sinh}{hyperbolic sine of \farg{x} (in radians)}{
+    \[
+    \mbox{\code{sinh}}(x) = \sinh(x)
+    \]}
+  %
+  \fitemUnaryVec{tanh}{hyperbolic tangent of \farg{x} (in radians)}{
+    \[
+    \mbox{\code{tanh}}(x) = \tanh(x)
+    \]}
+  %
+  \fitemUnaryVec{acosh}{inverse hyperbolic cosine (in radians)}{
+    %
+    \[
+    \mbox{\code{acosh}}(x) =
+    \begin{cases}
+      \cosh^{-1}(x) & \mbox{if } x \geq 1 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{asinh}{inverse hyperbolic cosine (in radians)}{
+    %
+    \[
+    \mbox{\code{asinh}}(x) = \sinh^{-1}(x)
+    \]}
+  %
+  \fitemUnaryVec{atanh}{inverse hyperbolic tangent (in radians) of \farg{x}}{
+    \[
+    \mbox{\code{atanh}}(x) =
+    \begin{cases}
+      \tanh^{-1}(x) & \mbox{if } -1\leq x \leq 1 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+\end{description}
+
+
+\section{Link Functions}\label{link-functions.section}
+
+The following functions are commonly used as link functions in
+generalized linear models.  The function $\Phi$ is also
+commonly used as a link function (see \refsection{Phi-function}).
+%
+\begin{description}
+  %
+  \fitemUnaryVec{logit}{log odds, or logit, function applied to \farg{x}}{
+    \[
+    \mbox{\code{logit}}(x) =
+    \begin{cases}
+      \log\frac{x}{1-x} & \mbox{if } 0\leq x \leq 1 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]
+  }
+  %
+  \fitemUnaryVec{inv\_logit}{logistic sigmoid function applied to \farg{x}}{
+    \[
+    \mbox{\code{inv\_logit}}(x) = \frac{1}{1 + \exp(-x)}
+    \]}
+  %
+  \fitemUnaryVec{inv\_cloglog}{inverse of the complementary log-log
+    function applied to \farg{x}}{
+    \[
+    \mbox{\code{inv\_cloglog}}(x) = 1 - \exp \! \left( - \exp(x) \right)
+    \]}
+  %
+\end{description}
+
+
+\section{Probability-Related Functions}\label{Phi-function.section}
+
+\subsection{Normal Cumulative Distribution Functions}
+
+The error function erf is related to the standard normal cumulative
+distribution function $\Phi$ by scaling.  See
+\refsection{normal-distribution} for the general normal cumulative
+distribution function (and its complement).
+%
+\begin{description}
+  %
+  \fitemUnaryVec{erf}{error function, also known as the Gauss error function, of \farg{x}}{
+    \[
+    \mbox{\code{erf}}(x) = \frac{2}{\sqrt{\pi}}\int_0^x e^{-t^2}dt
+    \]}
+  %
+  \fitemUnaryVec{erfc}{complementary error function of \farg{x}}{
+    \[
+    \mbox{\code{erfc}}(x) = \frac{2}{\sqrt{\pi}}\int_x^\infty e^{-t^2}dt
+    \]}
+  %
+  \fitemUnaryVecSort{Phi}{standard normal cumulative distribution function of \farg{x}}{
+    \[
+    \mbox{\code{Phi}}(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^{x} e^{-t^2/2} dt
+    \]}{phi}
+  %
+  \fitemUnaryVec{inv\_Phi}{standard normal inverse cumulative distribution function of \farg{p}, otherwise known as the quantile function}{
+    \[
+    \mbox{\code{Phi(inv\_Phi(p))}} = p
+    \]}
+  %
+  \fitemUnaryVecSort{Phi\_approx}{fast approximation of the unit (may
+    replace \code{Phi} for probit regression with maximum absolute error
+    of 0.00014, see \citep{BowlingEtAl:2009} for details)}{
+    \[
+    \mbox{\code{Phi\_approx}}(x) = \mbox{logit}^{-1}(0.07056 \, x^3 + 1.5976 \, x)
+    \]}{phi\_approx}
+\end{description}
+
+\subsection{Other Probability-Related Functions}
+
+\begin{description}
+  %
+  \fitem{real}{binary\_log\_loss}{int \farg{y}, real \farg{y\_hat}}{
+    Returns the log loss function for for predicting $\hat{y} \in [0,1]$ for
+    boolean outcome $y \in \setlist{0,1}$.
+    \[
+    \mbox{\code{binary\_log\_loss}}(y,\hat{y}) =
+    \begin{cases}
+      -\log \hat{y}       & \mbox{if } y = 0\\
+      -\log (1 - \hat{y}) & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{owens\_t}{real \farg{h}, real \farg{a}}{
+    Returns the Owen's T function for the probability of the event $X > h$
+    and $0<Y<aX$ where \farg{X} and \farg{Y} are independent standard
+    normal random variables.
+    \[
+    \mbox{\code{owens\_t}}(h,a)
+    = \frac{1}{2\pi} \int_0^a \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx
+    \]}
+  %
+\end{description}
+
+
+
+\section{Combinatorial Functions}\label{betafun.section}
+%
+
+\begin{description}
+  %
+  \fitem{real}{inc\_beta}{real \farg{alpha}, real \farg{beta}, real
+    \farg{x}}{ Returns the incomplete beta function up to \farg{x}
+    applied to \farg{alpha} and \farg{beta}.  See
+    \refsection{inc-beta-appendix} for a definition.  }
+  %
+  \fitem{real}{lbeta}{real \farg{alpha}, real \farg{beta}}{
+    Returns the natural logarithm of the beta function applied to
+    \farg{alpha} and \farg{beta}.  The beta function, $\mbox{B}(\alpha,\beta)$,
+    computes the normalizing constant for the beta distribution, and
+    is defined for $\alpha > 0$ and $\beta > 0$.
+    \[
+    \mbox{\code{lbeta}}(\alpha,\beta)
+    = \log \Gamma(a) + \log \Gamma(b) - \log \Gamma(a+b)
+    \]
+    See \refsection{beta-appendix} for definition of $\mbox{B}(\alpha, \beta)$.
+  }
+  %
+  \fitemUnaryVec{tgamma}{gamma function applied to \farg{x}.  The
+    gamma function is the generalization of the factorial function to
+    continuous variables, defined so that $\Gamma(n+1) = n!$.  See
+    \refsection{gamma-appendix} for a full definition of $\Gamma(x)$.
+    The function is defined for positive numbers and non-integral
+    negative numbers,}{
+    \[
+    \mbox{\code{tgamma}}(x)
+    =
+    \begin{cases}
+      \Gamma(x) & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
+      \textrm{error} & \mbox{otherwise}
+    \end{cases}
+    \]
+    %
+    See \refsection{gamma-appendix} for a definition of $\Gamma(x)$.
+  }
+  %
+  \fitemUnaryVec{lgamma}{natural logarithm of the gamma function
+    applied to \farg{x},}{
+    \[
+    \mbox{\code{lgamma}}(x)
+    =
+    \begin{cases}
+      \log\Gamma(x)   & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
+      \textrm{error} & \mbox{otherwise}
+    \end{cases}
+    \]
+  }
+  %
+  \fitemUnaryVec{digamma}{digamma function applied to \farg{x}.  The digamma function is the derivative of the natural logarithm of the Gamma function.  The function is defined  for positive numbers and non-integral negative numbers}{
+    \[
+    \mbox{\code{digamma}}(x)
+    =
+    \begin{cases}
+      \frac{\Gamma'(x)}{\Gamma(x)}  & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
+      \textrm{error}                & \mbox{otherwise}
+    \end{cases}
+    \]
+    See \refsection{gamma-appendix} for definition of $\Gamma(x)$.}
+  %
+  \fitemUnaryVec{trigamma}{trigamma function applied to \farg{x}.  The trigamma function is the second derivative of the natural logarithm of the Gamma function}{
+    \[
+    \mbox{\code{trigamma}}(x)
+    =
+    \begin{cases}
+      \sum_{n=0}^\infty \frac{1}{(x+n)^2}        & \mbox{if } x\not\in
+      \{\dots,-3,-2,-1,0\}
+      \\[6pt]
+      \textrm{error}                           & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{lmgamma}{int \farg{n}, real \farg{x}}{
+    Returns the natural logarithm of the multivariate gamma function
+    $\Gamma_n$ with \farg{n} dimensions applied to \farg{x}.
+    \[
+    \mbox{\code{lmgamma}}(n,x)
+    =
+    \begin{cases}
+      \frac{n(n-1)}{4} \log \pi + \sum_{j=1}^n \log \Gamma\left(x + \frac{1 - j}{2}\right)
+                     & \mbox{if } x\not\in \{\dots,-3,-2,-1,0\}\\
+      \textrm{error} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{gamma\_p}{real \farg{a}, real \farg{z}}{ Returns the
+    normalized lower incomplete gamma function of \farg{a} and
+    \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.
+    \[
+    \mbox{\code{gamma\_p}}(a,z)
+    =
+    \begin{cases}
+      \frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt & \mbox{if } a > 0, z \geq 0 \\
+      \textrm{error} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{gamma\_q}{real \farg{a}, real \farg{z}}{ Returns the
+    normalized upper incomplete gamma function of \farg{a} and
+    \farg{z} defined for positive \farg{a} and nonnegative \farg{z}.
+    \[
+    \mbox{\code{gamma\_q}}(a,z) =
+    \begin{cases}
+      \frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt & \mbox{if } a > 0, z \geq 0 \\[6pt]
+      \textrm{error} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{binomial\_coefficient\_log}{real \farg{x}, real
+    \farg{y}}{
+    {\it Warning:} This function is deprecated and should
+    be replaced with \code{lchoose}.
+
+    Returns the natural logarithm of the binomial coefficient
+    of \farg{x} and \farg{y}. For non-negative integer inputs, the
+    binomial coefficient function is written as $\binom{x}{y}$ and
+    pronounced ``\farg{x} choose \farg{y}.''  This function
+    generalizes to real numbers using the gamma function.
+
+    For $0 \leq y \leq x$,
+    \[
+    \mbox{\code{binomial\_coefficient\_log}}(x,y)
+    = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1).
+    \]}
+  %
+  \fitem{int}{choose}{int \farg{x}, int \farg{y}}{
+    Returns the binomial coefficient of \farg{x} and \farg{y}. For
+    non-negative integer inputs, the binomial coefficient function
+    is written as $\binom{x}{y}$ and pronounced ``\farg{x} choose
+    \farg{y}.'' In its the antilog of the \code{lchoose} function
+    but returns an integer rather than a real number with no
+    non-zero decimal places.
+
+    For $0 \leq y \leq x$, the binomial coefficient function can be
+    defined via the factorial function
+    \[
+    \mbox{\code{choose}}(x,y)
+    = \frac{x!}{\left(y!\right)\left(x - y\right)!}.
+    \]}
+  %
+  \fitem{real}{bessel\_first\_kind}{int \farg{v}, real \farg{x}}{
+    Returns the Bessel function of the first kind with order \farg{v}
+    applied to \farg{x}.
+    \[
+    \mbox{\code{bessel\_first\_kind}}(v,x) =  J_v(x),
+    \]
+    where
+    %
+    \[
+    J_v(x)=\left(\frac{1}{2}x\right)^v
+    \sum_{k=0}^\infty \frac{\left(-\frac{1}{4}x^2\right)^k}{k!\, \Gamma(v+k+1)}
+    \]}
+  %
+  \fitem{real}{bessel\_second\_kind}{int \farg{v}, real \farg{x}}{
+    Returns the Bessel function of the second kind with order \farg{v}
+    applied to \farg{x} defined for positive \farg{x} and \farg{v}.
+
+    For $x,v > 0$,
+    \[
+    \mbox{\code{bessel\_second\_kind}}(v,x) =
+    \begin{cases}
+      Y_v(x) & \mbox{if } x > 0 \\
+      \textrm{error} & \mbox{otherwise}
+    \end{cases}
+    \]
+    where
+    \[
+    Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)}
+    \]}
+  %
+  \fitem{real}{modified\_bessel\_first\_kind}{int \farg{v}, real
+    \farg{z}}{ Returns the modified Bessel function of the first kind
+    with order \farg{v} applied to \farg{z} defined for all \farg{z}
+    and \farg{v}.
+    \[
+    \mbox{\code{modified\_bessel\_first\_kind}}(v,z) = I_v(z)
+    \]
+    where
+    %
+    \[
+      {I_v}(z)
+        = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
+           \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)}
+    \]}
+  %
+  \fitem{real}{modified\_bessel\_second\_kind}{int \farg{v}, real \farg{z}}{
+    Returns the modified Bessel function of the second kind with order \farg{v}
+    applied to \farg{z} defined for  positive \farg{z} and \farg{v}.
+
+    \[
+    \mbox{modified\_bessel\_second\_kind}(v,z) =
+    \begin{cases}
+      K_v(z) & \mbox{if } z > 0 \\
+      \textrm{error} & \mbox{if } z \leq 0
+    \end{cases}
+    \]
+    where
+    \[
+      {K_v}(z)
+      =
+      \frac{\pi}{2}\cdot\frac{I_{-v}(z) - I_{v}(z)}{\sin(v\pi)}
+    \]}
+  %
+  \fitem{real}{falling\_factorial}{real \farg{x}, real \farg{n}}{
+    Returns the falling factorial of \farg{x} with power \farg{n}
+    defined for positive \farg{x} and real \farg{n}.
+    \[
+    \mbox{\code{falling\_factorial}}(x,n) =
+    \begin{cases}
+      (x)_n          & \mbox{if } x > 0 \\
+      \textrm{error} & \mbox{if } x \leq 0
+    \end{cases}
+    \]
+    where
+    \[
+    (x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)}
+    \]}
+  %
+  \fitem{real}{lchoose}{real \farg{x}, real \farg{y}}{ Returns the
+    natural logarithm of the generalized binomial coefficient of
+    \farg{x} and \farg{y}. For non-negative integer inputs, the
+    binomial coefficient function is written as $\binom{x}{y}$ and
+    pronounced ``\farg{x} choose \farg{y}.''  This function
+    generalizes to real numbers using the gamma function.
+
+    For $0 \leq y \leq x$,
+    \[
+    \mbox{\code{binomial\_coefficient\_log}}(x,y)
+    = \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1).
+    \]}
+  %
+  \fitem{real}{log\_falling\_factorial}{real \farg{x}, real \farg{n}}{
+    Returns the log of the falling factorial of \farg{x} with power
+    \farg{n} defined for positive \farg{x} and real \farg{n}.
+    \[
+    \mbox{\code{log\_falling\_factorial}}(x,n) =
+    \begin{cases}
+      \log (x)_n      & \mbox{if } x > 0 \\
+      \textrm{error} & \mbox{if } x \leq 0
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{rising\_factorial}{real \farg{x}, real \farg{n}}{
+    Returns the rising factorial of \farg{x} with power \farg{n}
+    defined for positive \farg{x} and real \farg{n}.
+    \[
+    \mbox{\code{rising\_factorial}}(x,n) =
+    \begin{cases}
+      x^{(n)}         & \mbox{if } x > 0 \\
+      \textrm{error} & \mbox{if } x \leq 0
+    \end{cases}
+    \]
+    where
+    \[
+    x^{(n)}=\frac{\Gamma(x+n)}{\Gamma(x)}
+    \]}
+  %
+  \fitem{real}{log\_rising\_factorial}{real \farg{x}, real \farg{n}}{
+    Returns the log of the rising factorial of \farg{x} with power
+    \farg{n} defined for positive \farg{x} and real \farg{n}.
+    \[
+    \mbox{\code{log\_rising\_factorial}}(x,n) =
+    \begin{cases}
+      \log x^{(n)}     & \mbox{if } x > 0 \\
+      \textrm{error} & \mbox{if } x \leq 0
+    \end{cases}
+    \]}
+  %
+\end{description}
+
+
+\section{Composed Functions}\label{composed-functions.section}
+
+The functions in this section are equivalent in theory to combinations
+of other functions.  In practice, they are implemented to be more
+efficient and more numerically stable than defining them directly
+using more basic Stan functions.
+%
+\begin{description}
+  %
+  \fitemUnaryVec{expm1}{natural exponential of \farg{x} minus 1}{
+    \[
+    \mbox{\code{expm1}}(x) = e^x - 1
+    \]}
+  %
+  \fitem{real}{fma}{real \farg{x}, real \farg{y}, real \farg{z}}{
+    Returns \farg{z} plus the result of \farg{x} multiplied by \farg{y}.
+    \[
+    \mbox{\code{fma}}(x,y,z) = (x \times y) + z
+    \]}
+  %
+  \fitem{real}{multiply\_log}{real \farg{x}, real \farg{y}}{
+    {\it Warning:} This function is deprecated and should be replaced
+    with \code{lmultiply}.
+
+    Returns the product of \farg{x} and the natural logarithm
+    of \farg{y}.
+    \[
+    \mbox{\code{multiply\_log}}(x,y) =
+    \begin{cases}
+      0 & \mbox{if } x = y = 0 \\
+      x \log y & \mbox{if } x, y \neq 0 \\
+      \mbox{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{lmultiply}{real \farg{x}, real \farg{y}}{
+    Returns the product of \farg{x} and the natural logarithm
+    of \farg{y}.
+    \[
+    \mbox{\code{lmultiply}}(x,y) =
+    \begin{cases}
+      0 & \mbox{if } x = y = 0 \\
+      x \log y & \mbox{if } x, y \neq 0 \\
+      \mbox{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{log1p}{natural logarithm of 1 plus \farg{x}}{
+    \[
+    \mbox{\code{log1p}}(x) =
+    \begin{cases}
+      \log(1+x)& \mbox{if } x \geq -1 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{log1m}{natural logarithm of 1 minus \farg{x}}{
+    \[
+    \mbox{\code{log1m}}(x) =
+    \begin{cases}
+      \log(1-x) & \mbox{if } x \leq 1 \\
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitemUnaryVec{log1p\_exp}{natural logarithm of one plus the natural exponentiation of \farg{x}}{
+    \[
+    \mbox{\code{log1p\_exp}}(x) = \log(1+\exp(x))
+    \]}
+  %
+  \fitemUnaryVec{log1m\_exp}{logarithm of one minus the natural exponentiation of \farg{x}}{
+    \[
+    \mbox{\code{log1m\_exp}}(x) =
+    \begin{cases}
+      \log(1-\exp(x)) & \mbox{if } x < 0 \\
+      \textrm{NaN} & \mbox{if } x \geq 0
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{log\_diff\_exp}{real \farg{x}, real \farg{y}}{
+    Returns the natural logarithm of the difference of the natural exponentiation
+    of \farg{x} and the natural exponentiation of \farg{y}.
+    \[
+    \mbox{\code{log\_diff\_exp}}(x,y) =
+    \begin{cases}
+      \log(\exp(x)-\exp(y)) & \mbox{if } x > y \\[6pt]
+      \textrm{NaN} & \mbox{otherwise}
+    \end{cases}
+    \]}
+  %
+  \fitem{real}{log\_mix}{real \farg{theta}, real \farg{lp1}, real
+    \farg{lp2}}{
+    Returns the log mixture of the log densities \farg{lp1} and
+    \farg{lp2} with mixing proportion \farg{theta}, defined by
+    \begin{eqnarray*}
+      \mbox{\code{log\_mix}}(\theta, \lambda_1, \lambda_2)
+      & = & \log \!\left( \theta \exp(\lambda_1)
+      + \left( 1 - \theta \right) \exp(\lambda_2)
+    \right)
+    \\[3pt]
+    & = & \mbox{\code{log\_sum\_exp}}\!\left(\log(\theta) + \lambda_1, \
+                               \log(1 - \theta) + \lambda_2\right).
+    \end{eqnarray*}
+  %
+  \fitem{real}{log\_sum\_exp}{real \farg{x}, real \farg{y}}{
+    Returns the natural logarithm of the sum of the natural exponentiation
+    of \farg{x} and the natural exponentiation of \farg{y}.
+    \[
+    \mbox{\code{log\_sum\_exp}}(x,y) = \log(\exp(x)+\exp(y))
+    \]}
+  %
+  \fitemUnaryVec{log\_inv\_logit}{natural logarithm of the inverse logit function of \farg{x}}{
+    \[
+    \mbox{\code{log\_inv\_logit}}(x) = \log \, \mbox{logit}^{-1}(x)
+    \]
+  See \refsection{link-functions} for a definition of inverse logit.}
+  %
+  \fitemUnaryVec{log1m\_inv\_logit}{natural logarithm of 1 minus the inverse logit function of \farg{x}}{
+    \[
+    \mbox{\code{log1m\_inv\_logit}}(x) = \log(1 - \mbox{logit}^{-1}(x))
+    \]
+  See \refsection{link-functions} for a definition of inverse logit.}
+}
+
+\end{description}
+
+
+
+
+\chapter{Array Operations}
+
+\section{Reductions}\label{array-reductions.section}
+
+The following operations take arrays as input and produce single
+output values.  The boundary values for size 0 arrays are the unit
+with respect to the combination operation (min, max, sum, or product).
+%
+
+\subsection{Minimum and Maximum}
+
+\begin{description}
+\fitem{real}{min}{real[] \farg{x}}{
+The minimum value in \farg{x}, or $+\infty$ if \farg{x} is size 0.}
+%
+\fitem{int}{min}{int[] \farg{x}}{
+The minimum value in \farg{x}, or error if \farg{x} is size 0.}
+%
+\fitem{real}{max}{real[] \farg{x}}{
+The maximum value in \farg{x}, or $-\infty$ if \farg{x} is size 0.}
+%
+\fitem{int}{max}{int[] \farg{x}}{
+The maximum value in \farg{x}, or error if \farg{x} is size 0.}
+%
+\end{description}
+
+\subsection{Sum, Product, and Log Sum of Exp}
+
+\begin{description}
+%
+\fitem{int}{sum}{int[] \farg{x}}{
+The sum of the elements in \farg{x}, defined for $x$ of size $N$ by
+\[
+\mbox{\code{sum}}(x)
+=
+\begin{cases}
+\sum_{n=1}^N x_n & \mbox{if}  N > 0
+\\[4pt]
+0 & \mbox{if} N = 0
+\end{cases}
+\]
+}
+%
+\fitem{real}{sum}{real[] \farg{x}}{
+The sum of the elements in \farg{x}; see definition above.}
+%
+\fitem{real}{prod}{real[] \farg{x}}{
+The product of the elements in \farg{x}, or 1 if \farg{x} is size 0.}
+%
+\fitem{real}{prod}{int[] \farg{x}}{
+The product of the elements in \farg{x},
+\[
+\mbox{\code{product}}(x) =
+\begin{cases}
+\prod_{n=1}^N x_n & \mbox{if}  N > 0
+\\[4pt]
+1 & \mbox{if} N = 0
+\end{cases}
+\]
+}
+%
+\fitem{real}{log\_sum\_exp}{real[] \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements
+in \farg{x}, or $-\infty$ if the array is empty.}
+\end{description}
+
+
+\subsection{Sample Mean, Variance, and Standard Deviation}
+
+The sample mean, variance, and standard deviation are calculated in
+the usual way.  For i.i.d. draws from a distribution of finite
+mean, the sample mean is an unbiased estimate of the mean of the
+distribution.  Similarly, for i.i.d. draws from a distribution of
+finite variance, the sample variance is an unbiased estimate of the
+variance.%
+%
+\footnote{Dividing by $N$ rather than $(N-1)$ produces a maximum
+  likelihood estimate of variance, which is biased to underestimate
+  variance.}
+%
+The sample deviation is defined as the square root of the
+sample deviation, but is not unbiased.
+
+\begin{description}
+\fitem{real}{mean}{real[] \farg{x}}{
+The sample mean of the elements in \farg{x}.
+For an array $x$ of size
+$N > 0$,
+\[
+\mbox{\code{mean}}(x)
+\ = \
+\bar{x}
+\ = \
+\frac{1}{N} \sum_{n=1}^N x_n.
+\]
+It is an error to the call the mean function with an array of size $0$.
+}
+%
+\fitem{real}{variance}{real[] \farg{x}}{
+The sample variance of the elements in \farg{x}. For $N > 0$,
+\[
+\mbox{\code{variance}}(x)
+\ = \
+\begin{cases}
+\frac{1}{N-1} \sum_{n=1}^N (x_n - \bar{x})^2
+& \mbox{if } N > 1
+\\[4pt]
+0 & \mbox{if } N = 1
+\end{cases}
+\]
+It is an error to call the \code{variance} function with an array of size 0.
+}
+%
+\fitem{real}{sd}{real[] \farg{x}}{The sample standard deviation of
+elements in \farg{x}.
+\[
+\mbox{sd}(x)
+=
+\begin{cases}
+\sqrt{\, \mbox{\code{variance}}(x)} & \mbox{if } N > 1
+\\[4pt]
+0 & \mbox{if } N = 0
+\end{cases}
+\]
+It is an error to call the \code{sd} function with an array of size 0.
+}
+\end{description}
+
+\subsection{Euclidean Distance and Squared Distance}
+
+\begin{description}
+  \fitem{real}{distance}{vector \farg{x}, vector \farg{y}}{The
+    Euclidean distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{\code{distance}}(x,y)
+\ = \
+\sqrt{\textstyle \sum_{n=1}^N (x_n - y_n)^2}
+\]
+where \code{N} is the size of \farg{x} and \farg{y}. It is an error to
+call \code{distance} with arguments of unequal size.}
+%
+\fitem{real}{distance}{vector \farg{x}, row\_vector \farg{y}}{The
+  Euclidean distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{distance}{row\_vector \farg{x}, vector \farg{y}}{The
+  Euclidean distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{distance}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+  Euclidean distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{vector \farg{x}, vector
+  \farg{y}}{The squared Euclidean
+  distance between \farg{x} and \farg{y}, defined by
+\[
+\mbox{\code{squared\_distance}}(x,y)
+\ = \
+\mbox{\code{distance}}(x,y)^2
+\ = \
+\textstyle \sum_{n=1}^N (x_n - y_n)^2,
+\]
+where \code{N} is the size of \farg{x} and \farg{y}.  It is an error
+to call \code{squared\_distance} with arguments of unequal size.}
+%
+\fitem{real}{squared\_distance}{vector \farg{x}, row\_vector
+ [] \farg{y}}{The squared Euclidean distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, vector
+ [] \farg{y}}{The squared Euclidean distance between \farg{x} and \farg{y}}
+%
+\fitem{real}{squared\_distance}{row\_vector \farg{x}, row\_vector[] \farg{y}}{The Euclidean
+  distance between \farg{x} and \farg{y}}
+%
+\end{description}
+
+\section{Array Size and Dimension Function}
+
+The size of an array or matrix can be obtained using the \code{dims()}
+function.  The \code{dims()} function is defined to take an argument
+consisting of any variable with up to 8 array dimensions (and up to 2
+additional matrix dimensions) and returns an array of integers with
+the dimensions.  For example, if two variables are declared as follows,
+\begin{stancode}
+real x[7,8,9];
+matrix[8,9] y[7];
+\end{stancode}
+%
+then calling \code{dims(x)} or \code{dims(y)} returns an integer
+array of size 3 containing the elements 7, 8, and 9 in that order.
+
+The \code{size()} function extracts the number of elements in an
+array.  This is just the top-level elements, so if the array is
+declared as
+%
+\begin{stancode}
+real a[M,N];
+\end{stancode}
+%
+the size of \code{a} is \code{M}.
+
+The function \code{num\_elements}, on the other hand, measures all of
+the elements, so that the array \code{a} above has $M \times N$ elements.
+
+The specialized functions \code{rows()} and \code{cols()} should be
+used to extract the dimensions of vectors and matrices.
+
+\begin{description}
+\fitem{int[]}{dims}{\farg{T} \farg{x}}{Returns an integer array
+  containing the dimensions of \farg{x}; the type of the argument
+  \farg{T} can be any Stan type with up to 8 array dimensions.}
+%
+\fitem{int}{num\_elements}{\farg{T}[] \farg{x}}{Returns the total
+  number of elements in the array \farg{x} including all elements
+  in contained arrays, vectors, and matrices.
+  \farg{T} can be any array type.  For example, if \code{x} is of
+  type \code{real[4,3]} then \code{num\_elements(x)} is 12, and if
+  \code{y} is declared as \code{matrix[3,4]~y[5]}, then \code{size(y)}
+  evaluates to 60.}
+%
+\fitem{int}{size}{\farg{T}[] \farg{x}}{Returns the number of elements
+  in the array \farg{x}; the type of the array \farg{T} can be any
+  type, but the size is just the size of the top level array, not the
+  total number of elements contained.  For example, if \code{x} is of
+  type \code{real[4,3]} then \code{size(x)} is 4.}
+\end{description}
+
+\section{Array Broadcasting}\label{array-broadcasting.section}
+
+The following operations create arrays by repeating elements to fill
+an array of a specified size.  These operations work for all input
+types \farg{T}, including reals, integers, vectors, row vectors,
+matrices, or arrays.
+%
+\begin{description}
+\fitem{\farg{T}[]}{rep\_array}{\farg{T} \farg{x}, int \farg{n}}{Return
+  the \farg{n} array with every entry assigned to \farg{x}.}
+%
+\fitem{\farg{T}[\,,\,]}{rep\_array}{\farg{T} \farg{x}, int \farg{m}, int
+  \farg{n}}{Return the \farg{m} by \farg{n} array with every entry
+  assigned to \farg{x}.}
+%
+\fitem{\farg{T}[\,,\,,\,]}{rep\_array}{\farg{T} \farg{x}, int
+  \farg{k}, int \farg{m}, int
+  \farg{n}}{Return the \farg{k} by \farg{m} by \farg{n} array with
+  every entry assigned to \farg{x}.}
+\end{description}
+%
+For example, \code{rep\_array(1.0,5)} produces a real array (type
+\code{real[]}) of size 5 with all values set to 1.0.  On the other
+hand, \code{rep\_array(1,5)} produces an integer array (type
+\code{int[]}) of size 5 with all values set to 1.  This distinction is
+important because it is not possible to assign an integer array to a
+real array.  For example, the following example contrasts legal with
+illegal array creation and assignment
+%
+\begin{stancode}
+real y[5];
+int x[5];
+
+x = rep_array(1,5);     // ok
+y = rep_array(1.0,5);   // ok
+
+x = rep_array(1.0,5);   // illegal
+y = rep_array(1,5);     // illegal
+
+x = y;                  // illegal
+y = x;                  // illegal
+\end{stancode}
+
+If the value being repeated \code{v} is a vector (i.e., \code{T} is
+\code{vector}), then \code{rep\_array(v,27)} is a size 27 array
+consisting of 27 copies of the vector \code{v}.
+%
+\begin{stancode}
+vector[5] v;
+vector[5] a[3];
+// ...
+a = rep_array(v,3);  // fill a with copies of v
+a[2,4] = 9.0;        // v[4], a[1,4], a[2,4] unchanged
+\end{stancode}
+
+If the type \farg{T} of \farg{x} is itself an array type, then the
+result will be an array with one, two, or three added dimensions,
+depending on which of the \code{rep\_array} functions is called.  For
+instance, consider the following legal code snippet.
+%
+\begin{stancode}
+real a[5,6];
+real b[3,4,5,6];
+// ...
+b = rep_array(a,3,4); //  make (3 x 4) copies of a
+b[1,1,1,1] = 27.9;    //  a[1,1] unchanged
+\end{stancode}
+%
+After the assignment to \code{b}, the value for \code{b[j,k,m,n]} is
+equal to \code{a[m,n]} where it is defined, for \code{j} in \code{1:3},
+\code{k} in \code{1:4}, \code{m} in \code{1:5}, and \code{n} in
+\code{1:6}.
+
+%
+\section{Array Concatenation}\label{array-concatenation.section}
+
+\begin{description}
+\fitem{T}{append\_array}{T \farg{x}, T \farg{y}}{
+  Return the concatenation of two arrays in the order of the arguments.
+  T must be an N-dimensional array of any Stan type (with a maximum N of 7). All
+  dimensions but the first must match. }
+\end{description}
+%
+For example, the following code appends two three dimensional arrays of matrices
+together. Note that all dimensions except the first match. Any mismatches will
+cause an error to be thrown.
+%
+\begin{stancode}
+matrix[4, 6] x1[2, 1, 7];
+matrix[4, 6] x2[3, 1, 7];
+matrix[4, 6] x3[5, 1, 7];
+// ...
+x3 = append_array(x1, x2);
+\end{stancode}
+%
+
+\section{Sorting functions}\label{sorting-functions.section}
+
+Sorting can be used to sort values or the indices of those values in
+either ascending or descending order.  For example, if \code{v} is
+declared as a real array of size 3, with values
+\[
+\mbox{\code{v}} = (1, -10.3, 20.987),
+\]
+then the various sort routines produce
+%
+\begin{eqnarray*}
+\mbox{\code{sort\_asc(v)}} & = &  (-10.3,1,20.987)
+\\[4pt]
+\mbox{\code{sort\_desc(v)}} & = &  (20.987,1,-10.3)
+\\[4pt]
+\mbox{\code{sort\_indices\_asc(v)}} & = &  (2,1,3)
+\\[4pt]
+\mbox{\code{sort\_indices\_desc(v)}} & = &  (3,1,2)
+\end{eqnarray*}
+
+\begin{description}
+%
+\fitem{real[]}{sort\_asc}{real[] \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{int[]}{sort\_asc}{int[] \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{real[]}{sort\_desc}{real[] \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{int[]}{sort\_desc}{int[] \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{int[]}{sort\_indices\_asc}{real[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_asc}{int[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{real[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{int[] \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
+\fitem{int}{rank}{real[] \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\fitem{int}{rank}{int[] \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\end{description}
+
+
+\chapter{Matrix Operations}\label{matrix-operations.chapter}
+
+\section{Integer-Valued Matrix Size Functions}
+%
+\begin{description}
+%
+\fitem{int}{num\_elements}{vector \farg{x}}{The total
+  number of elements in the vector
+  \farg{x} (same as function \code{rows})}
+%
+\fitem{int}{num\_elements}{row\_vector \farg{x}}{The total
+  number of elements in the vector
+  \farg{x} (same as function \code{cols})}
+%
+\fitem{int}{num\_elements}{matrix \farg{x}}{The total
+  number of elements in the matrix \farg{x}.
+  For example, if \code{x} is a $5 \times 3$ matrix,
+  then \code{num\_elements(x)} is 15}
+%
+\fitem{int}{rows}{vector \farg{x}}{The number of
+rows in the vector \farg{x}}
+%
+\fitem{int}{rows}{row\_vector \farg{x}}{The number of
+rows in the row vector \farg{x}, namely 1}
+%
+\fitem{int}{rows}{matrix \farg{x}}{The number of
+rows in the matrix \farg{x}}
+%
+\fitem{int}{cols}{vector \farg{x}}{The number of columns
+in the vector \farg{x}, namely 1}
+%
+\fitem{int}{cols}{row\_vector \farg{x}}{The number of columns
+in the row vector \farg{x}}
+%
+\fitem{int}{cols}{matrix \farg{x}}{The number of columns
+in the matrix \farg{x}}
+\end{description}
+
+
+
+
+\section{Matrix Arithmetic Operators}\label{matrix-arithmetic-operators.section}
+
+Stan supports the basic matrix operations using infix, prefix and
+postfix operations.  This section lists the operations supported by
+Stan along with their argument and result types.
+
+\subsection{Negation Prefix Operators}
+
+\begin{description}
+%
+\fitem{vector}{operator-}{vector \farg{x}}{The negation of the vector
+\farg{x}.}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}}{The negation of the row
+vector \farg{x}.}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}}{The negation of the matrix
+  \farg{x}.}
+%
+\end{description}
+
+
+\subsection{Infix Matrix Operators}
+
+\begin{description}
+%
+\fitem{vector}{operator+}{vector \farg{x}, vector \farg{y}}{The sum of
+the vectors \farg{x} and \farg{y}.}
+%
+\fitem{row\_vector}{operator+}{row\_vector \farg{x}, row\_vector \farg{y}}{The sum of
+the row vectors \farg{x} and \farg{y}.}
+%
+\fitem{matrix}{operator+}{matrix \farg{x}, matrix \farg{y}}{The sum of
+the matrices \farg{x} and \farg{y}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+\fitem{vector}{operator-}{vector \farg{x}, vector \farg{y}}{The difference between
+the vectors \farg{x} and \farg{y}.}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+  difference between the row vectors \farg{x} and \farg{y}}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}, matrix \farg{y}}{The difference between
+  the matrices \farg{x} and \farg{y}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+%
+\fitem{vector}{operator*}{real \farg{x}, vector \farg{y}}{The product of
+the scalar \farg{x} and vector \farg{y}}
+%
+\fitem{row\_vector}{operator*}{real \farg{x}, row\_vector \farg{y}}{The product of
+the scalar \farg{x} and the row vector \farg{y}}
+%
+\fitem{matrix}{operator*}{real \farg{x}, matrix \farg{y}}{The product of
+the scalar \farg{x} and the matrix \farg{y}}
+%
+%
+\fitem{vector}{operator*}{vector \farg{x}, real \farg{y}}{The product of
+the scalar \farg{y} and vector \farg{x}}
+%
+\fitem{matrix}{operator*}{vector \farg{x}, row\_vector \farg{y}}{The product
+of the vector \farg{x} and row vector \farg{y}}
+%
+%
+\fitem{row\_vector}{operator*}{row\_vector \farg{x}, real \farg{y}}{The product of
+the scalar \farg{y} and row vector \farg{x}}
+%
+\fitem{real}{operator*}{row\_vector \farg{x}, vector \farg{y}}{The product
+of the row vector \farg{x} and vector \farg{y}}
+%
+\fitem{row\_vector}{operator*}{row\_vector \farg{x}, matrix \farg{y}}{The product
+of the row vector \farg{x} and matrix \farg{y}}
+%
+%
+\fitem{matrix}{operator*}{matrix \farg{x}, real \farg{y}}{The product of
+the scalar \farg{y} and matrix \farg{x}}
+%
+\fitem{vector}{operator*}{matrix \farg{x}, vector \farg{y}}{The
+  product of the matrix \farg{x} and vector \farg{y}}
+%
+\fitem{matrix}{operator*}{matrix \farg{x}, matrix \farg{y}}{The product of
+  the matrices \farg{x} and \farg{y}}
+%
+\end{description}
+%
+
+
+
+\subsection{Broadcast Infix Operators}
+%
+\begin{description}
+%
+\fitem{vector}{operator+}{vector \farg{x}, real \farg{y}}{The result of
+adding \farg{y} to every entry in the vector \farg{x}}
+%
+\fitem{vector}{operator+}{real \farg{x}, vector \farg{y}}{The result of
+adding \farg{x} to every entry in the vector \farg{y}}
+%
+\fitem{row\_vector}{operator+}{row\_vector \farg{x}, real \farg{y}}{The result of
+adding \farg{y} to every entry in the row vector \farg{x}}
+%
+\fitem{row\_vector}{operator+}{real \farg{x}, row\_vector \farg{y}}{The result of
+adding \farg{x} to every entry in the row vector \farg{y}}
+%
+\fitem{matrix}{operator+}{matrix \farg{x}, real \farg{y}}{The result of
+adding \farg{y} to every entry in the matrix \farg{x}}
+%
+\fitem{matrix}{operator+}{real \farg{x}, matrix \farg{y}}{The result of
+adding \farg{x} to every entry in the matrix \farg{y}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+%
+\fitem{vector}{operator-}{vector \farg{x}, real \farg{y}}{The result of
+subtracting \farg{y} from every entry in the vector \farg{x}}
+%
+\fitem{vector}{operator-}{real \farg{x}, vector \farg{y}}{The result of
+adding \farg{x} to every entry in the negation of the vector \farg{y}}
+%
+\fitem{row\_vector}{operator-}{row\_vector \farg{x}, real \farg{y}}{The result of
+subtracting \farg{y} from every entry in the row vector \farg{x}}
+%
+\fitem{row\_vector}{operator-}{real \farg{x}, row\_vector \farg{y}}{The result of
+adding \farg{x} to every entry in the negation of the row vector \farg{y}}
+%
+\fitem{matrix}{operator-}{matrix \farg{x}, real \farg{y}}{The result of
+subtracting \farg{y} from every entry in the matrix \farg{x}}
+%
+\fitem{matrix}{operator-}{real \farg{x}, matrix \farg{y}}{The result of
+adding \farg{x} to every entry in negation of the matrix \farg{y}}
+%
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+%
+\fitem{vector}{operator/}{vector \farg{x}, real \farg{y}}{The result of
+dividing each entry in the vector \farg{x} by \farg{y}}
+%
+\fitem{row\_vector}{operator/}{row\_vector \farg{x}, real \farg{y}}{The result of
+dividing each entry in the row vector \farg{x} by \farg{y}}
+%
+\fitem{matrix}{operator/}{matrix \farg{x}, real \farg{y}}{The result of
+dividing each entry in the matrix \farg{x} by \farg{y}}
+%
+\end{description}
+
+\subsection{Elementwise Arithmetic Operations}
+
+\begin{description}
+%
+\fitem{vector}{operator.*}{vector \farg{x}, vector \farg{y}}{The
+elementwise product of \farg{y} and \farg{x}}
+%
+\fitem{row\_vector}{operator.*}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+elementwise product of \farg{y} and \farg{x}}
+%
+\fitem{matrix}{operator.*}{matrix \farg{x}, matrix \farg{y}}{The
+elementwise product of \farg{y} and \farg{x}}
+\end{description}
+\vspace*{-4pt}
+\begin{description}
+\fitem{vector}{operator./}{vector \farg{x}, vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{vector}{operator./}{vector \farg{x}, real \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{vector}{operator./}{real \farg{x}, vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{row\_vector}{operator./}{row\_vector \farg{x}, row\_vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{row\_vector}{operator./}{row\_vector \farg{x}, real \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{row\_vector}{operator./}{real \farg{x}, row\_vector \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{matrix}{operator./}{matrix \farg{x}, matrix \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{matrix}{operator./}{matrix \farg{x}, real \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\fitem{matrix}{operator./}{real \farg{x}, matrix \farg{y}}{The
+elementwise quotient of \farg{y} and \farg{x}}
+%
+\end{description}
+\vspace*{-4pt}
+
+\section{Transposition Operator}
+
+Matrix transposition is represented using a postfix operator.
+
+\begin{description}
+%
+\fitem{matrix}{operator'}{matrix \farg{x}}{The transpose of the matrix
+ \farg{x}, written as \code{x'}}
+%
+\fitem{row\_vector}{operator'}{vector \farg{x}}{The transpose of the vector
+ \farg{x}, written as \code{x'}}
+%
+\fitem{vector}{operator'}{row\_vector \farg{x}}{The transpose of the row vector
+ \farg{x}, written as \code{x'}}
+%
+\end{description}
+
+
+\section{Elementwise Functions}
+
+Elementwise functions apply a function to each element of a vector or
+matrix, returning a result of the same shape as the argument.  There
+are many functions that are vectorized in addition to the ad hoc cases
+listed in this section;  see \refsection{fun-vectorization} for the
+general cases.
+
+
+
+
+\section{Dot Products and Specialized Products}
+
+\begin{description}
+%
+\fitem{real}{dot\_product}{vector \farg{x}, vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_product}{vector \farg{x}, row\_vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_product}{row\_vector \farg{x}, vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+The dot product of \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{columns\_dot\_product}{vector \farg{x}, vector \farg{y}}{
+The dot product of the columns of \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{columns\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+The dot product of the columns of \farg{x} and \farg{y}}
+%
+\fitem{row\_vector}{columns\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
+The dot product of the columns of \farg{x} and \farg{y}}
+%
+\fitem{vector}{rows\_dot\_product}{vector \farg{x}, vector \farg{y}}{
+The dot product of the rows of \farg{x} and \farg{y}}
+%
+\fitem{vector}{rows\_dot\_product}{row\_vector \farg{x}, row\_vector \farg{y}}{
+The dot product of the rows of \farg{x} and \farg{y}}
+%
+\fitem{vector}{rows\_dot\_product}{matrix \farg{x}, matrix \farg{y}}{
+The dot product of the rows of \farg{x} and \farg{y}}
+%
+\fitem{real}{dot\_self}{vector \farg{x}}{
+The dot product of the vector \farg{x} with itself}
+%
+\fitem{real}{dot\_self}{row\_vector \farg{x}}{
+The dot product of the row vector \farg{x} with itself}
+%
+\fitem{row\_vector}{columns\_dot\_self}{vector \farg{x}}{
+The dot product of the columns of \farg{x} with themselves}
+%
+\fitem{row\_vector}{columns\_dot\_self}{row\_vector \farg{x}}{
+The dot product of the columns of \farg{x} with themselves}
+%
+\fitem{row\_vector}{columns\_dot\_self}{matrix \farg{x}}{
+The dot product of the columns of \farg{x} with themselves}
+%
+\fitem{vector}{rows\_dot\_self}{vector \farg{x}}{
+The dot product of the rows of \farg{x} with themselves}
+%
+\fitem{vector}{rows\_dot\_self}{row\_vector \farg{x}}{
+The dot product of the rows of \farg{x} with themselves}
+%
+\fitem{vector}{rows\_dot\_self}{matrix \farg{x}}{
+The dot product of the rows of \farg{x} with themselves}
+%
+\end{description}
+
+\subsection{Specialized Products}
+
+
+\begin{description}
+%
+\fitem{matrix}{tcrossprod}{matrix \farg{x}}{
+The product of \farg{x} postmultiplied by its own transpose, similar
+to the tcrossprod(x) function in R. The result is a symmetric matrix
+$\mbox{\code{x}}\,\mbox{\code{x}}^{\top}$.}
+%
+\end{description}
+
+\begin{description}
+%
+\fitem{matrix}{crossprod}{matrix \farg{x}}{
+The product of \farg{x} premultiplied by its own transpose,
+similar to the crossprod(x) function in R. The result is a symmetric matrix
+$\mbox{\code{x}}^{\top}\,\mbox{\code{x}}$.}
+%
+\end{description}
+
+
+The following functions all provide shorthand forms for common
+expressions, which are also much more efficient.
+%
+\begin{description}
+%
+\fitem{matrix}{quad\_form}{matrix \farg{A}, matrix \farg{B}}{
+  The quadratic form, i.e., \code{B'~*~A~*~B}.}
+%
+\fitem{real}{quad\_form}{matrix \farg{A}, vector \farg{B}}{
+  The quadratic form, i.e., \code{B'~*~A~*~B}.}
+%
+\fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, vector \farg{v}}
+  {The quadratic form using the column vector
+  \farg{v} as a diagonal matrix, i.e.,
+  \code{diag\_matrix(\farg{v})~*~\farg{m}~*~diag\_matrix(\farg{v})}.}
+%
+\fitem{matrix}{quad\_form\_diag}{matrix \farg{m}, row\_vector \farg{rv}}
+  {The quadratic form using the row vector
+  \farg{rv} as a diagonal matrix, i.e.,
+  \code{diag\_matrix(\farg{rv})~*~\farg{m}~*~diag\_matrix(\farg{rv})}.}
+%
+\fitem{matrix}{quad\_form\_sym}{matrix \farg{A}, matrix \farg{B}}{
+  Similarly to quad\_form, gives \code{B'~*~A~*~B}, but additionally
+  checks if A is symmetric and ensures that the result is also symmetric.}
+%
+\fitem{real}{quad\_form\_sym}{matrix \farg{A}, vector \farg{B}}{
+  Similarly to quad\_form, gives \code{B'~*~A~*~B}, but additionally
+  checks if A is symmetric and ensures that the result is also symmetric.}
+%
+\fitem{real}{trace\_quad\_form}{matrix \farg{A}, matrix \farg{B}}{
+The trace of the quadratic form, i.e., \code{trace(B'~*~A~*~B)}.}
+%
+\fitem{real}{trace\_gen\_quad\_form}{matrix \farg{D},matrix \farg{A}, matrix \farg{B}}{
+The trace of a generalized quadratic form, i.e., \code{trace(D~*~B'~*~A~*~B).}}
+%
+\end{description}
+
+
+\begin{description}
+%
+\fitem{matrix}{multiply\_lower\_tri\_self\_transpose}{matrix \farg{x}}{
+The product of the lower triangular portion of \farg{x} (including
+the diagonal) times its own transpose;  that is, if \code{L} is a
+matrix of the same dimensions as \farg{x}\, with \code{L(m,n)} equal to
+  \code{\farg{x}(m,n)} for $\mbox{\code{n}} \leq \mbox{\code{m}}$ and
+\code{L(m,n)} equal to 0 if $\mbox{\code{n}} > \mbox{\code{m}}$, the
+result is the symmetric matrix $\mbox{\code{L}}\,\mbox{\code{L}}^{\top}$.
+This is a specialization of tcrossprod(x) for lower-triangular
+matrices.  The input matrix does not need to be square.}
+%
+\end{description}
+
+\begin{description}
+  \fitem{matrix}{diag\_pre\_multiply}{vector \farg{v}, matrix
+    \farg{m}}{Return the product of the diagonal matrix formed from
+    the vector \farg{v} and the matrix \farg{m}, i.e.,
+    \code{diag\_matrix(\farg{v})~*~\farg{m}}.}
+%
+  \fitem{matrix}{diag\_pre\_multiply}{row\_vector \farg{rv}, matrix \farg{m}}{Return
+    the product of the diagonal matrix formed from the vector
+    \farg{rv} and the matrix \farg{m}, i.e., \code{diag\_matrix(\farg{rv})~*~\farg{m}}.}
+%
+  \fitem{matrix}{diag\_post\_multiply}{matrix \farg{m}, vector \farg{v}}{Return the
+    product of the matrix \farg{m} and the diagonal matrix formed from
+    the vector \farg{v}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{v})}.}
+%
+\fitem{matrix}{diag\_post\_multiply}{matrix \farg{m}, row\_vector \farg{rv}}{Return the
+  product of the matrix \code{\farg{m}} and the diagonal matrix formed from
+  the the row vector \code{\farg{rv}}, i.e., \code{\farg{m}~*~diag\_matrix(\farg{rv})}.}
+\end{description}
+
+
+
+
+
+\section{Reductions}
+
+\subsection{Log Sum of Exponents}
+
+\begin{description}
+\fitem{real}{log\_sum\_exp}{vector \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\fitem{real}{log\_sum\_exp}{row\_vector \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\fitem{real}{log\_sum\_exp}{matrix \farg{x}}{
+The natural logarithm of the sum of the exponentials of the elements in \farg{x}}
+\end{description}
+
+\subsection{Minimum and Maximum}
+
+\begin{description}
+%
+\fitem{real}{min}{vector \farg{x}}{
+The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
+%
+\fitem{real}{min}{row\_vector \farg{x}}{
+The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
+%
+\fitem{real}{min}{matrix \farg{x}}{
+The minimum value in \farg{x}, or $+\infty$ if \farg{x} is empty}
+%
+\fitem{real}{max}{vector \farg{x}}{
+The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
+%
+\fitem{real}{max}{row\_vector \farg{x}}{
+The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
+%
+\fitem{real}{max}{matrix \farg{x}}{
+The maximum value in \farg{x}, or $-\infty$ if \farg{x} is empty}
+%
+\end{description}
+
+\subsection{Sums and Products}
+
+\begin{description}
+%
+\fitem{real}{sum}{vector \farg{x}}{
+The sum of the values in \farg{x}, or 0 if \farg{x} is empty}
+%
+\fitem{real}{sum}{row\_vector \farg{x}}{
+The sum of the values in \farg{x}, or 0 if \farg{x} is empty}
+%
+\fitem{real}{sum}{matrix \farg{x}}{
+The sum of the values in \farg{x}, or 0 if \farg{x} is empty}
+%
+%
+\fitem{real}{prod}{vector \farg{x}}{
+The product of the values in \farg{x}, or 1 if \farg{x} is empty}
+%
+\fitem{real}{prod}{row\_vector \farg{x}}{
+The product of the values in \farg{x}, or 1 if \farg{x} is empty}
+%
+\fitem{real}{prod}{matrix \farg{x}}{
+The product of the values in \farg{x}, or 1 if \farg{x} is empty}
+%
+\end{description}
+
+
+
+\subsection{Sample Moments}
+
+Full definitions are provided for sample moments in
+\refsection{array-reductions}.
+
+\begin{description}
+%
+\fitem{real}{mean}{vector \farg{x}}{
+The sample mean of the values in \farg{x};
+see \refsection{array-reductions} for details.}
+%
+\fitem{real}{mean}{row\_vector \farg{x}}{
+The sample mean of the values in \farg{x};
+see \refsection{array-reductions} for details.}
+%
+\fitem{real}{mean}{matrix \farg{x}}{
+The sample mean of the values in \farg{x};
+see \refsection{array-reductions} for details.}
+%
+\vspace*{4pt}
+%
+\fitem{real}{variance}{vector \farg{x}}{
+  The sample variance of the values in
+  \farg{x}; see \refsection{array-reductions} for details.}
+%
+\fitem{real}{variance}{row\_vector \farg{x}}{
+  The sample variance of the values in
+  \farg{x}; see \refsection{array-reductions} for details.}
+%
+\fitem{real}{variance}{matrix \farg{x}}{
+The sample variance of the values in
+\farg{x}; see \refsection{array-reductions} for details.}
+%
+\vspace*{4pt}
+%
+\fitem{real}{sd}{vector \farg{x}}{
+The sample standard deviation of the values in \farg{x};  see
+\refsection{array-reductions} for details.}
+%
+\fitem{real}{sd}{row\_vector \farg{x}}{
+The sample standard deviation of the values in \farg{x}; see
+\refsection{array-reductions} for details.}
+%
+\fitem{real}{sd}{matrix \farg{x}}{
+The sample standard deviation of the values in \farg{x};
+see \refsection{array-reductions} for details.}%
+\end{description}
+
+
+\section{Broadcast Functions}\label{matrix-broadcast.section}
+
+The following broadcast functions allow vectors, row vectors and
+matrices to be created by copying a single element into all of their
+cells.  Matrices may also be created by stacking copies of row vectors
+vertically or stacking copies of column vectors horizontally.
+
+\begin{description}
+%
+  \fitem{vector}{rep\_vector}{real \farg{x}, int \farg{m}}{Return the
+    size \farg{m} (column) vector consisting of copies of \farg{x}.}
+%
+  \fitem{row\_vector}{rep\_row\_vector}{real \farg{x}, int
+    \farg{n}}{Return the size \farg{n} row vector consisting of copies of
+    \farg{x}.}
+%
+  \fitem{matrix}{rep\_matrix}{real \farg{x}, int
+    \farg{m}, int \farg{n}}{Return the \farg{m} by \farg{n} matrix
+    consisting of copies of \farg{x}.}
+%
+  \fitem{matrix}{rep\_matrix}{vector \farg{v}, int \farg{n}}{Return
+    the \farg{m} by \farg{n} matrix consisting of \farg{n}
+    copies of the (column) vector \farg{v} of
+    size \farg{m}.}
+%
+  \fitem{matrix}{rep\_matrix}{row\_vector \farg{rv}, int
+    \farg{m}}{Return the \farg{m} by \farg{n} matrix consisting of
+    \farg{m} copies of the row vector \farg{rv} of size \farg{n}.}
+%
+\end{description}
+%
+
+Unlike the situation with array broadcasting (see \refsection{array-broadcasting}), where there is a
+distinction between integer and real arguments, the following two
+statements produce the same result for vector broadcasting;  row vector
+and matrix broadcasting behave similarly.
+%
+\begin{stancode}
+vector[3] x;
+x = rep_vector(1, 3);
+x = rep_vector(1.0, 3);
+\end{stancode}
+%
+There are no integer vector or matrix types, so integer values are
+automatically promoted.
+
+
+\section{Diagonal Matrix Functions}
+
+\begin{description}
+%
+\fitem{vector}{diagonal}{matrix \farg{x}}{The diagonal
+of the matrix \farg{x}}
+%
+\fitem{matrix}{diag\_matrix}{vector \farg{x}}{The diagonal
+matrix with diagonal \farg{x}}
+%
+\end{description}
+
+Although the \code{diag\_matrix} function is available, it is unlikely
+to ever show up in an efficient Stan program.  For example, rather
+than converting a diagonal to a full matrix for use as a covariance
+matrix,
+%
+\begin{stancode}
+y ~ multi_normal(mu, diag_matrix(square(sigma)));
+\end{stancode}
+%
+it is much more efficient to just use a univariate normal, which
+produces the same density,
+%
+\begin{stancode}
+y ~ normal(mu, sigma);
+\end{stancode}
+%
+
+Rather than writing \code{m~*~diag\_matrix(v)} where \code{m} is a
+matrix and \code{v} is a vector, it is much more efficient to write
+\code{diag\_post\_multiply(m,~v)} (and similarly for pre-multiplication).
+By the same token, it is better to use \code{quad\_form\_diag(m,~v)}
+rather than \code{quad\_form(m,~diag\_matrix(v))}.
+
+
+\section{Slicing and Blocking Functions}
+
+Stan provides several functions for generating slices or blocks or
+diagonal entries for matrices.
+
+\subsection{Columns and Rows}
+
+\begin{description}
+%
+\fitem{vector}{col}{matrix \farg{x}, int \farg{n}}{The \farg{n}-th column
+of matrix \farg{x}}
+%
+\fitem{row\_vector}{row}{matrix \farg{x}, int \farg{m}}{The \farg{m}-th row
+of matrix \farg{x}}
+%
+\end{description}
+
+The \code{row} function is special in that it may be used as an lvalue
+in an assignment statement (i.e., something to which a value may be
+assigned).  The row function is also special in that the indexing
+notation \code{x[m]} is just an alternative way of writing
+\code{row(x,m)}.  The \code{col} function may {\it not}\, be used as
+an lvalue, nor is there an indexing based shorthand for it.
+
+
+\subsection{Block Operations}
+
+\subsubsection{Matrix Slicing Operations}
+
+Block operations may be used to extract a sub-block of a matrix.
+
+\begin{description}
+\fitem{matrix}{block}{matrix \farg{x}, int \farg{i}, int \farg{j},
+  int \farg{n\_rows}, int \farg{n\_cols}}{Return the submatrix of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends \farg{n\_rows}
+  rows and \farg{n\_cols} columns.}
+\end{description}
+%
+The sub-row and sub-column operations may be used to extract a
+slice of row or column from a matrix
+%
+\begin{description}
+%
+\fitem{vector}{sub\_col}{matrix \farg{x}, int \farg{i}, int \farg{j},
+  int \farg{n\_rows}}{Return the sub-column of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends
+  \farg{n\_rows} rows and 1 column.}
+%
+\fitem{row\_vector}{sub\_row}{matrix \farg{x}, int \farg{i}, int \farg{j},
+  int \farg{n\_cols}}{Return the sub-row of \farg{x} that
+  starts at row \farg{i} and column \farg{j} and extends 1
+  row and \farg{n\_cols} columns.}
+%
+\end{description}
+
+\subsubsection{Vector and Array Slicing Operations}
+
+The head operation extracts the first $n$ elements of a vector and
+the tail operation the last.  The segment operation extracts an
+arbitrary subvector.
+
+\begin{description}
+%
+  \fitem{vector}{head}{vector \farg{v}, int \farg{n}}{Return the
+    vector consisting of the first \farg{n} elements of \farg{v}.}
+%
+  \fitem{row\_vector}{head}{row\_vector \farg{rv}, int \farg{n}}{Return
+    the row vector consisting of the first \farg{n} elements of
+    \farg{rv}.}
+%
+  \fitem{T[]}{head}{T[] \farg{sv}, int \farg{n}}{Return
+    the array consisting of the first \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
+%
+  \fitem{vector}{tail}{vector \farg{v}, int \farg{n}}{Return the
+    vector consisting of the last \farg{n} elements of \farg{v}.}
+%
+  \fitem{row\_vector}{tail}{row\_vector \farg{rv}, int \farg{n}}{Return
+    the row vector consisting of the last \farg{n} elements of
+    \farg{rv}.}
+%
+  \fitem{T[]}{tail}{T[] \farg{sv}, int \farg{n}}{Return
+    the array consisting of the last \farg{n} elements of
+    \farg{sv}; applies to up to three-dimensional arrays containing
+    any type of elements \code{T}.}
+%
+  \fitem{vector}{segment}{vector \farg{v}, int \farg{i}, int
+    \farg{n}}{Return the vector consisting of the \farg{n} elements of \farg{v}
+    starting at \farg{i}; i.e., elements \farg{i} through
+    through \farg{i} + \farg{n} - 1.}
+%
+  \fitem{row\_vector}{segment}{row\_vector \farg{rv}, int \farg{i}, int
+    \farg{n}}{Return the row vector consisting of the \farg{n}
+    elements of \farg{rv} starting at \farg{i}; i.e., elements
+    \farg{i} through through \farg{i} + \farg{n} - 1.}
+%
+  \fitem{T[]}{segment}{T[] \farg{sv}, int \farg{i}, int
+    \farg{n}}{Return the array consisting of the \farg{n}
+    elements of \farg{sv} starting at \farg{i}; i.e., elements
+    \farg{i} through through \farg{i} + \farg{n} - 1. Applies to up to
+    three-dimensional arrays containing any type of elements
+    \code{T}.}
+%
+\end{description}
+
+
+\section{Matrix Concatenation}\label{matrix-concatenation.section}
+
+Stan's matrix concatenation operations \code{append\_col} and
+\code{append\_row} are like the operations \code{cbind} and
+\code{rbind} in R.%
+
+% THIS WAS REALLY HARD WORK FIGURING OUT HOW TO GET THESE IN, SO
+% I'M LEAVING THIS HERE IN CASE WE WANT THEM BACK AGAIN OR SOMETHING
+% LIKE THEM:
+%
+% \indexref{cbind}{{\tt\bfseries append\_col}}
+% \indexref{rbind}{{\tt\bfseries append\_row}}
+
+
+
+\subsubsection{Horizontal concatenation}
+
+\begin{description}
+%
+  \fitem{matrix}{append\_col}{matrix \farg{x}, matrix
+    \farg{y}}{Combine matrices \farg{x} and \farg{y} by columns. The
+    matrices must have the same number of rows.}
+%
+\fitem{matrix}{append\_col}{matrix \farg{x}, vector \farg{y}}{Combine
+  matrix \farg{x} and vector \farg{y} by columns. The matrix and the
+  vector must have the same number of rows.}
+%
+\fitem{matrix}{append\_col}{vector \farg{x}, matrix \farg{y}}{Combine
+  vector \farg{x} and matrix \farg{y} by columns. The vector and the
+  matrix must have the same number of rows.}
+%
+\fitem{matrix}{append\_col}{vector \farg{x}, vector \farg{y}}{Combine
+  vectors \farg{x} and \farg{y} by columns. The vectors must have the
+  same number of rows.}
+%
+\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, row\_vector
+  \farg{y}}{Combine row vectors \farg{x} and \farg{y} of any size into
+  another row vector.}
+%
+\fitem{row\_vector}{append\_col}{real \farg{x}, row\_vector
+  \farg{y}}{Append \farg{x} to the front of \farg{y}, returning
+  another row vector.}
+%
+\fitem{row\_vector}{append\_col}{row\_vector \farg{x}, real \farg{y}}
+  {Append \farg{y} to the end of \farg{x}, returning
+  another row vector.}
+%
+\end{description}
+
+\subsubsection{Vertical concatenation}
+
+\begin{description}
+%
+  \fitem{matrix}{append\_row}{matrix \farg{x}, matrix
+    \farg{y}}{Combine matrices \farg{x} and \farg{y} by rows. The
+    matrices must have the same number of columns.}
+%
+  \fitem{matrix}{append\_row}{matrix \farg{x}, row\_vector
+    \farg{y}}{Combine matrix \farg{x} and row vector \farg{y} by
+    rows. The matrix and the row vector must have the same number
+    of columns.}
+%
+  \fitem{matrix}{append\_row}{row\_vector \farg{x}, matrix
+    \farg{y}}{Combine row vector \farg{x} and matrix \farg{y} by
+    rows. The row vector and the matrix must have the same number
+    of columns.}
+%
+  \fitem{matrix}{append\_row}{row\_vector \farg{x}, row\_vector
+    \farg{y}}{Combine row vectors \farg{x} and \farg{y} by row. The
+    row vectors must have the same number of columns.}
+%
+  \fitem{vector}{append\_row}{vector \farg{x}, vector
+    \farg{y}}{Concatenate vectors \farg{x} and \farg{y} of any size into
+    another vector.}
+%
+\fitem{vector}{append\_row}{real \farg{x}, vector
+  \farg{y}}{Append \farg{x} to the top of \farg{y}, returning
+  another vector.}
+%
+\fitem{vector}{append\_row}{vector \farg{x}, real \farg{y}}
+  {Append \farg{y} to the bottom of \farg{x}, returning
+  another vector.}
+%
+\end{description}
+
+
+
+
+\section{Special Matrix Functions}\label{softmax.section}
+
+\subsection{Softmax}
+
+The softmax function%
+%
+\footnote{The softmax function is so called because in the limit as
+  $y_n \rightarrow \infty$ with $y_m$ for $m \neq n$ held constant,
+  the result tends toward the ``one-hot'' vector $\theta$ with
+  $\theta_n = 1$ and $\theta_m = 0$ for $m \neq n$, thus providing a
+  ``soft'' version of the maximum function.}
+maps $y \in \reals^K$ to the $K$-simplex by
+\[
+\mbox{softmax}(y)
+ = \frac{\exp(y)}
+        {\sum_{k=1}^K \exp(y_k)},
+\]
+%
+where $\exp(y)$ is the componentwise exponentiation of $y$.
+%
+Softmax is usually calculated on the log scale,
+%
+\begin{eqnarray*}
+\log \mbox{softmax}(y)
+& = & \ y - \log \sum_{k=1}^K \exp(y_k)
+\\[4pt]
+& = & y - \mbox{log\_sum\_exp}(y).
+\end{eqnarray*}
+%
+where the vector $y$ minus the scalar $\mbox{log\_sum\_exp}(y)$
+subtracts the scalar from each component of $y$.
+
+Stan provides the following functions for softmax and its log.
+%
+\begin{description}
+\fitem{vector}{softmax}{vector \farg{x}}{
+The softmax of \farg{x}}
+%
+\fitem{vector}{log\_softmax}{vector \farg{x}}{
+The natural logarithm of the softmax of \farg{x}}
+\end{description}
+%
+
+\subsection{Cumulative Sums}
+
+The cumulative sum of a sequence $x_1,\ldots,x_N$ is the
+sequence $y_1,\ldots,y_N$, where
+%
+\[
+y_n = \sum_{m = 1}^{n} x_m.
+\]
+
+\begin{description}
+%
+\fitem{real[]}{cumulative\_sum}{real[] \farg{x}}{
+The cumulative sum of \farg{x}}
+%
+\fitem{vector}{cumulative\_sum}{vector \farg{v}}{
+The cumulative sum of \farg{v}}
+%
+\fitem{row\_vector}{cumulative\_sum}{row\_vector \farg{rv}}{
+The cumulative sum of \farg{rv}}
+%
+\end{description}
+
+\section{Covariance Functions}\label{covariance.section}
+
+\subsection{Exponentiated quadratic covariance function}
+
+The exponentiated quadratic kernel defines the covariance between $f(x_i)$ and
+$f(x_j)$ where $f\colon \reals^D \mapsto \reals$ as a function of the squared
+Euclidian distance between $x_i \in \reals^D$ and $x_j \in \reals^D$:
+
+\[
+  \text{cov}(f(x_i), f(x_j)) = k(x_i, x_j)
+= \alpha^2
+\exp \left(
+	- \dfrac{1}{2\rho^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+\right)
+\]
+
+\noindent with $\alpha$ and $\rho$ constrained to be positive.
+
+There are two variants of the exponentiated quadratic covariance function in
+Stan. One builds a covariance matrix, $K \in \reals^{N \times N}$ for $x_1,
+\dots, x_N$, where $K_{i,j} = k(x_i, x_j)$, which is necessarily symmetric and
+positive semidefinite by construction. There is a second variant of the
+exponentiated quadratic covariance function that builds a $K \in \reals^{N
+\times M}$ covariance matrix for $x_1, \dots, x_N$ and $x^\prime_1, \dots,
+x^\prime_M$, where $x_i \in \reals^D$ and $x^\prime_i \in \reals^D$ and
+$K_{i,j} = k(x_i, x^\prime_j)$.
+
+\begin{description}
+%
+\fitem{matrix}{cov\_exp\_quad}{row\_vectors \farg{x}, real \farg{alpha}, real
+\farg{rho}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{vectors \farg{x}, real \farg{alpha}, real
+\farg{rho}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitem{matrix}{cov\_exp\_quad}{real[] \farg{x}, real \farg{alpha}, real
+\farg{rho}}{ The covariance matrix with an exponentiated quadratic kernel of
+\farg{x}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{row\_vectors \farg{x1}, row\_vectors
+\farg{x2}}{real \farg{alpha}, real \farg{rho}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{vectors \farg{x1}, vectors
+\farg{x2}}{real \farg{alpha}, real \farg{rho}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\fitemtwolines{matrix}{cov\_exp\_quad}{real[] \farg{x1}, real[]
+\farg{x2}}{real \farg{alpha}, real \farg{rho}}{ The covariance matrix with an
+exponentiated quadratic kernel of \farg{x1} and \farg{x2}.}
+
+\end{description}
+
+\section{Linear Algebra Functions and Solvers}
+
+\subsection{Matrix Division Operators and Functions}
+
+In general, it is much more efficient and also more arithmetically
+stable to use matrix division than to multiply by an inverse.  There
+are specialized forms for lower triangular matrices and for symmetric,
+positive-definite matrices.
+
+\subsubsection{Matrix division operators}
+
+\begin{description}
+%
+\fitem{row\_vector}{operator/}{row\_vector \farg{b}, matrix \farg{A}}{
+The right division of \farg{b} by \farg{A}; equivalently
+\code{\farg{b} * inverse(\farg{A})}}
+%
+\fitem{matrix}{operator/}{matrix \farg{B}, matrix \farg{A}}{
+The right division of \farg{B} by \farg{A}; equivalently
+\code{\farg{B} * inverse(\farg{A})}}
+%
+\fitem{vector}{operator\textbackslash}{matrix \farg{A}, vector \farg{b}}
+The left division of \farg{b} by \farg{A}; equivalently
+\code{inverse(\farg{A}) * \farg{b}}
+%
+\fitem{matrix}{operator\textbackslash}{matrix \farg{A}, matrix \farg{B}}
+The left division of \farg{B} by \farg{A}; equivalently
+\code{inverse(\farg{A}) * \farg{B}}
+%
+\end{description}
+
+\subsubsection{Lower-triangular matrix division functions}
+
+There are four division functions which use lower triangular views of
+a matrix.  The lower triangular view of a matrix $\mbox{tri}(A)$ is
+used in the definitions and defined by
+\[
+\mbox{tri}(A)[m,n] =
+\left\{
+\begin{array}{ll}
+A[m,n] & \mbox{if } m \geq n, \mbox{ and}
+\\[4pt]
+0 & \mbox{otherwise}.
+\end{array}
+\right.
+\]
+When a lower triangular view of a matrix is used, the elements above
+the diagonal are ignored.
+
+\begin{description}
+%
+\fitem{vector}{mdivide\_left\_tri\_low}{matrix \farg{A}, vector \farg{b}}{
+The left division of \farg{b} by a lower-triangular view of \farg{A};
+algebraically equivalent to the less efficient and stable form
+\code{inverse(tri(\farg{A})) * \farg{b}}, where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\fitem{matrix}{mdivide\_left\_tri\_low}{matrix \farg{A}, matrix \farg{B}}{
+The left division of \farg{B} by a triangular view of \farg{A};
+algebraically equivalent to the less efficient and stable form
+\code{inverse(tri(\farg{A})) * \farg{B}}, where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\fitem{row\_vector}{mdivide\_right\_tri\_low}{row\_vector \farg{b},
+  matrix \farg{A}}{
+The right division of \farg{b} by a triangular view of
+\farg{A};  algebraically equivalent to the less efficient and stable form
+\code{\farg{b} * inverse(tri(\farg{A}))},  where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\fitem{matrix}{mdivide\_right\_tri\_low}{matrix \farg{B}, matrix
+  \farg{A}}{
+The right division of \farg{B} by a triangular view of
+\farg{A};  algebraically equivalent to the less efficient and stable form
+\code{\farg{B} * inverse(tri(\farg{A}))},  where \code{tri(\farg{A})}
+is the lower-triangular portion of \farg{A} with the above-diagonal
+entries set to zero.}
+%
+\end{description}
+
+
+\subsection{Symmetric positive-definite matrix division functions}
+
+There are four division functions which are specialized for
+efficiency and stability for symmetric positive-definite matrix
+dividends.  If the matrix dividend argument is not symmetric and
+positive definite, these will reject and print warnings.
+%
+\begin{description}
+%
+\fitem{matrix}{mdivide\_left\_spd}{matrix \farg{A}, vector \farg{b}}{
+The left division of \farg{b} by the symmetric,
+positive-definite matrix \farg{A}; algebraically equivalent to the
+less efficient and stable form \code{inverse(\farg{A}) * \farg{b}}.}
+%
+\fitem{vector}{mdivide\_left\_spd}{matrix \farg{A}, matrix \farg{B}}{
+The left division of \farg{B} by the symmetric,
+positive-definite matrix \farg{A}; algebraically equivalent to the
+less efficient and stable form \code{inverse(\farg{A}) * B}.}
+%
+\fitem{row\_vector}{mdivide\_right\_spd}{row\_vector \farg{b},
+  matrix \farg{A}}{
+The right division of \farg{b} by the symmetric, positive-definite
+matrix \farg{A};  algebraically equivalent to the less efficient
+and stable form \code{\farg{b} * inverse(\farg{A})}.}
+%
+\fitem{matrix}{mdivide\_right\_spd}{matrix \farg{B}, matrix \farg{A}}{
+The right division of \farg{B} by the symmetric, positive-definite
+matrix \farg{A};  algebraically equivalent to the less efficient
+and stable form \code{\farg{B} * inverse(\farg{A})}.}
+
+%
+\end{description}
+
+
+\subsection{Matrix Exponential}
+
+The exponential of the matrix $A$ is formally defined by the
+convergent power series:
+%
+\[
+e^A = \sum_{n=0}^{\infty} \dfrac{A^n}{n!}
+\]
+
+\begin{description}
+%
+\fitem{matrix}{matrix\_exp}{matrix \farg{A}}{
+The matrix exponential of \farg{A}}
+%
+
+%
+\fitem{matrix}{matrix\_exp\_multiply}{matrix \farg{A}, matrix \farg{B}}{
+The multiplication of matrix exponential of \farg{A} and
+matrix \farg{B}; algebraically equivalent to the less efficient form
+\code{matrix\_exp(\farg{A}) * \farg{B}}.}
+%
+
+%
+\fitem{matrix}{scale\_matrix\_exp\_multiply}{real \farg{t}, matrix \farg{A}, matrix \farg{B}}{
+The multiplication of matrix exponential of \farg{t}\farg{A} and
+matrix \farg{B}; algebraically equivalent to the less efficient form
+\code{matrix\_exp(\farg{t}\farg{A}) * \farg{B}}.}
+%
+\end{description}
+
+
+\subsection{Linear Algebra Functions}
+
+\subsubsection{Trace}
+
+\begin{description}
+%
+\fitem{real}{trace}{matrix \farg{A}}{
+The trace of \farg{A}, or 0 if \farg{A} is empty;  \farg{A} is not
+required to be diagonal}
+%
+\end{description}
+
+\subsubsection{Determinants}
+
+\begin{description}
+\fitem{real}{determinant}{matrix \farg{A}}{
+The determinant of \farg{A}}
+%
+\fitem{real}{log\_determinant}{matrix \farg{A}}{
+The log of the absolute value of the determinant of \farg{A}}
+%
+\end{description}
+
+\subsubsection{Inverses}
+
+It is almost never a good idea to use matrix inverses directly because
+they are both inefficient and arithmetically unstable compared to the
+alternatives.  Rather than inverting a matrix \code{m} and
+post-multiplying by a vector or matrix \code{a}, as in
+\code{inverse(m)~*~a}, it is better to code this using matrix division, as
+in \code{m~\textbackslash~a}.  The pre-multiplication case is similar,
+with \code{b~*~inverse(m)} being more efficiently coded as as
+\code{b~/~m}.  There are also useful special cases for triangular and
+symmetric, positive-definite matrices that use more efficient solvers.
+
+{\it Warning:}  The function \code{inv(m)} is the elementwise inverse
+function, which returns \code{1 / m[i, j]} for each element.
+
+\begin{description}
+%
+\fitem{matrix}{inverse}{matrix \farg{A}}{
+The inverse of \farg{A}}
+%
+\fitem{matrix}{inverse\_spd}{matrix \farg{A}}{
+The inverse of \farg{A} where A is symmetric, positive definite.  This
+version is faster and more arithmetically stable when the input is
+symmetric and positive definite.}
+%
+\end{description}
+
+\subsubsection{Eigendecomposition}
+
+\begin{description}
+%
+\fitem{vector}{eigenvalues\_sym}{matrix \farg{A}}{
+The vector of eigenvalues of a symmetric matrix \farg{A}
+in ascending order}
+%
+\fitem{matrix}{eigenvectors\_sym}{matrix \farg{A}}{ The matrix with
+  the (column) eigenvectors of symmetric matrix \farg{A} in the same
+  order as returned by the function \code{eigenvalues\_sym}}
+%
+\end{description}
+%
+Because multiplying an eigenvector by $-1$ results in an eigenvector,
+eigenvectors returned by a decomposition are only identified up to a
+sign change.  In order to compare the eigenvectors produced by Stan's
+eigendecomposition to others, signs may need to be normalized in some
+way, such as by fixing the sign of a component, or doing comparisons
+allowing a multiplication by $-1$.
+
+The condition number of a symmetric matrix is defined to be the ratio
+of the largest eigenvalue to the smallest eigenvalue.  Large condition
+numbers lead to difficulty in numerical algorithms such as computing
+inverses, and thus known as ``ill conditioned.''  The ratio can even
+be infinite in the case of singular matrices (i.e., those with
+eigenvalues of 0).
+
+%
+% \fitem{vector}{eigenvalues\_self\_adjoint}{matrix \farg{A}}{The vector
+%   of eigenvalues of the self-adjoint view of \farg{A} in descending
+%   order.  The self-adjoint of matrix \farg{A} ignores the values in
+%   \farg{A} above the diagonal and treats \farg{A}[m,n] =
+%   \farg{A}[n,m].}
+%
+% \fitem{matrix}{eigenvectors\_self\_adjoint}{matrix \farg{A}}{ The
+%   matrix of eigenvectors of the matrix of the self-adjoint view of
+%   \farg{A}.  See \code{eigenvalues\_self\_adjoint} for information on
+%   the self-adjoint view of a matrix.}
+%
+
+\subsubsection{QR Decomposition}\label{QR-decomposition}
+
+\begin{description}
+%
+\fitem{matrix}{qr\_thin\_Q}{matrix \farg{A}}{
+The orthogonal matrix in the thin QR decomposition of \farg{A}, which
+implies that the resulting matrix has the same dimensions as \farg{A}}
+%
+\fitem{matrix}{qr\_thin\_R}{matrix \farg{A}}{
+  The upper triangular matrix in the thin QR decomposition of \farg{A},
+  which implies that the resulting matrix is square with the same
+  number of columns as \farg{A}}
+%
+\fitem{matrix}{qr\_Q}{matrix \farg{A}}{
+The orthogonal matrix in the fat QR decomposition of \farg{A}, which
+implies that the resulting matrix is square with the same number of
+rows as \farg{A}}
+%
+\fitem{matrix}{qr\_R}{matrix \farg{A}}{
+  The upper trapezoidal matrix in the fat QR decomposition of \farg{A},
+  which implies that the resulting matrix will be square with the same 
+  number of rows as \farg{A}}
+%
+\end{description}
+%
+The thin QR decomposition is always preferable because it will consume
+much less memory when the input matrix is large than will the fat QR 
+decomposition. Both versions of the decomposition represent the input
+matrix as
+\[
+A = Q \, R.
+\]
+Multiplying a column of an orthogonal matrix by $-1$ still results in
+an orthogonal matrix, and you can multiply the corresponding row of
+the upper trapezoidal matrix by $-1$ without changing the product. Thus,
+Stan adopts the normalization that the diagonal elements of the upper
+trapezoidal matrix are strictly positive and the columns of the
+orthogonal matrix are reflected if necessary. Also, these QR 
+decomposition algorithms do not utilize pivoting and thus may be 
+numerically unstable on input matrices that have less than full rank.
+
+\subsubsection{Cholesky Decomposition}
+
+Every symmetric, positive-definite matrix (such as a correlation or
+covariance matrix) has a Cholesky decomposition.  If $\Sigma$ is a
+symmetric, positive-definite matrix, its Cholesky decomposition is the
+lower-triangular vector $L$ such that
+\[
+\Sigma = L \, L^{\top}.
+\]
+
+\begin{description}
+%
+\fitem{matrix}{cholesky\_decompose}{matrix \farg{A}}{
+The lower-triangular Cholesky factor of the symmetric
+positive-definite matrix \farg{A}}
+%
+\end{description}
+
+\subsubsection{Singular Value Decomposition}
+
+Stan only provides functions for the singular values, not for the
+singular vectors involved in a singular value decomposition (SVD).
+
+\begin{description}
+%
+\fitem{vector}{singular\_values}{matrix \farg{A}}{
+The singular values of \farg{A} in descending order}
+%
+\end{description}
+
+
+\section{Sort Functions}
+
+See \refsection{sorting-functions} for examples of how the functions
+work.
+
+\begin{description}
+%
+\fitem{vector}{sort\_asc}{vector \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{row\_vector}{sort\_asc}{row\_vector \farg{v}}{
+Sort the elements of \farg{v} in ascending order}
+%
+\fitem{vector}{sort\_desc}{vector \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{row\_vector}{sort\_desc}{row\_vector \farg{v}}{
+Sort the elements of \farg{v} in descending order}
+%
+\fitem{int[]}{sort\_indices\_asc}{vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_asc}{row\_vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in ascending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
+\fitem{int[]}{sort\_indices\_desc}{row\_vector \farg{v}}{
+Return an array of indices between 1 and the size of \farg{v},
+sorted to index \farg{v} in descending order.}
+%
+\fitem{int}{rank}{vector \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\fitem{int}{rank}{row\_vector \farg{v}, int \farg{s}}{
+Number of components of \farg{v} less than \farg{v[s]}}
+%
+\end{description}
+
+
+\chapter{Sparse Matrix Operations}\label{sparse-matrices.chapter}
+
+\noindent
+For sparse matrices, for which many elements are zero, it is more
+efficient to use specialized representations to save memory and speed
+up matrix arithmetic (including derivative calculations).  Given
+Stan's implementation, there is substantial space (memory) savings by
+using sparse matrices.  Because of the ease of optimizing dense matrix
+operations, speed improvements only arise at 90\% or even greater
+sparsity; below that level, dense matrices are faster but use more memory.
+
+Because of this speedup and space savings, it may even be useful to
+read in a dense matrix and convert it to a sparse matrix before
+multiplying it by a vector.  This chapter covers a very specific form
+of sparsity consisting of a sparse matrix multiplied by a dense
+vector.
+
+\section{Compressed Row Storage}\label{CSR.section}
+
+Sparse matrices are represented in Stan using compressed row storage
+(CSR).  For example, the matrix
+\[
+A =
+\begin{bmatrix}
+19 & 27 & 0 & 0
+\\
+0 & 0 & 0 & 0
+\\
+0 & 0 & 0 & 52
+\\
+81 & 0 & 95 & 33
+\end{bmatrix}
+\]
+is translated into a vector of the non-zero real values, read by row
+from the matrix $A$,
+\[
+w(A) =
+\begin{bmatrix}
+19 & 27 & 52 & 81 & 95 & 33
+\end{bmatrix}^{\top} \! \! \! ,
+\]
+an array of integer column indices for the values,
+\[
+v(A) =
+\begin{bmatrix}
+1 & 2 & 4 & 1 & 3 & 4
+\end{bmatrix} \! ,
+\]
+and an array of integer indices indicating where in $w(A)$ a given row's
+values start,
+\[
+u(A) =
+\begin{bmatrix}
+1 & 3 & 3 & 4 & 7
+\end{bmatrix} \! ,
+\]
+with a padded value at the end to guarantee that
+\[
+u(A)[n+1] - u(A)[n]
+\]
+is the number of non-zero elements in row $n$ of the matrix (here $2$, $0$,
+$1$, and $3$). Note that because the second row has no non-zero elements both
+the second and third elements of $u(A)$ correspond to the third element of
+$w(A)$, which is $52$. The values $(w(A), \, v(A), \, u(A))$ are sufficient
+to reconstruct $A$.
+
+The values are structured so that there is a real value and integer
+column index for each non-zero entry in the array, plus one integer
+for each row of the matrix, plus one for padding.  There is also
+underlying storage for internal container pointers and sizes.  The
+total memory usage is roughly $12 K + M$ bytes plus a small constant
+overhead, which is often considerably fewer bytes than the $M \times N$
+required to store a dense matrix.  Even more importantly, zero
+values do not introduce derivatives under multiplication or addition,
+so many storage and evaluation steps are saved when sparse matrices
+are multiplied.
+
+\section{Conversion Functions}
+
+Conversion functions between dense and sparse matrices are provided.
+
+\subsection{Dense to Sparse Conversion}
+
+Converting a dense matrix $m$ to a sparse representation produces a
+vector $w$ and two integer arrays, $u$ and $v$.
+
+\begin{description}
+%
+  \fitem{vector}{csr\_extract\_w}{matrix \farg{a}}{ Return non-zero
+    values in matrix \farg{a}; see \refsection{CSR}.}
+%
+  \fitem{int[]}{csr\_extract\_v}{matrix \farg{a}}{Return column
+    indices for values in \code{csr\_extract\_w(\farg{a})}; see
+    \refsection{CSR}.}
+%
+  \fitem{int[]}{csr\_extract\_u}{matrix \farg{a}}{Return array of row
+    starting indices for entries in \code{csr\_extract\_w(\farg{a})}
+    followed by the size of \code{csr\_extract\_w(\farg{a})} plus one;
+    see \refsection{CSR}.}
+%
+\end{description}
+%
+
+\subsection{Sparse to Dense Conversion}
+
+To convert a sparse matrix representation to a dense matrix, there is
+a single function.
+%
+\begin{description}
+  \fitem{matrix}{csr\_to\_dense\_matrix}{int \farg{m}, int \farg{n},
+    vector \farg{w}, int[] \farg{v}, int[] \farg{u}}{Return dense
+    $\mbox{\farg{m}} \times \mbox{\farg{n}}$ matrix with non-zero
+    matrix entries \farg{w}, column indices \farg{v}, and row starting
+    indices \farg{u}; the vector \farg{w} and arrays \farg{v} and
+    \farg{u} must all be the same size, and the arrays \farg{v} and
+    \farg{u} must have index values bounded by \farg{m} and \farg{n}.
+    See \refsection{CSR} for more details.}
+\end{description}
+
+\section{Sparse Matrix Arithmetic}
+
+\subsection{Sparse Matrix Multiplication}
+
+The only supported operation is the multiplication of a sparse matrix
+$A$ and a dense vector $b$ to produce a dense vector $A\,b$.
+Multiplying a dense row vector $b$ and a sparse matrix $A$
+can be coded using transposition as
+\[
+b \, A = (A^{\top} \, b^{\top})^{\top},
+\]
+but care must be taken to represent $A^{\top}$ rather than $A$ as a
+sparse matrix.
+
+\begin{description}
+  \fitemtwolines{vector}{csr\_matrix\_times\_vector}{int \farg{m}, int
+    \farg{n}, vector \farg{w}}{int[] \farg{v}, int[] \farg{u}, vector
+    \farg{b}}{ Multiply the $\mbox{\farg{m}} \times \mbox{\farg{n}}$
+    matrix represented by values \farg{w}, column indices \farg{v},
+    and row start indices \farg{u} by the vector \farg{b}\,; see
+    \refsection{CSR}.}
+\end{description}
+
+
+
+\chapter{Mixed Operations}\label{mixed-operations.chapter}
+
+\noindent
+These functions perform conversions between Stan containers matrix,
+vector, row vector and arrays.
+
+\begin{description}
+%
+\fitem{matrix}{to\_matrix}{matrix \farg{m}}{
+Return the matrix \farg{m} itself.}
+%
+\fitem{matrix}{to\_matrix}{vector \farg{v}}{
+Convert the column vector \farg{v} to a \code{size(\farg{v})}
+by 1 matrix.}
+%
+\fitem{matrix}{to\_matrix}{row\_vector \farg{v}}{
+Convert the row vector \farg{v} to a 1 by \code{size(\farg{v})} matrix.}
+%
+%
+\fitem{matrix}{to\_matrix}{matrix \farg{m}, int \farg{m}, int \farg{n}}{
+Convert a matrix \farg{m} to a matrix with \farg{m} rows and
+\farg{n} columns filled in column-major order. }
+%
+\fitem{matrix}{to\_matrix}{vector \farg{v}, int \farg{m}, int \farg{n}}{
+Convert a vector \farg{v} to a matrix with \farg{m} rows and
+\farg{n} columns filled in column-major order. }
+%
+\fitem{matrix}{to\_matrix}{row\_vector \farg{v}, int \farg{m},
+                           int \farg{n}}{
+Convert a row\_vector \farg{a} to a matrix with \farg{m} rows and
+\farg{n} columns filled in column-major order. }
+%
+%
+\fitem{matrix}{to\_matrix}{matrix \farg{m}, int \farg{m}, int \farg{n},
+                           int col\_major}{
+Convert a matrix \farg{m} to a matrix with \farg{m} rows and
+\farg{n} columns filled in row-major order if col\_major equals 0
+(otherwise, they get filled in column-major order). }
+%
+\fitem{matrix}{to\_matrix}{vector \farg{v}, int \farg{m}, int \farg{n},
+                           int col\_major}{
+Convert a vector \farg{v} to a matrix with \farg{m} rows and
+\farg{n} columns filled in row-major order if col\_major equals 0
+(otherwise, they get filled in column-major order). }
+%
+\fitem{matrix}{to\_matrix}{row\_vector \farg{v}, int \farg{m},
+                           int \farg{n}, int col\_major}{
+Convert a row\_vector \farg{a} to a matrix with \farg{m} rows and
+\farg{n} columns filled in row-major order if col\_major equals 0
+(otherwise, they get filled in column-major order). }
+%
+%
+\fitem{matrix}{to\_matrix}{real[] \farg{a}, int \farg{m}, int \farg{n}}{
+Convert a one-dimensional array \farg{a} to a matrix with \farg{m} rows
+and \farg{n} columns filled in column-major order. }
+%
+\fitem{matrix}{to\_matrix}{int[] \farg{a}, int \farg{m}, int \farg{n}}{
+Convert a one-dimensional array \farg{a} to a matrix with \farg{m} rows
+and \farg{n} columns filled in column-major order. }
+%
+%
+\fitem{matrix}{to\_matrix}{real[] \farg{a}, int \farg{m}, int \farg{n},
+                           int col\_major}{
+Convert a one-dimensional array \farg{a} to a matrix with \farg{m} rows
+and \farg{n} columns filled in row-major order if col\_major equals 0
+(otherwise, they get filled in column-major order). }
+%
+\fitem{matrix}{to\_matrix}{int[] \farg{a}, int \farg{m}, int \farg{n},
+                           int col\_major}{
+Convert a one-dimensional array \farg{a} to a matrix with \farg{m} rows
+and \farg{n} columns filled in row-major order if col\_major equals 0
+(otherwise, they get filled in column-major order). }
+%
+%
+\fitem{matrix}{to\_matrix}{real[,] \farg{a}}{
+Convert the two dimensional array \farg{a} to a matrix with the same
+dimensions and indexing order.}
+%
+\fitem{matrix}{to\_matrix}{int[,] \farg{a}}{ Convert the two
+  dimensional array \farg{a} to a matrix with the same dimensions and
+  indexing order.  If any of the dimensions of \farg{a} are zero, the
+  result will be a $0 \times 0$ matrix.}
+%
+%
+\fitem{vector}{to\_vector}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a column vector in column-major order.}
+%
+\fitem{vector}{to\_vector}{vector \farg{v}}{
+Return the column vector \farg{v} itself.}
+%
+\fitem{vector}{to\_vector}{row\_vector \farg{v}}{
+Convert the row vector \farg{v} to a column vector.}
+%
+\fitem{vector}{to\_vector}{real[] \farg{a}}{
+Convert the one-dimensional array \farg{a} to a column vector.}
+%
+\fitem{vector}{to\_vector}{int[] \farg{a}}{
+Convert the one-dimensional integer array \farg{a} to a column vector.}
+%
+%
+%
+\fitem{row\_vector}{to\_row\_vector}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a row vector in column-major order.}
+%
+\fitem{row\_vector}{to\_row\_vector}{vector \farg{v}}{
+Convert the column vector \farg{v} to a row vector.}
+%
+\fitem{row\_vector}{to\_row\_vector}{row\_vector \farg{v}}{
+Return the row vector \farg{v} itself.}
+%
+\fitem{row\_vector}{to\_row\_vector}{real[] \farg{a}}{
+Convert the one-dimensional array \farg{a} to a row vector.}
+%
+\fitem{row\_vector}{to\_row\_vector}{int[] \farg{a}}{
+Convert the one-dimensional array \farg{a} to a row vector.}
+%
+%
+%
+\fitem{real[,]}{to\_array\_2d}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a two dimensional array with the same
+dimensions and indexing order.}
+%
+%
+%
+\fitem{real[]}{to\_array\_1d}{vector \farg{v}}{
+Convert the column vector \farg{v} to a one-dimensional array.}
+%
+\fitem{real[]}{to\_array\_1d}{row\_vector \farg{v}}{
+Convert the row vector \farg{v} to a one-dimensional array.}
+%
+\fitem{real[]}{to\_array\_1d}{matrix \farg{m}}{
+Convert the matrix \farg{m} to a one-dimensional array in column-major
+order.}
+%
+\fitem{real[]}{to\_array\_1d}{real[...] \farg{a}}{
+Convert the array \farg{a} (of any dimension up to 10) to a
+one-dimensional array in row-major order.}
+%
+\fitem{int[]}{to\_array\_1d}{int[...] \farg{a}}{
+Convert the array \farg{a} (of any dimension up to 10) to a
+one-dimensional array in row-major order.}
+%
+\end{description}
+
+
+\chapter{Compound Arithmetic and Assignment}
+
+\noindent
+Compound arithmetic and assignment statements combine an arithmetic
+operation and assignment,
+%
+\begin{stancode}
+x = x op y;
+\end{stancode}
+%
+replacing them with the compound form
+%
+\begin{stancode}
+x op= y;
+\end{stancode}
+%
+For example, \code{x = x + 1} may be replaced with \code{x += 1}.
+
+The signatures of the supported compound arithmetic and assignment
+operations are as follows.
+
+\section{Compound Addition and Assignment}
+
+\begin{description}
+\fitem{void}{operator+=}{int \farg{x}, int \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{real \farg{x}, real \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+%
+\fitem{void}{operator+=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+%
+\fitem{void}{operator+=}{vector \farg{x}, vector \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{row\_vector \farg{x}, row\_vector \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\fitem{void}{operator+=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} +=
+    y} is equivalent to \code{\farg{x} = \farg{x} + \farg{y}}.}
+\end{description}
+
+\section{Compound Subtraction and Assignment}
+
+\begin{description}
+\fitem{void}{operator-=}{int \farg{x}, int \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{real \farg{x}, real \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+%
+\fitem{void}{operator-=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+%
+\fitem{void}{operator-=}{vector \farg{x}, vector \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{row\_vector \farg{x}, row\_vector \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\fitem{void}{operator-=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} -=
+    y} is equivalent to \code{\farg{x} = \farg{x} - \farg{y}}.}
+\end{description}
+
+\section{Compound Multiplication and Assignment}
+
+\begin{description}
+\fitem{void}{operator*=}{int \farg{x}, int \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+\fitem{void}{operator*=}{real \farg{x}, real \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+%
+\fitem{void}{operator*=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+\fitem{void}{operator*=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+\fitem{void}{operator*=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+%
+\fitem{void}{operator*=}{row\_vector \farg{x}, matrix \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+%
+\fitem{void}{operator*=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} *=
+    y} is equivalent to \code{\farg{x} = \farg{x} * \farg{y}}.}
+\end{description}
+
+\section{Compound Division and Assignment}
+
+\begin{description}
+\fitem{void}{operator/=}{int \farg{x}, int \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+\fitem{void}{operator/=}{real \farg{x}, real \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+%
+\fitem{void}{operator/=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+\fitem{void}{operator/=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+\fitem{void}{operator/=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} /=
+    y} is equivalent to \code{\farg{x} = \farg{x} / \farg{y}}.}
+\end{description}
+
+\section{Compound Elementwise Multiplication and Assignment}
+
+\begin{description}
+\fitem{void}{operator.*=}{vector \farg{x}, vector \farg{y}}{\code{\farg{x} .*=
+    y} is equivalent to \code{\farg{x} = \farg{x} .* \farg{y}}.}
+\fitem{void}{operator.*=}{row\_vector \farg{x}, row\_vector \farg{y}}{\code{\farg{x} .*=
+    y} is equivalent to \code{\farg{x} = \farg{x} .* \farg{y}}.}
+\fitem{void}{operator.*=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} .*=
+    y} is equivalent to \code{\farg{x} = \farg{x} .* \farg{y}}.}
+\end{description}
+
+\section{Compound Elementwise Division and Assignment}
+
+\begin{description}
+\fitem{void}{operator./=}{vector \farg{x}, vector \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\fitem{void}{operator./=}{row\_vector \farg{x}, row\_vector \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\fitem{void}{operator./=}{matrix \farg{x}, matrix \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+%
+\fitem{void}{operator./=}{vector \farg{x}, real \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\fitem{void}{operator./=}{row\_vector \farg{x}, real \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\fitem{void}{operator./=}{matrix \farg{x}, real \farg{y}}{\code{\farg{x} ./=
+    y} is equivalent to \code{\farg{x} = \farg{x} ./ \farg{y}}.}
+\end{description}
+
+\chapter{Higher-Order Functions}
+
+\noindent
+Stan provides a few higher-order functions that act on other
+functions.  In all cases, the function arguments to the higher-order
+functions are defined as functions within the Stan language and passed
+by name to the higher-order functions.
+
+
+\section{Algebraic Equation Solver}%
+\label{functions-algebraic-solver.section}
+
+Stan provides a built-in algebraic equation solver. Although it looks
+like other function applications, the algebraic solver is special in
+two ways.
+
+First, the algebraic solver is a higher-order function, i.e. it takes
+another function as one of its arguments. The only other functions
+in Stan which share this feature are the ordinary differential equation
+solvers (see \refsection{functions-ode-solver}). Ordinary Stan
+functions do not allow functions as arguments.
+
+Second, some of the arguments of the algebraic solvers are restricted
+to data only expressions. These expressions must not contain variables
+other than those declared in the data or transformed data blocks. Ordinary
+Stan functions place no restriction on the origin of variables in their argument
+expressions.
+
+\subsection{Specifying an Algebraic Equation as a Function}
+
+An algebraic system is specified as an ordinary function in Stan within the
+function block. The algebraic system function must have this signature:
+%
+\begin{stancode}
+vector algebra_system(vector y, vector theta,
+                      real[] x_r, int[] x_i)
+\end{stancode}
+%
+The algebraic system function should return the value of the algebraic
+function which goes to 0, when we plug in the solution to the algebraic
+system.
+
+The argument of this function are:
+\begin{itemize}
+\item \farg{y}, the unknowns we wish to solve for
+\item \farg{theta}, parameter values used to evaluate the algebraic system
+\item \farg{x\_r}, data values used to evaluate the algebraic system
+\item \farg{x\_i}, integer data used to evaluate the algebraic system
+\end{itemize}
+
+The algebraic system function separates parameter values, \farg{theta},
+from data values, \farg{x\_r}, for efficiency in computing the gradients
+of the algebraic system.
+
+\subsection{Call to the Algebraic Solver}
+
+\begin{description}
+%
+   \fitemthreelines{vector}{algebra\_solver}%
+                  {function \farg{algebra\_system}}%
+                  {vector \farg{y\_guess}}%
+                  {vector \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {Solves the algebraic system, given an initial guess,
+                    using the Powell hybrid algorithm.}
+
+\fitemfourlines{vector}{algebra\_solver}%
+                  {function \farg{algebra\_system}}%
+                  {vector \farg{y\_guess}}%
+                  {vector \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {real \farg{rel\_tol}, real \farg{f\_tol}, int \farg{max\_steps}}%
+                  {Solves the algebraic system, given an initial guess,
+                    using the Powell hybrid algorithm with additional control
+                    parameters for the solver.}
+%
+\end{description}
+
+
+\subsubsection{Arguments to the Algebraic Solver}
+
+The arguments to the algebraic solver are as follows:
+%
+\begin{enumerate}
+\item \farg{algebra\_system}: function literal referring to a function
+  specifying the system of algebraic equations with signature
+  \begin{quote}
+    (vector, vector, real[], int[]):vector
+  \end{quote}
+  The arguments represent (1) unknowns, (2) parameters, (3) real data, and
+  (4) integer data, and the return value contains the value of the algebraic
+  function, which goes to 0 when we plug in the solution to the algebraic system,
+\item \farg{y\_guess}: initial guess for the solution, type \code{vector},
+\item \farg{theta}: parameters only, type \code{vector},
+\item \farg{x\_r}: real data only, type \code{real[]}, and
+\item \farg{x\_i}: integer data only, type \code{int[]}.
+\end{enumerate}
+
+For more fine-grained control of the algebraic solver, these parameters can also
+be provided:
+%
+\begin{enumerate}
+  \addtocounter{enumi}{5}
+  \item \farg{rel\_tol}: relative tolerance for the algebraic solver, type \code{real}, data only,
+  \item \farg{function\_tol}: function tolerance for the algebraic solver, type \code{real}, data only,
+  \item \farg{max\_num\_steps}: maximum number of steps to take in the algebraic solver, type \code{int}, data only.
+\end{enumerate}
+
+\subsubsection{Return value}
+
+The return value for the algebraic solver is an object of type \code{vector}, with values
+which, when plugged in as \code{y} make the algebraic function go to 0.
+
+\subsubsection{Sizes and parallel arrays}
+
+Certain sizes have to be consistent. The initial guess, return value of the solver, and
+return value of the algebraic function must all be the same size.
+
+The parameters, real data, and integer data will be passed from the solver directly to the
+system function.
+
+\subsubsection{Algorithmic details}
+
+The algebraic solver uses the Powell hybrid method \citep{Powell:1970}, which
+in turn uses first-order derivatives. The
+Stan code builds on the implementation of the hybrid solver in the
+unsupported module for nonlinear optimization problems of the Eigen library
+\citep{Eigen:2013}. This solver is in turn based on the algorithm developed
+for the package MINPACK-1 \citep{minpack:1980}.
+
+The Jacobian of the solution with respect to auxiliary parameters is computed
+using the implicit function theorem. Intermediate Jacobians (of the the algebraic
+function's output with respect to the unknowns \farg{y} and with respect to the
+auxiliary parameters \farg{theta}) are computed using Stan's automatic
+differentiation.
+
+
+\section{Ordinary Differential Equation Solvers}%
+\label{functions-ode-solver.section}
+
+Stan provides built-in ordinary differential equation (ODE) solvers.
+Although they look like function applications, the ODE solvers are
+special in two ways.
+
+First, the first argument to each of the solvers is a function
+specifying the ODE system as an argument, like PKBugs
+\citep{LunnEtAl:1999}. Ordinary Stan functions do not allow functions
+as arguments.
+
+Second, some of the arguments to the ODE solvers are restricted to
+data only expressions. These expressions must not contain variables
+other than those declared in the data or transformed data blocks.
+Ordinary Stan functions place no restriction on the origin of variables
+in their argument expressions.
+
+\subsection{Specifying an Ordinary Differential Equation as a Function}%
+\label{functions-ode-function.section}
+
+A system of ODEs is specified as an ordinary function in Stan within
+the functions block. The ODE system function must have this function
+signature:
+%
+\begin{stancode}
+real[] ode(real time, real[] state, real[] theta,
+           real[] x_r, int[] x_i)
+\end{stancode}
+%
+The ODE system function should return the derivative of the state
+with respect to time at the time provided. The length of the returned
+real array must match the length of the state input into the
+function.
+
+The arguments to this function are:
+\begin{itemize}
+\item \farg{time}, the time to evaluate the ODE system
+\item \farg{state}, the state of the ODE system at the time specified
+\item \farg{theta}, parameter values used to evaluate the ODE system
+\item \farg{x\_r}, data values used to evaluate the ODE system
+\item \farg{x\_i}, integer data values used to evaluate the ODE system.
+\end{itemize}
+%
+The ODE system function separates parameter values, \farg{theta}, from
+data values, \farg{x\_r}, for efficiency in computing the gradients of
+the ODE.
+
+\subsection{Non-Stiff Solver}
+
+\begin{description}
+  %
+  \fitemthreelines{real[~,~]}{integrate\_ode\_rk45}%
+                  {function \farg{ode}, real[] \farg{initial\_state}}%
+                  {real \farg{initial\_time}, real[] \farg{times}}%
+                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {Solves the ODE system for the times provided
+                    using the Runge Kutta Dopri algorithm with the implementation
+                    from Boost.}
+ %
+ \fitemfourlines{real[~,~]}{integrate\_ode\_rk45}%
+                {function \farg{ode}, real[] \farg{initial\_state}}%
+                {real \farg{initial\_time}, real[] \farg{times}}%
+                {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                {real \farg{rel\_tol}, real \farg{abs\_tol}, int \farg{max\_num\_steps}}%
+                {Solves the ODE system for the times provided using the Runge Kutta
+                  Dopri algorithm with the implementation from Boost with
+                  additional control parameters for the solver.}
+ %
+ \fitemthreelines{real[~,~]}{integrate\_ode}%
+                 {function \farg{ode}, real[] \farg{initial\_state}}%
+                 {real \farg{initial\_time}, real[] \farg{times}}%
+                 {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                 {Deprecated. Solves the ODE system for the times provided with a
+                   non-stiff solver.  This calls the Runge Kutta Dopri algorithm.}
+  %
+\end{description}
+
+
+\subsection{Stiff Solver}
+
+\begin{description}
+  %
+  \fitemthreelines{real[]}{integrate\_ode\_bdf}%
+                  {function \farg{ode}, real[] \farg{initial\_state}}%
+                  {real \farg{initial\_time}, real[] \farg{times}}%
+                  {real[] \farg{theta}, data real[] \farg{x\_r}, data int[] \farg{x\_i}}%
+                  {Solves the ODE system for the times provided using the backward
+                    differentiation formula (BDF) method with the implementation from
+                    CVODES.}
+ %
+ \fitemfourlines{real[]}{integrate\_ode\_bdf}%
+                {function \farg{ode}, real[] \farg{initial\_state}}%
+                {real \farg{initial\_time}, real[] \farg{times}}%
+                {real[] \farg{theta}, data real[] \farg{x\_r}, data int[] \farg{x\_i}}%
+                {data real \farg{rel\_tol}, data real \farg{abs\_tol},
+                  dta int \farg{max\_num\_steps}}%
+                {Solves the ODE system for the times provided using the backward
+                  differentiation formula (BDF) method with the implementation from
+                  CVODES with additional control parameters for the CVODES solver.}
+  %
+\end{description}
+
+\subsection{Arguments to the ODE solvers}
+
+The arguments to the ODE solvers in both the stiff and non-stiff cases
+are as follows.
+%
+\begin{enumerate}
+\item \farg{ode}: function literal referring to a function specifying
+  the system of differential equations with signature described in
+  \refsection{functions-ode-function}:
+  \begin{quote}
+    (real, real[], real[], data real[], data int[]):real[]
+  \end{quote}
+  The arguments represent (1) time, (2) system state, (3) parameters,
+  (4) real data, and (5) integer data, and the return value contains the
+  derivatives with respect to time of the state,
+\item \farg{initial\_state}: initial state, type \code{real[]},
+\item \farg{initial\_time}: initial time, type \code{int}
+  or \code{real},
+\item \farg{times}: solution times, type \code{real[]},
+\item \farg{theta}: parameters, type \code{real[]},
+\item \code{data} \farg{x\_r}: real data, type \code{real[]}, data only, and
+\item \code{data} \farg{x\_i}: integer data, type \code{int[]}, data only.
+\end{enumerate}
+
+For more fine-grained control of the ODE solvers, these parameters can
+also be provided:
+\begin{enumerate}
+  \addtocounter{enumi}{7}
+\item \code{data} \farg{rel\_tol}: relative tolerance for the ODE
+  solver, type \code{real}, data only,
+\item \code{data} \farg{abs\_tol}: absolute tolerance for the ODE
+  solver, type \code{real}, data only, and
+\item \code{data} \farg{max\_num\_steps}: maximum number of steps to take in the
+  ODE solver, type \code{int}, data only.
+\end{enumerate}
+%
+
+\subsubsection{Return values}
+
+The return value for the ODE solvers is an array of type
+\code{real[,]}, with values consisting of solutions at the specified
+times.
+
+\subsubsection{Sizes and parallel arrays}
+
+The sizes must match, and in particular, the following groups are of
+the same size:
+%
+\begin{itemize}
+\item state variables passed into the system function,
+  derivatives returned by the system function, initial state passed
+  into the solver, and rows of the return value of the solver,
+\item solution times and number of rows of the return value of the solver,
+\item parameters, real data and integer data passed to the solver will
+  be passed to the system function
+\end{itemize}
+%
+
+\section{Higher-Order Map}\label{functions-map.section}
+
+Stan provides a higher-order map function.  This allows map-reduce
+functionality to be coded in Stan as described in the user's guide.
+
+\subsection{Specifying the Mapped Function}
+
+The function being mapped must have a signature identical to that of
+the function \code{f} in the following declaration.
+%
+\begin{stancode}
+vector f(vector phi, vector theta,
+         data real[] x_r, data int[] x_i);
+\end{stancode}
+%
+The map function returns the sequence of results for the particular
+shard being evaluated.  The arguments to the mapped function are:
+%
+\begin{itemize}
+\item \farg{phi}, the sequence of parameters shared across shards
+\item \farg{theta}, the sequence of parameters specific to this shard
+\item \farg{x\_r}, sequence of real-valued data
+\item \farg{x\_i}, sequence of integer data
+\end{itemize}
+%
+All input for the mapped function must be packed into these sequences
+and all output from the mapped function must be packed into a single
+vector.  The vector of output from each mapped function is concatenated
+into the final result.
+
+\subsection{Rectangular Map}
+
+The rectangular map function operates on rectangular (not ragged) data
+structures, with parallel data structures for job-specific parameters,
+job-specific real data, and job-specific integer data.
+
+\begin{description}
+\fitemtwolines{vector}{map\_rect}{F \farg{f}, vector \farg{phi}, vector[] \farg{theta},
+  data real[,] \farg{x\_r}}{data int[,] \farg{x\_i}}{Return the concatenation of
+  the results of applying the function \farg{f}, of type
+  \code{(vector, vector, real[], int[]):vector} elementwise, i.e.,
+  \code{\farg{f}(\farg{phi}, \farg{theta}[n], \farg{x\_r}[n],
+    \farg{x\_i}[n])} for each \code{n} in \code{1:N}, where \code{N}
+  is the size of the parallel arrays of job-specific/local parameters
+  \code{theta}, real data \code{x\_r}, and integer data \code{x\_r}.
+  The shared/global parameters \code{phi} are passed to each
+  invocation of \code{f}.}
+\end{description}

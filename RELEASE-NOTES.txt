@@ -5,6 +5,66 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.18.0 (13 July 2018)
+======================================================================
+This is our first release with parallelism (threading and MPI)!
+
+New Features
+--------------------------------------------------
+* New functions from Math library:
+  - map_rect
+  - multi_normal_rng
+  - multi_normal_cholesky_rng
+  - multi_student_t_rng
+  - many vectorized RNGs
+    - multi_normal_rng
+    - multi_normal_cholesky_rng
+    - multi_student_t_rng
+    - bernoulli_rng
+    - beta_binomial_rng
+    - binomial_rng
+    - neg_binomial_2_rng
+    - neg_binomial_2_log_rng
+    - neg_binomial_rng
+    - poisson_rng
+    - poisson_log_rng
+    - uniform_rng
+    - von_mises_rng
+  - qr_thin_Q
+  - qr_thin_R
+  - matrix_exp_multiply
+  - scale_matrix_exp_multiply
+  - integrate_ode_adams
+  - log_mix
+  - std_normal
+  - ordered_logistic_log
+  - ordered_probit_log
+
+* Manual now available in HTML (#2558)
+* other vectorized RNGs (#2467)
+* Easier-to-use algebra_solver
+* Changes to effective sample size calculation (#2451)
+* Foreach loops (#2438)
+* Standalone generated quantities (#2434)
+* Allow users to qualify function parameters as data (#2430)
+
+Bug Fixes
+--------------------------------------------------
+* Better error messages (#2508, #2554)
+* Fixes the behavior in mcmc_writer so that when there's an exception thrown in the model's generated quantities block, it writes out the parameter values and NaN for any generated quantity (#2571)
+* Allow initialization of a Stan program to continue when there's a violation of constraints in transformed parameters (#2570)
+* Fixed `+=` #(2482)
+* rising_factorial and falling_factorial type checking (#2413)
+* have parser check return type of integrate_ode_bdf functional (#2411)
+* increase precision in output of ELBO values (#2406)
+* ternary op fixes (#2101)
+
+
+v2.17.1 (11 December 2017)
+======================================================================
+This is a bugfix release fixing a performance regression in the math repo. See
+https://github.com/stan-dev/math/issues/667 for more details.
+
 v2.17.0 (05 September 2017)
 ======================================================================
 

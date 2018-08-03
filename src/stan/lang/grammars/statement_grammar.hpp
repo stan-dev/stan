@@ -33,42 +33,14 @@ namespace stan {
       indexes_grammar<Iterator> indexes_g;
 
       boost::spirit::qi::rule<Iterator,
-                              assignment(scope),
-                              whitespace_grammar<Iterator> >
-      assignment_r;
-
-      boost::spirit::qi::rule<Iterator,
-                              compound_assignment(scope),
-                              whitespace_grammar<Iterator> >
-      compound_assignment_r;
-
-      boost::spirit::qi::rule<Iterator,
                               assgn(scope),
                               whitespace_grammar<Iterator> >
       assgn_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::unused_type,
+                              std::string(),
                               whitespace_grammar<Iterator> >
       assignment_operator_r;
-
-
-      boost::spirit::qi::rule<Iterator,
-                              expression(scope),
-                              whitespace_grammar<Iterator> >
-      non_lvalue_assign_r;
-
-
-      boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(scope),
-                              whitespace_grammar<Iterator> >
-      dims_r;
-
-      boost::spirit::qi::rule<Iterator,
-                              variable(scope),
-                              whitespace_grammar<Iterator> >
-      var_r;
-
 
       boost::spirit::qi::rule<Iterator,
                               distribution(scope),
@@ -92,6 +64,17 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       for_statement_r;
 
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<std::string>,
+                              for_array_statement(scope),
+                              whitespace_grammar<Iterator> >
+      for_array_statement_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              boost::spirit::qi::locals<std::string>,
+                              for_matrix_statement(scope),
+                              whitespace_grammar<Iterator> >
+      for_matrix_statement_r;
 
       boost::spirit::qi::rule<Iterator,
                               while_statement(scope),
@@ -146,14 +129,19 @@ namespace stan {
       local_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
+                              std::vector<idx>(scope),
+                              whitespace_grammar<Iterator> >
+      idxs_r;
+
+      boost::spirit::qi::rule<Iterator,
                               no_op_statement(),
                               whitespace_grammar<Iterator> >
       no_op_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(scope),
+                              std::vector<idx>(scope),
                               whitespace_grammar<Iterator> >
-      opt_dims_r;
+      opt_idxs_r;
 
       boost::spirit::qi::rule<Iterator,
                               range(scope),
@@ -188,9 +176,9 @@ namespace stan {
       truncation_range_r;
 
       boost::spirit::qi::rule<Iterator,
-                              variable_dims(scope),
+                              variable(scope),
                               whitespace_grammar<Iterator> >
-      var_lhs_r;
+      var_r;
 
       boost::spirit::qi::rule<Iterator,
                               expression(scope),

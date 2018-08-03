@@ -12,11 +12,7 @@ namespace stan {
 
     statement::statement(const nil& st) : statement_(st) { }
 
-    statement::statement(const assignment& st) : statement_(st) { }
-
     statement::statement(const assgn& st) : statement_(st) { }
-
-    statement::statement(const compound_assignment& st) : statement_(st) { }
 
     statement::statement(const sample& st) : statement_(st) { }
 
@@ -29,6 +25,10 @@ namespace stan {
     statement::statement(const expression& st) : statement_(st) { }
 
     statement::statement(const for_statement& st) : statement_(st) { }
+
+    statement::statement(const for_array_statement& st) : statement_(st) { }
+
+    statement::statement(const for_matrix_statement& st) : statement_(st) { }
 
     statement::statement(const while_statement& st) : statement_(st) { }
 

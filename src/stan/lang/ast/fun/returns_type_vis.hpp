@@ -9,14 +9,14 @@ namespace stan {
   namespace lang {
 
     struct nil;
-    struct assignment;
     struct assgn;
-    struct compound_assignment;
     struct sample;
     struct increment_log_prob_statement;
     struct expression;
     struct statements;
     struct for_statement;
+    struct for_array_statement;
+    struct for_matrix_statement;
     struct conditional_statement;
     struct while_statement;
     struct break_continue_statement;
@@ -59,27 +59,7 @@ namespace stan {
        * @param[in] st statement
        * @return false
        */
-      bool operator()(const assignment& st) const;
-
-      /**
-       * Return true if the specified statement is a return statement
-       * with an expression of the type specified at construction
-       * time.
-       *
-       * @param[in] st statement
-       * @return false
-       */
       bool operator()(const assgn& st) const;
-
-      /**
-       * Return true if the specified statement is a return statement
-       * with an expression of the type specified at construction
-       * time.
-       *
-       * @param[in] st statement
-       * @return false
-       */
-      bool operator()(const compound_assignment& st) const;
 
       /**
        * Return true if the specified statement is a return statement
@@ -130,6 +110,26 @@ namespace stan {
        * @return false
        */
       bool operator()(const for_statement& st) const;
+
+      /**
+       * Return true if the specified statement is a return statement
+       * with an expression of the type specified at construction
+       * time.
+       *
+       * @param[in] st statement
+       * @return false
+       */
+      bool operator()(const for_array_statement& st) const;
+
+      /**
+       * Return true if the specified statement is a return statement
+       * with an expression of the type specified at construction
+       * time.
+       *
+       * @param[in] st statement
+       * @return false
+       */
+      bool operator()(const for_matrix_statement& st) const;
 
       /**
        * Return true if the specified statement is a return statement

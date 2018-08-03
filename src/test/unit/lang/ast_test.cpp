@@ -1,7 +1,9 @@
 #include <stan/lang/ast_def.cpp>
 #include <stan/lang/generator.hpp>
 #include <gtest/gtest.h>
+#include <boost/variant/polymorphic_get.hpp>
 #include <cmath>
+
 #include <sstream>
 #include <string>
 #include <set>
@@ -119,7 +121,7 @@ TEST(langAst, printSignature) {
   EXPECT_EQ("  foo(real[,], int[], vector, data matrix, matrix)" + platform_eol,
             msgs3.str());
 
-  
+
 }
 
 TEST(langAst, hasVar) {
@@ -349,7 +351,7 @@ TEST(lang_ast,function_signatures_log_sum_exp_2) {
                                              expr_type(double_type())),
                                error_msgs));
 }
- 
+
 TEST(lang_ast, function_signatures_add) {
   stan::lang::function_signatures& fs = stan::lang::function_signatures::instance();
   std::stringstream error_msgs;
@@ -473,7 +475,7 @@ TEST(langAst, isUserDefined) {
   pair<string, function_signature_t> name_sig(name, sig);
 
   function_signatures::instance().set_user_defined(name_sig);
-  
+
   EXPECT_TRUE(is_user_defined(name, args));
   EXPECT_TRUE(function_signatures::instance().is_user_defined(name_sig));
   EXPECT_FALSE(is_user_defined_prob_function("foo",
@@ -565,32 +567,32 @@ TEST(langAst, solveAlgebra) {
     using stan::lang::variable;
     using stan::lang::expr_type;
     using stan::lang::expression;
-    
+
     algebra_solver so;  // null ctor should work and not raise error
     std::string system_function_name = "bronzino";
-    
+
     variable y("y_var_name");
     y.set_type(vector_type(), 0);  // vector from Eigen
-    
+
     variable theta("theta_var_name");
     theta.set_type(vector_type(), 0);
-    
+
     variable x_r("x_r_r_var_name");
     x_r.set_type(double_type(), 1);  // plain old vector
-    
+
     variable x_i("x_i_var_name");
     x_i.set_type(int_type(), 1);
-    
+
     // example of instantiation
     algebra_solver so2(system_function_name, y, theta, x_r, x_i);
-    
+
     // dumb test to make sure we at least get the right types back
     EXPECT_EQ(system_function_name, so2.system_function_name_);
     EXPECT_EQ(y.type_, so2.y_.expression_type());
     EXPECT_EQ(theta.type_, so2.theta_.expression_type());
     EXPECT_EQ(x_r.type_, so2.x_r_.expression_type());
     EXPECT_EQ(x_i.type_, so2.x_i_.expression_type());
-    
+
     expression e2(so2);
     EXPECT_EQ(expr_type(vector_type(), 0), e2.expression_type());
 }
@@ -719,8 +721,9 @@ TEST(langAst, assgn) {
   stan::lang::uni_idx ui(e_int3);
   stan::lang::idx idx0(ui);
   is.push_back(idx0);
+  std::string op("=");
   stan::lang::expression e(stan::lang::int_literal(3));
-  stan::lang::assgn a(v, is, e);
+  stan::lang::assgn a(v, is, op, e);
   // retrieve indexes
   EXPECT_EQ(1, a.idxs_.size());
   // retrieve LHS variable
@@ -1026,32 +1029,33 @@ TEST(langAst, lhsVarOccursOnRhs) {
   stan::lang::uni_idx ui(e_int3);
   stan::lang::idx idx0(ui);
   is.push_back(idx0);
+  std::string op("=");
   stan::lang::expression e(stan::lang::int_literal(3));
-  stan::lang::assgn a(v, is, e);
+  stan::lang::assgn a(v, is, op, e);
   EXPECT_FALSE(a.lhs_var_occurs_on_rhs());
 
   std::vector<stan::lang::idx> is2;
-  stan::lang::assgn a2(v, is2, v);
+  stan::lang::assgn a2(v, is2, op, v);
   EXPECT_TRUE(a2.lhs_var_occurs_on_rhs());
 
   stan::lang::unary_op uo('+', v);
-  stan::lang::assgn a3(v, is2, uo);
+  stan::lang::assgn a3(v, is2, op, uo);
   EXPECT_TRUE(a3.lhs_var_occurs_on_rhs());
 
   stan::lang::binary_op bo(v, "-", e_int3);
-  stan::lang::assgn a4(v, is2, bo);
+  stan::lang::assgn a4(v, is2, op, bo);
   EXPECT_TRUE(a4.lhs_var_occurs_on_rhs());
 
   stan::lang::binary_op bo2(e_int3, "*", e_int3);
-  stan::lang::assgn a5(v, is2, bo2);
+  stan::lang::assgn a5(v, is2, op, bo2);
   EXPECT_FALSE(a5.lhs_var_occurs_on_rhs());
 
   stan::lang::binary_op bo3(e_int3, "*", bo);
-  stan::lang::assgn a6(v, is2, bo3);
+  stan::lang::assgn a6(v, is2, op, bo3);
   EXPECT_TRUE(a6.lhs_var_occurs_on_rhs());
 
   stan::lang::index_op_sliced ios(v, is2);
-  stan::lang::assgn a7(v, is2, ios);
+  stan::lang::assgn a7(v, is2, op, ios);
   EXPECT_TRUE(a7.lhs_var_occurs_on_rhs());
 }
 
@@ -1115,4 +1119,27 @@ TEST(StanLangAst, Scope) {
 
   stan::lang::scope s2(stan::lang::data_origin);
   EXPECT_TRUE(s2.is_local() == true || s2.is_local() == false);
+}
+
+TEST(StanLangAst, MapRect) {
+  // make sure nullary ctor works
+  stan::lang::map_rect mr1;
+  EXPECT_TRUE(mr1.call_id_ == -1);
+
+  // test fidelity of storage
+  std::string name = "foo";
+  stan::lang::expression e1 = int_literal(1);
+  stan::lang::expression e2 = int_literal(2);
+  stan::lang::expression e3 = int_literal(3);
+  stan::lang::expression e4 = int_literal(4);
+  stan::lang::map_rect mr(name, e1, e2, e3, e4);
+  EXPECT_TRUE(mr.fun_name_ == "foo");
+  int_literal lit1 = boost::polymorphic_get<int_literal>(mr.shared_params_.expr_);
+  EXPECT_EQ(1, lit1.val_);
+  int_literal lit2 = boost::polymorphic_get<int_literal>(mr.job_params_.expr_);
+  EXPECT_EQ(2, lit2.val_);
+  int_literal lit3 = boost::polymorphic_get<int_literal>(mr.job_data_r_.expr_);
+  EXPECT_EQ(3, lit3.val_);
+  int_literal lit4 = boost::polymorphic_get<int_literal>(mr.job_data_i_.expr_);
+  EXPECT_EQ(4, lit4.val_);
 }

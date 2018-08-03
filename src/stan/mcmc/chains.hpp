@@ -3,6 +3,7 @@
 
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/prim/mat.hpp>
+#include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
@@ -207,70 +208,6 @@ namespace stan {
         for (idx_t i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
-      }
-
-      /**
-       * Returns the effective sample size for the specified parameter
-       * across all kept samples.
-       *
-       * The implementation matches BDA3's effective size description.
-       *
-       * Current implementation takes the minimum number of samples
-       * across chains as the number of samples per chain.
-       *
-       * @param VectorXd
-       * @param Dynamic
-       * @param samples
-       *
-       * @return
-       */
-      double effective_sample_size(const Eigen::Matrix<Eigen::VectorXd,
-                                   Dynamic, 1> &samples) const {
-        int chains = samples.size();
-
-        // need to generalize to each jagged samples per chain
-        int n_samples = samples(0).size();
-        for (int chain = 1; chain < chains; chain++) {
-          n_samples = std::min(n_samples,
-                               static_cast<int>(samples(chain).size()));
-        }
-
-        Eigen::Matrix<Eigen::VectorXd, Dynamic, 1> acov(chains);
-        for (int chain = 0; chain < chains; chain++) {
-          acov(chain) = autocovariance(samples(chain));
-        }
-
-        Eigen::VectorXd chain_mean(chains);
-        Eigen::VectorXd chain_var(chains);
-        for (int chain = 0; chain < chains; chain++) {
-          double n_kept_samples = num_kept_samples(chain);
-          chain_mean(chain) = mean(samples(chain));
-          chain_var(chain) = acov(chain)(0)*n_kept_samples/(n_kept_samples-1);
-        }
-
-        double mean_var = mean(chain_var);
-        double var_plus = mean_var*(n_samples-1)/n_samples;
-        if (chains > 1)
-          var_plus += variance(chain_mean);
-        Eigen::VectorXd rho_hat_t(n_samples);
-        rho_hat_t.setZero();
-        double rho_hat = 0;
-        int max_t = 0;
-        for (int t = 1; (t < n_samples && rho_hat >= 0); t++) {
-          Eigen::VectorXd acov_t(chains);
-          for (int chain = 0; chain < chains; chain++) {
-            acov_t(chain) = acov(chain)(t);
-          }
-          rho_hat = 1 - (mean_var - mean(acov_t)) / var_plus;
-          if (rho_hat >= 0)
-            rho_hat_t(t) = rho_hat;
-          max_t = t;
-        }
-        double ess = chains * n_samples;
-        if (max_t > 1) {
-          ess /= 1 + 2 * rho_hat_t.sum();
-        }
-        return ess;
       }
 
       /**
@@ -670,12 +607,17 @@ namespace stan {
 
       // FIXME: reimplement using autocorrelation.
       double effective_sample_size(const int index) const {
-        Eigen::Matrix<Eigen::VectorXd, Dynamic, 1>
-          samples(num_chains());
-        for (int chain = 0; chain < num_chains(); chain++) {
-          samples(chain) = this->samples(chain, index);
+        int n_chains = num_chains();
+        std::vector<const double*> draws(n_chains);
+        std::vector<size_t> sizes(n_chains);
+        int n_kept_samples = 0;
+        for (int chain = 0; chain < n_chains; ++chain) {
+          n_kept_samples = num_kept_samples(chain);
+          draws[chain]
+            = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+          sizes[chain] = n_kept_samples;
         }
-        return effective_sample_size(samples);
+        return analyze::compute_effective_sample_size(draws, sizes);
       }
 
       double effective_sample_size(const std::string& name) const {

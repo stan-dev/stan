@@ -197,9 +197,10 @@ TEST(lang, generate_cpp) {
   stan::lang::program prog;
   std::string model_name = "m";
   std::stringstream output;
-
-
-  stan::io::program_reader reader = create_stub_reader();
+  stan::io::program_reader reader;
+  // fake reader history - no stan program, just AST
+  reader.add_event(0, 0, "start", "generator-test");
+  reader.add_event(500, 500, "end", "generator-test");
   stan::lang::generate_cpp(prog, model_name, reader.history(), output);
   std::string output_str = output.str();
 
@@ -375,9 +376,9 @@ TEST(langGenerator, slicedAssigns) {
   std::vector<stan::lang::idx> is;
   is.push_back(idx0);
   is.push_back(idx1);
-
+  std::string op("=");
   stan::lang::expression e(stan::lang::int_literal(3));
-  stan::lang::assgn a(v, is, e);
+  stan::lang::assgn a(v, is, op, e);
   stan::lang::statement s(a);
   s.begin_line_ = 12U;
   s.end_line_ = 14U;
@@ -481,7 +482,7 @@ TEST(langGenerator, genArrayVars) {
   o.str(std::string());
   stan::lang::generate_array_var_type(base_expr_type(row_vector_type()), ssReal.str(), o);
   EXPECT_EQ(1, count_matches("Eigen::Matrix<double,1,Eigen::Dynamic> ", o.str()));
-  
+
   ssReal.str(std::string());
   stan::lang::generate_real_var_type(td_origin, true, ssReal);
   o.str(std::string());
@@ -510,4 +511,30 @@ TEST(genArrayBuilderAdds, addScalars) {
   std::stringstream o2;
   stan::lang::generate_array_builder_adds(elts, true, o2);
   EXPECT_EQ(3, count_matches(".add(", o2.str()));
+}
+
+
+TEST(genExpression, mapRect) {
+  std::string model_code
+      = "functions {"
+      "  vector foo(vector shared_params, vector job_params,"
+      "             real[] data_r, int[] data_i) {"
+      "    return [1, 2, 3]';"
+      "  }"
+      "}"
+      "data {"
+      "  vector[3] shared_params_d;"
+      "  vector[3] job_params_d[3];"
+      "  real data_r[3, 3];"
+      "  int data_i[3, 3];"
+      "}"
+      "generated quantities {"
+      "  vector[3] y_hat_gq"
+      "      = map_rect(foo, shared_params_d, job_params_d, data_r, data_i);"
+      "}";
+  expect_matches(1, model_code, "map_rect<");
+  // can't predict number in between
+  expect_matches(1, model_code,
+                 ", foo_functor__>(shared_params_d,"
+                 " job_params_d, data_r, data_i, pstream__)");
 }

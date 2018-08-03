@@ -62,8 +62,6 @@ namespace stan {
         boost::apply_visitor(vis_writer, prog.parameter_decl_[i].decl_);
       o << EOL;
 
-      o << INDENT2 << "if (!include_tparams__) return;"
-        << EOL;
       generate_comment("declare and define transformed parameters", 2, o);
       o << INDENT2 <<  "double lp__ = 0.0;" << EOL;
       generate_void_statement("lp__", 2, o);
@@ -87,9 +85,10 @@ namespace stan {
       o << EOL;
 
       generate_comment("write transformed parameters", 3, o);
+      o << INDENT3 << "if (include_tparams__) {" << EOL;
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
         boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
-      o << EOL;
+      o << INDENT3 << "}" << EOL;
 
       o << INDENT3 << "if (!include_gqs__) return;"
         << EOL;

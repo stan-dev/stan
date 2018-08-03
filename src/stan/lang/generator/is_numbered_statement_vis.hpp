@@ -23,11 +23,7 @@ namespace stan {
 
       bool operator()(const nil& st) const { return false; }
 
-      bool operator()(const assignment& st) const { return true; }
-
       bool operator()(const assgn& st) const { return true; }
-
-      bool operator()(const compound_assignment& st) const { return true; }
 
       bool operator()(const sample& st) const { return true; }
 
@@ -40,6 +36,10 @@ namespace stan {
       bool operator()(const statements& st) const  { return false; }
 
       bool operator()(const for_statement& st) const  { return true; }
+
+      bool operator()(const for_array_statement& st) const  { return true; }
+
+      bool operator()(const for_matrix_statement& st) const  { return true; }
 
       bool operator()(const conditional_statement& st) const { return true; }
 

@@ -13,13 +13,13 @@ TEST(langParserStatement2Grammar, addConditionalCondition) {
 TEST(langParserStatementGrammar, validateIntExpr2) {
   test_parsable("validate_int_expr2_good");
   test_throws("validate_int_expr2_bad1",
-              "expression denoting integer required");
+              "Loop must be over container or range");
   test_throws("validate_int_expr2_bad2",
-              "expression denoting integer required");
+              "Loop must be over container or range");
   test_throws("validate_int_expr2_bad3",
               "dimension declaration requires expression denoting integer");
   test_throws("validate_int_expr2_bad4",
-              "expression denoting integer required");
+              "Loop must be over container or range");
 }
 
 TEST(langParserStatementGrammar, validateAllowSample) {
@@ -126,11 +126,9 @@ TEST(langParserStatementGrammar, targetFunGetLpDeprecated) {
 
 TEST(langParserStatementGrammar, removeLpDoubleUnderscore) {
   test_throws("lp-error",
-              "ERROR (fatal):  Use of lp__ is no longer supported.");
+              "Error (fatal):  Use of lp__ is no longer supported.");
   test_throws("lp-error",
               "  Use target += ... statement to increment log density.");
-  test_throws("lp-error",
-              "  Use target() function to get log density.");
 }
 
 TEST(langParserStatementGrammar, plusEqualsGood) {
@@ -167,7 +165,7 @@ TEST(langParserStatementGrammar, plusEqualsBad) {
   test_throws("compound-assign/plus_equals_bad_var_lhs2",
               "Cannot assign to variable outside of declaration block");
   test_throws("compound-assign/plus_equals_bad_lhs_idxs",
-              "Too many indexes for variable");
+              "Left-hand side indexing incompatible with variable");
   test_throws("compound-assign/plus_equals_bad_var_rhs",
               "does not exist");
   test_throws("compound-assign/plus_equals_type_mismatch",
@@ -200,3 +198,25 @@ TEST(langParserStatementGrammar, eltOpEqualsBad) {
   test_throws("compound-assign/elt_divide_equals_prim",
               "Cannot apply element-wise operation to scalar");
 }
+
+TEST(langParserStatementGrammar, noCloseBrace) {
+  test_throws("expect_statement_seq_close_brace",
+              "PARSER EXPECTED: \"}\"");
+}              
+
+TEST(langParserStatementGrammar, noCloseBrace_2) {
+  test_throws("expect_statement_seq_close_brace_2",
+              "PARSER EXPECTED: \"}\"");
+}              
+
+TEST(langParserStatementGrammar, noCloseBrace_3) {
+  test_throws("expect_statement_seq_close_brace_3",
+              "Unexpected open block, missing close block \"}\""
+              " before keyword");
+}
+
+TEST(langParserStatementGrammar, noCloseBrace_4) {
+  test_throws("expect_statement_seq_close_brace_4",
+              "\'}\' to close variable declarations");
+}
+

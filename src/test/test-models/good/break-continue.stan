@@ -15,7 +15,7 @@ functions {
       b = 5;
       break;
     }
-    
+
     // if, else if, else body
     while (1) {
       if (0) break;
@@ -27,7 +27,72 @@ functions {
     while (1) while (0) break;
 
     // nested for
-    while (1) for (i in 1:10) break;
+    while (1) {
+      for (i in 1:10) break;
+    }
+
+    // nested foreach (array)
+    while (1) {
+      int vs[2, 3];
+      int z;
+      for (v in vs) {
+        z = 0;
+        break;
+      }        
+      for (v in vs) {
+        z = 0;
+        continue;
+      }
+      for (v in vs) {
+        for (vv in v) {
+          z = 0;
+          break;
+        }
+        z = 1;
+      }
+    }
+
+    // nested foreach (matrix)
+    while (1) {
+      real z;
+      matrix[2,3] vs;
+      for (v in vs) {
+        z = 0;
+        break;
+      }
+      for (v in vs) {
+        z = 3.2;
+        continue;
+      }
+    }
+
+    // nested foreach (vector)
+    while (1) {
+      real z;
+      vector[2] vs;
+      for (v in vs) {
+        z = 0;
+        break;
+      }
+      for (v in vs) {
+        z = 3.2;
+        continue;
+      }
+    }
+
+    // nested foreach (rowvector)
+    while (1) {
+      real z;
+      row_vector[2] vs;
+      for (v in vs) {
+        z = 0;
+        break;
+      }
+      for (v in vs) {
+        z = 3.2;
+        continue;
+      }
+    }
 
     // nested block
     while (1) {

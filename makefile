@@ -19,7 +19,7 @@ help:
 ##
 # Library locations
 ##
-STAN ?= 
+STAN ?=
 MATH ?= lib/stan_math/
 
 -include $(MATH)make/default_compiler_options
@@ -103,9 +103,8 @@ endif
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Documentation:'
-	@echo '  - manual         : Builds the reference manual. Copies built manual to'
-	@echo '                     doc/stan-reference-$(VERSION_STRING).pdf'
-	@echo '                     (requires LaTeX installation)'
+	@echo '  - doc            : Builds the documention and copies to doc/'
+	@echo '                     (requires LaTeX and bookdown installation)'
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
 	@echo '                     (requires doxygen installation)'
@@ -154,7 +153,7 @@ endif
 ##
 
 .PHONY: docs
-docs: manual doxygen
+docs: doc doxygen
 
 ##
 # Clean up.
@@ -171,15 +170,11 @@ clean:
 clean-dox:
 	$(RM) -r doc/api
 
-clean-manual:
-	rm -rf doc
-	cd src/docs/stan-reference; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa
-
 clean-deps:
 	@echo '  removing dependency files'
 	$(shell find . -type f -name '*.d' -exec rm {} +)
 
-clean-all: clean clean-manual clean-deps clean-libraries
+clean-all: clean clean-docs clean-deps clean-libraries
 	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
