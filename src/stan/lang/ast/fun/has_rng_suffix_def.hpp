@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_HAS_RNG_SUFFIX_DEF_HPP
 #define STAN_LANG_AST_FUN_HAS_RNG_SUFFIX_DEF_HPP
 
-#include <stan/lang/ast.hpp>
+#include <stan/lang/ast/fun/ends_with.hpp>
 #include <string>
 
 namespace stan {

@@ -9,7 +9,7 @@ namespace stan {
 
     statements::statements() {  }
 
-    statements::statements(const std::vector<var_decl>& local_decl,
+    statements::statements(const std::vector<local_var_decl>& local_decl,
                            const std::vector<statement>& stmts)
       : local_decl_(local_decl), statements_(stmts) { }
 

@@ -23,12 +23,12 @@ namespace stan {
      * type
      * @param[in,out] o stream for writing
      */
-    void generate_arg_decl(bool gen_const, bool gen_ref, const arg_decl& decl,
+    void generate_arg_decl(bool gen_const, bool gen_ref, const var_decl& decl,
                            const std::string& scalar_t_name, std::ostream& o) {
       if (gen_const) o << "const ";
-      generate_bare_type(decl.arg_type_, scalar_t_name, o);
+      generate_bare_type(decl.bare_type(), scalar_t_name, o);
       if (gen_ref) o << "&";
-      o << " " << decl.name_;
+      o << " " << decl.name();
     }
 
   }
