@@ -2,7 +2,6 @@
 #define STAN_LANG_GENERATOR_FUN_SCALAR_TYPE_HPP
 
 #include <stan/lang/ast.hpp>
-#include <stan/lang/generator/has_only_int_args.hpp>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -24,7 +23,7 @@ namespace stan {
     std::string fun_scalar_type(const function_decl_def& fun, bool is_lp) {
       size_t num_args = fun.arg_decls_.size();
       // nullary, non-lp
-      if (has_only_int_args(fun) && !is_lp)
+      if (fun.has_only_int_args() && !is_lp)
         return "double";
 
       // need template metaprogram to construct return
@@ -33,7 +32,7 @@ namespace stan {
       int num_open_brackets = 1;
       int num_generated_params = 0;
       for (size_t i = 0; i < num_args; ++i) {
-        if (!fun.arg_decls_[i].arg_type_.base_type_.is_int_type()) {
+        if (!fun.arg_decls_[i].bare_type().innermost_type().is_int_type()) {
           if (num_generated_params > 0)
             ss << ", ";
           // break into blocks of 4 and apply promotion recursively

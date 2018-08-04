@@ -12,8 +12,8 @@ namespace stan {
     binary_op::binary_op(const expression& left, const std::string& op,
                          const expression& right)
       : op(op), left(left), right(right),
-        type_(promote_primitive(left.expression_type(),
-                                right.expression_type())) {
+        type_(promote_primitive(left.bare_type(),
+                                right.bare_type())) {
     }
 
   }

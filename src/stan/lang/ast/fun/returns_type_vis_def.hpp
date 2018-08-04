@@ -1,26 +1,13 @@
 #ifndef STAN_LANG_AST_FUN_RETURNS_TYPE_VIS_DEF_HPP
 #define STAN_LANG_AST_FUN_RETURNS_TYPE_VIS_DEF_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
-#include <stan/lang/ast/fun/is_assignable.hpp>
-#include <stan/lang/ast/fun/returns_type.hpp>
-#include <stan/lang/ast/fun/returns_type_vis.hpp>
-#include <stan/lang/ast/node/break_continue_statement.hpp>
-#include <stan/lang/ast/node/conditional_statement.hpp>
-#include <stan/lang/ast/node/for_statement.hpp>
-#include <stan/lang/ast/node/for_array_statement.hpp>
-#include <stan/lang/ast/node/for_matrix_statement.hpp>
-#include <stan/lang/ast/node/statement.hpp>
-#include <stan/lang/ast/node/statements.hpp>
-#include <stan/lang/ast/node/return_statement.hpp>
-#include <stan/lang/ast/node/while_statement.hpp>
+#include <stan/lang/ast.hpp>
 #include <ostream>
 
 namespace stan {
   namespace lang {
 
-
-    returns_type_vis::returns_type_vis(const expr_type& return_type,
+    returns_type_vis::returns_type_vis(const bare_expr_type& return_type,
                                        std::ostream& error_msgs)
       : return_type_(return_type), error_msgs_(error_msgs) { }
 
@@ -107,7 +94,7 @@ namespace stan {
     bool returns_type_vis::operator()(const break_continue_statement& st)
       const  {
       // break/continue OK only as end of nested loop in void return
-      bool pass = (return_type_.is_void());
+      bool pass = (return_type_.is_void_type());
       if (!pass)
         error_msgs_ << "statement " << st.generate_
                     << " does not match return type";
@@ -130,8 +117,8 @@ namespace stan {
 
     bool returns_type_vis::operator()(const return_statement& st) const  {
       // return checked for type
-      return return_type_.is_void()
-        || is_assignable(return_type_, st.return_value_.expression_type(),
+      return return_type_.is_void_type()
+        || is_assignable(return_type_, st.return_value_.bare_type(),
                          "Returned expression does not match return type",
                          error_msgs_);
     }

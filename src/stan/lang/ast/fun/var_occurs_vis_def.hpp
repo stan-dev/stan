@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_FUN_VAR_OCCURS_VIS_DEF_HPP
 
 #include <stan/lang/ast.hpp>
+#include <boost/variant/apply_visitor.hpp>
 
 namespace stan {
   namespace lang {
