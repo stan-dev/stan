@@ -23,8 +23,8 @@ knitr::opts_chunk$set(
 ```
 # Includes {#includes.section}
 
-Stan allows one file to be included within another file with the
-following syntax.  For example, suppose the file
+Stan allows one file to be included within another file using a syntax
+similar to that from C++.  For example, suppose the file
 `my-std-normal.stan` defines the standard normal log probability
 density function (up to an additive constant).
 
@@ -67,12 +67,40 @@ model {
 }
 ```
 
-
 There are no restrictions on where include statements may be placed
-within a file or what the contents are of the replaced file.  No
-additional whitespace is included beyond what is in the included file.
+within a file or what the contents are of the replaced file.
 
-## Recursive Includes 
+### Space before includes
+
+It is possible to use includes on a line non-initially.  For example,
+the previous example could've included space before the `#` in the
+include line:
+
+```stan
+    #include my-std-normal.stan
+parameters {
+...
+```
+
+If there is initial space before an include, it will be discarded.
+
+### Comments after includes
+
+It is also possible to include line-based comments after the include.
+For example, the previous example can be coded as:
+
+
+```stan
+#include my-std-normal.stan  // definition of standard normal
+parameters {
+...
+```
+
+Line comments are discarded when the entire line is replaced with the
+contents of the included file.
+
+
+## Recursive Includes
 
 Recursive includes will be ignored.  For example, suppose
 `a.stan` contains
@@ -91,8 +119,13 @@ The result of processing this file will be empty, because
 `a.stan` will include `b.stan`, from which the include of
 `a.stan` is ignored and a warning printed.
 
-## Include Paths 
+## Include Paths
 
 The Stan interfaces provide a mechanism for specifying a sequence of
 system paths in which to search for include files.  The file included
 is the first one that is found in the sequence.
+
+### Slashes in include paths
+
+If there is not a final `/` or `\` in the path, a `/` will be
+appended between the path and the included file name.
