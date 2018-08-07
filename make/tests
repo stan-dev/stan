@@ -41,6 +41,9 @@ STANC_TESTS := $(patsubst src/%.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 $(STANC_TESTS_O) : bin/libstanc.a
 $(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
 
+# add additional dependency for function_signatures.h
+stan/lang/ast/sigs/function_signatures_def.hpp : stan/lang/function_signatures.h
+
 
 ############################################################
 ##
@@ -110,8 +113,8 @@ test/test-model-main.cpp:
 # a new function is probably missing an inline
 ##
 
-test/unit/multiple_translation_units%.o : CXX += -fPIC
-test/unit/libmultiple.so : CXXFLAGS += -fPIC
+test/unit/multiple_translation_units%.o : CXX += -pipe
+test/unit/libmultiple.so : LDFLAGS += -shared -fPIC
 
 test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o $(MPI_TARGETS)
 	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)

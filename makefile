@@ -31,33 +31,6 @@ include make/tests                        # tests
 INC_FIRST = -I $(if $(STAN),$(STAN)/src,src)
 LDLIBS_STANC ?= -Lbin -lstanc
 
-# include make/tests    # tests
-
-
-# ##
-# # Dependencies
-# ##
-# ifneq (,$(filter-out test-headers generate-tests clean% %-test math-% %.d,$(MAKECMDGOALS)))
-#   -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
-# endif
-
-
-# bin/%.o : src/%.cpp
-#	@mkdir -p $(dir $@)
-#	$(COMPILE.cc) -O$O $(OUTPUT_OPTION) $<
-
-# ##
-# # Rule for generating dependencies.
-# ##
-# bin/%.d : src/%.cpp
-#	@mkdir -p $(dir $@)
-#	@set -e; \
-#	rm -f $@; \
-#	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
-#	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\.o $@ : ,g' < $@.$$$$ > $@; \
-#	rm -f $@.$$$$
-
-
 
 .PHONY: help
 help:
@@ -141,52 +114,52 @@ help:
 	@echo '--------------------------------------------------------------------------------'
 
 
-# ##
-# # Documentation
-# ##
+##
+# Documentation
+##
 
-# .PHONY: docs
-# docs: doc doxygen
+.PHONY: docs
+docs: doc doxygen
 
-# ##
-# # Clean up.
-# ##
-# MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
-# .PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps
-# clean:
-#	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
-#	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.hpp))
-#	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%$(EXE)))
-#	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.o))
-#	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.d))
+##
+# Clean up.
+##
+MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
+.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps
+clean:
+	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.hpp))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%$(EXE)))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.o))
+	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.d))
 
-# clean-dox:
-#	$(RM) -r doc/api
+clean-dox:
+	$(RM) -r doc/api
 
-# clean-deps:
-#	@echo '  removing dependency files'
-#	$(shell find . -type f -name '*.d' -exec rm {} +)
+clean-deps:
+	@echo '  removing dependency files'
+	$(shell find . -type f -name '*.d' -exec rm {} +)
 
-# clean-all: clean clean-docs clean-deps clean-libraries
-#	$(RM) -r test bin
-#	@echo '  removing .o files'
-#	$(shell find src -type f -name '*.o' -exec rm {} +)
+clean-all: clean clean-docs clean-deps clean-libraries
+	$(RM) -r test bin
+	@echo '  removing .o files'
+	$(shell find src -type f -name '*.o' -exec rm {} +)
 
 
-# ##
-# # Submodule related tasks
-# ##
-# .PHONY: math-revert
-# math-revert:
-#	git submodule update --init --recursive
+##
+# Submodule related tasks
+##
+.PHONY: math-revert
+math-revert:
+	git submodule update --init --recursive
 
-# .PHONY: math-update
-# math-update:
-#	git submodule init
-#	git submodule update --recursive
+.PHONY: math-update
+math-update:
+	git submodule init
+	git submodule update --recursive
 
-# math-update/%: math-update
-#	cd $(MATH) && git fetch --all && git checkout $* && git pull
+math-update/%: math-update
+	cd $(MATH) && git fetch --all && git checkout $* && git pull
 
 ##
 # Debug target that allows you to print a variable
