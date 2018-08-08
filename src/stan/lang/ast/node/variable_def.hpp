@@ -11,8 +11,8 @@ namespace stan {
 
     variable::variable(const std::string& name) : name_(name) { }
 
-    void variable::set_type(const base_expr_type& base_type, size_t num_dims) {
-      type_ = expr_type(base_type, num_dims);
+    void variable::set_type(const bare_expr_type& bare_type) {
+      type_ = bare_type;
     }
 
   }

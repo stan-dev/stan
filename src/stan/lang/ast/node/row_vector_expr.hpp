@@ -1,7 +1,6 @@
 #ifndef STAN_LANG_AST_NODE_ROW_VECTOR_EXPR_HPP
 #define STAN_LANG_AST_NODE_ROW_VECTOR_EXPR_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
 #include <stan/lang/ast/scope.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 #include <vector>
