@@ -3,7 +3,7 @@ transformed data {
   int<lower=0> M = 100;
   matrix[N,M] x;
   real<lower=0> sigma = 0.5;
-  real y[N];
+  vector[N] y;
   vector[M] beta_true;
   real alpha_true = 1.5;
   for (j in 1:M)
