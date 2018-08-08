@@ -28,5 +28,5 @@ model {
   beta_inferred ~ normal(0, 2);
   alpha_inferred ~ normal(0, 4);
   
-  y ~ neg_binomial_2_log_glm(x, beta_inferred, alpha_inferred, sigma);
+  y ~ neg_binomial_2_log_glm(x, alpha_inferred, beta_inferred, sigma);
 }
