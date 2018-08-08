@@ -17,7 +17,3 @@ $(STANC_TEMPLATE_INSTANTIATION) : test/%.o : src/%.cpp
 ifneq ($(filter test/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
-
-# add additional dependency for function_signatures.h
-#test/stan/lang/ast_def.o : src/stan/lang/function_signatures.h
-#stan/lang/ast/sigs/function_signatures_def.hpp : stan/lang/function_signatures.h
