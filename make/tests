@@ -15,18 +15,26 @@ test/%.o : src/test/%.cpp
 	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
 
 ##
-# Rule for generating dependencies.
+# Customization for generating dependencies
 ##
 src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC += $(INC_GTEST)
 src/test/%.d : DEPFLAGS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@ -MM -E -MG -MP -MF $@
-src/stan/%.d : DEPFLAGS = -MT $(patsubst src/%.d,bin/%.o,$@) -MT $@ -MM -E -MG -MP -MF $@
+
+## this is for the $(STANC_TEMPLATE_INSTANTIATION) files
+src/stan/%.d : DEPFLAGS = -MT $(patsubst src/%.d,test/%.o,$@) -MT $@ -MM -E -MG -MP -MF $@
 
 
 ifneq ($(filter test/%,$(MAKECMDGOALS)),)
 -include $(patsubst test/%$(EXE),src/test/%.d,$(filter test/%,$(MAKECMDGOALS)))
 endif
+
+ifneq ($(filter test/%$(EXE) test/test-models/stanc% src/test/test-models/%.hpp,$(MAKECMDGOALS)),)
+-include src/test/test-models/stanc.d
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+endif
+
 
 ##
 # static rule to link in libstanc.
@@ -38,7 +46,7 @@ STANC_TESTS_O := $(patsubst src/%.cpp,%.o,$(STANC_TESTS_HEADERS))
 STANC_TESTS := $(patsubst src/%.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 
 # add additional dependency to libstanc.a
-$(STANC_TESTS_O) : bin/libstanc.a
+$(STANC_TESTS_O) : test/libstanc.a
 $(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
 
 
@@ -55,7 +63,7 @@ else
   DEV_NULL = /dev/null
 endif
 
-.PHONY: HEADER_TESTS
+.PHONY: $(HEADER_TESTS)
 %.hpp-test : %.hpp test/dummy.cpp
 	$(COMPILE.cpp) -O0 -include $^ -o $(DEV_NULL)
 
@@ -126,7 +134,7 @@ test/unit/multiple_translation_units_test$(EXE) : test/unit/libmultiple.so
 
 ## .PRECIOUS: test/test-models/stanc$(EXE)
 test/test-models/stanc$(EXE) : O = $(O_STANC)
-test/test-models/stanc$(EXE) : bin/libstanc.a
+test/test-models/stanc$(EXE) : test/libstanc.a
 test/test-models/stanc$(EXE) : %$(EXE) : %.o
 	@mkdir -p $(dir $@)
 	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
@@ -135,12 +143,6 @@ TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
 $(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : %.hpp : src/%.stan test/test-models/stanc$(EXE)
 	@mkdir -p $(dir $@)
 	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
-
-ifneq ($(filter $(STANC_TESTS) test/test-models/stanc% src/test/test-models/%.hpp,$(MAKECMDGOALS)),)
--include src/test/test-models/stanc.d
--include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
-endif
-
 
 ##
 # Generate C++ from Stan standalone functions
@@ -185,3 +187,6 @@ test/integration/compile_models_test$(EXE) : $(patsubst src/%.stan,%.hpp-test,$(
 # "src/test/test-models/good-standalone-functions/*.stanfuncs"
 ##
 test/integration/compile_standalone_functions_test$(EXE) : $(patsubst src/%.stanfuncs,%.hpp-test,$(shell find src/test/test-models/good-standalone-functions -type f -name '*.stanfuncs'))
+
+test/integration/compile_models_test$(EXE) test/integration/compile_standalone_functions_test$(EXE) : test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LIBSUNDIALS) $(MPI_TARGETS)
+	$(LINK.cpp) $(filter-out %-test,$^) $(LDLIBS) $(OUTPUT_OPTION)

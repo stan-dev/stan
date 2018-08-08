@@ -30,7 +30,7 @@ include make/cpplint                      # cpplint
 include make/tests                        # tests
 
 INC_FIRST = -I $(if $(STAN),$(STAN)/src,src)
-LDLIBS_STANC ?= -Lbin -lstanc
+LDLIBS_STANC ?= -Ltest -lstanc
 
 
 .PHONY: help

@@ -2,18 +2,22 @@
 # libstanc build rules
 
 STANC_TEMPLATE_INSTANTIATION_CPP := $(shell find $(STAN)src/stan/lang -type f -name '*_inst.cpp') $(shell find $(STAN)src/stan/lang -type f -name '*_def.cpp')
-STANC_TEMPLATE_INSTANTIATION := $(STANC_TEMPLATE_INSTANTIATION_CPP:src/%.cpp=bin/%.o)
+STANC_TEMPLATE_INSTANTIATION := $(STANC_TEMPLATE_INSTANTIATION_CPP:src/%.cpp=test/%.o)
 
-$(STAN)bin/libstanc.a : $(STANC_TEMPLATE_INSTANTIATION)
+$(STAN)test/libstanc.a : $(STANC_TEMPLATE_INSTANTIATION)
 	@mkdir -p $(dir $@)
 	$(AR) -rs $@ $^
 
 
 $(STANC_TEMPLATE_INSTANTIATION) : O = $(O_STANC)
-$(STANC_TEMPLATE_INSTANTIATION) : bin/%.o : src/%.cpp
+$(STANC_TEMPLATE_INSTANTIATION) : test/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
 
+ifneq ($(filter test/libstanc.a $(STANC_TEMPLATE_INSTANTIATION),$(MAKECMDGOALS)),)
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+endif
+
 # add additional dependency for function_signatures.h
-#bin/stan/lang/ast_def.o : src/stan/lang/function_signatures.h
+#test/stan/lang/ast_def.o : src/stan/lang/function_signatures.h
 #stan/lang/ast/sigs/function_signatures_def.hpp : stan/lang/function_signatures.h
