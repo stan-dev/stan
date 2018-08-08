@@ -119,7 +119,7 @@ namespace stan {
        * @return true if the variable occurs in the arguments
        */
       bool operator()(const integrate_dae& e) const;
-      
+
       /**
        * Return true if the variable occurs in the specified
        * expression.

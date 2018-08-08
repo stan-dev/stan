@@ -109,7 +109,7 @@ namespace stan {
        * @return true if expression contains a non-data variable
        */
       bool operator()(const integrate_dae& e) const;
-      
+
       /**
        * Return true if the specified expression contains a non-data
        * variable.

@@ -48,7 +48,7 @@ bare_expr_type expression_bare_type_vis::operator()(
   return bare_array_type(
       bare_expr_type(bare_array_type(bare_expr_type(double_type()))));
 }
-  
+
 bare_expr_type expression_bare_type_vis::operator()(
     const integrate_ode& e) const {
   return bare_array_type(

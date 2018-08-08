@@ -1545,7 +1545,8 @@ namespace stan {
                                             std::ostream& error_msgs) const {
       pass = true;
       // integrate_dae requires function with signature
-      // (real, data real[ ], data real[ ], real[ ], data real[ ], data int[ ]): real[ ]"      
+      // (real, data real[ ], data real[ ], real[ ],
+      // data real[ ], data int[ ]): real[ ]"
 
       double_type t_double;
       bare_expr_type t_ar_double(bare_array_type(t_double, 1));
