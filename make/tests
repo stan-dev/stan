@@ -64,7 +64,6 @@ else
   DEV_NULL = /dev/null
 endif
 
-.PHONY: $(HEADER_TESTS)
 %.hpp-test : %.hpp test/dummy.cpp
 	$(COMPILE.cpp) -O0 -include $^ -o $(DEV_NULL)
 
