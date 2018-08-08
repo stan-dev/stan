@@ -16,7 +16,7 @@ help:
 
 MATH ?= lib/stan_math/
 O_STANC ?= 0
-ifeq (,$(wildcard $(MATH)make/compiler_flags))
+ifeq (,$(wildcard $(MATH)make/compiler_flags) $(filter math-%,$(MAKECMDGOALS)))
   $(error "Math library is missing. Please download the Math library and try again")
 endif
 
