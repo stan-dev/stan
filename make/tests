@@ -19,6 +19,7 @@ test/%.o : src/test/%.cpp
 ##
 src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
+src/test/%.d : INC_FIRST += -I $(if $(STAN),$(STAN),.)
 src/test/%.d : INC += $(INC_GTEST)
 src/test/%.d : DEPFLAGS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@ -MM -E -MG -MP -MF $@
 
