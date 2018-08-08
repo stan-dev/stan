@@ -21,6 +21,7 @@ ifeq (,$(wildcard $(MATH)make/compiler_flags))
 endif
 
 include $(MATH)make/compiler_flags
+include $(MATH)make/dependencies
 include $(MATH)make/libraries
 include make/libstanc                     # bin/libstanc.a
 include make/doxygen                      # doxygen

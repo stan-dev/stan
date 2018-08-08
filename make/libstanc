@@ -13,3 +13,7 @@ $(STANC_TEMPLATE_INSTANTIATION) : O = $(O_STANC)
 $(STANC_TEMPLATE_INSTANTIATION) : bin/%.o : src/%.cpp
 	@mkdir -p $(dir $@)
 	$(COMPILE.cpp) $(OUTPUT_OPTION) $<
+
+# add additional dependency for function_signatures.h
+#bin/stan/lang/ast_def.o : src/stan/lang/function_signatures.h
+#stan/lang/ast/sigs/function_signatures_def.hpp : stan/lang/function_signatures.h
