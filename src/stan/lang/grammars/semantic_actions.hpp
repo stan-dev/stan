@@ -559,6 +559,15 @@ namespace stan {
     };
     extern boost::phoenix::function<set_no_op> set_no_op_f;
 
+    // called from: term_grammar
+    struct validate_integrate_dae
+      : public phoenix_functor_quaternary {
+      void operator()(const integrate_dae& dae_fun,
+                      const variable_map& var_map, bool& pass,
+                      std::ostream& error_msgs) const;
+    };
+    extern boost::phoenix::function<validate_integrate_dae>
+    validate_integrate_dae_f;
 
     // called from: term_grammar
     struct deprecated_integrate_ode : phoenix_functor_unary {
@@ -793,6 +802,7 @@ namespace stan {
       bool operator()(const matrix_expr& x) const;
       bool operator()(const row_vector_expr& x) const;
       bool operator()(const variable& x) const;
+      bool operator()(const integrate_dae& x) const;
       bool operator()(const integrate_ode& x) const;
       bool operator()(const integrate_ode_control& x) const;
       bool operator()(const algebra_solver& x) const;

@@ -127,6 +127,65 @@ TEST(astExpression, algebra_solver) {
   EXPECT_TRUE(e1.bare_type().is_vector_type());
 }
 
+TEST(astExpression, integrate_dae) {
+  stan::lang::integrate_dae so; // null ctor should work and not raise error
+
+  std::string integration_function_name = "bar";
+  std::string system_function_name = "foo";
+
+  stan::lang::variable yy0("yy0_var_name");
+  yy0.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+
+  stan::lang::variable yp0("yp0_var_name");
+  yp0.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+
+  stan::lang::variable t0("t0_var_name");
+  t0.set_type(stan::lang::double_type());
+
+  stan::lang::variable ts("ts_var_name");
+  ts.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+
+  stan::lang::variable theta("theta_var_name");
+  theta.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+
+  stan::lang::variable x("x_var_name");
+  x.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+
+  stan::lang::variable x_int("x_int_var_name");
+  x_int.set_type(stan::lang::bare_array_type(stan::lang::int_type()));
+
+  stan::lang::variable rtol("rtol_var_name");
+  rtol.set_type(stan::lang::double_type());
+
+  stan::lang::variable atol("atol_var_name");
+  atol.set_type(stan::lang::double_type());
+
+  stan::lang::variable max_steps("max_steps_var_name");
+  max_steps.set_type(stan::lang::int_type());
+
+  // example of instantiation
+  stan::lang::integrate_dae so2(integration_function_name, system_function_name,
+                                yy0, yp0, t0, ts, theta, x, x_int,
+                                rtol, atol, max_steps);
+  // check integrate_ode
+  EXPECT_EQ(integration_function_name, so2.integration_function_name_);
+  EXPECT_EQ(system_function_name, so2.system_function_name_);
+  EXPECT_EQ(yy0.type_, so2.yy0_.bare_type());
+  EXPECT_EQ(yp0.type_, so2.yp0_.bare_type());
+  EXPECT_EQ(t0.type_, so2.t0_.bare_type());
+  EXPECT_EQ(ts.type_, so2.ts_.bare_type());
+  EXPECT_EQ(theta.type_, so2.theta_.bare_type());
+  EXPECT_EQ(x.type_, so2.x_.bare_type());
+  EXPECT_EQ(x_int.type_, so2.x_int_.bare_type());
+  EXPECT_EQ(rtol.type_, so2.rel_tol_.bare_type());
+  EXPECT_EQ(atol.type_, so2.abs_tol_.bare_type());
+  EXPECT_EQ(max_steps.type_, so2.max_num_steps_.bare_type());
+
+  stan::lang::expression e1(so2);
+  // check expression
+  EXPECT_EQ(e1.bare_type().order_id(), "array_array_03_double_type");
+}
+
 // TODO:mitzi need similar test for integrate_ode_control
 TEST(astExpression, integrate_ode) {
   stan::lang::integrate_ode so; // null ctor should work and not raise error

@@ -139,6 +139,33 @@ namespace stan {
         o_ << ")";
       }
 
+      void operator()(const integrate_dae& fx) const {
+        o_ << "integrate_dae"
+           << "("
+           << fx.system_function_name_
+           << "_functor__(), ";
+        generate_expression(fx.yy0_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.yp0_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.t0_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.ts_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.theta_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.x_int_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.rel_tol_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.abs_tol_, NOT_USER_FACING, o_);
+        o_ << ", ";
+        generate_expression(fx.max_num_steps_, NOT_USER_FACING, o_);
+        o_ << ", pstream__)";
+      }
+
       void operator()(const integrate_ode& fx) const {
         o_ << (fx.integration_function_name_ == "integrate_ode"
                ? "integrate_ode_rk45"

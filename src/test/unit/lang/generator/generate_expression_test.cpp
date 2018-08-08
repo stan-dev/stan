@@ -143,6 +143,48 @@ TEST(generateExpression, algebra_solver) {
 }
 
 
+TEST(generateExpression, integrate_dae) {
+  static const bool user_facing = true;
+  std::stringstream msgs;
+
+  stan::lang::integrate_dae so; // null ctor should work and not raise error
+
+  std::string integration_function_name = "integrate_dae";
+  std::string system_function_name = "foo";
+  stan::lang::variable yy0("yy0_var_name");
+  yy0.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+  stan::lang::variable yp0("yp0_var_name");
+  yp0.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+  stan::lang::variable t0("t0_var_name");
+  t0.set_type(stan::lang::double_type());
+  stan::lang::variable ts("ts_var_name");
+  ts.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+  stan::lang::variable theta("theta_var_name");
+  theta.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+  stan::lang::variable x("x_var_name");
+  x.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
+  stan::lang::variable x_int("x_int_var_name");
+  x_int.set_type(stan::lang::bare_array_type(stan::lang::int_type()));
+  stan::lang::variable rtol("rtol_var_name");
+  rtol.set_type(stan::lang::double_type());
+  stan::lang::variable atol("atol_var_name");
+  atol.set_type(stan::lang::double_type());
+  stan::lang::variable max_steps("max_steps_var_name");
+  max_steps.set_type(stan::lang::int_type());
+
+  stan::lang::integrate_dae so2(integration_function_name, system_function_name,
+                                yy0, yp0, t0, ts, theta, x,
+                                x_int, rtol, atol, max_steps);
+  stan::lang::expression e1(so2);
+
+  generate_expression(e1, user_facing, msgs);
+  EXPECT_EQ(msgs.str(),
+            "integrate_dae(foo_functor__(), yy0_var_name, yp0_var_name, "
+            "t0_var_name, ts_var_name, "
+            "theta_var_name, x_var_name, x_int_var_name, "
+            "rtol_var_name, atol_var_name, max_steps_var_name, pstream__)");
+}
+
 TEST(generateExpression, integrate_ode) {
   static const bool user_facing = true;
   std::stringstream msgs;

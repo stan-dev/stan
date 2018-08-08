@@ -120,6 +120,7 @@
 #include <stan/lang/ast/node/increment_log_prob_statement.hpp>
 #include <stan/lang/ast/node/index_op.hpp>
 #include <stan/lang/ast/node/index_op_sliced.hpp>
+#include <stan/lang/ast/node/integrate_dae.hpp>
 #include <stan/lang/ast/node/integrate_ode.hpp>
 #include <stan/lang/ast/node/integrate_ode_control.hpp>
 #include <stan/lang/ast/node/int_literal.hpp>

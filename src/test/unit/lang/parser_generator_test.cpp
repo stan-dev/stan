@@ -58,6 +58,14 @@ TEST(unitLang, simpleTest) {
           "operator()(const T0__& x, std::ostream* pstream__) const {");
 }     
              
+// TEST(unitLang, daeTest) {
+//   std::string expected;
+//   expected = "stan::math::assign(y_hat, "
+//     "integrate_dae(dae_functor__(), yy0, yp0, t0, ts, theta, x, x_int, rtol, atol, max_steps, pstream__));";
+//   test_pg("dae", expected);
+//   test_pg_count("dae", expected, 1);
+// }
+
 TEST(unitLang, odeTest) {
   std::string expected;
   expected = "stan::math::assign(y_hat, "

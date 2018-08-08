@@ -55,6 +55,10 @@ namespace stan {
       return false;
     }
 
+    bool var_occurs_vis::operator()(const integrate_dae& e) const {
+      return false;  // no refs persist out of integrate_dae() call
+    }
+    
     bool var_occurs_vis::operator()(const integrate_ode& e) const {
       return false;  // no refs persist out of integrate_ode() call
     }

@@ -86,6 +86,11 @@ namespace stan {
       fun_r;
 
       boost::spirit::qi::rule<Iterator,
+                              integrate_dae(scope),
+                              whitespace_grammar<Iterator> >
+      integrate_dae_r;
+
+      boost::spirit::qi::rule<Iterator,
                               integrate_ode(scope),
                               whitespace_grammar<Iterator> >
       integrate_ode_r;

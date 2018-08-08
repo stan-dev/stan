@@ -9,6 +9,7 @@
 #include <stan/lang/ast/node/row_vector_expr.hpp>
 #include <stan/lang/ast/node/variable.hpp>
 #include <stan/lang/ast/node/fun.hpp>
+#include <stan/lang/ast/node/integrate_dae.hpp>
 #include <stan/lang/ast/node/integrate_ode.hpp>
 #include <stan/lang/ast/node/integrate_ode_control.hpp>
 #include <stan/lang/ast/node/algebra_solver.hpp>
@@ -74,6 +75,11 @@ struct write_expression_vis : public boost::static_visitor<std::string> {
    * Return string representation for expression.
    */
   std::string operator()(const fun& e) const;
+
+  /**
+   * Return string representation for expression.
+   */
+  std::string operator()(const integrate_dae& e) const;
 
   /**
    * Return string representation for expression.

@@ -14,9 +14,74 @@ using stan::lang::bare_expr_type;
 using stan::lang::double_type;
 using stan::lang::expression;
 using stan::lang::int_type;
+using stan::lang::integrate_dae;
 using stan::lang::integrate_ode;
 using stan::lang::vector_type;
 using stan::lang::variable;
+
+TEST(langAst, solveDae) {
+
+  integrate_dae so; // null ctor should work and not raise error
+
+  std::string integration_function_name = "bar";
+  std::string system_function_name = "foo";
+
+  double_type tDouble;
+  double_type tDoubleData(true);
+  int_type tIntData(true);
+
+  variable yy0("yy0_var_name");
+  yy0.set_type(bare_array_type(tDouble, 1));
+
+  variable yp0("yp0_var_name");
+  yp0.set_type(bare_array_type(tDouble, 1));
+
+  variable t0("t0_var_name");
+  t0.set_type(tDouble);
+
+  variable ts("ts_var_name");
+  ts.set_type(bare_array_type(tDoubleData, 1));
+
+  variable theta("theta_var_name");
+  theta.set_type(bare_array_type(tDouble, 1));
+
+  variable x("x_var_name");
+  x.set_type(bare_array_type(tDoubleData, 1));
+
+  variable x_int("x_int_var_name");
+  x_int.set_type(bare_array_type(tIntData, 1));
+
+  variable rtol("rtol_var_name");
+  rtol.set_type(tDouble);
+
+  variable atol("atol_var_name");
+  atol.set_type(tDouble);
+
+  variable max_steps("max_steps_var_name");
+  max_steps.set_type(tIntData);
+
+  // example of instantiation
+  integrate_dae so2(integration_function_name, system_function_name,
+                    yy0, yp0, t0, ts, theta, x, x_int, rtol,
+                    atol, max_steps);
+
+  // dumb test to make sure we at least get the right types back
+  EXPECT_EQ(integration_function_name, so2.integration_function_name_);
+  EXPECT_EQ(system_function_name, so2.system_function_name_);
+  EXPECT_EQ(yy0.type_, so2.yy0_.bare_type());
+  EXPECT_EQ(yp0.type_, so2.yp0_.bare_type());
+  EXPECT_EQ(t0.type_, so2.t0_.bare_type());
+  EXPECT_EQ(ts.type_, so2.ts_.bare_type());
+  EXPECT_EQ(theta.type_, so2.theta_.bare_type());
+  EXPECT_EQ(x.type_, so2.x_.bare_type());
+  EXPECT_EQ(x_int.type_, so2.x_int_.bare_type());
+  EXPECT_EQ(rtol.type_, so2.rel_tol_.bare_type());
+  EXPECT_EQ(atol.type_, so2.abs_tol_.bare_type());
+  EXPECT_EQ(max_steps.type_, so2.max_num_steps_.bare_type());
+
+  expression e2(so2);
+  EXPECT_EQ(bare_expr_type(bare_array_type(tDouble,2)), e2.bare_type());
+}
 
 TEST(langAst, solveOde) {
 

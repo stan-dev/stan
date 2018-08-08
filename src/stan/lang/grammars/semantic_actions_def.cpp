@@ -265,6 +265,8 @@ namespace stan {
     template void assign_lhs::operator()(expression&, const double_literal&)
       const;
     template void assign_lhs::operator()(expression&, const int_literal&) const;
+    template void assign_lhs::operator()(expression&, const integrate_dae&)
+      const;
     template void assign_lhs::operator()(expression&, const integrate_ode&)
       const;
     template void assign_lhs::operator()(expression&,
@@ -1537,6 +1539,185 @@ namespace stan {
     }
     boost::phoenix::function<set_no_op> set_no_op_f;
 
+    void validate_integrate_dae::operator()(const integrate_dae& dae_fun,
+                                            const variable_map& var_map,
+                                            bool& pass,
+                                            std::ostream& error_msgs) const {
+      pass = true;
+      // integrate_dae requires function with signature
+      // (real, data real[ ], data real[ ], real[ ], data real[ ], data int[ ]): real[ ]"      
+
+      double_type t_double;
+      bare_expr_type t_ar_double(bare_array_type(t_double, 1));
+      bare_expr_type t_ar_double_data(bare_array_type(t_double, 1));
+
+      int_type t_int_data;
+      bare_expr_type t_ar_int_data(bare_array_type(t_int_data, 1));
+
+      // validate dae fn signature
+      bare_expr_type sys_result_type(t_ar_double);
+      std::vector<bare_expr_type> sys_arg_types;
+      sys_arg_types.push_back(t_double);
+      sys_arg_types.push_back(t_ar_double_data);
+      sys_arg_types.push_back(t_ar_double_data);
+      sys_arg_types.push_back(t_ar_double);
+      sys_arg_types.push_back(t_ar_double_data);
+      sys_arg_types.push_back(t_ar_int_data);
+      function_signature_t system_signature(sys_result_type, sys_arg_types);
+      if (!function_signatures::instance()
+          .is_defined(dae_fun.system_function_name_, system_signature)) {
+        error_msgs << "Wrong signature for function "
+                   << dae_fun.integration_function_name_
+                   << "; first argument must be "
+                   << "the name of a function with signature"
+                   << " (real, data real[ ], data real[ ], "
+                   << "  real[ ], data real[ ], data int[ ]):"
+                   << " real[ ]." << std::endl;
+        pass = false;
+      }
+
+      // Stan lang integrate_dae takes 8 args:
+      // fn_name, yy0, yp0, t0, ts, theta, x_r, x_i
+      // only theta can have params
+      if (dae_fun.yy0_.bare_type() != t_ar_double_data) {
+        error_msgs << "Second argument to "
+                   << dae_fun.integration_function_name_
+                   << " must have type data real[ ]"
+                   << "; found type = "
+                   << dae_fun.yy0_.bare_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (dae_fun.yp0_.bare_type() != t_ar_double_data) {
+        error_msgs << "Third argument to "
+                   << dae_fun.integration_function_name_
+                   << " must have type data real[ ]"
+                   << "; found type = "
+                   << dae_fun.yp0_.bare_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (!dae_fun.t0_.bare_type().is_primitive()) {
+        error_msgs << "Fourth argument to "
+                   << dae_fun.integration_function_name_
+                   << " must have type real"
+                   << ";  found type = "
+                   << dae_fun.t0_.bare_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (dae_fun.ts_.bare_type() != t_ar_double) {
+        error_msgs << "Fifth argument to "
+                   << dae_fun.integration_function_name_
+                   << " must have type real[ ]"
+                   << ";  found type = "
+                   << dae_fun.ts_.bare_type()
+                   << ". " << std::endl;
+      pass = false;
+      }
+      if (dae_fun.theta_.bare_type() != t_ar_double) {
+        error_msgs << "Sixth argument to "
+                   << dae_fun.integration_function_name_
+                   << " must have type real[ ]"
+                   << ";  found type = "
+                   << dae_fun.theta_.bare_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (dae_fun.x_.bare_type() != t_ar_double_data) {
+        error_msgs << "Seventh argument to "
+                   << dae_fun.integration_function_name_
+                   << " must have type data real[ ]"
+                   << ";  found type = "
+                   << dae_fun.x_.bare_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (dae_fun.x_int_.bare_type() != t_ar_int_data) {
+        error_msgs << "Eighth argument to "
+                   << dae_fun.integration_function_name_
+                   << " must have type data int[ ]"
+                   << ";  found type = "
+                   << dae_fun.x_int_.bare_type()
+                   << ". " << std::endl;
+        pass = false;
+      }
+      if (!dae_fun.rel_tol_.bare_type().is_primitive()) {
+        error_msgs << "Ninth argument to "
+                   << dae_fun.integration_function_name_
+                   << " (relative tolerance) must have type real or int;"
+                   << " found type="
+                   << dae_fun.rel_tol_.bare_type()
+                   << ". ";
+        pass = false;
+      }
+      if (!dae_fun.abs_tol_.bare_type().is_primitive()) {
+        error_msgs << "Tenth argument to "
+                   << dae_fun.integration_function_name_
+                   << " (absolute tolerance) must have type real or int;"
+                   << " found type="
+                   << dae_fun.abs_tol_.bare_type()
+                   << ". ";
+        pass = false;
+      }
+      if (!dae_fun.max_num_steps_.bare_type().is_primitive()) {
+        error_msgs << "Eleventh argument to "
+                   << dae_fun.integration_function_name_
+                   << " (max steps) must have type real or int;"
+                   << " found type="
+                   << dae_fun.max_num_steps_.bare_type()
+                   << ". ";
+        pass = false;
+      }
+
+      // test data-only variables do not have parameters (int locals OK)
+      if (has_var(dae_fun.t0_, var_map)) {
+        error_msgs << "Fourth argument to "
+                   << dae_fun.integration_function_name_
+                   << " (initial times)"
+                   << " must be data only and not reference parameters."
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(dae_fun.ts_, var_map)) {
+        error_msgs << "Fifth argument to "
+                   << dae_fun.integration_function_name_
+                   << " (solution times)"
+                   << " must be data only and not reference parameters."
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(dae_fun.x_, var_map)) {
+        error_msgs << "Seventh argument to "
+                   << dae_fun.integration_function_name_
+                   << " (real data)"
+                   << " must be data only and not reference parameters."
+                   << std::endl;
+        pass = false;
+      }
+      if (has_var(dae_fun.rel_tol_, var_map)) {
+        error_msgs << "Ninth argument to "
+                   << dae_fun.integration_function_name_
+                   << " (relative tolerance) must be data only"
+                   << " and not depend on parameters.";
+        pass = false;
+      }
+      if (has_var(dae_fun.abs_tol_, var_map)) {
+        error_msgs << "Tenth argument to "
+                   << dae_fun.integration_function_name_
+                   << " (absolute tolerance ) must be data only"
+                   << " and not depend parameters.";
+        pass = false;
+      }
+      if (has_var(dae_fun.max_num_steps_, var_map)) {
+        error_msgs << "Eleventh argument to "
+                   << dae_fun.integration_function_name_
+                   << " (max steps) must be data only"
+                   << " and not depend on parameters.";
+        pass = false;
+      }
+    }
+    boost::phoenix::function<validate_integrate_dae> validate_integrate_dae_f;
 
     void deprecated_integrate_ode::operator()(std::ostream& error_msgs)
       const {
@@ -2570,6 +2751,9 @@ namespace stan {
         error_msgs_ << "." << std::endl;
       }
       return is_data;
+    }
+    bool data_only_expression::operator()(const integrate_dae& x) const {
+      return boost::apply_visitor(*this, x.theta_.expr_);
     }
     bool data_only_expression::operator()(const integrate_ode& x) const {
       return boost::apply_visitor(*this, x.y0_.expr_)

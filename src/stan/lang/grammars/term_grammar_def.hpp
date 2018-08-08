@@ -24,6 +24,20 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op_sliced,
                           (stan::lang::expression, expr_)
                           (std::vector<stan::lang::idx>, idxs_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_dae,
+                          (std::string, integration_function_name_)
+                          (std::string, system_function_name_)
+                          (stan::lang::expression, yy0_)
+                          (stan::lang::expression, yp0_)
+                          (stan::lang::expression, t0_)
+                          (stan::lang::expression, ts_)
+                          (stan::lang::expression, theta_)
+                          (stan::lang::expression, x_)
+                          (stan::lang::expression, x_int_)
+                          (stan::lang::expression, rel_tol_)
+                          (stan::lang::expression, abs_tol_)
+                          (stan::lang::expression, max_num_steps_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (std::string, integration_function_name_)
                           (std::string, system_function_name_)
@@ -181,6 +195,36 @@ namespace stan {
                > eps[transpose_f(_val, _pass,
                                  boost::phoenix::ref(error_msgs_))]) );
 
+      integrate_dae_r.name("expression");
+      integrate_dae_r
+        %= (string("integrate_dae") >> no_skip[!char_("a-zA-Z0-9_")])
+        >> lit('(')              // >> allows backtracking to non-control
+        >> identifier_r          // 1) system function name (function only)
+        >> lit(',')
+        >> expression_g(_r1)     // 2) yy0
+        >> lit(',')
+        >> expression_g(_r1)     // 2) yp0
+        >> lit(',')
+        >> expression_g(_r1)     // 3) t0 (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 4) ts (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 5) theta
+        >> lit(',')
+        >> expression_g(_r1)     // 6) x (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 7) x_int (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 8) relative tolerance (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 9) absolute tolerance (data only)
+        >> lit(',')
+        >> expression_g(_r1)     // 10) maximum number of steps (data only)
+        > lit(')')
+        [validate_integrate_dae_f(_val, boost::phoenix::ref(var_map_),
+                                  _pass,
+                                  boost::phoenix::ref(error_msgs_))];
+
       integrate_ode_control_r.name("expression");
       integrate_ode_control_r
         %= ( (string("integrate_ode_rk45") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -297,7 +341,8 @@ namespace stan {
 
       factor_r.name("expression");
       factor_r =
-        integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
+        integrate_dae_r(_r1)[assign_lhs_f(_val, _1)]
+        | integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
         | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_control_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_r(_r1)[assign_lhs_f(_val, _1)]
