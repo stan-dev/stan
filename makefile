@@ -16,13 +16,13 @@ help:
 
 MATH ?= lib/stan_math/
 O_STANC ?= 0
-ifeq (,$(wildcard $(MATH)make/compiler_flags) $(filter math-%,$(MAKECMDGOALS)))
+ifeq (,$(strip $(wildcard $(MATH)make/compiler_flags) $(filter math-%,$(MAKECMDGOALS))))
   $(error "Math library is missing. Please download the Math library and try again")
 endif
 
-include $(MATH)make/compiler_flags
-include $(MATH)make/dependencies
-include $(MATH)make/libraries
+-include $(MATH)make/compiler_flags
+-include $(MATH)make/dependencies
+-include $(MATH)make/libraries
 include make/libstanc                     # bin/libstanc.a
 include make/doxygen                      # doxygen
 include make/manual                       # manual: manual, doc/stan-reference.pdf
