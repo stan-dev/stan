@@ -15,6 +15,9 @@ help:
 -include make/local                       # user-defined variables
 
 MATH ?= lib/stan_math/
+ifeq ($(OS),Windows_NT)
+  O_STANC ?= 3
+endif
 O_STANC ?= 0
 
 -include $(MATH)make/compiler_flags
