@@ -118,7 +118,10 @@ test/test-model-main.cpp:
 # a new function is probably missing an inline
 ##
 
-test/unit/multiple_translation_units%.o : CXXFLAGS += -fPIC -pipe
+ifneq ($(OS),Windows_NT)
+test/unit/multiple_translation_units%.o : CXXFLAGS += -fPIC
+endif
+test/unit/multiple_translation_units%.o : CXXFLAGS += -pipe
 test/unit/libmultiple.so : LDFLAGS += -shared
 
 test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o $(MPI_TARGETS)
