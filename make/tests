@@ -21,10 +21,10 @@ src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC_FIRST += -I $(if $(STAN),$(STAN),.)
 src/test/%.d : INC += $(INC_GTEST)
-src/test/%.d : DEPFLAGS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@ -MM -E -MG -MP -MF $@
+src/test/%.d : DEPFLAGS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@ -M -MG -MP -MF $@
 
 ## this is for the $(STANC_TEMPLATE_INSTANTIATION) files
-src/stan/%.d : DEPFLAGS = -MT $(patsubst src/%.d,test/%.o,$@) -MT $@ -MM -E -MG -MP -MF $@
+src/stan/%.d : DEPFLAGS = -MT $(patsubst src/%.d,test/%.o,$@) -MT $@ -M -MG -MP -MF $@
 
 
 ifneq ($(filter test/%,$(MAKECMDGOALS)),)
