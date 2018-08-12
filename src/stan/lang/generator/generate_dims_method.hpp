@@ -11,14 +11,14 @@ namespace stan {
 
     void generate_var_dims(const block_var_decl& decl, std::ostream& o) {
       o << INDENT2 << "dims__.resize(0);" << EOL;
-      if (!is_nil(decl.type().arg1())) {
+      if (!is_nil(decl.type().innermost_type().arg1())) {
         o << INDENT2 << "dims__.push_back(";
-        generate_expression(decl.type().arg1(), NOT_USER_FACING, o);
+        generate_expression(decl.type().innermost_type().arg1(), NOT_USER_FACING, o);
         o << ");" << EOL;
       }
-      if (!is_nil(decl.type().arg2())) {
+      if (!is_nil(decl.type().innermost_type().arg2())) {
         o << INDENT2 << "dims__.push_back(";
-        generate_expression(decl.type().arg2(), NOT_USER_FACING, o);
+        generate_expression(decl.type().innermost_type().arg2(), NOT_USER_FACING, o);
         o << ");" << EOL;
       }
       std::vector<expression> ar_lens = decl.type().array_lens();

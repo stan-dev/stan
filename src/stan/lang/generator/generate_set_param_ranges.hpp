@@ -39,6 +39,11 @@ namespace stan {
           << EOL;
 
         std::string var_name(var_decls[i].name());
+        block_var_type eltype = var_decls[i].type().innermost_type();
+        if (!is_nil(eltype.arg1()))
+          generate_validate_nonnegative(var_name, eltype.arg1(), indent, o);
+        if (!is_nil(eltype.arg2()))
+          generate_validate_nonnegative(var_name, eltype.arg2(), indent, o);
         std::vector<expression> ar_lens(var_decls[i].type().array_lens());
         for (size_t i = 0; i < ar_lens.size(); ++i)
           generate_validate_nonnegative(var_name, ar_lens[i], indent, o);
