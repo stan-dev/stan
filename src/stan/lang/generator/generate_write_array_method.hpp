@@ -133,14 +133,15 @@ namespace stan {
       }
 
       if (prog.generated_decl_.first.size() > 0) {
+        generate_comment("validate, write generated quantities", 3, o);
         for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i) {
-          generate_comment("validate generated quantities", 3, o);
+          generate_indent(3, o);
+          o << "current_statement_begin__ = "
+            <<  prog.generated_decl_.first[i].begin_line_ << ";"
+            << EOL;
           generate_validate_block_var(prog.generated_decl_.first[i], 3, o);
-          o << EOL;
-
-          generate_comment("write generated quantities", 3, o);
           generate_write_block_var(prog.generated_decl_.first[i], 3, o);
-          o << EOL;
+        o << EOL;
         }
       }
       generate_catch_throw_located(2, o);
