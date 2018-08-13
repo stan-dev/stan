@@ -401,15 +401,17 @@ TEST(lang, transformed_params_block_var_hpp_write_array) {
   EXPECT_EQ(1, count_matches(expected_2,hpp));
 
   std::string expected_3("            // write transformed parameters\n"
-                         "            size_t ar_mat_j_2_max__ = 3;\n"
-                         "            size_t ar_mat_j_1_max__ = 2;\n"
-                         "            size_t ar_mat_k_0_max__ = 4;\n"
-                         "            size_t ar_mat_k_1_max__ = 5;\n"
-                         "            for (size_t j_2__ = 0; j_2__ < ar_mat_j_2_max__; ++j_2__) {\n"
-                         "                for (size_t j_1__ = 0; j_1__ < ar_mat_j_1_max__; ++j_1__) {\n"
-                         "                    for (size_t k_1__ = 0; k_1__ < ar_mat_k_1_max__; ++k_1__) {\n"
-                         "                        for (size_t k_0__ = 0; k_0__ < ar_mat_k_0_max__; ++k_0__) {\n"
-                         "                            vars__.push_back(ar_mat[k_0__][k_1__](j_1__, j_2__));\n"
+                         "            if (include_tparams__) {\n"
+                         "                size_t ar_mat_j_2_max__ = 3;\n"
+                         "                size_t ar_mat_j_1_max__ = 2;\n"
+                         "                size_t ar_mat_k_0_max__ = 4;\n"
+                         "                size_t ar_mat_k_1_max__ = 5;\n"
+                         "                for (size_t j_2__ = 0; j_2__ < ar_mat_j_2_max__; ++j_2__) {\n"
+                         "                    for (size_t j_1__ = 0; j_1__ < ar_mat_j_1_max__; ++j_1__) {\n"
+                         "                        for (size_t k_1__ = 0; k_1__ < ar_mat_k_1_max__; ++k_1__) {\n"
+                         "                            for (size_t k_0__ = 0; k_0__ < ar_mat_k_0_max__; ++k_0__) {\n"
+                         "                                vars__.push_back(ar_mat[k_0__][k_1__](j_1__, j_2__));\n"
+                         "                            }\n"
                          "                        }\n"
                          "                    }\n"
                          "                }\n"
@@ -424,22 +426,23 @@ TEST(lang, transformed_params_block_var_hpp_param_names) {
                  "}\n");
   std::string hpp = model_to_hpp("xformed_parameters_2d_ar_mat", m1);
 
-  std::string expected("        if (!include_gqs__ && !include_tparams__) return;\n"
-                       "        size_t ar_mat_j_2_max__ = 3;\n"
-                       "        size_t ar_mat_j_1_max__ = 2;\n"
-                       "        size_t ar_mat_k_0_max__ = 4;\n"
-                       "        size_t ar_mat_k_1_max__ = 5;\n"
-                       "        for (size_t j_2__ = 0; j_2__ < ar_mat_j_2_max__; ++j_2__) {\n"
-                       "            for (size_t j_1__ = 0; j_1__ < ar_mat_j_1_max__; ++j_1__) {\n"
-                       "                for (size_t k_1__ = 0; k_1__ < ar_mat_k_1_max__; ++k_1__) {\n"
-                       "                    for (size_t k_0__ = 0; k_0__ < ar_mat_k_0_max__; ++k_0__) {\n"
-                       "                        param_name_stream__.str(std::string());\n"
-                       "                        param_name_stream__ << \"ar_mat\" << '.' << k_0__ + 1 << '.' << k_1__ + 1 << '.' << j_1__ + 1 << '.' << j_2__ + 1;\n"
-                       "                        param_names__.push_back(param_name_stream__.str());\n"
+  std::string expected("        if (include_tparams__) {\n"
+                       "            size_t ar_mat_j_2_max__ = 3;\n"
+                       "            size_t ar_mat_j_1_max__ = 2;\n"
+                       "            size_t ar_mat_k_0_max__ = 4;\n"
+                       "            size_t ar_mat_k_1_max__ = 5;\n"
+                       "            for (size_t j_2__ = 0; j_2__ < ar_mat_j_2_max__; ++j_2__) {\n"
+                       "                for (size_t j_1__ = 0; j_1__ < ar_mat_j_1_max__; ++j_1__) {\n"
+                       "                    for (size_t k_1__ = 0; k_1__ < ar_mat_k_1_max__; ++k_1__) {\n"
+                       "                        for (size_t k_0__ = 0; k_0__ < ar_mat_k_0_max__; ++k_0__) {\n"
+                       "                            param_name_stream__.str(std::string());\n"
+                       "                            param_name_stream__ << \"ar_mat\" << '.' << k_0__ + 1 << '.' << k_1__ + 1 << '.' << j_1__ + 1 << '.' << j_2__ + 1;\n"
+                       "                            param_names__.push_back(param_name_stream__.str());\n"
+                       "                        }\n"
                        "                    }\n"
                        "                }\n"
-                       "            }\n"
-                       "        }\n");
+                       "            }\n");
+
   EXPECT_EQ(2, count_matches(expected,hpp));
 }
 

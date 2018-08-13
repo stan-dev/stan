@@ -32,8 +32,12 @@ namespace stan {
         generate_param_names_array(2, o, prog.parameter_decl_[i]);
       o << EOL << INDENT2
         << "if (!include_gqs__ && !include_tparams__) return;" << EOL;
+
+      o << EOL << INDENT2 << "if (include_tparams__) {"  << EOL;
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
-        generate_param_names_array(2, o, prog.derived_decl_.first[i]);
+        generate_param_names_array(3, o, prog.derived_decl_.first[i]);
+      o << INDENT2 << "}" << EOL;
+
       o << EOL << INDENT2 << "if (!include_gqs__) return;" << EOL;
       for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
         generate_param_names_array(2, o, prog.generated_decl_.first[i]);

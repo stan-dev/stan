@@ -101,12 +101,15 @@ namespace stan {
             generate_validate_block_var(prog.derived_decl_.first[i], 3, o);
           }
         }
+        o << INDENT3 << "if (!include_gqs__ && !include_tparams__) return;"
+          << EOL;
 
-        o << EOL;
         generate_comment("write transformed parameters", 3, o);
+        o << INDENT3 << "if (include_tparams__) {" << EOL;
         for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
-          generate_write_block_var(prog.derived_decl_.first[i], 3, o);
+          generate_write_block_var(prog.derived_decl_.first[i], 4, o);
         }
+        o << INDENT3 << "}" << EOL;
       }
 
       o << INDENT3 << "if (!include_gqs__) return;"
