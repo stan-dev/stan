@@ -3,7 +3,7 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/generate_param_names_array.hpp>
+#include <stan/lang/generator/generate_unconstrained_param_names_array.hpp>
 #include <ostream>
 #include <vector>
 
@@ -29,18 +29,18 @@ namespace stan {
         << EOL << INDENT2
         << "std::stringstream param_name_stream__;" << EOL;
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
-        generate_param_names_array(2, o, prog.parameter_decl_[i]);
+        generate_unconstrained_param_names_array(2, o, prog.parameter_decl_[i]);
       o << EOL << INDENT2
         << "if (!include_gqs__ && !include_tparams__) return;"  << EOL;
 
       o << EOL << INDENT2 << "if (include_tparams__) {"  << EOL;
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
-        generate_param_names_array(3, o, prog.derived_decl_.first[i]);
+        generate_unconstrained_param_names_array(3, o, prog.derived_decl_.first[i]);
       o << INDENT2 << "}" << EOL;
 
       o << EOL << INDENT2 << "if (!include_gqs__) return;" << EOL;
       for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
-        generate_param_names_array(2, o, prog.generated_decl_.first[i]);
+        generate_unconstrained_param_names_array(2, o, prog.generated_decl_.first[i]);
       o << INDENT << "}" << EOL2;
     }
 

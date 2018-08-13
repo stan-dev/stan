@@ -79,8 +79,6 @@ TEST(lang, data_block_var_hpp) {
   EXPECT_EQ(1, count_matches(expected, hpp));
 }
 
-//  TODO:morris run model on good/bad input data: src/test/test-models/good/parser-generator/multidim_var_data_ar45_mat23 + data files
-
 TEST(lang, transformed_data_block_var_ast) {
   std::string m1("transformed data {\n"
                  "  matrix<lower=0,upper=1>[2,3] ar_mat[4,5];\n"
