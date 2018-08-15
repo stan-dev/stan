@@ -363,13 +363,13 @@ TEST(lang, params_block_var_hpp_unconstrained_param_names) {
                        "        for (size_t j_1__ = 0; j_1__ < cfcov_54_j_1_max__; ++j_1__) {\n"
                        "            param_name_stream__.str(std::string());\n"
                        "            param_name_stream__ << \"cfcov_54\" << '.' << j_1__ + 1;\n"
-                       "        param_names__.push_back(param_name_stream__.str());\n"
+                       "            param_names__.push_back(param_name_stream__.str());\n"
                        "        }\n"
                        "        size_t cfcov_33_j_1_max__ = (((3 * (3 + 1)) / 2) + ((3 - 3) * 3));\n"
                        "        for (size_t j_1__ = 0; j_1__ < cfcov_33_j_1_max__; ++j_1__) {\n"
                        "            param_name_stream__.str(std::string());\n"
                        "            param_name_stream__ << \"cfcov_33\" << '.' << j_1__ + 1;\n"
-                       "        param_names__.push_back(param_name_stream__.str());\n"
+                       "            param_names__.push_back(param_name_stream__.str());\n"
                        "        }\n");
   EXPECT_EQ(1, count_matches(expected,hpp));
 }
@@ -562,13 +562,13 @@ TEST(lang, xform_params_block_var_hpp_unconstrained_param_names) {
                        "            for (size_t j_1__ = 0; j_1__ < cfcov_54_j_1_max__; ++j_1__) {\n"
                        "                param_name_stream__.str(std::string());\n"
                        "                param_name_stream__ << \"cfcov_54\" << '.' << j_1__ + 1;\n"
-                       "            param_names__.push_back(param_name_stream__.str());\n"
+                       "                param_names__.push_back(param_name_stream__.str());\n"
                        "            }\n"
                        "            size_t cfcov_33_j_1_max__ = (((3 * (3 + 1)) / 2) + ((3 - 3) * 3));\n"
                        "            for (size_t j_1__ = 0; j_1__ < cfcov_33_j_1_max__; ++j_1__) {\n"
                        "                param_name_stream__.str(std::string());\n"
                        "                param_name_stream__ << \"cfcov_33\" << '.' << j_1__ + 1;\n"
-                       "            param_names__.push_back(param_name_stream__.str());\n"
+                       "                param_names__.push_back(param_name_stream__.str());\n"
                        "            }\n"
                        "        }\n");
   EXPECT_EQ(1, count_matches(expected,hpp));

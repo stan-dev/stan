@@ -490,7 +490,8 @@ TEST(lang, generated_quantities_block_var_hpp_write_array) {
                          "            stan::math::fill(ar_mat, DUMMY_VAR__);\n");
   EXPECT_EQ(1, count_matches(expected_1,hpp));
 
-  std::string expected_2("            // validate generated quantities\n"
+  std::string expected_2("            // validate, write generated quantities\n"
+                         "            current_statement_begin__ = 2;\n"
                          "            size_t ar_mat_i_0_max__ = 4;\n"
                          "            size_t ar_mat_i_1_max__ = 5;\n"
                          "            for (size_t i_0__ = 0; i_0__ < ar_mat_i_0_max__; ++i_0__) {\n"
@@ -502,8 +503,7 @@ TEST(lang, generated_quantities_block_var_hpp_write_array) {
 
   EXPECT_EQ(1, count_matches(expected_2,hpp));
 
-  std::string expected_3("            // write generated quantities\n"
-                         "            size_t ar_mat_j_2_max__ = 3;\n"
+  std::string expected_3("            size_t ar_mat_j_2_max__ = 3;\n"
                          "            size_t ar_mat_j_1_max__ = 2;\n"
                          "            size_t ar_mat_k_0_max__ = 4;\n"
                          "            size_t ar_mat_k_1_max__ = 5;\n"

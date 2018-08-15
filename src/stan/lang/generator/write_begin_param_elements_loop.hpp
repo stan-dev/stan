@@ -37,7 +37,7 @@ namespace stan {
       if (var_decl.type().innermost_type().is_specialized()) {
         arg1 = var_decl.type().innermost_type().params_total();
         arg2 = expression(nil());
-      }      
+      }
       std::vector<expression> ar_var_dims = var_decl.type().array_lens();
 
       if (!is_nil(arg2)) {

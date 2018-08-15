@@ -13,12 +13,14 @@ namespace stan {
       o << INDENT2 << "dims__.resize(0);" << EOL;
       if (!is_nil(decl.type().innermost_type().arg1())) {
         o << INDENT2 << "dims__.push_back(";
-        generate_expression(decl.type().innermost_type().arg1(), NOT_USER_FACING, o);
+        generate_expression(decl.type().innermost_type().arg1(),
+                            NOT_USER_FACING, o);
         o << ");" << EOL;
       }
       if (!is_nil(decl.type().innermost_type().arg2())) {
         o << INDENT2 << "dims__.push_back(";
-        generate_expression(decl.type().innermost_type().arg2(), NOT_USER_FACING, o);
+        generate_expression(decl.type().innermost_type().arg2(),
+                            NOT_USER_FACING, o);
         o << ");" << EOL;
       }
       std::vector<expression> ar_lens = decl.type().array_lens();

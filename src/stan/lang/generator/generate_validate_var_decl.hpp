@@ -30,16 +30,6 @@ namespace stan {
       std::string var_name(decl.name());
       std::vector<expression> ar_lens(decl.type().array_lens());
 
-      // TODO:morris generate better var name for error message
-      // e.g.  ar_mat[2][3]  not: ar_mat[i_0__][i_1__]
-      // requires plugging in values of loop index to msgs
-      //                  std::stringstream ss_idx;
-      //                  ss_idx << var_name << "[" << i_0__ + 1 << "," << i_1__ + 1 << "]";
-      //                  std::string str_idx = ss_idx.str();
-      //                  const char* name_idx = str_idx.c_str();
-      //                  check_greater_or_equal(function__, name_idx, ar_mat[i_0__][i_1__], 0);
-      //                  check_less_or_equal(function__, name_idx, ar_mat[i_0__][i_1__], 1);
-
       block_var_type btype = decl.type().innermost_type();
       if (btype.has_def_bounds()) {
         range bounds = btype.bounds();

@@ -7,6 +7,7 @@
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/get_block_var_dims.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {
@@ -30,7 +31,7 @@ namespace stan {
         num_args = 1;
       }
       size_t num_dims = num_ar_dims + num_args;
-      
+
       write_begin_param_elements_loop(var_decl, true, indent, o);
 
       generate_indent(indent + num_dims, o);
@@ -47,7 +48,7 @@ namespace stan {
         o << " << '.' << j_1__ + 1 << '.' << j_2__ + 1";
       o << ';' << EOL;
 
-      generate_indent(indent + num_ar_dims, o);
+      generate_indent(indent + num_dims, o);
       o << "param_names__.push_back(param_name_stream__.str());" << EOL;
 
       write_end_loop(num_dims, indent, o);

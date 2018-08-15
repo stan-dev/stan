@@ -7,6 +7,7 @@
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/get_block_var_dims.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {

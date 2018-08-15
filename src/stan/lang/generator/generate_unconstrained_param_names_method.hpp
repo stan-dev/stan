@@ -5,6 +5,7 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_unconstrained_param_names_array.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {
@@ -35,12 +36,14 @@ namespace stan {
 
       o << EOL << INDENT2 << "if (include_tparams__) {"  << EOL;
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
-        generate_unconstrained_param_names_array(3, o, prog.derived_decl_.first[i]);
+        generate_unconstrained_param_names_array(3, o,
+                                                 prog.derived_decl_.first[i]);
       o << INDENT2 << "}" << EOL;
 
       o << EOL << INDENT2 << "if (!include_gqs__) return;" << EOL;
       for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
-        generate_unconstrained_param_names_array(2, o, prog.generated_decl_.first[i]);
+        generate_unconstrained_param_names_array(2, o,
+                                                 prog.generated_decl_.first[i]);
       o << INDENT << "}" << EOL2;
     }
 
