@@ -8,7 +8,7 @@ TEST(langParserExpressionGrammarDef, intDivUserFacing) {
 
 TEST(langParserExpressionGrammarDef, absDeprecate) {
   test_warning("abs-deprecate",
-               "Warning: function abs(real) is deprecated in the Stan language.");
+               "Warning: Function abs(real) is deprecated in the Stan language.");
 }
 
 TEST(langParserExpressionGrammarDef, conditionalOp) {
@@ -16,11 +16,9 @@ TEST(langParserExpressionGrammarDef, conditionalOp) {
 }
 
 TEST(langParserExpressionGrammarDef, conditionalOpBad1) {
-  test_throws("validate_conditional_op_bad-1",
-              "Condition in ternary expression must be primitive int;");
+  test_throws("validate_conditional_op_bad-1","Condition in ternary expression");
 }
 
 TEST(langParserExpressionGrammarDef, conditionalOpBad2) {
-  test_throws("validate_conditional_op_bad-2",
-              "Type mismatch in ternary expression, expression when true is:");
+  test_throws("validate_conditional_op_bad-2","Base type mismatch");
 }

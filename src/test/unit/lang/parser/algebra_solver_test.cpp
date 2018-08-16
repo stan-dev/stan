@@ -7,33 +7,32 @@ TEST(lang_parser, algebra_solver_good) {
 
 TEST(lang_parser, algebra_solver_bad) {
   test_throws("algebra_solver/bad_fun_type",
-              "Wrong signature ");
+              "first argument to algebra_solver must be the name of a function with signature");
   test_throws("algebra_solver/bad_y_type",
-              "Second argument to algebra_solver must have type");
+              "second argument to algebra_solver must have type vector");
   test_throws("algebra_solver/bad_theta_type",
-              "Third argument to algebra_solver must have type");
+              "third argument to algebra_solver must have type vector");
   test_throws("algebra_solver/bad_x_r_type",
-              "Fourth argument to algebra_solver must have type");
+              "fourth argument to algebra_solver must have type real[]");
   test_throws("algebra_solver/bad_x_i_type",
-              "Fifth argument to algebra_solver must have type");
+              "fifth argument to algebra_solver must have type int[]");
 
   test_throws("algebra_solver/bad_x_r_var_type",
-              "Fourth argument to algebra_solver must be data only");
+              "fourth argument to algebra_solver (real data) must be data only");
 }
 
 TEST(lang_parser, algebra_solver_control_bad) {
   test_throws("algebra_solver/bad_fun_type_control",
-              "Wrong signature ");
+              "first argument to algebra_solver must be the name of a function with signature");
   test_throws("algebra_solver/bad_y_type_control",
-              "Second argument to algebra_solver must have type");
+              "second argument to algebra_solver must have type vector");
   test_throws("algebra_solver/bad_theta_type_control",
-              "Third argument to algebra_solver must have type");
+              "third argument to algebra_solver must have type vector");
   test_throws("algebra_solver/bad_x_r_type_control",
-              "Fourth argument to algebra_solver must have type");
+              "fourth argument to algebra_solver must have type real[]");
   test_throws("algebra_solver/bad_x_i_type_control",
-              "Fifth argument to algebra_solver must have type");
+              "fifth argument to algebra_solver must have type int[]");
 
   test_throws("algebra_solver/bad_x_r_var_type_control",
-              "Fourth argument to algebra_solver must be data only");
-
+              "fourth argument to algebra_solver (real data) must be data only");
 }
