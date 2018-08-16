@@ -9,9 +9,9 @@ namespace stan {
     program::program() { }
 
     program::program(const function_decls_t& functions,
-                     const block_var_decls_t& data,
+                     const var_decls_t& data,
                      const var_decls_statements_t& transformed_data,
-                     const block_var_decls_t& parameters,
+                     const var_decls_t& parameters,
                      const var_decls_statements_t& transformed_parameters,
                      const statement& model,
                      const var_decls_statements_t& generated_quantities)

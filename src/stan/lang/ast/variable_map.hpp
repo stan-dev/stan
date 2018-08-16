@@ -2,8 +2,7 @@
 #define STAN_LANG_AST_VARIABLE_MAP_HPP
 
 #include <stan/lang/ast/scope.hpp>
-#include <stan/lang/ast/type/bare_expr_type.hpp>
-#include <stan/lang/ast/node/var_decl.hpp>
+#include <stan/lang/ast/node/base_var_decl.hpp>
 #include <cstddef>
 #include <map>
 #include <string>
@@ -13,13 +12,13 @@ namespace stan {
   namespace lang {
 
     /**
-     * A map from variable names to their declarations and their scope.
+     * A map from function names to their base declarations and their scope.
      */
     struct variable_map {
       /**
        * A variable type and the scope of its declaration.
        */
-      typedef std::pair<var_decl, scope> range_t;
+      typedef std::pair<base_var_decl, scope> range_t;
 
       /**
        * Return true if a variable has been declared with the
@@ -38,18 +37,29 @@ namespace stan {
        * @throw std::invalid_argument if the variable has not been
        * declared 
        */
-      var_decl get(const std::string& name) const;
+      base_var_decl get(const std::string& name) const;
 
       /**
        * Return the type declared for the variable with the specified
        * name. 
        *
        * @param name variable name
-       * @return bare var type
+       * @return base type
        * @throw std::invalid_argument if the variable has not been
        * declared 
        */
-      bare_expr_type get_bare_type(const std::string& name) const;
+      base_expr_type get_base_type(const std::string& name) const;
+
+      /**
+       * Return the number of dimensions declared for the variable
+       * with the specified name.
+       *
+       * @param name variable name
+       * @return number of dimensions declared for variable
+       * @throw std::invalid_argument if the variable has not been
+       * declared 
+       */
+      std::size_t get_num_dims(const std::string& name) const;
 
       /**
        * Return the scope in which the variable is declared for the
@@ -69,11 +79,11 @@ namespace stan {
        * variable if called with a new declaration and scope. 
        *
        * @param name variable name
-       * @param var_decl variable declaration
+       * @param base_decl variable declaration
        * @param scope_decl declaration scope 
        */
       void add(const std::string& name,
-               const var_decl& var_decl,
+               const base_var_decl& base_decl,
                const scope& scope_decl);
 
       /**
@@ -90,9 +100,8 @@ namespace stan {
        * origins.
        */
       std::map<std::string, range_t> map_;
-
-      size_t size() const;
     };
+
   }
 }
 #endif

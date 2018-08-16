@@ -951,6 +951,7 @@ namespace stan {
       }
 
 
+
       /**
        * Return the next Cholesky factor with the specified
        * dimensionality, reading it directly without transforms.
@@ -961,9 +962,9 @@ namespace stan {
        * @throw std::domain_error if the matrix is not a valid
        * Cholesky factor.
        */
-      inline matrix_t cholesky_factor_cov(size_t M, size_t N) {
+      inline matrix_t cholesky_factor(size_t M, size_t N) {
         matrix_t y(matrix(M, N));
-        stan::math::check_cholesky_factor("stan::io::cholesky_factor_cov",
+        stan::math::check_cholesky_factor("stan::io::cholesky_factor",
                                           "Constrained matrix", y);
         return y;
       }
@@ -979,7 +980,7 @@ namespace stan {
        * @throw std::domain_error if the matrix is not a valid
        *    Cholesky factor.
        */
-      inline matrix_t cholesky_factor_cov_constrain(size_t M, size_t N) {
+      inline matrix_t cholesky_factor_constrain(size_t M, size_t N) {
         return stan::math::cholesky_factor_constrain
           (vector((N * (N + 1)) / 2 + (M - N) * N), M, N);
       }
@@ -997,10 +998,12 @@ namespace stan {
        * @throw std::domain_error if the matrix is not a valid
        *    Cholesky factor.
        */
-      inline matrix_t cholesky_factor_cov_constrain(size_t M, size_t N, T& lp) {
+      inline matrix_t cholesky_factor_constrain(size_t M, size_t N, T& lp) {
         return stan::math::cholesky_factor_constrain
           (vector((N * (N + 1)) / 2 + (M - N) * N), M, N, lp);
       }
+
+
 
       /**
        * Return the next Cholesky factor for a correlation matrix with
@@ -1012,7 +1015,7 @@ namespace stan {
        * @throw std::domain_error if the matrix is not a valid
        * Cholesky factor for a correlation matrix.
        */
-      inline matrix_t cholesky_factor_corr(size_t K) {
+      inline matrix_t cholesky_corr(size_t K) {
         using stan::math::check_cholesky_factor_corr;
         matrix_t y(matrix(K, K));
         check_cholesky_factor_corr("stan::io::cholesky_factor_corr",
@@ -1030,7 +1033,7 @@ namespace stan {
        * @throw std::domain_error if the matrix is not a valid
        *    Cholesky factor for a correlation matrix.
        */
-      inline matrix_t cholesky_factor_corr_constrain(size_t K) {
+      inline matrix_t cholesky_corr_constrain(size_t K) {
         return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
                                                           K);
       }
@@ -1048,10 +1051,11 @@ namespace stan {
        * @throw std::domain_error if the matrix is not a valid
        *    Cholesky factor for a correlation matrix.
        */
-      inline matrix_t cholesky_factor_corr_constrain(size_t K, T& lp) {
+      inline matrix_t cholesky_corr_constrain(size_t K, T& lp) {
         return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
                                                    K, lp);
       }
+
 
 
       /**

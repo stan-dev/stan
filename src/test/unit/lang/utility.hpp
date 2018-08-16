@@ -9,13 +9,11 @@
 #include <stan/lang/generator.hpp>
 #include <stan/lang/grammars/program_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
-//#include <stan/lang/grammars/expression_grammar.hpp>
-//#include <stan/lang/grammars/statement_grammar.hpp>
-
-
+#include <stan/lang/grammars/expression_grammar.hpp>
+#include <stan/lang/grammars/statement_grammar.hpp>
+#include <stan/lang/grammars/var_decls_grammar.hpp>
 #include <test/unit/util.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <fstream>
 #include <istream>
@@ -43,9 +41,8 @@ std::string file_name_to_model_name(const std::string& name) {
   return name_copy;
 }
 
+
 /** test whether model with specified path name parses successfully
- * throws exception on parse fail; intended to be called from inside
- * a try/catch block (i.e., other utility functions defined here).
  *
  * @param file_name  Filepath of model file
  * @param msgs Expected error message (default: none)
@@ -120,19 +117,14 @@ void test_parsable_standalone_functions(const std::string& model_name) {
   }
 }
 
-/** Test that model with specified name in folder "bad" throws
+/** test that model with specified name in folder "bad" throws
  * an exception containing the second arg as a substring
- * when model not found, will fail with misleading message.
- * Case insensitive string comparison.
  *
  * @param model_name Name of model to parse
  * @param msg Substring of error message expected.
  */
 void test_throws(const std::string& model_name, const std::string& error_msg) {
   std::stringstream msgs;
-  std::string found_lc = boost::algorithm::to_lower_copy(msgs.str());
-  std::string expected_lc = boost::algorithm::to_lower_copy(error_msg);
-  bool pass = false;
   try {
     is_parsable_folder(model_name, "bad", &msgs);
     if (msgs.str().length() > 0)
@@ -144,9 +136,8 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
              << "*********************************" << std::endl
              << std::endl;
   } catch (const std::invalid_argument& e) {
-    std::string what_lc = boost::algorithm::to_lower_copy(std::string(e.what()));
-    if (what_lc.find(expected_lc) == std::string::npos
-        && found_lc.find(expected_lc) == std::string::npos) {
+    if (std::string(e.what()).find(error_msg) == std::string::npos
+        && msgs.str().find(error_msg) == std::string::npos) {
       FAIL() << std::endl << "*********************************" << std::endl
              << "model name=" << model_name << std::endl
              << "*** EXPECTED: error_msg=" << error_msg << std::endl
@@ -155,10 +146,6 @@ void test_throws(const std::string& model_name, const std::string& error_msg) {
              << "*********************************" << std::endl
              << std::endl;
     }
-    return;
-  }
-  if (!pass) {
-    FAIL() << "model name=" << model_name << " not found" << std::endl;
     return;
   }
   FAIL() << "model name=" << model_name
@@ -212,7 +199,6 @@ std::string model_to_cpp(const std::string& model_text) {
   std::stringstream msgs;
   stan::lang::program prog;
   stan::io::program_reader reader;
-
   // fake reader history - model is parseable, no includes
   reader.add_event(0, 0, "start", "unnamed_unit_test");
   reader.add_event(500, 500, "end", "unnamed_unit_test");
