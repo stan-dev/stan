@@ -21,8 +21,7 @@ transformed data {
 parameters {
   real alpha_inferred;
   vector[M] beta_inferred;
-  
-}
+  }
 model {
   beta_inferred ~ normal(0, 2);
   alpha_inferred ~ normal(0, 4);
