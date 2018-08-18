@@ -27,6 +27,8 @@ TEST(commandStancHelper, printStancHelp) {
 }
 
 bool create_test_file(const std::string& path, const std::string& program) {
+  std::string cmd_setup = "mkdir -p test/test-models";
+  system(cmd_setup.c_str());
   std::string cmd = "echo ";
   cmd += "\"";
   cmd += program;
@@ -147,4 +149,3 @@ TEST(commandStancHelper, readOnlyDirBadFile) {
   int rc = stanc_helper(argc, argv, &out, &err);
   EXPECT_TRUE(rc != 0);
 }
-
