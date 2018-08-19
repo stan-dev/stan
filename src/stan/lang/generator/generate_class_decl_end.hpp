@@ -12,6 +12,7 @@ namespace stan {
       o << "}; // model" << EOL2;
     }
 
+
   }
 }
 #endif

@@ -3,9 +3,9 @@
 
 TEST(langParserVarDeclsGrammarDef, addVar) {
   test_throws("validate_add_var_bad1",
-              "Duplicate declaration of variable");
+              "duplicate declaration of variable");
   test_throws("validate_add_var_bad2",
-              "Parameters or transformed parameters cannot be integer or integer array");
+              "parameters or transformed parameters cannot be integer or integer array");
   test_parsable("validate_add_var_good");
 }
 
@@ -15,13 +15,14 @@ TEST(langParserVarDeclsGrammarDef, validateIntExpr) {
     std::string model_name("validate_validate_int_expr_bad");
     model_name += boost::lexical_cast<std::string>(i);
     test_throws(model_name,
-                "Dimension declaration requires");
+                "dimension declaration requires expression"
+                " denoting integer; found type=real");
   }
   for (int i = 1; i <= 14; ++i) {
     std::string model_name("data_index/non_data_index");
     model_name += boost::lexical_cast<std::string>(i);
     test_throws(model_name,
-                "Non-data variables are not allowed in dimension declarations");
+                "non-data variables not allowed in dimension declarations");
   }
 }
 
@@ -62,18 +63,16 @@ TEST(langParserVarDeclsGrammarDef, setDoubleRangeUpper) {
 TEST(langParserVarDeclsGrammarDef, parametersInLocals) {
   // test_parsable("var-decls-in-functions");
   test_throws("var-decl-bad-1",
-              "Non-data variables are not allowed in dimension declarations");
+              "non-data variables not allowed in dimension declarations");
 }
 
 TEST(langParserVarDeclsGrammarDef, constraintsInLocals) {
   test_throws("local_var_constraint",
-              "PARSER EXPECTED: <vector length declaration");
+              "require unconstrained. found range constraint.");
   test_throws("local_var_constraint2",
-              "PARSER EXPECTED: <vector length declaration");
+              "require unconstrained. found range constraint.");
   test_throws("local_var_constraint3",
-              "PARSER EXPECTED: \"[\"");
-  test_throws("local_var_constraint4",
-              "PARSER EXPECTED: <identifier>");
+              "require unconstrained. found range constraint.");
 }
 
 TEST (langParserVarDeclsGrammarDef, zeroVecs) {
@@ -86,22 +85,22 @@ TEST(langParserVarDeclsGrammarDef, defDeclIntVar) {
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar1) {
   test_throws("declare-define-var-int-1",
-              "Variable definition base type mismatch");
+              "variable definition base type mismatch");
 }
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar2) {
   test_throws("declare-define-var-int-2",
-              "Variable definition base type mismatch");
+              "variable definition base type mismatch");
 }
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar3) {
   test_throws("declare-define-var-int-3",
-              "Variable definition dimensions mismatch");
+              "variable definition dimensions mismatch");
 }
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclIntVar4) {
   test_throws("declare-define-var-int-4",
-              "Variable definition dimensions mismatch");
+              "variable definition dimensions mismatch");
 }
 
 TEST(langParserVarDeclsGrammarDef, defDeclDoubleVar) {
@@ -110,22 +109,22 @@ TEST(langParserVarDeclsGrammarDef, defDeclDoubleVar) {
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar1) {
   test_throws("declare-define-var-double-1",
-              "Variable definition dimensions mismatch");
+              "variable definition dimensions mismatch");
 }
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar2) {
   test_throws("declare-define-var-double-2",
-              "Variable definition base type mismatch");
+              "variable definition base type mismatch");
 }
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar3) {
   test_throws("declare-define-var-double-3",
-              "Variable definition not possible in this block");
+              "variable definition not possible in this block");
 }
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclDoubleVar4) {
   test_throws("declare-define-var-double-4",
-              "Variable definition not possible in this block");
+              "variable definition not possible in this block");
 }
 
 TEST(langParserVarDeclsGrammarDef, defDeclVecTypesVar) {
@@ -134,7 +133,7 @@ TEST(langParserVarDeclsGrammarDef, defDeclVecTypesVar) {
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclVec1) {
   test_throws("declare-define-var-vec-1",
-              "Variable definition base type mismatch");
+              "variable definition base type mismatch");
 }
 
 TEST(langParserVarDeclsGrammarDef, defDeclMatrixVar) {
@@ -143,7 +142,7 @@ TEST(langParserVarDeclsGrammarDef, defDeclMatrixVar) {
 
 TEST(langParserVarDeclsGrammarDef, badDefDeclMatrix1) {
   test_throws("declare-define-var-matrix-1",
-              "Variable definition base type mismatch");
+              "variable definition base type mismatch");
 }
 
 TEST(langParserVarDeclsGrammarDef, defDeclConstrainedVectorVar) {
@@ -156,7 +155,7 @@ TEST(langParserVarDeclsGrammarDef, defDeclConstrainedMatrixVar) {
 
 TEST(langParserVarDeclsGrammarDef, badDefParamBlock) {
   test_throws("declare-define-param-block",
-              "Variable definition not possible in this block");
+              "variable definition not possible in this block");
 }
 
 TEST(langParserVarDeclsGrammarDef, gqLocalRngFunCall) {

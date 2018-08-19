@@ -1,6 +1,8 @@
 #ifndef STAN_LANG_AST_PRINTABLE_HPP
 #define STAN_LANG_AST_PRINTABLE_HPP
 
+
+
 #include <boost/variant/recursive_variant.hpp>
 #include <string>
 

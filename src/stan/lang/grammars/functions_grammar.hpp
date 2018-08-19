@@ -1,3 +1,4 @@
+
 #ifndef STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_HPP
 #define STAN_LANG_GRAMMARS_FUNCTIONS_GRAMMAR_HPP
 
@@ -47,13 +48,13 @@ namespace stan {
       function_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<var_decl>(),
+                              std::vector<arg_decl>(),
                               whitespace_grammar<Iterator> >
       arg_decls_r;
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<scope>,
-                              var_decl(),
+                              arg_decl(),
                               whitespace_grammar<Iterator> >
       arg_decl_r;
 

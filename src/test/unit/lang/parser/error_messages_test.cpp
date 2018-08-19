@@ -9,13 +9,13 @@ TEST(LangGrammars,test1) {
   test_throws("err-transformed-params",
               "PARSER EXPECTED: \"parameters");
   test_throws("err-expected-model",
-              "PARSER FAILED TO PARSE INPUT COMPLETELY");
+              "PARSER EXPECTED: whitespace to end of file");
   test_throws("err-expected-generated",
               "PARSER EXPECTED: \"quantities");
   test_throws("err-expected-bracket",
               "PARSER EXPECTED: \"{");
   test_throws("err-expected-end-of-model",
-              "PARSER FAILED TO PARSE INPUT COMPLETELY");
+              "PARSER EXPECTED: whitespace to end of file");
   test_throws("err-second-operand-plus",
               "PARSER EXPECTED: <expression>");
   test_throws("err-nested-parens",
@@ -35,7 +35,8 @@ TEST(LangGrammars,test1) {
   test_throws("err-incr-log-prob-scope",
               "Sampling statements (~) and increment_log_prob() are");
   test_throws("err-decl-vector",
-              "PARSER EXPECTED: <vector length declaration");
+              "PARSER EXPECTED: <size declaration: integer (data-only)"
+              " in square brackets>");
   test_throws("err-decl-vector-2",
               "PARSER EXPECTED: \"]");
   test_throws("err-decl-matrix",
@@ -47,7 +48,7 @@ TEST(LangGrammars,test1) {
   test_throws("err-decl-double",
               "a variable declaration, beginning with type");
   test_throws("err-decl-double-params",
-              "Variable \"lijaflj\" does not exist");
+              "variable \"lijaflj\" does not exist");
   test_throws("err-fun-bare-types-int",
               "comma to indicate more dimensions or ]");
   test_throws("err-bare-type-close-square",
@@ -59,11 +60,11 @@ TEST(LangGrammars,test1) {
   test_throws("err-if-else-no-cond",
               "PARSER EXPECTED: <expression>");
   test_throws("err-if-else-double-else",
-              "Variable \"else\" does not exist.");
+              "variable \"else\" does not exist.");
   test_throws("err-var-decl-after-statement",
-              "Variable \"real\" does not exist");
+              "variable \"real\" does not exist");
   test_throws("err-double-dims",
-              "Dimension declaration requires expression denoting integer; found type=real");
+              "dimension declaration requires expression denoting integer; found type=real");
   test_throws("oneline-error",
               "1: parameters { vector y[10]; } model { }");
 }
