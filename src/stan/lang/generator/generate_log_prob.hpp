@@ -93,12 +93,13 @@ namespace stan {
         o << EOL;
 
         for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
-          if (prog.derived_decl_.first[i].type().is_constrained()) {
-            generate_indent(3, o);
-            o << "current_statement_begin__ = "
-              <<  prog.derived_decl_.first[i].begin_line_ << ";" << EOL;
-            generate_validate_tparam_inits(prog.derived_decl_.first[i], 3, o);
-            generate_validate_var_decl(prog.derived_decl_.first[i], 3, o);
+          block_var_decl bvd = prog.derived_decl_.first[i];
+          generate_indent(3, o);
+          o << "current_statement_begin__ = "
+            <<  bvd.begin_line_ << ";" << EOL;
+          generate_validate_tparam_inits(bvd, 3, o);
+          if (bvd.type().innermost_type().is_constrained()) {
+            generate_validate_var_decl(bvd, 3, o);
             o << EOL;
           }
         }

@@ -31,7 +31,7 @@ namespace stan {
       if (var_decl.bare_type().is_int_type()) {
         o << "int(0)";
       } else if (var_decl.bare_type().is_double_type()) {
-        o << "DUMMY_VAR__";
+        o << "double(0)";
       } else {
         generate_var_constructor(var_decl, "double", o);
       }
