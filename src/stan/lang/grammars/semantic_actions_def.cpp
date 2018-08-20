@@ -102,7 +102,7 @@ namespace stan {
       if (f.name_ != old_name) return false;
       f.original_name_ = f.name_;
       f.name_ = new_name;
-      msgs << "Warning: Function name '" << old_name << "' is deprecated"
+      msgs << "Info: Function name '" << old_name << "' is deprecated"
            << " and will be removed in a later release; please replace"
            << " with '" << new_name << "'" << std::endl;
       return true;
@@ -112,7 +112,7 @@ namespace stan {
                           const std::string& replacement, fun& f,
                           std::ostream& msgs) {
       if (!ends_with(deprecated_suffix, f.name_)) return false;
-      msgs << "Warning: Deprecated function '" << f.name_ << "';"
+      msgs << "Info: Deprecated function '" << f.name_ << "';"
            << " please replace suffix '" << deprecated_suffix
            << "' with " << replacement << std::endl;
       return true;
@@ -918,7 +918,7 @@ namespace stan {
     void deprecate_old_assignment_op::operator()(std::string& op,
                                                  std::ostream& error_msgs)
       const {
-      error_msgs << "Warning (non-fatal): assignment operator <- deprecated"
+      error_msgs << "Info: assignment operator <- deprecated"
                  << " in the Stan language;"
                  << " use = instead."
                  << std::endl;
@@ -1026,7 +1026,7 @@ namespace stan {
         }
         if (a.lhs_var_occurs_on_rhs()) {
           // this only requires a warning --- a deep copy will be made
-          error_msgs << "Warning: left-hand side variable"
+          error_msgs << "Info: left-hand side variable"
                      << " (name=" << name << ")"
                      << " occurs on right-hand side of assignment, causing"
                      << " inefficient deep copy to avoid aliasing."
@@ -1157,7 +1157,7 @@ namespace stan {
       }
 
       if (internal_function_name == "lkj_cov_log") {
-        error_msgs << "Warning: the lkj_cov_log() sampling distribution"
+        error_msgs << "Info: the lkj_cov_log() sampling distribution"
                    << " is deprecated.  It will be removed in Stan 3."
                    << std::endl
                    << "Code LKJ covariance in terms of an lkj_corr()"
@@ -1174,7 +1174,7 @@ namespace stan {
       }
       // test for LHS not being purely a variable
       if (has_non_param_var(s.expr_, var_map)) {
-        error_msgs << "Warning (non-fatal):"
+        error_msgs << "Info:"
                    << std::endl
                    << "Left-hand side of sampling statement (~) may contain a"
                    << " non-linear transform of a parameter or local variable."
@@ -1460,7 +1460,7 @@ namespace stan {
 
     void deprecate_increment_log_prob::operator()(
                                        std::stringstream& error_msgs) const {
-      error_msgs << "Warning (non-fatal): increment_log_prob(...);"
+      error_msgs << "Info: increment_log_prob(...);"
                  << " is deprecated and will be removed in the future."
                  << std::endl
                  << "  Use target += ...; instead."
@@ -1540,7 +1540,7 @@ namespace stan {
 
     void deprecated_integrate_ode::operator()(std::ostream& error_msgs)
       const {
-      error_msgs << "Warning: the integrate_ode() function is deprecated"
+      error_msgs << "Info: the integrate_ode() function is deprecated"
              << " in the Stan language; use the following functions"
              << " instead.\n"
              << " integrate_ode_rk45()"
@@ -1987,7 +1987,7 @@ namespace stan {
                                         const variable_map& var_map,
                                         std::ostream& error_msgs) const {
       if (fun.name_ == "get_lp")
-        error_msgs << "Warning (non-fatal): get_lp() function deprecated."
+        error_msgs << "Info: get_lp() function deprecated."
                    << std::endl
                    << "  It will be removed in a future release."
                    << std::endl
@@ -2082,7 +2082,7 @@ namespace stan {
       if (fun.name_ == "abs"
           && fun.args_.size() > 0
           && fun.args_[0].bare_type().is_double_type()) {
-        error_msgs << "Warning: function abs(real) is deprecated"
+        error_msgs << "Info: Function abs(real) is deprecated"
                    << " in the Stan language."
                    << std::endl
                    << "         It will be removed in a future release."
@@ -2092,7 +2092,7 @@ namespace stan {
       }
 
       if (fun.name_ == "lkj_cov_log") {
-        error_msgs << "Warning: the lkj_cov_log() function"
+        error_msgs << "Info: the lkj_cov_log() function"
                    << " is deprecated.  It will be removed in Stan 3."
                    << std::endl
                    << "Code LKJ covariance in terms of an lkj_corr()"
@@ -2102,7 +2102,7 @@ namespace stan {
       }
 
       if (fun.name_ == "if_else") {
-        error_msgs << "Warning (non-fatal): the if_else() function"
+        error_msgs << "Info: the if_else() function"
                    << " is deprecated.  "
                    << "Use the conditional operator '?:' instead."
                    << std::endl;
@@ -2270,7 +2270,7 @@ namespace stan {
       if (expr1.bare_type().is_int_type()
           && expr2.bare_type().is_int_type()) {
         // result might be assigned to real - generate warning
-        error_msgs << "Warning: integer division"
+        error_msgs << "Info: integer division"
                    << " implicitly rounds to integer."
                    << " Found int division: "
                    << expr1.to_string()
@@ -2482,8 +2482,8 @@ namespace stan {
         pass = false;
         return;
       } else if (name == std::string("params_r__")) {
-        error_msgs << std::endl << "Warning:" << std::endl
-                   << " Direct access to params_r__ yields an inconsistent"
+        error_msgs << std::endl << "Info:" << std::endl
+                   << "  Direct access to params_r__ yields an inconsistent"
                    << " statistical model in isolation and no guarantee is"
                    << " made that this model will yield valid inferences."
                    << std::endl
@@ -3228,7 +3228,7 @@ namespace stan {
     boost::phoenix::function<trace_pass> trace_pass_f;
 
     void deprecate_pound_comment::operator()(std::ostream& error_msgs) const {
-      error_msgs << "Warning (non-fatal): Comments beginning with #"
+      error_msgs << "Info: Comments beginning with #"
                  << " are deprecated.  Please use // in place of #"
                  << " for line comments." << std::endl;
     }
