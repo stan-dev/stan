@@ -70,7 +70,7 @@ TEST(lang, data_block_hpp_ctor) {
                        "            size_t cfcov_54_j_1_max__ = 5;\n"
                        "            for (size_t j_2__ = 0; j_2__ < cfcov_54_j_2_max__; ++j_2__) {\n"
                        "                for (size_t j_1__ = 0; j_1__ < cfcov_54_j_1_max__; ++j_1__) {\n"
-                       "                    cfcov_54(j_1__, j_2__) = vals_r__[pos__++]; \n"
+                       "                    cfcov_54(j_1__, j_2__) = vals_r__[pos__++];\n"
                        "                }\n"
                        "            }\n"
                        "            stan::math::check_cholesky_factor(function__, \"cfcov_54\", cfcov_54);\n"
@@ -86,7 +86,7 @@ TEST(lang, data_block_hpp_ctor) {
                        "            size_t cfcov_33_j_1_max__ = 3;\n"
                        "            for (size_t j_2__ = 0; j_2__ < cfcov_33_j_2_max__; ++j_2__) {\n"
                        "                for (size_t j_1__ = 0; j_1__ < cfcov_33_j_1_max__; ++j_1__) {\n"
-                       "                    cfcov_33(j_1__, j_2__) = vals_r__[pos__++]; \n"
+                       "                    cfcov_33(j_1__, j_2__) = vals_r__[pos__++];\n"
                        "                }\n"
                        "            }\n"
                        "            stan::math::check_cholesky_factor(function__, \"cfcov_33\", cfcov_33);\n");

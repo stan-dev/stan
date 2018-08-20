@@ -66,7 +66,7 @@ namespace stan {
 
       generate_try(2, o);
       if (prog.derived_decl_.first.size() > 0) {
-        generate_comment("declare and define transformed parameters", 2, o);
+        generate_comment("declare and define transformed parameters", 3, o);
         for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
           generate_indent(3, o);
           o << "current_statement_begin__ = "

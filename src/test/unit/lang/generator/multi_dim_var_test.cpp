@@ -62,7 +62,7 @@ TEST(lang, data_block_var_hpp) {
                        "                for (size_t j_1__ = 0; j_1__ < ar_mat_j_1_max__; ++j_1__) {\n"
                        "                    for (size_t k_1__ = 0; k_1__ < ar_mat_k_1_max__; ++k_1__) {\n"
                        "                        for (size_t k_0__ = 0; k_0__ < ar_mat_k_0_max__; ++k_0__) {\n"
-                       "                            ar_mat[k_0__][k_1__](j_1__, j_2__) = vals_r__[pos__++]; \n"
+                       "                            ar_mat[k_0__][k_1__](j_1__, j_2__) = vals_r__[pos__++];\n"
                        "                        }\n"
                        "                    }\n"
                        "                }\n"
