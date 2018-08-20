@@ -341,23 +341,26 @@ namespace stan {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         eta = transform(eta);
       }
-        
         /**
-         * New: Draw a posterior sample from a normal distribution, and return the log normal density. Constant (d* log 2 pi) is removed. It is termed log_q because it denotes the approximation density using variational families.
+         * New: Draw a posterior sample from a normal distribution, 
+         and return the log normal density. 
+         Constant (d* log 2 pi) is removed. It changes as a function 
+         of parameters, but not as a fixed posterior sample.
+         It is saved as log_q because ( the approximation density 
+        using variational families)
          */
         template <class BaseRNG>
-        void sample_lp(BaseRNG& rng, Eigen::VectorXd& eta, double& log_q) const {
-            
-            // Draw from standard normal and transform to real-coordinate space
-            log_q=0;
-        for (int d = 0; d < dimension_; ++d){
-                eta(d) = stan::math::normal_rng(0, 1, rng);
-                
-                log_q+= stan::math::square(eta(d))*(-0.5);
-           }
+        void sample_lp(BaseRNG& rng,
+                       Eigen::VectorXd& eta,
+                       double& log_q)
+        const {
+                log_q = 0;
+                for (int d = 0; d < dimension_; ++d) {
+                  eta(d) = stan::math::normal_rng(0, 1, rng);
+                  log_q += stan::math::square(eta(d))*(-0.5);
+                }
             eta = transform(eta);
         }
-    
 
       /**
        * Calculates the "blackbox" gradient with respect to both the
