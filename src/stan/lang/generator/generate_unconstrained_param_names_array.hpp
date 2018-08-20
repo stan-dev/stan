@@ -6,6 +6,8 @@
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/get_block_var_dims.hpp>
+#include <stan/lang/generator/write_begin_param_elements_loop.hpp>
+#include <stan/lang/generator/write_end_loop.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
