@@ -445,7 +445,7 @@ TEST(io_writer, cov_matrix_unconstrain_exception) {
   EXPECT_THROW(writer.cov_matrix_unconstrain(y), std::runtime_error);
 }
 
-TEST(io_writer, cholesky_factor_unconstrain_exception) {
+TEST(io_writer, cholesky_factor_cov_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
   stan::io::writer<double> writer(theta,theta_i);
@@ -454,31 +454,31 @@ TEST(io_writer, cholesky_factor_unconstrain_exception) {
   y.resize(1,1);
   y << 
     1.0;
-  EXPECT_NO_THROW(writer.cholesky_factor_unconstrain(y));
+  EXPECT_NO_THROW(writer.cholesky_factor_cov_unconstrain(y));
   
   y.resize(1,1);
   y <<
     (-1.0);
-  EXPECT_THROW(writer.cholesky_factor_unconstrain(y), std::domain_error);
+  EXPECT_THROW(writer.cholesky_factor_cov_unconstrain(y), std::domain_error);
                
   y.resize(0,0);
-  EXPECT_THROW(writer.cholesky_factor_unconstrain(y), std::domain_error);
+  EXPECT_THROW(writer.cholesky_factor_cov_unconstrain(y), std::domain_error);
                
   y.resize(1,2);
-  EXPECT_THROW(writer.cholesky_factor_unconstrain(y), std::domain_error);
+  EXPECT_THROW(writer.cholesky_factor_cov_unconstrain(y), std::domain_error);
 
   y.resize(2,1);
   y << 
     1,
     2;
-  EXPECT_NO_THROW(writer.cholesky_factor_unconstrain(y));
+  EXPECT_NO_THROW(writer.cholesky_factor_cov_unconstrain(y));
   
   y.resize(3,3);
   y <<
     1, 0, 0,
     2, 3, 0,
     -4, -5, 6;
-  EXPECT_NO_THROW(writer.cholesky_factor_unconstrain(y));
+  EXPECT_NO_THROW(writer.cholesky_factor_cov_unconstrain(y));
 }
 TEST(io_reader_writer, cholesky_factor_roundtrip) {
   std::vector<int> theta_i;
@@ -490,7 +490,7 @@ TEST(io_reader_writer, cholesky_factor_roundtrip) {
     1, 0, 0,
     2, 3, 0,
     -4, -5, 6;
-  writer.cholesky_factor_unconstrain(y);
+  writer.cholesky_factor_cov_unconstrain(y);
 
   std::vector<double> data_r = writer.data_r();
   EXPECT_EQ(6U,data_r.size());
@@ -500,7 +500,7 @@ TEST(io_reader_writer, cholesky_factor_roundtrip) {
 
   EXPECT_EQ(6U,reader.available());
 
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(3,3));
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_cov_constrain(3,3));
   EXPECT_EQ(3,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(9,L.size());
@@ -520,7 +520,7 @@ TEST(io_reader_writer, cholesky_factor_roundtrip_asymmetric) {
     -4, -5, 6,
     -9, 16, -25;
     
-  writer.cholesky_factor_unconstrain(y);
+  writer.cholesky_factor_cov_unconstrain(y);
 
   std::vector<double> data_r = writer.data_r();
   EXPECT_EQ(9U,data_r.size());
@@ -530,7 +530,7 @@ TEST(io_reader_writer, cholesky_factor_roundtrip_asymmetric) {
 
   EXPECT_EQ(9U,reader.available());
 
-  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_constrain(4,3));
+  Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic> L(reader.cholesky_factor_cov_constrain(4,3));
   EXPECT_EQ(4,L.rows());
   EXPECT_EQ(3,L.cols());
   EXPECT_EQ(12,L.size());

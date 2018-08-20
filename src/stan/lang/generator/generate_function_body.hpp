@@ -31,7 +31,7 @@ namespace stan {
       o << " {" << EOL;
       o << INDENT << "typedef " << scalar_t_name << " local_scalar_t__;" << EOL;
       o << INDENT << "typedef "
-        << (fun.return_type_.base_type_.is_int_type()
+        << (fun.return_type_.innermost_type().is_int_type()
             ? "int" : "local_scalar_t__")
         << " fun_return_scalar_t__;" << EOL;
       o << INDENT

@@ -7,7 +7,7 @@
 #include <stan/lang/grammars/semantic_actions.hpp>
 #include <stan/lang/grammars/statement_2_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
-#include <stan/lang/grammars/var_decls_grammar.hpp>
+#include <stan/lang/grammars/local_var_decls_grammar.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <sstream>
 #include <string>
@@ -28,7 +28,7 @@ namespace stan {
       variable_map& var_map_;
       std::stringstream& error_msgs_;
       expression_grammar<Iterator> expression_g;
-      var_decls_grammar<Iterator> var_decls_g;
+      local_var_decls_grammar<Iterator> local_var_decls_g;
       statement_2_grammar<Iterator> statement_2_g;
       indexes_grammar<Iterator> indexes_g;
 
@@ -124,7 +124,7 @@ namespace stan {
       identifier_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<var_decl>(scope),
+                              std::vector<local_var_decl>(scope),
                               whitespace_grammar<Iterator> >
       local_var_decls_r;
 
@@ -164,8 +164,8 @@ namespace stan {
       statement_sub_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<std::vector<var_decl>,
-                                                        scope>,
+             boost::spirit::qi::locals<std::vector<local_var_decl>,
+                                       scope>,
                               statements(scope, bool),
                               whitespace_grammar<Iterator> >
       statement_seq_r;

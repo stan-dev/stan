@@ -1,7 +1,6 @@
 #ifndef STAN_LANG_AST_FUN_ENDS_WITH_DEF_HPP
 #define STAN_LANG_AST_FUN_ENDS_WITH_DEF_HPP
 
-#include <stan/lang/ast.hpp>
 #include <string>
 
 namespace stan {

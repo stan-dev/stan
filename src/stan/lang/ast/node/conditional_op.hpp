@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_CONDITIONAL_OP_HPP
 #define STAN_LANG_AST_NODE_CONDITIONAL_OP_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/scope.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 
@@ -30,7 +30,7 @@ namespace stan {
       /**
        * Type of result.
        */
-      expr_type type_;
+      bare_expr_type type_;
 
       /**
        * True if the conditional operator contains a variable that is
@@ -52,6 +52,7 @@ namespace stan {
       /**
        * Construct a conditional operator expression from the
        * specified condition and values.
+       * No type checking on expressions.
        *
        * @param cond condition expression
        * @param true_val value to return if true
