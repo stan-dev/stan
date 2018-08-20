@@ -879,19 +879,19 @@ for (const auto& t : all_vector_types) {
   }
  }
 add("neg_binomial_2_log_glm_lpmf",
-    expr_type(double_type()),
-    expr_type(int_type(), 1U),
-    expr_type(matrix_type()),
-    expr_type(double_type()),
-    expr_type(vector_type()),
-    expr_type(double_type()));
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(int_type(), 1)),
+    bare_expr_type(matrix_type()),
+    bare_expr_type(double_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(double_type()));
 add("neg_binomial_2_log_glm_lpmf",
-    expr_type(double_type()),
-    expr_type(int_type(), 1U),
-    expr_type(matrix_type()),
-    expr_type(vector_type()),
-    expr_type(vector_type()),
-    expr_type(double_type()));
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(int_type(), 1)),
+    bare_expr_type(matrix_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(double_type()));
 add_nullary("negative_infinity");
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
@@ -919,19 +919,19 @@ for (const auto& t : all_vector_types) {
   }
  }
 add("normal_id_glm_lpdf",
-    expr_type(double_type()),
-    expr_type(vector_type()),
-    expr_type(matrix_type()),
-    expr_type(double_type()),
-    expr_type(vector_type()),
-    expr_type(double_type()));
+    bare_expr_type(double_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(matrix_type()),
+    bare_expr_type(double_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(double_type()));
 add("normal_id_glm_lpdf",
-    expr_type(double_type()),
-    expr_type(vector_type()),
-    expr_type(matrix_type()),
-    expr_type(vector_type()),
-    expr_type(vector_type()),
-    expr_type(double_type()));
+    bare_expr_type(double_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(matrix_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(double_type()));
 add_nullary("not_a_number");
 add("num_elements", bare_expr_type(int_type()), bare_expr_type(matrix_type()));
 add("num_elements", bare_expr_type(int_type()), bare_expr_type(vector_type()));
@@ -1077,17 +1077,17 @@ for (const auto& t : all_vector_types) {
   add("poisson_log_rng", rng_return_type<int_type>(t), t);
  }
 add("poisson_log_glm_lpmf",
-    expr_type(double_type()),
-    expr_type(int_type(), 1U),
-    expr_type(matrix_type()),
-    expr_type(double_type()),
-    expr_type(vector_type()));
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(int_type(), 1)),
+    bare_expr_type(matrix_type()),
+    bare_expr_type(double_type()),
+    bare_expr_type(vector_type()));
 add("poisson_log_glm_lpmf",
-    expr_type(double_type()),
-    expr_type(int_type(), 1U),
-    expr_type(matrix_type()),
-    expr_type(vector_type()),
-    expr_type(vector_type()));
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(int_type(), 1)),
+    bare_expr_type(matrix_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()));
 add_nullary("positive_infinity");
 add_binary("pow");
 add("prod", bare_expr_type(int_type()), bare_expr_type(bare_array_type(int_type(), 1)));
