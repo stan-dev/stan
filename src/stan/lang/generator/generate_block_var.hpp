@@ -49,9 +49,9 @@ namespace stan {
           << EOL;
       }
       generate_indent(indent, o);
-      o << "stan::math::fill(" << var_decl.name() <<
-        (var_decl.type().innermost_type().bare_type().is_int_type() ?
-         ", std::numeric_limits<int>::min()" : ", DUMMY_VAR__")
+      o << "stan::math::fill(" << var_decl.name() << ", "
+        << (var_decl.type().innermost_type().bare_type().is_int_type() ?
+            "std::numeric_limits<int>::min()" : "DUMMY_VAR__")
         << ");" << EOL;
 
       if (var_decl.has_def()) {
