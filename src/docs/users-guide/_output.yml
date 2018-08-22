@@ -2,7 +2,7 @@ bookdown::gitbook:
   toc_depth: 1
   css: stan-manual.css
   config:
-    search: no
+    search: yes
     sharing: null
     download: null
     edit: null

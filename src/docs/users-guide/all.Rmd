@@ -6303,7 +6303,7 @@ model {
     for (k in 1:K)
       y[j, k] ~ bernoulli_logit(delta[k] * (alpha[j] - beta[k]));
   ...
-
+```
 
 \begin{figure}
 \begin{center}
@@ -9078,7 +9078,7 @@ stiff region of the parameter space, which would require a very small
 step size and very many steps to satisfy even modest tolerances.
 
 
-# <i style="font-size: 110%; color:#990017;">II. Programming Techniques</i> {-} {#programming-techniques.part}
+# <i style="font-size: 110%; color:#990017;">II. Programming Techniques</i> {-}
 
 This part of the manual surveys general programming techniques in
 Stan that are useful across a range of different model types.
