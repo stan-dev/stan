@@ -8,7 +8,7 @@ TEST(langParserExpressionGrammarDef, intDivUserFacing) {
 
 TEST(langParserExpressionGrammarDef, absDeprecate) {
   test_warning("abs-deprecate",
-               "Warning: Function abs(real) is deprecated in the Stan language.");
+               "Info: Function abs(real) is deprecated in the Stan language.");
 }
 
 TEST(langParserExpressionGrammarDef, conditionalOp) {
