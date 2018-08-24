@@ -158,6 +158,20 @@ for (const auto& t : all_vector_types) {
     add("beta_rng", rng_return_type<double_type>(t, u), t, u);
   }
  }
+for (const auto& t : vector_types) {
+  for (const auto& u : vector_types) {
+    for (const auto& v : all_vector_types) {
+      add("beta_proportion_lccdf", expr_type(double_type()), t, u, v);
+      add("beta_proportion_lcdf", expr_type(double_type()), t, u, v);
+      add("beta_proportion_lpdf", expr_type(double_type()), t, u, v);
+    }
+  }
+ }
+for (const auto& t : vector_types) {
+  for (const auto& u : all_vector_types) {
+    add("beta_proportion_rng", rng_return_type<double_type>(t, u), t, u);
+  }
+ }
 add("binary_log_loss", expr_type(double_type()), expr_type(int_type()), expr_type(double_type()));
 for (size_t i = 0; i < int_vector_types.size(); ++i) {
   for (size_t j = 0; j < int_vector_types.size(); ++j) {

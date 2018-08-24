@@ -392,6 +392,37 @@ generated quantities {
   x = beta_rng(0.35, u);
   z = beta_rng(0.35, 0.3);
   z = beta_rng(0.35, 0.35);
+
+  x = beta_proportion_rng(alpha, alpha);
+  x = beta_proportion_rng(alpha, nu);
+  x = beta_proportion_rng(alpha, ns);
+  x = beta_proportion_rng(alpha, u);
+  x = beta_proportion_rng(alpha, 0.3);
+  x = beta_proportion_rng(alpha, 0.35);
+  x = beta_proportion_rng(nu, alpha);
+  x = beta_proportion_rng(nu, nu);
+  x = beta_proportion_rng(nu, ns);
+  x = beta_proportion_rng(nu, u);
+  x = beta_proportion_rng(nu, 0.3);
+  x = beta_proportion_rng(nu, 0.35);
+  x = beta_proportion_rng(u, alpha);
+  x = beta_proportion_rng(u, nu);
+  x = beta_proportion_rng(u, ns);
+  x = beta_proportion_rng(u, u);
+  x = beta_proportion_rng(u, 0.3);
+  x = beta_proportion_rng(u, 0.35);
+  x = beta_proportion_rng(0.3, alpha);
+  x = beta_proportion_rng(0.3, nu);
+  x = beta_proportion_rng(0.3, ns);
+  x = beta_proportion_rng(0.3, u);
+  z = beta_proportion_rng(0.3, 0.3);
+  z = beta_proportion_rng(0.3, 0.35);
+  x = beta_proportion_rng(0.35, alpha);
+  x = beta_proportion_rng(0.35, nu);
+  x = beta_proportion_rng(0.35, ns);
+  x = beta_proportion_rng(0.35, u);
+  z = beta_proportion_rng(0.35, 0.3);
+  z = beta_proportion_rng(0.35, 0.35);
   
   x = normal_rng(alpha, alpha);
   x = normal_rng(alpha, nu);
