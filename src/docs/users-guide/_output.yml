@@ -1,4 +1,5 @@
 bookdown::gitbook:
+  code folding: hide
   toc_depth: 1
   css: stan-manual.css
   config:
