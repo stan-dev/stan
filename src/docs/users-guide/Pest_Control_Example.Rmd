@@ -41,7 +41,7 @@ The other chapters of this book are focused on building Stan models.  This chapt
 
 ## The problem
 
-### Background
+### Background {-}
 
 Imagine that you are a statistician or data scientist working as an independent
 contractor. One of your clients is a company that owns many residential buildings 
@@ -64,7 +64,7 @@ buildings are built differently than other common residential buildings in the
 US. This is particularly important as the unit cost for each bait station per
 year is high.
 
-### The goal
+### The goal {-}
 
 The manager wishes to employ your services to help them to find the optimal
 number of roach bait stations they should place in each of their buildings in
@@ -162,7 +162,7 @@ We will first just look at the association of the number of bait stations with t
 
 How should we model the number of complaints?  We will demonstrate using a Bayesian workflow of model building, model checking, and model improvement.
 
-## Modeling count data : Poisson distribution
+## Modeling count data: Poisson distribution
 
 We already know some rudimentary information about what we should expect. The
 number of complaints over a month should be either zero or a positive integer. The
@@ -175,7 +175,7 @@ over-dispersed, but we'll start with the Poisson model and then check
 whether over-dispersion is a problem by comparing our model's predictions 
 to the data.
 
-### Model 
+### Model {-}
 
 Given that we have chosen a Poisson regression, we define the likelihood to be
 the Poisson probability mass function over the number of bait stations placed in
@@ -196,13 +196,13 @@ $$
 
 Let's encode this probability model in a Stan program.
 
-### Writing our first Stan model
+### Writing our first Stan model {-}
 
 ```{r}
 print_file("stan/simple_poisson_regression.stan")
 ```
 
-### Making sure our code is right
+### Making sure our code is right {-}
 
 Before we fit the model to the data that have been given to us, we should check that our
 model works well with data that we have simulated ourselves. We'll simulate data according to the model
@@ -246,7 +246,7 @@ sims_dgp <- rstan::extract(fitted_model_dgp)
 str(sims_dgp)
 ```
 
-### Fit the model to the fake data
+### Fitting the model to the fake data {-}
 
 In order to pass the fake data to our Stan program using RStan, we need to
 arrange the data into a named list. The names must match the names used 
@@ -270,7 +270,7 @@ head(posterior_alpha_beta)
 ```
 
 
-### Assess parameter recovery
+### Assessing parameter recovery {-}
 
 We can compare the known values of the parameters to their posterior distributions in the model fit to simulated data:
 
@@ -305,7 +305,7 @@ counts relatively well.
 ppc_rootogram(stan_dat_fake$complaints, yrep = y_rep)
 ```
 
-### Fit with real data 
+### Fiting with the data supplied to us {-}
 
 To fit the model to the data given to us, we first create a list to pass to Stan using
 the variables in the `pest_data` dataframe:
@@ -330,7 +330,7 @@ associated with fewer complaints about cockroaches in the following month.
 
 But we still need to consider how well the model fits.
 
-### Posterior predictive checking
+### Posterior predictive checking {-}
 
 ```{r}
 y_rep <- as.matrix(fit_P_real_data, pars = "y_rep")
@@ -397,7 +397,7 @@ for our client. Moreover, the manager has told us that they expect there are a
 number of other reasons that one building might have more roach complaints than
 another.
 
-### Interpretability
+### Interpretability {-}
 
 Currently, our model's mean parameter is a rate of complaints per 30 days, but
 we're modeling a process that occurs over an area as well as over time. We have
@@ -441,7 +441,7 @@ stan_dat_simple$log_sq_foot <- log(pest_data$total_sq_foot/1e4)
 stan_dat_simple$live_in_super <- pest_data$live_in_super
 ```
 
-### Stan program for Poisson multiple regression
+### Stan program for Poisson multiple regression {-}
 
 Now we need a new Stan model that uses multiple predictors.
 
@@ -449,7 +449,7 @@ Now we need a new Stan model that uses multiple predictors.
 print_file("stan/multiple_poisson_regression.stan")
 ```
 
-### Simulate fake data with multiple predictors
+### Simulate fake data with multiple predictors {-}
 
 ```{r compmultPDGP, cache=TRUE, results="hide", message=FALSE}
 comp_dgp_multiple <- stan_model('stan/multiple_poisson_regression_dgp.stan')
@@ -485,7 +485,7 @@ mcmc_recover_hist(posterior_alpha_beta, true = true_alpha_beta)
 
 Now that wee've recovered the parameters from the data we have simulated, we're ready to fit the data that were given to us.
 
-### Fit the data given to us
+### Fit the data given to us {-}
 
 We explore the fit by comparing the data to posterior predictive simulations:
 
@@ -556,13 +556,13 @@ As $\phi$ gets larger the term $\lambda^2 / \phi$ approaches zero and so
 the variance of the negative-binomial approaches $\lambda$; that is, the
 negative-binomial gets closer and closer to the Poisson.
 
-### Stan program for negative-binomial regression
+### Stan program for negative-binomial regression {-}
 
 ```{r}
 print_file("stan/multiple_NB_regression.stan")
 ```
 
-### Fake data fit: Multiple negative-binomial regression
+### Fake data fit: Multiple negative-binomial regression {-}
 
 ```{r , cache=TRUE, results="hide", message=FALSE}
 comp_dgp_multiple_NB <- stan_model('stan/multiple_NB_regression_dgp.stan')
@@ -610,7 +610,7 @@ mcmc_recover_hist(posterior_alpha_beta_NB, true = true_alpha_beta_NB)
 ```
 
 
-### Fit to real data and check the fit
+### Fiting to the given data and checking the fit {-}
 
 ```{r runNB, results=FALSE}
 fitted_model_NB <- sampling(comp_model_NB, data = stan_dat_simple)
@@ -679,7 +679,7 @@ get much better estimates.
 
 ## Hierarchical modeling
 
-### Modeling varying intercepts for each building
+### Modeling varying intercepts for each building {-}
 
 Let's add a hierarchical intercept parameter, $\alpha_b$ at the building level
 to our model.
@@ -720,7 +720,7 @@ $$
 \mu \sim \text{normal}(\alpha + \texttt{building_data} \, \zeta, \,\sigma_{\mu})
 $$
 
-### Prepare building data for hierarchical 
+### Preparation for building data for hierarchical modeling {-}
 
 We'll need to do some more data prep before we can fit our models. Firstly to
 use the building variable in Stan we will need to transform it from a factor
@@ -762,7 +762,7 @@ stan_dat_hier <- with(pest_data,
     mo_idx = as.integer(as.factor(date)), K = 4, building_idx = building_idx))
 ```
 
-### Compile and fit the hierarchical model
+### Compile and fit the hierarchical model {-}
 
 Let's compile the model. 
 
@@ -777,7 +777,7 @@ fitted_model_NB_hier <- sampling(comp_model_NB_hier,
   data = stan_dat_hier, chains = 4, cores = 4, iter = 4000)
 ```
 
-### Diagnostics 
+### Diagnostics  {-}
 
 We get a bunch of warnings from Stan about divergent transitions, which is 
 an indication that there may be regions of the posterior that have not been
@@ -872,7 +872,7 @@ parcoord_with_divs
 
 Again, we see evidence that our problems concentrate when $\texttt{sigma_mu}$ is small.
 
-### Reparameterize and recheck diagnostics
+### Reparameterizing and rechecking diagnostics {-}
 
 Instead, we should use the non-centered parameterization for $\mu_b$. We
 define a vector of auxiliary variables in the parameters block,
@@ -941,7 +941,7 @@ bayesplot_grid(parcoord_with_divs, parcoord_no_divs, ylim = c(-3, 3))
 sims_NB_hier_ncp <- rstan::extract(fitted_model_NB_hier_ncp, pars = c('y_rep','inv_phi'))
 ```
 
-The marginal plot, again.
+The marginal plot, again:
 
 ```{r ppc-full-hier}
 y_rep <- as.matrix(fitted_model_NB_hier_ncp, pars = "y_rep")
@@ -987,7 +987,7 @@ ppc_rootogram(stan_dat_hier$complaints, yrep = y_rep)
 ```
 
 
-### Varying intercepts _and_ varying slopes
+### Varying intercepts and varying slopes  {-}
 
 We've gotten some new data that extends the number of time points for which we
 have observations for each building. This will let us explore how to expand the
@@ -1052,7 +1052,7 @@ ppc_dens_overlay(y = stan_dat_hier$complaints, yrep = y_rep[1:200,]
 ```
 
 
-## Time varying effects and structured priors
+## Time-varying effects and structured priors
 
 We haven't looked at how cockroach complaints change over time. Let's look
 at whether there's any pattern over time.
@@ -1330,7 +1330,7 @@ revenue strategy from the the draws of `rev_pred` we already have?
 
 ## Gaussian process instead of AR(1)
 
-### Joint density for AR(1) process
+### Joint density for AR(1) process {-}
 
 We can derive the joint distribution for the AR(1) process before we move to the
 Gaussian process (GP) which will give us a little more insight into what a GP
@@ -1471,7 +1471,7 @@ vector[M] mo;
 The existing Stan code in lines 59 to 63 is doing the exact same calculations but
 more efficiently.
 
-### Cholesky decomposition 
+### Cholesky decomposition  {-}
 
 If we only knew the covariance matrix of our process, say a matrix called $\Sigma$, and we had a way
 of decomposing $\Sigma$ into $L L^T$, then
@@ -1536,7 +1536,7 @@ vector[M] mo;
 }
 ```
 
-### Extension to Gaussian processes
+### Extension to Gaussian processes {-}
 
 The prior we defined for `mo` is strictly speaking a Gaussian process. It is a 
 stochastic process that is distributed as jointly multivariate normal for any
@@ -1605,20 +1605,20 @@ $$
 k(t, t+h | \theta) = \alpha^2  \exp \left( - \dfrac{h^2}{2\ell^2} \right) + \text{if } h = 0, \, \sigma^2_\texttt{noise} \text{ else } 0
 $$
 
-### Compiling the Gaussian process model
+### Compiling the Gaussian process model {-}
 
 ```{r comp-NB-hier-gp, cache=TRUE, results="hide", message=FALSE}
 comp_model_NB_hier_gp <- stan_model('stan/hier_NB_regression_ncp_slopes_mod_mos_gp.stan')
 ```
 
-### Fitting the Gaussian process model to data
+### Fitting the Gaussian process model to data {-}
 
 ```{r run-NB-hier-gp}
 fitted_model_NB_hier_gp <- sampling(comp_model_NB_hier_gp, data = stan_dat_hier, chains = 4, cores = 4, control = list(adapt_delta = 0.9))
 sims_gp <- rstan::extract(fitted_model_NB_hier_gp)
 ```
 
-### Examining the fit
+### Examining the fit {-}
 
 Let's look at the prior vs. posterior for the Gaussian process length scale parameter: 
 

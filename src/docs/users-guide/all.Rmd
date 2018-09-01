@@ -144,13 +144,13 @@ Print statements can be invaluable for debugging, especially for a
 language like Stan with no stepwise debugger.
 
 For instance, to print the value of variables `y` and
-`z`, use the following statement.
+`z`:
 
 ```
 print("y=", y, " z=", z);
 ```
 
-This print statement prints the string "y=" followed by the value of
+This statement prints the string "y=" followed by the value of
 `y`, followed by the string " z="
 (with the leading space), followed by the value of the variable
 `z`.
@@ -158,7 +158,7 @@ This print statement prints the string "y=" followed by the value of
 Each print statement is followed by a new line.  The specific ASCII
 character(s) generated to create a new line are platform specific.
 
-Arbitrary expressions can be used.  For example, the statement
+Arbitrary expressions can be used.  For example,
 
 ```
 print("1+1=", 1+1);
@@ -199,7 +199,7 @@ bracketed comments.
 
 ### What Not to Comment {-}
 
-When commenting code, it is usually safe to assume that you are
+When commenting code, you can usually assume that you are
 writing the comments for other programmers who understand the basics
 of the programming language in use.  In other words, don't comment the
 obvious.  For instance, there is no need to have comments
@@ -210,7 +210,7 @@ y ~ normal(0, 1);  // y has a standard normal distribution
 ```
 
 A Jacobian adjustment for a hand-coded transform might be worth
-commenting, as in the following example.
+commenting, as here:
 
 ```
 exp(y) ~ normal(0, 1);
@@ -237,9 +237,9 @@ int<lower=1> J;   // number of test questions
 The alternative is to use longer names that do not require comments.
 
 ```
-int<lower=1> n_obs;
-int<lower=1> n_students;
-int<lower=1> n_questions;
+int<lower=1> N_obs;
+int<lower=1> N_students;
+int<lower=1> N_questions;
 ```
 
 Both styles are reasonable and which one to adopt is mostly a matter of
@@ -273,7 +273,7 @@ worse than no comment at all!
 # {-}
 # <i style="font-size: 110%; color:#990017;">Part 2. Example Models</i></span> {- #example-models.part}
 
-This section of the user's guide surveys a range of example models,
+In this part of the book, we survey a range of example models,
 with the goal of illustrating how to code them efficiently in Stan.
 
 
@@ -506,8 +506,9 @@ model.
 
 ## Priors for Coefficients and Scales {#regression-priors.section}
 
-This section describes the choices available for modeling priors for
-regression coefficients and scales.  Later sections discuss [univariate
+See our [general discussion of priors](#general-priors.section) for tips on priors for parameters in regression models.
+
+Later sections discuss [univariate
 hierarchical priors](#hierarchical-priors.section) and [multivariate
 hierarchical priors](#multivariate-hierarchical-priors.section), as well
 as [priors used to identify models](#priors-for-identification.section).
@@ -521,232 +522,6 @@ usually does not matter much what prior is used on on the
 reparameterized regression coefficients and almost any weakly
 informative prior that scales with the outcome will do.
 
-### Background Reading {-}
-
-See @Gelman:2006 for an overview of choices for priors for
-scale parameters, @ChungEtAl:2013 for an overview of choices
-for scale priors in penalized maximum likelihood estimates, and
-@GelmanJakulinPittauEtAl:2008 for a discussion of prior choice
-for regression coefficients.
-
-### Improper Uniform Priors {-}
-
-The default in Stan is to provide uniform (or "flat") priors on
-parameters over their legal values as determined by their declared
-constraints.  A parameter declared without constraints is thus given a
-uniform prior on $(-\infty,\infty)$ by default, whereas a scale
-parameter declared with a lower bound of zero gets an improper uniform
-prior on $(0,\infty)$.  Both of these priors are improper in the sense
-that there is no way formulate a density function for them that
-integrates to 1 over its support.
-
-Stan allows models to be formulated with improper priors, but in order
-for sampling or optimization to work, the data provided must ensure a
-proper posterior.  This usually requires a minimum quantity of data,
-but can be useful as a starting point for inference and as a baseline
-for sensitivity analysis (i.e., considering the effect the prior
-has on the posterior).
-
-Uniform priors are specific to the scale on which they are formulated.
-For instance, we could give a scale parameter $\sigma > 0$ a uniform
-prior on $(0,\infty)$, $q(\sigma) = c$ (we use $q$ because the
-"density" is not only unnormalized, but unnormalizable), or we could
-work on the log scale and provide $\log \sigma$ a uniform prior on
-$(-\infty,\infty)$, $q(\log \sigma) = c$.  These work out to be
-different priors on $\sigma$ due to the Jacobian adjustment necessary
-for the log transform.
-
-Stan automatically applies the necessary Jacobian adjustment for
-variables declared with constraints to ensure a uniform density on the
-legal constrained values.  This Jacobian adjustment is turned off when
-optimization is being applied in order to produce appropriate maximum
-likelihood estimates.
-
-### Proper Uniform Priors: Interval Constraints {-}
-
-It is possible to declare a variable with a proper uniform prior by
-imposing both an upper and lower bound on it, for example,
-
-```
-real<lower=0.1, upper=2.7> sigma;
-```
-
-This will implicitly give `sigma` a $\mathsf{Uniform}(0.1, 2.7)$
-prior.
-
-#### Matching Support to Constraints {-}
-
-As with all constraints, it is important that the model
-provide support for all legal values of `sigma`.  For example,
-the following code constraints `sigma` to be positive, but then
-imposes a bounded uniform prior on it.
-
-```
-parameters {
-  real<lower=0> sigma;
-  ...
-model {
-  // *** bad *** : support narrower than constraint
-  sigma ~ uniform(0.1, 2.7);
-```
-
-The sampling statement imposes a limited support for `sigma` in
-(0.1, 2.7), which is narrower than the support declared in the
-constraint, namely $(0, \infty)$.  This can cause the Stan program to
-be difficult to initialize, hang during sampling, or devolve to a
-random walk.
-
-#### Boundary Estimates {-}
-
-Estimates near boundaries for interval-constrained parameters
-typically signal that the prior is not appropriate for the model.  It
-can also cause numerical problems with underflow and overflow when
-sampling or optimizing.
-
-### "Uninformative" Proper Priors {-}
-
-It is not uncommon to see models with priors on regression
-coefficients such as $\mathsf{normal}(0,1000)$.^[The practice was common in BUGS and can be seen in most of their examples @LunnEtAl:2012.]
-
-If the prior scale, such as 1000, is several orders of magnitude
-larger than the estimated coefficients, then such a prior is
-effectively providing no effect whatsoever.
-
-We actively discourage users from using the default scale priors
-suggested through the BUGS examples @LunnEtAl:2012, such as
-$$
-\sigma^2 \sim \mathsf{InvGamma}(0.001, 0.001).
-$$
-
-Such priors concentrate too much probability mass outside of
-reasonable posterior values, and unlike the symmetric wide normal
-priors, can have the profound effect of skewing posteriors; see
-@Gelman:2006 for examples and discussion.
-
-### Truncated Priors {-}
-
-If a variable is declared with a lower bound of zero, then assigning
-it a normal prior in a Stan model produces the same effect as
-providing a properly truncated half-normal prior.  The truncation at
-zero need not be specified as Stan only requires the density up to a
-proportion.  So a variable declared with
-
-```
-real<lower=0> sigma;
-```
-
-and given a prior
-```
-sigma ~ normal(0, 1000);
-```
-
-gives `sigma` a half-normal prior, technically
-
-$$
-p(\sigma)
-\ = \
-\frac{\mathsf{normal}(\sigma | 0, 1000)}
-     {1 - \mathsf{NormalCDF}(0 | 0, 1000)}
-\ \propto \
-\mathsf{normal}(\sigma | 0, 1000),
-$$
-
-but Stan is able to avoid the calculation of the normal cumulative
-distribution (CDF) function required to normalize the half-normal density.
-If either the prior location or scale is a parameter or if the
-truncation point is a parameter, the truncation cannot be dropped,
-because the normal CDF term will not be a constant.
-
-
-### Weakly Informative Priors {-}
-
-Typically a researcher will have some knowledge of the scale of the
-variables being estimated.  For instance, if we're estimating an
-intercept-only model for the mean population height for adult women,
-then we know the answer is going to be somewhere in the one to three
-meter range.  That gives us information around which to form a weakly
-informative prior.
-
-Similarly, a logistic regression with predictors on the standard scale
-(roughly zero mean, unit variance) is unlikely to have a
-coefficient that's larger than five in absolute value.  In these
-cases, it makes sense to provide a weakly informative prior such as
-$\mathsf{normal}(0,5)$ for such a coefficient.
-
-Weakly informative priors help control inference computationally and
-statistically.  Computationally, a prior increases the curvature
-around the volume where the solution is expected to lie, which in turn
-guides both gradient-based like L-BFGS and Hamiltonian Monte Carlo
-sampling by not allowing them to stray too far from the location of a
-surface.  Statistically, a weakly informative prior is more sensible
-for a problem like women's mean height, because a  diffuse prior
-like $\mathsf{normal}(0,1000)$ will ensure that the vast majority of
-the prior probability mass is outside the range of the expected
-answer, which can overwhelm the inferences available from a small data
-set.
-
-### Bounded Priors {-}
-
-Consider the women's height example again.  One way to formulate a
-proper prior is to impose a uniform prior on a bounded scale.  For
-example, we could declare the parameter for mean women's height to
-have a lower bound of one meter and an upper bound of three meters.
-Surely the answer has to lie in that range.
-
-Similarly, it is not uncommon to see priors for scale parameters that
-impose lower bounds of zero and upper bounds of  large numbers,
-such as 10,000.^[This was also a popular strategy in the BUGS example models @LunnEtAl:2012, which often went one step further and set the lower bounds to a small number like 0.001 to discourage numerical underflow to zero.]
-
-This provides roughly the same problem for estimation as a 
-diffuse inverse gamma prior on variance.  We prefer to leave
-parameters which are not absolutely physically constrained to float
-and provide them informative priors.  In the case of women's height,
-such a prior might be $\mathsf{normal}(2,0.5)$ on the scale of meters;
-it concentrates 95% of its mass in the interval $(1,3)$, but still
-allows values outside of that region.
-
-In cases where bounded priors are used, the posterior fits should be
-checked to make sure the parameter is not estimated at or  close
-to a boundary.  This will not only cause computational problems, it
-indicates a problem with the way the model is formulated.  In such
-cases, the interval should be widened to see where the parameter fits
-without such constraints, or boundary-avoid priors should be used (see
-the [hierarchical priors section](#hierarchical-priors.section).)
-
-
-### Fat-Tailed Priors and Default Priors {-}
-
-A reasonable alternative if we want to accommodate outliers is to use a
-prior that concentrates most of mass around the area where values are
-expected to be, but still leaves a lot of mass in its tails.  One choice in such a situation is to use a Cauchy distribution for a
-prior, which can concentrate its mass around its median, but has tails
-that are so fat that the variance is infinite.
-
-Without specific information, the Cauchy prior can be a reasonable default
-parameter choice for regression coefficients
-@GelmanJakulinPittauEtAl:2008 and the half-Cauchy (coded
-implicitly in Stan) a reasonable default choice for scale parameters
-@Gelman:2006.
-
-
-
-### Informative Priors {-}
-
-Ideally, there will be substantive information about a problem that
-can be included in an even tighter prior than a weakly informative
-prior.  This may come from actual prior experiments and thus be the
-posterior of other data, it may come from meta-analysis, or it may
-come simply by soliciting it from domain experts.  All the goodness of
-weakly informative priors applies, only with more strength.
-
-### Conjugacy {-}
-
-Unlike in Gibbs sampling, there is no computational advantage to
-providing conjugate priors (i.e., priors that produce posteriors in
-the same family) in a Stan program.^[BUGS and JAGS both support conjugate sampling through Gibbs sampling.  JAGS extended the range of conjugacy that could be exploited with its GLM module.  Unlike Stan, both BUGS and JAGS are restricted to conjugate priors for constrained multivariate quantities such as covariance matrices or simplexes.]
-
-Neither the Hamiltonian Monte Carlo samplers or the optimizers make
-use of conjugacy, working only on the log density and its derivatives.
 
 
 
@@ -941,7 +716,7 @@ used above is equivalent to writing
 The data block in the above model is defined without constraints on
 sizes `K`, `N`, and `D` or on the outcome array
 `y`.  Constraints on data declarations provide error checking at
-the point data is read (or transformed data is defined), which is
+the point data are read (or transformed data are defined), which is
 before sampling begins.  Constraints on data declarations also make
 the model author's intentions more explicit, which can help with
 readability.  The above model's declarations could be tightened to
@@ -1017,7 +792,7 @@ end of `beta_raw`;  the row vector `zeros` is defined as transformed
 data so that it doesn't need to be constructed from scratch each time
 it is used.
 
-This is not quite the same model as using $K$-vectors as parameters,
+This is not the same model as using $K$-vectors as parameters,
 because now the prior only applies to $(K-1)$-vectors.  In practice,
 this will cause the maximum likelihood solutions to be different and
 also the posteriors to be slightly different when taking priors
@@ -1243,7 +1018,7 @@ values `Phi(eta - c[k])` once and storing them for re-use.
 ## Hierarchical Logistic Regression
 
 The simplest multilevel model is a hierarchical model in which the
-data is grouped into $L$ distinct categories (or levels).  An extreme
+data are grouped into $L$ distinct categories (or levels).  An extreme
 approach would be to completely pool all the data and estimate a
 common vector of regression coefficients $\beta$.  At the other
 extreme, an approach with no pooling assigns each level $l$ its own
@@ -2121,7 +1896,7 @@ generated quantities {
 }
 ```
 
-Now the data is just as before, but the parameter `y_new` is now
+Now the data are just as before, but the parameter `y_new` is now
 declared as a generated quantity, and the prediction model is
 removed from the model and replaced by a pseudo-random draw from a
 normal distribution.
@@ -2615,8 +2390,8 @@ coefficient `beta` may be constrained with bounds as follows.
 real<lower=-1,upper=1> beta;
 ```
 
-In practice, such a constraint is not recommended.  If the data is not
-stationary, it is best to discover this while fitting the model.
+In practice, such a constraint is not recommended.  If the data are not well fit by a 
+stationary model it is best to know this.
 Stationary parameter estimates can be encouraged with a prior favoring
 values of `beta` near zero.
 
@@ -2663,8 +2438,8 @@ model {
 ### ARCH(1) Models {-}
 
 Econometric and financial time-series models usually assume
-heteroscedasticity (i.e., they allow the scale of the noise terms
-defining the series to vary over time).
+heteroscedasticity: hey allow the scale of the noise terms
+defining the series to vary over time.
 The simplest such model is the autoregressive conditional
 heteroscedasticity (ARCH) model @Engle:1982.  Unlike the
 autoregressive model AR(1), which modeled the mean of the series as
@@ -2785,7 +2560,7 @@ variance parameters) for the normal distribution.
 
 With the regression in the transformed parameters block, the model
 reduces a single vectorized sampling statement.  Because `r` and
-`sigma` are of length `T`, all of the data is modeled
+`sigma` are of length `T`, all of the data are modeled
 directly.
 
 
@@ -2894,10 +2669,10 @@ model {
 }
 ```
 
-Here all of the data is modeled, with missing terms just dropped from
+Here all of the data are modeled, with missing terms just dropped from
 the regressions as in the calculation of the error terms.  Both models
 converge  quickly and mix  well at convergence, with the
-vectorized model being quite a bit faster (per iteration, not to
+vectorized model being faster (per iteration, not to
 converge --- they compute the same model).
 
 
@@ -2936,7 +2711,7 @@ model {
 }
 ```
 
-The data is declared in the same way as the other time-series
+The data are declared in the same way as the other time-series
 regressions and the parameters are documented in the code.
 
 In the model block, the local vector `nu` stores the predictions
@@ -2972,7 +2747,7 @@ model {
 }
 ```
 
-This approach to ARMA models provides a nice example of how local
+This approach to ARMA models illustrates how local
 variables, such as `err` in this case, can be reused in Stan.
 Folta's approach could be extended to higher order moving-average
 models by storing more than one error term as a local variable and
@@ -3245,7 +3020,7 @@ The naive HMM estimation model presented above can be sped up
 dramatically by replacing the loops over categorical distributions
 with a single multinomial distribution.
 
-The data is declared as before.  The transformed data block
+The data are declared as before.  The transformed data block
 computes the sufficient statistics for estimating the transition and
 emission matrices.
 
@@ -3340,7 +3115,7 @@ data {
 ```
 
 The model for the supervised data does not change; the unsupervised
-data is handled with the following Stan implementation of the forward
+data are handled with the following Stan implementation of the forward
 algorithm.
 
 ```
@@ -3470,7 +3245,7 @@ parameters used to find the most likely state to have generated
 Bayesian inference supports a  general approach to missing data in
 which any missing data item is represented as a parameter that is
 estimated in the posterior @GelmanEtAl:2013.  If the missing
-data is not explicitly modeled, as in the predictors for most
+data are not explicitly modeled, as in the predictors for most
 regression models, then the result is an improper prior on the
 parameter representing the missing predictor.
 
@@ -3510,8 +3285,8 @@ model {
 
 The number of observed and missing data points are coded as data with
 non-negative integer variables `N_obs` and `N_mis`.  The
-observed data is provided as an array data variable `y_obs`.
-The missing data is coded as an array parameter, `y_mis`.  The
+observed data are provided as an array data variable `y_obs`.
+The missing data are coded as an array parameter, `y_mis`.  The
 ordinary parameters being estimated, the location `mu` and scale
 `sigma`, are also coded as parameters.  The model is vectorized
 on the observed and missing data; combining them in this case would be
@@ -3572,7 +3347,7 @@ defined as a local variable within the model block if
 
 ## Sliced Missing Data
 
-If the missing data is part of some larger data structure, then it can
+If the missing data are part of some larger data structure, then it can
 often be effectively reassembled using index arrays and slicing.
 Here's an example for time-series data, where only some entries in the
 series are observed.
@@ -3746,7 +3521,7 @@ for (n in 1:N) {
 }
 ```
 
-Then, in the model block, everything's nice and vectorizable
+Then, in the model block, everything is vectorizable
 using those indexes constructed once in transformed data:
 
 ```
@@ -3756,7 +3531,7 @@ y[ns2] ~ normal(mu[2], sqrt(Sigma[2, 2]));
 ```
 
 The result will be much more efficient than using latent variables for
-the missing data, but requires the multivariate distribution to be
+the missing data, but it requires the multivariate distribution to be
 marginalized analytically.  It'd be more efficient still to precompute
 the three arrays in the transformed data block, though the efficiency
 improvement will be relatively minor compared to vectorizing the
@@ -3787,12 +3562,12 @@ information on truncated distributions, cdfs, and ccdfs.
 
 ## Truncated Data {#truncated-data.section}
 
-Truncated data is data for which measurements are only reported if
+Truncated data are data for which measurements are only reported if
 they fall above a lower bound, below an upper bound, or between a
 lower and upper bound.
 
 Truncated data may be modeled in Stan using truncated distributions.
-For example, suppose the truncated data is $y_n$ with an upper
+For example, suppose the truncated data are $y_n$ with an upper
 truncation point of $U = 300$ so that $y_n < 300$.  In Stan, this
 data can be modeled as following a truncated normal distribution for
 the observations as follows.
@@ -3815,7 +3590,7 @@ model {
 
 The model declares an upper bound `U` as data and constrains
 the data for `y` to respect the constraint;  this will be checked
-when the data is loaded into the model before sampling begins.
+when the data are loaded into the model before sampling begins.
 
 This model implicitly uses an improper flat prior on the scale and
 location parameters; these could be given priors in the model using
@@ -3851,7 +3626,7 @@ parameters {
 
 If in the above model, `L` or `U` is a parameter and
 `y` is data, then `L` and `U` must be appropriately
-constrained so that all data is in range and the value of `L` is
+constrained so that all data are in range and the value of `L` is
 less than that of `U` (if they are equal, the parameter range
 collapses to a single point and the Hamiltonian dynamics used by
 the sampler break down).  The following declarations ensure the bounds
@@ -4566,7 +4341,7 @@ The code given above to compute the zero-inflated Poisson
 redundantly calculates all of the Bernoulli terms and also
 `poisson_lpmf(0 | lambda)` every time the first condition
 body executes.  The use of the redundant terms is conditioned on
-`y`, which is known when the data is read in.  This allows
+`y`, which is known when the data are read in.  This allows
 the transformed data block to be used to compute some more convenient
 terms for expressing the log density each iteration.
 
@@ -4855,7 +4630,7 @@ model {
 
 The regression coefficients `alpha` and `beta` and
 regression noise scale `sigma` are the same as before, but now
-`x` is declared as a parameter rather than as data.  The data is
+`x` is declared as a parameter rather than as data.  The data are
 now `x_meas`, which is a measurement of the true `x` value
 with noise scale `tau`.  The model then specifies that the
 measurement error for `x_meas[n]` given true value `x[n]`
@@ -5048,7 +4823,7 @@ data {
 
 #### Converting to Log Odds and Standard Error {-}
 
-Although the clinical trial data is binomial in its raw format, it may
+Although the clinical trial data are binomial in its raw format, it may
 be transformed to an unbounded scale by considering the log odds ratio
 $$
 y_j = \log \left( \frac{r^t_j / (n^t_j - r^t_j)}
@@ -5202,7 +4977,7 @@ for the years 1851--1962.^[The original source of the data is @Jarret:1979, whic
 
 ### Model with Latent Discrete Parameter {-}
 
-[@PyMC:2014, Section 3.1] provides a Poisson model of disaster
+[@PyMC:2014 Section 3.1] provides a Poisson model of disaster
 [@_t$ in year; @$t$ with two rate para]eters, an early rate ($e$)
 and @te ($l$), tat change at a given point in time $s$.  The
 full model expressed using a latent discrete parameter $s$ is
@@ -5634,12 +5409,12 @@ The Cormack-Jolly-Seber (CJS) model
 in which the population may change over time due to death; the
 presentation here draws heavily on @Schofield:2007.
 
-The basic data is
+The basic data are
 
 
-* $I$ : number of individuals,
-* $T$ : number of capture periods, and
-* $y_{i,t}$ : boolean indicating if individual $i$ was captured at
+* $I$: number of individuals,
+* $T$: number of capture periods, and
+* $y_{i,t}$: Boolean indicating if individual $i$ was captured at
   time $t$.
 
 
@@ -6646,7 +6421,7 @@ cannot be compared across multiple Markov chains.  In fact, the only
 parameter in soft $K$-means is not identified, leading to problems in
 monitoring convergence.  Clusters can even fail to be identified
 within a single chain, with indices swapping if the chain is long
-enough or the data is not cleanly separated.
+enough or the data are not cleanly separated.
 
 ### Multimodality {-}
 
@@ -7316,7 +7091,7 @@ model {
 }
 ```
 
-The input data is just the vector of inputs `x` and its size
+The input data are just the vector of inputs `x` and its size
 `N`.  Such a model can be used with values of `x` evenly
 spaced over some interval in order to plot sample draws of functions
 from a Gaussian process.
@@ -7339,7 +7114,7 @@ transformed data {
 ...
 ```
 
-The data is now declared as an array of vectors instead of an array of
+The data are now declared as an array of vectors instead of an array of
 scalars; the dimensionality `D` is also declared.
 
 In the remainder of the chapter, univariate models will be used for simplicity,
@@ -7393,7 +7168,7 @@ generated quantities {
 }
 ```
 
-The Cholesky decomposition is only computed once, after the data is
+The Cholesky decomposition is only computed once, after the data are
 loaded and the covariance matrix `K` computed.  The isotropic
 normal distribution for `eta` is specified as a vectorized
 univariate distribution for efficiency; this specifies that each
@@ -7503,7 +7278,7 @@ computational speed between the two approaches will not be noticeable, but for
 larger matrices ($N \gtrsim 100$) the Cholesky decomposition version will be
 faster.
 
-Hamiltonian Monte Carlo sampling is quite fast and effective for hyperparameter
+Hamiltonian Monte Carlo sampling is fast and effective for hyperparameter
 inference in this model @Neal:1997. If the posterior is
 well-concentrated for the hyperparameters the Stan implementation will fit
 hyperparameters in models with a few hundred data points in seconds.
@@ -8419,7 +8194,7 @@ daylight savings time.
 
 
 Stan provides a built-in mechanism for specifying and solving systems
-of algebraic equations, using the Powell hybrid method @Powell:1970.
+of algebraic equations, using the Powell hybrid method [@Powell:1970].
 The function signatures for Stan's algebraic solver aref ully
 described in the algebraic solver section of the reference manual.
 
@@ -8433,19 +8208,16 @@ For systems of linear algebraic equations, we recommend solving the system
 using matrix division. The algebraic solver becomes handy when we want
 to solve nonlinear equations.
 
-As an illustrative example, we consider a nonlinear system of two equations
-with two unknowns. Our goal is to simultaneously solve all equations for
+As an illustrative example, we consider the following nonlinear system of two equations
+with two unknowns:
+
+$$
+  z_1 = y_1 - \theta_1 \\
+  z_2 = y_1 y_2 + \theta_2
+$$
+
+Our goal is to simultaneously solve all equations for
 $y_1$ and $y_2$, such that the vector $z$ goes to 0.
-
-$$
-\begin{array}{rcl}
-  \begin{aligned}
-  z_1 &= y_1 - \theta_1 \\
-  z_2 &= y_1 y_2 + \theta_2 \\
-\end{array}
-$$
-
-
 
 ## Coding an Algebraic System
 
@@ -8498,7 +8270,7 @@ vector for parameters if the system does not involve data or parameters.
 
 ## Calling the Algebraic Solver
 
-Let's suppose $\theta = \{3, 6\}$. To call the algebraic solver, we need to
+Let's suppose $\theta = (3, 6)$. To call the algebraic solver, we need to
 provide an initial guess. This varies on a case-by-case basis, but in general
 a good guess will speed up the solver and, in pathological cases, even determine
 whether the solver converges or not. If the solver does not converge, the metropolis
@@ -8507,8 +8279,7 @@ found, is issued.
 
 The solver has three tuning parameters to determine convergence: the
 relative tolerance, the function tolerance, and the maximum number of
-steps. Their default values are respectively `1e-10` ($10^{-10}$),
-`1e-6` ($10^{-6}$), and `1e3` ($10^3$). Their behavior is explained in
+steps.  Their behavior is explained in
 the section about [algebraic solvers with control
 parameters](#algebra-control.section).
 
@@ -8529,7 +8300,7 @@ transformed parameters {
 }
 ```
 
-which returns $y = \{3, -2\}$.
+which returns $y = (3, -2)$.
 
 ### Data versus Parameters {-}
 The arguments for the real data `x_r` and
@@ -8613,7 +8384,7 @@ for stiff systems.
   non-stiff systems [@DormandPrince:1980; @AhnertMulansky:2011], and
 * `bdf`: a variable-step, variable-order,
   backward-differentiation formula implementation for stiff systems
-  [@CohenHindmarsh:1996; SerbanHindmarsh:2005]
+  [@CohenHindmarsh:1996; @SerbanHindmarsh:2005]
 
 
 For a discussion of stiff ODE systems, see the [stiff ODE
@@ -8625,16 +8396,16 @@ solvers can be found in the reference manual section on ODE solvers.
 
 ## Example: Simple Harmonic Oscillator
 
-As a concrete example of a system of ODEs, consider a harmonic
+As an example of a system of ODEs, consider a harmonic
 oscillator, which is characterized by an equilibrium position and a
 restoring force proportional to the displacement with friction.
 The system state will be a pair $y = (y_1, y_2)$ representing position
-and momentum (i.e., a point in phase space).  The change in the system
-with respect to time is given by the following differential equations.^[This example is drawn from the documentation for the Boost Numeric Odeint library @AhnertMulansky:2011, which Stan uses to implement the `rk45` solver.]
+and momentum: a point in phase space.  The change in the system
+with respect to time is given by the following differential equations.^[This example is drawn from the documentation for the Boost Numeric Odeint library [@AhnertMulansky:2011], which Stan uses to implement the `rk45` solver.]
 
 $$
 \frac{d}{dt} y_1 = y_2
-\hspace*{0.5in}
+\ \ \ \ \ \ \ \ \ \ \
 \frac{d}{dt} y_2 = -y_1 - \theta y_2
 $$
 id:ode-sho.equation
@@ -9087,7 +8858,7 @@ Stan that are useful across a range of different model types.
 # Reparameterization and Change of Variables  {#change-of-variables.chapter}
 
 
-As with BUGS, Stan supports a direct encoding of reparameterizations.
+Stan supports a direct encoding of reparameterizations.
 Stan also supports changes of variables by directly incrementing the
 log probability accumulator with the log Jacobian of the transform.
 
@@ -10628,7 +10399,7 @@ are at least two data points $y_n$ with distinct values.
 
 Consider an item-response theory model for students $j \in 1{:}J$ with
 abilities $\alpha_j$ and test items $i \in 1{:}I$ with difficulties
-$\beta_i$.  The observed data is an $I \times J$ array with entries
+$\beta_i$.  The observed data are an $I \times J$ array with entries
 $y_{i, j} \in \{ 0, 1 \}$ coded such that $y_{i, j} = 1$ indicates that
 student $j$ answered question $i$ correctly.  The sampling
 distribution for the data is
@@ -10893,7 +10664,7 @@ effective sample size are both compromised by label switching.  The
 problem is that the posterior mean, a key ingredient in these
 computations, is affected by label switching, resulting in a posterior
 mean for $\mu_1$ that is equal to that of $\mu_2$, and a posterior
-mean for $\theta$ that is always 1/2, no matter what the data is.
+mean for $\theta$ that is always 1/2, no matter what the data are.
 
 ### Some Inferences are Invariant {-}
 
@@ -11110,7 +10881,7 @@ $\psi$ at all points in $[0,1]$.
 With an improper posterior, it is theoretically impossible to properly
 explore the posterior. However, Gibbs sampling as performed by BUGS
 and JAGS, although still unable to properly sample from such an
-improper posterior, behaves quite differently in practice than the
+improper posterior, behaves differently in practice than the
 Hamiltonian Monte Carlo sampling performed by Stan when faced with an
 example such as the two intercept model discussed in
 the [collinearity section](#collinearity.section) and illustrated in
@@ -11170,8 +10941,8 @@ the ridge in the posterior log density (see
 ### No-U-Turn Sampling {-}
 
 Stan's default no-U-turn sampler (NUTS), is even more efficient at
-exploring the posterior (see
-[@Hoffman-Gelman:2011; Hoffman-Gelman:2014].  NUTS simulates the
+exploring the posterior; see
+@Hoffman-Gelman:2011 and @Hoffman-Gelman:2014.  NUTS simulates the
 motion of the fictitious particle representing the parameter values
 until it makes a U-turn, it will be defeated in most cases, as it will
 just move down the potential energy valley indefinitely without making
@@ -11187,9 +10958,10 @@ in particular should be reassuring in that it will clearly fail in
 cases of improper posteriors, resulting in a clean diagnostic of
 sweeping out  large paths in the posterior.
 
-\begin{figure}
+Here are results of Stan runs with default parameters fit to
+  $N=100$ data points generated from $y_n \sim \mathsf{normal}(0,1)$:
 
-\normalsize {\it Two Scale Parameters, Improper Prior}
+*Two Scale Parameters, Improper Prior*
 
 ```
 Inference for Stan model: improper_stan
@@ -11233,8 +11005,6 @@ mu              0.17  2.1e-03    0.10  -3.8e-03  0.17  0.33   2408    31417    1
 sigma            1.0  1.6e-03   0.071   9.3e-01   1.0   1.2   2094    27321    1.0
 ```
 
-\caption{\small\it Results of Stan runs with default parameters fit to
-  $N=100$ data points generated from $y_n \sim \mathsf{normal}(0,1)$.
 
   On the top is the non-identified model with improper uniform priors
   and likelihood $y_n \sim \mathsf{normal}(\lambda_1 + \lambda_2,
@@ -11249,8 +11019,6 @@ sigma            1.0  1.6e-03   0.071   9.3e-01   1.0   1.2   2094    27321    1
   error, but a high posterior standard deviation of 0.1;  the true
   value $\mu=0$ is within the 90% posterior intervals in all three models.
 
-}
-\end{figure}
 id:non-identified-stan-fits.figure
 
 
@@ -12255,7 +12023,7 @@ assigns it to the local variable `lp`.  This variable is then
 used in `[lp]'` to construct a row vector and then transpose it
 to a vector to return.
 
-The data is taken in as before.  There is an additional transformed
+The data are taken in as before.  There is an additional transformed
 data block that breaks the data up into three shards.^[The term "shard" is borrowed from databases, where it refers to a slice of the rows of a database.  That is exactly what it is here if we think of rows of a dataframe.  Stan's shards are more general in that they need not correspond to rows of a dataframe.]
 
 The value `3` is also hard coded; a more practical program would
@@ -12663,10 +12431,10 @@ can be seen in cases where simulated data according to the model runs
 robustly and efficiently, whereas the real data for which it was
 intended runs slowly or may even have convergence and mixing issues.
 While some of the techniques recommended in the remaining sections of
-this chapter may mitigate the problem somewhat, the best remedy is a
+this chapter may mitigate the problem, the best remedy is a
 better model specification.
 
-Somewhat counterintuitively, more complicated models often run faster
+Counterintuitively, more complicated models often run faster
 than simpler models.  One common pattern is with a group of parameters
 with a wide fixed prior such as `normal(0, 1000)`).  This can fit
 slowly due to the mismatch between prior and posterior (the prior has
@@ -12726,7 +12494,7 @@ behaved.
 ### Example: Neal's Funnel {-}
 
 In this section, we discuss a general transform from a centered to a
-non-centered parameterization @papa-et-al:2007.^[This parameterization came to be known on our mailing lists as the "Matt trick" after Matt Hoffman, who independently came up with it while fitting hierarchical models in Stan.]
+non-centered parameterization [@papa-et-al:2007].^[This parameterization came to be known on our mailing lists as the "Matt trick" after Matt Hoffman, who independently came up with it while fitting hierarchical models in Stan.]
 
 This reparameterization is helpful when there is not much data,
 because it separates the hierarchical parameters and lower-level
@@ -12811,7 +12579,7 @@ transformed parameter.
 
 Sampling from heavy tailed distributions such as the Cauchy is
 difficult for Hamiltonian Monte Carlo, which operates within a
-Euclidean geometry.^[Riemannian Manifold Hamiltonian Monte Carlo (RMHMC) overcomes this difficulty by simulating the Hamiltonian dynamics in a space with a position-dependent metric; see [@GirolamiCalderhead:2011; @Betancourt:2012].]
+Euclidean geometry.^[Riemannian Manifold Hamiltonian Monte Carlo (RMHMC) overcomes this difficulty by simulating the Hamiltonian dynamics in a space with a position-dependent metric; see @GirolamiCalderhead:2011 and @Betancourt:2012.]
 
 The practical problem is that tail of the Cauchy
 requires a relatively large step size compared to the trunk.  With a
@@ -13473,7 +13241,7 @@ that the transposition operator allocates a new vector into which the
 result of the transposition is copied.  This consumes both time
 and memory.^[Future versions of Stan may remove this inefficiency by more fully exploiting expression templates inside the Eigen C++ matrix library.  This will require enhancing Eigen to deal with mixed-type arguments, such as the type `double` used for constants and the algorithmic differentiation type `stan::math::var` used for variables.]
 
-The inefficiency of transposition could itself be mitigated somewhat by
+The inefficiency of transposition could itself be mitigated  by
 reordering the product and pulling the transposition out of the loop,
 as follows.
 
@@ -13729,7 +13497,7 @@ $$
 If either vector $x$ or $y$ has very large or very small values or if the
 sample mean of the values is far away from 0 (on the scale of the values),
 then it can be more efficient to standardize the outputs $y_n$ and
-predictors $x_n$.  The data is first centered by subtracting the
+predictors $x_n$.  The data are first centered by subtracting the
 sample mean, and then scaled by dividing by the sample deviation.
 Thus a data point $u$ is standardized with respect to
 a vector $y$  by the function $\mbox{z}_y$, defined by
@@ -13994,7 +13762,7 @@ function when viewed as a function of $\theta$ for fixed $y$ and $x$.
 
 The probability function $p(\theta)$ over the parameters given the
 constants $x$ is called the prior because it characterizes the probability
-of the parameters before any data is observed.  The conditional
+of the parameters before any data are observed.  The conditional
 probability function $p(\theta|y)$ is called the posterior because
 it characterizes the probability of parameters given observed data $y$
 and constants $x$.
@@ -14561,7 +14329,7 @@ $$
 
 Continuing the example of estimating the mean and variance of a normal
 distribution based on sample data, the maximum likelihood estimator
-(i.e., the sample mean) is the unbiased estimator for the mean $\mu$
+(in this case, the sample mean) is the unbiased estimator for the mean $\mu$
 with the lowest variance; the Gauss-Markov theorem establishes this
 result in some generality for least-squares estimation, or
 equivalently, maximum likelihood estimation under an assumption of
@@ -14674,11 +14442,11 @@ the case of a uniform distribution on a closed interval.
 
 ## Posterior Median Estimation
 
-The posterior median (i.e., 50th percentile or 0.5 quantile) is
+The posterior median (the 50th percentile or 0.5 quantile) is
 another popular point estimate reported for Bayesian models.  The
 posterior median minimizes the expected absolute error of estimates.
 These estimates are returned in the various Stan interfaces;  see the
-RStan, PyStan and CmdStan user's guides for more information on
+RStan, PyStan, and CmdStan user's guides for more information on
 format.
 
 Although posterior medians may fail to be meaningful, they often exist
@@ -15222,12 +14990,12 @@ followed by a line-feed (LF) character.
 # Stan for Users of BUGS  {#stan-for-bugs.appendix}
 
 From the outside, Stan and BUGS^[Except where otherwise noted, we use "BUGS" to refer to WinBUGS, OpenBUGS, and JAGS, indiscriminately.]
-are similar --- they use statistically-themed modeling languages
+are similar---they use statistically-themed modeling languages
 (which are similar but with some differences; see below), they can be
 called from R, running some specified number of chains to some
 specified length, producing posterior simulations that can be assessed
 using standard convergence diagnostics.  This is not a coincidence:
-in designing Stan, we wanted to keep many of the useful features of
+in designing Stan: we wanted to keep many of the useful features of
 Bugs.
 
 To start, take a look at the files of translated BUGS models at
@@ -15535,7 +15303,7 @@ model {
 
 
 * Stan does not yet support estimation of discrete parameters
-  (discrete data is supported).  We may eventually implement a
+  (discrete data are supported).  We may eventually implement a
   combination of Gibbs and slice sampling for discrete parameters, but
   we haven't done so yet.
 * Stan has some distributions on covariance matrices that do not
