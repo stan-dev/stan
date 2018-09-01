@@ -21,6 +21,7 @@ library("rstan")
 # options(mc.cores = parallel::detectCores(logical = FALSE))
 # rstan_options(auto_write = TRUE)
 ```
+# <i style="font-size: 110%; padding:1.5em 0 0 0; color:#990017;">Part 1:  Overview</i> {-}
 
 # Introduction
 
@@ -28,11 +29,13 @@ library("rstan")
 
 In Part 1 of this book we introduce Bayesian data analysis and Stan through a series of examples.
 
-Part 2 gives Stan code and discussion for a series of important models in applied statistics.
+Part 2 gives Stan code and discussions for several important classes of models.
 
-Part 3 discusses various general Stan issues that are not tied to any particular model.
+Part 3 discusses various general Stan programming techniques that are not tied to any particular model.
 
-We recommend working through this book using the textbooks _Bayesian Data Analysis_ and _Statistical Rethinking: A Bayesian Course with Examples in R and Stan_ as references on the concepts, and using the Stan manual when necessary to clarify programming issues.  Further resources are given at the end of this chapter.
+The book concludes in part 4 with a brief review of statistical inference, followed by appendices.
+
+We recommend working through this book using the textbooks _Bayesian Data Analysis_ and _Statistical Rethinking: A Bayesian Course with Examples in R and Stan_ as references on the concepts, and using the Stan Reference Manual when necessary to clarify programming issues.  Further resources are given at the end of this chapter.
 
 ## Hello World
 
@@ -151,7 +154,7 @@ Now we go through the output:
 
 * The next several columns give quantiles of the simulations.
 
-* The next columns gives the effective sample size and $\widehat{R}$. Typically we want $\widehat{R}$ to be less then 1.1 for each quantity in the table.
+* The next columns gives the effective sample size and $\widehat{R}$. Typically we want $\widehat{R}$ to be less then 1.1 for each row of the table.
 
 In the above output, $\widehat{R}$ is less then 1.1 for all quantities, so the chains seem to have mixed well, and we use the results to summarize the posterior distribution.  We can compare the posterior inferences to the true parameter values (here, $a=2$, $b=3$, and $\sigma=5$).  These true values are roughly within the range of uncertainty of the inferences.
 
@@ -471,7 +474,7 @@ Programs that perform Bayesian inference are called _probabilistic programming l
 
 Here is a list of resources, roughly in order from most to least formal:
 
-- The Stan manual:  http://mc-stan.org/users/documentation/index.html
+- The Stan Reference Manual:  http://mc-stan.org/users/documentation/index.html which has details on the algorithms and implementations used by Stan, along with all of Stan's functions.
 
 - _Bayesian Data Analysis_ by Gelman, Carlin, Stern, Dunson, Vehtari, and Rubin (third edition, 2014)
 

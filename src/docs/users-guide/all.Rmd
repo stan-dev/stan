@@ -110,7 +110,7 @@ principles apply.
 
 The way the developers of Stan themselves build models is to start as
 simply as possibly, then build up. This is true even if we have a
-complicated model in mind as the end goal, and even if we have a very
+complicated model in mind as the end goal, and even if we have a 
 good idea of the model we eventually want to fit.  Rather than
 building a hierarchical model with multiple interactions, covariance
 priors, or other complicated structure, start simple.  Build just a
@@ -123,7 +123,7 @@ these do the right thing.  Then expand.
 One of the best ways to make sure your model is doing the right thing
 computationally is to generate simulated (i.e., "fake") data with
 known parameter values, then see if the model can recover these
-parameters from the data.  If not, there is very little hope that it
+parameters from the data.  If not, there is  little hope that it
 will do the right thing with data from the wild.
 
 There are fancier ways to do this, where you can do things like run
@@ -271,7 +271,7 @@ the reality of the code.  A misleading comment or one that is wrong is
 worse than no comment at all!
 
 # {-}
-# <i style="font-size: 110%; color:#990017;">I. Example Models</i></span> {- #example-models.part}
+# <i style="font-size: 110%; color:#990017;">Part 2. Example Models</i></span> {- #example-models.part}
 
 This section of the user's guide surveys a range of example models,
 with the goal of illustrating how to code them efficiently in Stan.
@@ -293,16 +293,16 @@ regression notation as
 $$
 y_n = \alpha + \beta x_n + \epsilon_n
 \ \ \ \mbox{where} \ \ \
-\epsilon_n \sim \mathsf{Normal}(0,\sigma).
+\epsilon_n \sim \mathsf{normal}(0,\sigma).
 $$
 This is equivalent to the following sampling involving the
 residual,
 $$
-y_n - (\alpha + \beta X_n) \sim \mathsf{Normal}(0,\sigma),
+y_n - (\alpha + \beta X_n) \sim \mathsf{normal}(0,\sigma),
 $$
 and reducing still further, to
 $$
-y_n \sim \mathsf{Normal}(\alpha + \beta X_n, \, \sigma).
+y_n \sim \mathsf{normal}(\alpha + \beta X_n, \, \sigma).
 $$
 
 This latter form of the model is coded in Stan as follows.
@@ -517,7 +517,7 @@ section](#QR-reparameterization.section), if you do not have an
 informative prior on the *location* of the regression coefficients,
 then you are better off reparameterizing your model so that the
 regression coefficients are a generated quantity. In that case, it
-usually does not matter very much what prior is used on on the
+usually does not matter much what prior is used on on the
 reparameterized regression coefficients and almost any weakly
 informative prior that scales with the outcome will do.
 
@@ -606,7 +606,7 @@ sampling or optimizing.
 ### "Uninformative" Proper Priors {-}
 
 It is not uncommon to see models with priors on regression
-coefficients such as $\mathsf{Normal}(0,1000)$.^[The practice was common in BUGS and can be seen in most of their examples @LunnEtAl:2012.]
+coefficients such as $\mathsf{normal}(0,1000)$.^[The practice was common in BUGS and can be seen in most of their examples @LunnEtAl:2012.]
 
 If the prior scale, such as 1000, is several orders of magnitude
 larger than the estimated coefficients, then such a prior is
@@ -645,10 +645,10 @@ gives `sigma` a half-normal prior, technically
 $$
 p(\sigma)
 \ = \
-\frac{\mathsf{Normal}(\sigma | 0, 1000)}
+\frac{\mathsf{normal}(\sigma | 0, 1000)}
      {1 - \mathsf{NormalCDF}(0 | 0, 1000)}
 \ \propto \
-\mathsf{Normal}(\sigma | 0, 1000),
+\mathsf{normal}(\sigma | 0, 1000),
 $$
 
 but Stan is able to avoid the calculation of the normal cumulative
@@ -671,7 +671,7 @@ Similarly, a logistic regression with predictors on the standard scale
 (roughly zero mean, unit variance) is unlikely to have a
 coefficient that's larger than five in absolute value.  In these
 cases, it makes sense to provide a weakly informative prior such as
-$\mathsf{Normal}(0,5)$ for such a coefficient.
+$\mathsf{normal}(0,5)$ for such a coefficient.
 
 Weakly informative priors help control inference computationally and
 statistically.  Computationally, a prior increases the curvature
@@ -679,8 +679,8 @@ around the volume where the solution is expected to lie, which in turn
 guides both gradient-based like L-BFGS and Hamiltonian Monte Carlo
 sampling by not allowing them to stray too far from the location of a
 surface.  Statistically, a weakly informative prior is more sensible
-for a problem like women's mean height, because a very diffuse prior
-like $\mathsf{Normal}(0,1000)$ will ensure that the vast majority of
+for a problem like women's mean height, because a  diffuse prior
+like $\mathsf{normal}(0,1000)$ will ensure that the vast majority of
 the prior probability mass is outside the range of the expected
 answer, which can overwhelm the inferences available from a small data
 set.
@@ -694,19 +694,19 @@ have a lower bound of one meter and an upper bound of three meters.
 Surely the answer has to lie in that range.
 
 Similarly, it is not uncommon to see priors for scale parameters that
-impose lower bounds of zero and upper bounds of very large numbers,
+impose lower bounds of zero and upper bounds of  large numbers,
 such as 10,000.^[This was also a popular strategy in the BUGS example models @LunnEtAl:2012, which often went one step further and set the lower bounds to a small number like 0.001 to discourage numerical underflow to zero.]
 
-This provides roughly the same problem for estimation as a very
+This provides roughly the same problem for estimation as a 
 diffuse inverse gamma prior on variance.  We prefer to leave
 parameters which are not absolutely physically constrained to float
 and provide them informative priors.  In the case of women's height,
-such a prior might be $\mathsf{Normal}(2,0.5)$ on the scale of meters;
+such a prior might be $\mathsf{normal}(2,0.5)$ on the scale of meters;
 it concentrates 95% of its mass in the interval $(1,3)$, but still
 allows values outside of that region.
 
 In cases where bounded priors are used, the posterior fits should be
-checked to make sure the parameter is not estimated at or very close
+checked to make sure the parameter is not estimated at or  close
 to a boundary.  This will not only cause computational problems, it
 indicates a problem with the way the model is formulated.  In such
 cases, the interval should be widened to see where the parameter fits
@@ -714,19 +714,18 @@ without such constraints, or boundary-avoid priors should be used (see
 the [hierarchical priors section](#hierarchical-priors.section).)
 
 
-### Fat-Tailed Priors and "Default" Priors {-}
+### Fat-Tailed Priors and Default Priors {-}
 
 A reasonable alternative if we want to accommodate outliers is to use a
 prior that concentrates most of mass around the area where values are
-expected to be, but still leaves a lot of mass in its tails.  The
-usual choice in such a situation is to use a Cauchy distribution for a
+expected to be, but still leaves a lot of mass in its tails.  One choice in such a situation is to use a Cauchy distribution for a
 prior, which can concentrate its mass around its median, but has tails
 that are so fat that the variance is infinite.
 
-Without specific information, the Cauchy prior is a very good default
+Without specific information, the Cauchy prior can be a reasonable default
 parameter choice for regression coefficients
 @GelmanJakulinPittauEtAl:2008 and the half-Cauchy (coded
-implicitly in Stan) a good default choice for scale parameters
+implicitly in Stan) a reasonable default choice for scale parameters
 @Gelman:2006.
 
 
@@ -853,7 +852,7 @@ regression uses the cumulative normal distribution function, which is
 typically written as
 
 $$
-\Phi(x) = \int_{-\infty}^x \mathsf{Normal}(y|0,1) \, dy.
+\Phi(x) = \int_{-\infty}^x \mathsf{normal}(y|0,1) \, dy.
 $$
 
 The cumulative standard normal distribution function $\Phi$ is implemented
@@ -883,7 +882,7 @@ Multiple outcome forms of logistic regression can be coded directly in
 Stan.  For instance, suppose there are $K$ possible outcomes for each
 output variable $y_n$.  Also suppose that there is a $D$-dimensional
 vector $x_n$ of predictors for $y_n$.  The multi-logit model with
-$\mathsf{Normal}(0,5)$ priors on the coefficients is coded as follows.
+$\mathsf{normal}(0,5)$ priors on the coefficients is coded as follows.
 
 
 ```
@@ -1062,7 +1061,7 @@ on `beta` in the original parameterization without the
 sum-to-zero constraint.  Most notably, a simple prior on each
 component of `beta_raw` produces different results than putting
 the same prior on each component of an unconstrained $K$-vector
-`beta`.  For example, providing a $\mathsf{Normal}(0,5)$ prior
+`beta`.  For example, providing a $\mathsf{normal}(0,5)$ prior
 on `beta` will produce a different posterior mode than placing
 the same prior on `beta_raw`.
 
@@ -1146,7 +1145,7 @@ With this parameterization, a Dirichlet prior can be placed on
 
 ### Soft Centering {-}
 
-Adding a prior such as $\beta \sim \mathsf{Normal}(0,\sigma)$ will provide a kind
+Adding a prior such as $\beta \sim \mathsf{normal}(0,\sigma)$ will provide a kind
 of soft centering of a parameter vector $\beta$ by preferring, all
 else being equal, that $\sum_{k=1}^K \beta_k = 0$.  This approach is only
 guaranteed to roughly center  if $\beta$ and the elementwise addition $\beta + c$
@@ -1260,7 +1259,7 @@ gets its own coefficient vector $\beta_l \in \mathbb{R}^D$.  The
 hierarchical structure involves drawing the coefficients $\beta_{l,d}
 \in \mathbb{R}$ from a prior that is also estimated with the data.  This
 hierarchically estimated prior determines the amount of pooling.  If
-the data in each level are very similar, strong pooling will be
+the data in each level are  similar, strong pooling will be
 reflected in low hierarchical variance.  If the data in the levels are
 dissimilar, weaker pooling will be reflected in higher hierarchical variance.
 
@@ -1386,9 +1385,9 @@ hierarchical linear regression (with fixed prior mean) of $y_n \in
 
 $$
 \begin{array}{rcl}
-y_n & \sim & \mathsf{Normal}(x_n \beta, \sigma)
+y_n & \sim & \mathsf{normal}(x_n \beta, \sigma)
 \\[3pt]
-\beta_k & \sim & \mathsf{Normal}(0,\tau)
+\beta_k & \sim & \mathsf{normal}(0,\tau)
 \\[3pt]
 \tau & \sim & \mathsf{Cauchy}(0,2.5)
 \end{array}
@@ -1561,7 +1560,7 @@ The `std_normal` function is used here, defined by
 $$
 \mathsf{StdNormal}(y)
 \ = \
-\mathsf{Normal}(y \mid 0, 1).
+\mathsf{normal}(y \mid 0, 1).
 $$
 
 The sampling statement is also vectorized using elementwise
@@ -1646,7 +1645,7 @@ section](#collinearity.section) for a simple example of the problems
 this poses for estimation.
 
 The non-identifiability is resolved by providing a standard normal (i.e.,
-$\mathsf{Normal}(0,1)$) prior on one group of coefficients, such as
+$\mathsf{normal}(0,1)$) prior on one group of coefficients, such as
 the student abilities.  With a standard normal prior on the student
 abilities, the IRT model is identified in that the posterior will
 produce a group of estimates for student ability parameters that have
@@ -1678,7 +1677,7 @@ the coefficient, which will "shrink" the estimate back toward zero
 and thus identify the model in the posterior.
 
 Similar problems arise for sampling with improper flat priors.  The
-sampler will try to draw very large values.  By providing a prior,
+sampler will try to draw  large values.  By providing a prior,
 the posterior will be concentrated around finite values, leading to
 well-behaved sampling.
 
@@ -1715,7 +1714,7 @@ varying by group, so that $\beta_j$ is the coefficient $K$-vector for
 group $j$.  The likelihood function for individual $n$ is then just
 
 $$
-y_n \sim \mathsf{Normal}(x_n \, \beta_{jj[n]}, \, \sigma)
+y_n \sim \mathsf{normal}(x_n \, \beta_{jj[n]}, \, \sigma)
 \mbox{ for } n \in 1{:}N.
 $$
 
@@ -1727,7 +1726,7 @@ from a multivariate distribution with mean vector $\mu$ and
 covariance matrix $\Sigma$,
 
 $$
-\beta_j \sim \mathsf{MultiNormal}(\mu, \, \Sigma)
+\beta_j \sim \mathsf{multivariate normal}(\mu, \, \Sigma)
 \mbox{ for } j \in 1{:}J.
 $$
 
@@ -1743,9 +1742,9 @@ group-level mean vector can be given a reasonable weakly-informative
 prior for independent coefficients, such as
 
 $$
-\mu_j \sim \mathsf{Normal}(0,5).
+\mu_j \sim \mathsf{normal}(0,5).
 $$
-Of course, if more is known about the expected coefficient values
+If more is known about the expected coefficient values
 $\beta_{j, k}$, this information can be incorporated into the prior for
 $\mu_k$.
 
@@ -1827,13 +1826,13 @@ predictors $u_j$.  The prior mean for the $\beta_j$ can then itself be
 modeled as a regression, using an $L$-dimensional coefficient vector
 $\gamma$.  The prior for the group-level coefficients then becomes
 $$
-\beta_j \sim \mathsf{MultiNormal}(u_j \, \gamma, \Sigma)
+\beta_j \sim \mathsf{multivariate normal}(u_j \, \gamma, \Sigma)
 $$
 
 The group-level coefficients $\gamma$ may themselves be given
 independent weakly informative priors, such as
 $$
-\gamma_l \sim \mathsf{Normal}(0,5).
+\gamma_l \sim \mathsf{normal}(0,5).
 $$
 As usual, information about the group-level means should be
 incorporated into this prior.
@@ -1942,7 +1941,7 @@ optimization in and of itself because there are no shared computations.
 
 The code in the Stan program above also builds up an array of vectors
 for the outcomes and for the multivariate normal, which provides a
-very significant speedup by reducing the number of linear systems that
+major speedup by reducing the number of linear systems that
 need to be solved and differentiated.
 
 ```
@@ -2062,7 +2061,7 @@ author's feelings about the opposite of "fore").
 ### Programming Predictions {-}
 
 As a simple example, the following linear regression provides the same
-setup for estimating the coefficients `beta` as in our very first
+setup for estimating the coefficients `beta` as in our  first
 example above, using `y` for the `N` observations and
 `x` for the `N` predictor vectors.  The model parameters and
 model for observations are exactly the same as before.
@@ -2167,7 +2166,7 @@ $$
 \begin{array}{rcl}
  y_n & = & x_n \, \beta + \epsilon_n
 \\[4pt]
- \epsilon_n & \sim & \mathsf{MultiNormal}(0, \Sigma)
+ \epsilon_n & \sim & \mathsf{multivariate normal}(0, \Sigma)
 \end{array}
 $$
 
@@ -2260,7 +2259,7 @@ $$
 \begin{array}{rcl}
  z_n & = & x_n \, \beta + \epsilon_n
 \\[4pt]
- \epsilon_n & \sim & \mathsf{MultiNormal}(0, \Sigma)
+ \epsilon_n & \sim & \mathsf{multivariate normal}(0, \Sigma)
 \end{array}
 $$
 
@@ -2425,7 +2424,7 @@ generated quantities {
 }
 ```
 
-Of course, the same could be done for the seemingly unrelated
+The same could be done for the seemingly unrelated
 regressions in the previous section.
 
 ## Applications of Pseudorandom Number Generation
@@ -2451,7 +2450,7 @@ $$
 p(\alpha, \beta, \sigma \, | \, x, y)
 \propto
 \prod_{n=1}^N
-  \mathsf{Normal}(y_n \, | \, \alpha + \beta x_n, \sigma).
+  \mathsf{normal}(y_n \, | \, \alpha + \beta x_n, \sigma).
 $$
 
 For this model, the posterior predictive inference for a new outcome
@@ -2460,7 +2459,7 @@ observed data $x$ and $y$, is
 $$
 p(\tilde{y}_n \, | \, \tilde{x}_n, x, y)
 = \int_{(\alpha,\beta,\sigma)}
-  \mathsf{Normal}(\tilde{y}_n \, | \, \alpha + \beta \tilde{x}_n, \sigma)
+  \mathsf{normal}(\tilde{y}_n \, | \, \alpha + \beta \tilde{x}_n, \sigma)
   \times
   p(\alpha, \beta, \sigma \, | \, x, y)
   \
@@ -2498,7 +2497,7 @@ Given observed predictors $x$ and outcomes $y$, `y_tilde` will
 be drawn according to $p(\tilde{y} \, | \, \tilde{x}, y, x)$.  This
 means that, for example, the posterior mean for `y_tilde` is the
 estimate of the outcome that minimizes expected square error
-(conditioned on the data and model, of course).
+(conditioned on the data and model).
 
 ### Posterior Predictive Checks {-}
 
@@ -2548,7 +2547,7 @@ A first-order autoregressive model (AR(1)) with normal noise takes
 each point $y_n$ in a sequence $y$ to be generated according to
 
 $$
-y_n \sim \mathsf{Normal}(\alpha + \beta y_{n-1}, \sigma).
+y_n \sim \mathsf{normal}(\alpha + \beta y_{n-1}, \sigma).
 $$
 
 That is, the expected value of $y_n$ is $\alpha + \beta y_{n-1}$, with
@@ -2558,7 +2557,7 @@ noise scaled as $\sigma$.
 
 With improper flat priors on the regression coefficients $\alpha$ and
 $\beta$ and on the positively-constrained noise scale ($\sigma$), the
-Stan program for the AR(1) model is as follows.^[The intercept in this model is $\alpha / (1 - \beta)$.  An alternative parameterization in terms of an intercept $\gamma$ suggested Mark Scheuerell on GitHub is $y_n \sim \mathsf{Normal](\alpha + \gamma \cdot (y_{n-1} - \alpha), \sigma)$.]
+Stan program for the AR(1) model is as follows.^[The intercept in this model is $\alpha / (1 - \beta)$.  An alternative parameterization in terms of an intercept $\gamma$ suggested Mark Scheuerell on GitHub is $y_n \sim \mathsf{normal](\alpha + \gamma \cdot (y_{n-1} - \alpha), \sigma)$.]
 
 ```
 data {
@@ -2671,7 +2670,7 @@ heteroscedasticity (ARCH) model @Engle:1982.  Unlike the
 autoregressive model AR(1), which modeled the mean of the series as
 varying over time but left the noise term fixed, the ARCH(1) model
 takes the scale of the noise terms to vary over time but leaves the
-mean term fixed.  Of course, models could be defined where both the
+mean term fixed.  Models could be defined where both the
 mean and scale vary over time; the econometrics literature presents a
 wide range of time-series modeling choices.
 
@@ -2685,7 +2684,7 @@ r_t & = & \mu + a_t
 \\[2pt]
 a_t & = & \sigma_t \epsilon_t
 \\[2pt]
-\epsilon_t & \sim & \mathsf{Normal}(0,1)
+\epsilon_t & \sim & \mathsf{normal}(0,1)
 \\[2pt]
 \sigma^2_t & = & \alpha_0 + \alpha_1 a_{t-1}^2
 \end{array}
@@ -2804,7 +2803,7 @@ $$
 with the noise term $\epsilon_t$ for outcome $y_t$ modeled as
 normal,
 $$
-\epsilon_t \sim \mathsf{Normal}(0,\sigma).
+\epsilon_t \sim \mathsf{normal}(0,\sigma).
 $$
 In a proper Bayesian model, the parameters $\mu$, $\theta$, and
 $\sigma$ must all be given priors.
@@ -2897,7 +2896,7 @@ model {
 
 Here all of the data is modeled, with missing terms just dropped from
 the regressions as in the calculation of the error terms.  Both models
-converge very quickly and mix very well at convergence, with the
+converge  quickly and mix  well at convergence, with the
 vectorized model being quite a bit faster (per iteration, not to
 converge --- they compute the same model).
 
@@ -2979,7 +2978,7 @@ Folta's approach could be extended to higher order moving-average
 models by storing more than one error term as a local variable and
 reassigning them in the loop.
 
-Both encodings are very fast.  The original encoding has the advantage
+Both encodings are  fast.  The original encoding has the advantage
 of vectorizing the normal distribution, but it uses a bit more memory.
 A halfway point would be to vectorize just `err`.
 
@@ -2997,7 +2996,7 @@ When the model is run without the constraint, using synthetic data
 generated from the model, the simulation can sometimes find modes for
 (`theta`, `phi`) outside the $[-1,1]$ interval, which
 creates a multiple mode problem in the posterior and also causes the
-NUTS tree depth to get very large (often above 10). Adding the
+NUTS tree depth to get  large (often above 10). Adding the
 constraint both improves the accuracy of the posterior and
 dramatically reduces the tree depth, which speeds up the simulation
 considerably (typically by much more than an order of magnitude).
@@ -3033,21 +3032,21 @@ $$
 h_{t+1} = \mu + \phi (h_t - \mu) + \delta_t \sigma
 $$
 $$
-h_1 \sim \mathsf{Normal}\left( \mu, \frac{\sigma}{\sqrt{1 - \phi^2}} \right)
+h_1 \sim \mathsf{normal}\left( \mu, \frac{\sigma}{\sqrt{1 - \phi^2}} \right)
 $$
 $$
-\epsilon_t \sim \mathsf{Normal}(0,1); \ \ \ \ \  \delta_t \sim \mathsf{Normal}(0,1)
+\epsilon_t \sim \mathsf{normal}(0,1); \ \ \ \ \  \delta_t \sim \mathsf{normal}(0,1)
 $$
 
 Rearranging the first line, $\epsilon_t = y_t \exp(-h_t / 2)$,
 allowing the sampling distribution for $y_t$ to be written as
 $$
-y_t \sim \mathsf{Normal}(0,\exp(h_t/2)).
+y_t \sim \mathsf{normal}(0,\exp(h_t/2)).
 $$
 The recurrence equation for $h_{t+1}$ may be combined with the
 scaling and sampling of $\delta_t$ to yield the sampling distribution
 $$
-h_t \sim \mathsf{Normal}(\mu + \phi(h_t - \mu), \sigma).
+h_t \sim \mathsf{normal}(\mu + \phi(h_t - \mu), \sigma).
 $$
 This formulation can be directly encoded, as shown in the following
 Stan model.
@@ -3076,7 +3075,7 @@ model {
 ```
 
 Compared to the Kim et al.\ formulation, the Stan model adds priors
-for the parameters $\phi$, $\sigma$, and $\mu$.  Note that the shock
+for the parameters $\phi$, $\sigma$, and $\mu$.  The shock
 terms $\epsilon_t$ and $\delta_t$ do not appear explicitly in the
 model, although they could be calculated efficiently in a generated
 quantities block.
@@ -3129,11 +3128,11 @@ transformed parameters {
 ```
 
 The first assignment rescales `h_std` to have a
-$\mathsf{Normal}(0,\sigma)$ distribution and temporarily assigns it to
+$\mathsf{normal}(0,\sigma)$ distribution and temporarily assigns it to
 `h`.  The second assignment rescales `h[1]` so that its
 prior differs from that of `h[2]` through `h[T]`.  The next
 assignment supplies a `mu` offset, so that `h[2]` through
-`h[T]` are now distributed $\mathsf{Normal}(\mu,\sigma)$; note
+`h[T]` are now distributed $\mathsf{normal}(\mu,\sigma)$; note
 that this shift must be done after the rescaling of `h[1]`.  The
 final loop adds in the moving average so that `h[2]` through
 `h[T]` are appropriately modeled relative to `phi` and
@@ -3468,7 +3467,7 @@ parameters used to find the most likely state to have generated
 # Missing Data and Partially Known Parameters
 
 
-Bayesian inference supports a very general approach to missing data in
+Bayesian inference supports a  general approach to missing data in
 which any missing data item is represented as a parameter that is
 estimated in the posterior @GelmanEtAl:2013.  If the missing
 data is not explicitly modeled, as in the predictors for most
@@ -3683,7 +3682,7 @@ adjustment is detailed in the reference manual.
 ## Missing Multivariate Data
 
 It's often the case that one or more components of a multivariate
-outcome are missin^[Note that this is not the same as missing components of a multivariate predictor in a regression problem; in that case, you will need to represent the missing data as a parameter and impute missing values in order to feed them into the regression.]
+outcome are missing^[This is not the same as missing components of a multivariate predictor in a regression problem; in that case, you will need to represent the missing data as a parameter and impute missing values in order to feed them into the regression.]
 
 As an example, we'll consider the bivariate distribution, which is
 easily marginalized.  The coding here is brute force, representing
@@ -3864,7 +3863,7 @@ parameters {
   real<lower=fmax(L, max(y))> U; // L < U; y[n] < U
 ```
 
-Note that for pairs of real numbers, the function `fmax` is used
+For pairs of real numbers, the function `fmax` is used
 rather than `max`.
 
 
@@ -3964,7 +3963,7 @@ probability of
 
 $$
 \mbox{Pr}[y > U]
-= \int_U^{\infty} \mathsf{Normal}(y|\mu,\sigma) \, dy
+= \int_U^{\infty} \mathsf{normal}(y|\mu,\sigma) \, dy
 = 1 - \Phi\left(\frac{y - \mu}{\sigma}\right),
 $$
 
@@ -4074,7 +4073,7 @@ $$
 The variable $y_n$ is distributed according to the parameters
 of the mixture component $z_n$,
 $$
-y_n \sim \mathsf{Normal}(\mu_{z[n]},\sigma_{z[n]}).
+y_n \sim \mathsf{normal}(\mu_{z[n]},\sigma_{z[n]}).
 $$
 
 This model is not directly supported by Stan because it involves
@@ -4092,7 +4091,7 @@ $\lambda$ in the unit $K$-simplex, then
 $$
 p_Y(y | \lambda, \mu, \sigma)
 \ = \
-\sum_{k=1}^K \lambda_k \, \mathsf{Normal}(y \, | \, \mu_k, \sigma_k).
+\sum_{k=1}^K \lambda_k \, \mathsf{normal}(y \, | \, \mu_k, \sigma_k).
 $$
 
 
@@ -4124,8 +4123,8 @@ possibility of overflow or underflow in the leading term while
 extracting the most arithmetic precision possible by pulling the
 `max(a, b)` out of the log-exp round trip.
 
-For example, the mixture of $\mathsf{Normal}(-1, 2)$ with
-$\mathsf{Normal}(3, 1)$, with mixing proportion $\lambda =
+For example, the mixture of $\mathsf{normal}(-1, 2)$ with
+$\mathsf{normal}(3, 1)$, with mixing proportion $\lambda =
 [0.3,0.7]^{\top}$, can be implemented in Stan as follows.
 
 ```
@@ -4142,19 +4141,19 @@ The log probability term is derived by taking
 
 $$
 \begin{array}{rcl}
-\log p_Y(y | \lambda,\mu,\sigma) & = & \log\!\left( 0.3 \times \mathsf{Normal}(y|-1,2) \, + \,
+\log p_Y(y | \lambda,\mu,\sigma) & = & \log\!\left( 0.3 \times \mathsf{normal}(y|-1,2) \, + \,
   0.7 \times
-  \mathsf{Normal}(y|3,1) \, \right)
+  \mathsf{normal}(y|3,1) \, \right)
 \\[2pt]
 & = & \log(\hspace*{-5pt} \begin{array}[t]{l}
-                 \exp(\log(0.3 \times \mathsf{Normal}(y|-1,2))) \\
-                 + \exp(\log(0.7 \times \mathsf{Normal}(y|3,1))) \ )
+                 \exp(\log(0.3 \times \mathsf{normal}(y|-1,2))) \\
+                 + \exp(\log(0.7 \times \mathsf{normal}(y|3,1))) \ )
               \end{array}
 \\[2pt]
 & = & \mbox{log\_sum\_exp}(\hspace*{-5pt}\begin{array}[t]{l}
-                         \log(0.3) + \log \mathsf{Normal}(y|-1,2),
+                         \log(0.3) + \log \mathsf{normal}(y|-1,2),
                          \\
-                         \log(0.7) + \log \mathsf{Normal}(y|3,1) \ ).
+                         \log(0.7) + \log \mathsf{normal}(y|3,1) \ ).
                        \end{array}
 \end{array}
 $$
@@ -4217,7 +4216,7 @@ p(z_n = k \mid y_n, \mu, \sigma, \lambda)
 p(y_n \mid z_n = k, \mu, \sigma) \cdot p(z_n = k \mid \lambda)
 \\[4pt]
 & = &
-\mathsf{Normal}(y_n \mid \mu_k, \sigma_k) \cdot \lambda_k.
+\mathsf{normal}(y_n \mid \mu_k, \sigma_k) \cdot \lambda_k.
 \end{array}
 $$
 
@@ -4281,7 +4280,7 @@ The location parameter `mu` is declared to be an ordered vector
 in order to identify the model.  This will not affect inferences that
 do not depend on the ordering of the components as long as the prior
 for the components `mu[k]` is symmetric, as it is here (each
-component has an independent $\mathsf{Normal}(0, 10)$ prior).  It
+component has an independent $\mathsf{normal}(0, 10)$ prior).  It
 would even be possible to include a hierarchical prior for the components.
 
 The values in the scale array `sigma` are constrained to be
@@ -4292,7 +4291,7 @@ The model declares a local array variable `lps` to be size
 `K` and uses it to accumulate the log contributions from the
 mixture components.  The main action is in the loop over data points
 `n`.  For each such point, the log of $\theta_k \times
-\mathsf{Normal}(y_n \, | \, \mu_k,\sigma_k)$ is calculated and added to the
+\mathsf{normal}(y_n \, | \, \mu_k,\sigma_k)$ is calculated and added to the
 array `lpps`.  Then the log probability is incremented with the log
 sum of exponentials of those values.
 
@@ -4327,8 +4326,8 @@ This definition assumes that each observation $y_n$ may have arisen
 from either of the mixture components. The density is
 $$
 p(y \, | \, \lambda, \mu, \sigma)
-= \prod_{n=1}^N (\lambda \times \mathsf{Normal}(y_n \, | \, \mu_1, \sigma_1)
-                 + (1 - \lambda) \times \mathsf{Normal}(y_n \, | \, \mu_2, \sigma_2).
+= \prod_{n=1}^N (\lambda \times \mathsf{normal}(y_n \, | \, \mu_1, \sigma_1)
+                 + (1 - \lambda) \times \mathsf{normal}(y_n \, | \, \mu_2, \sigma_2).
 $$
 
 Contrast the previous model with the following (erroneous) attempt to
@@ -4354,8 +4353,8 @@ observations comes form one component or the other, defining a
 different density,
 $$
 p(y \, | \, \lambda, \mu, \sigma)
-= \lambda \times \prod_{n=1}^N \mbox{Normal}(y_n \, | \, \mu_1, \sigma_1)
-+ (1 - \lambda) \times \prod_{n=1}^N \mbox{Normal}(y_n \, | \, \mu_2, \sigma_2).
+= \lambda \times \prod_{n=1}^N \mbox{normal}(y_n \, | \, \mu_1, \sigma_1)
++ (1 - \lambda) \times \prod_{n=1}^N \mbox{normal}(y_n \, | \, \mu_2, \sigma_2).
 $$
 
 
@@ -4385,9 +4384,9 @@ $(\mu_1, \sigma_1)$ and $(\mu_2, \sigma_2)$,
 
 $$
 \begin{array}{rcl}
-\mu_1, \mu_2 & \sim & \mathsf{Normal}(0, 10)
+\mu_1, \mu_2 & \sim & \mathsf{normal}(0, 10)
 \\[8pt]
-\sigma_1, \sigma_2 & \sim & \mathsf{HalfNormal}(0, 10)
+\sigma_1, \sigma_2 & \sim & \mathsf{Halfnormal}(0, 10)
 \end{array}
 $$
 
@@ -4401,8 +4400,8 @@ so that with the likelihood
 
 $$
 p(y_n \, | \, \mu, \sigma)
-= \lambda \, \mathsf{Normal}(y_n \, | \, \mu_1, \sigma_1)
-+ (1 - \lambda) \, \mathsf{Normal}(y_n \, | \, \mu_2, \sigma_2),
+= \lambda \, \mathsf{normal}(y_n \, | \, \mu_1, \sigma_1)
++ (1 - \lambda) \, \mathsf{normal}(y_n \, | \, \mu_2, \sigma_2),
 $$
 
 the joint distribution $p(y, \mu, \sigma, \lambda)$ is exchangeable
@@ -4786,12 +4785,12 @@ Most quantities used in statistical models arise from measurements.
 Most of these measurements are taken with some error.  When the
 measurement error is small relative to the quantity being measured,
 its effect on a model is usually small.  When measurement error is
-large relative to the quantity being measured, or when very precise
+large relative to the quantity being measured, or when  precise
 relations can be estimated being measured quantities, it is useful to
 introduce an explicit model of measurement error.  One kind of
 measurement error is rounding.
 
-Meta-analysis plays out statistically very much like measurement error
+Meta-analysis plays out statistically  much like measurement error
 models, where the inferences drawn from multiple data sets are
 combined to do inference over all of them.  Inferences for each data
 set are treated as providing a kind of measurement error with respect
@@ -4832,7 +4831,7 @@ model {
 ```
 
 
-Now suppose that the true values of the predictors $x_n$ are not known, but for each $n$, a measurement $x^{\mathrm meas}_n$ of $x_n$ is available.  If the error in measurement can be modeled, the measured value $x^{\mathrm{meas}}_n$ can be modeled in terms of the true value $x_n$ plus measurement noise.  The true value $x_n$ is treated as missing data and estimated along with other quantities in the model.  A very simple approach is to assume the measurement error is normal with known deviation $\tau$.  This leads to the following regression model with constant measurement error.
+Now suppose that the true values of the predictors $x_n$ are not known, but for each $n$, a measurement $x^{\mathrm meas}_n$ of $x_n$ is available.  If the error in measurement can be modeled, the measured value $x^{\mathrm{meas}}_n$ can be modeled in terms of the true value $x_n$ plus measurement noise.  The true value $x_n$ is treated as missing data and estimated along with other quantities in the model.  A  simple approach is to assume the measurement error is normal with known deviation $\tau$.  This leads to the following regression model with constant measurement error.
 
 ```
 data {
@@ -4871,7 +4870,7 @@ risk factors $x$ in terms of known (without measurement error) risk
 factors $c$.  A simple model would regress $x_n$ on the covariates
 $c_n$ with noise term $\upsilon$,
 $$
-x_n \sim \mathsf{Normal}(\gamma^{\top}c, \upsilon).
+x_n \sim \mathsf{normal}(\gamma^{\top}c, \upsilon).
 $$
 This can be coded in Stan just like any other regression.  And, of
 course, other exposure models can be provided.
@@ -4900,7 +4899,7 @@ Letting $z_n$ be the unrounded measurement for $y_n$, the problem
 as stated assumes the likelihood
 
 $$
-z_n \sim \mathsf{Normal}(\mu, \sigma).
+z_n \sim \mathsf{normal}(\mu, \sigma).
 $$
 
 The rounding process entails that $z_n \in (y_n - 0.5, y_n + 0.5)$.
@@ -4911,7 +4910,7 @@ p(y_n \, | \, \mu, \sigma)
 =
 \int_{y_n - 0.5}^{y_n + 0.5}
 \
-\mathsf{Normal}(z_n \, | \, \mu, \sigma)
+\mathsf{normal}(z_n \, | \, \mu, \sigma)
 \
 \mathrm{d}z_n
 =
@@ -5116,8 +5115,8 @@ effect as the following.
 
 It is common to include a prior for `theta` in this model, but it
 is not strictly necessary for the model to be proper because `y`
-is fixed and $\mathsf{Normal}(y|\mu,\sigma) =
-\mathsf{Normal}(\mu|y,\sigma)$.
+is fixed and $\mathsf{normal}(y|\mu,\sigma) =
+\mathsf{normal}(\mu|y,\sigma)$.
 
 #### Hierarchical Model {-}
 
@@ -5403,10 +5402,10 @@ naturally in the forward direction.
 ### Fitting the Model with MCMC {-}
 
 This model is easy to fit using MCMC with NUTS in its default
-configuration.  Convergence is very fast and sampling produces roughly
+configuration.  Convergence is  fast and sampling produces roughly
 one effective sample every two iterations.  Because it is a relatively
 small model (the inner double loop over time is roughly 20,000 steps),
-it is very fast.
+it is  fast.
 
 The value of `lp` for each iteration for each change point is
 available because it is declared as a transformed parameter.  If the
@@ -5540,7 +5539,7 @@ process is then repeated one or more times, and is often done for
 populations on an ongoing basis.  The resulting data may be used to
 estimate population size.
 
-The first subsection describes a very simple mark-recapture model that does
+The first subsection describes a  simple mark-recapture model that does
 not involve any latent discrete parameters.  The following subsections
 describes the Cormack-Jolly-Seber model, which involves latent
 discrete parameters for animal death.
@@ -5966,7 +5965,7 @@ The inner loop for individual `i` first increments the log
 probability based on the survival of the individual with probability
 `phi[t-1]`.  The outcome of 1 is fixed because the individual
 must survive between the first and last capture (i.e., no zombies).
-Note that the loop starts after the first capture, because all
+The loop starts after the first capture, because all
 information in the CJS model is conditional on the first capture.
 
 In the inner loop, the observed capture status `y[i,~t]` for
@@ -6429,10 +6428,10 @@ $s  =  \{ 3 \ \ 2 \ \ 4 \}$
 \end{figure}
 id:ragged-data.figure
 
-Suppose the model is a very simple varying intercept model, which,
+Suppose the model is a  simple varying intercept model, which,
 using vectorized notation, would yield a likelihood
 $$
-\prod_{n=1}^3 \log \mathsf{Normal}(y_n | \mu_n, \sigma).
+\prod_{n=1}^3 \log \mathsf{normal}(y_n | \mu_n, \sigma).
 $$
 There's no direct way to encode this in Stan.
 
@@ -6537,7 +6536,7 @@ The data points themselves are generated from a multivariate normal
 distribution whose parameters are determined by the cluster assignment
 $z_n$,
 $$
-y_n \sim  \mathsf{Normal}(\mu_{z[n]},\Sigma_{z[n]})
+y_n \sim  \mathsf{normal}(\mu_{z[n]},\Sigma_{z[n]})
 $$
 
 The sample implementation in this section assumes a fixed unit
@@ -6548,7 +6547,7 @@ $$
 so that the log multivariate normal can be implemented directly up to a proportion
 by
 $$
-\mbox{Normal}\left( y_n | \mu_k, \mbox{diag\_matrix}({\bf 1}) \right)
+\mbox{normal}\left( y_n | \mu_k, \mbox{diag\_matrix}({\bf 1}) \right)
 \propto \exp \left (- \frac{1}{2} \sum_{d=1}^D \left( \mu_{k,d} - y_{n,d}
   \right)^2 \right).
 $$
@@ -6783,7 +6782,7 @@ model {
 }
 ```
 
-Note that the topic identifiers $z_m$ are declared as data and the
+The topic identifiers $z_m$ are declared as data and the
 latent category assignments are included as part of the likelihood
 function.
 
@@ -7171,7 +7170,7 @@ After defining Gaussian processes, this chapter covers the basic
 implementations for simulation, hyperparameter estimation, and
 posterior predictive inference for univariate regressions,
 multivariate regressions, and multivariate logistic regressions.
-Gaussian processes are very general, and by necessity this chapter
+Gaussian processes are  general, and by necessity this chapter
 only touches on some basic models.  For more information, see
 @RasmussenWilliams:2006.
 
@@ -7184,7 +7183,7 @@ $y_1,\ldots,y_N \in \mathbb{R}$.  The defining feature of Gaussian
 processes is that the probability of a finite number of outputs $y$
 conditioned on their inputs $x$ is Gaussian:
 $$
-y \sim \mathsf{MultiNormal}(m(x), K(x | \theta)),
+y \sim \mathsf{multivariate normal}(m(x), K(x | \theta)),
 $$
 where $m(x)$ is an $N$-vector and $K(x | \theta)$ is an $N \times N$
 covariance matrix.  The mean function $m : \mathbb{R}^{N \times D}
@@ -7204,9 +7203,9 @@ $$
 $$
 where $\alpha$, $\rho$, and $\sigma$ are hyperparameters defining the
 covariance function and where $\delta_{i, j}$ is the Kronecker delta
-function with value 1 if $i = j$ and value 0 otherwise; note that this
+function with value 1 if $i = j$ and value 0 otherwise; this
 test is between the indexes $i$ and $j$, not between values $x_i$ and
-$x_j$. Note that this kernel is obtained through a convolution of two
+$x_j$. This kernel is obtained through a convolution of two
 independent Gaussian processes, $f_1$ and $f_2$, with kernels
 $$
   K_1(x | \alpha, \rho)_{i, j}
@@ -7354,7 +7353,7 @@ A more efficient implementation of the simulation model can be
 coded in Stan by relocating, rescaling and rotating an isotropic standard
 normal variate.  Suppose $\eta$ is an an isotropic standard normal variate
 $$
-\eta \sim \mathsf{Normal}({\bf 0}, {\bf 1}),
+\eta \sim \mathsf{normal}({\bf 0}, {\bf 1}),
 $$
 where ${\bf 0}$ is an $N$-vector of 0 values and ${\bf 1}$ is the $N
 \times N$ identity matrix.  Let $L$ be the Cholesky decomposition of
@@ -7362,7 +7361,7 @@ $K(x | \theta)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
 K(x | \theta)$.  Then the transformed variable $\mu + L\eta$ has the intended
 target distribution,
 $$
-  \mu + L\eta \sim \mathsf{MultiNormal}(\mu(x), K(x | \theta)).
+  \mu + L\eta \sim \mathsf{multivariate normal}(\mu(x), K(x | \theta)).
 $$
 
 This transform can be applied directly to Gaussian process
@@ -7411,10 +7410,10 @@ $y \in \mathbb{R}^N$, with inputs $x \in \mathbb{R}^N$, for a finite $N$:
 
 \begin{align*}
   \rho & \sim \mathsf{InvGamma}(5, 5) \\
-  \alpha & \sim \mathsf{Normal}(0, 1) \\
-  \sigma & \sim \mathsf{Normal}(0, 1) \\
-  f & \sim \mathsf{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\
-  y_i & \sim \mathsf{Normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\}
+  \alpha & \sim \mathsf{normal}(0, 1) \\
+  \sigma & \sim \mathsf{normal}(0, 1) \\
+  f & \sim \mathsf{multivariate normal}\left(0, K(x | \alpha, \rho)\right) \\
+  y_i & \sim \mathsf{normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\}
 \end{align*}
 
 With a normal outcome, it is possible to integrate out the Gaussian
@@ -7422,9 +7421,9 @@ process $f$, yielding the more parsimonious model:
 
 \begin{align*}
   \rho & \sim \mathsf{InvGamma}(5, 5) \\
-  \alpha & \sim \mathsf{Normal}(0, 1) \\
-  \sigma & \sim \mathsf{Normal}(0, 1) \\
-  y & \sim \mathsf{MultiNormal}
+  \alpha & \sim \mathsf{normal}(0, 1) \\
+  \sigma & \sim \mathsf{normal}(0, 1) \\
+  y & \sim \mathsf{multivariate normal}
   \left(0, K(x | \alpha, \rho) + \mathbf{I}_N \sigma^2\right) \\
 \end{align*}
 
@@ -7496,8 +7495,8 @@ Cholesky-parameterized normal likelihood, only now the value `y` is known
 and the covariance matrix `K` is an unknown dependent on the
 hyperparameters, allowing us to learn the hyperparameters.
 
-We have used the Cholesky parameterized \mathsf{MultiNormal} rather than the
-standard \mathsf{MultiNormal} because it allows us to the
+We have used the Cholesky parameterized \mathsf{multivariate normal} rather than the
+standard \mathsf{multivariate normal} because it allows us to the
 `cholesky_decompose` function which has been optimized for both small and
 large matrices. When working with small matrices the differences in
 computational speed between the two approaches will not be noticeable, but for
@@ -7560,7 +7559,7 @@ Two differences between the latent variable GP and the marginal likelihood GP
 are worth noting. The first is that we have augmented our parameter block with
 a new parameter vector of length $N$ called $`eta`$. This is used in the model
 block to generate a multivariate normal vector called $f$, corresponding to the
-latent GP. We put a $\mathsf{Normal}(0,1)$ prior on `eta` like we did in the
+latent GP. We put a $\mathsf{normal}(0,1)$ prior on `eta` like we did in the
 Cholesky-parameterized GP in the simulation section.  The second difference is
 that our likelihood is now univariate, though we could code $N$ likelihood
 terms as one $N$-dimensional multivariate normal with an identity covariance
@@ -7741,7 +7740,7 @@ their ratio.
 
 #### Priors for length-scale {-}
 
-GPs are a flexible class of priors, and as such, can represent a wide spectrum
+GPs are a flexible class of priors and, as such, can represent a wide spectrum
 of functions.  For length scales below the minimum spacing of the covariates
 the GP likelihood plateaus.  Unless regularized by a prior, this flat
 likelihood induces considerable posterior mass at small length scales where the
@@ -7756,8 +7755,8 @@ dependent on how the GP is used in our statistical model.
 If our model consists of only the GP, i.e.:
 
 \begin{align*}
-  f & \sim \mathsf{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\
-  y_i & \sim \mathsf{Normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
+  f & \sim \mathsf{multivariate normal}\left(0, K(x | \alpha, \rho)\right) \\
+  y_i & \sim \mathsf{normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
   & x \in \mathbb{R}^{N \times D}, \, f \in \mathbb{R}^N
 \end{align*}
 
@@ -7779,8 +7778,8 @@ mean and fixed effects for the same variables we're using as the domain for the
 GP, i.e.:
 
 \begin{align*}
-  f & \sim \mathsf{MultiNormal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
-  \sim \mathsf{Normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
+  f & \sim \mathsf{multivariate normal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
+  \sim \mathsf{normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
   \in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \mathbb{R}^D,\, x \in \mathbb{R}^{N
   \times D},\, f \in \mathbb{R}^N
 \end{align*}
@@ -8003,7 +8002,7 @@ Jumping straight to the result,
 $$
 p(\tilde{y}|\tilde{x},y,x)
 =
-\mathsf{Normal}(K^{\top}\Sigma^{-1}y,\
+\mathsf{normal}(K^{\top}\Sigma^{-1}y,\
                 \Omega - K^{\top}\Sigma^{-1}K),
 $$
 where $\Sigma = K(x | \alpha, \rho, \sigma)$ is the result of applying the covariance
@@ -8119,7 +8118,7 @@ generated quantities {
 Suppose we have observations $y_i \in \mathbb{R}^M$ observed at
 $x_i \in \mathbb{R}^K$. One can model the data like so:
 \begin{align*}
-  y_i & \sim \mathsf{MultiNormal}(f(x_i), \mathbf{I}_M \sigma^2) \\
+  y_i & \sim \mathsf{multivariate normal}(f(x_i), \mathbf{I}_M \sigma^2) \\
   f(x) & \sim \mathsf{GP}(m(x), K(x | \theta, \phi)) \\
   K(x & | \theta) \in \mathbb{R}^{M \times M}, \, f(x), \, m(x) \in \mathbb{R}^M
 \end{align*}
@@ -8132,7 +8131,7 @@ dimensions of $f(x)$. If we parameterize our kernel $K$:
 then our finite dimensional generative model for the above is:
 \begin{align*}
   f & \sim \mathsf{MatrixNormal}(m(x), K(x | \alpha, \rho), C(\phi)) \\
-  y_{i, m} & \sim \mathsf{Normal}(f_{i,m}, \sigma) \\
+  y_{i, m} & \sim \mathsf{normal}(f_{i,m}, \sigma) \\
   f & \in \mathbb{R}^{N \times M}
 \end{align*}
 where $K(x | \alpha, \rho)$ is the exponentiated quadratic kernel we've used
@@ -8143,9 +8142,9 @@ The \mathsf{MatrixNormal} distribution has two covariance matrices: $K(x |
 \alpha, \rho)$ to encode column covariance, and $C(\phi)$ to define row
 covariance. The salient features of the \mathsf{MatrixNormal} are that the rows
 of the matrix $f$ are distributed:
-\begin{align*} f_{[n,]} \sim \mathsf{MultiNormal}(m(x)_{[n,]}, K(x | \alpha,
+\begin{align*} f_{[n,]} \sim \mathsf{multivariate normal}(m(x)_{[n,]}, K(x | \alpha,
 \rho)_{[n,n]} C(\phi)) \end{align*} and that the columns of the matrix $f$ are
-distributed: \begin{align*} f_{[,m]} \sim \mathsf{MultiNormal}(m(x)_{[,m]}, K(x
+distributed: \begin{align*} f_{[,m]} \sim \mathsf{multivariate normal}(m(x)_{[,m]}, K(x
   | \alpha, \rho) C(\phi)_{[m,m]}) \end{align*}
 This also means means that $\E\left[f^T f\right]$ is equal to
 $\text{trace}(K(x | \alpha, \rho)) \times C$, whereas $\E\left[ff^T\right]$
@@ -8160,7 +8159,7 @@ We can generate a random variable $f$ from a \mathsf{MatrixNormal} density in
 $\mathbb{R}^{N \times M}$ using the following algorithm:
 
 \begin{align*}
-  \eta_{i,j} & \sim \mathsf{Normal}(0, 1) \, \forall i,j \\
+  \eta_{i,j} & \sim \mathsf{normal}(0, 1) \, \forall i,j \\
   f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
   f & \sim \mathsf{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
   \eta & \in \mathbb{R}^{N \times M} \\
@@ -8335,7 +8334,7 @@ The above mapping from $\mathbb{R}^n$ to $S^n$ is not defined at zero.
 While this point outcome has measure zero during sampling, and may
 thus be ignored, it is the default initialization point and thus unit
 vector parameters cannot be initialized at zero.  A simple workaround
-is to initialize from a very small interval around zero, which is an
+is to initialize from a  small interval around zero, which is an
 option built into all of the Stan interfaces.
 
 
@@ -8765,7 +8764,7 @@ $$
 id:ode.sho_matrix
 
 The Stan model to simulate noisy observations using a matrix exponential function
-is given by \reffigure{sho-sim-me}. Note that because we are performing matrix
+is given by \reffigure{sho-sim-me}. Because we are performing matrix
 operations, we declare `y0` and `y_hat` as vectors, instead of using arrays,
 as in the previous example code (\reffigure{sho-sim}).
 
@@ -8817,7 +8816,7 @@ For instance, suppose the simple harmonic oscillator has a parameter
 value of $\theta = 0.15$ and initial state $y(t=0) = (1,0)$.  Now
 suppose the system is observed at 10 time points, say $t=1, 2, ...,
 10$, where each measurement of $y(t)$ has independent
-$\mathsf{Normal}(0, 0.1)$ error in both dimensions ($y_1(t)$ and
+$\mathsf{normal}(0, 0.1)$ error in both dimensions ($y_1(t)$ and
 $y_2(t)$).  A plot of such measurements is shown in
 \reffigure{sho-trajectory}.
 
@@ -8828,7 +8827,7 @@ $y_2(t)$).  A plot of such measurements is shown in
 \vspace*{-0.25in}
 \caption{\small\it Trajectory of the simple harmonic oscillator given
   parameter $\theta=0.15$ and initial condition $y(t=0) = (1,0)$ with
-  additional independent\ $\mathsf{Normal}(0,0.1)$ measurement error
+  additional independent\ $\mathsf{normal}(0,0.1)$ measurement error
   in both dimensions.}
 \end{figure}
 id:sho-trajectory.figure
@@ -9074,11 +9073,11 @@ by the Stan program.
 The maximum number of steps can be used to stop a runaway simulation.
 This can arise in MCMC when a bad jump is taken, particularly during
 warmup.  With the non-stiff solver, this may result in jumping into a
-stiff region of the parameter space, which would require a very small
-step size and very many steps to satisfy even modest tolerances.
+stiff region of the parameter space, which would require a  small
+step size and  many steps to satisfy even modest tolerances.
 
 
-# <i style="font-size: 110%; color:#990017;">II. Programming Techniques</i> {-}
+# <i style="font-size: 110%; color:#990017;">Part 3. Programming Techniques</i> {-}
 
 This part of the manual surveys general programming techniques in
 Stan that are useful across a range of different model types.
@@ -9273,8 +9272,8 @@ logistically-distributed quantity.
 
 Things work the same way for the probit case: if $u$ has a
 $\mathsf{Uniform}(0, 1)$ distribution, then $\Phi^{-1}(u)$ has a
-$\mathsf{Normal}(0, 1)$ distribution.  The other way around, if $v$
-has a $\mathsf{Normal}(0, 1)$ distribution, then $\Phi(v)$ has a
+$\mathsf{normal}(0, 1)$ distribution.  The other way around, if $v$
+has a $\mathsf{normal}(0, 1)$ distribution, then $\Phi(v)$ has a
 $\mathsf{Uniform}(0, 1)$ distribution.
 
 In order to use the probit and logistic as priors on variables
@@ -9380,7 +9379,7 @@ Changes of variables are applied when the transformation of a
 parameter is characterized by a distribution.  The standard textbook
 example is the lognormal distribution, which is the distribution of a
 variable $y > 0$ whose logarithm $\log y$ has a normal distribution.
-Note that the distribution is being assigned to $\log y$.
+The distribution is being assigned to $\log y$.
 
 The change of variables requires an adjustment to the probability to
 account for the distortion caused by the transform.  For this to work,
@@ -9395,15 +9394,15 @@ $\mu$ and deviation $\sigma$, then the distribution of $y$ is given by
 $$
 p(y)
 \ = \
-\mathsf{Normal}(\log y| \mu, \sigma) \  \left| \frac{d}{dy} \log y \right|
+\mathsf{normal}(\log y| \mu, \sigma) \  \left| \frac{d}{dy} \log y \right|
 \ = \
-\mathsf{Normal}(\log y| \mu, \sigma) \frac{1}{y}.
+\mathsf{normal}(\log y| \mu, \sigma) \frac{1}{y}.
 $$
 Stan works on the log scale to prevent underflow, where
 $$
 \log p(y)
 =
-\log \mathsf{Normal}(\log y| \mu, \sigma)
+\log \mathsf{normal}(\log y| \mu, \sigma)
 - \log y.
 $$
 
@@ -9451,7 +9450,7 @@ parameter, then transforms it, whereas a change of variables
 transforms a parameter, then samples it.  Only the latter requires a
 Jacobian adjustment.
 
-Note that it does not matter whether the probability function is
+It does not matter whether the probability function is
 expressed using a sampling statement, such as
 
 ```
@@ -9541,7 +9540,7 @@ model {
   ...
 ```
 
-Of course, if the Jacobian is known analytically, it will be more
+If the Jacobian is known analytically, it will be more
 efficient to apply it directly than to call the determinant function,
 which is neither efficient nor particularly stable numerically.
 
@@ -9750,7 +9749,7 @@ This encoding will work for any `lambda` and `y`; they can
 be parameters, data, or one of each, or even local variables.
 
 The assignment statement in the previous paragraph generates
-C++ code that is very similar to that generated by the following
+C++ code that is  similar to that generated by the following
 sampling statement.
 
 ```
@@ -9781,7 +9780,7 @@ $$
 $$
 where the random 2-vector $Z$ has the distribution
 $$
-Z \sim \mathsf{MultiNormal}\left(
+Z \sim \mathsf{multivariate normal}\left(
 \begin{bmatrix}
 0 \\
 0
@@ -10468,7 +10467,7 @@ real standard_normal_rng() {
 In order to generate non-standard variates of the location-scale
 variety, the variate is scaled by the scale parameter and shifted by
 the location parameter.  For example, to generate
-$\mathsf{Normal}(\mu, \sigma)$ variates, it is enough to generate a
+$\mathsf{normal}(\mu, \sigma)$ variates, it is enough to generate a
 uniform variate $u \sim \mathsf{Uniform}(0, 1)$, then convert to a
 standard normal variate, $z = \Phi(u)$, where
 $\Phi$ is the inverse cumulative distribution function for the
@@ -10522,7 +10521,7 @@ real weibull_lb_rng(real alpha, real sigma, real t) {
 
 If there is a lower bound and upper bound, then the CDF trick is used
 twice to find a lower and upper bound.  For example, to generate a
-$\mathsf{Normal}(\mu, \sigma)$ truncated to a region $(a, b)$, the
+$\mathsf{normal}(\mu, \sigma)$ truncated to a region $(a, b)$, the
 following code suffices,
 
 ```
@@ -10586,7 +10585,7 @@ two intercept parameters $\lambda_1$ and
 $\lambda_2$, a scale parameter $\sigma > 0$, and the sampling distribution
 
 $$
-y_n \sim \mathsf{Normal}(\lambda_1 + \lambda_2, \sigma).
+y_n \sim \mathsf{normal}(\lambda_1 + \lambda_2, \sigma).
 $$
 
 For any constant $q$, the sampling density for $y$ does not change if
@@ -10619,7 +10618,7 @@ $c$.
 Contrast this model with a simple regression with a single intercept
 parameter $\mu$ and sampling distribution
 $$
-y_n \sim \mathsf{Normal}(\mu,\sigma).
+y_n \sim \mathsf{normal}(\mu,\sigma).
 $$
 Even with an improper prior, the posterior is proper as long as there
 are at least two data points $y_n$ with distinct values.
@@ -10657,7 +10656,7 @@ The general form of the collinearity problem arises when predictors
 for a regression are collinear.  For example, consider a linear
 regression sampling distribution
 $$
-y_n \sim \mathsf{Normal}(x_n \beta, \sigma)
+y_n \sim \mathsf{normal}(x_n \beta, \sigma)
 $$
 for an $N$-dimensional observation vector $y$, an $N \times K$ predictor
 matrix $x$, and a $K$-dimensional coefficient vector $\beta$.
@@ -10734,7 +10733,7 @@ several ways.
 In the case of the multiple intercepts, $\lambda_1$ and $\lambda_2$,
 the simplest solution is to remove the redundant intercept, resulting
 in a model with a single intercept parameter $\mu$ and sampling
-distribution $y_n \sim \mathsf{Normal}(\mu, \sigma)$.  The same
+distribution $y_n \sim \mathsf{normal}(\mu, \sigma)$.  The same
 solution works for solving the problem with collinearity---just remove
 one of the columns of the predictor matrix $x$.
 
@@ -10790,12 +10789,12 @@ invariance.
 
 For example, normal priors on the multiple intercepts,
 $$
-\lambda_1, \lambda_2 \sim \mathsf{Normal}(0,\tau),
+\lambda_1, \lambda_2 \sim \mathsf{normal}(0,\tau),
 $$
 with a constant scale $\tau$, ensure that the posterior mode is
 located at a point where $\lambda_1 = \lambda_2$, because this
-minimizes $\log \mathsf{Normal}(\lambda_1|0,\tau) + \log
-\mathsf{Normal}(\lambda_2|0,\tau)$.^[A Laplace prior (or an L1 regularizer for penalized maximum likelihood estimation) is not sufficient to remove this additive invariance.  It provides shrinkage, but does not in and of itself identify the parameters because adding a constant to $\lambda_1$ and subtracting it from $\lambda_2$ results in the same value for the prior density.]
+minimizes $\log \mathsf{normal}(\lambda_1|0,\tau) + \log
+\mathsf{normal}(\lambda_2|0,\tau)$.^[A Laplace prior (or an L1 regularizer for penalized maximum likelihood estimation) is not sufficient to remove this additive invariance.  It provides shrinkage, but does not in and of itself identify the parameters because adding a constant to $\lambda_1$ and subtracting it from $\lambda_2$ results in the same value for the prior density.]
 
 \begin{figure}
 \includegraphics[height=1.45in]{img/non-identified.png}
@@ -10874,8 +10873,8 @@ and $\mu_2$, a shared scale $\sigma > 0$, a mixture ratio $\theta \in
 [0,1]$, and likelihood
 $$
 p(y|\theta,\mu_1,\mu_2,\sigma)
-= \prod_{n=1}^N \big( \theta \, \mathsf{Normal}(y_n|\mu_1,\sigma)
-                       + (1 - \theta) \, \mathsf{Normal}(y_n|\mu_2,\sigma) \big).
+= \prod_{n=1}^N \big( \theta \, \mathsf{normal}(y_n|\mu_1,\sigma)
+                       + (1 - \theta) \, \mathsf{normal}(y_n|\mu_2,\sigma) \big).
 $$
 The issue here is exchangeability of the mixture components, because
 $$
@@ -10987,7 +10986,7 @@ on each mixture component's membership responsibility.  A more extreme
 measure is to include additional mixture components to deal with the
 possibility that some of them may collapse.
 
-In general, it is very difficult to recover exactly the right $K$
+In general, it is  difficult to recover exactly the right $K$
 mixture components in a mixture model as $K$ increases beyond one
 (yes, even a two-component mixture can have this problem).
 
@@ -11011,7 +11010,7 @@ around a single data item $y_n$.
 ### Beta-Binomial Models with Skewed Data and Weak Priors {-}
 
 Another example of unbounded densities arises with a posterior such as
-$\mathsf{Beta}(\phi|0.5,0.5)$, which can arise if very "weak" beta
+$\mathsf{Beta}(\phi|0.5,0.5)$, which can arise if seemingly weak beta
 priors are used for groups that have no data. This density is
 unbounded as $\phi \rightarrow 0$ and $\phi \rightarrow 1$. Similarly,
 a Bernoulli likelihood model coupled with a "weak" beta prior, leads
@@ -11047,7 +11046,7 @@ proper.  The adjustment for the particular case of $(0,1)$ is $\log
 
 There are two problems that still arise, though.  The first is that if
 the posterior mass for $\phi$ is near one of the boundaries, the
-logit-transformed parameter will have to sweep out very long paths and
+logit-transformed parameter will have to sweep out  long paths and
 thus can dominate the U-turn condition imposed by the no-U-turn
 sampler (NUTS).  The second issue is that the inverse transform from
 the unconstrained space to the constrained space can underflow to 0 or
@@ -11141,10 +11140,10 @@ $$
 $$
 
 Now consider the draw for $\lambda_1$ (the draw for $\lambda_2$ is
-symmetric), which is conjugate in this model and thus can be done very
+symmetric), which is conjugate in this model and thus can be done 
 efficiently.  In this model, the range from which the next $\lambda_1$
 can be drawn is highly constrained by the current values of
-$\lambda_2$ and $\sigma$.  Gibbs will run very quickly and provide
+$\lambda_2$ and $\sigma$.  Gibbs will run  quickly and provide
 seemingly reasonable inferences for $\lambda_1 + \lambda_2$.  But it
 will not explore the full range of the posterior; it will merely take
 a slow random walk from the initial values.  This random walk behavior
@@ -11178,15 +11177,15 @@ until it makes a U-turn, it will be defeated in most cases, as it will
 just move down the potential energy valley indefinitely without making
 a U-turn. What happens in practice is that the maximum number of
 leapfrog steps in the simulation will be hit in many of the
-iterations, causing a very large number of log probability and
+iterations, causing a  large number of log probability and
 gradient evaluations (1000 if the max tree depth is set to 10, as in
-the default). Thus sampling will appear to be very slow.  This is
+the default). Thus sampling will appear to be  slow.  This is
 indicative of an improper posterior, not a bug in the NUTS algorithm
 or its implementation.  It is simply not possible to sample from an
 improper posterior!  Thus the behavior of HMC in general and NUTS
 in particular should be reassuring in that it will clearly fail in
 cases of improper posteriors, resulting in a clean diagnostic of
-sweeping out very large paths in the posterior.
+sweeping out  large paths in the posterior.
 
 \begin{figure}
 
@@ -11235,18 +11234,18 @@ sigma            1.0  1.6e-03   0.071   9.3e-01   1.0   1.2   2094    27321    1
 ```
 
 \caption{\small\it Results of Stan runs with default parameters fit to
-  $N=100$ data points generated from $y_n \sim \mathsf{Normal}(0,1)$.
+  $N=100$ data points generated from $y_n \sim \mathsf{normal}(0,1)$.
 
   On the top is the non-identified model with improper uniform priors
-  and likelihood $y_n \sim \mathsf{Normal}(\lambda_1 + \lambda_2,
+  and likelihood $y_n \sim \mathsf{normal}(\lambda_1 + \lambda_2,
   \sigma)$.
 
   In the middle is the same likelihood as the middle plus priors
-  $\lambda_k \sim \mathsf{Normal}(0,10)$.
+  $\lambda_k \sim \mathsf{normal}(0,10)$.
 
   On the bottom is an identified model with an improper prior, with
-  likelihood  $y_n \sim \mathsf{Normal}(\mu,\sigma)$.  All models
-  estimate $\mu$ at roughly 0.16 with very little Monte Carlo standard
+  likelihood  $y_n \sim \mathsf{normal}(\mu,\sigma)$.  All models
+  estimate $\mu$ at roughly 0.16 with low Monte Carlo standard
   error, but a high posterior standard deviation of 0.1;  the true
   value $\mu=0$ is within the 90% posterior intervals in all three models.
 
@@ -11423,7 +11422,7 @@ matrix operations or calling linear algebra functions.
 Arrays, on the other hand, are implemented as instances of the C++ \
 `std::vector` class (not to be confused with Eigen's
 `Eigen::Vector` class or Stan vectors).  By implementing arrays
-this way, indexing is very efficient because values can be returned by
+this way, indexing is  efficient because values can be returned by
 reference rather than copied by value.
 
 ### Matrices vs.\ Two-Dimensional Arrays {-}
@@ -11540,7 +11539,7 @@ for (n in 1:N)
 For use purely as a container, there is really nothing to decide among
 vectors, row vectors and one-dimensional arrays.  The
 `Eigen::Vector` template specialization and the
-`std::vector` template class are implemented very similarly as
+`std::vector` template class are implemented  similarly as
 containers of `double` values (the type `real` in Stan).
 Only arrays in Stan are allowed to store integer values.
 
@@ -12304,9 +12303,9 @@ The slopes and intercepts get hierarchical priors,
 $$
 \mbox{ }
 \hfill
-\alpha_k \sim \mathsf{Normal}(\mu_{\alpha}, \sigma_{\alpha})
+\alpha_k \sim \mathsf{normal}(\mu_{\alpha}, \sigma_{\alpha})
 \hspace*{0.5in}
-\beta_k \sim \mathsf{Normal}(\mu_{\beta}, \sigma_{\beta})
+\beta_k \sim \mathsf{normal}(\mu_{\beta}, \sigma_{\beta})
 \hfill
 \mbox{ }
 $$
@@ -12418,7 +12417,7 @@ transformed data {
 }
 ```
 
-The integer `J` is set to the number of observations per group.^[This makes the very strong assumption that each group has the same number of observations!]
+The integer `J` is set to the number of observations per group.^[This makes the  strong assumption that each group has the same number of observations!]
 
 The real data array `x_r` holds the predictors and the integer
 data array `x_i` holds the outcomes.  The grouped data arrays
@@ -12604,7 +12603,7 @@ optimal performance of Stan's algorithms.  For Hamiltonian Monte
 Carlo, this implies a unit mass matrix, which requires no adaptation
 as it is where the algorithm initializes.  Riemannian Hamiltonian
 Monte Carlo performs this conditioning on the fly at every step, but
-such conditioning is very expensive computationally.
+such conditioning is  expensive computationally.
 
 ### Varying Curvature {-}
 
@@ -12740,8 +12739,8 @@ sampling straightforward.  Neal's example has support for $y \in
 \mathbb{R}$ and $x \in \mathbb{R}^9$ with density
 
 $$
-p(y,x) = \mathsf{Normal}(y|0,3) \times \prod_{n=1}^9
-\mathsf{Normal}(x_n|0,\exp(y/2)).
+p(y,x) = \mathsf{normal}(y|0,3) \times \prod_{n=1}^9
+\mathsf{normal}(x_n|0,\exp(y/2)).
 $$
 
 The probability contours are shaped like ten-dimensional funnels.  The
@@ -12771,10 +12770,10 @@ the neck of the funnel, where $y$ is small and thus $x$ is constrained
 to be near 0.  This is due to the fact that the density's scale
 changes with $y$, so that a step size that works well in the body will
 be too large for the neck and a step size that works in the neck will be
-very inefficient in the body.  This can be seen in the following plot.
+ inefficient in the body.  This can be seen in the following plot.
 
 ![4000 draws from a run of Stan's sampler with default settings.  Both
-  plots are restricted to the shown window of $x_1$ and $y$ values; some draws fell outside of the displayed area as would be expected given the density.  The samples are consistent with the marginal density $p(y) = \mathsf{Normal}(y|0,3)$, which has mean 0 and standard deviation 3.](img/funnel-fit.png)
+  plots are restricted to the shown window of $x_1$ and $y$ values; some draws fell outside of the displayed area as would be expected given the density.  The samples are consistent with the marginal density $p(y) = \mathsf{normal}(y|0,3)$, which has mean 0 and standard deviation 3.](img/funnel-fit.png)
 
 In this particular instance, because the analytic form of the density
 from which samples are drawn is known, the model can be converted to
@@ -12986,7 +12985,7 @@ model {
 Although set to `0` here, in most cases, the lower bound for the
 degrees of freedom parameter `nu` can be set to `1` or
 higher; when `nu` is 1, the result is a Cauchy distribution with
-very fat tails and as `nu` approaches infinity, the Student-t
+ fat tails and as `nu` approaches infinity, the Student-t
 distribution approaches a normal distribution.  Thus the parameter
 `nu` characterizes the heaviness of the tails of the model.
 
@@ -12994,7 +12993,7 @@ distribution approaches a normal distribution.  Thus the parameter
 
 Unfortunately, the usual situation in applied Bayesian modeling
 involves complex geometries and interactions that are not known
-analytically.  Nevertheless, reparameterization can still be very
+analytically.  Nevertheless, reparameterization can still be 
 effective for separating parameters.
 
 #### Centered parameterization {-}
@@ -13067,7 +13066,7 @@ distribution, although the normal distribution is the best candidate
 for doing so. In general, any distribution of parameters in the
 location-scale family is a good candidate for reparameterization. Let
 $\beta = l + s\alpha$ where $l$ is a location parameter and $s$ is a
-scale parameter. Note that $l$ need not be the mean, $s$ need not
+scale parameter. The parameter $l$ need not be the mean, $s$ need not
 be the standard deviation, and neither the mean nor the standard
 deviation need to exist. If $\alpha$ and $\beta$ are from the same
 distributional family but $\alpha$ has location zero and unit scale,
@@ -13607,7 +13606,7 @@ declarations.  For instance, with 5 levels, we have
 
 This way, both the `mu` and `sigma` parameters are shared.
 Which way works out to be more efficient will depend on the shape of
-the data; if the sizes are very small, the simple vectorization may be
+the data; if the sizes are  small, the simple vectorization may be
 faster, but for moderate to large sized groups, the full expansion
 should be faster.
 
@@ -13724,7 +13723,7 @@ y_n = \alpha + \beta x_n + \epsilon_n,
 $$
 where
 $$
-\epsilon_n \sim \mathsf{Normal}(0,\sigma).
+\epsilon_n \sim \mathsf{normal}(0,\sigma).
 $$
 
 If either vector $x$ or $y$ has very large or very small values or if the
@@ -13819,7 +13818,7 @@ The parameters are renamed to indicate that they aren't the
 ``natural" parameters, but the model is otherwise identical.  In
 particular, the fairly diffuse priors on the coefficients and error
 scale are the same.  These could have been transformed as well, but
-here they are left as is, because the scales make sense as very
+here they are left as is, because the scales make sense as 
 diffuse priors for standardized data; the priors could be made more
 informative.  For instance, because the outputs $y$ have been
 standardized, the error $\sigma$ should not be greater than 1, because
@@ -13922,7 +13921,7 @@ generated quantities {
 }
 ```
 
-Of course, it is inefficient to compute all of the means and standard
+It is inefficient to compute all of the means and standard
 deviations every iteration; for more efficiency, these can be
 calculated once and stored as transformed data.  Furthermore, the
 model sampling statement can be easily vectorized, for instance, in
@@ -13966,69 +13965,13 @@ reduced memory overhead leads to increased memory locality and faster
 execution.  The Jacobians are all computed with local memory and their
 outputs stored contiguously in memory.
 
-# <i style="font-size: 110%; color:#990017;">III. Inference</i> {-}
+# <i style="font-size: 110%; color:#990017;">Part 4:  Review of Statistical Inference</i> {-}
 
-This section of the model provides an overview of statistical inference
-supported by Stan, including full Bayes, maximum posterior modes, and
-variational approximations.  It also covers the posterior analysis
-calculations such as $\hat{R}$ for convergence monitoring and effective
-sample size calculations.
+# Bayesian Data Analysis
 
-# Bayesian Data Analysis  {#bayesian.chapter}
+## Model Building
 
-
-@GelmanEtAl:2013 provide the following
-characterization of Bayesian data analysis.
-
-\begin{quote}
-  By Bayesian data analysis, we mean practical methods for making
-  inferences from data using probability models for quantities we
-  observe and about which we wish to learn.
-\end{quote}
-
-They go on to describe how Bayesian statistics differs from
-frequentist approaches.
-
-\begin{quote}
-  The essential characteristic of Bayesian methods is their explicit
-  use of probability for quantifying uncertainty in inferences based
-  on statistical analysis.
-\end{quote}
-
-Because they view probability as the limit of relative frequencies of
-observations, strict frequentists forbid probability statements about
-parameters.  Parameters are considered fixed, not random.
-
-Bayesians also treat parameters as fixed but unknown.  But unlike
-frequentists, they make use of both prior distributions over
-parameters and posterior distributions over parameters.  These prior
-and posterior probabilities and posterior predictive probabilities are
-intended to characterize knowledge about the parameters and future
-observables.  Posterior distributions form the basis of Bayesian
-inference, as described below.
-
-## Bayesian Modeling
-
-@GelmanEtAl:2013 break applied Bayesian modeling
-into the following three steps.
-
-1. Set up a full probability model for all observable and
-  unobservable quantities.  This model should be consistent with
-  existing knowledge of the data being modeled and how it was
-  collected.
-1. Calculate the posterior probability of unknown quantities
-  conditioned on observed quantities.  The unknowns may include
-  unobservable quantities such as parameters and potentially
-  observable quantities such as predictions for future observations.
-1. Evaluate the model fit to the data.  This includes evaluating
-  the implications of the posterior.
-
-
-Typically, this cycle will be repeated until a sufficient fit is
-achieved in the third step.  Stan automates the calculations involved
-in the second and third steps.
-
-## Bayesian Inference
+## Inference
 
 ### Basic Quantities {-}
 
@@ -14136,6 +14079,9 @@ $$
 p(\tilde{y}|\theta) p(\theta|y) \, d\tilde{y} \, d\theta.
 $$
 
+## Model Checking and Evaluation
+
+### Fake-Data Simulation {-}
 
 ### Posterior Predictive Checking {-}
 
@@ -14152,6 +14098,13 @@ approach, which also works for discrete variables, is to generate
 replicated data using random-number generators in the generated
 quantities block.
 
+### Exploratory Data Analysis as Model Checking {-}
+
+### Cross Validation {-}
+
+## Model Expansion
+
+## Decision Analysis
 
 
 # Penalized Maximum Likelihood Point Estimation  {#mle.chapter}
@@ -14214,7 +14167,7 @@ $x$ of predictors, a $K$-dimensional parameter vector $\beta$ of
 regression coefficients, and a real-valued noise scale $\sigma > 0$,
 with log likelihood function
 $$
-\log p(y|\beta,x) = \sum_{n=1}^N \log \mathsf{Normal}(y_n|x_n \beta,
+\log p(y|\beta,x) = \sum_{n=1}^N \log \mathsf{normal}(y_n|x_n \beta,
 \sigma).
 $$
 
@@ -14223,7 +14176,7 @@ $$
 (\hat{\beta},\hat{\sigma})
 \ = \
 \mbox{argmax}_{\beta,\sigma}
-\log p(y|\beta,\sigma,x) = \sum_{n=1}^N \log \mathsf{Normal}(y_n|x_n \beta, \sigma).
+\log p(y|\beta,\sigma,x) = \sum_{n=1}^N \log \mathsf{normal}(y_n|x_n \beta, \sigma).
 $$
 
 #### Squared Error {-}
@@ -14339,7 +14292,7 @@ $$
 (\hat{\beta},\hat{\sigma})
 \ = \
 \mbox{argmax}_{\beta,\sigma} \,
- \sum_{n=1}^N \log \mathsf{Normal}(y_n|x_n \beta, \sigma) - \lambda
+ \sum_{n=1}^N \log \mathsf{normal}(y_n|x_n \beta, \sigma) - \lambda
  \sum_{k=1}^K \beta_k^2
 $$
 
@@ -14383,15 +14336,15 @@ model {
 
 The noise term calculation remains the same.
 
-#### The Lasso {-}
+#### Lasso {-}
 
-The lasso @Tibshirani:1996 is an alternative to ridge
+Lasso [@Tibshirani:1996] is an alternative to ridge
 regression that applies a penalty based on the sum of the absolute
 coefficients, rather than the sum of their squares,
 $$
 r(\beta) = \lambda \sum_{k=1}^K | \beta_k |.
 $$
-The lasso is also called L1 shrinkage due to its relation to the L1
+Lasso is also called L1 shrinkage due to its relation to the L1
 norm, which is also known as taxicab distance or Manhattan distance.
 
 Because the derivative of the penalty does not depend on the value of
@@ -14404,7 +14357,7 @@ it has the effect of shrinking parameters all the way to 0 in maximum
 likelihood estimates.  Thus it can be used for variable selection as
 well as just shrinkage.^[In practice, Stan's gradient-based optimizers are not guaranteed to produce exact zero values; see @LangfordEtAl:2009 for a discussion of getting exactly zero values with gradient descent.]
 
-The lasso can be implemented in Stan just as easily as ridge
+Lasso can be implemented in Stan just as easily as ridge
 regression, with the magnitude declared as data and the penalty added
 to the model block,
 
@@ -14421,9 +14374,9 @@ model {
 }
 ```
 
-#### The Elastic Net {-}
+#### Elastic Net {-}
 
-The naive elastic net @ZouHastie:2005 involves a weighted
+The naive elastic net [@ZouHastie:2005] involves a weighted
 average of ridge and lasso penalties, with a penalty function
 $$
 r(\beta)
@@ -14431,10 +14384,10 @@ r(\beta)
 + \lambda_2 \sum_{k=1}^K \beta_k^2.
 $$
 The naive elastic net combines properties of both ridge regression and
-the lasso, providing both identification and variable selection.
+lasso, providing both identification and variable selection.
 
 The naive elastic net can be implemented directly in Stan by combining
-implementations of ridge regression and the lasso, as
+implementations of ridge regression and lasso, as
 
 ```
 data {
@@ -14451,10 +14404,10 @@ model {
 }
 ```
 
-Note that the signs are negative in the program because $r(\beta)$ is
+The signs are negative in the program because $r(\beta)$ is
 a penalty function.
 
-The elastic net @ZouHastie:2005 involves adjusting the final estimate for
+The elastic net [@ZouHastie:2005] involves adjusting the final estimate for
 $\beta$ based on the fit $\hat{\beta}$ produced by the naive elastic
 net.  The elastic net estimate is
 $$
@@ -14485,7 +14438,7 @@ It is also common to use penalty functions that bias the coefficient
 estimates toward values other than 0, as in the estimators of
 @JamesStein:1961.  Penalty functions can also be used to bias
 estimates toward population means; see
-[@EfronMorris:1975; @Efron:2012].  This latter approach is similar
+@EfronMorris:1975 and @Efron:2012.  This latter approach is similar
 to the hierarchical models commonly employed in Bayesian statistics.
 
 
@@ -14538,11 +14491,11 @@ is zero and biased otherwise.
 
 Suppose a data set of observations $y_n$ for $n \in 1{:}N$ drawn from
 a normal distribution.  This presupposes a model $y_n \sim
-\mathsf{Normal}(\mu,\sigma)$, where both $\mu$ and $\sigma > 0$ are
+\mathsf{normal}(\mu,\sigma)$, where both $\mu$ and $\sigma > 0$ are
 parameters.  The log likelihood is just
 $$
 \log p(y|\mu,\sigma) = \sum_{n=1}^N \log
-\mathsf{Normal}(y_n|\mu,\sigma).
+\mathsf{normal}(y_n|\mu,\sigma).
 $$
 The maximum likelihood estimator for $\mu$ is just the sample mean,
 i.e., the average of the samples,
@@ -14678,7 +14631,7 @@ posterior mode is equivalent to the maximum likelihood estimate.
 
 For most commonly used penalty functions, there are probabilistic
 equivalents.  For example, the ridge penalty function corresponds to a
-normal prior on coefficients and the lasso to a Laplace prior.  The
+normal prior on coefficients and lasso to a Laplace prior.  The
 reverse is always true---a negative prior can always be treated as a
 penalty function.
 
@@ -14813,10 +14766,10 @@ Gaussian,
 $$
   q(\zeta \, | \, \phi)
   =
-  \mathsf{Normal}\left(\zeta \, | \, \mu, \sigma\right)
+  \mathsf{normal}\left(\zeta \, | \, \mu, \sigma\right)
   =
   \prod_{k=1}^K
-  \mathsf{Normal}
+  \mathsf{normal}
   \left(\zeta_k \, | \, \mu_k, \sigma_k\right),
 $$
 
@@ -14833,7 +14786,7 @@ latent variables. This implicitly defines the variational approximation in the
 original latent variable space as
 
 $$
-\mathsf{Normal} \left(T(\theta) \, | \, \mu, \sigma\right)
+\mathsf{normal} \left(T(\theta) \, | \, \mu, \sigma\right)
 \big| \det J_{T}(\theta) \big|.
 $$
 This is, in general, not a Gaussian distribution.
@@ -15013,7 +14966,7 @@ for (n in 1:N) y[n] ~ normal(mu,1);
 ```
 
 These can be much harder to read than the first example. Only use this
-style if the statement is very simple, as in this example.  Unless
+style if the statement is  simple, as in this example.  Unless
 there are many similar cases, it's almost always clearer to put
 each sampling statement on its own line.
 

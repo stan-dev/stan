@@ -4,6 +4,7 @@ rmd_files: [
  "index.Rmd",
  "chapter1.Rmd",
  "chapter2.Rmd",
+ "Pest_Control_Example.Rmd",
  "all.Rmd"
 ]
 
