@@ -194,3 +194,6 @@ math-update:
 
 math-update/%: math-update
 	cd $(MATH) && git fetch --all && git checkout $* && git pull
+
+print_sigs: src/stan/lang/ast/sigs/*
+	$(LINK.cc) src/stan/lang/ast/sigs/print_sigs.cpp -o print_sigs 

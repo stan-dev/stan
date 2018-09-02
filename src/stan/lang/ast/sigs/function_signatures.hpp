@@ -399,6 +399,9 @@ namespace stan {
        */
       bool discrete_first_arg(const std::string& name) const;
 
+      void print_signatures(std::ostream& out);
+
+
     private:
       /**
        * Construction is private to enforce singleton pattern.
