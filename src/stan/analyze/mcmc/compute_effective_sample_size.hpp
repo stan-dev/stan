@@ -22,7 +22,8 @@ namespace stan {
      * @param std::vector stores sizes of chains
      * @return effective sample size for the specified parameter
      */
-    inline double compute_effective_sample_size(std::vector<const double*> draws,
+    inline
+    double compute_effective_sample_size(std::vector<const double*> draws,
                                          std::vector<size_t> sizes) {
       int num_chains = sizes.size();
 
@@ -84,7 +85,8 @@ namespace stan {
       return num_chains * num_draws / (1 + 2 * rho_hat_s.sum());
     }
 
-    inline double compute_effective_sample_size(std::vector<const double*> draws,
+    inline
+    double compute_effective_sample_size(std::vector<const double*> draws,
                                          size_t size) {
       int num_chains = draws.size();
       std::vector<size_t> sizes(num_chains, size);
