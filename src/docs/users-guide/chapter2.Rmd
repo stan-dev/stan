@@ -61,7 +61,7 @@ text(x + .4, y/n + se + .02, paste(y, "/", n,sep=""), cex=.6, col="gray40")
 The error bars associated with each point $j$ in the above graph are simple binomial standard deviations,
 $\sqrt{\hat{p}_j(1-\hat{p}_j)/n_j}$, where $\hat{p_j}=y_j/n_j$ is the success rate for putts taken at distance $x_j$.
 
-#### Logistic regression
+### Logistic regression {-}
 
 Can we model the probability of success in golf putting as a function of distance from the hole?  Given usual statistical practice, the natural starting point would be logistic regression:
 $$
@@ -103,7 +103,7 @@ text(10.6, .57, paste("Logistic regression,\n    a = ", fround(a_hat, 2), ", b =
 
 The thick line shows the fit corresponding to the posterior median estimates of the parameters $a$ and $b$; the light lines show 20 draws from the posterior distribution.
 
-#### Modeling from first principles
+### Modeling from first principles {-}
 
 As an alternative to logistic regression, we shall build a model from first principles and fit it to the data.  The graph below shows a simplified sketch of a golf shot.  The dotted line represents the angle within which the ball of radius $r$ must be hit so that it falls within the hole of radius $R$.  This threshold angle is $\sin^{-1}((R-r)/x)$.
 
@@ -180,7 +180,7 @@ We'll now make this point using Bayesian inference, going through the following 
 
 For each step, we set up a model, simulate fake data from that model, and check that we can recover the underlying parameters to some level of accuracy.
 
-### Model for 2 movies
+### Model for 2 movies {-}
 
 Define $\theta_j, j=1,2$ to be the true popularities of the two movies, with any randomly selected rating for movie $j$ being drawn from a normal distribution with mean $\theta_j$ and standard deviation $\sigma$.
 
@@ -226,7 +226,7 @@ The estimated population average popularity is 3.6 for the first movie and 4.0 f
 
 So, which movie to see?  It depends on your goals.  Movie 2 is a safer bet, with a higher estimated quality.  But Movie 1 has a small chance of being outstanding, along with a moderate chance of being mediocre.  You can see Movie 1 if you want to roll the dice.
 
-### Estending the model to J movies
+### Estending the model to J movies {-}
 
 It is easy to expand the Stan program to allow an arbitrary number of movies:
 
@@ -296,7 +296,7 @@ mtext("Where you have more data, you have less uncertainty", side=3)
 
 The only reason the points do not completely fall along a smooth curve here is that the intervals are computed using simulation.  Here we have 4000 simulation draws.  If we were to run Stan longer and obtain more iterations, then the resulting intervals would be more stable, and the above graph would look smoother.  For all practical purposes, though, we have enough simulations and enough iterations.  For example, if $\theta_1$ has a posterior 50\% interval of $[3.1, 3.5]$, there is no real reason to get a huge number of simulations and to find out that the precise interval is $[3.13, 3.48]$, as this makes no real difference in our understanding of $\theta_3$, nor should it seriously affect any decision we might want to make using these data.
 
-### Item-response model with parameters for raters and for movies
+### Item-response model with parameters for raters and for movies {-}
 
 There are many ways to extend the above model.  To start with, we can recognize that different people rate different movies, and each rater uses his or own scale.  Suppose, for example, that some people tend to give high ratings and others tend to give low ratings, and the sorts of people who give high ratings are more likely to watch romantic comedies, while the tougher judges more frequently watch crime movies.  Then a simple comparison of average ratings will be unfair to the crime movies, as this does not take into account systematic differences between raters.
 
@@ -517,7 +517,7 @@ The raw averages for the romantic comedies are mostly too high:  The open circle
 
 The model adjusts for these biases, though, and so the model-based estimates, shown in the second plot above, do not have these systematic problems.
 
-### Other potential extentions to the model
+### Other potential extentions to the model {-}
 
 Here are some of the many ways in which the model could be generalized in order to make it more realistic:
 

@@ -460,7 +460,7 @@ Here is a list of resources, roughly in order from most to least formal:
 - Stan Discourse list:  https://discourse.mc-stan.org
 
 
-# Data models and priors
+# Prior Distributions and Models for Data
 
 
 ## Prior, likelihood, posterior densities; Bayes as information aggregation
