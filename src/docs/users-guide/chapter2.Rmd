@@ -10,7 +10,6 @@ knitr::opts_chunk$set(comment = "")
 print_file <- function(file) {
   cat(paste(readLines(file), "\n", sep=""), sep="")
 }
-
 library("arm")
 library("rstan")
 # options(mc.cores = parallel::detectCores(logical = FALSE))
@@ -529,7 +528,7 @@ Here are some of the many ways in which the model could be generalized in order 
 
 ## World Cup
 
-We fit a model to estimate the abilities of the teams in the 2014 soccer World Cup.  We fit a simple linear item response model, using the score differentials as data (ignoring the shoot-outs). We also have a feeling that when the game is not close the extra goals don’t provide as much information so we’ll fit the model on the square-root scale.
+We fit a model to estimate the abilities of the teams in the 2014 soccer World Cup.  We fit a simple linear item response model, using the score differentials as data (ignoring the shoot-outs). We also have a feeling that when the game is not close the extra goals don't provide as much information so we'll fit the model on the square-root scale.
 
 The model is as follows:   if game $i$ has teams $j_1$ and team $j_2$ playing, and they score $z_1$ and $z_2$ goals, respectively, then the data point for this game is $y_i = \mbox{sign}(z_1-z_2)*\sqrt{|z_1-z_2|}$, and the data model is:
 $y_i \sim \mbox{normal}(a_{j_1[i]}-a_{j_2[i]}, \sigma_y)$,
@@ -544,7 +543,7 @@ There weren't so many World Cup games (only 64 games in total for 32 teams) so w
 Our model for the team abilities was then simply,
 $a_j \sim \mbox{normal}(\mu + b*\mbox{prior_score}_j, \sigma_a)$, which we write as $a_j=\mu+b*\mbox{prior_score}_j+\sigma_a*\alpha_j$, with $\alpha_j\sim\mbox{normal}(0,1) \mbox{ for } j=1,\dots,J=32$.  Actually, though, all we care about are the relative, not the absolute, team abilities, so we can just set $\mu=0$, so that the model is,
 $$a_j = b*\mbox{prior_score}_j+\sigma_a*\alpha_j, \mbox{ with } \alpha_j \sim \mbox{normal}(0, 1), \mbox{ for } j=1,\dots,J=32.$$
-At this point we should probably add weakly informative priors for $b$, $\sigma_a$, and $\sigma_y$, but we didn’t bother. We can always go back and add these to stabilize the inferences, but 32 teams should be enough to estimate these parameters so we don’t think it will be necessary in this case.
+At this point we should probably add weakly informative priors for $b$, $\sigma_a$, and $\sigma_y$, but we didn't bother. We can always go back and add these to stabilize the inferences, but 32 teams should be enough to estimate these parameters so we don't think it will be necessary in this case.
 
 We now set up the model in Stan:
 ```{r, echo=FALSE}
@@ -769,7 +768,7 @@ But also this:
 
 > Each entry must be accompanied by a payment of $10.
 
-OK, now it’s time to get to work.  We start by downloading and graphing the data.
+OK, now it's time to get to work.  We start by downloading and graphing the data.
 ```{r, echo=FALSE}
 series <- matrix(scan("data/Series1000.txt"), nrow=1000, ncol=135, byrow=TRUE)
 T <- 135

@@ -2,7 +2,7 @@
 knit: "bookdown::render_book"
 title: "Bayesian Statistics Using Stan"
 author: "Stan Development Team"
-date: "Version 2.18 (August 2018)"
+date: "Version 2.18.1 (September 2018)"
 description: "Bayesian Statistics Using Stan, including Stan user's guide with examples and programming techniques."
 url: 'http\://mc-stan.org/users/documentation'
 site: bookdown::bookdown_site
@@ -35,6 +35,17 @@ There is also a separate installation and getting started guide for
 each of the Stan interfaces (R, Python, Julia, Stata, MATLAB, 
 Mathematica, and command line).
 
+## How to use this book {-}
+
+In Part 1 of this book we introduce Bayesian data analysis and Stan through a series of examples.
+
+Part 2 gives Stan code and discussions for several important classes of models.
+
+Part 3 discusses various general Stan programming techniques that are not tied to any particular model.
+
+The book concludes in part 4 with a brief review of statistical inference, followed by appendices.
+
+We recommend working through this book using the textbooks _Bayesian Data Analysis_ and _Statistical Rethinking: A Bayesian Course with Examples in R and Stan_ as references on the concepts, and using the Stan Reference Manual when necessary to clarify programming issues.  Further resources are given at the end of the introductory chapter.
 
 ## Web Resources {-}
 
