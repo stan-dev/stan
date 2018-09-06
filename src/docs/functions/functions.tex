@@ -3942,6 +3942,98 @@ the same size:
   be passed to the system function
 \end{itemize}
 %
+\section{1D Integrator}%
+\label{functions-1d-integrator.section}
+
+Stan provides a built-in mechanism to perform 1D integration of a function via quadrature methods.
+
+It operates similarly to the algebraic solver (\refsection{functions-algebraic-solver}) and ordinary differential equations solver (\refsection{functions-ode-solver}) in that it allows as an argument a function.
+
+Like both of those utilities, some of the arguments are limited
+to data only expressions. These expressions must not contain variables
+other than those declared in the data or transformed data blocks.
+
+\subsection{Specifying an Integrand as a Function}
+
+Performing a 1D integration requires the integrand to be specified somehow.
+This is done by defining a function in the Stan functions block with the special signature:
+%
+\begin{stancode}
+real integrand(real x, real xc, real[] theta,
+                      real[] x_r, int[] x_i)
+\end{stancode}
+%
+The function should return the value of the integrand evaluated at
+the point x.
+
+The argument of this function are:
+\begin{itemize}
+\item \farg{x}, the independent variable being integrated over
+\item \farg{xc}, a high precision version of the distance from x to the nearest endpoint in a definite integral (for more into see \refsection{precision-loss})
+\item \farg{theta}, parameter values used to evaluate the integral
+\item \farg{x\_r}, data values used to evaluate the integral
+\item \farg{x\_i}, integer data used to evaluate the integral
+\end{itemize}
+
+Like algebraic solver and the differential equations solver, the 1D
+integrator separates parameter values, \farg{theta}, from data values, \farg{x\_r}.
+
+\subsection{Call to the 1D Integrator}
+
+\begin{description}
+%
+   \fitemthreelines{vector}{integrate\_1d}%
+                  {function \farg{integrand}}%
+                  {real \farg{a}, real \farg{b}}%
+                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {Integrates the integrand from \farg{a} to \farg{b}.}
+
+\fitemfourlines{vector}{integrate\_1d}%
+                  {function \farg{integrand}}%
+                  {real \farg{a}, real \farg{b}}%
+                  {real[] \farg{theta}, real[] \farg{x\_r}, int[] \farg{x\_i}}%
+                  {real \farg{relative\_tolerance}}%
+                  {Integrates the integrand from \farg{a} to \farg{b} with the given relative tolerance.}
+%
+\end{description}
+
+
+\subsubsection{Arguments to the 1D Integrator}
+
+The arguments to the 1D integrator are as follows:
+%
+\begin{enumerate}
+\item \farg{integrand}: function literal referring to a function
+  specifying the integrand with signature
+  \begin{quote}
+    (real, real, real[], real[], int[]):real
+  \end{quote}
+  The arguments represent (1) where integrand is evaluated, (2) distance from evaluation point to integration limit for definite integrals, (3) parameters, (4) real data, and
+  (5) integer data, and the return value is the integrand evaluated at the given point,
+\item \farg{a}: left limit of integration, may be negative infinity, type \code{real},
+\item \farg{b}: right limit of integration, may be positive infinity, type \code{real},
+\item \farg{theta}: parameters only, type \code{real[]},
+\item \farg{x\_r}: real data only, type \code{real[]}, and
+\item \farg{x\_i}: integer data only, type \code{int[]}.
+\end{enumerate}
+
+A \farg{relative\_tolerance} argument can also be provided for more control over the algorithm:
+%
+\begin{enumerate}
+  \addtocounter{enumi}{6}
+  \item \farg{relative\_tolerance}: relative tolerance for the 1d integrator, type \code{real}, data only.
+\end{enumerate}
+
+\subsubsection{Return value}
+
+The return value for the 1D integrator is a \code{real}, the value of the integral.
+
+\subsubsection{Algorithmic details}
+Internally the 1D integrator uses the double-exponential methods in the Boost 1D quadrature library. Boost in turn makes use of quadrature methods developed in \citep{Takahasi:1974}, \citep{Mori:1978}, \citep{Bailey:2005}, and \citep{Tanaka:2009}.
+
+The gradients of the integral are computed in accordance with the Leibniz integral rule. Gradients of the integrand are computed internally with Stan's automatic differentiation.
+%
+
 
 \section{Higher-Order Map}\label{functions-map.section}
 
