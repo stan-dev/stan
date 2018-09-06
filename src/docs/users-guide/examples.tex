@@ -3546,7 +3546,7 @@ recording only time and position of a pendulum (and not recording
 momentum).
 
 
-\chapter{Truncated or Censored Data}
+\chapter{Truncated or Censored Data}\label{truncated-data.chapter}
 
 \noindent
 Data in which measurements have been truncated or censored can be
@@ -8274,8 +8274,6 @@ can be modeled directly with ad-hoc predictors for holidays and
 weekends, or with data normalization back to natural scales for
 daylight savings time.
 
-
-
 \chapter{Solving Algebraic Equations}\label{algebra-solver.chapter}
 
 \noindent
@@ -8931,3 +8929,178 @@ This can arise in MCMC when a bad jump is taken, particularly during
 warmup.  With the non-stiff solver, this may result in jumping into a
 stiff region of the parameter space, which would require a very small
 step size and very many steps to satisfy even modest tolerances.
+
+
+\chapter{Computing 1D Integrals}
+
+\noindent
+Definite and indefinite 1D integrals can be performed in Stan via the \code{integrate\_1d} function.
+
+As an example, the normalizing constant of a left-truncated normal distribution is
+
+\begin{align*}
+  \int_a^\infty \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2}}
+\end{align*}
+
+\noindent
+To compute this integral in Stan, the integrand must first be defined as a Stan function (see \refchapter{functions-programming} for more information on coding user-defined functions).
+
+\begin{stancode}
+real normal_density(real x,          // Function argument
+                    real xc,         // Complement of function argument
+                                     //  on the domain (defined later)
+                    real[] theta,    // parameters
+                    real[] x_r,      // data (real)
+                    int[] x_i) {     // data (integer)
+  real mu = theta[1];
+  real sigma = theta[2];
+
+  return 1 / (sqrt(2 * pi()) * sigma) * exp(-0.5 * ((x - mu) / sigma)^2);
+}
+\end{stancode}
+%
+
+\noindent
+This function is expected to return the value of the integrand evaluated at point \code{x}. The
+argument \code{xc} is used in definite integrals to avoid loss of precision near
+the limits of integration and is set to NaN when either limit is infinite
+(see \refsection{integral-precision} for details on how to use this). The argument
+\code{theta} is used to pass in arguments of the integral
+that are a function of the parameters in our model. The arguments \code{x\_r}
+and \code{x\_i} are likewise used to pass in arguments of the integral that are data.
+
+\subsubsection{Strict Signature}
+%
+The function defining the integrand must have exactly the argument types and
+return type of \code{normal\_density} above, though argument naming is not important.
+Even if \code{x\_r} and \code{x\_i} are unused in the integrand, they must be
+included in the function signature. This may require passing in zero-length arrays
+for data or a zero-length vector for parameters if the integral does not involve
+data or parameters.
+
+\section{Calling the 1D Integrator}
+%
+Suppose that our model requires evaluating the lpdf of a left-truncated normal, but
+the truncation limit is to be estimated as a parameter. Because the truncation
+point is a parameter, we must include the normalization term of the truncated pdf when
+computing our model's log density. Note this is just an example of how to use the
+1D integrator. The more efficient way to perform the correct normalization in Stan
+is described in \refchapter{truncated-data}.
+
+Such a model might look like (including the function defined above):
+
+%
+\begin{stancode}
+data {
+  int N;
+  real y[N];
+}
+
+transformed data {
+  real x_r[0];
+  int x_i[0];
+}
+
+parameters {
+  real mu;
+  real<lower = 0.0> sigma;
+  real left_limit;
+}
+
+model {
+  mu ~ normal(0, 1);
+  sigma ~ normal(0, 1);
+  left_limit ~ normal(0, 1);
+  target += normal_lpdf(y | mu, sigma);
+  target += log(integrate_1d(normal_density, left_limit, positive_infinity(), { mu, sigma }, x_r, x_i));
+}
+\end{stancode}
+%
+\subsection{Limits of integration}
+The limits of integration can be finite or infinite. The infinite limits are made available via
+the Stan calls \code{negative\_infinity()} and \code{positive\_infinity()}.
+
+If both limits are either \code{negative\_infinity()} or \code{positive\_infinity()}, the integral
+and its gradients are set to zero.
+
+\subsection{Data versus Parameters}
+%
+The arguments for the real data \code{x\_r} and the integer data \code{x\_i}
+must be expressions that only involve data or transformed data variables.
+\code{theta}, on the other hand, must only involve parameters.
+
+The endpoints of integration can be data or parameters (and interally the
+derivatives of the integral with respect to the endpoints are handled
+with the Leibniz integral rule).
+
+\section{Integrator convergence}
+%
+The integral is performed with the iterative 1D quadrature methods implemented in the Boost library. If the nth estimate of the integral is denoted $I_n$ and the nth estimate of the norm of the integral is denoted $|I|_n$, the iteration is terminated when
+
+\begin{align*}
+  \frac{{|I_{n + 1} - I_n|}}{{|I|_{n + 1}}} < \text{relative tolerance}
+\end{align*}
+
+\noindent
+The \code{relative\_tolerance} parameter can be optionally specified as the last argument to \code{integrate\_1d} and defaults to the square root of the machine epsilon of double precision floating point numbers (that is a relative tolerance of around \code{1.5e-8}).
+
+\subsection{Zero-crossing integrals} \label{zero-crossing.section}
+Integrals on the (possibly infinite) interval $(a, b)$ that cross zero are split into two integrals, one from $(a, 0)$ and one from $(0, b)$. This is because the quadrature methods employed internally can have difficulty near zero.
+
+In this case, each integral is separately integrated to the given \code{relative\_tolerance}.
+
+\subsection{Avoiding precision loss near limits of integration in definite integrals} \label{integral-precision.section}
+
+If care is not taken, the quadrature can suffer from numerical loss of precision near the endpoints of definite integrals.
+
+For instance, in integrating the pdf of a beta distribution when the values of $\alpha$ and $\beta$ are small, most of the probability mass is lumped near zero and one.
+
+The pdf of a beta distribution is proportional to
+\begin{align*}
+p(x) \propto x^{\alpha - 1}(1 - x)^{\beta - 1}
+\end{align*}
+
+\noindent
+Normalizing this distribution requires computing the integral of $p(x)$ from zero to one. In Stan code, the integrand might look like:
+
+%
+\begin{stancode}
+real beta(real x, real xc, real[] theta, real[] x_r, int[] x_i) {
+  real alpha = theta[1];
+  real beta = theta[2];
+
+  return x^(alpha - 1.0) * (1.0 - x)^(beta - 1.0);
+}
+\end{stancode}
+%
+
+\noindent
+The issue is that there will be numerical breakdown in the precision of \code{1.0 - x} as \code{x} gets close to one. This is because of the limited precision of double precision floating numbers. This integral will fail to converge for values of \code{alpha} and \code{beta} much less than one.
+
+This is where \code{xc} is useful. It is defined, for definite integrals, as a high precision version of the distance from \code{x} to the nearest endpoint. To make use of this for the beta integral, the integrand can be re-coded:
+
+%
+\begin{stancode}
+real beta(real x, real xc, real[] theta, real[] x_r, int[] x_i) {
+  real alpha = theta[1];
+  real beta = theta[2];
+  real v;
+
+  if(x > 0.5) {
+    v = x^(alpha - 1.0) * xc^(beta - 1.0);
+  } else {
+    v = x^(alpha - 1.0) * (1.0 - x)^(beta - 1.0);
+  }
+
+  return v;
+}
+\end{stancode}
+%
+
+\noindent
+This version of the integrand will converge for much smaller values of \code{alpha} and \code{beta} than otherwise possible.
+
+Note, \code{xc} is only used for definite integrals. If either the left endpoint is at negative infinity or the right endpoint is at positive infinity, \code{xc} will be NaN.
+
+For zero-crossing definite integrals (see \refsection{zero-crossing}) the integrals are broken into two pieces ($(a, 0)$ and $(0, b)$ for endpoints $a < 0$ and $b > 0$) and \code{xc} is a high precision version of the distance to the limits of each of the two integrals separately. This means \code{xc} will be the a high precision version of \code{a - x}, \code{x}, or \code{b - x}, depending on the value of x and the endpoints.
+
