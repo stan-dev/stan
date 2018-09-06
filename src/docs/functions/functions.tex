@@ -4028,7 +4028,15 @@ A \farg{relative\_tolerance} argument can also be provided for more control over
 
 The return value for the 1D integrator is a \code{real}, the value of the integral.
 
-\subsubsection{Algorithmic details}
+\subsubsection{Zero-crossing integrals}\label{zero-crossing.section}
+
+For numeric stability, integrals on the (possibly infinite) interval $(a, b)$ that cross zero are split into two integrals, one from $(a, 0)$ and one from $(0, b)$. Each integral is separately integrated to the given \farg{relative\_tolerance}.
+
+\subsubsection{Precision loss near limits of integration in definite integrals}\label{precision-loss.section}
+
+When integrating certain definite integrals, there can be significant precision loss in evaluating the integrand near the endpoints. This has to do with the breakdown in precision of double precision floating point values when adding or subtracting a small number from a number much larger than it in magnitude (for instance, \code{1.0 - x}). \farg{xc} (as passed to the integrand) is a high-precision version of the distance between \farg{x} and the definite integral endpoints and can be used to address this issue. More information (and an example where this is useful) is given in the User's Guide. For zero crossing integrals, \farg{xc} will be a high precision version of the distance to the endpoints of the two smaller integrals. For any integral with an endpoint at negative infinity or positive infinity, \farg{xc} is set to \code{NaN}.
+
+\subsubsection{Algorithmic details}\label{algorithmic-details.section}
 Internally the 1D integrator uses the double-exponential methods in the Boost 1D quadrature library. Boost in turn makes use of quadrature methods developed in \citep{Takahasi:1974}, \citep{Mori:1978}, \citep{Bailey:2005}, and \citep{Tanaka:2009}.
 
 The gradients of the integral are computed in accordance with the Leibniz integral rule. Gradients of the integrand are computed internally with Stan's automatic differentiation.
