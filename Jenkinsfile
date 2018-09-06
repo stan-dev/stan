@@ -44,6 +44,8 @@ def deleteDirWin() {
     deleteDir()
 }
 
+String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
+
 pipeline {
     agent none
     parameters {
@@ -53,7 +55,10 @@ pipeline {
         string(defaultValue: 'downstream_tests', name: 'cmdstan_pr',
           description: 'PR to test CmdStan upstream against e.g. PR-630')
     }
-    options { skipDefaultCheckout() }
+    options {
+        skipDefaultCheckout()
+        preserveStashes(buildCount: 7)
+    }
     stages {
         stage('Kill previous builds') {
             when {
@@ -68,7 +73,7 @@ pipeline {
             }
         }
         stage('Linting & Doc checks') {
-            agent { label 'linux' }
+            agent any
             steps {
                 script {
                     retry(3) { checkout scm }
@@ -78,14 +83,12 @@ pipeline {
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
-                        Manuals: { sh "make doc" },
                     )
                 }
             }
             post {
                 always {
                     warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
-                    warnings consoleParsers: [[parserName: 'math-dependencies']], canRunOnFailed: true
                     deleteDir()
                 }
             }
@@ -125,15 +128,17 @@ pipeline {
             post { always { deleteDir() } }
         }
         stage('Upstream CmdStan tests') {
-            when { expression { env.BRANCH_NAME ==~ /PR-\d+/ } }
+            when { expression { env.BRANCH_NAME ==~ /PR-\d+/ ||
+                                env.BRANCH_NAME == "downstream_tests" } }
             steps {
-                build(job: "CmdStan/${params.cmdstan_pr}",
-                      parameters: [string(name: 'stan_pr', value: env.BRANCH_NAME),
-                                    string(name: 'math_pr', value: params.math_pr)])
+                build(job: "CmdStan/${cmdstan_pr()}",
+                      parameters: [string(name: 'stan_pr',
+                                          value: env.BRANCH_NAME == "downstream_tests" ? '' : env.BRANCH_NAME),
+                                   string(name: 'math_pr', value: params.math_pr)])
             }
         }
         stage('Performance') {
-            agent { label 'gelman-group-mac' }
+            agent { label 'master' }
             steps {
                 unstash 'StanSetup'
                 setupCC()
