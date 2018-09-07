@@ -45,7 +45,7 @@ ifneq ($(filter test/test-models/stanc%,$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
-ifneq ($(filter src/test/test-models/good/%.hpp,$(MAKECMDGOALS)),)
+ifneq ($(filter src/test/test-models/good/%.hpp src/test/test-models/good/%.hpp-test,$(MAKECMDGOALS)),)
 -include src/test/test-models/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
