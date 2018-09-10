@@ -289,8 +289,7 @@ namespace stan {
       assgn_r.name("assignment statement");
       assgn_r
         %= identifier_r[set_lhs_var_assgn_f(_val, _1, _pass,
-                                            boost::phoenix::ref(var_map_),
-                                            boost::phoenix::ref(error_msgs_))]
+                                            boost::phoenix::ref(var_map_))]
         >> opt_idxs_r(_r1)
         >> assignment_operator_r
         >> (eps[validate_lhs_var_assgn_f(_val, _r1, _pass,

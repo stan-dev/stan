@@ -992,10 +992,9 @@ namespace stan {
 
 
     void set_lhs_var_assgn::operator()(assgn& a, const std::string& name,
-                                       bool& pass, const variable_map& vm,
-                                       std::ostream& error_msgs) const {
+                                       bool& pass, const variable_map& vm)
+      const {
       if (!vm.exists(name)) {
-        error_msgs << "Unknown variable: " << name << std::endl;
         pass = false;
         return;
       }

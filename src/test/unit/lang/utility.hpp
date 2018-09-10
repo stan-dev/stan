@@ -107,6 +107,19 @@ void test_parsable(const std::string& model_name) {
   SUCCEED();
 }
 
+/** test that model with specified name in folder "good"
+ *  parses without throwing an exception
+ *
+ * @param model_name Name of model to parse
+ */
+std::string test_parse_msgs(const std::string& model_name) {
+  bool result;
+  std::stringstream msgs;
+  SCOPED_TRACE("parsing: " + model_name);
+  result = is_parsable_folder(model_name, "good", &msgs);
+  return msgs.str();
+}
+
 /** test that file with standalone functions with specified name in folder
  * "good-standalone-functions" parses without throwing an exception
  *
