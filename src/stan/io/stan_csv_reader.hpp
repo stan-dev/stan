@@ -156,8 +156,8 @@ namespace stan {
           } else if (name.compare("engine") == 0) {
             metadata.engine = value;
           } else if (name.compare("max_depth") == 0) {
-	    metadata.max_depth = boost::lexical_cast<int>(value);
-	  }
+            metadata.max_depth = boost::lexical_cast<int>(value);
+          }
         }
         if (ss.good() == true)
           return false;
