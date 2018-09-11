@@ -37,50 +37,8 @@ LDLIBS_STANC ?= -Ltest -lstanc
 help:
 	@echo '--------------------------------------------------------------------------------'
 	@echo 'Stan makefile:'
-	@echo '  Current configuration:'
-	@echo '  - OS_TYPE (Operating System): ' $(OS)
-	@echo '  - CXX (Compiler):             ' $(CXX)
-	@echo '  - CXX_TYPE                    ' $(CXX_TYPE)
-	@echo '  - Compiler version:           ' $(CXX_MAJOR).$(CXX_MINOR)
-	@echo '  - O (Optimization Level):     ' $(O)
+	@$(MAKE) print-compiler-flags
 	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
-	@echo '  - MATH                        ' $(MATH)
-	@echo '  - STAN                        ' $(STAN)
-	@echo '  Library configuration:'
-	@echo '  - EIGEN                       ' $(EIGEN)
-	@echo '  - BOOST                       ' $(BOOST)
-	@echo '  - SUNDIALS                    ' $(SUNDIALS)
-	@echo '  - GTEST                       ' $(GTEST)
-	@echo '  - STAN_OPENCL                 ' $(STAN_OPENCL)
-	@echo '  - STAN_MPI                    ' $(STAN_MPI)
-	@echo '  Compiler flags (each can be overriden separately):'
-	@echo '  - CXXFLAGS_LANG               ' $(CXXFLAGS_LANG)
-	@echo '  - CXXFLAGS_WARNINGS           ' $(CXXFLAGS_WARNINGS)
-	@echo '  - CXXFLAGS_BOOST              ' $(CXXFLAGS_BOOST)
-	@echo '  - CXXFLAGS_EIGEN              ' $(CXXFLAGS_EIGEN)
-	@echo '  - CXXFLAGS_OS                 ' $(CXXFLAGS_OS)
-	@echo '  - CXXFLAGS_GTEST              ' $(CXXFLAGS_GTEST)
-	@echo '  - CXXFLAGS_OPENCL             ' $(CXXFLAGS_OPENCL)
-	@echo '  - CXXFLAGS_MPI                ' $(CXXFLAGS_MPI)
-	@echo '  - CFLAGS_SUNDIALS             ' $(CFLAGS_SUNDIALS)
-	@echo '  LDLIBS:'
-	@echo '  - LDLIBS_LANG                 ' $(LDLIBS_LANG)
-	@echo '  - LDLIBS_WARNINGS             ' $(LDLIBS_WARNINGS)
-	@echo '  - LDLIBS_BOOST                ' $(LDLIBS_BOOST)
-	@echo '  - LDLIBS_EIGEN                ' $(LDLIBS_EIGEN)
-	@echo '  - LDLIBS_OS                   ' $(LDLIBS_OS)
-	@echo '  - LDLIBS_GTEST                ' $(LDLIBS_GTEST)
-	@echo '  - LDLIBS_OPENCL               ' $(LDLIBS_OPENCL)
-	@echo '  - LDLIBS_MPI                  ' $(LDLIBS_MPI)
-	@echo '  LDFLAGS:'
-	@echo '  - LDFLAGS_LANG                ' $(LDFLAGS_LANG)
-	@echo '  - LDFLAGS_WARNINGS            ' $(LDFLAGS_WARNINGS)
-	@echo '  - LDFLAGS_BOOST               ' $(LDFLAGS_BOOST)
-	@echo '  - LDFLAGS_EIGEN               ' $(LDFLAGS_EIGEN)
-	@echo '  - LDFLAGS_OS                  ' $(LDFLAGS_OS)
-	@echo '  - LDFLAGS_GTEST               ' $(LDFLAGS_GTEST)
-	@echo '  - LDFLAGS_OPENCL              ' $(LDFLAGS_OPENCL)
-	@echo '  - LDFLAGS_MPI                 ' $(LDFLAGS_MPI)
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Documentation:'
