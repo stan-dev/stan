@@ -28,7 +28,6 @@ TEST(lang, multidim_data_good) {
   } catch (std::exception& e) {
     FAIL();
   }
-  //  std::cout << out.str() << std::endl;
 }
 
 TEST(lang, multidim_data_bad) {

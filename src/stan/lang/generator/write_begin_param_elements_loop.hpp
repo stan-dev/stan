@@ -13,15 +13,12 @@ namespace stan {
   namespace lang {
 
     /**
-     * Generate the openings of a sequence of zero or more for loops
-     * corresponding to all dimensions of a parameter variable, with the
-     * specified indentation level writing to the specified stream.
+     * Generates unconstrained parameter element names in column-major order,
+     * e.g., order for 3-d array of matrices: col, row, d3, d2, d1
+     * Generated code consists of zero of more for loops, one per dimension,
+     * with the specified indentation level writing to the specified stream.
      * If specified, declare named size_t variable for each dimension
      * which avoids re-evaluation of size expression on each iteration.
-     *
-     * Indexing order is column major, nesting is innermost to outermost
-     * e.g., 3-d array of matrices indexing order:  col, row, d3, d2, d1
-     * Specialized matrices are treated as vectors.
      *
      * @param[in] var_decl variable declaration
      * @param[in] declare_size_vars if true, generate size_t var decls
@@ -35,11 +32,13 @@ namespace stan {
       expression arg1(var_decl.type().innermost_type().arg1());
       expression arg2(var_decl.type().innermost_type().arg2());
       if (var_decl.type().innermost_type().is_specialized()) {
+        // num dims for specialized matrices less than N*M
         arg1 = var_decl.type().innermost_type().params_total();
         arg2 = expression(nil());
       }
-      std::vector<expression> ar_var_dims = var_decl.type().array_lens();
 
+      // get values for loop bounds, generate loop bound declarations
+      std::vector<expression> ar_var_dims = var_decl.type().array_lens();
       if (!is_nil(arg2)) {
         generate_indent(indent, o);
         if (declare_size_vars)
