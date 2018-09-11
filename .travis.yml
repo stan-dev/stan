@@ -39,7 +39,22 @@ matrix:
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
-          TESTFOLDER=src/test/unit/lang
+          TESTFOLDER=src/test/unit/lang/ast
+          PARALLEL=2
+    - <<: *linux_clang
+      env:
+        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
+          TESTFOLDER=src/test/unit/lang/generator
+          PARALLEL=2
+    - <<: *linux_clang
+      env:
+        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
+          TESTFOLDER=src/test/unit/lang/parser
+          PARALLEL=2
+    - <<: *linux_clang
+      env:
+        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
+          TESTFOLDER=src/test/unit/lang/reject
           PARALLEL=2
     - <<: *linux_clang
       env:
@@ -60,6 +75,16 @@ matrix:
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
           TESTFOLDER="src/test/unit/lang/*.cpp"
+          PARALLEL=1
+    - <<: *linux_gcc
+      env:
+        - MATRIX_EVAL="CXX=g++-4.9"
+          TESTFOLDER=src/test/unit/lang/ast
+          PARALLEL=1
+    - <<: *linux_gcc
+      env:
+        - MATRIX_EVAL="CXX=g++-4.9"
+          TESTFOLDER=src/test/unit/lang/generator
           PARALLEL=1
     - <<: *linux_gcc
       env:
