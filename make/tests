@@ -20,6 +20,7 @@ src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
 src/test/%.d : INC_FIRST += -I $(if $(STAN),$(STAN),.)
 src/test/%.d : INC += $(INC_GTEST)
+
 ##
 # for the test Stan programs
 ##
@@ -28,7 +29,7 @@ src/test/test-models/good-standalone-functions/%.d : DEPFLAGS = -MT test/test-mo
 src/test/%.d : DEPFLAGS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@ -MM -MG -MP -MF $@
 
 ## this is for the $(STANC_TEMPLATE_INSTANTIATION) files
-src/stan/%.d : DEPFLAGS = -MT test/test-models/stanc$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@ -MM -MG -MP -MF $@
+src/stan/%.d : DEPFLAGS = -MT test/test-models/stanqc$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@ -MM -MG -MP -MF $@
 
 
 ifneq ($(filter test/%$(EXE),$(MAKECMDGOALS)),)
@@ -45,7 +46,7 @@ ifneq ($(filter test/test-models/stanc%,$(MAKECMDGOALS)),)
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
-ifneq ($(filter src/test/test-models/good/%.hpp src/test/test-models/good/%.hpp-test,$(MAKECMDGOALS)),)
+ifneq ($(filter test/test-models/good/%.hpp test/test-models/good/%.hpp-test,$(MAKECMDGOALS)),)
 -include src/test/test-models/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
@@ -99,8 +100,8 @@ test-headers: $(HEADER_TESTS)
 # compiles
 ##
 .PHONY: %.hpp-test
-src/test/test-models/good/%.hpp-test : O = 0
-src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp test/test-model-main.cpp
+test/test-models/good/%.hpp-test : O = 0
+test/test-models/good/%.hpp-test : test/test-models/good/%.hpp test/test-model-main.cpp
 	$(COMPILE.cpp) -o $(DEV_NULL) -include $^
 
 test/test-model-main.cpp:
@@ -131,7 +132,6 @@ test/test-model-main.cpp:
 # Adding a test for multiple translation units. If this fails,
 # a new function is probably missing an inline
 ##
-
 ifneq ($(OS),Windows_NT)
 test/unit/multiple_translation_units%.o : CXXFLAGS += -fPIC
 endif
@@ -148,7 +148,6 @@ test/unit/multiple_translation_units_test$(EXE) : test/unit/libmultiple.so
 ##
 # Use the stanc compiler to generate C++ from Stan programs
 ##
-
 test/test-models/stanc$(EXE) : O = $(O_STANC)
 test/test-models/stanc$(EXE) : test/libstanc.a
 test/test-models/stanc$(EXE) : LDLIBS += $(LDLIBS_STANC)
@@ -157,7 +156,7 @@ test/test-models/stanc$(EXE) : %$(EXE) : %.o
 	$(LINK.cpp) $< $(LDLIBS) $(OUTPUT_OPTION)
 
 TEST_MODELS = $(shell find src/test/test-models -type f -name '*.stan')
-$(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$(EXE)
+$(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/test-models/%.stan test/test-models/stanc$(EXE)
 	@mkdir -p $(dir $@)
 	$(WINE) test/test-models/stanc$(EXE) $< --o=$@
 
@@ -165,7 +164,7 @@ $(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$
 # Generate C++ from Stan standalone functions
 ##
 TEST_FUNCTIONS = $(shell find src/test/test-models -type f -name '*.stanfuncs')
-$(patsubst %.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : %.hpp : %.stanfuncs test/test-models/stanc$(EXE)
+$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs test/test-models/stanc$(EXE)
 	@mkdir -p $(dir $@)
 	$(WINE) test/test-models/stanc$(EXE) $< --o=$@
 
@@ -189,7 +188,7 @@ test/unit/lang/stanc_helper_test.o: change-file-permissions
 # Add additional dependencies for tests that should translate Stan to hpp, but
 # isn't included in the source using `#include`.
 ##
-test/unit/lang/parser_generator_test$(EXE): $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
+test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 
 ##
 # Compile models depends on every model within
@@ -197,10 +196,10 @@ test/unit/lang/parser_generator_test$(EXE): $(patsubst %.stan,%.hpp,$(shell find
 # be code-generated to a *.hpp, then passed through
 # the compiler using the -fsyntax-only flag
 ##
-test/integration/compile_models_test$(EXE): $(patsubst %.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
+test/integration/compile_models_test$(EXE): $(patsubst src/%.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
 
 ##
 # Same trick as above for models, but for standalone functions, using
 # "src/test/test-models/good-standalone-functions/*.stanfuncs"
 ##
-test/integration/compile_standalone_functions_test$(EXE): $(patsubst %.stanfuncs,%.hpp-test,$(shell find src/test/test-models/good-standalone-functions -type f -name '*.stanfuncs'))
+test/integration/compile_standalone_functions_test$(EXE): $(patsubst src/%.stanfuncs,%.hpp-test,$(shell find src/test/test-models/good-standalone-functions -type f -name '*.stanfuncs'))
