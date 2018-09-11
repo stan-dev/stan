@@ -64,9 +64,23 @@ help:
 	@echo '  - CXXFLAGS_MPI                ' $(CXXFLAGS_MPI)
 	@echo '  - CFLAGS_SUNDIALS             ' $(CFLAGS_SUNDIALS)
 	@echo '  LDLIBS:'
-	@echo '    $(LDLIBS)'
+	@echo '  - LDLIBS_LANG                 ' $(LDLIBS_LANG)
+	@echo '  - LDLIBS_WARNINGS             ' $(LDLIBS_WARNINGS)
+	@echo '  - LDLIBS_BOOST                ' $(LDLIBS_BOOST)
+	@echo '  - LDLIBS_EIGEN                ' $(LDLIBS_EIGEN)
+	@echo '  - LDLIBS_OS                   ' $(LDLIBS_OS)
+	@echo '  - LDLIBS_GTEST                ' $(LDLIBS_GTEST)
+	@echo '  - LDLIBS_OPENCL               ' $(LDLIBS_OPENCL)
+	@echo '  - LDLIBS_MPI                  ' $(LDLIBS_MPI)
 	@echo '  LDFLAGS:'
-	@echo '    $(LDFLAGS)'
+	@echo '  - LDFLAGS_LANG                ' $(LDFLAGS_LANG)
+	@echo '  - LDFLAGS_WARNINGS            ' $(LDFLAGS_WARNINGS)
+	@echo '  - LDFLAGS_BOOST               ' $(LDFLAGS_BOOST)
+	@echo '  - LDFLAGS_EIGEN               ' $(LDFLAGS_EIGEN)
+	@echo '  - LDFLAGS_OS                  ' $(LDFLAGS_OS)
+	@echo '  - LDFLAGS_GTEST               ' $(LDFLAGS_GTEST)
+	@echo '  - LDFLAGS_OPENCL              ' $(LDFLAGS_OPENCL)
+	@echo '  - LDFLAGS_MPI                 ' $(LDFLAGS_MPI)
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Documentation:'
