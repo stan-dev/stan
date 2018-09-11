@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 
+#include <boost/tokenizer.hpp>
 
 /**
  * Print the version of stanc with major, minor and patch.
@@ -227,6 +228,35 @@ inline int stanc_helper(int argc, const char* argv[],
 
     std::vector<std::string> include_paths;
     include_paths.push_back("");
+
+    if (cmd.has_key("include_paths")) {
+      std::string extra_path_str;      
+      cmd.val("include_paths", extra_path_str);
+
+      // extra_path_els is given explicitly so that multiple quote
+      // characters (in this case single and double quotes) can be
+      // used.
+      boost::escaped_list_separator<char> extra_path_els("\\", // escape char
+                                                         ",",  // delimiter
+                                                         "\"'" // quote chars
+                                                         );
+      
+      boost::tokenizer<
+        boost::escaped_list_separator<char>
+        > extra_path_tokenizer(extra_path_str, extra_path_els);
+
+      std::cout << "Include paths:\n";
+      for (const auto & inc_path : extra_path_tokenizer) {
+        if (!inc_path.empty()) {
+          include_paths.push_back(inc_path);
+
+          // Using include_paths.back() instead of inc_path to check
+          // that what is appended to include_paths is actually what
+          // inc_path is supposed to be.
+          std::cout << "    " << include_paths.back() << "\n";
+        }
+      }
+    }
 
     bool allow_undefined = cmd.has_flag("allow_undefined");
 
