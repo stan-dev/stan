@@ -183,7 +183,7 @@ else
 	chmod 555 src/test/test-models/bad/read_only
 endif
 
-src/test/unit/lang/stanc_helper_test.cpp: change-file-permissions
+test/unit/lang/stanc_helper_test.o: change-file-permissions
 
 ##
 # Add additional dependencies for tests that should translate Stan to hpp, but
