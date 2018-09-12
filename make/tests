@@ -29,19 +29,19 @@ src/test/test-models/good-standalone-functions/%.d : DEPFLAGS = -MT test/test-mo
 src/test/%.d : DEPFLAGS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@ -MM -MG -MP -MF $@
 
 ## this is for the $(STANC_TEMPLATE_INSTANTIATION) files
-src/stan/%.d : DEPFLAGS = -MT test/test-models/stanqc$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@ -MM -MG -MP -MF $@
+src/stan/%.d : DEPFLAGS = -MT test/test-models/stanc$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@ -MM -MG -MP -MF $@
 
 
 ifneq ($(filter test/%$(EXE),$(MAKECMDGOALS)),)
 -include $(patsubst test/%$(EXE),src/test/%.d,$(filter test/%,$(MAKECMDGOALS)))
 endif
 
-ifneq ($(filter test/unit/lang/%,$(MAKECMDGOALS)),)
+ifneq ($(filter test/unit/lang/%$(EXE),$(MAKECMDGOALS)),)
 -include src/test/test-models/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
-ifneq ($(filter test/test-models/stanc%,$(MAKECMDGOALS)),)
+ifneq ($(filter test/test-models/stanc$(EXE) test/test-models/stanc.o,$(MAKECMDGOALS)),)
 -include src/test/test-models/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
