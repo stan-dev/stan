@@ -1,6 +1,7 @@
 #ifndef STAN_COMMAND_STANC_HELPER_HPP
 #define STAN_COMMAND_STANC_HELPER_HPP
 
+#include <boost/tokenizer.hpp>
 #include <stan/version.hpp>
 #include <stan/lang/compiler.hpp>
 #include <stan/lang/compile_functions.hpp>
@@ -11,8 +12,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <boost/tokenizer.hpp>
 
 /**
  * Print the version of stanc with major, minor and patch.
@@ -230,17 +229,16 @@ inline int stanc_helper(int argc, const char* argv[],
     include_paths.push_back("");
 
     if (cmd.has_key("include_paths")) {
-      std::string extra_path_str;      
+      std::string extra_path_str;
       cmd.val("include_paths", extra_path_str);
 
       // extra_path_els is given explicitly so that multiple quote
       // characters (in this case single and double quotes) can be
       // used.
-      boost::escaped_list_separator<char> extra_path_els("\\", // escape char
-                                                         ",",  // delimiter
-                                                         "\"'" // quote chars
-                                                         );
-      
+      boost::escaped_list_separator<char> extra_path_els("\\",
+                                                         ",",
+                                                         "\"'");
+
       boost::tokenizer<
         boost::escaped_list_separator<char>
         > extra_path_tokenizer(extra_path_str, extra_path_els);
