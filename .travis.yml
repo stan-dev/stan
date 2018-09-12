@@ -39,22 +39,22 @@ matrix:
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
-          TESTFOLDER=src/test/unit/lang/ast
+          TESTFOLDER="src/test/unit/lang/ast"
           PARALLEL=2
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
-          TESTFOLDER=src/test/unit/lang/generator
+          TESTFOLDER="src/test/unit/lang/generator"
           PARALLEL=2
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
-          TESTFOLDER=src/test/unit/lang/parser
+          TESTFOLDER="src/test/unit/lang/parser"
           PARALLEL=2
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS=-stdlib=libc++"
-          TESTFOLDER=src/test/unit/lang/reject
+          TESTFOLDER="src/test/unit/lang/reject"
           PARALLEL=2
     - <<: *linux_clang
       env:
@@ -79,22 +79,22 @@ matrix:
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
-          TESTFOLDER=src/test/unit/lang/ast
+          TESTFOLDER="src/test/unit/lang/ast"
           PARALLEL=1
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
-          TESTFOLDER=src/test/unit/lang/generator
+          TESTFOLDER="src/test/unit/lang/generator"
           PARALLEL=1
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
-          TESTFOLDER=src/test/unit/lang/parser
+          TESTFOLDER="src/test/unit/lang/parser"
           PARALLEL=1
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
-          TESTFOLDER=src/test/unit/lang/reject
+          TESTFOLDER="src/test/unit/lang/reject"
           PARALLEL=1
     - <<: *linux_gcc
       env:
@@ -109,7 +109,7 @@ matrix:
     - <<: *linux_gcc
       env:
         - MATRIX_EVAL="CXX=g++-4.9"
-          TESTFOLDER=src/test/unit/variational
+          TESTFOLDER="src/test/unit/variational"
           PARALLEL=1
 
 
