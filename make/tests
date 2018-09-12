@@ -47,6 +47,8 @@ ifneq ($(filter test/test-models/stanc$(EXE) test/test-models/stanc.o,$(MAKECMDG
 endif
 
 ifneq ($(filter test/test-models/good/%.hpp test/test-models/good/%.hpp-test,$(MAKECMDGOALS)),)
+GENERATED_STAN_TARGETS=$(filter test/test-models/good/%.hpp test/test-models/good/%.hpp-test,$(MAKECMDGOALS))
+-include $(patsubst %.hpp-test,src/%.d,$(GENERATED_STAN_TARGETS)), $(patsubst %.hpp,src/%.d,$(GENERATED_STAN_TARGETS))
 -include src/test/test-models/stanc.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
