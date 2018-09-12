@@ -161,6 +161,9 @@ for (const auto& t : all_vector_types) {
 for (const auto& t : vector_types) {
   for (const auto& u : vector_types) {
     for (const auto& v : all_vector_types) {
+      add("beta_proportion_ccdf_log", expr_type(double_type()), t, u, v);
+      add("beta_proportion_cdf_log", expr_type(double_type()), t, u, v);
+      add("beta_proportion_log", expr_type(double_type()), t, u, v);
       add("beta_proportion_lccdf", expr_type(double_type()), t, u, v);
       add("beta_proportion_lcdf", expr_type(double_type()), t, u, v);
       add("beta_proportion_lpdf", expr_type(double_type()), t, u, v);

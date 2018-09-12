@@ -2600,24 +2600,24 @@ distribution requires $\mu \in (0, 1)$ and strictly positive parameter, $\kappa 
 \begin{description}
 %
   \fitem{real}{beta\_proportion\_lpdf}{reals \farg{theta} \textbar\
-    reals \farg{mu}, reals \farg{kappa}}{The log of the beta density
-    given \code{theta} in $(0,1)$, mean \farg{mu}, and
+    reals \farg{mu}, reals \farg{kappa}}{The log of the beta\_proportion density
+    of \code{theta} in $(0,1)$ given mean \farg{mu} and
     precision \farg{kappa}}
 %
   \fitem{real}{beta\_proportion\_lcdf}{reals \farg{theta} \textbar\
-    reals \farg{mu}, reals \farg{kappa}}{The log of the beta
+    reals \farg{mu}, reals \farg{kappa}}{The log of the beta\_proportion
     cumulative distribution function of \code{theta} in $(0,1)$ given
     mean \farg{mu} and precision \farg{kappa}}
 %
   \fitem{real}{beta\_proportion\_lccdf}{reals \farg{theta} \textbar\ reals
-    \farg{mu}, reals \farg{kappa}}{The log of the beta complementary
+    \farg{mu}, reals \farg{kappa}}{The log of the beta\_proportion complementary
     cumulative distribution function of \code{theta} in $(0,1)$ given
     mean \farg{mu} and precision \farg{kappa}}
 \end{description}
 %
 \begin{description}
   \fitem{R}{beta\_proportion\_rng}{reals \farg{mu}, reals
-    \farg{kappa}}{Generate a beta variate with mean \farg{mu} and
+    \farg{kappa}}{Generate a beta\_proportion variate with mean \farg{mu} and
     precision \farg{kappa}; may only be used in generated quantities
     block.  For a description of argument and return types, see
     \refsection{prng-vectorization}.}
