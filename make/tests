@@ -24,12 +24,12 @@ src/test/%.d : INC += $(INC_GTEST)
 ##
 # for the test Stan programs
 ##
-src/test/test-models/good/%.d : DEPFLAGS = -MT test/test-models/stanc$(EXE) -MT $(patsubst %.d,%.hpp,$@) -MM -MG -MP -MF $@
-src/test/test-models/good-standalone-functions/%.d : DEPFLAGS = -MT test/test-models/stanc$(EXE) -MT $(patsubst %.d,%.hpp,$@) -MM -MG -MP -MF $@
-src/test/%.d : DEPFLAGS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@ -MM -MG -MP -MF $@
+src/test/test-models/good/%.d : DEPTARGETS = -MT test/test-models/stanc$(EXE) -MT $(patsubst %.d,%.hpp,$@) -MM -MG -MP -MF $@
+src/test/test-models/good-standalone-functions/%.d : DEPTARGETS = -MT test/test-models/stanc$(EXE) -MT $(patsubst %.d,%.hpp,$@)
+src/test/%.d : DEPTARGETS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@
 
 ## this is for the $(STANC_TEMPLATE_INSTANTIATION) files
-src/stan/%.d : DEPFLAGS = -MT test/test-models/stanc$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@ -MM -MG -MP -MF $@
+src/stan/%.d : DEPTARGETS = -MT test/test-models/stanc$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@
 
 
 ifneq ($(filter test/%$(EXE),$(MAKECMDGOALS)),)
