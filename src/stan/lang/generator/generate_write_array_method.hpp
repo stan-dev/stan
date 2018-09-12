@@ -88,6 +88,7 @@ namespace stan {
 
       generate_comment("write transformed parameters", 3, o);
       o << INDENT3 << "if (include_tparams__) {" << EOL;
+      vis_writer.indent_ = 4;
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
         boost::apply_visitor(vis_writer, prog.derived_decl_.first[i].decl_);
       o << INDENT3 << "}" << EOL;
@@ -106,6 +107,7 @@ namespace stan {
       o << EOL;
 
       generate_comment("write generated quantities", 3, o);
+      vis_writer.indent_ = 3;
       for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
         boost::apply_visitor(vis_writer, prog.generated_decl_.first[i].decl_);
       if (prog.generated_decl_.first.size() > 0)
