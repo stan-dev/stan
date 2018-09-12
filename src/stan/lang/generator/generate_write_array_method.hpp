@@ -73,6 +73,8 @@ namespace stan {
         << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
+      o << INDENT2 << "if (!include_tparams__ && !include_gqs__) return;"
+        << EOL2;
 
       generate_try(2, o);
       generate_local_var_decls(prog.derived_decl_.first, 3, o);
