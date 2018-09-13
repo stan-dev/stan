@@ -1898,13 +1898,16 @@ namespace stan {
                    << fx.function_name_ << std::endl;
         pass = false;
       }
-      expr_type sys_result_type(double_type(), 0);
-      std::vector<function_arg_type> sys_arg_types;
-      sys_arg_types.push_back(function_arg_type(expr_type(double_type(), 0)));
-      sys_arg_types.push_back(function_arg_type(expr_type(double_type(), 0)));
-      sys_arg_types.push_back(function_arg_type(expr_type(double_type(), 1)));
-      sys_arg_types.push_back(function_arg_type(expr_type(double_type(), 1)));
-      sys_arg_types.push_back(function_arg_type(expr_type(int_type(), 1)));
+      double_type t_double;
+      bare_expr_type sys_result_type(t_double);
+      std::vector<bare_expr_type> sys_arg_types;
+      sys_arg_types.push_back(bare_expr_type(t_double));
+      sys_arg_types.push_back(bare_expr_type(t_double));
+      sys_arg_types.push_back(bare_expr_type(
+                              bare_array_type(double_type(), 1)));
+      sys_arg_types.push_back(bare_expr_type(
+                              bare_array_type(double_type(), 1)));
+      sys_arg_types.push_back(bare_expr_type(bare_array_type(int_type(), 1)));
       function_signature_t system_signature(sys_result_type, sys_arg_types);
       if (!function_signatures::instance()
           .is_defined(fx.function_name_, system_signature)) {
@@ -1916,54 +1919,54 @@ namespace stan {
       }
 
       // (2) lower bound of integration
-      if (!fx.lb_.expression_type().is_primitive()) {
+      if (!fx.lb_.bare_type().is_primitive()) {
         pass = false;
         error_msgs << "second argument to integrate_1d, the lower bound of"
                    << " integration, must have type int or real;"
-                   << " found type = " << fx.lb_.expression_type() << "."
+                   << " found type = " << fx.lb_.bare_type() << "."
                    << std::endl;
       }
 
       // (3) lower bound of integration
-      if (!fx.ub_.expression_type().is_primitive()) {
+      if (!fx.ub_.bare_type().is_primitive()) {
         pass = false;
         error_msgs << "third argument to integrate_1d, the upper bound of"
                    << " integration, must have type int or real;"
-                   << " found type = " << fx.ub_.expression_type() << "."
+                   << " found type = " << fx.ub_.bare_type() << "."
                    << std::endl;
       }
 
       // (4) parameters
-      if (fx.theta_.expression_type() != expr_type(double_type(), 1)) {
+      if (fx.theta_.bare_type() != bare_array_type(double_type(), 1)) {
         pass = false;
         error_msgs << "fourth argument to integrate_1d, the parameters,"
                    << " must have type real[];"
-                   << " found type = " << fx.theta_.expression_type() << "."
+                   << " found type = " << fx.theta_.bare_type() << "."
                    << std::endl;
       }
 
       // (5) real data
-      if (fx.x_r_.expression_type() != expr_type(double_type(), 1)) {
+      if (fx.x_r_.bare_type() != bare_array_type(double_type(), 1)) {
         pass = false;
         error_msgs << "fifth argument to integrate_1d, the real data,"
                    << " must have type real[]; found type = "
-                   << fx.x_r_.expression_type() << "." << std::endl;
+                   << fx.x_r_.bare_type() << "." << std::endl;
       }
 
       // (6) int data
-      if (fx.x_i_.expression_type() != expr_type(int_type(), 1)) {
+      if (fx.x_i_.bare_type() != bare_array_type(int_type(), 1)) {
         pass = false;
         error_msgs << "sixth argument to integrate_1d, the integer data,"
                    << " must have type int[]; found type = "
-                   << fx.x_i_.expression_type() << "." << std::endl;
+                   << fx.x_i_.bare_type() << "." << std::endl;
       }
 
       // (7) relative tolerance
-      if (!fx.rel_tol_.expression_type().is_primitive()) {
+      if (!fx.rel_tol_.bare_type().is_primitive()) {
         pass = false;
         error_msgs << "seventh argument to integrate_1d, relative tolerance,"
                    << " must be of type int or real;  found type = "
-                   << fx.rel_tol_.expression_type() << "." << std::endl;
+                   << fx.rel_tol_.bare_type() << "." << std::endl;
       }
 
 
