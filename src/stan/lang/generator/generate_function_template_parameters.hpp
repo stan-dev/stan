@@ -3,7 +3,6 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/has_only_int_args.hpp>
 #include <ostream>
 
 namespace stan {
@@ -22,7 +21,7 @@ namespace stan {
     void generate_function_template_parameters(const function_decl_def& fun,
                                                bool is_rng, bool is_lp,
                                                bool is_log, std::ostream& out) {
-      if (!has_only_int_args(fun)) {  // other cases handled below
+      if (!fun.has_only_int_args()) {  // other cases handled below
         out << "template <";
         bool continuing_tps = false;
         if (is_log) {
@@ -30,8 +29,8 @@ namespace stan {
           continuing_tps = true;
         }
         for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
-          // no template parameter for int-based args
-          if (!fun.arg_decls_[i].arg_type_.base_type_.is_int_type()) {
+          // no template parameter for int based args
+          if (!fun.arg_decls_[i].bare_type().innermost_type().is_int_type()) {
             if (continuing_tps)
               out << ", ";
             out << "typename T" << i << "__";
