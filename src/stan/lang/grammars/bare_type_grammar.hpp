@@ -17,28 +17,36 @@ namespace stan {
     template <typename Iterator>
     struct bare_type_grammar
       : boost::spirit::qi::grammar<Iterator,
-                                   expr_type(),
+                                   bare_expr_type(),
                                    whitespace_grammar<Iterator> > {
-      variable_map& var_map_;  // global info for function defs
       std::stringstream& error_msgs_;
 
-      bare_type_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs);
+      bare_type_grammar(std::stringstream& error_msgs);
 
       boost::spirit::qi::rule<Iterator,
-                              expr_type(),
+                              bare_expr_type(),
                               whitespace_grammar<Iterator> >
       bare_type_r;
 
       boost::spirit::qi::rule<Iterator,
-                              base_expr_type(),
+                              bare_expr_type(),
+                              whitespace_grammar<Iterator> >
+      array_bare_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              bare_expr_type(),
+                              whitespace_grammar<Iterator> >
+      single_bare_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              bare_expr_type(),
                               whitespace_grammar<Iterator> >
       type_identifier_r;
 
       boost::spirit::qi::rule<Iterator,
                               size_t(),
                               whitespace_grammar<Iterator> >
-      array_dims_r;
+      bare_dims_r;
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::unused_type,

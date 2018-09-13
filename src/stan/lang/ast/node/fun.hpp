@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_FUN_HPP
 #define STAN_LANG_AST_NODE_FUN_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <string>
 #include <vector>
 
@@ -34,7 +34,7 @@ namespace stan {
       /**
        * Type of result of applying function to arguments.
        */
-      expr_type type_;
+      bare_expr_type type_;
 
       /**
        * Construct a default function object.
@@ -44,6 +44,8 @@ namespace stan {
       /**
        * Construct a function object with the specified name and
        * arguments. 
+       * Note:  value of member `type_` not set by constructor;
+       * filled in after via lookup in `stan::lang::function_signatures`
        *
        * @param name name of function
        * @param args sequence of arguments to function
