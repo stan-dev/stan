@@ -3,9 +3,9 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/constrained_param_names_visgen.hpp>
-#include <boost/variant/apply_visitor.hpp>
+#include <stan/lang/generator/generate_param_names_array.hpp>
 #include <ostream>
+#include <vector>
 
 namespace stan {
   namespace lang {
@@ -28,19 +28,19 @@ namespace stan {
         << "                             bool include_gqs__ = true) const {"
         << EOL << INDENT2
         << "std::stringstream param_name_stream__;" << EOL;
-      constrained_param_names_visgen vis1(1, o);
-      constrained_param_names_visgen vis2(2, o);
       for (size_t i = 0; i < prog.parameter_decl_.size(); ++i)
-        boost::apply_visitor(vis1, prog.parameter_decl_[i].decl_);
+        generate_param_names_array(2, o, prog.parameter_decl_[i]);
       o << EOL << INDENT2
         << "if (!include_gqs__ && !include_tparams__) return;" << EOL;
+
       o << EOL << INDENT2 << "if (include_tparams__) {"  << EOL;
       for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i)
-        boost::apply_visitor(vis2, prog.derived_decl_.first[i].decl_);
-      o << INDENT2 << "}" << EOL2;
+        generate_param_names_array(3, o, prog.derived_decl_.first[i]);
+      o << INDENT2 << "}" << EOL;
+
       o << EOL << INDENT2 << "if (!include_gqs__) return;" << EOL;
       for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i)
-        boost::apply_visitor(vis1, prog.generated_decl_.first[i].decl_);
+        generate_param_names_array(2, o, prog.generated_decl_.first[i]);
       o << INDENT << "}" << EOL2;
     }
 

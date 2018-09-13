@@ -13,7 +13,7 @@ namespace stan {
      * @param[in, out] o stream for generating
      */
     void generate_namespace_end(std::ostream& o) {
-      o << "}" << EOL2;
+      o << "}  // namespace" << EOL2;
     }
 
   }
