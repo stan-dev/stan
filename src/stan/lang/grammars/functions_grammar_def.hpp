@@ -11,13 +11,13 @@
 #include <vector>
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::function_decl_def,
-                          (stan::lang::expr_type, return_type_)
+                          (stan::lang::bare_expr_type, return_type_)
                           (std::string, name_)
-                          (std::vector<stan::lang::arg_decl>, arg_decls_)
+                          (std::vector<stan::lang::var_decl>, arg_decls_)
                           (stan::lang::statement, body_) )
 
-BOOST_FUSION_ADAPT_STRUCT(stan::lang::arg_decl,
-                          (stan::lang::expr_type, arg_type_)
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::var_decl,
+                          (stan::lang::bare_expr_type, bare_type_)
                           (std::string, name_) )
 
 namespace stan {
@@ -33,7 +33,7 @@ namespace stan {
         functions_defined_(),
         error_msgs_(error_msgs),
         statement_g(var_map_, error_msgs_),
-        bare_type_g(var_map_, error_msgs_) {
+        bare_type_g(error_msgs_) {
       using boost::spirit::qi::_1;
       using boost::spirit::qi::char_;
       using boost::spirit::qi::eps;
@@ -92,12 +92,12 @@ namespace stan {
       arg_decl_r.name("function argument declaration");
       arg_decl_r
         %= -(lit("data")[set_data_origin_f(_a)])
-        >> bare_type_g[validate_non_void_arg_f(_1, _pass,
+        >> bare_type_g[validate_non_void_arg_f(_1, _a, _pass,
                        boost::phoenix::ref(error_msgs_))]
         > identifier_r
-        > eps[add_fun_var_f(_val, _a, _pass,
-                            boost::phoenix::ref(var_map_),
-                            boost::phoenix::ref(error_msgs_))];
+        > eps[add_fun_arg_var_f(_val, _a, _pass,
+                                boost::phoenix::ref(var_map_),
+                                boost::phoenix::ref(error_msgs_))];
 
       identifier_r.name("identifier");
       identifier_r
