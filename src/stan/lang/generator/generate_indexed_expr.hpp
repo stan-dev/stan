@@ -31,7 +31,7 @@ namespace stan {
     template <bool isLHS>
     void generate_indexed_expr(const std::string& expr,
                                const std::vector<expression>& indexes,
-                               base_expr_type base_type, size_t e_num_dims,
+                               bare_expr_type base_type, size_t e_num_dims,
                                bool user_facing, std::ostream& o) {
       if (user_facing) {
         generate_indexed_expr_user(expr, indexes, o);

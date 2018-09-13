@@ -13,12 +13,12 @@ namespace stan {
       : expr_(e), dist_(dist), is_discrete_(false) { }
 
     bool sample::is_ill_formed() const {
-        return expr_.expression_type().is_ill_formed()
+        return expr_.bare_type().is_ill_formed_type()
           || (truncation_.has_low()
-              && expr_.expression_type() != truncation_.low_.expression_type())
+              && expr_.bare_type() != truncation_.low_.bare_type())
           || (truncation_.has_high()
-               && expr_.expression_type()
-                  != truncation_.high_.expression_type());
+               && expr_.bare_type()
+                  != truncation_.high_.bare_type());
     }
 
     bool sample::is_discrete() const {

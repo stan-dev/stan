@@ -1,7 +1,6 @@
 #ifndef STAN_LANG_AST_NODE_MAP_RECT_DEF_HPP
 #define STAN_LANG_AST_NODE_MAP_RECT_DEF_HPP
 
-#include <stan/lang/ast/node/map_rect.hpp>
 #include <stan/lang/ast.hpp>
 #include <string>
 
