@@ -87,7 +87,7 @@ namespace stan {
 
       o << INDENT3 << "if (!include_gqs__ && !include_tparams__) return;"
         << EOL;
-      
+
       if (prog.derived_decl_.first.size() > 0) {
         generate_comment("validate transformed parameters", 3, o);
         o << INDENT3
@@ -97,6 +97,7 @@ namespace stan {
           << "(void) function__;  // dummy to suppress unused var warning"
           << EOL;
         o << EOL;
+
         for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
           block_var_decl bvd = prog.derived_decl_.first[i];
           if (bvd.type().innermost_type().is_constrained()) {
