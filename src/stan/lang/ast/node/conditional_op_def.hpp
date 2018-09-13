@@ -13,8 +13,8 @@ namespace stan {
                                    const expression& true_val,
                                    const expression& false_val)
       : cond_(cond), true_val_(true_val), false_val_(false_val),
-        type_(promote_primitive(true_val.expression_type(),
-                                false_val.expression_type())),
+        type_(promote_primitive(true_val.bare_type(),
+                                false_val.bare_type())),
         has_var_(false), scope_() {
     }
 

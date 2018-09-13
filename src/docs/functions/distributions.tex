@@ -389,11 +389,11 @@ regression.
 
 \subsubsection{Probability Mass Function}
 
-If $\alpha \in \reals$, then for $c \in \setlist{0,1}$,
+If $\alpha \in \reals$, then for $y \in \setlist{0,1}$,
 \[
-\distro{BernoulliLogit}(c|\alpha)
+\distro{BernoulliLogit}(y|\alpha)
 =
-\distro{Bernoulli}(c|\mbox{logit}^{-1}(\alpha))
+\distro{Bernoulli}(y|\mbox{logit}^{-1}(\alpha))
 =
 \left\{
 \begin{array}{ll}
@@ -423,6 +423,72 @@ If $\alpha \in \reals$, then for $c \in \setlist{0,1}$,
     quantities block.  For a description of argument and return types,
     see \refsection{prng-vectorization}.}
 \end{description}
+
+\section{Bernoulli-Logit Generalised Linear Model (Logistic Regression)}
+\label{bernoulli-logit-glm.section}
+
+Stan also supplies a single primitive for a Generalised Linear Model with
+Bernoulli likelihood and logit link function, i.e. a primitive for a
+logistic regression.
+This should provide a more efficient implementation of logistic regression
+than a manually written regression in terms of a Bernoulli likelihood
+and matrix multiplication.
+
+\subsubsection{Probability Mass Function}
+
+If $x\in \reals^{n\cdot m}, \alpha \in \reals^n, \beta\in \reals^m$, then for
+$y \in \setlist{0,1}^n$,
+\begin{align*}
+&\distro{BernoulliLogitGLM}(y|x, \alpha, \beta)
+=
+\prod_{1\leq i \leq n}\distro{Bernoulli}(y_i|\mbox{logit}^{-1}(\alpha_i +
+x_i\cdot \beta))\\
+&= \prod_{1\leq i \leq n}
+\left\{
+\begin{array}{ll}
+\mbox{logit}^{-1}(\alpha_i + \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) &
+\mbox{if } y_i = 1, \mbox{ and}
+\\
+1 - \mbox{logit}^{-1}(\alpha_i + \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) &
+\mbox{if } y_i = 0.
+\end{array}
+\right.
+\end{align*}
+
+\pitemdisc{y}{bernoulli\_logit\_glm}{x, alpha, beta}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{bernoulli\_logit\_glm\_lpmf}{int[] \farg{y} \textbar\ matrix
+\farg{x}, real \farg{alpha}, vector \farg{beta}}{The
+  log Bernoulli probability mass of \farg{y} given chance of success
+  \code{inv\_logit(\farg{alpha}\,+\,\farg{x}\,*\,\farg{beta})}, where a
+  constant intercept \code{\farg{alpha}} is used for all observations.
+  The number of rows of the independent variable matrix \code{\farg{x}} needs to
+  match the length of the dependent variable vector \code{\farg{y}} and
+  the number of columns of \code{\farg{x}} needs to match the length of
+  the weight vector \code{\farg{beta}}.}
+%
+\end{description}
+
+\begin{description}
+%
+\fitem{real}{bernoulli\_logit\_glm\_lpmf}{int[] \farg{y} \textbar\ matrix
+  \farg{x}, vector \farg{alpha}, vector \farg{beta}}{The
+  log Bernoulli probability mass of \farg{y} given chance of success
+  \code{inv\_logit(\farg{alpha}\,+\,\farg{x}\,*\,\farg{beta})}, where an
+  intercept \code{\farg{alpha}} is used that is allowed to vary with the different
+  observations.
+  The number of rows of the independent variable matrix \code{\farg{x}} needs
+  to match the length of the dependent variable vector 
+  \code{\farg{y}} and \code{\farg{alpha}}  and
+  the number of columns of \code{\farg{x}} needs to match the length of
+  the weight vector \code{\farg{beta}}.}
+%
+\end{description}
+
 
 
 \chapter{Bounded Discrete Distributions}\label{betafun.chapter}
@@ -992,7 +1058,7 @@ for it.
 
 \pitemdisc{y}{neg\_binomial\_2\_log}{eta, phi}
 
-\section{Stan Functions}
+\subsubsection{Stan Functions}
 
 \begin{description}
 %
@@ -1011,6 +1077,69 @@ for it.
     \refsection{prng-vectorization}.}
 %
 \end{description}
+
+\section{Negative-Binomial-2-Log Generalised Linear Model (Negative Binomial
+Regression)}
+\label{neg-binom-2-log-glm.section}
+
+Stan also supplies a single primitive for a Generalised Linear Model with
+negative binomial likelihood and log link function, i.e. a primitive for a
+negative binomial regression.
+This should provide a more efficient implementation of negative binomial
+regression than a manually written regression in terms of a negative binomial
+likelihood and matrix multiplication.
+
+\subsubsection{Probability Mass Function}
+
+If $x\in \reals^{n\cdot m}, \alpha \in \reals^n, \beta\in \reals^m,
+\phi\in \posreals$, then for
+$y \in \nats^n$,
+\[
+\distro{NegBinomial2LogGLM}(y|x, \alpha, \beta, \phi)
+=
+\prod_{1\leq i \leq n}\distro{NegBinomial2}(y_i|\exp(\alpha_i +
+x_i\cdot \beta), \phi).
+\]
+
+\pitemdisc{y}{neg\_binomial\_2\_log\_glm}{x, alpha, beta, phi}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{neg\_binomial\_2\_log\_glm\_lpmf}{int[] \farg{y} \textbar\ matrix
+\farg{x}, real \farg{alpha}, vector \farg{beta}, real \farg{phi}}{The
+  log negative binomial probability mass of \farg{y} given log-location
+  \code{\farg{alpha}\,+\,\farg{x}\,*\,\farg{beta}} and inverse overdispersion
+  control \code{\farg{phi}}, where a
+  constant intercept \code{\farg{alpha}} and \code{\farg{phi}} is used for all observations.
+  The number of rows of the independent variable matrix \code{\farg{x}} needs to
+  match the length of the dependent variable vector \code{\farg{y}} and
+  the number of columns of \code{\farg{x}} needs to match the length of
+  the weight vector \code{\farg{beta}}.}
+%
+\end{description}
+
+\begin{description}
+%
+\fitem{real}{neg\_binomial\_2\_log\_glm\_lpmf}{int[] \farg{y} \textbar\ matrix
+\farg{x}, vector \farg{alpha}, vector \farg{beta}, real \farg{phi}}{The
+  log negative binomial probability mass of \farg{y} given log-location
+  \code{\farg{alpha}\,+\,\farg{x}\,*\,\farg{beta}} and inverse overdispersion
+  control \code{\farg{phi}}, where a
+  constant \code{\farg{phi}} is used for all observations and an intercept
+  \code{\farg{alpha}} is used that is allowed to vary with the different
+  observations.
+  The number of rows of the independent variable matrix \code{\farg{x}} needs to
+  match the length of the dependent variable vector \code{\farg{y}} and
+  \code{\farg{alpha}} and
+  the number of columns of \code{\farg{x}} needs to match the length of
+  the weight vector \code{\farg{beta}}.}
+%
+\end{description}
+
+
+
 
 \section{Poisson Distribution}\label{poisson.section}
 
@@ -1087,6 +1216,61 @@ If $\alpha \in \reals$, then for $n \in \nats$,
   \refsection{prng-vectorization}.}
 \end{description}
 
+
+\section{Poisson-Log Generalised Linear Model (Poisson
+Regression)}
+\label{poisson-log-glm.section}
+
+Stan also supplies a single primitive for a Generalised Linear Model with
+poisson likelihood and log link function, i.e. a primitive for a
+poisson regression.
+This should provide a more efficient implementation of poisson regression
+than a manually written regression in terms of a poisson likelihood
+and matrix multiplication.
+
+\subsubsection{Probability Mass Function}
+
+If $x\in \reals^{n\cdot m}, \alpha \in \reals^n, \beta\in \reals^m$, then for
+$y \in \nats^n$,
+\[
+\distro{PoisonLogGLM}(y|x, \alpha, \beta)
+=
+\prod_{1\leq i \leq n}\distro{Poisson}(y_i|\exp(\alpha_i +
+x_i\cdot \beta)).
+\]
+
+\pitemdisc{y}{poisson\_log\_glm}{x, alpha, beta}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{poisson\_log\_glm\_lpmf}{int[] \farg{y} \textbar\ matrix
+\farg{x}, real \farg{alpha}, vector \farg{beta}}{The
+  log poisson probability mass of \farg{y} given log-rate
+  \code{\farg{alpha}\,+\,\farg{x}\,*\,\farg{beta}}, where a
+  constant intercept \code{\farg{alpha}} is used for all observations.
+  The number of rows of the independent variable matrix \code{\farg{x}} needs to
+  match the length of the dependent variable vector \code{\farg{y}} and
+  the number of columns of \code{\farg{x}} needs to match the length of
+  the weight vector \code{\farg{beta}}.}
+%
+\end{description}
+
+\begin{description}
+%
+\fitem{real}{poisson\_log\_glm\_lpmf}{int[] \farg{y} \textbar\ matrix
+\farg{x}, vector \farg{alpha}, vector \farg{beta}}{The
+  log poisson probability mass of \farg{y} given log-rate
+  \code{\farg{alpha}\,+\,\farg{x}\,*\,\farg{beta}}, where an intercept
+  \code{\farg{alpha}} is used that is allowed to vary with the different
+  observations.
+  The number of rows of the independent variable matrix \code{\farg{x}} needs to
+  match the length of the dependent variable vector \code{\farg{y}} and
+  the number of columns of \code{\farg{x}} needs to match the length of
+  the weight vector \code{\farg{beta}}.}
+%
+\end{description}
 
 
 
@@ -1240,6 +1424,64 @@ versions with parameters $\mu = 0$ and $\sigma = 1$.
 
 
 \pitemTwo{y}{std\_normal}
+
+
+\section{Normal-Id Generalised Linear Model (Linear
+Regression)}
+\label{normal-id-glm.section}
+
+Stan also supplies a single primitive for a Generalised Linear Model with
+normal likelihood and identity link function, i.e. a primitive for a
+linear regression.
+This should provide a more efficient implementation of linear regression
+than a manually written regression in terms of a normal likelihood
+and matrix multiplication.
+
+\subsubsection{Probability Mass Function}
+
+If $x\in \reals^{n\cdot m}, \alpha \in \reals^n, \beta\in \reals^m,
+\sigma\in \posreals$, then for
+$y \in \reals^n$,
+\[
+\distro{NormalIdGLM}(y|x, \alpha, \beta, \sigma)
+=
+\prod_{1\leq i \leq n}\distro{Normal}(y_i|\alpha_i +
+x_i\cdot \beta, \sigma).
+\]
+
+\pitemdisc{y}{normal\_id\_glm}{x, alpha, beta, sigma}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+\fitem{real}{normal\_id\_glm\_lpmf}{vector \farg{y} \textbar\ matrix
+\farg{x}, real \farg{alpha}, vector \farg{beta}, real \farg{sigma}}{The
+  log normal probability density of \farg{y} given location
+  \code{\farg{alpha}\,+\,\farg{x}\,*\,\farg{beta}} and scale \code{\farg{sigma}}, where a
+  constant intercept \code{\farg{alpha}} and \code{\farg{sigma}} is used for all observations.
+  The number of rows of the independent variable matrix \code{\farg{x}} needs to
+  match the length of the dependent variable vector \code{\farg{y}} and
+  the number of columns of \code{\farg{x}} needs to match the length of
+  the weight vector \code{\farg{beta}}.}
+%
+\end{description}
+
+\begin{description}
+%
+\fitem{real}{normal\_id\_glm\_lpmf}{vector \farg{y} \textbar\ matrix
+\farg{x}, vector \farg{alpha}, vector \farg{beta}, real \farg{sigma}}{The
+  log normal probability density of \farg{y} given location
+  \code{\farg{alpha}\,+\,\farg{x}\,*\,\farg{beta}} and scale \code{\farg{sigma}}, where a
+  constant \code{\farg{sigma}} is used for all observations and an intercept
+  \code{\farg{alpha}} is used that is allowed to vary with the different
+  observations.
+  The number of rows of the independent variable matrix \code{\farg{x}} needs to
+  match the length of the dependent variable vector \code{\farg{y}} and
+  the number of columns of \code{\farg{x}} needs to match the length of
+  the weight vector \code{\farg{beta}}.}
+%
+\end{description}
 
 \section{Exponentially Modified Normal Distribution}
 

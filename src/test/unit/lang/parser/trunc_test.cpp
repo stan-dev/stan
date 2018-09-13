@@ -3,12 +3,12 @@
 
 TEST(parserTruncTest, poisson_log_log) {
   test_throws("prob-poisson_log-trunc-low",
-              "lower truncation not defined",
+              "Lower truncation not defined",
               "arguments to poisson_log");
   test_throws("prob-poisson_log-trunc-high",
-              "upper truncation not defined",
+              "Upper truncation not defined",
               "arguments to poisson_log");
   test_throws("prob-poisson_log-trunc-both",
-              "lower truncation not defined",
+              "Lower truncation not defined",
               "arguments to poisson_log");
 }

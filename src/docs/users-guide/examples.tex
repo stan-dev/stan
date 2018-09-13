@@ -8390,9 +8390,9 @@ which returns $y = \{3, -2\}$.
 \subsection{Data versus Parameters}
 The arguments for the real data \code{x\_r} and
 the integer data \code{x\_i} must be expressions that only involve data or
-transformed data variables. \code{theta}, on the other hand,
-must only involve parameters. Note there are no restrictions on the initial guess,
-\code{y\_guess}, which may be a data or a parameter vector.
+transformed data variables.  There are no restrictions on the initial guess
+\code{y\_guess} and the parameters \code{theta};
+they can reference either data or parameter variables.
 
 \subsection{Length of the Algebraic Function and of the Vector of Unknowns}
 The Jacobian of the solution with respect to the parameters is computed
