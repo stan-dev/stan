@@ -50,7 +50,7 @@ struct integrate_1d {
   integrate_1d();
 
   /**
-   * Construct a 1D integrator AST nodew ith the specified function
+   * Construct a 1D integrator AST node with the specified function
    * name, lower and upper integration bounds, parameters, and real
    * and integer data.
    *

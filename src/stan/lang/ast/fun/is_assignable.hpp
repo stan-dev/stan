@@ -7,7 +7,7 @@
 namespace stan {
   namespace lang {
 
-    struct expr_type;
+    struct bare_expr_type;
 
     /**
      * Return true if an expression of the right-hand side type is
@@ -23,7 +23,8 @@ namespace stan {
      * written 
      * @return true if the assignment is legal
      */
-    bool is_assignable(const expr_type& l_type, const expr_type& r_type,
+    bool is_assignable(const bare_expr_type& l_type,
+                       const bare_expr_type& r_type,
                        const std::string& failure_message,
                        std::ostream& error_msgs);
 

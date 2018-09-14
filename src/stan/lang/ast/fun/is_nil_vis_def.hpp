@@ -38,6 +38,10 @@ namespace stan {
       return false;
     }
 
+    bool is_nil_vis::operator()(const fun& /* x */) const {
+      return false;
+    }
+
     bool is_nil_vis::operator()(const integrate_ode& /* x */) const {
       return false;
     }
@@ -55,10 +59,6 @@ namespace stan {
     }
 
     bool is_nil_vis::operator()(const map_rect& /* x */) const {
-      return false;
-    }
-
-    bool is_nil_vis::operator()(const fun& /* x */) const {
       return false;
     }
 

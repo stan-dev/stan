@@ -143,7 +143,10 @@ namespace stan {
                               whitespace_grammar<Iterator> >
       prob_args_r;
 
-
+      boost::spirit::qi::rule<Iterator,
+                              double_literal(),
+                              whitespace_grammar<Iterator> >
+      str_double_literal_r;
 
       boost::spirit::qi::rule<Iterator,
                               expression(scope),

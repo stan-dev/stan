@@ -11,10 +11,10 @@ TEST(lang_parser, integrate_1d_bad) {
               " real[], real[], int[]) : real");
   test_throws("integrate_1d/bad_lb_type",
               "second argument to integrate_1d, the lower bound of"
-              " integration, must have type int or real; found type = real[]");
+              " integration, must have type int or real; found type = real[ ]");
   test_throws("integrate_1d/bad_ub_type",
               "third argument to integrate_1d, the upper bound of"
-              " integration, must have type int or real; found type = real[]");
+              " integration, must have type int or real; found type = real[ ]");
   test_throws("integrate_1d/bad_parameters_type",
               "fourth argument to integrate_1d, the parameters, must have"
               " type real[]; found type = int.");
@@ -23,10 +23,10 @@ TEST(lang_parser, integrate_1d_bad) {
               " type real[]; found type = real.");
   test_throws("integrate_1d/bad_int_data_type",
               "sixth argument to integrate_1d, the integer data, must have"
-              " type int[]; found type = real[].");
+              " type int[]; found type = real[ ].");
   test_throws("integrate_1d/bad_rel_tol_type",
               "seventh argument to integrate_1d, relative tolerance,"
-              " must be of type int or real;  found type = real[].");
+              " must be of type int or real;  found type = real[ ].");
 
   test_throws("integrate_1d/bad_real_data_data",
               "fifth argument to integrate_1d, the real data, must"
