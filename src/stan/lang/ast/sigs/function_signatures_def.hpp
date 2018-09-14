@@ -414,6 +414,7 @@ namespace stan {
   void function_signatures::print_signatures(std::ostream& out) {
     for (auto&& kv :  sigs_map_) {
       for (auto&& sig : kv.second) {
+        out << sig.first;
         print_signature(kv.first, sig.second, false, out);
       }
     }
