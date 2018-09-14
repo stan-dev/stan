@@ -8934,7 +8934,7 @@ step size and very many steps to satisfy even modest tolerances.
 \chapter{Computing One Dimensional Integrals}
 
 \noindent
-Definite and indefinite 1D integrals can be performed in Stan via the \code{integrate\_1d} function.
+Definite and indefinite one dimensional integrals can be performed in Stan using the \code{integrate\_1d} function.
 
 As an example, the normalizing constant of a left-truncated normal distribution is
 
@@ -8967,7 +8967,8 @@ the limits of integration and is set to NaN when either limit is infinite
 (see \refsection{integral-precision} for details on how to use this). The argument
 \code{theta} is used to pass in arguments of the integral
 that are a function of the parameters in our model. The arguments \code{x\_r}
-and \code{x\_i} are likewise used to pass in arguments of the integral that are data.
+and \code{x\_i} are used to pass in real and integer arguments of the integral that are
+not a function of our parameters.
 
 \subsubsection{Strict Signature}
 %
@@ -8978,7 +8979,7 @@ included in the function signature. This may require passing in zero-length arra
 for data or a zero-length vector for parameters if the integral does not involve
 data or parameters.
 
-\section{Calling the 1D Integrator}
+\section{Calling the Integrator}
 %
 Suppose that our model requires evaluating the lpdf of a left-truncated normal, but
 the truncation limit is to be estimated as a parameter. Because the truncation
@@ -8987,7 +8988,8 @@ computing our model's log density. Note this is just an example of how to use th
 1D integrator. The more efficient way to perform the correct normalization in Stan
 is described in \refchapter{truncated-data}.
 
-Such a model might look like (including the function defined above):
+Such a model might look like (include the function defined at the beginning of this
+chapter to make this code compile):
 
 %
 \begin{stancode}
@@ -9012,18 +9014,22 @@ model {
   sigma ~ normal(0, 1);
   left_limit ~ normal(0, 1);
   target += normal_lpdf(y | mu, sigma);
-  target += log(integrate_1d(normal_density, left_limit, positive_infinity(), { mu, sigma }, x_r, x_i));
+  target += log(integrate_1d(normal_density,
+                             left_limit,
+                             positive_infinity(),
+                             { mu, sigma }, x_r, x_i));
 }
 \end{stancode}
 %
-\subsection{Limits of integration}
-The limits of integration can be finite or infinite. The infinite limits are made available via
-the Stan calls \code{negative\_infinity()} and \code{positive\_infinity()}.
+\subsection{Limits of Integration}
+The limits of integration can be finite or infinite. The infinite limits are
+made available via the Stan calls \code{negative\_infinity()} and
+\code{positive\_infinity()}.
 
-If both limits are either \code{negative\_infinity()} or \code{positive\_infinity()}, the integral
-and its gradients are set to zero.
+If both limits are either \code{negative\_infinity()} or
+\code{positive\_infinity()}, the integral and its gradients are set to zero.
 
-\subsection{Data versus Parameters}
+\subsection{Data Versus Parameters}
 %
 The arguments for the real data \code{x\_r} and the integer data \code{x\_i}
 must be expressions that only involve data or transformed data variables.
@@ -9034,27 +9040,41 @@ The endpoints of integration can be data or parameters (and interally the
 derivatives of the integral with respect to the endpoints are handled
 with the Leibniz integral rule).
 
-\section{Integrator convergence}
+\section{Integrator Convergence}
 %
-The integral is performed with the iterative 1D quadrature methods implemented in the Boost library \cite{BoostQuadrature:2017}. If the nth estimate of the integral is denoted $I_n$ and the nth estimate of the norm of the integral is denoted $|I|_n$, the iteration is terminated when
+The integral is performed with the iterative 1D quadrature methods implemented
+in the Boost library \cite{BoostQuadrature:2017}. If the nth estimate of the
+integral is denoted $I_n$ and the nth estimate of the norm of the integral is
+denoted $|I|_n$, the iteration is terminated when
 
 \begin{align*}
   \frac{{|I_{n + 1} - I_n|}}{{|I|_{n + 1}}} < \text{relative tolerance}
 \end{align*}
 
 \noindent
-The \code{relative\_tolerance} parameter can be optionally specified as the last argument to \code{integrate\_1d} and defaults to the square root of the machine epsilon of double precision floating point numbers (that is a relative tolerance of around \code{1.5e-8}).
+The \code{relative\_tolerance} parameter can be optionally specified as the
+last argument to \code{integrate\_1d} and defaults to the square root of the
+machine epsilon of double precision floating point numbers (that is a relative
+tolerance of around \code{1.5e-8}).
 
-\subsection{Zero-crossing integrals} \label{zero-crossing.section}
-Integrals on the (possibly infinite) interval $(a, b)$ that cross zero are split into two integrals, one from $(a, 0)$ and one from $(0, b)$. This is because the quadrature methods employed internally can have difficulty near zero.
+\subsection{Zero-crossing Integrals} \label{zero-crossing.section}
+Integrals on the (possibly infinite) interval $(a, b)$ that cross zero are
+split into two integrals, one from $(a, 0)$ and one from $(0, b)$. This is
+because the quadrature methods employed internally can have difficulty near
+zero.
 
-In this case, each integral is separately integrated to the given \code{relative\_tolerance}.
+In this case, each integral is separately integrated to the given
+\code{relative\_tolerance}.
 
-\subsection{Avoiding precision loss near limits of integration in definite integrals} \label{integral-precision.section}
+\subsection{Avoiding precision loss near limits of integration in definite
+  integrals} \label{integral-precision.section}
 
-If care is not taken, the quadrature can suffer from numerical loss of precision near the endpoints of definite integrals.
+If care is not taken, the quadrature can suffer from numerical loss of
+precision near the endpoints of definite integrals.
 
-For instance, in integrating the pdf of a beta distribution when the values of $\alpha$ and $\beta$ are small, most of the probability mass is lumped near zero and one.
+For instance, in integrating the pdf of a beta distribution when the values of
+$\alpha$ and $\beta$ are small, most of the probability mass is lumped near zero
+and one.
 
 The pdf of a beta distribution is proportional to
 \begin{align*}
@@ -9062,7 +9082,8 @@ p(x) \propto x^{\alpha - 1}(1 - x)^{\beta - 1}
 \end{align*}
 
 \noindent
-Normalizing this distribution requires computing the integral of $p(x)$ from zero to one. In Stan code, the integrand might look like:
+Normalizing this distribution requires computing the integral of $p(x)$ from
+zero to one. In Stan code, the integrand might look like:
 
 %
 \begin{stancode}
@@ -9076,9 +9097,15 @@ real beta(real x, real xc, real[] theta, real[] x_r, int[] x_i) {
 %
 
 \noindent
-The issue is that there will be numerical breakdown in the precision of \code{1.0 - x} as \code{x} gets close to one. This is because of the limited precision of double precision floating numbers. This integral will fail to converge for values of \code{alpha} and \code{beta} much less than one.
+The issue is that there will be numerical breakdown in the precision of
+\code{1.0 - x} as \code{x} gets close to one. This is because of the limited
+precision of double precision floating numbers. This integral will fail to
+converge for values of \code{alpha} and \code{beta} much less than one.
 
-This is where \code{xc} is useful. It is defined, for definite integrals, as a high precision version of the distance from \code{x} to the nearest endpoint. To make use of this for the beta integral, the integrand can be re-coded:
+This is where \code{xc} is useful. It is defined, for definite integrals,
+as a high precision version of the distance from \code{x} to the nearest
+endpoint. To make use of this for the beta integral, the integrand can be
+re-coded:
 
 %
 \begin{stancode}
@@ -9099,9 +9126,16 @@ real beta(real x, real xc, real[] theta, real[] x_r, int[] x_i) {
 %
 
 \noindent
-This version of the integrand will converge for much smaller values of \code{alpha} and \code{beta} than otherwise possible.
+This version of the integrand will converge for much smaller values of
+\code{alpha} and \code{beta} than otherwise possible.
 
-Note, \code{xc} is only used for definite integrals. If either the left endpoint is at negative infinity or the right endpoint is at positive infinity, \code{xc} will be NaN.
+Note, \code{xc} is only used for definite integrals. If either the left endpoint
+is at negative infinity or the right endpoint is at positive infinity, \code{xc}
+will be NaN.
 
-For zero-crossing definite integrals (see \refsection{zero-crossing}) the integrals are broken into two pieces ($(a, 0)$ and $(0, b)$ for endpoints $a < 0$ and $b > 0$) and \code{xc} is a high precision version of the distance to the limits of each of the two integrals separately. This means \code{xc} will be the a high precision version of \code{a - x}, \code{x}, or \code{b - x}, depending on the value of x and the endpoints.
-
+For zero-crossing definite integrals (see \refsection{zero-crossing}) the
+integrals are broken into two pieces ($(a, 0)$ and $(0, b)$ for endpoints
+$a < 0$ and $b > 0$) and \code{xc} is a high precision version of the distance
+to the limits of each of the two integrals separately. This means \code{xc} will
+be the a high precision version of \code{a - x}, \code{x}, or \code{b - x},
+depending on the value of x and the endpoints.
