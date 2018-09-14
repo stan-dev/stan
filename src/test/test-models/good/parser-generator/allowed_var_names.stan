@@ -6,7 +6,3 @@ functions {
     return data;
   }
 }
-
-
-
-
