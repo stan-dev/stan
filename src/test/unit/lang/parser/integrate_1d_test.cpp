@@ -34,4 +34,8 @@ TEST(lang_parser, integrate_1d_bad) {
   test_throws("integrate_1d/bad_rel_tol_data",
               "seventh argument to integrate_1d, relative tolerance,"
               " must be data only and not reference parameters.");
+  test_throws("integrate_1d/bad_fun_name",
+              "integrated function may not be an _rng function,"
+              " found function name: normal_rng");
 }
+

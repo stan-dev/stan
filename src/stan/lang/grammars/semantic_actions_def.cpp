@@ -1892,8 +1892,8 @@ namespace stan {
       pass = true;
 
       // (1) name of function to integrate
-      if (has_rng_lp_suffix(fx.function_name_)) {
-        error_msgs << "integrated function may not be an _rng or _lp function,"
+      if (ends_with("_rng",fx.function_name_)) {
+        error_msgs << "integrated function may not be an _rng function,"
                    << " found function name: "
                    << fx.function_name_ << std::endl;
         pass = false;
