@@ -8934,28 +8934,47 @@ step size and very many steps to satisfy even modest tolerances.
 \chapter{Computing One Dimensional Integrals}
 
 \noindent
-Definite and indefinite 1D integrals can be performed in Stan via the \code{integrate\_1d} function.
+Definite and indefinite one dimensional integrals can be performed in Stan via the \code{integrate\_1d} function.
 
-As an example, the normalizing constant of a left-truncated normal distribution is
+As an example, the Mat\'ern covariance kernel can be written
 
-\begin{align*}
-  \int_a^\infty \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2}}
-\end{align*}
+\begin{align}
+k_\nu(r) = \frac{2^{1 - \nu}}{\Gamma(\nu)} \left( \frac{\sqrt{2 \nu} r}{l} \right)^\nu K_\nu \left( \frac{\sqrt{2 \nu} r}{l} \right)
+\end{align}
+
+\noindent where K_\nu is a modified Bessel function of the second time. For general cases of $\nu$, this Bessel function can be computed
+with the definite integral given in \cite{Rothwell:2008}.
+
+\begin{align}
+K_\nu(z) = \frac{\pi}{\Gamma(\nu + \frac{1}{2})} (2 z)^{-\nu} e^{-z} \int_0^1 [\beta e^{-x^\beta} (2 z + x^\beta)^{\nu - \frac{1}{2}} x^{n - 1} e^{-\frac{1}{x}} x^{-2 \nu - 1} (2 z x + 1)^{\nu - \frac{1}{2}}] dx
+\end{align}
+
+\noindent where
+
+\begin{align}
+\beta = \frac{2 n}{2 \nu + 1}
+\end{align}
 
 \noindent
-To compute this integral in Stan, the integrand must first be defined as a Stan function (see \refchapter{functions-programming} for more information on coding user-defined functions).
+$n$ is set to $8$, mimicking \ref{Rothwell:2008}. To compute this integral in Stan, the integrand must first be defined as a Stan function (see \refchapter{functions-programming} for more information on coding user-defined functions).
 
 \begin{stancode}
-real normal_density(real x,          // Function argument
-                    real xc,         // Complement of function argument
-                                     //  on the domain (defined later)
-                    real[] theta,    // parameters
-                    real[] x_r,      // data (real)
-                    int[] x_i) {     // data (integer)
-  real mu = theta[1];
-  real sigma = theta[2];
+real Kv_int(real x,          // Function argument
+            real xc,         // Complement of function argument
+                             //  on the domain (defined later)
+            real[] theta,    // parameters
+            real[] x_r,      // data (real)
+            int[] x_i) {     // data (integer)
+  real nu = theta[1];
+  real beta = 16.0 / (2.0 * nu + 1.0);
 
-  return 1 / (sqrt(2 * pi()) * sigma) * exp(-0.5 * ((x - mu) / sigma)^2);
+  real first = beta * exp(-pow(x, beta)) * pow(2 * z + pow(x, beta), nu - 0.5) * pow(x, 7);
+  real second = exp(-1.0 / x);
+  if (second > 0) {
+    second = second * pow(x, -2 * nu - 1) * pow(2 * z * x + 1, v - 0.5);
+  }
+  
+  return first + second;
 }
 \end{stancode}
 %
