@@ -470,7 +470,6 @@ TEST(lang, transformed_params_block_var_hpp_write_array) {
                          "                check_less_or_equal(function__, \"ar_p2[i_0__]\", ar_p2[i_0__], 1);\n"
                          "            }\n"
                          "\n"
-                         "            if (!include_gqs__ && !include_tparams__) return;\n"
                          "            // write transformed parameters\n"
                          "            if (include_tparams__) {\n"
                          "                vars__.push_back(p2);\n"
