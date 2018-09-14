@@ -1,8 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_INTEGRATE_1D_DEF_HPP
 #define STAN_LANG_AST_NODE_INTEGRATE_1D_DEF_HPP
 
-#include <stan/lang/ast/node/expression.hpp>
-#include <stan/lang/ast/node/integrate_1d.hpp>
+#include <stan/lang/ast.hpp>
 #include <string>
 
 namespace stan {
