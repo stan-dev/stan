@@ -63,6 +63,10 @@ inline void print_stanc_help(std::ostream* out_stream) {
 
   print_help_option(out_stream, "allow_undefined", "",
                     "Do not fail if a function is declared but not defined");
+
+  print_help_option(out_stream, "include_paths", "comma-separated list",
+                    "Comma-separated list of directories that may contain a "
+                    "file in an #include directive");
   // TODO(martincerny) help for standalone function compilation
 }
 
@@ -243,15 +247,9 @@ inline int stanc_helper(int argc, const char* argv[],
         boost::escaped_list_separator<char>
         > extra_path_tokenizer(extra_path_str, extra_path_els);
 
-      std::cout << "Include paths:\n";
       for (const auto & inc_path : extra_path_tokenizer) {
         if (!inc_path.empty()) {
           include_paths.push_back(inc_path);
-
-          // Using include_paths.back() instead of inc_path to check
-          // that what is appended to include_paths is actually what
-          // inc_path is supposed to be.
-          std::cout << "    " << include_paths.back() << "\n";
         }
       }
     }
