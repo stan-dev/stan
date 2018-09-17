@@ -38,7 +38,7 @@ the value of `x` will be constrained to be a vector of size
 `K` with unit length;  the reference manual chapter on
 constrained parameter transforms provides precise definitions.
 
-{\it Warning:} An extra term gets added to the log density to ensure
+*Warning:* An extra term gets added to the log density to ensure
 the distribution on unit vectors is proper.  This is not a problem in
 practice, but it may lead to misunderstandings of the target log
 density output (`lp__` in some interfaces).  The underlying

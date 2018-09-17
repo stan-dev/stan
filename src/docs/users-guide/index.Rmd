@@ -13,7 +13,7 @@ documentclass: book
 bibliography: [../bibtex/all.bib]
 biblio-style: apalike
 link-citations: yes
-fontsize: 11pt
+fontsize: 10pt
 monofont: "Lucida Console"
 subparagraph: yes
 ---

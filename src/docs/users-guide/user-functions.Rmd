@@ -145,7 +145,7 @@ quantities block.
 |                      | `matrix[K, K]`   | `cov_matrix[K]`                       |
 |                      | `matrix[K, K]`   | `cholesky_factor_corr[K]`             |
 |                      | `matrix[K, K]`   | `cholesky_factor_cov[K]`              |
-|----------------------|------------------|---------------------------------------|
+
 id:constrained-types.figure
 
 The leftmost column is a list of the unconstrained and undimensioned

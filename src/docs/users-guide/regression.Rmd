@@ -462,7 +462,7 @@ discrete sampling to be well defined.
 
 Constraints on data declarations are optional.  Constraints on
 parameters declared in the `parameters` block, on the other hand,
-are {\it not}\ optional---they are required to ensure support for all
+are *not* optional---they are required to ensure support for all
 parameter values satisfying their constraints.  Constraints on
 transformed data, transformed parameters, and generated quantities are
 also optional.

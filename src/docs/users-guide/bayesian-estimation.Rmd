@@ -77,9 +77,8 @@ $$
 \hat{\theta} = \int \theta \, p(\theta|y) \, d\theta.
 $$
 
-The posterior mean is often called {\it the}\ Bayesian estimator,
-because it's the estimator that minimizes the expected square error of
-the estimate.
+The posterior mean minimizes the expected square error of the
+estimate.
 
 An estimate of the posterior mean for each parameter is returned by
 Stan's interfaces;  see the RStan, CmdStan, and PyStan user's guides

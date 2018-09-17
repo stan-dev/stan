@@ -302,7 +302,7 @@ transformed data {
     sigma[j] = sqrt(1 / r_t[j] + 1 / (n_t[j] - r_t[j])
                      + 1 / r_c[j] + 1 / (n_c[j] - r_c[j]));
 }
-<```
+```
 
 This definition will be problematic if any of the success counts is
 zero or equal to the number of trials.

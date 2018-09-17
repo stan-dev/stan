@@ -166,7 +166,6 @@ as in the previous example code.
 In general, computing a matrix exponential will be more efficient than using a numerical
 solver. We can however only apply this technique to systems of \underline{linear} ODEs.
 
-\begin{figure}
 ```
 data {
   int<lower=1> T;
@@ -189,17 +188,18 @@ generated quantities {
   }
 }
 ```
-\vspace*{-0.2in}
-\caption{\small\it Stan program to simulate noisy measurements from a
-  simple harmonic oscillator.  The system of linear differential equations is
-  coded as a matrix. The system parameters `theta` and initial
-  state `y0` are read in as data along  observation times `ts`.
-  The generated quantities block is used to solve the ODE for the specified
-  times and then add random measurement error, producing observations
-  `y_hat`. Because the ODEs are linear, we can use the `matrix_exp`
-  function to solve the system. }
-\end{figure}
 id:sho-sim-me.figure
+
+This Stan program simulates noisy measurements from a simple harmonic
+oscillator.  The system of linear differential equations is coded as a
+matrix. The system parameters `theta` and initial state `y0` are read
+in as data along observation times `ts`.  The generated quantities
+block is used to solve the ODE for the specified times and then add
+random measurement error, producing observations `y_hat`. Because the
+ODEs are linear, we can use the `matrix_exp` function to solve the
+system.
+
+
 
 ## Measurement Error Models
 
@@ -215,10 +215,11 @@ $\mathsf{normal}(0, 0.1)$ error in both dimensions ($y_1(t)$ and
 $y_2(t)$).  A plot of such measurements is shown in the simple harmonic
 oscillator trajectory plots.
 
-![Trajectory of the simple harmonic oscillator given
-  parameter $\theta=0.15$ and initial condition $y(t=0) = (1,0)$ with
-  additional independent\ $\mathsf{normal}(0,0.1)$ measurement error
-  in both dimensions.](img/sho-ode-trajectory.pdf)
+Trajectory of the simple harmonic oscillator given parameter $\theta=0.15$ and initial condition $y(t=0) = (1,0)$ with additional independent $\mathsf{normal}(0,0.1)$ measurement error in both dimensions.
+
+```{r fig.cap="Simple harmonic oscillator trajectory"}
+knitr::include_graphics("img/sho-ode-trajectory.pdf")
+```
 id:sho-trajectory.figure
 
 
@@ -261,6 +262,7 @@ generated quantities {
     y_hat[t, 2] += normal_rng(0, 0.1);
   }
 }
+```
 id:sho-sim.figure
 
 The system of differential equations is coded as a function.  The
@@ -309,7 +311,6 @@ predictions, much like the linear predictor does in a generalized
 linear model.  These states will then be observed with measurement error.
 
 
-\begin{figure}
 ```
 functions {
   real[] sho(real t,
