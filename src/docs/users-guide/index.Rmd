@@ -2,7 +2,7 @@
 knit: "bookdown::render_book"
 title: "Bayesian Statistics Using Stan"
 author: "Stan Development Team"
-date: "Version 2.18.1 (September 2018)"
+date: "Version 2.18 (September 2018)"
 description: "Bayesian Statistics Using Stan, including Stan user's guide with examples and programming techniques."
 url: 'http\://mc-stan.org/users/documentation'
 site: bookdown::bookdown_site

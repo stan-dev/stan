@@ -1,39 +1,4 @@
----
-title: "Pest Control"
-author: "A Case Study in Bayesian Workflow"
-date: "`r Sys.Date()`"
-output:
-  html_document:
-    toc: true
-    toc_depth: 2
----
-
-## Setup
-
-```{r setup, include=FALSE, echo=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE, 
-  dev = "png",
-  dpi = 150,
-  fig.align = "center",
-  comment = NA
-)
-library(rstan)
-library(dplyr)
-library(lubridate)
-library(ggplot2)
-library(bayesplot)
-
-theme_set(bayesplot::theme_default())
-
-print_file <- function(file) {
-  cat(paste(readLines(file), "\n", sep=""), sep="")
-}
-
-# seed for R's pseudo-random number generators, not Stan's
-set.seed(1123) 
-```
-# A Case Study in Bayesian Workflow 
+# Bayesian Workflow 
 
 In this chapter we go through an artificial probem from beginning to end, starting with the (hypothetical) scenario and the (simulated) data and then fitting a series of Bayesian models in Stan and exploring them in R.
 

@@ -1,0 +1,569 @@
+# Reparameterization and Change of Variables  {#change-of-variables.chapter}
+
+Stan supports a direct encoding of reparameterizations.
+Stan also supports changes of variables by directly incrementing the
+log probability accumulator with the log Jacobian of the transform.
+
+## Theoretical and Practical Background
+
+A Bayesian posterior is technically a probability *measure*,
+which is a parameterization-invariant, abstract mathematical object.^[This is in contrast to (penalized) maximum likelihood estimates, which are not parameterization invariant.]
+
+Stan's modeling language, on the other hand, defines a probability
+*density*, which is a non-unique, parameterization-dependent
+function in $\mathbb{R}^N \rightarrow \mathbb{R}^{+}$.  In practice, this
+means a given model can be represented different ways in Stan, and
+different representations have different computational performances.
+
+As pointed out by @Gelman:2004 in a paper discussing the
+relation between parameterizations and Bayesian modeling, a change of
+parameterization often carries with it suggestions of how the model
+might change, because we tend to use certain natural classes of prior
+distributions.  Thus, it's not *just* that we have a fixed
+distribution that we want to sample from, with reparameterizations
+being computational aids.  In addition, once we reparameterize and add
+prior information, the model itself typically changes, often in useful
+ways.
+
+
+## Reparameterizations
+
+Reparameterizations may be implemented directly using the transformed
+parameters block or just in the model block.
+
+### Beta and Dirichlet Priors {-}
+
+The beta and Dirichlet distributions may both be reparameterized from
+a vector of counts to use a mean and total count.
+
+#### Beta Distribution {-}
+
+For example, the Beta distribution is parameterized by two positive
+count parameters $\alpha, \beta > 0$.  The following example
+illustrates a hierarchical Stan model with a vector of parameters
+`theta` are drawn i.i.d.\ for a Beta distribution whose
+parameters are themselves drawn from a hyperprior distribution.
+
+```
+parameters {
+  real<lower = 0> alpha;
+  real<lower = 0> beta;
+  ...
+model {
+  alpha ~ ...
+  beta ~ ...
+  for (n in 1:N)
+    theta[n] ~ beta(alpha, beta);
+  ...
+```
+
+It is often more natural to specify hyperpriors in terms of
+transformed parameters.  In the case of the Beta, the obvious choice
+for reparameterization is in terms of a mean parameter
+$$
+\phi = \alpha / (\alpha + \beta)
+$$
+and total count parameter
+$$
+\lambda = \alpha + \beta.
+$$
+Following @[GelmanEtAl:2013, Chapter 5] the mean
+gets a uniform prior and the count parameter a Pareto prior with
+$p(\lambda) \propto \lambda^{-2.5}$.
+
+```
+parameters {
+  real<lower=0,upper=1> phi;
+  real<lower=0.1> lambda;
+  ...
+transformed parameters {
+  real<lower=0> alpha = lambda * phi;
+  real<lower=0> beta = lambda * (1 - phi);
+  ...
+model {
+  phi ~ beta(1, 1); // uniform on phi, could drop
+  lambda ~ pareto(0.1, 1.5);
+  for (n in 1:N)
+    theta[n] ~ beta(alpha, beta);
+  ...
+```
+
+The new parameters, `phi` and `lambda`, are declared in the
+parameters block and the parameters for the Beta distribution,
+`alpha` and `beta`, are declared and defined in the
+transformed parameters block.  And If their values are not of interest,
+they could instead be defined as local variables in the model as
+follows.
+
+```
+model {
+  real alpha = lambda * phi
+  real beta = lambda * (1 - phi);
+...
+  for (n in 1:N)
+    theta[n] ~ beta(alpha, beta);
+...
+}
+```
+
+With vectorization, this could be expressed more compactly and
+efficiently as follows.
+```
+model {
+  theta ~ beta(lambda * phi, lambda * (1 - phi));
+...
+}
+```
+
+If the variables `alpha` and `beta` are of interest, they
+can be defined in the transformed parameter block and then used in the
+model.
+
+
+#### Jacobians not Necessary {-}
+
+Because the transformed parameters are being used, rather than given a
+distribution, there is no need to apply a Jacobian adjustment for the
+transform.  For example, in the beta distribution example,
+`alpha` and `beta` have the correct posterior distribution.
+
+#### Dirichlet Priors {-}
+
+The same thing can be done with a Dirichlet, replacing the mean for
+the Beta, which is a probability value, with a simplex.  Assume there
+are $K > 0$ dimensions being considered ($K=1$ is trivial and $K=2$
+reduces to the beta distribution case).  The traditional prior is
+
+```
+parameters {
+  vector[K] alpha;
+  simplex[K] theta[N];
+  ...
+model {
+  alpha ~ ...;
+  for (n in 1:N)
+    theta[n] ~ dirichlet(alpha);
+}
+```
+
+This provides essentially $K$ degrees of freedom, one for each
+dimension of `alpha`, and it is not obvious how to specify a
+reasonable prior for `alpha`.
+
+An alternative coding is to use the mean, which is a simplex, and a
+total count.
+
+```
+parameters {
+  simplex[K] phi;
+  real<lower=0> kappa;
+  simplex[K] theta[N];
+  ...
+transformed parameters {
+  vector[K] alpha = kappa * phi;
+  ...
+}
+model {
+  phi ~ ...;
+  kappa ~ ...;
+  for (n in 1:N)
+    theta[n] ~ dirichlet(alpha);
+```
+
+Now it is much easier to formulate priors, because `phi` is the
+expected value of `theta` and `kappa` (minus `K`) is
+the strength of the prior mean measured in number of prior observations.
+
+### Transforming Unconstrained Priors: Probit and Logit {-}
+
+If the variable $u$ has a $\mathsf{Uniform}(0, 1)$ distribution, then
+$\mbox{logit}(u)$ is distributed as $\mathsf{Logistic}(0, 1)$.  This
+is because inverse logit is the cumulative distribution function (cdf)
+for the logistic distribution, so that the logit function itself is
+the inverse cdf and thus maps a uniform draw in $(0, 1)$ to a
+logistically-distributed quantity.
+
+Things work the same way for the probit case: if $u$ has a
+$\mathsf{Uniform}(0, 1)$ distribution, then $\Phi^{-1}(u)$ has a
+$\mathsf{normal}(0, 1)$ distribution.  The other way around, if $v$
+has a $\mathsf{normal}(0, 1)$ distribution, then $\Phi(v)$ has a
+$\mathsf{Uniform}(0, 1)$ distribution.
+
+In order to use the probit and logistic as priors on variables
+constrained to $(0, 1)$, create an unconstrained variable and
+transform it appropriately.  For comparison, the following Stan
+program fragment declares a $(0, 1)$-constrained parameter
+`theta` and gives it a beta prior, then uses it as a parameter in
+a distribution (here using `foo` as a placeholder).
+
+```
+parameters {
+  real<lower = 0, upper = 1> theta;
+...
+model {
+  theta ~ beta(a, b);
+  ...
+  y ~ foo(theta);
+...
+```
+
+If the variables `a` and `b` are one, then this imposes
+a uniform distribution `theta`.  If `a` and `b` are
+both less than one, then the density on `theta` has a U shape,
+whereas if they are both greater than one, the density of `theta`
+has an inverted-U or more bell-like shape.
+
+Roughly the same result can be achieved with unbounded parameters that
+are probit or inverse-logit-transformed.  For example,
+
+```
+parameters {
+  real theta_raw;
+...
+transformed parameters {
+  real<lower = 0, upper = 1> theta = inv_logit(theta_raw);
+...
+model {
+  theta_raw ~ logistic(mu, sigma);
+  ...
+  y ~ foo(theta);
+...
+```
+
+In this model, an unconstrained parameter `theta_raw` gets a
+logistic prior, and then the transformed parameter `theta` is
+defined to be the inverse logit of `theta_raw`.  In this
+parameterization, `inv_logit(mu)` is the mean of the implied
+prior on `theta`.  The prior distribution on `theta` will be
+flat if `sigma` is one and `mu` is zero, and will be
+U-shaped if `sigma` is larger than one and bell shaped if
+`sigma` is less than one.
+
+When moving from a variable in $(0, 1)$ to a simplex, the same trick
+may be performed using the softmax function, which is a multinomial
+generalization of the inverse logit function.  First, consider a
+simplex parameter with a Dirichlet prior.
+
+```
+parameters {
+  simplex[K] theta;
+...
+model {
+  theta ~ dirichlet(a);
+  ...
+  y ~ foo(theta);
+```
+
+Now `a` is a vector with `K` rows, but it has the same shape
+properties as the pair `a` and `b` for a beta; the beta
+distribution is just the distribution of the first component of a
+Dirichlet with parameter vector $[a b]^{\top}$.  To formulate an
+unconstrained prior, the exact same strategy works as for the beta.
+
+```
+parameters {
+  vector[K] theta_raw;
+...
+transformed parameters {
+  simplex[K] theta = softmax(theta_raw);
+...
+model {
+  theta_raw ~ multi_normal_cholesky(mu, L_Sigma);
+```
+
+The multivariate normal is used for convenience and efficiency with
+its Cholesky-factor parameterization.  Now the mean is controlled by
+`softmax(mu)`, but we have additional control of covariance
+through `L_Sigma` at the expense of having on the order of $K^2$
+parameters in the prior rather than order $K$.  If no covariance is
+desired, the number of parameters can be reduced back to $K$ using a
+vectorized normal distribution as follows.
+
+```
+  theta_raw ~ normal(mu, sigma);
+```
+
+where either or both of `mu` and `sigma` can be vectors.
+
+
+## Changes of Variables
+
+Changes of variables are applied when the transformation of a
+parameter is characterized by a distribution.  The standard textbook
+example is the lognormal distribution, which is the distribution of a
+variable $y > 0$ whose logarithm $\log y$ has a normal distribution.
+The distribution is being assigned to $\log y$.
+
+The change of variables requires an adjustment to the probability to
+account for the distortion caused by the transform.  For this to work,
+univariate changes of variables must be monotonic and differentiable
+everywhere in their support.
+
+For univariate changes of variables, the resulting probability must be
+scaled by the absolute derivative of the transform.
+
+In the case of log normals, if $y$'s logarithm is normal with mean
+$\mu$ and deviation $\sigma$, then the distribution of $y$ is given by
+$$
+p(y)
+\ = \
+\mathsf{normal}(\log y| \mu, \sigma) \  \left| \frac{d}{dy} \log y \right|
+\ = \
+\mathsf{normal}(\log y| \mu, \sigma) \frac{1}{y}.
+$$
+Stan works on the log scale to prevent underflow, where
+$$
+\log p(y)
+=
+\log \mathsf{normal}(\log y| \mu, \sigma)
+- \log y.
+$$
+
+In Stan, the change of variables can be applied in the sampling
+statement.  To adjust for the curvature, the log probability
+accumulator is incremented with the log absolute derivative of the
+transform.  The lognormal distribution can thus be implemented
+directly in Stan as follows.^[This example is for illustrative purposes only; the recommended way to implement the lognormal distribution in Stan is with the built-in `lognormal` probability function; see the functions reference manual for details.]
+
+```
+parameters {
+  real<lower=0> y;
+  ...
+model {
+  log(y) ~ normal(mu, sigma);
+  target += -log(y);
+  ...
+```
+
+It is important, as always, to declare appropriate constraints on
+parameters;  here `y` is constrained to be positive.
+
+It would be slightly more efficient to define a local variable for the
+logarithm, as follows.
+
+```
+model {
+  real log_y;
+  log_y = log(y);
+  log_y ~ normal(mu, sigma);
+  target += -log_y;
+  ...
+```
+
+
+If `y` were declared as data instead of as a parameter, then the
+adjustment can be ignored because the data will be constant and Stan
+only requires the log probability up to a constant.
+
+### Change of Variables vs.\ Transformations {-}
+
+This section illustrates the difference between a change of variables
+and a simple variable transformation.  A transformation samples a
+parameter, then transforms it, whereas a change of variables
+transforms a parameter, then samples it.  Only the latter requires a
+Jacobian adjustment.
+
+It does not matter whether the probability function is
+expressed using a sampling statement, such as
+
+```
+log(y) ~ normal(mu, sigma);
+```
+
+or as an increment to the log probability function, as in
+
+```
+target += normal_lpdf(log(y) | mu, sigma);
+```
+
+#### Gamma and Inverse Gamma Distribution {-} {#jacobian-adjustment.section}
+
+Like the log normal, the inverse gamma distribution is a distribution
+of variables whose inverse has a gamma distribution.  This section
+contrasts two approaches, first with a transform, then with a change
+of variables.
+
+The transform based approach to sampling `y_inv` with an inverse
+gamma distribution can be coded as follows.
+
+```
+parameters {
+  real<lower=0> y;
+}
+transformed parameters {
+  real<lower=0> y_inv;
+  y_inv = 1 / y;
+}
+model {
+  y ~ gamma(2,4);
+}
+```
+
+The change-of-variables approach to sampling `y_inv` with an
+inverse gamma distribution can be coded as follows.
+
+```
+parameters {
+  real<lower=0> y_inv;
+}
+transformed parameters {
+  real<lower=0> y;
+  y = 1 / y_inv;  // change variables
+}
+model {
+  y ~ gamma(2,4);
+  target +=  -2 * log(y_inv);  //  Jacobian adjustment;
+}
+```
+
+The Jacobian adjustment is the log of the absolute derivative of the
+transform, which in this case is
+
+$$
+\log \left| \frac{d}{du} \left( \frac{1}{u} \right) \right|
+\ = \
+\log | - u^{-2} |
+\ = \
+\log u^{-2}
+\ = \
+ -2 \log u.
+$$
+
+
+### Multivariate Changes of Variables {-}
+
+In the case of a multivariate transform, the log of the Jacobian of
+the transform must be added to the log probability accumulator.  In
+Stan, this can be coded as follows in the general case where the
+Jacobian is not a full matrix.
+
+```
+parameters {
+  vector[K] u;      // multivariate parameter
+   ...
+transformed parameters {
+  vector[K] v;     // transformed parameter
+  matrix[K, K] J;   // Jacobian matrix of transform
+  ... compute v as a function of u ...
+  ... compute J[m, n] = d.v[m] / d.u[n] ...
+  target += log(fabs(determinant(J)));
+  ...
+model {
+  v ~ ...;
+  ...
+```
+
+If the Jacobian is known analytically, it will be more
+efficient to apply it directly than to call the determinant function,
+which is neither efficient nor particularly stable numerically.
+
+In many cases, the Jacobian matrix will be triangular, so that only
+the diagonal elements will be required for the determinant
+calculation.  Triangular Jacobians arise when each element `v[k]`
+of the transformed parameter vector only depends on elements
+`u[1]`, \ldots, `u[k]` of the parameter vector.  For
+triangular matrices, the determinant is the product of the diagonal
+elements, so the transformed parameters block of the above model can
+be simplified and made more efficient by recoding as follows.
+
+```
+transformed parameters {
+  ...
+  vector[K] J_diag;  // diagonals of Jacobian matrix
+  ...
+  ... compute J[k, k] = d.v[k] / d.u[k] ...
+  target += sum(log(J_diag));
+  ...
+```
+
+
+## Vectors with Varying Bounds
+
+Stan only allows a single lower and upper bound to be declared in the
+constraints for a container data type.  But suppose we have a vector
+of parameters and a vector of lower bounds?  Then the transforms are
+calculated and their log Jacobians added to the log density accumulator;
+the Jacobian calculations are described in detail in the reference
+manual chapter on constrained parameter transforms.
+
+### Varying Lower Bounds {-}
+
+For example, suppose there is a vector parameter $\alpha$ with a
+vector $L$ of lower bounds.  The simplest way to deal with this if $L$
+is a constant is to shift a lower-bounded parameter.
+
+```
+data {
+  int N;
+  vector[N] L;  // lower bounds
+  ...
+parameters {
+  vector<lower=0>[N] alpha_raw;
+  ...
+transformed parameters {
+  vector[N] alpha = L + alpha_raw;
+  ...
+```
+
+The Jacobian for adding a constant is one, so its log drops out of the
+log density.
+
+Even if the lower bound is a parameter rather than data, there is no
+Jacobian required, because the transform from $(L, \alpha_{\mathrm
+  raw})$ to $(L + \alpha_{\mathrm raw}, \alpha_{\mathrm raw}$ produces
+a Jacobian derivative matrix with a unit determinant.
+
+It's also possible implement the transform by directly transforming
+an unconstrained parameter and accounting for the Jacobian.
+
+```
+data {
+  int N;
+  vector[N] L;  // lower bounds
+  ...
+parameters {
+  vector[N] alpha_raw;
+  ...
+transformed parameters {
+  vector[N] alpha = L + exp(alpha_raw);
+  ...
+model {
+  target += sum(alpha_raw);  // log Jacobian
+  ...
+```
+
+The adjustment in the the log Jacobian determinant of the transform
+mapping $\alpha_{\mathrm{raw}}$ to
+$\alpha = L + \exp(\alpha_{\mathrm{raw}})$.  The details are simple in
+this case because the Jacobian is diagonal; see the reference manual
+chapter on constrained parameter transforms for full details.  Here
+$L$ can even be a vector containing parameters that don't depend on
+$\alpha_{\mathrm{raw}}$; if the bounds do depend on
+$\alpha_{\mathrm{raw}}$ then a revised Jacobian needs to be calculated
+taking into account the dependencies.
+
+### Varying Upper and Lower Bounds {-}
+
+Suppose there are lower and upper bounds that vary by parameter.
+These can be applied to shift and rescale a parameter constrained to
+$(0, 1)$.
+
+```
+data {
+  int N;
+  vector[N] L;  // lower bounds
+  vector[N] U;  // upper bounds
+  ...
+parameters {
+  vector<lower=0, upper=1>[N] alpha_raw;
+  ...
+transformed parameters {
+  vector[N] alpha = L + (U - L) .* alpha_raw;
+```
+
+The expression `U - L` is multiplied by `alpha_raw`
+elementwise to produce a vector of variables in $(0, U-L)$, then
+adding $L$ results in a variable ranging between $(L, U)$.
+
+In this case, it is important that $L$ and $U$ are constants,
+otherwise a Jacobian would be required when multiplying by $U - L$.

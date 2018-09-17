@@ -1,22 +1,4 @@
-```{r setup, include=FALSE, echo=FALSE}
-options(htmltools.dir.version = FALSE)
-options(digits = 2)
-
-library(knitr)
-knitr::opts_chunk$set(cache = TRUE)
-knitr::opts_chunk$set(tidy = FALSE, cache.extra = packageVersion('tufte'))
-knitr::opts_chunk$set(comment = "")
-
-print_file <- function(file) {
-  cat(paste(readLines(file), "\n", sep=""), sep="")
-}
-library("arm")
-library("rstan")
-# options(mc.cores = parallel::detectCores(logical = FALSE))
-# rstan_options(auto_write = TRUE)
-```
-
-# Some Simple Examples
+# Simple Examples
 
 ## What is in this chapter?
 
