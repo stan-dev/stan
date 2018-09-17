@@ -275,7 +275,7 @@ regression models may be used.  These generalized linear models vary
 only in the link function they use to map linear predictions in
 $(-\infty,\infty)$ to probability values in $(0,1)$.  Their respective
 link functions, the logistic function and the standard normal cumulative distribution
-function, are both sigmoid functions (i.e., they are both {\it S}-shaped).
+function, are both sigmoid functions (i.e., they are both S-shaped).
 
 A logistic regression model with one predictor and an intercept is coded as
 follows.
@@ -1254,7 +1254,7 @@ and Hill, we decompose our prior into a scale and a matrix, but are
 able to do so in a more natural way based on the actual variable
 scales and a correlation matrix.  Specifically, we define
 $$
-\Sigma = \mbox{diag_matrix}(\tau) \ \Omega \ \mbox{diag_matrix}(\tau),
+\Sigma = \mbox{diag\_matrix}(\tau) \ \Omega \ \mbox{diag\_matrix}(\tau),
 $$
 where $\Omega$ is a correlation matrix and $\tau$ is the vector of
 coefficient scales.   This mapping from scale vector $\tau$ and

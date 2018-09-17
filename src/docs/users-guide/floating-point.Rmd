@@ -28,7 +28,7 @@ representation is divided into two signed components:
 The *value* of a finite floating point number is
 
 $$
-v = (−1)^s \times c \ 2^q
+v = (-1)^s \times c \ 2^q
 $$
 
 
@@ -284,7 +284,8 @@ $\log b$, how do we get $\log (a + b)$?  Working out the algebra,
 
 $$
 \log (a + b)
-& = & \log (\exp(\log a) + \exp(\log b))
+\ = \
+\log (\exp(\log a) + \exp(\log b))
 $$
 
 The nested log of sum of exponentials is so common, it has its own

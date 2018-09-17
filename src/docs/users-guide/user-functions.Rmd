@@ -91,7 +91,7 @@ catches the case where `x` is a not-a-number value.  If the
 condition had been coded as `(x~<~0)` it would not catch the
 not-a-number case, though it could be written as
 `(x~<~0~||~is_nan(x))`.  The positive infinite case is allowed
-through, but could also be checked with the \Verb/is_inf(x)/ function.
+through, but could also be checked with the `is_inf(x)` function.
 The square root function does not itself reject, but some downstream
 consumer of `dbl_sqrt(-2)` would be likely to raise an error, at
 which point the origin of the illegal input requires detective work.
@@ -114,104 +114,63 @@ quantities block.
 
 ### Type Declarations for Functions {-}
 
-\begin{figure}
-\begin{center}
-\begin{tabular}{l|l|l}
-{\it Functions:} & {\it Locals Variables:} & {\it Nonlocal Variables:} \\
-{\it Undimensioned} & {\it Unconstrained} & {\it Constrained} \\
-\hline \hline
-`int`
-& `int`
-& `int<lower=L>`
-\\
-& &  `int<upper=U>`
-\\
-& &  `int<lower=L,upper=U>`
-
-\\ \hline
-
-`real`
-& `real`
-& `real<lower=L>`
-\\
-& &  `real<upper=U>`
-\\
-& & `real<lower=L,upper=U>`
-
-\\ \hline
-
-`vector`
-&
-`vector[N]`
-& `vector<lower=L>[N]`
-\\
-& &  `vector<upper=U>[N]`
-\\
-& &  `vector<lower=L,upper=U>[N]`
-\\[4pt]
-& & `simplex[N]`
-\\
-& & `ordered[N]`
-\\
-& & `positive_ordered[N]`
-\\
-& & `unit_vector[N]`
-
-\\ \hline
-
-`row_vector`
-& `row_vector[M]`
-& `row_vector<lower=L>[M]`
-\\
-& &  `row_vector<upper=U>[M]`
-\\
-& &  `row_vector<lower=L,upper=U>[M]`
-
-\\ \hline
-
-`matrix`
-& `matrix[M,~N]`
-& `matrix<lower=L>[M,~N]`
-\\
-& &  `matrix<upper=U>[M,~N]`
-\\
-& &  `matrix<lower=L,upper=U>[M,~N]`
-\\[4pt]
-& & `cov_matrix[K]`
-\\
-& & `corr_matrix[K]`
-\\
-& & `cholesky_factor_cov[K]`
-\\
-& & `cholesky_factor_corr[K]`
-\end{tabular}
-\end{center}
-\caption{\small\it The leftmost column is a list of the unconstrained
-  and undimensioned basic types; these are used as function return
-  types and argument types.  The middle column is of unconstrained
-  types with dimensions; these are used as local variable types.  The
-  rightmost column lists the corresponding constrained types.  An
-  expression of any righthand column type may be assigned to its
-  corresponding lefthand column basic type.  At runtime, dimensions
-  are checked for consistency for all variables; containers of any
-  sizes may be assigned to function arguments.  The constrained matrix
-  types `cov_matrix[K]`, `corr_matrix[K]`,
-  `cholesky_factor_cov[K]`, and
-  `cholesky_factor_corr[K]` are only assignable to matrices of
-  dimensions `matrix[K,~K]` types. Stan also allows arrays of any
-  of these types, with slightly different declarations for function
-  arguments and return types and variables.
-}
-\end{figure}
+| Function Argument    | Local            | Block                                 |
+|:--------------------:|:-----------------|:-------------------------------------:|
+| (unsized)            | (unconstrained)  | (constrained)                         |
+| `int`                | `int`            | `int`                                 |
+|                      |                  | `int<lower = L>`                      |
+|                      |                  | `int<upper = U>`                      |
+|                      |                  | `int<lower = L, upper = U>`           |
+| `real`               | `real`           | `real`                                |
+|                      |                  | `real<lower = L>`                     |
+|                      |                  | `real<upper = U>`                     |
+|                      |                  | `real<lower = L, upper = U>`          |
+| `vector`             | `vector[N]`      | `vector[N]`                           |
+|                      |                  | `vector[N]<lower = L>`                |
+|                      |                  | `vector[N]<upper = U>`                |
+|                      |                  | `vector[N]<lower = L, upper = U>`     |
+|                      |                  | `ordered[N]`                          |
+|                      |                  | `positive_ordered[N]`                 |
+|                      |                  | `simplex[N]`                          |
+|                      |                  | `unit_vector[N]`                      |
+| `row_vector`         | `row_vector[N]`  | `row_vector[N]`                       |
+|                      |                  | `row_vector[N]<lower = L>`            |
+|                      |                  | `row_vector[N]<upper = U>`            |
+|                      |                  | `row_vector[N]<lower = L, upper = U>` |
+| `matrix`             | `matrix[M, N]`   | `matrix[M, N]`                        |
+|                      |                  | `matrix[M, N]<lower = L>`             |
+|                      |                  | `matrix[M, N]<upper = U>`             |
+|                      |                  | `matrix[M, N]<lower = L, upper = U>`  |
+|                      | `matrix[K, K]`   | `corr_matrix[K]`                      |
+|                      | `matrix[K, K]`   | `cov_matrix[K]`                       |
+|                      | `matrix[K, K]`   | `cholesky_factor_corr[K]`             |
+|                      | `matrix[K, K]`   | `cholesky_factor_cov[K]`              |
+|----------------------|------------------|---------------------------------------|
 id:constrained-types.figure
+
+The leftmost column is a list of the unconstrained and undimensioned
+basic types; these are used as function return types and argument
+types.  The middle column is of unconstrained types with dimensions;
+these are used as local variable types.  The rightmost column lists
+the corresponding constrained types.  An expression of any righthand
+column type may be assigned to its corresponding lefthand column basic
+type.  At runtime, dimensions are checked for consistency for all
+variables; containers of any sizes may be assigned to function
+arguments.  The constrained matrix types `cov_matrix[K]`,
+`corr_matrix[K]`, `cholesky_factor_cov[K]`, and
+`cholesky_factor_corr[K]` are only assignable to matrices of
+dimensions `matrix[K, K]` types. Stan also allows arrays of any of
+these types, with slightly different declarations for function
+arguments and return types and variables.
+
 
 Function argument and return types for vector and matrix types
 are not declared with their sizes, unlike type declarations for variables.
 Function argument type declarations may not be
 declared with constraints, either lower or upper bounds or structured
 constraints like forming a simplex or correlation matrix, (as is also
-the case for local varaibles);  see
-\reffigure{constrained-types} for a list.
+the case for local varaibles);  see the table of constrained types for
+full details.
 
 For example, here's a function to compute the entropy of a categorical
 distribution with simplex parameter `theta`.
@@ -332,7 +291,7 @@ transformed parameters {
 ## Functions Accessing the Log Probability  Accumulator
 
 Functions whose names end in `_lp` are allowed to use sampling
-statements and `target~+=` statements; other
+statements and `target +=` statements; other
 functions are not.  Because of this access, their use is restricted to
 the transformed parameters and model blocks.
 
@@ -473,7 +432,7 @@ target += foo_lpdf(y | theta1, ..., thetaN);
 ```
 
 As with the built-in functions, the suffix `_lpdf` is dropped and
-the first argument moves to the left of the sampling symbol (\Verb|~|)
+the first argument moves to the left of the sampling symbol (`~`)
 in the sampling statement.
 
 Functions ending in `_lpmf` (for probability mass functions),
@@ -566,7 +525,7 @@ return type `real` may be used as probability functions in
 sampling statements.
 
 Only functions ending in `_lp` may access the log probability
-accumulator through sampling statements or `target~+=`
+accumulator through sampling statements or `target +=`
 statements.  Such functions may only be used in the transformed
 parameters or model blocks.
 

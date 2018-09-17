@@ -79,16 +79,16 @@ id:sparse-data.figure
 
 When not every student is given every question, the dense array coding
 will no longer work, because Stan does not support undefined values.
-\reffigure{sparse-data} shows an example with $J=3$ and $K=4$, with
+The sparse data example shows an example with $J=3$ and $K=4$, with
 missing responses shown as NA, as in R.  There is no support within
 Stan for R's NA values, so this data structure cannot be used
 directly.  Instead, it must be converted to a "long form" as in a
 database, with columns indicating the $j$ and $k$ indexes along with
 the value.  For instance, with $jj$ and $kk$ used for the indexes
-(following @GelmanHill:2007), the data structure can be coded
-as in the right-hand example in \reffigure{sparse-data}.  This says
-that $y_{1,1} = 0$, $y_{1,2} = 1$, and so on, up to $y_{3,2} = 1$,
-with all other entries undefined.
+(following @GelmanHill:2007), the data structure can be coded as in
+the right-hand example in the example. This says that
+$y_{1,1} = 0$, $y_{1,2} = 1$, and so on, up to $y_{3,2} = 1$, with all
+other entries undefined.
 
 Letting $N$ be the number of $y$ that are defined, here $N=6$,
 the data and model can be formulated as follows.
@@ -166,7 +166,7 @@ example, but this is inefficient, wasting space for unnecessary
 indices and not allowing vector-based density operations.  A better
 way to code this data is as a single list of values, with a separate
 data structure indicating the sizes of each subarray.  This is
-indicated on the right of \reffigure{ragged-data}.  This coding uses a
+indicated on the right of the example. This coding uses a
 single array for the values and a separate array for the sizes of each
 row.
 

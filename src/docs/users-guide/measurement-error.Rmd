@@ -252,7 +252,7 @@ myocardial infarction under a treatment of beta blockers
 
 #### Data {-}
 
-The clinical data consists of $J$ trials, each with $n^t$ treatment cases, $n^c$ control cases, $r^t$ successful outcomes among those treated and $r^c$ successful outcomes among those in the control group.  This data can be declared in Stan as follows.^[Stan's integer constraints are not powerful enough to express the constraint that $\mbox{\code{r_t[j]}} \leq \mbox{\code{n_t[j]}}$, but this constraint could be checked in the transformed data block.]
+The clinical data consists of $J$ trials, each with $n^t$ treatment cases, $n^c$ control cases, $r^t$ successful outcomes among those treated and $r^c$ successful outcomes among those in the control group.  This data can be declared in Stan as follows.^[Stan's integer constraints are not powerful enough to express the constraint that $\mathtt{r\_t[j]} \leq \mathtt{n\_t[j]}$, but this constraint could be checked in the transformed data block.]
 
 ```
 data {
@@ -302,7 +302,7 @@ transformed data {
     sigma[j] = sqrt(1 / r_t[j] + 1 / (n_t[j] - r_t[j])
                      + 1 / r_c[j] + 1 / (n_c[j] - r_c[j]));
 }
-```
+<```
 
 This definition will be problematic if any of the success counts is
 zero or equal to the number of trials.

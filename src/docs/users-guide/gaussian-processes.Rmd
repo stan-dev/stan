@@ -274,24 +274,24 @@ encoding of the transform described above.
 The full generative model for a GP with a normal outcome,
 $y \in \mathbb{R}^N$, with inputs $x \in \mathbb{R}^N$, for a finite $N$:
 
-\begin{align*}
+$$ \begin{aligned}
   \rho & \sim \mathsf{InvGamma}(5, 5) \\
   \alpha & \sim \mathsf{normal}(0, 1) \\
   \sigma & \sim \mathsf{normal}(0, 1) \\
   f & \sim \mathsf{multivariate\ normal}\left(0, K(x | \alpha, \rho)\right) \\
   y_i & \sim \mathsf{normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\}
-\end{align*}
+\end{aligned} $$
 
 With a normal outcome, it is possible to integrate out the Gaussian
 process $f$, yielding the more parsimonious model:
 
-\begin{align*}
+$$ \begin{aligned}
   \rho & \sim \mathsf{InvGamma}(5, 5) \\
   \alpha & \sim \mathsf{normal}(0, 1) \\
   \sigma & \sim \mathsf{normal}(0, 1) \\
   y & \sim \mathsf{multivariate\ normal}
   \left(0, K(x | \alpha, \rho) + \mathbf{I}_N \sigma^2\right) \\
-\end{align*}
+\end{aligned} $$
 
 It can be more computationally efficient when dealing with a normal
 outcome to integrate out the Gaussian process, because this yields a
@@ -361,13 +361,13 @@ Cholesky-parameterized normal likelihood, only now the value `y` is known
 and the covariance matrix `K` is an unknown dependent on the
 hyperparameters, allowing us to learn the hyperparameters.
 
-We have used the Cholesky parameterized \mathsf{multivariate\ normal} rather than the
-standard \mathsf{multivariate\ normal} because it allows us to the
-`cholesky_decompose` function which has been optimized for both small and
-large matrices. When working with small matrices the differences in
-computational speed between the two approaches will not be noticeable, but for
-larger matrices ($N \gtrsim 100$) the Cholesky decomposition version will be
-faster.
+We have used the Cholesky parameterized multivariate normal rather
+than the standard parameterization because it allows us to the
+`cholesky_decompose` function which has been optimized for both small
+and large matrices. When working with small matrices the differences
+in computational speed between the two approaches will not be
+noticeable, but for larger matrices ($N \gtrsim 100$) the Cholesky
+decomposition version will be faster.
 
 Hamiltonian Monte Carlo sampling is fast and effective for hyperparameter
 inference in this model @Neal:1997. If the posterior is
@@ -620,11 +620,11 @@ dependent on how the GP is used in our statistical model.
 
 If our model consists of only the GP, i.e.:
 
-\begin{align*}
+$$ \begin{aligned}
   f & \sim \mathsf{multivariate\ normal}\left(0, K(x | \alpha, \rho)\right) \\
   y_i & \sim \mathsf{normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
   & x \in \mathbb{R}^{N \times D}, \, f \in \mathbb{R}^N
-\end{align*}
+\end{aligned} $$
 
 we likely don't need constraints beyond penalizing small
 length-scales.  We'd like to allow the GP prior to represent both
@@ -643,12 +643,12 @@ If we're using the GP as a component in a larger model that includes an overall
 mean and fixed effects for the same variables we're using as the domain for the
 GP, i.e.:
 
-\begin{align*}
+$$ \begin{aligned}
   f & \sim \mathsf{multivariate\ normal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
   \sim \mathsf{normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
   \in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \mathbb{R}^D,\, x \in \mathbb{R}^{N
   \times D},\, f \in \mathbb{R}^N
-\end{align*}
+\end{aligned} $$
 
 we'll likely want to constrain large length-scales as well.  A length scale
 that is larger than the scale of the data yields a GP posterior that is
@@ -660,11 +660,11 @@ GP and the linear regression, we should use a prior with a sharper right tail
 to limit the GP to higher-frequency functions. We can use a generalized inverse
 Gaussian distribution:
 
-\begin{align*}
+$$ \begin{aligned}
   f(x | a, b, p) & = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
   / x)/2) \\
   & x, a, b \in \mathbb{R}^{+}, \, p \in \mathbb{Z}
-\end{align*}
+\end{aligned} $$
 
 which has an inverse gamma left tail if $p \leq 0$ and an inverse Gaussian
 right tail.  This has not yet been implemented in Stan's math library, but it
@@ -922,12 +922,12 @@ functions {
         K[n, n] = K[n,n] + square(sigma);
       L_K = cholesky_decompose(K);
       K_div_y1 = mdivide_left_tri_low(L_K, y1);
-      K_div_y1 = mdivide_right_tri_low(K_div_y1',L_K)';
+      K_div_y1 = mdivide_right_tri_low(K_div_y1', L_K)';
       k_x1_x2 = cov_exp_quad(x1, x2, alpha, rho);
       f2_mu = (k_x1_x2' * K_div_y1);
       v_pred = mdivide_left_tri_low(L_K, k_x1_x2);
       cov_f2 = cov_exp_quad(x2, alpha, rho) - v_pred' * v_pred;
-      diag_delta = diag_matrix(rep_vector(delta,N2));
+      diag_delta = diag_matrix(rep_vector(delta, N2));
 
       f2 = multi_normal_rng(f2_mu, cov_f2 + diag_delta);
     }
@@ -983,58 +983,58 @@ generated quantities {
 
 Suppose we have observations $y_i \in \mathbb{R}^M$ observed at
 $x_i \in \mathbb{R}^K$. One can model the data like so:
-\begin{align*}
+$$ \begin{aligned}
   y_i & \sim \mathsf{multivariate\ normal}(f(x_i), \mathbf{I}_M \sigma^2) \\
   f(x) & \sim \mathsf{GP}(m(x), K(x | \theta, \phi)) \\
   K(x & | \theta) \in \mathbb{R}^{M \times M}, \, f(x), \, m(x) \in \mathbb{R}^M
-\end{align*}
+\end{aligned} $$
 where the $K(x, x^\prime | \theta, \phi)_{[m, m^\prime]}$ entry defines the
 covariance between $f_m(x)$ and $f_{m^\prime}(x^\prime)(x)$. This construction
 of Gaussian processes allows us to learn the covariance between the output
 dimensions of $f(x)$. If we parameterize our kernel $K$:
-\begin{align*} K(x, x^\prime | \theta, \phi)_{[m, m^\prime]} = k(x, x^\prime |
-\theta) k(m, m^\prime | \phi) \end{align*}
+$$ \begin{aligned} K(x, x^\prime | \theta, \phi)_{[m, m^\prime]} = k(x, x^\prime |
+\theta) k(m, m^\prime | \phi) \end{aligned} $$
 then our finite dimensional generative model for the above is:
-\begin{align*}
+$$ \begin{aligned}
   f & \sim \mathsf{Matrixnormalal}(m(x), K(x | \alpha, \rho), C(\phi)) \\
   y_{i, m} & \sim \mathsf{normal}(f_{i,m}, \sigma) \\
   f & \in \mathbb{R}^{N \times M}
-\end{align*}
+\end{aligned} $$
 where $K(x | \alpha, \rho)$ is the exponentiated quadratic kernel we've used
 throughout this chapter, and $C(\phi)$ is a positive-definite matrix,
 parameterized by some vector $\phi$.
 
-The \mathsf{MatrixNormal} distribution has two covariance matrices: $K(x |
+The matrix normal distribution has two covariance matrices: $K(x |
 \alpha, \rho)$ to encode column covariance, and $C(\phi)$ to define row
-covariance. The salient features of the \mathsf{MatrixNormal} are that the rows
+covariance. The salient features of the matrix normal are that the rows
 of the matrix $f$ are distributed:
-\begin{align*} f_{[n,]} \sim \mathsf{multivariate\ normal}(m(x)_{[n,]}, K(x | \alpha,
-\rho)_{[n,n]} C(\phi)) \end{align*} and that the columns of the matrix $f$ are
-distributed: \begin{align*} f_{[,m]} \sim \mathsf{multivariate\ normal}(m(x)_{[,m]}, K(x
-  | \alpha, \rho) C(\phi)_{[m,m]}) \end{align*}
-This also means means that $\E\left[f^T f\right]$ is equal to
-$\text{trace}(K(x | \alpha, \rho)) * C$, whereas $\E\left[ff^T\right]$
+$$ \begin{aligned} f_{[n,]} \sim \mathsf{multivariate\ normal}(m(x)_{[n,]}, K(x | \alpha,
+\rho)_{[n,n]} C(\phi)) \end{aligned} $$ and that the columns of the matrix $f$ are
+distributed: $$ \begin{aligned} f_{[,m]} \sim \mathsf{multivariate\ normal}(m(x)_{[,m]}, K(x
+  | \alpha, \rho) C(\phi)_{[m,m]}) \end{aligned} $$
+This also means means that $\mathbb{E}\left[f^T f\right]$ is equal to
+$\text{trace}(K(x | \alpha, \rho)) * C$, whereas $\mathbb{E}\left[ff^T\right]$
 is $\text{trace}(C) * K(x | \alpha, \rho)$. We can derive this using
-properties of expectation and the \mathsf{MatrixNormal} density.
+properties of expectation and the matrix normal density.
 
 We should set $\alpha$ to $1.0$ because the parameter is not identified unless
 we constrain $\text{trace}(C) = 1$. Otherwise, we can multiply $\alpha$ by a scalar $d$ and
 $C$ by $1/d$ and our likelihood will not change.
 
-We can generate a random variable $f$ from a \mathsf{MatrixNormal} density in
+We can generate a random variable $f$ from a matrix normal density in
 $\mathbb{R}^{N \times M}$ using the following algorithm:
 
-\begin{align*}
+$$ \begin{aligned}
   \eta_{i,j} & \sim \mathsf{normal}(0, 1) \, \forall i,j \\
   f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
   f & \sim \mathsf{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
   \eta & \in \mathbb{R}^{N \times M} \\
   L_C(\phi) & = \text{cholesky\_decompose}(C(\phi)) \\
   L_{K(x | 1.0, \rho)} & = \text{cholesky\_decompose}(K(x | 1.0, \rho))
-\end{align*}
+\end{aligned} $$
 
 This can be implemented in Stan using a latent-variable GP formulation. We've used
-\mathsf{LkjCorr} for $C(\phi)$, but any positive-definite matrix will do.
+$\mathsf{LkjCorr}$ for $C(\phi)$, but any positive-definite matrix will do.
 
 
 ```

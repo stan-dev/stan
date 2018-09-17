@@ -117,7 +117,7 @@ Stan operates on the log scale and thus requires the log likelihood,
 
 $$
 \log p(D | e,l) =
-\mbox{log_sum_exp}_{s=1}^T
+\mbox{log\_sum\_exp}_{s=1}^T
 (
  \log \mathsf{Uniform}(s \, | \, 1, T)
 + \sum_{t=1}^T \log \mathsf{Poisson}(D_t \, | \, t < s \ ?
@@ -126,7 +126,7 @@ $$
 
 where the log sum of exponents function is defined by
 $$
-\mbox{log_sum_exp}_{n=1}^N \, \alpha_n
+\mbox{log\_sum\_exp}_{n=1}^N \, \alpha_n
 \ = \
 \log \sum_{n=1}^N \mbox{exp}(\alpha_n).
 $$
@@ -140,10 +140,9 @@ model calculations.
 ### Coding the Model in Stan {-}
 
 The Stan program for the change point model is shown in
-\reffigure{change-point-model}.  The transformed parameter
+the figure below.  The transformed parameter
 `lp[s]` stores the quantity $\log p(s, D \, | \, e, l)$.
 
-\begin{figure}
 ```
 data {
   real<lower=0> r_e;
@@ -173,22 +172,21 @@ model {
   target += log_sum_exp(lp);
 }
 ```
-\vspace*{-6pt}
-\caption{\small\it A change point model in which disaster rates
-  `D[t]` have one rate, `e`, before the change point and a
-  different rate, `l`, after the change point.  The change point
-  itself, `s`, is marginalized out as described in the
-  text.}
-\end{figure}
 id:change-point-model.figure
 
-Although the model in \reffigure{change-point-model} is easy to
-understand, the doubly nested loop used for `s` and `t` is
-quadratic in `T`.  Luke Wiklendt pointed out that a linear
-alternative can be achieved by the use of dynamic programming similar
-to the forward-backward algorithm for Hidden Markov models;  he
-submitted a slight variant of the following code to replace the
-transformed parameters block of the above Stan program.
+A change point model in which disaster rates `D[t]` have one rate,
+`e`, before the change point and a different rate, `l`, after the
+change point.  The change point itself, `s`, is marginalized out as
+described in the text.
+
+
+
+Although the change-point model is coded directly, the doubly nested
+loop used for `s` and `t` is quadratic in `T`.  Luke Wiklendt pointed
+out that a linear alternative can be achieved by the use of dynamic
+programming similar to the forward-backward algorithm for Hidden
+Markov models; he submitted a slight variant of the following code to
+replace the transformed parameters block of the above Stan program.
 
 ```
 transformed parameters {
@@ -272,26 +270,17 @@ p(s | D)
 $$
 
 A plot of the values of $\log p(s|D)$ computed using Stan 2.4's
-default MCMC implementation is shown in
-\reffigure{change-point-posterior}.
+default MCMC implementation is shown in the posterior plot.
 
-\begin{figure}
-\begin{center}
-\includegraphics[height=2in]{img/change-point-posterior.pdf}
-\ \ \ \ \
-\includegraphics[height=2in]{img/s-discrete-posterior.pdf}
-\end{center}
-\vspace*{-12pt}
-\caption{\small\it The posterior estimates for the change point.  \
-  {\rm Left)} log probability of change point being in year,
-  calculated analytically using `lp`; \ {\rm Right)}\ frequency
-  of change point draws in the posterior generated using
-  `lp`. The plot on the left is on the log scale and the plot on
-  the right on the linear scale; note the narrower range of years in
-  the right-hand plot resulting from sampling. The posterior mean of
-  $s$ is roughly 1891.}
-\end{figure}
+![log probability of change point being in year, calculated analytically]{img/change-point-posterior.pdf}
+![frequency of change point draws in the
+posterior generated using draws of change points]{img/s-discrete-posterior.pdf}
 id:change-point-posterior.figure
+
+The firts plot is on the log scale and the second plot on the linear
+scale; note the narrower range of years in the right-hand plot
+resulting from sampling. The posterior mean of $s$ is roughly 1891.
+
 
 
 
@@ -310,8 +299,8 @@ generated quantities {
 }
 ```
 
-A posterior histogram of draws for $s$ is shown on the right side of
-\reffigure{change-point-posterior}.
+A posterior histogram of draws for $s$ is shown on the second change
+point posterior figure above.
 
 Compared to working in terms of expectations, discrete sampling is
 highly inefficient, especially for tails of distributions, so this
@@ -404,7 +393,7 @@ with a recapture probability of $M/N$, the fraction of the total
 population $N$ marked in the first round.
 
 
-\begin{figure}
+
 ```
 data {
   int<lower=0> M;
@@ -418,16 +407,15 @@ model {
   R ~ binomial(C, M / N);
 }
 ```
-\vspace*{-6pt}
-\caption{\small\it A probabilistic formulation of the Lincoln-Petersen
-estimator for population size based on data from a one-step
-mark-recapture study.  The lower bound on $N$ is necessary to
-efficiently eliminate impossible values.}
-\end{figure}
 id:lincoln-petersen-model.figure
 
+A probabilistic formulation of the Lincoln-Petersen
+estimator for population size based on data from a one-step
+mark-recapture study.  The lower bound on $N$ is necessary to
+efficiently eliminate impossible values.
+
 The probabilistic variant of the Lincoln-Petersen estimator can be
-directly coded in Stan as shown in \reffigure{lincoln-petersen-model}.
+directly coded in Stan as shown in the Lincon-Petersen model figure. 
 The Lincoln-Petersen estimate is the maximum likelihood estimate (MLE)
 for this model.
 
@@ -1024,10 +1012,8 @@ function.
 
 ### Stan Implementation {-}
 
-The Stan program for the Dawid and Skene model is provided in
-\reffigure{dawid-skene-model}.
+The Stan program for the Dawid and Skene model is provided below @DawidSkene:1979.
 
-\begin{figure}
 ```
 data {
   int<lower=2> K;
@@ -1063,13 +1049,11 @@ model {
     target += log_sum_exp(log_q_z[i]);
 }
 ```
-\vspace*{-12pt}
-\caption{\small\it Stan program for the rating (or diagnostic
-  accuracy) model of @DawidSkene:1979. The model marginalizes
-  out the discrete parameter $z$, storing the unnormalized conditional
-  probability $\log q(z_i=k|\theta,\pi)$ in\ `log_q_z[i,~k]`.}
-\end{figure}
 id:dawid-skene-model.figure
+
+The model marginalizes out the discrete parameter $z$, storing the
+unnormalized conditional probability $\log q(z_i=k|\theta,\pi)$ in\
+`log_q_z[i,~k]`.
 
 The Stan model converges quickly and mixes well using NUTS starting at
 diffuse initial points, unlike the equivalent model implemented with

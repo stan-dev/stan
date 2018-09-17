@@ -30,7 +30,7 @@ $y_1$ and $y_2$, such that the vector $z$ goes to 0.
 
 A system of algebraic equations is coded directly in Stan as a
 function with a strictly specified signature. For example, the
-nonlinear system given by \refequation{algebra} can be coded using the
+nonlinear system given above can be coded using the
 following function in Stan (see the [user-defined functions
 section](#functions-programming) for more information on coding
 user-defined functions).

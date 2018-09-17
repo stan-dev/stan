@@ -1,5 +1,6 @@
 new_session: yes
-
+before_chapter_script: "before-chapter.R"
+delete_merged_file: TRUE
 rmd_files: [
   "index.Rmd",
   
@@ -48,7 +49,3 @@ rmd_files: [
 
   "references.Rmd"
 ]
-
-before_chapter_script: "before-chapter.R"
-
-delete_merged_file: TRUE

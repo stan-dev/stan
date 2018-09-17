@@ -123,15 +123,15 @@ such conditioning is  expensive computationally.
 ### Varying Curvature {-}
 
 In all but very simple models (such as multivariate normals), the
-Hessian will vary as $\theta$ varies.  As an example, see the
-illustration of Neal's funnel example in \reffigure{funnel}.  The more
-the curvature varies, the harder it is for all of the algorithms with
-fixed adaptation parameters (that is, everything but Riemannian
-Hamiltonian Monte Carlo) to find adaptations that cover the entire
-density well.  Many of the variable transforms proposed are aimed at
-improving the conditioning of the Hessian and/or making it more
-consistent across the relevant portions of the density (or penalized
-maximum likelihood function) being fit.
+Hessian will vary as $\theta$ varies (an extreme example is Neal's
+funnel, as naturally arises in hierarchical models with little or no
+data).  The more the curvature varies, the harder it is for all of the
+algorithms with fixed adaptation parameters (that is, everything but
+Riemannian Hamiltonian Monte Carlo) to find adaptations that cover the
+entire density well.  Many of the variable transforms proposed are
+aimed at improving the conditioning of the Hessian and/or making it
+more consistent across the relevant portions of the density (or
+penalized maximum likelihood function) being fit.
 
 For all of Stan's algorithms, the curvature along the path from the
 initial values of the parameters to the solution is relevant.  For
@@ -160,9 +160,9 @@ derived from a set of diffuse initial parameter values.
 Improving statistical efficiency is achieved by reparameterizing the
 model so that the same result may be calculated using a density or
 penalized maximum likelihood that is better conditioned.  Again, see
-the example of reparameterizing Neal's funnel in \reffigure{funnel}
-for an example, and also the examples in the
-[change of variables chapter](#change-of-variables.chapter).
+the example of reparameterizing Neal's funnel for an example, and also
+the examples in the [change of variables
+chapter](#change-of-variables.chapter).
 
 One has to be careful in using change-of-variables reparameterizations
 when using maximum likelihood estimation, because they can change the
@@ -312,7 +312,7 @@ model {
 }
 ```
 
-In this second model, the parameters \Verb|x_raw| and \Verb|y_raw| are
+In this second model, the parameters `x_raw` and `y_raw` are
 sampled as independent standard normals, which is easy for Stan.  These
 are then transformed into samples from the funnel.  In this case, the
 same transform may be used to define Monte Carlo samples directly
@@ -573,7 +573,7 @@ model {
   ...
 ```
 
-Any priors defined for \Verb|mu_beta| and \Verb|sigma_beta| remain as
+Any priors defined for `mu_beta` and `sigma_beta` remain as
 defined in the original model.
 
 Reparameterization of hierarchical models is not limited to the normal
@@ -636,9 +636,9 @@ model {
   ...
 ```
 
-In this case \Verb|mu| and \Verb|Sigma| are fixed data, but they could
+In this case `mu` and `Sigma` are fixed data, but they could
 be unknown parameters, in which case their priors would be unaffected
-by a reparameterization of \Verb|beta|.
+by a reparameterization of `beta`.
 
 If $\alpha$ has the same dimensions as $\beta$ but the elements of
 $\alpha$ are independently and identically distributed standard normal
@@ -671,8 +671,8 @@ model {
 ```
 
 This reparameterization is more efficient for two reasons. First, it
-reduces dependence among the elements of \Verb|alpha| and second, it
-avoids the need to invert \Verb|Sigma| every time \Verb|multi_normal|
+reduces dependence among the elements of `alpha` and second, it
+avoids the need to invert `Sigma` every time `multi_normal`
 is evaluated.
 
 The Cholesky factor is also useful when a covariance matrix is
@@ -684,9 +684,9 @@ a diagonal matrix of standard deviations and the Cholesky factor of
 the correlation matrix. Furthermore, the product of a diagonal matrix
 of standard deviations and a vector is equal to the elementwise
 product between the standard deviations and that vector. Thus, if for
-example the correlation matrix \Verb|Tau| were fixed data but the
-vector of standard deviations \Verb|sigma| were unknown parameters,
-then a reparameterization of \Verb|beta| in terms of \Verb|alpha|
+example the correlation matrix `Tau` were fixed data but the
+vector of standard deviations `sigma` were unknown parameters,
+then a reparameterization of `beta` in terms of `alpha`
 could be implemented as follows.
 
 ```
@@ -782,12 +782,12 @@ model {
 ```
 
 This reparameterization is more efficient for three reasons. First, it
-reduces dependence among the elements of \Verb|z| and second, it
+reduces dependence among the elements of `z` and second, it
 avoids the need to invert the covariance matrix, $W$ every time
-\Verb|wishart| is evaluated. Third, if $W$ is to be used with a
+`wishart` is evaluated. Third, if $W$ is to be used with a
 multivariate normal distribution, you can pass $L A$ to the more
-efficient \Verb|multi_normal_cholesky| function, rather than passing
-$W$ to \Verb|multi_normal|.
+efficient `multi_normal_cholesky` function, rather than passing
+$W$ to `multi_normal`.
 
 If $W$ is distributed Wishart with scale matrix $S$ and degrees of
 freedom $\nu$, then $W^{-1}$ is distributed inverse Wishart with inverse
@@ -919,7 +919,7 @@ apply the `sum()` operator, as in the following refactoring.
 ```
 
 Syntactically, the replacement is a statement block delineated
-by curly brackets (\Verb|{|, \Verb|}|), starting with the definition
+by curly brackets (`{`, `}`), starting with the definition
 of the local variable `summands`.
 
 Even though it involves extra work to allocate the `summands`

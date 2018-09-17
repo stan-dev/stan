@@ -68,7 +68,7 @@ The log sum of exponentials function is used to define mixtures on the
 log scale.  It is defined for two inputs by
 
 $$
-\mbox{log_sum_exp}(a, b) = \log (\exp(a) + \exp(b)).
+\mbox{log\_sum\_exp}(a, b) = \log (\exp(a) + \exp(b)).
 $$
 
 If $a$ and $b$ are probabilities on the log scale, then $\exp(a) +
@@ -115,7 +115,7 @@ $$
                  \exp(\log(0.3 * \mathsf{normal}(y|-1,2))) 
                  + \exp(\log(0.7 * \mathsf{normal}(y|3,1))) )
 \\
- = \mbox{log_sum_exp}(
+ = \mbox{log\_sum\_exp}(
                          \log(0.3) + \log \mathsf{normal}(y|-1,2),
                          \log(0.7) + \log \mathsf{normal}(y|3,1) ).
 $$
@@ -369,7 +369,7 @@ $$
 
 the joint distribution $p(y, \mu, \sigma, \lambda)$ is exchangeable
 in the parameters $(\mu_1, \sigma_1)$ and $(\mu_2, \sigma_2)$ with
-$\lambda$ flipping to $1 - \lambda^[Imposing a constraint such as $\theta < 0.5$ will resolve the symmetry, but fundamentally changes the model and its posterior inferences.]
+$\lambda$ flipping to $1 - \lambda$.^[Imposing a constraint such as $\theta < 0.5$ will resolve the symmetry, but fundamentally changes the model and its posterior inferences.]
 
 ### Inference under Label Switching {-}
 
@@ -598,7 +598,8 @@ p(y|\theta,\lambda)
 \end{cases}
 $$
 
-where \mathsf{PoissonCDF} is the cumulative distribution function for
+
+where $\mathsf{PoissonCDF}$ is the cumulative distribution function for
 the Poisson distribution.  The hurdle model is even more straightforward to
 program in Stan, as it does not require an explicit mixture.
 

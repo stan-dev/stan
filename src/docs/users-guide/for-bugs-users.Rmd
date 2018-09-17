@@ -178,23 +178,17 @@ brackets indicating the body of the for loop.
   (i.e., the precision matrix) (as in BUGS). The same is true for
   the "multivariate student" distribution.
 
-\item
-The distributions have slightly different names:
-
-\begin{quote}
-\begin{tabular}{l|l}
-{\it BUGS} & {\it Stan} \\ \hline \hline
-`dnorm` & `normal` \\
-`dbinom` & `binomial` \\
-`dpois` & `poisson` \\
-$\vdots$ & $\vdots$
-\end{tabular}
-\end{quote}
+* The distributions have slightly different names:
+| BUGS     | Stan         | 
+|:--------:|:------------:|
+| `dnorm`  | `normal`     |
+| `dbinom` | `binomial`   |
+| `dpois`  | `poisson`    |
+|  ...     | ...          |
 
 * Stan, unlike BUGS, allows intermediate quantities, in the form
   of local variables, to be reassigned.  For example, the following is
   legal and meaningful (if possibly inefficient) Stan code.
-
 ```
 {
   total = 0;
@@ -204,7 +198,6 @@ $\vdots$ & $\vdots$
   }
 }
 ```
-
 In BUGS, the above model would not be legal because the variable
 `total` is defined more than once.  But in Stan, the loop is
 executed in order, so `total` is overwritten in each step.
@@ -216,30 +209,27 @@ executed in order, so `total` is overwritten in each step.
   are used for error checking.  For parameters, the constraints
   are critical to sampling as they determine the geometry over which
   the Hamiltonian is simulated.
-  \\[6pt]
-  Variables can be declared as data, transformed data, parameters, transformed
-  parameters, or generated quantities.  They can also be declared as
-  local variables within blocks.  For more information, see
-  the part of this manual devoted to the Stan programming language and
-  examine at the example models.
 
-* Stan allows all sorts of tricks with vector and matrix
-  operations which can make Stan models more compact.  For example,
-  arguments to probability functions may be vectorized,^[Most distributions have been vectorized, but currently the truncated versions may not exist and may not be vectorized.]
+* In Stan, variables can be declared as data, transformed data,
+  parameters, transformed parameters, or generated quantities.  They
+  can also be declared as local variables within blocks.  For more
+  information, see the part of this manual devoted to the Stan
+  programming language and examine at the example models.
 
+* Stan allows all sorts of tricks with vector and matrix operations
+  which can make Stan models more compact.  For example, arguments to
+  probability functions may be vectorized,^[Most distributions have
+  been vectorized, but currently the truncated versions may not exist
+  and may not be vectorized.]
 allowing
-
 ```
 for (i in 1:n)
   y[i] ~ normal(mu[i], sigma[i]);
 ```
-
 to be expressed more compactly as
-
 ```
 y ~ normal(mu, sigma);
 ```
-
 The vectorized form is also more efficient because Stan can unfold the
 computation of the chain rule during algorithmic differentiation.
 
@@ -252,7 +242,7 @@ vector[K] theta[J];
 
 Then `theta[j]` is an expression denoting a `K`-vector and
 may be used in the code just like any other vector variable.
-\\[6pt]
+
 An alternative encoding would be with a two-dimensional array, as in
 ```
 real theta[J,K];
@@ -308,42 +298,43 @@ model {
     }
 }
 ```
-<
+
 
 ## Some Differences in the Statistical Models that are Allowed
 
+* Stan does not yet support declaration of discrete parameters.
+  Discrete data variables are supported.  Inference is supported
+  for discrete parameters as described in the mixture and latent
+  discrete parameters chapters of the manual.
 
-* Stan does not yet support estimation of discrete parameters
-  (discrete data are supported).  We may eventually implement a
-  combination of Gibbs and slice sampling for discrete parameters, but
-  we haven't done so yet.
 * Stan has some distributions on covariance matrices that do not
   exist in BUGS, including a uniform distribution over correlation
   matrices which may be rescaled, and the priors based on C-vines
   defined in @LewandowskiKurowickaJoe:2009.  In particular, the
   Lewandowski et al.\ prior allows the correlation matrix to be shrunk
   toward the unit matrix while the scales are given independent priors.
+
 * In BUGS you need to define all variables.  In Stan, if you
   declare but don't define a parameter it implicitly has a flat prior
   (on the scale in which the parameter is defined).  For example, if
   you have a parameter `p` declared as
 ```
-real<lower=0,upper=1> p;
+real<lower = 0, upper = 1> p;
 ```
 
 and then have no sampling statement for `p` in the `model`
 block, then you are implicitly assigning a uniform $[0,1]$ prior on
 `p`.
+
 On the other hand, if you have a parameter `theta` declared with
 
 ```
 real theta;
 ```
 
-and have no sampling statement for `theta` in the
-`model` block,
- then you are implicitly assigning an improper uniform prior
-on $(-\infty,\infty)$ to `theta`.
+and have no sampling statement for `theta` in the `model` block, then
+you are implicitly assigning an improper uniform prior on
+$(-\infty,\infty)$ to `theta`.
 
 * BUGS models are always proper (being constructed as a product
   of proper marginal and conditional densities).  Stan models can be
@@ -360,38 +351,40 @@ model { }
   use these distributions for Bayesian inference.  There is no general
   way to check if a posterior distribution is improper.  But if all
   the priors are proper, the posterior will be proper also.
-\item
-  As noted earlier, each statement in a Stan model is directly translated into the C++ code for computing the log posterior.  Thus, for example, the following pair of statements is legal in a Stan model:
+
+
+* Each statement in a Stan model is directly translated into the C++ code for
+computing the log posterior.  Thus, for example, the following pair of statements is
+legal in a Stan model:
 ```
 y ~ normal(0,1);
 y ~ normal(2,3);
 ```
-
 The second line here does *not* simply overwrite the first;
 rather, *both* statements contribute to the density function that
 is evaluated.  The above two lines have the effect of including the
 product, $\mathsf{normal}(y|0,1) * \mathsf{normal}(y|2,3)$, into the
 density function.
-\\[6pt]
+
 For a perhaps more confusing example, consider the following two lines in a Stan model:
 ```
-x ~ normal(0.8*y, sigma);
-y ~ normal(0.8*x, sigma);
+x ~ normal(0.8 * y, sigma);
+y ~ normal(0.8 * x, sigma);
 ```
 
 At first, this might look like a joint normal distribution with a
-correlation of 0.8.  But it is not.  The above are *not*
-interpreted as conditional entities; rather, they are factors in the
-joint density.  Multiplying them gives, $\mathsf{normal}(x|0.8y,\sigma)
-* \mathsf{normal}(y|0.8x,\sigma)$, which is what it is (you can
+correlation of 0.8.  But it is not.  The above are *not* interpreted
+as conditional entities; rather, they are factors in the joint
+density.  Multiplying them gives, $\mathsf{normal}(x|0.8y,\sigma)
+\times \mathsf{normal}(y|0.8x,\sigma)$, which is what it is (you can
 work out the algebra) but it is not the joint distribution where the
 conditionals have regressions with slope 0.8.
 
 * With censoring and truncation, Stan uses the censored-data or
-  truncated-data likelihood---this is not always done in BUGS.  All
-  of the approaches to censoring and truncation discussed in
-  @GelmanEtAl:2013 and @GelmanHill:2007 may
-  be implemented in Stan directly as written.
+  truncated-data likelihood---this is not always done in BUGS.  All of
+  the approaches to censoring and truncation discussed in
+  @GelmanEtAl:2013 and @GelmanHill:2007 may be implemented in Stan
+  directly as written.
 
 * Stan, like BUGS, can benefit from human intervention in the
   form of reparameterization.  More on this topic to come.
@@ -401,19 +394,22 @@ conditionals have regressions with slope 0.8.
 
 
 * Stan can be set up from within R using two lines of code.
-  Follow the instructions for running Stan from R on
-  \url{http://mc-stan.org}.  You don't need to separately download
+  Follow the instructions for running Stan from R on the
+  [Stan web site](http://mc-stan.org).  You don't need to separately download
   Stan and RStan.  Installing RStan will automatically set up Stan.
   When RStan moves to CRAN, it will get even easier.
+
 * In practice we typically run the same Stan model repeatedly.  If
   you pass RStan the result of a previously fitted model the model will
   not need be recompiled. An example is given on the running
   Stan from R pages available from the [Stan web site](http://mc-stan.org).
+
 * When you run Stan, it saves various conditions including
   starting values, some control variables for the tuning and running
   of the no-U-turn sampler, and the initial random seed. You can
   specify these values in the Stan call and thus achieve exact
   replication if desired.  (This can be useful for debugging.)
+
 * When running BUGS from R, you need to send exactly the data
   that the model needs.  When running RStan, you can include extra
   data, which can be helpful when playing around with models.  For
@@ -421,10 +417,12 @@ conditionals have regressions with slope 0.8.
   it in the data sent from R, thus allowing you to quickly alter the
   Stan model without having to also change the calling information in
   your R script.
+
 * As in R2WinBUGS and R2jags, after running the Stan model, you
   can quickly summarize using `plot()` and `print()`.  You
   can access the simulations themselves using various extractor
   functions, as described in the RStan documentation.
+
 * Various information about the sampler, such as number of
   leapfrog steps, log probability, and step size, is available through
   extractor functions.   These can be useful for understanding what is

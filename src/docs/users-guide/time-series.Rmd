@@ -163,7 +163,7 @@ $$
 In order to ensure the noise terms $\sigma^2_t$ are positive, the
 scale coefficients are constrained to be positive, $\alpha_0, \alpha_1
 > 0$.  To ensure stationarity of the time series, the slope is
-constrained to to be less than one, $\alpha_1 < 1^[In practice, it can be useful to remove the constraint to test whether a non-stationary set of coefficients provides a better fit to the data.  It can also be useful to add a trend term to the model, because an unfitted trend will manifest as non-stationarity.]
+constrained to to be less than one, i.e., $\alpha_1 < 1$.^[In practice, it can be useful to remove the constraint to test whether a non-stationary set of coefficients provides a better fit to the data.  It can also be useful to add a trend term to the model, because an unfitted trend will manifest as non-stationarity.]
 
 The ARCH(1) model may be coded directly in Stan as follows.
 

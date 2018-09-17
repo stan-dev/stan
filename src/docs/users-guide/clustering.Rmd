@@ -73,12 +73,12 @@ $$
 The sample implementation in this section assumes a fixed unit
 covariance matrix shared by all clusters $k$,
 $$
-\Sigma_k = \mbox{diag_matrix}({\bf 1}),
+\Sigma_k = \mbox{diag\_matrix}({\bf 1}),
 $$
 so that the log multivariate normal can be implemented directly up to a proportion
 by
 $$
-\mbox{normal}\left( y_n | \mu_k, \mbox{diag_matrix}({\bf 1}) \right)
+\mbox{normal}\left( y_n | \mu_k, \mbox{diag\_matrix}({\bf 1}) \right)
 \propto \exp \left (- \frac{1}{2} \sum_{d=1}^D \left( \mu_{k,d} - y_{n,d}
   \right)^2 \right).
 $$
@@ -406,7 +406,7 @@ To specify a Stan model for performing full Bayesian inference, the
 model for labeled data is combined with the model for unlabeled data.
 A second document collection is declared as data, but without the
 category labels, leading to new variables `M2` `N2`,
-`w2`, \and `doc2`.  The number of categories and number of
+`w2`, and `doc2`.  The number of categories and number of
 words, as well as the hyperparameters are shared and only declared
 once.  Similarly, there is only one set of parameters.  Then the model
 contains a single set of statements for the prior, a set of statements

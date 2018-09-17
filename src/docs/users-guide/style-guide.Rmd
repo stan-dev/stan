@@ -35,9 +35,9 @@ more informatively, `.data.R`.
 
 The recommended variable naming is to follow C/C++ naming
 conventions, in which variables are lowercase, with the underscore
-character (\Verb|_|) used as a separator.  Thus it is preferred to use
-\Verb|sigma_y|, rather than the run together \Verb|sigmay|, camel-case
-\Verb|sigmaY|, or capitalized camel-case \Verb|SigmaY|.  Even matrix
+character (`_`) used as a separator.  Thus it is preferred to use
+`sigma_y`, rather than the run together `sigmay`, camel-case
+`sigmaY`, or capitalized camel-case `SigmaY`.  Even matrix
 variables should be lowercased.
 
 The exception to the lowercasing recommendation, which also follows

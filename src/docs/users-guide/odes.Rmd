@@ -50,10 +50,9 @@ sequence of times $t_0 < t_1 < t_2 < \cdots$.
 
 A system of ODEs is coded directly in Stan as a function with a
 strictly specified signature.  For example, the simple harmonic
-oscillator given in \refequation{ode-sho}, can be coded using the
-following function in Stan (see the [user-defined functions
-chapter](#functions-programming.chapter) for more information on coding
-user-defined functions).
+oscillator can be coded using the following function in Stan (see the
+[user-defined functions chapter](#functions-programming.chapter) for
+more information on coding user-defined functions).
 
 ```
 real[] sho(real t,        // time
@@ -88,8 +87,8 @@ The function defining the system must have exactly these argument
 types and return type.  This may require passing in zero-length arrays
 for data or parameters if the system does not involve data or
 parameters.  A full example for the simple harmonic oscillator, which
-does not depend on any constant data variables, is provided in
-\reffigure{sho-trajectory}.
+does not depend on any constant data variables, is provided in the
+simple harmonic oscillator trajectory plot. 
 
 ### Discontinuous ODE System Function {-}
 
@@ -160,9 +159,9 @@ $$
 id:ode.sho_matrix
 
 The Stan model to simulate noisy observations using a matrix exponential function
-is given by \reffigure{sho-sim-me}. Because we are performing matrix
+is given below. Because we are performing matrix
 operations, we declare `y0` and `y_hat` as vectors, instead of using arrays,
-as in the previous example code (\reffigure{sho-sim}).
+as in the previous example code.
 
 In general, computing a matrix exponential will be more efficient than using a numerical
 solver. We can however only apply this technique to systems of \underline{linear} ODEs.
@@ -213,29 +212,21 @@ value of $\theta = 0.15$ and initial state $y(t=0) = (1,0)$.  Now
 suppose the system is observed at 10 time points, say $t=1, 2, ...,
 10$, where each measurement of $y(t)$ has independent
 $\mathsf{normal}(0, 0.1)$ error in both dimensions ($y_1(t)$ and
-$y_2(t)$).  A plot of such measurements is shown in
-\reffigure{sho-trajectory}.
+$y_2(t)$).  A plot of such measurements is shown in the simple harmonic
+oscillator trajectory plots.
 
-\begin{figure}
-\begin{center}
-\includegraphics[height=2in]{img/sho-ode-trajectory.pdf}
-\end{center}
-\vspace*{-0.25in}
-\caption{\small\it Trajectory of the simple harmonic oscillator given
+![Trajectory of the simple harmonic oscillator given
   parameter $\theta=0.15$ and initial condition $y(t=0) = (1,0)$ with
   additional independent\ $\mathsf{normal}(0,0.1)$ measurement error
-  in both dimensions.}
-\end{figure}
+  in both dimensions.](img/sho-ode-trajectory.pdf)
 id:sho-trajectory.figure
-
 
 
 ### Simulating Noisy Measurements {-}
 
 The data used to make this plot is derived from the Stan model to
-simulate noisy observations given in \reffigure{sho-sim}.
+simulate noisy observations given below.
 
-\begin{figure}
 ```
 functions {
   real[] sho(real t,
@@ -270,18 +261,15 @@ generated quantities {
     y_hat[t, 2] += normal_rng(0, 0.1);
   }
 }
-```
-\vspace*{-0.2in}
-\caption{\small\it Stan program to simulate noisy measurements from a
-  simple harmonic oscillator.  The system of differential equations is
-  coded as a function.  The system parameters `theta` and initial
-  state `y0` are read in as data along with the initial time
-  `t0` and observation times `ts`. The generated quantities
-  block is used to solve the ODE for the specified times and then add
-  random measurement error, producing observations `y_hat`.
-  Because the system is not stiff, the `rk45` solver is used.}
-\end{figure}
 id:sho-sim.figure
+
+The system of differential equations is coded as a function.  The
+system parameters `theta` and initial state `y0` are read in as data
+along with the initial time `t0` and observation times `ts`. The
+generated quantities block is used to solve the ODE for the specified
+times and then add random measurement error, producing observations
+`y_hat`.  Because the system is not stiff, the `rk45` solver is used.
+
 
 This program illustrates the way in which the ODE solver is called in
 a Stan program,
@@ -360,25 +348,22 @@ model {
     y[t] ~ normal(y_hat[t], sigma);
 }
 ```
-\vspace*{-0.2in}
-\caption{\small\it Stan program to estimate unknown initial conditions
-  `y0` and system parameter `theta` for the simple harmonic
-  oscillator with independent normal measurement
-  error.}
-\end{figure}
 id:sho-both.figure
+
+This Stan program allows estimates of unknown initial conditions `y0`
+and system parameter `theta` for the simple harmonic oscillator with
+independent normal measurement error.
 
 A Stan program that can be used to estimate both the initial state and
 parameter value for the simple harmonic oscillator given noisy
-observations is given in \reffigure{sho-both}.  Compared to the
-simulation model in \reffigure{sho-sim}, the model to estimate
-parameters uses the `integrate_ode` function in the model block
-rather than the generated quantities block.  There are Cauchy priors on the
-measurement error scales `sigma` and standard normal priors on the
-components of parameter array `theta` and initial state parameter
-array `y0`.  The solutions to the ODE are then assigned to an
-array `y_hat`, which is then used as the location in the
-observation noise model as follows.
+observations is given above.  Compared to the program for simulation,
+the program to estimate parameters uses the `integrate_ode` function
+in the model block rather than the generated quantities block.  There
+are Cauchy priors on the measurement error scales `sigma` and standard
+normal priors on the components of parameter array `theta` and initial
+state parameter array `y0`.  The solutions to the ODE are then
+assigned to an array `y_hat`, which is then used as the location in
+the observation noise model as follows.
 
 ```
 y_hat = integrate_ode_rk45(sho, y0, t0, ts, theta, x_r, x_i);

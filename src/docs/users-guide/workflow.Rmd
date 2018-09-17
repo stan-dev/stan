@@ -5,7 +5,7 @@ In this chapter we go through an artificial probem from beginning to end, starti
 The other chapters of this book are focused on building Stan models.  This chapter is a bit different in focusing on the Bayesian data analysis workflow of model building, checking, and expansion within R.
 
 ## The problem
-
+g
 ### Background {-}
 
 Imagine that you are a statistician or data scientist working as an independent
@@ -151,13 +151,11 @@ model.
 
 For building $b = 1,\dots,10$ at time (month) $t = 1,\dots,12$, we have
 
-$$
-\begin{align*}
+$$ \begin{aligned}
 \textrm{complaints}_{b,t} & \sim \textrm{Poisson}(\lambda_{b,t}) \\
 \lambda_{b,t} & = \exp{(\eta_{b,t})} \\
 \eta_{b,t} &= \alpha + \beta \, \textrm{traps}_{b,t}
-\end{align*}
-$$
+\end{aligned} $$
 
 Let's encode this probability model in a Stan program.
 
@@ -370,24 +368,20 @@ the square footage of each building, so if we add that information into the
 model, we can interpret our parameters as a rate of complaints per square foot
 per 30 days.
 
-$$
-\begin{align*}
-\textrm{complaints}_{b,t} & \sim \textrm{Poisson}(\textrm{sq_foot}_b\,\lambda_{b,t}) \\
+$$ \begin{aligned}
+\textrm{complaints}_{b,t} & \sim \textrm{Poisson}(\textrm{sq\_foot}_b\,\lambda_{b,t}) \\
 \lambda_{b,t} & = \exp{(\eta_{b,t} )} \\
 \eta_{b,t} &= \alpha + \beta \, \textrm{traps}_{b,t}
-\end{align*}
-$$
+\end{aligned} $$
 
-The term $\text{sq_foot}$ is called an exposure term. If we log the term, we can 
+The term $\textrm{sq\_foot}$ is called an exposure term. If we log the term, we can 
 put it in $\eta_{b,t}$:
 
-$$
-\begin{align*}
+$$ \begin{aligned}
 \textrm{complaints}_{b,t} & \sim \textrm{Poisson}(\lambda_{b,t}) \\
 \lambda_{b,t} & = \exp{(\eta_{b,t} )} \\
-\eta_{b,t} &= \alpha + \beta \, \textrm{traps}_{b,t} + \textrm{log_sq_foot}_b
-\end{align*}
-$$
+\eta_{b,t} &= \alpha + \beta \, \textrm{traps}_{b,t} + \textrm{log\_sq\_foot}_b
+\end{aligned} $$
 
 A quick check finds a relationship between the square
 footage of the building and the number of complaints received:
@@ -495,17 +489,20 @@ count data well because the same parameter $\lambda$, controls both the
 expected counts and the variance of these counts. The natural alternative to
 this is the negative binomial model:
 
-$$
-\begin{align*}
-\text{complaints}_{b,t} & \sim \text{Neg-Binomial}(\lambda_{b,t}, \phi) \\
-\lambda_{b,t} & = \exp{(\eta_{b,t})} \\
-\eta_{b,t} &= \alpha + \beta \, {\rm traps}_{b,t} + \beta_{\rm super} \, {\rm super}_{b} + \text{log_sq_foot}_{b}
-\end{align*}
-$$
+$$ \begin{aligned}
+\mathrm{complaints}_{b,t} & \sim \mathrm{Neg-Binomial}(\lambda_{b,t}, \phi) \\
+\lambda_{b,t} & = \exp(\eta_{b,t}) \\
+\eta_{b,t} & = \alpha + \beta \, \mathrm{traps}_{b,t} + \beta_{\mathrm{super}} \, \mathrm{super}_{b} + \mathrm{log\_sq\_foot}_{b}
+\end{aligned} $$
 
-In Stan the negative binomial mass function we'll use is called 
-$\texttt{neg_binomial_2_log}(\text{ints} \, y, \text{reals} \, \eta, \text{reals} \, \phi)$ 
-in Stan. Like the `poisson_log` function, this negative binomial mass function
+
+In Stan the negative binomial mass function we'll use has the signature
+
+```
+neg_binomial_2_log(ints y, reals eta, reals phi)
+```
+
+Like the `poisson_log` function, this negative binomial mass function
 that is parameterized in terms of its log-mean, $\eta$, but it also has a
 precision $\phi$ such that
 
@@ -652,7 +649,7 @@ to our model.
 $$
 \text{complaints}_{b,t} \sim \text{Neg-Binomial}(\lambda_{b,t}, \phi) \\
 \lambda_{b,t}  = \exp{(\eta_{b,t})} \\
-\eta_{b,t} = \mu_b + \beta \, {\rm traps}_{b,t} + \beta_{\rm super}\, {\rm super}_b + \text{log_sq_foot}_b \\
+\eta_{b,t} = \mu_b + \beta \, {\rm traps}_{b,t} + \beta_{\rm super}\, {\rm super}_b + \text{log\_sq\_foot}_b \\
 \mu_b \sim \text{normal}(\alpha, \sigma_{\mu})
 $$
 
@@ -663,7 +660,7 @@ One of our predictors varies only by building, so we can rewrite the above model
 more efficiently like so:
 
 $$
-\eta_{b,t} = \mu_b + \beta \, {\rm traps}_{b,t} + \text{log_sq_foot}_b\\
+\eta_{b,t} = \mu_b + \beta \, {\rm traps}_{b,t} + \text{log\_sq\_foot}_b\\
 \mu_b \sim \text{normal}(\alpha +  \beta_{\text{super}} \, \text{super}_b , \sigma_{\mu})
 $$
 
@@ -681,8 +678,8 @@ monthly rent so we can add that data into a matrix called
 We'll write the Stan model like:
 
 $$
-\eta_{b,t} = \alpha_b + \beta \, {\rm traps} + \text{log_sq_foot}\\
-\mu \sim \text{normal}(\alpha + \texttt{building_data} \, \zeta, \,\sigma_{\mu})
+\eta_{b,t} = \alpha_b + \beta \, {\rm traps} + \text{log\_sq\_foot}\\
+\mu \sim \text{normal}(\alpha + \texttt{building\_data} \, \zeta, \,\sigma_{\mu})
 $$
 
 ### Preparation for building data for hierarchical modeling {-}
@@ -835,18 +832,18 @@ parcoord_with_divs <- mcmc_parcoord(as.array(fitted_model_NB_hier, pars = c("sig
 parcoord_with_divs
 ```
 
-Again, we see evidence that our problems concentrate when $\texttt{sigma_mu}$ is small.
+Again, we see evidence that our problems concentrate when `sigma_mu` is small.
 
 ### Reparameterizing and rechecking diagnostics {-}
 
 Instead, we should use the non-centered parameterization for $\mu_b$. We
 define a vector of auxiliary variables in the parameters block,
-$\texttt{mu_raw}$ that is given a normal(0,1) prior in the model
+`mu_raw` that is given a $\mathrm{normal}(0,1)$ prior in the model
 block. We then make $\texttt{mu}$ a transformed parameter:
 We can reparameterize the random intercept $\mu_b$, which is distributed:
 
 $$
-\mu_b \sim \text{normal}(\alpha + \texttt{building_data} \, \zeta, \sigma_{\mu})
+\mu_b \sim \text{normal}(\alpha + \texttt{building\_data} \, \zeta, \sigma_{\mu})
 $$
 
 
@@ -858,9 +855,9 @@ transformed parameters {
 ```
 
 This gives $\texttt{mu}$ a
-$\text{normal}(\alpha + \texttt{building_data}\, \zeta, \sigma_\mu)$ 
+$\text{normal}(\alpha + \texttt{building\_data}\, \zeta, \sigma_\mu)$ 
 distribution, but it decouples the dependence of the density of each element of
-$\texttt{mu}$ from $\texttt{sigma_mu}$ ($\sigma_\mu$).
+$\texttt{mu}$ from `sigma_mu` ($\sigma_\mu$).
 hier_NB_regression_ncp.stan uses the non-centered parameterization for
 $\texttt{mu}$. We will examine the effective sample size of the fitted model to
 see whether we've fixed the problem with our reparameterization.
@@ -970,9 +967,9 @@ the fit.
 $$
 \text{complaints}_{b,t} \sim \text{Neg-Binomial}(\lambda_{b,t}, \phi)  \\
 \lambda_{b,t} = \exp{(\eta_{b,t})}\\
-\eta_{b,t} = \mu_b + \kappa_b \, \texttt{traps}_{b,t} + \text{log_sq_foot}_b \\
-\mu_b \sim \text{normal}(\alpha + \texttt{building_data} \, \zeta, \sigma_{\mu}) \\
-\kappa_b \sim \text{normal}(\beta + \texttt{building_data} \, \gamma, \sigma_{\kappa})
+\eta_{b,t} = \mu_b + \kappa_b \, \texttt{traps}_{b,t} + \text{log\_sq\_foot}_b \\
+\mu_b \sim \text{normal}(\alpha + \texttt{building\_data} \, \zeta, \sigma_{\mu}) \\
+\kappa_b \sim \text{normal}(\beta + \texttt{building\_data} \, \gamma, \sigma_{\kappa})
 $$
 
 Let's compile the model.
@@ -1031,7 +1028,7 @@ ppc_stat_grouped(y = stan_dat_hier$complaints[select_vec],
 We might augment our model with a log-additive monthly effect, $\texttt{mo}_t$. 
 
 $$
-\eta_{b,t} = \mu_b + \kappa_b \, \texttt{traps}_{b,t} + \texttt{mo}_t + \text{log_sq_foot}_b
+\eta_{b,t} = \mu_b + \kappa_b \, \texttt{traps}_{b,t} + \texttt{mo}_t + \text{log\_sq\_foot}_b
 $$
 
 We have complete freedom over how to specify the prior for $\texttt{mo}_t$. There are 
@@ -1301,22 +1298,20 @@ We can derive the joint distribution for the AR(1) process before we move to the
 Gaussian process (GP) which will give us a little more insight into what a GP
 is. Remember that we've specified the AR(1) prior as:
 
-$$
-\begin{aligned}
+
+$$ \begin{aligned}
 \texttt{mo}_1 & \sim \text{normal}\left(0, \frac{\sigma_\texttt{mo}}{\sqrt{1 - \rho^2}}\right) \\
 \texttt{mo}_t & \sim \text{normal}\left(\rho \, \texttt{mo}_{t-1}, \sigma_\texttt{mo}\right) \forall t > 1
-\end{aligned}
-$$
+\end{aligned} $$
+
 Rewriting our process in terms of the errors will make the derivation
 of the joint distribution clearer
 
-$$
-\begin{aligned}
+$$ \begin{aligned}
 \texttt{mo}_1 & \sim \text{normal}\left(0, \frac{\sigma_\texttt{mo}}{\sqrt{1 - \rho^2}}\right) \\
 \texttt{mo}_t & = \rho \, \texttt{mo}_{t-1} + \sigma_\texttt{mo}\epsilon_t  \\
 \epsilon_t & \sim \text{normal}\left(0, 1\right)
-\end{aligned}
-$$
+\end{aligned} $$
 
 Given that the first term $\texttt{mo}_1$ is normally distributed, and
 the other terms are sums of normal random variables, jointly
@@ -1330,13 +1325,13 @@ We can use this fact to show that our vector `mo` is jointly multivariate
 normal.
 
 Just as before with the noncentered parameterization, we'll be taking a vector
-$\texttt{mo_raw} \in \mathbb{R}^M$ in which each element is univariate
+$\texttt{mo\_raw} \in \mathbb{R}^M$ in which each element is univariate
 $\text{normal}(0,1)$
 and transforming it into `mo`, but instead of doing the transformation with scalar transformations as in 
 the section __Time varying effects and structured priors__, we'll do it with linear algebra operations.
-The trick is that by specifying each element of $\texttt{mo_raw}$ to be distributed $\text{normal}(0,1)$ we
-are implicitly defining $\texttt{mo_raw} \sim \text{multivariate \ normal}(0, I_M)$, where $I_M$ is the identity matrix of
-dimension $M \times M$. Then we do a linear transformation using a matrix $L$ and assign the result to `mo` like $\texttt{mo} = L*\texttt{mo_raw}$
+The trick is that by specifying each element of $\texttt{mo\_raw}$ to be distributed $\text{normal}(0,1)$ we
+are implicitly defining $\texttt{mo\_raw} \sim \text{multivariate \ normal}(0, I_M)$, where $I_M$ is the identity matrix of
+dimension $M \times M$. Then we do a linear transformation using a matrix $L$ and assign the result to `mo` like $\texttt{mo} = L*\texttt{mo\_raw}$
 so $\texttt{mo} \sim \text{multivariate \ normal}(0, LI_M L^T)$ and $LI_M L^T = LL^T$.
 
 Consider the case where we have three elements in `mo` and we want to make figure out the form for $L$.
@@ -1345,43 +1340,39 @@ The first element of `mo` is fairly straightforward, because it mirrors our earl
 of the AR(1) prior. The only difference is that we're explicitly adding the last two terms of `mo_raw`
 into the equation so we can use matrix algebra for our transformation.
 $$
-\texttt{mo}_1 = \frac{\sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} *\texttt{mo_raw}_1 + 0 *\texttt{mo_raw}_2 + 0 *\texttt{mo_raw}_3\\
+\texttt{mo}_1 = \frac{\sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} *\texttt{mo\_raw}_1 + 0 *\texttt{mo\_raw}_2 + 0 *\texttt{mo\_raw}_3\\
 $$
 The second element is a bit more complicated:
 
-$$
-\begin{aligned}
-\texttt{mo}_2 & = \rho \texttt{mo}_1 + \sigma_{\texttt{mo}}\,\texttt{mo_raw}_2 + 0 * \texttt{mo_raw}_3  \\
- & = \rho \left(\frac{\sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} *\texttt{mo_raw}_1\right) + \sigma_{\texttt{mo}}\,\texttt{mo_raw}_2 + 0 * \texttt{mo_raw}_3  \\[5pt]
- & = \frac{\rho \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo_raw}_1 + \sigma_{\texttt{mo}}\,\texttt{mo_raw}_2 + 0 * \texttt{mo_raw}_3  \\
-\end{aligned}
-$$
+$$ \begin{aligned}
+\texttt{mo}_2 & = \rho \texttt{mo}_1 + \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_2 + 0 * \texttt{mo\_raw}_3  \\
+ & = \rho \left(\frac{\sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} *\texttt{mo\_raw}_1\right) + \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_2 + 0 * \texttt{mo\_raw}_3  \\[5pt]
+ & = \frac{\rho \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo\_raw}_1 + \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_2 + 0 * \texttt{mo\_raw}_3  \\
+\end{aligned} $$
 
 While the third element will involve all three terms
-$$
-\begin{aligned}
-\texttt{mo}_3 & = \rho \, \texttt{mo}_2 + \sigma_{\texttt{mo}}\,\texttt{mo_raw}_3 \\
- & = \rho \left(\frac{\rho \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} *\texttt{mo_raw}_1 + \sigma_{\texttt{mo}}\,\texttt{mo_raw}_2\right) + \sigma_{\texttt{mo}} \texttt{mo_raw}_3  \\[5pt]
-& = \frac{\rho^2 \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo_raw}_1 + \rho \, \sigma_{\texttt{mo}}\,\texttt{mo_raw}_2 +  \sigma_{\texttt{mo}}\,\texttt{mo_raw}_3  \\
-\end{aligned}
-$$
+
+$$ \begin{aligned}
+\texttt{mo}_3 & = \rho \, \texttt{mo}_2 + \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_3 \\
+ & = \rho \left(\frac{\rho \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} *\texttt{mo\_raw}_1 + \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_2\right) + \sigma_{\texttt{mo}} \texttt{mo\_raw}_3  \\[5pt]
+& = \frac{\rho^2 \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo\_raw}_1 + \rho \, \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_2 +  \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_3  \\
+\end{aligned} $$
 
 Writing this all together:
 
-$$
-\begin{aligned}
-\texttt{mo}_1 & = \frac{\sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo_raw}_1 + 0 * \texttt{mo_raw}_2 + 0 * \texttt{mo_raw}_3\\[3pt]
-\texttt{mo}_2 & = \frac{\rho \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo_raw}_1 + \sigma_{\texttt{mo}}\,\texttt{mo_raw}_2 + 0 * \texttt{mo_raw}_3  \\[3pt]
-\texttt{mo}_3 & = \frac{\rho^2 \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo_raw}_1 + \rho \, \sigma_{\texttt{mo}}\,\texttt{mo_raw}_2 +  \sigma_{\texttt{mo}}\,\texttt{mo_raw}_3  \\
-\end{aligned}
-$$
+$$ \begin{aligned}
+\texttt{mo}_1 & = \frac{\sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo\_raw}_1 + 0 * \texttt{mo\_raw}_2 + 0 * \texttt{mo\_raw}_3\\[3pt]
+\texttt{mo}_2 & = \frac{\rho \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo\_raw}_1 + \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_2 + 0 * \texttt{mo\_raw}_3  \\[3pt]
+\texttt{mo}_3 & = \frac{\rho^2 \sigma_{\texttt{mo}}}{\sqrt{1 - \rho^2}} * \texttt{mo\_raw}_1 + \rho \, \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_2 +  \sigma_{\texttt{mo}}\,\texttt{mo\_raw}_3  \\
+\end{aligned} $$
+
 Separating this into a matrix of coefficients $L$ and the vector `mo_raw`:
 
 $$
 \texttt{mo} = \begin{bmatrix} \sigma_\texttt{mo} / \sqrt{1 - \rho^2} & 0 & 0 \\ 
               \rho \sigma_\texttt{mo} / \sqrt{1 - \rho^2} & \sigma_\texttt{mo} & 0 \\ 
               \rho^2 \sigma_\texttt{mo} / \sqrt{1 - \rho^2} & \rho \,\sigma_\texttt{mo}  & \sigma_\texttt{mo}  
-              \end{bmatrix} * \texttt{mo_raw}
+              \end{bmatrix} * \texttt{mo\_raw}
 $$
 
 If we multiply $L$ on the right by its transpose $L^T$, we'll get expressions for the covariance matrix of our multivariate random vector `mo`:
@@ -1507,14 +1498,13 @@ The prior we defined for `mo` is strictly speaking a Gaussian process. It is a
 stochastic process that is distributed as jointly multivariate normal for any
 finite value of $M$. Formally, we could write the above prior for `mo` like so:
 
-$$
-\begin{aligned}
+$$ \begin{aligned}
   \sigma_\texttt{mo} & \sim \text{normal}(0, 1) \\
   \rho & \sim \text{GenBeta}(-1,1,10, 5) \\
   \texttt{mo}_t & \sim \text{GP}\left( 0,
   K(t | \sigma_\texttt{mo},\rho) \right) \\
-\end{aligned}
-$$
+\end{aligned} $$
+
 The notation $K(t | \sigma_\texttt{mo},\rho)$ defines the covariance matrix of the process over the domain $t$,
 which is months.
 
@@ -1541,12 +1531,10 @@ where $\theta$ are the hyperparameters that define the behavior of covariance ma
 One such function is called the __exponentiated quadratic function__, and it happens
 to be implemented in Stan as `cov_exp_quad`. The function is defined as:
 
-$$
-\begin{aligned}
+$$ \begin{aligned}
   k(t, t+h | \theta) & = \alpha^2  \exp \left( - \dfrac{1}{2\ell^2} ((t+h) - t)^2 \right) \\
   & = \alpha^2  \exp \left( - \dfrac{h^2}{2\ell^2} \right)
-\end{aligned}
-$$
+\end{aligned} $$
 
 The exponentiated quadratic kernel has two components to theta, $\alpha$, the
 marginal standard deviation of the stochastic process $f$ and $\ell$, the

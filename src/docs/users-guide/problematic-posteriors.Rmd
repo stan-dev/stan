@@ -54,8 +54,7 @@ The marginal posterior $p(\lambda_1,\lambda_2|y)$ for this model is
 thus improper.^[The marginal posterior $p(\sigma|y)$ for $\sigma$ is proper here as long as there are at least two distinct data points.]
 
 The impropriety shows up visually as a ridge in the posterior density,
-as illustrated in the left-hand figure of
-\reffigure{non-identifiable-density}.  The ridge for this model is
+as illustrated in the left-hand plot.  The ridge for this model is
 along the line where $\lambda_2 = \lambda_1 + c$ for some constant
 $c$.
 
@@ -240,27 +239,25 @@ located at a point where $\lambda_1 = \lambda_2$, because this
 minimizes $\log \mathsf{normal}(\lambda_1|0,\tau) + \log
 \mathsf{normal}(\lambda_2|0,\tau)$.^[A Laplace prior (or an L1 regularizer for penalized maximum likelihood estimation) is not sufficient to remove this additive invariance.  It provides shrinkage, but does not in and of itself identify the parameters because adding a constant to $\lambda_1$ and subtracting it from $\lambda_2$ results in the same value for the prior density.]
 
-\begin{figure}
-\includegraphics[height=1.45in]{img/non-identified.png}
-\includegraphics[height=1.45in]{img/non-identified-plus-prior.png}
-\includegraphics[height=1.45in]{img/one-param-identified.png}
-\vspace*{-.1in}
-\caption{\small\it Posteriors for two intercept parameterization
-  without prior, two intercept parameterization with standard normal
-  prior, and one intercept reparameterization without prior.  For all
-  three cases, the posterior is plotted for 100 data points drawn from
-  a standard normal. Left) The two intercept parameterization leads to an
+The following plots show the posteriors for two intercept
+parameterization without prior, two intercept parameterization with
+standard normal prior, and one intercept reparameterization without
+prior.  For all three cases, the posterior is plotted for 100 data
+points drawn from a standard normal.
+
+![The two intercept parameterization leads to an
   improper prior with a ridge extending infinitely to the northwest
-  and southeast.  Middle) Adding a standard normal prior for the
-  intercepts results in a proper posterior.  Right) The single
-  intercept parameterization with no prior also has a proper posterior.}
-\end{figure}
+  and southeast.](img/non-identified.png)
+![Adding a standard normal prior for the
+  intercepts results in a proper posterior.](img/non-identified-plus-prior.png)
+![The single
+  intercept parameterization with no prior also has a proper posterior.](img/one-param-identified.png)
 id:non-identifiable-density.figure
 
+
 The addition of a prior to the two intercepts model is shown in the
-middle plot in \reffigure{non-identifiable-density}.  The plot on
-the right of \reffigure{non-identifiable-density} shows the result of
-reparameterizing to a single intercept.
+second plot; the final plot shows the result of reparameterizing to a
+single intercept.
 
 An alternative strategy for identifying a $K$-simplex parameterization
 $\theta = \mbox{softmax}(\alpha)$ in terms of an unconstrained
@@ -558,7 +555,7 @@ improper posterior, behaves differently in practice than the
 Hamiltonian Monte Carlo sampling performed by Stan when faced with an
 example such as the two intercept model discussed in
 the [collinearity section](#collinearity.section) and illustrated in
-\reffigure{non-identifiable-density}.
+the non-identifiable density plot.
 
 ### Gibbs Sampling {-}
 
@@ -608,8 +605,8 @@ energy).  In practice, even with a random momentum for $\lambda_1$ and
 $\lambda_2$, the gradient of the log posterior is going to adjust for
 the correlation and the simulation will run $\lambda_1$ and
 $\lambda_2$ in opposite directions along the valley corresponding to
-the ridge in the posterior log density (see
-\reffigure{non-identifiable-density}.
+the ridge in the posterior log density.
+
 
 ### No-U-Turn Sampling {-}
 
@@ -700,7 +697,7 @@ id:non-identified-stan-fits.figure
 To illustrate the issues with sampling from non-identified and only
 weakly identified models, we fit three models with increasing degrees
 of identification of their parameters.  The posteriors for these
-models is illustrated in \reffigure{non-identifiable-density}.  The
+models is illustrated in the non-identifiable density plot.  The
 first model is the unidentified model with two location parameters and
 no priors discussed in the [collinearity section](#collinearity.section).
 
@@ -749,31 +746,30 @@ model {
 
 All three of the example models were fit in Stan 2.1.0 with default
 parameters (1000 warmup iterations, 1000 sampling iterations, NUTS
-sampler with max tree depth of 10). The results are shown in
-\reffigure{non-identified-stan-fits}. The key statistics from these
-outputs are the following.
+sampler with max tree depth of 10). The results are shown in the
+non-identified fits figure. The key statistics from these outputs are
+the following.
 
 
 * As indicated by `R_hat` column, all parameters have
   converged other than $\lambda_1$ and $\lambda_2$ in the
   non-identified model.
-\item
-  The average number of leapfrog steps is roughly 3 in
+
+* The average number of leapfrog steps is roughly 3 in
   the identified model, 150 in the model identified by a weak prior, and
   1400 in the non-identified model.
-\item
-  The number of effective samples per
+
+* The number of effective samples per
   second for $\mu$ is roughly 31,000 in the identified model, 1900 in the model
   identified with weakly informative priors, and 200 in the
   non-identified model; the results are similar for $\sigma$.
-\item
-  In the non-identified model, the 95% interval for $\lambda_1$ is
+
+* In the non-identified model, the 95% interval for $\lambda_1$ is
   (-2300,6000), whereas it is only (-12,12) in the model identified with
   weakly informative priors.
-\item
-  In all three models, the simulated value of $\mu=0$ and $\sigma=1$
-  are well within the posterior 90% intervals.
 
+*  In all three models, the simulated value of $\mu=0$ and $\sigma=1$
+  are well within the posterior 90% intervals.
 
 The first two points, lack of convergence and hitting the maximum
 number of leapfrog steps (equivalently maximum tree depth) are
