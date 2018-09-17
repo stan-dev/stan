@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_BINARY_OP_HPP
 #define STAN_LANG_AST_NODE_BINARY_OP_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 #include <string>
 
@@ -31,7 +31,7 @@ namespace stan {
       /**
        * Type of result.
        */
-      expr_type type_;
+      bare_expr_type type_;
 
       /**
        * Construct a default binary operation.

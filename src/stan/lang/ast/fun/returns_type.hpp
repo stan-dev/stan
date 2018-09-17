@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_RETURNS_TYPE_HPP
 #define STAN_LANG_AST_FUN_RETURNS_TYPE_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/node/statement.hpp>
 #include <ostream>
 
@@ -20,7 +20,7 @@ namespace stan {
      * @return true if the specified statement is a return statement
      * with a return expression of the specified type
      */
-    bool returns_type(const expr_type& return_type,
+    bool returns_type(const bare_expr_type& return_type,
                       const statement& statement,
                       std::ostream& error_msgs);
 
