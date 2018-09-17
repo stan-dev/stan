@@ -155,7 +155,7 @@ TEST(commandStancHelper, includeSinglePathGood) {
 
   argv_vec.push_back("main");
   argv_vec.push_back("--include_paths=src/test/test-models/included/");
-  argv_vec.push_back("src/test/test-models/good/stanc_helper_with_include.stan");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
 
   int argc = argv_vec.size();
   const char** argv = &argv_vec[0];
@@ -171,7 +171,7 @@ TEST(commandStancHelper, includeMultPathSimpleGood) {
 
   argv_vec.push_back("main");
   argv_vec.push_back("--include_paths=foo,src/test/test-models/included/,baz");
-  argv_vec.push_back("src/test/test-models/good/stanc_helper_with_include.stan");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
 
   int argc = argv_vec.size();
   const char** argv = &argv_vec[0];
@@ -187,7 +187,7 @@ TEST(commandStancHelper, includeMultPathSingleQuoteGood) {
 
   argv_vec.push_back("main");
   argv_vec.push_back("--include_paths='path,with,commas',src/test/test-models/included/");
-  argv_vec.push_back("src/test/test-models/good/stanc_helper_with_include.stan");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
 
   int argc = argv_vec.size();
   const char** argv = &argv_vec[0];
@@ -203,7 +203,7 @@ TEST(commandStancHelper, includeMultPathDoubleQuoteGood) {
 
   argv_vec.push_back("main");
   argv_vec.push_back("--include_paths=\"path,with,commas\",src/test/test-models/included/");
-  argv_vec.push_back("src/test/test-models/good/stanc_helper_with_include.stan");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
 
   int argc = argv_vec.size();
   const char** argv = &argv_vec[0];
@@ -219,7 +219,7 @@ TEST(commandStancHelper, includeMultPathEscapedCommaGood) {
 
   argv_vec.push_back("main");
   argv_vec.push_back("--include_paths=path\\,with\\,commas,src/test/test-models/included/");
-  argv_vec.push_back("src/test/test-models/good/stanc_helper_with_include.stan");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
 
   int argc = argv_vec.size();
   const char** argv = &argv_vec[0];
@@ -235,7 +235,7 @@ TEST(commandStancHelper, includeMultPathBad) {
 
   argv_vec.push_back("main");
   argv_vec.push_back("--include_paths=foo,baz");
-  argv_vec.push_back("src/test/test-models/good/stanc_helper_with_include.stan");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
 
   int argc = argv_vec.size();
   const char** argv = &argv_vec[0];
@@ -250,7 +250,7 @@ TEST(commandStancHelper, includeNoPathBad) {
   std::vector<const char*> argv_vec;
 
   argv_vec.push_back("main");
-  argv_vec.push_back("src/test/test-models/good/stanc_helper_with_include.stan");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
 
   int argc = argv_vec.size();
   const char** argv = &argv_vec[0];
