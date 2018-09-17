@@ -436,5 +436,3 @@ conditionals have regressions with slope 0.8.
   which you can access via the user's mailing list and the developer's
   mailing list; see the [Stan web site](http://mc-stan.org) for information on
   subscribing and posting and to look at archives.
-
-# <i style="font-size: 110%; color:#990017;">References</i> {-}

@@ -44,7 +44,9 @@ rmd_files: [
 
   "part-appendices.Rmd",
   "style-guide.Rmd",
-  "for-bugs-users.Rmd"
+  "for-bugs-users.Rmd",
+
+  "references.Rmd"
 ]
 
 before_chapter_script: "before-chapter.R"
