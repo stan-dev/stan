@@ -129,8 +129,10 @@ ratios can be dropped, because
 ```
 neg_log_half = -log(0.5);
 for (n in 1:N)
-  target += log_sum_exp(neg_log_half + normal_lpdf(y[n] | mu[1], sigma[1]),
-                   neg_log_half + normal_lpdf(y[n] | mu[2], sigma[2]));
+  target += log_sum_exp(neg_log_half
+                        + normal_lpdf(y[n] | mu[1], sigma[1]),
+                        neg_log_half
+			+ normal_lpdf(y[n] | mu[2], sigma[2]));
 ```
 
 then the $-\log 0.5$ term isn't contributing to the proportional
@@ -192,12 +194,14 @@ $$
 
 On the log scale, the normalized probability is computed as
 $$
+\begin{array}
 \log \mbox{Pr}(z_n = k \mid y_n, \mu, \sigma, \lambda)
- = 
- \\
- \log p(y_n \mid z_n = k, \mu, \sigma)  + \log \mbox{Pr}(z_n = k \mid \lambda) - 
-\mathrm{log\_sum\_exp}_{k' = 1}^K \log p(y_n \mid z_n = k', \mu,
-\sigma) + \log p(z_n = k' \mid \lambda). 
+\\
+= \log p(y_n \mid z_n = k, \mu, \sigma)
+  + \log \mbox{Pr}(z_n = k \mid \lambda)
+  - \mathrm{log\_sum\_exp}_{k' = 1}^K
+      \log p(y_n \mid z_n = k', \mu, \sigma)
+      + \log p(z_n = k' \mid \lambda). 
 $$
 This can be coded up directly in Stan; the change-point model in the
 [change point section](#change-point.section) provides an example.

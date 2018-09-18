@@ -8,7 +8,7 @@ url: 'http\://mc-stan.org/users/documentation'
 site: bookdown::bookdown_site
 github-repo: stan-dev/stan
 twitter-handle: mc-stan
-cover-image: img/logo_tm.png
+cover-image: img/logo-tm.png
 documentclass: book
 bibliography: [../bibtex/all.bib]
 biblio-style: apalike
@@ -18,12 +18,37 @@ monofont: "Lucida Console"
 subparagraph: yes
 ---
 
-# <i style="font-size: 110%; padding:1.5em 0 0 0; color:#990017;"></i> {-}
+# About this Book {-}
 
 <img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225" alt="Stan logo" />
 
 This book is is the official user's guide for Stan.  It provides example
 models and programming techniques for coding statistical models in Stan.
+It also serves as an example-driven introduction to Bayesian modeling
+and inference.
+
+## How to use this book {-}
+
+Part 1 introduces Bayesian data analysis and Stan through a series of
+examples.
+
+Part 2 gives Stan code and discussions for several important classes
+of models.
+
+Part 3 discusses various general Stan programming techniques that are
+not tied to any particular model.
+
+Part 4 is a brief review of statistical inference.
+
+The appendices provide a style guide and advice for users of BUGS and JAGS.
+
+We recommend working through this book using the textbooks _Bayesian
+Data Analysis_ and _Statistical Rethinking: A Bayesian Course with
+Examples in R and Stan_ as references on the concepts, and using the
+Stan Reference Manual when necessary to clarify programming issues.
+Further resources are given at the end of the introductory chapter.
+
+## Additional Stan manuals and guides
 
 In addition to this book, there are two reference manuals for
 the Stan language and algorithms.  The *Stan Reference Manual*
@@ -35,35 +60,23 @@ There is also a separate installation and getting started guide for
 each of the Stan interfaces (R, Python, Julia, Stata, MATLAB, 
 Mathematica, and command line).
 
-## How to use this book {-}
-
-In Part 1 of this book we introduce Bayesian data analysis and Stan through a series of examples.
-
-Part 2 gives Stan code and discussions for several important classes of models.
-
-Part 3 discusses various general Stan programming techniques that are not tied to any particular model.
-
-The book concludes in part 4 with a brief review of statistical inference, followed by appendices.
-
-We recommend working through this book using the textbooks _Bayesian Data Analysis_ and _Statistical Rethinking: A Bayesian Course with Examples in R and Stan_ as references on the concepts, and using the Stan Reference Manual when necessary to clarify programming issues.  Further resources are given at the end of the introductory chapter.
-
-## Web Resources {-}
+## Web resources {-}
 
 Stan is an open-source software project, resources for which are
 hosted on various web sites:
 
-The [Stan Web Site](http://mc-stan.org/) organizes all of the resources
+* The [Stan Web Site](http://mc-stan.org/) organizes all of the resources
 for the Stan project for users and developers.  It contains links to
 the official Stan releases, source code, installation instructions,
 and full documentation, including the latest version of this manual,
 the user's guide and the getting started guide for each interface,
 tutorials, case studies, and reference materials for developers.
 
-The [Stan Forums](http://discourse.mc-stan.org) provide structured
+* The [Stan Forums](http://discourse.mc-stan.org) provide structured
 message boards for questions, discussion, and announcements related to
 Stan for both users and developers.
 
-The [Stan GitHub Organization](https://github.com/stan-dev) hosts all
+* The [Stan GitHub Organization](https://github.com/stan-dev) hosts all
 of Stan's code, documentation, wikis, and web site, as well as the
 issue trackers for bug reports and feature requests and interactive
 code review for pull requests.
@@ -89,11 +102,11 @@ see the web site and project pages of the Stan developers.
 
 ## Copyright, Trademark, and Licensing {-}
 
-This book is copyright 2011--2018, Stan Development Team and
-their assignees.  The text content is distributed under the
-[CC-BY ND 4.0 license](https://creativecommons.org/licenses/by-nd/4.0/legalcode).
-The user's guide compuer code is distributed under the [BSD 3-clause
-license](https://opensource.org/licenses/BSD-3-Clause).
+This book is copyright 2011--2018, Stan Development Team and their
+assignees.  The text content is distributed under the [CC-BY ND 4.0
+license](https://creativecommons.org/licenses/by-nd/4.0/legalcode).
+The user's guide R and Stan programs are distributed under the [BSD
+3-clause license](https://opensource.org/licenses/BSD-3-Clause).
 
 The Stan name and logo are registered trademarks of NumFOCUS.  Use of
 the Stan name and logo are governed by the [Stan logo usage

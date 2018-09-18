@@ -1,4 +1,3 @@
-# {-}
 # <i style="font-size: 110%; color:#990017;">Part 2. Example Models</i></span> {- #example-models.part}
 
 In this part of the book, we survey a range of example models,

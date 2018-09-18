@@ -289,9 +289,6 @@ of years in the right-hand plot resulting from sampling. The posterior
 mean of $s$ is roughly 1891.
 
 
-
-
-
 ### Discrete Sampling {-}
 
 The generated quantities block may be used to draw discrete parameter

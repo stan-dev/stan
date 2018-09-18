@@ -1,4 +1,3 @@
-# {-}
 # <i style="font-size: 110%; color:#990017;">Part 4:  Review of Statistical Inference</i> {-}
 
 In this part of the book, we review the basic principles of full

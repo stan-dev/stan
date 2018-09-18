@@ -194,7 +194,7 @@ Upsetting situations---for example, the estimate of $1 \pm 1$ which leads to a s
 
 ## Priors {#general-priors.section}
 
-The prior only matters where the likelihood is nonzero (and vice-versa).  One way to think of the prior distribution is as a "regularization" or "soft constraint" on the parameters of the model.  We discuss prior choice more fully on this wiki:  https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations
+The prior only matters where the likelihood is nonzero (and vice-versa).  One way to think of the prior distribution is as a "regularization" or "soft constraint" on the parameters of the model.  We discuss prior choice more fully on the [prior choice wiki page](https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations).
 
 We consider 5 levels of priors:
 
@@ -296,8 +296,9 @@ sampling or optimizing.
 
 ### "Uninformative" Proper Priors {-}
 
-It is uncommon to see models with priors on regression
-coefficients such as $\mathsf{normal}(0,1000)$.^[The practice was common in BUGS and can be seen in most of their examples @LunnEtAl:2012.]
+It is uncommon to see models with priors on regression coefficients
+such as $\mathsf{normal}(0,1000)$.^[The practice was common in BUGS
+and can be seen in most of their examples @LunnEtAl:2012.]
 
 If the prior scale, such as 1000, is several orders of magnitude
 larger than the estimated coefficients, then such a prior is
@@ -385,8 +386,11 @@ have a lower bound of one meter and an upper bound of three meters.
 Surely the answer has to lie in that range.
 
 Similarly, it is uncommon to see priors for scale parameters that
-impose lower bounds of zero and upper bounds of  large numbers,
-such as 10,000.^[This was also a popular strategy in the BUGS example models [@LunnEtAl:2012], which often went one step further and set the lower bounds to a small number like 0.001 to discourage numerical underflow to zero.]
+impose lower bounds of zero and upper bounds of large numbers, such as
+10,000.^[This was also a popular strategy in the BUGS example models
+[@LunnEtAl:2012], which often went one step further and set the lower
+bounds to a small number like 0.001 to discourage numerical underflow
+to zero.]
 
 This provides roughly the same problem for estimation as a 
 diffuse inverse gamma prior on variance.  We prefer to leave
@@ -434,7 +438,13 @@ weakly informative priors applies, only with more strength.
 
 Unlike in Gibbs sampling, there is no computational advantage to
 providing conjugate priors (i.e., priors that produce posteriors in
-the same family) in a Stan program.^[BUGS and JAGS both support conjugate sampling through Gibbs sampling.  JAGS extended the range of conjugacy that could be exploited with its GLM module.  Unlike Stan, both BUGS and JAGS are restricted to conjugate priors for constrained multivariate quantities such as covariance matrices or simplexes.]
+the same family) in a Stan program.^[BUGS and JAGS both support
+conjugate sampling through Gibbs sampling.  JAGS extended the range of
+conjugacy that could be exploited with its GLM module.  Unlike Stan,
+both BUGS and JAGS are restricted to conjugate priors for constrained
+multivariate quantities such as covariance matrices or simplexes.]  It
+is possible in some cases to exploit conjugacy to marginalize out
+parameters, which can lead to efficiency gains.
 
 Neither the Hamiltonian Monte Carlo samplers or the optimizers make
 use of conjugacy, working only on the log density and its derivatives.

@@ -1,4 +1,4 @@
-# Transitioning from BUGS  {#stan-for-bugs.appendix}
+# Appendix 2. Transitioning from BUGS {- #stan-for-bugs.appendix}
 
 From the outside, Stan and BUGS^[Except where otherwise noted, we use "BUGS" to refer to WinBUGS, OpenBUGS, and JAGS, indiscriminately.]
 are similar---they use statistically-themed modeling languages

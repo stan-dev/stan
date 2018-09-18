@@ -1,4 +1,4 @@
-# Stan Program Style Guide
+# Appendix 1. Stan Program Style Guide {-}
 
 This chapter describes the preferred style for laying out Stan
 models. These are not rules of the language, but simply

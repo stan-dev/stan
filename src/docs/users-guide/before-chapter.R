@@ -18,7 +18,7 @@ library(knitr)
     fig.width = 6,
     fig.asp = 0.618,  # 1 / phi
     fig.show = "hold",
-    include = FALSE,
+    include = TRUE,
     out.width = "70%",
     tidy = FALSE
   )
