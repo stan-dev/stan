@@ -46,8 +46,8 @@ namespace stan {
         >> expression_r(_r1)
         >> lit(":")
         >> expression_r(_r1)[validate_conditional_op_f(_val, _r1, _pass,
-                                     boost::phoenix::ref(var_map_),
-                                     boost::phoenix::ref(error_msgs))];
+                                      boost::phoenix::ref(var_map_),
+                                      boost::phoenix::ref(error_msgs))];
 
       expression15_r.name("expression");
       expression15_r

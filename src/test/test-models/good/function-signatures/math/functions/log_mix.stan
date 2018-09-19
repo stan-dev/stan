@@ -16,7 +16,7 @@ data {
 }
 transformed data {
   real transformed_data_real;
- 
+
   transformed_data_real = log_mix(d_real_theta,
                                          d_real_lam_1,
                                          d_real_lam_1);
