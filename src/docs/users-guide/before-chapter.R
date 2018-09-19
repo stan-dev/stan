@@ -24,7 +24,7 @@ library(knitr)
   )
 library(lubridate)
 library(rstan)
-  rstan_options(auto_write = TRUE)
+  rstan_options(auto_write = FALSE)
 
 
 # UTILITY FUNCTIONS
@@ -46,6 +46,5 @@ extract_one_draw <- function(stanfit, chain = 1, iter = 1) {
 
 options(digits = 2)
 options(htmltools.dir.version = FALSE)
-options(mc.cores = parallel::detectCores(logical = FALSE))
 
 set.seed(1123) 
