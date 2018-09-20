@@ -1,6 +1,7 @@
 #ifndef STAN_COMMAND_STANC_HELPER_HPP
 #define STAN_COMMAND_STANC_HELPER_HPP
 
+#include <boost/tokenizer.hpp>
 #include <stan/version.hpp>
 #include <stan/lang/compiler.hpp>
 #include <stan/lang/compile_functions.hpp>
@@ -11,7 +12,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-
 
 /**
  * Print the version of stanc with major, minor and patch.
@@ -63,6 +63,10 @@ inline void print_stanc_help(std::ostream* out_stream) {
 
   print_help_option(out_stream, "allow_undefined", "",
                     "Do not fail if a function is declared but not defined");
+
+  print_help_option(out_stream, "include_paths", "comma-separated list",
+                    "Comma-separated list of directories that may contain a "
+                    "file in an #include directive");
   // TODO(martincerny) help for standalone function compilation
 }
 
@@ -227,6 +231,28 @@ inline int stanc_helper(int argc, const char* argv[],
 
     std::vector<std::string> include_paths;
     include_paths.push_back("");
+
+    if (cmd.has_key("include_paths")) {
+      std::string extra_path_str;
+      cmd.val("include_paths", extra_path_str);
+
+      // extra_path_els is given explicitly so that multiple quote
+      // characters (in this case single and double quotes) can be
+      // used.
+      boost::escaped_list_separator<char> extra_path_els("\\",
+                                                         ",",
+                                                         "\"'");
+
+      boost::tokenizer<
+        boost::escaped_list_separator<char>
+        > extra_path_tokenizer(extra_path_str, extra_path_els);
+
+      for (const auto & inc_path : extra_path_tokenizer) {
+        if (!inc_path.empty()) {
+          include_paths.push_back(inc_path);
+        }
+      }
+    }
 
     bool allow_undefined = cmd.has_flag("allow_undefined");
 
