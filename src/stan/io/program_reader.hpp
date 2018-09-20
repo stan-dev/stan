@@ -269,8 +269,18 @@ class program_reader {
           found_path = true;
           break;
         }
-        if (!found_path)
-          throw std::runtime_error("could not find include file: " + line);
+        if (!found_path) {
+          std::ostringstream include_err_msg;
+
+          include_err_msg << "could not find include file " << incl_path
+                          << " in the following directories:\n";
+
+          for (size_t i = 0; i < search_path.size(); ++i) {
+            include_err_msg << "    " << search_path[i] << "\n";
+          }
+
+          throw std::runtime_error(include_err_msg.str());
+        }
       } else {
         ++concat_line_num;
         program_ << line;
