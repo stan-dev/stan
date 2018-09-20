@@ -245,7 +245,7 @@ hello_data <- list(N=N, a=10, b=4, sigma=5, x=runif(N, 0, 10))
 ```
 We then run the Stan model and create the fake data:
 
-```{r, warning=FALSE, results=FALSE}
+```{r intro1,  warning=FALSE, results=FALSE}
 fake_data <- stan("stan/fake-data.stan",
                   chains=1, iter=1, algorithm="Fixed_param",
 		  data=hello_data)
@@ -291,7 +291,7 @@ for more complicated models.
 In any case, now that we have the data list, we can use it to estimate
 the parameters:
 
-```{r, results=FALSE}
+```{r intro2,  results=FALSE}
 fit <- stan("stan/simplest-regression.stan", data = hello_data)
 ```
 
@@ -500,7 +500,7 @@ posterior simulations.
 
 We gave an example earlier, when we typed:
 
-```{r, results=FALSE}
+```{r intro3,  results=FALSE}
 fit <- stan("stan/simplest-regression.stan", data=hello_data)
 ```
 
@@ -528,7 +528,7 @@ objective function, and Stan returns the value of the parameters at
 this estimated mode along with the computed value of the objective
 function.  Here is an example:
 
-```{r, results=FALSE}
+```{r intro4,  results=FALSE}
 simplest <- stan_model("stan/simplest-regression.stan")
 fit_2 <- optimizing(simplest, data=hello_data)
 ```
@@ -693,7 +693,7 @@ print_file("stan/vector-regression.stan")
 To fit this model, we simply reconfigure the data by constructing the
 matrix of predictors and then run from R:
 
-```{r, results=FALSE}
+```{r intro5,  results=FALSE}
 ones <- rep(1, N)
 X <- cbind(ones, x)
 K <- 2
