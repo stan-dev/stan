@@ -93,6 +93,14 @@ pipeline {
                 }
             }
         }
+        stage("Make doc") {
+            agent { dockerfile { filename ".circleci/doc-docker/Dockerfile" } }
+            steps {
+                unstash 'StanSetup'
+                sh "make doc"
+                archiveArtifacts 'doc/*'
+            }
+        }
         stage('Unit tests') {
             parallel {
                 stage('Windows Headers & Unit') {
