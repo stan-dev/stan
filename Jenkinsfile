@@ -84,6 +84,13 @@ pipeline {
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
                     )
+                    def docImage = docker.build("seantalts/bookdown",
+                                                ".circleci/doc-docker/Dockerfile")
+                    docImage.inside {
+                        sh "make doc"
+                        archiveArtifacts 'doc/*'
+                    }
+                    docImage.push()
                 }
             }
             post {
@@ -91,14 +98,6 @@ pipeline {
                     warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
                     deleteDir()
                 }
-            }
-        }
-        stage("Make doc") {
-            agent { dockerfile { filename ".circleci/doc-docker/Dockerfile" } }
-            steps {
-                unstash 'StanSetup'
-                sh "make doc"
-                archiveArtifacts 'doc/*'
             }
         }
         stage('Unit tests') {
