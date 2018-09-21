@@ -36,6 +36,10 @@ LDLIBS_STANC ?= -Ltest -lstanc
 .PHONY: help
 help:
 	@echo '--------------------------------------------------------------------------------'
+	@echo 'Note: testing of Stan is typically done with the `runTests.py` python script.'
+	@echo '  See https://github.com/stan-dev/stan/wiki/Testing-Stan-using-Gnu-Make-and-Python'
+	@echo '  for more detail on testing.'
+	@echo ''
 	@echo 'Stan makefile:'
 	@$(MAKE) print-compiler-flags
 	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
