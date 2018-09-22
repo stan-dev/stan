@@ -78,7 +78,7 @@ pipeline {
                 script {
                     checkout scm
                     def docImage = docker.build("seantalts/bookdown",
-                                                ".circleci/doc-docker")
+                                                "src/docs")
                     docImage.inside {
                         sh "make doc"
                         archiveArtifacts 'doc/*'
