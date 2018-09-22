@@ -1,56 +1,3 @@
-```{r simple-ex-1, include=FALSE, cache=FALSE}
-# LIBRARY CONFIGURATION
-
-library(arm)
-library(bayesplot)
-  # theme_set(bayesplot::theme_default())
-library(dplyr)
-library(ggplot2)
-library(knitr)
-  knitr::opts_chunk$set(
-    cache = TRUE,
-    cache.extra = packageVersion('tufte'),
-    collapse = TRUE,
-    comment = NA,
-    dev = "png",
-    dpi = 150,
-    echo = FALSE,
-    fig.align = "center",
-    fig.width = 6,
-    fig.asp = 0.618,  # 1 / phi
-    fig.show = "hold",
-    include = FALSE,
-    out.width = "70%",
-    tidy = FALSE
-  )
-library(lubridate)
-library(rstan)
-  rstan_options(auto_write = TRUE)
-
-
-# UTILITY FUNCTIONS
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-print_file <- function(file) {
-  cat(paste(readLines(file), "\n", sep=""), sep="")
-}
-
-extract_one_draw <- function(stanfit, chain = 1, iter = 1) {
-  x <- get_inits(stanfit, iter = iter)
-  x[[chain]]
-}
-
-# GENERAL R CONFIGURATION
-
-options(digits = 2)
-options(htmltools.dir.version = FALSE)
-options(mc.cores = parallel::detectCores(logical = FALSE))
-
-set.seed(1123) 
-```
 # Simple Examples
 
 ## What is in this chapter?
@@ -109,7 +56,7 @@ The following graph shows data on the proportion of successful golf
 putts as a function of distance from the hole.  Unsurprisingly, the
 probability of making the shot declines as a function of distance:
 
-```{r simple-ex-2, echo=FALSE}
+```{r}
 golf <- read.table("data/golf.txt", header=TRUE, skip=2)
 x <- golf$x
 y <- golf$y
@@ -145,17 +92,17 @@ $$
 
 In Stan, this is:
 
-```{r simple-ex-3, echo=FALSE}
+```{r}
 print_file("stan/golf_logistic.stan")
 ```
 
 Here is the result of fitting this model to the data:
 
-```{r simple-ex-4, echo=FALSE, results=FALSE}
+```{r, results=FALSE}
 golf_data <- list(x=x, y=y, n=n, J=J)
 fit_logistic <- stan("stan/golf_logistic.stan", data=golf_data)
 ```
-```{r simple-ex-5, echo=FALSE}
+```{r}
 print(fit_logistic)
 ```
 
@@ -172,7 +119,7 @@ well.
 
 The following graph shows the fit plotted along with the data:
 
-```{r simple-ex-6, echo=FALSE}
+```{r}
 sims_logistic <- as.matrix(fit_logistic)
 a_hat <- median(sims_logistic[,"a"])
 b_hat <- median(sims_logistic[,"b"])
@@ -223,7 +170,7 @@ $$p_j = 2\Phi(\sin^{-1}((R-r)/x)) - 1 , \mbox{ for } j=1,\dots, J.$$
 
 Here is the model in Stan:
 
-```{r simple-ex-7, echo=FALSE}
+```{r}
 print_file("stan/golf1.stan")
 ```
 
@@ -231,7 +178,7 @@ The data $J,n,x,y$ have already been set up; we just need to define
 $r$ and $R$ (the golf ball and hole have diameters 1.68 and 4.25
 inches, respectively), and run the Stan model:
 
-```{r simple-ex-8, echo=FALSE, results=FALSE}
+```{r, results=FALSE}
 r <- (1.68/2)/12
 R <- (4.25/2)/12
 fit_trig <- stan("stan/golf1.stan", data=golf_data)
@@ -239,7 +186,7 @@ fit_trig <- stan("stan/golf1.stan", data=golf_data)
 
 Here is the result:
 
-```{r simple-ex-9, echo=FALSE}
+```{r}
 print(fit_trig)
 ```
 
@@ -262,7 +209,7 @@ median of $\sigma$ but in this case the uncertainty is so narrow that
 any reasonable posterior summary would give essentially the same
 result), along with the logistic regression fitted earlier:
 
-```{r simple-ex-10, echo=FALSE}
+```{r}
 sims_trig <- as.matrix(fit_trig)
 sigma_hat <- median(sims_trig[,"sigma"])
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
@@ -378,7 +325,7 @@ ratings of the two movies.
 
 Here is the resulting Stan model:
 
-```{r simple-ex-11, echo=FALSE}
+```{r}
 print_file("stan/ratings_1.stan")
 ```
 
@@ -394,7 +341,7 @@ and 40 5's, which again average to 4.  This set of hypothetical
 ratings does _not_ follow the assumed normal distribution, but that's
 fine; we can still fit the model.
 
-```{r simple-ex-12, results=FALSE}
+```{r, results=FALSE}
 y_1 <- c(3, 5)
 y_2 <- rep(c(2,3,4,5), c(10,20,30,40))
 y <- c(y_1, y_2)
@@ -406,7 +353,7 @@ fit_1 <- stan("stan/ratings_1.stan", data=movie_data)
 
 Here is the result:
 
-```{r simple-ex-13, echo=FALSE}
+```{r}
 print(fit_1)
 ```
 
@@ -427,7 +374,7 @@ You can see Movie 1 if you want to roll the dice.
 
 It is easy to expand the Stan program to allow an arbitrary number of movies:
 
-```{r simple-ex-14, echo=FALSE}
+```{r}
 print_file("stan/ratings_2.stan")
 ```
 
@@ -449,7 +396,7 @@ Chapter **.  Here, though, we will ignore that feature of the data.
 
 We simulate the fake data in R and then fit the new model in Stan.
 
-```{r simple-ex-15, echo=FALSE, results=FALSE}
+```{r, results=FALSE}
 J <- 40
 
 # Assign each movie a random number of ratings between 0 and 100
@@ -466,13 +413,13 @@ fit_2 <- stan("stan/ratings_2.stan", data=movie_data)
 
 Here is the result:
 
-```{r simple-ex-16, echo=FALSE}
+```{r}
 print(fit_2)
 ```
 
 We can check the fit by plotting the posterior inferences against the true parameter values:
 
-```{r simple-ex-17, echo=FALSE}
+```{r}
 theta_post <- extract(fit_2)$theta
 quants <- c(0.025, 0.25, 0.5, 0.75, 0.975)
 theta_post_quants <-
@@ -505,7 +452,7 @@ for any given movie, the more precise is our estimate of its
 underlying popularity.  Here is a graph showing the width of the 50%
 interval as a function of sample size:
 
-```{r simple-ex-18, echo=FALSE}
+```{r}
 interval_width <- theta_post_quants[,"0.75"] - theta_post_quants[,"0.25"]
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 plot(c(0, 1.02*max(N_ratings)), c(0, 1.02*max(interval_width)),
@@ -602,7 +549,7 @@ $\sigma_y$ must all be positive), adding in prior information later if
 the data are weak enough that this seems necessary.
 
 Here is the Stan program:
-```{r simple-ex-19, echo=FALSE}
+```{r}
 print_file("stan/ratings_3.stan")
 ```
 As usual, we'll check it by simulating fake data, then fitting the
@@ -615,7 +562,7 @@ $\sigma_b=0.5$ (thus, the same amount of variation in raters'
 difficulties than in the quality of movies) and $\sigma_y=2$, as
 before.
 
-```{r simple-ex-20, echo=FALSE, results=FALSE}
+```{r, results=FALSE}
 J <- 40
 K <- 100
 N <- J*K
@@ -636,7 +583,7 @@ Here is part of the Stan fit.  We just display the hyperparameters, to
 save space omitting the parameter vectors $\alpha$ and $\beta$ and the
 transformed parameter vector $a$.
 
-```{r simple-ex-21, echo=FALSE}
+```{r}
 print(fit_3, pars=c("mu", "sigma_a", "sigma_b", "sigma_y"))
 ```
 
@@ -646,7 +593,7 @@ within the range of posterior uncertainty.
 
 Let's check the coverage for the $\alpha$'s and $\beta$'s:
 
-```{r simple-ex-22, echo=FALSE}
+```{r}
 par(mfrow=c(1,2))
 alpha_post <- extract(fit_3)$alpha
 beta_post <- extract(fit_3)$beta
@@ -708,13 +655,13 @@ we'll expect to see tougher reviews on the crime stories.
 We simulate this model, using the same ratings as before but just
 selecting a subset according to the above-defined probabilities.
 
-```{r simple-ex-23, echo=FALSE, results=FALSE}
+```{r, results=FALSE}
 genre <- rep(c("romantic","crime"), c(round(J/2), J - round(J/2)))
 prob_of_rated <- ifelse(beta[rater] > 0,
                         ifelse(genre[movie] == "romantic", 0.6, 0.3),
                         ifelse(genre[movie] == "romantic", 0.3, 0.6))
 # Returns TRUE if movie was rated, FALSE if not
-rated <- rbinom(N, 1, prob_of_rated)   
+rated <- rbinom(N, 1, prob_of_rated)
 data_3a <-
   list(N=sum(rated), J=J, K=K, movie=movie[rated],
        rater=rater[rated], y=y[rated])
@@ -723,7 +670,7 @@ fit_3a <- stan("stan/ratings_3.stan", data=data_3)
 
 We then fit the model in Stan.
 
-```{r simple-ex-24, echo=FALSE}
+```{r}
 print(fit_3a, pars=c("mu", "sigma_a", "sigma_b", "sigma_y"))
 ```
 
@@ -736,7 +683,7 @@ seems fine, which it should be---again, we ran our simulations under
 the model that we later fit---but it is still gratifying to see, as a
 confirmation that we are not making any obvious mistakes.
 
-```{r simple-ex-25, echo=FALSE}
+```{r}
 add_legend <- function(text, pch, range) {
   legend(0.6*min(range)+0.4*max(range),
          min(range)+0.12*(max(range)-min(range)),
@@ -799,12 +746,12 @@ give misleading estimates of movie quality, and the model-based
 estimates correct for this bias.  We first compute the average
 observed rating, $\bar{y}_j$ for each movie $j$.
 
-```{r simple-ex-26, echo=FALSE}
+```{r}
 ybar<- rep(NA, J)
 for (j in 1:J){
   # Assign an average rating of 3 to any movie that has zero ratings
   if (sum(movie == j & rated) == 0) {
-    ybar[j] <- 3    
+    ybar[j] <- 3
   }
   else {
     ybar[j] <- mean(y[movie == j & rated])
@@ -818,7 +765,7 @@ would see if everyone in the population rated every movie.  We compute
 the posterior median of $a_j$ and also recall its true value from the
 process used to simulate the data.
 
-```{r simple-ex-27, echo=FALSE}
+```{r}
 a <- mu + sigma_a * alpha
 a_post <- extract(fit_3a)$a
 a_post_median <- apply(a_post, 2, median)
@@ -827,7 +774,7 @@ a_post_median <- apply(a_post, 2, median)
 We then plot true movie quality (the parameter , first versus raw
 average rating, then versus the model-based estimate:
 
-```{r simple-ex-28, echo=FALSE}
+```{r}
 par(mfrow=c(1,2))
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 par(pty="s")
@@ -940,7 +887,7 @@ inferences, but 32 teams should be enough to estimate these parameters
 so we don't think it will be necessary in this case.
 
 We now set up the model in Stan:
-```{r 29, echo=FALSE}
+```{r}
 print_file("stan/worldcup_first_try.stan")
 ```
 
@@ -949,7 +896,7 @@ into signed square root differentials.  (The function "fabs" is short
 for "floating point absolute value.")  It turns out this code has a
 mistake in it, which we will get to in a bit.
 
-```{r simple-ex-30, echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 teams <- as.vector(unlist(read.table("data/soccerpowerindex.txt",
                                      header=FALSE)))
 N_teams <- length(teams)
@@ -969,7 +916,7 @@ fit_1 <- stan("stan/worldcup_first_try.stan", data=data_worldcup)
 
 The simulations converge, and the estimates seem reasonable.
 
-```{r simple-ex-31, echo=FALSE}
+```{r}
 print(fit_1, c("a", "b", "sigma_a", "sigma_y", "lp__"))
 ```
 
@@ -1014,7 +961,7 @@ equivalent to a plot of estimate vs.\ group-level predictor, which is
 the sort of graph we like to make to understand what a multilevel
 model is doing.
 
-```{r simple-ex-32, echo=FALSE}
+```{r}
 a_post <- extract(fit_1)$a
 a_hat <- apply(a_post, 2, median)
 a_se <- apply(a_post, 2, sd)
@@ -1035,12 +982,12 @@ the model, changing two lines by moving $b$ from the parameters to the
 data block in the Stan program.  Then we call the model with $b$ set
 to 0.
 
-```{r simple-ex-33, echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 b <- 0
 fit_1_noprior <- stan("stan/worldcup_first_try_noprior.stan",
                       data=c(data_worldcup, "b"))
 ```
-```{r simple-ex-34, echo=FALSE}
+```{r}
 a_post <- extract(fit_1_noprior)$a
 a_hat <- apply(a_post, 2, median)
 a_se <- apply(a_post, 2, sd)
@@ -1071,10 +1018,10 @@ tournament were to be repeated.  For each game we can then collect a
 95% predictive interval, and we plot these along with the actual game
 outcomes:
 
-```{r simple-ex-35,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 fit_1_rep <- stan("stan/worldcup_with_replication.stan", data=data_worldcup)
 ```
-```{r simple-ex-36,  echo=FALSE}
+```{r}
 sims <- extract(fit_1_rep)$y_rep_original_scale
 q25 <- apply(sims, 2, quantile, 0.025)
 q75 <- apply(sims, 2, quantile, 0.975)
@@ -1099,15 +1046,15 @@ goes well beyond rounding error.
 What about the square-root transformation?  Could that be the problem?
 Let's re-fit the model on the original scale:
 
-```{r simple-ex-37,  echo=FALSE}
+```{r}
 print_file("stan/worldcup_no_sqrt.stan")
 ```
 
 And then again we fit the model and produce the graph of inferences:
-```{r simple-ex-38,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 fit_2 <- stan("stan/worldcup_no_sqrt.stan", data=data_worldcup)
 ```
-```{r simple-ex-39,  echo=FALSE}
+```{r}
 a_post <- extract(fit_2)$a
 a_hat <- apply(a_post, 2, median)
 a_se <- apply(a_post, 2, sd)
@@ -1123,7 +1070,7 @@ square root scale.
 Next we make the graph comparing game outcomes to 95% posterior
 predictive intervals:
 
-```{r simple-ex-40,  echo=FALSE}
+```{r}
 sims <- extract(fit_2)$y_rep
 q25 <- apply(sims, 2, quantile, 0.025)
 q75 <- apply(sims, 2, quantile, 0.975)
@@ -1158,10 +1105,10 @@ sqrt_dif[i] = 2*(step(dif[i]) - 0.5)*sqrt(fabs(dif[i]));
 
 We now put fix the Stan program, re-fit the model, and display the
 parameter estimates and the two graphs as before:
-```{r simple-ex-41,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 fit_3 <- stan("stan/worldcup_no_sqrt.stan", data=data_worldcup)
 ```
-```{r simple-ex-42,  echo=FALSE}
+```{r}
 print(fit_3, pars=c("b", "sigma_a", "sigma_y", "lp__"))
 a_post <- extract(fit_3)$a
 a_hat <- apply(a_post, 2, median)
@@ -1171,7 +1118,7 @@ coefplot(rev(a_hat), rev(a_se), CI=1, varnames=rev(teams),
 	 cex.var=.9, mar=c(0, 4, 5.1, 2), xlim=c(-1.2, 1.2))
 ```
 
-```{r simple-ex-43,  echo=FALSE}
+```{r}
 sims <- extract(fit_3)$y_rep
 q25 <- apply(sims, 2, quantile, 0.025)
 q75 <- apply(sims, 2, quantile, 0.975)
@@ -1254,7 +1201,7 @@ $$
 
 But we are teaching Stan here, so we shall demonstrate the fit in
 Stan.  Here is the Stan code:
-```{r simple-ex-44,  echo=FALSE}
+```{r}
 print_file("stan/normal_normal.stan")
 ```
 One advantage of using Stan here, rather than the formula, is that
@@ -1266,11 +1213,11 @@ But for now we shall stick with the above normal model, feeding in the
 data $y = 8, \sigma_y = 3, \mu_0 = 0, \sigma_0 = 0.25$, to obtain the following
 result:
 
-```{r simple-ex-45,  echo=FALSE, results=FALSE}
+```{r, results=FALSE}
 sex_data <- list(y=8, sigma_y=3, mu_0=0, sigma_0=0.25)
 fit1 <- stan("stan/normal_normal.stan", data=sex_data)
 ```
-```{r simple-ex-46,  echo=FALSE}
+```{r}
 print(fit1)
 ```
 
@@ -1320,7 +1267,7 @@ But also this:
 
 OK, now it's time to get to work.  We start by downloading and
 graphing the data.
-```{r simple-ex-47,  echo=FALSE}
+```{r}
 series <- matrix(scan("data/Series1000.txt"), nrow=1000, ncol=135, byrow=TRUE)
 T <- 135
 N <- 1000
@@ -1335,7 +1282,7 @@ Aha! The lines are fanning out from a common starting point. We'll fit
 a regression to each line and then summarize each line by its average
 slope.
 
-```{r simple-ex-48,  echo=FALSE}
+```{r}
 slope <- rep(NA, N)
 se <- rep(NA, N)
 for (n in 1:N){
@@ -1352,14 +1299,14 @@ per-century scale to match the above instructions.
 
 Next we plot the estimated slopes and their standard errors:
 
-```{r simple-ex-49,  echo=FALSE}
+```{r}
 plot(slope, se, bty="l", xlab="Slope", ylab="SE", pch=20)
 ```
 
 OK, not much information in the se's. How about a histogram of the
 estimated slopes?
 
-```{r simple-ex-50,  echo=FALSE}
+```{r}
 hist(slope, xlab="Slope", breaks=seq(floor(10*min(slope)), ceiling(10*max(slope)))/10)
 ```
 
@@ -1368,13 +1315,13 @@ centered at 0, -1, and 1. It looks like this might be the case.
 
 So let's fit a mixture model. That's easy.  Here's the Stan program:
 
-```{r simple-ex-51,  echo=FALSE}
+```{r}
 print_file("stan/mixture.stan")
 ```
 
 We now run the program and display the results:
 
-```{r simple-ex-52,  echo=FALSE, warnings=FALSE}
+```{r}
 y <- slope
 K <- 3
 mu <- c(0,-1,1)
@@ -1418,7 +1365,7 @@ generated quantities {
 We then re-fit the model, extract the $p$'s, and average them over the
 posterior simulations.
 
-```{r simple-ex-53,  echo=FALSE, results=FALSE}
+```{r, results=FALSE}
 mix <- stan("stan/mixture_2.stan", data=data)
 prob_sims <- extract(mix)$p
 prob <- array(NA, c(N,K))
@@ -1432,7 +1379,7 @@ for (n in 1:N){
 We now have a $1000\times 3$ matrix of probabilities. Let's take a
 look at the first ten rows
 
-```{r simple-ex-54,  echo=FALSE}
+```{r}
 pfround(prob[1:10,], 2)
 ```
 
@@ -1447,7 +1394,7 @@ we'll pick which of the three mixture components has the highest
 probability. We'll save the probability and also which component is
 being picked.
 
-```{r simple-ex-55,  echo=FALSE}
+```{r}
 max_prob <- apply(prob, 1, max)
 choice <- apply(prob, 1, which.max)
 ```
@@ -1455,7 +1402,7 @@ choice <- apply(prob, 1, which.max)
 And now we can sum this over the 1000 series. We'll compute the number
 of series assigned to each of the three choices:
 
-```{r simple-ex-56,  echo=FALSE}
+```{r}
 print(table(choice))
 ```
 
@@ -1472,7 +1419,7 @@ of the number of correct guesses (based on the reasonable
 approximation of independence of the 1000 series conditional on the
 model). And then we'll print all these numbers:
 
-```{r simple-ex-57,  echo=FALSE}
+```{r}
 expected_correct <- sum(max_prob)
 sd_correct <- sqrt(sum(max_prob*(1-max_prob)))
 pfround(c(expected_correct, sd_correct), 1)
@@ -1486,11 +1433,11 @@ our expected number correct. That's bad news!
 How bad is it?  We can compute the normal cumulative density fucntion
 to get the probability of at least 900 successes; that's
 $\mbox{pnorm}(854.1, 900, 10.3)$:
-```{r simple-ex-58,  echo=FALSE}
+```{r}
 pnorm(expected_correct, 900, sd_correct)
 ```
 That's a small number; here's its reciprocal:
-```{r simple-ex-59,  echo=FALSE}
+```{r}
 1 / pnorm(expected_correct, 900, sd_correct)
 ```
 That's a 1-in-230,000 chance of winning the big prize!
@@ -1498,7 +1445,7 @@ That's a 1-in-230,000 chance of winning the big prize!
 But we only have to get _at least_ 900. So we can do the continuity
 correction and evaluate the probability of at least 899.5 successes,
 which, when inverted, yields:
-```{r simple-ex-60,  echo=FALSE}
+```{r}
 1 / pnorm(expected_correct, 899.5, sd_correct)
 ```
 Nope, still no good. For the bet to be worth it, even in the crudest
@@ -1550,7 +1497,7 @@ distributed: $\epsilon_i \sim \mbox{normal}(0,\sigma)$.
 
 Here is the model in Stan:
 
-```{r simple-ex-61,  echo=FALSE}
+```{r}
 print_file("stan/exponential.stan")
 ```
 
@@ -1578,7 +1525,7 @@ simulate $N=100$ data points with predictors $x$ uniformly distributed
 between 0 and 10, from the above model with $a=0.2, b=0.3,
 \sigma=0.5$.
 
-```{r simple-ex-62,  echo=FALSE}
+```{r}
 a <- 5
 b <- 0.3
 sigma <- 0.5
@@ -1589,7 +1536,7 @@ y <- rnorm(N, a*exp(-b*x), sigma)
 
 Here is a graph of the true curve and the simulated data:
 
-```{r simple-ex-63,  echo=FALSE}
+```{r}
 curve(a*exp(-b*x), from=0, to=10, ylim=range(x, y),
       xlab="x", ylab="y", bty="l", main="Data and true model", cex.main=1)
 points(x, y, pch=20, cex=0.2)
@@ -1597,11 +1544,11 @@ points(x, y, pch=20, cex=0.2)
 
 And then we fit the model:
 
-```{r simple-ex-64,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 data_1 <- list(N=N, x=x, y=y)
 fit_1 <- stan("stan/exponential.stan", data=data_1)
 ```
-```{r simple-ex-65,  echo=FALSE}
+```{r}
 print(fit_1)
 ```
 
@@ -1623,10 +1570,10 @@ positive, which we can do in the parameters block:
 Otherwise we leave the model unchanged.  In this case the results turn
 out to be very similar:
 
-```{r simple-ex-66,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 fit_1b <- stan("stan/exponential_positive.stan", data=data_1)
 ```
-```{r simple-ex-67,  echo=FALSE}
+```{r}
 print(fit_1b)
 ```
 
@@ -1634,7 +1581,7 @@ With weaker data, though, the constraints could make a difference.  We
 could experiment on this by doing the same simulation but with just
 $N=10$ data points:
 
-```{r simple-ex-68,  echo=FALSE}
+```{r}
 N <- 10
 x <- runif(N, 0, 10)
 y <- rnorm(N, a*exp(-b*x), sigma)
@@ -1645,20 +1592,20 @@ points(x, y, pch=20, cex=0.2)
 
 First we fit the unconstrained model:
 
-```{r simple-ex-69,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 data_2 <- list(N=N, x=x, y=y)
 fit_2 <- stan("stan/exponential.stan", data=data_2)
 ```
-```{r simple-ex-70,  echo=FALSE}
+```{r}
 print(fit_2)
 ```
 
 Then we fit the constrained model:
 
-```{r simple-ex-71,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 fit_2b <- stan("stan/exponential_positive.stan", data=data_2)
 ```
-```{r simple-ex-72,  echo=FALSE}
+```{r}
 print(fit_2b)
 ```
 
@@ -1680,12 +1627,12 @@ $$
 
 Here is the model in Stan:
 
-```{r simple-ex-73,  echo=FALSE}
+```{r}
 print_file("stan/exponential_positive_lognormal.stan")
 ```
 
 As before, we can simulate fake data from this model:
-```{r simple-ex-74,  echo=FALSE}
+```{r}
 a <- 5
 b <- 0.3
 sigma <- 0.5
@@ -1701,11 +1648,11 @@ points(x, y, pch=20, cex=0.2)
 We can then fit the model to the simulated data and check that the
 parameters are approximately recovered:
 
-```{r simple-ex-75,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 data_3 <- list(N=N, x=x, y=y)
 fit_3 <- stan("stan/exponential_positive_lognormal.stan", data=data_3)
 ```
-```{r simple-ex-76,  echo=FALSE}
+```{r}
 print(fit_3)
 ```
 
@@ -1734,7 +1681,7 @@ with lognormally-distributed errors $\epsilon$.
 
 Here is the model in Stan:
 
-```{r simple-ex-77,  echo=FALSE}
+```{r}
 print_file("stan/sum_of_exponentials.stan")
 ```
 The coefficients $a$ and the residual standard deviation $\sigma$ are
@@ -1758,7 +1705,7 @@ spaced from 0 to 10, and, somewhat arbitrarily, set $a_1=1.0$,
 $a_2=0.8$, and $\sigma=0.2$.  We can then simulate from the lognormal
 distribution to generate the data $y$.
 
-```{r simple-ex-78,  echo=FALSE}
+```{r}
 a <- c(1, 0.8)
 b <- c(0.1, 2)
 N <- 1000
@@ -1770,7 +1717,7 @@ y <- (a[1]*exp(-b[1]*x) + a[2]*exp(-b[2]*x)) * epsilon
 
 Here is a graph of the true curve and the simulated data:
 
-```{r simple-ex-79,  echo=FALSE}
+```{r}
 data_graph <- function(a, b, sigma, x, y) {
   curve(a[1]*exp(-b[1]*x) + a[2]*exp(-b[2]*x), from=min(x), to=max(x), ylim=c(0, 1.05*max(y)), xlim=c(0, max(x)),
      xlab="x", ylab="y", xaxs="i", yaxs="i", bty="l", main="Data and true model", cex.main=1)
@@ -1782,11 +1729,11 @@ data_graph(a, b, sigma, x, y)
 
 And then we fit the model:
 
-```{r simple-ex-80,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 data_1 <- list(N=N, x=x, y=y)
 fit_1 <- stan("stan/sum_of_exponentials.stan", data=data_1)
 ```
-```{r simple-ex-81,  echo=FALSE}
+```{r}
 print(fit_1)
 ```
 
@@ -1800,7 +1747,7 @@ of setting the two parameters $b$ to 0.1 and 2.0, we'll make them 0.1
 and 0.2, so now only a factor of 2 separates the scales of the two
 declining exponentials.
 
-```{r simple-ex-82,  echo=FALSE}
+```{r}
 b <- c(0.1, 0.2)
 y_2 <- (a[1]*exp(-b[1]*x) + a[2]*exp(-b[2]*x)) * epsilon
 data_2 <- list(N=N, x=x, y=y_2)
@@ -1808,10 +1755,10 @@ data_2 <- list(N=N, x=x, y=y_2)
 
 This should still be easy to fit in Stan, right?  Wrong:
 
-```{r simple-ex-83,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 fit_2 <- stan("stan/sum_of_exponentials.stan", data=data_2)
 ```
-```{r simple-ex-84,  echo=FALSE}
+```{r}
 print(fit_2)
 ```
 
@@ -1819,7 +1766,7 @@ What happened??  It turns out that these two declining exponentials
 are _very_ hard to detect.  Look: here's a graph of the two-component
 model for the expected data, $y=1.0e^{-0.1x}+0.8e^{-0.2x}$:
 
-```{r simple-ex-85,  echo=FALSE}
+```{r}
 curve(a[1]*exp(-b[1]*x) + a[2]*exp(-b[2]*x), from=0, to=10, ylim=c(0, 1.9), xlim=c(0, 10),
      xlab="x", ylab="y", xaxs="i", yaxs="i", bty="l", main="True model", cex.main=1)
 text(5.3, 0.8, "y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)", adj=1)
@@ -1828,7 +1775,7 @@ text(5.3, 0.8, "y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)", adj=1)
 And now we'll overlay a graph of a particular _one-component_ model,
 $y=1.8e^{-0.135x}$:
 
-```{r simple-ex-86,  echo=FALSE}
+```{r}
 curve(a[1]*exp(-b[1]*x) + a[2]*exp(-b[2]*x), from=0, to=10,
       ylim=c(0, 1.9), xlim=c(0, 10),
       xlab="x", ylab="y", xaxs="i", yaxs="i", bty="l",
@@ -1875,10 +1822,10 @@ as $\mbox{normal}^+(0,1)$.
 We now can fit this new model to our data, and the results are much
 more stable:
 
-```{r simple-ex-87,  echo=FALSE, warnings=FALSE, results=FALSE}
+```{r, results=FALSE}
 fit_2_with_priors <- stan("stan/sum_of_exponentials_with_priors.stan", data=data_2)
 ```
-```{r simple-ex-88,  echo=FALSE}
+```{r}
 print(fit_2_with_priors)
 ```
 

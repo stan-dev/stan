@@ -7,8 +7,7 @@ library(dplyr)
 library(ggplot2)
 library(knitr)
   knitr::opts_chunk$set(
-    cache = TRUE,
-    cache.extra = packageVersion('tufte'),
+    cache = FALSE,
     collapse = TRUE,
     comment = NA,
     dev = "png",
@@ -20,11 +19,13 @@ library(knitr)
     fig.show = "hold",
     include = TRUE,
     out.width = "70%",
-    tidy = FALSE
+    tidy = FALSE,
+    warnings = FALSE
   )
 library(lubridate)
 library(rstan)
   rstan_options(auto_write = FALSE)
+  options(mc.cores = 1)
 
 
 # UTILITY FUNCTIONS
@@ -47,4 +48,5 @@ extract_one_draw <- function(stanfit, chain = 1, iter = 1) {
 options(digits = 2)
 options(htmltools.dir.version = FALSE)
 
-set.seed(1123) 
+
+set.seed(1123)

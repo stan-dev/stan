@@ -3,8 +3,8 @@ before_chapter_script: "before-chapter.R"
 delete_merged_file: TRUE
 rmd_files: [
   "index.Rmd",
-  
-  "part1.Rmd", 
+
+  "part1.Rmd",
   "introduction.Rmd",
   "prior-data-models.Rmd",
   "simple-examples.Rmd",
