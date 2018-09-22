@@ -1,4 +1,4 @@
-# Bayesian Workflow 
+# Bayesian Workflow
 
 In this chapter we go through an artificial probem from beginning to
 end, starting with the (hypothetical) scenario and the (simulated)
@@ -97,7 +97,7 @@ These are the variables we will be using:
 * `live_in_super`: An indicator for whether the building has a live-in
   superintendent
 * `monthly_average_rent`: The average monthly rent in the building
-* `average_tenant_age`: The aerage age of the tenants in the building 
+* `average_tenant_age`: The aerage age of the tenants in the building
 * `age_of_building`: The age of the building
 * `total_sq_foot`: The total square footage in the building
 * `month`: Month of the year
@@ -114,7 +114,7 @@ And make some plots: a histogram of the number of complaints in the
 120 building-months in the data:
 
 ```{r data-plots, echo=FALSE}
-ggplot(pest_data, aes(x = complaints)) + 
+ggplot(pest_data, aes(x = complaints)) +
   geom_bar()
 ```
 
@@ -122,21 +122,21 @@ A scatterplot of complaints vs. bait stations, with each dot
 representing a building-month:
 
 ```{r, echo=FALSE}
-ggplot(pest_data, aes(x = traps, y = complaints, color = live_in_super == TRUE)) + 
+ggplot(pest_data, aes(x = traps, y = complaints, color = live_in_super == TRUE)) +
   geom_jitter()
 ```
 
 And the time series of bait stations and complaints for each building:
 
 ```{r data-plots-ts, echo=-FALSE, fig.width = 6, fig.height = 8}
-ggplot(pest_data, aes(x = date, y = complaints, color = live_in_super == TRUE)) + 
-  geom_line(aes(linetype = "Number of complaints")) + 
-  geom_point(color = "black") + 
-  geom_line(aes(y = traps, linetype = "Number of bait stations"), color = "black", size = 0.25) + 
-  facet_wrap(~building_id, scales = "free", ncol = 2, labeller = label_both) + 
-  scale_x_date(name = "Month", date_labels = "%b") + 
-  scale_y_continuous(name = "", limits = range(pest_data$complaints)) + 
-  scale_linetype_discrete(name = "") + 
+ggplot(pest_data, aes(x = date, y = complaints, color = live_in_super == TRUE)) +
+  geom_line(aes(linetype = "Number of complaints")) +
+  geom_point(color = "black") +
+  geom_line(aes(y = traps, linetype = "Number of bait stations"), color = "black", size = 0.25) +
+  facet_wrap(~building_id, scales = "free", ncol = 2, labeller = label_both) +
+  scale_x_date(name = "Month", date_labels = "%b") +
+  scale_y_continuous(name = "", limits = range(pest_data$complaints)) +
+  scale_linetype_discrete(name = "") +
   scale_color_discrete(name = "Live-in super")
 ```
 
@@ -249,7 +249,7 @@ need to arrange the data into a named list. The names must match the
 names used in the `data` block of the Stan program.
 
 ```{r}
-stan_dat_fake <- list(N = nrow(pest_data), traps = sims_dgp$traps[1, ], 
+stan_dat_fake <- list(N = nrow(pest_data), traps = sims_dgp$traps[1, ],
   complaints = sims_dgp$complaints[1, ])
 str(stan_dat_fake)
 ```
@@ -398,7 +398,7 @@ the number of bait stations. The model doesn't seem to fully capture
 the data.
 
 ```{r}
-ppc_intervals(y = stan_dat_simple$complaints, yrep = y_rep, x = stan_dat_simple$traps) + 
+ppc_intervals(y = stan_dat_simple$complaints, yrep = y_rep, x = stan_dat_simple$traps) +
   labs(x = "Number of bait stations", y = "Number of complaints")
 ```
 
@@ -440,7 +440,7 @@ A quick check finds a relationship between the square footage of the
 building and the number of complaints received:
 
 ```{r}
-ggplot(pest_data, aes(x = log(total_sq_foot), y = log1p(complaints))) + geom_point() + 
+ggplot(pest_data, aes(x = log(total_sq_foot), y = log1p(complaints))) + geom_point() +
   geom_smooth(method = "lm", se = FALSE)
 ```
 
@@ -448,7 +448,7 @@ Using the property manager's intuition, we include two extra pieces of
 information we know about the building - the (log of the) square floor
 space and whether there is a live in super or not - into both the
 simulated and real data.
- 
+
 ```{r}
 stan_dat_simple$log_sq_foot <- log(pest_data$total_sq_foot/1e4)
 stan_dat_simple$live_in_super <- pest_data$live_in_super
@@ -474,7 +474,7 @@ fitted_model_dgp <- sampling(comp_dgp_multiple, data = list(N = nrow(pest_data))
 sims_dgp <- rstan::extract(fitted_model_dgp)
 ```
 
-Now pop that simulated data into a list ready for Stan. 
+Now pop that simulated data into a list ready for Stan.
 
 ```{r}
 stan_dat_fake <- list(N = nrow(pest_data), log_sq_foot = sims_dgp$log_sq_foot[1, ],
@@ -527,14 +527,14 @@ We can also plot uncertainty intervals for the predicted complaints for differen
 numbers of bait stations.
 
 ```{r}
-ppc_intervals(y = stan_dat_simple$complaints, yrep = y_rep, x = stan_dat_simple$traps) + 
+ppc_intervals(y = stan_dat_simple$complaints, yrep = y_rep, x = stan_dat_simple$traps) +
   labs(x = "Number of bait stations", y = "Number of complaints")
 ```
 
 We've increased the tails a bit more at the larger numbers of bait
 stations but we still have some large observed numbers of complaints
 that the model would consider extremely unlikely events.
- 
+
 ## Modeling count data with the negative binomial distribution
 
 When we considered modelling the data using a Poisson, we saw that the
@@ -572,7 +572,7 @@ $$
 
 $$
 \text{Var}[y] = \lambda + \lambda^2/\phi = \exp(\eta) + \exp(\eta)^2 / \phi.
-$$ 
+$$
 
 As $\phi$ gets larger the term $\lambda^2 / \phi$ approaches zero and
 so the variance of the negative-binomial approaches $\lambda$; that
@@ -620,7 +620,7 @@ we've sufficiently recovered our known parameters, $\text{alpha}$
 $\texttt{beta}$, .
 
 ```{r runNBoverfake, message=FALSE, warning=FALSE}
-fitted_model_NB <- sampling(comp_model_NB, data = stan_dat_fake_NB, 
+fitted_model_NB <- sampling(comp_model_NB, data = stan_dat_fake_NB,
                             chains = 4, cores = 4)
 posterior_alpha_beta_NB <- as.matrix(fitted_model_NB, pars = c('alpha', 'beta', 'beta_super', 'inv_phi'))
 ```
@@ -680,11 +680,11 @@ now the expected number of complaints matches much closer to the
 observed number of complaints. However, we still have some larger
 counts that appear to be outliers for the model.
 
-Check predictions by number of bait stations: 
+Check predictions by number of bait stations:
 
 ```{r}
 ppc_intervals(y = stan_dat_simple$complaints, yrep = y_rep,
-              x = stan_dat_simple$traps) + 
+              x = stan_dat_simple$traps) +
   labs(x = "Number of bait stations", y = "Number of complaints")
 ```
 
@@ -767,10 +767,10 @@ pest_data <- pest_data %>%
 # Center and rescale the building specific data
 building_data <- pest_data %>%
     select(building_idx, live_in_super, age_of_building,
-      total_sq_foot, average_tenant_age, monthly_average_rent) %>% 
+      total_sq_foot, average_tenant_age, monthly_average_rent) %>%
     unique() %>%
-    arrange(building_idx) %>% 
-    select(-building_idx) %>% 
+    arrange(building_idx) %>%
+    select(-building_idx) %>%
     scale(scale=FALSE) %>%
     as.data.frame() %>%
     mutate( # scale by constants
@@ -782,7 +782,7 @@ building_data <- pest_data %>%
     as.matrix()
 
 # Make data list for Stan
-stan_dat_hier <- with(pest_data, 
+stan_dat_hier <- with(pest_data,
   list(complaints = complaints, traps = traps, N = length(traps), J = N_buildings, M = N_months,
     log_sq_foot = log(pest_data$total_sq_foot/1e4), building_data = building_data[,-3],
     mo_idx = as.integer(as.factor(date)), K = 4, building_idx = building_idx))
@@ -790,7 +790,7 @@ stan_dat_hier <- with(pest_data,
 
 ### Compile and fit the hierarchical model {-}
 
-Let's compile the model. 
+Let's compile the model.
 
 ```{r comp-NB-hier, cache=TRUE, results="hide", message=FALSE}
 comp_model_NB_hier <- stan_model('stan/hier_NB_regression.stan')
@@ -829,11 +829,11 @@ patterns in locations of the divergences.
 
 First let's extract the fits from the model.
 
-```{r} 
+```{r}
 sims_hier_NB <- rstan::extract(fitted_model_NB_hier)
 ```
 
-Then we print the fits for the parameters that are of most interest. 
+Then we print the fits for the parameters that are of most interest.
 
 ```{r print-NB-hier}
 print(fitted_model_NB_hier, pars = c('sigma_mu','beta','alpha','phi','mu'))
@@ -847,7 +847,7 @@ pattern.
 
 ```{r}
 # use as.array to keep the markov chains separate for trace plots
-mcmc_trace(as.array(fitted_model_NB_hier,pars = 'sigma_mu'), 
+mcmc_trace(as.array(fitted_model_NB_hier,pars = 'sigma_mu'),
   np = nuts_params(fitted_model_NB_hier), window = c(500,1000)
 )
 ```
@@ -895,7 +895,7 @@ confront the funnel geometry. (See the [Visual MCMC
 Diagnostics](http://mc-stan.org/bayesplot/articles/visual-mcmc-diagnostics.html)
 vignette for more on this.)
 
-Another way to look at the divergences is via a parallel coordinates plot: 
+Another way to look at the divergences is via a parallel coordinates plot:
 
 ```{r}
 parcoord_with_divs <-
@@ -961,9 +961,9 @@ extract the parameters to run our usual posterior predictive checks.
 
 ```{r}
 scatter_no_divs <- mcmc_scatter(as.array(fitted_model_NB_hier_ncp),
-  pars = c("mu[4]", 'sigma_mu'), transform = list('sigma_mu' = "log"), 
+  pars = c("mu[4]", 'sigma_mu'), transform = list('sigma_mu' = "log"),
   np = nuts_params(fitted_model_NB_hier_ncp))
-bayesplot_grid(scatter_with_divs, scatter_no_divs, 
+bayesplot_grid(scatter_with_divs, scatter_no_divs,
                grid_args = list(ncol = 2), ylim = c(-11, 1))
 ```
 
@@ -992,7 +992,7 @@ the posterior distribution of means by building should match well with
 the observed means of the quantity of building complaints by month.
 
 ```{r ppc-group_means-hier}
-ppc_stat_grouped(y = stan_dat_hier$complaints, 
+ppc_stat_grouped(y = stan_dat_hier$complaints,
   yrep = y_rep, group = pest_data$building_id, stat = 'mean', binwidth = 0.5)
 ```
 
@@ -1001,7 +1001,7 @@ now they are all well captured by our model. The model is also able to
 do a decent job estimating within-building variability:
 
 ```{r}
-ppc_stat_grouped(y = stan_dat_hier$complaints, 
+ppc_stat_grouped(y = stan_dat_hier$complaints,
   yrep = y_rep, group = pest_data$building_id, stat = 'sd', binwidth = 0.5)
 ```
 
@@ -1009,7 +1009,7 @@ Predictions by number of bait stations:
 
 ```{r}
 ppc_intervals(y = stan_dat_hier$complaints, yrep = y_rep,
-              x = stan_dat_hier$traps) + 
+              x = stan_dat_hier$traps) +
   labs(x = "Number of bait stations", y = "Number of complaints")
 ```
 
@@ -1065,7 +1065,7 @@ comp_model_NB_hier_slopes <-
   stan_model('stan/hier_NB_regression_ncp_slopes_mod.stan')
 ```
 
-Fit the model to data and extract the posterior draws needed for 
+Fit the model to data and extract the posterior draws needed for
 our posterior predictive checks.
 
 ```{r run-NB-hier-slopes}
@@ -1115,7 +1115,7 @@ look at whether there's any pattern over time.
 
 ```{r ppc-group_max-hier-slopes-mean-by-mo}
 select_vec <- which(stan_dat_hier$mo_idx %in% 1:12)
-ppc_stat_grouped(y = stan_dat_hier$complaints[select_vec], 
+ppc_stat_grouped(y = stan_dat_hier$complaints[select_vec],
   yrep = y_rep[,select_vec], group = stan_dat_hier$mo_idx[select_vec],
   stat = 'mean') +
   xlim(0, 11)
@@ -1190,7 +1190,7 @@ stationary, so $\text{Var}(\texttt{mo}_t) =
 distribution of $\texttt{mo}_1$ is the same as the marginal
 distribution of any $\texttt{mo}_t$.
 
-First we derive the marginal variance of $\texttt{mo}_{t}$. 
+First we derive the marginal variance of $\texttt{mo}_{t}$.
 
 $$
 \text{Var}(\texttt{mo}_t)
@@ -1223,13 +1223,13 @@ $$
   = \mbox{E}(\rho \, \texttt{mo}_{t-1}) + \mbox{E}(\epsilon_t)
 $$
 
-Since $\mbox{E}(\epsilon_t) = 0$ by assumption we have 
+Since $\mbox{E}(\epsilon_t) = 0$ by assumption we have
 
 $$
 \mbox{E}(\texttt{mo}_t) = \mbox{E}(\rho \, \texttt{mo}_{t-1})  + 0\\
 \mbox{E}(\texttt{mo}_t) = \rho \, \mbox{E}(\texttt{mo}_{t}) \\
 \mbox{E}(\texttt{mo}_t) - \rho \mbox{E}(\texttt{mo}_t) = 0  \\
-\mbox{E}(\texttt{mo}_t) = 0/(1 - \rho)  
+\mbox{E}(\texttt{mo}_t) = 0/(1 - \rho)
 $$
 
 which for $\rho \neq 1$ yields $\mbox{E}(\texttt{mo}_{t}) = 0$.
@@ -1273,9 +1273,9 @@ ppc_dens_overlay(y = stan_dat_hier$complaints, yrep = y_rep[1:200,])
 
 ```{r}
 select_vec <- which(stan_dat_hier$mo_idx %in% 1:12)
-ppc_stat_grouped(y = stan_dat_hier$complaints[select_vec], 
+ppc_stat_grouped(y = stan_dat_hier$complaints[select_vec],
   yrep = y_rep[,select_vec], group = stan_dat_hier$mo_idx[select_vec],
-  stat = 'mean') 
+  stat = 'mean')
 ```
 
 Our monthly random intercept has captured a monthly pattern across all
@@ -1298,7 +1298,7 @@ gen_rho_prior <- function(x) {
   beta <- 5
   a <- -1
   c <- 1
-  lp <- (alpha - 1) * log(x - a) + (beta - 1) * log(c - x) - 
+  lp <- (alpha - 1) * log(x - a) + (beta - 1) * log(c - x) -
     (alpha + beta - 1) * log(c - a) - lbeta(alpha, beta)
   return(exp(lp))
 }
@@ -1313,7 +1313,7 @@ print(fitted_model_NB_hier_mos,
 
 ```{r}
 ppc_intervals(y = stan_dat_hier$complaints, yrep = y_rep,
-              x = stan_dat_hier$traps) + 
+              x = stan_dat_hier$traps) +
   labs(x = "Number of bait stations", y = "Number of complaints")
 ```
 
@@ -1361,7 +1361,7 @@ $20.
 
 ```{r materials-cost-formulation}
 N_traps <- 20
-costs <- 10 * (0:N_traps) 
+costs <- 10 * (0:N_traps)
 ```
 
 We'll also need labor for maintaining the bait stations, which need to
@@ -1379,13 +1379,13 @@ N_months_forward <- 12
 N_months_labor <- N_months_forward / 2
 hourly_rate_low <- 20
 hourly_rate_high <- 30
-costs <- costs + 
+costs <- costs +
   (0:N_traps < 5 & 0:N_traps > 0) *
-    (N_months_labor * hourly_rate_low) + 
+    (N_months_labor * hourly_rate_low) +
   (0:N_traps >= 5 & 0:N_traps < 10) *
-    (N_months_labor * (hourly_rate_low + 1 * hourly_rate_high)) + 
+    (N_months_labor * (hourly_rate_low + 1 * hourly_rate_high)) +
   (0:N_traps >= 10 & 0:N_traps < 15) *
-    (N_months_labor * (hourly_rate_low + 2 * hourly_rate_high)) + 
+    (N_months_labor * (hourly_rate_low + 2 * hourly_rate_high)) +
   (0:N_traps >= 15) *
     (N_months_labor * (hourly_rate_low + 3 * hourly_rate_high))
 ```
@@ -1425,7 +1425,7 @@ building.
 
 <br>
 
-Left as an exercise for the reader: 
+Left as an exercise for the reader:
 
 * How would we build a revenue curve for a new building?
 
@@ -1596,13 +1596,13 @@ $$
 =
 \begin{bmatrix}
 \sigma_\texttt{mo} / \sqrt{1 - \rho^2} & 0 & 0
-\\ 
+\\
 \rho \sigma_\texttt{mo} / \sqrt{1 - \rho^2}
 & \sigma_\texttt{mo} & 0
-\\ 
+\\
 \rho^2 \sigma_\texttt{mo} / \sqrt{1 - \rho^2}
 & \rho \,\sigma_\texttt{mo}
-& \sigma_\texttt{mo}  
+& \sigma_\texttt{mo}
 \end{bmatrix}
   \times \texttt{mo\_raw}
 $$
@@ -1615,24 +1615,24 @@ $$
 \begin{bmatrix} \sigma_\texttt{mo} / \sqrt{1 - \rho^2}
 & 0
 & 0
-\\ 
+\\
 \rho \sigma_\texttt{mo} / \sqrt{1 - \rho^2}
 & \sigma_\texttt{mo}
 & 0
-\\ 
+\\
 \rho^2 \sigma_\texttt{mo} / \sqrt{1 - \rho^2}
 & \rho \,\sigma_\texttt{mo}
-& \sigma_\texttt{mo}  
+& \sigma_\texttt{mo}
 \end{bmatrix}
-\times 
+\times
 \begin{bmatrix}
 \sigma_\texttt{mo} / \sqrt{1 - \rho^2}
 & \rho \sigma_\texttt{mo} / \sqrt{1 - \rho^2}
 & \rho^2 \sigma_\texttt{mo} / \sqrt{1 - \rho^2}
-\\ 
+\\
 0 & \sigma_\texttt{mo} & \rho \,\sigma_\texttt{mo}
-\\ 
-0 & 0  & \sigma_\texttt{mo}  
+\\
+0 & 0  & \sigma_\texttt{mo}
 \end{bmatrix}
 $$
 
@@ -1643,24 +1643,24 @@ $$
 \sigma^2_\texttt{mo}
   / (1 - \rho^2) & \rho \, \sigma^2_\texttt{mo} / (1 - \rho^2)
 &  \rho^2 \, \sigma^2_\texttt{mo} / (1 - \rho^2)
-\\ 
+\\
 \rho \, \sigma^2_\texttt{mo} / (1 - \rho^2)
 & \sigma^2_\texttt{mo}
     / (1 - \rho^2)  & \rho \, \sigma^2_\texttt{mo} / (1 - \rho^2)
-\\ 
+\\
 \rho^2 \sigma^2_\texttt{mo} / (1 - \rho^2)
 & \rho \, \sigma^2_\texttt{mo}
-  / (1 - \rho^2) & \sigma^2_\texttt{mo} / (1 - \rho^2)  
-\end{bmatrix} 
+  / (1 - \rho^2) & \sigma^2_\texttt{mo} / (1 - \rho^2)
+\end{bmatrix}
 $$
 We can simplify this result by dividing the matrix by
 $\sigma^2_\texttt{mo} / (1 - \rho^2)$ to get
 
 $$
-\begin{bmatrix} 1 & \rho  &  \rho^2 \\ 
-\rho  & 1  & \rho  \\ 
-\rho^2 & \rho & 1  
-\end{bmatrix} 
+\begin{bmatrix} 1 & \rho  &  \rho^2 \\
+\rho  & 1  & \rho  \\
+\rho^2 & \rho & 1
+\end{bmatrix}
 $$
 
 This should generalize to higher dimensions pretty easily. We could
@@ -1672,7 +1672,7 @@ vector[M] mo;
 {
   matrix[M,M] A = rep_matrix(0, M, M);
   A[1,1] = sigma_mo / sqrt(1 - rho^2);
-  for (m in 2:M) 
+  for (m in 2:M)
     A[m,1] = rho^(m-1) * sigma_mo / sqrt(1 - rho^2);
   for (m in 2:M) {
     A[m,m] = sigma_mo;
@@ -1718,7 +1718,7 @@ covariance for two elements of $\texttt{mo}_t$ separated by one month:
 $$
 \text{Cov}(\texttt{mo}_{t+1},\texttt{mo}_{t})
   = \text{Cov}(\rho \, \texttt{mo}_{t}
-     + \sigma_\texttt{mo}\epsilon_{t+1},\texttt{mo}_{t}) 
+     + \sigma_\texttt{mo}\epsilon_{t+1},\texttt{mo}_{t})
 \\
 \text{Cov}(\texttt{mo}_{t+1},\texttt{mo}_{t})
   = \rho \text{Cov}(\texttt{mo}_{t},\texttt{mo}_{t})
@@ -1726,7 +1726,7 @@ $$
 \\
 \text{Cov}(\texttt{mo}_{t+1},\texttt{mo}_{t})
   = \rho \text{Var}(\texttt{mo}_t)
-     + 0 
+     + 0
 $$
 
 Then we define the covariance for
@@ -1824,7 +1824,7 @@ function is defined as:
 
 $$
 \begin{aligned}
-k(t, t+h | \theta) 
+k(t, t+h | \theta)
 & = \alpha^2  \exp \left( - \dfrac{1}{2\ell^2} ((t+h) - t)^2 \right)
 \\
 & = \alpha^2  \exp \left( - \dfrac{h^2}{2\ell^2} \right)
@@ -1881,8 +1881,8 @@ Let's look at the prior vs. posterior for the Gaussian process length
 scale parameter:
 
 ```{r}
-length_scale_draws <- 
-  cbind(prior = rgamma(4000, 10, 2), 
+length_scale_draws <-
+  cbind(prior = rgamma(4000, 10, 2),
         posterior = sims_gp$gp_len)
 mcmc_areas(length_scale_draws)
 ```
@@ -1921,7 +1921,7 @@ plot_data <- bind_rows(mo_ar_intervals, mo_gp_intervals)
 plot_data$prior <- factor(rep(c("AR1", "GP"), each = 36),
                           levels = c("GP", "AR1"))
 plot_data$time <- rep(1:36, times = 2)
-ggplot(plot_data, aes(x = time, y = m, ymin = l, ymax = h, fill = prior)) + 
+ggplot(plot_data, aes(x = time, y = m, ymin = l, ymax = h, fill = prior)) +
   geom_ribbon(alpha = 2/3)
 ```
 
@@ -1932,19 +1932,18 @@ the Stan code) and the underlying smoothly varying trend
 
 ```{r, message=FALSE, warning=FALSE}
 # visualizing 50% intervals
-mo_noise_intervals <- 
+mo_noise_intervals <-
   mcmc_intervals_data(as.matrix(fitted_model_NB_hier_gp,
                                 pars = "mo_noise"), prob = 0.5)
-gp_exp_quad_intervals <- 
+gp_exp_quad_intervals <-
   mcmc_intervals_data(as.matrix(fitted_model_NB_hier_gp,
                                 pars = "gp_exp_quad"), prob = 0.5)
 plot_data <- bind_rows(mo_noise_intervals, gp_exp_quad_intervals)
 plot_data$time <- rep(1:36, times = 2)
-plot_data$term <- factor(rep(c("Monthly Noise", "Smooth Trend"), each = 36), 
+plot_data$term <- factor(rep(c("Monthly Noise", "Smooth Trend"), each = 36),
   levels = c("Smooth Trend", "Monthly Noise"))
-ggplot(plot_data, aes(x = time, y = m, ymin = l, ymax = h, fill = term)) + 
-  geom_ribbon(alpha = 0.5) + 
-  geom_line(aes(color = term), size = 0.5) + 
+ggplot(plot_data, aes(x = time, y = m, ymin = l, ymax = h, fill = term)) +
+  geom_ribbon(alpha = 0.5) +
+  geom_line(aes(color = term), size = 0.5) +
   ylab(NULL)
 ```
-
