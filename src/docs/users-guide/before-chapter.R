@@ -20,7 +20,7 @@ library(knitr)
     include = TRUE,
     out.width = "70%",
     tidy = FALSE,
-    warnings = FALSE,
+    warnings = FALSE
   )
 library(lubridate)
 library(rstan)

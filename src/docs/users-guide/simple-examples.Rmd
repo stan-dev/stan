@@ -1,4 +1,3 @@
-
 # Simple Examples
 
 ## What is in this chapter?
