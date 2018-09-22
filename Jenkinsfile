@@ -72,6 +72,21 @@ pipeline {
                 }
             }
         }
+        stage("Make manuals") {
+            agent { label 'docker' }
+            steps {
+                script {
+                    checkout scm
+                    def docImage = docker.build("seantalts/bookdown",
+                                                ".circleci/doc-docker")
+                    docImage.inside {
+                        sh "make doc"
+                        archiveArtifacts 'doc/*'
+                    }
+                    docImage.push()
+                }
+            }
+        }
         stage('Linting & Doc checks') {
             agent any
             steps {
@@ -84,6 +99,13 @@ pipeline {
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
                     )
+                    def docImage = docker.build("seantalts/bookdown",
+                                                ".circleci/doc-docker/Dockerfile")
+                    docImage.inside {
+                        sh "make doc"
+                        archiveArtifacts 'doc/*'
+                    }
+                    docImage.push()
                 }
             }
             post {
