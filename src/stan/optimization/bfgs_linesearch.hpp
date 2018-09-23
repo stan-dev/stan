@@ -203,7 +203,7 @@ namespace stan {
      *
      * @param f0 Value of function at starting point, \f$ f(x_0) \f$.
      *
-     * @param gradx0 Value of function gradient at starting point, 
+     * @param gradx0 Value of function gradient at starting point,
      *    \f$ g(x_0) \f$.
      *
      * @param c1 Parameter of the Wolfe conditions. \f$ 0 < c_1 < c_2 < 1 \f$
@@ -214,6 +214,9 @@ namespace stan {
      *
      * @param minAlpha Smallest allowable step-size.
      *
+     * @param maxLSRetries Maximum number times line search can update
+     * step-size and retry to find approximate solution.
+     *
      * @return Returns zero on success, non-zero otherwise.
      **/
     template<typename FunctorType, typename Scalar, typename XType>
@@ -223,7 +226,7 @@ namespace stan {
                         const XType &p,
                         const XType &x0, const Scalar &f0, const XType &gradx0,
                         const Scalar &c1, const Scalar &c2,
-                        const Scalar &minAlpha) {
+                        const Scalar &minAlpha, const Scalar &maxLSRetries) {
       const Scalar dfp(gradx0.dot(p));
       const Scalar c1dfp(c1*dfp);
       const Scalar c2dfp(c2*dfp);
@@ -236,13 +239,18 @@ namespace stan {
       Scalar prevDFp(dfp);
       Scalar newDFp;
 
-      int retCode = 0, nits = 0, ret;
+      int retCode = 0, nits = 0, lsRetries = 0, ret;
 
       while (1) {
         x1.noalias() = x0 + alpha1 * p;
         ret = func(x1, f1, gradx1);
         if (ret != 0) {
+          if (lsRetries >= maxLSRetries) {
+            retCode = 1;
+            break;
+          }
           alpha1 = 0.5 * (alpha0 + alpha1);
+          lsRetries++;
           continue;
         }
         newDFp = gradx1.dot(p);
