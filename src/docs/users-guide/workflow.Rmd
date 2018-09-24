@@ -113,7 +113,7 @@ N_buildings
 And make some plots: a histogram of the number of complaints in the
 120 building-months in the data:
 
-```{r data-plots, echo=FALSE}
+```{r data-plots}
 ggplot(pest_data, aes(x = complaints)) +
   geom_bar()
 ```
@@ -121,7 +121,7 @@ ggplot(pest_data, aes(x = complaints)) +
 A scatterplot of complaints vs. bait stations, with each dot
 representing a building-month:
 
-```{r, echo=FALSE}
+```{r}
 ggplot(pest_data, aes(x = traps, y = complaints, color = live_in_super == TRUE)) +
   geom_jitter()
 ```

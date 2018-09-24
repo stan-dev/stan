@@ -50,11 +50,22 @@ options(htmltools.dir.version = FALSE)
 
 set.seed(1123) 
 ```
+
 # Prior Distributions and Models for Data
 
 ## Prior, likelihood, posterior densities; Bayes as information aggregation
 
-As discussed in the context of the Hello World example in chapter 1, a Stan model is constructed by adding to the objective function or log-posterior density; each line in the model block with "target +=" or a "~" symbol adds a term.  The increments can come in any order, as addition is commutative ($X+Y = Y+X$).  So your Stan model can start with the log-prior and then add the log-likelihood, or the other way around.  Or the two can be interspersed.  The structure of Stan can be thought of as an implementation of the general idea of Bayesian inference as information aggregation:  Prior information, data information, all of it is just information that is fed into the inference engine.
+As discussed in the context of the Hello World example in chapter 1, a
+Stan model is constructed by adding to the objective function or
+log-posterior density; each line in the model block with "target +="
+or a "~" symbol adds a term.  The increments can come in any order, as
+addition is commutative ($X+Y = Y+X$).  So your Stan model can start
+with the log-prior and then add the log-likelihood, or the other way
+around.  Or the two can be interspersed.  The structure of Stan can be
+thought of as an implementation of the general idea of Bayesian
+inference as information aggregation: Prior information, data
+information, all of it is just information that is fed into the
+inference engine.
 
 ## Example:  apparently duplicate priors
 
@@ -73,9 +84,12 @@ model {
 }
 ```
 
-Here, the prior and data happen to provide the same amount of information about $\theta$, and the posterior mean of $\theta$ will fall halfway between the data, $y$, and the prior mean, 0.
+Here, the prior and data happen to provide the same amount of
+information about $\theta$, and the posterior mean of $\theta$ will
+fall halfway between the data, $y$, and the prior mean, 0.
 
-Now suppose we add a new line to the model block, apparently duplicating the prior:
+Now suppose we add a new line to the model block, apparently
+duplicating the prior:
 
 ```
 model {
@@ -85,8 +99,12 @@ model {
 }
 ```
 
-This looks weird. We have specified a model for $\theta$ twice.  Does this cause an error in the Stan program?  Does Stan simply ignore the duplicate code?  Does the second "prior" overwrite the first?
-Actually, no.  The above model block is legal Stan code, as we can see by replacing each line by its equivalent augmentation of the objective function:
+This looks weird. We have specified a model for $\theta$ twice.  Does
+this cause an error in the Stan program?  Does Stan simply ignore the
+duplicate code?  Does the second "prior" overwrite the first?
+Actually, no.  The above model block is legal Stan code, as we can see
+by replacing each line by its equivalent augmentation of the objective
+function:
 
 ```
 model {
@@ -96,7 +114,11 @@ model {
 }
 ```
 
-Each line adds a piece of information to the log posterior density.  In this simple example, all three lines of code contain the equivalent amount of information---each is a normal density with scale 1---and so the posterior mean of $\theta$ will be the average of the three numbers, 0, 0, and $y$.
+Each line adds a piece of information to the log posterior density.
+In this simple example, all three lines of code contain the equivalent
+amount of information---each is a normal density with scale 1---and so
+the posterior mean of $\theta$ will be the average of the three
+numbers, 0, 0, and $y$.
 
 Indeed, the above code is equivalent to this:
 
@@ -107,7 +129,9 @@ model {
 }
 ```
 
-We cannot in general do this sort of simplification but it happens that with the normal distribution these computations can be performed analytically, as the product of two normal densities is itself normal.
+We cannot in general do this sort of simplification but it happens
+that with the normal distribution these computations can be performed
+analytically, as the product of two normal densities is itself normal.
 
 As a practical matter, we do _not_ recommend code like this:
 
@@ -116,36 +140,61 @@ As a practical matter, we do _not_ recommend code like this:
   theta ~ normal(0, 1);
 ```
 
-as it just looks confusing.  But understanding how it works gives insight into the way that priors and data combine to express information.
+as it just looks confusing.  But understanding how it works gives
+insight into the way that priors and data combine to express
+information.
 
 
 ## Concentration of the likelihood
 
-For any fixed model, as the sample size increases, the likelihood becomes more informative.  This can be seen, for example, in the mdoels above, where each additional data point adds another term to the likelihood in the implicit vector addition of the "target +=" or "~" statement.  See Chapter 4 of _Bayesian Data Analysis_ for more on this.
+For any fixed model, as the sample size increases, the likelihood
+becomes more informative.  This can be seen, for example, in the
+mdoels above, where each additional data point adds another term to
+the likelihood in the implicit vector addition of the `target +=` or
+`~` statement.  See Chapter 4 of _Bayesian Data Analysis_ for more on
+this.
 
 ## Problems with so-called noninformative priors
 
 Before discussing prior distributions more generally, we share a simple example.
 
-You have a single parameter $\theta$ which we estimate using an experiment which returns an estimate $y$.  For simplicity, assume the estimate is unbiased, normally distributed, and with known standard deviation that happens to equal 1.  Thus, the data model is:
+You have a single parameter $\theta$ which we estimate using an
+experiment which returns an estimate $y$.  For simplicity, assume the
+estimate is unbiased, normally distributed, and with known standard
+deviation that happens to equal 1.  Thus, the data model is:
 $$
 y \sim \mbox{normal}(\theta,1).
 $$
-Now suppose you perform Bayesian inference using a uniform prior on $\theta$.  Then your posterior distribution is simply (see, for example, chapter 2 of _Bayesian Data Analysis_),
+Now suppose you perform Bayesian inference using a uniform prior on
+$\theta$.  Then your posterior distribution is simply (see, for
+example, chapter 2 of _Bayesian Data Analysis_),
 $$
 \theta|y \sim \mbox{normal}(y,1).
 $$
-OK, fine.  Now suppose your estimate happens to be $y=1$.  There are two ways of thinking about this:
 
-* The observed data, 1 standard error away from 0, is completely consistent with a true value of $\theta=0$, or of low values of $\theta$ that could be either positive or negative.  From our usual statistical perspective, we would say that the data are consistent with pure noise, and we cannot learn much from these data alone.
+OK, fine.  Now suppose your estimate happens to be $y=1$.  There are
+two ways of thinking about this:
 
-* From the Bayesian posterior distribution, we can compute that $\mbox{Pr}(\theta>0) = 0.84$ (in R, `pnorm(1)`), thus you should be willing to bet with 5-to-1 odds that $\theta$ is positive.
+* The observed data, 1 standard error away from 0, is completely
+  consistent with a true value of $\theta=0$, or of low values of
+  $\theta$ that could be either positive or negative.  From our usual
+  statistical perspective, we would say that the data are consistent
+  with pure noise, and we cannot learn much from these data alone.
 
-This seems wrong, the idea that something recognizable as pure noise can lead to 5:1 posterior odds.
+* From the Bayesian posterior distribution, we can compute that
+  $\mbox{Pr}(\theta>0) = 0.84$ (in R, `pnorm(1)`), thus you should be
+  willing to bet with 5-to-1 odds that $\theta$ is positive.
 
-The problem is coming from the prior distribution. We can see this in two ways. First, just directly, effects near zero are more common than large effects.  
+This seems wrong, the idea that something recognizable as pure noise
+can lead to 5:1 posterior odds.
 
-Jakulin et al. (2008) argue that logistic regression coefficients are usually less than 1. So let's try  combining normal(1,1) data with a Cauchy(0,1) prior. It's easy enough to do in Stan:
+The problem is coming from the prior distribution. We can see this in
+two ways. First, just directly, effects near zero are more common than
+large effects.
+
+Jakulin et al. (2008) argue that logistic regression coefficients are
+usually less than 1. So let's try combining normal(1,1) data with a
+Cauchy(0,1) prior. It's easy enough to do in Stan:
 
 ```
 data {
@@ -160,9 +209,13 @@ model {
 }
 ```
 
-If we fit this model supplying data $y=1$, and then from the resulting simulations compute the posterior probability that $\theta > 0$, we get 0.77, that is, roughly a 3:1 posterior probability that the effect is positive.
+If we fit this model supplying data $y=1$, and then from the resulting
+simulations compute the posterior probability that $\theta > 0$, we
+get 0.77, that is, roughly a 3:1 posterior probability that the effect
+is positive.
 
-Just to check that we're not missing anything, let's  re-run using the flat prior. New Stan model:
+Just to check that we're not missing anything, let's re-run using the
+flat prior. New Stan model:
 
 ```
 data {

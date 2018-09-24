@@ -8,8 +8,9 @@ url: 'http\://mc-stan.org/users/documentation'
 site: bookdown::bookdown_site
 github-repo: stan-dev/stan
 twitter-handle: mc-stan
-cover-image: img/logo-tm.png
+cover-image: img/logo-tm.pdf
 documentclass: book
+classoption: oneside, openany
 bibliography: [../bibtex/all.bib]
 biblio-style: apalike
 link-citations: yes

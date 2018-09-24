@@ -245,7 +245,7 @@ hello_data <- list(N=N, a=10, b=4, sigma=5, x=runif(N, 0, 10))
 ```
 We then run the Stan model and create the fake data:
 
-```{r intro1,  warning=FALSE, results=FALSE}
+```{r intro1, results=FALSE}
 fake_data <- stan("stan/fake-data.stan",
                   chains=1, iter=1, algorithm="Fixed_param",
 		  data=hello_data)
@@ -411,12 +411,26 @@ posterior density, up to an arbitrary constant.
 A Stan program includes various blocks to declare data and parameters
 and make transformations, but the heart of a Stan program, where it
 computes the objective function, is in the model block.  The Stan
-program above has the following model block: ``` model { y ~ normal(a
-+ b * x, sigma); } ``` In this case, $y$ and $x$ are vectors of length
+program above has the following model block:
+
+```
+model {
+  y ~ normal(a + b * x, sigma);
+}
+```
+
+In this case, $y$ and $x$ are vectors of length
 $N$, and the above code is mathematically (but not computationally)
-equivalent to: ``` model { for (n in 1:N){ y[n] ~ normal(a + b * x[n],
-sigma); } } ``` Each line inside the loop adds a term to the objective
-function with the logarithm of the corresponding normal density; thus,
+equivalent to:
+```
+model {
+  for (n in 1:N) {
+    y[n] ~ normal(a + b * x[n], sigma);
+  }
+}
+```
+Each line inside the loop adds a term to the objective function with
+the logarithm of the corresponding normal density; thus,
 $\log(\frac{1}{\sqrt{2\pi}\sigma}\exp(-\frac{1}{2}(\frac{y_n - (a +
 bx_n)}{\sigma})^2)) = - \frac{1}{2}\log(2\pi) - \frac{1}{2}\log\sigma
 - \frac{1}{2}(\frac{y_n - (a + bx_n)}{\sigma})^2$.  For most purposes,
@@ -433,14 +447,25 @@ efficient in vectorized form (without the loop).
 The relevant point of the above discussion is that the model block is
 where the objective function is computing, with distributional
 statements corresponding to increments to the objective function.  We
-can make this explicit by rewriting the above model block as: ```
-model { target += normal_lpdf(y | a + b * x, sigma); } ``` Or ```
-model { for (n in 1:N){ target += y[n] ~ normal_lpdf(y[n] | a + b *
-x[n], sigma); } } ``` Here, "target" is the objective function, "lpdf"
-stands for "log probability density function," and the vertical bar is
-statistics notation for conditioning: thus, we are adding to the
-objective function the normal log density function of $y$, given mean
-$a+bx$ and standard deviation $\sigma$.
+can make this explicit by rewriting the above model block as:
+```
+model {
+  target += normal_lpdf(y | a + b * x, sigma);
+}
+```
+or
+```
+model {
+  for (n in 1:N) {
+    target += y[n] ~ normal_lpdf(y[n] | a + b * x[n], sigma);
+  }
+}
+```
+Here, "target" is the objective function, "lpdf" stands for "log
+probability density function," and the vertical bar is statistics
+notation for conditioning: thus, we are adding to the objective
+function the normal log density function of $y$, given mean $a+bx$ and
+standard deviation $\sigma$.
 
 Here is a slightly more elaborate version, in which we include
 $\mbox{normal}(0,1)$ prior distributions for $a$, $b$, and $\sigma$
@@ -448,22 +473,41 @@ $\mbox{normal}(0,1)$ prior distributions for $a$, $b$, and $\sigma$
 been constrained to be positive).  We will talk more about priors in a
 bit; for here, you can just think of these extra statements as
 representing additional information that the parameters $a$, $b$, and
-$\sigma$ are likely to be not too far from 0: ``` model { y ~ normal(a
-+ b * x, sigma); a ~ normal(0, 1); b ~ normal(0, 1); sigma ~ normal(0,
-1); } ``` Or, equivalently: ``` model { target += normal_lpdf(y | a +
-b * x, sigma); target += normal_lpdf(a | 0, 1); target +=
-normal_lpdf(b | 0, 1); target += normal_lpdf(sigma | 0, 1); } ```
+$\sigma$ are likely to be not too far from 0:
+```
+model {
+  y ~ normal(a + b * x, sigma);
+  a ~ normal(0, 1); b ~ normal(0, 1);
+  sigma ~ normal(0, 1);
+}
+```
+Or, equivalently:
+```
+model {
+  target += normal_lpdf(y | a + b * x, sigma);
+  target += normal_lpdf(a | 0, 1);
+  target += normal_lpdf(b | 0, 1);
+  target += normal_lpdf(sigma | 0, 1);
+}
+```
 Every line in the model block with a tilde (~) corresponds to an
 augmentation of the target, or objective function.
 
 We can also include lines in the code that do _not_ augment the
-objective function.  For example: ``` model { real a_shifted;
-a_shifted = a + 2*b; // expected value of y when x=2 y ~ normal(a + b
-* x, sigma); a_shifted ~ normal(0, 1); b ~ normal(0, 1); sigma ~
-normal(0, 1); } ``` Here we wanted to assign a prior distribution not
-to the parameter $a$ but to the shifted parameter $a+2b$.  The above
-code is executed directly, with an augmentation of "target" for every
-line with a tilde.
+objective function.  For example:
+```
+model {
+  // expected value of y when x=2 y ~ normal(a + b * x, sigma);
+  real a_shifted = a + 2 * b;
+  a_shifted ~ normal(0, 1);
+  b ~ normal(0, 1);
+  sigma ~ normal(0, 1);
+}
+```
+Here we wanted to assign a prior distribution not to the parameter $a$
+but to the shifted parameter $a+2b$.  The above code is executed
+directly, with an augmentation of "target" for every line with a
+tilde.
 
 ### Interpreting the objective function as the log posterior density {-}
 

@@ -7,7 +7,7 @@ library(dplyr)
 library(ggplot2)
 library(knitr)
   knitr::opts_chunk$set(
-    cache = FALSE,
+    cache = TRUE,
     collapse = TRUE,
     comment = NA,
     dev = "png",
@@ -18,9 +18,10 @@ library(knitr)
     fig.asp = 0.618,  # 1 / phi
     fig.show = "hold",
     include = TRUE,
+    message = FALSE,
     out.width = "70%",
     tidy = FALSE,
-    warnings = FALSE
+    warning = FALSE
   )
 library(lubridate)
 library(rstan)
