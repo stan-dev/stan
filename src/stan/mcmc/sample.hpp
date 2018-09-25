@@ -15,7 +15,15 @@ namespace stan {
         : cont_params_(q), log_prob_(log_prob), accept_stat_(stat) {
       }
 
-      virtual ~sample() {}  // No-op
+      sample(const sample&) = default;
+
+      sample(sample&&) = default;
+
+      sample& operator=(const sample&) = default;
+
+      sample& operator=(sample&&) = default;
+
+      virtual ~sample() = default;
 
       int size_cont() const {
         return cont_params_.size();
