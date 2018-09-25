@@ -128,3 +128,7 @@ TEST(langGrammarsTermGrammar, operatorErrorMsg) {
               "int[ ]'",
               "Available argument signatures for operator'");
 }
+
+TEST(langParserTermGrammar, variable_names) {
+  test_parsable("parser-generator/allowed_var_names");
+}

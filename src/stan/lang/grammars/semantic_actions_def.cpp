@@ -2489,19 +2489,6 @@ namespace stan {
                    << "  Moreover, access to params_r__ is unsupported"
                    << " and the variable may be removed without notice."
                    << std::endl;
-      } else if (name == std::string("data")
-                 || name == std::string("generated")
-                 || name == std::string("model")
-                 || name == std::string("parameters")
-                 || name == std::string("transformed")) {
-        error_msgs << std::endl
-                   << "Unexpected open block, missing close block \"}\""
-                   << " before keyword \""
-                   << name
-                   << "\"."
-                   << std::endl;
-        pass = false;
-        return;
       }
       pass = vm.exists(name);
       if (pass) {
