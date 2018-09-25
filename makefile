@@ -1,105 +1,48 @@
-# Makefile for Stan.
 ##
+# Stan
+# -----------------
+#
+# To customize your build, set make variables in either:
+#    ~/.config/stan/make.local
+#    make/local
+# Variables in make/local is loaded after ~/.config/stan/make.local
 
 
-# The default target of this Makefile is...
+## 'help' is the default make target.
 help:
 
-## Disable implicit rules.
-.SUFFIXES:
+-include $(HOME)/.config/stan/make.local  # user-defined variables
+-include make/local                       # user-defined variables
 
-##
-# Users should only need to set these three variables for use.
-# - CC: The compiler to use. Expecting g++ or clang++.
-# - O: Optimization level. Valid values are {0, 1, 2, 3}.
-# - AR: archiver (must specify for cross-compiling)
-# - OS_TYPE: {mac, win, linux}
-##
-
-##
-# Library locations
-##
-STAN ?=
 MATH ?= lib/stan_math/
-
--include $(MATH)make/default_compiler_options
-CXXFLAGS += -I src -isystem $(MATH) -DFUSION_MAX_VECTOR_SIZE=12 -Wno-unused-local-typedefs
-LDLIBS_STANC = -Lbin -lstanc
-
--include $(HOME)/.config/stan/make.local  # define local variables
--include make/local                       # overwrite local variables
-
-CXX = $(CC)
-
--include $(MATH)make/libraries
-
-##
-# Get information about the compiler used.
-# - CC_TYPE: {g++, clang++, mingw32-g++, other}
-# - CC_MAJOR: major version of CC
-# - CC_MINOR: minor version of CC
-##
--include $(MATH)make/detect_cc
-
-# OS_TYPE is set automatically by this script
-##
-# These includes should update the following variables
-# based on the OS:
-#   - CFLAGS
-#   - GTEST_CXXFLAGS
-#   - EXE
-##
--include $(MATH)make/detect_os
-
-include make/libstan  # bin/libstan.a bin/libstanc.a
-include make/tests    # tests
-include make/doxygen  # doxygen
-include make/manual   # manual: manual, doc/stan-reference.pdf
-include make/cpplint  # cpplint
-
-##
-# Dependencies
-##
-ifneq (,$(filter-out test-headers generate-tests clean% %-test math-% %.d,$(MAKECMDGOALS)))
-  -include $(addsuffix .d,$(subst $(EXE),,$(MAKECMDGOALS)))
+ifeq ($(OS),Windows_NT)
+  O_STANC ?= 3
 endif
+O_STANC ?= 0
 
+-include $(MATH)make/compiler_flags
+-include $(MATH)make/dependencies
+-include $(MATH)make/libraries
+include make/libstanc                     # bin/libstanc.a
+include make/doxygen                      # doxygen
+include make/manual                       # manual: manual, doc/stan-reference.pdf
+include make/cpplint                      # cpplint
+include make/tests                        # tests
 
-bin/%.o : src/%.cpp
-	@mkdir -p $(dir $@)
-	$(COMPILE.cc) -O$O $(OUTPUT_OPTION) $<
-
-##
-# Rule for generating dependencies.
-##
-bin/%.d : src/%.cpp
-	@mkdir -p $(dir $@)
-	@set -e; \
-	rm -f $@; \
-	$(COMPILE.cc) -O$O $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\.o[ :]*,$(dir $@)\1\.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
-
+INC_FIRST = -I $(if $(STAN),$(STAN)/src,src)
+LDLIBS_STANC ?= -Ltest -lstanc
 
 
 .PHONY: help
 help:
 	@echo '--------------------------------------------------------------------------------'
+	@echo 'Note: testing of Stan is typically done with the `runTests.py` python script.'
+	@echo '  See https://github.com/stan-dev/stan/wiki/Testing-Stan-using-Gnu-Make-and-Python'
+	@echo '  for more detail on testing.'
+	@echo ''
 	@echo 'Stan makefile:'
-	@echo '  Current configuration:'
-	@echo '  - OS_TYPE (Operating System): ' $(OS_TYPE)
-	@echo '  - CC (Compiler):              ' $(CC)
-	@echo '  - Compiler version:           ' $(CC_MAJOR).$(CC_MINOR)
-	@echo '  - O (Optimization Level):     ' $(O)
+	@$(MAKE) print-compiler-flags
 	@echo '  - O_STANC (Opt for stanc):    ' $(O_STANC)
-ifdef TEMPLATE_DEPTH
-	@echo '  - TEMPLATE_DEPTH:             ' $(TEMPLATE_DEPTH)
-endif
-	@echo '  - STAN_HOME                   ' $(STAN_HOME)
-	@echo '  Library configuration:'
-	@echo '  - EIGEN                       ' $(EIGEN)
-	@echo '  - BOOST                       ' $(BOOST)
-	@echo '  - GTEST                       ' $(GTEST)
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Documentation:'
@@ -109,10 +52,11 @@ endif
 	@echo '                     doc/api/'
 	@echo '                     (requires doxygen installation)'
 	@echo '  Submodule:'
-	@echo '  - math-revert    : Resets the Stan Math Library git submodule to the tagged'
-	@echo '                     version'
-	@echo '  - math-update    : Updates the Stan Math Library git submodule to the latest'
-	@echo '                     development version'
+	@echo '  - math-revert    : Reverts the Stan Math Library git submodule to the hash'
+	@echo '                     recorded in the Stan library'
+	@echo '  - math-update    : Updates the Stan Math Library git submodule branch,'
+	@echo '                     e.g. if the Math branch is `develop`, it will fetch the'
+	@echo '                     the latest version of `develop`'
 	@echo '  - math-update/<branch-name> : Updates the Stan Math Library git submodule to'
 	@echo '                     the branch specified'
 	@echo ''
@@ -194,3 +138,8 @@ math-update:
 
 math-update/%: math-update
 	cd $(MATH) && git fetch --all && git checkout $* && git pull
+
+##
+# Debug target that allows you to print a variable
+##
+print-%  : ; @echo $* = $($*)
