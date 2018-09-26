@@ -15,6 +15,10 @@ namespace stan {
         : cont_params_(q), log_prob_(log_prob), accept_stat_(stat) {
       }
 
+      sample(Eigen::VectorXd&& q, double log_prob, double stat)
+        : cont_params_(std::move(q)), log_prob_(log_prob), accept_stat_(stat) {
+      }
+
       sample(const sample&) = default;
 
       sample(sample&&) = default;
