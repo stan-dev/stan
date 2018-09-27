@@ -68,47 +68,47 @@ matrix:
           PARALLEL=2
     - <<: *linux_gcc
       env:
-        - MATRIX_EVAL="CXX=g++-4.9"
+        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread"
           TESTFOLDER="src/test/unit/callbacks src/test/unit/io"
           PARALLEL=1
     - <<: *linux_gcc
       env:
-        - MATRIX_EVAL="CXX=g++-4.9"
+        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread"
           TESTFOLDER="src/test/unit/lang/*.cpp"
           PARALLEL=1
     - <<: *linux_gcc
       env:
-        - MATRIX_EVAL="CXX=g++-4.9"
+        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread"
           TESTFOLDER="src/test/unit/lang/ast"
           PARALLEL=1
     - <<: *linux_gcc
       env:
-        - MATRIX_EVAL="CXX=g++-4.9"
+        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread"
           TESTFOLDER="src/test/unit/lang/generator"
           PARALLEL=1
     - <<: *linux_gcc
       env:
-        - MATRIX_EVAL="CXX=g++-4.9"
+        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread"
           TESTFOLDER="src/test/unit/lang/parser"
           PARALLEL=1
     - <<: *linux_gcc
       env:
-        - MATRIX_EVAL="CXX=g++-4.9"
+        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread"
           TESTFOLDER="src/test/unit/lang/reject"
           PARALLEL=1
     - <<: *linux_gcc
       env:
-        - MATRIX_EVAL="CXX=g++-4.9"
+        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread"
           TESTFOLDER="src/test/unit/mcmc src/test/unit/model src/test/unit/optimization"
           PARALLEL=1
     - <<: *linux_gcc
       env:
-        - MATRIX_EVAL="CXX=g++-4.9"
+        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread"
           TESTFOLDER="src/test/unit/services  src/test/unit/version_test.cpp"
           PARALLEL=1
     - <<: *linux_gcc
       env:
-        - MATRIX_EVAL="CXX=g++-4.9"
+        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread"
           TESTFOLDER="src/test/unit/variational"
           PARALLEL=1
 
