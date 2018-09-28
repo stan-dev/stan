@@ -9,6 +9,7 @@ before_script:
   - echo "CXX=$CXX" > make/local
   - echo "CXXFLAGS_OS+=$CXXFLAGS_OS" >> make/local
   - if [[ ! -z "$DEPFLAGS_OS" ]]; then echo "DEPFLAGS_OS=$DEPFLAGS_OS" >> make/local; fi
+  - cat make/local
 
 linux_clang: &linux_clang
   os: linux
