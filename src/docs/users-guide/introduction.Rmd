@@ -165,7 +165,7 @@ values, which in this simulated-data scenario are known.
 We begin by setting up R and Stan, setting it to run in parallel and
 to save compiled Stan programs in the working directory:
 
-```{r}
+```{r rstan-options, echo=TRUE}
 library("rstan")
 options(mc.cores = parallel::detectCores())
 rstan_options(auto_write = TRUE)
@@ -186,50 +186,56 @@ size $N$, the regression coefficients $a$ and $b$, the residual
 standard deviation $\sigma$, and the vector of predictors $x$, which
 we create in R and put in a list:
 
-```{r}
-N <- 100
-hello_data <- list(N=N, a=10, b=4, sigma=5, x=runif(N, 0, 10))
-```
-We then run the Stan model and create the fake data:
-
-```{r intro1, results=FALSE}
-fake_data <- stan("stan/fake-data.stan",
-                  chains=1, iter=1, algorithm="Fixed_param",
-		  data=hello_data)
-```
-
-We only needed one chain and one iteration as we are just simulating
-one fake dataset (in this case, a vector $y$ of length 100).  Also,
-just to know: the first time you run this on your computer, you'll
-have to wait 15 seconds or so for the Stan model to compile.  After
-that, it will save the compiled code in your home directory.
-
-We then extract the simulated data vector and append it to our data
-list:
-
-```{r}
-hello_data$y <- extract_one_draw(fake_data)$y
-```
-
-Alternatively we could simulate the fake data in R:
-
-```{r}
+```{r create-fake-data, echo=TRUE}
 N <- 100
 a <- 10
 b <- 4
 sigma <- 5
 x <- runif(N, 0, 10)
-y <- rnorm(N, a + b*x, sigma)
-hello_data <- list(N=N, x=x, y=y)
+input_data <- list(N=N, a=a, b=b, sigma=sigma, x=x)
 ```
-
-The awkward `N=N, x=x, y=y` formulation arises because we want to give
+The awkward `N=N, ..., x=x` formulation arises because we want to give
 a name to each item in the list.  It is not necessary that the names
 of the objects and the names within the list be the same.  But for
 convenience we often use the same names inside and outside the list,
 as above.
 
-For this example it was simple enough to fit the fake data in R.  But
+We then run the Stan model and create the fake data:
+
+```{r gen-data-cmd, echo=TRUE, eval=FALSE}
+fake_data <- stan("stan/fake-data.stan",
+                  chains=1, iter=1, algorithm="Fixed_param",
+		  data=input_data)
+```
+```{r gen-data-do, include=FALSE}
+fake_data <- stan("stan/fake-data.stan",
+                  chains=1, iter=1, algorithm="Fixed_param",
+		  data=input_data)
+```
+
+We only needed one chain and one iteration as we are just simulating
+one fake dataset (in this case, a vector $y$ of length `r N`).  Also,
+just to know: the first time you run this on your computer, you'll
+have to wait 15 seconds or so for the Stan model to compile.  After
+that, it will save the compiled code to a file with suffix `.rds`,
+e.g., the compiled model `fake-data.stan` is saved as `fake-data.rds`.
+
+We then extract the simulated data vector and put it in a list:
+
+```{r echo=TRUE}
+y <- extract_one_draw(fake_data)$y
+hello_data <- list(N=N, x=x, y=y)
+```
+
+Alternatively we could use R to simulate fake data $y$
+from $N, a, b, x, \sigma$:
+
+```{r echo=TRUE}
+y <- rnorm(N, a + b*x, sigma)
+hello_data <- list(N=N, x=x, y=y)
+```
+
+For this example it was simple enough to simulate the fake data in R.  But
 we wanted to show above how to do it in Stan, as this can be useful
 for more complicated models.
 
@@ -238,13 +244,16 @@ for more complicated models.
 In any case, now that we have the data list, we can use it to estimate
 the parameters:
 
-```{r intro2,  results=FALSE}
+```{r fit-data-cmd, echo=TRUE, eval=FALSE}
+fit <- stan("stan/simplest-regression.stan", data = hello_data)
+```
+```{r fit-data-do, include=FALSE}
 fit <- stan("stan/simplest-regression.stan", data = hello_data)
 ```
 
 Here is the summary of the fitted model:
 
-```{r}
+```{r fit-data}
 print(fit)
 ```
 
@@ -284,8 +293,8 @@ Now we go through the output:
 In the above output, $\widehat{R}$ is less then 1.1 for all
 quantities, so the chains seem to have mixed well, and we use the
 results to summarize the posterior distribution.  We can compare the
-posterior inferences to the true parameter values (here, $a=2$, $b=3$,
-and $\sigma=5$).  These true values are roughly within the range of
+posterior inferences to the true parameter values (here, $a=`r a`$, $b=`r b`$,
+and $\sigma=`r sigma`$).  These true values are roughly within the range of
 uncertainty of the inferences.
 
 ## Bayesian workflow
@@ -491,7 +500,7 @@ posterior simulations.
 
 We gave an example earlier, when we typed:
 
-```{r intro3,  results=FALSE}
+```{r ex-fit-cmd, echo=TRUE, eval=FALSE}
 fit <- stan("stan/simplest-regression.stan", data=hello_data)
 ```
 
@@ -500,7 +509,7 @@ posterior simulations and also some other information regarding the
 settings of the fitting algorithm.  Here, for example, we access some
 simulations:
 
-```{r}
+```{r echo=TRUE}
 sims_as_matrix <- as.matrix(fit)
 print(sims_as_matrix[1:5,])
 sims_as_list <- extract(fit)
@@ -519,7 +528,11 @@ objective function, and Stan returns the value of the parameters at
 this estimated mode along with the computed value of the objective
 function.  Here is an example:
 
-```{r intro4,  results=FALSE}
+```{r ex-opt-cmd, echo=TRUE, eval=FALSE}
+simplest <- stan_model("stan/simplest-regression.stan")
+fit_2 <- optimizing(simplest, data=hello_data)
+```
+```{r ex-opt-do, include=FALSE}
 simplest <- stan_model("stan/simplest-regression.stan")
 fit_2 <- optimizing(simplest, data=hello_data)
 ```
@@ -528,7 +541,7 @@ In this case we broke the computation into two steps, first compiling
 and saving the compiled model into the R object "simplest" and then
 performing the optimizer on this program.  And here is the result:
 
-```{r}
+```{r ex-opt-fit}
 print(fit_2)
 ```
 
@@ -684,7 +697,14 @@ print_file("stan/vector-regression.stan")
 To fit this model, we simply reconfigure the data by constructing the
 matrix of predictors and then run from R:
 
-```{r intro5,  results=FALSE}
+```{r ex-vector-cmd,  echo=TRUE, eval=FALSE}
+ones <- rep(1, N)
+X <- cbind(ones, x)
+K <- 2
+data_3 <- list(N=N, K=K, X=X, y=y)
+fit_3 <- stan("stan/vector-regression.stan", data=data_3)
+```
+```{r ex-vector-do,  include=FALSE}
 ones <- rep(1, N)
 X <- cbind(ones, x)
 K <- 2
@@ -701,7 +721,7 @@ print(fit_3)
 And here is what happens if we grab the matrix or list of posterior
 simulations:
 
-```{r}
+```{r echo=TRUE}
 sims_as_matrix <- as.matrix(fit_3)
 print(sims_as_matrix[1:5,])
 sims_as_list <- extract(fit_3)
