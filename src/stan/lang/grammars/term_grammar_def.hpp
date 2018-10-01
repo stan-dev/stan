@@ -9,6 +9,8 @@
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/phoenix/phoenix.hpp>
+#include <boost/version.hpp>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -81,11 +83,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_expr,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
                           (int, val_)
-                          (stan::lang::expr_type, type_))
+                          (stan::lang::bare_expr_type, type_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_literal,
                           (double, val_)
-                          (stan::lang::expr_type, type_) )
+                          (stan::lang::bare_expr_type, type_) )
 
 
 namespace stan {
@@ -117,7 +119,12 @@ namespace stan {
       using boost::spirit::qi::string;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
+      using boost::spirit::qi::raw;
+
       using boost::spirit::qi::labels::_r1;
+
+      using boost::phoenix::begin;
+      using boost::phoenix::end;
 
       term_r.name("expression");
       term_r
@@ -304,7 +311,7 @@ namespace stan {
                                 boost::phoenix::ref(error_msgs_),
                                 _pass)])
         | int_literal_r[assign_lhs_f(_val, _1)]
-        | double_literal_r[assign_lhs_f(_val, _1)]
+        | str_double_literal_r[assign_lhs_f(_val, _1)]
         | (array_expr_r(_r1)[assign_lhs_f(_c, _1)]
            > eps[infer_array_expr_type_f(_val, _c, _r1, _pass,
                                        boost::phoenix::ref(var_map_),
@@ -316,6 +323,11 @@ namespace stan {
         | (lit('(')
            > expression_g(_r1)[assign_lhs_f(_val, _1)]
            > lit(')'));
+
+
+      str_double_literal_r.name("double literal");
+      str_double_literal_r
+        = raw[double_literal_r][add_literal_string_f(_val, begin(_1), end(_1))];
 
       int_literal_r.name("integer literal");
       int_literal_r

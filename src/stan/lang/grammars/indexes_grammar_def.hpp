@@ -69,15 +69,14 @@ namespace stan {
       lub_index_r
         %= int_expression_r(_r1)
         >> lit(":")
-        >> int_expression_r(_r1)
-        > eps;
+        >> int_expression_r(_r1);
+
 
       //   _r1 var scope
       lb_index_r.name("index expression int:");
       lb_index_r
         %= int_expression_r(_r1)
-        >> lit(":")
-        > eps;
+        >> lit(":");
 
       //   _r1 var scope
       uni_index_r.name("index expression int");
@@ -89,15 +88,13 @@ namespace stan {
       multi_index_r
         %= expression_g(_r1)
            [validate_ints_expression_f(_1, _pass,
-                                       boost::phoenix::ref(error_msgs_))]
-        > eps;
+                                       boost::phoenix::ref(error_msgs_))];
 
       //   _r1 var scope
       ub_index_r.name("index expression :int");
       ub_index_r
         %= lit(":")
-        >> int_expression_r(_r1)
-        > eps;
+        >> int_expression_r(_r1);
 
       //   _r1 var scope
       omni_index_r.name("index expression :");

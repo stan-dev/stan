@@ -39,8 +39,8 @@ namespace stan {
       }
 
       for (size_t i = 0; i < fun.arg_decls_.size(); ++i) {
-        // no template parameter for int-based args
-        if (!fun.arg_decls_[i].arg_type_.base_type_.is_int_type()) {
+        // no template parameter for int.innermost_type()d args
+        if (!fun.arg_decls_[i].bare_type().innermost_type().is_int_type()) {
           type_params.push_back("double");
         }
       }

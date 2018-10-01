@@ -1,32 +1,48 @@
 ##
-# LIBGTEST is the google test library
-# GTEST_MAIN is the file that contains the google test
+# Build test executables
 ##
-LIBGTEST = test/libgtest.a
-GTEST_MAIN = $(GTEST)/src/gtest_main.cc
-GTEST_CXXFLAGS += -isystem $(GTEST)/include -isystem $(GTEST)
 
-##
-# Build the google test library.
-$(LIBGTEST): $(LIBGTEST)(test/gtest.o)
+test/%$(EXE) : CXXFLAGS += $(CXXFLAGS_GTEST)
+test/%$(EXE) : CPPFLAGS += $(CPPFLAGS_GTEST)
+test/%$(EXE) : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(STAN),.)
+test/%$(EXE) : INC += $(INC_GTEST)
+test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LIBSUNDIALS) $(MPI_TARGETS)
+	$(LINK.cpp) $(filter-out test/%.hpp %.hpp-test,$^) $(LDLIBS) $(OUTPUT_OPTION)
 
-test/gtest.o: $(GTEST)/src/gtest-all.cc
-	@mkdir -p test
-	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION)
-
-##
-# Rule for building a test
-##
-test/%.o : src/test/%_test.cpp
+test/%.o : src/test/%.cpp
 	@mkdir -p $(dir $@)
-	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $< $(OUTPUT_OPTION)
+	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
 
 ##
-# Rule for building a test executable
+# Customization for generating dependencies
 ##
-test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBSUNDIALS)
-	@mkdir -p $(dir $@)
-	$(LINK.cc) -O$O $(GTEST_MAIN) $< $(GTEST_CXXFLAGS) $(OUTPUT_OPTION) $(LIBGTEST) $(LDLIBS) $(LIBSUNDIALS)
+src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
+src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
+src/test/%.d : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(STAN),.)
+src/test/%.d : INC += $(INC_GTEST)
+src/test/%.d : DEPTARGETS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@
+
+## this is for the $(STANC_TEMPLATE_INSTANTIATION) files
+src/stan/%.d : DEPTARGETS = -MT test/test-models/stanc$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@
+
+ifneq ($(filter test/%$(EXE),$(MAKECMDGOALS)),)
+-include $(patsubst test/%$(EXE),src/test/%.d,$(filter test/%,$(MAKECMDGOALS)))
+endif
+
+ifneq ($(filter test/unit/lang/%$(EXE),$(MAKECMDGOALS)),)
+-include src/test/test-models/stanc.d
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+endif
+
+ifneq ($(filter test/test-models/stanc$(EXE) test/test-models/stanc.o,$(MAKECMDGOALS)),)
+-include src/test/test-models/stanc.d
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+endif
+
+ifneq ($(filter test/test-models/good/%.hpp test/test-models/good/%.hpp-test,$(MAKECMDGOALS)),)
+-include src/test/test-models/stanc.d
+-include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
+endif
 
 
 ##
@@ -35,34 +51,12 @@ test/%$(EXE) : test/%.o $(LIBGTEST) $(LIBSUNDIALS)
 # all these tests are under stan/test/unit/lang
 ##
 STANC_TESTS_HEADERS := $(shell find src/test/unit/lang -type f -name '*_test.cpp')
-STANC_TESTS_O := $(patsubst src/%_test.cpp,%.o,$(STANC_TESTS_HEADERS))
-STANC_TESTS := $(patsubst src/%_test.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
+STANC_TESTS_O := $(patsubst src/%.cpp,%.o,$(STANC_TESTS_HEADERS))
+STANC_TESTS := $(patsubst src/%.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 
 # add additional dependency to libstanc.a
-##$(patsubst src/%_test.cpp,%.o,$(STANC_TEST_HEADERS)) : test/%.o : bin/libstanc.a
-$(STANC_TESTS_O) : bin/libstanc.a
+$(STANC_TESTS_O) : test/libstanc.a
 $(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
-
-##
-# Rule for generating dependencies.
-##
-.PRECIOUS: test/%.d
-test/%.d : src/test/%_test.cpp
-	@mkdir -p $(dir $@)
-	@set -e; \
-	rm -f $@; \
-	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(notdir $*)\)\(_test\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
-
-.PRECIOUS: test/test-models/stanc.d
-test/test-models/stanc.d : src/test/test-models/stanc.cpp
-	@mkdir -p $(dir $@)
-	@set -e; \
-	rm -f $@; \
-	$(COMPILE.cc) -O$O $(GTEST_CXXFLAGS) $(TARGET_ARCH) -MM $< > $@.$$$$; \
-	sed -e 's,\($(basename $(@F))\)\.o[ :]*,$(dir $@)\1\$(EXE) $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
 
 
 ############################################################
@@ -72,11 +66,22 @@ test/test-models/stanc.d : src/test/test-models/stanc.cpp
 ##
 HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f))
 
-ifeq ($(OS_TYPE),win)
+ifeq ($(OS),Windows_NT)
   DEV_NULL = nul
 else
   DEV_NULL = /dev/null
 endif
+
+%.hpp-test : %.hpp test/dummy.cpp
+	$(COMPILE.cpp) -O0 -include $^ -o $(DEV_NULL)
+
+test/dummy.cpp:
+	@mkdir -p test
+	@touch $@
+	@echo "int main() {return 0;}" >> $@
+
+.PHONY: test-headers
+test-headers: $(HEADER_TESTS)
 
 ##
 # Target to verify code generated Stan programs
@@ -88,8 +93,9 @@ endif
 # compiles
 ##
 .PHONY: %.hpp-test
-src/test/test-models/good/%.hpp-test : src/test/test-models/good/%.hpp test/test-model-main.cpp
-	$(COMPILE.cc) -O0 -include $< -o $(DEV_NULL) test/test-model-main.cpp
+test/test-models/good/%.hpp-test : O = 0
+test/test-models/good/%.hpp-test : test/test-models/good/%.hpp test/test-model-main.cpp
+	$(COMPILE.cpp) -o $(DEV_NULL) -include $^
 
 test/test-model-main.cpp:
 	@mkdir -p test
@@ -115,64 +121,52 @@ test/test-model-main.cpp:
 	@echo "}" >> $@
 	@echo >> $@
 
-
-.PHONY: HEADER_TESTS
-%.hpp-test : %.hpp test/dummy.cpp
-	$(COMPILE.cc) -O0 -include $< -o $(DEV_NULL) test/dummy.cpp
-
-test/dummy.cpp:
-	@mkdir -p test
-	@touch $@
-	@echo "int main() {return 0;}" >> $@
-
-.PHONY: test-headers
-test-headers: $(HEADER_TESTS)
-
 ##
 # Adding a test for multiple translation units. If this fails,
 # a new function is probably missing an inline
 ##
+ifneq ($(OS),Windows_NT)
+test/unit/multiple_translation_units%.o : CXXFLAGS += -fPIC
+endif
+test/unit/multiple_translation_units%.o : CXXFLAGS += -pipe
+test/unit/libmultiple.so : LDFLAGS += -shared
 
-test/unit/multiple_translation_units%.o : src/test/unit/multiple_translation_units%.cpp
-	@mkdir -p $(dir $@)
-	$(COMPILE.cc) -O$O $< $(OUTPUT_OPTION)
+test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o $(MPI_TARGETS)
+	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
-test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o
-	@mkdir -p $(dir $@)
-	$(COMPILE.cc) -shared $(OUTPUT_OPTION) $^
-
-src/test/unit/multiple_translation_units_test.cpp : test/unit/libmultiple.so
-
+test/unit/multiple_translation_units_test$(EXE) : test/unit/libmultiple.so
 
 
 ############################################################
 ##
 # Use the stanc compiler to generate C++ from Stan programs
 ##
-
-.PRECIOUS: test/test-models/stanc$(EXE)
-test/test-models/stanc$(EXE) : src/test/test-models/stanc.cpp bin/libstanc.a
+test/test-models/stanc$(EXE) : O = $(O_STANC)
+test/test-models/stanc$(EXE) : test/libstanc.a
+test/test-models/stanc$(EXE) : LDLIBS += $(LDLIBS_STANC)
+test/test-models/stanc$(EXE) : %$(EXE) : %.o
 	@mkdir -p $(dir $@)
-	$(LINK.cc) -O$(O_STANC) $(OUTPUT_OPTION) $< $(LDLIBS_STANC)
+	$(LINK.cpp) $< $(LDLIBS) $(OUTPUT_OPTION)
 
-TEST_MODELS := $(shell find src/test/test-models -type f -name '*.stan')
-$(patsubst %.stan,%.hpp,$(TEST_MODELS)) : %.hpp : %.stan test/test-models/stanc$(EXE)
-	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
+TEST_MODELS = $(shell find src/test/test-models -type f -name '*.stan')
+$(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/test-models/%.stan test/test-models/stanc$(EXE)
+	@mkdir -p $(dir $@)
+	$(WINE) test/test-models/stanc$(EXE) $< --o=$@
 
 ##
 # Generate C++ from Stan standalone functions
 ##
-TEST_FUNCTIONS := $(shell find src/test/test-models -type f -name '*.stanfuncs')
-$(patsubst %.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : %.hpp : %.stanfuncs test/test-models/stanc$(EXE)
-	$(WINE) test/test-models/stanc$(EXE) --o=$@ $<
-
+TEST_FUNCTIONS = $(shell find src/test/test-models -type f -name '*.stanfuncs')
+$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs test/test-models/stanc$(EXE)
+	@mkdir -p $(dir $@)
+	$(WINE) test/test-models/stanc$(EXE) $< --o=$@
 
 ##
 # src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.
 ##
 .PHONY: change-file-permissions
 change-file-permissions:
-ifeq ($(OS_TYPE),win)
+ifeq ($(OS),Windows_NT)
 	attrib +r src\\test\\test-models\\good\\stanc_helper.stan
 	attrib +r src\\test\\test-models\\bad\\stanc_helper.stan
 	attrib +r src\\test\\test-models\\bad\\read_only
@@ -181,104 +175,13 @@ else
 	chmod 555 src/test/test-models/bad/read_only
 endif
 
-src/test/unit/lang/stanc_helper_test.cpp: change-file-permissions
-
-
+test/unit/lang/stanc_helper_test.o: change-file-permissions
 
 ##
-# Explicitly specify dependencies for tests that depend on the generated C++ of Stan programs.
+# Add additional dependencies for tests that should translate Stan to hpp, but
+# isn't included in the source using `#include`.
 ##
-src/test/performance/logistic_test.cpp: src/test/test-models/performance/logistic.hpp
-src/test/unit/lang/generator_test.cpp: src/test/test-models/good/lang/test_lp.hpp
-src/test/unit/lang/parser_generator_test.cpp: $(patsubst %.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
-src/test/unit/io/random_var_context_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/lang/parser/functions_standalone_instantiate_test.cpp: src/test/test-models/good-standalone-functions/basic.hpp src/test/test-models/good-standalone-functions/special_functions.hpp src/test/test-models/good-standalone-functions/integrate.hpp
-src/test/unit/lang/reject/reject_func_call_generated_quantities_test.cpp: src/test/test-models/good/lang/reject_func_call_generated_quantities.hpp
-src/test/unit/lang/reject/reject_func_call_model_test.cpp: src/test/test-models/good/lang/reject_func_call_model.hpp
-src/test/unit/lang/reject/reject_func_call_transformed_data_test.cpp: src/test/test-models/good/lang/reject_func_call_transformed_data.hpp
-src/test/unit/lang/reject/reject_func_call_transformed_parameters_test.cpp: src/test/test-models/good/lang/reject_func_call_transformed_parameters.hpp
-src/test/unit/lang/reject/reject_generated_quantities_test.cpp: src/test/test-models/good/lang/reject_generated_quantities.hpp
-src/test/unit/lang/reject/reject_model_test.cpp: src/test/test-models/good/lang/reject_model.hpp
-src/test/unit/lang/reject/reject_mult_args_test.cpp: src/test/test-models/good/lang/reject_mult_args.hpp
-src/test/unit/lang/reject/reject_transformed_data_test.cpp: src/test/test-models/good/lang/reject_transformed_data.hpp
-src/test/unit/lang/reject/reject_transformed_parameters_test.cpp: src/test/test-models/good/lang/reject_transformed_parameters.hpp
-src/test/unit/lang/reject/print_reject_function_gq_test.cpp: src/test/test-models/good/lang/print_reject_function_gq.hpp
-src/test/unit/lang/reject/print_reject_function_model_test.cpp: src/test/test-models/good/lang/print_reject_function_model.hpp
-src/test/unit/lang/reject/print_reject_function_tparams_test.cpp: src/test/test-models/good/lang/print_reject_function_tparams.hpp
-src/test/unit/lang/reject/print_reject_function_tdata_test.cpp: src/test/test-models/good/lang/print_reject_function_tdata.hpp
-src/test/unit/lang/reject/print_reject_gq_test.cpp: src/test/test-models/good/lang/print_reject_gq_block.hpp
-src/test/unit/lang/reject/print_reject_model_test.cpp: src/test/test-models/good/lang/print_reject_model_block.hpp
-src/test/unit/lang/reject/print_reject_tparams_test.cpp: src/test/test-models/good/lang/print_reject_tparams_block.hpp
-src/test/unit/lang/reject/print_reject_tdata_test.cpp: src/test/test-models/good/lang/print_reject_tdata_block.hpp
-src/test/unit/mcmc/hmc/hamiltonians/base_hamiltonian_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
-src/test/unit/mcmc/hmc/hamiltonians/dense_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
-src/test/unit/mcmc/hmc/hamiltonians/diag_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
-src/test/unit/mcmc/hmc/hamiltonians/unit_e_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
-src/test/unit/mcmc/hmc/hamiltonians/softabs_metric_test.cpp: src/test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp
-src/test/unit/mcmc/hmc/integrators/expl_leapfrog_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/command.hpp
-src/test/unit/mcmc/hmc/integrators/expl_leapfrog2_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/gauss.hpp
-src/test/unit/mcmc/hmc/integrators/impl_leapfrog_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/command.hpp
-src/test/unit/mcmc/hmc/integrators/impl_leapfrog2_test.cpp: src/test/test-models/good/mcmc/hmc/integrators/gauss.hpp
-src/test/unit/mcmc/hmc/nuts/unit_e_nuts_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/mcmc/hmc/nuts/softabs_nuts_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/mcmc/hmc/nuts/instantiation_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/mcmc/hmc/nuts_classic/instantiation_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/mcmc/hmc/xhmc/unit_e_xhmc_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/mcmc/hmc/xhmc/softabs_xhmc_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/mcmc/hmc/static_uniform/derived_static_uniform_test.cpp: src/test/test-models/good/mcmc/hmc/common/gauss.hpp
-src/test/unit/model/finite_diff_grad_test.cpp src/test/unit/model/grad_hess_log_prob_test.cpp src/test/unit/model/grad_tr_mat_times_hessian_test.cpp src/test/unit/model/gradient_dot_vector_test.cpp src/test/unit/model/gradient_test.cpp src/test/unit/model/hessian_test.cpp src/test/unit/model/hessian_times_vector_test.cpp src/test/unit/model/log_prob_grad_test.cpp src/test/unit/model/log_prob_propto_test.cpp src/test/unit/model/model_functional_test.cpp src/test/unit/model/test_gradients_test.cpp : src/test/test-models/good/model/valid.hpp
-src/test/unit/optimization/bfgs_linesearch_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/optimization/bfgs_minimizer_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/optimization/bfgs_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/optimization/bfgs_update_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/optimization/lbfgs_update_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/old_services/init/command_init_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/old_services/io/write_iteration_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/old_services/mcmc/sample_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/old_services/mcmc/warmup_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/old_services/optimize/do_bfgs_optimize_test.cpp: src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/diagnose/diagnose_test.cpp : src/test/test-models/good/services/test_lp.hpp
-src/test/unit/services/optimize/bfgs_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/optimize/lbfgs_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/optimize/newton_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/experimental/advi/fullrank_test.cpp src/test/unit/services/experimental/advi/meanfield_test.cpp : src/test/test-models/good/services/test_lp.hpp
-src/test/unit/services/sample/fixed_param_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_dense_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_dense_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_diag_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_diag_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_unit_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_unit_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_static_dense_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_static_dense_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_static_diag_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_static_diag_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_static_unit_e_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_static_unit_e_adapt_test.cpp : src/test/test-models/good/optimization/rosenbrock.hpp
-src/test/unit/services/sample/hmc_nuts_dense_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/services/sample/hmc_nuts_diag_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/services/sample/hmc_static_dense_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/services/sample/hmc_static_diag_inv_metric_test.cpp : src/test/test-models/good/mcmc/hmc/common/gauss3D.hpp
-src/test/unit/services/sample/standalone_gqs_test.cpp : src/test/test-models/good/services/test_gq.hpp
-src/test/unit/services/sample/standalone_gqs_bad_test.cpp : src/test/test-models/good/services/test_gq2.hpp
-src/test/unit/services/sample/standalone_gqs_big_test.cpp : src/test/test-models/good/services/bym2_offset_only.hpp
-src/test/unit/services/util/generate_transitions_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/services/util/gq_writer_test.cpp : src/test/test-models/good/services/test_gq.hpp
-src/test/unit/services/util/initialize_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/services/util/run_adaptive_sampler_test.cpp src/test/unit/services/util/run_sampler_test.cpp: src/test/test-models/good/services/test_lp.hpp
-src/test/unit/services/util/mcmc_writer_test.cpp : src/test/test-models/good/services/test_lp.hpp
-src/test/unit/old_services/sample/mcmc_writer_test.cpp: src/test/test-models/good/io_example.hpp
-src/test/unit/variational/advi_univar_no_constraint_test.cpp: src/test/test-models/good/variational/univariate_no_constraint.hpp
-src/test/unit/variational/advi_univar_with_constraint_test.cpp: src/test/test-models/good/variational/univariate_with_constraint.hpp
-src/test/unit/variational/advi_multivar_no_constraint_test.cpp: src/test/test-models/good/variational/multivariate_no_constraint.hpp
-src/test/unit/variational/advi_multivar_with_constraint_test.cpp: src/test/test-models/good/variational/multivariate_with_constraint.hpp
-src/test/unit/variational/gradient_warn_test.cpp: src/test/test-models/good/variational/gradient_warn.hpp
-src/test/unit/variational/hier_logistic_test.cpp: src/test/test-models/good/variational/hier_logistic.hpp
-src/test/unit/variational/hier_logistic_cp_test.cpp: src/test/test-models/good/variational/hier_logistic_cp.hpp
-src/test/unit/variational/advi_messages_test.cpp:src/test/test-models/good/variational/univariate_no_constraint.hpp
-src/test/unit/variational/eta_adapt_fail_test.cpp:src/test/test-models/good/variational/eta_should_fail.hpp
-src/test/unit/variational/eta_adapt_big_test.cpp:src/test/test-models/good/variational/eta_should_be_big.hpp
-src/test/unit/variational/eta_adapt_small_test.cpp:src/test/test-models/good/variational/eta_should_be_small.hpp
+test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
 
 ##
 # Compile models depends on every model within
@@ -286,21 +189,10 @@ src/test/unit/variational/eta_adapt_small_test.cpp:src/test/test-models/good/var
 # be code-generated to a *.hpp, then passed through
 # the compiler using the -fsyntax-only flag
 ##
-test/integration/compile_models$(EXE) : $(patsubst %.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
+test/integration/compile_models_test$(EXE): $(patsubst src/%.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
 
-## 
-# Same trick as above for models, but for standalone functions, using 
+##
+# Same trick as above for models, but for standalone functions, using
 # "src/test/test-models/good-standalone-functions/*.stanfuncs"
 ##
-test/integration/compile_standalone_functions$(EXE) : $(patsubst %.stanfuncs,%.hpp-test,$(shell find src/test/test-models/good-standalone-functions -type f -name '*.stanfuncs'))
-
-
-test_name = $(shell echo $(1) | sed 's,_[0-9]\{5\},_test.hpp,g')
-
-ifneq (,$(filter test/% src/test/test-models/%.hpp,$(MAKECMDGOALS)))
-  -include test/test-models/stanc.d
-endif
-
-ifneq (,$(filter $(STANC_TESTS),$(MAKECMDGOALS)))
-  -include $(patsubst src/%.cpp,bin/%.d,$(TEMPLATE_INSTANTIATION_CPP))
-endif
+test/integration/compile_standalone_functions_test$(EXE): $(patsubst src/%.stanfuncs,%.hpp-test,$(shell find src/test/test-models/good-standalone-functions -type f -name '*.stanfuncs'))
