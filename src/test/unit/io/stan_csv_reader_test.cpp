@@ -70,6 +70,7 @@ TEST_F(StanIoStanCsvReader,read_metadata1) {
   EXPECT_EQ(2U, metadata.thin);
   EXPECT_EQ("hmc", metadata.algorithm);
   EXPECT_EQ("nuts", metadata.engine);
+  EXPECT_EQ(10, metadata.max_depth);
 }
 TEST_F(StanIoStanCsvReader,read_metadata3) {
   stan::io::stan_csv_metadata metadata;
@@ -92,6 +93,7 @@ TEST_F(StanIoStanCsvReader,read_metadata3) {
   EXPECT_EQ(2U, metadata.thin);
   EXPECT_EQ("hmc", metadata.algorithm);
   EXPECT_EQ("nuts", metadata.engine);
+  EXPECT_EQ(15, metadata.max_depth);
 }
 TEST_F(StanIoStanCsvReader,read_header1) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
