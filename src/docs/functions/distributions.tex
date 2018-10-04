@@ -482,7 +482,7 @@ x_i\cdot \beta))\\
   intercept \code{\farg{alpha}} is used that is allowed to vary with the different
   observations.
   The number of rows of the independent variable matrix \code{\farg{x}} needs
-  to match the length of the dependent variable vector 
+  to match the length of the dependent variable vector
   \code{\farg{y}} and \code{\farg{alpha}}  and
   the number of columns of \code{\farg{x}} needs to match the length of
   the weight vector \code{\farg{beta}}.}
@@ -2567,6 +2567,60 @@ distribution requires strictly positive parameters, $\alpha, \beta >
     \farg{alpha} and prior failures (plus one) \farg{beta}; may only
     be used in generated quantities block.  For a description of
     argument and return types, see \refsection{prng-vectorization}.}
+\end{description}
+
+\section{Beta Proportion Distribution}
+
+\subsubsection{Probability Density Function}
+
+If $\mu \in (0, 1)$ and $\kappa \in \posreals$, then for $\theta
+\in (0,1)$,
+\[
+\distro{Beta\_Proportion}(\theta|\mu,\kappa)
+=
+\frac{1}{\Betafun(\mu \kappa, (1 - \mu) \kappa)}
+\,
+\theta^{\mu\kappa - 1}
+\,
+(1 - \theta)^{(1 - \mu)\kappa- 1}
+,
+\]
+where the beta function $\Betafun()$ is as defined in
+\refsection{betafun}.
+
+{\it Warning:}\ If $\theta = 0$ or $\theta = 1$, then the probability
+is 0 and the log probability is $-\infty$.  Similarly, the
+distribution requires $\mu \in (0, 1)$ and strictly positive parameter, $\kappa >
+0$.
+
+\pitem{theta}{beta\_proportion}{mu, kappa}
+
+\subsubsection{Stan Functions}
+
+\begin{description}
+%
+  \fitem{real}{beta\_proportion\_lpdf}{reals \farg{theta} \textbar\
+    reals \farg{mu}, reals \farg{kappa}}{The log of the beta\_proportion density
+    of \code{theta} in $(0,1)$ given mean \farg{mu} and
+    precision \farg{kappa}}
+%
+  \fitem{real}{beta\_proportion\_lcdf}{reals \farg{theta} \textbar\
+    reals \farg{mu}, reals \farg{kappa}}{The log of the beta\_proportion
+    cumulative distribution function of \code{theta} in $(0,1)$ given
+    mean \farg{mu} and precision \farg{kappa}}
+%
+  \fitem{real}{beta\_proportion\_lccdf}{reals \farg{theta} \textbar\ reals
+    \farg{mu}, reals \farg{kappa}}{The log of the beta\_proportion complementary
+    cumulative distribution function of \code{theta} in $(0,1)$ given
+    mean \farg{mu} and precision \farg{kappa}}
+\end{description}
+%
+\begin{description}
+  \fitem{R}{beta\_proportion\_rng}{reals \farg{mu}, reals
+    \farg{kappa}}{Generate a beta\_proportion variate with mean \farg{mu} and
+    precision \farg{kappa}; may only be used in generated quantities
+    block.  For a description of argument and return types, see
+    \refsection{prng-vectorization}.}
 \end{description}
 
 
