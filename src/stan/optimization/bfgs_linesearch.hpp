@@ -257,12 +257,12 @@ namespace stan {
             retCode = 1;
             break;
           }
+
           alpha1 = 0.5 * (alpha0 + alpha1);
           lsRestarts++;
           continue;
-        } else {
-          lsRestarts = 0;
         }
+        lsRestarts = 0;
 
         newDFp = gradx1.dot(p);
         if ((f1 > f0 + alpha * c1dfp) || (f1 >= prevF && nits > 0)) {
