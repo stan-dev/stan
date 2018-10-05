@@ -5,7 +5,6 @@
 #  gets arguments, descriptions
 #  writes some kind of markdown file
 
-
 import os
 import os.path
 import re
@@ -49,10 +48,11 @@ def main():
             elif (line.startswith("\\section")):
                 sectionName = get_name(line.strip())
                 sectionNum += 1
-                sectionRmd = section_rmd_page(sectionName, chapterNum, sectionNum)
+                sectionRmd = section_rmd_page(sectionName, sectionNum, chapterName, chapterNum)
+                process_section(chapterNum, sectionNum, sectionName, chapterRmd)
                 curFn = ""
             elif(line.startswith("\\begin")):
-                curFn = process_description(curFn, line, sectionName, chapterNum, sectionNum)
+                curFn = process_description(curFn, line, chapterName, sectionName, chapterNum, sectionNum)
             elif (line.startswith("\\sub")):
                 process_subsection(line, sectionRmd)
                 curFn = ""
@@ -64,8 +64,8 @@ def main():
     fp.close()
 
 
-def process_description(curFn, line, sectionName, chapterNum, sectionNum):
-    rmdPath = section_rmd_page(sectionName, chapterNum, sectionNum)
+def process_description(curFn, line, chapterName, sectionName, chapterNum, sectionNum):
+    rmdPath = section_rmd_page(sectionName, sectionNum, chapterName, chapterNum)
     line = remove_tags(line, "farg")
     line = remove_tags(line, "mbox")
     line = munge_code(line)
@@ -160,6 +160,16 @@ def process_item(item, numLines):
             "args":argsAll,
             "description":desc}
 
+def process_section(one, two, name, rmdPath):
+    display_name = '.'.join([str(one), str(two)])
+    display_name = ' '.join([display_name, name])
+    page_name = clean(str.lower(name).replace(" ","-"))
+    page_name += ".html"
+    fh = open(rmdPath, 'a')
+    fh.write("\n")
+    fh.write("<h2><a href=\"%s\">%s</a></h2>\n\n" % (page_name, display_name))
+    fh.close()
+
 def process_subsection(line, rmdPath):
     start = line.find("{")
     end = line.find("}",start)
@@ -176,11 +186,14 @@ def process_line(line, curPage):
     line = remove_tags(line, "farg")
     line = remove_tags(line, "mbox")
     line = munge_code(line)
-    line = re.sub('%',' ',line)
+    if line.startswith("```"):
+        lines = line.split("\\n")
+        line = '\n'.join(lines)
+    else:
+        line = re.sub('%',' ',line)
     fh = open(curPage, 'a')
     fh.write("%s\n\n" % line)
     fh.close()
-
 
 def chapter_rmd_page(chapterName, chapterNum):
     rmdFile = ''.join(["chp_", str(chapterNum), ".Rmd"])
@@ -194,7 +207,7 @@ def chapter_rmd_page(chapterName, chapterNum):
         print rmdPath
     return rmdPath
 
-def section_rmd_page(sectionName, chapterNum, sectionNum):
+def section_rmd_page(sectionName, sectionNum, chapterName, chapterNum):
     section = str.lower(sectionName).replace(" ","_")
     rmdFile = ''.join(["sec_", str(chapterNum), "_", str(sectionNum), "_", section, ".Rmd"])
     if (not os.path.exists(rmdDir)):
@@ -206,7 +219,6 @@ def section_rmd_page(sectionName, chapterNum, sectionNum):
         fh.close()
         print rmdPath
     return rmdPath
-
 
 def write_item(item_dict, rmdPath):
     fh = open(rstudioOut, 'a')

@@ -1,6 +1,7 @@
 bookdown::gitbook:
   toc_depth: 1
   css: stan-manual.css
+  split_by: "section"
   config:
     search: no
     sharing: null
