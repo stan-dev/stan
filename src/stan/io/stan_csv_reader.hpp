@@ -32,6 +32,7 @@ namespace stan {
       bool append_samples;
       std::string algorithm;
       std::string engine;
+      int max_depth;
 
       stan_csv_metadata()
         : stan_version_major(0), stan_version_minor(0), stan_version_patch(0),
@@ -39,7 +40,7 @@ namespace stan {
           chain_id(1), seed(0), random_seed(false),
           num_samples(0), num_warmup(0), save_warmup(false), thin(0),
           append_samples(false),
-          algorithm(""), engine("") {}
+          algorithm(""), engine(""), max_depth(10) {}
     };
 
     struct stan_csv_adaptation {
@@ -154,6 +155,8 @@ namespace stan {
             metadata.algorithm = value;
           } else if (name.compare("engine") == 0) {
             metadata.engine = value;
+          } else if (name.compare("max_depth") == 0) {
+            metadata.max_depth = boost::lexical_cast<int>(value);
           }
         }
         if (ss.good() == true)

@@ -3,9 +3,9 @@ import org.stan.Utils
 
 def utils = new org.stan.Utils()
 
-def setupCC(failOnError = true) {
+def setupCXX(failOnError = true) {
     errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CC=${env.CXX} ${errorStr}")
+    writeFile(file: "make/local", text: "CXX=${env.CXX} ${errorStr}")
 }
 
 def setup(String pr) {
@@ -79,7 +79,7 @@ pipeline {
                     retry(3) { checkout scm }
                     sh setup(params.math_pr)
                     stash 'StanSetup'
-                    setupCC()
+                    setupCXX()
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
@@ -100,9 +100,9 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCC()
+                            setupCXX()
                             bat "make -j${env.PARALLEL} test-headers"
-                            setupCC(false)
+                            setupCXX(false)
                             runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
@@ -111,7 +111,7 @@ pipeline {
                     agent any
                     steps {
                         unstash 'StanSetup'
-                        setupCC(false)
+                        setupCXX(false)
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -122,7 +122,7 @@ pipeline {
             agent any
             steps {
                 unstash 'StanSetup'
-                setupCC()
+                setupCXX()
                 runTests("src/test/integration", separateMakeStep=false)
             }
             post { always { deleteDir() } }
@@ -141,7 +141,7 @@ pipeline {
             agent { label 'master' }
             steps {
                 unstash 'StanSetup'
-                setupCC()
+                setupCXX()
                 sh """
                     ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance

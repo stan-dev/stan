@@ -13,14 +13,14 @@ void read_file(const std::string& path,
 
 void test_pg(const std::string& program_name,
              const std::string& expected_substring) {
-  std::string path = "src/test/test-models/good/parser-generator";
+  std::string path = "test/test-models/good/parser-generator";
   path += "/";
   path += program_name;
   path += ".hpp";
 
   std::string hpp_code;
   read_file(path, hpp_code);
-  
+
   EXPECT_TRUE(hpp_code.find(expected_substring) != std::string::npos)
     << "program_name: " << program_name << std::endl
     << "expected_substring: " << expected_substring;
@@ -42,7 +42,7 @@ int count_occurrences(const std::string target,
 void test_pg_count(const std::string& program_name,
                    const std::string& expected_substring,
                    const int expected_count) {
-  std::string path = "src/test/test-models/good/parser-generator";
+  std::string path = "test/test-models/good/parser-generator";
   path += "/";
   path += program_name;
   path += ".hpp";
@@ -54,10 +54,10 @@ void test_pg_count(const std::string& program_name,
 }
 
 TEST(unitLang, simpleTest) {
-  test_pg("user-function-struct-const", 
+  test_pg("user-function-struct-const",
           "operator()(const T0__& x, std::ostream* pstream__) const {");
-}     
-             
+}
+
 TEST(unitLang, odeTest) {
   std::string expected;
   expected = "stan::math::assign(y_hat, "
