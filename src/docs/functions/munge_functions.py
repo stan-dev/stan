@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-#  keeps track of part, chapter, section
+#  keeps track of chapter, section
 #  splits out latex macros for each function
 #  gets arguments, descriptions
-#  writes some kind of markdown file
+#  writes sections, chapters, Rmd files
 
 import os
 import os.path
@@ -166,8 +166,9 @@ def process_section(one, two, name, rmdPath):
     page_name = clean(str.lower(name).replace(" ","-"))
     page_name += ".html"
     fh = open(rmdPath, 'a')
-    fh.write("\n")
-    fh.write("<h2><a href=\"%s\">%s</a></h2>\n\n" % (page_name, display_name))
+    fh.write("\n```{asis, echo=is_html_output()}\n")
+    fh.write("<h2><a href=\"%s\">%s</a></h2>\n" % (page_name, display_name))
+    fh.write("```\n\n")
     fh.close()
 
 def process_subsection(line, rmdPath):
