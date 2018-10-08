@@ -12,8 +12,6 @@ then for $y \in \mathbb{R}^+$ with $y \geq y_{\text{min}}$, \[
 \text{Pareto}(y|y_{\text{min}},\alpha) = \frac{\displaystyle
 \alpha\,y_{\text{min}}^\alpha}{\displaystyle y^{\alpha+1}}. \]
 
-\pitem{y}{pareto}{y_min, alpha}
-
 ### Stan Functions
 
 <!-- pareto -->
@@ -56,13 +54,12 @@ description of argument and return types, see section
 
 If $\mu \in \mathbb{R}$, $\lambda \in \mathbb{R}^+$, and $\alpha \in
 \mathbb{R}^+$, then for $y \geq \mu$, \[
-\text{Pareto_Type_2}(y|\mu,\lambda,\alpha) = \ \frac{\alpha}{\lambda}
-\, \left( 1+\frac{y-\mu}{\lambda} \right)^{-(\alpha+1)} \! . \]
+\mathrm{Pareto\_Type\_2}(y|\mu,\lambda,\alpha) = \
+\frac{\alpha}{\lambda} \, \left( 1+\frac{y-\mu}{\lambda}
+\right)^{-(\alpha+1)} \! . \]
 
 Note that the Lomax distribution is a Pareto Type 2 distribution with
 $\mu=0$.
-
-\pitem{y}{pareto_type_2}{mu, lambda, alpha}
 
 ### Stan Functions
 

@@ -48,8 +48,6 @@ much better computationally to work directly with the Cholesky factor
 of $\Sigma$, so this distribution should never be explicitly used in
 practice.
 
-\pitem{y}{lkj_corr}{eta}
-
 ### Stan Functions
 
 <!-- lkj_corr -->
@@ -108,8 +106,6 @@ even though the density of $LL^\top$ is constant iff $\eta=1$.
 A lower triangular $L$ is a Cholesky factor for a correlation matrix
 if and only if $L_{k,k} > 0$ for $k \in 1{:}K$ and each row $L_k$ has
 unit Euclidean length.
-
-\pitem{L}{lkj_corr_cholesky}{eta}
 
 ### Stan Functions
 

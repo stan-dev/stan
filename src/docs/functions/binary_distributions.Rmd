@@ -12,8 +12,6 @@ If $\theta \in [0,1]$, then for $y \in \{0,1\}$, \[
 \text{if } y = 1, \text{ and} \\ 1 - \theta & \text{if } y = 0.
 \end{array} \right. \]
 
-\pitemdisc{y}{bernoulli}{theta}
-
 ### Stan Functions
 
 <!-- bernoulli -->
@@ -65,8 +63,6 @@ If $\alpha \in \mathbb{R}$, then for $y \in \{0,1\}$, \[
 \text{logit}^{-1}(\alpha) & \text{if } y = 1, \text{ and} \\ 1 -
 \text{logit}^{-1}(\alpha) &  \text{if } y = 0. \end{array} \right. \]
 
-\pitemdisc{y}{bernoulli_logit}{alpha}
-
 ### Stan Functions
 
 <!-- bernoulli_logit -->
@@ -105,8 +101,6 @@ n}\text{Bernoulli}(y_i~|~\text{logit}^{-1}(\alpha_i + x_i\cdot
 & \text{if } y_i = 1, \text{ and} \\ 1 - \text{logit}^{-1}(\alpha_i +
 \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) & \text{if } y_i = 0.
 \end{array} \right. \end{align*}
-
-\pitemdisc{y}{bernoulli_logit_glm}{x, alpha, beta}
 
 ### Stan Functions
 

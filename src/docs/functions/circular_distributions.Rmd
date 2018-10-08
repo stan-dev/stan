@@ -25,8 +25,6 @@ the mode.  Ideally, the parameterization and support will be set up so
 that the bulk of the probability mass is in a continuous interval
 around the mean $\mu$.
 
-\pitem{y}{von_mises}{mu, kappa}
-
 ### Stan Functions
 
 <!-- von_mises -->

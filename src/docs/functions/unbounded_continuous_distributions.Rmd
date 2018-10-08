@@ -12,8 +12,6 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 \sigma} \exp\left( - \, \frac{1}{2}            \left(  \frac{y -
 \mu}{\sigma} \right)^2     \right) \!. \]
 
-\pitem{y}{normal}{mu, sigma}
-
 ### Stan Functions
 
 <!-- normal -->
@@ -85,8 +83,6 @@ with parameters $\mu = 0$ and $\sigma = 1$.
 The standard normal (location zero, scale one) log probability density
 of y.
 
-\pitemTwo{y}{std_normal}
-
 ## Normal-Id Generalised Linear Model (Linear Regression) {#normal-id-glm}
 
 Stan also supplies a single primitive for a Generalised Linear Model
@@ -101,8 +97,6 @@ If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
 \mathbb{R}^m, \sigma\in \mathbb{R}^+$, then for $y \in \mathbb{R}^n$,
 \[ \text{NormalIdGLM}(y|x, \alpha, \beta, \sigma) = \prod_{1\leq i
 \leq n}\text{Normal}(y_i|\alpha_i + x_i\cdot \beta, \sigma). \]
-
-\pitemdisc{y}{normal_id_glm}{x, alpha, beta, sigma}
 
 ### Stan Functions
 
@@ -139,8 +133,6 @@ If $\mu \in \mathbb{R}$, $\sigma \in \mathbb{R}^+$, and $\lambda \in
 \left(\frac{\lambda}{2} \left(2\mu + \lambda \sigma^2 -
 2y\right)\right) \text{erfc}\left(\frac{\mu + \lambda\sigma^2 -
 y}{\sqrt{2}\sigma}\right) . \]
-
-\pitem{y}{exp_mod_normal}{mu, sigma, lambda}
 
 ### Stan Functions
 
@@ -190,8 +182,6 @@ If $\xi \in \mathbb{R}$, $\omega \in \mathbb{R}^+$, and $\alpha \in
 \right) \ \left(1 + \text{erf}\left( \alpha\left(\frac{y -
 \xi}{\omega\sqrt{2}}\right)\right)\right) . \]
 
-\pitem{y}{skew_normal}{xi, omega, alpha}
-
 ### Stan Functions
 
 <!-- skew_normal -->
@@ -239,8 +229,6 @@ If $\nu \in \mathbb{R}^+$, $\mu \in \mathbb{R}$, and $\sigma \in
 \ \left( 1 + \frac{1}{\nu} \left(\frac{y - \mu}{\sigma}\right)^2
 \right)^{-(\nu + 1)/2} \! . \]
 
-\pitem{y}{student_t}{nu, mu, sigma}
-
 ### Stan Functions
 
 <!-- student_t -->
@@ -285,8 +273,6 @@ For a description of argument and return types, see section
 If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 \mathbb{R}$, \[ \text{Cauchy}(y|\mu,\sigma) = \frac{1}{\pi \sigma} \
 \frac{1}{1 + \left((y - \mu)/\sigma\right)^2} . \]
-
-\pitem{y}{cauchy}{mu, sigma}
 
 ### Stan Functions
 
@@ -343,8 +329,6 @@ a non-centered parameterization by taking \[ \beta^{\text{raw}} \sim
 \mathsf{Normal}(0, 1) \] and defining \[ \beta = \mu + \alpha \,
 \beta^{\text{raw}}. \]
 
-\pitem{y}{double_exponential}{mu, sigma}
-
 ### Stan Functions
 
 <!-- double_exponential -->
@@ -390,8 +374,6 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 \exp\!\left( - \, \frac{y - \mu}{\sigma} \right) \ \left(1 + \exp
 \!\left( - \, \frac{y - \mu}{\sigma} \right) \right)^{\!-2} \! . \]
 
-\pitem{y}{logistic}{mu, sigma}
-
 ### Stan Functions
 
 <!-- logistic -->
@@ -435,8 +417,6 @@ If $\mu \in \mathbb{R}$ and $\beta \in \mathbb{R}^+$, then for $y \in
 \mathbb{R}$, \[ \text{Gumbel}(y|\mu,\beta) = \frac{1}{\beta} \
 \exp\left(-\frac{y-\mu}{\beta}-\exp\left(-\frac{y-\mu}{\beta}\right)\right)
 . \]
-
-\pitem{y}{gumbel}{mu, beta}
 
 ### Stan Functions
 

@@ -18,8 +18,6 @@ is the matrix trace function, and $\Gamma_K()$ is the multivariate
 Gamma function, \[ \Gamma_K(x) = \frac{1}{\pi^{K(K-1)/4}} \
 \prod_{k=1}^K \Gamma \left( x + \frac{1 - k}{2} \right) \!. \]
 
-\pitem{W}{wishart}{nu, Sigma}
-
 ### Stan Functions
 
 <!-- wishart -->
@@ -49,8 +47,6 @@ for symmetric and positive-definite $W \in \mathbb{R}^{K \times K}$,
 \frac{1}{\Gamma_K \! \left( \frac{\nu}{2} \right)} \ \left| S
 \right|^{\nu/2} \ \left| W \right|^{-(\nu + K + 1)/2} \ \exp \! \left(
 - \frac{1}{2} \ \text{tr}(SW^{-1}) \right) \! . \]
-
-\pitem{W}{inv_wishart}{nu, Sigma}
 
 ### Stan Functions
 

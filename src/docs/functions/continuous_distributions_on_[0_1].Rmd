@@ -18,8 +18,6 @@ is 0 and the log probability is $-\infty$.  Similarly, the
 distribution requires strictly positive parameters, $\alpha, \beta >
 0$.
 
-\pitem{theta}{beta}{alpha, beta}
-
 ### Stan Functions
 
 <!-- beta -->
@@ -64,7 +62,7 @@ section \@ref(prng-vectorization).
 ### Probability Density Function
 
 If $\mu \in (0, 1)$ and $\kappa \in \mathbb{R}^+$, then for $\theta
-\in (0,1)$, \[ \text{Beta_Proportion}(\theta|\mu,\kappa) =
+\in (0,1)$, \[ \mathrm{Beta\_Proportion}(\theta|\mu,\kappa) =
 \frac{1}{\mathrm{B}(\mu \kappa, (1 - \mu) \kappa)} \,
 \theta^{\mu\kappa - 1} \, (1 - \theta)^{(1 - \mu)\kappa- 1} , \] where
 the beta function $\mathrm{B}()$ is as defined in section
@@ -74,8 +72,6 @@ _**Warning:**_  If $\theta = 0$ or $\theta = 1$, then the probability
 is 0 and the log probability is $-\infty$.  Similarly, the
 distribution requires $\mu \in (0, 1)$ and strictly positive
 parameter, $\kappa > 0$.
-
-\pitem{theta}{beta_proportion}{mu, kappa}
 
 ### Stan Functions
 

@@ -38,7 +38,7 @@ sure and plan to use integer division with negative values.
 
 Unlike floating point division, where `1.0 / 0.0` produces the special
 positive infinite value, integer division by zero, as in `1 / 0`, has
-undefined behavior in the  C++ standard.  For example, the \clang++
+undefined behavior in the  C++ standard.  For example, the clang++
 compiler on Mac OS X returns 3764, whereas the g++ compiler throws an
 exception and aborts the program with a warning.  As with overflow, it
 is up to the user to make sure integer divide-by-zero does not occur.
@@ -88,8 +88,8 @@ x / y < 0. \end{cases} \]
 `int` **`operator%`**(`int x, int y`)
 x modulo y, which is the positive remainder after dividing x by y. If
 both x and y are non-negative, so is the result; otherwise, the sign
-of the result is platform dependent. \[ \text{operator%}(x, y) \ = \ x
-\ \text{mod} \ y \ = \ x - y * \lfloor x / y \rfloor \]
+of the result is platform dependent. \[ \mathrm{operator\%}(x, y) \ =
+\ x \ \text{mod} \ y \ = \ x - y * \lfloor x / y \rfloor \]
 
 ### Unary Prefix Operators
 
@@ -122,10 +122,11 @@ absolute value of x
 <!-- int; int_step; (real x); -->
 
 `int` **`int_step`**(`real x`)
- Returns the step function of x as an integer, \[ \text{int_step}(x) =
-\begin{cases} 1 & \text{if } x > 0 \\ 0 & \text{if } x \leq 0 \text{
-or } x \text{ is } NaN \end{cases} \] _**Warning:**_ `int_step(0)` and
-`int_step(NaN)` return 0 whereas `step(0)` and `step(NaN)` return 1.
+ Returns the step function of x as an integer, \[
+\mathrm{int\_step}(x) = \begin{cases} 1 & \text{if } x > 0 \\ 0 &
+\text{if } x \leq 0 \text{ or } x \text{ is } NaN \end{cases} \]
+_**Warning:**_ `int_step(0)` and `int_step(NaN)` return 0 whereas
+`step(0)` and `step(NaN)` return 1.
 
 See the warning in section \@ref(step-functions) about the dangers of
 step functions applied to anything other than data.

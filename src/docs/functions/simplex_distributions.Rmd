@@ -81,8 +81,6 @@ $\alpha = 1000$,
  5) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
  ```
 
-\pitem{theta}{dirichlet}{alpha}
-
 ### Stan Functions
 
 <!-- dirichlet -->

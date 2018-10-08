@@ -22,8 +22,6 @@ Suppose $N \in \mathbb{N}$ and $\theta \in [0,1]$, and $n \in
 \[ \frac{\partial}{\partial \theta} \log \text{Binomial}(n~|~N,\theta)
 = \frac{n}{\theta} - \frac{N - n}{1 - \theta} \]
 
-\pitemdisc{n}{binomial}{N, theta}
-
 ### Stan Functions
 
 <!-- binomial -->
@@ -88,8 +86,6 @@ Suppose $N \in \mathbb{N}$, $\alpha \in \mathbb{R}$, and $n \in
 \frac{n}{\text{logit}^{-1}(-\alpha)} - \frac{N -
 n}{\text{logit}^{-1}(\alpha)} \]
 
-\pitemdisc{n}{binomial_logit}{N, alpha}
-
 ### Stan Functions
 
 <!-- binomial_logit -->
@@ -110,8 +106,6 @@ If $N \in \mathbb{N}$, $\alpha \in \mathbb{R}^+$, and $\beta \in
 \] where the beta function $\mathrm{B}(u,v)$ is defined for $u \in
 \mathbb{R}^+$ and $v \in \mathbb{R}^+$ by \[ \mathrm{B}(u,v) =
 \frac{\Gamma(u) \ \Gamma(v)}{\Gamma(u + v)}. \]
-
-\pitemdisc{n}{beta_binomial}{N, alpha, beta}
 
 ### Stan Functions
 
@@ -162,8 +156,6 @@ If $a \in \mathbb{N}$, $b \in \mathbb{N}$, and $N \in
 \[ \text{Hypergeometric}(n~|~N,a,b) = \frac{\normalsize{\binom{a}{n}
 \binom{b}{N - n}}}      {\normalsize{\binom{a + b}{N}}}. \]
 
-\pitemdisc{n}{hypergeometric}{N, a, b}
-
 ### Stan Functions
 
 <!-- hypergeometric -->
@@ -192,9 +184,6 @@ for $y \in \{1,\ldots,N\}$, \[ \text{Categorical}(y~|~\theta) =
 distribution, \[ \text{CategoricalLogit}(y~|~\beta) =
 \text{Categorical}(y~|~\text{softmax}(\beta)). \] See section
 \@ref(softmax) for the definition of the softmax function.
-
-\pitemdisc{y}{categorical}{theta}
-\pitemdisc{y}{categorical_logit}{beta}
 
 ### Stan Functions
 
@@ -250,8 +239,6 @@ subsumed into the general definition by setting $c_0 = -\infty$ and
 $c_K = +\infty$ with $\text{logit}^{-1}(-\infty) = 0$ and
 $\text{logit}^{-1}(\infty) = 1$.
 
-\pitemdisc{k}{ordered_logistic}{eta, c}
-
 ### Stan Functions
 
 <!-- ordered_logistic -->
@@ -283,8 +270,6 @@ illustrate the parallelism of the cases; the $k=1$ and $k=K$ edge
 cases can be subsumed into the general definition by setting $c_0 =
 -\infty$ and $c_K = +\infty$ with $\Phi(-\infty) = 0$ and
 $\Phi(\infty) = 1$.
-
-\pitemdisc{k}{ordered_probit}{eta, c}
 
 ### Stan Functions
 

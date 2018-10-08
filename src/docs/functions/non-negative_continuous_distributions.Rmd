@@ -11,8 +11,6 @@ If $\sigma \in \mathbb{R}^+$, then for $y \in [0,\infty)$, \[
 \text{Rayleigh}(y|\sigma) = \frac{y}{\sigma^2} \exp(-y^2 / 2\sigma^2)
 \!. \]
 
-\pitem{y}{rayleigh}{sigma}
-
 ### Stan Functions
 
 <!-- rayleigh -->
@@ -58,8 +56,6 @@ If $\alpha \in \mathbb{R}^+$, $\tau \in \mathbb{R}^+$, $\beta \in [0,
 \] where $\phi(x)$ denotes the standard normal density function;  see
 [@Feller1968], [@NavarroFuss2009].
 
-\pitem{y}{wiener}{alpha, tau, beta, delta}
-
 ### Stan Functions
 
 <!-- wiener -->
@@ -75,5 +71,5 @@ rate delta
 Stan returns the first passage time of the accumulation process over
 the upper boundary only. To get the result for the lower boundary, use
 \[ \text{wiener}(y | \alpha, \tau, 1 - \beta, - \delta) \] For more
-details, see the appendix of \citet{Vandekerckhove-Wabersich:2014}.
+details, see the appendix of @Vandekerckhove-Wabersich:2014.
 

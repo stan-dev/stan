@@ -15,8 +15,6 @@ for $y \in \mathbb{R}^K$, \[ \text{MultiNormal}(y|\mu,\Sigma) =
 - \mu) \right) \! , \] where $|\Sigma|$ is the absolute determinant of
 $\Sigma$.
 
-\pitem{y}{multi_normal}{mu, Sigma}
-
 ### Stan Functions
 
 The multivariate normal probability function is overloaded to allow
@@ -92,8 +90,6 @@ If $K \in \mathbb{N}$, $\mu \in \mathbb{R}^K$, and $\Omega \in
 for $y \in \mathbb{R}^K$, \[ \text{MultiNormalPrecision}(y|\mu,\Omega)
 = \text{MultiNormal}(y|\mu,\Sigma^{-1}) \]
 
-\pitem{y}{multi_normal_prec}{mu, Omega}
-
 ### Stan Functions
 
 <!-- multi_normal_prec -->
@@ -134,8 +130,6 @@ $LL^{top}$ is a $K \times K$ positive definite matrix, then $L_{k,k}$
 must be strictly positive for $k \in 1{:}K$.  If an $L$ is provided
 that is not the Cholesky factor of a positive-definite matrix, the
 probability functions will raise errors.
-
-\pitem{y}{multi_normal_cholesky}{mu, L}
 
 ### Stan Functions
 
@@ -211,8 +205,6 @@ with multi-variate outputs where only the output dimensions share a
 kernel function but vary based on their scale.  Note that this
 function does not take into account the mean prediction.
 
-\pitem{y}{multi_gp}{Sigma, w}
-
 ### Stan Functions
 
 <!-- multi_gp -->
@@ -240,8 +232,6 @@ factor of the kernel matrix, this distribution is also more efficient
 than $\text{MultiGP}()$. Note that this function does not take into
 account the mean prediction.
 
-\pitem{y}{multi_gp_cholesky}{L, w}
-
 ### Stan Functions
 
 <!-- multi_gp_cholesky -->
@@ -265,8 +255,6 @@ K)/2\right)}      {\Gamma(\nu/2)} \ \frac{1}{\sqrt{\left| \Sigma
 \right|}} \ \left( 1 + \frac{1}{\nu} \, \left(y - \mu\right)^{\top} \,
 \Sigma^{-1} \, \left(y - \mu\right) \right)^{-(\nu + K)/2} \! .
 \end{array} \]
-
-\pitem{y}{multi_student_t}{nu, mu, Sigma}
 
 ### Stan Functions
 
@@ -340,8 +328,6 @@ log-likelihood is a system that is calculated using the Kalman Filter.
 If $V$ is diagonal, then a more efficient algorithm which sequentially
 processes observations and avoids a matrix inversions can be used
 [@DurbinKoopman:2001 section 6.4].
-
-\pitem{y}{gaussian_dlm_obs}{F, G, V, W, m0, C0}
 
 ### Stan Functions
 

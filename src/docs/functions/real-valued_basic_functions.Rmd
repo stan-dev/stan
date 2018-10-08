@@ -344,8 +344,8 @@ b) || (((c >= d) && (e != f)))`.
 
 `int` **`operator&&`**(`real x, real y`)
  Returns 1 if x is unequal to 0 and y is unequal to 0. \[
-\text{operator&&}(x,y) = \begin{cases} 1 & \text{if $x \neq 0$} \text{
-and } y \neq 0\\ 0 & \text{otherwise} \end{cases} \]
+\mathrm{operator\&\&}(x,y) = \begin{cases} 1 & \text{if $x \neq 0$}
+\text{ and } y \neq 0\\ 0 & \text{otherwise} \end{cases} \]
 
 <!-- operator_logical_or -->
 <!-- int; operator||; (int x, int y); -->
@@ -448,8 +448,8 @@ xy \]
 <!-- real; operator^; (real x, real y); -->
 
 `real` **`operator^`**(`real x, real y`)
- Return x raised to the power of y. \[ (x\text{^}y) =
-\text{operator^}(x,y) = x^y \]
+ Return x raised to the power of y. \[ (x^\mathrm{\wedge}y) =
+\text{operator}^\mathrm{\wedge}(x,y) = x^y \]
 
 ### Unary Prefix Operators
 
@@ -820,7 +820,7 @@ regression with maximum absolute error of 0.00014, see
 `real` **`binary_log_loss`**(`int y, real y_hat`)
  Returns the log loss function for for predicting $\hat{y} \in [0,1]$
 for boolean outcome $y \in \{0,1\}$. \[
-\text{binary_log_loss}(y,\hat{y}) = \begin{cases} -\log \hat{y} &
+\mathrm{binary\_log\_loss}(y,\hat{y}) = \begin{cases} -\log \hat{y} &
 \text{if } y = 0\\ -\log (1 - \hat{y}) & \text{otherwise} \end{cases}
 \]
 
@@ -830,7 +830,7 @@ for boolean outcome $y \in \{0,1\}$. \[
 `real` **`owens_t`**(`real h, real a`)
  Returns the Owen's T function for the probability of the event $X >
 h$ and $0<Y<aX$ where X and Y are independent standard normal random
-variables. \[ \text{owens_t}(h,a) = \frac{1}{2\pi} \int_0^a
+variables. \[ \mathrm{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a
 \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx \]
 
 ## Combinatorial Functions {#betafun}
@@ -900,7 +900,7 @@ $\Gamma_n$ with n dimensions applied to x. \[ \text{lmgamma}(n,x) =
 
 `real` **`gamma_p`**(`real a, real z`)
  Returns the normalized lower incomplete gamma function of a and z
-defined for positive a and nonnegative z. \[ \text{gamma_p}(a,z) =
+defined for positive a and nonnegative z. \[ \mathrm{gamma\_p}(a,z) =
 \begin{cases} \frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt & \text{if }
 a > 0, z \geq 0 \\ \textrm{error} & \text{otherwise} \end{cases} \]
 
@@ -909,7 +909,7 @@ a > 0, z \geq 0 \\ \textrm{error} & \text{otherwise} \end{cases} \]
 
 `real` **`gamma_q`**(`real a, real z`)
  Returns the normalized upper incomplete gamma function of a and z
-defined for positive a and nonnegative z. \[ \text{gamma_q}(a,z) =
+defined for positive a and nonnegative z. \[ \mathrm{gamma\_q}(a,z) =
 \begin{cases} \frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt &
 \text{if } a > 0, z \geq 0 \\[6pt] \textrm{error} & \text{otherwise}
 \end{cases} \]
@@ -924,7 +924,7 @@ coefficient of x and y. For non-negative integer inputs, the binomial
 coefficient function is written as $\binom{x}{y}$ and pronounced "x
 choose y." This function generalizes to real numbers using the gamma
 function. For $0 \leq y \leq x$, \[
-\text{binomial_coefficient_log}(x,y) = \log\Gamma(x+1) -
+\mathrm{binomial\_coefficient\_log}(x,y) = \log\Gamma(x+1) -
 \log\Gamma(y+1) - \log\Gamma(x-y+1). \]
 
 <!-- choose -->
@@ -944,7 +944,7 @@ coefficient function can be defined via the factorial function \[
 
 `real` **`bessel_first_kind`**(`int v, real x`)
  Returns the Bessel function of the first kind with order v applied to
-x. \[ \text{bessel_first_kind}(v,x) = J_v(x), \] where \[
+x. \[ \mathrm{bessel\_first\_kind}(v,x) = J_v(x), \] where \[
 J_v(x)=\left(\frac{1}{2}x\right)^v \sum_{k=0}^\infty
 \frac{\left(-\frac{1}{4}x^2\right)^k}{k!\, \Gamma(v+k+1)} \]
 
@@ -954,8 +954,8 @@ J_v(x)=\left(\frac{1}{2}x\right)^v \sum_{k=0}^\infty
 `real` **`bessel_second_kind`**(`int v, real x`)
  Returns the Bessel function of the second kind with order v applied
 to x defined for positive x and v. For $x,v > 0$, \[
-\text{bessel_second_kind}(v,x) = \begin{cases} Y_v(x) & \text{if } x >
-0 \\ \textrm{error} & \text{otherwise} \end{cases} \] where \[
+\mathrm{bessel\_second\_kind}(v,x) = \begin{cases} Y_v(x) & \text{if }
+x > 0 \\ \textrm{error} & \text{otherwise} \end{cases} \] where \[
 Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)} \]
 
 <!-- modified_bessel_first_kind -->
@@ -964,8 +964,8 @@ Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)} \]
 `real` **`modified_bessel_first_kind`**(`int v, real z`)
  Returns the modified Bessel function of the first kind with order v
 applied to z defined for all z and v. \[
-\text{modified_bessel_first_kind}(v,z) = I_v(z) \] where \[ {I_v}(z) =
-\left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
+\mathrm{modified\_bessel\_first\_kind}(v,z) = I_v(z) \] where \[
+{I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
 \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)} \]
 
 <!-- modified_bessel_second_kind -->
@@ -974,7 +974,7 @@ applied to z defined for all z and v. \[
 `real` **`modified_bessel_second_kind`**(`int v, real z`)
  Returns the modified Bessel function of the second kind with order v
 applied to z defined for positive z and v. \[
-\text{modified_bessel_second_kind}(v,z) = \begin{cases} K_v(z) &
+\mathrm{modified\_bessel\_second\_kind}(v,z) = \begin{cases} K_v(z) &
 \text{if } z > 0 \\ \textrm{error} & \text{if } z \leq 0 \end{cases}
 \] where \[ {K_v}(z) = \frac{\pi}{2}\cdot\frac{I_{-v}(z) -
 I_{v}(z)}{\sin(v\pi)} \]
@@ -984,9 +984,9 @@ I_{v}(z)}{\sin(v\pi)} \]
 
 `real` **`falling_factorial`**(`real x, real n`)
  Returns the falling factorial of x with power n defined for positive
-x and real n. \[ \text{falling_factorial}(x,n) = \begin{cases} (x)_n &
-\text{if } x > 0 \\ \textrm{error} & \text{if } x \leq 0 \end{cases}
-\] where \[ (x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)} \]
+x and real n. \[ \mathrm{falling\_factorial}(x,n) = \begin{cases}
+(x)_n & \text{if } x > 0 \\ \textrm{error} & \text{if } x \leq 0
+\end{cases} \] where \[ (x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)} \]
 
 <!-- lchoose -->
 <!-- real; lchoose; (real x, real y); -->
@@ -996,7 +996,7 @@ x and real n. \[ \text{falling_factorial}(x,n) = \begin{cases} (x)_n &
 of x and y. For non-negative integer inputs, the binomial coefficient
 function is written as $\binom{x}{y}$ and pronounced "x choose y."
 This function generalizes to real numbers using the gamma function.
-For $0 \leq y \leq x$, \[ \text{binomial_coefficient_log}(x,y) =
+For $0 \leq y \leq x$, \[ \mathrm{binomial\_coefficient\_log}(x,y) =
 \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1). \]
 
 <!-- log_falling_factorial -->
@@ -1004,7 +1004,7 @@ For $0 \leq y \leq x$, \[ \text{binomial_coefficient_log}(x,y) =
 
 `real` **`log_falling_factorial`**(`real x, real n`)
  Returns the log of the falling factorial of x with power n defined
-for positive x and real n. \[ \text{log_falling_factorial}(x,n) =
+for positive x and real n. \[ \mathrm{log\_falling\_factorial}(x,n) =
 \begin{cases} \log (x)_n & \text{if } x > 0 \\ \textrm{error} &
 \text{if } x \leq 0 \end{cases} \]
 
@@ -1013,8 +1013,8 @@ for positive x and real n. \[ \text{log_falling_factorial}(x,n) =
 
 `real` **`rising_factorial`**(`real x, real n`)
  Returns the rising factorial of x with power n defined for positive x
-and real n. \[ \text{rising_factorial}(x,n) = \begin{cases} x^{(n)} &
-\text{if } x > 0 \\ \textrm{error} & \text{if } x \leq 0 \end{cases}
+and real n. \[ \mathrm{rising\_factorial}(x,n) = \begin{cases} x^{(n)}
+& \text{if } x > 0 \\ \textrm{error} & \text{if } x \leq 0 \end{cases}
 \] where \[ x^{(n)}=\frac{\Gamma(x+n)}{\Gamma(x)} \]
 
 <!-- log_rising_factorial -->
@@ -1022,7 +1022,7 @@ and real n. \[ \text{rising_factorial}(x,n) = \begin{cases} x^{(n)} &
 
 `real` **`log_rising_factorial`**(`real x, real n`)
  Returns the log of the rising factorial of x with power n defined for
-positive x and real n. \[ \text{log_rising_factorial}(x,n) =
+positive x and real n. \[ \mathrm{log\_rising\_factorial}(x,n) =
 \begin{cases} \log x^{(n)} & \text{if } x > 0 \\ \textrm{error} &
 \text{if } x \leq 0 \end{cases} \]
 
@@ -1052,8 +1052,8 @@ natural exponential of x minus 1
 `real` **`multiply_log`**(`real x, real y`)
  _**Warning:**_ This function is deprecated and should be replaced
 with `lmultiply`. Returns the product of x and the natural logarithm
-of y. \[ \text{multiply_log}(x,y) = \begin{cases} 0 & \text{if } x = y
-= 0 \\ x \log y & \text{if } x, y \neq 0 \\ \text{NaN} &
+of y. \[ \mathrm{multiply\_log}(x,y) = \begin{cases} 0 & \text{if } x
+= y = 0 \\ x \log y & \text{if } x, y \neq 0 \\ \text{NaN} &
 \text{otherwise} \end{cases} \]
 
 <!-- lmultiply -->
@@ -1095,7 +1095,7 @@ logarithm of one minus the natural exponentiation of x
 `real` **`log_diff_exp`**(`real x, real y`)
  Returns the natural logarithm of the difference of the natural
 exponentiation of x and the natural exponentiation of y. \[
-\text{log_diff_exp}(x,y) = \begin{cases} \log(\exp(x)-\exp(y)) &
+\mathrm{log\_diff\_exp}(x,y) = \begin{cases} \log(\exp(x)-\exp(y)) &
 \text{if } x > y \\[6pt] \textrm{NaN} & \text{otherwise} \end{cases}
 \]
 
@@ -1104,11 +1104,11 @@ exponentiation of x and the natural exponentiation of y. \[
 
 `real` **`log_mix`**(`real theta, real lp1, real lp2`)
  Returns the log mixture of the log densities lp1 and lp2 with mixing
-proportion theta, defined by \begin{eqnarray*} \text{log_mix}(\theta,
-\lambda_1, \lambda_2) & = & \log \!\left( \theta \exp(\lambda_1) +
-\left( 1 - \theta \right) \exp(\lambda_2) \right) \\[3pt] & = &
-\text{log_sum_exp}\!\left(\log(\theta) + \lambda_1, \ \log(1 - \theta)
-+ \lambda_2\right). \end{eqnarray*}
+proportion theta, defined by \begin{eqnarray*}
+\mathrm{log\_mix}(\theta, \lambda_1, \lambda_2) & = & \log \!\left(
+\theta \exp(\lambda_1) + \left( 1 - \theta \right) \exp(\lambda_2)
+\right) \\[3pt] & = & \mathrm{log\_sum\_exp}\!\left(\log(\theta) +
+\lambda_1, \ \log(1 - \theta) + \lambda_2\right). \end{eqnarray*}
 
 <!-- log_sum_exp -->
 <!-- real; log_sum_exp; (real x, real y); -->
@@ -1116,7 +1116,7 @@ proportion theta, defined by \begin{eqnarray*} \text{log_mix}(\theta,
 `real` **`log_sum_exp`**(`real x, real y`)
  Returns the natural logarithm of the sum of the natural
 exponentiation of x and the natural exponentiation of y. \[
-\text{log_sum_exp}(x,y) = \log(\exp(x)+\exp(y)) \]
+\mathrm{log\_sum\_exp}(x,y) = \log(\exp(x)+\exp(y)) \]
 
 <!-- log_inv_logit -->
 <!-- R; log_inv_logit; (T x); -->

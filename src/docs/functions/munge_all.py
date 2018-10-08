@@ -40,6 +40,8 @@ def main():
                 process_description(line, chapterRmd, wrapper)
             elif (line.startswith("\\sub")):
                 process_subsection(line, chapterRmd)
+            elif (line.startswith("\\pitem")):
+                process_pitem(line, chapterRmd)
             else:
                 process_line(line, chapterRmd, wrapper)
     fp.close()
@@ -157,6 +159,9 @@ def write_item(item_dict, rmdPath, wrapper):
     fh.write("\n")
     fh.close()
 
+def process_pitem(line, rmdPath):
+    print("TODO: %s\n" % line)
+    
 def process_section(line, rmdPath):
     sectionName = get_name(line)
     label = get_label(line)

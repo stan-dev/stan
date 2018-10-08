@@ -6,8 +6,8 @@ numbers (i.e., the non-negative integers).
 ## Negative Binomial Distribution
 
 For the negative binomial distribution Stan uses the parameterization
-described in \citet{GelmanEtAl:2013}.  For alternative
-parameterizations, see section \@ref(neg-binom-2-log).
+described in @GelmanEtAl:2013.  For alternative parameterizations, see
+section \@ref(neg-binom-2-log).
 
 ### Probability Mass Function
 
@@ -20,8 +20,6 @@ The mean and variance of a random variable $y \sim
 \text{NegBinomial}(\alpha,\beta)$ are given by \[ \mathbb{E}[y] =
 \frac{\alpha}{\beta} \ \ \text{ and } \ \ \text{Var}[Y] =
 \frac{\alpha}{\beta^2} (\beta + 1). \]
-
-\pitemdisc{n}{neg_binomial}{alpha, beta}
 
 ### Stan Functions
 
@@ -82,8 +80,6 @@ is the additional variance of the negative binomial above that of the
 Poisson with mean $\mu$.  So the inverse of parameter $\phi$ controls
 the overdispersion, scaled by the square of the mean, $\mu^2$.
 
-\pitemdisc{y}{neg_binomial_2}{mu, phi}
-
 ### Stan Functions
 
 <!-- neg_binomial_2 -->
@@ -129,8 +125,6 @@ for $\eta \in \mathbb{R}$, $\phi \in \mathbb{R}^+$, so that for $y \in
 used for sampling, as a function, and for random number generation,
 but as of yet, there are no CDFs implemented for it.
 
-\pitemdisc{y}{neg_binomial_2_log}{eta, phi}
-
 ### Stan Functions
 
 <!-- neg_binomial_2_log -->
@@ -166,8 +160,6 @@ If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
 \leq n}\text{NegBinomial2}(y_i~|~\exp(\alpha_i + x_i\cdot \beta),
 \phi). \]
 
-\pitemdisc{y}{neg_binomial_2_log_glm}{x, alpha, beta, phi}
-
 ### Stan Functions
 
 <!-- neg_binomial_2_log_glm -->
@@ -201,8 +193,6 @@ vector `beta`.
 If $\lambda \in \mathbb{R}^+$, then for $n \in \mathbb{N}$, \[
 \text{Poisson}(n|\lambda) = \frac{1}{n!} \, \lambda^n \,
 \exp(-\lambda). \]
-
-\pitemdisc{n}{poisson}{lambda}
 
 ### Stan Functions
 
@@ -251,8 +241,6 @@ If $\alpha \in \mathbb{R}$, then for $n \in \mathbb{N}$, \[
 \text{PoissonLog}(n|\alpha) = \frac{1}{n!} \, \exp \left(n\alpha -
 \exp(\alpha) \right). \]
 
-\pitemdisc{n}{poisson_log}{alpha}
-
 ### Stan Functions
 
 <!-- poisson_log -->
@@ -283,8 +271,6 @@ If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
 \mathbb{R}^m$, then for $y \in \mathbb{N}^n$, \[
 \text{PoisonLogGLM}(y|x, \alpha, \beta) = \prod_{1\leq i \leq
 n}\text{Poisson}(y_i|\exp(\alpha_i + x_i\cdot \beta)). \]
-
-\pitemdisc{y}{poisson_log_glm}{x, alpha, beta}
 
 ### Stan Functions
 

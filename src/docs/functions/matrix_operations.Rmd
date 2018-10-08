@@ -999,8 +999,8 @@ $K$-simplex by \[ \text{softmax}(y)  = \frac{\exp(y)}
 {\sum_{k=1}^K \exp(y_k)}, \] where $\exp(y)$ is the componentwise
 exponentiation of $y$. Softmax is usually calculated on the log scale,
 \begin{eqnarray*} \log \text{softmax}(y) & = & \ y - \log \sum_{k=1}^K
-\exp(y_k) \\[4pt] & = & y - \text{log_sum_exp}(y). \end{eqnarray*}
-where the vector $y$ minus the scalar $\text{log_sum_exp}(y)$
+\exp(y_k) \\[4pt] & = & y - \mathrm{log\_sum\_exp}(y). \end{eqnarray*}
+where the vector $y$ minus the scalar $\mathrm{log\_sum\_exp}(y)$
 subtracts the scalar from each component of $y$.
 
 [^fnsoftmax]: The softmax function is so called because in the limit

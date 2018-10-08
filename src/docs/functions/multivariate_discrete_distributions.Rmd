@@ -14,8 +14,6 @@ $\sum_{k=1}^K y_k = N$, \[ \text{Multinomial}(y|\theta) =
 multinomial coefficient is defined by \[ \binom{N}{y_1,\ldots,y_k} =
 \frac{N!}{\prod_{k=1}^K y_k!}. \]
 
-\pitemdisc{y}{multinomial}{theta}
-
 ### Stan Functions
 
 <!-- multinomial -->

@@ -12,8 +12,6 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 \pi} \ \sigma} \, \frac{1}{y} \ \exp \! \left(        - \, \frac{1}{2}
 \, \left( \frac{\log y - \mu}{\sigma} \right)^2      \right) . \]
 
-\pitem{y}{lognormal}{mu, sigma}
-
 ### Stan Functions
 
 <!-- lognormal -->
@@ -57,8 +55,6 @@ If $\nu \in \mathbb{R}^+$, then for $y \in \mathbb{R}^+$, \[
 \text{ChiSquare}(y|\nu) = \frac{2^{-\nu/2}}     {\Gamma(\nu / 2)} \,
 y^{\nu/2 - 1} \, \exp \! \left( -\, \frac{1}{2} \, y \right) . \]
 
-\pitem{y}{chi_square}{nu}
-
 ### Stan Functions
 
 <!-- chi_square -->
@@ -101,8 +97,6 @@ If $\nu \in \mathbb{R}^+$, then for $y \in \mathbb{R}^+$, \[
 \text{InvChiSquare}(y \, | \, \nu) = \frac{2^{-\nu/2}}    {\Gamma(\nu
 / 2)} \, y^{-\nu/2 - 1} \, \exp\! \left( \! - \, \frac{1}{2} \,
 \frac{1}{y} \right) . \]
-
-\pitem{y}{inv_chi_square}{nu}
 
 ### Stan Functions
 
@@ -149,8 +143,6 @@ If $\nu \in \mathbb{R}^+$ and $\sigma \in \mathbb{R}^+$, then for $y
 y^{-(\nu/2 + 1)} \, \exp \! \left( \!    - \, \frac{1}{2} \, \nu \,
 \sigma^2 \, \frac{1}{y} \right) . \]
 
-\pitem{y}{scaled_inv_chi_square}{nu, sigma}
-
 ### Stan Functions
 
 <!-- scaled_inv_chi_square -->
@@ -195,8 +187,6 @@ For a description of argument and return types, see section
 If $\beta \in \mathbb{R}^+$, then for $y \in \mathbb{R}^+$, \[
 \text{Exponential}(y|\beta) = \beta \, \exp ( - \beta \, y ) . \]
 
-\pitem{y}{exponential}{beta}
-
 ### Stan Functions
 
 <!-- exponential -->
@@ -239,8 +229,6 @@ If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y
 \in \mathbb{R}^+$, \[ \text{Gamma}(y|\alpha,\beta) =
 \frac{\beta^{\alpha}}      {\Gamma(\alpha)} \, y^{\alpha - 1}
 \exp(-\beta \, y) . \]
-
-\pitem{y}{gamma}{alpha, beta}
 
 ### Stan Functions
 
@@ -285,8 +273,6 @@ If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y
 \in \mathbb{R}^+$, \[ \text{InvGamma}(y|\alpha,\beta) =
 \frac{\beta^{\alpha}}      {\Gamma(\alpha)} \ y^{-(\alpha + 1)} \,
 \exp \! \left( \! - \beta \, \frac{1}{y} \right) . \]
-
-\pitem{y}{inv_gamma}{alpha, beta}
 
 ### Stan Functions
 
@@ -336,8 +322,6 @@ $y \in [0,\infty)$, \[ \text{Weibull}(y|\alpha,\sigma) =
 Note that if $Y \propto \text{Weibull}(\alpha,\sigma)$, then $Y^{-1}
 \propto \text{Frechet}(\alpha,\sigma^{-1})$.
 
-\pitem{y}{weibull}{alpha, sigma}
-
 ### Stan Functions
 
 <!-- weibull -->
@@ -384,8 +368,6 @@ $y \in \mathbb{R}^+$, \[ \text{Frechet}(y|\alpha,\sigma) =
 
 Note that if $Y \propto \text{Frechet}(\alpha,\sigma)$, then $Y^{-1}
 \propto \text{Weibull}(\alpha,\sigma^{-1})$.
-
-\pitem{y}{frechet}{alpha, sigma}
 
 ### Stan Functions
 

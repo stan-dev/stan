@@ -11,8 +11,6 @@ If $\alpha \in \mathbb{R}$ and $\beta \in (\alpha,\infty)$, then for
 $y \in [\alpha,\beta]$, \[ \text{Uniform}(y|\alpha,\beta) =
 \frac{1}{\beta - \alpha} . \]
 
-\pitem{y}{uniform}{alpha, beta}
-
 ### Stan Functions
 
 <!-- uniform -->
