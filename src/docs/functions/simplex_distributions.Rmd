@@ -1,18 +1,29 @@
 # Simplex Distributions
 
-The simplex probabilities have support on the unit $K$-simplex for a specified $K$.  A $K$-dimensional vector $\theta$ is a unit $K$-simplex if $\theta_k \geq 0$ for $k \in \{1,\ldots,K\}$ and $\sum_{k = 1}^K \theta_k = 1$.
+The simplex probabilities have support on the unit $K$-simplex for a
+specified $K$.  A $K$-dimensional vector $\theta$ is a unit
+$K$-simplex if $\theta_k \geq 0$ for $k \in \{1,\ldots,K\}$ and
+$\sum_{k = 1}^K \theta_k = 1$.
 
 ## Dirichlet Distribution
 
 ### Probability Density Function
 
-If $K \in \mathbb{N}$ and $\alpha \in (\mathbb{R}^+)^{K}$, then for $\theta \in \text{$K$-simplex}$, \[ \text{Dirichlet}(\theta|\alpha) = \frac{\Gamma \! \left( \sum_{k=1}^K \alpha_k \right)}      {\prod_{k=1}^K \Gamma(\alpha_k)} \ \prod_{k=1}^K \theta_k^{\alpha_k - 1} . \]
+If $K \in \mathbb{N}$ and $\alpha \in (\mathbb{R}^+)^{K}$, then for
+$\theta \in \text{$K$-simplex}$, \[ \text{Dirichlet}(\theta|\alpha) =
+\frac{\Gamma \! \left( \sum_{k=1}^K \alpha_k \right)}
+{\prod_{k=1}^K \Gamma(\alpha_k)} \ \prod_{k=1}^K \theta_k^{\alpha_k -
+1} . \]
 
-_**Warning:**_  If any of the components of $\theta$ satisfies $\theta_i = 0$ or $\theta_i = 1$, then the probability is 0 and the log probability is $-\infty$.  Similarly, the distribution requires strictly positive parameters, with $\alpha_i > 0$ for each $i$.
+_**Warning:**_  If any of the components of $\theta$ satisfies
+$\theta_i = 0$ or $\theta_i = 1$, then the probability is 0 and the
+log probability is $-\infty$.  Similarly, the distribution requires
+strictly positive parameters, with $\alpha_i > 0$ for each $i$.
 
 ### Meaning of Dirichlet Parameters
 
-A symmetric Dirichlet prior is $[\alpha, \ldots, \alpha]^{\top}$.  To code this in Stan,
+A symmetric Dirichlet prior is $[\alpha, \ldots, \alpha]^{\top}$.  To
+code this in Stan,
 
 ```
  data {
@@ -24,7 +35,8 @@ A symmetric Dirichlet prior is $[\alpha, \ldots, \alpha]^{\top}$.  To code this 
  }
  ```
 
-Taking $K = 10$, here are the first five draws for $\alpha = 0.001$. For $\alpha = 1$, the distribution is uniform over simplexes.
+Taking $K = 10$, here are the first five draws for $\alpha = 0.001$.
+For $\alpha = 1$, the distribution is uniform over simplexes.
 
 ```
  1) 0.17 0.05 0.07 0.17 0.03 0.13 0.03 0.03 0.27 0.05
@@ -34,9 +46,17 @@ Taking $K = 10$, here are the first five draws for $\alpha = 0.001$. For $\alpha
  5) 0.11 0.22 0.02 0.01 0.06 0.18 0.33 0.04 0.01 0.01
  ```
 
-That does not mean it's uniform over the marginal probabilities of each element.  As the size of the simplex grows, the marginal draws become more and more concentrated below (not around) $1/K$.  When one component of the simplex is large, the others must all be relatively small to compensate.  For example, in a uniform distribution on $10$-simplexes, the probability that a component is greater than the mean of $1/10$ is only 39\%.  Most of the posterior marginal probability mass for each component is in the interval $(0, 0.1)$.
+That does not mean it's uniform over the marginal probabilities of
+each element.  As the size of the simplex grows, the marginal draws
+become more and more concentrated below (not around) $1/K$.  When one
+component of the simplex is large, the others must all be relatively
+small to compensate.  For example, in a uniform distribution on
+$10$-simplexes, the probability that a component is greater than the
+mean of $1/10$ is only 39\%.  Most of the posterior marginal
+probability mass for each component is in the interval $(0, 0.1)$.
 
-When the $\alpha$ value is small, the draws gravitate to the corners of the simplex.  Here are the first five draws for $\alpha = 0.001$.
+When the $\alpha$ value is small, the draws gravitate to the corners
+of the simplex.  Here are the first five draws for $\alpha = 0.001$.
 
 ```
  1) 3e-203 0e+00 2e-298 9e-106 1e+000 0e+00 0e+000 1e-047 0e+00 4e-279
@@ -46,9 +66,12 @@ When the $\alpha$ value is small, the draws gravitate to the corners of the simp
  5) 2e-091 0e+00 0e+000 0e+000 1e-060 0e+00 4e-312 1e+000 0e+00 0e+000
  ```
 
-Each row denotes a draw.  Each draw has a single value that rounds to one and other values that are very close to zero or rounded down to zero.
+Each row denotes a draw.  Each draw has a single value that rounds to
+one and other values that are very close to zero or rounded down to
+zero.
 
-As $\alpha$ increases, the draws become increasingly uniform.  For $\alpha = 1000$,
+As $\alpha$ increases, the draws become increasingly uniform.  For
+$\alpha = 1000$,
 
 ```
  1) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
@@ -62,9 +85,17 @@ As $\alpha$ increases, the draws become increasingly uniform.  For $\alpha = 100
 
 ### Stan Functions
 
+<!-- dirichlet -->
+<!-- real; dirichlet_lpdf; (vector theta | vector alpha); -->
+
 `real` **`dirichlet_lpdf`**(`vector theta | vector alpha`)
- The log of the Dirichlet density for simplex theta given prior counts (plus one) alpha
+ The log of the Dirichlet density for simplex theta given prior counts
+(plus one) alpha
+
+<!-- dirichlet -->
+<!-- vector; dirichlet_rng; (vector alpha); -->
 
 `vector` **`dirichlet_rng`**(`vector alpha`)
-Generate a Dirichlet variate with prior counts (plus one) alpha; may only be used in generated quantities block
+Generate a Dirichlet variate with prior counts (plus one) alpha; may
+only be used in generated quantities block
 

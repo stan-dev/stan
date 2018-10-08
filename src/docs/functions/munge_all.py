@@ -10,20 +10,17 @@ import os
 import os.path
 import re
 import sys
+import textwrap
 
-rstudioOut = "rstudio_listing.txt"
 rmdDir = "pages"
 texfile = "preproc_all.tex"
 
 def main():
-    if (not os.path.exists(rstudioOut)):
-        fh1 = open(rstudioOut, 'w+')
-        fh1.close()
-        
     if not os.path.isfile(texfile):
         print("File {} does not exist. Exiting...".format(texfile))
         sys.exit()
     
+    wrapper = textwrap.TextWrapper(break_long_words=False, break_on_hyphens=False)
     chapterRmd = ""
     with open(texfile) as fp:
         for line in fp:
@@ -40,14 +37,15 @@ def main():
             elif (line.startswith("\\section")):
                 process_section(line, chapterRmd)
             elif(line.startswith("\\begin{description}")):
-                process_description(line, chapterRmd)
+                process_description(line, chapterRmd, wrapper)
             elif (line.startswith("\\sub")):
                 process_subsection(line, chapterRmd)
             else:
-                process_line(line, chapterRmd)
+                process_line(line, chapterRmd, wrapper)
     fp.close()
 
-def process_description(line, rmdPath):
+def process_description(line, rmdPath, wrapper):
+    curIdxName = ""
     line = remove_tags(line, "farg")
     line = remove_tags(line, "mbox")
     line = munge_code(line)
@@ -75,7 +73,12 @@ def process_description(line, rmdPath):
                 item = item[0 : endIdx]
             item = ' '.join(item.split())
             item_dict = process_item(item, numLines)
-            write_item(item_dict, rmdPath)
+            if not (curIdxName == item_dict["idx_name"]):
+                curIdxName = item_dict["idx_name"]
+                fh = open(rmdPath, 'a')
+                fh.write("<!-- %s -->\n" % curIdxName) #insert index??
+                fh.close()
+            write_item(item_dict, rmdPath, wrapper)
     
 def process_item(item, numLines):
     curIdx = 0
@@ -100,6 +103,7 @@ def process_item(item, numLines):
         print "ERROR parsing name: ", item
         return
     name = item[openBrace+1 : closeBrace]
+    idx_name = clean(name)
 
     # get args
     argsAll = ""
@@ -127,10 +131,31 @@ def process_item(item, numLines):
     if (openBrace > 0 and closeBrace > 0):
         desc = item[openBrace+1 : closeBrace]
 
-    return {"name":name,
+    return {"idx_name":idx_name,
+            "name":name,
             "return_type":return_type,
             "args":argsAll,
             "description":desc}
+
+# put html comments for scraping by Rstudio, index entries
+def write_item(item_dict, rmdPath, wrapper):
+    desc = item_dict["description"]
+    if len(desc) > 70:
+        lines = wrapper.wrap(desc)
+        desc = '\n'.join(lines)
+
+    fh = open(rmdPath, 'a')
+    if (len(item_dict["args"]) == 0):
+        fh.write("<!-- %s; %s; () -->\n" % (item_dict["return_type"], item_dict["name"]))
+    else:
+        fh.write("<!-- %s; %s; (%s); -->\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"]))
+    fh.write("\n")
+    if (len(item_dict["args"]) == 0):
+        fh.write("`%s` **`%s`**()\n%s\n" % (item_dict["return_type"], item_dict["name"], desc))
+    else:
+        fh.write("`%s` **`%s`**(`%s`)\n%s\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"], desc))
+    fh.write("\n")
+    fh.close()
 
 def process_section(line, rmdPath):
     sectionName = get_name(line)
@@ -157,18 +182,22 @@ def process_subsection(line, rmdPath):
     fh.write("\n\n")
     fh.close()
 
-def process_line(line, curPage):
+def process_line(line, curPage, wrapper):
     if line.startswith("```"): # stan code
         lines = line.split("\\n")
         line = '\n'.join(lines)
     else:
         line = remove_tags(line, "farg")
         line = munge_code(line)
+    if not (line.startswith("```") or line.startswith("|")):
+        lines = wrapper.wrap(line)
+        line = '\n'.join(lines)
+
     fh = open(curPage, 'a')
     if line.startswith("|"):  # table
         fh.write("%s\n" % line) 
-    else:                     # paragraph
-        fh.write("%s\n\n" % line)  
+    else:
+        fh.write("%s\n\n" % line) 
     fh.close()
 
 def process_part(line):
@@ -177,9 +206,7 @@ def process_part(line):
     rmdPath = os.path.join(rmdDir, rmdFile)
     if (not os.path.exists(rmdPath)):
         fh = open(rmdPath, 'w+')
-        fh.write("# <i style=\"font-size: 110%; padding:1.5em 0 0 0; color:#990017;\">")
-        fh.write(part)
-        fh.write("</i> {-}\n")
+        fh.write("# (PART) %s {-}\n" % part)
         fh.close()
     print rmdPath
     
@@ -201,22 +228,6 @@ def chapter_rmd_page(chapterName, label):
         fh.close()
         print rmdPath
     return rmdPath
-
-def write_item(item_dict, rmdPath):
-    fh = open(rstudioOut, 'a')
-    if (len(item_dict["args"]) == 0):
-        fh.write("`%s`; `%s`; (); %s\n" % (item_dict["return_type"], item_dict["name"], item_dict["description"]))
-    else:
-        fh.write("`%s`; `%s`; (`%s`); %s\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"], item_dict["description"]))
-    fh.write("\n")
-    fh.close()
-    fh = open(rmdPath, 'a')
-    if (len(item_dict["args"]) == 0):
-        fh.write("`%s` **`%s`**()\n%s\n" % (item_dict["return_type"], item_dict["name"], item_dict["description"]))
-    else:
-        fh.write("`%s` **`%s`**(`%s`)\n%s\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"], item_dict["description"]))
-    fh.write("\n")
-    fh.close()
 
 
 def munge_code(line):

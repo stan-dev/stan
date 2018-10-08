@@ -1,65 +1,134 @@
 # Binary Distributions
 
-Binary probability distributions have support on $\{0,1\}$, where 1 represents the value true and 0 the value false.
+Binary probability distributions have support on $\{0,1\}$, where 1
+represents the value true and 0 the value false.
 
 ## Bernoulli Distribution
 
 ### Probability Mass Function
 
-If $\theta \in [0,1]$, then for $y \in \{0,1\}$, \[ \text{Bernoulli}(y|\theta) = \left\{ \begin{array}{ll} \theta & \text{if } y = 1, \text{ and} \\ 1 - \theta & \text{if } y = 0. \end{array} \right. \]
+If $\theta \in [0,1]$, then for $y \in \{0,1\}$, \[
+\text{Bernoulli}(y~|~\theta) = \left\{ \begin{array}{ll} \theta &
+\text{if } y = 1, \text{ and} \\ 1 - \theta & \text{if } y = 0.
+\end{array} \right. \]
 
 \pitemdisc{y}{bernoulli}{theta}
 
 ### Stan Functions
 
+<!-- bernoulli -->
+<!-- real; bernoulli_lpmf; (ints y | reals theta); -->
+
 `real` **`bernoulli_lpmf`**(`ints y | reals theta`)
 The log Bernoulli probability mass of y given chance of success theta
 
+<!-- bernoulli -->
+<!-- real; bernoulli_cdf; (ints y, reals theta); -->
+
 `real` **`bernoulli_cdf`**(`ints y, reals theta`)
-The Bernoulli cumulative distribution function of y given chance of success theta
+The Bernoulli cumulative distribution function of y given chance of
+success theta
+
+<!-- real; bernoulli_lcdf; (ints y | reals theta); -->
 
 `real` **`bernoulli_lcdf`**(`ints y | reals theta`)
-The log of the Bernoulli cumulative distribution function of y given chance of success theta
+The log of the Bernoulli cumulative distribution function of y given
+chance of success theta
+
+<!-- real; bernoulli_lccdf; (ints y | reals theta); -->
 
 `real` **`bernoulli_lccdf`**(`ints y | reals theta`)
-The log of the Bernoulli complementary cumulative distribution function of y given chance of success theta
+The log of the Bernoulli complementary cumulative distribution
+function of y given chance of success theta
+
+<!-- bernoulli -->
+<!-- R; bernoulli_rng; (reals theta); -->
 
 `R` **`bernoulli_rng`**(`reals theta`)
-Generate a Bernoulli variate with chance of success theta; may only be used in generated quantities block. For a description of argument and return types, see section \@ref(prng-vectorization).
+Generate a Bernoulli variate with chance of success theta; may only be
+used in generated quantities block. For a description of argument and
+return types, see section \@ref(prng-vectorization).
 
 ## Bernoulli Distribution, Logit Parameterization {#bernoulli-logit-distribution}
 
-Stan also supplies a direct parameterization in terms of a logit-transformed chance-of-success parameter.  This parameterization is more numerically stable if the chance-of-success parameter is on the logit scale, as with the linear predictor in a logistic regression.
+Stan also supplies a direct parameterization in terms of a
+logit-transformed chance-of-success parameter.  This parameterization
+is more numerically stable if the chance-of-success parameter is on
+the logit scale, as with the linear predictor in a logistic
+regression.
 
 ### Probability Mass Function
 
-If $\alpha \in \mathbb{R}$, then for $y \in \{0,1\}$, \[ \text{BernoulliLogit}(y|\alpha) = \text{Bernoulli}(y | \text{logit}^{-1}(\alpha)) = \left\{ \begin{array}{ll} \text{logit}^{-1}(\alpha) & \text{if } y = 1, \text{ and} \\ 1 - \text{logit}^{-1}(\alpha) &  \text{if } y = 0. \end{array} \right. \]
+If $\alpha \in \mathbb{R}$, then for $y \in \{0,1\}$, \[
+\text{BernoulliLogit}(y~|~\alpha) = \text{Bernoulli}(y |
+\text{logit}^{-1}(\alpha)) = \left\{ \begin{array}{ll}
+\text{logit}^{-1}(\alpha) & \text{if } y = 1, \text{ and} \\ 1 -
+\text{logit}^{-1}(\alpha) &  \text{if } y = 0. \end{array} \right. \]
 
 \pitemdisc{y}{bernoulli_logit}{alpha}
 
 ### Stan Functions
 
+<!-- bernoulli_logit -->
+<!-- real; bernoulli_logit_lpmf; (ints y | reals alpha); -->
+
 `real` **`bernoulli_logit_lpmf`**(`ints y | reals alpha`)
-The log Bernoulli probability mass of y given chance of success `inv_logit(alpha)`
+The log Bernoulli probability mass of y given chance of success
+`inv_logit(alpha)`
+
+<!-- bernoulli_logit -->
+<!-- R; bernoulli_logit_rng; (reals alpha); -->
 
 `R` **`bernoulli_logit_rng`**(`reals alpha`)
-Generate a Bernoulli variate with chance of success $\text{logit}^{-1}(\alpha)$; may only be used in generated quantities block. For a description of argument and return types, see section \@ref(prng-vectorization).
+Generate a Bernoulli variate with chance of success
+$\text{logit}^{-1}(\alpha)$; may only be used in generated quantities
+block. For a description of argument and return types, see section
+\@ref(prng-vectorization).
 
 ## Bernoulli-Logit Generalised Linear Model (Logistic Regression) {#bernoulli-logit-glm}
 
-Stan also supplies a single primitive for a Generalised Linear Model with Bernoulli likelihood and logit link function, i.e. a primitive for a logistic regression. This should provide a more efficient implementation of logistic regression than a manually written regression in terms of a Bernoulli likelihood and matrix multiplication.
+Stan also supplies a single primitive for a Generalised Linear Model
+with Bernoulli likelihood and logit link function, i.e. a primitive
+for a logistic regression. This should provide a more efficient
+implementation of logistic regression than a manually written
+regression in terms of a Bernoulli likelihood and matrix
+multiplication.
 
 ### Probability Mass Function
 
-If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in \mathbb{R}^m$, then for $y \in {\{0,1\}}^n$, \begin{align*} &\text{BernoulliLogitGLM}(y|x, \alpha, \beta) = \prod_{1\leq i \leq n}\text{Bernoulli}(y_i|\text{logit}^{-1}(\alpha_i + x_i\cdot \beta))\\ &= \prod_{1\leq i \leq n} \left\{ \begin{array}{ll} \text{logit}^{-1}(\alpha_i + \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) & \text{if } y_i = 1, \text{ and} \\ 1 - \text{logit}^{-1}(\alpha_i + \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) & \text{if } y_i = 0. \end{array} \right. \end{align*}
+If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
+\mathbb{R}^m$, then for $y \in {\{0,1\}}^n$, \begin{align*}
+&\text{BernoulliLogitGLM}(y~|~x, \alpha, \beta) = \prod_{1\leq i \leq
+n}\text{Bernoulli}(y_i~|~\text{logit}^{-1}(\alpha_i + x_i\cdot
+\beta))\\ &= \prod_{1\leq i \leq n} \left\{ \begin{array}{ll}
+\text{logit}^{-1}(\alpha_i + \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j)
+& \text{if } y_i = 1, \text{ and} \\ 1 - \text{logit}^{-1}(\alpha_i +
+\sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) & \text{if } y_i = 0.
+\end{array} \right. \end{align*}
 
 \pitemdisc{y}{bernoulli_logit_glm}{x, alpha, beta}
 
 ### Stan Functions
 
+<!-- bernoulli_logit_glm -->
+<!-- real; bernoulli_logit_glm_lpmf; (int[] y | matrix x, real alpha, vector beta); -->
+
 `real` **`bernoulli_logit_glm_lpmf`**(`int[] y | matrix x, real alpha, vector beta`)
-The log Bernoulli probability mass of y given chance of success `inv_logit(alpha+x*beta)`, where a constant intercept `alpha` is used for all observations. The number of rows of the independent variable matrix `x` needs to match the length of the dependent variable vector `y` and the number of columns of `x` needs to match the length of the weight vector `beta`.
+The log Bernoulli probability mass of y given chance of success
+`inv_logit(alpha+x*beta)`, where a constant intercept `alpha` is used
+for all observations. The number of rows of the independent variable
+matrix `x` needs to match the length of the dependent variable vector
+`y` and the number of columns of `x` needs to match the length of the
+weight vector `beta`.
+
+<!-- bernoulli_logit_glm -->
+<!-- real; bernoulli_logit_glm_lpmf; (int[] y | matrix x, vector alpha, vector beta); -->
 
 `real` **`bernoulli_logit_glm_lpmf`**(`int[] y | matrix x, vector alpha, vector beta`)
-The log Bernoulli probability mass of y given chance of success `inv_logit(alpha+x*beta)`, where an intercept `alpha` is used that is allowed to vary with the different observations. The number of rows of the independent variable matrix `x` needs to match the length of the dependent variable vector `y` and `alpha` and the number of columns of `x` needs to match the length of the weight vector `beta`.
+The log Bernoulli probability mass of y given chance of success
+`inv_logit(alpha+x*beta)`, where an intercept `alpha` is used that is
+allowed to vary with the different observations. The number of rows of
+the independent variable matrix `x` needs to match the length of the
+dependent variable vector `y` and `alpha` and the number of columns of
+`x` needs to match the length of the weight vector `beta`.
 

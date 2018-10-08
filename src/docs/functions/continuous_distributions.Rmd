@@ -1,1 +1,1 @@
-# <i style="font-size: 110%; padding:1.5em 0 0 0; color:#990017;">Continuous Distributions</i> {-}
+# (PART) Continuous Distributions {-}

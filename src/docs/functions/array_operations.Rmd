@@ -2,92 +2,181 @@
 
 ## Reductions {#array-reductions}
 
-The following operations take arrays as input and produce single output values.  The boundary values for size 0 arrays are the unit with respect to the combination operation (min, max, sum, or product).
+The following operations take arrays as input and produce single
+output values.  The boundary values for size 0 arrays are the unit
+with respect to the combination operation (min, max, sum, or product).
 
 ### Minimum and Maximum
+
+<!-- min -->
+<!-- real; min; (real[] x); -->
 
 `real` **`min`**(`real[] x`)
  The minimum value in x, or $+\infty$ if x is size 0.
 
+<!-- int; min; (int[] x); -->
+
 `int` **`min`**(`int[] x`)
  The minimum value in x, or error if x is size 0.
 
+<!-- max -->
+<!-- real; max; (real[] x); -->
+
 `real` **`max`**(`real[] x`)
  The maximum value in x, or $-\infty$ if x is size 0.
+
+<!-- int; max; (int[] x); -->
 
 `int` **`max`**(`int[] x`)
  The maximum value in x, or error if x is size 0.
 
 ### Sum, Product, and Log Sum of Exp
 
+<!-- sum -->
+<!-- int; sum; (int[] x); -->
+
 `int` **`sum`**(`int[] x`)
- The sum of the elements in x, defined for $x$ of size $N$ by \[ \text{sum}(x) = \begin{cases} \sum_{n=1}^N x_n & \text{if} N > 0 \\[4pt] 0 & \text{if} N = 0 \end{cases} \] 
+ The sum of the elements in x, defined for $x$ of size $N$ by \[
+\text{sum}(x) = \begin{cases} \sum_{n=1}^N x_n & \text{if} N > 0
+\\[4pt] 0 & \text{if} N = 0 \end{cases} \]
+
+<!-- real; sum; (real[] x); -->
 
 `real` **`sum`**(`real[] x`)
  The sum of the elements in x; see definition above.
 
+<!-- prod -->
+<!-- real; prod; (real[] x); -->
+
 `real` **`prod`**(`real[] x`)
  The product of the elements in x, or 1 if x is size 0.
 
+<!-- real; prod; (int[] x); -->
+
 `real` **`prod`**(`int[] x`)
- The product of the elements in x, \[ \text{product}(x) = \begin{cases} \prod_{n=1}^N x_n & \text{if} N > 0 \\[4pt] 1 & \text{if} N = 0 \end{cases} \] 
+ The product of the elements in x, \[ \text{product}(x) =
+\begin{cases} \prod_{n=1}^N x_n & \text{if} N > 0 \\[4pt] 1 &
+\text{if} N = 0 \end{cases} \]
+
+<!-- log_sum_exp -->
+<!-- real; log_sum_exp; (real[] x); -->
 
 `real` **`log_sum_exp`**(`real[] x`)
- The natural logarithm of the sum of the exponentials of the elements in x, or $-\infty$ if the array is empty.
+ The natural logarithm of the sum of the exponentials of the elements
+in x, or $-\infty$ if the array is empty.
 
 ### Sample Mean, Variance, and Standard Deviation
 
-The sample mean, variance, and standard deviation are calculated in the usual way.  For i.i.d. draws from a distribution of finite mean, the sample mean is an unbiased estimate of the mean of the distribution.  Similarly, for i.i.d. draws from a distribution of finite variance, the sample variance is an unbiased estimate of the variance.[^fnvar]  The sample deviation is defined as the square root of the sample deviation, but is not unbiased.
+The sample mean, variance, and standard deviation are calculated in
+the usual way.  For i.i.d. draws from a distribution of finite mean,
+the sample mean is an unbiased estimate of the mean of the
+distribution.  Similarly, for i.i.d. draws from a distribution of
+finite variance, the sample variance is an unbiased estimate of the
+variance.[^fnvar]  The sample deviation is defined as the square root
+of the sample deviation, but is not unbiased.
 
-[^fnvar]: Dividing by $N$ rather than $(N-1)$ produces a maximum   likelihood estimate of variance, which is biased to underestimate   variance.
+[^fnvar]: Dividing by $N$ rather than $(N-1)$ produces a maximum
+likelihood estimate of variance, which is biased to underestimate
+variance.
+
+<!-- mean -->
+<!-- real; mean; (real[] x); -->
 
 `real` **`mean`**(`real[] x`)
- The sample mean of the elements in x. For an array $x$ of size $N > 0$, \[ \text{mean}(x) \ = \ \bar{x} \ = \ \frac{1}{N} \sum_{n=1}^N x_n. \] It is an error to the call the mean function with an array of size $0$. 
+ The sample mean of the elements in x. For an array $x$ of size $N >
+0$, \[ \text{mean}(x) \ = \ \bar{x} \ = \ \frac{1}{N} \sum_{n=1}^N
+x_n. \] It is an error to the call the mean function with an array of
+size $0$.
+
+<!-- variance -->
+<!-- real; variance; (real[] x); -->
 
 `real` **`variance`**(`real[] x`)
- The sample variance of the elements in x. For $N > 0$, \[ \text{variance}(x) \ = \ \begin{cases} \frac{1}{N-1} \sum_{n=1}^N (x_n - \bar{x})^2 & \text{if } N > 1 \\[4pt] 0 & \text{if } N = 1 \end{cases} \] It is an error to call the `variance` function with an array of size 0. 
+ The sample variance of the elements in x. For $N > 0$, \[
+\text{variance}(x) \ = \ \begin{cases} \frac{1}{N-1} \sum_{n=1}^N (x_n
+- \bar{x})^2 & \text{if } N > 1 \\[4pt] 0 & \text{if } N = 1
+\end{cases} \] It is an error to call the `variance` function with an
+array of size 0.
+
+<!-- sd -->
+<!-- real; sd; (real[] x); -->
 
 `real` **`sd`**(`real[] x`)
-The sample standard deviation of elements in x. \[ \text{sd}(x) = \begin{cases} \sqrt{\, \text{variance}(x)} & \text{if } N > 1 \\[4pt] 0 & \text{if } N = 0 \end{cases} \] It is an error to call the `sd` function with an array of size 0. 
+The sample standard deviation of elements in x. \[ \text{sd}(x) =
+\begin{cases} \sqrt{\, \text{variance}(x)} & \text{if } N > 1 \\[4pt]
+0 & \text{if } N = 0 \end{cases} \] It is an error to call the `sd`
+function with an array of size 0.
 
 ### Euclidean Distance and Squared Distance
 
+<!-- distance -->
+<!-- real; distance; (vector x, vector y); -->
+
 `real` **`distance`**(`vector x, vector y`)
-The Euclidean distance between x and y, defined by \[ \text{distance}(x,y) \ = \ \sqrt{\textstyle \sum_{n=1}^N (x_n - y_n)^2} \] where `N` is the size of x and y. It is an error to call `distance` with arguments of unequal size.
+The Euclidean distance between x and y, defined by \[
+\text{distance}(x,y) \ = \ \sqrt{\textstyle \sum_{n=1}^N (x_n -
+y_n)^2} \] where `N` is the size of x and y. It is an error to call
+`distance` with arguments of unequal size.
+
+<!-- real; distance; (vector x, row_vector y); -->
 
 `real` **`distance`**(`vector x, row_vector y`)
 The Euclidean distance between x and y
 
+<!-- real; distance; (row_vector x, vector y); -->
+
 `real` **`distance`**(`row_vector x, vector y`)
 The Euclidean distance between x and y
+
+<!-- real; distance; (row_vector x, row_vector y); -->
 
 `real` **`distance`**(`row_vector x, row_vector y`)
 The Euclidean distance between x and y
 
+<!-- squared_distance -->
+<!-- real; squared_distance; (vector x, vector y); -->
+
 `real` **`squared_distance`**(`vector x, vector y`)
-The squared Euclidean distance between x and y, defined by \[ \text{squared_distance}(x,y) \ = \ \text{distance}(x,y)^2 \ = \ \textstyle \sum_{n=1}^N (x_n - y_n)^2, \] where `N` is the size of x and y. It is an error to call `squared_distance` with arguments of unequal size.
+The squared Euclidean distance between x and y, defined by \[
+\text{squared_distance}(x,y) \ = \ \text{distance}(x,y)^2 \ = \
+\textstyle \sum_{n=1}^N (x_n - y_n)^2, \] where `N` is the size of x
+and y. It is an error to call `squared_distance` with arguments of
+unequal size.
+
+<!-- real; squared_distance; (vector x, row_vector [] y); -->
 
 `real` **`squared_distance`**(`vector x, row_vector [] y`)
 The squared Euclidean distance between x and y
 
+<!-- real; squared_distance; (row_vector x, vector [] y); -->
+
 `real` **`squared_distance`**(`row_vector x, vector [] y`)
 The squared Euclidean distance between x and y
+
+<!-- real; squared_distance; (row_vector x, row_vector[] y); -->
 
 `real` **`squared_distance`**(`row_vector x, row_vector[] y`)
 The Euclidean distance between x and y
 
 ## Array Size and Dimension Function
 
-The size of an array or matrix can be obtained using the `dims()` function.  The `dims()` function is defined to take an argument consisting of any variable with up to 8 array dimensions (and up to 2 additional matrix dimensions) and returns an array of integers with the dimensions.  For example, if two variables are declared as follows,
+The size of an array or matrix can be obtained using the `dims()`
+function.  The `dims()` function is defined to take an argument
+consisting of any variable with up to 8 array dimensions (and up to 2
+additional matrix dimensions) and returns an array of integers with
+the dimensions.  For example, if two variables are declared as
+follows,
 
 ```
  real x[7,8,9];
  matrix[8,9] y[7];
  ```
 
-then calling `dims(x)` or `dims(y)` returns an integer array of size 3 containing the elements 7, 8, and 9 in that order.
+then calling `dims(x)` or `dims(y)` returns an integer array of size 3
+containing the elements 7, 8, and 9 in that order.
 
-The `size()` function extracts the number of elements in an array.  This is just the top-level elements, so if the array is declared as
+The `size()` function extracts the number of elements in an array.
+This is just the top-level elements, so if the array is declared as
 
 ```
  real a[M,N];
@@ -95,33 +184,68 @@ The `size()` function extracts the number of elements in an array.  This is just
 
 the size of `a` is `M`.
 
-The function `num_elements`, on the other hand, measures all of the elements, so that the array `a` above has $M \times N$ elements.
+The function `num_elements`, on the other hand, measures all of the
+elements, so that the array `a` above has $M \times N$ elements.
 
-The specialized functions `rows()` and `cols()` should be used to extract the dimensions of vectors and matrices.
+The specialized functions `rows()` and `cols()` should be used to
+extract the dimensions of vectors and matrices.
+
+<!-- dims -->
+<!-- int[]; dims; (T x); -->
 
 `int[]` **`dims`**(`T x`)
-Returns an integer array containing the dimensions of x; the type of the argument T can be any Stan type with up to 8 array dimensions.
+Returns an integer array containing the dimensions of x; the type of
+the argument T can be any Stan type with up to 8 array dimensions.
+
+<!-- num_elements -->
+<!-- int; num_elements; (T[] x); -->
 
 `int` **`num_elements`**(`T[] x`)
-Returns the total number of elements in the array x including all elements in contained arrays, vectors, and matrices. T can be any array type. For example, if `x` is of type `real[4,3]` then `num_elements(x)` is 12, and if `y` is declared as `matrix[3,4] y[5]`, then `size(y)` evaluates to 60.
+Returns the total number of elements in the array x including all
+elements in contained arrays, vectors, and matrices. T can be any
+array type. For example, if `x` is of type `real[4,3]` then
+`num_elements(x)` is 12, and if `y` is declared as `matrix[3,4] y[5]`,
+then `size(y)` evaluates to 60.
+
+<!-- size -->
+<!-- int; size; (T[] x); -->
 
 `int` **`size`**(`T[] x`)
-Returns the number of elements in the array x; the type of the array T can be any type, but the size is just the size of the top level array, not the total number of elements contained. For example, if `x` is of type `real[4,3]` then `size(x)` is 4.
+Returns the number of elements in the array x; the type of the array T
+can be any type, but the size is just the size of the top level array,
+not the total number of elements contained. For example, if `x` is of
+type `real[4,3]` then `size(x)` is 4.
 
 ## Array Broadcasting {#array-broadcasting}
 
-The following operations create arrays by repeating elements to fill an array of a specified size.  These operations work for all input types T, including reals, integers, vectors, row vectors, matrices, or arrays.
+The following operations create arrays by repeating elements to fill
+an array of a specified size.  These operations work for all input
+types T, including reals, integers, vectors, row vectors, matrices, or
+arrays.
+
+<!-- rep_array -->
+<!-- T[]; rep_array; (T x, int n); -->
 
 `T[]` **`rep_array`**(`T x, int n`)
 Return the n array with every entry assigned to x.
 
+<!-- T[,]; rep_array; (T x, int m, int n); -->
+
 `T[,]` **`rep_array`**(`T x, int m, int n`)
 Return the m by n array with every entry assigned to x.
+
+<!-- T[,,]; rep_array; (T x, int k, int m, int n); -->
 
 `T[,,]` **`rep_array`**(`T x, int k, int m, int n`)
 Return the k by m by n array with every entry assigned to x.
 
-For example, `rep_array(1.0,5)` produces a real array (type `real[]`) of size 5 with all values set to 1.0.  On the other hand, `rep_array(1,5)` produces an integer array (type `int[]`) of size 5 with all values set to 1.  This distinction is important because it is not possible to assign an integer array to a real array.  For example, the following example contrasts legal with illegal array creation and assignment
+For example, `rep_array(1.0,5)` produces a real array (type `real[]`)
+of size 5 with all values set to 1.0.  On the other hand,
+`rep_array(1,5)` produces an integer array (type `int[]`) of size 5
+with all values set to 1.  This distinction is important because it is
+not possible to assign an integer array to a real array.  For example,
+the following example contrasts legal with illegal array creation and
+assignment
 
 ```
  real y[5];
@@ -137,7 +261,9 @@ For example, `rep_array(1.0,5)` produces a real array (type `real[]`) of size 5 
  y = x;                  // illegal
  ```
 
-If the value being repeated `v` is a vector (i.e., `T` is `vector`), then `rep_array(v,27)` is a size 27 array consisting of 27 copies of the vector `v`.
+If the value being repeated `v` is a vector (i.e., `T` is `vector`),
+then `rep_array(v,27)` is a size 27 array consisting of 27 copies of
+the vector `v`.
 
 ```
  vector[5] v;
@@ -147,7 +273,10 @@ If the value being repeated `v` is a vector (i.e., `T` is `vector`), then `rep_a
  a[2,4] = 9.0;        // v[4], a[1,4], a[2,4] unchanged
  ```
 
-If the type T of x is itself an array type, then the result will be an array with one, two, or three added dimensions, depending on which of the `rep_array` functions is called.  For instance, consider the following legal code snippet.
+If the type T of x is itself an array type, then the result will be an
+array with one, two, or three added dimensions, depending on which of
+the `rep_array` functions is called.  For instance, consider the
+following legal code snippet.
 
 ```
  real a[5,6];
@@ -157,14 +286,23 @@ If the type T of x is itself an array type, then the result will be an array wit
  b[1,1,1,1] = 27.9;    //  a[1,1] unchanged
  ```
 
-After the assignment to `b`, the value for `b[j,k,m,n]` is equal to `a[m,n]` where it is defined, for `j` in `1:3`, `k` in `1:4`, `m` in `1:5`, and `n` in `1:6`.
+After the assignment to `b`, the value for `b[j,k,m,n]` is equal to
+`a[m,n]` where it is defined, for `j` in `1:3`, `k` in `1:4`, `m` in
+`1:5`, and `n` in `1:6`.
 
 ## Array Concatenation {#array-concatenation}
 
-`T` **`append_array`**(`T x, T y`)
- Return the concatenation of two arrays in the order of the arguments. T must be an N-dimensional array of any Stan type (with a maximum N of 7). All dimensions but the first must match. 
+<!-- append_array -->
+<!-- T; append_array; (T x, T y); -->
 
-For example, the following code appends two three dimensional arrays of matrices together. Note that all dimensions except the first match. Any mismatches will cause an error to be thrown.
+`T` **`append_array`**(`T x, T y`)
+ Return the concatenation of two arrays in the order of the arguments.
+T must be an N-dimensional array of any Stan type (with a maximum N of
+7). All dimensions but the first must match.
+
+For example, the following code appends two three dimensional arrays
+of matrices together. Note that all dimensions except the first match.
+Any mismatches will cause an error to be thrown.
 
 ```
  matrix[4, 6] x1[2, 1, 7];
@@ -176,34 +314,70 @@ For example, the following code appends two three dimensional arrays of matrices
 
 ## Sorting functions {#sorting-functions}
 
-Sorting can be used to sort values or the indices of those values in either ascending or descending order.  For example, if `v` is declared as a real array of size 3, with values \[ \text{v} = (1, -10.3, 20.987), \] then the various sort routines produce  \begin{eqnarray*} \text{sort_asc(v)} & = &  (-10.3,1,20.987) \\[4pt] \text{sort_desc(v)} & = &  (20.987,1,-10.3) \\[4pt] \text{sort_indices_asc(v)} & = &  (2,1,3) \\[4pt] \text{sort_indices_desc(v)} & = &  (3,1,2) \end{eqnarray*}
+Sorting can be used to sort values or the indices of those values in
+either ascending or descending order.  For example, if `v` is declared
+as a real array of size 3, with values \[ \text{v} = (1, -10.3,
+20.987), \] then the various sort routines produce  \begin{eqnarray*}
+\text{sort_asc(v)} & = &  (-10.3,1,20.987) \\[4pt] \text{sort_desc(v)}
+& = &  (20.987,1,-10.3) \\[4pt] \text{sort_indices_asc(v)} & = &
+(2,1,3) \\[4pt] \text{sort_indices_desc(v)} & = &  (3,1,2)
+\end{eqnarray*}
+
+<!-- sort_asc -->
+<!-- real[]; sort_asc; (real[] v); -->
 
 `real[]` **`sort_asc`**(`real[] v`)
  Sort the elements of v in ascending order
 
+<!-- int[]; sort_asc; (int[] v); -->
+
 `int[]` **`sort_asc`**(`int[] v`)
  Sort the elements of v in ascending order
+
+<!-- sort_desc -->
+<!-- real[]; sort_desc; (real[] v); -->
 
 `real[]` **`sort_desc`**(`real[] v`)
  Sort the elements of v in descending order
 
+<!-- int[]; sort_desc; (int[] v); -->
+
 `int[]` **`sort_desc`**(`int[] v`)
  Sort the elements of v in descending order
 
+<!-- sort_indices_asc -->
+<!-- int[]; sort_indices_asc; (real[] v); -->
+
 `int[]` **`sort_indices_asc`**(`real[] v`)
- Return an array of indices between 1 and the size of v, sorted to index v in ascending order.
+ Return an array of indices between 1 and the size of v, sorted to
+index v in ascending order.
+
+<!-- int[]; sort_indices_asc; (int[] v); -->
 
 `int[]` **`sort_indices_asc`**(`int[] v`)
- Return an array of indices between 1 and the size of v, sorted to index v in ascending order.
+ Return an array of indices between 1 and the size of v, sorted to
+index v in ascending order.
+
+<!-- sort_indices_desc -->
+<!-- int[]; sort_indices_desc; (real[] v); -->
 
 `int[]` **`sort_indices_desc`**(`real[] v`)
- Return an array of indices between 1 and the size of v, sorted to index v in descending order.
+ Return an array of indices between 1 and the size of v, sorted to
+index v in descending order.
+
+<!-- int[]; sort_indices_desc; (int[] v); -->
 
 `int[]` **`sort_indices_desc`**(`int[] v`)
- Return an array of indices between 1 and the size of v, sorted to index v in descending order.
+ Return an array of indices between 1 and the size of v, sorted to
+index v in descending order.
+
+<!-- rank -->
+<!-- int; rank; (real[] v, int s); -->
 
 `int` **`rank`**(`real[] v, int s`)
  Number of components of v less than v[s]
+
+<!-- int; rank; (int[] v, int s); -->
 
 `int` **`rank`**(`int[] v, int s`)
  Number of components of v less than v[s]

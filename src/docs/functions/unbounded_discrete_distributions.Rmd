@@ -1,155 +1,311 @@
 # Unbounded Discrete Distributions
 
-The unbounded discrete distributions have support over the natural numbers (i.e., the non-negative integers).
+The unbounded discrete distributions have support over the natural
+numbers (i.e., the non-negative integers).
 
 ## Negative Binomial Distribution
 
-For the negative binomial distribution Stan uses the parameterization described in \citet{GelmanEtAl:2013}.  For alternative parameterizations, see section \@ref(neg-binom-2-log).
+For the negative binomial distribution Stan uses the parameterization
+described in \citet{GelmanEtAl:2013}.  For alternative
+parameterizations, see section \@ref(neg-binom-2-log).
 
 ### Probability Mass Function
 
-If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y \in \mathbb{N}$, \[ \text{NegBinomial}(y|\alpha,\beta)  = \binom{y + \alpha - 1}{\alpha - 1} \, \left( \frac{\beta}{\beta+1} \right)^{\!\alpha} \, \left( \frac{1}{\beta + 1} \right)^{\!y} \!. \]
+If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y
+\in \mathbb{N}$, \[ \text{NegBinomial}(y~|~\alpha,\beta)  = \binom{y +
+\alpha - 1}{\alpha - 1} \, \left( \frac{\beta}{\beta+1}
+\right)^{\!\alpha} \, \left( \frac{1}{\beta + 1} \right)^{\!y} \!. \]
 
-The mean and variance of a random variable $y \sim \text{NegBinomial}(\alpha,\beta)$ are given by \[ \mathbb{E}[y] = \frac{\alpha}{\beta} \ \ \text{ and } \ \ \text{Var}[Y] = \frac{\alpha}{\beta^2} (\beta + 1). \]
+The mean and variance of a random variable $y \sim
+\text{NegBinomial}(\alpha,\beta)$ are given by \[ \mathbb{E}[y] =
+\frac{\alpha}{\beta} \ \ \text{ and } \ \ \text{Var}[Y] =
+\frac{\alpha}{\beta^2} (\beta + 1). \]
 
 \pitemdisc{n}{neg_binomial}{alpha, beta}
 
 ### Stan Functions
 
+<!-- neg_binomial -->
+<!-- real; neg_binomial_lpmf; (ints n | reals alpha, reals beta); -->
+
 `real` **`neg_binomial_lpmf`**(`ints n | reals alpha, reals beta`)
-The log negative binomial probability mass of n given shape alpha and inverse scale beta
+The log negative binomial probability mass of n given shape alpha and
+inverse scale beta
+
+<!-- real; neg_binomial_cdf; (ints n, reals alpha, reals beta); -->
 
 `real` **`neg_binomial_cdf`**(`ints n, reals alpha, reals beta`)
-The negative binomial cumulative distribution function of n given shape alpha and inverse scale beta
+The negative binomial cumulative distribution function of n given
+shape alpha and inverse scale beta
+
+<!-- real; neg_binomial_lcdf; (ints n | reals alpha, reals beta); -->
 
 `real` **`neg_binomial_lcdf`**(`ints n | reals alpha, reals beta`)
-The log of the negative binomial cumulative distribution function of n given shape alpha and inverse scale beta
+The log of the negative binomial cumulative distribution function of n
+given shape alpha and inverse scale beta
+
+<!-- real; neg_binomial_lccdf; (ints n | reals alpha, reals beta); -->
 
 `real` **`neg_binomial_lccdf`**(`ints n | reals alpha, reals beta`)
-The log of the negative binomial complementary cumulative distribution function of n given shape alpha and inverse scale beta
+The log of the negative binomial complementary cumulative distribution
+function of n given shape alpha and inverse scale beta
+
+<!-- R; neg_binomial_rng; (reals alpha, reals beta); -->
 
 `R` **`neg_binomial_rng`**(`reals alpha, reals beta`)
-Generate a negative binomial variate with shape alpha and inverse scale beta; may only be used in generated quantities block. alpha $/$ beta must be less than $2 ^ {29}$. For a description of argument and return types, see section \@ref(prob-vectorization).
+Generate a negative binomial variate with shape alpha and inverse
+scale beta; may only be used in generated quantities block. alpha $/$
+beta must be less than $2 ^ {29}$. For a description of argument and
+return types, see section \@ref(prob-vectorization).
 
 ## Negative Binomial Distribution (alternative parameterization) {#nbalt}
 
-Stan also provides an alternative parameterization of the negative binomial distribution directly using a mean (i.e., location) parameter and a parameter that controls overdispersion relative to the square of the mean.  Section \@ref(betafun), below, provides a second alternative parameterization directly in terms of the log mean.
+Stan also provides an alternative parameterization of the negative
+binomial distribution directly using a mean (i.e., location) parameter
+and a parameter that controls overdispersion relative to the square of
+the mean.  Section \@ref(betafun), below, provides a second
+alternative parameterization directly in terms of the log mean.
 
 ### Probability Mass Function
 
-The first parameterization is for $\mu \in \mathbb{R}^+$ and $\phi \in \mathbb{R}^+$, which for $y \in \mathbb{N}$ is defined as \[ \text{NegBinomial2}(y \, | \, \mu, \phi)  = \binom{y + \phi - 1}{y} \, \left( \frac{\mu}{\mu+\phi} \right)^{\!y} \, \left( \frac{\phi}{\mu+\phi} \right)^{\!\phi} \!. \]
+The first parameterization is for $\mu \in \mathbb{R}^+$ and $\phi \in
+\mathbb{R}^+$, which for $y \in \mathbb{N}$ is defined as \[
+\text{NegBinomial2}(y \, | \, \mu, \phi)  = \binom{y + \phi - 1}{y} \,
+\left( \frac{\mu}{\mu+\phi} \right)^{\!y} \, \left(
+\frac{\phi}{\mu+\phi} \right)^{\!\phi} \!. \]
 
-The mean and variance of a random variable $y \sim \text{NegBinomial2}(y|\mu,\phi)$ are \[ \mathbb{E}[Y] = \mu \ \ \ \text{ and } \ \ \ \text{Var}[Y] = \mu + \frac{\mu^2}{\phi}. \] Recall that $\text{Poisson}(\mu)$ has variance $\mu$, so $\mu^2 / \phi > 0$ is the additional variance of the negative binomial above that of the Poisson with mean $\mu$.  So the inverse of parameter $\phi$ controls the overdispersion, scaled by the square of the mean, $\mu^2$.
+The mean and variance of a random variable $y \sim
+\text{NegBinomial2}(y~|~\mu,\phi)$ are \[ \mathbb{E}[Y] = \mu \ \ \
+\text{ and } \ \ \ \text{Var}[Y] = \mu + \frac{\mu^2}{\phi}. \] Recall
+that $\text{Poisson}(\mu)$ has variance $\mu$, so $\mu^2 / \phi > 0$
+is the additional variance of the negative binomial above that of the
+Poisson with mean $\mu$.  So the inverse of parameter $\phi$ controls
+the overdispersion, scaled by the square of the mean, $\mu^2$.
 
 \pitemdisc{y}{neg_binomial_2}{mu, phi}
 
 ### Stan Functions
 
+<!-- neg_binomial_2 -->
+<!-- real; neg_binomial_2_lpmf; (ints y | reals mu, reals phi); -->
+
 `real` **`neg_binomial_2_lpmf`**(`ints y | reals mu, reals phi`)
-The negative binomial probability mass of n given location mu and precision phi.
+The negative binomial probability mass of n given location mu and
+precision phi.
+
+<!-- real; neg_binomial_2_cdf; (ints n, reals mu, reals phi); -->
 
 `real` **`neg_binomial_2_cdf`**(`ints n, reals mu, reals phi`)
-The negative binomial cumulative distribution function of n given location mu and precision phi.
+The negative binomial cumulative distribution function of n given
+location mu and precision phi.
+
+<!-- real; neg_binomial_2_lcdf; (ints n | reals mu, reals phi); -->
 
 `real` **`neg_binomial_2_lcdf`**(`ints n | reals mu, reals phi`)
-The log of the negative binomial cumulative distribution function of n given location mu and precision phi.
+The log of the negative binomial cumulative distribution function of n
+given location mu and precision phi.
+
+<!-- real; neg_binomial_2_lccdf; (ints n | reals mu, reals phi); -->
 
 `real` **`neg_binomial_2_lccdf`**(`ints n | reals mu, reals phi`)
-The log of the negative binomial complementary cumulative distribution function of n given location mu and precision phi.
+The log of the negative binomial complementary cumulative distribution
+function of n given location mu and precision phi.
+
+<!-- R; neg_binomial_2_rng; (reals mu, reals phi); -->
 
 `R` **`neg_binomial_2_rng`**(`reals mu, reals phi`)
- Generate a negative binomial variate with location mu and precision phi; may only be used in generated quantities block. mu must be less than $2 ^ {29}$. For a description of argument and return types, see section \@ref(prob-vectorization).
+ Generate a negative binomial variate with location mu and precision
+phi; may only be used in generated quantities block. mu must be less
+than $2 ^ {29}$. For a description of argument and return types, see
+section \@ref(prob-vectorization).
 
 ## Negative Binomial Distribution (log alternative parameterization) {#neg-binom-2-log}
 
-Related to the parameterization in section \@ref(nbalt), the following parameterization uses a log mean parameter $\eta = \log(\mu)$, defined for $\eta \in \mathbb{R}$, $\phi \in \mathbb{R}^+$, so that for $y \in \mathbb{N}$, \[ \text{NegBinomial2Log}(y \, | \, \eta, \phi) = \text{NegBinomial2}(y | \exp(\eta), \phi). \] This alternative may be used for sampling, as a function, and for random number generation, but as of yet, there are no CDFs implemented for it.
+Related to the parameterization in section \@ref(nbalt), the following
+parameterization uses a log mean parameter $\eta = \log(\mu)$, defined
+for $\eta \in \mathbb{R}$, $\phi \in \mathbb{R}^+$, so that for $y \in
+\mathbb{N}$, \[ \text{NegBinomial2Log}(y \, | \, \eta, \phi) =
+\text{NegBinomial2}(y | \exp(\eta), \phi). \] This alternative may be
+used for sampling, as a function, and for random number generation,
+but as of yet, there are no CDFs implemented for it.
 
 \pitemdisc{y}{neg_binomial_2_log}{eta, phi}
 
 ### Stan Functions
 
+<!-- neg_binomial_2_log -->
+<!-- real; neg_binomial_2_log_lpmf; (ints y | reals eta, reals phi); -->
+
 `real` **`neg_binomial_2_log_lpmf`**(`ints y | reals eta, reals phi`)
-The log negative binomial probability mass of n given log-location eta and inverse overdispersion control phi. This is especially useful for log-linear negative binomial regressions.
+The log negative binomial probability mass of n given log-location eta
+and inverse overdispersion control phi. This is especially useful for
+log-linear negative binomial regressions.
+
+<!-- R; neg_binomial_2_log_rng; (reals eta, reals phi); -->
 
 `R` **`neg_binomial_2_log_rng`**(`reals eta, reals phi`)
- Generate a negative binomial variate with log-location eta and inverse overdispersion control phi; may only be used in generated quantities block. eta must be less than $29 \log 2$. For a description of argument and return types, see section \@ref(prob-vectorization).
+ Generate a negative binomial variate with log-location eta and
+inverse overdispersion control phi; may only be used in generated
+quantities block. eta must be less than $29 \log 2$. For a description
+of argument and return types, see section \@ref(prob-vectorization).
 
 ## Negative-Binomial-2-Log Generalised Linear Model (Negative Binomial Regression) {#neg-binom-2-log-glm}
 
-Stan also supplies a single primitive for a Generalised Linear Model with negative binomial likelihood and log link function, i.e. a primitive for a negative binomial regression. This should provide a more efficient implementation of negative binomial regression than a manually written regression in terms of a negative binomial likelihood and matrix multiplication.
+Stan also supplies a single primitive for a Generalised Linear Model
+with negative binomial likelihood and log link function, i.e. a
+primitive for a negative binomial regression. This should provide a
+more efficient implementation of negative binomial regression than a
+manually written regression in terms of a negative binomial likelihood
+and matrix multiplication.
 
 ### Probability Mass Function
 
-If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in \mathbb{R}^m, \phi\in \mathbb{R}^+$, then for $y \in \mathbb{N}^n$, \[ \text{NegBinomial2LogGLM}(y|x, \alpha, \beta, \phi) = \prod_{1\leq i \leq n}\text{NegBinomial2}(y_i|\exp(\alpha_i + x_i\cdot \beta), \phi). \]
+If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
+\mathbb{R}^m, \phi\in \mathbb{R}^+$, then for $y \in \mathbb{N}^n$, \[
+\text{NegBinomial2LogGLM}(y~|~x, \alpha, \beta, \phi) = \prod_{1\leq i
+\leq n}\text{NegBinomial2}(y_i~|~\exp(\alpha_i + x_i\cdot \beta),
+\phi). \]
 
 \pitemdisc{y}{neg_binomial_2_log_glm}{x, alpha, beta, phi}
 
 ### Stan Functions
 
+<!-- neg_binomial_2_log_glm -->
+<!-- real; neg_binomial_2_log_glm_lpmf; (int[] y | matrix x, real alpha, vector beta, real phi); -->
+
 `real` **`neg_binomial_2_log_glm_lpmf`**(`int[] y | matrix x, real alpha, vector beta, real phi`)
-The log negative binomial probability mass of y given log-location `alpha+x*beta` and inverse overdispersion control `phi`, where a constant intercept `alpha` and `phi` is used for all observations. The number of rows of the independent variable matrix `x` needs to match the length of the dependent variable vector `y` and the number of columns of `x` needs to match the length of the weight vector `beta`.
+The log negative binomial probability mass of y given log-location
+`alpha+x*beta` and inverse overdispersion control `phi`, where a
+constant intercept `alpha` and `phi` is used for all observations. The
+number of rows of the independent variable matrix `x` needs to match
+the length of the dependent variable vector `y` and the number of
+columns of `x` needs to match the length of the weight vector `beta`.
+
+<!-- neg_binomial_2_log_glm -->
+<!-- real; neg_binomial_2_log_glm_lpmf; (int[] y | matrix x, vector alpha, vector beta, real phi); -->
 
 `real` **`neg_binomial_2_log_glm_lpmf`**(`int[] y | matrix x, vector alpha, vector beta, real phi`)
-The log negative binomial probability mass of y given log-location `alpha+x*beta` and inverse overdispersion control `phi`, where a constant `phi` is used for all observations and an intercept `alpha` is used that is allowed to vary with the different observations. The number of rows of the independent variable matrix `x` needs to match the length of the dependent variable vector `y` and `alpha` and the number of columns of `x` needs to match the length of the weight vector `beta`.
+The log negative binomial probability mass of y given log-location
+`alpha+x*beta` and inverse overdispersion control `phi`, where a
+constant `phi` is used for all observations and an intercept `alpha`
+is used that is allowed to vary with the different observations. The
+number of rows of the independent variable matrix `x` needs to match
+the length of the dependent variable vector `y` and `alpha` and the
+number of columns of `x` needs to match the length of the weight
+vector `beta`.
 
 ## Poisson Distribution {#poisson}
 
 ### Probability Mass Function
 
-If $\lambda \in \mathbb{R}^+$, then for $n \in \mathbb{N}$, \[ \text{Poisson}(n|\lambda) = \frac{1}{n!} \, \lambda^n \, \exp(-\lambda). \]
+If $\lambda \in \mathbb{R}^+$, then for $n \in \mathbb{N}$, \[
+\text{Poisson}(n|\lambda) = \frac{1}{n!} \, \lambda^n \,
+\exp(-\lambda). \]
 
 \pitemdisc{n}{poisson}{lambda}
 
 ### Stan Functions
 
+<!-- poisson -->
+<!-- real; poisson_lpmf; (ints n | reals lambda); -->
+
 `real` **`poisson_lpmf`**(`ints n | reals lambda`)
 The log Poisson probability mass of n given rate lambda
+
+<!-- real; poisson_cdf; (ints n, reals lambda); -->
 
 `real` **`poisson_cdf`**(`ints n, reals lambda`)
 The Poisson cumulative distribution function of n given rate lambda
 
+<!-- real; poisson_lcdf; (ints n | reals lambda); -->
+
 `real` **`poisson_lcdf`**(`ints n | reals lambda`)
-The log of the Poisson cumulative distribution function of n given rate lambda
+The log of the Poisson cumulative distribution function of n given
+rate lambda
+
+<!-- real; poisson_lccdf; (ints n | reals lambda); -->
 
 `real` **`poisson_lccdf`**(`ints n | reals lambda`)
-The log of the Poisson complementary cumulative distribution function of n given rate lambda
+The log of the Poisson complementary cumulative distribution function
+of n given rate lambda
+
+<!-- R; poisson_rng; (reals lambda); -->
 
 `R` **`poisson_rng`**(`reals lambda`)
-Generate a Poisson variate with rate lambda; may only be used in generated quantities block. lambda must be less than $2^{30}$. For a description of argument and return types, see section \@ref(prob-vectorization).
+Generate a Poisson variate with rate lambda; may only be used in
+generated quantities block. lambda must be less than $2^{30}$. For a
+description of argument and return types, see section
+\@ref(prob-vectorization).
 
 ## Poisson Distribution, Log Parameterization
 
-Stan also provides a parameterization of the Poisson using the log rate $\alpha = \log \lambda$ as a parameter.  This is useful for log-linear Poisson regressions so that the predictor does not need to be exponentiated and passed into the standard Poisson probability function.
+Stan also provides a parameterization of the Poisson using the log
+rate $\alpha = \log \lambda$ as a parameter.  This is useful for
+log-linear Poisson regressions so that the predictor does not need to
+be exponentiated and passed into the standard Poisson probability
+function.
 
 ### Probability Mass Function
 
-If $\alpha \in \mathbb{R}$, then for $n \in \mathbb{N}$, \[ \text{PoissonLog}(n|\alpha) = \frac{1}{n!} \, \exp \left(n\alpha - \exp(\alpha) \right). \]
+If $\alpha \in \mathbb{R}$, then for $n \in \mathbb{N}$, \[
+\text{PoissonLog}(n|\alpha) = \frac{1}{n!} \, \exp \left(n\alpha -
+\exp(\alpha) \right). \]
 
 \pitemdisc{n}{poisson_log}{alpha}
 
 ### Stan Functions
 
+<!-- poisson_log -->
+<!-- real; poisson_log_lpmf; (ints n | reals alpha); -->
+
 `real` **`poisson_log_lpmf`**(`ints n | reals alpha`)
 The log Poisson probability mass of n given log rate alpha
 
+<!-- R; poisson_log_rng; (reals alpha); -->
+
 `R` **`poisson_log_rng`**(`reals alpha`)
-Generate a Poisson variate with log rate alpha; may only be used in generated quantities block. alpha must be less than $30 \log 2$. For a description of argument and return types, see section \@ref(prob-vectorization).
+Generate a Poisson variate with log rate alpha; may only be used in
+generated quantities block. alpha must be less than $30 \log 2$. For a
+description of argument and return types, see section
+\@ref(prob-vectorization).
 
 ## Poisson-Log Generalised Linear Model (Poisson Regression) {#poisson-log-glm}
 
-Stan also supplies a single primitive for a Generalised Linear Model with poisson likelihood and log link function, i.e. a primitive for a poisson regression. This should provide a more efficient implementation of poisson regression than a manually written regression in terms of a poisson likelihood and matrix multiplication.
+Stan also supplies a single primitive for a Generalised Linear Model
+with poisson likelihood and log link function, i.e. a primitive for a
+poisson regression. This should provide a more efficient
+implementation of poisson regression than a manually written
+regression in terms of a poisson likelihood and matrix multiplication.
 
 ### Probability Mass Function
 
-If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in \mathbb{R}^m$, then for $y \in \mathbb{N}^n$, \[ \text{PoisonLogGLM}(y|x, \alpha, \beta) = \prod_{1\leq i \leq n}\text{Poisson}(y_i|\exp(\alpha_i + x_i\cdot \beta)). \]
+If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
+\mathbb{R}^m$, then for $y \in \mathbb{N}^n$, \[
+\text{PoisonLogGLM}(y|x, \alpha, \beta) = \prod_{1\leq i \leq
+n}\text{Poisson}(y_i|\exp(\alpha_i + x_i\cdot \beta)). \]
 
 \pitemdisc{y}{poisson_log_glm}{x, alpha, beta}
 
 ### Stan Functions
 
+<!-- poisson_log_glm -->
+<!-- real; poisson_log_glm_lpmf; (int[] y | matrix x, real alpha, vector beta); -->
+
 `real` **`poisson_log_glm_lpmf`**(`int[] y | matrix x, real alpha, vector beta`)
-The log poisson probability mass of y given log-rate `alpha+x*beta`, where a constant intercept `alpha` is used for all observations. The number of rows of the independent variable matrix `x` needs to match the length of the dependent variable vector `y` and the number of columns of `x` needs to match the length of the weight vector `beta`.
+The log poisson probability mass of y given log-rate `alpha+x*beta`,
+where a constant intercept `alpha` is used for all observations. The
+number of rows of the independent variable matrix `x` needs to match
+the length of the dependent variable vector `y` and the number of
+columns of `x` needs to match the length of the weight vector `beta`.
+
+<!-- poisson_log_glm -->
+<!-- real; poisson_log_glm_lpmf; (int[] y | matrix x, vector alpha, vector beta); -->
 
 `real` **`poisson_log_glm_lpmf`**(`int[] y | matrix x, vector alpha, vector beta`)
-The log poisson probability mass of y given log-rate `alpha+x*beta`, where an intercept `alpha` is used that is allowed to vary with the different observations. The number of rows of the independent variable matrix `x` needs to match the length of the dependent variable vector `y` and the number of columns of `x` needs to match the length of the weight vector `beta`.
+The log poisson probability mass of y given log-rate `alpha+x*beta`,
+where an intercept `alpha` is used that is allowed to vary with the
+different observations. The number of rows of the independent variable
+matrix `x` needs to match the length of the dependent variable vector
+`y` and the number of columns of `x` needs to match the length of the
+weight vector `beta`.
 

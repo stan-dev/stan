@@ -1398,7 +1398,7 @@ Binary probability distributions have support on $\{0,1\}$, where 1 represents t
 \subsection{Probability Mass Function}
 
 
-If $\theta \in [0,1]$, then for $y \in \{0,1\}$, \[ \text{Bernoulli}(y|\theta) = \left\{ \begin{array}{ll} \theta & \text{if } y = 1, \text{ and} \\ 1 - \theta & \text{if } y = 0. \end{array} \right. \] 
+If $\theta \in [0,1]$, then for $y \in \{0,1\}$, \[ \text{Bernoulli}(y~|~\theta) = \left\{ \begin{array}{ll} \theta & \text{if } y = 1, \text{ and} \\ 1 - \theta & \text{if } y = 0. \end{array} \right. \] 
 
 \pitemdisc{y}{bernoulli}{theta}
 
@@ -1424,7 +1424,7 @@ Stan also supplies a direct parameterization in terms of a logit-transformed cha
 \subsection{Probability Mass Function}
 
 
-If $\alpha \in \mathbb{R}$, then for $y \in \{0,1\}$, \[ \text{BernoulliLogit}(y|\alpha) = \text{Bernoulli}(y | \text{logit}^{-1}(\alpha)) = \left\{ \begin{array}{ll} \text{logit}^{-1}(\alpha) & \text{if } y = 1, \text{ and} \\ 1 - \text{logit}^{-1}(\alpha) &  \text{if } y = 0. \end{array} \right. \] 
+If $\alpha \in \mathbb{R}$, then for $y \in \{0,1\}$, \[ \text{BernoulliLogit}(y~|~\alpha) = \text{Bernoulli}(y | \text{logit}^{-1}(\alpha)) = \left\{ \begin{array}{ll} \text{logit}^{-1}(\alpha) & \text{if } y = 1, \text{ and} \\ 1 - \text{logit}^{-1}(\alpha) &  \text{if } y = 0. \end{array} \right. \] 
 
 \pitemdisc{y}{bernoulli_logit}{alpha}
 
@@ -1447,7 +1447,7 @@ Stan also supplies a single primitive for a Generalised Linear Model with Bernou
 \subsection{Probability Mass Function}
 
 
-If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in \mathbb{R}^m$, then for $y \in {\{0,1\}}^n$, \begin{align*} &\text{BernoulliLogitGLM}(y|x, \alpha, \beta) = \prod_{1\leq i \leq n}\text{Bernoulli}(y_i|\text{logit}^{-1}(\alpha_i + x_i\cdot \beta))\\ &= \prod_{1\leq i \leq n} \left\{ \begin{array}{ll} \text{logit}^{-1}(\alpha_i + \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) & \text{if } y_i = 1, \text{ and} \\ 1 - \text{logit}^{-1}(\alpha_i + \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) & \text{if } y_i = 0. \end{array} \right. \end{align*}
+If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in \mathbb{R}^m$, then for $y \in {\{0,1\}}^n$, \begin{align*} &\text{BernoulliLogitGLM}(y~|~x, \alpha, \beta) = \prod_{1\leq i \leq n}\text{Bernoulli}(y_i~|~\text{logit}^{-1}(\alpha_i + x_i\cdot \beta))\\ &= \prod_{1\leq i \leq n} \left\{ \begin{array}{ll} \text{logit}^{-1}(\alpha_i + \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) & \text{if } y_i = 1, \text{ and} \\ 1 - \text{logit}^{-1}(\alpha_i + \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) & \text{if } y_i = 0. \end{array} \right. \end{align*}
 
 
 \pitemdisc{y}{bernoulli_logit_glm}{x, alpha, beta}
@@ -1474,18 +1474,18 @@ Bounded discrete probability functions have support on $\{ 0, \ldots, N \}$ for 
 \subsection{Probability Mass Function}
 
 
-Suppose $N \in \mathbb{N}$ and $\theta \in [0,1]$, and $n \in \{0,\ldots,N\}$. \[ \text{Binomial}(n|N,\theta) = \binom{N}{n} \theta^n (1 - \theta)^{N - n}. \] 
+Suppose $N \in \mathbb{N}$ and $\theta \in [0,1]$, and $n \in \{0,\ldots,N\}$. \[ \text{Binomial}(n~|~N,\theta) = \binom{N}{n} \theta^n (1 - \theta)^{N - n}. \] 
 
 \subsection{Log Probability Mass Function}
 
 
-\begin{eqnarray*} \log \text{Binomial}(n|N,\theta) & = & \log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1) \\[4pt] & & { } + n \log \theta + (N - n) \log (1 - \theta), \end{eqnarray*}
+\begin{eqnarray*} \log \text{Binomial}(n~|~N,\theta) & = & \log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1) \\[4pt] & & { } + n \log \theta + (N - n) \log (1 - \theta), \end{eqnarray*}
 
 
 
 \subsection{Gradient of Log Probability Mass Function}
 
- \[ \frac{\partial}{\partial \theta} \log \text{Binomial}(n|N,\theta) = \frac{n}{\theta} - \frac{N - n}{1 - \theta} \] 
+ \[ \frac{\partial}{\partial \theta} \log \text{Binomial}(n~|~N,\theta) = \frac{n}{\theta} - \frac{N - n}{1 - \theta} \] 
 
 \pitemdisc{n}{binomial}{N, theta}
 
@@ -1508,17 +1508,17 @@ Stan also provides a version of the binomial probability mass function distribut
 \subsection{Probability Mass Function}
 
 
-Suppose $N \in \mathbb{N}$, $\alpha \in \mathbb{R}$, and $n \in \{0,\ldots,N\}$.  Then  \begin{eqnarray*} \text{BinomialLogit}(n|N,\alpha) & = & \text{Binomial}(n|N,\text{logit}^{-1}(\alpha)) \\[6pt] & = & \binom{N}{n} \left( \text{logit}^{-1}(\alpha) \right)^{n}  \left( 1 - \text{logit}^{-1}(\alpha) \right)^{N - n}.  \end{eqnarray*}
+Suppose $N \in \mathbb{N}$, $\alpha \in \mathbb{R}$, and $n \in \{0,\ldots,N\}$.  Then  \begin{eqnarray*} \text{BinomialLogit}(n~|~N,\alpha) & = & \text{Binomial}(n~|~N,\text{logit}^{-1}(\alpha)) \\[6pt] & = & \binom{N}{n} \left( \text{logit}^{-1}(\alpha) \right)^{n}  \left( 1 - \text{logit}^{-1}(\alpha) \right)^{N - n}.  \end{eqnarray*}
 
 
 \subsection{Log Probability Mass Function}
 
-\begin{eqnarray*} \log \text{BinomialLogit}(n|N,\alpha) & = & \log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1) \\[4pt]   & &  { } + n \log \text{logit}^{-1}(\alpha) + (N - n) \log \left( 1 -   \text{logit}^{-1}(\alpha) \right), \end{eqnarray*}
+\begin{eqnarray*} \log \text{BinomialLogit}(n~|~N,\alpha) & = & \log \Gamma(N+1) - \log \Gamma(n + 1) - \log \Gamma(N- n + 1) \\[4pt]   & &  { } + n \log \text{logit}^{-1}(\alpha) + (N - n) \log \left( 1 -   \text{logit}^{-1}(\alpha) \right), \end{eqnarray*}
 
 
 \subsection{Gradient of Log Probability Mass Function}
 
- \[ \frac{\partial}{\partial \alpha} \log \text{BinomialLogit}(n|N,\alpha) = \frac{n}{\text{logit}^{-1}(-\alpha)} - \frac{N - n}{\text{logit}^{-1}(\alpha)} \] 
+ \[ \frac{\partial}{\partial \alpha} \log \text{BinomialLogit}(n~|~N,\alpha) = \frac{n}{\text{logit}^{-1}(-\alpha)} - \frac{N - n}{\text{logit}^{-1}(\alpha)} \] 
 
 \pitemdisc{n}{binomial_logit}{N, alpha}
 
@@ -1535,7 +1535,7 @@ Suppose $N \in \mathbb{N}$, $\alpha \in \mathbb{R}$, and $n \in \{0,\ldots,N\}$.
 \subsection{Probability Mass Function}
 
 
-If $N \in \mathbb{N}$, $\alpha \in \mathbb{R}^+$, and $\beta \in \mathbb{R}^+$, then for $n \in {0,\ldots,N}$, \[ \text{BetaBinomial}(n|N,\alpha,\beta) = \binom{N}{n} \frac{\mathrm{B}(n+\alpha, N -n +   \beta)}{\mathrm{B}(\alpha,\beta)}, \] where the beta function $\mathrm{B}(u,v)$ is defined for $u \in \mathbb{R}^+$ and $v \in \mathbb{R}^+$ by \[ \mathrm{B}(u,v) = \frac{\Gamma(u) \ \Gamma(v)}{\Gamma(u + v)}. \] 
+If $N \in \mathbb{N}$, $\alpha \in \mathbb{R}^+$, and $\beta \in \mathbb{R}^+$, then for $n \in {0,\ldots,N}$, \[ \text{BetaBinomial}(n~|~N,\alpha,\beta) = \binom{N}{n} \frac{\mathrm{B}(n+\alpha, N -n +   \beta)}{\mathrm{B}(\alpha,\beta)}, \] where the beta function $\mathrm{B}(u,v)$ is defined for $u \in \mathbb{R}^+$ and $v \in \mathbb{R}^+$ by \[ \mathrm{B}(u,v) = \frac{\Gamma(u) \ \Gamma(v)}{\Gamma(u + v)}. \] 
 
 \pitemdisc{n}{beta_binomial}{N, alpha, beta}
 
@@ -1555,7 +1555,7 @@ If $N \in \mathbb{N}$, $\alpha \in \mathbb{R}^+$, and $\beta \in \mathbb{R}^+$, 
 \subsection{Probability Mass Function}
 
 
-If $a \in \mathbb{N}$, $b \in \mathbb{N}$, and $N \in \{0,\ldots,a+b\}$, then for $n \in \{\max(0,N-b),\ldots,\min(a,N)\}$, \[ \text{Hypergeometric}(n|N,a,b) = \frac{\normalsize{\binom{a}{n} \binom{b}{N - n}}}      {\normalsize{\binom{a + b}{N}}}. \] 
+If $a \in \mathbb{N}$, $b \in \mathbb{N}$, and $N \in \{0,\ldots,a+b\}$, then for $n \in \{\max(0,N-b),\ldots,\min(a,N)\}$, \[ \text{Hypergeometric}(n~|~N,a,b) = \frac{\normalsize{\binom{a}{n} \binom{b}{N - n}}}      {\normalsize{\binom{a + b}{N}}}. \] 
 
 \pitemdisc{n}{hypergeometric}{N, a, b}
 
@@ -1563,7 +1563,7 @@ If $a \in \mathbb{N}$, $b \in \mathbb{N}$, and $N \in \{0,\ldots,a+b\}$, then fo
 \subsection{Stan Functions}
 
 
-\begin{description}   \fitem{real}{hypergeometric_lpmf}{int \farg{n} | int \farg{N}, int     \farg{a}, int \farg{b}}{The log hypergeometric probability mass of     \farg{n} successes in \farg{N} trials given total success count of     \farg{a} and total failure count of \farg{b}} \end{description}
+\begin{description}   \fitem{real}{hypergeometric_lpmf}{int \farg{n} ~|~ int \farg{N}, int     \farg{a}, int \farg{b}}{The log hypergeometric probability mass of     \farg{n} successes in \farg{N} trials given total success count of     \farg{a} and total failure count of \farg{b}} \end{description}
 
 
 \begin{description} \fitem{int}{hypergeometric_rng}{int \farg{N}, int \farg{a}, int2    \farg{b}}{Generate a hypergeometric variate with \farg{N} trials, total     success count of \farg{a}, and total failure count of \farg{b}; may only     be used in generated quantities block} \end{description}
@@ -1575,7 +1575,7 @@ If $a \in \mathbb{N}$, $b \in \mathbb{N}$, and $N \in \{0,\ldots,a+b\}$, then fo
 \subsection{Probability Mass Functions}
 
 
-If $N \in \mathbb{N}$, $N > 0$, and if $\theta \in \mathbb{R}^N$ forms an $N$-simplex (i.e., has nonnegative entries summing to one), then for $y \in \{1,\ldots,N\}$, \[ \text{Categorical}(y|\theta) = \theta_y. \] In addition, Stan provides a log-odds scaled categorical distribution, \[ \text{CategoricalLogit}(y|\beta) = \text{Categorical}(y|\text{softmax}(\beta)). \] See section \@ref(softmax) for the definition of the softmax function.
+If $N \in \mathbb{N}$, $N > 0$, and if $\theta \in \mathbb{R}^N$ forms an $N$-simplex (i.e., has nonnegative entries summing to one), then for $y \in \{1,\ldots,N\}$, \[ \text{Categorical}(y~|~\theta) = \theta_y. \] In addition, Stan provides a log-odds scaled categorical distribution, \[ \text{CategoricalLogit}(y~|~\beta) = \text{Categorical}(y~|~\text{softmax}(\beta)). \] See section \@ref(softmax) for the definition of the softmax function.
 
 
 \pitemdisc{y}{categorical}{theta} \pitemdisc{y}{categorical_logit}{beta}
@@ -1602,7 +1602,7 @@ All of the categorical distributions are vectorized so that the outcome \farg{y}
 \subsection{Probability Mass Function}
 
 
-If $K \in \mathbb{N}$ with $K > 2$, $c \in \mathbb{R}^{K-1}$ such that $c_k < c_{k+1}$ for $k \in \{1,\ldots,K-2\}$, and $\eta \in \mathbb{R}$, then for $k \in \{1,\ldots,K\}$, \[ \text{OrderedLogistic}(k|\eta,c) = \left\{ \begin{array}{ll} 1 - \text{logit}^{-1}(\eta - c_1)  &  \text{if } k = 1, \\[4pt] \text{logit}^{-1}(\eta - c_{k-1}) - \text{logit}^{-1}(\eta - c_{k})  &  \text{if } 1 < k < K, \text{and} \\[4pt] \text{logit}^{-1}(\eta - c_{K-1}) - 0  &  \text{if } k = K. \end{array} \right. \] The $k=K$ case is written with the redundant subtraction of zero to illustrate the parallelism of the cases; the $k=1$ and $k=K$ edge cases can be subsumed into the general definition by setting $c_0 = -\infty$ and $c_K = +\infty$ with $\text{logit}^{-1}(-\infty) = 0$ and $\text{logit}^{-1}(\infty) = 1$.
+If $K \in \mathbb{N}$ with $K > 2$, $c \in \mathbb{R}^{K-1}$ such that $c_k < c_{k+1}$ for $k \in \{1,\ldots,K-2\}$, and $\eta \in \mathbb{R}$, then for $k \in \{1,\ldots,K\}$, \[ \text{OrderedLogistic}(k~|~\eta,c) = \left\{ \begin{array}{ll} 1 - \text{logit}^{-1}(\eta - c_1)  &  \text{if } k = 1, \\[4pt] \text{logit}^{-1}(\eta - c_{k-1}) - \text{logit}^{-1}(\eta - c_{k})  &  \text{if } 1 < k < K, \text{and} \\[4pt] \text{logit}^{-1}(\eta - c_{K-1}) - 0  &  \text{if } k = K. \end{array} \right. \] The $k=K$ case is written with the redundant subtraction of zero to illustrate the parallelism of the cases; the $k=1$ and $k=K$ edge cases can be subsumed into the general definition by setting $c_0 = -\infty$ and $c_K = +\infty$ with $\text{logit}^{-1}(-\infty) = 0$ and $\text{logit}^{-1}(\infty) = 1$.
 
 
 \pitemdisc{k}{ordered_logistic}{eta, c}
@@ -1620,7 +1620,7 @@ If $K \in \mathbb{N}$ with $K > 2$, $c \in \mathbb{R}^{K-1}$ such that $c_k < c_
 \subsection{Probability Mass Function}
 
 
-If $K \in \mathbb{N}$ with $K > 2$, $c \in \mathbb{R}^{K-1}$ such that $c_k < c_{k+1}$ for $k \in \{1,\ldots,K-2\}$, and $\eta \in \mathbb{R}$, then for $k \in \{1,\ldots,K\}$, \[ \text{OrderedProbit}(k|\eta,c) = \left\{ \begin{array}{ll} 1 - \Phi(\eta - c_1) & \text{if } k = 1, \\[4pt] \Phi(\eta - c_{k-1}) - \Phi(\eta - c_{k})  & \text{if } 1 < k < K, \text{and} \\[4pt] \Phi(\eta - c_{K-1}) - 0 & \text{if } k = K. \end{array} \right. \] The $k=K$ case is written with the redundant subtraction of zero to illustrate the parallelism of the cases; the $k=1$ and $k=K$ edge cases can be subsumed into the general definition by setting $c_0 = -\infty$ and $c_K = +\infty$ with $\Phi(-\infty) = 0$ and $\Phi(\infty) = 1$.
+If $K \in \mathbb{N}$ with $K > 2$, $c \in \mathbb{R}^{K-1}$ such that $c_k < c_{k+1}$ for $k \in \{1,\ldots,K-2\}$, and $\eta \in \mathbb{R}$, then for $k \in \{1,\ldots,K\}$, \[ \text{OrderedProbit}(k~|~\eta,c) = \left\{ \begin{array}{ll} 1 - \Phi(\eta - c_1) & \text{if } k = 1, \\[4pt] \Phi(\eta - c_{k-1}) - \Phi(\eta - c_{k})  & \text{if } 1 < k < K, \text{and} \\[4pt] \Phi(\eta - c_{K-1}) - 0 & \text{if } k = K. \end{array} \right. \] The $k=K$ case is written with the redundant subtraction of zero to illustrate the parallelism of the cases; the $k=1$ and $k=K$ edge cases can be subsumed into the general definition by setting $c_0 = -\infty$ and $c_K = +\infty$ with $\Phi(-\infty) = 0$ and $\Phi(\infty) = 1$.
 
 
 \pitemdisc{k}{ordered_probit}{eta, c}
@@ -1647,7 +1647,7 @@ For the negative binomial distribution Stan uses the parameterization described 
 \subsection{Probability Mass Function}
 
 
-If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y \in \mathbb{N}$, \[ \text{NegBinomial}(y|\alpha,\beta)  = \binom{y + \alpha - 1}{\alpha - 1} \, \left( \frac{\beta}{\beta+1} \right)^{\!\alpha} \, \left( \frac{1}{\beta + 1} \right)^{\!y} \!. \] 
+If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y \in \mathbb{N}$, \[ \text{NegBinomial}(y~|~\alpha,\beta)  = \binom{y + \alpha - 1}{\alpha - 1} \, \left( \frac{\beta}{\beta+1} \right)^{\!\alpha} \, \left( \frac{1}{\beta + 1} \right)^{\!y} \!. \] 
 
 The mean and variance of a random variable $y \sim \text{NegBinomial}(\alpha,\beta)$ are given by \[ \mathbb{E}[y] = \frac{\alpha}{\beta} \ \ \text{ and } \ \ \text{Var}[Y] = \frac{\alpha}{\beta^2} (\beta + 1). \] 
 
@@ -1671,7 +1671,7 @@ Stan also provides an alternative parameterization of the negative binomial dist
 
 The first parameterization is for $\mu \in \mathbb{R}^+$ and $\phi \in \mathbb{R}^+$, which for $y \in \mathbb{N}$ is defined as \[ \text{NegBinomial2}(y \, | \, \mu, \phi)  = \binom{y + \phi - 1}{y} \, \left( \frac{\mu}{\mu+\phi} \right)^{\!y} \, \left( \frac{\phi}{\mu+\phi} \right)^{\!\phi} \!. \] 
 
-The mean and variance of a random variable $y \sim \text{NegBinomial2}(y|\mu,\phi)$ are \[ \mathbb{E}[Y] = \mu \ \ \ \text{ and } \ \ \ \text{Var}[Y] = \mu + \frac{\mu^2}{\phi}. \] Recall that $\text{Poisson}(\mu)$ has variance $\mu$, so $\mu^2 / \phi > 0$ is the additional variance of the negative binomial above that of the Poisson with mean $\mu$.  So the inverse of parameter $\phi$ controls the overdispersion, scaled by the square of the mean, $\mu^2$.
+The mean and variance of a random variable $y \sim \text{NegBinomial2}(y~|~\mu,\phi)$ are \[ \mathbb{E}[Y] = \mu \ \ \ \text{ and } \ \ \ \text{Var}[Y] = \mu + \frac{\mu^2}{\phi}. \] Recall that $\text{Poisson}(\mu)$ has variance $\mu$, so $\mu^2 / \phi > 0$ is the additional variance of the negative binomial above that of the Poisson with mean $\mu$.  So the inverse of parameter $\phi$ controls the overdispersion, scaled by the square of the mean, $\mu^2$.
 
 
 \pitemdisc{y}{neg_binomial_2}{mu, phi}
@@ -1707,7 +1707,7 @@ Stan also supplies a single primitive for a Generalised Linear Model with negati
 \subsection{Probability Mass Function}
 
 
-If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in \mathbb{R}^m, \phi\in \mathbb{R}^+$, then for $y \in \mathbb{N}^n$, \[ \text{NegBinomial2LogGLM}(y|x, \alpha, \beta, \phi) = \prod_{1\leq i \leq n}\text{NegBinomial2}(y_i|\exp(\alpha_i + x_i\cdot \beta), \phi). \] 
+If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in \mathbb{R}^m, \phi\in \mathbb{R}^+$, then for $y \in \mathbb{N}^n$, \[ \text{NegBinomial2LogGLM}(y~|~x, \alpha, \beta, \phi) = \prod_{1\leq i \leq n}\text{NegBinomial2}(y_i~|~\exp(\alpha_i + x_i\cdot \beta), \phi). \] 
 
 \pitemdisc{y}{neg_binomial_2_log_glm}{x, alpha, beta, phi}
 
