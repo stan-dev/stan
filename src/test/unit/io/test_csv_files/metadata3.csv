@@ -21,7 +21,7 @@
 #       hmc
 #         engine = nuts (Default)
 #           nuts
-#             max_depth = 10 (Default)
+#             max_depth = 15
 #         metric = diag_e (Default)
 #         stepsize = 1 (Default)
 #         stepsize_jitter = 0 (Default)
