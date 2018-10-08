@@ -1,3 +1,0 @@
-is_html_output = function() {
-  FALSE
-}

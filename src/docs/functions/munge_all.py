@@ -3,8 +3,8 @@
 #  keeps track of chapter, section
 #  finds all function definitions (latex tag 'fitem')
 #  gets arguments, descriptions
-#  writes sections, chapters, Rmd files
-#  handles labels, xrefs
+#  writes each chapter as Rmd
+#  handles labels
 
 import os
 import os.path
@@ -14,28 +14,17 @@ import sys
 rstudioOut = "rstudio_listing.txt"
 rmdDir = "pages"
 texfile = "preproc_all.tex"
-labelsfile = "dict_xref_labels.txt"
-labels_dict = {}
 
 def main():
     if (not os.path.exists(rstudioOut)):
         fh1 = open(rstudioOut, 'w+')
         fh1.close()
-
-    read_xrefs(labelsfile)
         
     if not os.path.isfile(texfile):
         print("File {} does not exist. Exiting...".format(texfile))
         sys.exit()
     
-    chapterName = ""
-    chapterNum = 0
     chapterRmd = ""
-    sectionName = ""
-    sectionNum = 0
-    sectionRmd = ""
-    curFn = ""
-
     with open(texfile) as fp:
         for line in fp:
             line = line.strip()
@@ -44,34 +33,21 @@ def main():
             if (line.startswith("\\part")):
                 process_part(line)
             elif (line.startswith("\\chapter")):
-                chapterName = get_name(line.strip())
-                chapterNum += 1
+                chapterName = get_name(line)
+                chapterLabel = get_label(line)
                 sectionName = ""
-                sectionNum = 0
-                sectionRmd = ""
-                curFn = ""
-                chapterRmd = chapter_rmd_page(chapterName, chapterNum)
+                chapterRmd = chapter_rmd_page(chapterName, chapterLabel)
             elif (line.startswith("\\section")):
-                sectionName = get_name(line.strip())
-                sectionNum += 1
-                sectionRmd = section_rmd_page(sectionName, sectionNum, chapterName, chapterNum)
-                process_section(chapterNum, sectionNum, sectionName, chapterRmd)
-                curFn = ""
+                process_section(line, chapterRmd)
             elif(line.startswith("\\begin{description}")):
-                curFn = process_description(curFn, line, chapterName, sectionName, chapterNum, sectionNum)
+                process_description(line, chapterRmd)
             elif (line.startswith("\\sub")):
-                process_subsection(line, sectionRmd)
-                curFn = ""
+                process_subsection(line, chapterRmd)
             else:
-                if (len(sectionRmd) > 0):
-                    process_line(line, sectionRmd)
-                elif (len(chapterRmd) > 0):
-                    process_line(line, chapterRmd)
+                process_line(line, chapterRmd)
     fp.close()
 
-
-def process_description(curFn, line, chapterName, sectionName, chapterNum, sectionNum):
-    rmdPath = section_rmd_page(sectionName, sectionNum, chapterName, chapterNum)
+def process_description(line, rmdPath):
     line = remove_tags(line, "farg")
     line = remove_tags(line, "mbox")
     line = munge_code(line)
@@ -99,13 +75,7 @@ def process_description(curFn, line, chapterName, sectionName, chapterNum, secti
                 item = item[0 : endIdx]
             item = ' '.join(item.split())
             item_dict = process_item(item, numLines)
-            if (item_dict["name"] != curFn):
-                curFn = item_dict["name"]
-                fh = open(rmdPath, 'a')
-                fh.write("\n__%s__\n\n" % item_dict["name"])
-                fh.close()
             write_item(item_dict, rmdPath)
-    return curFn
     
 def process_item(item, numLines):
     curIdx = 0
@@ -129,8 +99,7 @@ def process_item(item, numLines):
     if (closeBrace < 0):
         print "ERROR parsing name: ", item
         return
-    fn_name = item[openBrace+1 : closeBrace]
-    item_name = clean(str.lower(fn_name).replace(" ","_"))
+    name = item[openBrace+1 : closeBrace]
 
     # get args
     argsAll = ""
@@ -158,23 +127,19 @@ def process_item(item, numLines):
     if (openBrace > 0 and closeBrace > 0):
         desc = item[openBrace+1 : closeBrace]
 
-    return {"name":item_name,
-            "fn_name":fn_name,
+    return {"name":name,
             "return_type":return_type,
             "args":argsAll,
             "description":desc}
 
-def process_section(one, two, name, rmdPath):
-    display_name = '.'.join([str(one), str(two)])
-    display_name = ' '.join([display_name, name])
-    page_name = clean(str.lower(name).replace(" ","-"))
-    page_name = page_name.replace("(","")
-    page_name = page_name.replace(")","")
-    page_name += ".html"
+def process_section(line, rmdPath):
+    sectionName = get_name(line)
+    label = get_label(line)
     fh = open(rmdPath, 'a')
-    fh.write("\n```{asis, echo=is_html_output()}\n")
-    fh.write("<a href=\"%s\"><b style=\"font-size: 110%%; color:#990017;\">%s</b></a>\n" % (page_name, display_name))
-    fh.write("```\n\n")
+    fh.write("## %s" % sectionName)
+    if (len(label) > 0):
+        fh.write(" {#%s}" % label)
+    fh.write("\n\n")
     fh.close()
 
 def process_subsection(line, rmdPath):
@@ -183,12 +148,13 @@ def process_subsection(line, rmdPath):
     tag = line[0:start]
     ct = tag.count("sub") + 2
     name = line[start+1:end]
+    label = get_label(line)
     fh = open(rmdPath, 'a')
-    fh.write("\n")
-    fh.write(line)
-    fh.write("\n```{asis, echo=is_html_output()}\n")
-    fh.write("<i style=\"font-size: 110%%; color:#800013;\"> %s</i>\n" % name)
-    fh.write("```\n\n")
+    fh.write('#' * ct)
+    fh.write(" %s" % name)
+    if (len(label) > 0):
+        fh.write(" {#%s}" % label)
+    fh.write("\n\n")
     fh.close()
 
 def process_line(line, curPage):
@@ -217,41 +183,38 @@ def process_part(line):
         fh.close()
     print rmdPath
     
-def chapter_rmd_page(chapterName, chapterNum):
-    rmdFile = ''.join(["chp_", str(chapterNum), ".Rmd"])
+def chapter_rmd_page(chapterName, label):
+    filename = str.lower(chapterName).replace(" ","_")
+    filename = filename.replace("(","")
+    filename = filename.replace(")","")
+    filename = filename.replace(",","")
+    rmdFile = ''.join([filename, ".Rmd"])
     if (not os.path.exists(rmdDir)):
         os.makedirs(rmdDir)
     rmdPath = os.path.join(rmdDir, rmdFile)
     if (not os.path.exists(rmdPath)):
         fh = open(rmdPath, 'w+')
-        fh.write("# %s\n\n" % chapterName)
-        fh.close()
-        print rmdPath
-    return rmdPath
-
-def section_rmd_page(sectionName, sectionNum, chapterName, chapterNum):
-    section = str.lower(sectionName).replace(" ","_")
-    section = section.replace("(","")
-    section = section.replace(")","")
-    section = section.replace(",","")
-    rmdFile = ''.join(["sec_", str(chapterNum), "_", str(sectionNum), "_", section, ".Rmd"])
-    if (not os.path.exists(rmdDir)):
-        os.makedirs(rmdDir)
-    rmdPath = os.path.join(rmdDir, rmdFile)
-    if (not os.path.exists(rmdPath)):
-        fh = open(rmdPath, 'w+')
-        fh.write("## %s\n\n" % sectionName)
+        fh.write("# %s" % chapterName)
+        if (len(label) > 0):
+            fh.write(" {#%s}" % label)
+        fh.write("\n\n")
         fh.close()
         print rmdPath
     return rmdPath
 
 def write_item(item_dict, rmdPath):
     fh = open(rstudioOut, 'a')
-    fh.write("`%s`; `%s`; (`%s`); %s\n" % (item_dict["return_type"], item_dict["fn_name"], item_dict["args"], item_dict["description"]))
+    if (len(item_dict["args"]) == 0):
+        fh.write("`%s`; `%s`; (); %s\n" % (item_dict["return_type"], item_dict["name"], item_dict["description"]))
+    else:
+        fh.write("`%s`; `%s`; (`%s`); %s\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"], item_dict["description"]))
     fh.write("\n")
     fh.close()
     fh = open(rmdPath, 'a')
-    fh.write("`%s` __`%s`__(`%s`)  \n%s\n" % (item_dict["return_type"], item_dict["fn_name"], item_dict["args"], item_dict["description"]))
+    if (len(item_dict["args"]) == 0):
+        fh.write("`%s` **`%s`**()\n%s\n" % (item_dict["return_type"], item_dict["name"], item_dict["description"]))
+    else:
+        fh.write("`%s` **`%s`**(`%s`)\n%s\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"], item_dict["description"]))
     fh.write("\n")
     fh.close()
 
@@ -314,6 +277,14 @@ def get_name(line):
     name = p.search(line).group()
     return name[1 : len(name)]
 
+def get_label(line):
+    start = str.find(line, "\label{")
+    if (start < 0):
+        return ""
+    end = str.find(line, ".", start)
+    return line[start+7 : end]
+
+
 def clean(name):
     if (name.endswith("_cdf")):
         return name[0:(len(name)-4)]
@@ -352,19 +323,6 @@ def clean(name):
     name = name.replace("\\","_left_div")
     return name
 
-def read_xrefs(labelsfile):
-    if not os.path.isfile(labelsfile):
-        print("File {} does not exist. Exiting...".format(labelsfile))
-        sys.exit()
-    with open(labelsfile, 'r') as fp:
-        for line in fp:
-            line = line.strip()
-            if (len(line) == 0):
-                continue
-            items = line.split(":")
-            key, values = items[0].strip(), items[1].strip()
-            labels_dict[key] = values
-    fp.close()
 
 if __name__ == '__main__':  
     main()

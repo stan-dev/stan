@@ -1,0 +1,97 @@
+# Mixed Operations {#mixed-operations}
+
+These functions perform conversions between Stan containers matrix, vector, row vector and arrays.
+
+`matrix` **`to_matrix`**(`matrix m`)
+ Return the matrix m itself.
+
+`matrix` **`to_matrix`**(`vector v`)
+ Convert the column vector v to a `size(v)` by 1 matrix.
+
+`matrix` **`to_matrix`**(`row_vector v`)
+ Convert the row vector v to a 1 by `size(v)` matrix.
+
+`matrix` **`to_matrix`**(`matrix m, int m, int n`)
+ Convert a matrix m to a matrix with m rows and n columns filled in column-major order. 
+
+`matrix` **`to_matrix`**(`vector v, int m, int n`)
+ Convert a vector v to a matrix with m rows and n columns filled in column-major order. 
+
+`matrix` **`to_matrix`**(`row_vector v, int m, int n`)
+ Convert a row_vector a to a matrix with m rows and n columns filled in column-major order. 
+
+`matrix` **`to_matrix`**(`matrix m, int m, int n, int col_major`)
+ Convert a matrix m to a matrix with m rows and n columns filled in row-major order if col_major equals 0 (otherwise, they get filled in column-major order). 
+
+`matrix` **`to_matrix`**(`vector v, int m, int n, int col_major`)
+ Convert a vector v to a matrix with m rows and n columns filled in row-major order if col_major equals 0 (otherwise, they get filled in column-major order). 
+
+`matrix` **`to_matrix`**(`row_vector v, int m, int n, int col_major`)
+ Convert a row_vector a to a matrix with m rows and n columns filled in row-major order if col_major equals 0 (otherwise, they get filled in column-major order). 
+
+`matrix` **`to_matrix`**(`real[] a, int m, int n`)
+ Convert a one-dimensional array a to a matrix with m rows and n columns filled in column-major order. 
+
+`matrix` **`to_matrix`**(`int[] a, int m, int n`)
+ Convert a one-dimensional array a to a matrix with m rows and n columns filled in column-major order. 
+
+`matrix` **`to_matrix`**(`real[] a, int m, int n, int col_major`)
+ Convert a one-dimensional array a to a matrix with m rows and n columns filled in row-major order if col_major equals 0 (otherwise, they get filled in column-major order). 
+
+`matrix` **`to_matrix`**(`int[] a, int m, int n, int col_major`)
+ Convert a one-dimensional array a to a matrix with m rows and n columns filled in row-major order if col_major equals 0 (otherwise, they get filled in column-major order). 
+
+`matrix` **`to_matrix`**(`real[,] a`)
+ Convert the two dimensional array a to a matrix with the same dimensions and indexing order.
+
+`matrix` **`to_matrix`**(`int[,] a`)
+ Convert the two dimensional array a to a matrix with the same dimensions and indexing order. If any of the dimensions of a are zero, the result will be a $0 \times 0$ matrix.
+
+`vector` **`to_vector`**(`matrix m`)
+ Convert the matrix m to a column vector in column-major order.
+
+`vector` **`to_vector`**(`vector v`)
+ Return the column vector v itself.
+
+`vector` **`to_vector`**(`row_vector v`)
+ Convert the row vector v to a column vector.
+
+`vector` **`to_vector`**(`real[] a`)
+ Convert the one-dimensional array a to a column vector.
+
+`vector` **`to_vector`**(`int[] a`)
+ Convert the one-dimensional integer array a to a column vector.
+
+`row_vector` **`to_row_vector`**(`matrix m`)
+ Convert the matrix m to a row vector in column-major order.
+
+`row_vector` **`to_row_vector`**(`vector v`)
+ Convert the column vector v to a row vector.
+
+`row_vector` **`to_row_vector`**(`row_vector v`)
+ Return the row vector v itself.
+
+`row_vector` **`to_row_vector`**(`real[] a`)
+ Convert the one-dimensional array a to a row vector.
+
+`row_vector` **`to_row_vector`**(`int[] a`)
+ Convert the one-dimensional array a to a row vector.
+
+`real[,]` **`to_array_2d`**(`matrix m`)
+ Convert the matrix m to a two dimensional array with the same dimensions and indexing order.
+
+`real[]` **`to_array_1d`**(`vector v`)
+ Convert the column vector v to a one-dimensional array.
+
+`real[]` **`to_array_1d`**(`row_vector v`)
+ Convert the row vector v to a one-dimensional array.
+
+`real[]` **`to_array_1d`**(`matrix m`)
+ Convert the matrix m to a one-dimensional array in column-major order.
+
+`real[]` **`to_array_1d`**(`real[...] a`)
+ Convert the array a (of any dimension up to 10) to a one-dimensional array in row-major order.
+
+`int[]` **`to_array_1d`**(`int[...] a`)
+ Convert the array a (of any dimension up to 10) to a one-dimensional array in row-major order.
+

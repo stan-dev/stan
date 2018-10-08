@@ -1,0 +1,141 @@
+# Compound Arithmetic and Assignment
+
+Compound arithmetic and assignment statements combine an arithmetic operation and assignment,
+
+```
+ x = x op y;
+ ```
+
+replacing them with the compound form
+
+```
+ x op= y;
+ ```
+
+For example, `x = x + 1` may be replaced with `x += 1`.
+
+The signatures of the supported compound arithmetic and assignment operations are as follows.
+
+## Compound Addition and Assignment
+
+`void` **`operator+=`**(`int x, int y`)
+`x += y` is equivalent to `x = x + y`.
+
+`void` **`operator+=`**(`real x, real y`)
+`x += y` is equivalent to `x = x + y`.
+
+`void` **`operator+=`**(`vector x, real y`)
+`x += y` is equivalent to `x = x + y`.
+
+`void` **`operator+=`**(`row_vector x, real y`)
+`x += y` is equivalent to `x = x + y`.
+
+`void` **`operator+=`**(`matrix x, real y`)
+`x += y` is equivalent to `x = x + y`.
+
+`void` **`operator+=`**(`vector x, vector y`)
+`x += y` is equivalent to `x = x + y`.
+
+`void` **`operator+=`**(`row_vector x, row_vector y`)
+`x += y` is equivalent to `x = x + y`.
+
+`void` **`operator+=`**(`matrix x, matrix y`)
+`x += y` is equivalent to `x = x + y`.
+
+## Compound Subtraction and Assignment
+
+`void` **`operator-=`**(`int x, int y`)
+`x -= y` is equivalent to `x = x - y`.
+
+`void` **`operator-=`**(`real x, real y`)
+`x -= y` is equivalent to `x = x - y`.
+
+`void` **`operator-=`**(`vector x, real y`)
+`x -= y` is equivalent to `x = x - y`.
+
+`void` **`operator-=`**(`row_vector x, real y`)
+`x -= y` is equivalent to `x = x - y`.
+
+`void` **`operator-=`**(`matrix x, real y`)
+`x -= y` is equivalent to `x = x - y`.
+
+`void` **`operator-=`**(`vector x, vector y`)
+`x -= y` is equivalent to `x = x - y`.
+
+`void` **`operator-=`**(`row_vector x, row_vector y`)
+`x -= y` is equivalent to `x = x - y`.
+
+`void` **`operator-=`**(`matrix x, matrix y`)
+`x -= y` is equivalent to `x = x - y`.
+
+## Compound Multiplication and Assignment
+
+`void` **`operator*=`**(`int x, int y`)
+`x *= y` is equivalent to `x = x * y`.
+
+`void` **`operator*=`**(`real x, real y`)
+`x *= y` is equivalent to `x = x * y`.
+
+`void` **`operator*=`**(`vector x, real y`)
+`x *= y` is equivalent to `x = x * y`.
+
+`void` **`operator*=`**(`row_vector x, real y`)
+`x *= y` is equivalent to `x = x * y`.
+
+`void` **`operator*=`**(`matrix x, real y`)
+`x *= y` is equivalent to `x = x * y`.
+
+`void` **`operator*=`**(`row_vector x, matrix y`)
+`x *= y` is equivalent to `x = x * y`.
+
+`void` **`operator*=`**(`matrix x, matrix y`)
+`x *= y` is equivalent to `x = x * y`.
+
+## Compound Division and Assignment
+
+`void` **`operator/=`**(`int x, int y`)
+`x /= y` is equivalent to `x = x / y`.
+
+`void` **`operator/=`**(`real x, real y`)
+`x /= y` is equivalent to `x = x / y`.
+
+`void` **`operator/=`**(`vector x, real y`)
+`x /= y` is equivalent to `x = x / y`.
+
+`void` **`operator/=`**(`row_vector x, real y`)
+`x /= y` is equivalent to `x = x / y`.
+
+`void` **`operator/=`**(`matrix x, real y`)
+`x /= y` is equivalent to `x = x / y`.
+
+## Compound Elementwise Multiplication and Assignment
+
+`void` **`operator.*=`**(`vector x, vector y`)
+`x .*= y` is equivalent to `x = x .* y`.
+
+`void` **`operator.*=`**(`row_vector x, row_vector y`)
+`x .*= y` is equivalent to `x = x .* y`.
+
+`void` **`operator.*=`**(`matrix x, matrix y`)
+`x .*= y` is equivalent to `x = x .* y`.
+
+## Compound Elementwise Division and Assignment
+
+`void` **`operator./=`**(`vector x, vector y`)
+`x ./= y` is equivalent to `x = x ./ y`.
+
+`void` **`operator./=`**(`row_vector x, row_vector y`)
+`x ./= y` is equivalent to `x = x ./ y`.
+
+`void` **`operator./=`**(`matrix x, matrix y`)
+`x ./= y` is equivalent to `x = x ./ y`.
+
+`void` **`operator./=`**(`vector x, real y`)
+`x ./= y` is equivalent to `x = x ./ y`.
+
+`void` **`operator./=`**(`row_vector x, real y`)
+`x ./= y` is equivalent to `x = x ./ y`.
+
+`void` **`operator./=`**(`matrix x, real y`)
+`x ./= y` is equivalent to `x = x ./ y`.
+
