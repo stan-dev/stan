@@ -18,16 +18,25 @@ is 0 and the log probability is $-\infty$.  Similarly, the
 distribution requires strictly positive parameters, $\alpha, \beta >
 0$.
 
+#### Sampling Statement
+
+`theta` ~ __`beta`__(`alpha, beta`)
+
+Increment target log probability density with `beta_lpdf( theta | alpha, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries beta}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- beta -->
 <!-- real; beta_lpdf; (reals theta | reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!(reals theta | reals alpha, reals beta): real|hyperpage}
 
 `real` **`beta_lpdf`**(`reals theta | reals alpha, reals beta`)
 The log of the beta density of `theta` in $[0,1]$ given positive prior
 successes (plus one) alpha and prior failures (plus one) beta
 
 <!-- real; beta_cdf; (reals theta, reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!(reals theta, reals alpha, reals beta): real|hyperpage}
 
 `real` **`beta_cdf`**(`reals theta, reals alpha, reals beta`)
 The beta cumulative distribution function of `theta` in $[0,1]$ given
@@ -35,6 +44,7 @@ positive prior successes (plus one) alpha and prior failures (plus
 one) beta
 
 <!-- real; beta_lcdf; (reals theta | reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!(reals theta | reals alpha, reals beta): real|hyperpage}
 
 `real` **`beta_lcdf`**(`reals theta | reals alpha, reals beta`)
 The log of the beta cumulative distribution function of `theta` in
@@ -42,14 +52,15 @@ $[0,1]$ given positive prior successes (plus one) alpha and prior
 failures (plus one) beta
 
 <!-- real; beta_lccdf; (reals theta | reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!(reals theta | reals alpha, reals beta): real|hyperpage}
 
 `real` **`beta_lccdf`**(`reals theta | reals alpha, reals beta`)
 The log of the beta complementary cumulative distribution function of
 `theta` in $[0,1]$ given positive prior successes (plus one) alpha and
 prior failures (plus one) beta
 
-<!-- beta -->
 <!-- R; beta_rng; (reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!(reals alpha, reals beta): R|hyperpage}
 
 `R` **`beta_rng`**(`reals alpha, reals beta`)
 Generate a beta variate with positive prior successes (plus one) alpha
@@ -73,29 +84,39 @@ is 0 and the log probability is $-\infty$.  Similarly, the
 distribution requires $\mu \in (0, 1)$ and strictly positive
 parameter, $\kappa > 0$.
 
+#### Sampling Statement
+
+`theta` ~ __`beta_proportion`__(`mu, kappa`)
+
+Increment target log probability density with `beta_proportion_lpdf( theta | mu, kappa)`
+dropping constant additive terms.
+\index{{\tt \bfseries beta\_proportion}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- beta_proportion -->
 <!-- real; beta_proportion_lpdf; (reals theta | reals mu, reals kappa); -->
+\index{{\tt \bfseries beta\_proportion}!(reals theta | reals mu, reals kappa): real|hyperpage}
 
 `real` **`beta_proportion_lpdf`**(`reals theta | reals mu, reals kappa`)
 The log of the beta_proportion density of `theta` in $(0,1)$ given
 mean mu and precision kappa
 
 <!-- real; beta_proportion_lcdf; (reals theta | reals mu, reals kappa); -->
+\index{{\tt \bfseries beta\_proportion}!(reals theta | reals mu, reals kappa): real|hyperpage}
 
 `real` **`beta_proportion_lcdf`**(`reals theta | reals mu, reals kappa`)
 The log of the beta_proportion cumulative distribution function of
 `theta` in $(0,1)$ given mean mu and precision kappa
 
 <!-- real; beta_proportion_lccdf; (reals theta | reals mu, reals kappa); -->
+\index{{\tt \bfseries beta\_proportion}!(reals theta | reals mu, reals kappa): real|hyperpage}
 
 `real` **`beta_proportion_lccdf`**(`reals theta | reals mu, reals kappa`)
 The log of the beta_proportion complementary cumulative distribution
 function of `theta` in $(0,1)$ given mean mu and precision kappa
 
-<!-- beta_proportion -->
 <!-- R; beta_proportion_rng; (reals mu, reals kappa); -->
+\index{{\tt \bfseries beta\_proportion}!(reals mu, reals kappa): R|hyperpage}
 
 `R` **`beta_proportion_rng`**(`reals mu, reals kappa`)
 Generate a beta_proportion variate with mean mu and precision kappa;

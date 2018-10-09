@@ -3,7 +3,7 @@ bookdown::gitbook:
   css: stan-manual.css
   split_by: "section"
   config:
-    search: no
+    search: yes
     sharing: null
     download: null
     edit: null
@@ -25,3 +25,7 @@ bookdown::pdf_book:
   latex_engine: "pdflatex"
   includes:
     in_header: header.tex
+    after_body: postamble.tex
+
+
+

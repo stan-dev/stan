@@ -18,18 +18,26 @@ is the matrix trace function, and $\Gamma_K()$ is the multivariate
 Gamma function, \[ \Gamma_K(x) = \frac{1}{\pi^{K(K-1)/4}} \
 \prod_{k=1}^K \Gamma \left( x + \frac{1 - k}{2} \right) \!. \]
 
+#### Sampling Statement
+
+`W` ~ __`wishart`__(`nu, Sigma`)
+
+Increment target log probability density with `wishart_lpdf( W | nu, Sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries wishart}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- wishart -->
 <!-- real; wishart_lpdf; (matrix W | real nu, matrix Sigma); -->
+\index{{\tt \bfseries wishart}!(matrix W | real nu, matrix Sigma): real|hyperpage}
 
 `real` **`wishart_lpdf`**(`matrix W | real nu, matrix Sigma`)
 The log of the Wishart density for symmetric and positive-definite
 matrix W given degrees of freedom nu and symmetric and
 positive-definite scale matrix Sigma
 
-<!-- wishart -->
 <!-- matrix; wishart_rng; (real nu, matrix Sigma); -->
+\index{{\tt \bfseries wishart}!(real nu, matrix Sigma): matrix|hyperpage}
 
 `matrix` **`wishart_rng`**(`real nu, matrix Sigma`)
 Generate a Wishart variate with degrees of freedom nu and symmetric
@@ -48,18 +56,26 @@ for symmetric and positive-definite $W \in \mathbb{R}^{K \times K}$,
 \right|^{\nu/2} \ \left| W \right|^{-(\nu + K + 1)/2} \ \exp \! \left(
 - \frac{1}{2} \ \text{tr}(SW^{-1}) \right) \! . \]
 
+#### Sampling Statement
+
+`W` ~ __`inv_wishart`__(`nu, Sigma`)
+
+Increment target log probability density with `inv_wishart_lpdf( W | nu, Sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries inv\_wishart}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- inv_wishart -->
 <!-- real; inv_wishart_lpdf; (matrix W | real nu, matrix Sigma); -->
+\index{{\tt \bfseries inv\_wishart}!(matrix W | real nu, matrix Sigma): real|hyperpage}
 
 `real` **`inv_wishart_lpdf`**(`matrix W | real nu, matrix Sigma`)
 The log of the inverse Wishart density for symmetric and
 positive-definite matrix W given degrees of freedom nu and symmetric
 and positive-definite scale matrix Sigma
 
-<!-- inv_wishart -->
 <!-- matrix; inv_wishart_rng; (real nu, matrix Sigma); -->
+\index{{\tt \bfseries inv\_wishart}!(real nu, matrix Sigma): matrix|hyperpage}
 
 `matrix` **`inv_wishart_rng`**(`real nu, matrix Sigma`)
 Generate an inverse Wishart variate with degrees of freedom nu and

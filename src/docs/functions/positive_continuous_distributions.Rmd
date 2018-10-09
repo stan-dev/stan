@@ -12,35 +12,46 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 \pi} \ \sigma} \, \frac{1}{y} \ \exp \! \left(        - \, \frac{1}{2}
 \, \left( \frac{\log y - \mu}{\sigma} \right)^2      \right) . \]
 
+#### Sampling Statement
+
+`y` ~ __`lognormal`__(`mu, sigma`)
+
+Increment target log probability density with `lognormal_lpdf( y | mu, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries lognormal}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- lognormal -->
 <!-- real; lognormal_lpdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries lognormal}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`lognormal_lpdf`**(`reals y | reals mu, reals sigma`)
 The log of the lognormal density of y given location mu and scale
 sigma
 
 <!-- real; lognormal_cdf; (reals y, reals mu, reals sigma); -->
+\index{{\tt \bfseries lognormal}!(reals y, reals mu, reals sigma): real|hyperpage}
 
 `real` **`lognormal_cdf`**(`reals y, reals mu, reals sigma`)
 The cumulative lognormal distribution function of y given location mu
 and scale sigma
 
 <!-- real; lognormal_lcdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries lognormal}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`lognormal_lcdf`**(`reals y | reals mu, reals sigma`)
 The log of the lognormal cumulative distribution function of y given
 location mu and scale sigma
 
 <!-- real; lognormal_lccdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries lognormal}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`lognormal_lccdf`**(`reals y | reals mu, reals sigma`)
 The log of the lognormal complementary cumulative distribution
 function of y given location mu and scale sigma
 
-<!-- lognormal -->
 <!-- R; lognormal_rng; (reals mu, reals beta); -->
+\index{{\tt \bfseries lognormal}!(reals mu, reals beta): R|hyperpage}
 
 `R` **`lognormal_rng`**(`reals mu, reals beta`)
 Generate a lognormal variate with location mu and scale sigma; may
@@ -55,34 +66,45 @@ If $\nu \in \mathbb{R}^+$, then for $y \in \mathbb{R}^+$, \[
 \text{ChiSquare}(y|\nu) = \frac{2^{-\nu/2}}     {\Gamma(\nu / 2)} \,
 y^{\nu/2 - 1} \, \exp \! \left( -\, \frac{1}{2} \, y \right) . \]
 
+#### Sampling Statement
+
+`y` ~ __`chi_square`__(`nu`)
+
+Increment target log probability density with `chi_square_lpdf( y | nu)`
+dropping constant additive terms.
+\index{{\tt \bfseries chi\_square}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- chi_square -->
 <!-- real; chi_square_lpdf; (reals y | reals nu); -->
+\index{{\tt \bfseries chi\_square}!(reals y | reals nu): real|hyperpage}
 
 `real` **`chi_square_lpdf`**(`reals y | reals nu`)
 The log of the Chi-square density of y given degrees of freedom nu
 
 <!-- real; chi_square_cdf; (reals y, reals nu); -->
+\index{{\tt \bfseries chi\_square}!(reals y, reals nu): real|hyperpage}
 
 `real` **`chi_square_cdf`**(`reals y, reals nu`)
 The Chi-square cumulative distribution function of y given degrees of
 freedom nu
 
 <!-- real; chi_square_lcdf; (reals y | reals nu); -->
+\index{{\tt \bfseries chi\_square}!(reals y | reals nu): real|hyperpage}
 
 `real` **`chi_square_lcdf`**(`reals y | reals nu`)
 The log of the Chi-square cumulative distribution function of y given
 degrees of freedom nu
 
 <!-- real; chi_square_lccdf; (reals y | reals nu); -->
+\index{{\tt \bfseries chi\_square}!(reals y | reals nu): real|hyperpage}
 
 `real` **`chi_square_lccdf`**(`reals y | reals nu`)
 The log of the complementary Chi-square cumulative distribution
 function of y given degrees of freedom nu
 
-<!-- chi_square -->
 <!-- R; chi_square_rng; (reals nu); -->
+\index{{\tt \bfseries chi\_square}!(reals nu): R|hyperpage}
 
 `R` **`chi_square_rng`**(`reals nu`)
 Generate a Chi-square variate with degrees of freedom nu; may only be
@@ -98,35 +120,46 @@ If $\nu \in \mathbb{R}^+$, then for $y \in \mathbb{R}^+$, \[
 / 2)} \, y^{-\nu/2 - 1} \, \exp\! \left( \! - \, \frac{1}{2} \,
 \frac{1}{y} \right) . \]
 
+#### Sampling Statement
+
+`y` ~ __`inv_chi_square`__(`nu`)
+
+Increment target log probability density with `inv_chi_square_lpdf( y | nu)`
+dropping constant additive terms.
+\index{{\tt \bfseries inv\_chi\_square}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- inv_chi_square -->
 <!-- real; inv_chi_square_lpdf; (reals y | reals nu); -->
+\index{{\tt \bfseries inv\_chi\_square}!(reals y | reals nu): real|hyperpage}
 
 `real` **`inv_chi_square_lpdf`**(`reals y | reals nu`)
 The log of the inverse Chi-square density of y given degrees of
 freedom nu
 
 <!-- real; inv_chi_square_cdf; (reals y, reals nu); -->
+\index{{\tt \bfseries inv\_chi\_square}!(reals y, reals nu): real|hyperpage}
 
 `real` **`inv_chi_square_cdf`**(`reals y, reals nu`)
 The inverse Chi-squared cumulative distribution function of y given
 degrees of freedom nu
 
 <!-- real; inv_chi_square_lcdf; (reals y | reals nu); -->
+\index{{\tt \bfseries inv\_chi\_square}!(reals y | reals nu): real|hyperpage}
 
 `real` **`inv_chi_square_lcdf`**(`reals y | reals nu`)
 The log of the inverse Chi-squared cumulative distribution function of
 y given degrees of freedom nu
 
 <!-- real; inv_chi_square_lccdf; (reals y | reals nu); -->
+\index{{\tt \bfseries inv\_chi\_square}!(reals y | reals nu): real|hyperpage}
 
 `real` **`inv_chi_square_lccdf`**(`reals y | reals nu`)
 The log of the inverse Chi-squared complementary cumulative
 distribution function of y given degrees of freedom nu
 
-<!-- inv_chi_square -->
 <!-- R; inv_chi_square_rng; (reals nu); -->
+\index{{\tt \bfseries inv\_chi\_square}!(reals nu): R|hyperpage}
 
 `R` **`inv_chi_square_rng`**(`reals nu`)
 Generate an inverse Chi-squared variate with degrees of freedom nu;
@@ -143,36 +176,46 @@ If $\nu \in \mathbb{R}^+$ and $\sigma \in \mathbb{R}^+$, then for $y
 y^{-(\nu/2 + 1)} \, \exp \! \left( \!    - \, \frac{1}{2} \, \nu \,
 \sigma^2 \, \frac{1}{y} \right) . \]
 
+#### Sampling Statement
+
+`y` ~ __`scaled_inv_chi_square`__(`nu, sigma`)
+
+Increment target log probability density with `scaled_inv_chi_square_lpdf( y | nu, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries scaled\_inv\_chi\_square}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- scaled_inv_chi_square -->
 <!-- real; scaled_inv_chi_square_lpdf; (reals y | reals nu, reals sigma); -->
+\index{{\tt \bfseries scaled\_inv\_chi\_square}!(reals y | reals nu, reals sigma): real|hyperpage}
 
 `real` **`scaled_inv_chi_square_lpdf`**(`reals y | reals nu, reals sigma`)
 The log of the scaled inverse Chi-square density of y given degrees of
 freedom nu and scale sigma
 
-<!-- scaled_inv_chi_square -->
 <!-- real; scaled_inv_chi_square_cdf; (reals y, reals nu, reals sigma); -->
+\index{{\tt \bfseries scaled\_inv\_chi\_square}!(reals y, reals nu, reals sigma): real|hyperpage}
 
 `real` **`scaled_inv_chi_square_cdf`**(`reals y, reals nu, reals sigma`)
 The scaled inverse Chi-square cumulative distribution function of y
 given degrees of freedom nu and scale sigma
 
 <!-- real; scaled_inv_chi_square_lcdf; (reals y | reals nu, reals sigma); -->
+\index{{\tt \bfseries scaled\_inv\_chi\_square}!(reals y | reals nu, reals sigma): real|hyperpage}
 
 `real` **`scaled_inv_chi_square_lcdf`**(`reals y | reals nu, reals sigma`)
 The log of the scaled inverse Chi-square cumulative distribution
 function of y given degrees of freedom nu and scale sigma
 
 <!-- real; scaled_inv_chi_square_lccdf; (reals y | reals nu, reals sigma); -->
+\index{{\tt \bfseries scaled\_inv\_chi\_square}!(reals y | reals nu, reals sigma): real|hyperpage}
 
 `real` **`scaled_inv_chi_square_lccdf`**(`reals y | reals nu, reals sigma`)
 The log of the scaled inverse Chi-square complementary cumulative
 distribution function of y given degrees of freedom nu and scale sigma
 
-<!-- scaled_inv_chi_square -->
 <!-- R; scaled_inv_chi_square_rng; (reals nu, reals sigma); -->
+\index{{\tt \bfseries scaled\_inv\_chi\_square}!(reals nu, reals sigma): R|hyperpage}
 
 `R` **`scaled_inv_chi_square_rng`**(`reals nu, reals sigma`)
 Generate a scaled inverse Chi-squared variate with degrees of freedom
@@ -187,34 +230,45 @@ For a description of argument and return types, see section
 If $\beta \in \mathbb{R}^+$, then for $y \in \mathbb{R}^+$, \[
 \text{Exponential}(y|\beta) = \beta \, \exp ( - \beta \, y ) . \]
 
+#### Sampling Statement
+
+`y` ~ __`exponential`__(`beta`)
+
+Increment target log probability density with `exponential_lpdf( y | beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries exponential}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- exponential -->
 <!-- real; exponential_lpdf; (reals y | reals beta); -->
+\index{{\tt \bfseries exponential}!(reals y | reals beta): real|hyperpage}
 
 `real` **`exponential_lpdf`**(`reals y | reals beta`)
 The log of the exponential density of y given inverse scale beta
 
 <!-- real; exponential_cdf; (reals y, reals beta); -->
+\index{{\tt \bfseries exponential}!(reals y, reals beta): real|hyperpage}
 
 `real` **`exponential_cdf`**(`reals y, reals beta`)
 The exponential cumulative distribution function of y given inverse
 scale beta
 
 <!-- real; exponential_lcdf; (reals y | reals beta); -->
+\index{{\tt \bfseries exponential}!(reals y | reals beta): real|hyperpage}
 
 `real` **`exponential_lcdf`**(`reals y | reals beta`)
 The log of the exponential cumulative distribution function of y given
 inverse scale beta
 
 <!-- real; exponential_lccdf; (reals y | reals beta); -->
+\index{{\tt \bfseries exponential}!(reals y | reals beta): real|hyperpage}
 
 `real` **`exponential_lccdf`**(`reals y | reals beta`)
 The log of the exponential complementary cumulative distribution
 function of y given inverse scale beta
 
-<!-- exponential -->
 <!-- R; exponential_rng; (reals beta); -->
+\index{{\tt \bfseries exponential}!(reals beta): R|hyperpage}
 
 `R` **`exponential_rng`**(`reals beta`)
 Generate an exponential variate with inverse scale beta; may only be
@@ -230,35 +284,46 @@ If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y
 \frac{\beta^{\alpha}}      {\Gamma(\alpha)} \, y^{\alpha - 1}
 \exp(-\beta \, y) . \]
 
+#### Sampling Statement
+
+`y` ~ __`gamma`__(`alpha, beta`)
+
+Increment target log probability density with `gamma_lpdf( y | alpha, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries gamma}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- gamma -->
 <!-- real; gamma_lpdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries gamma}!(reals y | reals alpha, reals beta): real|hyperpage}
 
 `real` **`gamma_lpdf`**(`reals y | reals alpha, reals beta`)
 The log of the gamma density of y given shape alpha and inverse scale
 beta
 
 <!-- real; gamma_cdf; (reals y, reals alpha, reals beta); -->
+\index{{\tt \bfseries gamma}!(reals y, reals alpha, reals beta): real|hyperpage}
 
 `real` **`gamma_cdf`**(`reals y, reals alpha, reals beta`)
 The cumulative gamma distribution function of y given shape alpha and
 inverse scale beta
 
 <!-- real; gamma_lcdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries gamma}!(reals y | reals alpha, reals beta): real|hyperpage}
 
 `real` **`gamma_lcdf`**(`reals y | reals alpha, reals beta`)
 The log of the cumulative gamma distribution function of y given shape
 alpha and inverse scale beta
 
 <!-- real; gamma_lccdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries gamma}!(reals y | reals alpha, reals beta): real|hyperpage}
 
 `real` **`gamma_lccdf`**(`reals y | reals alpha, reals beta`)
 The log of the complementary cumulative gamma distribution function of
 y given shape alpha and inverse scale beta
 
-<!-- gamma -->
 <!-- R; gamma_rng; (reals alpha, reals beta); -->
+\index{{\tt \bfseries gamma}!(reals alpha, reals beta): R|hyperpage}
 
 `R` **`gamma_rng`**(`reals alpha, reals beta`)
 Generate a gamma variate with shape alpha and inverse scale beta; may
@@ -274,35 +339,46 @@ If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y
 \frac{\beta^{\alpha}}      {\Gamma(\alpha)} \ y^{-(\alpha + 1)} \,
 \exp \! \left( \! - \beta \, \frac{1}{y} \right) . \]
 
+#### Sampling Statement
+
+`y` ~ __`inv_gamma`__(`alpha, beta`)
+
+Increment target log probability density with `inv_gamma_lpdf( y | alpha, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries inv\_gamma}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- inv_gamma -->
 <!-- real; inv_gamma_lpdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries inv\_gamma}!(reals y | reals alpha, reals beta): real|hyperpage}
 
 `real` **`inv_gamma_lpdf`**(`reals y | reals alpha, reals beta`)
 The log of the inverse gamma density of y given shape alpha and scale
 beta
 
 <!-- real; inv_gamma_cdf; (reals y, reals alpha, reals beta); -->
+\index{{\tt \bfseries inv\_gamma}!(reals y, reals alpha, reals beta): real|hyperpage}
 
 `real` **`inv_gamma_cdf`**(`reals y, reals alpha, reals beta`)
 The inverse gamma cumulative distribution function of y given shape
 alpha and scale beta
 
 <!-- real; inv_gamma_lcdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries inv\_gamma}!(reals y | reals alpha, reals beta): real|hyperpage}
 
 `real` **`inv_gamma_lcdf`**(`reals y | reals alpha, reals beta`)
 The log of the inverse gamma cumulative distribution function of y
 given shape alpha and scale beta
 
 <!-- real; inv_gamma_lccdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries inv\_gamma}!(reals y | reals alpha, reals beta): real|hyperpage}
 
 `real` **`inv_gamma_lccdf`**(`reals y | reals alpha, reals beta`)
 The log of the inverse gamma complementary cumulative distribution
 function of y given shape alpha and scale beta
 
-<!-- inv_gamma -->
 <!-- R; inv_gamma_rng; (reals alpha, reals beta); -->
+\index{{\tt \bfseries inv\_gamma}!(reals alpha, reals beta): R|hyperpage}
 
 `R` **`inv_gamma_rng`**(`reals alpha, reals beta`)
 Generate an inverse gamma variate with shape alpha and scale beta; may
@@ -322,34 +398,45 @@ $y \in [0,\infty)$, \[ \text{Weibull}(y|\alpha,\sigma) =
 Note that if $Y \propto \text{Weibull}(\alpha,\sigma)$, then $Y^{-1}
 \propto \text{Frechet}(\alpha,\sigma^{-1})$.
 
+#### Sampling Statement
+
+`y` ~ __`weibull`__(`alpha, sigma`)
+
+Increment target log probability density with `weibull_lpdf( y | alpha, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries weibull}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- weibull -->
 <!-- real; weibull_lpdf; (reals y | reals alpha, reals sigma); -->
+\index{{\tt \bfseries weibull}!(reals y | reals alpha, reals sigma): real|hyperpage}
 
 `real` **`weibull_lpdf`**(`reals y | reals alpha, reals sigma`)
 The log of the Weibull density of y given shape alpha and scale sigma
 
 <!-- real; weibull_cdf; (reals y, reals alpha, reals sigma); -->
+\index{{\tt \bfseries weibull}!(reals y, reals alpha, reals sigma): real|hyperpage}
 
 `real` **`weibull_cdf`**(`reals y, reals alpha, reals sigma`)
 The Weibull cumulative distribution function of y given shape alpha
 and scale sigma
 
 <!-- real; weibull_lcdf; (reals y | reals alpha, reals sigma); -->
+\index{{\tt \bfseries weibull}!(reals y | reals alpha, reals sigma): real|hyperpage}
 
 `real` **`weibull_lcdf`**(`reals y | reals alpha, reals sigma`)
 The log of the Weibull cumulative distribution function of y given
 shape alpha and scale sigma
 
 <!-- real; weibull_lccdf; (reals y | reals alpha, reals sigma); -->
+\index{{\tt \bfseries weibull}!(reals y | reals alpha, reals sigma): real|hyperpage}
 
 `real` **`weibull_lccdf`**(`reals y | reals alpha, reals sigma`)
 The log of the Weibull complementary cumulative distribution function
 of y given shape alpha and scale sigma
 
-<!-- weibull -->
 <!-- R; weibull_rng; (reals alpha, reals sigma); -->
+\index{{\tt \bfseries weibull}!(reals alpha, reals sigma): R|hyperpage}
 
 `R` **`weibull_rng`**(`reals alpha, reals sigma`)
 Generate a weibull variate with shape alpha and scale sigma; may only
@@ -369,34 +456,45 @@ $y \in \mathbb{R}^+$, \[ \text{Frechet}(y|\alpha,\sigma) =
 Note that if $Y \propto \text{Frechet}(\alpha,\sigma)$, then $Y^{-1}
 \propto \text{Weibull}(\alpha,\sigma^{-1})$.
 
+#### Sampling Statement
+
+`y` ~ __`frechet`__(`alpha, sigma`)
+
+Increment target log probability density with `frechet_lpdf( y | alpha, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries frechet}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- frechet -->
 <!-- real; frechet_lpdf; (reals y | reals alpha, reals sigma); -->
+\index{{\tt \bfseries frechet}!(reals y | reals alpha, reals sigma): real|hyperpage}
 
 `real` **`frechet_lpdf`**(`reals y | reals alpha, reals sigma`)
 The log of the Frechet density of y given shape alpha and scale sigma
 
 <!-- real; frechet_cdf; (reals y, reals alpha, reals sigma); -->
+\index{{\tt \bfseries frechet}!(reals y, reals alpha, reals sigma): real|hyperpage}
 
 `real` **`frechet_cdf`**(`reals y, reals alpha, reals sigma`)
 The Frechet cumulative distribution function of y given shape alpha
 and scale sigma
 
 <!-- real; frechet_lcdf; (reals y | reals alpha, reals sigma); -->
+\index{{\tt \bfseries frechet}!(reals y | reals alpha, reals sigma): real|hyperpage}
 
 `real` **`frechet_lcdf`**(`reals y | reals alpha, reals sigma`)
 The log of the Frechet cumulative distribution function of y given
 shape alpha and scale sigma
 
 <!-- real; frechet_lccdf; (reals y | reals alpha, reals sigma); -->
+\index{{\tt \bfseries frechet}!(reals y | reals alpha, reals sigma): real|hyperpage}
 
 `real` **`frechet_lccdf`**(`reals y | reals alpha, reals sigma`)
 The log of the Frechet complementary cumulative distribution function
 of y given shape alpha and scale sigma
 
-<!-- frechet -->
 <!-- R; frechet_rng; (reals alpha, reals sigma); -->
+\index{{\tt \bfseries frechet}!(reals alpha, reals sigma): R|hyperpage}
 
 `R` **`frechet_rng`**(`reals alpha, reals sigma`)
 Generate an Frechet variate with shape alpha and scale sigma; may only

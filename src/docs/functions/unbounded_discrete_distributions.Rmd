@@ -21,34 +21,46 @@ The mean and variance of a random variable $y \sim
 \frac{\alpha}{\beta} \ \ \text{ and } \ \ \text{Var}[Y] =
 \frac{\alpha}{\beta^2} (\beta + 1). \]
 
+#### Sampling Statement
+
+`n` ~ __`neg_binomial`__(`alpha, beta`)
+
+Increment target log probability density with `neg_binomial_lpmf( n | alpha, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries neg\_binomial}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- neg_binomial -->
 <!-- real; neg_binomial_lpmf; (ints n | reals alpha, reals beta); -->
+\index{{\tt \bfseries neg\_binomial}!(ints n | reals alpha, reals beta): real|hyperpage}
 
 `real` **`neg_binomial_lpmf`**(`ints n | reals alpha, reals beta`)
 The log negative binomial probability mass of n given shape alpha and
 inverse scale beta
 
 <!-- real; neg_binomial_cdf; (ints n, reals alpha, reals beta); -->
+\index{{\tt \bfseries neg\_binomial}!(ints n, reals alpha, reals beta): real|hyperpage}
 
 `real` **`neg_binomial_cdf`**(`ints n, reals alpha, reals beta`)
 The negative binomial cumulative distribution function of n given
 shape alpha and inverse scale beta
 
 <!-- real; neg_binomial_lcdf; (ints n | reals alpha, reals beta); -->
+\index{{\tt \bfseries neg\_binomial}!(ints n | reals alpha, reals beta): real|hyperpage}
 
 `real` **`neg_binomial_lcdf`**(`ints n | reals alpha, reals beta`)
 The log of the negative binomial cumulative distribution function of n
 given shape alpha and inverse scale beta
 
 <!-- real; neg_binomial_lccdf; (ints n | reals alpha, reals beta); -->
+\index{{\tt \bfseries neg\_binomial}!(ints n | reals alpha, reals beta): real|hyperpage}
 
 `real` **`neg_binomial_lccdf`**(`ints n | reals alpha, reals beta`)
 The log of the negative binomial complementary cumulative distribution
 function of n given shape alpha and inverse scale beta
 
 <!-- R; neg_binomial_rng; (reals alpha, reals beta); -->
+\index{{\tt \bfseries neg\_binomial}!(reals alpha, reals beta): R|hyperpage}
 
 `R` **`neg_binomial_rng`**(`reals alpha, reals beta`)
 Generate a negative binomial variate with shape alpha and inverse
@@ -80,34 +92,46 @@ is the additional variance of the negative binomial above that of the
 Poisson with mean $\mu$.  So the inverse of parameter $\phi$ controls
 the overdispersion, scaled by the square of the mean, $\mu^2$.
 
+#### Sampling Statement
+
+`y` ~ __`neg_binomial_2`__(`mu, phi`)
+
+Increment target log probability density with `neg_binomial_2_lpmf( y | mu, phi)`
+dropping constant additive terms.
+\index{{\tt \bfseries neg\_binomial\_2}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- neg_binomial_2 -->
 <!-- real; neg_binomial_2_lpmf; (ints y | reals mu, reals phi); -->
+\index{{\tt \bfseries neg\_binomial\_2}!(ints y | reals mu, reals phi): real|hyperpage}
 
 `real` **`neg_binomial_2_lpmf`**(`ints y | reals mu, reals phi`)
 The negative binomial probability mass of n given location mu and
 precision phi.
 
 <!-- real; neg_binomial_2_cdf; (ints n, reals mu, reals phi); -->
+\index{{\tt \bfseries neg\_binomial\_2}!(ints n, reals mu, reals phi): real|hyperpage}
 
 `real` **`neg_binomial_2_cdf`**(`ints n, reals mu, reals phi`)
 The negative binomial cumulative distribution function of n given
 location mu and precision phi.
 
 <!-- real; neg_binomial_2_lcdf; (ints n | reals mu, reals phi); -->
+\index{{\tt \bfseries neg\_binomial\_2}!(ints n | reals mu, reals phi): real|hyperpage}
 
 `real` **`neg_binomial_2_lcdf`**(`ints n | reals mu, reals phi`)
 The log of the negative binomial cumulative distribution function of n
 given location mu and precision phi.
 
 <!-- real; neg_binomial_2_lccdf; (ints n | reals mu, reals phi); -->
+\index{{\tt \bfseries neg\_binomial\_2}!(ints n | reals mu, reals phi): real|hyperpage}
 
 `real` **`neg_binomial_2_lccdf`**(`ints n | reals mu, reals phi`)
 The log of the negative binomial complementary cumulative distribution
 function of n given location mu and precision phi.
 
 <!-- R; neg_binomial_2_rng; (reals mu, reals phi); -->
+\index{{\tt \bfseries neg\_binomial\_2}!(reals mu, reals phi): R|hyperpage}
 
 `R` **`neg_binomial_2_rng`**(`reals mu, reals phi`)
  Generate a negative binomial variate with location mu and precision
@@ -125,10 +149,18 @@ for $\eta \in \mathbb{R}$, $\phi \in \mathbb{R}^+$, so that for $y \in
 used for sampling, as a function, and for random number generation,
 but as of yet, there are no CDFs implemented for it.
 
+#### Sampling Statement
+
+`y` ~ __`neg_binomial_2_log`__(`eta, phi`)
+
+Increment target log probability density with `neg_binomial_2_log_lpmf( y | eta, phi)`
+dropping constant additive terms.
+\index{{\tt \bfseries neg\_binomial\_2\_log}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- neg_binomial_2_log -->
 <!-- real; neg_binomial_2_log_lpmf; (ints y | reals eta, reals phi); -->
+\index{{\tt \bfseries neg\_binomial\_2\_log}!(ints y | reals eta, reals phi): real|hyperpage}
 
 `real` **`neg_binomial_2_log_lpmf`**(`ints y | reals eta, reals phi`)
 The log negative binomial probability mass of n given log-location eta
@@ -136,6 +168,7 @@ and inverse overdispersion control phi. This is especially useful for
 log-linear negative binomial regressions.
 
 <!-- R; neg_binomial_2_log_rng; (reals eta, reals phi); -->
+\index{{\tt \bfseries neg\_binomial\_2\_log}!(reals eta, reals phi): R|hyperpage}
 
 `R` **`neg_binomial_2_log_rng`**(`reals eta, reals phi`)
  Generate a negative binomial variate with log-location eta and
@@ -160,10 +193,18 @@ If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
 \leq n}\text{NegBinomial2}(y_i~|~\exp(\alpha_i + x_i\cdot \beta),
 \phi). \]
 
+#### Sampling Statement
+
+`y` ~ __`neg_binomial_2_log_glm`__(`x, alpha, beta, phi`)
+
+Increment target log probability density with `neg_binomial_2_log_glm_lpmf( y | x, alpha, beta, phi)`
+dropping constant additive terms.
+\index{{\tt \bfseries neg\_binomial\_2\_log\_glm}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- neg_binomial_2_log_glm -->
 <!-- real; neg_binomial_2_log_glm_lpmf; (int[] y | matrix x, real alpha, vector beta, real phi); -->
+\index{{\tt \bfseries neg\_binomial\_2\_log\_glm}!(int[] y | matrix x, real alpha, vector beta, real phi): real|hyperpage}
 
 `real` **`neg_binomial_2_log_glm_lpmf`**(`int[] y | matrix x, real alpha, vector beta, real phi`)
 The log negative binomial probability mass of y given log-location
@@ -173,8 +214,8 @@ number of rows of the independent variable matrix `x` needs to match
 the length of the dependent variable vector `y` and the number of
 columns of `x` needs to match the length of the weight vector `beta`.
 
-<!-- neg_binomial_2_log_glm -->
 <!-- real; neg_binomial_2_log_glm_lpmf; (int[] y | matrix x, vector alpha, vector beta, real phi); -->
+\index{{\tt \bfseries neg\_binomial\_2\_log\_glm}!(int[] y | matrix x, vector alpha, vector beta, real phi): real|hyperpage}
 
 `real` **`neg_binomial_2_log_glm_lpmf`**(`int[] y | matrix x, vector alpha, vector beta, real phi`)
 The log negative binomial probability mass of y given log-location
@@ -194,32 +235,44 @@ If $\lambda \in \mathbb{R}^+$, then for $n \in \mathbb{N}$, \[
 \text{Poisson}(n|\lambda) = \frac{1}{n!} \, \lambda^n \,
 \exp(-\lambda). \]
 
+#### Sampling Statement
+
+`n` ~ __`poisson`__(`lambda`)
+
+Increment target log probability density with `poisson_lpmf( n | lambda)`
+dropping constant additive terms.
+\index{{\tt \bfseries poisson}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- poisson -->
 <!-- real; poisson_lpmf; (ints n | reals lambda); -->
+\index{{\tt \bfseries poisson}!(ints n | reals lambda): real|hyperpage}
 
 `real` **`poisson_lpmf`**(`ints n | reals lambda`)
 The log Poisson probability mass of n given rate lambda
 
 <!-- real; poisson_cdf; (ints n, reals lambda); -->
+\index{{\tt \bfseries poisson}!(ints n, reals lambda): real|hyperpage}
 
 `real` **`poisson_cdf`**(`ints n, reals lambda`)
 The Poisson cumulative distribution function of n given rate lambda
 
 <!-- real; poisson_lcdf; (ints n | reals lambda); -->
+\index{{\tt \bfseries poisson}!(ints n | reals lambda): real|hyperpage}
 
 `real` **`poisson_lcdf`**(`ints n | reals lambda`)
 The log of the Poisson cumulative distribution function of n given
 rate lambda
 
 <!-- real; poisson_lccdf; (ints n | reals lambda); -->
+\index{{\tt \bfseries poisson}!(ints n | reals lambda): real|hyperpage}
 
 `real` **`poisson_lccdf`**(`ints n | reals lambda`)
 The log of the Poisson complementary cumulative distribution function
 of n given rate lambda
 
 <!-- R; poisson_rng; (reals lambda); -->
+\index{{\tt \bfseries poisson}!(reals lambda): R|hyperpage}
 
 `R` **`poisson_rng`**(`reals lambda`)
 Generate a Poisson variate with rate lambda; may only be used in
@@ -241,15 +294,24 @@ If $\alpha \in \mathbb{R}$, then for $n \in \mathbb{N}$, \[
 \text{PoissonLog}(n|\alpha) = \frac{1}{n!} \, \exp \left(n\alpha -
 \exp(\alpha) \right). \]
 
+#### Sampling Statement
+
+`n` ~ __`poisson_log`__(`alpha`)
+
+Increment target log probability density with `poisson_log_lpmf( n | alpha)`
+dropping constant additive terms.
+\index{{\tt \bfseries poisson\_log}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- poisson_log -->
 <!-- real; poisson_log_lpmf; (ints n | reals alpha); -->
+\index{{\tt \bfseries poisson\_log}!(ints n | reals alpha): real|hyperpage}
 
 `real` **`poisson_log_lpmf`**(`ints n | reals alpha`)
 The log Poisson probability mass of n given log rate alpha
 
 <!-- R; poisson_log_rng; (reals alpha); -->
+\index{{\tt \bfseries poisson\_log}!(reals alpha): R|hyperpage}
 
 `R` **`poisson_log_rng`**(`reals alpha`)
 Generate a Poisson variate with log rate alpha; may only be used in
@@ -272,10 +334,18 @@ If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
 \text{PoisonLogGLM}(y|x, \alpha, \beta) = \prod_{1\leq i \leq
 n}\text{Poisson}(y_i|\exp(\alpha_i + x_i\cdot \beta)). \]
 
+#### Sampling Statement
+
+`y` ~ __`poisson_log_glm`__(`x, alpha, beta`)
+
+Increment target log probability density with `poisson_log_glm_lpmf( y | x, alpha, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries poisson\_log\_glm}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- poisson_log_glm -->
 <!-- real; poisson_log_glm_lpmf; (int[] y | matrix x, real alpha, vector beta); -->
+\index{{\tt \bfseries poisson\_log\_glm}!(int[] y | matrix x, real alpha, vector beta): real|hyperpage}
 
 `real` **`poisson_log_glm_lpmf`**(`int[] y | matrix x, real alpha, vector beta`)
 The log poisson probability mass of y given log-rate `alpha+x*beta`,
@@ -284,8 +354,8 @@ number of rows of the independent variable matrix `x` needs to match
 the length of the dependent variable vector `y` and the number of
 columns of `x` needs to match the length of the weight vector `beta`.
 
-<!-- poisson_log_glm -->
 <!-- real; poisson_log_glm_lpmf; (int[] y | matrix x, vector alpha, vector beta); -->
+\index{{\tt \bfseries poisson\_log\_glm}!(int[] y | matrix x, vector alpha, vector beta): real|hyperpage}
 
 `real` **`poisson_log_glm_lpmf`**(`int[] y | matrix x, vector alpha, vector beta`)
 The log poisson probability mass of y given log-rate `alpha+x*beta`,

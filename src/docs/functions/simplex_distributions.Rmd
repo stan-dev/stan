@@ -81,17 +81,25 @@ $\alpha = 1000$,
  5) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
  ```
 
+#### Sampling Statement
+
+`theta` ~ __`dirichlet`__(`alpha`)
+
+Increment target log probability density with `dirichlet_lpdf( theta | alpha)`
+dropping constant additive terms.
+\index{{\tt \bfseries dirichlet}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- dirichlet -->
 <!-- real; dirichlet_lpdf; (vector theta | vector alpha); -->
+\index{{\tt \bfseries dirichlet}!(vector theta | vector alpha): real|hyperpage}
 
 `real` **`dirichlet_lpdf`**(`vector theta | vector alpha`)
  The log of the Dirichlet density for simplex theta given prior counts
 (plus one) alpha
 
-<!-- dirichlet -->
 <!-- vector; dirichlet_rng; (vector alpha); -->
+\index{{\tt \bfseries dirichlet}!(vector alpha): vector|hyperpage}
 
 `vector` **`dirichlet_rng`**(`vector alpha`)
 Generate a Dirichlet variate with prior counts (plus one) alpha; may

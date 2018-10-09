@@ -11,35 +11,46 @@ If $\alpha \in \mathbb{R}$ and $\beta \in (\alpha,\infty)$, then for
 $y \in [\alpha,\beta]$, \[ \text{Uniform}(y|\alpha,\beta) =
 \frac{1}{\beta - \alpha} . \]
 
+#### Sampling Statement
+
+`y` ~ __`uniform`__(`alpha, beta`)
+
+Increment target log probability density with `uniform_lpdf( y | alpha, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries uniform}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- uniform -->
 <!-- real; uniform_lpdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!(reals y | reals alpha, reals beta): real|hyperpage}
 
 `real` **`uniform_lpdf`**(`reals y | reals alpha, reals beta`)
 The log of the uniform density of y given lower bound alpha and upper
 bound beta
 
 <!-- real; uniform_cdf; (reals y, reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!(reals y, reals alpha, reals beta): real|hyperpage}
 
 `real` **`uniform_cdf`**(`reals y, reals alpha, reals beta`)
 The uniform cumulative distribution function of y given lower bound
 alpha and upper bound beta
 
 <!-- real; uniform_lcdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!(reals y | reals alpha, reals beta): real|hyperpage}
 
 `real` **`uniform_lcdf`**(`reals y | reals alpha, reals beta`)
 The log of the uniform cumulative distribution function of y given
 lower bound alpha and upper bound beta
 
 <!-- real; uniform_lccdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!(reals y | reals alpha, reals beta): real|hyperpage}
 
 `real` **`uniform_lccdf`**(`reals y | reals alpha, reals beta`)
 The log of the uniform complementary cumulative distribution function
 of y given lower bound alpha and upper bound beta
 
-<!-- uniform -->
 <!-- R; uniform_rng; (reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!(reals alpha, reals beta): R|hyperpage}
 
 `R` **`uniform_rng`**(`reals alpha, reals beta`)
 Generate a uniform variate with lower bound alpha and upper bound

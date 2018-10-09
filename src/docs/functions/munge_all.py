@@ -46,8 +46,26 @@ def main():
                 process_line(line, chapterRmd, wrapper)
     fp.close()
 
+def chapter_rmd_page(chapterName, label):
+    filename = str.lower(chapterName).replace(" ","_")
+    filename = filename.replace("(","")
+    filename = filename.replace(")","")
+    filename = filename.replace(",","")
+    rmdFile = ''.join([filename, ".Rmd"])
+    if (not os.path.exists(rmdDir)):
+        os.makedirs(rmdDir)
+    rmdPath = os.path.join(rmdDir, rmdFile)
+    if (not os.path.exists(rmdPath)):
+        fh = open(rmdPath, 'w+')
+        fh.write("# %s" % chapterName)
+        if (len(label) > 0):
+            fh.write(" {#%s}" % label)
+        fh.write("\n\n")
+        fh.close()
+        print rmdPath
+    return rmdPath
+
 def process_description(line, rmdPath, wrapper):
-    curIdxName = ""
     line = remove_tags(line, "farg")
     line = remove_tags(line, "mbox")
     line = munge_code(line)
@@ -75,11 +93,6 @@ def process_description(line, rmdPath, wrapper):
                 item = item[0 : endIdx]
             item = ' '.join(item.split())
             item_dict = process_item(item, numLines)
-            if not (curIdxName == item_dict["idx_name"]):
-                curIdxName = item_dict["idx_name"]
-                fh = open(rmdPath, 'a')
-                fh.write("<!-- %s -->\n" % curIdxName) #insert index??
-                fh.close()
             write_item(item_dict, rmdPath, wrapper)
     
 def process_item(item, numLines):
@@ -139,7 +152,6 @@ def process_item(item, numLines):
             "args":argsAll,
             "description":desc}
 
-# put html comments for scraping by Rstudio, index entries
 def write_item(item_dict, rmdPath, wrapper):
     desc = item_dict["description"]
     if len(desc) > 70:
@@ -147,11 +159,15 @@ def write_item(item_dict, rmdPath, wrapper):
         desc = '\n'.join(lines)
 
     fh = open(rmdPath, 'a')
+    # HTML comments for Rstudio
     if (len(item_dict["args"]) == 0):
         fh.write("<!-- %s; %s; () -->\n" % (item_dict["return_type"], item_dict["name"]))
     else:
         fh.write("<!-- %s; %s; (%s); -->\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"]))
-    fh.write("\n")
+    # \index - latex only
+    entry =  "{\\tt \\bfseries %s}!{\\tt (%s): %s}" % (item_dict["idx_name"], item_dict["args"], item_dict["return_type"])
+    fh.write("\index{%s|hyperpage}\n\n" % entry.replace("_","\_"))
+
     if (len(item_dict["args"]) == 0):
         fh.write("`%s` **`%s`**()\n%s\n" % (item_dict["return_type"], item_dict["name"], desc))
     else:
@@ -160,8 +176,37 @@ def write_item(item_dict, rmdPath, wrapper):
     fh.close()
 
 def process_pitem(line, rmdPath):
-    print("TODO: %s\n" % line)
-    
+    sfx = "lpdf"
+    if line.startswith("\pitemdisc"):
+        sfx = "lpmf"
+    start = str.find(line, "{") + 1
+    close = str.find(line, "}", start)
+    lhs = line[start : close]
+    start = str.find(line, "{", close) + 1
+    close = str.find(line, "}", start)
+    distr = line[start : close]
+    start = str.find(line, "{", close) + 1
+    close = str.find(line, "}", start)
+    args =  line[start : close]
+    fh = open(rmdPath, 'a')
+    fh.write("#### Sampling Statement\n\n")
+    fh.write("`%s` ~ __`%s`__(`%s`)\n\n" % (lhs, distr, args))
+    fh.write("Increment target log probability density with `%s_%s( %s | %s)`\n" % (distr, sfx, lhs, args))
+    fh.write("dropping constant additive terms.\n")
+    distr = distr.replace("_","\_")
+    fh.write("\index{{\\tt \\bfseries %s}!sampling statement|hyperpage}\n\n" % distr)
+    fh.close()
+
+def process_part(line):
+    part = get_name(line)
+    rmdFile = ''.join([str.lower(part).replace(" ","_"), ".Rmd"])
+    rmdPath = os.path.join(rmdDir, rmdFile)
+    if (not os.path.exists(rmdPath)):
+        fh = open(rmdPath, 'w+')
+        fh.write("# (PART) %s {-}\n" % part)
+        fh.close()
+    print rmdPath
+
 def process_section(line, rmdPath):
     sectionName = get_name(line)
     label = get_label(line)
@@ -204,36 +249,6 @@ def process_line(line, curPage, wrapper):
     else:
         fh.write("%s\n\n" % line) 
     fh.close()
-
-def process_part(line):
-    part = get_name(line)
-    rmdFile = ''.join([str.lower(part).replace(" ","_"), ".Rmd"])
-    rmdPath = os.path.join(rmdDir, rmdFile)
-    if (not os.path.exists(rmdPath)):
-        fh = open(rmdPath, 'w+')
-        fh.write("# (PART) %s {-}\n" % part)
-        fh.close()
-    print rmdPath
-    
-def chapter_rmd_page(chapterName, label):
-    filename = str.lower(chapterName).replace(" ","_")
-    filename = filename.replace("(","")
-    filename = filename.replace(")","")
-    filename = filename.replace(",","")
-    rmdFile = ''.join([filename, ".Rmd"])
-    if (not os.path.exists(rmdDir)):
-        os.makedirs(rmdDir)
-    rmdPath = os.path.join(rmdDir, rmdFile)
-    if (not os.path.exists(rmdPath)):
-        fh = open(rmdPath, 'w+')
-        fh.write("# %s" % chapterName)
-        if (len(label) > 0):
-            fh.write(" {#%s}" % label)
-        fh.write("\n\n")
-        fh.close()
-        print rmdPath
-    return rmdPath
-
 
 def munge_code(line):
     p = re.compile("\code{")

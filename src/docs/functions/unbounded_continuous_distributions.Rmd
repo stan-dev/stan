@@ -12,15 +12,24 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 \sigma} \exp\left( - \, \frac{1}{2}            \left(  \frac{y -
 \mu}{\sigma} \right)^2     \right) \!. \]
 
+#### Sampling Statement
+
+`y` ~ __`normal`__(`mu, sigma`)
+
+Increment target log probability density with `normal_lpdf( y | mu, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries normal}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- normal -->
 <!-- real; normal_lpdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries normal}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`normal_lpdf`**(`reals y | reals mu, reals sigma`)
 The log of the normal density of y given location mu and scale sigma
 
 <!-- real; normal_cdf; (reals y, reals mu, reals sigma); -->
+\index{{\tt \bfseries normal}!(reals y, reals mu, reals sigma): real|hyperpage}
 
 `real` **`normal_cdf`**(`reals y, reals mu, reals sigma`)
 The cumulative normal distribution of y given location mu and scale
@@ -30,6 +39,7 @@ below -37.5 and overflow to 1 for $\frac{{y}-{\mu}}{{\sigma}}$ above
 be scaled and translated for anything other than a standard normal.
 
 <!-- real; normal_lcdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries normal}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`normal_lcdf`**(`reals y | reals mu, reals sigma`)
 The log of the cumulative normal distribution of y given location mu
@@ -39,6 +49,7 @@ $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25; see above for discussion of
 `Phi_approx` as an alternative.
 
 <!-- real; normal_lccdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries normal}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`normal_lccdf`**(`reals y | reals mu, reals sigma`)
 The log of the complementary cumulative normal distribution of y given
@@ -47,8 +58,8 @@ $\frac{{y}-{\mu}}{{\sigma}}$ below -37.5 and underflow to $-\infty$
 for $\frac{{y}-{\mu}}{{\sigma}}$ above 8.25; see above for discussion
 of `Phi_approx` as an alternative.
 
-<!-- normal -->
 <!-- R; normal_rng; (reals mu, reals sigma); -->
+\index{{\tt \bfseries normal}!(reals mu, reals sigma): R|hyperpage}
 
 `R` **`normal_rng`**(`reals mu, reals sigma`)
 Generate a normal variate with location mu and scale sigma; may only
@@ -76,12 +87,20 @@ Only the log probabilty density function is available for the standard
 normal distribution; for other functions, use the `normal_` versions
 with parameters $\mu = 0$ and $\sigma = 1$.
 
-<!-- std_normal -->
 <!-- real; std_normal_lpdf; (reals y); -->
+\index{{\tt \bfseries std\_normal}!(reals y): real|hyperpage}
 
 `real` **`std_normal_lpdf`**(`reals y`)
 The standard normal (location zero, scale one) log probability density
 of y.
+
+#### Sampling Statement
+
+`y` ~ __`std_normal`__(`\pitemTwo{y`)
+
+Increment target log probability density with `std_normal_lpdf( y | \pitemTwo{y)`
+dropping constant additive terms.
+\index{{\tt \bfseries std\_normal}!sampling statement|hyperpage}
 
 ## Normal-Id Generalised Linear Model (Linear Regression) {#normal-id-glm}
 
@@ -98,10 +117,18 @@ If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
 \[ \text{NormalIdGLM}(y|x, \alpha, \beta, \sigma) = \prod_{1\leq i
 \leq n}\text{Normal}(y_i|\alpha_i + x_i\cdot \beta, \sigma). \]
 
+#### Sampling Statement
+
+`y` ~ __`normal_id_glm`__(`x, alpha, beta, sigma`)
+
+Increment target log probability density with `normal_id_glm_lpmf( y | x, alpha, beta, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries normal\_id\_glm}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- normal_id_glm -->
 <!-- real; normal_id_glm_lpmf; (vector y | matrix x, real alpha, vector beta, real sigma); -->
+\index{{\tt \bfseries normal\_id\_glm}!(vector y | matrix x, real alpha, vector beta, real sigma): real|hyperpage}
 
 `real` **`normal_id_glm_lpmf`**(`vector y | matrix x, real alpha, vector beta, real sigma`)
 The log normal probability density of y given location `alpha+x*beta`
@@ -111,8 +138,8 @@ variable matrix `x` needs to match the length of the dependent
 variable vector `y` and the number of columns of `x` needs to match
 the length of the weight vector `beta`.
 
-<!-- normal_id_glm -->
 <!-- real; normal_id_glm_lpmf; (vector y | matrix x, vector alpha, vector beta, real sigma); -->
+\index{{\tt \bfseries normal\_id\_glm}!(vector y | matrix x, vector alpha, vector beta, real sigma): real|hyperpage}
 
 `real` **`normal_id_glm_lpmf`**(`vector y | matrix x, vector alpha, vector beta, real sigma`)
 The log normal probability density of y given location `alpha+x*beta`
@@ -134,36 +161,47 @@ If $\mu \in \mathbb{R}$, $\sigma \in \mathbb{R}^+$, and $\lambda \in
 2y\right)\right) \text{erfc}\left(\frac{\mu + \lambda\sigma^2 -
 y}{\sqrt{2}\sigma}\right) . \]
 
+#### Sampling Statement
+
+`y` ~ __`exp_mod_normal`__(`mu, sigma, lambda`)
+
+Increment target log probability density with `exp_mod_normal_lpdf( y | mu, sigma, lambda)`
+dropping constant additive terms.
+\index{{\tt \bfseries exp\_mod\_normal}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- exp_mod_normal -->
 <!-- real; exp_mod_normal_lpdf; (reals y | reals mu, reals sigma, reals lambda); -->
+\index{{\tt \bfseries exp\_mod\_normal}!(reals y | reals mu, reals sigma, reals lambda): real|hyperpage}
 
 `real` **`exp_mod_normal_lpdf`**(`reals y | reals mu, reals sigma, reals lambda`)
 The log of the exponentially modified normal density of y given
 location mu, scale sigma, and shape lambda
 
 <!-- real; exp_mod_normal_cdf; (reals y, reals mu, reals sigma, reals lambda); -->
+\index{{\tt \bfseries exp\_mod\_normal}!(reals y, reals mu, reals sigma, reals lambda): real|hyperpage}
 
 `real` **`exp_mod_normal_cdf`**(`reals y, reals mu, reals sigma, reals lambda`)
 The exponentially modified normal cumulative distribution function of
 y given location mu, scale sigma, and shape lambda
 
 <!-- real; exp_mod_normal_lcdf; (reals y | reals mu, reals sigma, reals lambda); -->
+\index{{\tt \bfseries exp\_mod\_normal}!(reals y | reals mu, reals sigma, reals lambda): real|hyperpage}
 
 `real` **`exp_mod_normal_lcdf`**(`reals y | reals mu, reals sigma, reals lambda`)
 The log of the exponentially modified normal cumulative distribution
 function of y given location mu, scale sigma, and shape lambda
 
 <!-- real; exp_mod_normal_lccdf; (reals y | reals mu, reals sigma, reals lambda); -->
+\index{{\tt \bfseries exp\_mod\_normal}!(reals y | reals mu, reals sigma, reals lambda): real|hyperpage}
 
 `real` **`exp_mod_normal_lccdf`**(`reals y | reals mu, reals sigma, reals lambda`)
 The log of the exponentially modified normal complementary cumulative
 distribution function of y given location mu, scale sigma, and shape
 lambda
 
-<!-- exp_mod_normal -->
 <!-- R; exp_mod_normal_rng; (reals mu, reals sigma, reals lambda); -->
+\index{{\tt \bfseries exp\_mod\_normal}!(reals mu, reals sigma, reals lambda): R|hyperpage}
 
 `R` **`exp_mod_normal_rng`**(`reals mu, reals sigma, reals lambda`)
 Generate a exponentially modified normal variate with location mu,
@@ -182,35 +220,46 @@ If $\xi \in \mathbb{R}$, $\omega \in \mathbb{R}^+$, and $\alpha \in
 \right) \ \left(1 + \text{erf}\left( \alpha\left(\frac{y -
 \xi}{\omega\sqrt{2}}\right)\right)\right) . \]
 
+#### Sampling Statement
+
+`y` ~ __`skew_normal`__(`xi, omega, alpha`)
+
+Increment target log probability density with `skew_normal_lpdf( y | xi, omega, alpha)`
+dropping constant additive terms.
+\index{{\tt \bfseries skew\_normal}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- skew_normal -->
 <!-- real; skew_normal_lpdf; (reals y | reals xi, reals omega, reals alpha); -->
+\index{{\tt \bfseries skew\_normal}!(reals y | reals xi, reals omega, reals alpha): real|hyperpage}
 
 `real` **`skew_normal_lpdf`**(`reals y | reals xi, reals omega, reals alpha`)
 The log of the skew normal density of y given location xi, scale
 omega, and shape alpha
 
 <!-- real; skew_normal_cdf; (reals y, reals xi, reals omega, reals alpha); -->
+\index{{\tt \bfseries skew\_normal}!(reals y, reals xi, reals omega, reals alpha): real|hyperpage}
 
 `real` **`skew_normal_cdf`**(`reals y, reals xi, reals omega, reals alpha`)
 The skew normal distribution function of y given location xi, scale
 omega, and shape alpha
 
 <!-- real; skew_normal_lcdf; (reals y | reals xi, reals omega, reals alpha); -->
+\index{{\tt \bfseries skew\_normal}!(reals y | reals xi, reals omega, reals alpha): real|hyperpage}
 
 `real` **`skew_normal_lcdf`**(`reals y | reals xi, reals omega, reals alpha`)
 The log of the skew normal cumulative distribution function of y given
 location xi, scale omega, and shape alpha
 
 <!-- real; skew_normal_lccdf; (reals y | reals xi, reals omega, reals alpha); -->
+\index{{\tt \bfseries skew\_normal}!(reals y | reals xi, reals omega, reals alpha): real|hyperpage}
 
 `real` **`skew_normal_lccdf`**(`reals y | reals xi, reals omega, reals alpha`)
 The log of the skew normal complementary cumulative distribution
 function of y given location xi, scale omega, and shape alpha
 
-<!-- skew_normal -->
 <!-- R; skew_normal_rng; (reals xi, reals omega, real alpha); -->
+\index{{\tt \bfseries skew\_normal}!(reals xi, reals omega, real alpha): R|hyperpage}
 
 `R` **`skew_normal_rng`**(`reals xi, reals omega, real alpha`)
 Generate a skew normal variate with location xi, scale omega, and
@@ -229,36 +278,47 @@ If $\nu \in \mathbb{R}^+$, $\mu \in \mathbb{R}$, and $\sigma \in
 \ \left( 1 + \frac{1}{\nu} \left(\frac{y - \mu}{\sigma}\right)^2
 \right)^{-(\nu + 1)/2} \! . \]
 
+#### Sampling Statement
+
+`y` ~ __`student_t`__(`nu, mu, sigma`)
+
+Increment target log probability density with `student_t_lpdf( y | nu, mu, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries student\_t}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- student_t -->
 <!-- real; student_t_lpdf; (reals y | reals nu, reals mu, reals sigma); -->
+\index{{\tt \bfseries student\_t}!(reals y | reals nu, reals mu, reals sigma): real|hyperpage}
 
 `real` **`student_t_lpdf`**(`reals y | reals nu, reals mu, reals sigma`)
 The log of the Student-$t$ density of y given degrees of freedom nu,
 location mu, and scale sigma
 
 <!-- real; student_t_cdf; (reals y, reals nu, reals mu, reals sigma); -->
+\index{{\tt \bfseries student\_t}!(reals y, reals nu, reals mu, reals sigma): real|hyperpage}
 
 `real` **`student_t_cdf`**(`reals y, reals nu, reals mu, reals sigma`)
 The Student-$t$ cumulative distribution function of y given degrees of
 freedom nu, location mu, and scale sigma
 
 <!-- real; student_t_lcdf; (reals y | reals nu, reals mu, reals sigma); -->
+\index{{\tt \bfseries student\_t}!(reals y | reals nu, reals mu, reals sigma): real|hyperpage}
 
 `real` **`student_t_lcdf`**(`reals y | reals nu, reals mu, reals sigma`)
 The log of the Student-$t$ cumulative distribution function of y given
 degrees of freedom nu, location mu, and scale sigma
 
 <!-- real; student_t_lccdf; (reals y | reals nu, reals mu, reals sigma); -->
+\index{{\tt \bfseries student\_t}!(reals y | reals nu, reals mu, reals sigma): real|hyperpage}
 
 `real` **`student_t_lccdf`**(`reals y | reals nu, reals mu, reals sigma`)
 The log of the Student-$t$ complementary cumulative distribution
 function of y given degrees of freedom nu, location mu, and scale
 sigma
 
-<!-- student_t -->
 <!-- R; student_t_rng; (reals nu, reals mu, reals sigma); -->
+\index{{\tt \bfseries student\_t}!(reals nu, reals mu, reals sigma): R|hyperpage}
 
 `R` **`student_t_rng`**(`reals nu, reals mu, reals sigma`)
 Generate a Student-$t$ variate with degrees of freedom nu, location
@@ -274,34 +334,45 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 \mathbb{R}$, \[ \text{Cauchy}(y|\mu,\sigma) = \frac{1}{\pi \sigma} \
 \frac{1}{1 + \left((y - \mu)/\sigma\right)^2} . \]
 
+#### Sampling Statement
+
+`y` ~ __`cauchy`__(`mu, sigma`)
+
+Increment target log probability density with `cauchy_lpdf( y | mu, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries cauchy}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- cauchy -->
 <!-- real; cauchy_lpdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries cauchy}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`cauchy_lpdf`**(`reals y | reals mu, reals sigma`)
  The log of the Cauchy density of y given location mu and scale sigma
 
 <!-- real; cauchy_cdf; (reals y, reals mu, reals sigma); -->
+\index{{\tt \bfseries cauchy}!(reals y, reals mu, reals sigma): real|hyperpage}
 
 `real` **`cauchy_cdf`**(`reals y, reals mu, reals sigma`)
  The Cauchy cumulative distribution function of y given location mu
 and scale sigma
 
 <!-- real; cauchy_lcdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries cauchy}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`cauchy_lcdf`**(`reals y | reals mu, reals sigma`)
  The log of the Cauchy cumulative distribution function of y given
 location mu and scale sigma
 
 <!-- real; cauchy_lccdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries cauchy}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`cauchy_lccdf`**(`reals y | reals mu, reals sigma`)
  The log of the Cauchy complementary cumulative distribution function
 of y given location mu and scale sigma
 
-<!-- cauchy -->
 <!-- R; cauchy_rng; (reals mu, reals sigma); -->
+\index{{\tt \bfseries cauchy}!(reals mu, reals sigma): R|hyperpage}
 
 `R` **`cauchy_rng`**(`reals mu, reals sigma`)
 Generate a Cauchy variate with location mu and scale sigma; may only
@@ -329,35 +400,46 @@ a non-centered parameterization by taking \[ \beta^{\text{raw}} \sim
 \mathsf{Normal}(0, 1) \] and defining \[ \beta = \mu + \alpha \,
 \beta^{\text{raw}}. \]
 
+#### Sampling Statement
+
+`y` ~ __`double_exponential`__(`mu, sigma`)
+
+Increment target log probability density with `double_exponential_lpdf( y | mu, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries double\_exponential}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- double_exponential -->
 <!-- real; double_exponential_lpdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries double\_exponential}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`double_exponential_lpdf`**(`reals y | reals mu, reals sigma`)
  The log of the double exponential density of y given location mu and
 scale sigma
 
 <!-- real; double_exponential_cdf; (reals y, reals mu, reals sigma); -->
+\index{{\tt \bfseries double\_exponential}!(reals y, reals mu, reals sigma): real|hyperpage}
 
 `real` **`double_exponential_cdf`**(`reals y, reals mu, reals sigma`)
  The double exponential cumulative distribution function of y given
 location mu and scale sigma
 
 <!-- real; double_exponential_lcdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries double\_exponential}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`double_exponential_lcdf`**(`reals y | reals mu, reals sigma`)
  The log of the double exponential cumulative distribution function of
 y given location mu and scale sigma
 
 <!-- real; double_exponential_lccdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries double\_exponential}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`double_exponential_lccdf`**(`reals y | reals mu, reals sigma`)
  The log of the double exponential complementary cumulative
 distribution function of y given location mu and scale sigma
 
-<!-- double_exponential -->
 <!-- R; double_exponential_rng; (reals mu, reals sigma); -->
+\index{{\tt \bfseries double\_exponential}!(reals mu, reals sigma): R|hyperpage}
 
 `R` **`double_exponential_rng`**(`reals mu, reals sigma`)
 Generate a double exponential variate with location mu and scale
@@ -374,35 +456,46 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 \exp\!\left( - \, \frac{y - \mu}{\sigma} \right) \ \left(1 + \exp
 \!\left( - \, \frac{y - \mu}{\sigma} \right) \right)^{\!-2} \! . \]
 
+#### Sampling Statement
+
+`y` ~ __`logistic`__(`mu, sigma`)
+
+Increment target log probability density with `logistic_lpdf( y | mu, sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries logistic}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- logistic -->
 <!-- real; logistic_lpdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries logistic}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`logistic_lpdf`**(`reals y | reals mu, reals sigma`)
  The log of the logistic density of y given location mu and scale
 sigma
 
 <!-- real; logistic_cdf; (reals y, reals mu, reals sigma); -->
+\index{{\tt \bfseries logistic}!(reals y, reals mu, reals sigma): real|hyperpage}
 
 `real` **`logistic_cdf`**(`reals y, reals mu, reals sigma`)
  The logistic cumulative distribution function of y given location mu
 and scale sigma
 
 <!-- real; logistic_lcdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries logistic}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`logistic_lcdf`**(`reals y | reals mu, reals sigma`)
  The log of the logistic cumulative distribution function of y given
 location mu and scale sigma
 
 <!-- real; logistic_lccdf; (reals y | reals mu, reals sigma); -->
+\index{{\tt \bfseries logistic}!(reals y | reals mu, reals sigma): real|hyperpage}
 
 `real` **`logistic_lccdf`**(`reals y | reals mu, reals sigma`)
  The log of the logistic complementary cumulative distribution
 function of y given location mu and scale sigma
 
-<!-- logistic -->
 <!-- R; logistic_rng; (reals mu, reals sigma); -->
+\index{{\tt \bfseries logistic}!(reals mu, reals sigma): R|hyperpage}
 
 `R` **`logistic_rng`**(`reals mu, reals sigma`)
 Generate a logistic variate with location mu and scale sigma; may only
@@ -418,34 +511,45 @@ If $\mu \in \mathbb{R}$ and $\beta \in \mathbb{R}^+$, then for $y \in
 \exp\left(-\frac{y-\mu}{\beta}-\exp\left(-\frac{y-\mu}{\beta}\right)\right)
 . \]
 
+#### Sampling Statement
+
+`y` ~ __`gumbel`__(`mu, beta`)
+
+Increment target log probability density with `gumbel_lpdf( y | mu, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries gumbel}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- gumbel -->
 <!-- real; gumbel_lpdf; (reals y | reals mu, reals beta); -->
+\index{{\tt \bfseries gumbel}!(reals y | reals mu, reals beta): real|hyperpage}
 
 `real` **`gumbel_lpdf`**(`reals y | reals mu, reals beta`)
 The log of the gumbel density of y given location mu and scale beta
 
 <!-- real; gumbel_cdf; (reals y, reals mu, reals beta); -->
+\index{{\tt \bfseries gumbel}!(reals y, reals mu, reals beta): real|hyperpage}
 
 `real` **`gumbel_cdf`**(`reals y, reals mu, reals beta`)
 The gumbel cumulative distribution function of y given location mu and
 scale beta
 
 <!-- real; gumbel_lcdf; (reals y | reals mu, reals beta); -->
+\index{{\tt \bfseries gumbel}!(reals y | reals mu, reals beta): real|hyperpage}
 
 `real` **`gumbel_lcdf`**(`reals y | reals mu, reals beta`)
 The log of the gumbel cumulative distribution function of y given
 location mu and scale beta
 
 <!-- real; gumbel_lccdf; (reals y | reals mu, reals beta); -->
+\index{{\tt \bfseries gumbel}!(reals y | reals mu, reals beta): real|hyperpage}
 
 `real` **`gumbel_lccdf`**(`reals y | reals mu, reals beta`)
 The log of the gumbel complementary cumulative distribution function
 of y given location mu and scale beta
 
-<!-- gumbel -->
 <!-- R; gumbel_rng; (reals mu, reals beta); -->
+\index{{\tt \bfseries gumbel}!(reals mu, reals beta): R|hyperpage}
 
 `R` **`gumbel_rng`**(`reals mu, reals beta`)
 Generate a gumbel variate with location mu and scale beta; may only be

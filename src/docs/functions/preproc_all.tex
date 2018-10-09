@@ -1578,7 +1578,8 @@ If $a \in \mathbb{N}$, $b \in \mathbb{N}$, and $N \in \{0,\ldots,a+b\}$, then fo
 If $N \in \mathbb{N}$, $N > 0$, and if $\theta \in \mathbb{R}^N$ forms an $N$-simplex (i.e., has nonnegative entries summing to one), then for $y \in \{1,\ldots,N\}$, \[ \text{Categorical}(y~|~\theta) = \theta_y. \] In addition, Stan provides a log-odds scaled categorical distribution, \[ \text{CategoricalLogit}(y~|~\beta) = \text{Categorical}(y~|~\text{softmax}(\beta)). \] See section \@ref(softmax) for the definition of the softmax function.
 
 
-\pitemdisc{y}{categorical}{theta} \pitemdisc{y}{categorical_logit}{beta}
+\pitemdisc{y}{categorical}{theta}
+\pitemdisc{y}{categorical_logit}{beta}
 
 
 \subsection{Stan Functions}

@@ -12,35 +12,45 @@ If $\theta \in [0,1]$, then for $y \in \{0,1\}$, \[
 \text{if } y = 1, \text{ and} \\ 1 - \theta & \text{if } y = 0.
 \end{array} \right. \]
 
+#### Sampling Statement
+
+`y` ~ __`bernoulli`__(`theta`)
+
+Increment target log probability density with `bernoulli_lpmf( y | theta)`
+dropping constant additive terms.
+\index{{\tt \bfseries bernoulli}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- bernoulli -->
 <!-- real; bernoulli_lpmf; (ints y | reals theta); -->
+\index{{\tt \bfseries bernoulli}!(ints y | reals theta): real|hyperpage}
 
 `real` **`bernoulli_lpmf`**(`ints y | reals theta`)
 The log Bernoulli probability mass of y given chance of success theta
 
-<!-- bernoulli -->
 <!-- real; bernoulli_cdf; (ints y, reals theta); -->
+\index{{\tt \bfseries bernoulli}!(ints y, reals theta): real|hyperpage}
 
 `real` **`bernoulli_cdf`**(`ints y, reals theta`)
 The Bernoulli cumulative distribution function of y given chance of
 success theta
 
 <!-- real; bernoulli_lcdf; (ints y | reals theta); -->
+\index{{\tt \bfseries bernoulli}!(ints y | reals theta): real|hyperpage}
 
 `real` **`bernoulli_lcdf`**(`ints y | reals theta`)
 The log of the Bernoulli cumulative distribution function of y given
 chance of success theta
 
 <!-- real; bernoulli_lccdf; (ints y | reals theta); -->
+\index{{\tt \bfseries bernoulli}!(ints y | reals theta): real|hyperpage}
 
 `real` **`bernoulli_lccdf`**(`ints y | reals theta`)
 The log of the Bernoulli complementary cumulative distribution
 function of y given chance of success theta
 
-<!-- bernoulli -->
 <!-- R; bernoulli_rng; (reals theta); -->
+\index{{\tt \bfseries bernoulli}!(reals theta): R|hyperpage}
 
 `R` **`bernoulli_rng`**(`reals theta`)
 Generate a Bernoulli variate with chance of success theta; may only be
@@ -63,17 +73,25 @@ If $\alpha \in \mathbb{R}$, then for $y \in \{0,1\}$, \[
 \text{logit}^{-1}(\alpha) & \text{if } y = 1, \text{ and} \\ 1 -
 \text{logit}^{-1}(\alpha) &  \text{if } y = 0. \end{array} \right. \]
 
+#### Sampling Statement
+
+`y` ~ __`bernoulli_logit`__(`alpha`)
+
+Increment target log probability density with `bernoulli_logit_lpmf( y | alpha)`
+dropping constant additive terms.
+\index{{\tt \bfseries bernoulli\_logit}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- bernoulli_logit -->
 <!-- real; bernoulli_logit_lpmf; (ints y | reals alpha); -->
+\index{{\tt \bfseries bernoulli\_logit}!(ints y | reals alpha): real|hyperpage}
 
 `real` **`bernoulli_logit_lpmf`**(`ints y | reals alpha`)
 The log Bernoulli probability mass of y given chance of success
 `inv_logit(alpha)`
 
-<!-- bernoulli_logit -->
 <!-- R; bernoulli_logit_rng; (reals alpha); -->
+\index{{\tt \bfseries bernoulli\_logit}!(reals alpha): R|hyperpage}
 
 `R` **`bernoulli_logit_rng`**(`reals alpha`)
 Generate a Bernoulli variate with chance of success
@@ -102,10 +120,18 @@ n}\text{Bernoulli}(y_i~|~\text{logit}^{-1}(\alpha_i + x_i\cdot
 \sum_{1\leq j\leq m}x_{ij}\cdot \beta_j) & \text{if } y_i = 0.
 \end{array} \right. \end{align*}
 
+#### Sampling Statement
+
+`y` ~ __`bernoulli_logit_glm`__(`x, alpha, beta`)
+
+Increment target log probability density with `bernoulli_logit_glm_lpmf( y | x, alpha, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries bernoulli\_logit\_glm}!sampling statement|hyperpage}
+
 ### Stan Functions
 
-<!-- bernoulli_logit_glm -->
 <!-- real; bernoulli_logit_glm_lpmf; (int[] y | matrix x, real alpha, vector beta); -->
+\index{{\tt \bfseries bernoulli\_logit\_glm}!(int[] y | matrix x, real alpha, vector beta): real|hyperpage}
 
 `real` **`bernoulli_logit_glm_lpmf`**(`int[] y | matrix x, real alpha, vector beta`)
 The log Bernoulli probability mass of y given chance of success
@@ -115,8 +141,8 @@ matrix `x` needs to match the length of the dependent variable vector
 `y` and the number of columns of `x` needs to match the length of the
 weight vector `beta`.
 
-<!-- bernoulli_logit_glm -->
 <!-- real; bernoulli_logit_glm_lpmf; (int[] y | matrix x, vector alpha, vector beta); -->
+\index{{\tt \bfseries bernoulli\_logit\_glm}!(int[] y | matrix x, vector alpha, vector beta): real|hyperpage}
 
 `real` **`bernoulli_logit_glm_lpmf`**(`int[] y | matrix x, vector alpha, vector beta`)
 The log Bernoulli probability mass of y given chance of success
