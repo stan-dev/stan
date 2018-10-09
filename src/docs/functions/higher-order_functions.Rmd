@@ -55,14 +55,14 @@ of the algebraic system.
 ### Call to the Algebraic Solver
 
 <!-- vector; algebra_solver; (function algebra_system, vector y_guess, vector theta, real[] x_r, int[] x_i); -->
-\index{{\tt \bfseries algebra\_solver}!(function algebra\_system, vector y\_guess, vector theta, real[] x\_r, int[] x\_i): vector|hyperpage}
+\index{{\tt \bfseries algebra\_solver}!{\tt (function algebra\_system, vector y\_guess, vector theta, real[] x\_r, int[] x\_i): vector}|hyperpage}
 
 `vector` **`algebra_solver`**(`function algebra_system, vector y_guess, vector theta, real[] x_r, int[] x_i`)
 Solves the algebraic system, given an initial guess, using the Powell
 hybrid algorithm.
 
 <!-- vector; algebra_solver; (function algebra_system, vector y_guess, vector theta, real[] x_r, int[] x_i, real rel_tol, real f_tol, int max_steps); -->
-\index{{\tt \bfseries algebra\_solver}!(function algebra\_system, vector y\_guess, vector theta, real[] x\_r, int[] x\_i, real rel\_tol, real f\_tol, int max\_steps): vector|hyperpage}
+\index{{\tt \bfseries algebra\_solver}!{\tt (function algebra\_system, vector y\_guess, vector theta, real[] x\_r, int[] x\_i, real rel\_tol, real f\_tol, int max\_steps): vector}|hyperpage}
 
 `vector` **`algebra_solver`**(`function algebra_system, vector y_guess, vector theta, real[] x_r, int[] x_i, real rel_tol, real f_tol, int max_steps`)
 Solves the algebraic system, given an initial guess, using the Powell
@@ -180,14 +180,14 @@ ODE.
 ### Non-Stiff Solver
 
 <!-- real[ , ]; integrate_ode_rk45; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i); -->
-\index{{\tt \bfseries integrate\_ode\_rk45}!(function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, real[] x\_r, int[] x\_i): real[ , ]|hyperpage}
+\index{{\tt \bfseries integrate\_ode\_rk45}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, real[] x\_r, int[] x\_i): real[ , ]}|hyperpage}
 
 `real[ , ]` **`integrate_ode_rk45`**(`function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i`)
 Solves the ODE system for the times provided using the Runge Kutta
 Dopri algorithm with the implementation from Boost.
 
 <!-- real[ , ]; integrate_ode_rk45; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i, real rel_tol, real abs_tol, int max_num_steps); -->
-\index{{\tt \bfseries integrate\_ode\_rk45}!(function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, real[] x\_r, int[] x\_i, real rel\_tol, real abs\_tol, int max\_num\_steps): real[ , ]|hyperpage}
+\index{{\tt \bfseries integrate\_ode\_rk45}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, real[] x\_r, int[] x\_i, real rel\_tol, real abs\_tol, int max\_num\_steps): real[ , ]}|hyperpage}
 
 `real[ , ]` **`integrate_ode_rk45`**(`function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i, real rel_tol, real abs_tol, int max_num_steps`)
 Solves the ODE system for the times provided using the Runge Kutta
@@ -195,7 +195,7 @@ Dopri algorithm with the implementation from Boost with additional
 control parameters for the solver.
 
 <!-- real[ , ]; integrate_ode; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i); -->
-\index{{\tt \bfseries integrate\_ode}!(function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, real[] x\_r, int[] x\_i): real[ , ]|hyperpage}
+\index{{\tt \bfseries integrate\_ode}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, real[] x\_r, int[] x\_i): real[ , ]}|hyperpage}
 
 `real[ , ]` **`integrate_ode`**(`function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i`)
 Deprecated. Solves the ODE system for the times provided with a
@@ -204,7 +204,7 @@ non-stiff solver. This calls the Runge Kutta Dopri algorithm.
 ### Stiff Solver
 
 <!-- real[]; integrate_ode_bdf; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, data real[] x_r, data int[] x_i); -->
-\index{{\tt \bfseries integrate\_ode\_bdf}!(function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, data real[] x\_r, data int[] x\_i): real[]|hyperpage}
+\index{{\tt \bfseries integrate\_ode\_bdf}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, data real[] x\_r, data int[] x\_i): real[]}|hyperpage}
 
 `real[]` **`integrate_ode_bdf`**(`function ode, real[] initial_state, real initial_time, real[] times, real[] theta, data real[] x_r, data int[] x_i`)
 Solves the ODE system for the times provided using the backward
@@ -212,7 +212,7 @@ differentiation formula (BDF) method with the implementation from
 CVODES.
 
 <!-- real[]; integrate_ode_bdf; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, data real[] x_r, data int[] x_i, data real rel_tol, data real abs_tol, dta int max_num_steps); -->
-\index{{\tt \bfseries integrate\_ode\_bdf}!(function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, data real[] x\_r, data int[] x\_i, data real rel\_tol, data real abs\_tol, dta int max\_num\_steps): real[]|hyperpage}
+\index{{\tt \bfseries integrate\_ode\_bdf}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, data real[] x\_r, data int[] x\_i, data real rel\_tol, data real abs\_tol, dta int max\_num\_steps): real[]}|hyperpage}
 
 `real[]` **`integrate_ode_bdf`**(`function ode, real[] initial_state, real initial_time, real[] times, real[] theta, data real[] x_r, data int[] x_i, data real rel_tol, data real abs_tol, dta int max_num_steps`)
 Solves the ODE system for the times provided using the backward
@@ -318,7 +318,7 @@ structures, with parallel data structures for job-specific parameters,
 job-specific real data, and job-specific integer data.
 
 <!-- vector; map_rect; (F f, vector phi, vector[] theta, data real[,] x_r, data int[,] x_i); -->
-\index{{\tt \bfseries map\_rect}!(F f, vector phi, vector[] theta, data real[,] x\_r, data int[,] x\_i): vector|hyperpage}
+\index{{\tt \bfseries map\_rect}!{\tt (F f, vector phi, vector[] theta, data real[,] x\_r, data int[,] x\_i): vector}|hyperpage}
 
 `vector` **`map_rect`**(`F f, vector phi, vector[] theta, data real[,] x_r, data int[,] x_i`)
 Return the concatenation of the results of applying the function f, of

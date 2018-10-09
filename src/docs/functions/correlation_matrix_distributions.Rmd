@@ -48,7 +48,7 @@ much better computationally to work directly with the Cholesky factor
 of $\Sigma$, so this distribution should never be explicitly used in
 practice.
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`lkj_corr`__(`eta`)
 
@@ -59,7 +59,7 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- real; lkj_corr_lpdf; (matrix y | real eta); -->
-\index{{\tt \bfseries lkj\_corr}!(matrix y | real eta): real|hyperpage}
+\index{{\tt \bfseries lkj\_corr}!{\tt (matrix y | real eta): real}|hyperpage}
 
 `real` **`lkj_corr_lpdf`**(`matrix y | real eta`)
 The log of the LKJ density for the correlation matrix y given
@@ -69,7 +69,7 @@ risk of numerical errors. Use its Cholesky factor as described in the
 next section.
 
 <!-- matrix; lkj_corr_rng; (int K, real eta); -->
-\index{{\tt \bfseries lkj\_corr}!(int K, real eta): matrix|hyperpage}
+\index{{\tt \bfseries lkj\_corr}!{\tt (int K, real eta): matrix}|hyperpage}
 
 `matrix` **`lkj_corr_rng`**(`int K, real eta`)
 Generate a LKJ random correlation matrix of order K with shape eta;
@@ -115,7 +115,7 @@ A lower triangular $L$ is a Cholesky factor for a correlation matrix
 if and only if $L_{k,k} > 0$ for $k \in 1{:}K$ and each row $L_k$ has
 unit Euclidean length.
 
-#### Sampling Statement
+### Sampling Statement
 
 `L` ~ __`lkj_corr_cholesky`__(`eta`)
 
@@ -126,17 +126,17 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- real; lkj_corr_cholesky_lpdf; (matrix L | real eta); -->
-\index{{\tt \bfseries lkj\_corr\_cholesky}!(matrix L | real eta): real|hyperpage}
+\index{{\tt \bfseries lkj\_corr\_cholesky}!{\tt (matrix L | real eta): real}|hyperpage}
 
 `real` **`lkj_corr_cholesky_lpdf`**(`matrix L | real eta`)
 The log of the LKJ density for the lower-triangular Cholesky factor L
 of a correlation matrix given shape eta.
 
 <!-- matrix; lkj_corr_cholesky_rng; (int K, real eta); -->
-\index{{\tt \bfseries lkj\_corr\_cholesky}!(int K, real eta): matrix|hyperpage}
+\index{{\tt \bfseries lkj\_corr\_cholesky}!{\tt (int K, real eta): matrix}|hyperpage}
 
 `matrix` **`lkj_corr_cholesky_rng`**(`int K, real eta`)
- Generate a random Cholesky factor of a correlation matrix of order K
+Generate a random Cholesky factor of a correlation matrix of order K
 that is distributed LKJ with shape eta; may only be used in generated
 quantities block
 

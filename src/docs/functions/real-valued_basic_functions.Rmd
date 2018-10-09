@@ -115,63 +115,63 @@ called as such.  For instance, the mathematical constant $\pi$ must be
 written in a Stan program as `pi()`.
 
 <!-- real; pi; () -->
-\index{{\tt \bfseries pi}!(): real|hyperpage}
+\index{{\tt \bfseries pi}!{\tt (): real}|hyperpage}
 
 `real` **`pi`**()
- $\pi$, the ratio of a circle's circumference to its diameter
+$\pi$, the ratio of a circle's circumference to its diameter
 
 <!-- real; e; () -->
-\index{{\tt \bfseries e}!(): real|hyperpage}
+\index{{\tt \bfseries e}!{\tt (): real}|hyperpage}
 
 `real` **`e`**()
- $e$, the base of the natural logarithm
+$e$, the base of the natural logarithm
 
 <!-- real; sqrt2; () -->
-\index{{\tt \bfseries sqrt2}!(): real|hyperpage}
+\index{{\tt \bfseries sqrt2}!{\tt (): real}|hyperpage}
 
 `real` **`sqrt2`**()
- The square root of 2
+The square root of 2
 
 <!-- real; log2; () -->
-\index{{\tt \bfseries log2}!(): real|hyperpage}
+\index{{\tt \bfseries log2}!{\tt (): real}|hyperpage}
 
 `real` **`log2`**()
- The natural logarithm of 2
+The natural logarithm of 2
 
 <!-- real; log10; () -->
-\index{{\tt \bfseries log10}!(): real|hyperpage}
+\index{{\tt \bfseries log10}!{\tt (): real}|hyperpage}
 
 `real` **`log10`**()
- The natural logarithm of 10
+The natural logarithm of 10
 
 ## Special Values
 
 <!-- real; not_a_number; () -->
-\index{{\tt \bfseries not\_a\_number}!(): real|hyperpage}
+\index{{\tt \bfseries not\_a\_number}!{\tt (): real}|hyperpage}
 
 `real` **`not_a_number`**()
- Not-a-number, a special non-finite real value returned to signal an
+Not-a-number, a special non-finite real value returned to signal an
 error
 
 <!-- real; positive_infinity; () -->
-\index{{\tt \bfseries positive\_infinity}!(): real|hyperpage}
+\index{{\tt \bfseries positive\_infinity}!{\tt (): real}|hyperpage}
 
 `real` **`positive_infinity`**()
- Positive infinity, a special non-finite real value larger than all
+Positive infinity, a special non-finite real value larger than all
 finite numbers
 
 <!-- real; negative_infinity; () -->
-\index{{\tt \bfseries negative\_infinity}!(): real|hyperpage}
+\index{{\tt \bfseries negative\_infinity}!{\tt (): real}|hyperpage}
 
 `real` **`negative_infinity`**()
- Negative infinity, a special non-finite real value smaller than all
+Negative infinity, a special non-finite real value smaller than all
 finite numbers
 
 <!-- real; machine_precision; () -->
-\index{{\tt \bfseries machine\_precision}!(): real|hyperpage}
+\index{{\tt \bfseries machine\_precision}!{\tt (): real}|hyperpage}
 
 `real` **`machine_precision`**()
- The smallest number $x$ such that $(x + 1) \neq 1$ in floating-point
+The smallest number $x$ such that $(x + 1) \neq 1$ in floating-point
 arithmetic on the current hardware platform
 
 ## Log Probability Function {#get-log-prob}
@@ -201,16 +201,16 @@ has been deprecated; using it will print a warning.  The   function
 `get_lp()` will be removed in a future release.
 
 <!-- real; target; () -->
-\index{{\tt \bfseries target}!(): real|hyperpage}
+\index{{\tt \bfseries target}!{\tt (): real}|hyperpage}
 
 `real` **`target`**()
- Returns the current value of the log probability accumulator.
+Returns the current value of the log probability accumulator.
 
 <!-- real; get_lp; () -->
-\index{{\tt \bfseries get\_lp}!(): real|hyperpage}
+\index{{\tt \bfseries get\_lp}!{\tt (): real}|hyperpage}
 
 `real` **`get_lp`**()
- Returns the current value of the log probability accumulator;
+Returns the current value of the log probability accumulator;
 **deprecated;** - use `target()` instead.
 
 Both `target` and the deprecated `get_lp` act like other functions
@@ -233,86 +233,86 @@ floating-point comparisons.  Comparing an integer and real value is
 carried out by first promoting the integer value.
 
 <!-- int; operator<; (int x, int y); -->
-\index{{\tt \bfseries operator\_logical\_less\_than}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_less\_than}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator<`**(`int x, int y`)
 
 
 <!-- int; operator<; (real x, real y); -->
-\index{{\tt \bfseries operator\_logical\_less\_than}!(real x, real y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_less\_than}!{\tt (real x, real y): int}|hyperpage}
 
 `int` **`operator<`**(`real x, real y`)
- Returns 1 if x is less than y and 0 otherwise. \[
+Returns 1 if x is less than y and 0 otherwise. \[
 \text{operator<}(x,y) = \begin{cases} 1 & \text{if $x < y$} \\ 0 &
 \text{otherwise} \end{cases} \]
 
 <!-- int; operator<=; (int x, int y); -->
-\index{{\tt \bfseries operator\_logical\_less\_than\_equal}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_less\_than\_equal}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator<=`**(`int x, int y`)
 
 
 <!-- int; operator<=; (real x, real y); -->
-\index{{\tt \bfseries operator\_logical\_less\_than\_equal}!(real x, real y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_less\_than\_equal}!{\tt (real x, real y): int}|hyperpage}
 
 `int` **`operator<=`**(`real x, real y`)
- Returns 1 if x is less than or equal y and 0 otherwise. \[
+Returns 1 if x is less than or equal y and 0 otherwise. \[
 \text{operator<=}(x,y) = \begin{cases} 1 & \text{if $x \leq y$} \\ 0 &
 \text{otherwise} \end{cases} \]
 
 <!-- int; operator>; (int x, int y); -->
-\index{{\tt \bfseries operator\_logical\_greater\_than}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_greater\_than}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator>`**(`int x, int y`)
 
 
 <!-- int; operator>; (real x, real y); -->
-\index{{\tt \bfseries operator\_logical\_greater\_than}!(real x, real y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_greater\_than}!{\tt (real x, real y): int}|hyperpage}
 
 `int` **`operator>`**(`real x, real y`)
- Returns 1 if x is greater than y and 0 otherwise. \[ \text{operator>}
+Returns 1 if x is greater than y and 0 otherwise. \[ \text{operator>}
 = \begin{cases} 1 & \text{if $x > y$} \\ 0 & \text{otherwise}
 \end{cases} \]
 
 <!-- int; operator>=; (int x, int y); -->
-\index{{\tt \bfseries operator\_logical\_greater\_than\_equal}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_greater\_than\_equal}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator>=`**(`int x, int y`)
 
 
 <!-- int; operator>=; (real x, real y); -->
-\index{{\tt \bfseries operator\_logical\_greater\_than\_equal}!(real x, real y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_greater\_than\_equal}!{\tt (real x, real y): int}|hyperpage}
 
 `int` **`operator>=`**(`real x, real y`)
- Returns 1 if x is greater than or equal to y and 0 otherwise. \[
+Returns 1 if x is greater than or equal to y and 0 otherwise. \[
 \text{operator>=} = \begin{cases} 1 & \text{if $x \geq y$} \\ 0 &
 \text{otherwise} \end{cases} \]
 
 <!-- int; operator==; (int x, int y); -->
-\index{{\tt \bfseries operator\_logial\_equal}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_logial\_equal}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator==`**(`int x, int y`)
 
 
 <!-- int; operator==; (real x, real y); -->
-\index{{\tt \bfseries operator\_logial\_equal}!(real x, real y): int|hyperpage}
+\index{{\tt \bfseries operator\_logial\_equal}!{\tt (real x, real y): int}|hyperpage}
 
 `int` **`operator==`**(`real x, real y`)
- Returns 1 if x is equal to y and 0 otherwise. \[
+Returns 1 if x is equal to y and 0 otherwise. \[
 \text{operator==}(x,y) = \begin{cases} 1 & \text{if $x = y$} \\ 0 &
 \text{otherwise} \end{cases} \]
 
 <!-- int; operator!=; (int x, int y); -->
-\index{{\tt \bfseries operator\_logical\_not\_equal}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_not\_equal}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator!=`**(`int x, int y`)
 
 
 <!-- int; operator!=; (real x, real y); -->
-\index{{\tt \bfseries operator\_logical\_not\_equal}!(real x, real y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_not\_equal}!{\tt (real x, real y): int}|hyperpage}
 
 `int` **`operator!=`**(`real x, real y`)
- Returns 1 if x is not equal to y and 0 otherwise. \[
+Returns 1 if x is not equal to y and 0 otherwise. \[
 \text{operator!=}(x,y) = \begin{cases} 1 & \text{if $x \neq y$} \\ 0 &
 \text{otherwise} \end{cases} \]
 
@@ -328,44 +328,44 @@ interpreted as `(!a) && b`, and `a < b || c >= d && e != f` as `(a <
 b) || (((c >= d) && (e != f)))`.
 
 <!-- int; operator!; (int x); -->
-\index{{\tt \bfseries operator\_negation}!(int x): int|hyperpage}
+\index{{\tt \bfseries operator\_negation}!{\tt (int x): int}|hyperpage}
 
 `int` **`operator!`**(`int x`)
 
 
 <!-- int; operator!; (real x); -->
-\index{{\tt \bfseries operator\_negation}!(real x): int|hyperpage}
+\index{{\tt \bfseries operator\_negation}!{\tt (real x): int}|hyperpage}
 
 `int` **`operator!`**(`real x`)
- Returns 1 if x is zero and 0 otherwise. \[ \text{operator!}(x) =
+Returns 1 if x is zero and 0 otherwise. \[ \text{operator!}(x) =
 \begin{cases} 0 & \text{if $x \neq 0$} \\ 1 & \text{if $x = 0$}
 \end{cases} \]
 
 <!-- int; operator&&; (int x, int y); -->
-\index{{\tt \bfseries operator\_logical\_and}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_and}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator&&`**(`int x, int y`)
 
 
 <!-- int; operator&&; (real x, real y); -->
-\index{{\tt \bfseries operator\_logical\_and}!(real x, real y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_and}!{\tt (real x, real y): int}|hyperpage}
 
 `int` **`operator&&`**(`real x, real y`)
- Returns 1 if x is unequal to 0 and y is unequal to 0. \[
+Returns 1 if x is unequal to 0 and y is unequal to 0. \[
 \mathrm{operator\&\&}(x,y) = \begin{cases} 1 & \text{if $x \neq 0$}
 \text{ and } y \neq 0\\ 0 & \text{otherwise} \end{cases} \]
 
 <!-- int; operator||; (int x, int y); -->
-\index{{\tt \bfseries operator\_logical\_or}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_or}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator||`**(`int x, int y`)
 
 
 <!-- int; operator||; (real x, real y); -->
-\index{{\tt \bfseries operator\_logical\_or}!(real x, real y): int|hyperpage}
+\index{{\tt \bfseries operator\_logical\_or}!{\tt (real x, real y): int}|hyperpage}
 
 `int` **`operator||`**(`real x, real y`)
- Returns 1 if x is unequal to 0 or y is unequal to 0. \[
+Returns 1 if x is unequal to 0 or y is unequal to 0. \[
 \text{operator||}(x,y) = \begin{cases} 1 & \text{if $x \neq 0$}
 \textrm{ or } y \neq 0\\ 0 & \text{otherwise} \end{cases} \]
 
@@ -385,10 +385,10 @@ The logical functions introduce conditional behavior functionally and
 are primarily provided for compatibility with BUGS and JAGS.
 
 <!-- real; step; (real x); -->
-\index{{\tt \bfseries step}!(real x): real|hyperpage}
+\index{{\tt \bfseries step}!{\tt (real x): real}|hyperpage}
 
 `real` **`step`**(`real x`)
- Returns 1 if x is positive and 0 otherwise. \[ \text{step}(x) =
+Returns 1 if x is positive and 0 otherwise. \[ \text{step}(x) =
 \begin{cases} 0 & \text{if } x < 0 \\ 1 & \text{otherwise} \end{cases}
 \] _**Warning:**_ `int_step(0)` and `int_step(NaN)` return 0 whereas
 `step(0)` and `step(NaN)` return 1.
@@ -400,16 +400,16 @@ functions; see the warning in section \@ref(step-functions) applied to
 expressions dependent on parameters.
 
 <!-- int; is_inf; (real x); -->
-\index{{\tt \bfseries is\_inf}!(real x): int|hyperpage}
+\index{{\tt \bfseries is\_inf}!{\tt (real x): int}|hyperpage}
 
 `int` **`is_inf`**(`real x`)
- Returns 1 if x is infinite (positive or negative) and 0 otherwise. 
+Returns 1 if x is infinite (positive or negative) and 0 otherwise.
 
 <!-- int; is_nan; (real x); -->
-\index{{\tt \bfseries is\_nan}!(real x): int|hyperpage}
+\index{{\tt \bfseries is\_nan}!{\tt (real x): int}|hyperpage}
 
 `int` **`is_nan`**(`real x`)
- Returns 1 if x is NaN and 0 otherwise. 
+Returns 1 if x is NaN and 0 otherwise.
 
 Care must be taken because both of these indicator functions are
 step-like and thus can cause discontinuities in gradients when applied
@@ -426,54 +426,54 @@ y` and `-x`, respectively.
 ### Binary Infix Operators
 
 <!-- real; operator+; (real x, real y); -->
-\index{{\tt \bfseries operator\_add}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries operator\_add}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`operator+`**(`real x, real y`)
- Returns the sum of x and y. \[ (x + y) = \text{operator+}(x,y) = x+y
+Returns the sum of x and y. \[ (x + y) = \text{operator+}(x,y) = x+y
 \]
 
 <!-- real; operator-; (real x, real y); -->
-\index{{\tt \bfseries operator\_subtract}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries operator\_subtract}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`operator-`**(`real x, real y`)
- Returns the difference between x and y. \[ (x - y) =
+Returns the difference between x and y. \[ (x - y) =
 \text{operator-}(x,y) = x - y \]
 
 <!-- real; operator*; (real x, real y); -->
-\index{{\tt \bfseries operator\_multiply}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries operator\_multiply}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`operator*`**(`real x, real y`)
- Returns the product of x and y. \[ (x * y) = \text{operator*}(x,y) =
+Returns the product of x and y. \[ (x * y) = \text{operator*}(x,y) =
 xy \]
 
 <!-- real; operator/; (real x, real y); -->
-\index{{\tt \bfseries operator\_divide}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries operator\_divide}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`operator/`**(`real x, real y`)
- Returns the quotient of x and y. \[ (x / y) = \text{operator/}(x,y) =
+Returns the quotient of x and y. \[ (x / y) = \text{operator/}(x,y) =
 \frac{x}{y} \]
 
 <!-- real; operator^; (real x, real y); -->
-\index{{\tt \bfseries operator\_pow}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries operator\_pow}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`operator^`**(`real x, real y`)
- Return x raised to the power of y. \[ (x^\mathrm{\wedge}y) =
+Return x raised to the power of y. \[ (x^\mathrm{\wedge}y) =
 \text{operator}^\mathrm{\wedge}(x,y) = x^y \]
 
 ### Unary Prefix Operators
 
 <!-- real; operator-; (real x); -->
-\index{{\tt \bfseries operator\_subtract}!(real x): real|hyperpage}
+\index{{\tt \bfseries operator\_subtract}!{\tt (real x): real}|hyperpage}
 
 `real` **`operator-`**(`real x`)
- Returns the negation of the subtrahend x. \[ \text{operator-}(x) =
+Returns the negation of the subtrahend x. \[ \text{operator-}(x) =
 (-x) \]
 
 <!-- real; operator+; (real x); -->
-\index{{\tt \bfseries operator\_add}!(real x): real|hyperpage}
+\index{{\tt \bfseries operator\_add}!{\tt (real x): real}|hyperpage}
 
 `real` **`operator+`**(`real x`)
- Returns the value of x. \[ \text{operator+}(x) = x \]
+Returns the value of x. \[ \text{operator+}(x) = x \]
 
 ## Step-like Functions {#step-functions}
 
@@ -488,30 +488,30 @@ used in the   data, transformed data, or generated quantities blocks.*
 ### Absolute Value Functions
 
 <!-- R; fabs; (T x); -->
-\index{{\tt \bfseries fabs}!(T x): R|hyperpage}
+\index{{\tt \bfseries fabs}!{\tt (T x): R}|hyperpage}
 
 `R` **`fabs`**(`T x`)
 absolute value of x
 
 <!-- real; abs; (real x); -->
-\index{{\tt \bfseries abs}!(real x): real|hyperpage}
+\index{{\tt \bfseries abs}!{\tt (real x): real}|hyperpage}
 
 `real` **`abs`**(`real x`)
- Returns the absolute value of x, defined by \[ \text{abs}(x) = |x| \]
+Returns the absolute value of x, defined by \[ \text{abs}(x) = |x| \]
 See the warning at start of section \@ref(step-functions) for
 application to parameters.
 
 <!-- int; abs; (int x); -->
-\index{{\tt \bfseries abs}!(int x): int|hyperpage}
+\index{{\tt \bfseries abs}!{\tt (int x): int}|hyperpage}
 
 `int` **`abs`**(`int x`)
- Returns the absolute value of x, defined by \[ \text{abs}(x) = |x| \]
+Returns the absolute value of x, defined by \[ \text{abs}(x) = |x| \]
 
 <!-- real; fdim; (real x, real y); -->
-\index{{\tt \bfseries fdim}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries fdim}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`fdim`**(`real x, real y`)
- Returns the positive difference between x and y, which is x - y if x
+Returns the positive difference between x and y, which is x - y if x
 is greater than y and 0 otherwise; see warning at start of section
 \@ref(step-functions). \[ \text{fdim}(x,y) = \begin{cases} x-y &
 \text{if } x \geq y \\ 0 & \text{otherwise} \end{cases} \]
@@ -519,29 +519,29 @@ is greater than y and 0 otherwise; see warning at start of section
 ### Bounds Functions
 
 <!-- real; fmin; (real x, real y); -->
-\index{{\tt \bfseries fmin}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries fmin}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`fmin`**(`real x, real y`)
- Returns the minimum of x and y; see warning at start of section
+Returns the minimum of x and y; see warning at start of section
 \@ref(step-functions). \[ \text{fmin}(x,y) = \begin{cases} x &
 \text{if } x \leq y \\ y & \text{otherwise} \end{cases} \]
 
 <!-- real; fmax; (real x, real y); -->
-\index{{\tt \bfseries fmax}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries fmax}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`fmax`**(`real x, real y`)
- Returns the maximum of x and y; see warning at start of section
+Returns the maximum of x and y; see warning at start of section
 \@ref(step-functions). \[ \text{fmax}(x,y) = \begin{cases} x &
 \text{if } x \geq y \\ y & \text{otherwise} \end{cases} \]
 
 ### Arithmetic Functions
 
 <!-- real; fmod; (real x, real y); -->
-\index{{\tt \bfseries fmod}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries fmod}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`fmod`**(`real x, real y`)
- Returns the real value remainder after dividing x by y; see warning
-at start of section \@ref(step-functions). \[ \text{fmod}(x,y) = x -
+Returns the real value remainder after dividing x by y; see warning at
+start of section \@ref(step-functions). \[ \text{fmod}(x,y) = x -
 \left\lfloor \frac{x}{y} \right\rfloor \, y \] The operator $\lfloor u
 \rfloor$ is the floor operation; see below.
 
@@ -560,7 +560,7 @@ they return real values.  Stan may introduce integer-valued versions
 of these in the future, but as of now, there is no good workaround.
 
 <!-- R; floor; (T x); -->
-\index{{\tt \bfseries floor}!(T x): R|hyperpage}
+\index{{\tt \bfseries floor}!{\tt (T x): R}|hyperpage}
 
 `R` **`floor`**(`T x`)
 floor of x, which is the largest integer less than or equal to x,
@@ -568,7 +568,7 @@ converted to a real value; see warning at start of section
 \@ref(step-functions)
 
 <!-- R; ceil; (T x); -->
-\index{{\tt \bfseries ceil}!(T x): R|hyperpage}
+\index{{\tt \bfseries ceil}!{\tt (T x): R}|hyperpage}
 
 `R` **`ceil`**(`T x`)
 ceiling of x, which is the smallest integer greater than or equal to
@@ -576,14 +576,14 @@ x, converted to a real value; see warning at start of section
 \@ref(step-functions)
 
 <!-- R; round; (T x); -->
-\index{{\tt \bfseries round}!(T x): R|hyperpage}
+\index{{\tt \bfseries round}!{\tt (T x): R}|hyperpage}
 
 `R` **`round`**(`T x`)
 nearest integer to x, converted to a real value; see warning at start
 of section \@ref(step-functions)
 
 <!-- R; trunc; (T x); -->
-\index{{\tt \bfseries trunc}!(T x): R|hyperpage}
+\index{{\tt \bfseries trunc}!{\tt (T x): R}|hyperpage}
 
 `R` **`trunc`**(`T x`)
 integer nearest to but no larger in magnitude than x, converted to a
@@ -592,73 +592,73 @@ double value; see warning at start of section \@ref(step-functions)
 ## Power and Logarithm Functions
 
 <!-- R; sqrt; (T x); -->
-\index{{\tt \bfseries sqrt}!(T x): R|hyperpage}
+\index{{\tt \bfseries sqrt}!{\tt (T x): R}|hyperpage}
 
 `R` **`sqrt`**(`T x`)
 square root of x
 
 <!-- R; cbrt; (T x); -->
-\index{{\tt \bfseries cbrt}!(T x): R|hyperpage}
+\index{{\tt \bfseries cbrt}!{\tt (T x): R}|hyperpage}
 
 `R` **`cbrt`**(`T x`)
 cube root of x
 
 <!-- R; square; (T x); -->
-\index{{\tt \bfseries square}!(T x): R|hyperpage}
+\index{{\tt \bfseries square}!{\tt (T x): R}|hyperpage}
 
 `R` **`square`**(`T x`)
 square of x
 
 <!-- R; exp; (T x); -->
-\index{{\tt \bfseries exp}!(T x): R|hyperpage}
+\index{{\tt \bfseries exp}!{\tt (T x): R}|hyperpage}
 
 `R` **`exp`**(`T x`)
 natural exponential of x
 
 <!-- R; exp2; (T x); -->
-\index{{\tt \bfseries exp2}!(T x): R|hyperpage}
+\index{{\tt \bfseries exp2}!{\tt (T x): R}|hyperpage}
 
 `R` **`exp2`**(`T x`)
 base-2 exponential of x
 
 <!-- R; log; (T x); -->
-\index{{\tt \bfseries log}!(T x): R|hyperpage}
+\index{{\tt \bfseries log}!{\tt (T x): R}|hyperpage}
 
 `R` **`log`**(`T x`)
 natural logarithm of x
 
 <!-- R; log2; (T x); -->
-\index{{\tt \bfseries log2}!(T x): R|hyperpage}
+\index{{\tt \bfseries log2}!{\tt (T x): R}|hyperpage}
 
 `R` **`log2`**(`T x`)
 base-2 logarithm of x
 
 <!-- R; log10; (T x); -->
-\index{{\tt \bfseries log10}!(T x): R|hyperpage}
+\index{{\tt \bfseries log10}!{\tt (T x): R}|hyperpage}
 
 `R` **`log10`**(`T x`)
 base-10 logarithm of x
 
 <!-- real; pow; (real x, real y); -->
-\index{{\tt \bfseries pow}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries pow}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`pow`**(`real x, real y`)
- Returns x raised to the power of y. \[ \text{pow}(x,y) = x^y \]
+Returns x raised to the power of y. \[ \text{pow}(x,y) = x^y \]
 
 <!-- R; inv; (T x); -->
-\index{{\tt \bfseries inv}!(T x): R|hyperpage}
+\index{{\tt \bfseries inv}!{\tt (T x): R}|hyperpage}
 
 `R` **`inv`**(`T x`)
 inverse of x
 
 <!-- R; inv_sqrt; (T x); -->
-\index{{\tt \bfseries inv\_sqrt}!(T x): R|hyperpage}
+\index{{\tt \bfseries inv\_sqrt}!{\tt (T x): R}|hyperpage}
 
 `R` **`inv_sqrt`**(`T x`)
 inverse of the square root of x
 
 <!-- R; inv_square; (T x); -->
-\index{{\tt \bfseries inv\_square}!(T x): R|hyperpage}
+\index{{\tt \bfseries inv\_square}!{\tt (T x): R}|hyperpage}
 
 `R` **`inv_square`**(`T x`)
 inverse of the square of x
@@ -666,92 +666,91 @@ inverse of the square of x
 ## Trigonometric Functions
 
 <!-- real; hypot; (real x, real y); -->
-\index{{\tt \bfseries hypot}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries hypot}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`hypot`**(`real x, real y`)
- Returns the length of the hypotenuse of a right triangle with sides
-of length x and y. \[ \text{hypot}(x,y) = \begin{cases} \sqrt{x^2+y^2}
-& \text{if } x,y\geq 0 \\ \textrm{NaN} & \text{otherwise} \end{cases}
-\]
+Returns the length of the hypotenuse of a right triangle with sides of
+length x and y. \[ \text{hypot}(x,y) = \begin{cases} \sqrt{x^2+y^2} &
+\text{if } x,y\geq 0 \\ \textrm{NaN} & \text{otherwise} \end{cases} \]
 
 <!-- R; cos; (T x); -->
-\index{{\tt \bfseries cos}!(T x): R|hyperpage}
+\index{{\tt \bfseries cos}!{\tt (T x): R}|hyperpage}
 
 `R` **`cos`**(`T x`)
 cosine of the angle x (in radians)
 
 <!-- R; sin; (T x); -->
-\index{{\tt \bfseries sin}!(T x): R|hyperpage}
+\index{{\tt \bfseries sin}!{\tt (T x): R}|hyperpage}
 
 `R` **`sin`**(`T x`)
 sine of the angle x (in radians)
 
 <!-- R; tan; (T x); -->
-\index{{\tt \bfseries tan}!(T x): R|hyperpage}
+\index{{\tt \bfseries tan}!{\tt (T x): R}|hyperpage}
 
 `R` **`tan`**(`T x`)
 tangent of the angle x (in radians)
 
 <!-- R; acos; (T x); -->
-\index{{\tt \bfseries acos}!(T x): R|hyperpage}
+\index{{\tt \bfseries acos}!{\tt (T x): R}|hyperpage}
 
 `R` **`acos`**(`T x`)
 principal arc (inverse) cosine (in radians) of x
 
 <!-- R; asin; (T x); -->
-\index{{\tt \bfseries asin}!(T x): R|hyperpage}
+\index{{\tt \bfseries asin}!{\tt (T x): R}|hyperpage}
 
 `R` **`asin`**(`T x`)
 principal arc (inverse) sine (in radians) of x
 
 <!-- R; atan; (T x); -->
-\index{{\tt \bfseries atan}!(T x): R|hyperpage}
+\index{{\tt \bfseries atan}!{\tt (T x): R}|hyperpage}
 
 `R` **`atan`**(`T x`)
 principal arc (inverse) tangent (in radians) of x, with values from
 $-\pi$ to $\pi$
 
 <!-- real; atan2; (real y, real x); -->
-\index{{\tt \bfseries atan2}!(real y, real x): real|hyperpage}
+\index{{\tt \bfseries atan2}!{\tt (real y, real x): real}|hyperpage}
 
 `real` **`atan2`**(`real y, real x`)
- Returns the principal arc (inverse) tangent (in radians) of y divided
+Returns the principal arc (inverse) tangent (in radians) of y divided
 by x, \[ \text{atan2}(y, x) = \arctan\left(\frac{y}{x}\right) \]
 
 ## Hyperbolic Trigonometric Functions
 
 <!-- R; cosh; (T x); -->
-\index{{\tt \bfseries cosh}!(T x): R|hyperpage}
+\index{{\tt \bfseries cosh}!{\tt (T x): R}|hyperpage}
 
 `R` **`cosh`**(`T x`)
 hyperbolic cosine of x (in radians)
 
 <!-- R; sinh; (T x); -->
-\index{{\tt \bfseries sinh}!(T x): R|hyperpage}
+\index{{\tt \bfseries sinh}!{\tt (T x): R}|hyperpage}
 
 `R` **`sinh`**(`T x`)
 hyperbolic sine of x (in radians)
 
 <!-- R; tanh; (T x); -->
-\index{{\tt \bfseries tanh}!(T x): R|hyperpage}
+\index{{\tt \bfseries tanh}!{\tt (T x): R}|hyperpage}
 
 `R` **`tanh`**(`T x`)
 hyperbolic tangent of x (in radians)
 
 <!-- R; acosh; (T x); -->
-\index{{\tt \bfseries acosh}!(T x): R|hyperpage}
+\index{{\tt \bfseries acosh}!{\tt (T x): R}|hyperpage}
 
 `R` **`acosh`**(`T x`)
 inverse hyperbolic cosine (in radians)
 
 <!-- R; asinh; (T x); -->
-\index{{\tt \bfseries asinh}!(T x): R|hyperpage}
+\index{{\tt \bfseries asinh}!{\tt (T x): R}|hyperpage}
 
 `R` **`asinh`**(`T x`)
 inverse hyperbolic cosine (in radians)
 
 <!-- R; atanh; (T x); -->
-\index{{\tt \bfseries atanh}!(T x): R|hyperpage}
+\index{{\tt \bfseries atanh}!{\tt (T x): R}|hyperpage}
 
 `R` **`atanh`**(`T x`)
 inverse hyperbolic tangent (in radians) of x
@@ -763,19 +762,19 @@ generalized linear models.  The function $\Phi$ is also commonly used
 as a link function (see section \@ref(Phi-function)).
 
 <!-- R; logit; (T x); -->
-\index{{\tt \bfseries logit}!(T x): R|hyperpage}
+\index{{\tt \bfseries logit}!{\tt (T x): R}|hyperpage}
 
 `R` **`logit`**(`T x`)
 log odds, or logit, function applied to x
 
 <!-- R; inv_logit; (T x); -->
-\index{{\tt \bfseries inv\_logit}!(T x): R|hyperpage}
+\index{{\tt \bfseries inv\_logit}!{\tt (T x): R}|hyperpage}
 
 `R` **`inv_logit`**(`T x`)
 logistic sigmoid function applied to x
 
 <!-- R; inv_cloglog; (T x); -->
-\index{{\tt \bfseries inv\_cloglog}!(T x): R|hyperpage}
+\index{{\tt \bfseries inv\_cloglog}!{\tt (T x): R}|hyperpage}
 
 `R` **`inv_cloglog`**(`T x`)
 inverse of the complementary log-log function applied to x
@@ -790,32 +789,32 @@ distribution function $\Phi$ by scaling.  See section
 distribution function (and its complement).
 
 <!-- R; erf; (T x); -->
-\index{{\tt \bfseries erf}!(T x): R|hyperpage}
+\index{{\tt \bfseries erf}!{\tt (T x): R}|hyperpage}
 
 `R` **`erf`**(`T x`)
 error function, also known as the Gauss error function, of x
 
 <!-- R; erfc; (T x); -->
-\index{{\tt \bfseries erfc}!(T x): R|hyperpage}
+\index{{\tt \bfseries erfc}!{\tt (T x): R}|hyperpage}
 
 `R` **`erfc`**(`T x`)
 complementary error function of x
 
 <!-- R; Phi; (T x); -->
-\index{{\tt \bfseries Phi}!(T x): R|hyperpage}
+\index{{\tt \bfseries Phi}!{\tt (T x): R}|hyperpage}
 
 `R` **`Phi`**(`T x`)
 standard normal cumulative distribution function of x
 
 <!-- R; inv_Phi; (T x); -->
-\index{{\tt \bfseries inv\_Phi}!(T x): R|hyperpage}
+\index{{\tt \bfseries inv\_Phi}!{\tt (T x): R}|hyperpage}
 
 `R` **`inv_Phi`**(`T x`)
 standard normal inverse cumulative distribution function of p,
 otherwise known as the quantile function
 
 <!-- R; Phi_approx; (T x); -->
-\index{{\tt \bfseries Phi\_approx}!(T x): R|hyperpage}
+\index{{\tt \bfseries Phi\_approx}!{\tt (T x): R}|hyperpage}
 
 `R` **`Phi_approx`**(`T x`)
 fast approximation of the unit (may replace `Phi` for probit
@@ -825,38 +824,38 @@ regression with maximum absolute error of 0.00014, see
 ### Other Probability-Related Functions
 
 <!-- real; binary_log_loss; (int y, real y_hat); -->
-\index{{\tt \bfseries binary\_log\_loss}!(int y, real y\_hat): real|hyperpage}
+\index{{\tt \bfseries binary\_log\_loss}!{\tt (int y, real y\_hat): real}|hyperpage}
 
 `real` **`binary_log_loss`**(`int y, real y_hat`)
- Returns the log loss function for for predicting $\hat{y} \in [0,1]$
+Returns the log loss function for for predicting $\hat{y} \in [0,1]$
 for boolean outcome $y \in \{0,1\}$. \[
 \mathrm{binary\_log\_loss}(y,\hat{y}) = \begin{cases} -\log \hat{y} &
 \text{if } y = 0\\ -\log (1 - \hat{y}) & \text{otherwise} \end{cases}
 \]
 
 <!-- real; owens_t; (real h, real a); -->
-\index{{\tt \bfseries owens\_t}!(real h, real a): real|hyperpage}
+\index{{\tt \bfseries owens\_t}!{\tt (real h, real a): real}|hyperpage}
 
 `real` **`owens_t`**(`real h, real a`)
- Returns the Owen's T function for the probability of the event $X >
-h$ and $0<Y<aX$ where X and Y are independent standard normal random
+Returns the Owen's T function for the probability of the event $X > h$
+and $0<Y<aX$ where X and Y are independent standard normal random
 variables. \[ \mathrm{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a
 \frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx \]
 
 ## Combinatorial Functions {#betafun}
 
 <!-- real; inc_beta; (real alpha, real beta, real x); -->
-\index{{\tt \bfseries inc\_beta}!(real alpha, real beta, real x): real|hyperpage}
+\index{{\tt \bfseries inc\_beta}!{\tt (real alpha, real beta, real x): real}|hyperpage}
 
 `real` **`inc_beta`**(`real alpha, real beta, real x`)
- Returns the incomplete beta function up to x applied to alpha and
+Returns the incomplete beta function up to x applied to alpha and
 beta. See section \@ref(inc-beta-appendix) for a definition.
 
 <!-- real; lbeta; (real alpha, real beta); -->
-\index{{\tt \bfseries lbeta}!(real alpha, real beta): real|hyperpage}
+\index{{\tt \bfseries lbeta}!{\tt (real alpha, real beta): real}|hyperpage}
 
 `real` **`lbeta`**(`real alpha, real beta`)
- Returns the natural logarithm of the beta function applied to alpha
+Returns the natural logarithm of the beta function applied to alpha
 and beta. The beta function, $\text{B}(\alpha,\beta)$, computes the
 normalizing constant for the beta distribution, and is defined for
 $\alpha > 0$ and $\beta > 0$. \[ \text{lbeta}(\alpha,\beta) = \log
@@ -864,7 +863,7 @@ $\alpha > 0$ and $\beta > 0$. \[ \text{lbeta}(\alpha,\beta) = \log
 \@ref(beta-appendix) for definition of $\text{B}(\alpha, \beta)$.
 
 <!-- R; tgamma; (T x); -->
-\index{{\tt \bfseries tgamma}!(T x): R|hyperpage}
+\index{{\tt \bfseries tgamma}!{\tt (T x): R}|hyperpage}
 
 `R` **`tgamma`**(`T x`)
 gamma function applied to x. The gamma function is the generalization
@@ -874,13 +873,13 @@ function is defined for positive numbers and non-integral negative
 numbers,
 
 <!-- R; lgamma; (T x); -->
-\index{{\tt \bfseries lgamma}!(T x): R|hyperpage}
+\index{{\tt \bfseries lgamma}!{\tt (T x): R}|hyperpage}
 
 `R` **`lgamma`**(`T x`)
 natural logarithm of the gamma function applied to x,
 
 <!-- R; digamma; (T x); -->
-\index{{\tt \bfseries digamma}!(T x): R|hyperpage}
+\index{{\tt \bfseries digamma}!{\tt (T x): R}|hyperpage}
 
 `R` **`digamma`**(`T x`)
 digamma function applied to x. The digamma function is the derivative
@@ -888,17 +887,17 @@ of the natural logarithm of the Gamma function. The function is
 defined for positive numbers and non-integral negative numbers
 
 <!-- R; trigamma; (T x); -->
-\index{{\tt \bfseries trigamma}!(T x): R|hyperpage}
+\index{{\tt \bfseries trigamma}!{\tt (T x): R}|hyperpage}
 
 `R` **`trigamma`**(`T x`)
 trigamma function applied to x. The trigamma function is the second
 derivative of the natural logarithm of the Gamma function
 
 <!-- real; lmgamma; (int n, real x); -->
-\index{{\tt \bfseries lmgamma}!(int n, real x): real|hyperpage}
+\index{{\tt \bfseries lmgamma}!{\tt (int n, real x): real}|hyperpage}
 
 `real` **`lmgamma`**(`int n, real x`)
- Returns the natural logarithm of the multivariate gamma function
+Returns the natural logarithm of the multivariate gamma function
 $\Gamma_n$ with n dimensions applied to x. \[ \text{lmgamma}(n,x) =
 \begin{cases} \frac{n(n-1)}{4} \log \pi + \sum_{j=1}^n \log
 \Gamma\left(x + \frac{1 - j}{2}\right) & \text{if } x\not\in
@@ -906,42 +905,41 @@ $\Gamma_n$ with n dimensions applied to x. \[ \text{lmgamma}(n,x) =
 \]
 
 <!-- real; gamma_p; (real a, real z); -->
-\index{{\tt \bfseries gamma\_p}!(real a, real z): real|hyperpage}
+\index{{\tt \bfseries gamma\_p}!{\tt (real a, real z): real}|hyperpage}
 
 `real` **`gamma_p`**(`real a, real z`)
- Returns the normalized lower incomplete gamma function of a and z
+Returns the normalized lower incomplete gamma function of a and z
 defined for positive a and nonnegative z. \[ \mathrm{gamma\_p}(a,z) =
 \begin{cases} \frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt & \text{if }
 a > 0, z \geq 0 \\ \textrm{error} & \text{otherwise} \end{cases} \]
 
 <!-- real; gamma_q; (real a, real z); -->
-\index{{\tt \bfseries gamma\_q}!(real a, real z): real|hyperpage}
+\index{{\tt \bfseries gamma\_q}!{\tt (real a, real z): real}|hyperpage}
 
 `real` **`gamma_q`**(`real a, real z`)
- Returns the normalized upper incomplete gamma function of a and z
+Returns the normalized upper incomplete gamma function of a and z
 defined for positive a and nonnegative z. \[ \mathrm{gamma\_q}(a,z) =
 \begin{cases} \frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt &
 \text{if } a > 0, z \geq 0 \\[6pt] \textrm{error} & \text{otherwise}
 \end{cases} \]
 
 <!-- real; binomial_coefficient_log; (real x, real y); -->
-\index{{\tt \bfseries binomial\_coefficient\_log}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries binomial\_coefficient\_log}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`binomial_coefficient_log`**(`real x, real y`)
- _**Warning:**_ This function is deprecated and should be replaced
-with `lchoose`. Returns the natural logarithm of the binomial
-coefficient of x and y. For non-negative integer inputs, the binomial
-coefficient function is written as $\binom{x}{y}$ and pronounced "x
-choose y." This function generalizes to real numbers using the gamma
-function. For $0 \leq y \leq x$, \[
-\mathrm{binomial\_coefficient\_log}(x,y) = \log\Gamma(x+1) -
-\log\Gamma(y+1) - \log\Gamma(x-y+1). \]
+_**Warning:**_ This function is deprecated and should be replaced with
+`lchoose`. Returns the natural logarithm of the binomial coefficient
+of x and y. For non-negative integer inputs, the binomial coefficient
+function is written as $\binom{x}{y}$ and pronounced "x choose y."
+This function generalizes to real numbers using the gamma function.
+For $0 \leq y \leq x$, \[ \mathrm{binomial\_coefficient\_log}(x,y) =
+\log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1). \]
 
 <!-- int; choose; (int x, int y); -->
-\index{{\tt \bfseries choose}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries choose}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`choose`**(`int x, int y`)
- Returns the binomial coefficient of x and y. For non-negative integer
+Returns the binomial coefficient of x and y. For non-negative integer
 inputs, the binomial coefficient function is written as $\binom{x}{y}$
 and pronounced "x choose y." In its the antilog of the `lchoose`
 function but returns an integer rather than a real number with no
@@ -950,39 +948,39 @@ coefficient function can be defined via the factorial function \[
 \text{choose}(x,y) = \frac{x!}{\left(y!\right)\left(x - y\right)!}. \]
 
 <!-- real; bessel_first_kind; (int v, real x); -->
-\index{{\tt \bfseries bessel\_first\_kind}!(int v, real x): real|hyperpage}
+\index{{\tt \bfseries bessel\_first\_kind}!{\tt (int v, real x): real}|hyperpage}
 
 `real` **`bessel_first_kind`**(`int v, real x`)
- Returns the Bessel function of the first kind with order v applied to
+Returns the Bessel function of the first kind with order v applied to
 x. \[ \mathrm{bessel\_first\_kind}(v,x) = J_v(x), \] where \[
 J_v(x)=\left(\frac{1}{2}x\right)^v \sum_{k=0}^\infty
 \frac{\left(-\frac{1}{4}x^2\right)^k}{k!\, \Gamma(v+k+1)} \]
 
 <!-- real; bessel_second_kind; (int v, real x); -->
-\index{{\tt \bfseries bessel\_second\_kind}!(int v, real x): real|hyperpage}
+\index{{\tt \bfseries bessel\_second\_kind}!{\tt (int v, real x): real}|hyperpage}
 
 `real` **`bessel_second_kind`**(`int v, real x`)
- Returns the Bessel function of the second kind with order v applied
-to x defined for positive x and v. For $x,v > 0$, \[
+Returns the Bessel function of the second kind with order v applied to
+x defined for positive x and v. For $x,v > 0$, \[
 \mathrm{bessel\_second\_kind}(v,x) = \begin{cases} Y_v(x) & \text{if }
 x > 0 \\ \textrm{error} & \text{otherwise} \end{cases} \] where \[
 Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)} \]
 
 <!-- real; modified_bessel_first_kind; (int v, real z); -->
-\index{{\tt \bfseries modified\_bessel\_first\_kind}!(int v, real z): real|hyperpage}
+\index{{\tt \bfseries modified\_bessel\_first\_kind}!{\tt (int v, real z): real}|hyperpage}
 
 `real` **`modified_bessel_first_kind`**(`int v, real z`)
- Returns the modified Bessel function of the first kind with order v
+Returns the modified Bessel function of the first kind with order v
 applied to z defined for all z and v. \[
 \mathrm{modified\_bessel\_first\_kind}(v,z) = I_v(z) \] where \[
 {I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
 \frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)} \]
 
 <!-- real; modified_bessel_second_kind; (int v, real z); -->
-\index{{\tt \bfseries modified\_bessel\_second\_kind}!(int v, real z): real|hyperpage}
+\index{{\tt \bfseries modified\_bessel\_second\_kind}!{\tt (int v, real z): real}|hyperpage}
 
 `real` **`modified_bessel_second_kind`**(`int v, real z`)
- Returns the modified Bessel function of the second kind with order v
+Returns the modified Bessel function of the second kind with order v
 applied to z defined for positive z and v. \[
 \mathrm{modified\_bessel\_second\_kind}(v,z) = \begin{cases} K_v(z) &
 \text{if } z > 0 \\ \textrm{error} & \text{if } z \leq 0 \end{cases}
@@ -990,19 +988,19 @@ applied to z defined for positive z and v. \[
 I_{v}(z)}{\sin(v\pi)} \]
 
 <!-- real; falling_factorial; (real x, real n); -->
-\index{{\tt \bfseries falling\_factorial}!(real x, real n): real|hyperpage}
+\index{{\tt \bfseries falling\_factorial}!{\tt (real x, real n): real}|hyperpage}
 
 `real` **`falling_factorial`**(`real x, real n`)
- Returns the falling factorial of x with power n defined for positive
-x and real n. \[ \mathrm{falling\_factorial}(x,n) = \begin{cases}
-(x)_n & \text{if } x > 0 \\ \textrm{error} & \text{if } x \leq 0
-\end{cases} \] where \[ (x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)} \]
+Returns the falling factorial of x with power n defined for positive x
+and real n. \[ \mathrm{falling\_factorial}(x,n) = \begin{cases} (x)_n
+& \text{if } x > 0 \\ \textrm{error} & \text{if } x \leq 0 \end{cases}
+\] where \[ (x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)} \]
 
 <!-- real; lchoose; (real x, real y); -->
-\index{{\tt \bfseries lchoose}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries lchoose}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`lchoose`**(`real x, real y`)
- Returns the natural logarithm of the generalized binomial coefficient
+Returns the natural logarithm of the generalized binomial coefficient
 of x and y. For non-negative integer inputs, the binomial coefficient
 function is written as $\binom{x}{y}$ and pronounced "x choose y."
 This function generalizes to real numbers using the gamma function.
@@ -1010,28 +1008,28 @@ For $0 \leq y \leq x$, \[ \mathrm{binomial\_coefficient\_log}(x,y) =
 \log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1). \]
 
 <!-- real; log_falling_factorial; (real x, real n); -->
-\index{{\tt \bfseries log\_falling\_factorial}!(real x, real n): real|hyperpage}
+\index{{\tt \bfseries log\_falling\_factorial}!{\tt (real x, real n): real}|hyperpage}
 
 `real` **`log_falling_factorial`**(`real x, real n`)
- Returns the log of the falling factorial of x with power n defined
-for positive x and real n. \[ \mathrm{log\_falling\_factorial}(x,n) =
+Returns the log of the falling factorial of x with power n defined for
+positive x and real n. \[ \mathrm{log\_falling\_factorial}(x,n) =
 \begin{cases} \log (x)_n & \text{if } x > 0 \\ \textrm{error} &
 \text{if } x \leq 0 \end{cases} \]
 
 <!-- real; rising_factorial; (real x, real n); -->
-\index{{\tt \bfseries rising\_factorial}!(real x, real n): real|hyperpage}
+\index{{\tt \bfseries rising\_factorial}!{\tt (real x, real n): real}|hyperpage}
 
 `real` **`rising_factorial`**(`real x, real n`)
- Returns the rising factorial of x with power n defined for positive x
+Returns the rising factorial of x with power n defined for positive x
 and real n. \[ \mathrm{rising\_factorial}(x,n) = \begin{cases} x^{(n)}
 & \text{if } x > 0 \\ \textrm{error} & \text{if } x \leq 0 \end{cases}
 \] where \[ x^{(n)}=\frac{\Gamma(x+n)}{\Gamma(x)} \]
 
 <!-- real; log_rising_factorial; (real x, real n); -->
-\index{{\tt \bfseries log\_rising\_factorial}!(real x, real n): real|hyperpage}
+\index{{\tt \bfseries log\_rising\_factorial}!{\tt (real x, real n): real}|hyperpage}
 
 `real` **`log_rising_factorial`**(`real x, real n`)
- Returns the log of the rising factorial of x with power n defined for
+Returns the log of the rising factorial of x with power n defined for
 positive x and real n. \[ \mathrm{log\_rising\_factorial}(x,n) =
 \begin{cases} \log x^{(n)} & \text{if } x > 0 \\ \textrm{error} &
 \text{if } x \leq 0 \end{cases} \]
@@ -1044,76 +1042,76 @@ efficient and more numerically stable than defining them directly
 using more basic Stan functions.
 
 <!-- R; expm1; (T x); -->
-\index{{\tt \bfseries expm1}!(T x): R|hyperpage}
+\index{{\tt \bfseries expm1}!{\tt (T x): R}|hyperpage}
 
 `R` **`expm1`**(`T x`)
 natural exponential of x minus 1
 
 <!-- real; fma; (real x, real y, real z); -->
-\index{{\tt \bfseries fma}!(real x, real y, real z): real|hyperpage}
+\index{{\tt \bfseries fma}!{\tt (real x, real y, real z): real}|hyperpage}
 
 `real` **`fma`**(`real x, real y, real z`)
- Returns z plus the result of x multiplied by y. \[ \text{fma}(x,y,z)
-= (x \times y) + z \]
+Returns z plus the result of x multiplied by y. \[ \text{fma}(x,y,z) =
+(x \times y) + z \]
 
 <!-- real; multiply_log; (real x, real y); -->
-\index{{\tt \bfseries multiply\_log}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries multiply\_log}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`multiply_log`**(`real x, real y`)
- _**Warning:**_ This function is deprecated and should be replaced
-with `lmultiply`. Returns the product of x and the natural logarithm
-of y. \[ \mathrm{multiply\_log}(x,y) = \begin{cases} 0 & \text{if } x
-= y = 0 \\ x \log y & \text{if } x, y \neq 0 \\ \text{NaN} &
+_**Warning:**_ This function is deprecated and should be replaced with
+`lmultiply`. Returns the product of x and the natural logarithm of y.
+\[ \mathrm{multiply\_log}(x,y) = \begin{cases} 0 & \text{if } x = y =
+0 \\ x \log y & \text{if } x, y \neq 0 \\ \text{NaN} &
 \text{otherwise} \end{cases} \]
 
 <!-- real; lmultiply; (real x, real y); -->
-\index{{\tt \bfseries lmultiply}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries lmultiply}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`lmultiply`**(`real x, real y`)
- Returns the product of x and the natural logarithm of y. \[
+Returns the product of x and the natural logarithm of y. \[
 \text{lmultiply}(x,y) = \begin{cases} 0 & \text{if } x = y = 0 \\ x
 \log y & \text{if } x, y \neq 0 \\ \text{NaN} & \text{otherwise}
 \end{cases} \]
 
 <!-- R; log1p; (T x); -->
-\index{{\tt \bfseries log1p}!(T x): R|hyperpage}
+\index{{\tt \bfseries log1p}!{\tt (T x): R}|hyperpage}
 
 `R` **`log1p`**(`T x`)
 natural logarithm of 1 plus x
 
 <!-- R; log1m; (T x); -->
-\index{{\tt \bfseries log1m}!(T x): R|hyperpage}
+\index{{\tt \bfseries log1m}!{\tt (T x): R}|hyperpage}
 
 `R` **`log1m`**(`T x`)
 natural logarithm of 1 minus x
 
 <!-- R; log1p_exp; (T x); -->
-\index{{\tt \bfseries log1p\_exp}!(T x): R|hyperpage}
+\index{{\tt \bfseries log1p\_exp}!{\tt (T x): R}|hyperpage}
 
 `R` **`log1p_exp`**(`T x`)
 natural logarithm of one plus the natural exponentiation of x
 
 <!-- R; log1m_exp; (T x); -->
-\index{{\tt \bfseries log1m\_exp}!(T x): R|hyperpage}
+\index{{\tt \bfseries log1m\_exp}!{\tt (T x): R}|hyperpage}
 
 `R` **`log1m_exp`**(`T x`)
 logarithm of one minus the natural exponentiation of x
 
 <!-- real; log_diff_exp; (real x, real y); -->
-\index{{\tt \bfseries log\_diff\_exp}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries log\_diff\_exp}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`log_diff_exp`**(`real x, real y`)
- Returns the natural logarithm of the difference of the natural
+Returns the natural logarithm of the difference of the natural
 exponentiation of x and the natural exponentiation of y. \[
 \mathrm{log\_diff\_exp}(x,y) = \begin{cases} \log(\exp(x)-\exp(y)) &
 \text{if } x > y \\[6pt] \textrm{NaN} & \text{otherwise} \end{cases}
 \]
 
 <!-- real; log_mix; (real theta, real lp1, real lp2); -->
-\index{{\tt \bfseries log\_mix}!(real theta, real lp1, real lp2): real|hyperpage}
+\index{{\tt \bfseries log\_mix}!{\tt (real theta, real lp1, real lp2): real}|hyperpage}
 
 `real` **`log_mix`**(`real theta, real lp1, real lp2`)
- Returns the log mixture of the log densities lp1 and lp2 with mixing
+Returns the log mixture of the log densities lp1 and lp2 with mixing
 proportion theta, defined by \begin{eqnarray*}
 \mathrm{log\_mix}(\theta, \lambda_1, \lambda_2) & = & \log \!\left(
 \theta \exp(\lambda_1) + \left( 1 - \theta \right) \exp(\lambda_2)
@@ -1121,21 +1119,21 @@ proportion theta, defined by \begin{eqnarray*}
 \lambda_1, \ \log(1 - \theta) + \lambda_2\right). \end{eqnarray*}
 
 <!-- real; log_sum_exp; (real x, real y); -->
-\index{{\tt \bfseries log\_sum\_exp}!(real x, real y): real|hyperpage}
+\index{{\tt \bfseries log\_sum\_exp}!{\tt (real x, real y): real}|hyperpage}
 
 `real` **`log_sum_exp`**(`real x, real y`)
- Returns the natural logarithm of the sum of the natural
-exponentiation of x and the natural exponentiation of y. \[
+Returns the natural logarithm of the sum of the natural exponentiation
+of x and the natural exponentiation of y. \[
 \mathrm{log\_sum\_exp}(x,y) = \log(\exp(x)+\exp(y)) \]
 
 <!-- R; log_inv_logit; (T x); -->
-\index{{\tt \bfseries log\_inv\_logit}!(T x): R|hyperpage}
+\index{{\tt \bfseries log\_inv\_logit}!{\tt (T x): R}|hyperpage}
 
 `R` **`log_inv_logit`**(`T x`)
 natural logarithm of the inverse logit function of x
 
 <!-- R; log1m_inv_logit; (T x); -->
-\index{{\tt \bfseries log1m\_inv\_logit}!(T x): R|hyperpage}
+\index{{\tt \bfseries log1m\_inv\_logit}!{\tt (T x): R}|hyperpage}
 
 `R` **`log1m_inv_logit`**(`T x`)
 natural logarithm of 1 minus the inverse logit function of x

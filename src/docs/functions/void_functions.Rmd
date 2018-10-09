@@ -25,7 +25,7 @@ output stream is connected to (e.g., the terminal in command-line Stan
 or the R console in RStan).
 
 <!-- void; print; (T1 x1,..., TN xN); -->
-\index{{\tt \bfseries print}!(T1 x1,..., TN xN): void|hyperpage}
+\index{{\tt \bfseries print}!{\tt (T1 x1,..., TN xN): void}|hyperpage}
 
 `void` **`print`**(`T1 x1,..., TN xN`)
 Print the values denoted by the arguments x1 through xN on the output
@@ -45,7 +45,7 @@ with a rejection (the behavior of which will depend on the algorithmic
 context in which it occurs).
 
 <!-- void; reject; (T1 x1,..., TN xN); -->
-\index{{\tt \bfseries reject}!(T1 x1,..., TN xN): void|hyperpage}
+\index{{\tt \bfseries reject}!{\tt (T1 x1,..., TN xN): void}|hyperpage}
 
 `void` **`reject`**(`T1 x1,..., TN xN`)
 Reject the current iteration and print the values denoted by the

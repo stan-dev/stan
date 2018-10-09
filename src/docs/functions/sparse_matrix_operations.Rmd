@@ -55,20 +55,20 @@ Converting a dense matrix $m$ to a sparse representation produces a
 vector $w$ and two integer arrays, $u$ and $v$.
 
 <!-- vector; csr_extract_w; (matrix a); -->
-\index{{\tt \bfseries csr\_extract\_w}!(matrix a): vector|hyperpage}
+\index{{\tt \bfseries csr\_extract\_w}!{\tt (matrix a): vector}|hyperpage}
 
 `vector` **`csr_extract_w`**(`matrix a`)
- Return non-zero values in matrix a; see section \@ref(CSR).
+Return non-zero values in matrix a; see section \@ref(CSR).
 
 <!-- int[]; csr_extract_v; (matrix a); -->
-\index{{\tt \bfseries csr\_extract\_v}!(matrix a): int[]|hyperpage}
+\index{{\tt \bfseries csr\_extract\_v}!{\tt (matrix a): int[]}|hyperpage}
 
 `int[]` **`csr_extract_v`**(`matrix a`)
 Return column indices for values in `csr_extract_w(a)`; see
 \@ref(CSR).
 
 <!-- int[]; csr_extract_u; (matrix a); -->
-\index{{\tt \bfseries csr\_extract\_u}!(matrix a): int[]|hyperpage}
+\index{{\tt \bfseries csr\_extract\_u}!{\tt (matrix a): int[]}|hyperpage}
 
 `int[]` **`csr_extract_u`**(`matrix a`)
 Return array of row starting indices for entries in `csr_extract_w(a)`
@@ -81,7 +81,7 @@ To convert a sparse matrix representation to a dense matrix, there is
 a single function.
 
 <!-- matrix; csr_to_dense_matrix; (int m, int n, vector w, int[] v, int[] u); -->
-\index{{\tt \bfseries csr\_to\_dense\_matrix}!(int m, int n, vector w, int[] v, int[] u): matrix|hyperpage}
+\index{{\tt \bfseries csr\_to\_dense\_matrix}!{\tt (int m, int n, vector w, int[] v, int[] u): matrix}|hyperpage}
 
 `matrix` **`csr_to_dense_matrix`**(`int m, int n, vector w, int[] v, int[] u`)
 Return dense $\text{m} \times \text{n}$ matrix with non-zero matrix
@@ -102,10 +102,10 @@ b^{\top})^{\top}, \] but care must be taken to represent $A^{\top}$
 rather than $A$ as a sparse matrix.
 
 <!-- vector; csr_matrix_times_vector; (int m, int n, vector w, int[] v, int[] u, vector b); -->
-\index{{\tt \bfseries csr\_matrix\_times\_vector}!(int m, int n, vector w, int[] v, int[] u, vector b): vector|hyperpage}
+\index{{\tt \bfseries csr\_matrix\_times\_vector}!{\tt (int m, int n, vector w, int[] v, int[] u, vector b): vector}|hyperpage}
 
 `vector` **`csr_matrix_times_vector`**(`int m, int n, vector w, int[] v, int[] u, vector b`)
- Multiply the $\text{m} \times \text{n}$ matrix represented by values
+Multiply the $\text{m} \times \text{n}$ matrix represented by values
 w, column indices v, and row start indices u by the vector b; see
 \@ref(CSR).
 

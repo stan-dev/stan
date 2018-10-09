@@ -11,7 +11,7 @@ If $\sigma \in \mathbb{R}^+$, then for $y \in [0,\infty)$, \[
 \text{Rayleigh}(y|\sigma) = \frac{y}{\sigma^2} \exp(-y^2 / 2\sigma^2)
 \!. \]
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`rayleigh`__(`sigma`)
 
@@ -22,32 +22,32 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- real; rayleigh_lpdf; (reals y | reals sigma); -->
-\index{{\tt \bfseries rayleigh}!(reals y | reals sigma): real|hyperpage}
+\index{{\tt \bfseries rayleigh}!{\tt (reals y | reals sigma): real}|hyperpage}
 
 `real` **`rayleigh_lpdf`**(`reals y | reals sigma`)
 The log of the Rayleigh density of y given scale sigma
 
 <!-- real; rayleigh_cdf; (real y, real sigma); -->
-\index{{\tt \bfseries rayleigh}!(real y, real sigma): real|hyperpage}
+\index{{\tt \bfseries rayleigh}!{\tt (real y, real sigma): real}|hyperpage}
 
 `real` **`rayleigh_cdf`**(`real y, real sigma`)
 The Rayleigh cumulative distribution of y given scale sigma
 
 <!-- real; rayleigh_lcdf; (real y | real sigma); -->
-\index{{\tt \bfseries rayleigh}!(real y | real sigma): real|hyperpage}
+\index{{\tt \bfseries rayleigh}!{\tt (real y | real sigma): real}|hyperpage}
 
 `real` **`rayleigh_lcdf`**(`real y | real sigma`)
 The log of the Rayleigh cumulative distribution of y given scale sigma
 
 <!-- real; rayleigh_lccdf; (real y | real sigma); -->
-\index{{\tt \bfseries rayleigh}!(real y | real sigma): real|hyperpage}
+\index{{\tt \bfseries rayleigh}!{\tt (real y | real sigma): real}|hyperpage}
 
 `real` **`rayleigh_lccdf`**(`real y | real sigma`)
 The log of the Rayleigh complementary cumulative distribution of y
 given scale sigma
 
 <!-- R; rayleigh_rng; (reals sigma); -->
-\index{{\tt \bfseries rayleigh}!(reals sigma): R|hyperpage}
+\index{{\tt \bfseries rayleigh}!{\tt (reals sigma): R}|hyperpage}
 
 `R` **`rayleigh_rng`**(`reals sigma`)
 Generate a Rayleigh variate with scale sigma; may only be used in
@@ -67,7 +67,7 @@ If $\alpha \in \mathbb{R}^+$, $\tau \in \mathbb{R}^+$, $\beta \in [0,
 \] where $\phi(x)$ denotes the standard normal density function;  see
 [@Feller1968], [@NavarroFuss2009].
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`wiener`__(`alpha, tau, beta, delta`)
 
@@ -78,7 +78,7 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- real; wiener_lpdf; (reals y | reals alpha, reals tau, reals beta, reals delta); -->
-\index{{\tt \bfseries wiener}!(reals y | reals alpha, reals tau, reals beta, reals delta): real|hyperpage}
+\index{{\tt \bfseries wiener}!{\tt (reals y | reals alpha, reals tau, reals beta, reals delta): real}|hyperpage}
 
 `real` **`wiener_lpdf`**(`reals y | reals alpha, reals tau, reals beta, reals delta`)
 The log of the Wiener first passage time density of y given boundary

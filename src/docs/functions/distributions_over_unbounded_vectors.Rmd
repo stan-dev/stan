@@ -15,7 +15,7 @@ for $y \in \mathbb{R}^K$, \[ \text{MultiNormal}(y|\mu,\Sigma) =
 - \mu) \right) \! , \] where $|\Sigma|$ is the absolute determinant of
 $\Sigma$.
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`multi_normal`__(`mu, Sigma`)
 
@@ -33,28 +33,28 @@ arguments; see section \@ref(prob-vectorization) for a description of
 vectorization.
 
 <!-- real; multi_normal_lpdf; (vectors y | vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_normal}!(vectors y | vectors mu, matrix Sigma): real|hyperpage}
+\index{{\tt \bfseries multi\_normal}!{\tt (vectors y | vectors mu, matrix Sigma): real}|hyperpage}
 
 `real` **`multi_normal_lpdf`**(`vectors y | vectors mu, matrix Sigma`)
 The log of the multivariate normal density of vector(s) y given
 location vector(s) mu and covariance matrix Sigma
 
 <!-- real; multi_normal_lpdf; (vectors y | row_vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_normal}!(vectors y | row\_vectors mu, matrix Sigma): real|hyperpage}
+\index{{\tt \bfseries multi\_normal}!{\tt (vectors y | row\_vectors mu, matrix Sigma): real}|hyperpage}
 
 `real` **`multi_normal_lpdf`**(`vectors y | row_vectors mu, matrix Sigma`)
 The log of the multivariate normal density of vector(s) y given
 location row vector(s) mu and covariance matrix Sigma
 
 <!-- real; multi_normal_lpdf; (row_vectors y | vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_normal}!(row\_vectors y | vectors mu, matrix Sigma): real|hyperpage}
+\index{{\tt \bfseries multi\_normal}!{\tt (row\_vectors y | vectors mu, matrix Sigma): real}|hyperpage}
 
 `real` **`multi_normal_lpdf`**(`row_vectors y | vectors mu, matrix Sigma`)
 The log of the multivariate normal density of row vector(s) y given
 location vector(s) mu and covariance matrix Sigma
 
 <!-- real; multi_normal_lpdf; (row_vectors y | row_vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_normal}!(row\_vectors y | row\_vectors mu, matrix Sigma): real|hyperpage}
+\index{{\tt \bfseries multi\_normal}!{\tt (row\_vectors y | row\_vectors mu, matrix Sigma): real}|hyperpage}
 
 `real` **`multi_normal_lpdf`**(`row_vectors y | row_vectors mu, matrix Sigma`)
 The log of the multivariate normal density of row vector(s) y given
@@ -66,21 +66,21 @@ covariance matrix and call `multi_normal_cholesky_rng`;  see section
 \@ref(multi-normal-cholesky-fun).
 
 <!-- vector; multi_normal_rng; (vector mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_normal}!(vector mu, matrix Sigma): vector|hyperpage}
+\index{{\tt \bfseries multi\_normal}!{\tt (vector mu, matrix Sigma): vector}|hyperpage}
 
 `vector` **`multi_normal_rng`**(`vector mu, matrix Sigma`)
 Generate a multivariate normal variate with location mu and covariance
 matrix Sigma; may only be used in generated quantities block
 
 <!-- vector; multi_normal_rng; (row_vector mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_normal}!(row\_vector mu, matrix Sigma): vector|hyperpage}
+\index{{\tt \bfseries multi\_normal}!{\tt (row\_vector mu, matrix Sigma): vector}|hyperpage}
 
 `vector` **`multi_normal_rng`**(`row_vector mu, matrix Sigma`)
 Generate a multivariate normal variate with location mu and covariance
 matrix Sigma; may only be used in generated quantities block
 
 <!-- vectors; multi_normal_rng; (vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_normal}!(vectors mu, matrix Sigma): vectors|hyperpage}
+\index{{\tt \bfseries multi\_normal}!{\tt (vectors mu, matrix Sigma): vectors}|hyperpage}
 
 `vectors` **`multi_normal_rng`**(`vectors mu, matrix Sigma`)
 Generate an array of multivariate normal variates with locations mu
@@ -88,7 +88,7 @@ and covariance matrix Sigma; may only be used in generated quantities
 block
 
 <!-- vectors; multi_normal_rng; (row_vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_normal}!(row\_vectors mu, matrix Sigma): vectors|hyperpage}
+\index{{\tt \bfseries multi\_normal}!{\tt (row\_vectors mu, matrix Sigma): vectors}|hyperpage}
 
 `vectors` **`multi_normal_rng`**(`row_vectors mu, matrix Sigma`)
 Generate an array of multivariate normal variates with locations mu
@@ -104,7 +104,7 @@ If $K \in \mathbb{N}$, $\mu \in \mathbb{R}^K$, and $\Omega \in
 for $y \in \mathbb{R}^K$, \[ \text{MultiNormalPrecision}(y|\mu,\Omega)
 = \text{MultiNormal}(y|\mu,\Sigma^{-1}) \]
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`multi_normal_prec`__(`mu, Omega`)
 
@@ -115,28 +115,28 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- real; multi_normal_prec_lpdf; (vectors y | vectors mu, matrix Omega); -->
-\index{{\tt \bfseries multi\_normal\_prec}!(vectors y | vectors mu, matrix Omega): real|hyperpage}
+\index{{\tt \bfseries multi\_normal\_prec}!{\tt (vectors y | vectors mu, matrix Omega): real}|hyperpage}
 
 `real` **`multi_normal_prec_lpdf`**(`vectors y | vectors mu, matrix Omega`)
 The log of the multivariate normal density of vector(s) y given
 location vector(s) mu and positive definite precision matrix Omega
 
 <!-- real; multi_normal_prec_lpdf; (vectors y | row_vectors mu, matrix Omega); -->
-\index{{\tt \bfseries multi\_normal\_prec}!(vectors y | row\_vectors mu, matrix Omega): real|hyperpage}
+\index{{\tt \bfseries multi\_normal\_prec}!{\tt (vectors y | row\_vectors mu, matrix Omega): real}|hyperpage}
 
 `real` **`multi_normal_prec_lpdf`**(`vectors y | row_vectors mu, matrix Omega`)
 The log of the multivariate normal density of vector(s) y given
 location row vector(s) mu and positive definite precision matrix Omega
 
 <!-- real; multi_normal_prec_lpdf; (row_vectors y | vectors mu, matrix Omega); -->
-\index{{\tt \bfseries multi\_normal\_prec}!(row\_vectors y | vectors mu, matrix Omega): real|hyperpage}
+\index{{\tt \bfseries multi\_normal\_prec}!{\tt (row\_vectors y | vectors mu, matrix Omega): real}|hyperpage}
 
 `real` **`multi_normal_prec_lpdf`**(`row_vectors y | vectors mu, matrix Omega`)
 The log of the multivariate normal density of row vector(s) y given
 location vector(s) mu and positive definite precision matrix Omega
 
 <!-- real; multi_normal_prec_lpdf; (row_vectors y | row_vectors mu, matrix Omega); -->
-\index{{\tt \bfseries multi\_normal\_prec}!(row\_vectors y | row\_vectors mu, matrix Omega): real|hyperpage}
+\index{{\tt \bfseries multi\_normal\_prec}!{\tt (row\_vectors y | row\_vectors mu, matrix Omega): real}|hyperpage}
 
 `real` **`multi_normal_prec_lpdf`**(`row_vectors y | row_vectors mu, matrix Omega`)
 The log of the multivariate normal density of row vector(s) y given
@@ -156,7 +156,7 @@ must be strictly positive for $k \in 1{:}K$.  If an $L$ is provided
 that is not the Cholesky factor of a positive-definite matrix, the
 probability functions will raise errors.
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`multi_normal_cholesky`__(`mu, L`)
 
@@ -167,7 +167,7 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- real; multi_normal_cholesky_lpdf; (vectors y | vectors mu, matrix L); -->
-\index{{\tt \bfseries multi\_normal\_cholesky}!(vectors y | vectors mu, matrix L): real|hyperpage}
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (vectors y | vectors mu, matrix L): real}|hyperpage}
 
 `real` **`multi_normal_cholesky_lpdf`**(`vectors y | vectors mu, matrix L`)
 The log of the multivariate normal density of vector(s) y given
@@ -175,7 +175,7 @@ location vector(s) mu and lower-triangular Cholesky factor of the
 covariance matrix L
 
 <!-- real; multi_normal_cholesky_lpdf; (vectors y | row_vectors mu, matrix L); -->
-\index{{\tt \bfseries multi\_normal\_cholesky}!(vectors y | row\_vectors mu, matrix L): real|hyperpage}
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (vectors y | row\_vectors mu, matrix L): real}|hyperpage}
 
 `real` **`multi_normal_cholesky_lpdf`**(`vectors y | row_vectors mu, matrix L`)
 The log of the multivariate normal density of vector(s) y given
@@ -183,7 +183,7 @@ location row vector(s) mu and lower-triangular Cholesky factor of the
 covariance matrix L
 
 <!-- real; multi_normal_cholesky_lpdf; (row_vectors y | vectors mu, matrix L); -->
-\index{{\tt \bfseries multi\_normal\_cholesky}!(row\_vectors y | vectors mu, matrix L): real|hyperpage}
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (row\_vectors y | vectors mu, matrix L): real}|hyperpage}
 
 `real` **`multi_normal_cholesky_lpdf`**(`row_vectors y | vectors mu, matrix L`)
 The log of the multivariate normal density of row vector(s) y given
@@ -191,7 +191,7 @@ location vector(s) mu and lower-triangular Cholesky factor of the
 covariance matrix L
 
 <!-- real; multi_normal_cholesky_lpdf; (row_vectors y | row_vectors mu, matrix L); -->
-\index{{\tt \bfseries multi\_normal\_cholesky}!(row\_vectors y | row\_vectors mu, matrix L): real|hyperpage}
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (row\_vectors y | row\_vectors mu, matrix L): real}|hyperpage}
 
 `real` **`multi_normal_cholesky_lpdf`**(`row_vectors y | row_vectors mu, matrix L`)
 The log of the multivariate normal density of row vector(s) y given
@@ -199,7 +199,7 @@ location row vector(s) mu and lower-triangular Cholesky factor of the
 covariance matrix L
 
 <!-- vector; multi_normal_cholesky_rng; (vector mu, matrix L); -->
-\index{{\tt \bfseries multi\_normal\_cholesky}!(vector mu, matrix L): vector|hyperpage}
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (vector mu, matrix L): vector}|hyperpage}
 
 `vector` **`multi_normal_cholesky_rng`**(`vector mu, matrix L`)
 Generate a multivariate normal variate with location mu and
@@ -207,7 +207,7 @@ lower-triangular Cholesky factor of the covariance matrix L; may only
 be used in generated quantities block
 
 <!-- vector; multi_normal_cholesky_rng; (row_vector mu, matrix L); -->
-\index{{\tt \bfseries multi\_normal\_cholesky}!(row\_vector mu, matrix L): vector|hyperpage}
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (row\_vector mu, matrix L): vector}|hyperpage}
 
 `vector` **`multi_normal_cholesky_rng`**(`row_vector mu, matrix L`)
 Generate a multivariate normal variate with location mu and
@@ -215,7 +215,7 @@ lower-triangular Cholesky factor of the covariance matrix L; may only
 be used in generated quantities block
 
 <!-- vectors; multi_normal_cholesky_rng; (vectors mu, matrix L); -->
-\index{{\tt \bfseries multi\_normal\_cholesky}!(vectors mu, matrix L): vectors|hyperpage}
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (vectors mu, matrix L): vectors}|hyperpage}
 
 `vectors` **`multi_normal_cholesky_rng`**(`vectors mu, matrix L`)
 Generate an array of multivariate normal variates with locations mu
@@ -223,7 +223,7 @@ and lower-triangular Cholesky factor of the covariance matrix L; may
 only be used in generated quantities block
 
 <!-- vectors; multi_normal_cholesky_rng; (row_vectors mu, matrix L); -->
-\index{{\tt \bfseries multi\_normal\_cholesky}!(row\_vectors mu, matrix L): vectors|hyperpage}
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (row\_vectors mu, matrix L): vectors}|hyperpage}
 
 `vectors` **`multi_normal_cholesky_rng`**(`row_vectors mu, matrix L`)
 Generate an array of multivariate normal variates with locations mu
@@ -244,7 +244,7 @@ with multi-variate outputs where only the output dimensions share a
 kernel function but vary based on their scale.  Note that this
 function does not take into account the mean prediction.
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`multi_gp`__(`Sigma, w`)
 
@@ -255,7 +255,7 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- real; multi_gp_lpdf; (matrix y | matrix Sigma, vector w); -->
-\index{{\tt \bfseries multi\_gp}!(matrix y | matrix Sigma, vector w): real|hyperpage}
+\index{{\tt \bfseries multi\_gp}!{\tt (matrix y | matrix Sigma, vector w): real}|hyperpage}
 
 `real` **`multi_gp_lpdf`**(`matrix y | matrix Sigma, vector w`)
 The log of the multivariate GP density of matrix y given kernel matrix
@@ -279,7 +279,7 @@ factor of the kernel matrix, this distribution is also more efficient
 than $\text{MultiGP}()$. Note that this function does not take into
 account the mean prediction.
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`multi_gp_cholesky`__(`L, w`)
 
@@ -290,7 +290,7 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- real; multi_gp_cholesky_lpdf; (matrix y | matrix L, vector w); -->
-\index{{\tt \bfseries multi\_gp\_cholesky}!(matrix y | matrix L, vector w): real|hyperpage}
+\index{{\tt \bfseries multi\_gp\_cholesky}!{\tt (matrix y | matrix L, vector w): real}|hyperpage}
 
 `real` **`multi_gp_cholesky_lpdf`**(`matrix y | matrix L, vector w`)
 The log of the multivariate GP density of matrix y given
@@ -311,7 +311,7 @@ K)/2\right)}      {\Gamma(\nu/2)} \ \frac{1}{\sqrt{\left| \Sigma
 \Sigma^{-1} \, \left(y - \mu\right) \right)^{-(\nu + K)/2} \! .
 \end{array} \]
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`multi_student_t`__(`nu, mu, Sigma`)
 
@@ -322,14 +322,14 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- real; multi_student_t_lpdf; (vectors y | real nu, vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_student\_t}!(vectors y | real nu, vectors mu, matrix Sigma): real|hyperpage}
+\index{{\tt \bfseries multi\_student\_t}!{\tt (vectors y | real nu, vectors mu, matrix Sigma): real}|hyperpage}
 
 `real` **`multi_student_t_lpdf`**(`vectors y | real nu, vectors mu, matrix Sigma`)
 The log of the multivariate Student-$t$ density of vector(s) y given
 degrees of freedom nu, location vector(s) mu, and scale matrix Sigma
 
 <!-- real; multi_student_t_lpdf; (vectors y | real nu, row_vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_student\_t}!(vectors y | real nu, row\_vectors mu, matrix Sigma): real|hyperpage}
+\index{{\tt \bfseries multi\_student\_t}!{\tt (vectors y | real nu, row\_vectors mu, matrix Sigma): real}|hyperpage}
 
 `real` **`multi_student_t_lpdf`**(`vectors y | real nu, row_vectors mu, matrix Sigma`)
 The log of the multivariate Student-$t$ density of vector(s) y given
@@ -337,7 +337,7 @@ degrees of freedom nu, location row vector(s) mu, and scale matrix
 Sigma
 
 <!-- real; multi_student_t_lpdf; (row_vectors y | real nu, vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_student\_t}!(row\_vectors y | real nu, vectors mu, matrix Sigma): real|hyperpage}
+\index{{\tt \bfseries multi\_student\_t}!{\tt (row\_vectors y | real nu, vectors mu, matrix Sigma): real}|hyperpage}
 
 `real` **`multi_student_t_lpdf`**(`row_vectors y | real nu, vectors mu, matrix Sigma`)
 The log of the multivariate Student-$t$ density of row vector(s) y
@@ -345,7 +345,7 @@ given degrees of freedom nu, location vector(s) mu, and scale matrix
 Sigma
 
 <!-- real; multi_student_t_lpdf; (row_vectors y | real nu, row_vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_student\_t}!(row\_vectors y | real nu, row\_vectors mu, matrix Sigma): real|hyperpage}
+\index{{\tt \bfseries multi\_student\_t}!{\tt (row\_vectors y | real nu, row\_vectors mu, matrix Sigma): real}|hyperpage}
 
 `real` **`multi_student_t_lpdf`**(`row_vectors y | real nu, row_vectors mu, matrix Sigma`)
 The log of the multivariate Student-$t$ density of row vector(s) y
@@ -353,7 +353,7 @@ given degrees of freedom nu, location row vector(s) mu, and scale
 matrix Sigma
 
 <!-- vector; multi_student_t_rng; (real nu, vector mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_student\_t}!(real nu, vector mu, matrix Sigma): vector|hyperpage}
+\index{{\tt \bfseries multi\_student\_t}!{\tt (real nu, vector mu, matrix Sigma): vector}|hyperpage}
 
 `vector` **`multi_student_t_rng`**(`real nu, vector mu, matrix Sigma`)
 Generate a multivariate Student-$t$ variate with degrees of freedom
@@ -361,7 +361,7 @@ nu, location mu, and scale matrix Sigma; may only be used in generated
 quantities block
 
 <!-- vector; multi_student_t_rng; (real nu, row_vector mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_student\_t}!(real nu, row\_vector mu, matrix Sigma): vector|hyperpage}
+\index{{\tt \bfseries multi\_student\_t}!{\tt (real nu, row\_vector mu, matrix Sigma): vector}|hyperpage}
 
 `vector` **`multi_student_t_rng`**(`real nu, row_vector mu, matrix Sigma`)
 Generate a multivariate Student-$t$ variate with degrees of freedom
@@ -369,7 +369,7 @@ nu, location mu, and scale matrix Sigma; may only be used in generated
 quantities block
 
 <!-- vectors; multi_student_t_rng; (real nu, vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_student\_t}!(real nu, vectors mu, matrix Sigma): vectors|hyperpage}
+\index{{\tt \bfseries multi\_student\_t}!{\tt (real nu, vectors mu, matrix Sigma): vectors}|hyperpage}
 
 `vectors` **`multi_student_t_rng`**(`real nu, vectors mu, matrix Sigma`)
 Generate an array of multivariate Student-$t$ variates with degrees of
@@ -377,7 +377,7 @@ freedom nu, locations mu, and scale matrix Sigma; may only be used in
 generated quantities block
 
 <!-- vectors; multi_student_t_rng; (real nu, row_vectors mu, matrix Sigma); -->
-\index{{\tt \bfseries multi\_student\_t}!(real nu, row\_vectors mu, matrix Sigma): vectors|hyperpage}
+\index{{\tt \bfseries multi\_student\_t}!{\tt (real nu, row\_vectors mu, matrix Sigma): vectors}|hyperpage}
 
 `vectors` **`multi_student_t_rng`**(`real nu, row_vectors mu, matrix Sigma`)
 Generate an array of multivariate Student-$t$ variates with degrees of
@@ -398,7 +398,7 @@ If $V$ is diagonal, then a more efficient algorithm which sequentially
 processes observations and avoids a matrix inversions can be used
 [@DurbinKoopman:2001 section 6.4].
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`gaussian_dlm_obs`__(`F, G, V, W, m0, C0`)
 
@@ -415,7 +415,7 @@ The sampling statement defined in the previous section works with
 either type of observation V.
 
 <!-- real; gaussian_dlm_obs_lpdf; (matrix y | matrix F, matrix G, matrix V, matrix W, vector m0, matrix C0); -->
-\index{{\tt \bfseries gaussian\_dlm\_obs}!(matrix y | matrix F, matrix G, matrix V, matrix W, vector m0, matrix C0): real|hyperpage}
+\index{{\tt \bfseries gaussian\_dlm\_obs}!{\tt (matrix y | matrix F, matrix G, matrix V, matrix W, vector m0, matrix C0): real}|hyperpage}
 
 `real` **`gaussian_dlm_obs_lpdf`**(`matrix y | matrix F, matrix G, matrix V, matrix W, vector m0, matrix C0`)
 The log of the density of the Gaussian Dynamic Linear model with
@@ -425,7 +425,7 @@ covariance matrix V, system covariance matrix W, and the initial state
 is distributed normal with mean m0 and covariance C0.
 
 <!-- real; gaussian_dlm_obs_lpdf; (matrix y | matrix F, matrix G, vector V, matrix W, vector m0, matrix C0); -->
-\index{{\tt \bfseries gaussian\_dlm\_obs}!(matrix y | matrix F, matrix G, vector V, matrix W, vector m0, matrix C0): real|hyperpage}
+\index{{\tt \bfseries gaussian\_dlm\_obs}!{\tt (matrix y | matrix F, matrix G, vector V, matrix W, vector m0, matrix C0): real}|hyperpage}
 
 `real` **`gaussian_dlm_obs_lpdf`**(`matrix y | matrix F, matrix G, vector V, matrix W, vector m0, matrix C0`)
 The log of the density of the Gaussian Dynamic Linear model with

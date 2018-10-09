@@ -54,36 +54,36 @@ dependent before C++11;  the descriptions below provide the C++11
 definition.
 
 <!-- int; operator+; (int x, int y); -->
-\index{{\tt \bfseries operator\_add}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_add}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator+`**(`int x, int y`)
- The sum of the addends x and y \[ \text{operator+}(x,y) = (x + y) \] 
+The sum of the addends x and y \[ \text{operator+}(x,y) = (x + y) \]
 
 <!-- int; operator-; (int x, int y); -->
-\index{{\tt \bfseries operator\_subtract}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_subtract}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator-`**(`int x, int y`)
- The difference between the minuend x and subtrahend y \[
+The difference between the minuend x and subtrahend y \[
 \text{operator-}(x,y) = (x - y) \]
 
 <!-- int; operator*; (int x, int y); -->
-\index{{\tt \bfseries operator\_multiply}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_multiply}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator*`**(`int x, int y`)
- The product of the factors x and y \[ \text{operator*}(x,y) = (x
+The product of the factors x and y \[ \text{operator*}(x,y) = (x
 \times y) \]
 
 <!-- int; operator/; (int x, int y); -->
-\index{{\tt \bfseries operator\_divide}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_divide}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator/`**(`int x, int y`)
- The integer quotient of the dividend x and divisor y \[
+The integer quotient of the dividend x and divisor y \[
 \text{operator/}(x,y) = \begin{cases} \lfloor x / y \rfloor & \text{if
 } x / y \geq 0 \\ - \lfloor \text{floor}(-x / y) \rfloor & \text{if }
 x / y < 0. \end{cases} \]
 
 <!-- int; operator%; (int x, int y); -->
-\index{{\tt \bfseries operator\_mod}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries operator\_mod}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator%`**(`int x, int y`)
 x modulo y, which is the positive remainder after dividing x by y. If
@@ -94,40 +94,39 @@ of the result is platform dependent. \[ \mathrm{operator\%}(x, y) \ =
 ### Unary Prefix Operators
 
 <!-- int; operator-; (int x); -->
-\index{{\tt \bfseries operator\_subtract}!(int x): int|hyperpage}
+\index{{\tt \bfseries operator\_subtract}!{\tt (int x): int}|hyperpage}
 
 `int` **`operator-`**(`int x`)
- The negation of the subtrahend x \[ \text{operator-}(x) = -x 
+The negation of the subtrahend x \[ \text{operator-}(x) = -x
 
 <!-- int; operator+; (int x); -->
-\index{{\tt \bfseries operator\_add}!(int x): int|hyperpage}
+\index{{\tt \bfseries operator\_add}!{\tt (int x): int}|hyperpage}
 
 `int` **`operator+`**(`int x`)
- This is a no-op. \[ \text{operator+}(x) = x \] 
+This is a no-op. \[ \text{operator+}(x) = x \]
 
 ## Absolute Functions
 
 <!-- R; abs; (T x); -->
-\index{{\tt \bfseries abs}!(T x): R|hyperpage}
+\index{{\tt \bfseries abs}!{\tt (T x): R}|hyperpage}
 
 `R` **`abs`**(`T x`)
 absolute value of x
 
 <!-- int; int_step; (int x); -->
-\index{{\tt \bfseries int\_step}!(int x): int|hyperpage}
+\index{{\tt \bfseries int\_step}!{\tt (int x): int}|hyperpage}
 
 `int` **`int_step`**(`int x`)
 
 
 <!-- int; int_step; (real x); -->
-\index{{\tt \bfseries int\_step}!(real x): int|hyperpage}
+\index{{\tt \bfseries int\_step}!{\tt (real x): int}|hyperpage}
 
 `int` **`int_step`**(`real x`)
- Returns the step function of x as an integer, \[
-\mathrm{int\_step}(x) = \begin{cases} 1 & \text{if } x > 0 \\ 0 &
-\text{if } x \leq 0 \text{ or } x \text{ is } NaN \end{cases} \]
-_**Warning:**_ `int_step(0)` and `int_step(NaN)` return 0 whereas
-`step(0)` and `step(NaN)` return 1.
+Returns the step function of x as an integer, \[ \mathrm{int\_step}(x)
+= \begin{cases} 1 & \text{if } x > 0 \\ 0 & \text{if } x \leq 0 \text{
+or } x \text{ is } NaN \end{cases} \] _**Warning:**_ `int_step(0)` and
+`int_step(NaN)` return 0 whereas `step(0)` and `step(NaN)` return 1.
 
 See the warning in section \@ref(step-functions) about the dangers of
 step functions applied to anything other than data.
@@ -135,16 +134,16 @@ step functions applied to anything other than data.
 ## Bound Functions
 
 <!-- int; min; (int x, int y); -->
-\index{{\tt \bfseries min}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries min}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`min`**(`int x, int y`)
- Returns the minimum of x and y. \[ \text{min}(x, y) = \begin{cases} x
+Returns the minimum of x and y. \[ \text{min}(x, y) = \begin{cases} x
 & \text{if } x < y\\ y & \text{otherwise} \end{cases} \]
 
 <!-- int; max; (int x, int y); -->
-\index{{\tt \bfseries max}!(int x, int y): int|hyperpage}
+\index{{\tt \bfseries max}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`max`**(`int x, int y`)
- Returns the maximum of x and y. \[ \text{max}(x, y) = \begin{cases} x
+Returns the maximum of x and y. \[ \text{max}(x, y) = \begin{cases} x
 & \text{if } x > y\\ y & \text{otherwise} \end{cases} \]
 

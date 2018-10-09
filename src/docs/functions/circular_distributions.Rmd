@@ -25,7 +25,7 @@ the mode.  Ideally, the parameterization and support will be set up so
 that the bulk of the probability mass is in a continuous interval
 around the mean $\mu$.
 
-#### Sampling Statement
+### Sampling Statement
 
 `y` ~ __`von_mises`__(`mu, kappa`)
 
@@ -36,7 +36,7 @@ dropping constant additive terms.
 ### Stan Functions
 
 <!-- R; von_mises_lpdf; (reals y | reals mu, reals kappa); -->
-\index{{\tt \bfseries von\_mises}!(reals y | reals mu, reals kappa): R|hyperpage}
+\index{{\tt \bfseries von\_mises}!{\tt (reals y | reals mu, reals kappa): R}|hyperpage}
 
 `R` **`von_mises_lpdf`**(`reals y | reals mu, reals kappa`)
 The log of the von mises density of y given location mu and scale
@@ -44,7 +44,7 @@ kappa. For a description of argument and return types, see section
 \@ref(prob-vectorization).
 
 <!-- R; von_mises_rng; (reals mu, reals kappa); -->
-\index{{\tt \bfseries von\_mises}!(reals mu, reals kappa): R|hyperpage}
+\index{{\tt \bfseries von\_mises}!{\tt (reals mu, reals kappa): R}|hyperpage}
 
 `R` **`von_mises_rng`**(`reals mu, reals kappa`)
 Generate a Von Mises variate with location mu and scale kappa (i.e.

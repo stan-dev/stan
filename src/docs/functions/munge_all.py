@@ -144,7 +144,7 @@ def process_item(item, numLines):
     if (openBrace > 0):
         closeBrace = match_close(item, openBrace+1)
     if (openBrace > 0 and closeBrace > 0):
-        desc = item[openBrace+1 : closeBrace]
+        desc = item[openBrace+1 : closeBrace].strip()
 
     return {"idx_name":idx_name,
             "name":name,
@@ -189,7 +189,7 @@ def process_pitem(line, rmdPath):
     close = str.find(line, "}", start)
     args =  line[start : close]
     fh = open(rmdPath, 'a')
-    fh.write("#### Sampling Statement\n\n")
+    fh.write("### Sampling Statement\n\n")
     fh.write("`%s` ~ __`%s`__(`%s`)\n\n" % (lhs, distr, args))
     fh.write("Increment target log probability density with `%s_%s( %s | %s)`\n" % (distr, sfx, lhs, args))
     fh.write("dropping constant additive terms.\n")
