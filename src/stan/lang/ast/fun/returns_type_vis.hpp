@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_RETURNS_TYPE_VIS_HPP
 #define STAN_LANG_AST_FUN_RETURNS_TYPE_VIS_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <boost/variant/static_visitor.hpp>
 #include <ostream>
 
@@ -9,9 +9,7 @@ namespace stan {
   namespace lang {
 
     struct nil;
-    struct assignment;
     struct assgn;
-    struct compound_assignment;
     struct sample;
     struct increment_log_prob_statement;
     struct expression;
@@ -41,7 +39,8 @@ namespace stan {
        * @param[in, out] error_msgs stream to which error messages are
        * written 
        */
-      returns_type_vis(const expr_type& return_type, std::ostream& error_msgs);
+      returns_type_vis(const bare_expr_type& return_type,
+                       std::ostream& error_msgs);
 
       /**
        * Return true if the specified statement is a return statement
@@ -61,27 +60,7 @@ namespace stan {
        * @param[in] st statement
        * @return false
        */
-      bool operator()(const assignment& st) const;
-
-      /**
-       * Return true if the specified statement is a return statement
-       * with an expression of the type specified at construction
-       * time.
-       *
-       * @param[in] st statement
-       * @return false
-       */
       bool operator()(const assgn& st) const;
-
-      /**
-       * Return true if the specified statement is a return statement
-       * with an expression of the type specified at construction
-       * time.
-       *
-       * @param[in] st statement
-       * @return false
-       */
-      bool operator()(const compound_assignment& st) const;
 
       /**
        * Return true if the specified statement is a return statement
@@ -227,7 +206,7 @@ namespace stan {
       /**
        * The type of the returned expression expected.
        */
-      expr_type return_type_;
+      bare_expr_type return_type_;
 
       /**
        * Stream to which error messages are written.

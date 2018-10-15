@@ -8,7 +8,7 @@ namespace stan {
 
     unary_op::unary_op(char op, const expression& subject)
       : op(op), subject(subject),
-        type_(promote_primitive(subject.expression_type())) {
+        type_(promote_primitive(subject.bare_type())) {
     }
 
   }

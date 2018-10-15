@@ -1,0 +1,1372 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Constraint Transforms {#variable-transforms.chapter}
+
+To avoid having to deal with constraints while simulating the
+Hamiltonian dynamics during sampling, every (multivariate) parameter
+in a Stan model is transformed to an unconstrained variable behind
+the scenes by the model compiler.  The transform is based on the
+constraints, if any, in the parameter's definition.  Scalars or the
+scalar values in vectors, row vectors or matrices may be constrained
+with lower and/or upper bounds.  Vectors may alternatively be
+constrained to be ordered, positive ordered, or simplexes.  Matrices
+may be constrained to be correlation matrices or covariance matrices.
+This chapter provides a definition of the transforms used for each
+type of variable.
+
+Stan converts models to C++ classes which define probability
+functions with support on all of $\mathbb{R}^K$, where $K$ is the number
+of unconstrained parameters needed to define the constrained
+parameters defined in the program.  The C++ classes also include
+code to transform the parameters from unconstrained to constrained and
+apply the appropriate Jacobians.
+
+
+## Changes of Variables {#change-of-variables.section}
+
+The support of a random variable $X$ with density $p_X(x)$ is that
+subset of values for which it has non-zero density,
+
+$$
+\mathrm{supp}(X) = \{ x | p_X(x) > 0 \}.
+$$
+
+If $f$ is a total function defined on the support of $X$, then $Y =
+f(X)$ is a new random variable.  This section shows how to compute the
+probability density function of $Y$ for well-behaved transforms $f$.
+The rest of the chapter details the transforms used by Stan.
+
+
+### Univariate Changes of Variables {-}
+
+Suppose $X$ is one dimensional and $f: \mathrm{supp}(X) \rightarrow
+\mathbb{R}$ is a one-to-one, monotonic function with a differentiable
+inverse $f^{-1}$.  Then the density of $Y$ is given by
+
+$$
+p_Y(y) = p_X(f^{-1}(y))
+         \,
+         \left| \, \frac{d}{dy} f^{-1}(y)\, \right|.
+$$
+
+The absolute derivative of the inverse transform measures how the
+scale of the transformed variable changes with respect to the
+underlying variable.
+
+
+### Multivariate Changes of Variables {-}
+
+The multivariate generalization of an absolute derivative is a
+Jacobian, or more fully the absolute value of the determinant of the
+Jacobian matrix of the transform.  The Jacobian matrix measures the change of
+each output variable relative to every input variable and the absolute
+determinant uses that to determine the differential change in volume
+at a given point in the parameter space.
+
+Suppose $X$ is a $K$-dimensional random variable with probability
+density function $p_X(x)$.  A new random variable $Y = f(X)$ may be
+defined by transforming $X$ with a suitably well-behaved function $f$.
+It suffices for what follows to note that if $f$ is one-to-one
+and its inverse $f^{-1}$ has a well-defined Jacobian, then the
+density of $Y$ is
+
+$$
+p_Y(y) = p_X(f^{-1}(y)) \, \left| \, \det \, J_{f^{-1}}(y) \, \right|,
+$$
+
+where $\det{}$ is the matrix determinant operation and $J_{f^{-1}}(y)$
+is the Jacobian matrix of $f^{-1}$ evaluated at $y$.  Taking $x =
+f^{-1}(y)$, the Jacobian matrix is defined by
+
+$$
+J_{f^{-1}}(y) =
+\left[
+\begin{array}{ccc}\displaystyle
+\frac{\partial x_1}{\partial y_1}
+& \cdots
+& \displaystyle \frac{\partial x_1}{\partial y_{K}}
+\\
+\vdots & \vdots & \vdots
+\\
+\displaystyle\frac{\partial x_{K}}{\partial y_1}
+& \cdots
+& \displaystyle\frac{\partial x_{K}}{\partial y_{K}}
+\end{array}
+\right].
+$$
+
+If the Jacobian matrix is triangular, the determinant reduces to the
+product of the diagonal entries,
+
+$$
+\det \, J_{f^{-1}}(y)
+= \prod_{k=1}^K \frac{\partial x_k}{\partial y_k}.
+$$
+
+Triangular matrices naturally arise in situations where the variables
+are ordered, for instance by dimension, and each variable's
+transformed value depends on the previous variable's transformed
+values.  Diagonal matrices, a simple form of triangular matrix, arise
+if each transformed variable only depends on a single untransformed
+variable.
+
+
+## Lower Bounded Scalar {#lower-bound-transform.section}
+
+Stan uses a logarithmic transform for lower and upper bounds.
+
+
+### Lower Bound Transform {-}
+
+If a variable $X$ is declared to have lower bound $a$, it is
+transformed to an unbounded variable $Y$, where
+
+$$
+Y = \log(X - a).
+$$
+
+
+### Lower Bound Inverse Transform {-}
+
+The inverse of the lower-bound transform maps an unbounded
+variable $Y$ to a variable $X$ that is bounded below by $a$ by
+
+$$
+X = \exp(Y) + a.
+$$
+
+
+### Absolute Derivative of the Lower Bound Inverse Transform {-}
+
+The absolute derivative of the inverse transform is
+
+$$
+\left| \,
+\frac{d}{dy} \left( \exp(y) + a \right)
+\, \right|
+= \exp(y).
+$$
+
+Therefore, given the density $p_X$ of $X$, the density of $Y$ is
+
+$$
+p_Y(y)
+= p_X\!\left( \exp(y) + a \right) \cdot \exp(y).
+$$
+
+
+## Upper Bounded Scalar
+
+Stan uses a negated logarithmic transform for upper bounds.
+
+
+
+### Upper Bound Transform {-}
+
+If a variable $X$ is declared to have an upper bound $b$, it is
+transformed to the unbounded variable $Y$ by
+
+$$
+Y = \log(b - X).
+$$
+
+
+### Upper Bound Inverse Transform {-}
+
+The inverse of the upper bound transform converts the unbounded
+variable $Y$ to the variable $X$ bounded above by $b$ through
+
+$$
+X = b - \exp(Y).
+$$
+
+
+### Absolute Derivative of the Upper Bound Inverse Transform {-}
+
+The absolute derivative of the inverse of the upper bound transform is
+
+$$
+\left| \,
+\frac{d}{dy} \left( b - \exp(y) \right)
+\, \right|
+= \exp(y).
+$$
+
+Therefore, the density of the unconstrained variable $Y$ is defined in
+terms of the density of the variable $X$ with an upper bound of $b$ by
+
+$$
+p_Y(y)
+ =   p_X \!\left( b - \exp(y) \right) \cdot \exp(y).
+$$
+
+
+## Lower and Upper Bounded Scalar {#logit-transform-jacobian.section}
+
+For lower and upper-bounded variables, Stan uses a scaled and
+translated log-odds transform.
+
+### Log Odds and the Logistic Sigmoid {-}
+
+The log-odds function is defined for $u \in (0,1)$ by
+
+$$
+\mathrm{logit}(u) = \log \frac{u}{1 - u}.
+$$
+
+The inverse of the log odds function is the logistic sigmoid, defined
+for $v \in (-\infty,\infty)$ by
+
+$$
+\mathrm{logit}^{-1}(v) = \frac{1}{1 + \exp(-v)}.
+$$
+
+The derivative of the logistic sigmoid is
+
+$$
+\frac{d}{dy} \mathrm{logit}^{-1}(y)
+= \mathrm{logit}^{-1}(y) \cdot \left( 1 - \mathrm{logit}^{-1}(y) \right).
+$$
+
+
+### Lower and Upper Bounds Transform {-}
+
+For variables constrained to be in the open interval $(a, b)$, Stan
+uses a scaled and translated log-odds transform.  If variable $X$ is
+declared to have lower bound $a$ and upper bound $b$, then it is
+transformed to a new variable $Y$, where
+
+$$
+Y = \mathrm{logit} \left( \frac{X - a}{b - a} \right).
+$$
+
+
+### Lower and Upper Bounds Inverse Transform {-}
+
+The inverse of this transform is
+
+$$
+X = a + (b - a) \cdot \mathrm{logit}^{-1}(Y).
+$$
+
+
+### Absolute Derivative of the Lower and Upper Bounds Inverse Transform {-}
+
+The absolute derivative of the inverse transform is given by
+
+$$
+\left|
+  \frac{d}{dy}
+    \left(
+      a + (b - a) \cdot \mathrm{logit}^{-1}(y)
+    \right)
+  \right|
+= (b - a)
+    \cdot \mathrm{logit}^{-1}(y)
+    \cdot \left( 1 - \mathrm{logit}^{-1}(y) \right).
+$$
+
+Therefore, the density of the transformed variable $Y$ is
+
+$$
+p_Y(y)
+=
+ p_X \! \left( a + (b - a) \cdot \mathrm{logit}^{-1}(y) \right)
+    \cdot (b - a)
+    \cdot \mathrm{logit}^{-1}(y)
+    \cdot \left( 1 - \mathrm{logit}^{-1}(y) \right).
+$$
+
+Despite the apparent complexity of this expression, most of the terms
+are repeated and thus only need to be evaluated once.  Most
+importantly, $\mathrm{logit}^{-1}(y)$ only needs to be evaluated once,
+so there is only one call to $\exp(-y)$.
+
+
+## Ordered Vector
+
+For some modeling tasks, a vector-valued random variable $X$ is
+required with support on ordered sequences.  One example is the set of
+cut points in ordered logistic regression.
+
+In constraint terms, an ordered $K$-vector $x \in \mathbb{R}^K$ satisfies
+
+$$
+x_k < x_{k+1}
+$$
+
+for $k \in \{ 1, \ldots, K-1 \}$.
+
+
+### Ordered Transform {-}
+
+Stan's transform follows the constraint directly.  It maps an
+increasing vector $x \in \mathbb{R}^{K}$ to an unconstrained vector $y \in
+\mathbb{R}^K$ by setting
+
+$$
+y_k
+=
+\left\{
+\begin{array}{ll}
+x_1 & \mbox{if } k = 1, \mbox{ and}
+\\
+\log \left( x_{k} - x_{k-1} \right) & \mbox{if } 1 < k \leq K.
+\end{array}
+\right.
+$$
+
+
+### Ordered Inverse Transform {-}
+
+The inverse transform for an unconstrained $y \in \mathbb{R}^K$ to an
+ordered sequence $x \in \mathbb{R}^K$ is defined by the recursion
+
+$$
+x_k
+=
+\left\{
+\begin{array}{ll}
+y_1 & \mbox{if } k = 1, \mbox{ and}
+\\
+x_{k-1} + \exp(y_k) & \mbox{if } 1 < k \leq K.
+\end{array}
+\right.
+$$
+
+$x_k$ can also be expressed iteratively as
+
+$$
+x_k = y_1 + \sum_{k'=2}^k \exp(y_{k'}).
+$$
+
+
+### Absolute Jacobian Determinant of the Ordered Inverse Transform {-}
+
+The Jacobian of the inverse transform $f^{-1}$ is lower triangular,
+with diagonal elements for $1 \leq k \leq K$ of
+
+$$
+J_{k,k} =
+\left\{
+\begin{array}{ll}
+1 & \mbox{if } k = 1, \mbox{ and}
+\\
+\exp(y_k) & \mbox{if } 1 < k \leq K.
+\end{array}
+\right.
+$$
+
+Because $J$ is triangular, the absolute Jacobian determinant is
+
+$$
+\left| \, \det \, J \, \right|
+\ = \
+\left| \, \prod_{k=1}^K J_{k,k} \, \right|
+\ = \
+\prod_{k=2}^K \exp(y_k).
+$$
+
+Putting this all together, if $p_X$ is the density of $X$, then the
+transformed variable $Y$ has density $p_Y$ given by
+
+$$
+p_Y(y)
+= p_X(f^{-1}(y))
+\
+\prod_{k=2}^K \exp(y_k).
+$$
+
+
+## Unit Simplex {#simplex-transform.section}
+
+Variables constrained to the unit simplex show up in multivariate
+discrete models as both parameters (categorical and multinomial) and
+as variates generated by their priors (Dirichlet and multivariate
+logistic).
+
+The unit $K$-simplex is the set of points $x \in \mathbb{R}^K$ such that
+for $1 \leq k \leq K$,
+
+$$
+x_k > 0,
+$$
+
+and
+
+$$
+\sum_{k=1}^K x_k = 1.
+$$
+
+An alternative definition is to take the convex closure of the
+vertices.  For instance, in 2-dimensions, the simplex vertices are the
+extreme values $(0,1)$, and $(1,0)$ and the unit 2-simplex is the line
+connecting these two points; values such as $(0.3,0.7)$ and
+$(0.99,0.01)$ lie on the line.  In 3-dimensions, the basis is
+$(0,0,1)$, $(0,1,0)$ and $(1,0,0)$ and the unit 3-simplex is the
+boundary and interior of the triangle with these vertices.  Points in
+the 3-simplex include $(0.5,0.5,0)$, $(0.2,0.7,0.1)$ and all other
+triplets of non-negative values summing to 1.
+
+As these examples illustrate, the simplex always picks out a subspace
+of $K-1$ dimensions from $\mathbb{R}^K$.  Therefore a point $x$ in the
+$K$-simplex is fully determined by its first $K-1$ elements $x_1, x_2,
+\ldots, x_{K-1}$, with
+
+$$
+x_K = 1 - \sum_{k=1}^{K-1} x_k.
+$$
+
+
+### Unit Simplex Inverse Transform {-}
+
+Stan's unit simplex inverse transform may be understood using the
+following stick-breaking metaphor.^[For an alternative derivation of the same transform using hyperspherical coordinates, see [@Betancourt:2010].]
+
+1.  Take a stick of unit length (i.e., length 1).
+2.  Break a piece off and label it as $x_1$, and set it aside, keeping
+what's left.
+3.  Next, break a piece off what's left, label it $x_2$, and set it
+aside, keeping what's left.
+4.  Continue breaking off pieces of what's left, labeling them, and
+setting them aside for pieces $x_3,\ldots,x_{K-1}$.
+5.  Label what's left $x_K$.
+
+The resulting vector $x = [x_1,\ldots,x_{K}]^{\top}$ is a unit
+simplex because each piece has non-negative length and the sum of
+the stick lengths is one by construction.
+
+This full inverse mapping requires the breaks to be represented as the
+fraction in $(0,1)$ of the original stick that is broken off.  These
+break ratios are themselves derived from unconstrained values in
+$(-\infty,\infty)$ using the inverse logit transform as described
+above for unidimensional variables with lower and upper bounds.
+
+More formally, an intermediate vector $z \in \mathbb{R}^{K-1}$, whose
+coordinates $z_k$ represent the proportion of the stick broken off in
+step $k$, is defined elementwise for $1 \leq k < K$ by
+
+$$
+z_k = \mathrm{logit}^{-1} \left( y_k
+                             + \log \left( \frac{1}{K - k}
+                                            \right)
+                       \right).
+$$
+
+The logit term
+$\log\left(\frac{1}{K-k}\right) (i.e., \mathrm{logit}\left(\frac{1}{K-k+1}\right)$) in
+the above definition adjusts the transform so that a
+zero vector $y$ is mapped to the simplex $x = (1/K,\ldots,1/K)$.  For instance, if
+$y_1 = 0$, then $z_1 = 1/K$; if $y_2 = 0$, then $z_2 = 1/(K-1)$; and
+if $y_{K-1} = 0$, then $z_{K-1} = 1/2$.
+
+The break proportions $z$ are applied to determine the stick sizes and
+resulting value of $x_k$ for $1 \leq k < K$ by
+
+$$
+x_k =
+\left( 1 - \sum_{k'=1}^{k-1} x_{k'} \right) z_k.
+$$
+
+The summation term represents the length of the original stick left at
+stage $k$.  This is multiplied by the break proportion $z_k$ to yield
+$x_k$.  Only $K-1$ unconstrained parameters are required, with
+the last dimension's value $x_K$ set to the length of the remaining
+piece of the original stick,
+
+$$
+x_K = 1 - \sum_{k=1}^{K-1} x_k.
+$$
+
+
+### Absolute Jacobian Determinant of the Unit-Simplex Inverse Transform {-}
+
+The Jacobian $J$ of the inverse transform $f^{-1}$ is
+lower-triangular, with diagonal entries
+
+$$
+J_{k,k}
+=
+\frac{\partial x_k}{\partial y_k}
+=
+\frac{\partial x_k}{\partial z_k} \,
+\frac{\partial z_k}{\partial y_k},
+$$
+
+where
+
+$$
+\frac{\partial z_k}{\partial y_k}
+= \frac{\partial}{\partial y_k}
+   \mathrm{logit}^{-1} \left(
+                       y_k + \log \left( \frac{1}{K-k}
+                                          \right)
+                    \right)
+= z_k (1 - z_k),
+$$
+
+and
+
+$$
+\frac{\partial x_k}{\partial z_k}
+=
+\left(
+  1 - \sum_{k' = 1}^{k-1} x_{k'}
+   \right)
+.
+$$
+
+This definition is recursive, defining $x_k$ in terms of
+$x_{1},\ldots,x_{k-1}$.
+
+Because the Jacobian $J$ of $f^{-1}$ is lower triangular and positive, its
+absolute determinant reduces to
+
+$$
+\left| \, \det J \, \right|
+\ = \
+\prod_{k=1}^{K-1} J_{k,k}
+\ = \
+\prod_{k=1}^{K-1}
+z_k
+\,
+(1 - z_k)
+\
+\left(
+1 - \sum_{k'=1}^{k-1} x_{k'}
+\right)
+.
+$$
+
+Thus the transformed variable $Y = f(X)$ has a density given by
+
+$$
+p_Y(y)
+= p_X(f^{-1}(y))
+\,
+\prod_{k=1}^{K-1}
+z_k
+\,
+(1 - z_k)
+\
+\left(
+1 - \sum_{k'=1}^{k-1} x_{k'}
+\right)
+.
+$$
+
+Even though it is expressed in terms of intermediate values $z_k$,
+this expression still looks more complex than it is. The exponential
+function need only be evaluated once for each unconstrained parameter
+$y_k$; everything else is just basic arithmetic that can be computed
+incrementally along with the transform.
+
+
+### Unit Simplex Transform {-}
+
+The transform $Y = f(X)$ can be derived by reversing the stages of the
+inverse transform.  Working backwards, given the break proportions
+$z$, $y$ is defined elementwise by
+
+$$
+y_k
+= \mathrm{logit}(z_k)
+- \mbox{log}\left(
+   \frac{1}{K-k}
+   \right)
+.
+$$
+
+The break proportions $z_k$ are defined to be the ratio of $x_k$ to
+the length of stick left after the first $k-1$ pieces have been broken
+off,
+
+$$
+z_k
+= \frac{x_k}
+       {1 - \sum_{k' = 1}^{k-1} x_{k'}}
+.
+$$
+
+
+## Unit Vector {#unit-vector.section}
+
+An $n$-dimensional vector $x \in \mathbb{R}^n$ is said to be a unit vector
+if it has unit Euclidean length, so that
+
+$$
+\Vert x \Vert
+\ = \ \sqrt{x^{\top}\,x}
+\ = \ \sqrt{x_1^2 + x_2^2 + \cdots + x_n^2}
+\ = \ 1\ .
+$$
+
+
+### Unit Vector Inverse Transform {-}
+
+Stan divides an unconstrained vector $y \in \mathbb{R}^{n}$ by its norm,
+$\Vert y \Vert = \sqrt{y^\top y}$, to obtain a unit vector $x$,
+
+$$
+x = \frac{y}{\Vert y \Vert}.
+$$
+
+To generate a unit vector, Stan generates points at random in
+$\mathbb{R}^n$ with independent unit normal distributions, which are then
+standardized by dividing by their Euclidean length.
+@Marsaglia:1972 showed this generates points uniformly at random
+on $S^{n-1}$.  That is, if we draw $y_n \sim \mathsf{Normal}(0, 1)$
+for $n \in 1{:}n$, then $x = \frac{y}{\Vert y \Vert}$ has a uniform
+distribution over $S^{n-1}$.  This allows us to use an $n$-dimensional
+basis for $S^{n-1}$ that preserves local neighborhoods in that points
+that are close to each other in $\mathbb{R}^n$ map to points near each
+other in $S^{n-1}$.  The mapping is not perfectly distance preserving,
+because there are points arbitrarily far away from each other in
+$\mathbb{R}^n$ that map to identical points in $S^{n-1}$.
+
+
+#### Warning: undefined at zero! {-}
+
+The above mapping from $\mathbb{R}^n$ to $S^n$ is not defined at zero.
+While this point outcome has measure zero during sampling, and may
+thus be ignored, it is the default initialization point and thus unit
+vector parameters cannot be initialized at zero.  A simple workaround
+is to initialize from a very small interval around zero, which is an
+option built into all of the Stan interfaces.
+
+
+### Absolute Jacobian Determinant of the Unit Vector Inverse Transform {-}
+
+The Jacobian matrix relating the input vector $y$ to the output vector
+$x$ is singular because $x^\top x = 1$ for any non-zero input vector
+$y$. Thus, there technically is no unique transformation from $x$ to
+$y$. To circumvent this issue, let $r = \sqrt{y^\top y}$ so that $y = r
+x$. The transformation from $\left(r, x_{-n}\right)$ to $y$ is
+well-defined but $r$ is arbitrary, so we set $r = 1$. In this case,
+the determinant of the Jacobian is proportional to $-\frac{1}{2} y^\top y$,
+which is the kernel of a standard multivariate normal distribution
+with $n$ independent dimensions.
+
+
+## Correlation Matrices {#correlation-matrix-transform.section}
+
+A $K \times K$ correlation matrix $x$ must be is a symmetric, so that
+
+$$
+x_{k,k'} = x_{k',k}
+$$
+
+for all $k,k' \in \{ 1, \ldots, K \}$, it must have a unit diagonal,
+so that
+
+$$
+x_{k,k} = 1
+$$
+
+for all $k \in \{ 1, \ldots, K \}$, and it must be positive
+definite, so that for every non-zero $K$-vector $a$,
+
+$$
+a^{\top} x a > 0.
+$$
+
+The number of free parameters required to specify a $K \times K$
+correlation matrix is $\binom{K}{2}$.
+
+There is more than one way to map from $\binom{K}{2}$ unconstrained
+parameters to a $K \times K$ correlation matrix.  Stan implements the
+Lewandowski-Kurowicka-Joe (LKJ) transform
+@LewandowskiKurowickaJoe:2009.
+
+
+### Correlation Matrix Inverse Transform {-}
+
+It is easiest to specify the inverse, going from its $\binom{K}{2}$
+parameter basis to a correlation matrix.  The basis will actually be
+broken down into two steps.  To start, suppose $y$ is a vector
+containing $\binom{K}{2}$ unconstrained values.  These are first
+transformed via the bijective function $\tanh : \mathbb{R} \rightarrow
+(-1, 1)$
+
+$$
+\tanh x = \frac{\exp(2x) - 1}{\exp(2x) + 1}.
+$$
+
+Then, define a $K \times K$ matrix $z$, the upper triangular values of
+which are filled by row with the transformed values.  For example, in
+the $4 \times 4$ case, there are $\binom{4}{2}$ values arranged as
+
+$$
+z
+=
+\left[
+\begin{array}{cccc}
+0 & \tanh y_1 & \tanh y_2 & \tanh y_4
+\\
+0 & 0 & \tanh y_3 & \tanh y_5
+\\
+0 & 0 & 0 & \tanh y_6
+\\
+0 & 0 & 0 & 0
+\end{array}
+\right]
+.
+$$
+
+Lewandowski, Kurowicka and Joe (LKJ) show how to bijectively map the
+array $z$ to a correlation matrix $x$.  The entry $z_{i,j}$ for $i <
+j$ is interpreted as the canonical partial correlation (CPC) between
+$i$ and $j$, which is the correlation between $i$'s residuals and
+$j$'s residuals when both $i$ and $j$ are regressed on all variables
+$i'$ such that $i'< i$.  In the case of $i=1$, there are no earlier
+variables, so $z_{1,j}$ is just the Pearson correlation between $i$
+and $j$.
+
+In Stan, the LKJ transform is reformulated in terms of a Cholesky factor $w$
+of the final correlation matrix, defined for $1 \leq i,j \leq K$ by
+
+$$
+w_{i,j} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } i > j,
+\\
+1 & \mbox{if } 1 = i = j,
+\\
+\prod_{i'=1}^{i - 1} \left( 1 - z_{i'\!,\,j}^2 \right)^{1/2}
+& \mbox{if } 1 < i = j,
+\\
+z_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
+\\\
+z_{i,j} \, \prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,\,j}^2 \right)^{1/2}
+& \mbox{ if } 1 < i < j.
+\end{array}
+\right.
+$$
+
+This does not require as much computation per matrix entry as it may appear;
+calculating the rows in terms of earlier rows yields the more
+manageable expression
+
+$$
+w_{i,j} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } i > j,
+\\
+1 & \mbox{if } 1 = i = j,
+\\
+z_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
+\\
+z_{i,j} \ w_{i-1,j} \left( 1 - z_{i-1,j}^2 \right)^{1/2}
+& \mbox{ if } 1 < i \leq j.
+\end{array}
+\right.
+$$
+
+Given the upper-triangular Cholesky factor $w$, the final correlation
+matrix is
+
+$$
+x = w^{\top} w.
+$$
+
+@LewandowskiKurowickaJoe:2009 show that the determinant of the correlation
+matrix can be defined in terms of the canonical partial correlations
+as
+
+$$
+\mbox{det} \, x = \prod_{i=1}^{K-1} \ \prod_{j=i+1}^K \ (1 - z_{i,j}^2)
+ = \prod_{1 \leq i < j \leq K} (1 - z_{i,j}^2),
+$$
+
+
+### Absolute Jacobian Determinant of the Correlation Matrix Inverse Transform {-}
+
+From the inverse of equation 11 in [@LewandowskiKurowickaJoe:2009],
+the absolute Jacobian determinant is
+
+$$
+\sqrt{\prod_{i=1}^{K-1}\prod_{j=i+1}^K \left(1-z_{i,j}^2\right)^{K-i-1}} \
+\times \prod_{i=1}^{K-1}\prod_{j=i+1}^K
+\frac{\partial z_{i,j}}{\partial y_{i,j}}
+$$
+
+
+### Correlation Matrix Transform {-}
+
+The correlation transform is defined by reversing the steps of the
+inverse transform defined in the previous section.
+
+Starting with a correlation matrix $x$, the first step is to find the
+unique upper triangular $w$ such that $x = w w^{\top}$.  Because $x$
+is positive definite, this can be done by applying the Cholesky
+decomposition,
+
+$$
+w = \mbox{chol}(x).
+$$
+
+The next step from the Cholesky factor $w$ back to the array $z$ of
+canonical partial correlations (CPCs) is simplified by the ordering of the elements in the
+definition of $w$, which when inverted yields
+
+$$
+z_{i,j} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } i \leq j,
+\\
+w_{i,j} & \mbox{if } 1 = i < j, \mbox{ and}
+\\
+{w_{i,j}}
+\
+\prod_{i'=1}^{i-1} \left( 1 - z_{i'\!,j}^2 \right)^{-1/2}
+& \mbox{if } 1 < i < j.
+\end{array}
+\right.
+$$
+
+The final stage of the transform reverses the hyperbolic tangent
+transform, which is defined by
+
+$$
+\tanh^{-1} v = \frac{1}{2} \log \left( \frac{1 + v}{1 - v} \right).
+$$
+
+The inverse hyperbolic tangent function, $\tanh^{-1}$, is also called
+the Fisher transformation.
+
+
+## Covariance Matrices
+
+A $K \times K$ matrix is a covariance matrix if it is symmetric and
+positive definite (see the previous section for definitions).  It
+requires $K + \binom{K}{2}$ free parameters to specify a $K \times K$
+covariance matrix.
+
+
+### Covariance Matrix Transform {-}
+
+Stan's covariance transform is based on a Cholesky decomposition
+composed with a log transform of the positive-constrained diagonal
+elements.^[An alternative to the transform in this section, which can be coded directly in Stan, is to parameterize a covariance matrix as a scaled correlation matrix.  An arbitrary $K \times K$ covariance matrix $\Sigma$ can be expressed in terms of a $K$-vector $\sigma$ and correlation matrix $\Omega$ as $$\Sigma = \mbox{diag}(\sigma) \times \Omega \times \mbox{diag}(\sigma),$$ so that each entry is just a deviation-scaled correlation, $$\Sigma_{m,n} = \sigma_m \times \sigma_n \times \Omega_{m,n}.$$]
+
+If $x$ is a covariance matrix (i.e., a symmetric, positive definite
+matrix), then there is a unique lower-triangular matrix $z =
+\mathrm{chol}(x)$ with positive diagonal entries, called a Cholesky
+factor, such that
+
+$$
+x = z \, z^{\top}.
+$$
+
+The off-diagonal entries of the Cholesky factor $z$ are unconstrained,
+but the diagonal entries $z_{k,k}$ must be positive for $1 \leq k
+\leq K$.
+
+To complete the transform, the diagonal is log-transformed to produce
+a fully unconstrained lower-triangular matrix $y$ defined by
+
+$$
+y_{m,n} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\
+\log z_{m,m} & \mbox{if } m = n, \mbox{ and}
+\\
+z_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+$$
+
+
+### Covariance Matrix Inverse Transform {-}
+
+The inverse transform reverses the two steps of the transform.
+Given an unconstrained lower-triangular $K \times K$ matrix $y$, the
+first step is to recover the intermediate matrix $z$ by reversing the
+log transform,
+
+$$
+z_{m,n} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\
+\exp(y_{m,m}) & \mbox{if } m = n, \mbox{ and}
+\\
+y_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+$$
+
+The covariance matrix $x$ is recovered from its Cholesky factor $z$ by
+taking
+
+$$
+x = z \, z^{\top}.
+$$
+
+
+### Absolute Jacobian Determinant of the Covariance Matrix Inverse Transform {-}
+
+The Jacobian is the product of the Jacobians of the exponential
+transform from the unconstrained lower-triangular matrix $y$ to matrix
+$z$ with positive diagonals and the product transform from the
+Cholesky factor $z$ to $x$.
+
+The transform from unconstrained $y$ to Cholesky factor $z$ has a
+diagonal Jacobian matrix, the absolute determinant of which is thus
+
+$$
+\prod_{k=1}^K  \frac{\partial}{\partial_{y_{k,k}}} \, \exp(y_{k,k})
+\ = \
+\prod_{k=1}^K \exp(y_{k,k})
+\ = \
+\prod_{k=1}^K z_{k,k}.
+$$
+
+The Jacobian matrix of the second transform from the Cholesky factor $z$ to
+the covariance matrix $x$ is also triangular, with diagonal entries
+corresponding to pairs $(m,n)$ with $m \geq n$, defined by
+
+$$
+\frac{\partial}{\partial z_{m,n}}
+\left( z \, z^{\top} \right)_{m,n}
+\ = \
+\frac{\partial}{\partial z_{m,n}}
+\left( \sum_{k=1}^K z_{m,k} \, z_{n,k} \right)
+\ = \
+\left\{
+\begin{array}{cl}
+2 \, z_{n,n} & \mbox{if } m = n \mbox{ and }
+\\
+z_{n,n} & \mbox{if } m > n.
+\end{array}
+\right.
+$$
+
+The absolute Jacobian determinant of the second transform is thus
+
+$$
+2^{K} \ \prod_{m = 1}^{K} \ \prod_{n=1}^{m} z_{n,n}
+\ = \
+\prod_{n=1}^K \ \prod_{m=n}^K z_{n,n}
+\ = \
+2^{K} \ \prod_{k=1}^K z_{k,k}^{K - k + 1}.
+$$
+
+Finally, the full absolute Jacobian determinant of the inverse
+of the covariance matrix transform from the unconstrained lower-triangular
+$y$ to a symmetric, positive definite matrix $x$ is the product of the
+Jacobian determinants of the exponentiation and product transforms,
+
+$$
+\left( \prod_{k=1}^K z_{k,k} \right)
+\left(
+2^{K} \ \prod_{k=1}^K z_{k,k}^{K - k + 1}
+\right)
+\ = \
+2^K
+\, \prod_{k=1}^K z_{k,k}^{K-k+2}.
+$$
+
+Let $f^{-1}$ be the inverse transform from a $K + \binom{K}{2}$-vector
+$y$ to the $K \times K$ covariance matrix $x$.  A density function
+$p_X(x)$ defined on $K \times K$ covariance matrices is transformed to
+the density $p_Y(y)$ over $K + \binom{K}{2}$ vectors $y$ by
+
+$$
+p_Y(y) = p_X(f^{-1}(y)) \ 2^K \ \prod_{k=1}^K z_{k,k}^{K-k+2}.
+$$
+
+
+## Cholesky Factors of Covariance Matrices
+
+An $M \times M$ covariance matrix $\Sigma$ can be Cholesky factored to
+a lower triangular matrix $L$ such that $L\,L^{\top} = \Sigma$.  If
+$\Sigma$ is positive definite, then $L$ will be $M \times M$.  If
+$\Sigma$ is only positive semi-definite, then $L$ will be $M \times N$,
+with $N < M$.
+
+A matrix is a Cholesky factor for a covariance matrix if and only if
+it is lower triangular, the diagonal entries are positive, and $M \geq
+N$.  A matrix satisfying these conditions ensures that $L \,
+L^{\top}$ is positive semi-definite if $M > N$ and positive definite
+if $M = N$.
+
+A Cholesky factor of a covariance matrix requires $N + \binom{N}{2} +
+(M - N)N$ unconstrained parameters.
+
+
+### Cholesky Factor of Covariance Matrix Transform {-}
+
+Stan's Cholesky factor transform only requires the first step of the
+covariance matrix transform, namely log transforming the positive
+diagonal elements.  Suppose $x$ is an $M \times N$ Cholesky factor.
+The above-diagonal entries are zero, the diagonal entries are
+positive, and the below-diagonal entries are unconstrained.  The
+transform required is thus
+
+$$
+y_{m,n} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\
+\log x_{m,m} & \mbox{if } m = n, \mbox{ and}
+\\
+x_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+$$
+
+
+### Cholesky Factor of Covariance Matrix Inverse Transform {-}
+
+The inverse transform need only invert the logarithm with an
+exponentiation.  If $y$ is the unconstrained matrix representation,
+then the elements of the constrained matrix $x$ is defined by
+
+$$
+x_{m,n} =
+\left\{
+\begin{array}{cl}
+0 & \mbox{if } m < n,
+\\
+\exp(y_{m,m}) & \mbox{if } m = n, \mbox{ and}
+\\
+y_{m,n} & \mbox{if } m > n.
+\end{array}
+\right.
+$$
+
+
+### Absolute Jacobian Determinant of Cholesky Factor Inverse Transform {-}
+
+The transform has a diagonal Jacobian matrix, the absolute determinant
+of which is
+
+$$
+\prod_{n=1}^N  \frac{\partial}{\partial_{y_{n,n}}} \, \exp(y_{n,n})
+\ = \
+\prod_{n=1}^N \exp(y_{n,n})
+\ = \
+\prod_{n=1}^N x_{n,n}.
+$$
+
+Let $x = f^{-1}(y)$ be the inverse transform from a $N + \binom{N}{2}
++ (M - N)N$ vector to an $M \times N$ Cholesky factor for a covariance
+matrix $x$ defined in the previous section.  A density function
+$p_X(x)$ defined on $M \times N$ Cholesky factors of covariance
+matrices is transformed to the density $p_Y(y)$ over $N + \binom{N}{2}
++ (M - N)N$ vectors $y$ by
+
+$$
+p_Y(y) = p_X(f^{-1}(y)) \prod_{N=1}^N x_{n,n}.
+$$
+
+
+## Cholesky Factors of Correlation Matrices
+
+A $K \times K$ correlation matrix $\Omega$ is positive definite and
+has a unit diagonal.  Because it is positive definite, it can be
+Cholesky factored to a $K \times K$ lower-triangular matrix $L$ with
+positive diagonal elements such that $\Omega = L\,L^{\top}$.  Because
+the correlation matrix has a unit diagonal,
+
+$$
+\Omega_{k,k} = L_k\,L_k^{\top} = 1,
+$$
+
+each row vector $L_k$ of the Cholesky factor is of unit length.  The
+length and positivity constraint allow the diagonal elements of $L$ to
+be calculated from the off-diagonal elements, so that a Cholesky
+factor for a $K \times K$ correlation matrix requires only
+$\binom{K}{2}$ unconstrained parameters.
+
+
+### Cholesky Factor of Correlation Matrix Inverse Transform {-}
+
+It is easiest to start with the inverse transform from the $\binom{K}{2}$ unconstrained parameters $y$ to the $K \times K$ lower-triangular Cholesky factor $x$.  The inverse transform is based on the hyperbolic tangent function, $\tanh$, which satisfies $\tanh(x) \in (-1,1)$.  Here it will function like an inverse logit with a sign to pick out the direction of an underlying canonical partial correlation; see the [section on correlation matrix transforms](#correlation-matrix-transform.section) for more information on the relation between canonical partial correlations and the Cholesky factors of correlation matrices.
+
+Suppose $y$ is a vector of $\binom{K}{2}$ unconstrained values.  Let
+$z$ be a lower-triangular matrix with zero diagonal and below
+diagonal entries filled by row.  For example, in the $3 \times 3$
+case,
+
+$$
+z =
+\left[
+\begin{array}{ccc}
+0 & 0 & 0
+\\
+\tanh y_1 & 0 & 0
+\\
+\tanh y_2 & \tanh y_3 & 0
+\end{array}
+\right]
+$$
+
+The matrix $z$, with entries in the range $(-1, 1)$, is then
+transformed to the Cholesky factor $x$, by taking^[For convenience, a summation with no terms, such as $\sum_{j' < 1} x_{i,j'}$, is defined to be 0.  This implies  $x_{1,1} = 1$ and that $x_{i,1} = z_{i,1}$ for $i > 1$.]
+
+$$
+x_{i,j}
+=
+\left\{
+\begin{array}{lll}
+0 & \mbox{ if } i < j & \mbox{ [above diagonal]}
+\\
+\sqrt{1 - \sum_{j' < j} x_{i,j'}^2}
+  & \mbox{ if } i = j & \mbox{ [on diagonal]}
+\\
+z_{i,j} \ \sqrt{1 - \sum_{j' < j} x_{i,j'}^2}
+  & \mbox{ if } i > j & \mbox{ [below diagonal]}
+\end{array}
+\right.
+$$
+
+In the $3 \times 3$ case, this yields
+
+$$
+x =
+\left[
+\begin{array}{ccc}
+1 & 0 & 0
+\\
+z_{2,1} & \sqrt{1 - x_{2,1}^2} & 0
+\\
+z_{3,1} & z_{3,2} \sqrt{1 - x_{3,1}^2}
+        & \sqrt{1 - (x_{3,1}^2 + x_{3,2}^2)}
+\end{array}
+\right],
+$$
+
+where the $z_{i,j} \in (-1,1)$ are the $\tanh$-transformed $y$.
+
+The approach is a signed stick-breaking process on the quadratic
+(Euclidean length) scale.  Starting from length 1 at $j=1$, each
+below-diagonal entry $x_{i,j}$ is determined by the (signed) fraction
+$z_{i,j}$ of the remaining length for the row that it consumes. The
+diagonal entries $x_{i,i}$ get any leftover length from earlier
+entries in their row.  The above-diagonal entries are zero.
+
+
+### Cholesky Factor of Correlation Matrix Transform {-}
+
+Suppose $x$ is a $K \times K$ Cholesky factor for some correlation
+matrix.  The first step of the transform reconstructs the intermediate
+values $z$ from $x$,
+
+$$
+z_{i,j} = \frac{x_{i,j}}{\sqrt{1 - \sum_{j' < j}x_{i,j'}^2}}.
+$$
+
+The mapping from the resulting $z$ to $y$ inverts $\tanh$,
+
+$$
+y
+\ = \
+\tanh^{-1} z
+\ = \
+\frac{1}{2} \left( \log (1 + z) - \log (1 - z) \right).
+$$
+
+
+### Absolute Jacobian Determinant of Inverse Transform {-}
+
+The Jacobian of the full transform is the product of the Jacobians of
+its component transforms.
+
+First, for the inverse transform $z = \tanh y$, the derivative is
+
+$$
+\frac{d}{dy} \tanh y = \frac{1}{(\cosh y)^2}.
+$$
+
+Second, for the inverse transform of $z$ to $x$, the resulting
+Jacobian matrix $J$ is of dimension $\binom{K}{2} \times
+\binom{K}{2}$, with indexes $(i,j)$ for $(i > j)$.  The Jacobian
+matrix is lower triangular, so that its determinant is the product of
+its diagonal entries, of which there is one for each $(i,j)$ pair,
+
+$$
+\left| \, \mbox{det} \, J \, \right|
+  \ = \ \prod_{i > j} \left| \frac{d}{dz_{i,j}} x_{i,j} \right|,
+$$
+
+where
+
+$$
+\frac{d}{dz_{i,j}} x_{i,j}
+= \sqrt{1 - \sum_{j' < j} x^2_{i,j'}}.
+$$
+
+So the combined density for unconstrained $y$ is
+
+$$
+p_Y(y)
+= p_X(f^{-1}(y))
+  \ \
+  \prod_{n < \binom{K}{2}} \frac{1}{(\cosh y)^2}
+  \ \
+  \prod_{i > j} \left( 1 - \sum_{j' < j} x_{i,j'}^2
+  \right)^{1/2},
+$$
+
+where $x = f^{-1}(y)$ is used for notational convenience.  The log
+Jacobian determinant of the complete inverse transform $x = f^{-1}(y)$
+is given by
+
+$$
+\log \left| \, \det J \, \right|
+=
+-2 \sum_{n \leq \binom{K}{2}}
+\log \cosh y
+\
++
+\
+\frac{1}{2} \
+\sum_{i > j}
+\log \left( 1 - \sum_{j' < j} x_{i,j'}^2 \right)
+.
+$$

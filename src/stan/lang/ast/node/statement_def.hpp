@@ -12,11 +12,7 @@ namespace stan {
 
     statement::statement(const nil& st) : statement_(st) { }
 
-    statement::statement(const assignment& st) : statement_(st) { }
-
     statement::statement(const assgn& st) : statement_(st) { }
-
-    statement::statement(const compound_assignment& st) : statement_(st) { }
 
     statement::statement(const sample& st) : statement_(st) { }
 

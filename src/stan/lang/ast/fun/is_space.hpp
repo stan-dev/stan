@@ -7,6 +7,9 @@ namespace stan {
     /**
      * Returns true if the specified character is an ASCII whitespace
      * character (space, newline, carriage return, tab).
+
+     * This call delegates to the function
+     * <code>stan::io::is_whitespace</code>.
      *
      * @param c character to test
      * @return true if character is whitespace

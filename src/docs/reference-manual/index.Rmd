@@ -1,0 +1,71 @@
+---
+knit: "bookdown::render_book"
+title: "Stan Reference Manual"
+author: "Stan Development Team"
+date: "Version 2.18 (July 2018)"
+description: "Stan reference manual specifying the syntax and semantics of the Stan programming language."
+url: 'http\://mc-stan.org/users/documentation'
+site: bookdown::bookdown_site
+github-repo: stan-dev/stan
+twitter-handle: mc-stan
+cover-image: img/logo_tm.png
+documentclass: book
+bibliography: [../bibtex/all.bib]
+biblio-style: apalike
+link-citations: yes
+fontsize: 10pt
+monofont: "Lucida Console"
+subparagraph: yes
+---
+
+# <i style="font-size: 110%; padding:1.5em 0 0 0; color:#990017;">Overview</i> {-}
+
+<img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225" alt="Stan logo" />
+
+This is the official reference manual for Stan's *programming
+language* for coding probability models, *inference algorithms* for
+fitting models and making predictions, and *posterior analysis* tools
+for evaluating the results.  This manual applies to all Stan
+inteferfaces.
+
+There are two additional interface-neutral manuals, a *Functions
+Reference* listing all the built-in functions and their signatures,
+and a *User's Guide* providing examples and programming techniques.
+There is also a separate installation and getting started guide for
+each interface.
+
+## Web resources {-}
+
+Stan is an open-source software project, resources for which are
+hosted on various web sites:
+
+* [Stan web site](http://mc-stan.org/): links to
+the official Stan releases, source code, installation instructions,
+and full documentation, including the latest version of this manual,
+the user's guide and the getting started guide for each interface,
+tutorials, case studies, and reference materials for developers.
+
+* [Stan forum](http://discourse.mc-stan.org): message board
+for questions, discussion, and announcements related to Stan for
+both users and developers.
+
+* [Stan GitHub organization](https://github.com/stan-dev/stan):
+version controlled code and document repositories, issue trackers for
+bug reports and feature requests, code review, and wikis; includes
+all of Stan's source code, documentation, and web pages.
+
+
+## Copyright and Trademark {-}
+
+* Copyright 2011--2018, Stan Development Team and their assignees.
+
+* The Stan name and logo are registered trademarks of NumFOCUS.
+
+
+## Licensing {-}
+
+* *Text content:*  [CC-BY ND 4.0 license](https://creativecommons.org/licenses/by-nd/4.0/legalcode)
+
+* *Computer code:*  [BSD 3-clause license](https://opensource.org/licenses/BSD-3-Clause)
+
+* *Logo:*  [Stan logo usage guidelines](http://mc-stan.org/about/logo/)

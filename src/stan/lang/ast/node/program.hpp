@@ -3,7 +3,7 @@
 
 #include <stan/lang/ast/node/function_decl_def.hpp>
 #include <stan/lang/ast/node/statement.hpp>
-#include <stan/lang/ast/node/var_decl.hpp>
+#include <stan/lang/ast/node/block_var_decl.hpp>
 #include <utility>
 #include <vector>
 
@@ -23,7 +23,7 @@ namespace stan {
       /**
        * Type of a sequence of variable declarations.
        */
-      typedef std::vector<var_decl> var_decls_t;
+      typedef std::vector<block_var_decl> block_var_decls_t;
 
       /**
        * Type of a sequence of statements.
@@ -33,7 +33,7 @@ namespace stan {
       /**
        * Type of pair of variable declaration sequence and statement sequence.
        */
-      typedef std::pair<var_decls_t, statements_t> var_decls_statements_t;
+      typedef std::pair<block_var_decls_t, statements_t> var_decls_statements_t;
 
       /**
        * Construct an uninitialized program.
@@ -52,9 +52,9 @@ namespace stan {
        * @param[in] generated_quantities generated quantities block
        */
       program(const function_decls_t& functions,
-              const var_decls_t& data,
+              const block_var_decls_t& data,
               const var_decls_statements_t& transformed_data,
-              const var_decls_t& parameters,
+              const block_var_decls_t& parameters,
               const var_decls_statements_t& transformed_parameters,
               const statement& model,
               const var_decls_statements_t& generated_quantities);
@@ -67,23 +67,24 @@ namespace stan {
       /**
        * Data block.
        */
-      std::vector<var_decl> data_decl_;
+      std::vector<block_var_decl> data_decl_;
 
       /**
        * Transformed data block.
        */
-      std::pair<std::vector<var_decl>, std::vector<statement> >
+      std::pair<std::vector<block_var_decl>, std::vector<statement> >
         derived_data_decl_;
 
       /**
        * Parameters block.
        */
-      std::vector<var_decl> parameter_decl_;
+      std::vector<block_var_decl> parameter_decl_;
 
       /**
        * Transformed parameters block.
        */
-      std::pair<std::vector<var_decl>, std::vector<statement> > derived_decl_;
+      std::pair<std::vector<block_var_decl>,
+                std::vector<statement> > derived_decl_;
 
       /**
        * Model block.
@@ -93,7 +94,8 @@ namespace stan {
       /**
        * Generated quantities block.
        */
-      std::pair<std::vector<var_decl>, std::vector<statement> > generated_decl_;
+      std::pair<std::vector<block_var_decl>,
+                std::vector<statement> > generated_decl_;
     };
 
   }

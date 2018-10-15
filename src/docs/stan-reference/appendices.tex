@@ -117,7 +117,7 @@ you can look for similar structures in these examples.
 
 \begin{itemize}
 \item \BUGS is interpreted; Stan is compiled in two steps, first a
-  model is is translated to templated C++ and then to a
+  model is translated to templated C++ and then to a
   platform-specific executable.  Stan, unlike \BUGS, allows the user
   to directly program in C++, but we do not describe how to do this in
   this Stan manual (see the getting started with \Cpp section of
@@ -590,16 +590,15 @@ e.g., \code{A\{6\}} is equivalent to a sequence of six copies of \code{A}.
 
 {\small
 \begin{Verbatim}
-program ::= ?functions ?data ?tdata ?params ?tparams model ?generated
+program ::= ?functions ?data ?tdata ?params ?tparams ?model ?generated
 
 functions ::= 'functions' function_decls
 data ::= 'data' var_decls
 tdata ::= 'transformed data' var_decls_statements
 params ::= 'parameters' var_decls
 tparams ::= 'transformed parameters' var_decls_statements
-model ::= 'model' statement
+model ::= 'model' var_decls_statements
 generated ::= 'generated quantities' var_decls_statements
-
 function_decls ::= '{' function_decl* '}'
 var_decls ::= '{' var_decl* '}'
 var_decls_statements ::= '{' var_decl* statement* '}'
@@ -611,12 +610,12 @@ var_decls_statements ::= '{' var_decl* statement* '}'
 {
 \small
 \begin{Verbatim}[fontsize=\small]
-function_decl ::= unsized_return_type identifier '(' unsized_types ')'
-                 statement
+function_decl ::= return_type identifier '(' parameter_decl % ',' ')'
+                  statement
 
-unsized_return_type ::= 'void' | unsized_type
-unsized_type ::= (basic_type ?unsized_dims)
-unsized_types ::= unsized_type % ','
+return_type ::= 'void' | unsized_type
+parameter_decl ::= ?'data' unsized_type identifier
+unsized_type ::= basic_type ?unsized_dims
 basic_type ::= 'int' | 'real' | 'vector' | 'row_vector' | 'matrix'
 unsized_dims ::= '['  ','*  ']'
 \end{Verbatim}
@@ -645,15 +644,16 @@ var_type ::= 'int' range_constraint
 
 range_constraint ::= ?('<' range '>')
 
-range ::= 'lower' '=' expression ',' 'upper' = expression
-        | 'lower' '=' expression
-        | 'upper' '=' expression
+range ::= 'lower' '=' range_expression ',' 'upper' = range_expression
+        | 'lower' '=' range_expression
+        | 'upper' '=' range_expression
 
 dims ::= '['  expressions ']'
 
 variable ::= identifier
 
 identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
+
 \end{Verbatim}
 }
 
@@ -663,35 +663,56 @@ identifier ::= [a-zA-Z] [a-zA-Z0-9_]*
 \small
 \begin{Verbatim}[fontsize=\small]
 expressions ::= expression % ','
-expression ::= real_literal
-             | variable
-             | '{' expressions '}'
-             | expression `?` expression `:` expression
+
+expression ::= expression `?` expression `:` expression
              | expression infixOp expression
              | prefixOp expression
              | expression postfixOp
-             | expression '[' indexes ']'
-             | function_literal '(' ?expressions ')'
-             | function_literal '(' expression ?('|' expression % ',') ')'
-             | integrate_ode '(' function_literal (',' expression){6} ')'
-             | integrate_ode_rk45
-               '(' function_literal (',' expression){6|9} ')'
-             | integrate_ode_bdf
-               '(' function_literal (',' expression){6|9} ')'
-             | algebra_solver
-             '('function_literal (',' expression){4|7} ')'
-             | '(' expression ')'
+             | common_expression
+
+range_expression ::= range_expression arithmeticInfixOp range_expression
+                   | prefixOp range_expression
+                   | range_expression postfixOp
+                   | range_expression '[' indexes ']'
+                   | common_expression
+
+common_expression ::= real_literal
+                    | variable
+                    | '{' expressions '}'
+                    | '[' expressions ']'
+                    | function_literal '(' ?expressions ')'
+                    | function_literal '(' expression ?('|' expression % ',') ')'
+                    | integrate_ode '(' function_literal (',' expression){6} ')'
+                    | integrate_ode_rk45
+                      '(' function_literal (',' expression){6|9} ')'
+                    | integrate_ode_bdf
+                      '(' function_literal (',' expression){6|9} ')'
+                    | algebra_solver
+                    '(' function_literal (',' expression){4|7} ')'
+                    | '(' expression ')'
+
+prefixOp ::= ('!' | '-' | '+' | '^')
+
+postfixOp ::= '\''
+
+infixOp ::= arithmeticInfixOp | logicalInfixOp
+
+arithmeticInfixOp ::= ('+' | '-' | '*' | '/' | '%' | '\' | '.*' | './')
+
+logicalInfixOp :: ('||' | '&&' | '==' | '!=' | '<' | '<=' | '>' | '>=')
 
 index ::= ?(expression | expression ':' | ':' expression
-            | expression ':' expression)
+        | expression ':' expression)
 
 indexes ::= index % ','
 
-integer_literal ::= 0 | [1-9] [0-9]*
+integer_literal ::= [0-9]+
 
-real_literal ::= integer_literal ?('.' [0-9]*) ?exp_literal
+real_literal ::= integer_literal '.' [0-9]* ?exp_literal
+               | '.' [0-9]+ ?exp_literal
+               | integer_literal exp_literal
 
-exp_literal ::= ('e' | 'E') integer_literal
+exp_literal ::= ('e' | 'E') ?('+' | '-') integer_literal
 
 function_literal ::= identifier
 \end{Verbatim}
@@ -704,19 +725,17 @@ function_literal ::= identifier
 \begin{Verbatim}[fontsize=\small]
 statement ::= atomic_statement | nested_statement
 
-atomic_statement ::= atomic_statement_body ';'
-atomic_statement_body
-::=  lhs assignment_op expression
-   | expression '~' identifier '(' expressions ')' ?truncation
-   | function_literal '(' expressions ')'
-   | 'increment_log_prob' '(' expression ')'
-   | 'target' '+=' expression
-   | 'break'
-   | 'continue'
-   | 'print' '(' (expression | string_literal) % ',' ')'
-   | 'reject' '(' (expression | string_literal) % ',' ')'
-   | 'return' expression
-   | ''
+atomic_statement ::=  lhs assignment_op expression ';'
+   | expression '~' identifier '(' expressions ')' ?truncation ';'
+   | function_literal '(' expressions ')' ';'
+   | 'increment_log_prob' '(' expression ')' ';'
+   | 'target' '+=' expression ';'
+   | 'break' ';'
+   | 'continue' ';'
+   | 'print' '(' (expression | string_literal) % ',' ')' ';'
+   | 'reject' '(' (expression | string_literal) % ',' ')' ';'
+   | 'return' expression ';'
+   | ';'
 
 assignment_op ::= '<-' | '=' | '+=' | '-=' | '*=' | '/=' | '.*=' | '/*='
 
@@ -724,7 +743,7 @@ string_literal ::= '"' char* '"'
 
 truncation ::= 'T' '[' ?expression ',' ?expression ']'
 
-lhs ::= identifier ?('[' indexes ']')
+lhs ::= identifier ('[' indexes ']')*
 
 nested_statement
 ::=
@@ -886,77 +905,6 @@ adds 1 to the array dimension and a matrix adds 2.  That is, the type
 index positions: three for the array, one for the row of the matrix
 and one for the column.
 
-\chapter{Warning and Error Messages}\label{error-messages.appendix}
-
-\noindent
-This appendix details the specific error messages returned by the
-underlying Stan engine.  The individual Stan interfaces (RStan,
-PyStan, CmdStan) also return error or warning messages in some
-circumstances.
-
-\section{Warnings vs.\ Errors}
-
-The messages returned by Stan come in two flavors, warnings and
-errors.  Error messages arise when a fatal problem occurs under the
-hood from which there is no way to recover.  Warning messages arise
-in circumstances from which the underlying program can continue to
-operate.
-
-An example warning message is an informational message about
-ill-formed input to an underlying function, which results in a
-Metropolis rejection during sampling or a reduction in step size for
-optimization, without causing a fatal error.  An example error message
-is when either sampling or optimization cannot find a region of
-non-zero probability or when a program being parsed is ill formed.
-When an error arises, whatever program is running cannot continue and
-the entire execution must halt.
-
-\section{Parsing and Compilation}
-
-Both warning messages and error messages may arise during parsing.  If
-a Stan program parses successfully, it should compile in \Cpp as
-well.  If it does not compile, there is an underlying bug in Stan's
-parser and \Cpp code generator.
-
-\begin{itemize}
-\item {\it Jacobian may be necessary.}  This message arises when the
-  parser cannot verify that the left-hand side of a sampling statement
-  is a linear function of a parameter.  If it is not a linear function
-  of the parameters, a Jacobian adjustment must be applied.  See
-  \refchapter{change-of-variables} for more information on how to
-  adjust for the Jacobian of a non-linear transform
-\end{itemize}
-
-
-\section{Initialization}
-
-\begin{itemize}
-\item {\it vanishing density.} This message arises when there is a
-  problem with initialization not providing a finite log probability.
-%
-\end{itemize}
-
-\section{Function Evaluation}
-
-\begin{itemize}
-\item {\it informational message.}  This message shows up during
-  sampling when there is a rejected sample due to an underlying issue
-  with input to an underlying function (including probably functions
-  and sampling statements).  This is a {\it warning}\, message, not an
-  error message.  If it only appears at the beginning of warmup in
-  MCMC or during early iterations of optimization, it indicates that
-  adaptation has not yet found appropriate scales for the parameters
-  and an appropriate overall stepsize.  This causes problem like
-  overflow or underflow and thus causes illegal inputs to be passed to
-  functions.  Even if this message persists during sampling, the
-  Metropolis acceptance step will account for the problem and the
-  parameter values being evaluated will be rejected.  This can lead to
-  inefficiency in the best case and lack of ability to make progress
-  in the worst case.  In cases where the message persists, it is worth
-  investigating the arithmetic stability of the Stan program.  There
-  are several tips in this manual and in the user group about how to
-  rewrite problematic programs.
-\end{itemize}
 
 \chapter{Deprecated Features}\label{deprecated-features.appendix}
 

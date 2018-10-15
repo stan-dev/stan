@@ -1,0 +1,477 @@
+\part*{Appendices}
+\addcontentsline{toc}{part}{Appendices}
+
+
+\chapter{Stan for Users of BUGS}\label{stan-for-bugs.appendix}
+
+From the outside, Stan and BUGS%
+%
+\footnote{Except where otherwise noted, we use ``BUGS'' to refer to
+  WinBUGS, OpenBUGS, and JAGS, indiscriminately.}
+%
+are similar --- they use statistically-themed modeling languages
+(which are similar but with some differences; see below), they can be
+called from R, running some specified number of chains to some
+specified length, producing posterior simulations that can be assessed
+using standard convergence diagnostics.  This is not a coincidence:
+in designing Stan, we wanted to keep many of the useful features of
+Bugs.
+
+To start, take a look at the files of translated \BUGS models at
+\url{http://mc-stan.org}.  These are 40 or so models from the \BUGS
+example volumes, all translated and tested (to provide the same
+answers as \BUGS) in Stan.  For any particular model you want to fit,
+you can look for similar structures in these examples.
+
+\section{Some Differences in How BUGS and Stan Work}
+
+\begin{itemize}
+\item \BUGS is interpreted; Stan is compiled in two steps, first a
+  model is translated to templated C++ and then to a
+  platform-specific executable.  Stan, unlike \BUGS, allows the user
+  to directly program in C++, but we do not describe how to do this in
+  this Stan manual (see the getting started with \Cpp section of
+  \url{http://mc-stan.org} for more information on using Stan directly
+  from \Cpp).
+\item \BUGS performs \MCMC updating one scalar parameter at a time
+  (with some exceptions such as \JAGS's implementation of regression
+  and generalized linear models and some conjugate multivariate
+  parameters), using conditional distributions (Gibbs sampling) where
+  possible and otherwise using adaptive rejection sampling, slice
+  sampling, and Metropolis jumping.  \BUGS figures out the dependence
+  structure of the joint distribution as specified in its modeling
+  language and uses this information to compute only what it needs at
+  each step.  Stan moves in the entire space of all the parameters
+  using Hamiltonian Monte Carlo (more precisely, the no-U-turn
+  sampler), thus avoiding some difficulties that occur with
+  one-dimension-at-a-time sampling in high dimensions but at the cost
+  of requiring the computation of the entire log density at each step.
+\item \BUGS tunes its adaptive jumping (if necessary) during its
+  warmup phase (traditionally referred to as "burn-in").  Stan uses
+  its warmup phase to tune the no-U-turn sampler (\NUTS).
+\item The \BUGS modeling language is not directly executable.  Rather,
+  \BUGS parses its model to determine the posterior density and then
+  decides on a sampling scheme.  In contrast, the statements in a Stan
+  model are directly executable: they translate exactly into C++ code
+  that is used to compute the log posterior density (which in turn is
+  used to compute the gradient).
+\item In \BUGS, the order in which statements are written does not
+  matter.  They are executed according to the directed graphical model
+  so that variables are always defined when needed.  A side effect of
+  the direct execution of Stan's modeling language is that statements
+  execute in the order in which they are written.  For instance, the
+  following Stan program, which sets \code{mu} before using it to
+  sample \code{y}.
+%
+\begin{stancode}
+mu = a + b * x;
+y ~ normal(mu,sigma);
+\end{stancode}
+%
+It translates to the following \Cpp code.
+%
+\begin{stancode}
+mu = a + b * x;
+lp += normal_log(mu,sigma);
+\end{stancode}
+%
+Contrast this with the Stan program
+%
+\begin{stancode}
+y ~ normal(mu,sigma)
+mu = a + b * x
+\end{stancode}
+%
+This program is well formed, but is almost certainly
+a coding error, because it attempts to use \code{mu} before
+it is set. It translates to the following \Cpp code.
+%
+\begin{stancode}
+lp += normal_log(mu,sigma);
+mu = a + b * x;
+\end{stancode}
+%
+The direct translation to the imperative language of \Cpp code
+highlights the potential error of using \code{mu} in the first
+statement.
+\\[8pt]
+To trap these kinds of errors, variables are initialized to the
+special not-a-number (\code{NaN}) value.  If \code{NaN} is passed to a
+log probability function, it will raise a domain exception, which will
+in turn be reported by the sampler.  The sampler will reject the
+sample out of hand as if it had zero probability.
+%
+\item Stan uses its own \Cpp algorithmic differentiation packages to
+  compute the gradient of the log density (up to a proportion).
+  Gradients are required during the Hamiltonian dynamics simulations
+  within the leapfrog algorithm of the Hamiltonian Monte Carlo and
+  \NUTS samplers.  \BUGS computes the log density but not its
+  gradient.
+\item Both \BUGS and Stan are semi-automatic in that they run by
+  themselves with no outside tuning required. Nevertheless, the user
+  needs to pick the number of chains and number of iterations per
+  chain.  We usually pick 4 chains and start with 10 iterations per
+  chain (to make sure there are no major bugs and to approximately
+  check the timing), then go to 100, 1000, or more iterations as
+  necessary.  Compared to Gibbs or Metropolis, Hamiltonian Monte Carlo
+  can take longer per iteration (as it typically takes many "leapfrog
+  steps" within each iteration), but the iterations typically have lower
+  autocorrelation.  So Stan might work fine with 1000 iterations in an
+  example where \BUGS would require 100,000 for good mixing.  We
+  recommend monitoring potential scale reduction statistics ($\hat{R}$)
+  and the effective sample size to judge when to stop (stopping when
+  $\hat{R}$ values do not counter-indicate convergence and when enough
+  effective samples have been collected).
+\item WinBUGS is closed source.  OpenBUGS and JAGS are both licensed
+  under the Gnu Public License (GPL), otherwise known as copyleft due
+  to the restrictions it places on derivative works.  Stan is licensed
+  under the much more liberal new BSD license.
+\item Like WinBUGS, OpenBUGS and JAGS, Stan can be run directly from
+  the command line or through R (Python and MATLAB interfaces are in
+  the works)
+\item Like OpenBUGS and JAGS, Stan can be run on Linux, Mac, and
+  Windows platforms.
+\end{itemize}
+
+\section{Some Differences in the Modeling Languages}
+
+\begin{itemize}
+\item The \BUGS modeling language follows an R-like syntax in which
+  line breaks are meaningful.  Stan follows the rules of C, in which
+  line breaks are equivalent to spaces, and each statement ends in a
+  semicolon.  For example:
+%
+\begin{stancode}
+y ~ normal(mu, sigma);
+\end{stancode}
+%
+and
+%
+\begin{stancode}
+for (i in 1:n) y[i] ~ normal(mu, sigma);
+\end{stancode}
+%
+Or, equivalently (recall that a line break is just another form of whitespace),
+%
+\begin{stancode}
+for (i in 1:n)
+  y[i] ~ normal(mu, sigma);
+\end{stancode}
+%
+and also equivalently,
+%
+\begin{stancode}
+for (i in 1:n) {
+  y[i] ~ normal(mu, sigma);
+}
+\end{stancode}
+%
+There's a semicolon after the model statement but not after the
+brackets indicating the body of the for loop.
+%
+\item Another C thing: In Stan, variables can have names constructed
+  using letters, numbers, and the underscore (\code{\_}) symbol, but
+  nothing else (and a variable name cannot begin with a number).
+  \BUGS variables can also include the dot, or period (\code{.}) symbol.
+%
+\item In Stan, the second argument to the "normal" function is the
+  standard deviation (i.e., the scale), not the variance (as in {\it
+    Bayesian Data Analysis}) and not the inverse-variance (i.e.,
+  precision) (as in \BUGS).  Thus a normal with mean 1 and standard
+  deviation 2 is \code{normal(1,2)}, not \code{normal(1,4)} or
+  \code{normal(1,0.25)}.
+%
+\item Similarly, the second argument to the "multivariate normal"
+  function is the covariance matrix and not the inverse covariance matrix
+  (i.e., the precision matrix) (as in \BUGS). The same is true for
+  the "multivariate student" distribution.
+%
+\item
+The distributions have slightly different names:
+%
+\begin{quote}
+\begin{tabular}{l|l}
+{\it BUGS} & {\it Stan} \\ \hline \hline
+\code{dnorm} & \code{normal} \\
+\code{dbinom} & \code{binomial} \\
+\code{dpois} & \code{poisson} \\
+$\vdots$ & $\vdots$
+\end{tabular}
+\end{quote}
+%
+\item Stan, unlike \BUGS, allows intermediate quantities, in the form
+  of local variables, to be reassigned.  For example, the following is
+  legal and meaningful (if possibly inefficient) Stan code.
+%
+\begin{stancode}
+{
+  total = 0;
+  for (i in 1:n){
+    theta[i] ~ normal(total, sigma);
+    total = total + theta[i];
+  }
+}
+\end{stancode}
+%
+In \BUGS, the above model would not be legal because the variable
+\code{total} is defined more than once.  But in Stan, the loop is
+executed in order, so \code{total} is overwritten in each step.
+%
+\item Stan uses explicit declarations.  Variables are declared with
+  base type integer or real, and vectors, matrices, and arrays have
+  specified dimensions.  When variables are bounded, we give that
+  information also.  For data and transformed parameters, the bounds
+  are used for error checking.  For parameters, the constraints
+  are critical to sampling as they determine the geometry over which
+  the Hamiltonian is simulated.
+  \\[6pt]
+  Variables can be declared as data, transformed data, parameters, transformed
+  parameters, or generated quantities.  They can also be declared as
+  local variables within blocks.  For more information, see
+  the part of this manual devoted to the Stan programming language and
+  examine at the example models.
+%
+\item Stan allows all sorts of tricks with vector and matrix
+  operations which can make Stan models more compact.  For example,
+  arguments to probability functions may be vectorized,%
+%
+\footnote{Most distributions have been vectorized, but currently the
+truncated versions may not exist and may not be vectorized.}
+%
+allowing
+%
+\begin{stancode}
+for (i in 1:n)
+  y[i] ~ normal(mu[i], sigma[i]);
+\end{stancode}
+%
+to be expressed more compactly as
+%
+\begin{stancode}
+y ~ normal(mu,sigma);
+\end{stancode}
+%
+The vectorized form is also more efficient because Stan can unfold the
+computation of the chain rule during algorithmic differentiation.
+%
+\item Stan also allows for arrays of vectors and matrices.
+  For example, in a hierarchical model might have a vector of \code{K}
+  parameters for each of \code{J} groups; this can be declared using
+\begin{stancode}
+vector[K] theta[J];
+\end{stancode}
+%
+Then \code{theta[j]} is an expression denoting a \code{K}-vector and
+may be used in the code just like any other vector variable.
+\\[6pt]
+An alternative encoding would be with a two-dimensional array, as in
+\begin{stancode}
+real theta[J,K];
+\end{stancode}
+%
+The vector version can have some advantages, both in convenience and
+in computational speed for some operations.
+\\[6pt]
+A third encoding would use a matrix:
+%
+\begin{stancode}
+matrix[J,K] theta;
+\end{stancode}
+%
+but in this case, \code{theta[j]} is a row vector, not a vector, and
+accessing it as a vector is less efficient than with an array of
+vectors.  The transposition operator, as in \code{theta[j]'}, may be
+used to convert the row vector \code{theta[j]} to a (column) vector.
+Column vector and row vector types are not interchangeable everywhere
+in Stan; see the function signature declarations in the programming
+language section of this manual.
+%
+\item Stan supports general conditional statements using a standard
+  if-else syntax.  For example, a zero-inflated (or -deflated) Poisson
+  mixture model is defined using the if-else syntax as described in
+  \refsection{zero-inflated}.
+%
+\item Stan supports general while loops using a standard syntax.
+While loops give Stan full Turing equivalent computational power.
+They are useful for defining iterative functions with complex
+termination conditions.  As an illustration of their syntax,
+the for-loop
+%
+\begin{stancode}
+model {
+    ....
+    for (n in 1:N) {
+        ... do something with n ....
+    }
+}
+\end{stancode}
+%
+may be recoded using the following while loop.
+%
+\begin{stancode}
+model {
+    int n;
+    ...
+    n = 1;
+    while (n <= N) {
+        ... do something with n ...
+        n = n + 1;
+    }
+}
+\end{stancode}
+%
+
+
+\end{itemize}
+
+
+\section{Some Differences in the Statistical Models that are Allowed}
+
+\begin{itemize}
+\item Stan does not yet support estimation of discrete parameters
+  (discrete data is supported).  We may eventually implement a
+  combination of Gibbs and slice sampling for discrete parameters, but
+  we haven't done so yet.
+\item Stan has some distributions on covariance matrices that do not
+  exist in \BUGS, including a uniform distribution over correlation
+  matrices which may be rescaled, and the priors based on C-vines
+  defined in \citep{LewandowskiKurowickaJoe:2009}.  In particular, the
+  Lewandowski et al.\ prior allows the correlation matrix to be shrunk
+  toward the unit matrix while the scales are given independent priors.
+\item In \BUGS you need to define all variables.  In Stan, if you
+  declare but don't define a parameter it implicitly has a flat prior
+  (on the scale in which the parameter is defined).  For example, if
+  you have a parameter \code{p} declared as
+\begin{stancode}
+real<lower=0,upper=1> p;
+\end{stancode}
+%
+and then have no sampling statement for \code{p} in the \code{model}
+block, then you are implicitly assigning a uniform $[0,1]$ prior on
+\code{p}.
+On the other hand, if you have a parameter \code{theta} declared with
+%
+\begin{stancode}
+real theta;
+\end{stancode}
+%
+and have no sampling statement for \code{theta} in the
+\code{model} block,
+ then you are implicitly assigning an improper uniform prior
+on $(-\infty,\infty)$ to \code{theta}.
+%
+% Then if
+% you define a transformed parameter \code{p} using
+% \begin{stancode}
+% p = invlogit(theta);
+% \end{stancode}
+% %
+% then you get a $\distro{Beta}(0,0)$ on \code{p}.
+% then you are implicitly assigning an improper uniform
+% (-infinity, infinity) prior on theta, which corresponds to a Beta
+% (0,0) prior on p.  You could also assign this latter prior directly by
+% defining p as the parameter and then writing the following within the
+% model: p ~ beta (0, 0);
+\item \BUGS models are always proper (being constructed as a product
+  of proper marginal and conditional densities).  Stan models can be
+  improper.  Here is the simplest improper Stan model:
+\begin{stancode}
+parameters {
+  real theta;
+}
+model { }
+\end{stancode}
+% \item You can also define some improper models in \BUGS directly, for
+%   example, \Verb|p ~ beta (0, 0);| Remember how Stan works:
+%   lines in the model are executables that correspond directly to
+%   factors in the posterior density.  So you can define beta(0,0), it's
+%   simply a mathematical function.  Stan doesn't "care" if it has a
+%   finite integral.
+\item Although parameters in Stan models may have improper priors, we
+  do not want improper \emph{posterior} distributions, as we are trying to
+  use these distributions for Bayesian inference.  There is no general
+  way to check if a posterior distribution is improper.  But if all
+  the priors are proper, the posterior will be proper also.
+\item
+  As noted earlier, each statement in a Stan model is directly translated into the \Cpp code for computing the log posterior.  Thus, for example, the following pair of statements is legal in a Stan model:
+\begin{stancode}
+y ~ normal(0,1);
+y ~ normal(2,3);
+\end{stancode}
+%
+The second line here does \emph{not} simply overwrite the first;
+rather, \emph{both} statements contribute to the density function that
+is evaluated.  The above two lines have the effect of including the
+product, $\distro{Norm}(y|0,1) \times \distro{Norm}(y|2,3)$, into the
+density function.
+\\[6pt]
+For a perhaps more confusing example, consider the following two lines in a Stan model:
+\begin{stancode}
+x ~ normal(0.8*y, sigma);
+y ~ normal(0.8*x, sigma);
+\end{stancode}
+%
+At first, this might look like a joint normal distribution with a
+correlation of 0.8.  But it is not.  The above are \emph{not}
+interpreted as conditional entities; rather, they are factors in the
+joint density.  Multiplying them gives, $\distro{Norm}(x|0.8y,\sigma)
+\times \distro{Norm}(y|0.8x,\sigma)$, which is what it is (you can
+work out the algebra) but it is not the joint distribution where the
+conditionals have regressions with slope 0.8.
+%
+\item With censoring and truncation, Stan uses the censored-data or
+  truncated-data likelihood---this is not always done in \BUGS.  All
+  of the approaches to censoring and truncation discussed in
+  \citep{GelmanEtAl:2013} and \citep{GelmanHill:2007} may
+  be implemented in Stan directly as written.
+%
+\item Stan, like \BUGS, can benefit from human intervention in the
+  form of reparameterization.  More on this topic to come.
+  % For example, with the 8 schools: . . .
+\end{itemize}
+
+\section{Some Differences when Running from R}
+
+\begin{itemize}
+
+\item Stan can be set up from within R using two lines of code.
+  Follow the instructions for running Stan from R on
+  \url{http://mc-stan.org}.  You don't need to separately download
+  Stan and RStan.  Installing RStan will automatically set up Stan.
+  When RStan moves to CRAN, it will get even easier.
+\item In practice we typically run the same Stan model repeatedly.  If
+  you pass RStan the result of a previously fitted model the model will
+  not need be recompiled. An example is given on the running
+  Stan from R pages available from \code{http://mc-stan.org}.
+\item When you run Stan, it saves various conditions including
+  starting values, some control variables for the tuning and running
+  of the no-U-turn sampler, and the initial random seed. You can
+  specify these values in the Stan call and thus achieve exact
+  replication if desired.  (This can be useful for debugging.)
+\item When running \BUGS from R, you need to send exactly the data
+  that the model needs.  When running RStan, you can include extra
+  data, which can be helpful when playing around with models.  For
+  example, if you remove a variable \code{x} from the model, you can keep
+  it in the data sent from R, thus allowing you to quickly alter the
+  Stan model without having to also change the calling information in
+  your R script.
+\item As in R2WinBUGS and R2jags, after running the Stan model, you
+  can quickly summarize using \code{plot()} and \code{print()}.  You
+  can access the simulations themselves using various extractor
+  functions, as described in the RStan documentation.
+\item Various information about the sampler, such as number of
+  leapfrog steps, log probability, and step size, is available through
+  extractor functions.   These can be useful for understanding what is
+  going wrong when the algorithm is slow to converge.
+\end{itemize}
+
+\section{The Stan Community}
+
+\begin{itemize}
+\item Stan, like WinBUGS, OpenBUGS, and JAGS, has an active community,
+  which you can access via the user's mailing list and the developer's
+  mailing list; see \code{http://mc-stan.org} for information on
+  subscribing and posting and to look at archives.
+\end{itemize}
+
+

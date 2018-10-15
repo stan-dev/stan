@@ -57,13 +57,17 @@ namespace stan {
       LSOptions() {
         c1 = 1e-4;
         c2 = 0.9;
-        minAlpha = 1e-12;
         alpha0 = 1e-3;
+        minAlpha = 1e-12;
+        maxLSIts = 20;
+        maxLSRestarts = 10;
       }
       Scalar c1;
       Scalar c2;
       Scalar alpha0;
       Scalar minAlpha;
+      Scalar maxLSIts;
+      Scalar maxLSRestarts;
     };
     template<typename FunctorType, typename QNUpdateType,
              typename Scalar = double, int DimAtCompile = Eigen::Dynamic>
@@ -201,7 +205,9 @@ namespace stan {
           retCode = WolfeLineSearch(_func, _alpha, _xk_1, _fk_1, _gk_1,
                                     _pk, _xk, _fk, _gk,
                                     _ls_opts.c1, _ls_opts.c2,
-                                    _ls_opts.minAlpha);
+                                    _ls_opts.minAlpha,
+                                    _ls_opts.maxLSIts,
+                                    _ls_opts.maxLSRestarts);
           if (retCode) {
             // Line search failed...
             if (resetB) {

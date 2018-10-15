@@ -1,0 +1,47 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Comments {#comments.section}
+
+Stan supports C++-style line-based and bracketed comments.  Comments
+may be used anywhere whitespace is allowed in a Stan program.
+
+## Line-Based Comments 
+
+Any characters on a line following two forward slashes (`//`) is
+ignored along with the slashes.  These may be used, for example, to
+document variables,
+
+```stan
+data {
+  int<lower=0> N;  // number of observations
+  real y[N];  // observations
+}
+```
+
+## Bracketed Comments 
+
+For bracketed comments, any text between a forward-slash and asterisk
+pair (`/*`) and an asterisk and forward-slash pair (`*/`) is
+ignored.
+

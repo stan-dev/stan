@@ -1,0 +1,76 @@
+\let\digamma\undefined
+\IfFileExists{lucimatx.sty}{
+  % ----- if Lucida availalable------------------
+  \usepackage[
+    scale=0.875,
+    stdmathitalics=true,
+    stdmathdigits=true]{lucimatx}
+ \linespread{1.02}
+}{
+  % ------ if Lucida not available --------------
+  \usepackage{charter}
+  % \usepackage{mathpazo}    % palatino with math
+  % \usepackage{mathptmx}    % times with math
+  \usepackage{amssymb}
+  \linespread{1.03}
+}
+
+\usepackage{titlesec}
+\titleformat{\chapter}{\bfseries\LARGE}{\thechapter.}{1.5pc}{}{}
+\titlespacing{\chapter}{0pt}{0pt}{12pt}
+\titleformat{\section}{\bfseries\large}{\thesection.}{1em}{}
+\titlespacing{\section}{0pt}{6pt}{0pt}
+\titleformat{\subsection}{\bfseries}{}{0em}{}
+\titlespacing{\subsection}{0pt}{6pt}{0pt}
+\titleformat{\subsubsection}{\slshape}{}{0em}{}
+\titlespacing{\subsection}{0pt}{6pt}{0pt}
+
+\usepackage[titles]{tocloft}
+\renewcommand{\cftpartfont}{\normalsize\rm\bfseries}
+\renewcommand{\cftpartpagefont}{\normalsize\rm\bfseries}
+\setlength{\cftbeforechapskip}{2ex}
+\setlength{\cftchapnumwidth}{3ex}
+\renewcommand{\cftchapfont}{\normalsize\bf}
+\renewcommand{\cftchappagefont}{\footnotesize\rm}
+\renewcommand{\cftchapaftersnum}{.}
+\renewcommand{\cftchapaftersnumb}{\hspace*{8pt}}
+\renewcommand{\cftchapleader}{\hspace*{1em}}
+\renewcommand{\cftchapafterpnum}{\cftparfillskip}
+\renewcommand{\cftpnumalign}{l}
+\setlength{\cftbeforesecskip}{0.5ex}
+\setlength{\cftsecnumwidth}{5.5ex}
+\setlength{\cftsecindent}{5ex}
+\renewcommand{\cftsecfont}{\small}
+\renewcommand{\cftsecpagefont}{\footnotesize}
+\renewcommand{\cftsecaftersnum}{}
+\renewcommand{\cftsecaftersnumb}{\hspace*{8pt}}
+\renewcommand{\cftsecleader}{\hspace*{1em}}
+\renewcommand{\cftsecafterpnum}{\cftparfillskip}
+\renewcommand{\cftpnumalign}{l}
+
+\usepackage{xcolor}
+\definecolor{linkcolor}{RGB}{0,0,128}
+
+\setlength{\paperwidth}{6in}
+\setlength{\paperheight}{8in}
+\pdfpagewidth=\paperwidth
+\pdfpageheight=\paperheight
+
+\setlength{\textwidth}{5in}
+\setlength{\textheight}{6.75in}
+\setlength{\oddsidemargin}{-0.5in}
+\setlength{\evensidemargin}{-0.5in}
+\setlength{\topmargin}{-0.75in}
+\setlength{\headsep}{18pt}
+
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\textfraction}{0.07}
+
+\setcounter{tocdepth}{0}
+
+\raggedbottom
+\sloppy
+
+\let\cleardoublepage\clearpage

@@ -1,0 +1,352 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Deprecated Features {#deprecated-features.appendix}
+
+This appendix lists currently deprecated functionality along with how
+to replace it.  These deprecated features are likely to be removed in
+the next major release.  
+
+
+## Assignment with `<-`
+
+*Deprecated*: The deprecated syntax uses the operator `<-` for
+  assignment, e.g.,
+
+```
+a <- b;
+```
+
+*Replacement*: The new syntax uses the operator `=` for assignment,
+  e.g.,
+  
+```
+a = b;
+```
+
+
+## `increment_log_prob` Statement
+
+
+*Deprecated*: The deprecated syntax for incrementing the log density
+  accumulator by `u` is
+
+```
+increment_log_prob(u);
+```
+
+If `u` is an expression of real type, the underlying log density
+accumulator is incremented by `u`; if `u` is a container, the
+underlying log density is incremented with each element.
+
+*Replacement*: Replace the above statement with
+
+```
+target += u;
+```
+
+
+## `lp__` Variable
+
+*Deprecated*: The variable `lp__` is available wherever log density
+increment statements are allowed (`target~+=` and `~` shorthand
+statements).
+
+*Replacement*: General manipulation of `lp__` is not allowed, but
+
+```
+lp__ <- lp__ + e;
+```
+
+can be replaced with
+
+```
+target += e;
+```
+
+The value of `lp__` is available through the no-argument function
+`target()`.
+
+
+## `get_lp()` Function
+
+
+*Deprecated*: The no-argument function `get_lp()` is deprecated.
+
+*Replacement*: Use the no-argument function `target()` instead.
+
+
+## `_log` Density and Mass Functions
+
+
+*Deprecated*: The probability function for the distribution `foo` will
+be applied to an outcome variable `y` and sequence of zero or more
+parameters `...` to produce the expression `foo_log(y, ...)`.
+
+*Replacement*: If `y` can be a real value (including vectors
+or matrices), replace
+
+```
+foo_log(y, ...)
+```
+
+with the log probability density function notation
+
+```
+foo_lpdf(y | ...).
+```
+
+If `y` must be an integer (including arrays), instead replace
+
+```
+foo_log(y, ...
+```
+
+with the log probability mass function
+
+```
+foo_lpmf(y | ...).
+```
+
+
+## `cdf_log` and `ccdf_log` Cumulative Distribution Functions
+
+
+*Deprecated*: The log cumulative distribution and complementary
+cumulative distribution functions for a distribution `foo` are
+currently written as `foo_cdf_log` and `foo_ccdf_log`.
+
+*Replacement*: Replace `foo_cdf_log(y, ...)` with `foo_lcdf(y | ...)`.
+Replace `foo_ccdf_log(y, ...)` with `foo_lccdf(y | ...)`.
+
+
+## `multiply_log` and `binomial_coefficient_log` Functions
+
+*Deprecated*: Currently two non-conforming functions ending in suffix
+  `_log`.
+
+*Replacement*: Replace `multiply_log(...)` with `lmultiply(...)`.
+ Replace `binomial_coefficient_log(...)` with `lchoose(...)`.
+
+
+## User-Defined Function with `_log` Suffix
+
+*Deprecated*: A user-defined function ending in `_log` can
+  be used in sampling statements, with
+
+```
+y ~ foo(...);
+```
+
+having the same effect as
+
+```
+target += foo_log(y, ...);
+```
+
+*Replacement*: Replace the `_log` suffix with `_lpdf` for density
+functions or `_lpmf` for mass functions in the user-defined function.
+
+
+## `lkj_cov` Distribution
+
+*Deprecated*:The distribution `lkj_cov` is deprecated.
+
+*Replacement*: Replace `lkj_cov_log(...)` with an `lkj_corr`
+  distribution on the correlation matrix and independent lognormal
+  distributions on the scales.  That is, replace
+
+```
+cov_matrix[K] Sigma;
+...
+Sigma ~ lkj_cov(mu, tau, eta);
+```
+
+with
+
+```
+corr_matrix[K] Omega;
+vector<lower=0>[K] sigma;
+...
+Omega ~ lkj_corr(eta);
+sigma ~ lognormal(mu, tau);
+...
+cov_matrix[K] Sigma;
+Sigma <- quad_form_diag(Omega, sigma);
+```
+
+The variable `Sigma` may be defined as a local variable in the model
+block or as a transformed parameter.  An even more efficient transform
+would use Cholesky factors rather than full correlation matrix types.
+
+
+## `if_else` Function
+
+*Deprecated*:The function `if_else` is deprecated.  This function
+takes three arguments `a`, `b`, and `c`, where `a` is an `int` value
+and `b` and `c` are scalars. It returns `b` if `a` is non-zero and `c`
+otherwise.
+
+*Replacement*: Use the conditional operator which allows more
+flexibility in the types of `b` and `c` and is much more efficient in
+that it only evaluates whichever of `b` or `c` is returned.
+
+```
+x = if_else(a,b,c);
+```
+
+with
+
+```
+x = a ? b : c;
+```
+
+
+## `#` Comments
+
+
+*Deprecated*: The use of `#` for line-based comments is
+  deprecated.  From the first occurrence of `#` onward, the rest
+  of the line is ignored.  This happens after includes are resolved
+  starting with `#include`.
+
+*Replacement*: Use a pair of forward slashes, `//`, for line
+  comments.
+
+
+

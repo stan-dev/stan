@@ -3,10 +3,7 @@
 #include <string>
 
 void expect_starts(const std::string& p, const std::string& s, bool cond) {
-  if (cond)
-    EXPECT_TRUE(stan::io::starts_with(p, s));
-  else
-    EXPECT_FALSE(stan::io::starts_with(p, s));
+  EXPECT_EQ(cond, stan::io::starts_with(p, s));
 }
 
 TEST(Io, StartsWith) {

@@ -1,0 +1,70 @@
+\chapter{Mathematical Functions}\label{math-functions.appendix}
+
+This appendix provides the definition of several mathematical
+functions used throughout the manual.
+
+\section{Beta}\label{beta-appendix.section}
+
+The beta function, $\mbox{B}(\alpha,\beta)$, computes the normalizing
+constant for the beta distribution, and is defined for $a > 0$ and $b
+> 0$ by
+%
+\[
+\mbox{B}(a,b)
+\ = \
+\int_0^1 u^{a - 1} (1 - u)^{b - 1} \, du
+\ = \
+\frac{\Gamma(a) \, \Gamma(b)}{\Gamma(a+b)} \, .
+\]
+
+\section{Incomplete Beta}\label{inc-beta-appendix.section}
+
+The incomplete beta function, $\mathrm{B}(x; a, b)$, is defined for
+$x \in [0, 1]$ and $a, b \geq 0$ such that $a + b \neq 0$ by
+\[
+\mathrm{B}(x; \, a, b)
+\ = \
+\int_0^x u^{a -  1} \, (1 - u)^{b - 1} \, du,
+\]
+%
+where $\mathrm{B}(a, b)$ is the beta function defined in
+\refsection{beta-appendix}.  If $x = 1$, the incomplete beta function
+reduces to the beta function, $\mathrm{B}(1; a, b) = \mathrm{B}(a,
+b)$.
+
+The regularized incomplete beta function divides the incomplete beta
+function by the beta function,
+\[
+I_x(a, b) \ = \ \frac{\mathrm{B}(x; \, a, b)}{B(a, b)} \, .
+\]
+
+
+
+
+\section{Gamma}\label{gamma-appendix.section}
+
+The gamma function, $\Gamma(x)$, is the generalization of the
+factorial function to continuous variables, defined so that for
+positive integers $n$,
+\[
+\Gamma(n+1) = n!
+\]
+%
+Generalizing to all positive numbers and non-integer negative numbers,
+\[
+\Gamma(x) = \int_0^{\infty} u^{x - 1} \exp(-u) \, du.
+\]
+
+
+\section{Digamma}\label{digamma-appendix.section}
+
+The digamma function $\Psi$ is the derivative of the $\log \Gamma$
+function,
+%
+\[
+\Psi(u)
+\ = \
+\frac{d}{d u} \log \Gamma(u)
+\ = \
+\frac{1}{\Gamma(u)} \ \frac{d}{d u} \Gamma(u).
+\]

@@ -6,7 +6,7 @@
 namespace stan {
   namespace lang {
 
-    struct var_decl;
+    struct local_var_decl;
     struct statement;
 
     /**
@@ -17,7 +17,7 @@ namespace stan {
       /**
        * Sequence of variable declarations.
        */
-      std::vector<var_decl> local_decl_;
+      std::vector<local_var_decl> local_decl_;
 
       /**
        * Sequence of statements.
@@ -36,7 +36,7 @@ namespace stan {
        * @param local_decl sequence of local variable declarations
        * @param stmts sequence of statements
        */
-      statements(const std::vector<var_decl>& local_decl,
+      statements(const std::vector<local_var_decl>& local_decl,
                  const std::vector<statement>& stmts);
     };
 

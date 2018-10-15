@@ -1,0 +1,6 @@
+# <i style="font-size: 110%; color:#990017;">Language</i> {-}
+
+This part of the manual lays of the specification of the Stan
+programming language.  The language is responsible for defining a log
+density function conditioned on data.  Typically, this is a Bayesian
+posterior, but it may also be a penalized likelihood function.

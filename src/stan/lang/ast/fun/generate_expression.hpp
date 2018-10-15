@@ -1,6 +1,7 @@
 #ifndef STAN_LANG_AST_FUN_GENERATE_EXPRESSION_HPP
 #define STAN_LANG_AST_FUN_GENERATE_EXPRESSION_HPP
 
+#include <stan/lang/ast.hpp>
 #include <ostream>
 
 namespace stan {
