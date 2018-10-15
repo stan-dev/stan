@@ -3,5 +3,5 @@
 
 TEST(langParser, if_elseDeprecationFunction) {
   test_warning("function-signatures/math/functions/if_else",
-               "Warning (non-fatal): the if_else() function is deprecated.");
+               "Info: the if_else() function is deprecated.");
 }

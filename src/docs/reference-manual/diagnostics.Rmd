@@ -1,0 +1,207 @@
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(123454321)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+```{r include=FALSE, cache=FALSE}
+library(ggplot2)
+library(rstan)
+
+set.seed(10101010)
+
+options(digits = 3)
+
+printf <- function(pattern, ...) {
+  cat(sprintf(pattern, ...))
+}
+
+knitr::opts_chunk$set(
+  comment = "#>",
+  collapse = TRUE,
+  cache = TRUE,
+  out.width = "70%",
+  fig.align = 'left',
+  fig.width = 6,
+  fig.asp = 0.618,  # 1 / phi
+  fig.show = "hold"
+)
+```
+# Diagnostic Mode {#diagnostic-algorithms.chapter}
+
+Stan's diagnostic mode runs a Stan program with data, initializing
+parameters either randomly or with user-specified initial values, and
+then evaluates the log probability and its gradients. The gradients
+computed by the Stan program are compared to values calculated by
+finite differences.
+
+Diagnostic mode may be configured with two parameters.
+
+**Diagnostic Mode Configuration Table.**
+*The diagnostic model configuration parameters, constraints, and
+default values.*
+
+|  parameter    |  description                 |  constraints  |  default |
+|:-------------:|:-----------------------------|:-------------:|:--------:|
+`epsilon`       | finite difference size       | (0, infty)    |  1e--6   |
+`error`         | error threshold for matching | (0, infty)    |  1e--6   |
+
+If the difference between the Stan program's gradient value and that
+calculated by finite difference is higher than the specified
+threshold, the argument will be flagged.
+
+
+## Output
+
+Diagnostic mode prints the log posterior density (up to a proportion)
+calculated by the Stan program for the specified initial values. For
+each parameter, it prints the gradient at the initial parameter values
+calculated by Stan's program and by finite differences over Stan's
+program for the log probability.
+
+
+### Unconstrained Scale {-}
+
+The output is for the variable values and their gradients are on the
+unconstrained scale, which means each variable is a vector of size
+corresponding to the number of unconstrained variables required to
+define it. For example, an $N \times N$ correlation matrix, requires
+$\binom{N}{2}$ unconstrained parameters. The
+transformations from constrained to unconstrained parameters are based
+on the constraints in the parameter declarations and described in
+the reference manual chapter on transforms.
+
+
+### Includes Jacobian {-}
+
+The log density includes the Jacobian adjustment implied by the
+constraints declared on variables.  The Jacobian adjustment for
+constrained parameter transforms will be turned off if optimization is
+used in practice, but there is as of yet no way to turn it off in
+diagnostic mode.
+
+
+## Configuration Options
+
+The general configuration options for diagnostics are the same as
+those for MCMC. Initial values may be specified, or they may be drawn
+at random. Setting the random number generator will only have an
+effect if a random initialization is specified.
+
+
+## Speed Warning and Data Trimming
+
+Due to the application of finite differences, the computation time
+grows linearly with the number of parameters. This can be require a
+very long time, especially in models with latent parameters that grow
+with the data size. It can be helpful to diagnose a model with smaller
+data sizes in such cases.

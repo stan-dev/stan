@@ -7,7 +7,7 @@
 #include <stan/lang/grammars/semantic_actions.hpp>
 #include <stan/lang/grammars/statement_2_grammar.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
-#include <stan/lang/grammars/var_decls_grammar.hpp>
+#include <stan/lang/grammars/local_var_decls_grammar.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <sstream>
 #include <string>
@@ -28,19 +28,9 @@ namespace stan {
       variable_map& var_map_;
       std::stringstream& error_msgs_;
       expression_grammar<Iterator> expression_g;
-      var_decls_grammar<Iterator> var_decls_g;
+      local_var_decls_grammar<Iterator> local_var_decls_g;
       statement_2_grammar<Iterator> statement_2_g;
       indexes_grammar<Iterator> indexes_g;
-
-      boost::spirit::qi::rule<Iterator,
-                              assignment(scope),
-                              whitespace_grammar<Iterator> >
-      assignment_r;
-
-      boost::spirit::qi::rule<Iterator,
-                              compound_assignment(scope),
-                              whitespace_grammar<Iterator> >
-      compound_assignment_r;
 
       boost::spirit::qi::rule<Iterator,
                               assgn(scope),
@@ -48,27 +38,9 @@ namespace stan {
       assgn_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::unused_type,
+                              std::string(),
                               whitespace_grammar<Iterator> >
       assignment_operator_r;
-
-
-      boost::spirit::qi::rule<Iterator,
-                              expression(scope),
-                              whitespace_grammar<Iterator> >
-      non_lvalue_assign_r;
-
-
-      boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(scope),
-                              whitespace_grammar<Iterator> >
-      dims_r;
-
-      boost::spirit::qi::rule<Iterator,
-                              variable(scope),
-                              whitespace_grammar<Iterator> >
-      var_r;
-
 
       boost::spirit::qi::rule<Iterator,
                               distribution(scope),
@@ -152,9 +124,14 @@ namespace stan {
       identifier_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<var_decl>(scope),
+                              std::vector<local_var_decl>(scope),
                               whitespace_grammar<Iterator> >
       local_var_decls_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              std::vector<idx>(scope),
+                              whitespace_grammar<Iterator> >
+      idxs_r;
 
       boost::spirit::qi::rule<Iterator,
                               no_op_statement(),
@@ -162,9 +139,9 @@ namespace stan {
       no_op_statement_r;
 
       boost::spirit::qi::rule<Iterator,
-                              std::vector<expression>(scope),
+                              std::vector<idx>(scope),
                               whitespace_grammar<Iterator> >
-      opt_dims_r;
+      opt_idxs_r;
 
       boost::spirit::qi::rule<Iterator,
                               range(scope),
@@ -187,8 +164,8 @@ namespace stan {
       statement_sub_r;
 
       boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<std::vector<var_decl>,
-                                                        scope>,
+             boost::spirit::qi::locals<std::vector<local_var_decl>,
+                                       scope>,
                               statements(scope, bool),
                               whitespace_grammar<Iterator> >
       statement_seq_r;
@@ -199,9 +176,9 @@ namespace stan {
       truncation_range_r;
 
       boost::spirit::qi::rule<Iterator,
-                              variable_dims(scope),
+                              variable(scope),
                               whitespace_grammar<Iterator> >
-      var_lhs_r;
+      var_r;
 
       boost::spirit::qi::rule<Iterator,
                               expression(scope),

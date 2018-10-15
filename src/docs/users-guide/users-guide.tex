@@ -1,0 +1,34 @@
+% for printing two-up in traditional style with all
+% chapters, part markers, etc. opening on right, use:
+%\documentclass[10pt,twoside,openright]{book}
+\documentclass[10pt,openany]{book}
+\usepackage{stan-manuals}
+
+\begin{document}
+
+\pagestyle{plain}
+
+\newcommand{\stanversion}{2.18}
+
+\frontmatter
+\include{title}
+\tableofcontents
+\include{preface}
+\newcounter{savepage}
+\setcounter{savepage}{\arabic{page} + 1}
+
+\mainmatter
+\setcounter{page}{\thesavepage}
+\include{introduction}
+\include{examples}
+\include{model-as-software}
+\include{programming}
+\include{inference}
+\include{process}
+
+\appendix
+\include{appendices}
+\addtocontents{toc}{\vspace{2em}}
+\include{style}
+\include{references}
+\end{document}

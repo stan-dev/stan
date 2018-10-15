@@ -76,6 +76,11 @@ namespace stan {
      */
     const int void_function_argument_origin_rng = 11;
 
+    /**
+     * The variable arose as a loop identifier
+     */
+    const int loop_identifier_origin = 12;
+
   }
 }
 #endif

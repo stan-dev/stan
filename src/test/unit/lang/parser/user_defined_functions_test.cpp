@@ -119,7 +119,7 @@ TEST(parserFunctions,funsBad14) {
 
 TEST(parserFunctions,funsBad15) {
   test_throws("functions-bad15",
-              "attempt to increment log prob with void expression");
+              "Attempt to increment log prob with void expression");
 }
 
 TEST(parserFunctions,funsBad16) {
@@ -129,13 +129,13 @@ TEST(parserFunctions,funsBad16) {
 
 TEST(parserFunctions,funsBad17) {
   test_throws("functions-bad17",
-              "Require real return type for probability functions"
+              "Real return type required for probability functions"
               " ending in _log, _lpdf, _lpmf, _lcdf, or _lccdf.");
 }
 
 TEST(parserFunctions, funsBad18) {
   test_throws("functions-bad18",
-              "variable identifier (name) may not be reserved word");
+              "Variable identifier (name) may not be reserved word");
 }
 
 TEST(parserFunctions, funsBad19) {
@@ -162,3 +162,27 @@ TEST(parserFunctions, badProbFunSuffix) {
   test_throws("bad_prob_fun_suffix",
               "Probability function must end in _lpdf or _lpmf");
 }
+
+TEST(parserFunctions, voidFunReturn) {
+  test_throws("functions-bad23",
+              "Void returns only allowed from function bodies "
+              "of void return type.");
+}
+
+TEST(parserFunctions, nonVoidFunReturn) {
+  test_throws("functions-bad24",
+              "Void function cannot return a value.");
+}
+
+TEST(parserFunctions, incompleteReturnStmt) {
+  test_throws("functions-bad25",
+              "Non-void function must return expression "
+              "of specified return type.");
+}
+
+
+TEST(parserFunctions, returnNoSemi) {
+  test_throws("functions-bad26",
+              "PARSER EXPECTED: \";\"");
+}
+

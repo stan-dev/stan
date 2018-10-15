@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/services/instrumented_callbacks.hpp>
@@ -7,11 +8,47 @@
 #include <stan/io/empty_var_context.hpp>
 #include <stan/services/util/create_rng.hpp>
 
+namespace test {
+// mock_throwing_model_in_write_array throws exception in the write_array()
+// method
+class throwing_model : public stan_model {
+ public:
+
+  throwing_model(stan::io::var_context &context, std::ostream* pstream) :
+      stan_model(context, pstream) { }
+
+  template <typename RNG>
+  void write_array(RNG& base_rng__,
+                   std::vector<double>& params_r__,
+                   std::vector<int>& params_i__,
+                   std::vector<double>& vars__,
+                   bool include_tparams__ = true,
+                   bool include_gqs__ = true,
+                   std::ostream* pstream__ = 0) const {
+    vars__.resize(0);
+    for (size_t i = 0; i < params_r__.size() - 2; ++i)
+      vars__.push_back(params_r__[i]);
+    throw std::domain_error("throwing within write_array");
+  }
+
+  template <typename RNG>
+  void write_array(RNG& base_rng,
+                   Eigen::Matrix<double,Eigen::Dynamic,1>& params_r,
+                   Eigen::Matrix<double,Eigen::Dynamic,1>& vars,
+                   bool include_tparams = true,
+                   bool include_gqs = true,
+                   std::ostream* pstream = 0) const {
+    throw std::domain_error("throwing within write_array");
+  }
+};
+}
+
 class ServicesUtil : public ::testing::Test {
 public:
   ServicesUtil()
     : mcmc_writer(sample_writer, diagnostic_writer, logger),
-      model(context, &model_log) { }
+      model(context, &model_log),
+      throwing_model(context, &model_log) {}
 
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
   stan::test::unit::instrumented_logger logger;
@@ -19,6 +56,7 @@ public:
   std::stringstream model_log;
   stan::io::empty_var_context context;
   stan_model model;
+  test::throwing_model throwing_model;
 };
 
 TEST_F(ServicesUtil, constructor) {
@@ -89,6 +127,10 @@ TEST_F(ServicesUtil, write_sample_names) {
   EXPECT_EQ(1, sample_writer.call_count("vector_string"));
   EXPECT_EQ(0, diagnostic_writer.call_count());
   EXPECT_EQ(0, logger.call_count());
+
+  EXPECT_EQ(2, mcmc_writer.num_sample_params_);
+  EXPECT_EQ(0, mcmc_writer.num_sampler_params_);
+  EXPECT_EQ(5, mcmc_writer.num_model_params_);
 }
 
 TEST_F(ServicesUtil, write_sample_params) {
@@ -156,4 +198,36 @@ TEST_F(ServicesUtil, write_timing) {
   EXPECT_EQ(2, diagnostic_writer.call_count("empty"));
   EXPECT_EQ(5, logger.call_count());
   EXPECT_EQ(5, logger.call_count_info());
+}
+
+
+TEST_F(ServicesUtil, throwing_model__write_sample_parameters) {
+  boost::ecuyer1988 rng = stan::services::util::create_rng(0, 1);
+  Eigen::VectorXd x = Eigen::VectorXd::Zero(2);
+  stan::mcmc::sample sample(x, 1, 2);
+  mock_sampler sampler;
+
+  mcmc_writer.write_sample_names(sample, sampler, throwing_model);
+  ASSERT_EQ(5, mcmc_writer.num_model_params_);
+
+  mcmc_writer.write_sample_params(rng, sample, sampler, throwing_model);
+  EXPECT_EQ(2, sample_writer.call_count());
+  EXPECT_EQ(1, sample_writer.call_count("vector_double"));
+  EXPECT_EQ(0, diagnostic_writer.call_count());
+  EXPECT_EQ(1, logger.call_count());
+
+
+  std::vector<std::vector<double>> values = sample_writer.vector_double_values();
+  ASSERT_EQ(1, values.size());
+  ASSERT_EQ(mcmc_writer.num_sample_params_ + mcmc_writer.num_sampler_params_ + mcmc_writer.num_model_params_,
+            values[0].size());
+
+  for (size_t i = 0; i < mcmc_writer.num_sample_params_ + mcmc_writer.num_sampler_params_; ++i) {
+    EXPECT_FALSE(std::isnan(values[0][i]));
+  }
+
+  for (size_t i = mcmc_writer.num_sample_params_ + mcmc_writer.num_sampler_params_;
+       i < values[0].size(); ++i) {
+    EXPECT_TRUE(std::isnan(values[0][i]));
+  }
 }

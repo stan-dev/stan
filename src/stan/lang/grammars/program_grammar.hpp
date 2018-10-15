@@ -5,7 +5,7 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <stan/lang/grammars/expression_grammar.hpp>
-#include <stan/lang/grammars/var_decls_grammar.hpp>
+#include <stan/lang/grammars/block_var_decls_grammar.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
 #include <stan/lang/grammars/statement_grammar.hpp>
 #include <stan/lang/grammars/functions_grammar.hpp>
@@ -29,7 +29,7 @@ namespace stan {
       variable_map var_map_;
       std::stringstream error_msgs_;
       expression_grammar<Iterator> expression_g;
-      var_decls_grammar<Iterator> var_decls_g;
+      block_var_decls_grammar<Iterator> block_var_decls_g;
       statement_grammar<Iterator> statement_g;
       functions_grammar<Iterator> functions_g;
 
@@ -39,27 +39,27 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<scope>,
-                              std::vector<var_decl>(),
+                              std::vector<block_var_decl>(),
                               whitespace_grammar<Iterator> >
       data_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<scope>,
-                              std::pair<std::vector<var_decl>,
+                              std::pair<std::vector<block_var_decl>,
                                         std::vector<statement> >(),
                               whitespace_grammar<Iterator> >
       derived_data_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<scope>,
-                              std::pair<std::vector<var_decl>,
+                              std::pair<std::vector<block_var_decl>,
                                         std::vector<statement> >(),
                               whitespace_grammar<Iterator> >
       derived_var_decls_r;
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<scope>,
-                              std::pair<std::vector<var_decl>,
+                              std::pair<std::vector<block_var_decl>,
                                         std::vector<statement> >(),
                               whitespace_grammar<Iterator> >
       generated_var_decls_r;
@@ -72,7 +72,7 @@ namespace stan {
 
       boost::spirit::qi::rule<Iterator,
                               boost::spirit::qi::locals<scope>,
-                              std::vector<var_decl>(),
+                              std::vector<block_var_decl>(),
                               whitespace_grammar<Iterator> >
       param_var_decls_r;
 

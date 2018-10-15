@@ -10,16 +10,7 @@ namespace stan {
       return false;
     }
 
-    bool is_no_op_statement_vis::operator()(const assignment& st) const {
-      return false;
-    }
-
     bool is_no_op_statement_vis::operator()(const assgn& st) const {
-      return false;
-    }
-
-    bool is_no_op_statement_vis::operator()(const compound_assignment& st)
-      const {
       return false;
     }
 

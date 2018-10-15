@@ -7,9 +7,7 @@ namespace stan {
   namespace lang {
 
     struct nil;
-    struct assignment;
     struct assgn;
-    struct compound_assignment;
     struct sample;
     struct increment_log_prob_statement;
     struct expression;
@@ -43,23 +41,7 @@ namespace stan {
        * @param st statement
        * @return false
        */
-      bool operator()(const assignment& st) const;
-
-      /**
-       * Return true if the specified statement is a no-op statement.
-       *
-       * @param st statement
-       * @return false
-       */
       bool operator()(const assgn& st) const;
-
-      /**
-       * Return true if the specified statement is a no-op statement.
-       *
-       * @param st statement
-       * @return false
-       */
-      bool operator()(const compound_assignment& st) const;
 
       /**
        * Return true if the specified statement is a no-op statement.

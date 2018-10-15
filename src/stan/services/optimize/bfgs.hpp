@@ -65,8 +65,8 @@ namespace stan {
 
         std::vector<int> disc_vector;
         std::vector<double> cont_vector
-          = util::initialize(model, init, rng, init_radius, false,
-                             logger, init_writer);
+            = util::initialize<false>(model, init, rng, init_radius, false,
+                                      logger, init_writer);
 
         std::stringstream bfgs_ss;
         typedef stan::optimization::BFGSLineSearch
