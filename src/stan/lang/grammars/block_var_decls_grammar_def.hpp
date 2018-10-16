@@ -19,22 +19,26 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::block_var_decl,
                            (stan::lang::expression, def_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_block_type,
-                          (stan::lang::range, bounds_))
+                          (stan::lang::range, bounds_)
+                          (stan::lang::locscale, ls_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_block_type,
                           (stan::lang::range, bounds_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::matrix_block_type,
                           (stan::lang::range, bounds_)
+                          (stan::lang::locscale, ls_)
                           (stan::lang::expression, M_)
                           (stan::lang::expression, N_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_block_type,
                           (stan::lang::range, bounds_)
+                          (stan::lang::locscale, ls_)
                           (stan::lang::expression, N_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::vector_block_type,
                           (stan::lang::range, bounds_)
+                          (stan::lang::locscale, ls_)
                           (stan::lang::expression, N_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_factor_corr_block_type,
@@ -297,6 +301,31 @@ namespace stan {
             > lit('=')
             > expression07_g(_r1)
               [set_double_range_upper_f(_val, _1, _pass,
+                                        boost::phoenix::ref(error_msgs_))])
+            )
+        > lit('>');
+
+      // _r1 var scope
+      locscale_brackets_double_r.name("real loc-scale expression pair, brackets");
+      locscale_brackets_double_r
+        = lit('<')[empty_locscale_f(_val, boost::phoenix::ref(error_msgs_))]
+        > (
+           ((lit("location")
+             > lit('=')
+             > expression07_g(_r1)
+               [set_double_locscale_loc_f(_val, _1, _pass,
+                                         boost::phoenix::ref(error_msgs_))])
+             > -(lit(',')
+                 > lit("scale")
+                 > lit('=')
+                 > expression07_g(_r1)
+                   [set_double_locscale_scale_f(_val, _1, _pass,
+                                         boost::phoenix::ref(error_msgs_))]))
+           |
+           (lit("scale")
+            > lit('=')
+            > expression07_g(_r1)
+              [set_double_locscale_scale_f(_val, _1, _pass,
                                         boost::phoenix::ref(error_msgs_))])
             )
         > lit('>');

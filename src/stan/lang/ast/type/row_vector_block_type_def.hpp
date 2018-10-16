@@ -7,12 +7,18 @@ namespace stan {
 namespace lang {
 row_vector_block_type::row_vector_block_type(const range& bounds,
                                              const expression& N)
-    : bounds_(bounds), N_(N) {}
+    : bounds_(bounds), ls_(locscale()), N_(N) {}
+
+row_vector_block_type::row_vector_block_type(const locscale& ls,
+                                             const expression& N)
+    : bounds_(range()), ls_(ls), N_(N) {}
 
 row_vector_block_type::row_vector_block_type()
     : row_vector_block_type(range(), nil()) {}
 
 range row_vector_block_type::bounds() const { return bounds_; }
+
+locscale row_vector_block_type::ls() const { return ls_; }
 
 expression row_vector_block_type::N() const { return N_; }
 }  // namespace lang

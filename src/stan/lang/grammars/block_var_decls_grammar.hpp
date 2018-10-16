@@ -144,6 +144,11 @@ namespace stan {
       range_brackets_double_r;
 
       boost::spirit::qi::rule<Iterator,
+                              locscale(scope),
+                              whitespace_grammar<Iterator> >
+      locscale_brackets_double_r;
+
+      boost::spirit::qi::rule<Iterator,
                               range(scope),
                               whitespace_grammar<Iterator> >
       range_brackets_int_r;

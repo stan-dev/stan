@@ -9,5 +9,9 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::range,
                           (stan::lang::expression, low_)
                           (stan::lang::expression, high_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::locscale,
+                          (stan::lang::expression, loc_)
+                          (stan::lang::expression, scale_) )
+
 
 #endif

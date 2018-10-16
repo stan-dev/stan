@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_DOUBLE_BLOCK_TYPE_HPP
 
 #include <stan/lang/ast/node/range.hpp>
+#include <stan/lang/ast/node/locscale.hpp>
 
 namespace stan {
 namespace lang {
@@ -16,6 +17,11 @@ struct double_block_type {
   range bounds_;
 
   /**
+   * Location and scale
+   */
+  locscale ls_;
+
+  /**
    * Construct a block var type with default values.
    */
   double_block_type();
@@ -28,9 +34,21 @@ struct double_block_type {
   explicit double_block_type(const range& bounds);
 
   /**
+   * Construct a block var type with specified values.
+   *
+   * @param ls variable location and scale
+   */
+  explicit double_block_type(const locscale& ls);
+
+  /**
    * Get bounds constraints.
    */
   range bounds() const;
+
+  /**
+   * Get location and scale.
+   */
+  locscale ls() const;
 };
 
 }  // namespace lang

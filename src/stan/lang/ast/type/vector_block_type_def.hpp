@@ -6,11 +6,17 @@
 namespace stan {
 namespace lang {
 vector_block_type::vector_block_type(const range& bounds, const expression& N)
-    : bounds_(bounds), N_(N) {}
+    : bounds_(bounds), ls_(locscale()), N_(N) {}
+
+vector_block_type::vector_block_type(const locscale& ls,
+                                     const expression& N)
+    : bounds_(range()), ls_(ls), N_(N) {}
 
 vector_block_type::vector_block_type() : vector_block_type(range(), nil()) {}
 
 range vector_block_type::bounds() const { return bounds_; }
+
+locscale vector_block_type::ls() const { return ls_; }
 
 expression vector_block_type::N() const { return N_; }
 }  // namespace lang

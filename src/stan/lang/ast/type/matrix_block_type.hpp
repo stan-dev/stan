@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/range.hpp>
+#include <stan/lang/ast/node/locscale.hpp>
 
 namespace stan {
   namespace lang {
@@ -15,6 +16,11 @@ namespace stan {
        * Bounds constraints
        */
       range bounds_;
+
+      /**
+       * Location and scale
+       */
+      locscale ls_;
 
       /**
        * Number of rows (arg_1)
@@ -44,9 +50,26 @@ namespace stan {
                         const expression& N);
 
       /**
+       * Construct a block var type with specified values.
+       * Sizes should be int expressions - constructor doesn't check.
+       *
+       * @param ls variable location and scale
+       * @param M num rows
+       * @param N num columns
+       */
+      matrix_block_type(const locscale& ls,
+                        const expression& M,
+                        const expression& N);
+
+      /**
        * Get bounds.
        */
       range bounds() const;
+
+      /**
+       * Get location and scale.
+       */
+      locscale ls() const;
 
       /**
        * Get M (num rows).

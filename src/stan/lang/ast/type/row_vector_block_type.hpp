@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/range.hpp>
+#include <stan/lang/ast/node/locscale.hpp>
 
 namespace stan {
 namespace lang {
@@ -15,6 +16,11 @@ struct row_vector_block_type {
    * Bounds constraints
    */
   range bounds_;
+
+  /**
+   * Location and scale
+   */
+  locscale ls_;
 
   /**
    * Row vector length
@@ -36,9 +42,23 @@ struct row_vector_block_type {
   row_vector_block_type(const range& bounds, const expression& N);
 
   /**
+   * Construct a block var type with specified values.
+   * Arg `N` should be int expression - constructor doesn't check.
+   *
+   * @param ls variable location and scale
+   * @param N num columns for row vector
+   */
+  row_vector_block_type(const locscale& ls, const expression& N);
+
+  /**
    * Get bounds.
    */
   range bounds() const;
+
+  /**
+   * Get location and scale.
+   */
+  locscale ls() const;
 
   /**
    * Get N (num cols).

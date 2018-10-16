@@ -7,12 +7,19 @@ namespace stan {
 namespace lang {
 matrix_block_type::matrix_block_type(const range& bounds, const expression& M,
                                      const expression& N)
-    : bounds_(bounds), M_(M), N_(N) {}
+    : bounds_(bounds), ls_(locscale()), M_(M), N_(N) {}
+
+matrix_block_type::matrix_block_type(const locscale& ls,
+                                     const expression& M,
+                                     const expression& N)
+    : bounds_(range()), ls_(ls), M_(M), N_(N) {}
 
 matrix_block_type::matrix_block_type()
     : matrix_block_type(range(), nil(), nil()) {}
 
 range matrix_block_type::bounds() const { return bounds_; }
+
+locscale matrix_block_type::ls() const { return ls_; }
 
 expression matrix_block_type::M() const { return M_; }
 

@@ -5,11 +5,17 @@
 
 namespace stan {
 namespace lang {
-double_block_type::double_block_type(const range& bounds) : bounds_(bounds) {}
+double_block_type::double_block_type(const range& bounds) : bounds_(bounds),
+                                                            ls_(locscale()) {}
 
-  double_block_type::double_block_type() : double_block_type(range()) {}
+double_block_type::double_block_type(const locscale& ls) : bounds_(range()),
+                                                           ls_(ls) {}
+
+double_block_type::double_block_type() : double_block_type(range()) {}
 
 range double_block_type::bounds() const { return bounds_; }
+
+locscale double_block_type::ls() const { return ls_; }
 }  // namespace lang
 }  // namespace stan
 #endif
