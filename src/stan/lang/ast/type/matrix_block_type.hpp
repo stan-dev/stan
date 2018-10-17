@@ -42,10 +42,12 @@ namespace stan {
        * Sizes should be int expressions - constructor doesn't check.
        *
        * @param bounds variable upper and/or lower bounds
+       * @param ls variable location and scale
        * @param M num rows
        * @param N num columns
        */
       matrix_block_type(const range& bounds,
+                        const locscale& ls,
                         const expression& M,
                         const expression& N);
 
@@ -53,11 +55,11 @@ namespace stan {
        * Construct a block var type with specified values.
        * Sizes should be int expressions - constructor doesn't check.
        *
-       * @param ls variable location and scale
+       * @param bounds variable upper and/or lower bounds
        * @param M num rows
        * @param N num columns
        */
-      matrix_block_type(const locscale& ls,
+      matrix_block_type(const range& bounds,
                         const expression& M,
                         const expression& N);
 

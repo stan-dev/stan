@@ -6,12 +6,13 @@
 namespace stan {
 namespace lang {
 row_vector_block_type::row_vector_block_type(const range& bounds,
+                                             const locscale& ls,
+                                             const expression& N)
+    : bounds_(bounds), ls_(ls), N_(N) {}
+
+row_vector_block_type::row_vector_block_type(const range& bounds,
                                              const expression& N)
     : bounds_(bounds), ls_(locscale()), N_(N) {}
-
-row_vector_block_type::row_vector_block_type(const locscale& ls,
-                                             const expression& N)
-    : bounds_(range()), ls_(ls), N_(N) {}
 
 row_vector_block_type::row_vector_block_type()
     : row_vector_block_type(range(), nil()) {}

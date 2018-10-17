@@ -161,13 +161,15 @@ namespace stan {
       double_type_r
         %= (lit("real")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > -range_brackets_double_r(_r1);
+        > -((range_brackets_double_r(_r1) > empty_locscale_r(_r1))
+            | (empty_range_r(_r1) > locscale_brackets_double_r(_r1)));
 
       vector_type_r.name("vector type");
       vector_type_r
         %= (lit("vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
+        > empty_locscale_r(_r1)
         > dim1_r(_r1);
 
       row_vector_type_r.name("row vector type");
@@ -175,6 +177,7 @@ namespace stan {
         %= (lit("row_vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
+        > empty_locscale_r(_r1)
         > dim1_r(_r1);
 
       matrix_type_r.name("matrix type");
@@ -182,6 +185,7 @@ namespace stan {
         %= (lit("matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_double_r(_r1)
+        > empty_locscale_r(_r1)
         > lit('[')
         > int_data_expr_r(_r1)
         > lit(',')
@@ -284,7 +288,7 @@ namespace stan {
       range_brackets_double_r.name("real range expression pair, brackets");
       range_brackets_double_r
         = lit('<')[empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
-        > (
+        >> (
            ((lit("lower")
              > lit('=')
              > expression07_g(_r1)
@@ -304,6 +308,11 @@ namespace stan {
                                         boost::phoenix::ref(error_msgs_))])
             )
         > lit('>');
+
+      // _r1 var scope
+      empty_range_r.name("empty range expression pair");
+      empty_range_r
+        = eps[empty_range_f(_val, boost::phoenix::ref(error_msgs_))];
 
       // _r1 var scope
       locscale_brackets_double_r.name("real loc-scale expression pair, brackets");
@@ -329,6 +338,11 @@ namespace stan {
                                         boost::phoenix::ref(error_msgs_))])
             )
         > lit('>');
+
+      // _r1 var scope
+      empty_locscale_r.name("empty loc-scale expression pair");
+      empty_locscale_r
+        = eps[empty_locscale_f(_val, boost::phoenix::ref(error_msgs_))];
 
       // _r1 var scope
       dim1_r.name("vector length declaration:"

@@ -30,15 +30,16 @@ struct double_block_type {
    * Construct a block var type with specified values.
    *
    * @param bounds variable upper and/or lower bounds
+   * @param ls variable location and scale
    */
-  explicit double_block_type(const range& bounds);
+  explicit double_block_type(const range& bounds, const locscale& ls);
 
   /**
    * Construct a block var type with specified values.
    *
-   * @param ls variable location and scale
+   * @param bounds variable upper and/or lower bounds
    */
-  explicit double_block_type(const locscale& ls);
+  explicit double_block_type(const range& bounds);
 
   /**
    * Get bounds constraints.
