@@ -1,0 +1,2025 @@
+# Regression Models
+
+Stan supports regression models from simple linear regressions to
+multilevel generalized linear models.
+
+## Linear Regression
+
+The simplest linear regression model is the following, with a single
+predictor and a slope and intercept coefficient, and normally
+distributed noise.  This model can be written using standard
+regression notation as
+
+$$
+y_n = \alpha + \beta x_n + \epsilon_n
+\ \ \ \mbox{where} \ \ \
+\epsilon_n \sim \mathsf{normal}(0,\sigma).
+$$
+This is equivalent to the following sampling involving the
+residual,
+$$
+y_n - (\alpha + \beta X_n) \sim \mathsf{normal}(0,\sigma),
+$$
+and reducing still further, to
+$$
+y_n \sim \mathsf{normal}(\alpha + \beta X_n, \, \sigma).
+$$
+
+This latter form of the model is coded in Stan as follows.
+
+```
+data {
+  int<lower=0> N;
+  vector[N] x;
+  vector[N] y;
+}
+parameters {
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(alpha + beta * x, sigma);
+}
+```
+
+There are `N` observations, each with predictor `x[n]` and
+outcome `y[n]`.  The intercept and slope parameters are
+`alpha` and `beta`.  The model assumes a normally
+distributed noise term with scale `sigma`.  This model has
+improper priors for the two regression coefficients.
+
+### Matrix Notation and Vectorization {- #vectorization-section}
+
+The sampling statement in the previous model is vectorized, with
+
+```
+  y ~ normal(alpha + beta * x, sigma);
+```
+
+providing the same model as the unvectorized version,
+
+```
+  for (n in 1:N)
+    y[n] ~ normal(alpha + beta * x[n], sigma);
+```
+
+In addition to being more concise, the vectorized form is much faster.^[Unlike in Python and R, which are interpreted, Stan is translated to C++ and compiled, so loops and assignment statements are fast.  Vectorized code is faster in Stan because (a) the expression tree used to compute derivatives can be simplified, leading to fewer virtual function calls, and (b) computations that would be repeated in the looping version, such as `log(sigma)` in the above model, will be computed once and reused.]
+
+In general, Stan allows the arguments to distributions such as
+`normal` to be vectors.  If any of the other arguments are vectors or
+arrays, they have to be the same size.  If any of the other arguments
+is a scalar, it is reused for each vector entry.  See [the
+vectorization section](#vectorization-section) for more information on
+vectorization of probability functions.
+
+The other reason this works is that Stan's arithmetic operators are
+overloaded to perform matrix arithmetic on matrices.  In this case,
+because `x` is of type `vector` and `beta` of type
+`real`, the expression `beta * x` is of type `vector`.
+Because Stan supports vectorization, a regression model with more than
+one predictor can be written directly using matrix notation.
+
+```
+data {
+  int<lower=0> N;   // number of data items
+  int<lower=0> K;   // number of predictors
+  matrix[N, K] x;   // predictor matrix
+  vector[N] y;      // outcome vector
+}
+parameters {
+  real alpha;           // intercept
+  vector[K] beta;       // coefficients for predictors
+  real<lower=0> sigma;  // error scale
+}
+model {
+  y ~ normal(x * beta + alpha, sigma);  // likelihood
+}
+```
+
+The constraint `lower=0` in the declaration of `sigma`
+constrains the value to be greater than or equal to 0.  With no prior
+in the model block, the effect is an improper prior on non-negative
+real numbers.  Although a more informative prior may be added, improper
+priors are acceptable as long as they lead to proper posteriors.
+
+In the model above, `x` is an $N \times K$ matrix of predictors
+and `beta` a $K$-vector of coefficients, so `x * beta` is an
+$N$-vector of predictions, one for each of the $N$ data items.  These
+predictions line up with the outcomes in the $N$-vector `y`, so
+the entire model may be written using matrix arithmetic as shown.  It
+would be possible to include a column of ones the data matrix `x` and
+remove the `alpha` parameter.
+
+The sampling statement in the model above is just a more efficient,
+vector-based approach to coding the model with a loop, as in the
+following statistically equivalent model.
+
+```
+model {
+  for (n in 1:N)
+    y[n] ~ normal(x[n] * beta, sigma);
+}
+```
+
+With Stan's matrix indexing scheme, `x[n]` picks out row `n`
+of the matrix `x`;  because `beta` is a column vector,
+the product `x[n] * beta` is a scalar of type `real`.
+
+#### Intercepts as Inputs {-}
+
+In the model formulation
+
+```
+  y ~ normal(x * beta, sigma);
+```
+
+there is no longer an intercept coefficient `alpha`.  Instead, we
+have assumed that the first column of the input matrix `x` is a
+column of 1 values.  This way, `beta[1]` plays the role of the
+intercept.  If the intercept gets a different prior than the slope
+terms, then it would be clearer to break it out.  It is also slightly
+more efficient in its explicit form with the intercept variable
+singled out because there's one fewer multiplications; it should not
+make that much of a difference to speed, though, so the choice should
+be based on clarity.
+
+## The QR Reparameterization {#QR-reparameterization.section}
+
+In the previous example, the linear predictor can be written as $\eta
+= x \beta$, where $\eta$ is a $N$-vector of predictions, $x$ is a $N
+\times K$ matrix, and $\beta$ is a $K$-vector of coefficients.
+Presuming $N \geq K$, we can exploit the fact that any design matrix,
+$x$ can be decomposed using the thin QR decomposition into an
+orthogonal matrix $Q$ and an upper-triangular matrix $R$, i.e. $x = Q
+R$.  See the reference manual for a definition of the QR-decoposition.
+The functions `qr_Q` and `qr_R` implement the fat QR decomposition so
+here we thin it by including only $K$ columns in $Q$ and $K$ rows in
+$R$ (see the reference manual for more information on the `qr_Q` and
+`qr_R` functions). Also, in practice, it is best to write $x = Q^\ast
+R^\ast$ where $Q^\ast = Q * \sqrt{n - 1}$ and $R^\ast =
+\frac{1}{\sqrt{n - 1}} R$. Thus, we can equivalently write $\eta = x
+\beta = Q R \beta = Q^\ast R^\ast \beta$. If we let $\theta = R^\ast
+\beta$, then we have $\eta = Q^\ast \theta$ and $\beta = R^{\ast^{-1}}
+\theta$. In that case, the previous Stan program becomes
+
+```
+data {
+  int<lower=0> N;   // number of data items
+  int<lower=0> K;   // number of predictors
+  matrix[N, K] x;   // predictor matrix
+  vector[N] y;      // outcome vector
+}
+transformed data {
+  matrix[N, K] Q_ast;
+  matrix[K, K] R_ast;
+  matrix[K, K] R_ast_inverse;
+  // thin and scale the QR decomposition
+  Q_ast = qr_Q(x)[, 1:K] * sqrt(N - 1);
+  R_ast = qr_R(x)[1:K, ] / sqrt(N - 1);
+  R_ast_inverse = inverse(R_ast);
+}
+parameters {
+  real alpha;           // intercept
+  vector[K] theta;      // coefficients on Q_ast
+  real<lower=0> sigma;  // error scale
+}
+model {
+  y ~ normal(Q_ast * theta + alpha, sigma);  // likelihood
+}
+generated quantities {
+  vector[K] beta;
+  beta = R_ast_inverse * theta; // coefficients on x
+}
+```
+
+Since this Stan program generates equivalent predictions for $y$ and
+the same posterior distribution for $\alpha$, $\beta$, and $\sigma$ as
+the previous Stan program, many wonder why the version with this QR
+reparameterization performs so much better in practice, often both in
+terms of wall time and in terms of effective sample size. The
+reasoning is threefold:
+
+1. The columns of $Q^\ast$ are orthogonal whereas the columns of
+  $x$ generally are not. Thus, it is easier for a Markov Chain to move
+  around in $\theta$-space than in $\beta$-space.
+
+1. The columns of $Q^\ast$ have the same scale whereas the columns
+  of $x$ generally do not. Thus, a Hamiltonian Monte Carlo algorithm
+  can move around the parameter space with a smaller number of larger
+  steps
+
+1. Since the covariance matrix for the columns of $Q\ast$ is an
+  identity matrix, $\theta$ typically has a reasonable scale if the
+  units of $y$ are also reasonable. This also helps HMC move
+  efficiently without compromising numerical accuracy.
+
+
+Consequently, this QR reparameterization is recommended for linear and
+generalized linear models in Stan whenever $K > 1$ and you do not have
+an informative prior on the location of $\beta$. It can also be
+worthwhile to subtract the mean from each column of $x$ before
+obtaining the QR decomposition, which does not affect the posterior
+distribution of $\theta$ or $\beta$ but does affect $\alpha$ and
+allows you to interpret $\alpha$ as the expectation of $y$ in a linear
+model.
+
+## Priors for Coefficients and Scales {#regression-priors.section}
+
+See our [general discussion of priors](#general-priors.section) for tips on priors for parameters in regression models.
+
+Later sections discuss [univariate
+hierarchical priors](#hierarchical-priors.section) and [multivariate
+hierarchical priors](#multivariate-hierarchical-priors.section), as well
+as [priors used to identify models](#priors-for-identification.section).
+
+However, as described in [QR-reparameterization
+section](#QR-reparameterization.section), if you do not have an
+informative prior on the *location* of the regression coefficients,
+then you are better off reparameterizing your model so that the
+regression coefficients are a generated quantity. In that case, it
+usually does not matter much what prior is used on on the
+reparameterized regression coefficients and almost any weakly
+informative prior that scales with the outcome will do.
+
+
+
+
+## Robust Noise Models
+
+The standard approach to linear regression is to model the noise
+term $\epsilon$ as having a normal distribution.  From Stan's
+perspective, there is nothing special about normally distributed
+noise.  For instance, robust regression can be accommodated by giving
+the noise term a Student-$t$ distribution.  To code this in Stan, the
+sampling distribution is changed to the following.
+
+
+```
+data {
+  ...
+  real<lower=0> nu;
+}
+...
+model {
+  y ~ student_t(nu, alpha + beta * x, sigma);
+}
+```
+
+The degrees of freedom constant `nu` is specified as data.
+
+## Logistic and Probit Regression {#logistic-probit-regression.section}
+
+For binary outcomes, either of the closely related logistic or probit
+regression models may be used.  These generalized linear models vary
+only in the link function they use to map linear predictions in
+$(-\infty,\infty)$ to probability values in $(0,1)$.  Their respective
+link functions, the logistic function and the standard normal cumulative distribution
+function, are both sigmoid functions (i.e., they are both S-shaped).
+
+A logistic regression model with one predictor and an intercept is coded as
+follows.
+
+
+```
+data {
+  int<lower=0> N;
+  vector[N] x;
+  int<lower=0,upper=1> y[N];
+}
+parameters {
+  real alpha;
+  real beta;
+}
+model {
+  y ~ bernoulli_logit(alpha + beta * x);
+}
+```
+
+The noise parameter is built into the Bernoulli formulation here
+rather than specified directly.
+
+Logistic regression is a kind of generalized linear model with binary
+outcomes and the log odds (logit) link function, defined by
+
+$$
+\mbox{logit}(v) = \log \left( \frac{v}{1-v} \right).
+$$
+
+The inverse of the link function appears in the model.
+
+$$
+\mbox{logit}^{-1}(u) = \frac{1}{1 + \exp(-u)}.
+$$
+
+
+The model formulation above uses the logit-parameterized version of
+the Bernoulli distribution, which is defined by
+
+$$
+\mathsf{BernoulliLogit}(y|\alpha)
+=
+\mathsf{Bernoulli}(y \mid \mbox{logit}^{-1}(\alpha)).
+$$
+
+The formulation is also vectorized in the sense that `alpha` and
+`beta` are scalars and `x` is a vector, so that `alpha
+  + beta * x` is a vector.  The vectorized formulation is equivalent
+to the less efficient version
+
+
+```
+for (n in 1:N)
+  y[n] ~ bernoulli_logit(alpha + beta * x[n]);
+```
+
+Expanding out the Bernoulli logit, the model is equivalent to the more
+explicit, but less efficient and less arithmetically stable
+
+
+```
+for (n in 1:N)
+  y[n] ~ bernoulli(inv_logit(alpha + beta * x[n]));
+```
+
+Other link functions may be used in the same way.  For example, probit
+regression uses the cumulative normal distribution function, which is
+typically written as
+
+$$
+\Phi(x) = \int_{-\infty}^x \mathsf{normal}(y|0,1) \, dy.
+$$
+
+The cumulative standard normal distribution function $\Phi$ is implemented
+in Stan as the function `Phi`.  The probit regression model
+may be coded in Stan by replacing the logistic model's sampling
+statement with the following.
+
+
+```
+        y[n] ~ bernoulli(Phi(alpha + beta * x[n]));
+```
+
+A fast approximation to the cumulative standard normal distribution
+function $\Phi$ is implemented in Stan as the function
+`Phi_approx`.^[The `Phi_approx` function is a rescaled version of the inverse logit function, so while the scale is roughly the same $\Phi$, the tails do not match.]
+The approximate probit regression model may
+be coded with the following.
+
+
+```
+        y[n] ~ bernoulli(Phi_approx(alpha + beta * x[n]));
+```
+
+## Multi-Logit Regression {#multi-logit.section}
+
+Multiple outcome forms of logistic regression can be coded directly in
+Stan.  For instance, suppose there are $K$ possible outcomes for each
+output variable $y_n$.  Also suppose that there is a $D$-dimensional
+vector $x_n$ of predictors for $y_n$.  The multi-logit model with
+$\mathsf{normal}(0,5)$ priors on the coefficients is coded as follows.
+
+
+```
+data {
+  int K;
+  int N;
+  int D;
+  int y[N];
+  matrix[N, D] x;
+}
+parameters {
+  matrix[D, K] beta;
+}
+model {
+  matrix[N, K] x_beta = x * beta;
+
+  to_vector(beta) ~ normal(0, 2);
+
+  for (n in 1:N)
+    y[n] ~ categorical_logit(x_beta[n]);
+}
+```
+
+The prior on `beta` is coded in vectorized form.  As of Stan 2.18, the
+categorical-logit distribution is not vectorized for parameter
+arguments, so the loop is required.  The matrix multiplication is
+pulled out to define a local variable for all of the predictors for
+efficiency.  Like the Bernoulli-logit, the categorical-logit
+distribution applies softmax internally to convert an arbitrary vector
+to a simplex,
+
+$$
+\mathsf{CategoricalLogit}(y \mid \alpha)
+\ = \
+\mathsf{Categorical}(y \mid \mathsf{softmax}(\alpha)),
+$$
+
+where
+
+
+$$
+\mathrm{softmax}(u) = \mathrm{exp}(u) / \mathrm{sum}(\mathrm{exp}(u)).
+$$
+
+The categorical distribution with log-odds (logit) scaled parameters
+used above is equivalent to writing
+
+```
+    y[n] ~ categorical(softmax(x[n] * beta));
+```
+
+
+
+#### Constraints on Data Declarations {-}
+
+The data block in the above model is defined without constraints on
+sizes `K`, `N`, and `D` or on the outcome array
+`y`.  Constraints on data declarations provide error checking at
+the point data are read (or transformed data are defined), which is
+before sampling begins.  Constraints on data declarations also make
+the model author's intentions more explicit, which can help with
+readability.  The above model's declarations could be tightened to
+
+
+```
+  int<lower = 2> K;
+  int<lower = 0> N;
+  int<lower = 1> D;
+  int<lower = 1, upper = K> y[N];
+```
+
+These constraints arise because the number of categories, `K`,
+must be at least two in order for a categorical model to be useful.
+The number of data items, `N`, can be zero, but not negative;
+unlike R, Stan's for-loops always move forward, so that a loop extent
+of `1:N` when `N` is equal to zero ensures the loop's body
+will not be executed.  The number of predictors, `D`, must be at
+least one in order for `beta * x[n]` to produce an
+appropriate argument for `softmax()`.  The categorical outcomes
+`y[n]` must be between `1` and `K` in order for the
+discrete sampling to be well defined.
+
+Constraints on data declarations are optional.  Constraints on
+parameters declared in the `parameters` block, on the other hand,
+are *not* optional---they are required to ensure support for all
+parameter values satisfying their constraints.  Constraints on
+transformed data, transformed parameters, and generated quantities are
+also optional.
+
+### Identifiability {-}
+
+Because softmax is invariant under adding a constant to each component
+of its input, the model is typically only identified if there is a
+suitable prior on the coefficients.
+
+An alternative is to use $(K-1)$-vectors by fixing one of them to be
+zero. The [partially known parameters
+section](#partially-known-parameters.section) discusses how to mix
+constants and parameters in a vector.  In the multi-logit case, the
+parameter block would be redefined to use $(K - 1)$-vectors
+
+```
+parameters {
+  matrix[K - 1, D] beta_raw;
+}
+```
+
+and then these are transformed to parameters to use in the model.
+First, a transformed data block is added before the parameters block
+to define a row vector of zero values,
+
+```
+transformed data {
+  row_vector[D] zeros = rep_row_vector(0, D);
+}
+```
+
+which can then be appended to `beta_row` to produce the
+coefficient matrix `beta`,
+
+```
+transformed parameters {
+  matrix[K, D] beta;
+  beta = append_row(beta_raw, zeros);
+}
+```
+
+The `rep_row_vector(0, D)` call creates a row vector of size `D` with
+all entries set to zero.  The derived matrix `beta` is then defined to
+be the result of appending the row-vector `zeros` as a new row at the
+end of `beta_raw`;  the row vector `zeros` is defined as transformed
+data so that it doesn't need to be constructed from scratch each time
+it is used.
+
+This is not the same model as using $K$-vectors as parameters,
+because now the prior only applies to $(K-1)$-vectors.  In practice,
+this will cause the maximum likelihood solutions to be different and
+also the posteriors to be slightly different when taking priors
+centered around zero, as is typical for regression coefficients.
+
+## Parameterizing Centered Vectors
+
+It is often convenient to define a parameter vector $\beta$ that is
+centered in the sense of satisfying the sum-to-zero constraint,
+
+$$
+\sum_{k=1}^K \beta_k = 0.
+$$
+
+Such a parameter vector may be used to identify a multi-logit
+regression parameter vector (see the [multi-logit
+section](#multi-logit.section) for details), or may be used for
+ability or difficulty parameters (but not both) in an IRT model (see
+the [item-response model section](item-response-models.section) for
+details).
+
+
+### $K-1$ Degrees of Freedom {-}
+
+There is more than one way to enforce a sum-to-zero constraint on a
+parameter vector, the most efficient of which is to define the $K$-th
+element as the negation of the sum of the elements $1$ through $K-1$.
+
+```
+parameters {
+  vector[K-1] beta_raw;
+  ...
+transformed parameters {
+  vector[K] beta = append_row(beta_raw, -sum(beta_raw));
+  ...
+```
+
+Placing a prior on `beta_raw` in this parameterization leads to
+a subtly different posterior than that resulting from the same prior
+on `beta` in the original parameterization without the
+sum-to-zero constraint.  Most notably, a simple prior on each
+component of `beta_raw` produces different results than putting
+the same prior on each component of an unconstrained $K$-vector
+`beta`.  For example, providing a $\mathsf{normal}(0,5)$ prior
+on `beta` will produce a different posterior mode than placing
+the same prior on `beta_raw`.
+
+#### Marginal distribution of sum-to-zero components {-}
+
+On the Stan forums, Aaron Goodman provided the following code to
+produce a prior with standard normal marginals on the components of
+`beta`,
+
+```
+model {
+  beta ~ normal(0, inv(sqrt(1 - inv(K))));
+  ...
+```
+
+The components are not independent, as they must sum zero.  No
+Jacobian is required because summation and negation are linear
+operations (and thus have constant Jacobians).
+
+To generate distributions with marginals other than standard normal,
+the resulting `beta` may be scaled by some factor `sigma` and
+translated to some new location `mu`.
+
+
+### QR Decomposition {-}
+
+Aaron Goodman, on the Stan forums, also provided this approach, which
+calculates a QR decomposition in the transformed data block, then uses
+it to transform to a sum-to-zero parameter `x`,
+
+```
+transformed data{
+  matrix[K, K] A = diag_matrix(rep_vector(1,K));
+  matrix[K, K-1] A_qr;
+  for (i in 1:K-1) A[K,i] = -1;
+  A[K,K] = 0;
+  A_qr = qr_Q(A)[ , 1:(K-1)];
+}
+parameters {
+  vector[K-1] beta_raw;
+}
+transformed parameters{
+   vector[K] beta =  A_qr * beta_raw;
+}
+model {
+  beta_raw ~ normal(0, inv(sqrt(1 - inv(K))));
+}
+```
+
+This produces a marginal standard normal distribution on the values of
+`beta`, which will sum to zero by construction of the QR decomposition.
+
+
+### Translated and Scaled Simplex {-}
+
+An alternative approach that's less efficient, but amenable to a
+symmetric prior, is to offset and scale a simplex.
+
+```
+parameters {
+  simplex[K] beta_raw;
+  real beta_scale;
+  ...
+transformed parameters {
+  vector[K] beta;
+  beta = beta_scale * (beta_raw - inv(K));
+  ...
+```
+
+Here `inv(K)` is just a short way to write `1.0~/~K`.  Given
+that `beta_raw` sums to 1 because it is a simplex, the
+elementwise subtraction of `inv(K)` is guaranteed to sum to zero.
+Because the magnitude of the elements of the simplex is bounded, a
+scaling factor is required to provide `beta` with $K$ degrees of
+freedom necessary to take on every possible value that sums to zero.
+
+With this parameterization, a Dirichlet prior can be placed on
+`beta_raw`, perhaps uniform, and another prior put on
+`beta_scale`, typically for "shrinkage."
+
+
+### Soft Centering {-}
+
+Adding a prior such as $\beta \sim \mathsf{normal}(0,\sigma)$ will provide a kind
+of soft centering of a parameter vector $\beta$ by preferring, all
+else being equal, that $\sum_{k=1}^K \beta_k = 0$.  This approach is only
+guaranteed to roughly center  if $\beta$ and the elementwise addition $\beta + c$
+for a scalar constant $c$ produce the same likelihood (perhaps by
+another vector $\alpha$ being transformed to $\alpha - c$, as in the
+IRT models).  This is another way of achieving a symmetric prior.
+
+
+## Ordered Logistic and Probit Regression {#ordered-logistic.section}
+
+Ordered regression for an outcome $y_n \in \{ 1,\ldots, k \}$ with
+predictors $x_n \in \mathbb{R}^D$ is determined by a single coefficient
+vector $\beta \in \mathbb{R}^D$ along with a sequence of cutpoints $c \in
+\mathbb{R}^{K-1}$ sorted so that $c_d < c_{d+1}$.  The discrete output is
+$k$ if the linear predictor $x_n \beta$ falls between $c_{k-1}$ and
+$c_k$, assuming $c_0 = -\infty$ and $c_K = \infty$.  The noise term is
+fixed by the form of regression, with examples for ordered logistic
+and ordered probit models.
+
+### Ordered Logistic Regression {-}
+
+The ordered logistic model can be coded in Stan using the
+`ordered` data type for the cutpoints and the built-in
+`ordered_logistic` distribution.
+
+
+```
+data {
+  int<lower=2> K;
+  int<lower=0> N;
+  int<lower=1> D;
+  int<lower=1,upper=K> y[N];
+  row_vector[D] x[N];
+}
+parameters {
+  vector[D] beta;
+  ordered[K-1] c;
+}
+model {
+  for (n in 1:N)
+    y[n] ~ ordered_logistic(x[n] * beta, c);
+}
+```
+
+The vector of cutpoints `c` is declared as `ordered[K-1]`,
+which guarantees that `c[k]` is less than `c[k+1]`.
+
+If the cutpoints were assigned independent priors, the constraint
+effectively truncates the joint prior to support over points that
+satisfy the ordering constraint.  Luckily, Stan does not need to
+compute the effect of the constraint on the normalizing term because
+the probability is needed only up to a proportion.
+
+
+#### Ordered Probit {-}
+
+An ordered probit model could be coded in exactly the same way by
+swapping the cumulative logistic (`inv_logit`) for the cumulative
+normal (`Phi`).
+
+
+```
+data {
+  int<lower=2> K;
+  int<lower=0> N;
+  int<lower=1> D;
+  int<lower=1,upper=K> y[N];
+  row_vector[D] x[N];
+}
+parameters {
+  vector[D] beta;
+  ordered[K-1] c;
+}
+model {
+  vector[K] theta;
+  for (n in 1:N) {
+    real eta;
+    eta = x[n] * beta;
+    theta[1] = 1 - Phi(eta - c[1]);
+    for (k in 2:(K-1))
+      theta[k] = Phi(eta - c[k-1]) - Phi(eta - c[k]);
+    theta[K] = Phi(eta - c[K-1]);
+    y[n] ~ categorical(theta);
+  }
+}
+```
+
+The logistic model could also be coded this way by replacing
+`Phi` with `inv_logit`, though the built-in encoding based
+on the softmax transform is more efficient and more numerically
+stable.  A small efficiency gain could be achieved by computing the
+values `Phi(eta - c[k])` once and storing them for re-use.
+
+
+## Hierarchical Logistic Regression
+
+The simplest multilevel model is a hierarchical model in which the
+data are grouped into $L$ distinct categories (or levels).  An extreme
+approach would be to completely pool all the data and estimate a
+common vector of regression coefficients $\beta$.  At the other
+extreme, an approach with no pooling assigns each level $l$ its own
+coefficient vector $\beta_l$ that is estimated separately from the
+other levels.  A hierarchical model is an intermediate solution where
+the degree of pooling is determined by the data and a prior on the
+amount of pooling.
+
+Suppose each binary outcome $y_n \in \{ 0, 1 \}$ has an associated
+level, $ll_n \in \{ 1,\ldots,L \}$.  Each outcome will also have
+an associated predictor vector $x_n \in \mathbb{R}^D$.  Each level $l$
+gets its own coefficient vector $\beta_l \in \mathbb{R}^D$.  The
+hierarchical structure involves drawing the coefficients $\beta_{l,d}
+\in \mathbb{R}$ from a prior that is also estimated with the data.  This
+hierarchically estimated prior determines the amount of pooling.  If
+the data in each level are  similar, strong pooling will be
+reflected in low hierarchical variance.  If the data in the levels are
+dissimilar, weaker pooling will be reflected in higher hierarchical variance.
+
+The following model encodes a hierarchical logistic regression model
+with a hierarchical prior on the regression coefficients.
+
+
+```
+data {
+  int<lower=1> D;
+  int<lower=0> N;
+  int<lower=1> L;
+  int<lower=0,upper=1> y[N];
+  int<lower=1,upper=L> ll[N];
+  row_vector[D] x[N];
+}
+parameters {
+  real mu[D];
+  real<lower=0> sigma[D];
+  vector[D] beta[L];
+}
+model {
+  for (d in 1:D) {
+    mu[d] ~ normal(0, 100);
+    for (l in 1:L)
+      beta[l,d] ~ normal(mu[d], sigma[d]);
+  }
+  for (n in 1:N)
+    y[n] ~ bernoulli(inv_logit(x[n] * beta[ll[n]]));
+}
+```
+
+The standard deviation parameter `sigma` gets an implicit uniform
+prior on $(0,\infty)$ because of its declaration with a lower-bound
+constraint of zero.  Stan allows improper priors as long as the
+posterior is proper.  Nevertheless, it is usually helpful to have
+informative or at least weakly informative priors for all parameters;
+see the [regression priors section](#regression-priors.section) for
+recommendations on priors for regression coefficients and scales.
+
+#### Optimizing the Model {-}
+
+Where possible, vectorizing sampling statements leads to faster log
+probability and derivative evaluations.  The speed boost is not
+because loops are eliminated, but because vectorization allows sharing
+subcomputations in the log probability and gradient calculations and
+because it reduces the size of the expression tree required for
+gradient calculations.
+
+The first optimization vectorizes the for-loop over `D` as
+
+
+```
+  mu ~ normal(0, 100);
+  for (l in 1:L)
+    beta[l] ~ normal(mu, sigma);
+```
+
+The declaration of `beta` as an array of vectors means that the
+expression `beta[l]` denotes a vector.  Although `beta` could have
+been declared as a matrix, an array of vectors (or a two-dimensional
+array) is more efficient for accessing rows; see the [indexing
+efficiency section](#indexing-efficiency.section) for more information
+on the efficiency tradeoffs among arrays, vectors, and matrices.
+
+This model can be further sped up and at the same time made more
+arithmetically stable by replacing the application of inverse-logit
+inside the Bernoulli distribution with the logit-parameterized
+Bernoulli,^[The Bernoulli-logit distribution builds in the log link function, taking $$\mathsf{BernoulliLogit}(y \mid \alpha) = \mathsf{Bernoulli}(y \mid \mathrm{logit}^{-1}(\alpha)).$$]
+
+
+```
+  for (n in 1:N)
+    y[n] ~ bernoulli_logit(x[n] * beta[ll[n]]);
+```
+
+Unlike in R or BUGS, loops, array access and assignments are fast in
+Stan because they are translated directly to C++.  In most cases, the
+cost of allocating and assigning to a container is more than made up
+for by the increased efficiency due to vectorizing the log probability
+and gradient calculations.  Thus the following version is faster than
+the original formulation as a loop over a sampling statement.
+
+
+```
+  {
+    vector[N] x_beta_ll;
+    for (n in 1:N)
+      x_beta_ll[n] = x[n] * beta[ll[n]];
+    y ~ bernoulli_logit(x_beta_ll);
+  }
+```
+
+The brackets introduce a new scope for the local variable
+`x_beta_ll`; alternatively, the variable may be declared at the
+top of the model block.
+
+In some cases, such as the above, the local variable assignment leads
+to models that are less readable.  The recommended practice in such
+cases is to first develop and debug the more transparent version of
+the model and only work on optimizations when the simpler formulation
+has been debugged.
+
+
+## Hierarchical Priors {#hierarchical-priors.section}
+
+Priors on priors, also known as "hyperpriors," should be treated the
+same way as priors on lower-level parameters in that as much prior
+information as is available should be brought to bear.  Because
+hyperpriors often apply to only a handful of lower-level parameters,
+care must be taken to ensure the posterior is both proper and not
+overly sensitive either statistically or computationally to wide tails
+in the priors.
+
+### Boundary-Avoiding Priors for MLE in Hierarchical Models {-} {#bound-avoid-priors.subsection}
+
+The fundamental problem with maximum likelihood estimation (MLE) in
+the hierarchical model setting is that as the hierarchical variance
+drops and the values cluster around the hierarchical mean, the overall
+density grows without bound.  As an illustration, consider a simple
+hierarchical linear regression (with fixed prior mean) of $y_n \in
+\mathbb{R}$ on $x_n \in \mathbb{R}^K$, formulated as
+
+$$
+\begin{array}{rcl}
+y_n & \sim & \mathsf{normal}(x_n \beta, \sigma)
+\\[3pt]
+\beta_k & \sim & \mathsf{normal}(0,\tau)
+\\[3pt]
+\tau & \sim & \mathsf{Cauchy}(0,2.5)
+\end{array}
+$$
+
+In this case, as $\tau \rightarrow 0$ and $\beta_k \rightarrow 0$, the
+posterior density $$ p(\beta,\tau,\sigma|y,x) \propto
+p(y|x,\beta,\tau,\sigma) $$ grows without bound.  See the [plot of
+Neal's funnel density](#funnel.figure), which has similar behavior.
+
+There is obviously no MLE estimate for $\beta,\tau,\sigma$ in such a
+case, and therefore the model must be modified if posterior modes are
+to be used for inference.  The approach recommended by
+@ChungEtAl:2013 is to use a gamma distribution as a prior, such
+as
+
+$$
+\sigma \sim \mathsf{Gamma}(2, 1/A),
+$$
+
+for a reasonably large value of $A$, such as $A = 10$.
+
+
+## Item-Response Theory Models {#item-response-models.section}
+
+Item-response theory (IRT) models the situation in which a number of
+students each answer one or more of a group of test questions.  The
+model is based on parameters for the ability of the students, the
+difficulty of the questions, and in more articulated models, the
+discriminativeness of the questions and the probability of guessing
+correctly; [@GelmanHill:2007, pps. 314--320] for a textbook
+introduction to hierarchical IRT models and @Curtis:2010 for
+encodings of a range of IRT models in BUGS.
+
+
+### Data Declaration with Missingness {-}
+
+The data provided for an IRT model may be declared as follows
+to account for the fact that not every student is required to answer
+every question.
+
+
+```
+data {
+  int<lower=1> J;              // number of students
+  int<lower=1> K;              // number of questions
+  int<lower=1> N;              // number of observations
+  int<lower=1,upper=J> jj[N];  // student for observation n
+  int<lower=1,upper=K> kk[N];  // question for observation n
+  int<lower=0,upper=1> y[N];   // correctness for observation n
+}
+```
+
+This declares a total of `N` student-question pairs in the data
+set, where each `n` in `1:N` indexes a binary observation
+`y[n]` of the correctness of the answer of student `jj[n]`
+on question `kk[n]`.
+
+The prior hyperparameters will be hard coded in the rest of this
+section for simplicity, though they could be coded as data in
+Stan for more flexibility.
+
+### 1PL (Rasch) Model {-}
+
+The 1PL item-response model, also known as the Rasch model, has one
+parameter (1P) for questions and uses the logistic link function (L).
+
+
+
+The model parameters are declared as follows.
+
+
+```
+parameters {
+  real delta;         // mean student ability
+  real alpha[J];      // ability of student j - mean ability
+  real beta[K];       // difficulty of question k
+}
+```
+
+The parameter `alpha[j]` is the ability coefficient for student
+`j` and `beta[k]` is the difficulty coefficient for question
+`k`.  The non-standard parameterization used here also includes
+an intercept term `delta`, which represents the average student's
+response to the average question.^[@GelmanHill:2007 treat the $\delta$ term equivalently as the location parameter in the distribution of student abilities.]
+
+The model itself is as follows.
+
+
+```
+model {
+  alpha ~ std_normal();         // informative true prior
+  beta ~ std_normal();          // informative true prior
+  delta ~ normal(0.75, 1);      // informative true prior
+  for (n in 1:N)
+    y[n] ~ bernoulli_logit(alpha[jj[n]] - beta[kk[n]] + delta);
+}
+```
+
+This model uses the logit-parameterized Bernoulli distribution, where
+
+$$
+\mathsf{BernoulliLogit}(y \mid \alpha)
+\ = \
+\mathsf{Bernoulli}(y \mid \mbox{logit}^{-1}(\alpha)).
+$$
+
+The key to understanding it is the term inside the
+`bernoulli_logit` distribution, from which it follows that
+$$
+\mbox{Pr}[y_n = 1] = \mbox{logit}^{-1}(\alpha_{jj[n]} - \beta_{kk[n]}
++ \delta).
+$$
+
+The model suffers from additive identifiability issues without the
+priors.  For example, adding a term $\xi$ to each $\alpha_j$ and
+$\beta_k$ results in the same predictions.  The use of priors for
+$\alpha$ and $\beta$ located at 0 identifies the parameters; see
+@GelmanHill:2007 for a discussion of identifiability issues and
+alternative approaches to identification.
+
+For testing purposes, the IRT 1PL model distributed with Stan uses
+informative priors that match the actual data generation process used
+to simulate the data in R (the simulation code is supplied in the same
+directory as the models).  This is unrealistic for most practical
+applications, but allows Stan's inferences to be validated.  A simple
+sensitivity analysis with fatter priors shows that the posterior is
+fairly sensitive to the prior even with 400 students and 100 questions
+and only 25% missingness at random.  For real applications, the
+priors should be fit hierarchically along with the other parameters,
+as described in the next section.
+
+
+### Multilevel 2PL Model {-}
+
+The simple 1PL model described in the previous section is generalized
+in this section with the addition of a discrimination parameter to
+model how noisy a question is and by adding multilevel priors for the
+question difficulty and discrimination parameters.  The model
+parameters are declared as follows.
+
+
+```
+parameters {
+  real mu_beta;                // mean question difficulty
+  vector[J] alpha;             // ability for j - mean
+  vector[K] beta;              // difficulty for k
+  vector<lower=0>[K] gamma;    // discrimination of k
+  real<lower=0> sigma_beta;    // scale of difficulties
+  real<lower=0> sigma_gamma;   // scale of log discrimination
+}
+```
+
+The parameters should be clearer after the model definition.
+
+```
+model {
+  alpha ~ std_normal();
+  beta ~ normal(0, sigma_beta);
+  gamma ~ lognormal(0, sigma_gamma);
+  mu_beta ~ cauchy(0, 5);
+  sigma_beta ~ cauchy(0, 5);
+  sigma_gamma ~ cauchy(0, 5);
+  y ~ bernoulli_logit(gamma[kk] .* (alpha[jj] - (beta[kk] + mu_beta)));
+}
+```
+
+The `std_normal` function is used here, defined by
+
+$$
+\mathsf{Stdnormalal}(y)
+\ = \
+\mathsf{normal}(y \mid 0, 1).
+$$
+
+The sampling statement is also vectorized using elementwise
+multiplication;  it is equivalent to
+
+```
+for (n in 1:N)
+  y[n] ~ bernoulli_logit(gamma[kk[n]]
+                         * (alpha[jj[n]] - (beta[kk[n]] + mu_beta));
+```
+
+
+The 2PL model is similar to the 1PL model, with the additional parameter
+`gamma[k]` modeling how discriminative question `k` is.  If
+`gamma[k]` is greater than 1, responses are more attenuated with
+less chance of getting a question right at random.  The parameter
+`gamma[k]` is constrained to be positive, which prohibits there
+being questions that are easier for students of lesser ability;  such
+questions are not unheard of, but they tend to be eliminated from most
+testing situations where an IRT model would be applied.
+
+The model is parameterized here with student abilities `alpha` being
+given a standard normal prior.  This is to identify both the scale and
+the location of the parameters, both of which would be unidentified
+otherwise; see the [problematic posteriors
+chapter](#problematic-posteriors.chapter) for further discussion of
+identifiability. The difficulty and discrimination parameters `beta`
+and `gamma` then have varying scales given hierarchically in this
+model.  They could also be given weakly informative non-hierarchical
+priors, such as
+
+```
+  beta ~ normal(0, 5);
+  gamma ~ lognormal(0, 2);
+```
+
+The point is that the `alpha` determines the scale and location
+and `beta` and `gamma` are allowed to float.
+
+The `beta` parameter is here given a non-centered
+parameterization, with parameter `mu_beta` serving as the mean
+`beta` location. An alternative would've been to take:
+
+```
+  beta ~ normal(mu_beta, sigma_beta);
+```
+
+and
+
+```
+  y[n] ~ bernoulli_logit(gamma[kk[n]] * (alpha[jj[n]] - beta[kk[n]]));
+```
+
+Non-centered parameterizations tend to be more efficient in
+hierarchical models; see the [reparameterization
+section](#reparameterization.section) for more information on
+non-centered reparameterizations.
+
+The intercept term `mu_beta` can't itself be modeled
+hierarchically, so it is given a weakly informative
+$\mathsf{Cauchy}(0,5)$ prior.  Similarly, the scale terms,
+`sigma_beta`, and `sigma_gamma`, are given half-Cauchy
+priors.  As mentioned earlier, the scale and location for `alpha`
+are fixed to ensure identifiability.  The truncation in the
+half-Cauchy prior is implicit; explicit truncation is not necessary
+because the log probability need only be calculated up to a proportion
+and the scale variables are constrained to $(0,\infty)$ by their
+declarations.
+
+
+
+## Priors for Identifiability {#priors-for-identification.section}
+
+### Location and Scale Invariance {-}
+
+One application of (hierarchical) priors is to identify the scale
+and/or location of a group of parameters. For example, in the IRT
+models discussed in the previous section, there is both a location and
+scale non-identifiability.  With uniform priors, the posteriors will
+float in terms of both scale and location.  See the [collinearity
+section](#collinearity.section) for a simple example of the problems
+this poses for estimation.
+
+The non-identifiability is resolved by providing a standard normal (i.e.,
+$\mathsf{normal}(0,1)$) prior on one group of coefficients, such as
+the student abilities.  With a standard normal prior on the student
+abilities, the IRT model is identified in that the posterior will
+produce a group of estimates for student ability parameters that have
+a sample mean of close to zero and a sample variance of close to one.
+The difficulty and discrimination parameters for the questions should
+then be given a diffuse, or ideally a hierarchical prior, which will
+identify these parameters by scaling and locating relative to the
+student ability parameters.
+
+### Collinearity {-}
+
+Another case in which priors can help provide identifiability is in
+the case of collinearity in a linear regression.  In linear
+regression, if two predictors are collinear (i.e, one is a linear
+function of the other), then their coefficients will have a
+correlation of 1 (or -1) in the posterior.  This leads to
+non-identifiability.  By placing normal priors on the coefficients,
+the maximum likelihood solution of two duplicated predictors (trivially
+collinear) will be half the value than would be obtained by only
+including one.
+
+### Separability {-}
+
+In a logistic regression, if a predictor is positive in cases of 1
+outcomes and negative in cases of 0 outcomes, then the maximum
+likelihood estimate for the coefficient for that predictor diverges to
+infinity.  This divergence can be controlled by providing a prior for
+the coefficient, which will "shrink" the estimate back toward zero
+and thus identify the model in the posterior.
+
+Similar problems arise for sampling with improper flat priors.  The
+sampler will try to draw  large values.  By providing a prior,
+the posterior will be concentrated around finite values, leading to
+well-behaved sampling.
+
+
+
+## Multivariate Priors for Hierarchical Models {#multivariate-hierarchical-priors.section}
+
+In hierarchical regression models (and other situations), several
+individual-level variables may be assigned hierarchical priors.  For
+example, a model with multiple varying intercepts and slopes within
+might assign them a multivariate prior.
+
+As an example, the individuals might be people and the outcome income,
+with predictors such as education level and age, and the groups might be states
+or other geographic divisions.  The effect of education level and age
+as well as an intercept might be allowed to vary by state.
+Furthermore, there might be state-level predictors, such as average
+state income and unemployment level.
+
+### Multivariate Regression Example {-}
+
+[@GelmanHill:2007, Chapter 13, Chapter 17] includes a discussion of a
+hierarchical model with $N$ individuals organized into $J$ groups.
+Each individual has a predictor row vector $x_n$ of size $K$; to unify
+the notation, they assume that $x_{n,1} = 1$ is a fixed "intercept"
+predictor.  To encode group membership, they assume individual $n$
+belongs to group $jj[n] \in 1{:}J$.  Each individual $n$ also has an
+observed outcome $y_n$ taking on real values.
+
+#### Likelihood {-}
+
+The model is a linear regression with slope and intercept coefficients
+varying by group, so that $\beta_j$ is the coefficient $K$-vector for
+group $j$.  The likelihood function for individual $n$ is then just
+
+$$
+y_n \sim \mathsf{normal}(x_n \, \beta_{jj[n]}, \, \sigma)
+\mbox{ for } n \in 1{:}N.
+$$
+
+
+#### Coefficient Prior {-}
+
+Gelman and Hill model the coefficient vectors $\beta_j$ as being drawn
+from a multivariate distribution with mean vector $\mu$ and
+covariance matrix $\Sigma$,
+
+$$
+\beta_j \sim \mathsf{multivariate\ normal}(\mu, \, \Sigma)
+\mbox{ for } j \in 1{:}J.
+$$
+
+Below, we discuss the full model of Gelman and Hill, which uses
+group-level predictors to model $\mu$; for now, we assume $\mu$ is a
+simple vector parameter.
+
+#### Hyperpriors {-}
+
+For hierarchical modeling, the group-level mean vector $\mu$ and
+covariance matrix $\Sigma$ must themselves be given priors.  The
+group-level mean vector can be given a reasonable weakly-informative
+prior for independent coefficients, such as
+
+$$
+\mu_j \sim \mathsf{normal}(0,5).
+$$
+If more is known about the expected coefficient values
+$\beta_{j, k}$, this information can be incorporated into the prior for
+$\mu_k$.
+
+For the prior on the covariance matrix, Gelman and Hill suggest using
+a scaled inverse Wishart.  That choice was motivated primarily by
+convenience as it is conjugate to the multivariate likelihood function
+and thus simplifies Gibbs sampling
+
+In Stan, there is no restriction to conjugacy for multivariate priors,
+and we in fact recommend a slightly different approach.  Like Gelman
+and Hill, we decompose our prior into a scale and a matrix, but are
+able to do so in a more natural way based on the actual variable
+scales and a correlation matrix.  Specifically, we define
+$$
+\Sigma = \mbox{diag\_matrix}(\tau) \ \Omega \ \mbox{diag\_matrix}(\tau),
+$$
+where $\Omega$ is a correlation matrix and $\tau$ is the vector of
+coefficient scales.   This mapping from scale vector $\tau$ and
+correlation matrix $\Omega$ can be inverted, using
+$$
+\tau_k = \sqrt{\, \Sigma_{k,k}}
+$$
+and
+$$
+\Omega_{i, j} = \frac{\Sigma_{i, j}}{\tau_i \, \tau_j}.
+$$
+
+The components of the scale vector $\tau$ can be given any reasonable
+prior for scales, but we recommend something weakly informative like a
+half-Cauchy distribution with a small scale, such as
+$$
+\tau_k \sim \mathsf{Cauchy}(0, 2.5)
+\mbox{ for } k \in 1{:}K \mbox{ constrained by } \tau_k > 0.
+$$
+As for the prior means, if there is information about the scale of
+variation of coefficients across groups, it should be incorporated
+into the prior for $\tau$.  For large numbers of exchangeable
+coefficients, the components of $\tau$ itself (perhaps excluding the
+intercept) may themselves be given a hierarchical prior.
+
+Our final recommendation is to give the correlation matrix $\Omega$ an
+LKJ prior with shape $\eta \geq 1$,^[The prior is named for Lewandowski, Kurowicka, and Joe, as it was derived by inverting the random correlation matrix generation strategy of @LewandowskiKurowickaJoe:2009.]
+
+$$
+\Omega \sim \mathsf{LKJCorr}(\eta).
+$$
+
+The LKJ correlation distribution is defined by
+
+$$
+\mathsf{LkjCorr}(\Sigma \mid \eta)
+\ \propto \
+\mathsf{det}(\Sigma)^{\eta - 1}.
+$$
+
+The basic behavior of the LKJ correlation distribution is similar to
+that of a beta distribution.  For $\eta = 1$, the result is a uniform
+distribution.  Despite being the identity over correlation matrices, the
+marginal distribution over the entries in that matrix (i.e., the
+correlations) is not uniform between -1 and 1.  Rather, it
+concentrates around zero as the dimensionality increases due to the
+complex constraints.
+
+For $\eta > 1$, the density increasingly concentrates
+mass around the unit matrix, i.e., favoring less correlation.  For
+$\eta < 1$, it increasingly concentrates mass in the other direction,
+i.e., favoring more correlation.
+
+The LKJ prior may thus be used to control the expected amount of
+correlation among the parameters $\beta_j$.  For a discussion of
+decomposing a covariance prior into a prior on correlation matrices
+and an independent prior on scales, see @barnard-mcculloch-meng:2000.
+
+#### Group-Level Predictors for Prior Mean {-}
+
+To complete Gelman and Hill's model, suppose each group $j \in 1{:}J$
+is supplied with an $L$-dimensional row-vector of group-level
+predictors $u_j$.  The prior mean for the $\beta_j$ can then itself be
+modeled as a regression, using an $L$-dimensional coefficient vector
+$\gamma$.  The prior for the group-level coefficients then becomes
+$$
+\beta_j \sim \mathsf{multivariate\ normal}(u_j \, \gamma, \Sigma)
+$$
+
+The group-level coefficients $\gamma$ may themselves be given
+independent weakly informative priors, such as
+$$
+\gamma_l \sim \mathsf{normal}(0,5).
+$$
+As usual, information about the group-level means should be
+incorporated into this prior.
+
+
+#### Coding the Model in Stan {-}
+
+The Stan code for the full hierarchical model with multivariate priors
+on the group-level coefficients and group-level prior means follows
+its definition.
+
+```
+data {
+  int<lower=0> N;              // num individuals
+  int<lower=1> K;              // num ind predictors
+  int<lower=1> J;              // num groups
+  int<lower=1> L;              // num group predictors
+  int<lower=1,upper=J> jj[N];  // group for individual
+  matrix[N, K] x;               // individual predictors
+  row_vector[L] u[J];          // group predictors
+  vector[N] y;                 // outcomes
+}
+parameters {
+  corr_matrix[K] Omega;        // prior correlation
+  vector<lower=0>[K] tau;      // prior scale
+  matrix[L, K] gamma;           // group coeffs
+  vector[K] beta[J];           // indiv coeffs by group
+  real<lower=0> sigma;         // prediction error scale
+}
+model {
+  tau ~ cauchy(0, 2.5);
+  Omega ~ lkj_corr(2);
+  to_vector(gamma) ~ normal(0, 5);
+  {
+    row_vector[K] u_gamma[J];
+    for (j in 1:J)
+      u_gamma[j] = u[j] * gamma;
+    beta ~ multi_normal(u_gamma, quad_form_diag(Omega, tau));
+  }
+  for (n in 1:N)
+    y[n] ~ normal(x[n] * beta[jj[n]], sigma);
+}
+```
+
+The hyperprior covariance matrix is defined implicitly through the a
+quadratic form in the code because the correlation matrix `Omega` and
+scale vector `tau` are more natural to inspect in the output; to
+output `Sigma`, define it as a transformed parameter.  The function
+`quad_form_diag` is defined so that `quad_form_diag(Sigma, tau)` is
+equivalent to `diag_matrix(tau) * Sigma * diag_matrix(tau)`, where
+`diag_matrix(tau)` returns the matrix with `tau` on the diagonal and
+zeroes off diagonal; the version using `quad_form_diag` should be
+faster.  For details on these and other matrix arithmtic operators and
+functions, see the function reference manual.
+
+#### Optimization through Vectorization {-}
+
+The code in the Stan program above can be sped up dramatically by replacing:
+
+```
+  for (n in 1:N)
+    y[n] ~ normal(x[n] * beta[jj[n]], sigma);
+```
+
+with the vectorized form:
+
+```
+  {
+    vector[N] x_beta_jj;
+    for (n in 1:N)
+      x_beta_jj[n] = x[n] * beta[jj[n]];
+    y ~ normal(x_beta_jj, sigma);
+  }
+```
+
+The outer brackets create a local scope in which to define the
+variable `x_beta_jj`, which is then filled in a loop and used
+to define a vectorized sampling statement.  The reason this is such a
+big win is that it allows us to take the log of sigma only once and it
+greatly reduces the size of the resulting expression graph by packing
+all of the work into a single density function.
+
+Although it is tempting to redeclare `beta` and include a revised
+model block sampling statement,
+
+```
+parameters {
+  matrix[J, K] beta;
+...
+model {
+  y ~ normal(rows_dot_product(x, beta[jj]), sigma);
+  ...
+```
+
+this fails because it breaks the vectorization of sampling for
+`beta`,^[Thanks to Mike Lawrence for pointing this out in the GitHub issue for the manual.]
+
+```
+  beta ~ multi_normal(...);
+```
+
+which requires `beta` to be an array of vectors.  Both
+vectorizations are important, so the best solution is to just use the
+loop above, because `rows_dot_product` cannot do much
+optimization in and of itself because there are no shared computations.
+
+The code in the Stan program above also builds up an array of vectors
+for the outcomes and for the multivariate normal, which provides a
+major speedup by reducing the number of linear systems that
+need to be solved and differentiated.
+
+```
+  {
+    matrix[K, K] Sigma_beta;
+    Sigma_beta = quad_form_diag(Omega, tau);
+    for (j in 1:J)
+      beta[j] ~ multi_normal((u[j] * gamma)', Sigma_beta);
+  }
+```
+
+In this example, the covariance matrix `Sigma_beta` is defined
+as a local variable so as not to have to repeat the quadratic form
+computation $J$ times.  This vectorization can be combined with the
+Cholesky-factor optimization in the next section.
+
+#### Optimization through Cholesky Factorization {-}
+
+The multivariate normal density and LKJ prior on correlation matrices
+both require their matrix parameters to be factored.  Vectorizing, as
+in the previous section, ensures this is only done once for each
+density.  An even better solution, both in terms of efficiency and
+numerical stability, is to parameterize the model directly in terms of
+Cholesky factors of correlation matrices using the multivariate
+version of the non-centered parameterization.  For the model in the
+previous section, the program fragment to replace the full matrix
+prior with an equivalent Cholesky factorized prior is as follows.
+
+```
+data {
+  matrix[J, L] u;
+  ...
+parameters {
+  matrix[K, J] z;
+  cholesky_factor_corr[K] L_Omega;
+  ...
+transformed parameters {
+  matrix[J, K] beta;
+  beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
+}
+model {
+  to_vector(z) ~ std_normal();
+  L_Omega ~ lkj_corr_cholesky(2);
+  ...
+```
+
+The data variable `u` was originally an array of vectors, which
+is efficient for access; here it is redeclared as a matrix in order to
+use it in matrix arithmetic.  The new parameter `L_Omega` is
+the Cholesky factor of the original correlation matrix `Omega`,
+so that
+
+```
+Omega = L_Omega * L_Omega'
+```
+
+The prior scale vector `tau` is unchanged, and furthermore,
+Pre-multiplying the Cholesky factor by the scale produces the Cholesky
+factor of the final covariance matrix,
+
+```
+  Sigma_beta
+  = quad_form_diag(Omega, tau)
+  = diag_pre_multiply(tau, L_Omega) * diag_pre_multiply(tau, L_Omega)'
+```
+
+where the diagonal pre-multiply compound operation is defined by
+
+```
+diag_pre_multiply(a, b) = diag_matrix(a) * b
+```
+
+The new variable `z` is declared as a matrix, the entries of
+which are given independent standard normal priors; the `to_vector`
+operation turns the matrix into a vector so that it can be used as a
+vectorized argument to the univariate normal density.  Multiplying the
+Cholesky factor of the covariance matrix by `z` and adding the
+mean `(u\,*\,gamma)'` produces a `beta` distributed as in
+the original model.
+
+Omitting the data declarations, which are the same as before, the
+optimized model is as follows.
+
+```
+parameters {
+  matrix[K, J] z;
+  cholesky_factor_corr[K] L_Omega;
+  vector<lower=0,upper=pi()/2>[K] tau_unif;
+  matrix[L, K] gamma;                         // group coeffs
+  real<lower=0> sigma;                       // prediction error scale
+}
+transformed parameters {
+  matrix[J, K] beta;
+  vector<lower=0>[K] tau;     // prior scale
+  for (k in 1:K) tau[k] = 2.5 * tan(tau_unif[k]);
+  beta = u * gamma + (diag_pre_multiply(tau,L_Omega) * z)';
+}
+model {
+  to_vector(z) ~ std_normal();
+  L_Omega ~ lkj_corr_cholesky(2);
+  to_vector(gamma) ~ normal(0, 5);
+  y ~ normal(rows_dot_product(beta[jj] , x), sigma);
+}
+```
+
+This model also reparameterizes the prior scale `tau` to avoid potential problems with the heavy tails of the Cauchy distribution. The statement `tau_unif ~ uniform(0,pi()/2)` can be omitted from the model block because stan increments the log posterior for parameters with uniform priors without it.
+
+## Prediction, Forecasting, and Backcasting
+
+Stan models can be used for "predicting" the values of arbitrary
+model unknowns.  When predictions are about the future, they're called
+``forecasts;" when they are predictions about the past, as in climate
+reconstruction or cosmology, they are sometimes called "backcasts"
+(or "aftcasts" or "hindcasts" or "antecasts," depending on the
+author's feelings about the opposite of "fore").
+
+### Programming Predictions {-}
+
+As a simple example, the following linear regression provides the same
+setup for estimating the coefficients `beta` as in our  first
+example above, using `y` for the `N` observations and
+`x` for the `N` predictor vectors.  The model parameters and
+model for observations are exactly the same as before.
+
+To make predictions, we need to be given the number of predictions,
+`N_new`, and their predictor matrix, `x_new`.  The
+predictions themselves are modeled as a parameter `y_new`.  The
+model statement for the predictions is exactly the same as for the
+observations, with the new outcome vector `y_new` and prediction
+matrix `x_new`.
+
+```
+data {
+  int<lower=1> K;
+  int<lower=0> N;
+  matrix[N, K] x;
+  vector[N] y;
+
+  int<lower=0> N_new;
+  matrix[N_new, K] x_new;
+}
+parameters {
+  vector[K] beta;
+  real<lower=0> sigma;
+
+  vector[N_new] y_new;                  // predictions
+}
+model {
+  y ~ normal(x * beta, sigma);          // observed model
+
+  y_new ~ normal(x_new * beta, sigma);  // prediction model
+}
+```
+
+
+### Predictions as Generated Quantities {-}
+
+Where possible, the most efficient way to generate predictions is to
+use the generated quantities block.  This provides proper Monte Carlo
+(not Markov chain Monte Carlo) inference, which can have a much higher
+effective sample size per iteration.
+
+```
+...data as above...
+
+parameters {
+  vector[K] beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(x * beta, sigma);
+}
+generated quantities {
+  vector[N_new] y_new;
+  for (n in 1:N_new)
+    y_new[n] = normal_rng(x_new[n] * beta, sigma);
+}
+```
+
+Now the data are just as before, but the parameter `y_new` is now
+declared as a generated quantity, and the prediction model is
+removed from the model and replaced by a pseudo-random draw from a
+normal distribution.
+
+#### Overflow in Generated Quantities {-}
+
+It is possible for values to overflow or underflow in generated
+quantities.  The problem is that if the result is NaN, then any
+constraints placed on the variables will be violated.  It is possible
+to check a value assigned by an RNG and reject it if it overflows, but
+this is both inefficient and leads to biased posterior estimates.
+Instead, the conditions causing overflow, such as trying to generate a
+negative binomial random variate with a mean of $2^{31}$.  These must
+be intercepted and dealt with, typically be reparameterizing or
+reimplementing the random number generator using real values rather
+than integers, which are upper-bounded by $2^{31} - 1$ in Stan.
+
+
+## Multivariate Outcomes
+
+Most regressions are set up to model univariate observations (be they
+scalar, boolean, categorical, ordinal, or count).  Even multinomial
+regressions are just repeated categorical regressions.  In contrast,
+this section discusses regression when each observed value is
+multivariate.  To relate multiple outcomes in a regression setting,
+their error terms are provided with covariance structure.
+
+This section considers two cases, seemingly unrelated regressions for
+continuous multivariate quantities and multivariate probit regression
+for boolean multivariate quantities.
+
+### Seemingly Unrelated Regressions {-}
+
+The first model considered is the "seemingly unrelated" regressions
+(SUR) of econometrics where several linear regressions share
+predictors and use a covariance error structure rather than
+independent errors [@Zellner:1962; @Greene:2011].
+
+The model is easy to write down as a regression,
+
+$$
+\begin{array}{rcl}
+ y_n & = & x_n \, \beta + \epsilon_n
+\\[4pt]
+ \epsilon_n & \sim & \mathsf{multivariate\ normal}(0, \Sigma)
+\end{array}
+$$
+
+where $x_n$ is a $J$-row-vector of predictors ($x$ is an $(N \times
+J)$ matrix), $y_n$ is a $K$-vector of observations, $\beta$ is a $(K
+\times J)$ matrix of regression coefficients (vector $\beta_k$ holds
+coefficients for outcome $k$), and $\Sigma$ is covariance matrix
+governing the error.  As usual, the intercept can be rolled into $x$
+as a column of ones.
+
+The basic Stan code is straightforward (though see below for more
+optimized code for use with LKJ priors on correlation).
+
+```
+data {
+  int<lower=1> K;
+  int<lower=1> J;
+  int<lower=0> N;
+  vector[J] x[N];
+  vector[K] y[N];
+}
+parameters {
+  matrix[K, J] beta;
+  cov_matrix[K] Sigma;
+}
+model {
+  vector[K] mu[N];
+  for (n in 1:N)
+    mu[n] = beta * x[n];
+  y ~ multi_normal(mu, Sigma);
+}
+```
+
+For efficiency, the multivariate normal is vectorized by precomputing
+the array of mean vectors and sharing the same covariance matrix.
+
+Following the advice in the [multivariate hierarchical priors
+section](multivariate-hierarchical-priors.section), we will place a
+weakly informative normal prior on the regression coefficients, an LKJ
+prior on the correlations and a half-Cauchy prior on standard
+deviations.  The covariance structure is parameterized in terms of
+Cholesky factors for efficiency and arithmetic stability.
+
+```
+...
+parameters {
+  matrix[K, J] beta;
+  cholesky_factor_corr[K] L_Omega;
+  vector<lower=0>[K] L_sigma;
+}
+model {
+  vector[K] mu[N];
+  matrix[K, K] L_Sigma;
+
+  for (n in 1:N)
+    mu[n] = beta * x[n];
+
+  L_Sigma = diag_pre_multiply(L_sigma, L_Omega);
+
+  to_vector(beta) ~ normal(0, 5);
+  L_Omega ~ lkj_corr_cholesky(4);
+  L_sigma ~ cauchy(0, 2.5);
+
+  y ~ multi_normal_cholesky(mu, L_Sigma);
+}
+```
+
+The Cholesky factor of the covariance matrix is then reconstructed as
+a local variable and used in the model by scaling the Cholesky factor
+of the correlation matrices. The regression coefficients get a prior
+all at once by converting the matrix `beta` to a vector.
+
+If required, the full correlation or covariance matrices may be
+reconstructed from their Cholesky factors in the generated quantities
+block.
+
+
+### Multivariate Probit Regression {-}
+
+The multivariate probit model generates sequences of boolean variables
+by applying a step function to the output of a seemingly unrelated
+regression.
+
+The observations $y_n$ are $D$-vectors of boolean values (coded 0 for
+false, 1 for true).  The values for the observations $y_n$ are based
+on latent values $z_n$ drawn from a seemingly unrelated regression
+model (see the previous section),
+
+$$
+\begin{array}{rcl}
+ z_n & = & x_n \, \beta + \epsilon_n
+\\[4pt]
+ \epsilon_n & \sim & \mathsf{multivariate\ normal}(0, \Sigma)
+\end{array}
+$$
+
+These are then put through the step function to produce a $K$-vector $z_n$
+of boolean values with elements defined by
+$$
+y_{n, k} = \mathrm{I}(z_{n, k} > 0),
+$$
+where $\mathrm{I}()$ is the indicator function taking the value 1 if its
+argument is true and 0 otherwise.
+
+Unlike in the seemingly unrelated regressions case, here the
+covariance matrix $\Sigma$ has unit standard deviations (i.e., it is a
+correlation matrix).  As with ordinary probit and logistic
+regressions, letting the scale vary causes the model (which is defined
+only by a cutpoint at 0, not a scale) to be unidentified (see
+@Greene:2011).
+
+Multivariate probit regression can be coded in Stan using the trick
+introduced by @AlbertChib:1993, where the underlying continuous
+value vectors $y_n$ are coded as truncated parameters.  The key to
+coding the model in Stan is declaring the latent vector $z$ in two
+parts, based on whether the corresponding value of $y$ is 0 or 1.
+Otherwise, the model is identical to the seemingly unrelated
+regression model in the previous section.
+
+First, we introduce a sum function for two-dimensional arrays of
+integers;  this is going to help us calculate how many total 1 values
+there are in $y$.
+
+```
+functions {
+  int sum2d(int[,] a) {
+    int s = 0;
+    for (i in 1:size(a))
+      s += sum(a[i]);
+    return s;
+  }
+}
+```
+
+The function is trivial, but it's not a built-in for Stan and it's easier to
+understand the rest of the model if it's pulled into its own function
+so as not to create a distraction.
+
+The data declaration block is much like for the seemingly unrelated
+regressions, but the observations `y` are now integers
+constrained to be 0 or 1.
+
+```
+data {
+  int<lower=1> K;
+  int<lower=1> D;
+  int<lower=0> N;
+  int<lower=0,upper=1> y[N,D];
+  vector[K] x[N];
+}
+```
+
+After declaring the data, there is a rather involved transformed data
+block whose sole purpose is to sort the data array `y` into
+positive and negative components, keeping track of indexes so that
+`z` can be easily reassembled in the transformed parameters
+block.
+
+```
+transformed data {
+  int<lower=0> N_pos;
+  int<lower=1,upper=N> n_pos[sum2d(y)];
+  int<lower=1,upper=D> d_pos[size(n_pos)];
+  int<lower=0> N_neg;
+  int<lower=1,upper=N> n_neg[(N * D) - size(n_pos)];
+  int<lower=1,upper=D> d_neg[size(n_neg)];
+
+  N_pos = size(n_pos);
+  N_neg = size(n_neg);
+  {
+    int i;
+    int j;
+    i = 1;
+    j = 1;
+    for (n in 1:N) {
+      for (d in 1:D) {
+        if (y[n,d] == 1) {
+          n_pos[i] = n;
+          d_pos[i] = d;
+          i += 1;
+        } else {
+          n_neg[j] = n;
+          d_neg[j] = d;
+          j += 1;
+        }
+      }
+    }
+  }
+}
+```
+
+The variables `N_pos` and `N_neg` are set to the number of
+true (1) and number of false (0) observations in `y`.  The loop
+then fills in the sequence of indexes for the positive and negative
+values in four arrays.
+
+The parameters are declared as follows.
+
+```
+parameters {
+  matrix[D, K] beta;
+  cholesky_factor_corr[D] L_Omega;
+  vector<lower=0>[N_pos] z_pos;
+  vector<upper=0>[N_neg] z_neg;
+}
+```
+
+These include the regression coefficients `beta` and the Cholesky
+factor of the correlation matrix, `L_Omega`.  This time there is
+no scaling because the covariance matrix has unit scale (i.e., it is a
+correlation matrix;  see above).
+
+The critical part of the parameter declaration is that the latent real
+value $z$ is broken into positive-constrained and negative-constrained
+components, whose size was conveniently calculated in the transformed
+data block.  The transformed data block's real work was to allow the
+transformed parameter block to reconstruct $z$.
+
+```
+transformed parameters {
+  vector[D] z[N];
+  for (n in 1:N_pos)
+    z[n_pos[n], d_pos[n]] = z_pos[n];
+  for (n in 1:N_neg)
+    z[n_neg[n], d_neg[n]] = z_neg[n];
+}
+```
+
+At this point, the model is simple, pretty much recreating the
+seemingly unrelated regression.
+
+```
+model {
+  L_Omega ~ lkj_corr_cholesky(4);
+  to_vector(beta) ~ normal(0, 5);
+  {
+    vector[D] beta_x[N];
+    for (n in 1:N)
+      beta_x[n] = beta * x[n];
+    z ~ multi_normal_cholesky(beta_x, L_Omega);
+  }
+}
+```
+
+This simple form of model is made possible by the Albert and
+Chib-style constraints on `z`.
+
+Finally, the correlation matrix itself can be put back together in the
+generated quantities block if desired.
+
+```
+generated quantities {
+  corr_matrix[D] Omega;
+  Omega = multiply_lower_tri_self_transpose(L_Omega);
+}
+```
+
+The same could be done for the seemingly unrelated
+regressions in the previous section.
+
+## Applications of Pseudorandom Number Generation
+
+The main application of pseudorandom number generator (PRNGs) is for
+posterior inference, including prediction and posterior predictive
+checks.  They can also be used for pure data simulation, which is like
+a posterior predictive check with no conditioning.  See the function
+reference manual for a complete description of the syntax and usage of
+pseudorandom number generators.
+
+
+### Prediction {-}
+
+Consider predicting unobserved outcomes using linear
+regression.  Given predictors $x_1, \ldots, x_N$ and observed outcomes
+$y_1,\ldots,y_N$, and assuming a standard linear regression with
+intercept $\alpha$, slope $\beta$, and error scale $\sigma$, along with
+improper uniform priors, the posterior over the parameters given $x$
+and $y$ is
+
+$$
+p(\alpha, \beta, \sigma \, | \, x, y)
+\propto
+\prod_{n=1}^N
+  \mathsf{normal}(y_n \, | \, \alpha + \beta x_n, \sigma).
+$$
+
+For this model, the posterior predictive inference for a new outcome
+$\tilde{y}_m$ given a predictor $\tilde{x}_m$, conditioned on the
+observed data $x$ and $y$, is
+$$
+p(\tilde{y}_n \, | \, \tilde{x}_n, x, y)
+= \int_{(\alpha,\beta,\sigma)}
+  \mathsf{normal}(\tilde{y}_n \, | \, \alpha + \beta \tilde{x}_n, \sigma)
+  *
+  p(\alpha, \beta, \sigma \, | \, x, y)
+  \
+  \mathrm{d}(\alpha,\beta,\sigma).
+$$
+
+To code the posterior predictive inference in Stan, a standard linear
+regression is combined with a random number in the generated
+quantities block.
+
+```
+data {
+  int<lower=0> N;
+  vector[N] y;
+  vector[N] x;
+  int<lower=0> N_tilde;
+  vector[N_tilde] x_tilde;
+}
+parameters {
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
+}
+model {
+  y ~ normal(alpha + beta * x, sigma);
+}
+generated quantities {
+  vector[N_tilde] y_tilde;
+  for (n in 1:N_tilde)
+    y_tilde[n] = normal_rng(alpha + beta * x_tilde[n], sigma);
+}
+```
+
+Given observed predictors $x$ and outcomes $y$, `y_tilde` will
+be drawn according to $p(\tilde{y} \, | \, \tilde{x}, y, x)$.  This
+means that, for example, the posterior mean for `y_tilde` is the
+estimate of the outcome that minimizes expected square error
+(conditioned on the data and model).
+
+### Posterior Predictive Checks {-}
+
+A good way to investigate the fit of a model to the data, a critical
+step in Bayesian data analysis, is to generate simulated data
+according to the parameters of the model.  This is carried out with
+exactly the same procedure as before, only the observed data
+predictors $x$ are used in place of new predictors $\tilde{x}$ for
+unobserved outcomes.  If the model fits the data well, the predictions
+for $\tilde{y}$ based on $x$ should match the observed data $y$.
+
+To code posterior predictive checks in Stan requires only a slight
+modification of the prediction code to use $x$ and $N$ in place of
+$\tilde{x}$ and $\tilde{N}$,
+
+```
+generated quantities {
+  vector[N] y_tilde;
+  for (n in 1:N)
+    y_tilde[n] = normal_rng(alpha + beta * x[n], sigma);
+}
+```
+
+@GelmanEtAl:2013 recommend choosing several posterior draws
+$\tilde{y}^{(1)}, \ldots, \tilde{y}^{(M)}$ and plotting each of them
+alongside the data $y$ that was actually observed.  If the model fits
+well, the simulated $\tilde{y}$ will look like the actual data $y$.
+
+
+

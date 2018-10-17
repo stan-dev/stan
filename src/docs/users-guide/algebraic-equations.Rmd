@@ -1,0 +1,179 @@
+# Solving Algebraic Equations  {#algebra-solver.chapter}
+
+Stan provides a built-in mechanism for specifying and solving systems
+of algebraic equations, using the Powell hybrid method [@Powell:1970].
+The function signatures for Stan's algebraic solver aref ully
+described in the algebraic solver section of the reference manual.
+
+Solving any system of algebraic equations can be translated into a root-finding
+problem, that is, given a function $f$, we wish to find $y$ such that
+$f(y) = 0$.
+
+## Example: System of Nonlinear Algebraic Equations
+
+For systems of linear algebraic equations, we recommend solving the system
+using matrix division. The algebraic solver becomes handy when we want
+to solve nonlinear equations.
+
+As an illustrative example, we consider the following nonlinear system of two equations
+with two unknowns:
+
+$$
+  z_1 = y_1 - \theta_1 \\
+  z_2 = y_1 y_2 + \theta_2
+$$
+
+Our goal is to simultaneously solve all equations for
+$y_1$ and $y_2$, such that the vector $z$ goes to 0.
+
+## Coding an Algebraic System
+
+A system of algebraic equations is coded directly in Stan as a
+function with a strictly specified signature. For example, the
+nonlinear system given above can be coded using the
+following function in Stan (see the [user-defined functions
+section](#functions-programming) for more information on coding
+user-defined functions).
+
+```
+vector system(vector y,        // unknowns
+              vector theta,    // parameters
+              real[] x_r,      // data (real)
+              int[] x_i) {     // data (integer)
+  vector[2] z;
+  z[1] = y[1] - theta[1];
+  z[2] = y[1] * y[2] - theta[2];
+  return z;
+}
+```
+
+The function takes the unknowns we wish to solve for in `y` (a
+vector), the system parameters in `theta` (a vector), the real
+data in `x_r` (a real array) and the integer data in `x_i`
+(an integer array). The system function returns the value of the
+function (a vector), for which we want to compute the roots. Our
+example does not use real or integer data. Nevertheless, these unused
+arguments must be included in the system function with exactly the
+signature above.
+
+The body of the system function here could also be coded using a row
+vector constructor and transposition,
+
+```
+  return [ y[1] - theta[1],
+           y[1] * y[2] - theta[2] ]';
+```
+
+As systems get more complicated, naming the intermediate expressions
+goes a long way toward readability.
+
+
+
+#### Strict Signature {-}
+
+The function defining the system must have exactly these argument types and
+return type. This may require passing in zero-length arrays for data or a zero-length
+vector for parameters if the system does not involve data or parameters.
+
+## Calling the Algebraic Solver
+
+Let's suppose $\theta = (3, 6)$. To call the algebraic solver, we need to
+provide an initial guess. This varies on a case-by-case basis, but in general
+a good guess will speed up the solver and, in pathological cases, even determine
+whether the solver converges or not. If the solver does not converge, the metropolis
+proposal gets rejected and a warning message, stating no acceptable solution was
+found, is issued.
+
+The solver has three tuning parameters to determine convergence: the
+relative tolerance, the function tolerance, and the maximum number of
+steps.  Their behavior is explained in
+the section about [algebraic solvers with control
+parameters](#algebra-control.section).
+
+The following code returns the solution to our nonlinear algebraic system:
+
+```
+transformed data {
+  vector[2] y_guess = {1, 1};
+  real x_r[0];
+  int x_i[0];
+}
+
+transformed parameters {
+  vector[2] theta = {3, 6};
+  vector[2] y;
+
+  y = algebra_solver(system, y_guess, theta, x_r, x_i);
+}
+```
+
+which returns $y = (3, -2)$.
+
+### Data versus Parameters {-}
+The arguments for the real data `x_r` and
+the integer data `x_i` must be expressions that only involve data or
+transformed data variables. `theta`, on the other hand,
+must only involve parameters. Note there are no restrictions on the initial guess,
+`y_guess`, which may be a data or a parameter vector.
+
+### Length of the Algebraic Function and of the Vector of Unknowns {-}
+The Jacobian of the solution with respect to the parameters is computed
+using the implicit function theorem, which imposes certain restrictions. In particular,
+the Jacobian of the algebraic function $f$ with respect to the unknowns $x$ must
+be invertible. This requires the Jacobian to be square, meaning \textit{$f(y)$ and
+$y$ have the same length} or, in other words \textit{the number of equations in
+the system is the same as the number of unknowns.}
+
+### Pathological Solutions {-}
+Certain systems may be degenerate, meaning they have multiple solutions. The
+algebraic solver will not report these cases, as the algorithm stops once it has found
+an acceptable solution. The initial guess will often determine which solution gets found
+first. The degeneracy may be broken by putting additional constraints on the solution.
+For instance, it might make "physical sense" for a solution to be positive or negative.
+
+On the other hand, a system may not have a solution (for a given point in the parameter
+space). In that case, the solver will not converge to a solution. When the solver fails to
+do so, the current metropolis proposal gets rejected.
+
+## Control Parameters for the Algebraic Solver {#algebra-control.section}
+
+The call to the algebraic solver shown above uses the default control settings. The solver
+allows three additional parameters, all of which must be supplied if any of them is
+supplied.
+
+```
+  y = algebra_solver(system, y_guess, theta, x_r, x_i,
+                     rel_tol, f_tol, max_steps);
+```
+
+The three control arguments are relative tolerance, function tolerance, and maximum
+number of steps. Both tolerances need to be satisfied. If one of them is not met, the
+metropolis proposal gets rejected with a warning message explaining which criterion
+was not satisfied. The default values for the control arguments are respectively
+`1e-10` ($10^{-10}$), `1e-6` ($10^{-6}$), and `1e3` ($10^3$).
+
+### Tolerance {-}
+
+The relative and function tolerances control the accuracy of the solution generated by
+the solver. Relative tolerances are relative to the solution value. The function tolerance
+is the norm of the algebraic function, once we plug in the proposed solution. This norm
+should go to 0 (equivalently, all elements of the vector function are 0). It helps to think about this
+geometrically. Ideally the output of the algebraic function is at the origin; the norm measures
+deviations from this ideal. As the length of the return vector increases, a certain
+function tolerance becomes an increasingly difficult criterion to meet, given each
+individual element of the vector contribute to the norm.
+
+Smaller relative tolerances produce more accurate solutions but require more computational time.
+
+#### Sensitivity Analysis {-}
+
+The tolerances should be set low enough that setting them lower does not change the
+statistical properties of posterior samples generated by the Stan program.
+
+### Maximum Number of Steps {-}
+
+The maximum number of steps can be used to stop a runaway simulation. This can arise in
+MCMC when a bad jump is taken, particularly during warmup. If the limit is hit, the
+current metropolis proposal gets rejected. Users will see a  warning message stating the
+maximum number of steps has been exceeded.
+

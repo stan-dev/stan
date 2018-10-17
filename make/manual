@@ -5,12 +5,8 @@ STAN_MINOR := $(shell grep "\#define STAN_MINOR" $(STAN)src/stan/version.hpp | s
 STAN_PATCH := $(shell grep "\#define STAN_PATCH" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_PATCH \(.*\)/\1/')
 VERSION_STRING := $(STAN_MAJOR).$(STAN_MINOR).$(STAN_PATCH)
 
-doc: users-guide reference-manual
-manual: users-guide
-
-users-guide: $(STAN)src/docs/users-guide/users-guide.pdf $(STAN)src/docs/functions/functions-reference.pdf $(STAN)src/docs/functions/stan-functions.txt
-	@mkdir -p doc/
-	$(foreach artifact, $^, cp $(artifact) doc/$(basename $(notdir $(artifact)))-$(VERSION_STRING)$(suffix $(artifact));)
+doc: users-guide reference-manual $(STAN)src/docs/functions/stan-functions.txt
+manual: doc
 
 $(STAN)src/docs/functions/stan-functions.txt: $(STAN)src/docs/functions/functions-reference.pdf
 	@echo '  building $@'
@@ -58,12 +54,25 @@ $(STAN)doc/reference-manual/index.html:  $(STAN)src/docs/reference-manual/*.Rmd 
 	mkdir -p $(STAN)doc/reference-manual
 	mv -f $(STAN)src/docs/reference-manual/_book/* $(STAN)doc/reference-manual
 
+users-guide: $(STAN)doc/users-guide-$(VERSION_STRING).pdf $(STAN)doc/users-guide/index.html
+
+$(STAN)doc/users-guide-$(VERSION_STRING).pdf: $(STAN)src/docs/users-guide/*.Rmd $(STAN)src/docs/users-guide/*.yml $(STAN)src/docs/users-guide/*.R $(STAN)src/docs/users-guide/*.css $(STAN)src/docs/users-guide/*.tex
+	cd $(STAN)src/docs/users-guide; Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::pdf_book')"
+	mkdir -p $(STAN)doc
+	mv -f src/docs/users-guide/_book/_main.pdf doc/users-guide-$(VERSION_STRING).pdf
+
+$(STAN)doc/users-guide/index.html:  $(STAN)src/docs/users-guide/*.Rmd $(STAN)src/docs/users-guide/*.yml $(STAN)src/docs/users-guide/*.R $(STAN)src/docs/users-guide/*.css $(STAN)src/docs/users-guide/*.tex
+	cd $(STAN)src/docs/users-guide; Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::gitbook')"
+	rm -rf $(STAN)doc/users-guide
+	mkdir -p $(STAN)doc/users-guide
+	mv -f $(STAN)src/docs/users-guide/_book/* $(STAN)doc/users-guide
+
 clean-docs:
 	rm -rf $(STAN)doc
-	cd $(STAN)src/docs/users-guide; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa *.fdb_latexmk *.fls
 	cd $(STAN)src/docs/functions; $(RM) *.brf *.aux *.bbl *.blg *.log *.toc *.pdf *.out *.idx *.ilg *.ind *.cb *.cb2 *.upa *.fdb_latexmk *.fls
 	rm -rf $(STAN)src/docs/functions/functions-reference.pdf
 	rm -rf $(STAN)src/docs/functions/stan-functions.txt
-	rm -rf $(STAN)src/docs/users-guide/users-guide.pdf
 	rm -rf $(STAN)src/docs/reference-manual/_book/
 	rm -rf $(STAN)src/docs/reference-manual/_main.rds
+	rm -rf $(STAN)src/docs/users-guide/_book/
+	rm -rf $(STAN)src/docs/users-guide/_main.rds

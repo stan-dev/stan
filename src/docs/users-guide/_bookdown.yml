@@ -1,0 +1,51 @@
+new_session: yes
+before_chapter_script: "before-chapter.R"
+delete_merged_file: TRUE
+rmd_files: [
+  "index.Rmd",
+
+  "part1.Rmd",
+  "introduction.Rmd",
+  "prior-data-models.Rmd",
+  "simple-examples.Rmd",
+  "workflow.Rmd",
+
+  "part2.Rmd",
+  "regression.Rmd",
+  "time-series.Rmd",
+  "missing-data.Rmd",
+  "floating-point.Rmd",
+  "truncation-censoring.Rmd",
+  "finite-mixtures.Rmd",
+  "measurement-error.Rmd",
+  "latent-discrete.Rmd",
+  "sparse-ragged.Rmd",
+  "clustering.Rmd",
+  "gaussian-processes.Rmd",
+  "hyperspherical-models.Rmd",
+  "algebraic-equations.Rmd",
+  "odes.Rmd",
+
+  "part3.Rmd",
+  "modeling-as-software.Rmd",
+  "matrices-arrays.Rmd",
+  "multi-indexing.Rmd",
+  "user-functions.Rmd",
+  "custom-probability.Rmd",
+  "problematic-posteriors.Rmd",
+  "reparameterization.Rmd",
+  "efficiency-tuning.Rmd",
+  "map-reduce.Rmd",
+
+  "part4.Rmd",
+  "bayesian-data-analysis.Rmd",
+  "maximum-likelihood.Rmd",
+  "bayesian-estimation.Rmd",
+  "variational-inference.Rmd",
+
+  "part-appendices.Rmd",
+  "style-guide.Rmd",
+  "for-bugs-users.Rmd",
+
+  "references.Rmd"
+]

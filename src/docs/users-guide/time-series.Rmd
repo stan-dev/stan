@@ -1,0 +1,935 @@
+
+# Time-Series Models  {#time-series.chapter}
+
+
+Times series data come arranged in temporal order.  This chapter
+presents two kinds of time series models, regression-like models such
+as autoregressive and moving average models, and hidden Markov models.
+
+The [Gaussian processes chapter](#gaussian-processes.chapter) presents
+Gaussian processes, which may also be used for time-series (and
+spatial) data.
+
+
+## Autoregressive Models {#autoregressive.section}
+
+A first-order autoregressive model (AR(1)) with normal noise takes
+each point $y_n$ in a sequence $y$ to be generated according to
+
+$$
+y_n \sim \mathsf{normal}(\alpha + \beta y_{n-1}, \sigma).
+$$
+
+That is, the expected value of $y_n$ is $\alpha + \beta y_{n-1}$, with
+noise scaled as $\sigma$.
+
+### AR(1) Models {-}
+
+With improper flat priors on the regression coefficients $\alpha$ and
+$\beta$ and on the positively-constrained noise scale ($\sigma$), the
+Stan program for the AR(1) model is as follows.^[The intercept in this model is $\alpha / (1 - \beta)$.  An alternative parameterization in terms of an intercept $\gamma$ suggested Mark Scheuerell on GitHub is $y_n \sim \mathsf{normal}(\alpha + \gamma \cdot (y_{n-1} - \alpha), \sigma)$.]
+
+```
+data {
+  int<lower=0> N;
+  vector[N] y;
+}
+parameters {
+  real alpha;
+  real beta;
+  real<lower=0> sigma;
+}
+model {
+  for (n in 2:N)
+    y[n] ~ normal(alpha + beta * y[n-1], sigma);
+}
+```
+
+The first observed data point, `y[1]`, is not modeled here
+because there is nothing to condition on; instead, it acts to
+condition `y[2]`.  This model also uses an improper prior for
+`sigma`, but there is no obstacle to adding an informative prior
+if information is available on the scale of the changes in `y`
+over time, or a weakly informative prior to help guide inference if
+rough knowledge of the scale of `y` is available.
+
+#### Slicing for Efficiency {-}
+
+Although perhaps a bit more difficult to read, a much more efficient
+way to write the above model is by slicing the vectors, with the model
+above being replaced with the one-liner
+
+```
+model {
+  y[2:N] ~ normal(alpha + beta * y[1:(N - 1)], sigma);
+}
+```
+
+The left-hand side slicing operation pulls out the last $N-1$
+elements and the right-hand side version pulls out the first $N-1$.
+
+
+
+### Extensions to the AR(1) Model {-}
+
+Proper priors of a range of different families may be added for the
+regression coefficients and noise scale.  The normal noise model can
+be changed to a Student-$t$ distribution or any other distribution
+with unbounded support.  The model could also be made hierarchical if
+multiple series of observations are available.
+
+To enforce the estimation of a stationary AR(1) process, the slope
+coefficient `beta` may be constrained with bounds as follows.
+
+```
+real<lower=-1,upper=1> beta;
+```
+
+In practice, such a constraint is not recommended.  If the data are not well fit by a 
+stationary model it is best to know this.
+Stationary parameter estimates can be encouraged with a prior favoring
+values of `beta` near zero.
+
+
+### AR(2) Models {-}
+
+Extending the order of the model is also straightforward.  For
+example, an AR(2) model could be coded with the second-order
+coefficient `gamma` and the following model statement.
+
+```
+for (n in 3:N)
+  y[n] ~ normal(alpha + beta*y[n-1] + gamma*y[n-2], sigma);
+```
+
+
+### AR($K$) Models {-}
+
+A general model where the order is itself given as data can be coded
+by putting the coefficients in an array and computing the linear
+predictor in a loop.
+
+```
+data {
+  int<lower=0> K;
+  int<lower=0> N;
+  real y[N];
+}
+parameters {
+  real alpha;
+  real beta[K];
+  real sigma;
+}
+model {
+  for (n in (K+1):N) {
+    real mu = alpha;
+    for (k in 1:K)
+      mu += beta[k] * y[n-k];
+    y[n] ~ normal(mu, sigma);
+  }
+}
+```
+
+### ARCH(1) Models {-}
+
+Econometric and financial time-series models usually assume
+heteroscedasticity: hey allow the scale of the noise terms
+defining the series to vary over time.
+The simplest such model is the autoregressive conditional
+heteroscedasticity (ARCH) model @Engle:1982.  Unlike the
+autoregressive model AR(1), which modeled the mean of the series as
+varying over time but left the noise term fixed, the ARCH(1) model
+takes the scale of the noise terms to vary over time but leaves the
+mean term fixed.  Models could be defined where both the
+mean and scale vary over time; the econometrics literature presents a
+wide range of time-series modeling choices.
+
+The ARCH(1) model is typically presented as the following sequence of
+equations, where $r_t$ is the observed return at time point $t$
+and $\mu$, $\alpha_0$, and $\alpha_1$ are unknown regression coefficient parameters.
+
+$$
+\begin{array}{rcl}
+r_t & = & \mu + a_t
+\\[2pt]
+a_t & = & \sigma_t \epsilon_t
+\\[2pt]
+\epsilon_t & \sim & \mathsf{normal}(0,1)
+\\[2pt]
+\sigma^2_t & = & \alpha_0 + \alpha_1 a_{t-1}^2
+\end{array}
+$$
+
+In order to ensure the noise terms $\sigma^2_t$ are positive, the
+scale coefficients are constrained to be positive, $\alpha_0, \alpha_1
+> 0$.  To ensure stationarity of the time series, the slope is
+constrained to to be less than one, i.e., $\alpha_1 < 1$.^[In practice, it can be useful to remove the constraint to test whether a non-stationary set of coefficients provides a better fit to the data.  It can also be useful to add a trend term to the model, because an unfitted trend will manifest as non-stationarity.]
+
+The ARCH(1) model may be coded directly in Stan as follows.
+
+```
+data {
+  int<lower=0> T;   // number of time points
+  real r[T];        // return at time t
+}
+parameters {
+  real mu;                       // average return
+  real<lower=0> alpha0;          // noise intercept
+  real<lower=0,upper=1> alpha1;  // noise slope
+}
+model {
+  for (t in 2:T)
+    r[t] ~ normal(mu, sqrt(alpha0 + alpha1 * pow(r[t-1] - mu,2)));
+}
+```
+
+The loop in the model is defined so that the return at time $t=1$ is
+not modeled; the model in the next section shows how to model the
+return at $t=1$.  The model can be vectorized to be more efficient;
+the model in the next section provides an example.
+
+## Modeling Temporal Heteroscedasticity
+
+A set of variables is homoscedastic if their variances are all the
+same; the variables are heteroscedastic if they do not all have the
+same variance.  Heteroscedastic time-series models allow the noise
+term to vary over time.
+
+### GARCH(1,1) Models {-}
+
+The basic generalized autoregressive conditional heteroscedasticity
+(GARCH) model, GARCH(1,1), extends the ARCH(1) model by including the
+squared previous difference in return from the mean at time $t-1$ as a
+predictor of volatility at time $t$, defining
+
+$$
+\sigma^2_t = \alpha_0 + \alpha_1 a^2_{t-1} + \beta_1 \sigma^2_{t-1}.
+$$
+
+To ensure the scale term is positive and the resulting time series
+stationary, the coefficients must all satisfy $\alpha_0, \alpha_1,
+\beta_1 > 0$ and the slopes $\alpha_1 + \beta_1 < 1$.
+
+```
+data {
+  int<lower=0> T;
+  real r[T];
+  real<lower=0> sigma1;
+}
+parameters {
+  real mu;
+  real<lower=0> alpha0;
+  real<lower=0,upper=1> alpha1;
+  real<lower=0,upper=(1-alpha1)> beta1;
+}
+transformed parameters {
+  real<lower=0> sigma[T];
+  sigma[1] = sigma1;
+  for (t in 2:T)
+    sigma[t] = sqrt(alpha0
+                     + alpha1 * pow(r[t-1] - mu, 2)
+                     + beta1 * pow(sigma[t-1], 2));
+}
+model {
+  r ~ normal(mu, sigma);
+}
+```
+
+To get the recursive definition of the volatility regression off the
+ground, the data declaration includes a non-negative value
+`sigma1` for the scale of the noise at $t = 1$.
+
+The constraints are coded directly on the parameter declarations.
+This declaration is order-specific in that the constraint on `beta1`
+depends on the value of `alpha1`.
+
+A transformed parameter array of non-negative values `sigma` is
+used to store the scale values at each time point.  The definition of
+these values in the transformed parameters block is where the
+regression is now defined.  There is an intercept `alpha0`, a
+slope `alpha1` for the squared difference in return from the mean
+at the previous time, and a slope `beta1` for the previous noise
+scale squared.  Finally, the whole regression is inside the
+`sqrt` function because Stan requires scale (deviation) parameters (not
+variance parameters) for the normal distribution.
+
+With the regression in the transformed parameters block, the model
+reduces a single vectorized sampling statement.  Because `r` and
+`sigma` are of length `T`, all of the data are modeled
+directly.
+
+
+## Moving Average Models
+
+A moving average model uses previous errors as predictors for future
+outcomes.  For a moving average model of order $Q$, $\mbox{MA}(Q)$,
+there is an overall mean parameter $\mu$ and regression coefficients
+$\theta_q$ for previous error terms.  With $\epsilon_t$ being the
+noise at time $t$, the model for outcome $y_t$ is defined by
+$$
+y_t = \mu + \theta_1 \epsilon_{t-1} + \cdots + \theta_Q \epsilon_{t-Q}
++ \epsilon_t,
+$$
+with the noise term $\epsilon_t$ for outcome $y_t$ modeled as
+normal,
+$$
+\epsilon_t \sim \mathsf{normal}(0,\sigma).
+$$
+In a proper Bayesian model, the parameters $\mu$, $\theta$, and
+$\sigma$ must all be given priors.
+
+### MA(2) Example {-}
+
+An $\mbox{MA}(2)$ model can be coded in Stan as follows.
+
+```
+data {
+  int<lower=3> T;  // number of observations
+  vector[T] y;     // observation at time T
+}
+parameters {
+  real mu;              // mean
+  real<lower=0> sigma;  // error scale
+  vector[2] theta;      // lag coefficients
+}
+transformed parameters {
+  vector[T] epsilon;    // error terms
+  epsilon[1] = y[1] - mu;
+  epsilon[2] = y[2] - mu - theta[1] * epsilon[1];
+  for (t in 3:T)
+    epsilon[t] = ( y[t] - mu
+                    - theta[1] * epsilon[t - 1]
+                    - theta[2] * epsilon[t - 2] );
+}
+model {
+  mu ~ cauchy(0, 2.5);
+  theta ~ cauchy(0, 2.5);
+  sigma ~ cauchy(0, 2.5);
+  for (t in 3:T)
+    y[t] ~ normal(mu
+                  + theta[1] * epsilon[t - 1]
+                  + theta[2] * epsilon[t - 2],
+                  sigma);
+}
+```
+
+The error terms $\epsilon_t$ are defined as transformed parameters in
+terms of the observations and parameters.  The definition of the
+sampling statement (defining the likelihood) follows the definition,
+which can only be applied to $y_n$ for $n > Q$.  In this example, the
+parameters are all given Cauchy (half-Cauchy for $\sigma$) priors,
+although other priors can be used just as easily.
+
+This model could be improved in terms of speed by vectorizing the
+sampling statement in the model block.  Vectorizing the calculation of
+the $\epsilon_t$ could also be sped up by using a dot product instead
+of a loop.
+
+
+### Vectorized MA(Q) Model} {-}
+
+A general $\mbox{MA}(Q)$ model with a vectorized sampling probability
+may be defined as follows.
+
+```
+data {
+  int<lower=0> Q;  // num previous noise terms
+  int<lower=3> T;  // num observations
+  vector[T] y;     // observation at time t
+}
+parameters {
+  real mu;              // mean
+  real<lower=0> sigma;  // error scale
+  vector[Q] theta;      // error coeff, lag -t
+}
+transformed parameters {
+  vector[T] epsilon;    // error term at time t
+  for (t in 1:T) {
+    epsilon[t] = y[t] - mu;
+    for (q in 1:min(t - 1, Q))
+      epsilon[t] = epsilon[t] - theta[q] * epsilon[t - q];
+  }
+}
+model {
+  vector[T] eta;
+  mu ~ cauchy(0, 2.5);
+  theta ~ cauchy(0, 2.5);
+  sigma ~ cauchy(0, 2.5);
+  for (t in 1:T) {
+    eta[t] = mu;
+    for (q in 1:min(t - 1, Q))
+      eta[t] = eta[t] + theta[q] * epsilon[t - q];
+  }
+  y ~ normal(eta, sigma);
+}
+```
+
+Here all of the data are modeled, with missing terms just dropped from
+the regressions as in the calculation of the error terms.  Both models
+converge  quickly and mix  well at convergence, with the
+vectorized model being faster (per iteration, not to
+converge --- they compute the same model).
+
+
+## Autoregressive Moving Average Models
+
+Autoregressive moving-average models (ARMA), combine the predictors
+of the autoregressive model and the moving average model.  An
+ARMA(1,1) model, with a single state of history, can be encoded in
+Stan as follows.
+
+```
+data {
+  int<lower=1> T;            // num observations
+  real y[T];                 // observed outputs
+}
+parameters {
+  real mu;                   // mean coeff
+  real phi;                  // autoregression coeff
+  real theta;                // moving avg coeff
+  real<lower=0> sigma;       // noise scale
+}
+model {
+  vector[T] nu;              // prediction for time t
+  vector[T] err;             // error for time t
+  nu[1] = mu + phi * mu;    // assume err[0] == 0
+  err[1] = y[1] - nu[1];
+  for (t in 2:T) {
+    nu[t] = mu + phi * y[t-1] + theta * err[t-1];
+    err[t] = y[t] - nu[t];
+  }
+  mu ~ normal(0, 10);         // priors
+  phi ~ normal(0, 2);
+  theta ~ normal(0, 2);
+  sigma ~ cauchy(0, 5);
+  err ~ normal(0, sigma);    // likelihood
+}
+```
+
+The data are declared in the same way as the other time-series
+regressions and the parameters are documented in the code.
+
+In the model block, the local vector `nu` stores the predictions
+and `err` the errors.  These are computed similarly to the
+errors in the moving average models described in the previous section.
+
+The priors are weakly informative for stationary processes.  The
+likelihood only involves the error term, which is efficiently
+vectorized here.
+
+Often in models such as these, it is desirable to inspect the
+calculated error terms.  This could easily be accomplished in Stan by
+declaring `err` as a transformed parameter, then defining it the
+same way as in the model above.  The vector `nu` could still be a
+local variable, only now it will be in the transformed parameter block.
+
+Wayne Folta suggested encoding the model without local vector
+variables as follows.
+
+```
+model {
+  real err;
+  mu ~ normal(0, 10);
+  phi ~ normal(0, 2);
+  theta ~ normal(0, 2);
+  sigma ~ cauchy(0, 5);
+  err = y[1] - mu + phi * mu;
+  err ~ normal(0, sigma);
+  for (t in 2:T) {
+    err = y[t] - (mu + phi * y[t-1] + theta * err);
+    err ~ normal(0, sigma);
+  }
+}
+```
+
+This approach to ARMA models illustrates how local
+variables, such as `err` in this case, can be reused in Stan.
+Folta's approach could be extended to higher order moving-average
+models by storing more than one error term as a local variable and
+reassigning them in the loop.
+
+Both encodings are  fast.  The original encoding has the advantage
+of vectorizing the normal distribution, but it uses a bit more memory.
+A halfway point would be to vectorize just `err`.
+
+### Identifiability and Stationarity {-}
+
+MA and ARMA models are not identifiable if the roots of the
+characteristic polynomial for the MA part lie inside the unit circle,
+so it's necessary to add the following constrain^[This subsection is a lightly edited comment of Jonathan Gilligan's on GitHub; see \url{https://github.com/stan-dev/stan/issues/1617\#issuecomment-160249142}]
+
+```
+real<lower = -1, upper = 1> theta;
+```
+
+When the model is run without the constraint, using synthetic data
+generated from the model, the simulation can sometimes find modes for
+(`theta`, `phi`) outside the $[-1,1]$ interval, which
+creates a multiple mode problem in the posterior and also causes the
+NUTS tree depth to get  large (often above 10). Adding the
+constraint both improves the accuracy of the posterior and
+dramatically reduces the tree depth, which speeds up the simulation
+considerably (typically by much more than an order of magnitude).
+
+Further, unless one thinks that the process is really non-stationary,
+it's worth adding the following constraint to ensure stationarity.
+
+```
+real<lower = -1, upper = 1> phi;
+```
+
+
+
+## Stochastic Volatility Models
+
+Stochastic volatility models treat the volatility (i.e., variance) of
+a return on an asset, such as an option to buy a security, as
+following a latent stochastic process in discrete time
+@KimShephardChib:1998.  The data consist of mean corrected
+(i.e., centered) returns $y_t$ on an underlying asset at $T$ equally
+spaced time points.  Kim et al.\ formulate a typical stochastic
+volatility model using the following regression-like equations, with a
+latent parameter $h_t$ for the log volatility, along with parameters
+$\mu$ for the mean log volatility, and $\phi$ for the persistence of
+the volatility term.  The variable $\epsilon_t$ represents the
+white-noise shock (i.e., multiplicative error) on the asset return at
+time $t$, whereas $\delta_t$ represents the shock on volatility at
+time $t$.
+$$
+y_t = \epsilon_t \exp(h_t / 2),
+$$
+$$
+h_{t+1} = \mu + \phi (h_t - \mu) + \delta_t \sigma
+$$
+$$
+h_1 \sim \mathsf{normal}\left( \mu, \frac{\sigma}{\sqrt{1 - \phi^2}} \right)
+$$
+$$
+\epsilon_t \sim \mathsf{normal}(0,1); \ \ \ \ \  \delta_t \sim \mathsf{normal}(0,1)
+$$
+
+Rearranging the first line, $\epsilon_t = y_t \exp(-h_t / 2)$,
+allowing the sampling distribution for $y_t$ to be written as
+$$
+y_t \sim \mathsf{normal}(0,\exp(h_t/2)).
+$$
+The recurrence equation for $h_{t+1}$ may be combined with the
+scaling and sampling of $\delta_t$ to yield the sampling distribution
+$$
+h_t \sim \mathsf{normal}(\mu + \phi(h_t - \mu), \sigma).
+$$
+This formulation can be directly encoded, as shown in the following
+Stan model.
+
+```
+data {
+  int<lower=0> T;   // # time points (equally spaced)
+  vector[T] y;      // mean corrected return at time t
+}
+parameters {
+  real mu;                     // mean log volatility
+  real<lower=-1,upper=1> phi;  // persistence of volatility
+  real<lower=0> sigma;         // white noise shock scale
+  vector[T] h;                 // log volatility at time t
+}
+model {
+  phi ~ uniform(-1, 1);
+  sigma ~ cauchy(0, 5);
+  mu ~ cauchy(0, 10);
+  h[1] ~ normal(mu, sigma / sqrt(1 - phi * phi));
+  for (t in 2:T)
+    h[t] ~ normal(mu + phi * (h[t - 1] -  mu), sigma);
+  for (t in 1:T)
+    y[t] ~ normal(0, exp(h[t] / 2));
+}
+```
+
+Compared to the Kim et al.\ formulation, the Stan model adds priors
+for the parameters $\phi$, $\sigma$, and $\mu$.  The shock
+terms $\epsilon_t$ and $\delta_t$ do not appear explicitly in the
+model, although they could be calculated efficiently in a generated
+quantities block.
+
+The posterior of a stochastic volatility model such as this one
+typically has high posterior variance.  For example, simulating 500
+data points from the above model with $\mu = -1.02$, $\phi = 0.95$,
+and $\sigma = 0.25$ leads to 95% posterior intervals for $\mu$ of
+$(-1.23, -0.54)$, for $\phi$ of $(0.82,0.98 )$ and for $\sigma$ of
+$(0.16,0.38)$.
+
+The samples using NUTS show a high degree of autocorrelation among the
+samples, both for this model and the stochastic volatility model
+evaluated in [@Hoffman-Gelman:2011; @Hoffman-Gelman:2014].
+Using a non-diagonal mass
+matrix provides faster convergence and more effective samples than a
+diagonal mass matrix, but will not scale to large values of $T$.
+
+It is relatively straightforward to speed up the effective samples per
+second generated by this model by one or more orders of magnitude.
+First, the sampling statements for return $y$ is easily vectorized to
+
+```
+y ~ normal(0, exp(h / 2));
+```
+
+This speeds up the iterations, but does not change the effective
+sample size because the underlying parameterization and log
+probability function have not changed.  Mixing is improved by by
+reparameterizing in terms of a standardized volatility, then
+rescaling.  This requires a standardized parameter `h_std` to be
+declared instead of `h`.
+```
+parameters {
+  ...
+  vector[T] h_std;             // std log volatility time t
+```
+
+The original value of `h` is then defined in a transformed
+parameter block.
+
+```
+transformed parameters {
+  vector[T] h = h_std * sigma;  // now h ~ normal(0, sigma)
+  h[1] /= sqrt(1 - phi * phi);  // rescale h[1]
+  h += mu;
+  for (t in 2:T)
+    h[t] += phi * (h[t-1] - mu);
+}
+```
+
+The first assignment rescales `h_std` to have a
+$\mathsf{normal}(0,\sigma)$ distribution and temporarily assigns it to
+`h`.  The second assignment rescales `h[1]` so that its
+prior differs from that of `h[2]` through `h[T]`.  The next
+assignment supplies a `mu` offset, so that `h[2]` through
+`h[T]` are now distributed $\mathsf{normal}(\mu,\sigma)$; note
+that this shift must be done after the rescaling of `h[1]`.  The
+final loop adds in the moving average so that `h[2]` through
+`h[T]` are appropriately modeled relative to `phi` and
+`mu`.
+
+As a final improvement, the sampling statement for `h[1]` and
+loop for sampling `h[2]` to `h[T]` are replaced with a
+single vectorized standard normal sampling statement.
+
+```
+model {
+  ...
+  h_std ~ std_normal();
+```
+
+Although the original model can take hundreds and sometimes thousands
+of iterations to converge, the reparameterized model reliably
+converges in tens of iterations.  Mixing is also dramatically
+improved, which results in higher effective sample sizes per
+iteration.  Finally, each iteration runs in roughly a quarter of the
+time of the original iterations.
+
+## Hidden Markov Models {#hmms.section}
+
+A hidden Markov model (HMM) generates a sequence of $T$ output
+variables $y_t$ conditioned on a parallel sequence of latent
+categorical state variables $z_t \in \{1,\ldots, K\}$.  These
+``hidden" state variables are assumed to form a Markov chain so that
+$z_t$ is conditionally independent of other variables given $z_{t-1}$.
+This Markov chain is parameterized by a transition matrix $\theta$
+where $\theta_k$ is a $K$-simplex for $k \in \{1,\ldots, K\}$.  The
+probability of transitioning to state $z_t$ from state $z_{t-1}$ is
+$$
+z_t \sim \mathsf{Categorical}(\theta_{z[t-1]}).
+$$
+The output $y_t$ at time $t$ is generated conditionally independently
+based on the latent state $z_t$.
+
+This section describes HMMs with a simple categorical model for
+outputs $y_t \in \{1,\ldots,V\}$.  The categorical distribution for
+latent state $k$ is parameterized by a $V$-simplex $\phi_k$.  The
+observed output $y_t$ at time $t$ is generated based on the hidden
+state indicator $z_t$ at time $t$,
+$$
+y_t \sim \mathsf{Categorical}(\phi_{z[t]}).
+$$
+In short, HMMs form a discrete mixture model where the mixture
+component indicators form a latent Markov chain.
+
+
+
+### Supervised Parameter Estimation {-}
+
+In the situation where the hidden states are known, the following
+naive model can be used to fit the parameters $\theta$ and $\phi$.
+
+```
+data {
+  int<lower=1> K;  // num categories
+  int<lower=1> V;  // num words
+  int<lower=0> T;  // num instances
+  int<lower=1,upper=V> w[T]; // words
+  int<lower=1,upper=K> z[T]; // categories
+  vector<lower=0>[K] alpha;  // transit prior
+  vector<lower=0>[V] beta;   // emit prior
+}
+parameters {
+  simplex[K] theta[K];  // transit probs
+  simplex[V] phi[K];    // emit probs
+}
+model {
+  for (k in 1:K)
+    theta[k] ~ dirichlet(alpha);
+  for (k in 1:K)
+    phi[k] ~ dirichlet(beta);
+  for (t in 1:T)
+    w[t] ~ categorical(phi[z[t]]);
+  for (t in 2:T)
+    z[t] ~ categorical(theta[z[t - 1]]);
+}
+```
+
+Explicit Dirichlet priors have been provided for $\theta_k$ and
+$\phi_k$; dropping these two statements would implicitly take the
+prior to be uniform over all valid simplexes.
+
+### Start-State and End-State Probabilities {-}
+
+Although workable, the above description of HMMs is incomplete because
+the start state $z_1$ is not modeled (the index runs from 2 to $T$).
+If the data are conceived as a subsequence of a long-running process,
+the probability of $z_1$ should be set to the stationary state
+probabilities in the Markov chain.  In this case, there is no distinct
+end to the data, so there is no need to model the probability that the
+sequence ends at $z_T$.
+
+An alternative conception of HMMs is as models of finite-length
+sequences.  For example, human language sentences have distinct
+starting distributions (usually a capital letter) and ending
+distributions (usually some kind of punctuation).  The simplest way to
+model the sequence boundaries is to add a new latent state $K+1$,
+generate the first state from a categorical distribution with
+parameter vector $\theta_{K+1}$, and restrict the transitions so that
+a transition to state $K+1$ is forced to occur at the end of the
+sentence and is prohibited elsewhere.
+
+### Calculating Sufficient Statistics {-}
+
+The naive HMM estimation model presented above can be sped up
+dramatically by replacing the loops over categorical distributions
+with a single multinomial distribution.
+
+The data are declared as before.  The transformed data block
+computes the sufficient statistics for estimating the transition and
+emission matrices.
+
+```
+transformed data {
+  int<lower=0> trans[K, K];
+  int<lower=0> emit[K, V];
+  for (k1 in 1:K)
+    for (k2 in 1:K)
+      trans[k1, k2] = 0;
+  for (t in 2:T)
+    trans[z[t - 1], z[t]] += 1;
+  for (k in 1:K)
+    for (v in 1:V)
+      emit[k,v] = 0;
+  for (t in 1:T)
+    emit[z[t], w[t]] += 1;
+}
+```
+
+The likelihood component of the model based on looping over the input
+is replaced with multinomials as follows.
+
+```
+model {
+  ...
+  for (k in 1:K)
+    trans[k] ~ multinomial(theta[k]);
+  for (k in 1:K)
+    emit[k] ~ multinomial(phi[k]);
+}
+```
+
+In a continuous HMM with normal emission probabilities could be sped
+up in the same way by computing sufficient statistics.
+
+### Analytic Posterior {-}
+
+With the Dirichlet-multinomial HMM, the posterior can be computed analytically because the Dirichlet is the conjugate prior to the multinomial.  The following example illustrates how a Stan model can define the posterior analytically.  This is possible in the Stan language because the model only needs to define the conditional probability of the parameters given the data up to a proportion, which can be done by defining the (unnormalized) joint probability or the (unnormalized) conditional posterior, or anything in between.
+
+The model has the same data and parameters as the previous models, but
+now computes the posterior Dirichlet parameters in the transformed
+data block.
+
+```
+transformed data {
+  vector<lower=0>[K] alpha_post[K];
+  vector<lower=0>[V] beta_post[K];
+  for (k in 1:K)
+    alpha_post[k] = alpha;
+  for (t in 2:T)
+    alpha_post[z[t-1], z[t]] += 1;
+  for (k in 1:K)
+    beta_post[k] = beta;
+  for (t in 1:T)
+    beta_post[z[t], w[t]] += 1;
+}
+```
+
+The posterior can now be written analytically as follows.
+
+```
+model {
+  for (k in 1:K)
+    theta[k] ~ dirichlet(alpha_post[k]);
+  for (k in 1:K)
+    phi[k] ~ dirichlet(beta_post[k]);
+}
+```
+
+
+### Semisupervised Estimation {-}
+
+HMMs can be estimated in a fully unsupervised fashion without any data
+for which latent states are known.  The resulting posteriors are
+typically extremely multimodal.  An intermediate solution is to use
+semisupervised estimation, which is based on a combination of
+supervised and unsupervised data.  Implementing this estimation
+strategy in Stan requires calculating the probability of an output
+sequence with an unknown state sequence.  This is a marginalization
+problem, and for HMMs, it is computed with the so-called forward
+algorithm.
+
+In Stan, the forward algorithm is coded as follows.  First, two additional data variable are declared for the unsupervised data.
+
+```
+data {
+  ...
+  int<lower=1> T_unsup;  // num unsupervised items
+  int<lower=1,upper=V> u[T_unsup]; // unsup words
+  ...
+```
+
+The model for the supervised data does not change; the unsupervised
+data are handled with the following Stan implementation of the forward
+algorithm.
+
+```
+model {
+ ...
+  {
+    real acc[K];
+    real gamma[T_unsup, K];
+    for (k in 1:K)
+      gamma[1, k] = log(phi[k, u[1]]);
+    for (t in 2:T_unsup) {
+      for (k in 1:K) {
+        for (j in 1:K)
+          acc[j] = gamma[t-1, j] + log(theta[j, k]) + log(phi[k, u[t]]);
+        gamma[t, k] = log_sum_exp(acc);
+      }
+    }
+    target += log_sum_exp(gamma[T_unsup]);
+  }
+```
+
+The forward values `gamma[t,~k]` are defined to be the log
+marginal probability of the inputs `u[1],...,u[t]` up to time
+`t` and the latent state being equal to `k` at time
+`t`; the previous latent states are marginalized out.  The first
+row of `gamma` is initialized by setting `gamma[1,~k]` equal
+to the log probability of latent state `k` generating the first
+output `u[1]`; as before, the probability of the first latent
+state is not itself modeled.  For each subsequent time `t` and
+output `j`, the value `acc[j]` is set to the probability of
+the latent state at time `t-1` being `j`, plus the log
+transition probability from state `j` at time `t-1` to state
+`k` at time `t`, plus the log probability of the output
+`u[t]` being generated by state `k`.  The
+`log_sum_exp` operation just multiplies the probabilities for
+each prior state `j` on the log scale in an arithmetically stable
+way.
+
+The brackets provide the scope for the local variables `acc` and
+`gamma`; these could have been declared earlier, but it is
+clearer to keep their declaration near their use.
+
+
+### Predictive Inference {-}
+
+Given the transition and emission parameters, $\theta_{k, k'}$ and
+$\phi_{k,v}$ and an observation sequence $u_1,\ldots,u_T \in \{
+1,\ldots,V \}$, the Viterbi (dynamic programming) algorithm
+computes the state sequence which is most likely to have generated the
+observed output $u$.
+
+The Viterbi algorithm can be coded in Stan in the generated quantities
+block as follows.  The predictions here is the most likely state
+sequence `y_star[1], ..., y_star[T_unsup]` underlying the
+array of observations `u[1], ..., u[T_unsup]`.  Because this
+sequence is determined from the transition probabilities
+`theta` and emission probabilities `phi`, it may be
+different from sample to sample in the posterior.
+
+```
+generated quantities {
+  int<lower=1,upper=K> y_star[T_unsup];
+  real log_p_y_star;
+  {
+    int back_ptr[T_unsup, K];
+    real best_logp[T_unsup, K];
+    real best_total_logp;
+    for (k in 1:K)
+      best_logp[1, k] = log(phi[k, u[1]]);
+    for (t in 2:T_unsup) {
+      for (k in 1:K) {
+        best_logp[t, k] = negative_infinity();
+        for (j in 1:K) {
+          real logp;
+          logp = best_logp[t-1, j]
+                  + log(theta[j, k]) + log(phi[k, u[t]]);
+          if (logp > best_logp[t, k]) {
+            back_ptr[t, k] = j;
+            best_logp[t, k] = logp;
+          }
+        }
+      }
+    }
+    log_p_y_star = max(best_logp[T_unsup]);
+    for (k in 1:K)
+      if (best_logp[T_unsup, k] == log_p_y_star)
+        y_star[T_unsup] = k;
+    for (t in 1:(T_unsup - 1))
+      y_star[T_unsup - t] = back_ptr[T_unsup - t + 1,
+                                      y_star[T_unsup - t + 1]];
+  }
+}
+```
+
+The bracketed block is used to make the three variables
+`back_ptr`, `best_logp`, and `best_total_logp`
+local so they will not be output.  The variable `y_star` will
+hold the label sequence with the highest probability given the input
+sequence `u`.  Unlike the forward algorithm, where the
+intermediate quantities were total probability, here they consist of
+the maximum probability `best_logp[t,~k]` for the sequence up to
+time `t` with final output category `k` for time `t`,
+along with a backpointer to the source of the link.  Following the
+backpointers from the best final log probability for the final time
+`t` yields the optimal state sequence.
+
+This inference can be run for the same unsupervised outputs `u`
+as are used to fit the semisupervised model.  The above code can be
+found in the same model file as the unsupervised fit.  This is the
+Bayesian approach to inference, where the data being reasoned about is
+used in a semisupervised way to train the model.  It is not
+``cheating" because the underlying states for `u` are never
+observed --- they are just estimated along with all of the other
+parameters.
+
+If the outputs `u` are not used for semisupervised estimation but
+simply as the basis for prediction, the result is equivalent to what
+is represented in the BUGS modeling language via the cut operation.
+That is, the model is fit independently of `u`, then those
+parameters used to find the most likely state to have generated
+`u`.
+

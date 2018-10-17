@@ -37,6 +37,9 @@ stan.Rproj
 stan.kdev4
 .Rapp.history
 
+# R compiled objects
+*.rds
+
 # tests: compiled models
 /src/test/test-models/*.hpp
 /src/test/test-models/*/*.hpp

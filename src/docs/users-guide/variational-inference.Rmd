@@ -1,0 +1,124 @@
+# Variational Inference  {#vi-advanced.chapter}
+
+Stan implements an automatic variational inference algorithm based on
+transforming variables to the unconstrained scale and using a normal
+approximating distribution.
+
+Classical variational inference algorithms are difficult to derive. We
+must first define the family of approximating densities, and then
+calculate model-specific quantities relative to that family to solve
+the variational optimization problem.  Both steps require expert
+knowledge.  The resulting algorithm is tied to both the model and the
+chosen approximation.
+
+We begin by briefly describing the classical variational inference framework.
+For a thorough exposition, please refer to
+[@Jordan:1999; @Wainwright-Jordan:2008]; for a textbook presentation, please
+see @Bishop:2006. We follow with a high-level description of automatic
+differentiation variational inference (ADVI). For more details, see
+@Kucukelbir:2015.
+
+
+## Classical Variational Inference
+
+Variational inference approximates the
+posterior $p(\theta \, | \, y)$ with a simple, parameterized distribution
+$q(\theta \, | \, \phi)$. It matches the approximation to the
+true posterior by minimizing the Kullback-Leibler (KL) divergence,
+
+$$
+  \phi^* = \mbox{argmin}_\phi
+  \mbox{KL}{q(\theta \, | \, \phi) }{ p(\theta \mid y)}.
+$$
+
+Typically the KL divergence lacks an analytic, closed-form solution.
+Instead we maximize a proxy to the KL divergence, the so-called "evidence lower bound"
+(ELBO)
+
+$$
+  \mathcal{L} (\phi)
+  =
+  \mbox{E}_{q (\theta)} ( \log p (y,\theta) )
+  -
+  \mbox{E}_{q (\theta)} ( \log q (\theta\, | \,\phi) ).
+$$
+
+The first term is an expectation of the log
+joint density under the approximation, and the second is the entropy of the
+variational density. Maximizing the ELBO minimizes the KL
+divergence [@Jordan:1999; @Bishop:2006].
+
+
+## Automatic Variational Inference
+
+ADVI maximizes the ELBO in the real-coordinate space. Stan transforms the
+parameters from (potentially) constrained domains to
+the real-coordinate space. We denote the combined transformation as
+$T:\theta \to \zeta$, with the $\zeta$ variables living in $\mathbb{R}^K$.
+The variational objective (ELBO) becomes
+
+$$
+  \mathcal{L}(\phi)
+  =
+  \mbox{E}_{q(\zeta\,|\,\phi)}
+  \bigg(
+  \log p (y, T^{-1}(\zeta))
+  +
+  \log \big| \det J_{T^{-1}}(\zeta) \big|
+  \bigg)
+  -
+  \mbox{E}_{q (\zeta\, | \,\phi)} \big( \log q (\zeta\, | \,\phi) \big).
+$$
+
+Since the $\zeta$ variables live in the real-coordinate space, we can choose a
+fixed family for the variational distribution. We choose a fully-factorized
+Gaussian,
+
+$$
+  q(\zeta \, | \, \phi)
+  =
+  \mathsf{normal}\left(\zeta \, | \, \mu, \sigma\right)
+  =
+  \prod_{k=1}^K
+  \mathsf{normal}
+  \left(\zeta_k \, | \, \mu_k, \sigma_k\right),
+$$
+
+where the vector
+$\phi = (\mu_{1},\cdots,\mu_{K}, \sigma_ {1},\cdots,\sigma_{K})$
+concatenates the mean and standard deviation of each Gaussian factor.
+This reflects the "mean-field" assumption in classical variational
+inference algorithms; we will refer to this particular decomposition
+as the \texttt{meanfield} option.
+
+The transformation $T$ maps the support of the parameters to the real
+coordinate space. Thus, its inverse $T^{-1}$ maps back to the support of the
+latent variables. This implicitly defines the variational approximation in the
+original latent variable space as
+
+$$
+\mathsf{normal} \left(T(\theta) \, | \, \mu, \sigma\right)
+| \det J_{T}(\theta) |.
+$$
+This is, in general, not a Gaussian distribution.
+This choice may call to mind the Laplace approximation
+technique, where a second-order Taylor expansion around the
+maximum-a-posteriori estimate gives a Gaussian approximation to the
+posterior. However, they are not the same @Kucukelbir:2015.
+
+The variational objective (ELBO) that we maximize is,
+$$
+  \mathcal{L}(\phi)
+  =
+  \mbox{E}_{q(\zeta\, | \,\phi)}
+  \bigg(
+  \log p (y, T^{-1}(\zeta))
+  +
+  \log \big| \det J_{T^{-1}}(\zeta) \big|
+  \bigg)
+  +
+  \sum_{k=1}^K \log \sigma_k,
+$$
+where we plug in the analytic form for the Gaussian entropy and drop all terms
+that do not depend on $\phi$.  The algorithm used for optimization is
+described in the Stan reference manual chapter on variational inference.

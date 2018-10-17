@@ -1,0 +1,307 @@
+
+# Missing Data and Partially Known Parameters
+
+
+Bayesian inference supports a  general approach to missing data in
+which any missing data item is represented as a parameter that is
+estimated in the posterior @GelmanEtAl:2013.  If the missing
+data are not explicitly modeled, as in the predictors for most
+regression models, then the result is an improper prior on the
+parameter representing the missing predictor.
+
+Mixing arrays of observed and missing data can be difficult to
+include in Stan, partly because it can be tricky to model discrete
+unknowns in Stan and partly because unlike some other statistical
+languages (for example, R and Bugs), Stan requires observed and
+unknown quantities to be defined in separate places in the model. Thus
+it can be necessary to include code in a Stan program to splice
+together observed and missing parts of a data structure.  Examples are
+provided later in the chapter.
+
+## Missing Data
+
+Stan treats variables declared in the `data` and
+`transformed data` blocks as known and the variables in the
+`parameters` block as unknown.
+
+An example involving missing normal observation could be coded as follows.^[A more meaningful estimation example would involve a regression of the observed and missing observations using predictors that were known for each and specified in the `data` block.]
+
+```
+data {
+  int<lower=0> N_obs;
+  int<lower=0> N_mis;
+  real y_obs[N_obs];
+}
+parameters {
+  real mu;
+  real<lower=0> sigma;
+  real y_mis[N_mis];
+}
+model {
+  y_obs ~ normal(mu, sigma);
+  y_mis ~ normal(mu, sigma);
+}
+```
+
+The number of observed and missing data points are coded as data with
+non-negative integer variables `N_obs` and `N_mis`.  The
+observed data are provided as an array data variable `y_obs`.
+The missing data are coded as an array parameter, `y_mis`.  The
+ordinary parameters being estimated, the location `mu` and scale
+`sigma`, are also coded as parameters.  The model is vectorized
+on the observed and missing data; combining them in this case would be
+less efficient because the data observations would be promoted and
+have needless derivatives calculated.
+
+
+## Partially Known Parameters {#partially-known-parameters.section}
+
+In some situations, such as when a multivariate probability function
+has partially observed outcomes or parameters, it will be necessary to
+create a vector mixing known (data) and unknown (parameter) values.
+This can be done in Stan by creating a vector or array in the
+`transformed parameters` block and assigning to it.
+
+The following example involves a bivariate covariance matrix in which the
+variances are known, but the covariance is not.
+
+```
+data {
+  int<lower=0> N;
+  vector[2] y[N];
+  real<lower=0> var1;     real<lower=0> var2;
+}
+transformed data {
+  real<lower=0> max_cov = sqrt(var1 * var2);
+  real<upper=0> min_cov = -max_cov;
+}
+parameters {
+  vector[2] mu;
+  real<lower=min_cov, upper=max_cov> cov;
+}
+transformed parameters {
+  matrix[2, 2] Sigma;
+  Sigma[1, 1] = var1;     Sigma[1, 2] = cov;
+  Sigma[2, 1] = cov;      Sigma[2, 2] = var2;
+}
+model {
+  y ~ multi_normal(mu, Sigma);
+}
+```
+
+The variances are defined as data in variables `var1` and
+`var2`, whereas the covariance is defined as a parameter in
+variable `cov`.  The $2 \times 2$ covariance matrix `Sigma`
+is defined as a transformed parameter, with the variances assigned to
+the two diagonal elements and the covariance to the two off-diagonal
+elements.
+
+The constraint on the covariance declaration ensures that the
+resulting covariance matrix `sigma` is positive definite.  The
+bound, plus or minus the square root of the product of the variances,
+is defined as transformed data so that it is only calculated once.
+
+The vectorization of the multivariate normal is critical for
+efficiency here.  The transformed parameter `Sigma` could be
+defined as a local variable within the model block if
+
+## Sliced Missing Data
+
+If the missing data are part of some larger data structure, then it can
+often be effectively reassembled using index arrays and slicing.
+Here's an example for time-series data, where only some entries in the
+series are observed.
+
+```
+data {
+  int<lower = 0> N_obs;
+  int<lower = 0> N_mis;
+  int<lower = 1, upper = N_obs + N_mis> ii_obs[N_obs];
+  int<lower = 1, upper = N_obs + N_mis> ii_mis[N_mis];
+  real y_obs[N_obs];
+}
+transformed data {
+  int<lower = 0> N = N_obs + N_mis;
+}
+parameters {
+  real y_mis[N_mis];
+  real<lower=0> sigma;
+}
+transformed parameters {
+  real y[N];
+  y[ii_obs] = y_obs;
+  y[ii_mis] = y_mis;
+}
+model {
+  sigma ~ gamma(1, 1);
+  y[1] ~ normal(0, 100);
+  y[2:N] ~ normal(y[1:(N - 1)], sigma);
+}
+```
+
+The index arrays `ii_obs` and `ii_mis` contain the indexes into the
+final array `y` of the observed data (coded as a data vector `y_obs`)
+and the missing data (coded as a parameter vector `y_mis`).  See the
+[time series chapter](#time-series.chapter) for further discussion of
+time-series model and specifically the [autoregression
+section](autoregressive.section) for an explanation of the
+vectorization for `y` as well as an explanation of how to convert this
+example to a full AR(1) model.  To ensure `y[1]` has a proper
+posterior in case it is missing, we have given it an explicit, albeit
+broad, prior.
+
+Another potential application would be filling the
+columns of a data matrix of predictors for which some predictors are
+missing; matrix columns can be accessed as vectors and assigned the
+same way, as in
+
+```
+  x[N_obs_2, 2] = x_obs_2;
+  x[N_mis_2, 2] = x_mis_2;
+```
+
+where the relevant variables are all hard coded with index `2` because
+Stan doesn't support ragged arrays.  These could all be packed into a
+single array with more fiddly indexing that slices out vectors from
+longer vectors (see the [ragged data structures
+section](#ragged-data-structs.section) for a general discussion of
+coding ragged data structures in Stan).
+
+## Loading matrix for factor analysis
+
+Rick Farouni, on the Stan users group, inquired as to how to build
+a Cholesky factor for a covariance matrix with a unit diagonal, as
+used in Bayesian factor analysis @aguilar-west:2000.  This
+can be accomplished by declaring the below-diagonal elements as
+parameters, then filling the full matrix as a transformed parameter.
+
+```
+data {
+  int<lower=2> K;
+}
+transformed data {
+  int<lower=1> K_choose_2;
+  K_choose_2 = (K * (K - 1)) / 2;
+}
+parameters {
+  vector[K_choose_2] L_lower;
+}
+transformed parameters {
+  cholesky_factor_cov[K] L;
+  for (k in 1:K)
+    L[k, k] = 1;
+  {
+    int i;
+    for (m in 2:K) {
+      for (n in 1:(m - 1)) {
+        L[m, n] = L_lower[i];
+        L[n, m] = 0;
+        i += 1;
+      }
+    }
+  }
+}
+```
+
+It is most convenient to place a prior directly on `L_lower`.
+An alternative would be a prior for the full Cholesky factor `L`,
+because the transform from `L_lower` to `L` is just the
+identity and thus does not require a Jacobian adjustment (despite the
+warning from the parser, which is not smart enough to do the code
+analysis to infer that the transform is linear).  It would not be at
+all convenient to place a prior on the full covariance matrix `L
+  * L'`, because that would require a Jacobian adjustment; the exact
+adjustment is detailed in the reference manual.
+
+
+## Missing Multivariate Data
+
+It's often the case that one or more components of a multivariate
+outcome are missing^[This is not the same as missing components of a multivariate predictor in a regression problem; in that case, you will need to represent the missing data as a parameter and impute missing values in order to feed them into the regression.]
+
+As an example, we'll consider the bivariate distribution, which is
+easily marginalized.  The coding here is brute force, representing
+both an array of vector observations `y` and a boolean array
+`y_observed` to indicate which values were observed (others can
+have dummy values in the input).
+
+```
+vector[2] y[N];
+int<lower=0, upper=1> y_observed[N, 2];
+```
+
+If both components are observed, we model them using the full
+multi-normal, otherwise we model the marginal distribution of the
+component that is observed.
+
+```
+for (n in 1:N) {
+  if (y_observed[n, 1] && y_observed[n, 2])
+    y[n] ~ multi_normal(mu, Sigma);
+  else if (y_observed[n, 1])
+    y[n, 1] ~ normal(mu[1], sqrt(Sigma[1, 1]));
+  else if (y_observed[n, 2])
+    y[n, 2] ~ normal(mu[2], sqrt(Sigma[2, 2]));
+}
+```
+
+It's a bit more work, but much more efficient to vectorize these
+sampling statements.  In transformed data, build up three vectors of
+indices, for the three cases above:
+
+```
+transformed data {
+  int ns12[observed_12(y_observed)];
+  int ns1[observed_1(y_observed)];
+  int ns2[observed_2(y_observed)];
+}
+```
+
+You will need to write functions that pull out the count of
+observations in each of the three sampling situations.  This must be
+done with functions because the result needs to go in top-level block
+variable size declaration.  Then the rest of transformed data just
+fills in the values using three counters.
+
+```
+int n12 = 1;
+int n1 = 1;
+int n2 = 1;
+for (n in 1:N) {
+  if (y_observed[n, 1] && y_observed[n, 2]) {
+    ns12[n12] = n;
+    n12 += 1;
+  } else if (y_observed[n, 1]) {
+    ns1[n1] = n;
+    n1 += 1;
+  } else if (y_observed[n, 2]) {
+    ns2[n2] = n;
+    n2 += 1;
+  }
+}
+```
+
+Then, in the model block, everything is vectorizable
+using those indexes constructed once in transformed data:
+
+```
+y[ns12] ~ multi_normal(mu, Sigma);
+y[ns1] ~ normal(mu[1], sqrt(Sigma[1, 1]));
+y[ns2] ~ normal(mu[2], sqrt(Sigma[2, 2]));
+```
+
+The result will be much more efficient than using latent variables for
+the missing data, but it requires the multivariate distribution to be
+marginalized analytically.  It'd be more efficient still to precompute
+the three arrays in the transformed data block, though the efficiency
+improvement will be relatively minor compared to vectorizing the
+probability functions.
+
+This approach can easily be generalized with some index fiddling to
+the general multivariate case.  The trick is to pull out entries in
+the covariance matrix for the missing components.  It can also be used
+in situations such as multivariate differential equation solutions
+where only one component is observed, as in a phase-space experiment
+recording only time and position of a pendulum (and not recording
+momentum).
+

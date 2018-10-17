@@ -1,0 +1,1084 @@
+# Gaussian Processes  {#gaussian-processes.chapter}
+
+Gaussian processes are continuous stochastic processes and thus may be
+interpreted as providing a probability distribution over functions.  A
+probability distribution over continuous functions may be viewed,
+roughly, as an uncountably infinite collection of random variables,
+one for each valid input.  The generality of the supported functions
+makes Gaussian priors popular choices for priors in general
+multivariate (non-linear) regression problems.
+
+The defining feature of a Gaussian process is that the joint distribution of
+the function's value at a finite number of input points is a multivariate
+normal distribution.  This makes it tractable to both fit models from finite
+amounts of observed data and make predictions for finitely many new data
+points.
+
+Unlike a simple multivariate normal distribution, which is
+parameterized by a mean vector and covariance matrix, a Gaussian
+process is parameterized by a mean function and covariance function.
+The mean and covariance functions apply to vectors of inputs and
+return a mean vector and covariance matrix which provide the mean and
+covariance of the outputs corresponding to those input points in the
+functions drawn from the process.
+
+Gaussian processes can be encoded in Stan by implementing their mean and
+covariance functions and plugging the result into the Gaussian form of their
+sampling distribution, or by using the specialized covariance functions
+outlined below.  This form of model is straightforward and may be used for
+simulation, model fitting, or posterior predictive inference. A more efficient
+Stan implementation for the GP with a normally distributed outcome marginalizes
+over the latent Gaussian process, and applies a Cholesky-factor
+reparameterization of the Gaussian to compute the likelihood and the posterior
+predictive distribution analytically.
+
+After defining Gaussian processes, this chapter covers the basic
+implementations for simulation, hyperparameter estimation, and
+posterior predictive inference for univariate regressions,
+multivariate regressions, and multivariate logistic regressions.
+Gaussian processes are  general, and by necessity this chapter
+only touches on some basic models.  For more information, see
+@RasmussenWilliams:2006.
+
+
+## Gaussian Process Regression
+
+The data for a multivariate Gaussian process regression consists of a
+series of $N$ inputs $x_1,\ldots,x_N \in \mathbb{R}^D$ paired with outputs
+$y_1,\ldots,y_N \in \mathbb{R}$.  The defining feature of Gaussian
+processes is that the probability of a finite number of outputs $y$
+conditioned on their inputs $x$ is Gaussian:
+$$
+y \sim \mathsf{multivariate\ normal}(m(x), K(x | \theta)),
+$$
+where $m(x)$ is an $N$-vector and $K(x | \theta)$ is an $N \times N$
+covariance matrix.  The mean function $m : \mathbb{R}^{N \times D}
+\rightarrow \mathbb{R}^{N}$ can be anything, but the covariance function
+$K : \mathbb{R}^{N \times D} \rightarrow \mathbb{R}^{N \times N}$ must produce
+a positive-definite matrix for any input $x$.^[Gaussian processes can be extended to covariance functions producing positive semi-definite matrices, but Stan does not support inference in the resulting models because the resulting distribution does not have unconstrained support.]
+
+A popular covariance function, which will be used in the implementations later
+in this chapter, is an exponentiated quadratic function,
+$$
+  K(x | \alpha, \rho, \sigma)_{i, j}
+= \alpha^2
+\exp \left(
+- \dfrac{1}{2 \rho^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+\right)
++ \delta_{i, j} \sigma^2,
+$$
+where $\alpha$, $\rho$, and $\sigma$ are hyperparameters defining the
+covariance function and where $\delta_{i, j}$ is the Kronecker delta
+function with value 1 if $i = j$ and value 0 otherwise; this
+test is between the indexes $i$ and $j$, not between values $x_i$ and
+$x_j$. This kernel is obtained through a convolution of two
+independent Gaussian processes, $f_1$ and $f_2$, with kernels
+$$
+  K_1(x | \alpha, \rho)_{i, j}
+= \alpha^2
+\exp \left(
+- \dfrac{1}{2 \rho^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2
+\right)
+$$
+and
+$$
+  K_2(x | \sigma)_{i, j}
+=
+ \delta_{i, j} \sigma^2,
+$$
+
+The addition of $\sigma^2$ on the diagonal is important
+to ensure the positive definiteness of the resulting matrix in the case of
+two identical inputs $x_i = x_j$.  In statistical terms, $\sigma$ is
+the scale of the noise term in the regression.
+
+The hyperparameter $\rho$ is the *length-scale*, and corresponds to the
+frequency of the functions represented by the Gaussian process prior with
+respect to the domain. Values of $\rho$ closer to zero lead the GP to represent
+high-frequency functions, whereas larger values of $\rho$ lead to low-frequency
+functions. The hyperparameter $\alpha$ is the *marginal standard
+deviation*. It controls the magnitude of the range of the function represented
+by the GP. If you were to take the standard deviation of many draws from the GP
+$f_1$ prior at a single input $x$ conditional on one value of $\alpha$ one
+would recover $\alpha$.
+
+The only term in the squared exponential covariance function involving
+the inputs $x_i$ and $x_j$ is their vector difference, $x_i - x_j$.
+This produces a process with stationary covariance in the sense that
+if an input vector $x$ is translated by a vector $\epsilon$ to $x +
+\epsilon$, the covariance at any pair of outputs is unchanged, because
+$K(x | \theta) = K(x + \epsilon| \theta)$.
+
+The summation involved is just the squared Euclidean distance between
+$x_i$ and $x_j$ (i.e., the $L_2$ norm of their difference, $x_i -
+x_j$). This results in support for smooth functions in the process.
+The amount of variation in the function is controlled by the free
+hyperparameters $\alpha$, $\rho$, and $\sigma$.
+
+Changing the notion of distance from Euclidean to taxicab distance
+(i.e., an $L_1$ norm) changes the support to functions which are
+continuous but not smooth.
+
+## Simulating from a Gaussian Process
+
+It is simplest to start with a Stan model that does nothing more than
+simulate draws of functions $f$ from a Gaussian process.  In practical
+terms, the model will draw values $y_n = f(x_n)$ for finitely many
+input points $x_n$.
+
+The Stan model defines the mean and covariance functions in a
+transformed data block and then samples outputs $y$ in the model using
+a multivariate normal distribution.  To make the model concrete, the
+squared exponential covariance function described in the previous section
+will be used with hyperparameters set to $\alpha^2 = 1$, $\rho^2 = 1$,
+and $\sigma^2 = 0.1$, and the mean function $m$ is defined to always
+return the zero vector, $m(x) = {\bf 0}$.  Consider the following
+implementation of a Gaussian process simulator.
+
+```
+data {
+  int<lower=1> N;
+  real x[N];
+}
+transformed data {
+  matrix[N, N] K;
+  vector[N] mu = rep_vector(0, N);
+  for (i in 1:(N - 1)) {
+    K[i, i] = 1 + 0.1;
+    for (j in (i + 1):N) {
+      K[i, j] = exp(-0.5 * square(x[i] - x[j]));
+      K[j, i] = K[i, j];
+    }
+  }
+  K[N, N] = 1 + 0.1;
+}
+parameters {
+  vector[N] y;
+}
+model {
+  y ~ multi_normal(mu, K);
+}
+```
+
+The above model can also be written more compactly using the specialized
+covariance function that implements the exponentiated quadratic kernel.
+
+```
+data {
+  int<lower=1> N;
+  real x[N];
+}
+transformed data {
+  matrix[N, N] K = cov_exp_quad(x, 1.0, 1.0);
+  vector[N] mu = rep_vector(0, N);
+  for (n in 1:N)
+    K[n, n] = K[n, n] + 0.1;
+}
+parameters {
+  vector[N] y;
+}
+model {
+  y ~ multi_normal(mu, K);
+}
+```
+
+The input data are just the vector of inputs `x` and its size
+`N`.  Such a model can be used with values of `x` evenly
+spaced over some interval in order to plot sample draws of functions
+from a Gaussian process.
+
+### Multivariate Inputs {-}
+
+Only the input data needs to change in moving from a univariate model to a
+multivariate model.
+
+The only lines that change from the univariate model above are as follows.
+
+```
+data {
+  int<lower=1> N;
+  int<lower=1> D;
+  vector[D] x[N];
+}
+transformed data {
+...
+...
+```
+
+The data are now declared as an array of vectors instead of an array of
+scalars; the dimensionality `D` is also declared.
+
+In the remainder of the chapter, univariate models will be used for simplicity,
+but any of the models could be changed to multivariate in the same way as the
+simple sampling model. The only extra computational overhead from a
+multivariate model is in the distance calculation.
+
+### Cholesky Factored and Transformed Implementation {-}
+
+A more efficient implementation of the simulation model can be
+coded in Stan by relocating, rescaling and rotating an isotropic standard
+normal variate.  Suppose $\eta$ is an an isotropic standard normal variate
+$$
+\eta \sim \mathsf{normal}({\bf 0}, {\bf 1}),
+$$
+where ${\bf 0}$ is an $N$-vector of 0 values and ${\bf 1}$ is the $N
+\times N$ identity matrix.  Let $L$ be the Cholesky decomposition of
+$K(x | \theta)$, i.e., the lower-triangular matrix $L$ such that $LL^{\top} =
+K(x | \theta)$.  Then the transformed variable $\mu + L\eta$ has the intended
+target distribution,
+$$
+  \mu + L\eta \sim \mathsf{multivariate\ normal}(\mu(x), K(x | \theta)).
+$$
+
+This transform can be applied directly to Gaussian process
+simulation.
+
+This model has the same data declarations for `N` and `x`,
+and the same transformed data definitions of `mu` and
+`K` as the previous model, with the addition of a transformed
+data variable for the Cholesky decomposition.  The parameters change
+to the raw parameters sampled from an isotropic standard normal, and the
+actual samples are defined as generated quantities.
+
+```
+...
+transformed data {
+  matrix[N, N] L;
+...
+  L = cholesky_decompose(K);
+}
+parameters {
+  vector[N] eta;
+}
+model {
+  eta ~ std_normal();
+}
+generated quantities {
+  vector[N] y;
+  y = mu + L * eta;
+}
+```
+
+The Cholesky decomposition is only computed once, after the data are
+loaded and the covariance matrix `K` computed.  The isotropic
+normal distribution for `eta` is specified as a vectorized
+univariate distribution for efficiency; this specifies that each
+`eta[n]` has an independent standard normal distribution.  The sampled
+vector `y` is then defined as a generated quantity using a direct
+encoding of the transform described above.
+
+## Fitting a Gaussian Process {#fit-gp.section}
+
+### GP with a normal outcome {-}
+
+The full generative model for a GP with a normal outcome,
+$y \in \mathbb{R}^N$, with inputs $x \in \mathbb{R}^N$, for a finite $N$:
+
+$$ \begin{aligned}
+  \rho & \sim \mathsf{InvGamma}(5, 5) \\
+  \alpha & \sim \mathsf{normal}(0, 1) \\
+  \sigma & \sim \mathsf{normal}(0, 1) \\
+  f & \sim \mathsf{multivariate\ normal}\left(0, K(x | \alpha, \rho)\right) \\
+  y_i & \sim \mathsf{normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\}
+\end{aligned} $$
+
+With a normal outcome, it is possible to integrate out the Gaussian
+process $f$, yielding the more parsimonious model:
+
+$$ \begin{aligned}
+  \rho & \sim \mathsf{InvGamma}(5, 5) \\
+  \alpha & \sim \mathsf{normal}(0, 1) \\
+  \sigma & \sim \mathsf{normal}(0, 1) \\
+  y & \sim \mathsf{multivariate\ normal}
+  \left(0, K(x | \alpha, \rho) + \mathbf{I}_N \sigma^2\right) \\
+\end{aligned} $$
+
+It can be more computationally efficient when dealing with a normal
+outcome to integrate out the Gaussian process, because this yields a
+lower-dimensional parameter space over which to do inference. We'll fit
+both models in Stan. The former model will be referred to as the latent
+variable GP, while the latter will be called the marginal likelihood
+GP.
+
+The hyperparameters controlling the covariance function of a Gaussian
+process can be fit by assigning them priors, like we have in the
+generative models above, and then computing the posterior distribution
+of the hyperparameters given observed data. The priors on the
+parameters should be defined based on prior knowledge of the scale of
+the output values ($\alpha$), the scale of the output noise
+($\sigma$), and the scale at which distances are measured among inputs
+($\rho$). See the [Gaussian process priors
+section](#priors-gp.section) for more information about how to specify
+appropriate priors for the hyperparameters.
+
+The Stan program implementing the marginal likelihood GP is shown below. The
+program is similar to the Stan programs that implement the simulation GPs
+above, but because we are doing inference on the hyperparameters, we need to
+calculate the covariance matrix `K` in the model block, rather than
+the transformed data block.
+
+```
+data {
+  int<lower=1> N;
+  real x[N];
+  vector[N] y;
+}
+transformed data {
+  vector[N] mu = rep_vector(0, N);
+}
+parameters {
+  real<lower=0> rho;
+  real<lower=0> alpha;
+  real<lower=0> sigma;
+}
+model {
+  matrix[N, N] L_K;
+  matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+  real sq_sigma = square(sigma);
+
+  // diagonal elements
+  for (n in 1:N)
+    K[n, n] = K[n, n] + sq_sigma;
+
+  L_K = cholesky_decompose(K);
+
+  rho ~ inv_gamma(5, 5);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
+
+  y ~ multi_normal_cholesky(mu, L_K);
+}
+```
+
+The data block now declares a vector `y` of observed values `y[n]`
+for inputs `x[n]`.  The transformed data block now only defines the mean
+vector to be zero.  The three hyperparameters are defined as parameters
+constrained to be non-negative.  The computation of the covariance matrix
+`K` is now in the model block because it involves unknown parameters and
+thus can't simply be precomputed as transformed data.  The rest of the model
+consists of the priors for the hyperparameters and the multivariate
+Cholesky-parameterized normal likelihood, only now the value `y` is known
+and the covariance matrix `K` is an unknown dependent on the
+hyperparameters, allowing us to learn the hyperparameters.
+
+We have used the Cholesky parameterized multivariate normal rather
+than the standard parameterization because it allows us to the
+`cholesky_decompose` function which has been optimized for both small
+and large matrices. When working with small matrices the differences
+in computational speed between the two approaches will not be
+noticeable, but for larger matrices ($N \gtrsim 100$) the Cholesky
+decomposition version will be faster.
+
+Hamiltonian Monte Carlo sampling is fast and effective for hyperparameter
+inference in this model @Neal:1997. If the posterior is
+well-concentrated for the hyperparameters the Stan implementation will fit
+hyperparameters in models with a few hundred data points in seconds.
+
+#### Latent variable GP {-}
+
+We can also explicitly code the latent variable formulation of a GP in Stan.
+This will be useful for when the outcome is not normal. We'll need to add a
+small positive term, $\delta$ to the diagonal of the covariance matrix in order
+to ensure that our covariance matrix remains positive definite.
+
+
+```
+data {
+  int<lower=1> N;
+  real x[N];
+  vector[N] y;
+}
+transformed data {
+  real delta = 1e-9;
+}
+parameters {
+  real<lower=0> rho;
+  real<lower=0> alpha;
+  real<lower=0> sigma;
+  vector[N] eta;
+}
+model {
+  vector[N] f;
+  {
+    matrix[N, N] L_K;
+    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+
+    // diagonal elements
+    for (n in 1:N)
+      K[n, n] = K[n, n] + delta;
+
+    L_K = cholesky_decompose(K);
+    f = L_K * eta;
+  }
+
+  rho ~ inv_gamma(5, 5);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
+  eta ~ std_normal();
+
+  y ~ normal(f, sigma);
+}
+```
+
+
+Two differences between the latent variable GP and the marginal likelihood GP
+are worth noting. The first is that we have augmented our parameter block with
+a new parameter vector of length $N$ called $`eta`$. This is used in the model
+block to generate a multivariate normal vector called $f$, corresponding to the
+latent GP. We put a $\mathsf{normal}(0,1)$ prior on `eta` like we did in the
+Cholesky-parameterized GP in the simulation section.  The second difference is
+that our likelihood is now univariate, though we could code $N$ likelihood
+terms as one $N$-dimensional multivariate normal with an identity covariance
+matrix multiplied by $\sigma^2$. However, it is more efficient to use the
+vectorized statement as shown above.
+
+### Discrete outcomes with Gaussian Processes {-}
+
+Gaussian processes can be generalized the same way as standard linear
+models by introducing a link function.  This allows them to be used as
+discrete data models.
+
+#### Poisson GP {-}
+
+If we want to model count data, we can remove the $\sigma$ parameter, and use
+`poisson_log`, which implements a log link, for our likelihood rather
+than `normal`. We can also add an overall mean parameter, $a$, which
+will account for the marginal expected value for $y$. We do this because we
+cannot center count data like we would for normally distributed data.
+
+
+```
+data {
+...
+  int<lower=0> y[N];
+...
+}
+...
+parameters {
+  real<lower=0> rho;
+  real<lower=0> alpha;
+  real a;
+  vector[N] eta;
+}
+model {
+...
+  rho ~ inv_gamma(5, 5);
+  alpha ~ std_normal();
+  a ~ std_normal();
+  eta ~ std_normal();
+
+  y ~ poisson_log(a + f);
+}
+```
+
+
+#### Logistic Gaussian Process Regression {-}
+
+For binary classification problems, the observed outputs $z_n \in
+\{ 0,1 \}$ are binary.  These outputs are modeled using a Gaussian
+process with (unobserved) outputs $y_n$ through the logistic link,
+$$
+z_n \sim \mathsf{Bernoulli}(\mbox{logit}^{-1}(y_n)),
+$$
+or in other words,
+$$
+\mbox{Pr}[z_n = 1] = \mbox{logit}^{-1}(y_n).
+$$
+
+We can extend our latent variable GP Stan program to deal with classification
+problems. Below $a$ is the bias term, which can help account for imbalanced
+classes in the training data:
+
+
+```
+data {
+...
+  int<lower=0, upper=1> z[N];
+...
+}
+...
+model {
+...
+
+  y ~ bernoulli_logit(a + f);
+}
+```
+
+
+### Automatic Relevance Determination {-}
+
+If we have multivariate inputs $x \in \mathbb{R}^D$, the squared exponential
+covariance function can be further generalized by fitting a scale
+parameter $\rho_d$ for each dimension $d$,
+$$
+  k(x | \alpha, \vec{\rho}, \sigma)_{i, j} = \alpha^2 \exp
+\left(-\dfrac{1}{2}
+\sum_{d=1}^D \dfrac{1}{\rho_d^2} (x_{i,d} - x_{j,d})^2
+\right)
++ \delta_{i, j}\sigma^2.
+$$
+The estimation of $\rho$ was termed "automatic relevance determination" in
+@Neal:1996, but this is misleading, because the magnitude the scale of
+the posterior for each $\rho_d$ is dependent on the scaling of the input data
+along dimension $d$. Moreover, the scale of the parameters $\rho_d$ measures
+non-linearity along the $d$-th dimension, rather than "relevance"
+@PiironenVehtari:2016.
+
+A priori, the closer $\rho_d$ is to zero, the more nonlinear the
+conditional mean in dimension $d$ is.  A posteriori, the actual dependencies
+between $x$ and $y$ play a role.  With one covariate $x_1$ having a
+linear effect and another covariate $x_2$ having a nonlinear effect,
+it is possible that $\rho_1 > \rho_2$ even if the predictive relevance
+of $x_1$ is higher [@RasmussenWilliams:2006, page 80].
+The collection of $\rho_d$ (or $1/\rho_d$) parameters can also be
+modeled hierarchically.
+
+The implementation of automatic relevance determination in Stan is
+straightforward, though it currently requires the user to directly code the
+covariance matrix. We'll write a function to generate the Cholesky of the
+covariance matrix called `L_cov_exp_quad_ARD`.
+
+
+```
+functions {
+  matrix L_cov_exp_quad_ARD(vector[] x,
+                            real alpha,
+                            vector rho,
+                            real delta) {
+    int N = size(x);
+    matrix[N, N] K;
+    real sq_alpha = square(alpha);
+    for (i in 1:(N-1)) {
+      K[i, i] = sq_alpha + delta;
+      for (j in (i + 1):N) {
+        K[i, j] = sq_alpha
+                      * exp(-0.5 * dot_self((x[i] - x[j]) ./ rho));
+        K[j, i] = K[i, j];
+      }
+    }
+    K[N, N] = sq_alpha + delta;
+    return cholesky_decompose(K);
+  }
+}
+data {
+  int<lower=1> N;
+  int<lower=1> D;
+  vector[D] x[N];
+  vector[N] y;
+}
+transformed data {
+  real delta = 1e-9;
+}
+parameters {
+  vector<lower=0>[D] rho;
+  real<lower=0> alpha;
+  real<lower=0> sigma;
+  vector[N] eta;
+}
+model {
+  vector[N] f;
+  {
+    matrix[N, N] L_K = L_cov_exp_quad_ARD(x, alpha, rho, delta);
+    f = L_K * eta;
+  }
+
+  rho ~ inv_gamma(5, 5);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
+  eta ~ std_normal();
+
+  y ~ normal(f, sigma);
+}
+```
+
+
+### Priors for Gaussian Process Parameters {-} {#priors-gp.section}
+
+Formulating priors for GP hyperparameters requires the analyst to consider the
+inherent statistical properties of a GP, the GP's purpose in the model, and the
+numerical issues that may arise in Stan when estimating a GP.
+
+Perhaps most importantly, the parameters $\rho$ and $\alpha$ are weakly
+identified @zhang-gp:2004. The ratio of the two
+parameters is well-identified, but in practice we put independent priors on the
+two hyperparameters because these two quantities are more interpretable than
+their ratio.
+
+#### Priors for length-scale {-}
+
+GPs are a flexible class of priors and, as such, can represent a wide spectrum
+of functions.  For length scales below the minimum spacing of the covariates
+the GP likelihood plateaus.  Unless regularized by a prior, this flat
+likelihood induces considerable posterior mass at small length scales where the
+observation variance drops to zero and the functions supported by the GP being
+to exactly interpolate between the input data.  The resulting posterior not
+only significantly overfits to the input data, it also becomes hard to
+accurately sample using Euclidean HMC.
+
+We may wish to put further soft constraints on the length-scale, but these are
+dependent on how the GP is used in our statistical model.
+
+If our model consists of only the GP, i.e.:
+
+$$ \begin{aligned}
+  f & \sim \mathsf{multivariate\ normal}\left(0, K(x | \alpha, \rho)\right) \\
+  y_i & \sim \mathsf{normal}(f_i, \sigma) \, \forall i \in \{1, \dots, N\} \\
+  & x \in \mathbb{R}^{N \times D}, \, f \in \mathbb{R}^N
+\end{aligned} $$
+
+we likely don't need constraints beyond penalizing small
+length-scales.  We'd like to allow the GP prior to represent both
+high-frequency and low-frequency functions, so our prior should put
+non-negligible mass on both sets of functions.  In this case, an
+inverse gamma, `inv_gamma_lpdf` in Stan's language, will work
+well as it has a sharp left tail that puts negligible mass on
+infinitesimal length-scales, but a generous right tail, allowing for
+large length-scales. Inverse gamma priors will avoid infinitesimal length-scales
+because the density is zero at zero, so the posterior for length-scale will be
+pushed away from zero. An inverse gamma distribution is one of many
+zero-avoiding or boundary-avoiding distributions. See
+\ref{bound-avoid-priors.subsection} for more on boundary-avoiding priors.
+
+If we're using the GP as a component in a larger model that includes an overall
+mean and fixed effects for the same variables we're using as the domain for the
+GP, i.e.:
+
+$$ \begin{aligned}
+  f & \sim \mathsf{multivariate\ normal}\left(0, K(x | \alpha, \rho)\right) \\ y_i &
+  \sim \mathsf{normal}(\beta_0 + x_i \beta_{[1:D]} + f_i, \sigma) \, \forall i
+  \in \{1, \dots, N\} \\ & x_i^T, \beta_{[1:D]} \in \mathbb{R}^D,\, x \in \mathbb{R}^{N
+  \times D},\, f \in \mathbb{R}^N
+\end{aligned} $$
+
+we'll likely want to constrain large length-scales as well.  A length scale
+that is larger than the scale of the data yields a GP posterior that is
+practically linear (with respect to the particular covariate) and increasing
+the length scale has little impact on the likelihood. This will introduce
+nonidentifiability in our model, as both the fixed effects and the GP will
+explain similar variation. In order to limit the amount of overlap between the
+GP and the linear regression, we should use a prior with a sharper right tail
+to limit the GP to higher-frequency functions. We can use a generalized inverse
+Gaussian distribution:
+
+$$ \begin{aligned}
+  f(x | a, b, p) & = \dfrac{(a/b)^{p/2}}{2K_p(\sqrt{ab})} x^{p - 1}\exp(-(ax + b
+  / x)/2) \\
+  & x, a, b \in \mathbb{R}^{+}, \, p \in \mathbb{Z}
+\end{aligned} $$
+
+which has an inverse gamma left tail if $p \leq 0$ and an inverse Gaussian
+right tail.  This has not yet been implemented in Stan's math library, but it
+is possible to implement as a user defined function:
+```
+functions {
+  real generalized_inverse_gaussian_lpdf(real x, int p,
+                                        real a, real b) {
+    return p * 0.5 * log(a / b)
+      - log(2 * modified_bessel_second_kind(p, sqrt(a * b)))
+      + (p - 1) * log(x)
+      - (a * x + b / x) * 0.5;
+ }
+}
+data {
+...
+```
+
+If we have high-frequency covariates in our fixed effects, we may wish to
+further regularize the GP away from high-frequency functions, which means we'll
+need to penalize smaller length-scales. Luckily, we have a useful way of
+thinking about how length-scale affects the frequency of the functions
+supported the GP. If we were to repeatedly draw from a zero-mean GP with a
+length-scale of $\rho$ in a fixed-domain $[0,T]$, we would get a distribution
+for the number of times each draw of the GP crossed the zero axis. The
+expectation of this random variable, the number of zero crossings, is $T / \pi
+\rho$. You can see that as $\rho$ decreases, the expectation of the number of
+upcrossings increases as the GP is representing higher-frequency functions.
+Thus, this is a good statistic to keep in mind when setting a lower-bound for
+our prior on length-scale in the presence of high-frequency covariates.
+However, this statistic is only valid for one-dimensional inputs.
+
+#### Priors for marginal standard deviation {-}
+
+The parameter $\alpha$ corresponds to how much of the variation is
+explained by the regression function and has a similar role to the
+prior variance for linear model weights.  This means the prior can be
+the same as used in linear models, such as a half-$t$ prior on $\alpha$.
+
+A half-$t$ or half-Gaussian prior on alpha also has the benefit of putting
+nontrivial prior mass around zero. This allows the GP support the zero
+functions and allows the possibility that the GP won't contribute to the
+conditional mean of the total output.
+
+### Predictive Inference with a Gaussian Process {-}
+
+Suppose for a given sequence of inputs $x$ that the corresponding
+outputs $y$ are observed.  Given a new sequence of inputs $\tilde{x}$,
+the posterior predictive distribution of their labels is computed by
+sampling outputs $\tilde{y}$ according to
+$$
+p(\tilde{y}|\tilde{x},x,y)
+\ = \
+\frac{p(\tilde{y}, y|\tilde{x},x)}
+     {p(y|x)}
+\ \propto \
+p(\tilde{y}, y|\tilde{x},x).
+$$
+
+A direct implementation in Stan defines a model in terms of the
+joint distribution of the observed $y$ and unobserved $\tilde{y}$.
+
+```
+data {
+  int<lower=1> N1;
+  real x1[N1];
+  vector[N1] y1;
+  int<lower=1> N2;
+  real x2[N2];
+}
+transformed data {
+  real delta = 1e-9;
+  int<lower=1> N = N1 + N2;
+  real x[N];
+  for (n1 in 1:N1) x[n1] = x1[n1];
+  for (n2 in 1:N2) x[N1 + n2] = x2[n2];
+}
+parameters {
+  real<lower=0> rho;
+  real<lower=0> alpha;
+  real<lower=0> sigma;
+  vector[N] eta;
+}
+transformed parameters {
+  vector[N] f;
+  {
+    matrix[N, N] L_K;
+    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+
+    // diagonal elements
+    for (n in 1:N)
+      K[n, n] = K[n, n] + delta;
+
+    L_K = cholesky_decompose(K);
+    f = L_K * eta;
+  }
+}
+model {
+  rho ~ inv_gamma(5, 5);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
+  eta ~ std_normal();
+
+  y1 ~ normal(f[1:N1], sigma);
+}
+generated quantities {
+  vector[N2] y2;
+  for (n2 in 1:N2)
+    y2[n2] = normal_rng(f[N1 + n2], sigma);
+}
+```
+
+
+The input vectors `x1` and `x2` are declared as data, as is the
+observed output vector `y1`.  The unknown output vector `y2`, which
+corresponds to input vector `x2`, is declared in the generated quantities
+block and will be sampled when the model is executed.
+
+A transformed data block is used to combine the input vectors
+`x1` and `x2` into a single vector `x`.
+
+The model block declares and defines a local variable for the combined output
+vector `f`, which consists of the concatenation of the conditional mean
+for known outputs `y1` and unknown outputs `y2`.  Thus the
+combined output vector `f` is aligned with the combined
+input vector `x`.  All that is left is to define the univariate
+normal sampling statement for `y`.
+
+The generated quantities block defines the quantity `y2`. We generate
+`y2` by sampling `N2` univariate normals with each mean corresponding
+to the appropriate element in `f`.
+
+
+#### Predictive Inference in non-Gaussian GPs {-}
+
+We can do predictive inference in non-Gaussian GPs in much the
+same way as we do with Gaussian GPs.
+
+Consider the following full model for prediction using logistic Gaussian
+process regression.
+
+
+```
+data {
+  int<lower=1> N1;
+  real x1[N1];
+  int<lower=0, upper=1> z1[N1];
+  int<lower=1> N2;
+  real x2[N2];
+}
+transformed data {
+  real delta = 1e-9;
+  int<lower=1> N = N1 + N2;
+  real x[N];
+  for (n1 in 1:N1) x[n1] = x1[n1];
+  for (n2 in 1:N2) x[N1 + n2] = x2[n2];
+}
+parameters {
+  real<lower=0> rho;
+  real<lower=0> alpha;
+  real a;
+  vector[N] eta;
+}
+transformed parameters {
+  vector[N] f;
+  {
+    matrix[N, N] L_K;
+    matrix[N, N] K = cov_exp_quad(x, alpha, rho);
+
+    // diagonal elements
+    for (n in 1:N)
+      K[n, n] = K[n, n] + delta;
+
+    L_K = cholesky_decompose(K);
+    f = L_K * eta;
+  }
+}
+model {
+  rho ~ inv_gamma(5, 5);
+  alpha ~ std_normal();
+  a ~ std_normal();
+  eta ~ std_normal();
+
+  z1 ~ bernoulli_logit(a + f[1:N1]);
+}
+generated quantities {
+  int z2[N2];
+  for (n2 in 1:N2)
+    z2[n2] = bernoulli_logit_rng(a + f[N1 + n2]);
+}
+```
+
+
+#### Analytical Form of Joint Predictive Inference {-}
+
+Bayesian predictive inference for Gaussian processes with Gaussian observations
+can be sped up by deriving the posterior analytically, then directly sampling
+from it.
+
+Jumping straight to the result,
+$$
+p(\tilde{y}|\tilde{x},y,x)
+=
+\mathsf{normal}(K^{\top}\Sigma^{-1}y,\
+                \Omega - K^{\top}\Sigma^{-1}K),
+$$
+where $\Sigma = K(x | \alpha, \rho, \sigma)$ is the result of applying the covariance
+function to the inputs $x$ with observed outputs $y$, $\Omega =
+K(\tilde{x} | \alpha, \rho)$ is the result of applying the covariance function to the
+inputs $\tilde{x}$ for which predictions are to be inferred, and $K$
+is the matrix of covariances between inputs $x$ and $\tilde{x}$, which
+in the case of the exponentiated quadratic covariance function
+would be
+
+$$
+K(x | \alpha, \rho)_{i, j} = \eta^2 \exp(-\dfrac{1}{2 \rho^2}
+\sum_{d=1}^D (x_{i,d} - \tilde{x}_{j,d})^2).
+$$
+
+There is no noise term including $\sigma^2$ because the indexes of
+elements in $x$ and $\tilde{x}$ are never the same.
+
+This Stan code below uses the analytic form of the posterior and provides
+sampling of the resulting multivariate normal through the Cholesky
+decomposition. The data declaration is the same as for the latent variable
+example, but we've defined a function called `gp_pred_rng` which will
+generate a draw from the posterior predictive mean conditioned on observed data
+`y1`. The code uses a Cholesky decomposition in triangular solves in order
+to cut down on the the number of matrix-matrix multiplications when computing
+the conditional mean and the conditional covariance of $p(\tilde{y})$.
+
+```
+functions {
+  vector gp_pred_rng(real[] x2,
+                     vector y1,
+                     real[] x1,
+                     real alpha,
+                     real rho,
+                     real sigma,
+                     real delta) {
+    int N1 = rows(y1);
+    int N2 = size(x2);
+    vector[N2] f2;
+    {
+      matrix[N1, N1] L_K;
+      vector[N1] K_div_y1;
+      matrix[N1, N2] k_x1_x2;
+      matrix[N1, N2] v_pred;
+      vector[N2] f2_mu;
+      matrix[N2, N2] cov_f2;
+      matrix[N2, N2] diag_delta;
+      matrix[N1, N1] K;
+      K = cov_exp_quad(x1, alpha, rho);
+      for (n in 1:N1)
+        K[n, n] = K[n,n] + square(sigma);
+      L_K = cholesky_decompose(K);
+      K_div_y1 = mdivide_left_tri_low(L_K, y1);
+      K_div_y1 = mdivide_right_tri_low(K_div_y1', L_K)';
+      k_x1_x2 = cov_exp_quad(x1, x2, alpha, rho);
+      f2_mu = (k_x1_x2' * K_div_y1);
+      v_pred = mdivide_left_tri_low(L_K, k_x1_x2);
+      cov_f2 = cov_exp_quad(x2, alpha, rho) - v_pred' * v_pred;
+      diag_delta = diag_matrix(rep_vector(delta, N2));
+
+      f2 = multi_normal_rng(f2_mu, cov_f2 + diag_delta);
+    }
+    return f2;
+  }
+}
+data {
+  int<lower=1> N1;
+  real x1[N1];
+  vector[N1] y1;
+  int<lower=1> N2;
+  real x2[N2];
+}
+transformed data {
+  vector[N1] mu = rep_vector(0, N1);
+  real delta = 1e-9;
+}
+parameters {
+  real<lower=0> rho;
+  real<lower=0> alpha;
+  real<lower=0> sigma;
+}
+model {
+  matrix[N1, N1] L_K;
+  {
+    matrix[N1, N1] K = cov_exp_quad(x1, alpha, rho);
+    real sq_sigma = square(sigma);
+
+    // diagonal elements
+    for (n1 in 1:N1)
+      K[n1, n1] = K[n1, n1] + sq_sigma;
+
+    L_K = cholesky_decompose(K);
+  }
+
+  rho ~ inv_gamma(5, 5);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
+
+  y1 ~ multi_normal_cholesky(mu, L_K);
+}
+generated quantities {
+  vector[N2] f2;
+  vector[N2] y2;
+
+  f2 = gp_pred_rng(x2, y1, x1, alpha, rho, sigma, delta);
+  for (n2 in 1:N2)
+    y2[n2] = normal_rng(f2[n2], sigma);
+}
+```
+
+### Multiple-output Gaussian processes {-}
+
+Suppose we have observations $y_i \in \mathbb{R}^M$ observed at
+$x_i \in \mathbb{R}^K$. One can model the data like so:
+$$ \begin{aligned}
+  y_i & \sim \mathsf{multivariate\ normal}(f(x_i), \mathbf{I}_M \sigma^2) \\
+  f(x) & \sim \mathsf{GP}(m(x), K(x | \theta, \phi)) \\
+  K(x & | \theta) \in \mathbb{R}^{M \times M}, \, f(x), \, m(x) \in \mathbb{R}^M
+\end{aligned} $$
+where the $K(x, x^\prime | \theta, \phi)_{[m, m^\prime]}$ entry defines the
+covariance between $f_m(x)$ and $f_{m^\prime}(x^\prime)(x)$. This construction
+of Gaussian processes allows us to learn the covariance between the output
+dimensions of $f(x)$. If we parameterize our kernel $K$:
+$$ \begin{aligned} K(x, x^\prime | \theta, \phi)_{[m, m^\prime]} = k(x, x^\prime |
+\theta) k(m, m^\prime | \phi) \end{aligned} $$
+then our finite dimensional generative model for the above is:
+$$ \begin{aligned}
+  f & \sim \mathsf{Matrixnormalal}(m(x), K(x | \alpha, \rho), C(\phi)) \\
+  y_{i, m} & \sim \mathsf{normal}(f_{i,m}, \sigma) \\
+  f & \in \mathbb{R}^{N \times M}
+\end{aligned} $$
+where $K(x | \alpha, \rho)$ is the exponentiated quadratic kernel we've used
+throughout this chapter, and $C(\phi)$ is a positive-definite matrix,
+parameterized by some vector $\phi$.
+
+The matrix normal distribution has two covariance matrices: $K(x |
+\alpha, \rho)$ to encode column covariance, and $C(\phi)$ to define row
+covariance. The salient features of the matrix normal are that the rows
+of the matrix $f$ are distributed:
+$$ \begin{aligned} f_{[n,]} \sim \mathsf{multivariate\ normal}(m(x)_{[n,]}, K(x | \alpha,
+\rho)_{[n,n]} C(\phi)) \end{aligned} $$ and that the columns of the matrix $f$ are
+distributed: $$ \begin{aligned} f_{[,m]} \sim \mathsf{multivariate\ normal}(m(x)_{[,m]}, K(x
+  | \alpha, \rho) C(\phi)_{[m,m]}) \end{aligned} $$
+This also means means that $\mathbb{E}\left[f^T f\right]$ is equal to
+$\text{trace}(K(x | \alpha, \rho)) * C$, whereas $\mathbb{E}\left[ff^T\right]$
+is $\text{trace}(C) * K(x | \alpha, \rho)$. We can derive this using
+properties of expectation and the matrix normal density.
+
+We should set $\alpha$ to $1.0$ because the parameter is not identified unless
+we constrain $\text{trace}(C) = 1$. Otherwise, we can multiply $\alpha$ by a scalar $d$ and
+$C$ by $1/d$ and our likelihood will not change.
+
+We can generate a random variable $f$ from a matrix normal density in
+$\mathbb{R}^{N \times M}$ using the following algorithm:
+
+$$ \begin{aligned}
+  \eta_{i,j} & \sim \mathsf{normal}(0, 1) \, \forall i,j \\
+  f & = L_{K(x | 1.0, \rho)} \, \eta \, L_C(\phi)^T \\
+  f & \sim \mathsf{MatrixNormal}(0, K(x | 1.0, \rho), C(\phi)) \\
+  \eta & \in \mathbb{R}^{N \times M} \\
+  L_C(\phi) & = \text{cholesky\_decompose}(C(\phi)) \\
+  L_{K(x | 1.0, \rho)} & = \text{cholesky\_decompose}(K(x | 1.0, \rho))
+\end{aligned} $$
+
+This can be implemented in Stan using a latent-variable GP formulation. We've used
+$\mathsf{LkjCorr}$ for $C(\phi)$, but any positive-definite matrix will do.
+
+
+```
+data {
+  int<lower=1> N;
+  int<lower=1> D;
+  real x[N];
+  matrix[N, D] y;
+}
+transformed data {
+  real delta = 1e-9;
+}
+parameters {
+  real<lower=0> rho;
+  vector<lower=0>[D] alpha;
+  real<lower=0> sigma;
+  cholesky_factor_corr[D] L_Omega;
+  matrix[N, D] eta;
+}
+model {
+  matrix[N, D] f;
+  {
+    matrix[N, N] K = cov_exp_quad(x, 1.0, rho);
+    matrix[N, N] L_K;
+
+    // diagonal elements
+    for (n in 1:N)
+      K[n, n] = K[n, n] + delta;
+
+    L_K = cholesky_decompose(K);
+    f = L_K * eta
+        * diag_pre_multiply(alpha, L_Omega)';
+  }
+
+  rho ~ inv_gamma(5, 5);
+  alpha ~ std_normal();
+  sigma ~ std_normal();
+  L_Omega ~ lkj_corr_cholesky(3);
+  to_vector(eta) ~ std_normal();
+
+  to_vector(y) ~ normal(to_vector(f), sigma);
+}
+generated quantities {
+  matrix[D, D] Omega;
+  Omega = L_Omega * L_Omega';
+}
+```

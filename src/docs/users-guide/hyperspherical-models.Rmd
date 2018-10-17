@@ -1,0 +1,195 @@
+# Directions, Rotations, and Hyperspheres
+
+Directional statistics involve data and/or parameters that are
+constrained to be directions.  The set of directions forms a sphere,
+the geometry of which is not smoothly mappable to that of a Euclidean
+space because you can move around a sphere and come back to where you
+started.  This is why it is impossible to make a map of the globe on a
+flat piece of paper where all points that are close to each other on
+the globe are close to each other on the flat map.  The fundamental
+problem is easy to visualize in two dimensions, because as you move
+around a circle, you wind up back where you started.  In other words,
+0 degrees and 360 degrees (equivalently, 0 and $2 \pi$ radians) pick
+out the same point, and the distance between 359 degrees and 2 degrees
+is the same as the distance between 137 and 140 degrees.
+
+Stan supports directional statistics by providing a unit-vector data
+type, the values of which determine points on a hypersphere (circle in
+two dimensions, sphere in three dimensions).
+
+## Unit Vectors
+
+The length of a vector $x \in \mathbb{R}^K$ is given by
+$$
+\Vert x \Vert
+\ = \ \sqrt{x^{\top}\,x}
+\ = \ \sqrt{x_1^2 + x_2^2 + \cdots + x_K^2}.
+$$
+Unit vectors are defined to be vectors of unit length (i.e., length
+one).
+
+With a variable declaration such as
+
+```
+unit_vector[K] x;
+```
+
+the value of `x` will be constrained to be a vector of size
+`K` with unit length;  the reference manual chapter on
+constrained parameter transforms provides precise definitions.
+
+*Warning:* An extra term gets added to the log density to ensure
+the distribution on unit vectors is proper.  This is not a problem in
+practice, but it may lead to misunderstandings of the target log
+density output (`lp__` in some interfaces).  The underlying
+source of the problem is that a unit vector of size $K$ has only
+$K - 1$ degrees of freedom.  But there is no way to map those $K - 1$
+degrees of freedom continuously to $\mathbb{R}^N$---for example, the
+circle can't be mapped continuously to a line so the limits work out,
+nor can a sphere be mapped to a plane.  A workaround is needed
+instead.  Stan's unit vector transform uses $K$ unconstrained
+variables, then projects down to the unit hypersphere.  Even though
+the hypersphere is compact, the result would be an improper
+distribution.  To ensure the unit vector distribution is proper, each
+unconstrained variable is given a "Jacobian" adjustment equal to an
+independent standard normal distribution.  Effectively, each dimension is
+drawn standard normal, then they are together projected down to the
+hypersphere to produce a unit vector.  The result is a proper uniform
+distribution over the hypersphere.
+
+
+
+## Circles, Spheres, and Hyperspheres
+
+An $n$-sphere, written $S^{n}$, is defined as the set of $(n +
+1)$-dimensional unit vectors,
+$$
+S^{n} = \{ x \in \mathbb{R}^{n+1} \, : \, \Vert x \Vert = 1 \}.
+$$
+
+Even though $S^n$ is made up of points in $(n+1)$ dimensions, it is
+only an $n$-dimensional manifold.  For example, $S^2$ is defined as a
+set of points in $\mathbb{R}^3$, but each such point may be described
+uniquely by a latitude and longitude.  Geometrically, the surface
+defined by $S^2$ in $\mathbb{R}^3$ behaves locally like a plane, i.e.,
+$\mathbb{R}^2$.  However, the overall shape of $S^2$ is not like a plane
+in that is compact (i.e., there is a maximum distance between points).
+If you set off around the globe in a "straight line" (i.e., a
+geodesic), you wind up back where you started eventually; that is why
+the geodesics on the sphere ($S^2$) are called "great circles," and
+why we need to use some clever representations to do circular or
+spherical statistics.
+
+Even though $S^{n-1}$ behaves locally like $\mathbb{R}^{n-1}$, there is no
+way to smoothly map between them. For example, because
+latitude and longitude work on a modular basis (wrapping at $2\pi$
+radians in natural units), they do not produce a smooth map.
+
+Like a bounded interval $(a, b)$, in geometric terms, a sphere is
+compact in that the distance between any two points is bounded.
+
+
+## Transforming to Unconstrained Parameters
+
+Stan (inverse) transforms arbitrary points in $\mathbb{R}^{K+1}$ to points
+in $S^K$ using the auxiliary variable approach of
+@Marsaglia:1972.  A point $y \in \mathbb{R}^K$ is transformed to a
+point $x \in S^{K-1}$ by
+
+$$
+x = \frac{y}{\sqrt{y^{\top} y}}.
+$$
+
+The problem with this mapping is that it's many to one; any point
+lying on a vector out of the origin is projected to the same point on
+the surface of the sphere.  @Marsaglia:1972 introduced an
+auxiliary variable interpretation of this mapping that provides the
+desired properties of uniformity; the reference manual contains the
+precise definitions used in the chapter on constrained parameter
+transforms.
+
+
+#### Warning: undefined at zero! {-}
+
+The above mapping from $\mathbb{R}^n$ to $S^n$ is not defined at zero.
+While this point outcome has measure zero during sampling, and may
+thus be ignored, it is the default initialization point and thus unit
+vector parameters cannot be initialized at zero.  A simple workaround
+is to initialize from a  small interval around zero, which is an
+option built into all of the Stan interfaces.
+
+
+
+## Unit Vectors and Rotations
+
+Unit vectors correspond directly to angles and thus to rotations.
+This is easy to see in two dimensions, where a point on a circle
+determines a compass direction, or equivalently, an angle $\theta$).
+Given an angle $\theta$, a matrix can be defined, the
+pre-multiplication by which rotates a point by an angle of $\theta$.
+For angle $\theta$ (in two dimensions), the $2 \times 2$ rotation
+matrix is defined by
+$$
+R_{\theta}
+=
+\begin{bmatrix}
+\cos \theta & - \sin \theta
+\\
+\sin \theta & \cos \theta
+\end{bmatrix}.
+$$
+Given a two-dimensional vector $x$, $R_{\theta} \, x$ is the rotation
+of $x$ (around the origin) by $\theta$ degrees.
+
+### Unit vector type {-}
+
+In Stan, unit vectors in $K$ dimensions are declared as
+
+```
+unit_vector[K] alpha;
+```
+
+A unit vector has length one (meaning the sum of squared values is
+one, not that its number of elements is one).
+
+### Angles from unit vectors {-}
+
+Angles can be calculated from unit vectors.  For example, a random
+variable `theta` representing an angle in $(-\pi, \pi)$ radians
+can be declared as a two-dimensional unit vector then transformed to
+an angle.
+
+```
+parameters {
+  unit_vector[2] xy;
+
+transformed parameters {
+  real<lower = -pi(), upper = pi> theta = atan2(xy[2], xy[1]);
+```
+
+If the distribution of $(x, y)$ is uniform over a circle, then the
+distribution of $\arctan \frac{y}{x}$ is uniform over $(-\pi, pi]$.
+
+It might be tempting to try to just declare theta directly as a
+parameter with the lower and upper bound constraint as given above.
+The drawback to this approach is that the values $-\pi$ and $\pi$ are
+at $-\infty$ and $\infty$ on the unconstrained scale, which can
+produce multimodal posterior distribtions when the true distribution
+on the circle is unimodal.
+
+With a little additional work on the trigonometric front, the same
+conversion back to angles may be accomplished in more dimensions.
+
+
+## Circular Representations of Days and Years
+
+A 24-hour clock naturally represents the progression of time through
+the day, moving from midnight to noon and back again in one rotation.
+A point on a circle divided into 24 hours is thus a natural
+representation for the time of day.  Similarly, years cycle through
+the seasons and return to the season from which they started.
+
+In human affairs, temporal effects often arise by convention.  These
+can be modeled directly with ad-hoc predictors for holidays and
+weekends, or with data normalization back to natural scales for
+daylight savings time.

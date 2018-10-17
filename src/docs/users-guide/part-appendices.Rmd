@@ -1,0 +1,4 @@
+# <i style="font-size: 110%; color:#990017;">Appendices</i> {-}
+
+These are the appendices for the book, gathered here as they
+are not part of the main exposition.

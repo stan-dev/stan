@@ -1,0 +1,362 @@
+# Floating Point Arithmetic
+
+Computers approximate real values in $\mathbb{R}$ using a fixed number
+of bits. This chapter explains how this is done and why it is
+important for writing robust Stan (and other numerical) programs.  The
+subfield of computer science devoted to studying how real arithmetic
+works on computers is called *numerical analysis*.
+
+## Floating-point representations
+
+Stan's arithmetic is implemented using double-precision arithmetic.
+The behavior of most^[The notable exception is Intel's optimizing
+compilers under certain optimization settings.] modern computers
+follows the floating-point arithmetic, *IEEE Standard for
+Floating-Point Arithmetic* (IEEE 754).
+
+### Finite values
+
+The double-precision component of the IEEE 754 standard specifies the
+representation of real values using a fixed pattern of 64 bits (8
+bytes).  All values are represented in base two (i.e., binary).  The
+representation is divided into two signed components:
+
+* *significand* (53 bits): base value representing significant digits
+
+* *exponent* (11 bits): power of two multiplied by the base
+
+The *value* of a finite floating point number is
+
+$$
+v = (-1)^s \times c \ 2^q
+$$
+
+
+### Normality
+
+A *normal* floating-point value does not use any leading zeros in
+its significand;  *subnormal* numbers may use leading zeros.  Not all
+I/O systems support subnormal numbers.
+
+### Ranges and extreme values
+
+There are some reserved exponent values so that legal exponent values
+range between$-(2^10) + 2 = -1022$ and $2^10 - 1 = 1023$.  Legal
+significand values are between $-2^52$ and $2^52 - 1$.
+Floating point allows the representation of both really big and really
+small values.  Some extreme values are
+
+* *largest normal finite number*: $\approx 1.8 \times 10^{308}$
+
+* *largest subnormal finite number*: $\approx 2.2 \times 10^{308}$
+
+* *smallest positive normal number*: $\approx 2.2 \times 10^{-308}$
+
+* *smallest positive subnormal number*: $\approx 4.9 \times 10^{-324}$
+
+### Signed zero
+
+Because of the sign bit, there are two ways to represent zero, often
+called "positive zero" and "negative zero".  This distinction is
+irrelevant in Stan (as it is in R), because the two values are equal
+(i.e., `0 == -0` evaluates to true).
+
+### Not-a-number values
+
+A specially chosen bit pattern is used for the *not-a-number* value
+(often written as `NaN` in programming language output, including
+Stan's).
+
+Stan provides a value function `nan()` that returns this special
+not-a-number value.  It is meant to represent error conditions, not
+missing values.  Usually when not-a-number is an argument to a
+function, the result will not-a-number if an exception (a rejection in
+Stan) is not raised.
+
+Stan also provides a test function `is_nan(x)` that returns 1 if `x`
+is not-a-number and 0 otherwise.
+
+Not-a-number values propagate under almost all mathematical
+operations.  For example, all of the built-in binary arithmetic
+operations (addition, subtraction, multiplication, division, negation)
+return not-a-number if any of their arguments are not-a-number.  The
+built-in functions such as `log` and `exp` hav the same behavior,
+propagating not-a-number values.
+
+Most of Stan's built-in functions will throw exceptions (i.e., reject)
+when any of their arguments is not-a-number.
+
+Comparisons with not-a-number always return false, up to and including
+comparison with itself.  That is, `not_a_number() == not_a_number()`
+somewhat confusingly returns false.  That is why there is a built-in
+`is_not_a_number()` function in Stan (and in C++).  The only exception
+is negation, which remains coherent.  This means `not_a_number() !=
+not_a_number()` returns true.
+
+Undefined operations often return not-a-number values.  For example,
+`sqrt(-1)` will evaluate to not-a-number.
+
+### Positive and negative infinity
+
+There are also two special values representing positive infinity
+($\infty)$ and negative infinity ($-\infty$).   These are not
+as pathological as not-a-number, but are often used to represent error
+conditions such as overflow and underflow.  For example, rather than
+raising an error or returning not-a-number, `log(0)` evaluates to
+negative infinity.  Exponentiating negative infinity leads back to
+zero, so that `0 == exp(log(0))`.  Nevertheless, this should not be
+done in Stan because the chain rule used to calculate the derivatives
+will attempt illegal operations and return not-a-number.
+
+There are value functions `positive_infinity()` and
+`negative_infinity()` as well as a test function `is_infinity()`.
+
+Positive and negative infinity have the expected comparison behavior,
+so that `negative_infinty() < 0` evaluates to true (represented with 1
+in Stan).  Also, negating positive infinity leads to negative infinity
+and vice-versa.
+
+Positive infinity added to either itself or a finite value produces
+positive infinity.  Negative infinity behaves the same way.  However,
+attempts to subtract positive infinity from itself produce
+not-a-number, not zero.  Similarly, attempts to divide infinite values
+results in a not-a-number value.
+
+
+## Literals: decimal and scientific notation
+
+In programming languages such as Stan, numbers may be represented in
+standard *decimal* (base 10) notation.  For example, `2.39` or
+`-1567846.276452`.  Remember there is no point in writing more than 16
+significant digits as they cannot be represented.  A number may be
+coded in Stan using *scientific notation*, which consists of a signed
+decimal representation of a base and a signed integer decimal
+exponent.  For example, `36.29e-3` represents the number $36.29 \times
+10^{-3}$, which is the same number as is represneted by `0.3629`.
+
+## Aritmetic Precision
+
+The choice of significand provides $\log_10 2^53 \approx 15.95$
+decimal (base 10) digits of *arithmetic precision*.  This is just the
+precision of the floating-point representation.  After several
+operations are chained together, the realized arithmetic precision is
+often much lower.
+
+### Rounding and probabilities
+
+In practice, the finite amount of arithmetic precision leads to
+*rounding*, whereby a number is represented by the closest
+floating-point number.  For example, with only 16 decimal digits of
+accuracy,
+
+```
+1 + 1e-20 == 1
+```
+
+The closest floating point number to $1 + 10^{-20}$ turns out to be
+$1$ itself.   By contrast, `0 + 1e-20 == 1e-20`.
+
+This highlights the fact that precision depends on scale.  Even though
+`1 + 1e-20 == 1`, we have `1e-20 + 1e-20 == 2e-20`, as expected.
+
+Rounding also manifests itself in a lack of *transitivity*.  In
+particular, it does *not* usually hold for three floating point numbers
+$a, b, c$ that $(a + b) + c = a + (b = c)$.
+
+In statistical applications, problems often manifest in situations
+where users expect the usual rules of real-valued arithmetic to hold.
+Suppose we have a lower triangular matrix $L$ with strictly positive
+diagonal, so that it is the Cholesky factor of a positive-definite
+matrix $L \, L^{\top}$.  In practice, rounding and loss of precision
+may render the result $L \, L^{\top}$ neither symmetric nor positive
+definite.
+
+In practice, care must be taken to defend against rounding.  For
+example, symmetry may be produced by adding $L \, L^{top}$ with its
+transpose and dividing by two, or by copying the lower triangular
+portion into the upper portion.  Positive definiteness may be
+maintained by adding a small quantity to the diagonal.
+
+### Machine precision and the asymmetry of 0 and 1
+
+The smallest number greater than zero is roughly $0 + 10^{-323}$.  The
+largest number less than zero is roughly $1 - 10^{-15.95}$.  The
+asymmetry is apparent when considering the representation of that
+largest number smaller than one---the exponenti is of no help, and the
+number is represented as the binary equivalent of
+`0.9999999999999999`.
+
+For this reason, the *machine precision* is said to be roughly
+$10^{15.95}$.  This constant is available as `machine_precision()` in
+Stan.
+
+### Complementary and epsilon functions
+
+Special operations are available to mitigate this problem with numbers
+rounding when they get close to one.  For example, consider the
+operation `log(1 + x)` for positive `x`.  When `x` is small (less than
+$10^{-16}$ for double-precision floating point), the sum in the
+argument will round to 1 and the result will round to zero.  To allow
+more granularity, programming languages provide a library function
+directly implementing $f(x) = \log (1 + x)$.  In Stan (as in C++),
+this operation is written as `log1p(x)`.  Because `x` itself may be
+close to zero, the function `log1p(x)` can take the logarithm of
+values very close to one, the results of which are close to zero.
+
+Similarly, the complementary cumulative distribution functions (CCDF),
+defined by $F^{\complement}_Y(y) = 1 - F_Y(y)$, where $F_Y$ is the
+cumulative distribution function (CDF) for the random variable $Y$.
+This allows values very close to one to be represented in
+complementary form.
+
+### Catastrophic cancellation
+
+Another downside to floating point representations is that
+substraction of two numbers close to each other results in a loss of
+precision that depends on how close they are.  This is easy to see in
+practice.  Consider
+```
+  1.23456789012345
+- 1.23456789012344
+= 0.00000000000001
+```
+We start with fifteen decimal places of accuracy in the arguments and
+are left with a single decimal place of accuracy in the result.
+
+Catastrophic cancellation arises in statistical computations whenever
+we calculate variance for a distribution with small standard
+deviations relative to its location.  When calculating summary
+statistics, Stan uses *Welford's algorithm* for computing variances.
+This avoids catastrophic cancellation and may also be carried out in a
+single pass.
+
+### Overflow
+
+Even though `1e200` may be represented as a double precision floating
+point value, there is no finite value large enough to represent `1e200
+* 1e200`.  The result of `1e200 * 1e200` is said to *overflow*.  The
+IEEE 754 standard requires the result to be positive infinity.
+
+Overflow is rarely a problem in statistical computations.  If it is,
+it's possible to work on the log scale, just as for underflow as
+described below.
+
+
+### Underflow and the log scale
+
+When there is no number small enough to represent a result, it is said
+to *underflow*.  For instance, `1e-200` may be represented, but
+`1e-200 * 1e-200` underflows so that the result is zero.
+
+Underflow is a ubiquitous problem in likelihood calculations,
+For example, if $p(y_n \mid \theta) < 0.1$, then
+
+$$
+p(y \mid \theta) = \prod_{n=1}^N p(y_n \mid \theta)
+$$
+
+will underflow as soon as $N > 350$ or so.
+
+To deal with underflow, work on the log scale.  Even though $p(y \mid
+\theta)$ can't be represented, there is no problem representing
+
+$$
+\begin{array}{rcl}
+\log p(y \mid \theta)
+& = & \log \prod_{n=1}^N p(y_n \mid \theta)
+\\[4pt]
+& = & \sum_{n = 1}^N \log p(y_n \mid \theta)
+\end{array}
+$$
+
+This is why all of Stan's probability functions operate on the log
+scale.
+
+### Adding on the log scale
+
+If we work on the log scale, multiplication is converted to addition,
+$$
+\log (a \times b) = \log a + \log b.
+$$
+Thus we can just start on the log scale and stay there through
+multiplication.  But what about addition?  If we have $\log a$ and
+$\log b$, how do we get $\log (a + b)$?  Working out the algebra,
+
+$$
+\log (a + b)
+\ = \
+\log (\exp(\log a) + \exp(\log b))
+$$
+
+The nested log of sum of exponentials is so common, it has its own
+name,
+
+$$
+\mathrm{log\_sum\_exp}(u, v)
+\ = \
+\log (\exp(u) + \exp(v)).
+$$
+
+so that
+
+$$
+\log (a + b)
+\ = \
+\mathrm{log\_sum\_exp}(\log a, \log b).
+$$
+
+Altough it appears this might overflow as soon as exponentiation is
+introduced, evaluation does not proceed by evaluating the terms as
+written.  Instead, with a little algebra, the terms are rearranged
+into a stable form,
+
+$$
+\mathrm{log\_sum\_exp}(u, v)
+\ = \
+\max(u, v) + \log\left( \exp(u - \max(u, v)) + \exp(v - \max(u, v)) \right).
+$$
+
+Because the terms inside the exponentiations are $u - \max(u, v)$ and
+$v - \max(u, v)$, one will be zero, and the other will be negative.
+Because the operation is symmetric, it may be assumed without loss of
+generality that $u \geq v$, so that
+
+$$
+\mathrm{log\_sum\_exp}(u, v) = u + \log(1 + \exp(v - u)).
+$$
+
+The inner term may itself be evaluated using `log1p`, there is only
+limited gain because $\exp(v - u)$ is only near zero when $u$ is much
+larger than $v$, meaning the result is likely to round to $u$ anyway.
+
+To conclude, when evaluating $\log (a + b)$ given $\log a$ and $\log
+b$, and assuming $\log a > \log b$, return
+
+$$
+\log (a + b) \ = \
+\log a + \mathrm{log1p}(\exp(\log b - \log a)).
+$$
+
+## Comparing floating-point numbers
+
+Because floating-point representations are inexact, it is rarely a
+good idea to test exact inequality.  The general recommendation is
+that rather than testing `x == y`, an approximate test may be used
+given an absolute or relative tolerance.
+
+Given a positive *absolute tolerance* of `epsilon`, `x` can be compared
+to `y` using the conditional
+
+```
+abs(x - y) <= epsilon.
+```
+
+Absolute tolerances work when the scale of `x` and `y` and the
+relevant comparison is known.
+
+Given a positive *relative tolerance* of `epsilon`, a typical
+comparison is
+
+```
+2 * abs(x - y) / (abs(x) + abs(y)) <= epsilon.
+```

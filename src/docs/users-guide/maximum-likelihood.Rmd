@@ -1,0 +1,458 @@
+# Penalized Maximum Likelihood Point Estimation  {#mle.chapter}
+
+This chapter defines the workhorses of non-Bayesian estimation,
+maximum likelihood and penalized maximum likelihood, and relates them
+to Bayesian point estimation based on posterior means, medians, and
+modes.  Such estimates are called "point estimates" because they
+are composed of a single value for the model parameters $\theta$
+rather than a posterior distribution.
+
+Stan's optimizer can be used to implement (penalized) maximum
+likelihood estimation for any likelihood function and penalty function
+that can be coded in Stan's modeling language.  Stan's optimizer can
+also be used for point estimation in Bayesian settings based on
+posterior modes.  Stan's Markov chain Monte Carlo samplers can be used
+to implement point inference in Bayesian models based on posterior
+means or medians.
+
+## Maximum Likelihood Estimation {#mle.section}
+
+Given a likelihood function $p(y|\theta)$ and a fixed data vector $y$,
+the maximum likelihood estimate (MLE) is the parameter vector $\hat{\theta}$
+that maximizes the likelihood, i.e.,
+$$
+\hat{\theta} = \mbox{argmax}_{\theta} \ p(y|\theta).
+$$
+It is usually more convenient to work on the log scale.
+The following is an equivalent formulateion of the MLE,^[The equivalence follows from the fact that densities are positive and the log function is strictly monotonic, i.e., $p(y|\theta) \geq 0$ and for all $a, b > 0$, $\log a > \log b$ if and only if $a > b$.]
+
+$$
+\hat{\theta} = \mbox{argmax}_{\theta} \ \log p(y|\theta).
+$$
+
+### Existence of Maximum Likelihood Estimates {-}
+
+Because not all functions have unique maximum values, maximum
+likelihood estimates are not guaranteed to exist.  As discussed in the
+[problematic postriors chapter](#problematic-posteriors.chapter), this
+situation can arise when
+
+
+* there is more than one point that maximizes the likelihood function,
+* the likelihood function is unbounded, or
+* the likelihood function is bounded by an asymptote that is never
+  reached for legal parameter values.
+
+
+These problems persist with the penalized maximum likelihood estimates
+discussed in the next section, and Bayesian posterior modes as
+discussed in the following section.
+
+
+### Example: Linear Regression {-}
+
+Consider an ordinary linear regression problem with an $N$-dimensional
+vector of observations $y$, an $(N \times K)$-dimensional data matrix
+$x$ of predictors, a $K$-dimensional parameter vector $\beta$ of
+regression coefficients, and a real-valued noise scale $\sigma > 0$,
+with log likelihood function
+$$
+\log p(y|\beta,x) = \sum_{n=1}^N \log \mathsf{normal}(y_n|x_n \beta,
+\sigma).
+$$
+
+The maximum likelihood estimate for $\theta = (\beta,\sigma)$ is just
+$$
+(\hat{\beta},\hat{\sigma})
+\ = \
+\mbox{argmax}_{\beta,\sigma}
+\log p(y|\beta,\sigma,x) = \sum_{n=1}^N \log \mathsf{normal}(y_n|x_n \beta, \sigma).
+$$
+
+#### Squared Error {-}
+
+A little algebra on the log likelihood function shows that the
+marginal maximum likelihood estimate $\hat{\theta} =
+(\hat{\beta},\hat{\sigma})$ can be equivalently formulated for
+$\hat{\beta}$ in terms of least squares.  That is, $\hat{\beta}$ is
+the value for the coefficient vector that minimizes the sum of squared
+prediction errors,
+
+$$
+\hat{\beta}
+\ = \
+\mbox{argmin}_{\beta} \sum_{n=1}^N (y_n - x_n \beta)^2
+\ = \
+\mbox{argmin}_{\beta} (y - x \beta)^{\top} (y - x\beta).
+$$
+
+The residual error for data item $n$ is the difference between the
+actual value and predicted value, $y_n - x_n \hat{\beta}$.  The
+maximum likelihood estimate for the noise scale, $\hat{\sigma}$ is
+just the square root of the average squared residual,
+$$
+\hat{\sigma}^2
+\ = \
+\frac{1}{N} \sum_{n=1}^N \left( y_n - x_n \hat{\beta} \right)^2
+\ = \
+\frac{1}{N} (y - x \hat{\beta})^{\top} (y - x\hat{\beta}).
+$$
+
+#### Minimizing Squared Error in Stan {-}
+
+The squared error approach to linear regression can be directly coded
+in Stan with the following model.
+
+```
+data {
+  int<lower=0> N;
+  int<lower=1> K;
+  vector[N] y;
+  matrix[N,K] x;
+}
+parameters {
+  vector[K] beta;
+}
+transformed parameters {
+  real<lower=0> squared_error;
+  squared_error = dot_self(y - x * beta);
+}
+model {
+  target += -squared_error;
+}
+generated quantities {
+  real<lower=0> sigma_squared;
+  sigma_squared = squared_error / N;
+}
+```
+
+Running Stan's optimizer on this model produces the MLE for the linear
+regression by directly minimizing the sum of squared errors and using
+that to define the noise scale as a generated quantity.
+
+By replacing `N` with `N-1` in the denominator of the definition of
+`sigma_squared`, the more commonly supplied unbiased estimate of
+$\sigma^2$ can be calculated; see the [estimation bias
+section](#estimation-bias.section) for a definition and a discussion
+of estimating variance.
+
+
+
+## Penalized Maximum Likelihood Estimation
+
+There is nothing special about a likelihood function as far as the
+ability to perform optimization is concerned.  It is common among
+non-Bayesian statisticians to add so-called "penalty" functions
+to log likelihoods and optimize the new function.  The penalized
+maximum likelihood estimator for a log likelihood function
+$\log p(y|\theta)$ and penalty function $r(\theta)$ is defined to be
+$$
+\hat{\theta} = \mbox{argmax}_{\theta} \log p(y|\theta) - r(\theta).
+$$
+The penalty function $r(\theta)$ is negated in the maximization so
+that the estimate $\hat{\theta}$ balances maximizing the log
+likelihood and minimizing the penalty.  Penalization is sometimes
+called "regularization."
+
+
+### Examples {-} {#penalized-mle-examples}
+
+#### Ridge Regression {-}
+
+Ridge regression @HoerlKennard:1970 is based on penalizing the
+Euclidean length of the coefficient vector $\beta$. The ridge penalty
+function is
+
+$$
+r(\beta)
+\ = \
+\lambda \, \sum_{k=1}^K \beta_k^2
+\ = \
+\lambda \, \beta^{\top} \beta,
+$$
+
+where $\lambda$ is a constant tuning parameter that determines the
+magnitude of the penalty.
+
+
+Therefore, the penalized maximum likelihood estimate for ridge
+regression is just
+
+$$
+(\hat{\beta},\hat{\sigma})
+\ = \
+\mbox{argmax}_{\beta,\sigma} \,
+ \sum_{n=1}^N \log \mathsf{normal}(y_n|x_n \beta, \sigma) - \lambda
+ \sum_{k=1}^K \beta_k^2
+$$
+
+The ridge penalty is sometimes called L2 regularization or shrinkage,
+because of its relation to the L2 norm.
+
+Like the basic MLE for linear regression, the ridge regression
+estimate for the coefficients $\beta$ can also be formulated in terms
+of least squares,
+
+$$
+\hat{\beta}
+\ = \
+\mbox{argmin}_{\beta} \, \sum_{n=1}^N (y_n - x_n \beta)^2 + \sum_{k=1}^K \beta_k^2
+\ = \
+\mbox{argmin}_{\beta} \, (y - x\beta)^{\top} (y - x\beta) +
+\lambda \beta^{\top} \beta.
+$$
+
+The effect of adding the ridge penalty function is that the ridge
+regression estimate for $\beta$ is a vector of shorter length, or in
+other words, $\hat{\beta}$ is shrunk.  The ridge estimate does not
+necessarily have a smaller absolute $\beta_k$ for each $k$, nor does
+the coefficient vector necessarily point in the same direction as the
+maximum likelihood estimate.
+
+In Stan, adding the ridge penalty involves adding its magnitude as a
+data variable and the penalty itself to the model block,
+
+```
+data {
+  // ...
+  real<lower=0> lambda;
+}
+// ...
+model {
+  // ...
+  target += - lambda * dot_self(beta);
+}
+```
+
+The noise term calculation remains the same.
+
+#### Lasso {-}
+
+Lasso [@Tibshirani:1996] is an alternative to ridge
+regression that applies a penalty based on the sum of the absolute
+coefficients, rather than the sum of their squares,
+$$
+r(\beta) = \lambda \sum_{k=1}^K | \beta_k |.
+$$
+Lasso is also called L1 shrinkage due to its relation to the L1
+norm, which is also known as taxicab distance or Manhattan distance.
+
+Because the derivative of the penalty does not depend on the value of
+the $\beta_k$,
+$$
+\frac{d}{d\beta_k} \lambda \sum_{k=1}^K | \beta_k | =
+\mbox{signum}(\beta_k),
+$$
+it has the effect of shrinking parameters all the way to 0 in maximum
+likelihood estimates.  Thus it can be used for variable selection as
+well as just shrinkage.^[In practice, Stan's gradient-based optimizers are not guaranteed to produce exact zero values; see @LangfordEtAl:2009 for a discussion of getting exactly zero values with gradient descent.]
+
+Lasso can be implemented in Stan just as easily as ridge
+regression, with the magnitude declared as data and the penalty added
+to the model block,
+
+```
+data {
+  // ...
+  real<lower=0> lambda;
+}
+// ...
+model {
+  // ...
+  for (k in 1:K)
+    target += - lambda * fabs(beta[k]);
+}
+```
+
+#### Elastic Net {-}
+
+The naive elastic net [@ZouHastie:2005] involves a weighted
+average of ridge and lasso penalties, with a penalty function
+$$
+r(\beta)
+= \lambda_1 \sum_{k=1}^K |\beta_k|
++ \lambda_2 \sum_{k=1}^K \beta_k^2.
+$$
+The naive elastic net combines properties of both ridge regression and
+lasso, providing both identification and variable selection.
+
+The naive elastic net can be implemented directly in Stan by combining
+implementations of ridge regression and lasso, as
+
+```
+data {
+  real<lower=0> lambda1;
+  real<lower=0> lambda2;
+  // ...
+}
+// ...
+model {
+  // ...
+  for (k in 1:K)
+    target += -lambda1 * fabs(beta[k]);
+  target += -lambda2 * dot_self(beta);
+}
+```
+
+The signs are negative in the program because $r(\beta)$ is
+a penalty function.
+
+The elastic net [@ZouHastie:2005] involves adjusting the final estimate for
+$\beta$ based on the fit $\hat{\beta}$ produced by the naive elastic
+net.  The elastic net estimate is
+$$
+\hat{\beta} = (1 + \lambda_2) \beta^*
+$$
+where $\beta^{*}$ is the naive elastic net estimate.
+
+To implement the elastic net in Stan, the data, parameter, and model
+blocks are the same as for the naive elastic net.  In addition, the
+elastic net estimate is calculated in the generated quantities block.
+
+```
+generated quantities {
+  vector[K] beta_elastic_net;
+  // ...
+  beta_elastic_net = (1 + lambda2) * beta;
+}
+```
+
+The error scale also needs to be calculated in the generated
+quantities block based on the elastic net coefficients
+`beta_elastic_net`.
+
+
+#### Other Penalized Regressions {-}
+
+It is also common to use penalty functions that bias the coefficient
+estimates toward values other than 0, as in the estimators of
+@JamesStein:1961.  Penalty functions can also be used to bias
+estimates toward population means; see
+@EfronMorris:1975 and @Efron:2012.  This latter approach is similar
+to the hierarchical models commonly employed in Bayesian statistics.
+
+
+## Estimation Error, Bias, and Variance {#estimation-bias.section}
+
+An estimate $\hat{\theta}$ depends on the particular data $y$ and
+either the log likelihood function, $\log p(y|\theta)$, penalized log
+likelihood function $\log p(y|\theta) - r(\theta)$, or log probability
+function $\log p(y,\theta) = \log p(y,\theta) + \log p(\theta)$.  In
+this section, the notation $\hat{\theta}$ is overloaded to indicate
+the estimator, which is an implicit function of the data and
+(penalized) likelihood or probability function.
+
+### Estimation Error {-}
+
+For a particular observed data set $y$ generated according to true
+parameters $\theta$, the estimation error is the difference between
+the estimated value and true value of the parameter,
+$$
+\mbox{err}(\hat{\theta}) = \hat{\theta} - \theta.
+$$
+
+
+### Estimation Bias {-}
+
+For a particular true parameter value $\theta$ and a likelihood
+function $p(y|\theta)$, the expected estimation error averaged over
+possible data sets $y$ according to their density under the likelihood
+is
+
+$$
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}]
+\ = \
+\int \left( \mbox{argmax}_{\theta'} p(y|\theta') \right) p(y|\theta) dy.
+$$
+
+An estimator's bias is the expected estimation error,
+
+$$
+\mathbb{E}_{p(y|\theta)}[\hat{\theta} - \theta]
+\ = \
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}] - \theta
+$$
+
+The bias is a multivariate quantity with the same dimensions as
+$\theta$.  An estimator is unbiased if its expected estimation error
+is zero and biased otherwise.
+
+#### Example: Estimating a Normal Distribution {-}
+
+Suppose a data set of observations $y_n$ for $n \in 1{:}N$ drawn from
+a normal distribution.  This presupposes a model $y_n \sim
+\mathsf{normal}(\mu,\sigma)$, where both $\mu$ and $\sigma > 0$ are
+parameters.  The log likelihood is just
+$$
+\log p(y|\mu,\sigma) = \sum_{n=1}^N \log
+\mathsf{normal}(y_n|\mu,\sigma).
+$$
+The maximum likelihood estimator for $\mu$ is just the sample mean,
+i.e., the average of the samples,
+$$
+\hat{\mu} = \frac{1}{N} \sum_{n=1}^N y_n.
+$$
+The maximum likelihood estimate for the mean is unbiased.
+
+The maximum likelihood estimator for the variance $\sigma^2$ is the
+average of the squared difference from the mean,
+$$
+\hat{\sigma}^2 = \frac{1}{N} \sum_{n=1}^N (y_n - \hat{\mu})^2.
+$$
+The maximum likelihood for the variance is biased on the low side,
+i.e.,
+
+$$
+\mathbb{E}_{p(y|\mu,\sigma)}[\hat{\sigma}^2] < \sigma.
+$$
+
+The reason for this bias is that the maximum likelihood estimate is
+based on the difference from the estimated mean $\hat{\mu}$.  Plugging
+in the actual mean can lead to larger sum of squared differences;  if
+$\mu \neq \hat{\mu}$, then
+$$
+\frac{1}{N} \sum_{n=1}^N (y_n - \mu)^2
+>
+\frac{1}{N} \sum_{n=1}^N (y_n - \hat{\mu})^2.
+$$
+
+An alternative estimate for the variance is the sample variance, which
+is defined by
+$$
+\hat{\mu} = \frac{1}{N-1} \sum_{n=1}^N (y_n - \hat{\mu})^2.
+$$
+This value is larger than the maximum likelihood estimate by a factor
+of $N/(N-1)$.
+
+
+### Estimation Variance {-}
+
+The variance of component $k$ of an estimator $\hat{\theta}$ is
+computed like any other variance, as the expected squared difference
+from its expectation,
+
+$$
+\mbox{var}_{p(y|\theta})[\hat{\theta}_k]
+\ = \
+\mathbb{E}_{p(y|\theta})[\, (\hat{\theta}_k -
+\mathbb{E}_{p(y|\theta)}[\hat{\theta}_k])^2 \,].
+$$
+
+The full $K \times K$ covariance matrix for the estimator is thus
+defined, as usual, by
+
+$$
+\mbox{covar}_{p(y|\theta)}[\hat{\theta}]
+\ = \
+\mathbb{E}_{p(y|\theta})[\, (\hat{\theta} - \mathbb{E}[\hat{\theta}]) \,
+                         (\hat{\theta} -
+                         \mathbb{E}[\hat{\theta}])^{\top} \, ].
+$$
+
+Continuing the example of estimating the mean and variance of a normal
+distribution based on sample data, the maximum likelihood estimator
+(in this case, the sample mean) is the unbiased estimator for the mean $\mu$
+with the lowest variance; the Gauss-Markov theorem establishes this
+result in some generality for least-squares estimation, or
+equivalently, maximum likelihood estimation under an assumption of
+normal noise; see @[Section~3.2.2]{HastieTibshiraniFriedman:2009}.

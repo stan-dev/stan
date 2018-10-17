@@ -1,0 +1,663 @@
+# Clustering Models  {#clustering.chapter}
+
+Unsupervised methods for organizing data into groups are collectively
+referred to as clustering.  This chapter describes the implementation
+in Stan of two widely used statistical clustering models, soft
+$K$-means and latent Dirichlet allocation (LDA).  In addition, this
+chapter includes naive Bayesian classification, which can be viewed as
+a form of clustering which may be supervised.  These models are
+typically expressed using discrete parameters for cluster assignments.
+Nevertheless, they can be implemented in Stan like any other mixture
+model by marginalizing out the discrete parameters (see
+the [mixture modeling chapter](#mixture-modeling.chapter)).
+
+## Relation to Finite Mixture Models
+
+As mentioned in the [clustering section](#clustering-mixture.section),
+clustering models and finite mixture models are really just two sides
+of the same coin.  The ``soft" $K$-means model described in the next
+section is a normal mixture model (with varying assumptions about
+covariance in higher dimensions leading to variants of $K$-means).
+Latent Dirichlet allocation is a mixed-membership multinomial mixture.
+
+## Soft $K$-Means
+
+$K$-means clustering is a method of clustering data represented as
+$D$-dimensional vectors.  Specifically, there will be $N$ items to be
+clustered, each represented as a vector $y_n \in \mathbb{R}^D$.  In the
+"soft" version of $K$-means, the assignments to clusters will be
+probabilistic.
+
+### Geometric Hard  $K$-Means Clustering {-}
+
+$K$-means clustering is typically described geometrically in terms of
+the following algorithm, which assumes the number of clusters $K$ and
+data vectors $y$ as input.
+
+
+1. For each $n$ in $1:N$, randomly assign vector $y_n$ to a cluster in $1{:}K$;
+1. Repeat
+    1. For each cluster $k$ in $1{:}K$, compute the cluster centroid $\mu_k$  by averaging the vectors assigned to that cluster;
+    1. For each $n$ in $1:N$, reassign $y_n$ to the cluster $k$ for which the (Euclidean) distance from $y_n$ to $\mu_k$ is smallest;
+    1. If no vectors changed cluster, return the cluster assignments.
+
+This algorithm is guaranteed to terminate.
+
+### Soft $K$-Means Clustering {-}
+
+Soft $K$-means clustering treats the cluster assignments as
+probability distributions over the clusters.  Because of the
+connection between Euclidean distance and multivariate normal models
+with a fixed covariance, soft $K$-means can be expressed (and coded in
+Stan) as a multivariate normal mixture model.
+
+In the full generative model, each data point $n$ in $1{:}N$ is assigned
+a cluster $z_n \in 1{:}K$ with symmetric uniform probability,
+
+$$
+z_n \sim \mathsf{Categorical}({\bf 1}/K),
+$$
+where ${\bf 1}$ is the unit vector of $K$ dimensions, so that ${\bf
+  1}/K$ is the symmetric $K$-simplex.  Thus the model assumes that
+each data point is drawn from a hard decision about cluster
+membership.  The softness arises only from the uncertainty about which
+cluster generated a data point.
+
+The data points themselves are generated from a multivariate normal
+distribution whose parameters are determined by the cluster assignment
+$z_n$,
+$$
+y_n \sim  \mathsf{normal}(\mu_{z[n]},\Sigma_{z[n]})
+$$
+
+The sample implementation in this section assumes a fixed unit
+covariance matrix shared by all clusters $k$,
+$$
+\Sigma_k = \mbox{diag\_matrix}({\bf 1}),
+$$
+so that the log multivariate normal can be implemented directly up to a proportion
+by
+$$
+\mbox{normal}\left( y_n | \mu_k, \mbox{diag\_matrix}({\bf 1}) \right)
+\propto \exp \left (- \frac{1}{2} \sum_{d=1}^D \left( \mu_{k,d} - y_{n,d}
+  \right)^2 \right).
+$$
+The spatial perspective on $K$-means arises by noting that the inner
+term is just half the negative Euclidean distance from the cluster
+mean $\mu_k$ to the data point $y_n$.
+
+### Stan Implementation of Soft $K$-Means {-}
+
+Consider the following Stan program for implementing $K$-means
+clustering.
+
+```
+data {
+  int<lower=0> N;  // number of data points
+  int<lower=1> D;  // number of dimensions
+  int<lower=1> K;  // number of clusters
+  vector[D] y[N];  // observations
+}
+transformed data {
+  real<upper=0> neg_log_K;
+  neg_log_K = -log(K);
+}
+parameters {
+  vector[D] mu[K]; // cluster means
+}
+transformed parameters {
+  real<upper=0> soft_z[N, K]; // log unnormalized clusters
+  for (n in 1:N)
+    for (k in 1:K)
+      soft_z[n, k] = neg_log_K
+                     - 0.5 * dot_self(mu[k] - y[n]);
+}
+model {
+  // prior
+  for (k in 1:K)
+    mu[k] ~ std_normal();
+
+  // likelihood
+  for (n in 1:N)
+    target += log_sum_exp(soft_z[n]));
+}
+```
+
+There is an independent standard normal prior on the centroid parameters;
+this prior could be swapped with other priors, or even a hierarchical
+model to fit an overall problem scale and location.
+
+The only parameter is `mu`, where `mu[k]` is the centroid for cluster
+$k$.  The transformed parameters `soft_z[n]` contain the log of the
+unnormalized cluster assignment probabilities.  The vector `soft_z[n]`
+can be converted back to a normalized simplex using the softmax
+function (see the functions reference manual), either externally or
+within the model's generated quantities block.
+
+### Generalizing Soft $K$-Means {-}
+
+The multivariate normal distribution with unit covariance matrix
+produces a log probability density proportional to Euclidean distance
+(i.e., $L_2$ distance).  Other distributions relate to other
+geometries.  For instance, replacing the normal distribution with the
+double exponential (Laplace) distribution produces a clustering model
+based on $L_1$ distance (i.e., Manhattan or taxicab
+distance).
+
+Within the multivariate normal version of $K$-means, replacing the
+unit covariance matrix with a shared covariance matrix amounts to
+working with distances defined in a space transformed by the inverse
+covariance matrix.
+
+Although there is no global spatial analog, it is common to see soft
+$K$-means specified with a per-cluster covariance matrix. In this
+situation, a hierarchical prior may be used for the covariance matrices.
+
+
+
+## The Difficulty of Bayesian Inference for Clustering
+
+Two problems make it pretty much impossible to perform full Bayesian
+inference for clustering models, the lack of parameter identifiability
+and the extreme multimodality of the posteriors.  There is additional
+discussion related to the non-identifiability due to label switching
+in the [label switching
+section](#label-switching-problematic.section).
+
+### Non-Identifiability {-}
+
+Cluster assignments are not identified --- permuting the cluster mean
+vectors `mu` leads to a model with identical likelihoods.  For
+instance, permuting the first two indexes in `mu` and the first
+two indexes in each `soft_z[n]` leads to an identical likelihood
+(and prior).
+
+The lack of identifiability means that the cluster parameters
+cannot be compared across multiple Markov chains.  In fact, the only
+parameter in soft $K$-means is not identified, leading to problems in
+monitoring convergence.  Clusters can even fail to be identified
+within a single chain, with indices swapping if the chain is long
+enough or the data are not cleanly separated.
+
+### Multimodality {-}
+
+The other problem with clustering models is that their posteriors are
+highly multimodal.  One form of multimodality is the
+non-identifiability leading to index swapping.  But even without
+the index problems the posteriors are highly multimodal.
+
+Bayesian inference fails in cases of high multimodality because there
+is no way to visit all of the modes in the posterior in appropriate
+proportions and thus no way to evaluate integrals involved in
+posterior predictive inference.
+
+In light of these two problems, the advice often given in fitting
+clustering models is to try many different initializations and select
+the sample with the highest overall probability.  It is also popular
+to use optimization-based point estimators such as expectation
+maximization or variational Bayes, which can be much more efficient
+than sampling-based approaches.
+
+
+## Naive Bayes Classification and Clustering
+
+Naive Bayes is a kind of mixture model that can be used for
+classification or for clustering (or a mix of both), depending on
+which labels for items are observed.^[For clustering, the non-identifiability problems for all mixture models present a problem, whereas there is no such problem for classification.  Despite the difficulties with full Bayesian inference for clustering, researchers continue to use it, often in an exploratory data analysis setting rather than for predictive modeling.]
+
+Multinomial mixture models are referred to as "naive Bayes" because
+they are often applied to classification problems where the
+multinomial independence assumptions are clearly false.
+
+Naive Bayes classification and clustering can be applied to any data
+with multinomial structure.  A typical example of this is natural
+language text classification and clustering, which is used an example
+in what follows.
+
+The observed data consists of a sequence of $M$ documents made up of
+bags of words drawn from a vocabulary of $V$ distinct words.  A
+document $m$ has $N_m$ words, which are indexed as $w_{m,1}, \ldots,
+w_{m,N[m]} \in 1{:}V$.  Despite the ordered indexing of words in a
+document, this order is not part of the model, which is clearly
+defective for natural human language data.  A number of topics (or
+categories) $K$ is fixed.
+
+The multinomial mixture model generates a single category $z_m \in
+1{:}K$ for each document $m \in 1{:}M$ according to a categorical
+distribution,
+$$
+z_m \sim \mathsf{Categorical}(\theta).
+$$
+The $K$-simplex parameter $\theta$ represents the prevalence of each
+category in the data.
+
+Next, the words in each document are generated conditionally
+independently of each other and the words in other documents based on
+the category of the document, with word $n$ of document $m$ being
+generated as
+$$
+w_{m,n} \sim \mathsf{Categorical}(\phi_{z[m]}).
+$$
+The parameter $\phi_{z[m]}$ is a $V$-simplex representing the
+probability of each word in the vocabulary in documents of category
+$z_m$.
+
+The parameters $\theta$ and $\phi$ are typically given symmetric
+Dirichlet priors.  The prevalence $\theta$ is sometimes fixed to
+produce equal probabilities for each category $k \in 1:K$.
+
+### Coding Ragged Arrays {-}
+
+The specification for naive Bayes in the previous sections have used a ragged
+array notation for the words $w$.  Because Stan does not support
+ragged arrays, the models are coded using an alternative strategy that
+provides an index for each word in a global list of words.   The data
+is organized as follows, with the word arrays laid out in a column and each
+assigned to its document in a second column.
+
+\begin{center}
+\begin{tabular}{r|cc}
+`n` & `w[n]` & `doc[n]` \\ \hline
+1 & $w_{1,1}$ & 1 \\
+2 & $w_{1,2}$ & 1 \\
+\vdots & \vdots & \vdots \\
+$N_1$ & $w_{1,N[1]}$ & 1 \\
+$N_1 + 1$ & $w_{2,1}$ & 2 \\
+$N_1 + 2$ & $w_{2,2}$ & 2 \\
+\vdots & \vdots & \vdots \\
+$N_1 + N_2$ & $w_{2,N[2]}$ & 2 \\
+$N_1 + N_2 + 1$ & $w_{3,1}$ & 3 \\
+\vdots & \vdots & \vdots \\
+$`N` = \sum_{m=1}^M N_m$ & $w_{M,N[M]}$ & $M$ \\
+\end{tabular}
+\end{center}
+
+The relevant variables for the program are `N`, the total number
+of words in all the documents, the word array `w`, and the
+document identity array `doc`.
+
+### Estimation with Category-Labeled Training Data {-}
+
+
+A naive Bayes model for estimating the simplex parameters given
+training data with documents of known categories can be coded in Stan
+as follows
+
+
+```
+data {
+  // training data
+  int<lower=1> K;               // num topics
+  int<lower=1> V;               // num words
+  int<lower=0> M;               // num docs
+  int<lower=0> N;               // total word instances
+  int<lower=1,upper=K> z[M];    // topic for doc m
+  int<lower=1,upper=V> w[N];    // word n
+  int<lower=1,upper=M> doc[N];  // doc ID for word n
+  // hyperparameters
+  vector<lower=0>[K] alpha;     // topic prior
+  vector<lower=0>[V] beta;      // word prior
+}
+parameters {
+  simplex[K] theta;   // topic prevalence
+  simplex[V] phi[K];  // word dist for topic k
+}
+model {
+  theta ~ dirichlet(alpha);
+  for (k in 1:K)
+    phi[k] ~ dirichlet(beta);
+  for (m in 1:M)
+    z[m] ~ categorical(theta);
+  for (n in 1:N)
+    w[n] ~ categorical(phi[z[doc[n]]]);
+}
+```
+
+The topic identifiers $z_m$ are declared as data and the
+latent category assignments are included as part of the likelihood
+function.
+
+### Estimation without Category-Labeled Training Data {-}
+
+Naive Bayes models can be used in an unsupervised fashion to cluster
+multinomial-structured data into a fixed number $K$ of categories.
+The data declaration includes the same variables as the model in the
+previous section excluding the topic labels `z`.   Because
+`z` is discrete, it needs to be summed out of the model
+calculation.  This is done for naive Bayes as for other mixture
+models.  The parameters are the same up to the priors, but the
+likelihood is now computed as the marginal document probability
+$$
+\begin{array}{l}
+\log p(w_{m,1},\ldots,w_{m,N_m}|\theta,\phi)
+\\[2pt]
+\ \ \ = \
+\log \sum_{k=1}^K
+\left( \mathsf{Categorical}(k|\theta)
+        * \prod_{n=1}^{N_m} \mathsf{Categorical}(w_{m,n}|\phi_k)
+\right)
+\\[6pt]
+\ \ \ = \
+\log \sum_{k=1}^K \exp \left(
+\log \mathsf{Categorical}(k|\theta)
++ \sum_{n=1}^{N_m} \log \mathsf{Categorical}(w_{m,n}|\phi_k)
+\right).
+\end{array}
+$$
+
+The last step shows how the `log_sum_exp` function can be used
+to stabilize the numerical calculation and return a result on the log
+scale.
+
+```
+model {
+  real gamma[M, K];
+  theta ~ dirichlet(alpha);
+  for (k in 1:K)
+    phi[k] ~ dirichlet(beta);
+  for (m in 1:M)
+    for (k in 1:K)
+      gamma[m, k] = categorical_lpmf(k | theta);
+  for (n in 1:N)
+    for (k in 1:K)
+      gamma[doc[n], k] = gamma[doc[n], k]
+                         + categorical_lpmf(w[n] | phi[k]);
+  for (m in 1:M)
+    target += log_sum_exp(gamma[m]);
+}
+```
+
+The local variable `gamma[m, k]` represents the value
+$$
+\gamma_{m,k} = \log \mathsf{Categorical}(k|\theta)
++ \sum_{n=1}^{N_m} \log \mathsf{Categorical}(w_{m,n}|\phi_k).
+$$
+
+Given $\gamma$, the posterior probability that document
+$m$ is assigned category $k$ is
+$$
+\mbox{Pr}[z_m = k|w,\alpha,\beta]
+=
+\exp \left(
+\gamma_{m,k}
+- \log \sum_{k=1}^K \exp \left( \gamma_{m,k} \right)
+\right).
+$$
+
+If the variable `gamma` were declared and defined in the
+transformed parameter block, its sampled values would be saved by
+Stan.  The normalized posterior probabilities could also be defined as
+generated quantities.
+
+### Full Bayesian Inference for Naive Bayes {-}
+
+Full Bayesian posterior predictive inference for the naive Bayes model
+can be implemented in Stan by combining the models for labeled and
+unlabeled data.  The estimands include both the model parameters and
+the posterior distribution over categories for the unlabeled data.  The
+model is essentially a missing data model assuming the unknown
+category labels are missing completely at random; see
+@GelmanEtAl:2013 and @GelmanHill:2007 for more
+information on missing data imputation.  The model is also an instance
+of semisupervised learning because the unlabeled data contributes to
+the parameter estimations.
+
+To specify a Stan model for performing full Bayesian inference, the
+model for labeled data is combined with the model for unlabeled data.
+A second document collection is declared as data, but without the
+category labels, leading to new variables `M2` `N2`,
+`w2`, and `doc2`.  The number of categories and number of
+words, as well as the hyperparameters are shared and only declared
+once.  Similarly, there is only one set of parameters.  Then the model
+contains a single set of statements for the prior, a set of statements
+for the labeled data, and a set of statements for the unlabeled data.
+
+### Prediction without Model Updates {-}
+
+An alternative to full Bayesian inference involves estimating a model
+using labeled data, then applying it to unlabeled data without
+updating the parameter estimates based on the unlabeled data.  This
+behavior can be implemented by moving the definition of `gamma`
+for the unlabeled documents to the generated quantities block.
+Because the variables no longer contribute to the log probability,
+they no longer jointly contribute to the estimation of the model
+parameters.
+
+
+## Latent Dirichlet Allocation
+
+Latent Dirichlet allocation (LDA) is a mixed-membership multinomial
+clustering model @BleiNgJordan:2003 that generalized naive
+Bayes.  Using the topic and document terminology common in discussions of
+LDA, each document is modeled as having a mixture of topics, with each
+word drawn from a topic based on the mixing proportions.
+
+### The LDA Model {-}
+
+The basic model assumes each document is generated independently based
+on fixed hyperparameters. For document $m$, the first step is to draw a topic
+distribution simplex $\theta_m$ over the $K$ topics,
+
+$$
+\theta_m \sim \mathsf{Dirichlet}(\alpha).
+$$
+
+The prior hyperparameter $\alpha$ is fixed to a $K$-vector of positive
+values.  Each word in the document is generated independently
+conditional on the distribution $\theta_m$.  First, a topic
+$z_{m,n} \in 1{:}K$ is drawn for the word based on the
+document-specific topic-distribution,
+$$
+z_{m,n} \sim \mathsf{Categorical}(\theta_m).
+$$
+
+Finally, the word $w_{m,n}$ is drawn according to the word distribution
+for topic $z_{m,n}$,
+$$
+w_{m,n} \sim \mathsf{Categorical}(\phi_{z[m,n]}).
+$$
+The distributions $\phi_k$ over words for topic $k$ are also given a
+Dirichlet prior,
+$$
+\phi_k \sim \mathsf{Dirichlet}(\beta)
+$$
+
+where $\beta$ is a fixed $V$-vector of positive values.
+
+### Summing out the Discrete Parameters {-}
+
+Although Stan does not (yet) support discrete sampling, it is possible
+to calculate the marginal distribution over the continuous parameters
+by summing out the discrete parameters as in other mixture models.
+The marginal posterior of the topic and word variables is
+
+$$
+\begin{array}{rcl}
+p(\theta,\phi|w,\alpha,\beta)
+& \propto &
+p(\theta|\alpha) p(\phi|\beta) p(w|\theta,\phi)
+\\[4pt]
+& = &
+\prod_{m=1}^M p(\theta_m|\alpha)
+*
+\prod_{k=1}^K p(\phi_k|\beta)
+*
+\prod_{m=1}^M \prod_{n=1}^{M[n]} p(w_{m,n}|\theta_m,\phi).
+\end{array}
+$$
+
+The inner word-probability term is defined by summing out the
+topic assignments,
+
+$$
+\begin{array}{rcl}
+p(w_{m,n}|\theta_m,\phi)
+& = &
+\sum_{z=1}^K p(z,w_{m,n}|\theta_m,\phi).
+\\[4pt]
+& = &
+\sum_{z=1}^K p(z|\theta_m) p(w_{m,n}|\phi_z).
+\end{array}
+$$
+
+Plugging the distributions in and converting to the log scale provides a
+formula that can be implemented directly in Stan,
+$$
+\begin{array}{l}
+\log p(\theta,\phi|w,\alpha,\beta)
+\\[6pt]
+{ } \ \
+\begin{array}{l}
+{ } = \sum_{m=1}^M \log \mathsf{Dirichlet}(\theta_m|\alpha)
+\ + \
+\sum_{k=1}^K \log \mathsf{Dirichlet}(\phi_k|\beta)
+\\[6pt]
+{ } \ \ \ \ \
++ \sum_{m=1}^M \sum_{n=1}^{N[m]} \log \left(
+\sum_{z=1}^K
+  \mathsf{Categorical}(z|\theta_m)
+   * \mathsf{Categorical}(w_{m,n}|\phi_z)
+ \right)
+\end{array}
+\end{array}
+$$
+
+### Implementation of LDA {-}
+
+
+Applying the marginal derived in the last section to the data
+structure described in this section leads to the following Stan
+program for LDA.
+
+```
+data {
+  int<lower=2> K;               // num topics
+  int<lower=2> V;               // num words
+  int<lower=1> M;               // num docs
+  int<lower=1> N;               // total word instances
+  int<lower=1,upper=V> w[N];    // word n
+  int<lower=1,upper=M> doc[N];  // doc ID for word n
+  vector<lower=0>[K] alpha;     // topic prior
+  vector<lower=0>[V] beta;      // word prior
+}
+parameters {
+  simplex[K] theta[M];   // topic dist for doc m
+  simplex[V] phi[K];     // word dist for topic k
+}
+model {
+  for (m in 1:M)
+    theta[m] ~ dirichlet(alpha);  // prior
+  for (k in 1:K)
+    phi[k] ~ dirichlet(beta);     // prior
+  for (n in 1:N) {
+    real gamma[K];
+    for (k in 1:K)
+      gamma[k] = log(theta[doc[n], k]) + log(phi[k, w[n]]);
+    target += log_sum_exp(gamma);  // likelihood;
+  }
+}
+```
+
+As in the other mixture models, the log-sum-of-exponents function is
+used to stabilize the numerical arithmetic.
+
+### Correlated Topic Model {-}
+
+To account for correlations in the distribution of topics for
+documents, @BleiLafferty:2007 introduced a variant of LDA in
+which the Dirichlet prior on the per-document topic distribution is
+replaced with a multivariate logistic normal distribution.
+
+The authors treat the prior as a fixed hyperparameter.  They use an
+$L_1$-regularized estimate of covariance, which is equivalent to the
+maximum a posteriori estimate given a double-exponential prior.  Stan
+does not (yet) support maximum a posteriori estimation, so the mean and
+covariance of the multivariate logistic normal must be specified as
+data.
+
+#### Fixed Hyperparameter Correlated Topic Model {-}
+
+The Stan model in the previous section can be modified to implement
+the correlated topic model by replacing the Dirichlet topic prior
+`alpha` in the data declaration with the mean and covariance of
+the multivariate logistic normal prior.
+
+```
+data {
+  ... data as before without alpha ...
+  vector[K] mu;          // topic mean
+  cov_matrix[K] Sigma;   // topic covariance
+}
+```
+
+Rather than drawing the simplex parameter `theta` from a
+Dirichlet, a parameter `eta` is drawn from a multivariate normal
+distribution and then transformed using softmax into a simplex.
+
+```
+parameters {
+  simplex[V] phi[K];  // word dist for topic k
+  vector[K] eta[M];   // topic dist for doc m
+}
+transformed parameters {
+  simplex[K] theta[M];
+  for (m in 1:M)
+    theta[m] = softmax(eta[m]);
+}
+model {
+  for (m in 1:M)
+    eta[m] ~ multi_normal(mu, Sigma);
+  ... model as before w/o prior for theta ...
+}
+```
+
+#### Full Bayes Correlated Topic Model {-}
+
+By adding a prior for the mean and covariance, Stan supports full
+Bayesian inference for the correlated topic model.  This requires
+moving the declarations of topic mean `mu` and covariance `Sigma`
+from the data block to the parameters block and providing them with
+priors in the model.  A relatively efficient and interpretable prior
+for the covariance matrix `Sigma` may be encoded as follows.
+
+```
+... data block as before, but without alpha ...
+parameters {
+  vector[K] mu;              // topic mean
+  corr_matrix[K] Omega;      // correlation matrix
+  vector<lower=0>[K] sigma;  // scales
+  vector[K] eta[M];          // logit topic dist for doc m
+  simplex[V] phi[K];         // word dist for topic k
+}
+transformed parameters {
+  ... eta as above ...
+  cov_matrix[K] Sigma;       // covariance matrix
+  for (m in 1:K)
+    Sigma[m, m] = sigma[m] * sigma[m] * Omega[m, m];
+  for (m in 1:(K-1)) {
+    for (n in (m+1):K) {
+      Sigma[m, n] = sigma[m] * sigma[n] * Omega[m, n];
+      Sigma[n, m] = Sigma[m, n];
+    }
+  }
+}
+model {
+  mu ~ normal(0, 5);      // vectorized, diffuse
+  Omega ~ lkj_corr(2.0);  // regularize to unit correlation
+  sigma ~ cauchy(0, 5);   // half-Cauchy due to constraint
+  ... words sampled as above ...
+}
+```
+
+The $\mathsf{LkjCorr}$ distribution with shape $\alpha > 0$ has support
+on correlation matrices (i.e., symmetric positive definite with unit
+diagonal).  Its density is defined by
+$$
+\mathsf{LkjCorr}(\Omega|\alpha) \propto \mbox{det}(\Omega)^{\alpha - 1}
+$$
+With a scale of $\alpha = 2$, the weakly informative prior favors a
+unit correlation matrix.  Thus the compound effect of this prior on
+the covariance matrix $\Sigma$ for the multivariate logistic normal is
+a slight concentration around diagonal covariance matrices with scales
+determined by the prior on `sigma`.
+

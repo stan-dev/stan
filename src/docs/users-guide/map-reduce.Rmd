@@ -1,0 +1,390 @@
+# Map-Reduce  {#map-reduce.chapter}
+
+Map-reduce allows large calculations (e.g., log likelihoods) to be
+broken into components which may be calculated modularly (e.g., data
+blocks) and combined (e.g., by summation and incrementing the target
+log density).
+
+## Overview of Map-Reduce
+
+A _map function_ is a higher-order function that applies an
+argument function to every member of some collection, returning a
+collection of the results.  For example, mapping the square function,
+$f(x) = x^2$, over the vector $[3, 5, 10]$ produces the vector
+$[9, 25, 100]$.  In other words, map applies the square function
+elementwise.
+
+The output of mapping a sequence is often fed into a reduction.
+A _reduction function_ takes an arbitrarily long sequence of
+inputs and returns a single output.  Examples of reduction functions
+are summation (with the return being a single value) or sorting (with
+the return being a sorted sequence).  The combination of mapping and
+reducing is so common it has its own name, _map-reduce_.
+
+## Map Function
+
+In order to generalize the form of functions and results that are
+possible and accomodate both parameters (which need derivatives) and
+data values (which don't), Stan's map function operates on more than
+just a sequence of inputs.
+
+### Map Function Signature {-}
+
+Stan's map function has the following signature
+
+```
+vector map_rect((vector, vector, real[], int[]):vector f,
+                vector phi, vector[] thetas,
+                data real[ , ] x_rs, data int[ , ] x_is);
+```
+
+The arrays `thetas` of parametrs, `x_rs` of real data, and
+`x_is` of integer data have the suffix "`s`" to indicate they
+are arrays.  These arrays must all be the same size, as they will be
+mapped in parallel by the function `f`.  The value of `phi`
+is reused in each mapped operation.
+
+The `_rect` suffix in the name arises because the data
+structures it takes as arguments are rectangular.  In order to deal
+with ragged inputs, ragged inputs must be padded out to recangular
+form.
+
+The last two arguments are two dimensional arrays of real and integer
+data values.  These argument types are marked with the `data`
+qualifier to indicate that they must only contain variables
+originating in the data or transformed data blocks.  This will allow
+such data to be pinned to a processor on which it is being processed
+to reduce communication overhead.
+
+The notation `(vector, vector, real[], int[]):vector` indicates
+that the function argument `f` must have the following signature.
+
+```
+vector f(vector phi, vector theta,
+         data real[] x_r, data int[] x_i);
+```
+
+Although `f` will often return a vector of size one, the built-in
+flexiblity allows general multivariate functions to be mapped, even
+raggedly.
+
+### Map Function Semantics {-}
+
+Stan's map function applies the function `f` to the shared
+parameters along with one element each of the job parameters, real
+data, and integer data arrays.  Each of the arguments `theta`,
+`x_r`, and `x_i` must be arrays of the same size.  If the
+arrays are all size `N`, the result is defined as follows.
+
+```
+map_rect(f, phi, thetas, xs, ns)
+= f(phi, thetas[1], xs[1], ns[1]) . f(phi, thetas[2], xs[2], ns[2])
+  . ... . f(phi, thetas[N], xs[N], ns[N])
+```
+
+The dot operators in the notation above are meant to indicate
+concatenation (implemented as `append_row` in Stan).  The output
+of each application of `f` is a vector, and the sequence of
+`N` vectors is concatenated together to return a single vector.
+
+
+## Example:  Mapping Logistic Regression
+
+An example should help to clarify both the syntax and semantics of the
+mapping operation and how it may be combined with reductions built
+into Stan to provide a map-reduce implementation.
+
+### Unmapped Logistic Regression {-}
+
+Consider the following simple logistic regression model, which is
+coded unconventionally to accomodate direct translation to a mapped
+implementation.
+
+```
+data {
+  int y[12];
+  real x[12];
+}
+parameters {
+  vector[2] beta;
+}
+model {
+  beta ~ std_normal();
+  y ~ bernoulli_logit(beta[1] + beta[2] * to_vector(x));
+}
+```
+
+The program is unusual in that it (a) hardcodes the data size, which
+is not required by the map function but is just used here for
+simplicity, (b) represents the predictors as a real array even though
+it needs to be used as a vector, and (c) represents the regression
+coefficients (intercept and slope) as a vector even though they're
+used individually.  The `bernoulli_logit` distribution is used
+because the argument is on the logit scale---it implicitly applies the
+inverse logit function to map the argument to a probability.
+
+
+### Mapped Logistic Regression {-}
+
+The unmapped logistic regression model described in the previous
+subsection may be implemented using Stan's rectangular mapping
+functionality as follows.
+
+```
+functions {
+  vector lr(vector beta, vector theta, real[] x, int[] y) {
+    real lp = bernoulli_logit_lpmf(y | beta[1] + to_vector(x) * beta[2]);
+    return [lp]';
+  }
+}
+data {
+  int y[12];
+  real x[12];
+}
+transformed data {
+  // K = 3 shards
+  int ys[3, 4] = { y[1:4], y[5:8], y[9:12] };
+  real xs[3, 4] = { x[1:4], x[5:8], x[9:12] };
+  vector[0] theta[3];
+}
+parameters {
+  vector[2] beta;
+}
+model {
+  beta ~ std_normal();
+  target += sum(map_rect(lr, beta, theta, xs, ys));
+}
+```
+
+The first piece of the code is the actual function to compute the
+logistic regression.  The argument `beta` will contain the
+regression coefficients (intercept and slope), as before.  The second
+argument `theta` of job-specific parameters is not used, but
+nevertheless must be present.  The modeled data `y` is passed as
+an array of integers and the predictors `x` as an array of real
+values.  The function body then computes the log probability mass of `y` and
+assigns it to the local variable `lp`.  This variable is then
+used in `[lp]'` to construct a row vector and then transpose it
+to a vector to return.
+
+The data are taken in as before.  There is an additional transformed
+data block that breaks the data up into three shards.^[The term "shard" is borrowed from databases, where it refers to a slice of the rows of a database.  That is exactly what it is here if we think of rows of a dataframe.  Stan's shards are more general in that they need not correspond to rows of a dataframe.]
+
+The value `3` is also hard coded; a more practical program would
+allow the number of shards to be controlled.  There are three parallel
+arrays defined here, each of size three, corresponding to the number
+of shards.  The array `ys` contains the modeled data variables;
+each element of the array `ys` is an array of size four.  The
+second array `xs` is for the predictors, and each element of it
+is also of size four.  These contained arrays are the same size
+because the predictors `x` stand in a one-to-one relationship
+with the modeled data `y`. The final array `theta` is also
+of size three;  its elements are empty vectors, because there are no
+shard-specific parameters.
+
+The parameters and the prior are as before.  The likelihood is now
+coded using map-reduce.  The function `lr` to compute the log
+probability mass is mapped over the data `xs` and `ys`,
+which contain the original predictors and outcomes broken into shards.
+The parameters `beta` are in the first argument because they are
+shared across shards.  There are no shard-specific parameters, so
+the array of job-specific parameters `theta` contains only empty
+vectors.
+
+## Example:  Hierarchical Logistic Regression
+
+Consider a hierarchical model of American presidential voting behavior
+based on state of residence.^[This example is a simplified form of the model
+  described in [@GelmanHill:2007, Section 14.2]]
+
+Each of the fifty states $k \in 1{:}50$ will have its own slope
+$\beta_k$ and intercept $\alpha_k$ to model the log odds of voting for
+the Republican candidate as a function of income.  Suppose there are
+$N$ voters and with voter $n \in 1{:}N$ being in state $s[n]$ with
+income $x_n$.  The likelihood for the vote $y_n \in \{ 0, 1 \}$ is
+
+$$
+y_n \sim \mathsf{Bernoulli}
+\left(
+  \mathrm{logit}^{-1}\left( \alpha_{s[n]} +  \beta_{s[n]} \, x_n \right)
+\right).
+$$
+
+The slopes and intercepts get hierarchical priors,
+
+$$
+\alpha_k \sim \mathsf{normal}(\mu_{\alpha}, \sigma_{\alpha})
+\\
+\beta_k \sim \mathsf{normal}(\mu_{\beta}, \sigma_{\beta})
+$$
+
+### Unmapped Implementation {-}
+
+This model can be coded up in Stan directly as follows.
+
+```
+data {
+  int<lower = 0> K;
+  int<lower = 0> N;
+  int<lower = 1, upper = K> kk[N];
+  vector[N] x;
+  int<lower = 0, upper = 1> y[N];
+}
+parameters {
+  vector[2] beta[K];
+  vector[2] mu;
+  vector<lower=0>[2] sigma;
+}
+model {
+  mu ~ normal(0, 2);
+  sigma ~ normal(0, 2);
+  for (i in 1:2)
+    beta[ , i] ~ normal(mu[i], sigma[i]);
+  y ~ bernoulli_logit(beta[kk, 1] + beta[kk, 2] .* x);
+}
+```
+
+The priors for `mu` and `sigma` are vectorized.  The priors
+on the two components of `beta` (intercept and slope,
+respectively) are vectorized over the groups.  The likelihood is also
+vectorized using multi-indexing with index `kk` for the states
+and elementwise multiplication (`.*`) for the income `x`.
+The vectorized likelihood works out to the same thing as the following
+less efficient looped form.
+
+```
+for (n in 1:N)
+  y[n] ~ bernoulli_logit(beta[kk[n], 1] + beta[kk[n], 2] * x[n]);
+```
+
+
+
+### Mapped Implementation {-}
+
+The mapped version of the model will map over the states `K`.
+This means the group-level parameters, real data, and integer-data
+must be arrays of the same size.
+
+The mapped implementation requires a function to be mapped.  The
+following function evaluates both the likelihood for the data observed
+for a group as well as the prior for the group-specific parameters
+(the name `bl_glm` derives from the fact that it's a generalized
+linear model with a Bernoulli likelihood and logistic link function).
+
+```
+functions {
+ vector bl_glm(vector mu_sigma, vector beta,
+               real[] x, int[] y) {
+   vector[2] mu = mu_sigma[1:2];
+   vector[2] sigma = mu_sigma[3:4];
+   real lp = normal_lpdf(beta | mu, sigma);
+   real ll = bernoulli_logit_lpmf(y | beta[1] + beta[2] * to_vector(x));
+   return [lp + ll]';
+ }
+}
+```
+
+The shared parameter `mu_sigma` contains the locations
+(`mu_sigma[1:2]`) and scales (`mu_sigma[3:4]`) of the
+priors, which are extracted in the first two lines of the program.
+The variable `lp` is assigned the log density of the prior on
+`beta`.  The vector `beta` is of size two, as are the
+vectors `mu` and `sigma`, so everything lines up for the
+vectorization.  Next, the variable `ll` is assigned to the log
+likelihood contribution for the group.  Here `beta[1]` is the
+intercept of the regression and `beta[2]` the slope.  The
+predictor array `x` needs to be converted to a vector allow the
+multiplication.
+
+The data block is identical to that of the previous program, but
+repeated here for convenience.  A transformed data block computes the
+data structures needed for the mapping by organizing the data into
+arrays indexed by group.
+
+```
+data {
+  int<lower = 0> K;
+  int<lower = 0> N;
+  int<lower = 1, upper = K> kk[N];
+  vector[N] x;
+  int<lower = 0, upper = 1> y[N];
+}
+transformed data {
+  int<lower = 0> J = N / K;
+  real x_r[K, J];
+  int<lower = 0, upper = 1> x_i[K, J];
+  {
+    int pos = 1;
+    for (k in 1:K) {
+      int end = pos + J - 1;
+      x_r[k] = to_array_1d(x[pos:end]);
+      x_i[k] = to_array_1d(y[pos:end]);
+      pos += J;
+    }
+  }
+}
+```
+
+The integer `J` is set to the number of observations per group.^[This makes the  strong assumption that each group has the same number of observations!]
+
+The real data array `x_r` holds the predictors and the integer
+data array `x_i` holds the outcomes.  The grouped data arrays
+are constructed by slicing the predictor vector `x` (and
+converting it to an array) and slicing the outcome array `y`.
+
+Given the transformed data with groupings, the parameters are the same
+as the previous program.  The model has the same priors for the
+hyperparameters `mu` and `sigma`, but moves the prior for
+`beta` and the likelihood to the mapped function.
+
+```
+parameters {
+  vector[2] beta[K];
+  vector[2] mu;
+  vector<lower=0>[2] sigma;
+}
+model {
+  mu ~ normal(0, 2);
+  sigma ~ normal(0, 2);
+  target += sum(map_rect(bl_glm, append_row(mu, sigma), beta, x_r, x_i));
+}
+```
+
+
+The model as written here computes the priors for each group's
+parameters along with the likelihood contribution for the group.  An
+alternative mapping would leave the prior in the model block and only
+map the likelihood.  In a serial setting this shouldn't make much of a
+difference, but with parallelization, there is reduced communication
+(the prior's parameters need not be transmitted) and also reduced
+parallelization with the version that leaves the prior in the model
+block.
+
+
+## Ragged Inputs and Outputs
+
+The previous examples included rectangular data structures and single
+outputs.  Despite the name, this is not technically required by
+`map_rect`.
+
+### Ragged Inputs {-}
+
+If each group has a different number of observations, then the
+rectangular data structures for predictors and outcomes will need to
+be padded out to be rectangular.  In addition, the size of the ragged
+structure will need to be passed as integer data. This holds for
+shards with varying numbers of parameters as well as varying numbers
+of data points.
+
+### Ragged Outputs {-}
+
+The output of each mapped function is concatenated to produce the
+output of `map_rect`.  When every shard returns a singleton
+(size one) array, the result is the same size as the number of shards
+and is easy to deal with downstream.  If functions return longer
+arrays, they can still be structured using the `to_matrix`
+function if they are rectangular.
+
+If the outputs are of varying sizes, then there will have to be some way
+to convert it back to a usable form based on the input, because there
+is no way to directly return sizes or a ragged structure.

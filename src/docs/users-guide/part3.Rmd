@@ -1,0 +1,4 @@
+# <i style="font-size: 110%; color:#990017;">Part 3. Programming Techniques</i> {-}
+
+This part of the manual surveys general programming techniques in
+Stan that are useful across a range of different model types.

@@ -1,0 +1,319 @@
+# Matrices, Vectors, and Arrays
+
+This chapter provides pointers as to how to choose among the various
+matrix, vector, and array data structures provided by Stan.
+
+## Basic Motivation
+
+Stan provides two basic scalar types, `int` and `real`, and
+three basic linear algebra types, `vector`, `row_vector`,
+and `matrix`.  Then Stan allows arrays to be of any dimension and
+contain any type of element (though that type must be declared and
+must be the same for all elements).
+
+This leaves us in the awkward situation of having three
+one-dimensional containers, as exemplified by the following
+declarations.
+
+```
+real a[N];
+vector[N] a;
+row_vector[N] a;
+```
+
+These distinctions matter.  Matrix types, like vector and row vector,
+are required for linear algebra operations.  There is no automatic
+promotion of arrays to vectors because the target, row vector or
+column vector, is ambiguous.  Similarly, row vectors are separated
+from column vectors because multiplying a row vector by a column
+vector produces a scalar, whereas multiplying in the opposite order
+produces a matrix.
+
+The following code fragment shows all four ways to declare a
+two-dimensional container of size $M \times N$.
+
+```
+real b[M, N];          // b[m] : real[]     (efficient)
+vector[N] b[M];        // b[m] : vector     (efficient)
+row_vector[N] b[M];    // b[m] : row_vector (efficient)
+matrix[M, N] b;        // b[m] : row_vector (inefficient)
+```
+
+The main differences among these choices involve efficiency for
+various purposes and the type of `b[m]`, which is shown in
+comments to the right of the declarations.  Thus the only way to
+efficiently iterate over row vectors is to use the third declaration,
+but if you need linear algebra on matrices, but the only way to use
+matrix operations is to use the fourth declaration.
+
+The inefficiencies due to any manual reshaping of containers is
+usually slight compared to what else is going on in a Stan program
+(typically a lot of gradient calculations).
+
+
+## Fixed Sizes and Indexing out of Bounds
+
+Stan's matrices, vectors, and array variables are sized when they are
+declared and may not be dynamically resized.  Function arguments do
+not have sizes, but these sizes are fixed when the function is called
+and the container is instantiated.  Also, declarations may be inside
+loops and thus may change over the course of running a program, but
+each time a declaration is visited, it declares a fixed size object.
+
+When an index is provided that is out of bounds, Stan throws a
+rejection error and computation on the current log density and
+gradient evaluation is halted and the algorithm is left to clean up
+the error.  All of Stan's containers check the sizes of all indexes.
+
+
+
+## Data Type and Indexing Efficiency {#indexing-efficiency.section}
+
+The underlying matrix and linear algebra operations are implemented in
+terms of data types from the Eigen C++ library.  By having vectors
+and matrices as basic types, no conversion is necessary when invoking
+matrix operations or calling linear algebra functions.
+
+Arrays, on the other hand, are implemented as instances of the C++ \
+`std::vector` class (not to be confused with Eigen's
+`Eigen::Vector` class or Stan vectors).  By implementing arrays
+this way, indexing is  efficient because values can be returned by
+reference rather than copied by value.
+
+### Matrices vs.\ Two-Dimensional Arrays {-}
+
+In Stan models, there are a few minor efficiency considerations in
+deciding between a two-dimensional array and a matrix, which may seem
+interchangeable at first glance.
+
+First, matrices use a bit less memory than two-dimensional arrays.
+This is because they don't store a sequence of arrays, but just the
+data and the two dimensions.
+
+Second, matrices store their data in column-major order.  Furthermore,
+all of the data in a matrix is guaranteed to be contiguous in memory.
+This is an important consideration for optimized code because bringing
+in data from memory to cache is much more expensive than performing
+arithmetic operations with contemporary CPUs.  Arrays, on the other
+hand, only guarantee that the values of primitive types are contiguous
+in memory; otherwise, they hold copies of their values (which are
+returned by reference wherever possible).
+
+Third, both data structures are best traversed in the order in which
+they are stored.  This also helps with memory locality.  This is
+column-major for matrices, so the following order is appropriate.
+
+```
+matrix[M, N] a;
+//...
+for (n in 1:N)
+  for (m in 1:M)
+    // ... do something with a[m, n] ...
+```
+
+Arrays, on the other hand, should be traversed in row-major order
+(i.e., last index fastest), as in the following example.
+
+```
+real a[M, N];
+// ...
+for (m in 1:M)
+  for (n in 1:N)
+    // ... do something with a[m, n] ...
+```
+
+The first use of `a[m,~n]` should bring `a[m]` into memory.
+Overall, traversing matrices is more efficient than traversing arrays.
+
+This is true even for arrays of matrices.  For example, the ideal
+order in which to traverse a two-dimensional array of matrices is
+
+```
+matrix[M, N] b[I, J];
+// ...
+for (i in 1:I)
+  for (j in 1:J)
+    for (n in 1:N)
+      for (m in 1:M)
+        ... do something with b[i, j, m, n] ...
+```
+
+If `a` is a matrix, the notation `a[m]` picks out row
+`m` of that matrix.  This is a rather inefficient operation for
+matrices.  If indexing of vectors is needed, it is much better to
+declare an array of vectors.  That is, this
+
+```
+row_vector[N] b[M];
+// ...
+for (m in 1:M)
+   ... do something with row vector b[m] ...
+```
+
+is much more efficient than the pure matrix version
+
+```
+matrix b[M, N];
+// ...
+for (m in 1:M)
+   // ... do something with row vector b[m] ...
+```
+
+Similarly, indexing an array of column vectors is more efficient than
+using the `col` function to pick out a column of a matrix.
+
+In contrast, whatever can be done as pure matrix algebra will be the
+fastest.  So if I want to create a row of predictor-coefficient
+dot-products, it's more efficient to do this
+
+```
+matrix[N, k] x;    // predictors (aka covariates)
+// ...
+vector[K] beta;   // coeffs
+// ...
+vector[N] y_hat;  // linear prediction
+// ...
+y_hat = x * beta;
+```
+
+than it is to do this
+
+```
+row_vector[K] x[N];    // predictors (aka covariates)
+// ...
+vector[K] beta;   // coeffs
+...
+vector[N] y_hat;  // linear prediction
+...
+for (n in 1:N)
+  y_hat[n] = x[n] * beta;
+```
+
+### (Row) Vectors vs. One-Dimensional Arrays {-}
+
+For use purely as a container, there is really nothing to decide among
+vectors, row vectors and one-dimensional arrays.  The
+`Eigen::Vector` template specialization and the
+`std::vector` template class are implemented  similarly as
+containers of `double` values (the type `real` in Stan).
+Only arrays in Stan are allowed to store integer values.
+
+
+## Memory Locality
+
+The key to understanding efficiency of matrix and vector
+representations is memory locality and reference passing versus
+copying.
+
+### Memory Locality {-}
+
+CPUs on computers bring in memory in blocks through layers of caches.
+Fetching from memory is *much* slower than performing arithmetic
+operations.  The only way to make container operations fast is to
+respect memory locality and access elements that are close together in
+memory sequentially in the program.
+
+### Matrices {-}
+
+Matrices are stored internally in column-major order.  That is, an $M
+\times N$ matrix stores its elements in the order
+$$
+(1,1), (2, 1), \ldots, (M, 1), (1, 2), \ldots, (M, 2), \ldots, (1, N),
+\ldots, (M, N).
+$$
+
+This means that it's much more efficient to write loops over matrices
+column by column, as in the following example.
+
+```
+matrix[M, N] a;
+...
+for (n in 1:N)
+  for (m in 1:M)
+     ... do something with a[m, n] ...
+```
+
+It also follows that pulling a row out of a matrix is not memory
+local, as it has to stride over the whole sequence of values.  It also
+requires a copy operation into a new data structure as it is not
+stored internally as a unit in a matrix.  For sequential access to row
+vectors in a matrix, it is much better to use an array of row vectors,
+as in the following example.
+
+```
+row_vector[N] a[M];
+...
+for (m in 1:M)
+  ... do something with row vector a[m] ...
+```
+
+Even if what is done involves a function call, the row vector
+`a[m]` will not have to be copied.
+
+### Arrays {-}
+
+Arrays are stored internally following their data structure.  That
+means a two dimensional array is stored in row-major order.  Thus it
+is efficient to pull out a "row" of a two-dimensional array.
+
+```
+real a[M, N];
+...
+for (m in 1:M)
+  ... do something with a[m] ...
+```
+
+A difference with matrices is that the entries `a[m]` in the two
+dimensional array are not necessarily adjacent in memory, so there are
+no guarantees on iterating over all the elements in a two-dimensional
+array will provide memory locality across the "rows."
+
+## Converting among Matrix, Vector, and Array Types
+
+There is no automatic conversion among matrices, vectors, and arrays
+in Stan.  But there are a wide range of conversion functions to
+convert a matrix into a vector, or a multi-dimensional array into a
+one-dimensional array, or convert a vector to an array.  See the
+section on mixed matrix and array operations in the functions
+reference manual for a complete list of conversion operators and the
+[multi-indexing chapter](#multi-indexing.chapter) for some reshaping
+operations involving multiple indexing and range indexing.
+
+
+## Aliasing in Stan Containers
+
+Stan expressions are all evaluated before assignment happens, so there
+is no danger of so-called aliasing in array, vector, or matrix
+operations.  Contrast the behavior of the assignments to `u` and
+`x`, which start with the same values.
+
+The loop assigning to `u` and the compound slicing assigning to `x`.
+
+ the following trivial Stan program.
+
+```
+transformed data {
+  vector[4] x = [ 1, 2, 3, 4 ]';
+  vector[4] u = [ 1, 2, 3, 4 ]';
+
+  for (t in 2:4)
+    u[t] = u[t - 1] * 3;
+
+  x[2:4] = x[1:3] * 3;
+
+  print("u = ", u);
+  print("x = ", x);
+}
+```
+
+The output it produces is,
+
+```
+u = [1,3,9,27]
+x = [1,3,6,9]
+```
+
+In the loop version assiging to `u`, the values are updated before being used to
+define subseqeunt values;  in the sliced expression assigning to
+`x`, the entire right-hand side is evaluated before assigning to
+the left-hand side.
