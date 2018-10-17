@@ -138,10 +138,14 @@ namespace stan {
       element_type_r.name("block var element type declaration");
       element_type_r
         %= (int_type_r(_r1)
-            | double_type_r(_r1)
-            | vector_type_r(_r1)
-            | row_vector_type_r(_r1)
-            | matrix_type_r(_r1)
+            | double_range_type_r(_r1)
+            | double_locscale_type_r(_r1)
+            | vector_range_type_r(_r1)
+            | vector_locscale_type_r(_r1)
+            | row_vector_range_type_r(_r1)
+            | row_vector_locscale_type_r(_r1)
+            | matrix_range_type_r(_r1)
+            | matrix_locscale_type_r(_r1)
             | ordered_type_r(_r1)
             | positive_ordered_type_r(_r1)
             | simplex_type_r(_r1)
@@ -157,35 +161,70 @@ namespace stan {
             >> no_skip[!char_("a-zA-Z0-9_")])
         > -range_brackets_int_r(_r1);
 
-      double_type_r.name("real type");
-      double_type_r
+      double_range_type_r.name("real range type");
+      double_range_type_r
         %= (lit("real")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > -((range_brackets_double_r(_r1) > empty_locscale_r(_r1))
-            | (empty_range_r(_r1) > locscale_brackets_double_r(_r1)));
+        >> range_brackets_double_r(_r1)
+        > empty_locscale_r(_r1);
 
-      vector_type_r.name("vector type");
-      vector_type_r
+      double_locscale_type_r.name("real locscale type");
+      double_locscale_type_r
+        %= (lit("real")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > empty_range_r(_r1)
+        > -locscale_brackets_double_r(_r1);
+
+      vector_range_type_r.name("vector range type");
+      vector_range_type_r
         %= (lit("vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > -range_brackets_double_r(_r1)
+        >> range_brackets_double_r(_r1)
         > empty_locscale_r(_r1)
         > dim1_r(_r1);
 
-      row_vector_type_r.name("row vector type");
-      row_vector_type_r
+      vector_locscale_type_r.name("vector locscale type");
+      vector_locscale_type_r
+        %= (lit("vector")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > empty_range_r(_r1)
+        > -locscale_brackets_double_r(_r1)
+        > dim1_r(_r1);
+
+      row_vector_range_type_r.name("row vector range type");
+      row_vector_range_type_r
         %= (lit("row_vector")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > -range_brackets_double_r(_r1)
+        >> range_brackets_double_r(_r1)
         > empty_locscale_r(_r1)
         > dim1_r(_r1);
 
-      matrix_type_r.name("matrix type");
-      matrix_type_r
+      row_vector_locscale_type_r.name("row vector locscale type");
+      row_vector_locscale_type_r
+        %= (lit("row_vector")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > empty_range_r(_r1)
+        > -locscale_brackets_double_r(_r1)
+        > dim1_r(_r1);
+
+      matrix_range_type_r.name("matrix range type");
+      matrix_range_type_r
         %= (lit("matrix")
             >> no_skip[!char_("a-zA-Z0-9_")])
-        > -range_brackets_double_r(_r1)
+        >> range_brackets_double_r(_r1)
         > empty_locscale_r(_r1)
+        > lit('[')
+        > int_data_expr_r(_r1)
+        > lit(',')
+        > int_data_expr_r(_r1)
+        > lit(']');
+
+      matrix_locscale_type_r.name("matrix locscale type");
+      matrix_locscale_type_r
+        %= (lit("matrix")
+            >> no_skip[!char_("a-zA-Z0-9_")])
+        > empty_range_r(_r1)
+        > -locscale_brackets_double_r(_r1)
         > lit('[')
         > int_data_expr_r(_r1)
         > lit(',')

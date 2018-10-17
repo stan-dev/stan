@@ -56,7 +56,12 @@ namespace stan {
       boost::spirit::qi::rule<Iterator,
                               double_block_type(scope),
                               whitespace_grammar<Iterator> >
-      double_type_r;
+      double_range_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              double_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      double_locscale_type_r;
 
       boost::spirit::qi::rule<Iterator,
                               int_block_type(scope),
@@ -66,17 +71,32 @@ namespace stan {
       boost::spirit::qi::rule<Iterator,
                               matrix_block_type(scope),
                               whitespace_grammar<Iterator> >
-      matrix_type_r;
+      matrix_range_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              matrix_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      matrix_locscale_type_r;
 
       boost::spirit::qi::rule<Iterator,
                               row_vector_block_type(scope),
                               whitespace_grammar<Iterator> >
-      row_vector_type_r;
+      row_vector_range_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              row_vector_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      row_vector_locscale_type_r;
 
       boost::spirit::qi::rule<Iterator,
                               vector_block_type(scope),
                               whitespace_grammar<Iterator> >
-      vector_type_r;
+      vector_range_type_r;
+
+      boost::spirit::qi::rule<Iterator,
+                              vector_block_type(scope),
+                              whitespace_grammar<Iterator> >
+      vector_locscale_type_r;
 
       boost::spirit::qi::rule<Iterator,
                               cholesky_factor_corr_block_type(scope),
