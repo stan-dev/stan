@@ -197,24 +197,30 @@ unsized_dims ::= '['  ','*  ']'
 var_decl ::= var_type variable ?dims ?('=' expression) ';'
 
 var_type ::= 'int' range_constraint
-           | 'real' range_constraint
-           | 'vector' range_constraint '[' expression ']'
+           | 'real' constraint
+           | 'vector' constraint '[' expression ']'
            | 'ordered' '[' expression ']'
            | 'positive_ordered' '[' expression ']'
            | 'simplex' '[' expression ']'
            | 'unit_vector' '[' expression ']'
-           | 'row_vector' range_constraint '[' expression ']'
-           | 'matrix' range_constraint '[' expression ',' expression ']'
+           | 'row_vector' constraint '[' expression ']'
+           | 'matrix' constraint '[' expression ',' expression ']'
            | 'cholesky_factor_corr' '[' expression ']'
            | 'cholesky_factor_cov' '[' expression ?(',' expression) ']'
            | 'corr_matrix' '[' expression ']'
            | 'cov_matrix' '[' expression ']'
 
+constraint ::= range_constraint | '<' loc_scale '>')
+
 range_constraint ::= ?('<' range '>')
 
-range ::= 'lower' '=' range_expression ',' 'upper' = range_expression
-        | 'lower' '=' range_expression
-        | 'upper' '=' range_expression
+range ::= 'lower' '=' constr_expression ',' 'upper' = constr_expression
+        | 'lower' '=' constr_expression
+        | 'upper' '=' constr_expression
+
+loc_scale ::= 'location' '=' constr_expression ',' 'scale' = constr_expression
+            | 'location' '=' constr_expression
+            | 'scale' '=' constr_expression
 
 dims ::= '['  expressions ']'
 
@@ -235,11 +241,11 @@ expression ::= expression `?` expression `:` expression
              | expression postfixOp
              | common_expression
 
-range_expression ::= range_expression arithmeticInfixOp range_expression
-                   | prefixOp range_expression
-                   | range_expression postfixOp
-                   | range_expression '[' indexes ']'
-                   | common_expression
+constr_expression ::= constr_expression arithmeticInfixOp constr_expression
+                    | prefixOp constr_expression
+                    | constr_expression postfixOp
+                    | constr_expression '[' indexes ']'
+                    | common_expression
 
 common_expression ::= real_literal
                     | variable
