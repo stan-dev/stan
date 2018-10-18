@@ -354,7 +354,8 @@ namespace stan {
         = eps[empty_range_f(_val, boost::phoenix::ref(error_msgs_))];
 
       // _r1 var scope
-      locscale_brackets_double_r.name("real loc-scale expression pair, brackets");
+      locscale_brackets_double_r.name(
+        "real loc-scale expression pair, brackets");
       locscale_brackets_double_r
         = lit('<')[empty_locscale_f(_val, boost::phoenix::ref(error_msgs_))]
         > (
