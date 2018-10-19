@@ -44,6 +44,65 @@ TEST(McmcDenseEMetric, sample_p) {
   EXPECT_TRUE(std::fabs(var - 0.5 * q.size()) < 0.1 * q.size());
 }
 
+TEST(McmcDenseEMetric, sample_p_new) {
+  rng_t base_rng(0);
+
+  Eigen::VectorXd q(2);
+  q(0) = 5;
+  q(1) = 1;
+
+  Eigen::MatrixXd  m(2,2);
+  m(0,0) = 3.0;
+  m(1,0) = -2.0;
+  m(0,1) = -2.0;
+  m(1,1) = 4.0;
+
+  Eigen::MatrixXd  m_inv(2,2);
+  double det_inv = 1.0/(3.0*-2.0 - 4.0*-2.0);
+  m_inv(0,0) = m(1,1)*det_inv;
+  m_inv(1,0) = -1.0*m(1,0)*det_inv;
+  m_inv(0,1) = -1.0*m(0,1)*det_inv;
+  m_inv(1,1) = m(0,0)*det_inv;
+
+  stan::mcmc::mock_model model(q.size());
+
+  stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
+  stan::mcmc::dense_e_point z(q.size());
+  z.set_metric(m_inv);
+
+  int n_samples = 1000;
+
+  Eigen:MatrixXd sample_cov(2,2);
+  sample_cov(0,0) = 0.0;
+  sample_cov(0,1) = 0.0;
+  sample_cov(1,0) = 0.0;
+  sample_cov(1,1) = 0.0;
+
+  for (int i = 0; i < n_samples; ++i) {
+    metric.sample_p(z, base_rng);
+    sample_cov(0,0) += metric.p[0]*metric.p[0]/(n_samples+0.0);
+    sample_cov(0,1) += metric.p[0]*metric.p[1]/(n_samples+0.0);
+    sample_cov(1,0) += metric.p[1]*metric.p[0]/(n_samples+0.0);
+    sample_cov(1,1) += metric.p[1]*metric.p[1]/(n_samples+0.0);
+  }
+
+  Eigen::MatrixXd var(2,2);
+  var(0,0) = 2*m(0,0);
+  var(1,0) = m(1,0)*m(1,0) + m(1,1)*m(0,0);
+  var(0,1) = m(0,1)*m(0,1) + m(1,1)*m(0,0);
+  var(1,1) = 2*m(1,1);
+
+
+  // Covariance matrix within 5sigma of expected value (d / 2)
+  EXPECT_TRUE(std::fabs(m(0,0)   - sample_cov(0,0)) < 5.0 * sqrt(var(0,0)/n_samples));
+  EXPECT_TRUE(std::fabs(m(1,0)   - sample_cov(1,0)) < 5.0 * sqrt(var(1,0)/n_samples));
+  EXPECT_TRUE(std::fabs(m(0,1)   - sample_cov(0,1)) < 5.0 * sqrt(var(0,1)/n_samples));
+  EXPECT_TRUE(std::fabs(m(1,1)   - sample_cov(1,1)) < 5.0 * sqrt(var(1,1)/n_samples));
+
+
+}
+
+
 TEST(McmcDenseEMetric, gradients) {
   rng_t base_rng(0);
 
