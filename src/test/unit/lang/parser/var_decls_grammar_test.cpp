@@ -59,6 +59,12 @@ TEST(langParserVarDeclsGrammarDef, setDoubleRangeUpper) {
               "Expression denoting real required");
 }
 
+TEST(langParserVarDeclsGrammarDef, setDoubleLocationScale) {
+  test_parsable("validate_set_double_locscale_good");
+  test_throws("validate_set_double_locscale_scale_bad",
+              "locscale_constrain: scale is");
+}
+
 TEST(langParserVarDeclsGrammarDef, parametersInLocals) {
   // test_parsable("var-decls-in-functions");
   test_throws("var-decl-bad-1",
