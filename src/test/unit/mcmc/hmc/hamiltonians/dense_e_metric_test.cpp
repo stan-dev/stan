@@ -23,9 +23,6 @@ TEST(McmcDenseEMetric, sample_p) {
   m(1,0) = -2.0;
   m(0,1) = -2.0;
   m(1,1) = 4.0;
-  std::cout << "m"<<std::endl;
-  std::cout << m(0,0) << "  " << m(0,1) << std::endl;
-  std::cout << m(1,0) << "  " << m(1,1) << std::endl;
 
   Eigen::MatrixXd  m_inv(2,2);
   double det_inv = 1.0/(3.0*4.0 - (-2.0)*(-2.0));
@@ -33,9 +30,6 @@ TEST(McmcDenseEMetric, sample_p) {
   m_inv(1,0) = -1.0*m(1,0)*det_inv;
   m_inv(0,1) = -1.0*m(0,1)*det_inv;
   m_inv(1,1) = m(0,0)*det_inv;
-  std::cout << "m_inv" << std::endl;
-  std::cout << m_inv(0,0) << "  " << m_inv(0,1) << std::endl;
-  std::cout << m_inv(1,0) << "  " << m_inv(1,1) << std::endl;
 
   stan::mcmc::mock_model model(q.size());
 
@@ -59,19 +53,12 @@ TEST(McmcDenseEMetric, sample_p) {
     sample_cov(1,1) += z.p[1]*z.p[1]/(n_samples+0.0);
   }
 
-  std::cout << "sample_cov" << std::endl;
-  std::cout << sample_cov(0,0) << "  " << sample_cov(0,1) << std::endl;
-  std::cout << sample_cov(1,0) << "  " << sample_cov(1,1) << std::endl;
-
   Eigen::MatrixXd var(2,2);
   var(0,0) = 2*m(0,0);
   var(1,0) = m(1,0)*m(1,0) + m(1,1)*m(0,0);
   var(0,1) = m(0,1)*m(0,1) + m(1,1)*m(0,0);
   var(1,1) = 2*m(1,1);
-  std::cout << "var" << std::endl;
-  std::cout << var(0,0) << "  " << var(0,1) << std::endl;
-  std::cout << var(1,0) << "  " << var(1,1) << std::endl;
-
+  
   // Covariance matrix within 5sigma of expected value (comes from a Wishart distribution)
   EXPECT_TRUE(std::fabs(m(0,0)   - sample_cov(0,0)) < 5.0 * sqrt(var(0,0)/n_samples));
   EXPECT_TRUE(std::fabs(m(1,0)   - sample_cov(1,0)) < 5.0 * sqrt(var(1,0)/n_samples));
