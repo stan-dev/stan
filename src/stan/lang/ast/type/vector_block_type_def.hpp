@@ -12,6 +12,9 @@ vector_block_type::vector_block_type(const range& bounds, const locscale& ls,
 vector_block_type::vector_block_type(const range& bounds, const expression& N)
     : bounds_(bounds), ls_(locscale()), N_(N) {}
 
+vector_block_type::vector_block_type(const locscale& ls, const expression& N)
+    : bounds_(range()), ls_(ls), N_(N) {}
+
 vector_block_type::vector_block_type() : vector_block_type(range(), nil()) {}
 
 range vector_block_type::bounds() const { return bounds_; }

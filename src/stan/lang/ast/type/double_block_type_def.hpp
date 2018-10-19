@@ -11,6 +11,8 @@ double_block_type::double_block_type(const range& bounds,
 
 double_block_type::double_block_type(const range& bounds) : bounds_(bounds) {}
 
+double_block_type::double_block_type(const locscale& ls) : ls_(ls) {}
+
 double_block_type::double_block_type() : double_block_type(range(),
                                                            locscale()) {}
 

@@ -25,6 +25,7 @@ using stan::lang::expression;
 using stan::lang::int_literal;
 using stan::lang::double_literal;
 using stan::lang::range;
+using stan::lang::locscale;
 using stan::lang::write_bare_expr_type;
 
 TEST(blockVarType, createDefault) {
@@ -108,6 +109,7 @@ TEST(blockVarType, createDoubleBounded) {
   double_block_type tDouble(r1);
   block_var_type x(tDouble);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_FALSE(x.has_def_locscale());
   EXPECT_TRUE(x.is_constrained());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
@@ -126,7 +128,45 @@ TEST(blockVarType, createDoubleBounded2) {
   double_block_type tDouble(r1);
   block_var_type x(tDouble);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_FALSE(x.has_def_locscale());
   EXPECT_TRUE(x.is_constrained());
+  EXPECT_FALSE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 0);
+
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
+
+  std::stringstream ss;
+  write_bare_expr_type(ss, x.bare_type());
+  EXPECT_EQ("real", ss.str());
+}
+
+TEST(blockVarType, createDoubleLocScale) {
+  locscale r1(int_literal(-2), int_literal(2));
+  double_block_type tDouble(r1);
+  block_var_type x(tDouble);
+  EXPECT_TRUE(x.has_def_locscale());
+  EXPECT_FALSE(x.has_def_bounds());
+  EXPECT_FALSE(x.is_constrained());
+  EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
+  EXPECT_EQ(x.num_dims(), 0);
+
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
+
+  std::stringstream ss;
+  write_bare_expr_type(ss, x.bare_type());
+  EXPECT_EQ("real", ss.str());
+}
+
+TEST(blockVarType, createDoubleLocScale2) {
+  locscale r1(double_literal(-0.1), double_literal(0.1));
+  double_block_type tDouble(r1);
+  block_var_type x(tDouble);
+  EXPECT_TRUE(x.has_def_locscale());
+  EXPECT_FALSE(x.has_def_bounds());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 0);
 
@@ -160,7 +200,29 @@ TEST(blockVarType, createVectorBoundedSized) {
   vector_block_type tVector(r1, N);
   block_var_type x(tVector);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_FALSE(x.has_def_locscale());
   EXPECT_TRUE(x.is_constrained());
+  EXPECT_TRUE(x.arg1().bare_type().is_int_type());
+  EXPECT_FALSE(x.is_array_type());
+  EXPECT_FALSE(x.is_specialized());
+  EXPECT_EQ(x.num_dims(), 1);
+
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
+
+  std::stringstream ss;
+  write_bare_expr_type(ss, x.bare_type());
+  EXPECT_EQ("vector", ss.str());
+}
+
+TEST(blockVarType, createVectorLocScaleSized) {
+  locscale r1(int_literal(-2), int_literal(2));
+  expression N(int_literal(4));
+  vector_block_type tVector(r1, N);
+  block_var_type x(tVector);
+  EXPECT_FALSE(x.has_def_bounds());
+  EXPECT_TRUE(x.has_def_locscale());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_FALSE(x.is_specialized());
@@ -196,7 +258,28 @@ TEST(blockVarType, createRowVectorBoundedSized) {
   row_vector_block_type tRowVector(r1, N);
   block_var_type x(tRowVector);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_FALSE(x.has_def_locscale());
   EXPECT_TRUE(x.is_constrained());
+  EXPECT_TRUE(x.arg1().bare_type().is_int_type());
+  EXPECT_FALSE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 1);
+
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
+
+  std::stringstream ss;
+  write_bare_expr_type(ss, x.bare_type());
+  EXPECT_EQ("row_vector", ss.str());
+}
+
+TEST(blockVarType, createRowVectorLocScaleSized) {
+  locscale r1(int_literal(-2), int_literal(2));
+  expression N(int_literal(4));
+  row_vector_block_type tRowVector(r1, N);
+  block_var_type x(tRowVector);
+  EXPECT_FALSE(x.has_def_bounds());
+  EXPECT_TRUE(x.has_def_locscale());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_FALSE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
@@ -235,7 +318,30 @@ TEST(blockVarType, createMatrixBoundedSized) {
   matrix_block_type tMatrix(r1, M, N);
   block_var_type x(tMatrix);
   EXPECT_TRUE(x.has_def_bounds());
+  EXPECT_FALSE(x.has_def_locscale());
   EXPECT_TRUE(x.is_constrained());
+  EXPECT_TRUE(x.arg1().bare_type().is_int_type());
+  EXPECT_TRUE(x.arg2().bare_type().is_int_type());
+  EXPECT_FALSE(x.is_array_type());
+  EXPECT_EQ(x.num_dims(), 2);
+
+  std::vector<expression> array_lens = x.array_lens();
+  EXPECT_EQ(array_lens.size(), 0);
+
+  std::stringstream ss;
+  write_bare_expr_type(ss, x.bare_type());
+  EXPECT_EQ("matrix", ss.str());
+}
+
+TEST(blockVarType, createMatrixLocScaleSized) {
+  locscale r1(int_literal(-2), int_literal(2));
+  expression M(int_literal(3));
+  expression N(int_literal(4));
+  matrix_block_type tMatrix(r1, M, N);
+  block_var_type x(tMatrix);
+  EXPECT_FALSE(x.has_def_bounds());
+  EXPECT_TRUE(x.has_def_locscale());
+  EXPECT_FALSE(x.is_constrained());
   EXPECT_TRUE(x.arg1().bare_type().is_int_type());
   EXPECT_TRUE(x.arg2().bare_type().is_int_type());
   EXPECT_FALSE(x.is_array_type());

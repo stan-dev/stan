@@ -53,6 +53,15 @@ struct row_vector_block_type {
   row_vector_block_type(const range& bounds, const expression& N);
 
   /**
+   * Construct a block var type with specified values.
+   * Arg `N` should be int expression - constructor doesn't check.
+   *
+   * @param ls variable location and scale
+   * @param N num columns for row vector
+   */
+  row_vector_block_type(const locscale& ls, const expression& N);
+
+  /**
    * Get bounds.
    */
   range bounds() const;

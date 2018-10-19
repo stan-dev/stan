@@ -42,6 +42,13 @@ struct double_block_type {
   explicit double_block_type(const range& bounds);
 
   /**
+   * Construct a block var type with specified values.
+   *
+   * @param ls variable location and scale
+   */
+  explicit double_block_type(const locscale& ls);
+
+  /**
    * Get bounds constraints.
    */
   range bounds() const;

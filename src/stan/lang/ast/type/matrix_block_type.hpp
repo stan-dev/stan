@@ -64,6 +64,18 @@ namespace stan {
                         const expression& N);
 
       /**
+       * Construct a block var type with specified values.
+       * Sizes should be int expressions - constructor doesn't check.
+       *
+       * @param ls variable location and scale
+       * @param M num rows
+       * @param N num columns
+       */
+      matrix_block_type(const locscale& ls,
+                        const expression& M,
+                        const expression& N);
+
+      /**
        * Get bounds.
        */
       range bounds() const;

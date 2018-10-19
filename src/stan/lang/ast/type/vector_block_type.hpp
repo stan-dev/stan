@@ -54,6 +54,16 @@ namespace stan {
                         const expression& N);
 
       /**
+       * Construct a block var type with specified values.
+       * Length should be int expression - constructor doesn't check.
+       *
+       * @param ls variable location and scale
+       * @param N vector length
+       */
+      vector_block_type(const locscale& ls,
+                        const expression& N);
+
+      /**
        * Get bounds.
        */
       range bounds() const;
