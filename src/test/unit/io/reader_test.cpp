@@ -290,7 +290,7 @@ TEST(io_reader, scalar_locscale_exception) {
   theta.push_back(-1.0);
   theta.push_back(2.0);
   stan::io::reader<double> reader(theta,theta_i);
-  EXPECT_NO_THROW (reader.scalar_locscale(-2.0, 2.0));
+  EXPECT_NO_THROW (reader.scalar_locscale(-2.0, -2.0));
   EXPECT_THROW (reader.scalar_locscale_constrain(-2.0, -2.0), std::domain_error);
 }
 

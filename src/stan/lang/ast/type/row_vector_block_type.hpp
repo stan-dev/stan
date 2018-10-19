@@ -7,6 +7,7 @@
 
 namespace stan {
 namespace lang {
+  // TODO: We should only be allowed to have either a range of a locscale.
 
 /**
  * Row vector block var type.

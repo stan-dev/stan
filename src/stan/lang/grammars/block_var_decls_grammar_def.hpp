@@ -66,6 +66,10 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::simplex_block_type,
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::unit_vector_block_type,
                           (stan::lang::expression, K_))
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::locscale,
+                          (stan::lang::expression, loc_)
+                          (stan::lang::expression, scale_) )
+
 namespace stan {
 
   namespace lang {

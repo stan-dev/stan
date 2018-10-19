@@ -692,8 +692,8 @@ namespace stan {
       }
 
       /**
-       * Return the next scalar transformed to be between
-       * the specified lower and scales.
+       * Return the next scalar transformed to have the specified location and
+       * scale.
        *
        * <p>See <code>stan::math::locscale_constrain(T, double, double)</code>.
        *
@@ -710,8 +710,8 @@ namespace stan {
       }
 
       /**
-       * Return the next scalar transformed to be between the
-       * the specified lower and scales.
+       * Return the next scalar transformed to have the specified location and
+       * scale.
        *
        * <p>See <code>stan::math::locscale_constrain(T, double, double, T&)</code>.
        *

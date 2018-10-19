@@ -3244,7 +3244,7 @@ namespace stan {
 
     // only used to debug grammars
     void trace::operator()(const std::string& msg) const {
-            std::cout << msg << std::endl;
+      //      std::cout << msg << std::endl;
     }
     boost::phoenix::function<trace> trace_f;
 

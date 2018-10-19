@@ -11,6 +11,8 @@ namespace lang {
  * Double block var type.
  */
 struct double_block_type {
+  // TODO: We should only be allowed to have either a range of a locscale.
+
   /**
    * Bounds constraints
    */

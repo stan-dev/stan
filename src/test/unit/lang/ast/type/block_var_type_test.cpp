@@ -158,6 +158,9 @@ TEST(blockVarType, createDoubleLocScale) {
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("real", ss.str());
+
+  range r2(int_literal(-2), int_literal(2));
+  EXPECT_THROW(double_block_type(r2, r1), std::invalid_argument);
 }
 
 TEST(blockVarType, createDoubleLocScale2) {
@@ -234,6 +237,9 @@ TEST(blockVarType, createVectorLocScaleSized) {
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("vector", ss.str());
+
+  range r2(int_literal(-2), int_literal(2));
+  EXPECT_THROW(vector_block_type(r2, r1, N), std::invalid_argument);
 }
 
 TEST(blockVarType, createRowVector) {
@@ -290,6 +296,9 @@ TEST(blockVarType, createRowVectorLocScaleSized) {
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("row_vector", ss.str());
+
+  range r2(int_literal(-2), int_literal(2));
+  EXPECT_THROW(row_vector_block_type(r2, r1, N), std::invalid_argument);
 }
 
 TEST(blockVarType, createMatrixDefault) {
@@ -353,6 +362,9 @@ TEST(blockVarType, createMatrixLocScaleSized) {
   std::stringstream ss;
   write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("matrix", ss.str());
+
+  range r2(int_literal(-2), int_literal(2));
+  EXPECT_THROW(matrix_block_type(r2, r1, M, N), std::invalid_argument);
 }
 
 TEST(blockVarType, createCopy) {
