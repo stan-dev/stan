@@ -96,7 +96,9 @@ would then require Jacobian adjustments to imply the intended
 posterior.
 
 ```
- parameters {   cholesky_factor_corr[K] L;   # rather than corr_matrix[K] Sigma;   // ... 
+parameters {   
+   cholesky_factor_corr[K] L;   # rather than corr_matrix[K] Sigma;
+   // ... 
 ```
 
 ### Probability Density Function
