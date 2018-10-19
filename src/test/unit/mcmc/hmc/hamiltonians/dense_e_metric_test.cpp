@@ -14,32 +14,23 @@ typedef boost::ecuyer1988 rng_t;
 TEST(McmcDenseEMetric, sample_p) {
   rng_t base_rng(0);
 
-  Eigen::VectorXd q(2);
-  q(0) = 5;
-  q(1) = 1;
-
-  Eigen::MatrixXd  m(2,2);
+  Eigen::Matrix2d  m(2,2);
   m(0, 0) = 3.0;
   m(1, 0) = -2.0;
   m(0, 1) = -2.0;
   m(1, 1) = 4.0;
 
-  Eigen::MatrixXd  m_inv(2,2);
-  double det_inv = 1.0 / (3.0 * 4.0 - (-2.0) * (-2.0));
-  m_inv(0, 0) = m(1, 1) * det_inv;
-  m_inv(1, 0) = -1.0 * m(1, 0) * det_inv;
-  m_inv(0, 1) = -1.0 * m(0, 1) * det_inv;
-  m_inv(1, 1) = m(0, 0) * det_inv;
+  Eigen::Matrix2d  m_inv = m.inverse();
 
-  stan::mcmc::mock_model model(q.size());
+  stan::mcmc::mock_model model(2);
 
   stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
-  stan::mcmc::dense_e_point z(q.size());
+  stan::mcmc::dense_e_point z(2);
   z.set_metric(m_inv);
 
   int n_samples = 1000;
 
-  Eigen::MatrixXd sample_cov(2,2);
+  Eigen::Matrix2d sample_cov(2,2);
   sample_cov(0, 0) = 0.0;
   sample_cov(0, 1) = 0.0;
   sample_cov(1, 0) = 0.0;
@@ -53,7 +44,7 @@ TEST(McmcDenseEMetric, sample_p) {
     sample_cov(1, 1) += z.p[1] * z.p[1] / (n_samples + 0.0);
   }
 
-  Eigen::MatrixXd var(2,2);
+  Eigen::Matrix2d var(2,2);
   var(0, 0) = 2 * m(0, 0);
   var(1, 0) = m(1, 0) * m(1, 0) + m(1, 1) * m(0, 0);
   var(0, 1) = m(0, 1) * m(0, 1) + m(1, 1) * m(0, 0);
