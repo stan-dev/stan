@@ -7,6 +7,7 @@ parameters {
   real<location=1,scale=5> x;
   real<location=42> w;
   vector<scale=242>[3] ww;
+  row_vector<scale=242>[3] www;
 }
 transformed parameters {
   real<location=23> y = x^2;
