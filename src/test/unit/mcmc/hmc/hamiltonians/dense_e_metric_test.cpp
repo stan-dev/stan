@@ -19,17 +19,17 @@ TEST(McmcDenseEMetric, sample_p) {
   q(1) = 1;
 
   Eigen::MatrixXd  m(2,2);
-  m(0,0) = 3.0;
-  m(1,0) = -2.0;
-  m(0,1) = -2.0;
-  m(1,1) = 4.0;
+  m(0, 0) = 3.0;
+  m(1, 0) = -2.0;
+  m(0, 1) = -2.0;
+  m(1, 1) = 4.0;
 
   Eigen::MatrixXd  m_inv(2,2);
-  double det_inv = 1.0/(3.0*4.0 - (-2.0)*(-2.0));
-  m_inv(0,0) = m(1,1)*det_inv;
-  m_inv(1,0) = -1.0*m(1,0)*det_inv;
-  m_inv(0,1) = -1.0*m(0,1)*det_inv;
-  m_inv(1,1) = m(0,0)*det_inv;
+  double det_inv = 1.0 / (3.0 * 4.0 - (-2.0) * (-2.0));
+  m_inv(0, 0) = m(1, 1) * det_inv;
+  m_inv(1, 0) = -1.0 * m(1, 0) * det_inv;
+  m_inv(0, 1) = -1.0 * m(0, 1) * det_inv;
+  m_inv(1, 1) = m(0, 0) * det_inv;
 
   stan::mcmc::mock_model model(q.size());
 
@@ -40,30 +40,30 @@ TEST(McmcDenseEMetric, sample_p) {
   int n_samples = 1000;
 
   Eigen::MatrixXd sample_cov(2,2);
-  sample_cov(0,0) = 0.0;
-  sample_cov(0,1) = 0.0;
-  sample_cov(1,0) = 0.0;
-  sample_cov(1,1) = 0.0;
+  sample_cov(0, 0) = 0.0;
+  sample_cov(0, 1) = 0.0;
+  sample_cov(1, 0) = 0.0;
+  sample_cov(1, 1) = 0.0;
 
   for (int i = 0; i < n_samples; ++i) {
     metric.sample_p(z, base_rng);
-    sample_cov(0,0) += z.p[0]*z.p[0]/(n_samples+0.0);
-    sample_cov(0,1) += z.p[0]*z.p[1]/(n_samples+0.0);
-    sample_cov(1,0) += z.p[1]*z.p[0]/(n_samples+0.0);
-    sample_cov(1,1) += z.p[1]*z.p[1]/(n_samples+0.0);
+    sample_cov(0, 0) += z.p[0] * z.p[0] / (n_samples + 0.0);
+    sample_cov(0, 1) += z.p[0] * z.p[1] / (n_samples + 0.0);
+    sample_cov(1, 0) += z.p[1] * z.p[0] / (n_samples + 0.0);
+    sample_cov(1, 1) += z.p[1] * z.p[1] / (n_samples + 0.0);
   }
 
   Eigen::MatrixXd var(2,2);
-  var(0,0) = 2*m(0,0);
-  var(1,0) = m(1,0)*m(1,0) + m(1,1)*m(0,0);
-  var(0,1) = m(0,1)*m(0,1) + m(1,1)*m(0,0);
-  var(1,1) = 2*m(1,1);
-  
+  var(0, 0) = 2 * m(0, 0);
+  var(1, 0) = m(1, 0) * m(1, 0) + m(1, 1) * m(0, 0);
+  var(0, 1) = m(0, 1) * m(0, 1) + m(1, 1) * m(0, 0);
+  var(1, 1) = 2 * m(1, 1);
+
   // Covariance matrix within 5sigma of expected value (comes from a Wishart distribution)
-  EXPECT_TRUE(std::fabs(m(0,0)   - sample_cov(0,0)) < 5.0 * sqrt(var(0,0)/n_samples));
-  EXPECT_TRUE(std::fabs(m(1,0)   - sample_cov(1,0)) < 5.0 * sqrt(var(1,0)/n_samples));
-  EXPECT_TRUE(std::fabs(m(0,1)   - sample_cov(0,1)) < 5.0 * sqrt(var(0,1)/n_samples));
-  EXPECT_TRUE(std::fabs(m(1,1)   - sample_cov(1,1)) < 5.0 * sqrt(var(1,1)/n_samples));
+  EXPECT_TRUE(std::fabs(m(0, 0)   - sample_cov(0, 0)) < 5.0 * sqrt(var(0, 0) / n_samples));
+  EXPECT_TRUE(std::fabs(m(1, 0)   - sample_cov(1, 0)) < 5.0 * sqrt(var(1, 0) / n_samples));
+  EXPECT_TRUE(std::fabs(m(0, 1)   - sample_cov(0, 1)) < 5.0 * sqrt(var(0, 1) / n_samples));
+  EXPECT_TRUE(std::fabs(m(1, 1)   - sample_cov(1, 1)) < 5.0 * sqrt(var(1, 1) / n_samples));
 }
 
 
