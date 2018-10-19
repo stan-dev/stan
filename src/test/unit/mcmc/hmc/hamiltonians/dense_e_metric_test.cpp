@@ -37,10 +37,10 @@ TEST(McmcDenseEMetric, sample_p) {
 
   for (int i = 0; i < n_samples; ++i) {
     metric.sample_p(z, base_rng);
-    sample_cov(0, 0) += z.p[0] * z.p[0] / (n_samples + 0.0);
-    sample_cov(0, 1) += z.p[0] * z.p[1] / (n_samples + 0.0);
-    sample_cov(1, 0) += z.p[1] * z.p[0] / (n_samples + 0.0);
-    sample_cov(1, 1) += z.p[1] * z.p[1] / (n_samples + 0.0);
+    sample_cov(0, 0) += z.p[0] * z.p[0] / n_samples;
+    sample_cov(0, 1) += z.p[0] * z.p[1] / n_samples;
+    sample_cov(1, 0) += z.p[1] * z.p[0] / n_samples;
+    sample_cov(1, 1) += z.p[1] * z.p[1] / n_samples;
   }
 
   Eigen::Matrix2d var(2,2);
