@@ -7,7 +7,6 @@
 #include <stan/callbacks/stream_logger.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
-#include <iostream>
 
 typedef boost::ecuyer1988 rng_t;
 
