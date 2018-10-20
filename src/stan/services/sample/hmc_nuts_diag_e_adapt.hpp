@@ -164,46 +164,14 @@ namespace stan {
                                 callbacks::writer& init_writer,
                                 callbacks::writer& sample_writer,
                                 callbacks::writer& diagnostic_writer) {
-        boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
-
-        std::vector<int> disc_vector;
-        std::vector<double> cont_vector
-          = util::initialize(model, init, rng, init_radius, true,
-                             logger, init_writer);
-
-        Eigen::VectorXd inv_metric;
-        try {
-          inv_metric =
-            util::read_diag_inv_metric(init_inv_metric, model.num_params_r(),
-                                        logger);
-          util::validate_diag_inv_metric(inv_metric, logger);
-        } catch (const std::domain_error& e) {
-          return error_codes::CONFIG;
-        }
-
-        stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>
-          sampler(model, rng);
-
-        sampler.set_metric(inv_metric);
-        sampler.set_nominal_stepsize(stepsize);
-        sampler.set_stepsize_jitter(stepsize_jitter);
-        sampler.set_max_depth(max_depth);
-
-        sampler.get_stepsize_adaptation().set_mu(log(10 * stepsize));
-        sampler.get_stepsize_adaptation().set_delta(delta);
-        sampler.get_stepsize_adaptation().set_gamma(gamma);
-        sampler.get_stepsize_adaptation().set_kappa(kappa);
-        sampler.get_stepsize_adaptation().set_t0(t0);
-
-        sampler.set_window_params(num_warmup, init_buffer, term_buffer,
-                                  window, logger);
-
-        util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
-                                   num_samples, num_thin, refresh, save_warmup,
-                                   rng, interrupt, logger,
-                                   sample_writer, diagnostic_writer);
-
-        return error_codes::OK;
+        return hmc_nuts_diag_e_adapt(model, init, init_inv_metric, random_seed,
+                                     chain, init_radius, num_warmup,
+                                     num_samples, num_thin, save_warmup,
+                                     refresh, stepsize, stepsize_jitter,
+                                     max_depth, 10.0, delta, gamma, kappa,
+                                     t0, init_buffer, term_buffer, window,
+                                     interrupt, logger, init_writer,
+                                     sample_writer, diagnostic_writer);
       }
 
       /**
