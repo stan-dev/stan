@@ -58,7 +58,7 @@ namespace stan {
         for (idx_t i = 0; i < u.size(); ++i)
           u(i) = rand_dense_gaus();
 
-        z.p = z.inv_e_metric_.llt().matrixL().solve(u);
+        z.p = z.inv_e_metric_.llt().matrixU().solve(u);
       }
     };
 
