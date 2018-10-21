@@ -7,7 +7,7 @@
 
 namespace stan {
   namespace lang {
-  // TODO: We should only be allowed to have either a range of a locscale.
+  // TODO(VMatthijs): We should only allow to have either a range or a locscale.
 
     /**
      * Matrix block var type.

@@ -1,6 +1,6 @@
 parameters {
   vector[3] vvv;
-  real<location=vvv> a;
+  real<scale=vvv> a;
   real y;
 }
 

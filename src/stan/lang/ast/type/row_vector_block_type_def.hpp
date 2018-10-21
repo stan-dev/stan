@@ -11,8 +11,8 @@ row_vector_block_type::row_vector_block_type(const range& bounds,
     : bounds_(bounds), ls_(ls), N_(N) {
     if (bounds.has_low() || bounds.has_high())
       if (ls.has_loc() || ls.has_scale())
-        throw std::invalid_argument("Block type cannot have both a bound and\
-          a location/scale.");
+        throw std::invalid_argument("Block type cannot have both a bound and"
+          + "a location/scale.");
   }
 
 row_vector_block_type::row_vector_block_type(const range& bounds,

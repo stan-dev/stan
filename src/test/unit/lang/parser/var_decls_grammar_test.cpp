@@ -62,17 +62,11 @@ TEST(langParserVarDeclsGrammarDef, setDoubleRangeUpper) {
 TEST(langParserVarDeclsGrammarDef, setDoubleLocationScale) {
   test_parsable("validate_set_double_locscale_good");
   test_throws("validate_set_double_locscale_bad1",
-              "locscale_constrain: scale is");
+              "Expression denoting real required; found type=vector.");
   test_throws("validate_set_double_locscale_bad2",
               "Expression denoting real required; found type=vector.");
   test_throws("validate_set_double_locscale_bad3",
-              "Expression denoting real required; found type=vector.");
-  test_throws("validate_set_double_locscale_bad4",
               "PARSER EXPECTED: \"upper\"");
-  test_throws("validate_set_double_locscale_bad5",
-              "locscale_constrain: location is inf, but must be finite!");
-  test_throws("validate_set_double_locscale_bad6",
-              "locscale_constrain: scale is inf, but must be finite!");
 }
 
 TEST(langParserVarDeclsGrammarDef, parametersInLocals) {
