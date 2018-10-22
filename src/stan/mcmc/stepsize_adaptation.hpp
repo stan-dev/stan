@@ -100,11 +100,11 @@ namespace stan {
       double s_bar_;    // Moving average statistic
       double x_bar_;    // Moving average parameter
       double mu_;       // Asymptotic mean of parameter
-      double mu_c_;     // Coefficient of stepsize for setting mu
       double delta_;    // Target value of statistic
       double gamma_;    // Adaptation scaling
       double kappa_;    // Adaptation shrinkage
       double t0_;       // Effective starting iteration
+      double mu_c_;     // Coefficient of stepsize for setting mu
     };
 
   }  // mcmc
