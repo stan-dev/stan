@@ -13,7 +13,7 @@ matrix_block_type::matrix_block_type(const range& bounds,
     if (bounds.has_low() || bounds.has_high())
       if (ls.has_loc() || ls.has_scale())
         throw std::invalid_argument("Block type cannot have both a bound and"
-          + "a location/scale.");
+                                    "a location/scale.");
   }
 
 matrix_block_type::matrix_block_type(const range& bounds, const expression& M,

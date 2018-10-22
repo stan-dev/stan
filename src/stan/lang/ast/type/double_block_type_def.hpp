@@ -11,7 +11,7 @@ double_block_type::double_block_type(const range& bounds,
     if (bounds.has_low() || bounds.has_high())
       if (ls.has_loc() || ls.has_scale())
         throw std::invalid_argument("Block type cannot have both a bound and"
-          + "a location/scale.");
+                                    "a location/scale.");
   }
 
 double_block_type::double_block_type(const range& bounds) : bounds_(bounds) {}
