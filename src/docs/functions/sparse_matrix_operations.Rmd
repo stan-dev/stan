@@ -57,20 +57,20 @@ vector $w$ and two integer arrays, $u$ and $v$.
 <!-- vector; csr_extract_w; (matrix a); -->
 \index{{\tt \bfseries csr\_extract\_w}!{\tt (matrix a): vector}|hyperpage}
 
-`vector` **`csr_extract_w`**(`matrix a`)
+`vector` **`csr_extract_w`**`(matrix a)`<br>\newline
 Return non-zero values in matrix a; see section \@ref(CSR).
 
 <!-- int[]; csr_extract_v; (matrix a); -->
 \index{{\tt \bfseries csr\_extract\_v}!{\tt (matrix a): int[]}|hyperpage}
 
-`int[]` **`csr_extract_v`**(`matrix a`)
+`int[]` **`csr_extract_v`**`(matrix a)`<br>\newline
 Return column indices for values in `csr_extract_w(a)`; see
 \@ref(CSR).
 
 <!-- int[]; csr_extract_u; (matrix a); -->
 \index{{\tt \bfseries csr\_extract\_u}!{\tt (matrix a): int[]}|hyperpage}
 
-`int[]` **`csr_extract_u`**(`matrix a`)
+`int[]` **`csr_extract_u`**`(matrix a)`<br>\newline
 Return array of row starting indices for entries in `csr_extract_w(a)`
 followed by the size of `csr_extract_w(a)` plus one; see section
 \@ref(CSR).
@@ -83,7 +83,7 @@ a single function.
 <!-- matrix; csr_to_dense_matrix; (int m, int n, vector w, int[] v, int[] u); -->
 \index{{\tt \bfseries csr\_to\_dense\_matrix}!{\tt (int m, int n, vector w, int[] v, int[] u): matrix}|hyperpage}
 
-`matrix` **`csr_to_dense_matrix`**(`int m, int n, vector w, int[] v, int[] u`)
+`matrix` **`csr_to_dense_matrix`**`(int m, int n, vector w, int[] v, int[] u)`<br>\newline
 Return dense $\text{m} \times \text{n}$ matrix with non-zero matrix
 entries w, column indices v, and row starting indices u; the vector w
 and arrays v and u must all be the same size, and the arrays v and u
@@ -104,7 +104,7 @@ rather than $A$ as a sparse matrix.
 <!-- vector; csr_matrix_times_vector; (int m, int n, vector w, int[] v, int[] u, vector b); -->
 \index{{\tt \bfseries csr\_matrix\_times\_vector}!{\tt (int m, int n, vector w, int[] v, int[] u, vector b): vector}|hyperpage}
 
-`vector` **`csr_matrix_times_vector`**(`int m, int n, vector w, int[] v, int[] u, vector b`)
+`vector` **`csr_matrix_times_vector`**`(int m, int n, vector w, int[] v, int[] u, vector b)`<br>\newline
 Multiply the $\text{m} \times \text{n}$ matrix represented by values
 w, column indices v, and row start indices u by the vector b; see
 \@ref(CSR).

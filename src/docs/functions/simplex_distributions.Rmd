@@ -83,7 +83,7 @@ $\alpha = 1000$,
 
 ### Sampling Statement
 
-`theta` ~ __`dirichlet`__(`alpha`)
+`theta ~ ` **dirichlet**`(alpha)`
 
 Increment target log probability density with `dirichlet_lpdf( theta | alpha)`
 dropping constant additive terms.
@@ -94,14 +94,14 @@ dropping constant additive terms.
 <!-- real; dirichlet_lpdf; (vector theta | vector alpha); -->
 \index{{\tt \bfseries dirichlet}!{\tt (vector theta | vector alpha): real}|hyperpage}
 
-`real` **`dirichlet_lpdf`**(`vector theta | vector alpha`)
+`real` **`dirichlet_lpdf`**`(vector theta | vector alpha)`<br>\newline
 The log of the Dirichlet density for simplex theta given prior counts
 (plus one) alpha
 
 <!-- vector; dirichlet_rng; (vector alpha); -->
 \index{{\tt \bfseries dirichlet}!{\tt (vector alpha): vector}|hyperpage}
 
-`vector` **`dirichlet_rng`**(`vector alpha`)
+`vector` **`dirichlet_rng`**`(vector alpha)`<br>\newline
 Generate a Dirichlet variate with prior counts (plus one) alpha; may
 only be used in generated quantities block
 

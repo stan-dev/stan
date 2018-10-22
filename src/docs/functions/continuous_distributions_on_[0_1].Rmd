@@ -20,7 +20,7 @@ distribution requires strictly positive parameters, $\alpha, \beta >
 
 ### Sampling Statement
 
-`theta` ~ __`beta`__(`alpha, beta`)
+`theta ~ ` **beta**`(alpha, beta)`
 
 Increment target log probability density with `beta_lpdf( theta | alpha, beta)`
 dropping constant additive terms.
@@ -31,14 +31,14 @@ dropping constant additive terms.
 <!-- real; beta_lpdf; (reals theta | reals alpha, reals beta); -->
 \index{{\tt \bfseries beta}!{\tt (reals theta | reals alpha, reals beta): real}|hyperpage}
 
-`real` **`beta_lpdf`**(`reals theta | reals alpha, reals beta`)
+`real` **`beta_lpdf`**`(reals theta | reals alpha, reals beta)`<br>\newline
 The log of the beta density of `theta` in $[0,1]$ given positive prior
 successes (plus one) alpha and prior failures (plus one) beta
 
 <!-- real; beta_cdf; (reals theta, reals alpha, reals beta); -->
 \index{{\tt \bfseries beta}!{\tt (reals theta, reals alpha, reals beta): real}|hyperpage}
 
-`real` **`beta_cdf`**(`reals theta, reals alpha, reals beta`)
+`real` **`beta_cdf`**`(reals theta, reals alpha, reals beta)`<br>\newline
 The beta cumulative distribution function of `theta` in $[0,1]$ given
 positive prior successes (plus one) alpha and prior failures (plus
 one) beta
@@ -46,7 +46,7 @@ one) beta
 <!-- real; beta_lcdf; (reals theta | reals alpha, reals beta); -->
 \index{{\tt \bfseries beta}!{\tt (reals theta | reals alpha, reals beta): real}|hyperpage}
 
-`real` **`beta_lcdf`**(`reals theta | reals alpha, reals beta`)
+`real` **`beta_lcdf`**`(reals theta | reals alpha, reals beta)`<br>\newline
 The log of the beta cumulative distribution function of `theta` in
 $[0,1]$ given positive prior successes (plus one) alpha and prior
 failures (plus one) beta
@@ -54,7 +54,7 @@ failures (plus one) beta
 <!-- real; beta_lccdf; (reals theta | reals alpha, reals beta); -->
 \index{{\tt \bfseries beta}!{\tt (reals theta | reals alpha, reals beta): real}|hyperpage}
 
-`real` **`beta_lccdf`**(`reals theta | reals alpha, reals beta`)
+`real` **`beta_lccdf`**`(reals theta | reals alpha, reals beta)`<br>\newline
 The log of the beta complementary cumulative distribution function of
 `theta` in $[0,1]$ given positive prior successes (plus one) alpha and
 prior failures (plus one) beta
@@ -62,7 +62,7 @@ prior failures (plus one) beta
 <!-- R; beta_rng; (reals alpha, reals beta); -->
 \index{{\tt \bfseries beta}!{\tt (reals alpha, reals beta): R}|hyperpage}
 
-`R` **`beta_rng`**(`reals alpha, reals beta`)
+`R` **`beta_rng`**`(reals alpha, reals beta)`<br>\newline
 Generate a beta variate with positive prior successes (plus one) alpha
 and prior failures (plus one) beta; may only be used in generated
 quantities block. For a description of argument and return types, see
@@ -86,7 +86,7 @@ parameter, $\kappa > 0$.
 
 ### Sampling Statement
 
-`theta` ~ __`beta_proportion`__(`mu, kappa`)
+`theta ~ ` **beta_proportion**`(mu, kappa)`
 
 Increment target log probability density with `beta_proportion_lpdf( theta | mu, kappa)`
 dropping constant additive terms.
@@ -97,28 +97,28 @@ dropping constant additive terms.
 <!-- real; beta_proportion_lpdf; (reals theta | reals mu, reals kappa); -->
 \index{{\tt \bfseries beta\_proportion}!{\tt (reals theta | reals mu, reals kappa): real}|hyperpage}
 
-`real` **`beta_proportion_lpdf`**(`reals theta | reals mu, reals kappa`)
+`real` **`beta_proportion_lpdf`**`(reals theta | reals mu, reals kappa)`<br>\newline
 The log of the beta_proportion density of `theta` in $(0,1)$ given
 mean mu and precision kappa
 
 <!-- real; beta_proportion_lcdf; (reals theta | reals mu, reals kappa); -->
 \index{{\tt \bfseries beta\_proportion}!{\tt (reals theta | reals mu, reals kappa): real}|hyperpage}
 
-`real` **`beta_proportion_lcdf`**(`reals theta | reals mu, reals kappa`)
+`real` **`beta_proportion_lcdf`**`(reals theta | reals mu, reals kappa)`<br>\newline
 The log of the beta_proportion cumulative distribution function of
 `theta` in $(0,1)$ given mean mu and precision kappa
 
 <!-- real; beta_proportion_lccdf; (reals theta | reals mu, reals kappa); -->
 \index{{\tt \bfseries beta\_proportion}!{\tt (reals theta | reals mu, reals kappa): real}|hyperpage}
 
-`real` **`beta_proportion_lccdf`**(`reals theta | reals mu, reals kappa`)
+`real` **`beta_proportion_lccdf`**`(reals theta | reals mu, reals kappa)`<br>\newline
 The log of the beta_proportion complementary cumulative distribution
 function of `theta` in $(0,1)$ given mean mu and precision kappa
 
 <!-- R; beta_proportion_rng; (reals mu, reals kappa); -->
 \index{{\tt \bfseries beta\_proportion}!{\tt (reals mu, reals kappa): R}|hyperpage}
 
-`R` **`beta_proportion_rng`**(`reals mu, reals kappa`)
+`R` **`beta_proportion_rng`**`(reals mu, reals kappa)`<br>\newline
 Generate a beta_proportion variate with mean mu and precision kappa;
 may only be used in generated quantities block. For a description of
 argument and return types, see section \@ref(prng-vectorization).

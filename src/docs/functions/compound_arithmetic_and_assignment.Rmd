@@ -23,49 +23,49 @@ operations are as follows.
 <!-- void; operator+=; (int x, int y); -->
 \index{{\tt \bfseries operator\_compound\_add}!{\tt (int x, int y): void}|hyperpage}
 
-`void` **`operator+=`**(`int x, int y`)
+`void` **`operator+=`**`(int x, int y)`<br>\newline
 `x += y` is equivalent to `x = x + y`.
 
 <!-- void; operator+=; (real x, real y); -->
 \index{{\tt \bfseries operator\_compound\_add}!{\tt (real x, real y): void}|hyperpage}
 
-`void` **`operator+=`**(`real x, real y`)
+`void` **`operator+=`**`(real x, real y)`<br>\newline
 `x += y` is equivalent to `x = x + y`.
 
 <!-- void; operator+=; (vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_add}!{\tt (vector x, real y): void}|hyperpage}
 
-`void` **`operator+=`**(`vector x, real y`)
+`void` **`operator+=`**`(vector x, real y)`<br>\newline
 `x += y` is equivalent to `x = x + y`.
 
 <!-- void; operator+=; (row_vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_add}!{\tt (row\_vector x, real y): void}|hyperpage}
 
-`void` **`operator+=`**(`row_vector x, real y`)
+`void` **`operator+=`**`(row_vector x, real y)`<br>\newline
 `x += y` is equivalent to `x = x + y`.
 
 <!-- void; operator+=; (matrix x, real y); -->
 \index{{\tt \bfseries operator\_compound\_add}!{\tt (matrix x, real y): void}|hyperpage}
 
-`void` **`operator+=`**(`matrix x, real y`)
+`void` **`operator+=`**`(matrix x, real y)`<br>\newline
 `x += y` is equivalent to `x = x + y`.
 
 <!-- void; operator+=; (vector x, vector y); -->
 \index{{\tt \bfseries operator\_compound\_add}!{\tt (vector x, vector y): void}|hyperpage}
 
-`void` **`operator+=`**(`vector x, vector y`)
+`void` **`operator+=`**`(vector x, vector y)`<br>\newline
 `x += y` is equivalent to `x = x + y`.
 
 <!-- void; operator+=; (row_vector x, row_vector y); -->
 \index{{\tt \bfseries operator\_compound\_add}!{\tt (row\_vector x, row\_vector y): void}|hyperpage}
 
-`void` **`operator+=`**(`row_vector x, row_vector y`)
+`void` **`operator+=`**`(row_vector x, row_vector y)`<br>\newline
 `x += y` is equivalent to `x = x + y`.
 
 <!-- void; operator+=; (matrix x, matrix y); -->
 \index{{\tt \bfseries operator\_compound\_add}!{\tt (matrix x, matrix y): void}|hyperpage}
 
-`void` **`operator+=`**(`matrix x, matrix y`)
+`void` **`operator+=`**`(matrix x, matrix y)`<br>\newline
 `x += y` is equivalent to `x = x + y`.
 
 ## Compound Subtraction and Assignment
@@ -73,49 +73,49 @@ operations are as follows.
 <!-- void; operator-=; (int x, int y); -->
 \index{{\tt \bfseries operator\_compound\_subtract}!{\tt (int x, int y): void}|hyperpage}
 
-`void` **`operator-=`**(`int x, int y`)
+`void` **`operator-=`**`(int x, int y)`<br>\newline
 `x -= y` is equivalent to `x = x - y`.
 
 <!-- void; operator-=; (real x, real y); -->
 \index{{\tt \bfseries operator\_compound\_subtract}!{\tt (real x, real y): void}|hyperpage}
 
-`void` **`operator-=`**(`real x, real y`)
+`void` **`operator-=`**`(real x, real y)`<br>\newline
 `x -= y` is equivalent to `x = x - y`.
 
 <!-- void; operator-=; (vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_subtract}!{\tt (vector x, real y): void}|hyperpage}
 
-`void` **`operator-=`**(`vector x, real y`)
+`void` **`operator-=`**`(vector x, real y)`<br>\newline
 `x -= y` is equivalent to `x = x - y`.
 
 <!-- void; operator-=; (row_vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_subtract}!{\tt (row\_vector x, real y): void}|hyperpage}
 
-`void` **`operator-=`**(`row_vector x, real y`)
+`void` **`operator-=`**`(row_vector x, real y)`<br>\newline
 `x -= y` is equivalent to `x = x - y`.
 
 <!-- void; operator-=; (matrix x, real y); -->
 \index{{\tt \bfseries operator\_compound\_subtract}!{\tt (matrix x, real y): void}|hyperpage}
 
-`void` **`operator-=`**(`matrix x, real y`)
+`void` **`operator-=`**`(matrix x, real y)`<br>\newline
 `x -= y` is equivalent to `x = x - y`.
 
 <!-- void; operator-=; (vector x, vector y); -->
 \index{{\tt \bfseries operator\_compound\_subtract}!{\tt (vector x, vector y): void}|hyperpage}
 
-`void` **`operator-=`**(`vector x, vector y`)
+`void` **`operator-=`**`(vector x, vector y)`<br>\newline
 `x -= y` is equivalent to `x = x - y`.
 
 <!-- void; operator-=; (row_vector x, row_vector y); -->
 \index{{\tt \bfseries operator\_compound\_subtract}!{\tt (row\_vector x, row\_vector y): void}|hyperpage}
 
-`void` **`operator-=`**(`row_vector x, row_vector y`)
+`void` **`operator-=`**`(row_vector x, row_vector y)`<br>\newline
 `x -= y` is equivalent to `x = x - y`.
 
 <!-- void; operator-=; (matrix x, matrix y); -->
 \index{{\tt \bfseries operator\_compound\_subtract}!{\tt (matrix x, matrix y): void}|hyperpage}
 
-`void` **`operator-=`**(`matrix x, matrix y`)
+`void` **`operator-=`**`(matrix x, matrix y)`<br>\newline
 `x -= y` is equivalent to `x = x - y`.
 
 ## Compound Multiplication and Assignment
@@ -123,43 +123,43 @@ operations are as follows.
 <!-- void; operator*=; (int x, int y); -->
 \index{{\tt \bfseries operator\_compound\_multiply}!{\tt (int x, int y): void}|hyperpage}
 
-`void` **`operator*=`**(`int x, int y`)
+`void` **`operator*=`**`(int x, int y)`<br>\newline
 `x *= y` is equivalent to `x = x * y`.
 
 <!-- void; operator*=; (real x, real y); -->
 \index{{\tt \bfseries operator\_compound\_multiply}!{\tt (real x, real y): void}|hyperpage}
 
-`void` **`operator*=`**(`real x, real y`)
+`void` **`operator*=`**`(real x, real y)`<br>\newline
 `x *= y` is equivalent to `x = x * y`.
 
 <!-- void; operator*=; (vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_multiply}!{\tt (vector x, real y): void}|hyperpage}
 
-`void` **`operator*=`**(`vector x, real y`)
+`void` **`operator*=`**`(vector x, real y)`<br>\newline
 `x *= y` is equivalent to `x = x * y`.
 
 <!-- void; operator*=; (row_vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_multiply}!{\tt (row\_vector x, real y): void}|hyperpage}
 
-`void` **`operator*=`**(`row_vector x, real y`)
+`void` **`operator*=`**`(row_vector x, real y)`<br>\newline
 `x *= y` is equivalent to `x = x * y`.
 
 <!-- void; operator*=; (matrix x, real y); -->
 \index{{\tt \bfseries operator\_compound\_multiply}!{\tt (matrix x, real y): void}|hyperpage}
 
-`void` **`operator*=`**(`matrix x, real y`)
+`void` **`operator*=`**`(matrix x, real y)`<br>\newline
 `x *= y` is equivalent to `x = x * y`.
 
 <!-- void; operator*=; (row_vector x, matrix y); -->
 \index{{\tt \bfseries operator\_compound\_multiply}!{\tt (row\_vector x, matrix y): void}|hyperpage}
 
-`void` **`operator*=`**(`row_vector x, matrix y`)
+`void` **`operator*=`**`(row_vector x, matrix y)`<br>\newline
 `x *= y` is equivalent to `x = x * y`.
 
 <!-- void; operator*=; (matrix x, matrix y); -->
 \index{{\tt \bfseries operator\_compound\_multiply}!{\tt (matrix x, matrix y): void}|hyperpage}
 
-`void` **`operator*=`**(`matrix x, matrix y`)
+`void` **`operator*=`**`(matrix x, matrix y)`<br>\newline
 `x *= y` is equivalent to `x = x * y`.
 
 ## Compound Division and Assignment
@@ -167,31 +167,31 @@ operations are as follows.
 <!-- void; operator/=; (int x, int y); -->
 \index{{\tt \bfseries operator\_compound\_divide}!{\tt (int x, int y): void}|hyperpage}
 
-`void` **`operator/=`**(`int x, int y`)
+`void` **`operator/=`**`(int x, int y)`<br>\newline
 `x /= y` is equivalent to `x = x / y`.
 
 <!-- void; operator/=; (real x, real y); -->
 \index{{\tt \bfseries operator\_compound\_divide}!{\tt (real x, real y): void}|hyperpage}
 
-`void` **`operator/=`**(`real x, real y`)
+`void` **`operator/=`**`(real x, real y)`<br>\newline
 `x /= y` is equivalent to `x = x / y`.
 
 <!-- void; operator/=; (vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_divide}!{\tt (vector x, real y): void}|hyperpage}
 
-`void` **`operator/=`**(`vector x, real y`)
+`void` **`operator/=`**`(vector x, real y)`<br>\newline
 `x /= y` is equivalent to `x = x / y`.
 
 <!-- void; operator/=; (row_vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_divide}!{\tt (row\_vector x, real y): void}|hyperpage}
 
-`void` **`operator/=`**(`row_vector x, real y`)
+`void` **`operator/=`**`(row_vector x, real y)`<br>\newline
 `x /= y` is equivalent to `x = x / y`.
 
 <!-- void; operator/=; (matrix x, real y); -->
 \index{{\tt \bfseries operator\_compound\_divide}!{\tt (matrix x, real y): void}|hyperpage}
 
-`void` **`operator/=`**(`matrix x, real y`)
+`void` **`operator/=`**`(matrix x, real y)`<br>\newline
 `x /= y` is equivalent to `x = x / y`.
 
 ## Compound Elementwise Multiplication and Assignment
@@ -199,19 +199,19 @@ operations are as follows.
 <!-- void; operator.*=; (vector x, vector y); -->
 \index{{\tt \bfseries operator\_compound\_elt\_multiply}!{\tt (vector x, vector y): void}|hyperpage}
 
-`void` **`operator.*=`**(`vector x, vector y`)
+`void` **`operator.*=`**`(vector x, vector y)`<br>\newline
 `x .*= y` is equivalent to `x = x .* y`.
 
 <!-- void; operator.*=; (row_vector x, row_vector y); -->
 \index{{\tt \bfseries operator\_compound\_elt\_multiply}!{\tt (row\_vector x, row\_vector y): void}|hyperpage}
 
-`void` **`operator.*=`**(`row_vector x, row_vector y`)
+`void` **`operator.*=`**`(row_vector x, row_vector y)`<br>\newline
 `x .*= y` is equivalent to `x = x .* y`.
 
 <!-- void; operator.*=; (matrix x, matrix y); -->
 \index{{\tt \bfseries operator\_compound\_elt\_multiply}!{\tt (matrix x, matrix y): void}|hyperpage}
 
-`void` **`operator.*=`**(`matrix x, matrix y`)
+`void` **`operator.*=`**`(matrix x, matrix y)`<br>\newline
 `x .*= y` is equivalent to `x = x .* y`.
 
 ## Compound Elementwise Division and Assignment
@@ -219,36 +219,36 @@ operations are as follows.
 <!-- void; operator./=; (vector x, vector y); -->
 \index{{\tt \bfseries operator\_compound\_elt\_divide}!{\tt (vector x, vector y): void}|hyperpage}
 
-`void` **`operator./=`**(`vector x, vector y`)
+`void` **`operator./=`**`(vector x, vector y)`<br>\newline
 `x ./= y` is equivalent to `x = x ./ y`.
 
 <!-- void; operator./=; (row_vector x, row_vector y); -->
 \index{{\tt \bfseries operator\_compound\_elt\_divide}!{\tt (row\_vector x, row\_vector y): void}|hyperpage}
 
-`void` **`operator./=`**(`row_vector x, row_vector y`)
+`void` **`operator./=`**`(row_vector x, row_vector y)`<br>\newline
 `x ./= y` is equivalent to `x = x ./ y`.
 
 <!-- void; operator./=; (matrix x, matrix y); -->
 \index{{\tt \bfseries operator\_compound\_elt\_divide}!{\tt (matrix x, matrix y): void}|hyperpage}
 
-`void` **`operator./=`**(`matrix x, matrix y`)
+`void` **`operator./=`**`(matrix x, matrix y)`<br>\newline
 `x ./= y` is equivalent to `x = x ./ y`.
 
 <!-- void; operator./=; (vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_elt\_divide}!{\tt (vector x, real y): void}|hyperpage}
 
-`void` **`operator./=`**(`vector x, real y`)
+`void` **`operator./=`**`(vector x, real y)`<br>\newline
 `x ./= y` is equivalent to `x = x ./ y`.
 
 <!-- void; operator./=; (row_vector x, real y); -->
 \index{{\tt \bfseries operator\_compound\_elt\_divide}!{\tt (row\_vector x, real y): void}|hyperpage}
 
-`void` **`operator./=`**(`row_vector x, real y`)
+`void` **`operator./=`**`(row_vector x, real y)`<br>\newline
 `x ./= y` is equivalent to `x = x ./ y`.
 
 <!-- void; operator./=; (matrix x, real y); -->
 \index{{\tt \bfseries operator\_compound\_elt\_divide}!{\tt (matrix x, real y): void}|hyperpage}
 
-`void` **`operator./=`**(`matrix x, real y`)
+`void` **`operator./=`**`(matrix x, real y)`<br>\newline
 `x ./= y` is equivalent to `x = x ./ y`.
 

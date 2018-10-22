@@ -16,7 +16,7 @@ multinomial coefficient is defined by \[ \binom{N}{y_1,\ldots,y_k} =
 
 ### Sampling Statement
 
-`y` ~ __`multinomial`__(`theta`)
+`y ~ ` **multinomial**`(theta)`
 
 Increment target log probability density with `multinomial_lpmf( y | theta)`
 dropping constant additive terms.
@@ -27,7 +27,7 @@ dropping constant additive terms.
 <!-- real; multinomial_lpmf; (int[] y | vector theta); -->
 \index{{\tt \bfseries multinomial}!{\tt (int[] y | vector theta): real}|hyperpage}
 
-`real` **`multinomial_lpmf`**(`int[] y | vector theta`)
+`real` **`multinomial_lpmf`**`(int[] y | vector theta)`<br>\newline
 The log multinomial probability mass function with outcome array `y`
 of size $K$ given the $K$-simplex distribution parameter theta and
 (implicit) total count `N = sum(y)`
@@ -35,7 +35,7 @@ of size $K$ given the $K$-simplex distribution parameter theta and
 <!-- int[]; multinomial_rng; (vector theta, int N); -->
 \index{{\tt \bfseries multinomial}!{\tt (vector theta, int N): int[]}|hyperpage}
 
-`int[]` **`multinomial_rng`**(`vector theta, int N`)
+`int[]` **`multinomial_rng`**`(vector theta, int N)`<br>\newline
 Generate a multinomial variate with simplex distribution parameter
 theta and total count N; may only be used in generated quantities
 block

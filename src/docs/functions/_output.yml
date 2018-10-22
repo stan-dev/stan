@@ -1,5 +1,5 @@
 bookdown::gitbook:
-  toc_depth: 1
+  toc_depth: 2
   css: stan-manual.css
   split_by: "section"
   config:
@@ -14,7 +14,7 @@ bookdown::gitbook:
       family: serif
       size: 2
     toc:
-      collapse: section
+      collapse: chapter
       scroll_highlight: yes
       before: |
         <li style="font-size:110%; font-weight:400; font-family: Verdana, Helvetica, sans; line-height:1.4; margin: 0.5em 0 0 1em">Stan Functions Reference</li>

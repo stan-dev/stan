@@ -13,7 +13,7 @@ If $\sigma \in \mathbb{R}^+$, then for $y \in [0,\infty)$, \[
 
 ### Sampling Statement
 
-`y` ~ __`rayleigh`__(`sigma`)
+`y ~ ` **rayleigh**`(sigma)`
 
 Increment target log probability density with `rayleigh_lpdf( y | sigma)`
 dropping constant additive terms.
@@ -24,32 +24,32 @@ dropping constant additive terms.
 <!-- real; rayleigh_lpdf; (reals y | reals sigma); -->
 \index{{\tt \bfseries rayleigh}!{\tt (reals y | reals sigma): real}|hyperpage}
 
-`real` **`rayleigh_lpdf`**(`reals y | reals sigma`)
+`real` **`rayleigh_lpdf`**`(reals y | reals sigma)`<br>\newline
 The log of the Rayleigh density of y given scale sigma
 
 <!-- real; rayleigh_cdf; (real y, real sigma); -->
 \index{{\tt \bfseries rayleigh}!{\tt (real y, real sigma): real}|hyperpage}
 
-`real` **`rayleigh_cdf`**(`real y, real sigma`)
+`real` **`rayleigh_cdf`**`(real y, real sigma)`<br>\newline
 The Rayleigh cumulative distribution of y given scale sigma
 
 <!-- real; rayleigh_lcdf; (real y | real sigma); -->
 \index{{\tt \bfseries rayleigh}!{\tt (real y | real sigma): real}|hyperpage}
 
-`real` **`rayleigh_lcdf`**(`real y | real sigma`)
+`real` **`rayleigh_lcdf`**`(real y | real sigma)`<br>\newline
 The log of the Rayleigh cumulative distribution of y given scale sigma
 
 <!-- real; rayleigh_lccdf; (real y | real sigma); -->
 \index{{\tt \bfseries rayleigh}!{\tt (real y | real sigma): real}|hyperpage}
 
-`real` **`rayleigh_lccdf`**(`real y | real sigma`)
+`real` **`rayleigh_lccdf`**`(real y | real sigma)`<br>\newline
 The log of the Rayleigh complementary cumulative distribution of y
 given scale sigma
 
 <!-- R; rayleigh_rng; (reals sigma); -->
 \index{{\tt \bfseries rayleigh}!{\tt (reals sigma): R}|hyperpage}
 
-`R` **`rayleigh_rng`**(`reals sigma`)
+`R` **`rayleigh_rng`**`(reals sigma)`<br>\newline
 Generate a Rayleigh variate with scale sigma; may only be used in
 generated quantities block. For a description of argument and return
 types, see section \@ref(prng-vectorization).
@@ -69,7 +69,7 @@ If $\alpha \in \mathbb{R}^+$, $\tau \in \mathbb{R}^+$, $\beta \in [0,
 
 ### Sampling Statement
 
-`y` ~ __`wiener`__(`alpha, tau, beta, delta`)
+`y ~ ` **wiener**`(alpha, tau, beta, delta)`
 
 Increment target log probability density with `wiener_lpdf( y | alpha, tau, beta, delta)`
 dropping constant additive terms.
@@ -80,7 +80,7 @@ dropping constant additive terms.
 <!-- real; wiener_lpdf; (reals y | reals alpha, reals tau, reals beta, reals delta); -->
 \index{{\tt \bfseries wiener}!{\tt (reals y | reals alpha, reals tau, reals beta, reals delta): real}|hyperpage}
 
-`real` **`wiener_lpdf`**(`reals y | reals alpha, reals tau, reals beta, reals delta`)
+`real` **`wiener_lpdf`**`(reals y | reals alpha, reals tau, reals beta, reals delta)`<br>\newline
 The log of the Wiener first passage time density of y given boundary
 separation alpha, non-decision time tau, a-priori bias beta and drift
 rate delta

@@ -24,7 +24,7 @@ Suppose $N \in \mathbb{N}$ and $\theta \in [0,1]$, and $n \in
 
 ### Sampling Statement
 
-`n` ~ __`binomial`__(`N, theta`)
+`n ~ ` **binomial**`(N, theta)`
 
 Increment target log probability density with `binomial_lpmf( n | N, theta)`
 dropping constant additive terms.
@@ -35,35 +35,35 @@ dropping constant additive terms.
 <!-- real; binomial_lpmf; (ints n | ints N, reals theta); -->
 \index{{\tt \bfseries binomial}!{\tt (ints n | ints N, reals theta): real}|hyperpage}
 
-`real` **`binomial_lpmf`**(`ints n | ints N, reals theta`)
+`real` **`binomial_lpmf`**`(ints n | ints N, reals theta)`<br>\newline
 The log binomial probability mass of n successes in N trials given
 chance of success theta
 
 <!-- real; binomial_cdf; (ints n, ints N, reals theta); -->
 \index{{\tt \bfseries binomial}!{\tt (ints n, ints N, reals theta): real}|hyperpage}
 
-`real` **`binomial_cdf`**(`ints n, ints N, reals theta`)
+`real` **`binomial_cdf`**`(ints n, ints N, reals theta)`<br>\newline
 The binomial cumulative distribution function of n successes in N
 trials given chance of success theta
 
 <!-- real; binomial_lcdf; (ints n | ints N, reals theta); -->
 \index{{\tt \bfseries binomial}!{\tt (ints n | ints N, reals theta): real}|hyperpage}
 
-`real` **`binomial_lcdf`**(`ints n | ints N, reals theta`)
+`real` **`binomial_lcdf`**`(ints n | ints N, reals theta)`<br>\newline
 The log of the binomial cumulative distribution function of n
 successes in N trials given chance of success theta
 
 <!-- real; binomial_lccdf; (ints n | ints N, reals theta); -->
 \index{{\tt \bfseries binomial}!{\tt (ints n | ints N, reals theta): real}|hyperpage}
 
-`real` **`binomial_lccdf`**(`ints n | ints N, reals theta`)
+`real` **`binomial_lccdf`**`(ints n | ints N, reals theta)`<br>\newline
 The log of the binomial complementary cumulative distribution function
 of n successes in N trials given chance of success theta
 
 <!-- R; binomial_rng; (ints N, reals theta); -->
 \index{{\tt \bfseries binomial}!{\tt (ints N, reals theta): R}|hyperpage}
 
-`R` **`binomial_rng`**(`ints N, reals theta`)
+`R` **`binomial_rng`**`(ints N, reals theta)`<br>\newline
 Generate a binomial variate with N trials and chance of success theta;
 may only be used in generated quantities block. For a description of
 argument and return types, see section \@ref(prng-vectorization).
@@ -99,7 +99,7 @@ n}{\text{logit}^{-1}(\alpha)} \]
 
 ### Sampling Statement
 
-`n` ~ __`binomial_logit`__(`N, alpha`)
+`n ~ ` **binomial_logit**`(N, alpha)`
 
 Increment target log probability density with `binomial_logit_lpmf( n | N, alpha)`
 dropping constant additive terms.
@@ -110,7 +110,7 @@ dropping constant additive terms.
 <!-- real; binomial_logit_lpmf; (ints n | ints N, reals alpha); -->
 \index{{\tt \bfseries binomial\_logit}!{\tt (ints n | ints N, reals alpha): real}|hyperpage}
 
-`real` **`binomial_logit_lpmf`**(`ints n | ints N, reals alpha`)
+`real` **`binomial_logit_lpmf`**`(ints n | ints N, reals alpha)`<br>\newline
 The log binomial probability mass of n successes in N trials given
 logit-scaled chance of success alpha
 
@@ -128,7 +128,7 @@ If $N \in \mathbb{N}$, $\alpha \in \mathbb{R}^+$, and $\beta \in
 
 ### Sampling Statement
 
-`n` ~ __`beta_binomial`__(`N, alpha, beta`)
+`n ~ ` **beta_binomial**`(N, alpha, beta)`
 
 Increment target log probability density with `beta_binomial_lpmf( n | N, alpha, beta)`
 dropping constant additive terms.
@@ -139,7 +139,7 @@ dropping constant additive terms.
 <!-- real; beta_binomial_lpmf; (ints n | ints N, reals alpha, reals beta); -->
 \index{{\tt \bfseries beta\_binomial}!{\tt (ints n | ints N, reals alpha, reals beta): real}|hyperpage}
 
-`real` **`beta_binomial_lpmf`**(`ints n | ints N, reals alpha, reals beta`)
+`real` **`beta_binomial_lpmf`**`(ints n | ints N, reals alpha, reals beta)`<br>\newline
 The log beta-binomial probability mass of n successes in N trials
 given prior success count (plus one) of alpha and prior failure count
 (plus one) of beta
@@ -147,7 +147,7 @@ given prior success count (plus one) of alpha and prior failure count
 <!-- real; beta_binomial_cdf; (ints n, ints N, reals alpha, reals beta); -->
 \index{{\tt \bfseries beta\_binomial}!{\tt (ints n, ints N, reals alpha, reals beta): real}|hyperpage}
 
-`real` **`beta_binomial_cdf`**(`ints n, ints N, reals alpha, reals beta`)
+`real` **`beta_binomial_cdf`**`(ints n, ints N, reals alpha, reals beta)`<br>\newline
 The beta-binomial cumulative distribution function of n successes in N
 trials given prior success count (plus one) of alpha and prior failure
 count (plus one) of beta
@@ -155,7 +155,7 @@ count (plus one) of beta
 <!-- real; beta_binomial_lcdf; (ints n | ints N, reals alpha, reals beta); -->
 \index{{\tt \bfseries beta\_binomial}!{\tt (ints n | ints N, reals alpha, reals beta): real}|hyperpage}
 
-`real` **`beta_binomial_lcdf`**(`ints n | ints N, reals alpha, reals beta`)
+`real` **`beta_binomial_lcdf`**`(ints n | ints N, reals alpha, reals beta)`<br>\newline
 The log of the beta-binomial cumulative distribution function of n
 successes in N trials given prior success count (plus one) of alpha
 and prior failure count (plus one) of beta
@@ -163,7 +163,7 @@ and prior failure count (plus one) of beta
 <!-- real; beta_binomial_lccdf; (ints n | ints N, reals alpha, reals beta); -->
 \index{{\tt \bfseries beta\_binomial}!{\tt (ints n | ints N, reals alpha, reals beta): real}|hyperpage}
 
-`real` **`beta_binomial_lccdf`**(`ints n | ints N, reals alpha, reals beta`)
+`real` **`beta_binomial_lccdf`**`(ints n | ints N, reals alpha, reals beta)`<br>\newline
 The log of the beta-binomial complementary cumulative distribution
 function of n successes in N trials given prior success count (plus
 one) of alpha and prior failure count (plus one) of beta
@@ -171,7 +171,7 @@ one) of alpha and prior failure count (plus one) of beta
 <!-- R; beta_binomial_rng; (ints N, reals alpha, reals beta); -->
 \index{{\tt \bfseries beta\_binomial}!{\tt (ints N, reals alpha, reals beta): R}|hyperpage}
 
-`R` **`beta_binomial_rng`**(`ints N, reals alpha, reals beta`)
+`R` **`beta_binomial_rng`**`(ints N, reals alpha, reals beta)`<br>\newline
 Generate a beta-binomial variate with N trials, prior success count
 (plus one) of alpha, and prior failure count (plus one) of beta; may
 only be used in generated quantities block. For a description of
@@ -188,7 +188,7 @@ If $a \in \mathbb{N}$, $b \in \mathbb{N}$, and $N \in
 
 ### Sampling Statement
 
-`n` ~ __`hypergeometric`__(`N, a, b`)
+`n ~ ` **hypergeometric**`(N, a, b)`
 
 Increment target log probability density with `hypergeometric_lpmf( n | N, a, b)`
 dropping constant additive terms.
@@ -199,14 +199,14 @@ dropping constant additive terms.
 <!-- real; hypergeometric_lpmf; (int n ~|~ int N, int a, int b); -->
 \index{{\tt \bfseries hypergeometric}!{\tt (int n ~|~ int N, int a, int b): real}|hyperpage}
 
-`real` **`hypergeometric_lpmf`**(`int n ~|~ int N, int a, int b`)
+`real` **`hypergeometric_lpmf`**`(int n ~|~ int N, int a, int b)`<br>\newline
 The log hypergeometric probability mass of n successes in N trials
 given total success count of a and total failure count of b
 
 <!-- int; hypergeometric_rng; (int N, int a, int2 b); -->
 \index{{\tt \bfseries hypergeometric}!{\tt (int N, int a, int2 b): int}|hyperpage}
 
-`int` **`hypergeometric_rng`**(`int N, int a, int2 b`)
+`int` **`hypergeometric_rng`**`(int N, int a, int2 b)`<br>\newline
 Generate a hypergeometric variate with N trials, total success count
 of a, and total failure count of b; may only be used in generated
 quantities block
@@ -225,7 +225,7 @@ distribution, \[ \text{CategoricalLogit}(y~|~\beta) =
 
 ### Sampling Statement
 
-`y` ~ __`categorical`__(`theta`)
+`y ~ ` **categorical**`(theta)`
 
 Increment target log probability density with `categorical_lpmf( y | theta)`
 dropping constant additive terms.
@@ -233,7 +233,7 @@ dropping constant additive terms.
 
 ### Sampling Statement
 
-`y` ~ __`categorical_logit`__(`beta`)
+`y ~ ` **categorical_logit**`(beta)`
 
 Increment target log probability density with `categorical_logit_lpmf( y | beta)`
 dropping constant additive terms.
@@ -248,7 +248,7 @@ outcome y can be a single integer (type `int`) or an array of integers
 <!-- real; categorical_lpmf; (ints y | vector theta); -->
 \index{{\tt \bfseries categorical}!{\tt (ints y | vector theta): real}|hyperpage}
 
-`real` **`categorical_lpmf`**(`ints y | vector theta`)
+`real` **`categorical_lpmf`**`(ints y | vector theta)`<br>\newline
 The log categorical probability mass function with outcome(s) y in
 $1:N$ given $N$-vector of outcome probabilities theta. The parameter
 theta must have non-negative entries that sum to one, but it need not
@@ -257,21 +257,21 @@ be a variable declared as a simplex.
 <!-- real; categorical_logit_lpmf; (ints y | vector beta); -->
 \index{{\tt \bfseries categorical\_logit}!{\tt (ints y | vector beta): real}|hyperpage}
 
-`real` **`categorical_logit_lpmf`**(`ints y | vector beta`)
+`real` **`categorical_logit_lpmf`**`(ints y | vector beta)`<br>\newline
 The log categorical probability mass function with outcome(s) y in
 $1:N$ given log-odds of outcomes beta.
 
 <!-- int; categorical_rng; (vector theta); -->
 \index{{\tt \bfseries categorical}!{\tt (vector theta): int}|hyperpage}
 
-`int` **`categorical_rng`**(`vector theta`)
+`int` **`categorical_rng`**`(vector theta)`<br>\newline
 Generate a categorical variate with $N$-simplex distribution parameter
 theta; may only be used in generated quantities block
 
 <!-- int; categorical_logit_rng; (vector beta); -->
 \index{{\tt \bfseries categorical\_logit}!{\tt (vector beta): int}|hyperpage}
 
-`int` **`categorical_logit_rng`**(`vector beta`)
+`int` **`categorical_logit_rng`**`(vector beta)`<br>\newline
 Generate a categorical variate with outcome in range $1:N$ from
 log-odds vector beta; may only be used in generated quantities block
 
@@ -295,7 +295,7 @@ $\text{logit}^{-1}(\infty) = 1$.
 
 ### Sampling Statement
 
-`k` ~ __`ordered_logistic`__(`eta, c`)
+`k ~ ` **ordered_logistic**`(eta, c)`
 
 Increment target log probability density with `ordered_logistic_lpmf( k | eta, c)`
 dropping constant additive terms.
@@ -306,14 +306,14 @@ dropping constant additive terms.
 <!-- real; ordered_logistic_lpmf; (ints k | vector eta, vectors c); -->
 \index{{\tt \bfseries ordered\_logistic}!{\tt (ints k | vector eta, vectors c): real}|hyperpage}
 
-`real` **`ordered_logistic_lpmf`**(`ints k | vector eta, vectors c`)
+`real` **`ordered_logistic_lpmf`**`(ints k | vector eta, vectors c)`<br>\newline
 The log ordered logistic probability mass of k given linear predictors
 eta, and cutpoints c.
 
 <!-- int; ordered_logistic_rng; (real eta, vector c); -->
 \index{{\tt \bfseries ordered\_logistic}!{\tt (real eta, vector c): int}|hyperpage}
 
-`int` **`ordered_logistic_rng`**(`real eta, vector c`)
+`int` **`ordered_logistic_rng`**`(real eta, vector c)`<br>\newline
 Generate an ordered logistic variate with linear predictor eta and
 cutpoints c; may only be used in generated quantities block
 
@@ -336,7 +336,7 @@ $\Phi(\infty) = 1$.
 
 ### Sampling Statement
 
-`k` ~ __`ordered_probit`__(`eta, c`)
+`k ~ ` **ordered_probit**`(eta, c)`
 
 Increment target log probability density with `ordered_probit_lpmf( k | eta, c)`
 dropping constant additive terms.
@@ -347,14 +347,14 @@ dropping constant additive terms.
 <!-- real; ordered_probit_lpmf; (ints k | vector eta, vectors c); -->
 \index{{\tt \bfseries ordered\_probit}!{\tt (ints k | vector eta, vectors c): real}|hyperpage}
 
-`real` **`ordered_probit_lpmf`**(`ints k | vector eta, vectors c`)
+`real` **`ordered_probit_lpmf`**`(ints k | vector eta, vectors c)`<br>\newline
 The log ordered probit probability mass of k given linear predictors
 eta, and cutpoints c.
 
 <!-- int; ordered_probit_rng; (real eta, vector c); -->
 \index{{\tt \bfseries ordered\_probit}!{\tt (real eta, vector c): int}|hyperpage}
 
-`int` **`ordered_probit_rng`**(`real eta, vector c`)
+`int` **`ordered_probit_rng`**`(real eta, vector c)`<br>\newline
 Generate an ordered probit variate with linear predictor eta and
 cutpoints c; may only be used in generated quantities block
 

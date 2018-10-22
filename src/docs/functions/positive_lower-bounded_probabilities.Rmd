@@ -14,7 +14,7 @@ then for $y \in \mathbb{R}^+$ with $y \geq y_{\text{min}}$, \[
 
 ### Sampling Statement
 
-`y` ~ __`pareto`__(`y_min, alpha`)
+`y ~ ` **pareto**`(y_min, alpha)`
 
 Increment target log probability density with `pareto_lpdf( y | y_min, alpha)`
 dropping constant additive terms.
@@ -25,35 +25,35 @@ dropping constant additive terms.
 <!-- real; pareto_lpdf; (reals y | reals y_min, reals alpha); -->
 \index{{\tt \bfseries pareto}!{\tt (reals y | reals y\_min, reals alpha): real}|hyperpage}
 
-`real` **`pareto_lpdf`**(`reals y | reals y_min, reals alpha`)
+`real` **`pareto_lpdf`**`(reals y | reals y_min, reals alpha)`<br>\newline
 The log of the Pareto density of y given positive minimum value y_min
 and shape alpha
 
 <!-- real; pareto_cdf; (reals y, reals y_min, reals alpha); -->
 \index{{\tt \bfseries pareto}!{\tt (reals y, reals y\_min, reals alpha): real}|hyperpage}
 
-`real` **`pareto_cdf`**(`reals y, reals y_min, reals alpha`)
+`real` **`pareto_cdf`**`(reals y, reals y_min, reals alpha)`<br>\newline
 The Pareto cumulative distribution function of y given positive
 minimum value y_min and shape alpha
 
 <!-- real; pareto_lcdf; (reals y | reals y_min, reals alpha); -->
 \index{{\tt \bfseries pareto}!{\tt (reals y | reals y\_min, reals alpha): real}|hyperpage}
 
-`real` **`pareto_lcdf`**(`reals y | reals y_min, reals alpha`)
+`real` **`pareto_lcdf`**`(reals y | reals y_min, reals alpha)`<br>\newline
 The log of the Pareto cumulative distribution function of y given
 positive minimum value y_min and shape alpha
 
 <!-- real; pareto_lccdf; (reals y | reals y_min, reals alpha); -->
 \index{{\tt \bfseries pareto}!{\tt (reals y | reals y\_min, reals alpha): real}|hyperpage}
 
-`real` **`pareto_lccdf`**(`reals y | reals y_min, reals alpha`)
+`real` **`pareto_lccdf`**`(reals y | reals y_min, reals alpha)`<br>\newline
 The log of the Pareto complementary cumulative distribution function
 of y given positive minimum value y_min and shape alpha
 
 <!-- R; pareto_rng; (reals y_min, reals alpha); -->
 \index{{\tt \bfseries pareto}!{\tt (reals y\_min, reals alpha): R}|hyperpage}
 
-`R` **`pareto_rng`**(`reals y_min, reals alpha`)
+`R` **`pareto_rng`**`(reals y_min, reals alpha)`<br>\newline
 Generate a Pareto variate with positive minimum value y_min and shape
 alpha; may only be used in generated quantities block. For a
 description of argument and return types, see section
@@ -74,7 +74,7 @@ $\mu=0$.
 
 ### Sampling Statement
 
-`y` ~ __`pareto_type_2`__(`mu, lambda, alpha`)
+`y ~ ` **pareto_type_2**`(mu, lambda, alpha)`
 
 Increment target log probability density with `pareto_type_2_lpdf( y | mu, lambda, alpha)`
 dropping constant additive terms.
@@ -85,35 +85,35 @@ dropping constant additive terms.
 <!-- real; pareto_type_2_lpdf; (reals y | reals mu, reals lambda, reals alpha); -->
 \index{{\tt \bfseries pareto\_type\_2}!{\tt (reals y | reals mu, reals lambda, reals alpha): real}|hyperpage}
 
-`real` **`pareto_type_2_lpdf`**(`reals y | reals mu, reals lambda, reals alpha`)
+`real` **`pareto_type_2_lpdf`**`(reals y | reals mu, reals lambda, reals alpha)`<br>\newline
 The log of the Pareto Type 2 density of y given location mu, scale
 lambda, and shape alpha
 
 <!-- real; pareto_type_2_cdf; (reals y, reals mu, reals lambda, reals alpha); -->
 \index{{\tt \bfseries pareto\_type\_2}!{\tt (reals y, reals mu, reals lambda, reals alpha): real}|hyperpage}
 
-`real` **`pareto_type_2_cdf`**(`reals y, reals mu, reals lambda, reals alpha`)
+`real` **`pareto_type_2_cdf`**`(reals y, reals mu, reals lambda, reals alpha)`<br>\newline
 The Pareto Type 2 cumulative distribution function of y given location
 mu, scale lambda, and shape alpha
 
 <!-- real; pareto_type_2_lcdf; (reals y | reals mu, reals lambda, reals alpha); -->
 \index{{\tt \bfseries pareto\_type\_2}!{\tt (reals y | reals mu, reals lambda, reals alpha): real}|hyperpage}
 
-`real` **`pareto_type_2_lcdf`**(`reals y | reals mu, reals lambda, reals alpha`)
+`real` **`pareto_type_2_lcdf`**`(reals y | reals mu, reals lambda, reals alpha)`<br>\newline
 The log of the Pareto Type 2 cumulative distribution function of y
 given location mu, scale lambda, and shape alpha
 
 <!-- real; pareto_type_2_lccdf; (reals y | reals mu, reals lambda, reals alpha); -->
 \index{{\tt \bfseries pareto\_type\_2}!{\tt (reals y | reals mu, reals lambda, reals alpha): real}|hyperpage}
 
-`real` **`pareto_type_2_lccdf`**(`reals y | reals mu, reals lambda, reals alpha`)
+`real` **`pareto_type_2_lccdf`**`(reals y | reals mu, reals lambda, reals alpha)`<br>\newline
 The log of the Pareto Type 2 complementary cumulative distribution
 function of y given location mu, scale lambda, and shape alpha
 
 <!-- R; pareto_type_2_rng; (reals mu, reals lambda, reals alpha); -->
 \index{{\tt \bfseries pareto\_type\_2}!{\tt (reals mu, reals lambda, reals alpha): R}|hyperpage}
 
-`R` **`pareto_type_2_rng`**(`reals mu, reals lambda, reals alpha`)
+`R` **`pareto_type_2_rng`**`(reals mu, reals lambda, reals alpha)`<br>\newline
 Generate a Pareto Type 2 variate with location mu, scale lambda, and
 shape alpha; may only be used in generated quantities block. For a
 description of argument and return types, see section

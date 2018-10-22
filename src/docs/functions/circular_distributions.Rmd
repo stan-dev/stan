@@ -27,7 +27,7 @@ around the mean $\mu$.
 
 ### Sampling Statement
 
-`y` ~ __`von_mises`__(`mu, kappa`)
+`y ~ ` **von_mises**`(mu, kappa)`
 
 Increment target log probability density with `von_mises_lpdf( y | mu, kappa)`
 dropping constant additive terms.
@@ -38,7 +38,7 @@ dropping constant additive terms.
 <!-- R; von_mises_lpdf; (reals y | reals mu, reals kappa); -->
 \index{{\tt \bfseries von\_mises}!{\tt (reals y | reals mu, reals kappa): R}|hyperpage}
 
-`R` **`von_mises_lpdf`**(`reals y | reals mu, reals kappa`)
+`R` **`von_mises_lpdf`**`(reals y | reals mu, reals kappa)`<br>\newline
 The log of the von mises density of y given location mu and scale
 kappa. For a description of argument and return types, see section
 \@ref(prob-vectorization).
@@ -46,7 +46,7 @@ kappa. For a description of argument and return types, see section
 <!-- R; von_mises_rng; (reals mu, reals kappa); -->
 \index{{\tt \bfseries von\_mises}!{\tt (reals mu, reals kappa): R}|hyperpage}
 
-`R` **`von_mises_rng`**(`reals mu, reals kappa`)
+`R` **`von_mises_rng`**`(reals mu, reals kappa)`<br>\newline
 Generate a Von Mises variate with location mu and scale kappa (i.e.
 returns values in the interval $[(\mu \mod 2\pi)-\pi,(\mu \mod
 2\pi)+\pi]$); may only be used in generated quantities block. For a

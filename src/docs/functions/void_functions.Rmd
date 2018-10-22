@@ -27,7 +27,7 @@ or the R console in RStan).
 <!-- void; print; (T1 x1,..., TN xN); -->
 \index{{\tt \bfseries print}!{\tt (T1 x1,..., TN xN): void}|hyperpage}
 
-`void` **`print`**(`T1 x1,..., TN xN`)
+`void` **`print`**`(T1 x1,..., TN xN)`<br>\newline
 Print the values denoted by the arguments x1 through xN on the output
 message stream. There are no spaces between items in the print, but a
 line feed (LF; Unicode U+000A; C++ literal `'\{n}'`) is inserted at
@@ -47,7 +47,7 @@ context in which it occurs).
 <!-- void; reject; (T1 x1,..., TN xN); -->
 \index{{\tt \bfseries reject}!{\tt (T1 x1,..., TN xN): void}|hyperpage}
 
-`void` **`reject`**(`T1 x1,..., TN xN`)
+`void` **`reject`**`(T1 x1,..., TN xN)`<br>\newline
 Reject the current iteration and print the values denoted by the
 arguments x1 through xN on the output message stream. There are no
 spaces between items in the print, but a line feed (LF; Unicode
