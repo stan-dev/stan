@@ -15,7 +15,7 @@ TEST(McmcStepsizeAdaptation, set_mu_c) {
   
   double old_mu_c = 5.0;
   adaptation.set_mu_c(old_mu_c);
-  EXPECT_EQ(old_mu, adaptation.get_mu_c());
+  EXPECT_EQ(old_mu_c, adaptation.get_mu_c());
   
 }
 
