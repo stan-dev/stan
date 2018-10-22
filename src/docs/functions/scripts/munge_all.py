@@ -165,13 +165,13 @@ def write_item(item_dict, rmdPath, wrapper):
     else:
         fh.write("<!-- %s; %s; (%s); -->\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"]))
     # \index - latex only
-    entry =  "{\\tt \\bfseries %s}!{\\tt (%s): %s}" % (item_dict["idx_name"], item_dict["args"], item_dict["return_type"])
+    entry =  "{\\tt \\bfseries %s}!{\\tt (%s): %s}" % (str.lower(item_dict["idx_name"]), item_dict["args"], item_dict["return_type"])
     fh.write("\index{%s|hyperpage}\n\n" % entry.replace("_","\_"))
 
     if (len(item_dict["args"]) == 0):
-        fh.write("`%s` **`%s`**()\n%s\n" % (item_dict["return_type"], item_dict["name"], desc))
+        fh.write("`%s` **`%s`**`()`<br>\\newline\n%s\n" % (item_dict["return_type"], item_dict["name"], desc))
     else:
-        fh.write("`%s` **`%s`**(`%s`)\n%s\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"], desc))
+        fh.write("`%s` **`%s`**`(%s)`<br>\\newline\n%s\n" % (item_dict["return_type"], item_dict["name"], item_dict["args"], desc))
     fh.write("\n")
     fh.close()
 
@@ -190,7 +190,7 @@ def process_pitem(line, rmdPath):
     args =  line[start : close]
     fh = open(rmdPath, 'a')
     fh.write("### Sampling Statement\n\n")
-    fh.write("`%s` ~ __`%s`__(`%s`)\n\n" % (lhs, distr, args))
+    fh.write("`%s ~ ` **%s**`(%s)`\n\n" % (lhs, distr, args))
     fh.write("Increment target log probability density with `%s_%s( %s | %s)`\n" % (distr, sfx, lhs, args))
     fh.write("dropping constant additive terms.\n")
     distr = distr.replace("_","\_")
@@ -203,7 +203,7 @@ def process_part(line):
     rmdPath = os.path.join(rmdDir, rmdFile)
     if (not os.path.exists(rmdPath)):
         fh = open(rmdPath, 'w+')
-        fh.write("# (PART) %s {-}\n" % part)
+        fh.write("# <i style=\"font-size: 110%%; color:#990017;\">%s</i> {-}\n" % part)
         fh.close()
     print rmdPath
 
