@@ -92,3 +92,7 @@ TEST(langParserStatementGrammar, slicedOpEqualsBad) {
   test_throws("compound-assign/plus_equals_sliced",
               "left-hand side type = vector; right-hand side type=matrix");
 }
+
+TEST(langParserStatementGrammar, noDeepCopy) {
+  test_parsable("parser-generator/no-copy-warnings");
+}
