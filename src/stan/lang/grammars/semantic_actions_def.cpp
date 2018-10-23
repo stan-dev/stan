@@ -1023,14 +1023,6 @@ namespace stan {
           pass = false;
           return;
         }
-        if (a.lhs_var_occurs_on_rhs()) {
-          // this only requires a warning --- a deep copy will be made
-          error_msgs << "Info: left-hand side variable"
-                     << " (name=" << name << ")"
-                     << " occurs on right-hand side of assignment, causing"
-                     << " inefficient deep copy to avoid aliasing."
-                     << std::endl;
-        }
         pass = true;
         return;
       } else {
