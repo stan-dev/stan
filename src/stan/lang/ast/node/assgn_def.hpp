@@ -18,6 +18,12 @@ namespace stan {
       return !op_.compare("=");
     }
 
+    bool assgn::lhs_var_has_sliced_idx() const {
+      for (size_t i = 0; i < idxs_.size(); ++i)
+        if (is_multi_index(idxs_[i])) return true;
+      return false;
+    }
+
     bool assgn::lhs_var_occurs_on_rhs() const {
       var_occurs_vis vis(lhs_var_);
       return boost::apply_visitor(vis, rhs_.expr_);

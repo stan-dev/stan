@@ -1,10 +1,9 @@
 functions{
   matrix covsqrt2corsqrt(matrix mat, int invert){ 
-    int i = 1;
-    int j = 2;
     matrix[rows(mat),cols(mat)] o;
     o=mat;
-    o[i,j] = o[j,i];
+    o[1] = o[2];
+    o[3:4] = o[1:2];
     return o;
   }
 }
