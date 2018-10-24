@@ -1023,7 +1023,7 @@ namespace stan {
           // allow assignment but generate warning
           error_msgs << "Info: assignment to variable name "
                      << "\"" << name << "\","
-                     << " variable occurs on right-hand side of assignment, "
+                     << " variable occurs on right-hand side of assignment"
                      << " causing inefficient deep copy to avoid aliasing."
                      << std::endl;
         }
