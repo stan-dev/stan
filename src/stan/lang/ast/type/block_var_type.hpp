@@ -3,6 +3,7 @@
 
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/range.hpp>
+#include <stan/lang/ast/node/locscale.hpp>
 #include <boost/variant/recursive_variant.hpp>
 #include <string>
 #include <vector>
@@ -241,6 +242,17 @@ struct block_var_type {
    * for this type (contained type for arrays), false otherwise.
    */
   bool has_def_bounds() const;
+
+  /**
+   * Returns location and scale for this type.
+   */
+  locscale ls() const;
+
+  /**
+   * Returns true if there are specified location and/or scale
+   * for this type (contained type for arrays), false otherwise.
+   */
+  bool has_def_locscale() const;
 
   /**
    * Returns true if `var_type_` is `block_array_type`, false otherwise.

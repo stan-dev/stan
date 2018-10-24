@@ -385,7 +385,6 @@ $$
 X = a + (b - a) \cdot \mathrm{logit}^{-1}(Y).
 $$
 
-
 ### Absolute Derivative of the Lower and Upper Bounds Inverse Transform {-}
 
 The absolute derivative of the inverse transform is given by
@@ -417,6 +416,58 @@ Despite the apparent complexity of this expression, most of the terms
 are repeated and thus only need to be evaluated once.  Most
 importantly, $\mathrm{logit}^{-1}(y)$ only needs to be evaluated once,
 so there is only one call to $\exp(-y)$.
+
+
+## Affinely Transformed Scalar
+
+Stan uses an affine transform to be able to specify parameters with a given
+location and scale.
+
+### Affine Transform {-}
+
+For variables with expected location $\mu$ and/or (positive) scale $\sigma$,
+Stan uses an affine transform.  Such a variable $X$ is transformed to a new
+variable $Y$, where
+
+$$
+Y = \mu + \sigma * X.
+$$
+
+The default value for the location $\mu$ is $0$ and for the scale $\sigma$ is
+$1$ in case not both are specified.
+
+
+### Affine Inverse Transform {-}
+
+The inverse of this transform is
+
+$$
+X = \frac{Y-\mu}{\sigma}.
+$$
+
+### Absolute Derivative of the Affine Inverse Transform
+
+The absolute derivative of the affine inverse transform is
+
+
+$$
+\left|
+  \frac{d}{dy}
+    \left(
+      \frac{y-\mu}{\sigma}
+    \right)
+  \right|
+= \frac{1}{\sigma}.
+$$
+
+Therefore, the density of the transformed variable $Y$ is
+
+$$
+p_Y(y)
+=
+ p_X \! \left( \frac{y-\mu}{\sigma} \right)
+    \cdot \frac{1}{\sigma}.
+$$
 
 
 ## Ordered Vector

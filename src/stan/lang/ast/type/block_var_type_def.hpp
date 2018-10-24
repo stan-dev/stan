@@ -121,6 +121,17 @@ bool block_var_type::has_def_bounds() const {
   return false;
 }
 
+locscale block_var_type::ls() const {
+  block_type_locscale_vis vis;
+  return boost::apply_visitor(vis, var_type_);
+}
+
+bool block_var_type::has_def_locscale() const {
+  if (this->ls().has_loc() || this->ls().has_scale())
+    return true;
+  return false;
+}
+
 block_var_type block_var_type::innermost_type() const {
   if (boost::get<stan::lang::block_array_type>(&var_type_)) {
     block_array_type vt = boost::get<stan::lang::block_array_type>(var_type_);
