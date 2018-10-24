@@ -28,6 +28,17 @@ namespace stan {
           o << " upper";
         o << ">";
       }
+      if (el_type.has_def_locscale()) {
+        locscale ls = el_type.ls();
+        o << "<";
+        if (ls.has_loc())
+          o << " location";
+        if (ls.has_loc() && ls.has_scale())
+          o << ",";
+        if (ls.has_scale())
+          o << " scale";
+        o << ">";
+      }
       return o;
     }
   }

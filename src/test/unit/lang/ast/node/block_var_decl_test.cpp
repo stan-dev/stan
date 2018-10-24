@@ -192,6 +192,53 @@ TEST(arrayBlockVarDecl, createVar3) {
   EXPECT_EQ("3-dim array of matrix< lower, upper>", ss.str());
 }
 
+TEST(arrayBlockVarDecl, createVar4) {
+  // 1-d array of matrix
+  stan::lang::double_literal real_loc(-2.0);
+  stan::lang::double_literal real_scale(2.0);
+  stan::lang::expression loc(real_loc);
+  stan::lang::expression scale(real_scale);
+  stan::lang::locscale m_ls(loc, scale);
+  stan::lang::expression M(stan::lang::int_literal(3));
+  stan::lang::expression N(stan::lang::int_literal(4));
+  stan::lang::matrix_block_type bvtMatrix(m_ls, M, N);
+  stan::lang::expression array_len(stan::lang::int_literal(7));
+  stan::lang::block_array_type bat(bvtMatrix, array_len);
+
+  stan::lang::block_var_decl bvar("x", bat);
+  
+  EXPECT_EQ(bvar.name(), "x");
+  EXPECT_EQ(bvar.bare_type(), stan::lang::bare_array_type(stan::lang::matrix_type()));
+  EXPECT_TRUE(bvar.type().is_array_type());
+  EXPECT_TRUE(bvar.type().array_element_type().bare_type().is_matrix_type());
+  EXPECT_TRUE(bvar.type().array_contains().bare_type().is_matrix_type());
+  EXPECT_EQ(bvar.type().array_dims(), 1);
+  EXPECT_EQ(bvar.type().num_dims(), 3);
+
+  // get var_decl component
+  stan::lang::var_decl vdecl = static_cast<stan::lang::var_decl>(bvar);
+  EXPECT_EQ(vdecl.name_, "x");
+  EXPECT_TRUE(vdecl.bare_type().is_array_type());
+  EXPECT_TRUE(is_nil(vdecl.def_));
+
+  EXPECT_TRUE(bvar.type().array_contains().has_def_locscale());
+  EXPECT_TRUE(bvar.type().array_contains().ls().has_loc());
+  EXPECT_TRUE(bvar.type().array_contains().ls().has_scale());
+
+  std::vector<stan::lang::expression> bvar_array_lens = bvar.type().array_lens();
+  EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
+  EXPECT_TRUE(bvar_array_lens.at(0).bare_type().is_int_type());
+
+  std::stringstream ss;
+  stan::lang::write_bare_expr_type(ss, bvar.bare_type());
+  EXPECT_EQ("matrix[ ]", ss.str());
+
+  ss.str(std::string());
+  ss.clear();
+  stan::lang::write_block_var_type(ss, bvar.type());
+  EXPECT_EQ("1-dim array of matrix< location, scale>", ss.str());
+}
+
 TEST(choleskyCorrBlockVarDecl, createVar1) {
   stan::lang::int_literal int_len(5);
   stan::lang::expression K(int_len);
