@@ -166,6 +166,21 @@ namespace stan {
 
       /**
        * Write the unconstrained value corresponding to the specified
+       * value with the specified location and scale.  The unconstraining
+       * transform is given by <code>(y-loc)/scale</code>, which
+       * inverts the constraining transform defined in
+       * <code>scalar_locscale_constrain(double,double)</code>.
+       *
+       * @param loc Location.
+       * @param scale Scale.
+       * @param y Bounded value.
+       */
+      void scalar_locscale_unconstrain(double loc, double scale, T& y) {
+        data_r_.push_back(stan::math::locscale_free(y, loc, scale));
+      }
+
+      /**
+       * Write the unconstrained value corresponding to the specified
        * correlation-constrained variable.
        *
        * <p>The unconstraining transform is <code>atanh(y)</code>, which
@@ -334,6 +349,23 @@ namespace stan {
             scalar_lub_unconstrain(lb, ub, y(i, j));
       }
 
+      void vector_locscale_unconstrain(double loc, double scale, vector_t& y) {
+        typedef typename stan::math::index_type<vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
+          scalar_locscale_unconstrain(loc, scale, y(i));
+      }
+      void row_vector_locscale_unconstrain(double loc, double scale,
+                                           row_vector_t& y) {
+        typedef typename stan::math::index_type<row_vector_t>::type idx_t;
+        for (idx_t i = 0; i < y.size(); ++i)
+          scalar_locscale_unconstrain(loc, scale, y(i));
+      }
+      void matrix_locscale_unconstrain(double loc, double scale, matrix_t& y) {
+        typedef typename stan::math::index_type<matrix_t>::type idx_t;
+        for (idx_t j = 0; j < y.cols(); ++j)
+          for (idx_t i = 0; i < y.rows(); ++i)
+            scalar_locscale_unconstrain(loc, scale, y(i, j));
+      }
 
 
       /**

@@ -271,6 +271,63 @@ TEST(io_reader, scalar_lub_constrain_jacobian) {
   EXPECT_FLOAT_EQ(expected_lp,lp);
 }
 
+TEST(io_reader, scalar_locscale) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-1.0);
+  theta.push_back(2.0);
+  stan::io::reader<double> reader(theta,theta_i);
+  double x = reader.scalar_locscale(-3.0,3.0);
+  EXPECT_FLOAT_EQ(-1.0,x);
+  double y = reader.scalar_locscale(-3.0,3.0);
+  EXPECT_FLOAT_EQ(2.0,y);
+
+  EXPECT_EQ(0U,reader.available());
+}
+TEST(io_reader, scalar_locscale_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-1.0);
+  theta.push_back(2.0);
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_NO_THROW (reader.scalar_locscale(-2.0, -2.0));
+  EXPECT_THROW (reader.scalar_locscale_constrain(-2.0, -2.0), std::domain_error);
+}
+
+TEST(io_reader, scalar_locscale_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-2.0);
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(0.0);
+  stan::io::reader<double> reader(theta,theta_i);
+  EXPECT_FLOAT_EQ(-2.0, reader.scalar_locscale_constrain(0.0,1.0));
+  EXPECT_FLOAT_EQ(3.0 + 5.0 * 3.0, reader.scalar_locscale_constrain(3.0,5.0));
+  EXPECT_FLOAT_EQ(-3.0 + 2.0 * -1.0, reader.scalar_locscale_constrain(-3.0,2.0));
+  EXPECT_FLOAT_EQ(-15.0, reader.scalar_locscale_constrain(-15.0,15.0));
+}
+TEST(io_reader, scalar_locscale_constrain_jacobian) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-2.0);
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(0.0);
+  stan::io::reader<double> reader(theta,theta_i);
+  double lp = -7.2;
+  EXPECT_FLOAT_EQ(-2.0, reader.scalar_locscale_constrain(0.0,1.0,lp));
+  EXPECT_FLOAT_EQ(3.0 + 5.0 * 3.0, reader.scalar_locscale_constrain(3.0,5.0,lp));
+  EXPECT_FLOAT_EQ(-3.0 + 2.0 * -1.0, reader.scalar_locscale_constrain(-3.0,2.0,lp));
+  EXPECT_FLOAT_EQ(-15.0, reader.scalar_locscale_constrain(-15.0,15.0,lp));
+  double expected_lp = -7.2 
+    + log(1.0)
+    + log(5.0)
+    + log(2.0)
+    + log(15.0);
+  EXPECT_FLOAT_EQ(expected_lp,lp);
+}
+
 TEST(io_reader, prob) {
   std::vector<int> theta_i;
   std::vector<double> theta;

@@ -246,6 +246,60 @@ TEST(io_writer, matrix_lub_unconstrain) {
 }
 
 
+TEST(io_writer, vector_locscale_unconstrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta,theta_i);
+
+  double loc = -10;
+  double scale = 10;
+  int size = 3;
+  stan::math::vector_d vec(size);
+  for (int n = 0; n < size; n++)
+    vec(n) = n;
+
+  writer.vector_locscale_unconstrain(loc,scale,vec);
+  ASSERT_EQ((size_t)size, writer.data_r().size());
+  for (int n = 0; n < size; n++)
+    EXPECT_FLOAT_EQ((n - loc) / scale, writer.data_r()[n]);
+}
+TEST(io_writer, row_vector_locscale_unconstrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta,theta_i);
+
+  double loc = -1;
+  double scale = 7;
+  int size = 3;
+  stan::math::row_vector_d row_vec(size);
+  for (int n = 0; n < size; n++)
+    row_vec(n) = n;
+
+  writer.row_vector_locscale_unconstrain(loc,scale,row_vec);
+  ASSERT_EQ((size_t)size, writer.data_r().size());
+  for (int n = 0; n < size; n++)
+    EXPECT_FLOAT_EQ(((n - loc) / (scale)), writer.data_r()[n]);
+}
+TEST(io_writer, matrix_locscale_unconstrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta,theta_i);
+
+  double loc = -1;
+  double scale = 6;
+  
+  stan::math::matrix_d mat(3,2);
+  mat << 
+    0, 3,
+    1, 4,
+    2, 5;
+  
+  writer.matrix_locscale_unconstrain(loc,scale,mat);
+  ASSERT_EQ(6U, writer.data_r().size());
+  for (int n = 0; n < 6; n++)
+    EXPECT_FLOAT_EQ(((n - loc) / (scale)), writer.data_r()[n]);
+}
+
 TEST(io_writer, scalar_pos_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -297,6 +351,17 @@ TEST(io_writer, scalar_lub_unconstrain_exception) {
 
   y = -2.0;
   EXPECT_THROW(writer.scalar_lub_unconstrain(lb, ub, y), std::domain_error);
+}
+TEST(io_writer, scalar_locscale_unconstrain_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta,theta_i);
+  double y;
+  double loc = 0.0;
+  double scale = 1.0;
+  y = 0.5;
+  EXPECT_NO_THROW(writer.scalar_lub_unconstrain(loc, scale, y));
+  EXPECT_THROW(writer.scalar_lub_unconstrain(loc, -scale, y), std::domain_error);
 }
 TEST(io_writer, corr_unconstrain_exception) {
   std::vector<int> theta_i;

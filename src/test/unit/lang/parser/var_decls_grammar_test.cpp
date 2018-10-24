@@ -59,6 +59,16 @@ TEST(langParserVarDeclsGrammarDef, setDoubleRangeUpper) {
               "Expression denoting real required");
 }
 
+TEST(langParserVarDeclsGrammarDef, setDoubleLocationScale) {
+  test_parsable("validate_set_double_locscale_good");
+  test_throws("validate_set_double_locscale_bad1",
+              "Expression denoting real required; found type=vector.");
+  test_throws("validate_set_double_locscale_bad2",
+              "Expression denoting real required; found type=vector.");
+  test_throws("validate_set_double_locscale_bad3",
+              "PARSER EXPECTED: \"upper\"");
+}
+
 TEST(langParserVarDeclsGrammarDef, parametersInLocals) {
   // test_parsable("var-decls-in-functions");
   test_throws("var-decl-bad-1",

@@ -1,141 +1,11 @@
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
 
-set.seed(123454321)
 
-options(digits = 3)
 
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
 
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
 
-set.seed(123454321)
 
-options(digits = 3)
 
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
 
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(123454321)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(123454321)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(123454321)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(10101010)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
 # Language Syntax
 
 This chapter defines the basic syntax of the Stan modeling language
@@ -210,7 +80,7 @@ var_type ::= 'int' range_constraint
            | 'corr_matrix' '[' expression ']'
            | 'cov_matrix' '[' expression ']'
 
-constraint ::= range_constraint | '<' loc_scale '>')
+constraint ::= range_constraint | '<' loc_scale '>'
 
 range_constraint ::= ?('<' range '>')
 
