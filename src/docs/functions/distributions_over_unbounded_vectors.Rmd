@@ -3,6 +3,18 @@
 The unbounded vector probability distributions have support on all of
 $\mathbb{R}^K$ for some fixed $K$.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="multivariate-normal-distribution.html">Multivariate Normal Distribution</a>\n')
+cat(' * <a href="multivariate-normal-distribution-precision-parameterization.html">Multivariate Normal Distribution, Precision Parameterization</a>\n')
+cat(' * <a href="multi-normal-cholesky-fun.html">Multivariate Normal Distribution, Cholesky Parameterization</a>\n')
+cat(' * <a href="multivariate-gaussian-process-distribution.html">Multivariate Gaussian Process Distribution</a>\n')
+cat(' * <a href="multivariate-gaussian-process-distribution-cholesky-parameterization.html">Multivariate Gaussian Process Distribution, Cholesky parameterization</a>\n')
+cat(' * <a href="multivariate-student-t-distribution.html">Multivariate Student-T Distribution</a>\n')
+cat(' * <a href="gaussian-dynamic-linear-models.html">Gaussian Dynamic Linear Models</a>\n')
+}
+```
+
 ## Multivariate Normal Distribution
 
 ### Probability Density Function
@@ -17,7 +29,7 @@ $\Sigma$.
 
 ### Sampling Statement
 
-`y ~ ` **multi_normal**`(mu, Sigma)`
+`y ~ ` **`multi_normal`**`(mu, Sigma)`
 
 Increment target log probability density with `multi_normal_lpdf( y | mu, Sigma)`
 dropping constant additive terms.
@@ -106,7 +118,7 @@ for $y \in \mathbb{R}^K$, \[ \text{MultiNormalPrecision}(y|\mu,\Omega)
 
 ### Sampling Statement
 
-`y ~ ` **multi_normal_prec**`(mu, Omega)`
+`y ~ ` **`multi_normal_prec`**`(mu, Omega)`
 
 Increment target log probability density with `multi_normal_prec_lpdf( y | mu, Omega)`
 dropping constant additive terms.
@@ -158,7 +170,7 @@ probability functions will raise errors.
 
 ### Sampling Statement
 
-`y ~ ` **multi_normal_cholesky**`(mu, L)`
+`y ~ ` **`multi_normal_cholesky`**`(mu, L)`
 
 Increment target log probability density with `multi_normal_cholesky_lpdf( y | mu, L)`
 dropping constant additive terms.
@@ -246,7 +258,7 @@ function does not take into account the mean prediction.
 
 ### Sampling Statement
 
-`y ~ ` **multi_gp**`(Sigma, w)`
+`y ~ ` **`multi_gp`**`(Sigma, w)`
 
 Increment target log probability density with `multi_gp_lpdf( y | Sigma, w)`
 dropping constant additive terms.
@@ -281,7 +293,7 @@ account the mean prediction.
 
 ### Sampling Statement
 
-`y ~ ` **multi_gp_cholesky**`(L, w)`
+`y ~ ` **`multi_gp_cholesky`**`(L, w)`
 
 Increment target log probability density with `multi_gp_cholesky_lpdf( y | L, w)`
 dropping constant additive terms.
@@ -313,7 +325,7 @@ K)/2\right)}      {\Gamma(\nu/2)} \ \frac{1}{\sqrt{\left| \Sigma
 
 ### Sampling Statement
 
-`y ~ ` **multi_student_t**`(nu, mu, Sigma)`
+`y ~ ` **`multi_student_t`**`(nu, mu, Sigma)`
 
 Increment target log probability density with `multi_student_t_lpdf( y | nu, mu, Sigma)`
 dropping constant additive terms.
@@ -400,7 +412,7 @@ processes observations and avoids a matrix inversions can be used
 
 ### Sampling Statement
 
-`y ~ ` **gaussian_dlm_obs**`(F, G, V, W, m0, C0)`
+`y ~ ` **`gaussian_dlm_obs`**`(F, G, V, W, m0, C0)`
 
 Increment target log probability density with `gaussian_dlm_obs_lpdf( y | F, G, V, W, m0, C0)`
 dropping constant additive terms.

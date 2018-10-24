@@ -1,5 +1,15 @@
 # Array Operations
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="array-reductions.html">Reductions</a>\n')
+cat(' * <a href="array-size-and-dimension-function.html">Array Size and Dimension Function</a>\n')
+cat(' * <a href="array-broadcasting.html">Array Broadcasting</a>\n')
+cat(' * <a href="array-concatenation.html">Array Concatenation</a>\n')
+cat(' * <a href="sorting-functions.html">Sorting functions</a>\n')
+}
+```
+
 ## Reductions {#array-reductions}
 
 The following operations take arrays as input and produce single

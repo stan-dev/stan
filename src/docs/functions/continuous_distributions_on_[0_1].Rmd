@@ -3,6 +3,13 @@
 The continuous distributions with outcomes in the interval $[0,1]$ are
 used to characterized bounded quantities, including probabilities.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="beta-distribution.html">Beta Distribution</a>\n')
+cat(' * <a href="beta-proportion-distribution.html">Beta Proportion Distribution</a>\n')
+}
+```
+
 ## Beta Distribution
 
 ### Probability Density Function
@@ -20,7 +27,7 @@ distribution requires strictly positive parameters, $\alpha, \beta >
 
 ### Sampling Statement
 
-`theta ~ ` **beta**`(alpha, beta)`
+`theta ~ ` **`beta`**`(alpha, beta)`
 
 Increment target log probability density with `beta_lpdf( theta | alpha, beta)`
 dropping constant additive terms.
@@ -86,7 +93,7 @@ parameter, $\kappa > 0$.
 
 ### Sampling Statement
 
-`theta ~ ` **beta_proportion**`(mu, kappa)`
+`theta ~ ` **`beta_proportion`**`(mu, kappa)`
 
 Increment target log probability density with `beta_proportion_lpdf( theta | mu, kappa)`
 dropping constant additive terms.

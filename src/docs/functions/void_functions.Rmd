@@ -16,6 +16,13 @@ are the the only constructs to accept string literals (e.g., `"hello
 world"`) as arguments.  Third, they have no effect on the log density
 function and operate solely through side effects.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="print-statement.html">Print Statement</a>\n')
+cat(' * <a href="reject-statement.html">Reject Statement</a>\n')
+}
+```
+
 ## Print Statement
 
 Printing has no effect on the model's log probability function.  Its

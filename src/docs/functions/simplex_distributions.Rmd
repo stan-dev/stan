@@ -5,6 +5,12 @@ specified $K$.  A $K$-dimensional vector $\theta$ is a unit
 $K$-simplex if $\theta_k \geq 0$ for $k \in \{1,\ldots,K\}$ and
 $\sum_{k = 1}^K \theta_k = 1$.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="dirichlet-distribution.html">Dirichlet Distribution</a>\n')
+}
+```
+
 ## Dirichlet Distribution
 
 ### Probability Density Function
@@ -83,7 +89,7 @@ $\alpha = 1000$,
 
 ### Sampling Statement
 
-`theta ~ ` **dirichlet**`(alpha)`
+`theta ~ ` **`dirichlet`**`(alpha)`
 
 Increment target log probability density with `dirichlet_lpdf( theta | alpha)`
 dropping constant additive terms.

@@ -3,6 +3,15 @@
 This appendix provides the definition of several mathematical
 functions used throughout the manual.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="beta-appendix.html">Beta</a>\n')
+cat(' * <a href="inc-beta-appendix.html">Incomplete Beta</a>\n')
+cat(' * <a href="gamma-appendix.html">Gamma</a>\n')
+cat(' * <a href="digamma-appendix.html">Digamma</a>\n')
+}
+```
+
 ## Beta {#beta-appendix}
 
 The beta function, $\text{B}(\alpha,\beta)$, computes the normalizing

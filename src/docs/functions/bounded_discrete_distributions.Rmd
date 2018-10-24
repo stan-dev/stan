@@ -3,6 +3,18 @@
 Bounded discrete probability functions have support on $\{ 0, \ldots,
 N \}$ for some upper bound $N$.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="binomial-distribution.html">Binomial Distribution</a>\n')
+cat(' * <a href="binomial-distribution-logit-parameterization.html">Binomial Distribution, Logit Parameterization</a>\n')
+cat(' * <a href="beta-binomial-distribution.html">Beta-Binomial Distribution</a>\n')
+cat(' * <a href="hypergeometric-distribution.html">Hypergeometric Distribution</a>\n')
+cat(' * <a href="categorical-distribution.html">Categorical Distribution</a>\n')
+cat(' * <a href="ordered-logistic-distribution.html">Ordered Logistic Distribution</a>\n')
+cat(' * <a href="ordered-probit-distribution.html">Ordered Probit Distribution</a>\n')
+}
+```
+
 ## Binomial Distribution
 
 ### Probability Mass Function
@@ -24,7 +36,7 @@ Suppose $N \in \mathbb{N}$ and $\theta \in [0,1]$, and $n \in
 
 ### Sampling Statement
 
-`n ~ ` **binomial**`(N, theta)`
+`n ~ ` **`binomial`**`(N, theta)`
 
 Increment target log probability density with `binomial_lpmf( n | N, theta)`
 dropping constant additive terms.
@@ -99,7 +111,7 @@ n}{\text{logit}^{-1}(\alpha)} \]
 
 ### Sampling Statement
 
-`n ~ ` **binomial_logit**`(N, alpha)`
+`n ~ ` **`binomial_logit`**`(N, alpha)`
 
 Increment target log probability density with `binomial_logit_lpmf( n | N, alpha)`
 dropping constant additive terms.
@@ -128,7 +140,7 @@ If $N \in \mathbb{N}$, $\alpha \in \mathbb{R}^+$, and $\beta \in
 
 ### Sampling Statement
 
-`n ~ ` **beta_binomial**`(N, alpha, beta)`
+`n ~ ` **`beta_binomial`**`(N, alpha, beta)`
 
 Increment target log probability density with `beta_binomial_lpmf( n | N, alpha, beta)`
 dropping constant additive terms.
@@ -188,7 +200,7 @@ If $a \in \mathbb{N}$, $b \in \mathbb{N}$, and $N \in
 
 ### Sampling Statement
 
-`n ~ ` **hypergeometric**`(N, a, b)`
+`n ~ ` **`hypergeometric`**`(N, a, b)`
 
 Increment target log probability density with `hypergeometric_lpmf( n | N, a, b)`
 dropping constant additive terms.
@@ -225,7 +237,7 @@ distribution, \[ \text{CategoricalLogit}(y~|~\beta) =
 
 ### Sampling Statement
 
-`y ~ ` **categorical**`(theta)`
+`y ~ ` **`categorical`**`(theta)`
 
 Increment target log probability density with `categorical_lpmf( y | theta)`
 dropping constant additive terms.
@@ -233,7 +245,7 @@ dropping constant additive terms.
 
 ### Sampling Statement
 
-`y ~ ` **categorical_logit**`(beta)`
+`y ~ ` **`categorical_logit`**`(beta)`
 
 Increment target log probability density with `categorical_logit_lpmf( y | beta)`
 dropping constant additive terms.
@@ -295,7 +307,7 @@ $\text{logit}^{-1}(\infty) = 1$.
 
 ### Sampling Statement
 
-`k ~ ` **ordered_logistic**`(eta, c)`
+`k ~ ` **`ordered_logistic`**`(eta, c)`
 
 Increment target log probability density with `ordered_logistic_lpmf( k | eta, c)`
 dropping constant additive terms.
@@ -336,7 +348,7 @@ $\Phi(\infty) = 1$.
 
 ### Sampling Statement
 
-`k ~ ` **ordered_probit**`(eta, c)`
+`k ~ ` **`ordered_probit`**`(eta, c)`
 
 Increment target log probability density with `ordered_probit_lpmf( k | eta, c)`
 dropping constant additive terms.

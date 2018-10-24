@@ -3,6 +3,14 @@
 Binary probability distributions have support on $\{0,1\}$, where 1
 represents the value true and 0 the value false.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="bernoulli-distribution.html">Bernoulli Distribution</a>\n')
+cat(' * <a href="bernoulli-logit-distribution.html">Bernoulli Distribution, Logit Parameterization</a>\n')
+cat(' * <a href="bernoulli-logit-glm.html">Bernoulli-Logit Generalised Linear Model (Logistic Regression)</a>\n')
+}
+```
+
 ## Bernoulli Distribution
 
 ### Probability Mass Function
@@ -14,7 +22,7 @@ If $\theta \in [0,1]$, then for $y \in \{0,1\}$, \[
 
 ### Sampling Statement
 
-`y ~ ` **bernoulli**`(theta)`
+`y ~ ` **`bernoulli`**`(theta)`
 
 Increment target log probability density with `bernoulli_lpmf( y | theta)`
 dropping constant additive terms.
@@ -75,7 +83,7 @@ If $\alpha \in \mathbb{R}$, then for $y \in \{0,1\}$, \[
 
 ### Sampling Statement
 
-`y ~ ` **bernoulli_logit**`(alpha)`
+`y ~ ` **`bernoulli_logit`**`(alpha)`
 
 Increment target log probability density with `bernoulli_logit_lpmf( y | alpha)`
 dropping constant additive terms.
@@ -122,7 +130,7 @@ n}\text{Bernoulli}(y_i~|~\text{logit}^{-1}(\alpha_i + x_i\cdot
 
 ### Sampling Statement
 
-`y ~ ` **bernoulli_logit_glm**`(x, alpha, beta)`
+`y ~ ` **`bernoulli_logit_glm`**`(x, alpha, beta)`
 
 Increment target log probability density with `bernoulli_logit_glm_lpmf( y | x, alpha, beta)`
 dropping constant additive terms.

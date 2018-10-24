@@ -1,5 +1,24 @@
 # Matrix Operations {#matrix-operations}
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="integer-valued-matrix-size-functions.html">Integer-Valued Matrix Size Functions</a>\n')
+cat(' * <a href="matrix-arithmetic-operators.html">Matrix Arithmetic Operators</a>\n')
+cat(' * <a href="transposition-operator.html">Transposition Operator</a>\n')
+cat(' * <a href="elementwise-functions.html">Elementwise Functions</a>\n')
+cat(' * <a href="dot-products-and-specialized-products.html">Dot Products and Specialized Products</a>\n')
+cat(' * <a href="reductions.html">Reductions</a>\n')
+cat(' * <a href="matrix-broadcast.html">Broadcast Functions</a>\n')
+cat(' * <a href="diagonal-matrix-functions.html">Diagonal Matrix Functions</a>\n')
+cat(' * <a href="slicing-and-blocking-functions.html">Slicing and Blocking Functions</a>\n')
+cat(' * <a href="matrix-concatenation.html">Matrix Concatenation</a>\n')
+cat(' * <a href="softmax.html">Special Matrix Functions</a>\n')
+cat(' * <a href="covariance.html">Covariance Functions</a>\n')
+cat(' * <a href="linear-algebra-functions-and-solvers.html">Linear Algebra Functions and Solvers</a>\n')
+cat(' * <a href="sort-functions.html">Sort Functions</a>\n')
+}
+```
+
 ## Integer-Valued Matrix Size Functions
 
 <!-- int; num_elements; (vector x); -->

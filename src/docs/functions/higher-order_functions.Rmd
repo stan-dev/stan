@@ -5,6 +5,14 @@ functions.  In all cases, the function arguments to the higher-order
 functions are defined as functions within the Stan language and passed
 by name to the higher-order functions.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="functions-algebraic-solver.html">Algebraic Equation Solver</a>\n')
+cat(' * <a href="functions-ode-solver.html">Ordinary Differential Equation Solvers</a>\n')
+cat(' * <a href="functions-map.html">Higher-Order Map</a>\n')
+}
+```
+
 ## Algebraic Equation Solver {#functions-algebraic-solver}
 
 Stan provides a built-in algebraic equation solver. Although it looks

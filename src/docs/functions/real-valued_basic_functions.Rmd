@@ -3,6 +3,25 @@
 This chapter describes built-in functions that take zero or more real
 or integer arguments and return real values.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="fun-vectorization.html">Vectorization of Real-Valued Functions</a>\n')
+cat(' * <a href="built-in-constants.html">Mathematical Constants</a>\n')
+cat(' * <a href="special-values.html">Special Values</a>\n')
+cat(' * <a href="get-log-prob.html">Log Probability Function</a>\n')
+cat(' * <a href="logical-functions.html">Logical Functions</a>\n')
+cat(' * <a href="real-valued-arithmetic-operators.html">Real-Valued Arithmetic Operators</a>\n')
+cat(' * <a href="step-functions.html">Step-like Functions</a>\n')
+cat(' * <a href="power-and-logarithm-functions.html">Power and Logarithm Functions</a>\n')
+cat(' * <a href="trigonometric-functions.html">Trigonometric Functions</a>\n')
+cat(' * <a href="hyperbolic-trigonometric-functions.html">Hyperbolic Trigonometric Functions</a>\n')
+cat(' * <a href="link-functions.html">Link Functions</a>\n')
+cat(' * <a href="phi-function.html">Probability-Related Functions</a>\n')
+cat(' * <a href="betafun.html">Combinatorial Functions</a>\n')
+cat(' * <a href="composed-functions.html">Composed Functions</a>\n')
+}
+```
+
 ## Vectorization of Real-Valued Functions {#fun-vectorization}
 
 Although listed in this chapter, many of Stan's built-in functions are

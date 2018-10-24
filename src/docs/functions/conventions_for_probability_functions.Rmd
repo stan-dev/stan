@@ -4,6 +4,19 @@ Functions associated with distributions are set up to follow the same
 naming conventions for both built-in distributions and for
 user-defined distributions.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="suffix-marks-type-of-function.html">Suffix Marks Type of Function</a>\n')
+cat(' * <a href="argument-order-and-the-vertical-bar.html">Argument Order and the Vertical Bar</a>\n')
+cat(' * <a href="sampling-notation.html">Sampling Notation</a>\n')
+cat(' * <a href="finite-inputs.html">Finite Inputs</a>\n')
+cat(' * <a href="boundary-conditions.html">Boundary Conditions</a>\n')
+cat(' * <a href="distributions-prng.html">Pseudorandom Number Generators</a>\n')
+cat(' * <a href="cumulative-distribution-functions.html">Cumulative Distribution Functions</a>\n')
+cat(' * <a href="vectorization.html">Vectorization</a>\n')
+}
+```
+
 ## Suffix Marks Type of Function
 
 The suffix is determined by the type of function according to the

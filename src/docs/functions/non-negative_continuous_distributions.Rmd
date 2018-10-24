@@ -3,6 +3,13 @@
 The non-negative continuous probability functions have support on the
 non-negative real numbers.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="rayleigh-distribution.html">Rayleigh Distribution</a>\n')
+cat(' * <a href="wiener-first-passage-time-distribution.html">Wiener First Passage Time Distribution</a>\n')
+}
+```
+
 ## Rayleigh Distribution
 
 ### Probability Density Function
@@ -13,7 +20,7 @@ If $\sigma \in \mathbb{R}^+$, then for $y \in [0,\infty)$, \[
 
 ### Sampling Statement
 
-`y ~ ` **rayleigh**`(sigma)`
+`y ~ ` **`rayleigh`**`(sigma)`
 
 Increment target log probability density with `rayleigh_lpdf( y | sigma)`
 dropping constant additive terms.
@@ -69,7 +76,7 @@ If $\alpha \in \mathbb{R}^+$, $\tau \in \mathbb{R}^+$, $\beta \in [0,
 
 ### Sampling Statement
 
-`y ~ ` **wiener**`(alpha, tau, beta, delta)`
+`y ~ ` **`wiener`**`(alpha, tau, beta, delta)`
 
 Increment target log probability density with `wiener_lpdf( y | alpha, tau, beta, delta)`
 dropping constant additive terms.

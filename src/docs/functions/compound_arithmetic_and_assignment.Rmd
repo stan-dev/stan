@@ -18,6 +18,17 @@ For example, `x = x + 1` may be replaced with `x += 1`.
 The signatures of the supported compound arithmetic and assignment
 operations are as follows.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="compound-addition-and-assignment.html">Compound Addition and Assignment</a>\n')
+cat(' * <a href="compound-subtraction-and-assignment.html">Compound Subtraction and Assignment</a>\n')
+cat(' * <a href="compound-multiplication-and-assignment.html">Compound Multiplication and Assignment</a>\n')
+cat(' * <a href="compound-division-and-assignment.html">Compound Division and Assignment</a>\n')
+cat(' * <a href="compound-elementwise-multiplication-and-assignment.html">Compound Elementwise Multiplication and Assignment</a>\n')
+cat(' * <a href="compound-elementwise-division-and-assignment.html">Compound Elementwise Division and Assignment</a>\n')
+}
+```
+
 ## Compound Addition and Assignment
 
 <!-- void; operator+=; (int x, int y); -->

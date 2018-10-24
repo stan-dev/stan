@@ -190,7 +190,7 @@ def process_pitem(line, rmdPath):
     args =  line[start : close]
     fh = open(rmdPath, 'a')
     fh.write("### Sampling Statement\n\n")
-    fh.write("`%s ~ ` **%s**`(%s)`\n\n" % (lhs, distr, args))
+    fh.write("`%s ~ ` **`%s`**`(%s)`\n\n" % (lhs, distr, args))
     fh.write("Increment target log probability density with `%s_%s( %s | %s)`\n" % (distr, sfx, lhs, args))
     fh.write("dropping constant additive terms.\n")
     distr = distr.replace("_","\_")
@@ -215,6 +215,24 @@ def process_section(line, rmdPath):
     if (len(label) > 0):
         fh.write(" {#%s}" % label)
     fh.write("\n\n")
+    fh.close()
+
+    rmdTocPath = rmdPath.replace(".Rmd", ".toc");
+    if (not os.path.exists(rmdTocPath)):
+        fh = open(rmdTocPath, 'w+')
+        fh.write("```{r results='asis', echo=FALSE}\n")
+        fh.write("if (knitr::is_html_output()) {\n")
+        fh.close()
+    fh = open(rmdTocPath, 'a')
+    if (len(label) > 0):
+        href = str.lower(label).replace(" ","-") + ".html"
+        fh.write("cat(' * <a href=\"%s\">%s</a>\\n')\n" % (href, sectionName))
+    else:
+        href = str.lower(sectionName).replace(" ","-") + ".html"
+        href = href.replace("(","")
+        href = href.replace(")","")
+        href = href.replace(",","")
+        fh.write("cat(' * <a href=\"%s\">%s</a>\\n')\n" % (href, sectionName))
     fh.close()
 
 def process_subsection(line, rmdPath):

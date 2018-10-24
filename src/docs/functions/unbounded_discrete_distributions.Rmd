@@ -3,6 +3,18 @@
 The unbounded discrete distributions have support over the natural
 numbers (i.e., the non-negative integers).
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="negative-binomial-distribution.html">Negative Binomial Distribution</a>\n')
+cat(' * <a href="nbalt.html">Negative Binomial Distribution (alternative parameterization)</a>\n')
+cat(' * <a href="neg-binom-2-log.html">Negative Binomial Distribution (log alternative parameterization)</a>\n')
+cat(' * <a href="neg-binom-2-log-glm.html">Negative-Binomial-2-Log Generalised Linear Model (Negative Binomial Regression)</a>\n')
+cat(' * <a href="poisson.html">Poisson Distribution</a>\n')
+cat(' * <a href="poisson-distribution-log-parameterization.html">Poisson Distribution, Log Parameterization</a>\n')
+cat(' * <a href="poisson-log-glm.html">Poisson-Log Generalised Linear Model (Poisson Regression)</a>\n')
+}
+```
+
 ## Negative Binomial Distribution
 
 For the negative binomial distribution Stan uses the parameterization
@@ -23,7 +35,7 @@ The mean and variance of a random variable $y \sim
 
 ### Sampling Statement
 
-`n ~ ` **neg_binomial**`(alpha, beta)`
+`n ~ ` **`neg_binomial`**`(alpha, beta)`
 
 Increment target log probability density with `neg_binomial_lpmf( n | alpha, beta)`
 dropping constant additive terms.
@@ -94,7 +106,7 @@ the overdispersion, scaled by the square of the mean, $\mu^2$.
 
 ### Sampling Statement
 
-`y ~ ` **neg_binomial_2**`(mu, phi)`
+`y ~ ` **`neg_binomial_2`**`(mu, phi)`
 
 Increment target log probability density with `neg_binomial_2_lpmf( y | mu, phi)`
 dropping constant additive terms.
@@ -151,7 +163,7 @@ but as of yet, there are no CDFs implemented for it.
 
 ### Sampling Statement
 
-`y ~ ` **neg_binomial_2_log**`(eta, phi)`
+`y ~ ` **`neg_binomial_2_log`**`(eta, phi)`
 
 Increment target log probability density with `neg_binomial_2_log_lpmf( y | eta, phi)`
 dropping constant additive terms.
@@ -195,7 +207,7 @@ If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
 
 ### Sampling Statement
 
-`y ~ ` **neg_binomial_2_log_glm**`(x, alpha, beta, phi)`
+`y ~ ` **`neg_binomial_2_log_glm`**`(x, alpha, beta, phi)`
 
 Increment target log probability density with `neg_binomial_2_log_glm_lpmf( y | x, alpha, beta, phi)`
 dropping constant additive terms.
@@ -237,7 +249,7 @@ If $\lambda \in \mathbb{R}^+$, then for $n \in \mathbb{N}$, \[
 
 ### Sampling Statement
 
-`n ~ ` **poisson**`(lambda)`
+`n ~ ` **`poisson`**`(lambda)`
 
 Increment target log probability density with `poisson_lpmf( n | lambda)`
 dropping constant additive terms.
@@ -296,7 +308,7 @@ If $\alpha \in \mathbb{R}$, then for $n \in \mathbb{N}$, \[
 
 ### Sampling Statement
 
-`n ~ ` **poisson_log**`(alpha)`
+`n ~ ` **`poisson_log`**`(alpha)`
 
 Increment target log probability density with `poisson_log_lpmf( n | alpha)`
 dropping constant additive terms.
@@ -336,7 +348,7 @@ n}\text{Poisson}(y_i|\exp(\alpha_i + x_i\cdot \beta)). \]
 
 ### Sampling Statement
 
-`y ~ ` **poisson_log_glm**`(x, alpha, beta)`
+`y ~ ` **`poisson_log_glm`**`(x, alpha, beta)`
 
 Increment target log probability density with `poisson_log_glm_lpmf( y | x, alpha, beta)`
 dropping constant additive terms.

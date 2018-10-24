@@ -3,6 +3,20 @@
 The unbounded univariate continuous probability distributions have
 support on all real numbers.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="normal-distribution.html">Normal Distribution</a>\n')
+cat(' * <a href="normal-id-glm.html">Normal-Id Generalised Linear Model (Linear Regression)</a>\n')
+cat(' * <a href="exponentially-modified-normal-distribution.html">Exponentially Modified Normal Distribution</a>\n')
+cat(' * <a href="skew-normal-distribution.html">Skew Normal Distribution</a>\n')
+cat(' * <a href="student-t-distribution.html">Student-T Distribution</a>\n')
+cat(' * <a href="cauchy-distribution.html">Cauchy Distribution</a>\n')
+cat(' * <a href="double-exponential-laplace-distribution.html">Double Exponential (Laplace) Distribution</a>\n')
+cat(' * <a href="logistic-distribution.html">Logistic Distribution</a>\n')
+cat(' * <a href="gumbel-distribution.html">Gumbel Distribution</a>\n')
+}
+```
+
 ## Normal Distribution {#normal-distribution}
 
 ### Probability Density Function
@@ -14,7 +28,7 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 
 ### Sampling Statement
 
-`y ~ ` **normal**`(mu, sigma)`
+`y ~ ` **`normal`**`(mu, sigma)`
 
 Increment target log probability density with `normal_lpdf( y | mu, sigma)`
 dropping constant additive terms.
@@ -96,7 +110,7 @@ of y.
 
 ### Sampling Statement
 
-`y ~ ` **std_normal**`(\pitemTwo{y)`
+`y ~ ` **`std_normal`**`(\pitemTwo{y)`
 
 Increment target log probability density with `std_normal_lpdf( y | \pitemTwo{y)`
 dropping constant additive terms.
@@ -119,7 +133,7 @@ If $x\in \mathbb{R}^{n\cdot m}, \alpha \in \mathbb{R}^n, \beta\in
 
 ### Sampling Statement
 
-`y ~ ` **normal_id_glm**`(x, alpha, beta, sigma)`
+`y ~ ` **`normal_id_glm`**`(x, alpha, beta, sigma)`
 
 Increment target log probability density with `normal_id_glm_lpmf( y | x, alpha, beta, sigma)`
 dropping constant additive terms.
@@ -163,7 +177,7 @@ y}{\sqrt{2}\sigma}\right) . \]
 
 ### Sampling Statement
 
-`y ~ ` **exp_mod_normal**`(mu, sigma, lambda)`
+`y ~ ` **`exp_mod_normal`**`(mu, sigma, lambda)`
 
 Increment target log probability density with `exp_mod_normal_lpdf( y | mu, sigma, lambda)`
 dropping constant additive terms.
@@ -222,7 +236,7 @@ If $\xi \in \mathbb{R}$, $\omega \in \mathbb{R}^+$, and $\alpha \in
 
 ### Sampling Statement
 
-`y ~ ` **skew_normal**`(xi, omega, alpha)`
+`y ~ ` **`skew_normal`**`(xi, omega, alpha)`
 
 Increment target log probability density with `skew_normal_lpdf( y | xi, omega, alpha)`
 dropping constant additive terms.
@@ -280,7 +294,7 @@ If $\nu \in \mathbb{R}^+$, $\mu \in \mathbb{R}$, and $\sigma \in
 
 ### Sampling Statement
 
-`y ~ ` **student_t**`(nu, mu, sigma)`
+`y ~ ` **`student_t`**`(nu, mu, sigma)`
 
 Increment target log probability density with `student_t_lpdf( y | nu, mu, sigma)`
 dropping constant additive terms.
@@ -336,7 +350,7 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 
 ### Sampling Statement
 
-`y ~ ` **cauchy**`(mu, sigma)`
+`y ~ ` **`cauchy`**`(mu, sigma)`
 
 Increment target log probability density with `cauchy_lpdf( y | mu, sigma)`
 dropping constant additive terms.
@@ -402,7 +416,7 @@ a non-centered parameterization by taking \[ \beta^{\text{raw}} \sim
 
 ### Sampling Statement
 
-`y ~ ` **double_exponential**`(mu, sigma)`
+`y ~ ` **`double_exponential`**`(mu, sigma)`
 
 Increment target log probability density with `double_exponential_lpdf( y | mu, sigma)`
 dropping constant additive terms.
@@ -458,7 +472,7 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 
 ### Sampling Statement
 
-`y ~ ` **logistic**`(mu, sigma)`
+`y ~ ` **`logistic`**`(mu, sigma)`
 
 Increment target log probability density with `logistic_lpdf( y | mu, sigma)`
 dropping constant additive terms.
@@ -512,7 +526,7 @@ If $\mu \in \mathbb{R}$ and $\beta \in \mathbb{R}^+$, then for $y \in
 
 ### Sampling Statement
 
-`y ~ ` **gumbel**`(mu, beta)`
+`y ~ ` **`gumbel`**`(mu, beta)`
 
 Increment target log probability density with `gumbel_lpdf( y | mu, beta)`
 dropping constant additive terms.

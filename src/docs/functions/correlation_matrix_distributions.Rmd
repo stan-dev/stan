@@ -15,7 +15,14 @@ generated quantities block via
    corr_matrix[K] Sigma;
    Sigma = multiply_lower_tri_self_transpose(L);
  }
- ```
+```
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="lkj-correlation.html">LKJ Correlation Distribution</a>\n')
+cat(' * <a href="cholesky-lkj-correlation-distribution.html">Cholesky LKJ Correlation Distribution</a>\n')
+}
+```
 
 ## LKJ Correlation Distribution {#lkj-correlation}
 
@@ -50,7 +57,7 @@ practice.
 
 ### Sampling Statement
 
-`y ~ ` **lkj_corr**`(eta)`
+`y ~ ` **`lkj_corr`**`(eta)`
 
 Increment target log probability density with `lkj_corr_lpdf( y | eta)`
 dropping constant additive terms.
@@ -117,7 +124,7 @@ unit Euclidean length.
 
 ### Sampling Statement
 
-`L ~ ` **lkj_corr_cholesky**`(eta)`
+`L ~ ` **`lkj_corr_cholesky`**`(eta)`
 
 Increment target log probability density with `lkj_corr_cholesky_lpdf( L | eta)`
 dropping constant additive terms.

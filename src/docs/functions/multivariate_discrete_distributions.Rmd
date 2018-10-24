@@ -3,6 +3,12 @@
 The multivariate discrete distributions are over multiple integer
 values, which are expressed in Stan as arrays.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="multinomial-distribution.html">Multinomial Distribution</a>\n')
+}
+```
+
 ## Multinomial Distribution
 
 ### Probability Mass Function
@@ -16,7 +22,7 @@ multinomial coefficient is defined by \[ \binom{N}{y_1,\ldots,y_k} =
 
 ### Sampling Statement
 
-`y ~ ` **multinomial**`(theta)`
+`y ~ ` **`multinomial`**`(theta)`
 
 Increment target log probability density with `multinomial_lpmf( y | theta)`
 dropping constant additive terms.

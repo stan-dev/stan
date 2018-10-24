@@ -3,6 +3,13 @@
 The covariance matrix distributions have support on symmetric,
 positive-definite $K \times K$ matrices.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="wishart-distribution.html">Wishart Distribution</a>\n')
+cat(' * <a href="inverse-wishart-distribution.html">Inverse Wishart Distribution</a>\n')
+}
+```
+
 ## Wishart Distribution
 
 ### Probability Density Function
@@ -20,7 +27,7 @@ Gamma function, \[ \Gamma_K(x) = \frac{1}{\pi^{K(K-1)/4}} \
 
 ### Sampling Statement
 
-`W ~ ` **wishart**`(nu, Sigma)`
+`W ~ ` **`wishart`**`(nu, Sigma)`
 
 Increment target log probability density with `wishart_lpdf( W | nu, Sigma)`
 dropping constant additive terms.
@@ -58,7 +65,7 @@ for symmetric and positive-definite $W \in \mathbb{R}^{K \times K}$,
 
 ### Sampling Statement
 
-`W ~ ` **inv_wishart**`(nu, Sigma)`
+`W ~ ` **`inv_wishart`**`(nu, Sigma)`
 
 Increment target log probability density with `inv_wishart_lpdf( W | nu, Sigma)`
 dropping constant additive terms.

@@ -3,6 +3,12 @@
 The bounded continuous probabilities have support on a finite interval
 of real numbers.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="uniform-distribution.html">Uniform Distribution</a>\n')
+}
+```
+
 ## Uniform Distribution
 
 ### Probability Density Function
@@ -13,7 +19,7 @@ $y \in [\alpha,\beta]$, \[ \text{Uniform}(y|\alpha,\beta) =
 
 ### Sampling Statement
 
-`y ~ ` **uniform**`(alpha, beta)`
+`y ~ ` **`uniform`**`(alpha, beta)`
 
 Increment target log probability density with `uniform_lpdf( y | alpha, beta)`
 dropping constant additive terms.

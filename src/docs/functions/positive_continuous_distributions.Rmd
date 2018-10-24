@@ -3,6 +3,20 @@
 The positive continuous probability functions have support on the
 positive real numbers.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="lognormal.html">Lognormal Distribution</a>\n')
+cat(' * <a href="chi-square-distribution.html">Chi-Square Distribution</a>\n')
+cat(' * <a href="inverse-chi-square-distribution.html">Inverse Chi-Square Distribution</a>\n')
+cat(' * <a href="scaled-inverse-chi-square-distribution.html">Scaled Inverse Chi-Square Distribution</a>\n')
+cat(' * <a href="exponential-distribution.html">Exponential Distribution</a>\n')
+cat(' * <a href="gamma-distribution.html">Gamma Distribution</a>\n')
+cat(' * <a href="inverse-gamma-distribution.html">Inverse Gamma Distribution</a>\n')
+cat(' * <a href="weibull-distribution.html">Weibull Distribution</a>\n')
+cat(' * <a href="frechet-distribution.html">Frechet Distribution</a>\n')
+}
+```
+
 ## Lognormal Distribution {#lognormal}
 
 ### Probability Density Function
@@ -14,7 +28,7 @@ If $\mu \in \mathbb{R}$ and $\sigma \in \mathbb{R}^+$, then for $y \in
 
 ### Sampling Statement
 
-`y ~ ` **lognormal**`(mu, sigma)`
+`y ~ ` **`lognormal`**`(mu, sigma)`
 
 Increment target log probability density with `lognormal_lpdf( y | mu, sigma)`
 dropping constant additive terms.
@@ -68,7 +82,7 @@ y^{\nu/2 - 1} \, \exp \! \left( -\, \frac{1}{2} \, y \right) . \]
 
 ### Sampling Statement
 
-`y ~ ` **chi_square**`(nu)`
+`y ~ ` **`chi_square`**`(nu)`
 
 Increment target log probability density with `chi_square_lpdf( y | nu)`
 dropping constant additive terms.
@@ -122,7 +136,7 @@ If $\nu \in \mathbb{R}^+$, then for $y \in \mathbb{R}^+$, \[
 
 ### Sampling Statement
 
-`y ~ ` **inv_chi_square**`(nu)`
+`y ~ ` **`inv_chi_square`**`(nu)`
 
 Increment target log probability density with `inv_chi_square_lpdf( y | nu)`
 dropping constant additive terms.
@@ -178,7 +192,7 @@ y^{-(\nu/2 + 1)} \, \exp \! \left( \!    - \, \frac{1}{2} \, \nu \,
 
 ### Sampling Statement
 
-`y ~ ` **scaled_inv_chi_square**`(nu, sigma)`
+`y ~ ` **`scaled_inv_chi_square`**`(nu, sigma)`
 
 Increment target log probability density with `scaled_inv_chi_square_lpdf( y | nu, sigma)`
 dropping constant additive terms.
@@ -232,7 +246,7 @@ If $\beta \in \mathbb{R}^+$, then for $y \in \mathbb{R}^+$, \[
 
 ### Sampling Statement
 
-`y ~ ` **exponential**`(beta)`
+`y ~ ` **`exponential`**`(beta)`
 
 Increment target log probability density with `exponential_lpdf( y | beta)`
 dropping constant additive terms.
@@ -286,7 +300,7 @@ If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y
 
 ### Sampling Statement
 
-`y ~ ` **gamma**`(alpha, beta)`
+`y ~ ` **`gamma`**`(alpha, beta)`
 
 Increment target log probability density with `gamma_lpdf( y | alpha, beta)`
 dropping constant additive terms.
@@ -341,7 +355,7 @@ If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for $y
 
 ### Sampling Statement
 
-`y ~ ` **inv_gamma**`(alpha, beta)`
+`y ~ ` **`inv_gamma`**`(alpha, beta)`
 
 Increment target log probability density with `inv_gamma_lpdf( y | alpha, beta)`
 dropping constant additive terms.
@@ -400,7 +414,7 @@ Note that if $Y \propto \text{Weibull}(\alpha,\sigma)$, then $Y^{-1}
 
 ### Sampling Statement
 
-`y ~ ` **weibull**`(alpha, sigma)`
+`y ~ ` **`weibull`**`(alpha, sigma)`
 
 Increment target log probability density with `weibull_lpdf( y | alpha, sigma)`
 dropping constant additive terms.
@@ -458,7 +472,7 @@ Note that if $Y \propto \text{Frechet}(\alpha,\sigma)$, then $Y^{-1}
 
 ### Sampling Statement
 
-`y ~ ` **frechet**`(alpha, sigma)`
+`y ~ ` **`frechet`**`(alpha, sigma)`
 
 Increment target log probability density with `frechet_lpdf( y | alpha, sigma)`
 dropping constant additive terms.

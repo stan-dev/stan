@@ -3,6 +3,12 @@
 Circular distributions are defined for finite values y in any interval
 of length $2\pi$.
 
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="von-mises-distribution.html">Von Mises Distribution</a>\n')
+}
+```
+
 ## Von Mises Distribution
 
 ### Probability Density Function
@@ -27,7 +33,7 @@ around the mean $\mu$.
 
 ### Sampling Statement
 
-`y ~ ` **von_mises**`(mu, kappa)`
+`y ~ ` **`von_mises`**`(mu, kappa)`
 
 Increment target log probability density with `von_mises_lpdf( y | mu, kappa)`
 dropping constant additive terms.
