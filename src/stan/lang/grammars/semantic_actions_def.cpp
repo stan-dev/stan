@@ -1018,20 +1018,20 @@ namespace stan {
         pass = false;
         return;
       }
+      if (a.lhs_var_has_sliced_idx()) {
+        if (a.lhs_var_occurs_on_rhs()) {
+          // allow assignment but generate warning
+          error_msgs << "Info: assignment to variable name "
+                     << "\"" << name << "\","
+                     << " variable occurs on right-hand side of assignment, "
+                     << " causing inefficient deep copy to avoid aliasing."
+                     << std::endl;
+        }
+      }
       if (a.is_simple_assignment()) {
         if (!has_same_shape(lhs_type, a.rhs_, name, "assignment", error_msgs)) {
           pass = false;
           return;
-        }
-        if (a.lhs_var_has_sliced_idx()) {
-          if (a.lhs_var_occurs_on_rhs()) {
-            // allow assignment but generate warning
-            error_msgs << "Info: left-hand side variable"
-                       << " (name=" << name << ")"
-                       << " occurs on right-hand side of assignment, causing"
-                       << " inefficient deep copy to avoid aliasing."
-                       << std::endl;
-          }
         }
         pass = true;
         return;
