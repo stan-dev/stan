@@ -93,6 +93,7 @@ TEST(langParserStatementGrammar, slicedOpEqualsBad) {
               "left-hand side type = vector; right-hand side type=matrix");
 }
 
-TEST(langParserStatementGrammar, noDeepCopy) {
-  test_parsable("parser-generator/no-copy-warnings");
+TEST(langParserStatementGrammar, deepCopy) {
+  test_warning("parser-generator/deep-copy-warning",
+               "inefficient deep copy to avoid aliasing");
 }

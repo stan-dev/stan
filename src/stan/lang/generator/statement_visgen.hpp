@@ -161,7 +161,8 @@ namespace stan {
         }
         // generate arg for rhs
         if (assign_simple) {
-          if (y.lhs_var_occurs_on_rhs()) {
+          if (y.lhs_var_has_sliced_idx()
+              && y.lhs_var_occurs_on_rhs()) {
             o_ << "stan::model::deep_copy(";
             generate_expression(y.rhs_, NOT_USER_FACING, o_);
             o_ << ")";
