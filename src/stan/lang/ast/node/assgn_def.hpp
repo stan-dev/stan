@@ -19,8 +19,8 @@ namespace stan {
     }
 
     bool assgn::lhs_var_has_sliced_idx() const {
-      for (size_t i = 0; i < idxs_.size(); ++i)
-        if (is_multi_index(idxs_[i])) return true;
+      for (const auto& idx : idxs)
+        if (is_multi_idx[idx]) return true;
       return false;
     }
 
