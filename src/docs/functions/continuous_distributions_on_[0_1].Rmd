@@ -1,0 +1,132 @@
+# Continuous Distributions on [0, 1]
+
+The continuous distributions with outcomes in the interval $[0,1]$ are
+used to characterized bounded quantities, including probabilities.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="beta-distribution.html">Beta Distribution</a>\n')
+cat(' * <a href="beta-proportion-distribution.html">Beta Proportion Distribution</a>\n')
+}
+```
+
+## Beta Distribution
+
+### Probability Density Function
+
+If $\alpha \in \mathbb{R}^+$ and $\beta \in \mathbb{R}^+$, then for
+$\theta \in (0,1)$, \[ \text{Beta}(\theta|\alpha,\beta) =
+\frac{1}{\mathrm{B}(\alpha,\beta)} \, \theta^{\alpha - 1} \, (1 -
+\theta)^{\beta - 1} , \] where the beta function $\mathrm{B}()$ is as
+defined in section \@ref(betafun).
+
+_**Warning:**_  If $\theta = 0$ or $\theta = 1$, then the probability
+is 0 and the log probability is $-\infty$.  Similarly, the
+distribution requires strictly positive parameters, $\alpha, \beta >
+0$.
+
+### Sampling Statement
+
+`theta ~ ` **`beta`**`(alpha, beta)`
+
+Increment target log probability density with `beta_lpdf( theta | alpha, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries beta}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; beta_lpdf; (reals theta | reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!{\tt (reals theta | reals alpha, reals beta): real}|hyperpage}
+
+`real` **`beta_lpdf`**`(reals theta | reals alpha, reals beta)`<br>\newline
+The log of the beta density of `theta` in $[0,1]$ given positive prior
+successes (plus one) alpha and prior failures (plus one) beta
+
+<!-- real; beta_cdf; (reals theta, reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!{\tt (reals theta, reals alpha, reals beta): real}|hyperpage}
+
+`real` **`beta_cdf`**`(reals theta, reals alpha, reals beta)`<br>\newline
+The beta cumulative distribution function of `theta` in $[0,1]$ given
+positive prior successes (plus one) alpha and prior failures (plus
+one) beta
+
+<!-- real; beta_lcdf; (reals theta | reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!{\tt (reals theta | reals alpha, reals beta): real}|hyperpage}
+
+`real` **`beta_lcdf`**`(reals theta | reals alpha, reals beta)`<br>\newline
+The log of the beta cumulative distribution function of `theta` in
+$[0,1]$ given positive prior successes (plus one) alpha and prior
+failures (plus one) beta
+
+<!-- real; beta_lccdf; (reals theta | reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!{\tt (reals theta | reals alpha, reals beta): real}|hyperpage}
+
+`real` **`beta_lccdf`**`(reals theta | reals alpha, reals beta)`<br>\newline
+The log of the beta complementary cumulative distribution function of
+`theta` in $[0,1]$ given positive prior successes (plus one) alpha and
+prior failures (plus one) beta
+
+<!-- R; beta_rng; (reals alpha, reals beta); -->
+\index{{\tt \bfseries beta}!{\tt (reals alpha, reals beta): R}|hyperpage}
+
+`R` **`beta_rng`**`(reals alpha, reals beta)`<br>\newline
+Generate a beta variate with positive prior successes (plus one) alpha
+and prior failures (plus one) beta; may only be used in generated
+quantities block. For a description of argument and return types, see
+section \@ref(prng-vectorization).
+
+## Beta Proportion Distribution
+
+### Probability Density Function
+
+If $\mu \in (0, 1)$ and $\kappa \in \mathbb{R}^+$, then for $\theta
+\in (0,1)$, \[ \mathrm{Beta\_Proportion}(\theta|\mu,\kappa) =
+\frac{1}{\mathrm{B}(\mu \kappa, (1 - \mu) \kappa)} \,
+\theta^{\mu\kappa - 1} \, (1 - \theta)^{(1 - \mu)\kappa- 1} , \] where
+the beta function $\mathrm{B}()$ is as defined in section
+\@ref(betafun).
+
+_**Warning:**_  If $\theta = 0$ or $\theta = 1$, then the probability
+is 0 and the log probability is $-\infty$.  Similarly, the
+distribution requires $\mu \in (0, 1)$ and strictly positive
+parameter, $\kappa > 0$.
+
+### Sampling Statement
+
+`theta ~ ` **`beta_proportion`**`(mu, kappa)`
+
+Increment target log probability density with `beta_proportion_lpdf( theta | mu, kappa)`
+dropping constant additive terms.
+\index{{\tt \bfseries beta\_proportion}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; beta_proportion_lpdf; (reals theta | reals mu, reals kappa); -->
+\index{{\tt \bfseries beta\_proportion}!{\tt (reals theta | reals mu, reals kappa): real}|hyperpage}
+
+`real` **`beta_proportion_lpdf`**`(reals theta | reals mu, reals kappa)`<br>\newline
+The log of the beta_proportion density of `theta` in $(0,1)$ given
+mean mu and precision kappa
+
+<!-- real; beta_proportion_lcdf; (reals theta | reals mu, reals kappa); -->
+\index{{\tt \bfseries beta\_proportion}!{\tt (reals theta | reals mu, reals kappa): real}|hyperpage}
+
+`real` **`beta_proportion_lcdf`**`(reals theta | reals mu, reals kappa)`<br>\newline
+The log of the beta_proportion cumulative distribution function of
+`theta` in $(0,1)$ given mean mu and precision kappa
+
+<!-- real; beta_proportion_lccdf; (reals theta | reals mu, reals kappa); -->
+\index{{\tt \bfseries beta\_proportion}!{\tt (reals theta | reals mu, reals kappa): real}|hyperpage}
+
+`real` **`beta_proportion_lccdf`**`(reals theta | reals mu, reals kappa)`<br>\newline
+The log of the beta_proportion complementary cumulative distribution
+function of `theta` in $(0,1)$ given mean mu and precision kappa
+
+<!-- R; beta_proportion_rng; (reals mu, reals kappa); -->
+\index{{\tt \bfseries beta\_proportion}!{\tt (reals mu, reals kappa): R}|hyperpage}
+
+`R` **`beta_proportion_rng`**`(reals mu, reals kappa)`<br>\newline
+Generate a beta_proportion variate with mean mu and precision kappa;
+may only be used in generated quantities block. For a description of
+argument and return types, see section \@ref(prng-vectorization).
+

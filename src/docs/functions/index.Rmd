@@ -1,7 +1,28 @@
-\chapter*{About}
-\addcontentsline{toc}{chapter}{Preface}
+---
+knit: "bookdown::render_book"
+title: "Stan Functions Reference"
+author: "Stan Development Team"
+date: "Version 2.18"
+description: "Reference for the functions defined in the Stan math library and available in the Stan programming language."
+url: 'http\://mc-stan.org/users/documentation'
+site: bookdown::bookdown_site
+github-repo: stan-dev/stan
+twitter-handle: mc-stan
+documentclass: book
+bibliography: [../bibtex/all.bib]
+biblio-style: apalike
+link-citations: yes
+fontsize: 10pt
+monofont: "Lucida Console"
+subparagraph: yes
+---
 
-\noindent
+# <i style="font-size: 110%; padding:1.5em 0 0 0; color:#990017;">Overview</i> {-}
+
+<img style="float:right; margin: -2em 0em 4em 4em" src="img/logo_tm.png" width="225" alt="Stan logo" />
+
+### About {-}
+
 This is the reference for the functions defined in the Stan math
 library and available in the Stan programming language.
 
@@ -12,7 +33,7 @@ posterior analysis, along with interfaces and analysis tools in all of
 the popular data analysis languages.
 
 
-\section*{Interfaces and Platforms}
+### Interfaces and Platforms {-}
 
 Stan runs under Windows, Mac OS X, and Linux.
 
@@ -22,58 +43,56 @@ Julia, MATLAB, Mathematica, Stata, and the command line, as well
 as an alternative language interface in Scala.  See the web
 site (link below) for links and getting started instructions.
 
-\section*{Web Site}
+### Web Site {-}
 
 The official resource for all things related to Stan is the web site:
-%
-\begin{quote}
-\url{http://mc-stan.org}
-\end{quote}
-%
+
+[http://mc-stan.org](http://mc-stan.org)
+
 The web site links to all of the packages comprising Stan for both
 users and developers.  This is the place to get started with Stan.
 Find the interface in the language you want to use and follow the
 download, installation, and getting started instructions.  
 
 
-\section*{GitHub Organization}
+### GitHub Organization {-}
 
 Stan's source code and much of the developer process is hosted on
 GitHub.  Stan's organization is:
-%
-\begin{quote}
-\url{http://https://github.com/stan-dev}
-\end{quote}
-%
-Each package has its own repository within the \code{stan-dev}
+
+[https://github.com](https://github.com/stan-dev)
+
+Each package has its own repository within the `stan-dev`
 organization.  The web site is also hosted and managed through GitHub.
 This is the place to peruse the source code, request features, and
 report bugs.  Much of the ongoing design discussion is hosted on the
 GitHub Wiki.
 
 
-\section*{Forums}
+### Forums {-}
 
 Stan hosts message boards for discussing all things
 related to Stan.  
-%
-\begin{quote}
-\url{http://discourse.mc-stan.org}
-\end{quote}
-%
+
+[https://discourse.mc-stan.org](https://discourse.mc-stan.org)
+
 This is the place to ask questions about Stan, including modeling,
 programming, and installation.
 
 
-\section*{Licensing}
+### Licensing {-}
+
+* *Computer code:*  [BSD 3-clause license](https://opensource.org/licenses/BSD-3-Clause)
 
 The core C++ code underlying Stan, including the math library,
 language, and inference algorithms, is licensed under the BSD 3-clause
 licensed as detailed in each repository and on the web site along
 with the distribution links.
 
+* *Logo:*  [Stan logo usage guidelines](http://mc-stan.org/about/logo/)
 
-\section*{Acknowledgements}
+
+### Acknowledgements {-}
 
 The Stan project could not exist without the generous grant
 funding of many grant agencies to the participants in the project.

@@ -1,0 +1,119 @@
+# Sparse Matrix Operations {#sparse-matrices}
+
+For sparse matrices, for which many elements are zero, it is more
+efficient to use specialized representations to save memory and speed
+up matrix arithmetic (including derivative calculations).  Given
+Stan's implementation, there is substantial space (memory) savings by
+using sparse matrices.  Because of the ease of optimizing dense matrix
+operations, speed improvements only arise at 90\% or even greater
+sparsity; below that level, dense matrices are faster but use more
+memory.
+
+Because of this speedup and space savings, it may even be useful to
+read in a dense matrix and convert it to a sparse matrix before
+multiplying it by a vector.  This chapter covers a very specific form
+of sparsity consisting of a sparse matrix multiplied by a dense
+vector.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="csr.html">Compressed Row Storage</a>\n')
+cat(' * <a href="conversion-functions.html">Conversion Functions</a>\n')
+cat(' * <a href="sparse-matrix-arithmetic.html">Sparse Matrix Arithmetic</a>\n')
+}
+```
+
+## Compressed Row Storage {#CSR}
+
+Sparse matrices are represented in Stan using compressed row storage
+(CSR).  For example, the matrix \[ A = \begin{bmatrix} 19 & 27 & 0 & 0
+\\ 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 52 \\ 81 & 0 & 95 & 33 \end{bmatrix}
+\] is translated into a vector of the non-zero real values, read by
+row from the matrix $A$, \[ w(A) = \begin{bmatrix} 19 & 27 & 52 & 81 &
+95 & 33 \end{bmatrix}^{\top} \! \! \! , \] an array of integer column
+indices for the values, \[ v(A) = \begin{bmatrix} 1 & 2 & 4 & 1 & 3 &
+4 \end{bmatrix} \! , \] and an array of integer indices indicating
+where in $w(A)$ a given row's values start, \[ u(A) = \begin{bmatrix}
+1 & 3 & 3 & 4 & 7 \end{bmatrix} \! , \] with a padded value at the end
+to guarantee that \[ u(A)[n+1] - u(A)[n] \] is the number of non-zero
+elements in row $n$ of the matrix (here $2$, $0$, $1$, and $3$). Note
+that because the second row has no non-zero elements both the second
+and third elements of $u(A)$ correspond to the third element of
+$w(A)$, which is $52$. The values $(w(A), \, v(A), \, u(A))$ are
+sufficient to reconstruct $A$.
+
+The values are structured so that there is a real value and integer
+column index for each non-zero entry in the array, plus one integer
+for each row of the matrix, plus one for padding.  There is also
+underlying storage for internal container pointers and sizes.  The
+total memory usage is roughly $12 K + M$ bytes plus a small constant
+overhead, which is often considerably fewer bytes than the $M \times
+N$ required to store a dense matrix.  Even more importantly, zero
+values do not introduce derivatives under multiplication or addition,
+so many storage and evaluation steps are saved when sparse matrices
+are multiplied.
+
+## Conversion Functions
+
+Conversion functions between dense and sparse matrices are provided.
+
+### Dense to Sparse Conversion
+
+Converting a dense matrix $m$ to a sparse representation produces a
+vector $w$ and two integer arrays, $u$ and $v$.
+
+<!-- vector; csr_extract_w; (matrix a); -->
+\index{{\tt \bfseries csr\_extract\_w}!{\tt (matrix a): vector}|hyperpage}
+
+`vector` **`csr_extract_w`**`(matrix a)`<br>\newline
+Return non-zero values in matrix a; see section \@ref(CSR).
+
+<!-- int[]; csr_extract_v; (matrix a); -->
+\index{{\tt \bfseries csr\_extract\_v}!{\tt (matrix a): int[]}|hyperpage}
+
+`int[]` **`csr_extract_v`**`(matrix a)`<br>\newline
+Return column indices for values in `csr_extract_w(a)`; see
+\@ref(CSR).
+
+<!-- int[]; csr_extract_u; (matrix a); -->
+\index{{\tt \bfseries csr\_extract\_u}!{\tt (matrix a): int[]}|hyperpage}
+
+`int[]` **`csr_extract_u`**`(matrix a)`<br>\newline
+Return array of row starting indices for entries in `csr_extract_w(a)`
+followed by the size of `csr_extract_w(a)` plus one; see section
+\@ref(CSR).
+
+### Sparse to Dense Conversion
+
+To convert a sparse matrix representation to a dense matrix, there is
+a single function.
+
+<!-- matrix; csr_to_dense_matrix; (int m, int n, vector w, int[] v, int[] u); -->
+\index{{\tt \bfseries csr\_to\_dense\_matrix}!{\tt (int m, int n, vector w, int[] v, int[] u): matrix}|hyperpage}
+
+`matrix` **`csr_to_dense_matrix`**`(int m, int n, vector w, int[] v, int[] u)`<br>\newline
+Return dense $\text{m} \times \text{n}$ matrix with non-zero matrix
+entries w, column indices v, and row starting indices u; the vector w
+and arrays v and u must all be the same size, and the arrays v and u
+must have index values bounded by m and n. see section \@ref(CSR) for
+more details.
+
+## Sparse Matrix Arithmetic
+
+### Sparse Matrix Multiplication
+
+The only supported operation is the multiplication of a sparse matrix
+$A$ and a dense vector $b$ to produce a dense vector $A\,b$.
+Multiplying a dense row vector $b$ and a sparse matrix $A$ can be
+coded using transposition as \[ b \, A = (A^{\top} \,
+b^{\top})^{\top}, \] but care must be taken to represent $A^{\top}$
+rather than $A$ as a sparse matrix.
+
+<!-- vector; csr_matrix_times_vector; (int m, int n, vector w, int[] v, int[] u, vector b); -->
+\index{{\tt \bfseries csr\_matrix\_times\_vector}!{\tt (int m, int n, vector w, int[] v, int[] u, vector b): vector}|hyperpage}
+
+`vector` **`csr_matrix_times_vector`**`(int m, int n, vector w, int[] v, int[] u, vector b)`<br>\newline
+Multiply the $\text{m} \times \text{n}$ matrix represented by values
+w, column indices v, and row start indices u by the vector b; see
+\@ref(CSR).
+

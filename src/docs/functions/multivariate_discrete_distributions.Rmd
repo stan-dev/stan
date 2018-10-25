@@ -1,0 +1,48 @@
+# Multivariate Discrete Distributions
+
+The multivariate discrete distributions are over multiple integer
+values, which are expressed in Stan as arrays.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="multinomial-distribution.html">Multinomial Distribution</a>\n')
+}
+```
+
+## Multinomial Distribution
+
+### Probability Mass Function
+
+If $K \in \mathbb{N}$, $N \in \mathbb{N}$, and $\theta \in
+\text{$K$-simplex}$, then for $y \in \mathbb{N}^K$ such that
+$\sum_{k=1}^K y_k = N$, \[ \text{Multinomial}(y|\theta) =
+\binom{N}{y_1,\ldots,y_K} \prod_{k=1}^K \theta_k^{y_k}, \] where the
+multinomial coefficient is defined by \[ \binom{N}{y_1,\ldots,y_k} =
+\frac{N!}{\prod_{k=1}^K y_k!}. \]
+
+### Sampling Statement
+
+`y ~ ` **`multinomial`**`(theta)`
+
+Increment target log probability density with `multinomial_lpmf( y | theta)`
+dropping constant additive terms.
+\index{{\tt \bfseries multinomial}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; multinomial_lpmf; (int[] y | vector theta); -->
+\index{{\tt \bfseries multinomial}!{\tt (int[] y | vector theta): real}|hyperpage}
+
+`real` **`multinomial_lpmf`**`(int[] y | vector theta)`<br>\newline
+The log multinomial probability mass function with outcome array `y`
+of size $K$ given the $K$-simplex distribution parameter theta and
+(implicit) total count `N = sum(y)`
+
+<!-- int[]; multinomial_rng; (vector theta, int N); -->
+\index{{\tt \bfseries multinomial}!{\tt (vector theta, int N): int[]}|hyperpage}
+
+`int[]` **`multinomial_rng`**`(vector theta, int N)`<br>\newline
+Generate a multinomial variate with simplex distribution parameter
+theta and total count N; may only be used in generated quantities
+block
+
