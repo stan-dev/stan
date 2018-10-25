@@ -160,14 +160,12 @@ namespace stan {
           generate_indent(indent_ + 3, o_);
         }
         // generate arg for rhs
+        if (y.lhs_var_has_sliced_idx()
+            && y.lhs_var_occurs_on_rhs()) {
+          o_ << "stan::model::deep_copy(";
+        }
         if (assign_simple) {
-          if (y.lhs_var_occurs_on_rhs()) {
-            o_ << "stan::model::deep_copy(";
             generate_expression(y.rhs_, NOT_USER_FACING, o_);
-            o_ << ")";
-          } else {
-            generate_expression(y.rhs_, NOT_USER_FACING, o_);
-          }
         } else {
           if (y.op_name_.size() == 0) {
             o_ << "(";
@@ -182,6 +180,10 @@ namespace stan {
             generate_expression(y.rhs_, NOT_USER_FACING, o_);
             o_ << ")";
           }
+        }
+        if (y.lhs_var_has_sliced_idx()
+            && y.lhs_var_occurs_on_rhs()) {
+          o_ << ")";
         }
         // close method
         if (lhs_simple) {

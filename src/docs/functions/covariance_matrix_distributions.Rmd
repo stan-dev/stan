@@ -1,0 +1,91 @@
+# Covariance Matrix Distributions
+
+The covariance matrix distributions have support on symmetric,
+positive-definite $K \times K$ matrices.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="wishart-distribution.html">Wishart Distribution</a>\n')
+cat(' * <a href="inverse-wishart-distribution.html">Inverse Wishart Distribution</a>\n')
+}
+```
+
+## Wishart Distribution
+
+### Probability Density Function
+
+If $K \in \mathbb{N}$, $\nu \in (K-1,\infty)$, and $S \in
+\mathbb{R}^{K \times K}$ is symmetric and positive definite, then for
+symmetric and positive-definite $W \in \mathbb{R}^{K \times K}$, \[
+\text{Wishart}(W|\nu,S) = \frac{1}{2^{\nu K / 2}} \ \frac{1}{\Gamma_K
+\! \left( \frac{\nu}{2} \right)} \ \left| S \right|^{-\nu/2} \ \left|
+W \right|^{(\nu - K - 1)/2} \ \exp \! \left(- \frac{1}{2} \
+\text{tr}\left( S^{-1} W \right) \right) \! , \] where $\text{tr}()$
+is the matrix trace function, and $\Gamma_K()$ is the multivariate
+Gamma function, \[ \Gamma_K(x) = \frac{1}{\pi^{K(K-1)/4}} \
+\prod_{k=1}^K \Gamma \left( x + \frac{1 - k}{2} \right) \!. \]
+
+### Sampling Statement
+
+`W ~ ` **`wishart`**`(nu, Sigma)`
+
+Increment target log probability density with `wishart_lpdf( W | nu, Sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries wishart}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; wishart_lpdf; (matrix W | real nu, matrix Sigma); -->
+\index{{\tt \bfseries wishart}!{\tt (matrix W | real nu, matrix Sigma): real}|hyperpage}
+
+`real` **`wishart_lpdf`**`(matrix W | real nu, matrix Sigma)`<br>\newline
+The log of the Wishart density for symmetric and positive-definite
+matrix W given degrees of freedom nu and symmetric and
+positive-definite scale matrix Sigma
+
+<!-- matrix; wishart_rng; (real nu, matrix Sigma); -->
+\index{{\tt \bfseries wishart}!{\tt (real nu, matrix Sigma): matrix}|hyperpage}
+
+`matrix` **`wishart_rng`**`(real nu, matrix Sigma)`<br>\newline
+Generate a Wishart variate with degrees of freedom nu and symmetric
+and positive-definite scale matrix Sigma; may only be used in
+generated quantities block
+
+## Inverse Wishart Distribution
+
+### Probability Density Function
+
+If $K \in \mathbb{N}$, $\nu \in (K-1,\infty)$, and $S \in
+\mathbb{R}^{K \times   K}$ is symmetric and positive definite, then
+for symmetric and positive-definite $W \in \mathbb{R}^{K \times K}$,
+\[ \text{InvWishart}(W|\nu,S) = \frac{1}{2^{\nu K / 2}} \
+\frac{1}{\Gamma_K \! \left( \frac{\nu}{2} \right)} \ \left| S
+\right|^{\nu/2} \ \left| W \right|^{-(\nu + K + 1)/2} \ \exp \! \left(
+- \frac{1}{2} \ \text{tr}(SW^{-1}) \right) \! . \]
+
+### Sampling Statement
+
+`W ~ ` **`inv_wishart`**`(nu, Sigma)`
+
+Increment target log probability density with `inv_wishart_lpdf( W | nu, Sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries inv\_wishart}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; inv_wishart_lpdf; (matrix W | real nu, matrix Sigma); -->
+\index{{\tt \bfseries inv\_wishart}!{\tt (matrix W | real nu, matrix Sigma): real}|hyperpage}
+
+`real` **`inv_wishart_lpdf`**`(matrix W | real nu, matrix Sigma)`<br>\newline
+The log of the inverse Wishart density for symmetric and
+positive-definite matrix W given degrees of freedom nu and symmetric
+and positive-definite scale matrix Sigma
+
+<!-- matrix; inv_wishart_rng; (real nu, matrix Sigma); -->
+\index{{\tt \bfseries inv\_wishart}!{\tt (real nu, matrix Sigma): matrix}|hyperpage}
+
+`matrix` **`inv_wishart_rng`**`(real nu, matrix Sigma)`<br>\newline
+Generate an inverse Wishart variate with degrees of freedom nu and
+symmetric and positive-definite scale matrix Sigma; may only be used
+in generated quantities block
+

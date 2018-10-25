@@ -5,7 +5,7 @@ Steps to build manual:
 2.  Install on OS and ensure on PATH: pandoc, pandoc-citeproc,
 pdflatex
 
-3.  In a shell, change directories to this directory, <stan>/src/docs/manual
+3.  In a shell, change directories to this directory, <stan>/src/docs/reference-manual
 
 4.  In the shell, execute ./_build.sh
 
