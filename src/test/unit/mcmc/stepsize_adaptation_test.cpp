@@ -10,12 +10,12 @@ TEST(McmcStepsizeAdaptation, set_mu) {
   
 }
 
-TEST(McmcStepsizeAdaptation, set_mu_c) {
+TEST(McmcStepsizeAdaptation, set_log_mu_eps_scale) {
   stan::mcmc::stepsize_adaptation adaptation;
   
-  double old_mu_c = 5.0;
-  adaptation.set_mu_c(old_mu_c);
-  EXPECT_EQ(old_mu_c, adaptation.get_mu_c());
+  double old_log_mu_eps_scale = 5.0;
+  adaptation.set_log_mu_eps_scale(old_log_mu_eps_scale);
+  EXPECT_EQ(old_log_mu_eps_scale, adaptation.get_log_mu_eps_scale());
   
 }
 

@@ -12,7 +12,7 @@ namespace stan {
     public:
       stepsize_adaptation()
         : mu_(0.5), delta_(0.5), gamma_(0.05),
-          kappa_(0.75), t0_(10), mu_c_(10) {
+          kappa_(0.75), t0_(10), log_mu_eps_scale_(10) {
         restart();
       }
 
@@ -20,8 +20,8 @@ namespace stan {
         mu_ = m;
       }
 
-      void set_mu_c(double c) {
-        mu_c_ = c;
+      void set_log_mu_eps_scale(double c) {
+        log_mu_eps_scale_ = c;
       }
 
       void set_delta(double d) {
@@ -47,8 +47,8 @@ namespace stan {
         return mu_;
       }
 
-      double get_mu_c() {
-        return mu_c_;
+      double get_log_mu_eps_scale() {
+        return log_mu_eps_scale_;
       }
 
       double get_delta() {
@@ -96,15 +96,15 @@ namespace stan {
       }
 
     protected:
-      double counter_;  // Adaptation iteration
-      double s_bar_;    // Moving average statistic
-      double x_bar_;    // Moving average parameter
-      double mu_;       // Asymptotic mean of parameter
-      double delta_;    // Target value of statistic
-      double gamma_;    // Adaptation scaling
-      double kappa_;    // Adaptation shrinkage
-      double t0_;       // Effective starting iteration
-      double mu_c_;     // Coefficient of stepsize for setting mu
+      double counter_;              // Adaptation iteration
+      double s_bar_;                // Moving average statistic
+      double x_bar_;                // Moving average parameter
+      double mu_;                   // Asymptotic mean of parameter
+      double delta_;                // Target value of statistic
+      double gamma_;                // Adaptation scaling
+      double kappa_;                // Adaptation shrinkage
+      double t0_;                   // Effective starting iteration
+      double log_mu_eps_scale_;     // Coefficient of stepsize for setting mu
     };
 
   }  // mcmc

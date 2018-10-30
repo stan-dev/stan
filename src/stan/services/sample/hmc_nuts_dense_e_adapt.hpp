@@ -39,7 +39,7 @@ namespace stan {
        * @param[in] stepsize initial stepsize for discrete evolution
        * @param[in] stepsize_jitter uniform random jitter of stepsize
        * @param[in] max_depth Maximum tree depth
-       * @param[in] mu_c stepsize factor for warmup initialization
+       * @param[in] log_mu_eps_scale stepsize factor for warmup initialization
        * @param[in] delta adaptation target acceptance statistic
        * @param[in] gamma adaptation regularization scale
        * @param[in] kappa adaptation relaxation exponent
@@ -62,8 +62,8 @@ namespace stan {
                                  int num_samples, int num_thin,
                                  bool save_warmup, int refresh, double stepsize,
                                  double stepsize_jitter, int max_depth,
-                                 double mu_c, double delta, double gamma,
-                                 double kappa, double t0,
+                                 double log_mu_eps_scale, double delta,
+                                 double gamma, double kappa, double t0,
                                  unsigned int init_buffer,
                                  unsigned int term_buffer, unsigned int window,
                                  callbacks::interrupt& interrupt,
@@ -97,8 +97,10 @@ namespace stan {
         sampler.set_stepsize_jitter(stepsize_jitter);
         sampler.set_max_depth(max_depth);
 
-        sampler.get_stepsize_adaptation().set_mu_c(mu_c);
-        sampler.get_stepsize_adaptation().set_mu(log(mu_c * stepsize));
+        sampler.get_stepsize_adaptation().set_log_mu_eps_scale(
+          log_mu_eps_scale);
+        sampler.get_stepsize_adaptation().set_mu(
+          log(log_mu_eps_scale * stepsize));
         sampler.get_stepsize_adaptation().set_delta(delta);
         sampler.get_stepsize_adaptation().set_gamma(gamma);
         sampler.get_stepsize_adaptation().set_kappa(kappa);
