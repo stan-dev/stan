@@ -1475,14 +1475,21 @@ for (size_t i = 0; i < vector_types.size(); ++i) {
   }
  }
 
-add("wishart_log", expr_type(double_type()), expr_type(matrix_type()), expr_type(double_type()), expr_type(matrix_type()));
-add("wishart_lpdf", expr_type(double_type()), expr_type(matrix_type()), expr_type(double_type()), expr_type(matrix_type()));
-add("wishart_rng", expr_type(matrix_type()), expr_type(double_type()), expr_type(matrix_type()));
+add("wishart_log", bare_expr_type(double_type()), bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_expr_type(matrix_type()));
+add("wishart_lpdf", bare_expr_type(double_type()), bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_expr_type(matrix_type()));
+add("wishart_rng", bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_expr_type(matrix_type()));
 
 // Newton solver for Laplace approximation
-add("lgp_newton_solver", expr_type(vector_type()), expr_type(vector_type()), expr_type(double_type()),
+add("lgp_newton_solver", bare_expr_type(vector_type()), bare_expr_type(vector_type()), bare_expr_type(double_type()),
     int_vector_types[1], int_vector_types[1]);
 
-add("lgp_newton_solver", expr_type(vector_type()), expr_type(vector_type()), expr_type(double_type()),
-    int_vector_types[1], int_vector_types[1], base_types[1], base_types[0],
-    base_types[0]);
+add("lgp_newton_solver", bare_expr_type(vector_type()), bare_expr_type(vector_type()), bare_expr_type(double_type()),
+    int_vector_types[1], int_vector_types[1], bare_types[1], bare_types[0],
+    bare_types[0]);
+
+add("lgp_dense_newton_solver", bare_expr_type(vector_type()), bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()), int_vector_types[1], int_vector_types[1]);
+  
+add("lgp_dense_newton_solver", bare_expr_type(vector_type()), bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()), int_vector_types[1], int_vector_types[1], bare_types[1], 
+    bare_types[0], bare_types[0]);
