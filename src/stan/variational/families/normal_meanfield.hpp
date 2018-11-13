@@ -346,11 +346,11 @@ namespace stan {
          and return the log normal density. 
          Constant (d* log 2 pi) is removed. It changes as a function 
          of parameters, but not as a fixed posterior sample.
-         It is saved as log_q because ( the approximation density 
-        using variational families)
+         It is saved as log_q (the approximation density 
+        using variational families).
          */
         template <class BaseRNG>
-        void sample_lp(BaseRNG& rng,
+        void sample_lq(BaseRNG& rng,
                        Eigen::VectorXd& eta,
                        double& log_q)
         const {

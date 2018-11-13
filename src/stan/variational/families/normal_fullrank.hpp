@@ -382,7 +382,7 @@ namespace stan {
          * New: Draw a posterior sample from a normal distribution, and return the log normal density. Constant (d* log 2 pi) is removed.
          */
         template <class BaseRNG>
-        void sample_lp(BaseRNG& rng,
+        void sample_lq(BaseRNG& rng,
                        Eigen::VectorXd& eta,
                        double& log_q)
         const {

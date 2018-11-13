@@ -506,7 +506,7 @@ namespace stan {
                                    logger, diagnostic_writer);
 
         /* Write mean of posterior approximation on first output line.
-           The "posterior mean" block is the dirct transforation of posterior mean 
+           The "posterior mean" block is the dirct transformation of posterior mean 
            (not the posterior mean of the real parameters). */
         cont_params_ = variational.mean();
         std::vector<double> cont_vector(cont_params_.size());
@@ -520,6 +520,7 @@ namespace stan {
                            true, true, &msg);
         if (msg.str().length() > 0)
           logger.info(msg);
+        values.insert(values.begin(), 0);  // the first line of lp__
         values.insert(values.begin(), 0);  //  the first line of log_p
         values.insert(values.begin(), 0);  //  the first line of log_q
         parameter_writer(values);
@@ -535,7 +536,7 @@ namespace stan {
         double log_q = 0;
         // Draw posterior samples. log_q is the log normal densities.
         for (int n = 0; n < n_posterior_samples_; ++n) {
-          variational.sample_lp(rng_, cont_params_, log_q);
+          variational.sample_lq(rng_, cont_params_, log_q);
           for (int i = 0; i < cont_params_.size(); ++i) {
             cont_vector.at(i) = cont_params_(i);
           }
@@ -546,8 +547,9 @@ namespace stan {
           log_p = model_.template log_prob<false, true>(cont_params_, &msg2);
           if (msg2.str().length() > 0)
             logger.info(msg2);
-          values.insert(values.begin(), log_p);
-          values.insert(values.begin()+1, log_q);
+          values.insert(values.begin(), 0);    // lp__ is an empty column.
+          values.insert(values.begin()+1, log_p);
+          values.insert(values.begin()+2, log_q);
           parameter_writer(values);
         }
         logger.info("COMPLETED.");
