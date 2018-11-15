@@ -24,6 +24,24 @@ namespace stan {
       }
     };
 
+    // Interface for automatic differentiation of models
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    struct model_functional_template {
+      const M& model;
+      std::ostream* o;
+
+      model_functional_template(const M& m, std::ostream* out)
+        : model(m), o(out) {}
+
+      template <typename T>
+      T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
+        // log_prob() requires non-const but doesn't modify its argument
+        return model.template
+          log_prob<propto, jacobian_adjust_transform, T>(
+              const_cast<Eigen::Matrix<T, -1, 1>& >(x), o);
+      }
+    };
+
   }
 }
 #endif
