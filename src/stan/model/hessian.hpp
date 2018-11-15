@@ -20,6 +20,19 @@ namespace stan {
                                                 x, f, grad_f, hess_f);
     }
 
+    template <bool propto, bool jacobian_adjust_transform, class M>
+    void log_prob_hessian(
+        const M& model,
+        const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+        double& f,
+        Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
+        Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& hess_f,
+        std::ostream* msgs = 0) {
+      stan::math::hessian<model_functional_template<propto, jacobian_adjust_transform, M>>(
+          model_functional_template<propto, jacobian_adjust_transform, M>(model, msgs),
+              x, f, grad_f, hess_f);
+    }
+
   }
 }
 #endif
