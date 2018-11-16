@@ -40,7 +40,7 @@ this signature:
 ```
  vector algebra_system(vector y, vector theta,
                               real[] x_r, int[] x_i)
- ```
+```
 
 The algebraic system function should return the value of the algebraic
 function which goes to 0, when we plug in the solution to the
@@ -163,7 +163,7 @@ signature:
 ```
  real[] ode(real time, real[] state, real[] theta,
             real[] x_r, int[] x_i)
- ```
+```
 
 The ODE system function should return the derivative of the state with
 respect to time at the time provided. The length of the returned real
@@ -301,7 +301,7 @@ the function `f` in the following declaration.
 ```
  vector f(vector phi, vector theta,
           data real[] x_r, data int[] x_i);
- ```
+```
 
 The map function returns the sequence of results for the particular
 shard being evaluated.  The arguments to the mapped function are:
