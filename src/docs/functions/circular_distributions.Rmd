@@ -74,5 +74,5 @@ with
    y ~ von_mises(mu, kappa);
  else
    y ~ normal(mu, sqrt(1 / kappa));
- ```
+```
 

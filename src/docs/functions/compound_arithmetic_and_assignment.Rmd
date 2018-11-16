@@ -5,13 +5,13 @@ operation and assignment,
 
 ```
  x = x op y;
- ```
+```
 
 replacing them with the compound form
 
 ```
  x op= y;
- ```
+```
 
 For example, `x = x + 1` may be replaced with `x += 1`.
 

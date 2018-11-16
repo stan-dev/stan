@@ -52,14 +52,14 @@ The notation
 
 ```
  y ~ normal(mu, sigma);
- ```
+```
 
 provides the same (proportional) contribution to the model log density
 as the explicit target density increment,
 
 ```
  target += normal_lpdf(y | mu, sigma);
- ```
+```
 
 In both cases, the effect is to add terms to the target log density.
 The only difference is that the example with the sampling (`~`)
@@ -174,7 +174,7 @@ The normal probability function is specified with the signature
 
 ```
  normal_lpdf(reals | reals, reals);
- ```
+```
 
 The pseudotype `reals` is used to indicate that an argument position
 may be vectorized.  Argument positions declared as `reals` may be
@@ -191,7 +191,7 @@ vector arguments is written as
 
 ```
  multi_normal_lpdf(vectors | vectors, matrix);
- ```
+```
 
 These arguments may be row vectors, column vectors, or arrays of row
 vectors or column vectors.
@@ -211,7 +211,7 @@ then
 
 ```
  ll = normal_lpdf(y | mu, sigma);
- ```
+```
 
 is just a more efficient way to write
 
@@ -219,20 +219,20 @@ is just a more efficient way to write
  ll = 0;
  for (n in 1:N)
    ll = ll + normal_lpdf(y[n] | mu[n], sigma);
- ```
+```
 
 With the same arguments, the vectorized sampling statement
 
 ```
  y ~ normal(mu, sigma);
- ```
+```
 
 has the same effect on the total log probability as
 
 ```
  for (n in 1:N)
    y[n] ~ normal(mu[n], sigma);
- ```
+```
 
 ### Evaluating Vectorized PRNG Functions {#prng-vectorization}
 
@@ -245,7 +245,7 @@ quantities block.
 ```
  vector[3] mu = ...;
  real x[3] = normal_rng(mu, 3);
- ```
+```
 
 #### Argument types
 
@@ -269,7 +269,7 @@ number of elements.
  vector[3] mu = ...;
  real sigma[3] = ...;
  real x[3] = normal_rng(mu, sigma);
- ```
+```
 
 #### Return type
 
