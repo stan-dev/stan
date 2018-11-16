@@ -845,7 +845,7 @@ broadcasting behave similarly.
  vector[3] x;
  x = rep_vector(1, 3);
  x = rep_vector(1.0, 3);
- ```
+```
 
 There are no integer vector or matrix types, so integer values are
 automatically promoted.
@@ -870,14 +870,14 @@ converting a diagonal to a full matrix for use as a covariance matrix,
 
 ```
  y ~ multi_normal(mu, diag_matrix(square(sigma)));
- ```
+```
 
 it is much more efficient to just use a univariate normal, which
 produces the same density,
 
 ```
  y ~ normal(mu, sigma);
- ```
+```
 
 Rather than writing `m * diag_matrix(v)` where `m` is a matrix and `v`
 is a vector, it is much more efficient to write `diag_post_multiply(m,

@@ -39,7 +39,7 @@ code this in Stan,
  generated quantities {
    vector[K] theta = dirichlet_rng(rep_vector(alpha, K));
  }
- ```
+```
 
 Taking $K = 10$, here are the first five draws for $\alpha = 0.001$.
 For $\alpha = 1$, the distribution is uniform over simplexes.
@@ -50,7 +50,7 @@ For $\alpha = 1$, the distribution is uniform over simplexes.
  3) 0.02 0.03 0.22 0.29 0.17 0.10 0.09 0.00 0.05 0.03
  4) 0.04 0.03 0.21 0.13 0.04 0.01 0.10 0.04 0.22 0.18
  5) 0.11 0.22 0.02 0.01 0.06 0.18 0.33 0.04 0.01 0.01
- ```
+```
 
 That does not mean it's uniform over the marginal probabilities of
 each element.  As the size of the simplex grows, the marginal draws
@@ -70,7 +70,7 @@ of the simplex.  Here are the first five draws for $\alpha = 0.001$.
  3) 1e-308 0e+00 1e-213 0e+000 0e+000 8e-75 0e+000 1e+000 4e-58 7e-112
  4) 6e-166 5e-65 3e-068 3e-147 0e+000 1e+00 3e-249 0e+000 0e+00 0e+000
  5) 2e-091 0e+00 0e+000 0e+000 1e-060 0e+00 4e-312 1e+000 0e+00 0e+000
- ```
+```
 
 Each row denotes a draw.  Each draw has a single value that rounds to
 one and other values that are very close to zero or rounded down to
@@ -85,7 +85,7 @@ $\alpha = 1000$,
  3) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
  4) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
  5) 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10 0.10
- ```
+```
 
 ### Sampling Statement
 
