@@ -19,7 +19,7 @@ functions-reference: doc/functions-reference-$(VERSION_STRING).pdf $(STAN)doc/fu
 
 doc/reference-manual-$(VERSION_STRING).pdf: $(STAN)src/docs/reference-manual/*.Rmd $(STAN)src/docs/reference-manual/*.yml $(STAN)src/docs/reference-manual/*.R $(STAN)src/docs/reference-manual/*.css $(STAN)src/docs/reference-manual/*.tex
 	cd $(STAN)src/docs/reference-manual; Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::pdf_book')"
-	mkdir -p doc
+	mkdir -p doc   # needed for cmdstan docs
 	mkdir -p $(STAN)doc
 	mv -f $(STAN)src/docs/reference-manual/_book/_main.pdf doc/reference-manual-$(VERSION_STRING).pdf
 
@@ -32,7 +32,7 @@ $(STAN)doc/reference-manual/index.html:  $(STAN)src/docs/reference-manual/*.Rmd 
 
 doc/functions-reference-$(VERSION_STRING).pdf: $(STAN)src/docs/functions/*.Rmd $(STAN)src/docs/functions/*.yml $(STAN)src/docs/functions/*.css $(STAN)src/docs/functions/*.tex
 	cd $(STAN)src/docs/functions; Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::pdf_book')"
-	mkdir -p doc
+	mkdir -p doc   # needed for cmdstan docs
 	mkdir -p $(STAN)doc
 	mv -f $(STAN)src/docs/functions/_book/_main.pdf doc/functions-reference-$(VERSION_STRING).pdf
 
