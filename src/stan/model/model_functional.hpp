@@ -24,7 +24,7 @@ namespace stan {
       }
     };
 
-    // Interface for automatic differentiation of models
+    // Templated interface for automatic differentiation of models
     template <bool propto, bool jacobian_adjust_transform, class M>
     struct model_functional_template {
       const M& model;
