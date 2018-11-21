@@ -428,6 +428,8 @@ namespace stan {
             print_vector.push_back(iter_counter);
             print_vector.push_back(delta_t);
             print_vector.push_back(elbo);
+            print_vector.push_back(delta_elbo_ave);
+            print_vector.push_back(delta_elbo_med);
             diagnostic_writer(print_vector);
 
             if (delta_elbo_ave < tol_rel_obj) {
@@ -488,7 +490,8 @@ namespace stan {
               callbacks::writer& parameter_writer,
               callbacks::writer& diagnostic_writer)
         const {
-        diagnostic_writer("iter,time_in_seconds,ELBO");
+        diagnostic_writer("iter,time_in_seconds,ELBO,"
+                          "delta_ELBO_mean,delta_ELBO_med");
 
         // Initialize variational approximation
         Q variational = Q(cont_params_);
