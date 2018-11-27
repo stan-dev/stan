@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <istream>
+#include <limits>
 #include <sstream>
 #include <string>
 
@@ -110,7 +111,8 @@ namespace stan {
           unget_char();
           parse_text();
         } else if (c == '-' ||
-                   (c >= '0' && c <= '9') ) {
+                   (c >= '0' && c <= '9') ||
+                   c == 'I' || c == 'N') {
           unget_char();
           parse_number();
         } else {
@@ -129,6 +131,18 @@ namespace stan {
           is_positive = false;
           ss << c;
           c = get_char();
+        }
+
+        // Infinity
+        if ((is_positive && ss.str() == "I") ||
+            c == 'I') {
+            parse_infinity_literal(is_positive);
+            return;
+        }
+        // Nan
+        if (c == 'N') {
+          parse_nan_literal();
+          return;
         }
 
         // int
@@ -267,6 +281,19 @@ namespace stan {
       void parse_null_literal() {
         get_chars("ull");
         h_.null();
+      }
+
+      void parse_infinity_literal(bool is_positive) {
+        get_chars("nfinity");
+        if (is_positive)
+          h_.number_double(std::numeric_limits<double>::infinity());
+        else
+          h_.number_double(-std::numeric_limits<double>::infinity());
+      }
+
+      void parse_nan_literal() {
+        get_chars("aN");
+        h_.number_double(std::numeric_limits<double>::quiet_NaN());
       }
 
       void get_escaped_unicode(std::stringstream& s) {

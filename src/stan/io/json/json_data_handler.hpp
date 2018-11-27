@@ -45,8 +45,10 @@ namespace stan {
      * where the values can be either numeric scalar objects or
      * or numeric arrays of any dimensionality. Arrays must be rectangular.
      * Empty arrays are not allowed, nor are arrays of empty arrays.
-     * The strings \"inf\" and \"-inf\" are mapped to positive and negative
-     * infinity, respectively.
+     * The strings \"Inf\" and \"Infinity\" are mapped to positive infinity,
+     * the strings \"-Inf\" and \"-Infinity\" are mapped to negative infinity,
+     * and the string \"NaN\" is mapped to not-a-number.
+     * Bare versions of Infinity, -Infinity, and NaN are also allowed.
      */
     class json_data_handler : public stan::json::json_handler {
     private:
@@ -183,10 +185,16 @@ namespace stan {
 
       void string(const std::string& s) {
         double tmp;
-        if (0 == s.compare("-inf")) {
+        if (0 == s.compare("-Inf")) {
           tmp = -std::numeric_limits<double>::infinity();
-        } else if (0 == s.compare("inf")) {
+        } else if (0 == s.compare("-Infinity")) {
+          tmp = -std::numeric_limits<double>::infinity();
+        } else if (0 == s.compare("Inf")) {
           tmp = std::numeric_limits<double>::infinity();
+        } else if (0 == s.compare("Infinity")) {
+          tmp = std::numeric_limits<double>::infinity();
+        } else if (0 == s.compare("NaN")) {
+          tmp = std::numeric_limits<double>::quiet_NaN();
         } else {
           std::stringstream errorMsg;
           errorMsg << "variable: " << key_
