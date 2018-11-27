@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <istream>
+#include <limits>
 #include <sstream>
 #include <string>
 
