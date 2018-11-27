@@ -6,6 +6,10 @@
 #include <stan/io/json/json_handler.hpp>
 #include <stan/io/json/json_parser.hpp>
 
+#include <boost/limits.hpp>
+#include <boost/math/concepts/real_concept.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
+
 void test_int_var(stan::json::json_data& jdata,
                   const std::string& text,
                   const std::string& name,
@@ -401,3 +405,117 @@ TEST(ioJson,jsonData_parse_mult_objects) {
   EXPECT_EQ("foo",var_names[0]);
 }
 
+// R: strings "NaN", "Inf", "-Inf"
+TEST(ioJson,jsonData_NaN_str) {
+  std::string txt = "{ \"foo\" : \"NaN\" }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  double nan = 0.0/0.0;
+  expected_vals_r.push_back(nan);
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+TEST(ioJson,jsonData_unsigned_Inf_str) {
+  std::string txt = "{ \"foo\" : \"Inf\" }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  expected_vals_r.push_back(std::numeric_limits<double>::infinity());
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+TEST(ioJson,jsonData_pos_Inf_str) {
+  std::string txt = "{ \"foo\" : \"+Inf\" }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  expected_vals_r.push_back(std::numeric_limits<double>::infinity());
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+TEST(ioJson,jsonData_signed_neg_Inf_str) {
+  std::string txt = "{ \"foo\" : \"-Inf\" }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+// python/js:  Infinity, -Infinity, NaN
+// test both bare and strings
+TEST(ioJson,jsonData_NaN_bare) {
+  std::string txt = "{ \"foo\" : NaN }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  double nan = 0.0/0.0;
+  expected_vals_r.push_back(nan);
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+TEST(ioJson,jsonData_unsigned_Infinity_bare) {
+  std::string txt = "{ \"foo\" : Infinity }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  expected_vals_r.push_back(std::numeric_limits<double>::infinity());
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+TEST(ioJson,jsonData_pos_Infinity_bare) {
+  std::string txt = "{ \"foo\" : +Infinity }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  expected_vals_r.push_back(std::numeric_limits<double>::infinity());
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+TEST(ioJson,jsonData_signed_neg_Infinity_bare) {
+  std::string txt = "{ \"foo\" : -Infinity }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+TEST(ioJson,jsonData_unsigned_Infinity_str) {
+  std::string txt = "{ \"foo\" : \"Infinity\" }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  expected_vals_r.push_back(std::numeric_limits<double>::infinity());
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+TEST(ioJson,jsonData_pos_Infinity_str) {
+  std::string txt = "{ \"foo\" : \"+Infinity\" }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  expected_vals_r.push_back(std::numeric_limits<double>::infinity());
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
+
+TEST(ioJson,jsonData_signed_neg_Infinity_str) {
+  std::string txt = "{ \"foo\" : \"-Infinity\" }";
+  std::stringstream in(txt);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_r;
+  expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
+  std::vector<size_t> expected_dims;
+  test_real_var(jdata,txt,"foo",expected_vals_r,expected_dims);
+}
