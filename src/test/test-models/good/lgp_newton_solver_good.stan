@@ -14,7 +14,9 @@ transformed data {
  int n_samples[5];  // number of terms for a local parameter
  int samples[5];  // sum of observations for a local parameter
  int max_num_steps;
-int is_line_search;
+ int is_line_search;
+ int print_iteration;
+ int space_matters;
  real tol;
 
  vector[5] theta_dbl;
@@ -49,10 +51,10 @@ transformed parameters {
   theta = lgp_dense_newton_solver(theta_0, phi_vec_v, n_samples, samples);
   theta = lgp_dense_newton_solver(theta_0_v, phi_vec_v, n_samples, samples);
 
-  theta = lgp_dense_newton_solver(theta_0, phi_vec, n_samples, samples, tol, max_num_steps, is_line_search);
-  theta = lgp_dense_newton_solver(theta_0_v, phi_vec, n_samples, samples, tol, max_num_steps, is_line_search);
-  theta = lgp_dense_newton_solver(theta_0, phi_vec_v, n_samples, samples, tol, max_num_steps, is_line_search);
-  theta = lgp_dense_newton_solver(theta_0_v, phi_vec_v, n_samples, samples, tol, max_num_steps, is_line_search);
+  theta = lgp_dense_newton_solver(theta_0, phi_vec, n_samples, samples, tol, max_num_steps, is_line_search, print_iteration, space_matters);
+  theta = lgp_dense_newton_solver(theta_0_v, phi_vec, n_samples, samples, tol, max_num_steps, is_line_search, print_iteration, space_matters);
+  theta = lgp_dense_newton_solver(theta_0, phi_vec_v, n_samples, samples, tol, max_num_steps, is_line_search, print_iteration, space_matters);
+  theta = lgp_dense_newton_solver(theta_0_v, phi_vec_v, n_samples, samples, tol, max_num_steps, is_line_search, print_iteration, space_matters);
 }
 
 model {

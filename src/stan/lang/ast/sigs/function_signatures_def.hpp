@@ -190,6 +190,53 @@ namespace stan {
       add(name, result_type, arg_types);
     }
 
+    // Define new add overloads for lgp functions
+    void function_signatures::add(const std::string& name,
+                                  const bare_expr_type& result_type,
+                                  const bare_expr_type& arg_type1,
+                                  const bare_expr_type& arg_type2,
+                                  const bare_expr_type& arg_type3,
+                                  const bare_expr_type& arg_type4,
+                                  const bare_expr_type& arg_type5,
+                                  const bare_expr_type& arg_type6,
+                                  const bare_expr_type& arg_type7,
+                                  const bare_expr_type& arg_type8) {
+      std::vector<bare_expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      arg_types.push_back(arg_type4);
+      arg_types.push_back(arg_type5);
+      arg_types.push_back(arg_type6);
+      arg_types.push_back(arg_type7);
+      arg_types.push_back(arg_type8);
+      add(name, result_type, arg_types);
+    }
+
+    void function_signatures::add(const std::string& name,
+                                  const bare_expr_type& result_type,
+                                  const bare_expr_type& arg_type1,
+                                  const bare_expr_type& arg_type2,
+                                  const bare_expr_type& arg_type3,
+                                  const bare_expr_type& arg_type4,
+                                  const bare_expr_type& arg_type5,
+                                  const bare_expr_type& arg_type6,
+                                  const bare_expr_type& arg_type7,
+                                  const bare_expr_type& arg_type8,
+                                  const bare_expr_type& arg_type9) {
+      std::vector<bare_expr_type> arg_types;
+      arg_types.push_back(arg_type1);
+      arg_types.push_back(arg_type2);
+      arg_types.push_back(arg_type3);
+      arg_types.push_back(arg_type4);
+      arg_types.push_back(arg_type5);
+      arg_types.push_back(arg_type6);
+      arg_types.push_back(arg_type7);
+      arg_types.push_back(arg_type8);
+      arg_types.push_back(arg_type9);
+      add(name, result_type, arg_types);
+    }
+
     void function_signatures::add_nullary(const::std::string& name) {
       add(name, bare_expr_type(double_type()));
     }

@@ -210,6 +210,60 @@ namespace stan {
                const bare_expr_type& arg_type7);
 
       /**
+       * Add a built-in function with the specifed name, result type,
+       * and argument types.
+       *
+       * @param name function name
+       * @param result_type function return type
+       * @param arg_type1 type of first argument
+       * @param arg_type2 type of second argument
+       * @param arg_type3 type of third argument
+       * @param arg_type4 type of fourth argument
+       * @param arg_type5 type of fifth argument
+       * @param arg_type6 type of sixth argument
+       * @param arg_type7 type of seventh argument
+       * @param arg_type8 type of eigth argument
+       */
+      void add(const std::string& name,
+               const bare_expr_type& result_type,
+               const bare_expr_type& arg_type1,
+               const bare_expr_type& arg_type2,
+               const bare_expr_type& arg_type3,
+               const bare_expr_type& arg_type4,
+               const bare_expr_type& arg_type5,
+               const bare_expr_type& arg_type6,
+               const bare_expr_type& arg_type7,
+               const bare_expr_type& arg_type8);
+      
+      /**
+       * Add a built-in function with the specifed name, result type,
+       * and argument types.
+       *
+       * @param name function name
+       * @param result_type function return type
+       * @param arg_type1 type of first argument
+       * @param arg_type2 type of second argument
+       * @param arg_type3 type of third argument
+       * @param arg_type4 type of fourth argument
+       * @param arg_type5 type of fifth argument
+       * @param arg_type6 type of sixth argument
+       * @param arg_type7 type of seventh argument
+       * @param arg_type8 type of eigth argument
+       * @param arg_type9 type of the ninth argument
+       */
+      void add(const std::string& name,
+               const bare_expr_type& result_type,
+               const bare_expr_type& arg_type1,
+               const bare_expr_type& arg_type2,
+               const bare_expr_type& arg_type3,
+               const bare_expr_type& arg_type4,
+               const bare_expr_type& arg_type5,
+               const bare_expr_type& arg_type6,
+               const bare_expr_type& arg_type7,
+               const bare_expr_type& arg_type8,
+               const bare_expr_type& arg_type9);
+ 
+      /**
        * Add a built-in function with the specified name, a real
        * return type, and no arguments.
        *
