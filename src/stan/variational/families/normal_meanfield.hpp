@@ -342,15 +342,17 @@ namespace stan {
         eta = transform(eta);
       }
         /**
-         * New: Draw a posterior sample from a normal distribution, 
-         and return the log normal density. 
-         Constant (d* log 2 pi) is removed. It changes as a function 
-         of parameters, but not as a fixed posterior sample.
-         It is saved as log_q (the approximation density 
-        using variational families).
+         * New: Draw a posterior sample from the normal distribution, 
+         * and return its log normal density. The constant (d log 2 pi) is removed. 
+         * @param[in] rng Base random number generator.
+         * @param[in, out] eta Vector to which the draw is assigned; must already
+         * be properly sized. eta will be transformed into variational posteriors.
+         * @param[out] log_q The log  density in the mean-field normal approximation;
+         * The constant term is removed. 
+         * @throws std::range_error If the index is out of range.
          */
         template <class BaseRNG>
-        void sample_lq(BaseRNG& rng,
+        void sample_log_q(BaseRNG& rng,
                        Eigen::VectorXd& eta,
                        double& log_q)
         const {

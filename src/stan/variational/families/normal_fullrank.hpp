@@ -378,21 +378,27 @@ namespace stan {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         eta = transform(eta);
       }
-        /**
-         * New: Draw a posterior sample from a normal distribution, and return the log normal density. Constant (d* log 2 pi) is removed.
-         */
-        template <class BaseRNG>
-        void sample_lq(BaseRNG& rng,
+
+      /**
+        * New: Draw a posterior sample from the normal distribution, 
+        * and return its log normal density. The constant (d log 2 pi) is removed. 
+        * @param[in] rng Base random number generator.
+        * @param[in, out] eta Vector to which the draw is assigned; must
+        * already be properly sized. eta will be transformed into variational posteriors. 
+        * @param[out] log_q The log density in the full-rank normal approximation.
+        * @throws std::range_error If the index is out of range.
+        */
+      template <class BaseRNG>
+      void sample_log_q(BaseRNG& rng,
                        Eigen::VectorXd& eta,
-                       double& log_q)
-        const {
-            log_q = 0;
-            for (int d = 0; d < dimension_; ++d) {
-              eta(d) = stan::math::normal_rng(0, 1, rng);
-              log_q+= stan::math::square(eta(d))*(-0.5)- fabs(L_chol_(d, d));
-            }
-            eta = transform(eta);
+                       double& log_q) const {
+        log_q = 0;
+        for (int d = 0; d < dimension_; ++d) {
+          eta(d) = stan::math::normal_rng(0, 1, rng);
+          log_q+= stan::math::square(eta(d))*(-0.5)- fabs(L_chol_(d, d));
         }
+        eta = transform(eta);
+      }
       /**
        * Calculates the "blackbox" gradient with respect to BOTH the
        * location vector (mu) and the cholesky factor of the scale
