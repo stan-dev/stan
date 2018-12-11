@@ -380,7 +380,7 @@ namespace stan {
       }
 
       /**
-        * New: Draw a posterior sample from the normal distribution, 
+        * Draw a posterior sample from the normal distribution, 
         * and return its log normal density. The constant (d log 2 pi) is removed. 
         * @param[in] rng Base random number generator.
         * @param[in, out] eta Vector to which the draw is assigned; must
