@@ -1,8 +1,6 @@
 #ifndef STAN_LANG_GENERATOR_GENERATE_PARAM_VAR_HPP
 #define STAN_LANG_GENERATOR_GENERATE_PARAM_VAR_HPP
 
-#include <iostream>
-#include <ostream>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_bare_type.hpp>
@@ -12,6 +10,8 @@
 #include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
 #include <stan/lang/generator/write_resize_var_idx.hpp>
+#include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 

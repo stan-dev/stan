@@ -3,11 +3,11 @@
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/variant/recursive_variant.hpp>
-#include <map>
-#include <set>
 #include <stan/io/program_reader.hpp>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/iterator_typedefs.hpp>
+#include <map>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>

@@ -4,12 +4,12 @@
 #include <boost/phoenix/phoenix.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/version.hpp>
-#include <set>
-#include <sstream>
 #include <stan/lang/ast.hpp>
 #include <stan/lang/grammars/block_var_decls_grammar.hpp>
 #include <stan/lang/grammars/common_adaptors_def.hpp>
 #include <stan/lang/grammars/semantic_actions.hpp>
+#include <set>
+#include <sstream>
 #include <string>
 #include <vector>
 

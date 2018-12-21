@@ -1980,7 +1980,6 @@ void multiplication_expr::operator()(expression &expr1, const expression &expr2,
                                      std::ostream &error_msgs) const {
   if (expr1.bare_type().is_primitive() && expr2.bare_type().is_primitive()) {
     expr1 *= expr2;
-    ;
     return;
   }
   std::vector<expression> args;
