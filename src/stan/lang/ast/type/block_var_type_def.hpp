@@ -121,13 +121,13 @@ bool block_var_type::has_def_bounds() const {
   return false;
 }
 
-locscale block_var_type::ls() const {
-  block_type_locscale_vis vis;
+offset_multiplier block_var_type::ls() const {
+  block_type_offset_multiplier_vis vis;
   return boost::apply_visitor(vis, var_type_);
 }
 
-bool block_var_type::has_def_locscale() const {
-  if (this->ls().has_loc() || this->ls().has_scale())
+bool block_var_type::has_def_offset_multiplier() const {
+  if (this->ls().has_offset() || this->ls().has_multiplier())
     return true;
   return false;
 }

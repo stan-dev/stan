@@ -679,52 +679,52 @@ namespace stan {
       /**
        * Return the next scalar.
        *
-       * @tparam TL Type of location.
-       * @tparam TS Type of scale.
-       * @param loc Location.
-       * @param scal Scale.
+       * @tparam TL Type of offset.
+       * @tparam TS Type of multiplier.
+       * @param offset Offset.
+       * @param scal Multiplier.
        * @return Next scalar value.
        */
       template <typename TL, typename TS>
-      inline T scalar_locscale(const TL loc, const TS scale) {
+      inline T scalar_offset_multiplier(const TL offset, const TS multiplier) {
         T x(scalar());
         return x;
       }
 
       /**
-       * Return the next scalar transformed to have the specified location and
-       * scale.
+       * Return the next scalar transformed to have the specified offset and
+       * multiplier.
        *
-       * <p>See <code>stan::math::locscale_constrain(T, double, double)</code>.
+       * <p>See <code>stan::math::offset_multiplier_constrain(T, double, double)</code>.
        *
-       * @tparam TL Type of location.
-       * @tparam TS Type of scale.
-       * @param loc Location.
-       * @param scale Scale.
+       * @tparam TL Type of offset.
+       * @tparam TS Type of multiplier.
+       * @param offset Offset.
+       * @param multiplier Multiplier.
        * @return Next scalar transformed to fall between the specified
        * bounds.
        */
       template <typename TL, typename TS>
-      inline T scalar_locscale_constrain(const TL loc, const TS scale) {
-        return stan::math::locscale_constrain(scalar(), loc, scale);
+      inline T scalar_offset_multiplier_constrain(const TL offset, const TS multiplier) {
+        return stan::math::offset_multiplier_constrain(scalar(), offset, multiplier);
       }
 
       /**
-       * Return the next scalar transformed to have the specified location and
-       * scale.
+       * Return the next scalar transformed to have the specified offset and
+       * multiplier.
        *
-       * <p>See <code>stan::math::locscale_constrain(T, double, double, T&)</code>.
+       * <p>See <code>stan::math::offset_multiplier_constrain(T, double, double, T&)</code>.
        *
-       * @param loc Location.
-       * @param scale Scale.
+       * @param offset Offset.
+       * @param multiplier Multiplier.
        * @param lp Reference to log probability variable to increment.
        * @tparam T Type of scalar.
-       * @tparam TL Type of location.
-       * @tparam TS Type of scale.
+       * @tparam TL Type of offset.
+       * @tparam TS Type of multiplier.
        */
       template <typename TL, typename TS>
-      inline T scalar_locscale_constrain(TL loc, TS scale, T& lp) {
-        return stan::math::locscale_constrain(scalar(), loc, scale, lp);
+      inline T scalar_offset_multiplier_constrain(TL offset, TS multiplier, T& lp) {
+        return stan::math::offset_multiplier_constrain(scalar(), offset, multiplier, lp);
       }
 
       /**
@@ -1433,88 +1433,88 @@ namespace stan {
       }
 
       template <typename TL, typename TS>
-      inline vector_t vector_locscale(const TL loc, const TS scale, size_t m) {
+      inline vector_t vector_offset_multiplier(const TL offset, const TS multiplier, size_t m) {
         vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_locscale(loc, scale);
+          v(i) = scalar_offset_multiplier(offset, multiplier);
         return v;
       }
 
       template <typename TL, typename TS>
       inline vector_t
-      vector_locscale_constrain(const TL loc, const TS scale, size_t m) {
+      vector_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m) {
         vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_locscale_constrain(loc, scale);
+          v(i) = scalar_offset_multiplier_constrain(offset, multiplier);
         return v;
       }
 
       template <typename TL, typename TS>
       inline vector_t
-      vector_locscale_constrain(const TL loc, const TS scale, size_t m, T& lp) {
+      vector_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m, T& lp) {
         vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_locscale_constrain(loc, scale, lp);
+          v(i) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
         return v;
       }
 
       template <typename TL, typename TS>
-      inline row_vector_t row_vector_locscale(const TL loc, const TS scale,
+      inline row_vector_t row_vector_offset_multiplier(const TL offset, const TS multiplier,
                                               size_t m) {
         row_vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_locscale(loc, scale);
+          v(i) = scalar_offset_multiplier(offset, multiplier);
         return v;
       }
 
       template <typename TL, typename TS>
       inline row_vector_t
-      row_vector_locscale_constrain(const TL loc, const TS scale, size_t m) {
+      row_vector_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m) {
         row_vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_locscale_constrain(loc, scale);
+          v(i) = scalar_offset_multiplier_constrain(offset, multiplier);
         return v;
       }
 
       template <typename TL, typename TS>
       inline row_vector_t
-      row_vector_locscale_constrain(const TL loc, const TS scale, size_t m,
+      row_vector_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m,
                                     T& lp) {
         row_vector_t v(m);
         for (size_t i = 0; i < m; ++i)
-          v(i) = scalar_locscale_constrain(loc, scale, lp);
+          v(i) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
         return v;
       }
 
       template <typename TL, typename TS>
-      inline matrix_t matrix_locscale(const TL loc, const TS scale, size_t m,
+      inline matrix_t matrix_offset_multiplier(const TL offset, const TS multiplier, size_t m,
                                       size_t n) {
         matrix_t v(m, n);
         for (size_t j  = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i, j) = scalar_locscale(loc, scale);
+            v(i, j) = scalar_offset_multiplier(offset, multiplier);
         return v;
       }
 
       template <typename TL, typename TS>
       inline matrix_t
-      matrix_locscale_constrain(const TL loc, const TS scale, size_t m,
+      matrix_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m,
                                 size_t n) {
         matrix_t v(m, n);
         for (size_t j = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i, j) = scalar_locscale_constrain(loc, scale);
+            v(i, j) = scalar_offset_multiplier_constrain(offset, multiplier);
         return v;
       }
 
       template <typename TL, typename TS>
       inline matrix_t
-      matrix_locscale_constrain(const TL loc, const TS scale, size_t m,
+      matrix_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m,
                                 size_t n, T& lp) {
         matrix_t v(m, n);
         for (size_t j = 0; j < n; ++j)
           for (size_t i = 0; i < m; ++i)
-            v(i, j) = scalar_locscale_constrain(loc, scale, lp);
+            v(i, j) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
         return v;
       }
     };

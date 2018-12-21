@@ -2,7 +2,7 @@
 #define STAN_LANG_AST_DOUBLE_BLOCK_TYPE_HPP
 
 #include <stan/lang/ast/node/range.hpp>
-#include <stan/lang/ast/node/locscale.hpp>
+#include <stan/lang/ast/node/offset_multiplier.hpp>
 
 namespace stan {
 namespace lang {
@@ -11,7 +11,7 @@ namespace lang {
  * Double block var type.
  */
 struct double_block_type {
-  // TODO(VMatthijs): We should only allow to have either a range or a locscale.
+  // TODO(VMatthijs): We should only allow to have either a range or a offset_multiplier.
 
   /**
    * Bounds constraints
@@ -19,9 +19,9 @@ struct double_block_type {
   range bounds_;
 
   /**
-   * Location and scale
+   * Offset and multiplier
    */
-  locscale ls_;
+  offset_multiplier ls_;
 
   /**
    * Construct a block var type with default values.
@@ -32,9 +32,9 @@ struct double_block_type {
    * Construct a block var type with specified values.
    *
    * @param bounds variable upper and/or lower bounds
-   * @param ls variable location and scale
+   * @param ls variable offset and multiplier
    */
-  explicit double_block_type(const range& bounds, const locscale& ls);
+  explicit double_block_type(const range& bounds, const offset_multiplier& ls);
 
   /**
    * Construct a block var type with specified values.
@@ -46,9 +46,9 @@ struct double_block_type {
   /**
    * Construct a block var type with specified values.
    *
-   * @param ls variable location and scale
+   * @param ls variable offset and multiplier
    */
-  explicit double_block_type(const locscale& ls);
+  explicit double_block_type(const offset_multiplier& ls);
 
   /**
    * Get bounds constraints.
@@ -56,9 +56,9 @@ struct double_block_type {
   range bounds() const;
 
   /**
-   * Get location and scale.
+   * Get offset and multiplier.
    */
-  locscale ls() const;
+  offset_multiplier ls() const;
 };
 
 }  // namespace lang

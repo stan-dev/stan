@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_AST_NODE_LOCSCALE_HPP
-#define STAN_LANG_AST_NODE_LOCSCALE_HPP
+#ifndef STAN_LANG_AST_NODE_OFFSET_MULTIPLIER_HPP
+#define STAN_LANG_AST_NODE_OFFSET_MULTIPLIER_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
 
@@ -7,47 +7,47 @@ namespace stan {
   namespace lang {
 
     /**
-     * AST structure for a locscale object with a loc and scale value.
+     * AST structure for a offset_multiplier object with a offset and multiplier value.
      */
-    struct locscale {
+    struct offset_multiplier {
       /**
-       * Location of loc-scale pair with <code>nil</code> value if only
-       * scale.
+       * Offset of offset-multiplier pair with <code>nil</code> value if only
+       * multiplier.
        */
-      expression loc_;
+      expression offset_;
 
       /**
-       * Scale of loc-scale pair with <code>nil</code> value if only
-       * location.
+       * Multiplier of offset-multiplier pair with <code>nil</code> value if only
+       * offset.
        */
-      expression scale_;
+      expression multiplier_;
 
       /**
-       * Construct a default locscale object.
+       * Construct a default offset_multiplier object.
        */
-      locscale();
+      offset_multiplier();
 
       /**
-       * Construct a locscale object with the specified location and scale.
+       * Construct a offset_multiplier object with the specified offset and multiplier.
        *
-       * @param loc location
-       * @param scale scale
+       * @param offset offset
+       * @param multiplier multiplier
        */
-      locscale(const expression& loc, const expression& scale);
+      offset_multiplier(const expression& offset, const expression& multiplier);
 
       /**
-       * Return true if the location is non-nil.
+       * Return true if the offset is non-nil.
        *
-       * @return true if there is a location
+       * @return true if there is a offset
        */
-      bool has_loc() const;
+      bool has_offset() const;
 
       /**
-       * Return true if the scale is non-nil.
+       * Return true if the multiplier is non-nil.
        *
-       * @return true if there is a scale
+       * @return true if there is a multiplier
        */
-      bool has_scale() const;
+      bool has_multiplier() const;
     };
 
   }

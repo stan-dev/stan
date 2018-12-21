@@ -857,10 +857,10 @@ namespace stan {
     };
     extern boost::phoenix::function<empty_range> empty_range_f;
 
-    struct empty_locscale : public phoenix_functor_binary {
-      void operator()(locscale& r, std::stringstream& /*error_msgs*/) const;
+    struct empty_offset_multiplier : public phoenix_functor_binary {
+      void operator()(offset_multiplier& r, std::stringstream& /*error_msgs*/) const;
     };
-    extern boost::phoenix::function<empty_locscale> empty_locscale_f;
+    extern boost::phoenix::function<empty_offset_multiplier> empty_offset_multiplier_f;
 
     struct validate_int_expr : public phoenix_functor_ternary {
       void operator()(const expression& expr, bool& pass,
@@ -909,19 +909,19 @@ namespace stan {
     extern boost::phoenix::function<set_double_range_upper>
     set_double_range_upper_f;
 
-    struct set_double_locscale_loc : public phoenix_functor_quaternary {
-      void operator()(locscale& locscale, const expression& expr, bool& pass,
+    struct set_double_offset_multiplier_loc : public phoenix_functor_quaternary {
+      void operator()(offset_multiplier& offset_multiplier, const expression& expr, bool& pass,
                       std::stringstream& error_msgs) const;
     };
-    extern boost::phoenix::function<set_double_locscale_loc>
-    set_double_locscale_loc_f;
+    extern boost::phoenix::function<set_double_offset_multiplier_loc>
+    set_double_offset_multiplier_offset_f;
 
-    struct set_double_locscale_scale : public phoenix_functor_quaternary {
-      void operator()(locscale& locscale, const expression& expr, bool& pass,
+    struct set_double_offset_multiplier_multiplier : public phoenix_functor_quaternary {
+      void operator()(offset_multiplier& offset_multiplier, const expression& expr, bool& pass,
                       std::stringstream& error_msgs) const;
     };
-    extern boost::phoenix::function<set_double_locscale_scale>
-    set_double_locscale_scale_f;
+    extern boost::phoenix::function<set_double_offset_multiplier_multiplier>
+    set_double_offset_multiplier_multiplier_f;
 
     struct validate_bare_type : public phoenix_functor_quinary {
       void operator()(bare_expr_type& bare_type_result,

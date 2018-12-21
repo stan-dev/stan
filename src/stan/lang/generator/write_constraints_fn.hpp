@@ -44,33 +44,33 @@ namespace stan {
           ss << "_ub_" << fn_name << "(";
           generate_expression(btype.bounds().high_.expr_, NOT_USER_FACING, ss);
         }
-      } else if (btype.has_def_locscale()) {
-        if (btype.ls().has_loc() && btype.ls().has_scale()) {
-          ss << "_locscale_" << fn_name << "(";
-          generate_expression(btype.ls().loc_.expr_, NOT_USER_FACING, ss);
+      } else if (btype.has_def_offset_multiplier()) {
+        if (btype.ls().has_offset() && btype.ls().has_multiplier()) {
+          ss << "_offset_multiplier_" << fn_name << "(";
+          generate_expression(btype.ls().offset_.expr_, NOT_USER_FACING, ss);
           ss << ", ";
-          generate_expression(btype.ls().scale_.expr_, NOT_USER_FACING, ss);
-        } else if (btype.ls().has_loc()) {
-          ss << "_locscale_" << fn_name << "(";
-          generate_expression(btype.ls().loc_.expr_, NOT_USER_FACING, ss);
+          generate_expression(btype.ls().multiplier_.expr_, NOT_USER_FACING, ss);
+        } else if (btype.ls().has_offset()) {
+          ss << "_offset_multiplier_" << fn_name << "(";
+          generate_expression(btype.ls().offset_.expr_, NOT_USER_FACING, ss);
           ss << ", 1";
         } else {
-          ss << "_locscale_" << fn_name << "(0";
+          ss << "_offset_multiplier_" << fn_name << "(0";
           ss << ", ";
-          generate_expression(btype.ls().scale_.expr_, NOT_USER_FACING, ss);
+          generate_expression(btype.ls().multiplier_.expr_, NOT_USER_FACING, ss);
         }
       } else {
         ss << "_" << fn_name << "(";
       }
 
       if ((fn_name.compare("unconstrain") == 0)) {
-        if (btype.has_def_bounds() || btype.has_def_locscale())
+        if (btype.has_def_bounds() || btype.has_def_offset_multiplier())
           ss << ", ";
         return ss.str();
       }
 
       if (!is_nil(btype.arg1())) {
-        if (btype.has_def_bounds() || btype.has_def_locscale())
+        if (btype.has_def_bounds() || btype.has_def_offset_multiplier())
           ss << ", ";
         generate_expression(btype.arg1(), NOT_USER_FACING, ss);
       }

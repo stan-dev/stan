@@ -72,7 +72,7 @@ TEST(lang, data_block_var_hpp_ctor) {
                  "  real p2;\n"
                  "  int ar_p1[3];\n"
                  "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<location=1, scale=2> ar_p3[5];\n"
+                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
                  "}\n");
   std::string hpp = model_to_hpp("data_prim", m1);
 
@@ -204,7 +204,7 @@ TEST(lang, params_block_var_ast) {
   std::string m1("parameters {\n"
                  "  real p2;\n"
                  "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<location=1, scale=2> ar_p3[5];\n"
+                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
                  "}\n");
   stan::lang::program prog = model_to_ast("parameters_prim", m1);
   EXPECT_EQ(3,prog.parameter_decl_.size());
@@ -220,7 +220,7 @@ TEST(lang, params_block_var_hpp_ctor) {
   std::string m1("parameters {\n"
                  "  real p2;\n"
                  "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<location=1, scale=2> ar_p3[5];\n"
+                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
                  "}\n");
   std::string hpp = model_to_hpp("parameters_prim", m1);
 
@@ -243,7 +243,7 @@ TEST(lang, params_block_var_hpp_xform_inits) {
   std::string m1("parameters {\n"
                  "  real p2;\n"
                  "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<location=1, scale=2> ar_p3[5];\n"
+                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
                  "}\n");
   std::string hpp = model_to_hpp("parameters_prim", m1);
 
@@ -297,7 +297,7 @@ TEST(lang, params_block_var_hpp_xform_inits) {
                        "        size_t ar_p3_i_0_max__ = 5;\n"
                        "        for (size_t i_0__ = 0; i_0__ < ar_p3_i_0_max__; ++i_0__) {\n"
                        "            try {\n"
-                       "                writer__.scalar_locscale_unconstrain(1, 2, ar_p3[i_0__]);\n"
+                       "                writer__.scalar_offset_multiplier_unconstrain(1, 2, ar_p3[i_0__]);\n"
                        "            } catch (const std::exception& e) {\n"
                        "                stan::lang::rethrow_located(std::runtime_error(std::string(\"Error transforming variable ar_p3: \") + e.what()), current_statement_begin__, prog_reader__());\n"
                        "            }\n"
@@ -310,7 +310,7 @@ TEST(lang, params_block_var_hpp_log_prob) {
   std::string m1("parameters {\n"
                  "  real p2;\n"
                  "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<location=1, scale=2> ar_p3[5];\n"
+                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
                  "}\n");
   std::string hpp = model_to_hpp("parameters_prim", m1);
 
@@ -340,9 +340,9 @@ TEST(lang, params_block_var_hpp_log_prob) {
                        "            ar_p3.reserve(ar_p3_d_0_max__);\n"
                        "            for (size_t d_0__ = 0; d_0__ < ar_p3_d_0_max__; ++d_0__) {\n"
                        "                if (jacobian__)\n"
-                       "                    ar_p3.push_back(in__.scalar_locscale_constrain(1, 2, lp__));\n"
+                       "                    ar_p3.push_back(in__.scalar_offset_multiplier_constrain(1, 2, lp__));\n"
                        "                else\n"
-                       "                    ar_p3.push_back(in__.scalar_locscale_constrain(1, 2));\n"
+                       "                    ar_p3.push_back(in__.scalar_offset_multiplier_constrain(1, 2));\n"
                        "            }\n");
   EXPECT_EQ(1, count_matches(expected,hpp));
 }  

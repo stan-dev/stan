@@ -61,7 +61,7 @@ namespace stan {
       boost::spirit::qi::rule<Iterator,
                               double_block_type(scope),
                               whitespace_grammar<Iterator> >
-      double_locscale_type_r;
+      double_offset_multiplier_type_r;
 
       boost::spirit::qi::rule<Iterator,
                               int_block_type(scope),
@@ -76,7 +76,7 @@ namespace stan {
       boost::spirit::qi::rule<Iterator,
                               matrix_block_type(scope),
                               whitespace_grammar<Iterator> >
-      matrix_locscale_type_r;
+      matrix_offset_multiplier_type_r;
 
       boost::spirit::qi::rule<Iterator,
                               row_vector_block_type(scope),
@@ -86,7 +86,7 @@ namespace stan {
       boost::spirit::qi::rule<Iterator,
                               row_vector_block_type(scope),
                               whitespace_grammar<Iterator> >
-      row_vector_locscale_type_r;
+      row_vector_offset_multiplier_type_r;
 
       boost::spirit::qi::rule<Iterator,
                               vector_block_type(scope),
@@ -96,7 +96,7 @@ namespace stan {
       boost::spirit::qi::rule<Iterator,
                               vector_block_type(scope),
                               whitespace_grammar<Iterator> >
-      vector_locscale_type_r;
+      vector_offset_multiplier_type_r;
 
       boost::spirit::qi::rule<Iterator,
                               cholesky_factor_corr_block_type(scope),
@@ -169,14 +169,14 @@ namespace stan {
       empty_range_r;
 
       boost::spirit::qi::rule<Iterator,
-                              locscale(scope),
+                              offset_multiplier(scope),
                               whitespace_grammar<Iterator> >
-      locscale_brackets_double_r;
+      offset_multiplier_brackets_double_r;
 
       boost::spirit::qi::rule<Iterator,
-                              locscale(scope),
+                              offset_multiplier(scope),
                               whitespace_grammar<Iterator> >
-      empty_locscale_r;
+      empty_offset_multiplier_r;
 
       boost::spirit::qi::rule<Iterator,
                               range(scope),

@@ -1,7 +1,7 @@
-#ifndef STAN_LANG_AST_FUN_BLOCK_TYPE_LOCSCALE_VIS_HPP
-#define STAN_LANG_AST_FUN_BLOCK_TYPE_LOCSCALE_VIS_HPP
+#ifndef STAN_LANG_AST_FUN_BLOCK_TYPE_OFFSET_MULTIPLIER_VIS_HPP
+#define STAN_LANG_AST_FUN_BLOCK_TYPE_OFFSET_MULTIPLIER_VIS_HPP
 
-#include <stan/lang/ast/node/locscale.hpp>
+#include <stan/lang/ast/node/offset_multiplier.hpp>
 #include <stan/lang/ast/type/block_array_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_corr_block_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_cov_block_type.hpp>
@@ -23,133 +23,133 @@ namespace stan {
   namespace lang {
 
     /**
-     * Visitor to get locscale from block_var_type.
+     * Visitor to get offset_multiplier from block_var_type.
      */
-    struct block_type_locscale_vis : public boost::static_visitor<locscale> {
+    struct block_type_offset_multiplier_vis : public boost::static_visitor<offset_multiplier> {
       /**
        * Construct a visitor.
        */
-      block_type_locscale_vis();
+      block_type_offset_multiplier_vis();
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const block_array_type& x) const;
+      offset_multiplier operator()(const block_array_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const cholesky_factor_corr_block_type& x) const;
+      offset_multiplier operator()(const cholesky_factor_corr_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const cholesky_factor_cov_block_type& x) const;
+      offset_multiplier operator()(const cholesky_factor_cov_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const corr_matrix_block_type& x) const;
+      offset_multiplier operator()(const corr_matrix_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const cov_matrix_block_type& x) const;
+      offset_multiplier operator()(const cov_matrix_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const double_block_type& x) const;
+      offset_multiplier operator()(const double_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const ill_formed_type& x) const;
+      offset_multiplier operator()(const ill_formed_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const int_block_type& x) const;
+      offset_multiplier operator()(const int_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const matrix_block_type& x) const;
+      offset_multiplier operator()(const matrix_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const ordered_block_type& x) const;
+      offset_multiplier operator()(const ordered_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const positive_ordered_block_type& x) const;
+      offset_multiplier operator()(const positive_ordered_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const row_vector_block_type& x) const;
+      offset_multiplier operator()(const row_vector_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const simplex_block_type& x) const;
+      offset_multiplier operator()(const simplex_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const unit_vector_block_type& x) const;
+      offset_multiplier operator()(const unit_vector_block_type& x) const;
 
       /**
-       * Return locscale for this type.
+       * Return offset_multiplier for this type.
        *
        * @param x type
-       * @return locscale
+       * @return offset_multiplier
        */
-      locscale operator()(const vector_block_type& x) const;
+      offset_multiplier operator()(const vector_block_type& x) const;
     };
   }
 }

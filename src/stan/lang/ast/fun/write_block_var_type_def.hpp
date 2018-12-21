@@ -28,15 +28,15 @@ namespace stan {
           o << " upper";
         o << ">";
       }
-      if (el_type.has_def_locscale()) {
-        locscale ls = el_type.ls();
+      if (el_type.has_def_offset_multiplier()) {
+        offset_multiplier ls = el_type.ls();
         o << "<";
-        if (ls.has_loc())
-          o << " location";
-        if (ls.has_loc() && ls.has_scale())
+        if (ls.has_offset())
+          o << " offset";
+        if (ls.has_offset() && ls.has_multiplier())
           o << ",";
-        if (ls.has_scale())
-          o << " scale";
+        if (ls.has_multiplier())
+          o << " multiplier";
         o << ">";
       }
       return o;

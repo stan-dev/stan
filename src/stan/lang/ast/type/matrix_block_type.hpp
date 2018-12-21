@@ -3,11 +3,11 @@
 
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/range.hpp>
-#include <stan/lang/ast/node/locscale.hpp>
+#include <stan/lang/ast/node/offset_multiplier.hpp>
 
 namespace stan {
   namespace lang {
-  // TODO(VMatthijs): We should only allow to have either a range or a locscale.
+  // TODO(VMatthijs): We should only allow to have either a range or a offset_multiplier.
 
     /**
      * Matrix block var type.
@@ -19,9 +19,9 @@ namespace stan {
       range bounds_;
 
       /**
-       * Location and scale
+       * Offset and multiplier
        */
-      locscale ls_;
+      offset_multiplier ls_;
 
       /**
        * Number of rows (arg_1)
@@ -43,12 +43,12 @@ namespace stan {
        * Sizes should be int expressions - constructor doesn't check.
        *
        * @param bounds variable upper and/or lower bounds
-       * @param ls variable location and scale
+       * @param ls variable offset and multiplier
        * @param M num rows
        * @param N num columns
        */
       matrix_block_type(const range& bounds,
-                        const locscale& ls,
+                        const offset_multiplier& ls,
                         const expression& M,
                         const expression& N);
 
@@ -68,11 +68,11 @@ namespace stan {
        * Construct a block var type with specified values.
        * Sizes should be int expressions - constructor doesn't check.
        *
-       * @param ls variable location and scale
+       * @param ls variable offset and multiplier
        * @param M num rows
        * @param N num columns
        */
-      matrix_block_type(const locscale& ls,
+      matrix_block_type(const offset_multiplier& ls,
                         const expression& M,
                         const expression& N);
 
@@ -82,9 +82,9 @@ namespace stan {
       range bounds() const;
 
       /**
-       * Get location and scale.
+       * Get offset and multiplier.
        */
-      locscale ls() const;
+      offset_multiplier ls() const;
 
       /**
        * Get M (num rows).

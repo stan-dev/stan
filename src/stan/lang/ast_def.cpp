@@ -46,7 +46,7 @@
 #include <stan/lang/ast/fun/bare_type_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_total_dims_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_bounds_vis_def.hpp>
-#include <stan/lang/ast/fun/block_type_locscale_vis_def.hpp>
+#include <stan/lang/ast/fun/block_type_offset_multiplier_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_is_specialized_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_params_total_vis_def.hpp>
 #include <stan/lang/ast/fun/expression_bare_type_vis_def.hpp>
@@ -133,7 +133,7 @@
 #include <stan/lang/ast/node/print_statement_def.hpp>
 #include <stan/lang/ast/node/program_def.hpp>
 #include <stan/lang/ast/node/range_def.hpp>
-#include <stan/lang/ast/node/locscale_def.hpp>
+#include <stan/lang/ast/node/offset_multiplier_def.hpp>
 #include <stan/lang/ast/node/reject_statement_def.hpp>
 #include <stan/lang/ast/node/return_statement_def.hpp>
 #include <stan/lang/ast/node/matrix_expr_def.hpp>

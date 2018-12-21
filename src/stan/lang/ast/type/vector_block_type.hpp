@@ -3,11 +3,11 @@
 
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/range.hpp>
-#include <stan/lang/ast/node/locscale.hpp>
+#include <stan/lang/ast/node/offset_multiplier.hpp>
 
 namespace stan {
   namespace lang {
-  // TODO(VMatthijs): We should only allow to have either a range or a locscale.
+  // TODO(VMatthijs): We should only allow to have either a range or a offset_multiplier.
 
     /**
      * Vector block var type.
@@ -19,9 +19,9 @@ namespace stan {
       range bounds_;
 
       /**
-       * Location and scale
+       * Offset and multiplier
        */
-      locscale ls_;
+      offset_multiplier ls_;
 
       /**
        * Vector length
@@ -38,10 +38,10 @@ namespace stan {
        * Length should be int expression - constructor doesn't check.
        *
        * @param bounds variable upper and/or lower bounds
-       * @param ls variable location and scale
+       * @param ls variable offset and multiplier
        * @param N vector length
        */
-      vector_block_type(const range& bounds, const locscale& ls,
+      vector_block_type(const range& bounds, const offset_multiplier& ls,
                         const expression& N);
 
       /**
@@ -58,10 +58,10 @@ namespace stan {
        * Construct a block var type with specified values.
        * Length should be int expression - constructor doesn't check.
        *
-       * @param ls variable location and scale
+       * @param ls variable offset and multiplier
        * @param N vector length
        */
-      vector_block_type(const locscale& ls,
+      vector_block_type(const offset_multiplier& ls,
                         const expression& N);
 
       /**
@@ -70,9 +70,9 @@ namespace stan {
       range bounds() const;
 
       /**
-       * Get location and scale.
+       * Get offset and multiplier.
        */
-      locscale ls() const;
+      offset_multiplier ls() const;
 
       /**
        * Get N (num rows).

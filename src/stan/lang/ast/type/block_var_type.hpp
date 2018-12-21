@@ -3,7 +3,7 @@
 
 #include <stan/lang/ast/node/expression.hpp>
 #include <stan/lang/ast/node/range.hpp>
-#include <stan/lang/ast/node/locscale.hpp>
+#include <stan/lang/ast/node/offset_multiplier.hpp>
 #include <boost/variant/recursive_variant.hpp>
 #include <string>
 #include <vector>
@@ -244,15 +244,15 @@ struct block_var_type {
   bool has_def_bounds() const;
 
   /**
-   * Returns location and scale for this type.
+   * Returns offset and multiplier for this type.
    */
-  locscale ls() const;
+  offset_multiplier ls() const;
 
   /**
-   * Returns true if there are specified location and/or scale
+   * Returns true if there are specified offset and/or multiplier
    * for this type (contained type for arrays), false otherwise.
    */
-  bool has_def_locscale() const;
+  bool has_def_offset_multiplier() const;
 
   /**
    * Returns true if `var_type_` is `block_array_type`, false otherwise.

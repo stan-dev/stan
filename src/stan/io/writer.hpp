@@ -166,17 +166,17 @@ namespace stan {
 
       /**
        * Write the unconstrained value corresponding to the specified
-       * value with the specified location and scale.  The unconstraining
-       * transform is given by <code>(y-loc)/scale</code>, which
+       * value with the specified offset and multiplier.  The unconstraining
+       * transform is given by <code>(y-offset)/multiplier</code>, which
        * inverts the constraining transform defined in
-       * <code>scalar_locscale_constrain(double,double)</code>.
+       * <code>scalar_offset_multiplier_constrain(double,double)</code>.
        *
-       * @param loc Location.
-       * @param scale Scale.
+       * @param offset offset.
+       * @param multiplier multiplier.
        * @param y Bounded value.
        */
-      void scalar_locscale_unconstrain(double loc, double scale, T& y) {
-        data_r_.push_back(stan::math::locscale_free(y, loc, scale));
+      void scalar_offset_multiplier_unconstrain(double offset, double multiplier, T& y) {
+        data_r_.push_back(stan::math::offset_multiplier_free(y, offset, multiplier));
       }
 
       /**
@@ -349,22 +349,22 @@ namespace stan {
             scalar_lub_unconstrain(lb, ub, y(i, j));
       }
 
-      void vector_locscale_unconstrain(double loc, double scale, vector_t& y) {
+      void vector_offset_multiplier_unconstrain(double offset, double multiplier, vector_t& y) {
         typedef typename stan::math::index_type<vector_t>::type idx_t;
         for (idx_t i = 0; i < y.size(); ++i)
-          scalar_locscale_unconstrain(loc, scale, y(i));
+          scalar_offset_multiplier_unconstrain(offset, multiplier, y(i));
       }
-      void row_vector_locscale_unconstrain(double loc, double scale,
+      void row_vector_offset_multiplier_unconstrain(double offset, double multiplier,
                                            row_vector_t& y) {
         typedef typename stan::math::index_type<row_vector_t>::type idx_t;
         for (idx_t i = 0; i < y.size(); ++i)
-          scalar_locscale_unconstrain(loc, scale, y(i));
+          scalar_offset_multiplier_unconstrain(offset, multiplier, y(i));
       }
-      void matrix_locscale_unconstrain(double loc, double scale, matrix_t& y) {
+      void matrix_offset_multiplier_unconstrain(double offset, double multiplier, matrix_t& y) {
         typedef typename stan::math::index_type<matrix_t>::type idx_t;
         for (idx_t j = 0; j < y.cols(); ++j)
           for (idx_t i = 0; i < y.rows(); ++i)
-            scalar_locscale_unconstrain(loc, scale, y(i, j));
+            scalar_offset_multiplier_unconstrain(offset, multiplier, y(i, j));
       }
 
 
