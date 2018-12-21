@@ -62,6 +62,6 @@ struct double_block_type {
   offset_multiplier ls() const;
 };
 
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

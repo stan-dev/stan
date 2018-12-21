@@ -81,6 +81,6 @@ offset_multiplier block_type_offset_multiplier_vis::
 operator()(const vector_block_type &x) const {
   return x.ls_;
 }
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

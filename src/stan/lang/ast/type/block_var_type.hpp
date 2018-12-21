@@ -69,22 +69,14 @@ struct block_var_type {
    *
    * @param type block variable type
    */
-  block_var_type(const block_var_type &type); // NOLINT(runtime/explicit)
+  block_var_type(const block_var_type &type);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a block var type with the specified type.
    *
    * @param x block variable type
    */
-  block_var_type(const ill_formed_type &x); // NOLINT(runtime/explicit)
-
-  /**
-   * Construct a block var type with the specified type.
-   *
-   * @param x block variable type
-   */
-  block_var_type(
-      const cholesky_factor_corr_block_type &x); // NOLINT(runtime/explicit)
+  block_var_type(const ill_formed_type &x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a block var type with the specified type.
@@ -92,49 +84,7 @@ struct block_var_type {
    * @param x block variable type
    */
   block_var_type(
-      const cholesky_factor_cov_block_type &x); // NOLINT(runtime/explicit)
-
-  /**
-   * Construct a block var type with the specified type.
-   *
-   * @param x block variable type
-   */
-  block_var_type(const corr_matrix_block_type &x); // NOLINT(runtime/explicit)
-
-  /**
-   * Construct a block var type with the specified type.
-   *
-   * @param x block variable type
-   */
-  block_var_type(const cov_matrix_block_type &x); // NOLINT(runtime/explicit)
-
-  /**
-   * Construct a block var type with the specified type.
-   *
-   * @param x block variable type
-   */
-  block_var_type(const double_block_type &x); // NOLINT(runtime/explicit)
-
-  /**
-   * Construct a block var type with the specified type.
-   *
-   * @param x block variable type
-   */
-  block_var_type(const int_block_type &x); // NOLINT(runtime/explicit)
-
-  /**
-   * Construct a block var type with the specified type.
-   *
-   * @param x block variable type
-   */
-  block_var_type(const matrix_block_type &x); // NOLINT(runtime/explicit)
-
-  /**
-   * Construct a block var type with the specified type.
-   *
-   * @param x block variable type
-   */
-  block_var_type(const ordered_block_type &x); // NOLINT(runtime/explicit)
+      const cholesky_factor_corr_block_type &x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a block var type with the specified type.
@@ -142,49 +92,99 @@ struct block_var_type {
    * @param x block variable type
    */
   block_var_type(
-      const positive_ordered_block_type &x); // NOLINT(runtime/explicit)
+      const cholesky_factor_cov_block_type &x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a block var type with the specified type.
    *
    * @param x block variable type
    */
-  block_var_type(const row_vector_block_type &x); // NOLINT(runtime/explicit)
+  block_var_type(const corr_matrix_block_type &x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a block var type with the specified type.
    *
    * @param x block variable type
    */
-  block_var_type(const simplex_block_type &x); // NOLINT(runtime/explicit)
+  block_var_type(const cov_matrix_block_type &x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a block var type with the specified type.
    *
    * @param x block variable type
    */
-  block_var_type(const unit_vector_block_type &x); // NOLINT(runtime/explicit)
+  block_var_type(const double_block_type &x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a block var type with the specified type.
    *
    * @param x block variable type
    */
-  block_var_type(const vector_block_type &x); // NOLINT(runtime/explicit)
+  block_var_type(const int_block_type &x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a block var type with the specified type.
    *
    * @param x block variable type
    */
-  block_var_type(const block_array_type &x); // NOLINT(runtime/explicit)
+  block_var_type(const matrix_block_type &x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a block var type with the specified type.
    *
    * @param x block variable type
    */
-  block_var_type(const block_t &x); // NOLINT(runtime/explicit)
+  block_var_type(const ordered_block_type &x);  // NOLINT(runtime/explicit)
+
+  /**
+   * Construct a block var type with the specified type.
+   *
+   * @param x block variable type
+   */
+  block_var_type(
+      const positive_ordered_block_type &x);  // NOLINT(runtime/explicit)
+
+  /**
+   * Construct a block var type with the specified type.
+   *
+   * @param x block variable type
+   */
+  block_var_type(const row_vector_block_type &x);  // NOLINT(runtime/explicit)
+
+  /**
+   * Construct a block var type with the specified type.
+   *
+   * @param x block variable type
+   */
+  block_var_type(const simplex_block_type &x);  // NOLINT(runtime/explicit)
+
+  /**
+   * Construct a block var type with the specified type.
+   *
+   * @param x block variable type
+   */
+  block_var_type(const unit_vector_block_type &x);  // NOLINT(runtime/explicit)
+
+  /**
+   * Construct a block var type with the specified type.
+   *
+   * @param x block variable type
+   */
+  block_var_type(const vector_block_type &x);  // NOLINT(runtime/explicit)
+
+  /**
+   * Construct a block var type with the specified type.
+   *
+   * @param x block variable type
+   */
+  block_var_type(const block_array_type &x);  // NOLINT(runtime/explicit)
+
+  /**
+   * Construct a block var type with the specified type.
+   *
+   * @param x block variable type
+   */
+  block_var_type(const block_t &x);  // NOLINT(runtime/explicit)
 
   /**
    * Returns expression for length of vector types or
@@ -306,6 +306,6 @@ struct block_var_type {
  */
 std::ostream &operator<<(std::ostream &o, const block_var_type &x);
 
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

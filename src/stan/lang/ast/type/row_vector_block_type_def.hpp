@@ -31,6 +31,6 @@ range row_vector_block_type::bounds() const { return bounds_; }
 offset_multiplier row_vector_block_type::ls() const { return ls_; }
 
 expression row_vector_block_type::N() const { return N_; }
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

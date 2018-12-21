@@ -302,7 +302,7 @@ block_var_decls_grammar<Iterator>::block_var_decls_grammar(
   identifier_name_r.name("identifier subrule");
   identifier_name_r %= lexeme[char_("a-zA-Z") >> *char_("a-zA-Z0-9_.")];
 }
-} // namespace lang
+}  // namespace lang
 
-} // namespace stan
+}  // namespace stan
 #endif

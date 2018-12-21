@@ -29,6 +29,6 @@ range vector_block_type::bounds() const { return bounds_; }
 offset_multiplier vector_block_type::ls() const { return ls_; }
 
 expression vector_block_type::N() const { return N_; }
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

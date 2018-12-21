@@ -52,6 +52,6 @@ struct offset_multiplier {
   bool has_multiplier() const;
 };
 
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

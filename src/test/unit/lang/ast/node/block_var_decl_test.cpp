@@ -324,7 +324,7 @@ TEST(corrMatrixBlockVarDecl, createVar1) {
   EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
   EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
-  // // check corr_matrix_block_var_type
+  //  // check corr_matrix_block_var_type
   // stan::lang::corr_matrix_block_type cmbt2
   //   = boost::get<stan::lang::corr_matrix_block_type>(bvar.type().var_type_);
   // stan::lang::expression k_size = cmbt2.K();
@@ -355,7 +355,7 @@ TEST(covMatrixBlockVarDecl, createVar1) {
   EXPECT_EQ(bvar_array_lens.size(), bvar.type().array_dims());
   EXPECT_TRUE(bvar.type().arg1().bare_type().is_int_type());
 
-  // // check cov_matrix_block_var_type
+  //  // check cov_matrix_block_var_type
   // stan::lang::cov_matrix_block_type cmbt2
   //   = boost::get<stan::lang::cov_matrix_block_type>(bvar.type().var_type_);
   // stan::lang::expression k_size = cmbt2.K();

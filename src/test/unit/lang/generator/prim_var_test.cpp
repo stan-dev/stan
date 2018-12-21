@@ -441,7 +441,7 @@ TEST(lang, params_block_var_hpp_param_names) {
       "            param_name_stream__ << \"ar_p2\" << '.' << k_0__ + 1;\n"
       "            param_names__.push_back(param_name_stream__.str());\n"
       "        }\n");
-  EXPECT_EQ(2, count_matches(expected, hpp)); // matches 2 methods:
+  EXPECT_EQ(2, count_matches(expected, hpp));  // matches 2 methods:
                                               // constrained_param_names,
                                               // unconstrained_param_names
 }

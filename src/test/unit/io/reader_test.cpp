@@ -7,7 +7,7 @@ TEST(ioReader, zeroSizeVecs) {
   theta.push_back(1.0);
   stan::io::reader<double> reader(theta, theta_i);
 
-  EXPECT_FLOAT_EQ(1.0, reader.scalar()); // finish available
+  EXPECT_FLOAT_EQ(1.0, reader.scalar());  // finish available
 
   // these all fail in 2.6.3
   EXPECT_EQ(0, reader.std_vector(0).size());
@@ -230,8 +230,8 @@ TEST(io_reader, scalar_lub_exception) {
   EXPECT_NO_THROW(reader.scalar_lub(-2.0, 2.0));
   EXPECT_THROW(reader.scalar_lub(-1.0, 1.0), std::domain_error);
 }
-const double inv_logit_m2 = 0.1192029; // stan::math::inv_logit(-2.0)
-const double inv_logit_m1 = 0.2689414; // stan::math::inv_logit(-1.0)
+const double inv_logit_m2 = 0.1192029;  // stan::math::inv_logit(-2.0)
+const double inv_logit_m1 = 0.2689414;  // stan::math::inv_logit(-1.0)
 const double inv_logit_0 = 0.5;        // stan::math::inv_logit(0)
 const double inv_logit_3 = 0.9525741;  // stan::math::inv_logit(3.0)
 
@@ -627,7 +627,7 @@ TEST(io_reader, ordered) {
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta, theta_i);
-  EXPECT_FLOAT_EQ(0.0, reader.scalar()); // throw away theta[0]
+  EXPECT_FLOAT_EQ(0.0, reader.scalar());  // throw away theta[0]
   Eigen::Matrix<double, Eigen::Dynamic, 1> y = reader.ordered(5);
   EXPECT_EQ(5, y.size());
   EXPECT_FLOAT_EQ(1.0, y[0]);
@@ -641,7 +641,7 @@ TEST(io_reader, ordered_exception) {
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta, theta_i);
-  EXPECT_FLOAT_EQ(0.0, reader.scalar()); // throw away theta[0]
+  EXPECT_FLOAT_EQ(0.0, reader.scalar());  // throw away theta[0]
   Eigen::Matrix<double, Eigen::Dynamic, 1> y = reader.ordered(5);
   EXPECT_EQ(5, y.size());
   EXPECT_FLOAT_EQ(1.0, y[0]);
@@ -695,7 +695,7 @@ TEST(io_reader, positive_ordered) {
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::reader<double> reader(theta, theta_i);
-  EXPECT_FLOAT_EQ(0.0, reader.scalar()); // throw away theta[0]
+  EXPECT_FLOAT_EQ(0.0, reader.scalar());  // throw away theta[0]
   Eigen::Matrix<double, Eigen::Dynamic, 1> y = reader.positive_ordered(5);
   EXPECT_EQ(5, y.size());
   EXPECT_FLOAT_EQ(1.0, y[0]);
@@ -759,7 +759,7 @@ TEST(io_reader, corr_matrix) {
   theta[5] = 0.2248293054822660;
   theta[6] = 0.8620926037637362;
   theta[7] = 0.2248293054822660;
-  theta[8] = 1.0000000000000001; // allow some tolerance
+  theta[8] = 1.0000000000000001;  // allow some tolerance
   stan::io::reader<double> reader(theta, theta_i);
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> S =
       reader.corr_matrix(3);
@@ -896,7 +896,7 @@ TEST(io_reader, cov_matrix_constrain) {
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>
       solver(S, Eigen::EigenvaluesOnly);
   assert(solver.eigenvalues()[0] >
-         1E-10); // check positive definite with smallest eigenvalue > 0
+         1E-10);  // check positive definite with smallest eigenvalue > 0
 }
 TEST(io_reader, cov_matrix_constrain_jacobian) {
   std::vector<int> theta_i;
@@ -925,7 +925,7 @@ TEST(io_reader, cov_matrix_constrain_jacobian) {
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>
       solver(S, Eigen::EigenvaluesOnly);
   assert(solver.eigenvalues()[0] >
-         1E-10); // check positive definite with smallest eigenvalue > 0
+         1E-10);  // check positive definite with smallest eigenvalue > 0
   // FIXME: test Jacobian
 }
 

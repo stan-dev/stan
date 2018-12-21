@@ -1460,8 +1460,8 @@ public:
   }
 };
 
-} // namespace io
+}  // namespace io
 
-} // namespace stan
+}  // namespace stan
 
 #endif

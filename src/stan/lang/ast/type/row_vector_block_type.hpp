@@ -78,6 +78,6 @@ struct row_vector_block_type {
    */
   expression N() const;
 };
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

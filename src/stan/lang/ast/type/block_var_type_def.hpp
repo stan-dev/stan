@@ -171,6 +171,6 @@ std::ostream &operator<<(std::ostream &o, const block_var_type &var_type) {
   write_block_var_type(o, var_type);
   return o;
 }
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

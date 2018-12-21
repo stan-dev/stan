@@ -496,8 +496,8 @@ public:
       data_r_.push_back(cpcs[i]);
   }
 };
-} // namespace io
+}  // namespace io
 
-} // namespace stan
+}  // namespace stan
 
 #endif

@@ -24,6 +24,6 @@ double_block_type::double_block_type()
 range double_block_type::bounds() const { return bounds_; }
 
 offset_multiplier double_block_type::ls() const { return ls_; }
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

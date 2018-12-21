@@ -24,7 +24,7 @@ struct block_var_decls_grammar
   variable_map &var_map_;
   std::stringstream &error_msgs_;
   expression_grammar<Iterator> expression_g;
-  expression07_grammar<Iterator> expression07_g; // disallows comparisons
+  expression07_grammar<Iterator> expression07_g;  // disallows comparisons
 
   boost::spirit::qi::rule<Iterator, std::vector<block_var_decl>(scope),
                           whitespace_grammar<Iterator>>
@@ -158,6 +158,6 @@ struct block_var_decls_grammar
       dims_r;
 };
 
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -967,6 +967,6 @@ struct deprecate_pound_comment : public phoenix_functor_unary {
 extern boost::phoenix::function<deprecate_pound_comment>
     deprecate_pound_comment_f;
 
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -213,9 +213,9 @@ bool has_same_shape(const bare_expr_type &lhs_type, const expression &rhs_expr,
   return true;
 }
 
-// //////////////////////////////////
+//  //////////////////////////////////
 // *** functors for grammar rules ***
-// //////////////////////////////////
+//  //////////////////////////////////
 
 void validate_double_expr::operator()(const expression &expr, bool &pass,
                                       std::stringstream &error_msgs) const {
@@ -461,7 +461,7 @@ bool fun_exists(
        it != existing.end(); ++it) {
     if (name_sig.first == (*it).first &&
         (name_only || name_sig.second.second == (*it).second.second))
-      return true; // name and arg sequences match
+      return true;  // name and arg sequences match
   }
   return false;
 }
@@ -470,7 +470,7 @@ void validate_prob_fun::operator()(std::string &fname, bool &pass,
                                    std::ostream &error_msgs) const {
   if (has_prob_fun_suffix(fname)) {
     std::string dist_name = strip_prob_fun_suffix(fname);
-    if (!fun_name_exists(fname) // catch redefines later avoid fwd
+    if (!fun_name_exists(fname)  // catch redefines later avoid fwd
         && (fun_name_exists(dist_name + "_lpdf") ||
             fun_name_exists(dist_name + "_lpmf") ||
             fun_name_exists(dist_name + "_log"))) {
@@ -715,7 +715,7 @@ boost::phoenix::function<validate_ints_expression> validate_ints_expression_f;
 
 void add_params_var::operator()(variable_map &vm) const {
   vm.add("params_r__", var_decl("params_r__", vector_type()),
-         parameter_origin); // acts like a parameter
+         parameter_origin);  // acts like a parameter
 }
 boost::phoenix::function<add_params_var> add_params_var_f;
 
@@ -1542,7 +1542,7 @@ void validate_algebra_solver_non_control_args(const T &alg_fun,
   std::vector<bare_expr_type> sys_arg_types;
   sys_arg_types.push_back(t_vector);    // y
   sys_arg_types.push_back(t_vector);    // theta
-  sys_arg_types.push_back(t_ar_double); // x_r
+  sys_arg_types.push_back(t_ar_double);  // x_r
   sys_arg_types.push_back(t_ar_int);    // x_i
   function_signature_t system_signature(sys_result_type, sys_arg_types);
 
@@ -1753,7 +1753,7 @@ void set_fun_type_named::operator()(expression &fun_result, fun &fun,
                << "  It will be removed in a future release." << std::endl
                << "  Use target() instead." << std::endl;
   if (fun.name_ == "target")
-    fun.name_ = "get_lp"; // for code gen and context validation
+    fun.name_ = "get_lp";  // for code gen and context validation
 
   std::vector<bare_expr_type> arg_types;
   for (size_t i = 0; i < fun.args_.size(); ++i)
@@ -2068,7 +2068,7 @@ void left_division_expr::operator()(expression &expr1, bool &pass,
     pass = true;
     return;
   }
-  fun f("mdivide_left", args); // set for alt args err msg
+  fun f("mdivide_left", args);  // set for alt args err msg
   set_fun_type(f, error_msgs);
   expr1 = expression(f);
   pass = false;
@@ -2893,11 +2893,11 @@ boost::phoenix::function<trace_pass> trace_pass_f;
 
 void deprecate_pound_comment::operator()(std::ostream &error_msgs) const {
   error_msgs << "Info: Comments beginning with #"
-             << " are deprecated.  Please use // in place of #"
+             << " are deprecated.  Please use  // in place of #"
              << " for line comments." << std::endl;
 }
 boost::phoenix::function<deprecate_pound_comment> deprecate_pound_comment_f;
 
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

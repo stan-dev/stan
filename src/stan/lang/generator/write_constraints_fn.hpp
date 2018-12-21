@@ -81,6 +81,6 @@ std::string write_constraints_fn(const block_var_type &btype,
   return ss.str();
 }
 
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

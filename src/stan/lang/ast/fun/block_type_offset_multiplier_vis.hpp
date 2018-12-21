@@ -152,6 +152,6 @@ struct block_type_offset_multiplier_vis
    */
   offset_multiplier operator()(const vector_block_type &x) const;
 };
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

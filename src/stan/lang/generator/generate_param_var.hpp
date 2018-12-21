@@ -79,6 +79,6 @@ void generate_param_var(const block_var_decl &var_decl, bool gen_decl_stmt,
   write_end_loop(dims.size(), indent, o);
 }
 
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

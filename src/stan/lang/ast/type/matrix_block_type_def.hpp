@@ -33,6 +33,6 @@ offset_multiplier matrix_block_type::ls() const { return ls_; }
 expression matrix_block_type::M() const { return M_; }
 
 expression matrix_block_type::N() const { return N_; }
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif

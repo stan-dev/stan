@@ -39,7 +39,7 @@ std::ostream &write_block_var_type(std::ostream &o, block_var_type type) {
   }
   return o;
 }
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 
 #endif

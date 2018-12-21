@@ -18,6 +18,6 @@ bool offset_multiplier::has_multiplier() const {
   return !is_nil(multiplier_.expr_);
 }
 
-} // namespace lang
-} // namespace stan
+}  // namespace lang
+}  // namespace stan
 #endif
