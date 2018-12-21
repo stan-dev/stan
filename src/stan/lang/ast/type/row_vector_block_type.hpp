@@ -2,12 +2,13 @@
 #define STAN_LANG_AST_ROW_VECTOR_BLOCK_TYPE_HPP
 
 #include <stan/lang/ast/node/expression.hpp>
-#include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/node/offset_multiplier.hpp>
+#include <stan/lang/ast/node/range.hpp>
 
 namespace stan {
 namespace lang {
-  // TODO(VMatthijs): We should only allow to have either a range or a offset_multiplier.
+// TODO(VMatthijs): We should only allow to have either a range or a
+// offset_multiplier.
 
 /**
  * Row vector block var type.
@@ -41,8 +42,8 @@ struct row_vector_block_type {
    * @param ls variable offset and multiplier
    * @param N num columns for row vector
    */
-  row_vector_block_type(const range& bounds, const offset_multiplier& ls,
-                        const expression& N);
+  row_vector_block_type(const range &bounds, const offset_multiplier &ls,
+                        const expression &N);
 
   /**
    * Construct a block var type with specified values.
@@ -51,7 +52,7 @@ struct row_vector_block_type {
    * @param bounds variable upper and/or lower bounds
    * @param N num columns for row vector
    */
-  row_vector_block_type(const range& bounds, const expression& N);
+  row_vector_block_type(const range &bounds, const expression &N);
 
   /**
    * Construct a block var type with specified values.
@@ -60,7 +61,7 @@ struct row_vector_block_type {
    * @param ls variable offset and multiplier
    * @param N num columns for row vector
    */
-  row_vector_block_type(const offset_multiplier& ls, const expression& N);
+  row_vector_block_type(const offset_multiplier &ls, const expression &N);
 
   /**
    * Get bounds.
@@ -77,6 +78,6 @@ struct row_vector_block_type {
    */
   expression N() const;
 };
-}  // namespace lang
-}  // namespace stan
+} // namespace lang
+} // namespace stan
 #endif

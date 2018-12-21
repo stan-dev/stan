@@ -1,8 +1,8 @@
 #ifndef STAN_LANG_AST_DOUBLE_BLOCK_TYPE_HPP
 #define STAN_LANG_AST_DOUBLE_BLOCK_TYPE_HPP
 
-#include <stan/lang/ast/node/range.hpp>
 #include <stan/lang/ast/node/offset_multiplier.hpp>
+#include <stan/lang/ast/node/range.hpp>
 
 namespace stan {
 namespace lang {
@@ -11,7 +11,8 @@ namespace lang {
  * Double block var type.
  */
 struct double_block_type {
-  // TODO(VMatthijs): We should only allow to have either a range or a offset_multiplier.
+  // TODO(VMatthijs): We should only allow to have either a range or a
+  // offset_multiplier.
 
   /**
    * Bounds constraints
@@ -34,21 +35,21 @@ struct double_block_type {
    * @param bounds variable upper and/or lower bounds
    * @param ls variable offset and multiplier
    */
-  explicit double_block_type(const range& bounds, const offset_multiplier& ls);
+  explicit double_block_type(const range &bounds, const offset_multiplier &ls);
 
   /**
    * Construct a block var type with specified values.
    *
    * @param bounds variable upper and/or lower bounds
    */
-  explicit double_block_type(const range& bounds);
+  explicit double_block_type(const range &bounds);
 
   /**
    * Construct a block var type with specified values.
    *
    * @param ls variable offset and multiplier
    */
-  explicit double_block_type(const offset_multiplier& ls);
+  explicit double_block_type(const offset_multiplier &ls);
 
   /**
    * Get bounds constraints.
@@ -61,6 +62,6 @@ struct double_block_type {
   offset_multiplier ls() const;
 };
 
-}  // namespace lang
-}  // namespace stan
+} // namespace lang
+} // namespace stan
 #endif

@@ -15,45 +15,45 @@ namespace lang {
 
 block_var_type::block_var_type() : var_type_(ill_formed_type()) {}
 
-block_var_type::block_var_type(const block_var_type& x)
+block_var_type::block_var_type(const block_var_type &x)
     : var_type_(x.var_type_) {}
 
-block_var_type::block_var_type(const block_t& x) : var_type_(x) {}
+block_var_type::block_var_type(const block_t &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const ill_formed_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const ill_formed_type &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const cholesky_factor_corr_block_type& x)
+block_var_type::block_var_type(const cholesky_factor_corr_block_type &x)
     : var_type_(x) {}
 
-block_var_type::block_var_type(const cholesky_factor_cov_block_type& x)
+block_var_type::block_var_type(const cholesky_factor_cov_block_type &x)
     : var_type_(x) {}
 
-block_var_type::block_var_type(const corr_matrix_block_type& x)
+block_var_type::block_var_type(const corr_matrix_block_type &x)
     : var_type_(x) {}
 
-block_var_type::block_var_type(const cov_matrix_block_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const cov_matrix_block_type &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const double_block_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const double_block_type &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const int_block_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const int_block_type &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const matrix_block_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const matrix_block_type &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const ordered_block_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const ordered_block_type &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const positive_ordered_block_type& x)
+block_var_type::block_var_type(const positive_ordered_block_type &x)
     : var_type_(x) {}
 
-block_var_type::block_var_type(const row_vector_block_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const row_vector_block_type &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const simplex_block_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const simplex_block_type &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const unit_vector_block_type& x)
+block_var_type::block_var_type(const unit_vector_block_type &x)
     : var_type_(x) {}
 
-block_var_type::block_var_type(const vector_block_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const vector_block_type &x) : var_type_(x) {}
 
-block_var_type::block_var_type(const block_array_type& x) : var_type_(x) {}
+block_var_type::block_var_type(const block_array_type &x) : var_type_(x) {}
 
 expression block_var_type::arg1() const {
   var_type_arg1_vis vis;
@@ -160,19 +160,17 @@ std::string block_var_type::name() const {
   return boost::apply_visitor(vis, var_type_);
 }
 
-int block_var_type::num_dims() const {
-  return this->bare_type().num_dims();
-}
+int block_var_type::num_dims() const { return this->bare_type().num_dims(); }
 
 expression block_var_type::params_total() const {
   block_type_params_total_vis vis;
   return boost::apply_visitor(vis, var_type_);
 }
 
-std::ostream& operator<<(std::ostream& o, const block_var_type& var_type) {
+std::ostream &operator<<(std::ostream &o, const block_var_type &var_type) {
   write_block_var_type(o, var_type);
   return o;
 }
-}  // namespace lang
-}  // namespace stan
+} // namespace lang
+} // namespace stan
 #endif

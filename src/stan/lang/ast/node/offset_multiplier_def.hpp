@@ -4,21 +4,20 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    offset_multiplier::offset_multiplier() { }
+offset_multiplier::offset_multiplier() {}
 
-    offset_multiplier::offset_multiplier(const expression& offset, const expression& multiplier)
-      : offset_(offset), multiplier_(multiplier) {  }
+offset_multiplier::offset_multiplier(const expression &offset,
+                                     const expression &multiplier)
+    : offset_(offset), multiplier_(multiplier) {}
 
-    bool offset_multiplier::has_offset() const {
-      return !is_nil(offset_.expr_);
-    }
+bool offset_multiplier::has_offset() const { return !is_nil(offset_.expr_); }
 
-    bool offset_multiplier::has_multiplier() const {
-      return !is_nil(multiplier_.expr_);
-    }
-
-  }
+bool offset_multiplier::has_multiplier() const {
+  return !is_nil(multiplier_.expr_);
 }
+
+} // namespace lang
+} // namespace stan
 #endif
