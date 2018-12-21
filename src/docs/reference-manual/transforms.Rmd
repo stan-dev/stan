@@ -283,11 +283,11 @@ so there is only one call to $\exp(-y)$.
 ## Affinely Transformed Scalar
 
 Stan uses an affine transform to be able to specify parameters with a given
-location and scale.
+offset and multiplier.
 
 ### Affine Transform {-}
 
-For variables with expected location $\mu$ and/or (positive) scale $\sigma$,
+For variables with expected offset $\mu$ and/or (positive) multiplier $\sigma$,
 Stan uses an affine transform.  Such a variable $X$ is transformed to a new
 variable $Y$, where
 
@@ -295,7 +295,7 @@ $$
 Y = \mu + \sigma * X.
 $$
 
-The default value for the location $\mu$ is $0$ and for the scale $\sigma$ is
+The default value for the offset $\mu$ is $0$ and for the multiplier $\sigma$ is
 $1$ in case not both are specified.
 
 
