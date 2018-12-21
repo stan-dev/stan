@@ -7,8 +7,6 @@
 
 namespace stan {
 namespace lang {
-// TODO(VMatthijs): We should only allow to have either a range or a
-// offset_multiplier.
 
 /**
  * Matrix block var type.
