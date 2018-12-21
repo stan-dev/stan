@@ -14,39 +14,39 @@
 #include <vector>
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::block_var_decl,
-                          (stan::lang::block_var_type,
-                           type_)(std::string, name_)(stan::lang::expression,
-                                                      def_))
+                          (stan::lang::block_var_type, type_)
+                          (std::string, name_)
+                          (stan::lang::expression, def_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_block_type,
-                          (stan::lang::range,
-                           bounds_)(stan::lang::offset_multiplier, ls_))
+                          (stan::lang::range, bounds_)
+                          (stan::lang::offset_multiplier, ls_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_block_type,
                           (stan::lang::range, bounds_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::matrix_block_type,
-                          (stan::lang::range,
-                           bounds_)(stan::lang::offset_multiplier,
-                                    ls_)(stan::lang::expression,
-                                         M_)(stan::lang::expression, N_))
+                          (stan::lang::range, bounds_)
+                          (stan::lang::offset_multiplier, ls_)
+                          (stan::lang::expression, M_)
+                          (stan::lang::expression, N_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_block_type,
-                          (stan::lang::range,
-                           bounds_)(stan::lang::offset_multiplier,
-                                    ls_)(stan::lang::expression, N_))
+                          (stan::lang::range, bounds_)
+                          (stan::lang::offset_multiplier, ls_)
+                          (stan::lang::expression, N_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::vector_block_type,
-                          (stan::lang::range,
-                           bounds_)(stan::lang::offset_multiplier,
-                                    ls_)(stan::lang::expression, N_))
+                          (stan::lang::range, bounds_)
+                          (stan::lang::offset_multiplier, ls_)
+                          (stan::lang::expression, N_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_factor_corr_block_type,
                           (stan::lang::expression, K_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::cholesky_factor_cov_block_type,
-                          (stan::lang::expression, M_)(stan::lang::expression,
-                                                       N_))
+                          (stan::lang::expression, M_)
+                          (stan::lang::expression, N_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::corr_matrix_block_type,
                           (stan::lang::expression, K_))
@@ -67,8 +67,8 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::unit_vector_block_type,
                           (stan::lang::expression, K_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::offset_multiplier,
-                          (stan::lang::expression,
-                           offset_)(stan::lang::expression, multiplier_))
+                          (stan::lang::expression, offset_)
+                          (stan::lang::expression, multiplier_))
 
 namespace stan {
 
