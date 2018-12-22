@@ -1,0 +1,66 @@
+# Bounded Continuous Probabilities
+
+The bounded continuous probabilities have support on a finite interval
+of real numbers.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="uniform-distribution.html">Uniform Distribution</a>\n')
+}
+```
+
+## Uniform Distribution
+
+### Probability Density Function
+
+If $\alpha \in \mathbb{R}$ and $\beta \in (\alpha,\infty)$, then for
+$y \in [\alpha,\beta]$, \[ \text{Uniform}(y|\alpha,\beta) =
+\frac{1}{\beta - \alpha} . \]
+
+### Sampling Statement
+
+`y ~ ` **`uniform`**`(alpha, beta)`
+
+Increment target log probability density with `uniform_lpdf( y | alpha, beta)`
+dropping constant additive terms.
+\index{{\tt \bfseries uniform}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; uniform_lpdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!{\tt (reals y | reals alpha, reals beta): real}|hyperpage}
+
+`real` **`uniform_lpdf`**`(reals y | reals alpha, reals beta)`<br>\newline
+The log of the uniform density of y given lower bound alpha and upper
+bound beta
+
+<!-- real; uniform_cdf; (reals y, reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!{\tt (reals y, reals alpha, reals beta): real}|hyperpage}
+
+`real` **`uniform_cdf`**`(reals y, reals alpha, reals beta)`<br>\newline
+The uniform cumulative distribution function of y given lower bound
+alpha and upper bound beta
+
+<!-- real; uniform_lcdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!{\tt (reals y | reals alpha, reals beta): real}|hyperpage}
+
+`real` **`uniform_lcdf`**`(reals y | reals alpha, reals beta)`<br>\newline
+The log of the uniform cumulative distribution function of y given
+lower bound alpha and upper bound beta
+
+<!-- real; uniform_lccdf; (reals y | reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!{\tt (reals y | reals alpha, reals beta): real}|hyperpage}
+
+`real` **`uniform_lccdf`**`(reals y | reals alpha, reals beta)`<br>\newline
+The log of the uniform complementary cumulative distribution function
+of y given lower bound alpha and upper bound beta
+
+<!-- R; uniform_rng; (reals alpha, reals beta); -->
+\index{{\tt \bfseries uniform}!{\tt (reals alpha, reals beta): R}|hyperpage}
+
+`R` **`uniform_rng`**`(reals alpha, reals beta)`<br>\newline
+Generate a uniform variate with lower bound alpha and upper bound
+beta; may only be used in generated quantities block. For a
+description of argument and return types, see section
+\@ref(prng-vectorization).
+

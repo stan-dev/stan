@@ -1,0 +1,448 @@
+# Distributions over Unbounded Vectors
+
+The unbounded vector probability distributions have support on all of
+$\mathbb{R}^K$ for some fixed $K$.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="multivariate-normal-distribution.html">Multivariate Normal Distribution</a>\n')
+cat(' * <a href="multivariate-normal-distribution-precision-parameterization.html">Multivariate Normal Distribution, Precision Parameterization</a>\n')
+cat(' * <a href="multi-normal-cholesky-fun.html">Multivariate Normal Distribution, Cholesky Parameterization</a>\n')
+cat(' * <a href="multivariate-gaussian-process-distribution.html">Multivariate Gaussian Process Distribution</a>\n')
+cat(' * <a href="multivariate-gaussian-process-distribution-cholesky-parameterization.html">Multivariate Gaussian Process Distribution, Cholesky parameterization</a>\n')
+cat(' * <a href="multivariate-student-t-distribution.html">Multivariate Student-T Distribution</a>\n')
+cat(' * <a href="gaussian-dynamic-linear-models.html">Gaussian Dynamic Linear Models</a>\n')
+}
+```
+
+## Multivariate Normal Distribution
+
+### Probability Density Function
+
+If $K \in \mathbb{N}$, $\mu \in \mathbb{R}^K$, and $\Sigma \in
+\mathbb{R}^{K \times   K}$ is symmetric and positive definite, then
+for $y \in \mathbb{R}^K$, \[ \text{MultiNormal}(y|\mu,\Sigma) =
+\frac{1}{\left( 2 \pi \right)^{K/2}} \ \frac{1}{\sqrt{|\Sigma|}} \
+\exp \! \left( \! - \frac{1}{2} (y - \mu)^{\top} \, \Sigma^{-1} \, (y
+- \mu) \right) \! , \] where $|\Sigma|$ is the absolute determinant of
+$\Sigma$.
+
+### Sampling Statement
+
+`y ~ ` **`multi_normal`**`(mu, Sigma)`
+
+Increment target log probability density with `multi_normal_lpdf( y | mu, Sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries multi\_normal}!sampling statement|hyperpage}
+
+### Stan Functions
+
+The multivariate normal probability function is overloaded to allow
+the variate vector $y$ and location vector $\mu$ to be vectors or row
+vectors (or to mix the two types).  The density function is also
+vectorized, so it allows arrays of row vectors or vectors as
+arguments; see section \@ref(prob-vectorization) for a description of
+vectorization.
+
+<!-- real; multi_normal_lpdf; (vectors y | vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_normal}!{\tt (vectors y | vectors mu, matrix Sigma): real}|hyperpage}
+
+`real` **`multi_normal_lpdf`**`(vectors y | vectors mu, matrix Sigma)`<br>\newline
+The log of the multivariate normal density of vector(s) y given
+location vector(s) mu and covariance matrix Sigma
+
+<!-- real; multi_normal_lpdf; (vectors y | row_vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_normal}!{\tt (vectors y | row\_vectors mu, matrix Sigma): real}|hyperpage}
+
+`real` **`multi_normal_lpdf`**`(vectors y | row_vectors mu, matrix Sigma)`<br>\newline
+The log of the multivariate normal density of vector(s) y given
+location row vector(s) mu and covariance matrix Sigma
+
+<!-- real; multi_normal_lpdf; (row_vectors y | vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_normal}!{\tt (row\_vectors y | vectors mu, matrix Sigma): real}|hyperpage}
+
+`real` **`multi_normal_lpdf`**`(row_vectors y | vectors mu, matrix Sigma)`<br>\newline
+The log of the multivariate normal density of row vector(s) y given
+location vector(s) mu and covariance matrix Sigma
+
+<!-- real; multi_normal_lpdf; (row_vectors y | row_vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_normal}!{\tt (row\_vectors y | row\_vectors mu, matrix Sigma): real}|hyperpage}
+
+`real` **`multi_normal_lpdf`**`(row_vectors y | row_vectors mu, matrix Sigma)`<br>\newline
+The log of the multivariate normal density of row vector(s) y given
+location row vector(s) mu and covariance matrix Sigma
+
+Although there is a direct multi-normal RNG function, if more than one
+result is required, it's much more efficient to Cholesky factor the
+covariance matrix and call `multi_normal_cholesky_rng`;  see section
+\@ref(multi-normal-cholesky-fun).
+
+<!-- vector; multi_normal_rng; (vector mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_normal}!{\tt (vector mu, matrix Sigma): vector}|hyperpage}
+
+`vector` **`multi_normal_rng`**`(vector mu, matrix Sigma)`<br>\newline
+Generate a multivariate normal variate with location mu and covariance
+matrix Sigma; may only be used in generated quantities block
+
+<!-- vector; multi_normal_rng; (row_vector mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_normal}!{\tt (row\_vector mu, matrix Sigma): vector}|hyperpage}
+
+`vector` **`multi_normal_rng`**`(row_vector mu, matrix Sigma)`<br>\newline
+Generate a multivariate normal variate with location mu and covariance
+matrix Sigma; may only be used in generated quantities block
+
+<!-- vectors; multi_normal_rng; (vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_normal}!{\tt (vectors mu, matrix Sigma): vectors}|hyperpage}
+
+`vectors` **`multi_normal_rng`**`(vectors mu, matrix Sigma)`<br>\newline
+Generate an array of multivariate normal variates with locations mu
+and covariance matrix Sigma; may only be used in generated quantities
+block
+
+<!-- vectors; multi_normal_rng; (row_vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_normal}!{\tt (row\_vectors mu, matrix Sigma): vectors}|hyperpage}
+
+`vectors` **`multi_normal_rng`**`(row_vectors mu, matrix Sigma)`<br>\newline
+Generate an array of multivariate normal variates with locations mu
+and covariance matrix Sigma; may only be used in generated quantities
+block
+
+## Multivariate Normal Distribution, Precision Parameterization
+
+### Probability Density Function
+
+If $K \in \mathbb{N}$, $\mu \in \mathbb{R}^K$, and $\Omega \in
+\mathbb{R}^{K \times   K}$ is symmetric and positive definite, then
+for $y \in \mathbb{R}^K$, \[ \text{MultiNormalPrecision}(y|\mu,\Omega)
+= \text{MultiNormal}(y|\mu,\Sigma^{-1}) \]
+
+### Sampling Statement
+
+`y ~ ` **`multi_normal_prec`**`(mu, Omega)`
+
+Increment target log probability density with `multi_normal_prec_lpdf( y | mu, Omega)`
+dropping constant additive terms.
+\index{{\tt \bfseries multi\_normal\_prec}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; multi_normal_prec_lpdf; (vectors y | vectors mu, matrix Omega); -->
+\index{{\tt \bfseries multi\_normal\_prec}!{\tt (vectors y | vectors mu, matrix Omega): real}|hyperpage}
+
+`real` **`multi_normal_prec_lpdf`**`(vectors y | vectors mu, matrix Omega)`<br>\newline
+The log of the multivariate normal density of vector(s) y given
+location vector(s) mu and positive definite precision matrix Omega
+
+<!-- real; multi_normal_prec_lpdf; (vectors y | row_vectors mu, matrix Omega); -->
+\index{{\tt \bfseries multi\_normal\_prec}!{\tt (vectors y | row\_vectors mu, matrix Omega): real}|hyperpage}
+
+`real` **`multi_normal_prec_lpdf`**`(vectors y | row_vectors mu, matrix Omega)`<br>\newline
+The log of the multivariate normal density of vector(s) y given
+location row vector(s) mu and positive definite precision matrix Omega
+
+<!-- real; multi_normal_prec_lpdf; (row_vectors y | vectors mu, matrix Omega); -->
+\index{{\tt \bfseries multi\_normal\_prec}!{\tt (row\_vectors y | vectors mu, matrix Omega): real}|hyperpage}
+
+`real` **`multi_normal_prec_lpdf`**`(row_vectors y | vectors mu, matrix Omega)`<br>\newline
+The log of the multivariate normal density of row vector(s) y given
+location vector(s) mu and positive definite precision matrix Omega
+
+<!-- real; multi_normal_prec_lpdf; (row_vectors y | row_vectors mu, matrix Omega); -->
+\index{{\tt \bfseries multi\_normal\_prec}!{\tt (row\_vectors y | row\_vectors mu, matrix Omega): real}|hyperpage}
+
+`real` **`multi_normal_prec_lpdf`**`(row_vectors y | row_vectors mu, matrix Omega)`<br>\newline
+The log of the multivariate normal density of row vector(s) y given
+location row vector(s) mu and positive definite precision matrix Omega
+
+## Multivariate Normal Distribution, Cholesky Parameterization {#multi-normal-cholesky-fun}
+
+### Probability Density Function
+
+If $K \in \mathbb{N}$, $\mu \in \mathbb{R}^K$, and $L \in
+\mathbb{R}^{K \times K}$ is lower triangular and such that $LL^{\top}$
+is positive definite, then for $y \in \mathbb{R}^K$, \[
+\text{MultiNormalCholesky}(y|\mu,L) =
+\text{MultiNormal}(y|\mu,LL^{\top}). \] If $L$ is lower triangular and
+$LL^{top}$ is a $K \times K$ positive definite matrix, then $L_{k,k}$
+must be strictly positive for $k \in 1{:}K$.  If an $L$ is provided
+that is not the Cholesky factor of a positive-definite matrix, the
+probability functions will raise errors.
+
+### Sampling Statement
+
+`y ~ ` **`multi_normal_cholesky`**`(mu, L)`
+
+Increment target log probability density with `multi_normal_cholesky_lpdf( y | mu, L)`
+dropping constant additive terms.
+\index{{\tt \bfseries multi\_normal\_cholesky}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; multi_normal_cholesky_lpdf; (vectors y | vectors mu, matrix L); -->
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (vectors y | vectors mu, matrix L): real}|hyperpage}
+
+`real` **`multi_normal_cholesky_lpdf`**`(vectors y | vectors mu, matrix L)`<br>\newline
+The log of the multivariate normal density of vector(s) y given
+location vector(s) mu and lower-triangular Cholesky factor of the
+covariance matrix L
+
+<!-- real; multi_normal_cholesky_lpdf; (vectors y | row_vectors mu, matrix L); -->
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (vectors y | row\_vectors mu, matrix L): real}|hyperpage}
+
+`real` **`multi_normal_cholesky_lpdf`**`(vectors y | row_vectors mu, matrix L)`<br>\newline
+The log of the multivariate normal density of vector(s) y given
+location row vector(s) mu and lower-triangular Cholesky factor of the
+covariance matrix L
+
+<!-- real; multi_normal_cholesky_lpdf; (row_vectors y | vectors mu, matrix L); -->
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (row\_vectors y | vectors mu, matrix L): real}|hyperpage}
+
+`real` **`multi_normal_cholesky_lpdf`**`(row_vectors y | vectors mu, matrix L)`<br>\newline
+The log of the multivariate normal density of row vector(s) y given
+location vector(s) mu and lower-triangular Cholesky factor of the
+covariance matrix L
+
+<!-- real; multi_normal_cholesky_lpdf; (row_vectors y | row_vectors mu, matrix L); -->
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (row\_vectors y | row\_vectors mu, matrix L): real}|hyperpage}
+
+`real` **`multi_normal_cholesky_lpdf`**`(row_vectors y | row_vectors mu, matrix L)`<br>\newline
+The log of the multivariate normal density of row vector(s) y given
+location row vector(s) mu and lower-triangular Cholesky factor of the
+covariance matrix L
+
+<!-- vector; multi_normal_cholesky_rng; (vector mu, matrix L); -->
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (vector mu, matrix L): vector}|hyperpage}
+
+`vector` **`multi_normal_cholesky_rng`**`(vector mu, matrix L)`<br>\newline
+Generate a multivariate normal variate with location mu and
+lower-triangular Cholesky factor of the covariance matrix L; may only
+be used in generated quantities block
+
+<!-- vector; multi_normal_cholesky_rng; (row_vector mu, matrix L); -->
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (row\_vector mu, matrix L): vector}|hyperpage}
+
+`vector` **`multi_normal_cholesky_rng`**`(row_vector mu, matrix L)`<br>\newline
+Generate a multivariate normal variate with location mu and
+lower-triangular Cholesky factor of the covariance matrix L; may only
+be used in generated quantities block
+
+<!-- vectors; multi_normal_cholesky_rng; (vectors mu, matrix L); -->
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (vectors mu, matrix L): vectors}|hyperpage}
+
+`vectors` **`multi_normal_cholesky_rng`**`(vectors mu, matrix L)`<br>\newline
+Generate an array of multivariate normal variates with locations mu
+and lower-triangular Cholesky factor of the covariance matrix L; may
+only be used in generated quantities block
+
+<!-- vectors; multi_normal_cholesky_rng; (row_vectors mu, matrix L); -->
+\index{{\tt \bfseries multi\_normal\_cholesky}!{\tt (row\_vectors mu, matrix L): vectors}|hyperpage}
+
+`vectors` **`multi_normal_cholesky_rng`**`(row_vectors mu, matrix L)`<br>\newline
+Generate an array of multivariate normal variates with locations mu
+and lower-triangular Cholesky factor of the covariance matrix L; may
+only be used in generated quantities block
+
+## Multivariate Gaussian Process Distribution
+
+### Probability Density Function
+
+If $K,N \in \mathbb{N}$, $\Sigma \in \mathbb{R}^{N \times N}$ is
+symmetric, positive definite kernel matrix and $w \in \mathbb{R}^{K}$
+is a vector of positive inverse scales, then for $y \in \mathbb{R}^{K
+\times N}$, \[ \text{MultiGP}(y|\Sigma,w) = \prod_{i=1}^{K}
+\text{MultiNormal}(y_i|0,w_i^{-1} \Sigma), \] where $y_i$ is the $i$th
+row of $y$.  This is used to efficiently handle Gaussian Processes
+with multi-variate outputs where only the output dimensions share a
+kernel function but vary based on their scale.  Note that this
+function does not take into account the mean prediction.
+
+### Sampling Statement
+
+`y ~ ` **`multi_gp`**`(Sigma, w)`
+
+Increment target log probability density with `multi_gp_lpdf( y | Sigma, w)`
+dropping constant additive terms.
+\index{{\tt \bfseries multi\_gp}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; multi_gp_lpdf; (matrix y | matrix Sigma, vector w); -->
+\index{{\tt \bfseries multi\_gp}!{\tt (matrix y | matrix Sigma, vector w): real}|hyperpage}
+
+`real` **`multi_gp_lpdf`**`(matrix y | matrix Sigma, vector w)`<br>\newline
+The log of the multivariate GP density of matrix y given kernel matrix
+Sigma and inverses scales w
+
+## Multivariate Gaussian Process Distribution, Cholesky parameterization
+
+### Probability Density Function
+
+If $K,N \in \mathbb{N}$, $L \in \mathbb{R}^{N \times N}$ is lower
+triangular and such that $LL^{\top}$ is positive definite kernel
+matrix (implying $L_{n,n} > 0$ for $n \in 1{:}N$), and $w \in
+\mathbb{R}^{K}$ is a vector of positive inverse scales, then for $y
+\in \mathbb{R}^{K \times N}$, \[ \text{MultiGPCholesky}(y \, | \ L,w)
+= \prod_{i=1}^{K} \text{MultiNormal}(y_i|0,w_i^{-1} LL^{\top}), \]
+where $y_i$ is the $i$th row of $y$.  This is used to efficiently
+handle Gaussian Processes with multi-variate outputs where only the
+output dimensions share a kernel function but vary based on their
+scale.  If the model allows parameterization in terms of Cholesky
+factor of the kernel matrix, this distribution is also more efficient
+than $\text{MultiGP}()$. Note that this function does not take into
+account the mean prediction.
+
+### Sampling Statement
+
+`y ~ ` **`multi_gp_cholesky`**`(L, w)`
+
+Increment target log probability density with `multi_gp_cholesky_lpdf( y | L, w)`
+dropping constant additive terms.
+\index{{\tt \bfseries multi\_gp\_cholesky}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; multi_gp_cholesky_lpdf; (matrix y | matrix L, vector w); -->
+\index{{\tt \bfseries multi\_gp\_cholesky}!{\tt (matrix y | matrix L, vector w): real}|hyperpage}
+
+`real` **`multi_gp_cholesky_lpdf`**`(matrix y | matrix L, vector w)`<br>\newline
+The log of the multivariate GP density of matrix y given
+lower-triangular Cholesky factor of the kernel matrix L and inverses
+scales w
+
+## Multivariate Student-T Distribution
+
+### Probability Density Function
+
+If $K \in \mathbb{N}$, $\nu \in \mathbb{R}^+$, $\mu \in \mathbb{R}^K$,
+and $\Sigma \in \mathbb{R}^{K \times K}$ is symmetric and positive
+definite, then for $y \in \mathbb{R}^K$, \[ \begin{array}{l}
+\text{MultiStudentT}(y\,|\,\nu,\,\mu,\,\Sigma) \\  =
+\frac{1}{\pi^{K/2}} \ \frac{1}{\nu^{K/2}} \ \frac{\Gamma\!\left((\nu +
+K)/2\right)}      {\Gamma(\nu/2)} \ \frac{1}{\sqrt{\left| \Sigma
+\right|}} \ \left( 1 + \frac{1}{\nu} \, \left(y - \mu\right)^{\top} \,
+\Sigma^{-1} \, \left(y - \mu\right) \right)^{-(\nu + K)/2} \! .
+\end{array} \]
+
+### Sampling Statement
+
+`y ~ ` **`multi_student_t`**`(nu, mu, Sigma)`
+
+Increment target log probability density with `multi_student_t_lpdf( y | nu, mu, Sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries multi\_student\_t}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; multi_student_t_lpdf; (vectors y | real nu, vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_student\_t}!{\tt (vectors y | real nu, vectors mu, matrix Sigma): real}|hyperpage}
+
+`real` **`multi_student_t_lpdf`**`(vectors y | real nu, vectors mu, matrix Sigma)`<br>\newline
+The log of the multivariate Student-$t$ density of vector(s) y given
+degrees of freedom nu, location vector(s) mu, and scale matrix Sigma
+
+<!-- real; multi_student_t_lpdf; (vectors y | real nu, row_vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_student\_t}!{\tt (vectors y | real nu, row\_vectors mu, matrix Sigma): real}|hyperpage}
+
+`real` **`multi_student_t_lpdf`**`(vectors y | real nu, row_vectors mu, matrix Sigma)`<br>\newline
+The log of the multivariate Student-$t$ density of vector(s) y given
+degrees of freedom nu, location row vector(s) mu, and scale matrix
+Sigma
+
+<!-- real; multi_student_t_lpdf; (row_vectors y | real nu, vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_student\_t}!{\tt (row\_vectors y | real nu, vectors mu, matrix Sigma): real}|hyperpage}
+
+`real` **`multi_student_t_lpdf`**`(row_vectors y | real nu, vectors mu, matrix Sigma)`<br>\newline
+The log of the multivariate Student-$t$ density of row vector(s) y
+given degrees of freedom nu, location vector(s) mu, and scale matrix
+Sigma
+
+<!-- real; multi_student_t_lpdf; (row_vectors y | real nu, row_vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_student\_t}!{\tt (row\_vectors y | real nu, row\_vectors mu, matrix Sigma): real}|hyperpage}
+
+`real` **`multi_student_t_lpdf`**`(row_vectors y | real nu, row_vectors mu, matrix Sigma)`<br>\newline
+The log of the multivariate Student-$t$ density of row vector(s) y
+given degrees of freedom nu, location row vector(s) mu, and scale
+matrix Sigma
+
+<!-- vector; multi_student_t_rng; (real nu, vector mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_student\_t}!{\tt (real nu, vector mu, matrix Sigma): vector}|hyperpage}
+
+`vector` **`multi_student_t_rng`**`(real nu, vector mu, matrix Sigma)`<br>\newline
+Generate a multivariate Student-$t$ variate with degrees of freedom
+nu, location mu, and scale matrix Sigma; may only be used in generated
+quantities block
+
+<!-- vector; multi_student_t_rng; (real nu, row_vector mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_student\_t}!{\tt (real nu, row\_vector mu, matrix Sigma): vector}|hyperpage}
+
+`vector` **`multi_student_t_rng`**`(real nu, row_vector mu, matrix Sigma)`<br>\newline
+Generate a multivariate Student-$t$ variate with degrees of freedom
+nu, location mu, and scale matrix Sigma; may only be used in generated
+quantities block
+
+<!-- vectors; multi_student_t_rng; (real nu, vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_student\_t}!{\tt (real nu, vectors mu, matrix Sigma): vectors}|hyperpage}
+
+`vectors` **`multi_student_t_rng`**`(real nu, vectors mu, matrix Sigma)`<br>\newline
+Generate an array of multivariate Student-$t$ variates with degrees of
+freedom nu, locations mu, and scale matrix Sigma; may only be used in
+generated quantities block
+
+<!-- vectors; multi_student_t_rng; (real nu, row_vectors mu, matrix Sigma); -->
+\index{{\tt \bfseries multi\_student\_t}!{\tt (real nu, row\_vectors mu, matrix Sigma): vectors}|hyperpage}
+
+`vectors` **`multi_student_t_rng`**`(real nu, row_vectors mu, matrix Sigma)`<br>\newline
+Generate an array of multivariate Student-$t$ variates with degrees of
+freedom nu, locations mu, and scale matrix Sigma; may only be used in
+generated quantities block
+
+## Gaussian Dynamic Linear Models
+
+A Gaussian Dynamic Linear model is defined as follows, For $t \in 1,
+\dots, T$, \[   \begin{aligned}[t]     y_{t} &\sim N(F' \theta_{t}, V)
+\\     \theta_{t} &\sim N(G \theta_{t - 1}, W) \\     \theta_{0} &\sim
+N(m_{0}, C_{0})   \end{aligned} \] where $y$ is $n \times T$ matrix
+where rows are variables and columns are observations. These functions
+calculate the log-likelihood of the observations marginalizing over
+the latent states ($p(y | F, G, V, W, m_{0}, C_{0})$). This
+log-likelihood is a system that is calculated using the Kalman Filter.
+If $V$ is diagonal, then a more efficient algorithm which sequentially
+processes observations and avoids a matrix inversions can be used
+[@DurbinKoopman:2001 section 6.4].
+
+### Sampling Statement
+
+`y ~ ` **`gaussian_dlm_obs`**`(F, G, V, W, m0, C0)`
+
+Increment target log probability density with `gaussian_dlm_obs_lpdf( y | F, G, V, W, m0, C0)`
+dropping constant additive terms.
+\index{{\tt \bfseries gaussian\_dlm\_obs}!sampling statement|hyperpage}
+
+### Stan Functions
+
+The following two functions differ in the type of their V, the first
+taking a full observation covariance matrix V\ and the second a vector
+V\ representing the diagonal of the observation covariance matrix.
+The sampling statement defined in the previous section works with
+either type of observation V.
+
+<!-- real; gaussian_dlm_obs_lpdf; (matrix y | matrix F, matrix G, matrix V, matrix W, vector m0, matrix C0); -->
+\index{{\tt \bfseries gaussian\_dlm\_obs}!{\tt (matrix y | matrix F, matrix G, matrix V, matrix W, vector m0, matrix C0): real}|hyperpage}
+
+`real` **`gaussian_dlm_obs_lpdf`**`(matrix y | matrix F, matrix G, matrix V, matrix W, vector m0, matrix C0)`<br>\newline
+The log of the density of the Gaussian Dynamic Linear model with
+observation matrix y in which rows are variables and columns are
+observations, design matrix F, transition matrix G, observation
+covariance matrix V, system covariance matrix W, and the initial state
+is distributed normal with mean m0 and covariance C0.
+
+<!-- real; gaussian_dlm_obs_lpdf; (matrix y | matrix F, matrix G, vector V, matrix W, vector m0, matrix C0); -->
+\index{{\tt \bfseries gaussian\_dlm\_obs}!{\tt (matrix y | matrix F, matrix G, vector V, matrix W, vector m0, matrix C0): real}|hyperpage}
+
+`real` **`gaussian_dlm_obs_lpdf`**`(matrix y | matrix F, matrix G, vector V, matrix W, vector m0, matrix C0)`<br>\newline
+The log of the density of the Gaussian Dynamic Linear model with
+observation matrix y in which rows are variables and columns are
+observations, design matrix F, transition matrix G, observation
+covariance matrix with diagonal V, system covariance matrix W, and the
+initial state is distributed normal with mean m0 and covariance C0.
+

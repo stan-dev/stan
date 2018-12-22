@@ -1,0 +1,1595 @@
+# Matrix Operations {#matrix-operations}
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="integer-valued-matrix-size-functions.html">Integer-Valued Matrix Size Functions</a>\n')
+cat(' * <a href="matrix-arithmetic-operators.html">Matrix Arithmetic Operators</a>\n')
+cat(' * <a href="transposition-operator.html">Transposition Operator</a>\n')
+cat(' * <a href="elementwise-functions.html">Elementwise Functions</a>\n')
+cat(' * <a href="dot-products-and-specialized-products.html">Dot Products and Specialized Products</a>\n')
+cat(' * <a href="reductions.html">Reductions</a>\n')
+cat(' * <a href="matrix-broadcast.html">Broadcast Functions</a>\n')
+cat(' * <a href="diagonal-matrix-functions.html">Diagonal Matrix Functions</a>\n')
+cat(' * <a href="slicing-and-blocking-functions.html">Slicing and Blocking Functions</a>\n')
+cat(' * <a href="matrix-concatenation.html">Matrix Concatenation</a>\n')
+cat(' * <a href="softmax.html">Special Matrix Functions</a>\n')
+cat(' * <a href="covariance.html">Covariance Functions</a>\n')
+cat(' * <a href="linear-algebra-functions-and-solvers.html">Linear Algebra Functions and Solvers</a>\n')
+cat(' * <a href="sort-functions.html">Sort Functions</a>\n')
+}
+```
+
+## Integer-Valued Matrix Size Functions
+
+<!-- int; num_elements; (vector x); -->
+\index{{\tt \bfseries num\_elements}!{\tt (vector x): int}|hyperpage}
+
+`int` **`num_elements`**`(vector x)`<br>\newline
+The total number of elements in the vector x (same as function `rows`)
+
+<!-- int; num_elements; (row_vector x); -->
+\index{{\tt \bfseries num\_elements}!{\tt (row\_vector x): int}|hyperpage}
+
+`int` **`num_elements`**`(row_vector x)`<br>\newline
+The total number of elements in the vector x (same as function `cols`)
+
+<!-- int; num_elements; (matrix x); -->
+\index{{\tt \bfseries num\_elements}!{\tt (matrix x): int}|hyperpage}
+
+`int` **`num_elements`**`(matrix x)`<br>\newline
+The total number of elements in the matrix x. For example, if `x` is a
+$5 \times 3$ matrix, then `num_elements(x)` is 15
+
+<!-- int; rows; (vector x); -->
+\index{{\tt \bfseries rows}!{\tt (vector x): int}|hyperpage}
+
+`int` **`rows`**`(vector x)`<br>\newline
+The number of rows in the vector x
+
+<!-- int; rows; (row_vector x); -->
+\index{{\tt \bfseries rows}!{\tt (row\_vector x): int}|hyperpage}
+
+`int` **`rows`**`(row_vector x)`<br>\newline
+The number of rows in the row vector x, namely 1
+
+<!-- int; rows; (matrix x); -->
+\index{{\tt \bfseries rows}!{\tt (matrix x): int}|hyperpage}
+
+`int` **`rows`**`(matrix x)`<br>\newline
+The number of rows in the matrix x
+
+<!-- int; cols; (vector x); -->
+\index{{\tt \bfseries cols}!{\tt (vector x): int}|hyperpage}
+
+`int` **`cols`**`(vector x)`<br>\newline
+The number of columns in the vector x, namely 1
+
+<!-- int; cols; (row_vector x); -->
+\index{{\tt \bfseries cols}!{\tt (row\_vector x): int}|hyperpage}
+
+`int` **`cols`**`(row_vector x)`<br>\newline
+The number of columns in the row vector x
+
+<!-- int; cols; (matrix x); -->
+\index{{\tt \bfseries cols}!{\tt (matrix x): int}|hyperpage}
+
+`int` **`cols`**`(matrix x)`<br>\newline
+The number of columns in the matrix x
+
+## Matrix Arithmetic Operators {#matrix-arithmetic-operators}
+
+Stan supports the basic matrix operations using infix, prefix and
+postfix operations.  This section lists the operations supported by
+Stan along with their argument and result types.
+
+### Negation Prefix Operators
+
+<!-- vector; operator-; (vector x); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (vector x): vector}|hyperpage}
+
+`vector` **`operator-`**`(vector x)`<br>\newline
+The negation of the vector x.
+
+<!-- row_vector; operator-; (row_vector x); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (row\_vector x): row\_vector}|hyperpage}
+
+`row_vector` **`operator-`**`(row_vector x)`<br>\newline
+The negation of the row vector x.
+
+<!-- matrix; operator-; (matrix x); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (matrix x): matrix}|hyperpage}
+
+`matrix` **`operator-`**`(matrix x)`<br>\newline
+The negation of the matrix x.
+
+### Infix Matrix Operators
+
+<!-- vector; operator+; (vector x, vector y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (vector x, vector y): vector}|hyperpage}
+
+`vector` **`operator+`**`(vector x, vector y)`<br>\newline
+The sum of the vectors x and y.
+
+<!-- row_vector; operator+; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (row\_vector x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`operator+`**`(row_vector x, row_vector y)`<br>\newline
+The sum of the row vectors x and y.
+
+<!-- matrix; operator+; (matrix x, matrix y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (matrix x, matrix y): matrix}|hyperpage}
+
+`matrix` **`operator+`**`(matrix x, matrix y)`<br>\newline
+The sum of the matrices x and y
+
+<!-- vector; operator-; (vector x, vector y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (vector x, vector y): vector}|hyperpage}
+
+`vector` **`operator-`**`(vector x, vector y)`<br>\newline
+The difference between the vectors x and y.
+
+<!-- row_vector; operator-; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (row\_vector x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`operator-`**`(row_vector x, row_vector y)`<br>\newline
+The difference between the row vectors x and y
+
+<!-- matrix; operator-; (matrix x, matrix y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (matrix x, matrix y): matrix}|hyperpage}
+
+`matrix` **`operator-`**`(matrix x, matrix y)`<br>\newline
+The difference between the matrices x and y
+
+<!-- vector; operator*; (real x, vector y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (real x, vector y): vector}|hyperpage}
+
+`vector` **`operator*`**`(real x, vector y)`<br>\newline
+The product of the scalar x and vector y
+
+<!-- row_vector; operator*; (real x, row_vector y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (real x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`operator*`**`(real x, row_vector y)`<br>\newline
+The product of the scalar x and the row vector y
+
+<!-- matrix; operator*; (real x, matrix y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (real x, matrix y): matrix}|hyperpage}
+
+`matrix` **`operator*`**`(real x, matrix y)`<br>\newline
+The product of the scalar x and the matrix y
+
+<!-- vector; operator*; (vector x, real y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (vector x, real y): vector}|hyperpage}
+
+`vector` **`operator*`**`(vector x, real y)`<br>\newline
+The product of the scalar y and vector x
+
+<!-- matrix; operator*; (vector x, row_vector y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (vector x, row\_vector y): matrix}|hyperpage}
+
+`matrix` **`operator*`**`(vector x, row_vector y)`<br>\newline
+The product of the vector x and row vector y
+
+<!-- row_vector; operator*; (row_vector x, real y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (row\_vector x, real y): row\_vector}|hyperpage}
+
+`row_vector` **`operator*`**`(row_vector x, real y)`<br>\newline
+The product of the scalar y and row vector x
+
+<!-- real; operator*; (row_vector x, vector y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (row\_vector x, vector y): real}|hyperpage}
+
+`real` **`operator*`**`(row_vector x, vector y)`<br>\newline
+The product of the row vector x and vector y
+
+<!-- row_vector; operator*; (row_vector x, matrix y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (row\_vector x, matrix y): row\_vector}|hyperpage}
+
+`row_vector` **`operator*`**`(row_vector x, matrix y)`<br>\newline
+The product of the row vector x and matrix y
+
+<!-- matrix; operator*; (matrix x, real y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (matrix x, real y): matrix}|hyperpage}
+
+`matrix` **`operator*`**`(matrix x, real y)`<br>\newline
+The product of the scalar y and matrix x
+
+<!-- vector; operator*; (matrix x, vector y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (matrix x, vector y): vector}|hyperpage}
+
+`vector` **`operator*`**`(matrix x, vector y)`<br>\newline
+The product of the matrix x and vector y
+
+<!-- matrix; operator*; (matrix x, matrix y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (matrix x, matrix y): matrix}|hyperpage}
+
+`matrix` **`operator*`**`(matrix x, matrix y)`<br>\newline
+The product of the matrices x and y
+
+### Broadcast Infix Operators
+
+<!-- vector; operator+; (vector x, real y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (vector x, real y): vector}|hyperpage}
+
+`vector` **`operator+`**`(vector x, real y)`<br>\newline
+The result of adding y to every entry in the vector x
+
+<!-- vector; operator+; (real x, vector y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (real x, vector y): vector}|hyperpage}
+
+`vector` **`operator+`**`(real x, vector y)`<br>\newline
+The result of adding x to every entry in the vector y
+
+<!-- row_vector; operator+; (row_vector x, real y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (row\_vector x, real y): row\_vector}|hyperpage}
+
+`row_vector` **`operator+`**`(row_vector x, real y)`<br>\newline
+The result of adding y to every entry in the row vector x
+
+<!-- row_vector; operator+; (real x, row_vector y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (real x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`operator+`**`(real x, row_vector y)`<br>\newline
+The result of adding x to every entry in the row vector y
+
+<!-- matrix; operator+; (matrix x, real y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (matrix x, real y): matrix}|hyperpage}
+
+`matrix` **`operator+`**`(matrix x, real y)`<br>\newline
+The result of adding y to every entry in the matrix x
+
+<!-- matrix; operator+; (real x, matrix y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (real x, matrix y): matrix}|hyperpage}
+
+`matrix` **`operator+`**`(real x, matrix y)`<br>\newline
+The result of adding x to every entry in the matrix y
+
+<!-- vector; operator-; (vector x, real y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (vector x, real y): vector}|hyperpage}
+
+`vector` **`operator-`**`(vector x, real y)`<br>\newline
+The result of subtracting y from every entry in the vector x
+
+<!-- vector; operator-; (real x, vector y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (real x, vector y): vector}|hyperpage}
+
+`vector` **`operator-`**`(real x, vector y)`<br>\newline
+The result of adding x to every entry in the negation of the vector y
+
+<!-- row_vector; operator-; (row_vector x, real y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (row\_vector x, real y): row\_vector}|hyperpage}
+
+`row_vector` **`operator-`**`(row_vector x, real y)`<br>\newline
+The result of subtracting y from every entry in the row vector x
+
+<!-- row_vector; operator-; (real x, row_vector y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (real x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`operator-`**`(real x, row_vector y)`<br>\newline
+The result of adding x to every entry in the negation of the row
+vector y
+
+<!-- matrix; operator-; (matrix x, real y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (matrix x, real y): matrix}|hyperpage}
+
+`matrix` **`operator-`**`(matrix x, real y)`<br>\newline
+The result of subtracting y from every entry in the matrix x
+
+<!-- matrix; operator-; (real x, matrix y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (real x, matrix y): matrix}|hyperpage}
+
+`matrix` **`operator-`**`(real x, matrix y)`<br>\newline
+The result of adding x to every entry in negation of the matrix y
+
+<!-- vector; operator/; (vector x, real y); -->
+\index{{\tt \bfseries operator\_divide}!{\tt (vector x, real y): vector}|hyperpage}
+
+`vector` **`operator/`**`(vector x, real y)`<br>\newline
+The result of dividing each entry in the vector x by y
+
+<!-- row_vector; operator/; (row_vector x, real y); -->
+\index{{\tt \bfseries operator\_divide}!{\tt (row\_vector x, real y): row\_vector}|hyperpage}
+
+`row_vector` **`operator/`**`(row_vector x, real y)`<br>\newline
+The result of dividing each entry in the row vector x by y
+
+<!-- matrix; operator/; (matrix x, real y); -->
+\index{{\tt \bfseries operator\_divide}!{\tt (matrix x, real y): matrix}|hyperpage}
+
+`matrix` **`operator/`**`(matrix x, real y)`<br>\newline
+The result of dividing each entry in the matrix x by y
+
+### Elementwise Arithmetic Operations
+
+<!-- vector; operator.*; (vector x, vector y); -->
+\index{{\tt \bfseries operator\_elt\_multiply}!{\tt (vector x, vector y): vector}|hyperpage}
+
+`vector` **`operator.*`**`(vector x, vector y)`<br>\newline
+The elementwise product of y and x
+
+<!-- row_vector; operator.*; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries operator\_elt\_multiply}!{\tt (row\_vector x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`operator.*`**`(row_vector x, row_vector y)`<br>\newline
+The elementwise product of y and x
+
+<!-- matrix; operator.*; (matrix x, matrix y); -->
+\index{{\tt \bfseries operator\_elt\_multiply}!{\tt (matrix x, matrix y): matrix}|hyperpage}
+
+`matrix` **`operator.*`**`(matrix x, matrix y)`<br>\newline
+The elementwise product of y and x
+
+<!-- vector; operator./; (vector x, vector y); -->
+\index{{\tt \bfseries operator\_elt\_divide}!{\tt (vector x, vector y): vector}|hyperpage}
+
+`vector` **`operator./`**`(vector x, vector y)`<br>\newline
+The elementwise quotient of y and x
+
+<!-- vector; operator./; (vector x, real y); -->
+\index{{\tt \bfseries operator\_elt\_divide}!{\tt (vector x, real y): vector}|hyperpage}
+
+`vector` **`operator./`**`(vector x, real y)`<br>\newline
+The elementwise quotient of y and x
+
+<!-- vector; operator./; (real x, vector y); -->
+\index{{\tt \bfseries operator\_elt\_divide}!{\tt (real x, vector y): vector}|hyperpage}
+
+`vector` **`operator./`**`(real x, vector y)`<br>\newline
+The elementwise quotient of y and x
+
+<!-- row_vector; operator./; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries operator\_elt\_divide}!{\tt (row\_vector x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`operator./`**`(row_vector x, row_vector y)`<br>\newline
+The elementwise quotient of y and x
+
+<!-- row_vector; operator./; (row_vector x, real y); -->
+\index{{\tt \bfseries operator\_elt\_divide}!{\tt (row\_vector x, real y): row\_vector}|hyperpage}
+
+`row_vector` **`operator./`**`(row_vector x, real y)`<br>\newline
+The elementwise quotient of y and x
+
+<!-- row_vector; operator./; (real x, row_vector y); -->
+\index{{\tt \bfseries operator\_elt\_divide}!{\tt (real x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`operator./`**`(real x, row_vector y)`<br>\newline
+The elementwise quotient of y and x
+
+<!-- matrix; operator./; (matrix x, matrix y); -->
+\index{{\tt \bfseries operator\_elt\_divide}!{\tt (matrix x, matrix y): matrix}|hyperpage}
+
+`matrix` **`operator./`**`(matrix x, matrix y)`<br>\newline
+The elementwise quotient of y and x
+
+<!-- matrix; operator./; (matrix x, real y); -->
+\index{{\tt \bfseries operator\_elt\_divide}!{\tt (matrix x, real y): matrix}|hyperpage}
+
+`matrix` **`operator./`**`(matrix x, real y)`<br>\newline
+The elementwise quotient of y and x
+
+<!-- matrix; operator./; (real x, matrix y); -->
+\index{{\tt \bfseries operator\_elt\_divide}!{\tt (real x, matrix y): matrix}|hyperpage}
+
+`matrix` **`operator./`**`(real x, matrix y)`<br>\newline
+The elementwise quotient of y and x
+
+## Transposition Operator
+
+Matrix transposition is represented using a postfix operator.
+
+<!-- matrix; operator'; (matrix x); -->
+\index{{\tt \bfseries operator\_transpose}!{\tt (matrix x): matrix}|hyperpage}
+
+`matrix` **`operator'`**`(matrix x)`<br>\newline
+The transpose of the matrix x, written as `x'`
+
+<!-- row_vector; operator'; (vector x); -->
+\index{{\tt \bfseries operator\_transpose}!{\tt (vector x): row\_vector}|hyperpage}
+
+`row_vector` **`operator'`**`(vector x)`<br>\newline
+The transpose of the vector x, written as `x'`
+
+<!-- vector; operator'; (row_vector x); -->
+\index{{\tt \bfseries operator\_transpose}!{\tt (row\_vector x): vector}|hyperpage}
+
+`vector` **`operator'`**`(row_vector x)`<br>\newline
+The transpose of the row vector x, written as `x'`
+
+## Elementwise Functions
+
+Elementwise functions apply a function to each element of a vector or
+matrix, returning a result of the same shape as the argument.  There
+are many functions that are vectorized in addition to the ad hoc cases
+listed in this section;  see section \@ref(fun-vectorization)for the
+general cases.
+
+## Dot Products and Specialized Products
+
+<!-- real; dot_product; (vector x, vector y); -->
+\index{{\tt \bfseries dot\_product}!{\tt (vector x, vector y): real}|hyperpage}
+
+`real` **`dot_product`**`(vector x, vector y)`<br>\newline
+The dot product of x and y
+
+<!-- real; dot_product; (vector x, row_vector y); -->
+\index{{\tt \bfseries dot\_product}!{\tt (vector x, row\_vector y): real}|hyperpage}
+
+`real` **`dot_product`**`(vector x, row_vector y)`<br>\newline
+The dot product of x and y
+
+<!-- real; dot_product; (row_vector x, vector y); -->
+\index{{\tt \bfseries dot\_product}!{\tt (row\_vector x, vector y): real}|hyperpage}
+
+`real` **`dot_product`**`(row_vector x, vector y)`<br>\newline
+The dot product of x and y
+
+<!-- real; dot_product; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries dot\_product}!{\tt (row\_vector x, row\_vector y): real}|hyperpage}
+
+`real` **`dot_product`**`(row_vector x, row_vector y)`<br>\newline
+The dot product of x and y
+
+<!-- row_vector; columns_dot_product; (vector x, vector y); -->
+\index{{\tt \bfseries columns\_dot\_product}!{\tt (vector x, vector y): row\_vector}|hyperpage}
+
+`row_vector` **`columns_dot_product`**`(vector x, vector y)`<br>\newline
+The dot product of the columns of x and y
+
+<!-- row_vector; columns_dot_product; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries columns\_dot\_product}!{\tt (row\_vector x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`columns_dot_product`**`(row_vector x, row_vector y)`<br>\newline
+The dot product of the columns of x and y
+
+<!-- row_vector; columns_dot_product; (matrix x, matrix y); -->
+\index{{\tt \bfseries columns\_dot\_product}!{\tt (matrix x, matrix y): row\_vector}|hyperpage}
+
+`row_vector` **`columns_dot_product`**`(matrix x, matrix y)`<br>\newline
+The dot product of the columns of x and y
+
+<!-- vector; rows_dot_product; (vector x, vector y); -->
+\index{{\tt \bfseries rows\_dot\_product}!{\tt (vector x, vector y): vector}|hyperpage}
+
+`vector` **`rows_dot_product`**`(vector x, vector y)`<br>\newline
+The dot product of the rows of x and y
+
+<!-- vector; rows_dot_product; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries rows\_dot\_product}!{\tt (row\_vector x, row\_vector y): vector}|hyperpage}
+
+`vector` **`rows_dot_product`**`(row_vector x, row_vector y)`<br>\newline
+The dot product of the rows of x and y
+
+<!-- vector; rows_dot_product; (matrix x, matrix y); -->
+\index{{\tt \bfseries rows\_dot\_product}!{\tt (matrix x, matrix y): vector}|hyperpage}
+
+`vector` **`rows_dot_product`**`(matrix x, matrix y)`<br>\newline
+The dot product of the rows of x and y
+
+<!-- real; dot_self; (vector x); -->
+\index{{\tt \bfseries dot\_self}!{\tt (vector x): real}|hyperpage}
+
+`real` **`dot_self`**`(vector x)`<br>\newline
+The dot product of the vector x with itself
+
+<!-- real; dot_self; (row_vector x); -->
+\index{{\tt \bfseries dot\_self}!{\tt (row\_vector x): real}|hyperpage}
+
+`real` **`dot_self`**`(row_vector x)`<br>\newline
+The dot product of the row vector x with itself
+
+<!-- row_vector; columns_dot_self; (vector x); -->
+\index{{\tt \bfseries columns\_dot\_self}!{\tt (vector x): row\_vector}|hyperpage}
+
+`row_vector` **`columns_dot_self`**`(vector x)`<br>\newline
+The dot product of the columns of x with themselves
+
+<!-- row_vector; columns_dot_self; (row_vector x); -->
+\index{{\tt \bfseries columns\_dot\_self}!{\tt (row\_vector x): row\_vector}|hyperpage}
+
+`row_vector` **`columns_dot_self`**`(row_vector x)`<br>\newline
+The dot product of the columns of x with themselves
+
+<!-- row_vector; columns_dot_self; (matrix x); -->
+\index{{\tt \bfseries columns\_dot\_self}!{\tt (matrix x): row\_vector}|hyperpage}
+
+`row_vector` **`columns_dot_self`**`(matrix x)`<br>\newline
+The dot product of the columns of x with themselves
+
+<!-- vector; rows_dot_self; (vector x); -->
+\index{{\tt \bfseries rows\_dot\_self}!{\tt (vector x): vector}|hyperpage}
+
+`vector` **`rows_dot_self`**`(vector x)`<br>\newline
+The dot product of the rows of x with themselves
+
+<!-- vector; rows_dot_self; (row_vector x); -->
+\index{{\tt \bfseries rows\_dot\_self}!{\tt (row\_vector x): vector}|hyperpage}
+
+`vector` **`rows_dot_self`**`(row_vector x)`<br>\newline
+The dot product of the rows of x with themselves
+
+<!-- vector; rows_dot_self; (matrix x); -->
+\index{{\tt \bfseries rows\_dot\_self}!{\tt (matrix x): vector}|hyperpage}
+
+`vector` **`rows_dot_self`**`(matrix x)`<br>\newline
+The dot product of the rows of x with themselves
+
+### Specialized Products
+
+<!-- matrix; tcrossprod; (matrix x); -->
+\index{{\tt \bfseries tcrossprod}!{\tt (matrix x): matrix}|hyperpage}
+
+`matrix` **`tcrossprod`**`(matrix x)`<br>\newline
+The product of x postmultiplied by its own transpose, similar to the
+tcrossprod(x) function in R. The result is a symmetric matrix
+$\text{x}\,\text{x}^{\top}$.
+
+<!-- matrix; crossprod; (matrix x); -->
+\index{{\tt \bfseries crossprod}!{\tt (matrix x): matrix}|hyperpage}
+
+`matrix` **`crossprod`**`(matrix x)`<br>\newline
+The product of x premultiplied by its own transpose, similar to the
+crossprod(x) function in R. The result is a symmetric matrix
+$\text{x}^{\top}\,\text{x}$.
+
+The following functions all provide shorthand forms for common
+expressions, which are also much more efficient.
+
+<!-- matrix; quad_form; (matrix A, matrix B); -->
+\index{{\tt \bfseries quad\_form}!{\tt (matrix A, matrix B): matrix}|hyperpage}
+
+`matrix` **`quad_form`**`(matrix A, matrix B)`<br>\newline
+The quadratic form, i.e., `B' * A * B`.
+
+<!-- real; quad_form; (matrix A, vector B); -->
+\index{{\tt \bfseries quad\_form}!{\tt (matrix A, vector B): real}|hyperpage}
+
+`real` **`quad_form`**`(matrix A, vector B)`<br>\newline
+The quadratic form, i.e., `B' * A * B`.
+
+<!-- matrix; quad_form_diag; (matrix m, vector v); -->
+\index{{\tt \bfseries quad\_form\_diag}!{\tt (matrix m, vector v): matrix}|hyperpage}
+
+`matrix` **`quad_form_diag`**`(matrix m, vector v)`<br>\newline
+The quadratic form using the column vector v as a diagonal matrix,
+i.e., `diag_matrix(v) * m * diag_matrix(v)`.
+
+<!-- matrix; quad_form_diag; (matrix m, row_vector rv); -->
+\index{{\tt \bfseries quad\_form\_diag}!{\tt (matrix m, row\_vector rv): matrix}|hyperpage}
+
+`matrix` **`quad_form_diag`**`(matrix m, row_vector rv)`<br>\newline
+The quadratic form using the row vector rv as a diagonal matrix, i.e.,
+`diag_matrix(rv) * m * diag_matrix(rv)`.
+
+<!-- matrix; quad_form_sym; (matrix A, matrix B); -->
+\index{{\tt \bfseries quad\_form\_sym}!{\tt (matrix A, matrix B): matrix}|hyperpage}
+
+`matrix` **`quad_form_sym`**`(matrix A, matrix B)`<br>\newline
+Similarly to quad_form, gives `B' * A * B`, but additionally checks if
+A is symmetric and ensures that the result is also symmetric.
+
+<!-- real; quad_form_sym; (matrix A, vector B); -->
+\index{{\tt \bfseries quad\_form\_sym}!{\tt (matrix A, vector B): real}|hyperpage}
+
+`real` **`quad_form_sym`**`(matrix A, vector B)`<br>\newline
+Similarly to quad_form, gives `B' * A * B`, but additionally checks if
+A is symmetric and ensures that the result is also symmetric.
+
+<!-- real; trace_quad_form; (matrix A, matrix B); -->
+\index{{\tt \bfseries trace\_quad\_form}!{\tt (matrix A, matrix B): real}|hyperpage}
+
+`real` **`trace_quad_form`**`(matrix A, matrix B)`<br>\newline
+The trace of the quadratic form, i.e., `trace(B' * A * B)`.
+
+<!-- real; trace_gen_quad_form; (matrix D,matrix A, matrix B); -->
+\index{{\tt \bfseries trace\_gen\_quad\_form}!{\tt (matrix D,matrix A, matrix B): real}|hyperpage}
+
+`real` **`trace_gen_quad_form`**`(matrix D,matrix A, matrix B)`<br>\newline
+The trace of a generalized quadratic form, i.e., `trace(D * B' * A *
+B).`
+
+<!-- matrix; multiply_lower_tri_self_transpose; (matrix x); -->
+\index{{\tt \bfseries multiply\_lower\_tri\_self\_transpose}!{\tt (matrix x): matrix}|hyperpage}
+
+`matrix` **`multiply_lower_tri_self_transpose`**`(matrix x)`<br>\newline
+The product of the lower triangular portion of x (including the
+diagonal) times its own transpose; that is, if `L` is a matrix of the
+same dimensions as x with `L(m,n)` equal to `x(m,n)` for $\text{n}
+\leq \text{m}$ and `L(m,n)` equal to 0 if $\text{n} > \text{m}$, the
+result is the symmetric matrix $\text{L}\,\text{L}^{\top}$. This is a
+specialization of tcrossprod(x) for lower-triangular matrices. The
+input matrix does not need to be square.
+
+<!-- matrix; diag_pre_multiply; (vector v, matrix m); -->
+\index{{\tt \bfseries diag\_pre\_multiply}!{\tt (vector v, matrix m): matrix}|hyperpage}
+
+`matrix` **`diag_pre_multiply`**`(vector v, matrix m)`<br>\newline
+Return the product of the diagonal matrix formed from the vector v and
+the matrix m, i.e., `diag_matrix(v) * m`.
+
+<!-- matrix; diag_pre_multiply; (row_vector rv, matrix m); -->
+\index{{\tt \bfseries diag\_pre\_multiply}!{\tt (row\_vector rv, matrix m): matrix}|hyperpage}
+
+`matrix` **`diag_pre_multiply`**`(row_vector rv, matrix m)`<br>\newline
+Return the product of the diagonal matrix formed from the vector rv
+and the matrix m, i.e., `diag_matrix(rv) * m`.
+
+<!-- matrix; diag_post_multiply; (matrix m, vector v); -->
+\index{{\tt \bfseries diag\_post\_multiply}!{\tt (matrix m, vector v): matrix}|hyperpage}
+
+`matrix` **`diag_post_multiply`**`(matrix m, vector v)`<br>\newline
+Return the product of the matrix m and the diagonal matrix formed from
+the vector v, i.e., `m * diag_matrix(v)`.
+
+<!-- matrix; diag_post_multiply; (matrix m, row_vector rv); -->
+\index{{\tt \bfseries diag\_post\_multiply}!{\tt (matrix m, row\_vector rv): matrix}|hyperpage}
+
+`matrix` **`diag_post_multiply`**`(matrix m, row_vector rv)`<br>\newline
+Return the product of the matrix `m` and the diagonal matrix formed
+from the the row vector `rv`, i.e., `m * diag_matrix(rv)`.
+
+## Reductions
+
+### Log Sum of Exponents
+
+<!-- real; log_sum_exp; (vector x); -->
+\index{{\tt \bfseries log\_sum\_exp}!{\tt (vector x): real}|hyperpage}
+
+`real` **`log_sum_exp`**`(vector x)`<br>\newline
+The natural logarithm of the sum of the exponentials of the elements
+in x
+
+<!-- real; log_sum_exp; (row_vector x); -->
+\index{{\tt \bfseries log\_sum\_exp}!{\tt (row\_vector x): real}|hyperpage}
+
+`real` **`log_sum_exp`**`(row_vector x)`<br>\newline
+The natural logarithm of the sum of the exponentials of the elements
+in x
+
+<!-- real; log_sum_exp; (matrix x); -->
+\index{{\tt \bfseries log\_sum\_exp}!{\tt (matrix x): real}|hyperpage}
+
+`real` **`log_sum_exp`**`(matrix x)`<br>\newline
+The natural logarithm of the sum of the exponentials of the elements
+in x
+
+### Minimum and Maximum
+
+<!-- real; min; (vector x); -->
+\index{{\tt \bfseries min}!{\tt (vector x): real}|hyperpage}
+
+`real` **`min`**`(vector x)`<br>\newline
+The minimum value in x, or $+\infty$ if x is empty
+
+<!-- real; min; (row_vector x); -->
+\index{{\tt \bfseries min}!{\tt (row\_vector x): real}|hyperpage}
+
+`real` **`min`**`(row_vector x)`<br>\newline
+The minimum value in x, or $+\infty$ if x is empty
+
+<!-- real; min; (matrix x); -->
+\index{{\tt \bfseries min}!{\tt (matrix x): real}|hyperpage}
+
+`real` **`min`**`(matrix x)`<br>\newline
+The minimum value in x, or $+\infty$ if x is empty
+
+<!-- real; max; (vector x); -->
+\index{{\tt \bfseries max}!{\tt (vector x): real}|hyperpage}
+
+`real` **`max`**`(vector x)`<br>\newline
+The maximum value in x, or $-\infty$ if x is empty
+
+<!-- real; max; (row_vector x); -->
+\index{{\tt \bfseries max}!{\tt (row\_vector x): real}|hyperpage}
+
+`real` **`max`**`(row_vector x)`<br>\newline
+The maximum value in x, or $-\infty$ if x is empty
+
+<!-- real; max; (matrix x); -->
+\index{{\tt \bfseries max}!{\tt (matrix x): real}|hyperpage}
+
+`real` **`max`**`(matrix x)`<br>\newline
+The maximum value in x, or $-\infty$ if x is empty
+
+### Sums and Products
+
+<!-- real; sum; (vector x); -->
+\index{{\tt \bfseries sum}!{\tt (vector x): real}|hyperpage}
+
+`real` **`sum`**`(vector x)`<br>\newline
+The sum of the values in x, or 0 if x is empty
+
+<!-- real; sum; (row_vector x); -->
+\index{{\tt \bfseries sum}!{\tt (row\_vector x): real}|hyperpage}
+
+`real` **`sum`**`(row_vector x)`<br>\newline
+The sum of the values in x, or 0 if x is empty
+
+<!-- real; sum; (matrix x); -->
+\index{{\tt \bfseries sum}!{\tt (matrix x): real}|hyperpage}
+
+`real` **`sum`**`(matrix x)`<br>\newline
+The sum of the values in x, or 0 if x is empty
+
+<!-- real; prod; (vector x); -->
+\index{{\tt \bfseries prod}!{\tt (vector x): real}|hyperpage}
+
+`real` **`prod`**`(vector x)`<br>\newline
+The product of the values in x, or 1 if x is empty
+
+<!-- real; prod; (row_vector x); -->
+\index{{\tt \bfseries prod}!{\tt (row\_vector x): real}|hyperpage}
+
+`real` **`prod`**`(row_vector x)`<br>\newline
+The product of the values in x, or 1 if x is empty
+
+<!-- real; prod; (matrix x); -->
+\index{{\tt \bfseries prod}!{\tt (matrix x): real}|hyperpage}
+
+`real` **`prod`**`(matrix x)`<br>\newline
+The product of the values in x, or 1 if x is empty
+
+### Sample Moments
+
+Full definitions are provided for sample moments in section
+\@ref(array-reductions).
+
+<!-- real; mean; (vector x); -->
+\index{{\tt \bfseries mean}!{\tt (vector x): real}|hyperpage}
+
+`real` **`mean`**`(vector x)`<br>\newline
+The sample mean of the values in x; see section
+\@ref(array-reductions) for details.
+
+<!-- real; mean; (row_vector x); -->
+\index{{\tt \bfseries mean}!{\tt (row\_vector x): real}|hyperpage}
+
+`real` **`mean`**`(row_vector x)`<br>\newline
+The sample mean of the values in x; see section
+\@ref(array-reductions) for details.
+
+<!-- real; mean; (matrix x); -->
+\index{{\tt \bfseries mean}!{\tt (matrix x): real}|hyperpage}
+
+`real` **`mean`**`(matrix x)`<br>\newline
+The sample mean of the values in x; see section
+\@ref(array-reductions) for details.
+
+<!-- real; variance; (vector x); -->
+\index{{\tt \bfseries variance}!{\tt (vector x): real}|hyperpage}
+
+`real` **`variance`**`(vector x)`<br>\newline
+The sample variance of the values in x; see section
+\@ref(array-reductions) for details.
+
+<!-- real; variance; (row_vector x); -->
+\index{{\tt \bfseries variance}!{\tt (row\_vector x): real}|hyperpage}
+
+`real` **`variance`**`(row_vector x)`<br>\newline
+The sample variance of the values in x; see section
+\@ref(array-reductions) for details.
+
+<!-- real; variance; (matrix x); -->
+\index{{\tt \bfseries variance}!{\tt (matrix x): real}|hyperpage}
+
+`real` **`variance`**`(matrix x)`<br>\newline
+The sample variance of the values in x; see section
+\@ref(array-reductions) for details.
+
+<!-- real; sd; (vector x); -->
+\index{{\tt \bfseries sd}!{\tt (vector x): real}|hyperpage}
+
+`real` **`sd`**`(vector x)`<br>\newline
+The sample standard deviation of the values in x; see section
+\@ref(array-reductions) for details.
+
+<!-- real; sd; (row_vector x); -->
+\index{{\tt \bfseries sd}!{\tt (row\_vector x): real}|hyperpage}
+
+`real` **`sd`**`(row_vector x)`<br>\newline
+The sample standard deviation of the values in x; see section
+\@ref(array-reductions) for details.
+
+<!-- real; sd; (matrix x); -->
+\index{{\tt \bfseries sd}!{\tt (matrix x): real}|hyperpage}
+
+`real` **`sd`**`(matrix x)`<br>\newline
+The sample standard deviation of the values in x; see section
+\@ref(array-reductions) for details.
+
+## Broadcast Functions {#matrix-broadcast}
+
+The following broadcast functions allow vectors, row vectors and
+matrices to be created by copying a single element into all of their
+cells.  Matrices may also be created by stacking copies of row vectors
+vertically or stacking copies of column vectors horizontally.
+
+<!-- vector; rep_vector; (real x, int m); -->
+\index{{\tt \bfseries rep\_vector}!{\tt (real x, int m): vector}|hyperpage}
+
+`vector` **`rep_vector`**`(real x, int m)`<br>\newline
+Return the size m (column) vector consisting of copies of x.
+
+<!-- row_vector; rep_row_vector; (real x, int n); -->
+\index{{\tt \bfseries rep\_row\_vector}!{\tt (real x, int n): row\_vector}|hyperpage}
+
+`row_vector` **`rep_row_vector`**`(real x, int n)`<br>\newline
+Return the size n row vector consisting of copies of x.
+
+<!-- matrix; rep_matrix; (real x, int m, int n); -->
+\index{{\tt \bfseries rep\_matrix}!{\tt (real x, int m, int n): matrix}|hyperpage}
+
+`matrix` **`rep_matrix`**`(real x, int m, int n)`<br>\newline
+Return the m by n matrix consisting of copies of x.
+
+<!-- matrix; rep_matrix; (vector v, int n); -->
+\index{{\tt \bfseries rep\_matrix}!{\tt (vector v, int n): matrix}|hyperpage}
+
+`matrix` **`rep_matrix`**`(vector v, int n)`<br>\newline
+Return the m by n matrix consisting of n copies of the (column) vector
+v of size m.
+
+<!-- matrix; rep_matrix; (row_vector rv, int m); -->
+\index{{\tt \bfseries rep\_matrix}!{\tt (row\_vector rv, int m): matrix}|hyperpage}
+
+`matrix` **`rep_matrix`**`(row_vector rv, int m)`<br>\newline
+Return the m by n matrix consisting of m copies of the row vector rv
+of size n.
+
+Unlike the situation with array broadcasting (see section
+\@ref(array-broadcasting)), where there is a distinction between
+integer and real arguments, the following two statements produce the
+same result for vector broadcasting;  row vector and matrix
+broadcasting behave similarly.
+
+```
+ vector[3] x;
+ x = rep_vector(1, 3);
+ x = rep_vector(1.0, 3);
+```
+
+There are no integer vector or matrix types, so integer values are
+automatically promoted.
+
+## Diagonal Matrix Functions
+
+<!-- vector; diagonal; (matrix x); -->
+\index{{\tt \bfseries diagonal}!{\tt (matrix x): vector}|hyperpage}
+
+`vector` **`diagonal`**`(matrix x)`<br>\newline
+The diagonal of the matrix x
+
+<!-- matrix; diag_matrix; (vector x); -->
+\index{{\tt \bfseries diag\_matrix}!{\tt (vector x): matrix}|hyperpage}
+
+`matrix` **`diag_matrix`**`(vector x)`<br>\newline
+The diagonal matrix with diagonal x
+
+Although the `diag_matrix` function is available, it is unlikely to
+ever show up in an efficient Stan program.  For example, rather than
+converting a diagonal to a full matrix for use as a covariance matrix,
+
+```
+ y ~ multi_normal(mu, diag_matrix(square(sigma)));
+```
+
+it is much more efficient to just use a univariate normal, which
+produces the same density,
+
+```
+ y ~ normal(mu, sigma);
+```
+
+Rather than writing `m * diag_matrix(v)` where `m` is a matrix and `v`
+is a vector, it is much more efficient to write `diag_post_multiply(m,
+v)` (and similarly for pre-multiplication). By the same token, it is
+better to use `quad_form_diag(m, v)` rather than `quad_form(m,
+diag_matrix(v))`.
+
+## Slicing and Blocking Functions
+
+Stan provides several functions for generating slices or blocks or
+diagonal entries for matrices.
+
+### Columns and Rows
+
+<!-- vector; col; (matrix x, int n); -->
+\index{{\tt \bfseries col}!{\tt (matrix x, int n): vector}|hyperpage}
+
+`vector` **`col`**`(matrix x, int n)`<br>\newline
+The n-th column of matrix x
+
+<!-- row_vector; row; (matrix x, int m); -->
+\index{{\tt \bfseries row}!{\tt (matrix x, int m): row\_vector}|hyperpage}
+
+`row_vector` **`row`**`(matrix x, int m)`<br>\newline
+The m-th row of matrix x
+
+The `row` function is special in that it may be used as an lvalue in
+an assignment statement (i.e., something to which a value may be
+assigned).  The row function is also special in that the indexing
+notation `x[m]` is just an alternative way of writing `row(x,m)`.  The
+`col` function may **not**, be used as an lvalue, nor is there an
+indexing based shorthand for it.
+
+### Block Operations
+
+#### Matrix Slicing Operations
+
+Block operations may be used to extract a sub-block of a matrix.
+
+<!-- matrix; block; (matrix x, int i, int j, int n_rows, int n_cols); -->
+\index{{\tt \bfseries block}!{\tt (matrix x, int i, int j, int n\_rows, int n\_cols): matrix}|hyperpage}
+
+`matrix` **`block`**`(matrix x, int i, int j, int n_rows, int n_cols)`<br>\newline
+Return the submatrix of x that starts at row i and column j and
+extends n_rows rows and n_cols columns.
+
+The sub-row and sub-column operations may be used to extract a slice
+of row or column from a matrix
+
+<!-- vector; sub_col; (matrix x, int i, int j, int n_rows); -->
+\index{{\tt \bfseries sub\_col}!{\tt (matrix x, int i, int j, int n\_rows): vector}|hyperpage}
+
+`vector` **`sub_col`**`(matrix x, int i, int j, int n_rows)`<br>\newline
+Return the sub-column of x that starts at row i and column j and
+extends n_rows rows and 1 column.
+
+<!-- row_vector; sub_row; (matrix x, int i, int j, int n_cols); -->
+\index{{\tt \bfseries sub\_row}!{\tt (matrix x, int i, int j, int n\_cols): row\_vector}|hyperpage}
+
+`row_vector` **`sub_row`**`(matrix x, int i, int j, int n_cols)`<br>\newline
+Return the sub-row of x that starts at row i and column j and extends
+1 row and n_cols columns.
+
+#### Vector and Array Slicing Operations
+
+The head operation extracts the first $n$ elements of a vector and the
+tail operation the last.  The segment operation extracts an arbitrary
+subvector.
+
+<!-- vector; head; (vector v, int n); -->
+\index{{\tt \bfseries head}!{\tt (vector v, int n): vector}|hyperpage}
+
+`vector` **`head`**`(vector v, int n)`<br>\newline
+Return the vector consisting of the first n elements of v.
+
+<!-- row_vector; head; (row_vector rv, int n); -->
+\index{{\tt \bfseries head}!{\tt (row\_vector rv, int n): row\_vector}|hyperpage}
+
+`row_vector` **`head`**`(row_vector rv, int n)`<br>\newline
+Return the row vector consisting of the first n elements of rv.
+
+<!-- T[]; head; (T[] sv, int n); -->
+\index{{\tt \bfseries head}!{\tt (T[] sv, int n): T[]}|hyperpage}
+
+`T[]` **`head`**`(T[] sv, int n)`<br>\newline
+Return the array consisting of the first n elements of sv; applies to
+up to three-dimensional arrays containing any type of elements `T`.
+
+<!-- vector; tail; (vector v, int n); -->
+\index{{\tt \bfseries tail}!{\tt (vector v, int n): vector}|hyperpage}
+
+`vector` **`tail`**`(vector v, int n)`<br>\newline
+Return the vector consisting of the last n elements of v.
+
+<!-- row_vector; tail; (row_vector rv, int n); -->
+\index{{\tt \bfseries tail}!{\tt (row\_vector rv, int n): row\_vector}|hyperpage}
+
+`row_vector` **`tail`**`(row_vector rv, int n)`<br>\newline
+Return the row vector consisting of the last n elements of rv.
+
+<!-- T[]; tail; (T[] sv, int n); -->
+\index{{\tt \bfseries tail}!{\tt (T[] sv, int n): T[]}|hyperpage}
+
+`T[]` **`tail`**`(T[] sv, int n)`<br>\newline
+Return the array consisting of the last n elements of sv; applies to
+up to three-dimensional arrays containing any type of elements `T`.
+
+<!-- vector; segment; (vector v, int i, int n); -->
+\index{{\tt \bfseries segment}!{\tt (vector v, int i, int n): vector}|hyperpage}
+
+`vector` **`segment`**`(vector v, int i, int n)`<br>\newline
+Return the vector consisting of the n elements of v starting at i;
+i.e., elements i through through i + n - 1.
+
+<!-- row_vector; segment; (row_vector rv, int i, int n); -->
+\index{{\tt \bfseries segment}!{\tt (row\_vector rv, int i, int n): row\_vector}|hyperpage}
+
+`row_vector` **`segment`**`(row_vector rv, int i, int n)`<br>\newline
+Return the row vector consisting of the n elements of rv starting at
+i; i.e., elements i through through i + n - 1.
+
+<!-- T[]; segment; (T[] sv, int i, int n); -->
+\index{{\tt \bfseries segment}!{\tt (T[] sv, int i, int n): T[]}|hyperpage}
+
+`T[]` **`segment`**`(T[] sv, int i, int n)`<br>\newline
+Return the array consisting of the n elements of sv starting at i;
+i.e., elements i through through i + n - 1. Applies to up to
+three-dimensional arrays containing any type of elements `T`.
+
+## Matrix Concatenation {#matrix-concatenation}
+
+Stan's matrix concatenation operations `append_col` and `append_row`
+are like the operations `cbind` and `rbind` in R.
+
+#### Horizontal concatenation
+
+<!-- matrix; append_col; (matrix x, matrix y); -->
+\index{{\tt \bfseries append\_col}!{\tt (matrix x, matrix y): matrix}|hyperpage}
+
+`matrix` **`append_col`**`(matrix x, matrix y)`<br>\newline
+Combine matrices x and y by columns. The matrices must have the same
+number of rows.
+
+<!-- matrix; append_col; (matrix x, vector y); -->
+\index{{\tt \bfseries append\_col}!{\tt (matrix x, vector y): matrix}|hyperpage}
+
+`matrix` **`append_col`**`(matrix x, vector y)`<br>\newline
+Combine matrix x and vector y by columns. The matrix and the vector
+must have the same number of rows.
+
+<!-- matrix; append_col; (vector x, matrix y); -->
+\index{{\tt \bfseries append\_col}!{\tt (vector x, matrix y): matrix}|hyperpage}
+
+`matrix` **`append_col`**`(vector x, matrix y)`<br>\newline
+Combine vector x and matrix y by columns. The vector and the matrix
+must have the same number of rows.
+
+<!-- matrix; append_col; (vector x, vector y); -->
+\index{{\tt \bfseries append\_col}!{\tt (vector x, vector y): matrix}|hyperpage}
+
+`matrix` **`append_col`**`(vector x, vector y)`<br>\newline
+Combine vectors x and y by columns. The vectors must have the same
+number of rows.
+
+<!-- row_vector; append_col; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries append\_col}!{\tt (row\_vector x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`append_col`**`(row_vector x, row_vector y)`<br>\newline
+Combine row vectors x and y of any size into another row vector.
+
+<!-- row_vector; append_col; (real x, row_vector y); -->
+\index{{\tt \bfseries append\_col}!{\tt (real x, row\_vector y): row\_vector}|hyperpage}
+
+`row_vector` **`append_col`**`(real x, row_vector y)`<br>\newline
+Append x to the front of y, returning another row vector.
+
+<!-- row_vector; append_col; (row_vector x, real y); -->
+\index{{\tt \bfseries append\_col}!{\tt (row\_vector x, real y): row\_vector}|hyperpage}
+
+`row_vector` **`append_col`**`(row_vector x, real y)`<br>\newline
+Append y to the end of x, returning another row vector.
+
+#### Vertical concatenation
+
+<!-- matrix; append_row; (matrix x, matrix y); -->
+\index{{\tt \bfseries append\_row}!{\tt (matrix x, matrix y): matrix}|hyperpage}
+
+`matrix` **`append_row`**`(matrix x, matrix y)`<br>\newline
+Combine matrices x and y by rows. The matrices must have the same
+number of columns.
+
+<!-- matrix; append_row; (matrix x, row_vector y); -->
+\index{{\tt \bfseries append\_row}!{\tt (matrix x, row\_vector y): matrix}|hyperpage}
+
+`matrix` **`append_row`**`(matrix x, row_vector y)`<br>\newline
+Combine matrix x and row vector y by rows. The matrix and the row
+vector must have the same number of columns.
+
+<!-- matrix; append_row; (row_vector x, matrix y); -->
+\index{{\tt \bfseries append\_row}!{\tt (row\_vector x, matrix y): matrix}|hyperpage}
+
+`matrix` **`append_row`**`(row_vector x, matrix y)`<br>\newline
+Combine row vector x and matrix y by rows. The row vector and the
+matrix must have the same number of columns.
+
+<!-- matrix; append_row; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries append\_row}!{\tt (row\_vector x, row\_vector y): matrix}|hyperpage}
+
+`matrix` **`append_row`**`(row_vector x, row_vector y)`<br>\newline
+Combine row vectors x and y by row. The row vectors must have the same
+number of columns.
+
+<!-- vector; append_row; (vector x, vector y); -->
+\index{{\tt \bfseries append\_row}!{\tt (vector x, vector y): vector}|hyperpage}
+
+`vector` **`append_row`**`(vector x, vector y)`<br>\newline
+Concatenate vectors x and y of any size into another vector.
+
+<!-- vector; append_row; (real x, vector y); -->
+\index{{\tt \bfseries append\_row}!{\tt (real x, vector y): vector}|hyperpage}
+
+`vector` **`append_row`**`(real x, vector y)`<br>\newline
+Append x to the top of y, returning another vector.
+
+<!-- vector; append_row; (vector x, real y); -->
+\index{{\tt \bfseries append\_row}!{\tt (vector x, real y): vector}|hyperpage}
+
+`vector` **`append_row`**`(vector x, real y)`<br>\newline
+Append y to the bottom of x, returning another vector.
+
+## Special Matrix Functions {#softmax}
+
+### Softmax
+
+The softmax function maps[^fnsoftmax] $y \in \mathbb{R}^K$ to the
+$K$-simplex by \[ \text{softmax}(y)  = \frac{\exp(y)}
+{\sum_{k=1}^K \exp(y_k)}, \] where $\exp(y)$ is the componentwise
+exponentiation of $y$. Softmax is usually calculated on the log scale,
+\begin{eqnarray*} \log \text{softmax}(y) & = & \ y - \log \sum_{k=1}^K
+\exp(y_k) \\[4pt] & = & y - \mathrm{log\_sum\_exp}(y). \end{eqnarray*}
+where the vector $y$ minus the scalar $\mathrm{log\_sum\_exp}(y)$
+subtracts the scalar from each component of $y$.
+
+[^fnsoftmax]: The softmax function is so called because in the limit
+as   $y_n \rightarrow \infty$ with $y_m$ for $m \neq n$ held constant,
+the result tends toward the "one-hot" vector $\theta$ with   $\theta_n
+= 1$ and $\theta_m = 0$ for $m \neq n$, thus providing a   "soft"
+version of the maximum function.
+
+Stan provides the following functions for softmax and its log.
+
+<!-- vector; softmax; (vector x); -->
+\index{{\tt \bfseries softmax}!{\tt (vector x): vector}|hyperpage}
+
+`vector` **`softmax`**`(vector x)`<br>\newline
+The softmax of x
+
+<!-- vector; log_softmax; (vector x); -->
+\index{{\tt \bfseries log\_softmax}!{\tt (vector x): vector}|hyperpage}
+
+`vector` **`log_softmax`**`(vector x)`<br>\newline
+The natural logarithm of the softmax of x
+
+### Cumulative Sums
+
+The cumulative sum of a sequence $x_1,\ldots,x_N$ is the sequence
+$y_1,\ldots,y_N$, where \[ y_n = \sum_{m = 1}^{n} x_m. \]
+
+<!-- real[]; cumulative_sum; (real[] x); -->
+\index{{\tt \bfseries cumulative\_sum}!{\tt (real[] x): real[]}|hyperpage}
+
+`real[]` **`cumulative_sum`**`(real[] x)`<br>\newline
+The cumulative sum of x
+
+<!-- vector; cumulative_sum; (vector v); -->
+\index{{\tt \bfseries cumulative\_sum}!{\tt (vector v): vector}|hyperpage}
+
+`vector` **`cumulative_sum`**`(vector v)`<br>\newline
+The cumulative sum of v
+
+<!-- row_vector; cumulative_sum; (row_vector rv); -->
+\index{{\tt \bfseries cumulative\_sum}!{\tt (row\_vector rv): row\_vector}|hyperpage}
+
+`row_vector` **`cumulative_sum`**`(row_vector rv)`<br>\newline
+The cumulative sum of rv
+
+## Covariance Functions {#covariance}
+
+### Exponentiated quadratic covariance function
+
+The exponentiated quadratic kernel defines the covariance between
+$f(x_i)$ and $f(x_j)$ where $f\colon \mathbb{R}^D \mapsto \mathbb{R}$
+as a function of the squared Euclidian distance between $x_i \in
+\mathbb{R}^D$ and $x_j \in \mathbb{R}^D$: \[   \text{cov}(f(x_i),
+f(x_j)) = k(x_i, x_j) = \alpha^2 \exp \left(         -
+\dfrac{1}{2\rho^2} \sum_{d=1}^D (x_{i,d} - x_{j,d})^2 \right) \] with
+$\alpha$ and $\rho$ constrained to be positive.
+
+There are two variants of the exponentiated quadratic covariance
+function in Stan. One builds a covariance matrix, $K \in \mathbb{R}^{N
+\times N}$ for $x_1, \dots, x_N$, where $K_{i,j} = k(x_i, x_j)$, which
+is necessarily symmetric and positive semidefinite by construction.
+There is a second variant of the exponentiated quadratic covariance
+function that builds a $K \in \mathbb{R}^{N \times M}$ covariance
+matrix for $x_1, \dots, x_N$ and $x^\prime_1, \dots, x^\prime_M$,
+where $x_i \in \mathbb{R}^D$ and $x^\prime_i \in \mathbb{R}^D$ and
+$K_{i,j} = k(x_i, x^\prime_j)$.
+
+<!-- matrix; cov_exp_quad; (row_vectors x, real alpha, real rho); -->
+\index{{\tt \bfseries cov\_exp\_quad}!{\tt (row\_vectors x, real alpha, real rho): matrix}|hyperpage}
+
+`matrix` **`cov_exp_quad`**`(row_vectors x, real alpha, real rho)`<br>\newline
+The covariance matrix with an exponentiated quadratic kernel of x.
+
+<!-- matrix; cov_exp_quad; (vectors x, real alpha, real rho); -->
+\index{{\tt \bfseries cov\_exp\_quad}!{\tt (vectors x, real alpha, real rho): matrix}|hyperpage}
+
+`matrix` **`cov_exp_quad`**`(vectors x, real alpha, real rho)`<br>\newline
+The covariance matrix with an exponentiated quadratic kernel of x.
+
+<!-- matrix; cov_exp_quad; (real[] x, real alpha, real rho); -->
+\index{{\tt \bfseries cov\_exp\_quad}!{\tt (real[] x, real alpha, real rho): matrix}|hyperpage}
+
+`matrix` **`cov_exp_quad`**`(real[] x, real alpha, real rho)`<br>\newline
+The covariance matrix with an exponentiated quadratic kernel of x.
+
+<!-- matrix; cov_exp_quad; (row_vectors x1, row_vectors x2, real alpha, real rho); -->
+\index{{\tt \bfseries cov\_exp\_quad}!{\tt (row\_vectors x1, row\_vectors x2, real alpha, real rho): matrix}|hyperpage}
+
+`matrix` **`cov_exp_quad`**`(row_vectors x1, row_vectors x2, real alpha, real rho)`<br>\newline
+The covariance matrix with an exponentiated quadratic kernel of x1 and
+x2.
+
+<!-- matrix; cov_exp_quad; (vectors x1, vectors x2, real alpha, real rho); -->
+\index{{\tt \bfseries cov\_exp\_quad}!{\tt (vectors x1, vectors x2, real alpha, real rho): matrix}|hyperpage}
+
+`matrix` **`cov_exp_quad`**`(vectors x1, vectors x2, real alpha, real rho)`<br>\newline
+The covariance matrix with an exponentiated quadratic kernel of x1 and
+x2.
+
+<!-- matrix; cov_exp_quad; (real[] x1, real[] x2, real alpha, real rho); -->
+\index{{\tt \bfseries cov\_exp\_quad}!{\tt (real[] x1, real[] x2, real alpha, real rho): matrix}|hyperpage}
+
+`matrix` **`cov_exp_quad`**`(real[] x1, real[] x2, real alpha, real rho)`<br>\newline
+The covariance matrix with an exponentiated quadratic kernel of x1 and
+x2.
+
+## Linear Algebra Functions and Solvers
+
+### Matrix Division Operators and Functions
+
+In general, it is much more efficient and also more arithmetically
+stable to use matrix division than to multiply by an inverse.  There
+are specialized forms for lower triangular matrices and for symmetric,
+positive-definite matrices.
+
+#### Matrix division operators
+
+<!-- row_vector; operator/; (row_vector b, matrix A); -->
+\index{{\tt \bfseries operator\_divide}!{\tt (row\_vector b, matrix A): row\_vector}|hyperpage}
+
+`row_vector` **`operator/`**`(row_vector b, matrix A)`<br>\newline
+The right division of b by A; equivalently `b * inverse(A)`
+
+<!-- matrix; operator/; (matrix B, matrix A); -->
+\index{{\tt \bfseries operator\_divide}!{\tt (matrix B, matrix A): matrix}|hyperpage}
+
+`matrix` **`operator/`**`(matrix B, matrix A)`<br>\newline
+The right division of B by A; equivalently `B * inverse(A)`
+
+<!-- vector; operator\; (matrix A, vector b); -->
+\index{{\tt \bfseries operator\_left\_div}!{\tt (matrix A, vector b): vector}|hyperpage}
+
+`vector` **`operator\`**`(matrix A, vector b)`<br>\newline
+
+
+<!-- matrix; operator\; (matrix A, matrix B); -->
+\index{{\tt \bfseries operator\_left\_div}!{\tt (matrix A, matrix B): matrix}|hyperpage}
+
+`matrix` **`operator\`**`(matrix A, matrix B)`<br>\newline
+
+
+#### Lower-triangular matrix division functions
+
+There are four division functions which use lower triangular views of
+a matrix.  The lower triangular view of a matrix $\text{tri}(A)$ is
+used in the definitions and defined by \[ \text{tri}(A)[m,n] = \left\{
+\begin{array}{ll} A[m,n] & \text{if } m \geq n, \text{ and} \\[4pt] 0
+& \text{otherwise}. \end{array} \right. \] When a lower triangular
+view of a matrix is used, the elements above the diagonal are ignored.
+
+<!-- vector; mdivide_left_tri_low; (matrix A, vector b); -->
+\index{{\tt \bfseries mdivide\_left\_tri\_low}!{\tt (matrix A, vector b): vector}|hyperpage}
+
+`vector` **`mdivide_left_tri_low`**`(matrix A, vector b)`<br>\newline
+The left division of b by a lower-triangular view of A; algebraically
+equivalent to the less efficient and stable form `inverse(tri(A)) *
+b`, where `tri(A)` is the lower-triangular portion of A with the
+above-diagonal entries set to zero.
+
+<!-- matrix; mdivide_left_tri_low; (matrix A, matrix B); -->
+\index{{\tt \bfseries mdivide\_left\_tri\_low}!{\tt (matrix A, matrix B): matrix}|hyperpage}
+
+`matrix` **`mdivide_left_tri_low`**`(matrix A, matrix B)`<br>\newline
+The left division of B by a triangular view of A; algebraically
+equivalent to the less efficient and stable form `inverse(tri(A)) *
+B`, where `tri(A)` is the lower-triangular portion of A with the
+above-diagonal entries set to zero.
+
+<!-- row_vector; mdivide_right_tri_low; (row_vector b, matrix A); -->
+\index{{\tt \bfseries mdivide\_right\_tri\_low}!{\tt (row\_vector b, matrix A): row\_vector}|hyperpage}
+
+`row_vector` **`mdivide_right_tri_low`**`(row_vector b, matrix A)`<br>\newline
+The right division of b by a triangular view of A; algebraically
+equivalent to the less efficient and stable form `b *
+inverse(tri(A))`, where `tri(A)` is the lower-triangular portion of A
+with the above-diagonal entries set to zero.
+
+<!-- matrix; mdivide_right_tri_low; (matrix B, matrix A); -->
+\index{{\tt \bfseries mdivide\_right\_tri\_low}!{\tt (matrix B, matrix A): matrix}|hyperpage}
+
+`matrix` **`mdivide_right_tri_low`**`(matrix B, matrix A)`<br>\newline
+The right division of B by a triangular view of A; algebraically
+equivalent to the less efficient and stable form `B *
+inverse(tri(A))`, where `tri(A)` is the lower-triangular portion of A
+with the above-diagonal entries set to zero.
+
+### Symmetric positive-definite matrix division functions
+
+There are four division functions which are specialized for efficiency
+and stability for symmetric positive-definite matrix dividends.  If
+the matrix dividend argument is not symmetric and positive definite,
+these will reject and print warnings.
+
+<!-- matrix; mdivide_left_spd; (matrix A, vector b); -->
+\index{{\tt \bfseries mdivide\_left\_spd}!{\tt (matrix A, vector b): matrix}|hyperpage}
+
+`matrix` **`mdivide_left_spd`**`(matrix A, vector b)`<br>\newline
+The left division of b by the symmetric, positive-definite matrix A;
+algebraically equivalent to the less efficient and stable form
+`inverse(A) * b`.
+
+<!-- vector; mdivide_left_spd; (matrix A, matrix B); -->
+\index{{\tt \bfseries mdivide\_left\_spd}!{\tt (matrix A, matrix B): vector}|hyperpage}
+
+`vector` **`mdivide_left_spd`**`(matrix A, matrix B)`<br>\newline
+The left division of B by the symmetric, positive-definite matrix A;
+algebraically equivalent to the less efficient and stable form
+`inverse(A) * B`.
+
+<!-- row_vector; mdivide_right_spd; (row_vector b, matrix A); -->
+\index{{\tt \bfseries mdivide\_right\_spd}!{\tt (row\_vector b, matrix A): row\_vector}|hyperpage}
+
+`row_vector` **`mdivide_right_spd`**`(row_vector b, matrix A)`<br>\newline
+The right division of b by the symmetric, positive-definite matrix A;
+algebraically equivalent to the less efficient and stable form `b *
+inverse(A)`.
+
+<!-- matrix; mdivide_right_spd; (matrix B, matrix A); -->
+\index{{\tt \bfseries mdivide\_right\_spd}!{\tt (matrix B, matrix A): matrix}|hyperpage}
+
+`matrix` **`mdivide_right_spd`**`(matrix B, matrix A)`<br>\newline
+The right division of B by the symmetric, positive-definite matrix A;
+algebraically equivalent to the less efficient and stable form `B *
+inverse(A)`.
+
+### Matrix Exponential
+
+The exponential of the matrix $A$ is formally defined by the
+convergent power series: \[ e^A = \sum_{n=0}^{\infty} \dfrac{A^n}{n!}
+\]
+
+<!-- matrix; matrix_exp; (matrix A); -->
+\index{{\tt \bfseries matrix\_exp}!{\tt (matrix A): matrix}|hyperpage}
+
+`matrix` **`matrix_exp`**`(matrix A)`<br>\newline
+The matrix exponential of A
+
+<!-- matrix; matrix_exp_multiply; (matrix A, matrix B); -->
+\index{{\tt \bfseries matrix\_exp\_multiply}!{\tt (matrix A, matrix B): matrix}|hyperpage}
+
+`matrix` **`matrix_exp_multiply`**`(matrix A, matrix B)`<br>\newline
+The multiplication of matrix exponential of A and matrix B;
+algebraically equivalent to the less efficient form `matrix_exp(A) *
+B`.
+
+<!-- matrix; scale_matrix_exp_multiply; (real t, matrix A, matrix B); -->
+\index{{\tt \bfseries scale\_matrix\_exp\_multiply}!{\tt (real t, matrix A, matrix B): matrix}|hyperpage}
+
+`matrix` **`scale_matrix_exp_multiply`**`(real t, matrix A, matrix B)`<br>\newline
+The multiplication of matrix exponential of tA and matrix B;
+algebraically equivalent to the less efficient form `matrix_exp(tA) *
+B`.
+
+### Linear Algebra Functions
+
+#### Trace
+
+<!-- real; trace; (matrix A); -->
+\index{{\tt \bfseries trace}!{\tt (matrix A): real}|hyperpage}
+
+`real` **`trace`**`(matrix A)`<br>\newline
+The trace of A, or 0 if A is empty; A is not required to be diagonal
+
+#### Determinants
+
+<!-- real; determinant; (matrix A); -->
+\index{{\tt \bfseries determinant}!{\tt (matrix A): real}|hyperpage}
+
+`real` **`determinant`**`(matrix A)`<br>\newline
+The determinant of A
+
+<!-- real; log_determinant; (matrix A); -->
+\index{{\tt \bfseries log\_determinant}!{\tt (matrix A): real}|hyperpage}
+
+`real` **`log_determinant`**`(matrix A)`<br>\newline
+The log of the absolute value of the determinant of A
+
+#### Inverses
+
+It is almost never a good idea to use matrix inverses directly because
+they are both inefficient and arithmetically unstable compared to the
+alternatives.  Rather than inverting a matrix `m` and post-multiplying
+by a vector or matrix `a`, as in `inverse(m) * a`, it is better to
+code this using matrix division, as in `m \ a`.  The
+pre-multiplication case is similar, with `b * inverse(m)` being more
+efficiently coded as as `b / m`.  There are also useful special cases
+for triangular and symmetric, positive-definite matrices that use more
+efficient solvers.
+
+_**Warning:**_   The function `inv(m)` is the elementwise inverse
+function, which returns `1 / m[i, j]` for each element.
+
+<!-- matrix; inverse; (matrix A); -->
+\index{{\tt \bfseries inverse}!{\tt (matrix A): matrix}|hyperpage}
+
+`matrix` **`inverse`**`(matrix A)`<br>\newline
+The inverse of A
+
+<!-- matrix; inverse_spd; (matrix A); -->
+\index{{\tt \bfseries inverse\_spd}!{\tt (matrix A): matrix}|hyperpage}
+
+`matrix` **`inverse_spd`**`(matrix A)`<br>\newline
+The inverse of A where A is symmetric, positive definite. This version
+is faster and more arithmetically stable when the input is symmetric
+and positive definite.
+
+#### Eigendecomposition
+
+<!-- vector; eigenvalues_sym; (matrix A); -->
+\index{{\tt \bfseries eigenvalues\_sym}!{\tt (matrix A): vector}|hyperpage}
+
+`vector` **`eigenvalues_sym`**`(matrix A)`<br>\newline
+The vector of eigenvalues of a symmetric matrix A in ascending order
+
+<!-- matrix; eigenvectors_sym; (matrix A); -->
+\index{{\tt \bfseries eigenvectors\_sym}!{\tt (matrix A): matrix}|hyperpage}
+
+`matrix` **`eigenvectors_sym`**`(matrix A)`<br>\newline
+The matrix with the (column) eigenvectors of symmetric matrix A in the
+same order as returned by the function `eigenvalues_sym`
+
+Because multiplying an eigenvector by $-1$ results in an eigenvector,
+eigenvectors returned by a decomposition are only identified up to a
+sign change.  In order to compare the eigenvectors produced by Stan's
+eigendecomposition to others, signs may need to be normalized in some
+way, such as by fixing the sign of a component, or doing comparisons
+allowing a multiplication by $-1$.
+
+The condition number of a symmetric matrix is defined to be the ratio
+of the largest eigenvalue to the smallest eigenvalue.  Large condition
+numbers lead to difficulty in numerical algorithms such as computing
+inverses, and thus known as "ill conditioned."  The ratio can even be
+infinite in the case of singular matrices (i.e., those with
+eigenvalues of 0).
+
+#### QR Decomposition {#QR-decomposition}
+
+<!-- matrix; qr_thin_Q; (matrix A); -->
+\index{{\tt \bfseries qr\_thin\_q}!{\tt (matrix A): matrix}|hyperpage}
+
+`matrix` **`qr_thin_Q`**`(matrix A)`<br>\newline
+The orthogonal matrix in the thin QR decomposition of A, which implies
+that the resulting matrix has the same dimensions as A
+
+<!-- matrix; qr_thin_R; (matrix A); -->
+\index{{\tt \bfseries qr\_thin\_r}!{\tt (matrix A): matrix}|hyperpage}
+
+`matrix` **`qr_thin_R`**`(matrix A)`<br>\newline
+The upper triangular matrix in the thin QR decomposition of A, which
+implies that the resulting matrix is square with the same number of
+columns as A
+
+<!-- matrix; qr_Q; (matrix A); -->
+\index{{\tt \bfseries qr\_q}!{\tt (matrix A): matrix}|hyperpage}
+
+`matrix` **`qr_Q`**`(matrix A)`<br>\newline
+The orthogonal matrix in the fat QR decomposition of A, which implies
+that the resulting matrix is square with the same number of rows as A
+
+<!-- matrix; qr_R; (matrix A); -->
+\index{{\tt \bfseries qr\_r}!{\tt (matrix A): matrix}|hyperpage}
+
+`matrix` **`qr_R`**`(matrix A)`<br>\newline
+The upper trapezoidal matrix in the fat QR decomposition of A, which
+implies that the resulting matrix will be square with the same number
+of rows as A
+
+The thin QR decomposition is always preferable because it will consume
+much less memory when the input matrix is large than will the fat QR
+decomposition. Both versions of the decomposition represent the input
+matrix as \[ A = Q \, R. \] Multiplying a column of an orthogonal
+matrix by $-1$ still results in an orthogonal matrix, and you can
+multiply the corresponding row of the upper trapezoidal matrix by $-1$
+without changing the product. Thus, Stan adopts the normalization that
+the diagonal elements of the upper trapezoidal matrix are strictly
+positive and the columns of the orthogonal matrix are reflected if
+necessary. Also, these QR  decomposition algorithms do not utilize
+pivoting and thus may be  numerically unstable on input matrices that
+have less than full rank.
+
+#### Cholesky Decomposition
+
+Every symmetric, positive-definite matrix (such as a correlation or
+covariance matrix) has a Cholesky decomposition.  If $\Sigma$ is a
+symmetric, positive-definite matrix, its Cholesky decomposition is the
+lower-triangular vector $L$ such that \[ \Sigma = L \, L^{\top}. \]
+
+<!-- matrix; cholesky_decompose; (matrix A); -->
+\index{{\tt \bfseries cholesky\_decompose}!{\tt (matrix A): matrix}|hyperpage}
+
+`matrix` **`cholesky_decompose`**`(matrix A)`<br>\newline
+The lower-triangular Cholesky factor of the symmetric
+positive-definite matrix A
+
+#### Singular Value Decomposition
+
+Stan only provides functions for the singular values, not for the
+singular vectors involved in a singular value decomposition (SVD).
+
+<!-- vector; singular_values; (matrix A); -->
+\index{{\tt \bfseries singular\_values}!{\tt (matrix A): vector}|hyperpage}
+
+`vector` **`singular_values`**`(matrix A)`<br>\newline
+The singular values of A in descending order
+
+## Sort Functions
+
+see section \@ref(sorting-functions) for examples of how the functions
+work.
+
+<!-- vector; sort_asc; (vector v); -->
+\index{{\tt \bfseries sort\_asc}!{\tt (vector v): vector}|hyperpage}
+
+`vector` **`sort_asc`**`(vector v)`<br>\newline
+Sort the elements of v in ascending order
+
+<!-- row_vector; sort_asc; (row_vector v); -->
+\index{{\tt \bfseries sort\_asc}!{\tt (row\_vector v): row\_vector}|hyperpage}
+
+`row_vector` **`sort_asc`**`(row_vector v)`<br>\newline
+Sort the elements of v in ascending order
+
+<!-- vector; sort_desc; (vector v); -->
+\index{{\tt \bfseries sort\_desc}!{\tt (vector v): vector}|hyperpage}
+
+`vector` **`sort_desc`**`(vector v)`<br>\newline
+Sort the elements of v in descending order
+
+<!-- row_vector; sort_desc; (row_vector v); -->
+\index{{\tt \bfseries sort\_desc}!{\tt (row\_vector v): row\_vector}|hyperpage}
+
+`row_vector` **`sort_desc`**`(row_vector v)`<br>\newline
+Sort the elements of v in descending order
+
+<!-- int[]; sort_indices_asc; (vector v); -->
+\index{{\tt \bfseries sort\_indices\_asc}!{\tt (vector v): int[]}|hyperpage}
+
+`int[]` **`sort_indices_asc`**`(vector v)`<br>\newline
+Return an array of indices between 1 and the size of v, sorted to
+index v in ascending order.
+
+<!-- int[]; sort_indices_asc; (row_vector v); -->
+\index{{\tt \bfseries sort\_indices\_asc}!{\tt (row\_vector v): int[]}|hyperpage}
+
+`int[]` **`sort_indices_asc`**`(row_vector v)`<br>\newline
+Return an array of indices between 1 and the size of v, sorted to
+index v in ascending order.
+
+<!-- int[]; sort_indices_desc; (vector v); -->
+\index{{\tt \bfseries sort\_indices\_desc}!{\tt (vector v): int[]}|hyperpage}
+
+`int[]` **`sort_indices_desc`**`(vector v)`<br>\newline
+Return an array of indices between 1 and the size of v, sorted to
+index v in descending order.
+
+<!-- int[]; sort_indices_desc; (row_vector v); -->
+\index{{\tt \bfseries sort\_indices\_desc}!{\tt (row\_vector v): int[]}|hyperpage}
+
+`int[]` **`sort_indices_desc`**`(row_vector v)`<br>\newline
+Return an array of indices between 1 and the size of v, sorted to
+index v in descending order.
+
+<!-- int; rank; (vector v, int s); -->
+\index{{\tt \bfseries rank}!{\tt (vector v, int s): int}|hyperpage}
+
+`int` **`rank`**`(vector v, int s)`<br>\newline
+Number of components of v less than v[s]
+
+<!-- int; rank; (row_vector v, int s); -->
+\index{{\tt \bfseries rank}!{\tt (row\_vector v, int s): int}|hyperpage}
+
+`int` **`rank`**`(row_vector v, int s)`<br>\newline
+Number of components of v less than v[s]
+

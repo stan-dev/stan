@@ -1,0 +1,338 @@
+# Higher-Order Functions
+
+Stan provides a few higher-order functions that act on other
+functions.  In all cases, the function arguments to the higher-order
+functions are defined as functions within the Stan language and passed
+by name to the higher-order functions.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="functions-algebraic-solver.html">Algebraic Equation Solver</a>\n')
+cat(' * <a href="functions-ode-solver.html">Ordinary Differential Equation Solvers</a>\n')
+cat(' * <a href="functions-map.html">Higher-Order Map</a>\n')
+}
+```
+
+## Algebraic Equation Solver {#functions-algebraic-solver}
+
+Stan provides a built-in algebraic equation solver. Although it looks
+like other function applications, the algebraic solver is special in
+two ways.
+
+First, the algebraic solver is a higher-order function, i.e. it takes
+another function as one of its arguments. The only other functions in
+Stan which share this feature are the ordinary differential equation
+solvers (see section \@ref(functions-ode-solver)). Ordinary Stan
+functions do not allow functions as arguments.
+
+Second, some of the arguments of the algebraic solvers are restricted
+to data only expressions. These expressions must not contain variables
+other than those declared in the data or transformed data blocks.
+Ordinary Stan functions place no restriction on the origin of
+variables in their argument expressions.
+
+### Specifying an Algebraic Equation as a Function
+
+An algebraic system is specified as an ordinary function in Stan
+within the function block. The algebraic system function must have
+this signature:
+
+```
+ vector algebra_system(vector y, vector theta,
+                              real[] x_r, int[] x_i)
+```
+
+The algebraic system function should return the value of the algebraic
+function which goes to 0, when we plug in the solution to the
+algebraic system.
+
+The argument of this function are:
+
+*   *`y`*, the unknowns we wish to solve for
+
+*   *`theta`*, parameter values used to evaluate the algebraic system
+
+*   *`x_r`*, data values used to evaluate the algebraic system
+
+*   *`x_i`*, integer data used to evaluate the algebraic system
+
+The algebraic system function separates parameter values, *`theta`*,
+from data values, *`x_r`*, for efficiency in computing the gradients
+of the algebraic system.
+
+### Call to the Algebraic Solver
+
+<!-- vector; algebra_solver; (function algebra_system, vector y_guess, vector theta, real[] x_r, int[] x_i); -->
+\index{{\tt \bfseries algebra\_solver}!{\tt (function algebra\_system, vector y\_guess, vector theta, real[] x\_r, int[] x\_i): vector}|hyperpage}
+
+`vector` **`algebra_solver`**`(function algebra_system, vector y_guess, vector theta, real[] x_r, int[] x_i)`<br>\newline
+Solves the algebraic system, given an initial guess, using the Powell
+hybrid algorithm.
+
+<!-- vector; algebra_solver; (function algebra_system, vector y_guess, vector theta, real[] x_r, int[] x_i, real rel_tol, real f_tol, int max_steps); -->
+\index{{\tt \bfseries algebra\_solver}!{\tt (function algebra\_system, vector y\_guess, vector theta, real[] x\_r, int[] x\_i, real rel\_tol, real f\_tol, int max\_steps): vector}|hyperpage}
+
+`vector` **`algebra_solver`**`(function algebra_system, vector y_guess, vector theta, real[] x_r, int[] x_i, real rel_tol, real f_tol, int max_steps)`<br>\newline
+Solves the algebraic system, given an initial guess, using the Powell
+hybrid algorithm with additional control parameters for the solver.
+
+#### Arguments to the Algebraic Solver
+
+The arguments to the algebraic solver are as follows:
+
+* *`algebra_system`*: function literal referring to a function
+specifying the system of algebraic equations with signature
+`(vector, vector, real[], int[]):vector`.   The arguments represent
+(1) unknowns, (2) parameters, (3) real data, and   (4) integer data,
+and the return value contains the value of the algebraic   function,
+which goes to 0 when we plug in the solution to the algebraic system,
+
+*   *`y_guess`*: initial guess for the solution, type `vector`,
+
+*   *`theta`*: parameters only, type `vector`,
+
+*   *`x_r`*: real data only, type `real[]`, and
+
+*   *`x_i`*: integer data only, type `int[]`.
+
+For more fine-grained control of the algebraic solver, these
+parameters can also be provided:
+
+*   *`rel_tol`*: relative tolerance for the algebraic solver, type
+`real`, data only,
+
+*   *`function_tol`*: function tolerance for the algebraic solver,
+type `real`, data only,
+
+*   *`max_num_steps`*: maximum number of steps to take in the
+algebraic solver, type `int`, data only.
+
+#### Return value
+
+The return value for the algebraic solver is an object of type
+`vector`, with values which, when plugged in as `y` make the algebraic
+function go to 0.
+
+#### Sizes and parallel arrays
+
+Certain sizes have to be consistent. The initial guess, return value
+of the solver, and return value of the algebraic function must all be
+the same size.
+
+The parameters, real data, and integer data will be passed from the
+solver directly to the system function.
+
+#### Algorithmic details
+
+The algebraic solver uses the Powell hybrid method [@Powell:1970],
+which in turn uses first-order derivatives. The Stan code builds on
+the implementation of the hybrid solver in the unsupported module for
+nonlinear optimization problems of the Eigen library [@Eigen:2013].
+This solver is in turn based on the algorithm developed for the
+package MINPACK-1 [@minpack:1980].
+
+The Jacobian of the solution with respect to auxiliary parameters is
+computed using the implicit function theorem. Intermediate Jacobians
+(of the the algebraic function's output with respect to the unknowns y
+and with respect to the auxiliary parameters theta) are computed using
+Stan's automatic differentiation.
+
+## Ordinary Differential Equation Solvers {#functions-ode-solver}
+
+Stan provides built-in ordinary differential equation (ODE) solvers.
+Although they look like function applications, the ODE solvers are
+special in two ways.
+
+First, the first argument to each of the solvers is a function
+specifying the ODE system as an argument, like PKBugs
+[@LunnEtAl:1999]. Ordinary Stan functions do not allow functions as
+arguments.
+
+Second, some of the arguments to the ODE solvers are restricted to
+data only expressions. These expressions must not contain variables
+other than those declared in the data or transformed data blocks.
+Ordinary Stan functions place no restriction on the origin of
+variables in their argument expressions.
+
+### Specifying an Ordinary Differential Equation as a Function {#functions-ode-function}
+
+A system of ODEs is specified as an ordinary function in Stan within
+the functions block. The ODE system function must have this function
+signature:
+
+```
+ real[] ode(real time, real[] state, real[] theta,
+            real[] x_r, int[] x_i)
+```
+
+The ODE system function should return the derivative of the state with
+respect to time at the time provided. The length of the returned real
+array must match the length of the state input into the function.
+
+The arguments to this function are:
+
+*   *`time`*, the time to evaluate the ODE system
+
+*   *`state`*, the state of the ODE system at the time specified
+
+*   *`theta`*, parameter values used to evaluate the ODE system
+
+*   *`x_r`*, data values used to evaluate the ODE system
+
+*   *`x_i`*, integer data values used to evaluate the ODE system.
+
+The ODE system function separates parameter values, *`theta`*, from
+data values, *`x_r`*, for efficiency in computing the gradients of the
+ODE.
+
+### Non-Stiff Solver
+
+<!-- real[ , ]; integrate_ode_rk45; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i); -->
+\index{{\tt \bfseries integrate\_ode\_rk45}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, real[] x\_r, int[] x\_i): real[ , ]}|hyperpage}
+
+`real[ , ]` **`integrate_ode_rk45`**`(function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i)`<br>\newline
+Solves the ODE system for the times provided using the Runge Kutta
+Dopri algorithm with the implementation from Boost.
+
+<!-- real[ , ]; integrate_ode_rk45; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i, real rel_tol, real abs_tol, int max_num_steps); -->
+\index{{\tt \bfseries integrate\_ode\_rk45}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, real[] x\_r, int[] x\_i, real rel\_tol, real abs\_tol, int max\_num\_steps): real[ , ]}|hyperpage}
+
+`real[ , ]` **`integrate_ode_rk45`**`(function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i, real rel_tol, real abs_tol, int max_num_steps)`<br>\newline
+Solves the ODE system for the times provided using the Runge Kutta
+Dopri algorithm with the implementation from Boost with additional
+control parameters for the solver.
+
+<!-- real[ , ]; integrate_ode; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i); -->
+\index{{\tt \bfseries integrate\_ode}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, real[] x\_r, int[] x\_i): real[ , ]}|hyperpage}
+
+`real[ , ]` **`integrate_ode`**`(function ode, real[] initial_state, real initial_time, real[] times, real[] theta, real[] x_r, int[] x_i)`<br>\newline
+Deprecated. Solves the ODE system for the times provided with a
+non-stiff solver. This calls the Runge Kutta Dopri algorithm.
+
+### Stiff Solver
+
+<!-- real[]; integrate_ode_bdf; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, data real[] x_r, data int[] x_i); -->
+\index{{\tt \bfseries integrate\_ode\_bdf}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, data real[] x\_r, data int[] x\_i): real[]}|hyperpage}
+
+`real[]` **`integrate_ode_bdf`**`(function ode, real[] initial_state, real initial_time, real[] times, real[] theta, data real[] x_r, data int[] x_i)`<br>\newline
+Solves the ODE system for the times provided using the backward
+differentiation formula (BDF) method with the implementation from
+CVODES.
+
+<!-- real[]; integrate_ode_bdf; (function ode, real[] initial_state, real initial_time, real[] times, real[] theta, data real[] x_r, data int[] x_i, data real rel_tol, data real abs_tol, dta int max_num_steps); -->
+\index{{\tt \bfseries integrate\_ode\_bdf}!{\tt (function ode, real[] initial\_state, real initial\_time, real[] times, real[] theta, data real[] x\_r, data int[] x\_i, data real rel\_tol, data real abs\_tol, dta int max\_num\_steps): real[]}|hyperpage}
+
+`real[]` **`integrate_ode_bdf`**`(function ode, real[] initial_state, real initial_time, real[] times, real[] theta, data real[] x_r, data int[] x_i, data real rel_tol, data real abs_tol, dta int max_num_steps)`<br>\newline
+Solves the ODE system for the times provided using the backward
+differentiation formula (BDF) method with the implementation from
+CVODES with additional control parameters for the CVODES solver.
+
+### Arguments to the ODE solvers
+
+The arguments to the ODE solvers in both the stiff and non-stiff cases
+are as follows.
+
+*   *`ode`*: function literal referring to a function specifying   the
+system of differential equations with signature described in
+\@ref(functions-ode-function):
+
+```
+ (real, real[], real[], data real[], data int[]):real[]
+```
+
+The arguments represent (1) time, (2) system state, (3) parameters,
+(4) real data, and (5) integer data, and the return value contains the
+derivatives with respect to time of the state,
+
+*   *`initial_state`*: initial state, type `real[]`,
+
+*   *`initial_time`*: initial time, type `int`  or `real`,
+
+*   *`times`*: solution times, type `real[]`,
+
+*   *`theta`*: parameters, type `real[]`,
+
+*   `data`   *`x_r`*: real data, type `real[]`, data only, and
+
+*   `data`   *`x_i`*: integer data, type `int[]`, data only.
+
+For more fine-grained control of the ODE solvers, these parameters can
+also be provided:
+
+*   `data`   *`rel_tol`*: relative tolerance for the ODE  solver, type
+`real`, data only,
+
+*   `data`   *`abs_tol`*: absolute tolerance for the ODE  solver, type
+`real`, data only, and
+
+*   `data`   *`max_num_steps`*: maximum number of steps to take in the
+ODE solver, type `int`, data only.
+
+#### Return values
+
+The return value for the ODE solvers is an array of type `real[,]`,
+with values consisting of solutions at the specified times.
+
+#### Sizes and parallel arrays
+
+The sizes must match, and in particular, the following groups are of
+the same size:
+
+*   state variables passed into the system function,  derivatives
+returned by the system function, initial state passed  into the
+solver, and rows of the return value of the solver,
+
+*   solution times and number of rows of the return value of the
+solver,
+
+*   parameters, real data and integer data passed to the solver will
+be passed to the system function
+
+## Higher-Order Map {#functions-map}
+
+Stan provides a higher-order map function.  This allows map-reduce
+functionality to be coded in Stan as described in the user's guide.
+
+### Specifying the Mapped Function
+
+The function being mapped must have a signature identical to that of
+the function `f` in the following declaration.
+
+```
+ vector f(vector phi, vector theta,
+          data real[] x_r, data int[] x_i);
+```
+
+The map function returns the sequence of results for the particular
+shard being evaluated.  The arguments to the mapped function are:
+
+*   *`phi`*, the sequence of parameters shared across shards
+
+*   *`theta`*, the sequence of parameters specific to this shard
+
+*   *`x_r`*, sequence of real-valued data
+
+*   *`x_i`*, sequence of integer data
+
+All input for the mapped function must be packed into these sequences
+and all output from the mapped function must be packed into a single
+vector.  The vector of output from each mapped function is
+concatenated into the final result.
+
+### Rectangular Map
+
+The rectangular map function operates on rectangular (not ragged) data
+structures, with parallel data structures for job-specific parameters,
+job-specific real data, and job-specific integer data.
+
+<!-- vector; map_rect; (F f, vector phi, vector[] theta, data real[,] x_r, data int[,] x_i); -->
+\index{{\tt \bfseries map\_rect}!{\tt (F f, vector phi, vector[] theta, data real[,] x\_r, data int[,] x\_i): vector}|hyperpage}
+
+`vector` **`map_rect`**`(F f, vector phi, vector[] theta, data real[,] x_r, data int[,] x_i)`<br>\newline
+Return the concatenation of the results of applying the function f, of
+type `(vector, vector, real[], int[]):vector` elementwise, i.e.,
+`f(phi, theta[n], x_r[n], x_i[n])` for each `n` in `1:N`, where `N` is
+the size of the parallel arrays of job-specific/local parameters
+`theta`, real data `x_r`, and integer data `x_r`. The shared/global
+parameters `phi` are passed to each invocation of `f`.
+

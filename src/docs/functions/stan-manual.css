@@ -1,0 +1,224 @@
+a {
+    color: yellow;
+}
+p.caption {
+    color: #888;
+    margin-top: 10px;
+    font-style: italic;
+    font-size: 80%;
+    text-align: left;
+}
+
+p code {
+    white-space: inherit;
+    background-color: inherit;
+}
+
+pre {
+    word-break: normal;
+    word-wrap: normal;
+    background-color: inherit;
+}
+pre code {
+    white-space: inherit;
+    margin: 0;
+    padding: 0;
+    background-color: inherit;
+}
+
+.header-section-number {
+    font-weight: bold;
+    margin-right: 0.25em;
+}
+.header-section-number::after {
+    content: ".";
+    font-weight: bold;
+}
+.chapter a b {
+    font-weight: bold;
+    margin-right: 0.15em
+}
+.chapter a b::after {
+    content: ". ";
+}
+
+
+.book .book-body .page-wrapper .page-inner section.normal a {
+    color: #0645AD;
+}
+.book .book-body .page-wrapper .page-inner section.normal a:visited {
+    color: #0B0080;
+}
+
+div .definition {
+    font-style: italic;
+    font-weight: normal;
+}
+div .definition strong {
+    font-style: normal;
+    font-weight: normal;
+}
+div .definition em {
+    font-style: normal;
+    font-weight: normal;
+}
+
+div .example {
+    font-style: normal;
+    font-weight: normal;
+    margin-left: 2em;
+}
+div .example strong {
+    font-style: italic;
+    font-weight: normal;
+}
+div .example em {
+    font-style: italic;
+    font-weight: normal;
+}
+.example .example strong {
+    font-style: italic;
+    margin-left: -2em;
+}
+.book .book-body .body-inner .page-wrapper .page-inner section div div div div.example {
+    font-size: 100%;
+}
+.book .book-body .body-inner.page-wrapper .page-inner section div div div.example {
+    font-size: 100%;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal {
+    font-family: Georgia, Times Roman, serif;
+    font-weight: normal;
+    color: #000;
+    line-height: 1.5;
+}
+.book .book-body .page-wrapper .page-inner section.normal em {
+    font-style: italic;
+    font-weight: normal;
+    margin-right: 0.25em;
+}
+.book .book-body .page-wrapper .page-inner section.normal strong {
+    font-style: normal;
+    font-weight: bold;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal code {
+    font-family: "Lucida Console", Monaco, Menlo, monospaced;
+    font-size: 85%;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+}
+.book .book-body .page-wrapper .page-inner section.normal code:before {
+    content: none;
+}
+.book .book-body .page-wrapper .page-inner section.normal code:after {
+    content: none;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal pre {
+    font-family: "Lucida Console", Monaco, Menlo, monospaced;
+    background-color: #FFF;
+    font-size: 100%;
+    margin-left: 2em;
+    margin-below: 0.6em;
+    margin-above: -0.3em;
+    padding: 0;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h1 {
+    font-size: 200%;
+    font-weight: bold;
+    color: #a80018;
+    margin: 0 0 0.5em 0;
+}
+.book .book-body .page-wrapper .page-inner section.normal h2 {
+    font-size: 120%;
+    font-weight: bold;
+    color: #990017;
+    font-style: normal;
+    margin: 1em 0 0.5em 0;
+}
+.book .book-body .page-wrapper .page-inner section.normal h3 {
+    font-size: 100%;
+    font-weight: bold;
+    color: #800013;
+    font-style: normal;
+    margin: 0.75em 0 0.25em 0;
+}
+.book .book-body .page-wrapper .page-inner section.normal h4 {
+    font-size: 100%;
+    font-weight: normal;
+    font-style: italic;
+    color: #800013;
+    margin: 0.75em 0 0.5em 0;
+}
+
+.book .book-header h1 {
+    opacity: 1;
+    text-align: center;
+}
+
+#header .title {
+    margin-bottom: -0.6em;
+    font-size: 250%;
+    color: #800013;
+    font-weight: bold;
+}
+#header h4.author {
+    font-size: 175%;
+    color: #800013;
+    margin-bottom: 0;
+}
+#header h4.author em {
+    font-style: normal;
+    color: #800013;
+}
+#header h4.author strong {
+    font-style: normal;
+    color: #800013;
+}
+#header h4.date {
+    font-size: 125%;
+    color: #66000f;
+    margin-bottom: 3em;
+    margin-top: 1em;
+}
+#header h4.date em {
+    font-style: normal;
+    color: #66000f;
+}
+#header h4.date strong {
+    font-style: normal;
+    color: #66000f;
+}
+
+html body div div.book-summary nav ul.summary li.chapter {
+    font-size: 9pt;
+    font-family: Verdana, Helvetica, sans;
+    line-height: 0.6;
+}
+
+html body div div.book-summary nav ul.summary li.chapter a b {
+    font-size: 9pt;
+    font-weight: normal;
+    font-family: Verdana, Helvetica, sans;
+}
+
+table thead tr.header th {
+    font-style: italic;
+    font-weight: normal;
+}
+.book .book-body .page-wrapper .page-inner section.normal table tr:nth-child(2n) {
+    background-color: #FFF;
+}
+.book .book-body .page-wrapper table tbody tr.odd {
+    background-color: #FFF;
+}
+.book .book-body .page-wrapper table tbody tr.even {
+    background-color: #FFF;
+}
+.book .book-body .page-wrapper .page-inner section.normal table th {
+    font-weight: 300;
+}

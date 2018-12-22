@@ -1,0 +1,24 @@
+# Comments {#comments.section}
+
+Stan supports C++-style line-based and bracketed comments.  Comments
+may be used anywhere whitespace is allowed in a Stan program.
+
+## Line-Based Comments 
+
+Any characters on a line following two forward slashes (`//`) is
+ignored along with the slashes.  These may be used, for example, to
+document variables,
+
+```stan
+data {
+  int<lower=0> N;  // number of observations
+  real y[N];  // observations
+}
+```
+
+## Bracketed Comments 
+
+For bracketed comments, any text between a forward-slash and asterisk
+pair (`/*`) and an asterisk and forward-slash pair (`*/`) is
+ignored.
+

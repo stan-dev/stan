@@ -1,0 +1,411 @@
+# Array Operations
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="array-reductions.html">Reductions</a>\n')
+cat(' * <a href="array-size-and-dimension-function.html">Array Size and Dimension Function</a>\n')
+cat(' * <a href="array-broadcasting.html">Array Broadcasting</a>\n')
+cat(' * <a href="array-concatenation.html">Array Concatenation</a>\n')
+cat(' * <a href="sorting-functions.html">Sorting functions</a>\n')
+}
+```
+
+## Reductions {#array-reductions}
+
+The following operations take arrays as input and produce single
+output values.  The boundary values for size 0 arrays are the unit
+with respect to the combination operation (min, max, sum, or product).
+
+### Minimum and Maximum
+
+<!-- real; min; (real[] x); -->
+\index{{\tt \bfseries min}!{\tt (real[] x): real}|hyperpage}
+
+`real` **`min`**`(real[] x)`<br>\newline
+The minimum value in x, or $+\infty$ if x is size 0.
+
+<!-- int; min; (int[] x); -->
+\index{{\tt \bfseries min}!{\tt (int[] x): int}|hyperpage}
+
+`int` **`min`**`(int[] x)`<br>\newline
+The minimum value in x, or error if x is size 0.
+
+<!-- real; max; (real[] x); -->
+\index{{\tt \bfseries max}!{\tt (real[] x): real}|hyperpage}
+
+`real` **`max`**`(real[] x)`<br>\newline
+The maximum value in x, or $-\infty$ if x is size 0.
+
+<!-- int; max; (int[] x); -->
+\index{{\tt \bfseries max}!{\tt (int[] x): int}|hyperpage}
+
+`int` **`max`**`(int[] x)`<br>\newline
+The maximum value in x, or error if x is size 0.
+
+### Sum, Product, and Log Sum of Exp
+
+<!-- int; sum; (int[] x); -->
+\index{{\tt \bfseries sum}!{\tt (int[] x): int}|hyperpage}
+
+`int` **`sum`**`(int[] x)`<br>\newline
+The sum of the elements in x, defined for $x$ of size $N$ by \[
+\text{sum}(x) = \begin{cases} \sum_{n=1}^N x_n & \text{if} N > 0
+\\[4pt] 0 & \text{if} N = 0 \end{cases} \]
+
+<!-- real; sum; (real[] x); -->
+\index{{\tt \bfseries sum}!{\tt (real[] x): real}|hyperpage}
+
+`real` **`sum`**`(real[] x)`<br>\newline
+The sum of the elements in x; see definition above.
+
+<!-- real; prod; (real[] x); -->
+\index{{\tt \bfseries prod}!{\tt (real[] x): real}|hyperpage}
+
+`real` **`prod`**`(real[] x)`<br>\newline
+The product of the elements in x, or 1 if x is size 0.
+
+<!-- real; prod; (int[] x); -->
+\index{{\tt \bfseries prod}!{\tt (int[] x): real}|hyperpage}
+
+`real` **`prod`**`(int[] x)`<br>\newline
+The product of the elements in x, \[ \text{product}(x) = \begin{cases}
+\prod_{n=1}^N x_n & \text{if} N > 0 \\[4pt] 1 & \text{if} N = 0
+\end{cases} \]
+
+<!-- real; log_sum_exp; (real[] x); -->
+\index{{\tt \bfseries log\_sum\_exp}!{\tt (real[] x): real}|hyperpage}
+
+`real` **`log_sum_exp`**`(real[] x)`<br>\newline
+The natural logarithm of the sum of the exponentials of the elements
+in x, or $-\infty$ if the array is empty.
+
+### Sample Mean, Variance, and Standard Deviation
+
+The sample mean, variance, and standard deviation are calculated in
+the usual way.  For i.i.d. draws from a distribution of finite mean,
+the sample mean is an unbiased estimate of the mean of the
+distribution.  Similarly, for i.i.d. draws from a distribution of
+finite variance, the sample variance is an unbiased estimate of the
+variance.[^fnvar]  The sample deviation is defined as the square root
+of the sample deviation, but is not unbiased.
+
+[^fnvar]: Dividing by $N$ rather than $(N-1)$ produces a maximum
+likelihood estimate of variance, which is biased to underestimate
+variance.
+
+<!-- real; mean; (real[] x); -->
+\index{{\tt \bfseries mean}!{\tt (real[] x): real}|hyperpage}
+
+`real` **`mean`**`(real[] x)`<br>\newline
+The sample mean of the elements in x. For an array $x$ of size $N >
+0$, \[ \text{mean}(x) \ = \ \bar{x} \ = \ \frac{1}{N} \sum_{n=1}^N
+x_n. \] It is an error to the call the mean function with an array of
+size $0$.
+
+<!-- real; variance; (real[] x); -->
+\index{{\tt \bfseries variance}!{\tt (real[] x): real}|hyperpage}
+
+`real` **`variance`**`(real[] x)`<br>\newline
+The sample variance of the elements in x. For $N > 0$, \[
+\text{variance}(x) \ = \ \begin{cases} \frac{1}{N-1} \sum_{n=1}^N (x_n
+- \bar{x})^2 & \text{if } N > 1 \\[4pt] 0 & \text{if } N = 1
+\end{cases} \] It is an error to call the `variance` function with an
+array of size 0.
+
+<!-- real; sd; (real[] x); -->
+\index{{\tt \bfseries sd}!{\tt (real[] x): real}|hyperpage}
+
+`real` **`sd`**`(real[] x)`<br>\newline
+The sample standard deviation of elements in x. \[ \text{sd}(x) =
+\begin{cases} \sqrt{\, \text{variance}(x)} & \text{if } N > 1 \\[4pt]
+0 & \text{if } N = 0 \end{cases} \] It is an error to call the `sd`
+function with an array of size 0.
+
+### Euclidean Distance and Squared Distance
+
+<!-- real; distance; (vector x, vector y); -->
+\index{{\tt \bfseries distance}!{\tt (vector x, vector y): real}|hyperpage}
+
+`real` **`distance`**`(vector x, vector y)`<br>\newline
+The Euclidean distance between x and y, defined by \[
+\text{distance}(x,y) \ = \ \sqrt{\textstyle \sum_{n=1}^N (x_n -
+y_n)^2} \] where `N` is the size of x and y. It is an error to call
+`distance` with arguments of unequal size.
+
+<!-- real; distance; (vector x, row_vector y); -->
+\index{{\tt \bfseries distance}!{\tt (vector x, row\_vector y): real}|hyperpage}
+
+`real` **`distance`**`(vector x, row_vector y)`<br>\newline
+The Euclidean distance between x and y
+
+<!-- real; distance; (row_vector x, vector y); -->
+\index{{\tt \bfseries distance}!{\tt (row\_vector x, vector y): real}|hyperpage}
+
+`real` **`distance`**`(row_vector x, vector y)`<br>\newline
+The Euclidean distance between x and y
+
+<!-- real; distance; (row_vector x, row_vector y); -->
+\index{{\tt \bfseries distance}!{\tt (row\_vector x, row\_vector y): real}|hyperpage}
+
+`real` **`distance`**`(row_vector x, row_vector y)`<br>\newline
+The Euclidean distance between x and y
+
+<!-- real; squared_distance; (vector x, vector y); -->
+\index{{\tt \bfseries squared\_distance}!{\tt (vector x, vector y): real}|hyperpage}
+
+`real` **`squared_distance`**`(vector x, vector y)`<br>\newline
+The squared Euclidean distance between x and y, defined by \[
+\mathrm{squared\_distance}(x,y) \ = \ \text{distance}(x,y)^2 \ = \
+\textstyle \sum_{n=1}^N (x_n - y_n)^2, \] where `N` is the size of x
+and y. It is an error to call `squared_distance` with arguments of
+unequal size.
+
+<!-- real; squared_distance; (vector x, row_vector [] y); -->
+\index{{\tt \bfseries squared\_distance}!{\tt (vector x, row\_vector [] y): real}|hyperpage}
+
+`real` **`squared_distance`**`(vector x, row_vector [] y)`<br>\newline
+The squared Euclidean distance between x and y
+
+<!-- real; squared_distance; (row_vector x, vector [] y); -->
+\index{{\tt \bfseries squared\_distance}!{\tt (row\_vector x, vector [] y): real}|hyperpage}
+
+`real` **`squared_distance`**`(row_vector x, vector [] y)`<br>\newline
+The squared Euclidean distance between x and y
+
+<!-- real; squared_distance; (row_vector x, row_vector[] y); -->
+\index{{\tt \bfseries squared\_distance}!{\tt (row\_vector x, row\_vector[] y): real}|hyperpage}
+
+`real` **`squared_distance`**`(row_vector x, row_vector[] y)`<br>\newline
+The Euclidean distance between x and y
+
+## Array Size and Dimension Function
+
+The size of an array or matrix can be obtained using the `dims()`
+function.  The `dims()` function is defined to take an argument
+consisting of any variable with up to 8 array dimensions (and up to 2
+additional matrix dimensions) and returns an array of integers with
+the dimensions.  For example, if two variables are declared as
+follows,
+
+```
+ real x[7,8,9];
+ matrix[8,9] y[7];
+```
+
+then calling `dims(x)` or `dims(y)` returns an integer array of size 3
+containing the elements 7, 8, and 9 in that order.
+
+The `size()` function extracts the number of elements in an array.
+This is just the top-level elements, so if the array is declared as
+
+```
+ real a[M,N];
+```
+
+the size of `a` is `M`.
+
+The function `num_elements`, on the other hand, measures all of the
+elements, so that the array `a` above has $M \times N$ elements.
+
+The specialized functions `rows()` and `cols()` should be used to
+extract the dimensions of vectors and matrices.
+
+<!-- int[]; dims; (T x); -->
+\index{{\tt \bfseries dims}!{\tt (T x): int[]}|hyperpage}
+
+`int[]` **`dims`**`(T x)`<br>\newline
+Return an integer array containing the dimensions of x; the type of
+the argument T can be any Stan type with up to 8 array dimensions.
+
+<!-- int; num_elements; (T[] x); -->
+\index{{\tt \bfseries num\_elements}!{\tt (T[] x): int}|hyperpage}
+
+`int` **`num_elements`**`(T[] x)`<br>\newline
+Return the total number of elements in the array x including all
+elements in contained arrays, vectors, and matrices. T can be any
+array type. For example, if `x` is of type `real[4,3]` then
+`num_elements(x)` is 12, and if `y` is declared as `matrix[3,4] y[5]`,
+then `size(y)` evaluates to 60.
+
+<!-- int; size; (T[] x); -->
+\index{{\tt \bfseries size}!{\tt (T[] x): int}|hyperpage}
+
+`int` **`size`**`(T[] x)`<br>\newline
+Return the number of elements in the array x; the type of the array T
+can be any type, but the size is just the size of the top level array,
+not the total number of elements contained. For example, if `x` is of
+type `real[4,3]` then `size(x)` is 4.
+
+## Array Broadcasting {#array-broadcasting}
+
+The following operations create arrays by repeating elements to fill
+an array of a specified size.  These operations work for all input
+types T, including reals, integers, vectors, row vectors, matrices, or
+arrays.
+
+<!-- T[]; rep_array; (T x, int n); -->
+\index{{\tt \bfseries rep\_array}!{\tt (T x, int n): T[]}|hyperpage}
+
+`T[]` **`rep_array`**`(T x, int n)`<br>\newline
+Return the n array with every entry assigned to x.
+
+<!-- T[,]; rep_array; (T x, int m, int n); -->
+\index{{\tt \bfseries rep\_array}!{\tt (T x, int m, int n): T[,]}|hyperpage}
+
+`T[,]` **`rep_array`**`(T x, int m, int n)`<br>\newline
+Return the m by n array with every entry assigned to x.
+
+<!-- T[,,]; rep_array; (T x, int k, int m, int n); -->
+\index{{\tt \bfseries rep\_array}!{\tt (T x, int k, int m, int n): T[,,]}|hyperpage}
+
+`T[,,]` **`rep_array`**`(T x, int k, int m, int n)`<br>\newline
+Return the k by m by n array with every entry assigned to x.
+
+For example, `rep_array(1.0,5)` produces a real array (type `real[]`)
+of size 5 with all values set to 1.0.  On the other hand,
+`rep_array(1,5)` produces an integer array (type `int[]`) of size 5
+with all values set to 1.  This distinction is important because it is
+not possible to assign an integer array to a real array.  For example,
+the following example contrasts legal with illegal array creation and
+assignment
+
+```
+ real y[5];
+ int x[5];
+ 
+ x = rep_array(1,5);     // ok
+ y = rep_array(1.0,5);   // ok
+ 
+ x = rep_array(1.0,5);   // illegal
+ y = rep_array(1,5);     // illegal
+ 
+ x = y;                  // illegal
+ y = x;                  // illegal
+```
+
+If the value being repeated `v` is a vector (i.e., `T` is `vector`),
+then `rep_array(v,27)` is a size 27 array consisting of 27 copies of
+the vector `v`.
+
+```
+ vector[5] v;
+ vector[5] a[3];
+ 
+ a = rep_array(v,3);  // fill a with copies of v
+ a[2,4] = 9.0;        // v[4], a[1,4], a[2,4] unchanged
+```
+
+If the type T of x is itself an array type, then the result will be an
+array with one, two, or three added dimensions, depending on which of
+the `rep_array` functions is called.  For instance, consider the
+following legal code snippet.
+
+```
+ real a[5,6];
+ real b[3,4,5,6];
+ 
+ b = rep_array(a,3,4); //  make (3 x 4) copies of a
+ b[1,1,1,1] = 27.9;    //  a[1,1] unchanged
+```
+
+After the assignment to `b`, the value for `b[j,k,m,n]` is equal to
+`a[m,n]` where it is defined, for `j` in `1:3`, `k` in `1:4`, `m` in
+`1:5`, and `n` in `1:6`.
+
+## Array Concatenation {#array-concatenation}
+
+<!-- T; append_array; (T x, T y); -->
+\index{{\tt \bfseries append\_array}!{\tt (T x, T y): T}|hyperpage}
+
+`T` **`append_array`**`(T x, T y)`<br>\newline
+Return the concatenation of two arrays in the order of the arguments.
+T must be an N-dimensional array of any Stan type (with a maximum N of
+7). All dimensions but the first must match.
+
+For example, the following code appends two three dimensional arrays
+of matrices together. Note that all dimensions except the first match.
+Any mismatches will cause an error to be thrown.
+
+```
+ matrix[4, 6] x1[2, 1, 7];
+ matrix[4, 6] x2[3, 1, 7];
+ matrix[4, 6] x3[5, 1, 7];
+ 
+ x3 = append_array(x1, x2);
+```
+
+## Sorting functions {#sorting-functions}
+
+Sorting can be used to sort values or the indices of those values in
+either ascending or descending order.  For example, if `v` is declared
+as a real array of size 3, with values \[ \text{v} = (1, -10.3,
+20.987), \] then the various sort routines produce  \begin{eqnarray*}
+\mathrm{sort\_asc(v)} & = &  (-10.3,1,20.987) \\[4pt]
+\mathrm{sort\_desc(v)} & = &  (20.987,1,-10.3) \\[4pt]
+\mathrm{sort\_indices\_asc(v)} & = &  (2,1,3) \\[4pt]
+\text{sort\_indices\_desc(v)} & = &  (3,1,2) \end{eqnarray*}
+
+<!-- real[]; sort_asc; (real[] v); -->
+\index{{\tt \bfseries sort\_asc}!{\tt (real[] v): real[]}|hyperpage}
+
+`real[]` **`sort_asc`**`(real[] v)`<br>\newline
+Sort the elements of v in ascending order
+
+<!-- int[]; sort_asc; (int[] v); -->
+\index{{\tt \bfseries sort\_asc}!{\tt (int[] v): int[]}|hyperpage}
+
+`int[]` **`sort_asc`**`(int[] v)`<br>\newline
+Sort the elements of v in ascending order
+
+<!-- real[]; sort_desc; (real[] v); -->
+\index{{\tt \bfseries sort\_desc}!{\tt (real[] v): real[]}|hyperpage}
+
+`real[]` **`sort_desc`**`(real[] v)`<br>\newline
+Sort the elements of v in descending order
+
+<!-- int[]; sort_desc; (int[] v); -->
+\index{{\tt \bfseries sort\_desc}!{\tt (int[] v): int[]}|hyperpage}
+
+`int[]` **`sort_desc`**`(int[] v)`<br>\newline
+Sort the elements of v in descending order
+
+<!-- int[]; sort_indices_asc; (real[] v); -->
+\index{{\tt \bfseries sort\_indices\_asc}!{\tt (real[] v): int[]}|hyperpage}
+
+`int[]` **`sort_indices_asc`**`(real[] v)`<br>\newline
+Return an array of indices between 1 and the size of v, sorted to
+index v in ascending order.
+
+<!-- int[]; sort_indices_asc; (int[] v); -->
+\index{{\tt \bfseries sort\_indices\_asc}!{\tt (int[] v): int[]}|hyperpage}
+
+`int[]` **`sort_indices_asc`**`(int[] v)`<br>\newline
+Return an array of indices between 1 and the size of v, sorted to
+index v in ascending order.
+
+<!-- int[]; sort_indices_desc; (real[] v); -->
+\index{{\tt \bfseries sort\_indices\_desc}!{\tt (real[] v): int[]}|hyperpage}
+
+`int[]` **`sort_indices_desc`**`(real[] v)`<br>\newline
+Return an array of indices between 1 and the size of v, sorted to
+index v in descending order.
+
+<!-- int[]; sort_indices_desc; (int[] v); -->
+\index{{\tt \bfseries sort\_indices\_desc}!{\tt (int[] v): int[]}|hyperpage}
+
+`int[]` **`sort_indices_desc`**`(int[] v)`<br>\newline
+Return an array of indices between 1 and the size of v, sorted to
+index v in descending order.
+
+<!-- int; rank; (real[] v, int s); -->
+\index{{\tt \bfseries rank}!{\tt (real[] v, int s): int}|hyperpage}
+
+`int` **`rank`**`(real[] v, int s)`<br>\newline
+Number of components of v less than v[s]
+
+<!-- int; rank; (int[] v, int s); -->
+\index{{\tt \bfseries rank}!{\tt (int[] v, int s): int}|hyperpage}
+
+`int` **`rank`**`(int[] v, int s)`<br>\newline
+Number of components of v less than v[s]
+

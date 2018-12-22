@@ -1,0 +1,149 @@
+# Correlation Matrix Distributions
+
+The correlation matrix distributions have support on the (Cholesky
+factors of) correlation matrices.  A Cholesky factor $L$ for a $K
+\times K$ correlation matrix $\Sigma$ of dimension $K$ has rows of
+unit length so that the diagonal of $L L^{\top}$ is the unit
+$K$-vector. Even though models are usually conceptualized in terms of
+correlation matrices, it is better to operationalize them in terms of
+their Cholesky factors. If you are interested in the posterior
+distribution of the correlations, you can recover them in the
+generated quantities block via
+
+```
+ generated quantities {
+   corr_matrix[K] Sigma;
+   Sigma = multiply_lower_tri_self_transpose(L);
+ }
+```
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="lkj-correlation.html">LKJ Correlation Distribution</a>\n')
+cat(' * <a href="cholesky-lkj-correlation-distribution.html">Cholesky LKJ Correlation Distribution</a>\n')
+}
+```
+
+## LKJ Correlation Distribution {#lkj-correlation}
+
+### Probability Density Function
+
+For $\eta > 0$, if $\Sigma$ a positive-definite, symmetric matrix with
+unit diagonal (i.e., a correlation matrix), then \[
+\text{LkjCorr}(\Sigma|\eta) \propto \det \left( \Sigma \right)^{(\eta
+- 1)}. \] The expectation is the identity matrix for any positive
+value of the shape parameter $\eta$, which can be interpreted like the
+shape parameter of a symmetric beta distribution:
+
+*   if $\eta = 1$, then the density is uniform over correlation
+matrices of order $K$;
+
+*   if $\eta > 1$, the identity matrix is the modal correlation
+matrix, with a sharper peak in the density at the identity matrix
+for larger $\eta$; and
+
+*   for $0 < \eta < 1$, the density has a trough at the identity
+matrix.
+
+*   if $\eta$ were an unknown parameter, the Jeffreys prior is
+proportional to $\sqrt{2\sum_{k=1}^{K-1}\left(
+\psi_1\left(\eta+\frac{K-k-1}{2}\right) -   2\psi_1\left(2\eta+K-k-1
+\right)\right)}$, where $\psi_1()$ is the   trigamma function
+
+See [@LewandowskiKurowickaJoe:2009] for definitions. However, it is
+much better computationally to work directly with the Cholesky factor
+of $\Sigma$, so this distribution should never be explicitly used in
+practice.
+
+### Sampling Statement
+
+`y ~ ` **`lkj_corr`**`(eta)`
+
+Increment target log probability density with `lkj_corr_lpdf( y | eta)`
+dropping constant additive terms.
+\index{{\tt \bfseries lkj\_corr}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; lkj_corr_lpdf; (matrix y | real eta); -->
+\index{{\tt \bfseries lkj\_corr}!{\tt (matrix y | real eta): real}|hyperpage}
+
+`real` **`lkj_corr_lpdf`**`(matrix y | real eta)`<br>\newline
+The log of the LKJ density for the correlation matrix y given
+nonnegative shape eta. The only reason to use this density function is
+if you want the code to run slower and consume more memory with more
+risk of numerical errors. Use its Cholesky factor as described in the
+next section.
+
+<!-- matrix; lkj_corr_rng; (int K, real eta); -->
+\index{{\tt \bfseries lkj\_corr}!{\tt (int K, real eta): matrix}|hyperpage}
+
+`matrix` **`lkj_corr_rng`**`(int K, real eta)`<br>\newline
+Generate a LKJ random correlation matrix of order K with shape eta;
+may only be used in generated quantities block
+
+## Cholesky LKJ Correlation Distribution
+
+Stan provides an implicit parameterization of the LKJ correlation
+matrix density in terms of its Cholesky factor, which you should use
+rather than the explicit parameterization in the previous section. For
+example, if `L` is a Cholesky factor of a correlation matrix, then
+
+```
+ L ~ lkj_corr_cholesky(2.0); # implies L * L' ~ lkj_corr(2.0); 
+```
+
+Because Stan requires models to have support on all valid constrained
+parameters, `L` will almost always[^fnlkj] be a parameter declared
+with the type of a Cholesky factor for a correlation matrix; for
+example,
+
+[^fnlkj]: It is possible to build up a valid `L` within Stan, but that
+would then require Jacobian adjustments to imply the intended
+posterior.
+
+```
+ parameters {   cholesky_factor_corr[K] L;   # rather than corr_matrix[K] Sigma;   // ... 
+```
+
+### Probability Density Function
+
+For $\eta > 0$, if $L$ is a $K \times K$ lower-triangular Cholesky
+factor of a symmetric positive-definite matrix with unit diagonal
+(i.e., a correlation matrix), then \[ \text{LkjCholesky}(L|\eta)
+\propto \left|J\right|\det(L L^\top)^{(\eta - 1)} = \prod_{k=2}^K
+L_{kk}^{K-k+2\eta-2}. \] See the previous section for details on
+interpreting the shape parameter $\eta$. Note that even if $\eta=1$,
+it is still essential to evaluate the density function because the
+density of $L$ is not constant, regardless of the value of $\eta$,
+even though the density of $LL^\top$ is constant iff $\eta=1$.
+
+A lower triangular $L$ is a Cholesky factor for a correlation matrix
+if and only if $L_{k,k} > 0$ for $k \in 1{:}K$ and each row $L_k$ has
+unit Euclidean length.
+
+### Sampling Statement
+
+`L ~ ` **`lkj_corr_cholesky`**`(eta)`
+
+Increment target log probability density with `lkj_corr_cholesky_lpdf( L | eta)`
+dropping constant additive terms.
+\index{{\tt \bfseries lkj\_corr\_cholesky}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; lkj_corr_cholesky_lpdf; (matrix L | real eta); -->
+\index{{\tt \bfseries lkj\_corr\_cholesky}!{\tt (matrix L | real eta): real}|hyperpage}
+
+`real` **`lkj_corr_cholesky_lpdf`**`(matrix L | real eta)`<br>\newline
+The log of the LKJ density for the lower-triangular Cholesky factor L
+of a correlation matrix given shape eta.
+
+<!-- matrix; lkj_corr_cholesky_rng; (int K, real eta); -->
+\index{{\tt \bfseries lkj\_corr\_cholesky}!{\tt (int K, real eta): matrix}|hyperpage}
+
+`matrix` **`lkj_corr_cholesky_rng`**`(int K, real eta)`<br>\newline
+Generate a random Cholesky factor of a correlation matrix of order K
+that is distributed LKJ with shape eta; may only be used in generated
+quantities block
+
