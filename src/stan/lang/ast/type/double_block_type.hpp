@@ -11,7 +11,6 @@ namespace lang {
  * Double block var type.
  */
 struct double_block_type {
-
   /**
    * Bounds constraints
    */
