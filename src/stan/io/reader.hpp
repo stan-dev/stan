@@ -539,8 +539,7 @@ public:
    */
   template <typename TU> inline T scalar_ub(TU ub) {
     T x(scalar());
-    stan::math::check_less_or_equal("stan::io::scalar_ub",
-                                    "Constrained scalar",
+    stan::math::check_less_or_equal("stan::io::scalar_ub", "Constrained scalar",
                                     x, ub);
     return x;
   }
