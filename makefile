@@ -108,7 +108,6 @@ clean-all: clean clean-dox clean-deps clean-libraries
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
 
-
 ##
 # Submodule related tasks
 ##
