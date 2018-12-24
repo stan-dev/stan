@@ -4,6 +4,6 @@
 TEST(langParser, poundCommentDeprecated) {
   test_warning("pound-comment-deprecated",
                "Comments beginning with # are deprecated."
-               "  Please use  //");
+               "  Please use //");
 }
 
