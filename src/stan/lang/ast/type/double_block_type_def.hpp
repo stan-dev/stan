@@ -5,25 +5,25 @@
 
 namespace stan {
 namespace lang {
-double_block_type::double_block_type(const range& bounds,
-                                     const locscale& ls) : bounds_(bounds),
-                                                           ls_(ls) {
-    if (bounds.has_low() || bounds.has_high())
-      if (ls.has_loc() || ls.has_scale())
-        throw std::invalid_argument("Block type cannot have both a bound and"
-                                    "a location/scale.");
-  }
+double_block_type::double_block_type(const range &bounds,
+                                     const offset_multiplier &ls)
+    : bounds_(bounds), ls_(ls) {
+  if (bounds.has_low() || bounds.has_high())
+    if (ls.has_offset() || ls.has_multiplier())
+      throw std::invalid_argument("Block type cannot have both a bound and"
+                                  "an offset/multiplier.");
+}
 
-double_block_type::double_block_type(const range& bounds) : bounds_(bounds) {}
+double_block_type::double_block_type(const range &bounds) : bounds_(bounds) {}
 
-double_block_type::double_block_type(const locscale& ls) : ls_(ls) {}
+double_block_type::double_block_type(const offset_multiplier &ls) : ls_(ls) {}
 
-double_block_type::double_block_type() : double_block_type(range(),
-                                                           locscale()) {}
+double_block_type::double_block_type()
+    : double_block_type(range(), offset_multiplier()) {}
 
 range double_block_type::bounds() const { return bounds_; }
 
-locscale double_block_type::ls() const { return ls_; }
+offset_multiplier double_block_type::ls() const { return ls_; }
 }  // namespace lang
 }  // namespace stan
 #endif

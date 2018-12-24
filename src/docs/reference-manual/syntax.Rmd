@@ -72,7 +72,7 @@ var_type ::= 'int' range_constraint
            | 'corr_matrix' '[' expression ']'
            | 'cov_matrix' '[' expression ']'
 
-constraint ::= range_constraint | '<' loc_scale '>')
+constraint ::= range_constraint | '<' offset_multiplier '>')
 
 range_constraint ::= ?('<' range '>')
 
@@ -80,9 +80,9 @@ range ::= 'lower' '=' constr_expression ',' 'upper' = constr_expression
         | 'lower' '=' constr_expression
         | 'upper' '=' constr_expression
 
-loc_scale ::= 'location' '=' constr_expression ',' 'scale' = constr_expression
-            | 'location' '=' constr_expression
-            | 'scale' '=' constr_expression
+offset_multiplier ::= 'offset' '=' constr_expression ',' 'multiplier' = constr_expression
+            | 'offset' '=' constr_expression
+            | 'multiplier' '=' constr_expression
 
 dims ::= '['  expressions ']'
 
