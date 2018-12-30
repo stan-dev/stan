@@ -1,6 +1,6 @@
 parameters {
   vector[3] vvv;
-  real<location=vvv> a;
+  real<offset=vvv> a;
   real y;
 }
 

@@ -2,10 +2,9 @@
 #include <test/unit/lang/utility.hpp>
 
 TEST(langParserVarDeclsGrammarDef, addVar) {
-  test_throws("validate_add_var_bad1",
-              "Duplicate declaration of variable");
-  test_throws("validate_add_var_bad2",
-              "Parameters or transformed parameters cannot be integer or integer array");
+  test_throws("validate_add_var_bad1", "Duplicate declaration of variable");
+  test_throws("validate_add_var_bad2", "Parameters or transformed parameters "
+                                       "cannot be integer or integer array");
   test_parsable("validate_add_var_good");
 }
 
@@ -14,8 +13,7 @@ TEST(langParserVarDeclsGrammarDef, validateIntExpr) {
   for (int i = 1; i <= 13; ++i) {
     std::string model_name("validate_validate_int_expr_bad");
     model_name += boost::lexical_cast<std::string>(i);
-    test_throws(model_name,
-                "Dimension declaration requires");
+    test_throws(model_name, "Dimension declaration requires");
   }
   for (int i = 1; i <= 14; ++i) {
     std::string model_name("data_index/non_data_index");
@@ -59,13 +57,13 @@ TEST(langParserVarDeclsGrammarDef, setDoubleRangeUpper) {
               "Expression denoting real required");
 }
 
-TEST(langParserVarDeclsGrammarDef, setDoubleLocationScale) {
-  test_parsable("validate_set_double_locscale_good");
-  test_throws("validate_set_double_locscale_bad1",
+TEST(langParserVarDeclsGrammarDef, setDoubleOffsetMultiplier) {
+  test_parsable("validate_set_double_offset_multiplier_good");
+  test_throws("validate_set_double_offset_multiplier_bad1",
               "Expression denoting real required; found type=vector.");
-  test_throws("validate_set_double_locscale_bad2",
+  test_throws("validate_set_double_offset_multiplier_bad2",
               "Expression denoting real required; found type=vector.");
-  test_throws("validate_set_double_locscale_bad3",
+  test_throws("validate_set_double_offset_multiplier_bad3",
               "PARSER EXPECTED: \"upper\"");
 }
 
@@ -80,15 +78,11 @@ TEST(langParserVarDeclsGrammarDef, constraintsInLocals) {
               "PARSER EXPECTED: <vector length declaration");
   test_throws("local_var_constraint2",
               "PARSER EXPECTED: <vector length declaration");
-  test_throws("local_var_constraint3",
-              "PARSER EXPECTED: \"[\"");
-  test_throws("local_var_constraint4",
-              "PARSER EXPECTED: <identifier>");
+  test_throws("local_var_constraint3", "PARSER EXPECTED: \"[\"");
+  test_throws("local_var_constraint4", "PARSER EXPECTED: <identifier>");
 }
 
-TEST (langParserVarDeclsGrammarDef, zeroVecs) {
-  test_parsable("vector-zero");
-}
+TEST(langParserVarDeclsGrammarDef, zeroVecs) { test_parsable("vector-zero"); }
 
 TEST(langParserVarDeclsGrammarDef, defDeclIntVar) {
   test_parsable("declare-define-var-int");
@@ -161,7 +155,7 @@ TEST(langParserVarDeclsGrammarDef, defDeclConstrainedVectorVar) {
 }
 
 TEST(langParserVarDeclsGrammarDef, defDeclConstrainedMatrixVar) {
-   test_parsable("declare-define-var-constrained-matrix");
+  test_parsable("declare-define-var-constrained-matrix");
 }
 
 TEST(langParserVarDeclsGrammarDef, badDefParamBlock) {
@@ -170,5 +164,5 @@ TEST(langParserVarDeclsGrammarDef, badDefParamBlock) {
 }
 
 TEST(langParserVarDeclsGrammarDef, gqLocalRngFunCall) {
-   test_parsable("declare-define-gq-local-rng");
+  test_parsable("declare-define-gq-local-rng");
 }

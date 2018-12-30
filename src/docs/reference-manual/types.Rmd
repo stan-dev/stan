@@ -296,36 +296,36 @@ format.
 ### Affinely Transformed Real {-}
 
 Real variables may be declared on a space that has been transformed using an
-affine transformation $x\mapsto \mu + \sigma * x$ with location $\mu$ and
-(positive) scale $\sigma$, using a syntax similar to
+affine transformation $x\mapsto \mu + \sigma * x$ with offset $\mu$ and
+(positive) multiplier $\sigma$, using a syntax similar to
 that for bounds.
 While these transforms do not change the asymptotic sampling behaviour of
 the resulting Stan program (in a sense, the model the program implements),
 they can be useful for making the sampling process
 more efficient by transforming the geometry of the problem to a more natural
-scale and to a more natural location for the sampling process,
+multiplier and to a more natural offset for the sampling process,
 for instance by fascilitating a non-centered parameterisation.
 While these affine transformation declarations do not impose a hard constraint
 on variables, they behave like the bounds constraints in many ways and could
 perhaps be viewed as acting as a sort of soft constraint.
 
-The variable `x` may be declared to have location $1$ as follows.
+The variable `x` may be declared to have offset $1$ as follows.
 
 ```stan
-real<location=1> x;
+real<offset=1> x;
 ```
 
-Similarly, it can be declared to have scale $2$ as follows.
+Similarly, it can be declared to have multiplier $2$ as follows.
 
 ```stan
-real<scale=2> x;
+real<multiplier=2> x;
 ```
 
-Finally, we can combine both declarations to declare a variable with location
-$1$ and scale $2$.
+Finally, we can combine both declarations to declare a variable with offset
+$1$ and multiplier $2$.
 
 ```stan
-real<location=1,scale=2> x;
+real<offset=1,multiplier=2> x;
 ```
 
 As an example, we can give `x` a normal distribution with non-centered
@@ -333,7 +333,7 @@ parameterization as follows.
 
 ```stan
 parameters {
-  real<location=mu,scale=sigma> x;
+  real<offset=mu,multiplier=sigma> x;
 }
 model {
   x ~ normal(mu, sigma);
@@ -355,16 +355,16 @@ or equivalently
 
 ```stan
 parameters {
-  real<location=0,scale=1> x;
+  real<offset=0,multiplier=1> x;
 }
 model {
   x ~ normal(mu, sigma);
 }
 ```
 
-### Expressions as Bounds and Location/Scale{-}
+### Expressions as Bounds and Offset/Multiplier{-}
 
-Bounds (and location and scale)
+Bounds (and offset and multiplier)
 for integer or real variables may be arbitrary expressions.
 The only requirement is that they only include variables that have
 been declared (though not necessarily defined) before the declaration.
@@ -517,10 +517,10 @@ declaration of a 3-vector of non-negative values.
 vector<lower=0>[3] u;
 ```
 
-Similarly, they may be declared with a location and/or scale, as in the
+Similarly, they may be declared with a offset and/or multiplier, as in the
 following example
 ```stan
-vector<location=42,scale=3>[3] u;
+vector<offset=42,multiplier=3>[3] u;
 ```
 
 ### Unit Simplexes {-}
@@ -625,10 +625,10 @@ of a 10-vector with values between -1 and 1.
 ```stan
 row_vector<lower=-1,upper=1>[10] u;
 ```
-Location and scale are also similar as for the following 3-row-vector with
-location -42 and scale 3.
+Offset and multiplier are also similar as for the following 3-row-vector with
+offset -42 and multiplier 3.
 ```stan
-row_vector<location=-42,scale=3>[3] u;
+row_vector<offset=-42,multiplier=3>[3] u;
 ```
 
 Row vectors may not be assigned to column vectors, nor may column
@@ -657,10 +657,10 @@ matrix of non-positive values.
 matrix<upper=0>[3, 4] B;
 ```
 
-Similarly, matrices can be declared to have a set location and/or scale, as in
-this matrix with scale 5.
+Similarly, matrices can be declared to have a set offset and/or multiplier, as in
+this matrix with multiplier 5.
 ```stan
-matrix<scale=5>[3, 4] B;
+matrix<multiplier=5>[3, 4] B;
 ```
 
 #### Assigning to Rows of a Matrix {-}
