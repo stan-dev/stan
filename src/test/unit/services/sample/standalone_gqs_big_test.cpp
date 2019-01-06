@@ -19,7 +19,6 @@ TEST(ServicesStandaloneGQ_big, genDraws_bym) {
                                         logger_ss,
                                         logger_ss,
                                         logger_ss);
-
   // Get var_context for data
   std::fstream data_stream("src/test/test-models/good/services/bym2_inputs.data.R",
                            std::fstream::in);
@@ -29,45 +28,62 @@ TEST(ServicesStandaloneGQ_big, genDraws_bym) {
   // Instantiate model with data
   model_class model(data_var_context);
 
-  int num_params = stan::services::num_constrained_params(model);
-  EXPECT_EQ(num_params, 1420);
+  std::vector<std::string> param_names;
+  std::vector<std::vector<size_t>> param_dimss;
+  stan::services::get_model_parameters(model, param_names, param_dimss);
 
-  // Get param data from dumpfile matrix 1000 rows, 1420 columns
-  // using stan "var_context" - PITA!
-  std::fstream params_stream("src/test/test-models/good/services/bym2_draws.data.R",
-                           std::fstream::in);
-  stan::io::dump params_var_context(params_stream);
-  params_stream.close();
-  std::vector<std::vector<double>> cdraws(1000);
-  try {
-    params_var_context.validate_dims("get params", "bym2_draws", "matrix",
-                                     params_var_context.to_vec(1420, 1000));
-    std::vector<double> bym2_pars_vals = params_var_context.vals_r("bym2_draws");
-    int idx = 0;
-    for (int i = 0; i < 1000; ++i) {
-      std::vector<double> tmp(1420);
-      for (int j = 0; j < 1420; ++j) {
-        tmp[j] = bym2_pars_vals[idx++];
-      }
-      cdraws[i] = tmp;
-    }
-   } catch (const std::exception& e) {
-     logger.error("Cannot read draws from file.");
-     logger.error("Caught exception: ");
-     logger.error(e.what());
-     std::cerr << logger_ss.str() << std::endl;
-     throw std::domain_error("Initialization failure");
-   }
+  EXPECT_EQ(param_names.size(), 5);
+  EXPECT_EQ(param_dimss.size(), 5);
+
+  size_t total = 0;
+  for (int i=0; i< param_dimss.size(); ++i)  {
+    int cur_param = 1;
+    for (int j = 0; j < param_dimss[i].size(); ++j)
+      cur_param *= param_dimss[i][j];
+    //    std::cout << param_names[i] << " num dims: " << param_dimss[i].size();
+    //    std::cout << " num params: " << cur_param << std::endl;
+    total += cur_param;
+  }
+  EXPECT_EQ(total, 1420);
+
   
-  stan::services::standalone_generate(model,
-                                      cdraws,
-                                      12345,
-                                      interrupt,
-                                      logger,
-                                      sample_writer);
-  // verify results...
-  // std::ofstream gqs_file;
-  // gqs_file.open ("src/test/test-models/good/services/bym2_gqs_v2.csv");
-  // gqs_file << sample_ss.str();
-  // gqs_file.close();
+  // // Get param data from dumpfile matrix 1000 rows, 1420 columns
+ // using stan "var_context" - PITA!
+ std::fstream params_stream("src/test/test-models/good/services/bym2_draws.data.R",
+                          std::fstream::in);
+ stan::io::dump params_var_context(params_stream);
+ params_stream.close();
+ std::vector<std::vector<double>> cdraws(1000);
+ try {
+   params_var_context.validate_dims("get params", "bym2_draws", "matrix",
+                                    params_var_context.to_vec(1420, 1000));
+   std::vector<double> bym2_pars_vals = params_var_context.vals_r("bym2_draws");
+   int idx = 0;
+   for (int i = 0; i < 1000; ++i) {
+     std::vector<double> tmp(1420);
+     for (int j = 0; j < 1420; ++j) {
+       tmp[j] = bym2_pars_vals[idx++];
+     }
+     cdraws[i] = tmp;
+   }
+  } catch (const std::exception& e) {
+    logger.error("Cannot read draws from file.");
+    logger.error("Caught exception: ");
+    logger.error(e.what());
+    std::cerr << logger_ss.str() << std::endl;
+    throw std::domain_error("Initialization failure");
+ }
+  
+ stan::services::standalone_generate(model,
+                                     cdraws,
+                                     12345,
+                                     interrupt,
+                                     logger,
+                                     sample_writer);
+
+ // verify results...
+ // std::ofstream gqs_file;
+ // gqs_file.open ("src/test/test-models/good/services/bym2_gqs_v2.csv");
+ // gqs_file << sample_ss.str();
+ // gqs_file.close();
 }
