@@ -43,8 +43,8 @@ namespace stan {
       }
 
       /**
-       * Check (1) if the vecotr size of dimensions is no smaller
-       * than the name vecotr size; (2) if the size of the input
+       * Check (1) if the vector size of dimensions is no smaller
+       * than the name vector size; (2) if the size of the input
        * array is large enough for what is needed.
        */
       template <typename T>
