@@ -45,6 +45,15 @@ def deleteDirWin() {
 }
 
 String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
+String stan_pr() {
+    if (env.BRANCH_NAME == 'downstream_tests') {
+        ''
+    } else if (env.BRANCH_NAME == 'downstream_hotfix') {
+        'master'
+    } else {
+        env.BRANCH_NAME
+    }
+}
 
 pipeline {
     agent none
@@ -76,6 +85,7 @@ pipeline {
             agent any
             steps {
                 script {
+                    sh "printenv"
                     retry(3) { checkout scm }
                     sh setup(params.math_pr)
                     stash 'StanSetup'
@@ -128,10 +138,12 @@ pipeline {
             post { always { deleteDir() } }
         }
         stage('Upstream CmdStan tests') {
+            when { expression { env.BRANCH_NAME ==~ /PR-\d+/
+                               || env.BRANCH_NAME == "downstream_tests"
+                               || env.BRANCH_NAME == "downstream_hotfix" } }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
-                      parameters: [string(name: 'stan_pr',
-                                          value: env.BRANCH_NAME == "downstream_tests" ? '' : env.BRANCH_NAME),
+                      parameters: [string(name: 'stan_pr', value: stan_pr()),
                                    string(name: 'math_pr', value: params.math_pr)])
             }
         }
