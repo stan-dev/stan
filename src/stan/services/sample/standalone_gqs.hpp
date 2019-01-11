@@ -73,7 +73,6 @@ int standalone_generate(const Model &model,
                         unsigned int seed, callbacks::interrupt &interrupt,
                         callbacks::logger &logger,
                         callbacks::writer &sample_writer) {
-
   if (draws.size() == 0) {
     logger.error("Empty set of draws from fitted model.");
     return error_codes::DATAERR;
@@ -111,7 +110,8 @@ int standalone_generate(const Model &model,
     dummy_params_i.clear();
     unconstrained_params_r.clear();
     try {
-      stan::io::array_var_context context(param_names, draws.row(i), param_dimss);
+      stan::io::array_var_context context(param_names, draws.row(i),
+                                          param_dimss);
       model.transform_inits(context, dummy_params_i, unconstrained_params_r,
                             &msg);
     } catch (const std::exception& e) {
