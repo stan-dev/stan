@@ -7,7 +7,7 @@
 #include <test/test-models/good/services/bernoulli.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/util.hpp>
-#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
 #include <iostream>
@@ -35,8 +35,6 @@ public:
   stan::callbacks::stream_logger logger;
   stan_model *model;
 };
-
-typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
 
 TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
   stan::io::stan_csv bern_csv;
@@ -75,25 +73,25 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
   EXPECT_EQ(count_matches("y_rep",sample_ss.str()),10);
   EXPECT_EQ(count_matches("\n",sample_ss.str()),1001);
 
-  // compare standalone to sampler QoIs
   std::stringstream sampler_qoi_ss;
-  boost::char_separator<char> newline{"\n"};
-  boost::char_separator<char> comma{","};
-  tokenizer linetok{sample_ss.str(), newline};
+  std::vector<std::string> qois;
+  std::istringstream f(sample_ss.str());
+  std::string line;    
   size_t row = 0;
-  for (const auto &line : linetok) {
+  while (std::getline(f, line)) {
     if (row == 0) {
       ++row;
       continue;
     } 
-    tokenizer numtok{line, comma};
-    for (const auto &qoi : numtok) {
-      sampler_qoi_ss.str(std::string());
-      sampler_qoi_ss.clear();
-      sampler_qoi_ss << bern_csv.samples(row-1,8);  // 7 diagnostics, 1 param
-      EXPECT_EQ(qoi, sampler_qoi_ss.str());
+    if (row == 1001) {
       break;
-    }
+    } 
+    qois.clear();
+    boost::algorithm::split(qois, line, boost::is_any_of(","));
+    sampler_qoi_ss.str(std::string());
+    sampler_qoi_ss.clear();
+    sampler_qoi_ss << bern_csv.samples(row-1,8);  // 7 diagnostics, 1 param
+    EXPECT_EQ(qois[0], sampler_qoi_ss.str());
     ++row;
   }
 }      
