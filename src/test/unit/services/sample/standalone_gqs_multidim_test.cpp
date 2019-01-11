@@ -36,8 +36,6 @@ public:
   stan_model *model;
 };
 
-typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-
 TEST_F(ServicesStandaloneGQ2, genDraws_gq_test_multidim) {
   stan::io::stan_csv multidim_csv;
   std::stringstream out;
