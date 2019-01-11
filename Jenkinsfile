@@ -9,20 +9,12 @@ def setupCXX(failOnError = true) {
 }
 
 def setup(String pr) {
-    script = """
+    sh """
         make math-revert
         make clean-all
         git clean -xffd
     """
-    if (pr != '')  {
-        prNumber = pr.tokenize('-').last()
-        script += """
-            cd lib/stan_math
-            git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
-            git checkout refs/remotes/origin/pr/${prNumber}/merge
-        """
-    }
-    return script
+    utils.checkout_pr("math", "lib/stan_math")
 }
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
@@ -87,7 +79,7 @@ pipeline {
                 script {
                     sh "printenv"
                     retry(3) { checkout scm }
-                    sh setup(params.math_pr)
+                    setup(params.math_pr)
                     stash 'StanSetup'
                     setupCXX()
                     parallel(
