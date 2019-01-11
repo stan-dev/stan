@@ -7,7 +7,6 @@
 #include <test/test-models/good/services/gq_test_multidim.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/util.hpp>
-#include <boost/tokenizer.hpp>
 #include <Eigen/Dense>
 #include <gtest/gtest.h>
 #include <iostream>
@@ -78,31 +77,9 @@ TEST_F(ServicesStandaloneGQ2, genDraws_gq_test_multidim) {
                                     sample_writer);
   if (return_code != stan::services::error_codes::OK)
     std::cout << "ERROR: " << logger_ss.str() << std::endl;
-
   EXPECT_EQ(return_code, stan::services::error_codes::OK);
+  std::cout << "still here" << std::endl;
   EXPECT_EQ(count_matches("gq_ar_mat",sample_ss.str()),120);
+  std::cout << "still here" << std::endl;
   EXPECT_EQ(count_matches("\n",sample_ss.str()),1001);
-
-  // compare standalone to sampler QoIs
-  std::stringstream sampler_qoi_ss;
-  boost::char_separator<char> newline{"\n"};
-  boost::char_separator<char> comma{","};
-  tokenizer linetok{sample_ss.str(), newline};
-  size_t row = 0;
-  for (const auto &line : linetok) {
-    if (row == 0) {
-      ++row;
-      continue;
-    } 
-    tokenizer numtok{line, comma};
-    for (const auto &qoi : numtok) {
-      sampler_qoi_ss.str(std::string());
-      sampler_qoi_ss.clear();
-      sampler_qoi_ss << multidim_csv.samples(row-1,127);  // 7 diagnostics, 120 params
-      EXPECT_EQ(qoi, sampler_qoi_ss.str());
-      break;
-    }
-    ++row;
-  }
-
 }
