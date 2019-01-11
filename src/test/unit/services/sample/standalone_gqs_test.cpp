@@ -9,9 +9,7 @@
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
-
-typedef bernoulli_model_namespace::bernoulli_model model_class;
-typedef boost::ecuyer1988 rng_t;
+#include <boost/tokenizer.hpp>
 
 class ServicesStandaloneGQ : public ::testing::Test {
 public:
@@ -23,7 +21,7 @@ public:
                            std::fstream::in);
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
-  model = new model_class(data_var_context);
+  model = new stan_model(data_var_context);
  }
 
   void TearDown() {
@@ -33,12 +31,12 @@ public:
   stan::test::unit::instrumented_interrupt interrupt;
   std::stringstream logger_ss;
   stan::callbacks::stream_logger logger;
-  model_class *model;
+  stan_model *model;
 };
 
+typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+
 TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
-  // Get param data from fitted model param
-  // fitted with bernoulli.data.json, N = 10, y = 2 success, 8 fail
   stan::io::stan_csv bern_csv;
   std::stringstream out;
   std::ifstream csv_stream;
@@ -50,14 +48,8 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
   EXPECT_EQ("theta", bern_csv.header(7));
   ASSERT_EQ(1000, bern_csv.samples.rows());
   ASSERT_EQ(19, bern_csv.samples.cols());
-  std::vector<std::vector<double> > draws(1000);
-  for (int i = 0; i < 1000; ++i) {
-    std::vector<double> draw(1);
-    draw[0] =  bern_csv.samples(i,7);
-    draws[i] = draw;
-  }
 
-  // model bernoulli.stan has 2 params
+  // model bernoulli.stan has 1 param
   std::vector<std::string> param_names;
   std::vector<std::vector<size_t>> param_dimss;
   stan::services::get_model_parameters(*model, param_names, param_dimss);
@@ -68,7 +60,7 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   int return_code = stan::services::standalone_generate(*model,
-                                                        draws,
+                                                        bern_csv.samples.middleCols<1>(7),
                                                         12345,
                                                         interrupt,
                                                         logger,
@@ -80,75 +72,56 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
   EXPECT_EQ(count_matches("mu",sample_ss.str()),1);
   EXPECT_EQ(count_matches("y_rep",sample_ss.str()),10);
   EXPECT_EQ(count_matches("\n",sample_ss.str()),1001);
-  //  std::cout << sample_ss.str() << std::endl;
-  
 
-  // compare generated sample to original
+  // compare standalone to sampler QoIs
+  std::stringstream sampler_qoi_ss;
+  boost::char_separator<char> newline{"\n"};
+  boost::char_separator<char> comma{","};
+  tokenizer linetok{sample_ss.str(), newline};
+  size_t row = 0;
+  for (const auto &line : linetok) {
+    if (row == 0) {
+      ++row;
+      continue;
+    } 
+    tokenizer numtok{line, comma};
+    for (const auto &qoi : numtok) {
+      sampler_qoi_ss.str(std::string());
+      sampler_qoi_ss.clear();
+      sampler_qoi_ss << bern_csv.samples(row-1,8);  // 7 diagnostics, 1 param
+      EXPECT_EQ(qoi, sampler_qoi_ss.str());
+      break;
+    }
+    ++row;
+  }
+}      
 
-
-}
 
 TEST_F(ServicesStandaloneGQ, genDraws_empty_draws) {
-  std::vector<std::vector<double> > draws;
-  const std::vector<std::vector<double> > cdraws(draws);
-
+  const Eigen::MatrixXd draws;
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   int return_code = stan::services::standalone_generate(*model,
-                                                        cdraws,
+                                                        draws,
                                                         12345,
                                                         interrupt,
                                                         logger,
                                                         sample_writer);
-
   EXPECT_EQ(return_code, stan::services::error_codes::DATAERR);
   EXPECT_EQ(count_matches("Empty set of draws",logger_ss.str()),1);
 }
 
-TEST_F(ServicesStandaloneGQ, genDraws_bad1) {
-  std::vector<double> draw1;
-  draw1.push_back(0.345);
-  std::vector<double> draw2;
-  std::vector<std::vector<double> > draws;
-  draws.push_back(draw1);
-  draws.push_back(draw2);
-  const std::vector<std::vector<double> > cdraws(draws);
+TEST_F(ServicesStandaloneGQ, genDraws_bad) {
+  Eigen::MatrixXd draws(2,2);
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   int return_code = stan::services::standalone_generate(*model,
-                                                        cdraws,
+                                                        draws,
                                                         12345,
                                                         interrupt,
                                                         logger,
                                                         sample_writer);
-
   EXPECT_EQ(return_code, stan::services::error_codes::DATAERR);
-  EXPECT_EQ(count_matches("Draw 2, wrong number of parameter values.",
-                          logger_ss.str()),1);
-}
-
-
-TEST_F(ServicesStandaloneGQ, genDraws_bad2) {
-  std::vector<double> draw1;
-  draw1.push_back(0.345);
-  std::vector<double> draw2;
-  draw2.push_back(0.345);
-  draw2.push_back(0.345);
-  draw2.push_back(0.345);
-  std::vector<std::vector<double> > draws;
-  draws.push_back(draw1);
-  draws.push_back(draw2);
-  const std::vector<std::vector<double> > cdraws(draws);
-  std::stringstream sample_ss;
-  stan::callbacks::stream_writer sample_writer(sample_ss, "");
-  int return_code = stan::services::standalone_generate(*model,
-                                                        cdraws,
-                                                        12345,
-                                                        interrupt,
-                                                        logger,
-                                                        sample_writer);
-
-  EXPECT_EQ(return_code, stan::services::error_codes::DATAERR);
-  EXPECT_EQ(count_matches("Draw 2, wrong number of parameter values.",
+  EXPECT_EQ(count_matches("Wrong number of parameter values",
                           logger_ss.str()),1);
 }

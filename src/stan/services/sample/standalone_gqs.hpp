@@ -51,9 +51,6 @@ void get_model_parameters(const Model &model,
   }
 }
 
-// TODO(morris): refactor array_var_context to allow use Eigen::VectorXd
-//            this will allow use of MatrixXd for draws  (line 116)
-//            and enforce correct shape.  else need to check every row
 /**
  * Given a set of draws from a fitted model, generate corresponding
  * quantities of interes which are written to callback writer.
@@ -72,10 +69,11 @@ void get_model_parameters(const Model &model,
  */
 template <class Model>
 int standalone_generate(const Model &model,
-                        const std::vector<std::vector<double> >& draws,
+                        const Eigen::MatrixXd& draws,
                         unsigned int seed, callbacks::interrupt &interrupt,
                         callbacks::logger &logger,
                         callbacks::writer &sample_writer) {
+
   if (draws.size() == 0) {
     logger.error("Empty set of draws from fitted model.");
     return error_codes::DATAERR;
@@ -91,10 +89,10 @@ int standalone_generate(const Model &model,
   }
 
   std::stringstream msg;
-  if (p_names.size() != draws[0].size()) {
+  if (p_names.size() != draws.cols()) {
     msg << "Wrong number of parameter values in draws from fitted model.  ";
     msg << "Expecting " << p_names.size() << " columns, ";
-    msg << "found " << draws[0].size() << " columns.";
+    msg << "found " << draws.cols() << " columns.";
     std::string msgstr = msg.str();
     logger.error(msgstr);
     return error_codes::DATAERR;
@@ -109,19 +107,11 @@ int standalone_generate(const Model &model,
 
   std::vector<int> dummy_params_i;
   std::vector<double> unconstrained_params_r;
-  for (size_t i = 0; i < draws.size(); ++i) {
-    if (p_names.size() != draws[i].size()) {
-      msg << "Draw " << i + 1 << ", wrong number of parameter values. ";
-      msg << "Expecting " << p_names.size() << " columns, ";
-      msg << "found " << draws[i].size() << " columns.";
-      std::string msgstr = msg.str();
-      logger.error(msgstr);
-      return error_codes::DATAERR;
-    }
+  for (size_t i = 0; i < draws.rows(); ++i) {
     dummy_params_i.clear();
     unconstrained_params_r.clear();
     try {
-      stan::io::array_var_context context(param_names, draws[i], param_dimss);
+      stan::io::array_var_context context(param_names, draws.row(i), param_dimss);
       model.transform_inits(context, dummy_params_i, unconstrained_params_r,
                             &msg);
     } catch (const std::exception& e) {

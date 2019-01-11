@@ -28,8 +28,8 @@ namespace stan {
         generate_expression(decl.type().innermost_type().arg2(),
                             NOT_USER_FACING, o);
         o << ");" << EOL;
-      o << INDENT2 << "dimss__.push_back(dims__);" << EOL;
       }
+      o << INDENT2 << "dimss__.push_back(dims__);" << EOL;
     }
 
     /**

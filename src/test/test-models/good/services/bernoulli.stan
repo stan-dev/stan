@@ -13,5 +13,5 @@ generated quantities {
   real mu = theta;
   int y_rep[N];
   for (n in 1:N)
-    y_rep[n] = bernoulli_rng(mu);
+    y_rep[n] = bernoulli_rng(theta);
 }
