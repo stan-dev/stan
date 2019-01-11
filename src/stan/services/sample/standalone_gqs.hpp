@@ -8,6 +8,7 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/gq_writer.hpp>
+#include <Eigen/Dense>
 #include <string>
 #include <vector>
 

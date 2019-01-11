@@ -7,9 +7,11 @@
 #include <test/test-models/good/services/bernoulli.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/util.hpp>
+#include <boost/tokenizer.hpp>
+#include <Eigen/Dense>
 #include <gtest/gtest.h>
 #include <iostream>
-#include <boost/tokenizer.hpp>
+#include <vector>
 
 class ServicesStandaloneGQ : public ::testing::Test {
 public:

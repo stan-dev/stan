@@ -7,9 +7,12 @@
 #include <test/test-models/good/services/gq_test_multidim.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/util.hpp>
+#include <boost/tokenizer.hpp>
+#include <Eigen/Dense>
 #include <gtest/gtest.h>
 #include <iostream>
-#include <boost/tokenizer.hpp>
+#include <string>
+#include <vector>
 
 class ServicesStandaloneGQ2 : public ::testing::Test {
 public:

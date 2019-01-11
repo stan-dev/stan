@@ -6,8 +6,11 @@
 #include <test/test-models/good/services/test_gq2.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/util.hpp>
+#include <Eigen/Dense>
 #include <gtest/gtest.h>
 #include <iostream>
+#include <string>
+#include <vector>
 
 class ServicesStandaloneGQ2 : public testing::Test {
 public:
