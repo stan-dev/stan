@@ -76,8 +76,6 @@ TEST_F(ServicesStandaloneGQ2, genDraws_gq_test_multidim) {
   if (return_code != stan::services::error_codes::OK)
     std::cout << "ERROR: " << logger_ss.str() << std::endl;
   EXPECT_EQ(return_code, stan::services::error_codes::OK);
-  std::cout << "still here" << std::endl;
   EXPECT_EQ(count_matches("gq_ar_mat",sample_ss.str()),120);
-  std::cout << "still here" << std::endl;
   EXPECT_EQ(count_matches("\n",sample_ss.str()),1001);
 }
