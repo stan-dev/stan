@@ -9,20 +9,12 @@ def setupCXX(failOnError = true) {
 }
 
 def setup(String pr) {
-    script = """
+    sh """
         make math-revert
         make clean-all
         git clean -xffd
     """
-    if (pr != '')  {
-        prNumber = pr.tokenize('-').last()
-        script += """
-            cd lib/stan_math
-            git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
-            git checkout refs/remotes/origin/pr/${prNumber}/merge
-        """
-    }
-    return script
+    utils.checkout_pr("math", "lib/stan_math")
 }
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
@@ -45,6 +37,15 @@ def deleteDirWin() {
 }
 
 String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
+String stan_pr() {
+    if (env.BRANCH_NAME == 'downstream_tests') {
+        ''
+    } else if (env.BRANCH_NAME == 'downstream_hotfix') {
+        'master'
+    } else {
+        env.BRANCH_NAME
+    }
+}
 
 pipeline {
     agent none
@@ -76,8 +77,9 @@ pipeline {
             agent any
             steps {
                 script {
+                    sh "printenv"
                     retry(3) { checkout scm }
-                    sh setup(params.math_pr)
+                    setup(params.math_pr)
                     stash 'StanSetup'
                     setupCXX()
                     parallel(
@@ -128,12 +130,12 @@ pipeline {
             post { always { deleteDir() } }
         }
         stage('Upstream CmdStan tests') {
-            when { expression { env.BRANCH_NAME ==~ /PR-\d+/ ||
-                                env.BRANCH_NAME == "downstream_tests" } }
+            when { expression { env.BRANCH_NAME ==~ /PR-\d+/
+                               || env.BRANCH_NAME == "downstream_tests"
+                               || env.BRANCH_NAME == "downstream_hotfix" } }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
-                      parameters: [string(name: 'stan_pr',
-                                          value: env.BRANCH_NAME == "downstream_tests" ? '' : env.BRANCH_NAME),
+                      parameters: [string(name: 'stan_pr', value: stan_pr()),
                                    string(name: 'math_pr', value: params.math_pr)])
             }
         }
