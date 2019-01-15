@@ -1,5 +1,5 @@
-#ifndef STAN_CALLBACKS_STREAM_ITERATION_HPP
-#define STAN_CALLBACKS_STREAM_ITERATION_HPP
+#ifndef STAN_CALLBACKS_LOG_ITERATION_HPP
+#define STAN_CALLBACKS_LOG_ITERATION_HPP
 
 #include <stan/callbacks/iteration.hpp>
 #include <stan/callbacks/logger.hpp>
@@ -9,13 +9,13 @@ namespace stan {
 namespace callbacks {
 
 /**
- * <code>stream_iteration</code> is an implementation
+ * <code>log_iteration</code> is an implementation
  * of <code>iteration</code> that writes to a logger.
  */
-class stream_iteration : public iteration {
+class log_iteration : public iteration {
  public:
   /**
-   * Constructs a <code>stream_iteration</code> with a logger.
+   * Constructs a <code>log_iteration</code> with a logger.
    * 
    * This will write iteration messages to the logger at the info level.
    *
@@ -25,14 +25,12 @@ class stream_iteration : public iteration {
    *   warmup
    * @param[in] refresh_iterations number of iterations before printing again.
    *   This number must be greater or equal to 0. When this is set to 0, no
-   *   messages are 
-   * @param[in] comment_prefix string to stream before
-   *   each comment line. Default is "".
+   *   messages are logged.
    */
-  explicit stream_iteration(logger &logger,
-                            int num_warmup_iterations,
-                            int num_total_iterations,
-                            int refresh_iterations = 0)
+  explicit log_iteration(logger &logger,
+                         int num_warmup_iterations,
+                         int num_total_iterations,
+                         int refresh_iterations = 0)
       : logger_(logger),
         num_warmup_iterations_(num_warmup_iterations),
         num_total_iterations_(num_total_iterations),
@@ -100,7 +98,7 @@ class stream_iteration : public iteration {
   /**
    * Virtual destructor
    */
-  virtual ~stream_iteration() {}
+  virtual ~log_iteration() {}
 
  private:
   logger& logger_;

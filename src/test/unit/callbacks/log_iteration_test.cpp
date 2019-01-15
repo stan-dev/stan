@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <stan/callbacks/stream_iteration.hpp>
+#include <stan/callbacks/log_iteration.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <iostream>
 
@@ -7,17 +7,17 @@ TEST(StanCallbacks, should_print) {
   std::stringstream info;
   std::stringstream other;
   stan::callbacks::stream_logger logger(other, info, other, other, other);
-  stan::callbacks::stream_iteration iteration(logger, 1000, 2000, 1);
+  stan::callbacks::log_iteration iteration(logger, 1000, 2000, 1);
 
   EXPECT_TRUE(iteration.should_print(1));
   EXPECT_TRUE(iteration.should_print(2));
 }
 
-TEST(StanCallbacks, stream_iteration) {
+TEST(StanCallbacks, log_iteration) {
   std::stringstream info;
   std::stringstream other;
   stan::callbacks::stream_logger logger(other, info, other, other, other);
-  stan::callbacks::stream_iteration iteration(logger, 1000, 2000, 1);
+  stan::callbacks::log_iteration iteration(logger, 1000, 2000, 1);
 
   EXPECT_NO_THROW(iteration(1));
   EXPECT_EQ("", other.str());
@@ -61,11 +61,11 @@ TEST(StanCallbacks, stream_iteration) {
   info.str("");
 }
 
-TEST(StanCallbacks, stream_iteration_refresh) {
+TEST(StanCallbacks, log_iteration_refresh) {
   std::stringstream info;
   std::stringstream other;
   stan::callbacks::stream_logger logger(other, info, other, other, other);
-  stan::callbacks::stream_iteration iteration(logger, 1000, 2000, 100);
+  stan::callbacks::log_iteration iteration(logger, 1000, 2000, 100);
 
   for (int n = 1; n <= 2000; ++n) {
     other.str("");
@@ -79,11 +79,11 @@ TEST(StanCallbacks, stream_iteration_refresh) {
   }
 }
 
-TEST(StanCallbacks, stream_iteration_no_print) {
+TEST(StanCallbacks, log_iteration_no_print) {
   std::stringstream info;
   std::stringstream other;
   stan::callbacks::stream_logger logger(other, info, other, other, other);
-  stan::callbacks::stream_iteration iteration(logger, 1000, 2000, 0);
+  stan::callbacks::log_iteration iteration(logger, 1000, 2000, 0);
 
   for (int n = 1; n <= 2000; ++n) {
     other.str("");
