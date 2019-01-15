@@ -4,6 +4,8 @@
 #include <stan/callbacks/iteration.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <cmath>
+#include <iomanip>
+#include <sstream>
 
 namespace stan {
 namespace callbacks {
