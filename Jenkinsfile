@@ -76,7 +76,7 @@ pipeline {
                        make clean-all
                        git clean -xffd
                     """
-                    utils.checkout_pr("math", "lib/stan_math")
+                    utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
                     setupCXX()
                     parallel(
