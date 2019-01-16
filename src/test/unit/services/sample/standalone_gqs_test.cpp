@@ -26,10 +26,6 @@ public:
   model = new stan_model(data_var_context);
  }
 
-  void TearDown() {
-    delete(model);
-  }
-
   stan::test::unit::instrumented_interrupt interrupt;
   std::stringstream logger_ss;
   stan::callbacks::stream_logger logger;
@@ -65,37 +61,12 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
                                                         interrupt,
                                                         logger,
                                                         sample_writer);
-  if (return_code != stan::services::error_codes::OK)
-    std::cout << "ERROR: " << logger_ss.str() << std::endl;
-
   EXPECT_EQ(return_code, stan::services::error_codes::OK);
   EXPECT_EQ(count_matches("mu",sample_ss.str()),1);
   EXPECT_EQ(count_matches("y_rep",sample_ss.str()),10);
   EXPECT_EQ(count_matches("\n",sample_ss.str()),1001);
-
-  std::stringstream sampler_qoi_ss;
-  std::vector<std::string> qois;
-  std::istringstream f(sample_ss.str());
-  std::string line;    
-  size_t row = 0;
-  while (std::getline(f, line)) {
-    if (row == 0) {
-      ++row;
-      continue;
-    } 
-    if (row == 1001) {
-      break;
-    } 
-    qois.clear();
-    boost::algorithm::split(qois, line, boost::is_any_of(","));
-    sampler_qoi_ss.str(std::string());
-    sampler_qoi_ss.clear();
-    sampler_qoi_ss << bern_csv.samples(row-1,8);  // 7 diagnostics, 1 param
-    EXPECT_EQ(qois[0], sampler_qoi_ss.str());
-    ++row;
-  }
-}      
-
+  match_csv_columns(bern_csv.samples, sample_ss.str(), 1000, 1, 8);
+}
 
 TEST_F(ServicesStandaloneGQ, genDraws_empty_draws) {
   const Eigen::MatrixXd draws;
