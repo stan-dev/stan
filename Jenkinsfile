@@ -8,14 +8,6 @@ def setupCXX(failOnError = true) {
     writeFile(file: "make/local", text: "CXX=${env.CXX} ${errorStr}")
 }
 
-def setup(String pr) {
-    sh """
-        make math-revert
-        make clean-all
-        git clean -xffd
-    """
-    utils.checkout_pr("math", "lib/stan_math")
-}
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
     if (separateMakeStep) {
@@ -79,7 +71,12 @@ pipeline {
                 script {
                     sh "printenv"
                     retry(3) { checkout scm }
-                    setup(params.math_pr)
+                    sh """
+                       make math-revert
+                       make clean-all
+                       git clean -xffd
+                    """
+                    utils.checkout_pr("math", "lib/stan_math")
                     stash 'StanSetup'
                     setupCXX()
                     parallel(
