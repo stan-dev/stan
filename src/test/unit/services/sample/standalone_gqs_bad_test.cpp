@@ -22,6 +22,10 @@ public:
     model = new stan_model(context);
   }
 
+  void TearDown() {
+    delete model;
+  }
+
   stan::test::unit::instrumented_interrupt interrupt;
   std::stringstream logger_ss;
   stan::callbacks::stream_logger logger;

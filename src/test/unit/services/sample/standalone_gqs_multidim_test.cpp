@@ -15,13 +15,17 @@
 
 class ServicesStandaloneGQ2 : public ::testing::Test {
 public:
-  ServicesStandaloneGQ2() :
-    logger(logger_ss, logger_ss, logger_ss, logger_ss, logger_ss) {}
+  ServicesStandaloneGQ2()
+      : logger(logger_ss, logger_ss, logger_ss, logger_ss, logger_ss) {}
 
- void SetUp() {
-   stan::io::empty_var_context context;
-   model = new stan_model(context);
- }
+  void SetUp() {
+    stan::io::empty_var_context context;
+    model = new stan_model(context);
+  }
+
+  void TearDown() {
+    delete model;
+  }
 
   stan::test::unit::instrumented_interrupt interrupt;
   std::stringstream logger_ss;
