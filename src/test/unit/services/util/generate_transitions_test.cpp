@@ -251,7 +251,7 @@ TEST_F(ServicesSamplesGenerateTransitions, iteration_messages) {
 
   stan::services::util::generate_transitions(
     sampler, num_iterations, 0, 20, 1, true, true, writer,
-    s, model, rng, iteration, interrupt, logger);
+    s, model, rng, interrupt, iteration, logger);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
@@ -280,7 +280,7 @@ TEST_F(ServicesSamplesGenerateTransitions, iteration_messages) {
 
   stan::services::util::generate_transitions(
     sampler, num_iterations, 10, 20, 1, true, false, writer,
-    s, model, rng, iteration, interrupt, logger);
+    s, model, rng, interrupt, iteration, logger);
   EXPECT_EQ(20, iteration.call_count());
 
 

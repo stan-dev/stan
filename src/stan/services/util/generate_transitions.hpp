@@ -34,9 +34,9 @@ namespace stan {
        *   iteration's unconstrained parameter values
        * @param[in] model model
        * @param[in,out] base_rng random number generator
+       * @param[in,out] callback interrupt callback called once an iteration
        * @param[in,out] iteration iteration callback called with once an iteration with
        *   the iteration number (1-indexed)
-       * @param[in,out] callback interrupt callback called once an iteration
        * @param[in,out] logger logger for messages
        */
       template <class Model, class RNG>
@@ -47,8 +47,8 @@ namespace stan {
                                 util::mcmc_writer& mcmc_writer,
                                 stan::mcmc::sample& init_s,
                                 Model& model, RNG& base_rng,
-                                callbacks::iteration& iteration,
                                 callbacks::interrupt& callback,
+                                callbacks::iteration& iteration,
                                 callbacks::logger& logger) {
         for (int m = 0; m < num_iterations; ++m) {
           callback();
@@ -104,7 +104,7 @@ namespace stan {
                                            finish, refresh);
         generate_transitions(sampler, num_iterations, start, finish, num_thin,
                              save, warmup, mcmc_writer, init_s, model,
-                             base_rng, iteration, callback, logger);
+                             base_rng, callback, iteration, logger);
       }
 
     }
