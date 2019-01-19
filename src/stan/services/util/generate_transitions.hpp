@@ -24,8 +24,6 @@ namespace stan {
        * @param[in] finish end iteration number used for printing messages
        * @param[in] num_thin when save is true, a draw will be written to the
        *   mcmc_writer every num_thin iterations
-       * @param[in] refresh number of iterations to print a message. If
-       *   refresh is zero, iteration number messages will not be printed
        * @param[in] save if save is true, the transitions will be written
        *   to the mcmc_writer. If false, transitions will not be written
        * @param[in] warmup indicates whether these transitions are warmup. Used
@@ -36,6 +34,8 @@ namespace stan {
        *   iteration's unconstrained parameter values
        * @param[in] model model
        * @param[in,out] base_rng random number generator
+       * @param[in,out] iteration iteration callback called with once an iteration with
+       *   the iteration number (1-indexed)
        * @param[in,out] callback interrupt callback called once an iteration
        * @param[in,out] logger logger for messages
        */
@@ -100,35 +100,11 @@ namespace stan {
                                 Model& model, RNG& base_rng,
                                 callbacks::interrupt& callback,
                                 callbacks::logger& logger) {
-        callbacks::log_iteration iteration(logger, warmup ? finish : start, num_iterations);
-        for (int m = 0; m < num_iterations; ++m) {
-          callback();
-
-          if (refresh > 0
-              && (start + m + 1 == finish
-                  || m == 0
-                  || (m + 1) % refresh == 0)) {
-            int it_print_width
-              = std::ceil(std::log10(static_cast<double>(finish)));
-            std::stringstream message;
-            message << "Iteration: ";
-            message << std::setw(it_print_width) << m + 1 + start
-                    << " / " << finish;
-            message << " [" << std::setw(3)
-                    << static_cast<int>( (100.0 * (start + m + 1)) / finish )
-                    << "%] ";
-            message << (warmup ? " (Warmup)" : " (Sampling)");
-
-            logger.info(message);
-          }
-
-          init_s = sampler.transition(init_s, logger);
-
-          if (save && ((m % num_thin) == 0)) {
-            mcmc_writer.write_sample_params(base_rng, init_s, sampler, model);
-            mcmc_writer.write_diagnostic_params(init_s, sampler);
-          }
-        }
+        callbacks::log_iteration iteration(logger, warmup ? finish : start,
+                                           finish, refresh);
+        generate_transitions(sampler, num_iterations, start, finish, num_thin,
+                             save, warmup, mcmc_writer, init_s, model,
+                             base_rng, iteration, callback, logger);
       }
 
     }

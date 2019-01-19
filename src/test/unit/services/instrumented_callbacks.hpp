@@ -281,6 +281,33 @@ namespace stan {
       };
 
 
+
+      /**
+       * instrumented_iteration counts the number of times it is
+       * called and makes the count accessible via a method.
+       */
+      class instrumented_iteration: public stan::callbacks::iteration {
+      public:
+        instrumented_iteration() :
+          counter_(0) {}
+
+        void operator()(int iteration_number) {
+          counter_++;
+          iteration_numbers_.push_back(iteration_number);
+        }
+
+        unsigned int call_count() {
+          return counter_;
+        }
+
+        std::vector<int> iteration_numbers() {
+          return iteration_numbers_;
+        }
+
+      private:
+        unsigned int counter_;
+        std::vector<int> iteration_numbers_;
+      };
     }
   }
 }
