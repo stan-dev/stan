@@ -71,7 +71,7 @@ TEST(StanCallbacks, log_iteration_refresh) {
     other.str("");
     info.str("");
     EXPECT_NO_THROW(iteration(n));
-    if (n % 100 == 0 || n == 1 || n == 2000)
+    if (n % 100 == 0 || n == 1 || n == 1001 || n == 2000)
       EXPECT_NE(std::string::npos, info.str().find("Iteration:")) << "iteration " << n;
     else
       EXPECT_EQ("", info.str()) << "iteration " << n;
