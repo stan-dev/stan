@@ -3,6 +3,7 @@
 
 #include <stan/io/var_context.hpp>
 #include <boost/throw_exception.hpp>
+#include <Eigen/Dense>
 #include <map>
 #include <sstream>
 #include <string>
@@ -43,13 +44,13 @@ namespace stan {
       }
 
       /**
-       * Check (1) if the vecotr size of dimensions is no smaller
-       * than the name vecotr size; (2) if the size of the input
+       * Check (1) if the vector size of dimensions is no smaller
+       * than the name vector size; (2) if the size of the input
        * array is large enough for what is needed.
        */
       template <typename T>
       void validate(const std::vector<std::string>& names,
-                    const std::vector<T>& array,
+                    const T& array,
                     const std::vector<std::vector<size_t> >& dims) {
         size_t total = 0;
         size_t num_par = names.size();
@@ -87,6 +88,26 @@ namespace stan {
           start = end;
         }
       }
+
+      void add_r(const std::vector<std::string>& names,
+                 const Eigen::VectorXd& values,
+                 const std::vector<std::vector<size_t> >& dims) {
+        validate(names, values, dims);
+        size_t start = 0;
+        size_t end = 0;
+        for (size_t i = 0; i < names.size(); i++) {
+          end += product(dims[i]);
+          size_t v_len = end - start;
+          std::vector<double> v(v_len);
+          for (size_t i = 0; i < v_len; ++i)
+            v[i] = values(start + i);
+          vars_r_[names[i]]
+            = std::pair<std::vector<double>,
+                        std::vector<size_t> >(v, dims[i]);
+          start = end;
+        }
+      }
+
       void add_i(const std::vector<std::string>& names,
                  const std::vector<int>& values,
                  const std::vector<std::vector<size_t> >& dims) {
@@ -113,6 +134,19 @@ namespace stan {
        */
       array_var_context(const std::vector<std::string>& names_r,
                         const std::vector<double>& values_r,
+                        const std::vector<std::vector<size_t> >& dim_r) {
+        add_r(names_r, values_r, dim_r);
+      }
+
+      /**
+       * Construct an array_var_context from an Eigen::RowVectorXd.
+       *
+       * @param names_r  names for each element
+       * @param values_r an Eigen RowVector double values for all elements
+       * @param dim_r   a vector of dimensions
+       */
+      array_var_context(const std::vector<std::string>& names_r,
+                        const Eigen::RowVectorXd& values_r,
                         const std::vector<std::vector<size_t> >& dim_r) {
         add_r(names_r, values_r, dim_r);
       }
