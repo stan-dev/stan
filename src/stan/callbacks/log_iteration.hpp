@@ -63,6 +63,7 @@ class log_iteration : public iteration {
     if (iteration_number == 1
         || iteration_number == num_total_iterations_
         || iteration_number == num_warmup_iterations_
+        || iteration_number == num_warmup_iterations_ + 1
         || iteration_number % refresh_iterations_ == 0)
       return true;
     return false;
