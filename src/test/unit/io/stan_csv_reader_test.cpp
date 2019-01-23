@@ -22,6 +22,7 @@ public:
     samples2_stream.open("src/test/unit/io/test_csv_files/samples2.csv");
     
     blocker_nondiag0_stream.open("src/test/unit/io/test_csv_files/blocker_nondiag.0.csv");
+    eight_schools_stream.open("src/test/unit/io/test_csv_files/eight_schools.csv");
   }
   
   void TearDown() {
@@ -46,7 +47,7 @@ public:
   std::ifstream metadata1_stream, header1_stream, adaptation1_stream, samples1_stream;
   std::ifstream metadata3_stream;
   std::ifstream metadata2_stream, header2_stream, adaptation2_stream, samples2_stream;
-
+  std::ifstream eight_schools_stream;
 };
 
 TEST_F(StanIoStanCsvReader,read_metadata1) {
@@ -384,4 +385,11 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   EXPECT_FLOAT_EQ(0.648336, blocker0.timing.sampling);
 
   EXPECT_EQ("", out.str());
+}
+
+
+TEST_F(StanIoStanCsvReader,ParseEightSchools) {
+  stan::io::stan_csv eight_schools;
+  std::stringstream out;
+  eight_schools = stan::io::stan_csv_reader::parse(eight_schools_stream, &out);
 }
