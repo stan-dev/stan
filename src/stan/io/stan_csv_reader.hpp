@@ -141,7 +141,7 @@ namespace stan {
             metadata.save_warmup = boost::lexical_cast<bool>(value);
           } else if (name.compare("thin") == 0) {
             metadata.thin = boost::lexical_cast<int>(value);
-          } else if (name.compare("chain_id") == 0) {
+          } else if (name.compare("id") == 0) {
             metadata.chain_id = boost::lexical_cast<int>(value);
           } else if (name.compare("init") == 0) {
             metadata.init = value;

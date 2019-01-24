@@ -65,7 +65,7 @@ TEST_F(StanIoStanCsvReader,read_metadata1) {
   EXPECT_FALSE(metadata.save_warmup);
   EXPECT_EQ(4085885484U, metadata.seed);
   EXPECT_FALSE(metadata.random_seed);
-  EXPECT_EQ(1U, metadata.chain_id);
+  EXPECT_EQ(0U, metadata.chain_id);
   EXPECT_EQ(2000U, metadata.num_samples);
   EXPECT_EQ(2000U, metadata.num_warmup);
   EXPECT_EQ(2U, metadata.thin);
@@ -88,7 +88,7 @@ TEST_F(StanIoStanCsvReader,read_metadata3) {
   EXPECT_FALSE(metadata.save_warmup);
   EXPECT_EQ(4085885484U, metadata.seed);
   EXPECT_FALSE(metadata.random_seed);
-  EXPECT_EQ(1U, metadata.chain_id);
+  EXPECT_EQ(0U, metadata.chain_id);
   EXPECT_EQ(2000U, metadata.num_samples);
   EXPECT_EQ(2000U, metadata.num_warmup);
   EXPECT_EQ(2U, metadata.thin);
@@ -253,7 +253,7 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   EXPECT_FALSE(blocker0.metadata.save_warmup);
   EXPECT_EQ(4085885484U, blocker0.metadata.seed);
   EXPECT_FALSE(blocker0.metadata.random_seed);
-  EXPECT_EQ(1U, blocker0.metadata.chain_id);
+  EXPECT_EQ(0U, blocker0.metadata.chain_id);
   EXPECT_EQ(2000U, blocker0.metadata.num_samples);
   EXPECT_EQ(2000U, blocker0.metadata.num_warmup);
   EXPECT_EQ(2U, blocker0.metadata.thin);
@@ -392,4 +392,23 @@ TEST_F(StanIoStanCsvReader,ParseEightSchools) {
   stan::io::stan_csv eight_schools;
   std::stringstream out;
   eight_schools = stan::io::stan_csv_reader::parse(eight_schools_stream, &out);
+
+  // metadata
+  EXPECT_EQ(2, eight_schools.metadata.stan_version_major);
+  EXPECT_EQ(18, eight_schools.metadata.stan_version_minor);
+  EXPECT_EQ(0, eight_schools.metadata.stan_version_patch);
+
+  EXPECT_EQ("eight_schools_model", eight_schools.metadata.model);
+  EXPECT_EQ("eight_schools.data.R", eight_schools.metadata.data);
+  EXPECT_EQ("2", eight_schools.metadata.init);
+  EXPECT_FALSE(eight_schools.metadata.append_samples);
+  EXPECT_FALSE(eight_schools.metadata.save_warmup);
+  EXPECT_EQ(2212811313U, eight_schools.metadata.seed);
+  EXPECT_FALSE(eight_schools.metadata.random_seed);
+  EXPECT_EQ(3U, eight_schools.metadata.chain_id);
+  EXPECT_EQ(1000U, eight_schools.metadata.num_samples);
+  EXPECT_EQ(1000U, eight_schools.metadata.num_warmup);
+  EXPECT_EQ(1U, eight_schools.metadata.thin);
+  EXPECT_EQ("hmc", eight_schools.metadata.algorithm);
+  EXPECT_EQ("nuts", eight_schools.metadata.engine);
 }
