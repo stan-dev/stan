@@ -242,7 +242,7 @@ namespace stan {
             std::string token;
             std::getline(line_ss, token, ',');
             boost::trim(token);
-	    std::stringstream(token) >> adaptation.metric(row, col);
+            std::stringstream(token) >> adaptation.metric(row, col);
           }
           std::getline(ss, line);  // Read in next line
         }
@@ -279,15 +279,15 @@ namespace stan {
             if (line.find("(Warm-up)") != std::string::npos) {
               int left = 17;
               int right = line.find(" seconds");
-	      double warmup;
+              double warmup;
               std::stringstream(line.substr(left, right - left)) >> warmup;
-	      timing.warmup += warmup;
+              timing.warmup += warmup;
             } else if (line.find("(Sampling)") != std::string::npos) {
               int left = 17;
               int right = line.find(" seconds");
-	      double sampling;
-	      std::stringstream(line.substr(left, right - left)) >> sampling;
-	      timing.sampling += sampling;
+              double sampling;
+              std::stringstream(line.substr(left, right - left)) >> sampling;
+              timing.sampling += sampling;
             }
           } else {
             ss << line << '\n';
@@ -296,9 +296,9 @@ namespace stan {
               cols = current_cols;
             } else if (cols != current_cols) {
               if (out)
-              *out << "Error: expected " << cols << " columns, but found "
-                   << current_cols << " instead for row " << rows + 1
-                   << std::endl;
+                *out << "Error: expected " << cols << " columns, but found "
+                     << current_cols << " instead for row " << rows + 1
+                     << std::endl;
               return false;
             }
             rows++;
@@ -317,7 +317,7 @@ namespace stan {
             for (int col = 0; col < cols; col++) {
               std::getline(ls, line, ',');
               boost::trim(line);
-	      std::stringstream(line) >> samples(row, col);
+              std::stringstream(line) >> samples(row, col);
             }
           }
         }
