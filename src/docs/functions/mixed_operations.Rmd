@@ -1,0 +1,212 @@
+# Mixed Operations {#mixed-operations}
+
+These functions perform conversions between Stan containers matrix,
+vector, row vector and arrays.
+
+<!-- matrix; to_matrix; (matrix m); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (matrix m): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(matrix m)`<br>\newline
+Return the matrix m itself.
+
+<!-- matrix; to_matrix; (vector v); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (vector v): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(vector v)`<br>\newline
+Convert the column vector v to a `size(v)` by 1 matrix.
+
+<!-- matrix; to_matrix; (row_vector v); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (row\_vector v): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(row_vector v)`<br>\newline
+Convert the row vector v to a 1 by `size(v)` matrix.
+
+<!-- matrix; to_matrix; (matrix m, int m, int n); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (matrix m, int m, int n): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(matrix m, int m, int n)`<br>\newline
+Convert a matrix m to a matrix with m rows and n columns filled in
+column-major order.
+
+<!-- matrix; to_matrix; (vector v, int m, int n); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (vector v, int m, int n): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(vector v, int m, int n)`<br>\newline
+Convert a vector v to a matrix with m rows and n columns filled in
+column-major order.
+
+<!-- matrix; to_matrix; (row_vector v, int m, int n); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (row\_vector v, int m, int n): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(row_vector v, int m, int n)`<br>\newline
+Convert a row_vector a to a matrix with m rows and n columns filled in
+column-major order.
+
+<!-- matrix; to_matrix; (matrix m, int m, int n, int col_major); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (matrix m, int m, int n, int col\_major): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(matrix m, int m, int n, int col_major)`<br>\newline
+Convert a matrix m to a matrix with m rows and n columns filled in
+row-major order if col_major equals 0 (otherwise, they get filled in
+column-major order).
+
+<!-- matrix; to_matrix; (vector v, int m, int n, int col_major); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (vector v, int m, int n, int col\_major): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(vector v, int m, int n, int col_major)`<br>\newline
+Convert a vector v to a matrix with m rows and n columns filled in
+row-major order if col_major equals 0 (otherwise, they get filled in
+column-major order).
+
+<!-- matrix; to_matrix; (row_vector v, int m, int n, int col_major); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (row\_vector v, int m, int n, int col\_major): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(row_vector v, int m, int n, int col_major)`<br>\newline
+Convert a row_vector a to a matrix with m rows and n columns filled in
+row-major order if col_major equals 0 (otherwise, they get filled in
+column-major order).
+
+<!-- matrix; to_matrix; (real[] a, int m, int n); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (real[] a, int m, int n): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(real[] a, int m, int n)`<br>\newline
+Convert a one-dimensional array a to a matrix with m rows and n
+columns filled in column-major order.
+
+<!-- matrix; to_matrix; (int[] a, int m, int n); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (int[] a, int m, int n): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(int[] a, int m, int n)`<br>\newline
+Convert a one-dimensional array a to a matrix with m rows and n
+columns filled in column-major order.
+
+<!-- matrix; to_matrix; (real[] a, int m, int n, int col_major); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (real[] a, int m, int n, int col\_major): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(real[] a, int m, int n, int col_major)`<br>\newline
+Convert a one-dimensional array a to a matrix with m rows and n
+columns filled in row-major order if col_major equals 0 (otherwise,
+they get filled in column-major order).
+
+<!-- matrix; to_matrix; (int[] a, int m, int n, int col_major); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (int[] a, int m, int n, int col\_major): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(int[] a, int m, int n, int col_major)`<br>\newline
+Convert a one-dimensional array a to a matrix with m rows and n
+columns filled in row-major order if col_major equals 0 (otherwise,
+they get filled in column-major order).
+
+<!-- matrix; to_matrix; (real[,] a); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (real[,] a): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(real[,] a)`<br>\newline
+Convert the two dimensional array a to a matrix with the same
+dimensions and indexing order.
+
+<!-- matrix; to_matrix; (int[,] a); -->
+\index{{\tt \bfseries to\_matrix}!{\tt (int[,] a): matrix}|hyperpage}
+
+`matrix` **`to_matrix`**`(int[,] a)`<br>\newline
+Convert the two dimensional array a to a matrix with the same
+dimensions and indexing order. If any of the dimensions of a are zero,
+the result will be a $0 \times 0$ matrix.
+
+<!-- vector; to_vector; (matrix m); -->
+\index{{\tt \bfseries to\_vector}!{\tt (matrix m): vector}|hyperpage}
+
+`vector` **`to_vector`**`(matrix m)`<br>\newline
+Convert the matrix m to a column vector in column-major order.
+
+<!-- vector; to_vector; (vector v); -->
+\index{{\tt \bfseries to\_vector}!{\tt (vector v): vector}|hyperpage}
+
+`vector` **`to_vector`**`(vector v)`<br>\newline
+Return the column vector v itself.
+
+<!-- vector; to_vector; (row_vector v); -->
+\index{{\tt \bfseries to\_vector}!{\tt (row\_vector v): vector}|hyperpage}
+
+`vector` **`to_vector`**`(row_vector v)`<br>\newline
+Convert the row vector v to a column vector.
+
+<!-- vector; to_vector; (real[] a); -->
+\index{{\tt \bfseries to\_vector}!{\tt (real[] a): vector}|hyperpage}
+
+`vector` **`to_vector`**`(real[] a)`<br>\newline
+Convert the one-dimensional array a to a column vector.
+
+<!-- vector; to_vector; (int[] a); -->
+\index{{\tt \bfseries to\_vector}!{\tt (int[] a): vector}|hyperpage}
+
+`vector` **`to_vector`**`(int[] a)`<br>\newline
+Convert the one-dimensional integer array a to a column vector.
+
+<!-- row_vector; to_row_vector; (matrix m); -->
+\index{{\tt \bfseries to\_row\_vector}!{\tt (matrix m): row\_vector}|hyperpage}
+
+`row_vector` **`to_row_vector`**`(matrix m)`<br>\newline
+Convert the matrix m to a row vector in column-major order.
+
+<!-- row_vector; to_row_vector; (vector v); -->
+\index{{\tt \bfseries to\_row\_vector}!{\tt (vector v): row\_vector}|hyperpage}
+
+`row_vector` **`to_row_vector`**`(vector v)`<br>\newline
+Convert the column vector v to a row vector.
+
+<!-- row_vector; to_row_vector; (row_vector v); -->
+\index{{\tt \bfseries to\_row\_vector}!{\tt (row\_vector v): row\_vector}|hyperpage}
+
+`row_vector` **`to_row_vector`**`(row_vector v)`<br>\newline
+Return the row vector v itself.
+
+<!-- row_vector; to_row_vector; (real[] a); -->
+\index{{\tt \bfseries to\_row\_vector}!{\tt (real[] a): row\_vector}|hyperpage}
+
+`row_vector` **`to_row_vector`**`(real[] a)`<br>\newline
+Convert the one-dimensional array a to a row vector.
+
+<!-- row_vector; to_row_vector; (int[] a); -->
+\index{{\tt \bfseries to\_row\_vector}!{\tt (int[] a): row\_vector}|hyperpage}
+
+`row_vector` **`to_row_vector`**`(int[] a)`<br>\newline
+Convert the one-dimensional array a to a row vector.
+
+<!-- real[,]; to_array_2d; (matrix m); -->
+\index{{\tt \bfseries to\_array\_2d}!{\tt (matrix m): real[,]}|hyperpage}
+
+`real[,]` **`to_array_2d`**`(matrix m)`<br>\newline
+Convert the matrix m to a two dimensional array with the same
+dimensions and indexing order.
+
+<!-- real[]; to_array_1d; (vector v); -->
+\index{{\tt \bfseries to\_array\_1d}!{\tt (vector v): real[]}|hyperpage}
+
+`real[]` **`to_array_1d`**`(vector v)`<br>\newline
+Convert the column vector v to a one-dimensional array.
+
+<!-- real[]; to_array_1d; (row_vector v); -->
+\index{{\tt \bfseries to\_array\_1d}!{\tt (row\_vector v): real[]}|hyperpage}
+
+`real[]` **`to_array_1d`**`(row_vector v)`<br>\newline
+Convert the row vector v to a one-dimensional array.
+
+<!-- real[]; to_array_1d; (matrix m); -->
+\index{{\tt \bfseries to\_array\_1d}!{\tt (matrix m): real[]}|hyperpage}
+
+`real[]` **`to_array_1d`**`(matrix m)`<br>\newline
+Convert the matrix m to a one-dimensional array in column-major order.
+
+<!-- real[]; to_array_1d; (real[...] a); -->
+\index{{\tt \bfseries to\_array\_1d}!{\tt (real[...] a): real[]}|hyperpage}
+
+`real[]` **`to_array_1d`**`(real[...] a)`<br>\newline
+Convert the array a (of any dimension up to 10) to a one-dimensional
+array in row-major order.
+
+<!-- int[]; to_array_1d; (int[...] a); -->
+\index{{\tt \bfseries to\_array\_1d}!{\tt (int[...] a): int[]}|hyperpage}
+
+`int[]` **`to_array_1d`**`(int[...] a)`<br>\newline
+Convert the array a (of any dimension up to 10) to a one-dimensional
+array in row-major order.
+

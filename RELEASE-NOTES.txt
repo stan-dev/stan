@@ -5,6 +5,17 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.18.1 (24 December 2018)
+======================================================================
+Bugfix release - major bug in threading where certain thread count and
+job size combinations could result in incorrect output. See
+https://discourse.mc-stan.org/t/bug-in-map-rect-with-threading-in-stan-2-18-0/7056
+for more details.
+
+Bug Fixes
+--------------------------------------------------
+* Fix threading batch size bug (stan-dev/math#1075)
+
 v2.18.0 (13 July 2018)
 ======================================================================
 This is our first release with parallelism (threading and MPI)!

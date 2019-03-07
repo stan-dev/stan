@@ -63,6 +63,8 @@ namespace stan {
         << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
+      o << INDENT2 << "if (!include_tparams__ && !include_gqs__) return;"
+        << EOL2;
 
       generate_try(2, o);
       if (prog.derived_decl_.first.size() > 0) {
@@ -83,6 +85,9 @@ namespace stan {
         o << EOL;
       }
 
+      o << INDENT3 << "if (!include_gqs__ && !include_tparams__) return;"
+        << EOL;
+
       if (prog.derived_decl_.first.size() > 0) {
         generate_comment("validate transformed parameters", 3, o);
         o << INDENT3
@@ -102,8 +107,6 @@ namespace stan {
             generate_validate_block_var(bvd, 3, o);
           }
         }
-        o << INDENT3 << "if (!include_gqs__ && !include_tparams__) return;"
-          << EOL;
 
         generate_comment("write transformed parameters", 3, o);
         o << INDENT3 << "if (include_tparams__) {" << EOL;
@@ -142,7 +145,7 @@ namespace stan {
             << EOL;
           generate_validate_block_var(prog.generated_decl_.first[i], 3, o);
           generate_write_block_var(prog.generated_decl_.first[i], 3, o);
-        o << EOL;
+          o << EOL;
         }
       }
       generate_catch_throw_located(2, o);

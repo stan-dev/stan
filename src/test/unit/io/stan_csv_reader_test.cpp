@@ -22,6 +22,7 @@ public:
     samples2_stream.open("src/test/unit/io/test_csv_files/samples2.csv");
     
     blocker_nondiag0_stream.open("src/test/unit/io/test_csv_files/blocker_nondiag.0.csv");
+    eight_schools_stream.open("src/test/unit/io/test_csv_files/eight_schools.csv");
   }
   
   void TearDown() {
@@ -46,7 +47,7 @@ public:
   std::ifstream metadata1_stream, header1_stream, adaptation1_stream, samples1_stream;
   std::ifstream metadata3_stream;
   std::ifstream metadata2_stream, header2_stream, adaptation2_stream, samples2_stream;
-
+  std::ifstream eight_schools_stream;
 };
 
 TEST_F(StanIoStanCsvReader,read_metadata1) {
@@ -64,12 +65,13 @@ TEST_F(StanIoStanCsvReader,read_metadata1) {
   EXPECT_FALSE(metadata.save_warmup);
   EXPECT_EQ(4085885484U, metadata.seed);
   EXPECT_FALSE(metadata.random_seed);
-  EXPECT_EQ(1U, metadata.chain_id);
+  EXPECT_EQ(0U, metadata.chain_id);
   EXPECT_EQ(2000U, metadata.num_samples);
   EXPECT_EQ(2000U, metadata.num_warmup);
   EXPECT_EQ(2U, metadata.thin);
   EXPECT_EQ("hmc", metadata.algorithm);
   EXPECT_EQ("nuts", metadata.engine);
+  EXPECT_EQ(10, metadata.max_depth);
 }
 TEST_F(StanIoStanCsvReader,read_metadata3) {
   stan::io::stan_csv_metadata metadata;
@@ -86,12 +88,13 @@ TEST_F(StanIoStanCsvReader,read_metadata3) {
   EXPECT_FALSE(metadata.save_warmup);
   EXPECT_EQ(4085885484U, metadata.seed);
   EXPECT_FALSE(metadata.random_seed);
-  EXPECT_EQ(1U, metadata.chain_id);
+  EXPECT_EQ(0U, metadata.chain_id);
   EXPECT_EQ(2000U, metadata.num_samples);
   EXPECT_EQ(2000U, metadata.num_warmup);
   EXPECT_EQ(2U, metadata.thin);
   EXPECT_EQ("hmc", metadata.algorithm);
   EXPECT_EQ("nuts", metadata.engine);
+  EXPECT_EQ(15, metadata.max_depth);
 }
 TEST_F(StanIoStanCsvReader,read_header1) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
@@ -250,7 +253,7 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   EXPECT_FALSE(blocker0.metadata.save_warmup);
   EXPECT_EQ(4085885484U, blocker0.metadata.seed);
   EXPECT_FALSE(blocker0.metadata.random_seed);
-  EXPECT_EQ(1U, blocker0.metadata.chain_id);
+  EXPECT_EQ(0U, blocker0.metadata.chain_id);
   EXPECT_EQ(2000U, blocker0.metadata.num_samples);
   EXPECT_EQ(2000U, blocker0.metadata.num_warmup);
   EXPECT_EQ(2U, blocker0.metadata.thin);
@@ -381,5 +384,86 @@ TEST_F(StanIoStanCsvReader,ParseBlocker) {
   EXPECT_FLOAT_EQ(0.391415, blocker0.timing.warmup);
   EXPECT_FLOAT_EQ(0.648336, blocker0.timing.sampling);
 
+  EXPECT_EQ("", out.str());
+}
+
+
+TEST_F(StanIoStanCsvReader,ParseEightSchools) {
+  stan::io::stan_csv eight_schools;
+  std::stringstream out;
+  eight_schools = stan::io::stan_csv_reader::parse(eight_schools_stream, &out);
+
+  // metadata
+  EXPECT_EQ(2, eight_schools.metadata.stan_version_major);
+  EXPECT_EQ(18, eight_schools.metadata.stan_version_minor);
+  EXPECT_EQ(0, eight_schools.metadata.stan_version_patch);
+
+  EXPECT_EQ("eight_schools_model", eight_schools.metadata.model);
+  EXPECT_EQ("eight_schools.data.R", eight_schools.metadata.data);
+  EXPECT_EQ("2", eight_schools.metadata.init);
+  EXPECT_FALSE(eight_schools.metadata.append_samples);
+  EXPECT_FALSE(eight_schools.metadata.save_warmup);
+  EXPECT_EQ(2212811313U, eight_schools.metadata.seed);
+  EXPECT_FALSE(eight_schools.metadata.random_seed);
+  EXPECT_EQ(3U, eight_schools.metadata.chain_id);
+  EXPECT_EQ(1000U, eight_schools.metadata.num_samples);
+  EXPECT_EQ(1000U, eight_schools.metadata.num_warmup);
+  EXPECT_EQ(1U, eight_schools.metadata.thin);
+  EXPECT_EQ("hmc", eight_schools.metadata.algorithm);
+  EXPECT_EQ("nuts", eight_schools.metadata.engine);
+
+    // header
+  ASSERT_EQ(25, eight_schools.header.size());
+  EXPECT_EQ("lp__", eight_schools.header(0));
+  EXPECT_EQ("accept_stat__", eight_schools.header(1));
+  EXPECT_EQ("stepsize__", eight_schools.header(2));
+  EXPECT_EQ("treedepth__", eight_schools.header(3));
+  EXPECT_EQ("n_leapfrog__", eight_schools.header(4));
+  EXPECT_EQ("divergent__", eight_schools.header(5));
+  EXPECT_EQ("energy__", eight_schools.header(6));
+  EXPECT_EQ("mu", eight_schools.header(7));
+  EXPECT_EQ("tau", eight_schools.header(8));
+  EXPECT_EQ("eta[1]", eight_schools.header(9));
+  EXPECT_EQ("eta[2]", eight_schools.header(10));
+  EXPECT_EQ("eta[3]", eight_schools.header(11));
+  EXPECT_EQ("eta[4]", eight_schools.header(12));
+  EXPECT_EQ("eta[5]", eight_schools.header(13));
+  EXPECT_EQ("eta[6]", eight_schools.header(14));
+  EXPECT_EQ("eta[7]", eight_schools.header(15));
+  EXPECT_EQ("eta[8]", eight_schools.header(16));
+  EXPECT_EQ("theta[1]", eight_schools.header(17));
+  EXPECT_EQ("theta[2]", eight_schools.header(18));
+  EXPECT_EQ("theta[3]", eight_schools.header(19));
+  EXPECT_EQ("theta[4]", eight_schools.header(20));
+  EXPECT_EQ("theta[5]", eight_schools.header(21));
+  EXPECT_EQ("theta[6]", eight_schools.header(22));
+  EXPECT_EQ("theta[7]", eight_schools.header(23));
+  EXPECT_EQ("theta[8]", eight_schools.header(24));
+
+  // adaptation
+  EXPECT_FLOAT_EQ(0.400175, eight_schools.adaptation.step_size);
+  ASSERT_EQ(10, eight_schools.adaptation.metric.size());
+  EXPECT_FLOAT_EQ(33.4344, eight_schools.adaptation.metric(0));
+  EXPECT_FLOAT_EQ(1.06806, eight_schools.adaptation.metric(1));
+  EXPECT_FLOAT_EQ(0.875304, eight_schools.adaptation.metric(2));
+  EXPECT_FLOAT_EQ(0.881766, eight_schools.adaptation.metric(3));
+  EXPECT_FLOAT_EQ(0.956387, eight_schools.adaptation.metric(4));
+  EXPECT_FLOAT_EQ(0.704904, eight_schools.adaptation.metric(5));
+  EXPECT_FLOAT_EQ(0.838633, eight_schools.adaptation.metric(6));
+  EXPECT_FLOAT_EQ(0.785699, eight_schools.adaptation.metric(7));
+  EXPECT_FLOAT_EQ(0.701917, eight_schools.adaptation.metric(8));
+  EXPECT_FLOAT_EQ(0.886245, eight_schools.adaptation.metric(9));
+
+  ASSERT_EQ(1000, eight_schools.samples.rows());
+  ASSERT_EQ(25, eight_schools.samples.cols());
+
+  Eigen::VectorXd first_draw(25);
+  first_draw << -39.3871,0.998172,0.400175,3,7,0,41.5619,10.1835,2.02267,0.792196,-0.113107,1.23841,0.271166,-1.71864,0.0893772,0.689502,-0.977715,11.7858,9.95471,12.6884,10.732,6.70724,10.3643,11.5781,8.20589;
+  for (int i = 0; i < 25; ++i)
+    EXPECT_FLOAT_EQ(first_draw(i), eight_schools.samples(0, i));
+
+  EXPECT_FLOAT_EQ(0.053314, eight_schools.timing.warmup);
+  EXPECT_FLOAT_EQ(0.063405, eight_schools.timing.sampling);
+  
   EXPECT_EQ("", out.str());
 }

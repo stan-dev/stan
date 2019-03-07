@@ -1,0 +1,64 @@
+# Void Functions
+
+Stan does not technically support functions that do not return values.
+It does support two types of statements that look like functions, one
+for printing and one for rejecting outputs.  Documentation on these
+functions is included here for completeness.  The special keyword
+`void` is used for the return type of void functions, because they
+behave like variadic functions with void return type, even though they
+are special kinds of statements.
+
+Although `print` and `reject` appear to have the syntax of functions,
+they are actually special kinds of statements with slightly different
+form and behavior than other functions.  First, they are the
+constructs that allow a variable number of arguments.  Second, they
+are the the only constructs to accept string literals (e.g., `"hello
+world"`) as arguments.  Third, they have no effect on the log density
+function and operate solely through side effects.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="print-statement.html">Print Statement</a>\n')
+cat(' * <a href="reject-statement.html">Reject Statement</a>\n')
+}
+```
+
+## Print Statement
+
+Printing has no effect on the model's log probability function.  Its
+sole purpose is the side effect (i.e., an effect not represented in a
+return value) of arguments being printed to whatever the standard
+output stream is connected to (e.g., the terminal in command-line Stan
+or the R console in RStan).
+
+<!-- void; print; (T1 x1,..., TN xN); -->
+\index{{\tt \bfseries print}!{\tt (T1 x1,..., TN xN): void}|hyperpage}
+
+`void` **`print`**`(T1 x1,..., TN xN)`<br>\newline
+Print the values denoted by the arguments x1 through xN on the output
+message stream. There are no spaces between items in the print, but a
+line feed (LF; Unicode U+000A; C++ literal `'\{n}'`) is inserted at
+the end of the printed line. The types `T1` through `TN` can be any of
+Stan's built-in numerical types or double quoted strings of ASCII
+characters.
+
+## Reject Statement
+
+The reject statement has the same syntax as the print statement,
+accepting an arbitrary number of arguments of any type (including
+string literals).   The effect of executing a reject statement is to
+throw an exception internally that terminates the current iteration
+with a rejection (the behavior of which will depend on the algorithmic
+context in which it occurs).
+
+<!-- void; reject; (T1 x1,..., TN xN); -->
+\index{{\tt \bfseries reject}!{\tt (T1 x1,..., TN xN): void}|hyperpage}
+
+`void` **`reject`**`(T1 x1,..., TN xN)`<br>\newline
+Reject the current iteration and print the values denoted by the
+arguments x1 through xN on the output message stream. There are no
+spaces between items in the print, but a line feed (LF; Unicode
+U+000A; C++ literal `'\{n}'`) is inserted at the end of the printed
+line. The types `T1` through `TN` can be any of Stan's built-in
+numerical types or double quoted strings of ASCII characters.
+

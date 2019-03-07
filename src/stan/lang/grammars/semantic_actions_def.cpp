@@ -912,13 +912,6 @@ void validate_assgn::operator()(assgn &a, bool &pass, const variable_map &vm,
       pass = false;
       return;
     }
-    if (a.lhs_var_occurs_on_rhs()) {
-      // this only requires a warning --- a deep copy will be made
-      error_msgs << "Info: left-hand side variable"
-                 << " (name=" << name << ")"
-                 << " occurs on right-hand side of assignment, causing"
-                 << " inefficient deep copy to avoid aliasing." << std::endl;
-    }
     pass = true;
     return;
   } else {
@@ -1543,7 +1536,7 @@ void validate_algebra_solver_non_control_args(const T &alg_fun,
   sys_arg_types.push_back(t_vector);    // y
   sys_arg_types.push_back(t_vector);    // theta
   sys_arg_types.push_back(t_ar_double);  // x_r
-  sys_arg_types.push_back(t_ar_int);     // x_i
+  sys_arg_types.push_back(t_ar_int);    // x_i
   function_signature_t system_signature(sys_result_type, sys_arg_types);
 
   if (!function_signatures::instance().is_defined(alg_fun.system_function_name_,
@@ -1739,7 +1732,6 @@ void validate_integrate_1d::operator()(integrate_1d &fx,
   }
 }
 boost::phoenix::function<validate_integrate_1d> validate_integrate_1d_f;
-
 void validate_map_rect::operator()(map_rect &mr, const variable_map &var_map,
                                    bool &pass, std::ostream &error_msgs) const {
   pass = true;
@@ -2072,7 +2064,6 @@ void multiplication_expr::operator()(expression &expr1, const expression &expr2,
                                      std::ostream &error_msgs) const {
   if (expr1.bare_type().is_primitive() && expr2.bare_type().is_primitive()) {
     expr1 *= expr2;
-    ;
     return;
   }
   std::vector<expression> args;
@@ -2697,6 +2688,12 @@ void empty_range::operator()(range &r,
 }
 boost::phoenix::function<empty_range> empty_range_f;
 
+void empty_offset_multiplier::
+operator()(offset_multiplier &r, std::stringstream & /*error_msgs*/) const {
+  r = offset_multiplier();
+}
+boost::phoenix::function<empty_offset_multiplier> empty_offset_multiplier_f;
+
 void set_int_range_lower::operator()(range &range, const expression &expr,
                                      bool &pass,
                                      std::stringstream &error_msgs) const {
@@ -2750,6 +2747,27 @@ void set_double_range_upper::operator()(range &range, const expression &expr,
   validator(expr, pass, error_msgs);
 }
 boost::phoenix::function<set_double_range_upper> set_double_range_upper_f;
+
+void set_double_offset_multiplier_loc::
+operator()(offset_multiplier &offset_multiplier, const expression &expr,
+           bool &pass, std::stringstream &error_msgs) const {
+  offset_multiplier.offset_ = expr;
+  validate_double_expr validator;
+  validator(expr, pass, error_msgs);
+}
+boost::phoenix::function<set_double_offset_multiplier_loc>
+    set_double_offset_multiplier_offset_f;
+
+void set_double_offset_multiplier_multiplier::
+operator()(offset_multiplier &offset_multiplier, const expression &expr,
+           bool &pass, std::stringstream &error_msgs) const {
+  offset_multiplier.multiplier_ = expr;
+  validate_double_expr validator;
+  validator(expr, pass, error_msgs);
+}
+boost::phoenix::function<set_double_offset_multiplier_multiplier>
+    set_double_offset_multiplier_multiplier_f;
+
 
 void validate_array_block_var_decl::
 operator()(block_var_decl &var_decl_result, const block_var_type &el_type,
@@ -2971,5 +2989,4 @@ boost::phoenix::function<deprecate_pound_comment> deprecate_pound_comment_f;
 
 }  // namespace lang
 }  // namespace stan
-
 #endif

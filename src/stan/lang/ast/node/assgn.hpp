@@ -41,6 +41,14 @@ namespace stan {
       bool is_simple_assignment() const;
 
       /**
+       * Return true if any of the indexes on the lhs element
+       * are sliced indexes
+       *
+       * @return true if lhs has sliced idx
+       */
+      bool lhs_var_has_sliced_idx() const;
+
+      /**
        * Return true if the variable being assigned is a subexpression
        * of the value expression.
        *

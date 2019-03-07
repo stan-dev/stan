@@ -41,6 +41,8 @@ namespace stan {
         << EOL;
       o << INDENT << "                     std::ostream* pstream__) const {"
         << EOL;
+      o << INDENT2 << "typedef double local_scalar_t__;"
+        << EOL;
       o << INDENT2 << "stan::io::writer<double> "
         << "writer__(params_r__, params_i__);"
         << EOL;

@@ -9,5 +9,4 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::range,
                           (stan::lang::expression, low_)
                           (stan::lang::expression, high_) )
 
-
 #endif
