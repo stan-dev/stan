@@ -43,8 +43,8 @@
 #include <stan/lang/ast/fun/bare_type_is_data_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_order_id_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_set_is_data_vis_def.hpp>
-#include <stan/lang/ast/fun/bare_type_vis_def.hpp>
 #include <stan/lang/ast/fun/bare_type_total_dims_vis_def.hpp>
+#include <stan/lang/ast/fun/bare_type_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_bounds_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_is_specialized_vis_def.hpp>
 #include <stan/lang/ast/fun/block_type_params_total_vis_def.hpp>
@@ -61,8 +61,8 @@
 
 #include <stan/lang/ast/fun/ends_with_def.hpp>
 #include <stan/lang/ast/fun/fun_name_exists_def.hpp>
-#include <stan/lang/ast/fun/get_cdf_def.hpp>
 #include <stan/lang/ast/fun/get_ccdf_def.hpp>
+#include <stan/lang/ast/fun/get_cdf_def.hpp>
 #include <stan/lang/ast/fun/get_prob_fun_def.hpp>
 #include <stan/lang/ast/fun/has_ccdf_suffix_def.hpp>
 #include <stan/lang/ast/fun/has_cdf_suffix_def.hpp>
@@ -88,9 +88,9 @@
 #include <stan/lang/ast/fun/promote_primitive_def.hpp>
 #include <stan/lang/ast/fun/returns_type_def.hpp>
 #include <stan/lang/ast/fun/returns_type_vis_def.hpp>
-#include <stan/lang/ast/fun/strip_prob_fun_suffix_def.hpp>
 #include <stan/lang/ast/fun/strip_ccdf_suffix_def.hpp>
 #include <stan/lang/ast/fun/strip_cdf_suffix_def.hpp>
+#include <stan/lang/ast/fun/strip_prob_fun_suffix_def.hpp>
 #include <stan/lang/ast/fun/var_occurs_vis_def.hpp>
 
 #include <stan/lang/ast/sigs/function_signatures_def.hpp>
@@ -100,8 +100,8 @@
 
 #include <stan/lang/ast/node/var_decl_def.hpp>
 
-#include <stan/lang/ast/node/algebra_solver_def.hpp>
 #include <stan/lang/ast/node/algebra_solver_control_def.hpp>
+#include <stan/lang/ast/node/algebra_solver_def.hpp>
 #include <stan/lang/ast/node/array_expr_def.hpp>
 #include <stan/lang/ast/node/assgn_def.hpp>
 #include <stan/lang/ast/node/binary_op_def.hpp>
@@ -122,8 +122,8 @@
 #include <stan/lang/ast/node/index_op_sliced_def.hpp>
 #include <stan/lang/ast/node/int_literal_def.hpp>
 #include <stan/lang/ast/node/integrate_1d_def.hpp>
-#include <stan/lang/ast/node/integrate_ode_def.hpp>
 #include <stan/lang/ast/node/integrate_ode_control_def.hpp>
+#include <stan/lang/ast/node/integrate_ode_def.hpp>
 #include <stan/lang/ast/node/lb_idx_def.hpp>
 #include <stan/lang/ast/node/lub_idx_def.hpp>
 #include <stan/lang/ast/node/map_rect_def.hpp>

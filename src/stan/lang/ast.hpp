@@ -6,12 +6,12 @@
 #include <stan/lang/ast/scope.hpp>
 #include <stan/lang/ast/variable_map.hpp>
 
-#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/type/bare_array_type.hpp>
-#include <stan/lang/ast/type/block_var_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/type/block_array_type.hpp>
-#include <stan/lang/ast/type/local_var_type.hpp>
+#include <stan/lang/ast/type/block_var_type.hpp>
 #include <stan/lang/ast/type/local_array_type.hpp>
+#include <stan/lang/ast/type/local_var_type.hpp>
 
 #include <stan/lang/ast/type/cholesky_factor_corr_block_type.hpp>
 #include <stan/lang/ast/type/cholesky_factor_cov_block_type.hpp>
@@ -120,10 +120,10 @@
 #include <stan/lang/ast/node/increment_log_prob_statement.hpp>
 #include <stan/lang/ast/node/index_op.hpp>
 #include <stan/lang/ast/node/index_op_sliced.hpp>
+#include <stan/lang/ast/node/int_literal.hpp>
 #include <stan/lang/ast/node/integrate_1d.hpp>
 #include <stan/lang/ast/node/integrate_ode.hpp>
 #include <stan/lang/ast/node/integrate_ode_control.hpp>
-#include <stan/lang/ast/node/int_literal.hpp>
 #include <stan/lang/ast/node/lb_idx.hpp>
 #include <stan/lang/ast/node/lub_idx.hpp>
 #include <stan/lang/ast/node/map_rect.hpp>
