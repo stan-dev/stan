@@ -35,7 +35,7 @@ namespace stan {
     /**
      * A <code>json_data_handler</code> is an implementation of a
      * <code>json_handler</code> that restricts the allowed JSON text
-     * a set of Stan variable declarations in JSON format.
+     * to a set of Stan variable declarations in JSON format.
      * Each Stan variable consists of a JSON key : value pair.
      * The key is a string and the value is either a single numeric
      * scalar value or a JSON array of numeric values.
