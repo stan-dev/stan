@@ -109,20 +109,20 @@ constr_expression ::= constr_expression arithmeticInfixOp constr_expression
                     | constr_expression '[' indexes ']'
                     | common_expression
 
-common_expression ::= real_literal
-                    | variable
-                    | '{' expressions '}'
-                    | '[' expressions ']'
-                    | function_literal '(' ?expressions ')'
-                    | function_literal '(' expression ?('|' expression % ',') ')'
-                    | integrate_ode '(' function_literal (',' expression){6} ')'
-                    | integrate_ode_rk45
-                      '(' function_literal (',' expression){6|9} ')'
-                    | integrate_ode_bdf
-                      '(' function_literal (',' expression){6|9} ')'
-                    | algebra_solver
-                    '(' function_literal (',' expression){4|7} ')'
-                    | '(' expression ')'
+common_expression
+  ::= real_literal
+    | variable
+    | '{' expressions '}'
+    | '[' expressions ']'
+    | function_literal '(' ?expressions ')'
+    | function_literal '(' expression ?('|' expression % ',') ')'
+    | 'integrate_1d' '(' function_literal (',' expression){5|6} ')'
+    | 'integrate_ode' '(' function_literal (',' expression){6} ')'
+    | 'integrate_ode_rk45' '(' function_literal (',' expression){6|9} ')'
+    | 'integrate_ode_bdf' '(' function_literal (',' expression){6|9} ')'
+    | 'algebra_solver' '(' function_literal (',' expression){4|7} ')'
+    | 'map_rect' '(' function_literal (',' expression){4} ')'
+    | '(' expression ')'
 
 prefixOp ::= ('!' | '-' | '+' | '^')
 
@@ -295,6 +295,24 @@ which like the second, fourth, and fifth arguments, must be expressions free
 of parameter references. The final free arguments must be assignable to types
 `real`, `real`, and `int`, respectively.
 
+
+### Integrate 1D argument types and origins {-}
+
+The `integrate_1d` function requires
+
+* its first argument to refer to a function wth signature
+`(real, real, real[], real[], int[]) : real`,
+
+* the remaining six arguments are assignable to types
+`real`, `real`, `real[]`, `real[]`, and `int[]`, and
+
+* the fourth and fifth arguments must be expressions not containing
+any variables not originating in the data or transformed data blocks.
+
+`integrate_1d` can accept an extra argument, which, like the
+fourth and fifth arguments, must be expressions free of parameter
+references. This optional sixth argument must be assignable to a
+`real` type.
 
 ### ODE solver argument types and origins {-}
 

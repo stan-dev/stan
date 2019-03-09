@@ -122,6 +122,7 @@
 #include <stan/lang/ast/node/index_op.hpp>
 #include <stan/lang/ast/node/index_op_sliced.hpp>
 #include <stan/lang/ast/node/int_literal.hpp>
+#include <stan/lang/ast/node/integrate_1d.hpp>
 #include <stan/lang/ast/node/integrate_ode.hpp>
 #include <stan/lang/ast/node/integrate_ode_control.hpp>
 #include <stan/lang/ast/node/lb_idx.hpp>

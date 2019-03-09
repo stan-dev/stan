@@ -615,6 +615,32 @@ struct validate_map_rect : public phoenix_functor_quaternary {
 extern boost::phoenix::function<validate_map_rect> validate_map_rect_f;
 
 // called from: term_grammar
+/**
+ * Functor for validating the arguments to map_rect.
+ */
+struct validate_integrate_1d : public phoenix_functor_quaternary {
+  /**
+   * Validate that the specified 1d integration object has
+   * appropriately typed arguments with appropriate data-only
+   * requirements, setting the pass flag to false and writing an
+   * error message to the output stream if they don't.
+   *
+   * @param[in,out] fx structure to validate
+   * @param[in] var_map mapping for variables
+   * @param[in,out] pass reference to set to false upon failure
+   * @param[in,out] error_msgs reference to error message stream
+   * @throws std::illegal_argument_exception if the arguments are
+   * not of the appropriate shapes.
+   */
+  void operator()(integrate_1d &fx, const variable_map &var_map, bool &pass,
+                  std::ostream &error_msgs) const;
+};
+/**
+ * Phoenix wrapper for the rectangular map structure validator.
+ */
+extern boost::phoenix::function<validate_integrate_1d> validate_integrate_1d_f;
+
+// called from: term_grammar
 struct set_fun_type_named : public phoenix_functor_senary {
   void operator()(expression &fun_result, fun &fun, const scope &var_scope,
                   bool &pass, const variable_map &var_map,
@@ -747,6 +773,7 @@ struct data_only_expression : public boost::static_visitor<bool> {
   bool operator()(const matrix_expr &x) const;
   bool operator()(const row_vector_expr &x) const;
   bool operator()(const variable &x) const;
+  bool operator()(const integrate_1d &x) const;
   bool operator()(const integrate_ode &x) const;
   bool operator()(const integrate_ode_control &x) const;
   bool operator()(const algebra_solver &x) const;

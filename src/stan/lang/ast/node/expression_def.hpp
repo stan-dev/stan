@@ -32,6 +32,8 @@ namespace stan {
 
     expression::expression(const variable& expr) : expr_(expr) { }
 
+    expression::expression(const integrate_1d& expr) : expr_(expr) { }
+
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
 
     expression::expression(const integrate_ode_control& expr) : expr_(expr) { }
