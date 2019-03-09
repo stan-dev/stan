@@ -4,8 +4,8 @@
 #include <stan/lang/ast.hpp>
 #include <boost/variant/apply_visitor.hpp>
 
-
 namespace stan {
+
 namespace lang {
 
 has_var_vis::has_var_vis(const variable_map& var_map) : var_map_(var_map) {}
@@ -49,6 +49,13 @@ bool has_var_vis::operator()(const fun& e) const {
     if (boost::apply_visitor(*this, e.args_[i].expr_))
       return true;
   return false;
+}
+
+bool has_var_vis::operator()(const integrate_1d& e) const {
+  // only init state and params may contain vars
+  return boost::apply_visitor(*this, e.lb_.expr_)
+    || boost::apply_visitor(*this, e.ub_.expr_)
+    || boost::apply_visitor(*this, e.theta_.expr_);
 }
 
 bool has_var_vis::operator()(const integrate_ode& e) const {

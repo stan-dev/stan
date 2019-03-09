@@ -239,6 +239,7 @@ template void assign_lhs::operator()(expression &, const expression &) const;
 template void assign_lhs::operator()(expression &,
                                      const double_literal &) const;
 template void assign_lhs::operator()(expression &, const int_literal &) const;
+template void assign_lhs::operator()(expression &, const integrate_1d &) const;
 template void assign_lhs::operator()(expression &, const integrate_ode &) const;
 template void assign_lhs::operator()(expression &,
                                      const integrate_ode_control &) const;
@@ -905,14 +906,6 @@ void validate_assgn::operator()(assgn &a, bool &pass, const variable_map &vm,
                << std::endl;
     pass = false;
     return;
-  }
-  if (a.lhs_var_has_sliced_idx() && a.lhs_var_occurs_on_rhs()) {
-    // allow assignment but generate warning
-    error_msgs << "Info: assignment to variable name "
-               << "\"" << name << "\","
-               << " variable occurs on right-hand side of assignment"
-               << " causing inefficient deep copy to avoid aliasing."
-               << std::endl;
   }
   if (a.is_simple_assignment()) {
     if (!has_same_shape(lhs_type, a.rhs_, name, "assignment", error_msgs)) {
@@ -1648,6 +1641,97 @@ operator()(const algebra_solver_control &alg_fun, const variable_map &var_map,
 boost::phoenix::function<validate_algebra_solver_control>
     validate_algebra_solver_control_f;
 
+void validate_integrate_1d::operator()(integrate_1d &fx,
+                                       const variable_map &var_map, bool &pass,
+                                       std::ostream &error_msgs) const {
+  pass = true;
+
+  // (1) name of function to integrate
+  if (ends_with("_rng", fx.function_name_)) {
+    error_msgs << "integrated function may not be an _rng function,"
+               << " found function name: " << fx.function_name_ << std::endl;
+    pass = false;
+  }
+  double_type t_double;
+  bare_expr_type sys_result_type(t_double);
+  std::vector<bare_expr_type> sys_arg_types;
+  sys_arg_types.push_back(bare_expr_type(t_double));
+  sys_arg_types.push_back(bare_expr_type(t_double));
+  sys_arg_types.push_back(bare_expr_type(bare_array_type(double_type(), 1)));
+  sys_arg_types.push_back(bare_expr_type(bare_array_type(double_type(), 1)));
+  sys_arg_types.push_back(bare_expr_type(bare_array_type(int_type(), 1)));
+  function_signature_t system_signature(sys_result_type, sys_arg_types);
+  if (!function_signatures::instance().is_defined(fx.function_name_,
+                                                  system_signature)) {
+    pass = false;
+    error_msgs << "first argument to integrate_1d"
+               << " must be the name of a function with signature"
+               << " (real, real, real[], real[], int[]) : real " << std::endl;
+  }
+
+  // (2) lower bound of integration
+  if (!fx.lb_.bare_type().is_primitive()) {
+    pass = false;
+    error_msgs << "second argument to integrate_1d, the lower bound of"
+               << " integration, must have type int or real;"
+               << " found type = " << fx.lb_.bare_type() << "." << std::endl;
+  }
+
+  // (3) lower bound of integration
+  if (!fx.ub_.bare_type().is_primitive()) {
+    pass = false;
+    error_msgs << "third argument to integrate_1d, the upper bound of"
+               << " integration, must have type int or real;"
+               << " found type = " << fx.ub_.bare_type() << "." << std::endl;
+  }
+
+  // (4) parameters
+  if (fx.theta_.bare_type() != bare_array_type(double_type(), 1)) {
+    pass = false;
+    error_msgs << "fourth argument to integrate_1d, the parameters,"
+               << " must have type real[];"
+               << " found type = " << fx.theta_.bare_type() << "." << std::endl;
+  }
+
+  // (5) real data
+  if (fx.x_r_.bare_type() != bare_array_type(double_type(), 1)) {
+    pass = false;
+    error_msgs << "fifth argument to integrate_1d, the real data,"
+               << " must have type real[]; found type = " << fx.x_r_.bare_type()
+               << "." << std::endl;
+  }
+
+  // (6) int data
+  if (fx.x_i_.bare_type() != bare_array_type(int_type(), 1)) {
+    pass = false;
+    error_msgs << "sixth argument to integrate_1d, the integer data,"
+               << " must have type int[]; found type = " << fx.x_i_.bare_type()
+               << "." << std::endl;
+  }
+
+  // (7) relative tolerance
+  if (!fx.rel_tol_.bare_type().is_primitive()) {
+    pass = false;
+    error_msgs << "seventh argument to integrate_1d, relative tolerance,"
+               << " must be of type int or real;  found type = "
+               << fx.rel_tol_.bare_type() << "." << std::endl;
+  }
+
+  // test data-only variables do not have parameters (int locals OK)
+  if (has_var(fx.x_r_, var_map)) {
+    pass = false;
+    error_msgs << "fifth argument to integrate_1d, the real data,"
+               << " must be data only and not reference parameters."
+               << std::endl;
+  }
+  if (has_var(fx.rel_tol_, var_map)) {
+    pass = false;
+    error_msgs << "seventh argument to integrate_1d, relative tolerance,"
+               << " must be data only and not reference parameters."
+               << std::endl;
+  }
+}
+boost::phoenix::function<validate_integrate_1d> validate_integrate_1d_f;
 void validate_map_rect::operator()(map_rect &mr, const variable_map &var_map,
                                    bool &pass, std::ostream &error_msgs) const {
   pass = true;
@@ -2279,6 +2363,11 @@ bool data_only_expression::operator()(const variable &x) const {
   }
   return is_data;
 }
+bool data_only_expression::operator()(const integrate_1d &x) const {
+  return boost::apply_visitor(*this, x.lb_.expr_) &&
+         boost::apply_visitor(*this, x.ub_.expr_) &&
+         boost::apply_visitor(*this, x.theta_.expr_);
+}
 bool data_only_expression::operator()(const integrate_ode &x) const {
   return boost::apply_visitor(*this, x.y0_.expr_) &&
          boost::apply_visitor(*this, x.theta_.expr_);
@@ -2678,6 +2767,7 @@ operator()(offset_multiplier &offset_multiplier, const expression &expr,
 }
 boost::phoenix::function<set_double_offset_multiplier_multiplier>
     set_double_offset_multiplier_multiplier_f;
+
 
 void validate_array_block_var_decl::
 operator()(block_var_decl &var_decl_result, const block_var_type &el_type,
