@@ -79,6 +79,15 @@ std::string write_expression_vis::operator()(const fun& e) const {
   return ss.str();
 }
 
+std::string write_expression_vis::operator()(const integrate_1d& e) const {
+  std::stringstream ss;
+  ss << e.function_name_ << "(" << e.lb_.to_string() << ", "
+     << e.ub_.to_string() << ", " << e.theta_.to_string() << ", "
+     << e.x_r_.to_string() << ", " << e.x_i_.to_string() << ", "
+     << e.rel_tol_.to_string() << ")";
+  return ss.str();
+}
+
 std::string write_expression_vis::operator()(const integrate_ode& e) const {
   std::stringstream ss;
   ss << e.integration_function_name_ << "(" << e.system_function_name_ << ", "

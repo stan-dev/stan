@@ -235,6 +235,23 @@ namespace stan {
         o_ << ", pstream__)";
       }
 
+      void operator()(const integrate_1d& fx) const {
+        o_ << "integrate_1d("
+           << fx.function_name_ << "_functor__(), ";
+        generate_expression(fx.lb_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.ub_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.theta_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_r_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_i_, user_facing_, o_);
+        o_ << ", *pstream__, ";
+        generate_expression(fx.rel_tol_, user_facing_, o_);
+        o_ << ")";
+      }
+
       void operator()(const fun& fx) const {
         // first test if short-circuit op (binary && and || applied to
         // primitives; overloads are eager, not short-circuiting)
