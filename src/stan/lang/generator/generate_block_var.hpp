@@ -43,12 +43,16 @@ namespace stan {
         generate_initializer(var_decl.type(), type_str, o);
         o << ";" << EOL;
       }
+      if (!var_decl.type().innermost_type().bare_type().is_int_type()) {
+        generate_indent(indent, o);
+        o << "stan::math::initialize(" << var_decl.name() << ", DUMMY_VAR__);"
+          << EOL;
+      }
       generate_indent(indent, o);
-      o << "stan::math::initialize(" << var_decl.name() << ", DUMMY_VAR__);"
-        << EOL;
-
-      generate_indent(indent, o);
-      o << "stan::math::fill(" << var_decl.name() << ", DUMMY_VAR__);" << EOL;
+      o << "stan::math::fill(" << var_decl.name() << ", "
+        << (var_decl.type().innermost_type().bare_type().is_int_type() ?
+            "std::numeric_limits<int>::min()" : "DUMMY_VAR__")
+        << ");" << EOL;
 
       if (var_decl.has_def()) {
         generate_indent(indent, o);

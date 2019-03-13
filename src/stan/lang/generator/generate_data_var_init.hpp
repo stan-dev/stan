@@ -53,7 +53,7 @@ namespace stan {
       o << var_name;
       write_var_idx_all_dims(vtype.array_dims(),
                              vtype.num_dims() - vtype.array_dims(), o);
-      o << " = " << vals << "__[pos__++]; " << EOL;
+      o << " = " << vals << "__[pos__++];" << EOL;
 
       write_end_loop(vtype.num_dims(), indent, o);
     }

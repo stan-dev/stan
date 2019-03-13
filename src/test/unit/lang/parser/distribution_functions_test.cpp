@@ -15,6 +15,12 @@ TEST(lang_parser, beta_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/beta/beta_log");
 }
 
+TEST(lang_parser, beta_proportion_distribution_function_signatures) {
+  test_parsable("function-signatures/distributions/univariate/continuous/beta_proportion/beta_proportion_ccdf_log");
+    test_parsable("function-signatures/distributions/univariate/continuous/beta_proportion/beta_proportion_cdf_log");
+    test_parsable("function-signatures/distributions/univariate/continuous/beta_proportion/beta_proportion_log");
+}
+
 TEST(lang_parser, cauchy_distribution_function_signatures) {
   test_parsable("function-signatures/distributions/univariate/continuous/cauchy/cauchy_ccdf_log");
   test_parsable("function-signatures/distributions/univariate/continuous/cauchy/cauchy_cdf_log");

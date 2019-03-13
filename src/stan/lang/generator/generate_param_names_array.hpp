@@ -6,7 +6,10 @@
 #include <stan/lang/generator/generate_expression.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/get_block_var_dims.hpp>
+#include <stan/lang/generator/write_begin_all_dims_col_maj_loop.hpp>
+#include <stan/lang/generator/write_end_loop.hpp>
 #include <ostream>
+#include <string>
 #include <vector>
 
 namespace stan {
@@ -22,32 +25,33 @@ namespace stan {
     void
     generate_param_names_array(size_t indent, std::ostream& o,
                                const block_var_decl& var_decl) {
-      std::vector<expression> dims = get_block_var_dims(var_decl);
-      for (size_t i = dims.size(); i-- > 0; ) {
-        generate_indent(indent + dims.size() - i, o);
-        o << "for (int k_" << i << "__ = 1;"
-           << " k_" << i << "__ <= ";
-        generate_expression(dims[i].expr_, NOT_USER_FACING, o);
-        o << "; ++k_" << i << "__) {" << EOL;  // begin (1)
-      }
-      generate_indent(indent + 1 + dims.size(), o);
+      std::string var_name(var_decl.name());
+      block_var_type vtype = var_decl.type();
+      block_var_type el_type = vtype.innermost_type();
+
+      write_begin_all_dims_col_maj_loop(var_decl, true, indent, o);
+
+      generate_indent(indent + vtype.num_dims(), o);
       o << "param_name_stream__.str(std::string());" << EOL;
 
-      generate_indent(indent + 1 + dims.size(), o);
-      o << "param_name_stream__ << \"" << var_decl.name() << '"';
+      generate_indent(indent + vtype.num_dims(), o);
+      o << "param_name_stream__ << \"" << var_name << '"';
 
-      for (size_t i = 0; i < dims.size(); ++i)
-        o << " << '.' << k_" << i << "__";
+      size_t num_ar_dims = vtype.array_dims();
+      size_t num_args = vtype.num_dims() - vtype.array_dims();
+
+      for (size_t i = 0; i < num_ar_dims; ++i)
+        o << " << '.' << k_" << i << "__ + 1";
+      if (num_args == 1)
+        o << " << '.' << j_1__ + 1";
+      else if (num_args == 2)
+        o << " << '.' << j_1__ + 1 << '.' << j_2__ + 1";
       o << ';' << EOL;
 
-      generate_indent(indent + 1 + dims.size(), o);
+      generate_indent(indent + vtype.num_dims(), o);
       o << "param_names__.push_back(param_name_stream__.str());" << EOL;
 
-      // end for loop dims
-      for (size_t i = 0; i < dims.size(); ++i) {
-        generate_indent(indent + dims.size() - i, o);
-        o << "}" << EOL;  // end (1)
-      }
+      write_end_loop(vtype.num_dims(), indent, o);
     }
 
   }

@@ -44,7 +44,7 @@ TEST(langParserStatementGrammar, targetReserved) {
 
 TEST(langParserStatementGrammar, deprecateIncrementLogProb) {
   test_warning("deprecate-increment-log-prob",
-               "Warning (non-fatal): increment_log_prob(...);"
+               "Info: increment_log_prob(...);"
                " is deprecated and will be removed in the future.");
   test_warning("deprecate-increment-log-prob",
                "  Use target += ...; instead.");
@@ -110,7 +110,7 @@ TEST(langParserStatementGrammar, useCdfWithSamplingNotation) {
 
 TEST(langParserStatementGrammar, targetFunGetLpDeprecated) {
   test_warning("get-lp-deprecate", 
-               "Warning (non-fatal): get_lp() function deprecated.");
+               "Info: get_lp() function deprecated.");
   test_warning("get-lp-deprecate", 
                "  It will be removed in a future release.");
   test_warning("get-lp-deprecate", 

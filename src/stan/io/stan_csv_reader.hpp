@@ -2,7 +2,6 @@
 #define STAN_IO_STAN_CSV_READER_HPP
 
 #include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
 #include <Eigen/Dense>
 #include <istream>
 #include <iostream>
@@ -32,6 +31,7 @@ namespace stan {
       bool append_samples;
       std::string algorithm;
       std::string engine;
+      int max_depth;
 
       stan_csv_metadata()
         : stan_version_major(0), stan_version_minor(0), stan_version_patch(0),
@@ -39,7 +39,7 @@ namespace stan {
           chain_id(1), seed(0), random_seed(false),
           num_samples(0), num_warmup(0), save_warmup(false), thin(0),
           append_samples(false),
-          algorithm(""), engine("") {}
+          algorithm(""), engine(""), max_depth(10) {}
     };
 
     struct stan_csv_adaptation {
@@ -125,35 +125,37 @@ namespace stan {
           }
 
           if (name.compare("stan_version_major") == 0) {
-            metadata.stan_version_major = boost::lexical_cast<int>(value);
+            std::stringstream(value) >> metadata.stan_version_major;
           } else if (name.compare("stan_version_minor") == 0) {
-            metadata.stan_version_minor = boost::lexical_cast<int>(value);
+            std::stringstream(value) >> metadata.stan_version_minor;
           } else if (name.compare("stan_version_patch") == 0) {
-            metadata.stan_version_patch = boost::lexical_cast<int>(value);
+            std::stringstream(value) >> metadata.stan_version_patch;
           } else if (name.compare("model") == 0) {
             metadata.model = value;
           } else if (name.compare("num_samples") == 0) {
-            metadata.num_samples = boost::lexical_cast<int>(value);
+            std::stringstream(value) >> metadata.num_samples;
           } else if (name.compare("num_warmup") == 0) {
-            metadata.num_warmup = boost::lexical_cast<int>(value);
+            std::stringstream(value) >> metadata.num_warmup;
           } else if (name.compare("save_warmup") == 0) {
-            metadata.save_warmup = boost::lexical_cast<bool>(value);
+            std::stringstream(value) >> metadata.save_warmup;
           } else if (name.compare("thin") == 0) {
-            metadata.thin = boost::lexical_cast<int>(value);
-          } else if (name.compare("chain_id") == 0) {
-            metadata.chain_id = boost::lexical_cast<int>(value);
+            std::stringstream(value) >> metadata.thin;
+          } else if (name.compare("id") == 0) {
+            std::stringstream(value) >> metadata.chain_id;
           } else if (name.compare("init") == 0) {
             metadata.init = value;
             boost::trim(metadata.init);
           } else if (name.compare("seed") == 0) {
-            metadata.seed = boost::lexical_cast<unsigned int>(value);
+            std::stringstream(value) >> metadata.seed;
             metadata.random_seed = false;
           } else if (name.compare("append_samples") == 0) {
-            metadata.append_samples = boost::lexical_cast<bool>(value);
+            std::stringstream(value) >> metadata.append_samples;
           } else if (name.compare("algorithm") == 0) {
             metadata.algorithm = value;
           } else if (name.compare("engine") == 0) {
             metadata.engine = value;
+          } else if (name.compare("max_depth") == 0) {
+            std::stringstream(value) >> metadata.max_depth;
           }
         }
         if (ss.good() == true)
@@ -240,7 +242,7 @@ namespace stan {
             std::string token;
             std::getline(line_ss, token, ',');
             boost::trim(token);
-            adaptation.metric(row, col) = boost::lexical_cast<double>(token);
+            std::stringstream(token) >> adaptation.metric(row, col);
           }
           std::getline(ss, line);  // Read in next line
         }
@@ -277,13 +279,15 @@ namespace stan {
             if (line.find("(Warm-up)") != std::string::npos) {
               int left = 17;
               int right = line.find(" seconds");
-              timing.warmup
-                += boost::lexical_cast<double>(line.substr(left, right - left));
+              double warmup;
+              std::stringstream(line.substr(left, right - left)) >> warmup;
+              timing.warmup += warmup;
             } else if (line.find("(Sampling)") != std::string::npos) {
               int left = 17;
               int right = line.find(" seconds");
-              timing.sampling
-                += boost::lexical_cast<double>(line.substr(left, right - left));
+              double sampling;
+              std::stringstream(line.substr(left, right - left)) >> sampling;
+              timing.sampling += sampling;
             }
           } else {
             ss << line << '\n';
@@ -292,9 +296,9 @@ namespace stan {
               cols = current_cols;
             } else if (cols != current_cols) {
               if (out)
-              *out << "Error: expected " << cols << " columns, but found "
-                   << current_cols << " instead for row " << rows + 1
-                   << std::endl;
+                *out << "Error: expected " << cols << " columns, but found "
+                     << current_cols << " instead for row " << rows + 1
+                     << std::endl;
               return false;
             }
             rows++;
@@ -313,7 +317,7 @@ namespace stan {
             for (int col = 0; col < cols; col++) {
               std::getline(ls, line, ',');
               boost::trim(line);
-              samples(row, col) = boost::lexical_cast<double>(line);
+              std::stringstream(line) >> samples(row, col);
             }
           }
         }

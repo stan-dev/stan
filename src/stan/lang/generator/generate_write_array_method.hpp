@@ -63,10 +63,12 @@ namespace stan {
         << EOL;
       o << INDENT2 << "(void) DUMMY_VAR__;  // suppress unused var warning"
         << EOL2;
+      o << INDENT2 << "if (!include_tparams__ && !include_gqs__) return;"
+        << EOL2;
 
       generate_try(2, o);
       if (prog.derived_decl_.first.size() > 0) {
-        generate_comment("declare and define transformed parameters", 2, o);
+        generate_comment("declare and define transformed parameters", 3, o);
         for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
           generate_indent(3, o);
           o << "current_statement_begin__ = "
@@ -83,6 +85,9 @@ namespace stan {
         o << EOL;
       }
 
+      o << INDENT3 << "if (!include_gqs__ && !include_tparams__) return;"
+        << EOL;
+
       if (prog.derived_decl_.first.size() > 0) {
         generate_comment("validate transformed parameters", 3, o);
         o << INDENT3
@@ -94,10 +99,13 @@ namespace stan {
         o << EOL;
 
         for (size_t i = 0; i < prog.derived_decl_.first.size(); ++i) {
-          generate_indent(3, o);
-          o << "current_statement_begin__ = "
-            <<  prog.derived_decl_.first[i].begin_line_ << ";" << EOL;
-          generate_validate_block_var(prog.derived_decl_.first[i], 3, o);
+          block_var_decl bvd = prog.derived_decl_.first[i];
+          if (bvd.type().innermost_type().is_constrained()) {
+            generate_indent(3, o);
+            o << "current_statement_begin__ = "
+              <<  bvd.begin_line_ << ";" << EOL;
+            generate_validate_block_var(bvd, 3, o);
+          }
         }
 
         generate_comment("write transformed parameters", 3, o);
@@ -111,9 +119,9 @@ namespace stan {
       o << INDENT3 << "if (!include_gqs__) return;"
         << EOL;
       if (prog.generated_decl_.first.size() > 0) {
-        generate_comment("declare and define generated quantities", 4, o);
+        generate_comment("declare and define generated quantities", 3, o);
         for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i) {
-          generate_indent(4, o);
+          generate_indent(3, o);
           o << "current_statement_begin__ = "
             <<  prog.generated_decl_.first[i].begin_line_ << ";"
             << EOL;
@@ -123,18 +131,19 @@ namespace stan {
       }
 
       if (prog.generated_decl_.second.size() > 0) {
-        generate_comment("generated quantities statements", 2, o);
+        generate_comment("generated quantities statements", 3, o);
         generate_statements(prog.generated_decl_.second, 3, o);
         o << EOL;
       }
 
       if (prog.generated_decl_.first.size() > 0) {
+        generate_comment("validate, write generated quantities", 3, o);
         for (size_t i = 0; i < prog.generated_decl_.first.size(); ++i) {
-          generate_comment("validate generated quantities", 3, o);
+          generate_indent(3, o);
+          o << "current_statement_begin__ = "
+            <<  prog.generated_decl_.first[i].begin_line_ << ";"
+            << EOL;
           generate_validate_block_var(prog.generated_decl_.first[i], 3, o);
-          o << EOL;
-
-          generate_comment("write generated quantities", 3, o);
           generate_write_block_var(prog.generated_decl_.first[i], 3, o);
           o << EOL;
         }

@@ -107,6 +107,19 @@ void test_parsable(const std::string& model_name) {
   SUCCEED();
 }
 
+/** test that model with specified name in folder "good"
+ *  parses without throwing an exception
+ *
+ * @param model_name Name of model to parse
+ */
+std::string test_parse_msgs(const std::string& model_name) {
+  bool result;
+  std::stringstream msgs;
+  SCOPED_TRACE("parsing: " + model_name);
+  result = is_parsable_folder(model_name, "good", &msgs);
+  return msgs.str();
+}
+
 /** test that file with standalone functions with specified name in folder
  * "good-standalone-functions" parses without throwing an exception
  *
@@ -206,30 +219,41 @@ void test_warning(const std::string& model_name,
     << std::endl;
 }
 
-std::string model_to_cpp(const std::string& model_text) {
-  std::string model_name = "unnamed_unit_test";
+stan::lang::program model_to_ast(const std::string& model_name,
+                                 const std::string& model_text) {
   std::stringstream ss(model_text);
   std::stringstream msgs;
   stan::lang::program prog;
   stan::io::program_reader reader;
-
-  // fake reader history - model is parseable, no includes
-  reader.add_event(0, 0, "start", "unnamed_unit_test");
-  reader.add_event(500, 500, "end", "unnamed_unit_test");
   bool parsable = stan::lang::parse(&msgs, ss, model_name, reader, prog);
   EXPECT_TRUE(parsable);
+  return prog;
+}
 
+std::string model_to_hpp(const std::string& model_name,
+                         const std::string& model_text) {
+  std::stringstream ss(model_text);
+  std::stringstream msgs;
+  stan::lang::program prog;
+  stan::io::program_reader reader;
+  stan::lang::parse(&msgs, ss, model_name, reader, prog);
+
+  int lines = 0;
+  for (size_t pos = 0; (pos = model_text.find('\n',pos)) != std::string::npos; ++pos)
+    ++lines;
+  reader.add_event(0, 0, "start", model_name);
+  reader.add_event(lines, lines, "end", model_name);
+  
   std::stringstream output;
   stan::lang::generate_cpp(prog, model_name, reader.history(), output);
   return output.str();
 }
 
-
 void expect_matches(int n,
                     const std::string& stan_code,
                     const std::string& target) {
-  std::string model_cpp = model_to_cpp(stan_code);
-  EXPECT_EQ(n, count_matches(target, model_cpp))
+  std::string model_hpp = model_to_hpp("unnamed_unit_test",stan_code);
+  EXPECT_EQ(n, count_matches(target, model_hpp))
     << "looking for: " << target;
 }
 

@@ -4,7 +4,9 @@
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
-#include <stan/lang/generator/generate_validate_nonnegative.hpp>
+#include <stan/lang/generator/generate_initializer.hpp>
+#include <stan/lang/generator/generate_validate_var_dims.hpp>
+#include <stan/lang/generator/generate_void_statement.hpp>
 #include <stan/lang/generator/write_var_decl_arg.hpp>
 #include <stan/lang/generator/write_var_decl_type.hpp>
 #include <ostream>
@@ -33,33 +35,37 @@ namespace stan {
         o << "current_statement_begin__ = " <<  vs[i].begin_line_ << ";"
           << EOL;
 
-        int ar_dims = vs[i].type().array_dims();
-        std::vector<expression> ar_lens(vs[i].type().array_lens());
-        std::string var_name(vs[i].name());
-        // unfold array type to get array element info
-        local_var_type ltype = vs[i].type().innermost_type();
-        std::string cpp_type_str = get_verbose_var_type(ltype.bare_type());
-
         // validate dimensions before declaration
-        for (int i = 1; i < ar_dims; ++i)
-          generate_validate_nonnegative(var_name, ar_lens[i], indent, o);
+        if (vs[i].type().num_dims() > 0)
+          generate_validate_var_dims(vs[i], indent, o);
 
         // declare
+        std::string var_name(vs[i].name());
+        local_var_type ltype = vs[i].type().innermost_type();
+        std::string cpp_type_str = get_verbose_var_type(ltype.bare_type());
         write_var_decl_type(ltype.bare_type(), cpp_type_str,
-                            ar_dims, indent, o);
+                            vs[i].type().array_dims(), indent, o);
         o << " " << var_name;
         write_var_decl_arg(ltype.bare_type(), cpp_type_str,
-                           ar_lens, ltype.arg1(), ltype.arg2(), o);
+                           vs[i].type().array_lens(),
+                           ltype.arg1(), ltype.arg2(), o);
         o << ";" << EOL;
+
+        // initialize
+        if (vs[i].type().num_dims() == 0)
+          generate_void_statement(var_name, indent, o);
+        if (!ltype.bare_type().is_int_type()) {
+          generate_indent(indent, o);
+          o << "stan::math::initialize(" << var_name << ", DUMMY_VAR__);"
+            << EOL;
+        }
 
         // fill
         generate_indent(indent, o);
-        o << "stan::math::fill(" << var_name << ", ";
-        if (ltype.bare_type().is_int_type())
-          o << "std::numeric_limits<int>::min()";
-        else
-          o << "DUMMY_VAR__";
-        o << ");" << EOL;
+        o << "stan::math::fill(" << var_name << ", "
+          << (ltype.bare_type().is_int_type() ?
+              "std::numeric_limits<int>::min()" : "DUMMY_VAR__")
+          << ");" << EOL;
 
         // define
         if (vs[i].has_def()) {
@@ -70,8 +76,8 @@ namespace stan {
           generate_expression(vs[i].def(), NOT_USER_FACING, o);
           o << ");" << EOL;
         }
+        o << EOL;
       }
-      o << EOL;
     }
 
   }

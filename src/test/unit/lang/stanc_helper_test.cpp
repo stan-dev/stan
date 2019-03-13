@@ -27,6 +27,8 @@ TEST(commandStancHelper, printStancHelp) {
 }
 
 bool create_test_file(const std::string& path, const std::string& program) {
+  std::string cmd_setup = "mkdir -p test/test-models";
+  system(cmd_setup.c_str());
   std::string cmd = "echo ";
   cmd += "\"";
   cmd += program;
@@ -148,3 +150,113 @@ TEST(commandStancHelper, readOnlyDirBadFile) {
   EXPECT_TRUE(rc != 0);
 }
 
+TEST(commandStancHelper, includeSinglePathGood) {
+  std::stringstream out;
+  std::stringstream err;
+  std::vector<const char*> argv_vec;
+
+  argv_vec.push_back("main");
+  argv_vec.push_back("--include_paths=src/test/test-models/included/");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
+
+  int argc = argv_vec.size();
+  const char** argv = &argv_vec[0];
+
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_TRUE(rc == 0);
+}
+
+TEST(commandStancHelper, includeMultPathSimpleGood) {
+  std::stringstream out;
+  std::stringstream err;
+  std::vector<const char*> argv_vec;
+
+  argv_vec.push_back("main");
+  argv_vec.push_back("--include_paths=foo,src/test/test-models/included/,baz");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
+
+  int argc = argv_vec.size();
+  const char** argv = &argv_vec[0];
+
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_TRUE(rc == 0);
+}
+
+TEST(commandStancHelper, includeMultPathSingleQuoteGood) {
+  std::stringstream out;
+  std::stringstream err;
+  std::vector<const char*> argv_vec;
+
+  argv_vec.push_back("main");
+  argv_vec.push_back("--include_paths='path,with,commas',src/test/test-models/included/");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
+
+  int argc = argv_vec.size();
+  const char** argv = &argv_vec[0];
+
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_TRUE(rc == 0);
+}
+
+TEST(commandStancHelper, includeMultPathDoubleQuoteGood) {
+  std::stringstream out;
+  std::stringstream err;
+  std::vector<const char*> argv_vec;
+
+  argv_vec.push_back("main");
+  argv_vec.push_back("--include_paths=\"path,with,commas\",src/test/test-models/included/");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
+
+  int argc = argv_vec.size();
+  const char** argv = &argv_vec[0];
+
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_EQ(0, rc);
+}
+
+TEST(commandStancHelper, includeMultPathEscapedCommaGood) {
+  std::stringstream out;
+  std::stringstream err;
+  std::vector<const char*> argv_vec;
+
+  argv_vec.push_back("main");
+  argv_vec.push_back("--include_paths=path\\,with\\,commas,src/test/test-models/included/");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
+
+  int argc = argv_vec.size();
+  const char** argv = &argv_vec[0];
+
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_EQ(0, rc);
+}
+
+TEST(commandStancHelper, includeMultPathBad) {
+  std::stringstream out;
+  std::stringstream err;
+  std::vector<const char*> argv_vec;
+
+  argv_vec.push_back("main");
+  argv_vec.push_back("--include_paths=foo,baz");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
+
+  int argc = argv_vec.size();
+  const char** argv = &argv_vec[0];
+
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_TRUE(rc != 0);
+}
+
+TEST(commandStancHelper, includeNoPathBad) {
+  std::stringstream out;
+  std::stringstream err;
+  std::vector<const char*> argv_vec;
+
+  argv_vec.push_back("main");
+  argv_vec.push_back("src/test/test-models/include_path_test/stanc_helper_with_include.stan");
+
+  int argc = argv_vec.size();
+  const char** argv = &argv_vec[0];
+
+  int rc = stanc_helper(argc, argv, &out, &err);
+  EXPECT_TRUE(rc != 0);
+}

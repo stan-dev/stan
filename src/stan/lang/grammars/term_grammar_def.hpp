@@ -24,6 +24,15 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op_sliced,
                           (stan::lang::expression, expr_)
                           (std::vector<stan::lang::idx>, idxs_) )
 
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_1d,
+                          (std::string, function_name_)
+                          (stan::lang::expression, lb_)
+                          (stan::lang::expression, ub_)
+                          (stan::lang::expression, theta_)
+                          (stan::lang::expression, x_r_)
+                          (stan::lang::expression, x_i_)
+                          (stan::lang::expression, rel_tol_) )
+
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (std::string, integration_function_name_)
                           (std::string, system_function_name_)
@@ -295,9 +304,31 @@ namespace stan {
           [validate_map_rect_f(_val, boost::phoenix::ref(var_map_),
                                _pass, boost::phoenix::ref(error_msgs_))];
 
+      integrate_1d_r.name("integrate_1d");
+      integrate_1d_r
+          %= (lit("integrate_1d") >> no_skip[!char_("a-zA-Z0-9_")])
+          > lit('(')
+          > identifier_r          // 1) integrated function name
+          > lit(',')
+          > expression_g(_r1)     // 2) integration lower bound
+          > lit(',')
+          > expression_g(_r1)     // 3) integration upper bound
+          > lit(',')
+          > expression_g(_r1)     // 4) parameters
+          > lit(',')
+          > expression_g(_r1)     // 5) real data
+          > lit(',')
+          > expression_g(_r1)     // 6) integer data
+          > lit(',')
+          > expression_g(_r1)     // 7) relative tolerance
+          > lit(')')
+          [validate_integrate_1d_f(_val, boost::phoenix::ref(var_map_),
+                                   _pass, boost::phoenix::ref(error_msgs_))];
+
       factor_r.name("expression");
       factor_r =
-        integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
+          integrate_1d_r(_r1)[assign_lhs_f(_val, _1)]
+        | integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
         | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_control_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_r(_r1)[assign_lhs_f(_val, _1)]

@@ -13,36 +13,49 @@ typedef boost::ecuyer1988 rng_t;
 TEST(McmcDenseEMetric, sample_p) {
   rng_t base_rng(0);
 
-  Eigen::VectorXd q(2);
-  q(0) = 5;
-  q(1) = 1;
+  Eigen::Matrix2d  m(2,2);
+  m(0, 0) = 3.0;
+  m(1, 0) = -2.0;
+  m(0, 1) = -2.0;
+  m(1, 1) = 4.0;
 
-  stan::mcmc::mock_model model(q.size());
+  Eigen::Matrix2d  m_inv = m.inverse();
+
+  stan::mcmc::mock_model model(2);
 
   stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
-  stan::mcmc::dense_e_point z(q.size());
+  stan::mcmc::dense_e_point z(2);
+  z.set_metric(m_inv);
 
   int n_samples = 1000;
-  double m = 0;
-  double m2 = 0;
+
+  Eigen::Matrix2d sample_cov(2,2);
+  sample_cov(0, 0) = 0.0;
+  sample_cov(0, 1) = 0.0;
+  sample_cov(1, 0) = 0.0;
+  sample_cov(1, 1) = 0.0;
 
   for (int i = 0; i < n_samples; ++i) {
     metric.sample_p(z, base_rng);
-    double tau = metric.tau(z);
-
-    double delta = tau - m;
-    m += delta / static_cast<double>(i + 1);
-    m2 += delta * (tau - m);
+    sample_cov(0, 0) += z.p[0] * z.p[0] / n_samples;
+    sample_cov(0, 1) += z.p[0] * z.p[1] / n_samples;
+    sample_cov(1, 0) += z.p[1] * z.p[0] / n_samples;
+    sample_cov(1, 1) += z.p[1] * z.p[1] / n_samples;
   }
 
-  double var = m2 / (n_samples + 1.0);
+  Eigen::Matrix2d var(2,2);
+  var(0, 0) = 2 * m(0, 0);
+  var(1, 0) = m(1, 0) * m(1, 0) + m(1, 1) * m(0, 0);
+  var(0, 1) = m(0, 1) * m(0, 1) + m(1, 1) * m(0, 0);
+  var(1, 1) = 2 * m(1, 1);
 
-  // Mean within 5sigma of expected value (d / 2)
-  EXPECT_TRUE(std::fabs(m   - 0.5 * q.size()) < 5.0 * sqrt(var));
-
-  // Variance within 10% of expected value (d / 2)
-  EXPECT_TRUE(std::fabs(var - 0.5 * q.size()) < 0.1 * q.size());
+  // Covariance matrix within 5sigma of expected value (comes from a Wishart distribution)
+  EXPECT_TRUE(std::fabs(m(0, 0)   - sample_cov(0, 0)) < 5.0 * sqrt(var(0, 0) / n_samples));
+  EXPECT_TRUE(std::fabs(m(1, 0)   - sample_cov(1, 0)) < 5.0 * sqrt(var(1, 0) / n_samples));
+  EXPECT_TRUE(std::fabs(m(0, 1)   - sample_cov(0, 1)) < 5.0 * sqrt(var(0, 1) / n_samples));
+  EXPECT_TRUE(std::fabs(m(1, 1)   - sample_cov(1, 1)) < 5.0 * sqrt(var(1, 1) / n_samples));
 }
+
 
 TEST(McmcDenseEMetric, gradients) {
   rng_t base_rng(0);

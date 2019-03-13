@@ -10,6 +10,7 @@
 #include <stan/lang/generator/write_begin_all_dims_col_maj_loop.hpp>
 #include <stan/lang/generator/write_begin_all_dims_row_maj_loop.hpp>
 #include <stan/lang/generator/write_begin_array_dims_loop.hpp>
+#include <stan/lang/generator/write_begin_param_elements_loop.hpp>
 #include <stan/lang/generator/write_constraints_fn.hpp>
 #include <stan/lang/generator/write_end_loop.hpp>
 #include <stan/lang/generator/write_nested_resize_loop_begin.hpp>
@@ -92,6 +93,7 @@
 #include <stan/lang/generator/generate_try.hpp>
 #include <stan/lang/generator/generate_typedef.hpp>
 #include <stan/lang/generator/generate_typedefs.hpp>
+#include <stan/lang/generator/generate_unconstrained_param_names_array.hpp>
 #include <stan/lang/generator/generate_unconstrained_param_names_method.hpp>
 #include <stan/lang/generator/generate_using.hpp>
 #include <stan/lang/generator/generate_using_namespace.hpp>

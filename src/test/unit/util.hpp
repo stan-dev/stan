@@ -1,7 +1,15 @@
 #ifndef TEST__UNIT__UTIL_HPP
 #define TEST__UNIT__UTIL_HPP
 
+#include <stan/io/stan_csv_reader.hpp>
+
+#include <boost/algorithm/string.hpp>
+#include <Eigen/Dense>
+#include <gtest/gtest.h>
+#include <iostream>
 #include <string>
+#include <vector>
+
 
 #define EXPECT_THROW_MSG(expr, T_e, msg)                \
   try {                                                 \
@@ -24,6 +32,37 @@ int count_matches(const std::string& target,
     ++count;
   return count;
 }
+
+void match_csv_columns(const Eigen::MatrixXd& samples,
+                      const std::string& raw_output,
+                      size_t num_rows,
+                      size_t num_columns,
+                      size_t col_offset) {
+  std::stringstream cell_ss;
+  std::vector<std::string> cells;
+  std::string line;    
+  std::istringstream f(raw_output);
+  size_t row = 0;
+  while (std::getline(f, line)) {
+    if (row == 0) {
+      ++row;
+      continue;
+    } 
+    if (row == num_rows + 1) {
+      break;
+    } 
+    cells.clear();
+    boost::algorithm::split(cells, line, boost::is_any_of(","));
+    for (size_t i=0; i < num_columns; ++i) {
+      cell_ss.str(std::string());
+      cell_ss.clear();
+      cell_ss << samples(row - 1,i + col_offset);
+      EXPECT_EQ(cells[i], cell_ss.str());
+    }
+    ++row;
+  }
+}
+
 
 namespace stan {
   namespace test {

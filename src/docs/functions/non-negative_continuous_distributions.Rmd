@@ -1,0 +1,101 @@
+# Non-negative Continuous Distributions
+
+The non-negative continuous probability functions have support on the
+non-negative real numbers.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="rayleigh-distribution.html">Rayleigh Distribution</a>\n')
+cat(' * <a href="wiener-first-passage-time-distribution.html">Wiener First Passage Time Distribution</a>\n')
+}
+```
+
+## Rayleigh Distribution
+
+### Probability Density Function
+
+If $\sigma \in \mathbb{R}^+$, then for $y \in [0,\infty)$, \[
+\text{Rayleigh}(y|\sigma) = \frac{y}{\sigma^2} \exp(-y^2 / 2\sigma^2)
+\!. \]
+
+### Sampling Statement
+
+`y ~ ` **`rayleigh`**`(sigma)`
+
+Increment target log probability density with `rayleigh_lpdf( y | sigma)`
+dropping constant additive terms.
+\index{{\tt \bfseries rayleigh}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; rayleigh_lpdf; (reals y | reals sigma); -->
+\index{{\tt \bfseries rayleigh}!{\tt (reals y | reals sigma): real}|hyperpage}
+
+`real` **`rayleigh_lpdf`**`(reals y | reals sigma)`<br>\newline
+The log of the Rayleigh density of y given scale sigma
+
+<!-- real; rayleigh_cdf; (real y, real sigma); -->
+\index{{\tt \bfseries rayleigh}!{\tt (real y, real sigma): real}|hyperpage}
+
+`real` **`rayleigh_cdf`**`(real y, real sigma)`<br>\newline
+The Rayleigh cumulative distribution of y given scale sigma
+
+<!-- real; rayleigh_lcdf; (real y | real sigma); -->
+\index{{\tt \bfseries rayleigh}!{\tt (real y | real sigma): real}|hyperpage}
+
+`real` **`rayleigh_lcdf`**`(real y | real sigma)`<br>\newline
+The log of the Rayleigh cumulative distribution of y given scale sigma
+
+<!-- real; rayleigh_lccdf; (real y | real sigma); -->
+\index{{\tt \bfseries rayleigh}!{\tt (real y | real sigma): real}|hyperpage}
+
+`real` **`rayleigh_lccdf`**`(real y | real sigma)`<br>\newline
+The log of the Rayleigh complementary cumulative distribution of y
+given scale sigma
+
+<!-- R; rayleigh_rng; (reals sigma); -->
+\index{{\tt \bfseries rayleigh}!{\tt (reals sigma): R}|hyperpage}
+
+`R` **`rayleigh_rng`**`(reals sigma)`<br>\newline
+Generate a Rayleigh variate with scale sigma; may only be used in
+generated quantities block. For a description of argument and return
+types, see section \@ref(prng-vectorization).
+
+## Wiener First Passage Time Distribution
+
+### Probability Density Function
+
+If $\alpha \in \mathbb{R}^+$, $\tau \in \mathbb{R}^+$, $\beta \in [0,
+1]$ and $\delta \in \mathbb{R}$, then for $y > \tau$, \[
+\text{Wiener}(y|\alpha, \tau, \beta, \delta) =
+\frac{\alpha^3}{(y-\tau)^{3/2}} \exp \! \left(- \delta \alpha \beta -
+\frac{\delta^2(y-\tau)}{2}\right) \sum_{k = - \infty}^{\infty} (2k +
+\beta) \phi \! \left(\frac{2k \alpha + \beta}{\sqrt{y - \tau}}\right)
+\] where $\phi(x)$ denotes the standard normal density function;  see
+[@Feller1968], [@NavarroFuss2009].
+
+### Sampling Statement
+
+`y ~ ` **`wiener`**`(alpha, tau, beta, delta)`
+
+Increment target log probability density with `wiener_lpdf( y | alpha, tau, beta, delta)`
+dropping constant additive terms.
+\index{{\tt \bfseries wiener}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- real; wiener_lpdf; (reals y | reals alpha, reals tau, reals beta, reals delta); -->
+\index{{\tt \bfseries wiener}!{\tt (reals y | reals alpha, reals tau, reals beta, reals delta): real}|hyperpage}
+
+`real` **`wiener_lpdf`**`(reals y | reals alpha, reals tau, reals beta, reals delta)`<br>\newline
+The log of the Wiener first passage time density of y given boundary
+separation alpha, non-decision time tau, a-priori bias beta and drift
+rate delta
+
+### Boundaries
+
+Stan returns the first passage time of the accumulation process over
+the upper boundary only. To get the result for the lower boundary, use
+\[ \text{wiener}(y | \alpha, \tau, 1 - \beta, - \delta) \] For more
+details, see the appendix of @Vandekerckhove-Wabersich:2014.
+

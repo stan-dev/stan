@@ -1,0 +1,1158 @@
+# Real-Valued Basic Functions
+
+This chapter describes built-in functions that take zero or more real
+or integer arguments and return real values.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="fun-vectorization.html">Vectorization of Real-Valued Functions</a>\n')
+cat(' * <a href="built-in-constants.html">Mathematical Constants</a>\n')
+cat(' * <a href="special-values.html">Special Values</a>\n')
+cat(' * <a href="get-log-prob.html">Log Probability Function</a>\n')
+cat(' * <a href="logical-functions.html">Logical Functions</a>\n')
+cat(' * <a href="real-valued-arithmetic-operators.html">Real-Valued Arithmetic Operators</a>\n')
+cat(' * <a href="step-functions.html">Step-like Functions</a>\n')
+cat(' * <a href="power-and-logarithm-functions.html">Power and Logarithm Functions</a>\n')
+cat(' * <a href="trigonometric-functions.html">Trigonometric Functions</a>\n')
+cat(' * <a href="hyperbolic-trigonometric-functions.html">Hyperbolic Trigonometric Functions</a>\n')
+cat(' * <a href="link-functions.html">Link Functions</a>\n')
+cat(' * <a href="phi-function.html">Probability-Related Functions</a>\n')
+cat(' * <a href="betafun.html">Combinatorial Functions</a>\n')
+cat(' * <a href="composed-functions.html">Composed Functions</a>\n')
+}
+```
+
+## Vectorization of Real-Valued Functions {#fun-vectorization}
+
+Although listed in this chapter, many of Stan's built-in functions are
+vectorized so that they may be applied to any argument type.  The
+vectorized form of these functions is not any faster than writing an
+explicit loop that iterates over the elements applying the
+function---it's just easier to read and write and less error prone.
+
+### Unary Function Vectorization
+
+Many of Stan's unary functions can be applied to any argument type.
+For example, the exponential function, `exp`, can be applied to `real`
+arguments or arrays of `real` arguments.  Other than for integer
+arguments, the result type is the same as the argument type, including
+dimensionality and size.  Integer arguments are first promoted to real
+values, but the result will still have the same dimensionality and
+size as the argument.
+
+#### Real and real array arguments
+
+When applied to a simple real value, the result is a real value.  When
+applied to arrays, vectorized functions like `exp()` are defined
+elementwise.  For example,
+
+```
+ // declare some variables for arguments
+ real x0;
+ real x1[5];
+ real x2[4, 7];
+ ...
+ // declare some variables for results
+ real y0;
+ real y1[5];
+ real y2[4, 7];
+ ...
+ // calculate and assign results
+ y0 = exp(x0);
+ y1 = exp(x1);
+ y2 = exp(x2);
+```
+
+When `exp` is applied to an array, it applies elementwise.  For
+example, the statement above,
+
+```
+ y2 = exp(x2);
+```
+
+produces the same result for `y2` as the explicit loop
+
+```
+ for (i in 1:4)
+   for (j in 1:7)
+     y2[i, j] = exp(x2[i, j]);
+```
+
+#### Vector and matrix arguments
+
+Vectorized functions also apply elementwise to vectors and matrices.
+For example,
+
+```
+ vector[5] xv;
+ row_vector[7] xrv;
+ matrix[10, 20] xm;
+ 
+ vector[5] yv;
+ row_vector[7] yrv;
+ matrix[10, 20] ym;
+ 
+ yv = exp(xv);
+ yrv = exp(xrv);
+ ym = exp(xm);
+```
+
+Arrays of vectors and matrices work the same way.  For example,
+
+```
+ matrix[17, 93] u[12];
+ 
+ matrix[17, 93] z[12];
+ 
+ z = exp(u);
+```
+
+After this has been executed, `z[i, j, k]` will be equal to `exp(u[i,
+j, k])`.
+
+#### Integer and integer array arguments
+
+Integer arguments are promoted to real values in vectorized unary
+functions.  Thus if `n` is of type `int`, `exp(n)` is of type `real`.
+Arrays work the same way, so that if `n2` is a one dimensional array
+of integers, then `exp(n2)` will be a one-dimensional array of reals
+with the same number of elements as `n2`.  For example,
+
+```
+ int n1[23];
+ real z1[23];
+ z1 = exp(n1);
+```
+
+It would be illegal to try to assign `exp(n1)` to an array of
+integers; the return type is a real array.
+
+## Mathematical Constants {#built-in-constants}
+
+Constants are represented as functions with no arguments and must be
+called as such.  For instance, the mathematical constant $\pi$ must be
+written in a Stan program as `pi()`.
+
+<!-- real; pi; () -->
+\index{{\tt \bfseries pi}!{\tt (): real}|hyperpage}
+
+`real` **`pi`**`()`<br>\newline
+$\pi$, the ratio of a circle's circumference to its diameter
+
+<!-- real; e; () -->
+\index{{\tt \bfseries e}!{\tt (): real}|hyperpage}
+
+`real` **`e`**`()`<br>\newline
+$e$, the base of the natural logarithm
+
+<!-- real; sqrt2; () -->
+\index{{\tt \bfseries sqrt2}!{\tt (): real}|hyperpage}
+
+`real` **`sqrt2`**`()`<br>\newline
+The square root of 2
+
+<!-- real; log2; () -->
+\index{{\tt \bfseries log2}!{\tt (): real}|hyperpage}
+
+`real` **`log2`**`()`<br>\newline
+The natural logarithm of 2
+
+<!-- real; log10; () -->
+\index{{\tt \bfseries log10}!{\tt (): real}|hyperpage}
+
+`real` **`log10`**`()`<br>\newline
+The natural logarithm of 10
+
+## Special Values
+
+<!-- real; not_a_number; () -->
+\index{{\tt \bfseries not\_a\_number}!{\tt (): real}|hyperpage}
+
+`real` **`not_a_number`**`()`<br>\newline
+Not-a-number, a special non-finite real value returned to signal an
+error
+
+<!-- real; positive_infinity; () -->
+\index{{\tt \bfseries positive\_infinity}!{\tt (): real}|hyperpage}
+
+`real` **`positive_infinity`**`()`<br>\newline
+Positive infinity, a special non-finite real value larger than all
+finite numbers
+
+<!-- real; negative_infinity; () -->
+\index{{\tt \bfseries negative\_infinity}!{\tt (): real}|hyperpage}
+
+`real` **`negative_infinity`**`()`<br>\newline
+Negative infinity, a special non-finite real value smaller than all
+finite numbers
+
+<!-- real; machine_precision; () -->
+\index{{\tt \bfseries machine\_precision}!{\tt (): real}|hyperpage}
+
+`real` **`machine_precision`**`()`<br>\newline
+The smallest number $x$ such that $(x + 1) \neq 1$ in floating-point
+arithmetic on the current hardware platform
+
+## Log Probability Function {#get-log-prob}
+
+The basic purpose of a Stan program is to compute a log probability
+function and its derivatives.  The log probability function in a Stan
+model outputs the log density on the unconstrained scale.  A log
+probability accumulator starts at zero and is then incremented in
+various ways by a Stan program.  The variables are first transformed
+from unconstrained to constrained, and the log Jacobian determinant
+added to the log probability accumulator.  Then the model block is
+executed on the constrained parameters, with each sampling statement
+(`~`) and log probability increment statement (`increment_log_prob`)
+adding to the accumulator.  At the end of the model block execution,
+the value of the log probability accumulator is the log probability
+value returned by the Stan program.
+
+Stan provides a special built-in function `target()` that takes no
+arguments and returns the current value of the log probability
+accumulator.[^fn_lp]  This function is primarily useful for debugging
+purposes, where for instance, it may be used with a print statement to
+display the log probability accumulator at various stages of execution
+to see where it becomes ill defined.
+
+[^fn_lp]: This function used to be called `get_lp()`, but that   name
+has been deprecated; using it will print a warning.  The   function
+`get_lp()` will be removed in a future release.
+
+<!-- real; target; () -->
+\index{{\tt \bfseries target}!{\tt (): real}|hyperpage}
+
+`real` **`target`**`()`<br>\newline
+Return the current value of the log probability accumulator.
+
+<!-- real; get_lp; () -->
+\index{{\tt \bfseries get\_lp}!{\tt (): real}|hyperpage}
+
+`real` **`get_lp`**`()`<br>\newline
+Return the current value of the log probability accumulator;
+**deprecated;** - use `target()` instead.
+
+Both `target` and the deprecated `get_lp` act like other functions
+ending in `_lp`, meaning that they may only may only be used in the
+model block.
+
+## Logical Functions
+
+Like C++, BUGS, and R, Stan uses 0 to encode false, and 1 to encode
+true.  Stan supports the usual boolean comparison operations and
+boolean operators.  These all have the same syntax and precedence as
+in  C++; for the full list of operators and precedences, see the
+reference manual.
+
+### Comparison Operators
+
+All comparison operators return boolean values, either 0 or 1.  Each
+operator has two signatures, one for integer comparisons and one for
+floating-point comparisons.  Comparing an integer and real value is
+carried out by first promoting the integer value.
+
+<!-- int; operator<; (int x, int y); -->
+\index{{\tt \bfseries operator\_logical\_less\_than}!{\tt (int x, int y): int}|hyperpage}
+
+`int` **`operator<`**`(int x, int y)`<br>\newline
+
+
+<!-- int; operator<; (real x, real y); -->
+\index{{\tt \bfseries operator\_logical\_less\_than}!{\tt (real x, real y): int}|hyperpage}
+
+`int` **`operator<`**`(real x, real y)`<br>\newline
+Return 1 if x is less than y and 0 otherwise. \[ \text{operator<}(x,y)
+= \begin{cases} 1 & \text{if $x < y$} \\ 0 & \text{otherwise}
+\end{cases} \]
+
+<!-- int; operator<=; (int x, int y); -->
+\index{{\tt \bfseries operator\_logical\_less\_than\_equal}!{\tt (int x, int y): int}|hyperpage}
+
+`int` **`operator<=`**`(int x, int y)`<br>\newline
+
+
+<!-- int; operator<=; (real x, real y); -->
+\index{{\tt \bfseries operator\_logical\_less\_than\_equal}!{\tt (real x, real y): int}|hyperpage}
+
+`int` **`operator<=`**`(real x, real y)`<br>\newline
+Return 1 if x is less than or equal y and 0 otherwise. \[
+\text{operator<=}(x,y) = \begin{cases} 1 & \text{if $x \leq y$} \\ 0 &
+\text{otherwise} \end{cases} \]
+
+<!-- int; operator>; (int x, int y); -->
+\index{{\tt \bfseries operator\_logical\_greater\_than}!{\tt (int x, int y): int}|hyperpage}
+
+`int` **`operator>`**`(int x, int y)`<br>\newline
+
+
+<!-- int; operator>; (real x, real y); -->
+\index{{\tt \bfseries operator\_logical\_greater\_than}!{\tt (real x, real y): int}|hyperpage}
+
+`int` **`operator>`**`(real x, real y)`<br>\newline
+Return 1 if x is greater than y and 0 otherwise. \[ \text{operator>} =
+\begin{cases} 1 & \text{if $x > y$} \\ 0 & \text{otherwise}
+\end{cases} \]
+
+<!-- int; operator>=; (int x, int y); -->
+\index{{\tt \bfseries operator\_logical\_greater\_than\_equal}!{\tt (int x, int y): int}|hyperpage}
+
+`int` **`operator>=`**`(int x, int y)`<br>\newline
+
+
+<!-- int; operator>=; (real x, real y); -->
+\index{{\tt \bfseries operator\_logical\_greater\_than\_equal}!{\tt (real x, real y): int}|hyperpage}
+
+`int` **`operator>=`**`(real x, real y)`<br>\newline
+Return 1 if x is greater than or equal to y and 0 otherwise. \[
+\text{operator>=} = \begin{cases} 1 & \text{if $x \geq y$} \\ 0 &
+\text{otherwise} \end{cases} \]
+
+<!-- int; operator==; (int x, int y); -->
+\index{{\tt \bfseries operator\_logial\_equal}!{\tt (int x, int y): int}|hyperpage}
+
+`int` **`operator==`**`(int x, int y)`<br>\newline
+
+
+<!-- int; operator==; (real x, real y); -->
+\index{{\tt \bfseries operator\_logial\_equal}!{\tt (real x, real y): int}|hyperpage}
+
+`int` **`operator==`**`(real x, real y)`<br>\newline
+Return 1 if x is equal to y and 0 otherwise. \[ \text{operator==}(x,y)
+= \begin{cases} 1 & \text{if $x = y$} \\ 0 & \text{otherwise}
+\end{cases} \]
+
+<!-- int; operator!=; (int x, int y); -->
+\index{{\tt \bfseries operator\_logical\_not\_equal}!{\tt (int x, int y): int}|hyperpage}
+
+`int` **`operator!=`**`(int x, int y)`<br>\newline
+
+
+<!-- int; operator!=; (real x, real y); -->
+\index{{\tt \bfseries operator\_logical\_not\_equal}!{\tt (real x, real y): int}|hyperpage}
+
+`int` **`operator!=`**`(real x, real y)`<br>\newline
+Return 1 if x is not equal to y and 0 otherwise. \[
+\text{operator!=}(x,y) = \begin{cases} 1 & \text{if $x \neq y$} \\ 0 &
+\text{otherwise} \end{cases} \]
+
+### Boolean Operators
+
+Boolean operators return either 0 for false or 1 for true.  Inputs may
+be any real or integer values, with non-zero values being treated as
+true and zero values treated as false.  These operators have the usual
+precedences, with negation (not) binding the most tightly, conjunction
+the next and disjunction the weakest; all of the operators bind more
+tightly than the comparisons.  Thus an expression such as `!a && b` is
+interpreted as `(!a) && b`, and `a < b || c >= d && e != f` as `(a <
+b) || (((c >= d) && (e != f)))`.
+
+<!-- int; operator!; (int x); -->
+\index{{\tt \bfseries operator\_negation}!{\tt (int x): int}|hyperpage}
+
+`int` **`operator!`**`(int x)`<br>\newline
+
+
+<!-- int; operator!; (real x); -->
+\index{{\tt \bfseries operator\_negation}!{\tt (real x): int}|hyperpage}
+
+`int` **`operator!`**`(real x)`<br>\newline
+Return 1 if x is zero and 0 otherwise. \[ \text{operator!}(x) =
+\begin{cases} 0 & \text{if $x \neq 0$} \\ 1 & \text{if $x = 0$}
+\end{cases} \]
+
+<!-- int; operator&&; (int x, int y); -->
+\index{{\tt \bfseries operator\_logical\_and}!{\tt (int x, int y): int}|hyperpage}
+
+`int` **`operator&&`**`(int x, int y)`<br>\newline
+
+
+<!-- int; operator&&; (real x, real y); -->
+\index{{\tt \bfseries operator\_logical\_and}!{\tt (real x, real y): int}|hyperpage}
+
+`int` **`operator&&`**`(real x, real y)`<br>\newline
+Return 1 if x is unequal to 0 and y is unequal to 0. \[
+\mathrm{operator\&\&}(x,y) = \begin{cases} 1 & \text{if $x \neq 0$}
+\text{ and } y \neq 0\\ 0 & \text{otherwise} \end{cases} \]
+
+<!-- int; operator||; (int x, int y); -->
+\index{{\tt \bfseries operator\_logical\_or}!{\tt (int x, int y): int}|hyperpage}
+
+`int` **`operator||`**`(int x, int y)`<br>\newline
+
+
+<!-- int; operator||; (real x, real y); -->
+\index{{\tt \bfseries operator\_logical\_or}!{\tt (real x, real y): int}|hyperpage}
+
+`int` **`operator||`**`(real x, real y)`<br>\newline
+Return 1 if x is unequal to 0 or y is unequal to 0. \[
+\text{operator||}(x,y) = \begin{cases} 1 & \text{if $x \neq 0$}
+\textrm{ or } y \neq 0\\ 0 & \text{otherwise} \end{cases} \]
+
+#### Boolean Operator Short Circuiting
+
+Like in  C++, the boolean operators `&&` and `||` and are implemented
+to short circuit directly to a return value after evaluating the first
+argument if it is sufficient to resolve the result.  In evaluating `a
+|| b`, if `a` evaluates to a value other than zero, the expression
+returns the value 1 without evaluating the expression `b`.  Similarly,
+evaluating `a && b` first evaluates `a`, and if the result is zero,
+returns 0 without evaluating `b`.
+
+### Logical Functions
+
+The logical functions introduce conditional behavior functionally and
+are primarily provided for compatibility with BUGS and JAGS.
+
+<!-- real; step; (real x); -->
+\index{{\tt \bfseries step}!{\tt (real x): real}|hyperpage}
+
+`real` **`step`**`(real x)`<br>\newline
+Return 1 if x is positive and 0 otherwise. \[ \text{step}(x) =
+\begin{cases} 0 & \text{if } x < 0 \\ 1 & \text{otherwise} \end{cases}
+\] _**Warning:**_ `int_step(0)` and `int_step(NaN)` return 0 whereas
+`step(0)` and `step(NaN)` return 1.
+
+The step function is often used in BUGS to perform conditional
+operations.  For instance, `step(a-b)` evaluates to 1 if `a` is
+greater than `b` and evaluates to 0 otherwise. `step` is a step-like
+functions; see the warning in section \@ref(step-functions) applied to
+expressions dependent on parameters.
+
+<!-- int; is_inf; (real x); -->
+\index{{\tt \bfseries is\_inf}!{\tt (real x): int}|hyperpage}
+
+`int` **`is_inf`**`(real x)`<br>\newline
+Return 1 if x is infinite (positive or negative) and 0 otherwise.
+
+<!-- int; is_nan; (real x); -->
+\index{{\tt \bfseries is\_nan}!{\tt (real x): int}|hyperpage}
+
+`int` **`is_nan`**`(real x)`<br>\newline
+Return 1 if x is NaN and 0 otherwise.
+
+Care must be taken because both of these indicator functions are
+step-like and thus can cause discontinuities in gradients when applied
+to parameters; see section \@ref(step-functions) for details.
+
+## Real-Valued Arithmetic Operators {#real-valued-arithmetic-operators}
+
+The arithmetic operators are presented using  C++ notation.  For
+instance `operator+(x,y)` refers to the binary addition operator and
+`operator-(x)` to the unary negation operator.  In Stan programs,
+these are written using the usual infix and prefix notations as `x +
+y` and `-x`, respectively.
+
+### Binary Infix Operators
+
+<!-- real; operator+; (real x, real y); -->
+\index{{\tt \bfseries operator\_add}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`operator+`**`(real x, real y)`<br>\newline
+Return the sum of x and y. \[ (x + y) = \text{operator+}(x,y) = x+y \]
+
+<!-- real; operator-; (real x, real y); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`operator-`**`(real x, real y)`<br>\newline
+Return the difference between x and y. \[ (x - y) =
+\text{operator-}(x,y) = x - y \]
+
+<!-- real; operator*; (real x, real y); -->
+\index{{\tt \bfseries operator\_multiply}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`operator*`**`(real x, real y)`<br>\newline
+Return the product of x and y. \[ (x * y) = \text{operator*}(x,y) = xy
+\]
+
+<!-- real; operator/; (real x, real y); -->
+\index{{\tt \bfseries operator\_divide}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`operator/`**`(real x, real y)`<br>\newline
+Return the quotient of x and y. \[ (x / y) = \text{operator/}(x,y) =
+\frac{x}{y} \]
+
+<!-- real; operator^; (real x, real y); -->
+\index{{\tt \bfseries operator\_pow}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`operator^`**`(real x, real y)`<br>\newline
+Return x raised to the power of y. \[ (x^\mathrm{\wedge}y) =
+\text{operator}^\mathrm{\wedge}(x,y) = x^y \]
+
+### Unary Prefix Operators
+
+<!-- real; operator-; (real x); -->
+\index{{\tt \bfseries operator\_subtract}!{\tt (real x): real}|hyperpage}
+
+`real` **`operator-`**`(real x)`<br>\newline
+Return the negation of the subtrahend x. \[ \text{operator-}(x) = (-x)
+\]
+
+<!-- real; operator+; (real x); -->
+\index{{\tt \bfseries operator\_add}!{\tt (real x): real}|hyperpage}
+
+`real` **`operator+`**`(real x)`<br>\newline
+Return the value of x. \[ \text{operator+}(x) = x \]
+
+## Step-like Functions {#step-functions}
+
+_**Warning:**_  *These functions can seriously hinder sampling and
+optimization efficiency for gradient-based methods (e.g., NUTS, HMC,
+BFGS) if applied to parameters (including transformed parameters and
+local variables in the transformed parameters or model block).  The
+problem is that they break gradients due to discontinuities coupled
+with   zero gradients elsewhere.  They do not hinder sampling when
+used in the   data, transformed data, or generated quantities blocks.*
+
+### Absolute Value Functions
+
+<!-- R; fabs; (T x); -->
+\index{{\tt \bfseries fabs}!{\tt (T x): R}|hyperpage}
+
+`R` **`fabs`**`(T x)`<br>\newline
+absolute value of x
+
+<!-- real; abs; (real x); -->
+\index{{\tt \bfseries abs}!{\tt (real x): real}|hyperpage}
+
+`real` **`abs`**`(real x)`<br>\newline
+Return the absolute value of x, defined by \[ \text{abs}(x) = |x| \]
+See the warning at start of section \@ref(step-functions) for
+application to parameters.
+
+<!-- int; abs; (int x); -->
+\index{{\tt \bfseries abs}!{\tt (int x): int}|hyperpage}
+
+`int` **`abs`**`(int x)`<br>\newline
+Return the absolute value of x, defined by \[ \text{abs}(x) = |x| \]
+
+<!-- real; fdim; (real x, real y); -->
+\index{{\tt \bfseries fdim}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`fdim`**`(real x, real y)`<br>\newline
+Return the positive difference between x and y, which is x - y if x is
+greater than y and 0 otherwise; see warning at start of section
+\@ref(step-functions). \[ \text{fdim}(x,y) = \begin{cases} x-y &
+\text{if } x \geq y \\ 0 & \text{otherwise} \end{cases} \]
+
+### Bounds Functions
+
+<!-- real; fmin; (real x, real y); -->
+\index{{\tt \bfseries fmin}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`fmin`**`(real x, real y)`<br>\newline
+Return the minimum of x and y; see warning at start of section
+\@ref(step-functions). \[ \text{fmin}(x,y) = \begin{cases} x &
+\text{if } x \leq y \\ y & \text{otherwise} \end{cases} \]
+
+<!-- real; fmax; (real x, real y); -->
+\index{{\tt \bfseries fmax}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`fmax`**`(real x, real y)`<br>\newline
+Return the maximum of x and y; see warning at start of section
+\@ref(step-functions). \[ \text{fmax}(x,y) = \begin{cases} x &
+\text{if } x \geq y \\ y & \text{otherwise} \end{cases} \]
+
+### Arithmetic Functions
+
+<!-- real; fmod; (real x, real y); -->
+\index{{\tt \bfseries fmod}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`fmod`**`(real x, real y)`<br>\newline
+Return the real value remainder after dividing x by y; see warning at
+start of section \@ref(step-functions). \[ \text{fmod}(x,y) = x -
+\left\lfloor \frac{x}{y} \right\rfloor \, y \] The operator $\lfloor u
+\rfloor$ is the floor operation; see below.
+
+### Rounding Functions
+
+_**Warning:**_  Rounding functions convert real values to integers.
+Because the output is an integer, any gradient information resulting
+from functions applied to the integer is not passed to the real value
+it was derived from.  With MCMC sampling using HMC or NUTS, the MCMC
+acceptance procedure will correct for any error due to poor gradient
+calculations, but the result is likely to be reduced acceptance
+probabilities and less efficient sampling.
+
+The rounding functions cannot be used as indices to arrays because
+they return real values.  Stan may introduce integer-valued versions
+of these in the future, but as of now, there is no good workaround.
+
+<!-- R; floor; (T x); -->
+\index{{\tt \bfseries floor}!{\tt (T x): R}|hyperpage}
+
+`R` **`floor`**`(T x)`<br>\newline
+floor of x, which is the largest integer less than or equal to x,
+converted to a real value; see warning at start of section
+\@ref(step-functions)
+
+<!-- R; ceil; (T x); -->
+\index{{\tt \bfseries ceil}!{\tt (T x): R}|hyperpage}
+
+`R` **`ceil`**`(T x)`<br>\newline
+ceiling of x, which is the smallest integer greater than or equal to
+x, converted to a real value; see warning at start of section
+\@ref(step-functions)
+
+<!-- R; round; (T x); -->
+\index{{\tt \bfseries round}!{\tt (T x): R}|hyperpage}
+
+`R` **`round`**`(T x)`<br>\newline
+nearest integer to x, converted to a real value; see warning at start
+of section \@ref(step-functions)
+
+<!-- R; trunc; (T x); -->
+\index{{\tt \bfseries trunc}!{\tt (T x): R}|hyperpage}
+
+`R` **`trunc`**`(T x)`<br>\newline
+integer nearest to but no larger in magnitude than x, converted to a
+double value; see warning at start of section \@ref(step-functions)
+
+## Power and Logarithm Functions
+
+<!-- R; sqrt; (T x); -->
+\index{{\tt \bfseries sqrt}!{\tt (T x): R}|hyperpage}
+
+`R` **`sqrt`**`(T x)`<br>\newline
+square root of x
+
+<!-- R; cbrt; (T x); -->
+\index{{\tt \bfseries cbrt}!{\tt (T x): R}|hyperpage}
+
+`R` **`cbrt`**`(T x)`<br>\newline
+cube root of x
+
+<!-- R; square; (T x); -->
+\index{{\tt \bfseries square}!{\tt (T x): R}|hyperpage}
+
+`R` **`square`**`(T x)`<br>\newline
+square of x
+
+<!-- R; exp; (T x); -->
+\index{{\tt \bfseries exp}!{\tt (T x): R}|hyperpage}
+
+`R` **`exp`**`(T x)`<br>\newline
+natural exponential of x
+
+<!-- R; exp2; (T x); -->
+\index{{\tt \bfseries exp2}!{\tt (T x): R}|hyperpage}
+
+`R` **`exp2`**`(T x)`<br>\newline
+base-2 exponential of x
+
+<!-- R; log; (T x); -->
+\index{{\tt \bfseries log}!{\tt (T x): R}|hyperpage}
+
+`R` **`log`**`(T x)`<br>\newline
+natural logarithm of x
+
+<!-- R; log2; (T x); -->
+\index{{\tt \bfseries log2}!{\tt (T x): R}|hyperpage}
+
+`R` **`log2`**`(T x)`<br>\newline
+base-2 logarithm of x
+
+<!-- R; log10; (T x); -->
+\index{{\tt \bfseries log10}!{\tt (T x): R}|hyperpage}
+
+`R` **`log10`**`(T x)`<br>\newline
+base-10 logarithm of x
+
+<!-- real; pow; (real x, real y); -->
+\index{{\tt \bfseries pow}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`pow`**`(real x, real y)`<br>\newline
+Return x raised to the power of y. \[ \text{pow}(x,y) = x^y \]
+
+<!-- R; inv; (T x); -->
+\index{{\tt \bfseries inv}!{\tt (T x): R}|hyperpage}
+
+`R` **`inv`**`(T x)`<br>\newline
+inverse of x
+
+<!-- R; inv_sqrt; (T x); -->
+\index{{\tt \bfseries inv\_sqrt}!{\tt (T x): R}|hyperpage}
+
+`R` **`inv_sqrt`**`(T x)`<br>\newline
+inverse of the square root of x
+
+<!-- R; inv_square; (T x); -->
+\index{{\tt \bfseries inv\_square}!{\tt (T x): R}|hyperpage}
+
+`R` **`inv_square`**`(T x)`<br>\newline
+inverse of the square of x
+
+## Trigonometric Functions
+
+<!-- real; hypot; (real x, real y); -->
+\index{{\tt \bfseries hypot}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`hypot`**`(real x, real y)`<br>\newline
+Return the length of the hypotenuse of a right triangle with sides of
+length x and y. \[ \text{hypot}(x,y) = \begin{cases} \sqrt{x^2+y^2} &
+\text{if } x,y\geq 0 \\ \textrm{NaN} & \text{otherwise} \end{cases} \]
+
+<!-- R; cos; (T x); -->
+\index{{\tt \bfseries cos}!{\tt (T x): R}|hyperpage}
+
+`R` **`cos`**`(T x)`<br>\newline
+cosine of the angle x (in radians)
+
+<!-- R; sin; (T x); -->
+\index{{\tt \bfseries sin}!{\tt (T x): R}|hyperpage}
+
+`R` **`sin`**`(T x)`<br>\newline
+sine of the angle x (in radians)
+
+<!-- R; tan; (T x); -->
+\index{{\tt \bfseries tan}!{\tt (T x): R}|hyperpage}
+
+`R` **`tan`**`(T x)`<br>\newline
+tangent of the angle x (in radians)
+
+<!-- R; acos; (T x); -->
+\index{{\tt \bfseries acos}!{\tt (T x): R}|hyperpage}
+
+`R` **`acos`**`(T x)`<br>\newline
+principal arc (inverse) cosine (in radians) of x
+
+<!-- R; asin; (T x); -->
+\index{{\tt \bfseries asin}!{\tt (T x): R}|hyperpage}
+
+`R` **`asin`**`(T x)`<br>\newline
+principal arc (inverse) sine (in radians) of x
+
+<!-- R; atan; (T x); -->
+\index{{\tt \bfseries atan}!{\tt (T x): R}|hyperpage}
+
+`R` **`atan`**`(T x)`<br>\newline
+principal arc (inverse) tangent (in radians) of x, with values from
+$-\pi$ to $\pi$
+
+<!-- real; atan2; (real y, real x); -->
+\index{{\tt \bfseries atan2}!{\tt (real y, real x): real}|hyperpage}
+
+`real` **`atan2`**`(real y, real x)`<br>\newline
+Return the principal arc (inverse) tangent (in radians) of y divided
+by x, \[ \text{atan2}(y, x) = \arctan\left(\frac{y}{x}\right) \]
+
+## Hyperbolic Trigonometric Functions
+
+<!-- R; cosh; (T x); -->
+\index{{\tt \bfseries cosh}!{\tt (T x): R}|hyperpage}
+
+`R` **`cosh`**`(T x)`<br>\newline
+hyperbolic cosine of x (in radians)
+
+<!-- R; sinh; (T x); -->
+\index{{\tt \bfseries sinh}!{\tt (T x): R}|hyperpage}
+
+`R` **`sinh`**`(T x)`<br>\newline
+hyperbolic sine of x (in radians)
+
+<!-- R; tanh; (T x); -->
+\index{{\tt \bfseries tanh}!{\tt (T x): R}|hyperpage}
+
+`R` **`tanh`**`(T x)`<br>\newline
+hyperbolic tangent of x (in radians)
+
+<!-- R; acosh; (T x); -->
+\index{{\tt \bfseries acosh}!{\tt (T x): R}|hyperpage}
+
+`R` **`acosh`**`(T x)`<br>\newline
+inverse hyperbolic cosine (in radians)
+
+<!-- R; asinh; (T x); -->
+\index{{\tt \bfseries asinh}!{\tt (T x): R}|hyperpage}
+
+`R` **`asinh`**`(T x)`<br>\newline
+inverse hyperbolic cosine (in radians)
+
+<!-- R; atanh; (T x); -->
+\index{{\tt \bfseries atanh}!{\tt (T x): R}|hyperpage}
+
+`R` **`atanh`**`(T x)`<br>\newline
+inverse hyperbolic tangent (in radians) of x
+
+## Link Functions {#link-functions}
+
+The following functions are commonly used as link functions in
+generalized linear models.  The function $\Phi$ is also commonly used
+as a link function (see section \@ref(Phi-function)).
+
+<!-- R; logit; (T x); -->
+\index{{\tt \bfseries logit}!{\tt (T x): R}|hyperpage}
+
+`R` **`logit`**`(T x)`<br>\newline
+log odds, or logit, function applied to x
+
+<!-- R; inv_logit; (T x); -->
+\index{{\tt \bfseries inv\_logit}!{\tt (T x): R}|hyperpage}
+
+`R` **`inv_logit`**`(T x)`<br>\newline
+logistic sigmoid function applied to x
+
+<!-- R; inv_cloglog; (T x); -->
+\index{{\tt \bfseries inv\_cloglog}!{\tt (T x): R}|hyperpage}
+
+`R` **`inv_cloglog`**`(T x)`<br>\newline
+inverse of the complementary log-log function applied to x
+
+## Probability-Related Functions {#Phi-function}
+
+### Normal Cumulative Distribution Functions
+
+The error function `erf` is related to the standard normal cumulative
+distribution function $\Phi$ by scaling.  See section
+\@ref(normal-distribution) for the general normal cumulative
+distribution function (and its complement).
+
+<!-- R; erf; (T x); -->
+\index{{\tt \bfseries erf}!{\tt (T x): R}|hyperpage}
+
+`R` **`erf`**`(T x)`<br>\newline
+error function, also known as the Gauss error function, of x
+
+<!-- R; erfc; (T x); -->
+\index{{\tt \bfseries erfc}!{\tt (T x): R}|hyperpage}
+
+`R` **`erfc`**`(T x)`<br>\newline
+complementary error function of x
+
+<!-- R; Phi; (T x); -->
+\index{{\tt \bfseries phi}!{\tt (T x): R}|hyperpage}
+
+`R` **`Phi`**`(T x)`<br>\newline
+standard normal cumulative distribution function of x
+
+<!-- R; inv_Phi; (T x); -->
+\index{{\tt \bfseries inv\_phi}!{\tt (T x): R}|hyperpage}
+
+`R` **`inv_Phi`**`(T x)`<br>\newline
+standard normal inverse cumulative distribution function of p,
+otherwise known as the quantile function
+
+<!-- R; Phi_approx; (T x); -->
+\index{{\tt \bfseries phi\_approx}!{\tt (T x): R}|hyperpage}
+
+`R` **`Phi_approx`**`(T x)`<br>\newline
+fast approximation of the unit (may replace `Phi` for probit
+regression with maximum absolute error of 0.00014, see
+[@BowlingEtAl:2009] for details)
+
+### Other Probability-Related Functions
+
+<!-- real; binary_log_loss; (int y, real y_hat); -->
+\index{{\tt \bfseries binary\_log\_loss}!{\tt (int y, real y\_hat): real}|hyperpage}
+
+`real` **`binary_log_loss`**`(int y, real y_hat)`<br>\newline
+Return the log loss function for for predicting $\hat{y} \in [0,1]$
+for boolean outcome $y \in \{0,1\}$. \[
+\mathrm{binary\_log\_loss}(y,\hat{y}) = \begin{cases} -\log \hat{y} &
+\text{if } y = 0\\ -\log (1 - \hat{y}) & \text{otherwise} \end{cases}
+\]
+
+<!-- real; owens_t; (real h, real a); -->
+\index{{\tt \bfseries owens\_t}!{\tt (real h, real a): real}|hyperpage}
+
+`real` **`owens_t`**`(real h, real a)`<br>\newline
+Return the Owen's T function for the probability of the event $X > h$
+and $0<Y<aX$ where X and Y are independent standard normal random
+variables. \[ \mathrm{owens\_t}(h,a) = \frac{1}{2\pi} \int_0^a
+\frac{\exp(-\frac{1}{2}h^2(1+x^2))}{1+x^2}dx \]
+
+## Combinatorial Functions {#betafun}
+
+<!-- real; inc_beta; (real alpha, real beta, real x); -->
+\index{{\tt \bfseries inc\_beta}!{\tt (real alpha, real beta, real x): real}|hyperpage}
+
+`real` **`inc_beta`**`(real alpha, real beta, real x)`<br>\newline
+Return the incomplete beta function up to x applied to alpha and beta.
+See section \@ref(inc-beta-appendix) for a definition.
+
+<!-- real; lbeta; (real alpha, real beta); -->
+\index{{\tt \bfseries lbeta}!{\tt (real alpha, real beta): real}|hyperpage}
+
+`real` **`lbeta`**`(real alpha, real beta)`<br>\newline
+Return the natural logarithm of the beta function applied to alpha and
+beta. The beta function, $\text{B}(\alpha,\beta)$, computes the
+normalizing constant for the beta distribution, and is defined for
+$\alpha > 0$ and $\beta > 0$. \[ \text{lbeta}(\alpha,\beta) = \log
+\Gamma(a) + \log \Gamma(b) - \log \Gamma(a+b) \] See section
+\@ref(beta-appendix) for definition of $\text{B}(\alpha, \beta)$.
+
+<!-- R; tgamma; (T x); -->
+\index{{\tt \bfseries tgamma}!{\tt (T x): R}|hyperpage}
+
+`R` **`tgamma`**`(T x)`<br>\newline
+gamma function applied to x. The gamma function is the generalization
+of the factorial function to continuous variables, defined so that
+$\Gamma(n+1) = n!$. See for a full definition of $\Gamma(x)$. The
+function is defined for positive numbers and non-integral negative
+numbers,
+
+<!-- R; lgamma; (T x); -->
+\index{{\tt \bfseries lgamma}!{\tt (T x): R}|hyperpage}
+
+`R` **`lgamma`**`(T x)`<br>\newline
+natural logarithm of the gamma function applied to x,
+
+<!-- R; digamma; (T x); -->
+\index{{\tt \bfseries digamma}!{\tt (T x): R}|hyperpage}
+
+`R` **`digamma`**`(T x)`<br>\newline
+digamma function applied to x. The digamma function is the derivative
+of the natural logarithm of the Gamma function. The function is
+defined for positive numbers and non-integral negative numbers
+
+<!-- R; trigamma; (T x); -->
+\index{{\tt \bfseries trigamma}!{\tt (T x): R}|hyperpage}
+
+`R` **`trigamma`**`(T x)`<br>\newline
+trigamma function applied to x. The trigamma function is the second
+derivative of the natural logarithm of the Gamma function
+
+<!-- real; lmgamma; (int n, real x); -->
+\index{{\tt \bfseries lmgamma}!{\tt (int n, real x): real}|hyperpage}
+
+`real` **`lmgamma`**`(int n, real x)`<br>\newline
+Return the natural logarithm of the multivariate gamma function
+$\Gamma_n$ with n dimensions applied to x. \[ \text{lmgamma}(n,x) =
+\begin{cases} \frac{n(n-1)}{4} \log \pi + \sum_{j=1}^n \log
+\Gamma\left(x + \frac{1 - j}{2}\right) & \text{if } x\not\in
+\{\dots,-3,-2,-1,0\}\\ \textrm{error} & \text{otherwise} \end{cases}
+\]
+
+<!-- real; gamma_p; (real a, real z); -->
+\index{{\tt \bfseries gamma\_p}!{\tt (real a, real z): real}|hyperpage}
+
+`real` **`gamma_p`**`(real a, real z)`<br>\newline
+Return the normalized lower incomplete gamma function of a and z
+defined for positive a and nonnegative z. \[ \mathrm{gamma\_p}(a,z) =
+\begin{cases} \frac{1}{\Gamma(a)}\int_0^zt^{a-1}e^{-t}dt & \text{if }
+a > 0, z \geq 0 \\ \textrm{error} & \text{otherwise} \end{cases} \]
+
+<!-- real; gamma_q; (real a, real z); -->
+\index{{\tt \bfseries gamma\_q}!{\tt (real a, real z): real}|hyperpage}
+
+`real` **`gamma_q`**`(real a, real z)`<br>\newline
+Return the normalized upper incomplete gamma function of a and z
+defined for positive a and nonnegative z. \[ \mathrm{gamma\_q}(a,z) =
+\begin{cases} \frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t}dt &
+\text{if } a > 0, z \geq 0 \\[6pt] \textrm{error} & \text{otherwise}
+\end{cases} \]
+
+<!-- real; binomial_coefficient_log; (real x, real y); -->
+\index{{\tt \bfseries binomial\_coefficient\_log}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`binomial_coefficient_log`**`(real x, real y)`<br>\newline
+_**Warning:**_ This function is deprecated and should be replaced with
+`lchoose`. Return the natural logarithm of the binomial coefficient of
+x and y. For non-negative integer inputs, the binomial coefficient
+function is written as $\binom{x}{y}$ and pronounced "x choose y."
+This function generalizes to real numbers using the gamma function.
+For $0 \leq y \leq x$, \[ \mathrm{binomial\_coefficient\_log}(x,y) =
+\log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1). \]
+
+<!-- int; choose; (int x, int y); -->
+\index{{\tt \bfseries choose}!{\tt (int x, int y): int}|hyperpage}
+
+`int` **`choose`**`(int x, int y)`<br>\newline
+Return the binomial coefficient of x and y. For non-negative integer
+inputs, the binomial coefficient function is written as $\binom{x}{y}$
+and pronounced "x choose y." In its the antilog of the `lchoose`
+function but returns an integer rather than a real number with no
+non-zero decimal places. For $0 \leq y \leq x$, the binomial
+coefficient function can be defined via the factorial function \[
+\text{choose}(x,y) = \frac{x!}{\left(y!\right)\left(x - y\right)!}. \]
+
+<!-- real; bessel_first_kind; (int v, real x); -->
+\index{{\tt \bfseries bessel\_first\_kind}!{\tt (int v, real x): real}|hyperpage}
+
+`real` **`bessel_first_kind`**`(int v, real x)`<br>\newline
+Return the Bessel function of the first kind with order v applied to
+x. \[ \mathrm{bessel\_first\_kind}(v,x) = J_v(x), \] where \[
+J_v(x)=\left(\frac{1}{2}x\right)^v \sum_{k=0}^\infty
+\frac{\left(-\frac{1}{4}x^2\right)^k}{k!\, \Gamma(v+k+1)} \]
+
+<!-- real; bessel_second_kind; (int v, real x); -->
+\index{{\tt \bfseries bessel\_second\_kind}!{\tt (int v, real x): real}|hyperpage}
+
+`real` **`bessel_second_kind`**`(int v, real x)`<br>\newline
+Return the Bessel function of the second kind with order v applied to
+x defined for positive x and v. For $x,v > 0$, \[
+\mathrm{bessel\_second\_kind}(v,x) = \begin{cases} Y_v(x) & \text{if }
+x > 0 \\ \textrm{error} & \text{otherwise} \end{cases} \] where \[
+Y_v(x)=\frac{J_v(x)\cos(v\pi)-J_{-v}(x)}{\sin(v\pi)} \]
+
+<!-- real; modified_bessel_first_kind; (int v, real z); -->
+\index{{\tt \bfseries modified\_bessel\_first\_kind}!{\tt (int v, real z): real}|hyperpage}
+
+`real` **`modified_bessel_first_kind`**`(int v, real z)`<br>\newline
+Return the modified Bessel function of the first kind with order v
+applied to z defined for all z and v. \[
+\mathrm{modified\_bessel\_first\_kind}(v,z) = I_v(z) \] where \[
+{I_v}(z) = \left(\frac{1}{2}z\right)^v\sum_{k=0}^\infty
+\frac{\left(\frac{1}{4}z^2\right)^k}{k!\Gamma(v+k+1)} \]
+
+<!-- real; modified_bessel_second_kind; (int v, real z); -->
+\index{{\tt \bfseries modified\_bessel\_second\_kind}!{\tt (int v, real z): real}|hyperpage}
+
+`real` **`modified_bessel_second_kind`**`(int v, real z)`<br>\newline
+Return the modified Bessel function of the second kind with order v
+applied to z defined for positive z and v. \[
+\mathrm{modified\_bessel\_second\_kind}(v,z) = \begin{cases} K_v(z) &
+\text{if } z > 0 \\ \textrm{error} & \text{if } z \leq 0 \end{cases}
+\] where \[ {K_v}(z) = \frac{\pi}{2}\cdot\frac{I_{-v}(z) -
+I_{v}(z)}{\sin(v\pi)} \]
+
+<!-- real; falling_factorial; (real x, real n); -->
+\index{{\tt \bfseries falling\_factorial}!{\tt (real x, real n): real}|hyperpage}
+
+`real` **`falling_factorial`**`(real x, real n)`<br>\newline
+Return the falling factorial of x with power n defined for positive x
+and real n. \[ \mathrm{falling\_factorial}(x,n) = \begin{cases} (x)_n
+& \text{if } x > 0 \\ \textrm{error} & \text{if } x \leq 0 \end{cases}
+\] where \[ (x)_n=\frac{\Gamma(x+1)}{\Gamma(x-n+1)} \]
+
+<!-- real; lchoose; (real x, real y); -->
+\index{{\tt \bfseries lchoose}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`lchoose`**`(real x, real y)`<br>\newline
+Return the natural logarithm of the generalized binomial coefficient
+of x and y. For non-negative integer inputs, the binomial coefficient
+function is written as $\binom{x}{y}$ and pronounced "x choose y."
+This function generalizes to real numbers using the gamma function.
+For $0 \leq y \leq x$, \[ \mathrm{binomial\_coefficient\_log}(x,y) =
+\log\Gamma(x+1) - \log\Gamma(y+1) - \log\Gamma(x-y+1). \]
+
+<!-- real; log_falling_factorial; (real x, real n); -->
+\index{{\tt \bfseries log\_falling\_factorial}!{\tt (real x, real n): real}|hyperpage}
+
+`real` **`log_falling_factorial`**`(real x, real n)`<br>\newline
+Return the log of the falling factorial of x with power n defined for
+positive x and real n. \[ \mathrm{log\_falling\_factorial}(x,n) =
+\begin{cases} \log (x)_n & \text{if } x > 0 \\ \textrm{error} &
+\text{if } x \leq 0 \end{cases} \]
+
+<!-- real; rising_factorial; (real x, real n); -->
+\index{{\tt \bfseries rising\_factorial}!{\tt (real x, real n): real}|hyperpage}
+
+`real` **`rising_factorial`**`(real x, real n)`<br>\newline
+Return the rising factorial of x with power n defined for positive x
+and real n. \[ \mathrm{rising\_factorial}(x,n) = \begin{cases} x^{(n)}
+& \text{if } x > 0 \\ \textrm{error} & \text{if } x \leq 0 \end{cases}
+\] where \[ x^{(n)}=\frac{\Gamma(x+n)}{\Gamma(x)} \]
+
+<!-- real; log_rising_factorial; (real x, real n); -->
+\index{{\tt \bfseries log\_rising\_factorial}!{\tt (real x, real n): real}|hyperpage}
+
+`real` **`log_rising_factorial`**`(real x, real n)`<br>\newline
+Return the log of the rising factorial of x with power n defined for
+positive x and real n. \[ \mathrm{log\_rising\_factorial}(x,n) =
+\begin{cases} \log x^{(n)} & \text{if } x > 0 \\ \textrm{error} &
+\text{if } x \leq 0 \end{cases} \]
+
+## Composed Functions {#composed-functions}
+
+The functions in this section are equivalent in theory to combinations
+of other functions.  In practice, they are implemented to be more
+efficient and more numerically stable than defining them directly
+using more basic Stan functions.
+
+<!-- R; expm1; (T x); -->
+\index{{\tt \bfseries expm1}!{\tt (T x): R}|hyperpage}
+
+`R` **`expm1`**`(T x)`<br>\newline
+natural exponential of x minus 1
+
+<!-- real; fma; (real x, real y, real z); -->
+\index{{\tt \bfseries fma}!{\tt (real x, real y, real z): real}|hyperpage}
+
+`real` **`fma`**`(real x, real y, real z)`<br>\newline
+Return z plus the result of x multiplied by y. \[ \text{fma}(x,y,z) =
+(x \times y) + z \]
+
+<!-- real; multiply_log; (real x, real y); -->
+\index{{\tt \bfseries multiply\_log}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`multiply_log`**`(real x, real y)`<br>\newline
+_**Warning:**_ This function is deprecated and should be replaced with
+`lmultiply`. Return the product of x and the natural logarithm of y.
+\[ \mathrm{multiply\_log}(x,y) = \begin{cases} 0 & \text{if } x = y =
+0 \\ x \log y & \text{if } x, y \neq 0 \\ \text{NaN} &
+\text{otherwise} \end{cases} \]
+
+<!-- real; lmultiply; (real x, real y); -->
+\index{{\tt \bfseries lmultiply}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`lmultiply`**`(real x, real y)`<br>\newline
+Return the product of x and the natural logarithm of y. \[
+\text{lmultiply}(x,y) = \begin{cases} 0 & \text{if } x = y = 0 \\ x
+\log y & \text{if } x, y \neq 0 \\ \text{NaN} & \text{otherwise}
+\end{cases} \]
+
+<!-- R; log1p; (T x); -->
+\index{{\tt \bfseries log1p}!{\tt (T x): R}|hyperpage}
+
+`R` **`log1p`**`(T x)`<br>\newline
+natural logarithm of 1 plus x
+
+<!-- R; log1m; (T x); -->
+\index{{\tt \bfseries log1m}!{\tt (T x): R}|hyperpage}
+
+`R` **`log1m`**`(T x)`<br>\newline
+natural logarithm of 1 minus x
+
+<!-- R; log1p_exp; (T x); -->
+\index{{\tt \bfseries log1p\_exp}!{\tt (T x): R}|hyperpage}
+
+`R` **`log1p_exp`**`(T x)`<br>\newline
+natural logarithm of one plus the natural exponentiation of x
+
+<!-- R; log1m_exp; (T x); -->
+\index{{\tt \bfseries log1m\_exp}!{\tt (T x): R}|hyperpage}
+
+`R` **`log1m_exp`**`(T x)`<br>\newline
+logarithm of one minus the natural exponentiation of x
+
+<!-- real; log_diff_exp; (real x, real y); -->
+\index{{\tt \bfseries log\_diff\_exp}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`log_diff_exp`**`(real x, real y)`<br>\newline
+Return the natural logarithm of the difference of the natural
+exponentiation of x and the natural exponentiation of y. \[
+\mathrm{log\_diff\_exp}(x,y) = \begin{cases} \log(\exp(x)-\exp(y)) &
+\text{if } x > y \\[6pt] \textrm{NaN} & \text{otherwise} \end{cases}
+\]
+
+<!-- real; log_mix; (real theta, real lp1, real lp2); -->
+\index{{\tt \bfseries log\_mix}!{\tt (real theta, real lp1, real lp2): real}|hyperpage}
+
+`real` **`log_mix`**`(real theta, real lp1, real lp2)`<br>\newline
+Return the log mixture of the log densities lp1 and lp2 with mixing
+proportion theta, defined by \begin{eqnarray*}
+\mathrm{log\_mix}(\theta, \lambda_1, \lambda_2) & = & \log \!\left(
+\theta \exp(\lambda_1) + \left( 1 - \theta \right) \exp(\lambda_2)
+\right) \\[3pt] & = & \mathrm{log\_sum\_exp}\!\left(\log(\theta) +
+\lambda_1, \ \log(1 - \theta) + \lambda_2\right). \end{eqnarray*}
+
+<!-- real; log_sum_exp; (real x, real y); -->
+\index{{\tt \bfseries log\_sum\_exp}!{\tt (real x, real y): real}|hyperpage}
+
+`real` **`log_sum_exp`**`(real x, real y)`<br>\newline
+Return the natural logarithm of the sum of the natural exponentiation
+of x and the natural exponentiation of y. \[
+\mathrm{log\_sum\_exp}(x,y) = \log(\exp(x)+\exp(y)) \]
+
+<!-- R; log_inv_logit; (T x); -->
+\index{{\tt \bfseries log\_inv\_logit}!{\tt (T x): R}|hyperpage}
+
+`R` **`log_inv_logit`**`(T x)`<br>\newline
+natural logarithm of the inverse logit function of x
+
+<!-- R; log1m_inv_logit; (T x); -->
+\index{{\tt \bfseries log1m\_inv\_logit}!{\tt (T x): R}|hyperpage}
+
+`R` **`log1m_inv_logit`**`(T x)`<br>\newline
+natural logarithm of 1 minus the inverse logit function of x
+

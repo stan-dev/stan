@@ -3,27 +3,11 @@ import org.stan.Utils
 
 def utils = new org.stan.Utils()
 
-def setupCC(failOnError = true) {
+def setupCXX(failOnError = true) {
     errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CC=${env.CXX} ${errorStr}")
+    writeFile(file: "make/local", text: "CXX=${env.CXX} ${errorStr}")
 }
 
-def setup(String pr) {
-    script = """
-        make math-revert
-        make clean-all
-        git clean -xffd
-    """
-    if (pr != '')  {
-        prNumber = pr.tokenize('-').last()
-        script += """
-            cd lib/stan_math
-            git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
-            git checkout refs/remotes/origin/pr/${prNumber}/merge
-        """
-    }
-    return script
-}
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
     if (separateMakeStep) {
@@ -45,6 +29,15 @@ def deleteDirWin() {
 }
 
 String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
+String stan_pr() {
+    if (env.BRANCH_NAME == 'downstream_tests') {
+        ''
+    } else if (env.BRANCH_NAME == 'downstream_hotfix') {
+        'master'
+    } else {
+        env.BRANCH_NAME
+    }
+}
 
 pipeline {
     agent none
@@ -55,7 +48,10 @@ pipeline {
         string(defaultValue: 'downstream_tests', name: 'cmdstan_pr',
           description: 'PR to test CmdStan upstream against e.g. PR-630')
     }
-    options { skipDefaultCheckout() }
+    options {
+        skipDefaultCheckout()
+        preserveStashes(buildCount: 7)
+    }
     stages {
         stage('Kill previous builds') {
             when {
@@ -73,10 +69,16 @@ pipeline {
             agent any
             steps {
                 script {
+                    sh "printenv"
                     retry(3) { checkout scm }
-                    sh setup(params.math_pr)
+                    sh """
+                       make math-revert
+                       make clean-all
+                       git clean -xffd
+                    """
+                    utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
-                    setupCC()
+                    setupCXX()
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
@@ -97,9 +99,9 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCC()
+                            setupCXX()
                             bat "make -j${env.PARALLEL} test-headers"
-                            setupCC(false)
+                            setupCXX(false)
                             runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
@@ -108,7 +110,7 @@ pipeline {
                     agent any
                     steps {
                         unstash 'StanSetup'
-                        setupCC(false)
+                        setupCXX(false)
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -119,18 +121,18 @@ pipeline {
             agent any
             steps {
                 unstash 'StanSetup'
-                setupCC()
+                setupCXX()
                 runTests("src/test/integration", separateMakeStep=false)
             }
             post { always { deleteDir() } }
         }
         stage('Upstream CmdStan tests') {
             when { expression { env.BRANCH_NAME ==~ /PR-\d+/ ||
-                                env.BRANCH_NAME == "downstream_tests" } }
+                                env.BRANCH_NAME == "downstream_tests" ||
+                                env.BRANCH_NAME == "downstream_hotfix" } }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
-                      parameters: [string(name: 'stan_pr',
-                                          value: env.BRANCH_NAME == "downstream_tests" ? '' : env.BRANCH_NAME),
+                      parameters: [string(name: 'stan_pr', value: stan_pr()),
                                    string(name: 'math_pr', value: params.math_pr)])
             }
         }
@@ -138,7 +140,7 @@ pipeline {
             agent { label 'master' }
             steps {
                 unstash 'StanSetup'
-                setupCC()
+                setupCXX()
                 sh """
                     ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance

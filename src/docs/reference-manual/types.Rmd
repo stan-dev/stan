@@ -1,26 +1,3 @@
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(10101010)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
 # Data Types and Declarations {#data-types.chapter}
 
 This chapter covers the data types for expressions in Stan.  Every
@@ -316,9 +293,79 @@ be used for this purpose, or they may be read as data in the dump
 format.
 
 
-### Expressions as Bounds {-}
+### Affinely Transformed Real {-}
 
-Bounds for integer or real variables may be arbitrary expressions.
+Real variables may be declared on a space that has been transformed using an
+affine transformation $x\mapsto \mu + \sigma * x$ with offset $\mu$ and
+(positive) multiplier $\sigma$, using a syntax similar to
+that for bounds.
+While these transforms do not change the asymptotic sampling behaviour of
+the resulting Stan program (in a sense, the model the program implements),
+they can be useful for making the sampling process
+more efficient by transforming the geometry of the problem to a more natural
+multiplier and to a more natural offset for the sampling process,
+for instance by fascilitating a non-centered parameterisation.
+While these affine transformation declarations do not impose a hard constraint
+on variables, they behave like the bounds constraints in many ways and could
+perhaps be viewed as acting as a sort of soft constraint.
+
+The variable `x` may be declared to have offset $1$ as follows.
+
+```stan
+real<offset=1> x;
+```
+
+Similarly, it can be declared to have multiplier $2$ as follows.
+
+```stan
+real<multiplier=2> x;
+```
+
+Finally, we can combine both declarations to declare a variable with offset
+$1$ and multiplier $2$.
+
+```stan
+real<offset=1,multiplier=2> x;
+```
+
+As an example, we can give `x` a normal distribution with non-centered
+parameterization as follows.
+
+```stan
+parameters {
+  real<offset=mu,multiplier=sigma> x;
+}
+model {
+  x ~ normal(mu, sigma);
+}
+```
+
+Recall that the centered parameterization is achieved with the code 
+
+```stan
+parameters {
+  real x;
+}
+model {
+  x ~ normal(mu, sigma);
+}
+```
+
+or equivalently
+
+```stan
+parameters {
+  real<offset=0,multiplier=1> x;
+}
+model {
+  x ~ normal(mu, sigma);
+}
+```
+
+### Expressions as Bounds and Offset/Multiplier{-}
+
+Bounds (and offset and multiplier)
+for integer or real variables may be arbitrary expressions.
 The only requirement is that they only include variables that have
 been declared (though not necessarily defined) before the declaration.
 If the bounds themselves are parameters, the behind-the-scenes
@@ -470,6 +517,11 @@ declaration of a 3-vector of non-negative values.
 vector<lower=0>[3] u;
 ```
 
+Similarly, they may be declared with a offset and/or multiplier, as in the
+following example
+```stan
+vector<offset=42,multiplier=3>[3] u;
+```
 
 ### Unit Simplexes {-}
 
@@ -573,7 +625,11 @@ of a 10-vector with values between -1 and 1.
 ```stan
 row_vector<lower=-1,upper=1>[10] u;
 ```
-
+Offset and multiplier are also similar as for the following 3-row-vector with
+offset -42 and multiplier 3.
+```stan
+row_vector<offset=-42,multiplier=3>[3] u;
+```
 
 Row vectors may not be assigned to column vectors, nor may column
 vectors be assigned to row vectors.  If assignments are required, they
@@ -601,6 +657,11 @@ matrix of non-positive values.
 matrix<upper=0>[3, 4] B;
 ```
 
+Similarly, matrices can be declared to have a set offset and/or multiplier, as in
+this matrix with multiplier 5.
+```stan
+matrix<multiplier=5>[3, 4] B;
+```
 
 #### Assigning to Rows of a Matrix {-}
 

@@ -1,141 +1,3 @@
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(123454321)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(123454321)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(123454321)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(123454321)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(123454321)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
-```{r include=FALSE, cache=FALSE}
-library(ggplot2)
-library(rstan)
-
-set.seed(10101010)
-
-options(digits = 3)
-
-printf <- function(pattern, ...) {
-  cat(sprintf(pattern, ...))
-}
-
-knitr::opts_chunk$set(
-  comment = "#>",
-  collapse = TRUE,
-  cache = TRUE,
-  out.width = "70%",
-  fig.align = 'left',
-  fig.width = 6,
-  fig.asp = 0.618,  # 1 / phi
-  fig.show = "hold"
-)
-```
 # Language Syntax
 
 This chapter defines the basic syntax of the Stan modeling language
@@ -197,24 +59,30 @@ unsized_dims ::= '['  ','*  ']'
 var_decl ::= var_type variable ?dims ?('=' expression) ';'
 
 var_type ::= 'int' range_constraint
-           | 'real' range_constraint
-           | 'vector' range_constraint '[' expression ']'
+           | 'real' constraint
+           | 'vector' constraint '[' expression ']'
            | 'ordered' '[' expression ']'
            | 'positive_ordered' '[' expression ']'
            | 'simplex' '[' expression ']'
            | 'unit_vector' '[' expression ']'
-           | 'row_vector' range_constraint '[' expression ']'
-           | 'matrix' range_constraint '[' expression ',' expression ']'
+           | 'row_vector' constraint '[' expression ']'
+           | 'matrix' constraint '[' expression ',' expression ']'
            | 'cholesky_factor_corr' '[' expression ']'
            | 'cholesky_factor_cov' '[' expression ?(',' expression) ']'
            | 'corr_matrix' '[' expression ']'
            | 'cov_matrix' '[' expression ']'
 
+constraint ::= range_constraint | '<' offset_multiplier '>')
+
 range_constraint ::= ?('<' range '>')
 
-range ::= 'lower' '=' range_expression ',' 'upper' = range_expression
-        | 'lower' '=' range_expression
-        | 'upper' '=' range_expression
+range ::= 'lower' '=' constr_expression ',' 'upper' = constr_expression
+        | 'lower' '=' constr_expression
+        | 'upper' '=' constr_expression
+
+offset_multiplier ::= 'offset' '=' constr_expression ',' 'multiplier' = constr_expression
+            | 'offset' '=' constr_expression
+            | 'multiplier' '=' constr_expression
 
 dims ::= '['  expressions ']'
 
@@ -235,26 +103,26 @@ expression ::= expression `?` expression `:` expression
              | expression postfixOp
              | common_expression
 
-range_expression ::= range_expression arithmeticInfixOp range_expression
-                   | prefixOp range_expression
-                   | range_expression postfixOp
-                   | range_expression '[' indexes ']'
-                   | common_expression
+constr_expression ::= constr_expression arithmeticInfixOp constr_expression
+                    | prefixOp constr_expression
+                    | constr_expression postfixOp
+                    | constr_expression '[' indexes ']'
+                    | common_expression
 
-common_expression ::= real_literal
-                    | variable
-                    | '{' expressions '}'
-                    | '[' expressions ']'
-                    | function_literal '(' ?expressions ')'
-                    | function_literal '(' expression ?('|' expression % ',') ')'
-                    | integrate_ode '(' function_literal (',' expression){6} ')'
-                    | integrate_ode_rk45
-                      '(' function_literal (',' expression){6|9} ')'
-                    | integrate_ode_bdf
-                      '(' function_literal (',' expression){6|9} ')'
-                    | algebra_solver
-                    '(' function_literal (',' expression){4|7} ')'
-                    | '(' expression ')'
+common_expression
+  ::= real_literal
+    | variable
+    | '{' expressions '}'
+    | '[' expressions ']'
+    | function_literal '(' ?expressions ')'
+    | function_literal '(' expression ?('|' expression % ',') ')'
+    | 'integrate_1d' '(' function_literal (',' expression){5|6} ')'
+    | 'integrate_ode' '(' function_literal (',' expression){6} ')'
+    | 'integrate_ode_rk45' '(' function_literal (',' expression){6|9} ')'
+    | 'integrate_ode_bdf' '(' function_literal (',' expression){6|9} ')'
+    | 'algebra_solver' '(' function_literal (',' expression){4|7} ')'
+    | 'map_rect' '(' function_literal (',' expression){4} ')'
+    | '(' expression ')'
 
 prefixOp ::= ('!' | '-' | '+' | '^')
 
@@ -427,6 +295,24 @@ which like the second, fourth, and fifth arguments, must be expressions free
 of parameter references. The final free arguments must be assignable to types
 `real`, `real`, and `int`, respectively.
 
+
+### Integrate 1D argument types and origins {-}
+
+The `integrate_1d` function requires
+
+* its first argument to refer to a function wth signature
+`(real, real, real[], real[], int[]) : real`,
+
+* the remaining six arguments are assignable to types
+`real`, `real`, `real[]`, `real[]`, and `int[]`, and
+
+* the fourth and fifth arguments must be expressions not containing
+any variables not originating in the data or transformed data blocks.
+
+`integrate_1d` can accept an extra argument, which, like the
+fourth and fifth arguments, must be expressions free of parameter
+references. This optional sixth argument must be assignable to a
+`real` type.
 
 ### ODE solver argument types and origins {-}
 

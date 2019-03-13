@@ -1,0 +1,78 @@
+# Circular Distributions
+
+Circular distributions are defined for finite values y in any interval
+of length $2\pi$.
+
+```{r results='asis', echo=FALSE}
+if (knitr::is_html_output()) {
+cat(' * <a href="von-mises-distribution.html">Von Mises Distribution</a>\n')
+}
+```
+
+## Von Mises Distribution
+
+### Probability Density Function
+
+If $\mu \in \mathbb{R}$ and $\kappa \in \mathbb{R}^+$, then for $y \in
+\mathbb{R}$, \[ \text{VonMises}(y|\mu,\kappa) =
+\frac{\exp(\kappa\cos(y-\mu))}{2\pi I_0(\kappa)} \!. \] In order for
+this density to properly normalize, $y$ must be restricted to some
+interval  $(c, c + 2\pi)$ of length $2 \pi$, because \[ \int_{c}^{c +
+2\pi} \text{VonMises}(y|\mu,\kappa) dy = 1. \] Similarly, if $\mu$ is
+a parameter, it will typically be restricted to the same range as $y$.
+
+A von Mises distribution with its $2 \pi$ interval of support centered
+around its location $\mu$ will have a single mode at $\mu$; for
+example, restricting $y$ to $(-\pi,\pi)$ and taking $\mu = 0$ leads to
+a single local optimum at the model $\mu$.  If the location $\mu$ is
+not in the center of the support, the density is circularly translated
+and there will be a second local maximum at the boundary furthest from
+the mode.  Ideally, the parameterization and support will be set up so
+that the bulk of the probability mass is in a continuous interval
+around the mean $\mu$.
+
+### Sampling Statement
+
+`y ~ ` **`von_mises`**`(mu, kappa)`
+
+Increment target log probability density with `von_mises_lpdf( y | mu, kappa)`
+dropping constant additive terms.
+\index{{\tt \bfseries von\_mises}!sampling statement|hyperpage}
+
+### Stan Functions
+
+<!-- R; von_mises_lpdf; (reals y | reals mu, reals kappa); -->
+\index{{\tt \bfseries von\_mises}!{\tt (reals y | reals mu, reals kappa): R}|hyperpage}
+
+`R` **`von_mises_lpdf`**`(reals y | reals mu, reals kappa)`<br>\newline
+The log of the von mises density of y given location mu and scale
+kappa. For a description of argument and return types, see section
+\@ref(prob-vectorization).
+
+<!-- R; von_mises_rng; (reals mu, reals kappa); -->
+\index{{\tt \bfseries von\_mises}!{\tt (reals mu, reals kappa): R}|hyperpage}
+
+`R` **`von_mises_rng`**`(reals mu, reals kappa)`<br>\newline
+Generate a Von Mises variate with location mu and scale kappa (i.e.
+returns values in the interval $[(\mu \mod 2\pi)-\pi,(\mu \mod
+2\pi)+\pi]$); may only be used in generated quantities block. For a
+description of argument and return types, see section
+\@ref(prng-vectorization).
+
+### Numerical Stability
+
+Evaluating the Von Mises distribution for $\kappa > 100$ is
+numerically unstable in the current implementation.  Nathanael I.\
+Lichti suggested the following workaround on the Stan users group,
+based on the fact that as $\kappa \rightarrow \infty$, \[
+\text{VonMises}(y|\mu,\kappa) \rightarrow \text{Normal}(\mu, \sqrt{1 /
+\kappa}). \] The workaround is to replace `y ~ von_mises(mu,kappa)`
+with
+
+```
+ if (kappa < 100)
+   y ~ von_mises(mu, kappa);
+ else
+   y ~ normal(mu, sqrt(1 / kappa));
+```
+

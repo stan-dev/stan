@@ -9,6 +9,7 @@
 #include <stan/lang/ast/node/row_vector_expr.hpp>
 #include <stan/lang/ast/node/variable.hpp>
 #include <stan/lang/ast/node/fun.hpp>
+#include <stan/lang/ast/node/integrate_1d.hpp>
 #include <stan/lang/ast/node/integrate_ode.hpp>
 #include <stan/lang/ast/node/integrate_ode_control.hpp>
 #include <stan/lang/ast/node/algebra_solver.hpp>
@@ -86,6 +87,13 @@ struct expression_bare_type_vis : public boost::static_visitor<bare_expr_type> {
    * @return bare expression type
    */
   bare_expr_type operator()(const fun& e) const;
+
+  /**
+   * Return the bare_expr_type corresponding to this expression
+   *
+   * @return bare expression type
+   */
+  bare_expr_type operator()(const integrate_1d& e) const;
 
   /**
    * Return the bare_expr_type corresponding to this expression
