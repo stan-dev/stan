@@ -523,7 +523,7 @@ namespace stan {
         values.insert(values.begin(), {0, 0, 0});
         parameter_writer(values);
 
-        // Draw more samples from posterior and write on subsequent lines
+        // Draw more from posterior and write on subsequent lines
         logger.info("");
         std::stringstream ss;
         ss << "Drawing a sample of size "
@@ -532,7 +532,7 @@ namespace stan {
         logger.info(ss);
         double log_p = 0;
         double log_g = 0;
-        // Draw posterior samples. log_g is the log normal densities.
+        // Draw posterior sample. log_g is the log normal densities.
         for (int n = 0; n < n_posterior_samples_; ++n) {
           variational.sample_log_g(rng_, cont_params_, log_g);
           for (int i = 0; i < cont_params_.size(); ++i) {
