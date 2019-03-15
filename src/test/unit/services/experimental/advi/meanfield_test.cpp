@@ -80,27 +80,21 @@ TEST_F(ServicesExperimentalAdvi, meanfield) {
   parameter_names = parameter.vector_string_values();
   std::vector<std::vector<double> > parameter_values;
   parameter_values = parameter.vector_double_values();
-  std::vector<std::vector<std::string> > diagnostic_names;
-  diagnostic_names = diagnostic.vector_string_values();
-  std::vector<std::vector<double> > diagnostic_values;
-  diagnostic_values = diagnostic.vector_double_values();
-  
+
   // Expectations of parameter parameter names.
-  ASSERT_EQ(6, parameter_names[0].size());
+  ASSERT_EQ(8, parameter_names[0].size());
   EXPECT_EQ("lp__", parameter_names[0][0]);
   EXPECT_EQ("log_p__", parameter_names[0][1]);
   EXPECT_EQ("log_g__", parameter_names[0][2]);
-  EXPECT_EQ("y", parameter_names[0][3]);
-  EXPECT_EQ("z", parameter_names[0][4]);
-  EXPECT_EQ("xgq", parameter_names[0][5]);
-  
+  EXPECT_EQ("y.1", parameter_names[0][3]);
+  EXPECT_EQ("y.2", parameter_names[0][4]);
+  EXPECT_EQ("z.1", parameter_names[0][5]);
+  EXPECT_EQ("z.2", parameter_names[0][6]);
+  EXPECT_EQ("xgq", parameter_names[0][7]);
+
   // Expect one name per parameter value.
   EXPECT_EQ(parameter_names[0].size(), parameter_values[0].size());
-  EXPECT_EQ(diagnostic_names[0].size(), diagnostic_values[0].size());
-  
-  EXPECT_EQ("lp__", diagnostic_names[0][0]);
-  EXPECT_EQ("log_p__", diagnostic_names[0][1]);
-  
+
   ASSERT_EQ(1, init.vector_double_values().size());
   ASSERT_EQ(2, init.vector_double_values().at(0).size());
   std::vector<double> init_values = init.vector_double_values().at(0);
