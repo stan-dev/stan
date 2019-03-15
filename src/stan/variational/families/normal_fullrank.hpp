@@ -375,14 +375,24 @@ namespace stan {
       void sample_log_g(BaseRNG& rng,
 			Eigen::VectorXd& eta,
 			double& log_g) const {
-	// Draw from the approximation and compute the log density
-        log_g = 0;
+	// Draw from the approximation
         for (int d = 0; d < dimension_; ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
-	  // The log determinant is computed from the Cholesky factor
-          log_g += -stan::math::square(eta(d)) * 0.5 - fabs(L_chol_(d, d));
         }
+	// Compute the log density before transformation
+        log_g = log_g(eta);
+	// Transform to real-coordinate space
         eta = transform(eta);
+      }
+      
+      double log_g(Eigen::VectorXd& eta) const {
+	// Compute the log density wrt normal distribution
+        double log_g = 0;
+        for (int d = 0; d < dimension_; ++d) {
+	  // The log determinant is computed from the Cholesky factor
+          log_g += -stan::math::square(eta(d)) * 0.5 - log(L_chol_(d, d));
+        }
+	return log_g;
       }
       
       /**

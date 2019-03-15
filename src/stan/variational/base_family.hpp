@@ -56,6 +56,16 @@ namespace stan {
       template <class BaseRNG>
       virtual void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
                         double& log_g) const;
+      /**
+       * Compute the log normal density. The constant (d log 2 pi) is dropped. 
+       *
+       * @param[in] eta Vector; dimension has to be the same as the dimension 
+       * of variational q.
+       * @return The log  density in the variational approximation;
+       * The constant term is dropped. 
+       * @throws std::range_error If the index is out of range.
+       */
+      double log_p(const Eigen::VectorXd& eta) const;
       template <class M, class BaseRNG>
       void calc_grad(base_family& elbo_grad,
                      M& m,

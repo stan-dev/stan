@@ -336,13 +336,24 @@ namespace stan {
       void sample_log_g(BaseRNG& rng,
 			Eigen::VectorXd& eta,
 			double& log_g) const {
-	// Draw from the approximation and compute the log density
-	log_g = 0;
+	// Draw from the approximation
+        for (int d = 0; d < dimension_; ++d) {
+          eta(d) = stan::math::normal_rng(0, 1, rng);
+        }
+	// Compute the log density before transformation
+        log_g = log_g(eta);
+	// Transform to real-coordinate space
+        eta = transform(eta);
+      }
+      
+      double log_g(Eigen::VectorXd& eta) const {
+	// Compute the log density with respect to normal distribution
+	double log_g = 0;
 	for (int d = 0; d < dimension_; ++d) {
-	  eta(d) = stan::math::normal_rng(0, 1, rng);
 	  log_g += -stan::math::square(eta(d)) * 0.5;
 	}
-	eta = transform(eta);
+	log_g += omega_.sum();
+	return log_g;
       }
 
       /**
