@@ -331,28 +331,28 @@ namespace stan {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         eta = transform(eta);
       }
-      
+
       template <class BaseRNG>
       void sample_log_g(BaseRNG& rng,
-			Eigen::VectorXd& eta,
-			double& log_g) const {
-	// Draw from the approximation
+                        Eigen::VectorXd& eta,
+                        double& log_g) const {
+        // Draw from the approximation
         for (int d = 0; d < dimension_; ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         }
-	// Compute the log density before transformation
+        // Compute the log density before transformation
         log_g = calc_log_g(eta);
-	// Transform to real-coordinate space
+        // Transform to real-coordinate space
         eta = transform(eta);
       }
-      
+
       double calc_log_g(const Eigen::VectorXd& eta) const {
-	// Compute the log density wrt normal distribution dropping constants
-	double log_g = 0;
-	for (int d = 0; d < dimension_; ++d) {
-	  log_g += -stan::math::square(eta(d)) * 0.5;
-	}
-	return log_g;
+        // Compute the log density wrt normal distribution dropping constants
+        double log_g = 0;
+        for (int d = 0; d < dimension_; ++d) {
+          log_g += -stan::math::square(eta(d)) * 0.5;
+        }
+        return log_g;
       }
 
       /**
