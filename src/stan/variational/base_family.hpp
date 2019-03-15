@@ -40,7 +40,7 @@ namespace stan {
        * @throws std::range_error If the index is out of range.
        */
       template <class BaseRNG>
-      void sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
+      virtual void sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
       /**
        * Draw a posterior sample from the normal distribution, 
        * and return its log normal density. The constant (d log 2 pi) is dropped. 
@@ -54,7 +54,7 @@ namespace stan {
        * @throws std::range_error If the index is out of range.
        */
       template <class BaseRNG>
-      void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
+      virtual void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
                         double& log_g) const;
       template <class M, class BaseRNG>
       void calc_grad(base_family& elbo_grad,
