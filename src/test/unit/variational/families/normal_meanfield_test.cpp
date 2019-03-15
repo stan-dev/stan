@@ -149,7 +149,7 @@ TEST(normal_meanfield_test, log_g) {
   Eigen::Vector3d omega;
   omega << -0.42, 0.8922, 13.4;
 
-  double log_g_true = -81.571249999999992;
+  double log_g_true = -67.699049999999985;
 
   stan::variational::normal_meanfield my_normal_meanfield(mu, omega);
 

@@ -166,7 +166,7 @@ TEST(normal_fullrank_test, log_g) {
 
   stan::variational::normal_fullrank my_normal_fullrank(mu, L);
 
-  double log_g_true = -76.196774908220817;
+  double log_g_true = -67.699049999999985;
 
   const double log_g_out = my_normal_fullrank.log_g(x);
 

@@ -386,11 +386,10 @@ namespace stan {
       }
       
       double log_g(Eigen::VectorXd& eta) const {
-	// Compute the log density wrt normal distribution
+	// Compute the log density wrt normal distribution dropping constants
         double log_g = 0;
         for (int d = 0; d < dimension_; ++d) {
-	  // The log determinant is computed from the Cholesky factor
-          log_g += -stan::math::square(eta(d)) * 0.5 - log(L_chol_(d, d));
+          log_g += -stan::math::square(eta(d)) * 0.5;
         }
 	return log_g;
       }
