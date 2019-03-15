@@ -363,43 +363,28 @@ namespace stan {
         return (L_chol_ * eta) + mu_;
       }
 
-      /**
-       * Set the specified vector to a draw from this variational
-       * approximation using the specified random number generator.
-       *
-       * @tparam BaseRNG Class of random number generator.
-       * @param[in,out] rng Base random number generator.
-       * @param[out] eta Random draw.
-       * @return A sample from the variational distribution.
-       */
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
+        // Draw from standard normal and transform to real-coordinate space
         for (int d = 0; d < dimension_; ++d)
           eta(d) = stan::math::normal_rng(0, 1, rng);
         eta = transform(eta);
       }
 
-      /**
-        * Draw a posterior sample from the normal distribution, 
-        * and return its log normal density. The constant (d log 2 pi) is dropped. 
-        * @param[in] rng Base random number generator.
-        * @param[in, out] eta Vector to which the draw is assigned; must
-        * already be properly sized. eta will be transformed into variational posteriors. 
-        * @param[out] log_g The log density in the full-rank normal approximation.
-        * The constant term is dropped. 
-        * @throws std::range_error If the index is out of range.
-        */
       template <class BaseRNG>
       void sample_log_g(BaseRNG& rng,
-                       Eigen::VectorXd& eta,
-                       double& log_g) const {
+			Eigen::VectorXd& eta,
+			double& log_g) const {
+	// Draw from the approximation and compute the log density
         log_g = 0;
         for (int d = 0; d < dimension_; ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
-          log_g+= stan::math::square(eta(d))*(-0.5)- fabs(L_chol_(d, d));
+	  // The log determinant is computed from the Cholesky factor
+          log_g += stan::math::square(eta(d))*(-0.5) - fabs(L_chol_(d, d));
         }
         eta = transform(eta);
       }
+      
       /**
        * Calculates the "blackbox" gradient with respect to BOTH the
        * location vector (mu) and the cholesky factor of the scale
