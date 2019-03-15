@@ -340,7 +340,7 @@ namespace stan {
 	log_g = 0;
 	for (int d = 0; d < dimension_; ++d) {
 	  eta(d) = stan::math::normal_rng(0, 1, rng);
-	  log_g += stan::math::square(eta(d))*(-0.5);
+	  log_g += -stan::math::square(eta(d)) * 0.5;
 	}
 	eta = transform(eta);
       }

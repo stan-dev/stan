@@ -380,7 +380,7 @@ namespace stan {
         for (int d = 0; d < dimension_; ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
 	  // The log determinant is computed from the Cholesky factor
-          log_g += stan::math::square(eta(d))*(-0.5) - fabs(L_chol_(d, d));
+          log_g += -stan::math::square(eta(d)) * 0.5 - fabs(L_chol_(d, d));
         }
         eta = transform(eta);
       }
