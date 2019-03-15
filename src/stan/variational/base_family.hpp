@@ -32,8 +32,8 @@ namespace stan {
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
       template <class BaseRNG>
-      void sample_log_q(BaseRNG& rng, Eigen::VectorXd& eta,
-                        double& log_q) const;
+      void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
+                        double& log_g) const;
       template <class M, class BaseRNG>
       void calc_grad(base_family& elbo_grad,
                      M& m,

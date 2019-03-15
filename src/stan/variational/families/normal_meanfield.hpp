@@ -347,19 +347,19 @@ namespace stan {
          * @param[in] rng Base random number generator.
          * @param[in, out] eta Vector to which the draw is assigned; must already
          * be properly sized. eta will be transformed into variational posteriors.
-         * @param[out] log_q The log  density in the mean-field normal approximation;
+         * @param[out] log_g The log  density in the mean-field normal approximation;
          * The constant term is removed. 
          * @throws std::range_error If the index is out of range.
          */
         template <class BaseRNG>
-        void sample_log_q(BaseRNG& rng,
+        void sample_log_g(BaseRNG& rng,
                        Eigen::VectorXd& eta,
-                       double& log_q)
+                       double& log_g)
         const {
-                log_q = 0;
+                log_g = 0;
                 for (int d = 0; d < dimension_; ++d) {
                   eta(d) = stan::math::normal_rng(0, 1, rng);
-                  log_q += stan::math::square(eta(d))*(-0.5);
+                  log_g += stan::math::square(eta(d))*(-0.5);
                 }
             eta = transform(eta);
         }

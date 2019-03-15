@@ -519,7 +519,7 @@ namespace stan {
         if (msg.str().length() > 0)
           logger.info(msg);
 
-        // The first row of lp_, log_p, and log_q.
+        // The first row of lp_, log_p, and log_g.
         values.insert(values.begin(), {0, 0, 0});
         parameter_writer(values);
 
@@ -531,10 +531,10 @@ namespace stan {
            << " from the approximate posterior... ";
         logger.info(ss);
         double log_p = 0;
-        double log_q = 0;
-        // Draw posterior samples. log_q is the log normal densities.
+        double log_g = 0;
+        // Draw posterior samples. log_g is the log normal densities.
         for (int n = 0; n < n_posterior_samples_; ++n) {
-          variational.sample_log_q(rng_, cont_params_, log_q);
+          variational.sample_log_g(rng_, cont_params_, log_g);
           for (int i = 0; i < cont_params_.size(); ++i) {
             cont_vector.at(i) = cont_params_(i);
           }
@@ -545,8 +545,8 @@ namespace stan {
           log_p = model_.template log_prob<false, true>(cont_params_, &msg2);
           if (msg2.str().length() > 0)
             logger.info(msg2);
-         // Write lp__, log_p, and log_q.
-          values.insert(values.begin(), {0, log_p, log_q});
+         // Write lp__, log_p, and log_g.
+          values.insert(values.begin(), {0, log_p, log_g});
           parameter_writer(values);
         }
         logger.info("COMPLETED.");
