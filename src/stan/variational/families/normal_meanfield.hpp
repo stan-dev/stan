@@ -352,7 +352,7 @@ namespace stan {
 	for (int d = 0; d < dimension_; ++d) {
 	  log_g += -stan::math::square(eta(d)) * 0.5;
 	}
-	log_g += omega_.sum();
+	log_g += -omega_.sum();
 	return log_g;
       }
 
