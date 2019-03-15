@@ -341,12 +341,12 @@ namespace stan {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         }
 	// Compute the log density before transformation
-        log_g = log_g(eta);
+        log_g = calc_log_g(eta);
 	// Transform to real-coordinate space
         eta = transform(eta);
       }
       
-      double log_g(Eigen::VectorXd& eta) const {
+      double calc_log_g(const Eigen::VectorXd& eta) const {
 	// Compute the log density wrt normal distribution dropping constants
 	double log_g = 0;
 	for (int d = 0; d < dimension_; ++d) {

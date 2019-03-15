@@ -40,7 +40,7 @@ namespace stan {
        * @throws std::range_error If the index is out of range.
        */
       template <class BaseRNG>
-      virtual void sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
+      void sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
       /**
        * Draw a posterior sample from the normal distribution, 
        * and return its log normal density. The constant (d log 2 pi) is dropped. 
@@ -54,10 +54,10 @@ namespace stan {
        * @throws std::range_error If the index is out of range.
        */
       template <class BaseRNG>
-      virtual void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
+      void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
                         double& log_g) const;
       /**
-       * Compute the log normal density. The constant (d log 2 pi) is dropped. 
+       * Compute the log normal density. The constant is dropped. 
        *
        * @param[in] eta Vector; dimension has to be the same as the dimension 
        * of variational q.
@@ -65,7 +65,7 @@ namespace stan {
        * The constant term is dropped. 
        * @throws std::range_error If the index is out of range.
        */
-      double log_p(const Eigen::VectorXd& eta) const;
+      double calc_log_g(const Eigen::VectorXd& eta) const;
       template <class M, class BaseRNG>
       void calc_grad(base_family& elbo_grad,
                      M& m,
