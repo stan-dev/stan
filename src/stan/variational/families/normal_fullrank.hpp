@@ -419,7 +419,8 @@ namespace stan {
                         "Dimension of variables in model", cont_params.size());
 
         Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(dimension());
-        Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(dimension(), dimension());
+        Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(dimension(),
+                                                        dimension());
         double tmp_lp = 0.0;
         Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension());
         Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension());

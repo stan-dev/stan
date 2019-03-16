@@ -18,7 +18,7 @@ namespace stan {
 
     public:
       // Constructors
-      base_family(size_t dimension)
+      explicit base_family(size_t dimension)
         : dimension_(dimension) {}
 
       /**
@@ -38,9 +38,9 @@ namespace stan {
       base_family operator*=(double scalar);
 
       // Distribution-based operations
-      virtual const Eigen::VectorXd& mean() const {};
-      virtual double entropy() const {};
-      virtual Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {};
+      virtual const Eigen::VectorXd& mean() const {}
+      virtual double entropy() const {}
+      virtual Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {}
       /**
        * Assign a draw from this mean field approximation to the
        * specified vector using the specified random number generator.
