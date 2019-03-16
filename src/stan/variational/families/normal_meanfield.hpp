@@ -29,11 +29,6 @@ namespace stan {
        */
       Eigen::VectorXd omega_;
 
-      /**
-       * Dimensionality of distribution.
-       */
-      const int dimension_;
-
     public:
       /**
        * Construct a variational distribution of the specified
@@ -45,7 +40,7 @@ namespace stan {
       explicit normal_meanfield(size_t dimension)
         : mu_(Eigen::VectorXd::Zero(dimension)),
           omega_(Eigen::VectorXd::Zero(dimension)),
-          dimension_(dimension) {
+          base_family(dimension) {
       }
 
       /**
@@ -58,7 +53,7 @@ namespace stan {
       explicit normal_meanfield(const Eigen::VectorXd& cont_params)
         : mu_(cont_params),
           omega_(Eigen::VectorXd::Zero(cont_params.size())),
-          dimension_(cont_params.size()) {
+          base_family(cont_params.size()) {
       }
 
       /**
@@ -73,21 +68,15 @@ namespace stan {
        */
       normal_meanfield(const Eigen::VectorXd& mu,
                        const Eigen::VectorXd& omega)
-        : mu_(mu), omega_(omega), dimension_(mu.size()) {
+        : mu_(mu), omega_(omega), base_family(mu.size()) {
         static const char* function =
           "stan::variational::normal_meanfield";
         stan::math::check_size_match(function,
-                             "Dimension of mean vector", dimension_,
+                             "Dimension of mean vector", mu_.size(),
                              "Dimension of log std vector", omega_.size() );
         stan::math::check_not_nan(function, "Mean vector", mu_);
         stan::math::check_not_nan(function, "Log std vector", omega_);
       }
-
-      /**
-       * Return the dimensionality of the approximation.
-       */
-      int dimension() const { return dimension_; }
-
       /**
        * Return the mean vector.
        */
@@ -112,7 +101,7 @@ namespace stan {
 
         stan::math::check_size_match(function,
                                "Dimension of input vector", mu.size(),
-                               "Dimension of current vector", dimension_);
+                               "Dimension of current vector", dimension());
         stan::math::check_not_nan(function, "Input vector", mu);
         mu_ = mu;
       }
@@ -132,7 +121,7 @@ namespace stan {
 
         stan::math::check_size_match(function,
                                "Dimension of input vector", omega.size(),
-                               "Dimension of current vector", dimension_);
+                               "Dimension of current vector", dimension());
         stan::math::check_not_nan(function, "Input vector", omega);
         omega_ = omega;
       }
@@ -142,8 +131,8 @@ namespace stan {
        * approximation to zero.
        */
       void set_to_zero() {
-        mu_ = Eigen::VectorXd::Zero(dimension_);
-        omega_ = Eigen::VectorXd::Zero(dimension_);
+        mu_ = Eigen::VectorXd::Zero(dimension());
+        omega_ = Eigen::VectorXd::Zero(dimension());
       }
 
       /**
@@ -187,7 +176,7 @@ namespace stan {
         static const char* function =
           "stan::variational::normal_meanfield::operator=";
         stan::math::check_size_match(function,
-                             "Dimension of lhs", dimension_,
+                             "Dimension of lhs", dimension(),
                              "Dimension of rhs", rhs.dimension());
         mu_ = rhs.mu();
         omega_ = rhs.omega();
@@ -209,7 +198,7 @@ namespace stan {
         static const char* function =
           "stan::variational::normal_meanfield::operator+=";
         stan::math::check_size_match(function,
-                             "Dimension of lhs", dimension_,
+                             "Dimension of lhs", dimension(),
                              "Dimension of rhs", rhs.dimension());
         mu_ += rhs.mu();
         omega_ += rhs.omega();
@@ -233,7 +222,7 @@ namespace stan {
         static const char* function =
           "stan::variational::normal_meanfield::operator/=";
         stan::math::check_size_match(function,
-                             "Dimension of lhs", dimension_,
+                             "Dimension of lhs", dimension(),
                              "Dimension of rhs", rhs.dimension());
         mu_.array() /= rhs.mu().array();
         omega_.array() /= rhs.omega().array();
@@ -297,7 +286,7 @@ namespace stan {
        * @return Entropy of this approximation.
        */
       double entropy() const {
-        return 0.5 * static_cast<double>(dimension_) *
+        return 0.5 * static_cast<double>(dimension()) *
                (1.0 + stan::math::LOG_TWO_PI) + omega_.sum();
       }
 
@@ -317,42 +306,11 @@ namespace stan {
         static const char* function =
           "stan::variational::normal_meanfield::transform";
         stan::math::check_size_match(function,
-                         "Dimension of mean vector", dimension_,
+                         "Dimension of mean vector", dimension(),
                          "Dimension of input vector", eta.size() );
         stan::math::check_not_nan(function, "Input vector", eta);
         // exp(omega) * eta + mu
         return eta.array().cwiseProduct(omega_.array().exp()) + mu_.array();
-      }
-
-      template <class BaseRNG>
-      void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
-        // Draw from standard normal and transform to real-coordinate space
-        for (int d = 0; d < dimension_; ++d)
-          eta(d) = stan::math::normal_rng(0, 1, rng);
-        eta = transform(eta);
-      }
-
-      template <class BaseRNG>
-      void sample_log_g(BaseRNG& rng,
-                        Eigen::VectorXd& eta,
-                        double& log_g) const {
-        // Draw from the approximation
-        for (int d = 0; d < dimension_; ++d) {
-          eta(d) = stan::math::normal_rng(0, 1, rng);
-        }
-        // Compute the log density before transformation
-        log_g = calc_log_g(eta);
-        // Transform to real-coordinate space
-        eta = transform(eta);
-      }
-
-      double calc_log_g(const Eigen::VectorXd& eta) const {
-        // Compute the log density wrt normal distribution dropping constants
-        double log_g = 0;
-        for (int d = 0; d < dimension_; ++d) {
-          log_g += -stan::math::square(eta(d)) * 0.5;
-        }
-        return log_g;
       }
 
       /**
@@ -386,23 +344,23 @@ namespace stan {
 
         stan::math::check_size_match(function,
                         "Dimension of elbo_grad", elbo_grad.dimension(),
-                        "Dimension of variational q", dimension_);
+                        "Dimension of variational q", dimension());
         stan::math::check_size_match(function,
-                        "Dimension of variational q", dimension_,
+                        "Dimension of variational q", dimension(),
                         "Dimension of variables in model", cont_params.size());
 
-        Eigen::VectorXd mu_grad    = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd omega_grad = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd mu_grad    = Eigen::VectorXd::Zero(dimension());
+        Eigen::VectorXd omega_grad = Eigen::VectorXd::Zero(dimension());
         double tmp_lp = 0.0;
-        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd eta  = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension());
+        Eigen::VectorXd eta  = Eigen::VectorXd::Zero(dimension());
+        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension());
 
         // Naive Monte Carlo integration
         static const int n_retries = 10;
         for (int i = 0, n_monte_carlo_drop = 0; i < n_monte_carlo_grad; ) {
           // Draw from standard normal and transform to real-coordinate space
-          for (int d = 0; d < dimension_; ++d)
+          for (int d = 0; d < dimension(); ++d)
             eta(d) = stan::math::normal_rng(0, 1, rng);
           zeta = transform(eta);
           try {

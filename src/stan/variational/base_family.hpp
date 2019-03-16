@@ -10,9 +10,21 @@ namespace stan {
   namespace variational {
 
     class base_family {
+    private:
+      /**
+       * Dimensionality of distribution.
+       */
+      const int dimension_;
+
     public:
       // Constructors
-      base_family() {}
+      base_family(size_t dimension)
+        : dimension_(dimension) {}
+
+      /**
+       * Return the dimensionality of the approximation.
+       */
+      int dimension() const { return dimension_; }
 
       // Operations
       base_family square() const;
@@ -26,9 +38,9 @@ namespace stan {
       base_family operator*=(double scalar);
 
       // Distribution-based operations
-      const Eigen::VectorXd& mean() const;
-      double entropy() const;
-      Eigen::VectorXd transform(const Eigen::VectorXd& eta) const;
+      virtual const Eigen::VectorXd& mean() const {};
+      virtual double entropy() const {};
+      virtual Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {};
       /**
        * Assign a draw from this mean field approximation to the
        * specified vector using the specified random number generator.
@@ -40,32 +52,52 @@ namespace stan {
        * @throws std::range_error If the index is out of range.
        */
       template <class BaseRNG>
-      void sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
+      void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
+        // Draw from standard normal and transform to real-coordinate space
+        for (int d = 0; d < dimension_; ++d)
+          eta(d) = stan::math::normal_rng(0, 1, rng);
+        eta = transform(eta);
+      }
       /**
-       * Draw a posterior sample from the normal distribution, 
-       * and return its log normal density. The constant (d log 2 pi) is dropped. 
+       * Draw a posterior sample from the normal distribution,
+       * and return its log normal density. The constants are dropped.
        *
        * @param[in] rng Base random number generator.
        * @param[out] eta Vector to which the draw is assigned; dimension has to be
        * the same as the dimension of variational q. eta will be transformed into
        * variational posteriors.
        * @param[out] log_g The log  density in the variational approximation;
-       * The constant term is dropped. 
+       * The constant term is dropped.
        * @throws std::range_error If the index is out of range.
        */
       template <class BaseRNG>
-      void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
-                        double& log_g) const;
+      void sample_log_g(BaseRNG& rng,
+                        Eigen::VectorXd& eta,
+                        double& log_g) const {
+        // Draw from the approximation
+        for (int d = 0; d < dimension_; ++d) {
+          eta(d) = stan::math::normal_rng(0, 1, rng);
+        }
+        // Compute the log density before transformation
+        log_g = calc_log_g(eta);
+        // Transform to real-coordinate space
+        eta = transform(eta);
+      }
       /**
-       * Compute the log normal density. The constant is dropped. 
+       * Compute the unnormalized log unit normal density wrt eta. All constants are dropped.
        *
-       * @param[in] eta Vector; dimension has to be the same as the dimension 
+       * @param[in] eta Vector; dimension has to be the same as the dimension
        * of variational q.
-       * @return The log  density in the variational approximation;
-       * The constant term is dropped. 
+       * @return The unnormalized log density in the variational approximation;
        * @throws std::range_error If the index is out of range.
        */
-      double calc_log_g(const Eigen::VectorXd& eta) const;
+      double calc_log_g(const Eigen::VectorXd& eta) const {
+        double log_g = 0;
+        for (int d = 0; d < dimension_; ++d) {
+          log_g += -stan::math::square(eta(d)) * 0.5;
+        }
+        return log_g;
+      }
       template <class M, class BaseRNG>
       void calc_grad(base_family& elbo_grad,
                      M& m,
