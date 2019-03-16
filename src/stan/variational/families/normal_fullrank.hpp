@@ -31,6 +31,11 @@ namespace stan {
       Eigen::MatrixXd L_chol_;
 
       /**
+       * Dimensionality of distribution.
+       */
+      const int dimension_;
+
+      /**
        * Raise a domain exception if the specified vector contains
        * not-a-number values.
        *
@@ -83,7 +88,7 @@ namespace stan {
       explicit normal_fullrank(size_t dimension)
       : mu_(Eigen::VectorXd::Zero(dimension)),
         L_chol_(Eigen::MatrixXd::Zero(dimension, dimension)),
-        base_family(dimension) {
+        dimension_(dimension) {
       }
 
 
@@ -97,7 +102,7 @@ namespace stan {
       : mu_(cont_params),
         L_chol_(Eigen::MatrixXd::Identity(cont_params.size(),
                                           cont_params.size())),
-        base_family(cont_params.size()) {
+        dimension_(cont_params.size()) {
       }
 
       /**
@@ -116,11 +121,16 @@ namespace stan {
        */
       normal_fullrank(const Eigen::VectorXd& mu,
                       const Eigen::MatrixXd& L_chol)
-      : mu_(mu), L_chol_(L_chol),  base_family(mu.size()) {
+      : mu_(mu), L_chol_(L_chol),  dimension_(mu.size()) {
         static const char* function = "stan::variational::normal_fullrank";
         validate_mean(function, mu);
         validate_cholesky_factor(function, L_chol);
       }
+
+      /**
+       * Return the dimensionality of the approximation.
+       */
+      int dimension() const { return dimension_; }
 
       /**
        * Return the mean vector.

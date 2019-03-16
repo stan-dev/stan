@@ -10,37 +10,19 @@ namespace stan {
   namespace variational {
 
     class base_family {
-    private:
-      /**
-       * Dimensionality of distribution.
-       */
-      const int dimension_;
-
     public:
       // Constructors
-      explicit base_family(size_t dimension)
-        : dimension_(dimension) {}
+      base_family() {}
 
       /**
        * Return the dimensionality of the approximation.
        */
-      int dimension() const { return dimension_; }
-
-      // Operations
-      base_family square() const;
-      base_family sqrt() const;
-
-      // Compound assignment operators
-      base_family operator=(const base_family& rhs);
-      base_family operator+=(const base_family& rhs);
-      base_family operator/=(const base_family& rhs);
-      base_family operator+=(double scalar);
-      base_family operator*=(double scalar);
+      virtual int dimension() const = 0;
 
       // Distribution-based operations
-      virtual const Eigen::VectorXd& mean() const {}
-      virtual double entropy() const {}
-      virtual Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {}
+      virtual const Eigen::VectorXd& mean() const = 0;
+      virtual double entropy() const  = 0;
+      virtual Eigen::VectorXd transform(const Eigen::VectorXd& eta) const = 0;
       /**
        * Assign a draw from this mean field approximation to the
        * specified vector using the specified random number generator.
@@ -54,7 +36,7 @@ namespace stan {
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
         // Draw from standard normal and transform to real-coordinate space
-        for (int d = 0; d < dimension_; ++d)
+        for (int d = 0; d < dimension(); ++d)
           eta(d) = stan::math::normal_rng(0, 1, rng);
         eta = transform(eta);
       }
@@ -75,7 +57,7 @@ namespace stan {
                         Eigen::VectorXd& eta,
                         double& log_g) const {
         // Draw from the approximation
-        for (int d = 0; d < dimension_; ++d) {
+        for (int d = 0; d < dimension(); ++d) {
           eta(d) = stan::math::normal_rng(0, 1, rng);
         }
         // Compute the log density before transformation
@@ -93,7 +75,7 @@ namespace stan {
        */
       double calc_log_g(const Eigen::VectorXd& eta) const {
         double log_g = 0;
-        for (int d = 0; d < dimension_; ++d) {
+        for (int d = 0; d < dimension(); ++d) {
           log_g += -stan::math::square(eta(d)) * 0.5;
         }
         return log_g;
@@ -126,11 +108,6 @@ namespace stan {
       }
     };
 
-    // Arithmetic operators
-    base_family operator+(base_family lhs, const base_family& rhs);
-    base_family operator/(base_family lhs, const base_family& rhs);
-    base_family operator+(double scalar, base_family rhs);
-    base_family operator*(double scalar, base_family rhs);
   }  // variational
 }  // stan
 #endif

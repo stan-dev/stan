@@ -29,6 +29,11 @@ namespace stan {
        */
       Eigen::VectorXd omega_;
 
+      /**
+       * Dimensionality of distribution.
+       */
+      const int dimension_;
+
     public:
       /**
        * Construct a variational distribution of the specified
@@ -40,7 +45,7 @@ namespace stan {
       explicit normal_meanfield(size_t dimension)
         : mu_(Eigen::VectorXd::Zero(dimension)),
           omega_(Eigen::VectorXd::Zero(dimension)),
-          base_family(dimension) {
+          dimension_(dimension) {
       }
 
       /**
@@ -53,7 +58,7 @@ namespace stan {
       explicit normal_meanfield(const Eigen::VectorXd& cont_params)
         : mu_(cont_params),
           omega_(Eigen::VectorXd::Zero(cont_params.size())),
-          base_family(cont_params.size()) {
+          dimension_(cont_params.size()) {
       }
 
       /**
@@ -68,7 +73,7 @@ namespace stan {
        */
       normal_meanfield(const Eigen::VectorXd& mu,
                        const Eigen::VectorXd& omega)
-        : mu_(mu), omega_(omega), base_family(mu.size()) {
+        : mu_(mu), omega_(omega), dimension_(mu.size()) {
         static const char* function =
           "stan::variational::normal_meanfield";
         stan::math::check_size_match(function,
@@ -77,6 +82,12 @@ namespace stan {
         stan::math::check_not_nan(function, "Mean vector", mu_);
         stan::math::check_not_nan(function, "Log std vector", omega_);
       }
+
+      /**
+       * Return the dimensionality of the approximation.
+       */
+      int dimension() const { return dimension_; }
+
       /**
        * Return the mean vector.
        */
