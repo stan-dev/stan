@@ -308,13 +308,13 @@ Return 1 if x is greater than or equal to y and 0 otherwise. \[
 \text{otherwise} \end{cases} \]
 
 <!-- int; operator==; (int x, int y); -->
-\index{{\tt \bfseries operator\_logial\_equal}!{\tt (int x, int y): int}|hyperpage}
+\index{{\tt \bfseries operator\_logical\_equal}!{\tt (int x, int y): int}|hyperpage}
 
 `int` **`operator==`**`(int x, int y)`<br>\newline
 
 
 <!-- int; operator==; (real x, real y); -->
-\index{{\tt \bfseries operator\_logial\_equal}!{\tt (real x, real y): int}|hyperpage}
+\index{{\tt \bfseries operator\_logical\_equal}!{\tt (real x, real y): int}|hyperpage}
 
 `int` **`operator==`**`(real x, real y)`<br>\newline
 Return 1 if x is equal to y and 0 otherwise. \[ \text{operator==}(x,y)

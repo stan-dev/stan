@@ -349,7 +349,7 @@ def clean(name):
         return name[0:(len(name)-4)]
     if (not name.startswith("operator")):
         return name
-    name = name.replace("==","_logial_equal")
+    name = name.replace("==","_logical_equal")
     name = name.replace("!=","_logical_not_equal")
     name = name.replace("!","_negation")
     name = name.replace("<=","_logical_less_than_equal")
