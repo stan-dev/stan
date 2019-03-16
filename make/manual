@@ -1,4 +1,4 @@
-.PHONY: manual doc reference-manual functions-reference
+.PHONY: manual doc reference-manual functions-reference stan-functions
 
 STAN_MAJOR := $(shell grep "\#define STAN_MAJOR" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_MAJOR \(.*\)/\1/')
 STAN_MINOR := $(shell grep "\#define STAN_MINOR" $(STAN)src/stan/version.hpp | sed -e 's/.*STAN_MINOR \(.*\)/\1/')
@@ -7,11 +7,51 @@ VERSION_STRING := $(STAN_MAJOR).$(STAN_MINOR).$(STAN_PATCH)
 
 manual: doc
 
-doc: reference-manual functions-reference
+doc: reference-manual functions-reference stan-functions
 
 reference-manual: doc/reference-manual-$(VERSION_STRING).pdf $(STAN)doc/reference-manual/index.html
 
 functions-reference: doc/functions-reference-$(VERSION_STRING).pdf $(STAN)doc/functions/index.html
+
+stan-functions:
+	@grep --no-filename "hyperpage" $(STAN)src/docs/functions/*.Rmd > doc/functions/stan-functions.txt
+	@sed -i.bak 's/\\index{{\\tt \\bfseries //g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/}!{\\tt //g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/}|hyperpage}//g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/\\_/_/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/: /;/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/(/;(/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/}!sampling statement|hyperpage}/~;real/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/~|~/|/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_compound_add/operator+=/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_compound_subtract/operator-=/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_compound_multiply/operator*=/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_compound_divide/operator\/=/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_compound_elt_multiply/operator.*=/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_compound_elt_divide/operator.\/=/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_subtract/operator-/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_add/operator+/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_multiply/operator*/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_divide/operator\//g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_elt_divide/operator.\//g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_elt_multiply/operator.*/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_left_div/operator\\/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_logical_and/operator\&\&/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_logical_or/operator||/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_logical_greater_than_equal/operator>=/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_logical_less_than_equal/operator<=/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_logical_greater_than/operator>/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_logical_less_than/operator</g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_logical_not_equal/operator!=/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_logical_equal/operator==/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_mod/operator%/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_negation/operator!/g' doc/functions/stan-functions.txt
+	@sed -i.bak 's/operator_pow/operator^/g' doc/functions/stan-functions.txt
+	@sed -i.bak "s/operator_transpose/operator'/g" doc/functions/stan-functions.txt
+	@sort doc/functions/stan-functions.txt | uniq > doc/functions/stan-functions.txt.bak
+	@echo "# This file is semicolon delimited\nStanFunction;Arguments;ReturnType" > doc/functions/stan-functions.txt
+	@cat doc/functions/stan-functions.txt.bak >> doc/functions/stan-functions.txt
+	@rm doc/functions/stan-functions.txt.bak
 
 %.pdf: %.tex
 	cd $(dir $@); latexmk -pdf -pdflatex="pdflatex -file-line-error" -use-make $(notdir $^)
@@ -52,3 +92,4 @@ clean-docs:
 	rm -rf $(STAN)src/docs/reference-manual/reference-manual.pdf
 	rm -rf $(STAN)src/docs/reference-manual/_book/
 	rm -rf $(STAN)src/docs/reference-manual/_main.rds
+	rm -rf $(STAN)src/docs/functions/stan-functions.txt
