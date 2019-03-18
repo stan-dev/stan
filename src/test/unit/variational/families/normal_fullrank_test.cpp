@@ -151,3 +151,25 @@ TEST(normal_fullrank_test, transform) {
   EXPECT_THROW(my_normal_fullrank.transform(x_nan);,
                    std::domain_error);
 }
+
+TEST(normal_fullrank_test, calc_log_g) {
+  Eigen::Vector3d x;
+  x << 7.1, -9.2, 0.59;
+  
+  Eigen::Vector3d mu;
+  mu << 5.7, -3.2, 0.1332;
+
+  Eigen::Matrix3d L;
+  L << 1.3, 0,  0,
+       2.3, 41, 0,
+       3.3, 42, 92;
+
+  stan::variational::normal_fullrank my_normal_fullrank(mu, L);
+
+  double log_g_true = -67.699049999999985;
+
+  const double log_g_out = my_normal_fullrank.calc_log_g(x);
+
+  EXPECT_FLOAT_EQ(log_g_out, log_g_true);
+}
+

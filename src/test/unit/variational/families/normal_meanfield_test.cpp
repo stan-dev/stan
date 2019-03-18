@@ -138,3 +138,23 @@ TEST(normal_meanfield_test, transform) {
   EXPECT_THROW(my_normal_meanfield.transform(x_nan);,
                    std::domain_error);
 }
+
+TEST(normal_meanfield_test, calc_log_g) {
+  Eigen::Vector3d x;
+  x << 7.1, -9.2, 0.59;
+  
+  Eigen::Vector3d mu;
+  mu << 5.7, -3.2, 0.1332;
+
+  Eigen::Vector3d omega;
+  omega << -0.42, 0.8922, 13.4;
+
+  double log_g_true = -67.699049999999985;
+
+  stan::variational::normal_meanfield my_normal_meanfield(mu, omega);
+
+  const double log_g_out = my_normal_meanfield.calc_log_g(x);
+
+  EXPECT_FLOAT_EQ(log_g_out, log_g_true);
+
+}

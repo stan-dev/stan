@@ -70,6 +70,8 @@ namespace stan {
 
           std::vector<std::string> names;
           names.push_back("lp__");
+          names.push_back("log_p__");
+          names.push_back("log_g__");
           model.constrained_param_names(names, true, true);
           parameter_writer(names);
 

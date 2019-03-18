@@ -48,7 +48,7 @@ namespace stan {
         stan::math::check_not_nan(function, "Mean vector", mu);
         stan::math::check_size_match(function,
                                "Dimension of input vector", mu.size(),
-                               "Dimension of current vector", dimension_);
+                               "Dimension of current vector", dimension());
       }
 
       /**
@@ -71,7 +71,7 @@ namespace stan {
         stan::math::check_lower_triangular(function,
                                "Cholesky factor", L_chol);
         stan::math::check_size_match(function,
-                               "Dimension of mean vector", dimension_,
+                               "Dimension of mean vector", dimension(),
                                "Dimension of Cholesky factor", L_chol.rows());
         stan::math::check_not_nan(function, "Cholesky factor", L_chol);
       }
@@ -175,8 +175,8 @@ namespace stan {
        * matrix to zero.
        */
       void set_to_zero() {
-        mu_ = Eigen::VectorXd::Zero(dimension_);
-        L_chol_ = Eigen::MatrixXd::Zero(dimension_, dimension_);
+        mu_ = Eigen::VectorXd::Zero(dimension());
+        L_chol_ = Eigen::MatrixXd::Zero(dimension(), dimension());
       }
 
       /**
@@ -220,7 +220,7 @@ namespace stan {
         static const char* function =
           "stan::variational::normal_fullrank::operator=";
         stan::math::check_size_match(function,
-                             "Dimension of lhs", dimension_,
+                             "Dimension of lhs", dimension(),
                              "Dimension of rhs", rhs.dimension());
         mu_ = rhs.mu();
         L_chol_ = rhs.L_chol();
@@ -242,7 +242,7 @@ namespace stan {
         static const char* function =
           "stan::variational::normal_fullrank::operator+=";
         stan::math::check_size_match(function,
-                             "Dimension of lhs", dimension_,
+                             "Dimension of lhs", dimension(),
                              "Dimension of rhs", rhs.dimension());
         mu_ += rhs.mu();
         L_chol_ += rhs.L_chol();
@@ -267,7 +267,7 @@ namespace stan {
           "stan::variational::normal_fullrank::operator/=";
 
         stan::math::check_size_match(function,
-                             "Dimension of lhs", dimension_,
+                             "Dimension of lhs", dimension(),
                              "Dimension of rhs", rhs.dimension());
 
         mu_.array() /= rhs.mu().array();
@@ -332,8 +332,8 @@ namespace stan {
        */
       double entropy() const {
         static double mult = 0.5 * (1.0 + stan::math::LOG_TWO_PI);
-        double result = mult * dimension_;
-        for (int d = 0; d < dimension_; ++d) {
+        double result = mult * dimension();
+        for (int d = 0; d < dimension(); ++d) {
           double tmp = fabs(L_chol_(d, d));
           if (tmp != 0.0) result += log(tmp);
         }
@@ -357,26 +357,41 @@ namespace stan {
           "stan::variational::normal_fullrank::transform";
         stan::math::check_size_match(function,
                          "Dimension of input vector", eta.size(),
-                         "Dimension of mean vector",  dimension_);
+                         "Dimension of mean vector",  dimension());
         stan::math::check_not_nan(function, "Input vector", eta);
 
         return (L_chol_ * eta) + mu_;
       }
 
-      /**
-       * Set the specified vector to a draw from this variational
-       * approximation using the specified random number generator.
-       *
-       * @tparam BaseRNG Class of random number generator.
-       * @param[in,out] rng Base random number generator.
-       * @param[out] eta Random draw.
-       * @return A sample from the variational distribution.
-       */
       template <class BaseRNG>
       void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
-        for (int d = 0; d < dimension_; ++d)
+        // Draw from standard normal and transform to real-coordinate space
+        for (int d = 0; d < dimension(); ++d)
           eta(d) = stan::math::normal_rng(0, 1, rng);
         eta = transform(eta);
+      }
+
+      template <class BaseRNG>
+      void sample_log_g(BaseRNG& rng,
+                        Eigen::VectorXd& eta,
+                        double& log_g) const {
+        // Draw from the approximation
+        for (int d = 0; d < dimension(); ++d) {
+          eta(d) = stan::math::normal_rng(0, 1, rng);
+        }
+        // Compute the log density before transformation
+        log_g = calc_log_g(eta);
+        // Transform to real-coordinate space
+        eta = transform(eta);
+      }
+
+      double calc_log_g(const Eigen::VectorXd& eta) const {
+        // Compute the log density wrt normal distribution dropping constants
+        double log_g = 0;
+        for (int d = 0; d < dimension(); ++d) {
+          log_g += -stan::math::square(eta(d)) * 0.5;
+        }
+        return log_g;
       }
 
       /**
@@ -408,23 +423,24 @@ namespace stan {
           "stan::variational::normal_fullrank::calc_grad";
         stan::math::check_size_match(function,
                         "Dimension of elbo_grad", elbo_grad.dimension(),
-                        "Dimension of variational q", dimension_);
+                        "Dimension of variational q", dimension());
         stan::math::check_size_match(function,
-                        "Dimension of variational q", dimension_,
+                        "Dimension of variational q", dimension(),
                         "Dimension of variables in model", cont_params.size());
 
-        Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(dimension_, dimension_);
+        Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(dimension());
+        Eigen::MatrixXd L_grad  = Eigen::MatrixXd::Zero(dimension(),
+                                                        dimension());
         double tmp_lp = 0.0;
-        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension_);
-        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension_);
+        Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension());
+        Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension());
+        Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension());
 
         // Naive Monte Carlo integration
         static const int n_retries = 10;
         for (int i = 0, n_monte_carlo_drop = 0; i < n_monte_carlo_grad; ) {
           // Draw from standard normal and transform to real-coordinate space
-          for (int d = 0; d < dimension_; ++d) {
+          for (int d = 0; d < dimension(); ++d) {
             eta(d) = stan::math::normal_rng(0, 1, rng);
           }
           zeta = transform(eta);
@@ -436,7 +452,7 @@ namespace stan {
             stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
 
             mu_grad += tmp_mu_grad;
-            for (int ii = 0; ii < dimension_; ++ii) {
+            for (int ii = 0; ii < dimension(); ++ii) {
               for (int jj = 0; jj <= ii; ++jj) {
                 L_grad(ii, jj) += tmp_mu_grad(ii) * eta(jj);
               }
