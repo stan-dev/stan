@@ -530,7 +530,7 @@ add("gp_exp_quad_cov", bare_expr_type(matrix_type()), bare_expr_type(bare_array_
     bare_expr_type(bare_array_type(double_type(), 1)), bare_expr_type(double_type()), bare_expr_type(double_type()));
 add("gp_exp_quad_cov", bare_expr_type(matrix_type()), bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(double_type()), bare_expr_type(double_type()));
 add("gp_exp_quad_cov", bare_expr_type(matrix_type()), bare_expr_type(bare_array_type(vector_type(), 1)),
-    bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(double_type()), bare_expr_type(double_type()))
+    bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(double_type()), bare_expr_type(double_type()));
 add("gp_exp_quad_cov", bare_expr_type(matrix_type()), bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(double_type()), bare_expr_type(bare_array_type(double_type(), 1)));
 add("gp_exp_quad_cov", bare_expr_type(matrix_type()), bare_expr_type(bare_array_type(vector_type(), 1)),
     bare_expr_type(bare_array_type(vector_type(), 1)), bare_expr_type(double_type()), bare_expr_type(bare_array_type(double_type(), 1)));
