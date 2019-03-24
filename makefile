@@ -25,7 +25,6 @@ O_STANC ?= 0
 -include $(MATH)make/libraries
 include make/libstanc                     # bin/libstanc.a
 include make/doxygen                      # doxygen
-include make/manual                       # manual: manual, doc/stan-reference.pdf
 include make/cpplint                      # cpplint
 include make/tests                        # tests
 
@@ -46,8 +45,6 @@ help:
 	@echo ''
 	@echo 'Common targets:'
 	@echo '  Documentation:'
-	@echo '  - doc            : Builds the documention and copies to doc/'
-	@echo '                     (requires LaTeX and bookdown installation)'
 	@echo '  - doxygen        : Builds the API documentation. The documentation is located'
 	@echo '                     doc/api/'
 	@echo '                     (requires doxygen installation)'
@@ -81,29 +78,17 @@ help:
 	@echo ''
 	@echo 'Clean:'
 	@echo '  - clean         : Basic clean. Leaves doc and compiled libraries intact.'
-	@echo '  - clean-manual  : Cleans temporary files from building the manual.'
 	@echo '  - clean-deps    : Removes dependency files for tests. If tests stop building,'
 	@echo '                    run this target.'
 	@echo '  - clean-all     : Cleans up all of Stan.'
 	@echo ''
-	@echo 'Higher level targets:'
-	@echo '  - docs          : Builds all docs.'
-	@echo ''
 	@echo '--------------------------------------------------------------------------------'
-
-
-##
-# Documentation
-##
-
-.PHONY: docs
-docs: doc doxygen
 
 ##
 # Clean up.
 ##
 MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
-.PHONY: clean clean-demo clean-dox clean-manual clean-models clean-all clean-deps
+.PHONY: clean clean-demo clean-dox clean-models clean-all clean-deps
 clean:
 	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.hpp))
@@ -118,11 +103,10 @@ clean-deps:
 	@echo '  removing dependency files'
 	$(shell find . -type f -name '*.d' -exec rm {} +)
 
-clean-all: clean clean-docs clean-deps clean-libraries
+clean-all: clean clean-dox clean-deps clean-libraries
 	$(RM) -r test bin
 	@echo '  removing .o files'
 	$(shell find src -type f -name '*.o' -exec rm {} +)
-
 
 ##
 # Submodule related tasks
