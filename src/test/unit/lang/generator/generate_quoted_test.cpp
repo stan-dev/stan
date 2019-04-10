@@ -56,6 +56,6 @@ TEST(lang,printQuotedExpression) {
   vector<expression> dim;
   dim.push_back(int_literal(1));
   dimss.push_back(dim);
-  std::string s_exp = "\"get_base1(foo,1,\\\"foo\\\",1)\"";
+  std::string s_exp = "\"get_base1(foo, 1, \\\"foo\\\", 1)\"";
   test_generate_quoted_expression(index_op(expr,dimss), s_exp);
 }
