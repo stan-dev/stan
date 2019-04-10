@@ -128,7 +128,7 @@ transformed data {
   ty <- col(m,1);
   ty <- col(m1[1],1);
 
-  ty <- col(m2[1,1],1);   // is this legal?  m2[1,1] is a 2d array - signature of col: vector col(matrix x, int n)
+  ty <- col(m2[1,1],1);
 
   ty <- col(m3[1,1,1],1);
 
