@@ -40,8 +40,8 @@ namespace stan {
         o << expr;
         return;
       }
-      if (base_type.innermost_type().is_matrix_type()
-          && base_type.num_dims() == indexes.size()) {
+      if (indexes.size() > 1 && base_type.innermost_type().is_matrix_type()
+          && !(base_type.num_dims() - indexes.size() == 1)) {
         for (size_t n = 0; n < indexes.size() - 1; ++n)
           o << (isLHS ? "get_base1_lhs(" : "get_base1(");
         o << expr;
