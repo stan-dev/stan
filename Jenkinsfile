@@ -87,7 +87,19 @@ pipeline {
             }
             post {
                 always {
-                    warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+
+                    recordIssues id: "lint_doc_checks", 
+                    name: "Linting & Doc checks",
+                    enabledForFailure: true, 
+                    aggregatingResults : true, 
+                    tools: [
+                        cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
+                    ],
+                    blameDisabled: false,
+                    qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                    referenceJobName: env.BRANCH_NAME
+
                     deleteDir()
                 }
             }
@@ -162,8 +174,18 @@ pipeline {
     post {
         always {
             node("osx || linux") {
-                warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+                recordIssues id: "pipeline", 
+                name: "Entire pipeline results",
+                enabledForFailure: true, 
+                aggregatingResults : false, 
+                tools: [
+                    gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
+                    clang(id: "pipeline_clang", name: "LLVM/Clang")
+                ],
+                blameDisabled: false,
+                qualityGates: [[threshold: 30, type: 'TOTAL', unstable: true]],
+                healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                referenceJobName: env.BRANCH_NAME
             }
         }
         success {
