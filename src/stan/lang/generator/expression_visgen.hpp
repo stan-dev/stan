@@ -109,13 +109,12 @@ namespace stan {
         generate_expression(x.expr_, user_facing_, expr_o);
         std::string expr_string = expr_o.str();
         std::vector<expression> indexes;
-        size_t e_num_dims = x.type_.num_dims();
         for (size_t i = 0; i < x.dimss_.size(); ++i)
           for (size_t j = 0; j < x.dimss_[i].size(); ++j)
             indexes.push_back(x.dimss_[i][j]);  // wasteful copy, could use refs
         generate_indexed_expr<false>(expr_string, indexes,
-                                     x.type_.innermost_type(),
-                                     e_num_dims, user_facing_, o_);
+                                     x.expr_.bare_type(),
+                                     user_facing_, o_);
       }
 
       void operator()(const index_op_sliced& x) const {
