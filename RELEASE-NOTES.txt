@@ -5,6 +5,16 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.19.1 (18 Apr 2019)
+======================================================================
+
+This is a release out of cycle to address a performance bug in v.2.19 (stan-dev/stan#2748)
+
+Bug Fixes
+--------------------------------------------------
+* #2749 - Fixed generator so that matrix indexing uses most efficient access strategy - generated code should call stan::math::get_base1() on matrix using 5-arg function which specifies matrix row, column.
+
+
 v.2.19.0 (20 March 2019)
 ======================================================================
 Stan now comes with GPU support for certain functions; see the Math library
