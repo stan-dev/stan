@@ -1,5 +1,5 @@
-#ifndef STAN_MCMC_HMC_HAMILTONIANS_SWITCHING_E_POINT_HPP
-#define STAN_MCMC_HMC_HAMILTONIANS_SWITCHING_E_POINT_HPP
+#ifndef STAN_MCMC_HMC_HAMILTONIANS_AUTO_E_POINT_HPP
+#define STAN_MCMC_HMC_HAMILTONIANS_AUTO_E_POINT_HPP
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
@@ -8,9 +8,9 @@ namespace stan {
   namespace mcmc {
     /**
      * Point in a phase space with a base
-     * Euclidean manifold with switching metric
+     * Euclidean manifold with auto metric
      */
-    class switching_e_point: public ps_point {
+    class auto_e_point: public ps_point {
     public:
       /** 
        * Inverse mass matrix.
@@ -23,12 +23,12 @@ namespace stan {
       bool is_diagonal_;
 
       /**
-       * Construct a switching point in n-dimensional phase space
+       * Construct a auto point in n-dimensional phase space
        * with identity matrix as inverse mass matrix.
        *
        * @param n number of dimensions
        */
-      explicit switching_e_point(int n)
+      explicit auto_e_point(int n)
         : ps_point(n), inv_e_metric_(n, n), is_diagonal_(true) {
         inv_e_metric_.setIdentity();
       }
@@ -38,7 +38,7 @@ namespace stan {
        *
        * @param z point to copy
        */
-      switching_e_point(const switching_e_point& z)
+      auto_e_point(const auto_e_point& z)
         : ps_point(z), inv_e_metric_(z.inv_e_metric_.rows(),
                                      z.inv_e_metric_.cols()) {
         fast_matrix_copy_<double>(inv_e_metric_, z.inv_e_metric_);

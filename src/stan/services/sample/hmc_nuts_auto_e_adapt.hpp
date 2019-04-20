@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_SWITCHING_E_ADAPT_HPP
-#define STAN_SERVICES_SAMPLE_HMC_NUTS_SWITCHING_E_ADAPT_HPP
+#ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_AUTO_E_ADAPT_HPP
+#define STAN_SERVICES_SAMPLE_HMC_NUTS_AUTO_E_ADAPT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat.hpp>
@@ -8,7 +8,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/mcmc/hmc/nuts/adapt_switching_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_auto_e_nuts.hpp>
 #include <stan/services/util/run_adaptive_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -54,21 +54,21 @@ namespace stan {
        * @return error_codes::OK if successful
        */
       template <class Model>
-      int hmc_nuts_switching_e_adapt(Model& model, stan::io::var_context& init,
-				     stan::io::var_context& init_inv_metric,
-				     unsigned int random_seed, unsigned int chain,
-				     double init_radius, int num_warmup,
-				     int num_samples, int num_thin,
-				     bool save_warmup, int refresh, double stepsize,
-				     double stepsize_jitter, int max_depth,
-				     double delta, double gamma, double kappa,
-				     double t0, unsigned int init_buffer,
-				     unsigned int term_buffer, unsigned int window,
-				     callbacks::interrupt& interrupt,
-				     callbacks::logger& logger,
-				     callbacks::writer& init_writer,
-				     callbacks::writer& sample_writer,
-				     callbacks::writer& diagnostic_writer) {
+      int hmc_nuts_auto_e_adapt(Model& model, stan::io::var_context& init,
+				stan::io::var_context& init_inv_metric,
+				unsigned int random_seed, unsigned int chain,
+				double init_radius, int num_warmup,
+				int num_samples, int num_thin,
+				bool save_warmup, int refresh, double stepsize,
+				double stepsize_jitter, int max_depth,
+				double delta, double gamma, double kappa,
+				double t0, unsigned int init_buffer,
+				unsigned int term_buffer, unsigned int window,
+				callbacks::interrupt& interrupt,
+				callbacks::logger& logger,
+				callbacks::writer& init_writer,
+				callbacks::writer& sample_writer,
+				callbacks::writer& diagnostic_writer) {
         boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
         std::vector<int> disc_vector;
@@ -86,7 +86,7 @@ namespace stan {
           return error_codes::CONFIG;
         }
 
-        stan::mcmc::adapt_switching_e_nuts<Model, boost::ecuyer1988>
+        stan::mcmc::adapt_auto_e_nuts<Model, boost::ecuyer1988>
           sampler(model, rng);
 
         sampler.set_metric(inv_metric);
@@ -145,34 +145,34 @@ namespace stan {
        * @return error_codes::OK if successful
        */
       template <class Model>
-      int hmc_nuts_switching_e_adapt(Model& model, stan::io::var_context& init,
-				     unsigned int random_seed, unsigned int chain,
-				     double init_radius, int num_warmup,
-				     int num_samples, int num_thin,
-				     bool save_warmup, int refresh, double stepsize,
-				     double stepsize_jitter, int max_depth,
-				     double delta, double gamma, double kappa,
-				     double t0, unsigned int init_buffer,
-				     unsigned int term_buffer, unsigned int window,
-				     callbacks::interrupt& interrupt,
-				     callbacks::logger& logger,
-				     callbacks::writer& init_writer,
-				     callbacks::writer& sample_writer,
-				     callbacks::writer& diagnostic_writer) {
+      int hmc_nuts_auto_e_adapt(Model& model, stan::io::var_context& init,
+				unsigned int random_seed, unsigned int chain,
+				double init_radius, int num_warmup,
+				int num_samples, int num_thin,
+				bool save_warmup, int refresh, double stepsize,
+				double stepsize_jitter, int max_depth,
+				double delta, double gamma, double kappa,
+				double t0, unsigned int init_buffer,
+				unsigned int term_buffer, unsigned int window,
+				callbacks::interrupt& interrupt,
+				callbacks::logger& logger,
+				callbacks::writer& init_writer,
+				callbacks::writer& sample_writer,
+				callbacks::writer& diagnostic_writer) {
         stan::io::dump dmp =
           util::create_unit_e_dense_inv_metric(model.num_params_r());
         stan::io::var_context& unit_e_metric = dmp;
 
-        return hmc_nuts_switching_e_adapt(model, init, unit_e_metric,
-					  random_seed, chain, init_radius,
-					  num_warmup, num_samples, num_thin,
-					  save_warmup, refresh,
-					  stepsize, stepsize_jitter, max_depth,
-					  delta, gamma, kappa, t0,
-					  init_buffer, term_buffer, window,
-					  interrupt, logger,
-					  init_writer, sample_writer,
-					  diagnostic_writer);
+        return hmc_nuts_auto_e_adapt(model, init, unit_e_metric,
+				     random_seed, chain, init_radius,
+				     num_warmup, num_samples, num_thin,
+				     save_warmup, refresh,
+				     stepsize, stepsize_jitter, max_depth,
+				     delta, gamma, kappa, t0,
+				     init_buffer, term_buffer, window,
+				     interrupt, logger,
+				     init_writer, sample_writer,
+				     diagnostic_writer);
       }
 
     }

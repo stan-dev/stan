@@ -1,5 +1,5 @@
-#ifndef STAN_MCMC_SWITCHING_ADAPTATION_HPP
-#define STAN_MCMC_SWITCHING_ADAPTATION_HPP
+#ifndef STAN_MCMC_AUTO_ADAPTATION_HPP
+#define STAN_MCMC_AUTO_ADAPTATION_HPP
 
 #include <stan/math/prim/mat.hpp>
 #include <stan/mcmc/windowed_adaptation.hpp>
@@ -19,9 +19,9 @@ namespace stan {
       }
     };
 
-    class switching_adaptation: public windowed_adaptation {
+    class auto_adaptation: public windowed_adaptation {
     public:
-      explicit switching_adaptation(int n)
+      explicit auto_adaptation(int n)
         : windowed_adaptation("covariance") {}
 
       /**
@@ -62,7 +62,7 @@ namespace stan {
 	  double v_norm = v.norm();
 	  double new_eval = v.dot(Av) / (v_norm * v_norm);
 	  if(std::abs(new_eval - eval) <= tol * std::abs(eval)) {
-	    std::cout << "Converged at i = " << i << std::endl;
+	    //std::cout << "Converged at i = " << i << std::endl;
 	    eval = new_eval;
 	    break;
 	  }
