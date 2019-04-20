@@ -19,84 +19,121 @@ namespace stan {
       }
     };
 
-    template<typename Model>
-    class scaled_hessian_vector {
-    private:
-      const Model& model_;
-      const Eigen::MatrixXd& L_;
-      const Eigen::VectorXd& q_;
-    public:
-      scaled_hessian_vector(const Model& model,
-			    const Eigen::MatrixXd& L,
-			    const Eigen::VectorXd& q) : model_(model),
-							L_(L),
-							q_(q) {}
-
-      int rows() { return q_.size(); }
-      int cols() { return q_.size(); }
-
-      void perform_op(const double* x_in, double* y_out) {
-	Eigen::Map<const Eigen::VectorXd> x(x_in, cols());
-	Eigen::Map<Eigen::VectorXd> y(y_out, rows());
-	
-	double lp;
-	Eigen::VectorXd grad1;
-	Eigen::VectorXd grad2;
-	//stan::math::hessian_times_vector(log_prob_wrapper_covar<Model>(model), q, x, lp, Ax);
-	double dx = 1e-5;
-	Eigen::VectorXd dr = L_ * x * dx;
-	stan::math::gradient(log_prob_wrapper_covar<Model>(model_), q_ + dr / 2.0, lp, grad1);
-	stan::math::gradient(log_prob_wrapper_covar<Model>(model_), q_ - dr / 2.0, lp, grad2);
-	y = L_.transpose() * (grad1 - grad2) / dx;
-      }
-    };
-
     class switching_adaptation: public windowed_adaptation {
     public:
       explicit switching_adaptation(int n)
         : windowed_adaptation("covariance") {}
 
+      /**
+       * Compute the covariance of data in Y. Rows of Y are different data. Columns of Y are different variables.
+       *
+       * @param Y Data
+       * @return Covariance of Y
+       */
       Eigen::MatrixXd covariance(const Eigen::MatrixXd& Y) {
 	Eigen::MatrixXd centered = Y.colwise() - Y.rowwise().mean();
 	return centered * centered.transpose() / std::max(centered.rows() - 1.0, 1.0);
       }
-      
+
+      /**
+       * Compute the largest magnitude eigenvalue of a symmetric matrix using the power method. The function f
+       *  should return the product of that matrix with an abitrary vector.
+       *
+       * f should take one Eigen::VectorXd argument, x, and return the product of a matrix with x as
+       *  an Eigen::VectorXd argument of the same size.
+       *
+       * The eigenvalue is estimated iteratively. If the kth estimate is e_k, then the function returns when
+       *  either abs(e_{k + 1} - e_k) < tol * abs(e_k) or the maximum number of iterations have been performed
+       *
+       * This means the returned eigenvalue might not be computed to full precision
+       *
+       * @param initial_guess Initial guess of the eigenvector of the largest eigenvalue
+       * @param max_iterations Maximum number of power iterations
+       * @param tol Relative tolerance
+       * @return Largest magnitude eigenvalue of operator f
+       */
+      template<typename F>
+      double power_method(F& f, const Eigen::VectorXd& initial_guess, int max_iterations, double tol) {
+	Eigen::VectorXd v = initial_guess;
+	double eval = 0.0;
+
+	for(int i = 0; i < max_iterations; i++) {
+	  Eigen::VectorXd Av = f(v);
+	  double v_norm = v.norm();
+	  double new_eval = v.dot(Av) / (v_norm * v_norm);
+	  if(std::abs(new_eval - eval) <= tol * std::abs(eval)) {
+	    std::cout << "Converged at i = " << i << std::endl;
+	    eval = new_eval;
+	    break;
+	  }
+	  eval = new_eval;
+	  v = Av / Av.norm();
+	}
+
+	return eval;
+      }
+
+      /**
+       * Compute the largest eigenvalue of the Hessian of the log density rescaled by a metric,
+       *  that is, the largest eigenvalue of L^T \nabla^2_{qq} H(q) L
+       *
+       * @tparam Model Type of model
+       * @param model Defines the log density
+       * @param q Point around which to compute the Hessian
+       * @param L Cholesky decomposition of Metric
+       * @return Largest eigenvalue
+       */
       template<typename Model>
-      double top_eigenvalue(const Model& model, const Eigen::MatrixXd& L, const Eigen::VectorXd& q) {
+      double eigenvalue_scaled_hessian(const Model& model, const Eigen::MatrixXd& L, const Eigen::VectorXd& q) {
 	Eigen::VectorXd eigenvalues;
 	Eigen::MatrixXd eigenvectors;
 
-	scaled_hessian_vector<Model> op(model, L, q);
+	auto hessian_vector = [&](const Eigen::VectorXd& x) -> Eigen::VectorXd {
+	  double lp;
+	  Eigen::VectorXd grad1;
+	  Eigen::VectorXd grad2;
+	  //stan::math::hessian_times_vector(log_prob_wrapper_covar<Model>(model), q, x, lp, Ax);
+	  double dx = 1e-5;
+	  Eigen::VectorXd dr = L * x * dx;
+	  stan::math::gradient(log_prob_wrapper_covar<Model>(model), q + dr / 2.0, lp, grad1);
+	  stan::math::gradient(log_prob_wrapper_covar<Model>(model), q - dr / 2.0, lp, grad2);
+	  return L.transpose() * (grad1 - grad2) / dx;
+	};
 
-	Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, decltype(op)> eigs(&op, 1, 2);
-	eigs.init();
-	eigs.compute();
-
-	if(eigs.info() != Spectra::SUCCESSFUL) {
-	  throw std::domain_error("Failed to compute eigenvalue of Hessian of log density. The switching metric requires these");
-	}
-
-	return eigs.eigenvalues()(0);
+	return power_method(hessian_vector, Eigen::VectorXd::Random(q.size()), 100, 1e-3);
       }
 
-      double bottom_eigenvalue_estimate(const Eigen::MatrixXd& L, const Eigen::MatrixXd& covar) {
+      /**
+       * Compute the largest eigenvalue of the sample covariance rescaled by a metric,
+       *  that is, the largest eigenvalue of L^{-T} \Sigma L^{-1}
+       *
+       * @param L Cholesky decomposition of Metric
+       * @param Sigma Sample covariance
+       * @return Largest eigenvalue
+       */
+      double eigenvalue_scaled_covariance(const Eigen::MatrixXd& L, const Eigen::MatrixXd& Sigma) {
 	Eigen::MatrixXd S = L.template triangularView<Eigen::Lower>().
-	  solve(L.template triangularView<Eigen::Lower>().solve(covar).transpose()).transpose();
+	  solve(L.template triangularView<Eigen::Lower>().solve(Sigma).transpose()).transpose();
 
-	Spectra::DenseSymMatProd<double> op(S);
-	Spectra::SymEigsSolver<double, Spectra::LARGEST_MAGN, decltype(op)> eigs(&op, 1, 2);
-	eigs.init();
-	eigs.compute();
-
-	if(eigs.info() != Spectra::SUCCESSFUL) {
-	  throw std::domain_error("Failed to compute eigenvalue of covariance of log density. The switching metric requires these");
-	}
-
-	return -1.0 / eigs.eigenvalues()(0);
+	auto Sx = [&](Eigen::VectorXd x) -> Eigen::VectorXd {
+	  return S * x;
+	};
+	
+	return power_method(Sx, Eigen::VectorXd::Random(Sigma.cols()), 100, 1e-3);
       }
 
+      /**
+       * Update the metric if at the end of an adaptation window.
+       *
+       * @tparam Model Type of model
+       * @param model Defines the log density
+       * @param covar[out] New metric
+       * @param covar_is_diagonal[out] Set to true if metric is diagonal, false otherwise
+       * @param q New MCMC draw
+       * @return True if this was the end of an adaptation window, false otherwise
+       */
       template<typename Model>
-      bool learn_covariance(const Model& model, Eigen::MatrixXd& covar, const Eigen::VectorXd& q) {
+      bool learn_covariance(const Model& model, Eigen::MatrixXd& covar, bool& covar_is_diagonal, const Eigen::VectorXd& q) {
         if (adaptation_window())
 	  qs_.push_back(q);
 
@@ -131,7 +168,6 @@ namespace stan {
 		throw std::runtime_error("Each warmup stage must have at least 10 samples");
 	      }
 	      
-	      std::cout << "train: " << Y.cols() - Ntest << ", test: " << Ntest << std::endl;
 	      Ytrain = Y.block(0, 0, N, Y.cols() - Ntest);
 	      Ytest = Y.block(0, Ytrain.cols(), N, Ntest);
 	    } else {
@@ -151,14 +187,14 @@ namespace stan {
 	      Eigen::MatrixXd L_dense = dense.llt().matrixL();
 	      Eigen::MatrixXd L_diag = diag.diagonal().array().sqrt().matrix().asDiagonal();
 
-	      double low_eigenvalue_dense = bottom_eigenvalue_estimate(L_dense, cov_test);
-	      double low_eigenvalue_diag = bottom_eigenvalue_estimate(L_diag, cov_test);
+	      double low_eigenvalue_dense = -1.0 / eigenvalue_scaled_covariance(L_dense, cov_test);
+	      double low_eigenvalue_diag = -1.0 / eigenvalue_scaled_covariance(L_diag, cov_test);
 
 	      double c_dense = 0.0;
 	      double c_diag = 0.0;
 	      for(int i = 0; i < 5; i++) {
-		double high_eigenvalue_dense = top_eigenvalue(model, L_dense, Ytest.block(0, i, N, 1));
-		double high_eigenvalue_diag = top_eigenvalue(model, L_diag, Ytest.block(0, i, N, 1));
+		double high_eigenvalue_dense = eigenvalue_scaled_hessian(model, L_dense, Ytest.block(0, i, N, 1));
+		double high_eigenvalue_diag = eigenvalue_scaled_hessian(model, L_diag, Ytest.block(0, i, N, 1));
 
 		c_dense = std::max(c_dense, std::sqrt(high_eigenvalue_dense / low_eigenvalue_dense));
 		c_diag = std::max(c_diag, std::sqrt(high_eigenvalue_diag / low_eigenvalue_diag));
@@ -175,8 +211,10 @@ namespace stan {
 	    } else {
 	      if(use_dense) {
 		covar = dense;
+		covar_is_diagonal = false;
 	      } else {
 		covar = diag;
+		covar_is_diagonal = true;
 	      }
 	    }
 	  }
