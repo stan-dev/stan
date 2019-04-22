@@ -152,71 +152,80 @@ namespace stan {
 	  for(int i = 0; i < qs_.size(); i++)
 	    Y.block(0, i, N, 1) = qs_[idxs[i]];
 
-	  bool use_dense = false;
-	  for(auto state : { "selection", "refinement" }) {
-	    Eigen::MatrixXd Ytrain;
-	    Eigen::MatrixXd Ytest;
+	  try {
+	    bool use_dense = false;
+	    for(auto state : { "selection", "refinement" }) {
+	      Eigen::MatrixXd Ytrain;
+	      Eigen::MatrixXd Ytest;
 
-	    if(state == "selection") {
-	      int Ntest;
-	      Ntest = int(0.2 * Y.cols());
-	      if(Ntest < 5) {
-		Ntest = 5;
-	      }
+	      if(state == "selection") {
+		int Ntest;
+		Ntest = int(0.2 * Y.cols());
+		if(Ntest < 5) {
+		  Ntest = 5;
+		}
 
-	      if(Y.cols() < 10) {
-		throw std::runtime_error("Each warmup stage must have at least 10 samples");
-	      }
+		if(Y.cols() < 10) {
+		  throw std::runtime_error("Each warmup stage must have at least 10 samples");
+		}
 	      
-	      Ytrain = Y.block(0, 0, N, Y.cols() - Ntest);
-	      Ytest = Y.block(0, Ytrain.cols(), N, Ntest);
-	    } else {
-	      Ytrain = Y;
-	    }
-
-	    Eigen::MatrixXd cov_train = covariance(Ytrain);
-	    Eigen::MatrixXd cov_test = covariance(Ytest);
-
-	    Eigen::MatrixXd dense = (N / (N + 5.0)) * cov_train +
-	      1e-3 * (5.0 / (N + 5.0)) * Eigen::MatrixXd::Identity(cov_train.rows(), cov_train.cols());
-	    Eigen::MatrixXd diag = dense.diagonal().asDiagonal();
-
-	    covar = dense;
-
-	    if(state == "selection") {
-	      Eigen::MatrixXd L_dense = dense.llt().matrixL();
-	      Eigen::MatrixXd L_diag = diag.diagonal().array().sqrt().matrix().asDiagonal();
-
-	      double low_eigenvalue_dense = -1.0 / eigenvalue_scaled_covariance(L_dense, cov_test);
-	      double low_eigenvalue_diag = -1.0 / eigenvalue_scaled_covariance(L_diag, cov_test);
-
-	      double c_dense = 0.0;
-	      double c_diag = 0.0;
-	      for(int i = 0; i < 5; i++) {
-		double high_eigenvalue_dense = eigenvalue_scaled_hessian(model, L_dense, Ytest.block(0, i, N, 1));
-		double high_eigenvalue_diag = eigenvalue_scaled_hessian(model, L_diag, Ytest.block(0, i, N, 1));
-
-		c_dense = std::max(c_dense, std::sqrt(high_eigenvalue_dense / low_eigenvalue_dense));
-		c_diag = std::max(c_diag, std::sqrt(high_eigenvalue_diag / low_eigenvalue_diag));
-	      }
-
-	      std::cout << "adapt: " << adapt_window_counter_ << ", which: dense, max: " << c_dense << std::endl;
-	      std::cout << "adapt: " << adapt_window_counter_ << ", which: diag, max: " << c_diag << std::endl;
-
-	      if(c_dense < c_diag) {
-		use_dense = true;
+		Ytrain = Y.block(0, 0, N, Y.cols() - Ntest);
+		Ytest = Y.block(0, Ytrain.cols(), N, Ntest);
 	      } else {
-		use_dense = false;
+		Ytrain = Y;
 	      }
-	    } else {
-	      if(use_dense) {
-		covar = dense;
-		covar_is_diagonal = false;
+
+	      Eigen::MatrixXd cov_train = covariance(Ytrain);
+	      Eigen::MatrixXd cov_test = covariance(Ytest);
+
+	      Eigen::MatrixXd dense = (N / (N + 5.0)) * cov_train +
+		1e-3 * (5.0 / (N + 5.0)) * Eigen::MatrixXd::Identity(cov_train.rows(), cov_train.cols());
+	      Eigen::MatrixXd diag = dense.diagonal().asDiagonal();
+
+	      covar = dense;
+
+	      if(state == "selection") {
+		Eigen::MatrixXd L_dense = dense.llt().matrixL();
+		Eigen::MatrixXd L_diag = diag.diagonal().array().sqrt().matrix().asDiagonal();
+
+		double low_eigenvalue_dense = -1.0 / eigenvalue_scaled_covariance(L_dense, cov_test);
+		double low_eigenvalue_diag = -1.0 / eigenvalue_scaled_covariance(L_diag, cov_test);
+
+		double c_dense = 0.0;
+		double c_diag = 0.0;
+		for(int i = 0; i < 5; i++) {
+		  double high_eigenvalue_dense = eigenvalue_scaled_hessian(model, L_dense, Ytest.block(0, i, N, 1));
+		  double high_eigenvalue_diag = eigenvalue_scaled_hessian(model, L_diag, Ytest.block(0, i, N, 1));
+
+		  c_dense = std::max(c_dense, std::sqrt(high_eigenvalue_dense / low_eigenvalue_dense));
+		  c_diag = std::max(c_diag, std::sqrt(high_eigenvalue_diag / low_eigenvalue_diag));
+		}
+
+		std::cout << "adapt: " << adapt_window_counter_ << ", which: dense, max: " << c_dense << std::endl;
+		std::cout << "adapt: " << adapt_window_counter_ << ", which: diag, max: " << c_diag << std::endl;
+
+		if(c_dense < c_diag) {
+		  use_dense = true;
+		} else {
+		  use_dense = false;
+		}
 	      } else {
-		covar = diag;
-		covar_is_diagonal = true;
+		if(use_dense) {
+		  covar = dense;
+		  covar_is_diagonal = false;
+		} else {
+		  covar = diag;
+		  covar_is_diagonal = true;
+		}
 	      }
 	    }
+	  } catch(const std::exception& e) {
+	    std::cout << e.what() << std::endl;
+	    std::cout << "Exception while using auto adaptation, falling back to diagonal" << std::endl;
+	    Eigen::MatrixXd cov = covariance(Y);
+	    covar = ((M / (M + 5.0)) * cov.diagonal()
+		     + 1e-3 * (5.0 / (M + 5.0)) * Eigen::VectorXd::Ones(cov.cols())).asDiagonal();
+	    covar_is_diagonal = true;
 	  }
 
           ++adapt_window_counter_;
