@@ -2,6 +2,7 @@
 #define STAN_SERVICES_SAMPLE_HMC_STATIC_DIAG_E_ADAPT_HPP
 
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/log_iteration.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -103,9 +104,11 @@ namespace stan {
         sampler.set_window_params(num_warmup, init_buffer, term_buffer,
                                   window, logger);
 
+	callbacks::log_iteration iteration(logger, num_warmup, num_warmup + num_samples, refresh);
+
         util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,
-                                   num_samples, num_thin, refresh, save_warmup,
-                                   rng, interrupt, logger,
+                                   num_samples, num_thin, save_warmup,
+                                   rng, interrupt, iteration, logger,
                                    sample_writer, diagnostic_writer);
 
         return error_codes::OK;

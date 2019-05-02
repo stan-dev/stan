@@ -4,6 +4,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/iteration.hpp>
 #include <Eigen/Dense>
 #include <map>
 #include <string>

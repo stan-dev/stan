@@ -1,6 +1,7 @@
 #ifndef STAN_SERVICES_UTIL_RUN_ADAPTIVE_SAMPLER_HPP
 #define STAN_SERVICES_UTIL_RUN_ADAPTIVE_SAMPLER_HPP
 
+#include <stan/callbacks/iteration.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
@@ -25,11 +26,11 @@ namespace stan {
        * @param[in] num_samples number of post warmup draws
        * @param[in] num_thin number to thin the draws. Must be greater than
        *   or equal to 1.
-       * @param[in] refresh controls output to the <code>logger</code>
        * @param[in] save_warmup indicates whether the warmup draws should be
        *   sent to the sample writer
        * @param[in,out] rng random number generator
        * @param[in,out] interrupt interrupt callback
+       * @param[in,out] iteration iteration callback
        * @param[in,out] logger logger for messages
        * @param[in,out] sample_writer writer for draws
        * @param[in,out] diagnostic_writer writer for diagnostic information
@@ -38,9 +39,10 @@ namespace stan {
       void run_adaptive_sampler(Sampler& sampler, Model& model,
                                 std::vector<double>& cont_vector,
                                 int num_warmup, int num_samples,
-                                int num_thin, int refresh, bool save_warmup,
+                                int num_thin, bool save_warmup,
                                 RNG& rng,
                                 callbacks::interrupt& interrupt,
+                                callbacks::iteration& iteration,
                                 callbacks::logger& logger,
                                 callbacks::writer& sample_writer,
                                 callbacks::writer& diagnostic_writer) {
@@ -68,10 +70,10 @@ namespace stan {
         clock_t start = clock();
         util::generate_transitions(sampler, num_warmup, 0,
                                    num_warmup + num_samples, num_thin,
-                                   refresh, save_warmup, true,
+                                   save_warmup, true,
                                    writer,
                                    s, model, rng,
-                                   interrupt, logger);
+                                   interrupt, iteration, logger);
         clock_t end = clock();
         double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
@@ -82,10 +84,10 @@ namespace stan {
         start = clock();
         util::generate_transitions(sampler, num_samples, num_warmup,
                                    num_warmup + num_samples, num_thin,
-                                   refresh, true, false,
+                                   true, false,
                                    writer,
                                    s, model, rng,
-                                   interrupt, logger);
+                                   interrupt, iteration, logger);
         end = clock();
         double sample_delta_t
           = static_cast<double>(end - start) / CLOCKS_PER_SEC;

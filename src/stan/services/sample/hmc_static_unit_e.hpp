@@ -2,6 +2,7 @@
 #define STAN_SERVICES_SAMPLE_HMC_STATIC_UNIT_E_HPP
 
 #include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/log_iteration.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
@@ -66,9 +67,11 @@ namespace stan {
         sampler.set_nominal_stepsize_and_T(stepsize, int_time);
         sampler.set_stepsize_jitter(stepsize_jitter);
 
+	callbacks::log_iteration iteration(logger, num_warmup, num_warmup + num_samples, refresh);
+
         util::run_sampler(sampler, model, cont_vector, num_warmup, num_samples,
-                          num_thin, refresh, save_warmup, rng, interrupt,
-                          logger, sample_writer,
+                          num_thin, save_warmup, rng, interrupt,
+                          iteration, logger, sample_writer,
                           diagnostic_writer);
 
         return error_codes::OK;
