@@ -2,7 +2,7 @@
 #define STAN_IO_STAN_CSV_READER_HPP
 
 #include <boost/algorithm/string.hpp>
-#include <Eigen/Dense>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <istream>
 #include <iostream>
 #include <sstream>
