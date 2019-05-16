@@ -1036,6 +1036,11 @@ public:
     return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K);
   }
 
+  inline matrix_t cholesky_corr_constrain(size_t K) {
+    return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K);
+  }
+
+
   /**
    * Return the next Cholesky factor for a correlation matrix with
    * the specified dimensionality, reading from an unconstrained
@@ -1050,6 +1055,11 @@ public:
    *    Cholesky factor for a correlation matrix.
    */
   inline matrix_t cholesky_factor_corr_constrain(size_t K, T &lp) {
+    return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K,
+                                               lp);
+  }
+
+  inline matrix_t cholesky_corr_constrain(size_t K, T &lp) {
     return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K,
                                                lp);
   }
