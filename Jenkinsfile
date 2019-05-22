@@ -17,8 +17,10 @@ def runTests(String testPath, Boolean separateMakeStep=true) {
     finally { junit 'test/**/*.xml' }
 }
 
-def runTestsWin(String testPath) {
-    bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+def runTestsWin(String testPath, Boolean separateMakeStep=true) {
+    if (separateMakeStep) {
+        bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+    }
     try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
     finally { junit 'test/**/*.xml' }
 }
@@ -104,6 +106,7 @@ pipeline {
                 }
             }
         }
+
         stage('Unit tests') {
             parallel {
                 stage('Windows Headers & Unit') {
@@ -118,8 +121,26 @@ pipeline {
                     }
                     post { always { deleteDirWin() } }
                 }
-                stage('Unit') {
-                    agent any
+                stage('Linux Unit') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(false)
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Linux with MPI Unit') {
+                    agent { label 'linux && mpi' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(false)
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Mac Unit') {
+                    agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(false)
@@ -129,15 +150,102 @@ pipeline {
                 }
             }
         }
+
         stage('Integration') {
-            agent any
-            steps {
-                unstash 'StanSetup'
-                setupCXX()
-                runTests("src/test/integration", separateMakeStep=false)
+            parallel {
+                stage('Integration Windows') {
+                    agent { label 'windows' }
+                    steps {
+                        deleteDirWin()
+                            unstash 'StanSetup'
+                            setupCXX()
+                            bat "make -j${env.PARALLEL} test-headers"
+                            setupCXX(false)
+                            runTestsWin("src/test/integration")
+                    }
+                    post { always { deleteDirWin() } }
+                }
+                stage('Integration Linux') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Integration Linux with MPI') {
+                    agent { label 'linux && mpi' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Integration Mac') {
+                    agent { label 'osx' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
             }
-            post { always { deleteDir() } }
         }
+
+        stage('Additional merge tests') {
+            when { anyOf { branch 'develop'; branch 'master' } }
+            parallel {
+                //stage('Windows Headers & Unit') {
+                //    agent { label 'windows' }
+                //    steps {
+                //        deleteDirWin()
+                //            unstash 'StanSetup'
+                //            setupCXX()
+                //            bat "make -j${env.PARALLEL} test-headers"
+                //            setupCXX(false)
+                //            runTestsWin("test/unit")
+                //    }
+                //    post { always { deleteDirWin() } }
+                //}
+                stage('Linux Unit with Threading') {
+                    agent { label 'linux' }
+                    steps {
+                        deleteDir()
+                        unstash 'StanSetup'
+                        sh "echo CXX=${GCC} >> make/local"
+                        sh "echo CPPFLAGS=-DSTAN_THREADS >> make/local"
+                        runTests("test/unit")
+                    }
+                    post { always { retry(3) { deleteDir() } } }
+                }
+                stage('Linux Unit with MPI') {
+                    agent { label 'linux && mpi' }
+                    steps {
+                        deleteDir()
+                        unstash 'StanSetup'
+                        sh "echo CXX=${MPICXX} >> make/local"
+                        sh "echo STAN_MPI=true >> make/local"
+                        runTests("test/unit")
+                    }
+                    post { always { retry(3) { deleteDir() } } }
+                }
+                stage('Mac Unit with Threading') {
+                    agent  { label 'osx' }
+                    steps {
+                        deleteDir()
+                        unstash 'StanSetup'
+                        sh "echo CC=${env.CXX} -Werror > make/local"
+                        sh "echo CXXFLAGS+=-DSTAN_THREADS >> make/local"
+                        runTests("test/unit")
+                    }
+                    post { always { retry(3) { deleteDir() } } }
+                }
+            }
+        }
+
         stage('Upstream CmdStan tests') {
             when { expression { env.BRANCH_NAME ==~ /PR-\d+/ ||
                                 env.BRANCH_NAME == "downstream_tests" ||
