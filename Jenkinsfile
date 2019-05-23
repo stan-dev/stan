@@ -130,15 +130,6 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
-                stage('Linux with MPI Unit') {
-                    agent { label 'linux && mpi' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(false)
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
                 stage('Mac Unit') {
                     agent { label 'osx' }
                     steps {
@@ -174,15 +165,6 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
-                stage('Integration Linux with MPI') {
-                    agent { label 'linux && mpi' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX()
-                        runTests("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDir() } }
-                }
                 stage('Integration Mac') {
                     agent { label 'osx' }
                     steps {
@@ -191,57 +173,6 @@ pipeline {
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
-                }
-            }
-        }
-
-        stage('Additional merge tests') {
-            when { anyOf { branch 'develop'; branch 'master' } }
-            parallel {
-                //stage('Windows Headers & Unit') {
-                //    agent { label 'windows' }
-                //    steps {
-                //        deleteDirWin()
-                //            unstash 'StanSetup'
-                //            setupCXX()
-                //            bat "make -j${env.PARALLEL} test-headers"
-                //            setupCXX(false)
-                //            runTestsWin("test/unit")
-                //    }
-                //    post { always { deleteDirWin() } }
-                //}
-                stage('Linux Unit with Threading') {
-                    agent { label 'linux' }
-                    steps {
-                        deleteDir()
-                        unstash 'StanSetup'
-                        sh "echo CXX=${GCC} >> make/local"
-                        sh "echo CPPFLAGS=-DSTAN_THREADS >> make/local"
-                        runTests("test/unit")
-                    }
-                    post { always { retry(3) { deleteDir() } } }
-                }
-                stage('Linux Unit with MPI') {
-                    agent { label 'linux && mpi' }
-                    steps {
-                        deleteDir()
-                        unstash 'StanSetup'
-                        sh "echo CXX=${MPICXX} >> make/local"
-                        sh "echo STAN_MPI=true >> make/local"
-                        runTests("test/unit")
-                    }
-                    post { always { retry(3) { deleteDir() } } }
-                }
-                stage('Mac Unit with Threading') {
-                    agent  { label 'osx' }
-                    steps {
-                        deleteDir()
-                        unstash 'StanSetup'
-                        sh "echo CC=${env.CXX} -Werror > make/local"
-                        sh "echo CXXFLAGS+=-DSTAN_THREADS >> make/local"
-                        runTests("test/unit")
-                    }
-                    post { always { retry(3) { deleteDir() } } }
                 }
             }
         }
