@@ -3,11 +3,10 @@ import org.stan.Utils
 
 def utils = new org.stan.Utils()
 
-def setupCXX(failOnError = true) {
+def setupCXX(failOnError = true, CXX = env.GCC) {
     errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CXX=${env.CXX} ${errorStr}")
+    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
 }
-
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
     if (separateMakeStep) {
@@ -68,7 +67,7 @@ pipeline {
             }
         }
         stage('Linting & Doc checks') {
-            agent any
+            agent {label 'linux'}
             steps {
                 script {
                     sh "printenv"
@@ -114,9 +113,9 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCXX()
+                            setupCXX(true, "${env.CXX}")
                             bat "make -j${env.PARALLEL} test-headers"
-                            setupCXX(false)
+                            setupCXX(false, "${env.CXX}")
                             runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
@@ -134,7 +133,7 @@ pipeline {
                     agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false)
+                        setupCXX(false, "${env.CXX}")
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -149,9 +148,9 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCXX()
+                            setupCXX(true,"${env.CXX}")
                             bat "make -j${env.PARALLEL} test-headers"
-                            setupCXX(false)
+                            setupCXX(false, "${env.CXX}")
                             runTestsWin("src/test/integration")
                     }
                     post { always { deleteDirWin() } }
@@ -169,7 +168,7 @@ pipeline {
                     agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX()
+                        setupCXX(true, "${env.CXX}")
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
@@ -191,7 +190,7 @@ pipeline {
             agent { label 'master' }
             steps {
                 unstash 'StanSetup'
-                setupCXX()
+                setupCXX(true, "${env.CXX}")
                 sh """
                     ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance
