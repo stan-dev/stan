@@ -3,7 +3,7 @@ import org.stan.Utils
 
 def utils = new org.stan.Utils()
 
-def setupCXX(failOnError = true, CXX = env.GCC) {
+def setupCXX(failOnError = true, CXX = env.CXX) {
     errorStr = failOnError ? "-Werror " : ""
     writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
 }
@@ -79,7 +79,7 @@ pipeline {
                     """
                     utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
-                    setupCXX()
+                    setupCXX(true, "${env.GCC}")
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
@@ -113,9 +113,9 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCXX(true, "${env.CXX}")
+                            setupCXX()
                             bat "make -j${env.PARALLEL} test-headers"
-                            setupCXX(false, "${env.CXX}")
+                            setupCXX(false)
                             runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
@@ -124,7 +124,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false)
+                        setupCXX(false, "${env.GCC}")
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -133,7 +133,7 @@ pipeline {
                     agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false, "${env.CXX}")
+                        setupCXX(false)
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -148,9 +148,9 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCXX(true,"${env.CXX}")
+                            setupCXX()
                             bat "make -j${env.PARALLEL} test-headers"
-                            setupCXX(false, "${env.CXX}")
+                            setupCXX(false)
                             runTestsWin("src/test/integration")
                     }
                     post { always { deleteDirWin() } }
@@ -159,7 +159,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX()
+                        setupCXX(true, "${env.GCC}")
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
@@ -168,7 +168,7 @@ pipeline {
                     agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, "${env.CXX}")
+                        setupCXX()
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
@@ -190,7 +190,7 @@ pipeline {
             agent { label 'master' }
             steps {
                 unstash 'StanSetup'
-                setupCXX(true, "${env.CXX}")
+                setupCXX()
                 sh """
                     ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance
