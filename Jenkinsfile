@@ -79,7 +79,7 @@ pipeline {
                     """
                     utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
-                    setupCXX(true, "${env.GCC}")
+                    setupCXX(true, env.GCC)
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
@@ -124,7 +124,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false, "${env.GCC}")
+                        setupCXX(false, env.GCC)
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -159,7 +159,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, "${env.GCC}")
+                        setupCXX(true, env.GCC)
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
