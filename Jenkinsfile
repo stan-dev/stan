@@ -124,7 +124,8 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false, env.GCC)
+                        //setupCXX(false, env.GCC)
+                        setupCXX(false)
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -159,8 +160,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        //setupCXX(true, env.GCC)
-                        setupCXX()
+                        setupCXX(true, env.GCC)
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
