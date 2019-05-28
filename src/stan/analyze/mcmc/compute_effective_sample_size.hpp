@@ -21,8 +21,8 @@ namespace analyze {
    * Current implementation assumes chains are all of equal size and
    * draws are stored in contiguous blocks of memory.
    *
-   * @param std::vector stores pointers to arrays of chains
-   * @param std::vector stores sizes of chains
+   * @param Eigen::VectorXd stores autocovariance of each chain
+   * @param Eigen::VectorXd stores means of each chain
    * @return effective sample size for the specified parameter
    */
   template <typename DerivedA, typename DerivedB>
