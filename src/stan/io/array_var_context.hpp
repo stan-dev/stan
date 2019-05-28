@@ -3,7 +3,7 @@
 
 #include <stan/io/var_context.hpp>
 #include <boost/throw_exception.hpp>
-#include <Eigen/Dense>
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <map>
 #include <sstream>
 #include <string>
