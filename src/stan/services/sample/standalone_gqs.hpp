@@ -127,6 +127,22 @@ int standalone_generate(const Model &model,
   return error_codes::OK;
 }
 
+template <class Model>
+int standalone_generate(const Model &model,
+                        std::vector<std::vector<double> >& draws,
+                        unsigned int seed, callbacks::interrupt &interrupt,
+                        callbacks::logger &logger,
+                        callbacks::writer &sample_writer) {
+  int C = draws[0].size();
+  int R = draws.size();
+  Eigen::MatrixXd draws_mat(R, C);
+  for (int r = 0; r < R; r++) for (int c = 0; c < C; c++)
+    draws_mat.coeffRef(r, c) = draws[r][c];
+  return standalone_generate(model, draws_mat,
+                             seed, interrupt, logger, sample_writer);
+
+}
+
 }   // namespace services
 }   // namespace stan
 #endif
