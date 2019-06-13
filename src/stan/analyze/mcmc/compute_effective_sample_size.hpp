@@ -21,28 +21,37 @@ namespace analyze {
    * Current implementation assumes chains are all of equal size and
    * draws are stored in contiguous blocks of memory.
    *
-   * @param Eigen::VectorXd stores autocovariance of each chain
-   * @param Eigen::VectorXd stores means of each chain
+   * @param std::vector stores pointers to arrays of chains
+   * @param std::vector stores sizes of chains
    * @return effective sample size for the specified parameter
    */
-  template <typename DerivedA, typename DerivedB>
   inline
-  double effective_sample_size_impl(const Eigen::MatrixBase<DerivedA>& acov,
-                                    const Eigen::MatrixBase<DerivedB>& chain_mean) {
+  double compute_effective_sample_size(std::vector<const double*> draws,
+                                       std::vector<size_t> sizes) {
 
-    int num_chains = chain_mean.size();
-    Eigen::VectorXd chain_var(num_chains);
-    for (int chain = 0; chain < num_chains; ++chain) {
-      chain_var(chain) = acov(chain)(0);
-    }
+    int num_chains = sizes.size();
 
     // need to generalize to each jagged draws per chain
-    int num_draws = acov(0).size();
-    double mean_var = chain_var.mean() * num_draws / (num_draws - 1);
+    size_t num_draws = sizes[0];
+    for (int chain = 1; chain < num_chains; ++chain) {
+      num_draws = std::min(num_draws, sizes[chain]);
+    }
+
+    Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
+    Eigen::VectorXd chain_mean(num_chains);
+    Eigen::VectorXd chain_var(num_chains);
+    for (int chain = 0; chain < num_chains; ++chain) {
+      Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
+        draw(draws[chain], sizes[chain]);
+      autocovariance<double>(draw, acov(chain));
+      chain_mean(chain) = draw.mean();
+      chain_var(chain) = acov(chain)(0) * num_draws / (num_draws - 1);
+    }
+
+    double mean_var = chain_var.mean();
     double var_plus = mean_var * (num_draws - 1) / num_draws;
     if (num_chains > 1)
-      var_plus += (chain_mean.array() - chain_mean.mean()).square().sum() / (num_chains - 1);
-
+      var_plus += math::variance(chain_mean);
     Eigen::VectorXd rho_hat_s(num_draws);
     rho_hat_s.setZero();
     Eigen::VectorXd acov_s(num_chains);
@@ -90,9 +99,17 @@ namespace analyze {
     return ess / std::max(tau_hat, 1 / std::log10(ess));
   }
 
+  inline
+  double compute_effective_sample_size(std::vector<const double*> draws,
+                                       size_t size) {
+    int num_chains = draws.size();
+    std::vector<size_t> sizes(num_chains, size);
+    return compute_effective_sample_size(draws, sizes);
+  }
+
   /**
    * Returns the effective sample size for the specified parameter
-   * across all kept samples.
+   * across all kept and split samples.
    *
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation
@@ -100,65 +117,39 @@ namespace analyze {
    * Current implementation assumes chains are all of equal size and
    * draws are stored in contiguous blocks of memory.
    *
-   * @param Eigen::MatrixBase stores arrays of chains
+   * @param std::vector stores pointers to arrays of chains
+   * @param std::vector stores sizes of chains
    * @return effective sample size for the specified parameter
    */
-  template <typename Derived>
   inline
-  double compute_effective_sample_size(const Eigen::MatrixBase<Derived>& draws) {
+  double compute_split_effective_sample_size(std::vector<const double*> draws,
+                                             std::vector<size_t> sizes) {
 
-    int num_chains = draws.cols();
-    Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
-    Eigen::VectorXd chain_mean(num_chains);
-    for (int chain = 0; chain < num_chains; ++chain) {
-      autocovariance<double>(draws.col(chain), acov(chain));
-      chain_mean(chain) = draws.col(chain).mean();
+    int num_chains = sizes.size();
+
+    // need to generalize to each jagged draws per chain
+    size_t num_draws = sizes[0];
+    for (int chain = 1; chain < num_chains; ++chain) {
+      num_draws = std::min(num_draws, sizes[chain]);
     }
 
-    return effective_sample_size_impl(acov, chain_mean);
+    std::vector<const double*> split_draws = split_chains(draws, sizes);
+
+    double half = num_draws / 2.0;
+    std::vector<size_t> half_sizes(2 * num_chains, std::floor(half));
+
+    return compute_effective_sample_size(split_draws, half_sizes);
   }
 
-    /**
-     * Returns the effective sample size for the specified parameter
-     * across all kept samples.
-     *
-     * See more details in Stan reference manual section "Effective
-     * Sample Size". http://mc-stan.org/users/documentation
-     *
-     * Current implementation assumes chains are all of equal size and
-     * draws are stored in contiguous blocks of memory.
-     *
-     * @param std::vector stores pointers to arrays of chains
-     * @param std::vector stores sizes of chains
-     * @return effective sample size for the specified parameter
-     */
-    inline
-    double compute_effective_sample_size(std::vector<const double*> draws,
-                                         std::vector<size_t> sizes) {
+  inline
+  double compute_split_effective_sample_size(std::vector<const double*> draws,
+                                             size_t size) {
+    int num_chains = draws.size();
+    std::vector<size_t> sizes(num_chains, size);
+    return compute_split_effective_sample_size(draws, sizes);
+  }
 
-      // std::cout << compute_effective_sample_size(split_chains(draws, sizes))
-      //           << std::endl;
 
-      int num_chains = sizes.size();
-      Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
-      Eigen::VectorXd chain_mean(num_chains);
-      for (int chain = 0; chain < num_chains; ++chain) {
-        Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
-          draw(draws[chain], sizes[chain]);
-        autocovariance<double>(draw, acov(chain));
-        chain_mean(chain) = draw.mean();
-      }
-
-      return effective_sample_size_impl(acov, chain_mean);
-    }
-
-    inline
-    double compute_effective_sample_size(std::vector<const double*> draws,
-                                         size_t size) {
-      int num_chains = draws.size();
-      std::vector<size_t> sizes(num_chains, size);
-      return compute_effective_sample_size(draws, sizes);
-    }
 } // namespace analyze
 } // namespace stan
 
