@@ -112,7 +112,7 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             setupCXX()
-                            bat "make -j${env.PARALLEL} test-headers"
+                            bat "mingw32-make -j${env.PARALLEL} test-headers"
                             setupCXX(false)
                             runTestsWin("src/test/unit")
                     }
