@@ -99,6 +99,21 @@ namespace analyze {
     return ess / std::max(tau_hat, 1 / std::log10(ess));
   }
 
+  /**
+   * Returns the effective sample size for the specified parameter
+   * across all kept samples.
+   *
+   * See more details in Stan reference manual section "Effective
+   * Sample Size". http://mc-stan.org/users/documentation
+   *
+   * Current implementation assumes chains are all of equal size and
+   * draws are stored in contiguous blocks of memory.  Argument size
+   * will be broadcast to same length as draws.
+   *
+   * @param std::vector stores pointers to arrays of chains
+   * @param size_t size of chains
+   * @return effective sample size for the specified parameter
+   */
   inline
   double compute_effective_sample_size(std::vector<const double*> draws,
                                        size_t size) {
@@ -141,6 +156,21 @@ namespace analyze {
     return compute_effective_sample_size(split_draws, half_sizes);
   }
 
+  /**
+   * Returns the effective sample size for the specified parameter
+   * across all kept and split samples.
+   *
+   * See more details in Stan reference manual section "Effective
+   * Sample Size". http://mc-stan.org/users/documentation
+   *
+   * Current implementation assumes chains are all of equal size and
+   * draws are stored in contiguous blocks of memory.  Argument size
+   * will be broadcast to same length as draws.
+   *
+   * @param std::vector stores pointers to arrays of chains
+   * @param size_t size of chains
+   * @return effective sample size for the specified parameter
+   */
   inline
   double compute_split_effective_sample_size(std::vector<const double*> draws,
                                              size_t size) {
@@ -148,7 +178,6 @@ namespace analyze {
     std::vector<size_t> sizes(num_chains, size);
     return compute_split_effective_sample_size(draws, sizes);
   }
-
 
 } // namespace analyze
 } // namespace stan

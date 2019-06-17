@@ -7,6 +7,19 @@
 namespace stan {
 namespace analyze {
 
+  /**
+   * Returns samples split in half.
+   *
+   * See more details in Stan reference manual section "Effective
+   * Sample Size". http://mc-stan.org/users/documentation
+   *
+   * Current implementation assumes chains are all of equal size and
+   * draws are stored in contiguous blocks of memory.
+   *
+   * @param std::vector stores pointers to arrays of chains
+   * @param std::vector stores sizes of chains
+   * @return effective sample size for the specified parameter
+   */
   inline
   std::vector<const double*>
   split_chains(const std::vector<const double*>& draws,
@@ -29,6 +42,28 @@ namespace analyze {
   }
 
     return split_draws;
+  }
+
+  /**
+   * Returns samples split in half.
+   *
+   * See more details in Stan reference manual section "Effective
+   * Sample Size". http://mc-stan.org/users/documentation
+   *
+   * Current implementation assumes chains are all of equal size and
+   * draws are stored in contiguous blocks of memory.  Argument size
+   * will be broadcast to same length as draws.
+   *
+   * @param std::vector stores pointers to arrays of chains
+   * @param size_t size of chains
+   * @return effective sample size for the specified parameter
+   */
+  inline
+  double split_chains(std::vector<const double*> draws,
+                      size_t size) {
+    int num_chains = draws.size();
+    std::vector<size_t> sizes(num_chains, size);
+    return split_chains(draws, sizes);
   }
 
 } // namespace analyze

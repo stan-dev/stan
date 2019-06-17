@@ -11,8 +11,8 @@ namespace analyze {
 
   /**
    * Write autocorrelation estimates for every lag for the specified
-   * input sequence into the specified result using the specified
-   * FFT engine.  The return vector be resized to the same length as
+   * input sequence into the specified result using the specified FFT
+   * engine.  The return vector will be resized to the same length as
    * the input sequence with lags given by array index.
    *
    * <p>The implementation involves a fast Fourier transform,
