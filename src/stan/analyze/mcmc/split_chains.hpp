@@ -59,8 +59,8 @@ namespace analyze {
    * @return effective sample size for the specified parameter
    */
   inline
-  double split_chains(std::vector<const double*> draws,
-                      size_t size) {
+  std::vector<const double*>
+  split_chains(std::vector<const double*> draws, size_t size) {
     int num_chains = draws.size();
     std::vector<size_t> sizes(num_chains, size);
     return split_chains(draws, sizes);
