@@ -4,6 +4,7 @@
 #include <boost/throw_exception.hpp>
 #include <stan/math/prim/mat.hpp>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace stan {
