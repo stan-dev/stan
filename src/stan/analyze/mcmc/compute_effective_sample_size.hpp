@@ -28,7 +28,6 @@ namespace analyze {
   inline
   double compute_effective_sample_size(std::vector<const double*> draws,
                                        std::vector<size_t> sizes) {
-
     int num_chains = sizes.size();
 
     // need to generalize to each jagged draws per chain
@@ -94,8 +93,9 @@ namespace analyze {
     double ess = num_chains * num_draws;
     // Geyer's truncated estimate
     // Improved estimate reduces variance in antithetic case
-    double tau_hat = -1 + 2 * rho_hat_s.head(max_s).sum() + rho_hat_s(max_s + 1);
-    // Safety check for negative values and with max ess equal to ess*log10(ess)
+    double tau_hat = -1 + 2*rho_hat_s.head(max_s).sum() + rho_hat_s(max_s + 1);
+    // Safety check for negative values and
+    // with max ess equal to ess*log10(ess)
     return ess / std::max(tau_hat, 1 / std::log10(ess));
   }
 
@@ -139,7 +139,6 @@ namespace analyze {
   inline
   double compute_split_effective_sample_size(std::vector<const double*> draws,
                                              std::vector<size_t> sizes) {
-
     int num_chains = sizes.size();
 
     // need to generalize to each jagged draws per chain
@@ -179,7 +178,7 @@ namespace analyze {
     return compute_split_effective_sample_size(draws, sizes);
   }
 
-} // namespace analyze
-} // namespace stan
+}  // namespace analyze
+}  // namespace stan
 
 #endif

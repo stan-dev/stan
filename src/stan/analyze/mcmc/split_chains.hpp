@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <vector>
+#include <algorithm>
 
 namespace stan {
 namespace analyze {
@@ -24,7 +25,6 @@ namespace analyze {
   std::vector<const double*>
   split_chains(const std::vector<const double*>& draws,
                const std::vector<size_t>& sizes) {
-
     int num_chains = sizes.size();
 
     // need to generalize to each jagged draws per chain
@@ -66,7 +66,7 @@ namespace analyze {
     return split_chains(draws, sizes);
   }
 
-} // namespace analyze
-} // namespace stan
+}  // namespace analyze
+}  // namespace stan
 
 #endif
