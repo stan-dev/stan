@@ -22,7 +22,7 @@ namespace stan {
      * a nil index list, which just returns the value.
      *
      * Types:  T[] : T
-     * 
+     *
      * @tparam T Scalar type.
      * @param[in] c Value to index.
      * @return Input value.
@@ -52,7 +52,7 @@ namespace stan {
                     const char* name = "ANON", int depth = 0) {
       int ones_idx = idx.head_.n_;
       math::check_range("vector[single] indexing", name, v.size(), ones_idx);
-      return v(ones_idx - 1);
+      return v.coeff(ones_idx - 1);
     }
 
     /**
@@ -76,13 +76,13 @@ namespace stan {
       int n = idx.head_.n_;
       math::check_range("row_vector[single] indexing", name,
                         rv.size(), n);
-      return rv(n - 1);
+      return rv.coeff(n - 1);
     }
 
     /**
      * Return the result of indexing the specified Eigen vector with a
      * sequence containing one multiple index, returning a vector.
-     * 
+     *
      * Types: vec[multiple] : vec
      *
      * @tparam T Scalar type.
@@ -105,7 +105,7 @@ namespace stan {
       for (int i = 0; i < size; ++i) {
         int n = rvalue_at(i, idx.head_);
         math::check_range("vector[multi] indexing", name, v.size(), n);
-        a(i) = v(n - 1);
+        a(i) = v.coeff(n - 1);
       }
       return a;
     }
@@ -113,8 +113,8 @@ namespace stan {
     /**
      * Return the result of indexing the specified Eigen row vector
      * with a sequence containing one multiple index, returning a row
-     * vector. 
-     * 
+     * vector.
+     *
      * Types:  row_vec[multiple] : rowvec
      *
      * @tparam T Scalar type.
@@ -137,7 +137,7 @@ namespace stan {
       for (int i = 0; i < size; ++i) {
         int n = rvalue_at(i, idx.head_);
         math::check_range("row_vector[multi] indexing", name, rv.size(), n);
-        a(i) = rv(n - 1);
+        a(i) = rv.coeff(n - 1);
       }
       return a;
     }
@@ -220,7 +220,7 @@ namespace stan {
       int n = idx.tail_.head_.n_;
       math::check_range("matrix[uni,uni] indexing, row", name, a.rows(), m);
       math::check_range("matrix[uni,uni] indexing, col", name, a.cols(), n);
-      return a(m - 1, n - 1);
+      return a.coeff(m - 1, n - 1);
     }
 
     /**
@@ -282,14 +282,14 @@ namespace stan {
         int n = idx.tail_.head_.n_;
         math::check_range("matrix[multi,uni] index row", name, a.rows(), m);
         math::check_range("matrix[multi,uni] index col", name, a.cols(), n);
-        c(i) = a(m - 1, n - 1);
+        c(i) = a.coeff(m - 1, n - 1);
       }
       return c;
     }
 
     /**
      * Return the result of indexing the specified Eigen matrix with a
-     * sequence consisting of a pair o multiple indexes, returning a 
+     * sequence consisting of a pair o multiple indexes, returning a
      * a matrix.
      *
      * Types:  mat[multiple,multiple] : mat
@@ -323,14 +323,14 @@ namespace stan {
                             a.rows(), m);
           math::check_range("matrix[multi,multi] col index", name,
                             a.cols(), n);
-          c(i, j) = a(m - 1, n - 1);
+          c(i, j) = a.coeff(m - 1, n - 1);
         }
       }
       return c;
     }
 
     /**
-     * Return the result of indexing the specified array with 
+     * Return the result of indexing the specified array with
      * a list of indexes beginning with a single index;  the result is
      * determined recursively.  Note that arrays are represented as
      * standard library vectors.
@@ -356,7 +356,7 @@ namespace stan {
     }
 
     /**
-     * Return the result of indexing the specified array with 
+     * Return the result of indexing the specified array with
      * a list of indexes beginning with a multiple index;  the result is
      * determined recursively.  Note that arrays are represented as
      * standard library vectors.
