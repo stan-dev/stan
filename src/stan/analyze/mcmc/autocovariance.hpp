@@ -13,7 +13,8 @@ namespace analyze {
    * Write autocorrelation estimates for every lag for the specified
    * input sequence into the specified result using the specified FFT
    * engine.  The return vector will be resized to the same length as
-   * the input sequence with lags given by array index.
+   * the input sequence with lags given by array index.  Uses "biased"
+   * estimate as recommended by Geyer (1992).
    *
    * <p>The implementation involves a fast Fourier transform,
    * followed by a normalization, followed by an inverse transform.
@@ -57,8 +58,9 @@ namespace analyze {
   /**
    * Write autocovariance estimates for every lag for the specified
    * input sequence into the specified result.  The return vector be
-   * resized to the same length as the input sequence with lags
-   * given by array index.
+   * resized to the same length as the input sequence with lags given
+   * by array index.  Uses "biased" estimate as recommended by Geyer
+   * (1992).
    *
    * <p>The implementation involves a fast Fourier transform,
    * followed by a normalization, followed by an inverse transform.
@@ -81,8 +83,9 @@ namespace analyze {
   /**
    * Write autocovariance estimates for every lag for the specified
    * input sequence into the specified result.  The return vector be
-   * resized to the same length as the input sequence with lags
-   * given by array index.
+   * resized to the same length as the input sequence with lags given
+   * by array index.  Uses "biased" estimate as recommended by Geyer
+   * (1992).
    *
    * <p>The implementation involves a fast Fourier transform,
    * followed by a normalization, followed by an inverse transform.
