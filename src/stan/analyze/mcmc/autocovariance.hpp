@@ -78,6 +78,32 @@ namespace analyze {
     acov = acov.array() * (y.array() - y.mean()).square().sum() / y.size();
   }
 
+  /**
+   * Write autocovariance estimates for every lag for the specified
+   * input sequence into the specified result.  The return vector be
+   * resized to the same length as the input sequence with lags
+   * given by array index.
+   *
+   * <p>The implementation involves a fast Fourier transform,
+   * followed by a normalization, followed by an inverse transform.
+   *
+   * <p>This method is just a light wrapper around the three-argument
+   * autocovariance function
+   *
+   * @tparam T Scalar type.
+   * @param y Input sequence.
+   * @param acov Autocovariances.
+   */
+  template <typename T>
+  void autocovariance(const std::vector<T>& y, std::vector<T>& acov) {
+    size_t N = y.size();
+    acov.resize(N);
+
+    const Eigen::Map<const Eigen::Matrix<T, Eigen::Dynamic, 1> > y_map(&y[0], N);
+    Eigen::Map<Eigen::Matrix<T, Eigen::Dynamic, 1> > acov_map(&acov[0], N);
+    autocovariance<T>(y_map, acov_map);
+  }
+
 } // namespace analyze
 } // namespace stan
 
