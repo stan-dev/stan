@@ -1405,3 +1405,28 @@ TEST(io_reader, matrix_lub_constrain_lp) {
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0, a);
 }
+
+
+TEST(IoReader, SimplexThrows) {
+  std::vector<double> theta;
+  std::vector<int> theta_i;
+  stan::io::reader<double> reader(theta, theta_i);
+
+  double x = 0;
+  double lp = 0;
+  EXPECT_THROW(reader.simplex(x), std::invalid_argument);
+  EXPECT_THROW(reader.simplex_constrain(x), std::invalid_argument);
+  EXPECT_THROW(reader.simplex_constrain(x, lp), std::invalid_argument);
+}
+
+TEST(IoReader, UnitVectorThrows) {
+  std::vector<double> theta;
+  std::vector<int> theta_i;
+  stan::io::reader<double> reader(theta, theta_i);
+
+  double x = 0;
+  double lp = 0;
+  EXPECT_THROW(reader.unit_vector(x), std::invalid_argument);
+  EXPECT_THROW(reader.unit_vector_constrain(x), std::invalid_argument);
+  EXPECT_THROW(reader.unit_vector_constrain(x, lp), std::invalid_argument);
+}
