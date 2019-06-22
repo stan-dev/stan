@@ -19,7 +19,7 @@ namespace analyze {
    *
    * @param std::vector stores pointers to arrays of chains
    * @param std::vector stores sizes of chains
-   * @return effective sample size for the specified parameter
+   * @return std::vector of pointers to twice as many arrays of half chains
    */
   inline
   std::vector<const double*>
@@ -56,7 +56,7 @@ namespace analyze {
    *
    * @param std::vector stores pointers to arrays of chains
    * @param size_t size of chains
-   * @return effective sample size for the specified parameter
+   * @return std::vector of pointers to twice as many arrays of half chains
    */
   inline
   std::vector<const double*>

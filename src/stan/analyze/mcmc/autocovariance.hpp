@@ -2,6 +2,7 @@
 #define STAN_ANALYZE_MCMC_AUTOCOVARIANCE_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/mat.hpp>
 #include <unsupported/Eigen/FFT>
 #include <complex>
 #include <vector>
