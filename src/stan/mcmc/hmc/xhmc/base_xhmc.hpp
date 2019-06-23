@@ -41,11 +41,11 @@ namespace stan {
       if (log_w2 > log_w1) {
         double e = std::exp(log_w1 - log_w2);
         sum_a = (e * a1 + a2) / (1 + e);
-        log_sum_w = log_w2 + std::log(1 + e);
+        log_sum_w = log_w2 + std::log1p(e);
       } else {
         double e = std::exp(log_w2 - log_w1);
         sum_a = (a1 + e * a2) / (1 + e);
-        log_sum_w = log_w1 + std::log(1 + e);
+        log_sum_w = log_w1 + std::log1p(e);
       }
     }
 
