@@ -123,18 +123,27 @@ test/test-model-main.cpp:
 
 ##
 # Adding a test for multiple translation units. If this fails,
-# a new function is probably missing an inline
+# a new function is probably missing an inline.
+# Templates for such test are prefixed with 'mtu_'.
 ##
-ifneq ($(OS),Windows_NT)
-test/unit/multiple_translation_units%.o : CXXFLAGS += -fPIC
-endif
-test/unit/multiple_translation_units%.o : CXXFLAGS += -pipe
-test/unit/libmultiple.so : LDFLAGS += -shared
+test/unit/mtu_%_1.cpp: src/test/unit/mtu_%.cpp
+	cp $< $@
+test/unit/mtu_%_2.cpp: src/test/unit/mtu_%.cpp
+	cp $< $@
 
-test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o $(MPI_TARGETS)
+ifneq ($(OS),Windows_NT)
+test/unit/mtu_%.o : CXXFLAGS += -fPIC
+endif
+test/unit/mtu_%.o : O = 0
+test/unit/mtu_%.o : mtu_%.cpp
+	$(COMPILE.cpp) -pipe -o $(DEV_NULL) -include $^
+
+test/unit/libmtu_%.so : LDFLAGS += -shared
+
+test/unit/libmtu_%.so : test/unit/mtu_%_1.o test/unit/mtu_%_2.o $(MPI_TARGETS)
 	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
-test/unit/multiple_translation_units_test$(EXE) : test/unit/libmultiple.so
+test/unit/multiple_translation_units_test$(EXE) : test/unit/libmtu_model.so test/unit/libmtu_mcmc.so
 
 
 ############################################################
