@@ -274,7 +274,7 @@ namespace stan {
         if (this->rand_uniform_() < accept_prob)
           z_propose = z_propose_right;
 
-        return std::fabs(ave_subtree) >= x_delta_;
+        return std::abs(ave_subtree) >= x_delta_;
       }
 
       int depth_;
