@@ -196,7 +196,7 @@ namespace stan {
        * @param sum_metro_prob Summed Metropolis probabilities across trajectory
        * @param logger Logger for messages
       */
-      int build_tree(int depth, ps_point& z_propose,
+      bool build_tree(int depth, ps_point& z_propose,
                      double& ave, double& log_sum_weight,
                      double H0, double sign, int& n_leapfrog,
                      double& sum_metro_prob,
@@ -283,7 +283,7 @@ namespace stan {
       double x_delta_;
 
       int n_leapfrog_;
-      int divergent_;
+      bool divergent_;
       double energy_;
     };
 
