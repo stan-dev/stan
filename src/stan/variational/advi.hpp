@@ -505,7 +505,7 @@ namespace stan {
                                    tol_rel_obj, max_iterations,
                                    logger, diagnostic_writer);
 
-        // Write mean of posterior approximation on first output line
+        // Write posterior mean of variational approximations.
         cont_params_ = variational.mean();
         std::vector<double> cont_vector(cont_params_.size());
         for (int i = 0; i < cont_params_.size(); ++i)
@@ -518,32 +518,38 @@ namespace stan {
                            true, true, &msg);
         if (msg.str().length() > 0)
           logger.info(msg);
-        values.insert(values.begin(), 0);
+
+        // The first row of lp_, log_p, and log_g.
+        values.insert(values.begin(), {0, 0, 0});
         parameter_writer(values);
 
-        // Draw more samples from posterior and write on subsequent lines
+        // Draw more from posterior and write on subsequent lines
         logger.info("");
         std::stringstream ss;
         ss << "Drawing a sample of size "
            << n_posterior_samples_
            << " from the approximate posterior... ";
         logger.info(ss);
-
+        double log_p = 0;
+        double log_g = 0;
+        // Draw posterior sample. log_g is the log normal densities.
         for (int n = 0; n < n_posterior_samples_; ++n) {
-          variational.sample(rng_, cont_params_);
+          variational.sample_log_g(rng_, cont_params_, log_g);
           for (int i = 0; i < cont_params_.size(); ++i) {
             cont_vector.at(i) = cont_params_(i);
           }
           std::stringstream msg2;
-          model_.write_array(rng_, cont_vector, disc_vector, values,
-                             true, true, &msg2);
+          model_.write_array(rng_, cont_vector, disc_vector,
+                             values, true, true, &msg2);
+          //  log_p: Log probability in the unconstrained space
+          log_p = model_.template log_prob<false, true>(cont_params_, &msg2);
           if (msg2.str().length() > 0)
             logger.info(msg2);
-          values.insert(values.begin(), 0);
+         // Write lp__, log_p, and log_g.
+          values.insert(values.begin(), {0, log_p, log_g});
           parameter_writer(values);
         }
         logger.info("COMPLETED.");
-
         return stan::services::error_codes::OK;
       }
 

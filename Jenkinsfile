@@ -8,22 +8,6 @@ def setupCXX(failOnError = true) {
     writeFile(file: "make/local", text: "CXX=${env.CXX} ${errorStr}")
 }
 
-def setup(String pr) {
-    script = """
-        make math-revert
-        make clean-all
-        git clean -xffd
-    """
-    if (pr != '')  {
-        prNumber = pr.tokenize('-').last()
-        script += """
-            cd lib/stan_math
-            git fetch https://github.com/stan-dev/math +refs/pull/${prNumber}/merge:refs/remotes/origin/pr/${prNumber}/merge
-            git checkout refs/remotes/origin/pr/${prNumber}/merge
-        """
-    }
-    return script
-}
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
     if (separateMakeStep) {
@@ -45,6 +29,15 @@ def deleteDirWin() {
 }
 
 String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
+String stan_pr() {
+    if (env.BRANCH_NAME == 'downstream_tests') {
+        ''
+    } else if (env.BRANCH_NAME == 'downstream_hotfix') {
+        'master'
+    } else {
+        env.BRANCH_NAME
+    }
+}
 
 pipeline {
     agent none
@@ -76,8 +69,14 @@ pipeline {
             agent any
             steps {
                 script {
+                    sh "printenv"
                     retry(3) { checkout scm }
-                    sh setup(params.math_pr)
+                    sh """
+                       make math-revert
+                       make clean-all
+                       git clean -xffd
+                    """
+                    utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
                     setupCXX()
                     parallel(
@@ -88,7 +87,19 @@ pipeline {
             }
             post {
                 always {
-                    warnings consoleParsers: [[parserName: 'CppLint']], canRunOnFailed: true
+
+                    recordIssues id: "lint_doc_checks", 
+                    name: "Linting & Doc checks",
+                    enabledForFailure: true, 
+                    aggregatingResults : true, 
+                    tools: [
+                        cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
+                    ],
+                    blameDisabled: false,
+                    qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                    referenceJobName: env.BRANCH_NAME
+
                     deleteDir()
                 }
             }
@@ -129,11 +140,11 @@ pipeline {
         }
         stage('Upstream CmdStan tests') {
             when { expression { env.BRANCH_NAME ==~ /PR-\d+/ ||
-                                env.BRANCH_NAME == "downstream_tests" } }
+                                env.BRANCH_NAME == "downstream_tests" ||
+                                env.BRANCH_NAME == "downstream_hotfix" } }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
-                      parameters: [string(name: 'stan_pr',
-                                          value: env.BRANCH_NAME == "downstream_tests" ? '' : env.BRANCH_NAME),
+                      parameters: [string(name: 'stan_pr', value: stan_pr()),
                                    string(name: 'math_pr', value: params.math_pr)])
             }
         }
@@ -163,8 +174,18 @@ pipeline {
     post {
         always {
             node("osx || linux") {
-                warnings consoleParsers: [[parserName: 'GNU C Compiler 4 (gcc)']], canRunOnFailed: true
-                warnings consoleParsers: [[parserName: 'Clang (LLVM based)']], canRunOnFailed: true
+                recordIssues id: "pipeline", 
+                name: "Entire pipeline results",
+                enabledForFailure: true, 
+                aggregatingResults : false, 
+                tools: [
+                    gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
+                    clang(id: "pipeline_clang", name: "LLVM/Clang")
+                ],
+                blameDisabled: false,
+                qualityGates: [[threshold: 30, type: 'TOTAL', unstable: true]],
+                healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                referenceJobName: env.BRANCH_NAME
             }
         }
         success {

@@ -28,6 +28,11 @@ namespace stan {
       bare_expr_type type_;
 
       /**
+       * Construct a default unary operation.
+       */
+      unary_op();
+
+      /**
        * Construct a unary operation of the specified operation and
        * argument. 
        *

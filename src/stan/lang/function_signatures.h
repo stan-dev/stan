@@ -1480,16 +1480,25 @@ add("wishart_lpdf", bare_expr_type(double_type()), bare_expr_type(matrix_type())
 add("wishart_rng", bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_expr_type(matrix_type()));
 
 // Newton solver for Laplace approximation
-add("lgp_newton_solver", bare_expr_type(vector_type()), bare_expr_type(vector_type()), bare_expr_type(double_type()),
+add("lgp_newton_solver", bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()), bare_expr_type(double_type()),
     int_vector_types[1], int_vector_types[1]);
 
-add("lgp_newton_solver", bare_expr_type(vector_type()), bare_expr_type(vector_type()), bare_expr_type(double_type()),
+add("lgp_newton_solver", bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()), bare_expr_type(double_type()),
     int_vector_types[1], int_vector_types[1], bare_types[1], bare_types[0],
     bare_types[0]);
 
-add("lgp_dense_newton_solver", bare_expr_type(vector_type()), bare_expr_type(vector_type()),
-    bare_expr_type(vector_type()), int_vector_types[1], int_vector_types[1]);
+add("lgp_dense_newton_solver", bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()), bare_expr_type(vector_type()),
+    int_vector_types[1], int_vector_types[1]);
   
-add("lgp_dense_newton_solver", bare_expr_type(vector_type()), bare_expr_type(vector_type()),
-    bare_expr_type(vector_type()), int_vector_types[1], int_vector_types[1], bare_types[1], 
+add("lgp_dense_newton_solver", bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()), bare_expr_type(vector_type()),
+    int_vector_types[1], int_vector_types[1], bare_types[1], 
     bare_types[0], bare_types[0], bare_types[0], bare_types[0]);
+
+add("lgp_solver", bare_expr_type(vector_type()),
+    bare_expr_type(vector_type(), bare_expr_type(vector_type()),
+    int_vector_types[1], int_vector_types[1], bare_types[1],
+    bare_types[0]);

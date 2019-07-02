@@ -67,4 +67,14 @@ TEST(lang, generate_cpp) {
     << "generate_model_typedef()";
 
   EXPECT_EQ(0, count_matches("int main", output_str));
+
+}
+
+TEST(lang, generate_transform_inits_cpp) {
+  std::vector<stan::lang::block_var_decl> vs;
+  std::stringstream output;
+  stan::lang::generate_transform_inits_method(vs, output);
+  std::string output_str = output.str();
+  EXPECT_EQ(1, count_matches("typedef double local_scalar_t__;", output_str))
+    << "generate_transform_inits_method()";
 }

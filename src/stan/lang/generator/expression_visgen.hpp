@@ -109,13 +109,12 @@ namespace stan {
         generate_expression(x.expr_, user_facing_, expr_o);
         std::string expr_string = expr_o.str();
         std::vector<expression> indexes;
-        size_t e_num_dims = x.type_.num_dims();
         for (size_t i = 0; i < x.dimss_.size(); ++i)
           for (size_t j = 0; j < x.dimss_[i].size(); ++j)
             indexes.push_back(x.dimss_[i][j]);  // wasteful copy, could use refs
         generate_indexed_expr<false>(expr_string, indexes,
-                                     x.type_.innermost_type(),
-                                     e_num_dims, user_facing_, o_);
+                                     x.expr_.bare_type(),
+                                     user_facing_, o_);
       }
 
       void operator()(const index_op_sliced& x) const {
@@ -233,6 +232,23 @@ namespace stan {
         o_ << ", ";
         generate_expression(fx.job_data_i_, NOT_USER_FACING, o_);
         o_ << ", pstream__)";
+      }
+
+      void operator()(const integrate_1d& fx) const {
+        o_ << "integrate_1d("
+           << fx.function_name_ << "_functor__(), ";
+        generate_expression(fx.lb_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.ub_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.theta_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_r_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_i_, user_facing_, o_);
+        o_ << ", *pstream__, ";
+        generate_expression(fx.rel_tol_, user_facing_, o_);
+        o_ << ")";
       }
 
       void operator()(const fun& fx) const {

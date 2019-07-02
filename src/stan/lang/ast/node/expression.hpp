@@ -19,6 +19,7 @@ namespace stan {
     struct row_vector_expr;
     struct variable;
     struct fun;
+    struct integrate_1d;
     struct integrate_ode;
     struct integrate_ode_control;
     struct algebra_solver;
@@ -39,6 +40,7 @@ namespace stan {
                              boost::recursive_wrapper<row_vector_expr>,
                              boost::recursive_wrapper<variable>,
                              boost::recursive_wrapper<fun>,
+                             boost::recursive_wrapper<integrate_1d>,
                              boost::recursive_wrapper<integrate_ode>,
                              boost::recursive_wrapper<integrate_ode_control>,
                              boost::recursive_wrapper<algebra_solver>,
@@ -62,6 +64,7 @@ namespace stan {
       expression(const row_vector_expr& expr);  // NOLINT(runtime/explicit)
       expression(const variable& expr);  // NOLINT(runtime/explicit)
       expression(const fun& expr);  // NOLINT(runtime/explicit)
+      expression(const integrate_1d& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode& expr);  // NOLINT(runtime/explicit)
       expression(const integrate_ode_control& expr);  // NOLINT
       expression(const algebra_solver& expr);  // NOLINT(runtime/explicit)

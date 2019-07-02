@@ -214,10 +214,10 @@ TEST(lang, params_block_var_hpp_get_dims) {
 
   std::string expected("        std::vector<size_t> dims__;\n"
                        "        dims__.resize(0);\n"
-                       "        dims__.push_back(2);\n"
-                       "        dims__.push_back(3);\n"
                        "        dims__.push_back(4);\n"
-                       "        dims__.push_back(5);\n");
+                       "        dims__.push_back(5);\n"
+                       "        dims__.push_back(2);\n"
+                       "        dims__.push_back(3);\n");
 
   EXPECT_EQ(1, count_matches(expected,hpp));
 }
@@ -358,10 +358,10 @@ TEST(lang, transformed_params_block_var_hpp_get_dims) {
 
   std::string expected("        std::vector<size_t> dims__;\n"
                        "        dims__.resize(0);\n"
-                       "        dims__.push_back(2);\n"
-                       "        dims__.push_back(3);\n"
                        "        dims__.push_back(4);\n"
-                       "        dims__.push_back(5);\n");
+                       "        dims__.push_back(5);\n"
+                       "        dims__.push_back(2);\n"
+                       "        dims__.push_back(3);\n");
 
   EXPECT_EQ(1, count_matches(expected,hpp));
 }
@@ -464,10 +464,10 @@ TEST(lang, generated_quantities_block_var_hpp_get_dims) {
 
   std::string expected("        std::vector<size_t> dims__;\n"
                        "        dims__.resize(0);\n"
-                       "        dims__.push_back(2);\n"
-                       "        dims__.push_back(3);\n"
                        "        dims__.push_back(4);\n"
-                       "        dims__.push_back(5);\n");
+                       "        dims__.push_back(5);\n"
+                       "        dims__.push_back(2);\n"
+                       "        dims__.push_back(3);\n");
 
   EXPECT_EQ(1, count_matches(expected,hpp));
 }
