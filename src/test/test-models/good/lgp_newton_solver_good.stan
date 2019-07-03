@@ -1,7 +1,7 @@
-// Test both lgp solvers: first one is for the case where the
+// Test all three lgp solvers: first one is for the case where the
 // latent Gaussian variable has a diagonal covariance matrix,
 // second case generalises this to a dense covariance matrix.
-// This are experiment is rather specific.
+// (This experiment is rather specific.) (? why did I write this?)
 
 data {
 
@@ -55,6 +55,13 @@ transformed parameters {
   theta = lgp_dense_newton_solver(theta_0_v, phi_vec, n_samples, samples, tol, max_num_steps, is_line_search, print_iteration, space_matters);
   theta = lgp_dense_newton_solver(theta_0, phi_vec_v, n_samples, samples, tol, max_num_steps, is_line_search, print_iteration, space_matters);
   theta = lgp_dense_newton_solver(theta_0_v, phi_vec_v, n_samples, samples, tol, max_num_steps, is_line_search, print_iteration, space_matters);
+  
+  // lgp solver (interfaced with Kinsol)
+  theta = lgp_solver(theta_0, phi_vec, n_samples, samples, tol, max_num_steps);
+  theta = lgp_solver(theta_0_v, phi_vec, n_samples, samples, tol, max_num_steps);
+  theta = lgp_solver(theta_0, phi_vec_v, n_samples, samples, tol, max_num_steps);
+  theta = lgp_solver(theta_0_v, phi_vec_v, n_samples, samples, tol, max_num_steps);
+
 }
 
 model {
