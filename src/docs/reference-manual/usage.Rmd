@@ -1,3 +1,0 @@
-# <i style="font-size: 110%; color:#990017;">Usage</i> {-}
-
-The appendices provide auxiliary information pertaining to the use of Stan beyond the specification of the language and the algorithms.

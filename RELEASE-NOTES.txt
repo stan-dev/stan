@@ -5,6 +5,59 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.19.1 (18 Apr 2019)
+======================================================================
+
+This is a release out of cycle to address a performance bug in v.2.19 (stan-dev/stan#2748)
+
+Bug Fixes
+--------------------------------------------------
+* #2749 - Fixed generator so that matrix indexing uses most efficient access strategy - generated code should call stan::math::get_base1() on matrix using 5-arg function which specifies matrix row, column.
+
+
+v.2.19.0 (20 March 2019)
+======================================================================
+Stan now comes with GPU support for certain functions; see the Math library
+release notes for more details: https://github.com/stan-dev/math/releases/tag/v2.19.0
+The manual is now online in HTML format! 
+
+New Features
+--------------------------------------------------
+* #2618 - Add a new Variational Inference diagnostic 
+* #2627 - 1d integrator
+* #2725 - standalone generated quantities
+* #2717, #2669 - offset/multiplier transformations for easier non-centering, etc
+* #2652 - Allow CSV reader to read max_depth from CmdStan CSV file
+* #2620 - expose beta_proportion distribution, cdf, rng functions
+* #2635 - allow paths to be passed to stanc
+* #2441 - Add specialized functions for GLMs
+* #2358 - enchanced include syntax
+* #2575 - Analysis API for computing effective sample size
+* #2467 - expose bernoulli logit rng
+
+Bug Fixes
+--------------------------------------------------
+* #2730 - make read_stan_csv more robust; affects CmdStan.
+* #2714 - fix bug in generated code for strange constraint expressions
+* #2704 - fix json nan and inf handling
+* #2677 - fix copying for compound assignments
+* #2672 - fix sampling from multivariate normal specified by precision matrix
+* #2643 - fix segfault in optimizing an exponential model
+* #2636 - fix return of generated quantities when client only asked for params
+* #2614 - fix "unknown variable" messages for function calls on LHS
+* #2609 - use the word "info" instead of "warning" for many messages
+
+v.2.18.1 (24 December 2018)
+======================================================================
+Bugfix release - major bug in threading where certain thread count and
+job size combinations could result in incorrect output. See
+https://discourse.mc-stan.org/t/bug-in-map-rect-with-threading-in-stan-2-18-0/7056
+for more details.
+
+Bug Fixes
+--------------------------------------------------
+* Fix threading batch size bug (stan-dev/math#1075)
+
 v2.18.0 (13 July 2018)
 ======================================================================
 This is our first release with parallelism (threading and MPI)!

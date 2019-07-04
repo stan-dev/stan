@@ -127,7 +127,9 @@ transformed data {
   ty <- y3[1,1,1];
   ty <- col(m,1);
   ty <- col(m1[1],1);
+
   ty <- col(m2[1,1],1);
+
   ty <- col(m3[1,1,1],1);
 
   ty1[1] <- y;
@@ -166,8 +168,8 @@ transformed data {
   tz <- row(m2[1,1],1);
   tz <- row(m3[1,1,1],1);
   tz <- m[1];
-  tz <- m1[1,1];
-  tz <- m2[1,1,1];
+  tz <- m1[1,1]; // lhs: row_vector, rhs: array of matrix - should return rv 
+  tz <- m2[1,1,1]; // lhs: row_vector, rhs: 2d array of matrix - should return rv 
   tz <- m3[1,1,1,1];
 
   tz1[1] <- z;

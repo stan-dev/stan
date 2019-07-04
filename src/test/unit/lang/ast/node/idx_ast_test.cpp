@@ -32,7 +32,7 @@ TEST(langAst, uniIdx) {
   EXPECT_EQ(bare_expr_type(int_type()), i.idx_.bare_type());
   EXPECT_EQ(0, i.idx_.bare_type().num_dims());
   // test allow construction
-  EXPECT_NO_THROW(stan::lang::idx(i));
+  EXPECT_NO_THROW((stan::lang::idx)(i));
   stan::lang::idx i2(i);
   EXPECT_EQ(i2.to_string(), "3");
 }
@@ -46,7 +46,7 @@ TEST(langAst, multiIdx) {
   EXPECT_EQ(bare_expr_type(int_type()), i.idxs_.bare_type().innermost_type());
   EXPECT_EQ(1, i.idxs_.bare_type().num_dims());
   // test allow construction
-  EXPECT_NO_THROW(stan::lang::idx(i));
+  EXPECT_NO_THROW((stan::lang::idx)(i));
   stan::lang::idx i2(i);
   EXPECT_EQ(i2.to_string(), "foo");
 }
@@ -56,7 +56,7 @@ TEST(langAst, omniIdx) {
   EXPECT_NO_THROW(stan::lang::omni_idx());
   // test allow construction
   stan::lang::omni_idx i;
-  EXPECT_NO_THROW(stan::lang::idx(i));
+  EXPECT_NO_THROW((stan::lang::idx)(i));
   stan::lang::idx i2(i);
   EXPECT_EQ(i2.to_string(), ":");
 }
@@ -68,7 +68,7 @@ TEST(langAst, lbIdx) {
   EXPECT_EQ(bare_expr_type(int_type()), i.lb_.bare_type());
   EXPECT_EQ(0, i.lb_.bare_type().num_dims());
   // test allow construction
-  EXPECT_NO_THROW(stan::lang::idx(i));
+  EXPECT_NO_THROW((stan::lang::idx)(i));
   stan::lang::idx i2(i);
   EXPECT_EQ(i2.to_string(), "3:");
 }
@@ -80,7 +80,7 @@ TEST(langAst, ubIdx) {
   EXPECT_EQ(bare_expr_type(int_type()), i.ub_.bare_type());
   EXPECT_EQ(0, i.ub_.bare_type().num_dims());
   // test allow construction
-  EXPECT_NO_THROW(stan::lang::idx(i));
+  EXPECT_NO_THROW((stan::lang::idx)(i));
   stan::lang::idx i2(i);
   EXPECT_EQ(i2.to_string(), ":3");
 }
@@ -97,7 +97,7 @@ TEST(langAst, lubIdx) {
   EXPECT_EQ(bare_expr_type(int_type()), i.ub_.bare_type());
   EXPECT_EQ(0, i.ub_.bare_type().num_dims());
   // test allow construction
-  EXPECT_NO_THROW(stan::lang::idx(i));
+  EXPECT_NO_THROW((stan::lang::idx)(i));
   stan::lang::idx i2(i);
   EXPECT_EQ(i2.to_string(), "3:foo");
 }

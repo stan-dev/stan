@@ -92,8 +92,3 @@ TEST(langParserStatementGrammar, slicedOpEqualsBad) {
   test_throws("compound-assign/plus_equals_sliced",
               "left-hand side type = vector; right-hand side type=matrix");
 }
-
-TEST(langParserStatementGrammar, deepCopy) {
-  test_warning("parser-generator/deep-copy-warning",
-               "inefficient deep copy to avoid aliasing");
-}
