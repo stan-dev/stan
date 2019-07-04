@@ -95,7 +95,7 @@ namespace stan {
         double log_sum_weight = 0;  // log(exp(H0 - H0))
         double H0 = this->hamiltonian_.H(this->z_);
         int n_leapfrog = 0;
-        double sum_metro_prob = 0;
+        double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
 
         // Build a trajectory until the NUTS criterion is no longer satisfied
         this->depth_ = 0;
@@ -107,14 +107,16 @@ namespace stan {
           bool valid_subtree = false;
           double log_sum_weight_subtree
             = -std::numeric_limits<double>::infinity();
-
+          double log_sum_accept_stat_subtree 
+            = -std::numeric_limits<double>::infinity();
+          
           if (this->rand_uniform_() > 0.5) {
             this->z_.ps_point::operator=(z_plus);
             valid_subtree
               = build_tree(this->depth_, z_propose,
                            p_sharp_dummy, p_sharp_plus, rho_subtree,
                            H0, 1, n_leapfrog,
-                           log_sum_weight_subtree, sum_metro_prob,
+                           log_sum_weight_subtree, log_sum_accept_stat_subtree,
                            logger);
             z_plus.ps_point::operator=(this->z_);
           } else {
@@ -123,13 +125,13 @@ namespace stan {
               = build_tree(this->depth_, z_propose,
                            p_sharp_dummy, p_sharp_minus, rho_subtree,
                            H0, -1, n_leapfrog,
-                           log_sum_weight_subtree, sum_metro_prob,
+                           log_sum_weight_subtree, log_sum_accept_stat_subtree,
                            logger);
             z_minus.ps_point::operator=(this->z_);
           }
 
           if (!valid_subtree) break;
-
+          
           // Sample from an accepted subtree
           ++(this->depth_);
 
@@ -145,6 +147,10 @@ namespace stan {
           log_sum_weight
             = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
 
+          log_sum_accept_stat 
+            = math::log_sum_exp(log_sum_accept_stat, 
+                                log_sum_accept_stat_subtree);
+          
           // Break when NUTS criterion is no longer satisfied
           rho += rho_subtree;
           if (!compute_criterion(p_sharp_minus, p_sharp_plus, rho))
@@ -153,14 +159,17 @@ namespace stan {
 
         this->n_leapfrog_ = n_leapfrog;
 
-        // Compute average acceptance probabilty across entire trajectory,
-        // even over subtrees that may have been rejected
-        double accept_prob
-          = sum_metro_prob / static_cast<double>(n_leapfrog);
+        double accept_stat = 0; // Default to accept stat of zero
 
+        // Update accept stat if any subtrees were accepted
+        if (log_sum_weight > 0) {
+          log_sum_weight = math::log_diff_exp(log_sum_weight, 0);
+          accept_stat = std::exp(log_sum_accept_stat - log_sum_weight);
+        }
+        
         this->z_.ps_point::operator=(z_sample);
         this->energy_ = this->hamiltonian_.H(this->z_);
-        return sample(this->z_.q, -this->z_.V, accept_prob);
+        return sample(this->z_.q, -this->z_.V, accept_stat);
       }
 
       void get_sampler_param_names(std::vector<std::string>& names) {
@@ -185,7 +194,7 @@ namespace stan {
         return    p_sharp_plus.dot(rho) > 0
                && p_sharp_minus.dot(rho) > 0;
       }
-
+      
       /**
        * Recursively build a new subtree to completion or until
        * the subtree becomes invalid.  Returns validity of the
@@ -200,7 +209,7 @@ namespace stan {
        * @param sign Direction in time to built subtree
        * @param n_leapfrog Summed number of leapfrog evaluations
        * @param log_sum_weight Log of summed weights across trajectory
-       * @param sum_metro_prob Summed Metropolis probabilities across trajectory
+       * @param log_sum_accept_stat Log of summed accept stat proxy across trajectory
        * @param logger Logger for messages
       */
       bool build_tree(int depth, ps_point& z_propose,
@@ -208,7 +217,7 @@ namespace stan {
                       Eigen::VectorXd& p_sharp_right,
                       Eigen::VectorXd& rho,
                       double H0, double sign, int& n_leapfrog,
-                      double& log_sum_weight, double& sum_metro_prob,
+                      double& log_sum_weight, double& log_sum_accept_stat,
                       callbacks::logger& logger) {
         // Base case
         if (depth == 0) {
@@ -225,11 +234,16 @@ namespace stan {
 
           log_sum_weight = math::log_sum_exp(log_sum_weight, H0 - h);
 
-          if (H0 - h > 0)
-            sum_metro_prob += 1;
-          else
-            sum_metro_prob += std::exp(H0 - h);
-
+          if (H0 - h > 0) {
+            // Saturated Metropolis accept probability with Boltzman weight
+            log_sum_accept_stat 
+              = math::log_sum_exp(log_sum_accept_stat, (H0 - h) + 0);
+          } else {
+            // Unsaturated Metropolis accept probability with Boltzman weight
+            log_sum_accept_stat 
+              = math::log_sum_exp(log_sum_accept_stat, (H0 - h) + (H0 - h));
+          }
+          
           z_propose = this->z_;
           rho += this->z_.p;
 
@@ -249,7 +263,7 @@ namespace stan {
           = build_tree(depth - 1, z_propose,
                        p_sharp_left, p_sharp_dummy, rho_left,
                        H0, sign, n_leapfrog,
-                       log_sum_weight_left, sum_metro_prob,
+                       log_sum_weight_left, log_sum_accept_stat,
                        logger);
 
         if (!valid_left) return false;
@@ -264,7 +278,7 @@ namespace stan {
           = build_tree(depth - 1, z_propose_right,
                        p_sharp_dummy, p_sharp_right, rho_right,
                        H0, sign, n_leapfrog,
-                       log_sum_weight_right, sum_metro_prob,
+                       log_sum_weight_right, log_sum_accept_stat,
                        logger);
 
         if (!valid_right) return false;
