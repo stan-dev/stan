@@ -18,7 +18,9 @@ namespace stan {
      */
     void generate_class_decl(const std::string& model_name,
                              std::ostream& o) {
-      o << "class " << model_name << " : public prob_grad {" << EOL;
+      o << "class " << model_name
+        << " : public stan::model::model_crtp<" << model_name << "> {"
+        << EOL;
     }
 
 
