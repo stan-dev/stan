@@ -18,8 +18,8 @@ namespace stan {
      * Current implementation assumes chains are all of equal size and
      * draws are stored in contiguous blocks of memory.
      *
-     * @param std::vector stores pointers to arrays of chains
-     * @param std::vector stores sizes of chains
+     * @param draws stores pointers to arrays of chains
+     * @param sizes stores sizes of chains
      * @return effective sample size for the specified parameter
      */
     inline
