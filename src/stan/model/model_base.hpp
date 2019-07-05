@@ -51,7 +51,7 @@ class model_base : public prob_grad {
   /**
    * Return the name of the model.
    *
-   * @param return name of model
+   * @return model name
    */
   virtual std::string model_name() const = 0;
 
@@ -80,7 +80,7 @@ class model_base : public prob_grad {
    * }`, and a 2-dimensional array of 3 x 4 matrices will have
    * dimensionality `std::vector<size_t>{2, 3, 4}`.
    *
-   * @param dimss[in,out]
+   * @param[in,out] dimss sequence of dimensions specifications to set
    */
   virtual void get_dims(std::vector<std::vector<size_t> >& dimss) const = 0;
 
@@ -345,13 +345,13 @@ class model_base : public prob_grad {
    * number of constrained scalar parameters.
    *
    * @param base_rng RNG to use for generated quantities
-   * @param params_r[in] unconstrained parameters input
-   * @param params_constrained_r[in,out] constrained parameters produced
-   * @param inlcude_tparams[in] true if transformed parameters are
+   * @param[in] params_r unconstrained parameters input
+   * @param[in,out] params_constrained_r constrained parameters produced
+   * @param[in] include_tparams true if transformed parameters are
    * included in output
-   * @param inlcude_gqs[in] true if generated quantities are included
+   * @param[in] include_gqs true if generated quantities are included
    * in output
-   * @param msgs[in,out] msgs stream to which messages are written
+   * @param[in,out] msgs msgs stream to which messages are written
    */
   virtual void write_array(boost::ecuyer1988& base_rng,
                            Eigen::VectorXd& params_r,
@@ -380,7 +380,7 @@ class model_base : public prob_grad {
    */
   virtual double
   log_prob(std::vector<double>& params_r,  std::vector<int>& params_i,
-           std::ostream*) const = 0;
+           std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -541,9 +541,9 @@ class model_base : public prob_grad {
    * included for the change of variables from unconstrained to
    * constrained parameters.
    * @tparam T type of scalars in the vector of parameters
-   * @param params_r[in] unconstrained parameters
+   * @param[in] params_r unconstrained parameters
    * @param[in] params_i integer parameters (ignored)
-   * @param msgs[in,out] stream to which messages are written
+   * @param[in,out] msgs stream to which messages are written
    * @return log density with normalizing constants and Jacobian
    * included as specified by the template parameters
    */
@@ -589,19 +589,19 @@ class model_base : public prob_grad {
    * number of constrained scalar parameters.
    *
    * @param base_rng RNG to use for generated quantities
-   * @param params_r[in] unconstrained parameters input
+   * @param[in] params_r unconstrained parameters input
    * @param[in] params_i integer parameters (ignored)
-   * @param params_r_constrained[in,out] constrained parameters produced
-   * @param inlcude_tparams[in] true if transformed parameters are
+   * @param[in,out] params_r_constrained constrained parameters produced
+   * @param[in] include_tparams true if transformed parameters are
    * included in output
-   * @param inlcude_gqs[in] true if generated quantities are included
+   * @param[in] include_gqs true if generated quantities are included
    * in output
-   * @param msgs[in,out] msgs stream to which messages are written
+   * @param[in,out] msgs msgs stream to which messages are written
    */
   virtual void write_array(boost::ecuyer1988& base_rng,
                            std::vector<double>& params_r,
                            std::vector<int>& params_i,
-                           std::vector<double>& vars,
+                           std::vector<double>& params_r_constrained,
                            bool include_tparams = true,
                            bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
