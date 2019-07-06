@@ -1,8 +1,6 @@
 #ifndef STAN_MODEL_MODEL_CRTP_HPP
 #define STAN_MODEL_MODEL_CRTP_HPP
 
-#include <stan/io/var_context.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/model/model_base.hpp>
 #include <iostream>
 #include <utility>
@@ -71,7 +69,7 @@ namespace model {
  * template methods defined in the class documentation
  */
 template <typename M>
-class model_crtp : public model_base {
+class model_crtp : public stan::model::model_base {
  public:
   /**
    * Construct a model with the specified number of real unconstrained
