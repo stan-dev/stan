@@ -40,11 +40,8 @@ namespace stan {
                        const Eigen::Matrix<U, R, C>& y,
                        const char* name = "ANON",
                        int depth = 0) {
-      x.resize(y.rows(), y.cols());
-      for (int i = 0; i < y.size(); ++i)
-        assign(x(i), nil_index_list(), y(i), name, depth + 1);
+      x = y;
     }
-
 
     template <typename T, typename U>
     inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
