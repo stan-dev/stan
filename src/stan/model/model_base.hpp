@@ -1,8 +1,8 @@
 #ifndef STAN_MODEL_MODEL_BASE_HPP
 #define STAN_MODEL_MODEL_BASE_HPP
 
-#include <stan/model/model_header.hpp>
 #include <stan/model/prob_grad.hpp>
+#include <stan/math/rev/core.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <ostream>
 #include <string>
