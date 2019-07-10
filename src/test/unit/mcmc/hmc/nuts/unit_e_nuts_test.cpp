@@ -45,12 +45,12 @@ TEST(McmcUnitENuts, build_tree_test) {
 
   double H0 = -0.1;
   int n_leapfrog = 0;
-  double sum_metro_prob = 0;
+  double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
 
   bool valid_subtree = sampler.build_tree(3, z_propose,
                                           p_sharp_left, p_sharp_right, rho,
                                           H0, 1, n_leapfrog, log_sum_weight,
-                                          sum_metro_prob,
+                                          log_sum_accept_stat,
                                           logger);
 
   EXPECT_EQ(0.1, sampler.get_nominal_stepsize());
@@ -71,7 +71,7 @@ TEST(McmcUnitENuts, build_tree_test) {
 
   EXPECT_EQ(8, n_leapfrog);
   EXPECT_FLOAT_EQ(std::log(0.36134657), log_sum_weight);
-  EXPECT_FLOAT_EQ(0.36134657, sum_metro_prob);
+  EXPECT_FLOAT_EQ(-4.1152759, log_sum_accept_stat);
 
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
@@ -161,7 +161,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
 
   double H0 = -0.1;
   int n_leapfrog = 0;
-  double sum_metro_prob = 0;
+  double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
 
   // Depth 0 forward
   sampler.z() = z_init;
@@ -169,7 +169,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.build_tree(0, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+                     log_sum_accept_stat,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n)
@@ -184,7 +184,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.build_tree(1, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+                     log_sum_accept_stat,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n)
@@ -199,7 +199,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.build_tree(2, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+                     log_sum_accept_stat,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n)
@@ -214,7 +214,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.build_tree(3, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+                     log_sum_accept_stat,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n)
@@ -229,7 +229,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.build_tree(0, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, -1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+                     log_sum_accept_stat,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n)
@@ -244,7 +244,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.build_tree(1, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, -1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+                     log_sum_accept_stat,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n)
@@ -259,7 +259,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.build_tree(2, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, -1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+                     log_sum_accept_stat,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n)
@@ -274,7 +274,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.build_tree(3, z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, -1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+                     log_sum_accept_stat,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n)
@@ -323,7 +323,7 @@ TEST(McmcUnitENuts, transition_test) {
   EXPECT_FLOAT_EQ(-0.74208695, s.cont_params()(1));
   EXPECT_FLOAT_EQ( 1.5202962, s.cont_params()(2));
   EXPECT_FLOAT_EQ(-3.1828632, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99604273, s.accept_stat());
+  EXPECT_FLOAT_EQ(0.9960447, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());

@@ -45,12 +45,12 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
 
   double H0 = -0.1;
   int n_leapfrog = 0;
-  double sum_metro_prob = 0;
+  double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
 
   bool valid_subtree = sampler.build_tree(3, z_propose,
                                           p_sharp_left, p_sharp_right, rho,
                                           H0, 1, n_leapfrog, log_sum_weight,
-                                          sum_metro_prob, logger);
+                                          log_sum_accept_stat, logger);
 
   EXPECT_EQ(0.1, sampler.get_nominal_stepsize());
 
@@ -70,7 +70,7 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
 
   EXPECT_EQ(8, n_leapfrog);
   EXPECT_FLOAT_EQ(std::log(0.34310558), log_sum_weight);
-  EXPECT_FLOAT_EQ(0.34310558, sum_metro_prob);
+  EXPECT_FLOAT_EQ(-4.2188749, log_sum_accept_stat);
 
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
@@ -322,7 +322,7 @@ TEST(McmcSoftAbsNuts, transition_test) {
   EXPECT_FLOAT_EQ(-0.86902142, s.cont_params()(1));
   EXPECT_FLOAT_EQ(1.6008, s.cont_params()(2));
   EXPECT_FLOAT_EQ(-3.5239484, s.log_prob());
-  EXPECT_FLOAT_EQ(0.99690288, s.accept_stat());
+  EXPECT_FLOAT_EQ(0.99690413, s.accept_stat());
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
   EXPECT_EQ("", warn.str());
