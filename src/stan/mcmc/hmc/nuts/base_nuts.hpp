@@ -209,7 +209,8 @@ namespace stan {
        * @param sign Direction in time to built subtree
        * @param n_leapfrog Summed number of leapfrog evaluations
        * @param log_sum_weight Log of summed weights across trajectory
-       * @param log_sum_accept_stat Log of summed accept stat proxy across trajectory
+       * @param log_sum_accept_stat Log of summed acceptance statistics
+       *                            across numerical trajectory
        * @param logger Logger for messages
       */
       bool build_tree(int depth, ps_point& z_propose,
@@ -234,6 +235,8 @@ namespace stan {
 
           log_sum_weight = math::log_sum_exp(log_sum_weight, H0 - h);
 
+          // Add acceptance statistic of new state to running sum
+          // a += e^{-H(q_n, p_n)} max(1, e^{H(q_0 - p_0) -H(q_n, p_n)})
           if (H0 - h > 0) {
             // Saturated Metropolis accept probability with Boltzman weight
             log_sum_accept_stat 
