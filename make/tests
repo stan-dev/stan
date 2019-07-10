@@ -126,24 +126,27 @@ test/test-model-main.cpp:
 # a new function is probably missing an inline.
 # Templates for such test are prefixed with 'mtu_'.
 ##
-test/unit/mtu_%_1.cpp: src/test/unit/mtu_%.cpp
+test/integration/mtu :
+	mkdir -p test/integration/mtu
+
+test/integration/mtu/%_1.cpp : src/test/integration/mtu/%.cpp test/integration/mtu
 	cp $< $@
-test/unit/mtu_%_2.cpp: src/test/unit/mtu_%.cpp
+test/integration/mtu/%_2.cpp : src/test/integration/mtu/%.cpp test/integration/mtu
 	cp $< $@
 
 ifneq ($(OS),Windows_NT)
-test/unit/mtu_%.o : CXXFLAGS += -fPIC
+test/integration/mtu/%.o : CXXFLAGS += -fPIC
 endif
-test/unit/mtu_%.o : O = 0
-test/unit/mtu_%.o : mtu_%.cpp
+test/integration/mtu/%.o : O = 0
+test/integration/mtu/%.o : %.cpp
 	$(COMPILE.cpp) -pipe -o $(DEV_NULL) -include $^
 
-test/unit/libmtu_%.so : LDFLAGS += -shared
+test/integration/libmtu_%.so : LDFLAGS += -shared
 
-test/unit/libmtu_%.so : test/unit/mtu_%_1.o test/unit/mtu_%_2.o $(MPI_TARGETS)
+test/integration/libmtu_%.so : test/integration/mtu/%_1.o test/integration/mtu/%_2.o $(MPI_TARGETS)
 	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
-test/unit/multiple_translation_units_test$(EXE) : test/unit/libmtu_model.so test/unit/libmtu_mcmc.so
+test/integration/multiple_translation_units_test$(EXE) : test/integration/libmtu_model.so test/integration/libmtu_mcmc.so
 
 
 ############################################################
