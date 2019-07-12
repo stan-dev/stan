@@ -108,31 +108,31 @@ TEST_F(performance, values_from_tagged_version) {
     << "last tagged version, 2.17.0, had " << N_values << " elements";
 
   std::vector<double> first_run = last_draws_per_run[0];
-  EXPECT_FLOAT_EQ(-65.781998, first_run[0])
+  EXPECT_FLOAT_EQ(-65.227997, first_run[0])
     << "lp__: index 0";
 
-  EXPECT_FLOAT_EQ(1.0, first_run[1])
+  EXPECT_FLOAT_EQ(0.97589898, first_run[1])
     << "accept_stat__: index 1";
 
-  EXPECT_FLOAT_EQ(0.76853198, first_run[2])
+  EXPECT_FLOAT_EQ(0.80600202, first_run[2])
     << "stepsize__: index 2";
 
   EXPECT_FLOAT_EQ(2, first_run[3])
     << "treedepth__: index 3";
 
-  EXPECT_FLOAT_EQ(7, first_run[4])
+  EXPECT_FLOAT_EQ(3, first_run[4])
     << "n_leapfrog__: index 4";
 
   EXPECT_FLOAT_EQ(0, first_run[5])
     << "divergent__: index 5";
 
-  EXPECT_FLOAT_EQ(66.6695, first_run[6])
+  EXPECT_FLOAT_EQ(65.4617, first_run[6])
     << "energy__: index 6";
 
-  EXPECT_FLOAT_EQ(1.55186, first_run[7])
+  EXPECT_FLOAT_EQ(1.3497699, first_run[7])
     << "beta.1: index 7";
 
-  EXPECT_FLOAT_EQ(-0.52400702, first_run[8])
+  EXPECT_FLOAT_EQ(-0.56483799, first_run[8])
     << "beta.2: index 8";
 
   matches_tagged_version = !HasNonfatalFailure();
