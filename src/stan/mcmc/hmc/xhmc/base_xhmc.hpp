@@ -10,44 +10,10 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <utility>
 
 namespace stan {
   namespace mcmc {
-    /**
-     * a1 and a2 are running averages of the form
-     *   \f$ a1 =   ( \sum_{n \in N1} w_{n} f_{n} )
-     *            / ( \sum_{n \in N1}  w_{n} ) \f$
-     *   \f$ a2 =   ( \sum_{n \in N2} w_{n} f_{n} )
-     *            / ( \sum_{n \in N2}  w_{n} ) \f$
-     * and the weights are the respective normalizing constants
-     *   \f$ w1 = \sum_{n \in N1} w_{n} \f$
-     *   \f$ w2 = \sum_{n \in N2} w_{n}. \f$
-     *
-     * This function returns the pooled average
-     *   \f$ sum_a =   ( \sum_{n \in N1 \cup N2} w_{n} f_{n} )
-     *               / ( \sum_{n \in N1 \cup N2}  w_{n} ) \f$
-     * and the pooled weights
-     *   \f$ log_sum_w = log(w1 + w2). \f$
-     *
-     * @param a1 First running average, f1 / w1
-     * @param log_w1 Log of first summed weight
-     * @param a2 Second running average
-     * @param log_w2 Log of second summed weight
-     * @param sum_a Average of input running averages
-     * @param log_sum_w Log of summed input weights
-    */
-    void stable_sum(double a1, double log_w1, double a2, double log_w2,
-                    double& sum_a, double& log_sum_w) {
-      if (log_w2 > log_w1) {
-        double e = std::exp(log_w1 - log_w2);
-        sum_a = (e * a1 + a2) / (1 + e);
-        log_sum_w = log_w2 + std::log(1 + e);
-      } else {
-        double e = std::exp(log_w2 - log_w1);
-        sum_a = (a1 + e * a2) / (1 + e);
-        log_sum_w = log_w1 + std::log(1 + e);
-      }
-    }
 
     /**
      * Exhaustive Hamiltonian Monte Carlo (XHMC) with multinomial sampling.
@@ -136,9 +102,9 @@ namespace stan {
           }
 
           if (!valid_subtree) break;
-          stable_sum(ave, log_sum_weight,
-                     ave_subtree, log_sum_weight_subtree,
-                     ave, log_sum_weight);
+          std::tie(ave, log_sum_weight)
+            = stable_sum(ave, log_sum_weight,
+                         ave_subtree, log_sum_weight_subtree);
 
           // Sample from an accepted subtree
           ++(this->depth_);
@@ -195,12 +161,13 @@ namespace stan {
        * @param n_leapfrog Summed number of leapfrog evaluations
        * @param sum_metro_prob Summed Metropolis probabilities across trajectory
        * @param logger Logger for messages
+       * @return whether built tree is valid
       */
-      int build_tree(int depth, ps_point& z_propose,
-                     double& ave, double& log_sum_weight,
-                     double H0, double sign, int& n_leapfrog,
-                     double& sum_metro_prob,
-                     callbacks::logger& logger) {
+      bool build_tree(int depth, ps_point& z_propose,
+                      double& ave, double& log_sum_weight,
+                      double H0, double sign, int& n_leapfrog,
+                      double& sum_metro_prob,
+                      callbacks::logger& logger) {
         // Base case
         if (depth == 0) {
           this->integrator_.evolve(this->z_, this->hamiltonian_,
@@ -216,9 +183,8 @@ namespace stan {
 
           double dG_dt = this->hamiltonian_.dG_dt(this->z_, logger);
 
-          stable_sum(ave, log_sum_weight,
-                     dG_dt, H0 - h,
-                     ave, log_sum_weight);
+          std::tie(ave, log_sum_weight) = stable_sum(ave, log_sum_weight,
+                                                     dG_dt, H0 - h);
 
           if (H0 - h > 0)
             sum_metro_prob += 1;
@@ -242,9 +208,9 @@ namespace stan {
                        logger);
 
         if (!valid_left) return false;
-        stable_sum(ave, log_sum_weight,
-                   ave_left, log_sum_weight_left,
-                   ave, log_sum_weight);
+        std::tie(ave, log_sum_weight)
+          = stable_sum(ave, log_sum_weight,
+                       ave_left, log_sum_weight_left);
 
         // Build the right subtree
         ps_point z_propose_right(this->z_);
@@ -258,23 +224,58 @@ namespace stan {
                        logger);
 
         if (!valid_right) return false;
-        stable_sum(ave, log_sum_weight,
-                   ave_right, log_sum_weight_right,
-                   ave, log_sum_weight);
+        std::tie(ave, log_sum_weight)
+          = stable_sum(ave, log_sum_weight,
+                       ave_right, log_sum_weight_right);
 
         // Multinomial sample from right subtree
         double ave_subtree;
         double log_sum_weight_subtree;
-        stable_sum(ave_left,  log_sum_weight_left,
-                   ave_right, log_sum_weight_right,
-                   ave_subtree, log_sum_weight_subtree);
+        std::tie(ave_subtree, log_sum_weight_subtree)
+          = stable_sum(ave_left, log_sum_weight_left,
+                       ave_right, log_sum_weight_right);
 
         double accept_prob
           = std::exp(log_sum_weight_right - log_sum_weight_subtree);
         if (this->rand_uniform_() < accept_prob)
           z_propose = z_propose_right;
 
-        return std::fabs(ave_subtree) >= x_delta_;
+        return std::abs(ave_subtree) >= x_delta_;
+      }
+
+      /**
+       * a1 and a2 are running averages of the form
+       *   \f$ a1 =   ( \sum_{n \in N1} w_{n} f_{n} )
+       *            / ( \sum_{n \in N1}  w_{n} ) \f$
+       *   \f$ a2 =   ( \sum_{n \in N2} w_{n} f_{n} )
+       *            / ( \sum_{n \in N2}  w_{n} ) \f$
+       * and the weights are the respective normalizing constants
+       *   \f$ w1 = \sum_{n \in N1} w_{n} \f$
+       *   \f$ w2 = \sum_{n \in N2} w_{n}. \f$
+       *
+       * This function returns the pooled average
+       *   \f$ sum_a =   ( \sum_{n \in N1 \cup N2} w_{n} f_{n} )
+       *               / ( \sum_{n \in N1 \cup N2}  w_{n} ) \f$
+       * and the pooled weights
+       *   \f$ log_sum_w = log(w1 + w2). \f$
+       *
+       * @param[in] a1 First running average, f1 / w1
+       * @param[in] log_w1 Log of first summed weight
+       * @param[in] a2 Second running average
+       * @param[in] log_w2 Log of second summed weight
+       * @return Pair of average of input running averages and log of summed input weights
+      */
+      static std::pair<double, double> stable_sum(double a1, double log_w1,
+                                                  double a2, double log_w2) {
+        if (log_w2 > log_w1) {
+          const double e = std::exp(log_w1 - log_w2);
+          return std::make_pair((e * a1 + a2) / (1 + e),
+                                log_w2 + std::log1p(e));
+        } else {
+          const double e = std::exp(log_w2 - log_w1);
+          return std::make_pair((a1 + e * a2) / (1 + e),
+                                log_w1 + std::log1p(e));
+        }
       }
 
       int depth_;
@@ -283,7 +284,7 @@ namespace stan {
       double x_delta_;
 
       int n_leapfrog_;
-      int divergent_;
+      bool divergent_;
       double energy_;
     };
 
