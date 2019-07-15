@@ -13,9 +13,12 @@ namespace analyze {
   /**
    * Write autocorrelation estimates for every lag for the specified
    * input sequence into the specified result using the specified FFT
-   * engine.  The return vector will be resized to the same length as
-   * the input sequence with lags given by array index.  Uses "biased"
-   * estimate as recommended by Geyer (1992).
+   * engine. Normalizes lag-k autocorrelation estimators by N instead
+   * of (N - k), yielding biased but more stable estimators as
+   * discussed in Geyer (1992); see
+   * https://projecteuclid.org/euclid.ss/1177011137. The return vector
+   * will be resized to the same length as the input sequence with
+   * lags given by array index.
    *
    * <p>The implementation involves a fast Fourier transform,
    * followed by a normalization, followed by an inverse transform.
@@ -58,10 +61,13 @@ namespace analyze {
 
   /**
    * Write autocovariance estimates for every lag for the specified
-   * input sequence into the specified result.  The return vector be
-   * resized to the same length as the input sequence with lags given
-   * by array index.  Uses "biased" estimate as recommended by Geyer
-   * (1992).
+   * input sequence into the specified result using the specified FFT
+   * engine. Normalizes lag-k autocovariance estimators by N instead
+   * of (N - k), yielding biased but more stable estimators as
+   * discussed in Geyer (1992); see
+   * https://projecteuclid.org/euclid.ss/1177011137. The return vector
+   * will be resized to the same length as the input sequence with
+   * lags given by array index.
    *
    * <p>The implementation involves a fast Fourier transform,
    * followed by a normalization, followed by an inverse transform.
@@ -83,10 +89,13 @@ namespace analyze {
 
   /**
    * Write autocovariance estimates for every lag for the specified
-   * input sequence into the specified result.  The return vector be
-   * resized to the same length as the input sequence with lags given
-   * by array index.  Uses "biased" estimate as recommended by Geyer
-   * (1992).
+   * input sequence into the specified result using the specified FFT
+   * engine. Normalizes lag-k autocovariance estimators by N instead
+   * of (N - k), yielding biased but more stable estimators as
+   * discussed in Geyer (1992); see
+   * https://projecteuclid.org/euclid.ss/1177011137. The return vector
+   * will be resized to the same length as the input sequence with
+   * lags given by array index.
    *
    * <p>The implementation involves a fast Fourier transform,
    * followed by a normalization, followed by an inverse transform.

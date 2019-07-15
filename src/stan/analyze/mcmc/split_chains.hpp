@@ -9,7 +9,8 @@ namespace stan {
 namespace analyze {
 
   /**
-   * Returns samples split in half.
+   * Splits each chain into two chains of equal length.  When the
+   * number of total draws N is odd, the (N+1)/2th draw is ignored.
    *
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation
@@ -26,14 +27,12 @@ namespace analyze {
   split_chains(const std::vector<const double*>& draws,
                const std::vector<size_t>& sizes) {
     int num_chains = sizes.size();
-
-    // need to generalize to each jagged draws per chain
-    size_t num_draws = sizes[0];
+    size_t num_total_draws = sizes[0];
     for (int chain = 1; chain < num_chains; ++chain) {
-      num_draws = std::min(num_draws, sizes[chain]);
+      num_total_draws = std::min(num_total_draws, sizes[chain]);
     }
 
-    double half = num_draws / 2.0;
+    double half = num_total_draws / 2.0;
     int half_draws = std::ceil(half);
     std::vector<const double*> split_draws(2 * num_chains);
     for (int n = 0; n < num_chains; ++n) {
@@ -45,7 +44,8 @@ namespace analyze {
   }
 
   /**
-   * Returns samples split in half.
+   * Splits each chain into two chains of equal length.  When the
+   * number of total draws N is odd, the (N+1)/2th draw is ignored.
    *
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation

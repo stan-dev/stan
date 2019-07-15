@@ -12,8 +12,9 @@ namespace stan {
 namespace analyze {
 
   /**
-   * Returns the effective sample size for the specified parameter
-   * across all kept samples.
+   * Returns the effective sample size (ESS) for the specified parameter
+   * across all kept samples.  This function bounds the returned
+   * effective sample size to [0, ESS*log10(ESS)].
    *
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation
@@ -29,11 +30,9 @@ namespace analyze {
   double compute_effective_sample_size(std::vector<const double*> draws,
                                        std::vector<size_t> sizes) {
     int num_chains = sizes.size();
-
-    // need to generalize to each jagged draws per chain
-    size_t num_draws = sizes[0];
+    size_t num_total_draws = sizes[0];
     for (int chain = 1; chain < num_chains; ++chain) {
-      num_draws = std::min(num_draws, sizes[chain]);
+      num_total_draws = std::min(num_total_draws, sizes[chain]);
     }
 
     Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
@@ -44,14 +43,14 @@ namespace analyze {
         draw(draws[chain], sizes[chain]);
       autocovariance<double>(draw, acov(chain));
       chain_mean(chain) = draw.mean();
-      chain_var(chain) = acov(chain)(0) * num_draws / (num_draws - 1);
+      chain_var(chain) = acov(chain)(0)*num_total_draws / (num_total_draws - 1);
     }
 
     double mean_var = chain_var.mean();
-    double var_plus = mean_var * (num_draws - 1) / num_draws;
+    double var_plus = mean_var * (num_total_draws - 1) / num_total_draws;
     if (num_chains > 1)
       var_plus += math::variance(chain_mean);
-    Eigen::VectorXd rho_hat_s(num_draws);
+    Eigen::VectorXd rho_hat_s(num_total_draws);
     rho_hat_s.setZero();
     Eigen::VectorXd acov_s(num_chains);
     for (int chain = 0; chain < num_chains; ++chain)
@@ -60,10 +59,11 @@ namespace analyze {
     rho_hat_s(0) = rho_hat_even;
     double rho_hat_odd = 1 - (mean_var - acov_s.mean()) / var_plus;
     rho_hat_s(1) = rho_hat_odd;
-    // Geyer's initial positive sequence
+
+    // Convert raw autocovariance estimators into Geyer's initial
+    // positive sequence
     size_t s = 1;
-    for (; s < (num_draws - 4) && (rho_hat_even + rho_hat_odd) > 0;
-         s += 2) {
+    while (s < (num_total_draws - 4) && (rho_hat_even + rho_hat_odd) > 0) {
       for (int chain = 0; chain < num_chains; ++chain)
         acov_s(chain) = acov(chain)(s + 1);
       rho_hat_even = 1 - (mean_var - acov_s.mean()) / var_plus;
@@ -74,14 +74,17 @@ namespace analyze {
         rho_hat_s(s + 1) = rho_hat_even;
         rho_hat_s(s + 2) = rho_hat_odd;
       }
+      s += 2;
     }
 
     int max_s = s;
-    // this is used in the improved estimate
+    // this is used in the improved estimate, which reduces variance
+    // in antithetic case -- see tau_hat below
     if (rho_hat_even > 0)
       rho_hat_s(max_s + 1) = rho_hat_even;
 
-    // Geyer's initial monotone sequence
+    // Convert Geyer's initial positive sequence into an initial
+    // monotone sequence
     for (int s = 1; s <= max_s - 3; s += 2) {
       if (rho_hat_s(s + 1) + rho_hat_s(s + 2) >
           rho_hat_s(s - 1) + rho_hat_s(s)) {
@@ -90,8 +93,8 @@ namespace analyze {
       }
     }
 
-    double ess = num_chains * num_draws;
-    // Geyer's truncated estimate
+    double ess = num_chains * num_total_draws;
+    // Geyer's truncated estimator for the asymptotic variance
     // Improved estimate reduces variance in antithetic case
     double tau_hat = -1 + 2*rho_hat_s.head(max_s).sum() + rho_hat_s(max_s + 1);
     // Safety check for negative values and
@@ -101,7 +104,8 @@ namespace analyze {
 
   /**
    * Returns the effective sample size for the specified parameter
-   * across all kept samples.
+   * across all kept samples.  This function bounds the returned
+   * effective sample size to [0, ESS*log10(ESS)].
    *
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation
@@ -123,8 +127,10 @@ namespace analyze {
   }
 
   /**
-   * Returns the effective sample size for the specified parameter
-   * across all kept and split samples.
+   * Returns the split effective sample size for the specified
+   * parameter across all kept samples.  This function bounds the
+   * returned effective sample size to [0, ESS*log10(ESS)].  When the
+   * number of total draws N is odd, the (N+1)/2th draw is ignored.
    *
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation
@@ -140,24 +146,24 @@ namespace analyze {
   double compute_split_effective_sample_size(std::vector<const double*> draws,
                                              std::vector<size_t> sizes) {
     int num_chains = sizes.size();
-
-    // need to generalize to each jagged draws per chain
-    size_t num_draws = sizes[0];
+    size_t num_total_draws = sizes[0];
     for (int chain = 1; chain < num_chains; ++chain) {
-      num_draws = std::min(num_draws, sizes[chain]);
+      num_total_draws = std::min(num_total_draws, sizes[chain]);
     }
 
     std::vector<const double*> split_draws = split_chains(draws, sizes);
 
-    double half = num_draws / 2.0;
+    double half = num_total_draws / 2.0;
     std::vector<size_t> half_sizes(2 * num_chains, std::floor(half));
 
     return compute_effective_sample_size(split_draws, half_sizes);
   }
 
   /**
-   * Returns the effective sample size for the specified parameter
-   * across all kept and split samples.
+   * Returns the split effective sample size for the specified
+   * parameter across all kept samples.  This function bounds the
+   * returned effective sample size to [0, ESS*log10(ESS)].  When the
+   * number of total draws N is odd, the (N+1)/2th draw is ignored.
    *
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation
