@@ -10,7 +10,7 @@
 
 #include <stan/lang/rethrow_located.hpp>
 #include <stan/model/model_base.hpp>
-#include <stan/model/model_crtp.hpp>
+#include <stan/model/model_base_crtp.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <stan/model/indexing.hpp>
 #include <stan/services/util/create_rng.hpp>

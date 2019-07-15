@@ -1,5 +1,5 @@
-#ifndef STAN_MODEL_MODEL_CRTP_HPP
-#define STAN_MODEL_MODEL_CRTP_HPP
+#ifndef STAN_MODEL_MODEL_BASE_CRTP_HPP
+#define STAN_MODEL_MODEL_BASE_CRTP_HPP
 
 #include <stan/model/model_base.hpp>
 #include <iostream>
@@ -56,12 +56,12 @@ namespace model {
  * then `foo_model` should be declared as
  *
  * ```
- * class foo_model : public stan::model::model_crtp<foo_model> { ... };
+ * class foo_model : public stan::model::model_base_crtp<foo_model> { ... };
  * ```
  *
  * The so-called "curious recursion involves the class type that is
  * being declared (`foo_model`) showing up as a template parameter in
- * the class it extends (`model_crtp<foo_model>`).  In general, the
+ * the class it extends (`model_base_crtp<foo_model>`).  In general, the
  * template parameter `M` for this class is called the derived type,
  * and must be declared to extend `foo_model<M>`.
  *
@@ -69,7 +69,7 @@ namespace model {
  * template methods defined in the class documentation
  */
 template <typename M>
-class model_crtp : public stan::model::model_base {
+class model_base_crtp : public stan::model::model_base {
  public:
   /**
    * Construct a model with the specified number of real unconstrained
@@ -77,7 +77,7 @@ class model_crtp : public stan::model::model_base {
    *
    * @param[in] num_params_r number of real unconstrained parameters
    */
-  explicit model_crtp(size_t num_params_r) :
+  explicit model_base_crtp(size_t num_params_r) :
       model_base(num_params_r) { }
 
   /**
@@ -85,7 +85,7 @@ class model_crtp : public stan::model::model_base {
    * subclass references to clean up superclasses, but is otherwise a
    * no-op.
    */
-  virtual ~model_crtp() { }
+  virtual ~model_base_crtp() { }
 
   inline double log_prob(Eigen::VectorXd& theta,
                          std::ostream* msgs) const override {

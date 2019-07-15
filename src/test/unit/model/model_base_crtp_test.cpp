@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/model/model_base.hpp>
-#include <stan/model/model_crtp.hpp>
+#include <stan/model/model_base_crtp.hpp>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -8,8 +8,8 @@
 #include <utility>
 #include <vector>
 
-struct mock_model : public stan::model::model_crtp<mock_model> {
-  mock_model(size_t n) : model_crtp(n) { }
+struct mock_model : public stan::model::model_base_crtp<mock_model> {
+  mock_model(size_t n) : model_base_crtp(n) { }
 
   virtual ~mock_model() { }
 
