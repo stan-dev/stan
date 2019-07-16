@@ -62,7 +62,9 @@ namespace analyze {
     rho_hat_s(1) = rho_hat_odd;
 
     // Convert raw autocovariance estimators into Geyer's initial
-    // positive sequence
+    // positive sequence. Loop only until num_draws - 4 to leave the
+    // last pair of autocorrelations as a bias term that reduces
+    // variance in the case of antithetical chains.
     size_t s = 1;
     while (s < (num_draws - 4) && (rho_hat_even + rho_hat_odd) > 0) {
       for (int chain = 0; chain < num_chains; ++chain)
