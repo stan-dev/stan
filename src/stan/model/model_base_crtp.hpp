@@ -21,8 +21,8 @@ namespace model {
  * ```
  * template <bool propto, bool jacobian, typename T>
  * T log_prob(std::vector<T>& params_r,
- *              std::vector<int>& params_i,
- *              std::ostream* msgs = 0) const;
+ *            std::vector<int>& params_i,
+ *            std::ostream* msgs = 0) const;
 
  * template <bool propto, bool jacobian, typename T>
  * T log_prob(Eigen::Matrix<T, -1, 1>& params_r,
@@ -32,23 +32,22 @@ namespace model {
  * and
  *
  * ```
- *  template <typename RNG>
- *    void write_array(RNG& base_rng,
- *                     std::vector<double>& params_r,
- *                     std::vector<int>& params_i,
- *                     std::vector<double>& vars,
- *                     bool include_tparams = true,
- *                     bool include_gqs = true,
- *                     std::ostream* msgs = 0) const;
+ * template <typename RNG>
+ * void write_array(RNG& base_rng,
+ *                  std::vector<double>& params_r,
+ *                  std::vector<int>& params_i,
+ *                  std::vector<double>& vars,
+ *                  bool include_tparams = true,
+ *                  bool include_gqs = true,
+ *                  std::ostream* msgs = 0) const;
  *
- *   template <typename RNG>
- *    void write_array(RNG& base_rng,
- *                     Eigen::Matrix<double, -1, 1>& params_r,
- *                     Eigen::Matrix<double, -1, 1>& vars,
- *                     bool include_tparams = true,
- *                     bool include_gqs = true,
- *                     std::ostream* msgs = 0) const
-
+ * template <typename RNG>
+ * void write_array(RNG& base_rng,
+ *                  Eigen::Matrix<double, -1, 1>& params_r,
+ *                  Eigen::Matrix<double, -1, 1>& vars,
+ *                  bool include_tparams = true,
+ *                  bool include_gqs = true,
+ *                  std::ostream* msgs = 0) const
  * ```
  *
  * <p>The derived class `M` must be declared following the curiously
@@ -59,11 +58,11 @@ namespace model {
  * class foo_model : public stan::model::model_base_crtp<foo_model> { ... };
  * ```
  *
- * The so-called "curious recursion involves the class type that is
- * being declared (`foo_model`) showing up as a template parameter in
- * the class it extends (`model_base_crtp<foo_model>`).  In general, the
- * template parameter `M` for this class is called the derived type,
- * and must be declared to extend `foo_model<M>`.
+ * The recursion arises when the type of the declared class appears as
+ * a template parameter in the class it extends.  For example,
+ * `foo_model` is declared to extend `model_base_crtp<foo_model>`.  In
+ * general, the template parameter `M` for this class is called the
+ * derived class, and must be declared to extend `foo_model<M>`.
  *
  * @tparam M type of derived model, which must implemented the
  * template methods defined in the class documentation

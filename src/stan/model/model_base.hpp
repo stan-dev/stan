@@ -28,8 +28,7 @@ namespace model {
  *
  *<p>The approach to defining models used by the Stan language code
  * generator is use the curiously recursive template base class defined
- * in the extension `stan::model::model_base_crtp`; see that class's
- * documentation for details.
+ * in the extension `stan::model::model_base_crtp`.
  */
 class model_base : public prob_grad {
  public:
