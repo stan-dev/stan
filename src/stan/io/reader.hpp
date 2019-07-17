@@ -638,11 +638,11 @@ public:
   /**
    * Return the next scalar.
    *
-   * @tparam TL Type of offset.
-   * @tparam TS Type of multiplier.
-   * @param offset Offset.
-   * @param scal Multiplier.
-   * @return Next scalar value.
+   * @tparam TL type of offset
+   * @tparam TS type of multiplier
+   * @param offset offset
+   * @param multiplier multiplier
+   * @return next scalar value
    */
   template <typename TL, typename TS>
   inline T scalar_offset_multiplier(const TL offset, const TS multiplier) {
