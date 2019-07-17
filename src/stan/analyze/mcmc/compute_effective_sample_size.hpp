@@ -22,8 +22,8 @@ namespace analyze {
    * Current implementation assumes chains are all of equal size and
    * draws are stored in contiguous blocks of memory.
    *
-   * @param std::vector stores pointers to arrays of chains
-   * @param std::vector stores sizes of chains
+   * @param draws stores pointers to arrays of chains
+   * @param sizes stores sizes of chains
    * @return effective sample size for the specified parameter
    */
   inline
@@ -116,8 +116,8 @@ namespace analyze {
    * draws are stored in contiguous blocks of memory.  Argument size
    * will be broadcast to same length as draws.
    *
-   * @param std::vector stores pointers to arrays of chains
-   * @param size_t size of chains
+   * @param draws stores pointers to arrays of chains
+   * @param size size of chains
    * @return effective sample size for the specified parameter
    */
   inline
@@ -141,8 +141,8 @@ namespace analyze {
    * Current implementation assumes chains are all of equal size and
    * draws are stored in contiguous blocks of memory.
    *
-   * @param std::vector stores pointers to arrays of chains
-   * @param std::vector stores sizes of chains
+   * @param draws stores pointers to arrays of chains
+   * @param sizes stores sizes of chains
    * @return effective sample size for the specified parameter
    */
   inline
@@ -176,8 +176,8 @@ namespace analyze {
    * draws are stored in contiguous blocks of memory.  Argument size
    * will be broadcast to same length as draws.
    *
-   * @param std::vector stores pointers to arrays of chains
-   * @param size_t size of chains
+   * @param draws stores pointers to arrays of chains
+   * @param size size of chains
    * @return effective sample size for the specified parameter
    */
   inline
