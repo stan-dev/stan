@@ -53,7 +53,7 @@ TEST(lang, generate_cpp) {
     << "generate_dims_method()";
   EXPECT_EQ(2, count_matches("void write_array(", output_str))
     << "generate_write_array_method()";
-  EXPECT_EQ(1, count_matches("static std::string model_name()", output_str))
+  EXPECT_EQ(1, count_matches("std::string model_name()", output_str))
     << "generate_model_name_method()";
   EXPECT_EQ(1, count_matches("void constrained_param_names(", output_str))
     << "generate_constrained_param_names_method()";

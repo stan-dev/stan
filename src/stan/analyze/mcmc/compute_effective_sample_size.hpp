@@ -10,7 +10,6 @@
 
 namespace stan {
 namespace analyze {
-
   /**
    * Computes the effective sample size (ESS) for the specified
    * parameter across all kept samples.  The value returned is the
