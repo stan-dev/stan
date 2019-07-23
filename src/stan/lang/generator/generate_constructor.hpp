@@ -33,14 +33,14 @@ namespace stan {
       // constructor without seed or template parameter
       o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
       o << INDENT << "    std::ostream* pstream__ = 0)" << EOL;
-      o << INDENT2 << ": prob_grad(0) {" << EOL;
+      o << INDENT2 << ": model_base_crtp(0) {" << EOL;
       o << INDENT2 << "ctor_body(context__, 0, pstream__);" << EOL;
       o << INDENT << "}" << EOL2;
       // constructor with specified seed
       o << INDENT << model_name << "(stan::io::var_context& context__," << EOL;
       o << INDENT << "    unsigned int random_seed__," << EOL;
       o << INDENT << "    std::ostream* pstream__ = 0)" << EOL;
-      o << INDENT2 << ": prob_grad(0) {" << EOL;
+      o << INDENT2 << ": model_base_crtp(0) {" << EOL;
       o << INDENT2 << "ctor_body(context__, random_seed__, pstream__);" << EOL;
       o << INDENT << "}" << EOL2;
       // body of constructor now in function
