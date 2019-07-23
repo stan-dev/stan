@@ -1479,6 +1479,29 @@ add("wishart_log", bare_expr_type(double_type()), bare_expr_type(matrix_type()),
 add("wishart_lpdf", bare_expr_type(double_type()), bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_expr_type(matrix_type()));
 add("wishart_rng", bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_expr_type(matrix_type()));
 
+///////////////////////////////////////////////////////////////////////////////
+// Approximation to the marginal
+add("laplace_marginal_bernoulli",
+    bare_expr_type(bare_types[0]),  // (real) returns density
+    bare_expr_type(vector_type()),  // (vector) initial guess
+    bare_expr_type(vector_type()),  // (vector) global parameters
+    bare_expr_type(bare_array_type(vector_type())),
+                                    // (matrix[]) data for covariance
+    int_vector_types[1],            // (int[]) number of samples per group
+    int_vector_types[1],            // (int[]) total count per group
+    bare_types[1],                  // (double) tolerance for convergence
+    bare_types[0]);                 // (int) max number of steps
+
+    add("laplace_marginal_poisson",
+        bare_expr_type(bare_types[0]),
+        bare_expr_type(vector_type()),
+        bare_expr_type(vector_type()),
+        bare_expr_type(bare_array_type(vector_type())),
+        int_vector_types[1],
+        int_vector_types[1],
+        bare_types[1],
+        bare_types[0]);
+
 // Newton solver for Laplace approximation
 add("lgp_newton_solver", bare_expr_type(vector_type()),
     bare_expr_type(vector_type()), bare_expr_type(double_type()),
