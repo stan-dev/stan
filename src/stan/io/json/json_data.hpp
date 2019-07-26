@@ -6,6 +6,7 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_parser.hpp>
+#include <stan/io/json/rapidjson_parser.hpp>
 #include <stan/io/json/json_data_handler.hpp>
 #include <cctype>
 #include <iostream>
@@ -45,6 +46,8 @@ namespace stan {
     private:
       vars_map_r vars_r_;
       vars_map_i vars_i_;
+      vars_map_r vars_r1_;
+      vars_map_i vars_i1_;
 
       std::vector<double> const empty_vec_r_;
       std::vector<int> const empty_vec_i_;
@@ -72,9 +75,19 @@ namespace stan {
        * @param in Input stream from which to read.
        * @throws json_exception if data is not well-formed stan data declaration
        */
-      explicit json_data(std::istream& in) : vars_r_(), vars_i_() {
+      explicit json_data(std::istream& in) : vars_r_(), vars_i_(), vars_r1_(), vars_i1_() {
         json_data_handler handler(vars_r_, vars_i_);
+        std::cout << "Start parse" << std::endl;
+	      auto start = std::chrono::system_clock::now();
         stan::json::parse(in, handler);
+        json_data_handler handler1(vars_r1_, vars_i1_);
+        stan::json::rapidjson_parse(in, handler1);
+        std::cout << vars_r1_.size() << ", " << vars_i1_.size() << std::endl;
+        std::cout << vars_r1_.size() << ", " << vars_i1_.size() << std::endl;
+        auto end = std::chrono::system_clock::now();	 
+	      std::chrono::duration<double> elapsed_seconds = end-start;	 
+	      std::cout << "parse took " << elapsed_seconds.count() << "s\n";
+
       }
 
       /**
