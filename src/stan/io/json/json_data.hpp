@@ -77,16 +77,8 @@ namespace stan {
        */
       explicit json_data(std::istream& in) : vars_r_(), vars_i_(), vars_r1_(), vars_i1_() {
         json_data_handler handler(vars_r_, vars_i_);
-        std::cout << "Start parse" << std::endl;
-	      auto start = std::chrono::system_clock::now();
         //stan::json::parse(in, handler);
-        json_data_handler handler1(vars_r_, vars_i_);
-        stan::json::rapidjson_parse(in, handler1);
-        std::cout << vars_r_.size() << ", " << vars_i_.size() << std::endl;
-        auto end = std::chrono::system_clock::now();	 
-	      std::chrono::duration<double> elapsed_seconds = end-start;	 
-	      std::cout << "parse took " << elapsed_seconds.count() << "s\n";
-
+        stan::json::rapidjson_parse(in, handler);
       }
 
       /**
