@@ -135,13 +135,13 @@ namespace stan {
             rapidjson::IStreamWrapper isw(in);
 
             if (!reader.Parse<rapidjson::kParseNanAndInfFlag>(isw, filter)) {
-                if(filter.state_ != ParsingState::End) {
+                if (filter.state_ != ParsingState::End) {
                     rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
                     std::stringstream ss;
-                    ss << "Error in JSON parsing "
-                    << std::endl << rapidjson::GetParseError_En(err) << std::endl;
+                    ss << "Error in JSON parsing " << std::endl
+                    << rapidjson::GetParseError_En(err) << std::endl;
                     throw json_error(ss.str());
-                }                
+                }
             }
         }
     }
