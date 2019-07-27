@@ -46,8 +46,6 @@ namespace stan {
     private:
       vars_map_r vars_r_;
       vars_map_i vars_i_;
-      vars_map_r vars_r1_;
-      vars_map_i vars_i1_;
 
       std::vector<double> const empty_vec_r_;
       std::vector<int> const empty_vec_i_;
