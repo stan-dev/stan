@@ -75,7 +75,7 @@ namespace stan {
        */
       explicit json_data(std::istream& in) : vars_r_(), vars_i_() {
         json_data_handler handler(vars_r_, vars_i_);
-        //stan::json::parse(in, handler);
+        // stan::json::parse(in, handler);
         stan::json::rapidjson_parse(in, handler);
       }
 

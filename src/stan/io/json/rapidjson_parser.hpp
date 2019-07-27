@@ -1,6 +1,17 @@
 #ifndef STAN_IO_JSON_RAPIDJSON_PARSER_HPP
 #define STAN_IO_JSON_RAPIDJSON_PARSER_HPP
 
+#include <stan/io/validate_zero_buf.hpp>
+#include <stan/io/json/json_error.hpp>
+
+#include <cerrno>
+#include <stdexcept>
+#include <iostream>
+#include <istream>
+#include <limits>
+#include <sstream>
+#include <string>
+#include <fstream>
 
 #include "rapidjson/reader.h"
 #include "rapidjson/document.h"
@@ -8,19 +19,7 @@
 #include "rapidjson/cursorstreamwrapper.h"
 #include "rapidjson/error/en.h"
 
-#include <stan/io/validate_zero_buf.hpp>
-#include <stan/io/json/json_error.hpp>
-#include <stdexcept>
-#include <iostream>
-#include <istream>
-#include <limits>
-#include <sstream>
-#include <string>
-#include <iostream>
-#include <chrono>
-#include <fstream>
-#include <string>
-#include <cerrno>
+
 
 
 namespace stan {
@@ -29,7 +28,8 @@ namespace stan {
 
         template<typename Handler>
         struct RapidJSONHandler {
-            RapidJSONHandler(Handler& h) : h_(h), state_(ParsingState::Idle) {
+            explicit RapidJSONHandler(Handler& h) : h_(h),
+                state_(ParsingState::Idle) {
             }
             json_error json_exception(const std::string& msg) const {
                 std::stringstream ss;
@@ -42,7 +42,7 @@ namespace stan {
             }
             bool Null() {
                 h_.null();
-                return true; 
+                return true;
             }
             bool Bool(bool b) {
                 h_.boolean(b);
@@ -68,24 +68,25 @@ namespace stan {
                 h_.number_double(d);
                 return true;
             }
-            bool RawNumber(const char* str, rapidjson::SizeType length, bool copy) { 
-                std::cout << "ERROR" << std::endl;
+            bool RawNumber(const char* str, rapidjson::SizeType length,
+                    bool copy) {
                 // this probably should not happen in our case
                 return true;
             }
-            bool String(const char* str, rapidjson::SizeType length, bool copy) {
+            bool String(const char* str, rapidjson::SizeType length,
+                    bool copy) {
                 h_.string(str);
                 return true;
             }
-            bool StartObject() { 
-                if(state_ == ParsingState::Idle) {
+            bool StartObject() {
+                if (state_ == ParsingState::Idle) {
                     state_ = ParsingState::Started;
                     h_.start_object();
                     return true;
-                }else{
+                } else {
                     // error check here, nested objects not allowed
                     return true;
-                }                
+                }
             }
             bool Key(const char* str, rapidjson::SizeType length, bool copy) {
                 h_.key(str);
@@ -128,17 +129,10 @@ namespace stan {
             if (!reader.Parse(isw, filter)) {
                 rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
                 std::stringstream ss;
-                ss << "Error in JSON parsing at"
+                ss << "Error in JSON parsing "
                 << std::endl << rapidjson::GetParseError_En(err) << std::endl;
                 throw json_error(ss.str());
             }
-            /*else{
-                if(reader.HasParseError()){
-                    std::cout << "OK" << rapidjson::GetParseError_En(reader.GetParseErrorCode()) << std::endl;
-                }
-                std::cout << "OKI" << std::endl;
-                
-            }*/
         }
     }
 }
