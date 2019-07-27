@@ -97,20 +97,20 @@ namespace stan {
                 h_.end_object();
                 return true;
             }
-            bool StartArray() { 
-                h_.start_array();                
-                return true; 
+            bool StartArray() {
+                h_.start_array();
+                return true;
             }
-            bool EndArray(rapidjson::SizeType elementCount) { 
+            bool EndArray(rapidjson::SizeType elementCount) {
                 h_.end_array();
                 return true;
             }
 
-            Handler& h_;        
+            Handler& h_;
             ParsingState state_;
             std::string error_message;
         };
-        
+
         /**
          * Parse the JSON text represented by the specified input stream,
          * sending events to the specified handler.
@@ -125,7 +125,7 @@ namespace stan {
             rapidjson::Reader reader;
             RapidJSONHandler<Handler> filter(handler);
             rapidjson::IStreamWrapper isw(in);
-                   
+
             if (!reader.Parse(isw, filter)) {
                 rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
                 std::stringstream ss;
