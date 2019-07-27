@@ -24,7 +24,7 @@
 
 namespace stan {
     namespace json {
-        enum class ParsingState { Idle, Started };
+        enum class ParsingState { Idle, Started, End };
 
         template<typename Handler>
         struct RapidJSONHandler {
@@ -84,18 +84,25 @@ namespace stan {
                     h_.start_object();
                     return true;
                 } else {
-                    // error check here, nested objects not allowed
-                    return true;
+                    std::stringstream errorMsg;
+                    errorMsg << "variable: " << last_key_
+                            << ", error: nested objects not allowed";
+                    throw json_error(errorMsg.str());
+                    return false;
                 }
             }
             bool Key(const char* str, rapidjson::SizeType length, bool copy) {
                 h_.key(str);
+                last_key_ = str;
                 return true;
             }
             bool EndObject(rapidjson::SizeType memberCount) {
-                // This should be the end as nested objects are not allowed
                 h_.end_object();
-                return true;
+                // Stan will always use only the first object
+                // returning false here in order to stop parsing
+                // even if its not an error
+                state_ = ParsingState::End;
+                return false;
             }
             bool StartArray() {
                 h_.start_array();
@@ -109,6 +116,7 @@ namespace stan {
             Handler& h_;
             ParsingState state_;
             std::string error_message;
+            std::string last_key_;
         };
 
         /**
@@ -126,12 +134,14 @@ namespace stan {
             RapidJSONHandler<Handler> filter(handler);
             rapidjson::IStreamWrapper isw(in);
 
-            if (!reader.Parse(isw, filter)) {
-                rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
-                std::stringstream ss;
-                ss << "Error in JSON parsing "
-                << std::endl << rapidjson::GetParseError_En(err) << std::endl;
-                throw json_error(ss.str());
+            if (!reader.Parse<rapidjson::kParseNanAndInfFlag>(isw, filter)) {
+                if(filter.state_ != ParsingState::End) {
+                    rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
+                    std::stringstream ss;
+                    ss << "Error in JSON parsing "
+                    << std::endl << rapidjson::GetParseError_En(err) << std::endl;
+                    throw json_error(ss.str());
+                }                
             }
         }
     }
