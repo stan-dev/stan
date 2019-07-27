@@ -73,7 +73,7 @@ namespace stan {
        * @param in Input stream from which to read.
        * @throws json_exception if data is not well-formed stan data declaration
        */
-      explicit json_data(std::istream& in) : vars_r_(), vars_i_(), vars_r1_(), vars_i1_() {
+      explicit json_data(std::istream& in) : vars_r_(), vars_i_() {
         json_data_handler handler(vars_r_, vars_i_);
         //stan::json::parse(in, handler);
         stan::json::rapidjson_parse(in, handler);
