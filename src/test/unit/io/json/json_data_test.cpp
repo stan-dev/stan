@@ -397,12 +397,7 @@ TEST(ioJson,jsonData_parse_empty_obj) {
 // parser only reads one top-level object
 TEST(ioJson,jsonData_parse_mult_objects) {
   std::string txt = "{ \"foo\": 1}{ \"bar\": 1 }";
-  std::stringstream in(txt);
-  stan::json::json_data jdata(in);
-  std::vector<std::string> var_names;
-  jdata.names_i(var_names);
-  EXPECT_EQ(1U,var_names.size());
-  EXPECT_EQ("foo",var_names[0]);
+  test_exception(txt,"Error in JSON parsing \nThe document root must not be followed by other values.\n");
 }
 
 // R: strings "NaN", "Inf", "-Inf"
