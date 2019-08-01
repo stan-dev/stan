@@ -98,11 +98,7 @@ namespace stan {
             }
             bool EndObject(rapidjson::SizeType memberCount) {
                 h_.end_object();
-                // Stan will always use only the first object
-                // returning false here in order to stop parsing
-                // even if its not an error
-                state_ = ParsingState::End;
-                return false;
+                return true;
             }
             bool StartArray() {
                 h_.start_array();
@@ -135,13 +131,11 @@ namespace stan {
             rapidjson::IStreamWrapper isw(in);
 
             if (!reader.Parse<rapidjson::kParseNanAndInfFlag>(isw, filter)) {
-                if (filter.state_ != ParsingState::End) {
-                    rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
-                    std::stringstream ss;
-                    ss << "Error in JSON parsing " << std::endl
-                    << rapidjson::GetParseError_En(err) << std::endl;
-                    throw json_error(ss.str());
-                }
+                rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
+                std::stringstream ss;
+                ss << "Error in JSON parsing " << std::endl
+                << rapidjson::GetParseError_En(err) << std::endl;
+                throw json_error(ss.str());
             }
         }
     }
