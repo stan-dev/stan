@@ -1,6 +1,9 @@
 #ifndef STAN_IO_JSON_RAPIDJSON_PARSER_HPP
 #define STAN_IO_JSON_RAPIDJSON_PARSER_HPP
 
+#include <rapidjson/reader.h>
+#include <rapidjson/istreamwrapper.h>
+#include <rapidjson/error/en.h>
 #include <stan/io/validate_zero_buf.hpp>
 #include <stan/io/json/json_error.hpp>
 
@@ -13,9 +16,6 @@
 #include <string>
 #include <fstream>
 
-#include <rapidjson/reader.h>
-#include <rapidjson/istreamwrapper.h>
-#include <rapidjson/error/en.h>
 
 
 
