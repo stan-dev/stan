@@ -14,9 +14,7 @@
 #include <fstream>
 
 #include <rapidjson/reader.h>
-#include <rapidjson/document.h>
 #include <rapidjson/istreamwrapper.h>
-#include <rapidjson/cursorstreamwrapper.h>
 #include <rapidjson/error/en.h>
 
 
