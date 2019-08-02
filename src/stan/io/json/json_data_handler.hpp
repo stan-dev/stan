@@ -329,7 +329,7 @@ namespace stan {
           std::stringstream errorMsg;
           errorMsg << "variable: " << key_ << ", unexpected error";
           throw json_error(errorMsg.str());
-        } 
+        }
 
         // calculate offset by working left-to-right to get array indices
         // for row-major offset left-most dimensions are divided out

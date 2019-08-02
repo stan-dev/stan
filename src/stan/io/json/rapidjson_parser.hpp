@@ -40,8 +40,9 @@ namespace stan {
                 return json_error(ss.str());
             }
             void check_start() {
-                if(state_==ParsingState::Idle){
-                    json_exception("expecting start of object ({) or array ([)\n");
+                if (state_ == ParsingState::Idle) {
+                    json_exception(
+                        "expecting start of object ({) or array ([)\n");
                 }
             }
             bool Null() {
@@ -81,7 +82,7 @@ namespace stan {
             }
             bool RawNumber(const char* str, rapidjson::SizeType length,
                     bool copy) {
-                // this will never get 
+                // this will never get
                 return true;
             }
             bool String(const char* str, rapidjson::SizeType length,
@@ -139,7 +140,9 @@ namespace stan {
             RapidJSONHandler<Handler> filter(handler);
             rapidjson::IStreamWrapper isw(in);
             handler.start_text();
-            if (!reader.Parse<rapidjson::kParseNanAndInfFlag | rapidjson::kParseValidateEncodingFlag | rapidjson::kParseFullPrecisionFlag>(isw, filter)) {
+            if (!reader.Parse<rapidjson::kParseNanAndInfFlag |
+                rapidjson::kParseValidateEncodingFlag |
+                rapidjson::kParseFullPrecisionFlag>(isw, filter)) {
                 rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
                 std::stringstream ss;
                 ss << "Error in JSON parsing " << std::endl
