@@ -73,7 +73,7 @@ void test_exception(const std::string& input,
   try {
     recording_handler handler;
     std::stringstream s(input);
-    stan::json::rapidjson_parse(s, handler);
+    stan::json::rapidjson_parse(s, handler);    
   } catch (const std::exception& e) {
     EXPECT_TRUE(hasEnding(e.what(), exception_text));
     return;
@@ -349,12 +349,12 @@ TEST(ioJson,jsonParserStr17) {
   test_parser("[ \"a\\uE000\" ]",
               "S:text" "S:arr" "STR:\"a\xEE\x80\x80\"" "E:arr" "E:text");
 }
-/*
+
 TEST(ioJson,jsonParserErr01) {
   test_exception(" \n \n   5    ",
                  "expecting start of object ({) or array ([)\n");
 }
-*/
+
 TEST(ioJson,jsonParserErr02) {
   test_exception("[ .5 ]",
                  "Invalid value.\n");

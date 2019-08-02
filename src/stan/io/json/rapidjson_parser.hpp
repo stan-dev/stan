@@ -37,12 +37,12 @@ namespace stan {
                 << std::endl
                 << msg
                 << std::endl;
-                return json_error(ss.str());
+                throw json_error(ss.str());
             }
             void check_start() {
                 if (state_ == ParsingState::Idle) {
                     json_exception(
-                        "expecting start of object ({) or array ([)\n");
+                        "expecting start of object ({) or array ([)");
                 }
             }
             bool Null() {
@@ -92,7 +92,6 @@ namespace stan {
                 return true;
             }
             bool StartObject() {
-                check_start();
                 state_ = ParsingState::Started;
                 h_.start_object();
                 return true;
@@ -109,7 +108,7 @@ namespace stan {
                 return true;
             }
             bool StartArray() {
-                check_start();
+                state_ = ParsingState::Started;
                 h_.start_array();
                 return true;
             }
