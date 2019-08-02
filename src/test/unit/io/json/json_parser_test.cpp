@@ -547,7 +547,7 @@ TEST(ioJson,jsonParserErr19b) {
 }
 
 TEST(ioJson,jsonParserErr19c) {
-  test_exception("[ 9.9999999e-1000000000000000 ]",
+  test_exception("[ 9.9999999e-1000000000000 ]",
                  "Number too small for double range, would be rounded to 0.\n");
 }
 
