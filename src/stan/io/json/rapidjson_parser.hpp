@@ -38,14 +38,14 @@ namespace stan {
                 }
                 return true;
             }
-            bool Null() {                
+            bool Null() {
                 h_.null();
                 return check_start();
             }
             bool Bool(bool b) {
-                h_.boolean(b);                
+                h_.boolean(b);
                 return check_start();
-            }            
+            }
             bool Int(int i) {
                 h_.number_long(i);
                 return check_start();
@@ -132,7 +132,7 @@ namespace stan {
                    ss << filter.error_message_ << std::endl;
                 } else {
                    ss << rapidjson::GetParseError_En(err) << std::endl;
-                }                
+                }
                 throw json_error(ss.str());
             }
             handler.end_text();
