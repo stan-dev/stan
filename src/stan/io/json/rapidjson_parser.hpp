@@ -27,58 +27,44 @@ namespace stan {
 
         template<typename Handler>
         struct RapidJSONHandler {
-            explicit RapidJSONHandler(Handler& h) : h_(h),
+            explicit RapidJSONHandler(Handler& h) : h_(h), error_message_(""),
                 state_(ParsingState::Idle) {
             }
-            json_error json_exception(const std::string& msg) const {
-                std::stringstream ss;
-                ss << "Error in JSON parsing at"
-                // << " line=" << line_ << " column=" << column_
-                << std::endl
-                << msg
-                << std::endl;
-                throw json_error(ss.str());
-            }
-            void check_start() {
+            bool check_start() {
                 if (state_ == ParsingState::Idle) {
-                    json_exception(
-                        "expecting start of object ({) or array ([)");
+                    error_message_ =
+                        "expecting start of object ({) or array ([)";
+                    return false;
                 }
-            }
-            bool Null() {
-                check_start();
-                h_.null();
                 return true;
+            }
+            bool Null() {                
+                h_.null();
+                return check_start();
             }
             bool Bool(bool b) {
-                check_start();
-                h_.boolean(b);
-                return true;
-            }
+                h_.boolean(b);                
+                return check_start();
+            }            
             bool Int(int i) {
-                check_start();
                 h_.number_long(i);
-                return true;
+                return check_start();
             }
             bool Uint(unsigned u) {
-                check_start();
                 h_.number_unsigned_long(u);
-                return true;
+                return check_start();
             }
             bool Int64(int64_t i) {
-                check_start();
                 h_.number_long(i);
-                return true;
+                return check_start();
             }
             bool Uint64(uint64_t u) {
-                check_start();
                 h_.number_unsigned_long(u);
-                return true;
+                return check_start();
             }
             bool Double(double d) {
-                check_start();
                 h_.number_double(d);
-                return true;
+                return check_start();
             }
             bool RawNumber(const char* str, rapidjson::SizeType length,
                     bool copy) {
@@ -87,9 +73,8 @@ namespace stan {
             }
             bool String(const char* str, rapidjson::SizeType length,
                     bool copy) {
-                check_start();
                 h_.string(str);
-                return true;
+                return check_start();
             }
             bool StartObject() {
                 state_ = ParsingState::Started;
@@ -97,13 +82,11 @@ namespace stan {
                 return true;
             }
             bool Key(const char* str, rapidjson::SizeType length, bool copy) {
-                check_start();
                 h_.key(str);
                 last_key_ = str;
-                return true;
+                return check_start();
             }
             bool EndObject(rapidjson::SizeType memberCount) {
-                check_start();
                 h_.end_object();
                 return true;
             }
@@ -113,14 +96,13 @@ namespace stan {
                 return true;
             }
             bool EndArray(rapidjson::SizeType elementCount) {
-                check_start();
                 h_.end_array();
-                return true;
+                return check_start();
             }
 
             Handler& h_;
             ParsingState state_;
-            std::string error_message;
+            std::string error_message_;
             std::string last_key_;
         };
 
@@ -145,7 +127,12 @@ namespace stan {
                 rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
                 std::stringstream ss;
                 ss << "Error in JSON parsing " << std::endl
-                << rapidjson::GetParseError_En(err) << std::endl;
+                << "at offset " << reader.GetErrorOffset() << ": " << std::endl;
+                if (filter.error_message_.size() > 0) {
+                   ss << filter.error_message_ << std::endl;
+                } else {
+                   ss << rapidjson::GetParseError_En(err) << std::endl;
+                }                
                 throw json_error(ss.str());
             }
             handler.end_text();

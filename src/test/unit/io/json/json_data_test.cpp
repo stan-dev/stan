@@ -397,7 +397,7 @@ TEST(ioJson,jsonData_parse_empty_obj) {
 // parser only reads one top-level object
 TEST(ioJson,jsonData_parse_mult_objects) {
   std::string txt = "{ \"foo\": 1}{ \"bar\": 1 }";
-  test_exception(txt,"Error in JSON parsing \nThe document root must not be followed by other values.\n");
+  test_exception(txt,"Error in JSON parsing \nat offset 11: \nThe document root must not be followed by other values.\n");
 }
 
 // R: strings "NaN", "Inf", "-Inf"
