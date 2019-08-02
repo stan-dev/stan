@@ -82,6 +82,8 @@ enum ParseErrorCode {
     kParseErrorStringInvalidEncoding,           //!< Invalid encoding in string.
 
     kParseErrorNumberTooBig,                    //!< Number too big to be stored in double.
+    kParseErrorNumberTooBigInteger,                    //!< Number too big to be stored in double.
+    kParseErrorNumberTooSmall,                    //!< Number too big to be stored in double.
     kParseErrorNumberMissFraction,              //!< Miss fraction part in number.
     kParseErrorNumberMissExponent,              //!< Miss exponent in number.
 

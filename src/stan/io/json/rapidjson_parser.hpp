@@ -4,6 +4,7 @@
 #include <rapidjson/reader.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/error/en.h>
+#include <rapidjson/encodings.h>
 #include <stan/io/validate_zero_buf.hpp>
 #include <stan/io/json/json_error.hpp>
 
@@ -38,71 +39,81 @@ namespace stan {
                 << std::endl;
                 return json_error(ss.str());
             }
+            void check_start() {
+                if(state_==ParsingState::Idle){
+                    json_exception("expecting start of object ({) or array ([)\n");
+                }
+            }
             bool Null() {
+                check_start();
                 h_.null();
                 return true;
             }
             bool Bool(bool b) {
+                check_start();
                 h_.boolean(b);
                 return true;
             }
             bool Int(int i) {
+                check_start();
                 h_.number_long(i);
                 return true;
             }
             bool Uint(unsigned u) {
+                check_start();
                 h_.number_unsigned_long(u);
                 return true;
             }
             bool Int64(int64_t i) {
+                check_start();
                 h_.number_long(i);
                 return true;
             }
             bool Uint64(uint64_t u) {
+                check_start();
                 h_.number_unsigned_long(u);
                 return true;
             }
             bool Double(double d) {
+                check_start();
                 h_.number_double(d);
                 return true;
             }
             bool RawNumber(const char* str, rapidjson::SizeType length,
                     bool copy) {
-                // this probably should not happen in our case
+                // this will never get 
                 return true;
             }
             bool String(const char* str, rapidjson::SizeType length,
                     bool copy) {
+                check_start();
                 h_.string(str);
                 return true;
             }
             bool StartObject() {
-                if (state_ == ParsingState::Idle) {
-                    state_ = ParsingState::Started;
-                    h_.start_object();
-                    return true;
-                } else {
-                    std::stringstream errorMsg;
-                    errorMsg << "variable: " << last_key_
-                            << ", error: nested objects not allowed";
-                    throw json_error(errorMsg.str());
-                    return false;
-                }
+                check_start();
+                state_ = ParsingState::Started;
+                h_.start_object();
+                return true;
             }
             bool Key(const char* str, rapidjson::SizeType length, bool copy) {
+                check_start();
                 h_.key(str);
                 last_key_ = str;
                 return true;
             }
             bool EndObject(rapidjson::SizeType memberCount) {
+                check_start();
                 h_.end_object();
                 return true;
             }
             bool StartArray() {
+                check_start();
                 h_.start_array();
                 return true;
             }
             bool EndArray(rapidjson::SizeType elementCount) {
+                check_start();
                 h_.end_array();
                 return true;
             }
@@ -127,14 +138,15 @@ namespace stan {
             rapidjson::Reader reader;
             RapidJSONHandler<Handler> filter(handler);
             rapidjson::IStreamWrapper isw(in);
-
-            if (!reader.Parse<rapidjson::kParseNanAndInfFlag>(isw, filter)) {
+            handler.start_text();
+            if (!reader.Parse<rapidjson::kParseNanAndInfFlag | rapidjson::kParseValidateEncodingFlag | rapidjson::kParseFullPrecisionFlag>(isw, filter)) {
                 rapidjson::ParseErrorCode err = reader.GetParseErrorCode();
                 std::stringstream ss;
                 ss << "Error in JSON parsing " << std::endl
                 << rapidjson::GetParseError_En(err) << std::endl;
                 throw json_error(ss.str());
             }
+            handler.end_text();
         }
     }
 }

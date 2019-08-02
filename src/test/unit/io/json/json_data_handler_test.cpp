@@ -4,7 +4,7 @@
 #include <stan/io/json/json_data_handler.hpp>
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_handler.hpp>
-#include <stan/io/json/json_parser.hpp>
+#include <stan/io/json/rapidjson_parser.hpp>
 
 void test_rtl_2_ltr(size_t idx_rtl,
                     size_t idx_ltr,

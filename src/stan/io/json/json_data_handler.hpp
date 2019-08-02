@@ -5,7 +5,7 @@
 #include <boost/lexical_cast.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/io/json/json_error.hpp>
-#include <stan/io/json/json_parser.hpp>
+#include <stan/io/json/rapidjson_parser.hpp>
 #include <stan/io/json/json_handler.hpp>
 #include <cctype>
 #include <iostream>
@@ -329,7 +329,7 @@ namespace stan {
           std::stringstream errorMsg;
           errorMsg << "variable: " << key_ << ", unexpected error";
           throw json_error(errorMsg.str());
-        }
+        } 
 
         // calculate offset by working left-to-right to get array indices
         // for row-major offset left-most dimensions are divided out

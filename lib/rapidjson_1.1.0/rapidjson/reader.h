@@ -1560,9 +1560,13 @@ private:
 
         // Force double for big integer
         if (useDouble) {
+            // Do not cast big integers to double
+            RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBigInteger, startOffset);
+            /*
             while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                 d = d * 10 + (s.TakePush() - '0');
             }
+            */
         }
 
         // Parse frac = decimal-point 1*DIGIT
@@ -1695,11 +1699,14 @@ private:
 
            if (useDouble) {
                int p = exp + expFrac;
+               double old_d = d;
                if (parseFlags & kParseFullPrecisionFlag)
                    d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
                else
                    d = internal::StrtodNormalPrecision(d, p);
-
+               if (old_d != 0.0 && d == 0.0) {
+                   RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooSmall, startOffset);
+               }
                // Use > max, instead of == inf, to fix bogus warning -Wfloat-equal
                if (d > (std::numeric_limits<double>::max)()) {
                    // Overflow
