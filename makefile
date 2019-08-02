@@ -29,7 +29,7 @@ include make/doxygen                      # doxygen
 include make/cpplint                      # cpplint
 include make/tests                        # tests
 
-INC_FIRST = -I $(if $(STAN),$(STAN)/src,src)
+INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(RAPIDJSON)
 LDLIBS_STANC ?= -Ltest -lstanc
 
 
