@@ -27,7 +27,7 @@ namespace stan {
 
         template<typename Handler>
         struct RapidJSONHandler {
-            explicit RapidJSONHandler(Handler& h) : h_(h), error_message_(""),
+            explicit RapidJSONHandler(Handler& h) : h_(h),
                 state_(ParsingState::Idle) {
             }
             bool check_start() {
@@ -78,6 +78,7 @@ namespace stan {
             }
             bool StartObject() {
                 state_ = ParsingState::Started;
+                error_message_ = "";
                 h_.start_object();
                 return true;
             }
@@ -92,6 +93,7 @@ namespace stan {
             }
             bool StartArray() {
                 state_ = ParsingState::Started;
+                error_message_ = "";
                 h_.start_array();
                 return true;
             }
