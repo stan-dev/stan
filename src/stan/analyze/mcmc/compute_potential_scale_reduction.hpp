@@ -4,6 +4,7 @@
 #include <stan/math/prim/mat.hpp>
 #include <stan/analyze/mcmc/autocovariance.hpp>
 #include <stan/analyze/mcmc/split_chains.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -30,14 +31,35 @@ namespace analyze {
                                            std::vector<size_t> sizes) {
     int num_chains = sizes.size();
     size_t num_draws = sizes[0];
-    for (int chain = 1; chain < num_chains; ++chain) {
+    for ( int chain = 1; chain < num_chains; ++chain ) {
       num_draws = std::min(num_draws, sizes[chain]);
+    }
+
+    const char* function = "check_finite";
+    Eigen::VectorXd draw_val(num_chains);
+    for ( int chain = 0; chain < num_chains; chain++ ) {
+      Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
+        draw(draws[chain], sizes[chain]);
+
+      for ( int n = 0; n < num_draws; n++ ) {
+        if ( !boost::math::isfinite(draw(n)) ) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+      }
+
+      if ( draw.isApproxToConstant(draw(0)) ) {
+        draw_val(chain) = draw(0);
+      }
+    }
+
+    if ( draw_val.isApproxToConstant(draw_val(0)) ) {
+      return 1.0;
     }
 
     Eigen::VectorXd chain_mean(num_chains);
     Eigen::VectorXd chain_var(num_chains);
 
-    for (int chain = 0; chain < num_chains; chain++) {
+    for ( int chain = 0; chain < num_chains; chain++ ) {
       Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
         draw(draws[chain], sizes[chain]);
       chain_mean(chain) = draw.mean();
@@ -96,7 +118,7 @@ namespace analyze {
                                                  std::vector<size_t> sizes) {
     int num_chains = sizes.size();
     size_t num_draws = sizes[0];
-    for (int chain = 1; chain < num_chains; ++chain) {
+    for ( int chain = 1; chain < num_chains; ++chain ) {
       num_draws = std::min(num_draws, sizes[chain]);
     }
 
