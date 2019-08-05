@@ -4,6 +4,7 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/analyze/mcmc/autocovariance.hpp>
 #include <stan/analyze/mcmc/split_chains.hpp>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -33,6 +34,30 @@ namespace analyze {
     size_t num_draws = sizes[0];
     for (int chain = 1; chain < num_chains; ++chain) {
       num_draws = std::min(num_draws, sizes[chain]);
+    }
+
+    if ( num_draws < 3 ) {
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    Eigen::VectorXd draw_val = Eigen::VectorXd::Random(num_chains);
+    for ( int chain = 0; chain < num_chains; chain++ ) {
+      Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
+        draw(draws[chain], sizes[chain]);
+
+      for ( int n = 0; n < num_draws; n++ ) {
+        if ( !boost::math::isfinite(draw(n)) ) {
+          return std::numeric_limits<double>::quiet_NaN();
+        }
+      }
+
+      if ( draw.isApproxToConstant(draw(0)) ) {
+        draw_val(chain) = draw(0);
+      }
+    }
+
+    if ( draw_val.isApproxToConstant(draw_val(0)) ) {
+      return num_chains * num_draws;
     }
 
     Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);

@@ -35,8 +35,7 @@ namespace analyze {
       num_draws = std::min(num_draws, sizes[chain]);
     }
 
-    const char* function = "check_finite";
-    Eigen::VectorXd draw_val(num_chains);
+    Eigen::VectorXd draw_val = Eigen::VectorXd::Random(num_chains);
     for ( int chain = 0; chain < num_chains; chain++ ) {
       Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
         draw(draws[chain], sizes[chain]);
