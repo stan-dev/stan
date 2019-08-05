@@ -15,12 +15,14 @@ namespace analyze {
    * Computes the potential scale reduction (Rhat) for the specified
    * parameter across all kept samples.
    *
+   * See more details in Stan reference manual section "Potential
+   * Scale Reduction". http://mc-stan.org/users/documentation
+   *
    * Current implementation assumes chains are all of equal size and
    * draws are stored in contiguous blocks of memory.
    *
    * @param draws stores pointers to arrays of chains
    * @param sizes stores sizes of chains
-   *
    * @return potential scale reduction for the specified parameter
    */
   inline
@@ -51,6 +53,21 @@ namespace analyze {
     return sqrt( (var_between / var_within + num_draws - 1) / num_draws );
   }
 
+  /**
+   * Computes the potential scale reduction (Rhat) for the specified
+   * parameter across all kept samples.
+   *
+   * See more details in Stan reference manual section "Potential
+   * Scale Reduction". http://mc-stan.org/users/documentation
+   *
+   * Current implementation assumes chains are all of equal size and
+   * draws are stored in contiguous blocks of memory.  Argument size
+   * will be broadcast to same length as draws.
+   *
+   * @param draws stores pointers to arrays of chains
+   * @param sizes stores sizes of chains
+   * @return potential scale reduction for the specified parameter
+   */
   inline
   double compute_potential_scale_reduction(std::vector<const double*> draws,
                                            size_t size) {
@@ -59,6 +76,21 @@ namespace analyze {
     return compute_potential_scale_reduction(draws, sizes);
   }
 
+  /**
+   * Computes the split potential scale reduction (Rhat) for the
+   * specified parameter across all kept samples.  When the number of
+   * total draws N is odd, the (N+1)/2th draw is ignored.
+   *
+   * See more details in Stan reference manual section "Potential
+   * Scale Reduction". http://mc-stan.org/users/documentation
+   *
+   * Current implementation assumes chains are all of equal size and
+   * draws are stored in contiguous blocks of memory.
+   *
+   * @param draws stores pointers to arrays of chains
+   * @param sizes stores sizes of chains
+   * @return potential scale reduction for the specified parameter
+   */
   inline
   double compute_split_potential_scale_reduction(std::vector<const double*> draws,
                                                  std::vector<size_t> sizes) {
@@ -76,6 +108,22 @@ namespace analyze {
     return compute_potential_scale_reduction(split_draws, half_sizes);
   }
 
+  /**
+   * Computes the split potential scale reduction (Rhat) for the
+   * specified parameter across all kept samples.  When the number of
+   * total draws N is odd, the (N+1)/2th draw is ignored.
+   *
+   * See more details in Stan reference manual section "Potential
+   * Scale Reduction". http://mc-stan.org/users/documentation
+   *
+   * Current implementation assumes chains are all of equal size and
+   * draws are stored in contiguous blocks of memory.  Argument size
+   * will be broadcast to same length as draws.
+   *
+   * @param draws stores pointers to arrays of chains
+   * @param sizes stores sizes of chains
+   * @return potential scale reduction for the specified parameter
+   */
   inline
   double compute_split_potential_scale_reduction(std::vector<const double*> draws,
                                                  size_t size) {
