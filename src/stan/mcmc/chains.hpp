@@ -4,6 +4,7 @@
 #include <stan/io/stan_csv_reader.hpp>
 #include <stan/math/prim/mat.hpp>
 #include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
+#include <stan/analyze/mcmc/compute_potential_scale_reduction.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
@@ -208,51 +209,6 @@ namespace stan {
         for (idx_t i = 0; i < ac.size(); i++)
           ac2(i) = ac[i];
         return ac2;
-      }
-
-      /**
-       * Return the split potential scale reduction (split R hat)
-       * for the specified parameter.
-       *
-       * Current implementation takes the minimum number of samples
-       * across chains as the number of samples per chain.
-       *
-       * @param VectorXd
-       * @param Dynamic
-       * @param samples
-       *
-       * @return
-       */
-      double
-      split_potential_scale_reduction(
-                                      const Eigen::Matrix<Eigen::VectorXd,
-                                      Dynamic, 1> &samples) const {
-        int chains = samples.size();
-        int n_samples = samples(0).size();
-        for (int chain = 1; chain < chains; chain++) {
-          n_samples = std::min(n_samples,
-                               static_cast<int>(samples(chain).size()));
-        }
-        if (n_samples % 2 == 1)
-          n_samples--;
-        int n = n_samples / 2;
-
-        Eigen::VectorXd split_chain_mean(2*chains);
-        Eigen::VectorXd split_chain_var(2*chains);
-
-        for (int chain = 0; chain < chains; chain++) {
-          split_chain_mean(2*chain) = mean(samples(chain).topRows(n));
-          split_chain_mean(2*chain+1) = mean(samples(chain).bottomRows(n));
-
-          split_chain_var(2*chain) = variance(samples(chain).topRows(n));
-          split_chain_var(2*chain+1) = variance(samples(chain).bottomRows(n));
-        }
-
-        double var_between = n * variance(split_chain_mean);
-        double var_within = mean(split_chain_var);
-
-        // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
-        return sqrt((var_between/var_within + n-1)/n);
       }
 
     public:
@@ -643,12 +599,19 @@ namespace stan {
       }
 
       double split_potential_scale_reduction(const int index) const {
-        Eigen::Matrix<Eigen::VectorXd, Dynamic, 1>
-          samples(num_chains());
-        for (int chain = 0; chain < num_chains(); chain++) {
-          samples(chain) = this->samples(chain, index);
+
+        int n_chains = num_chains();
+        std::vector<const double*> draws(n_chains);
+        std::vector<size_t> sizes(n_chains);
+        int n_kept_samples = 0;
+        for (int chain = 0; chain < n_chains; ++chain) {
+          n_kept_samples = num_kept_samples(chain);
+          draws[chain]
+            = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+          sizes[chain] = n_kept_samples;
         }
-        return split_potential_scale_reduction(samples);
+
+        return analyze::compute_split_potential_scale_reduction(draws, sizes);
       }
 
       double split_potential_scale_reduction(const std::string& name) const {
