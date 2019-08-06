@@ -599,7 +599,6 @@ namespace stan {
       }
 
       double split_potential_scale_reduction(const int index) const {
-
         int n_chains = num_chains();
         std::vector<const double*> draws(n_chains);
         std::vector<size_t> sizes(n_chains);

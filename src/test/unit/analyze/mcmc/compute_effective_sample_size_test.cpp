@@ -249,3 +249,45 @@ TEST_F(ComputeEss,chains_compute_split_effective_sample_size) {
               chains.split_effective_sample_size(name));
   }
 }
+
+TEST_F(ComputeEss,compute_effective_sample_size_minimum_n) {
+  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
+  param_names << "a";
+
+  stan::mcmc::chains<> chains(param_names);
+  Eigen::Matrix<double, 2, 1> draws;
+  draws << 1.0, 2.0;
+  chains.add(draws);
+
+  ASSERT_TRUE(std::isnan(chains.effective_sample_size(0)))
+    << "n_effective for index: " << 1 << ", parameter: "
+    << chains.param_name(1);
+}
+
+TEST_F(ComputeEss,compute_effective_sample_size_nan) {
+  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
+  param_names << "a";
+
+  stan::mcmc::chains<> chains(param_names);
+  Eigen::Matrix<double, 2, 1> draws;
+  draws << 1.0, std::numeric_limits<double>::quiet_NaN();
+  chains.add(draws);
+
+  ASSERT_TRUE(std::isnan(chains.effective_sample_size(0)))
+    << "n_effective for index: " << 1 << ", parameter: "
+    << chains.param_name(1);
+}
+
+TEST_F(ComputeEss,compute_effective_sample_size_constant) {
+  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
+  param_names << "a";
+
+  stan::mcmc::chains<> chains(param_names);
+  Eigen::Matrix<double, 3, 1> draws;
+  draws << 1.0, 2.0, 3.0;
+  chains.add(draws);
+
+  ASSERT_NEAR(3.0, chains.effective_sample_size(0), 1e-4)
+    << "n_effective for index: " << 1 << ", parameter: "
+    << chains.param_name(1);
+}
