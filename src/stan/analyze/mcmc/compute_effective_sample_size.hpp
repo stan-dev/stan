@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <limits>
 
 namespace stan {
 namespace analyze {

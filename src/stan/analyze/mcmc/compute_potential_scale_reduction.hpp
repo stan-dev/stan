@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cmath>
 #include <vector>
+#include <limits>
 
 namespace stan {
 namespace analyze {
@@ -67,7 +68,8 @@ namespace analyze {
     }
 
     double var_between = num_draws *
-      (chain_mean.array() - chain_mean.mean()).square().sum() / (num_chains - 1);
+      (chain_mean.array() - chain_mean.mean()).square().sum()
+      / (num_chains - 1);
     double var_within = chain_var.mean();
 
     // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
@@ -112,8 +114,8 @@ namespace analyze {
    * @param sizes stores sizes of chains
    * @return potential scale reduction for the specified parameter
    */
-  inline
-  double compute_split_potential_scale_reduction(std::vector<const double*> draws,
+  inline double
+  compute_split_potential_scale_reduction(std::vector<const double*> draws,
                                                  std::vector<size_t> sizes) {
     int num_chains = sizes.size();
     size_t num_draws = sizes[0];
@@ -145,9 +147,9 @@ namespace analyze {
    * @param sizes stores sizes of chains
    * @return potential scale reduction for the specified parameter
    */
-  inline
-  double compute_split_potential_scale_reduction(std::vector<const double*> draws,
-                                                 size_t size) {
+  inline double
+  compute_split_potential_scale_reduction(std::vector<const double*> draws,
+                                          size_t size) {
     int num_chains = draws.size();
     std::vector<size_t> sizes(num_chains, size);
     return compute_split_potential_scale_reduction(draws, sizes);
