@@ -1398,7 +1398,7 @@ void validate_integrate_ode_non_control_args(const T &ode_fun,
 
   // Stan lang integrate_ode takes 7 args:
   // fn_name, y0, t0, ts, theta, x_r, x_i
-  // only y0 and theta can have params
+  // only y0, t0, ts, and theta can have params
   if (ode_fun.y0_.bare_type() != t_ar_double) {
     error_msgs << "Second argument to " << ode_fun.integration_function_name_
                << " must have type real[ ]"
@@ -1443,20 +1443,6 @@ void validate_integrate_ode_non_control_args(const T &ode_fun,
   }
 
   // test data-only variables do not have parameters (int locals OK)
-  if (has_var(ode_fun.t0_, var_map)) {
-    error_msgs << "Third argument to " << ode_fun.integration_function_name_
-               << " (initial times)"
-               << " must be data only and not reference parameters."
-               << std::endl;
-    pass = false;
-  }
-  if (has_var(ode_fun.ts_, var_map)) {
-    error_msgs << "Fourth argument to " << ode_fun.integration_function_name_
-               << " (solution times)"
-               << " must be data only and not reference parameters."
-               << std::endl;
-    pass = false;
-  }
   if (has_var(ode_fun.x_, var_map)) {
     error_msgs << "Sixth argument to " << ode_fun.integration_function_name_
                << " (real data)"
