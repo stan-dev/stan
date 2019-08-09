@@ -22,6 +22,8 @@ namespace stan {
       o << "typedef " << model_name << "_namespace::" << model_name
         << " stan_model;" << EOL2;
 
+      o << "#ifndef USING_R" << EOL2;
+
       o << "stan::model::model_base& new_model(" << EOL
         << "        stan::io::var_context& data_context," << EOL
         << "        unsigned int seed," << EOL
@@ -30,6 +32,8 @@ namespace stan {
         << EOL
         << "  return *m;" << EOL
         << "}" << EOL2;
+
+      o << "#endif" << EOL2;
     }
   }
 }
