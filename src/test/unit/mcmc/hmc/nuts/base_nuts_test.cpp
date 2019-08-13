@@ -149,9 +149,12 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
 
   stan::mcmc::ps_point z_propose(model_size);
 
-  Eigen::VectorXd p_sharp_left = Eigen::VectorXd::Zero(model_size);
-  Eigen::VectorXd p_sharp_right = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_end = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(model_size);
   Eigen::VectorXd rho = z_init.p;
+  
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
@@ -170,15 +173,18 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   bool valid_subtree = sampler.build_tree(3, z_propose,
-                                          p_sharp_left, p_sharp_right, rho,
+                                          p_sharp_begin, p_sharp_end, 
+                                          rho, p_begin, p_end,
                                           H0, 1, n_leapfrog, log_sum_weight,
                                           sum_metro_prob, logger);
 
   EXPECT_TRUE(valid_subtree);
 
   EXPECT_EQ(init_momentum * (n_leapfrog + 1), rho(0));
-  EXPECT_EQ(1, p_sharp_left(0));
-  EXPECT_EQ(1, p_sharp_right(0));
+  EXPECT_EQ(1.5, p_begin(0));
+  EXPECT_EQ(1, p_sharp_begin(0));
+  EXPECT_EQ(1.5, p_end(0));
+  EXPECT_EQ(1, p_sharp_end(0));
 
   EXPECT_EQ(8 * init_momentum, sampler.z().q(0));
   EXPECT_EQ(init_momentum, sampler.z().p(0));
@@ -207,9 +213,12 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
 
   stan::mcmc::ps_point z_propose(model_size);
 
-  Eigen::VectorXd p_sharp_left = Eigen::VectorXd::Zero(model_size);
-  Eigen::VectorXd p_sharp_right = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_end = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(model_size);
   Eigen::VectorXd rho = z_init.p;
+  
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
@@ -228,18 +237,19 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   sampler.build_tree(3, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
                      H0, 1, n_leapfrog, log_sum_weight,
                      sum_metro_prob, logger);
 
-  EXPECT_EQ(7, sampler.rho_values.size());
+  EXPECT_EQ(7 * 3, sampler.rho_values.size());
   EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(0));
   EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(1));
-  EXPECT_EQ(4 * init_momentum, sampler.rho_values.at(2));
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(2));
   EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(3));
   EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(4));
-  EXPECT_EQ(4 * init_momentum, sampler.rho_values.at(5));
-  EXPECT_EQ(8 * init_momentum, sampler.rho_values.at(6));
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(5));
+  EXPECT_EQ(4 * init_momentum, sampler.rho_values.at(6));
 }
 
 TEST(McmcNutsBaseNuts, divergence_test) {
@@ -255,9 +265,12 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   stan::mcmc::ps_point z_propose(model_size);
 
-  Eigen::VectorXd p_sharp_left = Eigen::VectorXd::Zero(model_size);
-  Eigen::VectorXd p_sharp_right = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_end = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(model_size);
   Eigen::VectorXd rho = z_init.p;
+  
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
@@ -279,7 +292,8 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   sampler.z().V = -750;
   valid_subtree = sampler.build_tree(0, z_propose,
-                                     p_sharp_left, p_sharp_right, rho,
+                                     p_sharp_begin, p_sharp_end, 
+                                     rho, p_begin, p_end,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
                                      logger);
@@ -288,7 +302,8 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   sampler.z().V = -250;
   valid_subtree = sampler.build_tree(0, z_propose,
-                                     p_sharp_left, p_sharp_right, rho,
+                                     p_sharp_begin, p_sharp_end, 
+                                     rho, p_begin, p_end,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
                                      logger);
@@ -298,7 +313,8 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   sampler.z().V = 750;
   valid_subtree = sampler.build_tree(0, z_propose,
-                                     p_sharp_left, p_sharp_right, rho,
+                                     p_sharp_begin, p_sharp_end, 
+                                     rho, p_begin, p_end,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
                                      logger);
