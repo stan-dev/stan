@@ -82,17 +82,17 @@ namespace stan {
         this->hamiltonian_.init(this->z_, logger);
 
         ps_point z_fwd(this->z_);  // State at forward end of trajectory
-        ps_point z_bck(z_plus);    // State at backward end of trajectory
+        ps_point z_bck(z_fwd);    // State at backward end of trajectory
 
-        ps_point z_sample(z_plus);
-        ps_point z_propose(z_plus);
+        ps_point z_sample(z_fwd);
+        ps_point z_propose(z_fwd);
 
         // Momentum and sharp momentum at forward end of forward subtree
         Eigen::VectorXd p_fwd_fwd = this->z_.p;
         Eigen::VectorXd p_sharp_fwd_fwd = this->hamiltonian_.dtau_dp(this->z_);
 
         // Momentum and sharp momentum at backward end of forward subtree
-        Eigen::VectorXd p_fwd_bkc = this->z_.p;
+        Eigen::VectorXd p_fwd_bck = this->z_.p;
         Eigen::VectorXd p_sharp_fwd_bck = p_sharp_fwd_fwd;
 
         // Momentum and sharp momentum at forward end of backward subtree
@@ -145,7 +145,7 @@ namespace stan {
             valid_subtree
               = build_tree(this->depth_, z_propose,
                            p_sharp_bck_fwd, p_sharp_bck_bck,
-                           rho_minus, p_bck_fwd, p_bck_bck,
+                           rho_bck, p_bck_fwd, p_bck_bck,
                            H0, -1, n_leapfrog,
                            log_sum_weight_subtree, sum_metro_prob,
                            logger);
@@ -170,11 +170,11 @@ namespace stan {
             = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
 
           // Break when no-u-turn criterion is no longer satisfied
-          rho = rho_minus + rho_plus;
+          rho = rho_bck + rho_fwd;
 
           // Demand satisfaction around merged subtrees
           bool persist_criterion =
-            compute_criterion(p_sharp_bkc_bck,
+            compute_criterion(p_sharp_bck_bck,
                               p_sharp_fwd_fwd,
                               rho);
 
