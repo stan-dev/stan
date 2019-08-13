@@ -67,7 +67,7 @@ pipeline {
             }
         }
         stage('Linting & Doc checks') {
-            agent {label 'linux'}
+            agent any
             steps {
                 script {
                     sh "printenv"
