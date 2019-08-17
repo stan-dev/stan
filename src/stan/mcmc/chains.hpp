@@ -624,6 +624,24 @@ namespace stan {
         return effective_sample_size(index(name));
       }
 
+      double split_effective_sample_size(const int index) const {
+        int n_chains = num_chains();
+        std::vector<const double*> draws(n_chains);
+        std::vector<size_t> sizes(n_chains);
+        int n_kept_samples = 0;
+        for (int chain = 0; chain < n_chains; ++chain) {
+          n_kept_samples = num_kept_samples(chain);
+          draws[chain]
+            = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+          sizes[chain] = n_kept_samples;
+        }
+        return analyze::compute_split_effective_sample_size(draws, sizes);
+      }
+
+      double split_effective_sample_size(const std::string& name) const {
+        return split_effective_sample_size(index(name));
+      }
+
       double split_potential_scale_reduction(const int index) const {
         Eigen::Matrix<Eigen::VectorXd, Dynamic, 1>
           samples(num_chains());
