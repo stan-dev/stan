@@ -8,18 +8,18 @@
 namespace stan {
   namespace lang {
 
-    bool is_assignable(const expr_type& l_type,
-                       const expr_type& r_type,
+    bool is_assignable(const bare_expr_type& l_type,
+                       const bare_expr_type& r_type,
                        const std::string& failure_message,
                        std::ostream& error_msgs) {
       bool assignable = true;
-      if (l_type.num_dims_ != r_type.num_dims_) {
+      if (l_type.num_dims() != r_type.num_dims()) {
         assignable = false;
         error_msgs << "Mismatched array dimensions.";
       }
-      if (!(l_type.base_type_ == r_type.base_type_
-            || (l_type.base_type_.is_double_type()
-                && r_type.base_type_.is_int_type()))) {
+      if (!(l_type == r_type
+            || (l_type.is_double_type()
+                && r_type.is_int_type()))) {
         assignable = false;
         error_msgs << "Base type mismatch. ";
       }

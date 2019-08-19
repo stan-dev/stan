@@ -9,6 +9,8 @@
 #include <stan/lang/grammars/whitespace_grammar.hpp>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/phoenix/phoenix.hpp>
+#include <boost/version.hpp>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -21,6 +23,15 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op,
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::index_op_sliced,
                           (stan::lang::expression, expr_)
                           (std::vector<stan::lang::idx>, idxs_) )
+
+BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_1d,
+                          (std::string, function_name_)
+                          (stan::lang::expression, lb_)
+                          (stan::lang::expression, ub_)
+                          (stan::lang::expression, theta_)
+                          (stan::lang::expression, x_r_)
+                          (stan::lang::expression, x_i_)
+                          (stan::lang::expression, rel_tol_) )
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::integrate_ode,
                           (std::string, integration_function_name_)
@@ -81,11 +92,11 @@ BOOST_FUSION_ADAPT_STRUCT(stan::lang::row_vector_expr,
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::int_literal,
                           (int, val_)
-                          (stan::lang::expr_type, type_))
+                          (stan::lang::bare_expr_type, type_))
 
 BOOST_FUSION_ADAPT_STRUCT(stan::lang::double_literal,
                           (double, val_)
-                          (stan::lang::expr_type, type_) )
+                          (stan::lang::bare_expr_type, type_) )
 
 
 namespace stan {
@@ -117,7 +128,12 @@ namespace stan {
       using boost::spirit::qi::string;
       using boost::spirit::qi::_pass;
       using boost::spirit::qi::_val;
+      using boost::spirit::qi::raw;
+
       using boost::spirit::qi::labels::_r1;
+
+      using boost::phoenix::begin;
+      using boost::phoenix::end;
 
       term_r.name("expression");
       term_r
@@ -184,9 +200,9 @@ namespace stan {
         >> lit(',')
         >> expression_g(_r1)     // 2) y0
         >> lit(',')
-        >> expression_g(_r1)     // 3) t0 (data only)
+        >> expression_g(_r1)     // 3) t0
         >> lit(',')
-        >> expression_g(_r1)     // 4) ts (data only)
+        >> expression_g(_r1)     // 4) ts
         >> lit(',')
         >> expression_g(_r1)     // 5) theta
         >> lit(',')
@@ -216,9 +232,9 @@ namespace stan {
         > lit(',')
         > expression_g(_r1)     // 2) y0
         > lit(',')
-        > expression_g(_r1)     // 3) t0 (data only)
+        > expression_g(_r1)     // 3) t0
         > lit(',')
-        > expression_g(_r1)     // 4) ts (data only)
+        > expression_g(_r1)     // 4) ts
         > lit(',')
         > expression_g(_r1)     // 5) theta
         > lit(',')
@@ -288,9 +304,31 @@ namespace stan {
           [validate_map_rect_f(_val, boost::phoenix::ref(var_map_),
                                _pass, boost::phoenix::ref(error_msgs_))];
 
+      integrate_1d_r.name("integrate_1d");
+      integrate_1d_r
+          %= (lit("integrate_1d") >> no_skip[!char_("a-zA-Z0-9_")])
+          > lit('(')
+          > identifier_r          // 1) integrated function name
+          > lit(',')
+          > expression_g(_r1)     // 2) integration lower bound
+          > lit(',')
+          > expression_g(_r1)     // 3) integration upper bound
+          > lit(',')
+          > expression_g(_r1)     // 4) parameters
+          > lit(',')
+          > expression_g(_r1)     // 5) real data
+          > lit(',')
+          > expression_g(_r1)     // 6) integer data
+          > lit(',')
+          > expression_g(_r1)     // 7) relative tolerance
+          > lit(')')
+          [validate_integrate_1d_f(_val, boost::phoenix::ref(var_map_),
+                                   _pass, boost::phoenix::ref(error_msgs_))];
+
       factor_r.name("expression");
       factor_r =
-        integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
+          integrate_1d_r(_r1)[assign_lhs_f(_val, _1)]
+        | integrate_ode_control_r(_r1)[assign_lhs_f(_val, _1)]
         | integrate_ode_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_control_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_r(_r1)[assign_lhs_f(_val, _1)]
@@ -304,7 +342,7 @@ namespace stan {
                                 boost::phoenix::ref(error_msgs_),
                                 _pass)])
         | int_literal_r[assign_lhs_f(_val, _1)]
-        | double_literal_r[assign_lhs_f(_val, _1)]
+        | str_double_literal_r[assign_lhs_f(_val, _1)]
         | (array_expr_r(_r1)[assign_lhs_f(_c, _1)]
            > eps[infer_array_expr_type_f(_val, _c, _r1, _pass,
                                        boost::phoenix::ref(var_map_),
@@ -316,6 +354,11 @@ namespace stan {
         | (lit('(')
            > expression_g(_r1)[assign_lhs_f(_val, _1)]
            > lit(')'));
+
+
+      str_double_literal_r.name("double literal");
+      str_double_literal_r
+        = raw[double_literal_r][add_literal_string_f(_val, begin(_1), end(_1))];
 
       int_literal_r.name("integer literal");
       int_literal_r

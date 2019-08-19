@@ -5,7 +5,7 @@
 #include <stan/lang/generator/constants.hpp>
 #include <stan/lang/generator/generate_indent.hpp>
 #include <stan/lang/generator/generate_indexed_expr.hpp>
-#include <stan/lang/generator/generate_local_var_decls.hpp>
+#include <stan/lang/generator/generate_local_var_decl_inits.hpp>
 #include <stan/lang/generator/generate_printable.hpp>
 #include <stan/lang/generator/generate_void_statement.hpp>
 #include <stan/lang/generator/visgen.hpp>
@@ -133,16 +133,18 @@ namespace stan {
       void operator()(const nil& /*x*/) const { }
 
       void operator()(const assgn& y) const {
-        // use stan::math::asign when no idxs (lhs_simple)
-        // use stan::model::asign when indexed (!lhs_simple)
         bool lhs_simple = y.idxs_.size() == 0;
-
         bool assign_simple = y.is_simple_assignment();
-        // need expr for rhs in compound operator-assign
+
+        // need expr for y for compound operator-assign
         index_op_sliced lhs_expr(y.lhs_var_, y.idxs_);
         lhs_expr.infer_type();
 
         generate_indent(indent_, o_);
+
+        // use stan::math::assign when no idxs (lhs_simple)
+        // use stan::model::assign when indexed (!lhs_simple)
+        // generate method, arg(s) for lhs
         if (lhs_simple) {
           o_ << "stan::math::assign(";
           generate_expression(y.lhs_var_, NOT_USER_FACING, o_);
@@ -157,15 +159,13 @@ namespace stan {
           o_ << ", " << EOL;
           generate_indent(indent_ + 3, o_);
         }
-
+        // generate arg for rhs
+        if (y.lhs_var_has_sliced_idx()
+            && y.lhs_var_occurs_on_rhs()) {
+          o_ << "stan::model::deep_copy(";
+        }
         if (assign_simple) {
-          if (y.lhs_var_occurs_on_rhs()) {
-            o_ << "stan::model::deep_copy(";
             generate_expression(y.rhs_, NOT_USER_FACING, o_);
-            o_ << ")";
-          } else {
-            generate_expression(y.rhs_, NOT_USER_FACING, o_);
-          }
         } else {
           if (y.op_name_.size() == 0) {
             o_ << "(";
@@ -181,7 +181,11 @@ namespace stan {
             o_ << ")";
           }
         }
-
+        if (y.lhs_var_has_sliced_idx()
+            && y.lhs_var_occurs_on_rhs()) {
+          o_ << ")";
+        }
+        // close method
         if (lhs_simple) {
           o_ << ");" << EOL;
         } else {
@@ -255,7 +259,7 @@ namespace stan {
         if (has_local_vars) {
           generate_indent(indent_, o_);
           o_ << "{" << EOL;
-          generate_local_var_decls(x.local_decl_, indent_, o_);
+          generate_local_var_decl_inits(x.local_decl_, indent_, o_);
         }
         o_ << EOL;
         for (size_t i = 0; i < x.statements_.size(); ++i) {
@@ -298,8 +302,8 @@ namespace stan {
       void operator()(const return_statement& rs) const {
         generate_indent(indent_, o_);
         o_ << "return ";
-        if (!rs.return_value_.expression_type().is_ill_formed()
-            && !rs.return_value_.expression_type().is_void()) {
+        if (!rs.return_value_.bare_type().is_ill_formed_type()
+            && !rs.return_value_.bare_type().is_void_type()) {
           o_ << "stan::math::promote_scalar<fun_return_scalar_t__>(";
           generate_expression(rs.return_value_, NOT_USER_FACING, o_);
           o_ << ")";

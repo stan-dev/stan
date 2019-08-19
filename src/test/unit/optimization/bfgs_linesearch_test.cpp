@@ -78,8 +78,8 @@ class linesearch_testfunc {
 public:
   double operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x) {
     return x.dot(x) - 1.0;
-  } 
-  int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x, 
+  }
+  int operator()(const Eigen::Matrix<double,Eigen::Dynamic,1> &x,
                  double &f, Eigen::Matrix<double,Eigen::Dynamic,1> &g) {
     f = x.dot(x) - 1.0;
     g = 2.0*x;
@@ -154,6 +154,8 @@ TEST(OptimizationBfgsLinesearch, wolfeLineSearch) {
   static const double c1 = 1e-4;
   static const double c2 = 0.9;
   static const double minAlpha = 1e-16;
+  static const double maxLSIts = 20;
+  static const double maxLSRestarts = 10;
 
   linesearch_testfunc func1;
   Eigen::Matrix<double,-1,1> x0,x1;
@@ -171,7 +173,8 @@ TEST(OptimizationBfgsLinesearch, wolfeLineSearch) {
   ret = WolfeLineSearch(func1, alpha,
                         x1, f1, gradx1,
                         p, x0, f0, gradx0,
-                        c1, c2, minAlpha);
+                        c1, c2, minAlpha,
+                        maxLSIts, maxLSRestarts);
   EXPECT_EQ(0,ret);
   EXPECT_NEAR(0.5,alpha,1e-8);
   EXPECT_NEAR(0,(x1 - (x0 + alpha*p)).norm(),1e-8);
@@ -183,7 +186,8 @@ TEST(OptimizationBfgsLinesearch, wolfeLineSearch) {
   ret = WolfeLineSearch(func1, alpha,
                         x1, f1, gradx1,
                         p, x0, f0, gradx0,
-                        c1, c2, minAlpha);
+                        c1, c2, minAlpha,
+                        maxLSIts, maxLSRestarts);
   EXPECT_EQ(0,ret);
   EXPECT_NEAR(0.5,alpha,1e-8);
   EXPECT_NEAR(0,(x1 - (x0 + alpha*p)).norm(),1e-8);
@@ -195,7 +199,8 @@ TEST(OptimizationBfgsLinesearch, wolfeLineSearch) {
   ret = WolfeLineSearch(func1, alpha,
                         x1, f1, gradx1,
                         p, x0, f0, gradx0,
-                        c1, c2, minAlpha);
+                        c1, c2, minAlpha,
+                        maxLSIts, maxLSRestarts);
   EXPECT_EQ(0,ret);
   EXPECT_NEAR(0.25,alpha,1e-8);
   EXPECT_NEAR(0,(x1 - (x0 + alpha*p)).norm(),1e-8);

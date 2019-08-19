@@ -5,14 +5,11 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    array_expr::array_expr() : args_(), type_(), has_var_(false),
-                               array_expr_scope_() { }
+array_expr::array_expr()
+    : args_(), type_(), has_var_(false), array_expr_scope_() {}
 
-    array_expr::array_expr(const std::vector<expression>& args)
-      : args_(args), type_(), has_var_(false), array_expr_scope_() { }
-
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

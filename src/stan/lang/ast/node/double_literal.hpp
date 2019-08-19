@@ -1,38 +1,45 @@
 #ifndef STAN_LANG_AST_NODE_DOUBLE_LITERAL_HPP
 #define STAN_LANG_AST_NODE_DOUBLE_LITERAL_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
+#include <string>
+#include <cstddef>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Node for holding a double literal.
-     */
-    struct double_literal {
-      /**
-       * Value of literal.
-       */
-      double val_;
+/**
+ * Node for holding a double literal.
+ */
+struct double_literal {
+  /**
+   * Value of literal.
+   */
+  double val_;
 
-      /**
-       * Expression type.
-       */
-      expr_type type_;
+  /**
+   * String representation.
+   */
+  std::string string_;
 
-      /**
-       * Default constructor for double literal.
-       */
-      double_literal();
+  /**
+   * Expression type.
+   */
+  bare_expr_type type_;
 
-      /**
-       * Construct a double literal with the specified value.
-       *
-       * @param val value of literal
-       */
-      explicit double_literal(double val);
-    };
+  /**
+   * Default constructor for double literal.
+   */
+  double_literal();
 
-  }
-}
+  /**
+   * Construct a double literal with the specified value.
+   *
+   * @param val value of literal
+   */
+  explicit double_literal(double val);
+};
+
+}  // namespace lang
+}  // namespace stan
 #endif

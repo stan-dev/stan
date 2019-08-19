@@ -3,15 +3,16 @@
 
 #include <stan/lang/ast.hpp>
 #include <stan/lang/generator/constants.hpp>
-#include <stan/lang/generator/generate_array_var_type.hpp>
+#include <stan/lang/generator/generate_bare_type.hpp>
 #include <stan/lang/generator/generate_indexed_expr.hpp>
 #include <stan/lang/generator/generate_real_var_type.hpp>
-#include <stan/lang/generator/generate_type.hpp>
 #include <stan/lang/generator/visgen.hpp>
 #include <boost/lexical_cast.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
+
+#include <iostream>
 
 namespace stan {
   namespace lang {
@@ -39,45 +40,46 @@ namespace stan {
         o_ << "nil";
       }
 
-      void operator()(const int_literal& n) const { o_ << n.val_; }
+      void operator()(const int_literal& n) const {
+        std::string num_str = boost::lexical_cast<std::string>(n.val_);
+        o_ << num_str;
+      }
 
       void operator()(const double_literal& x) const {
-        std::string num_str = boost::lexical_cast<std::string>(x.val_);
-        o_ << num_str;
-        if (num_str.find_first_of("eE.") == std::string::npos)
-          o_ << ".0";  // trailing 0 to ensure C++ makes it a double
+        o_ << x.string_;
+        if (x.string_.find_first_of("eE.") == std::string::npos)
+        o_ << ".0";  // trailing 0 to ensure C++ makes it a double
       }
 
       void operator()(const array_expr& x) const {
         std::stringstream ssRealType;
         generate_real_var_type(x.array_expr_scope_, x.has_var_, ssRealType);
+
         std::stringstream ssArrayType;
-        generate_array_var_type(x.type_.base_type_, ssRealType.str(),
-                                ssArrayType);
-        o_ << "static_cast<";
-        generate_type(ssArrayType.str(), x.args_, x.type_.num_dims_, o_);
-        o_ << " >(";
-        o_ << "stan::math::array_builder<";
-        generate_type(ssArrayType.str(),
-                      x.args_,
-                      x.type_.num_dims_ - 1,
-                      o_);
-        o_ << " >()";
+        generate_bare_type(x.type_, ssRealType.str(), ssArrayType);
+
+        std::stringstream ssArrayElType;
+        generate_bare_type(x.type_.array_element_type(),
+                           ssRealType.str(), ssArrayElType);
+
+        o_ << "static_cast<"
+           << ssArrayType.str()
+           << " >(stan::math::array_builder<"
+           << ssArrayElType.str()
+           << " >()";
         generate_array_builder_adds(x.args_, user_facing_, o_);
-        o_ << ".array()";
-        o_ << ")";
+        o_ << ".array())";
       }
 
       void operator()(const matrix_expr& x) const {
         std::stringstream ssRealType;
         generate_real_var_type(x.matrix_expr_scope_, x.has_var_, ssRealType);
         // to_matrix arg is std::vector of row vectors (Eigen::Matrix<T, 1, C>)
-        o_ << "stan::math::to_matrix(stan::math::array_builder<Eigen::Matrix<";
-        generate_type(ssRealType.str(), x.args_, 0, o_);
-        o_ << ", 1, Eigen::Dynamic> >()";
+        o_ << "stan::math::to_matrix(stan::math::array_builder<Eigen::Matrix<"
+           << ssRealType.str()
+           << ", 1, Eigen::Dynamic> >()";
         generate_array_builder_adds(x.args_, user_facing_, o_);
-        o_ << ".array()";
-        o_ << ")";
+        o_ << ".array())";
       }
 
       void operator()(const row_vector_expr& x) const {
@@ -85,12 +87,11 @@ namespace stan {
         generate_real_var_type(x.row_vector_expr_scope_, x.has_var_,
                                ssRealType);
         // to_row_vector arg is std::vector of type T
-        o_ << "stan::math::to_row_vector(stan::math::array_builder<";
-        generate_type(ssRealType.str(), x.args_, 0, o_);
-        o_ << " >()";
+        o_ << "stan::math::to_row_vector(stan::math::array_builder<"
+           << ssRealType.str()
+           << " >()";
         generate_array_builder_adds(x.args_, user_facing_, o_);
-        o_ << ".array()";
-        o_ << ")";
+        o_ << ".array())";
       }
 
       void operator()(const variable& v) const { o_ << v.name_; }
@@ -108,13 +109,12 @@ namespace stan {
         generate_expression(x.expr_, user_facing_, expr_o);
         std::string expr_string = expr_o.str();
         std::vector<expression> indexes;
-        size_t e_num_dims = x.expr_.expression_type().num_dims_;
-        base_expr_type base_type = x.expr_.expression_type().base_type_;
         for (size_t i = 0; i < x.dimss_.size(); ++i)
           for (size_t j = 0; j < x.dimss_[i].size(); ++j)
             indexes.push_back(x.dimss_[i][j]);  // wasteful copy, could use refs
-        generate_indexed_expr<false>(expr_string, indexes, base_type,
-                                     e_num_dims, user_facing_, o_);
+        generate_indexed_expr<false>(expr_string, indexes,
+                                     x.expr_.bare_type(),
+                                     user_facing_, o_);
       }
 
       void operator()(const index_op_sliced& x) const {
@@ -142,7 +142,7 @@ namespace stan {
         o_ << (fx.integration_function_name_ == "integrate_ode"
                ? "integrate_ode_rk45"
                : fx.integration_function_name_)
-           << '('
+           << "("
            << fx.system_function_name_
            << "_functor__(), ";
         generate_expression(fx.y0_, NOT_USER_FACING, o_);
@@ -161,7 +161,7 @@ namespace stan {
 
       void operator()(const integrate_ode_control& fx) const {
         o_ << fx.integration_function_name_
-           << '('
+           << "("
            << fx.system_function_name_
            << "_functor__(), ";
         generate_expression(fx.y0_, NOT_USER_FACING, o_);
@@ -186,7 +186,7 @@ namespace stan {
 
       void operator()(const algebra_solver& fx) const {
         o_ << "algebra_solver"
-           << '('
+           << "("
            << fx.system_function_name_
            << "_functor__(), ";
         generate_expression(fx.y_, NOT_USER_FACING, o_);
@@ -201,7 +201,7 @@ namespace stan {
 
       void operator()(const algebra_solver_control& fx) const {
         o_ << "algebra_solver"
-           << '('
+           << "("
            << fx.system_function_name_
            << "_functor__(), ";
         generate_expression(fx.y_, NOT_USER_FACING, o_);
@@ -234,6 +234,23 @@ namespace stan {
         o_ << ", pstream__)";
       }
 
+      void operator()(const integrate_1d& fx) const {
+        o_ << "integrate_1d("
+           << fx.function_name_ << "_functor__(), ";
+        generate_expression(fx.lb_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.ub_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.theta_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_r_, user_facing_, o_);
+        o_ << ", ";
+        generate_expression(fx.x_i_, user_facing_, o_);
+        o_ << ", *pstream__, ";
+        generate_expression(fx.rel_tol_, user_facing_, o_);
+        o_ << ")";
+      }
+
       void operator()(const fun& fx) const {
         // first test if short-circuit op (binary && and || applied to
         // primitives; overloads are eager, not short-circuiting)
@@ -246,9 +263,9 @@ namespace stan {
           o_ << "))";
           return;
         }
-        o_ << fx.name_ << '(';
+        o_ << fx.name_ << "(";
         for (size_t i = 0; i < fx.args_.size(); ++i) {
-          if (i > 0) o_ << ',';
+          if (i > 0) o_ << ", ";
           boost::apply_visitor(*this, fx.args_[i].expr_);
         }
         if (fx.args_.size() > 0
@@ -265,15 +282,15 @@ namespace stan {
             o_ << ", ";
           o_ << "pstream__";
         }
-        o_ << ')';
+        o_ << ")";
       }
 
       void operator()(const conditional_op& expr) const {
         bool types_prim_match
-          = (expr.type_.is_primitive() && expr.type_.base_type_.is_int_type())
+          = (expr.type_.is_primitive() && expr.type_.is_int_type())
           || (!expr.has_var_ && expr.type_.is_primitive()
-              && (expr.true_val_.expression_type()
-                  == expr.false_val_.expression_type()));
+              && (expr.true_val_.bare_type()
+                  == expr.false_val_.bare_type()));
         std::stringstream ss;
         generate_real_var_type(expr.scope_, expr.has_var_, ss);
 
@@ -303,17 +320,17 @@ namespace stan {
       }
 
       void operator()(const binary_op& expr) const {
-        o_ << '(';
+        o_ << "(";
         boost::apply_visitor(*this, expr.left.expr_);
-        o_ << ' ' << expr.op << ' ';
+        o_ << " " << expr.op << " ";
         boost::apply_visitor(*this, expr.right.expr_);
-        o_ << ')';
+        o_ << ")";
       }
 
       void operator()(const unary_op& expr) const {
-        o_ << expr.op << '(';
+        o_ << expr.op << "(";
         boost::apply_visitor(*this, expr.subject.expr_);
-        o_ << ')';
+        o_ << ")";
       }
     };
 

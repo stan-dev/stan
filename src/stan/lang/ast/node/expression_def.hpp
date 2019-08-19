@@ -2,6 +2,8 @@
 #define STAN_LANG_AST_NODE_EXPRESSION_DEF_HPP
 
 #include <stan/lang/ast.hpp>
+#include <boost/variant/apply_visitor.hpp>
+#include <string>
 
 namespace stan {
   namespace lang {
@@ -29,6 +31,8 @@ namespace stan {
     expression::expression(const row_vector_expr& expr) : expr_(expr) { }
 
     expression::expression(const variable& expr) : expr_(expr) { }
+
+    expression::expression(const integrate_1d& expr) : expr_(expr) { }
 
     expression::expression(const integrate_ode& expr) : expr_(expr) { }
 
@@ -72,22 +76,19 @@ namespace stan {
       return *this;
     }
 
-    expr_type expression::expression_type() const {
-      expression_type_vis vis;
+    bare_expr_type expression::bare_type() const {
+      expression_bare_type_vis vis;
       return boost::apply_visitor(vis, expr_);
     }
 
     int expression::total_dims() const {
-      int sum = expression_type().num_dims_;
-      if (expression_type().type().is_vector_type())
-        ++sum;
-      if (expression_type().type().is_row_vector_type())
-        ++sum;
-      if (expression_type().type().is_matrix_type())
-        sum += 2;
-      return sum;
+      return bare_type().num_dims();
     }
 
+    std::string expression::to_string() const {
+      write_expression_vis vis;
+      return boost::apply_visitor(vis, expr_);
+    }
   }
 }
 #endif

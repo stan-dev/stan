@@ -1,7 +1,7 @@
 #ifndef STAN_LANG_AST_NODE_UNARY_OP_HPP
 #define STAN_LANG_AST_NODE_UNARY_OP_HPP
 
-#include <stan/lang/ast/expr_type.hpp>
+#include <stan/lang/ast/type/bare_expr_type.hpp>
 #include <stan/lang/ast/node/expression.hpp>
 
 namespace stan {
@@ -25,7 +25,12 @@ namespace stan {
       /**
        * Type of result.
        */
-      expr_type type_;
+      bare_expr_type type_;
+
+      /**
+       * Construct a default unary operation.
+       */
+      unary_op();
 
       /**
        * Construct a unary operation of the specified operation and

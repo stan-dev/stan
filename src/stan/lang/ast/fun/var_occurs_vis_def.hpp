@@ -2,6 +2,7 @@
 #define STAN_LANG_AST_FUN_VAR_OCCURS_VIS_DEF_HPP
 
 #include <stan/lang/ast.hpp>
+#include <boost/variant/apply_visitor.hpp>
 
 namespace stan {
   namespace lang {
@@ -52,6 +53,10 @@ namespace stan {
         if (boost::apply_visitor(*this, e.args_[i].expr_))
           return true;
       return false;
+    }
+
+    bool var_occurs_vis::operator()(const integrate_1d& e) const {
+      return false;  // no refs persist out of integrate_1d() call
     }
 
     bool var_occurs_vis::operator()(const integrate_ode& e) const {

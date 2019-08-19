@@ -24,54 +24,58 @@ namespace stan {
      * @param[in] expr string for expression
      * @param[in] indexes indexes for expression
      * @param[in] base_type base type of expression
-     * @param[in] e_num_dims number of array dimensions in expression
      * @param[in] user_facing true if expression might be reported to user
      * @param[in,out] o stream for generating
      */
     template <bool isLHS>
     void generate_indexed_expr(const std::string& expr,
                                const std::vector<expression>& indexes,
-                               base_expr_type base_type, size_t e_num_dims,
+                               bare_expr_type base_type,
                                bool user_facing, std::ostream& o) {
       if (user_facing) {
         generate_indexed_expr_user(expr, indexes, o);
         return;
       }
-      size_t ai_size = indexes.size();
-      if (ai_size == 0) {
+      if (indexes.size() == 0) {
         o << expr;
         return;
       }
-      if (ai_size <= (e_num_dims + 1) || !base_type.is_matrix_type()) {
-        for (size_t n = 0; n < ai_size; ++n)
+      if (base_type.innermost_type().is_matrix_type()
+          && base_type.num_dims() == indexes.size()) {
+        for (size_t n = 0; n < indexes.size() - 1; ++n)
           o << (isLHS ? "get_base1_lhs(" : "get_base1(");
         o << expr;
-        for (size_t n = 0; n < ai_size; ++n) {
-          o << ',';
+        for (size_t n = 0; n < indexes.size() - 2 ; ++n) {
+          o << ", ";
           generate_expression(indexes[n], user_facing, o);
-          o << ',';
+          o << ", ";
           generate_quoted_string(expr, o);
-          o << ',' << (n + 1) << ')';
+          o << ", " << (n + 1) << ')';
         }
-      } else {
-        for (size_t n = 0; n < ai_size - 1; ++n)
-          o << (isLHS ? "get_base1_lhs(" : "get_base1(");
-        o << expr;
-        for (size_t n = 0; n < ai_size - 2; ++n) {
-          o << ',';
-          generate_expression(indexes[n], user_facing, o);
-          o << ',';
-          generate_quoted_string(expr, o);
-          o << ',' << (n+1) << ')';
-        }
-        o << ',';
-        generate_expression(indexes[ai_size - 2U], user_facing, o);
-        o << ',';
-        generate_expression(indexes[ai_size - 1U], user_facing, o);
-        o << ',';
+        o << ", ";
+        generate_expression(indexes[indexes.size() - 2U], user_facing, o);
+        o << ", ";
+        generate_expression(indexes[indexes.size() - 1U], user_facing, o);
+        o << ", ";
         generate_quoted_string(expr, o);
-        o << ',' << (ai_size - 1U) << ')';
+        o << ", " << (indexes.size() - 1U) << ')';
+        return;
       }
+      for (size_t n = 0; n < indexes.size(); ++n)
+        o << (isLHS ? "get_base1_lhs(" : "get_base1(");
+      o << expr;
+      for (size_t n = 0; n < indexes.size() - 1; ++n) {
+        o << ", ";
+        generate_expression(indexes[n], user_facing, o);
+        o << ", ";
+        generate_quoted_string(expr, o);
+        o << ", " << (n + 1) << ')';
+      }
+      o << ", ";
+      generate_expression(indexes[indexes.size() - 1U], user_facing, o);
+      o << ", ";
+      generate_quoted_string(expr, o);
+      o << ", " << (indexes.size()) << ')';
     }
 
   }
