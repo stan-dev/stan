@@ -34,24 +34,21 @@ namespace stan {
       using std::vector;
       using stan::math::fvar;
       double lp;
+      gradient.resize(model.num_params_r());
       try {
-        vector<fvar<double>> ad_params_r(params_r.size());
-        for (size_t i = 0; i < model.num_params_r(); ++i) {
-          stan::math::fvar<double> var_i(params_r[i]);
-          ad_params_r[i] = var_i;
-        }
-        fvar<double> adLogProb
-          = model.template log_prob<propto, jacobian_adjust_transform>
-          (ad_params_r, params_i, msgs);
-        lp = adLogProb.val();
-	std::cout << "********************************************************************************" << std::endl
-		  << "--------log_prob_grad" << std::endl;
-        //adLogProb.grad(ad_params_r, gradient);
+	for (size_t i = 0; i < model.num_params_r(); ++i) {
+	  std::vector<stan::math::fvar<double>> theta(model.num_params_r());
+	  for (size_t j = 0; j < model.num_params_r(); ++j)
+	    theta[i] = fvar<double>(params_r[i], i == j ? 1.0 : 0.0);
+	  fvar<double> log_prob
+	    = model.template log_prob<propto, jacobian_adjust_transform>
+	    (theta, params_i, msgs);
+	  lp = log_prob.val_;
+	  gradient[i] = log_prob.d_;
+	}
       } catch (const std::exception &ex) {
-        //stan::math::recover_memory();
         throw;
       }
-      //stan::math::recover_memory();
       return lp;
     }
 
@@ -78,26 +75,23 @@ namespace stan {
                          std::ostream* msgs = 0) {
       using std::vector;
       using stan::math::fvar;
-
-      Eigen::Matrix<fvar<double>, Eigen::Dynamic, 1> ad_params_r(params_r.size());
-      for (size_t i = 0; i < model.num_params_r(); ++i) {
-        stan::math::fvar<double> var_i(params_r[i]);
-        ad_params_r[i] = var_i;
-      }
+      double lp;
+      gradient.resize(model.num_params_r());
       try {
-        fvar<double> adLogProb
-          = model
-          .template log_prob<propto,
-                             jacobian_adjust_transform>(ad_params_r, msgs);
-        //double val = adLogProb.val();
-	std::cout << "********************************************************************************" << std::endl
-		  << "--------log_prob_grad" << std::endl;
-        //stan::math::grad(adLogProb, ad_params_r, gradient);
-        return adLogProb.val();
-      } catch (std::exception &ex) {
-        //stan::math::recover_memory();
+	for (size_t i = 0; i < model.num_params_r(); ++i) {
+	  std::vector<stan::math::fvar<double>> theta(model.num_params_r());
+	  for (size_t j = 0; j < model.num_params_r(); ++j)
+	    theta[i] = fvar<double>(params_r[i], i == j ? 1.0 : 0.0);
+	  fvar<double> log_prob
+	    = model.template log_prob<propto, jacobian_adjust_transform>
+	    (theta, msgs);
+	  lp = log_prob.val_;
+	  gradient[i] = log_prob.d_;
+	}
+      } catch (const std::exception &ex) {
         throw;
       }
+      return lp;
     }
 
   }

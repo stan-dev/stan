@@ -34,20 +34,24 @@ namespace stan {
                            std::vector<double>& params_r,
                            std::vector<int>& params_i,
                            std::ostream* msgs = 0) {
+      std::cout << "--------------------" << std::endl
+		<< "--------------------" << std::endl
+		<< "--------------------" << std::endl;
       using stan::math::fvar;
       using std::vector;
-      vector<fvar<double>> ad_params_r;
-      ad_params_r.reserve(model.num_params_r());
-      for (size_t i = 0; i < model.num_params_r(); ++i)
-        ad_params_r.push_back(params_r[i]);
+
       try {
-        double lp
-          = model.template log_prob<true, jacobian_adjust_transform>
-          (ad_params_r, params_i, msgs).val();
-        //stan::math::recover_memory();
+	vector<fvar<double>> theta(model.num_params_r());
+	for (size_t i = 0; i < model.num_params_r(); ++i)
+	  theta[i] = fvar<double>(params_r[i]);
+	double lp
+	  = model
+	  .template log_prob<true,
+			     jacobian_adjust_transform>(theta, params_i,
+							msgs)
+	  .val_;
         return lp;
       } catch (std::exception &ex) {
-        //stan::math::recover_memory();
         throw;
       }
     }
@@ -82,21 +86,18 @@ namespace stan {
 
       double lp;
       try {
-        vector<fvar<double>> ad_params_r;
-        ad_params_r.reserve(model.num_params_r());
-        for (size_t i = 0; i < model.num_params_r(); ++i)
-          ad_params_r.push_back(params_r(i));
+	vector<fvar<double>> theta(model.num_params_r());
+	for (size_t i = 0; i < model.num_params_r(); ++i)
+	  theta[i] = fvar<double>(params_r[i]);
         lp
           = model
           .template log_prob<true,
-                             jacobian_adjust_transform>(ad_params_r, params_i,
+                             jacobian_adjust_transform>(theta, params_i,
                                                         msgs)
-          .val();
+          .val_;
       } catch (std::exception &ex) {
-        //stan::math::recover_memory();
         throw;
       }
-      //stan::math::recover_memory();
       return lp;
     }
 

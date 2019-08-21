@@ -310,8 +310,8 @@ class model_base : public prob_grad {
   template <bool propto, bool jacobian, typename T>
   inline T log_prob(Eigen::Matrix<T, -1, 1>& params_r,
              std::ostream* msgs) const {
-    std::cout << "--------------------------------------------------------------------------------" << std::endl
-	      << "inside log_prob.... " << std::endl;
+    // std::cout << "--------------------------------------------------------------------------------" << std::endl
+    // 	      << "inside log_prob.... " << std::endl;
       
     if (propto && jacobian)
       return log_prob_propto_jacobian(params_r, msgs);

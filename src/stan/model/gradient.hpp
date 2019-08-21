@@ -17,9 +17,7 @@ namespace stan {
                   double& f,
                   Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
                   std::ostream* msgs = 0) {
-      std::cout << "!!!!!!!!!!!!!!!!!!!!" << std::endl
-		<< "gradient 1" << std::endl;
-      // stan::math::gradient(model_functional<M>(model, msgs), x, f, grad_f);
+      stan::math::gradient(model_functional<M>(model, msgs), x, f, grad_f);
     }
 
     template <class M>
@@ -28,8 +26,6 @@ namespace stan {
                   double& f,
                   Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
                   callbacks::logger& logger) {
-      std::cout << "!!!!!!!!!!!!!!!!!!!!" << std::endl
-		<< "gradient 2" << std::endl;
       std::stringstream ss;
       try {
         stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);

@@ -90,56 +90,56 @@ class model_base_crtp : public stan::model::model_base {
 
   inline double log_prob(Eigen::VectorXd& theta,
                          std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "double, vectorxd" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "double, vectorxd" << std::endl;
 
     return static_cast<const M*>(this)
         ->template log_prob<false, false, double>(theta, msgs);
   }
   inline math::fvar<double> log_prob(Eigen::Matrix<math::fvar<double>, -1, 1>& theta,
                             std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "fd, vector<fd>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "fd, vector<fd>" << std::endl;
     return static_cast<const M*>(this)
       ->template log_prob<false, false>(theta, msgs);
   }
 
   inline double log_prob_jacobian(Eigen::VectorXd& theta,
                                   std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-        std::cout << "log_prob_jacobian: double, vectorxd" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+        // std::cout << "log_prob_jacobian: double, vectorxd" << std::endl;
 
     return static_cast<const M*>(this)
         ->template log_prob<false, true>(theta, msgs);
   }
   inline math::fvar<double> log_prob_jacobian(Eigen::Matrix<math::fvar<double>, -1, 1>& theta,
                                   std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_jacobian: fd, vector<fd>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_jacobian: fd, vector<fd>" << std::endl;
     return static_cast<const M*>(this)
         ->template log_prob<false, true>(theta, msgs);
   }
 
   inline double log_prob_propto(Eigen::VectorXd& theta,
                                 std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_propto: double, vectorxd" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_propto: double, vectorxd" << std::endl;
 
     return static_cast<const M*>(this)
         ->template log_prob<true, false>(theta, msgs);
   }
   inline math::fvar<double> log_prob_propto(Eigen::Matrix<math::fvar<double>, -1, 1>& theta,
                                    std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_propto: fd, Vector<fd>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_propto: fd, Vector<fd>" << std::endl;
     return static_cast<const M*>(this)
         ->template log_prob<true, false>(theta, msgs);
   }
 
   inline double log_prob_propto_jacobian(Eigen::VectorXd& theta,
                                          std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_propto_jacobian: double, vectorxd" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_propto_jacobian: double, vectorxd" << std::endl;
 
     return static_cast<const M*>(this)
         ->template log_prob<true, true>(theta, msgs);
@@ -147,8 +147,8 @@ class model_base_crtp : public stan::model::model_base {
   inline math::fvar<double>
   log_prob_propto_jacobian(Eigen::Matrix<math::fvar<double>, -1, 1>& theta,
                            std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_propto_jacobian: fd, Vector<fd>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_propto_jacobian: fd, Vector<fd>" << std::endl;
     
     return static_cast<const M*>(this)
         ->template log_prob<true, true>(theta, msgs);
@@ -160,8 +160,8 @@ class model_base_crtp : public stan::model::model_base {
                    bool include_tparams = true,
                    bool include_gqs = true,
                    std::ostream* msgs = 0) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "write_array" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "write_array" << std::endl;
 
     return static_cast<const M*>(this)->template write_array(rng, theta, vars,
                                               include_tparams, include_gqs,
@@ -174,8 +174,8 @@ class model_base_crtp : public stan::model::model_base {
   inline double log_prob(std::vector<double>& theta,
                          std::vector<int>& theta_i,
                          std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob: std::vector" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob: std::vector" << std::endl;
 
     return static_cast<const M*>(this)
         ->template log_prob<false, false>(theta, theta_i, msgs);
@@ -183,8 +183,8 @@ class model_base_crtp : public stan::model::model_base {
   inline math::fvar<double> log_prob(std::vector<math::fvar<double>>& theta,
                             std::vector<int>& theta_i,
                             std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob: fd, std::vector<fd>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob: fd, std::vector<fd>" << std::endl;
     return static_cast<const M*>(this)
         ->template log_prob<false, false>(theta, theta_i, msgs);
   }
@@ -192,16 +192,16 @@ class model_base_crtp : public stan::model::model_base {
   inline double log_prob_jacobian(std::vector<double>& theta,
                                   std::vector<int>& theta_i,
                                   std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_jacobian: double, std::vector<double>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_jacobian: double, std::vector<double>" << std::endl;
     return static_cast<const M*>(this)
         ->template log_prob<false, true>(theta, theta_i, msgs);
   }
   inline math::fvar<double> log_prob_jacobian(std::vector<math::fvar<double>>& theta,
                                      std::vector<int>& theta_i,
                                      std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_jacobian: fd, std::vector<fd>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_jacobian: fd, std::vector<fd>" << std::endl;
     return static_cast<const M*>(this)
         ->template log_prob<false, true>(theta, theta_i, msgs);
   }
@@ -209,16 +209,16 @@ class model_base_crtp : public stan::model::model_base {
   inline double log_prob_propto(std::vector<double>& theta,
                                 std::vector<int>& theta_i,
                                 std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_propto: double, std::vector<double>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_propto: double, std::vector<double>" << std::endl;
     return static_cast<const M*>(this)
         ->template log_prob<true, false>(theta, theta_i, msgs);
   }
   inline math::fvar<double> log_prob_propto(std::vector<math::fvar<double>>& theta,
                                    std::vector<int>& theta_i,
                                    std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_propto: fd, std::vector<fd>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_propto: fd, std::vector<fd>" << std::endl;
     return static_cast<const M*>(this)
         ->template log_prob<true, false>(theta, theta_i, msgs);
   }
@@ -226,16 +226,16 @@ class model_base_crtp : public stan::model::model_base {
   inline double log_prob_propto_jacobian(std::vector<double>& theta,
                                          std::vector<int>& theta_i,
                                          std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_propto_jacobian: double, std::vector<double>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_propto_jacobian: double, std::vector<double>" << std::endl;
     return static_cast<const M*>(this)
         ->template log_prob<true, true>(theta, theta_i, msgs);
   }
   inline math::fvar<double> log_prob_propto_jacobian(std::vector<math::fvar<double>>& theta,
                                             std::vector<int>& theta_i,
                                             std::ostream* msgs) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "log_prob_propto_jacobian: fd, std::vector<fd>" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "log_prob_propto_jacobian: fd, std::vector<fd>" << std::endl;
     return static_cast<const M*>(this)
         ->template log_prob<true, true>(theta, theta_i, msgs);
   }
@@ -247,8 +247,8 @@ class model_base_crtp : public stan::model::model_base {
                    bool include_tparams = true,
                    bool include_gqs = true,
                    std::ostream* msgs = 0) const override {
-    std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
-    std::cout << "write_array" << std::endl;
+    // std::cout << "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" << std::endl;
+    // std::cout << "write_array" << std::endl;
     return static_cast<const M*>(this)
         ->template write_array(rng, theta, theta_i, vars, include_tparams,
                                include_gqs, msgs);
