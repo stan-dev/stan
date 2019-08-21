@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_LOG_PROB_PROPTO_HPP
 #define STAN_MODEL_LOG_PROB_PROPTO_HPP
 
-#include <stan/math/rev/mat.hpp>
+#include <stan/math/fwd/mat.hpp>
 #include <iostream>
 #include <vector>
 
@@ -34,9 +34,9 @@ namespace stan {
                            std::vector<double>& params_r,
                            std::vector<int>& params_i,
                            std::ostream* msgs = 0) {
-      using stan::math::var;
+      using stan::math::fvar;
       using std::vector;
-      vector<var> ad_params_r;
+      vector<fvar<double>> ad_params_r;
       ad_params_r.reserve(model.num_params_r());
       for (size_t i = 0; i < model.num_params_r(); ++i)
         ad_params_r.push_back(params_r[i]);
@@ -44,10 +44,10 @@ namespace stan {
         double lp
           = model.template log_prob<true, jacobian_adjust_transform>
           (ad_params_r, params_i, msgs).val();
-        stan::math::recover_memory();
+        //stan::math::recover_memory();
         return lp;
       } catch (std::exception &ex) {
-        stan::math::recover_memory();
+        //stan::math::recover_memory();
         throw;
       }
     }
@@ -76,13 +76,13 @@ namespace stan {
     double log_prob_propto(const M& model,
                            Eigen::VectorXd& params_r,
                            std::ostream* msgs = 0) {
-      using stan::math::var;
+      using stan::math::fvar;
       using std::vector;
       vector<int> params_i(0);
 
       double lp;
       try {
-        vector<var> ad_params_r;
+        vector<fvar<double>> ad_params_r;
         ad_params_r.reserve(model.num_params_r());
         for (size_t i = 0; i < model.num_params_r(); ++i)
           ad_params_r.push_back(params_r(i));
@@ -93,10 +93,10 @@ namespace stan {
                                                         msgs)
           .val();
       } catch (std::exception &ex) {
-        stan::math::recover_memory();
+        //stan::math::recover_memory();
         throw;
       }
-      stan::math::recover_memory();
+      //stan::math::recover_memory();
       return lp;
     }
 

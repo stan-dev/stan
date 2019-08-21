@@ -2,7 +2,7 @@
 #define STAN_MODEL_MODEL_BASE_HPP
 
 #include <stan/io/var_context.hpp>
-#include <stan/math/rev/core.hpp>
+#include <stan/math/fwd/core.hpp>
 #include <stan/model/prob_grad.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <ostream>
@@ -178,8 +178,8 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var
-  log_prob(Eigen::Matrix<math::var, -1, 1>& params_r,
+  virtual math::fvar<double>
+  log_prob(Eigen::Matrix<math::fvar<double>, -1, 1>& params_r,
            std::ostream* msgs) const = 0;
 
   /**
@@ -212,8 +212,8 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var
-  log_prob_jacobian(Eigen::Matrix<math::var, -1, 1>& params_r,
+  virtual math::fvar<double>
+  log_prob_jacobian(Eigen::Matrix<math::fvar<double>, -1, 1>& params_r,
                     std::ostream* msgs) const = 0;
 
   /**
@@ -224,7 +224,7 @@ class model_base : public prob_grad {
    * <p>This method is for completeness as `double`-based inputs are
    * always constant and will thus cause all probability functions to
    * be dropped from the result.  To get the value of this
-   * calculation, use the overload for `math::var`.
+   * calculation, use the overload for `math::fvar<double>`.
    *
    * @param[in] params_r unconstrained parameters
    * @param[in,out] msgs message stream
@@ -243,8 +243,8 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var
-  log_prob_propto(Eigen::Matrix<math::var, -1, 1>& params_r,
+  virtual math::fvar<double>
+  log_prob_propto(Eigen::Matrix<math::fvar<double>, -1, 1>& params_r,
                   std::ostream* msgs) const = 0;
 
   /**
@@ -259,7 +259,7 @@ class model_base : public prob_grad {
    * <p>This method is for completeness as `double`-based inputs are
    * always constant and will thus cause all probability functions to
    * be dropped from the result.  To get the value of this
-   * calculation, use the overload for `math::var`.
+   * calculation, use the overload for `math::fvar<double>`.
    *
    * @param[in] params_r unconstrained parameters
    * @param[in,out] msgs message stream
@@ -282,8 +282,8 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var
-  log_prob_propto_jacobian(Eigen::Matrix<math::var, -1, 1>& params_r,
+  virtual math::fvar<double>
+  log_prob_propto_jacobian(Eigen::Matrix<math::fvar<double>, -1, 1>& params_r,
                            std::ostream* msgs) const = 0;
 
   /**
@@ -310,6 +310,9 @@ class model_base : public prob_grad {
   template <bool propto, bool jacobian, typename T>
   inline T log_prob(Eigen::Matrix<T, -1, 1>& params_r,
              std::ostream* msgs) const {
+    std::cout << "--------------------------------------------------------------------------------" << std::endl
+	      << "inside log_prob.... " << std::endl;
+      
     if (propto && jacobian)
       return log_prob_propto_jacobian(params_r, msgs);
     else if (propto && !jacobian)
@@ -393,8 +396,8 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var
-  log_prob(std::vector<math::var>& params_r,  std::vector<int>& params_i,
+  virtual math::fvar<double>
+  log_prob(std::vector<math::fvar<double>>& params_r,  std::vector<int>& params_i,
            std::ostream* msgs) const = 0;
 
   /**
@@ -433,8 +436,8 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var
-  log_prob_jacobian(std::vector<math::var>& params_r,
+  virtual math::fvar<double>
+  log_prob_jacobian(std::vector<math::fvar<double>>& params_r,
                     std::vector<int>& params_i, std::ostream* msgs) const = 0;
 
  /**
@@ -445,7 +448,7 @@ class model_base : public prob_grad {
    * <p>This method is for completeness as `double`-based inputs are
    * always constant and will thus cause all probability functions to
    * be dropped from the result.  To get the value of this
-   * calculation, use the overload for `math::var`.
+   * calculation, use the overload for `math::fvar<double>`.
    *
    * \deprecated Use Eigen vector versions
    *
@@ -470,8 +473,8 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var
-  log_prob_propto(std::vector<math::var>& params_r, std::vector<int>& params_i,
+  virtual math::fvar<double>
+  log_prob_propto(std::vector<math::fvar<double>>& params_r, std::vector<int>& params_i,
                   std::ostream* msgs) const = 0;
 
   /**
@@ -486,7 +489,7 @@ class model_base : public prob_grad {
    * <p>This method is for completeness as `double`-based inputs are
    * always constant and will thus cause all probability functions to
    * be dropped from the result.  To get the value of this
-   * calculation, use the overload for `math::var`.
+   * calculation, use the overload for `math::fvar<double>`.
    *
    * \deprecated Use Eigen vector versions
    *
@@ -517,8 +520,8 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var
-  log_prob_propto_jacobian(std::vector<math::var>& params_r,
+  virtual math::fvar<double>
+  log_prob_propto_jacobian(std::vector<math::fvar<double>>& params_r,
                            std::vector<int>& params_i,
                            std::ostream* msgs) const = 0;
 

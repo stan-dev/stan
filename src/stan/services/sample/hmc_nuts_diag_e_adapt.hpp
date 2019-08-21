@@ -69,6 +69,8 @@ namespace stan {
                                 callbacks::writer& init_writer,
                                 callbacks::writer& sample_writer,
                                 callbacks::writer& diagnostic_writer) {
+	std::cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^" << std::endl
+		  << "hmc_nuts_diag_e_adapt" << std::endl;
         boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
         std::vector<int> disc_vector;

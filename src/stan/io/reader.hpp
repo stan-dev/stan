@@ -130,6 +130,8 @@ public:
    * @return Next scalar value.
    */
   inline T scalar() {
+    std::cout << "pos_ = " << pos_ << std::endl
+	      << "data_r_.size() = " << data_r_.size() << std::endl;
     if (pos_ >= data_r_.size())
       BOOST_THROW_EXCEPTION(std::runtime_error("no more scalars to read"));
     return data_r_[pos_++];

@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_MODEL_HEADER_HPP
 #define STAN_MODEL_MODEL_HEADER_HPP
 
-#include <stan/math.hpp>
+#include <stan/math/fwd/mat.hpp>
 
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
