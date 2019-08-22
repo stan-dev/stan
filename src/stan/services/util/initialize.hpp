@@ -73,8 +73,6 @@ std::vector<double> initialize(Model& model,
                                stan::callbacks::logger& logger,
                                stan::callbacks::writer&
                                init_writer) {
-  std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << std::endl
-	    << "initialize" << std::endl;
   std::vector<double> unconstrained;
   std::vector<int> disc_vector;
 
