@@ -90,13 +90,13 @@ namespace advi {
     return 0;
   }
 
-  // typename<T_k>
-  // int adjust_k_wip(T_k& k, const size_t& n) {
-  //   size_t a = 10;
-  //   size_t n_plus_a = n + a;
-  //   k = k * n / n_plus_a + a * 0.5 / n_plus_a;
-  //   return 0;
-  // }
+  template <typename T_k>
+  int adjust_k_wip(T_k& k, const size_t& n) {
+    size_t a = 10;
+    size_t n_plus_a = n + a;
+    k = k * n / n_plus_a + a * 0.5 / n_plus_a;
+    return 0;
+  }
   
 
 }  // namespace advi
