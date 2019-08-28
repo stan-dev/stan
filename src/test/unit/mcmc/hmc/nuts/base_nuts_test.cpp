@@ -243,13 +243,13 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
                      sum_metro_prob, logger);
 
   EXPECT_EQ(7 * 3, sampler.rho_values.size());
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(0));
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(1));
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(2));
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(3));
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(4));
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(5));
-  EXPECT_EQ(4 * init_momentum, sampler.rho_values.at(6));
+  
+  std::vector<double> rho_scales = {2, 2, 2, 2, 2, 2, 4, 3, 3, 2, 2,
+                                    2, 2, 2, 2, 4, 3, 3, 8, 5, 5};
+  
+  for (int n = 0; n < 21; ++n) {
+     EXPECT_EQ(rho_scales[n] * init_momentum, sampler.rho_values[n]);
+  }
 }
 
 TEST(McmcNutsBaseNuts, divergence_test) {
