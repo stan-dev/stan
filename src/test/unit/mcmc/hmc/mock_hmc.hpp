@@ -64,7 +64,7 @@ namespace stan {
 
       // Ensures that NUTS non-termination criterion is always true
       Eigen::VectorXd dtau_dp(ps_point& z) {
-        return Eigen::VectorXd::Ones(this->model_.num_params_r());
+        return z.q;
       }
 
       Eigen::VectorXd dphi_dq(ps_point& z,
