@@ -104,8 +104,8 @@ namespace stan {
         Eigen::VectorXd p_sharp_bck_bck = p_sharp_fwd_fwd;
 
         // Integrated momenta along trajectory
-        Eigen::VectorXd rho = this->z_.p;
-
+        Eigen::VectorXd rho = this->z_.p.transpose();
+        
         // Log sum of state weights (offset by H0) along trajectory
         double log_sum_weight = 0;  // log(exp(H0 - H0))
         double H0 = this->hamiltonian_.H(this->z_);
@@ -130,6 +130,9 @@ namespace stan {
             // Extend the current trajectory forward
             this->z_.ps_point::operator=(z_fwd);
             rho_bck = rho;
+            p_bck_fwd = p_fwd_fwd;
+            p_sharp_bck_fwd = p_sharp_fwd_fwd;
+            
             valid_subtree
               = build_tree(this->depth_, z_propose,
                            p_sharp_fwd_bck, p_sharp_fwd_fwd,
@@ -142,6 +145,9 @@ namespace stan {
             // Extend the current trajectory backwards
             this->z_.ps_point::operator=(z_bck);
             rho_fwd = rho;
+            p_fwd_bck = p_bck_bck;
+            p_sharp_fwd_bck = p_sharp_bck_bck;
+            
             valid_subtree
               = build_tree(this->depth_, z_propose,
                            p_sharp_bck_fwd, p_sharp_bck_bck,
