@@ -244,12 +244,32 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
 
   EXPECT_EQ(7 * 3, sampler.rho_values.size());
   
-  std::vector<double> rho_scales = {2, 2, 2, 2, 2, 2, 4, 3, 3, 2, 2,
-                                    2, 2, 2, 2, 4, 3, 3, 8, 5, 5};
+  // Trajectory component spanning rhos
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[0]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[3]);
+  EXPECT_EQ(4 * init_momentum, sampler.rho_values[6]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[9]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[12]);
+  EXPECT_EQ(4 * init_momentum, sampler.rho_values[15]);
+  EXPECT_EQ(8 * init_momentum, sampler.rho_values[18]);
   
-  for (int n = 0; n < 21; ++n) {
-     EXPECT_EQ(rho_scales[n] * init_momentum, sampler.rho_values[n]);
-  }
+  // Cross trajectory component rhos
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[1]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[4]);
+  EXPECT_EQ(3 * init_momentum, sampler.rho_values[7]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[10]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[13]);
+  EXPECT_EQ(3 * init_momentum, sampler.rho_values[16]);
+  EXPECT_EQ(5 * init_momentum, sampler.rho_values[19]);
+
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[2]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[5]);
+  EXPECT_EQ(3 * init_momentum, sampler.rho_values[8]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[11]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[14]);
+  EXPECT_EQ(3 * init_momentum, sampler.rho_values[17]);
+  EXPECT_EQ(5 * init_momentum, sampler.rho_values[20]);
+  
 }
 
 TEST(McmcNutsBaseNuts, divergence_test) {
