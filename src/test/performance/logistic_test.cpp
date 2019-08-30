@@ -114,7 +114,7 @@ TEST_F(performance, values_from_tagged_version) {
   EXPECT_FLOAT_EQ(0.91851199, first_run[1])
     << "accept_stat__: index 1";
 
-  EXPECT_FLOAT_EQ(0.76885599, first_run[2])
+  EXPECT_FLOAT_EQ(0.76885802, first_run[2])
     << "stepsize__: index 2";
 
   EXPECT_FLOAT_EQ(2, first_run[3])
@@ -132,7 +132,7 @@ TEST_F(performance, values_from_tagged_version) {
   EXPECT_FLOAT_EQ(1.3577, first_run[7])
     << "beta.1: index 7";
 
-  EXPECT_FLOAT_EQ(-0.511895, first_run[8])
+  EXPECT_FLOAT_EQ(-0.51189202, first_run[8])
     << "beta.2: index 8";
 
   matches_tagged_version = !HasNonfatalFailure();
