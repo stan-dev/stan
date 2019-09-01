@@ -100,14 +100,15 @@ namespace stan {
 
 
       // extends the tree into the direction of the sign of the subtree
-      std::tuple<bool, double, Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>
+      std::tuple<bool, double, Eigen::VectorXd, ps_point*>
       extend_tree(int depth, subtree& tree,
                   callbacks::logger& logger) {
         // save the current ends needed for later criterion computations
-        Eigen::VectorXd p_end = tree.p_end_;
-        Eigen::VectorXd p_sharp_end = tree.p_sharp_end_;
+        //Eigen::VectorXd p_end = tree.p_end_;
+        //Eigen::VectorXd p_sharp_end = tree.p_sharp_end_;
+        Eigen::VectorXd p_sharp_dummy = Eigen::VectorXd::Zero(tree.p_sharp_end_.size());
         
-        Eigen::VectorXd rho = Eigen::VectorXd::Zero(p_end.size());
+        Eigen::VectorXd rho = Eigen::VectorXd::Zero(tree.p_sharp_end_.size());
         double log_sum_weight = -std::numeric_limits<double>::infinity();
 
         bool valid_subtree = build_tree(depth,
@@ -119,13 +120,13 @@ namespace stan {
                                         tree.n_leapfrog_,
                                         log_sum_weight, tree.sum_metro_prob_,
                                         logger);
-        return std::make_tuple(valid_subtree, log_sum_weight, p_end, p_sharp_end, rho);
+        return std::make_tuple(valid_subtree, log_sum_weight,  rho, &tree.z_propose_);
       }
         
 
       
       sample
-      transition_new(sample& init_sample, callbacks::logger& logger) {
+      transition(sample& init_sample, callbacks::logger& logger) {
         // Initialize the algorithm
         this->sample_stepsize();
 
@@ -134,15 +135,80 @@ namespace stan {
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
         this->hamiltonian_.init(this->z_, logger);
 
+        Eigen::VectorXd rho = this->z_.p;
+
+        double log_sum_weight = 0;  // log(exp(H0 - H0))
+        double H0 = this->hamiltonian_.H(this->z_);
+        //int n_leapfrog = 0;
+        //double sum_metro_prob = 0;
+
         // forward tree
-        subtree tree_fwd(1.0, this->z_, this->hamiltonian_.dtau_dp(this->z_));
+        subtree tree_fwd(1.0, this->z_, this->hamiltonian_.dtau_dp(this->z_), H0);
         // backward tree
-        subtree tree_bck(-1.0, this->z_, tree_fwd.p_sharp_beg_);
+        subtree tree_bck(-1.0, this->z_, tree_fwd.p_sharp_beg_, H0);
         
+        ps_point z_sample(this->z_);
+
+        // Build a trajectory until the NUTS criterion is no longer satisfied
+        this->depth_ = 0;
+        this->divergent_ = false;
+
+        while (this->depth_ < this->max_depth_) {
+          Eigen::VectorXd rho_subtree;
+          bool valid_subtree;
+          double log_sum_weight_subtree;
+          ps_point* z_propose;
+          
+          if (this->rand_uniform_() > 0.5) {
+            std::tie(valid_subtree, log_sum_weight_subtree, rho_subtree, z_propose)
+                = extend_tree(this->depth_, tree_fwd, logger);
+          } else {
+            std::tie(valid_subtree, log_sum_weight_subtree, rho_subtree, z_propose)
+                = extend_tree(this->depth_, tree_bck, logger);
+          }
+          
+          if (!valid_subtree) break;
+
+          // Sample from an accepted subtree
+          ++(this->depth_);
+
+          if (log_sum_weight_subtree > log_sum_weight) {
+            z_sample = *z_propose;
+          } else {
+            double accept_prob
+              = std::exp(log_sum_weight_subtree - log_sum_weight);
+            if (this->rand_uniform_() < accept_prob)
+              z_sample = *z_propose;
+          }
+
+          log_sum_weight
+            = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
+
+          // Break when NUTS criterion is no longer satisfied
+          rho += rho_subtree;
+          if (!compute_criterion(tree_bck.p_sharp_end_, tree_fwd.p_sharp_end_, rho))
+            break;
+          //if (!compute_criterion(p_sharp_minus, p_sharp_plus, rho))
+          //  break;
+        }
+
+        //this->n_leapfrog_ = n_leapfrog;
+        this->n_leapfrog_ = tree_fwd.n_leapfrog_ + tree_bck.n_leapfrog_;
+
+        const double sum_metro_prob = tree_fwd.sum_metro_prob_ + tree_bck.sum_metro_prob_;
+
+        // Compute average acceptance probabilty across entire trajectory,
+        // even over subtrees that may have been rejected
+        double accept_prob
+          = sum_metro_prob / static_cast<double>(this->n_leapfrog_);
+
+        this->z_.ps_point::operator=(z_sample);
+        this->energy_ = this->hamiltonian_.H(this->z_);
+        return sample(this->z_.q, -this->z_.V, accept_prob);
       }
 
       sample
-      transition(sample& init_sample, callbacks::logger& logger) {
+      transition_old(sample& init_sample, callbacks::logger& logger) {
         // Initialize the algorithm
         this->sample_stepsize();
 
@@ -158,7 +224,7 @@ namespace stan {
         ps_point z_propose(z_plus);
 
         Eigen::VectorXd p_sharp_plus = this->hamiltonian_.dtau_dp(this->z_);
-        Eigen::VectorXd p_sharp_dummy = p_sharp_plus;
+        //Eigen::VectorXd p_sharp_dummy = p_sharp_plus;
         Eigen::VectorXd p_sharp_minus = p_sharp_plus;
         Eigen::VectorXd rho = this->z_.p;
 
@@ -177,6 +243,9 @@ namespace stan {
           bool valid_subtree = false;
           double log_sum_weight_subtree
             = -std::numeric_limits<double>::infinity();
+
+          // this should be fine (modified from orig)
+          Eigen::VectorXd p_sharp_dummy = Eigen::VectorXd::Zero(this->z_.p.size());
 
           if (this->rand_uniform_() > 0.5) {
             //this->z_.ps_point::operator=(z_plus);
