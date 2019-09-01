@@ -71,6 +71,76 @@ namespace stan {
       int get_max_depth() { return this->max_depth_; }
       double get_max_delta() { return this->max_deltaH_; }
 
+     // stores from left/right subtree entire information
+      struct subtree {
+        subtree(const double sign,
+                const ps_point& z_beg,
+                const Eigen::VectorXd& p_sharp_beg,
+                double H0)
+            : z_beg_(z_beg), z_propose_(z_beg),
+              p_sharp_beg_(p_sharp_beg),
+              p_sharp_end_(p_sharp_beg_),
+              log_sum_weight_(0),
+              H0_(H0),
+              sign_(sign),
+              n_leapfrog_(0),
+              sum_metro_prob_(0)
+        {}
+
+        ps_point z_beg_;
+        ps_point z_propose_;
+        Eigen::VectorXd p_sharp_beg_;
+        Eigen::VectorXd p_sharp_end_;
+        double H0_;
+        const double sign_;
+        int n_leapfrog_;
+        double log_sum_weight_;
+        double sum_metro_prob_;
+      };
+
+
+      // extends the tree into the direction of the sign of the subtree
+      std::tuple<bool, double, Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd>
+      extend_tree(int depth, subtree& tree,
+                  callbacks::logger& logger) {
+        // save the current ends needed for later criterion computations
+        Eigen::VectorXd p_end = tree.p_end_;
+        Eigen::VectorXd p_sharp_end = tree.p_sharp_end_;
+        
+        Eigen::VectorXd rho = Eigen::VectorXd::Zero(p_end.size());
+        double log_sum_weight = -std::numeric_limits<double>::infinity();
+
+        bool valid_subtree = build_tree(depth,
+                                        tree.z_beg_, tree.z_propose_,
+                                        tree.p_sharp_beg_, tree.p_sharp_end_,
+                                        rho,
+                                        tree.H0_,
+                                        tree.sign_,
+                                        tree.n_leapfrog_,
+                                        log_sum_weight, tree.sum_metro_prob_,
+                                        logger);
+        return std::make_tuple(valid_subtree, log_sum_weight, p_end, p_sharp_end, rho);
+      }
+        
+
+      
+      sample
+      transition_new(sample& init_sample, callbacks::logger& logger) {
+        // Initialize the algorithm
+        this->sample_stepsize();
+
+        this->seed(init_sample.cont_params());
+
+        this->hamiltonian_.sample_p(this->z_, this->rand_int_);
+        this->hamiltonian_.init(this->z_, logger);
+
+        // forward tree
+        subtree tree_fwd(1.0, this->z_, this->hamiltonian_.dtau_dp(this->z_));
+        // backward tree
+        subtree tree_bck(-1.0, this->z_, tree_fwd.p_sharp_beg_);
+        
+      }
+
       sample
       transition(sample& init_sample, callbacks::logger& logger) {
         // Initialize the algorithm
@@ -109,23 +179,23 @@ namespace stan {
             = -std::numeric_limits<double>::infinity();
 
           if (this->rand_uniform_() > 0.5) {
-            this->z_.ps_point::operator=(z_plus);
+            //this->z_.ps_point::operator=(z_plus);
             valid_subtree
-              = build_tree(this->depth_, z_propose,
+                = build_tree(this->depth_, z_plus, z_propose,
                            p_sharp_dummy, p_sharp_plus, rho_subtree,
                            H0, 1, n_leapfrog,
                            log_sum_weight_subtree, sum_metro_prob,
                            logger);
-            z_plus.ps_point::operator=(this->z_);
+            //z_plus.ps_point::operator=(this->z_);
           } else {
-            this->z_.ps_point::operator=(z_minus);
+            //this->z_.ps_point::operator=(z_minus);
             valid_subtree
-              = build_tree(this->depth_, z_propose,
-                           p_sharp_dummy, p_sharp_minus, rho_subtree,
-                           H0, -1, n_leapfrog,
-                           log_sum_weight_subtree, sum_metro_prob,
-                           logger);
-            z_minus.ps_point::operator=(this->z_);
+                = build_tree(this->depth_, z_minus, z_propose,
+                             p_sharp_dummy, p_sharp_minus, rho_subtree,
+                             H0, -1, n_leapfrog,
+                             log_sum_weight_subtree, sum_metro_prob,
+                             logger);
+            //z_minus.ps_point::operator=(this->z_);
           }
 
           if (!valid_subtree) break;
@@ -192,6 +262,7 @@ namespace stan {
        * resulting subtree.
        *
        * @param depth Depth of the desired subtree
+       * @param z_beg State beginning from subtree
        * @param z_propose State proposed from subtree
        * @param p_sharp_left p_sharp from left boundary of returned tree
        * @param p_sharp_right p_sharp from the right boundary of returned tree
@@ -203,7 +274,8 @@ namespace stan {
        * @param sum_metro_prob Summed Metropolis probabilities across trajectory
        * @param logger Logger for messages
       */
-      bool build_tree(int depth, ps_point& z_propose,
+      bool build_tree(int depth, ps_point& z_beg,
+                      ps_point& z_propose,
                       Eigen::VectorXd& p_sharp_left,
                       Eigen::VectorXd& p_sharp_right,
                       Eigen::VectorXd& rho,
@@ -212,12 +284,12 @@ namespace stan {
                       callbacks::logger& logger) {
         // Base case
         if (depth == 0) {
-          this->integrator_.evolve(this->z_, this->hamiltonian_,
+          this->integrator_.evolve(z_beg, this->hamiltonian_,
                                    sign * this->epsilon_,
                                    logger);
           ++n_leapfrog;
 
-          double h = this->hamiltonian_.H(this->z_);
+          double h = this->hamiltonian_.H(z_beg);
           if (boost::math::isnan(h))
             h = std::numeric_limits<double>::infinity();
 
@@ -230,42 +302,42 @@ namespace stan {
           else
             sum_metro_prob += std::exp(H0 - h);
 
-          z_propose = this->z_;
-          rho += this->z_.p;
+          z_propose = z_beg;
+          rho += z_beg.p;
 
-          p_sharp_left = this->hamiltonian_.dtau_dp(this->z_);
+          p_sharp_left = this->hamiltonian_.dtau_dp(z_beg);
           p_sharp_right = p_sharp_left;
 
           return !this->divergent_;
         }
         // General recursion
-        Eigen::VectorXd p_sharp_dummy(this->z_.p.size());
+        Eigen::VectorXd p_sharp_dummy(z_beg.p.size());
 
         // Build the left subtree
         double log_sum_weight_left = -std::numeric_limits<double>::infinity();
         Eigen::VectorXd rho_left = Eigen::VectorXd::Zero(rho.size());
 
         bool valid_left
-          = build_tree(depth - 1, z_propose,
-                       p_sharp_left, p_sharp_dummy, rho_left,
-                       H0, sign, n_leapfrog,
-                       log_sum_weight_left, sum_metro_prob,
-                       logger);
+            = build_tree(depth - 1, z_beg, z_propose,
+                         p_sharp_left, p_sharp_dummy, rho_left,
+                         H0, sign, n_leapfrog,
+                         log_sum_weight_left, sum_metro_prob,
+                         logger);
 
         if (!valid_left) return false;
 
         // Build the right subtree
-        ps_point z_propose_right(this->z_);
+        ps_point z_propose_right(z_beg);
 
         double log_sum_weight_right = -std::numeric_limits<double>::infinity();
         Eigen::VectorXd rho_right = Eigen::VectorXd::Zero(rho.size());
 
         bool valid_right
-          = build_tree(depth - 1, z_propose_right,
-                       p_sharp_dummy, p_sharp_right, rho_right,
-                       H0, sign, n_leapfrog,
-                       log_sum_weight_right, sum_metro_prob,
-                       logger);
+            = build_tree(depth - 1, z_beg, z_propose_right,
+                         p_sharp_dummy, p_sharp_right, rho_right,
+                         H0, sign, n_leapfrog,
+                         log_sum_weight_right, sum_metro_prob,
+                         logger);
 
         if (!valid_right) return false;
 

@@ -169,7 +169,7 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  bool valid_subtree = sampler.build_tree(3, z_propose,
+  bool valid_subtree = sampler.build_tree(3, sampler.z(), z_propose,
                                           p_sharp_left, p_sharp_right, rho,
                                           H0, 1, n_leapfrog, log_sum_weight,
                                           sum_metro_prob, logger);
@@ -227,7 +227,7 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  sampler.build_tree(3, z_propose,
+  sampler.build_tree(3, sampler.z(), z_propose,
                      p_sharp_left, p_sharp_right, rho,
                      H0, 1, n_leapfrog, log_sum_weight,
                      sum_metro_prob, logger);
@@ -278,7 +278,7 @@ TEST(McmcNutsBaseNuts, divergence_test) {
   bool valid_subtree = 0;
 
   sampler.z().V = -750;
-  valid_subtree = sampler.build_tree(0, z_propose,
+  valid_subtree = sampler.build_tree(0, sampler.z(), z_propose,
                                      p_sharp_left, p_sharp_right, rho,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
@@ -287,7 +287,7 @@ TEST(McmcNutsBaseNuts, divergence_test) {
   EXPECT_FALSE(sampler.divergent_);
 
   sampler.z().V = -250;
-  valid_subtree = sampler.build_tree(0, z_propose,
+  valid_subtree = sampler.build_tree(0, sampler.z(), z_propose,
                                      p_sharp_left, p_sharp_right, rho,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
@@ -297,7 +297,7 @@ TEST(McmcNutsBaseNuts, divergence_test) {
   EXPECT_FALSE(sampler.divergent_);
 
   sampler.z().V = 750;
-  valid_subtree = sampler.build_tree(0, z_propose,
+  valid_subtree = sampler.build_tree(0, sampler.z(), z_propose,
                                      p_sharp_left, p_sharp_right, rho,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
