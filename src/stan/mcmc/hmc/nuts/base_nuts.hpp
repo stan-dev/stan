@@ -21,6 +21,8 @@ namespace stan {
               template<class> class Integrator, class BaseRNG>
     class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
+      typedef typename Hamiltonian<Model, BaseRNG>::PointType state_t;
+      
       base_nuts(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
           depth_(0), max_depth_(5), max_deltaH_(1000),
@@ -74,12 +76,11 @@ namespace stan {
      // stores from left/right subtree entire information
       struct subtree {
         subtree(const double sign,
-                const ps_point& z_beg,
-                const Eigen::VectorXd& p_sharp_beg,
+                const ps_point& z_end,
+                const Eigen::VectorXd& p_sharp_end,
                 double H0)
-            : z_beg_(z_beg), z_propose_(z_beg),
-              p_sharp_beg_(p_sharp_beg),
-              p_sharp_end_(p_sharp_beg_),
+            : z_end_(z_end), z_propose_(z_end),
+              p_sharp_end_(p_sharp_end),
               log_sum_weight_(0),
               H0_(H0),
               sign_(sign),
@@ -87,9 +88,8 @@ namespace stan {
               sum_metro_prob_(0)
         {}
 
-        ps_point z_beg_;
+        ps_point z_end_;
         ps_point z_propose_;
-        Eigen::VectorXd p_sharp_beg_;
         Eigen::VectorXd p_sharp_end_;
         double H0_;
         const double sign_;
@@ -101,30 +101,38 @@ namespace stan {
 
       // extends the tree into the direction of the sign of the subtree
       std::tuple<bool, double, Eigen::VectorXd, ps_point*>
-      extend_tree(int depth, subtree& tree,
+      extend_tree(int depth, subtree& tree, state_t& z,
                   callbacks::logger& logger) {
         // save the current ends needed for later criterion computations
         //Eigen::VectorXd p_end = tree.p_end_;
         //Eigen::VectorXd p_sharp_end = tree.p_sharp_end_;
         Eigen::VectorXd p_sharp_dummy = Eigen::VectorXd::Zero(tree.p_sharp_end_.size());
         
-        Eigen::VectorXd rho = Eigen::VectorXd::Zero(tree.p_sharp_end_.size());
-        double log_sum_weight = -std::numeric_limits<double>::infinity();
+        Eigen::VectorXd rho_subtree = Eigen::VectorXd::Zero(tree.p_sharp_end_.size());
+        double log_sum_weight_subtree = -std::numeric_limits<double>::infinity();
 
+        z.ps_point::operator=(tree.z_end_);
+        
         bool valid_subtree = build_tree(depth,
-                                        tree.z_beg_, tree.z_propose_,
-                                        tree.p_sharp_beg_, tree.p_sharp_end_,
-                                        rho,
+                                        z, tree.z_propose_,
+                                        p_sharp_dummy, tree.p_sharp_end_,
+                                        rho_subtree,
                                         tree.H0_,
                                         tree.sign_,
                                         tree.n_leapfrog_,
-                                        log_sum_weight, tree.sum_metro_prob_,
+                                        log_sum_weight_subtree, tree.sum_metro_prob_,
                                         logger);
-        return std::make_tuple(valid_subtree, log_sum_weight,  rho, &tree.z_propose_);
+
+        tree.z_end_.ps_point::operator=(z);
+        
+        return std::make_tuple(valid_subtree, log_sum_weight_subtree, rho_subtree, &tree.z_propose_);
       }
         
 
-      
+      // right now we do not get the exact same transitions. This is
+      // likely due to copying of state_t points which contain a
+      // random generator...but its unclear where that is used during
+      // the transition phase...
       sample
       transition(sample& init_sample, callbacks::logger& logger) {
         // Initialize the algorithm
@@ -135,36 +143,40 @@ namespace stan {
         this->hamiltonian_.sample_p(this->z_, this->rand_int_);
         this->hamiltonian_.init(this->z_, logger);
 
-        Eigen::VectorXd rho = this->z_.p;
+        const ps_point z_init(this->z_);
+        
+        ps_point z_sample(z_init);
+        //ps_point z_propose(z_sample);
+        ps_point* z_propose = &z_sample;
 
+        const Eigen::VectorXd p_sharp = this->hamiltonian_.dtau_dp(this->z_);
+        Eigen::VectorXd rho = this->z_.p;
+        
         double log_sum_weight = 0;  // log(exp(H0 - H0))
         double H0 = this->hamiltonian_.H(this->z_);
         //int n_leapfrog = 0;
         //double sum_metro_prob = 0;
 
         // forward tree
-        subtree tree_fwd(1.0, this->z_, this->hamiltonian_.dtau_dp(this->z_), H0);
+        subtree tree_fwd(1, z_init, p_sharp, H0);
         // backward tree
-        subtree tree_bck(-1.0, this->z_, tree_fwd.p_sharp_beg_, H0);
+        subtree tree_bck(-1, z_init, p_sharp, H0);
         
-        ps_point z_sample(this->z_);
-
         // Build a trajectory until the NUTS criterion is no longer satisfied
         this->depth_ = 0;
         this->divergent_ = false;
 
         while (this->depth_ < this->max_depth_) {
-          Eigen::VectorXd rho_subtree;
           bool valid_subtree;
           double log_sum_weight_subtree;
-          ps_point* z_propose;
+          Eigen::VectorXd rho_subtree;
           
           if (this->rand_uniform_() > 0.5) {
             std::tie(valid_subtree, log_sum_weight_subtree, rho_subtree, z_propose)
-                = extend_tree(this->depth_, tree_fwd, logger);
+                = extend_tree(this->depth_, tree_fwd, this->z_, logger);
           } else {
             std::tie(valid_subtree, log_sum_weight_subtree, rho_subtree, z_propose)
-                = extend_tree(this->depth_, tree_bck, logger);
+                = extend_tree(this->depth_, tree_bck, this->z_, logger);
           }
           
           if (!valid_subtree) break;
@@ -248,23 +260,23 @@ namespace stan {
           Eigen::VectorXd p_sharp_dummy = Eigen::VectorXd::Zero(this->z_.p.size());
 
           if (this->rand_uniform_() > 0.5) {
-            //this->z_.ps_point::operator=(z_plus);
+            this->z_.ps_point::operator=(z_plus);
             valid_subtree
-                = build_tree(this->depth_, z_plus, z_propose,
+                = build_tree(this->depth_, this->z_, z_propose,
                            p_sharp_dummy, p_sharp_plus, rho_subtree,
                            H0, 1, n_leapfrog,
                            log_sum_weight_subtree, sum_metro_prob,
                            logger);
-            //z_plus.ps_point::operator=(this->z_);
+            z_plus.ps_point::operator=(this->z_);
           } else {
-            //this->z_.ps_point::operator=(z_minus);
+            this->z_.ps_point::operator=(z_minus);
             valid_subtree
-                = build_tree(this->depth_, z_minus, z_propose,
+                = build_tree(this->depth_, this->z_, z_propose,
                              p_sharp_dummy, p_sharp_minus, rho_subtree,
                              H0, -1, n_leapfrog,
                              log_sum_weight_subtree, sum_metro_prob,
                              logger);
-            //z_minus.ps_point::operator=(this->z_);
+            z_minus.ps_point::operator=(this->z_);
           }
 
           if (!valid_subtree) break;
@@ -343,7 +355,7 @@ namespace stan {
        * @param sum_metro_prob Summed Metropolis probabilities across trajectory
        * @param logger Logger for messages
       */
-      bool build_tree(int depth, ps_point& z_beg,
+      bool build_tree(int depth, state_t& z_beg,
                       ps_point& z_propose,
                       Eigen::VectorXd& p_sharp_left,
                       Eigen::VectorXd& p_sharp_right,
