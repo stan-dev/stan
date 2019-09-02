@@ -12,6 +12,14 @@
 #include <string>
 #include <vector>
 
+/*
+#include "tbb/task_scheduler_init.h"
+#include "tbb/flow_graph.h"
+
+using tbb::task_scheduler_init;
+using namespace tbb::flow;
+*/
+
 namespace stan {
   namespace mcmc {
     /**
@@ -91,7 +99,7 @@ namespace stan {
         ps_point z_end_;
         ps_point z_propose_;
         Eigen::VectorXd p_sharp_end_;
-        double H0_;
+        const double H0_;
         const double sign_;
         int n_leapfrog_;
         double log_sum_weight_;
@@ -100,7 +108,7 @@ namespace stan {
 
 
       // extends the tree into the direction of the sign of the subtree
-      std::tuple<bool, double, Eigen::VectorXd, ps_point*>
+      std::tuple<bool, double, Eigen::VectorXd, ps_point>
       extend_tree(int depth, subtree& tree, state_t& z,
                   callbacks::logger& logger) {
         // save the current ends needed for later criterion computations
@@ -125,16 +133,21 @@ namespace stan {
 
         tree.z_end_.ps_point::operator=(z);
         
-        return std::make_tuple(valid_subtree, log_sum_weight_subtree, rho_subtree, &tree.z_propose_);
+        return std::make_tuple(valid_subtree, log_sum_weight_subtree, rho_subtree, tree.z_propose_);
       }
         
 
+      sample
+      transition(sample& init_sample, callbacks::logger& logger) {
+        return transition_parallel(init_sample, logger);
+      }
+      
       // right now we do not get the exact same transitions. This is
       // likely due to copying of state_t points which contain a
       // random generator...but its unclear where that is used during
       // the transition phase...
       sample
-      transition(sample& init_sample, callbacks::logger& logger) {
+      transition_parallel(sample& init_sample, callbacks::logger& logger) {
         // Initialize the algorithm
         this->sample_stepsize();
 
@@ -146,8 +159,106 @@ namespace stan {
         const ps_point z_init(this->z_);
         
         ps_point z_sample(z_init);
-        //ps_point z_propose(z_sample);
-        ps_point* z_propose = &z_sample;
+        ps_point z_propose(z_init);
+
+        const Eigen::VectorXd p_sharp = this->hamiltonian_.dtau_dp(this->z_);
+        Eigen::VectorXd rho = this->z_.p;
+        
+        double log_sum_weight = 0;  // log(exp(H0 - H0))
+        double H0 = this->hamiltonian_.H(this->z_);
+        //int n_leapfrog = 0;
+        //double sum_metro_prob = 0;
+
+        // forward tree
+        subtree tree_fwd(1, z_init, p_sharp, H0);
+        // backward tree
+        subtree tree_bck(-1, z_init, p_sharp, H0);
+
+        // actual states which move... copy construct atm...revise?!
+        state_t z_fwd(this->z_);
+        state_t z_bck(this->z_);
+        
+        // Build a trajectory until the NUTS criterion is no longer satisfied
+        this->depth_ = 0;
+        this->divergent_ = false;
+
+        std::vector<bool> fwd_direction(this->max_depth_);
+
+        for (std::size_t i = 0; i != this->max_depth_; ++i)
+          fwd_direction[i] = this->rand_uniform_() > 0.5;
+
+        // build TBB flow graph
+        //graph g;
+
+        // add nodes which advance the left/right tree
+        
+        while (this->depth_ < this->max_depth_) {
+          bool valid_subtree;
+          double log_sum_weight_subtree;
+          Eigen::VectorXd rho_subtree;
+          
+          if (fwd_direction[this->depth_]) {
+            std::tie(valid_subtree, log_sum_weight_subtree, rho_subtree, z_propose)
+                = extend_tree(this->depth_, tree_fwd, z_fwd, logger);
+          } else {
+            std::tie(valid_subtree, log_sum_weight_subtree, rho_subtree, z_propose)
+                = extend_tree(this->depth_, tree_bck, z_bck, logger);
+          }
+          
+          if (!valid_subtree) break;
+
+          // Sample from an accepted subtree
+          ++(this->depth_);
+
+          if (log_sum_weight_subtree > log_sum_weight) {
+            z_sample = z_propose;
+          } else {
+            double accept_prob
+              = std::exp(log_sum_weight_subtree - log_sum_weight);
+            if (this->rand_uniform_() < accept_prob)
+              z_sample = z_propose;
+          }
+
+          log_sum_weight
+            = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
+
+          // Break when NUTS criterion is no longer satisfied
+          rho += rho_subtree;
+          if (!compute_criterion(tree_bck.p_sharp_end_, tree_fwd.p_sharp_end_, rho))
+            break;
+          //if (!compute_criterion(p_sharp_minus, p_sharp_plus, rho))
+          //  break;
+        }
+
+        //this->n_leapfrog_ = n_leapfrog;
+        this->n_leapfrog_ = tree_fwd.n_leapfrog_ + tree_bck.n_leapfrog_;
+
+        const double sum_metro_prob = tree_fwd.sum_metro_prob_ + tree_bck.sum_metro_prob_;
+
+        // Compute average acceptance probabilty across entire trajectory,
+        // even over subtrees that may have been rejected
+        double accept_prob
+          = sum_metro_prob / static_cast<double>(this->n_leapfrog_);
+
+        this->z_.ps_point::operator=(z_sample);
+        this->energy_ = this->hamiltonian_.H(this->z_);
+        return sample(this->z_.q, -this->z_.V, accept_prob);
+      }
+
+      sample
+      transition_refactored(sample& init_sample, callbacks::logger& logger) {
+        // Initialize the algorithm
+        this->sample_stepsize();
+
+        this->seed(init_sample.cont_params());
+
+        this->hamiltonian_.sample_p(this->z_, this->rand_int_);
+        this->hamiltonian_.init(this->z_, logger);
+
+        const ps_point z_init(this->z_);
+        
+        ps_point z_sample(z_init);
+        ps_point z_propose(z_init);
 
         const Eigen::VectorXd p_sharp = this->hamiltonian_.dtau_dp(this->z_);
         Eigen::VectorXd rho = this->z_.p;
@@ -185,12 +296,12 @@ namespace stan {
           ++(this->depth_);
 
           if (log_sum_weight_subtree > log_sum_weight) {
-            z_sample = *z_propose;
+            z_sample = z_propose;
           } else {
             double accept_prob
               = std::exp(log_sum_weight_subtree - log_sum_weight);
             if (this->rand_uniform_() < accept_prob)
-              z_sample = *z_propose;
+              z_sample = z_propose;
           }
 
           log_sum_weight
