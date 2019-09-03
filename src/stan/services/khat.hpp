@@ -71,12 +71,9 @@ namespace advi {
     
     std::vector<double> theta(M);
     for(size_t i = 0; i < M; ++i) {
-      //      theta[i] = 1 / x_s[i] + (1 - std::sqrt(M / (jj[i] - 0.5))) / (prior * x_star);
       theta[i] = std::exp(std::log(1.0) - std::log(x_s[N - 1]))
-        + (1.0 - std::sqrt(std::exp(std::log(M) - std::log(jj[i + 1] - .5))));
-      // theta[i] = std::exp(std::log(theta[i] - prior + x_star));
-      std::cout << "i: " << i<< "\n";
-      std::cout << theta[i] << "\n";
+        + (1.0 - std::sqrt(std::exp(std::log(M) - std::log(jj[i + 1] - .5)))) /
+        prior / x_star;
     }
     
     // std::vector<T_x> l_theta(M);
