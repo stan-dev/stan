@@ -76,13 +76,17 @@ namespace advi {
       prior / x_star;
     }
     
-    // std::vector<T_x> l_theta(M);
-    // Eigen::Matrix<double, -1, 1> x_lx; x_lx.resize(N, 1);
-    // for (size_t i = 0; i < N; ++i)
-    //   x_lx << x[i];
-    // lx(l_theta, x_lx);
-    // for (size_t i = 0; i < N; ++i)
-    //   l_theta[i] = N * l_theta[i];
+    Eigen::Matrix<double, -1, 1> x_lx;
+    x_lx.resize(N, 1);
+    for (size_t i = 0; i < N; ++i)
+      x_lx[i] = x[i];
+
+    std::vector<T_x> l_theta(M);
+    for (int i = 0; i < M; ++i)
+      l_theta[i] = theta[i];
+    lx(l_theta, x_lx);
+    for (int i = 0; i < M; ++i)
+      l_theta[i] = N * l_theta[i];
 
     // std::vector<T_x> w_theta(M);
     // for (size_t i = 0; i < M; ++i) {
