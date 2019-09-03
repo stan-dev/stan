@@ -73,7 +73,7 @@ namespace advi {
     for(size_t i = 0; i < M; ++i) {
       theta[i] = std::exp(std::log(1.0) - std::log(x_s[N - 1]))
         + (1.0 - std::sqrt(std::exp(std::log(M) - std::log(jj[i + 1] - .5)))) /
-        prior / x_star;
+      prior / x_star;
     }
     
     // std::vector<T_x> l_theta(M);
