@@ -12,13 +12,15 @@
 #include <string>
 #include <vector>
 
-/*
+
 #include "tbb/task_scheduler_init.h"
 #include "tbb/flow_graph.h"
 
 using tbb::task_scheduler_init;
 using namespace tbb::flow;
-*/
+
+// do not use actualy threading (yet)
+tbb::task_scheduler_init tbb_scheduler(1);
 
 namespace stan {
   namespace mcmc {
@@ -33,7 +35,7 @@ namespace stan {
       
       base_nuts(const Model& model, BaseRNG& rng)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-          depth_(0), max_depth_(5), max_deltaH_(1000),
+          depth_(0), max_depth_(5), max_deltaH_(1000), valid_trees_(true),
           n_leapfrog_(0), divergent_(false), energy_(0) {
       }
 
@@ -44,7 +46,7 @@ namespace stan {
                 Eigen::VectorXd& inv_e_metric)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                             inv_e_metric),
-          depth_(0), max_depth_(5), max_deltaH_(1000),
+          depth_(0), max_depth_(5), max_deltaH_(1000), valid_trees_(true),
           n_leapfrog_(0), divergent_(false), energy_(0) {
       }
 
@@ -55,7 +57,7 @@ namespace stan {
                 Eigen::MatrixXd& inv_e_metric)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                             inv_e_metric),
-        depth_(0), max_depth_(5), max_deltaH_(1000),
+        depth_(0), max_depth_(5), max_deltaH_(1000), valid_trees_(true),
         n_leapfrog_(0), divergent_(false), energy_(0) {
       }
 
@@ -107,8 +109,11 @@ namespace stan {
       };
 
 
-      // extends the tree into the direction of the sign of the subtree
-      std::tuple<bool, double, Eigen::VectorXd, ps_point>
+      // extends the tree into the direction of the sign of the
+      // subtree
+      typedef std::tuple<bool, double, Eigen::VectorXd, Eigen::VectorXd, ps_point> extend_tree_t;
+      
+      extend_tree_t
       extend_tree(int depth, subtree& tree, state_t& z,
                   callbacks::logger& logger) {
         // save the current ends needed for later criterion computations
@@ -133,7 +138,7 @@ namespace stan {
 
         tree.z_end_.ps_point::operator=(z);
         
-        return std::make_tuple(valid_subtree, log_sum_weight_subtree, rho_subtree, tree.z_propose_);
+        return std::make_tuple(valid_subtree, log_sum_weight_subtree, rho_subtree, tree.p_sharp_end_, tree.z_propose_);
       }
         
 
@@ -159,7 +164,7 @@ namespace stan {
         const ps_point z_init(this->z_);
         
         ps_point z_sample(z_init);
-        ps_point z_propose(z_init);
+        //ps_point z_propose(z_init);
 
         const Eigen::VectorXd p_sharp = this->hamiltonian_.dtau_dp(this->z_);
         Eigen::VectorXd rho = this->z_.p;
@@ -181,54 +186,178 @@ namespace stan {
         // Build a trajectory until the NUTS criterion is no longer satisfied
         this->depth_ = 0;
         this->divergent_ = false;
+        this->valid_trees_ = true;
 
         std::vector<bool> fwd_direction(this->max_depth_);
 
         for (std::size_t i = 0; i != this->max_depth_; ++i)
           fwd_direction[i] = this->rand_uniform_() > 0.5;
 
+        const std::size_t num_fwd = std::accumulate(fwd_direction.begin(), fwd_direction.end(), 0);
+        const std::size_t num_bck = this->max_depth_ - num_fwd;
+
+        /*
+        std::cout << "sampled turns: ";
+        for (std::size_t i = 0; i != this->max_depth_; ++i) {
+          if(fwd_direction[i])
+            std::cout <<  "+,";
+          else
+            std::cout << "-,";
+        }
+        std::cout << std::endl;
+        */
+        
+        std::vector<extend_tree_t> ends(this->max_depth_, std::make_tuple(true, 0, Eigen::VectorXd(), Eigen::VectorXd(), z_sample));
+        
         // build TBB flow graph
-        //graph g;
+        graph g;
 
         // add nodes which advance the left/right tree
-        
-        while (this->depth_ < this->max_depth_) {
-          bool valid_subtree;
-          double log_sum_weight_subtree;
-          Eigen::VectorXd rho_subtree;
-          
-          if (fwd_direction[this->depth_]) {
-            std::tie(valid_subtree, log_sum_weight_subtree, rho_subtree, z_propose)
-                = extend_tree(this->depth_, tree_fwd, z_fwd, logger);
+        typedef function_node<bool, bool> tree_builder_t;
+
+        std::vector<std::size_t> all_builder_idx(this->max_depth_);
+        std::vector<tree_builder_t> fwd_builder;
+        std::vector<tree_builder_t> bck_builder;
+
+        std::size_t fwd_idx = 0;
+        std::size_t bck_idx = 0;
+        // TODO: the extenders should also check for a global flag if
+        // we want to keep running
+        for (std::size_t depth=0; depth != this->max_depth_; ++depth) {
+          if (fwd_direction[depth]) {
+            fwd_builder.emplace_back(g, 1, [&,depth](bool valid_parent) -> bool {
+                                             //std::cout << "fwd turn at depth " << depth;
+                                             if (valid_parent) {
+                                               //std::cout << " yes, here we go!" << std::endl;
+                                               ends[depth] = extend_tree(depth, tree_fwd, z_fwd, logger);
+                                               return std::get<0>(ends[depth]);
+                                             }
+                                             //std::cout << " nothing to do." << std::endl;
+                                             return false;
+                                           });
+            if(fwd_idx != 0) {
+              // in this case this is not the starting node, we
+              // connect this with its predecessor
+              make_edge(fwd_builder[fwd_idx-1], fwd_builder[fwd_idx]);
+            }
+            all_builder_idx[depth] = fwd_idx;
+            ++fwd_idx;
           } else {
-            std::tie(valid_subtree, log_sum_weight_subtree, rho_subtree, z_propose)
-                = extend_tree(this->depth_, tree_bck, z_bck, logger);
+            bck_builder.emplace_back(g, 1, [&,depth](bool valid_parent) -> bool {
+                                             //std::cout << "bck turn at depth " << depth;
+                                             if (valid_parent) {
+                                               //std::cout << " yes, here we go!" << std::endl;
+                                               ends[depth] = extend_tree(depth, tree_bck, z_bck, logger);
+                                               return std::get<0>(ends[depth]);
+                                             }
+                                             //std::cout << " nothing to do." << std::endl;
+                                             return false;
+                                           });
+            if(bck_idx != 0) {
+              // in case this is not the starting node, we connect
+              // this with his predecessor
+              make_edge(bck_builder[bck_idx-1], bck_builder[bck_idx]);
+            }
+            all_builder_idx[depth] = bck_idx;
+            ++bck_idx;
           }
-          
-          if (!valid_subtree) break;
-
-          // Sample from an accepted subtree
-          ++(this->depth_);
-
-          if (log_sum_weight_subtree > log_sum_weight) {
-            z_sample = z_propose;
-          } else {
-            double accept_prob
-              = std::exp(log_sum_weight_subtree - log_sum_weight);
-            if (this->rand_uniform_() < accept_prob)
-              z_sample = z_propose;
-          }
-
-          log_sum_weight
-            = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
-
-          // Break when NUTS criterion is no longer satisfied
-          rho += rho_subtree;
-          if (!compute_criterion(tree_bck.p_sharp_end_, tree_fwd.p_sharp_end_, rho))
-            break;
-          //if (!compute_criterion(p_sharp_minus, p_sharp_plus, rho))
-          //  break;
         }
+
+        // finally wire in the checker which accepts or rejects the
+        // proposed states from the subtrees
+        typedef function_node< tbb::flow::tuple<bool, bool>, bool> checker_t;
+        typedef join_node< tbb::flow::tuple<bool,bool> > joiner_t;
+
+        std::vector<checker_t> checks;
+        std::vector<joiner_t> joins;
+
+        Eigen::VectorXd p_sharp_fwd(p_sharp);
+        Eigen::VectorXd p_sharp_bck(p_sharp);
+        
+        for (std::size_t depth=0; depth != this->max_depth_; ++depth) {
+          joins.emplace_back(g);
+          checks.emplace_back(g, 1, [&,depth](tbb::flow::tuple<bool,bool> valid_parents) -> bool {
+                                      bool valid_subtree = std::get<0>(valid_parents);
+                                      bool valid_predecessor = std::get<1>(valid_parents);
+
+                                      bool is_valid = valid_subtree & valid_predecessor & this->valid_trees_;
+
+                                      //std::cout << "check at depth " << depth;
+
+                                      if(!is_valid) {
+                                        //std::cout << " we are done"
+                                        //<< std::endl;
+                                        
+                                        // setting this globally here
+                                        // will terminate all ongoing work
+                                        this->valid_trees_ = false;
+                                        return false;
+                                      }
+
+                                      //std::cout << " checking" << std::endl;
+
+                                      extend_tree_t& subtree_result = ends[depth];
+                                      
+                                      double log_sum_weight_subtree = std::get<1>(subtree_result);
+                                      const Eigen::VectorXd& rho_subtree = std::get<2>(subtree_result);
+                                      
+                                      // update correct side
+                                      if (fwd_direction[depth]) {
+                                        p_sharp_fwd = std::get<3>(subtree_result);
+                                      } else {
+                                        p_sharp_bck = std::get<3>(subtree_result);
+                                      }
+
+                                      const ps_point& z_propose = std::get<4>(subtree_result);
+
+                                      // update running sums
+                                      if (log_sum_weight_subtree > log_sum_weight) {
+                                        z_sample = z_propose;
+                                      } else {
+                                        double accept_prob
+                                            = std::exp(log_sum_weight_subtree - log_sum_weight);
+                                        if (this->rand_uniform_() < accept_prob)
+                                          z_sample = z_propose;
+                                      }
+
+                                      log_sum_weight
+                                          = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
+
+                                      // Break when NUTS criterion is no longer satisfied
+                                      rho += rho_subtree;
+                                      if (!compute_criterion(p_sharp_bck, p_sharp_fwd, rho)) {
+                                        // setting this globally here
+                                        // will terminate all ongoing work
+                                        this->valid_trees_ = false;
+                                        return false;
+                                      }
+                                      return true;
+                                    });
+          make_edge(fwd_direction[depth] ? fwd_builder[all_builder_idx[depth]] : bck_builder[all_builder_idx[depth]] , input_port<0>( joins.back() ));
+          if(depth != 0) {
+            make_edge(checks[depth-1], input_port<1>( joins.back() ));
+          }
+          make_edge(joins.back(), checks.back());
+        }
+
+        broadcast_node<bool> primary_start(g);
+        make_edge(primary_start, input_port<1>(joins[0]));
+        make_edge(primary_start, fwd_direction[0] ? fwd_builder[0] : bck_builder[0]);
+
+        // kick off primary stream 
+        primary_start.try_put(true);
+
+        // kick off secondary stream
+        if(fwd_direction[0]) {
+          // the first turn is fwd, so kick off the bck walker if needed
+          if (num_bck != 0)
+            bck_builder[0].try_put(true);
+        } else {
+          if (num_fwd != 0)
+            fwd_builder[0].try_put(true);
+        }
+
+        g.wait_for_all();
 
         //this->n_leapfrog_ = n_leapfrog;
         this->n_leapfrog_ = tree_fwd.n_leapfrog_ + tree_bck.n_leapfrog_;
@@ -476,6 +605,10 @@ namespace stan {
                       callbacks::logger& logger) {
         // Base case
         if (depth == 0) {
+          // check if trees are still valid or if we should terminate
+          if(!this->valid_trees_)
+            return false;
+          
           this->integrator_.evolve(z_beg, this->hamiltonian_,
                                    sign * this->epsilon_,
                                    logger);
@@ -557,6 +690,7 @@ namespace stan {
       int depth_;
       int max_depth_;
       double max_deltaH_;
+      bool valid_trees_;
 
       int n_leapfrog_;
       bool divergent_;
