@@ -22,8 +22,8 @@ namespace services {
  *
  * @tparam Model type of model
  * @param[in] model model to query
- * @param[in, out] vector of parameter names
- * @param[in, out] vector of variable dimensions
+ * @param[in, out] param_names sequence of parameter names
+ * @param[in, out] param_dimss seqeunce of variable dimensionalities
  */
 template <class Model>
 void get_model_parameters(const Model &model,

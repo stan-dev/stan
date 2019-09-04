@@ -20,13 +20,18 @@ namespace stan {
       mock_nuts(const mock_model &m, rng_t& rng)
         : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng)
       { }
+                                        
+      bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
+                             Eigen::VectorXd& p_sharp_plus,
+                             Eigen::VectorXd& rho) {
+        return true;
+      }
     };
 
     class rho_inspector_mock_nuts: public base_nuts<mock_model,
                                                     mock_hamiltonian,
                                                     mock_integrator,
                                                     rng_t> {
-
     public:
       std::vector<double> rho_values;
       rho_inspector_mock_nuts(const mock_model &m, rng_t& rng)
@@ -40,6 +45,26 @@ namespace stan {
         return true;
       }
     };
+
+    class edge_inspector_mock_nuts: public base_nuts<mock_model,
+                                                     mock_hamiltonian,
+                                                     mock_integrator,
+                                                     rng_t> {
+    public:
+      std::vector<double> p_sharp_minus_values;
+      std::vector<double> p_sharp_plus_values;
+      edge_inspector_mock_nuts(const mock_model &m, rng_t& rng)
+        : base_nuts<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng)
+    { }
+    
+    bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
+                           Eigen::VectorXd& p_sharp_plus,
+                           Eigen::VectorXd& rho) {
+      p_sharp_minus_values.push_back(p_sharp_minus(0));
+      p_sharp_plus_values.push_back(p_sharp_plus(0));
+      return true;
+    }
+  };
 
     // Mock Hamiltonian
     template <typename M, typename BaseRNG>
@@ -149,9 +174,12 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
 
   stan::mcmc::ps_point z_propose(model_size);
 
-  Eigen::VectorXd p_sharp_left = Eigen::VectorXd::Zero(model_size);
-  Eigen::VectorXd p_sharp_right = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_end = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(model_size);
   Eigen::VectorXd rho = z_init.p;
+  
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
@@ -170,15 +198,18 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   bool valid_subtree = sampler.build_tree(3, z_propose,
-                                          p_sharp_left, p_sharp_right, rho,
+                                          p_sharp_begin, p_sharp_end, 
+                                          rho, p_begin, p_end,
                                           H0, 1, n_leapfrog, log_sum_weight,
                                           sum_metro_prob, logger);
 
   EXPECT_TRUE(valid_subtree);
 
   EXPECT_EQ(init_momentum * (n_leapfrog + 1), rho(0));
-  EXPECT_EQ(1, p_sharp_left(0));
-  EXPECT_EQ(1, p_sharp_right(0));
+  EXPECT_EQ(1.5, p_begin(0));
+  EXPECT_EQ(1.5, p_sharp_begin(0));
+  EXPECT_EQ(1.5, p_end(0));
+  EXPECT_EQ(12, p_sharp_end(0));
 
   EXPECT_EQ(8 * init_momentum, sampler.z().q(0));
   EXPECT_EQ(init_momentum, sampler.z().p(0));
@@ -207,9 +238,12 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
 
   stan::mcmc::ps_point z_propose(model_size);
 
-  Eigen::VectorXd p_sharp_left = Eigen::VectorXd::Zero(model_size);
-  Eigen::VectorXd p_sharp_right = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_end = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(model_size);
   Eigen::VectorXd rho = z_init.p;
+  
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
@@ -228,18 +262,39 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   sampler.build_tree(3, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
                      H0, 1, n_leapfrog, log_sum_weight,
                      sum_metro_prob, logger);
 
-  EXPECT_EQ(7, sampler.rho_values.size());
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(0));
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(1));
-  EXPECT_EQ(4 * init_momentum, sampler.rho_values.at(2));
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(3));
-  EXPECT_EQ(2 * init_momentum, sampler.rho_values.at(4));
-  EXPECT_EQ(4 * init_momentum, sampler.rho_values.at(5));
-  EXPECT_EQ(8 * init_momentum, sampler.rho_values.at(6));
+  EXPECT_EQ(7 * 3, sampler.rho_values.size());
+  
+  // Trajectory component spanning rhos
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[0]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[3]);
+  EXPECT_EQ(4 * init_momentum, sampler.rho_values[6]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[9]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[12]);
+  EXPECT_EQ(4 * init_momentum, sampler.rho_values[15]);
+  EXPECT_EQ(8 * init_momentum, sampler.rho_values[18]);
+  
+  // Cross trajectory component rhos
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[1]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[4]);
+  EXPECT_EQ(3 * init_momentum, sampler.rho_values[7]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[10]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[13]);
+  EXPECT_EQ(3 * init_momentum, sampler.rho_values[16]);
+  EXPECT_EQ(5 * init_momentum, sampler.rho_values[19]);
+
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[2]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[5]);
+  EXPECT_EQ(3 * init_momentum, sampler.rho_values[8]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[11]);
+  EXPECT_EQ(2 * init_momentum, sampler.rho_values[14]);
+  EXPECT_EQ(3 * init_momentum, sampler.rho_values[17]);
+  EXPECT_EQ(5 * init_momentum, sampler.rho_values[20]);
+  
 }
 
 TEST(McmcNutsBaseNuts, divergence_test) {
@@ -255,9 +310,12 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   stan::mcmc::ps_point z_propose(model_size);
 
-  Eigen::VectorXd p_sharp_left = Eigen::VectorXd::Zero(model_size);
-  Eigen::VectorXd p_sharp_right = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_end = Eigen::VectorXd::Zero(model_size);
+  Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(model_size);
   Eigen::VectorXd rho = z_init.p;
+  
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
@@ -279,7 +337,8 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   sampler.z().V = -750;
   valid_subtree = sampler.build_tree(0, z_propose,
-                                     p_sharp_left, p_sharp_right, rho,
+                                     p_sharp_begin, p_sharp_end, 
+                                     rho, p_begin, p_end,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
                                      logger);
@@ -288,7 +347,8 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   sampler.z().V = -250;
   valid_subtree = sampler.build_tree(0, z_propose,
-                                     p_sharp_left, p_sharp_right, rho,
+                                     p_sharp_begin, p_sharp_end, 
+                                     rho, p_begin, p_end,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
                                      logger);
@@ -298,7 +358,8 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   sampler.z().V = 750;
   valid_subtree = sampler.build_tree(0, z_propose,
-                                     p_sharp_left, p_sharp_right, rho,
+                                     p_sharp_begin, p_sharp_end, 
+                                     rho, p_begin, p_end,
                                      H0, 1, n_leapfrog, log_sum_weight,
                                      sum_metro_prob,
                                      logger);
@@ -352,4 +413,71 @@ TEST(McmcNutsBaseNuts, transition) {
   EXPECT_EQ("", warn.str());
   EXPECT_EQ("", error.str());
   EXPECT_EQ("", fatal.str());
+}
+
+TEST(McmcNutsBaseNuts, transition_egde_momenta) {
+  
+  rng_t base_rng(0);
+  
+  int model_size = 1;
+  double init_momentum = 1.5;
+  
+  stan::mcmc::ps_point z_init(model_size);
+  z_init.q(0) = 0;
+  z_init.p(0) = init_momentum;
+  
+  stan::mcmc::mock_model model(model_size);
+  stan::mcmc::edge_inspector_mock_nuts sampler(model, base_rng);
+  
+  sampler.set_max_depth(2);
+  
+  sampler.set_nominal_stepsize(1);
+  sampler.set_stepsize_jitter(0);
+  sampler.sample_stepsize();
+  sampler.z() = z_init;
+  
+  std::stringstream debug, info, warn, error, fatal;
+  stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
+  
+  stan::mcmc::sample init_sample(z_init.q, 0, 0);
+  
+  // Transition will expand trajectory until max_depth is hit
+  stan::mcmc::sample s = sampler.transition(init_sample, logger);
+  
+  EXPECT_EQ(2, sampler.depth_);
+  EXPECT_EQ((2 << (sampler.get_max_depth() - 1)) - 1, sampler.n_leapfrog_);
+  EXPECT_FALSE(sampler.divergent_);
+  
+  
+  EXPECT_EQ(9, sampler.p_sharp_minus_values.size());
+
+  // Depth 0 Transition Check
+  EXPECT_EQ(0, sampler.p_sharp_minus_values[0]);
+  EXPECT_EQ(init_momentum, sampler.p_sharp_plus_values[0]);
+
+  EXPECT_EQ(0, sampler.p_sharp_minus_values[1]);
+  EXPECT_EQ(init_momentum, sampler.p_sharp_plus_values[1]);
+  
+  EXPECT_EQ(0, sampler.p_sharp_minus_values[2]);
+  EXPECT_EQ(init_momentum, sampler.p_sharp_plus_values[2]);
+  
+  // Depth 1 Build Tree Check
+  EXPECT_EQ(2 * init_momentum, sampler.p_sharp_minus_values[3]);
+  EXPECT_EQ(3 * init_momentum, sampler.p_sharp_plus_values[3]);
+  
+  EXPECT_EQ(2 * init_momentum, sampler.p_sharp_minus_values[4]);
+  EXPECT_EQ(3 * init_momentum, sampler.p_sharp_plus_values[4]);
+  
+  EXPECT_EQ(2 * init_momentum, sampler.p_sharp_minus_values[5]);
+  EXPECT_EQ(3 * init_momentum, sampler.p_sharp_plus_values[5]);
+  
+  // Depth 1 Transition Check
+  EXPECT_EQ(0, sampler.p_sharp_minus_values[6]);
+  EXPECT_EQ(3 * init_momentum, sampler.p_sharp_plus_values[6]);
+  
+  EXPECT_EQ(0, sampler.p_sharp_minus_values[7]);
+  EXPECT_EQ(2 * init_momentum, sampler.p_sharp_plus_values[7]);
+  
+  EXPECT_EQ(init_momentum, sampler.p_sharp_minus_values[8]);
+  EXPECT_EQ(3 * init_momentum, sampler.p_sharp_plus_values[8]);
 }

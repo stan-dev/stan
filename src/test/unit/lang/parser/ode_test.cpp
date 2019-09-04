@@ -3,6 +3,9 @@
 
 TEST(lang_parser, integrate_ode_good) {
   test_parsable("ode_good");
+  test_parsable("integrate_ode_rk45");
+  test_parsable("integrate_ode_bdf");
+  test_parsable("integrate_ode_adams");
 }
 TEST(lang_parser, integrate_ode_bad) {
   test_throws("ode/bad_fun_type",
@@ -19,10 +22,6 @@ TEST(lang_parser, integrate_ode_bad) {
               "sixth argument to integrate_ode must");
   test_throws("ode/bad_x_int_type",
               "seventh argument to integrate_ode must");
-  test_throws("ode/bad_t0_var_type",
-              "third argument to integrate_ode (initial times)");
-  test_throws("ode/bad_ts_var_type",
-              "fourth argument to integrate_ode (solution times)");
   test_throws("ode/bad_x_var_type",
               "sixth argument to integrate_ode (real data)");
 }
@@ -41,10 +40,6 @@ TEST(lang_parser, integrate_ode_rk45_bad) {
               "sixth argument to integrate_ode_rk45 must");
   test_throws("ode/bad_x_int_type_rk45",
               "seventh argument to integrate_ode_rk45 must");
-  test_throws("ode/bad_t0_var_type_rk45",
-              "third argument to integrate_ode_rk45 (initial times)");
-  test_throws("ode/bad_ts_var_type_rk45",
-              "fourth argument to integrate_ode_rk45 (solution times)");
   test_throws("ode/bad_x_var_type_rk45",
               "sixth argument to integrate_ode_rk45 (real data)");
 }
@@ -65,10 +60,6 @@ TEST(lang_parser, integrate_ode_bdf_bad) {
               "sixth argument to integrate_ode_bdf must");
   test_throws("ode/bad_x_int_type_bdf",
               "seventh argument to integrate_ode_bdf must");
-  test_throws("ode/bad_t0_var_type_bdf",
-              "third argument to integrate_ode_bdf (initial times)");
-  test_throws("ode/bad_ts_var_type_bdf",
-              "fourth argument to integrate_ode_bdf (solution times)");
   test_throws("ode/bad_x_var_type_bdf",
               "sixth argument to integrate_ode_bdf (real data)");
 }
@@ -87,10 +78,6 @@ TEST(lang_parser, integrate_ode_rk45_control_bad) {
               "sixth argument to integrate_ode_rk45 must");
   test_throws("ode/bad_x_int_type_rk45_control",
               "seventh argument to integrate_ode_rk45 must");
-  test_throws("ode/bad_t0_var_type_rk45_control",
-              "third argument to integrate_ode_rk45 (initial times)");
-  test_throws("ode/bad_ts_var_type_rk45_control",
-              "fourth argument to integrate_ode_rk45 (solution times)");
   test_throws("ode/bad_x_var_type_rk45_control",
               "sixth argument to integrate_ode_rk45 (real data)");
 }
@@ -109,10 +96,6 @@ TEST(lang_parser, integrate_ode_bdf_control_bad) {
               "sixth argument to integrate_ode_bdf must");
   test_throws("ode/bad_x_int_type_bdf_control",
               "seventh argument to integrate_ode_bdf must");
-  test_throws("ode/bad_t0_var_type_bdf_control",
-              "third argument to integrate_ode_bdf (initial times)");
-  test_throws("ode/bad_ts_var_type_bdf_control",
-              "fourth argument to integrate_ode_bdf (solution times)");
   test_throws("ode/bad_x_var_type_bdf_control",
               "sixth argument to integrate_ode_bdf (real data)");
 }
@@ -131,8 +114,6 @@ TEST(lang_parser, integrate_ode_adams_bad) {
               "sixth argument to integrate_ode_adams must have type data real[ ]");
   test_throws("ode/adams/bad_x_int_type",
               "seventh argument to integrate_ode_adams must have type data int[ ]");
-  test_throws("ode/adams/bad_t0_var_type",
-      "third argument to integrate_ode_adams (initial times) must be data only");
   test_throws("ode/adams/bad_x_var_type",
       "sixth argument to integrate_ode_adams (real data) must be data only");
 }
@@ -151,10 +132,6 @@ TEST(lang_parser, integrate_ode_adams_control_bad) {
               "sixth argument to integrate_ode_adams must have type data real[ ]");
   test_throws("ode/adams/bad_x_int_type_control",
               "seventh argument to integrate_ode_adams must have type data int[ ]");
-  test_throws("ode/adams/bad_t0_var_type_control",
-      "third argument to integrate_ode_adams (initial times) must be data only");
-  test_throws("ode/adams/bad_ts_var_type_control",
-    "fourth argument to integrate_ode_adams (solution times) must be data only");
   test_throws("ode/adams/bad_x_var_type_adams_control",
       "sixth argument to integrate_ode_adams (real data) must be data only");
 }

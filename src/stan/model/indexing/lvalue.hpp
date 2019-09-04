@@ -3,7 +3,6 @@
 
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
-#include <Eigen/Dense>
 #include <stan/math/prim/mat.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
@@ -16,17 +15,16 @@ namespace stan {
   namespace model {
 
     /**
-     * Assign the specified scalar reference under the specified
-     * indexing to the specified scalar value.
+     * Assign the specified rvalue to the specified lvalue.  The index
+     * list's type must be `nil_index_list`, but its value will be
+     * ignored.  The last two arguments are also ignored.
      *
-     * Types:  x[] <- y
-     *
-     * @tparam T Assigned variable type.
-     * @tparam U Value type (must be assignable to T).
-     * @param[in] x Variable to be assigned.
-     * @param[in] y Value.
-     * @param[in] name Name of variable (default "ANON").
-     * @param[in] depth Indexing depth (default 0).
+     * @tparam T lvalue variable type
+     * @tparam U rvalue variable type, which must be assignable to `T`
+     * @param[in,out] x lvalue
+     * @param[in] y rvalue
+     * @param[in] name Name of lvalue variable (default "ANON"); ignored
+     * @param[in] depth Indexing depth (default 0; ignored
      */
     template <typename T, typename U>
     inline void assign(T& x, const nil_index_list& /* idxs */, const U& y,
@@ -34,18 +32,17 @@ namespace stan {
       x = y;
     }
 
-    template <typename T, typename U, int R, int C>
-    inline void assign(Eigen::Matrix<T, R, C>& x,
-                       const nil_index_list& /* idxs */,
-                       const Eigen::Matrix<U, R, C>& y,
-                       const char* name = "ANON",
-                       int depth = 0) {
-      x.resize(y.rows(), y.cols());
-      for (int i = 0; i < y.size(); ++i)
-        assign(x(i), nil_index_list(), y(i), name, depth + 1);
-    }
-
-
+    /**
+     * Assign the specified standard vector rvalue to the specified
+     * standard vector lvalue.
+     *
+     * @tparam T lvalue container element type
+     * @tparam U rvalue container element type, which must be assignable to `T`
+     * @param[in] x lvalue variable
+     * @param[in] y rvalue variable
+     * @param[in] name name of lvalue variable (default "ANON").
+     * @param[in] depth indexing depth (default 0).
+     */
     template <typename T, typename U>
     inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
                        const std::vector<U>& y, const char* name = "ANON",
@@ -54,7 +51,6 @@ namespace stan {
       for (size_t i = 0; i < y.size(); ++i)
         assign(x[i], nil_index_list(), y[i], name, depth + 1);
     }
-
 
     /**
      * Assign the specified Eigen vector at the specified single index

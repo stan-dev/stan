@@ -18,7 +18,7 @@ namespace stan {
      */
     void generate_model_name_method(const std::string& model_name,
                                     std::ostream& o) {
-      o << INDENT << "static std::string model_name() {" << EOL
+      o << INDENT << "std::string model_name() const {" << EOL
         << INDENT2 << "return \"" << model_name << "\";" << EOL
         << INDENT << "}" << EOL2;
     }

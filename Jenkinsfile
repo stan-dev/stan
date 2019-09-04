@@ -149,7 +149,7 @@ pipeline {
             }
         }
         stage('Performance') {
-            agent { label 'master' }
+            agent { label 'oldimac' }
             steps {
                 unstash 'StanSetup'
                 setupCXX()

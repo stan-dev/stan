@@ -5,6 +5,40 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.20.0 (18 July 2019)
+======================================================================
+
+New Features
+------------
+- Update effective sample size calculations, with a small change to the autocovariance function, to use split chains (#2774)
+- Add stan::model::model_base base class and and stan::model::model_crtp static adapter class for constructing models. (#2785)
+- Allow ts and t0 to be parameters, complete ode_test, and extend the integrate_ode_* stan models (#2791)
+- Add the GP covariance functions to the language (primitives of some popular materns, a dot product, and the periodic) (#2758)
+- Update Eigen includes to allow compilation with new plugin methods (#2754)
+- Add gp kernels to language (#2739)
+
+Bug Fixes
+---------
+- Multi-unit compilation of base_xhmc.hpp. (#2775)
+- Declaring a size zero simplex in a Stan program will halt the program. (#2773)
+
+Other
+-----
+- Defer to Eigen's copy constructor now for assignment ( faster matrix assign ) (#2784)
+- Rethrow_located also takes in a string to specify the location. (#2770)
+- Faster indexing (#2766)
+- Fixed generator so that matrix indexing uses most efficient access strategy (#2749)
+
+v.2.19.1 (18 Apr 2019)
+======================================================================
+
+This is a release out of cycle to address a performance bug in v.2.19 (stan-dev/stan#2748)
+
+Bug Fixes
+--------------------------------------------------
+* #2749 - Fixed generator so that matrix indexing uses most efficient access strategy - generated code should call stan::math::get_base1() on matrix using 5-arg function which specifies matrix row, column.
+
+
 v.2.19.0 (20 March 2019)
 ======================================================================
 Stan now comes with GPU support for certain functions; see the Math library
