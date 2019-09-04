@@ -179,6 +179,7 @@ namespace stan {
       }
 
     protected:
+
       typename Hamiltonian<Model, BaseRNG>::PointType z_;
       Integrator<Hamiltonian<Model, BaseRNG> > integrator_;
       Hamiltonian<Model, BaseRNG> hamiltonian_;
