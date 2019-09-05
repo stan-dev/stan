@@ -32,10 +32,11 @@ void test_recover(bare_expr_type base_et_expected, size_t num_dims_expected,
                   bare_expr_type base_et, size_t num_dims,
                   const std::vector<stan::lang::idx>& idxs) {
   stan::lang::variable v("foo");
-  if (num_dims == 0)
+  if (num_dims == 0) {
     v.set_type(base_et);
-  else
+  } else {
     v.set_type(bare_array_type(base_et, num_dims));
+  }
   stan::lang::expression e(v);
   bare_expr_type et = indexed_type(e, idxs);
   EXPECT_EQ(base_et_expected, et.innermost_type());
@@ -45,10 +46,11 @@ void test_recover(bare_expr_type base_et_expected, size_t num_dims_expected,
 void test_err(bare_expr_type base_et, size_t num_dims,
               const std::vector<stan::lang::idx>& idxs) {
   stan::lang::variable v("foo");
-  if (num_dims == 0)
+  if (num_dims == 0) {
     v.set_type(base_et);
-  else
+  } else {
     v.set_type(bare_array_type(base_et, num_dims));
+  }
   stan::lang::expression e(v);
   bare_expr_type et = indexed_type(e, idxs);
   EXPECT_EQ(bare_expr_type(ill_formed_type()), et);
@@ -60,9 +62,11 @@ TEST(langAst, idxs) {
          bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
          bare_expr_type(matrix_type())};
   vector<idx> idxs;
-  for (size_t n = 0; n < 4; ++n)
-    for (int i = 0; i < 5; ++i)
+  for (size_t n = 0; n < 4; ++n) {
+    for (int i = 0; i < 5; ++i) {
       test_recover(bet[i], n, bet[i], n, idxs);
+    }
+  }
 }
 
 void one_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
@@ -70,9 +74,11 @@ void one_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
       = {bare_expr_type(int_type()), bare_expr_type(double_type()),
          bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
          bare_expr_type(matrix_type())};
-  for (size_t n = 1; n < 4; ++n)
-    for (int i = 0; i < 5; ++i)
+  for (size_t n = 1; n < 4; ++n) {
+    for (int i = 0; i < 5; ++i) {
       test_recover(bet[i], n - redux, bet[i], n, idxs);
+    }
+  }
 }
 
 void one_index_errs(const std::vector<stan::lang::idx>& idxs) {
@@ -113,9 +119,11 @@ void two_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
       = {bare_expr_type(int_type()), bare_expr_type(double_type()),
          bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
          bare_expr_type(bare_expr_type(matrix_type()))};
-  for (size_t n = 2; n < 4; ++n)
-    for (int i = 0; i < 5; ++i)
+  for (size_t n = 2; n < 4; ++n) {
+    for (int i = 0; i < 5; ++i) {
       test_recover(bet[i], n - redux, bet[i], n, idxs);
+    }
+  }
 }
 
 void two_index_errs(const std::vector<stan::lang::idx>& idxs) {
@@ -201,9 +209,11 @@ void three_index_recover(const std::vector<stan::lang::idx>& idxs,
       = {bare_expr_type(int_type()), bare_expr_type(double_type()),
          bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
          bare_expr_type(matrix_type())};
-  for (int i = 0; i < 5; ++i)
-    for (size_t n = 3; n < 5; ++n)
+  for (int i = 0; i < 5; ++i) {
+    for (size_t n = 3; n < 5; ++n) {
       test_recover(bet[i], n - redux, bet[i], n, idxs);
+    }
+  }
 }
 
 void three_index_errs(const std::vector<stan::lang::idx>& idxs) {

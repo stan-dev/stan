@@ -5,8 +5,9 @@
 void read_file(const std::string& path, std::string& contents) {
   std::stringstream s;
   std::fstream f(path.c_str());
-  while (f.good())
+  while (f.good()) {
     s << static_cast<char>(f.get());
+  }
   contents = s.str();
 }
 
@@ -30,8 +31,9 @@ int count_occurrences(const std::string target, const std::string s) {
   size_t offset = 0;
   while (true) {
     offset = s.find(target, offset);
-    if (offset == std::string::npos)
+    if (offset == std::string::npos) {
       break;
+    }
     offset += target.size();
     ++count;
   }

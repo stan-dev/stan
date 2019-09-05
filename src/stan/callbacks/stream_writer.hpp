@@ -23,7 +23,8 @@ class stream_writer : public writer {
    * @param[in] comment_prefix string to stream before
    *   each comment line. Default is "".
    */
-  stream_writer(std::ostream& output, const std::string& comment_prefix = "")
+  explicit stream_writer(std::ostream& output,
+                         const std::string& comment_prefix = "")
       : output_(output), comment_prefix_(comment_prefix) {}
 
   /**

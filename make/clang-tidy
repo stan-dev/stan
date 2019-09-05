@@ -12,13 +12,13 @@ folder?= ./src/test/*
 .PHONY: clang-tidy
 clang-tidy:
 		find $(folder) -path './src/test/*' -wholename '*$(files).cpp' -type f | xargs -I {} clang-tidy "{}" \
-		 -checks='$(tidy_checks)' -format-style='file' -header-filter='./stan/*' \
+		 -checks='$(tidy_checks)' -format-style='file' -header-filter='./src/*' \
 		 -- $(CXXFLAGS) $(LDFLAGS) $(LDLIBS) $(INC_GTEST) $(CXXFLAGS_GTEST) $(CPPFLAGS)
 
 .PHONY: clang-tidy-fix
 clang-tidy-fix:
 		find $(folder) -path './src/test/*' -wholename '*$(files).cpp' -type f | xargs -I {} clang-tidy "{}" \
-		 -checks='$(tidy_checks)' -format-style='file' -header-filter='./stan/*' \
+		 -checks='$(tidy_checks)' -format-style='file' -header-filter='./src/*' \
 		 -fix -export-fixes="./.clang-fixes.log" \
 		 -- $(CXXFLAGS) $(LDFLAGS) $(LDLIBS) $(INC_GTEST) $(CXXFLAGS_GTEST) $(CPPFLAGS)
 
