@@ -24,4 +24,4 @@ clang-tidy-fix:
 
 .PHONY: clang-format
 clang-format:
-	 find src -name '*.hpp' -o -name '*.cpp' | xargs -n20 -P1 clang-format -i
+	 find src -name '*.hpp' -o -name '*.cpp' | xargs -n20 -P1 clang-format -i -style=file

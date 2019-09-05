@@ -28,6 +28,6 @@ TEST(ModelUtil, hessian) {
   // Incorporate once operands and partials has been generalized
   // output.str("");
   // domain_fail_namespace::domain_fail domain_fail_model(data_var_context,
-  // &output); EXPECT_THROW(stan::model::hessian(domain_fail_model, x, f, grad_f,
-  // hess_f), std::domain_error); EXPECT_EQ("", output.str());
+  // &output); EXPECT_THROW(stan::model::hessian(domain_fail_model, x, f,
+  // grad_f, hess_f), std::domain_error); EXPECT_EQ("", output.str());
 }
