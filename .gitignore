@@ -58,3 +58,6 @@ stan.kdev4
 /make/local
 
 *.gch
+
+#clang-tidy fixes yaml
+.clang-fixes.log

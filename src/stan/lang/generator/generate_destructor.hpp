@@ -7,19 +7,19 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the destructor for the class with name specified by
-     * the model name to the specified stream.
-     *
-     * @param[in] model_name name of model to use as class name
-     * @param[in,out] o stream for generating.
-     */
-    void generate_destructor(const std::string& model_name, std::ostream& o) {
-      o << EOL << INDENT << "~" << model_name << "() { }"  << EOL2;
-    }
-
-  }
+/**
+ * Generate the destructor for the class with name specified by
+ * the model name to the specified stream.
+ *
+ * @param[in] model_name name of model to use as class name
+ * @param[in,out] o stream for generating.
+ */
+void generate_destructor(const std::string& model_name, std::ostream& o) {
+  o << EOL << INDENT << "~" << model_name << "() { }" << EOL2;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

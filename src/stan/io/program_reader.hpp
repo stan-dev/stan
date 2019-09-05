@@ -31,14 +31,16 @@ struct preproc_event {
   std::string action_;
   std::string path_;
 
-  preproc_event(int concat_line_num, int line_num,
-                const std::string& action, const std::string& path)
-      : concat_line_num_(concat_line_num), line_num_(line_num),
-        action_(action), path_(path) { }
+  preproc_event(int concat_line_num, int line_num, const std::string& action,
+                const std::string& path)
+      : concat_line_num_(concat_line_num),
+        line_num_(line_num),
+        action_(action),
+        path_(path) {}
 
   void print(std::ostream& out) {
-    out << "(" << concat_line_num_ << ", " << line_num_
-        << ", " << action_ << ", " << path_ << ")";
+    out << "(" << concat_line_num_ << ", " << line_num_ << ", " << action_
+        << ", " << path_ << ")";
   }
 };
 
@@ -91,13 +93,13 @@ class program_reader {
    * @param r reader to copy
    */
   program_reader(const program_reader& r)
-      : program_(r.program_.str()), history_(r.history_) { }
+      : program_(r.program_.str()), history_(r.history_) {}
 
   /**
    * Construct a program reader with an empty program and
    * history.
    */
-  program_reader() : program_(""), history_() { }
+  program_reader() : program_(""), history_() {}
 
   /**
    * Return a string representing the concatenated program.  This
@@ -106,9 +108,7 @@ class program_reader {
    *
    * @return stream for program
    */
-  std::string program() const {
-    return program_.str();
-  }
+  std::string program() const { return program_.str(); }
 
   /**
    * Return the include trace of the path and line numbers leading
@@ -120,8 +120,9 @@ class program_reader {
    */
   trace_t trace(int target) const {
     if (target < 1)
-      throw std::runtime_error("trace() argument target must be"
-                               " greater than 1");
+      throw std::runtime_error(
+          "trace() argument target must be"
+          " greater than 1");
     trace_t result;
     std::string file = "ERROR: UNINITIALIZED";
     int file_start = -1;
@@ -132,12 +133,13 @@ class program_reader {
         result.push_back(path_line_t(file, line));
         return result;
       } else if (history_[i].action_ == "start"
-                 || history_[i].action_ == "restart" ) {
+                 || history_[i].action_ == "restart") {
         file = history_[i].path_;
         file_start = history_[i].line_num_;
         concat_start = history_[i].concat_line_num_;
       } else if (history_[i].action_ == "end") {
-        if (result.size() == 0) break;
+        if (result.size() == 0)
+          break;
         result.pop_back();
       } else if (history_[i].action_ == "include") {
         result.push_back(path_line_t(file, history_[i].line_num_ + 1));
@@ -152,9 +154,7 @@ class program_reader {
    *
    * @return I/O history of the program
    */
-  const std::vector<preproc_event>& history() const {
-    return history_;
-  }
+  const std::vector<preproc_event>& history() const { return history_; }
 
   /**
    * Adds preprocessing event with specified components to the
@@ -165,8 +165,8 @@ class program_reader {
    * @param[in] action purpose of preprocessing event
    * @param[in] path location of current file
    */
-  void add_event(int concat_line_num, int line_num,
-                 const std::string& action, const std::string& path) {
+  void add_event(int concat_line_num, int line_num, const std::string& action,
+                 const std::string& path) {
     preproc_event e(concat_line_num, line_num, action, path);
     history_.push_back(e);
   }
@@ -217,39 +217,38 @@ class program_reader {
   }
 
   void read(std::istream& in, const std::string& path,
-            const std::vector<std::string>& search_path,
-            int& concat_line_num, bool is_nested,
-            std::set<std::string>& visited_paths) {
+            const std::vector<std::string>& search_path, int& concat_line_num,
+            bool is_nested, std::set<std::string>& visited_paths) {
     if (visited_paths.find(path) != visited_paths.end())
       return;  // avoids recursive visitation
     visited_paths.insert(path);
     history_.push_back(preproc_event(concat_line_num, 0, "start", path));
-    for (int line_num = 1; ; ++line_num) {
+    for (int line_num = 1;; ++line_num) {
       std::string line = read_line(in);
       if (line.empty()) {
         // ends initial out of loop start event
         if (!is_nested) {
           // pad end concat_line_num of outermost file in order to properly
           // report end-of-file parse error - else trace throws exception
-          history_.push_back(preproc_event(concat_line_num + 2,
-                                           line_num - 1, "end", path));
+          history_.push_back(
+              preproc_event(concat_line_num + 2, line_num - 1, "end", path));
         } else {
-          history_.push_back(preproc_event(concat_line_num,
-                                           line_num - 1, "end", path));
+          history_.push_back(
+              preproc_event(concat_line_num, line_num - 1, "end", path));
         }
         break;
       } else if (starts_with("#include ", trim_spaces(line))) {
         std::string incl_path = include_path(line);
-        history_.push_back(preproc_event(concat_line_num, line_num - 1,
-                                         "include", incl_path));
+        history_.push_back(
+            preproc_event(concat_line_num, line_num - 1, "include", incl_path));
         bool found_path = false;
         for (size_t i = 0; i < search_path.size(); ++i) {
           std::string f
-              = (search_path[i].size() != 0
-                 && !ends_with("/", search_path[i])
+              = (search_path[i].size() != 0 && !ends_with("/", search_path[i])
                  && !ends_with("\\", search_path[i]))
-              ? search_path[i] + "/" + incl_path  // / will work under Windows
-              : search_path[i] + incl_path;
+                    ? search_path[i] + "/"
+                          + incl_path  // / will work under Windows
+                    : search_path[i] + incl_path;
 
           std::ifstream include_in(f.c_str());
           try {
@@ -264,8 +263,8 @@ class program_reader {
             throw;
           }
           include_in.close();
-          history_.push_back(preproc_event(concat_line_num, line_num,
-                                           "restart", path));
+          history_.push_back(
+              preproc_event(concat_line_num, line_num, "restart", path));
           found_path = true;
           break;
         }
@@ -289,7 +288,6 @@ class program_reader {
     visited_paths.erase(path);  // allow multiple, just not nested
   }
 
-
   /**
    * Read the rest of a program from the specified input stream in
    * the specified path, with the specified search path for
@@ -307,13 +305,12 @@ class program_reader {
    * @throw std::runtime_error if an included file cannot be found
    */
   void read(std::istream& in, const std::string& path,
-            const std::vector<std::string>& search_path,
-            int& concat_line_num) {
+            const std::vector<std::string>& search_path, int& concat_line_num) {
     std::set<std::string> visited_paths;
     read(in, path, search_path, concat_line_num, false, visited_paths);
   }
 };
 
-}
-}
+}  // namespace io
+}  // namespace stan
 #endif

@@ -4,31 +4,31 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST structure for break and continue statements.
-     */
-    struct break_continue_statement {
-      /**
-       * Construct an uninitialized break or continue statement.
-       */
-      break_continue_statement();
+/**
+ * AST structure for break and continue statements.
+ */
+struct break_continue_statement {
+  /**
+   * Construct an uninitialized break or continue statement.
+   */
+  break_continue_statement();
 
-      /**
-       * Construct a break or continue statement that generates the
-       * specified string.
-       *
-       * @param generate "break" or "continue"
-       */
-      explicit break_continue_statement(const std::string& generate);
+  /**
+   * Construct a break or continue statement that generates the
+   * specified string.
+   *
+   * @param generate "break" or "continue"
+   */
+  explicit break_continue_statement(const std::string& generate);
 
-      /**
-       * Text to generate, "break" or "continue".
-       */
-      std::string generate_;
-    };
+  /**
+   * Text to generate, "break" or "continue".
+   */
+  std::string generate_;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

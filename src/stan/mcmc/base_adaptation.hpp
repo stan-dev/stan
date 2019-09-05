@@ -3,15 +3,15 @@
 
 namespace stan {
 
-  namespace mcmc {
+namespace mcmc {
 
-    class base_adaptation {
-    public:
-      virtual void restart() {}
-    };
+class base_adaptation {
+ public:
+  virtual void restart() {}
+};
 
-  }  // mcmc
+}  // namespace mcmc
 
-}  // stan
+}  // namespace stan
 
 #endif

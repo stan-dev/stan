@@ -7,20 +7,19 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate using statement for the specified namespace to the
-     * specfied stream.
-     *
-     * @param[in] ns namespace for which using statement is generated
-     * @param[in,out] o stream for generating
-     */
-    void generate_using_namespace(const std::string& ns, std::ostream& o) {
-      o << "using namespace " << ns << ";" << EOL;
-    }
-
-
-  }
+/**
+ * Generate using statement for the specified namespace to the
+ * specfied stream.
+ *
+ * @param[in] ns namespace for which using statement is generated
+ * @param[in,out] o stream for generating
+ */
+void generate_using_namespace(const std::string& ns, std::ostream& o) {
+  o << "using namespace " << ns << ";" << EOL;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

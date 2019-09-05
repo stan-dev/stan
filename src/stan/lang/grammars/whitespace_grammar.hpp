@@ -6,21 +6,18 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    struct whitespace_grammar : public boost::spirit::qi::grammar<Iterator> {
-      explicit whitespace_grammar(std::stringstream& ss);
+template <typename Iterator>
+struct whitespace_grammar : public boost::spirit::qi::grammar<Iterator> {
+  explicit whitespace_grammar(std::stringstream& ss);
 
-      std::stringstream& error_msgs_;
-      boost::spirit::qi::rule<Iterator> whitespace;
-    };
+  std::stringstream& error_msgs_;
+  boost::spirit::qi::rule<Iterator> whitespace;
+};
 
+}  // namespace lang
 
-  }
-
-}
-
-
+}  // namespace stan
 
 #endif

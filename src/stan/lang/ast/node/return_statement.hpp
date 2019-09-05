@@ -4,30 +4,30 @@
 #include <stan/lang/ast/node/expression.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST node for the return statement.
-     */
-    struct return_statement {
-      /**
-       * Construct a return statement with a nil return value.
-       */
-      return_statement();
+/**
+ * AST node for the return statement.
+ */
+struct return_statement {
+  /**
+   * Construct a return statement with a nil return value.
+   */
+  return_statement();
 
-      /**
-       * Construct a return statement with the specified return value.
-       *
-       * @param[in] expr return value
-       */
-      return_statement(const expression& expr);  // NOLINT(runtime/explicit)
+  /**
+   * Construct a return statement with the specified return value.
+   *
+   * @param[in] expr return value
+   */
+  return_statement(const expression& expr);  // NOLINT(runtime/explicit)
 
-      /**
-       * The value returned.
-       */
-      expression return_value_;
-    };
+  /**
+   * The value returned.
+   */
+  expression return_value_;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

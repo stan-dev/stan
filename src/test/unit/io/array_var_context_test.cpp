@@ -7,7 +7,8 @@
 
 TEST(array_var_context, ctor_int) {
   std::vector<int> v;
-  for (size_t i = 0; i < 16; i++) v.push_back(i);
+  for (size_t i = 0; i < 16; i++)
+    v.push_back(i);
   std::vector<std::vector<size_t> > dims;
   std::vector<size_t> scalar_dim;
   std::vector<size_t> vec_dim;
@@ -57,10 +58,10 @@ TEST(array_var_context, ctor_int) {
   EXPECT_EQ(array_dim, avc.dims_i("gamma"));
 }
 
-
 TEST(array_var_context, ctor_real) {
   std::vector<double> v;
-  for (size_t i = 0; i < 16; i++) v.push_back(1.0 * i);
+  for (size_t i = 0; i < 16; i++)
+    v.push_back(1.0 * i);
   std::vector<std::vector<size_t> > dims;
   std::vector<size_t> scalar_dim;
   std::vector<size_t> vec_dim;
@@ -116,7 +117,8 @@ TEST(array_var_context, ctor_real) {
 TEST(array_var_context, ctor_RowVectorXd) {
   Eigen::RowVectorXd v;
   v.resize(16);
-  for (size_t i = 0; i < 16; i++) v(i) = 1.0 * i;
+  for (size_t i = 0; i < 16; i++)
+    v(i) = 1.0 * i;
   std::vector<std::vector<size_t> > dims;
   std::vector<size_t> scalar_dim;
   std::vector<size_t> vec_dim;
@@ -159,8 +161,6 @@ TEST(array_var_context, ctor_RowVectorXd) {
   EXPECT_EQ(array_dim, avc.dims_r("gamma"));
 }
 
-
-
 TEST(array_var_context, invalid_input) {
   try {
     std::vector<double> a;
@@ -197,4 +197,3 @@ TEST(array_var_context, invalid_input2) {
   }
   FAIL();
 }
-

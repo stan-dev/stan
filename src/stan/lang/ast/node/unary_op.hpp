@@ -5,43 +5,43 @@
 #include <stan/lang/ast/node/expression.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /** 
-     * AST structure for unary operations consisting of an operation
-     * and argument.
-     */
-    struct unary_op {
-      /**
-       * Character-level representation of operation.
-       */
-      char op;
+/**
+ * AST structure for unary operations consisting of an operation
+ * and argument.
+ */
+struct unary_op {
+  /**
+   * Character-level representation of operation.
+   */
+  char op;
 
-      /**
-       * Argument.
-       */
-      expression subject;
+  /**
+   * Argument.
+   */
+  expression subject;
 
-      /**
-       * Type of result.
-       */
-      bare_expr_type type_;
+  /**
+   * Type of result.
+   */
+  bare_expr_type type_;
 
-      /**
-       * Construct a default unary operation.
-       */
-      unary_op();
+  /**
+   * Construct a default unary operation.
+   */
+  unary_op();
 
-      /**
-       * Construct a unary operation of the specified operation and
-       * argument. 
-       *
-       * @param op operator representation
-       * @param subject argument
-       */
-      unary_op(char op, const expression& subject);
-    };
+  /**
+   * Construct a unary operation of the specified operation and
+   * argument.
+   *
+   * @param op operator representation
+   * @param subject argument
+   */
+  unary_op(char op, const expression& subject);
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

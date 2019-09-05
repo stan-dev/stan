@@ -5,28 +5,27 @@
 #include <boost/variant/apply_visitor.hpp>
 #include <string>
 
-
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    idx::idx() { }
+idx::idx() {}
 
-    idx::idx(const uni_idx& i) : idx_(i) { }
+idx::idx(const uni_idx& i) : idx_(i) {}
 
-    idx::idx(const multi_idx& i) : idx_(i) { }
+idx::idx(const multi_idx& i) : idx_(i) {}
 
-    idx::idx(const omni_idx& i) : idx_(i) { }
+idx::idx(const omni_idx& i) : idx_(i) {}
 
-    idx::idx(const lb_idx& i) : idx_(i) { }
+idx::idx(const lb_idx& i) : idx_(i) {}
 
-    idx::idx(const ub_idx& i) : idx_(i) { }
+idx::idx(const ub_idx& i) : idx_(i) {}
 
-    idx::idx(const lub_idx& i) : idx_(i) { }
+idx::idx(const lub_idx& i) : idx_(i) {}
 
-    std::string idx::to_string() const {
-      write_idx_vis vis;
-      return boost::apply_visitor(vis, idx_);
-    }
-  }
+std::string idx::to_string() const {
+  write_idx_vis vis;
+  return boost::apply_visitor(vis, idx_);
 }
+}  // namespace lang
+}  // namespace stan
 #endif
