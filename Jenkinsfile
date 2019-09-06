@@ -39,6 +39,11 @@ String stan_pr() {
     }
 }
 
+def isBranch(String b) { env.BRANCH_NAME == b }
+Boolean isPR() { env.CHANGE_URL != null }
+String fork() { env.CHANGE_FORK ?: "stan-dev" }
+String branchName() { isPR() ? env.CHANGE_BRANCH :env.BRANCH_NAME }
+
 pipeline {
     agent none
     parameters {
@@ -122,12 +127,13 @@ pipeline {
                             git config --global user.name "Stan Jenkins"
                             git add stan test
                             git commit -m "[Jenkins] auto-formatting by `clang-format --version`"
-                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/math.git ${branchName()}
+                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/stan.git ${branchName()}
                             echo "Exiting build because clang-format found changes."
                             echo "Those changes are now found on stan-dev/stan under branch ${branchName()}"
                             echo "Please 'git pull' before continuing to develop."
                             exit 1
-                        fi"""
+                        fi
+                    """
                 }
             }
             post {
