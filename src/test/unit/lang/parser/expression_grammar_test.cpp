@@ -2,8 +2,7 @@
 #include <test/unit/lang/utility.hpp>
 
 TEST(langParserExpressionGrammarDef, intDivUserFacing) {
-  test_warning("int_div_user",
-               "a[1] / b[2]");
+  test_warning("int_div_user", "a[1] / b[2]");
 }
 
 TEST(langParserExpressionGrammarDef, absDeprecate) {

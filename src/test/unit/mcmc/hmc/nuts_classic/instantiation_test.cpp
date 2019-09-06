@@ -27,20 +27,24 @@ TEST(McmcNutsClassic, instantiaton_test) {
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::unit_e_nuts_classic<gauss3D_model_namespace::gauss3D_model, rng_t>
-    unit_e_sampler(model, base_rng);
-  
+      unit_e_sampler(model, base_rng);
+
   stan::mcmc::diag_e_nuts_classic<gauss3D_model_namespace::gauss3D_model, rng_t>
-    diag_e_sampler(model, base_rng);
-  
-  stan::mcmc::dense_e_nuts_classic<gauss3D_model_namespace::gauss3D_model, rng_t>
-    dense_e_sampler(model, base_rng);
-  
-  stan::mcmc::adapt_unit_e_nuts_classic<gauss3D_model_namespace::gauss3D_model, rng_t>
-    adapt_unit_e_sampler(model, base_rng);
-  
-  stan::mcmc::adapt_diag_e_nuts_classic<gauss3D_model_namespace::gauss3D_model, rng_t>
-    adapt_diag_e_sampler(model, base_rng);
-  
-  stan::mcmc::adapt_dense_e_nuts_classic<gauss3D_model_namespace::gauss3D_model, rng_t>
-    adapt_dense_e_sampler(model, base_rng);
+      diag_e_sampler(model, base_rng);
+
+  stan::mcmc::dense_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
+                                   rng_t>
+      dense_e_sampler(model, base_rng);
+
+  stan::mcmc::adapt_unit_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
+                                        rng_t>
+      adapt_unit_e_sampler(model, base_rng);
+
+  stan::mcmc::adapt_diag_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
+                                        rng_t>
+      adapt_diag_e_sampler(model, base_rng);
+
+  stan::mcmc::adapt_dense_e_nuts_classic<gauss3D_model_namespace::gauss3D_model,
+                                         rng_t>
+      adapt_dense_e_sampler(model, base_rng);
 }

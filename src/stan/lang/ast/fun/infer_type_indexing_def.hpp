@@ -10,9 +10,9 @@ bare_expr_type infer_type_indexing(const bare_expr_type& bare_type,
                                    size_t num_index_dims) {
   if (num_index_dims == 0)
     return bare_type;
-  if (bare_type.num_dims() >= 0 &&
-      num_index_dims > static_cast<size_t>(bare_type.num_dims()))
-      return ill_formed_type();
+  if (bare_type.num_dims() >= 0
+      && num_index_dims > static_cast<size_t>(bare_type.num_dims()))
+    return ill_formed_type();
 
   bare_expr_type tmp = bare_type;
   while (tmp.array_dims() > 0 && num_index_dims > 0) {

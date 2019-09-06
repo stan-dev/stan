@@ -6,18 +6,16 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the private declaration scope for a class to the
-     * specified stream.
-     *
-     * @param[in,out] o stream for generating
-     */
-    void generate_private_decl(std::ostream& o) {
-      o << "private:" << EOL;
-    }
+/**
+ * Generate the private declaration scope for a class to the
+ * specified stream.
+ *
+ * @param[in,out] o stream for generating
+ */
+void generate_private_decl(std::ostream& o) { o << "private:" << EOL; }
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

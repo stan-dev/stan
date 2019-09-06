@@ -1,14 +1,14 @@
 #include <vector>
-#include <boost/type_traits/is_same.hpp> 
+#include <boost/type_traits/is_same.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <gtest/gtest.h>
 
-using stan::model::index_uni;
+using stan::model::index_max;
+using stan::model::index_min;
+using stan::model::index_min_max;
 using stan::model::index_multi;
 using stan::model::index_omni;
-using stan::model::index_min;
-using stan::model::index_max;
-using stan::model::index_min_max;
+using stan::model::index_uni;
 
 TEST(MathIndexingIndex, index_uni) {
   index_uni idx(17);
@@ -28,7 +28,7 @@ TEST(MathIndexingIndex, index_multi) {
 
 TEST(MathIndexingIndex, index_omni) {
   index_omni idx;
-  (void) idx;  // just to silence compiler griping about idx being unused
+  (void)idx;  // just to silence compiler griping about idx being unused
 }
 
 TEST(MathIndexingIndex, index_min) {
@@ -42,8 +42,7 @@ TEST(MathIndexingIndex, index_max) {
 }
 
 TEST(MathIndexingIndex, index_min_max) {
-  index_min_max idx(401,912);
+  index_min_max idx(401, 912);
   EXPECT_EQ(401, idx.min_);
   EXPECT_EQ(912, idx.max_);
 }
-

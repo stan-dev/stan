@@ -5,13 +5,13 @@
 #include <boost/variant/apply_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-   bool has_var(const expression& e, const variable_map& var_map) {
-      has_var_vis vis(var_map);
-      return boost::apply_visitor(vis, e.expr_);
-    }
-
-  }
+bool has_var(const expression& e, const variable_map& var_map) {
+  has_var_vis vis(var_map);
+  return boost::apply_visitor(vis, e.expr_);
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

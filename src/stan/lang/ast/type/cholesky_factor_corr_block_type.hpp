@@ -25,8 +25,7 @@ struct cholesky_factor_corr_block_type {
    *
    * @param K corr matrix num rows, columns
    */
-  explicit cholesky_factor_corr_block_type(
-      const expression& K);
+  explicit cholesky_factor_corr_block_type(const expression& K);
 
   /**
    * Get K (corr matrix num rows, columns)

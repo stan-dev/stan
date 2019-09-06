@@ -4,36 +4,35 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Integer type.
-     */
-    struct int_type {
-      /**
-       * True if variable type declared with "data" qualifier.
-       */
-      bool is_data_;
+/**
+ * Integer type.
+ */
+struct int_type {
+  /**
+   * True if variable type declared with "data" qualifier.
+   */
+  bool is_data_;
 
-      /**
-       * Construct a int type with default values.
-       */
-      int_type();
+  /**
+   * Construct a int type with default values.
+   */
+  int_type();
 
-      /**
-       * Construct a int type with the specified data-only variable flag.
-       *
-       * @param is_data true when var is specified data-only
-       */
-      explicit int_type(bool is_data);
+  /**
+   * Construct a int type with the specified data-only variable flag.
+   *
+   * @param is_data true when var is specified data-only
+   */
+  explicit int_type(bool is_data);
 
+  /**
+   * Returns identity string for this type.
+   */
+  std::string oid() const;
+};
 
-      /**
-       * Returns identity string for this type.
-       */
-      std::string oid() const;
-    };
-
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

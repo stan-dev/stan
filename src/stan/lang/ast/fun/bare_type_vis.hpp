@@ -25,185 +25,185 @@
 #include <boost/variant/static_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Visitor to get bare type for local and block var types.
-     */
-    struct bare_type_vis : public boost::static_visitor<bare_expr_type> {
-      /**
-       * Construct a visitor.
-       */
-      bare_type_vis();
+/**
+ * Visitor to get bare type for local and block var types.
+ */
+struct bare_type_vis : public boost::static_visitor<bare_expr_type> {
+  /**
+   * Construct a visitor.
+   */
+  bare_type_vis();
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const block_array_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const block_array_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const local_array_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const local_array_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const cholesky_factor_corr_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const cholesky_factor_corr_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const cholesky_factor_cov_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const cholesky_factor_cov_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const corr_matrix_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const corr_matrix_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const cov_matrix_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const cov_matrix_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const double_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const double_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const double_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const double_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const ill_formed_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const ill_formed_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const int_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const int_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const int_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const int_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const matrix_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const matrix_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const matrix_local_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const matrix_local_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const ordered_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const ordered_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const positive_ordered_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const positive_ordered_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const row_vector_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const row_vector_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const row_vector_local_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const row_vector_local_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const simplex_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const simplex_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const unit_vector_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const unit_vector_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const vector_block_type& x) const;
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const vector_block_type& x) const;
 
-      /**
-       * Return equivalent bare type.
-       *
-       * @param x type
-       * @return bare type
-       */
-      bare_expr_type operator()(const vector_local_type& x) const;
-    };
-  }
-}
+  /**
+   * Return equivalent bare type.
+   *
+   * @param x type
+   * @return bare type
+   */
+  bare_expr_type operator()(const vector_local_type& x) const;
+};
+}  // namespace lang
+}  // namespace stan
 #endif

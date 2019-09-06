@@ -7,19 +7,19 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate a using statement for the specified type to the
-     * specified stream.
-     *
-     * @param[in] type type for which using statement is geneated
-     * @param[in,out] o stream for generation
-     */
-    void generate_using(const std::string& type, std::ostream& o) {
-      o << "using " << type << ";" << EOL;
-    }
-
-  }
+/**
+ * Generate a using statement for the specified type to the
+ * specified stream.
+ *
+ * @param[in] type type for which using statement is geneated
+ * @param[in,out] o stream for generation
+ */
+void generate_using(const std::string& type, std::ostream& o) {
+  o << "using " << type << ";" << EOL;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

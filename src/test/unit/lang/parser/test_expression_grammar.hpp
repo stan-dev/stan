@@ -12,30 +12,25 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    struct test_expression_grammar
-      : boost::spirit::qi::grammar<Iterator,
-                                   boost::spirit::qi::locals<scope>,
-                                   expression,
-                                   whitespace_grammar<Iterator> > {
-      const io::program_reader& reader_;
-      variable_map var_map_;
-      std::stringstream& error_msgs_;
-      expression_grammar<Iterator> expression_g;
+template <typename Iterator>
+struct test_expression_grammar
+    : boost::spirit::qi::grammar<Iterator, boost::spirit::qi::locals<scope>,
+                                 expression, whitespace_grammar<Iterator> > {
+  const io::program_reader& reader_;
+  variable_map var_map_;
+  std::stringstream& error_msgs_;
+  expression_grammar<Iterator> expression_g;
 
-      test_expression_grammar(const io::program_reader& reader,
-                              variable_map& var_map,
-                              std::stringstream& error_msgs);
+  test_expression_grammar(const io::program_reader& reader,
+                          variable_map& var_map, std::stringstream& error_msgs);
 
-      boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<scope>,
-                              expression,
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, boost::spirit::qi::locals<scope>,
+                          expression, whitespace_grammar<Iterator> >
       test_expression_r;
-    };
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif
