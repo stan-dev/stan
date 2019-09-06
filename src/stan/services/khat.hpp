@@ -53,7 +53,7 @@ namespace advi {
   template <typename T_x>
   int compute_khat(const std::vector<T_x>& x,
                    const int& min_grid_points = 30,
-                   T_x &k = -1.0) {
+                   T_x &k = std::numeric_limits<double>::quiet_NaN()) {
     size_t N = x.size();
     std::vector<T_x> x_s(N);
     x_s = x;
@@ -99,18 +99,18 @@ namespace advi {
     for (size_t i = 0; i < M; ++i) {
       theta_hat = theta_hat + theta[i] * w_theta[i];
     }
-    
-    // std::vector<double> k_vec(N);
-    // for (size_t i = 0; i < N; ++i)
-    //   k_vec[i] = log(-theta_hat * x[i]);
 
-    // auto k_mean = mean(k_vec);
-    // auto sigma = -k_mean / theta_hat;
+    std::vector<double> k_vec(N);
+    for (size_t i = 0; i < N; ++i) {
+      k_vec[i] = log1p(-theta_hat * x_s[i]);
+    }
 
-    // adjust_k_wip(k, N);
+    k = mean(k_vec);
+    auto sigma = -k / theta_hat;
+    adjust_k_wip(k, N);
     
-    // if (std::numeric_limits<double>::quiet_NaN() == k)
-    //   k = std::numeric_limits<double>::infinity();
+    if (std::numeric_limits<double>::quiet_NaN() == k)
+      k = std::numeric_limits<double>::infinity();
 
     return 0;
   }

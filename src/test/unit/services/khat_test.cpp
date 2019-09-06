@@ -37,6 +37,5 @@ TEST(StanServices, khat_compute_khat) {
   x[3] = 4.0; x[4] = 1.0;
 
   EXPECT_NO_THROW(stan::math::services::experimental::advi::compute_khat(x, 30, k));
-
-  //  std::cout << k << "\n";
+  EXPECT_FLOAT_EQ(k, 0.1265339);
 }
