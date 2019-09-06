@@ -93,9 +93,11 @@ class array_var_context : public var_context {
              T&& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
+    using val_d_t = decltype(values.data());
     for (size_t i = 0; i < names.size(); i++) {
-      vars_r_[names[i]] = {{std::forward<decltype(values.data())>(values.data()) + dim_vec[i],
-                            std::forward<decltype(values.data())>(values.data()) + dim_vec[i + 1]}, dims[i]};
+      vars_r_[names[i]] = {{std::forward<val_d_t>(values.data()) + dim_vec[i],
+                            std::forward<val_d_t>(values.data()) +
+                            dim_vec[i + 1]}, dims[i]};
     }
   }
 
