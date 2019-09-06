@@ -50,7 +50,9 @@ class array_var_context : public var_context {
    * @param array_size The total size of the vector holding the values we want to access.
    * @param dims Vector holding the dimensions for each variable.
    * @return If the array size is equal to the number of dimensions, 
-   * a vector of the total dimensions for each element in dims.
+   * a vector of the cumulative sum of the dimensions of each inner element of dims.
+   * The return of this function is used in the add_* methods to get the sequence of values
+   * For each variable.
    */
   template <typename T>
   std::vector<size_t> validate_dims(const std::vector<std::string>& names, const T array_size,
@@ -75,30 +77,25 @@ class array_var_context : public var_context {
           << " is found, but " << total << " is needed.";
       BOOST_THROW_EXCEPTION(std::invalid_argument(msg.str()));
     }
-    return elem_dims_total;
+    std::vector<size_t> array_end_vec(elem_dims_total.size());
+    std::partial_sum(elem_dims_total.begin(), elem_dims_total.end(), array_end_vec.begin());
+    return array_end_vec;
   }
 
-  void add_r(const std::vector<std::string>& names,
-             const std::vector<double>& values,
-             const std::vector<std::vector<size_t>>& dims) {
-    std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
-    std::vector<size_t> end_vec(dim_vec.size());
-    std::partial_sum(dim_vec.begin(), dim_vec.end(), end_vec.begin());
-    for (size_t i = 0; i < names.size(); i++) {
-      vars_r_[names[i]] = {{values.data() + end_vec[i],
-                            values.data() + end_vec[i + 1]}, dims[i]};
-    }
-  }
+  // This is just here till the next math submodule is updated
+  template <typename T>
+  using is_vector_floating_point = std::integral_constant<bool,
+     is_vector<std::decay_t<T>>::value && 
+     std::is_floating_point<typename scalar_type<std::decay_t<T>>::type>::value>;
 
+  template<typename T, std::enable_if_t<is_vector_floating_point<T>::value>...>
   void add_r(const std::vector<std::string>& names,
-             const Eigen::VectorXd& values,
+             T&& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
-    std::vector<size_t> end_vec(dim_vec.size());
-    std::partial_sum(dim_vec.begin(), dim_vec.end(), end_vec.begin());
     for (size_t i = 0; i < names.size(); i++) {
-      vars_r_[names[i]] = {{values.data() + end_vec[i],
-                            values.data() + end_vec[i + 1]}, dims[i]};
+      vars_r_[names[i]] = {{std::forward<decltype(values.data())>(values.data()) + dim_vec[i],
+                            std::forward<decltype(values.data())>(values.data()) + dim_vec[i + 1]}, dims[i]};
     }
   }
 
@@ -106,11 +103,9 @@ class array_var_context : public var_context {
              const std::vector<int>& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
-    std::vector<size_t> end_vec(dim_vec.size());
-    std::partial_sum(dim_vec.begin(), dim_vec.end(), end_vec.begin());
     for (size_t i = 0; i < names.size(); i++) {
-      vars_i_[names[i]] = {{values.data() + end_vec[i],
-                            values.data() + end_vec[i + 1]}, dims[i]};
+      vars_i_[names[i]] = {{values.data() + dim_vec[i],
+                            values.data() + dim_vec[i + 1]}, dims[i]};
     }
   }
 
