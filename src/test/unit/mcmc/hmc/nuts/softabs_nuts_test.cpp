@@ -28,7 +28,7 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::softabs_nuts<gauss3D_model_namespace::gauss3D_model, rng_t>
-      sampler(model, base_rng);
+    sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -43,16 +43,18 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   Eigen::VectorXd p_end = Eigen::VectorXd::Zero(3);
   Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(3);
   Eigen::VectorXd rho = z_init.p;
-
+  
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
   double sum_metro_prob = 0;
 
-  bool valid_subtree = sampler.build_tree(
-      3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
-      n_leapfrog, log_sum_weight, sum_metro_prob, logger);
+  bool valid_subtree = sampler.build_tree(3, z_propose,
+                                          p_sharp_begin, p_sharp_end, 
+                                          rho, p_begin, p_end,
+                                          H0, 1, n_leapfrog, log_sum_weight,
+                                          sum_metro_prob, logger);
 
   EXPECT_EQ(0.1, sampler.get_nominal_stepsize());
 
@@ -65,15 +67,15 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   EXPECT_FLOAT_EQ(-1.0960016, p_begin(0));
   EXPECT_FLOAT_EQ(1.0960016, p_begin(1));
   EXPECT_FLOAT_EQ(-1.0960016, p_begin(2));
-
+  
   EXPECT_FLOAT_EQ(-0.83470845, p_sharp_begin(0));
   EXPECT_FLOAT_EQ(0.83470845, p_sharp_begin(1));
   EXPECT_FLOAT_EQ(-0.83470845, p_sharp_begin(2));
-
+  
   EXPECT_FLOAT_EQ(-1.5019561, p_end(0));
   EXPECT_FLOAT_EQ(1.5019561, p_end(1));
   EXPECT_FLOAT_EQ(-1.5019561, p_end(2));
-
+  
   EXPECT_FLOAT_EQ(-1.143881, p_sharp_end(0));
   EXPECT_FLOAT_EQ(1.143881, p_sharp_end(1));
   EXPECT_FLOAT_EQ(-1.143881, p_sharp_end(2));
@@ -184,7 +186,7 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   Eigen::VectorXd p_end = Eigen::VectorXd::Zero(3);
   Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(3);
   Eigen::VectorXd rho = z_init.p;
-
+  
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
@@ -194,14 +196,17 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   // Depth 0 forward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, log_sum_weight, sum_metro_prob,
+  sampler.build_tree(0, z_propose,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
+                     H0, 1, n_leapfrog, log_sum_weight,
+                     sum_metro_prob,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
     EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_begin(n));
-
+    
     EXPECT_FLOAT_EQ(p_forward_1(n), p_end(n));
     EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_end(n));
   }
@@ -209,14 +214,17 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   // Depth 1 forward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(1, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, log_sum_weight, sum_metro_prob,
+  sampler.build_tree(1, z_propose,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
+                     H0, 1, n_leapfrog, log_sum_weight,
+                     sum_metro_prob,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
     EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_begin(n));
-
+    
     EXPECT_FLOAT_EQ(p_forward_2(n), p_end(n));
     EXPECT_FLOAT_EQ(p_sharp_forward_2(n), p_sharp_end(n));
   }
@@ -224,23 +232,29 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   // Depth 2 forward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(2, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, log_sum_weight, sum_metro_prob,
+  sampler.build_tree(2, z_propose,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
+                     H0, 1, n_leapfrog, log_sum_weight,
+                     sum_metro_prob,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n) {
-    EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
-    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_begin(n));
-
-    EXPECT_FLOAT_EQ(p_forward_3(n), p_end(n));
-    EXPECT_FLOAT_EQ(p_sharp_forward_3(n), p_sharp_end(n));
+   EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
+   EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_begin(n));
+   
+   EXPECT_FLOAT_EQ(p_forward_3(n), p_end(n));
+   EXPECT_FLOAT_EQ(p_sharp_forward_3(n), p_sharp_end(n));
   }
-
+  
   // Depth 3 forward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, log_sum_weight, sum_metro_prob,
+  sampler.build_tree(3, z_propose,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
+                     H0, 1, n_leapfrog, log_sum_weight,
+                     sum_metro_prob,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n) {
@@ -254,14 +268,17 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   // Depth 0 backward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, -1, n_leapfrog, log_sum_weight, sum_metro_prob,
+  sampler.build_tree(0, z_propose,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
+                     H0, -1, n_leapfrog, log_sum_weight,
+                     sum_metro_prob,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
     EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_begin(n));
-
+    
     EXPECT_FLOAT_EQ(p_backward_1(n), p_end(n));
     EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_end(n));
   }
@@ -269,14 +286,17 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   // Depth 1 backward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(1, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, -1, n_leapfrog, log_sum_weight, sum_metro_prob,
+  sampler.build_tree(1, z_propose,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
+                     H0, -1, n_leapfrog, log_sum_weight,
+                     sum_metro_prob,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
     EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_begin(n));
-
+    
     EXPECT_FLOAT_EQ(p_backward_2(n), p_end(n));
     EXPECT_FLOAT_EQ(p_sharp_backward_2(n), p_sharp_end(n));
   }
@@ -284,14 +304,17 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   // Depth 2 backward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(2, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, -1, n_leapfrog, log_sum_weight, sum_metro_prob,
+  sampler.build_tree(2, z_propose,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
+                     H0, -1, n_leapfrog, log_sum_weight,
+                     sum_metro_prob,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
     EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_begin(n));
-
+    
     EXPECT_FLOAT_EQ(p_backward_3(n), p_end(n));
     EXPECT_FLOAT_EQ(p_sharp_backward_3(n), p_sharp_end(n));
   }
@@ -299,14 +322,17 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   // Depth 3 backward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, -1, n_leapfrog, log_sum_weight, sum_metro_prob,
+  sampler.build_tree(3, z_propose,
+                     p_sharp_begin, p_sharp_end, 
+                     rho, p_begin, p_end,
+                     H0, -1, n_leapfrog, log_sum_weight,
+                     sum_metro_prob,
                      logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
     EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_begin(n));
-
+    
     EXPECT_FLOAT_EQ(p_backward_4(n), p_end(n));
     EXPECT_FLOAT_EQ(p_sharp_backward_4(n), p_sharp_end(n));
   }
@@ -331,7 +357,7 @@ TEST(McmcSoftAbsNuts, transition_test) {
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::softabs_nuts<gauss3D_model_namespace::gauss3D_model, rng_t>
-      sampler(model, base_rng);
+    sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);

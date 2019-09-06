@@ -2,11 +2,11 @@
 #define STAN_LANG_AST_FUN_
 
 namespace stan {
-namespace lang {
+  namespace lang {
 
-/**
- */
+    /**
+     */
 
+  }
 }
-}  // namespace stan
 #endif

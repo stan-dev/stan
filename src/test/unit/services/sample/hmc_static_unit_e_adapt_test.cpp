@@ -6,8 +6,9 @@
 #include <iostream>
 
 class ServicesSampleHmcStaticUnitEAdapt : public testing::Test {
- public:
-  ServicesSampleHmcStaticUnitEAdapt() : model(context, &model_log) {}
+public:
+  ServicesSampleHmcStaticUnitEAdapt()
+    : model(context, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
@@ -15,6 +16,7 @@ class ServicesSampleHmcStaticUnitEAdapt : public testing::Test {
   stan::io::empty_var_context context;
   stan_model model;
 };
+
 
 TEST_F(ServicesSampleHmcStaticUnitEAdapt, call_count) {
   unsigned int random_seed = 0;
@@ -36,9 +38,11 @@ TEST_F(ServicesSampleHmcStaticUnitEAdapt, call_count) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   int return_code = stan::services::sample::hmc_static_unit_e_adapt(
-      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
-      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, int_time,
-      delta, gamma, kappa, t0, interrupt, logger, init, parameter, diagnostic);
+      model, context, random_seed, chain, init_radius,
+      num_warmup, num_samples, num_thin, save_warmup, refresh,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
+      interrupt, logger, init,
+      parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
 
@@ -52,13 +56,14 @@ TEST_F(ServicesSampleHmcStaticUnitEAdapt, call_count) {
   diagnostic_values = diagnostic.vector_double_values();
 
   // Expecatations of message call counts
-  int num_output_lines = (num_warmup + num_samples) / num_thin;
-  EXPECT_EQ(num_warmup + num_samples, interrupt.call_count());
+  int num_output_lines = (num_warmup+num_samples)/num_thin;
+  EXPECT_EQ(num_warmup+num_samples, interrupt.call_count());
   EXPECT_EQ(1, parameter.call_count("vector_string"));
   EXPECT_EQ(num_output_lines, parameter.call_count("vector_double"));
   EXPECT_EQ(1, diagnostic.call_count("vector_string"));
   EXPECT_EQ(num_output_lines, diagnostic.call_count("vector_double"));
 }
+
 
 TEST_F(ServicesSampleHmcStaticUnitEAdapt, output_sizes) {
   unsigned int random_seed = 0;
@@ -80,9 +85,11 @@ TEST_F(ServicesSampleHmcStaticUnitEAdapt, output_sizes) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   stan::services::sample::hmc_static_unit_e_adapt(
-      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
-      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, int_time,
-      delta, gamma, kappa, t0, interrupt, logger, init, parameter, diagnostic);
+      model, context, random_seed, chain, init_radius,
+      num_warmup, num_samples, num_thin, save_warmup, refresh,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
+      interrupt, logger, init,
+      parameter, diagnostic);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
@@ -104,13 +111,14 @@ TEST_F(ServicesSampleHmcStaticUnitEAdapt, output_sizes) {
   EXPECT_EQ(parameter_names[0].size(), parameter_values[0].size());
   EXPECT_EQ(diagnostic_names[0].size(), diagnostic_values[0].size());
 
-  EXPECT_EQ((num_warmup + num_samples) / num_thin, parameter_values.size());
+  EXPECT_EQ((num_warmup+num_samples)/num_thin, parameter_values.size());
 
   // Expect one call to set parameter names, and one set of output per
   // iteration.
   EXPECT_EQ("lp__", diagnostic_names[0][0]);
   EXPECT_EQ("accept_stat__", diagnostic_names[0][1]);
 }
+
 
 TEST_F(ServicesSampleHmcStaticUnitEAdapt, parameter_checks) {
   unsigned int random_seed = 0;
@@ -131,10 +139,13 @@ TEST_F(ServicesSampleHmcStaticUnitEAdapt, parameter_checks) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
+
   int return_code = stan::services::sample::hmc_static_unit_e_adapt(
-      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
-      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, int_time,
-      delta, gamma, kappa, t0, interrupt, logger, init, parameter, diagnostic);
+      model, context, random_seed, chain, init_radius,
+      num_warmup, num_samples, num_thin, save_warmup, refresh,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
+      interrupt, logger, init,
+      parameter, diagnostic);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
@@ -146,6 +157,7 @@ TEST_F(ServicesSampleHmcStaticUnitEAdapt, parameter_checks) {
   diagnostic_values = diagnostic.vector_double_values();
 
   EXPECT_EQ(return_code, 0);
+
 }
 
 TEST_F(ServicesSampleHmcStaticUnitEAdapt, output_regression) {
@@ -167,10 +179,13 @@ TEST_F(ServicesSampleHmcStaticUnitEAdapt, output_regression) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
+
   stan::services::sample::hmc_static_unit_e_adapt(
-      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
-      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, int_time,
-      delta, gamma, kappa, t0, interrupt, logger, init, parameter, diagnostic);
+      model, context, random_seed, chain, init_radius,
+      num_warmup, num_samples, num_thin, save_warmup, refresh,
+      stepsize, stepsize_jitter, int_time, delta, gamma, kappa, t0,
+      interrupt, logger, init,
+      parameter, diagnostic);
 
   std::vector<std::string> init_values;
   init_values = init.string_values();

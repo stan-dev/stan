@@ -2,13 +2,17 @@
 #include <exception>
 #include <test/unit/lang/utility.hpp>
 TEST(langParserStatementGrammar, validateAssignmentTypes) {
-  test_throws("bad_var_assignment_type1", "mismatch in assignment");
-  test_throws("bad_var_assignment_type2", "mismatch in assignment");
-  test_throws("bad_var_assignment_vec_arr", "mismatch in assignment");
+  test_throws("bad_var_assignment_type1",
+              "mismatch in assignment");
+  test_throws("bad_var_assignment_type2",
+              "mismatch in assignment");
+  test_throws("bad_var_assignment_vec_arr",
+              "mismatch in assignment");
 }
 
 TEST(langParserStatementGrammar, assignRealToIntMessage) {
-  test_throws("assign_real_to_int", "Base type mismatch in assignment");
+  test_throws("assign_real_to_int",
+              "Base type mismatch in assignment");
 }
 
 TEST(langParserStatementGrammar, plusEqualsGood) {
@@ -47,11 +51,13 @@ TEST(langParserStatementGrammar, eltOpEqualsGood) {
 }
 
 TEST(langParserStatementGrammar, plusEqualsBad) {
-  test_throws("compound-assign/plus_equals_bad_var_lhs", "does not exist");
+  test_throws("compound-assign/plus_equals_bad_var_lhs","does not exist");
   test_throws("compound-assign/plus_equals_bad_var_lhs2",
               "Cannot assign to variable outside of declaration block");
-  test_throws("compound-assign/plus_equals_bad_lhs_idxs", "Too many indexes");
-  test_throws("compound-assign/plus_equals_bad_var_rhs", "does not exist");
+  test_throws("compound-assign/plus_equals_bad_lhs_idxs",
+              "Too many indexes");
+  test_throws("compound-assign/plus_equals_bad_var_rhs",
+              "does not exist");
   test_throws("compound-assign/plus_equals_type_mismatch",
               "Cannot apply operator '+='");
   test_throws("compound-assign/plus_equals_type_mismatch2",
@@ -66,7 +72,8 @@ TEST(langParserStatementGrammar, plusEqualsBad) {
               "Cannot apply operator '+='");
   test_throws("compound-assign/plus_equals_row_vec_array",
               "Cannot apply operator '+='");
-  test_throws("compound-assign/plus_equals_bad_init", "PARSER EXPECTED: \";\"");
+  test_throws("compound-assign/plus_equals_bad_init",
+              "PARSER EXPECTED: \";\"");
 }
 
 TEST(langParserStatementGrammar, timesEqualsBad) {
