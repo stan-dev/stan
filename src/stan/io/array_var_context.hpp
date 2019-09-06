@@ -12,6 +12,8 @@
 #include <utility>
 #include <numeric>
 #include <unordered_map>
+#include <functional>
+#include <type_traits>
 
 namespace stan {
 
