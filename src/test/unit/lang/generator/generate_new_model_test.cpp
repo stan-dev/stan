@@ -17,17 +17,15 @@ TEST(langGenerator, generateNewModel) {
 
   stan::lang::generate_cpp(prog, model_name, reader.history(), code_stream);
   std::string generated_code = code_stream.str();
-  EXPECT_EQ(
-      1,
-      count_matches(
-          "#ifndef USING_R\n\n"
-          "stan::model::model_base& new_model(\n"
-          "        stan::io::var_context& data_context,\n"
-          "        unsigned int seed,\n"
-          "        std::ostream* msg_stream) {\n"
-          "  stan_model* m = new stan_model(data_context, seed, msg_stream);\n"
-          "  return *m;\n"
-          "}\n\n"
-          "#endif\n",
-          generated_code));
+  EXPECT_EQ(1, count_matches(
+      "#ifndef USING_R\n\n"
+      "stan::model::model_base& new_model(\n"
+      "        stan::io::var_context& data_context,\n"
+      "        unsigned int seed,\n"
+      "        std::ostream* msg_stream) {\n"
+      "  stan_model* m = new stan_model(data_context, seed, msg_stream);\n"
+      "  return *m;\n"
+      "}\n\n"
+      "#endif\n",
+      generated_code));
 }

@@ -5,13 +5,16 @@
 #include <string>
 
 namespace stan {
-namespace lang {
+  namespace lang {
 
-double_type::double_type(bool is_data) : is_data_(is_data) {}
+    double_type::double_type(bool is_data) : is_data_(is_data) { }
 
-double_type::double_type() : double_type(false) {}
+    double_type::double_type() : double_type(false) { }
 
-std::string double_type::oid() const { return "03_double_type"; }
-}  // namespace lang
-}  // namespace stan
+    std::string double_type::oid() const {
+      return "03_double_type";
+    }
+  }
+}
 #endif
+

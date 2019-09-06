@@ -7,30 +7,41 @@
 #include <vector>
 
 struct mock_model : public stan::model::model_base {
-  mock_model(size_t n) : model_base(n) {}
+  mock_model(size_t n) : model_base(n) { }
 
-  virtual ~mock_model() {}
+  virtual ~mock_model() { }
 
-  std::string model_name() const override { return "mock_model"; }
+  std::string model_name() const override {
+    return "mock_model";
+  }
 
-  void get_param_names(std::vector<std::string>& names) const override {}
-  void get_dims(std::vector<std::vector<size_t> >& dimss) const override {}
+  void get_param_names(std::vector<std::string>& names)
+      const override {
+  }
+  void get_dims(std::vector<std::vector<size_t> >& dimss)
+      const override {
+  }
 
   void constrained_param_names(std::vector<std::string>& param_names,
                                bool include_tparams,
-                               bool include_gqs) const override {}
+                               bool include_gqs)
+      const override {
+  }
 
   void unconstrained_param_names(std::vector<std::string>& param_names,
                                  bool include_tparams,
-                                 bool include_gqs) const override {}
+                                 bool include_gqs)
+      const override {
+  }
 
-  double log_prob(Eigen::VectorXd& params_r,
-                  std::ostream* msgs) const override {
+  double log_prob(Eigen::VectorXd& params_r, std::ostream* msgs)
+      const override {
     return 1;
   }
 
   stan::math::var log_prob(Eigen::Matrix<stan::math::var, -1, 1>& params_r,
-                           std::ostream* msgs) const override {
+                     std::ostream* msgs)
+      const override {
     return 2;
   }
 
@@ -69,11 +80,16 @@ struct mock_model : public stan::model::model_base {
 
   void transform_inits(const stan::io::var_context& context,
                        Eigen::VectorXd& params_r,
-                       std::ostream* msgs) const override {}
+                       std::ostream* msgs) const override {
+  }
 
-  void write_array(boost::ecuyer1988& base_rng, Eigen::VectorXd& params_r,
-                   Eigen::VectorXd& params_constrained_r, bool include_tparams,
-                   bool include_gqs, std::ostream* msgs) const override {}
+  void write_array(boost::ecuyer1988& base_rng,
+                   Eigen::VectorXd& params_r,
+                   Eigen::VectorXd& params_constrained_r,
+                   bool include_tparams,
+                   bool include_gqs,
+                   std::ostream* msgs) const override {
+  }
 
   double log_prob(std::vector<double>& params_r, std::vector<int>& params_i,
                   std::ostream* msgs) const override {
@@ -81,8 +97,8 @@ struct mock_model : public stan::model::model_base {
   }
 
   stan::math::var log_prob(std::vector<stan::math::var>& params_r,
-                           std::vector<int>& params_i,
-                           std::ostream* msgs) const override {
+                     std::vector<int>& params_i,
+                     std::ostream* msgs) const override {
     return 12;
   }
 
@@ -93,8 +109,8 @@ struct mock_model : public stan::model::model_base {
   }
 
   stan::math::var log_prob_jacobian(std::vector<stan::math::var>& params_r,
-                                    std::vector<int>& params_i,
-                                    std::ostream* msgs) const override {
+                              std::vector<int>& params_i,
+                              std::ostream* msgs) const override {
     return 14;
   }
 
@@ -105,8 +121,8 @@ struct mock_model : public stan::model::model_base {
   }
 
   stan::math::var log_prob_propto(std::vector<stan::math::var>& params_r,
-                                  std::vector<int>& params_i,
-                                  std::ostream* msgs) const override {
+                            std::vector<int>& params_i,
+                            std::ostream* msgs) const override {
     return 16;
   }
 
@@ -117,7 +133,8 @@ struct mock_model : public stan::model::model_base {
   }
 
   stan::math::var log_prob_propto_jacobian(
-      std::vector<stan::math::var>& params_r, std::vector<int>& params_i,
+      std::vector<stan::math::var>& params_r,
+      std::vector<int>& params_i,
       std::ostream* msgs) const override {
     return 0;
   }
@@ -125,13 +142,17 @@ struct mock_model : public stan::model::model_base {
   void transform_inits(const stan::io::var_context& context,
                        std::vector<int>& params_i,
                        std::vector<double>& params_r,
-                       std::ostream* msgs) const override {}
+                       std::ostream* msgs) const override {
+  }
 
-  void write_array(boost::ecuyer1988& base_rng, std::vector<double>& params_r,
+  void write_array(boost::ecuyer1988& base_rng,
+                   std::vector<double>& params_r,
                    std::vector<int>& params_i,
                    std::vector<double>& params_r_constrained,
-                   bool include_tparams, bool include_gqs,
-                   std::ostream* msgs) const override {}
+                   bool include_tparams,
+                   bool include_gqs,
+                   std::ostream* msgs) const override {
+  }
 };
 
 TEST(model, modelBaseInheritance) {
@@ -163,7 +184,7 @@ TEST(model, modelTemplateLogProb) {
   // test template version from base class;  not callable from mock_model
   // because templated class functions are not inherited
   // long form assignment avoids test macro parse error with multi tparams
-  double v1 = bm.template log_prob<false, false>(params_r, msgs);
+  double v1 =  bm.template log_prob<false, false>(params_r, msgs);
   EXPECT_FLOAT_EQ(1, v1);
   double v2 = bm.template log_prob<false, false>(params_r_v, msgs).val();
   EXPECT_FLOAT_EQ(2, v2);

@@ -5,10 +5,12 @@
 #include <stan/lang/ast/fun/is_space.hpp>
 
 namespace stan {
-namespace lang {
+  namespace lang {
 
-bool is_space(char c) { return stan::io::is_whitespace(c); }
+    bool is_space(char c) {
+      return stan::io::is_whitespace(c);
+    }
 
-}  // namespace lang
-}  // namespace stan
+  }
+}
 #endif

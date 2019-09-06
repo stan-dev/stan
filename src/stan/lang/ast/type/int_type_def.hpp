@@ -5,13 +5,16 @@
 #include <string>
 
 namespace stan {
-namespace lang {
+  namespace lang {
 
-int_type::int_type(bool is_data) : is_data_(is_data) {}
+    int_type::int_type(bool is_data) : is_data_(is_data) { }
 
-int_type::int_type() : int_type(false) {}
+    int_type::int_type() : int_type(false) { }
 
-std::string int_type::oid() const { return "02_int_type"; }
-}  // namespace lang
-}  // namespace stan
+    std::string int_type::oid() const {
+      return "02_int_type";
+    }
+  }
+}
 #endif
+

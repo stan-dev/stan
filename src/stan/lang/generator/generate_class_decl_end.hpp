@@ -6,10 +6,12 @@
 #include <ostream>
 
 namespace stan {
-namespace lang {
+  namespace lang {
 
-void generate_class_decl_end(std::ostream& o) { o << "}; // model" << EOL2; }
+    void generate_class_decl_end(std::ostream& o) {
+      o << "}; // model" << EOL2;
+    }
 
-}  // namespace lang
-}  // namespace stan
+  }
+}
 #endif

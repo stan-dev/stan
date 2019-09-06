@@ -39,12 +39,13 @@ class model_base : public prob_grad {
    * @param[in] num_params_r number of real-valued, unconstrained
    * parameters
    */
-  explicit model_base(size_t num_params_r) : prob_grad(num_params_r) {}
+  explicit model_base(size_t num_params_r) :
+      prob_grad(num_params_r) { }
 
   /**
    * Destructor.  This class has a no-op destructor.
    */
-  virtual ~model_base() {}
+  virtual ~model_base() { }
 
   /**
    * Return the name of the model.
@@ -149,9 +150,10 @@ class model_base : public prob_grad {
    * @param[in] include_gqs true if generated quantities should be
    * included
    */
-  virtual void unconstrained_param_names(std::vector<std::string>& param_names,
-                                         bool include_tparams = true,
-                                         bool include_gqs = true) const = 0;
+  virtual void
+  unconstrained_param_names(std::vector<std::string>& param_names,
+                            bool include_tparams = true,
+                            bool include_gqs = true) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -162,8 +164,10 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual double log_prob(Eigen::VectorXd& params_r,
-                          std::ostream* msgs) const = 0;
+  virtual double
+  log_prob(Eigen::VectorXd& params_r,
+           std::ostream* msgs) const = 0;
+
 
   /**
    * Return the log density for the specified unconstrained
@@ -174,8 +178,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var log_prob(Eigen::Matrix<math::var, -1, 1>& params_r,
-                             std::ostream* msgs) const = 0;
+  virtual math::var
+  log_prob(Eigen::Matrix<math::var, -1, 1>& params_r,
+           std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -190,8 +195,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual double log_prob_jacobian(Eigen::VectorXd& params_r,
-                                   std::ostream* msgs) const = 0;
+  virtual double
+  log_prob_jacobian(Eigen::VectorXd& params_r,
+                    std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -206,8 +212,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var log_prob_jacobian(Eigen::Matrix<math::var, -1, 1>& params_r,
-                                      std::ostream* msgs) const = 0;
+  virtual math::var
+  log_prob_jacobian(Eigen::Matrix<math::var, -1, 1>& params_r,
+                    std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -223,8 +230,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual double log_prob_propto(Eigen::VectorXd& params_r,
-                                 std::ostream* msgs) const = 0;
+  virtual double
+  log_prob_propto(Eigen::VectorXd& params_r,
+                  std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -235,8 +243,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var log_prob_propto(Eigen::Matrix<math::var, -1, 1>& params_r,
-                                    std::ostream* msgs) const = 0;
+  virtual math::var
+  log_prob_propto(Eigen::Matrix<math::var, -1, 1>& params_r,
+                  std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -256,8 +265,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual double log_prob_propto_jacobian(Eigen::VectorXd& params_r,
-                                          std::ostream* msgs) const = 0;
+  virtual double
+  log_prob_propto_jacobian(Eigen::VectorXd& params_r,
+                           std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -272,8 +282,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var log_prob_propto_jacobian(
-      Eigen::Matrix<math::var, -1, 1>& params_r, std::ostream* msgs) const = 0;
+  virtual math::var
+  log_prob_propto_jacobian(Eigen::Matrix<math::var, -1, 1>& params_r,
+                           std::ostream* msgs) const = 0;
 
   /**
    * Convenience template function returning the log density for the
@@ -298,7 +309,7 @@ class model_base : public prob_grad {
    */
   template <bool propto, bool jacobian, typename T>
   inline T log_prob(Eigen::Matrix<T, -1, 1>& params_r,
-                    std::ostream* msgs) const {
+             std::ostream* msgs) const {
     if (propto && jacobian)
       return log_prob_propto_jacobian(params_r, msgs);
     else if (propto && !jacobian)
@@ -319,9 +330,9 @@ class model_base : public prob_grad {
    * @param[in,out] params_r unconstrained parameter values produced
    * @param[in,out] msgs stream to which messages are written
    */
-  virtual void transform_inits(const io::var_context& context,
-                               Eigen::VectorXd& params_r,
-                               std::ostream* msgs) const = 0;
+  virtual void
+  transform_inits(const io::var_context& context, Eigen::VectorXd& params_r,
+                  std::ostream* msgs) const = 0;
 
   /**
    * Convert the specified sequence of unconstrained parameters to a
@@ -344,12 +355,17 @@ class model_base : public prob_grad {
   virtual void write_array(boost::ecuyer1988& base_rng,
                            Eigen::VectorXd& params_r,
                            Eigen::VectorXd& params_constrained_r,
-                           bool include_tparams = true, bool include_gqs = true,
+                           bool include_tparams = true,
+                           bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
+
+
+
+
 
   // TODO(carpenter): cut redundant std::vector versions from here ===
 
-  /**
+   /**
    * Return the log density for the specified unconstrained
    * parameters, without Jacobian and with normalizing constants for
    * probability functions.
@@ -361,9 +377,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual double log_prob(std::vector<double>& params_r,
-                          std::vector<int>& params_i,
-                          std::ostream* msgs) const = 0;
+  virtual double
+  log_prob(std::vector<double>& params_r,  std::vector<int>& params_i,
+           std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -377,9 +393,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var log_prob(std::vector<math::var>& params_r,
-                             std::vector<int>& params_i,
-                             std::ostream* msgs) const = 0;
+  virtual math::var
+  log_prob(std::vector<math::var>& params_r,  std::vector<int>& params_i,
+           std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -397,9 +413,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual double log_prob_jacobian(std::vector<double>& params_r,
-                                   std::vector<int>& params_i,
-                                   std::ostream* msgs) const = 0;
+  virtual double
+  log_prob_jacobian(std::vector<double>& params_r, std::vector<int>& params_i,
+                    std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -417,11 +433,11 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var log_prob_jacobian(std::vector<math::var>& params_r,
-                                      std::vector<int>& params_i,
-                                      std::ostream* msgs) const = 0;
+  virtual math::var
+  log_prob_jacobian(std::vector<math::var>& params_r,
+                    std::vector<int>& params_i, std::ostream* msgs) const = 0;
 
-  /**
+ /**
    * Return the log density for the specified unconstrained
    * parameters, without Jacobian correction for constraints and
    * dropping normalizing constants.
@@ -438,9 +454,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual double log_prob_propto(std::vector<double>& params_r,
-                                 std::vector<int>& params_i,
-                                 std::ostream* msgs) const = 0;
+  virtual double
+  log_prob_propto(std::vector<double>& params_r, std::vector<int>& params_i,
+                  std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -454,9 +470,9 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var log_prob_propto(std::vector<math::var>& params_r,
-                                    std::vector<int>& params_i,
-                                    std::ostream* msgs) const = 0;
+  virtual math::var
+  log_prob_propto(std::vector<math::var>& params_r, std::vector<int>& params_i,
+                  std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -479,9 +495,11 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual double log_prob_propto_jacobian(std::vector<double>& params_r,
-                                          std::vector<int>& params_i,
-                                          std::ostream* msgs) const = 0;
+  virtual double
+  log_prob_propto_jacobian(std::vector<double>& params_r,
+                           std::vector<int>& params_i,
+                           std::ostream* msgs) const = 0;
+
 
   /**
    * Return the log density for the specified unconstrained
@@ -499,9 +517,10 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual math::var log_prob_propto_jacobian(std::vector<math::var>& params_r,
-                                             std::vector<int>& params_i,
-                                             std::ostream* msgs) const = 0;
+  virtual math::var
+  log_prob_propto_jacobian(std::vector<math::var>& params_r,
+                           std::vector<int>& params_i,
+                           std::ostream* msgs) const = 0;
 
   /**
    * Convenience template function returning the log density for the
@@ -528,7 +547,8 @@ class model_base : public prob_grad {
    * included as specified by the template parameters
    */
   template <bool propto, bool jacobian, typename T>
-  inline T log_prob(std::vector<T>& params_r, std::vector<int>& params_i,
+  inline T log_prob(std::vector<T>& params_r,
+                    std::vector<int>& params_i,
                     std::ostream* msgs) const {
     if (propto && jacobian)
       return log_prob_propto_jacobian(params_r, params_i, msgs);
@@ -581,7 +601,8 @@ class model_base : public prob_grad {
                            std::vector<double>& params_r,
                            std::vector<int>& params_i,
                            std::vector<double>& params_r_constrained,
-                           bool include_tparams = true, bool include_gqs = true,
+                           bool include_tparams = true,
+                           bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
 };
 

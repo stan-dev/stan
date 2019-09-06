@@ -19,19 +19,19 @@ TEST(OptimizationLbfgsUpdate, lbfgs_update_secant) {
       sk[i] = 1;
       yk[i] = 1;
 
-      bfgsUp.update(yk, sk, i == 0);
+      bfgsUp.update(yk,sk,i==0);
 
       // Because the constructed update vectors are all orthogonal the secant
       // equation should be exactlty satisfied for all nDim updates.
-      for (unsigned int j = 0; j <= std::min(rank, i); j++) {
+      for (unsigned int j = 0; j <= std::min(rank,i); j++) {
         sk.setZero(nDim);
         yk.setZero(nDim);
         sk[i - j] = 1;
         yk[i - j] = 1;
 
-        bfgsUp.search_direction(sdir, yk);
-
-        EXPECT_NEAR((sdir + sk).norm(), 0.0, 1e-10);
+        bfgsUp.search_direction(sdir,yk);
+      
+        EXPECT_NEAR((sdir + sk).norm(),0.0,1e-10);
       }
     }
   }
@@ -48,17 +48,19 @@ TEST(OptimizationLbfgsUpdate, constructor) {
   }
 }
 
+
 namespace stan {
-namespace optimization {
+  namespace optimization {
 
-class mock_lbfgs_update : public LBFGSUpdate<> {
- public:
-  mock_lbfgs_update(size_t L) : LBFGSUpdate<>(L){};
+    class mock_lbfgs_update : public LBFGSUpdate<> {
 
-  size_t get_history_size() { return this->_buf.capacity(); }
-};
-}  // namespace optimization
-}  // namespace stan
+    public:
+      mock_lbfgs_update(size_t L) : LBFGSUpdate<>(L) {};
+
+      size_t get_history_size() { return this->_buf.capacity(); }
+    };
+  }
+}
 
 TEST(OptimizationLbfgsUpdate, set_history_size) {
   typedef stan::optimization::mock_lbfgs_update QNUpdateT;
@@ -71,8 +73,8 @@ TEST(OptimizationLbfgsUpdate, set_history_size) {
   for (unsigned int rank = 1; rank <= maxRank; rank++) {
     QNUpdateT bfgsUp(rank);
     EXPECT_FLOAT_EQ(bfgsUp.get_history_size(), rank);
-    bfgsUp.set_history_size(rank + 1);
-    EXPECT_FLOAT_EQ(bfgsUp.get_history_size(), rank + 1);
+    bfgsUp.set_history_size(rank+1);
+    EXPECT_FLOAT_EQ(bfgsUp.get_history_size(), rank+1);
   }
 }
 
@@ -92,7 +94,7 @@ TEST(OptimizationLbfgsUpdate, update) {
       sk[i] = 1;
       yk[i] = 1;
 
-      bfgsUp.update(yk, sk, i == 0);
+      bfgsUp.update(yk,sk,i==0);
     }
   }
 }
@@ -108,13 +110,14 @@ TEST(OptimizationLbfgsUpdate, search_direction) {
   for (unsigned int rank = 1; rank <= maxRank; rank++) {
     QNUpdateT bfgsUp(rank);
     for (unsigned int i = 0; i < nDim; i++) {
-      for (unsigned int j = 0; j <= std::min(rank, i); j++) {
+      for (unsigned int j = 0; j <= std::min(rank,i); j++) {
         sk.setZero(nDim);
         yk.setZero(nDim);
         sk[i - j] = 1;
         yk[i - j] = 1;
 
-        bfgsUp.search_direction(sdir, yk);
+        bfgsUp.search_direction(sdir,yk);
+      
       }
     }
   }
