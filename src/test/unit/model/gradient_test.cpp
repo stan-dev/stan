@@ -24,10 +24,10 @@ TEST(ModelUtil, gradient) {
   EXPECT_EQ("", output.str());
 
   // Incorporate once operands and partials has been generalized
-  //output.str("");
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
-  //EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g), std::domain_error);
-  //EXPECT_EQ("", output.str());
+  // output.str("");
+  // domain_fail_namespace::domain_fail domain_fail_model(data_var_context,
+  // &output); EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g),
+  // std::domain_error); EXPECT_EQ("", output.str());
 }
 
 TEST(ModelUtil, gradient_writer) {
@@ -52,8 +52,8 @@ TEST(ModelUtil, gradient_writer) {
   EXPECT_EQ(0, logger.call_count());
 
   // Incorporate once operands and partials has been generalized
-  //output.str("");
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
-  //EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g), std::domain_error);
-  //EXPECT_EQ("", output.str());
+  // output.str("");
+  // domain_fail_namespace::domain_fail domain_fail_model(data_var_context,
+  // &output); EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g),
+  // std::domain_error); EXPECT_EQ("", output.str());
 }

@@ -411,7 +411,7 @@ TEST(parserReservedWords, reinterpret_cast) {
               "Variable identifier (name) may not be reserved word");
 }
 
-TEST(parserReservedWords, return) {
+TEST(parserReservedWords, return ) {
   test_throws("reserved/return",
               "Variable identifier (name) may not be reserved word");
 }

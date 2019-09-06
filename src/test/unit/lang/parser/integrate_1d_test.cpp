@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/lang/utility.hpp>
 
-TEST(lang_parser, integrate_1d_good) {
-  test_parsable("integrate_1d_good");
-}
+TEST(lang_parser, integrate_1d_good) { test_parsable("integrate_1d_good"); }
 TEST(lang_parser, integrate_1d_bad) {
   test_throws("integrate_1d/bad_fun_sig",
               "first argument to integrate_1d must be the name"
@@ -38,4 +36,3 @@ TEST(lang_parser, integrate_1d_bad) {
               "integrated function may not be an _rng function,"
               " found function name: normal_rng");
 }
-

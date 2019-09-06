@@ -37,8 +37,8 @@ void generate_param_var(const block_var_decl &var_decl, bool gen_decl_stmt,
   std::string constrain_str = write_constraints_fn(btype, "constrain");
   // lp__ is single or last arg to write_constraints_fn
   std::string lp_arg("lp__)");
-  if (btype.has_def_bounds() || btype.has_def_offset_multiplier() ||
-      !btype.bare_type().is_double_type())
+  if (btype.has_def_bounds() || btype.has_def_offset_multiplier()
+      || !btype.bare_type().is_double_type())
     lp_arg = ", lp__)";
 
   // declare

@@ -27,8 +27,11 @@ TEST(langGenerator, sliceIndexes) {
 
   std::stringstream o;
   stan::lang::generate_idxs(is, o);
-  EXPECT_EQ("stan::model::cons_list(stan::model::index_uni(3), stan::model::cons_list(stan::model::index_max(5), stan::model::nil_index_list()))",
-            o.str());
+  EXPECT_EQ(
+      "stan::model::cons_list(stan::model::index_uni(3), "
+      "stan::model::cons_list(stan::model::index_max(5), "
+      "stan::model::nil_index_list()))",
+      o.str());
 }
 
 TEST(langGenerator, slicedAssigns) {
@@ -60,6 +63,8 @@ TEST(langGenerator, slicedAssigns) {
 
   std::stringstream o;
   generate_statement(s, 2, o);
-  EXPECT_TRUE(0U < o.str().find(
-      "stan::model::cons_list(stan::model::index_uni(3), stan::model::cons_list(stan::model::index_max(5), stan::model::nil_index_list()))"));
+  EXPECT_TRUE(0U
+              < o.str().find("stan::model::cons_list(stan::model::index_uni(3),"
+                             " stan::model::cons_list(stan::model::index_max(5)"
+                             ", stan::model::nil_index_list()))"));
 }

@@ -9,8 +9,7 @@ TEST(langParser, functionSigErrorsFunUnknown) {
 }
 TEST(langParser, functionSigErrorsFunKnown) {
   test_throws("signature_function_known",
-              "No matches for:",
-              "bernoulli_logit_log(vector, vector)",
+              "No matches for:", "bernoulli_logit_log(vector, vector)",
               "Available argument signatures for bernoulli_logit_log:");
 }
 TEST(langParser, functionSigErrorsSampUnknown) {
@@ -20,18 +19,19 @@ TEST(langParser, functionSigErrorsSampUnknown) {
 }
 TEST(langParser, functionSigErrorsSampKnown) {
   test_throws("signature_sampling_known",
-              "No matches for:",
-              "vector ~ bernoulli_logit(vector)",
+              "No matches for:", "vector ~ bernoulli_logit(vector)",
               "Available argument signatures for bernoulli_logit:");
 }
 TEST(langParser, functionSigErrorsMultiDef) {
   test_parsable("multiple_funs");
-  test_throws("multi_fun",
-              "Function already defined, name=foo");
+  test_throws("multi_fun", "Function already defined, name=foo");
 }
 TEST(langParser, functionSigErrorsFactorial) {
-  EXPECT_THROW(is_parsable("src/test/test-models/bad/function-signatures/falling_factorial.stan"),
-                           std::invalid_argument);
-  EXPECT_THROW(is_parsable("src/test/test-models/bad/function-signatures/rising_factorial.stan"),
-                           std::invalid_argument);
-}  
+  EXPECT_THROW(is_parsable("src/test/test-models/bad/function-signatures/"
+                           "falling_factorial.stan"),
+               std::invalid_argument);
+  EXPECT_THROW(
+      is_parsable(
+          "src/test/test-models/bad/function-signatures/rising_factorial.stan"),
+      std::invalid_argument);
+}

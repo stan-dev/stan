@@ -2,29 +2,22 @@
 #define STAN_MCMC_BASE_ADAPTER_HPP
 
 namespace stan {
-  namespace mcmc {
+namespace mcmc {
 
-    class base_adapter {
-    public:
-      base_adapter()
-        : adapt_flag_(false) {}
+class base_adapter {
+ public:
+  base_adapter() : adapt_flag_(false) {}
 
-      virtual void engage_adaptation() {
-        adapt_flag_ = true;
-      }
+  virtual void engage_adaptation() { adapt_flag_ = true; }
 
-      virtual void disengage_adaptation() {
-        adapt_flag_ = false;
-      }
+  virtual void disengage_adaptation() { adapt_flag_ = false; }
 
-      bool adapting() {
-        return adapt_flag_;
-      }
+  bool adapting() { return adapt_flag_; }
 
-    protected:
-      bool adapt_flag_;
-    };
+ protected:
+  bool adapt_flag_;
+};
 
-  }  // mcmc
-}  // stan
+}  // namespace mcmc
+}  // namespace stan
 #endif

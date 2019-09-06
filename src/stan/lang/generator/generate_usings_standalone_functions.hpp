@@ -8,22 +8,22 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the using statements for a Stan standalone functions file.
-     *
-     * @param[in,out] o stream for generating
-     */
-    void generate_usings_standalone_functions(std::ostream& o) {
-      generate_using("std::istream", o);
-      generate_using("std::string", o);
-      generate_using("std::stringstream", o);
-      generate_using("std::vector", o);
-      generate_using_namespace("stan::math", o);
-      o << EOL;
-    }
-
-  }
+/**
+ * Generate the using statements for a Stan standalone functions file.
+ *
+ * @param[in,out] o stream for generating
+ */
+void generate_usings_standalone_functions(std::ostream& o) {
+  generate_using("std::istream", o);
+  generate_using("std::string", o);
+  generate_using("std::stringstream", o);
+  generate_using("std::vector", o);
+  generate_using_namespace("stan::math", o);
+  o << EOL;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 #include <stan/callbacks/logger.hpp>
 
-class StanInterfaceCallbacksLogger: public ::testing::Test {
-public:
-  void SetUp() { }
-  void TearDown() { }
+class StanInterfaceCallbacksLogger : public ::testing::Test {
+ public:
+  void SetUp() {}
+  void TearDown() {}
   stan::callbacks::logger logger;
 };
 

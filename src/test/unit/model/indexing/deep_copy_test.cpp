@@ -20,7 +20,7 @@ void test_vec() {
 
   // something bigger than size 0
   C v(3);
-  v[0] = 1; 
+  v[0] = 1;
   v[1] = 2;
   v[2] = 3.5;
 
@@ -33,24 +33,20 @@ void test_vec() {
   EXPECT_FLOAT_EQ(v[2], vc[2]);
 
   // modifying copy should not affect original
-  vc[1] = 10;  
+  vc[1] = 10;
   EXPECT_FLOAT_EQ(10, vc[1]);
   EXPECT_FLOAT_EQ(2, v[1]);
 }
 
-TEST(modelIndexingDeepCopy, vectorDouble) {
-  test_vec<Eigen::VectorXd>();
-}
-TEST(modelIndexingDeepCopy, rowVectorDouble) {
-  test_vec<Eigen::RowVectorXd>();
-}
+TEST(modelIndexingDeepCopy, vectorDouble) { test_vec<Eigen::VectorXd>(); }
+TEST(modelIndexingDeepCopy, rowVectorDouble) { test_vec<Eigen::RowVectorXd>(); }
 TEST(modelIndexingDeepCopy, stdVectorDouble) {
   test_vec<std::vector<double> >();
 }
 
 TEST(modelIndexingDeepCopy, matrixDouble) {
-  using stan::model::deep_copy;
   using Eigen::MatrixXd;
+  using stan::model::deep_copy;
 
   // first test size 0
   MatrixXd a(0, 0);
@@ -68,20 +64,18 @@ TEST(modelIndexingDeepCopy, matrixDouble) {
     for (int i = 0; i < b.rows(); ++i)
       EXPECT_FLOAT_EQ(b(i, j), bc(i, j));
 
-
   // modifying copy should not affect original
   bc(0, 1) = 110;
   EXPECT_FLOAT_EQ(110, bc(0, 1));
   EXPECT_FLOAT_EQ(2, b(0, 1));
 }
 
-
 TEST(modelIndexingDeepCopy, stdVectorStdVectorDouble) {
   using stan::model::deep_copy;
   using std::vector;
   typedef vector<double> doubles_t;
   typedef vector<doubles_t> doubless_t;
-  
+
   doubles_t a1;
   doubles_t a2;
   for (size_t i = 0; i < 3; ++i) {
@@ -91,7 +85,6 @@ TEST(modelIndexingDeepCopy, stdVectorStdVectorDouble) {
   doubless_t a;
   a.push_back(a1);
   a.push_back(a2);
-  
 
   doubless_t ac = deep_copy(a);
   EXPECT_EQ(a.size(), ac.size());

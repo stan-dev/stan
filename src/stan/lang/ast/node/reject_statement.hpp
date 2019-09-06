@@ -6,31 +6,31 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST node for the reject statement.
-     */
-    struct reject_statement {
-      /**
-       * Construct an empty reject statement.
-       */
-      reject_statement();
+/**
+ * AST node for the reject statement.
+ */
+struct reject_statement {
+  /**
+   * Construct an empty reject statement.
+   */
+  reject_statement();
 
-      /**
-       * Construct a reject statement from the specified sequence of
-       * printable objects.
-       *
-       * @param[in] printables sequence of items to print
-       */
-      reject_statement(const std::vector<printable>& printables);  // NOLINT
+  /**
+   * Construct a reject statement from the specified sequence of
+   * printable objects.
+   *
+   * @param[in] printables sequence of items to print
+   */
+  reject_statement(const std::vector<printable>& printables);  // NOLINT
 
-      /**
-       * Sequence of objects to print in output message.
-       */
-      std::vector<printable> printables_;
-    };
+  /**
+   * Sequence of objects to print in output message.
+   */
+  std::vector<printable> printables_;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

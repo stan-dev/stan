@@ -4,21 +4,22 @@
 #include <sstream>
 
 typedef rosenbrock_model_namespace::rosenbrock_model Model;
-typedef stan::optimization::BFGSMinimizer<stan::optimization::ModelAdaptor<Model>,
-                                          stan::optimization::BFGSUpdate_HInv<> > Optimizer;
+typedef stan::optimization::BFGSMinimizer<
+    stan::optimization::ModelAdaptor<Model>,
+    stan::optimization::BFGSUpdate_HInv<> >
+    Optimizer;
 
 class OptimizationBfgsMinimizer : public testing::Test {
-public:
-  Eigen::Matrix<double,Eigen::Dynamic,1> cont_vector;
+ public:
+  Eigen::Matrix<double, Eigen::Dynamic, 1> cont_vector;
   std::vector<int> disc_vector;
 
   void SetUp() {
     cont_vector.resize(2);
-    cont_vector[0] = -1; cont_vector[1] = 1;
-
+    cont_vector[0] = -1;
+    cont_vector[1] = 1;
   }
 };
-
 
 TEST_F(OptimizationBfgsMinimizer, constructor) {
   static const std::string DATA("");
@@ -320,12 +321,19 @@ TEST_F(OptimizationBfgsMinimizer, get_code_string) {
   bfgs.initialize(cont_vector);
 
   EXPECT_TRUE(bfgs.get_code_string(0) == "Successful step completed");
-  EXPECT_TRUE(bfgs.get_code_string(10) == "Convergence detected: absolute parameter change was below tolerance");
+  EXPECT_TRUE(
+      bfgs.get_code_string(10)
+      == "Convergence detected: absolute parameter change was below tolerance");
   EXPECT_TRUE(bfgs.get_code_string(20) == "Convergence detected: absolute change in objective function was below tolerance");
   EXPECT_TRUE(bfgs.get_code_string(21) == "Convergence detected: relative change in objective function was below tolerance");
-  EXPECT_TRUE(bfgs.get_code_string(30) == "Convergence detected: gradient norm is below tolerance");
-  EXPECT_TRUE(bfgs.get_code_string(31) == "Convergence detected: relative gradient magnitude is below tolerance");
-  EXPECT_TRUE(bfgs.get_code_string(40) == "Maximum number of iterations hit, may not be at an optima");
+  EXPECT_TRUE(bfgs.get_code_string(30)
+              == "Convergence detected: gradient norm is below tolerance");
+  EXPECT_TRUE(
+      bfgs.get_code_string(31)
+      == "Convergence detected: relative gradient magnitude is below "
+         "tolerance");
+  EXPECT_TRUE(bfgs.get_code_string(40)
+              == "Maximum number of iterations hit, may not be at an optima");
   EXPECT_TRUE(bfgs.get_code_string(-1) == "Line search failed to achieve a sufficient decrease, no more progress can be made");
   EXPECT_TRUE(bfgs.get_code_string(42) == "Unknown termination code");
   EXPECT_TRUE(bfgs.get_code_string(32) == "Unknown termination code");
@@ -346,7 +354,7 @@ TEST_F(OptimizationBfgsMinimizer, initialize) {
   EXPECT_FLOAT_EQ(bfgs.curr_x().size(), 0);
   EXPECT_FLOAT_EQ(bfgs.curr_p().size(), 0);
   EXPECT_FLOAT_EQ(bfgs.curr_g().size(), 0);
-  
+
   bfgs.initialize(cont_vector);
   EXPECT_FLOAT_EQ(bfgs.curr_x().size(), 2);
   EXPECT_FLOAT_EQ(bfgs.curr_x()[0], -1);

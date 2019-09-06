@@ -4,18 +4,18 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Returns true if the specified suffix appears at the end of the
-     * specified string.
-     *
-     * @param suffix suffix to test
-     * @param s string in which to search
-     * @return true if the string ends with the suffix
-     */
-    bool ends_with(const std::string& suffix, const std::string& s);
+/**
+ * Returns true if the specified suffix appears at the end of the
+ * specified string.
+ *
+ * @param suffix suffix to test
+ * @param s string in which to search
+ * @return true if the string ends with the suffix
+ */
+bool ends_with(const std::string& suffix, const std::string& s);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

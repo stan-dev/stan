@@ -16,34 +16,29 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    struct test_functions_grammar
-      : boost::spirit::qi::grammar<Iterator,
-                                   std::vector<function_decl_def>(),
-                                   whitespace_grammar<Iterator> > {
-      const io::program_reader& reader_;
-      variable_map var_map_;
-      std::set<std::pair<std::string,
-                         function_signature_t> > functions_declared_;
-      std::set<std::pair<std::string,
-                         function_signature_t> > functions_defined_;
-      std::stringstream& error_msgs_;
-      statement_grammar<Iterator> statement_g;
-      bare_type_grammar<Iterator> bare_type_g;
-      functions_grammar<Iterator> functions_g;
+template <typename Iterator>
+struct test_functions_grammar
+    : boost::spirit::qi::grammar<Iterator, std::vector<function_decl_def>(),
+                                 whitespace_grammar<Iterator> > {
+  const io::program_reader& reader_;
+  variable_map var_map_;
+  std::set<std::pair<std::string, function_signature_t> > functions_declared_;
+  std::set<std::pair<std::string, function_signature_t> > functions_defined_;
+  std::stringstream& error_msgs_;
+  statement_grammar<Iterator> statement_g;
+  bare_type_grammar<Iterator> bare_type_g;
+  functions_grammar<Iterator> functions_g;
 
-      test_functions_grammar(const io::program_reader& reader,
-                                   variable_map& var_map,
-                                   std::stringstream& error_msgs);
+  test_functions_grammar(const io::program_reader& reader,
+                         variable_map& var_map, std::stringstream& error_msgs);
 
-      boost::spirit::qi::rule<Iterator,
-                              std::vector<function_decl_def>(),
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, std::vector<function_decl_def>(),
+                          whitespace_grammar<Iterator> >
       test_functions_r;
-    };
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif
