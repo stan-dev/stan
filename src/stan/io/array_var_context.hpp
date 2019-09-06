@@ -1,8 +1,8 @@
 #ifndef STAN_IO_ARRAY_VAR_CONTEXT_HPP
 #define STAN_IO_ARRAY_VAR_CONTEXT_HPP
 
+#include <stan/math.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/math/prim/meta.hpp>
 #include <boost/throw_exception.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <map>
@@ -71,30 +71,20 @@ class array_var_context : public var_context {
     }
     std::vector<size_t> elem_dims_total(dims.size() + 1);
     elem_dims_total[0] = 0;
-    std::transform(
-        dims.begin(), dims.end(), elem_dims_total.begin() + 1, [](auto&& x) {
-          return std::accumulate(x.begin(), x.end(), 1, std::multiplies<T>());
-        });
-    auto total
-        = std::accumulate(elem_dims_total.begin(), elem_dims_total.end(), 0);
-    if (total > array_size) {
+    int i = 0;
+    for (i = 0; i < dims.size(); i++) {
+      elem_dims_total[i + 1] = std::accumulate(dims[i].begin(), dims[i].end(),
+                                               1, std::multiplies<T>());
+      elem_dims_total[i + 1] += elem_dims_total[i];
+    }
+    if (elem_dims_total[i] > array_size) {
       std::stringstream msg;
       msg << "array is not long enough for all elements: " << array_size
-          << " is found, but " << total << " is needed.";
+          << " is found, but " << elem_dims_total[i] << " is needed.";
       BOOST_THROW_EXCEPTION(std::invalid_argument(msg.str()));
     }
-    std::vector<size_t> array_end_vec(elem_dims_total.size());
-    std::partial_sum(elem_dims_total.begin(), elem_dims_total.end(),
-                     array_end_vec.begin());
-    return array_end_vec;
+    return elem_dims_total;
   }
-
-  // FIXME(Steve): This is just here till the math submodule is updated
-  template <typename T>
-  using is_vector_floating_point = std::integral_constant<
-      bool, is_vector<std::decay_t<T>>::value
-                && std::is_floating_point<
-                    typename scalar_type<std::decay_t<T>>::type>::value>;
 
   /**
    * Adds a set of floating point variables to the floating point map.
@@ -103,15 +93,26 @@ class array_var_context : public var_context {
    * column major order container.
    * @param dims the dimensions for each variable.
    */
-  template <typename T, std::enable_if_t<is_vector_floating_point<T>::value>...>
-  void add_r(const std::vector<std::string>& names, T&& values,
+  void add_r(const std::vector<std::string>& names,
+             const std::vector<double>& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     using val_d_t = decltype(values.data());
     for (size_t i = 0; i < names.size(); i++) {
       vars_r_[names[i]]
-          = {{std::forward<val_d_t>(values.data()) + dim_vec[i],
-              std::forward<val_d_t>(values.data()) + dim_vec[i + 1]},
+          = {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]},
+             dims[i]};
+    }
+  }
+
+  void add_r(const std::vector<std::string>& names,
+             const Eigen::VectorXd& values,
+             const std::vector<std::vector<size_t>>& dims) {
+    std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
+    using val_d_t = decltype(values.data());
+    for (size_t i = 0; i < names.size(); i++) {
+      vars_r_[names[i]]
+          = {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]},
              dims[i]};
     }
   }
@@ -141,11 +142,18 @@ class array_var_context : public var_context {
    * @param values_r a vector of double values for all elements
    * @param dim_r   a vector of dimensions
    */
-  template <typename T, std::enable_if_t<is_vector_floating_point<T>::value>...>
-  array_var_context(const std::vector<std::string>& names_r, T&& values_r,
+  array_var_context(const std::vector<std::string>& names_r,
+                    const std::vector<double>& values_r,
                     const std::vector<std::vector<size_t>>& dim_r)
       : vars_r_(names_r.size()) {
-    add_r(names_r, std::forward<T>(values_r), dim_r);
+    add_r(names_r, values_r, dim_r);
+  }
+
+  array_var_context(const std::vector<std::string>& names_r,
+                    const Eigen::VectorXd& values_r,
+                    const std::vector<std::vector<size_t>>& dim_r)
+      : vars_r_(names_r.size()) {
+    add_r(names_r, values_r, dim_r);
   }
 
   /**
@@ -167,15 +175,26 @@ class array_var_context : public var_context {
    * and integer separately
    *
    */
-  template <typename T, std::enable_if_t<is_vector_floating_point<T>::value>...>
-  array_var_context(const std::vector<std::string>& names_r, T&& values_r,
+  array_var_context(const std::vector<std::string>& names_r,
+                    const std::vector<double>& values_r,
                     const std::vector<std::vector<size_t>>& dim_r,
                     const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
                     const std::vector<std::vector<size_t>>& dim_i)
       : vars_i_(names_i.size()), vars_r_(names_r.size()) {
     add_i(names_i, values_i, dim_i);
-    add_r(names_r, std::forward<T>(values_r), dim_r);
+    add_r(names_r, values_r, dim_r);
+  }
+
+  array_var_context(const std::vector<std::string>& names_r,
+                    const Eigen::VectorXd& values_r,
+                    const std::vector<std::vector<size_t>>& dim_r,
+                    const std::vector<std::string>& names_i,
+                    const std::vector<int>& values_i,
+                    const std::vector<std::vector<size_t>>& dim_i)
+      : vars_i_(names_i.size()), vars_r_(names_r.size()) {
+    add_i(names_i, values_i, dim_i);
+    add_r(names_r, values_r, dim_r);
   }
 
   /**
