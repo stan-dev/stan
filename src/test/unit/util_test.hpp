@@ -2,6 +2,7 @@
 #include <test/unit/util.hpp>
 
 TEST(TestUnitUtil, streams) {
+
   std::cout << "foo";
   std::cerr << "bar";
   stan::test::capture_std_streams();
@@ -11,4 +12,4 @@ TEST(TestUnitUtil, streams) {
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());
   EXPECT_EQ("", stan::test::cerr_ss.str());
-}
+}  

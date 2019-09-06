@@ -21,13 +21,12 @@ namespace io {
  *
  * @tparam T Basic scalar type.
  */
-template <typename T>
-class writer {
- private:
+template <typename T> class writer {
+private:
   std::vector<T> data_r_;
   std::vector<int> data_i_;
 
- public:
+public:
   typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
   typedef Eigen::Matrix<T, Eigen::Dynamic, 1> vector_t;
   typedef Eigen::Matrix<T, 1, Eigen::Dynamic> row_vector_t;
@@ -418,8 +417,8 @@ class writer {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
 
     // FIXME:  optimize by unrolling cholesky_factor_free
-    Eigen::Matrix<T, Eigen::Dynamic, 1> y_free
-        = stan::math::cholesky_factor_free(y);
+    Eigen::Matrix<T, Eigen::Dynamic, 1> y_free =
+        stan::math::cholesky_factor_free(y);
     for (idx_t i = 0; i < y_free.size(); ++i)
       data_r_.push_back(y_free[i]);
   }
@@ -439,8 +438,8 @@ class writer {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
 
     // FIXME:  optimize by unrolling cholesky_factor_free
-    Eigen::Matrix<T, Eigen::Dynamic, 1> y_free
-        = stan::math::cholesky_corr_free(y);
+    Eigen::Matrix<T, Eigen::Dynamic, 1> y_free =
+        stan::math::cholesky_corr_free(y);
     for (idx_t i = 0; i < y_free.size(); ++i)
       data_r_.push_back(y_free[i]);
   }
@@ -460,9 +459,8 @@ class writer {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
     idx_t k = y.rows();
     if (k == 0 || y.cols() != k)
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("y must have elements and"
-                             " y must be a square matrix"));
+      BOOST_THROW_EXCEPTION(std::runtime_error("y must have elements and"
+                                               " y must be a square matrix"));
     vector_t L_vec = stan::math::cov_matrix_free(y);
     int i = 0;
     for (idx_t m = 0; m < k; ++m) {

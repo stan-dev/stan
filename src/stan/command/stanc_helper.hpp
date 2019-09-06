@@ -19,10 +19,14 @@
  * @param[in,out] out_stream stream to which version is written.
  */
 inline void print_version(std::ostream* out_stream) {
-  if (!out_stream)
-    return;
-  *out_stream << "stanc version " << stan::MAJOR_VERSION << "."
-              << stan::MINOR_VERSION << "." << stan::PATCH_VERSION << std::endl;
+  if (!out_stream) return;
+  *out_stream << "stanc version "
+              << stan::MAJOR_VERSION
+              << "."
+              << stan::MINOR_VERSION
+              << "."
+              << stan::PATCH_VERSION
+              << std::endl;
 }
 
 /**
@@ -33,15 +37,13 @@ inline void print_version(std::ostream* out_stream) {
 inline void print_stanc_help(std::ostream* out_stream) {
   using stan::io::print_help_option;
 
-  if (!out_stream)
-    return;
+  if (!out_stream) return;
 
   *out_stream << std::endl;
   print_version(out_stream);
   *out_stream << std::endl;
 
-  *out_stream << "USAGE:  "
-              << "stanc [options] <model_file>" << std::endl;
+  *out_stream << "USAGE:  " << "stanc [options] <model_file>" << std::endl;
   *out_stream << std::endl;
 
   *out_stream << "OPTIONS:" << std::endl;
@@ -51,7 +53,8 @@ inline void print_stanc_help(std::ostream* out_stream) {
 
   print_help_option(out_stream, "version", "", "Display stanc version number");
 
-  print_help_option(out_stream, "name", "string", "Model name",
+  print_help_option(out_stream, "name", "string",
+                    "Model name",
                     "default = \"$model_filename_model\"");
 
   print_help_option(out_stream, "o", "file",
@@ -83,7 +86,8 @@ inline void delete_file(std::ostream* err_stream,
   int return_code = std::remove(file_name.c_str());
   if (return_code != 0)
     if (err_stream)
-      *err_stream << "Could not remove output file=" << file_name << std::endl;
+      *err_stream << "Could not remove output file=" << file_name
+                  << std::endl;
 }
 
 /**
@@ -104,9 +108,10 @@ inline std::string identifier_from_file_name(const std::string& in_file_name) {
   } else {
     slashInd++;
   }
-  std::string result = in_file_name.substr(slashInd, ptInd - slashInd);
-  for (std::string::iterator strIt = result.begin(); strIt != result.end();
-       strIt++) {
+  std::string result =
+    in_file_name.substr(slashInd, ptInd - slashInd);
+  for (std::string::iterator strIt = result.begin();
+       strIt != result.end(); strIt++) {
     if (!isalnum(*strIt) && *strIt != '_') {
       *strIt = '_';
     }
@@ -114,6 +119,7 @@ inline std::string identifier_from_file_name(const std::string& in_file_name) {
 
   return result;
 }
+
 
 /**
  * Check whether a given file has the specified extension.
@@ -125,9 +131,8 @@ inline std::string identifier_from_file_name(const std::string& in_file_name) {
 inline bool has_extension(const std::string& file_name,
                           const std::string& extension) {
   if (file_name.length() >= extension.length() + 1) {  // +1 for the dot
-    if (0
-            == file_name.compare(file_name.length() - extension.length(),
-                                 extension.length(), extension)
+    if (0 == file_name.compare (file_name.length() - extension.length(),
+                                extension.length(), extension)
         && file_name[file_name.length() - extension.length() - 1] == '.')
       return true;
     else
@@ -176,9 +181,12 @@ inline void check_identifier(const std::string& identifier,
  * written
  * @return return code
  */
-inline int stanc_helper(int argc, const char* argv[], std::ostream* out_stream,
-                        std::ostream* err_stream) {
-  enum CompilationType { kModel, kStandaloneFunctions };
+inline int stanc_helper(int argc, const char* argv[],
+                        std::ostream* out_stream, std::ostream* err_stream) {
+  enum CompilationType {
+    kModel,
+    kStandaloneFunctions
+  };
   static const int SUCCESS_RC = 0;
   static const int EXCEPTION_RC = -1;
   static const int PARSE_FAIL_RC = -2;
@@ -216,7 +224,8 @@ inline int stanc_helper(int argc, const char* argv[], std::ostream* out_stream,
     std::ifstream in(in_file_name.c_str());
     if (!in.is_open()) {
       std::stringstream msg;
-      msg << "Failed to open model file " << in_file_name.c_str();
+      msg << "Failed to open model file "
+          <<  in_file_name.c_str();
       throw std::invalid_argument(msg.str());
     }
 
@@ -230,12 +239,15 @@ inline int stanc_helper(int argc, const char* argv[], std::ostream* out_stream,
       // extra_path_els is given explicitly so that multiple quote
       // characters (in this case single and double quotes) can be
       // used.
-      boost::escaped_list_separator<char> extra_path_els("\\", ",", "\"'");
+      boost::escaped_list_separator<char> extra_path_els("\\",
+                                                         ",",
+                                                         "\"'");
 
-      boost::tokenizer<boost::escaped_list_separator<char> >
-          extra_path_tokenizer(extra_path_str, extra_path_els);
+      boost::tokenizer<
+        boost::escaped_list_separator<char>
+        > extra_path_tokenizer(extra_path_str, extra_path_els);
 
-      for (const auto& inc_path : extra_path_tokenizer) {
+      for (const auto & inc_path : extra_path_tokenizer) {
         if (!inc_path.empty()) {
           include_paths.push_back(inc_path);
         }
@@ -247,95 +259,96 @@ inline int stanc_helper(int argc, const char* argv[], std::ostream* out_stream,
     bool valid_input = false;
 
     switch (compilation_type) {
-      case kModel: {
-        std::string model_name;
-        if (cmd.has_key("name")) {
-          cmd.val("name", model_name);
-        } else {
-          model_name = identifier_from_file_name(in_file_name) + "_model";
-        }
-
-        // TODO(martincerny) Check that the -namespace flag is not set
-
-        if (cmd.has_key("o")) {
-          cmd.val("o", out_file_name);
-        } else {
-          out_file_name = model_name;
-          // TODO(carpenter): shouldn't this be .hpp without a main()?
-          out_file_name += ".cpp";
-        }
-
-        check_identifier(model_name, "model_name");
-
-        std::fstream out(out_file_name.c_str(), std::fstream::out);
-        if (out_stream) {
-          *out_stream << "Model name=" << model_name << std::endl;
-          *out_stream << "Input file=" << in_file_name << std::endl;
-          *out_stream << "Output file=" << out_file_name << std::endl;
-        }
-        if (!out.is_open()) {
-          std::stringstream msg;
-          msg << "Failed to open output file " << out_file_name.c_str();
-          throw std::invalid_argument(msg.str());
-        }
-
-        valid_input
-            = stan::lang::compile(err_stream, in, out, model_name,
-                                  allow_undefined, in_file_name, include_paths);
-        out.close();
-        break;
+    case kModel: {
+      std::string model_name;
+      if (cmd.has_key("name")) {
+        cmd.val("name", model_name);
+      } else {
+        model_name = identifier_from_file_name(in_file_name) + "_model";
       }
-      case kStandaloneFunctions: {
-        if (cmd.has_key("o")) {
-          cmd.val("o", out_file_name);
-        } else {
-          out_file_name = identifier_from_file_name(in_file_name);
-          out_file_name += ".hpp";
-        }
 
-        // TODO(martincerny) Allow multiple namespaces
-        // (split namespace argument by "::")
-        std::vector<std::string> namespaces;
-        if (cmd.has_key("namespace")) {
-          std::string ns;
-          cmd.val("namespace", ns);
-          namespaces.push_back(ns);
-        } else {
-          namespaces.push_back(identifier_from_file_name(in_file_name)
-                               + "_functions");
-        }
+      // TODO(martincerny) Check that the -namespace flag is not set
 
-        // TODO(martincerny) Check that the -name flag is not set
-
-        for (size_t namespace_i = 0; namespace_i < namespaces.size();
-             ++namespace_i) {
-          check_identifier(namespaces[namespace_i], "namespace");
-        }
-
-        std::fstream out(out_file_name.c_str(), std::fstream::out);
-        if (out_stream) {
-          *out_stream << "Parsing a fuctions-only file" << std::endl;
-
-          *out_stream << "Target namespace= ";
-          for (size_t namespace_i = 0; namespace_i < namespaces.size();
-               ++namespace_i) {
-            *out_stream << "::" << namespaces[namespace_i];
-          }
-          *out_stream << std::endl;
-
-          *out_stream << "Input file=" << in_file_name << std::endl;
-          *out_stream << "Output file=" << out_file_name << std::endl;
-        }
-
-        valid_input = stan::lang::compile_functions(
-            err_stream, in, out, namespaces, allow_undefined);
-
-        out.close();
-        break;
+      if (cmd.has_key("o")) {
+        cmd.val("o", out_file_name);
+      } else {
+        out_file_name = model_name;
+        // TODO(carpenter): shouldn't this be .hpp without a main()?
+        out_file_name += ".cpp";
       }
-      default: {
-        assert(false);
+
+      check_identifier(model_name, "model_name");
+
+      std::fstream out(out_file_name.c_str(), std::fstream::out);
+      if (out_stream) {
+        *out_stream << "Model name=" << model_name << std::endl;
+        *out_stream << "Input file=" << in_file_name << std::endl;
+        *out_stream << "Output file=" << out_file_name << std::endl;
       }
+      if (!out.is_open()) {
+        std::stringstream msg;
+        msg << "Failed to open output file "
+            <<  out_file_name.c_str();
+        throw std::invalid_argument(msg.str());
+      }
+
+      valid_input = stan::lang::compile(err_stream, in, out, model_name,
+                                        allow_undefined, in_file_name,
+                                        include_paths);
+      out.close();
+      break;
+    }
+    case kStandaloneFunctions: {
+      if (cmd.has_key("o")) {
+        cmd.val("o", out_file_name);
+      } else {
+        out_file_name = identifier_from_file_name(in_file_name);
+        out_file_name += ".hpp";
+      }
+
+      // TODO(martincerny) Allow multiple namespaces
+      // (split namespace argument by "::")
+      std::vector<std::string> namespaces;
+      if (cmd.has_key("namespace")) {
+        std::string ns;
+        cmd.val("namespace", ns);
+        namespaces.push_back(ns);
+      } else {
+        namespaces.push_back(identifier_from_file_name(in_file_name)
+                             + "_functions");
+      }
+
+      // TODO(martincerny) Check that the -name flag is not set
+
+      for (size_t namespace_i = 0;
+           namespace_i < namespaces.size(); ++namespace_i) {
+        check_identifier(namespaces[namespace_i], "namespace");
+      }
+
+      std::fstream out(out_file_name.c_str(), std::fstream::out);
+      if (out_stream) {
+        *out_stream << "Parsing a fuctions-only file" << std::endl;
+
+        *out_stream << "Target namespace= ";
+        for (size_t namespace_i = 0;
+             namespace_i < namespaces.size(); ++namespace_i) {
+          *out_stream << "::" << namespaces[namespace_i];
+        }
+        *out_stream << std::endl;
+
+        *out_stream << "Input file=" << in_file_name << std::endl;
+        *out_stream << "Output file=" << out_file_name << std::endl;
+      }
+
+      valid_input = stan::lang::compile_functions(err_stream, in, out,
+                                                  namespaces, allow_undefined);
+
+      out.close();
+      break;
+    }
+    default: {
+      assert(false);
+    }
     }
 
     if (!valid_input) {
@@ -347,13 +360,17 @@ inline int stanc_helper(int argc, const char* argv[], std::ostream* out_stream,
     }
   } catch (const std::invalid_argument& e) {
     if (err_stream) {
-      *err_stream << std::endl << e.what() << std::endl;
+      *err_stream << std::endl
+                  << e.what()
+                  << std::endl;
       delete_file(out_stream, out_file_name);
     }
     return INVALID_ARGUMENT_RC;
   } catch (const std::exception& e) {
     if (err_stream) {
-      *err_stream << std::endl << e.what() << std::endl;
+      *err_stream << std::endl
+                  << e.what()
+                  << std::endl;
     }
     delete_file(out_stream, out_file_name);
     return EXCEPTION_RC;

@@ -11,18 +11,18 @@
 typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
-namespace mcmc {
-// Mock Static HMC
-class mock_static_uniform
-    : public base_static_uniform<mock_model, mock_hamiltonian, mock_integrator,
-                                 rng_t> {
- public:
-  mock_static_uniform(const mock_model& m, rng_t& rng)
-      : base_static_uniform<mock_model, mock_hamiltonian, mock_integrator,
-                            rng_t>(m, rng) {}
-};
-}  // namespace mcmc
-}  // namespace stan
+  namespace mcmc {
+    // Mock Static HMC
+    class mock_static_uniform:
+      public base_static_uniform<mock_model, mock_hamiltonian,
+                                 mock_integrator, rng_t> {
+    public:
+      mock_static_uniform(const mock_model &m, rng_t& rng):
+        base_static_uniform<mock_model, mock_hamiltonian,
+                            mock_integrator, rng_t>(m, rng) { }
+    };
+  }
+}
 
 TEST(McmcBaseStaticUniform, set_nominal_stepsize) {
   rng_t base_rng(0);
@@ -45,6 +45,7 @@ TEST(McmcBaseStaticUniform, set_nominal_stepsize) {
 }
 
 TEST(McmcBaseStaticUniform, set_T) {
+
   rng_t base_rng(0);
 
   std::vector<double> q(5, 1.0);
@@ -65,6 +66,7 @@ TEST(McmcBaseStaticUniform, set_T) {
 }
 
 TEST(McmcBaseStaticUniform, set_nominal_stepsize_and_T) {
+
   rng_t base_rng(0);
 
   std::vector<double> q(5, 1.0);
@@ -92,6 +94,7 @@ TEST(McmcBaseStaticUniform, set_nominal_stepsize_and_T) {
 }
 
 TEST(McmcBaseStaticUniform, set_nominal_stepsize_and_L) {
+
   rng_t base_rng(0);
 
   std::vector<double> q(5, 1.0);

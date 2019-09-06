@@ -12,6 +12,7 @@
 typedef boost::ecuyer1988 rng_t;
 
 TEST(McmcDerivedNutsClassic, compute_criterion_unit_e) {
+
   rng_t base_rng(0);
 
   int model_size = 1;
@@ -21,8 +22,8 @@ TEST(McmcDerivedNutsClassic, compute_criterion_unit_e) {
   Eigen::VectorXd rho(model_size);
 
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::unit_e_nuts_classic<stan::mcmc::mock_model, rng_t> sampler(
-      model, base_rng);
+  stan::mcmc::unit_e_nuts_classic<stan::mcmc::mock_model, rng_t>
+    sampler(model, base_rng);
 
   start.q(0) = 1;
   start.p(0) = 1;
@@ -43,9 +44,11 @@ TEST(McmcDerivedNutsClassic, compute_criterion_unit_e) {
   rho = start.p + finish.p;
 
   EXPECT_FALSE(sampler.compute_criterion(start, finish, rho));
+
 }
 
 TEST(McmcDerivedNutsClassic, compute_criterion_diag_e) {
+
   rng_t base_rng(0);
 
   int model_size = 1;
@@ -55,8 +58,8 @@ TEST(McmcDerivedNutsClassic, compute_criterion_diag_e) {
   Eigen::VectorXd rho(model_size);
 
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::diag_e_nuts_classic<stan::mcmc::mock_model, rng_t> sampler(
-      model, base_rng);
+  stan::mcmc::diag_e_nuts_classic<stan::mcmc::mock_model, rng_t>
+    sampler(model, base_rng);
 
   start.q(0) = 1;
   start.p(0) = 1;
@@ -80,6 +83,7 @@ TEST(McmcDerivedNutsClassic, compute_criterion_diag_e) {
 }
 
 TEST(McmcDerivedNutsClassic, compute_criterion_dense_e) {
+
   rng_t base_rng(0);
 
   int model_size = 1;
@@ -89,8 +93,8 @@ TEST(McmcDerivedNutsClassic, compute_criterion_dense_e) {
   Eigen::VectorXd rho(model_size);
 
   stan::mcmc::mock_model model(model_size);
-  stan::mcmc::dense_e_nuts_classic<stan::mcmc::mock_model, rng_t> sampler(
-      model, base_rng);
+  stan::mcmc::dense_e_nuts_classic<stan::mcmc::mock_model, rng_t>
+    sampler(model, base_rng);
 
   start.q(0) = 1;
   start.p(0) = 1;
@@ -111,4 +115,5 @@ TEST(McmcDerivedNutsClassic, compute_criterion_dense_e) {
   rho = start.p + finish.p;
 
   EXPECT_FALSE(sampler.compute_criterion(start, finish, rho));
+
 }
