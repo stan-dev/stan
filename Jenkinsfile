@@ -132,7 +132,8 @@ pipeline {
                             echo "Those changes are now found on stan-dev/stan under branch ${branchName()}"
                             echo "Please 'git pull' before continuing to develop."
                             exit 1
-                        fi"""
+                        fi
+                    """
                 }
             }
             post {
