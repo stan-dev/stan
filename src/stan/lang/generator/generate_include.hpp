@@ -7,20 +7,20 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate an include statement for the specified library path.
-     *
-     * @param lib_name path to library
-     * @param o stream for generating
-     */
-    void generate_include(const std::string& lib_name, std::ostream& o) {
-      o << "#include" << " " << "<" << lib_name << ">" << EOL;
-    }
-
-
-
-  }
+/**
+ * Generate an include statement for the specified library path.
+ *
+ * @param lib_name path to library
+ * @param o stream for generating
+ */
+void generate_include(const std::string& lib_name, std::ostream& o) {
+  o << "#include"
+    << " "
+    << "<" << lib_name << ">" << EOL;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

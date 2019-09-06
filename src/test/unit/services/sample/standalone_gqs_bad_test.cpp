@@ -13,18 +13,16 @@
 #include <vector>
 
 class ServicesStandaloneGQ2 : public testing::Test {
-public:
-  ServicesStandaloneGQ2() :
-    logger(logger_ss, logger_ss, logger_ss, logger_ss, logger_ss) {}
+ public:
+  ServicesStandaloneGQ2()
+      : logger(logger_ss, logger_ss, logger_ss, logger_ss, logger_ss) {}
 
   void SetUp() {
     stan::io::empty_var_context context;
     model = new stan_model(context);
   }
 
-  void TearDown() {
-    delete model;
-  }
+  void TearDown() { delete model; }
 
   stan::test::unit::instrumented_interrupt interrupt;
   std::stringstream logger_ss;
@@ -39,16 +37,13 @@ TEST_F(ServicesStandaloneGQ2, no_QoIs) {
   EXPECT_EQ(param_names.size(), 1);
   EXPECT_EQ(param_dimss.size(), 1);
 
-  const Eigen::MatrixXd draws(1,1);
+  const Eigen::MatrixXd draws(1, 1);
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
-  int return_code = stan::services::standalone_generate(*model,
-                                                        draws,
-                                                        12345,
-                                                        interrupt,
-                                                        logger,
-                                                        sample_writer);
+  int return_code = stan::services::standalone_generate(
+      *model, draws, 12345, interrupt, logger, sample_writer);
   EXPECT_EQ(return_code, stan::services::error_codes::CONFIG);
   EXPECT_EQ(count_matches("Model doesn't generate any quantities of interest.",
-                          logger_ss.str()),1);
+                          logger_ss.str()),
+            1);
 }

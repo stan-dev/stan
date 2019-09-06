@@ -17,28 +17,25 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    test_functions_grammar<Iterator>::test_functions_grammar(
-                                            const io::program_reader& reader,
-                                            variable_map& var_map,
-                                            std::stringstream& error_msgs)
-      : test_functions_grammar::base_type(test_functions_r),
-        reader_(reader),
-        var_map_(var_map),
-        functions_declared_(),
-        functions_defined_(),
-        error_msgs_(error_msgs),
-        statement_g(var_map_, error_msgs_),
-        bare_type_g(error_msgs_),
-        functions_g(var_map_, error_msgs_, false) {
-
-      test_functions_r.name("test functions");
-      test_functions_r
-        %= functions_g;
-    }
-
-  }
+template <typename Iterator>
+test_functions_grammar<Iterator>::test_functions_grammar(
+    const io::program_reader& reader, variable_map& var_map,
+    std::stringstream& error_msgs)
+    : test_functions_grammar::base_type(test_functions_r),
+      reader_(reader),
+      var_map_(var_map),
+      functions_declared_(),
+      functions_defined_(),
+      error_msgs_(error_msgs),
+      statement_g(var_map_, error_msgs_),
+      bare_type_g(error_msgs_),
+      functions_g(var_map_, error_msgs_, false) {
+  test_functions_r.name("test functions");
+  test_functions_r %= functions_g;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -4,18 +4,18 @@
 #include <string>
 #include <iostream>
 
+using stan::lang::double_type;
+using stan::lang::expression;
+using stan::lang::ill_formed_type;
+using stan::lang::int_type;
 using stan::lang::local_array_type;
 using stan::lang::local_var_type;
-using stan::lang::double_type;
-using stan::lang::int_type;
-using stan::lang::ill_formed_type;
 using stan::lang::matrix_local_type;
 using stan::lang::row_vector_local_type;
 using stan::lang::vector_local_type;
-using stan::lang::expression;
 
-using stan::lang::int_literal;
 using stan::lang::double_literal;
+using stan::lang::int_literal;
 using stan::lang::write_bare_expr_type;
 
 TEST(localVarType, createDefault) {
@@ -179,7 +179,7 @@ TEST(localVarType, createCopy) {
 TEST(localVarType, createArray) {
   int_type tInt;
   expression e;
-  local_array_type d1(tInt,e);
+  local_array_type d1(tInt, e);
   local_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
@@ -196,7 +196,7 @@ TEST(localVarType, createArray) {
 TEST(localVarType, getArrayElType) {
   int_type tInt;
   expression e;
-  local_array_type d1(tInt,e);
+  local_array_type d1(tInt, e);
   local_var_type x(d1);
   local_var_type y(tInt);
   EXPECT_TRUE(x.is_array_type());
@@ -206,19 +206,18 @@ TEST(localVarType, getArrayElType) {
   std::stringstream ss;
   write_bare_expr_type(ss, z.bare_type());
   EXPECT_EQ("int", ss.str());
-
 }
 
 TEST(localVarType, create2DArray) {
   int_type tInt;
   expression e1;
-  local_array_type d1(tInt,e1);
+  local_array_type d1(tInt, e1);
   local_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 1);
 
   expression e2;
-  local_array_type d2(x,e2);
+  local_array_type d2(x, e2);
   EXPECT_EQ(d2.dims(), 2);
 
   local_var_type y(d2);
@@ -246,13 +245,13 @@ TEST(localVarType, create2DArrayOfMatrices) {
   expression e4;
 
   matrix_local_type tMat(e1, e2);
-  local_array_type d1(tMat,e3);
+  local_array_type d1(tMat, e3);
   local_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_EQ(x.num_dims(), 3);
   EXPECT_EQ(x.array_dims(), 1);
 
-  local_array_type d2(x,e4);
+  local_array_type d2(x, e4);
   EXPECT_EQ(d2.dims(), 2);
 
   local_var_type y(d2);
@@ -265,7 +264,6 @@ TEST(localVarType, create2DArrayOfMatrices) {
   std::stringstream ss;
   write_bare_expr_type(ss, y.bare_type());
   EXPECT_EQ("matrix[ , ]", ss.str());
-
 }
 
 TEST(localVarType, create4DArrayInt) {
@@ -282,7 +280,7 @@ TEST(localVarType, create4DArrayInt) {
   dims.push_back(e3);
   dims.push_back(e4);
 
-  local_array_type d4(tInt,dims);
+  local_array_type d4(tInt, dims);
   local_var_type y(d4);
   EXPECT_TRUE(y.is_array_type());
   EXPECT_TRUE(y.array_contains().bare_type().is_int_type());
@@ -290,7 +288,7 @@ TEST(localVarType, create4DArrayInt) {
 
   std::vector<expression> lens = d4.array_lens();
   EXPECT_EQ(lens.size(), y.array_dims());
-  
+
   std::stringstream ss;
   write_bare_expr_type(ss, y.bare_type());
   EXPECT_EQ("int[ , , , ]", ss.str());

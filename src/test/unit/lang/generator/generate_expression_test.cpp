@@ -23,7 +23,7 @@ TEST(generateExpression, gen_double_lit_expr) {
   stan::lang::expression e1 = dblLit;
   generate_expression(e1, user_facing, msgs);
   EXPECT_EQ(msgs.str(), "5.10");
- }
+}
 
 TEST(generateExpression, row_vector_expr) {
   static const bool user_facing = true;
@@ -40,7 +40,8 @@ TEST(generateExpression, row_vector_expr) {
 
   generate_expression(e2, user_facing, msgs);
   EXPECT_NE(msgs.str().find("stan::math::to_row_vector"), std::string::npos);
-  EXPECT_NE(msgs.str().find("stan::math::array_builder<double"), std::string::npos);
+  EXPECT_NE(msgs.str().find("stan::math::array_builder<double"),
+            std::string::npos);
   EXPECT_NE(msgs.str().find("add(5.1).array()"), std::string::npos);
 }
 
@@ -61,7 +62,10 @@ TEST(generateExpression, matrix_expr) {
 
   generate_expression(e2, user_facing, msgs);
   EXPECT_NE(msgs.str().find("stan::math::to_matrix"), std::string::npos);
-  EXPECT_NE(msgs.str().find("stan::math::array_builder<Eigen::Matrix<double, 1, Eigen::Dynamic>"), std::string::npos);
+  EXPECT_NE(
+      msgs.str().find(
+          "stan::math::array_builder<Eigen::Matrix<double, 1, Eigen::Dynamic>"),
+      std::string::npos);
   EXPECT_NE(msgs.str().find("add(5.1).array()"), std::string::npos);
 }
 
@@ -82,8 +86,10 @@ TEST(generateExpression, array_expr) {
   stan::lang::expression e2 = ar1;
 
   generate_expression(e2, user_facing, msgs);
-  EXPECT_NE(msgs.str().find("static_cast<std::vector<double"), std::string::npos);
-  EXPECT_NE(msgs.str().find("stan::math::array_builder<double"), std::string::npos);
+  EXPECT_NE(msgs.str().find("static_cast<std::vector<double"),
+            std::string::npos);
+  EXPECT_NE(msgs.str().find("stan::math::array_builder<double"),
+            std::string::npos);
   EXPECT_NE(msgs.str().find("add(5.1).array()"), std::string::npos);
 }
 
@@ -92,7 +98,7 @@ TEST(generateExpression, variable_expr) {
   std::stringstream msgs;
 
   stan::lang::matrix_type tMat;
-  stan::lang::bare_array_type d2_ar(tMat,2);
+  stan::lang::bare_array_type d2_ar(tMat, 2);
   stan::lang::bare_expr_type bet(d2_ar);
   stan::lang::variable v("foo");
   v.set_type(bet);
@@ -142,12 +148,11 @@ TEST(generateExpression, algebra_solver) {
             "theta_var_name, x_r_r_var_name, x_i_var_name, pstream__)");
 }
 
-
 TEST(generateExpression, integrate_ode) {
   static const bool user_facing = true;
   std::stringstream msgs;
 
-  stan::lang::integrate_ode so; // null ctor should work and not raise error
+  stan::lang::integrate_ode so;  // null ctor should work and not raise error
 
   std::string integration_function_name = "bar";
   std::string system_function_name = "foo";
@@ -164,14 +169,13 @@ TEST(generateExpression, integrate_ode) {
   stan::lang::variable x_int("x_int_var_name");
   x.set_type(stan::lang::bare_array_type(stan::lang::int_type()));
   stan::lang::integrate_ode so2(integration_function_name, system_function_name,
-                    y0, t0, ts, theta, x, x_int);
+                                y0, t0, ts, theta, x, x_int);
   stan::lang::expression e1(so2);
 
   generate_expression(e1, user_facing, msgs);
   EXPECT_EQ(msgs.str(),
             "bar(foo_functor__(), y0_var_name, t0_var_name, ts_var_name, "
             "theta_var_name, x_var_name, x_int_var_name, pstream__)");
-
 }
 
 TEST(generateExpression, conditional_op) {
@@ -185,12 +189,11 @@ TEST(generateExpression, conditional_op) {
   stan::lang::double_literal b(-2.0);
   b.string_ = "-2.0";
   stan::lang::expression e3(b);
-  stan::lang::expression e4(stan::lang::conditional_op(e1,e2,e3));
+  stan::lang::expression e4(stan::lang::conditional_op(e1, e2, e3));
 
   generate_expression(e4, user_facing, msgs);
   EXPECT_EQ(msgs.str(), "(5 ? 2.0 : -2.0 )");
 }
-
 
 TEST(generateExpression, binary_op) {
   static const bool user_facing = true;
@@ -200,7 +203,7 @@ TEST(generateExpression, binary_op) {
   stan::lang::double_literal b(-2.0);
   b.string_ = "-2.0";
   stan::lang::expression e2(b);
-  stan::lang::expression e3(stan::lang::binary_op(e1,"+",e2));
+  stan::lang::expression e3(stan::lang::binary_op(e1, "+", e2));
 
   generate_expression(e3, user_facing, msgs);
   EXPECT_EQ(msgs.str(), "(5 + -2.0)");
@@ -211,7 +214,7 @@ TEST(generateExpression, unary_op) {
   std::stringstream msgs;
 
   stan::lang::expression e1 = stan::lang::int_literal(5);
-  stan::lang::expression e2(stan::lang::unary_op('-',e1));
+  stan::lang::expression e2(stan::lang::unary_op('-', e1));
 
   generate_expression(e2, user_facing, msgs);
   EXPECT_EQ(msgs.str(), "-(5)");
@@ -242,7 +245,8 @@ TEST(generateExpression, index_op) {
   // result is index into row_vector
   generate_expression(e3, user_facing, msgs);
   EXPECT_NE(msgs.str().find("stan::math::to_row_vector"), std::string::npos);
-  EXPECT_NE(msgs.str().find("stan::math::array_builder<double"), std::string::npos);
+  EXPECT_NE(msgs.str().find("stan::math::array_builder<double"),
+            std::string::npos);
   EXPECT_NE(msgs.str().find("add(5.1).array()"), std::string::npos);
   EXPECT_NE(msgs.str().find("[1]"), std::string::npos);
 }
@@ -262,7 +266,8 @@ TEST(generateExpression, index_op_sliced) {
   idxs.push_back(idx);
 
   // bar is 2-d array of int
-  stan::lang::bare_expr_type d2_ar_int = stan::lang::bare_array_type(stan::lang::int_type(),2);
+  stan::lang::bare_expr_type d2_ar_int
+      = stan::lang::bare_array_type(stan::lang::int_type(), 2);
   stan::lang::variable v2("bar");
   v2.set_type(d2_ar_int);
   stan::lang::expression e2(v2);

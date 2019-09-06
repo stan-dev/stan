@@ -69,8 +69,7 @@ void get_model_parameters(const Model &model,
  * @return error code
  */
 template <class Model>
-int standalone_generate(const Model &model,
-                        const Eigen::MatrixXd& draws,
+int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
                         unsigned int seed, callbacks::interrupt &interrupt,
                         callbacks::logger &logger,
                         callbacks::writer &sample_writer) {
@@ -115,18 +114,18 @@ int standalone_generate(const Model &model,
                                           param_dimss);
       model.transform_inits(context, dummy_params_i, unconstrained_params_r,
                             &msg);
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
       if (msg.str().length() > 0)
         logger.error(msg);
       logger.error(e.what());
       return error_codes::DATAERR;
     }
-    interrupt();   // call out to interrupt and fail
+    interrupt();  // call out to interrupt and fail
     writer.write_gq_values(model, rng, unconstrained_params_r);
   }
   return error_codes::OK;
 }
 
-}   // namespace services
-}   // namespace stan
+}  // namespace services
+}  // namespace stan
 #endif

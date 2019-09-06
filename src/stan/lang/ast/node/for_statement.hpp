@@ -7,44 +7,44 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST node for representing a for statement.
-     */
-    struct for_statement {
-      /**
-       * Construct an uninitialized for statement.
-       */
-      for_statement();
+/**
+ * AST node for representing a for statement.
+ */
+struct for_statement {
+  /**
+   * Construct an uninitialized for statement.
+   */
+  for_statement();
 
-      /**
-       * Construct a for statement that loops the specified variable
-       * over the specified range to execute the specified statement.
-       *
-       * @param[in] variable loop variable
-       * @param[in] range value range for loop variable
-       * @param[in] stmt body of the for loop
-       */
-      for_statement(const std::string& variable, const range& range,
-                    const statement& stmt);
+  /**
+   * Construct a for statement that loops the specified variable
+   * over the specified range to execute the specified statement.
+   *
+   * @param[in] variable loop variable
+   * @param[in] range value range for loop variable
+   * @param[in] stmt body of the for loop
+   */
+  for_statement(const std::string& variable, const range& range,
+                const statement& stmt);
 
-      /**
-       * The loop variable.
-       */
-      std::string variable_;
+  /**
+   * The loop variable.
+   */
+  std::string variable_;
 
-      /**
-       * The range of values for the loop variable.
-       */
-      range range_;
+  /**
+   * The range of values for the loop variable.
+   */
+  range range_;
 
-      /**
-       * The body of the for loop.
-       */
-      statement statement_;
-    };
+  /**
+   * The body of the for loop.
+   */
+  statement statement_;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

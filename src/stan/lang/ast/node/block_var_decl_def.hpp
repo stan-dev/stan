@@ -8,17 +8,17 @@
 namespace stan {
 namespace lang {
 
-block_var_decl::block_var_decl() : var_decl("", ill_formed_type(), nil()),
-                                   type_(ill_formed_type()) { }
+block_var_decl::block_var_decl()
+    : var_decl("", ill_formed_type(), nil()), type_(ill_formed_type()) {}
 
 block_var_decl::block_var_decl(const std::string& name,
                                const block_var_type& type)
-  : var_decl(name, type.bare_type(), nil()), type_(type) { }
+    : var_decl(name, type.bare_type(), nil()), type_(type) {}
 
 block_var_decl::block_var_decl(const std::string& name,
                                const block_var_type& type,
                                const expression& def)
-  : var_decl(name, type.bare_type(), def), type_(type) { }
+    : var_decl(name, type.bare_type(), def), type_(type) {}
 
 bare_expr_type block_var_decl::bare_type() const { return type_.bare_type(); }
 

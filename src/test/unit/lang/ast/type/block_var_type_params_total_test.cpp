@@ -15,8 +15,8 @@
 #include <stan/lang/generator/idx_visgen.hpp>
 #include <stan/lang/generator/idx_user_visgen.hpp>
 
-using stan::lang::block_var_type;
 using stan::lang::block_array_type;
+using stan::lang::block_var_type;
 using stan::lang::cholesky_factor_corr_block_type;
 using stan::lang::cholesky_factor_cov_block_type;
 using stan::lang::corr_matrix_block_type;
@@ -32,9 +32,9 @@ using stan::lang::simplex_block_type;
 using stan::lang::unit_vector_block_type;
 using stan::lang::vector_block_type;
 
+using stan::lang::double_literal;
 using stan::lang::expression;
 using stan::lang::int_literal;
-using stan::lang::double_literal;
 using stan::lang::range;
 using stan::lang::write_bare_expr_type;
 
@@ -90,7 +90,6 @@ TEST(blockVarType, createMatrix) {
   EXPECT_EQ("(4 * 5)", msgs.str());
 }
 
-
 TEST(blockVarType, createCholeskyFactor) {
   expression M(int_literal(2));
   expression N(int_literal(3));
@@ -100,7 +99,6 @@ TEST(blockVarType, createCholeskyFactor) {
   std::stringstream msgs;
   generate_expression(x.params_total(), false, msgs);
 }
-
 
 TEST(blockVarType, createCholeskyFactorCorr) {
   expression K(int_literal(3));
@@ -119,7 +117,7 @@ TEST(blockVarType, createArrayCFCorr) {
   dims.push_back(d2);
   expression K(int_literal(3));
   cholesky_factor_corr_block_type tCFCorr(K);
-  block_array_type bat(tCFCorr,dims);
+  block_array_type bat(tCFCorr, dims);
   block_var_type x(bat);
 
   std::stringstream msgs;
@@ -157,7 +155,7 @@ TEST(blockVarType, createArrayOrd) {
   expression d1(int_literal(7));
   expression K(int_literal(3));
   ordered_block_type tOrd(K);
-  block_array_type bat(tOrd,d1);
+  block_array_type bat(tOrd, d1);
   block_var_type x(bat);
 
   std::stringstream msgs;
@@ -186,7 +184,7 @@ TEST(blockVarType, createArraySimplex) {
   expression d1(int_literal(7));
   expression K(int_literal(3));
   simplex_block_type tSimplex(K);
-  block_array_type bat(tSimplex,K);
+  block_array_type bat(tSimplex, K);
   block_var_type x(bat);
 
   std::stringstream msgs;

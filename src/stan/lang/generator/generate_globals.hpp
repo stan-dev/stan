@@ -5,17 +5,17 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the global variables to the specified stream.
-     *
-     * @param[in] o stream for generating
-     */
-    void generate_globals(std::ostream& o) {
-      o << "static int current_statement_begin__;" << EOL2;
-    }
-
-  }
+/**
+ * Generate the global variables to the specified stream.
+ *
+ * @param[in] o stream for generating
+ */
+void generate_globals(std::ostream& o) {
+  o << "static int current_statement_begin__;" << EOL2;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

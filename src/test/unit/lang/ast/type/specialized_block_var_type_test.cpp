@@ -16,8 +16,8 @@
 #include <string>
 #include <iostream>
 
-using stan::lang::block_var_type;
 using stan::lang::block_array_type;
+using stan::lang::block_var_type;
 using stan::lang::cholesky_factor_corr_block_type;
 using stan::lang::cholesky_factor_cov_block_type;
 using stan::lang::corr_matrix_block_type;
@@ -33,9 +33,9 @@ using stan::lang::simplex_block_type;
 using stan::lang::unit_vector_block_type;
 using stan::lang::vector_block_type;
 
+using stan::lang::double_literal;
 using stan::lang::expression;
 using stan::lang::int_literal;
-using stan::lang::double_literal;
 using stan::lang::range;
 using stan::lang::write_bare_expr_type;
 using stan::lang::write_block_var_type;
@@ -49,7 +49,7 @@ TEST(blockVarType, createCholeskyFactorCovDefault) {
   EXPECT_EQ(x.num_dims(), 2);
   EXPECT_TRUE(x.arg1().bare_type().is_ill_formed_type());
   EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
-  
+
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), x.array_dims());
 
@@ -169,7 +169,7 @@ TEST(blockVarType, createCholeskyFactorCorr) {
 TEST(blockVarType, createArrayCFCorr) {
   expression K(int_literal(3));
   cholesky_factor_corr_block_type tCFCorr(K);
-  block_array_type d1(tCFCorr,K);
+  block_array_type d1(tCFCorr, K);
   block_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_TRUE(x.is_specialized());
@@ -245,7 +245,7 @@ TEST(blockVarType, createCorrMatrix) {
 TEST(blockVarType, createArrayCorrMat) {
   expression K(int_literal(3));
   corr_matrix_block_type tCorrMat(K);
-  block_array_type d1(tCorrMat,K);
+  block_array_type d1(tCorrMat, K);
   block_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_TRUE(x.is_specialized());
@@ -313,7 +313,7 @@ TEST(blockVarType, createCovMatrix) {
 TEST(blockVarType, createArrayCovMat) {
   expression K(int_literal(3));
   cov_matrix_block_type tCovMat(K);
-  block_array_type d1(tCovMat,K);
+  block_array_type d1(tCovMat, K);
   block_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_TRUE(x.is_specialized());
@@ -322,7 +322,7 @@ TEST(blockVarType, createArrayCovMat) {
   EXPECT_EQ(x.num_dims(), 3);
   std::vector<expression> array_lens = x.array_lens();
   EXPECT_EQ(array_lens.size(), x.array_dims());
-  
+
   EXPECT_TRUE(x.arg1().bare_type().is_ill_formed_type());
   EXPECT_TRUE(x.arg2().bare_type().is_ill_formed_type());
 
@@ -390,7 +390,7 @@ TEST(blockVarType, createOrdered) {
 TEST(blockVarType, createArrayOrd) {
   expression K(int_literal(3));
   ordered_block_type tOrd(K);
-  block_array_type d1(tOrd,K);
+  block_array_type d1(tOrd, K);
   block_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_TRUE(x.is_specialized());
@@ -441,7 +441,7 @@ TEST(blockVarType, createPosOrdered) {
 TEST(blockVarType, createArrayPosOrd) {
   expression K(int_literal(3));
   positive_ordered_block_type tPosOrd(K);
-  block_array_type d1(tPosOrd,K);
+  block_array_type d1(tPosOrd, K);
   block_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_TRUE(x.is_specialized());
@@ -492,7 +492,7 @@ TEST(blockVarType, createSimplex) {
 TEST(blockVarType, createArraySimplex) {
   expression K(int_literal(3));
   simplex_block_type tSimplex(K);
-  block_array_type d1(tSimplex,K);
+  block_array_type d1(tSimplex, K);
   block_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_TRUE(x.is_specialized());
@@ -510,7 +510,6 @@ TEST(blockVarType, createArraySimplex) {
   write_bare_expr_type(ss, x.bare_type());
   EXPECT_EQ("vector[ ]", ss.str());
 }
-
 
 TEST(blockVarType, createUnitVec) {
   expression K(int_literal(3));
@@ -544,7 +543,7 @@ TEST(blockVarType, createUnitVec) {
 TEST(blockVarType, createArrayUnitVec) {
   expression K(int_literal(3));
   unit_vector_block_type tUnitVec(K);
-  block_array_type d1(tUnitVec,K);
+  block_array_type d1(tUnitVec, K);
   block_var_type x(d1);
   EXPECT_TRUE(x.is_array_type());
   EXPECT_TRUE(x.is_specialized());

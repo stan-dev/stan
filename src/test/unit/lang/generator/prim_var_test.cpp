@@ -8,12 +8,13 @@
 #include <test/unit/util.hpp>
 
 TEST(lang, data_block_var_ast) {
-  std::string m1("data {\n"
-                 "  int<lower=0, upper=1> p1;\n"
-                 "  real p2;\n"
-                 "  int ar_p1[3];\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "data {\n"
+      "  int<lower=0, upper=1> p1;\n"
+      "  real p2;\n"
+      "  int ar_p1[3];\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   stan::lang::program prog = model_to_ast("data_prim", m1);
 
   EXPECT_EQ(4, prog.data_decl_.size());
@@ -47,31 +48,34 @@ TEST(lang, data_block_var_ast) {
 }
 
 TEST(lang, data_block_var_hpp_class_member_vars) {
-  std::string m1("data {\n"
-                 "  int<lower=0, upper=1> p1;\n"
-                 "  real p2;\n"
-                 "  int ar_p1[3];\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "data {\n"
+      "  int<lower=0, upper=1> p1;\n"
+      "  real p2;\n"
+      "  int ar_p1[3];\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("data_prim", m1);
 
-  std::string expected("private:\n"
-                       "        int p1;\n"
-                       "        double p2;\n"
-                       "        std::vector<int> ar_p1;\n"
-                       "        std::vector<double> ar_p2;\n");
+  std::string expected(
+      "private:\n"
+      "        int p1;\n"
+      "        double p2;\n"
+      "        std::vector<int> ar_p1;\n"
+      "        std::vector<double> ar_p2;\n");
 
   EXPECT_EQ(1, count_matches(expected, hpp));
 }
 
 TEST(lang, data_block_var_hpp_ctor) {
-  std::string m1("data {\n"
-                 "  int<lower=0, upper=1> p1;\n"
-                 "  real p2;\n"
-                 "  int ar_p1[3];\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
-                 "}\n");
+  std::string m1(
+      "data {\n"
+      "  int<lower=0, upper=1> p1;\n"
+      "  real p2;\n"
+      "  int ar_p1[3];\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "  real<offset=1, multiplier=2> ar_p3[5];\n"
+      "}\n");
   std::string hpp = model_to_hpp("data_prim", m1);
 
   std::string expected(
@@ -142,12 +146,13 @@ TEST(lang, data_block_var_hpp_ctor) {
 }
 
 TEST(lang, transformed_data_block_var_ast) {
-  std::string m1("transformed data {\n"
-                 "  int<lower=0, upper=1> p1;\n"
-                 "  real p2;\n"
-                 "  int ar_p1[3];\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "transformed data {\n"
+      "  int<lower=0, upper=1> p1;\n"
+      "  real p2;\n"
+      "  int ar_p1[3];\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   stan::lang::program prog = model_to_ast("transformed_data_prim", m1);
 
   EXPECT_EQ(4, prog.derived_data_decl_.first.size());
@@ -162,12 +167,13 @@ TEST(lang, transformed_data_block_var_ast) {
 }
 
 TEST(lang, transformed_data_block_var_hpp_ctor) {
-  std::string m1("transformed data {\n"
-                 "  int<lower=0, upper=1> p1;\n"
-                 "  real p2;\n"
-                 "  int ar_p1[3];\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "transformed data {\n"
+      "  int<lower=0, upper=1> p1;\n"
+      "  real p2;\n"
+      "  int ar_p1[3];\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("transformed_data_prim", m1);
 
   std::string expected_1(
@@ -209,11 +215,12 @@ TEST(lang, transformed_data_block_var_hpp_ctor) {
 }
 
 TEST(lang, params_block_var_ast) {
-  std::string m1("parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
-                 "}\n");
+  std::string m1(
+      "parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "  real<offset=1, multiplier=2> ar_p3[5];\n"
+      "}\n");
   stan::lang::program prog = model_to_ast("parameters_prim", m1);
   EXPECT_EQ(3, prog.parameter_decl_.size());
   stan::lang::block_var_decl bvd1 = prog.parameter_decl_[0];
@@ -225,11 +232,12 @@ TEST(lang, params_block_var_ast) {
 }
 
 TEST(lang, params_block_var_hpp_ctor) {
-  std::string m1("parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
-                 "}\n");
+  std::string m1(
+      "parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "  real<offset=1, multiplier=2> ar_p3[5];\n"
+      "}\n");
   std::string hpp = model_to_hpp("parameters_prim", m1);
 
   std::string expected(
@@ -249,11 +257,12 @@ TEST(lang, params_block_var_hpp_ctor) {
 
 TEST(lang, params_block_var_hpp_xform_inits) {
   // transform_inits block has parameter initialization
-  std::string m1("parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
-                 "}\n");
+  std::string m1(
+      "parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "  real<offset=1, multiplier=2> ar_p3[5];\n"
+      "}\n");
   std::string hpp = model_to_hpp("parameters_prim", m1);
 
   std::string expected(
@@ -336,11 +345,12 @@ TEST(lang, params_block_var_hpp_xform_inits) {
 
 TEST(lang, params_block_var_hpp_log_prob) {
   // log_prob checks constraints on model param
-  std::string m1("parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "  real<offset=1, multiplier=2> ar_p3[5];\n"
-                 "}\n");
+  std::string m1(
+      "parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "  real<offset=1, multiplier=2> ar_p3[5];\n"
+      "}\n");
   std::string hpp = model_to_hpp("parameters_prim", m1);
 
   std::string expected(
@@ -382,28 +392,31 @@ TEST(lang, params_block_var_hpp_log_prob) {
 
 TEST(lang, params_block_var_hpp_get_dims) {
   // get_dims gets all dimensions
-  std::string m1("parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("parameters_prim", m1);
 
-  std::string expected("        dimss__.resize(0);\n"
-                       "        std::vector<size_t> dims__;\n"
-                       "        dims__.resize(0);\n"
-                       "        dimss__.push_back(dims__);\n"
-                       "        dims__.resize(0);\n"
-                       "        dims__.push_back(4);\n"
-                       "        dimss__.push_back(dims__);\n");
+  std::string expected(
+      "        dimss__.resize(0);\n"
+      "        std::vector<size_t> dims__;\n"
+      "        dims__.resize(0);\n"
+      "        dimss__.push_back(dims__);\n"
+      "        dims__.resize(0);\n"
+      "        dims__.push_back(4);\n"
+      "        dimss__.push_back(dims__);\n");
 
   EXPECT_EQ(1, count_matches(expected, hpp));
 }
 
 TEST(lang, params_block_var_hpp_write_array) {
-  std::string m1("parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("parameters_prim", m1);
   std::string expected(
       "        // read-transform, write parameters\n"
@@ -424,10 +437,11 @@ TEST(lang, params_block_var_hpp_write_array) {
 }
 
 TEST(lang, params_block_var_hpp_param_names) {
-  std::string m1("parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("parameters_prim", m1);
 
   std::string expected(
@@ -442,15 +456,16 @@ TEST(lang, params_block_var_hpp_param_names) {
       "            param_names__.push_back(param_name_stream__.str());\n"
       "        }\n");
   EXPECT_EQ(2, count_matches(expected, hpp));  // matches 2 methods:
-                                              // constrained_param_names,
-                                              // unconstrained_param_names
+                                               // constrained_param_names,
+                                               // unconstrained_param_names
 }
 
 TEST(lang, transformed_params_block_var_ast) {
-  std::string m1("transformed parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "transformed parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   stan::lang::program prog = model_to_ast("xformed_parameters_prim", m1);
   EXPECT_EQ(2, prog.derived_decl_.first.size());
   stan::lang::block_var_decl bvd1 = prog.derived_decl_.first[0];
@@ -460,10 +475,11 @@ TEST(lang, transformed_params_block_var_ast) {
 }
 
 TEST(lang, transformed_params_block_var_hpp_log_prob) {
-  std::string m1("transformed parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "transformed parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("xformed_parameters_prim", m1);
 
   // declare
@@ -525,27 +541,30 @@ TEST(lang, transformed_params_block_var_hpp_log_prob) {
 }
 
 TEST(lang, transformed_params_block_var_hpp_get_dims) {
-  std::string m1("transformed parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "transformed parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("xformed_parameters_prim", m1);
 
-  std::string expected("        dimss__.resize(0);\n"
-                       "        std::vector<size_t> dims__;\n"
-                       "        dims__.resize(0);\n"
-                       "        dimss__.push_back(dims__);\n"
-                       "        dims__.resize(0);\n"
-                       "        dims__.push_back(4);\n"
-                       "        dimss__.push_back(dims__);\n");
+  std::string expected(
+      "        dimss__.resize(0);\n"
+      "        std::vector<size_t> dims__;\n"
+      "        dims__.resize(0);\n"
+      "        dimss__.push_back(dims__);\n"
+      "        dims__.resize(0);\n"
+      "        dims__.push_back(4);\n"
+      "        dimss__.push_back(dims__);\n");
   EXPECT_EQ(1, count_matches(expected, hpp));
 }
 
 TEST(lang, transformed_params_block_var_hpp_write_array) {
-  std::string m1("transformed parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "transformed parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("xformed_parameters_prim", m1);
 
   std::string expected_1(
@@ -591,10 +610,11 @@ TEST(lang, transformed_params_block_var_hpp_write_array) {
 }
 
 TEST(lang, transformed_params_block_var_hpp_param_names) {
-  std::string m1("transformed parameters {\n"
-                 "  real p2;\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "transformed parameters {\n"
+      "  real p2;\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("xformed_parameters_prim", m1);
 
   std::string expected(
@@ -613,12 +633,13 @@ TEST(lang, transformed_params_block_var_hpp_param_names) {
 }
 
 TEST(lang, generated_quantities_block_var_ast) {
-  std::string m1("generated quantities {\n"
-                 "  int<lower=0, upper=1> p1;\n"
-                 "  real p2;\n"
-                 "  int ar_p1[3];\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "generated quantities {\n"
+      "  int<lower=0, upper=1> p1;\n"
+      "  real p2;\n"
+      "  int ar_p1[3];\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   stan::lang::program prog = model_to_ast("gqs_prim", m1);
   EXPECT_EQ(4, prog.generated_decl_.first.size());
   stan::lang::block_var_decl bvd1 = prog.generated_decl_.first[0];
@@ -632,36 +653,39 @@ TEST(lang, generated_quantities_block_var_ast) {
 }
 
 TEST(lang, generated_quantities_block_var_hpp_get_dims) {
-  std::string m1("generated quantities {\n"
-                 "  int<lower=0, upper=1> p1;\n"
-                 "  real p2;\n"
-                 "  int ar_p1[3];\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "generated quantities {\n"
+      "  int<lower=0, upper=1> p1;\n"
+      "  real p2;\n"
+      "  int ar_p1[3];\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("gqs_prim", m1);
 
-  std::string expected("        dimss__.resize(0);\n"
-                       "        std::vector<size_t> dims__;\n"
-                       "        dims__.resize(0);\n"
-                       "        dimss__.push_back(dims__);\n"
-                       "        dims__.resize(0);\n"
-                       "        dimss__.push_back(dims__);\n"
-                       "        dims__.resize(0);\n"
-                       "        dims__.push_back(3);\n"
-                       "        dimss__.push_back(dims__);\n"
-                       "        dims__.resize(0);\n"
-                       "        dims__.push_back(4);\n"
-                       "        dimss__.push_back(dims__);\n");
+  std::string expected(
+      "        dimss__.resize(0);\n"
+      "        std::vector<size_t> dims__;\n"
+      "        dims__.resize(0);\n"
+      "        dimss__.push_back(dims__);\n"
+      "        dims__.resize(0);\n"
+      "        dimss__.push_back(dims__);\n"
+      "        dims__.resize(0);\n"
+      "        dims__.push_back(3);\n"
+      "        dimss__.push_back(dims__);\n"
+      "        dims__.resize(0);\n"
+      "        dims__.push_back(4);\n"
+      "        dimss__.push_back(dims__);\n");
   EXPECT_EQ(1, count_matches(expected, hpp));
 }
 
 TEST(lang, generated_quantities_block_var_hpp_write_array) {
-  std::string m1("generated quantities {\n"
-                 "  int<lower=0, upper=1> p1;\n"
-                 "  real p2;\n"
-                 "  int ar_p1[3];\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "generated quantities {\n"
+      "  int<lower=0, upper=1> p1;\n"
+      "  real p2;\n"
+      "  int ar_p1[3];\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("gqs_prim", m1);
   // decl-def
   std::string expected_1(
@@ -727,12 +751,13 @@ TEST(lang, generated_quantities_block_var_hpp_write_array) {
 }
 
 TEST(lang, generated_quantities_block_var_hpp_param_names) {
-  std::string m1("generated quantities {\n"
-                 "  int<lower=0, upper=1> p1;\n"
-                 "  real p2;\n"
-                 "  int ar_p1[3];\n"
-                 "  real<lower=0, upper=1> ar_p2[4];\n"
-                 "}\n");
+  std::string m1(
+      "generated quantities {\n"
+      "  int<lower=0, upper=1> p1;\n"
+      "  real p2;\n"
+      "  int ar_p1[3];\n"
+      "  real<lower=0, upper=1> ar_p2[4];\n"
+      "}\n");
   std::string hpp = model_to_hpp("gqs_prim", m1);
 
   std::string expected(

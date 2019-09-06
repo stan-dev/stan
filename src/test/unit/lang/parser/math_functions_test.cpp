@@ -20,7 +20,7 @@ TEST(lang_parser, acos_math_function_signatures) {
 TEST(lang_parser, acosh_math_function_signatures) {
   test_parsable("function-signatures/math/functions/acosh");
 }
- 
+
 TEST(lang_parser, atan_math_function_signatures) {
   test_parsable("function-signatures/math/functions/atan");
 }
@@ -28,10 +28,10 @@ TEST(lang_parser, atan_math_function_signatures) {
 TEST(lang_parser, atan2_math_function_signatures) {
   test_parsable("function-signatures/math/functions/atan2");
 }
-  
+
 TEST(lang_parser, atanh_math_function_signatures) {
   test_parsable("function-signatures/math/functions/atanh");
-}  
+}
 
 TEST(lang_parser, bessel_first_kind_math_function_signatures) {
   test_parsable("function-signatures/math/functions/bessel_first_kind");
@@ -74,23 +74,23 @@ TEST(lang_parser, digamma_math_function_signatures) {
 }
 
 TEST(lang_parser, erf_math_function_signatures) {
-  test_parsable("function-signatures/math/functions/erf"); 
+  test_parsable("function-signatures/math/functions/erf");
 }
 
 TEST(lang_parser, erfc_math_function_signatures) {
-  test_parsable("function-signatures/math/functions/erfc"); 
+  test_parsable("function-signatures/math/functions/erfc");
 }
 
 TEST(lang_parser, exp_math_function_signatures) {
-  test_parsable("function-signatures/math/functions/exp"); 
+  test_parsable("function-signatures/math/functions/exp");
 }
 
 TEST(lang_parser, exp2_math_function_signatures) {
-  test_parsable("function-signatures/math/functions/exp2"); 
+  test_parsable("function-signatures/math/functions/exp2");
 }
 
 TEST(lang_parser, expm1_math_function_signatures) {
-  test_parsable("function-signatures/math/functions/expm1"); 
+  test_parsable("function-signatures/math/functions/expm1");
 }
 
 TEST(lang_parser, fabs_math_function_signatures) {
@@ -104,7 +104,7 @@ TEST(lang_parser, falling_factorial_math_function_signatures) {
 TEST(lang_parser, fdim_math_function_signatures) {
   test_parsable("function-signatures/math/functions/fdim");
 }
- 
+
 TEST(lang_parser, floor_math_function_signatures) {
   test_parsable("function-signatures/math/functions/floor");
 }
@@ -222,7 +222,7 @@ TEST(lang_parser, log_inv_logit_math_function_signatures) {
 }
 
 TEST(lang_parser, logit_math_function_signatures) {
-  test_parsable("function-signatures/math/functions/logit"); 
+  test_parsable("function-signatures/math/functions/logit");
 }
 
 TEST(lang_parser, log_falling_factorial_math_function_signatures) {
@@ -250,11 +250,13 @@ TEST(lang_parser, min_math_function_signatures) {
 }
 
 TEST(lang_parser, modified_bessel_first_kind_math_function_signatures) {
-  test_parsable("function-signatures/math/functions/modified_bessel_first_kind");
+  test_parsable(
+      "function-signatures/math/functions/modified_bessel_first_kind");
 }
 
 TEST(lang_parser, modified_bessel_second_kind_math_function_signatures) {
-  test_parsable("function-signatures/math/functions/modified_bessel_second_kind");
+  test_parsable(
+      "function-signatures/math/functions/modified_bessel_second_kind");
 }
 
 TEST(lang_parser, multiply_log_math_function_signatures) {

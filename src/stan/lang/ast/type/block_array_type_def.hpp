@@ -14,7 +14,6 @@ block_array_type::block_array_type(const block_var_type& el_type,
 block_array_type::block_array_type()
     : block_array_type(ill_formed_type(), nil()) {}
 
-
 block_array_type::block_array_type(const block_var_type& el_type,
                                    const std::vector<expression>& lens)
     : element_type_(el_type), array_len_(lens[0]) {

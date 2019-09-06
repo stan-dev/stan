@@ -4,21 +4,20 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the loop indexes for the first n-1 of the specified
-     * number of array dimensions, writing to the specified stream.
-     *
-     * @param[in] num_ar_dims number of array dimensions of variable
-     * @param[in,out] o stream for generating
-     */
-    void write_resize_var_idx(size_t num_ar_dims,
-                              std::ostream& o) {
-      for (size_t i = 0; i < num_ar_dims - 1; ++i)
-        o << "[d_" << i << "__]";
-    }
-
-  }
+/**
+ * Generate the loop indexes for the first n-1 of the specified
+ * number of array dimensions, writing to the specified stream.
+ *
+ * @param[in] num_ar_dims number of array dimensions of variable
+ * @param[in,out] o stream for generating
+ */
+void write_resize_var_idx(size_t num_ar_dims, std::ostream& o) {
+  for (size_t i = 0; i < num_ar_dims - 1; ++i)
+    o << "[d_" << i << "__]";
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif
