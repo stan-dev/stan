@@ -32,8 +32,9 @@ test_statement_grammar<Iterator>::test_statement_grammar(
   using boost::spirit::qi::labels::_a;
 
   test_statement_r.name("test statement");
-  test_statement_r %= eps[set_var_scope_f(_a, derived_origin)] > statement_g(
-                          _a, false);  // not in loop, disallow break/continue
+  test_statement_r
+      %= eps[set_var_scope_f(_a, derived_origin)]
+         > statement_g(_a, false);  // not in loop, disallow break/continue
 }
 
 }  // namespace lang

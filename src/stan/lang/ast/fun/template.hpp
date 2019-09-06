@@ -6,7 +6,6 @@ namespace lang {
 
 /**
  */
-
 }
 }  // namespace stan
 #endif
