@@ -2,6 +2,7 @@
 #define STAN_IO_ARRAY_VAR_CONTEXT_HPP
 
 #include <stan/io/var_context.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <boost/throw_exception.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <map>
@@ -9,18 +10,13 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <numeric>
+#include <unordered_map>
 
 namespace stan {
 
 namespace io {
 
-template <typename T>
-T product(std::vector<T> dims) {
-  T y = 1;
-  for (size_t i = 0; i < dims.size(); ++i)
-    y *= dims[i];
-  return y;
-}
 
 /**
  * An array_var_context object represents a named arrays
@@ -29,10 +25,15 @@ T product(std::vector<T> dims) {
  */
 class array_var_context : public var_context {
  private:
-  std::map<std::string, std::pair<std::vector<double>, std::vector<size_t> > >
-      vars_r_;
-  std::map<std::string, std::pair<std::vector<int>, std::vector<size_t> > >
-      vars_i_;
+  // Map holding reals
+  using pair_r_ = std::pair<std::vector<double>, std::vector<size_t>>;
+  using map_r_ = std::unordered_map<std::string, pair_r_>;
+  map_r_ vars_r_;
+  // Map holding integers
+  using pair_i_ =std::pair<std::vector<int>, std::vector<size_t>>;
+  using map_i_ = std::unordered_map<std::string, pair_i_>;
+  map_i_ vars_i_;
+  // When search for variable name fails, return one these
   std::vector<double> const empty_vec_r_;
   std::vector<int> const empty_vec_i_;
   std::vector<size_t> const empty_vec_ui_;
@@ -45,12 +46,16 @@ class array_var_context : public var_context {
    * Check (1) if the vector size of dimensions is no smaller
    * than the name vector size; (2) if the size of the input
    * array is large enough for what is needed.
+   * @param names The names for each variable
+   * @param array_size The total size of the vector holding the values we want to access.
+   * @param dims Vector holding the dimensions for each variable.
+   * @return If the array size is equal to the number of dimensions, 
+   * a vector of the total dimensions for each element in dims.
    */
   template <typename T>
-  void validate(const std::vector<std::string>& names, const T& array,
-                const std::vector<std::vector<size_t> >& dims) {
-    size_t total = 0;
-    size_t num_par = names.size();
+  std::vector<size_t> validate_dims(const std::vector<std::string>& names, const T array_size,
+                const std::vector<std::vector<size_t>>& dims) {
+    const size_t num_par = names.size();
     if (num_par > dims.size()) {
       std::stringstream msg;
       msg << "size of vector of dimensions (found " << dims.size() << ") "
@@ -58,62 +63,54 @@ class array_var_context : public var_context {
           << ").";
       BOOST_THROW_EXCEPTION(std::invalid_argument(msg.str()));
     }
-    for (size_t i = 0; i < num_par; i++)
-      total += stan::io::product(dims[i]);
-    size_t array_len = array.size();
-    if (total > array_len) {
+    std::vector<size_t> elem_dims_total(dims.size() + 1);
+    elem_dims_total[0] = 0;
+    std::transform(dims.begin(), dims.end(), elem_dims_total.begin() + 1, [](auto&& x) {
+      return std::accumulate(x.begin(), x.end(), 1, std::multiplies<T>());
+    });
+    auto total = std::accumulate(elem_dims_total.begin(), elem_dims_total.end(), 0);
+    if (total > array_size) {
       std::stringstream msg;
-      msg << "array is not long enough for all elements: " << array_len
+      msg << "array is not long enough for all elements: " << array_size
           << " is found, but " << total << " is needed.";
       BOOST_THROW_EXCEPTION(std::invalid_argument(msg.str()));
     }
+    return elem_dims_total;
   }
 
   void add_r(const std::vector<std::string>& names,
              const std::vector<double>& values,
-             const std::vector<std::vector<size_t> >& dims) {
-    validate(names, values, dims);
-    size_t start = 0;
-    size_t end = 0;
+             const std::vector<std::vector<size_t>>& dims) {
+    std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
+    std::vector<size_t> end_vec(dim_vec.size());
+    std::partial_sum(dim_vec.begin(), dim_vec.end(), end_vec.begin());
     for (size_t i = 0; i < names.size(); i++) {
-      end += product(dims[i]);
-      std::vector<double> v(values.begin() + start, values.begin() + end);
-      vars_r_[names[i]]
-          = std::pair<std::vector<double>, std::vector<size_t> >(v, dims[i]);
-      start = end;
+      vars_r_[names[i]] = {{values.data() + end_vec[i],
+                            values.data() + end_vec[i + 1]}, dims[i]};
     }
   }
 
   void add_r(const std::vector<std::string>& names,
              const Eigen::VectorXd& values,
-             const std::vector<std::vector<size_t> >& dims) {
-    validate(names, values, dims);
-    size_t start = 0;
-    size_t end = 0;
+             const std::vector<std::vector<size_t>>& dims) {
+    std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
+    std::vector<size_t> end_vec(dim_vec.size());
+    std::partial_sum(dim_vec.begin(), dim_vec.end(), end_vec.begin());
     for (size_t i = 0; i < names.size(); i++) {
-      end += product(dims[i]);
-      size_t v_len = end - start;
-      std::vector<double> v(v_len);
-      for (size_t i = 0; i < v_len; ++i)
-        v[i] = values(start + i);
-      vars_r_[names[i]]
-          = std::pair<std::vector<double>, std::vector<size_t> >(v, dims[i]);
-      start = end;
+      vars_r_[names[i]] = {{values.data() + end_vec[i],
+                            values.data() + end_vec[i + 1]}, dims[i]};
     }
   }
 
   void add_i(const std::vector<std::string>& names,
              const std::vector<int>& values,
-             const std::vector<std::vector<size_t> >& dims) {
-    validate(names, values, dims);
-    size_t start = 0;
-    size_t end = 0;
+             const std::vector<std::vector<size_t>>& dims) {
+    std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
+    std::vector<size_t> end_vec(dim_vec.size());
+    std::partial_sum(dim_vec.begin(), dim_vec.end(), end_vec.begin());
     for (size_t i = 0; i < names.size(); i++) {
-      end += product(dims[i]);
-      std::vector<int> v(values.begin() + start, values.begin() + end);
-      vars_i_[names[i]]
-          = std::pair<std::vector<int>, std::vector<size_t> >(v, dims[i]);
-      start = end;
+      vars_i_[names[i]] = {{values.data() + end_vec[i],
+                            values.data() + end_vec[i + 1]}, dims[i]};
     }
   }
 
@@ -127,7 +124,7 @@ class array_var_context : public var_context {
    */
   array_var_context(const std::vector<std::string>& names_r,
                     const std::vector<double>& values_r,
-                    const std::vector<std::vector<size_t> >& dim_r) {
+                    const std::vector<std::vector<size_t>>& dim_r) {
     add_r(names_r, values_r, dim_r);
   }
 
@@ -140,7 +137,7 @@ class array_var_context : public var_context {
    */
   array_var_context(const std::vector<std::string>& names_r,
                     const Eigen::RowVectorXd& values_r,
-                    const std::vector<std::vector<size_t> >& dim_r) {
+                    const std::vector<std::vector<size_t>>& dim_r) {
     add_r(names_r, values_r, dim_r);
   }
 
@@ -153,7 +150,7 @@ class array_var_context : public var_context {
    */
   array_var_context(const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t> >& dim_i) {
+                    const std::vector<std::vector<size_t>>& dim_i) {
     add_i(names_i, values_i, dim_i);
   }
 
@@ -164,10 +161,10 @@ class array_var_context : public var_context {
    */
   array_var_context(const std::vector<std::string>& names_r,
                     const std::vector<double>& values_r,
-                    const std::vector<std::vector<size_t> >& dim_r,
+                    const std::vector<std::vector<size_t>>& dim_r,
                     const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t> >& dim_i) {
+                    const std::vector<std::vector<size_t>>& dim_i) {
     add_i(names_i, values_i, dim_i);
     add_r(names_r, values_r, dim_r);
   }
@@ -202,17 +199,14 @@ class array_var_context : public var_context {
    *
    * @param name Name of variable.
    * @return Values of variable.
+   *
    */
   std::vector<double> vals_r(const std::string& name) const {
     if (contains_r_only(name)) {
       return (vars_r_.find(name)->second).first;
     } else if (contains_i(name)) {
       std::vector<int> vec_int = (vars_i_.find(name)->second).first;
-      std::vector<double> vec_r(vec_int.size());
-      for (size_t ii = 0; ii < vec_int.size(); ii++) {
-        vec_r[ii] = vec_int[ii];
-      }
-      return vec_r;
+      return {vec_int.begin(), vec_int.end()};
     }
     return empty_vec_r_;
   }
@@ -268,13 +262,10 @@ class array_var_context : public var_context {
    * @param names Vector to store the list of names in.
    */
   virtual void names_r(std::vector<std::string>& names) const {
-    names.resize(0);
-    for (std::map<std::string, std::pair<std::vector<double>,
-                                         std::vector<size_t> > >::const_iterator
-             it
-         = vars_r_.begin();
-         it != vars_r_.end(); ++it)
-      names.push_back((*it).first);
+    names.clear();
+    for (auto& vars_r_iter : vars_r_) {
+      names.push_back(vars_r_iter.first);
+    }
   }
 
   /**
@@ -284,13 +275,10 @@ class array_var_context : public var_context {
    * @param names Vector to store the list of names in.
    */
   virtual void names_i(std::vector<std::string>& names) const {
-    names.resize(0);
-    for (std::map<std::string, std::pair<std::vector<int>,
-                                         std::vector<size_t> > >::const_iterator
-             it
-         = vars_i_.begin();
-         it != vars_i_.end(); ++it)
-      names.push_back((*it).first);
+    names.clear();
+    for (auto& vars_i_iter : vars_r_) {
+      names.push_back(vars_i_iter.first);
+    }
   }
 
   /**
