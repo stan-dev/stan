@@ -180,7 +180,7 @@ class array_var_context : public var_context {
                     const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
                     const std::vector<std::vector<size_t>>& dim_i)
-      : vars_i_(names_i.size()), vars_r_(names_r.size()) {
+      : vars_r_(names_r.size()), vars_i_(names_i.size()) {
     add_i(names_i, values_i, dim_i);
     add_r(names_r, values_r, dim_r);
   }
@@ -191,7 +191,7 @@ class array_var_context : public var_context {
                     const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
                     const std::vector<std::vector<size_t>>& dim_i)
-      : vars_i_(names_i.size()), vars_r_(names_r.size()) {
+      : vars_r_(names_r.size()), vars_i_(names_i.size()) {
     add_i(names_i, values_i, dim_i);
     add_r(names_r, values_r, dim_r);
   }
