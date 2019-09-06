@@ -39,6 +39,11 @@ String stan_pr() {
     }
 }
 
+def isBranch(String b) { env.BRANCH_NAME == b }
+Boolean isPR() { env.CHANGE_URL != null }
+String fork() { env.CHANGE_FORK ?: "stan-dev" }
+String branchName() { isPR() ? env.CHANGE_BRANCH :env.BRANCH_NAME }
+
 pipeline {
     agent none
     parameters {
