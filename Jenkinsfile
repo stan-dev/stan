@@ -125,7 +125,7 @@ pipeline {
                         if [[ `git diff` != "" ]]; then
                             git config --global user.email "mc.stanislaw@gmail.com"
                             git config --global user.name "Stan Jenkins"
-                            git add stan test
+                            git add src
                             git commit -m "[Jenkins] auto-formatting by `clang-format --version`"
                             git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/stan.git ${branchName()}
                             echo "Exiting build because clang-format found changes."
