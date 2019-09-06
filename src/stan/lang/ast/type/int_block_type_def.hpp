@@ -4,13 +4,15 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-namespace lang {
+  namespace lang {
 
-int_block_type::int_block_type() : bounds_(nil(), nil()) {}
+    int_block_type::int_block_type()
+      : bounds_(nil(), nil()) { }
 
-int_block_type::int_block_type(const range& bounds) : bounds_(bounds) {}
+    int_block_type::int_block_type(const range& bounds)
+      : bounds_(bounds) { }
 
-range int_block_type::bounds() const { return bounds_; }
-}  // namespace lang
-}  // namespace stan
+    range int_block_type::bounds() const { return bounds_; }
+  }
+}
 #endif

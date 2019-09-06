@@ -12,6 +12,7 @@ TEST(diagnose_defaults, epsilon) {
   EXPECT_FLOAT_EQ(1e-6, epsilon::default_value());
 }
 
+
 TEST(diagnose_defaults, error) {
   using stan::services::diagnose::error;
   EXPECT_EQ("Absolute error threshold.", error::description());

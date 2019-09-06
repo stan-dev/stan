@@ -43,6 +43,7 @@ struct integrate_1d {
    */
   expression rel_tol_;
 
+
   /**
    * Construct a 1D integrator AST node.
    */
@@ -67,6 +68,6 @@ struct integrate_1d {
                const expression& rel_tol);
 };
 
-}  // namespace lang
-}  // namespace stan
+}
+}
 #endif

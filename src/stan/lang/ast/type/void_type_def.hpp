@@ -5,11 +5,14 @@
 #include <string>
 
 namespace stan {
-namespace lang {
+  namespace lang {
 
-void_type::void_type() : is_data_(false) {}
+    void_type::void_type() : is_data_(false) { }
 
-std::string void_type::oid() const { return "01_void_type"; }
-}  // namespace lang
-}  // namespace stan
+    std::string void_type::oid() const {
+      return "01_void_type";
+    }
+  }
+}
 #endif
+
