@@ -88,17 +88,18 @@ namespace advi {
     for (int i = 0; i < M; ++i)
       l_theta[i] = N * l_theta[i];
 
-    // std::vector<T_x> w_theta(M);
+    std::vector<T_x> w_theta(M);
+    for (size_t i = 0; i < M; ++i) {
+      w_theta[i] = 0;
+      for (size_t ii = 0; ii < M; ++ii)
+        w_theta[i] = w_theta[i] + std::exp(l_theta[ii] - l_theta[i]);
+      w_theta[i] = 1 / w_theta[i];
+    }    
+    // auto theta_hat = 0;
     // for (size_t i = 0; i < M; ++i) {
-    //   w_theta[i] = 0;
-    //   for (size_t ii = 0; ii < M; ++ii)
-    //     w_theta[i] = w_theta[i] + std::exp(l_theta[i] - l_theta[ii]);
-    // }
-
-    // T_x theta_hat = 0;
-    // for (size_t i = 0; i < M; ++i)
     //   theta_hat = theta_hat + theta[i] * w_theta[i];
-
+    // }
+    
     // std::vector<double> k_vec(N);
     // for (size_t i = 0; i < N; ++i)
     //   k_vec[i] = log(-theta_hat * x[i]);
