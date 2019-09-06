@@ -270,7 +270,7 @@ class array_var_context : public var_context {
    */
   virtual void names_r(std::vector<std::string>& names) const {
     names.clear();
-    for (auto& vars_r_iter : vars_r_) {
+    for (const auto& vars_r_iter : vars_r_) {
       names.push_back(vars_r_iter.first);
     }
   }
@@ -283,7 +283,7 @@ class array_var_context : public var_context {
    */
   virtual void names_i(std::vector<std::string>& names) const {
     names.clear();
-    for (auto& vars_i_iter : vars_r_) {
+    for (const auto& vars_i_iter : vars_r_) {
       names.push_back(vars_i_iter.first);
     }
   }
