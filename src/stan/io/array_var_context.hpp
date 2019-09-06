@@ -17,7 +17,6 @@ namespace stan {
 
 namespace io {
 
-
 /**
  * An array_var_context object represents a named arrays
  * with dimensions constructed from an array, a vector
@@ -30,7 +29,7 @@ class array_var_context : public var_context {
   using map_r_ = std::unordered_map<std::string, pair_r_>;
   map_r_ vars_r_;
   // Map holding integers
-  using pair_i_ =std::pair<std::vector<int>, std::vector<size_t>>;
+  using pair_i_ = std::pair<std::vector<int>, std::vector<size_t>>;
   using map_i_ = std::unordered_map<std::string, pair_i_>;
   map_i_ vars_i_;
   // When search for variable name fails, return one these
@@ -46,17 +45,20 @@ class array_var_context : public var_context {
    * Check (1) if the vector size of dimensions is no smaller
    * than the name vector size; (2) if the size of the input
    * array is large enough for what is needed.
+   *
    * @param names The names for each variable
-   * @param array_size The total size of the vector holding the values we want to access.
+   * @param array_size The total size of the vector holding the values we want
+   * to access.
    * @param dims Vector holding the dimensions for each variable.
-   * @return If the array size is equal to the number of dimensions, 
-   * a vector of the cumulative sum of the dimensions of each inner element of dims.
-   * The return of this function is used in the add_* methods to get the sequence of values
-   * For each variable.
+   * @return If the array size is equal to the number of dimensions,
+   * a vector of the cumulative sum of the dimensions of each inner element of
+   * dims. The return of this function is used in the add_* methods to get the
+   * sequence of values For each variable.
    */
   template <typename T>
-  std::vector<size_t> validate_dims(const std::vector<std::string>& names, const T array_size,
-                const std::vector<std::vector<size_t>>& dims) {
+  std::vector<size_t> validate_dims(
+      const std::vector<std::string>& names, const T array_size,
+      const std::vector<std::vector<size_t>>& dims) {
     const size_t num_par = names.size();
     if (num_par > dims.size()) {
       std::stringstream msg;
@@ -67,10 +69,12 @@ class array_var_context : public var_context {
     }
     std::vector<size_t> elem_dims_total(dims.size() + 1);
     elem_dims_total[0] = 0;
-    std::transform(dims.begin(), dims.end(), elem_dims_total.begin() + 1, [](auto&& x) {
-      return std::accumulate(x.begin(), x.end(), 1, std::multiplies<T>());
-    });
-    auto total = std::accumulate(elem_dims_total.begin(), elem_dims_total.end(), 0);
+    std::transform(
+        dims.begin(), dims.end(), elem_dims_total.begin() + 1, [](auto&& x) {
+          return std::accumulate(x.begin(), x.end(), 1, std::multiplies<T>());
+        });
+    auto total
+        = std::accumulate(elem_dims_total.begin(), elem_dims_total.end(), 0);
     if (total > array_size) {
       std::stringstream msg;
       msg << "array is not long enough for all elements: " << array_size
@@ -78,36 +82,52 @@ class array_var_context : public var_context {
       BOOST_THROW_EXCEPTION(std::invalid_argument(msg.str()));
     }
     std::vector<size_t> array_end_vec(elem_dims_total.size());
-    std::partial_sum(elem_dims_total.begin(), elem_dims_total.end(), array_end_vec.begin());
+    std::partial_sum(elem_dims_total.begin(), elem_dims_total.end(),
+                     array_end_vec.begin());
     return array_end_vec;
   }
 
-  // This is just here till the next math submodule is updated
+  // FIXME(Steve): This is just here till the math submodule is updated
   template <typename T>
-  using is_vector_floating_point = std::integral_constant<bool,
-     is_vector<std::decay_t<T>>::value && 
-     std::is_floating_point<typename scalar_type<std::decay_t<T>>::type>::value>;
+  using is_vector_floating_point = std::integral_constant<
+      bool, is_vector<std::decay_t<T>>::value
+                && std::is_floating_point<
+                    typename scalar_type<std::decay_t<T>>::type>::value>;
 
-  template<typename T, std::enable_if_t<is_vector_floating_point<T>::value>...>
-  void add_r(const std::vector<std::string>& names,
-             T&& values,
+  /**
+   * Adds a set of floating point variables to the floating point map.
+   * @param names Names of each variable.
+   * @param values The real values of variable in a contiguous
+   * column major order container.
+   * @param dims the dimensions for each variable.
+   */
+  template <typename T, std::enable_if_t<is_vector_floating_point<T>::value>...>
+  void add_r(const std::vector<std::string>& names, T&& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     using val_d_t = decltype(values.data());
     for (size_t i = 0; i < names.size(); i++) {
-      vars_r_[names[i]] = {{std::forward<val_d_t>(values.data()) + dim_vec[i],
-                            std::forward<val_d_t>(values.data()) +
-                            dim_vec[i + 1]}, dims[i]};
+      vars_r_[names[i]]
+          = {{std::forward<val_d_t>(values.data()) + dim_vec[i],
+              std::forward<val_d_t>(values.data()) + dim_vec[i + 1]},
+             dims[i]};
     }
   }
 
+  /**
+   * Adds a set of integer variables to the integer map.
+   * @param names Names of each variable.
+   * @param values The integer values of variable in a vector.
+   * @param dims the dimensions for each variable.
+   */
   void add_i(const std::vector<std::string>& names,
              const std::vector<int>& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
-      vars_i_[names[i]] = {{values.data() + dim_vec[i],
-                            values.data() + dim_vec[i + 1]}, dims[i]};
+      vars_i_[names[i]]
+          = {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]},
+             dims[i]};
     }
   }
 
@@ -119,23 +139,11 @@ class array_var_context : public var_context {
    * @param values_r a vector of double values for all elements
    * @param dim_r   a vector of dimensions
    */
-  array_var_context(const std::vector<std::string>& names_r,
-                    const std::vector<double>& values_r,
-                    const std::vector<std::vector<size_t>>& dim_r) {
-    add_r(names_r, values_r, dim_r);
-  }
-
-  /**
-   * Construct an array_var_context from an Eigen::RowVectorXd.
-   *
-   * @param names_r  names for each element
-   * @param values_r an Eigen RowVector double values for all elements
-   * @param dim_r   a vector of dimensions
-   */
-  array_var_context(const std::vector<std::string>& names_r,
-                    const Eigen::RowVectorXd& values_r,
-                    const std::vector<std::vector<size_t>>& dim_r) {
-    add_r(names_r, values_r, dim_r);
+  template <typename T, std::enable_if_t<is_vector_floating_point<T>::value>...>
+  array_var_context(const std::vector<std::string>& names_r, T&& values_r,
+                    const std::vector<std::vector<size_t>>& dim_r)
+      : vars_r_(names_r.size()) {
+    add_r(names_r, std::forward<T>(values_r), dim_r);
   }
 
   /**
@@ -147,7 +155,8 @@ class array_var_context : public var_context {
    */
   array_var_context(const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t>>& dim_i) {
+                    const std::vector<std::vector<size_t>>& dim_i)
+      : vars_i_(names_i.size()) {
     add_i(names_i, values_i, dim_i);
   }
 
@@ -156,14 +165,15 @@ class array_var_context : public var_context {
    * and integer separately
    *
    */
-  array_var_context(const std::vector<std::string>& names_r,
-                    const std::vector<double>& values_r,
+  template <typename T, std::enable_if_t<is_vector_floating_point<T>::value>...>
+  array_var_context(const std::vector<std::string>& names_r, T&& values_r,
                     const std::vector<std::vector<size_t>>& dim_r,
                     const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t>>& dim_i) {
+                    const std::vector<std::vector<size_t>>& dim_i)
+      : vars_i_(names_i.size()), vars_r_(names_r.size()) {
     add_i(names_i, values_i, dim_i);
-    add_r(names_r, values_r, dim_r);
+    add_r(names_r, std::forward<T>(values_r), dim_r);
   }
 
   /**
