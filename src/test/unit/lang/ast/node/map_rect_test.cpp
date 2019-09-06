@@ -20,7 +20,8 @@ TEST(StanLangAst, MapRect) {
   stan::lang::expression e4 = int_literal(4);
   stan::lang::map_rect mr(name, e1, e2, e3, e4);
   EXPECT_TRUE(mr.fun_name_ == "foo");
-  int_literal lit1 = boost::polymorphic_get<int_literal>(mr.shared_params_.expr_);
+  int_literal lit1
+      = boost::polymorphic_get<int_literal>(mr.shared_params_.expr_);
   EXPECT_EQ(1, lit1.val_);
   int_literal lit2 = boost::polymorphic_get<int_literal>(mr.job_params_.expr_);
   EXPECT_EQ(2, lit2.val_);

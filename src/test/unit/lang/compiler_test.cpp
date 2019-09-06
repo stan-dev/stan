@@ -20,7 +20,7 @@ TEST(LangCompiler, emptyProgram) {
 
   stan::lang::compile(&msgs, stan_lang_in, cpp_out, model_name);
 
-  EXPECT_EQ(1,count_matches("WARNING: empty program",msgs.str()));
+  EXPECT_EQ(1, count_matches("WARNING: empty program", msgs.str()));
   EXPECT_EQ(std::string::npos, cpp_out.str().find("int main("));
 
   // can't test equivalence of "" and "model { }" because of the

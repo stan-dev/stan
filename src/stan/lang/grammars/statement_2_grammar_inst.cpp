@@ -2,7 +2,7 @@
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 
 namespace stan {
-  namespace lang {
-    template struct statement_2_grammar<pos_iterator_t>;
-  }
+namespace lang {
+template struct statement_2_grammar<pos_iterator_t>;
 }
+}  // namespace stan

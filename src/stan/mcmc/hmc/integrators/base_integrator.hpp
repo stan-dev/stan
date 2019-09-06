@@ -4,20 +4,19 @@
 #include <stan/callbacks/logger.hpp>
 
 namespace stan {
-  namespace mcmc {
+namespace mcmc {
 
-    template <class Hamiltonian>
-    class base_integrator {
-    public:
-      base_integrator() {}
+template <class Hamiltonian>
+class base_integrator {
+ public:
+  base_integrator() {}
 
-      virtual void
-      evolve(typename Hamiltonian::PointType& z,
-             Hamiltonian& hamiltonian,
-             const double epsilon,
-             callbacks::logger& logger) = 0;
-    };
+  virtual void evolve(typename Hamiltonian::PointType& z,
+                      Hamiltonian& hamiltonian, const double epsilon,
+                      callbacks::logger& logger)
+      = 0;
+};
 
-  }  // mcmc
-}  // stan
+}  // namespace mcmc
+}  // namespace stan
 #endif

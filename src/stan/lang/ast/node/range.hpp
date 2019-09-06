@@ -4,52 +4,52 @@
 #include <stan/lang/ast/node/expression.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST structure for a range object with a low and high value.
-     */
-    struct range {
-      /**
-       * Lower bound of range with <code>nil</code> value if only
-       * upper bound.
-       */
-      expression low_;
+/**
+ * AST structure for a range object with a low and high value.
+ */
+struct range {
+  /**
+   * Lower bound of range with <code>nil</code> value if only
+   * upper bound.
+   */
+  expression low_;
 
-      /**
-       * Upper bound of range with <code>nil</code> value if only
-       * upper bound.
-       */
-      expression high_;
+  /**
+   * Upper bound of range with <code>nil</code> value if only
+   * upper bound.
+   */
+  expression high_;
 
-      /**
-       * Construct a default range object.
-       */
-      range();
+  /**
+   * Construct a default range object.
+   */
+  range();
 
-      /**
-       * Construct a range object with the specified bounds.
-       *
-       * @param low lower bound
-       * @param high upper bound
-       */
-      range(const expression& low, const expression& high);
+  /**
+   * Construct a range object with the specified bounds.
+   *
+   * @param low lower bound
+   * @param high upper bound
+   */
+  range(const expression& low, const expression& high);
 
-      /**
-       * Return true if the lower bound is non-nil.
-       *
-       * @return true if there is a lower bound
-       */
-      bool has_low() const;
+  /**
+   * Return true if the lower bound is non-nil.
+   *
+   * @return true if there is a lower bound
+   */
+  bool has_low() const;
 
-      /**
-       * Return true if the upper bound is non-nil.
-       *
-       * @return true if there is an upper bound
-       */
-      bool has_high() const;
-    };
+  /**
+   * Return true if the upper bound is non-nil.
+   *
+   * @return true if there is an upper bound
+   */
+  bool has_high() const;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

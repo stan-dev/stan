@@ -11,81 +11,81 @@
 #include <boost/variant/static_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Visitor to get data restriction status for bare type.
-     */
-    struct bare_type_is_data_vis : public boost::static_visitor<bool> {
-      /**
-       * Construct a visitor.
-       */
-      bare_type_is_data_vis();
+/**
+ * Visitor to get data restriction status for bare type.
+ */
+struct bare_type_is_data_vis : public boost::static_visitor<bool> {
+  /**
+   * Construct a visitor.
+   */
+  bare_type_is_data_vis();
 
-      /**
-       * Return variable restriction status for this type.
-       *
-       * @param x type
-       * @return is_data flag
-       */
-      bool operator()(const bare_array_type& x) const;
+  /**
+   * Return variable restriction status for this type.
+   *
+   * @param x type
+   * @return is_data flag
+   */
+  bool operator()(const bare_array_type& x) const;
 
-      /**
-       * Return variable restriction status for this type.
-       *
-       * @param x type
-       * @return is_data flag
-       */
-      bool operator()(const double_type& x) const;
+  /**
+   * Return variable restriction status for this type.
+   *
+   * @param x type
+   * @return is_data flag
+   */
+  bool operator()(const double_type& x) const;
 
-      /**
-       * Return variable restriction status for this type.
-       *
-       * @param x type
-       * @return is_data flag
-       */
-      bool operator()(const ill_formed_type& x) const;
+  /**
+   * Return variable restriction status for this type.
+   *
+   * @param x type
+   * @return is_data flag
+   */
+  bool operator()(const ill_formed_type& x) const;
 
-      /**
-       * Return variable restriction status for this type.
-       *
-       * @param x type
-       * @return is_data flag
-       */
-      bool operator()(const int_type& x) const;
+  /**
+   * Return variable restriction status for this type.
+   *
+   * @param x type
+   * @return is_data flag
+   */
+  bool operator()(const int_type& x) const;
 
-      /**
-       * Return variable restriction status for this type.
-       *
-       * @param x type
-       * @return is_data flag
-       */
-      bool operator()(const matrix_type& x) const;
+  /**
+   * Return variable restriction status for this type.
+   *
+   * @param x type
+   * @return is_data flag
+   */
+  bool operator()(const matrix_type& x) const;
 
-      /**
-       * Return variable restriction status for this type.
-       *
-       * @param x type
-       * @return is_data flag
-       */
-      bool operator()(const row_vector_type& x) const;
+  /**
+   * Return variable restriction status for this type.
+   *
+   * @param x type
+   * @return is_data flag
+   */
+  bool operator()(const row_vector_type& x) const;
 
-      /**
-       * Return variable restriction status for this type.
-       *
-       * @param x type
-       * @return is_data flag
-       */
-      bool operator()(const vector_type& x) const;
+  /**
+   * Return variable restriction status for this type.
+   *
+   * @param x type
+   * @return is_data flag
+   */
+  bool operator()(const vector_type& x) const;
 
-      /**
-       * Return variable restriction status for this type.
-       *
-       * @param x type
-       * @return is_data flag
-       */
-      bool operator()(const void_type& x) const;
-    };
-  }
-}
+  /**
+   * Return variable restriction status for this type.
+   *
+   * @param x type
+   * @return is_data flag
+   */
+  bool operator()(const void_type& x) const;
+};
+}  // namespace lang
+}  // namespace stan
 #endif

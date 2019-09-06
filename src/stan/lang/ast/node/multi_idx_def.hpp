@@ -4,12 +4,12 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    multi_idx::multi_idx() { }
+multi_idx::multi_idx() {}
 
-    multi_idx::multi_idx(const expression& idxs) : idxs_(idxs) { }
+multi_idx::multi_idx(const expression& idxs) : idxs_(idxs) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

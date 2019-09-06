@@ -4,17 +4,17 @@
 #include <stan/lang/ast/node/idx.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Return true if the specified index potentially takes more than
-     * one value.
-     *
-     * @param idx index
-     * @return true if index is not a unary index
-     */
-    bool is_multi_index(const idx& idx);
+/**
+ * Return true if the specified index potentially takes more than
+ * one value.
+ *
+ * @param idx index
+ * @return true if index is not a unary index
+ */
+bool is_multi_index(const idx& idx);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

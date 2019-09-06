@@ -28,7 +28,7 @@ TEST(McmcUnitEXHMC, build_tree) {
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::unit_e_xhmc<gauss3D_model_namespace::gauss3D_model, rng_t>
-    sampler(model, base_rng);
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -45,10 +45,9 @@ TEST(McmcUnitEXHMC, build_tree) {
   int n_leapfrog = 0;
   double sum_metro_prob = 0;
 
-  bool valid_subtree = sampler.build_tree(3, z_propose, ave, log_sum_weight,
-                                          H0, 1, n_leapfrog,
-                                          sum_metro_prob,
-                                          logger);
+  bool valid_subtree
+      = sampler.build_tree(3, z_propose, ave, log_sum_weight, H0, 1, n_leapfrog,
+                           sum_metro_prob, logger);
 
   EXPECT_EQ(0.1, sampler.get_nominal_stepsize());
 
@@ -101,7 +100,7 @@ TEST(McmcUnitEXHMC, transition) {
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::unit_e_xhmc<gauss3D_model_namespace::gauss3D_model, rng_t>
-    sampler(model, base_rng);
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);

@@ -7,21 +7,19 @@
 #include <stan/mcmc/hmc/integrators/impl_leapfrog.hpp>
 
 namespace stan {
-  namespace mcmc {
-    /**
-     * The No-U-Turn sampler (NUTS) with multinomial sampling
-     * with a Gaussian-Riemannian disintegration and SoftAbs metric
-     */
-    template <class Model, class BaseRNG>
-    class softabs_nuts
-      : public base_nuts<Model, softabs_metric,
-                         impl_leapfrog, BaseRNG> {
-    public:
-      softabs_nuts(const Model& model, BaseRNG& rng)
-        : base_nuts<Model, softabs_metric, impl_leapfrog,
-                    BaseRNG>(model, rng) { }
-    };
+namespace mcmc {
+/**
+ * The No-U-Turn sampler (NUTS) with multinomial sampling
+ * with a Gaussian-Riemannian disintegration and SoftAbs metric
+ */
+template <class Model, class BaseRNG>
+class softabs_nuts
+    : public base_nuts<Model, softabs_metric, impl_leapfrog, BaseRNG> {
+ public:
+  softabs_nuts(const Model& model, BaseRNG& rng)
+      : base_nuts<Model, softabs_metric, impl_leapfrog, BaseRNG>(model, rng) {}
+};
 
-  }  // mcmc
-}  // stan
+}  // namespace mcmc
+}  // namespace stan
 #endif
