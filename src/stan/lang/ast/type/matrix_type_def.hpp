@@ -5,13 +5,16 @@
 #include <string>
 
 namespace stan {
-namespace lang {
+  namespace lang {
 
-matrix_type::matrix_type(bool is_data) : is_data_(is_data) {}
+    matrix_type::matrix_type(bool is_data) : is_data_(is_data) { }
 
-matrix_type::matrix_type() : matrix_type(false) {}
+    matrix_type::matrix_type() : matrix_type(false) { }
 
-std::string matrix_type::oid() const { return "06_matrix_type"; }
-}  // namespace lang
-}  // namespace stan
+    std::string matrix_type::oid() const {
+      return "06_matrix_type";
+    }
+  }
+}
 #endif
+

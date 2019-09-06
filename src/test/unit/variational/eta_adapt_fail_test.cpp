@@ -6,15 +6,14 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/additive_combine.hpp> // L'Ecuyer RNG
 
 typedef boost::ecuyer1988 rng_t;
 
 class eta_should_fail_test : public ::testing::Test {
- public:
+public:
   eta_should_fail_test()
-      : logger(log_stream_, log_stream_, log_stream_, log_stream_,
-               log_stream_) {}
+    : logger(log_stream_, log_stream_, log_stream_, log_stream_, log_stream_) { }
 
   void SetUp() {
     static const std::string DATA = "";
@@ -27,13 +26,15 @@ class eta_should_fail_test : public ::testing::Test {
     model_stream_.str("");
     log_stream_.str("");
 
-    advi_meanfield_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_meanfield, rng_t>(
-        *model_, cont_params_, base_rng_, 1, 1, 100, 1);
+    advi_meanfield_ = new stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t>
+      (*model_, cont_params_, base_rng_,
+       1, 1,
+       100, 1);
 
-    advi_fullrank_ = new stan::variational::advi<
-        stan_model, stan::variational::normal_fullrank, rng_t>(
-        *model_, cont_params_, base_rng_, 1, 1, 100, 1);
+    advi_fullrank_ = new stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
+      (*model_, cont_params_, base_rng_,
+       1, 1,
+       100, 1);
   }
 
   void TearDown() {
@@ -42,10 +43,8 @@ class eta_should_fail_test : public ::testing::Test {
     delete model_;
   }
 
-  stan::variational::advi<stan_model, stan::variational::normal_meanfield,
-                          rng_t> *advi_meanfield_;
-  stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
-      *advi_fullrank_;
+  stan::variational::advi<stan_model, stan::variational::normal_meanfield, rng_t> *advi_meanfield_;
+  stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t> *advi_fullrank_;
   std::stringstream model_stream_;
   std::stringstream log_stream_;
   stan::callbacks::stream_logger logger;
@@ -55,17 +54,17 @@ class eta_should_fail_test : public ::testing::Test {
   Eigen::VectorXd cont_params_;
 };
 
-TEST_F(eta_should_fail_test, eta_adapt_should_fail) {
-  stan::variational::normal_meanfield meanfield_init
-      = stan::variational::normal_meanfield(cont_params_);
-  stan::variational::normal_fullrank fullrank_init
-      = stan::variational::normal_fullrank(cont_params_);
 
-  std::string error
-      = "stan::variational::advi::adapt_eta: "
-        "All proposed step-sizes "
-        "failed. Your model may be either "
-        "severely ill-conditioned or misspecified.";
+TEST_F(eta_should_fail_test, eta_adapt_should_fail) {
+  stan::variational::normal_meanfield meanfield_init =
+    stan::variational::normal_meanfield(cont_params_);
+  stan::variational::normal_fullrank fullrank_init =
+    stan::variational::normal_fullrank(cont_params_);
+
+  std::string error = "stan::variational::advi::adapt_eta: "
+                      "All proposed step-sizes "
+                      "failed. Your model may be either "
+                      "severely ill-conditioned or misspecified.";
 
   EXPECT_THROW_MSG(advi_meanfield_->adapt_eta(meanfield_init, 1, logger),
                    std::domain_error, error);

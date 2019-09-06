@@ -29,4 +29,5 @@ TEST(lang_parser, new_assign) {
                "Info: assignment operator <- deprecated"
                " in the Stan language;"
                " use = instead.");
+
 }

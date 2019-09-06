@@ -5,15 +5,17 @@
 #include <vector>
 
 namespace stan {
-namespace lang {
+  namespace lang {
 
-conditional_statement::conditional_statement() {}
+    conditional_statement::conditional_statement() {  }
 
-conditional_statement ::conditional_statement(
-    const std::vector<expression>& conditions,
-    const std::vector<statement>& bodies)
-    : conditions_(conditions), bodies_(bodies) {}
+    conditional_statement
+    ::conditional_statement(const std::vector<expression>& conditions,
+                            const std::vector<statement>& bodies)
+      : conditions_(conditions), bodies_(bodies) { }
 
-}  // namespace lang
-}  // namespace stan
+
+
+  }
+}
 #endif
