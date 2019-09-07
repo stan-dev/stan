@@ -4,35 +4,35 @@
 #include <stan/lang/ast/node/expression.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST node for the increment log prob (deprecated) and target
-     * increment statements.
-     */
-    struct increment_log_prob_statement {
-      /**
-       * Construct an increment log prob statement with a nil return
-       * expression. 
-       */
-      increment_log_prob_statement();
+/**
+ * AST node for the increment log prob (deprecated) and target
+ * increment statements.
+ */
+struct increment_log_prob_statement {
+  /**
+   * Construct an increment log prob statement with a nil return
+   * expression.
+   */
+  increment_log_prob_statement();
 
-      /**
-       * Construct an increment log prob statement with the specified
-       * expression for the quantity to increment.
-       *
-       * @param log_prob quantity with which to increment the target
-       * log density
-       */
-      increment_log_prob_statement(const expression& log_prob);  // NOLINT
+  /**
+   * Construct an increment log prob statement with the specified
+   * expression for the quantity to increment.
+   *
+   * @param log_prob quantity with which to increment the target
+   * log density
+   */
+  increment_log_prob_statement(const expression& log_prob);  // NOLINT
 
-      /**
-       * Expression for the quantity with which to increment the
-       * target log density.
-       */
-      expression log_prob_;
-    };
+  /**
+   * Expression for the quantity with which to increment the
+   * target log density.
+   */
+  expression log_prob_;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -19,16 +19,24 @@ TEST(ModelUtil, grad_hess_log_prob) {
 
   try {
     std::vector<double> hessian;
-    stan::model::grad_hess_log_prob<true, true, stan_model>(model, params_r, params_i, gradient, hessian, 0);
-    stan::model::grad_hess_log_prob<true, false, stan_model>(model, params_r, params_i, gradient, hessian, 0);
-    stan::model::grad_hess_log_prob<false, true, stan_model>(model, params_r, params_i, gradient, hessian, 0);
-    stan::model::grad_hess_log_prob<false, false, stan_model>(model, params_r, params_i, gradient, hessian, 0);
+    stan::model::grad_hess_log_prob<true, true, stan_model>(
+        model, params_r, params_i, gradient, hessian, 0);
+    stan::model::grad_hess_log_prob<true, false, stan_model>(
+        model, params_r, params_i, gradient, hessian, 0);
+    stan::model::grad_hess_log_prob<false, true, stan_model>(
+        model, params_r, params_i, gradient, hessian, 0);
+    stan::model::grad_hess_log_prob<false, false, stan_model>(
+        model, params_r, params_i, gradient, hessian, 0);
 
     out.str("");
-    stan::model::grad_hess_log_prob<true, true, stan_model>(model, params_r, params_i, gradient, hessian, &out);
-    stan::model::grad_hess_log_prob<true, false, stan_model>(model, params_r, params_i, gradient, hessian, &out);
-    stan::model::grad_hess_log_prob<false, true, stan_model>(model, params_r, params_i, gradient, hessian, &out);
-    stan::model::grad_hess_log_prob<false, false, stan_model>(model, params_r, params_i, gradient, hessian, &out);
+    stan::model::grad_hess_log_prob<true, true, stan_model>(
+        model, params_r, params_i, gradient, hessian, &out);
+    stan::model::grad_hess_log_prob<true, false, stan_model>(
+        model, params_r, params_i, gradient, hessian, &out);
+    stan::model::grad_hess_log_prob<false, true, stan_model>(
+        model, params_r, params_i, gradient, hessian, &out);
+    stan::model::grad_hess_log_prob<false, false, stan_model>(
+        model, params_r, params_i, gradient, hessian, &out);
     EXPECT_EQ("", out.str());
   } catch (...) {
     FAIL() << "grad_hess_log_prob";

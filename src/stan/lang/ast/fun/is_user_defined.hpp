@@ -5,30 +5,30 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    struct expression;
-    struct fun;
+struct expression;
+struct fun;
 
-    /**
-     * Return true if the specified function was declared in the
-     * functions block.
-     *
-     * @param[in] fx function with arguments
-     */
-    bool is_user_defined(const fun& fx);
+/**
+ * Return true if the specified function was declared in the
+ * functions block.
+ *
+ * @param[in] fx function with arguments
+ */
+bool is_user_defined(const fun& fx);
 
-    /**
-     * Return true if a function with the specified name and arguments
-     * was defined in the functions block.
-     *
-     * @param[in] name function name
-     * @param[in] args function arguments
-     * @return true if function is defined in the functions block
-     */
-    bool is_user_defined(const std::string& name,
-                         const std::vector<expression>& args);
+/**
+ * Return true if a function with the specified name and arguments
+ * was defined in the functions block.
+ *
+ * @param[in] name function name
+ * @param[in] args function arguments
+ * @return true if function is defined in the functions block
+ */
+bool is_user_defined(const std::string& name,
+                     const std::vector<expression>& args);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

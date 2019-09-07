@@ -6,14 +6,14 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    variable_dims::variable_dims() { }
+variable_dims::variable_dims() {}
 
-    variable_dims::variable_dims(const std::string& name,
-                                 const std::vector<expression>& dims)
-      : name_(name), dims_(dims) { }
+variable_dims::variable_dims(const std::string& name,
+                             const std::vector<expression>& dims)
+    : name_(name), dims_(dims) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

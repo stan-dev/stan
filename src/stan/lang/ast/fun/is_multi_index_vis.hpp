@@ -10,60 +10,60 @@
 #include <boost/variant/static_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Visitor for callback to determine if an index is a multiple
-     * index or a single index.
-     */
-    struct is_multi_index_vis : public boost::static_visitor<bool> {
-      /**
-       * Construct a multi-index visitor.
-       */
-      is_multi_index_vis();
+/**
+ * Visitor for callback to determine if an index is a multiple
+ * index or a single index.
+ */
+struct is_multi_index_vis : public boost::static_visitor<bool> {
+  /**
+   * Construct a multi-index visitor.
+   */
+  is_multi_index_vis();
 
-      /**
-       * Return false.
-       *
-       * @param i index
-       */
-      bool operator()(const uni_idx& i) const;
+  /**
+   * Return false.
+   *
+   * @param i index
+   */
+  bool operator()(const uni_idx& i) const;
 
-      /**
-       * Return true.
-       *
-       * @param i index
-       */
-      bool operator()(const multi_idx& i) const;
+  /**
+   * Return true.
+   *
+   * @param i index
+   */
+  bool operator()(const multi_idx& i) const;
 
-      /**
-       * Return true.
-       *
-       * @param i index
-       */
-      bool operator()(const omni_idx& i) const;
+  /**
+   * Return true.
+   *
+   * @param i index
+   */
+  bool operator()(const omni_idx& i) const;
 
-      /**
-       * Return true.
-       *
-       * @param i index
-       */
-      bool operator()(const lb_idx& i) const;
+  /**
+   * Return true.
+   *
+   * @param i index
+   */
+  bool operator()(const lb_idx& i) const;
 
-      /**
-       * Return true.
-       *
-       * @param i index
-       */
-      bool operator()(const ub_idx& i) const;
+  /**
+   * Return true.
+   *
+   * @param i index
+   */
+  bool operator()(const ub_idx& i) const;
 
-      /**
-       * Return true.
-       *
-       * @param i index
-       */
-      bool operator()(const lub_idx& i) const;
-    };
-  }
-}
+  /**
+   * Return true.
+   *
+   * @param i index
+   */
+  bool operator()(const lub_idx& i) const;
+};
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -6,31 +6,31 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST node for print statements.
-     */
-    struct print_statement {
-      /**
-       * Construct an empty print statement.
-       */
-      print_statement();
+/**
+ * AST node for print statements.
+ */
+struct print_statement {
+  /**
+   * Construct an empty print statement.
+   */
+  print_statement();
 
-      /**
-       * Construct a print statement with the specified sequence of
-       * printable objects.
-       *
-       * @param[in] printables sequence of printable objects
-       */
-      print_statement(const std::vector<printable>& printables);  // NOLINT
+  /**
+   * Construct a print statement with the specified sequence of
+   * printable objects.
+   *
+   * @param[in] printables sequence of printable objects
+   */
+  print_statement(const std::vector<printable>& printables);  // NOLINT
 
-      /**
-       * Sequence of printable objects.
-       */
-      std::vector<printable> printables_;
-    };
+  /**
+   * Sequence of printable objects.
+   */
+  std::vector<printable> printables_;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

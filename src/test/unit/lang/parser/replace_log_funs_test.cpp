@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
 #include <test/unit/lang/utility.hpp>
 
-TEST(langParser, funsNewLSyntax) {
-  test_parsable("fun-defs-lpdf");
-}
+TEST(langParser, funsNewLSyntax) { test_parsable("fun-defs-lpdf"); }
 TEST(langParser, deprecateOldLogFuns) {
   test_warning("old-log-funs",
                "Info: Function name 'multiply_log' is deprecated"
@@ -26,9 +24,5 @@ TEST(langParser, deprecateOldProbLogFuns) {
                "Info: Deprecated function 'normal_ccdf_log'; please"
                " replace suffix '_ccdf_log' with '_lccdf'");
 }
-TEST(langParser, newProbFunSuffixes) {
-  test_parsable("new-prob-fun-suffixes");
-}
-TEST(langParser, userTruncation) {
-  test_parsable("user-distro-truncate");
-}
+TEST(langParser, newProbFunSuffixes) { test_parsable("new-prob-fun-suffixes"); }
+TEST(langParser, userTruncation) { test_parsable("user-distro-truncate"); }

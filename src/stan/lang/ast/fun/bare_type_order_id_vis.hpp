@@ -12,22 +12,22 @@
 #include <boost/variant/static_visitor.hpp>
 #include <string>
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Visitor to get a string which describes type wrapped by variant bare_expr_type.
-     * Ordering is ill-formed < void < primitive < vector < matrix < array.
-     * Array type ids constructed recursively.
-     */
-    struct bare_type_order_id_vis : public boost::static_visitor<std::string> {
-      /**
-       * Construct a visitor.
-       */
-      bare_type_order_id_vis();
+/**
+ * Visitor to get a string which describes type wrapped by variant
+ * bare_expr_type. Ordering is ill-formed < void < primitive < vector < matrix <
+ * array. Array type ids constructed recursively.
+ */
+struct bare_type_order_id_vis : public boost::static_visitor<std::string> {
+  /**
+   * Construct a visitor.
+   */
+  bare_type_order_id_vis();
 
-      template <typename T>
-      std::string operator()(const T& x) const;
-    };
-  }
-}
+  template <typename T>
+  std::string operator()(const T& x) const;
+};
+}  // namespace lang
+}  // namespace stan
 #endif

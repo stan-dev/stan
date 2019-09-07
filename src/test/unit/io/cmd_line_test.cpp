@@ -6,10 +6,10 @@ TEST(io_cmd_line, cmd_line_0) {
   int argc = 0;
   const char* argv[1];
   argv[0] = "foo";
-  stan::io::cmd_line cl(argc,argv);
+  stan::io::cmd_line cl(argc, argv);
   EXPECT_FALSE(cl.has_key("bar"));
   std::string y;
-  EXPECT_FALSE(cl.val<std::string>("bar",y));
+  EXPECT_FALSE(cl.val<std::string>("bar", y));
 }
 
 TEST(io_cmd_line, cmd_line_string) {
@@ -17,10 +17,10 @@ TEST(io_cmd_line, cmd_line_string) {
   const char* argv[2];
   argv[0] = "prog";
   argv[1] = "--foo=bar";
-  stan::io::cmd_line cl(argc,argv);
+  stan::io::cmd_line cl(argc, argv);
   std::string x;
-  EXPECT_TRUE(cl.val<std::string>("foo",x));
-  EXPECT_EQ("bar",x);
+  EXPECT_TRUE(cl.val<std::string>("foo", x));
+  EXPECT_EQ("bar", x);
 }
 
 TEST(io_cmd_line, cmd_line_int) {
@@ -32,25 +32,25 @@ TEST(io_cmd_line, cmd_line_int) {
   argv[3] = "--bing=3";
   argv[4] = "ahoy";
   argv[5] = "17";
-  stan::io::cmd_line cl(argc,argv);
-  EXPECT_EQ("prog.exe",cl.command());
+  stan::io::cmd_line cl(argc, argv);
+  EXPECT_EQ("prog.exe", cl.command());
   std::string x;
-  EXPECT_TRUE(cl.val<std::string>("foo",x));
-  EXPECT_EQ("bar",x);
+  EXPECT_TRUE(cl.val<std::string>("foo", x));
+  EXPECT_EQ("bar", x);
   unsigned int y;
-  EXPECT_TRUE(cl.val<unsigned int>("bing",y));
-  EXPECT_EQ(3U,y);
+  EXPECT_TRUE(cl.val<unsigned int>("bing", y));
+  EXPECT_EQ(3U, y);
   EXPECT_TRUE(cl.has_flag("bz"));
   EXPECT_FALSE(cl.has_flag("bza"));
-  EXPECT_FALSE(cl.val<unsigned int>("bongo",y));
+  EXPECT_FALSE(cl.val<unsigned int>("bongo", y));
   EXPECT_EQ(2U, cl.bare_size());
   std::string z;
-  EXPECT_TRUE(cl.bare<std::string>(0,z));
+  EXPECT_TRUE(cl.bare<std::string>(0, z));
   EXPECT_EQ("ahoy", z);
-  EXPECT_TRUE(cl.bare<unsigned int>(1,y));
+  EXPECT_TRUE(cl.bare<unsigned int>(1, y));
   EXPECT_EQ(17U, y);
   double aaa;
-  EXPECT_FALSE(cl.bare<double>(2,aaa));
+  EXPECT_FALSE(cl.bare<double>(2, aaa));
 }
 
 TEST(io_cmd_line, spaces) {
@@ -59,15 +59,15 @@ TEST(io_cmd_line, spaces) {
   argv[0] = "prog";
   argv[1] = "arg 1";
   argv[2] = "--foo=arg 2";
-  stan::io::cmd_line cl(argc,argv);
+  stan::io::cmd_line cl(argc, argv);
   std::string x;
   EXPECT_EQ(1U, cl.bare_size());
-  EXPECT_TRUE(cl.bare<std::string>(0,x));
+  EXPECT_TRUE(cl.bare<std::string>(0, x));
   EXPECT_EQ("arg 1", x);
 
   std::string y;
-  EXPECT_TRUE(cl.val<std::string>("foo",y));
-  EXPECT_EQ("arg 2",y);
+  EXPECT_TRUE(cl.val<std::string>("foo", y));
+  EXPECT_EQ("arg 2", y);
 }
 
 TEST(io_cmd_line, pad_help_option) {

@@ -4,17 +4,17 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Return true if the specified function name has a suffix
-     * indicating it is a CCDF.
-     *
-     * @param[in] name of function
-     * @return true if the function has a suffix indicating it is a CCDF
-     */
-    bool has_ccdf_suffix(const std::string& name);
+/**
+ * Return true if the specified function name has a suffix
+ * indicating it is a CCDF.
+ *
+ * @param[in] name of function
+ * @return true if the function has a suffix indicating it is a CCDF
+ */
+bool has_ccdf_suffix(const std::string& name);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -7,36 +7,36 @@
 #include <set>
 #include <vector>
 
-using stan::lang::idx;
-using stan::lang::uni_idx;
-using stan::lang::omni_idx;
-using stan::lang::expression;
-using stan::lang::int_literal;
-using stan::lang::function_signatures;
 using stan::lang::bare_array_type;
 using stan::lang::bare_expr_type;
-using stan::lang::ill_formed_type;
-using stan::lang::void_type;
 using stan::lang::double_type;
+using stan::lang::expression;
+using stan::lang::function_signatures;
+using stan::lang::idx;
+using stan::lang::ill_formed_type;
+using stan::lang::int_literal;
 using stan::lang::int_type;
-using stan::lang::vector_type;
-using stan::lang::row_vector_type;
 using stan::lang::matrix_type;
+using stan::lang::omni_idx;
+using stan::lang::row_vector_type;
+using stan::lang::uni_idx;
+using stan::lang::vector_type;
+using stan::lang::void_type;
 using std::vector;
 
 // Type Inference Tests for Generalized Indexing
 
 // tests recovery of base expression type and number of dims
 // given expression and indexing
-void test_recover(bare_expr_type base_et_expected,
-                  size_t num_dims_expected,
+void test_recover(bare_expr_type base_et_expected, size_t num_dims_expected,
                   bare_expr_type base_et, size_t num_dims,
                   const std::vector<stan::lang::idx>& idxs) {
   stan::lang::variable v("foo");
-  if (num_dims == 0)
+  if (num_dims == 0) {
     v.set_type(base_et);
-  else
+  } else {
     v.set_type(bare_array_type(base_et, num_dims));
+  }
   stan::lang::expression e(v);
   bare_expr_type et = indexed_type(e, idxs);
   EXPECT_EQ(base_et_expected, et.innermost_type());
@@ -46,10 +46,11 @@ void test_recover(bare_expr_type base_et_expected,
 void test_err(bare_expr_type base_et, size_t num_dims,
               const std::vector<stan::lang::idx>& idxs) {
   stan::lang::variable v("foo");
-  if (num_dims == 0)
+  if (num_dims == 0) {
     v.set_type(base_et);
-  else
+  } else {
     v.set_type(bare_array_type(base_et, num_dims));
+  }
   stan::lang::expression e(v);
   bare_expr_type et = indexed_type(e, idxs);
   EXPECT_EQ(bare_expr_type(ill_formed_type()), et);
@@ -57,23 +58,27 @@ void test_err(bare_expr_type base_et, size_t num_dims,
 
 TEST(langAst, idxs) {
   const stan::lang::bare_expr_type bet[]
-    = { bare_expr_type(int_type()), bare_expr_type(double_type()),
-        bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
-        bare_expr_type(matrix_type()) };
+      = {bare_expr_type(int_type()), bare_expr_type(double_type()),
+         bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
+         bare_expr_type(matrix_type())};
   vector<idx> idxs;
-  for (size_t n = 0; n < 4; ++n)
-    for (int i = 0; i < 5; ++i)
+  for (size_t n = 0; n < 4; ++n) {
+    for (int i = 0; i < 5; ++i) {
       test_recover(bet[i], n, bet[i], n, idxs);
+    }
+  }
 }
 
 void one_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
   const stan::lang::bare_expr_type bet[]
-    = { bare_expr_type(int_type()), bare_expr_type(double_type()),
-        bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
-        bare_expr_type(matrix_type()) };
-  for (size_t n = 1; n < 4; ++n)
-    for (int i = 0; i < 5; ++i)
+      = {bare_expr_type(int_type()), bare_expr_type(double_type()),
+         bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
+         bare_expr_type(matrix_type())};
+  for (size_t n = 1; n < 4; ++n) {
+    for (int i = 0; i < 5; ++i) {
       test_recover(bet[i], n - redux, bet[i], n, idxs);
+    }
+  }
 }
 
 void one_index_errs(const std::vector<stan::lang::idx>& idxs) {
@@ -87,8 +92,8 @@ TEST(langAst, idxs0) {
 
   one_index_errs(idxs);
   one_index_recover(idxs, 1U);
-  test_recover(bare_expr_type(double_type()), 0U,
-               bare_expr_type(vector_type()), 0U, idxs);
+  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(vector_type()),
+               0U, idxs);
   test_recover(bare_expr_type(double_type()), 0U,
                bare_expr_type(row_vector_type()), 0U, idxs);
   test_recover(bare_expr_type(row_vector_type()), 0U,
@@ -101,19 +106,24 @@ TEST(langAst, idxs1) {
 
   one_index_errs(idxs);
   one_index_recover(idxs, 0U);
-  test_recover(bare_expr_type(vector_type()), 0U, bare_expr_type(vector_type()), 0U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 0U, bare_expr_type(row_vector_type()), 0U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()), 0U, idxs);
+  test_recover(bare_expr_type(vector_type()), 0U, bare_expr_type(vector_type()),
+               0U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 0U,
+               bare_expr_type(row_vector_type()), 0U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()),
+               0U, idxs);
 }
 
 void two_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
   const stan::lang::bare_expr_type bet[]
-    = { bare_expr_type(int_type()), bare_expr_type(double_type()),
-        bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
-        bare_expr_type(bare_expr_type(matrix_type())) };
-  for (size_t n = 2; n < 4; ++n)
-    for (int i = 0; i < 5; ++i)
+      = {bare_expr_type(int_type()), bare_expr_type(double_type()),
+         bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
+         bare_expr_type(bare_expr_type(matrix_type()))};
+  for (size_t n = 2; n < 4; ++n) {
+    for (int i = 0; i < 5; ++i) {
       test_recover(bet[i], n - redux, bet[i], n, idxs);
+    }
+  }
 }
 
 void two_index_errs(const std::vector<stan::lang::idx>& idxs) {
@@ -132,10 +142,14 @@ TEST(langAst, idxs00) {
 
   two_index_errs(idxs);
   two_index_recover(idxs, 2U);
-  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(vector_type()), 1U, idxs);
-  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(row_vector_type()), 1U, idxs);
-  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(matrix_type()), 0U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 0U, bare_expr_type(matrix_type()), 1U, idxs);
+  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(vector_type()),
+               1U, idxs);
+  test_recover(bare_expr_type(double_type()), 0U,
+               bare_expr_type(row_vector_type()), 1U, idxs);
+  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(matrix_type()),
+               0U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 0U,
+               bare_expr_type(matrix_type()), 1U, idxs);
 }
 
 TEST(langAst, idxs01) {
@@ -145,10 +159,14 @@ TEST(langAst, idxs01) {
 
   two_index_errs(idxs);
   two_index_recover(idxs, 1U);
-  test_recover(bare_expr_type(vector_type()), 0U, bare_expr_type(vector_type()), 1U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 0U, bare_expr_type(row_vector_type()), 1U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 0U, bare_expr_type(matrix_type()), 0U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()), 1U, idxs);
+  test_recover(bare_expr_type(vector_type()), 0U, bare_expr_type(vector_type()),
+               1U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 0U,
+               bare_expr_type(row_vector_type()), 1U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 0U,
+               bare_expr_type(matrix_type()), 0U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()),
+               1U, idxs);
 }
 
 TEST(langAst, idxs10) {
@@ -158,10 +176,14 @@ TEST(langAst, idxs10) {
 
   two_index_errs(idxs);
   two_index_recover(idxs, 1U);
-  test_recover(bare_expr_type(double_type()), 1U, bare_expr_type(vector_type()), 1U, idxs);
-  test_recover(bare_expr_type(double_type()), 1U, bare_expr_type(row_vector_type()), 1U, idxs);
-  test_recover(bare_expr_type(vector_type()), 0U, bare_expr_type(matrix_type()), 0U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 1U, bare_expr_type(matrix_type()), 1U, idxs);
+  test_recover(bare_expr_type(double_type()), 1U, bare_expr_type(vector_type()),
+               1U, idxs);
+  test_recover(bare_expr_type(double_type()), 1U,
+               bare_expr_type(row_vector_type()), 1U, idxs);
+  test_recover(bare_expr_type(vector_type()), 0U, bare_expr_type(matrix_type()),
+               0U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 1U,
+               bare_expr_type(matrix_type()), 1U, idxs);
 }
 
 TEST(langAst, idxs11) {
@@ -171,20 +193,27 @@ TEST(langAst, idxs11) {
 
   two_index_errs(idxs);
   two_index_recover(idxs, 0U);
-  test_recover(bare_expr_type(vector_type()), 1U, bare_expr_type(vector_type()), 1U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 1U, bare_expr_type(row_vector_type()), 1U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()), 0U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 1U, bare_expr_type(matrix_type()), 1U, idxs);
+  test_recover(bare_expr_type(vector_type()), 1U, bare_expr_type(vector_type()),
+               1U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 1U,
+               bare_expr_type(row_vector_type()), 1U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()),
+               0U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 1U, bare_expr_type(matrix_type()),
+               1U, idxs);
 }
 
-void three_index_recover(const std::vector<stan::lang::idx>& idxs, size_t redux) {
+void three_index_recover(const std::vector<stan::lang::idx>& idxs,
+                         size_t redux) {
   const stan::lang::bare_expr_type bet[]
-    = { bare_expr_type(int_type()), bare_expr_type(double_type()),
-        bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
-        bare_expr_type(matrix_type()) };
-  for (int i = 0; i < 5; ++i)
-    for (size_t n = 3; n < 5; ++n)
+      = {bare_expr_type(int_type()), bare_expr_type(double_type()),
+         bare_expr_type(vector_type()), bare_expr_type(row_vector_type()),
+         bare_expr_type(matrix_type())};
+  for (int i = 0; i < 5; ++i) {
+    for (size_t n = 3; n < 5; ++n) {
       test_recover(bet[i], n - redux, bet[i], n, idxs);
+    }
+  }
 }
 
 void three_index_errs(const std::vector<stan::lang::idx>& idxs) {
@@ -209,10 +238,14 @@ TEST(langAst, idxs000) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 3U);
-  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(row_vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(matrix_type()), 1U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 0U, bare_expr_type(matrix_type()), 2U, idxs);
+  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(vector_type()),
+               2U, idxs);
+  test_recover(bare_expr_type(double_type()), 0U,
+               bare_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(bare_expr_type(double_type()), 0U, bare_expr_type(matrix_type()),
+               1U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 0U,
+               bare_expr_type(matrix_type()), 2U, idxs);
 }
 
 TEST(langAst, idxs001) {
@@ -223,10 +256,14 @@ TEST(langAst, idxs001) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 2U);
-  test_recover(bare_expr_type(vector_type()), 0U, bare_expr_type(vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 0U, bare_expr_type(row_vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 0U, bare_expr_type(matrix_type()), 1U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()), 2U, idxs);
+  test_recover(bare_expr_type(vector_type()), 0U, bare_expr_type(vector_type()),
+               2U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 0U,
+               bare_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 0U,
+               bare_expr_type(matrix_type()), 1U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()),
+               2U, idxs);
 }
 
 TEST(langAst, idxs011) {
@@ -237,10 +274,14 @@ TEST(langAst, idxs011) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 1U);
-  test_recover(bare_expr_type(vector_type()), 1U, bare_expr_type(vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 1U, bare_expr_type(row_vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()), 1U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 1U, bare_expr_type(matrix_type()), 2U, idxs);
+  test_recover(bare_expr_type(vector_type()), 1U, bare_expr_type(vector_type()),
+               2U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 1U,
+               bare_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 0U, bare_expr_type(matrix_type()),
+               1U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 1U, bare_expr_type(matrix_type()),
+               2U, idxs);
 }
 
 TEST(langAst, idxs100) {
@@ -251,10 +292,14 @@ TEST(langAst, idxs100) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 2U);
-  test_recover(bare_expr_type(double_type()), 1U, bare_expr_type(vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(double_type()), 1U, bare_expr_type(row_vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(double_type()), 1U, bare_expr_type(matrix_type()), 1U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 1U, bare_expr_type(matrix_type()), 2U, idxs);
+  test_recover(bare_expr_type(double_type()), 1U, bare_expr_type(vector_type()),
+               2U, idxs);
+  test_recover(bare_expr_type(double_type()), 1U,
+               bare_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(bare_expr_type(double_type()), 1U, bare_expr_type(matrix_type()),
+               1U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 1U,
+               bare_expr_type(matrix_type()), 2U, idxs);
 }
 
 TEST(langAst, idxs101) {
@@ -265,10 +310,14 @@ TEST(langAst, idxs101) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 1U);
-  test_recover(bare_expr_type(vector_type()), 1U, bare_expr_type(vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 1U, bare_expr_type(row_vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 1U, bare_expr_type(matrix_type()), 1U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 1U, bare_expr_type(matrix_type()), 2U, idxs);
+  test_recover(bare_expr_type(vector_type()), 1U, bare_expr_type(vector_type()),
+               2U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 1U,
+               bare_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 1U,
+               bare_expr_type(matrix_type()), 1U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 1U, bare_expr_type(matrix_type()),
+               2U, idxs);
 }
 
 TEST(langAst, idxs110) {
@@ -279,10 +328,14 @@ TEST(langAst, idxs110) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 1U);
-  test_recover(bare_expr_type(double_type()), 2U, bare_expr_type(vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(double_type()), 2U, bare_expr_type(row_vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(vector_type()), 1U, bare_expr_type(matrix_type()), 1U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 2U, bare_expr_type(matrix_type()), 2U, idxs);
+  test_recover(bare_expr_type(double_type()), 2U, bare_expr_type(vector_type()),
+               2U, idxs);
+  test_recover(bare_expr_type(double_type()), 2U,
+               bare_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(bare_expr_type(vector_type()), 1U, bare_expr_type(matrix_type()),
+               1U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 2U,
+               bare_expr_type(matrix_type()), 2U, idxs);
 }
 
 TEST(langAst, idxs111) {
@@ -293,10 +346,14 @@ TEST(langAst, idxs111) {
 
   three_index_errs(idxs);
   three_index_recover(idxs, 0U);
-  test_recover(bare_expr_type(vector_type()), 2U, bare_expr_type(vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(row_vector_type()), 2U, bare_expr_type(row_vector_type()), 2U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 1U, bare_expr_type(matrix_type()), 1U, idxs);
-  test_recover(bare_expr_type(matrix_type()), 2U, bare_expr_type(matrix_type()), 2U, idxs);
+  test_recover(bare_expr_type(vector_type()), 2U, bare_expr_type(vector_type()),
+               2U, idxs);
+  test_recover(bare_expr_type(row_vector_type()), 2U,
+               bare_expr_type(row_vector_type()), 2U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 1U, bare_expr_type(matrix_type()),
+               1U, idxs);
+  test_recover(bare_expr_type(matrix_type()), 2U, bare_expr_type(matrix_type()),
+               2U, idxs);
 }
 
 TEST(langAst, indexOpSliced) {

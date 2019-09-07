@@ -4,12 +4,12 @@
 #include <test/unit/util.hpp>
 
 TEST(normal_meanfield_test, zero_init) {
-  int my_dimension =  10;
+  int my_dimension = 10;
 
   stan::variational::normal_meanfield my_normal_meanfield(my_dimension);
   EXPECT_FLOAT_EQ(my_dimension, my_normal_meanfield.dimension());
 
-  const Eigen::VectorXd& mu_out    = my_normal_meanfield.mu();
+  const Eigen::VectorXd& mu_out = my_normal_meanfield.mu();
   const Eigen::VectorXd& omega_out = my_normal_meanfield.omega();
 
   for (int i = 0; i < my_dimension; ++i) {
@@ -47,13 +47,14 @@ TEST(normal_meanfield_test, mean_vector) {
 
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Vector3d mu_nan = Eigen::VectorXd::Constant(3, nan);
-  EXPECT_THROW(stan::variational::normal_meanfield my_normal_meanfield_nan(mu_nan, omega),
-                   std::domain_error);
-  EXPECT_THROW(my_normal_meanfield.set_mu(mu_nan),
-                   std::domain_error);
-  Eigen::Vector3d omega_nan = Eigen::VectorXd::Constant(3,nan);
-  EXPECT_THROW(stan::variational::normal_meanfield my_normal_meanfield_nan(mu, omega_nan);,
-                   std::domain_error);
+  EXPECT_THROW(stan::variational::normal_meanfield my_normal_meanfield_nan(
+                   mu_nan, omega),
+               std::domain_error);
+  EXPECT_THROW(my_normal_meanfield.set_mu(mu_nan), std::domain_error);
+  Eigen::Vector3d omega_nan = Eigen::VectorXd::Constant(3, nan);
+  EXPECT_THROW(stan::variational::normal_meanfield my_normal_meanfield_nan(
+                   mu, omega_nan);
+               , std::domain_error);
 
   my_normal_meanfield.set_to_zero();
   const Eigen::Vector3d& mu_out_zero = my_normal_meanfield.mu();
@@ -61,7 +62,6 @@ TEST(normal_meanfield_test, mean_vector) {
   for (int i = 0; i < my_normal_meanfield.dimension(); ++i) {
     EXPECT_FLOAT_EQ(0.0, mu_out_zero(i));
   }
-
 }
 
 TEST(normal_meanfield_test, omega_vector) {
@@ -81,8 +81,7 @@ TEST(normal_meanfield_test, omega_vector) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Vector3d omega_nan = Eigen::VectorXd::Constant(3, nan);
 
-  EXPECT_THROW(my_normal_meanfield.set_omega(omega_nan);,
-                   std::domain_error);
+  EXPECT_THROW(my_normal_meanfield.set_omega(omega_nan);, std::domain_error);
 
   my_normal_meanfield.set_to_zero();
   const Eigen::Vector3d& omega_out_zero = my_normal_meanfield.omega();
@@ -106,11 +105,9 @@ TEST(normal_meanfield_test, entropy) {
   const double entropy_out = my_normal_meanfield.entropy();
 
   EXPECT_FLOAT_EQ(entropy_out, entropy_true);
-
 }
 
 TEST(normal_meanfield_test, transform) {
-
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -123,8 +120,8 @@ TEST(normal_meanfield_test, transform) {
   x << 7.1, -9.2, 0.59;
 
   Eigen::Vector3d x_transformed;
-  x_transformed << 1.036503242068690e01,  -2.565253407151558e01,
-         3.894020358120325e05;
+  x_transformed << 1.036503242068690e01, -2.565253407151558e01,
+      3.894020358120325e05;
 
   Eigen::Vector3d x_result;
   x_result = my_normal_meanfield.transform(x);
@@ -135,14 +132,13 @@ TEST(normal_meanfield_test, transform) {
   double nan = std::numeric_limits<double>::quiet_NaN();
   Eigen::Vector3d x_nan = Eigen::VectorXd::Constant(3, nan);
 
-  EXPECT_THROW(my_normal_meanfield.transform(x_nan);,
-                   std::domain_error);
+  EXPECT_THROW(my_normal_meanfield.transform(x_nan);, std::domain_error);
 }
 
 TEST(normal_meanfield_test, calc_log_g) {
   Eigen::Vector3d x;
   x << 7.1, -9.2, 0.59;
-  
+
   Eigen::Vector3d mu;
   mu << 5.7, -3.2, 0.1332;
 
@@ -156,5 +152,4 @@ TEST(normal_meanfield_test, calc_log_g) {
   const double log_g_out = my_normal_meanfield.calc_log_g(x);
 
   EXPECT_FLOAT_EQ(log_g_out, log_g_true);
-
 }

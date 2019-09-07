@@ -5,12 +5,12 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    bool fun_name_exists(const std::string& name) {
-      return function_signatures::instance().has_key(name);
-    }
-
-  }
+bool fun_name_exists(const std::string& name) {
+  return function_signatures::instance().has_key(name);
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

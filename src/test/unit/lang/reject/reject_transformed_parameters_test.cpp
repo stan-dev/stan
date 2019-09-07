@@ -5,9 +5,7 @@
 
 // test reject() throws from transformed parameters
 TEST(StanCommon, rejectFuncCallTransformedParameters) {
-  typedef 
-    reject_transformed_parameters_model_namespace
-    ::reject_transformed_parameters_model
-    model_t;
-  reject_test<model_t,std::domain_error>("user-specified rejection", "6");
+  typedef reject_transformed_parameters_model_namespace ::
+      reject_transformed_parameters_model model_t;
+  reject_test<model_t, std::domain_error>("user-specified rejection", "6");
 }

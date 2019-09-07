@@ -5,17 +5,17 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    std::string get_ccdf(const std::string& dist_name) {
-      if (function_signatures::instance().has_key(dist_name + "_ccdf_log"))
-        return dist_name + "_ccdf_log";
-      else if (function_signatures::instance().has_key(dist_name + "_lccdf"))
-        return dist_name + "_lccdf";
-      else
-        return dist_name;
-    }
-
-  }
+std::string get_ccdf(const std::string& dist_name) {
+  if (function_signatures::instance().has_key(dist_name + "_ccdf_log"))
+    return dist_name + "_ccdf_log";
+  else if (function_signatures::instance().has_key(dist_name + "_lccdf"))
+    return dist_name + "_lccdf";
+  else
+    return dist_name;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif
