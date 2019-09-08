@@ -14,11 +14,13 @@
 
 #include <mutex>
 
+#include <stan/math/parallel/get_num_threads.hpp>
+
 #include "tbb/task_scheduler_init.h"
 #include "tbb/flow_graph.h"
 #include "tbb/concurrent_vector.h"
 
-using tbb::task_scheduler_init;
+//using tbb::task_scheduler_init;
 using namespace tbb::flow;
 
 // do not use actualy threading (yet)
@@ -111,7 +113,7 @@ namespace stan {
 
       // extends the tree into the direction of the sign of the
       // subtree
-      typedef std::tuple<bool, double, Eigen::VectorXd, Eigen::VectorXd, ps_point> extend_tree_t;
+      typedef std::tuple<bool, double, Eigen::VectorXd, Eigen::VectorXd, ps_point, int, double> extend_tree_t;
       
       extend_tree_t
       extend_tree(int depth, subtree& tree, state_t& z,
@@ -124,6 +126,9 @@ namespace stan {
         Eigen::VectorXd rho_subtree = Eigen::VectorXd::Zero(tree.p_sharp_end_.size());
         double log_sum_weight_subtree = -std::numeric_limits<double>::infinity();
 
+        tree.n_leapfrog_ = 0;
+        tree.sum_metro_prob_ = 0;
+        
         z.ps_point::operator=(tree.z_end_);
         
         bool valid_subtree = build_tree(depth,
@@ -138,7 +143,7 @@ namespace stan {
 
         tree.z_end_.ps_point::operator=(z);
         
-        return std::make_tuple(valid_subtree, log_sum_weight_subtree, rho_subtree, tree.p_sharp_end_, tree.z_propose_);
+        return std::make_tuple(valid_subtree, log_sum_weight_subtree, rho_subtree, tree.p_sharp_end_, tree.z_propose_, tree.n_leapfrog_, tree.sum_metro_prob_);
       }
         
 
@@ -188,6 +193,13 @@ namespace stan {
         this->divergent_ = false;
         this->valid_trees_ = true;
 
+        // the actual number of leapfrog steps in trajectory used
+        // excluding the ones executed speculative
+        int n_leapfrog = 0;
+
+        // actually summed metropolis prob of used trajectory
+        double sum_metro_prob = 0;
+
         std::vector<bool> fwd_direction(this->max_depth_);
 
         for (std::size_t i = 0; i != this->max_depth_; ++i)
@@ -207,7 +219,7 @@ namespace stan {
         std::cout << std::endl;
         */
         
-        tbb::concurrent_vector<extend_tree_t> ends(this->max_depth_, std::make_tuple(true, 0, Eigen::VectorXd(), Eigen::VectorXd(), z_sample));
+        tbb::concurrent_vector<extend_tree_t> ends(this->max_depth_, std::make_tuple(true, 0, Eigen::VectorXd(), Eigen::VectorXd(), z_sample, 0, 0.0));
         tbb::concurrent_vector<bool> valid_subtree_fwd(num_fwd, true);
         tbb::concurrent_vector<bool> valid_subtree_bck(num_bck, true);
 
@@ -225,6 +237,10 @@ namespace stan {
         tbb::concurrent_vector<tree_builder_t> fwd_builder;
         tbb::concurrent_vector<tree_builder_t> bck_builder;
         typedef tbb::concurrent_vector<tree_builder_t>::iterator builder_iter_t;
+
+        // now wire up the fwd and bck build of the trees which
+        // depends on single-core or multi-core run
+        const bool run_serial = stan::math::internal::get_num_threads() == 1;
 
         std::size_t fwd_idx = 0;
         std::size_t bck_idx = 0;
@@ -245,7 +261,7 @@ namespace stan {
                                                  }
                                                  //std::cout << " nothing to do." << std::endl;
                                                         });
-            if(fwd_idx != 0) {
+            if(!run_serial && fwd_idx != 0) {
               // in this case this is not the starting node, we
               // connect this with its predecessor
               make_edge(*(fwd_iter-1), *fwd_iter);
@@ -266,7 +282,7 @@ namespace stan {
                                                  }
                                                  //std::cout << " nothing to do." << std::endl;
                                                            });
-            if(bck_idx != 0) {
+            if(!run_serial && bck_idx != 0) {
               // in case this is not the starting node, we connect
               // this with his predecessor
               //make_edge(bck_builder[bck_idx-1], bck_builder[bck_idx]);
@@ -294,6 +310,18 @@ namespace stan {
           //std::cout << "creating check at depth " << depth << std::endl;
           checks.emplace_back(g, [&,depth](continue_msg) {
                                           bool is_fwd = fwd_direction[depth];
+
+                                          extend_tree_t& subtree_result = ends[depth];
+                                          
+                                          // if we are still on the
+                                          // trajectories which are
+                                          // actually used update the
+                                          // running tree stats
+                                          if (this->valid_trees_) {
+                                            this->depth_ = depth + 1;
+                                            n_leapfrog += std::get<5>(subtree_result);
+                                            sum_metro_prob += std::get<6>(subtree_result);
+                                          }
                                           
                                           bool valid_subtree = is_fwd ?
                                                                valid_subtree_fwd[all_builder_idx[depth]] :
@@ -314,8 +342,6 @@ namespace stan {
 
                                           //std::cout << " checking" << std::endl;
 
-                                          extend_tree_t& subtree_result = ends[depth];
-                                      
                                           double log_sum_weight_subtree = std::get<1>(subtree_result);
                                           const Eigen::VectorXd& rho_subtree = std::get<2>(subtree_result);
                                       
@@ -361,25 +387,26 @@ namespace stan {
             //std::cout << "depth " << depth << ": joining bck node " << all_builder_idx[depth] << " into join node." << std::endl;
             make_edge(bck_builder[all_builder_idx[depth]], checks.back());
           }
-          if(depth != 0) {
+          if(!run_serial && depth != 0) {
             make_edge(checks[depth-1], checks.back());
           }
         }
 
-        broadcast_node<continue_msg> primary_start(g);
-        make_edge(primary_start, checks[0]);
-        make_edge(primary_start, fwd_direction[0] ? fwd_builder[0] : bck_builder[0]);
+        if(run_serial) {
+          for(std::size_t i = 1; i < this->max_depth_; ++i) {
+            make_edge(checks[i-1], fwd_direction[i] ? fwd_builder[all_builder_idx[i]] : bck_builder[all_builder_idx[i]]);
+          }
+        }
 
-        // kick off primary stream 
-        primary_start.try_put(continue_msg());
-
-        // kick off secondary stream
+        // kick off work
         if(fwd_direction[0]) {
+          fwd_builder[0].try_put(continue_msg());
           // the first turn is fwd, so kick off the bck walker if needed
-          if (num_bck != 0)
+          if (!run_serial && num_bck != 0)
             bck_builder[0].try_put(continue_msg());
         } else {
-          if (num_fwd != 0)
+          bck_builder[0].try_put(continue_msg());
+          if (!run_serial && num_fwd != 0)
             fwd_builder[0].try_put(continue_msg());
         }
 
@@ -392,10 +419,11 @@ namespace stan {
         checks.clear();
         */
         
-        //this->n_leapfrog_ = n_leapfrog;
-        this->n_leapfrog_ = tree_fwd.n_leapfrog_ + tree_bck.n_leapfrog_;
+        this->n_leapfrog_ = n_leapfrog;
+        //this->n_leapfrog_ = tree_fwd.n_leapfrog_ + tree_bck.n_leapfrog_;
 
-        const double sum_metro_prob = tree_fwd.sum_metro_prob_ + tree_bck.sum_metro_prob_;
+        // this includes the speculative executed ones
+        //const double sum_metro_prob = tree_fwd.sum_metro_prob_ + tree_bck.sum_metro_prob_;
 
         // Compute average acceptance probabilty across entire trajectory,
         // even over subtrees that may have been rejected
@@ -652,7 +680,11 @@ namespace stan {
           if (boost::math::isnan(h))
             h = std::numeric_limits<double>::infinity();
 
-          if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
+          // TODO: in parallel case we cannot use the global divergent
+          // flag since this could be a speculative tree!!
+          //if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
+          bool is_divergent = (h - H0) > this->max_deltaH_;
+          //if ((h - H0) > this->max_deltaH_) this->divergent_ = true;
 
           log_sum_weight = math::log_sum_exp(log_sum_weight, H0 - h);
 
@@ -667,7 +699,7 @@ namespace stan {
           p_sharp_left = this->hamiltonian_.dtau_dp(z_beg);
           p_sharp_right = p_sharp_left;
 
-          return !this->divergent_;
+          return !is_divergent;
         }
         // General recursion
         Eigen::VectorXd p_sharp_dummy(z_beg.p.size());
@@ -722,7 +754,7 @@ namespace stan {
         return compute_criterion(p_sharp_left, p_sharp_right, rho_subtree);
       }
 
-      double get_rand_uniform() {
+      inline double get_rand_uniform() {
         static std::mutex rng_mutex;
         std::lock_guard<std::mutex> lock(rng_mutex);
         return this->rand_uniform_();
