@@ -39,7 +39,6 @@ class array_var_context : public var_context {
   std::vector<int> const empty_vec_i_{0};
   std::vector<size_t> const empty_vec_ui_{0};
 
-
   // Find method
   bool contains_r_only(const std::string& name) const {
     return vars_r_.find(name) != vars_r_.end();
@@ -321,11 +320,9 @@ class array_var_context : public var_context {
    * @return If variable is removed returns <code>true</code>, else
    *   returns <code>false</code>.
    */
-  bool remove(const std::string& name) {
-    vars_i_.erase(name);
-    vars_r_.erase(name);
-    return true;
-  }
+   bool remove(const std::string& name) {
+     return (vars_i_.erase(name) > 0) || (vars_r_.erase(name) > 0);
+   }
 };
 }  // namespace io
 }  // namespace stan
