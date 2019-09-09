@@ -41,22 +41,19 @@ class array_var_context : public var_context {
 
   template <typename Str>
   auto find_var_r(Str&& name) const {
-    auto found_val = std::find_if(vars_r_.begin(), vars_r_.end(),
-     [&](auto& element){ return element.first == name;} );
-    return found_val;
+    return std::find_if(vars_r_.begin(), vars_r_.end(),
+     [&](auto&& element){ return element.first == name;});
   }
 
   template <typename Str>
   auto find_var_i(Str&& name) const {
-    auto found_val = std::find_if(vars_i_.begin(), vars_i_.end(),
-     [&](auto& element){ return element.first == name;} );
-    return found_val;
-      }
+    return std::find_if(vars_i_.begin(), vars_i_.end(),
+     [&](auto&& element){ return element.first == name;});
+  }
 
   // Find method
   bool contains_r_only(const std::string& name) const {
-    auto check_var = find_var_r(name);
-    return check_var != vars_r_.end();
+    return find_var_r(name) != vars_r_.end();
   }
 
   /**
@@ -247,11 +244,14 @@ class array_var_context : public var_context {
    *
    */
   std::vector<double> vals_r(const std::string& name) const {
-    if (contains_r_only(name)) {
-      return (find_var_r(name)->second).first;
-    } else if (contains_i(name)) {
-      std::vector<int> vec_int = (find_var_i(name)->second).first;
-      return {vec_int.begin(), vec_int.end()};
+    auto ret_val_r = find_var_r(name);
+    if (ret_val_r != vars_r_.end()) {
+      return ret_val_r->second.first;
+    } else {
+      auto ret_val_i = find_var_i(name);
+      if (ret_val_i != vars_i_.end()) {
+        return {ret_val_i->second.first.begin(), ret_val_i->second.first.end()};
+      }
     }
     return empty_vec_r_;
   }
@@ -264,10 +264,14 @@ class array_var_context : public var_context {
    * @return Dimensions of variable.
    */
   std::vector<size_t> dims_r(const std::string& name) const {
-    if (contains_r_only(name)) {
-      return (find_var_r(name)->second).second;
-    } else if (contains_i(name)) {
-      return (find_var_i(name)->second).second;
+    auto ret_val_r = find_var_r(name);
+    if (ret_val_r != vars_r_.end()) {
+      return ret_val_r->second.second;
+    } else {
+      auto ret_val_i = find_var_i(name);
+      if (ret_val_i != vars_i_.end()) {
+        return ret_val_i->second.second;
+      }
     }
     return empty_vec_ui_;
   }
@@ -280,8 +284,9 @@ class array_var_context : public var_context {
    * @return Values.
    */
   std::vector<int> vals_i(const std::string& name) const {
-    if (contains_i(name)) {
-      return (find_var_i(name)->second).first;
+    auto ret_val_i = find_var_i(name);
+    if (ret_val_i != vars_i_.end()) {
+      return ret_val_i->second.first;
     }
     return empty_vec_i_;
   }
@@ -294,8 +299,9 @@ class array_var_context : public var_context {
    * @return Dimensions of variable.
    */
   std::vector<size_t> dims_i(const std::string& name) const {
-    if (contains_i(name)) {
-      return (find_var_i(name)->second).second;
+    auto ret_val_i = find_var_i(name);
+    if (ret_val_i != vars_i_.end()) {
+      return ret_val_i->second.second;
     }
     return empty_vec_ui_;
   }
