@@ -6,12 +6,12 @@
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <algorithm>
 #include <functional>
-#include <map>
 #include <numeric>
 #include <sstream>
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <utility>
 
 namespace stan {
 
@@ -26,7 +26,8 @@ class array_var_context : public var_context {
  private:
   // Pairs
   template <typename T>
-  using pair_ = std::pair<std::string, std::pair<std::vector<T>, std::vector<size_t>>>;
+  using pair_ = std::pair<std::string, std::pair<std::vector<T>,
+    std::vector<size_t>>>;
 
   // Map holding reals
   using map_r_ = std::vector<pair_<double>>;
@@ -40,13 +41,15 @@ class array_var_context : public var_context {
 
   template <typename Str>
   auto find_var_r(Str&& name) const {
-    auto found_val = std::find_if(vars_r_.begin(), vars_r_.end(), [&](auto& element){ return element.first == name;} );
+    auto found_val = std::find_if(vars_r_.begin(), vars_r_.end(),
+     [&](auto& element){ return element.first == name;} );
     return found_val;
   }
 
   template <typename Str>
   auto find_var_i(Str&& name) const {
-    auto found_val = std::find_if(vars_i_.begin(), vars_i_.end(), [&](auto& element){ return element.first == name;} );
+    auto found_val = std::find_if(vars_i_.begin(), vars_i_.end(),
+     [&](auto& element){ return element.first == name;} );
     return found_val;
       }
 
@@ -114,7 +117,8 @@ class array_var_context : public var_context {
     using val_d_t = decltype(values.data());
     for (size_t i = 0; i < names.size(); i++) {
       vars_r_[i] =
-          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}};
+          {names[i], {{values.data() + dim_vec[i],
+             values.data() + dim_vec[i + 1]}, dims[i]}};
     }
   }
 
@@ -125,7 +129,8 @@ class array_var_context : public var_context {
     using val_d_t = decltype(values.data());
     for (size_t i = 0; i < names.size(); i++) {
       vars_r_[i] =
-          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}};
+          {names[i], {{values.data() + dim_vec[i],
+             values.data() + dim_vec[i + 1]}, dims[i]}};
     }
   }
 
@@ -141,7 +146,8 @@ class array_var_context : public var_context {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
       vars_i_[i] =
-          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}};
+          {names[i], {{values.data() + dim_vec[i],
+             values.data() + dim_vec[i + 1]}, dims[i]}};
     }
   }
 
