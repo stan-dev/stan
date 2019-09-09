@@ -113,8 +113,8 @@ class array_var_context : public var_context {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     using val_d_t = decltype(values.data());
     for (size_t i = 0; i < names.size(); i++) {
-      vars_r_.push_back(
-          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}});
+      vars_r_[i] =
+          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}};
     }
   }
 
@@ -124,8 +124,8 @@ class array_var_context : public var_context {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     using val_d_t = decltype(values.data());
     for (size_t i = 0; i < names.size(); i++) {
-      vars_r_.push_back(
-          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}});
+      vars_r_[i] =
+          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}};
     }
   }
 
@@ -140,8 +140,8 @@ class array_var_context : public var_context {
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
-      vars_i_.push_back(
-          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}});
+      vars_i_[i] =
+          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}};
     }
   }
 
