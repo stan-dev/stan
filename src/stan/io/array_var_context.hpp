@@ -42,13 +42,13 @@ class array_var_context : public var_context {
   template <typename Str>
   auto find_var_r(Str&& name) const {
     return std::find_if(vars_r_.begin(), vars_r_.end(),
-     [&](auto&& element){ return element.first == name;});
+                        [&](auto&& element) { return element.first == name; });
   }
 
   template <typename Str>
   auto find_var_i(Str&& name) const {
     return std::find_if(vars_i_.begin(), vars_i_.end(),
-     [&](auto&& element){ return element.first == name;});
+                        [&](auto&& element) { return element.first == name; });
   }
 
   // Find method
