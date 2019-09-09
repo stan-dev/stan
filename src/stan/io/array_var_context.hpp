@@ -4,6 +4,7 @@
 #include <stan/io/var_context.hpp>
 #include <boost/throw_exception.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <unordered_map>
 #include <algorithm>
 #include <functional>
 #include <numeric>
@@ -26,34 +27,22 @@ class array_var_context : public var_context {
  private:
   // Pairs
   template <typename T>
-  using pair_ = std::pair<std::string, std::pair<std::vector<T>,
-    std::vector<size_t>>>;
+  using pair_ = std::pair<std::vector<T>, std::vector<size_t>>;
 
   // Map holding reals
-  using map_r_ = std::vector<pair_<double>>;
+  using map_r_ = std::unordered_map<std::string, pair_<double>>;
   map_r_ vars_r_;
-  using map_i_ = std::vector<pair_<int>>;
+  using map_i_ = std::unordered_map<std::string, pair_<int>>;
   map_i_ vars_i_;
   // When search for variable name fails, return one these
-  std::vector<double> const empty_vec_r_;
-  std::vector<int> const empty_vec_i_;
-  std::vector<size_t> const empty_vec_ui_;
+  std::vector<double> const empty_vec_r_{0};
+  std::vector<int> const empty_vec_i_{0};
+  std::vector<size_t> const empty_vec_ui_{0};
 
-  template <typename Str>
-  auto find_var_r(Str&& name) const {
-    return std::find_if(vars_r_.begin(), vars_r_.end(),
-     [&](auto&& element){ return element.first == name;});
-  }
-
-  template <typename Str>
-  auto find_var_i(Str&& name) const {
-    return std::find_if(vars_i_.begin(), vars_i_.end(),
-     [&](auto&& element){ return element.first == name;});
-  }
 
   // Find method
   bool contains_r_only(const std::string& name) const {
-    return find_var_r(name) != vars_r_.end();
+    return vars_r_.find(name) != vars_r_.end();
   }
 
   /**
@@ -88,8 +77,8 @@ class array_var_context : public var_context {
     int i = 0;
     for (i = 0; i < dims.size(); i++) {
       elem_dims_total[i + 1] = std::accumulate(dims[i].begin(), dims[i].end(),
-                                               1, std::multiplies<T>());
-      elem_dims_total[i + 1] += elem_dims_total[i];
+                                               1, std::multiplies<T>())
+                                + elem_dims_total[i];;
     }
     if (elem_dims_total[i] > array_size) {
       std::stringstream msg;
@@ -112,9 +101,8 @@ class array_var_context : public var_context {
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
-      vars_r_[i] =
-          {names[i], {{values.data() + dim_vec[i],
-             values.data() + dim_vec[i + 1]}, dims[i]}};
+      vars_r_.emplace(names[i], pair_<double>{{values.data() + dim_vec[i],
+         values.data() + dim_vec[i + 1]}, dims[i]});
     }
   }
 
@@ -122,11 +110,10 @@ class array_var_context : public var_context {
              const Eigen::VectorXd& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
-    using val_d_t = decltype(values.data());
-    for (size_t i = 0; i < names.size(); i++) {
-      vars_r_[i] =
-          {names[i], {{values.data() + dim_vec[i],
-             values.data() + dim_vec[i + 1]}, dims[i]}};
+    const auto name_size = names.size();
+    for (size_t i = 0; i < name_size; i++) {
+      vars_r_.emplace(names[i], pair_<double>{{values.data() + dim_vec[i],
+          values.data() + dim_vec[i + 1]}, dims[i]});
     }
   }
 
@@ -141,9 +128,8 @@ class array_var_context : public var_context {
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
-      vars_i_[i] =
-          {names[i], {{values.data() + dim_vec[i],
-             values.data() + dim_vec[i + 1]}, dims[i]}};
+      vars_i_.emplace(names[i], pair_<int>{{values.data() + dim_vec[i],
+        values.data() + dim_vec[i + 1]}, dims[i]});
     }
   }
 
@@ -231,7 +217,7 @@ class array_var_context : public var_context {
    * array value.
    */
   bool contains_i(const std::string& name) const {
-    return find_var_i(name) != vars_i_.end();
+    return vars_i_.find(name) != vars_i_.end();
   }
 
   /**
@@ -243,11 +229,11 @@ class array_var_context : public var_context {
    *
    */
   std::vector<double> vals_r(const std::string& name) const {
-    auto ret_val_r = find_var_r(name);
+    const auto ret_val_r = vars_r_.find(name);
     if (ret_val_r != vars_r_.end()) {
       return ret_val_r->second.first;
     } else {
-      auto ret_val_i = find_var_i(name);
+      const auto ret_val_i = vars_i_.find(name);
       if (ret_val_i != vars_i_.end()) {
         return {ret_val_i->second.first.begin(), ret_val_i->second.first.end()};
       }
@@ -263,11 +249,11 @@ class array_var_context : public var_context {
    * @return Dimensions of variable.
    */
   std::vector<size_t> dims_r(const std::string& name) const {
-    auto ret_val_r = find_var_r(name);
+    const auto ret_val_r = vars_r_.find(name);
     if (ret_val_r != vars_r_.end()) {
       return ret_val_r->second.second;
     } else {
-      auto ret_val_i = find_var_i(name);
+      const auto ret_val_i = vars_i_.find(name);
       if (ret_val_i != vars_i_.end()) {
         return ret_val_i->second.second;
       }
@@ -283,7 +269,7 @@ class array_var_context : public var_context {
    * @return Values.
    */
   std::vector<int> vals_i(const std::string& name) const {
-    auto ret_val_i = find_var_i(name);
+    auto ret_val_i = vars_i_.find(name);
     if (ret_val_i != vars_i_.end()) {
       return ret_val_i->second.first;
     }
@@ -298,7 +284,7 @@ class array_var_context : public var_context {
    * @return Dimensions of variable.
    */
   std::vector<size_t> dims_i(const std::string& name) const {
-    auto ret_val_i = find_var_i(name);
+    auto ret_val_i = vars_i_.find(name);
     if (ret_val_i != vars_i_.end()) {
       return ret_val_i->second.second;
     }
@@ -313,6 +299,7 @@ class array_var_context : public var_context {
    */
   virtual void names_r(std::vector<std::string>& names) const {
     names.clear();
+    names.reserve(vars_r_.size());
     for (const auto& vars_r_iter : vars_r_) {
       names.push_back(vars_r_iter.first);
     }
@@ -326,6 +313,7 @@ class array_var_context : public var_context {
    */
   virtual void names_i(std::vector<std::string>& names) const {
     names.clear();
+    names.reserve(vars_i_.size());
     for (const auto& vars_i_iter : vars_r_) {
       names.push_back(vars_i_iter.first);
     }
@@ -339,8 +327,8 @@ class array_var_context : public var_context {
    *   returns <code>false</code>.
    */
   bool remove(const std::string& name) {
-    vars_i_.erase(find_var_i(name));
-    vars_r_.erase(find_var_r(name));
+    vars_i_.erase(name);
+    vars_r_.erase(name);
     return true;
   }
 };
