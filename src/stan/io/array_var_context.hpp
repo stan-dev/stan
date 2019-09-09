@@ -4,15 +4,14 @@
 #include <stan/io/var_context.hpp>
 #include <boost/throw_exception.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <algorithm>
+#include <functional>
 #include <map>
+#include <numeric>
 #include <sstream>
 #include <string>
-#include <vector>
-#include <utility>
-#include <numeric>
-#include <unordered_map>
-#include <functional>
 #include <type_traits>
+#include <vector>
 
 namespace stan {
 
@@ -25,21 +24,36 @@ namespace io {
  */
 class array_var_context : public var_context {
  private:
+  // Pairs
+  template <typename T>
+  using pair_ = std::pair<std::string, std::pair<std::vector<T>, std::vector<size_t>>>;
+
   // Map holding reals
-  using pair_r_ = std::pair<std::vector<double>, std::vector<size_t>>;
-  using map_r_ = std::unordered_map<std::string, pair_r_>;
+  using map_r_ = std::vector<pair_<double>>;
   map_r_ vars_r_;
-  // Map holding integers
-  using pair_i_ = std::pair<std::vector<int>, std::vector<size_t>>;
-  using map_i_ = std::unordered_map<std::string, pair_i_>;
+  using map_i_ = std::vector<pair_<int>>;
   map_i_ vars_i_;
   // When search for variable name fails, return one these
   std::vector<double> const empty_vec_r_;
   std::vector<int> const empty_vec_i_;
   std::vector<size_t> const empty_vec_ui_;
 
+  template <typename Str>
+  auto find_var_r(Str&& name) const {
+    auto found_val = std::find_if(vars_r_.begin(), vars_r_.end(), [&](auto& element){ return element.first == name;} );
+    return found_val;
+  }
+
+  template <typename Str>
+  auto find_var_i(Str&& name) const {
+    auto found_val = std::find_if(vars_i_.begin(), vars_i_.end(), [&](auto& element){ return element.first == name;} );
+    return found_val;
+      }
+
+  // Find method
   bool contains_r_only(const std::string& name) const {
-    return vars_r_.find(name) != vars_r_.end();
+    auto check_var = find_var_r(name);
+    return check_var != vars_r_.end();
   }
 
   /**
@@ -56,6 +70,7 @@ class array_var_context : public var_context {
    * dims. The return of this function is used in the add_* methods to get the
    * sequence of values For each variable.
    */
+
   template <typename T>
   std::vector<size_t> validate_dims(
       const std::vector<std::string>& names, const T array_size,
@@ -98,9 +113,8 @@ class array_var_context : public var_context {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     using val_d_t = decltype(values.data());
     for (size_t i = 0; i < names.size(); i++) {
-      vars_r_[names[i]]
-          = {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]},
-             dims[i]};
+      vars_r_.push_back(
+          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}});
     }
   }
 
@@ -110,9 +124,8 @@ class array_var_context : public var_context {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     using val_d_t = decltype(values.data());
     for (size_t i = 0; i < names.size(); i++) {
-      vars_r_[names[i]]
-          = {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]},
-             dims[i]};
+      vars_r_.push_back(
+          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}});
     }
   }
 
@@ -127,9 +140,8 @@ class array_var_context : public var_context {
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
-      vars_i_[names[i]]
-          = {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]},
-             dims[i]};
+      vars_i_.push_back(
+          {names[i], {{values.data() + dim_vec[i], values.data() + dim_vec[i + 1]}, dims[i]}});
     }
   }
 
@@ -217,7 +229,7 @@ class array_var_context : public var_context {
    * array value.
    */
   bool contains_i(const std::string& name) const {
-    return vars_i_.find(name) != vars_i_.end();
+    return find_var_i(name) != vars_i_.end();
   }
 
   /**
@@ -230,9 +242,9 @@ class array_var_context : public var_context {
    */
   std::vector<double> vals_r(const std::string& name) const {
     if (contains_r_only(name)) {
-      return (vars_r_.find(name)->second).first;
+      return (find_var_r(name)->second).first;
     } else if (contains_i(name)) {
-      std::vector<int> vec_int = (vars_i_.find(name)->second).first;
+      std::vector<int> vec_int = (find_var_i(name)->second).first;
       return {vec_int.begin(), vec_int.end()};
     }
     return empty_vec_r_;
@@ -247,9 +259,9 @@ class array_var_context : public var_context {
    */
   std::vector<size_t> dims_r(const std::string& name) const {
     if (contains_r_only(name)) {
-      return (vars_r_.find(name)->second).second;
+      return (find_var_r(name)->second).second;
     } else if (contains_i(name)) {
-      return (vars_i_.find(name)->second).second;
+      return (find_var_i(name)->second).second;
     }
     return empty_vec_ui_;
   }
@@ -263,7 +275,7 @@ class array_var_context : public var_context {
    */
   std::vector<int> vals_i(const std::string& name) const {
     if (contains_i(name)) {
-      return (vars_i_.find(name)->second).first;
+      return (find_var_i(name)->second).first;
     }
     return empty_vec_i_;
   }
@@ -277,7 +289,7 @@ class array_var_context : public var_context {
    */
   std::vector<size_t> dims_i(const std::string& name) const {
     if (contains_i(name)) {
-      return (vars_i_.find(name)->second).second;
+      return (find_var_i(name)->second).second;
     }
     return empty_vec_ui_;
   }
@@ -316,7 +328,9 @@ class array_var_context : public var_context {
    *   returns <code>false</code>.
    */
   bool remove(const std::string& name) {
-    return (vars_i_.erase(name) > 0) || (vars_r_.erase(name) > 0);
+    vars_i_.erase(find_var_i(name));
+    vars_r_.erase(find_var_r(name));
+    return true;
   }
 };
 }  // namespace io
