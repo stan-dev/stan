@@ -30,9 +30,9 @@ class array_var_context : public var_context {
   using pair_ = std::pair<std::vector<T>, std::vector<size_t>>;
 
   // Map holding reals
-  using map_r_ = std::unordered_map<std::string, pair_<double>>;
+  using map_r_ = std::map<std::string, pair_<double>>;
   map_r_ vars_r_;
-  using map_i_ = std::unordered_map<std::string, pair_<int>>;
+  using map_i_ = std::map<std::string, pair_<int>>;
   map_i_ vars_i_;
   // When search for variable name fails, return one these
   std::vector<double> const empty_vec_r_{0};
@@ -143,15 +143,13 @@ class array_var_context : public var_context {
    */
   array_var_context(const std::vector<std::string>& names_r,
                     const std::vector<double>& values_r,
-                    const std::vector<std::vector<size_t>>& dim_r)
-      : vars_r_(names_r.size()) {
+                    const std::vector<std::vector<size_t>>& dim_r) {
     add_r(names_r, values_r, dim_r);
   }
 
   array_var_context(const std::vector<std::string>& names_r,
                     const Eigen::VectorXd& values_r,
-                    const std::vector<std::vector<size_t>>& dim_r)
-      : vars_r_(names_r.size()) {
+                    const std::vector<std::vector<size_t>>& dim_r) {
     add_r(names_r, values_r, dim_r);
   }
 
@@ -164,8 +162,7 @@ class array_var_context : public var_context {
    */
   array_var_context(const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t>>& dim_i)
-      : vars_i_(names_i.size()) {
+                    const std::vector<std::vector<size_t>>& dim_i) {
     add_i(names_i, values_i, dim_i);
   }
 
@@ -179,8 +176,7 @@ class array_var_context : public var_context {
                     const std::vector<std::vector<size_t>>& dim_r,
                     const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t>>& dim_i)
-      : vars_r_(names_r.size()), vars_i_(names_i.size()) {
+                    const std::vector<std::vector<size_t>>& dim_i) {
     add_i(names_i, values_i, dim_i);
     add_r(names_r, values_r, dim_r);
   }
@@ -190,8 +186,7 @@ class array_var_context : public var_context {
                     const std::vector<std::vector<size_t>>& dim_r,
                     const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t>>& dim_i)
-      : vars_r_(names_r.size()), vars_i_(names_i.size()) {
+                    const std::vector<std::vector<size_t>>& dim_i) {
     add_i(names_i, values_i, dim_i);
     add_r(names_r, values_r, dim_r);
   }
