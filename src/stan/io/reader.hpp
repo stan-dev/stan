@@ -37,21 +37,21 @@ class reader {
  private:
   std::vector<T> &data_r_;
   std::vector<int> &data_i_;
-  size_t pos_;
-  size_t int_pos_;
+  size_t pos_{0};
+  size_t int_pos_{0};
 
-  inline T &scalar_ptr() { return data_r_.at(pos_); }
+  inline T &scalar_ptr() { return data_r_[pos_]; }
 
   inline T &scalar_ptr_increment(size_t m) {
     pos_ += m;
-    return data_r_.at(pos_ - m);
+    return data_r_[pos_ - m];
   }
 
-  inline int &int_ptr() { return data_i_.at(int_pos_); }
+  inline int &int_ptr() { return data_i_[int_pos_]; }
 
   inline int &int_ptr_increment(size_t m) {
     int_pos_ += m;
-    return data_i_.at(int_pos_ - m);
+    return data_i_[int_pos_ - m];
   }
 
  public:
@@ -75,7 +75,7 @@ class reader {
    * @param data_i Sequence of integer values.
    */
   reader(std::vector<T> &data_r, std::vector<int> &data_i)
-      : data_r_(data_r), data_i_(data_i), pos_(0), int_pos_(0) {}
+      : data_r_(data_r), data_i_(data_i) {}
 
   /**
    * Destroy this variable reader.
@@ -167,9 +167,9 @@ class reader {
   inline std::vector<T> std_vector(size_t m) {
     if (m == 0)
       return std::vector<T>();
-    std::vector<T> vec;
-    T &start = scalar_ptr_increment(m);
-    vec.insert(vec.begin(), &start, &scalar_ptr());
+    std::vector<T> vec(&this->data_r_[this->pos_],
+                       &this->data_r_[this->pos_ + m]);
+    this->pos_ += m;
     return vec;
   }
 
@@ -1234,7 +1234,7 @@ class reader {
   }
 
   template <typename TL>
-  inline matrix_t matrix_lb(const TL lb, size_t m, size_t n) {
+  inline matrix_t matrix_lb(const TL lb, const size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1318,7 +1318,7 @@ class reader {
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n) {
+  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1327,7 +1327,8 @@ class reader {
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n, T &lp) {
+  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n,
+                                      T &lp) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
