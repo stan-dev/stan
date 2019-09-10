@@ -2,9 +2,10 @@
 #define STAN_IO_ARRAY_VAR_CONTEXT_HPP
 
 #include <stan/io/var_context.hpp>
+#include <stan/math.hpp>
 #include <boost/throw_exception.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <unordered_map>
+#include <map>
 #include <algorithm>
 #include <functional>
 #include <numeric>
@@ -25,21 +26,22 @@ namespace io {
  */
 class array_var_context : public var_context {
  private:
-  // Pairs
+  // Pair used in data maps
   template <typename T>
-  using pair_ = std::pair<std::vector<T>, std::vector<size_t>>;
+  using data_pair_t = std::pair<std::vector<T>, std::vector<size_t>>;
 
-  // Map holding reals
-  using map_r_ = std::map<std::string, pair_<double>>;
-  map_r_ vars_r_;
-  using map_i_ = std::map<std::string, pair_<int>>;
-  map_i_ vars_i_;
+  std::map<std::string, data_pair_t<double>> vars_r_; // Holds data for reals
+  std::map<std::string, data_pair_t<int>> vars_i_; // Holds data for doubles
   // When search for variable name fails, return one these
-  std::vector<double> const empty_vec_r_{0};
-  std::vector<int> const empty_vec_i_{0};
-  std::vector<size_t> const empty_vec_ui_{0};
+  const std::vector<double> empty_vec_r_;
+  const std::vector<int> empty_vec_i_;
+  const std::vector<size_t> empty_vec_ui_;
 
-  // Find method
+  /**
+   * Search over the real variables to check if a name is in the map
+   * @param name The name of the variable to search for
+   * @return logical indiciating if the variable was found in the map of reals.
+   */
   bool contains_r_only(const std::string& name) const {
     return vars_r_.find(name) != vars_r_.end();
   }
@@ -57,34 +59,25 @@ class array_var_context : public var_context {
    * a vector of the cumulative sum of the dimensions of each inner element of
    * dims. The return of this function is used in the add_* methods to get the
    * sequence of values For each variable.
+   * @throw std::invalid_argument when size of dimensions is less
+   *  then array size or array is not long enough to hold
+   *  the dimensions of the data.
    */
-
   template <typename T>
-  std::vector<size_t> validate_dims(
+  inline std::vector<size_t> validate_dims(
       const std::vector<std::string>& names, const T array_size,
       const std::vector<std::vector<size_t>>& dims) {
     const size_t num_par = names.size();
-    if (num_par > dims.size()) {
-      std::stringstream msg;
-      msg << "size of vector of dimensions (found " << dims.size() << ") "
-          << "should be no smaller than number of parameters (found " << num_par
-          << ").";
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg.str()));
-    }
+    stan::math::check_less_or_equal("validate_dims", "array_var_context",
+                                    dims.size(), num_par);
     std::vector<size_t> elem_dims_total(dims.size() + 1);
-    elem_dims_total[0] = 0;
-    int i = 0;
-    for (i = 0; i < dims.size(); i++) {
+    for (int i = 0; i < dims.size(); i++) {
       elem_dims_total[i + 1] = std::accumulate(dims[i].begin(), dims[i].end(),
                                                1, std::multiplies<T>())
-                                + elem_dims_total[i];;
+                                + elem_dims_total[i];
     }
-    if (elem_dims_total[i] > array_size) {
-      std::stringstream msg;
-      msg << "array is not long enough for all elements: " << array_size
-          << " is found, but " << elem_dims_total[i] << " is needed.";
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg.str()));
-    }
+    stan::math::check_less_or_equal("validate_dims", "array_var_context",
+                                    elem_dims_total[dims.size()], array_size);
     return elem_dims_total;
   }
 
@@ -94,24 +87,35 @@ class array_var_context : public var_context {
    * @param values The real values of variable in a contiguous
    * column major order container.
    * @param dims the dimensions for each variable.
+   * @throw std::invalid_argument when size of dimensions is less
+   *  then array size or array is not long enough to hold
+   *  the dimensions of the data.
    */
   void add_r(const std::vector<std::string>& names,
              const std::vector<double>& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
-      vars_r_.emplace(names[i], pair_<double>{{values.data() + dim_vec[i],
+      vars_r_.emplace(names[i], data_pair_t<double>{{values.data() + dim_vec[i],
          values.data() + dim_vec[i + 1]}, dims[i]});
     }
   }
 
+  /**
+   * Adds a set of floating point variables to the floating point map.
+   * @param names Names of each variable.
+   * @param values The real values of variable in an Eigen column vector.
+   * @param dims the dimensions for each variable.
+   * @throw std::invalid_argument when size of dimensions is less
+   *  then array size or array is not long enough to hold
+   *  the dimensions of the data.
+   */
   void add_r(const std::vector<std::string>& names,
              const Eigen::VectorXd& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
-    const auto name_size = names.size();
-    for (size_t i = 0; i < name_size; i++) {
-      vars_r_.emplace(names[i], pair_<double>{{values.data() + dim_vec[i],
+    for (size_t i = 0; i < names.size(); i++) {
+      vars_r_.emplace(names[i], data_pair_t<double>{{values.data() + dim_vec[i],
           values.data() + dim_vec[i + 1]}, dims[i]});
     }
   }
@@ -121,13 +125,16 @@ class array_var_context : public var_context {
    * @param names Names of each variable.
    * @param values The integer values of variable in a vector.
    * @param dims the dimensions for each variable.
+   * @throw std::invalid_argument when size of dimensions is less
+   *  then array size or array is not long enough to hold
+   *  the dimensions of the data.
    */
   void add_i(const std::vector<std::string>& names,
              const std::vector<int>& values,
              const std::vector<std::vector<size_t>>& dims) {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
-      vars_i_.emplace(names[i], pair_<int>{{values.data() + dim_vec[i],
+      vars_i_.emplace(names[i], data_pair_t<int>{{values.data() + dim_vec[i],
         values.data() + dim_vec[i + 1]}, dims[i]});
     }
   }
@@ -139,6 +146,9 @@ class array_var_context : public var_context {
    * @param names_r  names for each element
    * @param values_r a vector of double values for all elements
    * @param dim_r   a vector of dimensions
+   * @throw std::invalid_argument when size of dimensions is less
+   *  then array size or array is not long enough to hold
+   *  the dimensions of the data.
    */
   array_var_context(const std::vector<std::string>& names_r,
                     const std::vector<double>& values_r,
@@ -146,6 +156,16 @@ class array_var_context : public var_context {
     add_r(names_r, values_r, dim_r);
   }
 
+  /**
+   * Construct an array_var_context from an Eigen column vector.
+   *
+   * @param names_r  names for each element
+   * @param values_r a vector of double values for all elements
+   * @param dim_r   a vector of dimensions
+   * @throw std::invalid_argument when size of dimensions is less
+   *  then array size or array is not long enough to hold
+   *  the dimensions of the data.
+   */
   array_var_context(const std::vector<std::string>& names_r,
                     const Eigen::VectorXd& values_r,
                     const std::vector<std::vector<size_t>>& dim_r) {
@@ -158,6 +178,9 @@ class array_var_context : public var_context {
    * @param names_i  names for each element
    * @param values_i a vector of integer values for all elements
    * @param dim_i   a vector of dimensions
+   * @throw std::invalid_argument when size of dimensions is less
+   *  then array size or array is not long enough to hold
+   *  the dimensions of the data.
    */
   array_var_context(const std::vector<std::string>& names_i,
                     const std::vector<int>& values_i,
@@ -169,6 +192,15 @@ class array_var_context : public var_context {
    * Construct an array_var_context from arrays of both double
    * and integer separately
    *
+   * @param names_r  names for each element
+   * @param values_r a vector of double values for all elements
+   * @param dim_r   a vector of dimensions
+   * @param names_i  names for each element
+   * @param values_i a vector of integer values for all elements
+   * @param dim_i   a vector of dimensions
+   * @throw std::invalid_argument when size of dimensions is less
+   *  then array size or array is not long enough to hold
+   *  the dimensions of the data.
    */
   array_var_context(const std::vector<std::string>& names_r,
                     const std::vector<double>& values_r,
@@ -180,6 +212,20 @@ class array_var_context : public var_context {
     add_r(names_r, values_r, dim_r);
   }
 
+  /**
+   * Construct an array_var_context from arrays of both double
+   * and integer separately
+   *
+   * @param names_r  names for each element
+   * @param values_r Eigen column vector of double elements.
+   * @param dim_r   a vector of dimensions
+   * @param names_i  names for each element
+   * @param values_i a vector of integer values for all elements
+   * @param dim_i   a vector of dimensions
+   * @throw std::invalid_argument when size of dimensions is less
+   *  then array size or array is not long enough to hold
+   *  the dimensions of the data.
+   */
   array_var_context(const std::vector<std::string>& names_r,
                     const Eigen::VectorXd& values_r,
                     const std::vector<std::vector<size_t>>& dim_r,
