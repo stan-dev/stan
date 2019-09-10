@@ -1234,7 +1234,7 @@ class reader {
   }
 
   template <typename TL>
-  inline matrix_t matrix_lb(const TL lb, const size_t m, size_t n) {
+  inline matrix_t matrix_lb(const TL lb, size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1318,7 +1318,7 @@ class reader {
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
+  inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1327,7 +1327,7 @@ class reader {
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n,
+  inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n,
                                       T &lp) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)

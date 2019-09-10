@@ -31,11 +31,11 @@ class array_var_context : public var_context {
   using data_pair_t = std::pair<std::vector<T>, std::vector<size_t>>;
 
   std::map<std::string, data_pair_t<double>> vars_r_;  // Holds data for reals
-  std::map<std::string, data_pair_t<int>> vars_i_;     // Holds data for doubles
+  std::map<std::string, data_pair_t<int>> vars_i_;     // Holds data for integers
   // When search for variable name fails, return one these
-  const std::vector<double> empty_vec_r_;
-  const std::vector<int> empty_vec_i_;
-  const std::vector<size_t> empty_vec_ui_;
+  const std::vector<double> empty_vec_r_{0};
+  const std::vector<int> empty_vec_i_{0};
+  const std::vector<size_t> empty_vec_ui_{0};
 
   /**
    * Search over the real variables to check if a name is in the map
@@ -68,7 +68,7 @@ class array_var_context : public var_context {
       const std::vector<std::string>& names, const T array_size,
       const std::vector<std::vector<size_t>>& dims) {
     const size_t num_par = names.size();
-    stan::math::check_less_or_equal("validate_dims", "array_var_context",
+    stan::math::check_less_or_equal("validate_dims", "dims",
                                     dims.size(), num_par);
     std::vector<size_t> elem_dims_total(dims.size() + 1);
     for (int i = 0; i < dims.size(); i++) {
@@ -76,7 +76,8 @@ class array_var_context : public var_context {
                                                1, std::multiplies<T>())
                                + elem_dims_total[i];
     }
-    stan::math::check_less_or_equal("validate_dims", "array_var_context",
+    stan::math::check_less_or_equal("validate_dims",
+                                    "dimension vector (elem_dims_total)",
                                     elem_dims_total[dims.size()], array_size);
     return elem_dims_total;
   }
@@ -97,7 +98,7 @@ class array_var_context : public var_context {
     std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
       vars_r_.emplace(names[i],
-                      data_pair_t<double>{{values.data() + dim_vec[i],
+                        data_pair_t<double>{{values.data() + dim_vec[i],
                                            values.data() + dim_vec[i + 1]},
                                           dims[i]});
     }
@@ -376,6 +377,7 @@ class array_var_context : public var_context {
     return (vars_i_.erase(name) > 0) || (vars_r_.erase(name) > 0);
   }
 };
+
 }  // namespace io
 }  // namespace stan
 #endif
