@@ -1226,8 +1226,7 @@ class reader {
   }
 
   template <typename TL>
-  inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m,
-                                              T &lp) {
+  inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = scalar_lb_constrain(lb, lp);
@@ -1244,8 +1243,7 @@ class reader {
   }
 
   template <typename TL>
-  inline matrix_t matrix_lb_constrain(const TL lb, size_t m,
-                                      size_t n) {
+  inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1254,8 +1252,7 @@ class reader {
   }
 
   template <typename TL>
-  inline matrix_t matrix_lb_constrain(const TL lb, size_t m,
-                                      size_t n, T &lp) {
+  inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1304,8 +1301,7 @@ class reader {
   }
 
   template <typename TU>
-  inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m,
-                                              T &lp) {
+  inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = scalar_ub_constrain(ub, lp);
@@ -1322,8 +1318,7 @@ class reader {
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m,
-                                      size_t n) {
+  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1332,8 +1327,8 @@ class reader {
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m,
-                                      size_t n, T &lp) {
+  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n,
+                                      T &lp) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1350,8 +1345,7 @@ class reader {
   }
 
   template <typename TL, typename TU>
-  inline vector_t vector_lub_constrain(const TL lb, const TU ub,
-                                       size_t m) {
+  inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m) {
     vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = scalar_lub_constrain(lb, ub);
@@ -1393,8 +1387,7 @@ class reader {
   }
 
   template <typename TL, typename TU>
-  inline matrix_t matrix_lub(const TL lb, const TU ub, size_t m,
-                             size_t n) {
+  inline matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1492,8 +1485,7 @@ class reader {
   template <typename TL, typename TS>
   inline matrix_t matrix_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
-                                                     size_t m,
-                                                     size_t n) {
+                                                     size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1504,8 +1496,8 @@ class reader {
   template <typename TL, typename TS>
   inline matrix_t matrix_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
-                                                     size_t m,
-                                                     size_t n, T &lp) {
+                                                     size_t m, size_t n,
+                                                     T &lp) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
