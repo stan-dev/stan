@@ -5,31 +5,29 @@
 #include <sstream>
 
 namespace stan {
-  namespace services {
-    namespace util {
+namespace services {
+namespace util {
 
-      /**
-       * Create a stan::dump object which contains vector "metric"
-       * of specified size where all elements are ones.
-       *
-       * @param[in] num_params expected number of diagonal elements
-       * @return var_context 
-       */
-      inline
-      stan::io::dump
-      create_unit_e_diag_inv_metric(size_t num_params) {
-        std::stringstream txt;
-        txt << "inv_metric <- structure(c(";
-        for (size_t i = 0; i < num_params; ++i) {
-          txt << "1.0";
-          if (i < num_params - 1)
-            txt << ", ";
-        }
-        txt << "),.Dim=c(" << num_params << "))";
-        return stan::io::dump(txt);
-      }
-    }
+/**
+ * Create a stan::dump object which contains vector "metric"
+ * of specified size where all elements are ones.
+ *
+ * @param[in] num_params expected number of diagonal elements
+ * @return var_context
+ */
+inline stan::io::dump create_unit_e_diag_inv_metric(size_t num_params) {
+  std::stringstream txt;
+  txt << "inv_metric <- structure(c(";
+  for (size_t i = 0; i < num_params; ++i) {
+    txt << "1.0";
+    if (i < num_params - 1)
+      txt << ", ";
   }
+  txt << "),.Dim=c(" << num_params << "))";
+  return stan::io::dump(txt);
 }
+}  // namespace util
+}  // namespace services
+}  // namespace stan
 
 #endif

@@ -5,13 +5,13 @@
 #include <boost/variant/apply_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    bool is_nil(const expression& e) {
-      is_nil_vis ino;
-      return boost::apply_visitor(ino, e.expr_);
-    }
-
-  }
+bool is_nil(const expression& e) {
+  is_nil_vis ino;
+  return boost::apply_visitor(ino, e.expr_);
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

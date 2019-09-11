@@ -5,13 +5,13 @@
 #include <boost/variant/apply_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    bool is_multi_index(const idx& idx) {
-      is_multi_index_vis v;
-      return boost::apply_visitor(v, idx.idx_);
-    }
-
-  }
+bool is_multi_index(const idx& idx) {
+  is_multi_index_vis v;
+  return boost::apply_visitor(v, idx.idx_);
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

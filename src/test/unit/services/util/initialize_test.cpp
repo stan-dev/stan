@@ -32,11 +32,9 @@ TEST_F(ServicesUtilInitialize, radius_zero__print_false) {
 
   double init_radius = 0;
   bool print_timing = false;
-  params = stan::services::util::initialize(model, empty_context, rng,
-                                            init_radius, print_timing,
-                                            logger, init);
-  ASSERT_EQ(model.num_params_r(), params.size())
-      << "2 parameters";
+  params = stan::services::util::initialize(
+      model, empty_context, rng, init_radius, print_timing, logger, init);
+  ASSERT_EQ(model.num_params_r(), params.size()) << "2 parameters";
   EXPECT_FLOAT_EQ(0, params[0]);
   EXPECT_FLOAT_EQ(0, params[1]);
 
@@ -52,11 +50,9 @@ TEST_F(ServicesUtilInitialize, radius_zero__initialize_with_Jacobian) {
 
   double init_radius = 0;
   bool print_timing = false;
-  params = stan::services::util::initialize<false>(model, empty_context, rng,
-                                                   init_radius, print_timing,
-                                                   logger, init);
-  ASSERT_EQ(model.num_params_r(), params.size())
-      << "2 parameters";
+  params = stan::services::util::initialize<false>(
+      model, empty_context, rng, init_radius, print_timing, logger, init);
+  ASSERT_EQ(model.num_params_r(), params.size()) << "2 parameters";
   EXPECT_FLOAT_EQ(0, params[0]);
   EXPECT_FLOAT_EQ(0, params[1]);
 
@@ -72,11 +68,9 @@ TEST_F(ServicesUtilInitialize, radius_two__print_false) {
 
   double init_radius = 2;
   bool print_timing = false;
-  params = stan::services::util::initialize(model, empty_context, rng,
-                                            init_radius, print_timing,
-                                            logger, init);
-  ASSERT_EQ(model.num_params_r(), params.size())
-      << "2 parameters";
+  params = stan::services::util::initialize(
+      model, empty_context, rng, init_radius, print_timing, logger, init);
+  ASSERT_EQ(model.num_params_r(), params.size()) << "2 parameters";
   EXPECT_GT(params[0], -init_radius);
   EXPECT_LT(params[0], init_radius);
   EXPECT_GT(params[1], -init_radius);
@@ -94,11 +88,9 @@ TEST_F(ServicesUtilInitialize, radius_two__print_true) {
 
   double init_radius = 2;
   bool print_timing = true;
-  params = stan::services::util::initialize(model, empty_context, rng,
-                                            init_radius, print_timing,
-                                            logger, init);
-  ASSERT_EQ(model.num_params_r(), params.size())
-      << "2 parameters";
+  params = stan::services::util::initialize(
+      model, empty_context, rng, init_radius, print_timing, logger, init);
+  ASSERT_EQ(model.num_params_r(), params.size()) << "2 parameters";
   EXPECT_GT(params[0], -init_radius);
   EXPECT_LT(params[0], init_radius);
   EXPECT_GT(params[1], -init_radius);
@@ -118,23 +110,20 @@ TEST_F(ServicesUtilInitialize, full_init__print_false) {
   std::vector<double> values_r;
   std::vector<std::vector<size_t> > dim_r;
   names_r.push_back("y");
-  values_r.push_back(6.35149);   // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
-  values_r.push_back(-2.449187); // -0.5 unconstrained
+  values_r.push_back(6.35149);  // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
+  values_r.push_back(-2.449187);  // -0.5 unconstrained
   std::vector<size_t> d;
   d.push_back(2);
   dim_r.push_back(d);
   stan::io::array_var_context init_context(names_r, values_r, dim_r);
 
-
   std::vector<double> params;
 
   double init_radius = 2;
   bool print_timing = false;
-  params = stan::services::util::initialize(model, init_context, rng,
-                                            init_radius, print_timing,
-                                            logger, init);
-  ASSERT_EQ(model.num_params_r(), params.size())
-      << "2 parameters";
+  params = stan::services::util::initialize(
+      model, init_context, rng, init_radius, print_timing, logger, init);
+  ASSERT_EQ(model.num_params_r(), params.size()) << "2 parameters";
   EXPECT_FLOAT_EQ(1.5, params[0]);
   EXPECT_FLOAT_EQ(-0.5, params[1]);
 
@@ -150,23 +139,20 @@ TEST_F(ServicesUtilInitialize, full_init__print_true) {
   std::vector<double> values_r;
   std::vector<std::vector<size_t> > dim_r;
   names_r.push_back("y");
-  values_r.push_back(6.35149);   // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
-  values_r.push_back(-2.449187); // -0.5 unconstrained
+  values_r.push_back(6.35149);  // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
+  values_r.push_back(-2.449187);  // -0.5 unconstrained
   std::vector<size_t> d;
   d.push_back(2);
   dim_r.push_back(d);
   stan::io::array_var_context init_context(names_r, values_r, dim_r);
 
-
   std::vector<double> params;
 
   double init_radius = 2;
   bool print_timing = true;
-  params = stan::services::util::initialize(model, init_context, rng,
-                                            init_radius, print_timing,
-                                            logger, init);
-  ASSERT_EQ(model.num_params_r(), params.size())
-      << "2 parameters";
+  params = stan::services::util::initialize(
+      model, init_context, rng, init_radius, print_timing, logger, init);
+  ASSERT_EQ(model.num_params_r(), params.size()) << "2 parameters";
   EXPECT_FLOAT_EQ(1.5, params[0]);
   EXPECT_FLOAT_EQ(-0.5, params[1]);
 
@@ -181,15 +167,14 @@ TEST_F(ServicesUtilInitialize, full_init__print_true) {
 
 namespace test {
 // Mock Throwing Model throws exception
-class mock_throwing_model: public stan::model::prob_grad {
+class mock_throwing_model : public stan::model::prob_grad {
  public:
-
-  mock_throwing_model():
-      stan::model::prob_grad(1),
-      templated_log_prob_calls(0),
-      transform_inits_calls(0),
-      write_array_calls(0),
-      log_prob_return_value(0.0) { }
+  mock_throwing_model()
+      : stan::model::prob_grad(1),
+        templated_log_prob_calls(0),
+        transform_inits_calls(0),
+        write_array_calls(0),
+        log_prob_return_value(0.0) {}
 
   void reset() {
     templated_log_prob_calls = 0;
@@ -199,8 +184,7 @@ class mock_throwing_model: public stan::model::prob_grad {
   }
 
   template <bool propto__, bool jacobian__, typename T__>
-  T__ log_prob(std::vector<T__>& params_r__,
-               std::vector<int>& params_i__,
+  T__ log_prob(std::vector<T__>& params_r__, std::vector<int>& params_i__,
                std::ostream* pstream__ = 0) const {
     ++templated_log_prob_calls;
     throw std::domain_error("throwing within log_prob");
@@ -244,12 +228,9 @@ class mock_throwing_model: public stan::model::prob_grad {
     }
   }
   template <typename RNG>
-  void write_array(RNG& base_rng__,
-                   std::vector<double>& params_r__,
-                   std::vector<int>& params_i__,
-                   std::vector<double>& vars__,
-                   bool include_tparams__ = true,
-                   bool include_gqs__ = true,
+  void write_array(RNG& base_rng__, std::vector<double>& params_r__,
+                   std::vector<int>& params_i__, std::vector<double>& vars__,
+                   bool include_tparams__ = true, bool include_gqs__ = true,
                    std::ostream* pstream__ = 0) const {
     ++write_array_calls;
     vars__.resize(0);
@@ -263,17 +244,17 @@ class mock_throwing_model: public stan::model::prob_grad {
   double log_prob_return_value;
 };
 
-}
+}  // namespace test
 
 TEST_F(ServicesUtilInitialize, model_throws__radius_zero) {
   test::mock_throwing_model throwing_model;
 
   double init_radius = 0;
   bool print_timing = false;
-  EXPECT_THROW(stan::services::util::initialize(throwing_model, empty_context, rng,
-                                                init_radius, print_timing,
-                                                logger, init),
-               std::domain_error);
+  EXPECT_THROW(
+      stan::services::util::initialize(throwing_model, empty_context, rng,
+                                       init_radius, print_timing, logger, init),
+      std::domain_error);
 
   EXPECT_EQ(3, logger.call_count());
   EXPECT_EQ(3, logger.call_count_info());
@@ -285,10 +266,10 @@ TEST_F(ServicesUtilInitialize, model_throws__radius_two) {
 
   double init_radius = 2;
   bool print_timing = false;
-  EXPECT_THROW(stan::services::util::initialize(throwing_model, empty_context, rng,
-                                                init_radius, print_timing,
-                                                logger, init),
-               std::domain_error);
+  EXPECT_THROW(
+      stan::services::util::initialize(throwing_model, empty_context, rng,
+                                       init_radius, print_timing, logger, init),
+      std::domain_error);
   EXPECT_EQ(303, logger.call_count());
   EXPECT_EQ(303, logger.call_count_info());
   EXPECT_EQ(100, logger.find_info("throwing within log_prob"));
@@ -299,8 +280,8 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
   std::vector<double> values_r;
   std::vector<std::vector<size_t> > dim_r;
   names_r.push_back("y");
-  values_r.push_back(6.35149);   // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
-  values_r.push_back(-2.449187); // -0.5 unconstrained
+  values_r.push_back(6.35149);  // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
+  values_r.push_back(-2.449187);  // -0.5 unconstrained
   std::vector<size_t> d;
   d.push_back(2);
   dim_r.push_back(d);
@@ -310,27 +291,25 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
 
   double init_radius = 2;
   bool print_timing = false;
-  EXPECT_THROW(stan::services::util::initialize(throwing_model, init_context, rng,
-                                                init_radius, print_timing,
-                                                logger, init),
-               std::domain_error);
+  EXPECT_THROW(
+      stan::services::util::initialize(throwing_model, init_context, rng,
+                                       init_radius, print_timing, logger, init),
+      std::domain_error);
   EXPECT_EQ(303, logger.call_count());
   EXPECT_EQ(303, logger.call_count_info());
   EXPECT_EQ(100, logger.find_info("throwing within log_prob"));
 }
 
-
 namespace test {
 // Mock Throwing Model throws exception
-class mock_error_model: public stan::model::prob_grad {
+class mock_error_model : public stan::model::prob_grad {
  public:
-
-  mock_error_model():
-      stan::model::prob_grad(1),
-      templated_log_prob_calls(0),
-      transform_inits_calls(0),
-      write_array_calls(0),
-      log_prob_return_value(0.0) { }
+  mock_error_model()
+      : stan::model::prob_grad(1),
+        templated_log_prob_calls(0),
+        transform_inits_calls(0),
+        write_array_calls(0),
+        log_prob_return_value(0.0) {}
 
   void reset() {
     templated_log_prob_calls = 0;
@@ -340,8 +319,7 @@ class mock_error_model: public stan::model::prob_grad {
   }
 
   template <bool propto__, bool jacobian__, typename T__>
-  T__ log_prob(std::vector<T__>& params_r__,
-               std::vector<int>& params_i__,
+  T__ log_prob(std::vector<T__>& params_r__, std::vector<int>& params_i__,
                std::ostream* pstream__ = 0) const {
     ++templated_log_prob_calls;
     throw std::out_of_range("out_of_range error in log_prob");
@@ -385,12 +363,9 @@ class mock_error_model: public stan::model::prob_grad {
     }
   }
   template <typename RNG>
-  void write_array(RNG& base_rng__,
-                   std::vector<double>& params_r__,
-                   std::vector<int>& params_i__,
-                   std::vector<double>& vars__,
-                   bool include_tparams__ = true,
-                   bool include_gqs__ = true,
+  void write_array(RNG& base_rng__, std::vector<double>& params_r__,
+                   std::vector<int>& params_i__, std::vector<double>& vars__,
+                   bool include_tparams__ = true, bool include_gqs__ = true,
                    std::ostream* pstream__ = 0) const {
     ++write_array_calls;
     vars__.resize(0);
@@ -403,23 +378,22 @@ class mock_error_model: public stan::model::prob_grad {
   mutable int write_array_calls;
   double log_prob_return_value;
 };
-}
-
+}  // namespace test
 
 TEST_F(ServicesUtilInitialize, model_errors__radius_zero) {
   test::mock_error_model error_model;
 
   double init_radius = 0;
   bool print_timing = false;
-  EXPECT_THROW_MSG(stan::services::util::initialize(error_model, empty_context, rng,
-                                                    init_radius, print_timing,
-                                                    logger, init),
-                   std::out_of_range,
-                   "out_of_range error in log_prob");
+  EXPECT_THROW_MSG(
+      stan::services::util::initialize(error_model, empty_context, rng,
+                                       init_radius, print_timing, logger, init),
+      std::out_of_range, "out_of_range error in log_prob");
   EXPECT_EQ(2, logger.call_count());
   EXPECT_EQ(2, logger.call_count_info());
   EXPECT_EQ(1, logger.find_info("out_of_range error in log_prob"));
-  EXPECT_EQ(1, logger.find_info("Unrecoverable error evaluating the log probability at the initial value."));
+  EXPECT_EQ(1, logger.find_info("Unrecoverable error evaluating the log "
+                                "probability at the initial value."));
 }
 
 TEST_F(ServicesUtilInitialize, model_errors__radius_two) {
@@ -427,11 +401,10 @@ TEST_F(ServicesUtilInitialize, model_errors__radius_two) {
 
   double init_radius = 2;
   bool print_timing = false;
-  EXPECT_THROW_MSG(stan::services::util::initialize(error_model, empty_context, rng,
-                                                    init_radius, print_timing,
-                                                    logger, init),
-                   std::out_of_range,
-                   "out_of_range error in log_prob");
+  EXPECT_THROW_MSG(
+      stan::services::util::initialize(error_model, empty_context, rng,
+                                       init_radius, print_timing, logger, init),
+      std::out_of_range, "out_of_range error in log_prob");
   EXPECT_EQ(2, logger.call_count());
   EXPECT_EQ(2, logger.call_count_info());
   EXPECT_EQ(1, logger.find_info("out_of_range error in log_prob"));
@@ -442,8 +415,8 @@ TEST_F(ServicesUtilInitialize, model_errors__full_init) {
   std::vector<double> values_r;
   std::vector<std::vector<size_t> > dim_r;
   names_r.push_back("y");
-  values_r.push_back(6.35149);   // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
-  values_r.push_back(-2.449187); // -0.5 unconstrained
+  values_r.push_back(6.35149);  // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
+  values_r.push_back(-2.449187);  // -0.5 unconstrained
   std::vector<size_t> d;
   d.push_back(2);
   dim_r.push_back(d);
@@ -453,11 +426,10 @@ TEST_F(ServicesUtilInitialize, model_errors__full_init) {
 
   double init_radius = 2;
   bool print_timing = false;
-  EXPECT_THROW_MSG(stan::services::util::initialize(error_model, init_context, rng,
-                                                    init_radius, print_timing,
-                                                    logger, init),
-                   std::out_of_range,
-                   "out_of_range error in log_prob");
+  EXPECT_THROW_MSG(
+      stan::services::util::initialize(error_model, init_context, rng,
+                                       init_radius, print_timing, logger, init),
+      std::out_of_range, "out_of_range error in log_prob");
   EXPECT_EQ(2, logger.call_count());
   EXPECT_EQ(2, logger.call_count_info());
   EXPECT_EQ(1, logger.find_info("out_of_range error in log_prob"));
@@ -466,15 +438,14 @@ TEST_F(ServicesUtilInitialize, model_errors__full_init) {
 namespace test {
 // mock_throwing_model_in_write_array throws exception in the write_array()
 // method
-class mock_throwing_model_in_write_array: public stan::model::prob_grad {
+class mock_throwing_model_in_write_array : public stan::model::prob_grad {
  public:
-
-  mock_throwing_model_in_write_array():
-      stan::model::prob_grad(1),
-      templated_log_prob_calls(0),
-      transform_inits_calls(0),
-      write_array_calls(0),
-      log_prob_return_value(0.0) { }
+  mock_throwing_model_in_write_array()
+      : stan::model::prob_grad(1),
+        templated_log_prob_calls(0),
+        transform_inits_calls(0),
+        write_array_calls(0),
+        log_prob_return_value(0.0) {}
 
   void reset() {
     templated_log_prob_calls = 0;
@@ -484,8 +455,7 @@ class mock_throwing_model_in_write_array: public stan::model::prob_grad {
   }
 
   template <bool propto__, bool jacobian__, typename T__>
-  T__ log_prob(std::vector<T__>& params_r__,
-               std::vector<int>& params_i__,
+  T__ log_prob(std::vector<T__>& params_r__, std::vector<int>& params_i__,
                std::ostream* pstream__ = 0) const {
     ++templated_log_prob_calls;
     return log_prob_return_value;
@@ -528,12 +498,9 @@ class mock_throwing_model_in_write_array: public stan::model::prob_grad {
     }
   }
   template <typename RNG>
-  void write_array(RNG& base_rng__,
-                   std::vector<double>& params_r__,
-                   std::vector<int>& params_i__,
-                   std::vector<double>& vars__,
-                   bool include_tparams__ = true,
-                   bool include_gqs__ = true,
+  void write_array(RNG& base_rng__, std::vector<double>& params_r__,
+                   std::vector<int>& params_i__, std::vector<double>& vars__,
+                   bool include_tparams__ = true, bool include_gqs__ = true,
                    std::ostream* pstream__ = 0) const {
     ++write_array_calls;
     throw std::domain_error("throwing within write_array");
@@ -547,17 +514,17 @@ class mock_throwing_model_in_write_array: public stan::model::prob_grad {
   mutable int write_array_calls;
   double log_prob_return_value;
 };
-}
+}  // namespace test
 
 TEST_F(ServicesUtilInitialize, model_throws_in_write_array__radius_zero) {
   test::mock_throwing_model_in_write_array throwing_model;
 
   double init_radius = 0;
   bool print_timing = false;
-  EXPECT_THROW(stan::services::util::initialize(throwing_model, empty_context, rng,
-                                                init_radius, print_timing,
-                                                logger, init),
-               std::domain_error);
+  EXPECT_THROW(
+      stan::services::util::initialize(throwing_model, empty_context, rng,
+                                       init_radius, print_timing, logger, init),
+      std::domain_error);
 
   EXPECT_EQ(3, logger.call_count());
   EXPECT_EQ(3, logger.call_count_info());
@@ -569,10 +536,10 @@ TEST_F(ServicesUtilInitialize, model_throws_in_write_array__radius_two) {
 
   double init_radius = 2;
   bool print_timing = false;
-  EXPECT_THROW(stan::services::util::initialize(throwing_model, empty_context, rng,
-                                                init_radius, print_timing,
-                                                logger, init),
-               std::domain_error);
+  EXPECT_THROW(
+      stan::services::util::initialize(throwing_model, empty_context, rng,
+                                       init_radius, print_timing, logger, init),
+      std::domain_error);
   EXPECT_EQ(303, logger.call_count());
   EXPECT_EQ(303, logger.call_count_info());
   EXPECT_EQ(100, logger.find_info("throwing within write_array"));
@@ -583,8 +550,8 @@ TEST_F(ServicesUtilInitialize, model_throws_in_write_array__full_init) {
   std::vector<double> values_r;
   std::vector<std::vector<size_t> > dim_r;
   names_r.push_back("y");
-  values_r.push_back(6.35149);   // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
-  values_r.push_back(-2.449187); // -0.5 unconstrained
+  values_r.push_back(6.35149);  // 1.5 unconstrained: -10 + 20 * inv.logit(1.5)
+  values_r.push_back(-2.449187);  // -0.5 unconstrained
   std::vector<size_t> d;
   d.push_back(2);
   dim_r.push_back(d);
@@ -594,10 +561,10 @@ TEST_F(ServicesUtilInitialize, model_throws_in_write_array__full_init) {
 
   double init_radius = 2;
   bool print_timing = false;
-  EXPECT_THROW(stan::services::util::initialize(throwing_model, init_context, rng,
-                                                init_radius, print_timing,
-                                                logger, init),
-               std::domain_error);
+  EXPECT_THROW(
+      stan::services::util::initialize(throwing_model, init_context, rng,
+                                       init_radius, print_timing, logger, init),
+      std::domain_error);
   EXPECT_EQ(303, logger.call_count());
   EXPECT_EQ(303, logger.call_count_info());
   EXPECT_EQ(100, logger.find_info("throwing within write_array"));

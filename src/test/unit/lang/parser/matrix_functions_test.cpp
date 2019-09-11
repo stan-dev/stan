@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <test/unit/lang/utility.hpp>
 
-
 TEST(lang_parser, csr_extract_w_function_signatures) {
   test_parsable("function-signatures/math/matrix/csr_extract_w");
 }
@@ -17,7 +16,6 @@ TEST(lang_parser, csr_matrix_times_vector_function_signatures) {
 TEST(lang_parser, csr_to_dense_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/csr_to_dense_matrix");
 }
-
 
 TEST(lang_parser, append_array_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/append_array");
@@ -160,11 +158,11 @@ TEST(lang_parser, division_matrix_function_signatures) {
 }
 
 TEST(lang_parser, matrix_exp_matrix_function_signatures) {
-    test_parsable("function-signatures/math/matrix/matrix_exp");
+  test_parsable("function-signatures/math/matrix/matrix_exp");
 }
 
 TEST(lang_parser, matrix_exp_multiply_matrix_function_signatures) {
-    test_parsable("function-signatures/math/matrix/matrix_exp_multiply");
+  test_parsable("function-signatures/math/matrix/matrix_exp_multiply");
 }
 
 TEST(lang_parser, max_matrix_function_signatures) {
@@ -195,8 +193,10 @@ TEST(lang_parser, min_matrix_function_signatures) {
   test_parsable("function-signatures/math/matrix/min");
 }
 
-TEST(lang_parser, multiply_lower_tri_self_transpose_matrix_function_signatures) {
-  test_parsable("function-signatures/math/matrix/multiply_lower_tri_self_transpose");
+TEST(lang_parser,
+     multiply_lower_tri_self_transpose_matrix_function_signatures) {
+  test_parsable(
+      "function-signatures/math/matrix/multiply_lower_tri_self_transpose");
 }
 
 TEST(lang_parser, negation_matrix_function_signatures) {
@@ -244,7 +244,9 @@ TEST(lang_parser, rep_matrix_matrix_function_signatures) {
 }
 
 TEST(lang_parser, rep_param_matrix_function_signatures) {
-  test_parsable("function-signatures/math/matrix/rep_param"); //mostly rep_array with some other rep_ tests
+  test_parsable(
+      "function-signatures/math/matrix/rep_param");  // mostly rep_array with
+                                                     // some other rep_ tests
 }
 
 TEST(lang_parser, rep_row_vector_matrix_function_signatures) {
@@ -272,7 +274,7 @@ TEST(lang_parser, rows_dot_self_matrix_function_signatures) {
 }
 
 TEST(lang_parser, scale_matrix_exp_multiply_matrix_function_signatures) {
-    test_parsable("function-signatures/math/matrix/scale_matrix_exp_multiply");
+  test_parsable("function-signatures/math/matrix/scale_matrix_exp_multiply");
 }
 
 TEST(lang_parser, singular_values_matrix_function_signatures) {

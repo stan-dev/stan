@@ -12,26 +12,24 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    struct test_bare_type_grammar
-      : boost::spirit::qi::grammar<Iterator,
-                                   bare_expr_type,
-                                   whitespace_grammar<Iterator> > {
-      const io::program_reader& reader_;
-      std::stringstream& error_msgs_;
-      bare_type_grammar<Iterator> bare_type_g;
+template <typename Iterator>
+struct test_bare_type_grammar
+    : boost::spirit::qi::grammar<Iterator, bare_expr_type,
+                                 whitespace_grammar<Iterator> > {
+  const io::program_reader& reader_;
+  std::stringstream& error_msgs_;
+  bare_type_grammar<Iterator> bare_type_g;
 
-      test_bare_type_grammar(const io::program_reader& reader,
-                                   std::stringstream& error_msgs);
+  test_bare_type_grammar(const io::program_reader& reader,
+                         std::stringstream& error_msgs);
 
-      boost::spirit::qi::rule<Iterator,
-                              bare_expr_type,
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, bare_expr_type,
+                          whitespace_grammar<Iterator> >
       test_bare_type_r;
-    };
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -17,6 +17,6 @@ inline bool is_whitespace(char c) {
   return c == ' ' || c == '\n' || c == '\r' || c == '\t';
 }
 
-}
-}
+}  // namespace io
+}  // namespace stan
 #endif

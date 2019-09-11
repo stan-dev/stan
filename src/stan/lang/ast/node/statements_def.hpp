@@ -5,14 +5,14 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    statements::statements() {  }
+statements::statements() {}
 
-    statements::statements(const std::vector<local_var_decl>& local_decl,
-                           const std::vector<statement>& stmts)
-      : local_decl_(local_decl), statements_(stmts) { }
+statements::statements(const std::vector<local_var_decl>& local_decl,
+                       const std::vector<statement>& stmts)
+    : local_decl_(local_decl), statements_(stmts) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

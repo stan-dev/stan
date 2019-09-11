@@ -14,7 +14,7 @@
 #include <vector>
 
 class ServicesStandaloneGQ2 : public ::testing::Test {
-public:
+ public:
   ServicesStandaloneGQ2()
       : logger(logger_ss, logger_ss, logger_ss, logger_ss, logger_ss) {}
 
@@ -23,9 +23,7 @@ public:
     model = new stan_model(context);
   }
 
-  void TearDown() {
-    delete model;
-  }
+  void TearDown() { delete model; }
 
   stan::test::unit::instrumented_interrupt interrupt;
   std::stringstream logger_ss;
@@ -37,7 +35,8 @@ TEST_F(ServicesStandaloneGQ2, genDraws_gq_test_multidim) {
   stan::io::stan_csv multidim_csv;
   std::stringstream out;
   std::ifstream csv_stream;
-  csv_stream.open("src/test/test-models/good/services/gq_test_multidim_fit.csv");
+  csv_stream.open(
+      "src/test/test-models/good/services/gq_test_multidim_fit.csv");
   multidim_csv = stan::io::stan_csv_reader::parse(csv_stream, &out);
   csv_stream.close();
   EXPECT_EQ(12345U, multidim_csv.metadata.seed);
@@ -64,14 +63,11 @@ TEST_F(ServicesStandaloneGQ2, genDraws_gq_test_multidim) {
 
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
-  int return_code = stan::services::standalone_generate(*model,
-                                    multidim_csv.samples.middleCols<120>(7),
-                                    12345,
-                                    interrupt,
-                                    logger,
-                                    sample_writer);
+  int return_code = stan::services::standalone_generate(
+      *model, multidim_csv.samples.middleCols<120>(7), 12345, interrupt, logger,
+      sample_writer);
   EXPECT_EQ(return_code, stan::services::error_codes::OK);
-  EXPECT_EQ(count_matches("gq_ar_mat",sample_ss.str()),120);
-  EXPECT_EQ(count_matches("\n",sample_ss.str()),1001);
+  EXPECT_EQ(count_matches("gq_ar_mat", sample_ss.str()), 120);
+  EXPECT_EQ(count_matches("\n", sample_ss.str()), 1001);
   match_csv_columns(multidim_csv.samples, sample_ss.str(), 1000, 120, 127);
 }

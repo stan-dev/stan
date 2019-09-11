@@ -4,13 +4,13 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    lub_idx::lub_idx() { }
+lub_idx::lub_idx() {}
 
-    lub_idx::lub_idx(const expression& lb, const expression& ub)
-      : lb_(lb), ub_(ub) {  }
+lub_idx::lub_idx(const expression& lb, const expression& ub)
+    : lb_(lb), ub_(ub) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

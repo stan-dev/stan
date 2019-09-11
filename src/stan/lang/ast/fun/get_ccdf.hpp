@@ -4,16 +4,16 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Return the CCDF for the specified distribution.
-     *
-     * @param[in] dist_name name of distribution
-     * @return CCDF for distribution
-     */
-    std::string get_ccdf(const std::string& dist_name);
+/**
+ * Return the CCDF for the specified distribution.
+ *
+ * @param[in] dist_name name of distribution
+ * @return CCDF for distribution
+ */
+std::string get_ccdf(const std::string& dist_name);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

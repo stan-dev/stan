@@ -7,19 +7,19 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate include statements for a Stan model class to the
-     * specified stream.
-     *
-     * @param o stream for generating
-     */
-    void generate_includes(std::ostream& o) {
-      generate_include("stan/model/model_header.hpp", o);
-      o << EOL;
-    }
-
-  }
+/**
+ * Generate include statements for a Stan model class to the
+ * specified stream.
+ *
+ * @param o stream for generating
+ */
+void generate_includes(std::ostream& o) {
+  generate_include("stan/model/model_header.hpp", o);
+  o << EOL;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

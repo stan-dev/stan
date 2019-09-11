@@ -76,137 +76,128 @@ class model_base_crtp : public stan::model::model_base {
    *
    * @param[in] num_params_r number of real unconstrained parameters
    */
-  explicit model_base_crtp(size_t num_params_r) :
-      model_base(num_params_r) { }
+  explicit model_base_crtp(size_t num_params_r) : model_base(num_params_r) {}
 
   /**
    * Destroy this class.  This is required to be virtual to allow
    * subclass references to clean up superclasses, but is otherwise a
    * no-op.
    */
-  virtual ~model_base_crtp() { }
+  virtual ~model_base_crtp() {}
 
   inline double log_prob(Eigen::VectorXd& theta,
                          std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<false, false, double>(theta, msgs);
+    return static_cast<const M*>(this)->template log_prob<false, false, double>(
+        theta, msgs);
   }
   inline math::var log_prob(Eigen::Matrix<math::var, -1, 1>& theta,
                             std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<false, false>(theta, msgs);
+    return static_cast<const M*>(this)->template log_prob<false, false>(theta,
+                                                                        msgs);
   }
 
   inline double log_prob_jacobian(Eigen::VectorXd& theta,
                                   std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<false, true>(theta, msgs);
+    return static_cast<const M*>(this)->template log_prob<false, true>(theta,
+                                                                       msgs);
   }
   inline math::var log_prob_jacobian(Eigen::Matrix<math::var, -1, 1>& theta,
-                                  std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<false, true>(theta, msgs);
+                                     std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<false, true>(theta,
+                                                                       msgs);
   }
 
   inline double log_prob_propto(Eigen::VectorXd& theta,
                                 std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<true, false>(theta, msgs);
+    return static_cast<const M*>(this)->template log_prob<true, false>(theta,
+                                                                       msgs);
   }
   inline math::var log_prob_propto(Eigen::Matrix<math::var, -1, 1>& theta,
                                    std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<true, false>(theta, msgs);
+    return static_cast<const M*>(this)->template log_prob<true, false>(theta,
+                                                                       msgs);
   }
 
   inline double log_prob_propto_jacobian(Eigen::VectorXd& theta,
                                          std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<true, true>(theta, msgs);
+    return static_cast<const M*>(this)->template log_prob<true, true>(theta,
+                                                                      msgs);
   }
-  inline math::var
-  log_prob_propto_jacobian(Eigen::Matrix<math::var, -1, 1>& theta,
-                           std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<true, true>(theta, msgs);
+  inline math::var log_prob_propto_jacobian(
+      Eigen::Matrix<math::var, -1, 1>& theta,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<true, true>(theta,
+                                                                      msgs);
   }
 
-  void write_array(boost::ecuyer1988& rng,
-                   Eigen::VectorXd& theta,
-                   Eigen::VectorXd& vars,
-                   bool include_tparams = true,
+  void write_array(boost::ecuyer1988& rng, Eigen::VectorXd& theta,
+                   Eigen::VectorXd& vars, bool include_tparams = true,
                    bool include_gqs = true,
                    std::ostream* msgs = 0) const override {
-    return static_cast<const M*>(this)->template write_array(rng, theta, vars,
-                                              include_tparams, include_gqs,
-                                              msgs);
+    return static_cast<const M*>(this)->template write_array(
+        rng, theta, vars, include_tparams, include_gqs, msgs);
   }
 
   // TODO(carpenter): remove redundant std::vector methods below here =====
   // ======================================================================
 
-  inline double log_prob(std::vector<double>& theta,
-                         std::vector<int>& theta_i,
+  inline double log_prob(std::vector<double>& theta, std::vector<int>& theta_i,
                          std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<false, false>(theta, theta_i, msgs);
+    return static_cast<const M*>(this)->template log_prob<false, false>(
+        theta, theta_i, msgs);
   }
   inline math::var log_prob(std::vector<math::var>& theta,
                             std::vector<int>& theta_i,
                             std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<false, false>(theta, theta_i, msgs);
+    return static_cast<const M*>(this)->template log_prob<false, false>(
+        theta, theta_i, msgs);
   }
 
   inline double log_prob_jacobian(std::vector<double>& theta,
                                   std::vector<int>& theta_i,
                                   std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<false, true>(theta, theta_i, msgs);
+    return static_cast<const M*>(this)->template log_prob<false, true>(
+        theta, theta_i, msgs);
   }
   inline math::var log_prob_jacobian(std::vector<math::var>& theta,
                                      std::vector<int>& theta_i,
                                      std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<false, true>(theta, theta_i, msgs);
+    return static_cast<const M*>(this)->template log_prob<false, true>(
+        theta, theta_i, msgs);
   }
 
   inline double log_prob_propto(std::vector<double>& theta,
                                 std::vector<int>& theta_i,
                                 std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<true, false>(theta, theta_i, msgs);
+    return static_cast<const M*>(this)->template log_prob<true, false>(
+        theta, theta_i, msgs);
   }
   inline math::var log_prob_propto(std::vector<math::var>& theta,
                                    std::vector<int>& theta_i,
                                    std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<true, false>(theta, theta_i, msgs);
+    return static_cast<const M*>(this)->template log_prob<true, false>(
+        theta, theta_i, msgs);
   }
 
   inline double log_prob_propto_jacobian(std::vector<double>& theta,
                                          std::vector<int>& theta_i,
                                          std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<true, true>(theta, theta_i, msgs);
+    return static_cast<const M*>(this)->template log_prob<true, true>(
+        theta, theta_i, msgs);
   }
   inline math::var log_prob_propto_jacobian(std::vector<math::var>& theta,
                                             std::vector<int>& theta_i,
                                             std::ostream* msgs) const override {
-    return static_cast<const M*>(this)
-        ->template log_prob<true, true>(theta, theta_i, msgs);
+    return static_cast<const M*>(this)->template log_prob<true, true>(
+        theta, theta_i, msgs);
   }
 
-  void write_array(boost::ecuyer1988& rng,
-                   std::vector<double>& theta,
-                   std::vector<int>& theta_i,
-                   std::vector<double>& vars,
-                   bool include_tparams = true,
-                   bool include_gqs = true,
+  void write_array(boost::ecuyer1988& rng, std::vector<double>& theta,
+                   std::vector<int>& theta_i, std::vector<double>& vars,
+                   bool include_tparams = true, bool include_gqs = true,
                    std::ostream* msgs = 0) const override {
-    return static_cast<const M*>(this)
-        ->template write_array(rng, theta, theta_i, vars, include_tparams,
-                               include_gqs, msgs);
+    return static_cast<const M*>(this)->template write_array(
+        rng, theta, theta_i, vars, include_tparams, include_gqs, msgs);
   }
 };
 

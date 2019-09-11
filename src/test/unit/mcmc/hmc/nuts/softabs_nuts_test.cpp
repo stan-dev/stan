@@ -28,7 +28,7 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::softabs_nuts<gauss3D_model_namespace::gauss3D_model, rng_t>
-    sampler(model, base_rng);
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -38,19 +38,21 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
 
   stan::mcmc::ps_point z_propose = z_init;
 
-  Eigen::VectorXd p_sharp_left = Eigen::VectorXd::Zero(z_init.p.size());
-  Eigen::VectorXd p_sharp_right = Eigen::VectorXd::Zero(z_init.p.size());
+  Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(3);
+  Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(3);
+  Eigen::VectorXd p_end = Eigen::VectorXd::Zero(3);
+  Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(3);
   Eigen::VectorXd rho = z_init.p;
+
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
   double sum_metro_prob = 0;
 
-  bool valid_subtree = sampler.build_tree(3, z_propose,
-                                          p_sharp_left, p_sharp_right, rho,
-                                          H0, 1, n_leapfrog, log_sum_weight,
-                                          sum_metro_prob, logger);
+  bool valid_subtree = sampler.build_tree(
+      3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
+      n_leapfrog, log_sum_weight, sum_metro_prob, logger);
 
   EXPECT_EQ(0.1, sampler.get_nominal_stepsize());
 
@@ -59,6 +61,22 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   EXPECT_FLOAT_EQ(-11.679803, rho(0));
   EXPECT_FLOAT_EQ(11.679803, rho(1));
   EXPECT_FLOAT_EQ(-11.679803, rho(2));
+
+  EXPECT_FLOAT_EQ(-1.0960016, p_begin(0));
+  EXPECT_FLOAT_EQ(1.0960016, p_begin(1));
+  EXPECT_FLOAT_EQ(-1.0960016, p_begin(2));
+
+  EXPECT_FLOAT_EQ(-0.83470845, p_sharp_begin(0));
+  EXPECT_FLOAT_EQ(0.83470845, p_sharp_begin(1));
+  EXPECT_FLOAT_EQ(-0.83470845, p_sharp_begin(2));
+
+  EXPECT_FLOAT_EQ(-1.5019561, p_end(0));
+  EXPECT_FLOAT_EQ(1.5019561, p_end(1));
+  EXPECT_FLOAT_EQ(-1.5019561, p_end(2));
+
+  EXPECT_FLOAT_EQ(-1.143881, p_sharp_end(0));
+  EXPECT_FLOAT_EQ(1.143881, p_sharp_end(1));
+  EXPECT_FLOAT_EQ(-1.143881, p_sharp_end(2));
 
   EXPECT_FLOAT_EQ(0.20423166, sampler.z().q(0));
   EXPECT_FLOAT_EQ(-0.20423166, sampler.z().q(1));
@@ -110,38 +128,46 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   metric.init(z_test, logger);
 
   softabs_integrator.evolve(z_test, metric, epsilon, logger);
+  Eigen::VectorXd p_forward_1 = z_test.p;
   Eigen::VectorXd p_sharp_forward_1 = metric.dtau_dp(z_test);
 
   softabs_integrator.evolve(z_test, metric, epsilon, logger);
+  Eigen::VectorXd p_forward_2 = z_test.p;
   Eigen::VectorXd p_sharp_forward_2 = metric.dtau_dp(z_test);
 
   softabs_integrator.evolve(z_test, metric, epsilon, logger);
   softabs_integrator.evolve(z_test, metric, epsilon, logger);
+  Eigen::VectorXd p_forward_3 = z_test.p;
   Eigen::VectorXd p_sharp_forward_3 = metric.dtau_dp(z_test);
 
   softabs_integrator.evolve(z_test, metric, epsilon, logger);
   softabs_integrator.evolve(z_test, metric, epsilon, logger);
   softabs_integrator.evolve(z_test, metric, epsilon, logger);
   softabs_integrator.evolve(z_test, metric, epsilon, logger);
+  Eigen::VectorXd p_forward_4 = z_test.p;
   Eigen::VectorXd p_sharp_forward_4 = metric.dtau_dp(z_test);
 
   z_test = z_init;
   metric.init(z_test, logger);
 
   softabs_integrator.evolve(z_test, metric, -epsilon, logger);
+  Eigen::VectorXd p_backward_1 = z_test.p;
   Eigen::VectorXd p_sharp_backward_1 = metric.dtau_dp(z_test);
 
   softabs_integrator.evolve(z_test, metric, -epsilon, logger);
+  Eigen::VectorXd p_backward_2 = z_test.p;
   Eigen::VectorXd p_sharp_backward_2 = metric.dtau_dp(z_test);
 
   softabs_integrator.evolve(z_test, metric, -epsilon, logger);
   softabs_integrator.evolve(z_test, metric, -epsilon, logger);
+  Eigen::VectorXd p_backward_3 = z_test.p;
   Eigen::VectorXd p_sharp_backward_3 = metric.dtau_dp(z_test);
 
   softabs_integrator.evolve(z_test, metric, -epsilon, logger);
   softabs_integrator.evolve(z_test, metric, -epsilon, logger);
   softabs_integrator.evolve(z_test, metric, -epsilon, logger);
   softabs_integrator.evolve(z_test, metric, -epsilon, logger);
+  Eigen::VectorXd p_backward_4 = z_test.p;
   Eigen::VectorXd p_sharp_backward_4 = metric.dtau_dp(z_test);
 
   // Check expected tree boundaries to those dynamically geneated by NUTS
@@ -153,9 +179,12 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
 
   stan::mcmc::ps_point z_propose = z_init;
 
-  Eigen::VectorXd p_sharp_left = Eigen::VectorXd::Zero(z_init.p.size());
-  Eigen::VectorXd p_sharp_right = Eigen::VectorXd::Zero(z_init.p.size());
+  Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(3);
+  Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(3);
+  Eigen::VectorXd p_end = Eigen::VectorXd::Zero(3);
+  Eigen::VectorXd p_sharp_end = Eigen::VectorXd::Zero(3);
   Eigen::VectorXd rho = z_init.p;
+
   double log_sum_weight = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
@@ -165,122 +194,122 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   // Depth 0 forward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(0, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
-                     H0, 1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+  sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
+                     p_end, H0, 1, n_leapfrog, log_sum_weight, sum_metro_prob,
                      logger);
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_left(n));
+  for (int n = 0; n < rho.size(); ++n) {
+    EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
+    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_begin(n));
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_right(n));
+    EXPECT_FLOAT_EQ(p_forward_1(n), p_end(n));
+    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_end(n));
+  }
 
   // Depth 1 forward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(1, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
-                     H0, 1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+  sampler.build_tree(1, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
+                     p_end, H0, 1, n_leapfrog, log_sum_weight, sum_metro_prob,
                      logger);
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_left(n));
+  for (int n = 0; n < rho.size(); ++n) {
+    EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
+    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_begin(n));
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_forward_2(n), p_sharp_right(n));
+    EXPECT_FLOAT_EQ(p_forward_2(n), p_end(n));
+    EXPECT_FLOAT_EQ(p_sharp_forward_2(n), p_sharp_end(n));
+  }
 
   // Depth 2 forward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(2, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
-                     H0, 1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+  sampler.build_tree(2, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
+                     p_end, H0, 1, n_leapfrog, log_sum_weight, sum_metro_prob,
                      logger);
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_left(n));
+  for (int n = 0; n < rho.size(); ++n) {
+    EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
+    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_begin(n));
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_forward_3(n), p_sharp_right(n));
+    EXPECT_FLOAT_EQ(p_forward_3(n), p_end(n));
+    EXPECT_FLOAT_EQ(p_sharp_forward_3(n), p_sharp_end(n));
+  }
 
   // Depth 3 forward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(3, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
-                     H0, 1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+  sampler.build_tree(3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
+                     p_end, H0, 1, n_leapfrog, log_sum_weight, sum_metro_prob,
                      logger);
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_left(n));
+  for (int n = 0; n < rho.size(); ++n) {
+    EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
+    EXPECT_FLOAT_EQ(p_sharp_forward_1(n), p_sharp_begin(n));
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_forward_4(n), p_sharp_right(n));
+    EXPECT_FLOAT_EQ(p_forward_4(n), p_end(n));
+    EXPECT_FLOAT_EQ(p_sharp_forward_4(n), p_sharp_end(n));
+  }
 
   // Depth 0 backward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(0, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
-                     H0, -1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+  sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
+                     p_end, H0, -1, n_leapfrog, log_sum_weight, sum_metro_prob,
                      logger);
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_left(n));
+  for (int n = 0; n < rho.size(); ++n) {
+    EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
+    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_begin(n));
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_right(n));
+    EXPECT_FLOAT_EQ(p_backward_1(n), p_end(n));
+    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_end(n));
+  }
 
   // Depth 1 backward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(1, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
-                     H0, -1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+  sampler.build_tree(1, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
+                     p_end, H0, -1, n_leapfrog, log_sum_weight, sum_metro_prob,
                      logger);
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_left(n));
+  for (int n = 0; n < rho.size(); ++n) {
+    EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
+    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_begin(n));
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_backward_2(n), p_sharp_right(n));
+    EXPECT_FLOAT_EQ(p_backward_2(n), p_end(n));
+    EXPECT_FLOAT_EQ(p_sharp_backward_2(n), p_sharp_end(n));
+  }
 
   // Depth 2 backward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(2, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
-                     H0, -1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+  sampler.build_tree(2, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
+                     p_end, H0, -1, n_leapfrog, log_sum_weight, sum_metro_prob,
                      logger);
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_left(n));
+  for (int n = 0; n < rho.size(); ++n) {
+    EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
+    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_begin(n));
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_backward_3(n), p_sharp_right(n));
+    EXPECT_FLOAT_EQ(p_backward_3(n), p_end(n));
+    EXPECT_FLOAT_EQ(p_sharp_backward_3(n), p_sharp_end(n));
+  }
 
   // Depth 3 backward
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
-  sampler.build_tree(3, z_propose,
-                     p_sharp_left, p_sharp_right, rho,
-                     H0, -1, n_leapfrog, log_sum_weight,
-                     sum_metro_prob,
+  sampler.build_tree(3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
+                     p_end, H0, -1, n_leapfrog, log_sum_weight, sum_metro_prob,
                      logger);
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_left(n));
+  for (int n = 0; n < rho.size(); ++n) {
+    EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
+    EXPECT_FLOAT_EQ(p_sharp_backward_1(n), p_sharp_begin(n));
 
-  for (int n = 0; n < rho.size(); ++n)
-    EXPECT_FLOAT_EQ(p_sharp_backward_4(n), p_sharp_right(n));
+    EXPECT_FLOAT_EQ(p_backward_4(n), p_end(n));
+    EXPECT_FLOAT_EQ(p_sharp_backward_4(n), p_sharp_end(n));
+  }
 }
 
 TEST(McmcSoftAbsNuts, transition_test) {
@@ -302,7 +331,7 @@ TEST(McmcSoftAbsNuts, transition_test) {
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::softabs_nuts<gauss3D_model_namespace::gauss3D_model, rng_t>
-    sampler(model, base_rng);
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
