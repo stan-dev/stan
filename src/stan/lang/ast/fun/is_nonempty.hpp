@@ -4,17 +4,17 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Returns true if the specified string contains a character other
-     * than a whitespace character.
-     *
-     * @param s string to test
-     * @return true if string contains a non-space character
-     */
-    bool is_nonempty(const std::string& s);
+/**
+ * Returns true if the specified string contains a character other
+ * than a whitespace character.
+ *
+ * @param s string to test
+ * @return true if string contains a non-space character
+ */
+bool is_nonempty(const std::string& s);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

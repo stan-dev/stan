@@ -18,6 +18,6 @@ inline bool ends_with(const std::string& p, const std::string& s) {
   return s.size() >= p.size() && s.substr(s.size() - p.size()) == p;
 }
 
-}
-}
+}  // namespace io
+}  // namespace stan
 #endif

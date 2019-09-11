@@ -8,84 +8,76 @@
 typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
-  namespace mcmc {
+namespace mcmc {
 
-    class mock_nuts_classic:
-      public base_nuts_classic<mock_model, mock_hamiltonian,
-                               mock_integrator, rng_t> {
-    public:
-      mock_nuts_classic(const mock_model &m, rng_t& rng):
-        base_nuts_classic<mock_model, mock_hamiltonian,
-                          mock_integrator, rng_t>(m, rng)
-      { }
+class mock_nuts_classic : public base_nuts_classic<mock_model, mock_hamiltonian,
+                                                   mock_integrator, rng_t> {
+ public:
+  mock_nuts_classic(const mock_model& m, rng_t& rng)
+      : base_nuts_classic<mock_model, mock_hamiltonian, mock_integrator, rng_t>(
+            m, rng) {}
 
-    private:
-      bool compute_criterion(ps_point& start,
-                             ps_point& finish,
-                             Eigen::VectorXd& rho) { return true; }
-    };
-
-    // Mock Hamiltonian
-    template <typename M, typename BaseRNG>
-    class divergent_hamiltonian
-      : public base_hamiltonian<M, ps_point, BaseRNG> {
-    public:
-      divergent_hamiltonian(const M& m)
-        : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
-
-      double T(ps_point& z) { return 0; }
-
-      double tau(ps_point& z) { return T(z); }
-      double phi(ps_point& z) { return this->V(z); }
-
-      double dG_dt(ps_point& z, callbacks::logger& logger) {
-        return 2;
-      }
-
-      Eigen::VectorXd dtau_dq(ps_point& z, callbacks::logger& logger) {
-        return Eigen::VectorXd::Zero(this->model_.num_params_r());
-      }
-
-      Eigen::VectorXd dtau_dp(ps_point& z) {
-        return Eigen::VectorXd::Zero(this->model_.num_params_r());
-      }
-
-      Eigen::VectorXd dphi_dq(ps_point& z, callbacks::logger& logger) {
-        return Eigen::VectorXd::Zero(this->model_.num_params_r());
-      }
-
-      void init(ps_point& z, callbacks::logger& logger) {
-        z.V = 0;
-      }
-
-      void sample_p(ps_point& z, BaseRNG& rng) {};
-
-      void update_potential_gradient(ps_point& z, callbacks::logger& logger) {
-        z.V += 500;
-      }
-
-    };
-
-    class divergent_nuts_classic:
-      public base_nuts_classic<mock_model, divergent_hamiltonian,
-                               expl_leapfrog, rng_t> {
-    public:
-      divergent_nuts_classic(const mock_model &m, rng_t& rng):
-        base_nuts_classic<mock_model, divergent_hamiltonian,
-                          expl_leapfrog, rng_t>(m, rng)
-      { }
-
-    private:
-      bool compute_criterion(ps_point& start,
-                             ps_point& finish,
-                             Eigen::VectorXd& rho) { return false; }
-    };
-
+ private:
+  bool compute_criterion(ps_point& start, ps_point& finish,
+                         Eigen::VectorXd& rho) {
+    return true;
   }
-}
+};
+
+// Mock Hamiltonian
+template <typename M, typename BaseRNG>
+class divergent_hamiltonian : public base_hamiltonian<M, ps_point, BaseRNG> {
+ public:
+  divergent_hamiltonian(const M& m)
+      : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
+
+  double T(ps_point& z) { return 0; }
+
+  double tau(ps_point& z) { return T(z); }
+  double phi(ps_point& z) { return this->V(z); }
+
+  double dG_dt(ps_point& z, callbacks::logger& logger) { return 2; }
+
+  Eigen::VectorXd dtau_dq(ps_point& z, callbacks::logger& logger) {
+    return Eigen::VectorXd::Zero(this->model_.num_params_r());
+  }
+
+  Eigen::VectorXd dtau_dp(ps_point& z) {
+    return Eigen::VectorXd::Zero(this->model_.num_params_r());
+  }
+
+  Eigen::VectorXd dphi_dq(ps_point& z, callbacks::logger& logger) {
+    return Eigen::VectorXd::Zero(this->model_.num_params_r());
+  }
+
+  void init(ps_point& z, callbacks::logger& logger) { z.V = 0; }
+
+  void sample_p(ps_point& z, BaseRNG& rng){};
+
+  void update_potential_gradient(ps_point& z, callbacks::logger& logger) {
+    z.V += 500;
+  }
+};
+
+class divergent_nuts_classic
+    : public base_nuts_classic<mock_model, divergent_hamiltonian, expl_leapfrog,
+                               rng_t> {
+ public:
+  divergent_nuts_classic(const mock_model& m, rng_t& rng)
+      : base_nuts_classic<mock_model, divergent_hamiltonian, expl_leapfrog,
+                          rng_t>(m, rng) {}
+
+ private:
+  bool compute_criterion(ps_point& start, ps_point& finish,
+                         Eigen::VectorXd& rho) {
+    return false;
+  }
+};
+
+}  // namespace mcmc
+}  // namespace stan
 
 TEST(McmcNutsBaseNutsClassic, set_max_depth) {
-
   rng_t base_rng(0);
 
   Eigen::VectorXd q(2);
@@ -105,7 +97,6 @@ TEST(McmcNutsBaseNutsClassic, set_max_depth) {
   EXPECT_EQ(old_max_depth, sampler.get_max_depth());
 }
 
-
 TEST(McmcNutsBaseNuts, set_max_delta) {
   rng_t base_rng(0);
 
@@ -122,7 +113,6 @@ TEST(McmcNutsBaseNuts, set_max_delta) {
 }
 
 TEST(McmcNutsBaseNutsClassic, build_tree) {
-
   rng_t base_rng(0);
 
   int model_size = 1;
@@ -154,8 +144,7 @@ TEST(McmcNutsBaseNutsClassic, build_tree) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  int n_valid = sampler.build_tree(3, rho, &z_init, z_propose, util,
-                                   logger);
+  int n_valid = sampler.build_tree(3, rho, &z_init, z_propose, util, logger);
 
   EXPECT_EQ(8, n_valid);
 
@@ -178,7 +167,6 @@ TEST(McmcNutsBaseNutsClassic, build_tree) {
 }
 
 TEST(McmcNutsBaseNutsClassic, slice_criterion) {
-
   rng_t base_rng(0);
 
   int model_size = 1;
@@ -213,22 +201,19 @@ TEST(McmcNutsBaseNutsClassic, slice_criterion) {
   int n_valid = 0;
 
   sampler.z().V = -750;
-  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util,
-                               logger);
+  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util, logger);
 
   EXPECT_EQ(1, n_valid);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = -250;
-  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util,
-                               logger);
+  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util, logger);
 
   EXPECT_EQ(0, n_valid);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = 750;
-  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util,
-                               logger);
+  n_valid = sampler.build_tree(0, rho, &z_init, z_propose, util, logger);
 
   EXPECT_EQ(0, n_valid);
   EXPECT_EQ(1, sampler.divergent_);

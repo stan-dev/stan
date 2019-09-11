@@ -5,17 +5,17 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Write a user-readable version of the specified variable scope
-     * to the specified output stream.
-     *
-     * @param o output stream
-     * @param var_scope variable scope
-     */
-    void print_scope(std::ostream& o, const scope& var_scope);
+/**
+ * Write a user-readable version of the specified variable scope
+ * to the specified output stream.
+ *
+ * @param o output stream
+ * @param var_scope variable scope
+ */
+void print_scope(std::ostream& o, const scope& var_scope);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

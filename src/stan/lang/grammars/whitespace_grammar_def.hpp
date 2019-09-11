@@ -10,22 +10,21 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    whitespace_grammar<Iterator>::whitespace_grammar(std::stringstream& ss)
-      : whitespace_grammar::base_type(whitespace), error_msgs_(ss) {
-      using boost::spirit::qi::omit;
-      using boost::spirit::qi::char_;
-      using boost::spirit::qi::eol;
-      whitespace
-        = ((omit["/*"] >> *(char_ - "*/")) > omit["*/"])
-        | (omit["//"] >> *(char_ - eol))
-        | (omit["#"] >> *(char_ - eol))
-          [deprecate_pound_comment_f(boost::phoenix::ref(error_msgs_))]
-        | boost::spirit::ascii::space_type();
-    }
-
-  }
+template <typename Iterator>
+whitespace_grammar<Iterator>::whitespace_grammar(std::stringstream& ss)
+    : whitespace_grammar::base_type(whitespace), error_msgs_(ss) {
+  using boost::spirit::qi::char_;
+  using boost::spirit::qi::eol;
+  using boost::spirit::qi::omit;
+  whitespace = ((omit["/*"] >> *(char_ - "*/")) > omit["*/"])
+               | (omit["//"] >> *(char_ - eol))
+               | (omit["#"] >> *(char_ - eol))[deprecate_pound_comment_f(
+                     boost::phoenix::ref(error_msgs_))]
+               | boost::spirit::ascii::space_type();
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

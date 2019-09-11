@@ -4,14 +4,14 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    while_statement::while_statement() { }
+while_statement::while_statement() {}
 
-    while_statement::while_statement(const expression& condition,
-                                     const statement& body)
-      : condition_(condition), body_(body) { }
+while_statement::while_statement(const expression& condition,
+                                 const statement& body)
+    : condition_(condition), body_(body) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

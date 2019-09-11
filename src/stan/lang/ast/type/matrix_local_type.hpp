@@ -4,48 +4,47 @@
 #include <stan/lang/ast/node/expression.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Matrix local var type.
-     */
-    struct matrix_local_type {
-      /**
-       * Number of rows
-       */
-      expression M_;
+/**
+ * Matrix local var type.
+ */
+struct matrix_local_type {
+  /**
+   * Number of rows
+   */
+  expression M_;
 
-      /**
-       * Number of columns
-       */
-      expression N_;
+  /**
+   * Number of columns
+   */
+  expression N_;
 
-      /**
-       * Construct a local var type with default values.
-       */
-      matrix_local_type();
+  /**
+   * Construct a local var type with default values.
+   */
+  matrix_local_type();
 
-      /**
-       * Construct a local var type with specified values.
-       * Sizes should be int expressions - constructor doesn't check.
-       *
-       * @param M num rows
-       * @param N num columns
-       */
-      matrix_local_type(const expression& M,
-                        const expression& N);
+  /**
+   * Construct a local var type with specified values.
+   * Sizes should be int expressions - constructor doesn't check.
+   *
+   * @param M num rows
+   * @param N num columns
+   */
+  matrix_local_type(const expression& M, const expression& N);
 
-      /**
-       * Get M (num rows).
-       */
-      expression M() const;
+  /**
+   * Get M (num rows).
+   */
+  expression M() const;
 
-      /**
-       * Get N (num cols).
-       */
-      expression N() const;
-    };
+  /**
+   * Get N (num cols).
+   */
+  expression N() const;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

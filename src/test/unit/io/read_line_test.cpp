@@ -25,4 +25,3 @@ TEST(Io, Readline3) {
   EXPECT_EQ("baz bing", read_line(s));
   EXPECT_EQ("", read_line(s));
 }
-

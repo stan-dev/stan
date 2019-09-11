@@ -113,6 +113,6 @@ struct map_rect {
   void register_id();
 };
 
-}
-}
+}  // namespace lang
+}  // namespace stan
 #endif

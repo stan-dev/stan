@@ -7,41 +7,41 @@
 
 namespace stan {
 
-  namespace mcmc {
+namespace mcmc {
 
-    class var_adaptation: public windowed_adaptation {
-    public:
-      explicit var_adaptation(int n)
-        : windowed_adaptation("variance"), estimator_(n) {}
+class var_adaptation : public windowed_adaptation {
+ public:
+  explicit var_adaptation(int n)
+      : windowed_adaptation("variance"), estimator_(n) {}
 
-      bool learn_variance(Eigen::VectorXd& var, const Eigen::VectorXd& q) {
-        if (adaptation_window())
-          estimator_.add_sample(q);
+  bool learn_variance(Eigen::VectorXd& var, const Eigen::VectorXd& q) {
+    if (adaptation_window())
+      estimator_.add_sample(q);
 
-        if (end_adaptation_window()) {
-          compute_next_window();
+    if (end_adaptation_window()) {
+      compute_next_window();
 
-          estimator_.sample_variance(var);
+      estimator_.sample_variance(var);
 
-          double n = static_cast<double>(estimator_.num_samples());
-          var = (n / (n + 5.0)) * var
-                + 1e-3 * (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
+      double n = static_cast<double>(estimator_.num_samples());
+      var = (n / (n + 5.0)) * var
+            + 1e-3 * (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
 
-          estimator_.restart();
+      estimator_.restart();
 
-          ++adapt_window_counter_;
-          return true;
-        }
+      ++adapt_window_counter_;
+      return true;
+    }
 
-        ++adapt_window_counter_;
-        return false;
-      }
+    ++adapt_window_counter_;
+    return false;
+  }
 
-    protected:
-      stan::math::welford_var_estimator estimator_;
-    };
+ protected:
+  stan::math::welford_var_estimator estimator_;
+};
 
-  }  // mcmc
+}  // namespace mcmc
 
-}  // stan
+}  // namespace stan
 #endif

@@ -8,17 +8,17 @@
 #include <sstream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     *
-     */
-    void generate_quoted_expression(const expression& e, std::ostream& o) {
-      std::stringstream ss;
-      generate_expression(e, NOT_USER_FACING, ss);
-      generate_quoted_string(ss.str(), o);
-    }
-
-  }
+/**
+ *
+ */
+void generate_quoted_expression(const expression& e, std::ostream& o) {
+  std::stringstream ss;
+  generate_expression(e, NOT_USER_FACING, ss);
+  generate_quoted_string(ss.str(), o);
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

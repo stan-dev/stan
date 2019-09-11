@@ -8,24 +8,24 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate validation statements for bounded or specialized block variables.
-     *
-     * @param[in] var_decl block variable
-     * @param[in] indent indentation level
-     * @param[in,out] o stream for generating
-     */
-    void generate_validate_block_var(const block_var_decl& var_decl,
-                                     int indent, std::ostream& o) {
-      block_var_type vtype = var_decl.type().innermost_type();
-      if (vtype.is_constrained()) {
-        generate_validate_var_decl(var_decl, indent, o);
-        o << EOL;
-      }
-    }
-
+/**
+ * Generate validation statements for bounded or specialized block variables.
+ *
+ * @param[in] var_decl block variable
+ * @param[in] indent indentation level
+ * @param[in,out] o stream for generating
+ */
+void generate_validate_block_var(const block_var_decl& var_decl, int indent,
+                                 std::ostream& o) {
+  block_var_type vtype = var_decl.type().innermost_type();
+  if (vtype.is_constrained()) {
+    generate_validate_var_decl(var_decl, indent, o);
+    o << EOL;
   }
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -13,17 +13,13 @@ namespace test {
 // method
 class throwing_model : public stan_model {
  public:
-
-  throwing_model(stan::io::var_context &context, std::ostream* pstream) :
-      stan_model(context, pstream) { }
+  throwing_model(stan::io::var_context& context, std::ostream* pstream)
+      : stan_model(context, pstream) {}
 
   template <typename RNG>
-  void write_array(RNG& base_rng__,
-                   std::vector<double>& params_r__,
-                   std::vector<int>& params_i__,
-                   std::vector<double>& vars__,
-                   bool include_tparams__ = true,
-                   bool include_gqs__ = true,
+  void write_array(RNG& base_rng__, std::vector<double>& params_r__,
+                   std::vector<int>& params_i__, std::vector<double>& vars__,
+                   bool include_tparams__ = true, bool include_gqs__ = true,
                    std::ostream* pstream__ = 0) const {
     vars__.resize(0);
     for (size_t i = 0; i < params_r__.size() - 2; ++i)
@@ -33,22 +29,21 @@ class throwing_model : public stan_model {
 
   template <typename RNG>
   void write_array(RNG& base_rng,
-                   Eigen::Matrix<double,Eigen::Dynamic,1>& params_r,
-                   Eigen::Matrix<double,Eigen::Dynamic,1>& vars,
-                   bool include_tparams = true,
-                   bool include_gqs = true,
+                   Eigen::Matrix<double, Eigen::Dynamic, 1>& params_r,
+                   Eigen::Matrix<double, Eigen::Dynamic, 1>& vars,
+                   bool include_tparams = true, bool include_gqs = true,
                    std::ostream* pstream = 0) const {
     throw std::domain_error("throwing within write_array");
   }
 };
-}
+}  // namespace test
 
 class ServicesUtil : public ::testing::Test {
-public:
+ public:
   ServicesUtil()
-    : mcmc_writer(sample_writer, diagnostic_writer, logger),
-      model(context, &model_log),
-      throwing_model(context, &model_log) {}
+      : mcmc_writer(sample_writer, diagnostic_writer, logger),
+        model(context, &model_log),
+        throwing_model(context, &model_log) {}
 
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
   stan::test::unit::instrumented_logger logger;
@@ -66,7 +61,7 @@ TEST_F(ServicesUtil, constructor) {
 }
 
 class mock_sampler : public stan::mcmc::base_mcmc {
-public:
+ public:
   int n_transition;
   int n_get_sampler_param_names;
   int n_get_sampler_params;
@@ -74,9 +69,7 @@ public:
   int n_get_sampler_diagnostic_names;
   int n_get_sampler_diagnostics;
 
-  mock_sampler() {
-    reset();
-  }
+  mock_sampler() { reset(); }
 
   void reset() {
     n_transition = 0;
@@ -87,9 +80,8 @@ public:
     n_get_sampler_diagnostics = 0;
   }
 
-  stan::mcmc::sample
-  transition(stan::mcmc::sample& init_sample,
-             stan::callbacks::logger& logger) {
+  stan::mcmc::sample transition(stan::mcmc::sample& init_sample,
+                                stan::callbacks::logger& logger) {
     ++n_transition;
     stan::mcmc::sample result(init_sample);
     return result;
@@ -200,7 +192,6 @@ TEST_F(ServicesUtil, write_timing) {
   EXPECT_EQ(5, logger.call_count_info());
 }
 
-
 TEST_F(ServicesUtil, throwing_model__write_sample_parameters) {
   boost::ecuyer1988 rng = stan::services::util::create_rng(0, 1);
   Eigen::VectorXd x = Eigen::VectorXd::Zero(2);
@@ -216,17 +207,21 @@ TEST_F(ServicesUtil, throwing_model__write_sample_parameters) {
   EXPECT_EQ(0, diagnostic_writer.call_count());
   EXPECT_EQ(1, logger.call_count());
 
-
-  std::vector<std::vector<double>> values = sample_writer.vector_double_values();
+  std::vector<std::vector<double>> values
+      = sample_writer.vector_double_values();
   ASSERT_EQ(1, values.size());
-  ASSERT_EQ(mcmc_writer.num_sample_params_ + mcmc_writer.num_sampler_params_ + mcmc_writer.num_model_params_,
+  ASSERT_EQ(mcmc_writer.num_sample_params_ + mcmc_writer.num_sampler_params_
+                + mcmc_writer.num_model_params_,
             values[0].size());
 
-  for (size_t i = 0; i < mcmc_writer.num_sample_params_ + mcmc_writer.num_sampler_params_; ++i) {
+  for (size_t i = 0;
+       i < mcmc_writer.num_sample_params_ + mcmc_writer.num_sampler_params_;
+       ++i) {
     EXPECT_FALSE(std::isnan(values[0][i]));
   }
 
-  for (size_t i = mcmc_writer.num_sample_params_ + mcmc_writer.num_sampler_params_;
+  for (size_t i
+       = mcmc_writer.num_sample_params_ + mcmc_writer.num_sampler_params_;
        i < values[0].size(); ++i) {
     EXPECT_TRUE(std::isnan(values[0][i]));
   }

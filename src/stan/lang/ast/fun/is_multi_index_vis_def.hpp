@@ -4,34 +4,22 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    is_multi_index_vis::is_multi_index_vis() { }
+is_multi_index_vis::is_multi_index_vis() {}
 
-    bool is_multi_index_vis::operator()(const uni_idx& i) const {
-      return false;
-    }
+bool is_multi_index_vis::operator()(const uni_idx& i) const { return false; }
 
-    bool is_multi_index_vis::operator()(const multi_idx& i) const {
-      return true;
-    }
+bool is_multi_index_vis::operator()(const multi_idx& i) const { return true; }
 
-    bool is_multi_index_vis::operator()(const omni_idx& i) const {
-      return true;
-    }
+bool is_multi_index_vis::operator()(const omni_idx& i) const { return true; }
 
-    bool is_multi_index_vis::operator()(const lb_idx& i) const {
-      return true;
-    }
+bool is_multi_index_vis::operator()(const lb_idx& i) const { return true; }
 
-    bool is_multi_index_vis::operator()(const ub_idx& i) const {
-      return true;
-    }
+bool is_multi_index_vis::operator()(const ub_idx& i) const { return true; }
 
-    bool is_multi_index_vis::operator()(const lub_idx& i) const {
-      return true;
-    }
+bool is_multi_index_vis::operator()(const lub_idx& i) const { return true; }
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

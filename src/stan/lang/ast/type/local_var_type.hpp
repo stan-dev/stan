@@ -85,8 +85,7 @@ struct local_var_type {
    *
    * @param x local variable type
    */
-  local_var_type(
-      const row_vector_local_type& x);  // NOLINT(runtime/explicit)
+  local_var_type(const row_vector_local_type& x);  // NOLINT(runtime/explicit)
 
   /**
    * Construct a local var type with the specified type.

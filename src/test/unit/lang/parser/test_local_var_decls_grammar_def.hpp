@@ -17,27 +17,25 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    test_local_var_decls_grammar<Iterator>::test_local_var_decls_grammar(
-                                            const io::program_reader& reader,
-                                            variable_map& var_map,
-                                            std::stringstream& error_msgs)
-      : test_local_var_decls_grammar::base_type(test_local_var_decls_r),
-        reader_(reader),
-        var_map_(var_map),
-        error_msgs_(error_msgs),
-        local_var_decls_g(var_map_, error_msgs_) {
-      using boost::spirit::qi::eps;
-      using boost::spirit::qi::labels::_a;
+template <typename Iterator>
+test_local_var_decls_grammar<Iterator>::test_local_var_decls_grammar(
+    const io::program_reader& reader, variable_map& var_map,
+    std::stringstream& error_msgs)
+    : test_local_var_decls_grammar::base_type(test_local_var_decls_r),
+      reader_(reader),
+      var_map_(var_map),
+      error_msgs_(error_msgs),
+      local_var_decls_g(var_map_, error_msgs_) {
+  using boost::spirit::qi::eps;
+  using boost::spirit::qi::labels::_a;
 
-      test_local_var_decls_r.name("test local_var_decls");
-      test_local_var_decls_r
-        %= eps[set_var_scope_f(_a, derived_origin)]
-        > local_var_decls_g(_a);
-    }
-
-  }
+  test_local_var_decls_r.name("test local_var_decls");
+  test_local_var_decls_r
+      %= eps[set_var_scope_f(_a, derived_origin)] > local_var_decls_g(_a);
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif
