@@ -12,71 +12,70 @@
 
 namespace stan {
 namespace analyze {
-  /**
-   * Computes the effective sample size (ESS) for the specified
-   * parameter across all kept samples.  The value returned is the
-   * minimum of ESS and the number_total_draws *
-   * log10(number_total_draws).
-   *
-   * See more details in Stan reference manual section "Effective
-   * Sample Size". http://mc-stan.org/users/documentation
-   *
-   * Current implementation assumes draws are stored in contiguous
-   * blocks of memory.  Chains are trimmed from the back to match the
-   * length of the shortest chain.  Note that the variance can not
-   * be estimated with less than three draws.
-   *
-   * @param draws stores pointers to arrays of chains
-   * @param sizes stores sizes of chains
-   * @return effective sample size for the specified parameter
-   */
-  inline
-  double compute_effective_sample_size(std::vector<const double*> draws,
-                                       std::vector<size_t> sizes) {
-    int num_chains = sizes.size();
-    size_t num_draws = sizes[0];
-    for (int chain = 1; chain < num_chains; ++chain) {
-      num_draws = std::min(num_draws, sizes[chain]);
-    }
+/**
+ * Computes the effective sample size (ESS) for the specified
+ * parameter across all kept samples.  The value returned is the
+ * minimum of ESS and the number_total_draws *
+ * log10(number_total_draws).
+ *
+ * See more details in Stan reference manual section "Effective
+ * Sample Size". http://mc-stan.org/users/documentation
+ *
+ * Current implementation assumes draws are stored in contiguous
+ * blocks of memory.  Chains are trimmed from the back to match the
+ * length of the shortest chain.  Note that the variance can not
+ * be estimated with less than three draws.
+ *
+ * @param draws stores pointers to arrays of chains
+ * @param sizes stores sizes of chains
+ * @return effective sample size for the specified parameter
+ */
+inline double compute_effective_sample_size(std::vector<const double*> draws,
+                                            std::vector<size_t> sizes) {
+  int num_chains = sizes.size();
+  size_t num_draws = sizes[0];
+  for (int chain = 1; chain < num_chains; ++chain) {
+    num_draws = std::min(num_draws, sizes[chain]);
+  }
 
-    if ( num_draws < 3 ) {
-      return std::numeric_limits<double>::quiet_NaN();
-    }
+  if (num_draws < 3) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
 
-    // check if chains are constant; all equal to first draw's value
-    Eigen::VectorXd draw_val(num_chains);
-    for (int chain = 0; chain < num_chains; chain++)
-      draw_val(chain) = static_cast<double>(chain);
+  // check if chains are constant; all equal to first draw's value
+  Eigen::VectorXd draw_val(num_chains);
+  for (int chain = 0; chain < num_chains; chain++)
+    draw_val(chain) = static_cast<double>(chain);
 
-    for (int chain = 0; chain < num_chains; chain++) {
-      Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
-        draw(draws[chain], sizes[chain]);
+  for (int chain = 0; chain < num_chains; chain++) {
+    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
+        draws[chain], sizes[chain]);
 
-      for (int n = 0; n < num_draws; n++) {
-        if ( !boost::math::isfinite(draw(n)) ) {
-          return std::numeric_limits<double>::quiet_NaN();
-        }
-      }
-
-      if ( draw.isApproxToConstant(draw(0)) ) {
-        draw_val(chain) = draw(0);
+    for (int n = 0; n < num_draws; n++) {
+      if (!boost::math::isfinite(draw(n))) {
+        return std::numeric_limits<double>::quiet_NaN();
       }
     }
 
-    if ( draw_val.isApproxToConstant(draw_val(0)) ) {
-      return std::numeric_limits<double>::quiet_NaN();
+    if (draw.isApproxToConstant(draw(0))) {
+      draw_val(chain) = draw(0);
     }
+  }
 
-    Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
-    Eigen::VectorXd chain_mean(num_chains);
-    Eigen::VectorXd chain_var(num_chains);
-    for (int chain = 0; chain < num_chains; ++chain) {
-      Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
-        draw(draws[chain], sizes[chain]);
-      autocovariance<double>(draw, acov(chain));
-      chain_mean(chain) = draw.mean();
-      chain_var(chain) = acov(chain)(0)*num_draws / (num_draws - 1);
-    }
+  if (draw_val.isApproxToConstant(draw_val(0))) {
+    return std::numeric_limits<double>::quiet_NaN();
+  }
+
+  Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
+  Eigen::VectorXd chain_mean(num_chains);
+  Eigen::VectorXd chain_var(num_chains);
+  for (int chain = 0; chain < num_chains; ++chain) {
+    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
+        draws[chain], sizes[chain]);
+    autocovariance<double>(draw, acov(chain));
+    chain_mean(chain) = draw.mean();
+    chain_var(chain) = acov(chain)(0) * num_draws / (num_draws - 1);
+  }
 
   double mean_var = chain_var.mean();
   double var_plus = mean_var * (num_draws - 1) / num_draws;

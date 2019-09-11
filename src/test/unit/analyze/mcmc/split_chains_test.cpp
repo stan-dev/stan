@@ -49,20 +49,18 @@ TEST_F(SplitChains, split_chains) {
     int first_half = std::floor(half);
     for (int draw = 0; draw < first_half; ++draw) {
       ASSERT_NEAR(samples(chain)(draw), split_draws[chain][draw], 1.0)
-        << "samples[" << chain << "]["<< draw << "]: "
-        << draws[chain][draw]
-        << ", split_chain[" << chain << "][" << draw << "]: "
-        << split_draws[chain][draw];
+          << "samples[" << chain << "][" << draw << "]: " << draws[chain][draw]
+          << ", split_chain[" << chain << "][" << draw
+          << "]: " << split_draws[chain][draw];
     }
 
     int second_half = std::ceil(half);
     for (int draw = second_half; draw < sizes[chain]; ++draw) {
       ASSERT_NEAR(samples(chain)(draw),
-                  split_draws[2*chain + 1][draw - first_half], 1.0)
-        << "samples[" << chain << "]["<< draw << "]: "
-        << draws[chain][draw]
-        << ", split_chain[" << chain << "][" << draw << "]: "
-        << split_draws[chain][draw];
+                  split_draws[2 * chain + 1][draw - first_half], 1.0)
+          << "samples[" << chain << "][" << draw << "]: " << draws[chain][draw]
+          << ", split_chain[" << chain << "][" << draw
+          << "]: " << split_draws[chain][draw];
     }
   }
 }
@@ -96,20 +94,18 @@ TEST_F(SplitChains, split_chains_convenience) {
     int first_half = std::floor(half);
     for (int draw = 0; draw < first_half; ++draw) {
       ASSERT_NEAR(samples(chain)(draw), split_draws[chain][draw], 1.0)
-        << "samples[" << chain << "]["<< draw << "]: "
-        << draws[chain][draw]
-        << ", split_chain[" << chain << "][" << draw << "]: "
-        << split_draws[chain][draw];
+          << "samples[" << chain << "][" << draw << "]: " << draws[chain][draw]
+          << ", split_chain[" << chain << "][" << draw
+          << "]: " << split_draws[chain][draw];
     }
 
     int second_half = std::ceil(half);
     for (int draw = second_half; draw < size; ++draw) {
       ASSERT_NEAR(samples(chain)(draw),
-                  split_draws[2*chain + 1][draw - first_half], 1.0)
-        << "samples[" << chain << "]["<< draw << "]: "
-        << draws[chain][draw]
-        << ", split_chain[" << chain << "][" << draw << "]: "
-        << split_draws[chain][draw];
+                  split_draws[2 * chain + 1][draw - first_half], 1.0)
+          << "samples[" << chain << "][" << draw << "]: " << draws[chain][draw]
+          << ", split_chain[" << chain << "][" << draw
+          << "]: " << split_draws[chain][draw];
     }
   }
 }

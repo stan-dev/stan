@@ -610,7 +610,7 @@ class chains {
     for (int chain = 0; chain < n_chains; ++chain) {
       n_kept_samples = num_kept_samples(chain);
       draws[chain]
-        = samples_(chain).col(index).bottomRows(n_kept_samples).data();
+          = samples_(chain).col(index).bottomRows(n_kept_samples).data();
       sizes[chain] = n_kept_samples;
     }
 

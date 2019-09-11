@@ -244,7 +244,7 @@ TEST_F(ComputeEss, chains_compute_split_effective_sample_size) {
   }
 }
 
-TEST_F(ComputeEss,compute_effective_sample_size_minimum_n) {
+TEST_F(ComputeEss, compute_effective_sample_size_minimum_n) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
   param_names << "a";
 
@@ -254,11 +254,11 @@ TEST_F(ComputeEss,compute_effective_sample_size_minimum_n) {
   chains.add(draws);
 
   ASSERT_TRUE(std::isnan(chains.effective_sample_size(0)))
-    << "n_effective for index: " << 1 << ", parameter: "
-    << chains.param_name(1);
+      << "n_effective for index: " << 1
+      << ", parameter: " << chains.param_name(1);
 }
 
-TEST_F(ComputeEss,compute_effective_sample_size_nan) {
+TEST_F(ComputeEss, compute_effective_sample_size_nan) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
   param_names << "a";
 
@@ -268,11 +268,11 @@ TEST_F(ComputeEss,compute_effective_sample_size_nan) {
   chains.add(draws);
 
   ASSERT_TRUE(std::isnan(chains.effective_sample_size(0)))
-    << "n_effective for index: " << 1 << ", parameter: "
-    << chains.param_name(1);
+      << "n_effective for index: " << 1
+      << ", parameter: " << chains.param_name(1);
 }
 
-TEST_F(ComputeEss,compute_effective_sample_size_constant) {
+TEST_F(ComputeEss, compute_effective_sample_size_constant) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
   param_names << "a";
 
@@ -282,6 +282,6 @@ TEST_F(ComputeEss,compute_effective_sample_size_constant) {
   chains.add(draws);
 
   ASSERT_TRUE(std::isnan(chains.effective_sample_size(0)))
-    << "n_effective for index: " << 1 << ", parameter: "
-    << chains.param_name(1);
+      << "n_effective for index: " << 1
+      << ", parameter: " << chains.param_name(1);
 }
