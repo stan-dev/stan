@@ -229,7 +229,7 @@ TEST_F(ComputeRhat,compute_potential_scale_reduction_constant) {
   draws << 1.0, 1.0;
   chains.add(draws);
 
-  ASSERT_NEAR(1.0, chains.split_potential_scale_reduction(0), 1e-4)
+  ASSERT_TRUE(std::isnan(chains.split_potential_scale_reduction(0)))
     << "rhat for index: " << 1 << ", parameter: "
     << chains.param_name(1);
 }

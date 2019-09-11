@@ -21,8 +21,10 @@ namespace analyze {
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation
    *
-   * Current implementation assumes chains are all of equal size and
-   * draws are stored in contiguous blocks of memory.
+   * Current implementation assumes draws are stored in contiguous
+   * blocks of memory.  Chains are trimmed from the back to match the
+   * length of the shortest chain.  Note that the variance can not
+   * be estimated for less than three draws.
    *
    * @param draws stores pointers to arrays of chains
    * @param sizes stores sizes of chains
@@ -41,12 +43,16 @@ namespace analyze {
       return std::numeric_limits<double>::quiet_NaN();
     }
 
-    Eigen::VectorXd draw_val = Eigen::VectorXd::Random(num_chains);
-    for ( int chain = 0; chain < num_chains; chain++ ) {
+    // check if chains are constant; all equal to first draw's value
+    Eigen::VectorXd draw_val(num_chains);
+    for (int chain = 0; chain < num_chains; chain++)
+      draw_val(chain) = static_cast<double>(chain);
+
+    for (int chain = 0; chain < num_chains; chain++) {
       Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
         draw(draws[chain], sizes[chain]);
 
-      for ( int n = 0; n < num_draws; n++ ) {
+      for (int n = 0; n < num_draws; n++) {
         if ( !boost::math::isfinite(draw(n)) ) {
           return std::numeric_limits<double>::quiet_NaN();
         }
@@ -58,7 +64,7 @@ namespace analyze {
     }
 
     if ( draw_val.isApproxToConstant(draw_val(0)) ) {
-      return num_chains * num_draws;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
@@ -138,9 +144,11 @@ namespace analyze {
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation
    *
-   * Current implementation assumes chains are all of equal size and
-   * draws are stored in contiguous blocks of memory.  Argument size
-   * will be broadcast to same length as draws.
+   * Current implementation assumes draws are stored in contiguous
+   * blocks of memory.  Chains are trimmed from the back to match the
+   * length of the shortest chain.  Note that the variance can not be
+   * estimated for less than three draws.  Argument size will be
+   * broadcast to same length as draws.
    *
    * @param draws stores pointers to arrays of chains
    * @param size size of chains
@@ -198,9 +206,11 @@ namespace analyze {
    * See more details in Stan reference manual section "Effective
    * Sample Size". http://mc-stan.org/users/documentation
    *
-   * Current implementation assumes chains are all of equal size and
-   * draws are stored in contiguous blocks of memory.  Argument size
-   * will be broadcast to same length as draws.
+   * Current implementation assumes draws are stored in contiguous
+   * blocks of memory.  Chains are trimmed from the back to match the
+   * length of the shortest chain.  Note that the variance can not be
+   * estimated for less than three draws.  Argument size will be
+   * broadcast to same length as draws.
    *
    * @param draws stores pointers to arrays of chains
    * @param size size of chains

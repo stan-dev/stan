@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 #include <fstream>
 #include <sstream>
+#include <cmath>
 
 class ComputeEss : public testing::Test {
 public:
@@ -284,10 +285,10 @@ TEST_F(ComputeEss,compute_effective_sample_size_constant) {
 
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 3, 1> draws;
-  draws << 1.0, 2.0, 3.0;
+  draws << 1.0, 1.0, 1.0;
   chains.add(draws);
 
-  ASSERT_NEAR(3.0, chains.effective_sample_size(0), 1e-4)
+  ASSERT_TRUE(std::isnan(chains.effective_sample_size(0)))
     << "n_effective for index: " << 1 << ", parameter: "
     << chains.param_name(1);
 }

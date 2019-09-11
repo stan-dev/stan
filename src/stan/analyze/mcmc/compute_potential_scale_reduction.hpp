@@ -20,8 +20,9 @@ namespace analyze {
    * See more details in Stan reference manual section "Potential
    * Scale Reduction". http://mc-stan.org/users/documentation
    *
-   * Current implementation assumes chains are all of equal size and
-   * draws are stored in contiguous blocks of memory.
+   * Current implementation assumes draws are stored in contiguous
+   * blocks of memory.  Chains are trimmed from the back to match the
+   * length of the shortest chain.
    *
    * @param draws stores pointers to arrays of chains
    * @param sizes stores sizes of chains
@@ -32,16 +33,20 @@ namespace analyze {
                                            std::vector<size_t> sizes) {
     int num_chains = sizes.size();
     size_t num_draws = sizes[0];
-    for ( int chain = 1; chain < num_chains; ++chain ) {
+    for (int chain = 1; chain < num_chains; ++chain) {
       num_draws = std::min(num_draws, sizes[chain]);
     }
 
-    Eigen::VectorXd draw_val = Eigen::VectorXd::Random(num_chains);
-    for ( int chain = 0; chain < num_chains; chain++ ) {
+    // check if chains are constant; all equal to first draw's value
+    Eigen::VectorXd draw_val(num_chains);
+    for (int chain = 0; chain < num_chains; chain++)
+      draw_val(chain) = static_cast<double>(chain);
+
+    for (int chain = 0; chain < num_chains; chain++) {
       Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
         draw(draws[chain], sizes[chain]);
 
-      for ( int n = 0; n < num_draws; n++ ) {
+      for (int n = 0; n < num_draws; n++) {
         if ( !boost::math::isfinite(draw(n)) ) {
           return std::numeric_limits<double>::quiet_NaN();
         }
@@ -53,13 +58,13 @@ namespace analyze {
     }
 
     if ( draw_val.isApproxToConstant(draw_val(0)) ) {
-      return 1.0;
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     Eigen::VectorXd chain_mean(num_chains);
     Eigen::VectorXd chain_var(num_chains);
 
-    for ( int chain = 0; chain < num_chains; chain++ ) {
+    for (int chain = 0; chain < num_chains; ++chain) {
       Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
         draw(draws[chain], sizes[chain]);
       chain_mean(chain) = draw.mean();
@@ -83,9 +88,10 @@ namespace analyze {
    * See more details in Stan reference manual section "Potential
    * Scale Reduction". http://mc-stan.org/users/documentation
    *
-   * Current implementation assumes chains are all of equal size and
-   * draws are stored in contiguous blocks of memory.  Argument size
-   * will be broadcast to same length as draws.
+   * Current implementation assumes draws are stored in contiguous
+   * blocks of memory.  Chains are trimmed from the back to match the
+   * length of the shortest chain.  Argument size will be broadcast to
+   * same length as draws.
    *
    * @param draws stores pointers to arrays of chains
    * @param sizes stores sizes of chains
@@ -107,8 +113,9 @@ namespace analyze {
    * See more details in Stan reference manual section "Potential
    * Scale Reduction". http://mc-stan.org/users/documentation
    *
-   * Current implementation assumes chains are all of equal size and
-   * draws are stored in contiguous blocks of memory.
+   * Current implementation assumes trims chains from the back to
+   * match the length of the shortest chain, and draws are stored in
+   * contiguous blocks of memory.
    *
    * @param draws stores pointers to arrays of chains
    * @param sizes stores sizes of chains
@@ -139,9 +146,10 @@ namespace analyze {
    * See more details in Stan reference manual section "Potential
    * Scale Reduction". http://mc-stan.org/users/documentation
    *
-   * Current implementation assumes chains are all of equal size and
-   * draws are stored in contiguous blocks of memory.  Argument size
-   * will be broadcast to same length as draws.
+   * Current implementation assumes draws are stored in contiguous
+   * blocks of memory.  Chains are trimmed from the back to match the
+   * length of the shortest chain.  Argument size will be broadcast to
+   * same length as draws.
    *
    * @param draws stores pointers to arrays of chains
    * @param sizes stores sizes of chains
