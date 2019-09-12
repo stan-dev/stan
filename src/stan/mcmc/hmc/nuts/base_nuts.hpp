@@ -20,11 +20,15 @@
 #include "tbb/flow_graph.h"
 #include "tbb/concurrent_vector.h"
 
-//using tbb::task_scheduler_init;
 using namespace tbb::flow;
 
-// do not use actualy threading (yet)
-/* tbb::task_scheduler_init tbb_scheduler(1); */
+// Prototype of speculative NUTS
+
+// not meant to be used & needs refactoring!!
+
+// also note that this branch is off the released v2.20.0 tag; so
+// please start off from a fresh branch off from develop if this is
+// continued.
 
 namespace stan {
   namespace mcmc {
@@ -151,11 +155,16 @@ namespace stan {
       transition(sample& init_sample, callbacks::logger& logger) {
         return transition_parallel(init_sample, logger);
       }
-      
-      // right now we do not get the exact same transitions. This is
-      // likely due to copying of state_t points which contain a
-      // random generator...but its unclear where that is used during
-      // the transition phase...
+
+      // this implementation builds up the dependence graph every call
+      // to transition. Things which should be refactored:
+      // 1. build up the nodes only once
+      // 2. add a prepare method to each node which samples its
+      // direction and needed random numbers for multinomial sampling
+      // 3. only the edges are added dynamically. So the forward nodes
+      // are wired-up and the backward nodes are wired-up if run
+      // parallel. If run serially, then each grow node is alternated
+      // with a check node.
       sample
       transition_parallel(sample& init_sample, callbacks::logger& logger) {
         // Initialize the algorithm
@@ -411,13 +420,6 @@ namespace stan {
         }
 
         g.wait_for_all();
-
-        /*
-        fwd_builder.clear();
-        bck_builder.clear();
-        joins.clear();
-        checks.clear();
-        */
         
         this->n_leapfrog_ = n_leapfrog;
         //this->n_leapfrog_ = tree_fwd.n_leapfrog_ + tree_bck.n_leapfrog_;
