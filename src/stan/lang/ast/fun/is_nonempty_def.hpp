@@ -5,15 +5,15 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    bool is_nonempty(const std::string& s) {
-      for (size_t i = 0; i < s.size(); ++i)
-        if (!is_space(s[i]))
-          return true;
-      return false;
-    }
-
-  }
+bool is_nonempty(const std::string& s) {
+  for (size_t i = 0; i < s.size(); ++i)
+    if (!is_space(s[i]))
+      return true;
+  return false;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

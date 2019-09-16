@@ -7,23 +7,22 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the set of statements in a program block with
-     * the specified indentation level on the specified stream.
-     *
-     * @param[in] statements vector of statements
-     * @param[in] indent indentation level
-     * @param[in,out] o stream for generating
-     */
-    void generate_statements(const std::vector<statement> statements,
-                             int indent, std::ostream& o) {
-      for (size_t i = 0; i < statements.size(); ++i)
-        generate_statement(statements[i], indent, o);
-    }
-
-  }
+/**
+ * Generate the set of statements in a program block with
+ * the specified indentation level on the specified stream.
+ *
+ * @param[in] statements vector of statements
+ * @param[in] indent indentation level
+ * @param[in,out] o stream for generating
+ */
+void generate_statements(const std::vector<statement> statements, int indent,
+                         std::ostream& o) {
+  for (size_t i = 0; i < statements.size(); ++i)
+    generate_statement(statements[i], indent, o);
 }
-#endif
 
+}  // namespace lang
+}  // namespace stan
+#endif

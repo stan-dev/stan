@@ -14,36 +14,33 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    struct term_grammar;
+template <typename Iterator>
+struct term_grammar;
 
-    template <typename Iterator>
-    struct expression_grammar;
+template <typename Iterator>
+struct expression_grammar;
 
-    template <typename Iterator>
-    struct expression07_grammar
-      : public boost::spirit::qi::grammar<Iterator,
-                                          expression(scope),
-                                          whitespace_grammar<Iterator> > {
-      expression07_grammar(variable_map& var_map,
-                           std::stringstream& error_msgs,
-                           expression_grammar<Iterator>& eg);
+template <typename Iterator>
+struct expression07_grammar
+    : public boost::spirit::qi::grammar<Iterator, expression(scope),
+                                        whitespace_grammar<Iterator> > {
+  expression07_grammar(variable_map& var_map, std::stringstream& error_msgs,
+                       expression_grammar<Iterator>& eg);
 
-      // global parser information
-      variable_map& var_map_;
-      std::stringstream& error_msgs_;
+  // global parser information
+  variable_map& var_map_;
+  std::stringstream& error_msgs_;
 
-      // nested grammars
-      term_grammar<Iterator> term_g;
+  // nested grammars
+  term_grammar<Iterator> term_g;
 
-      boost::spirit::qi::rule<Iterator,
-                              expression(scope),
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, expression(scope),
+                          whitespace_grammar<Iterator> >
       expression07_r;
-    };
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

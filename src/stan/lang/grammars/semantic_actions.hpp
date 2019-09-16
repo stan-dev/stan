@@ -34,13 +34,15 @@ struct phoenix_functor_unary {
   /**
    * Declare result to be a template struct.
    */
-  template <class> struct result;
+  template <class>
+  struct result;
 
   /**
    * Specialize as required by Phoenix to functional form
    * with typedef of return type.
    */
-  template <typename F, typename T1> struct result<F(T1)> {
+  template <typename F, typename T1>
+  struct result<F(T1)> {
     typedef void type;
   };
 };
@@ -54,13 +56,15 @@ struct phoenix_functor_binary {
   /**
    * Declare result to be a template struct.
    */
-  template <class> struct result;
+  template <class>
+  struct result;
 
   /**
    * Specialize as required by Phoenix to functional form
    * with typedef of return type.
    */
-  template <typename F, typename T1, typename T2> struct result<F(T1, T2)> {
+  template <typename F, typename T1, typename T2>
+  struct result<F(T1, T2)> {
     typedef void type;
   };
 };
@@ -74,7 +78,8 @@ struct phoenix_functor_ternary {
   /**
    * Declare result to be a template struct.
    */
-  template <class> struct result;
+  template <class>
+  struct result;
 
   /**
    * Specialize as required by Phoenix to functional form
@@ -95,7 +100,8 @@ struct phoenix_functor_quaternary {
   /**
    * Declare result to be a template struct.
    */
-  template <class> struct result;
+  template <class>
+  struct result;
 
   /**
    * Specialize as required by Phoenix to functional form
@@ -116,7 +122,8 @@ struct phoenix_functor_quinary {
   /**
    * Declare result to be a template struct.
    */
-  template <class> struct result;
+  template <class>
+  struct result;
 
   /**
    * Specialize as required by Phoenix to functional form
@@ -138,7 +145,8 @@ struct phoenix_functor_senary {
   /**
    * Declare result to be a template struct.
    */
-  template <class> struct result;
+  template <class>
+  struct result;
 
   /**
    * Specialize as required by Phoenix to functional form
@@ -160,7 +168,8 @@ struct phoenix_functor_septenary {
   /**
    * Declare result to be a template struct.
    */
-  template <class> struct result;
+  template <class>
+  struct result;
 
   /**
    * Specialize as required by Phoenix to functional form
@@ -174,7 +183,8 @@ struct phoenix_functor_septenary {
 };
 
 struct assign_lhs : public phoenix_functor_binary {
-  template <typename L, typename R> void operator()(L &lhs, const R &rhs) const;
+  template <typename L, typename R>
+  void operator()(L &lhs, const R &rhs) const;
 };
 extern boost::phoenix::function<assign_lhs> assign_lhs_f;
 
@@ -251,11 +261,11 @@ extern boost::phoenix::function<set_allows_sampling_origin>
 
 // called from: functions_grammar
 struct validate_declarations : public phoenix_functor_quinary {
-  void
-  operator()(bool &pass,
-             std::set<std::pair<std::string, function_signature_t>> &declared,
-             std::set<std::pair<std::string, function_signature_t>> &defined,
-             std::ostream &error_msgs, bool allow_undefined) const;
+  void operator()(
+      bool &pass,
+      std::set<std::pair<std::string, function_signature_t>> &declared,
+      std::set<std::pair<std::string, function_signature_t>> &defined,
+      std::ostream &error_msgs, bool allow_undefined) const;
 };
 extern boost::phoenix::function<validate_declarations> validate_declarations_f;
 

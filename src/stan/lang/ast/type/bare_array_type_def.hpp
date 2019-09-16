@@ -36,10 +36,9 @@ bare_array_type::bare_array_type()
 bare_array_type::bare_array_type(const bare_expr_type& el_type)
     : element_type_(el_type), is_data_(el_type.is_data()) {}
 
-bare_array_type::bare_array_type(const bare_expr_type& el_type,
-                                 size_t num_dims)
-  : element_type_(to_element_type(el_type, num_dims)),
-    is_data_(el_type.is_data()) {}
+bare_array_type::bare_array_type(const bare_expr_type& el_type, size_t num_dims)
+    : element_type_(to_element_type(el_type, num_dims)),
+      is_data_(el_type.is_data()) {}
 
 bare_expr_type bare_array_type::contains() const {
   bare_expr_type cur_type(element_type_);

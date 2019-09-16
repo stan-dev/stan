@@ -17,7 +17,7 @@ mathRunTests = imp.load_source('runTests',
 
 # set up good makefile target name
 def mungeName(name):
-    if (name.startswith("src")):
+    if (name.startswith("src") or name.startswith("./src")):
         name = name.replace("src/","",1)
     if (name.endswith(mathRunTests.testsfx)):
         name = name.replace(mathRunTests.testsfx,"_test")

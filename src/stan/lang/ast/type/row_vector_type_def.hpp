@@ -5,15 +5,13 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    row_vector_type::row_vector_type(bool is_data) : is_data_(is_data) { }
+row_vector_type::row_vector_type(bool is_data) : is_data_(is_data) {}
 
-    row_vector_type::row_vector_type() : row_vector_type(false) { }
+row_vector_type::row_vector_type() : row_vector_type(false) {}
 
-    std::string row_vector_type::oid() const {
-      return "05_row_vector_type";
-    }
-  }
-}
+std::string row_vector_type::oid() const { return "05_row_vector_type"; }
+}  // namespace lang
+}  // namespace stan
 #endif

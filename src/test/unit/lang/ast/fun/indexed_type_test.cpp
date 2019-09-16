@@ -394,7 +394,7 @@ TEST(indexedType, indexed_expr_1d_arr_matrix_3_idxs_pos_1_2_is_multi) {
   stan::lang::variable v1("foo");
   v1.set_type(stan::lang::bare_array_type(stan::lang::matrix_type()));
   stan::lang::expression e1(v1);
-  
+
   // m, m, u reduces 1-d arr of matrix to 1-d arr of vector
   stan::lang::bare_expr_type idx_type = stan::lang::indexed_type(e1, idxs);
   EXPECT_EQ(idx_type.array_dims(), 1);

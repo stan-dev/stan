@@ -6,4 +6,3 @@ TEST(langParser, poundCommentDeprecated) {
                "Comments beginning with # are deprecated."
                "  Please use //");
 }
-

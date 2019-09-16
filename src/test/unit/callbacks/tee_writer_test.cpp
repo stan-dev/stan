@@ -2,35 +2,26 @@
 #include <gtest/gtest.h>
 
 namespace test {
-  class mock_writer : public stan::callbacks::writer {
-  public:
-    int N;
+class mock_writer : public stan::callbacks::writer {
+ public:
+  int N;
 
-    mock_writer() : N(0) { }
+  mock_writer() : N(0) {}
 
-    void operator()(const std::vector<std::string>& names) {
-      ++N;
-    }
+  void operator()(const std::vector<std::string>& names) { ++N; }
 
-    void operator()(const std::vector<double>& state) {
-      ++N;
-    }
+  void operator()(const std::vector<double>& state) { ++N; }
 
-    void operator()() {
-      ++N;
-    }
+  void operator()() { ++N; }
 
-    void operator()(const std::string& message) {
-      ++N;
-    }
-  };
-}
+  void operator()(const std::string& message) { ++N; }
+};
+}  // namespace test
 
 class StanCallbacksTeeWriter : public ::testing::Test {
-public:
+ public:
   StanCallbacksTeeWriter()
-    : writer1(), writer2(),
-      tee_writer(writer1, writer2) { }
+      : writer1(), writer2(), tee_writer(writer1, writer2) {}
 
   test::mock_writer writer1, writer2;
   stan::callbacks::tee_writer tee_writer;

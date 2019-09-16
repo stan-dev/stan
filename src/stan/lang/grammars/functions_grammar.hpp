@@ -15,59 +15,47 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    struct functions_grammar
-      : boost::spirit::qi::grammar<Iterator,
-                                   std::vector<function_decl_def>(),
-                                   whitespace_grammar<Iterator> > {
-      variable_map& var_map_;
-      std::set<std::pair<std::string,
-                         function_signature_t> > functions_declared_;
-      std::set<std::pair<std::string,
-                         function_signature_t> > functions_defined_;
-      std::stringstream& error_msgs_;
-      statement_grammar<Iterator> statement_g;
-      bare_type_grammar<Iterator> bare_type_g;
+template <typename Iterator>
+struct functions_grammar
+    : boost::spirit::qi::grammar<Iterator, std::vector<function_decl_def>(),
+                                 whitespace_grammar<Iterator> > {
+  variable_map& var_map_;
+  std::set<std::pair<std::string, function_signature_t> > functions_declared_;
+  std::set<std::pair<std::string, function_signature_t> > functions_defined_;
+  std::stringstream& error_msgs_;
+  statement_grammar<Iterator> statement_g;
+  bare_type_grammar<Iterator> bare_type_g;
 
-      functions_grammar(variable_map& var_map,
-                        std::stringstream& error_msgs,
-                        bool allow_undefined = false);
+  functions_grammar(variable_map& var_map, std::stringstream& error_msgs,
+                    bool allow_undefined = false);
 
-      boost::spirit::qi::rule<Iterator,
-                              std::vector<function_decl_def>(),
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, std::vector<function_decl_def>(),
+                          whitespace_grammar<Iterator> >
       functions_r;
 
-      boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<scope>,
-                              function_decl_def(),
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, boost::spirit::qi::locals<scope>,
+                          function_decl_def(), whitespace_grammar<Iterator> >
       function_r;
 
-      boost::spirit::qi::rule<Iterator,
-                              std::vector<var_decl>(),
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, std::vector<var_decl>(),
+                          whitespace_grammar<Iterator> >
       arg_decls_r;
 
-      boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<scope>,
-                              var_decl(),
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, boost::spirit::qi::locals<scope>,
+                          var_decl(), whitespace_grammar<Iterator> >
       arg_decl_r;
 
-      boost::spirit::qi::rule<Iterator,
-                              std::string(),
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, std::string(),
+                          whitespace_grammar<Iterator> >
       identifier_r;
 
-      boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::unused_type,
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, boost::spirit::qi::unused_type,
+                          whitespace_grammar<Iterator> >
       close_arg_decls_r;
-    };
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

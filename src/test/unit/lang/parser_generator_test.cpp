@@ -2,12 +2,12 @@
 #include <iostream>
 #include <gtest/gtest.h>
 
-void read_file(const std::string& path,
-               std::string& contents) {
+void read_file(const std::string& path, std::string& contents) {
   std::stringstream s;
   std::fstream f(path.c_str());
-  while (f.good())
+  while (f.good()) {
     s << static_cast<char>(f.get());
+  }
   contents = s.str();
 }
 
@@ -22,17 +22,18 @@ void test_pg(const std::string& program_name,
   read_file(path, hpp_code);
 
   EXPECT_TRUE(hpp_code.find(expected_substring) != std::string::npos)
-    << "program_name: " << program_name << std::endl
-    << "expected_substring: " << expected_substring;
+      << "program_name: " << program_name << std::endl
+      << "expected_substring: " << expected_substring;
 }
 
-int count_occurrences(const std::string target,
-                      const std::string s) {
+int count_occurrences(const std::string target, const std::string s) {
   size_t count = 0;
   size_t offset = 0;
   while (true) {
     offset = s.find(target, offset);
-    if (offset == std::string::npos) break;
+    if (offset == std::string::npos) {
+      break;
+    }
     offset += target.size();
     ++count;
   }
@@ -50,7 +51,7 @@ void test_pg_count(const std::string& program_name,
   std::string hpp_code;
   read_file(path, hpp_code);
 
-  EXPECT_EQ(expected_count, count_occurrences(expected_substring,hpp_code));
+  EXPECT_EQ(expected_count, count_occurrences(expected_substring, hpp_code));
 }
 
 TEST(unitLang, simpleTest) {
@@ -60,16 +61,20 @@ TEST(unitLang, simpleTest) {
 
 TEST(unitLang, odeTest) {
   std::string expected;
-  expected = "stan::math::assign(y_hat, "
-    "integrate_ode_rk45(sho_functor__(), y0, t0, ts, theta, x, x_int, pstream__));";
+  expected
+      = "stan::math::assign(y_hat, "
+        "integrate_ode_rk45(sho_functor__(), y0, t0, ts, theta, x, x_int, "
+        "pstream__));";
   test_pg("ode", expected);
   test_pg_count("ode", expected, 1);
 }
 
 TEST(unitLang, algebra_solverTest) {
   std::string expected;
-  expected = "stan::math::assign(y_s, "
-    "algebra_solver(algebra_system_functor__(), y, theta, x_r, x_i, pstream__));";
+  expected
+      = "stan::math::assign(y_s, "
+        "algebra_solver(algebra_system_functor__(), y, theta, x_r, x_i, "
+        "pstream__));";
   test_pg("algebra_solver", expected);
   test_pg_count("algebra_solver", expected, 1);
 }
