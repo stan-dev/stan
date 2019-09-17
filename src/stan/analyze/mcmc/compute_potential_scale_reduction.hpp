@@ -66,7 +66,7 @@ inline double compute_potential_scale_reduction(
 
   for (int chain = 0; chain < num_chains; ++chain) {
     Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
-      draws[chain], sizes[chain]);
+        draws[chain], sizes[chain]);
     chain_mean(chain) = draw.mean();
     chain_var(chain) = welford_variance(draw);
   }

@@ -14,7 +14,7 @@ namespace analyze {
  * @param ddof denominator degrees of freedom, defaults to 1
  * @return variance estimate
  */
-template<typename Derived>
+template <typename Derived>
 inline double welford_variance(const Eigen::MatrixBase<Derived>& y,
                                int ddof = 1) {
   double d = 0;
