@@ -5,20 +5,19 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    printable::printable() : printable_(std::string()) { }
+printable::printable() : printable_(std::string()) {}
 
-    printable::printable(const expression& expr) : printable_(expr) { }
+printable::printable(const expression& expr) : printable_(expr) {}
 
-    printable::printable(const std::string& msg) : printable_(msg) { }
+printable::printable(const std::string& msg) : printable_(msg) {}
 
-    printable::printable(const printable_t& printable)
-      : printable_(printable) { }
+printable::printable(const printable_t& printable) : printable_(printable) {}
 
-    printable::printable(const printable& printable)
-      : printable_(printable.printable_) { }
+printable::printable(const printable& printable)
+    : printable_(printable.printable_) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

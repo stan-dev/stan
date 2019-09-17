@@ -50,9 +50,8 @@
 #include <test/performance/utility.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
-
 class performance : public ::testing::Test {
-public:
+ public:
   static void SetUpTestCase() {
     N = 100;
     seconds_per_run.resize(N);
@@ -74,29 +73,26 @@ std::vector<std::vector<double> > performance::last_draws_per_run;
 bool performance::matches_tagged_version;
 bool performance::all_values_same;
 
-
-using stan::test::performance::run_command_output;
-using stan::test::performance::run_command;
+using stan::test::performance::get_date;
+using stan::test::performance::get_git_date;
+using stan::test::performance::get_git_hash;
 using stan::test::performance::get_last_iteration_from_file;
 using stan::test::performance::quote;
-using stan::test::performance::get_git_hash;
-using stan::test::performance::get_git_date;
-using stan::test::performance::get_date;
+using stan::test::performance::run_command;
+using stan::test::performance::run_command_output;
 
 TEST_F(performance, run) {
   clock_t t;
   for (int n = 0; n < N; ++n) {
     std::cout << "iteration: " << n << " / " << N << std::endl;
-    t = clock();      // start timer
-    stan::test::performance::command<stan_model>(1000,
-                                                 10000,
-                                                 "src/test/test-models/performance/logistic.data.R",
-                                                 "test/performance/logistic_output.csv",
-                                                 0U);
+    t = clock();  // start timer
+    stan::test::performance::command<stan_model>(
+        1000, 10000, "src/test/test-models/performance/logistic.data.R",
+        "test/performance/logistic_output.csv", 0U);
     t = clock() - t;  // end timer
     seconds_per_run[n] = static_cast<double>(t) / CLOCKS_PER_SEC;
     last_draws_per_run[n]
-      = get_last_iteration_from_file("test/performance/logistic_output.csv");
+        = get_last_iteration_from_file("test/performance/logistic_output.csv");
   }
   SUCCEED();
 }
@@ -105,35 +101,26 @@ TEST_F(performance, run) {
 TEST_F(performance, values_from_tagged_version) {
   int N_values = 9;
   ASSERT_EQ(N_values, last_draws_per_run[0].size())
-    << "last tagged version, 2.17.0, had " << N_values << " elements";
+      << "last tagged version, 2.17.0, had " << N_values << " elements";
 
   std::vector<double> first_run = last_draws_per_run[0];
-  EXPECT_FLOAT_EQ(-65.781998, first_run[0])
-    << "lp__: index 0";
+  EXPECT_FLOAT_EQ(-65.216301, first_run[0]) << "lp__: index 0";
 
-  EXPECT_FLOAT_EQ(1.0, first_run[1])
-    << "accept_stat__: index 1";
+  EXPECT_FLOAT_EQ(0.91851199, first_run[1]) << "accept_stat__: index 1";
 
-  EXPECT_FLOAT_EQ(0.76853198, first_run[2])
-    << "stepsize__: index 2";
+  EXPECT_FLOAT_EQ(0.76885802, first_run[2]) << "stepsize__: index 2";
 
-  EXPECT_FLOAT_EQ(2, first_run[3])
-    << "treedepth__: index 3";
+  EXPECT_FLOAT_EQ(2, first_run[3]) << "treedepth__: index 3";
 
-  EXPECT_FLOAT_EQ(7, first_run[4])
-    << "n_leapfrog__: index 4";
+  EXPECT_FLOAT_EQ(3, first_run[4]) << "n_leapfrog__: index 4";
 
-  EXPECT_FLOAT_EQ(0, first_run[5])
-    << "divergent__: index 5";
+  EXPECT_FLOAT_EQ(0, first_run[5]) << "divergent__: index 5";
 
-  EXPECT_FLOAT_EQ(66.6695, first_run[6])
-    << "energy__: index 6";
+  EXPECT_FLOAT_EQ(66.696503, first_run[6]) << "energy__: index 6";
 
-  EXPECT_FLOAT_EQ(1.55186, first_run[7])
-    << "beta.1: index 7";
+  EXPECT_FLOAT_EQ(1.3577, first_run[7]) << "beta.1: index 7";
 
-  EXPECT_FLOAT_EQ(-0.52400702, first_run[8])
-    << "beta.2: index 8";
+  EXPECT_FLOAT_EQ(-0.51189202, first_run[8]) << "beta.2: index 8";
 
   matches_tagged_version = !HasNonfatalFailure();
 }
@@ -145,9 +132,9 @@ TEST_F(performance, values_same_run_to_run) {
     double expected_value = last_draws_per_run[0][i];
     for (int n = 1; n < N; n++) {
       EXPECT_FLOAT_EQ(expected_value, last_draws_per_run[n][i])
-        << "expecting run to run values to be the same. Found run "
-        << n << " to have different values than the 0th run for "
-        << "index: " << i;
+          << "expecting run to run values to be the same. Found run " << n
+          << " to have different values than the 0th run for "
+          << "index: " << i;
     }
   }
   all_values_same = !HasNonfatalFailure();
@@ -155,14 +142,16 @@ TEST_F(performance, values_same_run_to_run) {
 
 TEST_F(performance, check_output_is_same) {
   std::ifstream file_stream;
-  file_stream.open("test/performance/logistic_output.csv",
-                   std::ios_base::in);
+  file_stream.open("test/performance/logistic_output.csv", std::ios_base::in);
   ASSERT_TRUE(file_stream.good());
 
   std::string line, expected;
 
   getline(file_stream, line);
-  ASSERT_EQ("lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,energy__,beta.1,beta.2", line);
+  ASSERT_EQ(
+      "lp__,accept_stat__,stepsize__,treedepth__,n_leapfrog__,divergent__,"
+      "energy__,beta.1,beta.2",
+      line);
   ASSERT_TRUE(file_stream.good());
 
   getline(file_stream, line);
@@ -199,33 +188,29 @@ TEST_F(performance, write_results_to_disk) {
   // N times
   for (int n = 0; n < N; n++) {
     std::stringstream ss;
-    ss << "run " << n+1;
+    ss << "run " << n + 1;
     header << "," << quote(ss.str());
     line << "," << seconds_per_run[n];
   }
-
 
   // append output to: test/performance/performance.csv
   bool write_header = false;
   std::fstream file_stream;
 
-  file_stream.open("test/performance/performance.csv",
-                   std::ios_base::in);
+  file_stream.open("test/performance/performance.csv", std::ios_base::in);
   if (file_stream.peek() == std::fstream::traits_type::eof()) {
     write_header = true;
   } else {
     std::string file_header;
     std::getline(file_stream, file_header);
 
-    EXPECT_EQ(file_header, header.str())
-      << "header of file is different";
+    EXPECT_EQ(file_header, header.str()) << "header of file is different";
     if (file_header != header.str())
       write_header = true;
   }
   file_stream.close();
 
-  file_stream.open("test/performance/performance.csv",
-                   std::ios_base::app);
+  file_stream.open("test/performance/performance.csv", std::ios_base::app);
   if (write_header)
     file_stream << header.str() << std::endl;
   file_stream << line.str() << std::endl;

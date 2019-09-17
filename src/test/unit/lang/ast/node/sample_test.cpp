@@ -10,4 +10,3 @@ TEST(StanLangAst, Sample) {
   stan::lang::sample s2(e, d);
   EXPECT_TRUE(s2.is_discrete_ == true || s2.is_discrete_ == false);
 }
-

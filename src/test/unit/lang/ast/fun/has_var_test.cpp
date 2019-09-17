@@ -3,18 +3,17 @@
 #include <sstream>
 #include <string>
 
-
 TEST(langAst, hasVar) {
-  using stan::lang::var_decl;
-  using stan::lang::int_type;
-  using stan::lang::double_type;
   using stan::lang::bare_array_type;
   using stan::lang::binary_op;
+  using stan::lang::double_type;
   using stan::lang::expression;
+  using stan::lang::int_type;
   using stan::lang::model_name_origin;
   using stan::lang::parameter_origin;
-  using stan::lang::unary_op;
   using stan::lang::scope;
+  using stan::lang::unary_op;
+  using stan::lang::var_decl;
   using stan::lang::variable;
   using stan::lang::variable_map;
 
@@ -28,8 +27,8 @@ TEST(langAst, hasVar) {
   v.set_type(double_type());
   expression e(v);
   EXPECT_TRUE(has_var(e, vm));
-  expression e2(binary_op(e,"+",e));
-  EXPECT_TRUE(has_var(e2,vm));
+  expression e2(binary_op(e, "+", e));
+  EXPECT_TRUE(has_var(e2, vm));
 
   var_decl scalar_int_var_decl = var_decl("scalar_int_var", int_type());
   vm.add("scalar_int_var", scalar_int_var_decl, model_name_origin);
@@ -39,14 +38,15 @@ TEST(langAst, hasVar) {
   expression e_scalar_int_var(v_scalar_int_var);
   EXPECT_FALSE(has_var(e_scalar_int_var, vm));
 
-  expression e3(binary_op(e,"+",e_scalar_int_var));
-  EXPECT_TRUE(has_var(e3,vm));
+  expression e3(binary_op(e, "+", e_scalar_int_var));
+  EXPECT_TRUE(has_var(e3, vm));
 
-  expression not_e_scalar_int_var(unary_op('!',unary_op('-',e_scalar_int_var)));
-  EXPECT_FALSE(has_var(not_e_scalar_int_var,vm));
+  expression not_e_scalar_int_var(
+      unary_op('!', unary_op('-', e_scalar_int_var)));
+  EXPECT_FALSE(has_var(not_e_scalar_int_var, vm));
 
-  var_decl array_int_var_decl = var_decl("array_int_var",
-                                         bare_array_type(int_type(), 1));
+  var_decl array_int_var_decl
+      = var_decl("array_int_var", bare_array_type(int_type(), 1));
   vm.add("array_int_var", array_int_var_decl, model_name_origin);
   variable v_array_int_var("array_int_var");
   v_array_int_var.set_type(bare_array_type(int_type(), 1));

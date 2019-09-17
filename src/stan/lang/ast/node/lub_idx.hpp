@@ -4,38 +4,37 @@
 #include <stan/lang/ast/node/expression.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST structure for lower and upper bounds.
-     */
-    struct lub_idx {
-      /**
-       * Lower bound.
-       */
-      expression lb_;
+/**
+ * AST structure for lower and upper bounds.
+ */
+struct lub_idx {
+  /**
+   * Lower bound.
+   */
+  expression lb_;
 
-      /**
-       * Upper bound.
-       */
-      expression ub_;
+  /**
+   * Upper bound.
+   */
+  expression ub_;
 
-      /**
-       * Construct a default (nil valued) lower and upper bound index.
-       */
-      lub_idx();
+  /**
+   * Construct a default (nil valued) lower and upper bound index.
+   */
+  lub_idx();
 
-      /**
-       * Construt a lower and upper bound index with the specified
-       * bounds.
-       *
-       * @param lb lower bound
-       * @param ub upper bound
-       */
-      lub_idx(const expression& lb,
-              const expression& ub);
-    };
+  /**
+   * Construt a lower and upper bound index with the specified
+   * bounds.
+   *
+   * @param lb lower bound
+   * @param ub upper bound
+   */
+  lub_idx(const expression& lb, const expression& ub);
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

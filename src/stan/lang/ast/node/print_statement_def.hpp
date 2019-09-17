@@ -5,13 +5,13 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    print_statement::print_statement() { }
+print_statement::print_statement() {}
 
-    print_statement::print_statement(const std::vector<printable>& printables)
-      : printables_(printables) { }
+print_statement::print_statement(const std::vector<printable>& printables)
+    : printables_(printables) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

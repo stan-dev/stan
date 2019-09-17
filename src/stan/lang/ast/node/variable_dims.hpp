@@ -5,40 +5,39 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    struct expression;
+struct expression;
 
-    /**
-     * Structure for holding a variable with its dimension
-     * declarations. 
-     */
-    struct variable_dims {
-      /**
-       * Name of the variable.
-       */
-      std::string name_;
+/**
+ * Structure for holding a variable with its dimension
+ * declarations.
+ */
+struct variable_dims {
+  /**
+   * Name of the variable.
+   */
+  std::string name_;
 
-      /**
-       * Sequence of expressions for dimensions.
-       */
-      std::vector<expression> dims_;
+  /**
+   * Sequence of expressions for dimensions.
+   */
+  std::vector<expression> dims_;
 
-      /**
-       * Construct a default object.
-       */
-      variable_dims();
+  /**
+   * Construct a default object.
+   */
+  variable_dims();
 
-      /**
-       * Construct with the specified name and dimensions.
-       *
-       * @param name name of variable
-       * @param dims dimensions of variable
-       */
-      variable_dims(const std::string& name,
-                    const std::vector<expression>& dims);
-    };
+  /**
+   * Construct with the specified name and dimensions.
+   *
+   * @param name name of variable
+   * @param dims dimensions of variable
+   */
+  variable_dims(const std::string& name, const std::vector<expression>& dims);
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

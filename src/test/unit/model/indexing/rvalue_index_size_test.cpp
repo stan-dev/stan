@@ -12,7 +12,7 @@ TEST(modelIndexingRvalueIndexSize, multi) {
   std::vector<int> ns;
   ns.push_back(1);
   ns.push_back(2);
-  
+
   index_multi idx(ns);
   EXPECT_EQ(2, rvalue_index_size(idx, 10));
 }
