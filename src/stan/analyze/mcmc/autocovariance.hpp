@@ -3,6 +3,7 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/math/prim/mat.hpp>
+#include <stan/analyze/mcmc/welford_variance.hpp>
 #include <unsupported/Eigen/FFT>
 #include <complex>
 #include <vector>
@@ -84,7 +85,7 @@ void autocovariance(const Eigen::MatrixBase<DerivedA>& y,
                     Eigen::MatrixBase<DerivedB>& acov) {
   Eigen::FFT<T> fft;
   autocorrelation(y, acov, fft);
-  acov = acov.array() * (y.array() - y.mean()).square().sum() / y.size();
+  acov = acov.array() * welford_variance(y, 0);
 }
 
 /**

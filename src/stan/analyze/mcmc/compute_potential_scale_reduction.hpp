@@ -4,6 +4,7 @@
 #include <stan/math/prim/mat.hpp>
 #include <stan/analyze/mcmc/autocovariance.hpp>
 #include <stan/analyze/mcmc/split_chains.hpp>
+#include <stan/analyze/mcmc/welford_variance.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <algorithm>
 #include <cmath>
@@ -65,15 +66,12 @@ inline double compute_potential_scale_reduction(
 
   for (int chain = 0; chain < num_chains; ++chain) {
     Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
-        draws[chain], sizes[chain]);
+      draws[chain], sizes[chain]);
     chain_mean(chain) = draw.mean();
-    chain_var(chain)
-        = (draw.array() - chain_mean(chain)).square().sum() / (num_draws - 1);
+    chain_var(chain) = welford_variance(draw);
   }
 
-  double var_between = num_draws
-                       * (chain_mean.array() - chain_mean.mean()).square().sum()
-                       / (num_chains - 1);
+  double var_between = num_draws * welford_variance(chain_mean);
   double var_within = chain_var.mean();
 
   // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
