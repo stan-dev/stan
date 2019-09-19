@@ -114,7 +114,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     double log_sum_weight = 0;  // log(exp(H0 - H0))
     double H0 = this->hamiltonian_.H(this->z_);
     int n_leapfrog = 0;
-    double sum_metro_prob = 0;
+    double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
 
     // Build a trajectory until the no-u-turn
     // criterion is no longer satisfied
@@ -127,7 +127,10 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       Eigen::VectorXd rho_bck = Eigen::VectorXd::Zero(rho.size());
 
       bool valid_subtree = false;
-      double log_sum_weight_subtree = -std::numeric_limits<double>::infinity();
+      double log_sum_weight_subtree
+        = -std::numeric_limits<double>::infinity();
+      double log_sum_accept_stat_subtree
+        = -std::numeric_limits<double>::infinity();
 
       if (this->rand_uniform_() > 0.5) {
         // Extend the current trajectory forward
@@ -138,8 +141,8 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
         valid_subtree = build_tree(
             this->depth_, z_propose, p_sharp_fwd_bck, p_sharp_fwd_fwd, rho_fwd,
-            p_fwd_bck, p_fwd_fwd, H0, 1, n_leapfrog, log_sum_weight_subtree,
-            sum_metro_prob, logger);
+            p_fwd_bck, p_fwd_fwd, H0, 1, n_leapfrog,
+            log_sum_weight_subtree, log_sum_accept_stat_subtree, logger);
         z_fwd.ps_point::operator=(this->z_);
       } else {
         // Extend the current trajectory backwards
@@ -150,8 +153,8 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
         valid_subtree = build_tree(
             this->depth_, z_propose, p_sharp_bck_fwd, p_sharp_bck_bck, rho_bck,
-            p_bck_fwd, p_bck_bck, H0, -1, n_leapfrog, log_sum_weight_subtree,
-            sum_metro_prob, logger);
+            p_bck_fwd, p_bck_bck, H0, -1, n_leapfrog,
+            log_sum_weight_subtree, log_sum_accept_stat_subtree, logger);
         z_bck.ps_point::operator=(this->z_);
       }
 
@@ -171,6 +174,10 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
       log_sum_weight
           = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
+
+      log_sum_accept_stat
+          = math::log_sum_exp(log_sum_accept_stat,
+                              log_sum_accept_stat_subtree);
 
       // Break when no-u-turn criterion is no longer satisfied
       rho = rho_bck + rho_fwd;
@@ -195,13 +202,18 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
     this->n_leapfrog_ = n_leapfrog;
 
-    // Compute average acceptance probabilty across entire trajectory,
-    // even over subtrees that may have been rejected
-    double accept_prob = sum_metro_prob / static_cast<double>(n_leapfrog);
+    double accept_stat = 0;  // Default accept stat to zero
+
+    // Update accept stat if any subtrees were accepted
+    if (log_sum_weight > 0) {
+      // Remove contribution from initial state which is always a perfec accept
+      log_sum_weight = math::log_diff_exp(log_sum_weight, 0);
+      accept_stat = std::exp(log_sum_accept_stat - log_sum_weight);
+    }
 
     this->z_.ps_point::operator=(z_sample);
     this->energy_ = this->hamiltonian_.H(this->z_);
-    return sample(this->z_.q, -this->z_.V, accept_prob);
+    return sample(this->z_.q, -this->z_.V, accept_stat);
   }
 
   void get_sampler_param_names(std::vector<std::string>& names) {
@@ -242,14 +254,15 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * @param sign Direction in time to built subtree
    * @param n_leapfrog Summed number of leapfrog evaluations
    * @param log_sum_weight Log of summed weights across trajectory
-   * @param sum_metro_prob Summed Metropolis probabilities across trajectory
+   * @param log_sum_accept_stat Log of summed acceptance statistics
+   *                            across numerical trajectory
    * @param logger Logger for messages
    */
   bool build_tree(int depth, ps_point& z_propose, Eigen::VectorXd& p_sharp_beg,
                   Eigen::VectorXd& p_sharp_end, Eigen::VectorXd& rho,
                   Eigen::VectorXd& p_beg, Eigen::VectorXd& p_end, double H0,
                   double sign, int& n_leapfrog, double& log_sum_weight,
-                  double& sum_metro_prob, callbacks::logger& logger) {
+                  double& log_sum_accept_stat, callbacks::logger& logger) {
     // Base case
     if (depth == 0) {
       this->integrator_.evolve(this->z_, this->hamiltonian_,
@@ -265,10 +278,17 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
       log_sum_weight = math::log_sum_exp(log_sum_weight, H0 - h);
 
-      if (H0 - h > 0)
-        sum_metro_prob += 1;
-      else
-        sum_metro_prob += std::exp(H0 - h);
+      // Add acceptance statistic of new state to running sum
+      // a += e^{-H(q_n, p_n)} max(1, e^{H(q_0 - p_0) - H(q_n, p_n)})
+      if (H0 - h > 0) {
+        // Saturated Metropolis accept probability with Boltzman weight
+        log_sum_accept_stat
+          = math::log_sum_exp(log_sum_accept_stat, (H0 - h) + 0);
+      } else {
+        // Unsaturated Metropolis accept probability with Boltzman weight
+        log_sum_accept_stat
+          = math::log_sum_exp(log_sum_accept_stat, (H0 - h) + (H0 - h));
+      }
 
       z_propose = this->z_;
 
@@ -295,7 +315,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     bool valid_init
         = build_tree(depth - 1, z_propose, p_sharp_beg, p_sharp_init_end,
                      rho_init, p_beg, p_init_end, H0, sign, n_leapfrog,
-                     log_sum_weight_init, sum_metro_prob, logger);
+                     log_sum_weight_init, log_sum_accept_stat, logger);
 
     if (!valid_init)
       return false;
@@ -314,7 +334,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     bool valid_final
         = build_tree(depth - 1, z_propose_final, p_sharp_final_beg, p_sharp_end,
                      rho_final, p_final_beg, p_end, H0, sign, n_leapfrog,
-                     log_sum_weight_final, sum_metro_prob, logger);
+                     log_sum_weight_final, log_sum_accept_stat, logger);
 
     if (!valid_final)
       return false;
