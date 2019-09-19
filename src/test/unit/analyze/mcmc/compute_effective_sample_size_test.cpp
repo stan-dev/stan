@@ -22,25 +22,25 @@ class ComputeEss : public testing::Test {
 TEST_F(ComputeEss, compute_effective_sample_size_one_chain) {
   std::stringstream out;
   stan::io::stan_csv blocker1
-    = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
+      = stan::io::stan_csv_reader::parse(blocker1_stream, &out);
 
   EXPECT_EQ("", out.str());
-  
+
   stan::mcmc::chains<> chains(blocker1);
-  
+
   Eigen::VectorXd n_eff(49);
   n_eff << 284.772, 105.681, 668.691, 569.402, 523.292, 403.396, 432.348,
-           441.288, 209.865, 472.828, 451.133, 429.327, 375.418, 507.376,
-           222.906, 218.278, 316.072, 489.084, 404.057, 379.351,
-           232.849, 445.684, 675.562, 362.882, 720.201, 426.744,
-           376.692, 509.399, 247.151, 440.426, 160.532, 411.109,
-           419.395, 411.988, 425.529, 420.615,  336.495, 131.946,
-           461.606, 469.628, 479.458, 611.196,  483.301, 584.614,
-           500.264, 453.112, 646.067, 72.1878, 1;
-  
+      441.288, 209.865, 472.828, 451.133, 429.327, 375.418, 507.376, 222.906,
+      218.278, 316.072, 489.084, 404.057, 379.351, 232.849, 445.684, 675.562,
+      362.882, 720.201, 426.744, 376.692, 509.399, 247.151, 440.426, 160.532,
+      411.109, 419.395, 411.988, 425.529, 420.615, 336.495, 131.946, 461.606,
+      469.628, 479.458, 611.196, 483.301, 584.614, 500.264, 453.112, 646.067,
+      72.1878, 1;
+
   // replicates calls to stan::anlayze::compute_effective_sample_size
   // for any interface *without* access to chains class
-  Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(chains.num_chains());
+  Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(
+      chains.num_chains());
   std::vector<const double*> draws(chains.num_chains());
   std::vector<size_t> sizes(chains.num_chains());
   for (int index = 4; index < chains.num_params(); index++) {
@@ -298,17 +298,16 @@ TEST_F(ComputeEss, compute_effective_sample_size_minimum_n) {
 TEST_F(ComputeEss, compute_effective_sample_size_sufficient_n) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
   param_names << "a";
-  
+
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 4, 1> draws;
   draws << 1.0, 2.0, 3.0, 4.0;
   chains.add(draws);
-  
-  ASSERT_TRUE(!std::isnan(chains.effective_sample_size(0)))
-    << "n_effective for index: " << 0
-    << ", parameter: " << chains.param_name(0);
-}
 
+  ASSERT_TRUE(!std::isnan(chains.effective_sample_size(0)))
+      << "n_effective for index: " << 0
+      << ", parameter: " << chains.param_name(0);
+}
 
 TEST_F(ComputeEss, compute_effective_sample_size_nan) {
   Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);

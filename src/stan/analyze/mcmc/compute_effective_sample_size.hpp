@@ -47,8 +47,8 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
   Eigen::VectorXd init_draw = Eigen::VectorXd::Zero(num_chains);
 
   for (int chain_idx = 0; chain_idx < num_chains; chain_idx++) {
-    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>>
-      draw(draws[chain_idx], sizes[chain_idx]);
+    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
+        draws[chain_idx], sizes[chain_idx]);
 
     for (int n = 0; n < num_draws; n++) {
       if (!boost::math::isfinite(draw(n))) {
