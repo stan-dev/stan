@@ -29,7 +29,7 @@ include make/cpplint                      # cpplint
 include make/tests                        # tests
 include make/clang-tidy
 
-INC_FIRST = -I $(if $(STAN),$(STAN)/src,src)
+INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I ./src/
 LDLIBS_STANC ?= -Ltest -lstanc
 
 
