@@ -1623,15 +1623,26 @@ add("laplace_marginal_bernoulli",
     bare_types[1],                  // (double) tolerance for convergence
     bare_types[0]);                 // (int) max number of steps
 
-    add("laplace_marginal_poisson",
-        bare_expr_type(bare_types[0]),
-        bare_expr_type(vector_type()),
-        bare_expr_type(vector_type()),
-        bare_expr_type(bare_array_type(vector_type())),
-        int_vector_types[1],
-        int_vector_types[1],
-        bare_types[1],
-        bare_types[0]);
+add("laplace_marginal_poisson",
+    bare_expr_type(bare_types[0]),
+    bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(bare_array_type(vector_type())),
+    int_vector_types[1],
+    int_vector_types[1],
+    bare_types[1],
+    bare_types[0]);
+
+add("laplace_marginal_poisson",
+    bare_expr_type(bare_types[0]),
+    bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(bare_array_type(vector_type())),
+    int_vector_types[1],
+    int_vector_types[1],
+    bare_expr_type(vector_type()),  //  exposure term
+    bare_types[1],
+    bare_types[0]);
 
 // Newton solver for Laplace approximation
 add("lgp_newton_solver", bare_expr_type(vector_type()),
