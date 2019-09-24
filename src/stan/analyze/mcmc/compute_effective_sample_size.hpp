@@ -23,8 +23,8 @@ namespace analyze {
  *
  * Current implementation assumes draws are stored in contiguous
  * blocks of memory.  Chains are trimmed from the back to match the
- * length of the shortest chain.  Note that the variance can not
- * be estimated with less than three draws.
+ * length of the shortest chain.  Note that the effective sample size
+ * can not be estimated with less than four draws.
  *
  * @param draws stores pointers to arrays of chains
  * @param sizes stores sizes of chains
@@ -38,18 +38,17 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
     num_draws = std::min(num_draws, sizes[chain]);
   }
 
-  if (num_draws < 3) {
+  if (num_draws < 4) {
     return std::numeric_limits<double>::quiet_NaN();
   }
 
   // check if chains are constant; all equal to first draw's value
-  Eigen::VectorXd draw_val(num_chains);
-  for (int chain = 0; chain < num_chains; chain++)
-    draw_val(chain) = static_cast<double>(chain);
+  bool are_all_const = false;
+  Eigen::VectorXd init_draw = Eigen::VectorXd::Zero(num_chains);
 
-  for (int chain = 0; chain < num_chains; chain++) {
+  for (int chain_idx = 0; chain_idx < num_chains; chain_idx++) {
     Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
-        draws[chain], sizes[chain]);
+        draws[chain_idx], sizes[chain_idx]);
 
     for (int n = 0; n < num_draws; n++) {
       if (!boost::math::isfinite(draw(n))) {
@@ -57,13 +56,19 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
       }
     }
 
+    init_draw(chain_idx) = draw(0);
+
     if (draw.isApproxToConstant(draw(0))) {
-      draw_val(chain) = draw(0);
+      are_all_const |= true;
     }
   }
 
-  if (draw_val.isApproxToConstant(draw_val(0))) {
-    return std::numeric_limits<double>::quiet_NaN();
+  if (are_all_const) {
+    // If all chains are constant then return NaN
+    // if they all equal the same constant value
+    if (init_draw.isApproxToConstant(init_draw(0))) {
+      return std::numeric_limits<double>::quiet_NaN();
+    }
   }
 
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
@@ -92,9 +97,9 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
   rho_hat_s(1) = rho_hat_odd;
 
   // Convert raw autocovariance estimators into Geyer's initial
-  // positive sequence. Loop only until num_draws - 4 to leave the
-  // last pair of autocorrelations as a bias term that reduces
-  // variance in the case of antithetical chains.
+  // positive sequence. Loop only until num_draws - 4 to
+  // leave the last pair of autocorrelations as a bias term that
+  // reduces variance in the case of antithetical chains.
   size_t s = 1;
   while (s < (num_draws - 4) && (rho_hat_even + rho_hat_odd) > 0) {
     for (int chain = 0; chain < num_chains; ++chain)
@@ -144,8 +149,8 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
  *
  * Current implementation assumes draws are stored in contiguous
  * blocks of memory.  Chains are trimmed from the back to match the
- * length of the shortest chain.  Note that the variance can not
- * be estimated with less than three draws.  Argument size
+ * length of the shortest chain.  Note that the effective sample size
+ * can not be estimated with less than four draws.  Argument size
  * will be broadcast to same length as draws.
  *
  * @param draws stores pointers to arrays of chains
@@ -171,8 +176,8 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
  *
  * Current implementation assumes draws are stored in contiguous
  * blocks of memory.  Chains are trimmed from the back to match the
- * length of the shortest chain.  Note that the variance can not
- * be estimated with less than three draws.
+ * length of the shortest chain.  Note that the effective sample size
+ * can not be estimated with less than four draws.
  *
  * @param draws stores pointers to arrays of chains
  * @param sizes stores sizes of chains
@@ -206,8 +211,8 @@ inline double compute_split_effective_sample_size(
  *
  * Current implementation assumes draws are stored in contiguous
  * blocks of memory.  Chains are trimmed from the back to match the
- * length of the shortest chain.  Note that the variance can not
- * be estimated with less than three draws.  Argument size
+ * length of the shortest chain.  Note that the effective sample size
+ * can not be estimated with less than four draws.  Argument size
  * will be broadcast to same length as draws.
  *
  * @param draws stores pointers to arrays of chains
