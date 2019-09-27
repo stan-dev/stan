@@ -21,26 +21,6 @@ class ps_point {
  public:
   explicit ps_point(int n) : q(n), p(n), V(0), g(n) {}
 
-  ps_point(const ps_point& z)
-      : q(z.q.size()), p(z.p.size()), V(z.V), g(z.g.size()) {
-    fast_vector_copy_<double>(q, z.q);
-    fast_vector_copy_<double>(p, z.p);
-    fast_vector_copy_<double>(g, z.g);
-  }
-
-  ps_point& operator=(const ps_point& z) {
-    if (this == &z)
-      return *this;
-
-    fast_vector_copy_<double>(q, z.q);
-
-    V = z.V;
-
-    fast_vector_copy_<double>(p, z.p);
-    fast_vector_copy_<double>(g, z.g);
-
-    return *this;
-  }
 
   Eigen::VectorXd q;
   Eigen::VectorXd p;
