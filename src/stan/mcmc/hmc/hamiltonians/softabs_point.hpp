@@ -38,7 +38,7 @@ class softabs_point : public ps_point {
   // Psuedo-Jacobian of the eigenvalues
   Eigen::MatrixXd pseudo_j;
 
-  inline virtual inline void write_metric(stan::callbacks::writer& writer) {
+  inline virtual void write_metric(stan::callbacks::writer& writer) {
     writer("No free parameters for SoftAbs metric");
   }
 };
