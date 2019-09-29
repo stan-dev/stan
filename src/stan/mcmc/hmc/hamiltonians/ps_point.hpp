@@ -21,9 +21,9 @@ class ps_point {
  public:
   explicit ps_point(int n) : q(n), p(n), V(0), g(n) {}
 
-  double V;
   Eigen::VectorXd q;
   Eigen::VectorXd p;
+  double V;
   Eigen::VectorXd g;
 
   virtual inline void get_param_names(std::vector<std::string>& model_names,
