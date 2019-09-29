@@ -11,7 +11,6 @@ class ps_point_test : public ::testing::Test {
  public:
   typedef Eigen::Matrix<double, Eigen::Dynamic, 1> vector_t;
   typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
-
 };
 
 TEST(psPoint, write_metric_streams) {
