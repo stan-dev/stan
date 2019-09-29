@@ -21,7 +21,7 @@ class adapt_unit_e_xhmc : public unit_e_xhmc<Model, BaseRNG>,
 
   ~adapt_unit_e_xhmc() {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = unit_e_xhmc<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_)
@@ -31,7 +31,7 @@ class adapt_unit_e_xhmc : public unit_e_xhmc<Model, BaseRNG>,
     return s;
   }
 
-  void disengage_adaptation() {
+  inline void disengage_adaptation() {
     base_adapter::disengage_adaptation();
     this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
   }

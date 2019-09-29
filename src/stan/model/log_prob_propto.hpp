@@ -30,14 +30,12 @@ namespace model {
  * @param[in,out] msgs
  */
 template <bool jacobian_adjust_transform, class M>
-double log_prob_propto(const M& model, std::vector<double>& params_r,
-                       std::vector<int>& params_i, std::ostream* msgs = 0) {
+inline double log_prob_propto(const M& model, std::vector<double>& params_r,
+                              std::vector<int>& params_i,
+                              std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
-  vector<var> ad_params_r;
-  ad_params_r.reserve(model.num_params_r());
-  for (size_t i = 0; i < model.num_params_r(); ++i)
-    ad_params_r.push_back(params_r[i]);
+  vector<var> ad_params_r(params_r.begin(), params_r.end());
   try {
     double lp = model
                     .template log_prob<true, jacobian_adjust_transform>(
@@ -72,18 +70,14 @@ double log_prob_propto(const M& model, std::vector<double>& params_r,
  * @param[in,out] msgs
  */
 template <bool jacobian_adjust_transform, class M>
-double log_prob_propto(const M& model, Eigen::VectorXd& params_r,
-                       std::ostream* msgs = 0) {
+inline double log_prob_propto(const M& model, Eigen::VectorXd& params_r,
+                              std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
   vector<int> params_i(0);
-
   double lp;
+  vector<var> ad_params_r(params_r.data(), params_r.data() + params_r.size());
   try {
-    vector<var> ad_params_r;
-    ad_params_r.reserve(model.num_params_r());
-    for (size_t i = 0; i < model.num_params_r(); ++i)
-      ad_params_r.push_back(params_r(i));
     lp = model
              .template log_prob<true, jacobian_adjust_transform>(ad_params_r,
                                                                  params_i, msgs)

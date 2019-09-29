@@ -17,9 +17,9 @@ namespace util {
  * @return var_context
  */
 inline stan::io::dump create_unit_e_dense_inv_metric(size_t num_params) {
-  Eigen::MatrixXd inv_metric(num_params, num_params);
-  inv_metric.setIdentity();
-  size_t num_elements = num_params * num_params;
+  Eigen::MatrixXd inv_metric
+      = Eigen::MatrixXd::Identity(num_params, num_params);
+  const size_t num_elements = num_params * num_params;
   std::stringstream txt;
   txt << "inv_metric <- structure(c(";
   for (size_t i = 0; i < num_elements; i++) {

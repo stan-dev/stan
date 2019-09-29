@@ -26,9 +26,9 @@ namespace services {
  * @param[in, out] param_dimss seqeunce of variable dimensionalities
  */
 template <class Model>
-void get_model_parameters(const Model &model,
-                          std::vector<std::string> &param_names,
-                          std::vector<std::vector<size_t>> &param_dimss) {
+inline void get_model_parameters(
+    const Model &model, std::vector<std::string> &param_names,
+    std::vector<std::vector<size_t>> &param_dimss) {
   std::vector<std::string> constrained_names;
   model.constrained_param_names(constrained_names, false, false);
   size_t num_params = constrained_names.size();
@@ -69,10 +69,11 @@ void get_model_parameters(const Model &model,
  * @return error code
  */
 template <class Model>
-int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
-                        unsigned int seed, callbacks::interrupt &interrupt,
-                        callbacks::logger &logger,
-                        callbacks::writer &sample_writer) {
+inline int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
+                               unsigned int seed,
+                               callbacks::interrupt &interrupt,
+                               callbacks::logger &logger,
+                               callbacks::writer &sample_writer) {
   if (draws.size() == 0) {
     logger.error("Empty set of draws from fitted model.");
     return error_codes::DATAERR;

@@ -10,10 +10,7 @@ namespace mcmc {
 template <typename Hamiltonian>
 class impl_leapfrog : public base_leapfrog<Hamiltonian> {
  public:
-  impl_leapfrog()
-      : base_leapfrog<Hamiltonian>(),
-        max_num_fixed_point_(10),
-        fixed_point_threshold_(1e-8) {}
+  impl_leapfrog() : base_leapfrog<Hamiltonian>() {}
 
   void begin_update_p(typename Hamiltonian::PointType& z,
                       Hamiltonian& hamiltonian, double epsilon,
@@ -83,8 +80,8 @@ class impl_leapfrog : public base_leapfrog<Hamiltonian> {
   }
 
  private:
-  int max_num_fixed_point_;
-  double fixed_point_threshold_;
+  int max_num_fixed_point_{10};
+  double fixed_point_threshold_{1e-8};
 };
 
 }  // namespace mcmc

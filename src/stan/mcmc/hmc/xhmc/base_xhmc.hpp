@@ -24,14 +24,7 @@ template <class Model, template <class, class> class Hamiltonian,
 class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_xhmc(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        depth_(0),
-        max_depth_(5),
-        max_deltaH_(1000),
-        x_delta_(0.1),
-        n_leapfrog_(0),
-        divergent_(0),
-        energy_(0) {}
+      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng) {}
 
   ~base_xhmc() {}
 
@@ -47,11 +40,11 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       x_delta_ = d;
   }
 
-  int get_max_depth() { return this->max_depth_; }
-  double get_max_deltaH() { return this->max_deltaH_; }
-  double get_x_delta() { return this->x_delta_; }
+  inline int get_max_depth() { return this->max_depth_; }
+  inline double get_max_deltaH() { return this->max_deltaH_; }
+  inline double get_x_delta() { return this->x_delta_; }
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
     this->sample_stepsize();
 
@@ -125,15 +118,15 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     return sample(this->z_.q, -this->z_.V, accept_prob);
   }
 
-  void get_sampler_param_names(std::vector<std::string>& names) {
-    names.push_back("stepsize__");
-    names.push_back("treedepth__");
-    names.push_back("n_leapfrog__");
-    names.push_back("divergent__");
-    names.push_back("energy__");
+  inline void get_sampler_param_names(std::vector<std::string>& names) {
+    names.emplace_back("stepsize__");
+    names.emplace_back("treedepth__");
+    names.emplace_back("n_leapfrog__");
+    names.emplace_back("divergent__");
+    names.emplace_back("energy__");
   }
 
-  void get_sampler_params(std::vector<double>& values) {
+  inline void get_sampler_params(std::vector<double>& values) {
     values.push_back(this->epsilon_);
     values.push_back(this->depth_);
     values.push_back(this->n_leapfrog_);
@@ -157,10 +150,10 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * @param logger Logger for messages
    * @return whether built tree is valid
    */
-  bool build_tree(int depth, ps_point& z_propose, double& ave,
-                  double& log_sum_weight, double H0, double sign,
-                  int& n_leapfrog, double& sum_metro_prob,
-                  callbacks::logger& logger) {
+  inline bool build_tree(int depth, ps_point& z_propose, double& ave,
+                         double& log_sum_weight, double H0, double sign,
+                         int& n_leapfrog, double& sum_metro_prob,
+                         callbacks::logger& logger) {
     // Base case
     if (depth == 0) {
       this->integrator_.evolve(this->z_, this->hamiltonian_,
@@ -254,8 +247,8 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * @return Pair of average of input running averages and log of summed input
    * weights
    */
-  static std::pair<double, double> stable_sum(double a1, double log_w1,
-                                              double a2, double log_w2) {
+  static inline std::pair<double, double> stable_sum(double a1, double log_w1,
+                                                     double a2, double log_w2) {
     if (log_w2 > log_w1) {
       const double e = std::exp(log_w1 - log_w2);
       return std::make_pair((e * a1 + a2) / (1 + e), log_w2 + std::log1p(e));
@@ -265,14 +258,14 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     }
   }
 
-  int depth_;
-  int max_depth_;
-  double max_deltaH_;
-  double x_delta_;
+  int depth_{0};
+  int max_depth_{5};
+  double max_deltaH_{1000};
+  double x_delta_{0.1};
 
-  int n_leapfrog_;
-  bool divergent_;
-  double energy_;
+  int n_leapfrog_{0};
+  bool divergent_{0};
+  double energy_{0};
 };
 
 }  // namespace mcmc

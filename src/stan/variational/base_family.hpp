@@ -53,7 +53,8 @@ class base_family {
    * @throws std::range_error If the index is out of range.
    */
   template <class BaseRNG>
-  void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta, double& log_g) const {
+  inline void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
+                           double& log_g) const {
     // Draw from the approximation
     for (int d = 0; d < dimension(); ++d) {
       eta(d) = stan::math::normal_rng(0, 1, rng);
@@ -72,7 +73,7 @@ class base_family {
    * @return The unnormalized log density in the variational approximation;
    * @throws std::range_error If the index is out of range.
    */
-  double calc_log_g(const Eigen::VectorXd& eta) const {
+  inline double calc_log_g(const Eigen::VectorXd& eta) const {
     double log_g = 0;
     for (int d = 0; d < dimension(); ++d) {
       log_g += -stan::math::square(eta(d)) * 0.5;
@@ -85,8 +86,8 @@ class base_family {
                  callbacks::logger& logger) const;
 
  protected:
-  void write_error_msg_(std::ostream* error_msgs,
-                        const std::exception& e) const {
+  inline void write_error_msg_(std::ostream* error_msgs,
+                               const std::exception& e) const {
     if (!error_msgs) {
       return;
     }

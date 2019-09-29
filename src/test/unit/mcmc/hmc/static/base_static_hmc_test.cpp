@@ -16,7 +16,7 @@ class mock_static_hmc : public base_static_hmc<mock_model, mock_hamiltonian,
  public:
   mock_static_hmc(const mock_model& m, rng_t& rng)
       : base_static_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t>(
-            m, rng) {}
+          m, rng) {}
 };
 
 }  // namespace mcmc

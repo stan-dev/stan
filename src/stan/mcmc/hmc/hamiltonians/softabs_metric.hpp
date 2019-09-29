@@ -35,20 +35,24 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
   explicit softabs_metric(const Model& model)
       : base_hamiltonian<Model, softabs_point, BaseRNG>(model) {}
 
-  double T(softabs_point& z) { return this->tau(z) + 0.5 * z.log_det_metric; }
+  inline double T(softabs_point& z) {
+    return this->tau(z) + 0.5 * z.log_det_metric;
+  }
 
-  double tau(softabs_point& z) {
+  inline double tau(softabs_point& z) {
     Eigen::VectorXd Qp = z.eigen_deco.eigenvectors().transpose() * z.p;
     return 0.5 * Qp.transpose() * z.softabs_lambda_inv.cwiseProduct(Qp);
   }
 
-  double phi(softabs_point& z) { return this->V(z) + 0.5 * z.log_det_metric; }
+  inline double phi(softabs_point& z) {
+    return this->V(z) + 0.5 * z.log_det_metric;
+  }
 
-  double dG_dt(softabs_point& z, callbacks::logger& logger) {
+  inline double dG_dt(softabs_point& z, callbacks::logger& logger) {
     return 2 * T(z) - z.q.dot(dtau_dq(z, logger) + dphi_dq(z, logger));
   }
 
-  Eigen::VectorXd dtau_dq(softabs_point& z, callbacks::logger& logger) {
+  inline Eigen::VectorXd dtau_dq(softabs_point& z, callbacks::logger& logger) {
     Eigen::VectorXd a = z.softabs_lambda_inv.cwiseProduct(
         z.eigen_deco.eigenvectors().transpose() * z.p);
     Eigen::MatrixXd A
@@ -66,7 +70,7 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
   Eigen::VectorXd dtau_dp(softabs_point& z) {
     return z.eigen_deco.eigenvectors()
            * z.softabs_lambda_inv.cwiseProduct(
-                 z.eigen_deco.eigenvectors().transpose() * z.p);
+               z.eigen_deco.eigenvectors().transpose() * z.p);
   }
 
   Eigen::VectorXd dphi_dq(softabs_point& z, callbacks::logger& logger) {

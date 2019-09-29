@@ -82,17 +82,17 @@ class normal_meanfield : public base_family {
   /**
    * Return the dimensionality of the approximation.
    */
-  int dimension() const { return dimension_; }
+  inline int dimension() const { return dimension_; }
 
   /**
    * Return the mean vector.
    */
-  const Eigen::VectorXd& mu() const { return mu_; }
+  const inline Eigen::VectorXd& mu() const { return mu_; }
 
   /**
    * Return the log standard deviation vector.
    */
-  const Eigen::VectorXd& omega() const { return omega_; }
+  const inline Eigen::VectorXd& omega() const { return omega_; }
 
   /**
    * Set the mean vector to the specified value.
@@ -102,7 +102,7 @@ class normal_meanfield : public base_family {
    * match this approximation's dimensionality, or if it contains
    * not-a-number values.
    */
-  void set_mu(const Eigen::VectorXd& mu) {
+  inline void set_mu(const Eigen::VectorXd& mu) {
     static const char* function = "stan::variational::normal_meanfield::set_mu";
 
     stan::math::check_size_match(function, "Dimension of input vector",
@@ -121,7 +121,7 @@ class normal_meanfield : public base_family {
    * vector's size does not match this approximation's
    * dimensionality, or if it contains not-a-number values.
    */
-  void set_omega(const Eigen::VectorXd& omega) {
+  inline void set_omega(const Eigen::VectorXd& omega) {
     static const char* function
         = "stan::variational::normal_meanfield::set_omega";
 
@@ -136,7 +136,7 @@ class normal_meanfield : public base_family {
    * Sets the mean and log standard deviation vector for this
    * approximation to zero.
    */
-  void set_to_zero() {
+  inline void set_to_zero() {
     mu_ = Eigen::VectorXd::Zero(dimension());
     omega_ = Eigen::VectorXd::Zero(dimension());
   }
@@ -147,7 +147,7 @@ class normal_meanfield : public base_family {
    * approximation does not hold any references to this
    * approximation.
    */
-  normal_meanfield square() const {
+  inline normal_meanfield square() const {
     return normal_meanfield(Eigen::VectorXd(mu_.array().square()),
                             Eigen::VectorXd(omega_.array().square()));
   }
@@ -162,7 +162,7 @@ class normal_meanfield : public base_family {
    * entries are non-negative before taking square roots, so
    * not-a-number values may result.
    */
-  normal_meanfield sqrt() const {
+  inline normal_meanfield sqrt() const {
     return normal_meanfield(Eigen::VectorXd(mu_.array().sqrt()),
                             Eigen::VectorXd(omega_.array().sqrt()));
   }
@@ -178,7 +178,7 @@ class normal_meanfield : public base_family {
    * @throw std::domain_error If the dimensionality of the specified
    * approximation does not match this approximation's dimensionality.
    */
-  normal_meanfield& operator=(const normal_meanfield& rhs) {
+  inline normal_meanfield& operator=(const normal_meanfield& rhs) {
     static const char* function
         = "stan::variational::normal_meanfield::operator=";
     stan::math::check_size_match(function, "Dimension of lhs", dimension(),
@@ -199,7 +199,7 @@ class normal_meanfield : public base_family {
    * @throw std::domain_error If the size of the specified
    * approximation does not match the size of this approximation.
    */
-  normal_meanfield& operator+=(const normal_meanfield& rhs) {
+  inline normal_meanfield& operator+=(const normal_meanfield& rhs) {
     static const char* function
         = "stan::variational::normal_meanfield::operator+=";
     stan::math::check_size_match(function, "Dimension of lhs", dimension(),
@@ -242,7 +242,7 @@ class normal_meanfield : public base_family {
    * @return This approximation after elementwise addition of the
    * specified scalar.
    */
-  normal_meanfield& operator+=(double scalar) {
+  inline normal_meanfield& operator+=(double scalar) {
     mu_.array() += scalar;
     omega_.array() += scalar;
     return *this;
@@ -260,7 +260,7 @@ class normal_meanfield : public base_family {
    * @return This approximation after elementwise addition of the
    * specified scalar.
    */
-  normal_meanfield& operator*=(double scalar) {
+  inline normal_meanfield& operator*=(double scalar) {
     mu_ *= scalar;
     omega_ *= scalar;
     return *this;
@@ -273,7 +273,7 @@ class normal_meanfield : public base_family {
    *
    * @return Mean vector for this approximation.
    */
-  const Eigen::VectorXd& mean() const { return mu(); }
+  const inline Eigen::VectorXd& mean() const { return mu(); }
 
   /**
    * Return the entropy of the approximation.
@@ -285,7 +285,7 @@ class normal_meanfield : public base_family {
    *
    * @return Entropy of this approximation.
    */
-  double entropy() const {
+  inline double entropy() const {
     return 0.5 * static_cast<double>(dimension())
                * (1.0 + stan::math::LOG_TWO_PI)
            + omega_.sum();
@@ -303,7 +303,7 @@ class normal_meanfield : public base_family {
    * not match the dimensionality of this approximation.
    * @return Transformed vector.
    */
-  Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
+  inline Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
     static const char* function
         = "stan::variational::normal_meanfield::transform";
     stan::math::check_size_match(function, "Dimension of mean vector",
@@ -333,9 +333,9 @@ class normal_meanfield : public base_family {
    * iterations exceeds its specified bounds.
    */
   template <class M, class BaseRNG>
-  void calc_grad(normal_meanfield& elbo_grad, M& m,
-                 Eigen::VectorXd& cont_params, int n_monte_carlo_grad,
-                 BaseRNG& rng, callbacks::logger& logger) const {
+  inline void calc_grad(normal_meanfield& elbo_grad, M& m,
+                        Eigen::VectorXd& cont_params, int n_monte_carlo_grad,
+                        BaseRNG& rng, callbacks::logger& logger) const {
     static const char* function
         = "stan::variational::normal_meanfield::calc_grad";
 

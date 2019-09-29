@@ -32,7 +32,7 @@ class dense_e_point : public ps_point {
    *
    * @param inv_e_metric initial mass matrix
    */
-  void set_metric(const Eigen::MatrixXd& inv_e_metric) {
+  inline void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     inv_e_metric_ = inv_e_metric;
   }
 

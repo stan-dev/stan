@@ -43,7 +43,7 @@ class normal_fullrank : public base_family {
    * @throw std::domain_error If the mean vector contains NaN
    * values or does not match this distribution's dimensionality.
    */
-  void validate_mean(const char* function, const Eigen::VectorXd& mu) {
+  inline void validate_mean(const char* function, const Eigen::VectorXd& mu) {
     stan::math::check_not_nan(function, "Mean vector", mu);
     stan::math::check_size_match(function, "Dimension of input vector",
                                  mu.size(), "Dimension of current vector",
@@ -64,8 +64,8 @@ class normal_fullrank : public base_family {
    * the dimensionality of this approximation, or if it contains
    * not-a-number values.
    */
-  void validate_cholesky_factor(const char* function,
-                                const Eigen::MatrixXd& L_chol) {
+  inline void validate_cholesky_factor(const char* function,
+                                       const Eigen::MatrixXd& L_chol) {
     stan::math::check_square(function, "Cholesky factor", L_chol);
     stan::math::check_lower_triangular(function, "Cholesky factor", L_chol);
     stan::math::check_size_match(function, "Dimension of mean vector",
@@ -123,17 +123,17 @@ class normal_fullrank : public base_family {
   /**
    * Return the dimensionality of the approximation.
    */
-  int dimension() const { return dimension_; }
+  inline int dimension() const { return dimension_; }
 
   /**
    * Return the mean vector.
    */
-  const Eigen::VectorXd& mu() const { return mu_; }
+  const inline Eigen::VectorXd& mu() const { return mu_; }
 
   /**
    * Return the Cholesky factor of the covariance matrix.
    */
-  const Eigen::MatrixXd& L_chol() const { return L_chol_; }
+  const inline Eigen::MatrixXd& L_chol() const { return L_chol_; }
 
   /**
    * Set the mean vector to the specified value.
@@ -142,7 +142,7 @@ class normal_fullrank : public base_family {
    * @throw std::domain_error If the size of the specified mean
    * vector does not match the stored dimension of this approximation.
    */
-  void set_mu(const Eigen::VectorXd& mu) {
+  inline void set_mu(const Eigen::VectorXd& mu) {
     static const char* function = "stan::variational::set_mu";
     validate_mean(function, mu);
     mu_ = mu;
@@ -157,7 +157,7 @@ class normal_fullrank : public base_family {
    * the dimensionality of this approximation, or if it contains
    * not-a-number values.
    */
-  void set_L_chol(const Eigen::MatrixXd& L_chol) {
+  inline void set_L_chol(const Eigen::MatrixXd& L_chol) {
     static const char* function = "stan::variational::set_L_chol";
     validate_cholesky_factor(function, L_chol);
     L_chol_ = L_chol;
@@ -167,7 +167,7 @@ class normal_fullrank : public base_family {
    * Set the mean vector and Cholesky factor for the covariance
    * matrix to zero.
    */
-  void set_to_zero() {
+  inline void set_to_zero() {
     mu_ = Eigen::VectorXd::Zero(dimension());
     L_chol_ = Eigen::MatrixXd::Zero(dimension(), dimension());
   }
@@ -178,7 +178,7 @@ class normal_fullrank : public base_family {
    * covariance matrix.  The new approximation does not hold
    * any references to this approximation.
    */
-  normal_fullrank square() const {
+  inline normal_fullrank square() const {
     return normal_fullrank(Eigen::VectorXd(mu_.array().square()),
                            Eigen::MatrixXd(L_chol_.array().square()));
   }
@@ -193,7 +193,7 @@ class normal_fullrank : public base_family {
    * entries are non-negative before taking square roots, so
    * not-a-number values may result.
    */
-  normal_fullrank sqrt() const {
+  inline normal_fullrank sqrt() const {
     return normal_fullrank(Eigen::VectorXd(mu_.array().sqrt()),
                            Eigen::MatrixXd(L_chol_.array().sqrt()));
   }
@@ -209,7 +209,7 @@ class normal_fullrank : public base_family {
    * @throw std::domain_error If the dimensionality of the specified
    * approximation does not match this approximation's dimensionality.
    */
-  normal_fullrank& operator=(const normal_fullrank& rhs) {
+  inline normal_fullrank& operator=(const normal_fullrank& rhs) {
     static const char* function
         = "stan::variational::normal_fullrank::operator=";
     stan::math::check_size_match(function, "Dimension of lhs", dimension(),
@@ -230,7 +230,7 @@ class normal_fullrank : public base_family {
    * @throw std::domain_error If the dimensionality of the specified
    * approximation does not match this approximation's dimensionality.
    */
-  normal_fullrank& operator+=(const normal_fullrank& rhs) {
+  inline normal_fullrank& operator+=(const normal_fullrank& rhs) {
     static const char* function
         = "stan::variational::normal_fullrank::operator+=";
     stan::math::check_size_match(function, "Dimension of lhs", dimension(),
@@ -275,7 +275,7 @@ class normal_fullrank : public base_family {
    * @return This approximation after elementwise addition of the
    * specified scalar.
    */
-  normal_fullrank& operator+=(double scalar) {
+  inline normal_fullrank& operator+=(double scalar) {
     mu_.array() += scalar;
     L_chol_.array() += scalar;
     return *this;
@@ -293,7 +293,7 @@ class normal_fullrank : public base_family {
    * @return This approximation after elementwise addition of the
    * specified scalar.
    */
-  normal_fullrank& operator*=(double scalar) {
+  inline normal_fullrank& operator*=(double scalar) {
     mu_ *= scalar;
     L_chol_ *= scalar;
     return *this;
@@ -306,7 +306,7 @@ class normal_fullrank : public base_family {
    *
    * @return Mean vector for this approximation.
    */
-  const Eigen::VectorXd& mean() const { return mu(); }
+  const inline Eigen::VectorXd& mean() const { return mu(); }
 
   /**
    * Return the entropy of this approximation.
@@ -317,7 +317,7 @@ class normal_fullrank : public base_family {
    *
    * @return Entropy of this approximation
    */
-  double entropy() const {
+  inline double entropy() const {
     static double mult = 0.5 * (1.0 + stan::math::LOG_TWO_PI);
     double result = mult * dimension();
     for (int d = 0; d < dimension(); ++d) {
@@ -340,7 +340,7 @@ class normal_fullrank : public base_family {
    * not match the dimensionality of this approximation.
    * @return Transformed vector.
    */
-  Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
+  inline Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
     static const char* function
         = "stan::variational::normal_fullrank::transform";
     stan::math::check_size_match(function, "Dimension of input vector",
@@ -352,7 +352,7 @@ class normal_fullrank : public base_family {
   }
 
   template <class BaseRNG>
-  void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
+  inline void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
     // Draw from standard normal and transform to real-coordinate space
     for (int d = 0; d < dimension(); ++d)
       eta(d) = stan::math::normal_rng(0, 1, rng);
@@ -360,7 +360,8 @@ class normal_fullrank : public base_family {
   }
 
   template <class BaseRNG>
-  void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta, double& log_g) const {
+  inline void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
+                           double& log_g) const {
     // Draw from the approximation
     for (int d = 0; d < dimension(); ++d) {
       eta(d) = stan::math::normal_rng(0, 1, rng);
@@ -371,7 +372,7 @@ class normal_fullrank : public base_family {
     eta = transform(eta);
   }
 
-  double calc_log_g(const Eigen::VectorXd& eta) const {
+  inline double calc_log_g(const Eigen::VectorXd& eta) const {
     // Compute the log density wrt normal distribution dropping constants
     double log_g = 0;
     for (int d = 0; d < dimension(); ++d) {
@@ -398,9 +399,9 @@ class normal_fullrank : public base_family {
    * iterations exceeds its specified bounds.
    */
   template <class M, class BaseRNG>
-  void calc_grad(normal_fullrank& elbo_grad, M& m, Eigen::VectorXd& cont_params,
-                 int n_monte_carlo_grad, BaseRNG& rng,
-                 callbacks::logger& logger) const {
+  inline void calc_grad(normal_fullrank& elbo_grad, M& m,
+                        Eigen::VectorXd& cont_params, int n_monte_carlo_grad,
+                        BaseRNG& rng, callbacks::logger& logger) const {
     static const char* function
         = "stan::variational::normal_fullrank::calc_grad";
     stan::math::check_size_match(function, "Dimension of elbo_grad",

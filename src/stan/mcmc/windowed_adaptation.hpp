@@ -11,24 +11,19 @@ namespace mcmc {
 
 class windowed_adaptation : public base_adaptation {
  public:
-  explicit windowed_adaptation(std::string name) : estimator_name_(name) {
-    num_warmup_ = 0;
-    adapt_init_buffer_ = 0;
-    adapt_term_buffer_ = 0;
-    adapt_base_window_ = 0;
+  explicit windowed_adaptation(std::string name) : estimator_name_(name) {}
 
-    restart();
-  }
-
-  void restart() {
+  inline void restart() {
     adapt_window_counter_ = 0;
     adapt_window_size_ = adapt_base_window_;
     adapt_next_window_ = adapt_init_buffer_ + adapt_window_size_ - 1;
   }
 
-  void set_window_params(unsigned int num_warmup, unsigned int init_buffer,
-                         unsigned int term_buffer, unsigned int base_window,
-                         callbacks::logger& logger) {
+  inline void set_window_params(unsigned int num_warmup,
+                                unsigned int init_buffer,
+                                unsigned int term_buffer,
+                                unsigned int base_window,
+                                callbacks::logger& logger) {
     if (num_warmup < 20) {
       logger.info("WARNING: No " + estimator_name_ + " estimation is");
       logger.info("         performed for num_warmup < 20");
@@ -77,18 +72,18 @@ class windowed_adaptation : public base_adaptation {
     restart();
   }
 
-  bool adaptation_window() {
+  inline bool adaptation_window() {
     return (adapt_window_counter_ >= adapt_init_buffer_)
            && (adapt_window_counter_ < num_warmup_ - adapt_term_buffer_)
            && (adapt_window_counter_ != num_warmup_);
   }
 
-  bool end_adaptation_window() {
+  inline bool end_adaptation_window() {
     return (adapt_window_counter_ == adapt_next_window_)
            && (adapt_window_counter_ != num_warmup_);
   }
 
-  void compute_next_window() {
+  inline void compute_next_window() {
     if (adapt_next_window_ == num_warmup_ - adapt_term_buffer_ - 1)
       return;
 
@@ -112,14 +107,14 @@ class windowed_adaptation : public base_adaptation {
  protected:
   std::string estimator_name_;
 
-  unsigned int num_warmup_;
-  unsigned int adapt_init_buffer_;
-  unsigned int adapt_term_buffer_;
-  unsigned int adapt_base_window_;
+  unsigned int num_warmup_{0};
+  unsigned int adapt_init_buffer_{0};
+  unsigned int adapt_term_buffer_{0};
+  unsigned int adapt_base_window_{0};
 
-  unsigned int adapt_window_counter_;
-  unsigned int adapt_next_window_;
-  unsigned int adapt_window_size_;
+  int adapt_window_counter_{-1};
+  unsigned int adapt_next_window_{0};
+  unsigned int adapt_window_size_{0};
 };
 
 }  // namespace mcmc

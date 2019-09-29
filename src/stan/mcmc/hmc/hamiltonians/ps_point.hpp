@@ -21,14 +21,13 @@ class ps_point {
  public:
   explicit ps_point(int n) : q(n), p(n), V(0), g(n) {}
 
-
   double V;
   Eigen::VectorXd q;
   Eigen::VectorXd p;
   Eigen::VectorXd g;
 
-  virtual void get_param_names(std::vector<std::string>& model_names,
-                               std::vector<std::string>& names) {
+  virtual inline void get_param_names(std::vector<std::string>& model_names,
+                                      std::vector<std::string>& names) {
     names.reserve(q.size() + p.size() + g.size());
     for (int i = 0; i < q.size(); ++i)
       names.emplace_back(model_names[i]);
@@ -38,7 +37,7 @@ class ps_point {
       names.emplace_back(std::string("g_") + model_names[i]);
   }
 
-  virtual void get_params(std::vector<double>& values) {
+  virtual inline void get_params(std::vector<double>& values) {
     values.reserve(q.size() + p.size() + g.size());
     for (int i = 0; i < q.size(); ++i)
       values.push_back(q[i]);
@@ -54,7 +53,6 @@ class ps_point {
    * @param writer writer callback
    */
   virtual inline void write_metric(stan::callbacks::writer& writer) {}
-
 };
 
 }  // namespace mcmc

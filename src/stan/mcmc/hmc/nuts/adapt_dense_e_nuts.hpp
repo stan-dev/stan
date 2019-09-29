@@ -22,7 +22,7 @@ class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
 
   ~adapt_dense_e_nuts() {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = dense_e_nuts<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_) {
@@ -42,7 +42,7 @@ class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
     return s;
   }
 
-  void disengage_adaptation() {
+  inline void disengage_adaptation() {
     base_adapter::disengage_adaptation();
     this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
   }

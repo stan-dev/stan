@@ -17,7 +17,9 @@ struct epsilon {
    *
    * @return description
    */
-  static std::string description() { return "Finite difference stepsize."; }
+  static inline std::string description() {
+    return "Finite difference stepsize.";
+  }
 
   /**
    * Validates epsilon; epsilon must be greater than 0.
@@ -25,7 +27,7 @@ struct epsilon {
    * @param[in] epsilon argument to validate
    * @throw std::invalid_argument unless epsilon is greater than zero
    */
-  static void validate(double epsilon) {
+  static inline void validate(double epsilon) {
     if (!(epsilon > 0))
       throw std::invalid_argument("epsilon must be greater than 0.");
   }
@@ -35,7 +37,7 @@ struct epsilon {
    *
    * @return 1e-6
    */
-  static double default_value() { return 1e-6; }
+  static inline double default_value() { return 1e-6; }
 };
 
 /**
@@ -48,7 +50,9 @@ struct error {
    *
    * @return description
    */
-  static std::string description() { return "Absolute error threshold."; }
+  static inline std::string description() {
+    return "Absolute error threshold.";
+  }
 
   /**
    * Validates error; error must be greater than 0.
@@ -56,7 +60,7 @@ struct error {
    * @throw std::invalid_argument unless error is greater than zero
    * equal to 0.
    */
-  static void validate(double error) {
+  static inline void validate(double error) {
     if (!(error > 0))
       throw std::invalid_argument("error must be greater than 0.");
   }
@@ -66,7 +70,7 @@ struct error {
    *
    * @return 1e-6
    */
-  static double default_value() { return 1e-6; }
+  static inline double default_value() { return 1e-6; }
 };
 
 }  // namespace diagnose

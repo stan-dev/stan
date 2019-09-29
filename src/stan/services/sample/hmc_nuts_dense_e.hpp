@@ -46,16 +46,14 @@ namespace sample {
  * @return error_codes::OK if successful
  */
 template <class Model>
-int hmc_nuts_dense_e(Model& model, stan::io::var_context& init,
-                     stan::io::var_context& init_inv_metric,
-                     unsigned int random_seed, unsigned int chain,
-                     double init_radius, int num_warmup, int num_samples,
-                     int num_thin, bool save_warmup, int refresh,
-                     double stepsize, double stepsize_jitter, int max_depth,
-                     callbacks::interrupt& interrupt, callbacks::logger& logger,
-                     callbacks::writer& init_writer,
-                     callbacks::writer& sample_writer,
-                     callbacks::writer& diagnostic_writer) {
+inline int hmc_nuts_dense_e(
+    Model& model, stan::io::var_context& init,
+    stan::io::var_context& init_inv_metric, unsigned int random_seed,
+    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    int num_thin, bool save_warmup, int refresh, double stepsize,
+    double stepsize_jitter, int max_depth, callbacks::interrupt& interrupt,
+    callbacks::logger& logger, callbacks::writer& init_writer,
+    callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
@@ -112,15 +110,13 @@ int hmc_nuts_dense_e(Model& model, stan::io::var_context& init,
  *
  */
 template <class Model>
-int hmc_nuts_dense_e(Model& model, stan::io::var_context& init,
-                     unsigned int random_seed, unsigned int chain,
-                     double init_radius, int num_warmup, int num_samples,
-                     int num_thin, bool save_warmup, int refresh,
-                     double stepsize, double stepsize_jitter, int max_depth,
-                     callbacks::interrupt& interrupt, callbacks::logger& logger,
-                     callbacks::writer& init_writer,
-                     callbacks::writer& sample_writer,
-                     callbacks::writer& diagnostic_writer) {
+inline int hmc_nuts_dense_e(
+    Model& model, stan::io::var_context& init, unsigned int random_seed,
+    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    int num_thin, bool save_warmup, int refresh, double stepsize,
+    double stepsize_jitter, int max_depth, callbacks::interrupt& interrupt,
+    callbacks::logger& logger, callbacks::writer& init_writer,
+    callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
   stan::io::dump dmp
       = util::create_unit_e_dense_inv_metric(model.num_params_r());
   stan::io::var_context& unit_e_metric = dmp;

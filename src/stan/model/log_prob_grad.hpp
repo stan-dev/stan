@@ -26,18 +26,15 @@ namespace model {
  * @param[in,out] msgs
  */
 template <bool propto, bool jacobian_adjust_transform, class M>
-double log_prob_grad(const M& model, std::vector<double>& params_r,
-                     std::vector<int>& params_i, std::vector<double>& gradient,
-                     std::ostream* msgs = 0) {
+inline double log_prob_grad(const M& model, std::vector<double>& params_r,
+                            std::vector<int>& params_i,
+                            std::vector<double>& gradient,
+                            std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
   double lp;
+  vector<var> ad_params_r(params_r.begin(), params_r.end());
   try {
-    vector<var> ad_params_r(params_r.size());
-    for (size_t i = 0; i < model.num_params_r(); ++i) {
-      stan::math::var var_i(params_r[i]);
-      ad_params_r[i] = var_i;
-    }
     var adLogProb = model.template log_prob<propto, jacobian_adjust_transform>(
         ad_params_r, params_i, msgs);
     lp = adLogProb.val();
@@ -67,16 +64,12 @@ double log_prob_grad(const M& model, std::vector<double>& params_r,
  * @param[in,out] msgs
  */
 template <bool propto, bool jacobian_adjust_transform, class M>
-double log_prob_grad(const M& model, Eigen::VectorXd& params_r,
-                     Eigen::VectorXd& gradient, std::ostream* msgs = 0) {
+inline double log_prob_grad(const M& model, Eigen::VectorXd& params_r,
+                            Eigen::VectorXd& gradient, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
 
-  Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r(params_r.size());
-  for (size_t i = 0; i < model.num_params_r(); ++i) {
-    stan::math::var var_i(params_r[i]);
-    ad_params_r[i] = var_i;
-  }
+  Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r = params_r.cast<var>();
   try {
     var adLogProb = model.template log_prob<propto, jacobian_adjust_transform>(
         ad_params_r, msgs);

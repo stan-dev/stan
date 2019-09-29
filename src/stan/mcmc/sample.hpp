@@ -17,34 +17,24 @@ class sample {
   sample(Eigen::VectorXd&& q, double log_prob, double stat)  // NOLINT
       : cont_params_(std::move(q)), log_prob_(log_prob), accept_stat_(stat) {}
 
-  sample(const sample&) = default;
+  inline int size_cont() const { return cont_params_.size(); }
 
-  sample(sample&&) = default;
+  inline double cont_params(int k) const { return cont_params_.coeffRef(k); }
 
-  sample& operator=(const sample&) = default;
+  inline void cont_params(Eigen::VectorXd& x) const { x = cont_params_; }
 
-  sample& operator=(sample&&) = default;
-
-  virtual ~sample() = default;
-
-  int size_cont() const { return cont_params_.size(); }
-
-  double cont_params(int k) const { return cont_params_(k); }
-
-  void cont_params(Eigen::VectorXd& x) const { x = cont_params_; }
-
-  const Eigen::VectorXd& cont_params() const { return cont_params_; }
+  const inline Eigen::VectorXd& cont_params() const { return cont_params_; }
 
   inline double log_prob() const { return log_prob_; }
 
   inline double accept_stat() const { return accept_stat_; }
 
-  static void get_sample_param_names(std::vector<std::string>& names) {
-    names.push_back("lp__");
-    names.push_back("accept_stat__");
+  static inline void get_sample_param_names(std::vector<std::string>& names) {
+    names.emplace_back("lp__");
+    names.emplace_back("accept_stat__");
   }
 
-  void get_sample_params(std::vector<double>& values) {
+  inline void get_sample_params(std::vector<double>& values) {
     values.push_back(log_prob_);
     values.push_back(accept_stat_);
   }

@@ -52,13 +52,15 @@ namespace optimize {
  * @return error_codes::OK if successful
  */
 template <class Model>
-int lbfgs(Model& model, stan::io::var_context& init, unsigned int random_seed,
-          unsigned int chain, double init_radius, int history_size,
-          double init_alpha, double tol_obj, double tol_rel_obj,
-          double tol_grad, double tol_rel_grad, double tol_param,
-          int num_iterations, bool save_iterations, int refresh,
-          callbacks::interrupt& interrupt, callbacks::logger& logger,
-          callbacks::writer& init_writer, callbacks::writer& parameter_writer) {
+inline int lbfgs(Model& model, stan::io::var_context& init,
+                 unsigned int random_seed, unsigned int chain,
+                 double init_radius, int history_size, double init_alpha,
+                 double tol_obj, double tol_rel_obj, double tol_grad,
+                 double tol_rel_grad, double tol_param, int num_iterations,
+                 bool save_iterations, int refresh,
+                 callbacks::interrupt& interrupt, callbacks::logger& logger,
+                 callbacks::writer& init_writer,
+                 callbacks::writer& parameter_writer) {
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
