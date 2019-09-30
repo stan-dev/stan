@@ -16,7 +16,6 @@ using Eigen::Dynamic;
  * Point in a generic phase space
  */
 class ps_point {
-
  public:
   explicit ps_point(int n) : q(n), p(n), g(n) {}
 
