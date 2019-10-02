@@ -1,9 +1,9 @@
-#ifndef STAN_SERVICES_KHAT_HPP
-#define STAN_SERVICES_KHAT_HPP
+#ifndef STAN_SERVICES_GPD_FIT_HPP
+#define STAN_SERVICES_GPD_FIT_HPP
 
 #include <stan/math/prim/mat/fun/mean.hpp>
 #include <stan/math/rev/scal/fun/exp.hpp>
-#include <stan/services/khat.hpp>
+#include <stan/services/gpd_fit.hpp>
 #include <Eigen/Dense>
 #include <type_traits>
 #include <vector>
@@ -51,7 +51,7 @@ namespace advi {
   }
 
   template <typename T_x>
-  int compute_khat(const std::vector<T_x>& x,
+  int gpd_fit(const std::vector<T_x>& x,
                    const int& min_grid_points = 30,
                    T_x &k = std::numeric_limits<double>::quiet_NaN()) {
     size_t N = x.size();
