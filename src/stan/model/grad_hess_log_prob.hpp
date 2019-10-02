@@ -43,22 +43,25 @@ double grad_hess_log_prob(const M& model, std::vector<double>& params_r,
       = {-2 * epsilon, -1 * epsilon, epsilon, 2 * epsilon};
   static const double coefficients[order]
       = {1.0 / 12.0, -2.0 / 3.0, 2.0 / 3.0, -1.0 / 12.0};
-
+  static const double half_epsilon_coeff[order]
+      = {half_epsilon * coefficients[0], half_epsilon * coefficients[1],
+         half_epsilon * coefficients[2], half_epsilon * coefficients[3]};
   double result = log_prob_grad<propto, jacobian_adjust_transform>(
       model, params_r, params_i, gradient, msgs);
   hessian.assign(params_r.size() * params_r.size(), 0);
   std::vector<double> temp_grad(params_r.size());
   std::vector<double> perturbed_params(params_r.begin(), params_r.end());
   for (size_t d = 0; d < params_r.size(); ++d) {
-    double* row = &hessian[d * params_r.size()];
+    const int row_iter = d * params_r.size();
     for (int i = 0; i < order; ++i) {
       perturbed_params[d] = params_r[d] + perturbations[i];
       log_prob_grad<propto, jacobian_adjust_transform>(model, perturbed_params,
                                                        params_i, temp_grad);
       for (size_t dd = 0; dd < params_r.size(); ++dd) {
-        double increment = half_epsilon * coefficients[i] * temp_grad[dd];
-        row[dd] += increment;
-        hessian[d + dd * params_r.size()] += increment;
+        const double increment = half_epsilon_coeff[i] * temp_grad[dd];
+        const int col_iter = dd * params_r.size();
+        hessian[dd + row_iter] += increment;
+        hessian[d + col_iter] += increment;
       }
     }
     perturbed_params[d] = params_r[d];
