@@ -75,19 +75,19 @@ inline double compute_potential_scale_reduction(
   double unbiased_var_scale = num_draws / (num_draws - 1.0);
 
   for (int chain = 0; chain < num_chains; ++chain) {
-      accumulator_set<double, stats<mean, variance>> acc_draw;
-      for (int n = 0; n < num_draws; ++n) {
-        acc_draw(draws[chain][n]);
-      }
+    accumulator_set<double, stats<mean, variance>> acc_draw;
+    for (int n = 0; n < num_draws; ++n) {
+      acc_draw(draws[chain][n]);
+    }
 
-      chain_mean(chain) = boost::accumulators::mean(acc_draw);
-      acc_chain_mean(chain_mean(chain));
-      chain_var(chain) = boost::accumulators::variance(acc_draw)
-        * unbiased_var_scale;
+    chain_mean(chain) = boost::accumulators::mean(acc_draw);
+    acc_chain_mean(chain_mean(chain));
+    chain_var(chain)
+        = boost::accumulators::variance(acc_draw) * unbiased_var_scale;
   }
 
   double var_between = num_draws * boost::accumulators::variance(acc_chain_mean)
-    * num_chains / (num_chains - 1);
+                       * num_chains / (num_chains - 1);
   double var_within = chain_var.mean();
 
   // rewrote [(n-1)*W/n + B/n]/W as (n-1+ B/W)/n
