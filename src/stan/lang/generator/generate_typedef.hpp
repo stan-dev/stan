@@ -7,21 +7,20 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate a typedef statement for the specified type and
-     * abbreviation to the specified stream.
-     *
-     * @param[in] type type for definition
-     * @param[in] abbrev abbreviation defined for type
-     * @param[in,out] o stream for writing
-     */
-    void generate_typedef(const std::string& type, const std::string& abbrev,
-                          std::ostream& o) {
-      o << "typedef" << " " << type << " " << abbrev << ";" << EOL;
-    }
-
-  }
+/**
+ * Generate a typedef statement for the specified type.
+ *
+ * @param[in] type type for definition
+ * @param[in] abbrev abbreviation defined for type
+ * @param[in,out] o stream for writing
+ */
+void generate_typedef(const std::string& type, const std::string& abbrev,
+                      std::ostream& o) {
+  o << "typedef"
+    << " " << type << " " << abbrev << ";" << EOL2;
 }
+}  // namespace lang
+}  // namespace stan
 #endif

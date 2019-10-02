@@ -5,25 +5,25 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    struct expression;
+struct expression;
 
-    /**
-     * Structure for a distribution with parameters.
-     */
-    struct distribution {
-      /**
-       * The name of the distribution.
-       */
-      std::string family_;
+/**
+ * Structure for a distribution with parameters.
+ */
+struct distribution {
+  /**
+   * The name of the distribution.
+   */
+  std::string family_;
 
-      /**
-       * The sequence of parameters for the distribution.
-       */
-      std::vector<expression> args_;
-    };
+  /**
+   * The sequence of parameters for the distribution.
+   */
+  std::vector<expression> args_;
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -8,76 +8,63 @@
 typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
-  namespace mcmc {
+namespace mcmc {
 
-    class mock_xhmc: public base_xhmc<mock_model,
-                                      mock_hamiltonian,
-                                      mock_integrator,
-                                      rng_t> {
+class mock_xhmc
+    : public base_xhmc<mock_model, mock_hamiltonian, mock_integrator, rng_t> {
+ public:
+  mock_xhmc(const mock_model& m, rng_t& rng)
+      : base_xhmc<mock_model, mock_hamiltonian, mock_integrator, rng_t>(m,
+                                                                        rng) {}
+};
 
-    public:
-      mock_xhmc(const mock_model &m, rng_t& rng)
-        : base_xhmc<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng)
-      { }
-    };
+// Mock Hamiltonian
+template <typename M, typename BaseRNG>
+class divergent_hamiltonian : public base_hamiltonian<M, ps_point, BaseRNG> {
+ public:
+  divergent_hamiltonian(const M& m)
+      : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
 
-    // Mock Hamiltonian
-    template <typename M, typename BaseRNG>
-    class divergent_hamiltonian
-      : public base_hamiltonian<M, ps_point, BaseRNG> {
-    public:
-      divergent_hamiltonian(const M& m)
-        : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
+  double T(ps_point& z) { return 0; }
 
-      double T(ps_point& z) { return 0; }
+  double tau(ps_point& z) { return T(z); }
+  double phi(ps_point& z) { return this->V(z); }
 
-      double tau(ps_point& z) { return T(z); }
-      double phi(ps_point& z) { return this->V(z); }
+  double dG_dt(ps_point& z, callbacks::logger& logger) { return 2; }
 
-      double dG_dt(ps_point& z,callbacks::logger& logger) {
-        return 2;
-      }
-
-      Eigen::VectorXd dtau_dq(ps_point& z, callbacks::logger& logger) {
-        return Eigen::VectorXd::Zero(this->model_.num_params_r());
-      }
-
-      Eigen::VectorXd dtau_dp(ps_point& z) {
-        return Eigen::VectorXd::Zero(this->model_.num_params_r());
-      }
-
-      Eigen::VectorXd dphi_dq(ps_point& z, callbacks::logger& logger) {
-        return Eigen::VectorXd::Zero(this->model_.num_params_r());
-      }
-
-      void init(ps_point& z, callbacks::logger& logger) {
-        z.V = 0;
-      }
-
-      void sample_p(ps_point& z, BaseRNG& rng) {};
-
-      void update_potential_gradient(ps_point& z, callbacks::logger& logger) {
-        z.V += 500;
-      }
-
-    };
-
-    class divergent_xhmc: public base_xhmc<mock_model,
-                                           divergent_hamiltonian,
-                                           expl_leapfrog,
-                                           rng_t> {
-    public:
-
-      divergent_xhmc(const mock_model &m, rng_t& rng)
-        : base_xhmc<mock_model, divergent_hamiltonian, expl_leapfrog,rng_t>(m, rng)
-      { }
-    };
-
+  Eigen::VectorXd dtau_dq(ps_point& z, callbacks::logger& logger) {
+    return Eigen::VectorXd::Zero(this->model_.num_params_r());
   }
-}
+
+  Eigen::VectorXd dtau_dp(ps_point& z) {
+    return Eigen::VectorXd::Zero(this->model_.num_params_r());
+  }
+
+  Eigen::VectorXd dphi_dq(ps_point& z, callbacks::logger& logger) {
+    return Eigen::VectorXd::Zero(this->model_.num_params_r());
+  }
+
+  void init(ps_point& z, callbacks::logger& logger) { z.V = 0; }
+
+  void sample_p(ps_point& z, BaseRNG& rng){};
+
+  void update_potential_gradient(ps_point& z, callbacks::logger& logger) {
+    z.V += 500;
+  }
+};
+
+class divergent_xhmc : public base_xhmc<mock_model, divergent_hamiltonian,
+                                        expl_leapfrog, rng_t> {
+ public:
+  divergent_xhmc(const mock_model& m, rng_t& rng)
+      : base_xhmc<mock_model, divergent_hamiltonian, expl_leapfrog, rng_t>(
+            m, rng) {}
+};
+
+}  // namespace mcmc
+}  // namespace stan
 
 TEST(McmcXHMCBaseXHMC, set_max_depth) {
-
   rng_t base_rng(0);
 
   Eigen::VectorXd q(2);
@@ -94,7 +81,6 @@ TEST(McmcXHMCBaseXHMC, set_max_depth) {
   sampler.set_max_depth(-1);
   EXPECT_EQ(old_max_depth, sampler.get_max_depth());
 }
-
 
 TEST(McmcXHMCBaseXHMC, set_max_deltaH) {
   rng_t base_rng(0);
@@ -127,7 +113,6 @@ TEST(McmcXHMCBaseXHMC, set_x_delta) {
 }
 
 TEST(McmcXHMCBaseXHMC, build_tree) {
-
   rng_t base_rng(0);
 
   int model_size = 1;
@@ -157,11 +142,9 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  bool valid_subtree = sampler.build_tree(3, z_propose,
-                                          ave, log_sum_weight,
-                                          H0, 1, n_leapfrog,
-                                          sum_metro_prob,
-                                          logger);
+  bool valid_subtree
+      = sampler.build_tree(3, z_propose, ave, log_sum_weight, H0, 1, n_leapfrog,
+                           sum_metro_prob, logger);
 
   EXPECT_TRUE(valid_subtree);
 
@@ -170,7 +153,7 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
 
   EXPECT_EQ(8, n_leapfrog);
   EXPECT_FLOAT_EQ(2, ave);
-  EXPECT_FLOAT_EQ(H0  + std::log(n_leapfrog), log_sum_weight);
+  EXPECT_FLOAT_EQ(H0 + std::log(n_leapfrog), log_sum_weight);
   EXPECT_FLOAT_EQ(std::exp(H0) * n_leapfrog, sum_metro_prob);
 
   EXPECT_EQ("", debug.str());
@@ -181,7 +164,6 @@ TEST(McmcXHMCBaseXHMC, build_tree) {
 }
 
 TEST(McmcXHMCBaseXHMC, divergence_test) {
-
   rng_t base_rng(0);
 
   int model_size = 1;
@@ -214,30 +196,21 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
   bool valid_subtree = 0;
 
   sampler.z().V = -750;
-  valid_subtree = sampler.build_tree(0, z_propose,
-                                     ave, log_sum_weight,
-                                     H0, 1, n_leapfrog,
-                                     sum_metro_prob,
-                                     logger);
+  valid_subtree = sampler.build_tree(0, z_propose, ave, log_sum_weight, H0, 1,
+                                     n_leapfrog, sum_metro_prob, logger);
   EXPECT_TRUE(valid_subtree);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = -250;
-  valid_subtree = sampler.build_tree(0, z_propose,
-                                     ave, log_sum_weight,
-                                     H0, 1, n_leapfrog,
-                                     sum_metro_prob,
-                                     logger);
+  valid_subtree = sampler.build_tree(0, z_propose, ave, log_sum_weight, H0, 1,
+                                     n_leapfrog, sum_metro_prob, logger);
 
   EXPECT_TRUE(valid_subtree);
   EXPECT_EQ(0, sampler.divergent_);
 
   sampler.z().V = 750;
-  valid_subtree = sampler.build_tree(0, z_propose,
-                                     ave, log_sum_weight,
-                                     H0, 1, n_leapfrog,
-                                     sum_metro_prob,
-                                     logger);
+  valid_subtree = sampler.build_tree(0, z_propose, ave, log_sum_weight, H0, 1,
+                                     n_leapfrog, sum_metro_prob, logger);
 
   EXPECT_FALSE(valid_subtree);
   EXPECT_EQ(1, sampler.divergent_);
@@ -250,7 +223,6 @@ TEST(McmcXHMCBaseXHMC, divergence_test) {
 }
 
 TEST(McmcXHMCBaseXHMC, transition) {
-
   rng_t base_rng(0);
 
   int model_size = 1;

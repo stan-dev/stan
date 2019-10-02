@@ -4,12 +4,12 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    lb_idx::lb_idx() { }
+lb_idx::lb_idx() {}
 
-    lb_idx::lb_idx(const expression& lb) : lb_(lb) { }
+lb_idx::lb_idx(const expression& lb) : lb_(lb) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

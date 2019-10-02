@@ -45,6 +45,14 @@ add("add", bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_ex
 for (size_t i = 0; i < bare_types.size(); ++i) {
   add("add", bare_types[i], bare_types[i]);
  }
+
+add("add_diag", bare_expr_type(matrix_type()), bare_expr_type(matrix_type()),
+    bare_expr_type(double_type()));
+add("add_diag", bare_expr_type(matrix_type()), bare_expr_type(matrix_type()),
+    bare_expr_type(vector_type()));
+add("add_diag", bare_expr_type(matrix_type()), bare_expr_type(matrix_type()),
+    bare_expr_type(row_vector_type()));
+
 for (size_t i = 1; i < 8; ++i) {
   add("append_array", bare_expr_type(bare_array_type(int_type(), i)), bare_expr_type(bare_array_type(int_type(), i)), bare_expr_type(bare_array_type(int_type(), i)));
   add("append_array", bare_expr_type(bare_array_type(double_type(), i)), bare_expr_type(bare_array_type(double_type(), i)), bare_expr_type(bare_array_type(double_type(), i)));
@@ -516,6 +524,137 @@ add("gaussian_dlm_obs_lpdf", bare_expr_type(double_type()), bare_expr_type(matri
 add("gaussian_dlm_obs_lpdf", bare_expr_type(double_type()), bare_expr_type(matrix_type()), bare_expr_type(matrix_type()), bare_expr_type(matrix_type()),
     bare_expr_type(vector_type()), bare_expr_type(matrix_type()), bare_expr_type(vector_type()), bare_expr_type(matrix_type()));
 add_nullary("get_lp");  // special handling in term_grammar_def
+
+add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()));
+add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()));
+add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()));
+add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()));
+
+add("gp_exp_quad_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_exp_quad_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_exp_quad_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_exp_quad_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_exp_quad_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)));
+add("gp_exp_quad_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)));
+
+add("gp_exponential_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_exponential_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_exponential_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_exponential_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_exponential_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)));
+add("gp_exponential_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)));
+
+add("gp_matern52_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_matern52_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_matern52_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_matern52_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_matern52_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)));
+add("gp_matern52_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)));
+
+add("gp_matern32_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_matern32_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_matern32_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_matern32_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()));
+add("gp_matern32_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)));
+add("gp_matern32_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)));
+
+add("gp_periodic_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()),
+    bare_expr_type(double_type()));
+add("gp_periodic_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()),
+    bare_expr_type(double_type()));
+add("gp_periodic_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()),
+    bare_expr_type(double_type()));
+add("gp_periodic_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(double_type()), bare_expr_type(double_type()),
+    bare_expr_type(double_type()));
+
 for (size_t i = 0; i < vector_types.size(); ++i) {
   for (size_t j = 0; j < vector_types.size(); ++j) {
     for (size_t k = 0; k < vector_types.size(); ++k) {

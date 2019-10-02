@@ -7,20 +7,19 @@
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 
 namespace stan {
-  namespace mcmc {
-    /**
-     * The No-U-Turn sampler (NUTS) with multinomial sampling
-     * with a Gaussian-Euclidean disintegration and diagonal metric
-     */
-    template <class Model, class BaseRNG>
-    class diag_e_nuts : public base_nuts<Model, diag_e_metric,
-                                         expl_leapfrog, BaseRNG> {
-    public:
-      diag_e_nuts(const Model& model, BaseRNG& rng)
-        : base_nuts<Model, diag_e_metric, expl_leapfrog,
-                    BaseRNG>(model, rng) { }
-    };
+namespace mcmc {
+/**
+ * The No-U-Turn sampler (NUTS) with multinomial sampling
+ * with a Gaussian-Euclidean disintegration and diagonal metric
+ */
+template <class Model, class BaseRNG>
+class diag_e_nuts
+    : public base_nuts<Model, diag_e_metric, expl_leapfrog, BaseRNG> {
+ public:
+  diag_e_nuts(const Model& model, BaseRNG& rng)
+      : base_nuts<Model, diag_e_metric, expl_leapfrog, BaseRNG>(model, rng) {}
+};
 
-  }  // mcmc
-}  // stan
+}  // namespace mcmc
+}  // namespace stan
 #endif

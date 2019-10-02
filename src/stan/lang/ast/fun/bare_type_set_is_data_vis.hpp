@@ -11,73 +11,73 @@
 #include <boost/variant/static_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Visitor to get data restriction status for bare type.
-     */
-    struct bare_type_set_is_data_vis : public boost::static_visitor<void> {
-      /**
-       * Construct a visitor.
-       */
-      bare_type_set_is_data_vis();
+/**
+ * Visitor to get data restriction status for bare type.
+ */
+struct bare_type_set_is_data_vis : public boost::static_visitor<void> {
+  /**
+   * Construct a visitor.
+   */
+  bare_type_set_is_data_vis();
 
-      /**
-       * Do nothing - bare_array_type elements must be updated.
-       *
-       * @param x type
-       */
-      void operator()(bare_array_type& x) const;
+  /**
+   * Do nothing - bare_array_type elements must be updated.
+   *
+   * @param x type
+   */
+  void operator()(bare_array_type& x) const;
 
-      /**
-       * Set `is_data_` flag to true.
-       *
-       * @param x type
-       */
-      void operator()(double_type& x) const;
+  /**
+   * Set `is_data_` flag to true.
+   *
+   * @param x type
+   */
+  void operator()(double_type& x) const;
 
-      /**
-       * Do nothing.
-       *
-       * @param x type
-       */
-      void operator()(ill_formed_type& x) const;
+  /**
+   * Do nothing.
+   *
+   * @param x type
+   */
+  void operator()(ill_formed_type& x) const;
 
-      /**
-       * Set `is_data_` flag to true.
-       *
-       * @param x type
-       */
-      void operator()(int_type& x) const;
+  /**
+   * Set `is_data_` flag to true.
+   *
+   * @param x type
+   */
+  void operator()(int_type& x) const;
 
-      /**
-       * Set `is_data_` flag to true.
-       *
-       * @param x type
-       */
-      void operator()(matrix_type& x) const;
+  /**
+   * Set `is_data_` flag to true.
+   *
+   * @param x type
+   */
+  void operator()(matrix_type& x) const;
 
-      /**
-       * Set `is_data_` flag to true.
-       *
-       * @param x type
-       */
-      void operator()(row_vector_type& x) const;
+  /**
+   * Set `is_data_` flag to true.
+   *
+   * @param x type
+   */
+  void operator()(row_vector_type& x) const;
 
-      /**
-       * Set `is_data_` flag to true.
-       *
-       * @param x type
-       */
-      void operator()(vector_type& x) const;
+  /**
+   * Set `is_data_` flag to true.
+   *
+   * @param x type
+   */
+  void operator()(vector_type& x) const;
 
-      /**
-       * Do nothing.
-       *
-       * @param x type
-       */
-      void operator()(void_type& x) const;
-    };
-  }
-}
+  /**
+   * Do nothing.
+   *
+   * @param x type
+   */
+  void operator()(void_type& x) const;
+};
+}  // namespace lang
+}  // namespace stan
 #endif

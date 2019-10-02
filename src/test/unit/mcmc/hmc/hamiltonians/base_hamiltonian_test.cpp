@@ -9,7 +9,6 @@
 typedef boost::ecuyer1988 rng_t;
 
 TEST(BaseHamiltonian, update_potential_gradient) {
-
   std::fstream data_stream(std::string("").c_str(), std::fstream::in);
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
@@ -17,7 +16,8 @@ TEST(BaseHamiltonian, update_potential_gradient) {
   std::stringstream model_output;
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
-  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t> metric(model);
+  stan::mcmc::mock_hamiltonian<funnel_model_namespace::funnel_model, rng_t>
+      metric(model);
   stan::mcmc::ps_point z(11);
   z.q.setOnes();
 
@@ -31,7 +31,6 @@ TEST(BaseHamiltonian, update_potential_gradient) {
   EXPECT_FLOAT_EQ(8.757758279, z.g(0));
   for (int i = 1; i < z.q.size(); ++i)
     EXPECT_FLOAT_EQ(0.1353352832, z.g(i));
-
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", debug.str());
@@ -48,11 +47,11 @@ TEST(BaseHamiltonian, streams) {
   stan::io::dump data_var_context(data_stream);
   data_stream.close();
 
-  EXPECT_NO_THROW(funnel_model_namespace::funnel_model
-                  model(data_var_context, 0,
-                        static_cast<std::stringstream*>(0)));
+  EXPECT_NO_THROW(funnel_model_namespace::funnel_model model(
+      data_var_context, 0, static_cast<std::stringstream*>(0)));
   std::stringstream output;
-  EXPECT_NO_THROW(funnel_model_namespace::funnel_model model(data_var_context, &output));
+  EXPECT_NO_THROW(
+      funnel_model_namespace::funnel_model model(data_var_context, &output));
   EXPECT_EQ("", output.str());
 
   stan::test::reset_std_streams();

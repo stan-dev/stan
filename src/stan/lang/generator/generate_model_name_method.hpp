@@ -7,22 +7,21 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the <code>model_name</code> method for the specified
-     * name on the specified stream.
-     *
-     * @param[in] model_name name of model
-     * @param[in,out] o stream for generating
-     */
-    void generate_model_name_method(const std::string& model_name,
-                                    std::ostream& o) {
-      o << INDENT << "static std::string model_name() {" << EOL
-        << INDENT2 << "return \"" << model_name << "\";" << EOL
-        << INDENT << "}" << EOL2;
-    }
-
-  }
+/**
+ * Generate the <code>model_name</code> method for the specified
+ * name on the specified stream.
+ *
+ * @param[in] model_name name of model
+ * @param[in,out] o stream for generating
+ */
+void generate_model_name_method(const std::string& model_name,
+                                std::ostream& o) {
+  o << INDENT << "std::string model_name() const {" << EOL << INDENT2
+    << "return \"" << model_name << "\";" << EOL << INDENT << "}" << EOL2;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

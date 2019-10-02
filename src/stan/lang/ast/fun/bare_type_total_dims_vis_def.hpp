@@ -19,9 +19,7 @@ int bare_type_total_dims_vis::operator()(const ill_formed_type& x) const {
   return 0;
 }
 
-int bare_type_total_dims_vis::operator()(const int_type& x) const {
-  return 0;
-}
+int bare_type_total_dims_vis::operator()(const int_type& x) const { return 0; }
 
 int bare_type_total_dims_vis::operator()(const matrix_type& x) const {
   return 2;
@@ -35,9 +33,7 @@ int bare_type_total_dims_vis::operator()(const vector_type& x) const {
   return 1;
 }
 
-int bare_type_total_dims_vis::operator()(const void_type& x) const {
-  return 0;
-}
+int bare_type_total_dims_vis::operator()(const void_type& x) const { return 0; }
 }  // namespace lang
 }  // namespace stan
 #endif

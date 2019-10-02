@@ -5,13 +5,13 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    break_continue_statement::break_continue_statement() { }
+break_continue_statement::break_continue_statement() {}
 
-    break_continue_statement::break_continue_statement(const std::string& s)
-      : generate_(s) { }
+break_continue_statement::break_continue_statement(const std::string& s)
+    : generate_(s) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

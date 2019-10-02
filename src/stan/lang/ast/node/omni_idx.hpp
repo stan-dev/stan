@@ -2,18 +2,18 @@
 #define STAN_LANG_AST_NODE_OMNI_IDX_HPP
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST structure for representing all legal indexes.
-     */
-    struct omni_idx {
-      /**
-       * Construct an omni-index.
-       */
-      omni_idx();
-    };
+/**
+ * AST structure for representing all legal indexes.
+ */
+struct omni_idx {
+  /**
+   * Construct an omni-index.
+   */
+  omni_idx();
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

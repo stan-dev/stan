@@ -16,7 +16,7 @@ local_array_type::local_array_type()
 
 local_array_type::local_array_type(const local_var_type& el_type,
                                    const std::vector<expression>& lens)
-  : element_type_(el_type), array_len_(lens[0]) {
+    : element_type_(el_type), array_len_(lens[0]) {
   if (lens.size() == 1) {
     return;
   }

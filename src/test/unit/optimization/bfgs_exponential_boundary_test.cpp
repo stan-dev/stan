@@ -3,11 +3,14 @@
 #include <test/test-models/good/optimization/exponential_boundary.hpp>
 
 typedef exponential_boundary_model_namespace::exponential_boundary_model Model;
-typedef stan::optimization::BFGSLineSearch<Model,stan::optimization::BFGSUpdate_HInv<> > Optimizer;
+typedef stan::optimization::BFGSLineSearch<
+    Model, stan::optimization::BFGSUpdate_HInv<> >
+    Optimizer;
 
 TEST(OptimizationBfgs, exponential_boundary_nonconvergence) {
   std::vector<double> cont_vector(2);
-  cont_vector[0] = 1; cont_vector[1] = 1;
+  cont_vector[0] = 1;
+  cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
   static const std::string DATA("");

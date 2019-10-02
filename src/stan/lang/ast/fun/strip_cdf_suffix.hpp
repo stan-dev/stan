@@ -4,17 +4,17 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Return the result of removing the suffix from the specified
-     * function name indicating it is a CDF.
-     *
-     * @param[in] dist_fun name of function
-     * @return result of removing suffix from function
-     */
-    std::string strip_cdf_suffix(const std::string& dist_fun);
+/**
+ * Return the result of removing the suffix from the specified
+ * function name indicating it is a CDF.
+ *
+ * @param[in] dist_fun name of function
+ * @return result of removing suffix from function
+ */
+std::string strip_cdf_suffix(const std::string& dist_fun);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -5,19 +5,19 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    std::string get_prob_fun(const std::string& dist_name) {
-      if (function_signatures::instance().has_key(dist_name + "_log"))
-        return dist_name + "_log";
-      else if (function_signatures::instance().has_key(dist_name + "_lpdf"))
-        return dist_name + "_lpdf";
-      else if (function_signatures::instance().has_key(dist_name + "_lpmf"))
-        return dist_name + "_lpmf";
-      else
-        return dist_name;
-    }
-
-  }
+std::string get_prob_fun(const std::string& dist_name) {
+  if (function_signatures::instance().has_key(dist_name + "_log"))
+    return dist_name + "_log";
+  else if (function_signatures::instance().has_key(dist_name + "_lpdf"))
+    return dist_name + "_lpdf";
+  else if (function_signatures::instance().has_key(dist_name + "_lpmf"))
+    return dist_name + "_lpmf";
+  else
+    return dist_name;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

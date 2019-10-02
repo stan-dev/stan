@@ -7,20 +7,20 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the opening for a try statement at the specified
-     * indentation level on the specified stream.
-     *
-     * @param[in] indent indentation level
-     * @param[in,out] o stream for generating
-     */
-    void generate_try(int indent, std::ostream& o) {
-      generate_indent(indent, o);
-      o << "try {" << EOL;
-    }
-
-  }
+/**
+ * Generate the opening for a try statement at the specified
+ * indentation level on the specified stream.
+ *
+ * @param[in] indent indentation level
+ * @param[in,out] o stream for generating
+ */
+void generate_try(int indent, std::ostream& o) {
+  generate_indent(indent, o);
+  o << "try {" << EOL;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

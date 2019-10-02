@@ -13,15 +13,13 @@ void expect_substring(const std::string& msg,
                       const std::string& expected_substring) {
   if (msg.find(expected_substring) == std::string::npos)
     FAIL() << "expected to find substring=" << expected_substring
-           << " in string=" << msg 
-           << std::endl;
+           << " in string=" << msg << std::endl;
 }
 
 template <class M, class E>
 void reject_test(const std::string& expected_msg1 = "",
                  const std::string& expected_msg2 = "",
                  const std::string& expected_msg3 = "") {
-
   std::fstream empty_data_stream("");
   stan::io::dump empty_data_context(empty_data_stream);
   empty_data_stream.close();
@@ -36,13 +34,14 @@ void reject_test(const std::string& expected_msg1 = "",
     M model(empty_data_context, &model_output);
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
-    double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &out);
-    (void) lp;
+    double lp
+        = model.template log_prob<false, false>(cont_vector, disc_vector, &out);
+    (void)lp;
     stan::callbacks::stream_writer writer(out);
     std::vector<double> params;
     std::stringstream ss;
-    model.write_array(base_rng, cont_vector, disc_vector,
-                      params, true, true, &ss);
+    model.write_array(base_rng, cont_vector, disc_vector, params, true, true,
+                      &ss);
   } catch (const E& e) {
     expect_substring(e.what(), expected_msg1);
     expect_substring(e.what(), expected_msg2);
@@ -56,7 +55,6 @@ void reject_test(const std::string& expected_msg1 = "",
 
 template <class M, class E>
 void print_reject_test(const std::string& expected_msg1 = "") {
-
   std::fstream empty_data_stream("");
   stan::io::dump empty_data_context(empty_data_stream);
   empty_data_stream.close();
@@ -71,11 +69,12 @@ void print_reject_test(const std::string& expected_msg1 = "") {
     M model(empty_data_context, &ss);
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
-    double lp = model.template log_prob<false,false>(cont_vector, disc_vector, &ss);
-    (void) lp;
+    double lp
+        = model.template log_prob<false, false>(cont_vector, disc_vector, &ss);
+    (void)lp;
     std::vector<double> params;
-    model.write_array(base_rng, cont_vector, disc_vector,
-                      params, true, true, &ss);
+    model.write_array(base_rng, cont_vector, disc_vector, params, true, true,
+                      &ss);
   } catch (const E& e) {
     expect_substring(ss.str(), expected_msg1);
     return;
@@ -83,4 +82,4 @@ void print_reject_test(const std::string& expected_msg1 = "") {
   FAIL() << "model failed to reject" << std::endl;
 }
 
-#endif 
+#endif
