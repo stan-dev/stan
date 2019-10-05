@@ -9,9 +9,8 @@
 
 namespace stan {
 namespace math {
-namespace services {
-namespace experimental {
-namespace advi {
+namespace analyze {
+namespace misc {
 
   template <typename T_x>
   int lx(std::vector<T_x>& a, const Eigen::Matrix<T_x, -1, 1>& x) {
@@ -113,9 +112,9 @@ namespace advi {
 
     return 0;
   }
-}  // namespace advi
-}  // namespace experimental
-}  // namespace services
+
+}  // namespace misc
+}  // namespace analyze
 }  // namespace math
 }  // namespace stan
 #endif
