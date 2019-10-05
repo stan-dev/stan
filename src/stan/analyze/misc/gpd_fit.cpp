@@ -1,9 +1,8 @@
-#ifndef STAN_SERVICES_GPD_FIT_HPP
-#define STAN_SERVICES_GPD_FIT_HPP
+#ifndef STAN_ANALYZE_MISC_GPD_FIT_HPP
+#define STAN_ANALYZE_MISC_GPD_FIT_HPP
 
 #include <stan/math/prim/mat/fun/mean.hpp>
 #include <stan/math/rev/scal/fun/exp.hpp>
-#include <stan/services/gpd_fit.hpp>
 #include <Eigen/Dense>
 #include <type_traits>
 #include <vector>
