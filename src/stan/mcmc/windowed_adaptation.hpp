@@ -11,14 +11,26 @@ namespace mcmc {
 
 class windowed_adaptation : public base_adaptation {
  public:
-  explicit windowed_adaptation(std::string name) : estimator_name_(name) {}
+  template <typename T>
+  using require_string_convertible =
+   std::enable_if_t<std::is_convertible<std::decay_t<T>, std::string>::value>;
+
+  template <typename T, require_string_convertible<T>...>
+  explicit windowed_adaptation(T&& name) : estimator_name_(std::forward<T>(name)) {}
 
   inline void restart() {
     adapt_window_counter_ = 0;
     adapt_window_size_ = adapt_base_window_;
-    adapt_next_window_ = adapt_init_buffer_ + adapt_window_size_ - 1;
+    if ((adapt_init_buffer_ + adapt_window_size_) == 0) {
+      adapt_next_window_ = num_warmup_;
+    } else {
+      adapt_next_window_ = adapt_init_buffer_ + adapt_window_size_ - 1;
+    }
   }
 
+  /**
+   * Set the number of window parameters
+   */
   inline void set_window_params(unsigned int num_warmup,
                                 unsigned int init_buffer,
                                 unsigned int term_buffer,
@@ -86,14 +98,12 @@ class windowed_adaptation : public base_adaptation {
   inline void compute_next_window() {
     if (adapt_next_window_ == num_warmup_ - adapt_term_buffer_ - 1)
       return;
-
     adapt_window_size_ *= 2;
     adapt_next_window_ = adapt_window_counter_ + adapt_window_size_;
-
     if (adapt_next_window_ == num_warmup_ - adapt_term_buffer_ - 1)
       return;
 
-    // Bounday of the following window, not the window just computed
+    // Boundary of the following window, not the window just computed
     unsigned int next_window_boundary
         = adapt_next_window_ + 2 * adapt_window_size_;
 
@@ -107,12 +117,12 @@ class windowed_adaptation : public base_adaptation {
  protected:
   std::string estimator_name_;
 
-  unsigned int num_warmup_{0};
+  unsigned int num_warmup_{1};
   unsigned int adapt_init_buffer_{0};
   unsigned int adapt_term_buffer_{0};
   unsigned int adapt_base_window_{0};
 
-  int adapt_window_counter_{-1};
+  unsigned int adapt_window_counter_{0};
   unsigned int adapt_next_window_{0};
   unsigned int adapt_window_size_{0};
 };

@@ -13,6 +13,16 @@ TEST(McmcWindowedAdaptation, set_window_params1) {
   EXPECT_EQ(1, logger.find_info("performed for num_warmup < 20"));
 }
 
+// If you don't set the values, there should be no windows to roll through
+TEST(MmcmcWindowedAdaption, adaption_window_unset) {
+  stan::mcmc::windowed_adaptation adapter("test");
+  EXPECT_TRUE((adapter.adaptation_window()));
+  EXPECT_TRUE((adapter.end_adaptation_window()));
+  adapter.compute_next_window();
+  EXPECT_TRUE((adapter.adaptation_window()));
+  EXPECT_TRUE((adapter.end_adaptation_window()));
+}
+
 TEST(McmcWindowedAdaptation, set_window_params2) {
   stan::test::unit::instrumented_logger logger;
 
