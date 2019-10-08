@@ -16,7 +16,8 @@ class windowed_adaptation : public base_adaptation {
    std::enable_if_t<std::is_convertible<std::decay_t<T>, std::string>::value>;
 
   template <typename T, require_string_convertible<T>...>
-  explicit windowed_adaptation(T&& name) : estimator_name_(std::forward<T>(name)) {}
+  explicit windowed_adaptation(T&& name) :
+    estimator_name_(std::forward<T>(name)) {}
 
   inline void restart() {
     adapt_window_counter_ = 0;
