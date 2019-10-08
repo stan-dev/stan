@@ -5,6 +5,7 @@
 #include <stan/mcmc/base_adaptation.hpp>
 #include <ostream>
 #include <string>
+#include <climits>
 
 namespace stan {
 namespace mcmc {
@@ -118,13 +119,14 @@ class windowed_adaptation : public base_adaptation {
  protected:
   std::string estimator_name_;
 
-  unsigned int num_warmup_{1};
+  unsigned int num_warmup_{0};
   unsigned int adapt_init_buffer_{0};
   unsigned int adapt_term_buffer_{0};
   unsigned int adapt_base_window_{0};
 
   unsigned int adapt_window_counter_{0};
-  unsigned int adapt_next_window_{0};
+  // the first iteration after initilization will roll this value over
+  unsigned int adapt_next_window_{UINT_MAX};
   unsigned int adapt_window_size_{0};
 };
 
