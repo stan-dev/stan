@@ -11,7 +11,7 @@ test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LI
 ifeq ($(OS),Windows_NT)
 ifneq ($(notdir $(shell where tbb.dll)),tbb.dll)
 	@echo 'Intel TBB is not in PATH.'
-        cp -v $(TBB_TARGETS) $(@D)
+	cp -v $(TBB_TARGETS) $(@D)
 endif
 endif
 
