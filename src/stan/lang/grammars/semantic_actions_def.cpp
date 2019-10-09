@@ -1864,8 +1864,9 @@ void set_fun_type_named::operator()(expression &fun_result, fun &fun,
       || deprecate_suffix("_cdf_log", "'_lcdf'", fun, error_msgs)
       || deprecate_suffix("_ccdf_log", "'_lccdf'", fun, error_msgs)
       || deprecate_suffix(
-          "_log", "'_lpdf' for density functions or '_lpmf' for mass functions",
-          fun, error_msgs);
+             "_log",
+             "'_lpdf' for density functions or '_lpmf' for mass functions", fun,
+             error_msgs);
 
   // use old function names for built-in prob funs
   if (!function_signatures::instance().has_user_defined_key(fun.name_)) {
