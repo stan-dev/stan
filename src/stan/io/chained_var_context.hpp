@@ -16,10 +16,15 @@ class chained_var_context : public var_context {
  private:
   const var_context& vc1_;
   const var_context& vc2_;
+  template <typename T>
+  using require_var_context_t
+      = require_t<bool_constant<is_same<var_context, std::decay_t<T>>>>;
 
  public:
-  chained_var_context(const var_context& v1, const var_context& v2)
-      : vc1_(v1), vc2_(v2) {}
+  template <typename VarContext, require_var_context_t<VarContext>...>
+  chained_var_context(VarContext&& v1, VarContext&& v2)
+      : vc1_(std::forward<VarContext>(v1)),
+        vc2_(std::forward<VarContext>(v2)) {}
 
   bool contains_i(const std::string& name) const {
     return vc1_.contains_i(name) || vc2_.contains_i(name);

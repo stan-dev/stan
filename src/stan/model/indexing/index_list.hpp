@@ -1,7 +1,10 @@
 #ifndef STAN_MODEL_INDEXING_INDEX_LIST_HPP
 #define STAN_MODEL_INDEXING_INDEX_LIST_HPP
 
+#include <stan/model/indexing/index.hpp>
+
 namespace stan {
+
 namespace model {
 
 /**
@@ -34,29 +37,43 @@ struct cons_index_list {
 
 // factory-like function does type inference for I and T
 template <typename I, typename T>
-inline cons_index_list<I, T> cons_list(const I& idx1, const T& t) {
+inline auto cons_list(const I& idx1, const T& t) {
   return cons_index_list<I, T>(idx1, t);
 }
 
-inline nil_index_list index_list() { return nil_index_list(); }
+inline auto index_list() { return nil_index_list(); }
 
 template <typename I>
-inline cons_index_list<I, nil_index_list> index_list(const I& idx) {
+inline auto index_list(const I& idx) {
   return cons_list(idx, index_list());
 }
 
-template <typename I1, typename I2>
-inline cons_index_list<I1, cons_index_list<I2, nil_index_list> > index_list(
-    const I1& idx1, const I2& idx2) {
-  return cons_list(idx1, index_list(idx2));
+template <typename I1, typename... Idx2>
+inline auto index_list(const I1& idx1, const Idx2&... idx2) {
+  return cons_list(idx1, index_list(idx2...));
 }
 
-template <typename I1, typename I2, typename I3>
-inline cons_index_list<
-    I1, cons_index_list<I2, cons_index_list<I3, nil_index_list> > >
-index_list(const I1& idx1, const I2& idx2, const I3& idx3) {
-  return cons_list(idx1, index_list(idx2, idx3));
-}
+template <typename I, typename L>
+using generic_index = cons_index_list<I, L>;
+
+using single_index = cons_index_list<index_uni, nil_index_list>;
+
+template <typename I>
+using multiple_index = cons_index_list<I, nil_index_list>;
+
+template <typename I1, typename I2>
+using variadic_multiple_index = cons_index_list<I1, multiple_index<I2>>;
+
+template <typename I>
+using variadic_single_index = cons_index_list<I, single_index>;
+
+using uni_single_index = cons_index_list<index_uni, single_index>;
+
+template <typename L>
+using uni_variadic_index = cons_index_list<index_uni, L>;
+
+template <typename L>
+using uni_multiple_index = cons_index_list<index_uni, multiple_index<L>>;
 
 }  // namespace model
 }  // namespace stan

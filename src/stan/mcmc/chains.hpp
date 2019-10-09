@@ -174,7 +174,7 @@ class chains {
   static Eigen::VectorXd autocorrelation(const Eigen::VectorXd& x) {
     using stan::math::index_type;
     using std::vector;
-    typedef typename index_type<vector<double> >::type idx_t;
+    typedef typename index_type<vector<double>>::type idx_t;
 
     std::vector<double> ac;
     std::vector<double> sample(x.size());
@@ -191,7 +191,7 @@ class chains {
   static Eigen::VectorXd autocovariance(const Eigen::VectorXd& x) {
     using stan::math::index_type;
     using std::vector;
-    typedef typename index_type<vector<double> >::type idx_t;
+    typedef typename index_type<vector<double>>::type idx_t;
 
     std::vector<double> ac;
     std::vector<double> sample(x.size());

@@ -28,7 +28,7 @@ typedef Eigen::RowVectorXd rowvec;
 typedef std::vector<rowvec> rowvecs;
 typedef std::vector<rowvecs> rowvecss;
 
-typedef cons_index_list<index_uni, nil_index_list> uni;
+typedef single_index uni;
 typedef cons_index_list<index_multi, nil_index_list> multi;
 
 typedef cons_index_list<index_uni, uni> uni_uni;

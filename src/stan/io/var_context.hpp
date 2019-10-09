@@ -1,6 +1,7 @@
 #ifndef STAN_IO_VAR_CONTEXT_HPP
 #define STAN_IO_VAR_CONTEXT_HPP
 
+#include <stan/math.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -27,6 +28,13 @@ namespace io {
  * accessed through the floating-point methods.
  */
 class var_context {
+  template <typename T>
+  using is_string_convertible = std::is_convertible<T, std::string>;
+  // TODO: Add this to stan math
+  template <typename T>
+  using is_index = bool_constant<!std::is_floating_point<T>::value
+                                 && std::is_arithmetic<T>::value>;
+
  public:
   virtual ~var_context() {}
 

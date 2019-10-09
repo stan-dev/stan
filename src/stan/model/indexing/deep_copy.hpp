@@ -1,10 +1,20 @@
 #ifndef STAN_MODEL_INDEXING_DEEP_COPY_HPP
 #define STAN_MODEL_INDEXING_DEEP_COPY_HPP
 
+#include <stan/math/prim/meta.hpp>
 #include <Eigen/Dense>
 #include <vector>
 
 namespace stan {
+
+// TODO(Steve): Put these is Stan math
+template <typename Container>
+using require_not_container_t = require_not_t<
+    math::disjunction<is_eigen<Container>, is_std_vector<Container>>>;
+
+template <typename Container>
+using require_container_t = require_t<
+    math::disjunction<is_eigen<Container>, is_std_vector<Container>>>;
 
 namespace model {
 
@@ -20,9 +30,9 @@ namespace model {
  * @param x Input value.
  * @return Constant reference to input.
  */
-template <typename T>
-inline const T& deep_copy(const T& x) {
-  return x;
+template <typename Container, typename = require_not_container_t<Container>>
+inline const Container& deep_copy(Container&& x) {
+  return std::forward<Container>(x);
 }
 
 /**
@@ -39,27 +49,9 @@ inline const T& deep_copy(const T& x) {
  * @param a Input matrix, vector, or row vector.
  * @return Deep copy of input.
  */
-template <typename T, int R, int C>
-inline Eigen::Matrix<T, R, C> deep_copy(const Eigen::Matrix<T, R, C>& a) {
-  Eigen::Matrix<T, R, C> result(a);
-  return result;
-}
-
-/**
- * Return a deep copy of the specified standard vector.  The
- * return value is a copy in the sense that modifying its contents
- * will not affect the original vector.
- *
- * <p>Warning:  This function assumes that the elements of the
- * vector deep copy under assignment.
- *
- * @tparam T Scalar type.
- * @param v Input vector.
- * @return Deep copy of input.
- */
-template <typename T>
-inline std::vector<T> deep_copy(const std::vector<T>& v) {
-  std::vector<T> result(v);
+template <typename Container, typename = require_container_t<Container>>
+inline Container deep_copy(Container&& a) {
+  Container result(std::forward<Container>(a));
   return result;
 }
 

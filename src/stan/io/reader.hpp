@@ -39,6 +39,9 @@ class reader {
   std::vector<int> &data_i_;
   size_t pos_{0};
   size_t int_pos_{0};
+  template <typename K>
+  using is_index = bool_constant<!std::is_floating_point<K>::value
+                                 && std::is_arithmetic<K>::value>;
 
   inline T &scalar_ptr() { return data_r_[pos_]; }
 
@@ -53,6 +56,8 @@ class reader {
     int_pos_ += m;
     return data_i_[int_pos_ - m];
   }
+  template <typename Other>
+  using is_same_class_type = std::is_same<std::decay_t<T>, std::decay_t<Other>>;
 
  public:
   typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
@@ -74,8 +79,12 @@ class reader {
    * @param data_r Sequence of scalar values.
    * @param data_i Sequence of integer values.
    */
-  reader(std::vector<T> &data_r, std::vector<int> &data_i)
-      : data_r_(data_r), data_i_(data_i) {}
+  template <typename ScalarVec, typename IntVec,
+            require_vector_vt<is_same_class_type, ScalarVec>...,
+            require_vector_vt<is_index, IntVec>...>
+  reader(ScalarVec &&data_r, IntVec &&data_i)
+      : data_r_(std::forward<ScalarVec>(data_r)),
+        data_i_(std::forward<IntVec>(data_i)) {}
 
   /**
    * Destroy this variable reader.

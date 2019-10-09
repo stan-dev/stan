@@ -7,6 +7,10 @@
 
 namespace stan {
 namespace model {
+  // TODO(Steve): Move this to stan math.
+  template <typename K>
+  using is_index = bool_constant<!std::is_floating_point<K>::value
+                                 && std::is_arithmetic<K>::value>;
 
 /**
  * Compute the gradient using reverse-mode automatic
@@ -25,19 +29,16 @@ namespace model {
  * @param[out] gradient Vector into which gradient is written.
  * @param[in,out] msgs
  */
-template <bool propto, bool jacobian_adjust_transform, class M>
-double log_prob_grad(const M& model, std::vector<double>& params_r,
-                     std::vector<int>& params_i, std::vector<double>& gradient,
-                     std::ostream* msgs = 0) {
+template <bool propto, bool jacobian_adjust_transform, class M, typename VecR, typename VecI, typename VecGrad,
+require_std_vector_vt<std::is_floating_point, VecR>...,
+require_std_vector_vt<is_index, VecI>...,
+require_std_vector_vt<std::is_floating_point, VecGrad>...>
+double log_prob_grad(const M& model, VecR&& params_r, VecI&& params_i, VecGrad&& gradient, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
   double lp;
   try {
-    vector<var> ad_params_r(params_r.size());
-    for (size_t i = 0; i < model.num_params_r(); ++i) {
-      stan::math::var var_i(params_r[i]);
-      ad_params_r[i] = var_i;
-    }
+    vector<var> ad_params_r(params_r.begin(), params_r.end());
     var adLogProb = model.template log_prob<propto, jacobian_adjust_transform>(
         ad_params_r, params_i, msgs);
     lp = adLogProb.val();
@@ -46,7 +47,6 @@ double log_prob_grad(const M& model, std::vector<double>& params_r,
     stan::math::recover_memory();
     throw;
   }
-  stan::math::recover_memory();
   return lp;
 }
 
@@ -66,17 +66,15 @@ double log_prob_grad(const M& model, std::vector<double>& params_r,
  * @param[out] gradient Vector into which gradient is written.
  * @param[in,out] msgs
  */
-template <bool propto, bool jacobian_adjust_transform, class M>
-double log_prob_grad(const M& model, Eigen::VectorXd& params_r,
-                     Eigen::VectorXd& gradient, std::ostream* msgs = 0) {
+template <bool propto, bool jacobian_adjust_transform, class M, typename VecR, typename VecGrad,
+require_eigen_vector_vt<std::is_arithmetic, VecR>...,
+require_eigen_vector_vt<std::is_arithmetic, VecGrad>...>
+double log_prob_grad(const M& model, VecR&& params_r,
+                     VecGrad&& gradient, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
 
-  Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r(params_r.size());
-  for (size_t i = 0; i < model.num_params_r(); ++i) {
-    stan::math::var var_i(params_r[i]);
-    ad_params_r[i] = var_i;
-  }
+  auto ad_params_r = params_r.template cast<var>().eval();
   try {
     var adLogProb = model.template log_prob<propto, jacobian_adjust_transform>(
         ad_params_r, msgs);

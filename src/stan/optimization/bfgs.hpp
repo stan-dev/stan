@@ -309,7 +309,7 @@ class ModelAdaptor {
     using Eigen::Matrix;
     using stan::math::index_type;
     using stan::model::log_prob_propto;
-    typedef typename index_type<Matrix<double, Dynamic, 1> >::type idx_t;
+    typedef typename index_type<Matrix<double, Dynamic, 1>>::type idx_t;
 
     _x.resize(x.size());
     for (idx_t i = 0; i < x.size(); i++)
@@ -339,7 +339,7 @@ class ModelAdaptor {
     using Eigen::Matrix;
     using stan::math::index_type;
     using stan::model::log_prob_grad;
-    typedef typename index_type<Matrix<double, Dynamic, 1> >::type idx_t;
+    typedef typename index_type<Matrix<double, Dynamic, 1>>::type idx_t;
 
     _x.resize(x.size());
     for (idx_t i = 0; i < x.size(); i++)

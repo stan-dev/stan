@@ -36,14 +36,14 @@ class array_var_context : public var_context {
   const std::vector<double> empty_vec_r_;
   const std::vector<int> empty_vec_i_;
   const std::vector<size_t> empty_vec_ui_;
-
   /**
    * Search over the real variables to check if a name is in the map
    * @param name The name of the variable to search for
    * @return logical indiciating if the variable was found in the map of reals.
    */
-  bool contains_r_only(const std::string& name) const {
-    return vars_r_.find(name) != vars_r_.end();
+  template <typename T, require_convertible_t<T, std::string>...>
+  bool contains_r_only(T&& name) const {
+    return vars_r_.find(std::forward<T>(name)) != vars_r_.end();
   }
 
   /**
@@ -63,17 +63,20 @@ class array_var_context : public var_context {
    *  then array size or array is not long enough to hold
    *  the dimensions of the data.
    */
-  template <typename T>
-  inline std::vector<size_t> validate_dims(
-      const std::vector<std::string>& names, const T array_size,
-      const std::vector<std::vector<size_t>>& dims) {
+  template <typename NameVec, typename ArrSize, typename DimVec,
+            require_vector_vt<is_string_convertible, NameVec>...,
+            require_arithmetic_t<ArrSize>...,
+            require_vector_vt<is_vector, DimVec>...,
+            require_vector_st<is_index, DimVec>...>
+  inline auto validate_dims(NameVec&& names, const ArrSize array_size,
+                            DimVec&& dims) {
     const size_t num_par = names.size();
     stan::math::check_less_or_equal("validate_dims", "array_var_context",
                                     dims.size(), num_par);
     std::vector<size_t> elem_dims_total(dims.size() + 1);
     for (int i = 0; i < dims.size(); i++) {
       elem_dims_total[i + 1] = std::accumulate(dims[i].begin(), dims[i].end(),
-                                               1, std::multiplies<T>())
+                                               1, std::multiplies<ArrSize>())
                                + elem_dims_total[i];
     }
     stan::math::check_less_or_equal("validate_dims", "array_var_context",
@@ -82,50 +85,10 @@ class array_var_context : public var_context {
   }
 
   /**
-   * Adds a set of floating point variables to the floating point map.
-   * @param names Names of each variable.
-   * @param values The real values of variable in a contiguous
-   * column major order container.
-   * @param dims the dimensions for each variable.
-   * @throw std::invalid_argument when size of dimensions is less
-   *  then array size or array is not long enough to hold
-   *  the dimensions of the data.
-   */
-  void add_r(const std::vector<std::string>& names,
-             const std::vector<double>& values,
-             const std::vector<std::vector<size_t>>& dims) {
-    std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
-    for (size_t i = 0; i < names.size(); i++) {
-      vars_r_.emplace(names[i],
-                      data_pair_t<double>{{values.data() + dim_vec[i],
-                                           values.data() + dim_vec[i + 1]},
-                                          dims[i]});
-    }
-  }
-
-  /**
-   * Adds a set of floating point variables to the floating point map.
-   * @param names Names of each variable.
-   * @param values The real values of variable in an Eigen column vector.
-   * @param dims the dimensions for each variable.
-   * @throw std::invalid_argument when size of dimensions is less
-   *  then array size or array is not long enough to hold
-   *  the dimensions of the data.
-   */
-  void add_r(const std::vector<std::string>& names,
-             const Eigen::VectorXd& values,
-             const std::vector<std::vector<size_t>>& dims) {
-    std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
-    for (size_t i = 0; i < names.size(); i++) {
-      vars_r_.emplace(names[i],
-                      data_pair_t<double>{{values.data() + dim_vec[i],
-                                           values.data() + dim_vec[i + 1]},
-                                          dims[i]});
-    }
-  }
-
-  /**
    * Adds a set of integer variables to the integer map.
+   * @tparam NameVec Vector holding strings of names
+   * @tparam ValueVec Vector holding the numeric values of the variable
+   * @tparam DimVec Vector holding dimensions of variables
    * @param names Names of each variable.
    * @param values The integer values of variable in a vector.
    * @param dims the dimensions for each variable.
@@ -133,22 +96,40 @@ class array_var_context : public var_context {
    *  then array size or array is not long enough to hold
    *  the dimensions of the data.
    */
-  void add_i(const std::vector<std::string>& names,
-             const std::vector<int>& values,
-             const std::vector<std::vector<size_t>>& dims) {
-    std::vector<size_t> dim_vec = validate_dims(names, values.size(), dims);
+  template <typename NameVec, typename ValueVec, typename DimVec,
+            require_vector_vt<is_string_convertible, NameVec>...,
+            require_vector_vt<std::is_arithmetic, ValueVec>...,
+            require_vector_vt<is_vector, DimVec>...,
+            require_vector_st<is_index, DimVec>...>
+  void add_vals(NameVec&& names, ValueVec&& values, DimVec&& dims) {
+    auto dim_vec = validate_dims(names, values.size(), dims);
     for (size_t i = 0; i < names.size(); i++) {
-      vars_i_.emplace(names[i],
-                      data_pair_t<int>{{values.data() + dim_vec[i],
-                                        values.data() + dim_vec[i + 1]},
-                                       dims[i]});
+      if (std::is_floating_point<value_type_t<ValueVec>>::value) {
+        vars_r_.emplace(std::piecewise_construct,
+                        std::forward_as_tuple(
+                            std::forward<value_type_t<NameVec>>(names[i])),
+                        std::forward_as_tuple(
+                            std::vector<double>(values.data() + dim_vec[i],
+                                                values.data() + dim_vec[i + 1]),
+                            dims[i]));
+      } else {
+        vars_i_.emplace(std::piecewise_construct,
+                        std::forward_as_tuple(
+                            std::forward<value_type_t<NameVec>>(names[i])),
+                        std::forward_as_tuple(
+                            std::vector<int>(values.data() + dim_vec[i],
+                                             values.data() + dim_vec[i + 1]),
+                            dims[i]));
+      }
     }
   }
 
  public:
   /**
    * Construct an array_var_context from only real value arrays.
-   *
+   * @tparam NameVec Vector holding strings of names
+   * @tparam ValueVec Vector holding the numeric values of the variable
+   * @tparam DimVec Vector holding dimensions of variables
    * @param names_r  names for each element
    * @param values_r a vector of double values for all elements
    * @param dim_r   a vector of dimensions
@@ -156,48 +137,24 @@ class array_var_context : public var_context {
    *  then array size or array is not long enough to hold
    *  the dimensions of the data.
    */
-  array_var_context(const std::vector<std::string>& names_r,
-                    const std::vector<double>& values_r,
-                    const std::vector<std::vector<size_t>>& dim_r) {
-    add_r(names_r, values_r, dim_r);
-  }
-
-  /**
-   * Construct an array_var_context from an Eigen column vector.
-   *
-   * @param names_r  names for each element
-   * @param values_r a vector of double values for all elements
-   * @param dim_r   a vector of dimensions
-   * @throw std::invalid_argument when size of dimensions is less
-   *  then array size or array is not long enough to hold
-   *  the dimensions of the data.
-   */
-  array_var_context(const std::vector<std::string>& names_r,
-                    const Eigen::VectorXd& values_r,
-                    const std::vector<std::vector<size_t>>& dim_r) {
-    add_r(names_r, values_r, dim_r);
-  }
-
-  /**
-   * Construct an array_var_context from only integer value arrays.
-   *
-   * @param names_i  names for each element
-   * @param values_i a vector of integer values for all elements
-   * @param dim_i   a vector of dimensions
-   * @throw std::invalid_argument when size of dimensions is less
-   *  then array size or array is not long enough to hold
-   *  the dimensions of the data.
-   */
-  array_var_context(const std::vector<std::string>& names_i,
-                    const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t>>& dim_i) {
-    add_i(names_i, values_i, dim_i);
+  template <typename NameVec, typename ValueVec, typename DimVec,
+            require_vector_vt<is_string_convertible, NameVec>...,
+            require_vector_vt<std::is_arithmetic, ValueVec>...,
+            require_vector_vt<is_vector, DimVec>...,
+            require_vector_st<is_index, DimVec>...>
+  array_var_context(NameVec&& names, ValueVec&& values, DimVec&& dims) {
+    add_vals(std::forward<NameVec>(names), std::forward<ValueVec>(values),
+             std::forward<DimVec>(dims));
   }
 
   /**
    * Construct an array_var_context from arrays of both double
    * and integer separately
-   *
+   * @tparam NameVec Vector holding strings of names
+   * @tparam FloatingVec Vector holding the floating point values of the
+   * variable
+   * @tparam IntVec Vector holding the integer values of the variable
+   * @tparam DimVec Vector holding dimensions of variables
    * @param names_r  names for each element
    * @param values_r a vector of double values for all elements
    * @param dim_r   a vector of dimensions
@@ -208,38 +165,19 @@ class array_var_context : public var_context {
    *  then array size or array is not long enough to hold
    *  the dimensions of the data.
    */
-  array_var_context(const std::vector<std::string>& names_r,
-                    const std::vector<double>& values_r,
-                    const std::vector<std::vector<size_t>>& dim_r,
-                    const std::vector<std::string>& names_i,
-                    const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t>>& dim_i) {
-    add_i(names_i, values_i, dim_i);
-    add_r(names_r, values_r, dim_r);
-  }
-
-  /**
-   * Construct an array_var_context from arrays of both double
-   * and integer separately
-   *
-   * @param names_r  names for each element
-   * @param values_r Eigen column vector of double elements.
-   * @param dim_r   a vector of dimensions
-   * @param names_i  names for each element
-   * @param values_i a vector of integer values for all elements
-   * @param dim_i   a vector of dimensions
-   * @throw std::invalid_argument when size of dimensions is less
-   *  then array size or array is not long enough to hold
-   *  the dimensions of the data.
-   */
-  array_var_context(const std::vector<std::string>& names_r,
-                    const Eigen::VectorXd& values_r,
-                    const std::vector<std::vector<size_t>>& dim_r,
-                    const std::vector<std::string>& names_i,
-                    const std::vector<int>& values_i,
-                    const std::vector<std::vector<size_t>>& dim_i) {
-    add_i(names_i, values_i, dim_i);
-    add_r(names_r, values_r, dim_r);
+  template <typename NameVec, typename FloatingVec, typename IntVec,
+            typename DimVec,
+            require_vector_vt<is_string_convertible, NameVec>...,
+            require_vector_vt<std::is_floating_point, FloatingVec>...,
+            require_vector_vt<is_index, IntVec>...,
+            require_vector_vt<is_vector, DimVec>...,
+            require_vector_st<is_index, DimVec>...>
+  array_var_context(NameVec&& names_r, FloatingVec&& values_r, DimVec&& dim_r,
+                    NameVec&& names_i, IntVec&& values_i, DimVec&& dim_i) {
+    add_vals(std::forward<NameVec>(names_r),
+             std::forward<FloatingVec>(values_r), std::forward<DimVec>(dim_r));
+    add_vals(std::forward<NameVec>(names_i), std::forward<IntVec>(values_i),
+             std::forward<DimVec>(dim_i));
   }
 
   /**

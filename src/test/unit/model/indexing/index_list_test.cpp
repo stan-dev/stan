@@ -14,7 +14,7 @@ TEST(MathIndexingIndexList, cons_index_list) {
 
   index_uni idx_u(7);
 
-  cons_index_list<index_uni, nil_index_list> cil(idx_u, empty);
+  single_index cil(idx_u, empty);
   EXPECT_EQ(index_uni(7).n_, cil.head_.n_);
 
   std::vector<int> ns;
@@ -22,7 +22,7 @@ TEST(MathIndexingIndexList, cons_index_list) {
   ns.push_back(17);
   index_multi idx_m(ns);
 
-  cons_index_list<index_multi, cons_index_list<index_uni, nil_index_list> >
+  cons_index_list<index_multi, single_index >
       cil2(idx_m, cil);
   EXPECT_EQ(2, cil2.head_.ns_.size());
   EXPECT_EQ(17, cil2.head_.ns_[1]);
