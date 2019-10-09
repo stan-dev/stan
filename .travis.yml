@@ -8,7 +8,7 @@ before_script:
   - ${CXX} --version
   - echo "CXX=$CXX" > make/local
   - echo "CXXFLAGS_OS+=$CXXFLAGS_OS" >> make/local
-  - echo "CXXFLAGS= -std=c++14"
+  - echo "CXXFLAGS= -std=c++1y" >> make/local
   - if [[ ! -z "$DEPFLAGS_OS" ]]; then echo "DEPFLAGS_OS=$DEPFLAGS_OS" >> make/local; fi
   - cat make/local
 
