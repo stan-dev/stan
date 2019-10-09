@@ -132,49 +132,41 @@ term_grammar<Iterator>::term_grammar(variable_map& var_map,
   using boost::phoenix::end;
 
   term_r.name("expression");
-  term_r
-      = (negated_factor_r(_r1)[assign_lhs_f(_val, _1)]
-         >> *((lit('*') > negated_factor_r(_r1)[multiplication_f(
-                              _val, _1, boost::phoenix::ref(error_msgs_))])
-              | (lit('/') > negated_factor_r(_r1)[division_f(
-                                _val, _1, boost::phoenix::ref(error_msgs_))])
-              | (lit('%')
-                 > negated_factor_r(_r1)[modulus_f(
-                       _val, _1, _pass, boost::phoenix::ref(error_msgs_))])
-              | (lit('\\')
-                 > negated_factor_r(_r1)[left_division_f(
-                       _val, _pass, _1, boost::phoenix::ref(error_msgs_))])
-              | (lit(".*") > negated_factor_r(_r1)[elt_multiplication_f(
-                                 _val, _1, boost::phoenix::ref(error_msgs_))])
-              | (lit("./")
-                 > negated_factor_r(_r1)[elt_division_f(
-                       _val, _1, boost::phoenix::ref(error_msgs_))])));
+  term_r = (negated_factor_r(_r1)[assign_lhs_f(_val, _1)]
+            >> *((lit('*') > negated_factor_r(_r1)[multiplication_f(
+                      _val, _1, boost::phoenix::ref(error_msgs_))])
+                 | (lit('/') > negated_factor_r(_r1)[division_f(
+                        _val, _1, boost::phoenix::ref(error_msgs_))])
+                 | (lit('%') > negated_factor_r(_r1)[modulus_f(
+                        _val, _1, _pass, boost::phoenix::ref(error_msgs_))])
+                 | (lit('\\') > negated_factor_r(_r1)[left_division_f(
+                        _val, _pass, _1, boost::phoenix::ref(error_msgs_))])
+                 | (lit(".*") > negated_factor_r(_r1)[elt_multiplication_f(
+                        _val, _1, boost::phoenix::ref(error_msgs_))])
+                 | (lit("./") > negated_factor_r(_r1)[elt_division_f(
+                        _val, _1, boost::phoenix::ref(error_msgs_))])));
 
   negated_factor_r.name("expression");
-  negated_factor_r
-      = lit('-') >> negated_factor_r(_r1)[negate_expr_f(
-                        _val, _1, _pass, boost::phoenix::ref(error_msgs_))]
-        | lit('!') >> negated_factor_r(_r1)[logical_negate_expr_f(
-                          _val, _1, boost::phoenix::ref(error_msgs_))]
-        | lit('+') >> negated_factor_r(_r1)[assign_lhs_f(_val, _1)]
-        | exponentiated_factor_r(_r1)[assign_lhs_f(_val, _1)];
+  negated_factor_r = lit('-') >> negated_factor_r(_r1)[negate_expr_f(
+                         _val, _1, _pass, boost::phoenix::ref(error_msgs_))]
+                     | lit('!') >> negated_factor_r(_r1)[logical_negate_expr_f(
+                           _val, _1, boost::phoenix::ref(error_msgs_))]
+                     | lit('+') >> negated_factor_r(_r1)[assign_lhs_f(_val, _1)]
+                     | exponentiated_factor_r(_r1)[assign_lhs_f(_val, _1)];
 
   exponentiated_factor_r.name("expression");
   exponentiated_factor_r
       = idx_factor_r(_r1)[assign_lhs_f(_val, _1)]
-        >> -(lit('^')
-             > negated_factor_r(_r1)[exponentiation_f(
-                   _val, _1, _r1, _pass, boost::phoenix::ref(error_msgs_))]);
+        >> -(lit('^') > negated_factor_r(_r1)[exponentiation_f(
+                 _val, _1, _r1, _pass, boost::phoenix::ref(error_msgs_))]);
 
   idx_factor_r.name("expression");
   idx_factor_r
       = factor_r(_r1)[assign_lhs_f(_val, _1)]
-        > *(((+dims_r(_r1))[assign_lhs_f(_a, _1)]
-             > eps[add_expression_dimss_f(_val, _a, _pass,
-                                          boost::phoenix::ref(error_msgs_))])
-            | (indexes_g(_r1)[assign_lhs_f(_b, _1)]
-               > eps[add_idxs_f(_val, _b, _pass,
-                                boost::phoenix::ref(error_msgs_))])
+        > *(((+dims_r(_r1))[assign_lhs_f(_a, _1)] > eps[add_expression_dimss_f(
+                 _val, _a, _pass, boost::phoenix::ref(error_msgs_))])
+            | (indexes_g(_r1)[assign_lhs_f(_b, _1)] > eps[add_idxs_f(
+                   _val, _b, _pass, boost::phoenix::ref(error_msgs_))])
             | (lit("'") > eps[transpose_f(_val, _pass,
                                           boost::phoenix::ref(error_msgs_))]));
 
@@ -196,8 +188,8 @@ term_grammar<Iterator>::term_grammar(variable_map& var_map,
          >> lit(',')
          >> expression_g(_r1)  // 10) maximum number of steps (data only)
          > lit(')')[validate_integrate_ode_control_f(
-               _val, boost::phoenix::ref(var_map_), _pass,
-               boost::phoenix::ref(error_msgs_))];
+             _val, boost::phoenix::ref(var_map_), _pass,
+             boost::phoenix::ref(error_msgs_))];
 
   integrate_ode_r.name("expression");
   integrate_ode_r
@@ -206,7 +198,7 @@ term_grammar<Iterator>::term_grammar(variable_map& var_map,
           | (string("integrate_ode_adams") >> no_skip[!char_("a-zA-Z0-9_")])
           | (string("integrate_ode")
              >> no_skip[!char_("a-zA-Z0-9_")])[deprecated_integrate_ode_f(
-                boost::phoenix::ref(error_msgs_))])
+              boost::phoenix::ref(error_msgs_))])
          > lit('(') > identifier_r  // 1) system function name (function only)
          > lit(',') > expression_g(_r1)  // 2) y0
          > lit(',') > expression_g(_r1)  // 3) t0
@@ -215,8 +207,8 @@ term_grammar<Iterator>::term_grammar(variable_map& var_map,
          > lit(',') > expression_g(_r1)  // 6) x (data only)
          > lit(',') > expression_g(_r1)  // 7) x_int (data only)
          > lit(')')[validate_integrate_ode_f(
-               _val, boost::phoenix::ref(var_map_), _pass,
-               boost::phoenix::ref(error_msgs_))];
+             _val, boost::phoenix::ref(var_map_), _pass,
+             boost::phoenix::ref(error_msgs_))];
 
   algebra_solver_control_r.name("expression");
   algebra_solver_control_r
@@ -231,8 +223,8 @@ term_grammar<Iterator>::term_grammar(variable_map& var_map,
          >> lit(',')
          >> expression_g(_r1)  // 8) maximum number of steps (data only)
          > lit(')')[validate_algebra_solver_control_f(
-               _val, boost::phoenix::ref(var_map_), _pass,
-               boost::phoenix::ref(error_msgs_))];
+             _val, boost::phoenix::ref(var_map_), _pass,
+             boost::phoenix::ref(error_msgs_))];
 
   algebra_solver_r.name("expression");
   algebra_solver_r %= (lit("algebra_solver") >> no_skip[!char_("a-zA-Z0-9_")])
@@ -243,8 +235,8 @@ term_grammar<Iterator>::term_grammar(variable_map& var_map,
                       > lit(',') > expression_g(_r1)  // 4) x_r (data only)
                       > lit(',') > expression_g(_r1)  // 5) x_i (data only)
                       > lit(')')[validate_algebra_solver_f(
-                            _val, boost::phoenix::ref(var_map_), _pass,
-                            boost::phoenix::ref(error_msgs_))];
+                          _val, boost::phoenix::ref(var_map_), _pass,
+                          boost::phoenix::ref(error_msgs_))];
 
   map_rect_r.name("map_rect");
   map_rect_r
@@ -254,9 +246,9 @@ term_grammar<Iterator>::term_grammar(variable_map& var_map,
          > lit(',') > expression_g(_r1)  // 3) job-specific param vector
          > lit(',') > expression_g(_r1)  // 4) job-specific real data vector
          > lit(',') > expression_g(_r1)  // 4) job-specific integer data vector
-         > lit(')')[validate_map_rect_f(_val, boost::phoenix::ref(var_map_),
-                                        _pass,
-                                        boost::phoenix::ref(error_msgs_))];
+         > lit(
+             ')')[validate_map_rect_f(_val, boost::phoenix::ref(var_map_),
+                                      _pass, boost::phoenix::ref(error_msgs_))];
 
   integrate_1d_r.name("integrate_1d");
   integrate_1d_r
@@ -280,10 +272,9 @@ term_grammar<Iterator>::term_grammar(variable_map& var_map,
         | algebra_solver_control_r(_r1)[assign_lhs_f(_val, _1)]
         | algebra_solver_r(_r1)[assign_lhs_f(_val, _1)]
         | map_rect_r(_r1)[assign_lhs_f(_val, _1)]
-        | (fun_r(_r1)[assign_lhs_f(_b, _1)]
-           > eps[set_fun_type_named_f(_val, _b, _r1, _pass,
-                                      boost::phoenix::ref(var_map_),
-                                      boost::phoenix::ref(error_msgs_))])
+        | (fun_r(_r1)[assign_lhs_f(_b, _1)] > eps[set_fun_type_named_f(
+               _val, _b, _r1, _pass, boost::phoenix::ref(var_map_),
+               boost::phoenix::ref(error_msgs_))])
         | (variable_r[assign_lhs_f(_a, _1)]
            > eps[set_var_type_f(_a, _val, boost::phoenix::ref(var_map_),
                                 boost::phoenix::ref(error_msgs_), _pass)])
@@ -295,8 +286,8 @@ term_grammar<Iterator>::term_grammar(variable_map& var_map,
                                          boost::phoenix::ref(error_msgs_))])
         | (vec_expr_r(_r1)[assign_lhs_f(_d, _1)]
            > eps[infer_vec_or_matrix_expr_type_f(
-                 _val, _d, _r1, _pass, boost::phoenix::ref(var_map_),
-                 boost::phoenix::ref(error_msgs_))])
+               _val, _d, _r1, _pass, boost::phoenix::ref(var_map_),
+               boost::phoenix::ref(error_msgs_))])
         | (lit('(') > expression_g(_r1)[assign_lhs_f(_val, _1)] > lit(')'));
 
   str_double_literal_r.name("double literal");
