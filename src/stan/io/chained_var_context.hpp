@@ -4,6 +4,7 @@
 #include <stan/io/var_context.hpp>
 #include <string>
 #include <vector>
+#include <type_traits>
 
 namespace stan {
 namespace io {
@@ -18,7 +19,7 @@ class chained_var_context : public var_context {
   const var_context& vc2_;
   template <typename T>
   using require_var_context_t
-      = require_t<bool_constant<is_same<var_context, std::decay_t<T>>>>;
+      = require_t<std::is_base_of<var_context, std::decay_t<T>>>;
 
  public:
   template <typename VarContext, require_var_context_t<VarContext>...>

@@ -7,7 +7,6 @@ namespace stan {
 
 namespace model {
 
-// no error checking
 
 /**
  * Return size of specified multi-index.
@@ -16,7 +15,8 @@ namespace model {
  * @param[in] size Size of container (ignored here).
  * @return Size of result.
  */
-inline int rvalue_index_size(const index_multi& idx, int size) {
+template <typename Ind>
+inline int rvalue_index_size(const index_multi& idx, Ind size) {
   return idx.ns_.size();
 }
 
@@ -28,7 +28,8 @@ inline int rvalue_index_size(const index_multi& idx, int size) {
  * @param[in] size Size of container.
  * @return Size of result.
  */
-inline int rvalue_index_size(const index_omni& idx, int size) { return size; }
+template <typename Ind>
+inline int rvalue_index_size(const index_omni& idx, Ind size) { return size; }
 
 /**
  * Return size of specified min index for specified size of
@@ -38,7 +39,8 @@ inline int rvalue_index_size(const index_omni& idx, int size) { return size; }
  * @param[in] size Size of container.
  * @return Size of result.
  */
-inline int rvalue_index_size(const index_min& idx, int size) {
+template <typename Ind>
+inline int rvalue_index_size(const index_min& idx, Ind size) {
   return size - idx.min_ + 1;
 }
 
@@ -49,7 +51,8 @@ inline int rvalue_index_size(const index_min& idx, int size) {
  * @param[in] size Size of container (ignored).
  * @return Size of result.
  */
-inline int rvalue_index_size(const index_max& idx, int size) {
+template <typename Ind>
+inline int rvalue_index_size(const index_max& idx, Ind size) {
   return idx.max_;
 }
 
@@ -61,7 +64,8 @@ inline int rvalue_index_size(const index_max& idx, int size) {
  * @param[in] size Size of container (ignored).
  * @return Size of result.
  */
-inline int rvalue_index_size(const index_min_max& idx, int size) {
+template <typename Ind>
+inline int rvalue_index_size(const index_min_max& idx, Ind size) {
   return (idx.max_ < idx.min_) ? 0 : (idx.max_ - idx.min_ + 1);
 }
 

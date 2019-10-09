@@ -58,22 +58,23 @@ using generic_index = cons_index_list<I, L>;
 
 using single_index = cons_index_list<index_uni, nil_index_list>;
 
+using uni_single_index = cons_index_list<index_uni, single_index>;
+
 template <typename I>
 using multiple_index = cons_index_list<I, nil_index_list>;
-
-template <typename I1, typename I2>
-using variadic_multiple_index = cons_index_list<I1, multiple_index<I2>>;
-
-template <typename I>
-using variadic_single_index = cons_index_list<I, single_index>;
-
-using uni_single_index = cons_index_list<index_uni, single_index>;
 
 template <typename L>
 using uni_variadic_index = cons_index_list<index_uni, L>;
 
 template <typename L>
 using uni_multiple_index = cons_index_list<index_uni, multiple_index<L>>;
+
+template <typename I>
+using variadic_single_index = cons_index_list<I, single_index>;
+
+template <typename I1, typename I2>
+using variadic_multiple_index = cons_index_list<I1, multiple_index<I2>>;
+
 
 }  // namespace model
 }  // namespace stan
