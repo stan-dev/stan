@@ -7,7 +7,6 @@ namespace stan {
 
 namespace model {
 
-
 /**
  * Return size of specified multi-index.
  *
@@ -29,7 +28,9 @@ inline int rvalue_index_size(const index_multi& idx, Ind size) {
  * @return Size of result.
  */
 template <typename Ind>
-inline int rvalue_index_size(const index_omni& idx, Ind size) { return size; }
+inline int rvalue_index_size(const index_omni& idx, Ind size) {
+  return size;
+}
 
 /**
  * Return size of specified min index for specified size of

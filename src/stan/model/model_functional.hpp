@@ -20,7 +20,8 @@ struct model_functional {
   template <typename Vec, require_eigen_vector_t<Vec>...>
   auto operator()(Vec&& x) const {
     // log_prob() requires non-const but doesn't modify its argument
-    return model.template log_prob<true, true, scalar_type_t<Vec>>(const_cast<std::decay_t<Vec>&>(x), o);
+    return model.template log_prob<true, true, scalar_type_t<Vec>>(
+        const_cast<std::decay_t<Vec>&>(x), o);
   }
 };
 

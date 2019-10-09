@@ -96,7 +96,7 @@ class divergent_nuts : public base_nuts<mock_model, divergent_hamiltonian,
  public:
   divergent_nuts(const mock_model& m, rng_t& rng)
       : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog, rng_t>(
-            m, rng) {}
+          m, rng) {}
 };
 
 }  // namespace mcmc

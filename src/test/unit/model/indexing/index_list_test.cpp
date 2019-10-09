@@ -6,16 +6,16 @@
 using stan::model::cons_index_list;
 using stan::model::nil_index_list;
 
+using stan::model::generic_index;
 using stan::model::index_multi;
 using stan::model::index_uni;
-using stan::model::generic_index;
-using stan::model::single_index;
-using stan::model::uni_single_index;
 using stan::model::multiple_index;
-using stan::model::uni_variadic_index;
+using stan::model::single_index;
 using stan::model::uni_multiple_index;
-using stan::model::variadic_single_index;
+using stan::model::uni_single_index;
+using stan::model::uni_variadic_index;
 using stan::model::variadic_multiple_index;
+using stan::model::variadic_single_index;
 
 TEST(MathIndexingIndexList, cons_index_list) {
   nil_index_list empty;  // ()

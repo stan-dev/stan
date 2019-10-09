@@ -124,7 +124,7 @@ block_var_decls_grammar<Iterator>::block_var_decls_grammar(
   single_var_decl_r.name("single-element block var declaration");
   single_var_decl_r %= element_type_r(_r1) > identifier_r > opt_def_r(_r1)
                        > eps[validate_single_block_var_decl_f(
-                             _val, _pass, boost::phoenix::ref(error_msgs_))];
+                           _val, _pass, boost::phoenix::ref(error_msgs_))];
 
   element_type_r.name("block var element type declaration");
   element_type_r
@@ -245,13 +245,13 @@ block_var_decls_grammar<Iterator>::block_var_decls_grammar(
       = lit('<')[empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
         > (((lit("lower") > lit('=')
              > expression07_g(_r1)[set_int_range_lower_f(
-                   _val, _1, _pass, boost::phoenix::ref(error_msgs_))])
+                 _val, _1, _pass, boost::phoenix::ref(error_msgs_))])
             > -(lit(',') > lit("upper") > lit('=')
                 > expression07_g(_r1)[set_int_range_upper_f(
-                      _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
+                    _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
            | (lit("upper") > lit('=')
               > expression07_g(_r1)[set_int_range_upper_f(
-                    _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
+                  _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
         > lit('>');
 
   // _r1 var scope
@@ -260,13 +260,13 @@ block_var_decls_grammar<Iterator>::block_var_decls_grammar(
       = lit('<')[empty_range_f(_val, boost::phoenix::ref(error_msgs_))]
         >> (((lit("lower") > lit('=')
               > expression07_g(_r1)[set_double_range_lower_f(
-                    _val, _1, _pass, boost::phoenix::ref(error_msgs_))])
+                  _val, _1, _pass, boost::phoenix::ref(error_msgs_))])
              > -(lit(',') > lit("upper") > lit('=')
                  > expression07_g(_r1)[set_double_range_upper_f(
-                       _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
+                     _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
             | (lit("upper") > lit('=')
                > expression07_g(_r1)[set_double_range_upper_f(
-                     _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
+                   _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
         > lit('>');
 
   // _r1 var scope
@@ -281,13 +281,13 @@ block_var_decls_grammar<Iterator>::block_var_decls_grammar(
                                            boost::phoenix::ref(error_msgs_))]
         > (((lit("offset") > lit('=')
              > expression07_g(_r1)[set_double_offset_multiplier_offset_f(
-                   _val, _1, _pass, boost::phoenix::ref(error_msgs_))])
+                 _val, _1, _pass, boost::phoenix::ref(error_msgs_))])
             > -(lit(',') > lit("multiplier") > lit('=')
                 > expression07_g(_r1)[set_double_offset_multiplier_multiplier_f(
-                      _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
+                    _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
            | (lit("multiplier") > lit('=')
               > expression07_g(_r1)[set_double_offset_multiplier_multiplier_f(
-                    _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
+                  _val, _1, _pass, boost::phoenix::ref(error_msgs_))]))
         > lit('>');
 
   // _r1 var scope
