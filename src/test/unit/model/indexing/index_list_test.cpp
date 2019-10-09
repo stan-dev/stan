@@ -22,8 +22,7 @@ TEST(MathIndexingIndexList, cons_index_list) {
   ns.push_back(17);
   index_multi idx_m(ns);
 
-  cons_index_list<index_multi, single_index >
-      cil2(idx_m, cil);
+  cons_index_list<index_multi, single_index> cil2(idx_m, cil);
   EXPECT_EQ(2, cil2.head_.ns_.size());
   EXPECT_EQ(17, cil2.head_.ns_[1]);
   EXPECT_EQ(7, cil2.tail_.head_.n_);

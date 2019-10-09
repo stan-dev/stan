@@ -29,11 +29,12 @@ namespace model {
  */
 template <typename T>
 inline T& rvalue(T&& c, const nil_index_list& /*idx*/,
-                const char* /*name*/ = "", int /*depth*/ = 0) {
+                 const char* /*name*/ = "", int /*depth*/ = 0) {
   return std::forward<T>(c);
 }
 
-// TODO(Steve): Put this in math and fix row/col (and make one for not eigen vector)
+// TODO(Steve): Put this in math and fix row/col (and make one for not eigen
+// vector)
 template <typename T>
 using require_eigen_row_vector = require_t<is_eigen_row_vector<T>>;
 template <typename T>
@@ -52,8 +53,8 @@ using require_eigen_col_vector = require_t<is_eigen_col_vector<T>>;
  * @return Result of indexing vector.
  */
 template <typename Vec, require_eigen_vector_t<Vec>...>
-inline auto rvalue(Vec&& v, const single_index& idx,
-                const char* name = "ANON", int depth = 0) {
+inline auto rvalue(Vec&& v, const single_index& idx, const char* name = "ANON",
+                   int depth = 0) {
   int ones_idx = idx.head_.n_;
   if (is_eigen_row_vector<Vec>::value) {
     math::check_range("row_vector[single] indexing", name, v.size(), ones_idx);
@@ -77,8 +78,10 @@ inline auto rvalue(Vec&& v, const single_index& idx,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing vector.
  */
-template <typename Vec, typename I, require_eigen_vector_t<Vec>..., require_not_same_t<I, index_uni>...>
-inline auto rvalue(Vec&& v, const multiple_index<I>& idx, const char* name = "ANON", int depth = 0) {
+template <typename Vec, typename I, require_eigen_vector_t<Vec>...,
+          require_not_same_t<I, index_uni>...>
+inline auto rvalue(Vec&& v, const multiple_index<I>& idx,
+                   const char* name = "ANON", int depth = 0) {
   int size = rvalue_index_size(idx.head_, v.size());
   std::decay_t<decltype(v.eval())> a(size);
   for (int i = 0; i < size; ++i) {
@@ -93,7 +96,6 @@ inline auto rvalue(Vec&& v, const multiple_index<I>& idx, const char* name = "AN
   return a;
 }
 
-
 /**
  * Return the result of indexing the specified Eigen matrix with a
  * sequence consisting of one single index, returning a row vector.
@@ -107,8 +109,10 @@ inline auto rvalue(Vec&& v, const multiple_index<I>& idx, const char* name = "AN
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename Mat, require_eigen_t<Mat>..., require_not_eigen_vector_t<Mat>...>
-inline auto rvalue(Mat&& a, const single_index& idx, const char* name = "ANON", int depth = 0) {
+template <typename Mat, require_eigen_t<Mat>...,
+          require_not_eigen_vector_t<Mat>...>
+inline auto rvalue(Mat&& a, const single_index& idx, const char* name = "ANON",
+                   int depth = 0) {
   int n = idx.head_.n_;
   math::check_range("matrix[uni] indexing", name, a.rows(), n);
   return a.row(n - 1);
@@ -128,8 +132,11 @@ inline auto rvalue(Mat&& a, const single_index& idx, const char* name = "ANON", 
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename Mat, typename I, require_eigen_t<Mat>..., require_not_eigen_vector_t<Mat>..., require_not_same_t<I, index_uni>...>
-inline auto rvalue(Mat&& a, const multiple_index<I>& idx, const char* name = "ANON", int depth = 0) {
+template <typename Mat, typename I, require_eigen_t<Mat>...,
+          require_not_eigen_vector_t<Mat>...,
+          require_not_same_t<I, index_uni>...>
+inline auto rvalue(Mat&& a, const multiple_index<I>& idx,
+                   const char* name = "ANON", int depth = 0) {
   int n_rows = rvalue_index_size(idx.head_, a.rows());
   std::decay_t<Mat> b(n_rows, a.cols());
   for (int i = 0; i < n_rows; ++i) {
@@ -153,8 +160,10 @@ inline auto rvalue(Mat&& a, const multiple_index<I>& idx, const char* name = "AN
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename Mat, require_eigen_t<Mat>..., require_not_eigen_vector_t<Mat>...>
-inline auto rvalue(Mat&& a, const uni_single_index& idx, const char* name = "ANON", int depth = 0) {
+template <typename Mat, require_eigen_t<Mat>...,
+          require_not_eigen_vector_t<Mat>...>
+inline auto rvalue(Mat&& a, const uni_single_index& idx,
+                   const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   int n = idx.tail_.head_.n_;
   math::check_range("matrix[uni,uni] indexing, row", name, a.rows(), m);
@@ -178,11 +187,10 @@ inline auto rvalue(Mat&& a, const uni_single_index& idx, const char* name = "ANO
  * @return Result of indexing matrix.
  */
 template <typename T, typename I, require_not_same_t<I, index_uni>...>
-inline Eigen::Matrix<T, 1, Eigen::Dynamic>
-rvalue(
+inline Eigen::Matrix<T, 1, Eigen::Dynamic> rvalue(
     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-    const uni_multiple_index<I>& idx,
-    const char* name = "ANON", int depth = 0) {
+    const uni_multiple_index<I>& idx, const char* name = "ANON",
+    int depth = 0) {
   int m = idx.head_.n_;
   math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
   return rvalue(a.row(m - 1), idx.tail_);
@@ -204,11 +212,10 @@ rvalue(
  * @return Result of indexing matrix.
  */
 template <typename T, typename I, require_not_same_t<I, index_uni>...>
-inline Eigen::Matrix<T, Eigen::Dynamic, 1>
-rvalue(
+inline Eigen::Matrix<T, Eigen::Dynamic, 1> rvalue(
     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-    const variadic_single_index<I>& idx,
-    const char* name = "ANON", int depth = 0) {
+    const variadic_single_index<I>& idx, const char* name = "ANON",
+    int depth = 0) {
   int rows = rvalue_index_size(idx.head_, a.rows());
   Eigen::Matrix<T, Eigen::Dynamic, 1> c(rows);
   for (int i = 0; i < rows; ++i) {
@@ -236,11 +243,12 @@ rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename T, typename I1, typename I2, require_any_not_same_t<index_uni, I1, I2>...>
-inline Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
-rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-       const variadic_multiple_index<I1, I2>& idx,
-       const char* name = "ANON", int depth = 0) {
+template <typename T, typename I1, typename I2,
+          require_any_not_same_t<index_uni, I1, I2>...>
+inline Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> rvalue(
+    const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
+    const variadic_multiple_index<I1, I2>& idx, const char* name = "ANON",
+    int depth = 0) {
   int rows = rvalue_index_size(idx.head_, a.rows());
   int cols = rvalue_index_size(idx.tail_.head_, a.cols());
   Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> c(rows, cols);
@@ -274,7 +282,7 @@ rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
  */
 template <typename Vec, typename L, require_std_vector_t<Vec>...>
 inline auto rvalue(Vec&& c, const uni_variadic_index<L>& idx,
-           const char* name = "ANON", int depth = 0) {
+                   const char* name = "ANON", int depth = 0) {
   int n = idx.head_.n_;
   math::check_range("array[uni,...] index", name, c.size(), n);
   return rvalue(c[n - 1], idx.tail_, name, depth + 1);
@@ -298,7 +306,7 @@ inline auto rvalue(Vec&& c, const uni_variadic_index<L>& idx,
  */
 template <typename Vec, typename I, typename L, require_std_vector_t<Vec>...>
 inline auto rvalue(Vec&& c, const generic_index<I, L>& idx,
-       const char* name = "ANON", int depth = 0) {
+                   const char* name = "ANON", int depth = 0) {
   rvalue_return_t<std::decay_t<Vec>, generic_index<I, L>> result;
   for (int i = 0; i < rvalue_index_size(idx.head_, c.size()); ++i) {
     int n = rvalue_at(i, idx.head_);

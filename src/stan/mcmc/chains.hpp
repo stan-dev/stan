@@ -72,7 +72,7 @@ class chains {
     using boost::accumulators::tag::covariate1;
     using boost::accumulators::tag::variance;
 
-    accumulator_set<double, stats<covariance<double, covariate1> > > acc;
+    accumulator_set<double, stats<covariance<double, covariate1>>> acc;
 
     int M = std::min(x.size(), y.size());
     for (int i = 0; i < M; i++)
@@ -91,9 +91,9 @@ class chains {
     using boost::accumulators::tag::covariate1;
     using boost::accumulators::tag::variance;
 
-    accumulator_set<double, stats<variance, covariance<double, covariate1> > >
+    accumulator_set<double, stats<variance, covariance<double, covariate1>>>
         acc_xy;
-    accumulator_set<double, stats<variance> > acc_y;
+    accumulator_set<double, stats<variance>> acc_y;
 
     int M = std::min(x.size(), y.size());
     for (int i = 0; i < M; i++) {
@@ -123,13 +123,13 @@ class chains {
     size_t cache_size = M;
 
     if (prob < 0.5) {
-      accumulator_set<double, stats<tail_quantile<left> > > acc(
+      accumulator_set<double, stats<tail_quantile<left>>> acc(
           tail<left>::cache_size = cache_size);
       for (int i = 0; i < M; i++)
         acc(x(i));
       return quantile(acc, quantile_probability = prob);
     }
-    accumulator_set<double, stats<tail_quantile<right> > > acc(
+    accumulator_set<double, stats<tail_quantile<right>>> acc(
         tail<right>::cache_size = cache_size);
     for (int i = 0; i < M; i++)
       acc(x(i));
@@ -151,9 +151,9 @@ class chains {
     // size_t cache_size = M/2 + 2;
     size_t cache_size = M;  // 2 + 2;
 
-    accumulator_set<double, stats<tail_quantile<left> > > acc_left(
+    accumulator_set<double, stats<tail_quantile<left>>> acc_left(
         tail<left>::cache_size = cache_size);
-    accumulator_set<double, stats<tail_quantile<right> > > acc_right(
+    accumulator_set<double, stats<tail_quantile<right>>> acc_right(
         tail<right>::cache_size = cache_size);
 
     for (int i = 0; i < M; i++) {
@@ -362,7 +362,7 @@ class chains {
    * Stan (e.g., PyStan) so that it need not additionally wrap Eigen.
    *
    */
-  void add(const std::vector<std::vector<double> >& sample) {
+  void add(const std::vector<std::vector<double>>& sample) {
     int n_row = sample.size();
     if (n_row == 0)
       return;

@@ -30,7 +30,7 @@ namespace io {
 class var_context {
   template <typename T>
   using is_string_convertible = std::is_convertible<T, std::string>;
-  // TODO: Add this to stan math
+  // TODO(Steve): Add this to stan math
   template <typename T>
   using is_index = bool_constant<!std::is_floating_point<T>::value
                                  && std::is_arithmetic<T>::value>;

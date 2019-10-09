@@ -7,10 +7,10 @@
 
 namespace stan {
 namespace model {
-  // TODO(Steve): Move this to stan math.
-  template <typename K>
-  using is_index = bool_constant<!std::is_floating_point<K>::value
-                                 && std::is_arithmetic<K>::value>;
+// TODO(Steve): Move this to stan math.
+template <typename K>
+using is_index = bool_constant<!std::is_floating_point<K>::value
+                               && std::is_arithmetic<K>::value>;
 
 /**
  * Compute the gradient using reverse-mode automatic
@@ -29,11 +29,13 @@ namespace model {
  * @param[out] gradient Vector into which gradient is written.
  * @param[in,out] msgs
  */
-template <bool propto, bool jacobian_adjust_transform, class M, typename VecR, typename VecI, typename VecGrad,
-require_std_vector_vt<std::is_floating_point, VecR>...,
-require_std_vector_vt<is_index, VecI>...,
-require_std_vector_vt<std::is_floating_point, VecGrad>...>
-double log_prob_grad(const M& model, VecR&& params_r, VecI&& params_i, VecGrad&& gradient, std::ostream* msgs = 0) {
+template <bool propto, bool jacobian_adjust_transform, class M, typename VecR,
+          typename VecI, typename VecGrad,
+          require_std_vector_vt<std::is_floating_point, VecR>...,
+          require_std_vector_vt<is_index, VecI>...,
+          require_std_vector_vt<std::is_floating_point, VecGrad>...>
+double log_prob_grad(const M& model, VecR&& params_r, VecI&& params_i,
+                     VecGrad&& gradient, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
   double lp;
@@ -66,11 +68,12 @@ double log_prob_grad(const M& model, VecR&& params_r, VecI&& params_i, VecGrad&&
  * @param[out] gradient Vector into which gradient is written.
  * @param[in,out] msgs
  */
-template <bool propto, bool jacobian_adjust_transform, class M, typename VecR, typename VecGrad,
-require_eigen_vector_vt<std::is_arithmetic, VecR>...,
-require_eigen_vector_vt<std::is_arithmetic, VecGrad>...>
-double log_prob_grad(const M& model, VecR&& params_r,
-                     VecGrad&& gradient, std::ostream* msgs = 0) {
+template <bool propto, bool jacobian_adjust_transform, class M, typename VecR,
+          typename VecGrad,
+          require_eigen_vector_vt<std::is_arithmetic, VecR>...,
+          require_eigen_vector_vt<std::is_arithmetic, VecGrad>...>
+double log_prob_grad(const M& model, VecR&& params_r, VecGrad&& gradient,
+                     std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
 
