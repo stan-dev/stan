@@ -28,7 +28,7 @@ class ps_point {
                                       std::vector<std::string>& names) {
     names.reserve(q.size() + p.size() + g.size());
     for (int i = 0; i < q.size(); ++i)
-      names.emplace_back(model_names[i]);
+      names.emplace_back(std::string("q_") + model_names[i]);
     for (int i = 0; i < p.size(); ++i)
       names.emplace_back(std::string("p_") + model_names[i]);
     for (int i = 0; i < g.size(); ++i)
