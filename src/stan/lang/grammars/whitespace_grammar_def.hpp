@@ -21,7 +21,7 @@ whitespace_grammar<Iterator>::whitespace_grammar(std::stringstream& ss)
   whitespace = ((omit["/*"] >> *(char_ - "*/")) > omit["*/"])
                | (omit["//"] >> *(char_ - eol))
                | (omit["#"] >> *(char_ - eol))[deprecate_pound_comment_f(
-                   boost::phoenix::ref(error_msgs_))]
+                     boost::phoenix::ref(error_msgs_))]
                | boost::spirit::ascii::space_type();
 }
 

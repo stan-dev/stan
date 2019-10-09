@@ -56,10 +56,9 @@ bool returns_type_vis::operator()(const no_op_statement& st) const {
 bool returns_type_vis::operator()(const statements& st) const {
   // last statement in sequence must return type
   if (st.statements_.size() == 0) {
-    error_msgs_
-        << ("Expecting return, found"
-            " statement sequence with empty body.")
-        << std::endl;
+    error_msgs_ << ("Expecting return, found"
+                    " statement sequence with empty body.")
+                << std::endl;
     return false;
   }
   return returns_type(return_type_, st.statements_.back(), error_msgs_);
@@ -97,10 +96,9 @@ bool returns_type_vis::operator()(const break_continue_statement& st) const {
 bool returns_type_vis::operator()(const conditional_statement& st) const {
   // all condition bodies must end in appropriate return
   if (st.bodies_.size() != (st.conditions_.size() + 1)) {
-    error_msgs_
-        << ("Expecting return, found conditional"
-            " without final else.")
-        << std::endl;
+    error_msgs_ << ("Expecting return, found conditional"
+                    " without final else.")
+                << std::endl;
     return false;
   }
   for (size_t i = 0; i < st.bodies_.size(); ++i)
