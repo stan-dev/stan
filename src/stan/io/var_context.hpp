@@ -5,8 +5,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
 #include <vector>
+#include <type_traits>
 
 namespace stan {
 
@@ -29,7 +29,6 @@ namespace io {
  * accessed through the floating-point methods.
  */
 class var_context {
- protected:
   template <typename T>
   using is_string_convertible = std::is_convertible<T, std::string>;
   // TODO(Steve): Add this to stan math
@@ -121,8 +120,7 @@ class var_context {
    */
   virtual void names_i(std::vector<std::string>& names) const = 0;
 
-  template <typename Vec, require_vector_vt<is_index, Vec>...>
-  void add_vec(std::stringstream& msg, Vec&& dims) const {
+  void add_vec(std::stringstream& msg, const std::vector<size_t>& dims) const {
     msg << '(';
     for (size_t i = 0; i < dims.size(); ++i) {
       if (i > 0)
@@ -131,13 +129,10 @@ class var_context {
     }
     msg << ')';
   }
-  template <typename Stage, typename Name, typename BaseType, typename Vec,
-            require_convertible_t<Stage, std::string>...,
-            require_convertible_t<Name, std::string>...,
-            require_convertible_t<BaseType, std::string>...,
-            require_vector_vt<is_index, Vec>...>
-  void validate_dims(Stage&& stage, Name&& name, BaseType&& base_type,
-                     Vec&& dims_declared) const {
+
+  void validate_dims(const std::string& stage, const std::string& name,
+                     const std::string& base_type,
+                     const std::vector<size_t>& dims_declared) const {
     bool is_int_type = base_type == "int";
     if (is_int_type) {
       if (!contains_i(name)) {
@@ -182,9 +177,80 @@ class var_context {
     }
   }
 
-  template <typename... Sizes, require_t<is_index<Sizes>>...>
-  static auto to_vec(Sizes&&... sizes) {
-    return std::vector<int>({sizes...});
+  static std::vector<size_t> to_vec() { return std::vector<size_t>(); }
+  static std::vector<size_t> to_vec(size_t n1) {
+    std::vector<size_t> v(1);
+    v[0] = n1;
+    return v;
+  }
+  static std::vector<size_t> to_vec(size_t n1, size_t n2) {
+    std::vector<size_t> v(2);
+    v[0] = n1;
+    v[1] = n2;
+    return v;
+  }
+  static std::vector<size_t> to_vec(size_t n1, size_t n2, size_t n3) {
+    std::vector<size_t> v(3);
+    v[0] = n1;
+    v[1] = n2;
+    v[2] = n3;
+    return v;
+  }
+  static std::vector<size_t> to_vec(size_t n1, size_t n2, size_t n3,
+                                    size_t n4) {
+    std::vector<size_t> v(4);
+    v[0] = n1;
+    v[1] = n2;
+    v[2] = n3;
+    v[3] = n4;
+    return v;
+  }
+  static std::vector<size_t> to_vec(size_t n1, size_t n2, size_t n3, size_t n4,
+                                    size_t n5) {
+    std::vector<size_t> v(5);
+    v[0] = n1;
+    v[1] = n2;
+    v[2] = n3;
+    v[3] = n4;
+    v[4] = n5;
+    return v;
+  }
+  static std::vector<size_t> to_vec(size_t n1, size_t n2, size_t n3, size_t n4,
+                                    size_t n5, size_t n6) {
+    std::vector<size_t> v(6);
+    v[0] = n1;
+    v[1] = n2;
+    v[2] = n3;
+    v[3] = n4;
+    v[4] = n5;
+    v[5] = n6;
+    return v;
+  }
+  static std::vector<size_t> to_vec(size_t n1, size_t n2, size_t n3, size_t n4,
+                                    size_t n5, size_t n6, size_t n7) {
+    std::vector<size_t> v(7);
+    v[0] = n1;
+    v[1] = n2;
+    v[2] = n3;
+    v[3] = n4;
+    v[4] = n5;
+    v[5] = n6;
+    v[6] = n7;
+    return v;
+  }
+  static std::vector<size_t> to_vec(size_t n1, size_t n2, size_t n3, size_t n4,
+                                    size_t n5, size_t n6, size_t n7,
+                                    size_t n8) {
+    std::vector<size_t> v(8);
+    v[0] = n1;
+    v[1] = n2;
+    v[2] = n3;
+    v[3] = n4;
+    v[4] = n5;
+    v[5] = n6;
+    v[6] = n7;
+    v[7] = n8;
+    return v;
   }
 };
 
