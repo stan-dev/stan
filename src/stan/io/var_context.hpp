@@ -28,13 +28,13 @@ namespace io {
  * accessed through the floating-point methods.
  */
 class var_context {
-  protected:
-   template <typename T>
-   using is_string_convertible = std::is_convertible<T, std::string>;
-   // TODO(Steve): Add this to stan math
-   template <typename T>
-   using is_index = bool_constant<!std::is_floating_point<T>::value
-                                   && std::is_arithmetic<T>::value>;
+ protected:
+  template <typename T>
+  using is_string_convertible = std::is_convertible<T, std::string>;
+  // TODO(Steve): Add this to stan math
+  template <typename T>
+  using is_index = bool_constant<!std::is_floating_point<T>::value
+                                 && std::is_arithmetic<T>::value>;
 
  public:
   virtual ~var_context() {}
@@ -131,12 +131,11 @@ class var_context {
     msg << ')';
   }
   template <typename Stage, typename Name, typename BaseType, typename Vec,
-   require_convertible_t<Stage, std::string>...,
-   require_convertible_t<Name, std::string>...,
-   require_convertible_t<BaseType, std::string>...,
-   require_vector_vt<is_index, Vec>...>
-  void validate_dims(Stage&& stage, Name&& name,
-                     BaseType&& base_type,
+            require_convertible_t<Stage, std::string>...,
+            require_convertible_t<Name, std::string>...,
+            require_convertible_t<BaseType, std::string>...,
+            require_vector_vt<is_index, Vec>...>
+  void validate_dims(Stage&& stage, Name&& name, BaseType&& base_type,
                      Vec&& dims_declared) const {
     bool is_int_type = base_type == "int";
     if (is_int_type) {
@@ -181,7 +180,6 @@ class var_context {
       }
     }
   }
-
 
   template <typename... Sizes, require_t<is_index<Sizes>>...>
   static auto to_vec(Sizes&&... sizes) {
