@@ -41,9 +41,8 @@ inline double compute_potential_scale_reduction(
   }
 
   // check if chains are constant; all equal to first draw's value
-  Eigen::VectorXd draw_val(num_chains);
-  for (int chain = 0; chain < num_chains; chain++)
-    draw_val(chain) = static_cast<double>(chain);
+  bool are_all_const = false;
+  Eigen::VectorXd init_draw = Eigen::VectorXd::Zero(num_chains);
 
   for (int chain = 0; chain < num_chains; chain++) {
     Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
@@ -55,13 +54,19 @@ inline double compute_potential_scale_reduction(
       }
     }
 
+    init_draw(chain) = draw(0);
+
     if (draw.isApproxToConstant(draw(0))) {
-      draw_val(chain) = draw(0);
+      are_all_const |= true;
     }
   }
 
-  if (draw_val.isApproxToConstant(draw_val(0))) {
-    return std::numeric_limits<double>::quiet_NaN();
+  if (are_all_const) {
+    // If all chains are constant then return NaN
+    // if they all equal the same constant value
+    if (init_draw.isApproxToConstant(init_draw(0))) {
+      return std::numeric_limits<double>::quiet_NaN();
+    }
   }
 
   using boost::accumulators::accumulator_set;
