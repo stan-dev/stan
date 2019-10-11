@@ -46,7 +46,7 @@ TEST(McmcUnitENuts, build_tree_test) {
 
   double log_sum_weight = -std::numeric_limits<double>::infinity();
   double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
-  
+
   double H0 = -0.1;
   int n_leapfrog = 0;
 
@@ -187,7 +187,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
 
   double log_sum_weight = -std::numeric_limits<double>::infinity();
   double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
-  
+
   double H0 = -0.1;
   int n_leapfrog = 0;
 
@@ -195,8 +195,8 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
   sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, 
-                     log_sum_weight, log_sum_accept_stat, logger);
+                     p_end, H0, 1, n_leapfrog, log_sum_weight,
+                     log_sum_accept_stat, logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
@@ -210,8 +210,8 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
   sampler.build_tree(1, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, 
-                     log_sum_weight, log_sum_accept_stat, logger);
+                     p_end, H0, 1, n_leapfrog, log_sum_weight,
+                     log_sum_accept_stat, logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
@@ -225,8 +225,8 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
   sampler.build_tree(2, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, 
-                     log_sum_weight, log_sum_accept_stat, logger);
+                     p_end, H0, 1, n_leapfrog, log_sum_weight,
+                     log_sum_accept_stat, logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
@@ -240,8 +240,8 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
   sampler.build_tree(3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, 
-                     log_sum_weight, log_sum_accept_stat, logger);
+                     p_end, H0, 1, n_leapfrog, log_sum_weight,
+                     log_sum_accept_stat, logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_forward_1(n), p_begin(n));
@@ -255,8 +255,8 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
   sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, -1, n_leapfrog, 
-                     log_sum_weight, log_sum_accept_stat, logger);
+                     p_end, H0, -1, n_leapfrog, log_sum_weight,
+                     log_sum_accept_stat, logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
@@ -270,8 +270,8 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
   sampler.build_tree(1, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, -1, n_leapfrog, 
-                     log_sum_weight, log_sum_accept_stat, logger);
+                     p_end, H0, -1, n_leapfrog, log_sum_weight,
+                     log_sum_accept_stat, logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
@@ -285,8 +285,8 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
   sampler.build_tree(2, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, -1, n_leapfrog, 
-                     log_sum_weight, log_sum_accept_stat, logger);
+                     p_end, H0, -1, n_leapfrog, log_sum_weight,
+                     log_sum_accept_stat, logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));
@@ -300,8 +300,8 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
   sampler.build_tree(3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, -1, n_leapfrog, 
-                     log_sum_weight, log_sum_accept_stat, logger);
+                     p_end, H0, -1, n_leapfrog, log_sum_weight,
+                     log_sum_accept_stat, logger);
 
   for (int n = 0; n < rho.size(); ++n) {
     EXPECT_FLOAT_EQ(p_backward_1(n), p_begin(n));

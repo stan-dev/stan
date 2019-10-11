@@ -127,10 +127,9 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       Eigen::VectorXd rho_bck = Eigen::VectorXd::Zero(rho.size());
 
       bool valid_subtree = false;
-      double log_sum_weight_subtree
-        = -std::numeric_limits<double>::infinity();
+      double log_sum_weight_subtree = -std::numeric_limits<double>::infinity();
       double log_sum_accept_stat_subtree
-        = -std::numeric_limits<double>::infinity();
+          = -std::numeric_limits<double>::infinity();
 
       if (this->rand_uniform_() > 0.5) {
         // Extend the current trajectory forward
@@ -141,8 +140,8 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
         valid_subtree = build_tree(
             this->depth_, z_propose, p_sharp_fwd_bck, p_sharp_fwd_fwd, rho_fwd,
-            p_fwd_bck, p_fwd_fwd, H0, 1, n_leapfrog,
-            log_sum_weight_subtree, log_sum_accept_stat_subtree, logger);
+            p_fwd_bck, p_fwd_fwd, H0, 1, n_leapfrog, log_sum_weight_subtree,
+            log_sum_accept_stat_subtree, logger);
         z_fwd.ps_point::operator=(this->z_);
       } else {
         // Extend the current trajectory backwards
@@ -153,8 +152,8 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
         valid_subtree = build_tree(
             this->depth_, z_propose, p_sharp_bck_fwd, p_sharp_bck_bck, rho_bck,
-            p_bck_fwd, p_bck_bck, H0, -1, n_leapfrog,
-            log_sum_weight_subtree, log_sum_accept_stat_subtree, logger);
+            p_bck_fwd, p_bck_bck, H0, -1, n_leapfrog, log_sum_weight_subtree,
+            log_sum_accept_stat_subtree, logger);
         z_bck.ps_point::operator=(this->z_);
       }
 
@@ -176,8 +175,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
           = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
 
       log_sum_accept_stat
-          = math::log_sum_exp(log_sum_accept_stat,
-                              log_sum_accept_stat_subtree);
+          = math::log_sum_exp(log_sum_accept_stat, log_sum_accept_stat_subtree);
 
       // Break when no-u-turn criterion is no longer satisfied
       rho = rho_bck + rho_fwd;
@@ -283,11 +281,11 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       if (H0 - h > 0) {
         // Saturated Metropolis accept probability with Boltzman weight
         log_sum_accept_stat
-          = math::log_sum_exp(log_sum_accept_stat, (H0 - h) + 0);
+            = math::log_sum_exp(log_sum_accept_stat, (H0 - h) + 0);
       } else {
         // Unsaturated Metropolis accept probability with Boltzman weight
         log_sum_accept_stat
-          = math::log_sum_exp(log_sum_accept_stat, (H0 - h) + (H0 - h));
+            = math::log_sum_exp(log_sum_accept_stat, (H0 - h) + (H0 - h));
       }
 
       z_propose = this->z_;
