@@ -18,9 +18,11 @@ def runTests(String testPath, Boolean separateMakeStep=true) {
 }
 
 def runTestsWin(String testPath) {
-    bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
-    try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
-    finally { junit 'test/**/*.xml' }
+    withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
+       bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+       try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
+       finally { junit 'test/**/*.xml' }
+    }
 }
 
 def deleteDirWin() {
@@ -165,7 +167,7 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             setupCXX()
-                            bat "make -j${env.PARALLEL} test-headers"
+                            bat "mingw32-make -j${env.PARALLEL} test-headers"
                             setupCXX(false)
                             runTestsWin("src/test/unit")
                     }

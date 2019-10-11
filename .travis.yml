@@ -13,11 +13,11 @@ before_script:
 
 linux_clang: &linux_clang
   os: linux
-  compiler: "clang-3.8"
+  compiler: "clang-6.0"
   addons:
     apt:
-      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.8' ]
-      packages: [ 'clang-3.8', 'libc++-dev' ]
+      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-6.0' ]
+      packages: [ 'clang-6.0', 'libc++-dev' ]
 
 linux_gcc: &linux_gcc
   os: linux
@@ -35,37 +35,37 @@ matrix:
     - <<: *linux_clang
       env:
           # For Travis's Ubuntu 14.04, the libstdc++ is broken with clang
-        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS_OS=-stdlib=libc++"
+        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/callbacks src/test/unit/io"
           PARALLEL=2
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS_OS=-stdlib=libc++"
+        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/lang/ast"
           PARALLEL=2
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS_OS=-stdlib=libc++"
+        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/lang/generator"
           PARALLEL=2
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS_OS=-stdlib=libc++"
+        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/lang/parser"
           PARALLEL=2
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS_OS=-stdlib=libc++"
+        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/lang/reject"
           PARALLEL=2
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS_OS=-stdlib=libc++"
+        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/mcmc src/test/unit/model src/test/unit/optimization"
           PARALLEL=2
     - <<: *linux_clang
       env:
-        - MATRIX_EVAL="CXX=clang++-3.8 && CXXFLAGS_OS=-stdlib=libc++"
+        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/services src/test/unit/variational src/test/unit/version_test.cpp"
           PARALLEL=2
     - <<: *linux_gcc
