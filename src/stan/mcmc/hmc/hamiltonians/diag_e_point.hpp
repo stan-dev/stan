@@ -28,16 +28,6 @@ class diag_e_point : public ps_point {
   }
 
   /**
-   * Copy constructor which does fast copy of inverse mass matrix.
-   *
-   * @param z point to copy
-   */
-  diag_e_point(const diag_e_point& z)
-      : ps_point(z), inv_e_metric_(z.inv_e_metric_.size()) {
-    fast_vector_copy_<double>(inv_e_metric_, z.inv_e_metric_);
-  }
-
-  /**
    * Set elements of mass matrix
    *
    * @param inv_e_metric initial mass matrix
