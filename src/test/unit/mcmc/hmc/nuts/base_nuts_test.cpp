@@ -218,7 +218,7 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
 
   double log_sum_weight = -std::numeric_limits<double>::infinity();
   double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
-  
+
   double H0 = -0.1;
   int n_leapfrog = 0;
 
@@ -234,8 +234,8 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   sampler.build_tree(3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, 
-                     log_sum_weight, log_sum_accept_stat, logger);
+                     p_end, H0, 1, n_leapfrog, log_sum_weight,
+                     log_sum_accept_stat, logger);
 
   EXPECT_EQ(7 * 3, sampler.rho_values.size());
 
@@ -286,7 +286,7 @@ TEST(McmcNutsBaseNuts, divergence_test) {
 
   double log_sum_weight = -std::numeric_limits<double>::infinity();
   double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
-  
+
   double H0 = -0.1;
   int n_leapfrog = 0;
 
@@ -304,27 +304,24 @@ TEST(McmcNutsBaseNuts, divergence_test) {
   bool valid_subtree = 0;
 
   sampler.z().V = -750;
-  valid_subtree = sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end,
-                                     rho, p_begin, p_end, H0, 1, n_leapfrog,
-                                     log_sum_weight, log_sum_accept_stat, 
-                                     logger);
+  valid_subtree = sampler.build_tree(
+      0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
+      n_leapfrog, log_sum_weight, log_sum_accept_stat, logger);
   EXPECT_TRUE(valid_subtree);
   EXPECT_FALSE(sampler.divergent_);
 
   sampler.z().V = -250;
-  valid_subtree = sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end,
-                                     rho, p_begin, p_end, H0, 1, n_leapfrog,
-                                     log_sum_weight, log_sum_accept_stat, 
-                                     logger);
+  valid_subtree = sampler.build_tree(
+      0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
+      n_leapfrog, log_sum_weight, log_sum_accept_stat, logger);
 
   EXPECT_TRUE(valid_subtree);
   EXPECT_FALSE(sampler.divergent_);
 
   sampler.z().V = 750;
-  valid_subtree = sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end,
-                                     rho, p_begin, p_end, H0, 1, n_leapfrog,
-                                     log_sum_weight, log_sum_accept_stat, 
-                                     logger);
+  valid_subtree = sampler.build_tree(
+      0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
+      n_leapfrog, log_sum_weight, log_sum_accept_stat, logger);
 
   EXPECT_FALSE(valid_subtree);
   EXPECT_TRUE(sampler.divergent_);
