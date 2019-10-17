@@ -156,10 +156,10 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
   Eigen::VectorXd rho = z_init.p;
 
   double log_sum_weight = -std::numeric_limits<double>::infinity();
-  double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
+  double sum_metro_prob = 0;
 
   stan::mcmc::mock_model model(model_size);
   stan::mcmc::mock_nuts sampler(model, base_rng);
@@ -174,7 +174,7 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
 
   bool valid_subtree = sampler.build_tree(
       3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
-      n_leapfrog, log_sum_weight, log_sum_accept_stat, logger);
+      n_leapfrog, log_sum_weight, sum_metro_prob, logger);
 
   EXPECT_TRUE(valid_subtree);
 
@@ -189,7 +189,7 @@ TEST(McmcNutsBaseNuts, build_tree_test) {
 
   EXPECT_EQ(8, n_leapfrog);
   EXPECT_FLOAT_EQ(H0 + std::log(n_leapfrog), log_sum_weight);
-  EXPECT_FLOAT_EQ(2 * H0 + std::log(n_leapfrog), log_sum_accept_stat);
+  EXPECT_FLOAT_EQ(std::exp(H0) * n_leapfrog, sum_metro_prob);
 
   EXPECT_EQ("", debug.str());
   EXPECT_EQ("", info.str());
@@ -217,10 +217,10 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
   Eigen::VectorXd rho = z_init.p;
 
   double log_sum_weight = -std::numeric_limits<double>::infinity();
-  double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
+  double sum_metro_prob = 0;
 
   stan::mcmc::mock_model model(model_size);
   stan::mcmc::rho_inspector_mock_nuts sampler(model, base_rng);
@@ -234,8 +234,8 @@ TEST(McmcNutsBaseNuts, rho_aggregation_test) {
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
   sampler.build_tree(3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin,
-                     p_end, H0, 1, n_leapfrog, log_sum_weight,
-                     log_sum_accept_stat, logger);
+                     p_end, H0, 1, n_leapfrog, log_sum_weight, sum_metro_prob,
+                     logger);
 
   EXPECT_EQ(7 * 3, sampler.rho_values.size());
 
@@ -285,10 +285,10 @@ TEST(McmcNutsBaseNuts, divergence_test) {
   Eigen::VectorXd rho = z_init.p;
 
   double log_sum_weight = -std::numeric_limits<double>::infinity();
-  double log_sum_accept_stat = -std::numeric_limits<double>::infinity();
 
   double H0 = -0.1;
   int n_leapfrog = 0;
+  double sum_metro_prob = 0;
 
   stan::mcmc::mock_model model(model_size);
   stan::mcmc::divergent_nuts sampler(model, base_rng);
@@ -304,24 +304,24 @@ TEST(McmcNutsBaseNuts, divergence_test) {
   bool valid_subtree = 0;
 
   sampler.z().V = -750;
-  valid_subtree = sampler.build_tree(
-      0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
-      n_leapfrog, log_sum_weight, log_sum_accept_stat, logger);
+  valid_subtree = sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end,
+                                     rho, p_begin, p_end, H0, 1, n_leapfrog,
+                                     log_sum_weight, sum_metro_prob, logger);
   EXPECT_TRUE(valid_subtree);
   EXPECT_FALSE(sampler.divergent_);
 
   sampler.z().V = -250;
-  valid_subtree = sampler.build_tree(
-      0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
-      n_leapfrog, log_sum_weight, log_sum_accept_stat, logger);
+  valid_subtree = sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end,
+                                     rho, p_begin, p_end, H0, 1, n_leapfrog,
+                                     log_sum_weight, sum_metro_prob, logger);
 
   EXPECT_TRUE(valid_subtree);
   EXPECT_FALSE(sampler.divergent_);
 
   sampler.z().V = 750;
-  valid_subtree = sampler.build_tree(
-      0, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
-      n_leapfrog, log_sum_weight, log_sum_accept_stat, logger);
+  valid_subtree = sampler.build_tree(0, z_propose, p_sharp_begin, p_sharp_end,
+                                     rho, p_begin, p_end, H0, 1, n_leapfrog,
+                                     log_sum_weight, sum_metro_prob, logger);
 
   EXPECT_FALSE(valid_subtree);
   EXPECT_TRUE(sampler.divergent_);
