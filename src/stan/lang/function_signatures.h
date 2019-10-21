@@ -526,6 +526,13 @@ add("gaussian_dlm_obs_lpdf", bare_expr_type(double_type()), bare_expr_type(matri
 add_nullary("get_lp");  // special handling in term_grammar_def
 
 add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()));
+add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(bare_array_type(double_type(), 1)),
+    bare_expr_type(double_type()));
+add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
     bare_expr_type(bare_array_type(vector_type(), 1)),
     bare_expr_type(double_type()));
 add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
@@ -533,12 +540,19 @@ add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
     bare_expr_type(bare_array_type(vector_type(), 1)),
     bare_expr_type(double_type()));
 add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
-    bare_expr_type(bare_array_type(double_type(), 1)),
-    bare_expr_type(double_type()));
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(vector_type()));
 add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
-    bare_expr_type(bare_array_type(double_type(), 1)),
-    bare_expr_type(bare_array_type(double_type(), 1)),
-    bare_expr_type(double_type()));
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(vector_type()));
+add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(matrix_type()));
+add("gp_dot_prod_cov", bare_expr_type(matrix_type()),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(bare_array_type(vector_type(), 1)),
+    bare_expr_type(matrix_type()));
 
 add("gp_exp_quad_cov", bare_expr_type(matrix_type()),
     bare_expr_type(bare_array_type(double_type(), 1)),

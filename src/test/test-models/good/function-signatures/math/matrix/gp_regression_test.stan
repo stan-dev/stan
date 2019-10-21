@@ -20,6 +20,8 @@ parameters {
   real<lower=0> sig;
   
   real<lower=0> sigma;
+  vector<lower=0>[D] diagonal_Sigma;
+  cov_matrix[D] Sigma;
 }
 transformed parameters {
   matrix[N, N] L_K;
@@ -30,9 +32,17 @@ transformed parameters {
     matrix[N, N] K2 =
       gp_dot_prod_cov(x1, sig);  // dot product N-D
     matrix[N, N] K3 =
-      gp_dot_prod_cov(x, x, sig);   // dot product cross covariance 1-D
+      gp_dot_prod_cov(x1, diagonal_Sigma);  // dot product N-D, diagonal covariance
     matrix[N, N] K4 =
+      gp_dot_prod_cov(x1, Sigma);  // dot product N-D, matrix covariance
+    matrix[N, N] K5 =
+      gp_dot_prod_cov(x, x, sig);   // dot product cross covariance 1-D
+    matrix[N, N] K6 =
       gp_dot_prod_cov(x1, x1, sig);   // dot product cross covariance N-D
+    matrix[N, N] K7 =
+      gp_dot_prod_cov(x1, x1, diagonal_Sigma);   // dot product cross covariance N-D, diagonal covariance
+    matrix[N, N] K8 =
+      gp_dot_prod_cov(x1, x1, Sigma);   // dot product cross covariance N-D, matrix covariance
     // RBF   
     matrix[N, N] K5 =
       gp_exp_quad_cov(x, magnitude, length_scale);  // 1-D
