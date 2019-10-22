@@ -341,10 +341,10 @@ class advi {
     logger.info("Begin stochastic gradient ascent.");
     logger.info(
         "  iter"
-        "             ELBO"
-        "   delta_ELBO_mean"
-        "   delta_ELBO_med"
-        "   notes ");
+        "\tELBO"
+        "\tdelta_ELBO_mean"
+        "\tdelta_ELBO_med"
+        "\tnotes ");
 
     // Timing variables
     clock_t start = clock();
@@ -383,10 +383,10 @@ class advi {
               / static_cast<double>(elbo_diff.size());
         delta_elbo_med = circ_buff_median(elbo_diff);
         std::stringstream ss;
-        ss << "  " << std::setw(4) << iter_counter << "  " << std::setw(15)
-           << std::fixed << std::setprecision(3) << elbo << "  "
+        ss << "  " << std::setw(4) << iter_counter << "\t" << std::setw(15)
+           << std::fixed << std::setprecision(3) << elbo << "\t"
            << std::setw(16) << std::fixed << std::setprecision(3)
-           << delta_elbo_ave << "  " << std::setw(15) << std::fixed
+           << delta_elbo_ave << "\t" << std::setw(15) << std::fixed
            << std::setprecision(3) << delta_elbo_med;
 
         end = clock();
@@ -400,18 +400,18 @@ class advi {
         diagnostic_writer(print_vector);
 
         if (delta_elbo_ave < tol_rel_obj) {
-          ss << "   MEAN ELBO CONVERGED";
+          ss << "\tMEAN ELBO CONVERGED";
           do_more_iterations = false;
         }
 
         if (delta_elbo_med < tol_rel_obj) {
-          ss << "   MEDIAN ELBO CONVERGED";
+          ss << "\tMEDIAN ELBO CONVERGED";
           do_more_iterations = false;
         }
 
         if (iter_counter > 10 * eval_elbo_) {
           if (delta_elbo_med > 0.5 || delta_elbo_ave > 0.5) {
-            ss << "   MAY BE DIVERGING... INSPECT ELBO";
+            ss << "\tMAY BE DIVERGING... INSPECT ELBO";
           }
         }
 
