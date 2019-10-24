@@ -49,3 +49,9 @@ transformed parameters {
 model {
   dummy_parameter ~ normal(0, 1);
 }
+
+generated quantities {
+  vector[5] theta_pred;
+
+  theta_pred = laplace_approx_poisson_rng(theta_0, phi, x, n_samples, sums, ye);
+}

@@ -1633,6 +1633,16 @@ add("laplace_marginal_poisson",
     bare_types[1],
     bare_types[0]);
 
+add("laplace_approx_poisson_rng",
+    bare_expr_type(vector_type()),  // returns theta_pred
+    bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(bare_array_type(vector_type())),
+    int_vector_types[1],
+    int_vector_types[1]);  // FIX ME -- add tuning parameters?
+                           // Need to worry about the rng term.
+                           // (same with exposure overload)
+
 add("laplace_marginal_poisson",
     bare_expr_type(bare_types[0]),
     bare_expr_type(vector_type()),
@@ -1640,9 +1650,18 @@ add("laplace_marginal_poisson",
     bare_expr_type(bare_array_type(vector_type())),
     int_vector_types[1],
     int_vector_types[1],
-    bare_expr_type(vector_type()),  //  exposure term
+    bare_expr_type(vector_type()),  // exposure term
     bare_types[1],
     bare_types[0]);
+
+add("laplace_approx_poisson_rng",
+    bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(vector_type()),
+    bare_expr_type(bare_array_type(vector_type())),
+    int_vector_types[1],
+    int_vector_types[1],
+    bare_expr_type(vector_type()));  // exposure term
 
 // Newton solver for Laplace approximation
 add("lgp_newton_solver", bare_expr_type(vector_type()),
