@@ -5,15 +5,15 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    for_array_statement::for_array_statement() { }
+for_array_statement::for_array_statement() {}
 
-    for_array_statement::for_array_statement(const std::string& variable,
-                                             const expression& expression,
-                                             const statement& stmt)
-      : variable_(variable), expression_(expression), statement_(stmt) { }
+for_array_statement::for_array_statement(const std::string& variable,
+                                         const expression& expression,
+                                         const statement& stmt)
+    : variable_(variable), expression_(expression), statement_(stmt) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

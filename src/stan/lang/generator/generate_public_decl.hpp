@@ -6,18 +6,16 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the public declaration scope for a class to the
-     * specified stream.
-     *
-     * @param[in,out] o stream for generating
-     */
-    void generate_public_decl(std::ostream& o) {
-      o << "public:" << EOL;
-    }
+/**
+ * Generate the public declaration scope for a class to the
+ * specified stream.
+ *
+ * @param[in,out] o stream for generating
+ */
+void generate_public_decl(std::ostream& o) { o << "public:" << EOL; }
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -5,32 +5,32 @@
 #include <cstddef>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    struct int_literal {
-      /**
-       * Value of literal.
-       */
-      int val_;
+struct int_literal {
+  /**
+   * Value of literal.
+   */
+  int val_;
 
-      /**
-       * Expression type of literal.
-       */
-      bare_expr_type type_;
+  /**
+   * Expression type of literal.
+   */
+  bare_expr_type type_;
 
-      /**
-       * Construct a default int literal.
-       */
-      int_literal();
+  /**
+   * Construct a default int literal.
+   */
+  int_literal();
 
-      /**
-       * Construct an int literal with the specified value.
-       *
-       * @param val value of literal
-       */
-      explicit int_literal(int val);
-    };
+  /**
+   * Construct an int literal with the specified value.
+   *
+   * @param val value of literal
+   */
+  explicit int_literal(int val);
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

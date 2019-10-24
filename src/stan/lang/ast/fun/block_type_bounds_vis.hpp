@@ -20,137 +20,137 @@
 #include <boost/variant/static_visitor.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Visitor to get bounds from block_var_type.
-     */
-    struct block_type_bounds_vis : public boost::static_visitor<range> {
-      /**
-       * Construct a visitor.
-       */
-      block_type_bounds_vis();
+/**
+ * Visitor to get bounds from block_var_type.
+ */
+struct block_type_bounds_vis : public boost::static_visitor<range> {
+  /**
+   * Construct a visitor.
+   */
+  block_type_bounds_vis();
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const block_array_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const block_array_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const cholesky_factor_corr_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const cholesky_factor_corr_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const cholesky_factor_cov_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const cholesky_factor_cov_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const corr_matrix_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const corr_matrix_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const cov_matrix_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const cov_matrix_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const double_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const double_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const ill_formed_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const ill_formed_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const int_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const int_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const matrix_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const matrix_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const ordered_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const ordered_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const positive_ordered_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const positive_ordered_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const row_vector_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const row_vector_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const simplex_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const simplex_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const unit_vector_block_type& x) const;
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const unit_vector_block_type& x) const;
 
-      /**
-       * Return bounds for this type.
-       *
-       * @param x type
-       * @return bounds
-       */
-      range operator()(const vector_block_type& x) const;
-    };
-  }
-}
+  /**
+   * Return bounds for this type.
+   *
+   * @param x type
+   * @return bounds
+   */
+  range operator()(const vector_block_type& x) const;
+};
+}  // namespace lang
+}  // namespace stan
 #endif

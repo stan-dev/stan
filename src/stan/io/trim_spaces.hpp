@@ -16,12 +16,14 @@ namespace io {
  */
 inline std::string trim_spaces(const std::string& x) {
   std::size_t start = 0;
-  while (start < x.size() && is_whitespace(x[start])) ++start;
+  while (start < x.size() && is_whitespace(x[start]))
+    ++start;
   std::size_t end = x.size();
-  while (end > 0 && is_whitespace(x[end - 1])) --end;
+  while (end > 0 && is_whitespace(x[end - 1]))
+    --end;
   return x.substr(start, end - start);
 }
 
-}
-}
+}  // namespace io
+}  // namespace stan
 #endif

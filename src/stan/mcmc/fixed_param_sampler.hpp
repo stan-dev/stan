@@ -6,18 +6,17 @@
 #include <stan/mcmc/sample.hpp>
 
 namespace stan {
-  namespace mcmc {
+namespace mcmc {
 
-    class fixed_param_sampler : public base_mcmc {
-    public:
-      fixed_param_sampler() { }
+class fixed_param_sampler : public base_mcmc {
+ public:
+  fixed_param_sampler() {}
 
-      sample
-      transition(sample& init_sample, callbacks::logger& logger) {
-        return init_sample;
-      }
-    };
+  sample transition(sample& init_sample, callbacks::logger& logger) {
+    return init_sample;
+  }
+};
 
-  }  // mcmc
-}  // stan
+}  // namespace mcmc
+}  // namespace stan
 #endif

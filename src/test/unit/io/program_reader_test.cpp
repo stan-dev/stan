@@ -12,7 +12,7 @@ std::vector<std::string> create_search_path() {
 }
 
 void expect_eq_traces(const std::vector<std::pair<std::string, int> >& e,
-                         const std::vector<std::pair<std::string, int> >& f) {
+                      const std::vector<std::pair<std::string, int> >& f) {
   EXPECT_EQ(e.size(), f.size());
   for (size_t i = 0; i < e.size(); ++i) {
     EXPECT_EQ(e[i].first, f[i].first);
@@ -31,8 +31,8 @@ void expect_trace(stan::io::program_reader& reader, int pos,
   expect_eq_traces(expected, found);
 }
 void expect_trace(stan::io::program_reader& reader, int pos,
-                  const std::string& path1, int pos1,
-                  const std::string& path2, int pos2) {
+                  const std::string& path1, int pos1, const std::string& path2,
+                  int pos2) {
   using std::pair;
   using std::string;
   using std::vector;
@@ -43,9 +43,8 @@ void expect_trace(stan::io::program_reader& reader, int pos,
   expect_eq_traces(expected, found);
 }
 void expect_trace(stan::io::program_reader& reader, int pos,
-                  const std::string& path1, int pos1,
-                  const std::string& path2, int pos2,
-                  const std::string& path3, int pos3) {
+                  const std::string& path1, int pos1, const std::string& path2,
+                  int pos2, const std::string& path3, int pos3) {
   using std::pair;
   using std::string;
   using std::vector;
@@ -75,33 +74,33 @@ TEST(progr_reader, trimComment) {
             program_reader::trim_comment("  #include foo.stan // blah blah"));
   EXPECT_EQ("  #include foo.stan",
             program_reader::trim_comment("  #include foo.stan// blah blah"));
-
 }
 
 TEST(prog_reader, one) {
+  using stan::io::program_reader;
   using std::pair;
   using std::string;
-  using stan::io::program_reader;
 
   std::stringstream ss;
-  ss << "parameters {\n"            // 1
-     << "  real y;\n"               // 2
-     << "}\n"                       // 3
-     << "model {\n"                 // 4
-     << "  y ~ normal(0, 1);\n"     // 5
-     << "}\n"                       // 6
-     << "";                         // 7 (nothing on line)
+  ss << "parameters {\n"         // 1
+     << "  real y;\n"            // 2
+     << "}\n"                    // 3
+     << "model {\n"              // 4
+     << "  y ~ normal(0, 1);\n"  // 5
+     << "}\n"                    // 6
+     << "";                      // 7 (nothing on line)
 
   std::vector<std::string> search_path = create_search_path();
   stan::io::program_reader reader(ss, "foo", search_path);
 
-  EXPECT_EQ("parameters {\n"
-            "  real y;\n"
-            "}\n"
-            "model {\n"
-            "  y ~ normal(0, 1);\n"
-            "}\n",
-            reader.program());
+  EXPECT_EQ(
+      "parameters {\n"
+      "  real y;\n"
+      "}\n"
+      "model {\n"
+      "  y ~ normal(0, 1);\n"
+      "}\n",
+      reader.program());
   // program is 6 lines, but spirit qi line_pos_iterator will go further
   for (int i = 1; i < 9; ++i)
     expect_trace(reader, i, "foo", i);
@@ -110,11 +109,9 @@ TEST(prog_reader, one) {
   EXPECT_THROW(reader.trace(9), std::runtime_error);
 }
 
-
-
 TEST(prog_reader, two) {
-  using std::vector;
   using std::string;
+  using std::vector;
   std::stringstream ss;
   ss << "functions {\n"                // 1
      << "#include incl_fun.stan\n"     // 2
@@ -127,17 +124,18 @@ TEST(prog_reader, two) {
 
   stan::io::program_reader reader(ss, "foo", search_path);
 
-  EXPECT_EQ("functions {\n"            // 1
-            "  int foo() {\n"          // 2 foo, 1 include
-            "    return 1;\n"          // 3, 2 foo, 2 include
-            "  }\n"                    // 4, 2 foo, 3 include
-            "}\n"                      // 5, 3 foo
-            "parameters {\n"           // 6, 4 foo, 1 include
-            "  real y;\n"              // 7, 4 foo, 2 include
-            "}\n"                      // 8, 4 foo, 3 indluce
-            "model {\n"                // 9, 5 foo
-            "}\n",                     // 10, 6 foo
-            reader.program());
+  EXPECT_EQ(
+      "functions {\n"    // 1
+      "  int foo() {\n"  // 2 foo, 1 include
+      "    return 1;\n"  // 3, 2 foo, 2 include
+      "  }\n"            // 4, 2 foo, 3 include
+      "}\n"              // 5, 3 foo
+      "parameters {\n"   // 6, 4 foo, 1 include
+      "  real y;\n"      // 7, 4 foo, 2 include
+      "}\n"              // 8, 4 foo, 3 indluce
+      "model {\n"        // 9, 5 foo
+      "}\n",             // 10, 6 foo
+      reader.program());
 
   expect_trace(reader, 1, "foo", 1);
   expect_trace(reader, 2, "foo", 2, "incl_fun.stan", 1);
@@ -156,31 +154,31 @@ TEST(prog_reader, two) {
   EXPECT_THROW(reader.trace(13), std::runtime_error);
 }
 
-
 TEST(prog_reader, three) {
-  using std::vector;
   using std::string;
+  using std::vector;
   std::stringstream ss;
-  ss << "functions {\n"              // 1
-     << "#include incl_rec.stan\n"   // 2
-     << "}\n"                        // 3
-     << "model { }\n";               // 4
+  ss << "functions {\n"             // 1
+     << "#include incl_rec.stan\n"  // 2
+     << "}\n"                       // 3
+     << "model { }\n";              // 4
 
   vector<string> search_path = create_search_path();
 
   stan::io::program_reader reader(ss, "foo", search_path);
 
-  EXPECT_EQ("functions {\n"          // 1, foo 1
-            "parameters {\n"         // 2, foo 2, incl 1
-            "real y;\n"              // 3, foo 2, incl 2
-            "real z;\n"              // 4, foo 2, incl 3
-            "}\n"                    // 5, foo 2, incl 4
-            "transformed parameters {\n"  // 6
-            "  real w = y + z;\n"         // 7
-            "}\n"                         // 8, foo 2
-            "}\n"                         // 9, foo 3
-            "model { }\n",                // 10, foo 4
-            reader.program());
+  EXPECT_EQ(
+      "functions {\n"               // 1, foo 1
+      "parameters {\n"              // 2, foo 2, incl 1
+      "real y;\n"                   // 3, foo 2, incl 2
+      "real z;\n"                   // 4, foo 2, incl 3
+      "}\n"                         // 5, foo 2, incl 4
+      "transformed parameters {\n"  // 6
+      "  real w = y + z;\n"         // 7
+      "}\n"                         // 8, foo 2
+      "}\n"                         // 9, foo 3
+      "model { }\n",                // 10, foo 4
+      reader.program());
 
   expect_trace(reader, 1, "foo", 1);
   expect_trace(reader, 2, "foo", 2, "incl_rec.stan", 1);
@@ -200,31 +198,32 @@ TEST(prog_reader, three) {
 }
 
 TEST(prog_reader, four) {
-  using std::vector;
   using std::string;
+  using std::vector;
   std::stringstream ss;
-  ss << "functions {\n"                  // 1
-     << "#include incl_fun.stan\n"  // 2
-     << "}\n"                            // 3
-     << "#include incl_params.stan// comment should be OK\n"    // 4
-     << "model {\n"                      // 5
-     << "}\n";                           // 6
+  ss << "functions {\n"                                       // 1
+     << "#include incl_fun.stan\n"                            // 2
+     << "}\n"                                                 // 3
+     << "#include incl_params.stan// comment should be OK\n"  // 4
+     << "model {\n"                                           // 5
+     << "}\n";                                                // 6
 
   vector<string> search_path = create_search_path();
 
   stan::io::program_reader reader(ss, "foo", search_path);
 
-  EXPECT_EQ("functions {\n"            // 1
-            "  int foo() {\n"          // 2 foo, 1 include
-            "    return 1;\n"          // 3, 2 foo, 2 include
-            "  }\n"                    // 4, 2 foo, 3 include
-            "}\n"                      // 5, 3 foo
-            "parameters {\n"           // 6, 4 foo, 1 include
-            "  real y;\n"              // 7, 4 foo, 2 include
-            "}\n"                      // 8, 4 foo, 3 indluce
-            "model {\n"                // 9, 5 foo
-            "}\n",                     // 10, 6 foo
-            reader.program());
+  EXPECT_EQ(
+      "functions {\n"    // 1
+      "  int foo() {\n"  // 2 foo, 1 include
+      "    return 1;\n"  // 3, 2 foo, 2 include
+      "  }\n"            // 4, 2 foo, 3 include
+      "}\n"              // 5, 3 foo
+      "parameters {\n"   // 6, 4 foo, 1 include
+      "  real y;\n"      // 7, 4 foo, 2 include
+      "}\n"              // 8, 4 foo, 3 indluce
+      "model {\n"        // 9, 5 foo
+      "}\n",             // 10, 6 foo
+      reader.program());
 
   expect_trace(reader, 1, "foo", 1);
   expect_trace(reader, 2, "foo", 2, "incl_fun.stan", 1);
@@ -243,10 +242,9 @@ TEST(prog_reader, four) {
   EXPECT_THROW(reader.trace(13), std::runtime_error);
 }
 
-
 TEST(prog_reader, ignoreRecursive) {
-  using std::vector;
   using std::string;
+  using std::vector;
   std::stringstream ss;
   ss << "functions {\n"
      << "#include badrecurse1.stan\n"
@@ -257,8 +255,8 @@ TEST(prog_reader, ignoreRecursive) {
   EXPECT_EQ("functions {\n}\nmodel { }\n", reader.program());
 }
 TEST(prog_reader, ignoreRecursive2) {
-  using std::vector;
   using std::string;
+  using std::vector;
   std::stringstream ss;
   ss << "functions {\n"
      << "#include badrecurse2.stan\n"
@@ -269,8 +267,8 @@ TEST(prog_reader, ignoreRecursive2) {
   EXPECT_EQ("functions {\n}\nmodel { }\n", reader.program());
 }
 TEST(prog_reader, allowSequential) {
-  using std::vector;
   using std::string;
+  using std::vector;
   std::stringstream ss;
   ss << "functions {\n"
      << "#include simple1.stan\n"

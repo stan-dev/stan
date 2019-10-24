@@ -97,7 +97,6 @@ local_var_type local_var_type::innermost_type() const {
   return var_type_;
 }
 
-
 bool local_var_type::is_array_type() const {
   if (boost::get<stan::lang::local_array_type>(&var_type_))
     return true;
@@ -109,9 +108,7 @@ std::string local_var_type::name() const {
   return boost::apply_visitor(vis, var_type_);
 }
 
-int local_var_type::num_dims() const {
-  return this->bare_type().num_dims();
-}
+int local_var_type::num_dims() const { return this->bare_type().num_dims(); }
 
 std::ostream& operator<<(std::ostream& o, const local_var_type& var_type) {
   write_bare_expr_type(o, var_type.bare_type());

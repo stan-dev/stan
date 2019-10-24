@@ -7,21 +7,19 @@
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 
 namespace stan {
-  namespace mcmc {
-    /**
-     * Exhausive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
-     * with a Gaussian-Euclidean disintegration and diagonal metric
-     */
-    template <class Model, class BaseRNG>
-    class diag_e_xhmc
-      : public base_xhmc<Model, diag_e_metric,
-                         expl_leapfrog, BaseRNG> {
-    public:
-      diag_e_xhmc(const Model& model, BaseRNG& rng)
-        : base_xhmc<Model, diag_e_metric, expl_leapfrog,
-                    BaseRNG>(model, rng) { }
-    };
+namespace mcmc {
+/**
+ * Exhausive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
+ * with a Gaussian-Euclidean disintegration and diagonal metric
+ */
+template <class Model, class BaseRNG>
+class diag_e_xhmc
+    : public base_xhmc<Model, diag_e_metric, expl_leapfrog, BaseRNG> {
+ public:
+  diag_e_xhmc(const Model& model, BaseRNG& rng)
+      : base_xhmc<Model, diag_e_metric, expl_leapfrog, BaseRNG>(model, rng) {}
+};
 
-  }  // mcmc
-}  // stan
+}  // namespace mcmc
+}  // namespace stan
 #endif

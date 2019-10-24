@@ -9,10 +9,13 @@ TEST(langParser, lowerTruncAdjust) {
   test_parsable("lower-trunc-discrete");
   // built-in T[L, ]
   expect_match("lower-trunc-discrete",
-               "lp_accum__.add(-log_sum_exp(poisson_ccdf_log(L, lambda), poisson_log(L, lambda)));");
+               "lp_accum__.add(-log_sum_exp(poisson_ccdf_log(L, lambda), "
+               "poisson_log(L, lambda)));");
   // built-in T[L, U]
-  expect_match("lower-trunc-discrete",
-               "lp_accum__.add(-log_sum_exp(log_diff_exp(poisson_cdf_log(U, lambda), poisson_cdf_log(L, lambda)), poisson_log(L, lambda)));");
+  expect_match(
+      "lower-trunc-discrete",
+      "lp_accum__.add(-log_sum_exp(log_diff_exp(poisson_cdf_log(U, lambda), "
+      "poisson_cdf_log(L, lambda)), poisson_log(L, lambda)));");
   // built-in T[ , U]
   expect_match("lower-trunc-discrete",
                "lp_accum__.add(-poisson_cdf_log(U, lambda));");
@@ -84,6 +87,4 @@ TEST(langParser, lowerTruncAdjust) {
   expect_match("lower-trunc-discrete",
                "lp_accum__.add(-quux_cdf_log(U, lambda,"
                " pstream__));");
-
-
 }

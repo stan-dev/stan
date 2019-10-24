@@ -5,14 +5,14 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    row_vector_expr::row_vector_expr()
-      : args_(), has_var_(false), row_vector_expr_scope_() { }
+row_vector_expr::row_vector_expr()
+    : args_(), has_var_(false), row_vector_expr_scope_() {}
 
-    row_vector_expr::row_vector_expr(const std::vector<expression>& args)
-      : args_(args), has_var_(false), row_vector_expr_scope_() { }
+row_vector_expr::row_vector_expr(const std::vector<expression>& args)
+    : args_(args), has_var_(false), row_vector_expr_scope_() {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

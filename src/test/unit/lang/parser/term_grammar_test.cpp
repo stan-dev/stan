@@ -3,26 +3,21 @@
 
 TEST(langParserTermGrammar, vector_expr) {
   test_parsable("vec-expr/row_vector_expr_terms");
-  test_throws("row_vector_expr_bad1",
-              "Variable definition base type mismatch");
+  test_throws("row_vector_expr_bad1", "Variable definition base type mismatch");
   test_throws("row_vector_expr_bad2",
               "Row vector expression elements must be int or real");
-  test_throws("row_vector_expr_bad3",
-              "PARSER EXPECTED: <expression>");
+  test_throws("row_vector_expr_bad3", "PARSER EXPECTED: <expression>");
 }
 
 TEST(langParserTermGrammar, matrix_expr) {
   test_parsable("vec-expr/matrix_expr_terms");
-  test_throws("matrix_expr_bad1",
-              "Variable definition base type mismatch");
+  test_throws("matrix_expr_bad1", "Variable definition base type mismatch");
   test_throws("matrix_expr_bad2",
               "Matrix expression elements must be type row_vector");
   test_throws("matrix_expr_bad3",
               "Matrix expression elements must be type row_vector");
-  test_throws("matrix_expr_bad4",
-              "found element of type matrix");
-  test_throws("matrix_expr_bad5",
-              "PARSER EXPECTED: <expression>");
+  test_throws("matrix_expr_bad4", "found element of type matrix");
+  test_throws("matrix_expr_bad5", "PARSER EXPECTED: <expression>");
 }
 
 TEST(langParserTermGrammar, array_expr) {
@@ -31,20 +26,21 @@ TEST(langParserTermGrammar, array_expr) {
   test_parsable("array-expr/validate_array_expr_containers");
   test_throws("validate_array_expr_bad1", "Base type mismatch");
   test_throws("validate_array_expr_bad2", "Dimension mismatch");
-  test_throws("validate_array_expr_bad3", "expression assignable to left-hand side");
+  test_throws("validate_array_expr_bad3",
+              "expression assignable to left-hand side");
   test_throws("validate_array_expr_bad3a", "expression");
 }
 
 TEST(langParserTermGrammar, infixExponentiation) {
   test_parsable("validate_exponentiation_good");
   test_parsable("validate_exponentiation_precedence");
-  test_throws("validate_exponentiation_bad", 
+  test_throws("validate_exponentiation_bad",
               "Base type mismatch in assignment; variable name = z");
 }
 
 TEST(langParserTermGrammar, modulusOp) {
   test_parsable("validate_modulus_good");
-  test_throws("validate_modulus_bad", 
+  test_throws("validate_modulus_bad",
               "Both operands of % must be int; cannot modulo real by real");
 }
 
@@ -53,11 +49,10 @@ TEST(langParserTermGrammar, multiplicationFun) {
 }
 
 TEST(langParserTermGrammar, divisionFun) {
-  test_warning("validate_division_int_warning", 
+  test_warning("validate_division_int_warning",
                "integer division implicitly rounds");
   test_parsable("validate_division_good");
 }
-
 
 TEST(langParserTermGrammar, leftDivisionFun) {
   test_parsable("validate_left_division_good");
@@ -82,8 +77,7 @@ TEST(langParserTermGrammar, logicalNegateExprFun) {
 }
 
 TEST(langParserTermGrammar, addExpressionDimssFun) {
-  test_throws("validate_add_expression_dimss_bad",
-              "Too many indexes");
+  test_throws("validate_add_expression_dimss_bad", "Too many indexes");
   test_parsable("validate_add_expression_dimss_good");
 }
 
@@ -92,39 +86,28 @@ TEST(langParserTermGrammar, setFunTypeNamed) {
 }
 
 TEST(langGrammarsTermGrammar, operatorErrorMsg) {
-  test_throws("op_addition_bad",
-              "matrix + vector",
+  test_throws("op_addition_bad", "matrix + vector",
               "Available argument signatures for operator+");
-  test_throws("op_subtraction_bad",
-              "vector - matrix",
+  test_throws("op_subtraction_bad", "vector - matrix",
               "Available argument signatures for operator-");
-  test_throws("op_multiplication_bad",
-              "int[ ] * matrix",
+  test_throws("op_multiplication_bad", "int[ ] * matrix",
               "Available argument signatures for operator*");
-  test_throws("op_divide_bad",
-              "int[ ] / matrix",
+  test_throws("op_divide_bad", "int[ ] / matrix",
               "Available argument signatures for operator/");
   test_throws("op_modulus_bad",
               "Both operands of % must be int; cannot modulo int[ ] by matrix");
-  test_throws("op_mdivide_left_bad",
-              "int[ ] \\ matrix",
+  test_throws("op_mdivide_left_bad", "int[ ] \\ matrix",
               "Available argument signatures for operator\\");
-  test_throws("op_divide_right_bad",
-              "int[ ] / matrix",
+  test_throws("op_divide_right_bad", "int[ ] / matrix",
               "Available argument signatures for operator/");
-  test_throws("op_elt_multiply_bad",
-              "int[ ] .* matrix",
+  test_throws("op_elt_multiply_bad", "int[ ] .* matrix",
               "Available argument signatures for operator.*");
-  test_throws("op_elt_divide_bad",
-              "int[ ] ./ matrix",
+  test_throws("op_elt_divide_bad", "int[ ] ./ matrix",
               "Available argument signatures for operator./");
-  test_throws("op_minus_bad",
-              "-int[ ]",
+  test_throws("op_minus_bad", "-int[ ]",
               "Available argument signatures for operator-");
-  test_throws("op_logical_negation_bad",
-              "!int[ ]",
+  test_throws("op_logical_negation_bad", "!int[ ]",
               "Available argument signatures for operator!");
-  test_throws("op_transpose_bad",
-              "int[ ]'",
+  test_throws("op_transpose_bad", "int[ ]'",
               "Available argument signatures for operator'");
 }

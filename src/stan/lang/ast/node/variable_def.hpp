@@ -5,16 +5,14 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    variable::variable() { }
+variable::variable() {}
 
-    variable::variable(const std::string& name) : name_(name) { }
+variable::variable(const std::string& name) : name_(name) {}
 
-    void variable::set_type(const bare_expr_type& bare_type) {
-      type_ = bare_type;
-    }
+void variable::set_type(const bare_expr_type& bare_type) { type_ = bare_type; }
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

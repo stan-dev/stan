@@ -4,7 +4,8 @@
 
 TEST(chained_var_context, ctor) {
   std::vector<double> v;
-  for (size_t i = 0; i < 16; i++) v.push_back(1.0 * i);
+  for (size_t i = 0; i < 16; i++)
+    v.push_back(1.0 * i);
   std::vector<std::vector<size_t> > dims;
   std::vector<size_t> scalar_dim;
   std::vector<size_t> vec_dim;
@@ -22,17 +23,18 @@ TEST(chained_var_context, ctor) {
   stan::io::array_var_context avc(names, v, dims);
 
   std::vector<double> v2;
-  for (size_t i = 1; i < 21; i++) v2.push_back(10 * i);
+  for (size_t i = 1; i < 21; i++)
+    v2.push_back(10 * i);
   std::vector<std::vector<size_t> > dims2;
   std::vector<size_t> vec_dim2;
   vec_dim2.push_back(4);
   std::vector<size_t> array_dim2;
   array_dim2.push_back(2);
   array_dim2.push_back(7);
-  dims2.push_back(scalar_dim); // 1
-  dims2.push_back(vec_dim2);   // 4 
-  dims2.push_back(array_dim2); // 14 
-  dims2.push_back(scalar_dim); // 1
+  dims2.push_back(scalar_dim);  // 1
+  dims2.push_back(vec_dim2);    // 4
+  dims2.push_back(array_dim2);  // 14
+  dims2.push_back(scalar_dim);  // 1
   std::vector<std::string> names2;
   names2.push_back("alpha");
   names2.push_back("b");

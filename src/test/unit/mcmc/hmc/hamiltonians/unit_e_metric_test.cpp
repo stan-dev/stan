@@ -37,14 +37,13 @@ TEST(McmcUnitEMetric, sample_p) {
   double var = m2 / (n_samples + 1.0);
 
   // Mean within 5sigma of expected value (d / 2)
-  EXPECT_TRUE(std::fabs(m   - 0.5 * q.size()) < 5.0 * sqrt(var));
+  EXPECT_TRUE(std::fabs(m - 0.5 * q.size()) < 5.0 * sqrt(var));
 
   // Variance within 10% of expected value (d / 2)
   EXPECT_TRUE(std::fabs(var - 0.5 * q.size()) < 0.1 * q.size());
 }
 
 TEST(McmcUnitEMetric, gradients) {
-
   rng_t base_rng(0);
 
   Eigen::VectorXd q = Eigen::VectorXd::Ones(11);
@@ -63,7 +62,8 @@ TEST(McmcUnitEMetric, gradients) {
 
   funnel_model_namespace::funnel_model model(data_var_context, &model_output);
 
-  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
+  stan::mcmc::unit_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(
+      model);
 
   double epsilon = 1e-6;
 

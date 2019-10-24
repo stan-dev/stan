@@ -7,23 +7,22 @@
 #include <set>
 #include <vector>
 
-using stan::lang::idx;
-using stan::lang::uni_idx;
-using stan::lang::omni_idx;
-using stan::lang::expression;
-using stan::lang::int_literal;
-using stan::lang::function_signatures;
 using stan::lang::bare_array_type;
 using stan::lang::bare_expr_type;
-using stan::lang::ill_formed_type;
-using stan::lang::void_type;
 using stan::lang::double_type;
+using stan::lang::expression;
+using stan::lang::function_signatures;
+using stan::lang::idx;
+using stan::lang::ill_formed_type;
+using stan::lang::int_literal;
 using stan::lang::int_type;
-using stan::lang::vector_type;
-using stan::lang::row_vector_type;
 using stan::lang::matrix_type;
+using stan::lang::omni_idx;
+using stan::lang::row_vector_type;
+using stan::lang::uni_idx;
+using stan::lang::vector_type;
+using stan::lang::void_type;
 using std::vector;
-
 
 TEST(langAst, uniIdx) {
   stan::lang::expression e(stan::lang::int_literal(3));
@@ -90,7 +89,7 @@ TEST(langAst, lubIdx) {
   stan::lang::variable v("foo");
   v.set_type(int_type());
   stan::lang::expression e2(v);
-  stan::lang::lub_idx i(e1,e2);
+  stan::lang::lub_idx i(e1, e2);
   // test proper type storage and retrieval
   EXPECT_EQ(bare_expr_type(int_type()), i.lb_.bare_type());
   EXPECT_EQ(0, i.lb_.bare_type().num_dims());
