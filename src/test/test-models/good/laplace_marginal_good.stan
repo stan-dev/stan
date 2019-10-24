@@ -53,5 +53,13 @@ model {
 generated quantities {
   vector[5] theta_pred;
 
+  theta_pred = laplace_approx_poisson_rng(theta_0, phi, x, n_samples, sums);
+  theta_pred = laplace_approx_poisson_rng(theta_0_v, phi, x, n_samples, sums);
+  theta_pred = laplace_approx_poisson_rng(theta_0, phi_v, x, n_samples, sums);
+  theta_pred = laplace_approx_poisson_rng(theta_0_v, phi_v, x, n_samples, sums);
+
   theta_pred = laplace_approx_poisson_rng(theta_0, phi, x, n_samples, sums, ye);
+  theta_pred = laplace_approx_poisson_rng(theta_0_v, phi, x, n_samples, sums, ye);
+  theta_pred = laplace_approx_poisson_rng(theta_0, phi_v, x, n_samples, sums, ye);
+  theta_pred = laplace_approx_poisson_rng(theta_0_v, phi_v, x, n_samples, sums, ye);
 }
