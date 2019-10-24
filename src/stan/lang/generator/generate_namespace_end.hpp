@@ -5,17 +5,15 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate the end of a namespace to the specified stream.
-     *
-     * @param[in, out] o stream for generating
-     */
-    void generate_namespace_end(std::ostream& o) {
-      o << "}  // namespace" << EOL2;
-    }
+/**
+ * Generate the end of a namespace to the specified stream.
+ *
+ * @param[in, out] o stream for generating
+ */
+void generate_namespace_end(std::ostream& o) { o << "}  // namespace" << EOL2; }
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

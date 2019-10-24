@@ -5,17 +5,17 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    binary_op::binary_op() { }
+binary_op::binary_op() {}
 
-    binary_op::binary_op(const expression& left, const std::string& op,
-                         const expression& right)
-      : op(op), left(left), right(right),
-        type_(promote_primitive(left.bare_type(),
-                                right.bare_type())) {
-    }
+binary_op::binary_op(const expression& left, const std::string& op,
+                     const expression& right)
+    : op(op),
+      left(left),
+      right(right),
+      type_(promote_primitive(left.bare_type(), right.bare_type())) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

@@ -6,41 +6,38 @@
 #include <stan/mcmc/stepsize_adapter.hpp>
 
 namespace stan {
-  namespace mcmc {
+namespace mcmc {
 
-    // The No-U-Turn Sampler (NUTS) on a
-    // Euclidean manifold with unit metric
-    // and adaptive stepsize
+// The No-U-Turn Sampler (NUTS) on a
+// Euclidean manifold with unit metric
+// and adaptive stepsize
 
-    template <class Model, class BaseRNG>
-    class adapt_unit_e_nuts_classic:
-      public unit_e_nuts_classic<Model, BaseRNG>,
-      public stepsize_adapter {
-    public:
-      adapt_unit_e_nuts_classic(const Model& model, BaseRNG& rng):
-        unit_e_nuts_classic<Model, BaseRNG>(model, rng) {}
+template <class Model, class BaseRNG>
+class adapt_unit_e_nuts_classic : public unit_e_nuts_classic<Model, BaseRNG>,
+                                  public stepsize_adapter {
+ public:
+  adapt_unit_e_nuts_classic(const Model& model, BaseRNG& rng)
+      : unit_e_nuts_classic<Model, BaseRNG>(model, rng) {}
 
-      ~adapt_unit_e_nuts_classic() {}
+  ~adapt_unit_e_nuts_classic() {}
 
-      sample
-      transition(sample& init_sample, callbacks::logger& logger) {
-        sample s
-          = unit_e_nuts_classic<Model, BaseRNG>::transition(init_sample,
-                                                            logger);
+  sample transition(sample& init_sample, callbacks::logger& logger) {
+    sample s
+        = unit_e_nuts_classic<Model, BaseRNG>::transition(init_sample, logger);
 
-        if (this->adapt_flag_)
-          this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
-                                                    s.accept_stat());
+    if (this->adapt_flag_)
+      this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
+                                                s.accept_stat());
 
-        return s;
-      }
+    return s;
+  }
 
-      void disengage_adaptation() {
-        base_adapter::disengage_adaptation();
-        this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
-      }
-    };
+  void disengage_adaptation() {
+    base_adapter::disengage_adaptation();
+    this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
+  }
+};
 
-  }  // mcmc
-}  // stan
+}  // namespace mcmc
+}  // namespace stan
 #endif

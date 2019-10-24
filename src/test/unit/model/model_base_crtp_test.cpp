@@ -9,95 +9,90 @@
 #include <vector>
 
 struct mock_model : public stan::model::model_base_crtp<mock_model> {
-  mock_model(size_t n) : model_base_crtp(n) { }
+  mock_model(size_t n) : model_base_crtp(n) {}
 
-  virtual ~mock_model() { }
+  virtual ~mock_model() {}
 
-  std::string model_name() const override {
-    return "mock_model";
-  }
+  std::string model_name() const override { return "mock_model"; }
 
-  void get_param_names(std::vector<std::string>& names)
-      const override {
-  }
-  void get_dims(std::vector<std::vector<size_t> >& dimss)
-      const override {
-  }
+  void get_param_names(std::vector<std::string>& names) const override {}
+  void get_dims(std::vector<std::vector<size_t> >& dimss) const override {}
 
   void constrained_param_names(std::vector<std::string>& param_names,
                                bool include_tparams,
-                               bool include_gqs)
-      const override {
-  }
+                               bool include_gqs) const override {}
 
   void unconstrained_param_names(std::vector<std::string>& param_names,
                                  bool include_tparams,
-                                 bool include_gqs)
-      const override {
-  }
+                                 bool include_gqs) const override {}
 
   template <bool propto, bool jacobian, typename T>
-  T log_prob(Eigen::Matrix<T, -1, 1>& params_r,
-             std::ostream* msgs) const {
+  T log_prob(Eigen::Matrix<T, -1, 1>& params_r, std::ostream* msgs) const {
     if (std::is_same<T, double>::value) {
-      if (!propto && !jacobian) return 1;
-      else if (!propto && jacobian) return 3;
-      else if (propto && !jacobian) return 5;
-      else return 7;
+      if (!propto && !jacobian)
+        return 1;
+      else if (!propto && jacobian)
+        return 3;
+      else if (propto && !jacobian)
+        return 5;
+      else
+        return 7;
     } else {
-      if (!propto && !jacobian) return 2;
-      else if (!propto && jacobian) return 4;
-      else if (propto && !jacobian) return 6;
-      else return 8;
+      if (!propto && !jacobian)
+        return 2;
+      else if (!propto && jacobian)
+        return 4;
+      else if (propto && !jacobian)
+        return 6;
+      else
+        return 8;
     }
   }
 
   void transform_inits(const stan::io::var_context& context,
                        Eigen::VectorXd& params_r,
-                       std::ostream* msgs) const override {
-  }
+                       std::ostream* msgs) const override {}
 
   template <typename RNG>
-  void write_array(RNG& base_rng,
-                   Eigen::VectorXd& params_r,
-                   Eigen::VectorXd& params_constrained_r,
-                   bool include_tparams,
-                   bool include_gqs,
-                   std::ostream* msgs) const {
-  }
+  void write_array(RNG& base_rng, Eigen::VectorXd& params_r,
+                   Eigen::VectorXd& params_constrained_r, bool include_tparams,
+                   bool include_gqs, std::ostream* msgs) const {}
 
   template <bool propto, bool jacobian, typename T>
-  T log_prob(std::vector<T>& params_r,
-             std::vector<int>& params_i,
+  T log_prob(std::vector<T>& params_r, std::vector<int>& params_i,
              std::ostream* msgs) const {
     if (std::is_same<T, double>::value) {
-      if (!propto && !jacobian) return 1;
-      else if (!propto && jacobian) return 3;
-      else if (propto && !jacobian) return 5;
-      else return 7;
+      if (!propto && !jacobian)
+        return 1;
+      else if (!propto && jacobian)
+        return 3;
+      else if (propto && !jacobian)
+        return 5;
+      else
+        return 7;
     } else {
-      if (!propto && !jacobian) return 2;
-      else if (!propto && jacobian) return 4;
-      else if (propto && !jacobian) return 6;
-      else return 8;
+      if (!propto && !jacobian)
+        return 2;
+      else if (!propto && jacobian)
+        return 4;
+      else if (propto && !jacobian)
+        return 6;
+      else
+        return 8;
     }
   }
 
   void transform_inits(const stan::io::var_context& context,
                        std::vector<int>& params_i,
                        std::vector<double>& params_r,
-                       std::ostream* msgs) const override {
-  }
+                       std::ostream* msgs) const override {}
 
   template <typename RNG>
-  void write_array(RNG& base_rng,
-                   std::vector<double>& params_r,
+  void write_array(RNG& base_rng, std::vector<double>& params_r,
                    std::vector<int>& params_i,
                    std::vector<double>& params_r_constrained,
-                   bool include_tparams,
-                   bool include_gqs,
-                   std::ostream* msgs) const {
-  }
+                   bool include_tparams, bool include_gqs,
+                   std::ostream* msgs) const {}
 };
 
 TEST(model, modelBaseInheritance) {
@@ -128,7 +123,7 @@ TEST(model, modelTemplateLogProb) {
 
   // test template version from base class reference
   // long form assignment avoids test macro parse error with multi tparams
-  double v1 =  bm.template log_prob<false, false>(params_r, msgs);
+  double v1 = bm.template log_prob<false, false>(params_r, msgs);
   EXPECT_FLOAT_EQ(1, v1);
   double v2 = bm.template log_prob<false, false>(params_r_v, msgs).val();
   EXPECT_FLOAT_EQ(2, v2);

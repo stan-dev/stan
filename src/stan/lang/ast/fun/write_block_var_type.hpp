@@ -5,16 +5,16 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Write a user-readable version of the specified variable type
-     * to the specified output stream.
-     *
-     * @param o output stream
-     * @param type variable type
-     */
-    std::ostream& write_block_var_type(std::ostream& o, block_var_type type);
-  }
-}
+/**
+ * Write a user-readable version of the specified variable type
+ * to the specified output stream.
+ *
+ * @param o output stream
+ * @param type variable type
+ */
+std::ostream& write_block_var_type(std::ostream& o, block_var_type type);
+}  // namespace lang
+}  // namespace stan
 #endif

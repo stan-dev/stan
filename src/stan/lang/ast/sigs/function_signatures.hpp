@@ -10,7 +10,6 @@
 #include <utility>
 #include <vector>
 
-
 namespace stan {
   namespace lang {
 
@@ -483,6 +482,7 @@ namespace stan {
       static function_signatures* sigs_;  // init below outside of class
     };
 
-  }
-}
+}  // namespace math
+}  // namespace stan
+
 #endif

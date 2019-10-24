@@ -15,30 +15,28 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    struct test_local_var_decls_grammar
-      : boost::spirit::qi::grammar<Iterator,
-                                   boost::spirit::qi::locals<scope>,
-                                   std::vector<local_var_decl>,
-                                   whitespace_grammar<Iterator> > {
-      const io::program_reader& reader_;
-      variable_map var_map_;
-      std::stringstream& error_msgs_;
-      local_var_decls_grammar<Iterator> local_var_decls_g;
+template <typename Iterator>
+struct test_local_var_decls_grammar
+    : boost::spirit::qi::grammar<Iterator, boost::spirit::qi::locals<scope>,
+                                 std::vector<local_var_decl>,
+                                 whitespace_grammar<Iterator> > {
+  const io::program_reader& reader_;
+  variable_map var_map_;
+  std::stringstream& error_msgs_;
+  local_var_decls_grammar<Iterator> local_var_decls_g;
 
-      test_local_var_decls_grammar(const io::program_reader& reader,
-                                   variable_map& var_map,
-                                   std::stringstream& error_msgs);
+  test_local_var_decls_grammar(const io::program_reader& reader,
+                               variable_map& var_map,
+                               std::stringstream& error_msgs);
 
-      boost::spirit::qi::rule<Iterator,
-                              boost::spirit::qi::locals<scope>,
-                              std::vector<local_var_decl>,
-                              whitespace_grammar<Iterator> >
+  boost::spirit::qi::rule<Iterator, boost::spirit::qi::locals<scope>,
+                          std::vector<local_var_decl>,
+                          whitespace_grammar<Iterator> >
       test_local_var_decls_r;
-    };
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

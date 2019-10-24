@@ -45,6 +45,14 @@ add("add", bare_expr_type(matrix_type()), bare_expr_type(double_type()), bare_ex
 for (size_t i = 0; i < bare_types.size(); ++i) {
   add("add", bare_types[i], bare_types[i]);
  }
+
+add("add_diag", bare_expr_type(matrix_type()), bare_expr_type(matrix_type()),
+    bare_expr_type(double_type()));
+add("add_diag", bare_expr_type(matrix_type()), bare_expr_type(matrix_type()),
+    bare_expr_type(vector_type()));
+add("add_diag", bare_expr_type(matrix_type()), bare_expr_type(matrix_type()),
+    bare_expr_type(row_vector_type()));
+
 for (size_t i = 1; i < 8; ++i) {
   add("append_array", bare_expr_type(bare_array_type(int_type(), i)), bare_expr_type(bare_array_type(int_type(), i)), bare_expr_type(bare_array_type(int_type(), i)));
   add("append_array", bare_expr_type(bare_array_type(double_type(), i)), bare_expr_type(bare_array_type(double_type(), i)), bare_expr_type(bare_array_type(double_type(), i)));

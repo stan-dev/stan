@@ -5,14 +5,14 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    for_statement::for_statement() { }
+for_statement::for_statement() {}
 
-    for_statement::for_statement(const std::string& variable,
-                                 const range& range,  const statement& stmt)
-      : variable_(variable), range_(range), statement_(stmt) { }
+for_statement::for_statement(const std::string& variable, const range& range,
+                             const statement& stmt)
+    : variable_(variable), range_(range), statement_(stmt) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

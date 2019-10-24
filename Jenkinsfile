@@ -18,9 +18,11 @@ def runTests(String testPath, Boolean separateMakeStep=true) {
 }
 
 def runTestsWin(String testPath) {
-    bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
-    try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
-    finally { junit 'test/**/*.xml' }
+    withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
+       bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+       try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
+       finally { junit 'test/**/*.xml' }
+    }
 }
 
 def deleteDirWin() {
@@ -38,6 +40,11 @@ String stan_pr() {
         env.BRANCH_NAME
     }
 }
+
+def isBranch(String b) { env.BRANCH_NAME == b }
+Boolean isPR() { env.CHANGE_URL != null }
+String fork() { env.CHANGE_FORK ?: "stan-dev" }
+String branchName() { isPR() ? env.CHANGE_BRANCH :env.BRANCH_NAME }
 
 pipeline {
     agent none
@@ -88,10 +95,10 @@ pipeline {
             post {
                 always {
 
-                    recordIssues id: "lint_doc_checks", 
+                    recordIssues id: "lint_doc_checks",
                     name: "Linting & Doc checks",
-                    enabledForFailure: true, 
-                    aggregatingResults : true, 
+                    enabledForFailure: true,
+                    aggregatingResults : true,
                     tools: [
                         cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
                     ],
@@ -104,6 +111,54 @@ pipeline {
                 }
             }
         }
+        stage("Clang-format") {
+            agent any
+            steps {
+                sh "printenv"
+                deleteDir()
+                retry(3) { checkout scm }
+                withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
+                    usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    sh """#!/bin/bash
+                        set -x
+                        git checkout -b ${branchName()}
+                        clang-format --version
+                        find src -name '*.hpp' -o -name '*.cpp' | xargs -n20 -P${env.PARALLEL} clang-format -i
+                        if [[ `git diff` != "" ]]; then
+                            git config --global user.email "mc.stanislaw@gmail.com"
+                            git config --global user.name "Stan Jenkins"
+                            git add src
+                            git commit -m "[Jenkins] auto-formatting by `clang-format --version`"
+                            git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/stan.git ${branchName()}
+                            echo "Exiting build because clang-format found changes."
+                            echo "Those changes are now found on stan-dev/stan under branch ${branchName()}"
+                            echo "Please 'git pull' before continuing to develop."
+                            exit 1
+                        fi
+                    """
+                }
+            }
+            post {
+                always { deleteDir() }
+                failure {
+                    script {
+                        emailext (
+                            subject: "[StanJenkins] Autoformattted: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
+                            body: "Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' " +
+                                "has been autoformatted and the changes committed " +
+                                "to your branch, if permissions allowed." +
+                                "Please pull these changes before continuing." +
+                                "\n\n" +
+                                "See https://github.com/stan-dev/stan/wiki/Coding-Style-and-Idioms" +
+                                " for setting up the autoformatter locally.\n"+
+                            "(Check console output at ${env.BUILD_URL})",
+                            recipientProviders: [[$class: 'RequesterRecipientProvider']],
+                            to: "${env.CHANGE_AUTHOR_EMAIL}"
+                        )
+                    }
+                }
+            }
+        }
         stage('Unit tests') {
             parallel {
                 stage('Windows Headers & Unit') {
@@ -112,7 +167,7 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             setupCXX()
-                            bat "make -j${env.PARALLEL} test-headers"
+                            bat "mingw32-make -j${env.PARALLEL} test-headers"
                             setupCXX(false)
                             runTestsWin("src/test/unit")
                     }
@@ -174,10 +229,10 @@ pipeline {
     post {
         always {
             node("osx || linux") {
-                recordIssues id: "pipeline", 
+                recordIssues id: "pipeline",
                 name: "Entire pipeline results",
-                enabledForFailure: true, 
-                aggregatingResults : false, 
+                enabledForFailure: true,
+                aggregatingResults : false,
                 tools: [
                     gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
                     clang(id: "pipeline_clang", name: "LLVM/Clang")

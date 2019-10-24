@@ -4,13 +4,13 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    bool ends_with(const std::string& suffix, const std::string& s) {
-      size_t idx = s.rfind(suffix);
-      return idx != std::string::npos && idx == (s.size() - suffix.size());
-    }
-
-  }
+bool ends_with(const std::string& suffix, const std::string& s) {
+  size_t idx = s.rfind(suffix);
+  return idx != std::string::npos && idx == (s.size() - suffix.size());
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

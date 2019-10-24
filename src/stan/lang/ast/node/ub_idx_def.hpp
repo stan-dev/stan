@@ -4,12 +4,12 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    ub_idx::ub_idx() { }
+ub_idx::ub_idx() {}
 
-    ub_idx::ub_idx(const expression& ub) : ub_(ub) { }
+ub_idx::ub_idx(const expression& ub) : ub_(ub) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif
