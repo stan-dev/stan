@@ -1,4 +1,3 @@
-#include <Eigen/Dense>
 #include <boost/algorithm/string.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
@@ -14,7 +13,7 @@
 #include <vector>
 
 class ServicesStandaloneGQ : public ::testing::Test {
-public:
+ public:
   ServicesStandaloneGQ()
       : logger(logger_ss, logger_ss, logger_ss, logger_ss, logger_ss) {}
 
@@ -27,9 +26,7 @@ public:
     model = new stan_model(data_var_context);
   }
 
-  void TearDown() {
-    delete model;
-  }
+  void TearDown() { delete model; }
 
   stan::test::unit::instrumented_interrupt interrupt;
   std::stringstream logger_ss;

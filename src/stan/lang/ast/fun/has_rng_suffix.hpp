@@ -4,16 +4,16 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Return true if the specified string has the suffix
-     * "_rng".
-     *
-     * @param[in] name function name
-     */
-    bool has_rng_suffix(const std::string& name);
+/**
+ * Return true if the specified string has the suffix
+ * "_rng".
+ *
+ * @param[in] name function name
+ */
+bool has_rng_suffix(const std::string& name);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

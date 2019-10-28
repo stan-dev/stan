@@ -5,6 +5,48 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.21.0 (18 October 2019)
+======================================================================
+
+New Features
+------------
+- Add Intel TBB (#2769)
+- Add automated maintanence and cleanup via clang-tools to makefile (#2805)
+- Use Welford's algorithm for Variance Estimates in src/stan/analyze (#2819)
+- Adds additional no-u-turn checks across subtrees to avoid missing u-turns for approximately iid normal models (#2800)
+- Add gp kernels to language (#2739)
+- Update rhat and ess (#2794)
+
+Bug Fixes
+---------
+- Fix const logic and size check (#2822)
+- Add ifdef for R new_model (#2798)
+- Add g_ to name of g vector name in ps_point (#2832)
+
+v.2.20.0 (18 July 2019)
+======================================================================
+
+New Features
+------------
+- Update effective sample size calculations, with a small change to the autocovariance function, to use split chains (#2774)
+- Add stan::model::model_base base class and and stan::model::model_crtp static adapter class for constructing models. (#2785)
+- Allow ts and t0 to be parameters, complete ode_test, and extend the integrate_ode_* stan models (#2791)
+- Add the GP covariance functions to the language (primitives of some popular materns, a dot product, and the periodic) (#2758)
+- Update Eigen includes to allow compilation with new plugin methods (#2754)
+- Add gp kernels to language (#2739)
+
+Bug Fixes
+---------
+- Multi-unit compilation of base_xhmc.hpp. (#2775)
+- Declaring a size zero simplex in a Stan program will halt the program. (#2773)
+
+Other
+-----
+- Defer to Eigen's copy constructor now for assignment ( faster matrix assign ) (#2784)
+- Rethrow_located also takes in a string to specify the location. (#2770)
+- Faster indexing (#2766)
+- Fixed generator so that matrix indexing uses most efficient access strategy (#2749)
+
 v.2.19.1 (18 Apr 2019)
 ======================================================================
 

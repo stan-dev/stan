@@ -19,7 +19,7 @@ TEST(astExpression, int_literal) {
   stan::lang::int_literal intLit(5);
   EXPECT_TRUE(intLit.type_.is_int_type());
   EXPECT_EQ(intLit.val_, 5);
-  
+
   stan::lang::expression e1 = intLit;
   EXPECT_TRUE(e1.bare_type().is_int_type());
   EXPECT_EQ(e1.to_string(), "5");
@@ -77,7 +77,7 @@ TEST(astExpression, array_expr) {
 
 TEST(astExpression, variable_expr) {
   stan::lang::matrix_type tMat;
-  stan::lang::bare_array_type d2_ar(tMat,2);
+  stan::lang::bare_array_type d2_ar(tMat, 2);
   stan::lang::bare_expr_type bet(d2_ar);
   stan::lang::variable v("foo");
   v.set_type(bet);
@@ -101,13 +101,13 @@ TEST(astExpression, fun_expr) {
 TEST(astExpression, algebra_solver) {
   stan::lang::algebra_solver so;  // null ctor should work and not raise error
   std::string system_function_name = "bronzino";
-    
+
   stan::lang::variable y("y_var_name");
   y.set_type(stan::lang::vector_type());
-    
+
   stan::lang::variable theta("theta_var_name");
   theta.set_type(stan::lang::vector_type());
-    
+
   stan::lang::variable x_r("x_r_r_var_name");
   x_r.set_type(stan::lang::bare_array_type(stan::lang::double_type()));
   stan::lang::variable x_i("x_i_var_name");
@@ -129,7 +129,7 @@ TEST(astExpression, algebra_solver) {
 
 // TODO:mitzi need similar test for integrate_ode_control
 TEST(astExpression, integrate_ode) {
-  stan::lang::integrate_ode so; // null ctor should work and not raise error
+  stan::lang::integrate_ode so;  // null ctor should work and not raise error
 
   std::string integration_function_name = "bar";
   std::string system_function_name = "foo";
@@ -154,7 +154,7 @@ TEST(astExpression, integrate_ode) {
 
   // example of instantiation
   stan::lang::integrate_ode so2(integration_function_name, system_function_name,
-                    y0, t0, ts, theta, x, x_int);
+                                y0, t0, ts, theta, x, x_int);
   // check integrate_ode
   EXPECT_EQ(integration_function_name, so2.integration_function_name_);
   EXPECT_EQ(system_function_name, so2.system_function_name_);
@@ -174,7 +174,7 @@ TEST(astExpression, conditional_op) {
   stan::lang::expression e1 = stan::lang::int_literal(5);
   stan::lang::expression e2 = stan::lang::double_literal(2.0);
   stan::lang::expression e3 = stan::lang::double_literal(-2.0);
-  stan::lang::conditional_op co(e1,e2,e3);
+  stan::lang::conditional_op co(e1, e2, e3);
   stan::lang::expression e4(co);
   EXPECT_TRUE(e4.bare_type().is_double_type());
 }
@@ -183,7 +183,7 @@ TEST(astExpression, conditional_op_mixed) {
   stan::lang::expression e1 = stan::lang::int_literal(5);
   stan::lang::expression e2 = stan::lang::int_literal(2);
   stan::lang::expression e3 = stan::lang::double_literal(-2.0);
-  stan::lang::conditional_op co(e1,e2,e3);
+  stan::lang::conditional_op co(e1, e2, e3);
   stan::lang::expression e4(co);
   EXPECT_TRUE(e4.bare_type().is_double_type());
 }
@@ -192,7 +192,7 @@ TEST(astExpression, conditional_op_int) {
   stan::lang::expression e1 = stan::lang::int_literal(5);
   stan::lang::expression e2 = stan::lang::int_literal(2);
   stan::lang::expression e3 = stan::lang::int_literal(3);
-  stan::lang::conditional_op co(e1,e2,e3);
+  stan::lang::conditional_op co(e1, e2, e3);
   stan::lang::expression e4(co);
   EXPECT_TRUE(e4.bare_type().is_int_type());
 }
@@ -201,7 +201,7 @@ TEST(astExpression, conditional_op_bad) {
   stan::lang::expression e1 = stan::lang::double_literal(1.0);
   stan::lang::expression e2 = stan::lang::int_literal(2);
   stan::lang::expression e3 = stan::lang::array_expr();
-  stan::lang::conditional_op co(e1,e2,e3);
+  stan::lang::conditional_op co(e1, e2, e3);
   stan::lang::expression e4(co);
   EXPECT_TRUE(e4.bare_type().is_ill_formed_type());
 }
@@ -210,19 +210,19 @@ TEST(astExpression, binary_op) {
   stan::lang::expression e1 = stan::lang::int_literal(5);
   stan::lang::expression e2 = stan::lang::double_literal(-2.0);
 
-  stan::lang::expression e3(stan::lang::binary_op(e1,"+",e2));
+  stan::lang::expression e3(stan::lang::binary_op(e1, "+", e2));
   EXPECT_TRUE(e3.bare_type().is_double_type());
 
-  stan::lang::expression e4(stan::lang::binary_op(e1,"+",e1));
+  stan::lang::expression e4(stan::lang::binary_op(e1, "+", e1));
   EXPECT_TRUE(e4.bare_type().is_int_type());
 
-  stan::lang::expression e5(stan::lang::binary_op(e2,"+",e2));
+  stan::lang::expression e5(stan::lang::binary_op(e2, "+", e2));
   EXPECT_TRUE(e5.bare_type().is_double_type());
 }
 
 TEST(astExpression, unary_op) {
   stan::lang::expression e1 = stan::lang::int_literal(5);
-  stan::lang::expression neg_e1(stan::lang::unary_op('-',e1));
+  stan::lang::expression neg_e1(stan::lang::unary_op('-', e1));
   EXPECT_TRUE(neg_e1.bare_type().is_int_type());
 }
 
@@ -260,8 +260,8 @@ TEST(astExpression, idx_sliced_all_multi) {
   idxs.push_back(idx);
   idxs.push_back(idx);
 
-  stan::lang::bare_expr_type d3_ar_mat =
-    stan::lang::bare_array_type(stan::lang::matrix_type(), 3);
+  stan::lang::bare_expr_type d3_ar_mat
+      = stan::lang::bare_array_type(stan::lang::matrix_type(), 3);
   stan::lang::variable v2("bar");
   v2.set_type(d3_ar_mat);
   stan::lang::expression e2(v2);
@@ -291,13 +291,14 @@ TEST(astExpression, index_sliced_2) {
   idxs.push_back(m_idx);
   idxs.push_back(u_idx);
 
-  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::int_type(), 3);
+  stan::lang::bare_expr_type d3
+      = stan::lang::bare_array_type(stan::lang::int_type(), 3);
   stan::lang::variable v2("bar");
   v2.set_type(d3);
   stan::lang::expression e3(v2);
   stan::lang::index_op_sliced i_op_slice(e3, idxs);
   stan::lang::expression e4 = i_op_slice;
-  
+
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 2);
   EXPECT_TRUE(e4.bare_type().innermost_type().is_int_type());
@@ -320,15 +321,17 @@ TEST(astExpression, index_sliced_3) {
   idxs.push_back(m_idx);
   idxs.push_back(m_idx);
   idxs.push_back(u_idx);
-  
-  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::vector_type(), 2);
+
+  stan::lang::bare_expr_type d3
+      = stan::lang::bare_array_type(stan::lang::vector_type(), 2);
   stan::lang::variable v2("bar");
   v2.set_type(d3);
   stan::lang::expression e3(v2);
   stan::lang::index_op_sliced i_op_slice(e3, idxs);
   stan::lang::expression e4 = i_op_slice;
 
-  // 3 indexes, reduce vector to double : e.g. [1:5, 1:5, 3]  2-d array of double
+  // 3 indexes, reduce vector to double : e.g. [1:5, 1:5, 3]  2-d array of
+  // double
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 2);
   EXPECT_TRUE(e4.bare_type().innermost_type().is_double_type());
@@ -352,13 +355,14 @@ TEST(astExpression, index_sliced_4) {
   idxs.push_back(m_idx);
   idxs.push_back(m_idx);
 
-  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::vector_type(), 2);
+  stan::lang::bare_expr_type d3
+      = stan::lang::bare_array_type(stan::lang::vector_type(), 2);
   stan::lang::variable v2("bar");
   v2.set_type(d3);
   stan::lang::expression e3(v2);
   stan::lang::index_op_sliced i_op_slice(e3, idxs);
-  
-  // 3 indexes, reduce 2-d array to 1-d : e.g. [3, 1:5, 1:5] 
+
+  // 3 indexes, reduce 2-d array to 1-d : e.g. [3, 1:5, 1:5]
   stan::lang::expression e4 = i_op_slice;
   EXPECT_TRUE(e4.bare_type().num_dims() == 2);
   EXPECT_TRUE(e4.bare_type().array_dims() == 1);
@@ -383,12 +387,12 @@ TEST(astExpression, index_sliced_5) {
   idxs.push_back(m_idx);
   idxs.push_back(m_idx);
 
-  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::matrix_type(), 1);
+  stan::lang::bare_expr_type d3
+      = stan::lang::bare_array_type(stan::lang::matrix_type(), 1);
   stan::lang::variable v2("bar");
   v2.set_type(d3);
   stan::lang::expression e3(v2);
   stan::lang::index_op_sliced i_op_slice(e3, idxs);
-
 
   // reduce 1-d array of matrix to matrix
   stan::lang::expression e4 = i_op_slice;
@@ -415,7 +419,8 @@ TEST(astExpression, index_sliced_6) {
   idxs.push_back(u_idx);
   idxs.push_back(m_idx);
 
-  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::matrix_type(), 1);
+  stan::lang::bare_expr_type d3
+      = stan::lang::bare_array_type(stan::lang::matrix_type(), 1);
   stan::lang::variable v2("bar");
   v2.set_type(d3);
   stan::lang::expression e3(v2);
@@ -433,7 +438,7 @@ TEST(astExpression, print_index_sliced) {
   stan::lang::variable v1("foo");
   v1.set_type(stan::lang::int_type());
   stan::lang::expression e2(v1);
-  stan::lang::lub_idx i1(e1,e2);
+  stan::lang::lub_idx i1(e1, e2);
   stan::lang::idx idx1(i1);
 
   stan::lang::variable v2("multi");
@@ -451,7 +456,8 @@ TEST(astExpression, print_index_sliced) {
   idxs.push_back(idx2);
   idxs.push_back(idx3);
 
-  stan::lang::bare_expr_type d3 = stan::lang::bare_array_type(stan::lang::matrix_type(), 1);
+  stan::lang::bare_expr_type d3
+      = stan::lang::bare_array_type(stan::lang::matrix_type(), 1);
   stan::lang::variable v3("bar");
   v3.set_type(d3);
   stan::lang::expression e4(v3);

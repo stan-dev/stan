@@ -6,7 +6,7 @@ test/%$(EXE) : CXXFLAGS += $(CXXFLAGS_GTEST)
 test/%$(EXE) : CPPFLAGS += $(CPPFLAGS_GTEST)
 test/%$(EXE) : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(STAN),.)
 test/%$(EXE) : INC += $(INC_GTEST)
-test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LIBSUNDIALS) $(MPI_TARGETS)
+test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
 	$(LINK.cpp) $(filter-out test/%.hpp %.hpp-test,$^) $(LDLIBS) $(OUTPUT_OPTION)
 
 test/%.o : src/test/%.cpp
@@ -123,18 +123,30 @@ test/test-model-main.cpp:
 
 ##
 # Adding a test for multiple translation units. If this fails,
-# a new function is probably missing an inline
+# a new function is probably missing an inline.
+# Templates for such test are prefixed with 'mtu_'.
 ##
-ifneq ($(OS),Windows_NT)
-test/unit/multiple_translation_units%.o : CXXFLAGS += -fPIC
-endif
-test/unit/multiple_translation_units%.o : CXXFLAGS += -pipe
-test/unit/libmultiple.so : LDFLAGS += -shared
+test/integration/mtu :
+	mkdir -p test/integration/mtu
 
-test/unit/libmultiple.so : test/unit/multiple_translation_units1.o test/unit/multiple_translation_units2.o $(MPI_TARGETS)
+test/integration/mtu/%_1.cpp : src/test/integration/mtu/%.cpp test/integration/mtu
+	cp $< $@
+test/integration/mtu/%_2.cpp : src/test/integration/mtu/%.cpp test/integration/mtu
+	cp $< $@
+
+ifneq ($(OS),Windows_NT)
+test/integration/mtu/%.o : CXXFLAGS += -fPIC
+endif
+test/integration/mtu/%.o : O = 0
+test/integration/mtu/%.o : %.cpp
+	$(COMPILE.cpp) -pipe -o $(DEV_NULL) -include $^
+
+test/integration/libmtu_%.so : LDFLAGS += -shared
+
+test/integration/libmtu_%.so : test/integration/mtu/%_1.o test/integration/mtu/%_2.o $(MPI_TARGETS) $(TBB_TARGETS)
 	$(LINK.cpp) $^ $(LDLIBS) $(OUTPUT_OPTION)
 
-test/unit/multiple_translation_units_test$(EXE) : test/unit/libmultiple.so
+test/integration/multiple_translation_units_test$(EXE) : test/integration/libmtu_model.so test/integration/libmtu_mcmc.so
 
 
 ############################################################

@@ -11,8 +11,9 @@ matrix_block_type::matrix_block_type(const range &bounds,
     : bounds_(bounds), ls_(ls), M_(M), N_(N) {
   if (bounds.has_low() || bounds.has_high())
     if (ls.has_offset() || ls.has_multiplier())
-      throw std::invalid_argument("Block type cannot have both a bound and"
-                                  "a offset/multiplier.");
+      throw std::invalid_argument(
+          "Block type cannot have both a bound and"
+          "a offset/multiplier.");
 }
 
 matrix_block_type::matrix_block_type(const range &bounds, const expression &M,

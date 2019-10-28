@@ -2,9 +2,8 @@
 #include <stan/lang/grammars/iterator_typedefs.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    template struct stan::lang::indexes_grammar<pos_iterator_t>;
-
-  }
+template struct stan::lang::indexes_grammar<pos_iterator_t>;
 }
+}  // namespace stan

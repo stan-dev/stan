@@ -7,50 +7,49 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * AST structure for holding an expression with a sequence of
-     * indexes.
-     */
-    struct index_op_sliced {
-      /**
-       * Expression being indexed.
-       */
-      expression expr_;
+/**
+ * AST structure for holding an expression with a sequence of
+ * indexes.
+ */
+struct index_op_sliced {
+  /**
+   * Expression being indexed.
+   */
+  expression expr_;
 
-      /**
-       * Sequence of indexes.
-       */
-      std::vector<idx> idxs_;
+  /**
+   * Sequence of indexes.
+   */
+  std::vector<idx> idxs_;
 
-      /**
-       * Type of result.
-       */
-      bare_expr_type type_;
+  /**
+   * Type of result.
+   */
+  bare_expr_type type_;
 
-      /**
-       * Construct a default indexed expression (all nil).
-       */
-      index_op_sliced();
+  /**
+   * Construct a default indexed expression (all nil).
+   */
+  index_op_sliced();
 
-      /**
-       * Construct an indexed expression from the specified expression
-       * and indexes.
-       *
-       * @param expr expression being indexed
-       * @param idxs indexes
-       */
-      index_op_sliced(const expression& expr,
-                      const std::vector<idx>& idxs);
+  /**
+   * Construct an indexed expression from the specified expression
+   * and indexes.
+   *
+   * @param expr expression being indexed
+   * @param idxs indexes
+   */
+  index_op_sliced(const expression& expr, const std::vector<idx>& idxs);
 
-      /**
-       * Infer the type of the result.  Modifies the underlying
-       * expression type and not well formed until this is run.
-       */
-      void infer_type();
-    };
+  /**
+   * Infer the type of the result.  Modifies the underlying
+   * expression type and not well formed until this is run.
+   */
+  void infer_type();
+};
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

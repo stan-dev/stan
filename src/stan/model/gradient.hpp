@@ -9,35 +9,31 @@
 #include <stdexcept>
 
 namespace stan {
-  namespace model {
+namespace model {
 
-    template <class M>
-    void gradient(const M& model,
-                  const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
-                  double& f,
-                  Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
-                  std::ostream* msgs = 0) {
-      stan::math::gradient(model_functional<M>(model, msgs), x, f, grad_f);
-    }
-
-    template <class M>
-    void gradient(const M& model,
-                  const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
-                  double& f,
-                  Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
-                  callbacks::logger& logger) {
-      std::stringstream ss;
-      try {
-        stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);
-      } catch (std::exception& e) {
-        if (ss.str().length() > 0)
-          logger.info(ss);
-        throw;
-      }
-      if (ss.str().length() > 0)
-        logger.info(ss);
-    }
-
-  }
+template <class M>
+void gradient(const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+              double& f, Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
+              std::ostream* msgs = 0) {
+  stan::math::gradient(model_functional<M>(model, msgs), x, f, grad_f);
 }
+
+template <class M>
+void gradient(const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+              double& f, Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
+              callbacks::logger& logger) {
+  std::stringstream ss;
+  try {
+    stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);
+  } catch (std::exception& e) {
+    if (ss.str().length() > 0)
+      logger.info(ss);
+    throw;
+  }
+  if (ss.str().length() > 0)
+    logger.info(ss);
+}
+
+}  // namespace model
+}  // namespace stan
 #endif

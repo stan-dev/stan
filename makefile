@@ -27,8 +27,9 @@ include make/libstanc                     # bin/libstanc.a
 include make/doxygen                      # doxygen
 include make/cpplint                      # cpplint
 include make/tests                        # tests
+include make/clang-tidy
 
-INC_FIRST = -I $(if $(STAN),$(STAN)/src,src)
+INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I ./src/
 LDLIBS_STANC ?= -Ltest -lstanc
 
 
@@ -75,6 +76,26 @@ help:
 	@echo '                      CPPLINT = $(CPPLINT)'
 	@echo '                    To set the version of python 2, set the PYTHON2 variable:'
 	@echo '                      PYTHON2 = $(PYTHON2)'
+	@echo ''
+	@echo ' Clang Tidy'
+	@echo ' - clang-tidy     : runs the clang-tidy makefile over the test suite.'
+	@echo '                    Options:'
+	@echo '                     files: (Optional) regex for file names to include in the check'
+	@echo '                      Default runs all the tests in unit'
+	@echo '                     tidy_checks: (Optional) A set of checks'
+	@echo '                      Default runs a hand picked selection of tests'
+	@echo ''
+	@echo '     Example: This runs clang-tidy over all the multiply tests in prim'
+	@echo ''
+	@echo '     make clang-tidy files=*prim*multiply*'
+	@echo ''
+	@echo ' - clang-tidy-fix : same as above but runs with the -fix flag.'
+	@echo '                    For automated fixes, outputs a yaml named'
+	@echo '                    .clang-fixes.yml'
+	@echo ''
+	@echo ' Clang Format'
+	@echo ' - clang-format     : runs clang-format over all the .hpp and .cpp files.'
+	@echo '                      in src.'
 	@echo ''
 	@echo 'Clean:'
 	@echo '  - clean         : Basic clean. Leaves doc and compiled libraries intact.'

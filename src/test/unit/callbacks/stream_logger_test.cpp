@@ -3,11 +3,12 @@
 #include <sstream>
 #include <stan/callbacks/stream_logger.hpp>
 
-class StanInterfaceCallbacksStreamLogger: public ::testing::Test {
-public:
-  StanInterfaceCallbacksStreamLogger() :
-    message1("message 1"), message2("message 2"),
-    logger(debug, info, warn, error, fatal) {}
+class StanInterfaceCallbacksStreamLogger : public ::testing::Test {
+ public:
+  StanInterfaceCallbacksStreamLogger()
+      : message1("message 1"),
+        message2("message 2"),
+        logger(debug, info, warn, error, fatal) {}
 
   void SetUp() {
     debug.str("");
@@ -17,7 +18,7 @@ public:
     fatal.str("");
   }
 
-  void TearDown() { }
+  void TearDown() {}
 
   std::string message1;
   std::stringstream message2;
@@ -44,7 +45,6 @@ TEST_F(StanInterfaceCallbacksStreamLogger, debug_stringstream) {
   EXPECT_EQ("", error.str());
   EXPECT_EQ("", fatal.str());
 }
-
 
 TEST_F(StanInterfaceCallbacksStreamLogger, info_string) {
   EXPECT_NO_THROW(logger.info(message1));

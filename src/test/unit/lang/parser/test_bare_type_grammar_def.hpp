@@ -15,22 +15,19 @@
 
 namespace stan {
 
-  namespace lang {
+namespace lang {
 
-    template <typename Iterator>
-    test_bare_type_grammar<Iterator>::test_bare_type_grammar(
-                                            const io::program_reader& reader,
-                                            std::stringstream& error_msgs)
-      : test_bare_type_grammar::base_type(test_bare_type_r),
-        reader_(reader),
-        error_msgs_(error_msgs),
-        bare_type_g(error_msgs_) {
-
-      test_bare_type_r.name("test bare_type");
-      test_bare_type_r
-        %= bare_type_g;
-    }
-
-  }
+template <typename Iterator>
+test_bare_type_grammar<Iterator>::test_bare_type_grammar(
+    const io::program_reader& reader, std::stringstream& error_msgs)
+    : test_bare_type_grammar::base_type(test_bare_type_r),
+      reader_(reader),
+      error_msgs_(error_msgs),
+      bare_type_g(error_msgs_) {
+  test_bare_type_r.name("test bare_type");
+  test_bare_type_r %= bare_type_g;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

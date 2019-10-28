@@ -6,21 +6,21 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Generate a name for a non-variable (double only) instantiation of
-     * specified function
+/**
+ * Generate a name for a non-variable (double only) instantiation of
+ * specified function
 
-     * @param[in] fun function AST object
-     * @param[in, out] out output stream to which function definition
-     * is written
-     */
-    void generate_function_instantiation_name(const function_decl_def& fun,
-                           std::ostream& out) {
-      out << fun.name_;
-    }
-
-  }
+ * @param[in] fun function AST object
+ * @param[in, out] out output stream to which function definition
+ * is written
+ */
+void generate_function_instantiation_name(const function_decl_def& fun,
+                                          std::ostream& out) {
+  out << fun.name_;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif
