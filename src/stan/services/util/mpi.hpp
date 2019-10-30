@@ -157,22 +157,23 @@ namespace mpi {
     /*
      * helper function to master node (rank = 0) to recv
      * results.
-     * @return array {tag, source}.
+     * @return MPI_Status of recv operation
      */
     template<typename Recv_processor, typename Sampler, typename Model>
     MPI_Status
-    recv(std::vector<MPI_Request>& req, const Recv_processor& chain_func,
+    recv(std::vector<MPI_Request>& req, Recv_processor& chain_func,
          Sampler& sampler, Model& model) {
       MPI_Status stat;
       MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &stat);
       int source = stat.MPI_SOURCE;
+      int ireq = source - 1;
       if (stat.MPI_TAG == err_tag) {
         double dummy;
-        MPI_Irecv(&dummy, 0, MPI_DOUBLE, source, err_tag, comm, &req[source]);
+        MPI_Irecv(&dummy, 0, MPI_DOUBLE, source, err_tag, comm, &req[ireq]);
       } else {
         int n = chain_func.recv_size(sampler, model);
         MPI_Irecv(&workspace_r((source - 1) * n), n,
-                  MPI_DOUBLE, source, work_tag, comm, &req[source]);
+                  MPI_DOUBLE, source, work_tag, comm, &req[ireq]);
       }
       return stat;
     }
@@ -182,48 +183,44 @@ namespace mpi {
      * available tasks to vacant slaves.
      */
     template<typename Sampler, typename Model,
-             typename Send_processor, typename Recv_processor>
+             typename Send_processor, typename Recv_processor,
+             typename Post_processor>
     void operator()(Sampler& sampler, Model& model,
-                    const Send_processor& ensemble_func,
-                    const Recv_processor& chain_func) {
+                    Send_processor& ensemble_func,
+                    Recv_processor& chain_func,
+                    Post_processor& post_func) {
       static const char* caller = "warmup_dynamic_loader_master::master";
       stan::math::check_less(caller, "MPI comm rank", warmup_comm.rank, 1);
 
-      std::vector<MPI_Request> req(warmup_comm.size);
+      int nslave = warmup_comm.size - 1;
+      std::vector<MPI_Request> req(nslave);
       std::array<int, 2> recv_out;
       
       int recved = 0;
       int irecve = 0;
       int source;
       bool is_invalid = false;
-      while (irecve != warmup_comm.size || (!is_invalid)) {
+      while (irecve != nslave && (!is_invalid)) {
         // recv adaption results from certain chain
+        workspace_r.resize(chain_func.recv_size(sampler, model),
+                           nslave);
         MPI_Status stat(recv(req, chain_func, sampler, model));
         is_invalid = stat.MPI_TAG == err_tag;
         source = stat.MPI_SOURCE;
         irecve++;
-
-        // processing recieved data
-        if (!is_invalid) {
-          int index, flag = 0;
-          MPI_Testany(warmup_comm.size, req.data(), &index,
-                      &flag, MPI_STATUS_IGNORE);
-          if(flag) {
-            recved++;
-            chain_func(sampler, model, workspace_r, index);
-          }
-        }
       }
+
+      MPI_Request bcast_req;
 
       if (is_invalid) {
         for (int i = 1; i < warmup_comm.size; ++i) {
           MPI_Send(workspace_r.data(), 0, MPI_DOUBLE, i, err_tag, comm);
         }
-        while (irecve != warmup_comm.size) {
+        while (irecve != nslave) {
           recv(req, chain_func, sampler, model);
           irecve++;
         }
-        MPI_Waitall(warmup_comm.size, req.data(), MPI_STATUSES_IGNORE);
+        MPI_Waitall(nslave, req.data(), MPI_STATUSES_IGNORE);
         std::ostringstream chain_adapt_fail_msg;
         chain_adapt_fail_msg << "Invalid adaptation data in Chain " << source;
         throw std::runtime_error(chain_adapt_fail_msg.str());
@@ -231,18 +228,21 @@ namespace mpi {
         for (int i = 1; i < warmup_comm.size; ++i) {
           MPI_Send(workspace_r.data(), 0, MPI_DOUBLE, i, adapt_tag, comm);
         }
-        while (recved != warmup_comm.size) {
+        while (recved != nslave) {
           int index, flag = 0;
-          MPI_Testany(warmup_comm.size, req.data(), &index,
-                      &flag, MPI_STATUS_IGNORE);
+          MPI_Testany(nslave, req.data(), &index, &flag, MPI_STATUS_IGNORE);
           if(flag) {
             recved++;
-            chain_func(sampler, model, workspace_r, index);
+            chain_func(sampler, model, workspace_r, index + 1);
           }
         }
         ensemble_func(sampler, model, workspace_r);
-        MPI_Bcast(workspace_r.data(), ensemble_func.send_size, MPI_DOUBLE, 0, comm);
+        MPI_Ibcast(workspace_r.data(), ensemble_func.send_size(sampler, model),
+                   MPI_DOUBLE, 0, comm, &bcast_req);
       }
+
+      post_func(sampler, model, workspace_r);
+      MPI_Wait(&bcast_req, MPI_STATUS_IGNORE);
     }
   };
 
@@ -259,8 +259,8 @@ namespace mpi {
      */
     template<typename Sampler, typename Model, typename Send_processor, typename Recv_processor>
     void operator()(Sampler& sampler, Model& model,
-                    const Send_processor& chain_func,
-                    const Recv_processor& adapt_func) {
+                    Send_processor& chain_func,
+                    Recv_processor& adapt_func) {
       using Eigen::MatrixXd;
       using Eigen::Matrix;
 
@@ -268,19 +268,21 @@ namespace mpi {
       stan::math::check_greater(caller, "MPI comm rank", warmup_comm.rank, 0);
 
       // process adapt info before sending out to master
-      workspace_r.resize(chain_func.send_size, 1);
       chain_func(sampler, model, workspace_r, warmup_comm.rank);
-      MPI_Send(workspace_r.data(), chain_func.send_size, MPI_DOUBLE, 0, work_tag, comm);
+      MPI_Send(workspace_r.data(), chain_func.send_size(sampler, model), MPI_DOUBLE, 0, work_tag, comm);
 
       MPI_Status stat;
+      MPI_Request bcast_req;
       MPI_Recv(workspace_r.data(), 0, MPI_DOUBLE, 0, MPI_ANY_TAG, comm, &stat);
       if (stat.MPI_TAG == err_tag) {
         std::ostringstream chain_adapt_fail_msg;
         chain_adapt_fail_msg << "Invalid adaptation data in ensemble";
         throw std::runtime_error(chain_adapt_fail_msg.str());
       } else if (stat.MPI_TAG == adapt_tag) {
-        workspace_r.resize(adapt_func.recv_size, 1);
-        MPI_Bcast(workspace_r.data(), adapt_func.recv_size, MPI_DOUBLE, 0, comm);
+        workspace_r.resize(adapt_func.recv_size(sampler, model), 1);
+        MPI_Ibcast(workspace_r.data(), adapt_func.recv_size(sampler, model),
+                   MPI_DOUBLE, 0, comm, &bcast_req);
+        MPI_Wait(&bcast_req, MPI_STATUS_IGNORE);
         adapt_func(sampler, model, workspace_r);
       }
     }
