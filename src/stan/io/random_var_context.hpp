@@ -39,7 +39,7 @@ class random_var_context : public var_context {
    *   must be greater than 0.
    */
   template <class Model, class RNG>
-  random_var_context(Model& model, RNG& rng, double init_radius, bool init_zero)
+  random_var_context(Model&& model, RNG&& rng, double init_radius, bool init_zero)
       : unconstrained_params_(model.num_params_r()) {
     size_t num_unconstrained_ = model.num_params_r();
     model.get_param_names(names_);
@@ -63,13 +63,14 @@ class random_var_context : public var_context {
     names_.erase(names_.begin() + i, names_.end());
 
     if (init_zero) {
-      for (size_t n = 0; n < num_unconstrained_; ++n)
-        unconstrained_params_[n] = 0.0;
+      std::fill(unconstrained_params_.begin(), unconstrained_params_.end(), 0.0);
     } else {
       boost::random::uniform_real_distribution<double> unif(-init_radius,
                                                             init_radius);
-      for (size_t n = 0; n < num_unconstrained_; ++n)
-        unconstrained_params_[n] = unif(rng);
+      std::generate(unconstrained_params_.begin(), unconstrained_params_.end(),
+        [&rng, &unif](){
+          return unif(rng);
+        });
     }
 
     std::vector<double> constrained_params;

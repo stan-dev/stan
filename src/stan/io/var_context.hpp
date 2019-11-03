@@ -29,10 +29,7 @@ namespace io {
  * accessed through the floating-point methods.
  */
 class var_context {
-
  public:
-   
-   // TODO(Steve): Add these to stan math
    template <typename T>
    using is_string_convertible = std::is_convertible<T, std::string>;
    template <typename T>
