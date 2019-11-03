@@ -39,9 +39,6 @@ class reader {
   std::vector<int> &data_i_;
   size_t pos_{0};
   size_t int_pos_{0};
-  template <typename K>
-  using is_index = bool_constant<!std::is_floating_point<K>::value
-                                 && std::is_arithmetic<K>::value>;
 
   inline T &scalar_ptr() { return data_r_[pos_]; }
 
@@ -60,13 +57,18 @@ class reader {
   using is_same_class_type = std::is_same<std::decay_t<T>, std::decay_t<Other>>;
 
  public:
-  typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
-  typedef Eigen::Matrix<T, Eigen::Dynamic, 1> vector_t;
-  typedef Eigen::Matrix<T, 1, Eigen::Dynamic> row_vector_t;
+   //  Move this to stan math
+   template <typename K>
+   using is_index = bool_constant<!std::is_floating_point<K>::value
+                                  && std::is_arithmetic<K>::value>;
 
-  typedef Eigen::Map<matrix_t> map_matrix_t;
-  typedef Eigen::Map<vector_t> map_vector_t;
-  typedef Eigen::Map<row_vector_t> map_row_vector_t;
+  using matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+  using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
+  using row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
+
+  using map_matrix_t = Eigen::Map<matrix_t>;
+  using map_vector_t = Eigen::Map<vector_t>;
+  using map_row_vector_t = Eigen::Map<row_vector_t>;
 
   /**
    * Construct a variable reader using the specified vectors

@@ -29,14 +29,16 @@ namespace io {
  * accessed through the floating-point methods.
  */
 class var_context {
-  template <typename T>
-  using is_string_convertible = std::is_convertible<T, std::string>;
-  // TODO(Steve): Add this to stan math
-  template <typename T>
-  using is_index = bool_constant<!std::is_floating_point<T>::value
-                                 && std::is_arithmetic<T>::value>;
 
  public:
+   
+   // TODO(Steve): Add these to stan math
+   template <typename T>
+   using is_string_convertible = std::is_convertible<T, std::string>;
+   template <typename T>
+   using is_index = bool_constant<!std::is_floating_point<T>::value
+                                  && std::is_arithmetic<T>::value>;
+
   virtual ~var_context() {}
 
   /**
