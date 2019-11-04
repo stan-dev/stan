@@ -53,8 +53,8 @@ class base_hmc : public base_mcmc {
     write_sampler_metric(writer);
   }
 
-  inline void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
-                                    std::vector<std::string>& names) {
+  inline void get_sampler_diagnostic_names(
+      std::vector<std::string>& model_names, std::vector<std::string>& names) {
     z_.get_param_names(model_names, names);
   }
 

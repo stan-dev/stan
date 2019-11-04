@@ -15,7 +15,7 @@ class mock_nuts_classic : public base_nuts_classic<mock_model, mock_hamiltonian,
  public:
   mock_nuts_classic(const mock_model& m, rng_t& rng)
       : base_nuts_classic<mock_model, mock_hamiltonian, mock_integrator, rng_t>(
-            m, rng) {}
+          m, rng) {}
 
  private:
   bool compute_criterion(ps_point& start, ps_point& finish,

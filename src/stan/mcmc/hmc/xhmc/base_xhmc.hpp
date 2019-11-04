@@ -32,14 +32,14 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
   base_xhmc& operator=(const base_xhmc&) = default;
   base_xhmc& operator=(base_xhmc&&) = default;
 
-  int& max_depth() { return max_depth_;}
-  const int& max_depth() const { return max_depth_;}
+  int& max_depth() { return max_depth_; }
+  const int& max_depth() const { return max_depth_; }
 
   double& max_deltaH() { return max_deltaH_; }
   const double& max_deltaH() const { return max_deltaH_; }
 
-  double& x_delta() { return x_delta_;}
-  const double& x_delta() const { return x_delta_;}
+  double& x_delta() { return x_delta_; }
+  const double& x_delta() const { return x_delta_; }
 
   sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
