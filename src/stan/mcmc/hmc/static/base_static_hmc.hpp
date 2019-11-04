@@ -113,7 +113,7 @@ class base_static_hmc
   int get_L() { return this->L_; }
 
  protected:
-  double T_{0]};
+  double T_{0};
   int L_;
   double energy_{0};
 
