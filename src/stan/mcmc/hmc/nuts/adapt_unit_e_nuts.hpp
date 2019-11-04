@@ -25,7 +25,7 @@ class adapt_unit_e_nuts : public unit_e_nuts<Model, BaseRNG>,
     sample s = unit_e_nuts<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_)
-      this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
+      this->nom_epsilon_ = this->stepsize_adaptation_.learn_stepsize(
                                                 s.accept_stat());
 
     return s;
@@ -33,7 +33,7 @@ class adapt_unit_e_nuts : public unit_e_nuts<Model, BaseRNG>,
 
   void disengage_adaptation() {
     base_adapter::disengage_adaptation();
-    this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
+    this->nom_epsilon_ = this->stepsize_adaptation_.complete_adaptation();
   }
 };
 

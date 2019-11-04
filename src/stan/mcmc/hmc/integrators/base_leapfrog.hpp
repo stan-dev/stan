@@ -13,15 +13,16 @@ template <class Hamiltonian>
 class base_leapfrog : public base_integrator<Hamiltonian> {
  public:
   base_leapfrog() : base_integrator<Hamiltonian>() {}
+  using point_type = typename Hamiltonian::PointType;
 
-  void evolve(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
+  inline void evolve(point_type& z, Hamiltonian& hamiltonian,
               const double epsilon, callbacks::logger& logger) {
     begin_update_p(z, hamiltonian, 0.5 * epsilon, logger);
     update_q(z, hamiltonian, epsilon, logger);
     end_update_p(z, hamiltonian, 0.5 * epsilon, logger);
   }
 
-  void verbose_evolve(typename Hamiltonian::PointType& z,
+  inline void verbose_evolve(point_type& z,
                       Hamiltonian& hamiltonian, const double epsilon,
                       callbacks::logger& logger) {
     std::stringstream msg;
@@ -97,16 +98,16 @@ class base_leapfrog : public base_integrator<Hamiltonian> {
     logger.info(msg);
   }
 
-  virtual void begin_update_p(typename Hamiltonian::PointType& z,
+  virtual void begin_update_p(point_type& z,
                               Hamiltonian& hamiltonian, double epsilon,
                               callbacks::logger& logger)
       = 0;
 
-  virtual void update_q(typename Hamiltonian::PointType& z,
+  virtual void update_q(point_type& z,
                         Hamiltonian& hamiltonian, double epsilon,
                         callbacks::logger& logger)
       = 0;
-  virtual void end_update_p(typename Hamiltonian::PointType& z,
+  virtual void end_update_p(point_type& z,
                             Hamiltonian& hamiltonian, double epsilon,
                             callbacks::logger& logger)
       = 0;

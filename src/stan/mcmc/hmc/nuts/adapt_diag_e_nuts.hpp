@@ -20,13 +20,11 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
       : diag_e_nuts<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 
-  ~adapt_diag_e_nuts() {}
-
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = diag_e_nuts<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_) {
-      this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
+      this->nom_epsilon_ = this->stepsize_adaptation_.learn_stepsize(
                                                 s.accept_stat());
 
       bool update = this->var_adaptation_.learn_variance(this->z_.inv_e_metric_,
@@ -42,9 +40,9 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
     return s;
   }
 
-  void disengage_adaptation() {
+  inline void disengage_adaptation() {
     base_adapter::disengage_adaptation();
-    this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
+    this->nom_epsilon_ = this->stepsize_adaptation_.complete_adaptation();
   }
 };
 

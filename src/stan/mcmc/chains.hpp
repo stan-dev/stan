@@ -218,7 +218,7 @@ class chains {
    *
    * @return
    */
-  double split_potential_scale_reduction(
+  inline double split_potential_scale_reduction(
       const Eigen::Matrix<Eigen::VectorXd, Dynamic, 1>& samples) const {
     int chains = samples.size();
     int n_samples = samples(0).size();
@@ -267,13 +267,14 @@ class chains {
 
   inline int num_params() const { return param_names_.size(); }
 
-  const Eigen::Matrix<std::string, Dynamic, 1>& param_names() const {
+  inline const Eigen::Matrix<std::string, Dynamic, 1>& param_names() const {
     return param_names_;
   }
 
-  const std::string& param_name(int j) const { return param_names_(j); }
+  inline const std::string& param_name(int j) const { return param_names_(j); }
+  inline std::string& param_name(int j) { return param_names_(j); }
 
-  int index(const std::string& name) const {
+  inline int index(const std::string& name) const {
     int index = -1;
     for (int i = 0; i < param_names_.size(); i++)
       if (param_names_(i) == name)
@@ -281,37 +282,37 @@ class chains {
     return index;
   }
 
-  void set_warmup(const int chain, const int warmup) {
+  inline void set_warmup(const int chain, const int warmup) {
     warmup_(chain) = warmup;
   }
 
-  void set_warmup(const int warmup) { warmup_.setConstant(warmup); }
+  inline void set_warmup(const int warmup) { warmup_.setConstant(warmup); }
 
-  const Eigen::VectorXi& warmup() const { return warmup_; }
+  inline const Eigen::VectorXi& warmup() const { return warmup_; }
 
-  int warmup(const int chain) const { return warmup_(chain); }
+  inline int warmup(const int chain) const { return warmup_(chain); }
 
-  int num_samples(const int chain) const { return samples_(chain).rows(); }
+  inline int num_samples(const int chain) const { return samples_(chain).rows(); }
 
-  int num_samples() const {
+  inline int num_samples() const {
     int n = 0;
     for (int chain = 0; chain < num_chains(); chain++)
       n += num_samples(chain);
     return n;
   }
 
-  int num_kept_samples(const int chain) const {
+  inline int num_kept_samples(const int chain) const {
     return num_samples(chain) - warmup(chain);
   }
 
-  int num_kept_samples() const {
+  inline int num_kept_samples() const {
     int n = 0;
     for (int chain = 0; chain < num_chains(); chain++)
       n += num_kept_samples(chain);
     return n;
   }
 
-  void add(const int chain, const Eigen::MatrixXd& sample) {
+  inline void add(const int chain, const Eigen::MatrixXd& sample) {
     if (sample.cols() != num_params())
       throw std::invalid_argument(
           "add(chain, sample): number of columns"
@@ -345,7 +346,7 @@ class chains {
     samples_(chain) = new_samples;
   }
 
-  void add(const Eigen::MatrixXd& sample) {
+  inline void add(const Eigen::MatrixXd& sample) {
     if (sample.rows() == 0)
       return;
     if (sample.cols() != num_params())
@@ -362,7 +363,7 @@ class chains {
    * Stan (e.g., PyStan) so that it need not additionally wrap Eigen.
    *
    */
-  void add(const std::vector<std::vector<double> >& sample) {
+  inline void add(const std::vector<std::vector<double> >& sample) {
     int n_row = sample.size();
     if (n_row == 0)
       return;
@@ -375,7 +376,7 @@ class chains {
     add(sample_copy);
   }
 
-  void add(const stan::io::stan_csv& stan_csv) {
+  inline void add(const stan::io::stan_csv& stan_csv) {
     if (stan_csv.header.size() != num_params())
       throw std::invalid_argument(
           "add(stan_csv): number of columns in"
@@ -390,11 +391,11 @@ class chains {
       set_warmup(num_chains() - 1, stan_csv.metadata.num_warmup);
   }
 
-  Eigen::VectorXd samples(const int chain, const int index) const {
+  inline Eigen::VectorXd samples(const int chain, const int index) const {
     return samples_(chain).col(index).bottomRows(num_kept_samples(chain));
   }
 
-  Eigen::VectorXd samples(const int index) const {
+  inline Eigen::VectorXd samples(const int index) const {
     Eigen::VectorXd s(num_kept_samples());
     int start = 0;
     for (int chain = 0; chain < num_chains(); chain++) {
@@ -405,123 +406,123 @@ class chains {
     return s;
   }
 
-  Eigen::VectorXd samples(const int chain, const std::string& name) const {
+  inline Eigen::VectorXd samples(const int chain, const std::string& name) const {
     return samples(chain, index(name));
   }
 
-  Eigen::VectorXd samples(const std::string& name) const {
+  inline Eigen::VectorXd samples(const std::string& name) const {
     return samples(index(name));
   }
 
-  double mean(const int chain, const int index) const {
+  inline double mean(const int chain, const int index) const {
     return mean(samples(chain, index));
   }
 
-  double mean(const int index) const { return mean(samples(index)); }
+  inline double mean(const int index) const { return mean(samples(index)); }
 
-  double mean(const int chain, const std::string& name) const {
+  inline double mean(const int chain, const std::string& name) const {
     return mean(chain, index(name));
   }
 
-  double mean(const std::string& name) const { return mean(index(name)); }
+  inline double mean(const std::string& name) const { return mean(index(name)); }
 
-  double sd(const int chain, const int index) const {
+  inline double sd(const int chain, const int index) const {
     return sd(samples(chain, index));
   }
 
-  double sd(const int index) const { return sd(samples(index)); }
+  inline double sd(const int index) const { return sd(samples(index)); }
 
-  double sd(const int chain, const std::string& name) const {
+  inline double sd(const int chain, const std::string& name) const {
     return sd(chain, index(name));
   }
 
-  double sd(const std::string& name) const { return sd(index(name)); }
+  inline double sd(const std::string& name) const { return sd(index(name)); }
 
-  double variance(const int chain, const int index) const {
+  inline double variance(const int chain, const int index) const {
     return variance(samples(chain, index));
   }
 
-  double variance(const int index) const { return variance(samples(index)); }
+  inline double variance(const int index) const { return variance(samples(index)); }
 
-  double variance(const int chain, const std::string& name) const {
+  inline double variance(const int chain, const std::string& name) const {
     return variance(chain, index(name));
   }
 
-  double variance(const std::string& name) const {
+  inline double variance(const std::string& name) const {
     return variance(index(name));
   }
 
-  double covariance(const int chain, const int index1, const int index2) const {
+  inline double covariance(const int chain, const int index1, const int index2) const {
     return covariance(samples(chain, index1), samples(chain, index2));
   }
 
-  double covariance(const int index1, const int index2) const {
+  inline double covariance(const int index1, const int index2) const {
     return covariance(samples(index1), samples(index2));
   }
 
-  double covariance(const int chain, const std::string& name1,
+  inline double covariance(const int chain, const std::string& name1,
                     const std::string& name2) const {
     return covariance(chain, index(name1), index(name2));
   }
 
-  double covariance(const std::string& name1, const std::string& name2) const {
+  inline double covariance(const std::string& name1, const std::string& name2) const {
     return covariance(index(name1), index(name2));
   }
 
-  double correlation(const int chain, const int index1,
+  inline double correlation(const int chain, const int index1,
                      const int index2) const {
     return correlation(samples(chain, index1), samples(chain, index2));
   }
 
-  double correlation(const int index1, const int index2) const {
+  inline double correlation(const int index1, const int index2) const {
     return correlation(samples(index1), samples(index2));
   }
 
-  double correlation(const int chain, const std::string& name1,
+  inline double correlation(const int chain, const std::string& name1,
                      const std::string& name2) const {
     return correlation(chain, index(name1), index(name2));
   }
 
-  double correlation(const std::string& name1, const std::string& name2) const {
+  inline double correlation(const std::string& name1, const std::string& name2) const {
     return correlation(index(name1), index(name2));
   }
 
-  double quantile(const int chain, const int index, const double prob) const {
+  inline double quantile(const int chain, const int index, const double prob) const {
     return quantile(samples(chain, index), prob);
   }
 
-  double quantile(const int index, const double prob) const {
+  inline double quantile(const int index, const double prob) const {
     return quantile(samples(index), prob);
   }
 
-  double quantile(int chain, const std::string& name, double prob) const {
+  inline double quantile(int chain, const std::string& name, double prob) const {
     return quantile(chain, index(name), prob);
   }
 
-  double quantile(const std::string& name, const double prob) const {
+  inline double quantile(const std::string& name, const double prob) const {
     return quantile(index(name), prob);
   }
 
-  Eigen::VectorXd quantiles(int chain, int index,
+  inline Eigen::VectorXd quantiles(int chain, int index,
                             const Eigen::VectorXd& probs) const {
     return quantiles(samples(chain, index), probs);
   }
 
-  Eigen::VectorXd quantiles(int index, const Eigen::VectorXd& probs) const {
+  inline Eigen::VectorXd quantiles(int index, const Eigen::VectorXd& probs) const {
     return quantiles(samples(index), probs);
   }
 
-  Eigen::VectorXd quantiles(int chain, const std::string& name,
+  inline Eigen::VectorXd quantiles(int chain, const std::string& name,
                             const Eigen::VectorXd& probs) const {
     return quantiles(chain, index(name), probs);
   }
 
-  Eigen::VectorXd quantiles(const std::string& name,
+  inline Eigen::VectorXd quantiles(const std::string& name,
                             const Eigen::VectorXd& probs) const {
     return quantiles(index(name), probs);
   }
 
-  Eigen::Vector2d central_interval(int chain, int index, double prob) const {
+  inline Eigen::Vector2d central_interval(int chain, int index, double prob) const {
     double low_prob = (1 - prob) / 2;
     double high_prob = 1 - low_prob;
 
@@ -531,7 +532,7 @@ class chains {
     return interval;
   }
 
-  Eigen::Vector2d central_interval(int index, double prob) const {
+  inline Eigen::Vector2d central_interval(int index, double prob) const {
     double low_prob = (1 - prob) / 2;
     double high_prob = 1 - low_prob;
 
@@ -540,33 +541,33 @@ class chains {
     return interval;
   }
 
-  Eigen::Vector2d central_interval(int chain, const std::string& name,
+  inline Eigen::Vector2d central_interval(int chain, const std::string& name,
                                    double prob) const {
     return central_interval(chain, index(name), prob);
   }
 
-  Eigen::Vector2d central_interval(const std::string& name, double prob) const {
+  inline Eigen::Vector2d central_interval(const std::string& name, double prob) const {
     return central_interval(index(name), prob);
   }
 
-  Eigen::VectorXd autocorrelation(const int chain, const int index) const {
+  inline Eigen::VectorXd autocorrelation(const int chain, const int index) const {
     return autocorrelation(samples(chain, index));
   }
 
-  Eigen::VectorXd autocorrelation(int chain, const std::string& name) const {
+  inline Eigen::VectorXd autocorrelation(int chain, const std::string& name) const {
     return autocorrelation(chain, index(name));
   }
 
-  Eigen::VectorXd autocovariance(const int chain, const int index) const {
+  inline Eigen::VectorXd autocovariance(const int chain, const int index) const {
     return autocovariance(samples(chain, index));
   }
 
-  Eigen::VectorXd autocovariance(int chain, const std::string& name) const {
+  inline Eigen::VectorXd autocovariance(int chain, const std::string& name) const {
     return autocovariance(chain, index(name));
   }
 
   // FIXME: reimplement using autocorrelation.
-  double effective_sample_size(const int index) const {
+  inline double effective_sample_size(const int index) const {
     int n_chains = num_chains();
     std::vector<const double*> draws(n_chains);
     std::vector<size_t> sizes(n_chains);
@@ -580,11 +581,11 @@ class chains {
     return analyze::compute_effective_sample_size(draws, sizes);
   }
 
-  double effective_sample_size(const std::string& name) const {
+  inline double effective_sample_size(const std::string& name) const {
     return effective_sample_size(index(name));
   }
 
-  double split_effective_sample_size(const int index) const {
+  inline double split_effective_sample_size(const int index) const {
     int n_chains = num_chains();
     std::vector<const double*> draws(n_chains);
     std::vector<size_t> sizes(n_chains);
@@ -598,11 +599,11 @@ class chains {
     return analyze::compute_split_effective_sample_size(draws, sizes);
   }
 
-  double split_effective_sample_size(const std::string& name) const {
+  inline double split_effective_sample_size(const std::string& name) const {
     return split_effective_sample_size(index(name));
   }
 
-  double split_potential_scale_reduction(const int index) const {
+  inline double split_potential_scale_reduction(const int index) const {
     int n_chains = num_chains();
     std::vector<const double*> draws(n_chains);
     std::vector<size_t> sizes(n_chains);
@@ -617,7 +618,7 @@ class chains {
     return analyze::compute_split_potential_scale_reduction(draws, sizes);
   }
 
-  double split_potential_scale_reduction(const std::string& name) const {
+  inline double split_potential_scale_reduction(const std::string& name) const {
     return split_potential_scale_reduction(index(name));
   }
 };

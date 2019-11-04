@@ -26,7 +26,7 @@ class adapt_dense_e_xhmc : public dense_e_xhmc<Model, BaseRNG>,
     sample s = dense_e_xhmc<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_) {
-      this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
+      this->nom_epsilon_ = this->stepsize_adaptation_.learn_stepsize(
                                                 s.accept_stat());
 
       bool update = this->covar_adaptation_.learn_covariance(
@@ -44,7 +44,7 @@ class adapt_dense_e_xhmc : public dense_e_xhmc<Model, BaseRNG>,
 
   void disengage_adaptation() {
     base_adapter::disengage_adaptation();
-    this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
+    this->nom_epsilon_ = this->stepsize_adaptation_.complete_adaptation();
   }
 };
 

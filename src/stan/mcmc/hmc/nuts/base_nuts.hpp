@@ -22,61 +22,41 @@ template <class Model, template <class, class> class Hamiltonian,
 class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_nuts(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        depth_(0),
-        max_depth_(5),
-        max_deltaH_(1000),
-        n_leapfrog_(0),
-        divergent_(false),
-        energy_(0) {}
+      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng) {}
 
   /**
    * specialized constructor for specified diag mass matrix
    */
   base_nuts(const Model& model, BaseRNG& rng, Eigen::VectorXd& inv_e_metric)
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                          inv_e_metric),
-        depth_(0),
-        max_depth_(5),
-        max_deltaH_(1000),
-        n_leapfrog_(0),
-        divergent_(false),
-        energy_(0) {}
+                                                          inv_e_metric) {}
 
   /**
    * specialized constructor for specified dense mass matrix
    */
   base_nuts(const Model& model, BaseRNG& rng, Eigen::MatrixXd& inv_e_metric)
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                          inv_e_metric),
-        depth_(0),
-        max_depth_(5),
-        max_deltaH_(1000),
-        n_leapfrog_(0),
-        divergent_(false),
-        energy_(0) {}
+                                                          inv_e_metric) {}
 
-  ~base_nuts() {}
-
-  void set_metric(const Eigen::MatrixXd& inv_e_metric) {
+  inline void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);
   }
 
-  void set_metric(const Eigen::VectorXd& inv_e_metric) {
+  inline void set_metric(const Eigen::VectorXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);
   }
 
-  void set_max_depth(int d) {
+  inline void set_max_depth(int d) {
     if (d > 0)
       max_depth_ = d;
   }
 
-  void set_max_delta(double d) { max_deltaH_ = d; }
+  inline void set_max_delta(double d) { max_deltaH_ = d; }
 
-  int get_max_depth() { return this->max_depth_; }
-  double get_max_delta() { return this->max_deltaH_; }
+  inline int get_max_depth() { return this->max_depth_; }
+  inline double get_max_delta() { return this->max_deltaH_; }
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
     this->sample_stepsize();
 
@@ -204,7 +184,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     return sample(this->z_.q, -this->z_.V, accept_prob);
   }
 
-  void get_sampler_param_names(std::vector<std::string>& names) {
+  inline void get_sampler_param_names(std::vector<std::string>& names) {
     names.push_back("stepsize__");
     names.push_back("treedepth__");
     names.push_back("n_leapfrog__");
@@ -212,7 +192,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     names.push_back("energy__");
   }
 
-  void get_sampler_params(std::vector<double>& values) {
+  inline void get_sampler_params(std::vector<double>& values) {
     values.push_back(this->epsilon_);
     values.push_back(this->depth_);
     values.push_back(this->n_leapfrog_);
@@ -245,7 +225,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * @param sum_metro_prob Summed Metropolis probabilities across trajectory
    * @param logger Logger for messages
    */
-  bool build_tree(int depth, ps_point& z_propose, Eigen::VectorXd& p_sharp_beg,
+  inline bool build_tree(int depth, ps_point& z_propose, Eigen::VectorXd& p_sharp_beg,
                   Eigen::VectorXd& p_sharp_end, Eigen::VectorXd& rho,
                   Eigen::VectorXd& p_beg, Eigen::VectorXd& p_end, double H0,
                   double sign, int& n_leapfrog, double& log_sum_weight,
@@ -352,13 +332,13 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     return persist_criterion;
   }
 
-  int depth_;
-  int max_depth_;
-  double max_deltaH_;
+  int depth_{0};
+  int max_depth_{5};
+  double max_deltaH_{1000.0};
 
-  int n_leapfrog_;
-  bool divergent_;
-  double energy_;
+  int n_leapfrog_{0};
+  bool divergent_{false};
+  double energy_{0.0};
 };
 
 }  // namespace mcmc

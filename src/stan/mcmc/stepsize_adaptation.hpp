@@ -49,7 +49,12 @@ class stepsize_adaptation : public base_adaptation {
     x_bar_ = 0;
   }
 
-  inline void learn_stepsize(double adapt_stat) {
+  /**
+   * Computes the stepsize given the adaption statistic.
+   * @param adapt_stat The adaption statistic (HALP: What this?)
+   * @return Epsilon
+   */
+  inline double learn_stepsize(double adapt_stat) {
     ++counter_;
 
     adapt_stat = adapt_stat > 1 ? 1 : adapt_stat;
@@ -64,10 +69,10 @@ class stepsize_adaptation : public base_adaptation {
 
     x_bar_ = (1.0 - x_eta) * x_bar_ + x_eta * x;
 
-    epsilon = std::exp(x);
+    return std::exp(x);
   }
 
-  void complete_adaptation(double& epsilon) { epsilon = std::exp(x_bar_); }
+  inline double complete_adaptation() { return std::exp(x_bar_); }
 
  protected:
   double counter_{0};  // Adaptation iteration

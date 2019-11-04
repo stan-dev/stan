@@ -20,13 +20,13 @@ class windowed_adaptation : public base_adaptation {
     restart();
   }
 
-  void restart() {
+  inline void restart() {
     adapt_window_counter_ = 0;
     adapt_window_size_ = adapt_base_window_;
     adapt_next_window_ = adapt_init_buffer_ + adapt_window_size_ - 1;
   }
 
-  void set_window_params(unsigned int num_warmup, unsigned int init_buffer,
+  inline void set_window_params(unsigned int num_warmup, unsigned int init_buffer,
                          unsigned int term_buffer, unsigned int base_window,
                          callbacks::logger& logger) {
     if (num_warmup < 20) {
@@ -77,18 +77,18 @@ class windowed_adaptation : public base_adaptation {
     restart();
   }
 
-  bool adaptation_window() {
+  inline bool adaptation_window() {
     return (adapt_window_counter_ >= adapt_init_buffer_)
            && (adapt_window_counter_ < num_warmup_ - adapt_term_buffer_)
            && (adapt_window_counter_ != num_warmup_);
   }
 
-  bool end_adaptation_window() {
+  inline bool end_adaptation_window() {
     return (adapt_window_counter_ == adapt_next_window_)
            && (adapt_window_counter_ != num_warmup_);
   }
 
-  void compute_next_window() {
+  inline void compute_next_window() {
     if (adapt_next_window_ == num_warmup_ - adapt_term_buffer_ - 1)
       return;
 

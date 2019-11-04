@@ -147,7 +147,7 @@ class base_nuts_classic
     return sample(this->z_.q, -this->z_.V, accept_prob);
   }
 
-  void get_sampler_param_names(std::vector<std::string>& names) {
+  inline void get_sampler_param_names(std::vector<std::string>& names) {
     names.push_back("stepsize__");
     names.push_back("treedepth__");
     names.push_back("n_leapfrog__");
@@ -155,7 +155,7 @@ class base_nuts_classic
     names.push_back("energy__");
   }
 
-  void get_sampler_params(std::vector<double>& values) {
+  inline void get_sampler_params(std::vector<double>& values) {
     values.push_back(this->epsilon_);
     values.push_back(this->depth_);
     values.push_back(this->n_leapfrog_);
@@ -169,7 +169,7 @@ class base_nuts_classic
       = 0;
 
   // Returns number of valid points in the completed subtree
-  int build_tree(int depth, Eigen::VectorXd& rho, ps_point* z_init_parent,
+  inline int build_tree(int depth, Eigen::VectorXd& rho, ps_point* z_init_parent,
                  ps_point& z_propose, nuts_util& util,
                  callbacks::logger& logger) {
     // Base case

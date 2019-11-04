@@ -12,7 +12,7 @@ class stepsize_adapter : public base_adapter {
  public:
   stepsize_adapter() {}
 
-  stepsize_adaptation& get_stepsize_adaptation() {
+  inline stepsize_adaptation& get_stepsize_adaptation() {
     return stepsize_adaptation_;
   }
 

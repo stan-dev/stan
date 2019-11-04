@@ -28,7 +28,7 @@ class adapt_diag_e_static_hmc : public diag_e_static_hmc<Model, BaseRNG>,
         = diag_e_static_hmc<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_) {
-      this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
+      this->nom_epsilon_ = this->stepsize_adaptation_.learn_stepsize(
                                                 s.accept_stat());
       this->update_L_();
 
@@ -48,7 +48,7 @@ class adapt_diag_e_static_hmc : public diag_e_static_hmc<Model, BaseRNG>,
 
   void disengage_adaptation() {
     base_adapter::disengage_adaptation();
-    this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
+    this->nom_epsilon_ = this->stepsize_adaptation_.complete_adaptation();
   }
 };
 

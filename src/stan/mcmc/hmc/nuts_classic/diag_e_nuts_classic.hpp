@@ -20,7 +20,7 @@ class diag_e_nuts_classic
 
   // Note that the points don't need to be swapped here
   // since start.inv_e_metric_ = finish.inv_e_metric_
-  bool compute_criterion(ps_point& start, diag_e_point& finish,
+  inline bool compute_criterion(ps_point& start, diag_e_point& finish,
                          Eigen::VectorXd& rho) {
     return finish.inv_e_metric_.cwiseProduct(finish.p).dot(rho - finish.p) > 0
            && finish.inv_e_metric_.cwiseProduct(start.p).dot(rho - start.p) > 0;

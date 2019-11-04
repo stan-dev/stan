@@ -14,7 +14,7 @@ class var_adaptation : public windowed_adaptation {
   explicit var_adaptation(int n)
       : windowed_adaptation("variance"), estimator_(n) {}
 
-  bool learn_variance(Eigen::VectorXd& var, const Eigen::VectorXd& q) {
+  inline bool learn_variance(Eigen::VectorXd& var, const Eigen::VectorXd& q) {
     if (adaptation_window())
       estimator_.add_sample(q);
 

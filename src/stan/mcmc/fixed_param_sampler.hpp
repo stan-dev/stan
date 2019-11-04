@@ -12,7 +12,7 @@ class fixed_param_sampler : public base_mcmc {
  public:
   fixed_param_sampler() {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
     return init_sample;
   }
 };
