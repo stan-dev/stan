@@ -136,17 +136,9 @@ class normal_fullrank : public base_family {
   const Eigen::MatrixXd& L_chol() const { return L_chol_; }
 
   /**
-   * Set the mean vector to the specified value.
-   *
-   * @param[in] mu Mean vector.
-   * @throw std::domain_error If the size of the specified mean
-   * vector does not match the stored dimension of this approximation.
+   * Get the mean vector to the specified value.
    */
-  void mu() = const Eigen::VectorXd & mu {
-    static const char* function = "stan::variational::set_mu";
-    validate_mean(function, mu);
-    mu_ = mu;
-  }
+  const Eigen::VectorXd& mu() const { return mu_;}
 
   /**
    * Set the Cholesky factor to the specified value.

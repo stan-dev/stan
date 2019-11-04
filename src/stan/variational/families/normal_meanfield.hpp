@@ -85,32 +85,15 @@ class normal_meanfield : public base_family {
   int dimension() const { return dimension_; }
 
   /**
-   * Return the mean vector.
-   */
-  const Eigen::VectorXd& mu() const { return mu_; }
-
-  /**
    * Return the log standard deviation vector.
    */
   const Eigen::VectorXd& omega() const { return omega_; }
 
   /**
    * Set the mean vector to the specified value.
-   *
-   * @param[in] mu Mean vector.
-   * @throw std::domain_error If the mean vector's size does not
-   * match this approximation's dimensionality, or if it contains
-   * not-a-number values.
    */
-  void mu() = const Eigen::VectorXd & mu {
-    static const char* function = "stan::variational::normal_meanfield::set_mu";
-
-    stan::math::check_size_match(function, "Dimension of input vector",
-                                 mu.size(), "Dimension of current vector",
-                                 dimension());
-    stan::math::check_not_nan(function, "Input vector", mu);
-    mu_ = mu;
-  }
+  Eigen::VectorXd& mu() {return mu_;}
+  const Eigen::VectorXd& mu() const {return mu_;}
 
   /**
    * Set the log standard deviation vector to the specified
