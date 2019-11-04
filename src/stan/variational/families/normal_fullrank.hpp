@@ -129,16 +129,13 @@ class normal_fullrank : public base_family {
    * Return the mean vector.
    */
   const Eigen::VectorXd& mu() const { return mu_; }
+  Eigen::VectorXd& mu() { return mu_;}
 
   /**
    * Return the Cholesky factor of the covariance matrix.
    */
   const Eigen::MatrixXd& L_chol() const { return L_chol_; }
 
-  /**
-   * Get the mean vector to the specified value.
-   */
-  const Eigen::VectorXd& mu() const { return mu_;}
 
   /**
    * Set the Cholesky factor to the specified value.
