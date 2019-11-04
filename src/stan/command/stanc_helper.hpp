@@ -333,9 +333,7 @@ inline int stanc_helper(int argc, const char* argv[], std::ostream* out_stream,
         out.close();
         break;
       }
-      default: {
-        assert(false);
-      }
+      default: { assert(false); }
     }
 
     if (!valid_input) {
