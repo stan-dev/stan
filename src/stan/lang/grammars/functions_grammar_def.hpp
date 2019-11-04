@@ -47,9 +47,9 @@ functions_grammar<Iterator>::functions_grammar(variable_map& var_map,
   functions_r.name("function declarations and definitions");
   functions_r %= (lit("functions") > lit("{")) >> *function_r > lit('}')
                  > eps[validate_declarations_f(
-                     _pass, boost::phoenix::ref(functions_declared_),
-                     boost::phoenix::ref(functions_defined_),
-                     boost::phoenix::ref(error_msgs_), allow_undefined)];
+                       _pass, boost::phoenix::ref(functions_declared_),
+                       boost::phoenix::ref(functions_defined_),
+                       boost::phoenix::ref(error_msgs_), allow_undefined)];
 
   // locals: _a = scope (origin) function subtype void,rng,lp)
   function_r.name("function declaration or definition");
@@ -60,16 +60,16 @@ functions_grammar<Iterator>::functions_grammar(variable_map& var_map,
                                   _1, _pass, boost::phoenix::ref(error_msgs_))]
                 > lit('(') > arg_decls_r > close_arg_decls_r
                 > eps[validate_pmf_pdf_variate_f(
-                    _val, _pass, boost::phoenix::ref(error_msgs_))]
+                      _val, _pass, boost::phoenix::ref(error_msgs_))]
                 > eps[set_fun_params_scope_f(_a, boost::phoenix::ref(var_map_))]
                 > statement_g(_a, false)
                 > eps[unscope_variables_f(_val, boost::phoenix::ref(var_map_))]
                 > eps[validate_return_type_f(_val, _pass,
                                              boost::phoenix::ref(error_msgs_))]
                 > eps[add_function_signature_f(
-                    _val, _pass, boost::phoenix::ref(functions_declared_),
-                    boost::phoenix::ref(functions_defined_),
-                    boost::phoenix::ref(error_msgs_))];
+                      _val, _pass, boost::phoenix::ref(functions_declared_),
+                      boost::phoenix::ref(functions_defined_),
+                      boost::phoenix::ref(error_msgs_))];
 
   close_arg_decls_r.name(
       "argument declaration or close paren )"
@@ -84,7 +84,7 @@ functions_grammar<Iterator>::functions_grammar(variable_map& var_map,
   arg_decl_r
       %= -(lit("data")[set_data_origin_f(_a)])
          >> bare_type_g[validate_non_void_arg_f(
-             _1, _a, _pass, boost::phoenix::ref(error_msgs_))]
+                _1, _a, _pass, boost::phoenix::ref(error_msgs_))]
          > identifier_r
          > eps[add_fun_arg_var_f(_val, _a, _pass, boost::phoenix::ref(var_map_),
                                  boost::phoenix::ref(error_msgs_))];
