@@ -53,8 +53,8 @@ class base_hmc : public base_mcmc {
     write_sampler_metric(writer);
   }
 
-  inline void get_sampler_diagnostic_names(
-      std::vector<std::string>& model_names, std::vector<std::string>& names) {
+  inline void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
+                                    std::vector<std::string>& names) {
     z_.get_param_names(model_names, names);
   }
 
@@ -93,7 +93,7 @@ class base_hmc : public base_mcmc {
     int direction = delta_H > std::log(0.8) ? 1 : -1;
 
     while (1) {
-      this->z_ = z_init;
+      this->z_.ps_point::operator=(z_init);
 
       this->hamiltonian_.sample_p(this->z_, this->rand_int_);
       this->hamiltonian_.init(this->z_, logger);
@@ -117,41 +117,39 @@ class base_hmc : public base_mcmc {
         this->nom_epsilon_ = direction == 1 ? 2.0 * this->nom_epsilon_
                                             : 0.5 * this->nom_epsilon_;
 
-      if (this->nom_epsilon_ > 1e7) {
+      if (this->nom_epsilon_ > 1e7)
         throw std::runtime_error(
             "Posterior is improper. "
             "Please check your model.");
-      }
-      if (this->nom_epsilon_ == 0) {
+      if (this->nom_epsilon_ == 0)
         throw std::runtime_error(
             "No acceptably small step size could "
             "be found. Perhaps the posterior is "
             "not continuous?");
-      }
     }
 
-    this->z_ = z_init;
+    this->z_.ps_point::operator=(z_init);
   }
 
-  inline auto& z() { return z_; }
+  typename Hamiltonian<Model, BaseRNG>::PointType& z() { return z_; }
 
   virtual void set_nominal_stepsize(double e) {
     if (e > 0)
       nom_epsilon_ = e;
   }
 
-  inline double get_nominal_stepsize() { return this->nom_epsilon_; }
+  double get_nominal_stepsize() { return this->nom_epsilon_; }
 
-  inline double get_current_stepsize() { return this->epsilon_; }
+  double get_current_stepsize() { return this->epsilon_; }
 
   virtual void set_stepsize_jitter(double j) {
     if (j > 0 && j < 1)
       epsilon_jitter_ = j;
   }
 
-  inline double get_stepsize_jitter() { return this->epsilon_jitter_; }
+  double get_stepsize_jitter() { return this->epsilon_jitter_; }
 
-  inline void sample_stepsize() {
+  void sample_stepsize() {
     this->epsilon_ = this->nom_epsilon_;
     if (this->epsilon_jitter_)
       this->epsilon_
@@ -160,7 +158,7 @@ class base_hmc : public base_mcmc {
 
  protected:
   typename Hamiltonian<Model, BaseRNG>::PointType z_;
-  Integrator<Hamiltonian<Model, BaseRNG>> integrator_;
+  Integrator<Hamiltonian<Model, BaseRNG> > integrator_;
   Hamiltonian<Model, BaseRNG> hamiltonian_;
 
   BaseRNG& rand_int_;

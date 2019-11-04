@@ -38,6 +38,12 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                           inv_e_metric) {}
 
+  ~base_nuts() = default;
+  base_nuts(const base_nuts& other) = default;
+  base_nuts(base_nuts&& other) = default;
+  base_nuts& operator=(const base_nuts& other) = default;
+  base_nuts& operator=(base_nuts&& other) = default;
+
   inline auto& metric() { return this->z_.metric(); }
   inline const auto& metric() const { return this->z_.metric(); }
 

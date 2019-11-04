@@ -24,32 +24,22 @@ template <class Model, template <class, class> class Hamiltonian,
 class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_xhmc(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        depth_(0),
-        max_depth_(5),
-        max_deltaH_(1000),
-        x_delta_(0.1),
-        n_leapfrog_(0),
-        divergent_(0),
-        energy_(0) {}
+      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng) {}
 
   ~base_xhmc() {}
+  base_xhmc(const base_xhmc& other) = default;
+  base_xhmc(base_xhmc&& other) = default;
+  base_xhmc& operator=(const base_xhmc&) = default;
+  base_xhmc& operator=(base_xhmc&&) = default;
 
-  void max_depth() = int d {
-    if (d > 0)
-      max_depth_ = d;
-  }
+  int& max_depth() { return max_depth_;}
+  const int& max_depth() const { return max_depth_;}
 
-  void set_max_deltaH(double d) { max_deltaH_ = d; }
+  double& max_deltaH() { return max_deltaH_; }
+  const double& max_deltaH() const { return max_deltaH_; }
 
-  void set_x_delta(double d) {
-    if (d > 0)
-      x_delta_ = d;
-  }
-
-  int max_depth() { return this->max_depth_; }
-  double get_max_deltaH() { return this->max_deltaH_; }
-  double get_x_delta() { return this->x_delta_; }
+  double& x_delta() { return x_delta_;}
+  const double& x_delta() const { return x_delta_;}
 
   sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
@@ -265,14 +255,14 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     }
   }
 
-  int depth_;
-  int max_depth_;
-  double max_deltaH_;
-  double x_delta_;
+  int depth_{0};
+  int max_depth_{5};
+  double max_deltaH_{1000};
+  double x_delta_{0.1};
 
-  int n_leapfrog_;
-  bool divergent_;
-  double energy_;
+  int n_leapfrog_{0};
+  bool divergent_{0};
+  double energy_{0};
 };
 
 }  // namespace mcmc
