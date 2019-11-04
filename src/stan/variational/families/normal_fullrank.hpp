@@ -136,7 +136,6 @@ class normal_fullrank : public base_family {
    */
   const Eigen::MatrixXd& L_chol() const { return L_chol_; }
 
-
   /**
    * Set the Cholesky factor to the specified value.
    *
