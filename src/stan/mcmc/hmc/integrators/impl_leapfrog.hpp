@@ -75,7 +75,7 @@ class impl_leapfrog : public base_leapfrog<Hamiltonian> {
   inline double& fixed_point_threshold() {
     return this->fixed_point_threshold_;
   }
-  inline double& const fixed_point_threshold() const {
+  inline const double& fixed_point_threshold() const {
     return this->fixed_point_threshold_;
   }
 
