@@ -27,8 +27,8 @@ class adapt_softabs_static_hmc : public softabs_static_hmc<Model, BaseRNG>,
         = softabs_static_hmc<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_) {
-      this->nom_epsilon_ = this->stepsize_adaptation_.learn_stepsize(
-                                                s.accept_stat());
+      this->nom_epsilon_
+          = this->stepsize_adaptation_.learn_stepsize(s.accept_stat());
       this->update_L_();
     }
 

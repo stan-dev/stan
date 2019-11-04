@@ -292,7 +292,9 @@ class chains {
 
   inline int warmup(const int chain) const { return warmup_(chain); }
 
-  inline int num_samples(const int chain) const { return samples_(chain).rows(); }
+  inline int num_samples(const int chain) const {
+    return samples_(chain).rows();
+  }
 
   inline int num_samples() const {
     int n = 0;
@@ -406,7 +408,8 @@ class chains {
     return s;
   }
 
-  inline Eigen::VectorXd samples(const int chain, const std::string& name) const {
+  inline Eigen::VectorXd samples(const int chain,
+                                 const std::string& name) const {
     return samples(chain, index(name));
   }
 
@@ -424,7 +427,9 @@ class chains {
     return mean(chain, index(name));
   }
 
-  inline double mean(const std::string& name) const { return mean(index(name)); }
+  inline double mean(const std::string& name) const {
+    return mean(index(name));
+  }
 
   inline double sd(const int chain, const int index) const {
     return sd(samples(chain, index));
@@ -442,7 +447,9 @@ class chains {
     return variance(samples(chain, index));
   }
 
-  inline double variance(const int index) const { return variance(samples(index)); }
+  inline double variance(const int index) const {
+    return variance(samples(index));
+  }
 
   inline double variance(const int chain, const std::string& name) const {
     return variance(chain, index(name));
@@ -452,7 +459,8 @@ class chains {
     return variance(index(name));
   }
 
-  inline double covariance(const int chain, const int index1, const int index2) const {
+  inline double covariance(const int chain, const int index1,
+                           const int index2) const {
     return covariance(samples(chain, index1), samples(chain, index2));
   }
 
@@ -461,16 +469,17 @@ class chains {
   }
 
   inline double covariance(const int chain, const std::string& name1,
-                    const std::string& name2) const {
+                           const std::string& name2) const {
     return covariance(chain, index(name1), index(name2));
   }
 
-  inline double covariance(const std::string& name1, const std::string& name2) const {
+  inline double covariance(const std::string& name1,
+                           const std::string& name2) const {
     return covariance(index(name1), index(name2));
   }
 
   inline double correlation(const int chain, const int index1,
-                     const int index2) const {
+                            const int index2) const {
     return correlation(samples(chain, index1), samples(chain, index2));
   }
 
@@ -479,15 +488,17 @@ class chains {
   }
 
   inline double correlation(const int chain, const std::string& name1,
-                     const std::string& name2) const {
+                            const std::string& name2) const {
     return correlation(chain, index(name1), index(name2));
   }
 
-  inline double correlation(const std::string& name1, const std::string& name2) const {
+  inline double correlation(const std::string& name1,
+                            const std::string& name2) const {
     return correlation(index(name1), index(name2));
   }
 
-  inline double quantile(const int chain, const int index, const double prob) const {
+  inline double quantile(const int chain, const int index,
+                         const double prob) const {
     return quantile(samples(chain, index), prob);
   }
 
@@ -495,7 +506,8 @@ class chains {
     return quantile(samples(index), prob);
   }
 
-  inline double quantile(int chain, const std::string& name, double prob) const {
+  inline double quantile(int chain, const std::string& name,
+                         double prob) const {
     return quantile(chain, index(name), prob);
   }
 
@@ -504,25 +516,27 @@ class chains {
   }
 
   inline Eigen::VectorXd quantiles(int chain, int index,
-                            const Eigen::VectorXd& probs) const {
+                                   const Eigen::VectorXd& probs) const {
     return quantiles(samples(chain, index), probs);
   }
 
-  inline Eigen::VectorXd quantiles(int index, const Eigen::VectorXd& probs) const {
+  inline Eigen::VectorXd quantiles(int index,
+                                   const Eigen::VectorXd& probs) const {
     return quantiles(samples(index), probs);
   }
 
   inline Eigen::VectorXd quantiles(int chain, const std::string& name,
-                            const Eigen::VectorXd& probs) const {
+                                   const Eigen::VectorXd& probs) const {
     return quantiles(chain, index(name), probs);
   }
 
   inline Eigen::VectorXd quantiles(const std::string& name,
-                            const Eigen::VectorXd& probs) const {
+                                   const Eigen::VectorXd& probs) const {
     return quantiles(index(name), probs);
   }
 
-  inline Eigen::Vector2d central_interval(int chain, int index, double prob) const {
+  inline Eigen::Vector2d central_interval(int chain, int index,
+                                          double prob) const {
     double low_prob = (1 - prob) / 2;
     double high_prob = 1 - low_prob;
 
@@ -542,27 +556,32 @@ class chains {
   }
 
   inline Eigen::Vector2d central_interval(int chain, const std::string& name,
-                                   double prob) const {
+                                          double prob) const {
     return central_interval(chain, index(name), prob);
   }
 
-  inline Eigen::Vector2d central_interval(const std::string& name, double prob) const {
+  inline Eigen::Vector2d central_interval(const std::string& name,
+                                          double prob) const {
     return central_interval(index(name), prob);
   }
 
-  inline Eigen::VectorXd autocorrelation(const int chain, const int index) const {
+  inline Eigen::VectorXd autocorrelation(const int chain,
+                                         const int index) const {
     return autocorrelation(samples(chain, index));
   }
 
-  inline Eigen::VectorXd autocorrelation(int chain, const std::string& name) const {
+  inline Eigen::VectorXd autocorrelation(int chain,
+                                         const std::string& name) const {
     return autocorrelation(chain, index(name));
   }
 
-  inline Eigen::VectorXd autocovariance(const int chain, const int index) const {
+  inline Eigen::VectorXd autocovariance(const int chain,
+                                        const int index) const {
     return autocovariance(samples(chain, index));
   }
 
-  inline Eigen::VectorXd autocovariance(int chain, const std::string& name) const {
+  inline Eigen::VectorXd autocovariance(int chain,
+                                        const std::string& name) const {
     return autocovariance(chain, index(name));
   }
 

@@ -25,8 +25,8 @@ class adapt_diag_e_nuts_classic : public diag_e_nuts_classic<Model, BaseRNG>,
         = diag_e_nuts_classic<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_) {
-      this->nom_epsilon_ = this->stepsize_adaptation_.learn_stepsize(
-                                                s.accept_stat());
+      this->nom_epsilon_
+          = this->stepsize_adaptation_.learn_stepsize(s.accept_stat());
 
       bool update = this->var_adaptation_.learn_variance(this->z_.inv_e_metric_,
                                                          this->z_.q);

@@ -26,9 +26,11 @@ class windowed_adaptation : public base_adaptation {
     adapt_next_window_ = adapt_init_buffer_ + adapt_window_size_ - 1;
   }
 
-  inline void set_window_params(unsigned int num_warmup, unsigned int init_buffer,
-                         unsigned int term_buffer, unsigned int base_window,
-                         callbacks::logger& logger) {
+  inline void set_window_params(unsigned int num_warmup,
+                                unsigned int init_buffer,
+                                unsigned int term_buffer,
+                                unsigned int base_window,
+                                callbacks::logger& logger) {
     if (num_warmup < 20) {
       logger.info("WARNING: No " + estimator_name_ + " estimation is");
       logger.info("         performed for num_warmup < 20");

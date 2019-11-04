@@ -24,8 +24,8 @@ class adapt_unit_e_nuts_classic : public unit_e_nuts_classic<Model, BaseRNG>,
         = unit_e_nuts_classic<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_)
-      this->nom_epsilon_ = this->stepsize_adaptation_.learn_stepsize(
-                                                s.accept_stat());
+      this->nom_epsilon_
+          = this->stepsize_adaptation_.learn_stepsize(s.accept_stat());
 
     return s;
   }

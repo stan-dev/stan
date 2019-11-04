@@ -11,7 +11,6 @@ namespace mcmc {
 
 class sample {
  public:
-
   sample(const Eigen::VectorXd& q, double log_prob, double stat)
       : cont_params_(q), log_prob_(log_prob), accept_stat_(stat) {}
 

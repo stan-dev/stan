@@ -28,8 +28,8 @@ class adapt_dense_e_static_hmc : public dense_e_static_hmc<Model, BaseRNG>,
         = dense_e_static_hmc<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_) {
-      this->nom_epsilon_ = this->stepsize_adaptation_.learn_stepsize(
-                                                s.accept_stat());
+      this->nom_epsilon_
+          = this->stepsize_adaptation_.learn_stepsize(s.accept_stat());
       this->update_L_();
 
       bool update = this->covar_adaptation_.learn_covariance(

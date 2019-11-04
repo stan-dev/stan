@@ -14,7 +14,8 @@ class covar_adaptation : public windowed_adaptation {
   explicit covar_adaptation(int n)
       : windowed_adaptation("covariance"), estimator_(n) {}
 
-  inline bool learn_covariance(Eigen::MatrixXd& covar, const Eigen::VectorXd& q) {
+  inline bool learn_covariance(Eigen::MatrixXd& covar,
+                               const Eigen::VectorXd& q) {
     if (adaptation_window())
       estimator_.add_sample(q);
 

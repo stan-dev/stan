@@ -20,9 +20,11 @@ class stepsize_covar_adapter : public base_adapter {
 
   inline covar_adaptation& get_covar_adaptation() { return covar_adaptation_; }
 
-  inline void set_window_params(unsigned int num_warmup, unsigned int init_buffer,
-                         unsigned int term_buffer, unsigned int base_window,
-                         callbacks::logger& logger) {
+  inline void set_window_params(unsigned int num_warmup,
+                                unsigned int init_buffer,
+                                unsigned int term_buffer,
+                                unsigned int base_window,
+                                callbacks::logger& logger) {
     covar_adaptation_.set_window_params(num_warmup, init_buffer, term_buffer,
                                         base_window, logger);
   }

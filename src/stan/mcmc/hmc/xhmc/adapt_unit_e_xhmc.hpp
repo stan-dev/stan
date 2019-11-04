@@ -25,8 +25,8 @@ class adapt_unit_e_xhmc : public unit_e_xhmc<Model, BaseRNG>,
     sample s = unit_e_xhmc<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_)
-      this->nom_epsilon_ = this->stepsize_adaptation_.learn_stepsize(
-                                                s.accept_stat());
+      this->nom_epsilon_
+          = this->stepsize_adaptation_.learn_stepsize(s.accept_stat());
 
     return s;
   }

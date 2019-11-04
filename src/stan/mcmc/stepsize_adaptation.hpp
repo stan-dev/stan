@@ -75,13 +75,13 @@ class stepsize_adaptation : public base_adaptation {
   inline double complete_adaptation() { return std::exp(x_bar_); }
 
  protected:
-  double counter_{0};  // Adaptation iteration
-  double s_bar_{0};    // Moving average statistic
-  double x_bar_{0};    // Moving average parameter
-  double mu_{0.5};       // Asymptotic mean of parameter
-  double delta_{0.5};    // Target value of statistic
-  double gamma_{0.05};    // Adaptation scaling
-  double kappa_{0.75};    // Adaptation shrinkage
+  double counter_{0};   // Adaptation iteration
+  double s_bar_{0};     // Moving average statistic
+  double x_bar_{0};     // Moving average parameter
+  double mu_{0.5};      // Asymptotic mean of parameter
+  double delta_{0.5};   // Target value of statistic
+  double gamma_{0.05};  // Adaptation scaling
+  double kappa_{0.75};  // Adaptation shrinkage
   double t0_{10};       // Effective starting iteration
 };
 

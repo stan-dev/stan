@@ -19,9 +19,11 @@ class stepsize_var_adapter : public base_adapter {
 
   inline var_adaptation& get_var_adaptation() { return var_adaptation_; }
 
-  inline void set_window_params(unsigned int num_warmup, unsigned int init_buffer,
-                         unsigned int term_buffer, unsigned int base_window,
-                         callbacks::logger& logger) {
+  inline void set_window_params(unsigned int num_warmup,
+                                unsigned int init_buffer,
+                                unsigned int term_buffer,
+                                unsigned int base_window,
+                                callbacks::logger& logger) {
     var_adaptation_.set_window_params(num_warmup, init_buffer, term_buffer,
                                       base_window, logger);
   }

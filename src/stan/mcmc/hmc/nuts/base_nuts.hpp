@@ -225,11 +225,13 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * @param sum_metro_prob Summed Metropolis probabilities across trajectory
    * @param logger Logger for messages
    */
-  inline bool build_tree(int depth, ps_point& z_propose, Eigen::VectorXd& p_sharp_beg,
-                  Eigen::VectorXd& p_sharp_end, Eigen::VectorXd& rho,
-                  Eigen::VectorXd& p_beg, Eigen::VectorXd& p_end, double H0,
-                  double sign, int& n_leapfrog, double& log_sum_weight,
-                  double& sum_metro_prob, callbacks::logger& logger) {
+  inline bool build_tree(int depth, ps_point& z_propose,
+                         Eigen::VectorXd& p_sharp_beg,
+                         Eigen::VectorXd& p_sharp_end, Eigen::VectorXd& rho,
+                         Eigen::VectorXd& p_beg, Eigen::VectorXd& p_end,
+                         double H0, double sign, int& n_leapfrog,
+                         double& log_sum_weight, double& sum_metro_prob,
+                         callbacks::logger& logger) {
     // Base case
     if (depth == 0) {
       this->integrator_.evolve(this->z_, this->hamiltonian_,

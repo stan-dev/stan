@@ -169,9 +169,9 @@ class base_nuts_classic
       = 0;
 
   // Returns number of valid points in the completed subtree
-  inline int build_tree(int depth, Eigen::VectorXd& rho, ps_point* z_init_parent,
-                 ps_point& z_propose, nuts_util& util,
-                 callbacks::logger& logger) {
+  inline int build_tree(int depth, Eigen::VectorXd& rho,
+                        ps_point* z_init_parent, ps_point& z_propose,
+                        nuts_util& util, callbacks::logger& logger) {
     // Base case
     if (depth == 0) {
       this->integrator_.evolve(this->z_, this->hamiltonian_,
