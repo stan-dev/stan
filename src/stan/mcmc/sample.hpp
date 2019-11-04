@@ -11,6 +11,7 @@ namespace mcmc {
 
 class sample {
  public:
+
   sample(const Eigen::VectorXd& q, double log_prob, double stat)
       : cont_params_(q), log_prob_(log_prob), accept_stat_(stat) {}
 
@@ -27,13 +28,14 @@ class sample {
 
   virtual ~sample() = default;
 
-  int size_cont() const { return cont_params_.size(); }
+  inline int size_cont() const { return cont_params_.size(); }
 
-  double cont_params(int k) const { return cont_params_(k); }
+  inline double cont_params(int k) const { return cont_params_(k); }
 
-  void cont_params(Eigen::VectorXd& x) const { x = cont_params_; }
+  inline void cont_params(Eigen::VectorXd& x) const { x = cont_params_; }
 
-  const Eigen::VectorXd& cont_params() const { return cont_params_; }
+  inline const Eigen::VectorXd& cont_params() const { return cont_params_; }
+  inline Eigen::VectorXd& cont_params() { return cont_params_; }
 
   inline double log_prob() const { return log_prob_; }
 
@@ -44,7 +46,7 @@ class sample {
     names.push_back("accept_stat__");
   }
 
-  void get_sample_params(std::vector<double>& values) {
+  inline void get_sample_params(std::vector<double>& values) {
     values.push_back(log_prob_);
     values.push_back(accept_stat_);
   }

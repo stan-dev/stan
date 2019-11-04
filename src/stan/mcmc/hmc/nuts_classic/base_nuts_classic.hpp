@@ -37,27 +37,19 @@ class base_nuts_classic
     : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_nuts_classic(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        depth_(0),
-        max_depth_(5),
-        max_delta_(1000),
-        n_leapfrog_(0),
-        divergent_(0),
-        energy_(0) {}
+      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng) {}
 
-  ~base_nuts_classic() {}
-
-  void set_max_depth(int d) {
+  inline void set_max_depth(int d) {
     if (d > 0)
       max_depth_ = d;
   }
 
-  void set_max_delta(double d) { max_delta_ = d; }
+  inline void set_max_delta(double d) { max_delta_ = d; }
 
-  int get_max_depth() { return this->max_depth_; }
-  double get_max_delta() { return this->max_delta_; }
+  inline int get_max_depth() { return this->max_depth_; }
+  inline double get_max_delta() { return this->max_delta_; }
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
     this->sample_stepsize();
 
@@ -241,14 +233,13 @@ class base_nuts_classic
       return n1 + n2;
     }
   }
+  int depth_{0};
+  int max_depth_{5};
+  double max_delta_{1000};
 
-  int depth_;
-  int max_depth_;
-  double max_delta_;
-
-  int n_leapfrog_;
-  int divergent_;
-  double energy_;
+  int n_leapfrog_{0};
+  int divergent_{0};
+  double energy_{0};
 };
 
 }  // namespace mcmc
