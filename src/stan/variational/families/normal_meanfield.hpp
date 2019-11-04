@@ -92,8 +92,8 @@ class normal_meanfield : public base_family {
   /**
    * Set the mean vector to the specified value.
    */
-  Eigen::VectorXd& mu() {return mu_;}
-  const Eigen::VectorXd& mu() const {return mu_;}
+  Eigen::VectorXd& mu() { return mu_; }
+  const Eigen::VectorXd& mu() const { return mu_; }
 
   /**
    * Set the log standard deviation vector to the specified

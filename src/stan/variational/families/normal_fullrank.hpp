@@ -138,7 +138,7 @@ class normal_fullrank : public base_family {
   /**
    * Get the mean vector to the specified value.
    */
-  const Eigen::VectorXd& mu() const { return mu_;}
+  const Eigen::VectorXd& mu() const { return mu_; }
 
   /**
    * Set the Cholesky factor to the specified value.
