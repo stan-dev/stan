@@ -73,10 +73,10 @@ int hmc_nuts_diag_e(Model& model, stan::io::var_context& init,
 
   stan::mcmc::diag_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
 
-  sampler.set_metric(inv_metric);
+  sampler.metric() = inv_metric;
   sampler.set_nominal_stepsize(stepsize);
   sampler.set_stepsize_jitter(stepsize_jitter);
-  sampler.set_max_depth(max_depth);
+  sampler.max_depth() = max_depth;
 
   util::run_sampler(sampler, model, cont_vector, num_warmup, num_samples,
                     num_thin, refresh, save_warmup, rng, interrupt, logger,

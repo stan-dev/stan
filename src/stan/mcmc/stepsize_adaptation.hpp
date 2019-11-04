@@ -12,36 +12,20 @@ class stepsize_adaptation : public base_adaptation {
  public:
   stepsize_adaptation() {}
 
-  inline void set_mu(double m) { mu_ = m; }
+  inline auto& mu() { return mu_; }
+  inline const auto& mu() const { return mu_; }
 
-  inline void set_delta(double d) {
-    if (d > 0 && d < 1)
-      delta_ = d;
-  }
+  inline auto& delta() { return delta_;}
+  inline const auto& delta() const { return delta_;}
 
-  inline void set_gamma(double g) {
-    if (g > 0)
-      gamma_ = g;
-  }
+  inline auto& gamma(double g) { return gamma_;}
+  inline auto& gamma(double g) const { return gamma_;}
 
-  inline void set_kappa(double k) {
-    if (k > 0)
-      kappa_ = k;
-  }
-  inline void set_t0(double t) {
-    if (t > 0)
-      t0_ = t;
-  }
+  inline auto& kappa(double k) { return kappa_;}
+  inline const auto& kappa(double k) const { return kappa_;}
 
-  inline double get_mu() { return mu_; }
-
-  inline double get_delta() { return delta_; }
-
-  inline double get_gamma() { return gamma_; }
-
-  inline double get_kappa() { return kappa_; }
-
-  inline double get_t0() { return t0_; }
+  inline auto& t0(double t) { return t0_;}
+  inline const auto& t0(double t) const { return t0_;}
 
   inline void restart() {
     counter_ = 0;

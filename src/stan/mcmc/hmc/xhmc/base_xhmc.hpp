@@ -35,7 +35,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
   ~base_xhmc() {}
 
-  void set_max_depth(int d) {
+  void max_depth() = int d {
     if (d > 0)
       max_depth_ = d;
   }
@@ -47,7 +47,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       x_delta_ = d;
   }
 
-  int get_max_depth() { return this->max_depth_; }
+  int max_depth() { return this->max_depth_; }
   double get_max_deltaH() { return this->max_deltaH_; }
   double get_x_delta() { return this->x_delta_; }
 

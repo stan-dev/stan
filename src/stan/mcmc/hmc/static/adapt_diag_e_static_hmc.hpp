@@ -39,7 +39,7 @@ class adapt_diag_e_static_hmc : public diag_e_static_hmc<Model, BaseRNG>,
         this->init_stepsize(logger);
         this->update_L_();
 
-        this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
+        this->stepsize_adaptation_.mu() = log(10 * this->nom_epsilon_);
         this->stepsize_adaptation_.restart();
       }
     }

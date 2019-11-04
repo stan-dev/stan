@@ -33,7 +33,7 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
       if (update) {
         this->init_stepsize(logger);
 
-        this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
+        this->stepsize_adaptation_.mu() = log(10 * this->nom_epsilon_);
         this->stepsize_adaptation_.restart();
       }
     }

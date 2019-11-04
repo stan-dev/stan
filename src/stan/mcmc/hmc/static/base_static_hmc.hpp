@@ -22,23 +22,20 @@ class base_static_hmc
     : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_static_hmc(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        T_(1),
-        energy_(0) {
+      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng) {
     update_L_();
   }
 
   ~base_static_hmc() {}
+  base_static_hmc(const base_static_hmc& other) = default;
+  base_static_hmc(base_static_hmc&& other) = default;
+  base_static_hmc& operator=(const base_static_hmc& other) = default;
+  base_static_hmc& operator=(base_static_hmc&& other) = default;
 
-  void set_metric(const Eigen::MatrixXd& inv_e_metric) {
-    this->z_.set_metric(inv_e_metric);
-  }
+  inline auto& metric() { return this->z_.metric()}
+  inline const auto& metric() const { return this->z_.metric()}
 
-  void set_metric(const Eigen::VectorXd& inv_e_metric) {
-    this->z_.set_metric(inv_e_metric);
-  }
-
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
     this->sample_stepsize();
 
     this->seed(init_sample.cont_params());
@@ -116,9 +113,9 @@ class base_static_hmc
   int get_L() { return this->L_; }
 
  protected:
-  double T_;
+  double T_{0]};
   int L_;
-  double energy_;
+  double energy_{0};
 
   void update_L_() {
     L_ = static_cast<int>(T_ / this->nom_epsilon_);

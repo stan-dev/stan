@@ -142,7 +142,7 @@ class normal_fullrank : public base_family {
    * @throw std::domain_error If the size of the specified mean
    * vector does not match the stored dimension of this approximation.
    */
-  void set_mu(const Eigen::VectorXd& mu) {
+  void mu() = const Eigen::VectorXd& mu {
     static const char* function = "stan::variational::set_mu";
     validate_mean(function, mu);
     mu_ = mu;
@@ -458,7 +458,7 @@ class normal_fullrank : public base_family {
     // Add gradient of entropy term
     L_grad.diagonal().array() += L_chol_.diagonal().array().inverse();
 
-    elbo_grad.set_mu(mu_grad);
+    elbo_grad.mu() = mu_grad;
     elbo_grad.set_L_chol(L_grad);
   }
 };

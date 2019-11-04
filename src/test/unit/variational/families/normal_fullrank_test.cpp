@@ -52,7 +52,7 @@ TEST(normal_fullrank_test, mean_vector) {
   EXPECT_THROW(
       stan::variational::normal_fullrank my_normal_fullrank_nan(mu_nan, L);
       , std::domain_error);
-  EXPECT_THROW(my_normal_fullrank.set_mu(mu_nan);, std::domain_error);
+  EXPECT_THROW(my_normal_fullrank.mu() = mu_nan);, std::domain_error;
   Eigen::MatrixXd L_nan = Eigen::MatrixXd::Constant(3, 3, nan);
   EXPECT_THROW(
       stan::variational::normal_fullrank my_normal_fullrank_nan(mu, L_nan);

@@ -39,14 +39,11 @@ class base_nuts_classic
   base_nuts_classic(const Model& model, BaseRNG& rng)
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng) {}
 
-  inline void set_max_depth(int d) {
-    if (d > 0)
-      max_depth_ = d;
-  }
+  inline auto& max_depth() { return max_depth_;}
+  inline const auto& max_depth() const { return max_depth_;}
 
   inline void set_max_delta(double d) { max_delta_ = d; }
 
-  inline int get_max_depth() { return this->max_depth_; }
   inline double get_max_delta() { return this->max_delta_; }
 
   inline sample transition(sample& init_sample, callbacks::logger& logger) {

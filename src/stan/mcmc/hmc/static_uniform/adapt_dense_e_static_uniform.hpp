@@ -36,7 +36,7 @@ class adapt_dense_e_static_uniform
 
       if (update) {
         this->init_stepsize(logger);
-        this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
+        this->stepsize_adaptation_.mu() = log(10 * this->nom_epsilon_);
         this->stepsize_adaptation_.restart();
       }
     }

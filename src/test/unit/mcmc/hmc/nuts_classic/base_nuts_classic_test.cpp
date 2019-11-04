@@ -90,11 +90,11 @@ TEST(McmcNutsBaseNutsClassic, set_max_depth) {
   EXPECT_TRUE(sampler.divergent_ == true || sampler.divergent_ == false);
 
   int old_max_depth = 1;
-  sampler.set_max_depth(old_max_depth);
-  EXPECT_EQ(old_max_depth, sampler.get_max_depth());
+  sampler.max_depth() = old_max_depth;
+  EXPECT_EQ(old_max_depth, sampler.max_depth());
 
-  sampler.set_max_depth(-1);
-  EXPECT_EQ(old_max_depth, sampler.get_max_depth());
+  sampler.max_depth() = -1;
+  EXPECT_EQ(old_max_depth, sampler.max_depth());
 }
 
 TEST(McmcNutsBaseNuts, set_max_delta) {
@@ -108,8 +108,8 @@ TEST(McmcNutsBaseNuts, set_max_delta) {
   stan::mcmc::mock_nuts_classic sampler(model, base_rng);
 
   double old_max_delta = 10;
-  sampler.set_max_delta(old_max_delta);
-  EXPECT_EQ(old_max_delta, sampler.get_max_delta());
+  sampler.max_delta() = old_max_delta;
+  EXPECT_EQ(old_max_delta, sampler.max_delta());
 }
 
 TEST(McmcNutsBaseNutsClassic, build_tree) {

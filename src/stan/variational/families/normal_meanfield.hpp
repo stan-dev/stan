@@ -102,7 +102,7 @@ class normal_meanfield : public base_family {
    * match this approximation's dimensionality, or if it contains
    * not-a-number values.
    */
-  void set_mu(const Eigen::VectorXd& mu) {
+  void mu() = const Eigen::VectorXd& mu {
     static const char* function = "stan::variational::normal_meanfield::set_mu";
 
     stan::math::check_size_match(function, "Dimension of input vector",
@@ -389,7 +389,7 @@ class normal_meanfield : public base_family {
 
     omega_grad.array() += 1.0;  // add entropy gradient (unit)
 
-    elbo_grad.set_mu(mu_grad);
+    elbo_grad.mu() = mu_grad;
     elbo_grad.set_omega(omega_grad);
   }
 };

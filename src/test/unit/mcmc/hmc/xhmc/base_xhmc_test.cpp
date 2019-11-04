@@ -75,11 +75,11 @@ TEST(McmcXHMCBaseXHMC, set_max_depth) {
   stan::mcmc::mock_xhmc sampler(model, base_rng);
 
   int old_max_depth = 1;
-  sampler.set_max_depth(old_max_depth);
-  EXPECT_EQ(old_max_depth, sampler.get_max_depth());
+  sampler.max_depth() = old_max_depth;
+  EXPECT_EQ(old_max_depth, sampler.max_depth());
 
-  sampler.set_max_depth(-1);
-  EXPECT_EQ(old_max_depth, sampler.get_max_depth());
+  sampler.max_depth() = -1;
+  EXPECT_EQ(old_max_depth, sampler.max_depth());
 }
 
 TEST(McmcXHMCBaseXHMC, set_max_deltaH) {

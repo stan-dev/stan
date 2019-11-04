@@ -63,9 +63,9 @@ int hmc_nuts_unit_e_adapt(
   stan::mcmc::adapt_unit_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
   sampler.set_nominal_stepsize(stepsize);
   sampler.set_stepsize_jitter(stepsize_jitter);
-  sampler.set_max_depth(max_depth);
+  sampler.max_depth() = max_depth;
 
-  sampler.get_stepsize_adaptation().set_mu(log(10 * stepsize));
+  sampler.get_stepsize_adaptation().mu() = log(10 * stepsize);
   sampler.get_stepsize_adaptation().set_delta(delta);
   sampler.get_stepsize_adaptation().set_gamma(gamma);
   sampler.get_stepsize_adaptation().set_kappa(kappa);

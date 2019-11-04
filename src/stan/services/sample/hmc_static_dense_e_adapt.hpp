@@ -82,11 +82,11 @@ int hmc_static_dense_e_adapt(
   stan::mcmc::adapt_dense_e_static_hmc<Model, boost::ecuyer1988> sampler(model,
                                                                          rng);
 
-  sampler.set_metric(inv_metric);
+  sampler.metric() = inv_metric;
   sampler.set_nominal_stepsize_and_T(stepsize, int_time);
   sampler.set_stepsize_jitter(stepsize_jitter);
 
-  sampler.get_stepsize_adaptation().set_mu(log(10 * stepsize));
+  sampler.get_stepsize_adaptation().mu() = log(10 * stepsize);
   sampler.get_stepsize_adaptation().set_delta(delta);
   sampler.get_stepsize_adaptation().set_gamma(gamma);
   sampler.get_stepsize_adaptation().set_kappa(kappa);

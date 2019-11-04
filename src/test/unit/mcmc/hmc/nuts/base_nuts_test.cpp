@@ -115,11 +115,11 @@ TEST(McmcNutsBaseNuts, set_max_depth_test) {
   EXPECT_TRUE(sampler.divergent_ == true || sampler.divergent_ == false);
 
   int old_max_depth = 1;
-  sampler.set_max_depth(old_max_depth);
-  EXPECT_EQ(old_max_depth, sampler.get_max_depth());
+  sampler.max_depth() = old_max_depth;
+  EXPECT_EQ(old_max_depth, sampler.max_depth());
 
-  sampler.set_max_depth(-1);
-  EXPECT_EQ(old_max_depth, sampler.get_max_depth());
+  sampler.max_depth() = -1;
+  EXPECT_EQ(old_max_depth, sampler.max_depth());
 }
 
 TEST(McmcNutsBaseNuts, set_max_delta_test) {
@@ -133,8 +133,8 @@ TEST(McmcNutsBaseNuts, set_max_delta_test) {
   stan::mcmc::mock_nuts sampler(model, base_rng);
 
   double old_max_delta = 10;
-  sampler.set_max_delta(old_max_delta);
-  EXPECT_EQ(old_max_delta, sampler.get_max_delta());
+  sampler.max_delta() = old_max_delta;
+  EXPECT_EQ(old_max_delta, sampler.max_delta());
 }
 
 TEST(McmcNutsBaseNuts, build_tree_test) {
@@ -359,8 +359,8 @@ TEST(McmcNutsBaseNuts, transition) {
   // Transition will expand trajectory until max_depth is hit
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
-  EXPECT_EQ(sampler.get_max_depth(), sampler.depth_);
-  EXPECT_EQ((2 << (sampler.get_max_depth() - 1)) - 1, sampler.n_leapfrog_);
+  EXPECT_EQ(sampler.max_depth(), sampler.depth_);
+  EXPECT_EQ((2 << (sampler.max_depth() - 1)) - 1, sampler.n_leapfrog_);
   EXPECT_FALSE(sampler.divergent_);
 
   EXPECT_EQ(21 * init_momentum, s.cont_params()(0));
@@ -386,7 +386,7 @@ TEST(McmcNutsBaseNuts, transition_egde_momenta) {
   stan::mcmc::mock_model model(model_size);
   stan::mcmc::edge_inspector_mock_nuts sampler(model, base_rng);
 
-  sampler.set_max_depth(2);
+  sampler.max_depth() = 2;
 
   sampler.set_nominal_stepsize(1);
   sampler.set_stepsize_jitter(0);
@@ -402,7 +402,7 @@ TEST(McmcNutsBaseNuts, transition_egde_momenta) {
   stan::mcmc::sample s = sampler.transition(init_sample, logger);
 
   EXPECT_EQ(2, sampler.depth_);
-  EXPECT_EQ((2 << (sampler.get_max_depth() - 1)) - 1, sampler.n_leapfrog_);
+  EXPECT_EQ((2 << (sampler.max_depth() - 1)) - 1, sampler.n_leapfrog_);
   EXPECT_FALSE(sampler.divergent_);
 
   EXPECT_EQ(9, sampler.p_sharp_minus_values.size());

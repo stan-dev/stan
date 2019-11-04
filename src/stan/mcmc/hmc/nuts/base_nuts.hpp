@@ -38,23 +38,14 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                           inv_e_metric) {}
 
-  inline void set_metric(const Eigen::MatrixXd& inv_e_metric) {
-    this->z_.set_metric(inv_e_metric);
-  }
+  inline auto& metric() { return this->z_.metric();}
+  inline const auto& metric() const { return this->z_.metric();}
 
-  inline void set_metric(const Eigen::VectorXd& inv_e_metric) {
-    this->z_.set_metric(inv_e_metric);
-  }
+  inline auto& max_depth() {return max_depth_;}
+  inline const auto& max_depth() const {return max_depth_;}
 
-  inline void set_max_depth(int d) {
-    if (d > 0)
-      max_depth_ = d;
-  }
-
-  inline void set_max_delta(double d) { max_deltaH_ = d; }
-
-  inline int get_max_depth() { return this->max_depth_; }
-  inline double get_max_delta() { return this->max_deltaH_; }
+  inline auto& max_delta() { return max_deltaH_; }
+  inline const auto& max_delta() const { return max_deltaH_; }
 
   inline sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
