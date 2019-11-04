@@ -67,8 +67,8 @@ class impl_leapfrog : public base_leapfrog<Hamiltonian> {
     }
   }
 
-  inline int max_num_fixed_point() { return this->max_num_fixed_point_; }
-  inline const int max_num_fixed_point() const {
+  inline int& max_num_fixed_point() { return this->max_num_fixed_point_; }
+  inline const int& max_num_fixed_point() const {
     return this->max_num_fixed_point_;
   }
 
