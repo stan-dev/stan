@@ -39,8 +39,8 @@ class base_nuts_classic
   base_nuts_classic(const Model& model, BaseRNG& rng)
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng) {}
 
-  inline auto& max_depth() { return max_depth_;}
-  inline const auto& max_depth() const { return max_depth_;}
+  inline auto& max_depth() { return max_depth_; }
+  inline const auto& max_depth() const { return max_depth_; }
 
   inline auto& max_delta() { return max_delta_; }
   inline const auto& max_delta() const { return max_delta_; }
