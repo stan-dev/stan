@@ -20,7 +20,7 @@ class softabs_static_uniform
  public:
   softabs_static_uniform(const Model& model, BaseRNG& rng)
       : base_static_uniform<Model, softabs_metric, impl_leapfrog, BaseRNG>(
-            model, rng) {}
+          model, rng) {}
 };
 }  // namespace mcmc
 }  // namespace stan

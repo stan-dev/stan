@@ -15,17 +15,17 @@ class stepsize_adaptation : public base_adaptation {
   inline auto& mu() { return mu_; }
   inline const auto& mu() const { return mu_; }
 
-  inline auto& delta() { return delta_;}
-  inline const auto& delta() const { return delta_;}
+  inline auto& delta() { return delta_; }
+  inline const auto& delta() const { return delta_; }
 
-  inline auto& gamma(double g) { return gamma_;}
-  inline auto& gamma(double g) const { return gamma_;}
+  inline auto& gamma(double g) { return gamma_; }
+  inline auto& gamma(double g) const { return gamma_; }
 
-  inline auto& kappa(double k) { return kappa_;}
-  inline const auto& kappa(double k) const { return kappa_;}
+  inline auto& kappa(double k) { return kappa_; }
+  inline const auto& kappa(double k) const { return kappa_; }
 
-  inline auto& t0(double t) { return t0_;}
-  inline const auto& t0(double t) const { return t0_;}
+  inline auto& t0(double t) { return t0_; }
+  inline const auto& t0(double t) const { return t0_; }
 
   inline void restart() {
     counter_ = 0;

@@ -38,11 +38,11 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                           inv_e_metric) {}
 
-  inline auto& metric() { return this->z_.metric();}
-  inline const auto& metric() const { return this->z_.metric();}
+  inline auto& metric() { return this->z_.metric(); }
+  inline const auto& metric() const { return this->z_.metric(); }
 
-  inline auto& max_depth() {return max_depth_;}
-  inline const auto& max_depth() const {return max_depth_;}
+  inline auto& max_depth() { return max_depth_; }
+  inline const auto& max_depth() const { return max_depth_; }
 
   inline auto& max_delta() { return max_deltaH_; }
   inline const auto& max_delta() const { return max_deltaH_; }

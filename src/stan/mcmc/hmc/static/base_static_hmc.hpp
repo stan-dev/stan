@@ -32,8 +32,8 @@ class base_static_hmc
   base_static_hmc& operator=(const base_static_hmc& other) = default;
   base_static_hmc& operator=(base_static_hmc&& other) = default;
 
-  inline auto& metric() { return this->z_.metric()}
-  inline const auto& metric() const { return this->z_.metric()}
+  inline auto& metric() { return this->z_.metric() }
+  inline const auto& metric() const { return this->z_.metric() }
 
   inline sample transition(sample& init_sample, callbacks::logger& logger) {
     this->sample_stepsize();

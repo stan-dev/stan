@@ -32,8 +32,8 @@ class diag_e_point : public ps_point {
    *
    * @param inv_e_metric initial mass matrix
    */
-  auto& metric() { return inv_e_metric_;}
-  const auto& metric() const { return inv_e_metric_;}
+  auto& metric() { return inv_e_metric_; }
+  const auto& metric() const { return inv_e_metric_; }
 
   /**
    * Write elements of mass matrix to string and handoff to writer.

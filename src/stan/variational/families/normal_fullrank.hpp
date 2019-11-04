@@ -142,7 +142,7 @@ class normal_fullrank : public base_family {
    * @throw std::domain_error If the size of the specified mean
    * vector does not match the stored dimension of this approximation.
    */
-  void mu() = const Eigen::VectorXd& mu {
+  void mu() = const Eigen::VectorXd & mu {
     static const char* function = "stan::variational::set_mu";
     validate_mean(function, mu);
     mu_ = mu;

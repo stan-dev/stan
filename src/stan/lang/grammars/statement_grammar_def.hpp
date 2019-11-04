@@ -125,8 +125,8 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
          | assgn_r(_r1)                         // var[idxs] = expr
          | sample_r(_r1)                        // expression "~"
          | expression_g(_r1)                    // expression
-               [expression_as_statement_f(_pass, _1,
-                                          boost::phoenix::ref(error_msgs_))];
+             [expression_as_statement_f(_pass, _1,
+                                        boost::phoenix::ref(error_msgs_))];
 
   // _r1 = var scope,  _r2 = true if in loop,  _a var_decls, _b local scope
   statement_seq_r.name("sequence of statements");
@@ -145,25 +145,24 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
          > eps[validate_allow_sample_f(_r1, _pass,
                                        boost::phoenix::ref(error_msgs_))]
          > lit('(') > expression_g(_r1)[validate_non_void_expression_f(
-                          _1, _pass, boost::phoenix::ref(error_msgs_))]
+             _1, _pass, boost::phoenix::ref(error_msgs_))]
          > lit(')') > lit(';');
 
   // just variant syntax for increment_log_prob_r (see above)
   // _r1 = var scope
   increment_target_statement_r.name("increment target statement");
   increment_target_statement_r
-      %= (lit("target") >> lit("+="))
-         > eps[validate_allow_sample_f(_r1, _pass,
-                                       boost::phoenix::ref(error_msgs_))]
+      %= (lit("target") >> lit("+=")) > eps[validate_allow_sample_f(
+             _r1, _pass, boost::phoenix::ref(error_msgs_))]
          > expression_g(_r1)[validate_non_void_expression_f(
-               _1, _pass, boost::phoenix::ref(error_msgs_))]
+             _1, _pass, boost::phoenix::ref(error_msgs_))]
          > lit(';');
 
   // _r1 = var scope
   while_statement_r.name("while statement");
   while_statement_r = (lit("while") >> no_skip[!char_("a-zA-Z0-9_")]) > lit('(')
                       > expression_g(_r1)[add_while_condition_f(
-                            _val, _1, _pass, boost::phoenix::ref(error_msgs_))]
+                          _val, _1, _pass, boost::phoenix::ref(error_msgs_))]
                       > lit(')')
                       > statement_r(_r1, true)[add_while_body_f(_val, _1)];
 
@@ -179,8 +178,8 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
   for_statement_r
       %= lit("for") >> no_skip[!char_("a-zA-Z0-9_")] >> lit('(')
          >> identifier_r[store_loop_identifier_f(
-                _1, _a, _pass, boost::phoenix::ref(var_map_),
-                boost::phoenix::ref(error_msgs_))]
+             _1, _a, _pass, boost::phoenix::ref(var_map_),
+             boost::phoenix::ref(error_msgs_))]
          >> lit("in") >> (range_r(_r1) > lit(')'))
          >> (eps[add_loop_identifier_f(_a, _r1, boost::phoenix::ref(var_map_))]
              > statement_r(_r1, true))
@@ -191,8 +190,8 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
   for_array_statement_r
       %= lit("for") >> no_skip[!char_("a-zA-Z0-9_")] >> lit('(')
          >> identifier_r[store_loop_identifier_f(
-                _1, _a, _pass, boost::phoenix::ref(var_map_),
-                boost::phoenix::ref(error_msgs_))]
+             _1, _a, _pass, boost::phoenix::ref(var_map_),
+             boost::phoenix::ref(error_msgs_))]
          >> lit("in")
          >> (expression_rhs_r(_r1)[add_array_loop_identifier_f(
                  _1, _a, _r1, _pass, boost::phoenix::ref(var_map_))]
@@ -205,11 +204,11 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
   for_matrix_statement_r
       %= (lit("for") >> no_skip[!char_("a-zA-Z0-9_")]) > lit('(')
          > identifier_r[store_loop_identifier_f(
-               _1, _a, _pass, boost::phoenix::ref(var_map_),
-               boost::phoenix::ref(error_msgs_))]
+             _1, _a, _pass, boost::phoenix::ref(var_map_),
+             boost::phoenix::ref(error_msgs_))]
          > lit("in") > expression_rhs_r(_r1)[add_matrix_loop_identifier_f(
-                           _1, _a, _r1, _pass, boost::phoenix::ref(var_map_),
-                           boost::phoenix::ref(error_msgs_))]
+             _1, _a, _r1, _pass, boost::phoenix::ref(var_map_),
+             boost::phoenix::ref(error_msgs_))]
 
          > lit(')') > statement_r(_r1, true)
          > eps[remove_loop_identifier_f(_a, boost::phoenix::ref(var_map_))];
@@ -228,7 +227,7 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
   printable_r.name("printable");
   printable_r %= printable_string_r
                  | expression_g(_r1)[non_void_expression_f(
-                       _1, _pass, boost::phoenix::ref(error_msgs_))];
+                     _1, _pass, boost::phoenix::ref(error_msgs_))];
 
   printable_string_r.name("printable quoted string");
   printable_string_r
@@ -242,7 +241,7 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
   range_r.name("range expression pair, colon");
   range_r %= expression_g(_r1)[validate_int_expr_silent_f(_1, _pass)]
              >> lit(':') >> expression_g(_r1)[validate_int_expr_f(
-                                _1, _pass, boost::phoenix::ref(error_msgs_))];
+                 _1, _pass, boost::phoenix::ref(error_msgs_))];
 
   // _r1 = var scope
   assgn_r.name("assignment statement");
@@ -253,8 +252,8 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
                                               boost::phoenix::ref(var_map_),
                                               boost::phoenix::ref(error_msgs_))]
                  > expression_rhs_r(_r1))[validate_assgn_f(
-                    _val, _pass, boost::phoenix::ref(var_map_),
-                    boost::phoenix::ref(error_msgs_))]
+                 _val, _pass, boost::phoenix::ref(var_map_),
+                 boost::phoenix::ref(error_msgs_))]
              > lit(';');
 
   assignment_operator_r.name("assignment operator");
@@ -262,7 +261,7 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
                            | string("-=") | string("*=") | string("/=")
                            | string(".*=") | string("./=")
                            | string("<-")[deprecate_old_assignment_op_f(
-                                 _val, boost::phoenix::ref(error_msgs_))];
+                               _val, boost::phoenix::ref(error_msgs_))];
 
   // _r1 = var scope
   expression_rhs_r.name("expression assignable to left-hand side");
@@ -277,9 +276,8 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
 
   // _r1 = var scope
   sample_r.name("distribution of expression");
-  sample_r %= (expression_g(_r1) >> lit('~'))
-              > eps[validate_allow_sample_f(_r1, _pass,
-                                            boost::phoenix::ref(error_msgs_))]
+  sample_r %= (expression_g(_r1) >> lit('~')) > eps[validate_allow_sample_f(
+                  _r1, _pass, boost::phoenix::ref(error_msgs_))]
               > distribution_r(_r1) > -truncation_range_r(_r1) > lit(';')
               > eps[validate_sample_f(_val, boost::phoenix::ref(var_map_),
                                       _pass, boost::phoenix::ref(error_msgs_))];
@@ -296,10 +294,9 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
 
   // _r1 = var scope
   void_return_statement_r.name("void return statement");
-  void_return_statement_r
-      = lit("return")[set_void_return_f(_val)]
-        >> lit(';')[validate_void_return_allowed_f(
-               _r1, _pass, boost::phoenix::ref(error_msgs_))];
+  void_return_statement_r = lit("return")[set_void_return_f(_val)]
+                            >> lit(';')[validate_void_return_allowed_f(
+                                _r1, _pass, boost::phoenix::ref(error_msgs_))];
 
   // _r1 = var scope
   return_statement_r.name("return statement");
@@ -309,7 +306,7 @@ statement_grammar<Iterator>::statement_grammar(variable_map& var_map,
                                   _r1, _pass, boost::phoenix::ref(error_msgs_))]
                               > expression_g(_r1)))
                         > lit(';')[validate_return_allowed_f(
-                              _r1, _pass, boost::phoenix::ref(error_msgs_))];
+                            _r1, _pass, boost::phoenix::ref(error_msgs_))];
 
   no_op_statement_r.name("no op statement");
   no_op_statement_r %= lit(';')[set_no_op_f(_val)];
