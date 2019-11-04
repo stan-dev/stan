@@ -7,15 +7,6 @@
 
 namespace stan {
 
-// TODO(Steve): Put these is Stan math
-template <typename Container>
-using require_not_container_t = require_not_t<
-    math::disjunction<is_eigen<Container>, is_std_vector<Container>>>;
-
-template <typename Container>
-using require_container_t = require_t<
-    math::disjunction<is_eigen<Container>, is_std_vector<Container>>>;
-
 namespace model {
 
 /**

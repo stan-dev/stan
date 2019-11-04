@@ -29,19 +29,19 @@ namespace model {
  * @param[in] params_i Integer-valued parameters.
  * @param[in,out] msgs
  */
-template <bool jacobian_adjust_transform, class M>
-double log_prob_propto(const M& model, std::vector<double>& params_r,
-                       std::vector<int>& params_i, std::ostream* msgs = 0) {
+template <bool jacobian_adjust_transform, typename M, typename VecParamsR, typename VecParamI,
+ require_vector_vt<std::is_floating_point, VecParamsR>...,
+ require_vector_vt<is_index, VecParamI>...>
+double log_prob_propto(const M& model, VecParamsR&& params_r,
+                       VecParamI&& params_i, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
-  vector<var> ad_params_r;
-  ad_params_r.reserve(model.num_params_r());
-  for (size_t i = 0; i < model.num_params_r(); ++i)
-    ad_params_r.push_back(params_r[i]);
+  // If we had to_var return a container we could create this in the func call
+  std::vector<var> ad_params_r(params_r.data(), params_r.data() + params_r.size());
   try {
     double lp = model
                     .template log_prob<true, jacobian_adjust_transform>(
-                        ad_params_r, params_i, msgs)
+                        ad_params_r, std::forward<VecParamI>(params_i), msgs)
                     .val();
     stan::math::recover_memory();
     return lp;
@@ -71,8 +71,9 @@ double log_prob_propto(const M& model, std::vector<double>& params_r,
  * @param[in] params_r Real-valued parameters.
  * @param[in,out] msgs
  */
-template <bool jacobian_adjust_transform, class M>
-double log_prob_propto(const M& model, Eigen::VectorXd& params_r,
+template <bool jacobian_adjust_transform, typename M, typename VecParamR,
+ require_vector_vt<std::is_floating_point, VecParamR>...>
+double log_prob_propto(const M& model, VecParamR&& params_r,
                        std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;

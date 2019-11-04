@@ -7,10 +7,6 @@
 
 namespace stan {
 namespace model {
-// TODO(Steve): Move this to stan math.
-template <typename K>
-using is_index = bool_constant<!std::is_floating_point<K>::value
-                               && std::is_arithmetic<K>::value>;
 
 /**
  * Compute the gradient using reverse-mode automatic

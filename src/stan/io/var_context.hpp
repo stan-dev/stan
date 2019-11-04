@@ -30,12 +30,6 @@ namespace io {
  */
 class var_context {
  public:
-   template <typename T>
-   using is_string_convertible = std::is_convertible<T, std::string>;
-   template <typename T>
-   using is_index = bool_constant<!std::is_floating_point<T>::value
-                                  && std::is_arithmetic<T>::value>;
-
   virtual ~var_context() {}
 
   /**

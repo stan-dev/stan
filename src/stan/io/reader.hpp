@@ -57,10 +57,6 @@ class reader {
   using is_same_class_type = std::is_same<std::decay_t<T>, std::decay_t<Other>>;
 
  public:
-   //  Move this to stan math
-   template <typename K>
-   using is_index = bool_constant<!std::is_floating_point<K>::value
-                                  && std::is_arithmetic<K>::value>;
 
   using matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
   using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;

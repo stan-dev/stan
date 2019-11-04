@@ -8,14 +8,12 @@
 namespace stan {
 namespace model {
 
-template <class M>
-void hessian_times_vector(
-    const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
-    const Eigen::Matrix<double, Eigen::Dynamic, 1>& v, double& f,
-    Eigen::Matrix<double, Eigen::Dynamic, 1>& hess_f_dot_v,
-    std::ostream* msgs = 0) {
-  stan::math::hessian_times_vector(model_functional<M>(model, msgs), x, v, f,
-                                   hess_f_dot_v);
+template <typename M, typename VecX, typename VecV, typename VecHessDot,
+ require_all_vector_vt<std::is_floating_point, VecX, VecV, VecHessDot>...>
+void hessian_times_vector(M&& model, VecX&& x, VecV&& v, double& f,
+    VecHessDot&& hess_f_dot_v, std::ostream* msgs = 0) {
+  stan::math::hessian_times_vector(model_functional<M>(std::forward<M>(model), msgs),
+   std::forward<VecX>(x), std::forward<VecV>(v), f, std::forward<VecHessDot>(hess_f_dot_v));
 }
 
 }  // namespace model
