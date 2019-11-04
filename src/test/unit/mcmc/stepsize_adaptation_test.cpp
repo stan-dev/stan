@@ -65,8 +65,7 @@ TEST(McmcStepsizeAdaptation, learn_stepsize) {
   adaptation.mu() = log(target_epsilon);
   adaptation.set_delta(target_accept);
 
-  double new_epsilon = 0;
-  adaptation.learn_stepsize(new_epsilon, target_accept);
+  double new_epsilon = adaptation.learn_stepsize(target_accept);
 
   EXPECT_EQ(target_epsilon, new_epsilon);
 }
@@ -102,7 +101,7 @@ TEST(McmcStepsizeAdaptation, learn_stepsize_1) {
   double epsilon, adapt_stat;
   epsilon = 2.2037632781885;
   adapt_stat = 1.0;
-  adaptation.learn_stepsize(epsilon, adapt_stat);
+  epsilon = adaptation.learn_stepsize(adapt_stat);
   EXPECT_NEAR(3.95863527373545, epsilon, 1e-14);
 }
 
@@ -112,7 +111,7 @@ TEST(McmcStepsizeAdaptation, learn_stepsize_2) {
   double epsilon, adapt_stat;
   epsilon = 1.50198560950968;
   adapt_stat = 0.728285153733299;
-  adaptation.learn_stepsize(epsilon, adapt_stat);
+  epsilon = adaptation.learn_stepsize(adapt_stat);
   EXPECT_NEAR(2.40769920051673, epsilon, 1e-14);
   EXPECT_NEAR(80, adaptation.counter(), 1e-14);
   EXPECT_NEAR(0.0181765250233587, adaptation.s_bar(), 1e-14);
@@ -130,7 +129,7 @@ TEST(McmcStepsizeAdaptation, learn_stepsize_3) {
   double epsilon, adapt_stat;
   epsilon = 1.574313439903;
   adapt_stat = 0.684248188546772;
-  adaptation.learn_stepsize(epsilon, adapt_stat);
+  epsilon = adaptation.learn_stepsize(adapt_stat);
   EXPECT_NEAR(2.31161210908631, epsilon, 5e-14);
   EXPECT_NEAR(80, adaptation.counter(), 1e-14);
   EXPECT_NEAR(0.0184041693043455, adaptation.s_bar(), 1e-14);
