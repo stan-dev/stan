@@ -30,9 +30,9 @@ expression_grammar<Iterator>::expression_grammar(variable_map& var_map,
   using boost::spirit::qi::_val;
   using boost::spirit::qi::char_;
   using boost::spirit::qi::eps;
+  using boost::spirit::qi::labels::_r1;
   using boost::spirit::qi::lit;
   using boost::spirit::qi::no_skip;
-  using boost::spirit::qi::labels::_r1;
 
   expression_r.name("expression");
   expression_r %= (expression15_r(_r1) >> no_skip[!char_('?')] > eps)
@@ -42,46 +42,52 @@ expression_grammar<Iterator>::expression_grammar(variable_map& var_map,
   conditional_op_r %= expression15_r(_r1) >> lit("?") >> expression_r(_r1)
                       >> lit(":")
                       >> expression_r(_r1)[validate_conditional_op_f(
-                          _val, _r1, _pass, boost::phoenix::ref(var_map_),
-                          boost::phoenix::ref(error_msgs))];
+                             _val, _r1, _pass, boost::phoenix::ref(var_map_),
+                             boost::phoenix::ref(error_msgs))];
 
   expression15_r.name("expression");
-  expression15_r = expression14_r(_r1)[assign_lhs_f(_val, _1)]
-                   > *(lit("||") > expression14_r(
-                           _r1)[binary_op_f(_val, _1, "||", "logical_or",
-                                            boost::phoenix::ref(error_msgs))]);
+  expression15_r
+      = expression14_r(_r1)[assign_lhs_f(_val, _1)]
+        > *(lit("||") > expression14_r(
+                            _r1)[binary_op_f(_val, _1, "||", "logical_or",
+                                             boost::phoenix::ref(error_msgs))]);
 
   expression14_r.name("expression");
-  expression14_r = expression10_r(_r1)[assign_lhs_f(_val, _1)]
-                   > *(lit("&&") > expression10_r(
-                           _r1)[binary_op_f(_val, _1, "&&", "logical_and",
-                                            boost::phoenix::ref(error_msgs))]);
+  expression14_r
+      = expression10_r(_r1)[assign_lhs_f(_val, _1)]
+        > *(lit("&&") > expression10_r(
+                            _r1)[binary_op_f(_val, _1, "&&", "logical_and",
+                                             boost::phoenix::ref(error_msgs))]);
 
   expression10_r.name("expression");
   expression10_r
       = expression09_r(_r1)[assign_lhs_f(_val, _1)]
         > *((lit("==") > expression09_r(
-                 _r1)[binary_op_f(_val, _1, "==", "logical_eq",
-                                  boost::phoenix::ref(error_msgs))])
-            | (lit("!=") > expression09_r(
-                   _r1)[binary_op_f(_val, _1, "!=", "logical_neq",
-                                    boost::phoenix::ref(error_msgs))]));
+                             _r1)[binary_op_f(_val, _1, "==", "logical_eq",
+                                              boost::phoenix::ref(error_msgs))])
+            | (lit("!=")
+               > expression09_r(
+                     _r1)[binary_op_f(_val, _1, "!=", "logical_neq",
+                                      boost::phoenix::ref(error_msgs))]));
 
   expression09_r.name("expression");
   expression09_r
       = expression07_g(_r1)[assign_lhs_f(_val, _1)]
         > *((lit("<=") > expression07_g(
-                 _r1)[binary_op_f(_val, _1, "<", "logical_lte",
-                                  boost::phoenix::ref(error_msgs))])
-            | (lit("<") > expression07_g(
-                   _r1)[binary_op_f(_val, _1, "<=", "logical_lt",
-                                    boost::phoenix::ref(error_msgs))])
-            | (lit(">=") > expression07_g(
-                   _r1)[binary_op_f(_val, _1, ">", "logical_gte",
-                                    boost::phoenix::ref(error_msgs))])
-            | (lit(">") > expression07_g(
-                   _r1)[binary_op_f(_val, _1, ">=", "logical_gt",
-                                    boost::phoenix::ref(error_msgs))]));
+                             _r1)[binary_op_f(_val, _1, "<", "logical_lte",
+                                              boost::phoenix::ref(error_msgs))])
+            | (lit("<")
+               > expression07_g(
+                     _r1)[binary_op_f(_val, _1, "<=", "logical_lt",
+                                      boost::phoenix::ref(error_msgs))])
+            | (lit(">=")
+               > expression07_g(
+                     _r1)[binary_op_f(_val, _1, ">", "logical_gte",
+                                      boost::phoenix::ref(error_msgs))])
+            | (lit(">")
+               > expression07_g(
+                     _r1)[binary_op_f(_val, _1, ">=", "logical_gt",
+                                      boost::phoenix::ref(error_msgs))]));
 }
 }  // namespace lang
 }  // namespace stan
