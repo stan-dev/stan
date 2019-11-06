@@ -75,16 +75,18 @@ pipeline {
         stage("Clang-format") {
             agent any
             steps {
-              sh "printenv"
-              retry(3) { checkout scm }
-              sh """
-                 make math-revert
-                 make clean-all
-                 git clean -xffd
-              """
-              utils.checkout_pr("math", "lib/stan_math", params.math_pr)
-              stash 'StanSetup'
-              setupCXX()
+              script {
+                sh "printenv"
+                retry(3) { checkout scm }
+                sh """
+                   make math-revert
+                   make clean-all
+                   git clean -xffd
+                """
+                  utils.checkout_pr("math", "lib/stan_math", params.math_pr)
+                  stash 'StanSetup'
+                  setupCXX()
+                
                 withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
                     usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                     sh """#!/bin/bash
@@ -104,6 +106,7 @@ pipeline {
                             exit 1
                         fi
                     """
+                  }
                 }
             }
             post {
