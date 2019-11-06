@@ -60,7 +60,9 @@ class chains {
     return ((x.array() - m) / std::sqrt((x.size() - 1.0))).square().sum();
   }
 
-  inline double sd(const Eigen::VectorXd& x) const { return std::sqrt(variance(x)); }
+  inline double sd(const Eigen::VectorXd& x) const {
+     return std::sqrt(variance(x));
+  }
 
   inline double covariance(const Eigen::VectorXd& x, const Eigen::VectorXd& y,
                            std::ostream* err = 0) const {
@@ -412,7 +414,8 @@ class chains {
     return s;
   }
 
-  inline Eigen::VectorXd samples(const int chain, const std::string& name) const {
+  inline Eigen::VectorXd samples(const int chain, const std::string& name)
+   const {
     return samples(chain, index(name));
   }
   inline Eigen::VectorXd samples(const int chain, const std::string& name) {
