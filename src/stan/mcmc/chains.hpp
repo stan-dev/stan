@@ -426,7 +426,9 @@ class chains {
     return mean(chain, index(name));
   }
 
-  inline double mean(const std::string& name) const { return mean(index(name)); }
+  inline double mean(const std::string& name) const {
+     return mean(index(name));
+  }
 
   inline double sd(const int chain, const int index) const {
     return sd(samples(chain, index));
