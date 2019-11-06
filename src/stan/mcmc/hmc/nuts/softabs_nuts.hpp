@@ -13,7 +13,7 @@ namespace mcmc {
  * with a Gaussian-Riemannian disintegration and SoftAbs metric
  */
 template <class Model, class BaseRNG>
-class softabs_nuts = base_nuts<Model, softabs_metric, impl_leapfrog, BaseRNG>;
+using softabs_nuts = base_nuts<Model, softabs_metric, impl_leapfrog, BaseRNG>;
 
 }  // namespace mcmc
 }  // namespace stan

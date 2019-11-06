@@ -51,19 +51,19 @@ class chains {
   Eigen::Matrix<Eigen::MatrixXd, Dynamic, 1> samples_;
   Eigen::VectorXi warmup_;
 
-  inline double mean(const Eigen::VectorXd& x) {
+  inline double mean(const Eigen::VectorXd& x) const {
     return (x.array() / x.size()).sum();
   }
 
-  inline double variance(const Eigen::VectorXd& x) {
+  inline double variance(const Eigen::VectorXd& x) const {
     double m = mean(x);
     return ((x.array() - m) / std::sqrt((x.size() - 1.0))).square().sum();
   }
 
-  inline double sd(const Eigen::VectorXd& x) { return std::sqrt(variance(x)); }
+  inline double sd(const Eigen::VectorXd& x) const { return std::sqrt(variance(x)); }
 
   inline double covariance(const Eigen::VectorXd& x, const Eigen::VectorXd& y,
-                           std::ostream* err = 0) {
+                           std::ostream* err = 0) const {
     if (x.rows() != y.rows() && err)
       *err << "warning: covariance of different length chains";
     using boost::accumulators::accumulator_set;
@@ -82,7 +82,7 @@ class chains {
   }
 
   inline double correlation(const Eigen::VectorXd& x, const Eigen::VectorXd& y,
-                            std::ostream* err = 0) {
+                            std::ostream* err = 0) const {
     if (x.rows() != y.rows() && err)
       *err << "warning: covariance of different length chains";
     using boost::accumulators::accumulator_set;
@@ -109,7 +109,7 @@ class chains {
                        * boost::accumulators::variance(acc_y));
   }
 
-  inline double quantile(const Eigen::VectorXd& x, const double prob) {
+  inline double quantile(const Eigen::VectorXd& x, const double prob) const {
     using boost::accumulators::accumulator_set;
     using boost::accumulators::left;
     using boost::accumulators::quantile;
@@ -137,7 +137,7 @@ class chains {
   }
 
   inline Eigen::VectorXd quantiles(const Eigen::VectorXd& x,
-                                   const Eigen::VectorXd& probs) {
+                                   const Eigen::VectorXd& probs) const {
     using boost::accumulators::accumulator_set;
     using boost::accumulators::left;
     using boost::accumulators::quantile;
@@ -171,7 +171,7 @@ class chains {
     return q;
   }
 
-  inline Eigen::VectorXd autocorrelation(const Eigen::VectorXd& x) {
+  inline Eigen::VectorXd autocorrelation(const Eigen::VectorXd& x) const {
     using stan::math::index_type;
     using std::vector;
     typedef typename index_type<vector<double> >::type idx_t;
@@ -188,7 +188,7 @@ class chains {
     return ac2;
   }
 
-  inline Eigen::VectorXd autocovariance(const Eigen::VectorXd& x) {
+  inline Eigen::VectorXd autocovariance(const Eigen::VectorXd& x) const {
     using stan::math::index_type;
     using std::vector;
     typedef typename index_type<vector<double> >::type idx_t;
@@ -288,8 +288,10 @@ class chains {
   inline void set_warmup(const int warmup) { warmup_.setConstant(warmup); }
 
   inline const Eigen::VectorXi& warmup() const { return warmup_; }
+  inline Eigen::VectorXi& warmup() { return warmup_; }
 
-  inline int warmup(const int chain) const { return warmup_(chain); }
+  inline const int warmup(const int chain) const { return warmup_(chain); }
+  inline int& warmup(const int chain) { return warmup_(chain); }
 
   inline int num_samples(const int chain) const {
     return samples_(chain).rows();
@@ -395,6 +397,9 @@ class chains {
   inline Eigen::VectorXd samples(const int chain, const int index) const {
     return samples_(chain).col(index).bottomRows(num_kept_samples(chain));
   }
+  inline Eigen::VectorXd& samples(const int chain, const int index) {
+    return samples_(chain).col(index).bottomRows(num_kept_samples(chain));
+  }
 
   inline Eigen::VectorXd samples(const int index) const {
     Eigen::VectorXd s(num_kept_samples());
@@ -407,12 +412,17 @@ class chains {
     return s;
   }
 
-  inline Eigen::VectorXd samples(const int chain,
-                                 const std::string& name) const {
+  inline Eigen::VectorXd samples(const int chain, const std::string& name) const {
+    return samples(chain, index(name));
+  }
+  inline Eigen::VectorXd samples(const int chain, const std::string& name) {
     return samples(chain, index(name));
   }
 
   inline Eigen::VectorXd samples(const std::string& name) const {
+    return samples(index(name));
+  }
+  inline Eigen::VectorXd samples(const std::string& name) {
     return samples(index(name));
   }
 

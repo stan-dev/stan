@@ -20,7 +20,7 @@ class base_mcmc {
   base_mcmc(base_mcmc&& other) = default;
   base_mcmc& operator=(const base_mcmc&) = default;
   base_mcmc& operator=(base_mcmc&&) = default;
-  inline virtual sample transition(sample& init_sample,
+  virtual sample transition(sample& init_sample,
                                    callbacks::logger& logger)
       = 0;
 

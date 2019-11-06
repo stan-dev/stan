@@ -23,30 +23,30 @@ class base_hamiltonian {
 
   typedef Point PointType;
 
-  inline virtual double T(Point& z) = 0;
+  virtual double T(Point& z) = 0;
 
   inline double V(Point& z) { return z.V; }
 
-  inline virtual double tau(Point& z) = 0;
+  virtual double tau(Point& z) = 0;
 
-  inline virtual double phi(Point& z) = 0;
+  virtual double phi(Point& z) = 0;
 
   inline double H(Point& z) { return T(z) + V(z); }
 
   // The time derivative of the virial, G = \sum_{d = 1}^{D} q^{d} p_{d}.
-  inline virtual double dG_dt(Point& z, callbacks::logger& logger) = 0;
+  virtual double dG_dt(Point& z, callbacks::logger& logger) = 0;
 
   // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
-  inline virtual Eigen::VectorXd dtau_dq(Point& z, callbacks::logger& logger)
+  virtual Eigen::VectorXd dtau_dq(Point& z, callbacks::logger& logger)
       = 0;
 
-  inline virtual Eigen::VectorXd dtau_dp(Point& z) = 0;
+  virtual Eigen::VectorXd dtau_dp(Point& z) = 0;
 
   // phi = 0.5 * log | Lambda (q) | + V(q)
-  inline virtual Eigen::VectorXd dphi_dq(Point& z, callbacks::logger& logger)
+  virtual Eigen::VectorXd dphi_dq(Point& z, callbacks::logger& logger)
       = 0;
 
-  inline virtual void sample_p(Point& z, BaseRNG& rng) = 0;
+  virtual void sample_p(Point& z, BaseRNG& rng) = 0;
 
   inline void init(Point& z, callbacks::logger& logger) {
     this->update_potential_gradient(z, logger);
