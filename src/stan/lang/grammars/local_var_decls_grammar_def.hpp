@@ -81,7 +81,7 @@ local_var_decls_grammar<Iterator>::local_var_decls_grammar(
   single_local_var_decl_r
       %= local_element_type_r(_r1) > local_identifier_r > local_opt_def_r(_r1)
          > eps[validate_single_local_var_decl_f(
-             _val, _pass, boost::phoenix::ref(error_msgs_))];
+               _val, _pass, boost::phoenix::ref(error_msgs_))];
 
   local_element_type_r.name("local var element type declaration");
   local_element_type_r %= local_int_type_r(_r1) | local_double_type_r(_r1)
