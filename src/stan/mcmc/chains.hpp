@@ -399,7 +399,7 @@ class chains {
   inline Eigen::VectorXd samples(const int chain, const int index) const {
     return samples_(chain).col(index).bottomRows(num_kept_samples(chain));
   }
-  inline Eigen::VectorXd& samples(const int chain, const int index) {
+  inline Eigen::VectorXd samples(const int chain, const int index) {
     return samples_(chain).col(index).bottomRows(num_kept_samples(chain));
   }
 
