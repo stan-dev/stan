@@ -20,9 +20,7 @@ class base_mcmc {
   base_mcmc(base_mcmc&& other) = default;
   base_mcmc& operator=(const base_mcmc&) = default;
   base_mcmc& operator=(base_mcmc&&) = default;
-  virtual sample transition(sample& init_sample,
-                                   callbacks::logger& logger)
-      = 0;
+  virtual sample transition(sample& init_sample, callbacks::logger& logger) = 0;
 
   inline virtual void get_sampler_param_names(std::vector<std::string>& names) {
   }

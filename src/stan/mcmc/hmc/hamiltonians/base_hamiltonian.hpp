@@ -37,14 +37,12 @@ class base_hamiltonian {
   virtual double dG_dt(Point& z, callbacks::logger& logger) = 0;
 
   // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
-  virtual Eigen::VectorXd dtau_dq(Point& z, callbacks::logger& logger)
-      = 0;
+  virtual Eigen::VectorXd dtau_dq(Point& z, callbacks::logger& logger) = 0;
 
   virtual Eigen::VectorXd dtau_dp(Point& z) = 0;
 
   // phi = 0.5 * log | Lambda (q) | + V(q)
-  virtual Eigen::VectorXd dphi_dq(Point& z, callbacks::logger& logger)
-      = 0;
+  virtual Eigen::VectorXd dphi_dq(Point& z, callbacks::logger& logger) = 0;
 
   virtual void sample_p(Point& z, BaseRNG& rng) = 0;
 
