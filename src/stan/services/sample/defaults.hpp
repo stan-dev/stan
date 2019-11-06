@@ -113,9 +113,7 @@ struct thin {
    *
    * @return description
    */
-  inline std::string description() {
-    return "Period between saved samples.";
-  }
+  inline std::string description() { return "Period between saved samples."; }
 
   /**
    * Validates thin; thin must be greater than 0.
@@ -205,9 +203,7 @@ struct kappa {
    *
    * @return description
    */
-  inline std::string description() {
-    return "Adaptation relaxation exponent.";
-  }
+  inline std::string description() { return "Adaptation relaxation exponent."; }
 
   /**
    * Validates kappa; kappa must be greater than 0.
@@ -237,9 +233,7 @@ struct t0 {
    *
    * @return description
    */
-  inline std::string description() {
-    return "Adaptation iteration offset.";
-  }
+  inline std::string description() { return "Adaptation iteration offset."; }
 
   /**
    * Validates t0; t0 must be greater than 0.
