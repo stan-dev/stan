@@ -61,7 +61,7 @@ class chains {
   }
 
   inline double sd(const Eigen::VectorXd& x) const {
-     return std::sqrt(variance(x));
+    return std::sqrt(variance(x));
   }
 
   inline double covariance(const Eigen::VectorXd& x, const Eigen::VectorXd& y,
@@ -414,8 +414,8 @@ class chains {
     return s;
   }
 
-  inline Eigen::VectorXd samples(const int chain, const std::string& name)
-   const {
+  inline Eigen::VectorXd samples(const int chain,
+                                 const std::string& name) const {
     return samples(chain, index(name));
   }
   inline Eigen::VectorXd samples(const int chain, const std::string& name) {

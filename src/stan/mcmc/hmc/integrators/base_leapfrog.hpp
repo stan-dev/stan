@@ -99,17 +99,17 @@ class base_leapfrog : public base_integrator<Hamiltonian> {
   }
 
   virtual void begin_update_p(typename Hamiltonian::PointType& z,
-                                     Hamiltonian& hamiltonian, double epsilon,
-                                     callbacks::logger& logger)
+                              Hamiltonian& hamiltonian, double epsilon,
+                              callbacks::logger& logger)
       = 0;
 
   virtual void update_q(typename Hamiltonian::PointType& z,
-                               Hamiltonian& hamiltonian, double epsilon,
-                               callbacks::logger& logger)
+                        Hamiltonian& hamiltonian, double epsilon,
+                        callbacks::logger& logger)
       = 0;
   virtual void end_update_p(typename Hamiltonian::PointType& z,
-                                   Hamiltonian& hamiltonian, double epsilon,
-                                   callbacks::logger& logger)
+                            Hamiltonian& hamiltonian, double epsilon,
+                            callbacks::logger& logger)
       = 0;
 };
 
