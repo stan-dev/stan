@@ -17,7 +17,7 @@ struct num_samples {
    *
    * @return description
    */
-  static std::string description() { return "Number of sampling iterations."; }
+  inline std::string description() { return "Number of sampling iterations."; }
 
   /**
    * Validates num_samples; num_samples must be greater than or
@@ -27,7 +27,7 @@ struct num_samples {
    * @throw std::invalid_argument unless num_samples is greater
    *   than or equal to zero
    */
-  static void validate(int num_samples) {
+  inline void validate(int num_samples) {
     if (!(num_samples >= 0))
       throw std::invalid_argument(
           "num_samples must be greater"
@@ -39,7 +39,7 @@ struct num_samples {
    *
    * @return 1000
    */
-  static int default_value() { return 1000; }
+  inline int default_value() { return 1000; }
 };
 
 /**
@@ -51,7 +51,7 @@ struct num_warmup {
    *
    * @return description
    */
-  static std::string description() { return "Number of warmup iterations."; }
+  inline std::string description() { return "Number of warmup iterations."; }
 
   /**
    * Validates num_warmup; num_warmup must be greater than or
@@ -61,7 +61,7 @@ struct num_warmup {
    * @throw std::invalid_argument unless num_warmup is greater than
    *   or equal to zero
    */
-  static void validate(int num_warmup) {
+  inline void validate(int num_warmup) {
     if (!(num_warmup >= 0))
       throw std::invalid_argument(
           "num_warmup must be greater"
@@ -73,7 +73,7 @@ struct num_warmup {
    *
    * @return 1000
    */
-  static int default_value() { return 1000; }
+  inline int default_value() { return 1000; }
 };
 
 /**
@@ -85,7 +85,7 @@ struct save_warmup {
    *
    * @return description
    */
-  static std::string description() {
+  inline std::string description() {
     return "Save warmup iterations to output.";
   }
 
@@ -94,14 +94,14 @@ struct save_warmup {
    *
    * @param[in] save_warmup argument to validate
    */
-  static void validate(bool save_warmup) {}
+  inline void validate(bool save_warmup) {}
 
   /**
    * Return the default save_warmup value.
    *
    * @return false
    */
-  static bool default_value() { return false; }
+  inline bool default_value() { return false; }
 };
 
 /**
@@ -113,7 +113,9 @@ struct thin {
    *
    * @return description
    */
-  static std::string description() { return "Period between saved samples."; }
+  inline constexpr std::string description() {
+    return "Period between saved samples.";
+  }
 
   /**
    * Validates thin; thin must be greater than 0.
@@ -121,7 +123,7 @@ struct thin {
    * @param[in] thin argument to validate
    * @throw std::invalid_argument unless thin is greater than zero
    */
-  static void validate(int thin) {
+  inline void validate(int thin) {
     if (!(thin > 0))
       throw std::invalid_argument("thin must be greater than 0.");
   }
@@ -131,7 +133,7 @@ struct thin {
    *
    * @return 1
    */
-  static int default_value() { return 1; }
+  inline constexpr int default_value() { return 1; }
 };
 
 /**
@@ -143,7 +145,7 @@ struct adaptation_engaged {
    *
    * @return description
    */
-  static std::string description() {
+  inline constexpr std::string description() {
     return "Indicates whether adaptation is engaged.";
   }
 
@@ -152,14 +154,14 @@ struct adaptation_engaged {
    *
    * @param[in] adaptation_engaged argument to validate
    */
-  static void validate(bool adaptation_engaged) {}
+  inline void validate(bool adaptation_engaged) {}
 
   /**
    * Return the default adaptation_engaged value.
    *
    * @return true
    */
-  static bool default_value() { return true; }
+  inline constexpr bool default_value() { return true; }
 };
 
 /**
@@ -171,7 +173,7 @@ struct gamma {
    *
    * @return description
    */
-  static std::string description() {
+  inline constexpr std::string description() {
     return "Adaptation regularization scale.";
   }
 
@@ -181,7 +183,7 @@ struct gamma {
    * @param[in] gamma argument to validate
    * @throw std::invalid_argument unless gamma is greater than zero
    */
-  static void validate(double gamma) {
+  inline void validate(double gamma) {
     if (!(gamma > 0))
       throw std::invalid_argument("gamma must be greater than 0.");
   }
@@ -191,7 +193,7 @@ struct gamma {
    *
    * @return 0.05
    */
-  static double default_value() { return 0.05; }
+  inline constexpr double default_value() { return 0.05; }
 };
 
 /**
@@ -203,7 +205,9 @@ struct kappa {
    *
    * @return description
    */
-  static std::string description() { return "Adaptation relaxation exponent."; }
+  inline constexpr std::string description() {
+    return "Adaptation relaxation exponent.";
+  }
 
   /**
    * Validates kappa; kappa must be greater than 0.
@@ -211,7 +215,7 @@ struct kappa {
    * @param[in] kappa argument to validate
    * @throw std::invalid_argument unless kappa is greater than zero
    */
-  static void validate(double kappa) {
+  inline void validate(double kappa) {
     if (!(kappa > 0))
       throw std::invalid_argument("kappa must be greater than 0.");
   }
@@ -221,7 +225,7 @@ struct kappa {
    *
    * @return 0.75
    */
-  static double default_value() { return 0.75; }
+  inline constexpr double default_value() { return 0.75; }
 };
 
 /**
@@ -233,7 +237,9 @@ struct t0 {
    *
    * @return description
    */
-  static std::string description() { return "Adaptation iteration offset."; }
+  inline constexpr std::string description() {
+    return "Adaptation iteration offset.";
+  }
 
   /**
    * Validates t0; t0 must be greater than 0.
@@ -241,7 +247,7 @@ struct t0 {
    * @param[in] t0 argument to validate
    * @throw std::invalid_argument unless t0 is greater than zero
    */
-  static void validate(double t0) {
+  inline void validate(double t0) {
     if (!(t0 > 0))
       throw std::invalid_argument("t0 must be greater than 0.");
   }
@@ -251,7 +257,7 @@ struct t0 {
    *
    * @return 10
    */
-  static double default_value() { return 10; }
+  inline constexpr double default_value() { return 10; }
 };
 
 /**
@@ -263,7 +269,7 @@ struct init_buffer {
    *
    * @return description
    */
-  static std::string description() {
+  inline constexpr std::string description() {
     return "Width of initial fast adaptation interval.";
   }
 
@@ -272,14 +278,14 @@ struct init_buffer {
    *
    * @param[in] init_buffer argument to validate
    */
-  static void validate(unsigned int init_buffer) {}
+  inline void validate(unsigned int init_buffer) {}
 
   /**
    * Return the default init_buffer value.
    *
    * @return 75
    */
-  static unsigned int default_value() { return 75; }
+  inline constexpr unsigned int default_value() { return 75; }
 };
 
 /**
@@ -291,7 +297,7 @@ struct term_buffer {
    *
    * @return description
    */
-  static std::string description() {
+  inline constexpr std::string description() {
     return "Width of final fast adaptation interval.";
   }
 
@@ -300,14 +306,14 @@ struct term_buffer {
    *
    * @param[in] term_buffer argument to validate
    */
-  static void validate(unsigned int term_buffer) {}
+  inline void validate(unsigned int term_buffer) {}
 
   /**
    * Return the default term_buffer value.
    *
    * @return 50
    */
-  static unsigned int default_value() { return 50; }
+  inline constexpr unsigned int default_value() { return 50; }
 };
 
 /**
@@ -319,7 +325,7 @@ struct window {
    *
    * @return description
    */
-  static std::string description() {
+  inline constexpr std::string description() {
     return "Initial width of slow adaptation interval.";
   }
 
@@ -328,14 +334,14 @@ struct window {
    *
    * @param[in] window argument to validate
    */
-  static void validate(unsigned int window) {}
+  inline void validate(unsigned int window) {}
 
   /**
    * Return the default window value.
    *
    * @return 25
    */
-  static unsigned int default_value() { return 25; }
+  inline constexpr unsigned int default_value() { return 25; }
 };
 
 /**
@@ -347,7 +353,7 @@ struct int_time {
    *
    * @return description
    */
-  static std::string description() {
+  inline constexpr std::string description() {
     return "Total integration time for Hamiltonian evolution.";
   }
 
@@ -357,7 +363,7 @@ struct int_time {
    * @param[in] int_time argument to validate
    * @throw std::invalid_argument unless int_time is greater than zero
    */
-  static void validate(double int_time) {
+  inline void validate(double int_time) {
     if (!(int_time > 0))
       throw std::invalid_argument("int_time must be greater than 0.");
   }
@@ -367,7 +373,7 @@ struct int_time {
    *
    * @return 2 * pi
    */
-  static double default_value() { return 6.28318530717959; }
+  inline constexpr double default_value() { return 6.28318530717959; }
 };
 
 /**
@@ -379,7 +385,7 @@ struct max_depth {
    *
    * @return description
    */
-  static std::string description() { return "Maximum tree depth."; }
+  inline constexpr std::string description() { return "Maximum tree depth."; }
 
   /**
    * Validates max_depth; max_depth must be greater than 0.
@@ -387,7 +393,7 @@ struct max_depth {
    * @param[in] max_depth argument to validate
    * @throw std::invalid_argument unless max_depth is greater than zero
    */
-  static void validate(int max_depth) {
+  inline void validate(int max_depth) {
     if (!(max_depth > 0))
       throw std::invalid_argument("max_depth must be greater than 0.");
   }
@@ -397,7 +403,7 @@ struct max_depth {
    *
    * @return 10
    */
-  static int default_value() { return 10; }
+  inline constexpr int default_value() { return 10; }
 };
 
 /**
@@ -409,7 +415,7 @@ struct stepsize {
    *
    * @return description
    */
-  static std::string description() {
+  inline constexpr std::string description() {
     return "Step size for discrete evolution.";
   }
 
@@ -419,7 +425,7 @@ struct stepsize {
    * @param[in] stepsize argument to validate
    * @throw std::invalid_argument unless stepsize is greater than zero
    */
-  static void validate(double stepsize) {
+  inline void validate(double stepsize) {
     if (!(stepsize > 0))
       throw std::invalid_argument("stepsize must be greater than 0.");
   }
@@ -429,7 +435,7 @@ struct stepsize {
    *
    * @return 1
    */
-  static double default_value() { return 1; }
+  inline constexpr double default_value() { return 1; }
 };
 
 /**
@@ -441,7 +447,7 @@ struct stepsize_jitter {
    *
    * @return description
    */
-  static std::string description() {
+  inline constexpr std::string description() {
     return "Uniformly random jitter of the stepsize, in percent.";
   }
 
@@ -452,7 +458,7 @@ struct stepsize_jitter {
    * @throw std::invalid_argument unless stepsize_jitter is between 0 and
    *   1, inclusive
    */
-  static void validate(double stepsize_jitter) {
+  inline void validate(double stepsize_jitter) {
     if (!(stepsize_jitter >= 0 && stepsize_jitter <= 1))
       throw std::invalid_argument(
           "stepsize_jitter must be between"
@@ -464,7 +470,7 @@ struct stepsize_jitter {
    *
    * @return 0
    */
-  static double default_value() { return 0; }
+  inline constexpr double default_value() { return 0; }
 };
 
 }  // namespace sample

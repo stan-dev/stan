@@ -29,9 +29,9 @@ inline void make_negative_definite_and_solve(matrix_d& H, vector_d& g) {
 }
 
 template <typename M>
-double newton_step(M& model, std::vector<double>& params_r,
-                   std::vector<int>& params_i,
-                   std::ostream* output_stream = 0) {
+inline double newton_step(M& model, std::vector<double>& params_r,
+                          std::vector<int>& params_i,
+                          std::ostream* output_stream = 0) {
   std::vector<double> gradient;
   std::vector<double> hessian;
 

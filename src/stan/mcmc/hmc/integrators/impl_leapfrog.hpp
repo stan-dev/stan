@@ -15,15 +15,16 @@ class impl_leapfrog : public base_leapfrog<Hamiltonian> {
         max_num_fixed_point_(10),
         fixed_point_threshold_(1e-8) {}
 
-  void begin_update_p(typename Hamiltonian::PointType& z,
-                      Hamiltonian& hamiltonian, double epsilon,
-                      callbacks::logger& logger) {
+  inline void begin_update_p(typename Hamiltonian::PointType& z,
+                             Hamiltonian& hamiltonian, double epsilon,
+                             callbacks::logger& logger) final {
     hat_phi(z, hamiltonian, epsilon, logger);
     hat_tau(z, hamiltonian, epsilon, this->max_num_fixed_point_, logger);
   }
 
-  void update_q(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
-                double epsilon, callbacks::logger& logger) {
+  inline void update_q(typename Hamiltonian::PointType& z,
+                       Hamiltonian& hamiltonian, double epsilon,
+                       callbacks::logger& logger) final {
     // hat{T} = dT/dp * d/dq
     Eigen::VectorXd q_init = z.q + 0.5 * epsilon * hamiltonian.dtau_dp(z);
     Eigen::VectorXd delta_q(z.q.size());
@@ -40,22 +41,24 @@ class impl_leapfrog : public base_leapfrog<Hamiltonian> {
     hamiltonian.update_gradients(z, logger);
   }
 
-  void end_update_p(typename Hamiltonian::PointType& z,
-                    Hamiltonian& hamiltonian, double epsilon,
-                    callbacks::logger& logger) {
+  inline void end_update_p(typename Hamiltonian::PointType& z,
+                           Hamiltonian& hamiltonian, double epsilon,
+                           callbacks::logger& logger) final {
     hat_tau(z, hamiltonian, epsilon, 1, logger);
     hat_phi(z, hamiltonian, epsilon, logger);
   }
 
   // hat{phi} = dphi/dq * d/dp
-  void hat_phi(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
-               double epsilon, callbacks::logger& logger) {
+  inline void hat_phi(typename Hamiltonian::PointType& z,
+                      Hamiltonian& hamiltonian, double epsilon,
+                      callbacks::logger& logger) {
     z.p -= epsilon * hamiltonian.dphi_dq(z, logger);
   }
 
   // hat{tau} = dtau/dq * d/dp
-  void hat_tau(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
-               double epsilon, int num_fixed_point, callbacks::logger& logger) {
+  inline void hat_tau(typename Hamiltonian::PointType& z,
+                      Hamiltonian& hamiltonian, double epsilon,
+                      int num_fixed_point, callbacks::logger& logger) {
     Eigen::VectorXd p_init = z.p;
     Eigen::VectorXd delta_p(z.p.size());
 
@@ -68,14 +71,17 @@ class impl_leapfrog : public base_leapfrog<Hamiltonian> {
     }
   }
 
-  int max_num_fixed_point() { return this->max_num_fixed_point_; }
+  inline const int max_num_fixed_point() const {
+    return this->max_num_fixed_point_;
+  }
+  inline int& max_num_fixed_point() { return this->max_num_fixed_point_; }
 
-  void set_max_num_fixed_point(int n) {
+  inline void set_max_num_fixed_point(int n) {
     if (n > 0)
       this->max_num_fixed_point_ = n;
   }
 
-  double fixed_point_threshold() { return this->fixed_point_threshold_; }
+  inline double fixed_point_threshold() { return this->fixed_point_threshold_; }
 
   void set_fixed_point_threshold(double t) {
     if (t > 0)

@@ -19,7 +19,7 @@ class diag_e_static_uniform
  public:
   diag_e_static_uniform(const Model& model, BaseRNG& rng)
       : base_static_uniform<Model, diag_e_metric, expl_leapfrog, BaseRNG>(
-            model, rng) {}
+          model, rng) {}
 };
 }  // namespace mcmc
 }  // namespace stan

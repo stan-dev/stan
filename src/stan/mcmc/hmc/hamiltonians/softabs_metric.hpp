@@ -18,7 +18,7 @@ struct softabs_fun {
   softabs_fun(const Model& m, std::ostream* out) : model_(m), o_(out) {}
 
   template <typename T>
-  T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
+  inline T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
     // log_prob() requires non-const but doesn't modify its argument
     return model_.template log_prob<true, true, T>(
         const_cast<Eigen::Matrix<T, -1, 1>&>(x), o_);
@@ -35,20 +35,24 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
   explicit softabs_metric(const Model& model)
       : base_hamiltonian<Model, softabs_point, BaseRNG>(model) {}
 
-  double T(softabs_point& z) { return this->tau(z) + 0.5 * z.log_det_metric; }
+  inline double T(softabs_point& z) {
+    return this->tau(z) + 0.5 * z.log_det_metric;
+  }
 
-  double tau(softabs_point& z) {
+  inline double tau(softabs_point& z) final {
     Eigen::VectorXd Qp = z.eigen_deco.eigenvectors().transpose() * z.p;
     return 0.5 * Qp.transpose() * z.softabs_lambda_inv.cwiseProduct(Qp);
   }
 
-  double phi(softabs_point& z) { return this->V(z) + 0.5 * z.log_det_metric; }
+  inline double phi(softabs_point& z) {
+    return this->V(z) + 0.5 * z.log_det_metric;
+  }
 
-  double dG_dt(softabs_point& z, callbacks::logger& logger) {
+  inline double dG_dt(softabs_point& z, callbacks::logger& logger) {
     return 2 * T(z) - z.q.dot(dtau_dq(z, logger) + dphi_dq(z, logger));
   }
 
-  Eigen::VectorXd dtau_dq(softabs_point& z, callbacks::logger& logger) {
+  inline Eigen::VectorXd dtau_dq(softabs_point& z, callbacks::logger& logger) {
     Eigen::VectorXd a = z.softabs_lambda_inv.cwiseProduct(
         z.eigen_deco.eigenvectors().transpose() * z.p);
     Eigen::MatrixXd A
@@ -63,13 +67,13 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
     return 0.5 * b;
   }
 
-  Eigen::VectorXd dtau_dp(softabs_point& z) {
+  inline Eigen::VectorXd dtau_dp(softabs_point& z) {
     return z.eigen_deco.eigenvectors()
            * z.softabs_lambda_inv.cwiseProduct(
-                 z.eigen_deco.eigenvectors().transpose() * z.p);
+               z.eigen_deco.eigenvectors().transpose() * z.p);
   }
 
-  Eigen::VectorXd dphi_dq(softabs_point& z, callbacks::logger& logger) {
+  inline Eigen::VectorXd dphi_dq(softabs_point& z, callbacks::logger& logger) {
     Eigen::VectorXd a
         = z.softabs_lambda_inv.cwiseProduct(z.pseudo_j.diagonal());
     Eigen::MatrixXd A
@@ -82,7 +86,7 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
     return -0.5 * a + z.g;
   }
 
-  void sample_p(softabs_point& z, BaseRNG& rng) {
+  inline void sample_p(softabs_point& z, BaseRNG& rng) {
     boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
         rand_unit_gaus(rng, boost::normal_distribution<>());
 
@@ -94,12 +98,12 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
     z.p = z.eigen_deco.eigenvectors() * a;
   }
 
-  void init(softabs_point& z, callbacks::logger& logger) {
+  inline void init(softabs_point& z, callbacks::logger& logger) {
     update_metric(z, logger);
     update_metric_gradient(z, logger);
   }
 
-  void update_metric(softabs_point& z, callbacks::logger& logger) {
+  inline void update_metric(softabs_point& z, callbacks::logger& logger) {
     math::hessian<softabs_fun<Model> >(softabs_fun<Model>(this->model_, 0), z.q,
                                        z.V, z.g, z.hessian);
     z.V = -z.V;
@@ -136,7 +140,8 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
       z.log_det_metric += std::log(z.softabs_lambda(i));
   }
 
-  void update_metric_gradient(softabs_point& z, callbacks::logger& logger) {
+  inline void update_metric_gradient(softabs_point& z,
+                                     callbacks::logger& logger) {
     // Compute the pseudo-Jacobian of the SoftAbs transform
     for (idx_t i = 0; i < z.q.size(); ++i) {
       for (idx_t j = 0; j <= i; ++j) {
@@ -168,7 +173,7 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
     }
   }
 
-  void update_gradients(softabs_point& z, callbacks::logger& logger) {
+  inline void update_gradients(softabs_point& z, callbacks::logger& logger) {
     update_metric_gradient(z, logger);
   }
 

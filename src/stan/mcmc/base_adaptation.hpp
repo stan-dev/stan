@@ -7,7 +7,7 @@ namespace mcmc {
 
 class base_adaptation {
  public:
-  virtual void restart() {}
+  inline virtual void restart() {}
 };
 
 }  // namespace mcmc

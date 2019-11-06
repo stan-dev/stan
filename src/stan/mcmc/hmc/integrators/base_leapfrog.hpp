@@ -14,16 +14,17 @@ class base_leapfrog : public base_integrator<Hamiltonian> {
  public:
   base_leapfrog() : base_integrator<Hamiltonian>() {}
 
-  void evolve(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
-              const double epsilon, callbacks::logger& logger) {
+  inline void evolve(typename Hamiltonian::PointType& z,
+                     Hamiltonian& hamiltonian, const double epsilon,
+                     callbacks::logger& logger) {
     begin_update_p(z, hamiltonian, 0.5 * epsilon, logger);
     update_q(z, hamiltonian, epsilon, logger);
     end_update_p(z, hamiltonian, 0.5 * epsilon, logger);
   }
 
-  void verbose_evolve(typename Hamiltonian::PointType& z,
-                      Hamiltonian& hamiltonian, const double epsilon,
-                      callbacks::logger& logger) {
+  inline void verbose_evolve(typename Hamiltonian::PointType& z,
+                             Hamiltonian& hamiltonian, const double epsilon,
+                             callbacks::logger& logger) {
     std::stringstream msg;
     msg.precision(6);
 
@@ -97,18 +98,18 @@ class base_leapfrog : public base_integrator<Hamiltonian> {
     logger.info(msg);
   }
 
-  virtual void begin_update_p(typename Hamiltonian::PointType& z,
-                              Hamiltonian& hamiltonian, double epsilon,
-                              callbacks::logger& logger)
+  inline virtual void begin_update_p(typename Hamiltonian::PointType& z,
+                                     Hamiltonian& hamiltonian, double epsilon,
+                                     callbacks::logger& logger)
       = 0;
 
-  virtual void update_q(typename Hamiltonian::PointType& z,
-                        Hamiltonian& hamiltonian, double epsilon,
-                        callbacks::logger& logger)
+  inline virtual void update_q(typename Hamiltonian::PointType& z,
+                               Hamiltonian& hamiltonian, double epsilon,
+                               callbacks::logger& logger)
       = 0;
-  virtual void end_update_p(typename Hamiltonian::PointType& z,
-                            Hamiltonian& hamiltonian, double epsilon,
-                            callbacks::logger& logger)
+  inline virtual void end_update_p(typename Hamiltonian::PointType& z,
+                                   Hamiltonian& hamiltonian, double epsilon,
+                                   callbacks::logger& logger)
       = 0;
 };
 

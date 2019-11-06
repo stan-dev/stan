@@ -99,9 +99,9 @@ Scalar CubicInterp(const Scalar &df0, const Scalar &x1, const Scalar &f1,
  * @param hiX Upper bound on the interval of solutions
  **/
 template <typename Scalar>
-Scalar CubicInterp(const Scalar &x0, const Scalar &f0, const Scalar &df0,
-                   const Scalar &x1, const Scalar &f1, const Scalar &df1,
-                   const Scalar &loX, const Scalar &hiX) {
+inline Scalar CubicInterp(const Scalar &x0, const Scalar &f0, const Scalar &df0,
+                          const Scalar &x1, const Scalar &f1, const Scalar &df1,
+                          const Scalar &loX, const Scalar &hiX) {
   return x0 + CubicInterp(df0, x1 - x0, f1 - f0, df1, loX - x0, hiX - x0);
 }
 
@@ -109,12 +109,12 @@ Scalar CubicInterp(const Scalar &x0, const Scalar &f0, const Scalar &df0,
  * An internal utility function for implementing WolfeLineSearch()
  **/
 template <typename FunctorType, typename Scalar, typename XType>
-int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
-               FunctorType &func, const XType &x, const Scalar &f,
-               const Scalar &dfp, const Scalar &c1dfp, const Scalar &c2dfp,
-               const XType &p, Scalar alo, Scalar aloF, Scalar aloDFp,
-               Scalar ahi, Scalar ahiF, Scalar ahiDFp,
-               const Scalar &min_range) {
+inline int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
+                      FunctorType &func, const XType &x, const Scalar &f,
+                      const Scalar &dfp, const Scalar &c1dfp,
+                      const Scalar &c2dfp, const XType &p, Scalar alo,
+                      Scalar aloF, Scalar aloDFp, Scalar ahi, Scalar ahiF,
+                      Scalar ahiDFp, const Scalar &min_range) {
   Scalar d1, d2, newDFp;
   int itNum(0);
 
@@ -220,11 +220,13 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
  * @return Returns zero on success, non-zero otherwise.
  **/
 template <typename FunctorType, typename Scalar, typename XType>
-int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1, Scalar &f1,
-                    XType &gradx1, const XType &p, const XType &x0,
-                    const Scalar &f0, const XType &gradx0, const Scalar &c1,
-                    const Scalar &c2, const Scalar &minAlpha,
-                    const Scalar &maxLSIts, const Scalar &maxLSRestarts) {
+inline int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
+                           Scalar &f1, XType &gradx1, const XType &p,
+                           const XType &x0, const Scalar &f0,
+                           const XType &gradx0, const Scalar &c1,
+                           const Scalar &c2, const Scalar &minAlpha,
+                           const Scalar &maxLSIts,
+                           const Scalar &maxLSRestarts) {
   const Scalar dfp(gradx0.dot(p));
   const Scalar c1dfp(c1 * dfp);
   const Scalar c2dfp(c2 * dfp);

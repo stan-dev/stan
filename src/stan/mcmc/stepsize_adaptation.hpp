@@ -10,49 +10,47 @@ namespace mcmc {
 
 class stepsize_adaptation : public base_adaptation {
  public:
-  stepsize_adaptation()
-      : mu_(0.5), delta_(0.5), gamma_(0.05), kappa_(0.75), t0_(10) {
-    restart();
-  }
+  stepsize_adaptation() { restart(); }
 
-  void set_mu(double m) { mu_ = m; }
+  inline void set_mu(double m) { mu_ = m; }
 
-  void set_delta(double d) {
+  inline void set_delta(double d) {
     if (d > 0 && d < 1)
       delta_ = d;
   }
 
-  void set_gamma(double g) {
+  inline void set_gamma(double g) {
     if (g > 0)
       gamma_ = g;
   }
 
-  void set_kappa(double k) {
+  inline void set_kappa(double k) {
     if (k > 0)
       kappa_ = k;
   }
-  void set_t0(double t) {
+
+  inline void set_t0(double t) {
     if (t > 0)
       t0_ = t;
   }
 
-  double get_mu() { return mu_; }
+  inline double get_mu() { return mu_; }
 
-  double get_delta() { return delta_; }
+  inline double get_delta() { return delta_; }
 
-  double get_gamma() { return gamma_; }
+  inline double get_gamma() { return gamma_; }
 
-  double get_kappa() { return kappa_; }
+  inline double get_kappa() { return kappa_; }
 
-  double get_t0() { return t0_; }
+  inline double get_t0() { return t0_; }
 
-  void restart() {
+  inline void restart() {
     counter_ = 0;
     s_bar_ = 0;
     x_bar_ = 0;
   }
 
-  void learn_stepsize(double& epsilon, double adapt_stat) {
+  inline void learn_stepsize(double& epsilon, double adapt_stat) {
     ++counter_;
 
     adapt_stat = adapt_stat > 1 ? 1 : adapt_stat;
@@ -70,17 +68,19 @@ class stepsize_adaptation : public base_adaptation {
     epsilon = std::exp(x);
   }
 
-  void complete_adaptation(double& epsilon) { epsilon = std::exp(x_bar_); }
+  inline void complete_adaptation(double& epsilon) {
+    epsilon = std::exp(x_bar_);
+  }
 
  protected:
-  double counter_;  // Adaptation iteration
-  double s_bar_;    // Moving average statistic
-  double x_bar_;    // Moving average parameter
-  double mu_;       // Asymptotic mean of parameter
-  double delta_;    // Target value of statistic
-  double gamma_;    // Adaptation scaling
-  double kappa_;    // Adaptation shrinkage
-  double t0_;       // Effective starting iteration
+  double counter_;      // Adaptation iteration
+  double s_bar_;        // Moving average statistic
+  double x_bar_;        // Moving average parameter
+  double mu_{0.5};      // Asymptotic mean of parameter
+  double delta_{0.5};   // Target value of statistic
+  double gamma_{0.05};  // Adaptation scaling
+  double kappa_{0.75};  // Adaptation shrinkage
+  double t0_{10};       // Effective starting iteration
 };
 
 }  // namespace mcmc

@@ -13,21 +13,22 @@ class expl_leapfrog : public base_leapfrog<Hamiltonian> {
  public:
   expl_leapfrog() : base_leapfrog<Hamiltonian>() {}
 
-  void begin_update_p(typename Hamiltonian::PointType& z,
-                      Hamiltonian& hamiltonian, double epsilon,
-                      callbacks::logger& logger) {
+  inline void begin_update_p(typename Hamiltonian::PointType& z,
+                             Hamiltonian& hamiltonian, double epsilon,
+                             callbacks::logger& logger) final {
     z.p -= epsilon * hamiltonian.dphi_dq(z, logger);
   }
 
-  void update_q(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
-                double epsilon, callbacks::logger& logger) {
+  inline void update_q(typename Hamiltonian::PointType& z,
+                       Hamiltonian& hamiltonian, double epsilon,
+                       callbacks::logger& logger) final {
     z.q += epsilon * hamiltonian.dtau_dp(z);
     hamiltonian.update_potential_gradient(z, logger);
   }
 
-  void end_update_p(typename Hamiltonian::PointType& z,
-                    Hamiltonian& hamiltonian, double epsilon,
-                    callbacks::logger& logger) {
+  inline void end_update_p(typename Hamiltonian::PointType& z,
+                           Hamiltonian& hamiltonian, double epsilon,
+                           callbacks::logger& logger) final {
     z.p -= epsilon * hamiltonian.dphi_dq(z, logger);
   }
 };
