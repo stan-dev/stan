@@ -113,7 +113,7 @@ struct thin {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Period between saved samples.";
   }
 
@@ -133,7 +133,7 @@ struct thin {
    *
    * @return 1
    */
-  inline constexpr int default_value() { return 1; }
+  inline int default_value() { return 1; }
 };
 
 /**
@@ -145,7 +145,7 @@ struct adaptation_engaged {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Indicates whether adaptation is engaged.";
   }
 
@@ -161,7 +161,7 @@ struct adaptation_engaged {
    *
    * @return true
    */
-  inline constexpr bool default_value() { return true; }
+  inline bool default_value() { return true; }
 };
 
 /**
@@ -173,7 +173,7 @@ struct gamma {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Adaptation regularization scale.";
   }
 
@@ -193,7 +193,7 @@ struct gamma {
    *
    * @return 0.05
    */
-  inline constexpr double default_value() { return 0.05; }
+  inline double default_value() { return 0.05; }
 };
 
 /**
@@ -205,7 +205,7 @@ struct kappa {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Adaptation relaxation exponent.";
   }
 
@@ -225,7 +225,7 @@ struct kappa {
    *
    * @return 0.75
    */
-  inline constexpr double default_value() { return 0.75; }
+  inline double default_value() { return 0.75; }
 };
 
 /**
@@ -237,7 +237,7 @@ struct t0 {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Adaptation iteration offset.";
   }
 
@@ -257,7 +257,7 @@ struct t0 {
    *
    * @return 10
    */
-  inline constexpr double default_value() { return 10; }
+  inline double default_value() { return 10; }
 };
 
 /**
@@ -269,7 +269,7 @@ struct init_buffer {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Width of initial fast adaptation interval.";
   }
 
@@ -285,7 +285,7 @@ struct init_buffer {
    *
    * @return 75
    */
-  inline constexpr unsigned int default_value() { return 75; }
+  inline unsigned int default_value() { return 75; }
 };
 
 /**
@@ -297,7 +297,7 @@ struct term_buffer {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Width of final fast adaptation interval.";
   }
 
@@ -313,7 +313,7 @@ struct term_buffer {
    *
    * @return 50
    */
-  inline constexpr unsigned int default_value() { return 50; }
+  inline unsigned int default_value() { return 50; }
 };
 
 /**
@@ -325,7 +325,7 @@ struct window {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Initial width of slow adaptation interval.";
   }
 
@@ -341,7 +341,7 @@ struct window {
    *
    * @return 25
    */
-  inline constexpr unsigned int default_value() { return 25; }
+  inline unsigned int default_value() { return 25; }
 };
 
 /**
@@ -353,7 +353,7 @@ struct int_time {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Total integration time for Hamiltonian evolution.";
   }
 
@@ -373,7 +373,7 @@ struct int_time {
    *
    * @return 2 * pi
    */
-  inline constexpr double default_value() { return 6.28318530717959; }
+  inline double default_value() { return 6.28318530717959; }
 };
 
 /**
@@ -385,7 +385,7 @@ struct max_depth {
    *
    * @return description
    */
-  inline constexpr std::string description() { return "Maximum tree depth."; }
+  inline std::string description() { return "Maximum tree depth."; }
 
   /**
    * Validates max_depth; max_depth must be greater than 0.
@@ -403,7 +403,7 @@ struct max_depth {
    *
    * @return 10
    */
-  inline constexpr int default_value() { return 10; }
+  inline int default_value() { return 10; }
 };
 
 /**
@@ -415,7 +415,7 @@ struct stepsize {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Step size for discrete evolution.";
   }
 
@@ -435,7 +435,7 @@ struct stepsize {
    *
    * @return 1
    */
-  inline constexpr double default_value() { return 1; }
+  inline double default_value() { return 1; }
 };
 
 /**
@@ -447,7 +447,7 @@ struct stepsize_jitter {
    *
    * @return description
    */
-  inline constexpr std::string description() {
+  inline std::string description() {
     return "Uniformly random jitter of the stepsize, in percent.";
   }
 
@@ -470,7 +470,7 @@ struct stepsize_jitter {
    *
    * @return 0
    */
-  inline constexpr double default_value() { return 0; }
+  inline double default_value() { return 0; }
 };
 
 }  // namespace sample
