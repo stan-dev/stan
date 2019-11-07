@@ -12,16 +12,20 @@ namespace stan {
 namespace model {
 
 template <class M>
-inline void gradient(const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
-              double& f, Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
-              std::ostream* msgs = 0) {
+inline void gradient(const M& model,
+                     const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                     double& f,
+                     Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
+                     std::ostream* msgs = 0) {
   stan::math::gradient(model_functional<M>(model, msgs), x, f, grad_f);
 }
 
 template <class M>
-inline void gradient(const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
-              double& f, Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
-              callbacks::logger& logger) {
+inline void gradient(const M& model,
+                     const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+                     double& f,
+                     Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
+                     callbacks::logger& logger) {
   std::stringstream ss;
   try {
     stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);

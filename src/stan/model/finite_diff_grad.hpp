@@ -29,10 +29,12 @@ namespace model {
  * @param[in,out] msgs
  */
 template <bool propto, bool jacobian_adjust_transform, class M>
-inline void finite_diff_grad(const M& model, stan::callbacks::interrupt& interrupt,
-                      std::vector<double>& params_r, std::vector<int>& params_i,
-                      std::vector<double>& grad, double epsilon = 1e-6,
-                      std::ostream* msgs = 0) {
+inline void finite_diff_grad(const M& model,
+                             stan::callbacks::interrupt& interrupt,
+                             std::vector<double>& params_r,
+                             std::vector<int>& params_i,
+                             std::vector<double>& grad, double epsilon = 1e-6,
+                             std::ostream* msgs = 0) {
   std::vector<double> perturbed(params_r);
   grad.resize(params_r.size());
   for (size_t k = 0; k < params_r.size(); k++) {

@@ -32,10 +32,10 @@ namespace model {
  */
 template <bool propto, bool jacobian_adjust_transform, class M>
 inline double grad_hess_log_prob(const M& model, std::vector<double>& params_r,
-                          std::vector<int>& params_i,
-                          std::vector<double>& gradient,
-                          std::vector<double>& hessian,
-                          std::ostream* msgs = 0) {
+                                 std::vector<int>& params_i,
+                                 std::vector<double>& gradient,
+                                 std::vector<double>& hessian,
+                                 std::ostream* msgs = 0) {
   static const double epsilon = 1e-3;
   static const double half_epsilon = 0.5 * epsilon;
   static const int order = 4;
