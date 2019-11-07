@@ -36,7 +36,7 @@ class ConvergenceOptions {
   Scalar tolAbsF{1e-12};
   Scalar tolRelF{1e+4};
   Scalar fScale{1.0};
-  Scalar tolAbsGrad{1e+4};
+  Scalar tolAbsGrad{1e-8};
   Scalar tolRelGrad{1e+3};
 };
 
@@ -151,7 +151,7 @@ class BFGSMinimizer {
     _note = "";
   }
 
-  int step() {
+  inline int step() {
     Scalar gradNorm, stepNorm;
     VectorT sk, yk;
     int retCode(0);
@@ -261,7 +261,7 @@ class BFGSMinimizer {
     return retCode;
   }
 
-  int minimize(VectorT &x0) {
+  inline int minimize(VectorT &x0) {
     int retcode;
     initialize(x0);
     while (!(retcode = step()))
@@ -359,7 +359,7 @@ class ModelAdaptor {
       return 2;
     }
   }
-  int df(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
+  inline int df(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
          Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
     double f;
     return (*this)(x, f, g);
