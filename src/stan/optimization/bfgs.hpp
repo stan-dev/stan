@@ -360,7 +360,7 @@ class ModelAdaptor {
     }
   }
   inline int df(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
-         Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
+                Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
     double f;
     return (*this)(x, f, g);
   }
