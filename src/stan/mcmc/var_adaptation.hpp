@@ -5,6 +5,8 @@
 #include <stan/mcmc/windowed_adaptation.hpp>
 #include <vector>
 
+#include <iostream>
+
 namespace stan {
 
 namespace mcmc {
@@ -19,6 +21,7 @@ class var_adaptation : public windowed_adaptation {
       estimator_.add_sample(q);
 
     if (end_adaptation_window()) {
+      std::cout << "Adaptation Window ended." << std::endl;
       compute_next_window();
 
       estimator_.sample_variance(var);

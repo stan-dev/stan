@@ -7,6 +7,8 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
 
+#include <iostream>
+
 namespace stan {
 namespace mcmc {
 
@@ -42,11 +44,20 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
   }
 
   void sample_p(diag_e_point& z, BaseRNG& rng) {
-    boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
-        rand_diag_gaus(rng, boost::normal_distribution<>());
+    boost::random::variate_generator<BaseRNG&, boost::random::normal_distribution<> >
+        rand_diag_gaus(rng, boost::random::normal_distribution<>());
+    //boost::random::normal_distribution<> std_normal(0.0, 1.0);
 
-    for (int i = 0; i < z.p.size(); ++i)
+    //std::cout << "sampling moments " << z.p.size() << std::endl;
+    for (int i = 0; i < z.p.size(); ++i) {
+      //std::cout << "component " << i << " scaled by " << sqrt(z.inv_e_metric_(i)) << std::endl;
+      //const double draw = std_normal(rng);
+      //std::cout << "normal variate " << draw << std::endl;
       z.p(i) = rand_diag_gaus() / sqrt(z.inv_e_metric_(i));
+      //z.p(i) = draw / sqrt(z.inv_e_metric_(i));
+      //std::cout << "got " << z.p(i) << std::endl;
+    }
+    //std::cout << "sampling moments done" << std::endl;
   }
 };
 

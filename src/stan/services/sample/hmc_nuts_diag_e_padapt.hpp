@@ -8,22 +8,20 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
-//#include <stan/services/util/run_adaptive_sampler.hpp>
-#include <stan/services/util/run_parallel_adaptive_sampler.hpp>
+#include <stan/mcmc/hmc/nuts/padapt_diag_e_nuts.hpp>
+#include <stan/services/util/run_adaptive_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/inv_metric.hpp>
 #include <vector>
-#include <memory>
 
 namespace stan {
 namespace services {
 namespace sample {
 
 /**
- * Runs HMC with NUTS with adaptation using diagonal Euclidean metric
- * with a pre-specified Euclidean metric.
+ * Runs HMC with NUTS with parallel adaptation using diagonal
+ * Euclidean metric with a pre-specified Euclidean metric.
  *
  * @tparam Model Model class
  * @param[in] model Input model to test (with data already instantiated)
@@ -55,19 +53,22 @@ namespace sample {
  * @param[in,out] diagnostic_writer Writer for diagnostic information
  * @return error_codes::OK if successful
  */
-
 template <class Model>
-int hmc_nuts_diag_e_adapt(
+int hmc_nuts_diag_e_padapt(
     Model& model, stan::io::var_context& init,
     stan::io::var_context& init_inv_metric, unsigned int random_seed,
-    unsigned int chain, double init_radius, unsigned int num_chains,
-    int num_warmup, int num_samples,
+    unsigned int chain, double init_radius, int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
+  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+
+  std::vector<int> disc_vector;
+  std::vector<double> cont_vector = util::initialize(
+      model, init, rng, init_radius, true, logger, init_writer);
 
   Eigen::VectorXd inv_metric;
   try {
@@ -78,53 +79,23 @@ int hmc_nuts_diag_e_adapt(
     return error_codes::CONFIG;
   }
 
+  stan::mcmc::padapt_diag_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
 
-  //boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
-  std::vector<std::unique_ptr<boost::ecuyer1988>> rng;
-  //std::vector<boost::ecuyer1988> rng2;
+  sampler.set_metric(inv_metric);
+  sampler.set_nominal_stepsize(stepsize);
+  sampler.set_stepsize_jitter(stepsize_jitter);
+  sampler.set_max_depth(max_depth);
 
-  //std::vector<int> disc_vector;
-  //std::vector<double> cont_vector = util::initialize(
-  //    model, init, rng, init_radius, true, logger, init_writer);
-  std::vector<std::vector<double>> cont_vector;
+  sampler.get_stepsize_adaptation().set_mu(log(10 * stepsize));
+  sampler.get_stepsize_adaptation().set_delta(delta);
+  sampler.get_stepsize_adaptation().set_gamma(gamma);
+  sampler.get_stepsize_adaptation().set_kappa(kappa);
+  sampler.get_stepsize_adaptation().set_t0(t0);
 
-  //stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>
-  //sampler(model, rng);
+  sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
+                            logger);
 
-  typedef stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988> sampler_t;
-  std::vector<std::unique_ptr<sampler_t>> sampler;
-
-  for(unsigned int i=0; i != num_chains; ++i) {
-
-    rng.emplace_back(util::create_rng_ptr(random_seed, chain+i));
-    //rng2.push_back(util::create_rng(random_seed+1, chain+i));
-
-    std::cout << "chain " << i << " my lucky number is " << (*rng.back())() << std::endl;
-    //std::cout << "chain " << i << " my 2nd lucky number is " << rng2.back()() << std::endl;
-
-    cont_vector.push_back(util::initialize(
-        model, init, *rng.back(), init_radius, i==0, logger, init_writer));
-
-    // argh: this does not work, because we only get the base here!!!
-    //sampler.push_back(sampler_t(model, rng.back()));
-    sampler.emplace_back(new sampler_t(model, *rng.back()));
-    
-    sampler.back()->set_metric(inv_metric);
-    sampler.back()->set_nominal_stepsize(stepsize);
-    sampler.back()->set_stepsize_jitter(stepsize_jitter);
-    sampler.back()->set_max_depth(max_depth);
-
-    sampler.back()->get_stepsize_adaptation().set_mu(log(10 * stepsize));
-    sampler.back()->get_stepsize_adaptation().set_delta(delta);
-    sampler.back()->get_stepsize_adaptation().set_gamma(gamma);
-    sampler.back()->get_stepsize_adaptation().set_kappa(kappa);
-    sampler.back()->get_stepsize_adaptation().set_t0(t0);
-
-    sampler.back()->set_window_params(num_warmup, init_buffer, term_buffer, window,
-                                     logger);
-  }
-  
-  util::run_parallel_adaptive_sampler(num_chains,
+  util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
 
@@ -162,11 +133,10 @@ int hmc_nuts_diag_e_adapt(
  * @param[in,out] diagnostic_writer Writer for diagnostic information
  * @return error_codes::OK if successful
  */
-
 template <class Model>
-int hmc_nuts_diag_e_adapt(
+int hmc_nuts_diag_e_padapt(
     Model& model, stan::io::var_context& init, unsigned int random_seed,
-    unsigned int chain, double init_radius, unsigned int num_chains, int num_warmup, int num_samples,
+    unsigned int chain, double init_radius, int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
@@ -177,8 +147,8 @@ int hmc_nuts_diag_e_adapt(
       = util::create_unit_e_diag_inv_metric(model.num_params_r());
   stan::io::var_context& unit_e_metric = dmp;
 
-  return hmc_nuts_diag_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_chains, num_warmup,
+  return hmc_nuts_diag_e_padapt(
+      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer);

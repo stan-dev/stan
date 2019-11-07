@@ -30,6 +30,14 @@ inline boost::ecuyer1988 create_rng(unsigned int seed, unsigned int chain) {
   return rng;
 }
 
+inline boost::ecuyer1988* create_rng_ptr(unsigned int seed, unsigned int chain) {
+  using boost::uintmax_t;
+  static uintmax_t DISCARD_STRIDE = static_cast<uintmax_t>(1) << 50;
+  boost::ecuyer1988* rng = new boost::ecuyer1988(seed);
+  rng->discard(DISCARD_STRIDE * chain);
+  return rng;
+}
+
 }  // namespace util
 }  // namespace services
 }  // namespace stan

@@ -6,6 +6,7 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <string>
+#include <iostream>
 
 namespace stan {
 namespace services {
@@ -49,7 +50,9 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
     callback();
 
     if (refresh > 0
-        && (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
+        && (start + m + 1 == finish
+            || m == 0
+            || (m + 1) % refresh == 0)) {
       int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
       std::stringstream message;
       message << "Iteration: ";
@@ -59,6 +62,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
       message << (warmup ? " (Warmup)" : " (Sampling)");
 
       logger.info(message);
+      //std::cout << message.str() << std::endl;
     }
 
     init_s = sampler.transition(init_s, logger);

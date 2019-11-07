@@ -72,20 +72,28 @@ class base_hmc : public base_mcmc {
   }
 
   void init_stepsize(callbacks::logger& logger) {
+    //std::cout << "initializing stepsize" << std::endl;
+
     ps_point z_init(this->z_);
 
     // Skip initialization for extreme step sizes
     if (this->nom_epsilon_ == 0 || this->nom_epsilon_ > 1e7)
       return;
 
+    //std::cout << "sampling moment" << std::endl;
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);
+    //std::cout << "initializing hamiltonian" << std::endl;
     this->hamiltonian_.init(this->z_, logger);
 
     // Guaranteed to be finite if randomly initialized
     double H0 = this->hamiltonian_.H(this->z_);
 
+    //std::cout << "starting evolve" << std::endl;
+
     this->integrator_.evolve(this->z_, this->hamiltonian_, this->nom_epsilon_,
                              logger);
+
+    //std::cout << "end evolve" << std::endl;
 
     double h = this->hamiltonian_.H(this->z_);
     if (boost::math::isnan(h))
@@ -94,6 +102,8 @@ class base_hmc : public base_mcmc {
     double delta_H = H0 - h;
 
     int direction = delta_H > std::log(0.8) ? 1 : -1;
+
+    //std::cout << "going into loop" << std::endl;
 
     while (1) {
       this->z_.ps_point::operator=(z_init);
