@@ -9,7 +9,7 @@ namespace stan {
 namespace model {
 
 template <class M>
-void hessian(const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
+inline void hessian(const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
              double& f, Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_f,
              Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& hess_f,
              std::ostream* msgs = 0) {

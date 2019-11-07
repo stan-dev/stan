@@ -26,7 +26,7 @@ namespace model {
  * @param[in,out] msgs
  */
 template <bool propto, bool jacobian_adjust_transform, class M>
-double log_prob_grad(const M& model, std::vector<double>& params_r,
+inline double log_prob_grad(const M& model, std::vector<double>& params_r,
                      std::vector<int>& params_i, std::vector<double>& gradient,
                      std::ostream* msgs = 0) {
   using stan::math::var;
@@ -67,7 +67,7 @@ double log_prob_grad(const M& model, std::vector<double>& params_r,
  * @param[in,out] msgs
  */
 template <bool propto, bool jacobian_adjust_transform, class M>
-double log_prob_grad(const M& model, Eigen::VectorXd& params_r,
+inline double log_prob_grad(const M& model, Eigen::VectorXd& params_r,
                      Eigen::VectorXd& gradient, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;

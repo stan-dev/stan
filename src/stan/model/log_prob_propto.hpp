@@ -30,7 +30,7 @@ namespace model {
  * @param[in,out] msgs
  */
 template <bool jacobian_adjust_transform, class M>
-double log_prob_propto(const M& model, std::vector<double>& params_r,
+inline double log_prob_propto(const M& model, std::vector<double>& params_r,
                        std::vector<int>& params_i, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
@@ -72,7 +72,7 @@ double log_prob_propto(const M& model, std::vector<double>& params_r,
  * @param[in,out] msgs
  */
 template <bool jacobian_adjust_transform, class M>
-double log_prob_propto(const M& model, Eigen::VectorXd& params_r,
+inline double log_prob_propto(const M& model, Eigen::VectorXd& params_r,
                        std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
