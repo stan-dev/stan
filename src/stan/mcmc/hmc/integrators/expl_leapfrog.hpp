@@ -9,25 +9,25 @@ namespace stan {
 namespace mcmc {
 
 template <class Hamiltonian>
-class expl_leapfrog : public base_leapfrog<Hamiltonian> {
+class expl_leapfrog
+    : public base_leapfrog<expl_leapfrog<Hamiltonian>, Hamiltonian> {
  public:
-  expl_leapfrog() : base_leapfrog<Hamiltonian>() {}
-
-  void begin_update_p(typename Hamiltonian::PointType& z,
-                      Hamiltonian& hamiltonian, double epsilon,
-                      callbacks::logger& logger) {
+  expl_leapfrog() : base_leapfrog<expl_leapfrog<Hamiltonian>, Hamiltonian>() {}
+  using hamiltonian_type = Hamiltonian;
+  using point_type = typename Hamiltonian::point_type;
+  inline void begin_update_p(point_type& z, hamiltonian_type& hamiltonian,
+                             double epsilon, callbacks::logger& logger) {
     z.p -= epsilon * hamiltonian.dphi_dq(z, logger);
   }
 
-  void update_q(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
-                double epsilon, callbacks::logger& logger) {
+  inline void update_q(point_type& z, hamiltonian_type& hamiltonian,
+                       double epsilon, callbacks::logger& logger) {
     z.q += epsilon * hamiltonian.dtau_dp(z);
     hamiltonian.update_potential_gradient(z, logger);
   }
 
-  void end_update_p(typename Hamiltonian::PointType& z,
-                    Hamiltonian& hamiltonian, double epsilon,
-                    callbacks::logger& logger) {
+  inline void end_update_p(point_type& z, hamiltonian_type& hamiltonian,
+                           double epsilon, callbacks::logger& logger) {
     z.p -= epsilon * hamiltonian.dphi_dq(z, logger);
   }
 };

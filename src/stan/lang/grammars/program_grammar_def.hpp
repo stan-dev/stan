@@ -52,10 +52,10 @@ program_grammar<Iterator>::program_grammar(const std::string& model_name,
   using boost::spirit::qi::_2;
   using boost::spirit::qi::_3;
   using boost::spirit::qi::eps;
-  using boost::spirit::qi::labels::_a;
   using boost::spirit::qi::lit;
   using boost::spirit::qi::on_error;
   using boost::spirit::qi::rethrow;
+  using boost::spirit::qi::labels::_a;
 
   // add model_name to var_map with special origin
   var_map_.add(model_name, var_decl(), scope(model_name_origin, true));

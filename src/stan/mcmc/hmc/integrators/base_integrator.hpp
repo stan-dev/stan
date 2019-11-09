@@ -6,15 +6,19 @@
 namespace stan {
 namespace mcmc {
 
-template <class Hamiltonian>
+template <typename Derived, typename Hamiltonian>
 class base_integrator {
  public:
   base_integrator() {}
+  using point_type = typename Hamiltonian::point_type;
+  using hamiltonian_type = Hamiltonian;
+  Derived& derived() { return static_cast<Derived&>(*this); }
+  const Derived& derived() const { return static_cast<Derived const&>(*this); }
 
-  virtual void evolve(typename Hamiltonian::PointType& z,
-                      Hamiltonian& hamiltonian, const double epsilon,
-                      callbacks::logger& logger)
-      = 0;
+  inline void evolve(point_type& z, hamiltonian_type& hamiltonian,
+                     const double epsilon, callbacks::logger& logger) {
+    this->derived().evolve(z, epsilon, logger);
+  }
 };
 
 }  // namespace mcmc

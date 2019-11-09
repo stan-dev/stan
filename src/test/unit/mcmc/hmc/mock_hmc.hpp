@@ -64,11 +64,15 @@ class mock_hamiltonian : public base_hamiltonian<Model, ps_point, BaseRNG> {
 
 // Mock Integrator
 template <typename Hamiltonian>
-class mock_integrator : public base_integrator<Hamiltonian> {
+class mock_integrator
+    : public base_integrator<mock_integrator<Hamiltonian>, Hamiltonian> {
  public:
-  mock_integrator() : base_integrator<Hamiltonian>() {}
+  mock_integrator()
+      : base_integrator<mock_integrator<Hamiltonian>, Hamiltonian>() {}
+  using hamiltonian_type = Hamiltonian;
+  using point_type = typename Hamiltonian::point_type;
 
-  void evolve(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
+  void evolve(typename Hamiltonian::point_type& z, Hamiltonian& hamiltonian,
               const double epsilon, callbacks::logger& logger) {
     z.q += epsilon * z.p;
   };
