@@ -9,6 +9,12 @@
 namespace stan {
 namespace mcmc {
 
+/**
+ * Base class for leapfrog integrators.
+ * @tparam Derived class that defines methods /c begin_update_p,
+ *  /c end_update_p, /c update_q.
+ * @tparam Hamiltonian class representing a hamiltonian.
+ */
 template <typename Derived, typename Hamiltonian>
 class base_leapfrog
     : public base_integrator<base_leapfrog<Derived, Hamiltonian>, Hamiltonian> {
@@ -18,7 +24,9 @@ class base_leapfrog
 
   using hamiltonian_type = Hamiltonian;
   using point_type = typename Hamiltonian::point_type;
+  // modifier to the derived class
   inline Derived& derived() { return static_cast<Derived&>(*this); }
+  // inspector to the derived class
   inline const Derived& derived() const {
     return static_cast<Derived const&>(*this);
   }
