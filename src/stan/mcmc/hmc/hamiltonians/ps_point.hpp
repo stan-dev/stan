@@ -24,7 +24,7 @@ class ps_point {
   Eigen::VectorXd g;
   double V{0};
 
-  virtual inline void get_param_names(std::vector<std::string>& model_names,
+  inline void get_param_names(std::vector<std::string>& model_names,
                                       std::vector<std::string>& names) {
     names.reserve(q.size() + p.size() + g.size());
     for (int i = 0; i < q.size(); ++i)
@@ -35,7 +35,7 @@ class ps_point {
       names.emplace_back(std::string("g_") + model_names[i]);
   }
 
-  virtual inline void get_params(std::vector<double>& values) {
+  inline void get_params(std::vector<double>& values) {
     values.reserve(q.size() + p.size() + g.size());
     for (int i = 0; i < q.size(); ++i)
       values.push_back(q[i]);

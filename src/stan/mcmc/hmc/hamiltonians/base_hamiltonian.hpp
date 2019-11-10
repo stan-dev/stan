@@ -14,43 +14,61 @@
 namespace stan {
 namespace mcmc {
 
-template <class Model, class Point, class BaseRNG>
+template <typename Derived, typename Model, typename PointType, typename BaseRNG>
 class base_hamiltonian {
  public:
   explicit base_hamiltonian(const Model& model) : model_(model) {}
 
-  ~base_hamiltonian() {}
+  using point_type = PointType;
+  // modifier to the derived class
+  inline Derived& derived() { return static_cast<Derived&>(*this); }
+  // inspector to the derived class
+  inline const Derived& derived() const { return static_cast<Derived const&>(*this); }
 
-  typedef Point PointType;
+  inline auto T(point_type& z) {
+    return this->derived().T(z);
+  };
 
-  virtual double T(Point& z) = 0;
+  inline auto V(point_type& z) { return z.V; }
 
-  double V(Point& z) { return z.V; }
+  inline auto tau(point_type& z){
+    return this->derived().tau(z);
+  };
 
-  virtual double tau(Point& z) = 0;
+  inline auto phi(point_type& z) {
+    return this->derived().phi(z);
+  };
 
-  virtual double phi(Point& z) = 0;
-
-  double H(Point& z) { return T(z) + V(z); }
+  inline auto H(point_type& z) { return T(z) + V(z); }
 
   // The time derivative of the virial, G = \sum_{d = 1}^{D} q^{d} p_{d}.
-  virtual double dG_dt(Point& z, callbacks::logger& logger) = 0;
+  inline auto dG_dt(point_type& z, callbacks::logger& logger) {
+    return this->derived().dG_dt(z, logger);
+  };
 
   // tau = 0.5 p_{i} p_{j} Lambda^{ij} (q)
-  virtual Eigen::VectorXd dtau_dq(Point& z, callbacks::logger& logger) = 0;
+  inline auto dtau_dq(point_type& z, callbacks::logger& logger) {
+    return this->derived().dtau_dq(z, logger);
+  };
 
-  virtual Eigen::VectorXd dtau_dp(Point& z) = 0;
+  inline auto dtau_dp(point_type& z) {
+    return this->derived().dtau_dp(z);
+  };
 
   // phi = 0.5 * log | Lambda (q) | + V(q)
-  virtual Eigen::VectorXd dphi_dq(Point& z, callbacks::logger& logger) = 0;
+  inline auto dphi_dq(point_type& z, callbacks::logger& logger) {
+    return this->derived().dphi_dq(z, logger);
+  };
 
-  virtual void sample_p(Point& z, BaseRNG& rng) = 0;
+  inline void sample_p(point_type& z, BaseRNG& rng) {
+    this->derived().sample_p(z, rng);
+  };
 
-  void init(Point& z, callbacks::logger& logger) {
+  inline void init(point_type& z, callbacks::logger& logger) {
     this->update_potential_gradient(z, logger);
   }
 
-  void update_potential(Point& z, callbacks::logger& logger) {
+  inline void update_potential(point_type& z, callbacks::logger& logger) {
     try {
       z.V = -stan::model::log_prob_propto<true>(model_, z.q);
     } catch (const std::exception& e) {
@@ -59,7 +77,7 @@ class base_hamiltonian {
     }
   }
 
-  void update_potential_gradient(Point& z, callbacks::logger& logger) {
+  inline void update_potential_gradient(point_type& z, callbacks::logger& logger) {
     try {
       stan::model::gradient(model_, z.q, z.V, z.g, logger);
       z.V = -z.V;
@@ -70,18 +88,18 @@ class base_hamiltonian {
     z.g = -z.g;
   }
 
-  void update_metric(Point& z, callbacks::logger& logger) {}
+  inline void update_metric(point_type& z, callbacks::logger& logger) {}
 
-  void update_metric_gradient(Point& z, callbacks::logger& logger) {}
+  inline void update_metric_gradient(point_type& z, callbacks::logger& logger) {}
 
-  void update_gradients(Point& z, callbacks::logger& logger) {
+  inline void update_gradients(point_type& z, callbacks::logger& logger) {
     update_potential_gradient(z, logger);
   }
 
  protected:
   const Model& model_;
 
-  void write_error_msg_(const std::exception& e, callbacks::logger& logger) {
+  inline void write_error_msg_(const std::exception& e, callbacks::logger& logger) {
     logger.error(
         "Informational Message: The current Metropolis proposal "
         "is about to be rejected because of the following issue:");

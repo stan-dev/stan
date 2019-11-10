@@ -36,10 +36,10 @@ class mock_model : public model::prob_grad {
 
 // Mock Hamiltonian
 template <typename Model, typename BaseRNG>
-class mock_hamiltonian : public base_hamiltonian<Model, ps_point, BaseRNG> {
+class mock_hamiltonian : public base_hamiltonian<mock_hamiltonian<Model, BaseRNG>, Model, ps_point, BaseRNG> {
  public:
   explicit mock_hamiltonian(const Model& model)
-      : base_hamiltonian<Model, ps_point, BaseRNG>(model) {}
+      : base_hamiltonian<mock_hamiltonian<Model, BaseRNG>, Model, ps_point, BaseRNG>(model) {}
 
   double T(ps_point& z) { return 0; }
 
@@ -68,7 +68,7 @@ class mock_integrator : public base_integrator<Hamiltonian> {
  public:
   mock_integrator() : base_integrator<Hamiltonian>() {}
 
-  void evolve(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
+  void evolve(typename Hamiltonian::point_type& z, Hamiltonian& hamiltonian,
               const double epsilon, callbacks::logger& logger) {
     z.q += epsilon * z.p;
   };

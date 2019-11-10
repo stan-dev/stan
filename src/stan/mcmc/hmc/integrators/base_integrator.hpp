@@ -11,7 +11,7 @@ class base_integrator {
  public:
   base_integrator() {}
 
-  virtual void evolve(typename Hamiltonian::PointType& z,
+  virtual void evolve(typename Hamiltonian::point_type& z,
                       Hamiltonian& hamiltonian, const double epsilon,
                       callbacks::logger& logger)
       = 0;

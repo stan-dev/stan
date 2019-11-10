@@ -27,38 +27,39 @@ struct softabs_fun {
 
 // Riemannian manifold with SoftAbs metric
 template <class Model, class BaseRNG>
-class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
+class softabs_metric : public base_hamiltonian<softabs_metric<Model, BaseRNG>, Model, softabs_point, BaseRNG> {
  private:
   typedef typename stan::math::index_type<Eigen::VectorXd>::type idx_t;
 
  public:
   explicit softabs_metric(const Model& model)
-      : base_hamiltonian<Model, softabs_point, BaseRNG>(model) {}
+      : base_hamiltonian<softabs_metric<Model, BaseRNG>, Model, softabs_point, BaseRNG>(model) {}
 
-  double T(softabs_point& z) { return this->tau(z) + 0.5 * z.log_det_metric; }
+  inline auto T(softabs_point& z) { return this->tau(z) + 0.5 * z.log_det_metric; }
 
   double tau(softabs_point& z) {
-    Eigen::VectorXd Qp = z.eigen_deco.eigenvectors().transpose() * z.p;
+    auto Qp = z.eigen_deco.eigenvectors().transpose() * z.p;
     return 0.5 * Qp.transpose() * z.softabs_lambda_inv.cwiseProduct(Qp);
   }
 
-  double phi(softabs_point& z) { return this->V(z) + 0.5 * z.log_det_metric; }
+  inline auto phi(softabs_point& z) { return this->V(z) + 0.5 * z.log_det_metric; }
 
-  double dG_dt(softabs_point& z, callbacks::logger& logger) {
+  inline auto dG_dt(softabs_point& z, callbacks::logger& logger) {
     return 2 * T(z) - z.q.dot(dtau_dq(z, logger) + dphi_dq(z, logger));
   }
 
   Eigen::VectorXd dtau_dq(softabs_point& z, callbacks::logger& logger) {
-    Eigen::VectorXd a = z.softabs_lambda_inv.cwiseProduct(
+    // inline auto here builds up an eigen expression
+    auto a = z.softabs_lambda_inv.cwiseProduct(
         z.eigen_deco.eigenvectors().transpose() * z.p);
-    Eigen::MatrixXd A
+    auto A
         = a.asDiagonal() * z.eigen_deco.eigenvectors().transpose();
-    Eigen::MatrixXd B = z.pseudo_j.selfadjointView<Eigen::Lower>() * A;
-    Eigen::MatrixXd C = A.transpose() * B;
+    auto B = z.pseudo_j.selfadjointView<Eigen::Lower>() * A;
+    auto C = A.transpose() * B;
 
     Eigen::VectorXd b(z.q.size());
     stan::math::grad_tr_mat_times_hessian(softabs_fun<Model>(this->model_, 0),
-                                          z.q, C, b);
+                                          z.q, C.eval(), b);
 
     return 0.5 * b;
   }
@@ -82,7 +83,7 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
     return -0.5 * a + z.g;
   }
 
-  void sample_p(softabs_point& z, BaseRNG& rng) {
+  inline void sample_p(softabs_point& z, BaseRNG& rng) {
     boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
         rand_unit_gaus(rng, boost::normal_distribution<>());
 
@@ -94,12 +95,12 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
     z.p = z.eigen_deco.eigenvectors() * a;
   }
 
-  void init(softabs_point& z, callbacks::logger& logger) {
+  inline void init(softabs_point& z, callbacks::logger& logger) {
     update_metric(z, logger);
     update_metric_gradient(z, logger);
   }
 
-  void update_metric(softabs_point& z, callbacks::logger& logger) {
+  inline void update_metric(softabs_point& z, callbacks::logger& logger) {
     math::hessian<softabs_fun<Model> >(softabs_fun<Model>(this->model_, 0), z.q,
                                        z.V, z.g, z.hessian);
     z.V = -z.V;
@@ -136,7 +137,7 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
       z.log_det_metric += std::log(z.softabs_lambda(i));
   }
 
-  void update_metric_gradient(softabs_point& z, callbacks::logger& logger) {
+  inline void update_metric_gradient(softabs_point& z, callbacks::logger& logger) {
     // Compute the pseudo-Jacobian of the SoftAbs transform
     for (idx_t i = 0; i < z.q.size(); ++i) {
       for (idx_t j = 0; j <= i; ++j) {
@@ -168,7 +169,7 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
     }
   }
 
-  void update_gradients(softabs_point& z, callbacks::logger& logger) {
+  inline void update_gradients(softabs_point& z, callbacks::logger& logger) {
     update_metric_gradient(z, logger);
   }
 

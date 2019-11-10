@@ -14,34 +14,40 @@ namespace mcmc {
 
 // Euclidean manifold with dense metric
 template <class Model, class BaseRNG>
-class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
+class dense_e_metric : public base_hamiltonian<dense_e_metric<Model, BaseRNG>, Model, dense_e_point, BaseRNG> {
  public:
   explicit dense_e_metric(const Model& model)
-      : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
-
-  double T(dense_e_point& z) {
+      : base_hamiltonian<dense_e_metric<Model, BaseRNG>, Model, dense_e_point, BaseRNG>(model) {
+        dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
+      }
+  Eigen::VectorXd dtau_dq_;
+  inline auto T(dense_e_point& z) {
     return 0.5 * z.p.transpose() * z.inv_e_metric_ * z.p;
   }
 
-  double tau(dense_e_point& z) { return T(z); }
+  inline auto tau(dense_e_point& z) { return T(z); }
 
-  double phi(dense_e_point& z) { return this->V(z); }
+  inline auto phi(dense_e_point& z) { return this->V(z); }
 
-  double dG_dt(dense_e_point& z, callbacks::logger& logger) {
+  inline auto dG_dt(dense_e_point& z, callbacks::logger& logger) {
     return 2 * T(z) - z.q.dot(z.g);
   }
 
-  Eigen::VectorXd dtau_dq(dense_e_point& z, callbacks::logger& logger) {
-    return Eigen::VectorXd::Zero(this->model_.num_params_r());
+  inline auto dtau_dq(dense_e_point& z, callbacks::logger& logger) {
+    return dtau_dq_;
   }
 
-  Eigen::VectorXd dtau_dp(dense_e_point& z) { return z.inv_e_metric_ * z.p; }
+  inline const auto dtau_dq(dense_e_point& z, callbacks::logger& logger) const {
+    return dtau_dq_;
+  }
 
-  Eigen::VectorXd dphi_dq(dense_e_point& z, callbacks::logger& logger) {
+  inline auto dtau_dp(dense_e_point& z) { return z.inv_e_metric_ * z.p; }
+
+  inline auto& dphi_dq(dense_e_point& z, callbacks::logger& logger) {
     return z.g;
   }
 
-  void sample_p(dense_e_point& z, BaseRNG& rng) {
+  inline void sample_p(dense_e_point& z, BaseRNG& rng) {
     typedef typename stan::math::index_type<Eigen::VectorXd>::type idx_t;
     boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
         rand_dense_gaus(rng, boost::normal_distribution<>());

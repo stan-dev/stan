@@ -58,11 +58,12 @@ class edge_inspector_mock_nuts
 
 // Mock Hamiltonian
 template <typename M, typename BaseRNG>
-class divergent_hamiltonian : public base_hamiltonian<M, ps_point, BaseRNG> {
+class divergent_hamiltonian : public base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point, BaseRNG> {
  public:
   divergent_hamiltonian(const M& m)
-      : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
+      : base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point, BaseRNG>(m) {}
 
+  using point_type = ps_point;
   double T(ps_point& z) { return 0; }
 
   double tau(ps_point& z) { return T(z); }
