@@ -34,7 +34,7 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
  public:
   explicit softabs_metric(const Model& model)
       : base_hamiltonian<Model, softabs_point, BaseRNG>(model) {}
-
+  using point_type = softabs_point;
   double T(softabs_point& z) { return this->tau(z) + 0.5 * z.log_det_metric; }
 
   double tau(softabs_point& z) {

@@ -18,6 +18,7 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
  public:
   explicit dense_e_metric(const Model& model)
       : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
+  using point_type = dense_e_point;
 
   double T(dense_e_point& z) {
     return 0.5 * z.p.transpose() * z.inv_e_metric_ * z.p;

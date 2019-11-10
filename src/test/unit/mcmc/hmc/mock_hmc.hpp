@@ -68,7 +68,7 @@ class mock_integrator : public base_integrator<Hamiltonian> {
  public:
   mock_integrator() : base_integrator<Hamiltonian>() {}
 
-  void evolve(typename Hamiltonian::PointType& z, Hamiltonian& hamiltonian,
+  void evolve(typename Hamiltonian::point_type& z, Hamiltonian& hamiltonian,
               const double epsilon, callbacks::logger& logger) {
     z.q += epsilon * z.p;
   };

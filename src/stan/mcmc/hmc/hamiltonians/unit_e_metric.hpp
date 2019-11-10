@@ -15,7 +15,7 @@ class unit_e_metric : public base_hamiltonian<Model, unit_e_point, BaseRNG> {
  public:
   explicit unit_e_metric(const Model& model)
       : base_hamiltonian<Model, unit_e_point, BaseRNG>(model) {}
-
+  using point_type = unit_e_point;
   double T(unit_e_point& z) { return 0.5 * z.p.squaredNorm(); }
 
   double tau(unit_e_point& z) { return T(z); }

@@ -36,7 +36,7 @@ TEST(McmcUnitENuts, build_tree_test) {
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
-  stan::mcmc::ps_point z_propose = z_init;
+  stan::mcmc::unit_e_point z_propose = z_init;
 
   Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(z_init.p.size());
   Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(z_init.p.size());
@@ -177,7 +177,7 @@ TEST(McmcUnitENuts, tree_boundary_test) {
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
-  stan::mcmc::ps_point z_propose = z_init;
+  stan::mcmc::unit_e_point z_propose = z_init;
 
   Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(z_init.p.size());
   Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(z_init.p.size());

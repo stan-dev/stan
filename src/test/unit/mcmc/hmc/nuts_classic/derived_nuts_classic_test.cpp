@@ -16,7 +16,7 @@ TEST(McmcDerivedNutsClassic, compute_criterion_unit_e) {
 
   int model_size = 1;
 
-  stan::mcmc::ps_point start(model_size);
+  stan::mcmc::unit_e_point start(model_size);
   stan::mcmc::unit_e_point finish(model_size);
   Eigen::VectorXd rho(model_size);
 
@@ -50,7 +50,7 @@ TEST(McmcDerivedNutsClassic, compute_criterion_diag_e) {
 
   int model_size = 1;
 
-  stan::mcmc::ps_point start(model_size);
+  stan::mcmc::diag_e_point start(model_size);
   stan::mcmc::diag_e_point finish(model_size);
   Eigen::VectorXd rho(model_size);
 
@@ -84,7 +84,7 @@ TEST(McmcDerivedNutsClassic, compute_criterion_dense_e) {
 
   int model_size = 1;
 
-  stan::mcmc::ps_point start(model_size);
+  stan::mcmc::dense_e_point start(model_size);
   stan::mcmc::dense_e_point finish(model_size);
   Eigen::VectorXd rho(model_size);
 

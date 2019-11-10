@@ -46,6 +46,7 @@ class base_nuts_classic
         energy_(0) {}
 
   ~base_nuts_classic() {}
+  using point_type = typename Hamiltonian<Model, BaseRNG>::point_type;
 
   void set_max_depth(int d) {
     if (d > 0)
@@ -68,11 +69,11 @@ class base_nuts_classic
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);
     this->hamiltonian_.init(this->z_, logger);
 
-    ps_point z_plus(this->z_);
-    ps_point z_minus(z_plus);
+    point_type z_plus(this->z_);
+    point_type z_minus(z_plus);
 
-    ps_point z_sample(z_plus);
-    ps_point z_propose(z_plus);
+    point_type z_sample(z_plus);
+    point_type z_propose(z_plus);
 
     int n_cont = init_sample.cont_params().size();
 
@@ -99,7 +100,7 @@ class base_nuts_classic
 
     while (util.criterion && (this->depth_ <= this->max_depth_)) {
       // Randomly sample a direction in time
-      ps_point* z = 0;
+      point_type* z = 0;
       Eigen::VectorXd* rho = 0;
 
       if (this->rand_uniform_() > 0.5) {
@@ -113,7 +114,7 @@ class base_nuts_classic
       }
 
       // And build a new subtree in that direction
-      this->z_.ps_point::operator=(*z);
+      this->z_ = *z;
 
       int n_valid_subtree
           = build_tree(depth_, *rho, 0, z_propose, util, logger);
@@ -140,7 +141,7 @@ class base_nuts_classic
       n_valid += n_valid_subtree;
 
       // Check validity of completed tree
-      this->z_.ps_point::operator=(z_plus);
+      this->z_ = z_plus;
       Eigen::VectorXd delta_rho = rho_minus + rho_init + rho_plus;
 
       util.criterion = compute_criterion(z_minus, this->z_, delta_rho);
@@ -150,7 +151,7 @@ class base_nuts_classic
 
     double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
 
-    this->z_.ps_point::operator=(z_sample);
+    this->z_ = z_sample;
     this->energy_ = this->hamiltonian_.H(this->z_);
     return sample(this->z_.q, -this->z_.V, accept_prob);
   }
@@ -172,13 +173,13 @@ class base_nuts_classic
   }
 
   virtual bool compute_criterion(
-      ps_point& start, typename Hamiltonian<Model, BaseRNG>::PointType& finish,
+      point_type& start, typename Hamiltonian<Model, BaseRNG>::point_type& finish,
       Eigen::VectorXd& rho)
       = 0;
 
   // Returns number of valid points in the completed subtree
-  int build_tree(int depth, Eigen::VectorXd& rho, ps_point* z_init_parent,
-                 ps_point& z_propose, nuts_util& util,
+  int build_tree(int depth, Eigen::VectorXd& rho, point_type* z_init_parent,
+                 point_type& z_propose, nuts_util& util,
                  callbacks::logger& logger) {
     // Base case
     if (depth == 0) {
@@ -207,7 +208,7 @@ class base_nuts_classic
       // General recursion
       Eigen::VectorXd left_subtree_rho(rho.size());
       left_subtree_rho.setZero();
-      ps_point z_init(this->z_);
+      point_type z_init(this->z_);
 
       int n1 = build_tree(depth - 1, left_subtree_rho, &z_init, z_propose, util,
                           logger);
@@ -220,7 +221,7 @@ class base_nuts_classic
 
       Eigen::VectorXd right_subtree_rho(rho.size());
       right_subtree_rho.setZero();
-      ps_point z_propose_right(z_init);
+      point_type z_propose_right(z_init);
 
       int n2 = build_tree(depth - 1, right_subtree_rho, 0, z_propose_right,
                           util, logger);

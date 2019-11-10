@@ -17,10 +17,11 @@ class dense_e_nuts_classic
   dense_e_nuts_classic(const Model& model, BaseRNG& rng)
       : base_nuts_classic<Model, dense_e_metric, expl_leapfrog, BaseRNG>(model,
                                                                          rng) {}
+ using point_type = typename dense_e_metric<Model, BaseRNG>::point_type;
 
   // Note that the points don't need to be swapped
   // here since start.inv_e_metric_ = finish.inv_e_metric_
-  bool compute_criterion(ps_point& start, dense_e_point& finish,
+  bool compute_criterion(point_type& start, point_type& finish,
                          Eigen::VectorXd& rho) {
     return finish.p.transpose() * finish.inv_e_metric_ * (rho - finish.p) > 0
            && start.p.transpose() * finish.inv_e_metric_ * (rho - start.p) > 0;

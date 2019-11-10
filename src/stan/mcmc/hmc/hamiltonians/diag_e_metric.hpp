@@ -16,7 +16,7 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
  public:
   explicit diag_e_metric(const Model& model)
       : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {}
-
+  using point_type = diag_e_point;
   double T(diag_e_point& z) {
     return 0.5 * z.p.dot(z.inv_e_metric_.cwiseProduct(z.p));
   }

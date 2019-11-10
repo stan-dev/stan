@@ -32,6 +32,7 @@ class base_hmc : public base_mcmc {
         epsilon_(nom_epsilon_),
         epsilon_jitter_(0.0) {}
 
+  using point_type = typename Hamiltonian<Model, BaseRNG>::point_type;
   /**
    * format and write stepsize
    */
@@ -72,7 +73,7 @@ class base_hmc : public base_mcmc {
   }
 
   void init_stepsize(callbacks::logger& logger) {
-    ps_point z_init(this->z_);
+    point_type z_init(this->z_);
 
     // Skip initialization for extreme step sizes
     if (this->nom_epsilon_ == 0 || this->nom_epsilon_ > 1e7)
@@ -96,7 +97,7 @@ class base_hmc : public base_mcmc {
     int direction = delta_H > std::log(0.8) ? 1 : -1;
 
     while (1) {
-      this->z_.ps_point::operator=(z_init);
+      this->z_ = z_init;
 
       this->hamiltonian_.sample_p(this->z_, this->rand_int_);
       this->hamiltonian_.init(this->z_, logger);
@@ -131,10 +132,11 @@ class base_hmc : public base_mcmc {
             "not continuous?");
     }
 
-    this->z_.ps_point::operator=(z_init);
+    this->z_ = z_init;
   }
 
-  typename Hamiltonian<Model, BaseRNG>::PointType& z() { return z_; }
+  point_type& z() { return z_; }
+  const point_type& z() const { return z_; }
 
   virtual void set_nominal_stepsize(double e) {
     if (e > 0)
@@ -160,8 +162,8 @@ class base_hmc : public base_mcmc {
   }
 
  protected:
-  typename Hamiltonian<Model, BaseRNG>::PointType z_;
-  Integrator<Hamiltonian<Model, BaseRNG> > integrator_;
+  point_type z_;
+  Integrator<Hamiltonian<Model, BaseRNG>> integrator_;
   Hamiltonian<Model, BaseRNG> hamiltonian_;
 
   BaseRNG& rand_int_;

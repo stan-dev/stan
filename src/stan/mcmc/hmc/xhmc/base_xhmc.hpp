@@ -34,7 +34,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
         energy_(0) {}
 
   ~base_xhmc() {}
-
+  using point_type = typename Hamiltonian<Model, BaseRNG>::point_type;
   void set_max_depth(int d) {
     if (d > 0)
       max_depth_ = d;
@@ -60,11 +60,11 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);
     this->hamiltonian_.init(this->z_, logger);
 
-    ps_point z_plus(this->z_);
-    ps_point z_minus(z_plus);
+    point_type z_plus(this->z_);
+    point_type z_minus(z_plus);
 
-    ps_point z_sample(z_plus);
-    ps_point z_propose(z_plus);
+    point_type z_sample(z_plus);
+    point_type z_propose(z_plus);
 
     double ave = this->hamiltonian_.dG_dt(this->z_, logger);
     double log_sum_weight = 0;  // log(exp(H0 - H0))
@@ -84,17 +84,17 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       double log_sum_weight_subtree = -std::numeric_limits<double>::infinity();
 
       if (this->rand_uniform_() > 0.5) {
-        this->z_.ps_point::operator=(z_plus);
+        this->z_ = z_plus;
         valid_subtree = build_tree(this->depth_, z_propose, ave_subtree,
                                    log_sum_weight_subtree, H0, 1, n_leapfrog,
                                    sum_metro_prob, logger);
-        z_plus.ps_point::operator=(this->z_);
+        z_plus = this->z_;
       } else {
-        this->z_.ps_point::operator=(z_minus);
+        this->z_ = z_minus;
         valid_subtree = build_tree(this->depth_, z_propose, ave_subtree,
                                    log_sum_weight_subtree, H0, -1, n_leapfrog,
                                    sum_metro_prob, logger);
-        z_minus.ps_point::operator=(this->z_);
+        z_minus = this->z_;
       }
 
       if (!valid_subtree)
@@ -120,7 +120,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     // even over subtrees that may have been rejected
     double accept_prob = sum_metro_prob / static_cast<double>(n_leapfrog + 1);
 
-    this->z_.ps_point::operator=(z_sample);
+    this->z_ = z_sample;
     this->energy_ = this->hamiltonian_.H(this->z_);
     return sample(this->z_.q, -this->z_.V, accept_prob);
   }
@@ -157,7 +157,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * @param logger Logger for messages
    * @return whether built tree is valid
    */
-  bool build_tree(int depth, ps_point& z_propose, double& ave,
+  bool build_tree(int depth, point_type& z_propose, double& ave,
                   double& log_sum_weight, double H0, double sign,
                   int& n_leapfrog, double& sum_metro_prob,
                   callbacks::logger& logger) {
@@ -204,7 +204,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
         = stable_sum(ave, log_sum_weight, ave_left, log_sum_weight_left);
 
     // Build the right subtree
-    ps_point z_propose_right(this->z_);
+    point_type z_propose_right(this->z_);
     double ave_right = 0;
     double log_sum_weight_right = -std::numeric_limits<double>::infinity();
 

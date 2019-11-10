@@ -36,7 +36,7 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
-  stan::mcmc::ps_point z_propose = z_init;
+  stan::mcmc::softabs_point z_propose = z_init;
 
   Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(3);
   Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(3);
@@ -177,7 +177,7 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
-  stan::mcmc::ps_point z_propose = z_init;
+  stan::mcmc::softabs_point z_propose = z_init;
 
   Eigen::VectorXd p_begin = Eigen::VectorXd::Zero(3);
   Eigen::VectorXd p_sharp_begin = Eigen::VectorXd::Zero(3);

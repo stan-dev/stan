@@ -57,6 +57,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
         energy_(0) {}
 
   ~base_nuts() {}
+  using point_type = typename Hamiltonian<Model, BaseRNG>::point_type;
 
   void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);
@@ -85,11 +86,11 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);
     this->hamiltonian_.init(this->z_, logger);
 
-    ps_point z_fwd(this->z_);  // State at forward end of trajectory
-    ps_point z_bck(z_fwd);     // State at backward end of trajectory
+    point_type z_fwd(this->z_);  // State at forward end of trajectory
+    point_type z_bck(z_fwd);     // State at backward end of trajectory
 
-    ps_point z_sample(z_fwd);
-    ps_point z_propose(z_fwd);
+    point_type z_sample(z_fwd);
+    point_type z_propose(z_fwd);
 
     // Momentum and sharp momentum at forward end of forward subtree
     Eigen::VectorXd p_fwd_fwd = this->z_.p;
@@ -131,7 +132,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
       if (this->rand_uniform_() > 0.5) {
         // Extend the current trajectory forward
-        this->z_.ps_point::operator=(z_fwd);
+        this->z_ = z_fwd;
         rho_bck = rho;
         p_bck_fwd = p_fwd_fwd;
         p_sharp_bck_fwd = p_sharp_fwd_fwd;
@@ -140,10 +141,10 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
             this->depth_, z_propose, p_sharp_fwd_bck, p_sharp_fwd_fwd, rho_fwd,
             p_fwd_bck, p_fwd_fwd, H0, 1, n_leapfrog, log_sum_weight_subtree,
             sum_metro_prob, logger);
-        z_fwd.ps_point::operator=(this->z_);
+        z_fwd = this->z_;
       } else {
         // Extend the current trajectory backwards
-        this->z_.ps_point::operator=(z_bck);
+        this->z_ = z_bck;
         rho_fwd = rho;
         p_fwd_bck = p_bck_bck;
         p_sharp_fwd_bck = p_sharp_bck_bck;
@@ -152,7 +153,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
             this->depth_, z_propose, p_sharp_bck_fwd, p_sharp_bck_bck, rho_bck,
             p_bck_fwd, p_bck_bck, H0, -1, n_leapfrog, log_sum_weight_subtree,
             sum_metro_prob, logger);
-        z_bck.ps_point::operator=(this->z_);
+        z_bck = this->z_;
       }
 
       if (!valid_subtree)
@@ -199,7 +200,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     // even over subtrees that may have been rejected
     double accept_prob = sum_metro_prob / static_cast<double>(n_leapfrog);
 
-    this->z_.ps_point::operator=(z_sample);
+    this->z_ = z_sample;
     this->energy_ = this->hamiltonian_.H(this->z_);
     return sample(this->z_.q, -this->z_.V, accept_prob);
   }
@@ -245,7 +246,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * @param sum_metro_prob Summed Metropolis probabilities across trajectory
    * @param logger Logger for messages
    */
-  bool build_tree(int depth, ps_point& z_propose, Eigen::VectorXd& p_sharp_beg,
+  bool build_tree(int depth, point_type& z_propose, Eigen::VectorXd& p_sharp_beg,
                   Eigen::VectorXd& p_sharp_end, Eigen::VectorXd& rho,
                   Eigen::VectorXd& p_beg, Eigen::VectorXd& p_end, double H0,
                   double sign, int& n_leapfrog, double& log_sum_weight,
@@ -301,7 +302,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       return false;
 
     // Build the final subtree
-    ps_point z_propose_final(this->z_);
+    point_type z_propose_final(this->z_);
 
     double log_sum_weight_final = -std::numeric_limits<double>::infinity();
 

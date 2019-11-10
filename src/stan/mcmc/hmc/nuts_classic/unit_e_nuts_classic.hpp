@@ -18,7 +18,9 @@ class unit_e_nuts_classic
       : base_nuts_classic<Model, unit_e_metric, expl_leapfrog, BaseRNG>(model,
                                                                         rng) {}
 
-  bool compute_criterion(ps_point& start, unit_e_point& finish,
+  using point_type = typename unit_e_metric<Model, BaseRNG>::point_type;
+
+  bool compute_criterion(point_type& start, point_type& finish,
                          Eigen::VectorXd& rho) {
     return finish.p.dot(rho - finish.p) > 0 && start.p.dot(rho - start.p) > 0;
   }

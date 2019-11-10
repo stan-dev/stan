@@ -36,7 +36,7 @@ TEST(McmcUnitEXHMC, build_tree) {
   sampler.set_stepsize_jitter(0);
   sampler.sample_stepsize();
 
-  stan::mcmc::ps_point z_propose = z_init;
+  stan::mcmc::unit_e_point z_propose = z_init;
 
   double ave = 0;
   double log_sum_weight = -std::numeric_limits<double>::infinity();
