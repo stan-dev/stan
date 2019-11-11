@@ -20,10 +20,13 @@ class mock_xhmc
 
 // Mock Hamiltonian
 template <typename M, typename BaseRNG>
-class divergent_hamiltonian : public base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point, BaseRNG> {
+class divergent_hamiltonian
+    : public base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point,
+                              BaseRNG> {
  public:
   divergent_hamiltonian(const M& m)
-      : base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point, BaseRNG>(m) {}
+      : base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point,
+                         BaseRNG>(m) {}
 
   auto T(ps_point& z) { return 0.0; }
 
@@ -58,7 +61,7 @@ class divergent_xhmc : public base_xhmc<mock_model, divergent_hamiltonian,
  public:
   divergent_xhmc(const mock_model& m, rng_t& rng)
       : base_xhmc<mock_model, divergent_hamiltonian, expl_leapfrog, rng_t>(
-            m, rng) {}
+          m, rng) {}
 };
 
 }  // namespace mcmc

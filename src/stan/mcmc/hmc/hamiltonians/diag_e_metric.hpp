@@ -12,11 +12,13 @@ namespace mcmc {
 
 // Euclidean manifold with diagonal metric
 template <class Model, class BaseRNG>
-class diag_e_metric : public base_hamiltonian<diag_e_metric<Model, BaseRNG>, Model, diag_e_point, BaseRNG> {
+class diag_e_metric : public base_hamiltonian<diag_e_metric<Model, BaseRNG>,
+                                              Model, diag_e_point, BaseRNG> {
  public:
   explicit diag_e_metric(const Model& model)
-      : base_hamiltonian<diag_e_metric<Model, BaseRNG>, Model, diag_e_point, BaseRNG>(model) {
-        dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
+      : base_hamiltonian<diag_e_metric<Model, BaseRNG>, Model, diag_e_point,
+                         BaseRNG>(model) {
+    dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
   }
 
   Eigen::VectorXd dtau_dq_;

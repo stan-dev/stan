@@ -25,7 +25,7 @@ class ps_point {
   double V{0};
 
   inline void get_param_names(std::vector<std::string>& model_names,
-                                      std::vector<std::string>& names) {
+                              std::vector<std::string>& names) {
     names.reserve(q.size() + p.size() + g.size());
     for (int i = 0; i < q.size(); ++i)
       names.emplace_back(model_names[i]);

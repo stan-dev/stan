@@ -58,10 +58,13 @@ class edge_inspector_mock_nuts
 
 // Mock Hamiltonian
 template <typename M, typename BaseRNG>
-class divergent_hamiltonian : public base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point, BaseRNG> {
+class divergent_hamiltonian
+    : public base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point,
+                              BaseRNG> {
  public:
   divergent_hamiltonian(const M& m)
-      : base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point, BaseRNG>(m) {}
+      : base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point,
+                         BaseRNG>(m) {}
 
   using point_type = ps_point;
   double T(ps_point& z) { return 0; }
@@ -97,7 +100,7 @@ class divergent_nuts : public base_nuts<mock_model, divergent_hamiltonian,
  public:
   divergent_nuts(const mock_model& m, rng_t& rng)
       : base_nuts<mock_model, divergent_hamiltonian, expl_leapfrog, rng_t>(
-            m, rng) {}
+          m, rng) {}
 };
 
 }  // namespace mcmc

@@ -27,33 +27,38 @@ struct softabs_fun {
 
 // Riemannian manifold with SoftAbs metric
 template <class Model, class BaseRNG>
-class softabs_metric : public base_hamiltonian<softabs_metric<Model, BaseRNG>, Model, softabs_point, BaseRNG> {
+class softabs_metric : public base_hamiltonian<softabs_metric<Model, BaseRNG>,
+                                               Model, softabs_point, BaseRNG> {
  private:
   typedef typename stan::math::index_type<Eigen::VectorXd>::type idx_t;
 
  public:
   explicit softabs_metric(const Model& model)
-      : base_hamiltonian<softabs_metric<Model, BaseRNG>, Model, softabs_point, BaseRNG>(model) {}
+      : base_hamiltonian<softabs_metric<Model, BaseRNG>, Model, softabs_point,
+                         BaseRNG>(model) {}
 
-  inline auto T(softabs_point& z) { return this->tau(z) + 0.5 * z.log_det_metric; }
+  inline auto T(softabs_point& z) {
+    return this->tau(z) + 0.5 * z.log_det_metric;
+  }
 
-  double tau(softabs_point& z) {
+  inline double tau(softabs_point& z) {
     auto Qp = z.eigen_deco.eigenvectors().transpose() * z.p;
     return 0.5 * Qp.transpose() * z.softabs_lambda_inv.cwiseProduct(Qp);
   }
 
-  inline auto phi(softabs_point& z) { return this->V(z) + 0.5 * z.log_det_metric; }
+  inline auto phi(softabs_point& z) {
+    return this->V(z) + 0.5 * z.log_det_metric;
+  }
 
   inline auto dG_dt(softabs_point& z, callbacks::logger& logger) {
     return 2 * T(z) - z.q.dot(dtau_dq(z, logger) + dphi_dq(z, logger));
   }
 
-  Eigen::VectorXd dtau_dq(softabs_point& z, callbacks::logger& logger) {
+  inline Eigen::VectorXd dtau_dq(softabs_point& z, callbacks::logger& logger) {
     // inline auto here builds up an eigen expression
     auto a = z.softabs_lambda_inv.cwiseProduct(
         z.eigen_deco.eigenvectors().transpose() * z.p);
-    auto A
-        = a.asDiagonal() * z.eigen_deco.eigenvectors().transpose();
+    auto A = a.asDiagonal() * z.eigen_deco.eigenvectors().transpose();
     auto B = z.pseudo_j.selfadjointView<Eigen::Lower>() * A;
     auto C = A.transpose() * B;
 
@@ -64,13 +69,13 @@ class softabs_metric : public base_hamiltonian<softabs_metric<Model, BaseRNG>, M
     return 0.5 * b;
   }
 
-  Eigen::VectorXd dtau_dp(softabs_point& z) {
+  inline Eigen::VectorXd dtau_dp(softabs_point& z) {
     return z.eigen_deco.eigenvectors()
            * z.softabs_lambda_inv.cwiseProduct(
-                 z.eigen_deco.eigenvectors().transpose() * z.p);
+               z.eigen_deco.eigenvectors().transpose() * z.p);
   }
 
-  Eigen::VectorXd dphi_dq(softabs_point& z, callbacks::logger& logger) {
+  inline Eigen::VectorXd dphi_dq(softabs_point& z, callbacks::logger& logger) {
     Eigen::VectorXd a
         = z.softabs_lambda_inv.cwiseProduct(z.pseudo_j.diagonal());
     Eigen::MatrixXd A
@@ -137,7 +142,8 @@ class softabs_metric : public base_hamiltonian<softabs_metric<Model, BaseRNG>, M
       z.log_det_metric += std::log(z.softabs_lambda(i));
   }
 
-  inline void update_metric_gradient(softabs_point& z, callbacks::logger& logger) {
+  inline void update_metric_gradient(softabs_point& z,
+                                     callbacks::logger& logger) {
     // Compute the pseudo-Jacobian of the SoftAbs transform
     for (idx_t i = 0; i < z.q.size(); ++i) {
       for (idx_t j = 0; j <= i; ++j) {

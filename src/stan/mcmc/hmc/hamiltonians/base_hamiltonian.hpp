@@ -14,7 +14,17 @@
 namespace stan {
 namespace mcmc {
 
-template <typename Derived, typename Model, typename PointType, typename BaseRNG>
+/**
+ * Base CRTP class for hamiltonians.
+ * @tparam Derived type that inherits from base_hamiltonian and defines members
+ * functions @c T, @c tau @c phi @c dG_dt, @c dtau_dq, @c dtau_dp, @c dphi_dq,
+ * and @c sample_p
+ * @tparam Model class that can take returns log probability
+ * @tparam PointType type that inherits from ps_point
+ * @tparam BaseRNG a random number generator class.
+ */
+template <typename Derived, typename Model, typename PointType,
+          typename BaseRNG>
 class base_hamiltonian {
  public:
   explicit base_hamiltonian(const Model& model) : model_(model) {}
@@ -23,21 +33,17 @@ class base_hamiltonian {
   // modifier to the derived class
   inline Derived& derived() { return static_cast<Derived&>(*this); }
   // inspector to the derived class
-  inline const Derived& derived() const { return static_cast<Derived const&>(*this); }
+  inline const Derived& derived() const {
+    return static_cast<Derived const&>(*this);
+  }
 
-  inline auto T(point_type& z) {
-    return this->derived().T(z);
-  };
+  inline auto T(point_type& z) { return this->derived().T(z); };
 
   inline auto V(point_type& z) { return z.V; }
 
-  inline auto tau(point_type& z){
-    return this->derived().tau(z);
-  };
+  inline auto tau(point_type& z) { return this->derived().tau(z); };
 
-  inline auto phi(point_type& z) {
-    return this->derived().phi(z);
-  };
+  inline auto phi(point_type& z) { return this->derived().phi(z); };
 
   inline auto H(point_type& z) { return T(z) + V(z); }
 
@@ -51,9 +57,7 @@ class base_hamiltonian {
     return this->derived().dtau_dq(z, logger);
   };
 
-  inline auto dtau_dp(point_type& z) {
-    return this->derived().dtau_dp(z);
-  };
+  inline auto dtau_dp(point_type& z) { return this->derived().dtau_dp(z); };
 
   // phi = 0.5 * log | Lambda (q) | + V(q)
   inline auto dphi_dq(point_type& z, callbacks::logger& logger) {
@@ -77,7 +81,8 @@ class base_hamiltonian {
     }
   }
 
-  inline void update_potential_gradient(point_type& z, callbacks::logger& logger) {
+  inline void update_potential_gradient(point_type& z,
+                                        callbacks::logger& logger) {
     try {
       stan::model::gradient(model_, z.q, z.V, z.g, logger);
       z.V = -z.V;
@@ -90,7 +95,8 @@ class base_hamiltonian {
 
   inline void update_metric(point_type& z, callbacks::logger& logger) {}
 
-  inline void update_metric_gradient(point_type& z, callbacks::logger& logger) {}
+  inline void update_metric_gradient(point_type& z, callbacks::logger& logger) {
+  }
 
   inline void update_gradients(point_type& z, callbacks::logger& logger) {
     update_potential_gradient(z, logger);
@@ -99,7 +105,8 @@ class base_hamiltonian {
  protected:
   const Model& model_;
 
-  inline void write_error_msg_(const std::exception& e, callbacks::logger& logger) {
+  inline void write_error_msg_(const std::exception& e,
+                               callbacks::logger& logger) {
     logger.error(
         "Informational Message: The current Metropolis proposal "
         "is about to be rejected because of the following issue:");

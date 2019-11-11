@@ -15,7 +15,7 @@ class mock_nuts_classic : public base_nuts_classic<mock_model, mock_hamiltonian,
  public:
   mock_nuts_classic(const mock_model& m, rng_t& rng)
       : base_nuts_classic<mock_model, mock_hamiltonian, mock_integrator, rng_t>(
-            m, rng) {}
+          m, rng) {}
 
  private:
   bool compute_criterion(ps_point& start, ps_point& finish,
@@ -26,10 +26,13 @@ class mock_nuts_classic : public base_nuts_classic<mock_model, mock_hamiltonian,
 
 // Mock Hamiltonian
 template <typename M, typename BaseRNG>
-class divergent_hamiltonian : public base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point, BaseRNG> {
+class divergent_hamiltonian
+    : public base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point,
+                              BaseRNG> {
  public:
   divergent_hamiltonian(const M& m)
-      : base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point, BaseRNG>(m) {}
+      : base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point,
+                         BaseRNG>(m) {}
 
   using point_type = ps_point;
   auto T(ps_point& z) { return 0.0; }

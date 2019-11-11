@@ -14,12 +14,14 @@ namespace mcmc {
 
 // Euclidean manifold with dense metric
 template <class Model, class BaseRNG>
-class dense_e_metric : public base_hamiltonian<dense_e_metric<Model, BaseRNG>, Model, dense_e_point, BaseRNG> {
+class dense_e_metric : public base_hamiltonian<dense_e_metric<Model, BaseRNG>,
+                                               Model, dense_e_point, BaseRNG> {
  public:
   explicit dense_e_metric(const Model& model)
-      : base_hamiltonian<dense_e_metric<Model, BaseRNG>, Model, dense_e_point, BaseRNG>(model) {
-        dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
-      }
+      : base_hamiltonian<dense_e_metric<Model, BaseRNG>, Model, dense_e_point,
+                         BaseRNG>(model) {
+    dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
+  }
   Eigen::VectorXd dtau_dq_;
   inline auto T(dense_e_point& z) {
     return 0.5 * z.p.transpose() * z.inv_e_metric_ * z.p;
