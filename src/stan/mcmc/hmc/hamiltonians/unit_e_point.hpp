@@ -12,11 +12,10 @@ namespace mcmc {
 class unit_e_point : public ps_point {
  public:
   explicit unit_e_point(int n) : ps_point(n) {}
+  inline void write_metric(stan::callbacks::writer& writer) final {
+    writer("No free parameters for unit metric");
+  }
 };
-
-inline void write_metric(stan::callbacks::writer& writer) {
-  writer("No free parameters for unit metric");
-}
 
 }  // namespace mcmc
 }  // namespace stan

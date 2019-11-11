@@ -11,28 +11,32 @@ namespace mcmc {
 
 // Euclidean manifold with unit metric
 template <class Model, class BaseRNG>
-class unit_e_metric : public base_hamiltonian<Model, unit_e_point, BaseRNG> {
+class unit_e_metric : public base_hamiltonian<unit_e_metric<Model, BaseRNG>,
+                                              Model, unit_e_point, BaseRNG> {
  public:
   explicit unit_e_metric(const Model& model)
-      : base_hamiltonian<Model, unit_e_point, BaseRNG>(model) {}
+      : base_hamiltonian<unit_e_metric<Model, BaseRNG>, Model, unit_e_point,
+                         BaseRNG>(model) {
+    dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
+  }
+  Eigen::VectorXd dtau_dq_;
+  inline auto T(unit_e_point& z) { return 0.5 * z.p.squaredNorm(); }
 
-  inline double T(unit_e_point& z) { return 0.5 * z.p.squaredNorm(); }
+  inline auto tau(unit_e_point& z) { return T(z); }
 
-  inline double tau(unit_e_point& z) { return T(z); }
+  inline auto phi(unit_e_point& z) { return this->V(z); }
 
-  inline double phi(unit_e_point& z) { return this->V(z); }
-
-  inline double dG_dt(unit_e_point& z, callbacks::logger& logger) {
+  inline auto dG_dt(unit_e_point& z, callbacks::logger& logger) {
     return 2 * T(z) - z.q.dot(z.g);
   }
 
-  inline Eigen::VectorXd dtau_dq(unit_e_point& z, callbacks::logger& logger) {
-    return Eigen::VectorXd::Zero(this->model_.num_params_r());
+  inline auto dtau_dq(unit_e_point& z, callbacks::logger& logger) {
+    return dtau_dq_;
   }
 
-  inline Eigen::VectorXd dtau_dp(unit_e_point& z) { return z.p; }
+  inline auto dtau_dp(unit_e_point& z) { return z.p; }
 
-  inline Eigen::VectorXd dphi_dq(unit_e_point& z, callbacks::logger& logger) {
+  inline auto dphi_dq(unit_e_point& z, callbacks::logger& logger) {
     return z.g;
   }
 

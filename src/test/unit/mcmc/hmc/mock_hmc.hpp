@@ -36,10 +36,13 @@ class mock_model : public model::prob_grad {
 
 // Mock Hamiltonian
 template <typename Model, typename BaseRNG>
-class mock_hamiltonian : public base_hamiltonian<Model, ps_point, BaseRNG> {
+class mock_hamiltonian
+    : public base_hamiltonian<mock_hamiltonian<Model, BaseRNG>, Model, ps_point,
+                              BaseRNG> {
  public:
   explicit mock_hamiltonian(const Model& model)
-      : base_hamiltonian<Model, ps_point, BaseRNG>(model) {}
+      : base_hamiltonian<mock_hamiltonian<Model, BaseRNG>, Model, ps_point,
+                         BaseRNG>(model) {}
 
   double T(ps_point& z) { return 0; }
 

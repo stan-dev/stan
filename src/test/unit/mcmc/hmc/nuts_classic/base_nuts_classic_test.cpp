@@ -26,27 +26,31 @@ class mock_nuts_classic : public base_nuts_classic<mock_model, mock_hamiltonian,
 
 // Mock Hamiltonian
 template <typename M, typename BaseRNG>
-class divergent_hamiltonian : public base_hamiltonian<M, ps_point, BaseRNG> {
+class divergent_hamiltonian
+    : public base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point,
+                              BaseRNG> {
  public:
   divergent_hamiltonian(const M& m)
-      : base_hamiltonian<M, ps_point, BaseRNG>(m) {}
+      : base_hamiltonian<divergent_hamiltonian<M, BaseRNG>, M, ps_point,
+                         BaseRNG>(m) {}
 
-  double T(ps_point& z) { return 0; }
+  using point_type = ps_point;
+  auto T(ps_point& z) { return 0.0; }
 
-  double tau(ps_point& z) { return T(z); }
-  double phi(ps_point& z) { return this->V(z); }
+  auto tau(ps_point& z) { return T(z); }
+  auto phi(ps_point& z) { return this->V(z); }
 
-  double dG_dt(ps_point& z, callbacks::logger& logger) { return 2; }
+  auto dG_dt(ps_point& z, callbacks::logger& logger) { return 2; }
 
-  Eigen::VectorXd dtau_dq(ps_point& z, callbacks::logger& logger) {
+  auto dtau_dq(ps_point& z, callbacks::logger& logger) {
     return Eigen::VectorXd::Zero(this->model_.num_params_r());
   }
 
-  Eigen::VectorXd dtau_dp(ps_point& z) {
+  auto dtau_dp(ps_point& z) {
     return Eigen::VectorXd::Zero(this->model_.num_params_r());
   }
 
-  Eigen::VectorXd dphi_dq(ps_point& z, callbacks::logger& logger) {
+  auto dphi_dq(ps_point& z, callbacks::logger& logger) {
     return Eigen::VectorXd::Zero(this->model_.num_params_r());
   }
 

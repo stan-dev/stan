@@ -27,42 +27,44 @@ struct softabs_fun {
 
 // Riemannian manifold with SoftAbs metric
 template <class Model, class BaseRNG>
-class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
+class softabs_metric : public base_hamiltonian<softabs_metric<Model, BaseRNG>,
+                                               Model, softabs_point, BaseRNG> {
  private:
   typedef typename stan::math::index_type<Eigen::VectorXd>::type idx_t;
 
  public:
   explicit softabs_metric(const Model& model)
-      : base_hamiltonian<Model, softabs_point, BaseRNG>(model) {}
+      : base_hamiltonian<softabs_metric<Model, BaseRNG>, Model, softabs_point,
+                         BaseRNG>(model) {}
 
-  inline double T(softabs_point& z) {
+  inline auto T(softabs_point& z) {
     return this->tau(z) + 0.5 * z.log_det_metric;
   }
 
-  inline double tau(softabs_point& z) final {
-    Eigen::VectorXd Qp = z.eigen_deco.eigenvectors().transpose() * z.p;
+  inline double tau(softabs_point& z) {
+    auto Qp = z.eigen_deco.eigenvectors().transpose() * z.p;
     return 0.5 * Qp.transpose() * z.softabs_lambda_inv.cwiseProduct(Qp);
   }
 
-  inline double phi(softabs_point& z) {
+  inline auto phi(softabs_point& z) {
     return this->V(z) + 0.5 * z.log_det_metric;
   }
 
-  inline double dG_dt(softabs_point& z, callbacks::logger& logger) {
+  inline auto dG_dt(softabs_point& z, callbacks::logger& logger) {
     return 2 * T(z) - z.q.dot(dtau_dq(z, logger) + dphi_dq(z, logger));
   }
 
   inline Eigen::VectorXd dtau_dq(softabs_point& z, callbacks::logger& logger) {
-    Eigen::VectorXd a = z.softabs_lambda_inv.cwiseProduct(
+    // inline auto here builds up an eigen expression
+    auto a = z.softabs_lambda_inv.cwiseProduct(
         z.eigen_deco.eigenvectors().transpose() * z.p);
-    Eigen::MatrixXd A
-        = a.asDiagonal() * z.eigen_deco.eigenvectors().transpose();
-    Eigen::MatrixXd B = z.pseudo_j.selfadjointView<Eigen::Lower>() * A;
-    Eigen::MatrixXd C = A.transpose() * B;
+    auto A = a.asDiagonal() * z.eigen_deco.eigenvectors().transpose();
+    auto B = z.pseudo_j.selfadjointView<Eigen::Lower>() * A;
+    auto C = A.transpose() * B;
 
     Eigen::VectorXd b(z.q.size());
     stan::math::grad_tr_mat_times_hessian(softabs_fun<Model>(this->model_, 0),
-                                          z.q, C, b);
+                                          z.q, C.eval(), b);
 
     return 0.5 * b;
   }

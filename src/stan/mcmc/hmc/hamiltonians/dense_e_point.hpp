@@ -41,7 +41,7 @@ class dense_e_point : public ps_point {
    *
    * @param writer Stan writer callback
    */
-  inline void write_metric(stan::callbacks::writer& writer) {
+  inline void write_metric(stan::callbacks::writer& writer) final {
     writer("Elements of inverse mass matrix:");
     for (int i = 0; i < inv_e_metric_.rows(); ++i) {
       std::stringstream inv_e_metric_ss;
