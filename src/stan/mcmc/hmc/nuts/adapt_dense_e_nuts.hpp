@@ -20,8 +20,6 @@ class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
       : dense_e_nuts<Model, BaseRNG>(model, rng),
         stepsize_covar_adapter(model.num_params_r()) {}
 
-  ~adapt_dense_e_nuts() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = dense_e_nuts<Model, BaseRNG>::transition(init_sample, logger);
 

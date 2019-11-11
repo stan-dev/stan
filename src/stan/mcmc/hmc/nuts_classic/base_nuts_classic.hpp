@@ -34,18 +34,16 @@ struct nuts_util {
 template <class Model, template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
 class base_nuts_classic
-    : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
+    : public base_hmc<base_nuts_classic<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_nuts_classic(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
+      : base_hmc<base_nuts_classic<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         depth_(0),
         max_depth_(5),
         max_delta_(1000),
         n_leapfrog_(0),
         divergent_(0),
         energy_(0) {}
-
-  ~base_nuts_classic() {}
 
   void set_max_depth(int d) {
     if (d > 0)
@@ -54,8 +52,10 @@ class base_nuts_classic
 
   void set_max_delta(double d) { max_delta_ = d; }
 
-  int get_max_depth() { return this->max_depth_; }
-  double get_max_delta() { return this->max_delta_; }
+  int& get_max_depth() { return this->max_depth_; }
+  const int get_max_depth() const { return this->max_depth_; }
+  double& get_max_delta() { return this->max_delta_; }
+  const double get_max_delta() const { return this->max_delta_; }
 
   sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
@@ -241,7 +241,7 @@ class base_nuts_classic
       return n1 + n2;
     }
   }
-
+  void update_L_() {}
   int depth_;
   int max_depth_;
   double max_delta_;

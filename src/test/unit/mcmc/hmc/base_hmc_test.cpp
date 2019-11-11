@@ -12,10 +12,10 @@ namespace stan {
 namespace mcmc {
 
 class mock_hmc
-    : public base_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t> {
+    : public base_hmc<mock_hmc, mock_model, mock_hamiltonian, mock_integrator, rng_t> {
  public:
   mock_hmc(const mock_model& m, rng_t& rng)
-      : base_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t>(m, rng) {
+      : base_hmc<mock_hmc, mock_model, mock_hamiltonian, mock_integrator, rng_t>(m, rng) {
   }
 
   sample transition(sample& init_sample, callbacks::logger& logger) {
@@ -26,6 +26,8 @@ class mock_hmc
   void get_sampler_param_names(std::vector<std::string>& names) {}
 
   void get_sampler_params(std::vector<double>& values) {}
+
+  void update_L_() {};
 };
 
 }  // namespace mcmc

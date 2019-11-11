@@ -19,8 +19,6 @@ class adapt_unit_e_nuts_classic : public unit_e_nuts_classic<Model, BaseRNG>,
   adapt_unit_e_nuts_classic(const Model& model, BaseRNG& rng)
       : unit_e_nuts_classic<Model, BaseRNG>(model, rng) {}
 
-  ~adapt_unit_e_nuts_classic() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s
         = unit_e_nuts_classic<Model, BaseRNG>::transition(init_sample, logger);

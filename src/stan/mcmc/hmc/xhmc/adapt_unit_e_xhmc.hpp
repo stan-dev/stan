@@ -19,8 +19,6 @@ class adapt_unit_e_xhmc : public unit_e_xhmc<Model, BaseRNG>,
   adapt_unit_e_xhmc(const Model& model, BaseRNG& rng)
       : unit_e_xhmc<Model, BaseRNG>(model, rng) {}
 
-  ~adapt_unit_e_xhmc() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = unit_e_xhmc<Model, BaseRNG>::transition(init_sample, logger);
 

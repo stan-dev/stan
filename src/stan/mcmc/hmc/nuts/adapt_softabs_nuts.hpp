@@ -19,8 +19,6 @@ class adapt_softabs_nuts : public softabs_nuts<Model, BaseRNG>,
   adapt_softabs_nuts(const Model& model, BaseRNG& rng)
       : softabs_nuts<Model, BaseRNG>(model, rng) {}
 
-  ~adapt_softabs_nuts() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = softabs_nuts<Model, BaseRNG>::transition(init_sample, logger);
 

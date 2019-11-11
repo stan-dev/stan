@@ -19,10 +19,10 @@ namespace mcmc {
  */
 template <class Model, template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
-class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
+class base_nuts : public base_hmc<base_nuts<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_nuts(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
+      : base_hmc<base_nuts<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         depth_(0),
         max_depth_(5),
         max_deltaH_(1000),
@@ -34,7 +34,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * specialized constructor for specified diag mass matrix
    */
   base_nuts(const Model& model, BaseRNG& rng, Eigen::VectorXd& inv_e_metric)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
+      : base_hmc<base_nuts<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                           inv_e_metric),
         depth_(0),
         max_depth_(5),
@@ -47,7 +47,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * specialized constructor for specified dense mass matrix
    */
   base_nuts(const Model& model, BaseRNG& rng, Eigen::MatrixXd& inv_e_metric)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
+      : base_hmc<base_nuts<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                           inv_e_metric),
         depth_(0),
         max_depth_(5),
@@ -55,8 +55,6 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
         n_leapfrog_(0),
         divergent_(false),
         energy_(0) {}
-
-  ~base_nuts() {}
 
   void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);
@@ -351,7 +349,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
     return persist_criterion;
   }
-
+  void update_L_() {}
   int depth_;
   int max_depth_;
   double max_deltaH_;

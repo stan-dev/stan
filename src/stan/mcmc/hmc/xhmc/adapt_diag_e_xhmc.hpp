@@ -20,8 +20,6 @@ class adapt_diag_e_xhmc : public diag_e_xhmc<Model, BaseRNG>,
       : diag_e_xhmc<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 
-  ~adapt_diag_e_xhmc() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = diag_e_xhmc<Model, BaseRNG>::transition(init_sample, logger);
 

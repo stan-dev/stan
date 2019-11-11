@@ -19,16 +19,14 @@ namespace mcmc {
 template <class Model, template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
 class base_static_hmc
-    : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
+    : public base_hmc<base_static_hmc<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_static_hmc(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
+      : base_hmc<base_static_hmc<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         T_(1),
         energy_(0) {
     update_L_();
   }
-
-  ~base_static_hmc() {}
 
   void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);
@@ -111,19 +109,22 @@ class base_static_hmc
     }
   }
 
-  double get_T() { return this->T_; }
+  double& get_T() { return this->T_; }
+  const double get_T() const { return this->T_; }
 
-  int get_L() { return this->L_; }
+  int& get_L() { return this->L_; }
+  const int get_L() const { return this->L_; }
+
+  void update_L_() {
+    L_ = static_cast<int>(T_ / this->nom_epsilon_);
+    L_ = L_ < 1 ? 1 : L_;
+  }
 
  protected:
   double T_;
   int L_;
   double energy_;
 
-  void update_L_() {
-    L_ = static_cast<int>(T_ / this->nom_epsilon_);
-    L_ = L_ < 1 ? 1 : L_;
-  }
 };
 
 }  // namespace mcmc

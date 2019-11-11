@@ -21,8 +21,6 @@ class adapt_unit_e_static_uniform
   adapt_unit_e_static_uniform(const Model& model, BaseRNG& rng)
       : unit_e_static_uniform<Model, BaseRNG>(model, rng) {}
 
-  ~adapt_unit_e_static_uniform() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = unit_e_static_uniform<Model, BaseRNG>::transition(init_sample,
                                                                  logger);

@@ -21,10 +21,10 @@ namespace mcmc {
  */
 template <class Model, template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
-class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
+class base_xhmc : public base_hmc<base_xhmc<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_xhmc(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
+      : base_hmc<base_xhmc<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         depth_(0),
         max_depth_(5),
         max_deltaH_(1000),
@@ -32,8 +32,6 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
         n_leapfrog_(0),
         divergent_(0),
         energy_(0) {}
-
-  ~base_xhmc() {}
 
   void set_max_depth(int d) {
     if (d > 0)
@@ -264,6 +262,8 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       return std::make_pair((a1 + e * a2) / (1 + e), log_w1 + std::log1p(e));
     }
   }
+
+  void update_L_() {}
 
   int depth_;
   int max_depth_;

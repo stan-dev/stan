@@ -19,8 +19,6 @@ class adapt_softabs_xhmc : public softabs_xhmc<Model, BaseRNG>,
   adapt_softabs_xhmc(const Model& model, BaseRNG& rng)
       : softabs_xhmc<Model, BaseRNG>(model, rng) {}
 
-  ~adapt_softabs_xhmc() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = softabs_xhmc<Model, BaseRNG>::transition(init_sample, logger);
 

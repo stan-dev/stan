@@ -17,16 +17,6 @@ class sample {
   sample(Eigen::VectorXd&& q, double log_prob, double stat)  // NOLINT
       : cont_params_(std::move(q)), log_prob_(log_prob), accept_stat_(stat) {}
 
-  sample(const sample&) = default;
-
-  sample(sample&&) = default;
-
-  sample& operator=(const sample&) = default;
-
-  sample& operator=(sample&&) = default;
-
-  virtual ~sample() = default;
-
   int size_cont() const { return cont_params_.size(); }
 
   double cont_params(int k) const { return cont_params_(k); }

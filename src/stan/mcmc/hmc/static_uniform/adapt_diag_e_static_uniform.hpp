@@ -21,8 +21,6 @@ class adapt_diag_e_static_uniform
       : diag_e_static_uniform<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 
-  ~adapt_diag_e_static_uniform() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = diag_e_static_uniform<Model, BaseRNG>::transition(init_sample,
                                                                  logger);
