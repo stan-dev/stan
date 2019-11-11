@@ -52,7 +52,7 @@ class base_xhmc
   double get_max_deltaH() { return this->max_deltaH_; }
   double get_x_delta() { return this->x_delta_; }
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  virtual sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
     this->sample_stepsize();
 

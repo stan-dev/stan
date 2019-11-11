@@ -80,7 +80,7 @@ class base_hmc
   }
 
   inline void init_stepsize(callbacks::logger& logger) {
-    ps_point z_init(this->z_);
+    point_type z_init(this->z_);
 
     // Skip initialization for extreme step sizes
     if (this->nom_epsilon_ == 0 || this->nom_epsilon_ > 1e7)
@@ -104,7 +104,7 @@ class base_hmc
     int direction = delta_H > std::log(0.8) ? 1 : -1;
 
     while (1) {
-      this->z_.ps_point::operator=(z_init);
+      this->z_ = z_init;
 
       this->hamiltonian_.sample_p(this->z_, this->rand_int_);
       this->hamiltonian_.init(this->z_, logger);
@@ -139,7 +139,7 @@ class base_hmc
             "not continuous?");
     }
 
-    this->z_.ps_point::operator=(z_init);
+    this->z_ = z_init;
   }
 
   inline point_type& z() { return z_; }

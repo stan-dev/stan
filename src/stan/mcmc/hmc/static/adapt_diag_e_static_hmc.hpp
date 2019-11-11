@@ -21,7 +21,7 @@ class adapt_diag_e_static_hmc : public diag_e_static_hmc<Model, BaseRNG>,
       : diag_e_static_hmc<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  sample transition(sample& init_sample, callbacks::logger& logger) final {
     sample s
         = diag_e_static_hmc<Model, BaseRNG>::transition(init_sample, logger);
 

@@ -14,13 +14,7 @@ namespace mcmc {
  * Gaussian-Euclidean disintegration and unit metric
  */
 template <class Model, class BaseRNG>
-class unit_e_static_hmc
-    : public base_static_hmc<Model, unit_e_metric, expl_leapfrog, BaseRNG> {
- public:
-  unit_e_static_hmc(const Model& model, BaseRNG& rng)
-      : base_static_hmc<Model, unit_e_metric, expl_leapfrog, BaseRNG>(model,
-                                                                      rng) {}
-};
+using unit_e_static_hmc = base_static_hmc<Model, unit_e_metric, expl_leapfrog, BaseRNG>;
 
 }  // namespace mcmc
 }  // namespace stan

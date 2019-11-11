@@ -14,13 +14,7 @@ namespace mcmc {
  * Gaussian-Riemannian disintegration and SoftAbs metric
  */
 template <class Model, class BaseRNG>
-class softabs_static_hmc
-    : public base_static_hmc<Model, softabs_metric, impl_leapfrog, BaseRNG> {
- public:
-  softabs_static_hmc(const Model& model, BaseRNG& rng)
-      : base_static_hmc<Model, softabs_metric, impl_leapfrog, BaseRNG>(model,
-                                                                       rng) {}
-};
+using softabs_static_hmc = base_static_hmc<Model, softabs_metric, impl_leapfrog, BaseRNG>;
 
 }  // namespace mcmc
 }  // namespace stan

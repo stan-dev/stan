@@ -60,12 +60,11 @@ class base_nuts_classic
   double& get_max_delta() { return this->max_delta_; }
   const double get_max_delta() const { return this->max_delta_; }
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  virtual sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
     this->sample_stepsize();
 
     nuts_util util;
-
     this->seed(init_sample.cont_params());
 
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);

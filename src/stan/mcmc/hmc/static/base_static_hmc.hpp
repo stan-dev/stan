@@ -29,7 +29,7 @@ class base_static_hmc
         energy_(0) {
     update_L_();
   }
-
+  using point_type = typename Hamiltonian<Model, BaseRNG>::point_type;
   void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);
   }
@@ -38,7 +38,7 @@ class base_static_hmc
     this->z_.set_metric(inv_e_metric);
   }
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  virtual sample transition(sample& init_sample, callbacks::logger& logger) {
     this->sample_stepsize();
 
     this->seed(init_sample.cont_params());
@@ -46,7 +46,7 @@ class base_static_hmc
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);
     this->hamiltonian_.init(this->z_, logger);
 
-    ps_point z_init(this->z_);
+    point_type z_init(this->z_);
 
     double H0 = this->hamiltonian_.H(this->z_);
 
@@ -61,7 +61,7 @@ class base_static_hmc
     double acceptProb = std::exp(H0 - h);
 
     if (acceptProb < 1 && this->rand_uniform_() > acceptProb)
-      this->z_.ps_point::operator=(z_init);
+      this->z_ = z_init;
 
     acceptProb = acceptProb > 1 ? 1 : acceptProb;
 

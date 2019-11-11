@@ -63,7 +63,7 @@ class mcmc_writer {
    */
   template <class Model, class Derived>
   void write_sample_names(stan::mcmc::sample& sample,
-                          stan::mcmc::base_mcmc<Derived>& sampler, Model& model) {
+                          Derived& sampler, Model& model) {
     std::vector<std::string> names;
 
     sample.get_sample_param_names(names);
@@ -95,7 +95,7 @@ class mcmc_writer {
    */
   template <class Model, class RNG, class Derived>
   void write_sample_params(RNG& rng, stan::mcmc::sample& sample,
-                           stan::mcmc::base_mcmc<Derived>& sampler, Model& model) {
+                           Derived& sampler, Model& model) {
     std::vector<double> values;
 
     sample.get_sample_params(values);
@@ -136,7 +136,7 @@ class mcmc_writer {
    * @param[in] sampler sampler
    */
   template <class Derived>
-  void write_adapt_finish(stan::mcmc::base_mcmc<Derived>& sampler) {
+  void write_adapt_finish(Derived& sampler) {
     sample_writer_("Adaptation terminated");
   }
 
@@ -149,7 +149,7 @@ class mcmc_writer {
    */
   template <class Model, class Derived>
   void write_diagnostic_names(stan::mcmc::sample sample,
-                              stan::mcmc::base_mcmc<Derived>& sampler, Model& model) {
+                              Derived& sampler, Model& model) {
     std::vector<std::string> names;
 
     sample.get_sample_param_names(names);
@@ -171,7 +171,7 @@ class mcmc_writer {
    */
   template <class Derived>
   void write_diagnostic_params(stan::mcmc::sample& sample,
-                               stan::mcmc::base_mcmc<Derived>& sampler) {
+                               Derived& sampler) {
     std::vector<double> values;
 
     sample.get_sample_params(values);

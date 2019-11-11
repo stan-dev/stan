@@ -21,7 +21,7 @@ class adapt_dense_e_static_hmc : public dense_e_static_hmc<Model, BaseRNG>,
       : dense_e_static_hmc<Model, BaseRNG>(model, rng),
         stepsize_covar_adapter(model.num_params_r()) {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  sample transition(sample& init_sample, callbacks::logger& logger) final {
     sample s
         = dense_e_static_hmc<Model, BaseRNG>::transition(init_sample, logger);
 
