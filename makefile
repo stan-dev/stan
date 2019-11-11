@@ -11,8 +11,6 @@
 ## 'help' is the default make target.
 help:
 
--include $(HOME)/.config/stan/make.local  # user-defined variables
--include make/local                       # user-defined variables
 
 MATH ?= lib/stan_math/
 ifeq ($(OS),Windows_NT)
@@ -28,6 +26,8 @@ include make/doxygen                      # doxygen
 include make/cpplint                      # cpplint
 include make/tests                        # tests
 include make/clang-tidy
+-include $(HOME)/.config/stan/make.local  # user-defined variables
+-include make/local                       # user-defined variables
 
 INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I ./src/
 LDLIBS_STANC ?= -Ltest -lstanc

@@ -10,7 +10,20 @@ namespace mcmc {
 
 class fixed_param_sampler : public base_mcmc<fixed_param_sampler> {
  public:
-  fixed_param_sampler() {}
+
+  inline void get_sampler_param_names(std::vector<std::string>& names) {}
+
+  inline void get_sampler_params(std::vector<double>& values) {}
+
+  inline void write_sampler_state(callbacks::writer& writer) {
+  }
+
+  inline void get_sampler_diagnostic_names(
+      std::vector<std::string>& model_names, std::vector<std::string>& names) {
+  }
+
+  inline void get_sampler_diagnostics(std::vector<double>& values) {
+  }
 
   inline sample transition(sample& init_sample, callbacks::logger& logger) {
     return init_sample;

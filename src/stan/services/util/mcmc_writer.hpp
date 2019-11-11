@@ -61,7 +61,7 @@ class mcmc_writer {
    * @param[in] sampler a stan::mcmc::base_mcmc object
    * @param[in] model the model
    */
-  template <class Derived, class Model>
+  template <class Model, class Derived>
   void write_sample_names(stan::mcmc::sample& sample,
                           stan::mcmc::base_mcmc<Derived>& sampler, Model& model) {
     std::vector<std::string> names;
@@ -93,7 +93,7 @@ class mcmc_writer {
    * @param[in] sampler the sampler
    * @param[in] model the model
    */
-  template <class Derived, class Model, class RNG>
+  template <class Model, class RNG, class Derived>
   void write_sample_params(RNG& rng, stan::mcmc::sample& sample,
                            stan::mcmc::base_mcmc<Derived>& sampler, Model& model) {
     std::vector<double> values;
@@ -147,7 +147,7 @@ class mcmc_writer {
    * @param[in] sampler sampler
    * @param[in] model model
    */
-  template <class Derived, class Model>
+  template <class Model, class Derived>
   void write_diagnostic_names(stan::mcmc::sample sample,
                               stan::mcmc::base_mcmc<Derived>& sampler, Model& model) {
     std::vector<std::string> names;
@@ -169,7 +169,7 @@ class mcmc_writer {
    * @param[in] sample unconstrained sample
    * @param[in] sampler sampler
    */
-  template <typename Derived>
+  template <class Derived>
   void write_diagnostic_params(stan::mcmc::sample& sample,
                                stan::mcmc::base_mcmc<Derived>& sampler) {
     std::vector<double> values;
