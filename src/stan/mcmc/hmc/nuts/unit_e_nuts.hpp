@@ -13,12 +13,7 @@ namespace mcmc {
  * with a Gaussian-Euclidean disintegration and unit metric
  */
 template <class Model, class BaseRNG>
-class unit_e_nuts
-    : public base_nuts<Model, unit_e_metric, expl_leapfrog, BaseRNG> {
- public:
-  unit_e_nuts(const Model& model, BaseRNG& rng)
-      : base_nuts<Model, unit_e_metric, expl_leapfrog, BaseRNG>(model, rng) {}
-};
+using unit_e_nuts = base_nuts<Model, unit_e_metric, expl_leapfrog, BaseRNG>;
 
 }  // namespace mcmc
 }  // namespace stan

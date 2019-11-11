@@ -19,9 +19,7 @@ class adapt_softabs_nuts : public softabs_nuts<Model, BaseRNG>,
   adapt_softabs_nuts(const Model& model, BaseRNG& rng)
       : softabs_nuts<Model, BaseRNG>(model, rng) {}
 
-  ~adapt_softabs_nuts() {}
-
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = softabs_nuts<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_)
@@ -31,7 +29,7 @@ class adapt_softabs_nuts : public softabs_nuts<Model, BaseRNG>,
     return s;
   }
 
-  void disengage_adaptation() {
+  inline void disengage_adaptation() {
     base_adapter::disengage_adaptation();
     this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
   }

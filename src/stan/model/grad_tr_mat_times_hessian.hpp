@@ -9,7 +9,7 @@ namespace stan {
 namespace model {
 
 template <class M>
-void grad_tr_mat_times_hessian(
+inline void grad_tr_mat_times_hessian(
     const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
     const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& X,
     Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_tr_X_hess_f,

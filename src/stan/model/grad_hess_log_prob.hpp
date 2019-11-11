@@ -31,7 +31,7 @@ namespace model {
  * programs are written, default is 0
  */
 template <bool propto, bool jacobian_adjust_transform, class M>
-double grad_hess_log_prob(const M& model, std::vector<double>& params_r,
+inline double grad_hess_log_prob(const M& model, std::vector<double>& params_r,
                           std::vector<int>& params_i,
                           std::vector<double>& gradient,
                           std::vector<double>& hessian,

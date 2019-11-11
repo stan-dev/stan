@@ -17,31 +17,33 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
   explicit diag_e_metric(const Model& model)
       : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {}
 
-  double T(diag_e_point& z) {
+  inline double T(diag_e_point& z) final {
     return 0.5 * z.p.dot(z.inv_e_metric_.cwiseProduct(z.p));
   }
 
-  double tau(diag_e_point& z) { return T(z); }
+  inline double tau(diag_e_point& z) final { return T(z); }
 
-  double phi(diag_e_point& z) { return this->V(z); }
+  inline double phi(diag_e_point& z) final { return this->V(z); }
 
-  double dG_dt(diag_e_point& z, callbacks::logger& logger) {
+  inline double dG_dt(diag_e_point& z, callbacks::logger& logger) final {
     return 2 * T(z) - z.q.dot(z.g);
   }
 
-  Eigen::VectorXd dtau_dq(diag_e_point& z, callbacks::logger& logger) {
+  inline Eigen::VectorXd dtau_dq(diag_e_point& z,
+                                 callbacks::logger& logger) final {
     return Eigen::VectorXd::Zero(this->model_.num_params_r());
   }
 
-  Eigen::VectorXd dtau_dp(diag_e_point& z) {
+  inline Eigen::VectorXd dtau_dp(diag_e_point& z) final {
     return z.inv_e_metric_.cwiseProduct(z.p);
   }
 
-  Eigen::VectorXd dphi_dq(diag_e_point& z, callbacks::logger& logger) {
+  inline Eigen::VectorXd dphi_dq(diag_e_point& z,
+                                 callbacks::logger& logger) final {
     return z.g;
   }
 
-  void sample_p(diag_e_point& z, BaseRNG& rng) {
+  inline void sample_p(diag_e_point& z, BaseRNG& rng) final {
     boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
         rand_diag_gaus(rng, boost::normal_distribution<>());
 

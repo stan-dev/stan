@@ -31,43 +31,24 @@ typedef enum {
 template <typename Scalar = double>
 class ConvergenceOptions {
  public:
-  ConvergenceOptions() {
-    maxIts = 10000;
-    fScale = 1.0;
-
-    tolAbsX = 1e-8;
-    tolAbsF = 1e-12;
-    tolAbsGrad = 1e-8;
-
-    tolRelF = 1e+4;
-    tolRelGrad = 1e+3;
-  }
-  size_t maxIts;
-  Scalar tolAbsX;
-  Scalar tolAbsF;
-  Scalar tolRelF;
-  Scalar fScale;
-  Scalar tolAbsGrad;
-  Scalar tolRelGrad;
+  size_t maxIts{10000};
+  Scalar tolAbsX{1e-8};
+  Scalar tolAbsF{1e-12};
+  Scalar tolRelF{1e+4};
+  Scalar fScale{1.0};
+  Scalar tolAbsGrad{1e-8};
+  Scalar tolRelGrad{1e+3};
 };
 
 template <typename Scalar = double>
 class LSOptions {
  public:
-  LSOptions() {
-    c1 = 1e-4;
-    c2 = 0.9;
-    alpha0 = 1e-3;
-    minAlpha = 1e-12;
-    maxLSIts = 20;
-    maxLSRestarts = 10;
-  }
-  Scalar c1;
-  Scalar c2;
-  Scalar alpha0;
-  Scalar minAlpha;
-  Scalar maxLSIts;
-  Scalar maxLSRestarts;
+  Scalar c1{1e-4};
+  Scalar c2{0.9};
+  Scalar alpha0{1e-3};
+  Scalar minAlpha{1e-12};
+  Scalar maxLSIts{20};
+  Scalar maxLSRestarts{10};
 };
 template <typename FunctorType, typename QNUpdateType, typename Scalar = double,
           int DimAtCompile = Eigen::Dynamic>
@@ -89,18 +70,18 @@ class BFGSMinimizer {
   LSOptions<Scalar> _ls_opts;
   ConvergenceOptions<Scalar> _conv_opts;
 
-  QNUpdateType &get_qnupdate() { return _qn; }
-  const QNUpdateType &get_qnupdate() const { return _qn; }
+  inline QNUpdateType &get_qnupdate() { return _qn; }
+  inline const QNUpdateType &get_qnupdate() const { return _qn; }
 
-  const Scalar &curr_f() const { return _fk; }
-  const VectorT &curr_x() const { return _xk; }
-  const VectorT &curr_g() const { return _gk; }
-  const VectorT &curr_p() const { return _pk; }
+  inline const Scalar &curr_f() const { return _fk; }
+  inline const VectorT &curr_x() const { return _xk; }
+  inline const VectorT &curr_g() const { return _gk; }
+  inline const VectorT &curr_p() const { return _pk; }
 
-  const Scalar &prev_f() const { return _fk_1; }
-  const VectorT &prev_x() const { return _xk_1; }
-  const VectorT &prev_g() const { return _gk_1; }
-  const VectorT &prev_p() const { return _pk_1; }
+  inline const Scalar &prev_f() const { return _fk_1; }
+  inline const VectorT &prev_x() const { return _xk_1; }
+  inline const VectorT &prev_g() const { return _gk_1; }
+  inline const VectorT &prev_p() const { return _pk_1; }
   Scalar prev_step_size() const { return _pk_1.norm() * _alphak_1; }
 
   inline Scalar rel_grad_norm() const {
@@ -112,13 +93,13 @@ class BFGSMinimizer {
                       std::max(std::fabs(_fk), _conv_opts.fScale));
   }
 
-  const Scalar &alpha0() const { return _alpha0; }
-  const Scalar &alpha() const { return _alpha; }
-  const size_t iter_num() const { return _itNum; }
+  inline const Scalar &alpha0() const { return _alpha0; }
+  inline const Scalar &alpha() const { return _alpha; }
+  inline const size_t iter_num() const { return _itNum; }
 
-  const std::string &note() const { return _note; }
+  inline const std::string &note() const { return _note; }
 
-  std::string get_code_string(int retCode) {
+  inline std::string get_code_string(int retCode) {
     switch (retCode) {
       case TERM_SUCCESS:
         return std::string("Successful step completed");
@@ -157,7 +138,7 @@ class BFGSMinimizer {
 
   explicit BFGSMinimizer(FunctorType &f) : _func(f) {}
 
-  void initialize(const VectorT &x0) {
+  inline void initialize(const VectorT &x0) {
     int ret;
     _xk = x0;
     ret = _func(_xk, _fk, _gk);
@@ -170,7 +151,7 @@ class BFGSMinimizer {
     _note = "";
   }
 
-  int step() {
+  inline int step() {
     Scalar gradNorm, stepNorm;
     VectorT sk, yk;
     int retCode(0);
@@ -280,7 +261,7 @@ class BFGSMinimizer {
     return retCode;
   }
 
-  int minimize(VectorT &x0) {
+  inline int minimize(VectorT &x0) {
     int retcode;
     initialize(x0);
     while (!(retcode = step()))
@@ -304,7 +285,8 @@ class ModelAdaptor {
       : _model(model), _params_i(params_i), _msgs(msgs), _fevals(0) {}
 
   size_t fevals() const { return _fevals; }
-  int operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x, double &f) {
+  inline int operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
+                        double &f) {
     using Eigen::Dynamic;
     using Eigen::Matrix;
     using stan::math::index_type;
@@ -333,8 +315,9 @@ class ModelAdaptor {
       return 2;
     }
   }
-  int operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x, double &f,
-                 Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
+  inline int operator()(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
+                        double &f,
+                        Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
     using Eigen::Dynamic;
     using Eigen::Matrix;
     using stan::math::index_type;
@@ -376,8 +359,8 @@ class ModelAdaptor {
       return 2;
     }
   }
-  int df(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
-         Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
+  inline int df(const Eigen::Matrix<double, Eigen::Dynamic, 1> &x,
+                Eigen::Matrix<double, Eigen::Dynamic, 1> &g) {
     double f;
     return (*this)(x, f, g);
   }
@@ -402,7 +385,7 @@ class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>, QNUpdateType,
     initialize(params_r);
   }
 
-  void initialize(const std::vector<double> &params_r) {
+  inline void initialize(const std::vector<double> &params_r) {
     Eigen::Matrix<double, Eigen::Dynamic, 1> x;
     x.resize(params_r.size());
     for (size_t i = 0; i < params_r.size(); i++)
@@ -410,16 +393,16 @@ class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>, QNUpdateType,
     BFGSBase::initialize(x);
   }
 
-  size_t grad_evals() { return _adaptor.fevals(); }
-  double logp() { return -(this->curr_f()); }
-  double grad_norm() { return this->curr_g().norm(); }
-  void grad(std::vector<double> &g) {
+  inline size_t grad_evals() { return _adaptor.fevals(); }
+  inline double logp() { return -(this->curr_f()); }
+  inline double grad_norm() { return this->curr_g().norm(); }
+  inline void grad(std::vector<double> &g) {
     const vector_t &cg(this->curr_g());
     g.resize(cg.size());
     for (idx_t i = 0; i < cg.size(); i++)
       g[i] = -cg[i];
   }
-  void params_r(std::vector<double> &x) {
+  inline void params_r(std::vector<double> &x) {
     const vector_t &cx(this->curr_x());
     x.resize(cx.size());
     for (idx_t i = 0; i < cx.size(); i++)

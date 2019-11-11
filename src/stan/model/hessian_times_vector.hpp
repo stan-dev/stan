@@ -9,7 +9,7 @@ namespace stan {
 namespace model {
 
 template <class M>
-void hessian_times_vector(
+inline void hessian_times_vector(
     const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
     const Eigen::Matrix<double, Eigen::Dynamic, 1>& v, double& f,
     Eigen::Matrix<double, Eigen::Dynamic, 1>& hess_f_dot_v,

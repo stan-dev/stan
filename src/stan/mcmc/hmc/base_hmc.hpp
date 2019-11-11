@@ -27,15 +27,12 @@ class base_hmc : public base_mcmc {
         integrator_(),
         hamiltonian_(model),
         rand_int_(rng),
-        rand_uniform_(rand_int_),
-        nom_epsilon_(0.1),
-        epsilon_(nom_epsilon_),
-        epsilon_jitter_(0.0) {}
+        rand_uniform_(rand_int_) {}
 
   /**
    * format and write stepsize
    */
-  void write_sampler_stepsize(callbacks::writer& writer) {
+  inline void write_sampler_stepsize(callbacks::writer& writer) {
     std::stringstream nominal_stepsize;
     nominal_stepsize << "Step size = " << get_nominal_stepsize();
     writer(nominal_stepsize.str());
@@ -44,34 +41,34 @@ class base_hmc : public base_mcmc {
   /**
    * write elements of mass matrix
    */
-  void write_sampler_metric(callbacks::writer& writer) {
+  inline void write_sampler_metric(callbacks::writer& writer) {
     z_.write_metric(writer);
   }
 
   /**
    * write stepsize and elements of mass matrix
    */
-  void write_sampler_state(callbacks::writer& writer) {
+  inline void write_sampler_state(callbacks::writer& writer) {
     write_sampler_stepsize(writer);
     write_sampler_metric(writer);
   }
 
-  void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
-                                    std::vector<std::string>& names) {
+  inline void get_sampler_diagnostic_names(
+      std::vector<std::string>& model_names, std::vector<std::string>& names) {
     z_.get_param_names(model_names, names);
   }
 
-  void get_sampler_diagnostics(std::vector<double>& values) {
+  inline void get_sampler_diagnostics(std::vector<double>& values) {
     z_.get_params(values);
   }
 
-  void seed(const Eigen::VectorXd& q) { z_.q = q; }
+  inline void seed(const Eigen::VectorXd& q) { z_.q = q; }
 
-  void init_hamiltonian(callbacks::logger& logger) {
+  inline void init_hamiltonian(callbacks::logger& logger) {
     this->hamiltonian_.init(this->z_, logger);
   }
 
-  void init_stepsize(callbacks::logger& logger) {
+  inline void init_stepsize(callbacks::logger& logger) {
     ps_point z_init(this->z_);
 
     // Skip initialization for extreme step sizes
@@ -136,23 +133,23 @@ class base_hmc : public base_mcmc {
 
   typename Hamiltonian<Model, BaseRNG>::point_type& z() { return z_; }
 
-  virtual void set_nominal_stepsize(double e) {
+  inline virtual void set_nominal_stepsize(double e) {
     if (e > 0)
       nom_epsilon_ = e;
   }
 
-  double get_nominal_stepsize() { return this->nom_epsilon_; }
+  inline double get_nominal_stepsize() { return this->nom_epsilon_; }
 
-  double get_current_stepsize() { return this->epsilon_; }
+  inline double get_current_stepsize() { return this->epsilon_; }
 
-  virtual void set_stepsize_jitter(double j) {
+  inline virtual void set_stepsize_jitter(double j) {
     if (j > 0 && j < 1)
       epsilon_jitter_ = j;
   }
 
-  double get_stepsize_jitter() { return this->epsilon_jitter_; }
+  inline double get_stepsize_jitter() { return this->epsilon_jitter_; }
 
-  void sample_stepsize() {
+  inline void sample_stepsize() {
     this->epsilon_ = this->nom_epsilon_;
     if (this->epsilon_jitter_)
       this->epsilon_
@@ -169,9 +166,9 @@ class base_hmc : public base_mcmc {
   // Uniform(0, 1) RNG
   boost::uniform_01<BaseRNG&> rand_uniform_;
 
-  double nom_epsilon_;
-  double epsilon_;
-  double epsilon_jitter_;
+  double nom_epsilon_{0.1};
+  double epsilon_{0.1};
+  double epsilon_jitter_{0.0};
 };
 
 }  // namespace mcmc
