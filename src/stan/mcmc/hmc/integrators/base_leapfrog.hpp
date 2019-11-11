@@ -31,10 +31,8 @@ class base_leapfrog
     return static_cast<Derived const&>(*this);
   }
 
-
-  inline void verbose_evolve(point_type& z,
-                      Hamiltonian& hamiltonian, const double epsilon,
-                      callbacks::logger& logger) {
+  inline void verbose_evolve(point_type& z, Hamiltonian& hamiltonian,
+                             const double epsilon, callbacks::logger& logger) {
     std::stringstream msg;
     msg.precision(6);
 
