@@ -61,7 +61,7 @@ class base_nuts
   inline int get_max_depth() { return this->max_depth_; }
   inline double get_max_delta() { return this->max_deltaH_; }
 
-  inline sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline virtual sample transition(sample& init_sample, callbacks::logger& logger) {
     // Initialize the algorithm
     this->sample_stepsize();
 
@@ -144,7 +144,6 @@ class base_nuts
         break;
 
       // Sample from accepted subtree
-      printf("\n Depth: %d", this->depth_);
       ++this->depth_;
 
       if (log_sum_weight_subtree > log_sum_weight) {
@@ -239,10 +238,7 @@ class base_nuts
                          double& log_sum_weight, double& sum_metro_prob,
                          callbacks::logger& logger) {
     // Base case
-    printf("\n Build Tree Internal");
-
     if (depth == 0) {
-      printf("\n Evolve Depth 0");
       this->integrator_.evolve(this->z_, this->hamiltonian_,
                                sign * this->epsilon_, logger);
       ++n_leapfrog;
@@ -283,7 +279,6 @@ class base_nuts
 
     Eigen::VectorXd rho_init = Eigen::VectorXd::Zero(rho.size());
 
-    printf("\n Build Subtree");
     bool valid_init
         = build_tree(depth - 1, z_propose, p_sharp_beg, p_sharp_init_end,
                      rho_init, p_beg, p_init_end, H0, sign, n_leapfrog,
@@ -343,6 +338,7 @@ class base_nuts
 
     return persist_criterion;
   }
+  void update_L_() {}
   int depth_{0};
   int max_depth_{5};
   double max_deltaH_{1000};

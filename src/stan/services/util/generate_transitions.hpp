@@ -38,7 +38,7 @@ namespace util {
  * @param[in,out] logger logger for messages
  */
 template <class Model, class RNG, class Derived>
-void generate_transitions(stan::mcmc::base_mcmc<Derived>& sampler, int num_iterations,
+void generate_transitions(Derived& sampler, int num_iterations,
                           int start, int finish, int num_thin, int refresh,
                           bool save, bool warmup,
                           util::mcmc_writer& mcmc_writer,

@@ -20,7 +20,7 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
       : diag_e_nuts<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 
-  inline sample transition(sample& init_sample, callbacks::logger& logger) {
+  inline sample transition(sample& init_sample, callbacks::logger& logger) final {
     sample s = diag_e_nuts<Model, BaseRNG>::transition(init_sample, logger);
 
     if (this->adapt_flag_) {

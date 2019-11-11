@@ -33,7 +33,7 @@ namespace util {
  * @param[in,out] diagnostic_writer writer for diagnostic information
  */
 template <class Model, class RNG, class Derived>
-void run_sampler(stan::mcmc::base_mcmc<Derived>& sampler, Model& model,
+void run_sampler(Derived& sampler, Model& model,
                  std::vector<double>& cont_vector, int num_warmup,
                  int num_samples, int num_thin, int refresh, bool save_warmup,
                  RNG& rng, callbacks::interrupt& interrupt,

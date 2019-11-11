@@ -15,6 +15,7 @@ namespace mcmc {
 template <class Model, class BaseRNG>
 using softabs_nuts = base_nuts<Model, softabs_metric, impl_leapfrog, BaseRNG>;
 
+
 }  // namespace mcmc
 }  // namespace stan
 #endif

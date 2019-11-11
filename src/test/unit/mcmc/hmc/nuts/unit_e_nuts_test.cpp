@@ -10,9 +10,7 @@
 typedef boost::ecuyer1988 rng_t;
 
 TEST(McmcUnitENuts, build_tree_test) {
-  printf("\n Starting test");
   rng_t base_rng(4839294);
-  printf("\n First unit_e_point");
 
   stan::mcmc::unit_e_point z_init(3);
   z_init.q(0) = 1;
@@ -27,9 +25,7 @@ TEST(McmcUnitENuts, build_tree_test) {
 
   std::fstream empty_stream("", std::fstream::in);
   stan::io::dump data_var_context(empty_stream);
-  printf("\n Setting up Model");
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
-  printf("\n Setting up sampler");
   stan::mcmc::unit_e_nuts<gauss3D_model_namespace::gauss3D_model, rng_t>
       sampler(model, base_rng);
 
@@ -53,7 +49,6 @@ TEST(McmcUnitENuts, build_tree_test) {
   int n_leapfrog = 0;
   double sum_metro_prob = 0;
 
-  printf("\n Build Tree");
   bool valid_subtree = sampler.build_tree(
       3, z_propose, p_sharp_begin, p_sharp_end, rho, p_begin, p_end, H0, 1,
       n_leapfrog, log_sum_weight, sum_metro_prob, logger);
