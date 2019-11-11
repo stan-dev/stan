@@ -37,8 +37,8 @@ namespace util {
  * @param[in,out] callback interrupt callback called once an iteration
  * @param[in,out] logger logger for messages
  */
-template <class Model, class RNG>
-void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
+template <class Model, class RNG, class Derived>
+void generate_transitions(stan::mcmc::base_mcmc<Derived>& sampler, int num_iterations,
                           int start, int finish, int num_thin, int refresh,
                           bool save, bool warmup,
                           util::mcmc_writer& mcmc_writer,
@@ -47,7 +47,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
                           callbacks::logger& logger) {
   for (int m = 0; m < num_iterations; ++m) {
     callback();
-
+    
     if (refresh > 0
         && (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
       int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
