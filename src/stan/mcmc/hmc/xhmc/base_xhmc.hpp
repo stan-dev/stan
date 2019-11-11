@@ -21,10 +21,13 @@ namespace mcmc {
  */
 template <class Model, template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
-class base_xhmc : public base_hmc<base_xhmc<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG> {
+class base_xhmc
+    : public base_hmc<base_xhmc<Model, Hamiltonian, Integrator, BaseRNG>, Model,
+                      Hamiltonian, Integrator, BaseRNG> {
  public:
   base_xhmc(const Model& model, BaseRNG& rng)
-      : base_hmc<base_xhmc<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
+      : base_hmc<base_xhmc<Model, Hamiltonian, Integrator, BaseRNG>, Model,
+                 Hamiltonian, Integrator, BaseRNG>(model, rng),
         depth_(0),
         max_depth_(5),
         max_deltaH_(1000),

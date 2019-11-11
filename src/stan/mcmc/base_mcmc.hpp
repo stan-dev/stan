@@ -39,8 +39,8 @@ class base_mcmc {
 
   inline void get_sampler_diagnostic_names(
       std::vector<std::string>& model_names, std::vector<std::string>& names) {
-        return this->derived().get_sampler_diagnostic_names(model_names, names);
-      }
+    return this->derived().get_sampler_diagnostic_names(model_names, names);
+  }
 
   inline void get_sampler_diagnostics(std::vector<double>& values) {
     return this->derived().get_sampler_diagnostics(values);

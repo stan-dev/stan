@@ -15,7 +15,6 @@ namespace mcmc {
 template <class Model, class BaseRNG>
 using diag_e_nuts = base_nuts<Model, diag_e_metric, expl_leapfrog, BaseRNG>;
 
-
 }  // namespace mcmc
 }  // namespace stan
 #endif

@@ -34,10 +34,13 @@ struct nuts_util {
 template <class Model, template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
 class base_nuts_classic
-    : public base_hmc<base_nuts_classic<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG> {
+    : public base_hmc<
+          base_nuts_classic<Model, Hamiltonian, Integrator, BaseRNG>, Model,
+          Hamiltonian, Integrator, BaseRNG> {
  public:
   base_nuts_classic(const Model& model, BaseRNG& rng)
-      : base_hmc<base_nuts_classic<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
+      : base_hmc<base_nuts_classic<Model, Hamiltonian, Integrator, BaseRNG>,
+                 Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         depth_(0),
         max_depth_(5),
         max_delta_(1000),

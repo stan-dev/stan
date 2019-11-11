@@ -18,9 +18,11 @@ namespace stan {
 namespace mcmc {
 
 template <typename Derived, typename Model,
- template <class, class> class Hamiltonian, template <class> class Integrator,
-  class BaseRNG>
-class base_hmc : public base_mcmc<base_hmc<Derived, Model, Hamiltonian, Integrator, BaseRNG>> {
+          template <class, class> class Hamiltonian,
+          template <class> class Integrator, class BaseRNG>
+class base_hmc
+    : public base_mcmc<
+          base_hmc<Derived, Model, Hamiltonian, Integrator, BaseRNG>> {
  public:
   base_hmc(const Model& model, BaseRNG& rng)
       : base_mcmc<base_hmc<Derived, Model, Hamiltonian, Integrator, BaseRNG>>(),
@@ -62,8 +64,8 @@ class base_hmc : public base_mcmc<base_hmc<Derived, Model, Hamiltonian, Integrat
     write_sampler_metric(writer);
   }
 
-  inline void get_sampler_diagnostic_names(std::vector<std::string>& model_names,
-                                    std::vector<std::string>& names) {
+  inline void get_sampler_diagnostic_names(
+      std::vector<std::string>& model_names, std::vector<std::string>& names) {
     z_.get_param_names(model_names, names);
   }
 
@@ -166,12 +168,11 @@ class base_hmc : public base_mcmc<base_hmc<Derived, Model, Hamiltonian, Integrat
       this->epsilon_
           *= 1.0 + this->epsilon_jitter_ * (2.0 * this->rand_uniform_() - 1.0);
   }
-  inline void update_L_() {
-    this->derived().update_L_();
-  }
+  inline void update_L_() { this->derived().update_L_(); }
+
  protected:
   PointType z_;
-  Integrator<Hamiltonian<Model, BaseRNG> > integrator_;
+  Integrator<Hamiltonian<Model, BaseRNG>> integrator_;
   Hamiltonian<Model, BaseRNG> hamiltonian_;
 
   BaseRNG& rand_int_;

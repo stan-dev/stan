@@ -21,10 +21,13 @@ namespace mcmc {
 template <class Model, template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
 class base_static_uniform
-    : public base_hmc<base_static_uniform<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG> {
+    : public base_hmc<
+          base_static_uniform<Model, Hamiltonian, Integrator, BaseRNG>, Model,
+          Hamiltonian, Integrator, BaseRNG> {
  public:
   base_static_uniform(const Model& model, BaseRNG& rng)
-      : base_hmc<base_static_uniform<Model, Hamiltonian, Integrator, BaseRNG>, Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
+      : base_hmc<base_static_uniform<Model, Hamiltonian, Integrator, BaseRNG>,
+                 Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
         T_(1),
         energy_(0) {
     update_L_();
@@ -146,7 +149,6 @@ class base_static_uniform
   double T_;
   int L_;
   double energy_;
-
 };
 }  // namespace mcmc
 }  // namespace stan
