@@ -60,7 +60,7 @@ TEST_F(ServicesUtil, constructor) {
   EXPECT_EQ(0, logger.call_count());
 }
 
-class mock_sampler : public stan::mcmc::base_mcmc {
+class mock_sampler : public stan::mcmc::base_mcmc<mock_sampler> {
  public:
   int n_transition;
   int n_get_sampler_param_names;

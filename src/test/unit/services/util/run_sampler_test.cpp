@@ -6,7 +6,7 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 
-class mock_sampler : public stan::mcmc::base_mcmc {
+class mock_sampler : public stan::mcmc::base_mcmc<mock_sampler> {
  public:
   int n_transition;
   int n_get_sampler_param_names;

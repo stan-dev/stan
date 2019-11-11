@@ -8,7 +8,7 @@
 namespace stan {
 namespace mcmc {
 
-class fixed_param_sampler : public base_mcmc {
+class fixed_param_sampler : public base_mcmc<fixed_param_sampler> {
  public:
   fixed_param_sampler() {}
 
