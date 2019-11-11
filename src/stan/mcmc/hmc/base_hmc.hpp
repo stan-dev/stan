@@ -17,17 +17,28 @@
 namespace stan {
 namespace mcmc {
 
-template <class Model, template <class, class> class Hamiltonian,
+template <typename Derived, typename Model,
+          template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
-class base_hmc : public base_mcmc {
+class base_hmc
+    : public base_mcmc<
+          base_hmc<Derived, Model, Hamiltonian, Integrator, BaseRNG>> {
  public:
   base_hmc(const Model& model, BaseRNG& rng)
-      : base_mcmc(),
+      : base_mcmc<base_hmc<Derived, Model, Hamiltonian, Integrator, BaseRNG>>(),
         z_(model.num_params_r()),
         integrator_(),
         hamiltonian_(model),
         rand_int_(rng),
         rand_uniform_(rand_int_) {}
+
+  using point_type = typename Hamiltonian<Model, BaseRNG>::point_type;
+  // modifier to the derived class
+  inline Derived& derived() { return static_cast<Derived&>(*this); }
+  // inspector to the derived class
+  inline const Derived& derived() const {
+    return static_cast<Derived const&>(*this);
+  }
 
   /**
    * format and write stepsize
@@ -131,18 +142,20 @@ class base_hmc : public base_mcmc {
     this->z_.ps_point::operator=(z_init);
   }
 
-  typename Hamiltonian<Model, BaseRNG>::point_type& z() { return z_; }
+  inline point_type& z() { return z_; }
+  inline const point_type& z() const { return z_; }
 
-  inline virtual void set_nominal_stepsize(double e) {
+  inline void set_nominal_stepsize(double e) {
     if (e > 0)
       nom_epsilon_ = e;
+    update_L_();
   }
 
   inline double get_nominal_stepsize() { return this->nom_epsilon_; }
 
   inline double get_current_stepsize() { return this->epsilon_; }
 
-  inline virtual void set_stepsize_jitter(double j) {
+  inline void set_stepsize_jitter(double j) {
     if (j > 0 && j < 1)
       epsilon_jitter_ = j;
   }
@@ -155,10 +168,11 @@ class base_hmc : public base_mcmc {
       this->epsilon_
           *= 1.0 + this->epsilon_jitter_ * (2.0 * this->rand_uniform_() - 1.0);
   }
+  inline void update_L_() { this->derived().update_L_(); }
 
  protected:
-  typename Hamiltonian<Model, BaseRNG>::point_type z_;
-  Integrator<Hamiltonian<Model, BaseRNG> > integrator_;
+  point_type z_;
+  Integrator<Hamiltonian<Model, BaseRNG>> integrator_;
   Hamiltonian<Model, BaseRNG> hamiltonian_;
 
   BaseRNG& rand_int_;

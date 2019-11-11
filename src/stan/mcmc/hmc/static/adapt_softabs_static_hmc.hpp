@@ -20,8 +20,6 @@ class adapt_softabs_static_hmc : public softabs_static_hmc<Model, BaseRNG>,
   adapt_softabs_static_hmc(const Model& model, BaseRNG& rng)
       : softabs_static_hmc<Model, BaseRNG>(model, rng) {}
 
-  ~adapt_softabs_static_hmc() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s
         = softabs_static_hmc<Model, BaseRNG>::transition(init_sample, logger);

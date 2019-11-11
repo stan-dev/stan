@@ -20,8 +20,6 @@ class adapt_diag_e_nuts_classic : public diag_e_nuts_classic<Model, BaseRNG>,
       : diag_e_nuts_classic<Model, BaseRNG>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 
-  ~adapt_diag_e_nuts_classic() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s
         = diag_e_nuts_classic<Model, BaseRNG>::transition(init_sample, logger);

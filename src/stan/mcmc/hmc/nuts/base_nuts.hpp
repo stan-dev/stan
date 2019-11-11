@@ -19,24 +19,27 @@ namespace mcmc {
  */
 template <class Model, template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
-class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
+class base_nuts
+    : public base_hmc<base_nuts<Model, Hamiltonian, Integrator, BaseRNG>, Model,
+                      Hamiltonian, Integrator, BaseRNG> {
  public:
   base_nuts(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng) {}
+      : base_hmc<base_nuts<Model, Hamiltonian, Integrator, BaseRNG>, Model,
+                 Hamiltonian, Integrator, BaseRNG>(model, rng) {}
 
   /**
    * specialized constructor for specified diag mass matrix
    */
   base_nuts(const Model& model, BaseRNG& rng, Eigen::VectorXd& inv_e_metric)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                          inv_e_metric) {}
+      : base_hmc<base_nuts<Model, Hamiltonian, Integrator, BaseRNG>, Model,
+                 Hamiltonian, Integrator, BaseRNG>(model, rng, inv_e_metric) {}
 
   /**
    * specialized constructor for specified dense mass matrix
    */
   base_nuts(const Model& model, BaseRNG& rng, Eigen::MatrixXd& inv_e_metric)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                          inv_e_metric) {}
+      : base_hmc<base_nuts<Model, Hamiltonian, Integrator, BaseRNG>, Model,
+                 Hamiltonian, Integrator, BaseRNG>(model, rng, inv_e_metric) {}
 
   inline void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);

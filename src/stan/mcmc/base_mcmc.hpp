@@ -11,28 +11,40 @@
 namespace stan {
 namespace mcmc {
 
+template <typename Derived>
 class base_mcmc {
  public:
-  base_mcmc() {}
-
-  virtual ~base_mcmc() {}
-  base_mcmc(const base_mcmc& other) = default;
-  base_mcmc(base_mcmc&& other) = default;
-  base_mcmc& operator=(const base_mcmc&) = default;
-  base_mcmc& operator=(base_mcmc&&) = default;
-  virtual sample transition(sample& init_sample, callbacks::logger& logger) = 0;
-
-  inline virtual void get_sampler_param_names(std::vector<std::string>& names) {
+  // mutator for the derived type
+  inline Derived& derived() { return static_cast<Derived&>(*this); }
+  // inspector to the derived class
+  inline const Derived& derived() const {
+    return static_cast<Derived const&>(*this);
   }
 
-  inline virtual void get_sampler_params(std::vector<double>& values) {}
+  inline sample transition(sample& init_sample, callbacks::logger& logger) {
+    return this->derived().transition(init_sample, logger);
+  };
 
-  inline virtual void write_sampler_state(callbacks::writer& writer) {}
+  inline void get_sampler_param_names(std::vector<std::string>& names) {
+    this->derived().get_sampler_param_names(names);
+  }
 
-  inline virtual void get_sampler_diagnostic_names(
-      std::vector<std::string>& model_names, std::vector<std::string>& names) {}
+  inline void get_sampler_params(std::vector<double>& values) {
+    return this->derived().get_sampler_params(values);
+  }
 
-  inline virtual void get_sampler_diagnostics(std::vector<double>& values) {}
+  inline void write_sampler_state(callbacks::writer& writer) {
+    return this->derived().write_sampler_state(writer);
+  }
+
+  inline void get_sampler_diagnostic_names(
+      std::vector<std::string>& model_names, std::vector<std::string>& names) {
+    return this->derived().get_sampler_diagnostic_names(model_names, names);
+  }
+
+  inline void get_sampler_diagnostics(std::vector<double>& values) {
+    return this->derived().get_sampler_diagnostics(values);
+  }
 };
 
 }  // namespace mcmc

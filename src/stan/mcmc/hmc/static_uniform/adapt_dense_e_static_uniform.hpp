@@ -21,8 +21,6 @@ class adapt_dense_e_static_uniform
       : dense_e_static_uniform<Model, BaseRNG>(model, rng),
         stepsize_covar_adapter(model.num_params_r()) {}
 
-  ~adapt_dense_e_static_uniform() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = dense_e_static_uniform<Model, BaseRNG>::transition(init_sample,
                                                                   logger);

@@ -20,8 +20,6 @@ class adapt_unit_e_static_hmc : public unit_e_static_hmc<Model, BaseRNG>,
   adapt_unit_e_static_hmc(const Model& model, BaseRNG& rng)
       : unit_e_static_hmc<Model, BaseRNG>(model, rng) {}
 
-  ~adapt_unit_e_static_hmc() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s
         = unit_e_static_hmc<Model, BaseRNG>::transition(init_sample, logger);

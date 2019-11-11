@@ -21,8 +21,6 @@ class adapt_softabs_static_uniform
   adapt_softabs_static_uniform(const Model& model, BaseRNG& rng)
       : softabs_static_uniform<Model, BaseRNG>(model, rng) {}
 
-  ~adapt_softabs_static_uniform() {}
-
   sample transition(sample& init_sample, callbacks::logger& logger) {
     sample s = softabs_static_uniform<Model, BaseRNG>::transition(init_sample,
                                                                   logger);
