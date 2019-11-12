@@ -172,7 +172,7 @@ class base_nuts_classic
   }
 
   virtual bool compute_criterion(
-      ps_point& start, typename Hamiltonian<Model, BaseRNG>::PointType& finish,
+      ps_point& start, typename Hamiltonian<Model, BaseRNG>::point_type& finish,
       Eigen::VectorXd& rho)
       = 0;
 
