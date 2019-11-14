@@ -225,8 +225,11 @@ namespace mpi {
       comm(comm_in), mpi_comm(comm.comm)
     {
       // make sure there are slave chains.
-      static const char* caller = "MPI load balance initialization";
-      stan::math::check_greater(caller, "MPI comm size", comm.size, 1);      
+      // comm.rank == -1 indicates non inter-comm node
+      if (comm.rank >= 0) {
+        static const char* caller = "MPI load balance initialization";
+        stan::math::check_greater(caller, "MPI comm size", comm.size, 1);
+      }
     }
   };
 
@@ -236,147 +239,97 @@ namespace mpi {
    * in order to improve the quality of adaptation, before
    * sending the improved adapt info to slave chains.
    */
-  struct warmup_dynamic_loader_master : mpi_loader_base {
-    MPI_Request bcast_req;
+  struct mpi_warmup {
+    mpi_loader_base& loader;
+    Eigen::MatrixXd& workspace_r;
     int interval;
+    MPI_Request req;
+    bool is_inter_comm_node;
 
     //! construct loader given MPI communicator
-    warmup_dynamic_loader_master(const Communicator& comm_in, int inter) :
-      mpi_loader_base(comm_in), interval(inter)
+    mpi_warmup(mpi_loader_base& l, int inter) :
+      loader(l), workspace_r(l.workspace_r), interval(inter),
+      is_inter_comm_node(loader.comm.size > 0)
     {}
 
-    //! during destruction ensure MPI request is fulfilled.
-    ~warmup_dynamic_loader_master() {
-      MPI_Wait(&bcast_req, MPI_STATUS_IGNORE);
-    }
+    ~mpi_warmup() {}
 
     /*
-     * helper function to master node (rank = 0) to recv
-     * results.
-     * @return MPI_Status of recv operation
-     */
-    template<typename Recv_processor, typename Sampler, typename Model>
-    MPI_Status
-    recv(std::vector<MPI_Request>& req, Recv_processor& chain_func,
-         Sampler& sampler, Model& model) {
-      MPI_Status stat;
-      MPI_Probe(MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &stat);
-      int source = stat.MPI_SOURCE;
-      int ireq = source - 1;
-      if (stat.MPI_TAG == err_tag) {
-        double dummy;
-        MPI_Irecv(&dummy, 0, MPI_DOUBLE, source, err_tag, comm, &req[ireq]);
-      } else {
-        int n = chain_func.recv_size(sampler, model);
-        MPI_Irecv(&workspace_r((source - 1) * n), n,
-                  MPI_DOUBLE, source, work_tag, comm, &req[ireq]);
-      }
-      return stat;
-    }
-    
-    /*
-     * master node (rank = 0) recv results and send
-     * available tasks to vacant slaves.
+     * run transitions and process each chain's adaptation
+     * information before sending it to others.
+     * 
+     * @tparam Sampler sampler used
+     * @tparam Model model struct
+     * @tparam S functor that process the adaptation
+     *           information and return it as a vector.
+     * @tparam F functor that does transitions.
+     * @tparam Ts args of @c F.
      */
     template<typename Sampler, typename Model,
-             typename Send_processor, typename Recv_processor>
+             typename S,
+             typename F, typename... Ts>
     void operator()(Sampler& sampler, Model& model,
-                    const stan::mcmc::sample& sample,
-                    stan::callbacks::logger& logger,
-                    Send_processor& ensemble_func,
-                    Recv_processor& chain_func) {
-      static const char* caller = "warmup_dynamic_loader_master::master";
-      stan::math::check_less(caller, "MPI comm rank", warmup_comm.rank, 1);
+                    stan::mcmc::sample& sample,
+                    const S& fs, F& f, Ts... pars) {
+      if (is_inter_comm_node) {
+        f(pars...);
 
-      int nslave = warmup_comm.size - 1;
-      std::vector<MPI_Request> req(nslave);
-      std::array<int, 2> recv_out;
-      
-      int recved = 0;
-      int irecve = 0;
-      int source;
-      bool is_invalid = false;
-      while (irecve != nslave && (!is_invalid)) {
-        // recv adaption results from certain chain
-        workspace_r.resize(chain_func.recv_size(sampler, model),
-                           nslave);
-        MPI_Status stat(recv(req, chain_func, sampler, model));
-        is_invalid = stat.MPI_TAG == err_tag;
-        source = stat.MPI_SOURCE;
-        irecve++;
-      }
-
-      if (is_invalid) {
-        for (int i = 1; i < warmup_comm.size; ++i) {
-          MPI_Send(workspace_r.data(), 0, MPI_DOUBLE, i, err_tag, comm);
-        }
-        while (irecve != nslave) {
-          recv(req, chain_func, sampler, model);
-          irecve++;
-        }
-        MPI_Waitall(nslave, req.data(), MPI_STATUSES_IGNORE);
-        std::ostringstream chain_adapt_fail_msg;
-        chain_adapt_fail_msg << "Invalid adaptation data in Chain " << source;
-        throw std::runtime_error(chain_adapt_fail_msg.str());
-      } else {
-        for (int i = 1; i < warmup_comm.size; ++i) {
-          MPI_Send(workspace_r.data(), 0, MPI_DOUBLE, i, done_tag, comm);
-        }
-        while (recved != nslave) {
-          int index, flag = 0;
-          MPI_Testany(nslave, req.data(), &index, &flag, MPI_STATUS_IGNORE);
-          if(flag) {
-            recved++;
-            chain_func(sampler, model, sample, logger, workspace_r, index + 1);
-          }
-        }
-        ensemble_func(sampler, model, sample, logger, workspace_r);
-        MPI_Ibcast(workspace_r.data(), ensemble_func.send_size(sampler, model),
-                   MPI_DOUBLE, 0, comm, &bcast_req);
+        const int rank = loader.comm.rank;
+        const int mpi_size = loader.comm.size;
+        const int size = S::size(sampler, model, sample);
+        workspace_r.resize(size, mpi_size);
+        Eigen::VectorXd work(fs(sampler, model, sample));
+        MPI_Iallgather(work.data(), size, MPI_DOUBLE, 
+                       workspace_r.data(), size, MPI_DOUBLE,
+                       loader.mpi_comm, &req);
+        
       }
     }
-  };
-
-  struct warmup_dynamic_loader_slave : mpi_loader_base {
-    //! construct loader given MPI communicator
-    warmup_dynamic_loader_slave(const Communicator& comm_in,
-                                int inter) :
-      warmup_dynamic_loader_base(comm_in, inter)
-    {}
 
     /*
-     * master node (rank = 0) recv results and send
-     * available tasks to vacant slaves.
+     * check if the MPI communication is finished. While
+     * waiting, keep doing transitions. When communication
+     * is done, generate updated adaptation information and
+     * update sampler.
+     * 
+     * @tparam Sampler sampler used
+     * @tparam Model model struct
+     * @tparam S functor that update sampler with new adaptation .
+     * @tparam F functor that does transitions.
+     * @tparam Ts args of @c F.
      */
-    template<typename Sampler, typename Model, typename Send_processor, typename Recv_processor>
-    void operator()(Sampler& sampler, Model& model,
-                    const stan::mcmc::sample& sample,
-                    stan::callbacks::logger& logger,
-                    Send_processor& chain_func,
-                    Recv_processor& adapt_func) {
-      using Eigen::MatrixXd;
-      using Eigen::Matrix;
+    void finalize() {
+      if (is_inter_comm_node) {
+      MPI_Wait(&req, MPI_STATUS_IGNORE);
+      }
+    }
 
-      static const char* caller = "warmup_dynamic_loader_slave::slave";
-      stan::math::check_greater(caller, "MPI comm rank", warmup_comm.rank, 0);
-
-      // process adapt info before sending out to master
-      chain_func(sampler, model, sample, logger, workspace_r, warmup_comm.rank);
-      MPI_Send(workspace_r.data(), chain_func.send_size(sampler, model), MPI_DOUBLE, 0, work_tag, comm);
-
-      MPI_Status stat;
-      MPI_Request bcast_req;
-      MPI_Recv(workspace_r.data(), 0, MPI_DOUBLE, 0, MPI_ANY_TAG, comm, &stat);
-      if (stat.MPI_TAG == err_tag) {
-        std::ostringstream chain_adapt_fail_msg;
-        chain_adapt_fail_msg << "Invalid adaptation data in ensemble";
-        throw std::runtime_error(chain_adapt_fail_msg.str());
-      } else if (stat.MPI_TAG == done_tag) {
-        workspace_r.resize(adapt_func.recv_size(sampler, model), 1);
-        MPI_Ibcast(workspace_r.data(), adapt_func.recv_size(sampler, model),
-                   MPI_DOUBLE, 0, comm, &bcast_req);
-        MPI_Wait(&bcast_req, MPI_STATUS_IGNORE);
-        adapt_func(sampler, model, sample, logger, workspace_r);
+    /*
+     * check if the MPI communication is finished. While
+     * waiting, keep doing transitions. When communication
+     * is done, generate updated adaptation information and
+     * update sampler.
+     * 
+     * @tparam Sampler sampler used
+     * @tparam Model model struct
+     * @tparam S functor that update sampler with new adaptation .
+     * @tparam F functor that does transitions.
+     * @tparam Ts args of @c F.
+     */
+    template<typename Sampler, typename Model,
+             typename S,
+             typename F, typename... Ts>
+    void finalize(Sampler& sampler, Model& model,
+                  stan::mcmc::sample& sample,
+                  const S& fs, F& f, Ts... pars) {
+      if (is_inter_comm_node) {
+        int flag = 0;
+        MPI_Test(&req, &flag, MPI_STATUS_IGNORE);
+        while (flag == 0) {
+          f(pars...);
+          MPI_Test(&req, &flag, MPI_STATUS_IGNORE);
+        }
+        fs(workspace_r, sampler, model, sample);
       }
     }
   };

@@ -8,75 +8,8 @@ using Eigen::Matrix;
 using std::vector;
 using stan::services::util::mpi::Communicator;
 using stan::services::util::mpi::Session;
-using stan::services::util::mpi::warmup_dynamic_loader_base;
-using stan::services::util::mpi::warmup_dynamic_loader_master;
-using stan::services::util::mpi::warmup_dynamic_loader_slave;
-
-struct dummy_sampler {};
-struct dummy_model {};
-struct dummy_master_ensemble_processor {
-  template<typename Sampler, typename Model>
-  int send_size(Sampler& sampler, Model& model) {
-    return 10;
-  }
-
-  template<typename Sampler, typename Model>
-  void operator()(Sampler& sampler, Model& model,
-                  const stan::mcmc::sample& sample,
-                  stan::callbacks::logger& logger,
-                  Eigen::MatrixXd& workspace_r) {
-    for (int i = 0; i < workspace_r.cols(); ++i) {
-      workspace_r(i, 0) = workspace_r(i + 1, i);
-    }
-  }
-};
-
-struct dummy_master_chain_processor {
-  template<typename Sampler, typename Model>
-  int recv_size(Sampler& sampler, Model& model) {
-    return 10;
-  }
-
-  template<typename Sampler, typename Model>
-  void operator()(Sampler& sampler, Model& model,
-                  const stan::mcmc::sample& sample,
-                  stan::callbacks::logger& logger,
-                  Eigen::MatrixXd& workspace_r, int index) {
-    workspace_r(index, index - 1) *= 2.5;
-  }
-};
-
-struct dummy_slave_chain_processor {
-  template<typename Sampler, typename Model>
-  int send_size(Sampler& sampler, Model& model) {
-    return 10;
-  }
-
-  template<typename Sampler, typename Model>
-  void operator()(Sampler& sampler, Model& model,
-                  const stan::mcmc::sample& sample,
-                  stan::callbacks::logger& logger,
-                  Eigen::MatrixXd& workspace_r, int index) {
-    workspace_r.resize(send_size(sampler, model), 1);
-    workspace_r.setZero();
-    workspace_r(index) = index;
-  }
-};
-
-struct dummy_slave_adapt_processor {
-  template<typename Sampler, typename Model>
-  int recv_size(Sampler& sampler, Model& model) {
-    return 10;
-  }
-
-  template<typename Sampler, typename Model>
-  void operator()(Sampler& sampler, Model& model,
-                  const stan::mcmc::sample& sample,
-                  stan::callbacks::logger& logger,
-                  Eigen::MatrixXd& workspace_r) {
-    workspace_r *= 1.5;
-  }
-};
+using stan::services::util::mpi::mpi_loader_base;
+using stan::services::util::mpi::mpi_warmup;
 
 TEST(mpi_warmup_test, mpi_inter_intra_comms) {
   const Communicator world_comm(MPI_COMM_STAN);
@@ -200,39 +133,73 @@ TEST(mpi_warmup_test, mpi_inter_intra_comms) {
   }
 }
 
-// TEST(mpi_warmup_test, mpi_warmup) {
-//   const Communicator world_comm(MPI_COMM_STAN);
-//   const Communicator inter_comm(Session<3>::MPI_COMM_INTER_CHAIN);
-//   const Communicator intra_comm(Session<3>::MPI_COMM_INTRA_CHAIN);
-//   // 
-//   // warmup_dynamic_loader_base load(warmup_comm, 10);
+struct send_processor {
+  const Communicator& comm;
 
-// }
+  send_processor(const Communicator& comm_in) :
+    comm(comm_in)
+  {}
 
-// TEST(mpi_warmup_test, mpi_master_slave) {
-//   const Communicator& warmup_comm =
-//     Session<NUM_STAN_LANG_MPI_COMM>::comms[0];
+  template<typename Sampler, typename Model>
+  static int size(const Sampler& sampler, const Model& model,
+           stan::mcmc::sample& sample) {
+    return 10;
+  }
 
-//   dummy_sampler sampler;
-//   dummy_model model;
-//   stan::mcmc::sample sample(Eigen::VectorXd(0), 0, 0);
-//   stan::callbacks::logger logger;
+  template<typename Sampler, typename Model>
+  Eigen::VectorXd operator()(Sampler& sampler, Model& model, stan::mcmc::sample& sample) const {
+    Eigen::VectorXd x(Eigen::VectorXd::Zero(size(sampler, model, sample)));
+    x(comm.rank) = comm.rank;
+    return x;
+  }
+};
 
-//   if (warmup_comm.rank == 0) {
-//     warmup_dynamic_loader_master master(warmup_comm, 10);
-//     dummy_master_ensemble_processor f;
-//     dummy_master_chain_processor g;
-//     EXPECT_NO_THROW(master(sampler, model, sample, logger, f, g));
-//     EXPECT_FLOAT_EQ(master.workspace_r(0), 2.5);
-//     EXPECT_FLOAT_EQ(master.workspace_r(1), 5.0);
-//   } else {
-//     warmup_dynamic_loader_slave slave(warmup_comm, 10);    
-//     dummy_slave_chain_processor f;
-//     dummy_slave_adapt_processor g;
-//     EXPECT_NO_THROW(slave(sampler, model, sample, logger, f, g));
-//     EXPECT_FLOAT_EQ(slave.workspace_r(0), 3.75);
-//     EXPECT_FLOAT_EQ(slave.workspace_r(1), 7.50);
-//   }
-// }
+struct adapt_processor {
+  const Communicator& comm;
+
+  adapt_processor(const Communicator& comm_in) :
+    comm(comm_in)
+  {}
+
+  template<typename Sampler, typename Model>
+  void operator()(const Eigen::MatrixXd& workspace_r, Sampler& sampler, Model& model, stan::mcmc::sample& sample) const {
+    for (int i = 0; i < workspace_r.cols(); ++i) {
+      EXPECT_FLOAT_EQ(workspace_r(i, i), double(i));
+    }
+    double sum1 = 0.5 * comm.size * (comm.size - 1);
+    double sum2 = workspace_r.sum();
+    EXPECT_FLOAT_EQ(sum1, sum2);
+  }
+};
+
+struct dummy_transition {
+  template<typename Sampler, typename Model>
+  void operator()(Sampler& sampler, Model& model, stan::mcmc::sample& sample) {
+  }
+
+  void operator()() {
+  }
+};
+
+TEST(mpi_warmup_test, mpi_warmup_loader) {
+  const Communicator inter_comm(Session<3>::MPI_COMM_INTER_CHAIN);
+  mpi_loader_base loader(inter_comm);
+
+  Eigen::MatrixXd dummy_sampler;
+  Eigen::MatrixXd dummy_model;
+  stan::mcmc::sample sample(Eigen::VectorXd(0), 0, 0);
+  mpi_warmup mpi_warmup_adapt(loader, 10);
+
+  send_processor fs(inter_comm);
+  adapt_processor fd(inter_comm);
+  dummy_transition f;
+  
+  mpi_warmup_adapt(dummy_sampler, dummy_model, sample, fs,
+                   f, dummy_sampler, dummy_model, sample);
+
+  mpi_warmup_adapt.finalize(dummy_sampler, dummy_model, sample, fd, f);
+
+  mpi_warmup_adapt.finalize();
+}
 
 #endif
