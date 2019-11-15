@@ -244,7 +244,7 @@ namespace mpi {
     Eigen::MatrixXd& workspace_r;
     int interval;
     MPI_Request req;
-    bool is_inter_comm_node;
+    const bool is_inter_comm_node;
 
     //! construct loader given MPI communicator
     mpi_warmup(mpi_loader_base& l, int inter) :
@@ -290,25 +290,8 @@ namespace mpi {
      * check if the MPI communication is finished. While
      * waiting, keep doing transitions. When communication
      * is done, generate updated adaptation information and
-     * update sampler.
-     * 
-     * @tparam Sampler sampler used
-     * @tparam Model model struct
-     * @tparam S functor that update sampler with new adaptation .
-     * @tparam F functor that does transitions.
-     * @tparam Ts args of @c F.
-     */
-    void finalize() {
-      if (is_inter_comm_node) {
-      MPI_Wait(&req, MPI_STATUS_IGNORE);
-      }
-    }
-
-    /*
-     * check if the MPI communication is finished. While
-     * waiting, keep doing transitions. When communication
-     * is done, generate updated adaptation information and
-     * update sampler.
+     * update sampler. This function must be called before
+     * exiting the scope in which @c mpi_warmup obj is declared.
      * 
      * @tparam Sampler sampler used
      * @tparam Model model struct
