@@ -36,15 +36,15 @@ class stepsize_adaptation : public base_adaptation {
       t0_ = t;
   }
 
-  double get_mu() { return mu_; }
+  double get_mu() const noexcept { return mu_; }
 
-  double get_delta() { return delta_; }
+  double get_delta() const noexcept { return delta_; }
 
-  double get_gamma() { return gamma_; }
+  double get_gamma() const noexcept { return gamma_; }
 
-  double get_kappa() { return kappa_; }
+  double get_kappa() const noexcept { return kappa_; }
 
-  double get_t0() { return t0_; }
+  double get_t0() const noexcept { return t0_; }
 
   void restart() {
     counter_ = 0;
