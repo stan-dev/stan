@@ -17,6 +17,7 @@ There are interfaces available in R, Python, MATLAB, Julia, Stata, Mathematica, 
 
 [![DOI](https://zenodo.org/badge/19868/stan-dev/stan.svg)](https://zenodo.org/badge/latestdoi/19868/stan-dev/stan)
 
+
 Home Page
 ---------
 Stan's home page, with links to everything you'll need to use Stan is:
