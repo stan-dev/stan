@@ -378,7 +378,7 @@ class normal_meanfield : public base_family {
           const char* msg2
               = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
-          stan::math::domain_error(function, name, y, msg1, msg2);
+          stan::math::throw_domain_error(function, name, y, msg1, msg2);
         }
       }
     }
