@@ -17,6 +17,10 @@ class stepsize_var_adapter : public base_adapter {
     return stepsize_adaptation_;
   }
 
+  const stepsize_adaptation& get_stepsize_adaptation() const noexcept {
+    return stepsize_adaptation_;
+  }
+
   var_adaptation& get_var_adaptation() { return var_adaptation_; }
 
   void set_window_params(unsigned int num_warmup, unsigned int init_buffer,
