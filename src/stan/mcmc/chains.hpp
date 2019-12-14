@@ -257,7 +257,8 @@ class chains {
       param_names_[i] = param_names(i);
   }
 
-  explicit chains(const stan::io::stan_csv& stan_csv) : chains(stan_csv.header) {
+  explicit chains(const stan::io::stan_csv& stan_csv)
+      : chains(stan_csv.header) {
     if (stan_csv.samples.rows() > 0)
       add(stan_csv);
   }
