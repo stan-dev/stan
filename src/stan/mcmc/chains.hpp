@@ -47,7 +47,7 @@ using Eigen::Dynamic;
 template <class RNG = boost::random::ecuyer1988>
 class chains {
  private:
-  Eigen::Matrix<std::string, Dynamic, 1> param_names_;
+  std::vector<std::string> param_names_;
   Eigen::Matrix<Eigen::MatrixXd, Dynamic, 1> samples_;
   Eigen::VectorXi warmup_;
 
@@ -248,17 +248,16 @@ class chains {
   }
 
  public:
-  explicit chains(const Eigen::Matrix<std::string, Dynamic, 1>& param_names)
+  explicit chains(const std::vector<std::string>& param_names)
       : param_names_(param_names) {}
 
-  explicit chains(const std::vector<std::string>& param_names)
+  explicit chains(const Eigen::Matrix<std::string, Dynamic, 1>& param_names)
       : param_names_(param_names.size()) {
     for (size_t i = 0; i < param_names.size(); i++)
-      param_names_(i) = param_names[i];
+      param_names_[i] = param_names(i);
   }
 
-  explicit chains(const stan::io::stan_csv& stan_csv)
-      : param_names_(stan_csv.header) {
+  explicit chains(const stan::io::stan_csv& stan_csv) : chains(stan_csv.header) {
     if (stan_csv.samples.rows() > 0)
       add(stan_csv);
   }
@@ -267,16 +266,16 @@ class chains {
 
   inline int num_params() const { return param_names_.size(); }
 
-  const Eigen::Matrix<std::string, Dynamic, 1>& param_names() const {
+  const std::vector<std::string>& param_names() const {
     return param_names_;
   }
 
-  const std::string& param_name(int j) const { return param_names_(j); }
+  const std::string& param_name(int j) const { return param_names_[j]; }
 
   int index(const std::string& name) const {
     int index = -1;
     for (int i = 0; i < param_names_.size(); i++)
-      if (param_names_(i) == name)
+      if (param_names_[i] == name)
         return i;
     return index;
   }
@@ -380,10 +379,12 @@ class chains {
       throw std::invalid_argument(
           "add(stan_csv): number of columns in"
           " sample does not match chains");
-    if (!param_names_.cwiseEqual(stan_csv.header).all()) {
-      throw std::invalid_argument(
-          "add(stan_csv): header does not match"
-          " chain's header");
+    for (int i = 0; i < num_params(); i++) {
+      if (param_names_[i] != stan_csv.header(i)) {
+        throw std::invalid_argument(
+            "add(stan_csv): header does not match"
+            " chain's header");
+      }
     }
     add(stan_csv.samples);
     if (stan_csv.metadata.save_warmup)
