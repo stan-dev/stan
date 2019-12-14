@@ -267,9 +267,7 @@ class chains {
 
   inline int num_params() const { return param_names_.size(); }
 
-  const std::vector<std::string>& param_names() const {
-    return param_names_;
-  }
+  const std::vector<std::string>& param_names() const { return param_names_; }
 
   const std::string& param_name(int j) const { return param_names_[j]; }
 
