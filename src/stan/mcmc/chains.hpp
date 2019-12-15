@@ -380,9 +380,10 @@ class chains {
           " sample does not match chains");
     for (int i = 0; i < num_params(); i++) {
       if (param_names_[i] != stan_csv.header(i)) {
-        throw std::invalid_argument(
-            "add(stan_csv): header does not match"
-            " chain's header");
+        std::stringstream ss;
+        ss << "add(stan_csv): header " << param_names_[i]
+           << " does not match chain's header (" << stan_csv.header(i) << ")";
+        throw std::invalid_argument(ss.str());
       }
     }
     add(stan_csv.samples);
