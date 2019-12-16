@@ -231,7 +231,7 @@ TEST_F(McmcChains, blocker1_param_names) {
   ASSERT_EQ(blocker1.header.size(), chains.num_params());
   ASSERT_EQ(blocker1.header.size(), chains.param_names().size());
   for (int i = 0; i < blocker1.header.size(); i++) {
-    EXPECT_EQ(blocker1.header(i), chains.param_names()(i));
+    EXPECT_EQ(blocker1.header(i), chains.param_names()[i]);
   }
 }
 TEST_F(McmcChains, blocker1_param_name) {
