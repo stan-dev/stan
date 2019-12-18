@@ -43,7 +43,7 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
   csv_stream.close();
   EXPECT_EQ(12345U, bern_csv.metadata.seed);
   ASSERT_EQ(19, bern_csv.header.size());
-  EXPECT_EQ("theta", bern_csv.header(7));
+  EXPECT_EQ("theta", bern_csv.header[7]);
   ASSERT_EQ(1000, bern_csv.samples.rows());
   ASSERT_EQ(19, bern_csv.samples.cols());
 
