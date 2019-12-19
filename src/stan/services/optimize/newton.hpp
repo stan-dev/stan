@@ -1,12 +1,10 @@
 #ifndef STAN_SERVICES_OPTIMIZE_NEWTON_HPP
 #define STAN_SERVICES_OPTIMIZE_NEWTON_HPP
 
-#include <stan/io/var_context.hpp>
-#include <stan/io/chained_var_context.hpp>
-#include <stan/io/random_var_context.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/io/var_context.hpp>
 #include <stan/optimization/newton.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -39,10 +37,11 @@ namespace optimize {
  * @return error_codes::OK if successful
  */
 template <class Model>
-int newton(Model& model, stan::io::var_context& init, unsigned int random_seed,
-           unsigned int chain, double init_radius, int num_iterations,
-           bool save_iterations, callbacks::interrupt& interrupt,
-           callbacks::logger& logger, callbacks::writer& init_writer,
+int newton(Model& model, const stan::io::var_context& init,
+           unsigned int random_seed, unsigned int chain, double init_radius,
+           int num_iterations, bool save_iterations,
+           callbacks::interrupt& interrupt, callbacks::logger& logger,
+           callbacks::writer& init_writer,
            callbacks::writer& parameter_writer) {
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
