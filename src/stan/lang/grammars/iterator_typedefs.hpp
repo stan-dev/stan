@@ -6,9 +6,9 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
-    typedef std::string::const_iterator input_iterator_t;
-    typedef boost::spirit::line_pos_iterator<input_iterator_t> pos_iterator_t;
-  }
-}
+namespace lang {
+typedef std::string::const_iterator input_iterator_t;
+typedef boost::spirit::line_pos_iterator<input_iterator_t> pos_iterator_t;
+}  // namespace lang
+}  // namespace stan
 #endif

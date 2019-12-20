@@ -4,14 +4,14 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    increment_log_prob_statement::increment_log_prob_statement() { }
+increment_log_prob_statement::increment_log_prob_statement() {}
 
-    increment_log_prob_statement::increment_log_prob_statement(
-                                               const expression& log_prob)
-      : log_prob_(log_prob) {  }
+increment_log_prob_statement::increment_log_prob_statement(
+    const expression& log_prob)
+    : log_prob_(log_prob) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

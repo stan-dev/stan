@@ -8,34 +8,29 @@
 
 typedef boost::ecuyer1988 rng_t;
 
-
 namespace stan {
-  namespace mcmc {
+namespace mcmc {
 
-    class mock_hmc: public base_hmc<mock_model,
-                                    mock_hamiltonian,
-                                    mock_integrator,
-                                    rng_t> {
-
-    public:
-      mock_hmc(const mock_model& m, rng_t& rng)
-        : base_hmc<mock_model,mock_hamiltonian,mock_integrator,rng_t>(m, rng)
-      { }
-
-      sample transition(sample& init_sample,
-                        callbacks::logger& logger) {
-        this->seed(init_sample.cont_params());
-        return sample(this->z_.q, - this->hamiltonian_.V(this->z_), 0);
-      }
-
-      void get_sampler_param_names(std::vector<std::string>& names) {}
-
-      void get_sampler_params(std::vector<double>& values) {}
-    };
-
+class mock_hmc
+    : public base_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t> {
+ public:
+  mock_hmc(const mock_model& m, rng_t& rng)
+      : base_hmc<mock_model, mock_hamiltonian, mock_integrator, rng_t>(m, rng) {
   }
 
-}
+  sample transition(sample& init_sample, callbacks::logger& logger) {
+    this->seed(init_sample.cont_params());
+    return sample(this->z_.q, -this->hamiltonian_.V(this->z_), 0);
+  }
+
+  void get_sampler_param_names(std::vector<std::string>& names) {}
+
+  void get_sampler_params(std::vector<double>& values) {}
+};
+
+}  // namespace mcmc
+
+}  // namespace stan
 
 TEST(McmcBaseHMC, point_construction) {
   rng_t base_rng(0);
@@ -103,7 +98,6 @@ TEST(McmcBaseHMC, set_stepsize_jitter) {
   EXPECT_EQ(old_jitter, sampler.get_stepsize_jitter());
 }
 
-
 TEST(McmcBaseHMC, streams) {
   stan::test::capture_std_streams();
 
@@ -123,8 +117,7 @@ TEST(McmcBaseHMC, streams) {
   stan::callbacks::stream_writer writer(output);
 
   EXPECT_NO_THROW(sampler.write_sampler_state(writer));
-  EXPECT_EQ("Step size = 0.1\n",
-            output.str());
+  EXPECT_EQ("Step size = 0.1\n", output.str());
 
   stan::test::reset_std_streams();
   EXPECT_EQ("", stan::test::cout_ss.str());

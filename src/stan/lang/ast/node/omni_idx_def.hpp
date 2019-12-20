@@ -4,10 +4,10 @@
 #include <stan/lang/ast.hpp>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    omni_idx::omni_idx() { }
+omni_idx::omni_idx() {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

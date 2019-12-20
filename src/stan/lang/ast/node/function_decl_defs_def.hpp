@@ -5,14 +5,14 @@
 #include <vector>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    function_decl_defs::function_decl_defs() { }
+function_decl_defs::function_decl_defs() {}
 
-    function_decl_defs::function_decl_defs(
-                            const std::vector<function_decl_def>& decl_defs)
-      : decl_defs_(decl_defs) { }
+function_decl_defs::function_decl_defs(
+    const std::vector<function_decl_def>& decl_defs)
+    : decl_defs_(decl_defs) {}
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

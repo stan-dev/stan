@@ -6,7 +6,8 @@ TEST(experimental_advi_defaults, gradient_samples) {
   EXPECT_EQ("Number of Monte Carlo draws for computing the gradient.",
             gradient_samples::description());
 
-  EXPECT_NO_THROW(gradient_samples::validate(gradient_samples::default_value()));
+  EXPECT_NO_THROW(
+      gradient_samples::validate(gradient_samples::default_value()));
   EXPECT_NO_THROW(gradient_samples::validate(1));
   EXPECT_THROW(gradient_samples::validate(0), std::invalid_argument);
 
@@ -51,8 +52,7 @@ TEST(experimental_advi_defaults, tol_rel_obj) {
 
 TEST(experimental_advi_defaults, eta) {
   using stan::services::experimental::advi::eta;
-  EXPECT_EQ("Stepsize scaling parameter.",
-            eta::description());
+  EXPECT_EQ("Stepsize scaling parameter.", eta::description());
 
   EXPECT_NO_THROW(eta::validate(eta::default_value()));
   EXPECT_NO_THROW(eta::validate(1.0));
@@ -63,8 +63,7 @@ TEST(experimental_advi_defaults, eta) {
 
 TEST(experimental_advi_defaults, adapt_engaged) {
   using stan::services::experimental::advi::adapt_engaged;
-  EXPECT_EQ("Boolean flag for eta adaptation.",
-            adapt_engaged::description());
+  EXPECT_EQ("Boolean flag for eta adaptation.", adapt_engaged::description());
 
   EXPECT_NO_THROW(adapt_engaged::validate(adapt_engaged::default_value()));
   EXPECT_NO_THROW(adapt_engaged::validate(true));
@@ -78,7 +77,8 @@ TEST(experimental_advi_defaults, adapt_iterations) {
   EXPECT_EQ("Number of iterations for eta adaptation.",
             adapt_iterations::description());
 
-  EXPECT_NO_THROW(adapt_iterations::validate(adapt_iterations::default_value()));
+  EXPECT_NO_THROW(
+      adapt_iterations::validate(adapt_iterations::default_value()));
   EXPECT_NO_THROW(adapt_iterations::validate(1));
   EXPECT_THROW(adapt_iterations::validate(0), std::invalid_argument);
 

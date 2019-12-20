@@ -5,16 +5,16 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Write a user-readable version of the specified bare expression
-     * type to the specified output stream.
-     *
-     * @param o output stream
-     * @param type bare expression type
-     */
-    std::ostream& write_bare_expr_type(std::ostream& o, bare_expr_type type);
-  }
-}
+/**
+ * Write a user-readable version of the specified bare expression
+ * type to the specified output stream.
+ *
+ * @param o output stream
+ * @param type bare expression type
+ */
+std::ostream& write_bare_expr_type(std::ostream& o, bare_expr_type type);
+}  // namespace lang
+}  // namespace stan
 #endif

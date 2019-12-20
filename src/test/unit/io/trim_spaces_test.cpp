@@ -14,5 +14,4 @@ TEST(ioUtil, trimSpaces) {
   EXPECT_EQ("a", trim_spaces(" a"));
   EXPECT_EQ("a", trim_spaces("a "));
   EXPECT_EQ("abcd efg", trim_spaces("\t\n      abcd efg     \r\n     "));
-
 }

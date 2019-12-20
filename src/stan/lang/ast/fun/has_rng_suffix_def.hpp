@@ -5,17 +5,14 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    bool has_rng_suffix(const std::string& s) {
-      int n = s.size();
-      return n > 4
-        && s[n-1] == 'g'
-        && s[n-2] == 'n'
-        && s[n-3] == 'r'
-        && s[n-4] == '_';
-    }
-
-  }
+bool has_rng_suffix(const std::string& s) {
+  int n = s.size();
+  return n > 4 && s[n - 1] == 'g' && s[n - 2] == 'n' && s[n - 3] == 'r'
+         && s[n - 4] == '_';
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

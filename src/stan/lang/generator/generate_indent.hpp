@@ -5,20 +5,20 @@
 #include <ostream>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Write the specified number of indentations to the specified
-     * output stream.
-     *
-     * @param indent number of indentations
-     * @param[in, out] o stream to which indentations are written
-     */
-    void generate_indent(size_t indent, std::ostream& o) {
-      for (size_t k = 0; k < indent; ++k)
-        o << INDENT;
-    }
-
-  }
+/**
+ * Write the specified number of indentations to the specified
+ * output stream.
+ *
+ * @param indent number of indentations
+ * @param[in, out] o stream to which indentations are written
+ */
+void generate_indent(size_t indent, std::ostream& o) {
+  for (size_t k = 0; k < indent; ++k)
+    o << INDENT;
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif

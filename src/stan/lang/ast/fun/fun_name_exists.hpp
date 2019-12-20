@@ -4,17 +4,17 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    /**
-     * Return true if the function name has been declared as a
-     * built-in or by the user.  
-     *
-     * @param name name of function
-     * @return true if it has been declared
-     */
-    bool fun_name_exists(const std::string& name);
+/**
+ * Return true if the function name has been declared as a
+ * built-in or by the user.
+ *
+ * @param name name of function
+ * @return true if it has been declared
+ */
+bool fun_name_exists(const std::string& name);
 
-  }
-}
+}  // namespace lang
+}  // namespace stan
 #endif

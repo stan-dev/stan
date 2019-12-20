@@ -32,28 +32,29 @@ namespace io {
  *
  * @tparam T Basic scalar type.
  */
-template <typename T> class reader {
-private:
+template <typename T>
+class reader {
+ private:
   std::vector<T> &data_r_;
   std::vector<int> &data_i_;
-  size_t pos_;
-  size_t int_pos_;
+  size_t pos_{0};
+  size_t int_pos_{0};
 
-  inline T &scalar_ptr() { return data_r_.at(pos_); }
+  inline T &scalar_ptr() { return data_r_[pos_]; }
 
   inline T &scalar_ptr_increment(size_t m) {
     pos_ += m;
-    return data_r_.at(pos_ - m);
+    return data_r_[pos_ - m];
   }
 
-  inline int &int_ptr() { return data_i_.at(int_pos_); }
+  inline int &int_ptr() { return data_i_[int_pos_]; }
 
   inline int &int_ptr_increment(size_t m) {
     int_pos_ += m;
-    return data_i_.at(int_pos_ - m);
+    return data_i_[int_pos_ - m];
   }
 
-public:
+ public:
   typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
   typedef Eigen::Matrix<T, Eigen::Dynamic, 1> vector_t;
   typedef Eigen::Matrix<T, 1, Eigen::Dynamic> row_vector_t;
@@ -74,7 +75,7 @@ public:
    * @param data_i Sequence of integer values.
    */
   reader(std::vector<T> &data_r, std::vector<int> &data_i)
-      : data_r_(data_r), data_i_(data_i), pos_(0), int_pos_(0) {}
+      : data_r_(data_r), data_i_(data_i) {}
 
   /**
    * Destroy this variable reader.
@@ -166,9 +167,9 @@ public:
   inline std::vector<T> std_vector(size_t m) {
     if (m == 0)
       return std::vector<T>();
-    std::vector<T> vec;
-    T &start = scalar_ptr_increment(m);
-    vec.insert(vec.begin(), &start, &scalar_ptr());
+    std::vector<T> vec(&this->data_r_[this->pos_],
+                       &this->data_r_[this->pos_ + m]);
+    this->pos_ += m;
     return vec;
   }
 
@@ -490,7 +491,8 @@ public:
    * @throw std::runtime_error if the scalar is less than the
    *    specified lower bound
    */
-  template <typename TL> inline T scalar_lb(const TL lb) {
+  template <typename TL>
+  inline T scalar_lb(const TL lb) {
     T x(scalar());
     stan::math::check_greater_or_equal("stan::io::scalar_lb",
                                        "Constrained scalar", x, lb);
@@ -508,7 +510,8 @@ public:
    * @return Next scalar transformed to have the specified
    * lower bound.
    */
-  template <typename TL> inline T scalar_lb_constrain(const TL lb) {
+  template <typename TL>
+  inline T scalar_lb_constrain(const TL lb) {
     return stan::math::lb_constrain(scalar(), lb);
   }
 
@@ -523,7 +526,8 @@ public:
    * @param lb Lower bound on result.
    * @param lp Reference to log probability variable to increment.
    */
-  template <typename TL> inline T scalar_lb_constrain(const TL lb, T &lp) {
+  template <typename TL>
+  inline T scalar_lb_constrain(const TL lb, T &lp) {
     return stan::math::lb_constrain(scalar(), lb, lp);
   }
 
@@ -539,10 +543,10 @@ public:
    * @throw std::runtime_error if the scalar is greater than the
    *    specified upper bound
    */
-  template <typename TU> inline T scalar_ub(TU ub) {
+  template <typename TU>
+  inline T scalar_ub(TU ub) {
     T x(scalar());
-    stan::math::check_less_or_equal("stan::io::scalar_ub",
-                                    "Constrained scalar",
+    stan::math::check_less_or_equal("stan::io::scalar_ub", "Constrained scalar",
                                     x, ub);
     return x;
   }
@@ -558,7 +562,8 @@ public:
    * @return Next scalar transformed to have the specified
    * upper bound.
    */
-  template <typename TU> inline T scalar_ub_constrain(const TU ub) {
+  template <typename TU>
+  inline T scalar_ub_constrain(const TU ub) {
     return stan::math::ub_constrain(scalar(), ub);
   }
 
@@ -573,7 +578,8 @@ public:
    * @param ub Upper bound on result.
    * @param lp Reference to log probability variable to increment.
    */
-  template <typename TU> inline T scalar_ub_constrain(const TU ub, T &lp) {
+  template <typename TU>
+  inline T scalar_ub_constrain(const TU ub, T &lp) {
     return stan::math::ub_constrain(scalar(), ub, lp);
   }
 
@@ -808,8 +814,9 @@ public:
    */
   inline Eigen::Matrix<T, Eigen::Dynamic, 1> unit_vector_constrain(size_t k) {
     if (k == 0) {
-      std::string msg = "io::unit_vector_constrain:"
-          " unit vectors cannot be size 0.";
+      std::string msg
+          = "io::unit_vector_constrain:"
+            " unit vectors cannot be size 0.";
       throw std::invalid_argument(msg);
     }
     return stan::math::unit_vector_constrain(vector(k));
@@ -830,8 +837,9 @@ public:
    */
   inline vector_t unit_vector_constrain(size_t k, T &lp) {
     if (k == 0) {
-      std::string msg = "io::unit_vector_constrain:"
-          " unit vectors cannot be size 0.";
+      std::string msg
+          = "io::unit_vector_constrain:"
+            " unit vectors cannot be size 0.";
       throw std::invalid_argument(msg);
     }
     return stan::math::unit_vector_constrain(vector(k), lp);
@@ -1177,7 +1185,8 @@ public:
     return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k, lp);
   }
 
-  template <typename TL> inline vector_t vector_lb(const TL lb, size_t m) {
+  template <typename TL>
+  inline vector_t vector_lb(const TL lb, size_t m) {
     vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = scalar_lb(lb);
@@ -1225,7 +1234,7 @@ public:
   }
 
   template <typename TL>
-  inline matrix_t matrix_lb(const TL lb, size_t m, size_t n) {
+  inline matrix_t matrix_lb(const TL lb, const size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1251,7 +1260,8 @@ public:
     return v;
   }
 
-  template <typename TU> inline vector_t vector_ub(const TU ub, size_t m) {
+  template <typename TU>
+  inline vector_t vector_ub(const TU ub, size_t m) {
     vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = scalar_ub(ub);
@@ -1308,7 +1318,7 @@ public:
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n) {
+  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1317,7 +1327,8 @@ public:
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, size_t m, size_t n, T &lp) {
+  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n,
+                                      T &lp) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)
@@ -1434,8 +1445,9 @@ public:
   }
 
   template <typename TL, typename TS>
-  inline row_vector_t
-  row_vector_offset_multiplier(const TL offset, const TS multiplier, size_t m) {
+  inline row_vector_t row_vector_offset_multiplier(const TL offset,
+                                                   const TS multiplier,
+                                                   size_t m) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = scalar_offset_multiplier(offset, multiplier);
@@ -1443,9 +1455,8 @@ public:
   }
 
   template <typename TL, typename TS>
-  inline row_vector_t
-  row_vector_offset_multiplier_constrain(const TL offset, const TS multiplier,
-                                         size_t m) {
+  inline row_vector_t row_vector_offset_multiplier_constrain(
+      const TL offset, const TS multiplier, size_t m) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = scalar_offset_multiplier_constrain(offset, multiplier);
@@ -1453,9 +1464,8 @@ public:
   }
 
   template <typename TL, typename TS>
-  inline row_vector_t
-  row_vector_offset_multiplier_constrain(const TL offset, const TS multiplier,
-                                         size_t m, T &lp) {
+  inline row_vector_t row_vector_offset_multiplier_constrain(
+      const TL offset, const TS multiplier, size_t m, T &lp) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
@@ -1484,9 +1494,10 @@ public:
   }
 
   template <typename TL, typename TS>
-  inline matrix_t
-  matrix_offset_multiplier_constrain(const TL offset, const TS multiplier,
-                                     size_t m, size_t n, T &lp) {
+  inline matrix_t matrix_offset_multiplier_constrain(const TL offset,
+                                                     const TS multiplier,
+                                                     size_t m, size_t n,
+                                                     T &lp) {
     matrix_t v(m, n);
     for (size_t j = 0; j < n; ++j)
       for (size_t i = 0; i < m; ++i)

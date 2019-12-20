@@ -5,12 +5,12 @@
 #include <string>
 
 namespace stan {
-  namespace lang {
+namespace lang {
 
-    bool has_ccdf_suffix(const std::string& fname) {
-      return ends_with("_lccdf", fname) || ends_with("_ccdf_log", fname);
-    }
-
-  }
+bool has_ccdf_suffix(const std::string& fname) {
+  return ends_with("_lccdf", fname) || ends_with("_ccdf_log", fname);
 }
+
+}  // namespace lang
+}  // namespace stan
 #endif
