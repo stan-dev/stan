@@ -120,51 +120,16 @@ TEST_F(StanIoStanCsvReader, read_header1) {
   EXPECT_EQ("energy__", header[6]);
   EXPECT_EQ("d", header[7]);
   EXPECT_EQ("sigmasq_delta", header[8]);
-  EXPECT_EQ("mu[1]", header[9]);
-  EXPECT_EQ("mu[2]", header[10]);
-  EXPECT_EQ("mu[3]", header[11]);
-  EXPECT_EQ("mu[4]", header[12]);
-  EXPECT_EQ("mu[5]", header[13]);
-  EXPECT_EQ("mu[6]", header[14]);
-  EXPECT_EQ("mu[7]", header[15]);
-  EXPECT_EQ("mu[8]", header[16]);
-  EXPECT_EQ("mu[9]", header[17]);
-  EXPECT_EQ("mu[10]", header[18]);
-  EXPECT_EQ("mu[11]", header[19]);
-  EXPECT_EQ("mu[12]", header[20]);
-  EXPECT_EQ("mu[13]", header[21]);
-  EXPECT_EQ("mu[14]", header[22]);
-  EXPECT_EQ("mu[15]", header[23]);
-  EXPECT_EQ("mu[16]", header[24]);
-  EXPECT_EQ("mu[17]", header[25]);
-  EXPECT_EQ("mu[18]", header[26]);
-  EXPECT_EQ("mu[19]", header[27]);
-  EXPECT_EQ("mu[20]", header[28]);
-  EXPECT_EQ("mu[21]", header[29]);
-  EXPECT_EQ("mu[22]", header[30]);
-  EXPECT_EQ("delta[1]", header[31]);
-  EXPECT_EQ("delta[2]", header[32]);
-  EXPECT_EQ("delta[3]", header[33]);
-  EXPECT_EQ("delta[4]", header[34]);
-  EXPECT_EQ("delta[5]", header[35]);
-  EXPECT_EQ("delta[6]", header[36]);
-  EXPECT_EQ("delta[7]", header[37]);
-  EXPECT_EQ("delta[8]", header[38]);
-  EXPECT_EQ("delta[9]", header[39]);
-  EXPECT_EQ("delta[10]", header[40]);
-  EXPECT_EQ("delta[11]", header[41]);
-  EXPECT_EQ("delta[12]", header[42]);
-  EXPECT_EQ("delta[13]", header[43]);
-  EXPECT_EQ("delta[14]", header[44]);
-  EXPECT_EQ("delta[15]", header[45]);
-  EXPECT_EQ("delta[16]", header[46]);
-  EXPECT_EQ("delta[17]", header[47]);
-  EXPECT_EQ("delta[18]", header[48]);
-  EXPECT_EQ("delta[19]", header[49]);
-  EXPECT_EQ("delta[20]", header[50]);
-  EXPECT_EQ("delta[21]", header[51]);
-  EXPECT_EQ("delta[22]", header[52]);
-  EXPECT_EQ("delta_new", header[53]);
+  for (int i = 1; i <= 22; ++i) {
+    std::stringstream ss;
+    ss << "mu[" << i << "]";
+    EXPECT_EQ(ss.str(), header[8 + i]);
+  }
+  for (int i = 1; i <= 22; ++i) {
+    std::stringstream ss;
+    ss << "delta[" << i << "]";
+    EXPECT_EQ(ss.str(), header[30 + i]);
+  }
   EXPECT_EQ("sigma_delta", header[54]);
 }
 
@@ -320,50 +285,16 @@ TEST_F(StanIoStanCsvReader, ParseBlocker) {
   EXPECT_EQ("energy__", blocker0.header[6]);
   EXPECT_EQ("d", blocker0.header[7]);
   EXPECT_EQ("sigmasq_delta", blocker0.header[8]);
-  EXPECT_EQ("mu[1]", blocker0.header[9]);
-  EXPECT_EQ("mu[2]", blocker0.header[10]);
-  EXPECT_EQ("mu[3]", blocker0.header[11]);
-  EXPECT_EQ("mu[4]", blocker0.header[12]);
-  EXPECT_EQ("mu[5]", blocker0.header[13]);
-  EXPECT_EQ("mu[6]", blocker0.header[14]);
-  EXPECT_EQ("mu[7]", blocker0.header[15]);
-  EXPECT_EQ("mu[8]", blocker0.header[16]);
-  EXPECT_EQ("mu[9]", blocker0.header[17]);
-  EXPECT_EQ("mu[10]", blocker0.header[18]);
-  EXPECT_EQ("mu[11]", blocker0.header[19]);
-  EXPECT_EQ("mu[12]", blocker0.header[20]);
-  EXPECT_EQ("mu[13]", blocker0.header[21]);
-  EXPECT_EQ("mu[14]", blocker0.header[22]);
-  EXPECT_EQ("mu[15]", blocker0.header[23]);
-  EXPECT_EQ("mu[16]", blocker0.header[24]);
-  EXPECT_EQ("mu[17]", blocker0.header[25]);
-  EXPECT_EQ("mu[18]", blocker0.header[26]);
-  EXPECT_EQ("mu[19]", blocker0.header[27]);
-  EXPECT_EQ("mu[20]", blocker0.header[28]);
-  EXPECT_EQ("mu[21]", blocker0.header[29]);
-  EXPECT_EQ("mu[22]", blocker0.header[30]);
-  EXPECT_EQ("delta[1]", blocker0.header[31]);
-  EXPECT_EQ("delta[2]", blocker0.header[32]);
-  EXPECT_EQ("delta[3]", blocker0.header[33]);
-  EXPECT_EQ("delta[4]", blocker0.header[34]);
-  EXPECT_EQ("delta[5]", blocker0.header[35]);
-  EXPECT_EQ("delta[6]", blocker0.header[36]);
-  EXPECT_EQ("delta[7]", blocker0.header[37]);
-  EXPECT_EQ("delta[8]", blocker0.header[38]);
-  EXPECT_EQ("delta[9]", blocker0.header[39]);
-  EXPECT_EQ("delta[10]", blocker0.header[40]);
-  EXPECT_EQ("delta[11]", blocker0.header[41]);
-  EXPECT_EQ("delta[12]", blocker0.header[42]);
-  EXPECT_EQ("delta[13]", blocker0.header[43]);
-  EXPECT_EQ("delta[14]", blocker0.header[44]);
-  EXPECT_EQ("delta[15]", blocker0.header[45]);
-  EXPECT_EQ("delta[16]", blocker0.header[46]);
-  EXPECT_EQ("delta[17]", blocker0.header[47]);
-  EXPECT_EQ("delta[18]", blocker0.header[48]);
-  EXPECT_EQ("delta[19]", blocker0.header[49]);
-  EXPECT_EQ("delta[20]", blocker0.header[50]);
-  EXPECT_EQ("delta[21]", blocker0.header[51]);
-  EXPECT_EQ("delta[22]", blocker0.header[52]);
+  for (int i = 1; i <= 22; ++i) {
+    std::stringstream ss;
+    ss << "mu[" << i << "]";
+    EXPECT_EQ(ss.str(), blocker0.header[8 + i]);
+  }
+  for (int i = 1; i <= 22; ++i) {
+    std::stringstream ss;
+    ss << "delta[" << i << "]";
+    EXPECT_EQ(ss.str(), blocker0.header[30 + i]);
+  }
   EXPECT_EQ("delta_new", blocker0.header[53]);
   EXPECT_EQ("sigma_delta", blocker0.header[54]);
 
@@ -517,22 +448,16 @@ TEST_F(StanIoStanCsvReader, ParseEightSchools) {
   EXPECT_EQ("energy__", eight_schools.header[6]);
   EXPECT_EQ("mu", eight_schools.header[7]);
   EXPECT_EQ("tau", eight_schools.header[8]);
-  EXPECT_EQ("eta[1]", eight_schools.header[9]);
-  EXPECT_EQ("eta[2]", eight_schools.header[10]);
-  EXPECT_EQ("eta[3]", eight_schools.header[11]);
-  EXPECT_EQ("eta[4]", eight_schools.header[12]);
-  EXPECT_EQ("eta[5]", eight_schools.header[13]);
-  EXPECT_EQ("eta[6]", eight_schools.header[14]);
-  EXPECT_EQ("eta[7]", eight_schools.header[15]);
-  EXPECT_EQ("eta[8]", eight_schools.header[16]);
-  EXPECT_EQ("theta[1]", eight_schools.header[17]);
-  EXPECT_EQ("theta[2]", eight_schools.header[18]);
-  EXPECT_EQ("theta[3]", eight_schools.header[19]);
-  EXPECT_EQ("theta[4]", eight_schools.header[20]);
-  EXPECT_EQ("theta[5]", eight_schools.header[21]);
-  EXPECT_EQ("theta[6]", eight_schools.header[22]);
-  EXPECT_EQ("theta[7]", eight_schools.header[23]);
-  EXPECT_EQ("theta[8]", eight_schools.header[24]);
+  for (int i = 1; i <= 8; ++i) {
+    std::stringstream ss;
+    ss << "eta[" << i << "]";
+    EXPECT_EQ(ss.str(), eight_schools.header[8 + i]);
+  }
+  for (int i = 1; i <= 8; ++i) {
+    std::stringstream ss;
+    ss << "theta[" << i << "]";
+    EXPECT_EQ(ss.str(), eight_schools.header[16 + i]);
+  }
 
   // adaptation
   EXPECT_FLOAT_EQ(0.400175, eight_schools.adaptation.step_size);
