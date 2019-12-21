@@ -79,6 +79,7 @@ TEST_F(StanIoStanCsvReader, read_metadata1) {
   EXPECT_EQ("nuts", metadata.engine);
   EXPECT_EQ(10, metadata.max_depth);
 }
+
 TEST_F(StanIoStanCsvReader, read_metadata3) {
   stan::io::stan_csv_metadata metadata;
   EXPECT_TRUE(
@@ -105,6 +106,7 @@ TEST_F(StanIoStanCsvReader, read_metadata3) {
   EXPECT_EQ("nuts", metadata.engine);
   EXPECT_EQ(15, metadata.max_depth);
 }
+
 TEST_F(StanIoStanCsvReader, read_header1) {
   std::vector<std::string> header;
   EXPECT_TRUE(
@@ -248,6 +250,7 @@ TEST_F(StanIoStanCsvReader, read_samples1) {
   EXPECT_FLOAT_EQ(0.391415, timing.warmup);
   EXPECT_FLOAT_EQ(0.648336, timing.sampling);
 }
+
 TEST_F(StanIoStanCsvReader, ParseBlocker) {
   stan::io::stan_csv blocker0;
   std::stringstream out;
