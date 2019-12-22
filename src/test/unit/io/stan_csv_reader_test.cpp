@@ -476,6 +476,7 @@ TEST_F(StanIoStanCsvReader, ParseEightSchools) {
   EXPECT_FLOAT_EQ(0.701917, eight_schools.adaptation.metric(8));
   EXPECT_FLOAT_EQ(0.886245, eight_schools.adaptation.metric(9));
 
+  // samples
   ASSERT_EQ(1000, eight_schools.samples.rows());
   ASSERT_EQ(25, eight_schools.samples.cols());
 
