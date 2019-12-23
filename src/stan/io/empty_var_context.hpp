@@ -94,7 +94,7 @@ class empty_var_context : public var_context {
                      const std::vector<size_t>& dims_declared) const {
   }
 
-    
+
   /**
    * Fill a list of the names of the floating point variables in
    * the context. This context has no variables.

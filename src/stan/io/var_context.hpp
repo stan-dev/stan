@@ -123,8 +123,9 @@ class var_context {
    *        dimensions and dimensions found in context.
    */
   virtual void validate_dims(const std::string& stage, const std::string& name,
-                     const std::string& base_type,
-                             const std::vector<size_t>& dims_declared) const = 0;
+                             const std::string& base_type,
+                             const std::vector<size_t>& dims_declared)
+    const = 0;
 
   /**
    * Append vector of dimensions to message string.

@@ -74,7 +74,6 @@ class chained_var_context : public var_context {
                      const std::string& base_type,
                      const std::vector<size_t>& dims_declared) const {
   }
-
 };
 }  // namespace io
 }  // namespace stan
