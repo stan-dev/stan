@@ -341,7 +341,7 @@ class array_var_context : public var_context {
    * Check variable dimensions against variable declaration.
    * Only used for data read in from file.
    *
-   * @param stage stan program processing stage 
+   * @param stage stan program processing stage
    * @param name variable name
    * @param base_type declared stan variable type
    * @param dims variable dimensions
@@ -350,9 +350,7 @@ class array_var_context : public var_context {
    */
   void validate_dims(const std::string& stage, const std::string& name,
                      const std::string& base_type,
-                     const std::vector<size_t>& dims_declared) const {
-  }
-
+                     const std::vector<size_t>& dims_declared) const {}
 
   /**
    * Return a list of the names of the floating point variables in

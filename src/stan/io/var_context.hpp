@@ -111,21 +111,20 @@ class var_context {
    */
   virtual void names_i(std::vector<std::string>& names) const = 0;
 
-
   /**
    * Check variable dimensions against variable declaration.
    *
-   * @param stage stan program processing stage 
+   * @param stage stan program processing stage
    * @param name variable name
    * @param base_type declared stan variable type
    * @param dims variable dimensions
    * @throw std::runtime_error if mismatch between declared
    *        dimensions and dimensions found in context.
    */
-  virtual void validate_dims(const std::string& stage, const std::string& name,
-                             const std::string& base_type,
-                             const std::vector<size_t>& dims_declared)
-    const = 0;
+  virtual void validate_dims(
+      const std::string& stage, const std::string& name,
+      const std::string& base_type,
+      const std::vector<size_t>& dims_declared) const = 0;
 
   /**
    * Append vector of dimensions to message string.

@@ -769,7 +769,7 @@ class dump : public stan::io::var_context {
   /**
    * Check variable dimensions against variable declaration.
    *
-   * @param stage stan program processing stage 
+   * @param stage stan program processing stage
    * @param name variable name
    * @param base_type declared stan variable type
    * @param dims variable dimensions
@@ -822,22 +822,6 @@ class dump : public stan::io::var_context {
       }
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   /**
    * Remove variable from the object.
