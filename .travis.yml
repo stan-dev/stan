@@ -14,10 +14,10 @@ before_script:
 linux_clang: &linux_clang
   os: linux
   compiler: "clang-6.0"
-  dist: xenial
+  dist: trusty
   addons:
     apt:
-      sources: [ 'ubuntu-toolchain-r-test' ]
+      sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-6.0' ]
       packages: [ 'clang-6.0', 'libc++-dev' ]
 
 linux_gcc: &linux_gcc
