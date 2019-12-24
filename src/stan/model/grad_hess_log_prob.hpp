@@ -30,12 +30,13 @@ namespace model {
  * @param[in, out] msgs Stream to which print statements in Stan
  * programs are written, default is 0
  */
-template <bool propto, bool jacobian_adjust_transform, class M>
-double grad_hess_log_prob(const M& model, std::vector<double>& params_r,
-                          std::vector<int>& params_i,
-                          std::vector<double>& gradient,
-                          std::vector<double>& hessian,
-                          std::ostream* msgs = 0) {
+template <bool propto, bool jacobian_adjust_transform, class M,
+  typename VecParamR, typename VecParamI, typename VecGrad, typename VecHess,
+  require_vector_like_vt<std::is_arithmetic, VecParamR, VecGrad, VecHess>...,
+  require_vector_like_vt<std::is_integral, VecParamI>...>
+double grad_hess_log_prob(const M& model, VecParamR&& params_r,
+  VecParamI&& params_i, VecGrad&& gradient, VecHess&& hessian,
+  std::ostream* msgs = 0) {
   static const double epsilon = 1e-3;
   static const double half_epsilon = 0.5 * epsilon;
   static const int order = 4;

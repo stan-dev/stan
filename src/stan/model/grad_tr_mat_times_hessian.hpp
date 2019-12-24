@@ -8,14 +8,14 @@
 namespace stan {
 namespace model {
 
-template <class M>
-void grad_tr_mat_times_hessian(
-    const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
-    const Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>& X,
-    Eigen::Matrix<double, Eigen::Dynamic, 1>& grad_tr_X_hess_f,
-    std::ostream* msgs = 0) {
-  stan::math::grad_tr_mat_times_hessian(model_functional<M>(model, msgs), x, X,
-                                        grad_tr_X_hess_f);
+template <class M, typename VecX, typename MatX, typename VecGrad,
+ require_all_vector_like_vt<std::is_arithmetic, VecX, VecGrad>...,
+ require_eigen_vt<std::is_arithmetic, MatX>...>
+void grad_tr_mat_times_hessian(const M& model, VecX&& x, MatX&& X,
+   VecGrad&& grad_tr_X_hess_f, std::ostream* msgs = 0) {
+  stan::math::grad_tr_mat_times_hessian(model_functional<M>(model, msgs),
+   std::forward<VecX>(x), std::forward<MatX>(X),
+   std::forward<VecGrad>(grad_tr_X_hess_f));
 }
 
 }  // namespace model

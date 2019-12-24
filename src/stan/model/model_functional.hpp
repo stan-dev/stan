@@ -2,6 +2,7 @@
 #define STAN_MODEL_MODEL_FUNCTIONAL_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <iostream>
 
 namespace stan {
@@ -13,13 +14,16 @@ struct model_functional {
   const M& model;
   std::ostream* o;
 
-  model_functional(const M& m, std::ostream* out) : model(m), o(out) {}
+  template <typename Model, require_same_t<M, Model>...>
+  model_functional(Model&& m, std::ostream* out) :
+   model(std::forward<Model>(m)), o(out) {}
 
-  template <typename T>
-  T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& x) const {
+  template <typename Vec, require_vector_t<Vec>...>
+  auto operator()(Vec&& x) const {
     // log_prob() requires non-const but doesn't modify its argument
-    return model.template log_prob<true, true, T>(
-        const_cast<Eigen::Matrix<T, -1, 1>&>(x), o);
+    using vec_value = value_type_t<Vec>;
+    return model.template log_prob<true, true, vec_value>(
+        const_cast<std::decay_t<Vec>&>(x), o);
   }
 };
 
