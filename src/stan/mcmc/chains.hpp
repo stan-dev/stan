@@ -251,12 +251,6 @@ class chains {
   explicit chains(const std::vector<std::string>& param_names)
       : param_names_(param_names) {}
 
-  explicit chains(const Eigen::Matrix<std::string, Dynamic, 1>& param_names)
-      : param_names_(param_names.size()) {
-    for (size_t i = 0; i < param_names.size(); i++)
-      param_names_[i] = param_names(i);
-  }
-
   explicit chains(const stan::io::stan_csv& stan_csv)
       : chains(stan_csv.header) {
     if (stan_csv.samples.rows() > 0)
@@ -379,10 +373,10 @@ class chains {
           "add(stan_csv): number of columns in"
           " sample does not match chains");
     for (int i = 0; i < num_params(); i++) {
-      if (param_names_[i] != stan_csv.header(i)) {
+      if (param_names_[i] != stan_csv.header[i]) {
         std::stringstream ss;
         ss << "add(stan_csv): header " << param_names_[i]
-           << " does not match chain's header (" << stan_csv.header(i) << ")";
+           << " does not match chain's header (" << stan_csv.header[i] << ")";
         throw std::invalid_argument(ss.str());
       }
     }

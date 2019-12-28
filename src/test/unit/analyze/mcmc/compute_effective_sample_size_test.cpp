@@ -282,9 +282,7 @@ TEST_F(ComputeEss, chains_compute_split_effective_sample_size) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_minimum_n) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 3, 1> draws;
   draws << 1.0, 2.0, 3.0;
@@ -296,9 +294,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_minimum_n) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_sufficient_n) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 4, 1> draws;
   draws << 1.0, 2.0, 3.0, 4.0;
@@ -310,9 +306,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_sufficient_n) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_nan) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 2, 1> draws;
   draws << 1.0, std::numeric_limits<double>::quiet_NaN();
@@ -324,9 +318,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_nan) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_constant) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> const_chains(param_names);
   Eigen::Matrix<double, 4, 1> const_draws;
   const_draws << 1.0, 1.0, 1.0, 1.0;
@@ -338,9 +330,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_constant) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_not_constant) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> nonconst_chains(param_names);
   Eigen::Matrix<double, 4, 1> nonconst_draws;
   nonconst_draws << 1.0, 2.0, 3.0, 4.0;
