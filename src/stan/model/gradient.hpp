@@ -11,15 +11,18 @@
 namespace stan {
 namespace model {
 
-template <class M, typename VecX, typename VecGrad, require_all_vector_like_vt<std::is_arithmetic, VecX, VecGrad>...>
+template <class M, typename VecX, typename VecGrad,
+ require_all_vector_like_vt<std::is_arithmetic, VecX, VecGrad>...>
 void gradient(const M& model, VecX&& x, double& f, VecGrad&& grad_f,
   std::ostream* msgs = 0) {
   stan::math::gradient(model_functional<M>(model, msgs), std::forward<VecX>(x),
    f, std::forward<VecGrad>(grad_f));
 }
 
-template <class M, typename VecX, typename VecGrad, require_all_vector_like_vt<std::is_arithmetic, VecX, VecGrad>...>
-void gradient(const M& model, VecX&& x, double& f, VecGrad&& grad_f, callbacks::logger& logger) {
+template <class M, typename VecX, typename VecGrad,
+ require_all_vector_like_vt<std::is_arithmetic, VecX, VecGrad>...>
+void gradient(const M& model, VecX&& x, double& f, VecGrad&& grad_f,
+  callbacks::logger& logger) {
   std::stringstream ss;
   try {
     stan::math::gradient(model_functional<M>(model, &ss), std::forward<VecX>(x),

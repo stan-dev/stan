@@ -8,7 +8,8 @@
 namespace stan {
 namespace model {
 
-template <class M, typename VecX, typename VecV, require_all_vector_like_vt<std::is_arithmetic, VecX, VecV>...>
+template <class M, typename VecX, typename VecV,
+ require_all_vector_like_vt<std::is_arithmetic, VecX, VecV>...>
 void gradient_dot_vector(const M& model, VecX&& x, VecV&& v,
                          double& f, double& grad_f_dot_v,
                          std::ostream* msgs = 0) {

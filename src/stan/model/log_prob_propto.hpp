@@ -29,8 +29,8 @@ namespace model {
  * @param[in] params_i Integer-valued parameters.
  * @param[in,out] msgs
  */
-template <bool jacobian_adjust_transform, class M, typename VecParamR, typename VecParamI,
-  require_vector_like_vt<std::is_arithmetic, VecParamR>...,
+template <bool jacobian_adjust_transform, class M, typename VecParamR,
+  typename VecParamI, require_vector_like_vt<std::is_arithmetic, VecParamR>...,
   require_vector_like_vt<std::is_integral, VecParamI>...>
 double log_prob_propto(const M& model, VecParamR&& params_r,
                        VecParamI&& params_i, std::ostream* msgs = 0) {
