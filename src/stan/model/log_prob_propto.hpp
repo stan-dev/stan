@@ -30,8 +30,9 @@ namespace model {
  * @param[in,out] msgs
  */
 template <bool jacobian_adjust_transform, class M, typename VecParamR,
-  typename VecParamI, require_vector_like_vt<std::is_arithmetic, VecParamR>...,
-  require_vector_like_vt<std::is_integral, VecParamI>...>
+          typename VecParamI,
+          require_vector_like_vt<std::is_arithmetic, VecParamR>...,
+          require_vector_like_vt<std::is_integral, VecParamI>...>
 double log_prob_propto(const M& model, VecParamR&& params_r,
                        VecParamI&& params_i, std::ostream* msgs = 0) {
   using stan::math::var;
@@ -71,7 +72,7 @@ double log_prob_propto(const M& model, VecParamR&& params_r,
  * @param[in,out] msgs
  */
 template <bool jacobian_adjust_transform, class M, typename VecParamR,
-  require_vector_like_vt<std::is_arithmetic, VecParamR>...>
+          require_vector_like_vt<std::is_arithmetic, VecParamR>...>
 double log_prob_propto(const M& model, VecParamR&& params_r,
                        std::ostream* msgs = 0) {
   using stan::math::var;

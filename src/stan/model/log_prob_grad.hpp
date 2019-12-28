@@ -26,11 +26,11 @@ namespace model {
  * @param[in,out] msgs
  */
 template <bool propto, bool jacobian_adjust_transform, class M, typename VecInt,
- typename VecParamR, typename VecGrad,
-  require_vector_like_vt<std::is_integral, VecInt>...,
-  require_all_vector_like_vt<std::is_arithmetic, VecParamR, VecGrad>...>
+          typename VecParamR, typename VecGrad,
+          require_vector_like_vt<std::is_integral, VecInt>...,
+          require_all_vector_like_vt<std::is_arithmetic, VecParamR, VecGrad>...>
 double log_prob_grad(const M& model, VecParamR&& params_r, VecInt&& params_i,
-   VecGrad&& gradient, std::ostream* msgs = 0) {
+                     VecGrad&& gradient, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
   double lp;

@@ -15,8 +15,8 @@ struct model_functional {
   std::ostream* o;
 
   template <typename Model, require_same_t<M, Model>...>
-  model_functional(Model&& m, std::ostream* out) :
-   model(std::forward<Model>(m)), o(out) {}
+  model_functional(Model&& m, std::ostream* out)
+      : model(std::forward<Model>(m)), o(out) {}
 
   template <typename Vec, require_vector_t<Vec>...>
   auto operator()(Vec&& x) const {
