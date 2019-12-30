@@ -22,41 +22,22 @@ template <class Model, template <class, class> class Hamiltonian,
 class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
  public:
   base_nuts(const Model& model, BaseRNG& rng)
-      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-        depth_(0),
-        max_depth_(5),
-        max_deltaH_(1000),
-        n_leapfrog_(0),
-        divergent_(false),
-        energy_(0) {}
+      : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng) {}
 
   /**
    * specialized constructor for specified diag mass matrix
    */
   base_nuts(const Model& model, BaseRNG& rng, Eigen::VectorXd& inv_e_metric)
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                          inv_e_metric),
-        depth_(0),
-        max_depth_(5),
-        max_deltaH_(1000),
-        n_leapfrog_(0),
-        divergent_(false),
-        energy_(0) {}
+                                                          inv_e_metric) {}
 
   /**
    * specialized constructor for specified dense mass matrix
    */
   base_nuts(const Model& model, BaseRNG& rng, Eigen::MatrixXd& inv_e_metric)
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                          inv_e_metric),
-        depth_(0),
-        max_depth_(5),
-        max_deltaH_(1000),
-        n_leapfrog_(0),
-        divergent_(false),
-        energy_(0) {}
+                                                          inv_e_metric) {}
 
-  ~base_nuts() {}
 
   void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);
@@ -308,7 +289,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       return false;
 
     // Build the final subtree
-    ps_point z_propose_final(this->z_);
+    z_propose_final = this->z_;
 
     double log_sum_weight_final = -std::numeric_limits<double>::infinity();
 
@@ -359,18 +340,19 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     return persist_criterion;
   }
 
-  int depth_;
-  int max_depth_;
-  double max_deltaH_;
+  int depth_{0};
+  int max_depth_{5};
+  double max_deltaH_{1000};
 
-  int n_leapfrog_;
-  bool divergent_;
-  double energy_;
+  int n_leapfrog_{0};
+  bool divergent_{false};
+  double energy_{0};
   ps_point z_fwd{this->z_};  // State at forward end of trajectory
   ps_point z_bck{z_fwd};     // State at backward end of trajectory
 
   ps_point z_sample{z_fwd};
   ps_point z_propose{z_fwd};
+  ps_point z_propose_final{this->z_}
 
 };
 
