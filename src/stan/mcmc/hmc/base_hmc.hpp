@@ -96,7 +96,7 @@ class base_hmc : public base_mcmc {
     int direction = delta_H > std::log(0.8) ? 1 : -1;
 
     while (1) {
-      this->z_.ps_point::operator=(z_init);
+      this->z_ = z_init;
 
       this->hamiltonian_.sample_p(this->z_, this->rand_int_);
       this->hamiltonian_.init(this->z_, logger);
@@ -131,7 +131,7 @@ class base_hmc : public base_mcmc {
             "not continuous?");
     }
 
-    this->z_.ps_point::operator=(z_init);
+    this->z_ = z_init;
   }
 
   typename Hamiltonian<Model, BaseRNG>::PointType& z() { return z_; }

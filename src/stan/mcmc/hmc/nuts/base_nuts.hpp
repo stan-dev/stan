@@ -85,11 +85,11 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);
     this->hamiltonian_.init(this->z_, logger);
 
-    ps_point z_fwd(this->z_);  // State at forward end of trajectory
-    ps_point z_bck(z_fwd);     // State at backward end of trajectory
+    z_fwd = this->z_;  // State at forward end of trajectory
+    z_bck = z_fwd;     // State at backward end of trajectory
 
-    ps_point z_sample(z_fwd);
-    ps_point z_propose(z_fwd);
+    z_sample = z_fwd;
+    z_propose = z_fwd;
 
     // Momentum and sharp momentum at forward end of forward subtree
     Eigen::VectorXd p_fwd_fwd = this->z_.p;
@@ -120,18 +120,19 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     // criterion is no longer satisfied
     this->depth_ = 0;
     this->divergent_ = false;
+    // Build a new subtree in a random direction
+    Eigen::VectorXd rho_fwd = Eigen::VectorXd::Zero(rho.size());
+    Eigen::VectorXd rho_bck = Eigen::VectorXd::Zero(rho.size());
 
     while (this->depth_ < this->max_depth_) {
-      // Build a new subtree in a random direction
-      Eigen::VectorXd rho_fwd = Eigen::VectorXd::Zero(rho.size());
-      Eigen::VectorXd rho_bck = Eigen::VectorXd::Zero(rho.size());
-
       bool valid_subtree = false;
       double log_sum_weight_subtree = -std::numeric_limits<double>::infinity();
 
+      // Build a new subtree in a random direction
       if (this->rand_uniform_() > 0.5) {
         // Extend the current trajectory forward
-        this->z_.ps_point::operator=(z_fwd);
+        rho_fwd.setZero();
+        this->z_ = z_fwd;
         rho_bck = rho;
         p_bck_fwd = p_fwd_fwd;
         p_sharp_bck_fwd = p_sharp_fwd_fwd;
@@ -140,10 +141,11 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
             this->depth_, z_propose, p_sharp_fwd_bck, p_sharp_fwd_fwd, rho_fwd,
             p_fwd_bck, p_fwd_fwd, H0, 1, n_leapfrog, log_sum_weight_subtree,
             sum_metro_prob, logger);
-        z_fwd.ps_point::operator=(this->z_);
+        z_fwd = this->z_;
       } else {
         // Extend the current trajectory backwards
-        this->z_.ps_point::operator=(z_bck);
+        rho_bck.setZero();
+        this->z_ = z_bck;
         rho_fwd = rho;
         p_fwd_bck = p_bck_bck;
         p_sharp_fwd_bck = p_sharp_bck_bck;
@@ -152,7 +154,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
             this->depth_, z_propose, p_sharp_bck_fwd, p_sharp_bck_bck, rho_bck,
             p_bck_fwd, p_bck_bck, H0, -1, n_leapfrog, log_sum_weight_subtree,
             sum_metro_prob, logger);
-        z_bck.ps_point::operator=(this->z_);
+        z_bck = this->z_;
       }
 
       if (!valid_subtree)
@@ -199,7 +201,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     // even over subtrees that may have been rejected
     double accept_prob = sum_metro_prob / static_cast<double>(n_leapfrog);
 
-    this->z_.ps_point::operator=(z_sample);
+    this->z_ = z_sample;
     this->energy_ = this->hamiltonian_.H(this->z_);
     return sample(this->z_.q, -this->z_.V, accept_prob);
   }
@@ -220,6 +222,9 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     values.push_back(this->energy_);
   }
 
+  /**
+   * Check whether tree conditions are satisfied
+   */
   virtual bool compute_criterion(Eigen::VectorXd& p_sharp_minus,
                                  Eigen::VectorXd& p_sharp_plus,
                                  Eigen::VectorXd& rho) {
@@ -231,23 +236,25 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * the subtree becomes invalid.  Returns validity of the
    * resulting subtree.
    *
-   * @param depth Depth of the desired subtree
-   * @param z_propose State proposed from subtree
-   * @param p_sharp_beg Sharp momentum at beginning of new tree
-   * @param p_sharp_end Sharp momentum at end of new tree
-   * @param rho Summed momentum across trajectory
-   * @param p_beg Momentum at beginning of returned tree
-   * @param p_end Momentum at end of returned tree
-   * @param H0 Hamiltonian of initial state
-   * @param sign Direction in time to built subtree
-   * @param n_leapfrog Summed number of leapfrog evaluations
-   * @param log_sum_weight Log of summed weights across trajectory
-   * @param sum_metro_prob Summed Metropolis probabilities across trajectory
-   * @param logger Logger for messages
+   * @param[in] depth Depth of the desired subtree
+   * @param[out] z_propose State proposed from subtree
+   * @param[in, out] p_sharp_beg Sharp momentum at beginning of new tree
+   * @param[in, out] p_sharp_end Sharp momentum at end of new tree
+   * @param[out] rho Summed momentum across trajectory
+   * @param[in, out] p_beg Momentum at beginning of returned tree
+   * @param[in, out] p_end Momentum at end of returned tree
+   * @param[in] H0 Hamiltonian of initial state
+   * @param[in] sign Direction in time to built subtree
+   * @param[in, out] n_leapfrog Summed number of leapfrog evaluations
+   * @param[in, out] log_sum_weight Log of summed weights across trajectory
+   * @param[in, out] sum_metro_prob Summed Metropolis probabilities across trajectory
+   * @param[in, out] logger Logger for messages
    */
-  bool build_tree(int depth, ps_point& z_propose, Eigen::VectorXd& p_sharp_beg,
-                  Eigen::VectorXd& p_sharp_end, Eigen::VectorXd& rho,
-                  Eigen::VectorXd& p_beg, Eigen::VectorXd& p_end, double H0,
+  template <typename PSharpBeg, typename PSharpEnd, typename Rho, typename PBeg, typename PEnd,
+   require_all_eigen_vt<std::is_arithmetic, PSharpBeg, PSharpEnd, Rho, PBeg, PEnd>...>
+  bool build_tree(int depth, ps_point& z_proposal, PSharpBeg&& p_sharp_beg,
+                  PSharpEnd&& p_sharp_end, Rho&& rho,
+                  PBeg&& p_beg, PEnd&& p_end, double H0,
                   double sign, int& n_leapfrog, double& log_sum_weight,
                   double& sum_metro_prob, callbacks::logger& logger) {
     // Base case
@@ -270,7 +277,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       else
         sum_metro_prob += std::exp(H0 - h);
 
-      z_propose = this->z_;
+      z_proposal = this->z_;
 
       p_sharp_beg = this->hamiltonian_.dtau_dp(this->z_);
       p_sharp_end = p_sharp_beg;
@@ -293,7 +300,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     Eigen::VectorXd rho_init = Eigen::VectorXd::Zero(rho.size());
 
     bool valid_init
-        = build_tree(depth - 1, z_propose, p_sharp_beg, p_sharp_init_end,
+        = build_tree(depth - 1, z_proposal, p_sharp_beg, p_sharp_init_end,
                      rho_init, p_beg, p_init_end, H0, sign, n_leapfrog,
                      log_sum_weight_init, sum_metro_prob, logger);
 
@@ -325,12 +332,12 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     log_sum_weight = math::log_sum_exp(log_sum_weight, log_sum_weight_subtree);
 
     if (log_sum_weight_final > log_sum_weight_subtree) {
-      z_propose = z_propose_final;
+      z_proposal = z_propose_final;
     } else {
       double accept_prob
           = std::exp(log_sum_weight_final - log_sum_weight_subtree);
       if (this->rand_uniform_() < accept_prob)
-        z_propose = z_propose_final;
+        z_proposal = z_propose_final;
     }
 
     Eigen::VectorXd rho_subtree = rho_init + rho_final;
@@ -359,6 +366,12 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
   int n_leapfrog_;
   bool divergent_;
   double energy_;
+  ps_point z_fwd{this->z_};  // State at forward end of trajectory
+  ps_point z_bck{z_fwd};     // State at backward end of trajectory
+
+  ps_point z_sample{z_fwd};
+  ps_point z_propose{z_fwd};
+
 };
 
 }  // namespace mcmc

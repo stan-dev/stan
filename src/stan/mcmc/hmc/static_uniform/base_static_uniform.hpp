@@ -66,7 +66,7 @@ class base_static_uniform
         z_sample = this->z_;
     }
 
-    this->z_.ps_point::operator=(z_init);
+    this->z_ = z_init;
 
     for (int l = 0; l < L_ - 1 - Lp; ++l) {
       this->integrator_.evolve(this->z_, this->hamiltonian_, this->epsilon_,
@@ -86,7 +86,7 @@ class base_static_uniform
 
     double accept_prob = sum_metro_prob / static_cast<double>(L_);
 
-    this->z_.ps_point::operator=(z_sample);
+    this->z_ = z_sample;
     this->energy_ = this->hamiltonian_.H(this->z_);
     return sample(this->z_.q, -this->hamiltonian_.V(this->z_), accept_prob);
   }

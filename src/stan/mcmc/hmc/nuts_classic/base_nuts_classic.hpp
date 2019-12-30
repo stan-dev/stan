@@ -113,7 +113,7 @@ class base_nuts_classic
       }
 
       // And build a new subtree in that direction
-      this->z_.ps_point::operator=(*z);
+      this->z_ = z;
 
       int n_valid_subtree
           = build_tree(depth_, *rho, 0, z_propose, util, logger);
@@ -140,7 +140,7 @@ class base_nuts_classic
       n_valid += n_valid_subtree;
 
       // Check validity of completed tree
-      this->z_.ps_point::operator=(z_plus);
+      this->z_ = z_plus;
       Eigen::VectorXd delta_rho = rho_minus + rho_init + rho_plus;
 
       util.criterion = compute_criterion(z_minus, this->z_, delta_rho);
@@ -150,7 +150,7 @@ class base_nuts_classic
 
     double accept_prob = util.sum_prob / static_cast<double>(util.n_tree);
 
-    this->z_.ps_point::operator=(z_sample);
+    this->z_ = z_sample;
     this->energy_ = this->hamiltonian_.H(this->z_);
     return sample(this->z_.q, -this->z_.V, accept_prob);
   }

@@ -61,7 +61,7 @@ class base_static_hmc
     double acceptProb = std::exp(H0 - h);
 
     if (acceptProb < 1 && this->rand_uniform_() > acceptProb)
-      this->z_.ps_point::operator=(z_init);
+      this->z_ = z_init;
 
     acceptProb = acceptProb > 1 ? 1 : acceptProb;
 

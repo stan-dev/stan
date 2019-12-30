@@ -1,12 +1,13 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 
+#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/lexical_cast.hpp>
-#include <Eigen/Dense>
 #include <string>
 #include <vector>
+#include <utility>
 
 namespace stan {
 namespace mcmc {
@@ -51,6 +52,7 @@ class ps_point {
    * @param writer writer callback
    */
   virtual inline void write_metric(stan::callbacks::writer& writer) {}
+
 };
 
 }  // namespace mcmc
