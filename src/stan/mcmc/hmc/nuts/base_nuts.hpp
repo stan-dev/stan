@@ -289,7 +289,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       return false;
 
     // Build the final subtree
-    z_propose_final = this->z_;
+    ps_point z_propose_final(this->z_);
 
     double log_sum_weight_final = -std::numeric_limits<double>::infinity();
 
@@ -352,7 +352,6 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
   ps_point z_sample{z_fwd};
   ps_point z_propose{z_fwd};
-  ps_point z_propose_final{this->z_};
 
 };
 
