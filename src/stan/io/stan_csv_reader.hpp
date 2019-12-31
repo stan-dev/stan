@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace stan {
 namespace io {
@@ -69,7 +70,7 @@ struct stan_csv_timing {
 
 struct stan_csv {
   stan_csv_metadata metadata;
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
+  std::vector<std::string> header;
   stan_csv_adaptation adaptation;
   Eigen::MatrixXd samples;
   stan_csv_timing timing;
@@ -173,8 +174,7 @@ class stan_csv_reader {
     return true;
   }  // read_metadata
 
-  static bool read_header(std::istream& in,
-                          Eigen::Matrix<std::string, Eigen::Dynamic, 1>& header,
+  static bool read_header(std::istream& in, std::vector<std::string>& header,
                           std::ostream* out) {
     std::string line;
 
@@ -197,7 +197,7 @@ class stan_csv_reader {
         std::replace(token.begin(), token.end(), '.', ',');
         token += "]";
       }
-      header(idx++) = token;
+      header[idx++] = token;
     }
     return true;
   }
