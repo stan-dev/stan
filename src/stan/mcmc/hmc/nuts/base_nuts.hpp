@@ -347,9 +347,9 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
   int n_leapfrog_{0};
   bool divergent_{false};
   double energy_{0};
+protected:
   ps_point z_fwd{this->z_};  // State at forward end of trajectory
   ps_point z_bck{z_fwd};     // State at backward end of trajectory
-
   ps_point z_sample{z_fwd};
   ps_point z_propose{z_fwd};
 
