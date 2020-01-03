@@ -113,7 +113,7 @@ class base_nuts_classic
       }
 
       // And build a new subtree in that direction
-      this->z_ = z;
+      this->z_ = *z;
 
       int n_valid_subtree
           = build_tree(depth_, *rho, 0, z_propose, util, logger);
