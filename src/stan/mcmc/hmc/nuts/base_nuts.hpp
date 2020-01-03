@@ -38,7 +38,6 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                           inv_e_metric) {}
 
-
   void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);
   }
@@ -228,16 +227,19 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
    * @param[in] sign Direction in time to built subtree
    * @param[in, out] n_leapfrog Summed number of leapfrog evaluations
    * @param[in, out] log_sum_weight Log of summed weights across trajectory
-   * @param[in, out] sum_metro_prob Summed Metropolis probabilities across trajectory
+   * @param[in, out] sum_metro_prob Summed Metropolis probabilities across
+   * trajectory
    * @param[in, out] logger Logger for messages
    */
-  template <typename PSharpBeg, typename PSharpEnd, typename Rho, typename PBeg, typename PEnd,
-   require_all_eigen_vt<std::is_arithmetic, PSharpBeg, PSharpEnd, Rho, PBeg, PEnd>...>
+  template <typename PSharpBeg, typename PSharpEnd, typename Rho, typename PBeg,
+            typename PEnd,
+            require_all_eigen_vt<std::is_arithmetic, PSharpBeg, PSharpEnd, Rho,
+                                 PBeg, PEnd>...>
   bool build_tree(int depth, ps_point& z_proposal, PSharpBeg&& p_sharp_beg,
-                  PSharpEnd&& p_sharp_end, Rho&& rho,
-                  PBeg&& p_beg, PEnd&& p_end, double H0,
-                  double sign, int& n_leapfrog, double& log_sum_weight,
-                  double& sum_metro_prob, callbacks::logger& logger) {
+                  PSharpEnd&& p_sharp_end, Rho&& rho, PBeg&& p_beg,
+                  PEnd&& p_end, double H0, double sign, int& n_leapfrog,
+                  double& log_sum_weight, double& sum_metro_prob,
+                  callbacks::logger& logger) {
     // Base case
     if (depth == 0) {
       this->integrator_.evolve(this->z_, this->hamiltonian_,
@@ -347,12 +349,12 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
   int n_leapfrog_{0};
   bool divergent_{false};
   double energy_{0};
-protected:
+
+ protected:
   ps_point z_fwd{this->z_};  // State at forward end of trajectory
   ps_point z_bck{z_fwd};     // State at backward end of trajectory
   ps_point z_sample{z_fwd};
   ps_point z_propose{z_fwd};
-
 };
 
 }  // namespace mcmc

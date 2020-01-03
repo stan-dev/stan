@@ -23,7 +23,6 @@ class unit_e_point : public ps_point {
     this->ps_point::operator=(std::forward<Base>(other));
     return *this;
   }
-
 };
 
 inline void write_metric(stan::callbacks::writer& writer) {

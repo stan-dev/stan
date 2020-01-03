@@ -3,7 +3,6 @@
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
 #include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
@@ -52,7 +51,6 @@ class ps_point {
    * @param writer writer callback
    */
   virtual inline void write_metric(stan::callbacks::writer& writer) {}
-
 };
 
 }  // namespace mcmc

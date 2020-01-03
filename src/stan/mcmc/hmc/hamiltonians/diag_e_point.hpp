@@ -61,7 +61,6 @@ class diag_e_point : public ps_point {
     this->ps_point::operator=(std::forward<Base>(other));
     return *this;
   }
-
 };
 
 }  // namespace mcmc
