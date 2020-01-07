@@ -5,6 +5,24 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.21.0 (18 October 2019)
+======================================================================
+
+New Features
+------------
+- Add Intel TBB (#2769)
+- Add automated maintanence and cleanup via clang-tools to makefile (#2805)
+- Use Welford's algorithm for Variance Estimates in src/stan/analyze (#2819)
+- Adds additional no-u-turn checks across subtrees to avoid missing u-turns for approximately iid normal models (#2800)
+- Add gp kernels to language (#2739)
+- Update rhat and ess (#2794)
+
+Bug Fixes
+---------
+- Fix const logic and size check (#2822)
+- Add ifdef for R new_model (#2798)
+- Add g_ to name of g vector name in ps_point (#2832)
+
 v.2.20.0 (18 July 2019)
 ======================================================================
 

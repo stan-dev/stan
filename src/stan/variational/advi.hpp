@@ -115,8 +115,8 @@ class advi {
           const char* msg2
               = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
-          stan::math::domain_error(function, name, n_monte_carlo_elbo_, msg1,
-                                   msg2);
+          stan::math::throw_domain_error(function, name, n_monte_carlo_elbo_,
+                                         msg1, msg2);
         }
       }
     }
@@ -187,7 +187,7 @@ class advi {
       const char* msg1
           = "Your model may be either "
             "severely ill-conditioned or misspecified.";
-      stan::math::domain_error(function, name, "", msg1);
+      stan::math::throw_domain_error(function, name, "", msg1);
     }
 
     // Variational family to store gradients
@@ -279,7 +279,7 @@ class advi {
             const char* msg1
                 = "failed. Your model may be either "
                   "severely ill-conditioned or misspecified.";
-            stan::math::domain_error(function, name, "", msg1);
+            stan::math::throw_domain_error(function, name, "", msg1);
           }
         }
         // Reset
