@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_HMC_HAMILTONIANS_SOFTABS_METRIC_HPP
 #define STAN_MCMC_HMC_HAMILTONIANS_SOFTABS_METRIC_HPP
 
-#include <stan/math/mix/mat.hpp>
+#include <stan/math/mix.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_point.hpp>
 #include <boost/random/variate_generator.hpp>

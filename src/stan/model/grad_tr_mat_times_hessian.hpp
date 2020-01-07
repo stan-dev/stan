@@ -1,8 +1,8 @@
 #ifndef STAN_MODEL_GRAD_TR_MAT_TIMES_HESSIAN_HPP
 #define STAN_MODEL_GRAD_TR_MAT_TIMES_HESSIAN_HPP
 
+#include <stan/math/mix.hpp>
 #include <stan/model/model_functional.hpp>
-#include <stan/math/mix/mat.hpp>
 #include <ostream>
 
 namespace stan {
