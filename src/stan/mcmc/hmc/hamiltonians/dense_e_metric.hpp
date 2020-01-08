@@ -18,8 +18,8 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
  public:
   explicit dense_e_metric(const Model& model)
       : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {
-        dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
-      }
+    dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
+  }
   using point_type = dense_e_point;
   Eigen::VectorXd dtau_dq_;
   double T(dense_e_point& z) {

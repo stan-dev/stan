@@ -16,8 +16,8 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
  public:
   explicit diag_e_metric(const Model& model)
       : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {
-        dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
-      }
+    dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
+  }
   Eigen::VectorXd dtau_dq_;
   using point_type = diag_e_point;
   double T(diag_e_point& z) {

@@ -353,8 +353,8 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
   double energy_{0};
 
  protected:
-  ps_point z_fwd{this->z_};  // State at forward end of trajectory
-  ps_point z_bck{this->z_.p.size()};     // State at backward end of trajectory
+  ps_point z_fwd{this->z_};           // State at forward end of trajectory
+  ps_point z_bck{this->z_.p.size()};  // State at backward end of trajectory
   ps_point z_sample{this->z_.p.size()};
   ps_point z_propose{this->z_.p.size()};
   ps_point z_propose_final{this->z_.p.size()};
