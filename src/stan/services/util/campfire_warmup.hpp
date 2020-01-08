@@ -5,6 +5,7 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
+#include <stan/math/mpi/envionment.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
@@ -41,8 +42,8 @@ namespace util {
  * @param[in,out] callback interrupt callback called once an iteration
  * @param[in,out] logger logger for messages
  */
-template <class Model, class RNG>
-void campfire_warmup(stan::mcmc::base_mcmc& sampler, int num_iterations,
+  template <class Sampler, class Model, class RNG>
+void campfire_warmup(Sampler& sampler, int num_iterations,
                      int start, int finish, int num_thin, int refresh,
                      bool save, bool warmup,
                      util::mcmc_writer& mcmc_writer,
@@ -50,16 +51,10 @@ void campfire_warmup(stan::mcmc::base_mcmc& sampler, int num_iterations,
                      RNG& base_rng, callbacks::interrupt& callback,
                      callbacks::logger& logger) {
   // for prototyping, we have @c max_num_windows fixed
+  const int num_mpi_chains = 4;
   const int window_size = 100;
   const int max_num_windows = num_iterations / window_size;
-  const int num_chains;
-
-  // rhat for each window combination, e.g. ABCD, BCD, CD, D for 4 windows.
-  std::vector<double> adapt_quantity(max_num_windows, 0.0);
-  bool is_adapted = false;
-
-  const int target_rhat = 1.05;
-  const int target_ess = 50;
+  const int num_chains = 4;
 
   using boost::accumulators::accumulator_set;
   using boost::accumulators::stats;
@@ -69,12 +64,21 @@ void campfire_warmup(stan::mcmc::base_mcmc& sampler, int num_iterations,
   using stan::math::mpi::Session;
   using stan::math::mpi::Communicator;
 
-  accumulator_set<double, stats<mean, variance>> acc_log(max_num_windows);
+  std::vector<accumulator_set<double, stats<mean, variance>>> acc_log(max_num_windows);
 
-  for (int m = 0; m < num_iterations; ++m) {
+  // Session::inter_chain_comm(num_mpi_chains);
+  // Session::intra_chain_comm(num_mpi_chains);
+
+  bool is_adapted = false;
+  const double target_rhat = 1.05;
+  const double target_ess = 50.0;
+
+  int m = 0;
+  while (m < num_iterations && (!is_adapted)) {
     callback();
 
-    if (refresh > 0 & (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
+    if (refresh > 0
+        && (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
       int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
       std::stringstream message;
       message << "Iteration: ";
@@ -88,19 +92,15 @@ void campfire_warmup(stan::mcmc::base_mcmc& sampler, int num_iterations,
 
     init_s = sampler.transition(init_s, logger);
 
-    if (save & ((m % num_thin) == 0)) {
+    if (save && ((m % num_thin) == 0)) {
       mcmc_writer.write_sample_params(base_rng, init_s, sampler, model);
       mcmc_writer.write_diagnostic_params(init_s, sampler);
     }
 
     double stepsize = -999.0;
+    bool is_inter_rank = Session::is_in_inter_chain_comm(num_mpi_chains);
 
-    // check adaptation by examining rhat and ess
-    if(stan::math::mpi::Session::is_in_inter_chain_comm()) {
-      if (!boost::math::isfinite(init_s.log_prob())) {
-        return std::numeric_limits<double>::quiet_NaN();
-      }
-
+    if (is_inter_rank && boost::math::isfinite(init_s.log_prob())) {
       int m_win = m / window_size + 1;
       for (int i = 0; i < m_win; ++i) {
         acc_log[i](init_s.log_prob());
@@ -121,7 +121,7 @@ void campfire_warmup(stan::mcmc::base_mcmc& sampler, int num_iterations,
           chain_gather[3 * i + 2] = sampler.get_nominal_stepsize();
         }
 
-        const Communicator& comm = Session::inter_chain_comm();
+        const Communicator& comm = Session::inter_chain_comm(num_mpi_chains);
         if (comm.rank() == 0) {
           std::vector<double> rhat(m_win), ess(m_win);
           std::vector<double> all_chain_gather(n_gather * num_chains);
@@ -138,7 +138,8 @@ void campfire_warmup(stan::mcmc::base_mcmc& sampler, int num_iterations,
             double var_between = n_draws * boost::accumulators::variance(acc_chain_mean)
               * num_chains / (num_chains - 1);
             double var_within = boost::accumulators::mean(acc_chain_var);
-            rhat[i] = sqrt((var_between / var_within + num_draws - 1) / num_draws);
+            rhat[i] = sqrt((var_between / var_within + n_draws - 1) / n_draws);
+
             // TODO also calculate ess
             is_adapted = (rhat[i]) < target_rhat;
             if (is_adapted) {
@@ -159,12 +160,15 @@ void campfire_warmup(stan::mcmc::base_mcmc& sampler, int num_iterations,
       }
     }
 
-    const Communicator& intra_comm = Session::intra_chain_comm();
+    const Communicator& intra_comm = Session::intra_chain_comm(num_mpi_chains);
     MPI_Bcast(&stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
     if (stepsize > 0.0) {
+      is_adapted = true;
       sampler.set_nominal_stepsize(stepsize);
       break;
     }
+
+    m++;
   }
 }
 

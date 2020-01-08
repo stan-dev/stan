@@ -10,6 +10,7 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/services/util/run_adaptive_sampler.hpp>
+#include <stan/services/util/run_mpi_adaptive_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/inv_metric.hpp>
@@ -95,9 +96,15 @@ int hmc_nuts_diag_e_adapt(
   sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
                             logger);
 
+#ifdef MPI_ADAPTED_WARMUP
+  util::run_mpi_adaptive_sampler(
+      sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
+      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
+#else
   util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
+#endif
 
   return error_codes::OK;
 }
