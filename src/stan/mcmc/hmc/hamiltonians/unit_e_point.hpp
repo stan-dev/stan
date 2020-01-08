@@ -2,6 +2,7 @@
 #define STAN_MCMC_HMC_HAMILTONIANS_UNIT_E_POINT_HPP
 
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <stan/math/prim/meta.hpp>
 
 namespace stan {
 namespace mcmc {

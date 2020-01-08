@@ -17,7 +17,8 @@ using Eigen::Dynamic;
  */
 class ps_point {
  public:
-  explicit ps_point(int n) : q(n), p(n), g(n) {}
+  template <typename Integer, require_t<std::is_integral<Integer>>...>
+  explicit ps_point(Integer n) : q(n), p(n), g(n) {}
 
   Eigen::VectorXd q;
   Eigen::VectorXd p;

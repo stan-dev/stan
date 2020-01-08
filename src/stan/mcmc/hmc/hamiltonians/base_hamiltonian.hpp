@@ -21,7 +21,7 @@ class base_hamiltonian {
 
   ~base_hamiltonian() {}
 
-  typedef Point PointType;
+  using point_type = Point;
 
   virtual double T(Point& z) = 0;
 

@@ -3,6 +3,7 @@
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
+#include <stan/math/prim/meta.hpp>
 
 namespace stan {
 namespace mcmc {

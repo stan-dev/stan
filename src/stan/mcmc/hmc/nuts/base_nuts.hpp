@@ -4,6 +4,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <stan/math/prim/scal.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <algorithm>
@@ -37,7 +38,8 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
   base_nuts(const Model& model, BaseRNG& rng, Eigen::MatrixXd& inv_e_metric)
       : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
                                                           inv_e_metric) {}
-
+  using point_type = typename Hamiltonian<Model, BaseRNG>::point_type;
+  ~base_nuts() {}
   void set_metric(const Eigen::MatrixXd& inv_e_metric) {
     this->z_.set_metric(inv_e_metric);
   }
@@ -291,7 +293,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
       return false;
 
     // Build the final subtree
-    ps_point z_propose_final(this->z_);
+    point_type z_propose_final(this->z_);
 
     double log_sum_weight_final = -std::numeric_limits<double>::infinity();
 
@@ -352,9 +354,10 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
  protected:
   ps_point z_fwd{this->z_};  // State at forward end of trajectory
-  ps_point z_bck{z_fwd};     // State at backward end of trajectory
-  ps_point z_sample{z_fwd};
-  ps_point z_propose{z_fwd};
+  ps_point z_bck{this->z_.p.size()};     // State at backward end of trajectory
+  ps_point z_sample{this->z_.p.size()};
+  ps_point z_propose{this->z_.p.size()};
+  ps_point z_propose_final{this->z_.p.size()};
 };
 
 }  // namespace mcmc

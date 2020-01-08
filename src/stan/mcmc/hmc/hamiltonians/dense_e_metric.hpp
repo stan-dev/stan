@@ -17,8 +17,11 @@ template <class Model, class BaseRNG>
 class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
  public:
   explicit dense_e_metric(const Model& model)
-      : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
-
+      : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {
+        dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
+      }
+  using point_type = dense_e_point;
+  Eigen::VectorXd dtau_dq_;
   double T(dense_e_point& z) {
     return 0.5 * z.p.transpose() * z.inv_e_metric_ * z.p;
   }
@@ -32,7 +35,7 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
   }
 
   Eigen::VectorXd dtau_dq(dense_e_point& z, callbacks::logger& logger) {
-    return Eigen::VectorXd::Zero(this->model_.num_params_r());
+    return dtau_dq_;
   }
 
   Eigen::VectorXd dtau_dp(dense_e_point& z) { return z.inv_e_metric_ * z.p; }

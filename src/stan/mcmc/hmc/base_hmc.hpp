@@ -134,7 +134,7 @@ class base_hmc : public base_mcmc {
     this->z_ = z_init;
   }
 
-  typename Hamiltonian<Model, BaseRNG>::PointType& z() { return z_; }
+  typename Hamiltonian<Model, BaseRNG>::point_type& z() { return z_; }
 
   virtual void set_nominal_stepsize(double e) {
     if (e > 0)
@@ -160,7 +160,7 @@ class base_hmc : public base_mcmc {
   }
 
  protected:
-  typename Hamiltonian<Model, BaseRNG>::PointType z_;
+  typename Hamiltonian<Model, BaseRNG>::point_type z_;
   Integrator<Hamiltonian<Model, BaseRNG> > integrator_;
   Hamiltonian<Model, BaseRNG> hamiltonian_;
 

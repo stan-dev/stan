@@ -15,8 +15,11 @@ template <class Model, class BaseRNG>
 class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
  public:
   explicit diag_e_metric(const Model& model)
-      : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {}
-
+      : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {
+        dtau_dq_ = Eigen::VectorXd::Zero(this->model_.num_params_r());
+      }
+  Eigen::VectorXd dtau_dq_;
+  using point_type = diag_e_point;
   double T(diag_e_point& z) {
     return 0.5 * z.p.dot(z.inv_e_metric_.cwiseProduct(z.p));
   }
@@ -30,7 +33,7 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
   }
 
   Eigen::VectorXd dtau_dq(diag_e_point& z, callbacks::logger& logger) {
-    return Eigen::VectorXd::Zero(this->model_.num_params_r());
+    return dtau_dq_;
   }
 
   Eigen::VectorXd dtau_dp(diag_e_point& z) {
