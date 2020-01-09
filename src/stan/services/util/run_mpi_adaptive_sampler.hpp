@@ -37,7 +37,8 @@ namespace util {
  */
 template <class Sampler, class Model, class RNG>
 void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
-                              std::vector<double>& cont_vector, int num_warmup,
+                              std::vector<double>& cont_vector,
+                              int num_chains, int num_warmup,
                               int num_samples, int num_thin, int refresh,
                               bool save_warmup, RNG& rng,
                               callbacks::interrupt& interrupt,
@@ -66,7 +67,8 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
 
   // warmup
   clock_t start = clock();
-  util::campfire_warmup(sampler, num_warmup, 0, num_warmup + num_samples,
+  util::campfire_warmup(sampler, num_chains,
+                        num_warmup, 0, num_warmup + num_samples,
                         num_thin, refresh, save_warmup, true, writer, s,
                         model, rng, interrupt, logger);
   clock_t end = clock();

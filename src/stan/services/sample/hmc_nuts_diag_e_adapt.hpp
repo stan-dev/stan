@@ -97,8 +97,9 @@ int hmc_nuts_diag_e_adapt(
                             logger);
 
 #ifdef MPI_ADAPTED_WARMUP
-  util::run_mpi_adaptive_sampler(
-      sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
+  const int num_chains = 4;
+  util::run_mpi_adaptive_sampler(sampler, 
+      model, cont_vector, num_chains, num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
 #else
   util::run_adaptive_sampler(

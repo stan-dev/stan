@@ -42,8 +42,9 @@ namespace util {
  * @param[in,out] callback interrupt callback called once an iteration
  * @param[in,out] logger logger for messages
  */
-  template <class Sampler, class Model, class RNG>
-void campfire_warmup(Sampler& sampler, int num_iterations,
+template <class Sampler, class Model, class RNG>
+void campfire_warmup(Sampler& sampler, int num_chains,
+                     int num_iterations,
                      int start, int finish, int num_thin, int refresh,
                      bool save, bool warmup,
                      util::mcmc_writer& mcmc_writer,
@@ -51,10 +52,8 @@ void campfire_warmup(Sampler& sampler, int num_iterations,
                      RNG& base_rng, callbacks::interrupt& callback,
                      callbacks::logger& logger) {
   // for prototyping, we have @c max_num_windows fixed
-  const int num_mpi_chains = 4;
   const int window_size = 100;
   const int max_num_windows = num_iterations / window_size;
-  const int num_chains = 4;
 
   using boost::accumulators::accumulator_set;
   using boost::accumulators::stats;
@@ -65,9 +64,6 @@ void campfire_warmup(Sampler& sampler, int num_iterations,
   using stan::math::mpi::Communicator;
 
   std::vector<accumulator_set<double, stats<mean, variance>>> acc_log(max_num_windows);
-
-  // Session::inter_chain_comm(num_mpi_chains);
-  // Session::intra_chain_comm(num_mpi_chains);
 
   bool is_adapted = false;
   const double target_rhat = 1.05;
@@ -98,7 +94,7 @@ void campfire_warmup(Sampler& sampler, int num_iterations,
     }
 
     double stepsize = -999.0;
-    bool is_inter_rank = Session::is_in_inter_chain_comm(num_mpi_chains);
+    bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains);
 
     if (is_inter_rank && boost::math::isfinite(init_s.log_prob())) {
       int m_win = m / window_size + 1;
@@ -121,7 +117,7 @@ void campfire_warmup(Sampler& sampler, int num_iterations,
           chain_gather[3 * i + 2] = sampler.get_nominal_stepsize();
         }
 
-        const Communicator& comm = Session::inter_chain_comm(num_mpi_chains);
+        const Communicator& comm = Session::inter_chain_comm(num_chains);
         if (comm.rank() == 0) {
           std::vector<double> rhat(m_win), ess(m_win);
           std::vector<double> all_chain_gather(n_gather * num_chains);
@@ -148,6 +144,7 @@ void campfire_warmup(Sampler& sampler, int num_iterations,
                 acc_step(all_chain_gather[chain * n_gather + 3 * i + 2]);
               }
               stepsize = boost::accumulators::mean(acc_step);
+              std::cout << "taki test rhat: " << rhat[i] << "\n";
               break;
             }
           }
@@ -160,7 +157,7 @@ void campfire_warmup(Sampler& sampler, int num_iterations,
       }
     }
 
-    const Communicator& intra_comm = Session::intra_chain_comm(num_mpi_chains);
+    const Communicator& intra_comm = Session::intra_chain_comm(num_chains);
     MPI_Bcast(&stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
     if (stepsize > 0.0) {
       is_adapted = true;
