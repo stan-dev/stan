@@ -2,6 +2,7 @@
 #define STAN_MCMC_HMC_HAMILTONIANS_PS_POINT_HPP
 
 #include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <boost/lexical_cast.hpp>
 #include <string>
