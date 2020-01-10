@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/math/rev/mat.hpp>
+#include <stan/math/rev.hpp>
 #include <stan/model/model_functional.hpp>
 #include <sstream>
 #include <stdexcept>

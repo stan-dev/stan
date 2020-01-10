@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_LOG_PROB_GRAD_HPP
 #define STAN_MODEL_LOG_PROB_GRAD_HPP
 
-#include <stan/math/rev/mat.hpp>
+#include <stan/math/rev.hpp>
 #include <iostream>
 #include <vector>
 
