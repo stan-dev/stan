@@ -2,8 +2,7 @@
 #define STAN_VARIATIONAL_PRINT_PROGRESS_HPP
 
 #include <stan/callbacks/logger.hpp>
-#include <stan/math/prim/scal/err/check_positive.hpp>
-#include <stan/math/prim/scal/err/check_nonnegative.hpp>
+#include <stan/math/prim/err.hpp>
 #include <cmath>
 #include <iomanip>
 #include <iostream>
