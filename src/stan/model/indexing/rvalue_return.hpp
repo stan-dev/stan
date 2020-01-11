@@ -1,9 +1,10 @@
 #ifndef STAN_MODEL_INDEXING_RVALUE_RETURN_HPP
 #define STAN_MODEL_INDEXING_RVALUE_RETURN_HPP
 
-#include <Eigen/Dense>
+#include <stan/math/prim/meta.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
+#include <Eigen/Dense>
 #include <vector>
 
 namespace stan {
@@ -22,7 +23,7 @@ namespace model {
  * @tparam C Type of container or scalar.
  * @tparam L Type of index list.
  */
-template <typename C, typename L>
+template <typename C, typename L, typename = void>
 struct rvalue_return {};
 
 /**
@@ -53,8 +54,7 @@ struct rvalue_return<C, nil_index_list> {
  * @tparam C Columns for matrix.
  */
 template <typename T, typename I, int R, int C>
-struct rvalue_return<Eigen::Matrix<T, R, C>,
-                     cons_index_list<I, nil_index_list> > {
+struct rvalue_return<Eigen::Matrix<T, R, C>, multiple_index<I>> {
   /**
    * Return type is the matrix container type.
    */
@@ -69,7 +69,7 @@ struct rvalue_return<Eigen::Matrix<T, R, C>,
  */
 template <typename T>
 struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-                     cons_index_list<index_uni, nil_index_list> > {
+                     single_index> {
   /**
    * Return type is row vector.
    */
@@ -83,8 +83,7 @@ struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
  * @tparam T Type of scalar in vector.
  */
 template <typename T>
-struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, 1>,
-                     cons_index_list<index_uni, nil_index_list> > {
+struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, 1>, single_index> {
   /**
    * Return type is scalar type of vector.
    */
@@ -98,8 +97,7 @@ struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, 1>,
  * @tparam T Type of scalar in row vector.
  */
 template <typename T>
-struct rvalue_return<Eigen::Matrix<T, 1, Eigen::Dynamic>,
-                     cons_index_list<index_uni, nil_index_list> > {
+struct rvalue_return<Eigen::Matrix<T, 1, Eigen::Dynamic>, single_index> {
   /**
    * Return type is scalar type of row vector.
    */
@@ -115,9 +113,8 @@ struct rvalue_return<Eigen::Matrix<T, 1, Eigen::Dynamic>,
  * @tparam I2 Type of second multiple index.
  */
 template <typename T, typename I1, typename I2>
-struct rvalue_return<
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-    cons_index_list<I1, cons_index_list<I2, nil_index_list> > > {
+struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                     variadic_multiple_index<I1, I2>> {
   /**
    * Return type is matrix container type.
    */
@@ -132,9 +129,8 @@ struct rvalue_return<
  * @tparam I Type of multiple index.
  */
 template <typename T, typename I>
-struct rvalue_return<
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-    cons_index_list<I, cons_index_list<index_uni, nil_index_list> > > {
+struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                     variadic_single_index<I>> {
   /**
    * Return type is vector with same scalar type as matrix container.
    */
@@ -149,9 +145,8 @@ struct rvalue_return<
  * @tparam I Type of multiple index.
  */
 template <typename T, typename I>
-struct rvalue_return<
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-    cons_index_list<index_uni, cons_index_list<I, nil_index_list> > > {
+struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                     uni_multiple_index<I>> {
   /**
    * Return type is row vector with same scalar type as matrix container.
    */
@@ -165,9 +160,8 @@ struct rvalue_return<
  * @tparam T Type of scalar in matrix.
  */
 template <typename T>
-struct rvalue_return<
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
-    cons_index_list<index_uni, cons_index_list<index_uni, nil_index_list> > > {
+struct rvalue_return<Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>,
+                     uni_single_index> {
   /**
    * Return type is scalar type of matrix.
    */
@@ -184,7 +178,7 @@ struct rvalue_return<
  * @tparam L Following index types.
  */
 template <typename C, typename I, typename L>
-struct rvalue_return<std::vector<C>, cons_index_list<I, L> > {
+struct rvalue_return<std::vector<C>, generic_index<I, L>> {
   /**
    * Return type is calculated recursively as a standard vector of
    * the rvalue return for the element type C and following index
@@ -202,13 +196,16 @@ struct rvalue_return<std::vector<C>, cons_index_list<I, L> > {
  * @tparam L Following index types.
  */
 template <typename C, typename L>
-struct rvalue_return<std::vector<C>, cons_index_list<index_uni, L> > {
+struct rvalue_return<std::vector<C>, uni_variadic_index<L>> {
   /**
    * Return type is calculated recursively as the rvalue return
    * for the element type C and following index types L.
    */
   typedef typename rvalue_return<C, L>::type type;
 };
+
+template <typename... Types>
+using rvalue_return_t = typename rvalue_return<Types...>::type;
 
 }  // namespace model
 }  // namespace stan

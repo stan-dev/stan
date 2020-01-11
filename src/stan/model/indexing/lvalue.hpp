@@ -69,8 +69,8 @@ inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
  */
 template <typename T, typename U>
 inline void assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
-                   const cons_index_list<index_uni, nil_index_list>& idxs,
-                   const U& y, const char* name = "ANON", int depth = 0) {
+                   const single_index& idxs, const U& y,
+                   const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("vector[uni] assign range", name, x.size(), i);
   x(i - 1) = y;
@@ -93,8 +93,8 @@ inline void assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
  */
 template <typename T, typename U>
 inline void assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
-                   const cons_index_list<index_uni, nil_index_list>& idxs,
-                   const U& y, const char* name = "ANON", int depth = 0) {
+                   const single_index& idxs, const U& y,
+                   const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("row_vector[uni] assign range", name, x.size(), i);
   x(i - 1) = y;
@@ -120,8 +120,7 @@ inline void assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
  */
 template <typename T, typename I, typename U>
 inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
-assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
-       const cons_index_list<I, nil_index_list>& idxs,
+assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x, const multiple_index<I>& idxs,
        const Eigen::Matrix<U, Eigen::Dynamic, 1>& y, const char* name = "ANON",
        int depth = 0) {
   math::check_size_match("vector[multi] assign sizes", "lhs",
@@ -155,8 +154,7 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
  */
 template <typename T, typename I, typename U>
 inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
-assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
-       const cons_index_list<I, nil_index_list>& idxs,
+assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x, const multiple_index<I>& idxs,
        const Eigen::Matrix<U, 1, Eigen::Dynamic>& y, const char* name = "ANON",
        int depth = 0) {
   math::check_size_match("row_vector[multi] assign sizes", "lhs",
@@ -189,7 +187,7 @@ assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
  */
 template <typename T, typename U>
 void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-            const cons_index_list<index_uni, nil_index_list>& idxs,
+            const single_index& idxs,
             const Eigen::Matrix<U, 1, Eigen::Dynamic>& y,
             const char* name = "ANON", int depth = 0) {
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.cols(), name,
@@ -221,7 +219,7 @@ void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
 template <typename T, typename I, typename U>
 inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
 assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-       const cons_index_list<I, nil_index_list>& idxs,
+       const multiple_index<I>& idxs,
        const Eigen::Matrix<U, Eigen::Dynamic, Eigen::Dynamic>& y,
        const char* name = "ANON", int depth = 0) {
   int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
@@ -255,9 +253,8 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  */
 template <typename T, typename U>
 void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-            const cons_index_list<
-                index_uni, cons_index_list<index_uni, nil_index_list> >& idxs,
-            const U& y, const char* name = "ANON", int depth = 0) {
+            const cons_index_list<index_uni, single_index>& idxs, const U& y,
+            const char* name = "ANON", int depth = 0) {
   int m = idxs.head_.n_;
   int n = idxs.tail_.head_.n_;
   math::check_range("matrix[uni,uni] assign range", name, x.rows(), m);
@@ -286,11 +283,10 @@ void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  */
 template <typename T, typename I, typename U>
 inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
-assign(
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-    const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idxs,
-    const Eigen::Matrix<U, 1, Eigen::Dynamic>& y, const char* name = "ANON",
-    int depth = 0) {
+assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
+       const uni_multiple_index<I>& idxs,
+       const Eigen::Matrix<U, 1, Eigen::Dynamic>& y, const char* name = "ANON",
+       int depth = 0) {
   int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
   math::check_size_match("matrix[uni,multi] assign sizes", "lhs", x_idxs_cols,
                          name, y.cols());
@@ -323,11 +319,10 @@ assign(
  */
 template <typename T, typename I, typename U>
 inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
-assign(
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-    const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idxs,
-    const Eigen::Matrix<U, Eigen::Dynamic, 1>& y, const char* name = "ANON",
-    int depth = 0) {
+assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
+       const cons_index_list<I, single_index>& idxs,
+       const Eigen::Matrix<U, Eigen::Dynamic, 1>& y, const char* name = "ANON",
+       int depth = 0) {
   int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
   math::check_size_match("matrix[multi,uni] assign sizes", "lhs", x_idxs_rows,
                          name, y.rows());
@@ -364,7 +359,7 @@ inline typename boost::disable_if_c<boost::is_same<I1, index_uni>::value
                                         || boost::is_same<I2, index_uni>::value,
                                     void>::type
 assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-       const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idxs,
+       const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idxs,
        const Eigen::Matrix<U, Eigen::Dynamic, Eigen::Dynamic>& y,
        const char* name = "ANON", int depth = 0) {
   int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
@@ -408,7 +403,7 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  * tail assignment.
  */
 template <typename T, typename L, typename U>
-inline void assign(std::vector<T>& x, const cons_index_list<index_uni, L>& idxs,
+inline void assign(std::vector<T>& x, const uni_variadic_index<L>& idxs,
                    const U& y, const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("vector[uni,...] assign range", name, x.size(), i);
@@ -442,7 +437,7 @@ inline void assign(std::vector<T>& x, const cons_index_list<index_uni, L>& idxs,
  */
 template <typename T, typename I, typename L, typename U>
 typename boost::disable_if<boost::is_same<I, index_uni>, void>::
-    type inline assign(std::vector<T>& x, const cons_index_list<I, L>& idxs,
+    type inline assign(std::vector<T>& x, const generic_index<I, L>& idxs,
                        const std::vector<U>& y, const char* name = "ANON",
                        int depth = 0) {
   int x_idx_size = rvalue_index_size(idxs.head_, x.size());
