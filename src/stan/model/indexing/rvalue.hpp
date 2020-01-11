@@ -28,7 +28,7 @@ namespace model {
  * @return Input value.
  */
 template <typename T>
-inline auto&& rvalue(T&& c, const nil_index_list& /*idx*/,
+inline auto& rvalue(T&& c, const nil_index_list& /*idx*/,
                  const char* /*name*/ = "", int /*depth*/ = 0) {
   return std::forward<T>(c);
 }
@@ -53,7 +53,7 @@ using require_eigen_col_vector = require_t<is_eigen_col_vector<T>>;
  * @return Result of indexing vector.
  */
 template <typename Vec, require_eigen_vector_t<Vec>...>
-inline auto&& rvalue(Vec&& v, const single_index& idx, const char* name = "ANON",
+inline auto& rvalue(Vec&& v, const single_index& idx, const char* name = "ANON",
                    int depth = 0) {
   int ones_idx = idx.head_.n_;
   if (is_eigen_row_vector<Vec>::value) {
@@ -61,7 +61,7 @@ inline auto&& rvalue(Vec&& v, const single_index& idx, const char* name = "ANON"
   } else {
     math::check_range("vector[single] indexing", name, v.size(), ones_idx);
   }
-  return v.coeffRef(ones_idx - 1);
+  return std::forward<decltype(v.coeffRef(0))>(v.coeffRef(ones_idx - 1));
 }
 
 /**
@@ -142,7 +142,7 @@ inline auto rvalue(Mat&& a, const multiple_index<I>& idx,
   for (int i = 0; i < n_rows; ++i) {
     int n = rvalue_at(i, idx.head_);
     math::check_range("matrix[multi] indexing", name, a.rows(), n);
-    b.row(i) = a.row(n - 1);
+    b.row(i) = std::forward<decltype(a.row(0))>(a.row(n - 1));
   }
   return b;
 }
@@ -162,7 +162,7 @@ inline auto rvalue(Mat&& a, const multiple_index<I>& idx,
  */
 template <typename Mat, require_eigen_t<Mat>...,
           require_not_eigen_vector_t<Mat>...>
-inline auto&& rvalue(Mat&& a, const uni_single_index& idx,
+inline auto& rvalue(Mat&& a, const uni_single_index& idx,
                    const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   int n = idx.tail_.head_.n_;
@@ -188,11 +188,11 @@ inline auto&& rvalue(Mat&& a, const uni_single_index& idx,
  */
 template <typename Mat, typename I, require_not_same_t<I, index_uni>...,
           require_eigen_t<Mat>..., require_not_eigen_vector_t<Mat>...>
-inline auto&& rvalue(Mat&& a, const uni_multiple_index<I>& idx,
+inline auto rvalue(Mat&& a, const uni_multiple_index<I>& idx,
                    const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
-  return rvalue(a.row(m - 1), idx.tail_);
+  return rvalue(std::forward<decltype(a.row(0))>(a.row(m - 1)), idx.tail_);
 }
 
 /**
@@ -285,7 +285,7 @@ inline auto rvalue(Vec&& c, const uni_variadic_index<L>& idx,
                    const char* name = "ANON", int depth = 0) {
   int n = idx.head_.n_;
   math::check_range("array[uni,...] index", name, c.size(), n);
-  return rvalue(c[n - 1], idx.tail_, name, depth + 1);
+  return rvalue(std::forward<decltype(c[0])>(c[n - 1]), idx.tail_, name, depth + 1);
 }
 
 /**

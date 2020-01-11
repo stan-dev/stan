@@ -78,6 +78,7 @@ using variadic_single_index = cons_index_list<I, single_index>;
 template <typename I1, typename I2>
 using variadic_multiple_index = cons_index_list<I1, multiple_index<I2>>;
 
+
 }  // namespace model
 }  // namespace stan
 #endif

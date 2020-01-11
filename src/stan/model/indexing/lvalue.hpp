@@ -4,6 +4,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
@@ -27,9 +28,9 @@ namespace model {
  * @param[in] depth Indexing depth (default 0; ignored
  */
 template <typename T, typename U>
-inline void assign(T& x, const nil_index_list& /* idxs */, const U& y,
+inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
-  x = y;
+  x = std::forward<U>(y);
 }
 
 /**
@@ -43,13 +44,14 @@ inline void assign(T& x, const nil_index_list& /* idxs */, const U& y,
  * @param[in] name name of lvalue variable (default "ANON").
  * @param[in] depth indexing depth (default 0).
  */
-template <typename T, typename U>
+template <typename T, typename U, require_std_vector_t<U>...>
 inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
-                   const std::vector<U>& y, const char* name = "ANON",
+                   U&& y, const char* name = "ANON",
                    int depth = 0) {
   x.resize(y.size());
-  for (size_t i = 0; i < y.size(); ++i)
-    assign(x[i], nil_index_list(), y[i], name, depth + 1);
+  for (size_t i = 0; i < y.size(); ++i) {
+    assign(x[i], nil_index_list(), std::forward<decltype(y[0])>(y[i]), name, depth + 1);
+  }
 }
 
 /**
@@ -67,38 +69,16 @@ inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If the index is out of bounds.
  */
-template <typename T, typename U>
-inline void assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
-                   const single_index& idxs, const U& y,
-                   const char* name = "ANON", int depth = 0) {
+template <typename Derived, typename U,
+ require_eigen_vector_t<Derived>...>
+inline void assign(Eigen::DenseBase<Derived>& x,
+                   const cons_index_list<index_uni, nil_index_list>& idxs,
+                   U&& y, const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("vector[uni] assign range", name, x.size(), i);
-  x(i - 1) = y;
+  x.coeffRef(i - 1) = std::forward<U>(y);
 }
 
-/**
- * Assign the specified Eigen vector at the specified single index
- * to the specified value.
- *
- * Types:  row_vec[uni] <- scalar
- *
- * @tparam T Type of assigned row vector scalar.
- * @tparam U Type of value (must be assignable to T).
- * @param[in] x Row vector variable to be assigned.
- * @param[in] idxs Sequence of one single index (from 1).
- * @param[in] y Value scalar.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
- * @throw std::out_of_range Index is out of bounds.
- */
-template <typename T, typename U>
-inline void assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
-                   const single_index& idxs, const U& y,
-                   const char* name = "ANON", int depth = 0) {
-  int i = idxs.head_.n_;
-  math::check_range("row_vector[uni] assign range", name, x.size(), i);
-  x(i - 1) = y;
-}
 
 /**
  * Assign the specified Eigen vector at the specified multiple
@@ -118,10 +98,13 @@ inline void assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
  */
-template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
-assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x, const multiple_index<I>& idxs,
-       const Eigen::Matrix<U, Eigen::Dynamic, 1>& y, const char* name = "ANON",
+template <typename Derived1, typename I, typename Derived2,
+  require_all_eigen_t<Derived1, Derived2>...,
+  require_not_same_t<index_uni, I>...>
+inline void
+assign(Eigen::DenseBase<Derived1>& x,
+       const cons_index_list<I, nil_index_list>& idxs,
+       const Eigen::DenseBase<Derived2>& y, const char* name = "ANON",
        int depth = 0) {
   math::check_size_match("vector[multi] assign sizes", "lhs",
                          rvalue_index_size(idxs.head_, x.size()), name,
@@ -129,43 +112,10 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x, const multiple_index<I>& idxs,
   for (int n = 0; n < y.size(); ++n) {
     int i = rvalue_at(n, idxs.head_);
     math::check_range("vector[multi] assign range", name, x.size(), i);
-    x(i - 1) = y(n);
+    x.coeffRef(i - 1) = y(n);
   }
 }
 
-/**
- * Assign the specified Eigen row vector at the specified multiple
- * index to the specified value.
- *
- * Types:   row_vec[multi] <- row_vec
- *
- * @tparam T Scalar type for assigned row vector.
- * @tparam I Type of multiple index.
- * @tparam U Type of value row vector scalar (must be assignable
- * to T).
- * @param[in] x Row vector variable to be assigned.
- * @param[in] idxs Sequence of one multiple index (from 1).
- * @param[in] y Value vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
- * @throw std::out_of_range If any of the indices are out of bounds.
- * @throw std::invalid_argument If the value size isn't the same as
- * the indexed size.
- */
-template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
-assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x, const multiple_index<I>& idxs,
-       const Eigen::Matrix<U, 1, Eigen::Dynamic>& y, const char* name = "ANON",
-       int depth = 0) {
-  math::check_size_match("row_vector[multi] assign sizes", "lhs",
-                         rvalue_index_size(idxs.head_, x.size()), name,
-                         y.size());
-  for (int n = 0; n < y.size(); ++n) {
-    int i = rvalue_at(n, idxs.head_);
-    math::check_range("row_vector[multi] assign range", name, x.size(), i);
-    x(i - 1) = y(n);
-  }
-}
 
 /**
  * Assign the specified Eigen matrix at the specified single index
@@ -187,7 +137,7 @@ assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x, const multiple_index<I>& idxs,
  */
 template <typename T, typename U>
 void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-            const single_index& idxs,
+            const cons_index_list<index_uni, nil_index_list>& idxs,
             const Eigen::Matrix<U, 1, Eigen::Dynamic>& y,
             const char* name = "ANON", int depth = 0) {
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.cols(), name,
@@ -195,7 +145,7 @@ void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
   int i = idxs.head_.n_;
   math::check_range("matrix[uni] assign range", name, x.rows(), i);
   for (int j = 0; j < x.cols(); ++j)  // loop allows double to var assgn
-    x(i - 1, j) = y(j);
+    x.coeffRef(i - 1, j) = y(j);
 }
 
 /**
@@ -216,10 +166,11 @@ void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
-template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
+template <typename T, typename I, typename U,
+  require_not_same_t<index_uni, I>...>
+inline void
 assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-       const multiple_index<I>& idxs,
+       const cons_index_list<I, nil_index_list>& idxs,
        const Eigen::Matrix<U, Eigen::Dynamic, Eigen::Dynamic>& y,
        const char* name = "ANON", int depth = 0) {
   int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
@@ -232,7 +183,7 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
     math::check_range("matrix[multi] assign range", name, x.rows(), m);
     // recurse to allow double to var assign
     for (int j = 0; j < x.cols(); ++j)
-      x(m - 1, j) = y(i, j);
+      x.coeffRef(m - 1, j) = y(i, j);
   }
 }
 
@@ -253,13 +204,14 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  */
 template <typename T, typename U>
 void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-            const cons_index_list<index_uni, single_index>& idxs, const U& y,
-            const char* name = "ANON", int depth = 0) {
+            const cons_index_list<
+                index_uni, cons_index_list<index_uni, nil_index_list> >& idxs,
+            U&& y, const char* name = "ANON", int depth = 0) {
   int m = idxs.head_.n_;
   int n = idxs.tail_.head_.n_;
   math::check_range("matrix[uni,uni] assign range", name, x.rows(), m);
   math::check_range("matrix[uni,uni] assign range", name, x.cols(), n);
-  x(m - 1, n - 1) = y;
+  x.coeffRef(m - 1, n - 1) = y;
 }
 
 /**
@@ -281,12 +233,15 @@ void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side row vector do not match.
  */
-template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
-assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-       const uni_multiple_index<I>& idxs,
-       const Eigen::Matrix<U, 1, Eigen::Dynamic>& y, const char* name = "ANON",
-       int depth = 0) {
+template <typename T, typename I, typename EigVec,
+require_eigen_vector_t<EigVec>...,
+ require_not_same_t<index_uni, I>...>
+inline void
+assign(
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
+    const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idxs,
+    EigVec&& y, const char* name = "ANON",
+    int depth = 0) {
   int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
   math::check_size_match("matrix[uni,multi] assign sizes", "lhs", x_idxs_cols,
                          name, y.cols());
@@ -295,7 +250,7 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
   for (int i = 0; i < y.size(); ++i) {
     int n = rvalue_at(i, idxs.tail_.head_);
     math::check_range("matrix[uni,multi] assign range", name, x.cols(), n);
-    x(m - 1, n - 1) = y(i);
+    x.coeffRef(m - 1, n - 1) = y(i);
   }
 }
 
@@ -317,12 +272,14 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side vector do not match.
  */
-template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
-assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-       const cons_index_list<I, single_index>& idxs,
-       const Eigen::Matrix<U, Eigen::Dynamic, 1>& y, const char* name = "ANON",
-       int depth = 0) {
+template <typename T, typename I, typename U,
+require_not_same_t<index_uni, I>...>
+inline void
+assign(
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
+    const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idxs,
+    const Eigen::Matrix<U, Eigen::Dynamic, 1>& y, const char* name = "ANON",
+    int depth = 0) {
   int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
   math::check_size_match("matrix[multi,uni] assign sizes", "lhs", x_idxs_rows,
                          name, y.rows());
@@ -354,12 +311,12 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
-template <typename T, typename I1, typename I2, typename U>
-inline typename boost::disable_if_c<boost::is_same<I1, index_uni>::value
-                                        || boost::is_same<I2, index_uni>::value,
-                                    void>::type
+template <typename T, typename I1, typename I2, typename U,
+  require_not_same_t<index_uni, I1>...,
+  require_not_same_t<index_uni, I2>...>
+inline void
 assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
-       const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idxs,
+       const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idxs,
        const Eigen::Matrix<U, Eigen::Dynamic, Eigen::Dynamic>& y,
        const char* name = "ANON", int depth = 0) {
   int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
@@ -403,8 +360,8 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  * tail assignment.
  */
 template <typename T, typename L, typename U>
-inline void assign(std::vector<T>& x, const uni_variadic_index<L>& idxs,
-                   const U& y, const char* name = "ANON", int depth = 0) {
+inline void assign(std::vector<T>& x, const cons_index_list<index_uni, L>& idxs,
+                   U&& y, const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("vector[uni,...] assign range", name, x.size(), i);
   assign(x[i - 1], idxs.tail_, y, name, depth + 1);
@@ -435,10 +392,11 @@ inline void assign(std::vector<T>& x, const uni_variadic_index<L>& idxs,
  * and size of first dimension of value do not match, or any of
  * the recursive tail assignment dimensions do not match.
  */
-template <typename T, typename I, typename L, typename U>
-typename boost::disable_if<boost::is_same<I, index_uni>, void>::
-    type inline assign(std::vector<T>& x, const generic_index<I, L>& idxs,
-                       const std::vector<U>& y, const char* name = "ANON",
+template <typename T, typename I, typename L, typename FromVec,
+  require_std_vector_t<FromVec>...,
+  require_not_same_t<index_uni, I>...>
+void inline assign(std::vector<T>& x, const cons_index_list<I, L>& idxs,
+                       FromVec&& y, const char* name = "ANON",
                        int depth = 0) {
   int x_idx_size = rvalue_index_size(idxs.head_, x.size());
   math::check_size_match("vector[multi,...] assign sizes", "lhs", x_idx_size,

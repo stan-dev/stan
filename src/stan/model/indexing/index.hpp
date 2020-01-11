@@ -1,6 +1,7 @@
 #ifndef STAN_MODEL_INDEXING_INDEX_HPP
 #define STAN_MODEL_INDEXING_INDEX_HPP
 
+#include <stan/math/prim/meta.hpp>
 #include <vector>
 
 namespace stan {
@@ -39,7 +40,8 @@ struct index_multi {
    *
    * @param ns multiple indexes.
    */
-  explicit index_multi(const std::vector<int>& ns) : ns_(ns) {}
+  template <typename Vec, require_std_vector_t<Vec>...>
+  explicit index_multi(Vec&& ns) : ns_(std::forward<Vec>(ns)) {}
 };
 
 /**
