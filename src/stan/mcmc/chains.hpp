@@ -2,7 +2,7 @@
 #define STAN_MCMC_CHAINS_HPP
 
 #include <stan/io/stan_csv_reader.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
 #include <stan/analyze/mcmc/compute_potential_scale_reduction.hpp>
 #include <boost/accumulators/accumulators.hpp>

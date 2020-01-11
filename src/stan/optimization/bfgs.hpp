@@ -1,7 +1,7 @@
 #ifndef STAN_OPTIMIZATION_BFGS_HPP
 #define STAN_OPTIMIZATION_BFGS_HPP
 
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/model/log_prob_propto.hpp>
 #include <stan/model/log_prob_grad.hpp>
 #include <stan/optimization/bfgs_linesearch.hpp>
