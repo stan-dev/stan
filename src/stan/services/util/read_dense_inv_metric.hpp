@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <limits>
 #include <sstream>
 #include <string>
