@@ -246,10 +246,7 @@ draw_vecs[3] <<
  const std::vector<const double* > draws{draw_vecs[0].data(),
      draw_vecs[1].data(), draw_vecs[2].data(), draw_vecs[3].data()};
 
-  std::vector<double> chain_stepsize{1.1, 1.2, 1.3, 1.4};
-  for (int j = 0; j < num_chains; ++j) {
-    chain_stepsize[j] += 0.1 * comm.rank();
-  }
+ double chain_stepsize = 1.1 + 0.1 * comm.rank();
 
   // a large ESS target should make all windows fail to pass tests
   for (int curr_num_win = 1; curr_num_win < 6; ++curr_num_win) {

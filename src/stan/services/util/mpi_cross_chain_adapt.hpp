@@ -57,7 +57,7 @@ single_chain_ess(const double* draw, size_t num_draws) {
   std::vector<double>
   mpi_cross_chain_adapt(const double* draw_p,
                         const std::vector<Acc>& acc,
-                        const std::vector<double>& chain_stepsize,
+                        double chain_stepsize,
                         int num_current_window, int max_num_window,
                         int window_size, int num_chains,
                         double target_rhat, double target_ess) {
@@ -68,7 +68,6 @@ single_chain_ess(const double* draw, size_t num_draws) {
 
     using stan::math::mpi::Session;
     using stan::math::mpi::Communicator;
-
 
     const Communicator& comm = Session::inter_chain_comm(num_chains);
 
@@ -81,7 +80,7 @@ single_chain_ess(const double* draw, size_t num_draws) {
       chain_gather[nd_win * win] = boost::accumulators::mean(acc[win]);
       chain_gather[nd_win * win + 1] = boost::accumulators::variance(acc[win]) *
         unbiased_var_scale;
-      chain_gather[nd_win * win + 2] = chain_stepsize[win];
+      chain_gather[nd_win * win + 2] = chain_stepsize;
       chain_gather[nd_win * win + 3] =
         single_chain_ess(draw_p + win * window_size, num_draws);
     }
@@ -121,12 +120,11 @@ single_chain_ess(const double* draw, size_t num_draws) {
           break;
         }
       }
-      MPI_Bcast(res.data(), 1, MPI_DOUBLE, 0, comm.comm());
     } else {
       MPI_Gather(chain_gather.data(), n_gather, MPI_DOUBLE,
                  NULL, 0, MPI_DOUBLE, 0, comm.comm());
-      MPI_Bcast(res.data(), 1, MPI_DOUBLE, 0, comm.comm());
     }
+    MPI_Bcast(res.data(), 1, MPI_DOUBLE, 0, comm.comm());
     return res;
   }
 }

@@ -65,6 +65,22 @@ int hmc_nuts_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
+
+    using stan::math::mpi::Session;
+    using stan::math::mpi::Communicator;
+
+#ifdef MPI_ADAPTED_WARMUP
+  const int num_chains = 4;
+  const Communicator& inter_comm = Session::inter_chain_comm(num_chains);
+  const Communicator& intra_comm = Session::intra_chain_comm(num_chains);
+  bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains);
+  if (is_inter_rank) {
+    random_seed += inter_comm.rank();
+  }
+  MPI_Bcast(&random_seed, 1, MPI_UNSIGNED, 0, intra_comm.comm());
+  int rank;
+  MPI_Comm_rank(MPI_COMM_STAN, &rank);
+#endif
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
@@ -97,7 +113,6 @@ int hmc_nuts_diag_e_adapt(
                             logger);
 
 #ifdef MPI_ADAPTED_WARMUP
-  const int num_chains = 4;
   util::run_mpi_adaptive_sampler(sampler, 
       model, cont_vector, num_chains, num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);

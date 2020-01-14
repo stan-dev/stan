@@ -67,9 +67,14 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
 
   // warmup
   clock_t start = clock();
+  const double target_rhat = 1.1;
+  const double target_ess = 50;
+  const int window_size = 100;
   util::campfire_warmup(sampler, num_chains,
                         num_warmup, 0, num_warmup + num_samples,
-                        num_thin, refresh, save_warmup, true, writer, s,
+                        num_thin, refresh, save_warmup, true,
+                        window_size, target_rhat, target_ess,
+                        writer, s,
                         model, rng, interrupt, logger);
   clock_t end = clock();
   double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
