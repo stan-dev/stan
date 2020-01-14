@@ -4,7 +4,7 @@
 #include <stan/io/var_context.hpp>
 #include <stan/math.hpp>
 #include <boost/throw_exception.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <map>
 #include <algorithm>
 #include <functional>
@@ -336,6 +336,21 @@ class array_var_context : public var_context {
     }
     return empty_vec_ui_;
   }
+
+  /**
+   * Check variable dimensions against variable declaration.
+   * Only used for data read in from file.
+   *
+   * @param stage stan program processing stage
+   * @param name variable name
+   * @param base_type declared stan variable type
+   * @param dims variable dimensions
+   * @throw std::runtime_error if mismatch between declared
+   *        dimensions and dimensions found in context.
+   */
+  void validate_dims(const std::string& stage, const std::string& name,
+                     const std::string& base_type,
+                     const std::vector<size_t>& dims_declared) const {}
 
   /**
    * Return a list of the names of the floating point variables in
