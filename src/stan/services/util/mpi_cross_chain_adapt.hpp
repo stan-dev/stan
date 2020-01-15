@@ -17,6 +17,110 @@
 namespace stan {
 namespace services {
 namespace util {
+
+inline double compute_effective_sample_size(std::vector<const double*> draws,
+                                            std::vector<size_t> sizes) {
+  int num_chains = sizes.size();
+  size_t num_draws = sizes[0];
+  for (int chain = 1; chain < num_chains; ++chain) {
+    num_draws = std::min(num_draws, sizes[chain]);
+  }
+
+  // check if chains are constant; all equal to first draw's value
+  bool are_all_const = false;
+  Eigen::VectorXd init_draw = Eigen::VectorXd::Zero(num_chains);
+
+  for (int chain_idx = 0; chain_idx < num_chains; chain_idx++) {
+    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
+        draws[chain_idx], sizes[chain_idx]);
+
+    for (int n = 0; n < num_draws; n++) {
+      if (!boost::math::isfinite(draw(n))) {
+        return std::numeric_limits<double>::quiet_NaN();
+      }
+    }
+
+    init_draw(chain_idx) = draw(0);
+
+    if (draw.isApproxToConstant(draw(0))) {
+      are_all_const |= true;
+    }
+  }
+
+  if (are_all_const) {
+    // If all chains are constant then return NaN
+    // if they all equal the same constant value
+    if (init_draw.isApproxToConstant(init_draw(0))) {
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+  }
+
+  Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> acov(num_chains);
+  Eigen::VectorXd chain_mean(num_chains);
+  Eigen::VectorXd chain_var(num_chains);
+  for (int chain = 0; chain < num_chains; ++chain) {
+    Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 1>> draw(
+        draws[chain], sizes[chain]);
+    stan::analyze::autocovariance<double>(draw, acov(chain));
+    chain_mean(chain) = draw.mean();
+    chain_var(chain) = acov(chain)(0) * num_draws / (num_draws - 1);
+  }
+
+  double mean_var = chain_var.mean();
+  double var_plus = mean_var * (num_draws - 1) / num_draws;
+  if (num_chains > 1)
+    var_plus += math::variance(chain_mean);
+  Eigen::VectorXd rho_hat_s(num_draws);
+  rho_hat_s.setZero();
+  Eigen::VectorXd acov_s(num_chains);
+  for (int chain = 0; chain < num_chains; ++chain)
+    acov_s(chain) = acov(chain)(1);
+  double rho_hat_even = 1.0;
+  rho_hat_s(0) = rho_hat_even;
+  double rho_hat_odd = 1 - (mean_var - acov_s.mean()) / var_plus;
+  rho_hat_s(1) = rho_hat_odd;
+
+  // Convert raw autocovariance estimators into Geyer's initial
+  // positive sequence. Loop only until num_draws - 4 to
+  // leave the last pair of autocorrelations as a bias term that
+  // reduces variance in the case of antithetical chains.
+  size_t s = 1;
+  while (s < (num_draws - 4) && (rho_hat_even + rho_hat_odd) > 0) {
+    for (int chain = 0; chain < num_chains; ++chain)
+      acov_s(chain) = acov(chain)(s + 1);
+    rho_hat_even = 1 - (mean_var - acov_s.mean()) / var_plus;
+    for (int chain = 0; chain < num_chains; ++chain)
+      acov_s(chain) = acov(chain)(s + 2);
+    rho_hat_odd = 1 - (mean_var - acov_s.mean()) / var_plus;
+    if ((rho_hat_even + rho_hat_odd) >= 0) {
+      rho_hat_s(s + 1) = rho_hat_even;
+      rho_hat_s(s + 2) = rho_hat_odd;
+    }
+    s += 2;
+  }
+
+  int max_s = s;
+  // this is used in the improved estimate, which reduces variance
+  // in antithetic case -- see tau_hat below
+  if (rho_hat_even > 0)
+    rho_hat_s(max_s + 1) = rho_hat_even;
+
+  // Convert Geyer's initial positive sequence into an initial
+  // monotone sequence
+  for (int s = 1; s <= max_s - 3; s += 2) {
+    if (rho_hat_s(s + 1) + rho_hat_s(s + 2) > rho_hat_s(s - 1) + rho_hat_s(s)) {
+      rho_hat_s(s + 1) = (rho_hat_s(s - 1) + rho_hat_s(s)) / 2;
+      rho_hat_s(s + 2) = rho_hat_s(s + 1);
+    }
+  }
+
+  double num_total_draws = num_chains * num_draws;
+  // Geyer's truncated estimator for the asymptotic variance
+  // Improved estimate reduces variance in antithetic case
+  double tau_hat = -1 + 2 * rho_hat_s.head(max_s).sum() + rho_hat_s(max_s + 1);
+  return std::min(num_total_draws / tau_hat,
+                  num_total_draws * std::log10(num_total_draws));
+}
   /*
    * Computes the effective sample size (ESS) for the specified
    * parameter across all kept samples.  The value returned is the
@@ -29,18 +133,10 @@ namespace util {
    * calculated(on the fly during adaptation)
    *
    */
-inline double
-single_chain_ess(const double* draw, size_t num_draws) {
-  Eigen::Map<const Eigen::Matrix<double, -1, 1> > d(draw, num_draws);
-  Eigen::Matrix<double, -1, 1> acov;
-  stan::math::autocorrelation<double>(d, acov);
-  double rhos = 0.0;
-  int i = 1;
-  while (i < num_draws && acov(i) > 0.05) {
-    rhos += acov(i);
-    i++;
-  }
-  return double(num_draws) / (1.0 + 2.0 * rhos);
+inline double compute_effective_sample_size(const double* draw, size_t size) {
+  std::vector<const double*> draws{draw};
+  std::vector<size_t> sizes{size};
+  return compute_effective_sample_size(draws, sizes);
 }
 
   /*
@@ -82,7 +178,7 @@ single_chain_ess(const double* draw, size_t num_draws) {
         unbiased_var_scale;
       chain_gather[nd_win * win + 2] = chain_stepsize;
       chain_gather[nd_win * win + 3] =
-        single_chain_ess(draw_p + win * window_size, num_draws);
+        compute_effective_sample_size(draw_p + win * window_size, num_draws);
     }
 
     double stepsize = -999.0;
