@@ -2,6 +2,7 @@
 #define STAN_CALLBACKS_STREAM_WRITER_HPP
 
 #include <stan/callbacks/writer.hpp>
+#include <stan/math/mpi/envionment.hpp>
 #include <ostream>
 #include <vector>
 #include <string>
@@ -52,12 +53,24 @@ class stream_writer : public writer {
    *
    * @param[in] state Values in a std::vector
    */
-  void operator()(const std::vector<double>& state) { write_vector(state); }
+  void operator()(const std::vector<double>& state) {
+    write_vector(state);
+  }
 
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
-  void operator()() { output_ << comment_prefix_ << std::endl; }
+  void operator()() {
+#ifdef MPI_ADAPTED_WARMUP
+    int rank;
+    MPI_Comm_rank(MPI_COMM_STAN, &rank);
+    if (rank == 0) {
+      output_ << comment_prefix_ << std::endl;
+    }
+#else
+    output_ << comment_prefix_ << std::endl;    
+#endif
+  }
 
   /**
    * Writes the comment_prefix then the message followed by a newline.
@@ -65,7 +78,15 @@ class stream_writer : public writer {
    * @param[in] message A string
    */
   void operator()(const std::string& message) {
+#ifdef MPI_ADAPTED_WARMUP
+    int rank;
+    MPI_Comm_rank(MPI_COMM_STAN, &rank);
+    if (rank == 0) {
+      output_ << comment_prefix_ << message << std::endl;
+    }
+#else
     output_ << comment_prefix_ << message << std::endl;
+#endif
   }
 
  private:
@@ -89,16 +110,33 @@ class stream_writer : public writer {
    */
   template <class T>
   void write_vector(const std::vector<T>& v) {
-    if (v.empty())
-      return;
+#ifdef MPI_ADAPTED_WARMUP
+    int rank;
+    MPI_Comm_rank(MPI_COMM_STAN, &rank);
+    if (rank == 0) {
+      if (v.empty())
+        return;
 
-    typename std::vector<T>::const_iterator last = v.end();
-    --last;
+      typename std::vector<T>::const_iterator last = v.end();
+      --last;
 
-    for (typename std::vector<T>::const_iterator it = v.begin(); it != last;
-         ++it)
-      output_ << *it << ",";
-    output_ << v.back() << std::endl;
+      for (typename std::vector<T>::const_iterator it = v.begin(); it != last;
+           ++it)
+        output_ << *it << ",";
+      output_ << v.back() << std::endl;      
+    }
+#else
+      if (v.empty())
+        return;
+
+      typename std::vector<T>::const_iterator last = v.end();
+      --last;
+
+      for (typename std::vector<T>::const_iterator it = v.begin(); it != last;
+           ++it)
+        output_ << *it << ",";
+      output_ << v.back() << std::endl;
+#endif
   }
 };
 
