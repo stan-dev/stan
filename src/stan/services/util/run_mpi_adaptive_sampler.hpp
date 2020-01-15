@@ -5,7 +5,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
-#include <stan/services/util/campfire_warmup.hpp>
+#include <stan/services/util/mpi_cross_chain_warmup.hpp>
 #include <ctime>
 #include <vector>
 
@@ -70,7 +70,7 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
   const double target_rhat = 1.1;
   const double target_ess = 50;
   const int window_size = 100;
-  util::campfire_warmup(sampler, num_chains,
+  util::mpi_cross_chain_warmup(sampler, num_chains,
                         num_warmup, 0, num_warmup + num_samples,
                         num_thin, refresh, save_warmup, true,
                         window_size, target_rhat, target_ess,
