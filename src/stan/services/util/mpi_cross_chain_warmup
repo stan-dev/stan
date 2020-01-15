@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_UTIL_CAMPFIRE_WARMUP_HPP
-#define STAN_SERVICES_UTIL_CAMPFIRE_WARMUP_HPP
+#ifndef STAN_SERVICES_UTIL_MPI_CROSS_CHAIN_WARMUP_HPP
+#define STAN_SERVICES_UTIL_MPI_CROSS_CHAIN_WARMUP_HPP
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/interrupt.hpp>
@@ -44,7 +44,7 @@ namespace util {
  * @param[in,out] logger logger for messages
  */
 template <class Sampler, class Model, class RNG>
-void campfire_warmup(Sampler& sampler, int num_chains,
+void mpi_cross_chain_warmup(Sampler& sampler, int num_chains,
                      int num_iterations,
                      int start, int finish, int num_thin, int refresh,
                      bool save, bool warmup,
