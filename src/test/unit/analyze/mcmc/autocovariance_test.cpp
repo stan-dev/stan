@@ -1,5 +1,4 @@
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/analyze/mcmc/autocovariance.hpp>
 #include <gtest/gtest.h>
 #include <fstream>

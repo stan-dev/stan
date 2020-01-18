@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_GRADIENT_DOT_VECTOR_HPP
 #define STAN_MODEL_GRADIENT_DOT_VECTOR_HPP
 
-#include <stan/math/mix/mat.hpp>
+#include <stan/math/mix.hpp>
 #include <stan/model/model_functional.hpp>
 #include <iostream>
 

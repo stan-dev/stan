@@ -4,7 +4,7 @@
 #include <stan/io/var_context.hpp>
 #include <stan/math.hpp>
 #include <boost/throw_exception.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <map>
 #include <algorithm>
 #include <functional>

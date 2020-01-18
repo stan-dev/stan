@@ -3,7 +3,7 @@
 
 #include <stan/io/validate_zero_buf.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/type_traits/is_floating_point.hpp>

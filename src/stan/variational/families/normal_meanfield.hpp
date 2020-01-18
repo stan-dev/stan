@@ -2,7 +2,7 @@
 #define STAN_VARIATIONAL_NORMAL_MEANFIELD_HPP
 
 #include <stan/callbacks/logger.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/model/gradient.hpp>
 #include <stan/variational/base_family.hpp>
 #include <algorithm>

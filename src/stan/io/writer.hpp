@@ -1,7 +1,7 @@
 #ifndef STAN_IO_WRITER_HPP
 #define STAN_IO_WRITER_HPP
 
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <stdexcept>
 #include <vector>
 
