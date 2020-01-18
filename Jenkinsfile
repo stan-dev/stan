@@ -167,6 +167,7 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             setupCXX()
+                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             bat "mingw32-make -j${env.PARALLEL} test-headers"
                             setupCXX(false)
                             runTestsWin("src/test/unit")
