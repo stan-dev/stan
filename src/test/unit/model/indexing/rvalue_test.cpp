@@ -144,6 +144,21 @@ TEST(ModelIndexing, rvalue_vector_min_max_nil) {
   test_out_of_range(x, index_list(index_min_max(2, 5)));
 }
 
+TEST(ModelIndexing, rvalue_eigen_mat_min_max_nil) {
+  Eigen::Matrix<double, -1, -1> x(4, 4);
+  for (int i = 0; i < 16; i++) {
+    x(i) = i;
+  }
+
+  Eigen::Matrix<double, -1, 1> x_row_sub = rvalue(x, index_list(index_min_max(1, 3), index_uni(3)));
+  EXPECT_EQ(3, x_row_sub.size());
+  EXPECT_EQ(8, x_row_sub(0));
+  EXPECT_EQ(9, x_row_sub(1));
+  EXPECT_EQ(10, x_row_sub(2));
+
+}
+
+
 TEST(ModelIndexing, rvalue_doubless_uni_uni) {
   using std::vector;
 
@@ -321,6 +336,20 @@ TEST(ModelIndexing, rvalue_doubless_multi_uni) {
 
   ns[ns.size() - 1] = 15;
   test_out_of_range(x, index_list(index_multi(ns), index_uni(1)));
+}
+
+TEST(ModelIndexing, rvalue_eigen_mat_omni_uni) {
+  Eigen::Matrix<double, -1, -1> x(4, 4);
+  for (int i = 0; i < 16; i++) {
+    x(i) = i;
+  }
+
+  Eigen::Matrix<double, -1, 1> x_row_sub = rvalue(x, index_list(index_omni(), index_uni(3)));
+  EXPECT_EQ(4, x_row_sub.size());
+  EXPECT_EQ(8, x_row_sub(0));
+  EXPECT_EQ(9, x_row_sub(1));
+  EXPECT_EQ(10, x_row_sub(2));
+  EXPECT_EQ(11, x_row_sub(3));
 }
 
 TEST(ModelIndexing, rvalue_doubless_multi_multi) {
