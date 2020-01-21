@@ -150,14 +150,13 @@ TEST(ModelIndexing, rvalue_eigen_mat_min_max_nil) {
     x(i) = i;
   }
 
-  Eigen::Matrix<double, -1, 1> x_row_sub = rvalue(x, index_list(index_min_max(1, 3), index_uni(3)));
+  Eigen::Matrix<double, -1, 1> x_row_sub
+      = rvalue(x, index_list(index_min_max(1, 3), index_uni(3)));
   EXPECT_EQ(3, x_row_sub.size());
   EXPECT_EQ(8, x_row_sub(0));
   EXPECT_EQ(9, x_row_sub(1));
   EXPECT_EQ(10, x_row_sub(2));
-
 }
-
 
 TEST(ModelIndexing, rvalue_doubless_uni_uni) {
   using std::vector;
@@ -344,7 +343,8 @@ TEST(ModelIndexing, rvalue_eigen_mat_omni_uni) {
     x(i) = i;
   }
 
-  Eigen::Matrix<double, -1, 1> x_row_sub = rvalue(x, index_list(index_omni(), index_uni(3)));
+  Eigen::Matrix<double, -1, 1> x_row_sub
+      = rvalue(x, index_list(index_omni(), index_uni(3)));
   EXPECT_EQ(4, x_row_sub.size());
   EXPECT_EQ(8, x_row_sub(0));
   EXPECT_EQ(9, x_row_sub(1));
