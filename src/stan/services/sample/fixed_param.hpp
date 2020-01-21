@@ -41,7 +41,7 @@ namespace sample {
  * @return error_codes::OK if successful
  */
 template <class Model>
-int fixed_param(Model& model, stan::io::var_context& init,
+int fixed_param(Model& model, const stan::io::var_context& init,
                 unsigned int random_seed, unsigned int chain,
                 double init_radius, int num_samples, int num_thin, int refresh,
                 callbacks::interrupt& interrupt, callbacks::logger& logger,

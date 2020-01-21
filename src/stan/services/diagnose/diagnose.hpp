@@ -1,12 +1,10 @@
 #ifndef STAN_SERVICES_DIAGNOSE_DIAGNOSE_HPP
 #define STAN_SERVICES_DIAGNOSE_DIAGNOSE_HPP
 
-#include <stan/io/var_context.hpp>
-#include <stan/io/chained_var_context.hpp>
-#include <stan/io/random_var_context.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/io/var_context.hpp>
 #include <stan/model/test_gradients.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -40,7 +38,7 @@ namespace diagnose {
  * of the finite difference calculation
  */
 template <class Model>
-int diagnose(Model& model, stan::io::var_context& init,
+int diagnose(Model& model, const stan::io::var_context& init,
              unsigned int random_seed, unsigned int chain, double init_radius,
              double epsilon, double error, callbacks::interrupt& interrupt,
              callbacks::logger& logger, callbacks::writer& init_writer,
