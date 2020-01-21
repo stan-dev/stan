@@ -214,9 +214,7 @@ TEST_F(ComputeRhat, compute_split_potential_scale_reduction_convenience) {
 }
 
 TEST_F(ComputeRhat, compute_potential_scale_reduction_constant) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 2, 1> draws;
   draws << 1.0, 1.0;
@@ -227,9 +225,7 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction_constant) {
 }
 
 TEST_F(ComputeRhat, compute_potential_scale_reduction_nan) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 2, 1> draws;
   draws << 1.0, std::numeric_limits<double>::quiet_NaN();
