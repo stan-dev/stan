@@ -29,7 +29,7 @@ namespace model {
  */
 template <typename T, require_not_stan_scalar_t<T>...>
 inline auto&& rvalue(T&& c, const nil_index_list& /*idx*/,
-                const char* /*name*/ = "", int /*depth*/ = 0) {
+                     const char* /*name*/ = "", int /*depth*/ = 0) {
   return std::forward<T>(c);
 }
 
@@ -63,9 +63,10 @@ inline T rvalue(const T& c, const nil_index_list& /*idx*/,
  * @return Result of indexing vector.
  */
 template <typename T, int R>
-inline decltype(auto) rvalue(const Eigen::Matrix<T, R, 1>& v,
-                const cons_index_list<index_uni, nil_index_list>& idx,
-                const char* name = "ANON", int depth = 0) {
+inline decltype(auto) rvalue(
+    const Eigen::Matrix<T, R, 1>& v,
+    const cons_index_list<index_uni, nil_index_list>& idx,
+    const char* name = "ANON", int depth = 0) {
   int ones_idx = idx.head_.n_;
   math::check_range("vector[single] indexing", name, v.size(), ones_idx);
   return v.coeffRef(ones_idx - 1);
@@ -86,12 +87,13 @@ inline decltype(auto) rvalue(const Eigen::Matrix<T, R, 1>& v,
  * @return Result of indexing row vector.
  */
 template <typename T, int C>
-inline decltype(auto) rvalue(const Eigen::Matrix<T, 1, C>& rv,
-                const cons_index_list<index_uni, nil_index_list>& idx,
-                const char* name = "ANON", int depth = 0) {
+inline decltype(auto) rvalue(
+    const Eigen::Matrix<T, 1, C>& rv,
+    const cons_index_list<index_uni, nil_index_list>& idx,
+    const char* name = "ANON", int depth = 0) {
   int n = idx.head_.n_;
   math::check_range("row_vector[single] indexing", name, rv.size(), n);
-  return rv.coeffRef(n - 1);
+  return rv.coeff(n - 1);
 }
 
 /**
@@ -109,10 +111,9 @@ inline decltype(auto) rvalue(const Eigen::Matrix<T, 1, C>& rv,
  * @return Result of indexing vector.
  */
 template <typename T, typename I, int R, require_not_same_t<index_uni, I>...>
-inline auto
-rvalue(const Eigen::Matrix<T, R, 1>& v,
-       const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
-       int depth = 0) {
+inline auto rvalue(const Eigen::Matrix<T, R, 1>& v,
+                   const cons_index_list<I, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
   int size = rvalue_index_size(idx.head_, v.size());
   Eigen::Matrix<T, Eigen::Dynamic, 1> a(size);
   for (int i = 0; i < size; ++i) {
@@ -139,10 +140,9 @@ rvalue(const Eigen::Matrix<T, R, 1>& v,
  * @return Result of indexing vector.
  */
 template <typename T, typename I, int C, require_not_same_t<index_uni, I>...>
-inline auto
-rvalue(const Eigen::Matrix<T, 1, C>& rv,
-       const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
-       int depth = 0) {
+inline auto rvalue(const Eigen::Matrix<T, 1, C>& rv,
+                   const cons_index_list<I, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
   int size = rvalue_index_size(idx.head_, rv.size());
   Eigen::Matrix<T, 1, Eigen::Dynamic> a(size);
   for (int i = 0; i < size; ++i) {
@@ -167,10 +167,9 @@ rvalue(const Eigen::Matrix<T, 1, C>& rv,
  * @return Result of indexing matrix.
  */
 template <typename T, int R, int C>
-inline auto rvalue(
-    const Eigen::Matrix<T, R, C>& a,
-    const cons_index_list<index_uni, nil_index_list>& idx,
-    const char* name = "ANON", int depth = 0) {
+inline auto rvalue(const Eigen::Matrix<T, R, C>& a,
+                   const cons_index_list<index_uni, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
   int n = idx.head_.n_;
   math::check_range("matrix[uni, omni] indexing", name, a.rows(), n);
   return a.row(n - 1);
@@ -192,7 +191,8 @@ inline auto rvalue(
 template <typename T, int R, int C>
 inline decltype(auto) rvalue(
     Eigen::Matrix<T, R, C>& a,
-    const cons_index_list<index_omni, cons_index_list<index_uni, nil_index_list>>& idx,
+    const cons_index_list<index_omni,
+                          cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   int n = idx.tail_.head_.n_;
   math::check_range("matrix[omni, uni] indexing", name, a.cols(), n);
@@ -201,7 +201,8 @@ inline decltype(auto) rvalue(
 
 /**
  * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of a column index and a slice of rows, returning a row vector.
+ * sequence consisting of a column index and a slice of rows, returning a row
+ * vector.
  *
  * Types:  mat[min_max, single] : vec
  *
@@ -215,15 +216,20 @@ inline decltype(auto) rvalue(
 template <typename T, int R, int C>
 inline auto rvalue(
     Eigen::Matrix<T, R, C>& a,
-    const cons_index_list<index_min_max, cons_index_list<index_uni, nil_index_list>>& idx,
+    const cons_index_list<index_min_max,
+                          cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[min_max, uni] uni indexing", name, a.cols(), idx.tail_.head_.n_);
-  math::check_range("matrix[min_max, uni] min indexing", name, a.rows(), idx.head_.max_);
-  math::check_range("matrix[min_max, uni] max indexing", name, a.rows(), idx.head_.min_);
+  math::check_range("matrix[min_max, uni] uni indexing", name, a.cols(),
+                    idx.tail_.head_.n_);
+  math::check_range("matrix[min_max, uni] min indexing", name, a.rows(),
+                    idx.head_.max_);
+  math::check_range("matrix[min_max, uni] max indexing", name, a.rows(),
+                    idx.head_.min_);
   int bottom = idx.head_.max_;
   int top = idx.head_.min_ - 1;
   int n = idx.tail_.head_.n_ - 1;
-  return Eigen::Map<Eigen::Matrix<T, -1, 1>>(a.data() + top + (a.rows() * n), bottom);
+  return Eigen::Map<Eigen::Matrix<T, -1, 1>>(a.data() + top + (a.rows() * n),
+                                             bottom);
 }
 
 /**
@@ -240,11 +246,11 @@ inline auto rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename T, typename I, int R, int C, require_not_same_t<index_uni, I>...>
-inline auto
-rvalue(const Eigen::Matrix<T, R, C>& a,
-       const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
-       int depth = 0) {
+template <typename T, typename I, int R, int C,
+          require_not_same_t<index_uni, I>...>
+inline auto rvalue(const Eigen::Matrix<T, R, C>& a,
+                   const cons_index_list<I, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
   int n_rows = rvalue_index_size(idx.head_, a.rows());
   Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> b(n_rows, a.cols());
   for (int i = 0; i < n_rows; ++i) {
@@ -269,16 +275,15 @@ rvalue(const Eigen::Matrix<T, R, C>& a,
  * @return Result of indexing matrix.
  */
 template <typename T, int R, int C>
-inline T rvalue(
-    const Eigen::Matrix<T, R, C>& a,
-    const cons_index_list<index_uni,
-                          cons_index_list<index_uni, nil_index_list> >& idx,
-    const char* name = "ANON", int depth = 0) {
+inline T rvalue(const Eigen::Matrix<T, R, C>& a,
+                const cons_index_list<
+                    index_uni, cons_index_list<index_uni, nil_index_list>>& idx,
+                const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   int n = idx.tail_.head_.n_;
   math::check_range("matrix[uni,uni] indexing, row", name, a.rows(), m);
   math::check_range("matrix[uni,uni] indexing, col", name, a.cols(), n);
-  return a.coeffRef(m - 1, n - 1);
+  return a.coeff(m - 1, n - 1);
 }
 
 /**
@@ -296,11 +301,11 @@ inline T rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename T, typename I, int R, int C, require_not_same_t<index_uni, I>...>
-inline auto
-rvalue(
+template <typename T, typename I, int R, int C,
+          require_not_same_t<index_uni, I>...>
+inline auto rvalue(
     const Eigen::Matrix<T, R, C>& a,
-    const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idx,
+    const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
@@ -323,11 +328,11 @@ rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename T, typename I, int R, int C, require_not_same_t<index_uni, I>...>
-inline auto
-rvalue(
+template <typename T, typename I, int R, int C,
+          require_not_same_t<index_uni, I>...>
+inline auto rvalue(
     const Eigen::Matrix<T, R, C>& a,
-    const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idx,
+    const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   int rows = rvalue_index_size(idx.head_, a.rows());
   Eigen::Matrix<T, Eigen::Dynamic, 1> c(rows);
@@ -356,11 +361,12 @@ rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename T, typename I1, typename I2, int R, int C, require_any_not_same_t<index_uni, I1, I2>...>
-inline auto
-rvalue(const Eigen::Matrix<T, R, C>& a,
-       const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idx,
-       const char* name = "ANON", int depth = 0) {
+template <typename T, typename I1, typename I2, int R, int C,
+          require_any_not_same_t<index_uni, I1, I2>...>
+inline auto rvalue(
+    const Eigen::Matrix<T, R, C>& a,
+    const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
   int rows = rvalue_index_size(idx.head_, a.rows());
   int cols = rvalue_index_size(idx.tail_.head_, a.cols());
   Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> c(rows, cols);
@@ -393,12 +399,12 @@ rvalue(const Eigen::Matrix<T, R, C>& a,
  * @return Result of indexing array.
  */
 template <typename VecT, typename L, require_std_vector_t<VecT>...>
-inline auto
-    rvalue(VecT&& c, const cons_index_list<index_uni, L>& idx,
-           const char* name = "ANON", int depth = 0) {
+inline auto rvalue(VecT&& c, const cons_index_list<index_uni, L>& idx,
+                   const char* name = "ANON", int depth = 0) {
   int n = idx.head_.n_;
   math::check_range("array[uni,...] index", name, c.size(), n);
-  return rvalue(std::forward<decltype(c[0])>(c[n - 1]), idx.tail_, name, depth + 1);
+  return rvalue(std::forward<decltype(c[0])>(c[n - 1]), idx.tail_, name,
+                depth + 1);
 }
 
 /**
@@ -418,14 +424,15 @@ inline auto
  * @return Result of indexing array.
  */
 template <typename VecT, typename I, typename L, require_std_vector_t<VecT>...>
-inline auto
-rvalue(VecT&& c, const cons_index_list<I, L>& idx,
-       const char* name = "ANON", int depth = 0) {
-  typename rvalue_return<std::vector<value_type_t<VecT>>, cons_index_list<I, L> >::type result;
+inline auto rvalue(VecT&& c, const cons_index_list<I, L>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  typename rvalue_return<std::vector<value_type_t<VecT>>,
+                         cons_index_list<I, L>>::type result;
   for (int i = 0; i < rvalue_index_size(idx.head_, c.size()); ++i) {
     int n = rvalue_at(i, idx.head_);
     math::check_range("array[multi,...] index", name, c.size(), n);
-    result.emplace_back(rvalue(std::forward<decltype(c[0])>(c[n - 1]), idx.tail_, name, depth + 1));
+    result.emplace_back(rvalue(std::forward<decltype(c[0])>(c[n - 1]),
+                               idx.tail_, name, depth + 1));
   }
   return result;
 }

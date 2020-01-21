@@ -26,10 +26,16 @@ namespace model {
  * @param[in] name Name of lvalue variable (default "ANON"); ignored
  * @param[in] depth Indexing depth (default 0; ignored
  */
-template <typename T, typename U>
+template <typename T, typename U, require_not_stan_scalar_t<U>...>
 inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x = std::forward<U>(y);
+}
+
+template <typename T, typename U, require_stan_scalar_t<U>...>
+inline void assign(T& x, const nil_index_list& /* idxs */, const U& y,
+                   const char* name = "ANON", int depth = 0) {
+  x = y;
 }
 
 /**
@@ -45,11 +51,11 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
  */
 template <typename T, typename VecU, require_std_vector_t<VecU>...>
 inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
-                   VecU&& y, const char* name = "ANON",
-                   int depth = 0) {
+                   VecU&& y, const char* name = "ANON", int depth = 0) {
   x.reserve(y.size());
   for (size_t i = 0; i < y.size(); ++i) {
-    assign(x[i], nil_index_list(), std::forward<decltype(y[0])>(y[i]), name, depth + 1);
+    assign(x[i], nil_index_list(), std::forward<decltype(y[0])>(y[i]), name,
+           depth + 1);
   }
 }
 
@@ -119,12 +125,12 @@ inline void assign(Eigen::Matrix<T, 1, C>& x,
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
  */
-template <typename T, typename I, typename U, int R1, int R2, require_not_same_t<I, index_uni>...>
-inline void
-assign(Eigen::Matrix<T, R1, 1>& x,
-       const cons_index_list<I, nil_index_list>& idxs,
-       const Eigen::Matrix<U, R2, 1>& y, const char* name = "ANON",
-       int depth = 0) {
+template <typename T, typename I, typename U, int R1, int R2,
+          require_not_same_t<I, index_uni>...>
+inline void assign(Eigen::Matrix<T, R1, 1>& x,
+                   const cons_index_list<I, nil_index_list>& idxs,
+                   const Eigen::Matrix<U, R2, 1>& y, const char* name = "ANON",
+                   int depth = 0) {
   math::check_size_match("vector[multi] assign sizes", "lhs",
                          rvalue_index_size(idxs.head_, x.size()), name,
                          y.size());
@@ -154,12 +160,12 @@ assign(Eigen::Matrix<T, R1, 1>& x,
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
  */
-template <typename T, typename I, typename U, int C1, int C2, require_not_same_t<index_uni, I>...>
-inline void
-assign(Eigen::Matrix<T, 1, C1>& x,
-       const cons_index_list<I, nil_index_list>& idxs,
-       const Eigen::Matrix<U, 1, C2>& y, const char* name = "ANON",
-       int depth = 0) {
+template <typename T, typename I, typename U, int C1, int C2,
+          require_not_same_t<index_uni, I>...>
+inline void assign(Eigen::Matrix<T, 1, C1>& x,
+                   const cons_index_list<I, nil_index_list>& idxs,
+                   const Eigen::Matrix<U, 1, C2>& y, const char* name = "ANON",
+                   int depth = 0) {
   math::check_size_match("row_vector[multi] assign sizes", "lhs",
                          rvalue_index_size(idxs.head_, x.size()), name,
                          y.size());
@@ -191,8 +197,8 @@ assign(Eigen::Matrix<T, 1, C1>& x,
 template <typename T, typename U, int R1, int C1, int C2>
 void assign(Eigen::Matrix<T, R1, C1>& x,
             const cons_index_list<index_uni, nil_index_list>& idxs,
-            const Eigen::Matrix<U, 1, C2>& y,
-            const char* name = "ANON", int depth = 0) {
+            const Eigen::Matrix<U, 1, C2>& y, const char* name = "ANON",
+            int depth = 0) {
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.cols(), name,
                          y.cols());
   int i = idxs.head_.n_;
@@ -218,12 +224,12 @@ void assign(Eigen::Matrix<T, R1, C1>& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
-template <typename T, typename I, typename U, int R1, int C1, int R2, int C2, require_not_same_t<index_uni, I>...>
-inline void
-assign(Eigen::Matrix<T, R1, C1>& x,
-       const cons_index_list<I, nil_index_list>& idxs,
-       const Eigen::Matrix<U, R2, C2>& y,
-       const char* name = "ANON", int depth = 0) {
+template <typename T, typename I, typename U, int R1, int C1, int R2, int C2,
+          require_not_same_t<index_uni, I>...>
+inline void assign(Eigen::Matrix<T, R1, C1>& x,
+                   const cons_index_list<I, nil_index_list>& idxs,
+                   const Eigen::Matrix<U, R2, C2>& y, const char* name = "ANON",
+                   int depth = 0) {
   int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
   math::check_size_match("matrix[multi] assign row sizes", "lhs", x_idx_rows,
                          name, y.rows());
@@ -284,9 +290,9 @@ void assign(Eigen::Matrix<T, R, C>& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side row vector do not match.
  */
-template <typename T, typename I, typename U, int R1, int C1, int C2, require_not_same_t<index_uni, I>...>
-inline void
-assign(
+template <typename T, typename I, typename U, int R1, int C1, int C2,
+          require_not_same_t<index_uni, I>...>
+inline void assign(
     Eigen::Matrix<T, R1, C1>& x,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idxs,
     const Eigen::Matrix<U, 1, C2>& y, const char* name = "ANON",
@@ -321,7 +327,8 @@ assign(
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side vector do not match.
  */
-template <typename T, typename I, typename U, int R1, int C1, int R2, require_not_same_t<index_uni, I>...>
+template <typename T, typename I, typename U, int R1, int C1, int R2,
+          require_not_same_t<index_uni, I>...>
 inline void assign(
     Eigen::Matrix<T, R1, C1>& x,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idxs,
@@ -358,11 +365,13 @@ inline void assign(
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
-template <typename T, typename I1, typename I2, typename U, int R1, int C1, int R2, int C2, require_any_not_same_t<index_uni, I1, I2>...>
-inline void assign(Eigen::Matrix<T, R1, C1>& x,
-       const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idxs,
-       const Eigen::Matrix<U, R2, C2>& y,
-       const char* name = "ANON", int depth = 0) {
+template <typename T, typename I1, typename I2, typename U, int R1, int C1,
+          int R2, int C2, require_any_not_same_t<index_uni, I1, I2>...>
+inline void assign(
+    Eigen::Matrix<T, R1, C1>& x,
+    const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idxs,
+    const Eigen::Matrix<U, R2, C2>& y, const char* name = "ANON",
+    int depth = 0) {
   int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
   int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
   math::check_size_match("matrix[multi,multi] assign sizes", "lhs", x_idxs_rows,
@@ -436,17 +445,18 @@ inline void assign(std::vector<T>& x, const cons_index_list<index_uni, L>& idxs,
  * and size of first dimension of value do not match, or any of
  * the recursive tail assignment dimensions do not match.
  */
-template <typename T, typename I, typename L, typename VecU, require_not_same_t<index_uni, I>..., require_std_vector_t<VecU>...>
+template <typename T, typename I, typename L, typename VecU,
+          require_not_same_t<index_uni, I>..., require_std_vector_t<VecU>...>
 inline void assign(std::vector<T>& x, const cons_index_list<I, L>& idxs,
-                       VecU&& y, const char* name = "ANON",
-                       int depth = 0) {
+                   VecU&& y, const char* name = "ANON", int depth = 0) {
   int x_idx_size = rvalue_index_size(idxs.head_, x.size());
   math::check_size_match("vector[multi,...] assign sizes", "lhs", x_idx_size,
                          name, y.size());
   for (size_t n = 0; n < y.size(); ++n) {
     int i = rvalue_at(n, idxs.head_);
     math::check_range("vector[multi,...] assign range", name, x.size(), i);
-    assign(x[i - 1], idxs.tail_, std::forward<decltype(y[0])>(y[n]), name, depth + 1);
+    assign(x[i - 1], idxs.tail_, std::forward<decltype(y[0])>(y[n]), name,
+           depth + 1);
   }
 }
 
