@@ -1,7 +1,6 @@
 #ifdef STAN_LANG_MPI
 
 #include <gtest/gtest.h>
-#include <stan/services/util/mpi_cross_chain_adapt.hpp>
 #include <stan/mcmc/mpi_cross_chain_adapter.hpp>
 #include <stan/analyze/mcmc/compute_potential_scale_reduction.hpp>
 #include <stan/math/mpi/envionment.hpp>

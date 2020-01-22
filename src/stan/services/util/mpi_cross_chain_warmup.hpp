@@ -5,7 +5,6 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
-#include <stan/services/util/mpi_cross_chain_adapt.hpp>
 #include <stan/math/mpi/envionment.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
