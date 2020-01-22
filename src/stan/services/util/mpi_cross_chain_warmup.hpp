@@ -77,11 +77,7 @@ void mpi_cross_chain_warmup(Sampler& sampler, int num_chains,
     }
 
     // check cross-chain convergence
-    double stepsize = sampler.get_nominal_stepsize();
-    Eigen::VectorXd dummy;      // for future diag metric
-    bool is_adapted = sampler.cross_chain_adaptation(stepsize, dummy);
-    if (is_adapted) {
-      sampler.set_nominal_stepsize(stepsize);
+    if (sampler.is_cross_chain_adapted()) {
       break;
     }
   }

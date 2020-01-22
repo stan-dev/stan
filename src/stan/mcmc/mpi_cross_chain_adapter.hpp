@@ -41,6 +41,7 @@ namespace mcmc {
                                                   int window_size,
                                                   int num_chains,
                                                   double target_rhat, double target_ess) {
+      is_adapted_ = false;
       window_size_ = window_size;
       num_chains_ = num_chains;
       max_num_windows_ = num_iterations / window_size;
@@ -55,6 +56,7 @@ namespace mcmc {
     }
 
     inline void reset_cross_chain_adaptation() {
+      is_adapted_ = false;
       log_prob_draws_.clear();
       log_prob_accumulators_.clear();
       log_prob_accumulators_.resize(max_num_windows_);
@@ -214,8 +216,8 @@ namespace mcmc {
         (log_prob_draws_.size() % window_size_ == 0);
     }
 
-    inline void debug() {
-      std::cout << "taki test debug: " << compute_effective_sample_size(0, 50) << "\n";
+    inline bool is_cross_chain_adapted() {
+      return is_adapted_;
     }
 
     /*
@@ -237,8 +239,6 @@ namespace mcmc {
 
       using stan::math::mpi::Session;
       using stan::math::mpi::Communicator;
-
-      bool is_adapted = false;
 
       if (is_cross_chain_adapt_window_end()) {
         bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
@@ -287,9 +287,9 @@ namespace mcmc {
                 * num_chains_ / (num_chains_ - 1);
               double var_within = boost::accumulators::mean(acc_chain_var);
               rhat_(win) = sqrt((var_between / var_within + num_draws - 1) / num_draws);
-              is_adapted = rhat_(win) < target_rhat_ && (ess_ > target_ess_).all();
+              is_adapted_ = rhat_(win) < target_rhat_ && (ess_ > target_ess_).all();
               chain_stepsize = invalid_stepsize;
-              if (is_adapted) {
+              if (is_adapted_) {
                 chain_stepsize = boost::accumulators::mean(acc_step);
                 break;
               }
@@ -302,12 +302,12 @@ namespace mcmc {
         }
         const Communicator& intra_comm = Session::intra_chain_comm(num_chains_);
         MPI_Bcast(&chain_stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
-        is_adapted = chain_stepsize > 0.0;
-        if (is_adapted) {
+        is_adapted_ = chain_stepsize > 0.0;
+        if (is_adapted_) {
           // MPI_Bcast(mpi_inv_e_metric.data(), num_params, MPI_DOUBLE, 0, intra_comm.comm())
         }
       }
-      return is_adapted;
+      return is_adapted_;
     }
     
   };
