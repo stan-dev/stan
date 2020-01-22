@@ -4,9 +4,9 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
+#include <stan/mcmc/mpi_var_adaptation.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <stan/math/mpi/envionment.hpp>
-// #include <stan/math/prim/scal/err/check_greater_or_equal.hpp>
 #include <stan/analyze/mcmc/autocovariance.hpp>
 #include <stan/analyze/mcmc/split_chains.hpp>
 #include <boost/accumulators/accumulators.hpp>
@@ -33,9 +33,15 @@ namespace mcmc {
                                                                                 boost::accumulators::tag::variance>>> log_prob_accumulators_; // NOLINT
     Eigen::ArrayXd rhat_;
     Eigen::ArrayXd ess_;
+    mpi_var_adaptation* var_adapt;
 
   public:
     mpi_cross_chain_adapter() = default;
+
+    inline void set_cross_chain_var_adaptation(mpi_var_adaptation& adapt)
+    {
+      var_adapt = &adapt;
+    }
 
     inline void set_cross_chain_adaptation_params(int num_iterations,
                                                   int window_size,
@@ -62,6 +68,7 @@ namespace mcmc {
       log_prob_accumulators_.resize(max_num_windows_);
       rhat_ = Eigen::ArrayXd::Zero(max_num_windows_);
       ess_ = Eigen::ArrayXd::Zero(num_chains_);
+      var_adapt -> estimator.restart();
     }
 
     inline int current_cross_chain_window_counter() {
@@ -71,6 +78,13 @@ namespace mcmc {
     inline void add_cross_chain_sample(const Eigen::VectorXd& q, double s) {
       using stan::math::mpi::Session;
       using stan::math::mpi::Communicator;
+
+      // every rank needs num_params through q's size
+      if (log_prob_draws_.empty()) {
+        var_adapt -> estimator.restart(q.size());
+      }
+
+      // only add samples to inter-chain ranks
       bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
       if (is_inter_rank) {
         log_prob_draws_.push_back(s);
@@ -78,6 +92,13 @@ namespace mcmc {
         for (int i = 0; i < n; ++i) {
           log_prob_accumulators_[i](s);
         }
+
+        // we only keep @c window_size q's
+        if (is_cross_chain_adapt_window_begin()) {
+          var_adapt -> estimator.restart(q.size());
+        }
+
+        var_adapt -> estimator.add_sample(q);
       }
     }
 
@@ -216,6 +237,10 @@ namespace mcmc {
         (log_prob_draws_.size() % window_size_ == 0);
     }
 
+    inline bool is_cross_chain_adapt_window_begin() {
+      return (log_prob_draws_.size() - 1) % window_size_ == 0;
+    }
+
     inline bool is_cross_chain_adapted() {
       return is_adapted_;
     }
@@ -304,7 +329,8 @@ namespace mcmc {
         MPI_Bcast(&chain_stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
         is_adapted_ = chain_stepsize > 0.0;
         if (is_adapted_) {
-          // MPI_Bcast(mpi_inv_e_metric.data(), num_params, MPI_DOUBLE, 0, intra_comm.comm())
+          var_adapt -> learn_variance(inv_e_metric);
+          MPI_Bcast(inv_e_metric.data(), var_adapt -> estimator.num_params(), MPI_DOUBLE, 0, intra_comm.comm());
         }
       }
       return is_adapted_;

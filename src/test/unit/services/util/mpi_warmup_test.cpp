@@ -253,6 +253,8 @@ draw_vecs[3] <<
  cc_adapter.set_cross_chain_adaptation_params(num_iterations,
                                               window_size,
                                               num_chains, 1.1, 40);
+ stan::mcmc::mpi_var_adaptation var_adapt(0, comm);
+ cc_adapter.set_cross_chain_var_adaptation(var_adapt);
 
  Eigen::VectorXd dummy;
 
