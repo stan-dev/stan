@@ -78,8 +78,6 @@ int hmc_nuts_diag_e_adapt(
     random_seed += inter_comm.rank();
   }
   MPI_Bcast(&random_seed, 1, MPI_UNSIGNED, 0, intra_comm.comm());
-  int rank;
-  MPI_Comm_rank(MPI_COMM_STAN, &rank);
 #endif
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 

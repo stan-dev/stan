@@ -5,6 +5,10 @@
 #include <stan/mcmc/stepsize_var_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
 
+#ifdef MPI_ADAPTED_WARMUP
+#include <stan/mcmc/mpi_cross_chain_adapter.hpp>
+#endif
+
 namespace stan {
 namespace mcmc {
 /**
@@ -13,8 +17,14 @@ namespace mcmc {
  * diagonal metric and adaptive step size
  */
 template <class Model, class BaseRNG>
+#ifdef MPI_ADAPTED_WARMUP
+class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
+                          public stepsize_var_adapter,
+                          public mpi_cross_chain_adapter {
+#else
 class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
                           public stepsize_var_adapter {
+#endif
  public:
   adapt_diag_e_nuts(const Model& model, BaseRNG& rng)
       : diag_e_nuts<Model, BaseRNG>(model, rng),
@@ -38,6 +48,8 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
         this->stepsize_adaptation_.restart();
       }
+
+      this -> add_cross_chain_sample(this->z_.q, s.log_prob());
     }
     return s;
   }
