@@ -1,5 +1,5 @@
-#ifndef STAN_SERVICES_UTIL_MPI_CROSS_CHAIN_ADAPTER_HPP
-#define STAN_SERVICES_UTIL_MPI_CROSS_CHAIN_ADAPTER_HPP
+#ifndef STAN_MCMC_MPI_CROSS_CHAIN_ADAPTER_HPP
+#define STAN_MCMC_MPI_CROSS_CHAIN_ADAPTER_HPP
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/interrupt.hpp>
@@ -17,8 +17,7 @@
 #include <string>
 
 namespace stan {
-namespace services {
-namespace util {
+namespace mcmc {
 
   class mpi_cross_chain_adapter {
   protected:
@@ -312,7 +311,6 @@ namespace util {
     }
     
   };
-}
 }
 }
 #endif

@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 #include <stan/services/util/mpi_cross_chain_adapt.hpp>
+#include <stan/mcmc/mpi_cross_chain_adapter.hpp>
 #include <stan/analyze/mcmc/compute_potential_scale_reduction.hpp>
-#include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
 #include <stan/math/mpi/envionment.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
@@ -27,7 +27,7 @@ using boost::accumulators::tag::mean;
 using boost::accumulators::tag::variance;
 
 // 4 chains with 4 cores, each chain run on a core
-TEST(mpi_warmup_test, rhat_adaption) {
+TEST(mpi_warmup_test, mpi_cross_chain_adapter) {
   const int num_chains = 4;
   const int max_num_windows = 5;
   const int window_size = 50;
@@ -248,52 +248,55 @@ draw_vecs[3] <<
 
  double chain_stepsize = 1.1 + 0.1 * comm.rank();
 
-  // a large ESS target should make all windows fail to pass tests
-  for (int curr_num_win = 1; curr_num_win < 6; ++curr_num_win) {
-    double target_ess = 40.0;
-    std::vector<accumulator_set<double, stats<mean, variance>>> acc(curr_num_win);
-    for (int win = 0; win < curr_num_win; ++win) {
-      for (int j = win * window_size; j < curr_num_win * window_size; ++j) {
-        acc[win](draw_vecs[comm.rank()](j));
-      }
-    }
+ const int num_iterations = window_size * max_num_windows;
+ stan::mcmc::mpi_cross_chain_adapter cc_adapter;
+ cc_adapter.set_cross_chain_adaptation_params(num_iterations,
+                                              window_size,
+                                              num_chains, 1.1, 40);
 
-    std::vector<double> output =
-      stan::services::util::mpi_cross_chain_adapt(draws[comm.rank()], acc,
-                                                  chain_stepsize,
-                                                  curr_num_win, max_num_windows,
-                                                  window_size, num_chains, 1.1, target_ess);
-    for (int win = 0; win < curr_num_win; ++win) {
-      const std::vector<const double* > p{
-          draws[0] + win * window_size,
-          draws[1] + win * window_size,
-          draws[2] + win * window_size,
-          draws[3] + win * window_size};
-      double rhat =
-        stan::analyze::compute_potential_scale_reduction(p, (curr_num_win - win) * window_size);
-      if (comm.rank() == 0) { 
-        EXPECT_FLOAT_EQ(rhat, output[win + 1]);
-      }
-    }
-  }
+ Eigen::VectorXd dummy;
+
+  // a large ESS target should make all windows fail to pass tests
+ for (int i = 0; i < num_iterations; ++i) {
+   cc_adapter.add_cross_chain_sample(dummy, draw_vecs[comm.rank()](i));
+
+   double step = chain_stepsize;
+   bool is_adapted = cc_adapter.cross_chain_adaptation(step, dummy);
+
+   EXPECT_FALSE(is_adapted);
+
+   if (cc_adapter.is_cross_chain_adapt_window_end()) {
+     int curr_num_win = cc_adapter.current_cross_chain_window_counter();
+     for (int win = 0; win < curr_num_win; ++win) {
+       const std::vector<const double* > p{
+         draws[0] + win * window_size,
+           draws[1] + win * window_size,
+           draws[2] + win * window_size,
+           draws[3] + win * window_size};
+       double rhat =
+         stan::analyze::compute_potential_scale_reduction(p, (curr_num_win - win) * window_size);
+       if (comm.rank() == 0) { 
+         EXPECT_FLOAT_EQ(rhat, cc_adapter.cross_chain_adapt_rhat()(win));
+       }
+     }     
+   }
+ }
 
   // a target_ess that 4-window tests should pass
+ cc_adapter.set_cross_chain_adaptation_params(num_iterations,
+                                              window_size,
+                                              num_chains, 1.1, 15);
+
   {
     int curr_num_win = 4;
     double target_ess = 15.0;
-    std::vector<accumulator_set<double, stats<mean, variance>>> acc(curr_num_win);
-    for (int win = 0; win < curr_num_win; ++win) {
-      for (int j = win * window_size; j < curr_num_win * window_size; ++j) {
-        acc[win](draw_vecs[comm.rank()](j));
-      }
+    for (int i = 0; i < num_iterations; ++i) {
+      cc_adapter.add_cross_chain_sample(dummy, draw_vecs[comm.rank()](i));
+
+      double step = chain_stepsize;
+      bool is_adapted = cc_adapter.cross_chain_adaptation(step, dummy);
+      if (is_adapted) break;
     }
-
-    std::vector<double> output =
-      stan::services::util::mpi_cross_chain_adapt(draws[comm.rank()], acc,
-                                                  chain_stepsize,
-                                                  curr_num_win, max_num_windows,
-                                                  window_size, num_chains, 1.1, target_ess);
-
     int win = 1; // win = 1 @c is_adapted
     const std::vector<const double* > p{
       draws[0] + win * window_size,
@@ -302,9 +305,13 @@ draw_vecs[3] <<
         draws[3] + win * window_size};
     double rhat =
       stan::analyze::compute_potential_scale_reduction(p, (curr_num_win - win) * window_size);
-    if (comm.rank() == 0) { 
-      EXPECT_FLOAT_EQ(rhat, output[1 + 1]);
+    if (comm.rank() == 0) {
+      EXPECT_FLOAT_EQ(rhat, cc_adapter.cross_chain_adapt_rhat()(win));
+      for (int i = win + 1; i < max_num_windows; ++i) {
+        EXPECT_FLOAT_EQ(0.0, cc_adapter.cross_chain_adapt_rhat()(i));
+      }
     }
+
   }
 }
 
