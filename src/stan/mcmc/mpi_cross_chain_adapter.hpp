@@ -312,7 +312,8 @@ namespace mcmc {
                 * num_chains_ / (num_chains_ - 1);
               double var_within = boost::accumulators::mean(acc_chain_var);
               rhat_(win) = sqrt((var_between / var_within + num_draws - 1) / num_draws);
-              is_adapted_ = rhat_(win) < target_rhat_ && (ess_ > target_ess_).all();
+              double ess_hmean = ess_.size()/((1.0/ess_).sum()); // harmonic mean
+              is_adapted_ = rhat_(win) < target_rhat_ && ess_hmean > target_ess_;
               chain_stepsize = invalid_stepsize;
               if (is_adapted_) {
                 chain_stepsize = boost::accumulators::mean(acc_step);
