@@ -31,6 +31,8 @@ namespace mcmc {
     std::vector<boost::accumulators::accumulator_set<double,
                                                      boost::accumulators::stats<boost::accumulators::tag::mean, // NOLINT
                                                                                 boost::accumulators::tag::variance>>> log_prob_accumulators_; // NOLINT
+    boost::accumulators::accumulator_set<int,
+                                         boost::accumulators::features<boost::accumulators::tag::count> > draw_counter_acc_;
     Eigen::ArrayXd rhat_;
     Eigen::ArrayXd ess_;
     mpi_var_adaptation* var_adapt;
@@ -57,6 +59,7 @@ namespace mcmc {
       log_prob_draws_.reserve(num_iterations);
       log_prob_accumulators_.clear();
       log_prob_accumulators_.resize(max_num_windows_);
+      draw_counter_acc_ = {};
       rhat_ = Eigen::ArrayXd::Zero(max_num_windows_);
       ess_ = Eigen::ArrayXd::Zero(num_chains_);
     }
@@ -66,6 +69,7 @@ namespace mcmc {
       log_prob_draws_.clear();
       log_prob_accumulators_.clear();
       log_prob_accumulators_.resize(max_num_windows_);
+      draw_counter_acc_ = {};
       rhat_ = Eigen::ArrayXd::Zero(max_num_windows_);
       ess_ = Eigen::ArrayXd::Zero(num_chains_);
       var_adapt -> estimator.restart();
@@ -83,6 +87,9 @@ namespace mcmc {
       if (log_prob_draws_.empty()) {
         var_adapt -> estimator.restart(q.size());
       }
+
+      // all procs keep a counter
+      draw_counter_acc_(0);
 
       // only add samples to inter-chain ranks
       bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
@@ -233,8 +240,8 @@ namespace mcmc {
     }
 
     inline bool is_cross_chain_adapt_window_end() {
-      return (!log_prob_draws_.empty()) &&
-        (log_prob_draws_.size() % window_size_ == 0);
+      size_t n = boost::accumulators::count(draw_counter_acc_);
+      return n > 0 && (n % window_size_ == 0);
     }
 
     inline bool is_cross_chain_adapt_window_begin() {
@@ -330,7 +337,9 @@ namespace mcmc {
         MPI_Bcast(&chain_stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
         is_adapted_ = chain_stepsize > 0.0;
         if (is_adapted_) {
-          var_adapt -> learn_variance(inv_e_metric);
+          if (is_inter_rank) {
+            var_adapt -> learn_variance(inv_e_metric);
+          }
           MPI_Bcast(inv_e_metric.data(), var_adapt -> estimator.num_params(), MPI_DOUBLE, 0, intra_comm.comm());
         }
       }
