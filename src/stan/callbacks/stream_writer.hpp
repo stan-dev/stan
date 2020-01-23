@@ -62,9 +62,7 @@ class stream_writer : public writer {
    */
   void operator()() {
 #ifdef MPI_ADAPTED_WARMUP
-    int rank;
-    MPI_Comm_rank(MPI_COMM_STAN, &rank);
-    if (rank == 0) {
+    if (stan::math::mpi::Session::is_in_inter_chain_comm(4)) {
       output_ << comment_prefix_ << std::endl;
     }
 #else
@@ -79,9 +77,7 @@ class stream_writer : public writer {
    */
   void operator()(const std::string& message) {
 #ifdef MPI_ADAPTED_WARMUP
-    int rank;
-    MPI_Comm_rank(MPI_COMM_STAN, &rank);
-    if (rank == 0) {
+    if (stan::math::mpi::Session::is_in_inter_chain_comm(4)) {
       output_ << comment_prefix_ << message << std::endl;
     }
 #else
@@ -111,9 +107,7 @@ class stream_writer : public writer {
   template <class T>
   void write_vector(const std::vector<T>& v) {
 #ifdef MPI_ADAPTED_WARMUP
-    int rank;
-    MPI_Comm_rank(MPI_COMM_STAN, &rank);
-    if (rank == 0) {
+    if (stan::math::mpi::Session::is_in_inter_chain_comm(4)) {
       if (v.empty())
         return;
 
