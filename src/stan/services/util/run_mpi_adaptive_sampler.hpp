@@ -3,6 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/mcmc/mpi_var_adaptation.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <stan/services/util/mpi_cross_chain_warmup.hpp>

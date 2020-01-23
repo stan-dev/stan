@@ -71,13 +71,6 @@ int hmc_nuts_diag_e_adapt(
 
 #ifdef MPI_ADAPTED_WARMUP
   const int num_chains = 4;
-  const Communicator& inter_comm = Session::inter_chain_comm(num_chains);
-  const Communicator& intra_comm = Session::intra_chain_comm(num_chains);
-  bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains);
-  if (is_inter_rank) {
-    random_seed += inter_comm.rank();
-  }
-  MPI_Bcast(&random_seed, 1, MPI_UNSIGNED, 0, intra_comm.comm());
 #endif
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
