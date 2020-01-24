@@ -58,7 +58,7 @@ template <class Model>
 int hmc_nuts_diag_e_adapt(
     Model& model, stan::io::var_context& init,
     stan::io::var_context& init_inv_metric, unsigned int random_seed,
-    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    unsigned int chain, double init_radius, int num_cross_chains, int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
@@ -69,9 +69,6 @@ int hmc_nuts_diag_e_adapt(
     using stan::math::mpi::Session;
     using stan::math::mpi::Communicator;
 
-#ifdef MPI_ADAPTED_WARMUP
-  const int num_chains = 4;
-#endif
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
@@ -105,7 +102,7 @@ int hmc_nuts_diag_e_adapt(
 
 #ifdef MPI_ADAPTED_WARMUP
   util::run_mpi_adaptive_sampler(sampler, 
-      model, cont_vector, num_chains, num_warmup, num_samples, num_thin, refresh,
+      model, cont_vector, num_cross_chains, num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
 #else
   util::run_adaptive_sampler(
@@ -150,7 +147,7 @@ int hmc_nuts_diag_e_adapt(
 template <class Model>
 int hmc_nuts_diag_e_adapt(
     Model& model, stan::io::var_context& init, unsigned int random_seed,
-    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    unsigned int chain, double init_radius, int num_cross_chains, int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
@@ -162,7 +159,7 @@ int hmc_nuts_diag_e_adapt(
   stan::io::var_context& unit_e_metric = dmp;
 
   return hmc_nuts_diag_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, unit_e_metric, random_seed, chain, init_radius, num_cross_chains, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer);

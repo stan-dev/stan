@@ -48,7 +48,7 @@ namespace sample {
 template <class Model>
 int hmc_nuts_unit_e_adapt(
     Model& model, stan::io::var_context& init, unsigned int random_seed,
-    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    unsigned int chain, double init_radius, int num_cross_chains, int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, callbacks::interrupt& interrupt,
@@ -72,9 +72,8 @@ int hmc_nuts_unit_e_adapt(
   sampler.get_stepsize_adaptation().set_t0(t0);
 
 #ifdef MPI_ADAPTED_WARMUP
-  const int num_chains = 4;
   util::run_mpi_adaptive_sampler(
-      sampler, model, cont_vector, num_chains, num_warmup, num_samples, num_thin, refresh,
+      sampler, model, cont_vector, num_cross_chains, num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
 #else
   util::run_adaptive_sampler(
