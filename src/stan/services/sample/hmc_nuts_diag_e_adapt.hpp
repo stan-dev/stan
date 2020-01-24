@@ -10,11 +10,14 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/services/util/run_adaptive_sampler.hpp>
-#include <stan/services/util/run_mpi_adaptive_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/inv_metric.hpp>
 #include <vector>
+
+#ifdef MPI_ADAPTED_WARMUP
+#include <stan/services/util/run_mpi_adaptive_sampler.hpp>
+#endif
 
 namespace stan {
 namespace services {
@@ -65,10 +68,6 @@ int hmc_nuts_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-
-    using stan::math::mpi::Session;
-    using stan::math::mpi::Communicator;
-
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;

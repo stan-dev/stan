@@ -2,10 +2,13 @@
 #define STAN_CALLBACKS_STREAM_WRITER_HPP
 
 #include <stan/callbacks/writer.hpp>
-#include <stan/math/mpi/envionment.hpp>
 #include <ostream>
 #include <vector>
 #include <string>
+
+#ifdef STAN_LANG_MPI
+#include <stan/math/mpi/envionment.hpp>
+#endif
 
 namespace stan {
 namespace callbacks {

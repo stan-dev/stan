@@ -3,12 +3,15 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/mcmc/mpi_var_adaptation.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
-#include <stan/services/util/mpi_cross_chain_warmup.hpp>
 #include <ctime>
 #include <vector>
+
+#ifdef MPI_ADAPTED_WARMUP
+#include <stan/mcmc/mpi_var_adaptation.hpp>
+#include <stan/services/util/mpi_cross_chain_warmup.hpp>
+#endif
 
 namespace stan {
 namespace services {
@@ -68,6 +71,7 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
 
   // warmup
   clock_t start = clock();
+#ifdef MPI_ADAPTED_WARMUP
   const double target_rhat = 1.1;
   const double target_ess = 50;
   const int window_size = 100;
@@ -83,6 +87,11 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
                         window_size, target_rhat, target_ess,
                         writer, s,
                         model, rng, interrupt, logger);
+#else
+  util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
+                             num_thin, refresh, save_warmup, true, writer, s,
+                             model, rng, interrupt, logger);
+#endif
   clock_t end = clock();
   double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
