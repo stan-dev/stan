@@ -338,9 +338,9 @@ namespace mcmc {
         is_adapted_ = chain_stepsize > 0.0;
         if (is_adapted_) {
           if (is_inter_rank) {
-            var_adapt -> learn_variance(inv_e_metric);
+            // var_adapt -> learn_variance(inv_e_metric);
           }
-          MPI_Bcast(inv_e_metric.data(), var_adapt -> estimator.num_params(), MPI_DOUBLE, 0, intra_comm.comm());
+          // MPI_Bcast(inv_e_metric.data(), var_adapt -> estimator.num_params(), MPI_DOUBLE, 0, intra_comm.comm());
         }
       }
       return is_adapted_;
