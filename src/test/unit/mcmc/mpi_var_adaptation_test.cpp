@@ -26,12 +26,12 @@ TEST(McmcVarAdaptation, mpi_learn_variance) {
   stan::math::mpi::Communicator comm(MPI_COMM_STAN);
   const int num_chains = comm.size();
   const int n_learn_chain = n_learn / num_chains;
-  stan::mcmc::mpi_var_adaptation mpi_adapter(n, comm);
+  stan::mcmc::mpi_var_adaptation mpi_adapter(n);
   Eigen::VectorXd mpi_var(Eigen::VectorXd::Zero(n));  
   for (int i = 0; i < n_learn_chain; ++i)
     mpi_adapter.estimator.add_sample(q);
 
-  mpi_adapter.learn_variance(mpi_var);
+  mpi_adapter.learn_variance(mpi_var, comm);
 
   for (int i = 0; i < n; ++i) {
     EXPECT_FLOAT_EQ(var(i), mpi_var(i));
@@ -71,14 +71,14 @@ TEST(McmcVarAdaptation, mpi_data_learn_variance) {
   stan::math::mpi::Communicator comm(MPI_COMM_STAN);
   const int num_chains = comm.size();
   const int n_learn_chain = n_learn / num_chains;
-  stan::mcmc::mpi_var_adaptation mpi_adapter(n, comm);
+  stan::mcmc::mpi_var_adaptation mpi_adapter(n);
   Eigen::VectorXd mpi_var(Eigen::VectorXd::Zero(n));  
   for (int i = 0; i < n_learn_chain; ++i) {
     Eigen::VectorXd q =
       Eigen::VectorXd::Map(&q_all(i * n + comm.rank() * n * n_learn_chain), n);
     mpi_adapter.estimator.add_sample(q);
   }
-  mpi_adapter.learn_variance(mpi_var);
+  mpi_adapter.learn_variance(mpi_var, comm);
 
   for (int i = 0; i < n; ++i) {
     EXPECT_FLOAT_EQ(var(i), mpi_var(i));

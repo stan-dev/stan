@@ -252,6 +252,18 @@ namespace mcmc {
       return is_adapted_;
     }
 
+    inline void log_adaptation(int win, callbacks::logger& logger) {
+      std::stringstream message;
+      message << "iteration: ";
+      message << boost::accumulators::count(draw_counter_acc_);
+      message << " window: " << win + 1 << " / " << current_cross_chain_window_counter();
+      message << " Rhat: " << std::setprecision(3) << cross_chain_adapt_rhat()[win];
+      const Eigen::ArrayXd& ess(cross_chain_adapt_ess());
+      message << " ESS: " << std::setprecision(3) << ess.size()/((1.0/ess).sum());
+
+      logger.info(message);
+    }
+
     /*
      * @tparam Sampler sampler class
      * @param[in] m_win number of windows
@@ -263,7 +275,8 @@ namespace mcmc {
      # @return vector {stepsize, rhat(only in rank 0)}
     */
     inline bool cross_chain_adaptation(double& chain_stepsize,
-                                       Eigen::VectorXd& inv_e_metric) {
+                                       Eigen::VectorXd& inv_e_metric,
+                                       callbacks::logger& logger) {
       using boost::accumulators::accumulator_set;
       using boost::accumulators::stats;
       using boost::accumulators::tag::mean;
@@ -321,6 +334,9 @@ namespace mcmc {
               rhat_(win) = sqrt((var_between / var_within + num_draws - 1) / num_draws);
               double ess_hmean = ess_.size()/((1.0/ess_).sum()); // harmonic mean
               is_adapted_ = rhat_(win) < target_rhat_ && ess_hmean > target_ess_;
+
+              log_adaptation(win, logger);
+
               chain_stepsize = invalid_stepsize;
               if (is_adapted_) {
                 chain_stepsize = boost::accumulators::mean(acc_step);
@@ -338,7 +354,8 @@ namespace mcmc {
         is_adapted_ = chain_stepsize > 0.0;
         if (is_adapted_) {
           if (is_inter_rank) {
-            // var_adapt -> learn_variance(inv_e_metric);
+            const Communicator& comm = Session::inter_chain_comm(num_chains_);
+            // var_adapt -> learn_variance(inv_e_metric, comm);
           }
           // MPI_Bcast(inv_e_metric.data(), var_adapt -> estimator.num_params(), MPI_DOUBLE, 0, intra_comm.comm());
         }

@@ -71,15 +71,13 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
 
   // warmup
   clock_t start = clock();
-#ifdef MPI_ADAPTED_WARMUP
-  const double target_rhat = 1.1;
+  const double target_rhat = 1.05;
   const double target_ess = 50;
   const int window_size = 100;
   sampler.set_cross_chain_adaptation_params(num_warmup,
                                                   window_size, num_chains,
                                                   target_rhat, target_ess);
-  stan::mcmc::mpi_var_adaptation var_adapt(sampler.z().q.size(),
-                                           stan::math::mpi::Session::inter_chain_comm(num_chains));
+  stan::mcmc::mpi_var_adaptation var_adapt(sampler.z().q.size());
   sampler.set_cross_chain_var_adaptation(var_adapt);
   util::mpi_cross_chain_warmup(sampler, num_chains,
                         num_warmup, 0, num_warmup + num_samples,
@@ -87,11 +85,6 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
                         window_size, target_rhat, target_ess,
                         writer, s,
                         model, rng, interrupt, logger);
-#else
-  util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
-                             num_thin, refresh, save_warmup, true, writer, s,
-                             model, rng, interrupt, logger);
-#endif
   clock_t end = clock();
   double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 

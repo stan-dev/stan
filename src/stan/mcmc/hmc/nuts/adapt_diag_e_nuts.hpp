@@ -52,7 +52,7 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
 #ifdef MPI_ADAPTED_WARMUP
       this -> add_cross_chain_sample(this->z_.q, s.log_prob());
       double stepsize = this -> get_nominal_stepsize();
-      this -> cross_chain_adaptation(stepsize, this->z_.inv_e_metric_);
+      this -> cross_chain_adaptation(stepsize, this->z_.inv_e_metric_, logger);
       if (this -> is_cross_chain_adapted()) {
         this -> set_nominal_stepsize(stepsize);
       }

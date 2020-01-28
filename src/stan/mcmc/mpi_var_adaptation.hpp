@@ -13,15 +13,16 @@ class mpi_var_adaptation {
  public:
   stan::math::mpi::mpi_var_estimator estimator;
 
-  explicit mpi_var_adaptation(int n_params,
-                              const stan::math::mpi::Communicator& comm)
-    : estimator(n_params, comm) {}
+  explicit mpi_var_adaptation(int n_params)
+    : estimator(n_params)
+  {}
 
-  explicit mpi_var_adaptation(int num_chains)
-    : estimator(0, stan::math::mpi::Session::inter_chain_comm(num_chains)) {}
+  // explicit mpi_var_adaptation(int num_chains)
+  //   : estimator(0, stan::math::mpi::Session::inter_chain_comm(num_chains)) {}
 
-  void learn_variance(Eigen::VectorXd& var) {
-    double n = static_cast<double>(estimator.sample_variance(var));
+  void learn_variance(Eigen::VectorXd& var,
+                      const stan::math::mpi::Communicator& comm) {
+    double n = static_cast<double>(estimator.sample_variance(var, comm));
     var = (n / (n + 5.0)) * var
       + 1e-3 * (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
     estimator.restart();
