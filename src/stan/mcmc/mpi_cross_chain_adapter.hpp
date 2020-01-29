@@ -250,7 +250,7 @@ namespace mcmc {
       message << std::setw(5) << std::setprecision(2);
       message << " Rhat: " << std::fixed << cross_chain_adapt_rhat()[win];
       const Eigen::ArrayXd& ess(cross_chain_adapt_ess());
-      message << " ESS: " << std::fixed << ess.size()/((1.0/ess).sum());
+      message << " ESS: " << std::fixed << ess_.matrix().mean();
 
       logger.info(message);
     }
@@ -326,8 +326,8 @@ namespace mcmc {
                 * num_chains_ / (num_chains_ - 1);
               double var_within = boost::accumulators::mean(acc_chain_var);
               rhat_(win) = sqrt((var_between / var_within + num_draws - 1) / num_draws);
-              double ess_hmean = ess_.size()/((1.0/ess_).sum()); // harmonic mean
-              is_adapted_ = rhat_(win) < target_rhat_ && ess_hmean > target_ess_;
+              // double ess_hmean = ess_.size()/((1.0/ess_).sum()); // harmonic mean
+              is_adapted_ = rhat_(win) < target_rhat_ && (ess_ > target_ess_).all();
 
               msg_adaptation(win, logger);
 
