@@ -77,7 +77,8 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
   sampler.set_cross_chain_adaptation_params(num_warmup,
                                                   window_size, num_chains,
                                                   target_rhat, target_ess);
-  stan::mcmc::mpi_var_adaptation var_adapt(sampler.z().q.size());
+  stan::mcmc::mpi_var_adaptation
+    var_adapt(sampler.z().q.size(), num_warmup, window_size);
   sampler.set_cross_chain_var_adaptation(var_adapt);
   util::mpi_cross_chain_warmup(sampler, num_chains,
                         num_warmup, 0, num_warmup + num_samples,

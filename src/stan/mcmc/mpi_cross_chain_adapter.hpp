@@ -72,7 +72,7 @@ namespace mcmc {
       draw_counter_acc_ = {};
       rhat_ = Eigen::ArrayXd::Zero(max_num_windows_);
       ess_ = Eigen::ArrayXd::Zero(num_chains_);
-      var_adapt -> estimator.restart();
+      var_adapt -> restart();
     }
 
     inline int current_cross_chain_window_counter() {
@@ -83,11 +83,6 @@ namespace mcmc {
       using stan::math::mpi::Session;
       using stan::math::mpi::Communicator;
 
-      // every rank needs num_params through q's size
-      if (log_prob_draws_.empty()) {
-        var_adapt -> estimator.restart(q.size());
-      }
-
       // all procs keep a counter
       draw_counter_acc_(0);
 
@@ -95,17 +90,11 @@ namespace mcmc {
       bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
       if (is_inter_rank) {
         log_prob_draws_.push_back(s);
-        int n = current_cross_chain_window_counter();
-        for (int i = 0; i < n; ++i) {
-          log_prob_accumulators_[i](s);
+        int n_win = current_cross_chain_window_counter();
+        for (int win = 0; win < n_win; ++win) {
+          log_prob_accumulators_[win](s);
+          var_adapt -> estimators[win].add_sample(q);
         }
-
-        // we only keep @c window_size q's
-        if (is_cross_chain_adapt_window_begin()) {
-          var_adapt -> estimator.restart(q.size());
-        }
-
-        var_adapt -> estimator.add_sample(q);
       }
     }
 
@@ -252,14 +241,16 @@ namespace mcmc {
       return is_adapted_;
     }
 
-    inline void log_adaptation(int win, callbacks::logger& logger) {
+    inline void msg_adaptation(int win, callbacks::logger& logger) {
       std::stringstream message;
       message << "iteration: ";
+      message << std::setw(3);
       message << boost::accumulators::count(draw_counter_acc_);
       message << " window: " << win + 1 << " / " << current_cross_chain_window_counter();
-      message << " Rhat: " << std::setprecision(3) << cross_chain_adapt_rhat()[win];
+      message << std::setw(5) << std::setprecision(2);
+      message << " Rhat: " << std::fixed << cross_chain_adapt_rhat()[win];
       const Eigen::ArrayXd& ess(cross_chain_adapt_ess());
-      message << " ESS: " << std::setprecision(3) << ess.size()/((1.0/ess).sum());
+      message << " ESS: " << std::fixed << ess.size()/((1.0/ess).sum());
 
       logger.info(message);
     }
@@ -287,6 +278,8 @@ namespace mcmc {
 
       if (is_cross_chain_adapt_window_end()) {
         bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
+        double invalid_stepsize = -999.0;
+        double new_stepsize = invalid_stepsize;
         if (is_inter_rank) {
           const Communicator& comm = Session::inter_chain_comm(num_chains_);
 
@@ -305,9 +298,10 @@ namespace mcmc {
               compute_effective_sample_size(win * window_size_, num_draws);
           }
 
-          double invalid_stepsize = -999.0;
           rhat_ = Eigen::ArrayXd::Zero(max_num_windows_);
           ess_ = Eigen::ArrayXd::Zero(num_chains_);
+          const int invalid_win = -999;
+          int adapted_win = invalid_win;
 
           if (comm.rank() == 0) {
             std::vector<double> all_chain_gather(n_gather * num_chains_);
@@ -335,11 +329,10 @@ namespace mcmc {
               double ess_hmean = ess_.size()/((1.0/ess_).sum()); // harmonic mean
               is_adapted_ = rhat_(win) < target_rhat_ && ess_hmean > target_ess_;
 
-              log_adaptation(win, logger);
+              msg_adaptation(win, logger);
 
-              chain_stepsize = invalid_stepsize;
               if (is_adapted_) {
-                chain_stepsize = boost::accumulators::mean(acc_step);
+                adapted_win = win;
                 break;
               }
             }
@@ -347,22 +340,23 @@ namespace mcmc {
             MPI_Gather(chain_gather.data(), n_gather, MPI_DOUBLE,
                        NULL, 0, MPI_DOUBLE, 0, comm.comm());
           }
-          MPI_Bcast(&chain_stepsize, 1, MPI_DOUBLE, 0, comm.comm());
+          MPI_Bcast(&adapted_win, 1, MPI_INT, 0, comm.comm());
+          if (adapted_win >= 0) {
+            MPI_Allreduce(&chain_stepsize, &new_stepsize, 1, MPI_DOUBLE, MPI_SUM, comm.comm());
+            new_stepsize /= num_chains_;
+            var_adapt -> learn_variance(inv_e_metric, adapted_win, comm);
+          }
         }
         const Communicator& intra_comm = Session::intra_chain_comm(num_chains_);
-        MPI_Bcast(&chain_stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
-        is_adapted_ = chain_stepsize > 0.0;
+        MPI_Bcast(&new_stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
+        is_adapted_ = new_stepsize > 0.0;
         if (is_adapted_) {
-          if (is_inter_rank) {
-            const Communicator& comm = Session::inter_chain_comm(num_chains_);
-            // var_adapt -> learn_variance(inv_e_metric, comm);
-          }
-          // MPI_Bcast(inv_e_metric.data(), var_adapt -> estimator.num_params(), MPI_DOUBLE, 0, intra_comm.comm());
+          chain_stepsize = new_stepsize;
+          MPI_Bcast(inv_e_metric.data(), var_adapt -> estimators[0].num_params(), MPI_DOUBLE, 0, intra_comm.comm());
         }
       }
       return is_adapted_;
     }
-    
   };
 }
 }

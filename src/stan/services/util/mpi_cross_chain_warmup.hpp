@@ -77,6 +77,22 @@ void mpi_cross_chain_warmup(Sampler& sampler, int num_chains,
 
     // check cross-chain convergence
     if (sampler.is_cross_chain_adapted()) {
+      for (int j = m + 1; j < m + 50; ++j) {
+        if (refresh > 0
+            && (start + j + 1 == finish || j == 0 || (j + 1) % refresh == 0)) {
+          int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
+          std::stringstream message;
+          message << "Iteration: ";
+          message << std::setw(it_print_width) << j + 1 + start << " / " << finish;
+          message << " [" << std::setw(3)
+                  << static_cast<int>((100.0 * (start + j + 1)) / finish) << "%] ";
+          message << (warmup ? " (Warmup)" : " (Sampling)");
+
+          logger.info(message);
+        }
+
+        init_s = sampler.transition(init_s, logger);
+      }
       break;
     }
   }
