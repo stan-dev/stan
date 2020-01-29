@@ -1,9 +1,11 @@
-#ifndef STAN_MCMC_MPI_CROSS_CHAIN_ADAPTER_HPP
-#define STAN_MCMC_MPI_CROSS_CHAIN_ADAPTER_HPP
+#ifndef STAN_MCMC_HMC_MPI_CROSS_CHAIN_ADAPTER_HPP
+#define STAN_MCMC_HMC_MPI_CROSS_CHAIN_ADAPTER_HPP
+
+#ifdef MPI_ADAPTED_WARMUP
 
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/interrupt.hpp>
-#include <stan/mcmc/base_mcmc.hpp>
+#include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/mpi_var_adaptation.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <stan/math/mpi/envionment.hpp>
@@ -83,17 +85,19 @@ namespace mcmc {
       using stan::math::mpi::Session;
       using stan::math::mpi::Communicator;
 
-      // all procs keep a counter
-      draw_counter_acc_(0);
+      if (!is_adapted_) {
+        // all procs keep a counter
+        draw_counter_acc_(0);
 
-      // only add samples to inter-chain ranks
-      bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
-      if (is_inter_rank) {
-        log_prob_draws_.push_back(s);
-        int n_win = current_cross_chain_window_counter();
-        for (int win = 0; win < n_win; ++win) {
-          log_prob_accumulators_[win](s);
-          var_adapt -> estimators[win].add_sample(q);
+        // only add samples to inter-chain ranks
+        bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
+        if (is_inter_rank) {
+          log_prob_draws_.push_back(s);
+          int n_win = current_cross_chain_window_counter();
+          for (int win = 0; win < n_win; ++win) {
+            log_prob_accumulators_[win](s);
+            var_adapt -> estimators[win].add_sample(q);
+          }
         }
       }
     }
@@ -265,7 +269,8 @@ namespace mcmc {
      *                maximum windows for all chains.
      # @return vector {stepsize, rhat(only in rank 0)}
     */
-    inline bool cross_chain_adaptation(double& chain_stepsize,
+    template<typename Sampler>
+    inline void cross_chain_adaptation(Sampler* hmc_sampler,
                                        Eigen::VectorXd& inv_e_metric,
                                        callbacks::logger& logger) {
       using boost::accumulators::accumulator_set;
@@ -276,7 +281,8 @@ namespace mcmc {
       using stan::math::mpi::Session;
       using stan::math::mpi::Communicator;
 
-      if (is_cross_chain_adapt_window_end()) {
+      if ((!is_adapted_) && is_cross_chain_adapt_window_end()) {
+        double chain_stepsize = hmc_sampler -> get_nominal_stepsize();
         bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
         double invalid_stepsize = -999.0;
         double new_stepsize = invalid_stepsize;
@@ -354,10 +360,14 @@ namespace mcmc {
           chain_stepsize = new_stepsize;
           MPI_Bcast(inv_e_metric.data(), var_adapt -> estimators[0].num_params(), MPI_DOUBLE, 0, intra_comm.comm());
         }
+        if (is_adapted_) {
+          hmc_sampler -> set_nominal_stepsize(chain_stepsize);
+        }
       }
-      return is_adapted_;
     }
   };
 }
 }
+#endif
+
 #endif

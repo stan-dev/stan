@@ -6,7 +6,7 @@
 #include <stan/mcmc/stepsize_adapter.hpp>
 
 #ifdef MPI_ADAPTED_WARMUP
-#include <stan/mcmc/mpi_cross_chain_adapter.hpp>
+#include <stan/mcmc/hmc/mpi_cross_chain_adapter.hpp>
 #endif
 
 namespace stan {
@@ -17,14 +17,11 @@ namespace mcmc {
  * and adaptive step size
  */
 template <class Model, class BaseRNG>
+class adapt_unit_e_nuts : public unit_e_nuts<Model, BaseRNG>,
 #ifdef MPI_ADAPTED_WARMUP
-class adapt_unit_e_nuts : public unit_e_nuts<Model, BaseRNG>,
-                          public stepsize_adapter,
-                          public mpi_cross_chain_adapter {
-#else
-class adapt_unit_e_nuts : public unit_e_nuts<Model, BaseRNG>,
-                          public stepsize_adapter {
+                          public mpi_cross_chain_adapter,
 #endif
+                          public stepsize_adapter {
  public:
   adapt_unit_e_nuts(const Model& model, BaseRNG& rng)
       : unit_e_nuts<Model, BaseRNG>(model, rng) {}

@@ -6,7 +6,7 @@
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
 
 #ifdef MPI_ADAPTED_WARMUP
-#include <stan/mcmc/mpi_cross_chain_adapter.hpp>
+#include <stan/mcmc/hmc/mpi_cross_chain_adapter.hpp>
 #endif
 
 namespace stan {
@@ -17,14 +17,11 @@ namespace mcmc {
  * diagonal metric and adaptive step size
  */
 template <class Model, class BaseRNG>
+class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
 #ifdef MPI_ADAPTED_WARMUP
-class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
-                          public stepsize_var_adapter,
-                          public mpi_cross_chain_adapter {
-#else
-class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
-                          public stepsize_var_adapter {
+                          public mpi_cross_chain_adapter,
 #endif
+                          public stepsize_var_adapter {
  public:
   adapt_diag_e_nuts(const Model& model, BaseRNG& rng)
       : diag_e_nuts<Model, BaseRNG>(model, rng),
@@ -50,14 +47,8 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
       }
 
 #ifdef MPI_ADAPTED_WARMUP
-      if (!this -> is_cross_chain_adapted()) {
         this -> add_cross_chain_sample(this->z_.q, s.log_prob());
-        double stepsize = this -> get_nominal_stepsize();
-        this -> cross_chain_adaptation(stepsize, this->z_.inv_e_metric_, logger);
-        if (this -> is_cross_chain_adapted()) {
-          this -> set_nominal_stepsize(stepsize);
-        }
-      }
+        this -> cross_chain_adaptation(this, this->z_.inv_e_metric_, logger);
 #endif
     }
     return s;

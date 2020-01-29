@@ -1,7 +1,7 @@
 #ifdef STAN_LANG_MPI
 
 #include <gtest/gtest.h>
-#include <stan/mcmc/mpi_cross_chain_adapter.hpp>
+#include <stan/mcmc/hmc/mpi_cross_chain_adapter.hpp>
 #include <stan/analyze/mcmc/compute_potential_scale_reduction.hpp>
 #include <stan/math/mpi/envionment.hpp>
 #include <stan/callbacks/stream_logger.hpp>
@@ -25,8 +25,25 @@ using boost::accumulators::stats;
 using boost::accumulators::tag::mean;
 using boost::accumulators::tag::variance;
 
+struct dummy_sampler {
+  double stepsize;
+
+  dummy_sampler(double step) : stepsize(step) {}
+
+  double get_nominal_stepsize() {
+    return stepsize;
+  }
+
+  void set_nominal_stepsize(double new_stepsize) {
+    stepsize = new_stepsize;
+  }
+};
+
 // 4 chains with 4 cores, each chain run on a core
 TEST(mpi_warmup_test, mpi_cross_chain_adapter) {
+  stan::callbacks::stream_logger logger(std::cout, std::cout, std::cout,
+                                        std::cerr, std::cerr);
+
   const int num_chains = 4;
   const int max_num_windows = 5;
   const int window_size = 50;
@@ -252,7 +269,7 @@ draw_vecs[3] <<
  cc_adapter.set_cross_chain_adaptation_params(num_iterations,
                                               window_size,
                                               num_chains, 1.1, 40);
- stan::mcmc::mpi_var_adaptation var_adapt(0, comm);
+ stan::mcmc::mpi_var_adaptation var_adapt(0, max_num_windows);
  cc_adapter.set_cross_chain_var_adaptation(var_adapt);
 
  Eigen::VectorXd dummy;
@@ -261,10 +278,10 @@ draw_vecs[3] <<
  for (int i = 0; i < num_iterations; ++i) {
    cc_adapter.add_cross_chain_sample(dummy, draw_vecs[comm.rank()](i));
 
-   double step = chain_stepsize;
-   bool is_adapted = cc_adapter.cross_chain_adaptation(step, dummy);
+   dummy_sampler sampler(chain_stepsize);
+   cc_adapter.cross_chain_adaptation(&sampler, dummy, logger);
 
-   EXPECT_FALSE(is_adapted);
+   EXPECT_FALSE(cc_adapter.is_cross_chain_adapted());
 
    if (cc_adapter.is_cross_chain_adapt_window_end()) {
      int curr_num_win = cc_adapter.current_cross_chain_window_counter();
@@ -292,11 +309,12 @@ draw_vecs[3] <<
     int curr_num_win = 4;
     double target_ess = 15.0;
     for (int i = 0; i < num_iterations; ++i) {
+      dummy_sampler sampler(chain_stepsize);
       cc_adapter.add_cross_chain_sample(dummy, draw_vecs[comm.rank()](i));
 
       double step = chain_stepsize;
-      bool is_adapted = cc_adapter.cross_chain_adaptation(step, dummy);
-      if (is_adapted) break;
+      cc_adapter.cross_chain_adaptation(&sampler, dummy, logger);
+      if (cc_adapter.is_cross_chain_adapted()) break;
     }
     int win = 1; // win = 1 @c is_adapted
     const std::vector<const double* > p{
