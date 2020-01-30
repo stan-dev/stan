@@ -254,7 +254,7 @@ namespace mcmc {
       message << std::setw(5) << std::setprecision(2);
       message << " Rhat: " << std::fixed << cross_chain_adapt_rhat()[win];
       const Eigen::ArrayXd& ess(cross_chain_adapt_ess());
-      message << " ESS: " << std::fixed << ess_.matrix().mean();
+      message << " ESS: " << std::fixed << ess_.matrix().minCoeff();
 
       logger.info(message);
     }
