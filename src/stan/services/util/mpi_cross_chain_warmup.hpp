@@ -43,11 +43,9 @@ namespace util {
  * @param[in,out] logger logger for messages
  */
 template <class Sampler, class Model, class RNG>
-void mpi_cross_chain_warmup(Sampler& sampler, int num_chains,
-                     int num_iterations,
+void mpi_cross_chain_warmup(Sampler& sampler, int num_iterations,
                      int start, int finish, int num_thin, int refresh,
                      bool save, bool warmup,
-                     int window_size, double target_rhat, double target_ess,
                      util::mcmc_writer& mcmc_writer,
                      stan::mcmc::sample& init_s, Model& model,
                      RNG& base_rng, callbacks::interrupt& callback,

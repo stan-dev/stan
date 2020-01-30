@@ -49,7 +49,8 @@ template <class Model>
 int hmc_nuts_unit_e_adapt(
     Model& model, stan::io::var_context& init, unsigned int random_seed,
     unsigned int chain, double init_radius,
-    int num_cross_chains, int cross_chain_window, int num_warmup, int num_samples,
+    int num_cross_chains, int cross_chain_window, int cross_chain_ess,
+    int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, callbacks::interrupt& interrupt,
@@ -74,7 +75,7 @@ int hmc_nuts_unit_e_adapt(
 
 #ifdef MPI_ADAPTED_WARMUP
   util::run_mpi_adaptive_sampler(
-      sampler, model, cont_vector, num_cross_chains, cross_chain_window,
+      sampler, model, cont_vector, num_cross_chains, cross_chain_window, cross_chain_ess,
       num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
 #else
