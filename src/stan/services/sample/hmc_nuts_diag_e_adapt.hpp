@@ -62,7 +62,7 @@ int hmc_nuts_diag_e_adapt(
     Model& model, stan::io::var_context& init,
     stan::io::var_context& init_inv_metric, unsigned int random_seed,
     unsigned int chain, double init_radius,
-    int num_cross_chains, int cross_chain_window, int cross_chain_ess,
+    int num_cross_chains, int cross_chain_window, double cross_chain_rhat, int cross_chain_ess,
     int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
@@ -103,7 +103,7 @@ int hmc_nuts_diag_e_adapt(
 
 #ifdef MPI_ADAPTED_WARMUP
   util::run_mpi_adaptive_sampler(sampler, 
-      model, cont_vector, num_cross_chains, cross_chain_window, cross_chain_ess,
+      model, cont_vector, num_cross_chains, cross_chain_window, cross_chain_rhat, cross_chain_ess,
       num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
 #else
@@ -150,7 +150,7 @@ template <class Model>
 int hmc_nuts_diag_e_adapt(
     Model& model, stan::io::var_context& init, unsigned int random_seed,
     unsigned int chain, double init_radius,
-    int num_cross_chains, int cross_chain_window, int cross_chain_ess,
+    int num_cross_chains, int cross_chain_window, double cross_chain_rhat, int cross_chain_ess,
     int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
@@ -164,7 +164,7 @@ int hmc_nuts_diag_e_adapt(
 
   return hmc_nuts_diag_e_adapt(
       model, init, unit_e_metric, random_seed, chain, init_radius,
-      num_cross_chains, cross_chain_window, cross_chain_ess, num_warmup,
+      num_cross_chains, cross_chain_window, cross_chain_rhat, cross_chain_ess, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer);

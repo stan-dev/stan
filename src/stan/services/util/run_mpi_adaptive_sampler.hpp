@@ -42,7 +42,8 @@ namespace util {
 template <class Sampler, class Model, class RNG>
 void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
                               std::vector<double>& cont_vector,
-                              int num_chains, int cross_chain_window, int cross_chain_ess,
+                              int num_chains, int cross_chain_window,
+                              double cross_chain_rhat, int cross_chain_ess,
                               int num_warmup,int num_samples, int num_thin, int refresh,
                               bool save_warmup, RNG& rng,
                               callbacks::interrupt& interrupt,
@@ -71,10 +72,9 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
 
   // warmup
   clock_t start = clock();
-  const double target_rhat = 1.05;
   sampler.set_cross_chain_adaptation_params(num_warmup,
                                             cross_chain_window, num_chains,
-                                            target_rhat, cross_chain_ess);
+                                            cross_chain_rhat, cross_chain_ess);
   stan::mcmc::mpi_var_adaptation
     var_adapt(sampler.z().q.size(), num_warmup, cross_chain_window);
   sampler.set_cross_chain_var_adaptation(var_adapt);
