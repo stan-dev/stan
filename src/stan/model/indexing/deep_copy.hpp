@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_INDEXING_DEEP_COPY_HPP
 #define STAN_MODEL_INDEXING_DEEP_COPY_HPP
 
-#include <stan/math/prim/Eigen.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/math/prim/meta.hpp>
 #include <vector>
 
@@ -21,7 +21,7 @@ namespace model {
  * @param x Input value.
  * @return Constant reference to input.
  */
-template <typename T>
+template <typename T, typename = require_not_eigen_t<T>>
 inline const T& deep_copy(const T& x) {
   return x;
 }
@@ -42,7 +42,7 @@ inline const T& deep_copy(const T& x) {
  */
 template <typename EigMat, typename = require_eigen_t<EigMat>>
 inline auto deep_copy(const EigMat& a) {
-  Eigen::Matrix<T, R, C> result(a);
+  typename EigMat::PlainObject result(a);
   return result;
 }
 
