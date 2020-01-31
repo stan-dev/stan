@@ -5,6 +5,11 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.22.1 (31 January 2020)
+======================================================================
+
+Updated math version to v3.1.1
+
 v.2.22.0 (24 January 2020)
 ======================================================================
 
