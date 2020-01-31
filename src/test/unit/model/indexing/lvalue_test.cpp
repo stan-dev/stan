@@ -116,7 +116,6 @@ TEST(model_indexing, assign_stdvec_stdvec_min_index_max_index) {
   test_throw_ia(lhs_x, index_list(index_max(10)), rhs_y);
 }
 
-
 TEST(model_indexing, assign_stdvec_stdvec_multi_index) {
   vector<double> lhs_x;
   for (int i = 0; i < 10; ++i) {
@@ -568,11 +567,11 @@ TEST(model_indexing, assign_double_to_var) {
   lhs_x.push_back(1);
   lhs_x.push_back(2);
   lhs_x.push_back(3);
-  vector<vector<double> > lhs_xs;
+  vector<vector<double>> lhs_xs;
   lhs_xs.push_back(lhs_x);
 
   vector<var> rhs_y(3);
-  vector<vector<var> > rhs_ys;
+  vector<vector<var>> rhs_ys;
   rhs_ys.push_back(rhs_y);
 
   assign(rhs_ys, cons_list(index_omni(), nil_index_list()), lhs_xs, "foo");

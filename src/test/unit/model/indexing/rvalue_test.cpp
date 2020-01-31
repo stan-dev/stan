@@ -379,9 +379,7 @@ void vector_uni_test() {
   test_out_of_range(v, index_list(index_uni(20)));
 }
 
-TEST(model_indexing, rvalue_vector_uni) {
-   vector_uni_test<Eigen::VectorXd>();
- }
+TEST(model_indexing, rvalue_vector_uni) { vector_uni_test<Eigen::VectorXd>(); }
 
 TEST(model_indexing, rvalue_eigrowvec_uni) {
   vector_uni_test<Eigen::RowVectorXd>();
@@ -505,7 +503,6 @@ TEST(model_indexing, rvalue_eigmatrix_uni) {
 
   test_out_of_range(m, index_list(index_uni(0)));
   test_out_of_range(m, index_list(index_uni(15)));
-
 }
 
 TEST(model_indexing, rvalue_eigmatrix_multi) {
@@ -592,7 +589,6 @@ TEST(model_indexing, rvalue_eigmatrix_multi) {
   EXPECT_FLOAT_EQ(3.1, a(3, 1));
   EXPECT_FLOAT_EQ(3.2, a(3, 2));
 
-
   a = rvalue(m.array() + 2, index_list(index_omni()));
   EXPECT_EQ(4, a.rows());
   EXPECT_EQ(3, a.cols());
@@ -657,8 +653,9 @@ TEST(model_indexing, rvalue_eigmatrix_uni_uni) {
 
   for (int m = 0; m < 3; ++m) {
     for (int n = 0; n < 4; ++n) {
-      EXPECT_FLOAT_EQ(2 + m + n / 10.0, rvalue(x.array() + 2, index_list(index_uni(m + 1),
-                                                         index_uni(n + 1))));
+      EXPECT_FLOAT_EQ(2 + m + n / 10.0,
+                      rvalue(x.array() + 2,
+                             index_list(index_uni(m + 1), index_uni(n + 1))));
     }
   }
 
