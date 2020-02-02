@@ -107,7 +107,7 @@ inline auto rvalue(const EigMat& a,
                    const char* name = "ANON", int depth = 0) {
   int n = idx.head_.n_;
   math::check_range("matrix[uni] indexing", name, a.rows(), n);
-  return a.row(n - 1);
+  return a.row(n - 1).eval();
 }
 
 /**
@@ -132,7 +132,7 @@ inline auto rvalue(
     const char* name = "ANON", int depth = 0) {
   int n = idx.tail_.head_.n_;
   math::check_range("matrix[uni] indexing", name, a.rows(), n);
-  return a.col(n - 1);
+  return a.col(n - 1).eval();
 }
 
 /**
