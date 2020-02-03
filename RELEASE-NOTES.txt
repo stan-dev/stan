@@ -5,6 +5,17 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.22.0 (24 January 2020)
+======================================================================
+
+New Features
+------------
+
+- validate_dims in stan::io::var_context vas made a virtual function which allows its implementation for JSON data which is needed to accepts arrays where any dimension is size 0
+- replaced Eigen vectors of strings with std::vector<std::string>
+- replaced stan::math::domain_error with throw_domain_error
+- added const noexcept accessors to the stepsize adaptation class which allows developers to query the adaptation parameters in contexts where it's natural to have a const sampler (logging, serialization, ...)
+
 v.2.21.0 (18 October 2019)
 ======================================================================
 
