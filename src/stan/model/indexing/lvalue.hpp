@@ -68,8 +68,8 @@ inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
  * @throw std::out_of_range If the index is out of bounds.
  */
 template <typename EigVec, typename Scalar,
- typename = require_eigen_vector_t<EigVec>,
- typename = require_stan_scalar_t<Scalar>>
+          typename = require_eigen_vector_t<EigVec>,
+          typename = require_stan_scalar_t<Scalar>>
 inline void assign(EigVec& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const Scalar& y, const char* name = "ANON", int depth = 0) {
