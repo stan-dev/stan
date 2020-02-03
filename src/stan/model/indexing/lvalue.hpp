@@ -67,36 +67,14 @@ inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If the index is out of bounds.
  */
-template <typename T, typename U>
-inline void assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
+template <typename EigVec, typename Scalar,
+ typename = require_eigen_vector_t<EigVec>,
+ typename = require_stan_scalar_t<Scalar>>
+inline void assign(EigVec& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
-                   const U& y, const char* name = "ANON", int depth = 0) {
+                   const Scalar& y, const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("vector[uni] assign range", name, x.size(), i);
-  x(i - 1) = y;
-}
-
-/**
- * Assign the specified Eigen vector at the specified single index
- * to the specified value.
- *
- * Types:  row_vec[uni] <- scalar
- *
- * @tparam T Type of assigned row vector scalar.
- * @tparam U Type of value (must be assignable to T).
- * @param[in] x Row vector variable to be assigned.
- * @param[in] idxs Sequence of one single index (from 1).
- * @param[in] y Value scalar.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
- * @throw std::out_of_range Index is out of bounds.
- */
-template <typename T, typename U>
-inline void assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
-                   const cons_index_list<index_uni, nil_index_list>& idxs,
-                   const U& y, const char* name = "ANON", int depth = 0) {
-  int i = idxs.head_.n_;
-  math::check_range("row_vector[uni] assign range", name, x.size(), i);
   x(i - 1) = y;
 }
 

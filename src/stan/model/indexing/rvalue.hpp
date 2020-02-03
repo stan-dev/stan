@@ -137,6 +137,31 @@ inline auto rvalue(
 
 /**
  * Return the result of indexing the specified Eigen matrix with a
+ * an omni index and a one single index, returning a vector.
+ *
+ * Types:  mat[single,] : vec
+ *
+ * @tparam T Scalar type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, typename = require_eigen_t<EigMat>,
+          typename = require_not_eigen_vector_t<EigMat>>
+inline auto rvalue(
+    const EigMat& a,
+    const cons_index_list<index_uni,
+                          cons_index_list<index_omni, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  int n = idx.head_.n_;
+  math::check_range("matrix[uni] indexing", name, a.rows(), n);
+  return a.row(n - 1).eval();
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a
  * sequence consisting of a one multiple index, returning a matrix.
  *
  * Types:  mat[multiple] : mat
