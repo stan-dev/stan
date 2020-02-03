@@ -182,7 +182,8 @@ inline auto rvalue(const EigMat& a,
                    const cons_index_list<I, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   int n_rows = rvalue_index_size(idx.head_, a.rows());
-  Eigen::Matrix<scalar_type_t<EigMat>, EigMat::RowsAtCompileTime, EigMat::ColsAtCompileTime> b(
+  Eigen::Matrix<scalar_type_t<EigMat>,
+   EigMat::RowsAtCompileTime, EigMat::ColsAtCompileTime> b(
       n_rows, a.cols());
   const Eigen::Ref<const typename EigMat::PlainObject>& mat = a;
   for (int i = 0; i < n_rows; ++i) {
@@ -246,7 +247,8 @@ inline auto rvalue(
     const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
-  Eigen::Matrix<scalar_type_t<EigMat>, 1, EigMat::ColsAtCompileTime> r = a.row(m - 1);
+  Eigen::Matrix<scalar_type_t<EigMat>, 1,
+   EigMat::ColsAtCompileTime> r = a.row(m - 1);
   return rvalue(r, idx.tail_);
 }
 
@@ -311,8 +313,8 @@ inline auto rvalue(
     const char* name = "ANON", int depth = 0) {
   int rows = rvalue_index_size(idx.head_, a.rows());
   int cols = rvalue_index_size(idx.tail_.head_, a.cols());
-  Eigen::Matrix<scalar_type_t<EigMat>, EigMat::RowsAtCompileTime, EigMat::ColsAtCompileTime> c(rows,
-                                                                         cols);
+  Eigen::Matrix<scalar_type_t<EigMat>, EigMat::RowsAtCompileTime,
+   EigMat::ColsAtCompileTime> c(rows, cols);
   const Eigen::Ref<const typename EigMat::PlainObject>& mat = a;
   for (int j = 0; j < cols; ++j) {
     for (int i = 0; i < rows; ++i) {
