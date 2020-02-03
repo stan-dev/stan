@@ -78,7 +78,8 @@ inline auto rvalue(const EigVec& v,
                    const char* name = "ANON", int depth = 0) {
   int size = rvalue_index_size(idx.head_, v.size());
   const Eigen::Ref<const typename EigVec::PlainObject>& vec = v;
-  Eigen::Matrix<scalar_type_t<EigVec>, EigVec::RowsAtCompileTime, 1> a(size);
+  Eigen::Matrix<scalar_type_t<EigVec>, EigVec::RowsAtCompileTime,
+   EigVec::ColsAtCompileTime> a(size);
   for (int i = 0; i < size; ++i) {
     int n = rvalue_at(i, idx.head_);
     math::check_range("vector[multi] indexing", name, v.size(), n);
