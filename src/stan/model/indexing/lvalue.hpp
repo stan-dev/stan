@@ -205,7 +205,8 @@ template <typename LhsEigMat, typename I, typename RhsEigMat,
           typename = require_not_eigen_vector_t<RhsEigMat>>
 inline void assign(LhsEigMat& x,
                    const cons_index_list<I, nil_index_list>& idxs,
-                   const RhsEigMat& y, const char* name = "ANON", int depth = 0) {
+                   const RhsEigMat& y,
+                   const char* name = "ANON", int depth = 0) {
   int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
   math::check_size_match("matrix[multi] assign row sizes", "lhs", x_idx_rows,
                          name, y.rows());
