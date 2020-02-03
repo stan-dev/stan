@@ -391,7 +391,7 @@ void vector_multi_test() {
   v << 0, 1, 2, 3, 4;
 
   T vi = rvalue(v, index_list(index_omni()));
-/*  EXPECT_EQ(5, vi.size());
+  EXPECT_EQ(5, vi.size());
   EXPECT_FLOAT_EQ(0, vi(0));
   EXPECT_FLOAT_EQ(2, vi(2));
   EXPECT_FLOAT_EQ(4, vi(4));
@@ -460,7 +460,7 @@ void vector_multi_test() {
 
   ns[ns.size() - 1] = 15;
   test_out_of_range(v, index_list(index_multi(ns)));
-*/}
+}
 
 TEST(model_indexing, rvalue_eigvec_multi) {
   vector_multi_test<Eigen::VectorXd>();
