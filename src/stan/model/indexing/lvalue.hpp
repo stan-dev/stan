@@ -130,12 +130,10 @@ inline void assign(EigVec1& x, const cons_index_list<I, nil_index_list>& idxs,
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename EigMat, typename RowVec,
-          typename = require_eigen_t<EigMat>,
+template <typename EigMat, typename RowVec, typename = require_eigen_t<EigMat>,
           typename = require_not_eigen_vector_t<EigMat>,
           typename = require_t<is_eigen_row_vector<RowVec>>>
-void assign(EigMat& x,
-            const cons_index_list<index_uni, nil_index_list>& idxs,
+void assign(EigMat& x, const cons_index_list<index_uni, nil_index_list>& idxs,
             const RowVec& y, const char* name = "ANON", int depth = 0) {
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.cols(), name,
                          y.cols());
@@ -163,8 +161,7 @@ void assign(EigMat& x,
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename EigMat, typename ColVec,
-          typename = require_eigen_t<EigMat>,
+template <typename EigMat, typename ColVec, typename = require_eigen_t<EigMat>,
           typename = require_not_eigen_vector_t<EigMat>,
           typename = require_t<is_eigen_col_vector<ColVec>>>
 void assign(EigMat& x,
@@ -203,10 +200,9 @@ template <typename LhsEigMat, typename I, typename RhsEigMat,
           typename = require_not_same_t<index_uni, I>,
           typename = require_eigen_t<RhsEigMat>,
           typename = require_not_eigen_vector_t<RhsEigMat>>
-inline void assign(LhsEigMat& x,
-                   const cons_index_list<I, nil_index_list>& idxs,
-                   const RhsEigMat& y,
-                   const char* name = "ANON", int depth = 0) {
+inline void assign(LhsEigMat& x, const cons_index_list<I, nil_index_list>& idxs,
+                   const RhsEigMat& y, const char* name = "ANON",
+                   int depth = 0) {
   int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
   math::check_size_match("matrix[multi] assign row sizes", "lhs", x_idx_rows,
                          name, y.rows());
@@ -238,8 +234,7 @@ inline void assign(LhsEigMat& x,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If either of the indices are out of bounds.
  */
-template <typename EigMat, typename U,
-          typename = require_eigen_t<EigMat>,
+template <typename EigMat, typename U, typename = require_eigen_t<EigMat>,
           typename = require_not_eigen_vector_t<EigMat>>
 void assign(EigMat& x,
             const cons_index_list<
