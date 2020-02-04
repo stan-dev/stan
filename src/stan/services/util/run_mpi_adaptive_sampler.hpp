@@ -78,11 +78,11 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
   stan::mcmc::mpi_var_adaptation
     var_adapt(sampler.z().q.size(), num_warmup, cross_chain_window);
   sampler.set_cross_chain_var_adaptation(var_adapt);
-  int n_cross_chain_warmup = util::mpi_cross_chain_warmup(sampler,
-                                                          num_warmup, 0, num_warmup + num_samples,
-                                                          num_thin, refresh, save_warmup, true,
-                                                          writer, s,
-                                                          model, rng, interrupt, logger);
+  util::mpi_cross_chain_warmup(sampler,
+                        num_warmup, 0, num_warmup + num_samples,
+                        num_thin, refresh, save_warmup, true,
+                        writer, s,
+                        model, rng, interrupt, logger);
   clock_t end = clock();
   double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
@@ -98,14 +98,6 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
   double sample_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
   writer.write_timing(warm_delta_t, sample_delta_t);
-
-  // replace num_warmup with actual one
-  if (stan::math::mpi::Session::is_in_inter_chain_comm(num_chains)) {
-    const std::string& file_name = dynamic_cast<callbacks::mpi_fstream_writer&>(sample_writer).file_name;
-    int i = stan::math::mpi::Session::inter_chain_comm(num_chains).rank();
-    std::string sys_call = "awk '{ gsub(\"num_warmup = [0-9]*\", \"num_warmup = " + std::to_string(n_cross_chain_warmup) + "\") ; print $0 }' " + file_name + " > " + std::to_string(i) + ".temp.csv && mv " + std::to_string(i) + ".temp.csv " + file_name;
-    system(sys_call.c_str());
-  }
 }
 }  // namespace util
 }  // namespace services
