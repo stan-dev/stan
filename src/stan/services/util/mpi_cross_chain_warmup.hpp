@@ -43,13 +43,14 @@ namespace util {
  * @param[in,out] logger logger for messages
  */
 template <class Sampler, class Model, class RNG>
-void mpi_cross_chain_warmup(Sampler& sampler, int num_iterations,
+int mpi_cross_chain_warmup(Sampler& sampler, int num_iterations,
                      int start, int finish, int num_thin, int refresh,
                      bool save, bool warmup,
                      util::mcmc_writer& mcmc_writer,
                      stan::mcmc::sample& init_s, Model& model,
                      RNG& base_rng, callbacks::interrupt& callback,
                      callbacks::logger& logger) {
+  int n_cross_chain_warmup = num_iterations;
   for (int m = 0; m < num_iterations; ++m) {
     callback();
 
@@ -90,10 +91,16 @@ void mpi_cross_chain_warmup(Sampler& sampler, int num_iterations,
         }
 
         init_s = sampler.transition(init_s, logger);
-      }
+
+        // always save post-adjustment draws
+        mcmc_writer.write_sample_params(base_rng, init_s, sampler, model);
+        mcmc_writer.write_diagnostic_params(init_s, sampler);
+       }
+      n_cross_chain_warmup = m + 50;
       break;
     }
   }
+  return n_cross_chain_warmup;
 }
 
 }  // namespace util

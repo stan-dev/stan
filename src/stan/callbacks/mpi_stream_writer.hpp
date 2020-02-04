@@ -130,6 +130,33 @@ namespace stan {
       }
     };
 
+    class mpi_fstream_writer : public mpi_stream_writer {
+    public:
+      /**
+       * hack: foutput stream so we can replace warmup num
+       */
+      const std::string& file_name;
+
+      /**
+       * Constructs a stream writer with an output stream
+       * and an optional prefix for comments.
+       *
+       * @param[in, out] output stream to write
+       * @param[in] comment_prefix string to stream before
+       *   each comment line. Default is "".
+       */
+      mpi_fstream_writer(int num_chains, std::ostream& output,
+                         const std::string& fname,
+                         const std::string& comment_prefix = "")
+        : mpi_stream_writer(num_chains, output, comment_prefix),
+          file_name(fname)
+      {}
+
+      /**
+       * Virtual destructor
+       */
+      virtual ~mpi_fstream_writer() {}
+    };
   }
 }
 
