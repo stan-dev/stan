@@ -78,13 +78,14 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
   stan::mcmc::mpi_var_adaptation
     var_adapt(sampler.z().q.size(), num_warmup, cross_chain_window);
   sampler.set_cross_chain_var_adaptation(var_adapt);
-  util::mpi_cross_chain_warmup(sampler,
-                        num_warmup, 0, num_warmup + num_samples,
-                        num_thin, refresh, save_warmup, true,
-                        writer, s,
-                        model, rng, interrupt, logger);
+  int num_cross_chain_warmup = util::mpi_cross_chain_warmup(sampler,
+                               num_warmup, 0, num_warmup + num_samples,
+                               num_thin, refresh, save_warmup, true,
+                               writer, s,
+                               model, rng, interrupt, logger);
   clock_t end = clock();
   double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+  sample_writer("num_warmup = " + std::to_string(num_cross_chain_warmup));
 
   sampler.disengage_adaptation();
   writer.write_adapt_finish(sampler);
