@@ -39,17 +39,18 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
       bool update = this->var_adaptation_.learn_variance(this->z_.inv_e_metric_,
                                                          this->z_.q);
 
+#ifdef MPI_ADAPTED_WARMUP
+        this -> add_cross_chain_sample(this->z_.q, s.log_prob());
+        this -> cross_chain_adaptation(this, this->z_.inv_e_metric_, logger);
+        if (this -> is_cross_chain_adapted()) update = false;
+#endif
+
       if (update) {
         this->init_stepsize(logger);
 
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
         this->stepsize_adaptation_.restart();
       }
-
-#ifdef MPI_ADAPTED_WARMUP
-        this -> add_cross_chain_sample(this->z_.q, s.log_prob());
-        this -> cross_chain_adaptation(this, this->z_.inv_e_metric_, logger);
-#endif
     }
     return s;
   }
