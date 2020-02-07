@@ -19,7 +19,7 @@ namespace mcmc {
 template <class Model, class BaseRNG>
 class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
 #ifdef MPI_ADAPTED_WARMUP
-                          public mpi_cross_chain_adapter,
+                          public mpi_cross_chain_adapter<adapt_diag_e_nuts<Model, BaseRNG>>,
 #endif
                           public stepsize_var_adapter {
  public:
@@ -40,8 +40,8 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
                                                          this->z_.q);
 
 #ifdef MPI_ADAPTED_WARMUP
-        this -> add_cross_chain_sample(this->z_.q, s.log_prob());
-        this -> cross_chain_adaptation(this, this->z_.inv_e_metric_, logger);
+        this -> add_cross_chain_sample(s.log_prob());
+        this -> cross_chain_adaptation(logger);
         if (this -> is_cross_chain_adapted()) update = false;
 #endif
 

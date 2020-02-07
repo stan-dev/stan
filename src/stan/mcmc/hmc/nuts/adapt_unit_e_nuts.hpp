@@ -19,7 +19,7 @@ namespace mcmc {
 template <class Model, class BaseRNG>
 class adapt_unit_e_nuts : public unit_e_nuts<Model, BaseRNG>,
 #ifdef MPI_ADAPTED_WARMUP
-                          public mpi_cross_chain_adapter,
+                          public mpi_cross_chain_adapter<adapt_unit_e_nuts<Model, BaseRNG>>,
 #endif
                           public stepsize_adapter {
  public:

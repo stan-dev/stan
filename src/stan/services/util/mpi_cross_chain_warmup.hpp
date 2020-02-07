@@ -43,14 +43,13 @@ namespace util {
  * @param[in,out] logger logger for messages
  */
 template <class Sampler, class Model, class RNG>
-int mpi_cross_chain_warmup(Sampler& sampler, int num_iterations,
+void mpi_cross_chain_warmup(Sampler& sampler, int num_iterations,
                      int start, int finish, int num_thin, int refresh,
                      bool save, bool warmup,
                      util::mcmc_writer& mcmc_writer,
                      stan::mcmc::sample& init_s, Model& model,
                      RNG& base_rng, callbacks::interrupt& callback,
                      callbacks::logger& logger) {
-  int num_cross_chain_warmup = 0;
   for (int m = 0; m < num_iterations; ++m) {
     callback();
 
@@ -74,41 +73,13 @@ int mpi_cross_chain_warmup(Sampler& sampler, int num_iterations,
       mcmc_writer.write_diagnostic_params(init_s, sampler);
     }
 
-    if (m % num_thin == 0) {
-      num_cross_chain_warmup++;
-    }
-
     // check cross-chain convergence
-    if (sampler.is_cross_chain_adapted()) {
-      for (int j = m + 1; j < m + 51; ++j) {
-        if (refresh > 0
-            && (start + j + 1 == finish || j == 0 || (j + 1) % refresh == 0)) {
-          int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
-          std::stringstream message;
-          message << "Iteration: ";
-          message << std::setw(it_print_width) << j + 1 + start << " / " << finish;
-          message << " [" << std::setw(3)
-                  << static_cast<int>((100.0 * (start + j + 1)) / finish) << "%] ";
-          message << (warmup ? " (Warmup)" : " (Sampling)");
-
-          logger.info(message);
-        }
-
-        init_s = sampler.transition(init_s, logger);
-
-        if (save && ((j % num_thin) == 0)) {
-          mcmc_writer.write_sample_params(base_rng, init_s, sampler, model);
-          mcmc_writer.write_diagnostic_params(init_s, sampler);
-        }
-
-        if (m % num_thin == 0) {
-          num_cross_chain_warmup++;
-        }
-      }
+    if ((!sampler.is_post_cross_chain()) && sampler.is_cross_chain_adapted()) {
+      std::cout << "taki test: " << "break" << "\n";
+      sampler.set_post_cross_chain();
       break;
     }
   }
-  return num_cross_chain_warmup;
 }
 
 }  // namespace util

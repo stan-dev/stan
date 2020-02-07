@@ -17,6 +17,8 @@ class mpi_var_adaptation {
 public:
   std::vector<est_t> estimators;
 
+  mpi_var_adaptation() = default;
+
   mpi_var_adaptation(int n_params, int max_num_windows)
     : estimators(max_num_windows, est_t(n_params))
   {}
@@ -34,10 +36,17 @@ public:
   }
 
   void restart() {
-    for (auto&& adapt : estimators) {
-      adapt.restart();
+    for (auto&& e : estimators) {
+      e.restart();
     }
   }
+
+  // void restart(int n_params, int num_iterations, int window_size) {
+  //   estimators.resize(num_iterations / window_size);
+  //   for (auto&& e : estimators) {
+  //     e.restart(n_params);
+  //   }
+  // }
 };
 
 }  // namespace mcmc

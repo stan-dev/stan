@@ -101,9 +101,16 @@ int hmc_nuts_diag_e_adapt(
   sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
                             logger);
 
+  // cross chain adaptation
+  sampler.set_cross_chain_adaptation_params(num_warmup,
+                                            cross_chain_window, num_cross_chains,
+                                            cross_chain_rhat, cross_chain_ess);
+  sampler.set_cross_chain_var_adaptation(model.num_params_r(),
+                                         num_warmup, cross_chain_window);
+
 #ifdef MPI_ADAPTED_WARMUP
   util::run_mpi_adaptive_sampler(sampler, 
-      model, cont_vector, num_cross_chains, cross_chain_window, cross_chain_rhat, cross_chain_ess,
+      model, cont_vector,
       num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
 #else

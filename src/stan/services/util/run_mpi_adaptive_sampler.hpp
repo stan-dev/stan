@@ -42,8 +42,6 @@ namespace util {
 template <class Sampler, class Model, class RNG>
 void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
                               std::vector<double>& cont_vector,
-                              int num_chains, int cross_chain_window,
-                              double cross_chain_rhat, int cross_chain_ess,
                               int num_warmup,int num_samples, int num_thin, int refresh,
                               bool save_warmup, RNG& rng,
                               callbacks::interrupt& interrupt,
@@ -72,20 +70,15 @@ void run_mpi_adaptive_sampler(Sampler& sampler, Model& model,
 
   // warmup
   clock_t start = clock();
-  sampler.set_cross_chain_adaptation_params(num_warmup,
-                                            cross_chain_window, num_chains,
-                                            cross_chain_rhat, cross_chain_ess);
-  stan::mcmc::mpi_var_adaptation
-    var_adapt(sampler.z().q.size(), num_warmup, cross_chain_window);
-  sampler.set_cross_chain_var_adaptation(var_adapt);
-  int num_cross_chain_warmup = util::mpi_cross_chain_warmup(sampler,
-                               num_warmup, 0, num_warmup + num_samples,
-                               num_thin, refresh, save_warmup, true,
-                               writer, s,
-                               model, rng, interrupt, logger);
+  util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
+                             num_thin, refresh, save_warmup, true, writer, s,
+                             model, rng, interrupt, logger);
+  util::generate_transitions(sampler, sampler.num_post_warmup, sampler.num_cross_chain_draws(),
+                             num_warmup + num_samples, num_thin, refresh, save_warmup,
+                             true, writer, s, model, rng, interrupt, logger);
+  sampler.write_num_cross_chain_warmup(sample_writer, num_thin);
   clock_t end = clock();
   double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-  sample_writer("num_warmup = " + std::to_string(num_cross_chain_warmup));
 
   sampler.disengage_adaptation();
   writer.write_adapt_finish(sampler);
