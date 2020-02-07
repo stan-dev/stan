@@ -15,10 +15,6 @@
 #include <stan/services/util/inv_metric.hpp>
 #include <vector>
 
-#ifdef MPI_ADAPTED_WARMUP
-#include <stan/services/util/run_mpi_adaptive_sampler.hpp>
-#endif
-
 namespace stan {
 namespace services {
 namespace sample {
@@ -102,22 +98,15 @@ int hmc_nuts_diag_e_adapt(
                             logger);
 
   // cross chain adaptation
-  sampler.set_cross_chain_adaptation_params(num_warmup,
-                                            cross_chain_window, num_cross_chains,
-                                            cross_chain_rhat, cross_chain_ess);
-  sampler.set_cross_chain_var_adaptation(model.num_params_r(),
-                                         num_warmup, cross_chain_window);
+  util::mpi_cross_chain::set_params(sampler, num_warmup,
+                                    cross_chain_window, num_cross_chains,
+                                    cross_chain_rhat, cross_chain_ess);
+  util::mpi_cross_chain::set_var_adaptation(sampler, model.num_params_r(),
+                                            num_warmup, cross_chain_window);
 
-#ifdef MPI_ADAPTED_WARMUP
-  util::run_mpi_adaptive_sampler(sampler, 
-      model, cont_vector,
-      num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
-#else
   util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
-#endif
 
   return error_codes::OK;
 }

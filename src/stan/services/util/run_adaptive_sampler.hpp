@@ -67,6 +67,14 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true, writer, s,
                              model, rng, interrupt, logger);
+
+  // cross-chain post convergence iterations
+  util::generate_transitions(sampler, mpi_cross_chain::num_post_warmup(sampler),
+                             mpi_cross_chain::num_draws(sampler),
+                             num_warmup + num_samples, num_thin, refresh, save_warmup,
+                             true, writer, s, model, rng, interrupt, logger);
+  mpi_cross_chain::write_num_warmup(sampler, sample_writer, num_thin);
+
   clock_t end = clock();
   double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
 
