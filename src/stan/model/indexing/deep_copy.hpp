@@ -41,8 +41,8 @@ inline const T& deep_copy(const T& x) {
  * @return Deep copy of input.
  */
 template <typename EigMat, typename = require_eigen_t<EigMat>>
-inline auto deep_copy(const EigMat& a) {
-  typename EigMat::PlainObject result(a);
+inline auto deep_copy(EigMat&& a) {
+  typename std::decay_t<EigMat>::PlainObject result(a);
   return result;
 }
 

@@ -18,7 +18,23 @@ namespace model {
 // all indexing from 1
 
 /**
- * Return the result of indexing a specified value with
+ * Return the result of indexing a specified scalar type with
+ * a nil index list, which just returns the scalar.
+ *
+ * Types:  T[] : T
+ *
+ * @tparam T Scalar type.
+ * @param[in] c Value to index.
+ * @return Input value.
+ */
+template <typename T, typename = require_stan_scalar_t<T>>
+inline T rvalue(T&& c, const nil_index_list& /*idx*/,
+                const char* /*name*/ = "", int /*depth*/ = 0) {
+  return c;
+}
+
+/**
+ * Return the result of indexing a specified non-scalar value with
  * a nil index list, which just returns the value.
  *
  * Types:  T[] : T
@@ -27,10 +43,10 @@ namespace model {
  * @param[in] c Value to index.
  * @return Input value.
  */
-template <typename T>
-inline T rvalue(const T& c, const nil_index_list& /*idx*/,
+template <typename T, typename = require_not_stan_scalar_t<T>>
+inline auto&& rvalue(T&& c, const nil_index_list& /*idx*/,
                 const char* /*name*/ = "", int /*depth*/ = 0) {
-  return c;
+  return std::forward<T>(c);
 }
 
 /**
@@ -39,7 +55,7 @@ inline T rvalue(const T& c, const nil_index_list& /*idx*/,
  *
  * Types:  vec[single] : scal
  *
- * @tparam T Scalar type.
+ * @tparam EigVec Type of the Eigen Vector.
  * @param[in] v Vector being indexed.
  * @param[in] idx One single index.
  * @param[in] name String form of expression being evaluated.
@@ -62,7 +78,7 @@ inline auto rvalue(const EigVec& v,
  *
  * Types: vec[multiple] : vec
  *
- * @tparam T Scalar type.
+ * @tparam EigVec Type of the Eigen Vector.
  * @tparam I Multi-index type.
  * @param[in] v Eigen vector.
  * @param[in] idx Index consisting of one multi-index.
@@ -95,7 +111,7 @@ inline auto rvalue(const EigVec& v,
  *
  * Types:  mat[single] : rowvec
  *
- * @tparam T Scalar type.
+ * @tparam EigMat The type of the Eigen Matrix.
  * @param[in] a Eigen matrix.
  * @param[in] idx Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -113,12 +129,12 @@ inline auto rvalue(const EigMat& a,
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * an omni index and a one single index, returning a vector.
+ * Return the result of indexing the specified Eigen matrix with
+ * an omni and single index, returning a vector.
  *
- * Types:  mat[,single] : vec
+ * Types:  mat[omni, single] : vec
  *
- * @tparam T Scalar type.
+ * @tparam EigMat The type of the Eigen Matrix.
  * @param[in] a Eigen matrix.
  * @param[in] idx Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -138,12 +154,12 @@ inline auto rvalue(
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * an omni index and a one single index, returning a vector.
+ * Return the result of indexing the specified Eigen matrix with
+ * a single index and an omni index, returning a vector.
  *
- * Types:  mat[single,] : vec
+ * Types:  mat[single, omni] : vec
  *
- * @tparam T Scalar type.
+ * @tparam EigMat The type of the Eigen Matrix.
  * @param[in] a Eigen matrix.
  * @param[in] idx Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -168,7 +184,7 @@ inline auto rvalue(
  *
  * Types:  mat[multiple] : mat
  *
- * @tparam T Scalar type.
+ * @tparam EigMat The type of the Eigen Matrix.
  * @tparam I Type of multiple index.
  * @param[in] a Matrix to index.
  * @param[in] idx Index consisting of single multiple index.
@@ -202,7 +218,7 @@ inline auto rvalue(const EigMat& a,
  *
  * Types:  mat[single,single] : scalar
  *
- * @tparam T Scalar type.
+ * @tparam EigMat The type of the Eigen Matrix.
  * @param[in] a Matrix to index.
  * @param[in] idx Pair of single indexes.
  * @param[in] name String form of expression being evaluated.
@@ -231,7 +247,7 @@ inline auto rvalue(
  *
  * Types:  mat[single,multiple] : row vector
  *
- * @tparam T Scalar type.
+ * @tparam EigMat The type of the Eigen Matrix.
  * @tparam I Type of multiple index.
  * @param[in] a Matrix to index.
  * @param[in] idx Pair of single index and multiple index.
@@ -249,8 +265,7 @@ inline auto rvalue(
     const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
-  Eigen::Matrix<scalar_type_t<EigMat>, 1, EigMat::ColsAtCompileTime> r
-      = a.row(m - 1);
+  auto&& r = a.row(m - 1);
   return rvalue(r, idx.tail_);
 }
 
@@ -261,7 +276,7 @@ inline auto rvalue(
  *
  * Types:  mat[multiple,single] : vector
  *
- * @tparam T Scalar type.
+ * @tparam EigMat The type of the Eigen Matrix.
  * @tparam I Type of multiple index.
  * @param[in] a Matrix to index.
  * @param[in] idx Pair multiple index and single index.
@@ -297,7 +312,7 @@ inline auto rvalue(
  *
  * Types:  mat[multiple,multiple] : mat
  *
- * @tparam T Scalar type.
+ * @tparam EigMat The type of the Eigen Matrix.
  * @tparam I Type of multiple index.
  * @param[in] a Matrix to index.
  * @param[in] idx Pair of multiple indexes.

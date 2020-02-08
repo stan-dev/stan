@@ -15,7 +15,7 @@ namespace stan {
 namespace model {
 
 /**
- * Assign the specified rvalue to the specified lvalue.  The index
+ * Assign the specified scalar rvalue to the specified scalar lvalue.  The index
  * list's type must be `nil_index_list`, but its value will be
  * ignored.  The last two arguments are also ignored.
  *
@@ -26,10 +26,30 @@ namespace model {
  * @param[in] name Name of lvalue variable (default "ANON"); ignored
  * @param[in] depth Indexing depth (default 0; ignored
  */
-template <typename T, typename U>
-inline void assign(T& x, const nil_index_list& /* idxs */, const U& y,
+template <typename T, typename U,
+ typename = require_all_stan_scalar_t<U, T>>
+inline void assign(T& x, const nil_index_list& /* idxs */, U y,
                    const char* name = "ANON", int depth = 0) {
   x = y;
+}
+
+/**
+ * Assign the specified non-scalar rvalue to the specified non-scalar lvalue. The index
+ * list's type must be `nil_index_list`, but its value will be
+ * ignored.  The last two arguments are also ignored.
+ *
+ * @tparam T lvalue variable type
+ * @tparam U rvalue variable type, which must be assignable to `T`
+ * @param[in,out] x lvalue
+ * @param[in] y rvalue
+ * @param[in] name Name of lvalue variable (default "ANON"); ignored
+ * @param[in] depth Indexing depth (default 0; ignored
+ */
+template <typename T, typename U,
+ typename = require_all_not_stan_scalar_t<U, T>>
+inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
+                   const char* name = "ANON", int depth = 0) {
+  x = std::forward<U>(y);
 }
 
 /**
@@ -48,8 +68,9 @@ inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
                    const std::vector<U>& y, const char* name = "ANON",
                    int depth = 0) {
   x.resize(y.size());
-  for (size_t i = 0; i < y.size(); ++i)
+  for (size_t i = 0; i < y.size(); ++i) {
     assign(x[i], nil_index_list(), y[i], name, depth + 1);
+  }
 }
 
 /**
@@ -58,8 +79,8 @@ inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
  *
  * Types: vec[uni] <- scalar
  *
- * @tparam T Type of assigned vector scalar.
- * @tparam U Type of value (must be assignable to T).
+ * @tparam EigVec Type type of the Eigen Row or Column Vector.
+ * @tparam Scalar Type of value (must be assignable to T).
  * @param[in] x Vector variable to be assigned.
  * @param[in] idxs Sequence of one single index (from 1).
  * @param[in] y Value scalar.
@@ -72,10 +93,10 @@ template <typename EigVec, typename Scalar,
           typename = require_stan_scalar_t<Scalar>>
 inline void assign(EigVec& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
-                   const Scalar& y, const char* name = "ANON", int depth = 0) {
+                   Scalar y, const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("vector[uni] assign range", name, x.size(), i);
-  x(i - 1) = y;
+  x.coeffRef(i - 1) = y;
 }
 
 /**
@@ -84,9 +105,9 @@ inline void assign(EigVec& x,
  *
  * Types:  vec[multi] <- vec
  *
- * @tparam T Type of assigned vector scalar.
+ * @tparam LhsEigVec Type type of the Eigen Column or Row Vector.
  * @tparam I Type of multiple index.
- * @tparam U Type of vector value scalar (must be assignable to T).
+ * @tparam RhsEigVec Type type of the Eigen Column or Row Vector.
  * @param[in] x Row vector variable to be assigned.
  * @param[in] idxs Sequence of one single index (from 1).
  * @param[in] y Value vector.
@@ -96,19 +117,19 @@ inline void assign(EigVec& x,
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
  */
-template <typename EigVec1, typename EigVec2, typename I,
+template <typename LhsEigVec, typename RhsEigVec, typename I,
           typename = require_not_same_t<index_uni, I>,
-          typename = require_all_eigen_vector_t<EigVec1, EigVec2>>
-inline void assign(EigVec1& x, const cons_index_list<I, nil_index_list>& idxs,
-                   const EigVec2& y, const char* name = "ANON", int depth = 0) {
+          typename = require_all_eigen_vector_t<LhsEigVec, RhsEigVec>>
+inline void assign(LhsEigVec& x, const cons_index_list<I, nil_index_list>& idxs,
+                   const RhsEigVec& y, const char* name = "ANON", int depth = 0) {
   math::check_size_match("vector[multi] assign sizes", "lhs",
                          rvalue_index_size(idxs.head_, x.size()), name,
                          y.size());
-  const Eigen::Ref<const typename EigVec2::PlainObject>& vec = y;
+  const Eigen::Ref<const typename RhsEigVec::PlainObject>& vec = y;
   for (int n = 0; n < y.size(); ++n) {
     int i = rvalue_at(n, idxs.head_);
     math::check_range("vector[multi] assign range", name, x.size(), i);
-    x(i - 1) = vec(n);
+    x.coeffRef(i - 1) = vec.coeff(n);
   }
 }
 
@@ -118,9 +139,8 @@ inline void assign(EigVec1& x, const cons_index_list<I, nil_index_list>& idxs,
  *
  * Types:  mat[uni,] = rowvec
  *
- * @tparam T Assigned matrix scalar type.
- * @tparam U Type of value scalar for row vector (must be
- * assignable to T).
+ * @tparam EigMat Type of matrix to be assigned to.
+ * @tparam RowVec Type of Eigen Row Vector to be assigned from.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of one single index (from 1).
  * @param[in] y Value row vector.
@@ -138,9 +158,8 @@ void assign(EigMat& x, const cons_index_list<index_uni, nil_index_list>& idxs,
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.cols(), name,
                          y.cols());
   int i = idxs.head_.n_;
-  math::check_range("matrix[uni,] assign range", name, x.rows(), i);
-  const Eigen::Ref<const typename RowVec::PlainObject>& vec = y;
-  x.row(i - 1) = vec;
+  math::check_range("matrix[uni] assign range", name, x.rows(), i);
+  x.row(i - 1) = y;
 }
 
 /**
@@ -149,9 +168,8 @@ void assign(EigMat& x, const cons_index_list<index_uni, nil_index_list>& idxs,
  *
  * Types:  mat[,uni] = vec
  *
- * @tparam T Assigned matrix scalar type.
- * @tparam U Type of value scalar for row vector (must be
- * assignable to T).
+ * @tparam EigMat Type of Eigen Matrix to be assigned to.
+ * @tparam ColVec Type of Eigen Column Matrix to be assigned from.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of one single index (from 1).
  * @param[in] y Value row vector.
@@ -171,9 +189,8 @@ void assign(EigMat& x,
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.cols(), name,
                          y.cols());
   int i = idxs.tail_.head_.n_;
-  math::check_range("matrix[uni,] assign range", name, x.rows(), i);
-  const Eigen::Ref<const typename ColVec::PlainObject>& vec = y;
-  x.col(i - 1) = vec;
+  math::check_range("matrix[, uni] assign range", name, x.rows(), i);
+  x.col(i - 1) = y;
 }
 
 /**
@@ -182,9 +199,9 @@ void assign(EigMat& x,
  *
  * Types:  mat[multi] = mat
  *
- * @tparam T Assigned matrix scalar type.
+ * @tparam LhsEigMat Type of Eigen Matrix to be assigned to.
  * @tparam I Multiple index type.
- * @tparam U Value matrix scalar type (must be assignable to T).
+ * @tparam RhsEigMat Type of Eigen Matrix to be assigned from.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of one multiple index (from 1).
  * @param[in] y Value matrix.
@@ -195,11 +212,9 @@ void assign(EigMat& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename LhsEigMat, typename I, typename RhsEigMat,
-          typename = require_eigen_t<LhsEigMat>,
-          typename = require_not_eigen_vector_t<LhsEigMat>,
-          typename = require_not_same_t<index_uni, I>,
-          typename = require_eigen_t<RhsEigMat>,
-          typename = require_not_eigen_vector_t<RhsEigMat>>
+          typename = require_all_eigen_t<LhsEigMat, RhsEigMat>,
+          typename = require_all_not_eigen_vector_t<LhsEigMat, RhsEigMat>,
+          typename = require_not_same_t<index_uni, I>>
 inline void assign(LhsEigMat& x, const cons_index_list<I, nil_index_list>& idxs,
                    const RhsEigMat& y, const char* name = "ANON",
                    int depth = 0) {
@@ -215,7 +230,7 @@ inline void assign(LhsEigMat& x, const cons_index_list<I, nil_index_list>& idxs,
     math::check_range("matrix[multi] assign range", name, x.rows(), m);
     // recurse to allow double to var assign
     for (int j = 0; j < x.cols(); ++j)
-      x(m - 1, j) = mat(i, j);
+      x.coeffRef(m - 1, j) = mat.coeffRef(i, j);
   }
 }
 
@@ -225,7 +240,7 @@ inline void assign(LhsEigMat& x, const cons_index_list<I, nil_index_list>& idxs,
  *
  * Types:  mat[single, single] = scalar
  *
- * @tparam T Matrix scalar type.
+ * @tparam EigMat Type of Eigen Matrix to assign to.
  * @tparam U Scalar type.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of two single indexes (from 1).
@@ -244,7 +259,7 @@ void assign(EigMat& x,
   int n = idxs.tail_.head_.n_;
   math::check_range("matrix[uni,uni] assign range", name, x.rows(), m);
   math::check_range("matrix[uni,uni] assign range", name, x.cols(), n);
-  x(m - 1, n - 1) = y;
+  x.coeffRef(m - 1, n - 1) = y;
 }
 
 /**
@@ -253,10 +268,9 @@ void assign(EigMat& x,
  *
  * Types:  mat[uni, multi] = rowvec
  *
- * @tparam T Assigned matrix scalar type.
+ * @tparam EigMat Type of Eigen Matrix to be assigned to.
  * @tparam I Multi-index type.
- * @tparam U Value row vector scalar type (must be assignable to
- * T).
+ * @tparam RowVec Type of Eigen Row Vector to be assigned from.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of single and multiple index (from 1).
  * @param[in] y Value row vector.
@@ -284,7 +298,7 @@ inline void assign(
   for (int i = 0; i < y.size(); ++i) {
     int n = rvalue_at(i, idxs.tail_.head_);
     math::check_range("matrix[uni,multi] assign range", name, x.cols(), n);
-    x(m - 1, n - 1) = vec(i);
+    x.coeffRef(m - 1, n - 1) = vec.coeff(i);
   }
 }
 
@@ -294,9 +308,9 @@ inline void assign(
  *
  * Types:  mat[multi, uni] = vec
  *
- * @tparam T Assigned matrix scalar type.
+ * @tparam EigMat Type of Eigen Matrix to be assigned to.
  * @tparam I Multi-index type.
- * @tparam U Value vector scalar type (must be assignable to T).
+ * @tparam ColVec Type of Eigen Column Vector to be assigned from.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of multiple and single index (from 1).
  * @param[in] y Value vector.
@@ -324,7 +338,7 @@ inline void assign(
   for (int i = 0; i < y.size(); ++i) {
     int m = rvalue_at(i, idxs.head_);
     math::check_range("matrix[multi,uni] assign range", name, x.rows(), m);
-    x(m - 1, n - 1) = vec(i);
+    x.coeffRef(m - 1, n - 1) = vec.coeff(i);
   }
 }
 
@@ -334,10 +348,10 @@ inline void assign(
  *
  * Types:  mat[multi, multi] = mat
  *
- * @tparam T Assigned matrix scalar type.
+ * @tparam LhsEigMat Type of Eigen Matrix to assign to.
  * @tparam I1 First multiple index type.
  * @tparam I2 Second multiple index type.
- * @tparam U Value matrix scalar type (must be assignable to T).
+ * @tparam RhsEigMat Type of Eigen Matrix to be assigned from.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Pair of multiple indexes (from 1).
  * @param[in] y Value matrix.
@@ -348,11 +362,9 @@ inline void assign(
  * matrix and value matrix do not match.
  */
 template <typename LhsEigMat, typename I1, typename I2, typename RhsEigMat,
-          typename = require_eigen_t<LhsEigMat>,
-          typename = require_not_eigen_vector_t<LhsEigMat>,
-          typename = require_any_not_same_t<index_uni, I1, I2>,
-          typename = require_eigen_t<RhsEigMat>,
-          typename = require_not_eigen_vector_t<RhsEigMat>>
+          typename = require_all_eigen_t<LhsEigMat, RhsEigMat>,
+          typename = require_all_not_eigen_vector_t<LhsEigMat, RhsEigMat>,
+          typename = require_any_not_same_t<index_uni, I1, I2>>
 inline void assign(
     LhsEigMat& x,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idxs,
@@ -370,7 +382,7 @@ inline void assign(
     for (int i = 0; i < y.rows(); ++i) {
       int m = rvalue_at(i, idxs.head_);
       math::check_range("matrix[multi,multi] assign range", name, x.rows(), m);
-      x(m - 1, n - 1) = mat(i, j);
+      x.coeffRef(m - 1, n - 1) = mat.coeffRef(i, j);
     }
   }
 }

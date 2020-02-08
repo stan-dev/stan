@@ -233,9 +233,6 @@ TEST(model_indexing, assign_eigvec_scalar_uni_index) {
   assign(lhs_x, index_list(index_uni(3)), y);
   EXPECT_FLOAT_EQ(y, lhs_x(2));
 
-  assign(lhs_x, index_list(index_uni(3)), y);
-  EXPECT_FLOAT_EQ(y, lhs_x(2));
-
   test_throw(lhs_x, index_list(index_uni(0)), y);
   test_throw(lhs_x, index_list(index_uni(6)), y);
 }
