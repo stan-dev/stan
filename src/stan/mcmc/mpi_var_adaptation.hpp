@@ -4,6 +4,7 @@
 #ifdef STAN_LANG_MPI
 
 #include <stan/math/prim/mat.hpp>
+#include <stan/mcmc/mpi_metric_adaptation.hpp>
 #include <stan/math/mpi/mpi_var_estimator.hpp>
 #include <vector>
 
@@ -11,7 +12,7 @@ namespace stan {
 
 namespace mcmc {
 
-class mpi_var_adaptation {
+  class mpi_var_adaptation : public mpi_metric_adaptation {
   using est_t = stan::math::mpi::mpi_var_estimator;
 
 public:
@@ -27,7 +28,18 @@ public:
     : mpi_var_adaptation(n_params, num_iterations / window_size)
   {}
 
-  void learn_variance(Eigen::VectorXd& var, int win,
+  virtual void add_sample(Eigen::VectorXd& q, int curr_win_count) {
+    for (int win = 0; win < curr_win_count; ++win) {
+      estimators[win].add_sample(q);
+    }
+  }
+
+  virtual void learn_metric(Eigen::VectorXd& var, int win, int curr_win_count,
+                    const stan::math::mpi::Communicator& comm) {
+    learn_variance(var, win, curr_win_count, comm);
+  }
+
+  void learn_variance(Eigen::VectorXd& var, int win, int curr_win_count,
                       const stan::math::mpi::Communicator& comm) {
     double n = static_cast<double>(estimators[win].sample_variance(var, comm));
     var = (n / (n + 5.0)) * var
@@ -35,7 +47,7 @@ public:
     restart();
   }
 
-  void restart() {
+  virtual void restart() {
     for (auto&& e : estimators) {
       e.restart();
     }

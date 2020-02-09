@@ -1,14 +1,11 @@
 #ifndef STAN_MCMC_HMC_MPI_CROSS_CHAIN_ADAPTER_HPP
 #define STAN_MCMC_HMC_MPI_CROSS_CHAIN_ADAPTER_HPP
 
-#ifdef MPI_ADAPTED_WARMUP
-
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
-#include <stan/mcmc/mpi_var_adaptation.hpp>
+#include <stan/mcmc/stepsize_covar_adapter.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
-#include <stan/math/mpi/envionment.hpp>
 #include <stan/analyze/mcmc/autocovariance.hpp>
 #include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
 #include <boost/accumulators/accumulators.hpp>
@@ -18,8 +15,27 @@
 #include <boost/accumulators/statistics/count.hpp>
 #include <string>
 
+#ifdef MPI_ADAPTED_WARMUP
+#include <stan/mcmc/mpi_var_adaptation.hpp>
+#include <stan/mcmc/mpi_covar_adaptation.hpp>
+#include <stan/math/mpi/envionment.hpp>
+#endif
+
 namespace stan {
 namespace mcmc {
+
+#ifdef MPI_ADAPTED_WARMUP
+  // template <typename Sampler,
+  //           typename std::enable_if_t<!std::is_base_of<stepsize_covar_adapter, Sampler>::value>* = nullptr>
+  // struct mpi_cross_chain_metric_adapt_t {
+  //   using type = mpi_var_adaptation;
+  // };
+
+  // template <typename Sampler,
+  //           typename std::enable_if_t<std::is_base_of<stepsize_covar_adapter, Sampler>::value>* = nullptr>
+  // struct mpi_cross_chain_metric_adapt_t {
+  //   using type = mpi_covar_adaptation;
+  // };
 
   template<typename Sampler>
   class mpi_cross_chain_adapter {
@@ -311,7 +327,7 @@ namespace mcmc {
           if (adapted_win >= 0) {
             MPI_Allreduce(&chain_stepsize, &new_stepsize, 1, MPI_DOUBLE, MPI_SUM, comm.comm());
             new_stepsize /= num_chains_;
-            var_adapt -> learn_variance(sampler.z().inv_e_metric_, adapted_win, comm);
+            var_adapt -> learn_metric(sampler.z().inv_e_metric_, adapted_win, win_count, comm);
           }
         }
         const Communicator& intra_comm = Session::intra_chain_comm(num_chains_);
@@ -320,7 +336,7 @@ namespace mcmc {
         if (is_adapted_) {
           chain_stepsize = new_stepsize;
           MPI_Bcast(sampler.z().inv_e_metric_.data(),
-                    var_adapt -> estimators[0].num_params(), MPI_DOUBLE, 0, intra_comm.comm());
+                    sampler.z().inv_e_metric_.size(), MPI_DOUBLE, 0, intra_comm.comm());
         }
         if (is_adapted_) {
           sampler.set_nominal_stepsize(chain_stepsize);
@@ -328,8 +344,23 @@ namespace mcmc {
       }
     }
   };
+
+#else  // sequential version
+
+  template<typename Sampler>
+  class mpi_cross_chain_adapter {
+  public:
+    inline void add_cross_chain_sample(double s) {}
+
+    inline void cross_chain_adaptation(callbacks::logger& logger) {}
+
+    inline bool is_cross_chain_adapted() { return false; }
+  };
+  
+#endif
+
 }
 }
 #endif
 
-#endif
+

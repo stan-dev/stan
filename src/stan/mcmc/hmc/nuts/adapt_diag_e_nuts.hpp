@@ -4,10 +4,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/stepsize_var_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
-
-#ifdef MPI_ADAPTED_WARMUP
 #include <stan/mcmc/hmc/mpi_cross_chain_adapter.hpp>
-#endif
 
 namespace stan {
 namespace mcmc {
@@ -18,9 +15,7 @@ namespace mcmc {
  */
 template <class Model, class BaseRNG>
 class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
-#ifdef MPI_ADAPTED_WARMUP
                           public mpi_cross_chain_adapter<adapt_diag_e_nuts<Model, BaseRNG>>,
-#endif
                           public stepsize_var_adapter {
  public:
   adapt_diag_e_nuts(const Model& model, BaseRNG& rng)
@@ -39,11 +34,11 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
       bool update = this->var_adaptation_.learn_variance(this->z_.inv_e_metric_,
                                                          this->z_.q);
 
-#ifdef MPI_ADAPTED_WARMUP
-        this -> add_cross_chain_sample(s.log_prob());
-        this -> cross_chain_adaptation(logger);
-        if (this -> is_cross_chain_adapted()) update = false;
-#endif
+      // cross-chain adaptation
+      this -> add_cross_chain_sample(s.log_prob());
+      this -> cross_chain_adaptation(logger);
+      if (this -> is_cross_chain_adapted()) update = false;
+      // cross-chain adaptation
 
       if (update) {
         this->init_stepsize(logger);
