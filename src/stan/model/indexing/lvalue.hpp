@@ -26,16 +26,15 @@ namespace model {
  * @param[in] name Name of lvalue variable (default "ANON"); ignored
  * @param[in] depth Indexing depth (default 0; ignored
  */
-template <typename T, typename U,
- typename = require_all_stan_scalar_t<U, T>>
+template <typename T, typename U, typename = require_all_stan_scalar_t<U, T>>
 inline void assign(T& x, const nil_index_list& /* idxs */, U y,
                    const char* name = "ANON", int depth = 0) {
   x = y;
 }
 
 /**
- * Assign the specified non-scalar rvalue to the specified non-scalar lvalue. The index
- * list's type must be `nil_index_list`, but its value will be
+ * Assign the specified non-scalar rvalue to the specified non-scalar lvalue.
+ * The index list's type must be `nil_index_list`, but its value will be
  * ignored.  The last two arguments are also ignored.
  *
  * @tparam T lvalue variable type
@@ -46,7 +45,7 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U y,
  * @param[in] depth Indexing depth (default 0; ignored
  */
 template <typename T, typename U,
- typename = require_all_not_stan_scalar_t<U, T>>
+          typename = require_all_not_stan_scalar_t<U, T>>
 inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x = std::forward<U>(y);
@@ -121,7 +120,8 @@ template <typename LhsEigVec, typename RhsEigVec, typename I,
           typename = require_not_same_t<index_uni, I>,
           typename = require_all_eigen_vector_t<LhsEigVec, RhsEigVec>>
 inline void assign(LhsEigVec& x, const cons_index_list<I, nil_index_list>& idxs,
-                   const RhsEigVec& y, const char* name = "ANON", int depth = 0) {
+                   const RhsEigVec& y, const char* name = "ANON",
+                   int depth = 0) {
   math::check_size_match("vector[multi] assign sizes", "lhs",
                          rvalue_index_size(idxs.head_, x.size()), name,
                          y.size());
