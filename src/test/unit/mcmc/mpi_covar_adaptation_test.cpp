@@ -1,46 +1,55 @@
 #ifdef STAN_LANG_MPI
 
-#include <stan/mcmc/var_adaptation.hpp>
-#include <stan/mcmc/mpi_var_adaptation.hpp>
+#include <stan/mcmc/covar_adaptation.hpp>
+#include <stan/mcmc/mpi_covar_adaptation.hpp>
 #include <stan/math/mpi/envionment.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <gtest/gtest.h>
 
-TEST(McmcVarAdaptation, mpi_learn_variance) {
+TEST(McmcVarAdaptation, mpi_learn_covariance) {
   stan::test::unit::instrumented_logger logger;
 
   const int n = 10;
-  Eigen::VectorXd q(Eigen::VectorXd::Zero(n)), var(q);
+  Eigen::VectorXd q = Eigen::VectorXd::Zero(n);
+  Eigen::MatrixXd covar(Eigen::MatrixXd::Zero(n, n));
+
   const int n_learn = 12;
-  Eigen::VectorXd target_var(Eigen::VectorXd::Ones(n));
-  target_var *= 1e-3 * 5.0 / (n_learn + 5.0);
 
-  stan::mcmc::var_adaptation adapter(n);
+  Eigen::MatrixXd target_covar(Eigen::MatrixXd::Identity(n, n));
+  target_covar *= 1e-3 * 5.0 / (n_learn + 5.0);
+
+  stan::mcmc::covar_adaptation adapter(n);
   adapter.set_window_params(50, 0, 0, n_learn, logger);
+
   for (int i = 0; i < n_learn; ++i)
-    adapter.learn_variance(var, q);
+    adapter.learn_covariance(covar, q);
 
-  for (int i = 0; i < n; ++i)
-    EXPECT_FLOAT_EQ(target_var(i), var(i));
-
+  for (int i = 0; i < n; ++i) {
+    for (int j = 0; j < n; ++j) {
+      EXPECT_EQ(target_covar(i, j), covar(i, j));
+    }
+  }
   EXPECT_EQ(0, logger.call_count());
 
   stan::math::mpi::Communicator comm(MPI_COMM_STAN);
-  const int num_chains = comm.size();
+  const int num_chains = comm.size(); // must be <= 4
+  if (n_learn % num_chains != 0)
+    throw std::domain_error("this test function was called with inconsistent MPI COMM size");
+
   const int n_learn_chain = n_learn / num_chains;
-  stan::mcmc::mpi_var_adaptation mpi_adapter(n, 1, 1);
-  Eigen::VectorXd mpi_var(Eigen::VectorXd::Zero(n));  
+  stan::mcmc::mpi_covar_adaptation mpi_adapter(n, n_learn_chain, n_learn_chain);
+  Eigen::MatrixXd mpi_covar(Eigen::MatrixXd::Zero(n, n));  
   for (int i = 0; i < n_learn_chain; ++i)
     mpi_adapter.add_sample(q, 1);
 
-  mpi_adapter.learn_variance(mpi_var, 0, 1, comm);
+  mpi_adapter.learn_metric(mpi_covar, 0, 1, comm);
 
-  for (int i = 0; i < n; ++i) {
-    EXPECT_FLOAT_EQ(var(i), mpi_var(i));
+  for (int i = 0; i < covar.size(); ++i) {
+    EXPECT_FLOAT_EQ(covar(i), mpi_covar(i));
   }
 }
 
-TEST(McmcVarAdaptation, mpi_data_learn_variance) {
+TEST(McmcVarAdaptation, mpi_data_learn_covariance) {
   stan::test::unit::instrumented_logger logger;
 
   const int n = 5;
@@ -60,30 +69,32 @@ TEST(McmcVarAdaptation, mpi_data_learn_variance) {
     -266.122,  -265.903,  -265.903,  -265.717,  -271.78 ,
     -271.78 ,  -271.712,  -271.712,  -271.011,  -273.137;
 
-  stan::mcmc::var_adaptation adapter(n);
+  stan::mcmc::covar_adaptation adapter(n);
   adapter.set_window_params(50, 0, 0, n_learn, logger);
-  Eigen::VectorXd var(Eigen::VectorXd::Zero(n));
+  Eigen::MatrixXd covar(Eigen::MatrixXd::Zero(n, n));
   for (int i = 0; i < n_learn; ++i) {
     Eigen::VectorXd q = Eigen::VectorXd::Map(&q_all(i * n), n);
-    adapter.learn_variance(var, q);
+    adapter.learn_covariance(covar, q);
   }
 
   EXPECT_EQ(0, logger.call_count());
 
   stan::math::mpi::Communicator comm(MPI_COMM_STAN);
   const int num_chains = comm.size();
+  if (n_learn % num_chains != 0)
+    throw std::domain_error("this test function was called with inconsistent MPI COMM size");
   const int n_learn_chain = n_learn / num_chains;
-  stan::mcmc::mpi_var_adaptation mpi_adapter(n, 1, 1);
-  Eigen::VectorXd mpi_var(Eigen::VectorXd::Zero(n));  
+  stan::mcmc::mpi_covar_adaptation mpi_adapter(n, n_learn_chain, n_learn_chain);
+  Eigen::MatrixXd mpi_covar(Eigen::MatrixXd::Zero(n, n));
   for (int i = 0; i < n_learn_chain; ++i) {
     Eigen::VectorXd q =
       Eigen::VectorXd::Map(&q_all(i * n + comm.rank() * n * n_learn_chain), n);
     mpi_adapter.add_sample(q, 1);
   }
-  mpi_adapter.learn_variance(mpi_var, 0, 1, comm);
+  mpi_adapter.learn_metric(mpi_covar, 0, 1, comm);
 
   for (int i = 0; i < n; ++i) {
-    EXPECT_FLOAT_EQ(var(i), mpi_var(i));
+    EXPECT_FLOAT_EQ(covar(i), mpi_covar(i));
   }
 }
 
