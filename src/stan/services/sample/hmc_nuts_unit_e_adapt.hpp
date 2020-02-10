@@ -74,11 +74,12 @@ int hmc_nuts_unit_e_adapt(
   sampler.get_stepsize_adaptation().set_t0(t0);
 
   // cross chain adaptation setup
-  util::mpi_cross_chain::set_params(sampler, num_warmup,
-                              cross_chain_window, num_cross_chains,
-                              cross_chain_rhat, cross_chain_ess);
-  util::mpi_cross_chain::set_var_adaptation(sampler, model.num_params_r(),
-                                      num_warmup, cross_chain_window);
+  sampler.set_cross_chain_adaptation_params(num_warmup,
+                                            cross_chain_window, num_cross_chains,
+                                            cross_chain_rhat, cross_chain_ess);
+  mcmc::mpi_var_adaptation var_adapt(model.num_params_r(), num_warmup, cross_chain_window);
+  sampler.set_cross_chain_metric_adaptation(&var_adapt);
+
 
   util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,

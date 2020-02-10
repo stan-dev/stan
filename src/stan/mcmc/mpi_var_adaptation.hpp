@@ -1,18 +1,20 @@
 #ifndef STAN_MCMC_MPI_VAR_ADAPTATION_HPP
 #define STAN_MCMC_MPI_VAR_ADAPTATION_HPP
 
-#ifdef STAN_LANG_MPI
-
 #include <stan/math/prim/mat.hpp>
 #include <stan/mcmc/mpi_metric_adaptation.hpp>
-#include <stan/math/mpi/mpi_var_estimator.hpp>
 #include <vector>
+
+#ifdef STAN_LANG_MPI
+#include <stan/math/mpi/mpi_var_estimator.hpp>
+#endif
 
 namespace stan {
 
 namespace mcmc {
 
   class mpi_var_adaptation : public mpi_metric_adaptation {
+#ifdef STAN_LANG_MPI
   using est_t = stan::math::mpi::mpi_var_estimator;
 
 public:
@@ -28,7 +30,7 @@ public:
     : mpi_var_adaptation(n_params, num_iterations / window_size)
   {}
 
-  virtual void add_sample(Eigen::VectorXd& q, int curr_win_count) {
+  virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
     for (int win = 0; win < curr_win_count; ++win) {
       estimators[win].add_sample(q);
     }
@@ -53,18 +55,17 @@ public:
     }
   }
 
-  // void restart(int n_params, int num_iterations, int window_size) {
-  //   estimators.resize(num_iterations / window_size);
-  //   for (auto&& e : estimators) {
-  //     e.restart(n_params);
-  //   }
-  // }
+#else
+  public:
+  mpi_var_adaptation(int n_params, int num_iterations, int window_size)
+    {}    
+#endif
 };
 
 }  // namespace mcmc
 
 }  // namespace stan
 
-#endif
+
 
 #endif

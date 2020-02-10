@@ -5,6 +5,8 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/stepsize_covar_adapter.hpp>
+#include <stan/mcmc/mpi_var_adaptation.hpp>
+#include <stan/mcmc/mpi_covar_adaptation.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <stan/analyze/mcmc/autocovariance.hpp>
 #include <stan/analyze/mcmc/compute_effective_sample_size.hpp>
@@ -16,8 +18,6 @@
 #include <string>
 
 #ifdef MPI_ADAPTED_WARMUP
-#include <stan/mcmc/mpi_var_adaptation.hpp>
-#include <stan/mcmc/mpi_covar_adaptation.hpp>
 #include <stan/math/mpi/envionment.hpp>
 #endif
 
@@ -25,18 +25,6 @@ namespace stan {
 namespace mcmc {
 
 #ifdef MPI_ADAPTED_WARMUP
-  // template <typename Sampler,
-  //           typename std::enable_if_t<!std::is_base_of<stepsize_covar_adapter, Sampler>::value>* = nullptr>
-  // struct mpi_cross_chain_metric_adapt_t {
-  //   using type = mpi_var_adaptation;
-  // };
-
-  // template <typename Sampler,
-  //           typename std::enable_if_t<std::is_base_of<stepsize_covar_adapter, Sampler>::value>* = nullptr>
-  // struct mpi_cross_chain_metric_adapt_t {
-  //   using type = mpi_covar_adaptation;
-  // };
-
   template<typename Sampler>
   class mpi_cross_chain_adapter {
   protected:
@@ -56,7 +44,7 @@ namespace mcmc {
                                          boost::accumulators::features<boost::accumulators::tag::count> > draw_count_acc_;
     Eigen::ArrayXd rhat_;
     Eigen::ArrayXd ess_;
-    std::shared_ptr<mpi_var_adaptation> var_adapt;
+    mpi_metric_adaptation* var_adapt;
 
   public:
     const static int num_post_warmup = 50;
@@ -81,9 +69,7 @@ namespace mcmc {
       ess_(Eigen::ArrayXd::Zero(max_num_windows_))
     {}
 
-    inline void set_cross_chain_var_adaptation(int num_params, int num_iterations, int window_size) {
-      var_adapt = std::shared_ptr<mpi_var_adaptation>(new mpi_var_adaptation(num_params, num_iterations, window_size));
-    }
+    inline void set_cross_chain_metric_adaptation(mpi_metric_adaptation* ptr) {var_adapt = ptr;}
 
     inline void set_cross_chain_adaptation_params(int num_iterations,
                                                   int window_size,
@@ -163,8 +149,8 @@ namespace mcmc {
             lp_draws_[i] = s;
             for (int win = 0; win < n_win; ++win) {
               lp_acc_[win](s);
-              var_adapt -> estimators[win].add_sample(sampler.z().q);
             }
+            var_adapt -> add_sample(sampler.z().q, n_win);
           }
         }
       }
@@ -350,6 +336,12 @@ namespace mcmc {
   template<typename Sampler>
   class mpi_cross_chain_adapter {
   public:
+    inline void set_cross_chain_metric_adaptation(mpi_metric_adaptation* ptr) {}
+
+    inline void set_cross_chain_adaptation_params(int num_iterations,
+                                                  int window_size,
+                                                  int num_chains,
+                                                  double target_rhat, double target_ess) {}
     inline void add_cross_chain_sample(double s) {}
 
     inline void cross_chain_adaptation(callbacks::logger& logger) {}

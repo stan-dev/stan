@@ -16,6 +16,10 @@ namespace stan {
 namespace services {
 namespace util {
 
+  /*
+   * Helper functions for samplers with MPI WARMUP. Other
+   * samplers have dummy implmenentation.
+   */ 
   struct mpi_cross_chain {
     template <class Sampler>
     static bool end_transitions(Sampler& sampler) {return false;}
@@ -33,17 +37,6 @@ namespace util {
     static void write_num_warmup(Sampler& sampler,
                                  callbacks::writer& sample_writer,
                                  int num_thin)
-    {}
-
-    template <class Sampler>
-    static void set_params(Sampler& sampler, int num_iterations,
-                           int window_size, int num_chains,
-                           double target_rhat, double target_ess)
-    {}
-
-    template <class Sampler>
-    static void set_var_adaptation(Sampler& sampler,
-                                   int num_params, int num_iterations, int window_size)
     {}
 
     static void set_seed(unsigned int& seed, int num_chains) {
@@ -126,39 +119,6 @@ namespace util {
     static void set_post_iter(mcmc::adapt_unit_e_nuts<Model, RNG>& sampler) {
       sampler.set_post_cross_chain();
     }
-
-    template <class Model, class RNG>
-    static void set_params(mcmc::adapt_diag_e_nuts<Model, RNG>& sampler,
-                           int num_iterations,
-                           int window_size, int num_chains,
-                           double target_rhat, double target_ess) {
-      sampler.set_cross_chain_adaptation_params(num_iterations,
-                                                window_size, num_chains,
-                                                target_rhat, target_ess);
-    }
-
-    template <class Model, class RNG>
-    static void set_params(mcmc::adapt_unit_e_nuts<Model, RNG>& sampler,
-                           int num_iterations,
-                           int window_size, int num_chains,
-                           double target_rhat, double target_ess) {
-      sampler.set_cross_chain_adaptation_params(num_iterations,
-                                                window_size, num_chains,
-                                                target_rhat, target_ess);
-    }
-
-    template <class Model, class RNG>
-    static void set_var_adaptation(mcmc::adapt_diag_e_nuts<Model, RNG>& sampler,
-                                               int num_params, int num_iterations, int window_size) {
-      sampler.set_cross_chain_var_adaptation(num_params, num_iterations, window_size);
-    }
-
-    template <class Model, class RNG>
-    static void set_var_adaptation(mcmc::adapt_unit_e_nuts<Model, RNG>& sampler,
-                                               int num_params, int num_iterations, int window_size) {
-      sampler.set_cross_chain_var_adaptation(num_params, num_iterations, window_size);
-    }
-
 #endif
   };
 }
