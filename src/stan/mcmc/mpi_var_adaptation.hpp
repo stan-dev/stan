@@ -58,7 +58,7 @@ public:
 #else
   public:
   mpi_var_adaptation(int n_params, int num_iterations, int window_size)
-    {}    
+    {}
 #endif
 };
 

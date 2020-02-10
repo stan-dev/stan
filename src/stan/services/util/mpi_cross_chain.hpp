@@ -6,6 +6,7 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 #include <string>
 
 #ifdef STAN_LANG_MPI
@@ -77,12 +78,22 @@ namespace util {
     }
 
     template <class Model, class RNG>
+    static bool end_transitions(mcmc::adapt_dense_e_nuts<Model, RNG>& sampler) {
+      return !sampler.is_post_cross_chain() && sampler.is_cross_chain_adapted();
+    }
+
+    template <class Model, class RNG>
     static int num_post_warmup(mcmc::adapt_diag_e_nuts<Model, RNG>& sampler) {
       return sampler.num_post_warmup;
     }
 
     template <class Model, class RNG>
     static int num_post_warmup(mcmc::adapt_unit_e_nuts<Model, RNG>& sampler) {
+      return sampler.num_post_warmup;
+    }
+
+    template <class Model, class RNG>
+    static int num_post_warmup(mcmc::adapt_dense_e_nuts<Model, RNG>& sampler) {
       return sampler.num_post_warmup;
     }
 
@@ -96,6 +107,11 @@ namespace util {
       return sampler.num_cross_chain_draws();
     }
     
+    template <class Model, class RNG>
+    static int num_draws(mcmc::adapt_dense_e_nuts<Model, RNG>& sampler) {
+      return sampler.num_cross_chain_draws();
+    }
+
     template <class Model, class RNG>
     static void write_num_warmup(mcmc::adapt_diag_e_nuts<Model, RNG>& sampler,
                                  callbacks::writer& sample_writer,
@@ -111,12 +127,24 @@ namespace util {
     }
 
     template <class Model, class RNG>
+    static void write_num_warmup(mcmc::adapt_dense_e_nuts<Model, RNG>& sampler,
+                                 callbacks::writer& sample_writer,
+                                 int num_thin) {
+      sampler.write_num_cross_chain_warmup(sample_writer, num_thin);      
+    }
+
+    template <class Model, class RNG>
     static void set_post_iter(mcmc::adapt_diag_e_nuts<Model, RNG>& sampler) {
       sampler.set_post_cross_chain();
     }
 
     template <class Model, class RNG>
     static void set_post_iter(mcmc::adapt_unit_e_nuts<Model, RNG>& sampler) {
+      sampler.set_post_cross_chain();
+    }
+
+    template <class Model, class RNG>
+    static void set_post_iter(mcmc::adapt_dense_e_nuts<Model, RNG>& sampler) {
       sampler.set_post_cross_chain();
     }
 #endif

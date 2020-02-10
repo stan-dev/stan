@@ -4,6 +4,10 @@
 #include <stan/math/prim/mat.hpp>
 #include <vector>
 
+#ifdef STAN_LANG_MPI
+#include <stan/math/mpi/envionment.hpp>
+#endif
+
 namespace stan {
 
 namespace mcmc {

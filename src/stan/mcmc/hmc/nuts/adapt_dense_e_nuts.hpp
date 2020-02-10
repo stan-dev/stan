@@ -4,6 +4,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/stepsize_covar_adapter.hpp>
 #include <stan/mcmc/hmc/nuts/dense_e_nuts.hpp>
+#include <stan/mcmc/hmc/mpi_cross_chain_adapter.hpp>
 
 namespace stan {
 namespace mcmc {
@@ -14,6 +15,7 @@ namespace mcmc {
  */
 template <class Model, class BaseRNG>
 class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
+                          public mpi_cross_chain_adapter<adapt_dense_e_nuts<Model, BaseRNG>>,
                            public stepsize_covar_adapter {
  public:
   adapt_dense_e_nuts(const Model& model, BaseRNG& rng)
@@ -31,6 +33,12 @@ class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
 
       bool update = this->covar_adaptation_.learn_covariance(
           this->z_.inv_e_metric_, this->z_.q);
+
+      // cross-chain adaptation
+      this -> add_cross_chain_sample(s.log_prob());
+      this -> cross_chain_adaptation(logger);
+      if (this -> is_cross_chain_adapted()) update = false;
+      // cross-chain adaptation
 
       if (update) {
         this->init_stepsize(logger);
