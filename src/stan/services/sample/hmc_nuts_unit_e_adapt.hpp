@@ -77,8 +77,8 @@ int hmc_nuts_unit_e_adapt(
   sampler.set_cross_chain_adaptation_params(num_warmup,
                                             cross_chain_window, num_cross_chains,
                                             cross_chain_rhat, cross_chain_ess);
-  mcmc::mpi_var_adaptation var_adapt(model.num_params_r(), num_warmup, cross_chain_window);
-  sampler.set_cross_chain_metric_adaptation(&var_adapt);
+  mcmc::mpi_metric_adaptation dummy_adapt;
+  sampler.set_cross_chain_metric_adaptation(&dummy_adapt);
 
 
   util::run_adaptive_sampler(

@@ -72,7 +72,7 @@ namespace util {
     }
 
     static int num_post_warmup(Sampler& sampler) {
-      return sampler.num_post_warmup;
+      return sampler.is_cross_chain_adapted()? sampler.num_post_warmup : 0;
     }
 
     static int num_draws(Sampler& sampler) {
