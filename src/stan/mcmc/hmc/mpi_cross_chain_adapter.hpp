@@ -277,7 +277,7 @@ namespace mcmc {
               }
             }
 
-            for (int win = 0; win < win_count; ++win) {
+            for (int win = win_count - 1; win >= 0; --win) {
               accumulator_set<double, stats<variance>> acc_chain_mean;
               accumulator_set<double, stats<mean>> acc_chain_var;
               accumulator_set<double, stats<mean>> acc_step;
