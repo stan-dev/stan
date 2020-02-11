@@ -121,16 +121,15 @@ namespace util {
   /*
    * modify cmdstan::command seed
    */
-  void set_cross_chain_seed(unsigned int& seed, int num_chains) {
+  void set_cross_chain_id(unsigned int& id, int num_chains) {
 #ifdef MPI_ADAPTED_WARMUP
     using stan::math::mpi::Session;
     using stan::math::mpi::Communicator;
 
     const Communicator& inter_comm = Session::inter_chain_comm(num_chains);
     const Communicator& intra_comm = Session::intra_chain_comm(num_chains);
-    MPI_Bcast(&seed, 1, MPI_UNSIGNED, 0, MPI_COMM_STAN);
-    seed += inter_comm.rank();
-    MPI_Bcast(&seed, 1, MPI_UNSIGNED, 0, intra_comm.comm());
+    id = inter_comm.rank();
+    MPI_Bcast(&id, 1, MPI_UNSIGNED, 0, intra_comm.comm());
 #endif
   }
 
