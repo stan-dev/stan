@@ -419,14 +419,15 @@ namespace mcmc {
                        NULL, 0, MPI_DOUBLE, 0, comm.comm());
           }
           MPI_Bcast(&adapted_win, 1, MPI_INT, 0, comm.comm());
+          chain_stepsize = 1.0/(chain_stepsize * chain_stepsize); // harmonic mean
           if (adapted_win >= 0) {
             MPI_Allreduce(&chain_stepsize, &new_stepsize, 1, MPI_DOUBLE, MPI_SUM, comm.comm());
-            new_stepsize /= num_chains_;
+            new_stepsize = sqrt(num_chains_ / new_stepsize);
             var_adapt -> learn_metric(sampler.z().inv_e_metric_, adapted_win, win_count, comm);
             std::cout << "cross chain win: " << adapted_win + 1 << "\n";
           } else {
             MPI_Allreduce(&chain_stepsize, &new_stepsize, 1, MPI_DOUBLE, MPI_SUM, comm.comm());
-            new_stepsize /= -num_chains_;
+            new_stepsize = -sqrt(num_chains_ / new_stepsize);
             var_adapt -> learn_metric(sampler.z().inv_e_metric_, std::abs(adapted_win)-1, win_count, comm);
             std::cout << "cross chain win: " << std::abs(adapted_win) << "\n";
           }
@@ -458,6 +459,8 @@ namespace mcmc {
     inline void cross_chain_adaptation(callbacks::logger& logger) {}
 
     inline bool is_cross_chain_adapted() { return false; }
+
+    inline bool is_cross_chain_adapt_window_end() { return false; }
   };
   
 #endif
