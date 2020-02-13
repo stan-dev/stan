@@ -45,7 +45,7 @@ public:
     covar = (n / (n + 5.0)) * covar
       + 1e-3 * (5.0 / (n + 5.0))
       * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
-    restart();
+    // restart();
   }
 
   virtual void restart() {

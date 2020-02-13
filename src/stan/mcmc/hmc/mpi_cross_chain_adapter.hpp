@@ -45,7 +45,6 @@ namespace mcmc {
     Eigen::ArrayXd rhat_;
     Eigen::ArrayXd ess_;
     mpi_metric_adaptation* var_adapt;
-
   public:
     const static int num_post_warmup = 50;
 
@@ -143,7 +142,6 @@ namespace mcmc {
         if (!is_adapted_) {
           int n_win = current_cross_chain_window_counter();
 
-          Sampler& sampler = static_cast<Sampler&>(*this);
           bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
           if (is_inter_rank) {
             lp_draws_[i] = s;
@@ -330,7 +328,7 @@ namespace mcmc {
       }
     }
 
-    inline void cross_chain_adaptation(callbacks::logger& logger) {
+    inline bool cross_chain_adaptation(callbacks::logger& logger) {
       using boost::accumulators::accumulator_set;
       using boost::accumulators::stats;
       using boost::accumulators::tag::mean;
@@ -419,28 +417,44 @@ namespace mcmc {
                        NULL, 0, MPI_DOUBLE, 0, comm.comm());
           }
           MPI_Bcast(&adapted_win, 1, MPI_INT, 0, comm.comm());
-          chain_stepsize = 1.0/(chain_stepsize * chain_stepsize); // harmonic mean
-          if (adapted_win >= 0) {
-            MPI_Allreduce(&chain_stepsize, &new_stepsize, 1, MPI_DOUBLE, MPI_SUM, comm.comm());
-            new_stepsize = sqrt(num_chains_ / new_stepsize);
-            var_adapt -> learn_metric(sampler.z().inv_e_metric_, adapted_win, win_count, comm);
-            std::cout << "cross chain win: " << adapted_win + 1 << "\n";
-          } else {
-            MPI_Allreduce(&chain_stepsize, &new_stepsize, 1, MPI_DOUBLE, MPI_SUM, comm.comm());
-            new_stepsize = -sqrt(num_chains_ / new_stepsize);
-            var_adapt -> learn_metric(sampler.z().inv_e_metric_, std::abs(adapted_win)-1, win_count, comm);
-            std::cout << "cross chain win: " << std::abs(adapted_win) << "\n";
-          }
+          is_adapted_ = adapted_win >= 0;
+          int max_ess_win = is_adapted_ ? adapted_win : (-adapted_win - 1);
+          var_adapt -> learn_metric(sampler.z().inv_e_metric_, max_ess_win, win_count, comm);
+          std::cout << "cross chain win: " << max_ess_win + 1 << "\n";
         }
         const Communicator& intra_comm = Session::intra_chain_comm(num_chains_);
-        MPI_Bcast(&new_stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
-        is_adapted_ = new_stepsize > 0.0;
-        chain_stepsize = std::abs(new_stepsize);
+        MPI_Bcast(&is_adapted_, 1, MPI_C_BOOL, 0, intra_comm.comm());
         MPI_Bcast(sampler.z().inv_e_metric_.data(),
                   sampler.z().inv_e_metric_.size(), MPI_DOUBLE, 0, intra_comm.comm());
-        sampler.set_nominal_stepsize(chain_stepsize);
+        if (is_adapted_) {
+          set_cross_chain_stepsize();
+        }
+        return true;
+      } else {
+        return false;
       }
     }
+
+    inline void set_cross_chain_stepsize() {
+      using stan::math::mpi::Session;
+      using stan::math::mpi::Communicator;
+
+      const Communicator& comm = Session::inter_chain_comm(num_chains_);
+      bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
+      double new_stepsize;
+      Sampler& sampler = static_cast<Sampler&>(*this);
+      if (is_inter_rank) {
+        double chain_stepsize = sampler.get_nominal_stepsize();
+        chain_stepsize = 1.0/(chain_stepsize * chain_stepsize); // harmonic mean
+        MPI_Allreduce(&chain_stepsize, &new_stepsize, 1, MPI_DOUBLE, MPI_SUM, comm.comm());
+        new_stepsize = sqrt(num_chains_ / new_stepsize);
+      }
+      const Communicator& intra_comm = Session::intra_chain_comm(num_chains_);
+      MPI_Bcast(&new_stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
+      sampler.set_nominal_stepsize(new_stepsize);
+    }
+
+    inline bool use_cross_chain_adapt() { return true; }
   };
 
 #else  // sequential version
@@ -456,11 +470,13 @@ namespace mcmc {
                                                   double target_rhat, double target_ess) {}
     inline void add_cross_chain_sample(double s) {}
 
-    inline void cross_chain_adaptation(callbacks::logger& logger) {}
+    inline bool cross_chain_adaptation(callbacks::logger& logger) { return false; }
 
     inline bool is_cross_chain_adapted() { return false; }
 
-    inline bool is_cross_chain_adapt_window_end() { return false; }
+    inline void set_cross_chain_stepsize() {}
+
+    inline bool use_cross_chain_adapt() { return false; }
   };
   
 #endif
