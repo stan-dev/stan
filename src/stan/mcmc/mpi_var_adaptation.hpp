@@ -46,7 +46,6 @@ public:
     double n = static_cast<double>(estimators[win].sample_variance(var, comm));
     var = (n / (n + 5.0)) * var
       + 1e-3 * (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
-    restart();
   }
 
   virtual void restart() {
