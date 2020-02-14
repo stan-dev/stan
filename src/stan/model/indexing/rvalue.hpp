@@ -45,7 +45,7 @@ inline T rvalue(T c, const nil_index_list& /*idx*/, const char* /*name*/ = "",
  */
 template <typename T, typename = require_not_stan_scalar_t<T>>
 inline decltype(auto) rvalue(T&& c, const nil_index_list& /*idx*/,
-                     const char* /*name*/ = "", int /*depth*/ = 0) {
+                             const char* /*name*/ = "", int /*depth*/ = 0) {
   return std::forward<T>(c);
 }
 
