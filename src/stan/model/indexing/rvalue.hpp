@@ -28,7 +28,7 @@ namespace model {
  * @return Input value.
  */
 template <typename T, typename = require_stan_scalar_t<T>>
-inline T rvalue(T&& c, const nil_index_list& /*idx*/, const char* /*name*/ = "",
+inline T rvalue(T c, const nil_index_list& /*idx*/, const char* /*name*/ = "",
                 int /*depth*/ = 0) {
   return c;
 }
@@ -44,7 +44,7 @@ inline T rvalue(T&& c, const nil_index_list& /*idx*/, const char* /*name*/ = "",
  * @return Input value.
  */
 template <typename T, typename = require_not_stan_scalar_t<T>>
-inline auto&& rvalue(T&& c, const nil_index_list& /*idx*/,
+inline decltype(auto) rvalue(T&& c, const nil_index_list& /*idx*/,
                      const char* /*name*/ = "", int /*depth*/ = 0) {
   return std::forward<T>(c);
 }
@@ -265,8 +265,7 @@ inline auto rvalue(
     const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
-  auto&& r = a.row(m - 1);
-  return rvalue(r, idx.tail_);
+  return rvalue(a.row(m - 1), idx.tail_);
 }
 
 /**
