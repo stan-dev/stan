@@ -17,13 +17,14 @@ namespace mcmc {
 #ifdef STAN_LANG_MPI
   using est_t = stan::math::mpi::mpi_var_estimator;
 
+  int init_draw_counter;
 public:
   std::vector<est_t> estimators;
 
   mpi_var_adaptation() = default;
 
   mpi_var_adaptation(int n_params, int max_num_windows)
-    : estimators(max_num_windows, est_t(n_params))
+    : init_draw_counter(0), estimators(max_num_windows, est_t(n_params))
   {}
 
   mpi_var_adaptation(int n_params, int num_iterations, int window_size)
@@ -31,8 +32,11 @@ public:
   {}
 
   virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
-    for (int win = 0; win < curr_win_count; ++win) {
-      estimators[win].add_sample(q);
+    init_draw_counter++;
+    if (init_draw_counter > init_bufer_size) {
+      for (int win = 0; win < curr_win_count; ++win) {
+        estimators[win].add_sample(q);
+      }
     }
   }
 
