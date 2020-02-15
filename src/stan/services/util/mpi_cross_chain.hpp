@@ -141,9 +141,9 @@ namespace util {
     using stan::math::mpi::Session;
     using stan::math::mpi::Communicator;
 
-    if (Session::is_in_inter_chain_comm(num_chains)) {
+    if (file_name.size() > 0 && num_chains > 1 && Session::is_in_inter_chain_comm(num_chains)) {
       const Communicator& comm = Session::inter_chain_comm(num_chains);
-      file_name = "mpi." + std::to_string(comm.rank()) + "." + file_name;
+      file_name = file_name + "." + "mpi." + std::to_string(comm.rank());
     }
 #endif
   }
