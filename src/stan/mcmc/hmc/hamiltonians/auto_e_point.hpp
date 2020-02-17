@@ -34,18 +34,6 @@ namespace stan {
       }
 
       /**
-       * Copy constructor which does fast copy of inverse mass matrix.
-       *
-       * @param z point to copy
-       */
-      auto_e_point(const auto_e_point& z)
-        : ps_point(z), inv_e_metric_(z.inv_e_metric_.rows(),
-                                     z.inv_e_metric_.cols()) {
-        fast_matrix_copy_<double>(inv_e_metric_, z.inv_e_metric_);
-	is_diagonal_ = z.is_diagonal_;
-      }
-
-      /**
        * Set elements of mass matrix
        *
        * @param inv_e_metric initial mass matrix

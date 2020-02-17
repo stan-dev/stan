@@ -44,8 +44,9 @@ namespace mcmc {
                                          boost::accumulators::features<boost::accumulators::tag::count> > draw_count_acc_;
     Eigen::ArrayXd rhat_;
     Eigen::ArrayXd ess_;
-    mpi_metric_adaptation* var_adapt;
   public:
+    mpi_metric_adaptation* var_adapt;
+
     const static int num_post_warmup = 50;
 
     mpi_cross_chain_adapter() = default;
@@ -212,120 +213,6 @@ namespace mcmc {
       message << " ESS: " << std::fixed << ess_[win];
 
       logger.info(message);
-    }
-
-    /*
-     * @tparam Sampler sampler class
-     * @param[in] m_win number of windows
-     * @param[in] window_size window size
-     * @param[in] num_chains number of chains
-     * @param[in,out] chain_gather gathered information from each chain,
-     *                must have enough capacity to store up to
-     *                maximum windows for all chains.
-     # @return vector {stepsize, rhat(only in rank 0)}
-    */
-    inline void cross_chain_adaptation_v1(callbacks::logger& logger) {
-      using boost::accumulators::accumulator_set;
-      using boost::accumulators::stats;
-      using boost::accumulators::tag::mean;
-      using boost::accumulators::tag::variance;
-
-      using stan::math::mpi::Session;
-      using stan::math::mpi::Communicator;
-
-      Sampler& sampler = static_cast<Sampler&>(*this);
-
-      if ((!is_adapted_) && is_cross_chain_adapt_window_end()) {
-        double chain_stepsize = sampler.get_nominal_stepsize();
-        bool is_inter_rank = Session::is_in_inter_chain_comm(num_chains_);
-        double invalid_stepsize = -999.0;
-        double new_stepsize = invalid_stepsize;
-        if (is_inter_rank) {
-          const Communicator& comm = Session::inter_chain_comm(num_chains_);
-
-          const int nd_win = 3; // mean, variance, chain_stepsize
-          const int win_count = current_cross_chain_window_counter();
-          int n_gather = nd_win * win_count + window_size_;
-          std::vector<double> chain_gather(n_gather, 0.0);
-          for (int win = 0; win < win_count; ++win) {
-            int num_draws = (win_count - win) * window_size_;
-            double unbiased_var_scale = num_draws / (num_draws - 1.0);
-            chain_gather[nd_win * win] = boost::accumulators::mean(lp_acc_[win]);
-            chain_gather[nd_win * win + 1] = boost::accumulators::variance(lp_acc_[win]) *
-              unbiased_var_scale;
-            chain_gather[nd_win * win + 2] = chain_stepsize;
-          }
-          std::copy(lp_draws_.begin(), lp_draws_.end(),
-                    chain_gather.begin() + nd_win * win_count);
-
-          rhat_ = Eigen::ArrayXd::Zero(max_num_windows_);
-          ess_ = Eigen::ArrayXd::Zero(max_num_windows_);
-          const int invalid_win = -999;
-          int adapted_win = invalid_win;
-
-          if (comm.rank() == 0) {
-            std::vector<double> all_chain_gather(n_gather * num_chains_);
-            MPI_Gather(chain_gather.data(), n_gather, MPI_DOUBLE,
-                       all_chain_gather.data(), n_gather, MPI_DOUBLE, 0, comm.comm());
-            int begin_row = (win_count - 1) * window_size_;
-            for (int chain = 0; chain < num_chains_; ++chain) {
-              int j = n_gather * chain + nd_win * win_count;
-              for (int i = 0; i < window_size_; ++i) {
-                all_lp_draws_(begin_row + i, chain) = all_chain_gather[j + i];
-              }
-            }
-
-            for (int win = win_count - 1; win >= 0; --win) {
-              accumulator_set<double, stats<variance>> acc_chain_mean;
-              accumulator_set<double, stats<mean>> acc_chain_var;
-              accumulator_set<double, stats<mean>> acc_step;
-              Eigen::VectorXd chain_mean(num_chains_);
-              Eigen::VectorXd chain_var(num_chains_);
-              for (int chain = 0; chain < num_chains_; ++chain) {
-                chain_mean(chain) = all_chain_gather[chain * n_gather + nd_win * win];
-                acc_chain_mean(chain_mean(chain));
-                chain_var(chain) = all_chain_gather[chain * n_gather + nd_win * win + 1];
-                acc_chain_var(chain_var(chain));
-                acc_step(all_chain_gather[chain * n_gather + nd_win * win + 2]);
-              }
-              size_t num_draws = (win_count - win) * window_size_;
-              double var_between = num_draws * boost::accumulators::variance(acc_chain_mean)
-                * num_chains_ / (num_chains_ - 1);
-              double var_within = boost::accumulators::mean(acc_chain_var);
-              rhat_(win) = sqrt((var_between / var_within + num_draws - 1) / num_draws);
-              ess_[win] = compute_effective_sample_size(win, win_count);
-              is_adapted_ = rhat_(win) < target_rhat_ && ess_[win] > target_ess_;
-
-              msg_adaptation(win, logger);
-
-              if (is_adapted_) {
-                adapted_win = win;
-                break;
-              }
-            }
-          } else {
-            MPI_Gather(chain_gather.data(), n_gather, MPI_DOUBLE,
-                       NULL, 0, MPI_DOUBLE, 0, comm.comm());
-          }
-          MPI_Bcast(&adapted_win, 1, MPI_INT, 0, comm.comm());
-          if (adapted_win >= 0) {
-            MPI_Allreduce(&chain_stepsize, &new_stepsize, 1, MPI_DOUBLE, MPI_SUM, comm.comm());
-            new_stepsize /= num_chains_;
-            var_adapt -> learn_metric(sampler.z().inv_e_metric_, adapted_win, win_count, comm);
-          }
-        }
-        const Communicator& intra_comm = Session::intra_chain_comm(num_chains_);
-        MPI_Bcast(&new_stepsize, 1, MPI_DOUBLE, 0, intra_comm.comm());
-        is_adapted_ = new_stepsize > 0.0;
-        if (is_adapted_) {
-          chain_stepsize = new_stepsize;
-          MPI_Bcast(sampler.z().inv_e_metric_.data(),
-                    sampler.z().inv_e_metric_.size(), MPI_DOUBLE, 0, intra_comm.comm());
-        }
-        if (is_adapted_) {
-          sampler.set_nominal_stepsize(chain_stepsize);
-        }
-      }
     }
 
     inline bool cross_chain_adaptation(callbacks::logger& logger) {
