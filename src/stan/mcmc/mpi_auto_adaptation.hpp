@@ -151,7 +151,6 @@ class mpi_auto_adaptation : public mpi_metric_adaptation {
   int n_params_;
   Model& model_;
   std::deque<Eigen::VectorXd> last_qs_;
-  int init_draw_counter_;
 public:
   est_t estimator;
   bool is_diagonal_;
@@ -160,25 +159,21 @@ public:
     : window_size_(window_size),
       n_params_(n_params),
       model_(model),
-      init_draw_counter_(0),
       estimator(n_params, num_iterations),
       is_diagonal_(false) {}
 
   virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
-    init_draw_counter++;
-    if (init_draw_counter > init_bufer_size) {
-      estimator.add_sample(q);
-      last_qs_.push_back(q);
-      if(last_qs_.size() > 5) {
-	last_qs_.pop_front();
-      }
+    estimator.add_sample(q);
+    last_qs_.push_back(q);
+    if(last_qs_.size() > 5) {
+      last_qs_.pop_front();
     }
   }
 
   virtual void learn_metric(Eigen::MatrixXd& covar, int win, int curr_win_count,
 			    const stan::math::mpi::Communicator& comm) {
-    int col_begin = win * window_size_;
-    int num_draws = (curr_win_count - win) * window_size_;
+    int col_begin = std::max(win * window_size_, init_bufer_size);
+    int num_draws = std::max(curr_win_count * window_size_ - col_begin, 0);
     
     int M = n_params_;
 
@@ -187,6 +182,8 @@ public:
       for(auto state : { "selection", "refinement" }) {
 	Eigen::MatrixXd cov_train = Eigen::MatrixXd::Zero(M, M);
 	Eigen::MatrixXd cov_test = Eigen::MatrixXd::Zero(M, M);
+
+	//std::cout << "col_begin: " << col_begin << ", num_draws: " << num_draws << std::endl;
 
 	int Ntest;
 	if(state == "selection") {
@@ -222,9 +219,6 @@ public:
 
 	  double low_eigenvalue_dense = -1.0 / internal::eigenvalue_scaled_covariance(L_dense, cov_test);
 	  double low_eigenvalue_diag = -1.0 / internal::eigenvalue_scaled_covariance(L_diag, cov_test);
-
-	  std::cout << "TRAIN low:" << low_eigenvalue_dense << std::endl;
-	  std::cout << "TEST low :" << low_eigenvalue_diag << std::endl;
 
 	  double c_dense = 0.0;
 	  double c_diag = 0.0;
@@ -263,8 +257,6 @@ public:
 	       + 1e-3 * (5.0 / (num_draws + 5.0)) * Eigen::VectorXd::Ones(cov.cols())).asDiagonal();
       is_diagonal_ = true;
     }
-
-    std::cout << covar << std::endl;
   }
 
   void learn_covariance(Eigen::MatrixXd& covar,

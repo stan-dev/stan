@@ -7,6 +7,7 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
+#include <stan/mcmc/hmc/nuts/adapt_auto_e_nuts.hpp>
 #include <string>
 
 #ifdef STAN_LANG_MPI
@@ -35,6 +36,11 @@ namespace util {
 
   template <class Model, class RNG>
   struct has_cross_chain_warmup<mcmc::adapt_dense_e_nuts<Model, RNG>> {
+    static const bool value = true;
+  };
+
+  template <class Model, class RNG>
+  struct has_cross_chain_warmup<mcmc::adapt_auto_e_nuts<Model, RNG>> {
     static const bool value = true;
   };
 
