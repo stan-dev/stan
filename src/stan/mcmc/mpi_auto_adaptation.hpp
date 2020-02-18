@@ -151,6 +151,7 @@ class mpi_auto_adaptation : public mpi_metric_adaptation {
   int n_params_;
   Model& model_;
   std::deque<Eigen::VectorXd> last_qs_;
+  int init_draw_counter_;
 public:
   est_t estimator;
   bool is_diagonal_;
@@ -159,23 +160,23 @@ public:
     : window_size_(window_size),
       n_params_(n_params),
       model_(model),
+      init_draw_counter_(0),
       estimator(n_params, num_iterations),
       is_diagonal_(false) {}
 
   virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
-    estimator.add_sample(q);
-    last_qs_.push_back(q);
-    if(last_qs_.size() > 5) {
-      last_qs_.pop_front();
+    init_draw_counter++;
+    if (init_draw_counter > init_bufer_size) {
+      estimator.add_sample(q);
+      last_qs_.push_back(q);
+      if(last_qs_.size() > 5) {
+	last_qs_.pop_front();
+      }
     }
   }
-    
+
   virtual void learn_metric(Eigen::MatrixXd& covar, int win, int curr_win_count,
 			    const stan::math::mpi::Communicator& comm) {
-    if(curr_win_count > 1) {
-      win = std::max(1, win);
-    }
-
     int col_begin = win * window_size_;
     int num_draws = (curr_win_count - win) * window_size_;
     
