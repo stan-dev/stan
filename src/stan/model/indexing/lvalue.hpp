@@ -137,7 +137,7 @@ inline void assign(LhsEigVec& x, const cons_index_list<I, nil_index_list>& idxs,
  * Assign the specified Eigen matrix at the specified single index
  * to the specified row vector value.
  *
- * Types:  mat[,uni] = rowvec
+ * Types:  mat[uni,] = rowvec
  *
  * @tparam EigMat Type of matrix to be assigned to.
  * @tparam RowVec Type of Eigen Row Vector to be assigned from.
