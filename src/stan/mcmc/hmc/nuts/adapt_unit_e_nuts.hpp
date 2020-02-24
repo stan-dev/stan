@@ -4,6 +4,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/hmc/nuts/unit_e_nuts.hpp>
 #include <stan/mcmc/stepsize_adapter.hpp>
+#include <stan/mcmc/hmc/mpi_cross_chain_adapter.hpp>
 
 namespace stan {
 namespace mcmc {
@@ -14,6 +15,7 @@ namespace mcmc {
  */
 template <class Model, class BaseRNG>
 class adapt_unit_e_nuts : public unit_e_nuts<Model, BaseRNG>,
+                          public mpi_cross_chain_adapter<adapt_unit_e_nuts<Model, BaseRNG>>,
                           public stepsize_adapter {
  public:
   adapt_unit_e_nuts(const Model& model, BaseRNG& rng)
