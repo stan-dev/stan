@@ -1,19 +1,21 @@
-#ifndef STAN_CALLBACKS_STREAM_WRITER_HPP
-#define STAN_CALLBACKS_STREAM_WRITER_HPP
+#ifndef STAN_CALLBACKS_MPI_STREAM_WRITER_HPP
+#define STAN_CALLBACKS_MPI_STREAM_WRITER_HPP
+
+#ifdef MPI_ADAPTED_WARMUP
 
 #include <stan/callbacks/writer.hpp>
+#include <stan/math/mpi/envionment.hpp>
 #include <ostream>
 #include <vector>
 #include <string>
 
 namespace stan {
   namespace callbacks {
-
     /**
-     * <code>stream_writer</code> is an implementation
+     * <code>mpi_stream_writer</code> is an implementation
      * of <code>writer</code> that writes to a stream.
      */
-    class stream_writer : public writer {
+    class mpi_stream_writer : public writer {
     public:
       /**
        * Constructs a stream writer with an output stream
@@ -23,14 +25,25 @@ namespace stan {
        * @param[in] comment_prefix string to stream before
        *   each comment line. Default is "".
        */
-      stream_writer(std::ostream& output,
-                    const std::string& comment_prefix = ""):
-        output_(output), comment_prefix_(comment_prefix) {}
+      mpi_stream_writer(int num_chains, std::ostream& output,
+                        const std::string& comment_prefix = "")
+        : num_chains_(num_chains), output_(output),
+          comment_prefix_(comment_prefix)
+      {}
 
       /**
        * Virtual destructor
        */
-      virtual ~stream_writer() {}
+      virtual ~mpi_stream_writer() {}
+
+      /**
+       * Set new value for @c num_chains_.
+       *
+       * @param[in] n new value of @c num_chains_
+       */
+      void set_num_chains(int n) {
+        num_chains_ = n;
+      }
 
       /**
        * Writes a set of names on a single line in csv format followed
@@ -60,7 +73,9 @@ namespace stan {
        * Writes the comment_prefix to the stream followed by a newline.
        */
       void operator()() {
-        output_ << comment_prefix_ << std::endl;
+        if (stan::math::mpi::Session::is_in_inter_chain_comm(num_chains_)) {
+          output_ << comment_prefix_ << std::endl;
+        }
       }
 
       /**
@@ -69,10 +84,18 @@ namespace stan {
        * @param[in] message A string
        */
       void operator()(const std::string& message) {
-        output_ << comment_prefix_ << message << std::endl;
+        if (stan::math::mpi::Session::is_in_inter_chain_comm(num_chains_)) {
+          output_ << comment_prefix_ << message << std::endl;
+        }
       }
 
     private:
+
+      /**
+       * nb. of chains that have its own output stream
+       */
+      int num_chains_;
+
       /**
        * Output stream
        */
@@ -93,18 +116,23 @@ namespace stan {
        */
       template <class T>
       void write_vector(const std::vector<T>& v) {
-        if (v.empty()) return;
+        if (stan::math::mpi::Session::is_in_inter_chain_comm(num_chains_)) {
+          if (v.empty()) return;
 
-        typename std::vector<T>::const_iterator last = v.end();
-        --last;
+          typename std::vector<T>::const_iterator last = v.end();
+          --last;
 
-        for (typename std::vector<T>::const_iterator it = v.begin();
-             it != last; ++it)
-          output_ << *it << ",";
-        output_ << v.back() << std::endl;
+          for (typename std::vector<T>::const_iterator it = v.begin();
+               it != last; ++it)
+            output_ << *it << ",";
+          output_ << v.back() << std::endl;
+        }
       }
     };
 
   }
 }
+
+#endif
+
 #endif

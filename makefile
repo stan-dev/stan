@@ -13,6 +13,7 @@ help:
 
 -include $(HOME)/.config/stan/make.local  # user-defined variables
 -include make/local                       # user-defined variables
+-include make/mpi_warmup.mk
 
 MATH ?= lib/stan_math/
 ifeq ($(OS),Windows_NT)
