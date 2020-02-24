@@ -33,7 +33,12 @@ def deleteDirWin() {
 def sourceCodePaths(){
     // These paths will be passed to git diff
     // If there are changes to them, CI/CD will continue else skip
-    def paths = ["lib/stan_math\\ ':(exclude)lib/stan_math/doxygen/*\'", 'make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py']
+    def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
+        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
+        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
+        'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
+    ]
+    
     def bashArray = ""
 
     for(path in paths){
