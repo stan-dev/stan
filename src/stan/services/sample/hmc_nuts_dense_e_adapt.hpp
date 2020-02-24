@@ -102,7 +102,8 @@ int hmc_nuts_dense_e_adapt(
   sampler.set_cross_chain_adaptation_params(num_warmup,
                                             cross_chain_window, num_cross_chains,
                                             cross_chain_rhat, cross_chain_ess);
-  mcmc::mpi_covar_adaptation var_adapt(model.num_params_r(), num_warmup, cross_chain_window);
+  mcmc::mpi_covar_adaptation var_adapt(model.num_params_r(),
+                                       num_cross_chains, num_warmup, cross_chain_window);
   sampler.set_cross_chain_metric_adaptation(&var_adapt);
 
   util::run_adaptive_sampler(
