@@ -63,7 +63,8 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
  * @param[in] name name of lvalue variable (default "ANON").
  * @param[in] depth indexing depth (default 0).
  */
-template <typename Vec1, typename Vec2, typename = require_all_std_vector_t<Vec1, Vec2>>
+template <typename Vec1, typename Vec2,
+ typename = require_all_std_vector_t<Vec1, Vec2>>
 inline void assign(Vec1&& x, const nil_index_list& /* idxs */,
                    Vec2&& y, const char* name = "ANON",
                    int depth = 0) {
