@@ -622,7 +622,17 @@ TEST(model_indexing, assign_result_size_neg_index) {
   EXPECT_EQ(0, lhs.size());
 }
 
-TEST(model_indexing, assign_double_to_var_simple) {
+TEST(model_indexing, assign_double_to_var_scalar) {
+  using stan::math::var;
+  using stan::model::nil_index_list;
+  double a = 5;
+  var b;
+  assign(b, nil_index_list(), a);
+    EXPECT_FLOAT_EQ(a, b.val());
+}
+
+
+TEST(model_indexing, assign_double_to_var_matrix) {
   using stan::math::var;
   using stan::model::nil_index_list;
   typedef Eigen::MatrixXd mat_d;
@@ -634,5 +644,21 @@ TEST(model_indexing, assign_double_to_var_simple) {
   assign(b, nil_index_list(), a);
   for (int i = 0; i < a.size(); ++i) {
     EXPECT_FLOAT_EQ(a(i), b(i).val());
+  }
+}
+
+
+TEST(model_indexing, assign_double_to_var_vector) {
+  using stan::math::var;
+  using stan::model::nil_index_list;
+
+  std::vector<double> a(2);
+  for (int i = 0; i < a.size(); i++) {
+    a[i] = static_cast<double>(i);
+  }
+  std::vector<stan::math::var> b(2);
+  assign(b, nil_index_list(), a);
+  for (int i = 0; i < a.size(); ++i) {
+    EXPECT_FLOAT_EQ(a[i], b[i].val());
   }
 }

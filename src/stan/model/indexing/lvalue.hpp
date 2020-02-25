@@ -45,7 +45,8 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U y,
  * @param[in] depth Indexing depth (default 0; ignored
  */
 template <typename T, typename U,
-          typename = require_all_not_stan_scalar_t<U, T>>
+          typename = require_all_not_stan_scalar_t<U, T>,
+          typename = require_all_not_std_vector_t<U, T>>
 inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x = std::forward<U>(y);
@@ -62,9 +63,9 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
  * @param[in] name name of lvalue variable (default "ANON").
  * @param[in] depth indexing depth (default 0).
  */
-template <typename T, typename U>
-inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
-                   const std::vector<U>& y, const char* name = "ANON",
+template <typename Vec1, typename Vec2, typename = require_all_std_vector_t<Vec1, Vec2>>
+inline void assign(Vec1&& x, const nil_index_list& /* idxs */,
+                   Vec2&& y, const char* name = "ANON",
                    int depth = 0) {
   x.resize(y.size());
   for (size_t i = 0; i < y.size(); ++i) {
