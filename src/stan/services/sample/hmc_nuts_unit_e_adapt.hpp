@@ -75,6 +75,8 @@ int hmc_nuts_unit_e_adapt(
 
   // cross chain adaptation setup
   sampler.set_cross_chain_adaptation_params(num_warmup,
+                                            std::numeric_limits<int>::max(),
+                                            std::numeric_limits<int>::max(),
                                             cross_chain_window, num_cross_chains,
                                             cross_chain_rhat, cross_chain_ess);
   mcmc::mpi_metric_adaptation dummy_adapt;

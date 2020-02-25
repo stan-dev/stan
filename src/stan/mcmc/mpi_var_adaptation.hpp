@@ -33,10 +33,8 @@ public:
 
   virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
     init_draw_counter++;
-    if (init_draw_counter > init_bufer_size) {
-      for (int win = 0; win < curr_win_count; ++win) {
-        estimators[win].add_sample(q);
-      }
+    for (int win = 0; win < curr_win_count; ++win) {
+      estimators[win].add_sample(q);
     }
   }
 

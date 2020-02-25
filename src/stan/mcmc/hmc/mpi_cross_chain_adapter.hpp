@@ -30,6 +30,8 @@ namespace mcmc {
   protected:
     bool is_adapted_;
     int term_buffer_counter_;
+    int init_buffer_;
+    int term_buffer_;
     int window_size_; 
     int num_chains_;
     int max_num_windows_;
@@ -44,9 +46,8 @@ namespace mcmc {
                                          boost::accumulators::features<boost::accumulators::tag::count> > draw_count_acc_;
     Eigen::ArrayXd rhat_;
     Eigen::ArrayXd ess_;
-    mpi_metric_adaptation* var_adapt;
+    mpi_metric_adaptation* metric_adapt;
   public:
-    const static int term_buffer_ = 50;
 
     mpi_cross_chain_adapter() = default;
 
@@ -55,6 +56,8 @@ namespace mcmc {
                             double target_rhat, double target_ess) :
       is_adapted_(false),
       term_buffer_counter_(0),
+      init_buffer_(75),
+      term_buffer_(50),
       window_size_(window_size),
       num_chains_(num_chains),
       max_num_windows_(num_iterations / window_size),
@@ -68,14 +71,18 @@ namespace mcmc {
       ess_(Eigen::ArrayXd::Zero(max_num_windows_))
     {}
 
-    inline void set_cross_chain_metric_adaptation(mpi_metric_adaptation* ptr) {var_adapt = ptr;}
+    inline void set_cross_chain_metric_adaptation(mpi_metric_adaptation* ptr) {metric_adapt = ptr;}
 
     inline void set_cross_chain_adaptation_params(int num_iterations,
+                                                  int init_buffer,
+                                                  int term_buffer,
                                                   int window_size,
                                                   int num_chains,
                                                   double target_rhat, double target_ess) {
       is_adapted_ = false;
-      term_buffer_counter_ = 0,
+      term_buffer_counter_ = 0;
+      init_buffer_ = init_buffer;
+      term_buffer_ = term_buffer;
       window_size_ = window_size;
       num_chains_ = num_chains;
       max_num_windows_ = num_iterations / window_size;
@@ -99,7 +106,7 @@ namespace mcmc {
       draw_count_acc_ = {};
       rhat_ = Eigen::ArrayXd::Zero(max_num_windows_);
       ess_ = Eigen::ArrayXd::Zero(max_num_windows_);
-      var_adapt -> restart();
+      metric_adapt -> restart();
     }
 
     inline int max_num_windows() {return max_num_windows_;}
@@ -152,7 +159,9 @@ namespace mcmc {
             for (int win = 0; win < n_win; ++win) {
               lp_acc_[win](s);
             }
-            var_adapt -> add_sample(sampler.z().q, n_win);
+            if (num_cross_chain_draws() > init_buffer_) {
+              metric_adapt -> add_sample(sampler.z().q, n_win);
+            }
           }
         }
       }
@@ -322,7 +331,7 @@ namespace mcmc {
           if (adapted_win >= 0) {
             MPI_Allreduce(&chain_stepsize, &new_stepsize, 1, MPI_DOUBLE, MPI_SUM, comm.comm());
             new_stepsize /= num_chains_;
-            var_adapt -> learn_metric(sampler.z().inv_e_metric_, adapted_win, win_count, comm);
+            metric_adapt -> learn_metric(sampler.z().inv_e_metric_, adapted_win, win_count, comm);
           }
         }
         const Communicator& intra_comm = Session::intra_chain_comm(num_chains_);
@@ -430,7 +439,7 @@ namespace mcmc {
           MPI_Bcast(&adapted_win, 1, MPI_INT, 0, comm.comm());
           is_adapted_ = adapted_win >= 0;
           int max_ess_win = is_adapted_ ? adapted_win : (-adapted_win - 1);
-          var_adapt -> learn_metric(sampler.z().inv_e_metric_, max_ess_win, win_count, comm);
+          metric_adapt -> learn_metric(sampler.z().inv_e_metric_, max_ess_win, win_count, comm);
           std::cout << "cross chain win: " << max_ess_win + 1 << "\n";
         }
         const Communicator& intra_comm = Session::intra_chain_comm(num_chains_);
@@ -481,6 +490,8 @@ namespace mcmc {
     inline void set_cross_chain_metric_adaptation(mpi_metric_adaptation* ptr) {}
 
     inline void set_cross_chain_adaptation_params(int num_iterations,
+                                                  int init_buffer,
+                                                  int term_buffer,
                                                   int window_size,
                                                   int num_chains,
                                                   double target_rhat, double target_ess) {}

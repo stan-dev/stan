@@ -43,20 +43,17 @@ public:
       reqs.resize(window_size_);
     }
 
-  virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
-    const stan::math::mpi::Communicator& comm =
-      stan::math::mpi::Session::inter_chain_comm(num_chains_);
-    init_draw_counter_++;
-    if (init_draw_counter_ > init_bufer_size) {
+    virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
+      const stan::math::mpi::Communicator& comm =
+        stan::math::mpi::Session::inter_chain_comm(num_chains_);
       MPI_Iallgather(q.data(), q.size(), MPI_DOUBLE,
-                    draws[draw_req_counter_].data(), q.size(), MPI_DOUBLE,
+                     draws[draw_req_counter_].data(), q.size(), MPI_DOUBLE,
                      comm.comm(), &reqs[draw_req_counter_]);
       draw_req_counter_++;
       for (int win = 0; win < curr_win_count; ++win) {
         num_draws[win]++;
       }
     }
-  }
 
   virtual void learn_metric(Eigen::MatrixXd& covar, int win, int curr_win_count,
                             const stan::math::mpi::Communicator& comm) {
