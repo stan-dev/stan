@@ -56,8 +56,8 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
  * Assign the specified standard vector rvalue to the specified
  * standard vector lvalue.
  *
- * @tparam T lvalue container element type
- * @tparam U rvalue container element type, which must be assignable to `T`
+ * @tparam Vec1 vector type to be assigned to
+ * @tparam Vec2 vector type that must be assignable to `Vec1`
  * @param[in] x lvalue variable
  * @param[in] y rvalue variable
  * @param[in] name name of lvalue variable (default "ANON").
