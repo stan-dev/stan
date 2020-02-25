@@ -72,7 +72,6 @@ void generate_transitions(Sampler& sampler, int num_iterations,
 
     // check cross-chain convergence
     if (mpi_cross_chain<Sampler>::end_transitions(sampler)) {
-      mpi_cross_chain<Sampler>::set_post_iter(sampler);
       break;
     }
   }

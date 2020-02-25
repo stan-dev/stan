@@ -29,7 +29,7 @@ namespace mcmc {
   class mpi_cross_chain_adapter {
   protected:
     bool is_adapted_;
-    bool is_post_warmup_;
+    int term_buffer_counter_;
     int window_size_; 
     int num_chains_;
     int max_num_windows_;
@@ -46,7 +46,7 @@ namespace mcmc {
     Eigen::ArrayXd ess_;
     mpi_metric_adaptation* var_adapt;
   public:
-    const static int num_post_warmup = 50;
+    const static int term_buffer_ = 50;
 
     mpi_cross_chain_adapter() = default;
 
@@ -54,7 +54,7 @@ namespace mcmc {
                             int num_chains,
                             double target_rhat, double target_ess) :
       is_adapted_(false),
-      is_post_warmup_(false),
+      term_buffer_counter_(0),
       window_size_(window_size),
       num_chains_(num_chains),
       max_num_windows_(num_iterations / window_size),
@@ -75,7 +75,7 @@ namespace mcmc {
                                                   int num_chains,
                                                   double target_rhat, double target_ess) {
       is_adapted_ = false;
-      is_post_warmup_ = false,
+      term_buffer_counter_ = 0,
       window_size_ = window_size;
       num_chains_ = num_chains;
       max_num_windows_ = num_iterations / window_size;
@@ -92,7 +92,7 @@ namespace mcmc {
 
     inline void reset_cross_chain_adaptation() {
       is_adapted_ = false;
-      is_post_warmup_ = false,
+      term_buffer_counter_ = 0,
       lp_draws_.clear();
       lp_acc_.clear();
       lp_acc_.resize(max_num_windows_);
@@ -196,12 +196,19 @@ namespace mcmc {
       return is_adapted_;
     }
 
-    inline bool is_post_cross_chain() {
-      return is_post_warmup_;
-    }
-
-    inline void set_post_cross_chain() {
-      is_post_warmup_ = !is_post_warmup_;
+    /*
+     * if transition needs to be ended in @c generate_transitions()
+     * Once warmup converges and term buffer is finished we
+     * further increase counter by 1 so this function never
+     * returns true.
+     */
+    inline bool end_transitions() {
+      if (is_adapted_ && (term_buffer_counter_ == term_buffer_)) {
+        term_buffer_counter_++;
+        return true;
+      } else {
+        return false;
+      }
     }
 
     inline void msg_adaptation(int win, callbacks::logger& logger) {
@@ -435,6 +442,9 @@ namespace mcmc {
         }
         return true;
       } else {
+        if (is_adapted_) {
+          term_buffer_counter_++;          
+        }
         return false;
       }
     }

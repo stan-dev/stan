@@ -46,10 +46,6 @@ namespace util {
   struct mpi_cross_chain_impl {
     static bool end_transitions(Sampler& sampler) {return false;}
 
-    static void set_post_iter(Sampler& sampler) {}
-
-    static int num_post_warmup(Sampler& sampler) { return 0;}
-
     static int num_draws(Sampler& sampler) { return 0;}
 
     static void write_num_warmup(Sampler& sampler,
@@ -64,15 +60,7 @@ namespace util {
   template <class Sampler>
   struct mpi_cross_chain_impl<Sampler, true> {
     static bool end_transitions(Sampler& sampler) {
-      return !sampler.is_post_cross_chain() && sampler.is_cross_chain_adapted();
-    }
-
-    static void set_post_iter(Sampler& sampler) {
-      sampler.set_post_cross_chain();
-    }
-
-    static int num_post_warmup(Sampler& sampler) {
-      return sampler.is_cross_chain_adapted()? sampler.num_post_warmup : 0;
+      return sampler.end_transitions();
     }
 
     static int num_draws(Sampler& sampler) {
@@ -92,16 +80,6 @@ namespace util {
     static bool end_transitions(Sampler& sampler) {
       return mpi_cross_chain_impl<Sampler, has_cross_chain_warmup<Sampler>::value>::
         end_transitions(sampler);
-    }
-
-    static void set_post_iter(Sampler& sampler) {
-      mpi_cross_chain_impl<Sampler, has_cross_chain_warmup<Sampler>::value>::
-        set_post_iter(sampler);
-    }
-
-    static int num_post_warmup(Sampler& sampler) {
-      return mpi_cross_chain_impl<Sampler, has_cross_chain_warmup<Sampler>::value>::
-        num_post_warmup(sampler);
     }
 
     static int num_draws(Sampler& sampler) {
