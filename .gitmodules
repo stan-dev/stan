@@ -1,4 +1,4 @@
 [submodule "lib/stan_math"]
 	path = lib/stan_math
 	url = https://github.com/stan-dev/math.git
-        branch = mpi_warmup_framework
+        branch = mpi_warmup_v2
