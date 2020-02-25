@@ -628,9 +628,8 @@ TEST(model_indexing, assign_double_to_var_scalar) {
   double a = 5;
   var b;
   assign(b, nil_index_list(), a);
-    EXPECT_FLOAT_EQ(a, b.val());
+  EXPECT_FLOAT_EQ(a, b.val());
 }
-
 
 TEST(model_indexing, assign_double_to_var_matrix) {
   using stan::math::var;
@@ -646,7 +645,6 @@ TEST(model_indexing, assign_double_to_var_matrix) {
     EXPECT_FLOAT_EQ(a(i), b(i).val());
   }
 }
-
 
 TEST(model_indexing, assign_double_to_var_vector) {
   using stan::math::var;
