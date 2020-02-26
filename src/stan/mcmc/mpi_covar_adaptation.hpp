@@ -1,7 +1,6 @@
 #ifndef STAN_MCMC_MPI_COVAR_ADAPTATION_HPP
 #define STAN_MCMC_MPI_COVAR_ADAPTATION_HPP
 
-#include <stan/math/prim/mat.hpp>
 #include <stan/mcmc/mpi_metric_adaptation.hpp>
 #include <vector>
 
