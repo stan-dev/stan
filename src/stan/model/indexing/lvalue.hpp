@@ -46,7 +46,7 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U y,
  */
 template <typename T, typename U,
           typename = require_all_not_stan_scalar_t<U, T>,
-          typename = require_all_not_std_vector_t<U, T>>
+          typename = require_any_t<is_not_std_vector_t<U, T>, is_same_vt<U, T>>>
 inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x = std::forward<U>(y);
