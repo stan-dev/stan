@@ -57,7 +57,8 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
  * standard vector lvalue.
  *
  * @tparam Vec1 vector type to be assigned to
- * @tparam Vec2 vector type that must be assignable to `Vec1`
+ * @tparam Vec2 vector type with scalar that must be assignable to scalar out
+ *  `Vec1`.
  * @param[in] x lvalue variable
  * @param[in] y rvalue variable
  * @param[in] name name of lvalue variable (default "ANON").
