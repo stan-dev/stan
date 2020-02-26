@@ -48,8 +48,10 @@ namespace sample {
  */
 template <class Model>
 int hmc_nuts_unit_e_adapt(
-    Model& model, const stan::io::var_context& init, unsigned int random_seed,
-    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    Model& model, stan::io::var_context& init, unsigned int random_seed,
+    unsigned int chain, double init_radius,
+    int num_cross_chains, int cross_chain_window, double cross_chain_rhat, int cross_chain_ess,
+    int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, callbacks::interrupt& interrupt,
@@ -71,6 +73,16 @@ int hmc_nuts_unit_e_adapt(
   sampler.get_stepsize_adaptation().set_gamma(gamma);
   sampler.get_stepsize_adaptation().set_kappa(kappa);
   sampler.get_stepsize_adaptation().set_t0(t0);
+
+  // cross chain adaptation setup
+  sampler.set_cross_chain_adaptation_params(num_warmup,
+                                            std::numeric_limits<int>::max(),
+                                            std::numeric_limits<int>::max(),
+                                            cross_chain_window, num_cross_chains,
+                                            cross_chain_rhat, cross_chain_ess);
+  mcmc::mpi_metric_adaptation dummy_adapt;
+  sampler.set_cross_chain_metric_adaptation(&dummy_adapt);
+
 
   util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,

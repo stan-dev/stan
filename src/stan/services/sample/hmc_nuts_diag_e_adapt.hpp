@@ -55,9 +55,11 @@ namespace sample {
  */
 template <class Model>
 int hmc_nuts_diag_e_adapt(
-    Model& model, const stan::io::var_context& init,
-    const stan::io::var_context& init_inv_metric, unsigned int random_seed,
-    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    Model& model, stan::io::var_context& init,
+    stan::io::var_context& init_inv_metric, unsigned int random_seed,
+    unsigned int chain, double init_radius,
+    int num_cross_chains, int cross_chain_window, double cross_chain_rhat, int cross_chain_ess,
+    int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
@@ -94,6 +96,13 @@ int hmc_nuts_diag_e_adapt(
 
   sampler.set_window_params(num_warmup, init_buffer, term_buffer, window,
                             logger);
+
+  // cross chain adaptation
+  sampler.set_cross_chain_adaptation_params(num_warmup,  init_buffer, term_buffer,
+                                            cross_chain_window, num_cross_chains,
+                                            cross_chain_rhat, cross_chain_ess);
+  mcmc::mpi_var_adaptation var_adapt(model.num_params_r(), num_warmup, cross_chain_window);
+  sampler.set_cross_chain_metric_adaptation(&var_adapt);
 
   util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
@@ -135,8 +144,10 @@ int hmc_nuts_diag_e_adapt(
  */
 template <class Model>
 int hmc_nuts_diag_e_adapt(
-    Model& model, const stan::io::var_context& init, unsigned int random_seed,
-    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    Model& model, stan::io::var_context& init, unsigned int random_seed,
+    unsigned int chain, double init_radius,
+    int num_cross_chains, int cross_chain_window, double cross_chain_rhat, int cross_chain_ess,
+    int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
@@ -148,7 +159,8 @@ int hmc_nuts_diag_e_adapt(
   stan::io::var_context& unit_e_metric = dmp;
 
   return hmc_nuts_diag_e_adapt(
-      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
+      model, init, unit_e_metric, random_seed, chain, init_radius,
+      num_cross_chains, cross_chain_window, cross_chain_rhat, cross_chain_ess, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer);
