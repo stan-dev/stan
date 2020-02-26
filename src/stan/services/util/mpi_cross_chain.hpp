@@ -52,15 +52,11 @@ namespace util {
   struct mpi_cross_chain_impl {
     static bool end_transitions(Sampler& sampler) {return false;}
 
-    static void set_post_iter(Sampler& sampler) {}
-
-    static int num_post_warmup(Sampler& sampler) { return 0;}
-
     static int num_draws(Sampler& sampler) { return 0;}
 
     static void write_num_warmup(Sampler& sampler,
                                  callbacks::writer& sample_writer,
-                                 int num_thin) {}
+                                 int num_thin, int num_warmup) {}
   };
 
   /*
@@ -70,15 +66,7 @@ namespace util {
   template <class Sampler>
   struct mpi_cross_chain_impl<Sampler, true> {
     static bool end_transitions(Sampler& sampler) {
-      return !sampler.is_post_cross_chain() && sampler.is_cross_chain_adapted();
-    }
-
-    static void set_post_iter(Sampler& sampler) {
-      sampler.set_post_cross_chain();
-    }
-
-    static int num_post_warmup(Sampler& sampler) {
-      return sampler.is_cross_chain_adapted()? sampler.num_post_warmup : 0;
+      return sampler.end_transitions();
     }
 
     static int num_draws(Sampler& sampler) {
@@ -87,8 +75,8 @@ namespace util {
 
     static void write_num_warmup(Sampler& sampler,
                                  callbacks::writer& sample_writer,
-                                 int num_thin) {
-      sampler.write_num_cross_chain_warmup(sample_writer, num_thin);      
+                                 int num_thin, int num_warmup) {
+      sampler.write_num_cross_chain_warmup(sample_writer, num_thin, num_warmup);
     }
   };
 #endif
@@ -100,16 +88,6 @@ namespace util {
         end_transitions(sampler);
     }
 
-    static void set_post_iter(Sampler& sampler) {
-      mpi_cross_chain_impl<Sampler, has_cross_chain_warmup<Sampler>::value>::
-        set_post_iter(sampler);
-    }
-
-    static int num_post_warmup(Sampler& sampler) {
-      return mpi_cross_chain_impl<Sampler, has_cross_chain_warmup<Sampler>::value>::
-        num_post_warmup(sampler);
-    }
-
     static int num_draws(Sampler& sampler) {
       return mpi_cross_chain_impl<Sampler, has_cross_chain_warmup<Sampler>::value>::
         num_draws(sampler);
@@ -117,9 +95,9 @@ namespace util {
 
     static void write_num_warmup(Sampler& sampler,
                                  callbacks::writer& sample_writer,
-                                 int num_thin) {
+                                 int num_thin, int num_warmup) {
       mpi_cross_chain_impl<Sampler, has_cross_chain_warmup<Sampler>::value>::
-        write_num_warmup(sampler, sample_writer, num_thin);
+        write_num_warmup(sampler, sample_writer, num_thin, num_warmup);
     }
   };
 
@@ -147,7 +125,7 @@ namespace util {
     using stan::math::mpi::Session;
     using stan::math::mpi::Communicator;
 
-    if (file_name.size() > 0 && num_chains > 1 && Session::is_in_inter_chain_comm(num_chains)) {
+    if (file_name.size() > 0 && Session::is_in_inter_chain_comm(num_chains)) {
       const Communicator& comm = Session::inter_chain_comm(num_chains);
       file_name = file_name + "." + "mpi." + std::to_string(comm.rank());
     }

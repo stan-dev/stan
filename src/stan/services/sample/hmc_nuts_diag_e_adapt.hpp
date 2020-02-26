@@ -98,7 +98,7 @@ int hmc_nuts_diag_e_adapt(
                             logger);
 
   // cross chain adaptation
-  sampler.set_cross_chain_adaptation_params(num_warmup,
+  sampler.set_cross_chain_adaptation_params(num_warmup,  init_buffer, term_buffer,
                                             cross_chain_window, num_cross_chains,
                                             cross_chain_rhat, cross_chain_ess);
   mcmc::mpi_var_adaptation var_adapt(model.num_params_r(), num_warmup, cross_chain_window);
