@@ -16,6 +16,10 @@ class stepsize_adapter : public base_adapter {
     return stepsize_adaptation_;
   }
 
+  const stepsize_adaptation& get_stepsize_adaptation() const noexcept {
+    return stepsize_adaptation_;
+  }
+
  protected:
   stepsize_adaptation stepsize_adaptation_;
 };

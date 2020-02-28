@@ -4,7 +4,8 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/math/prim/fun.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
+#include <stan/io/var_context.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/adapt_dense_e_static_hmc.hpp>
 #include <stan/services/error_codes.hpp>
@@ -54,8 +55,8 @@ namespace sample {
  */
 template <class Model>
 int hmc_static_dense_e_adapt(
-    Model& model, stan::io::var_context& init,
-    stan::io::var_context& init_inv_metric, unsigned int random_seed,
+    Model& model, const stan::io::var_context& init,
+    const stan::io::var_context& init_inv_metric, unsigned int random_seed,
     unsigned int chain, double init_radius, int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, double int_time, double delta, double gamma,
@@ -135,7 +136,7 @@ int hmc_static_dense_e_adapt(
  */
 template <class Model>
 int hmc_static_dense_e_adapt(
-    Model& model, stan::io::var_context& init, unsigned int random_seed,
+    Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int chain, double init_radius, int num_warmup, int num_samples,
     int num_thin, bool save_warmup, int refresh, double stepsize,
     double stepsize_jitter, double int_time, double delta, double gamma,

@@ -1,10 +1,11 @@
 #ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_DIAG_E_ADAPT_HPP
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_DIAG_E_ADAPT_HPP
 
-#include <stan/math/prim/fun.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/io/var_context.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>

@@ -5,7 +5,7 @@
 #include <stan/io/reader.hpp>
 #include <stan/io/writer.hpp>
 
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 
 TEST(ioWriter, infBounds) {
   std::vector<int> theta_i;
