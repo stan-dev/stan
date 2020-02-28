@@ -1,8 +1,7 @@
 #ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_ADAPT_HPP
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_ADAPT_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/fun.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>

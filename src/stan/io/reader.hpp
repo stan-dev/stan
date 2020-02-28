@@ -2,7 +2,7 @@
 #define STAN_IO_READER_HPP
 
 #include <boost/throw_exception.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/fun.hpp>
 #include <stdexcept>
 #include <string>
 #include <vector>

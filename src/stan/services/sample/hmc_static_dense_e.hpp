@@ -4,8 +4,7 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/fun.hpp>
 #include <stan/mcmc/hmc/static/dense_e_static_hmc.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/run_sampler.hpp>

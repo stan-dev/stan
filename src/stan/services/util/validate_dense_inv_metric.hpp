@@ -2,7 +2,7 @@
 #define STAN_SERVICES_UTIL_VALIDATE_DENSE_INV_METRIC_HPP
 
 #include <stan/callbacks/logger.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/fun.hpp>
 
 namespace stan {
 namespace services {

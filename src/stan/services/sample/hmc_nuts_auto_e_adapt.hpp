@@ -1,8 +1,7 @@
 #ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_AUTO_E_ADAPT_HPP
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_AUTO_E_ADAPT_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/fun.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
@@ -108,10 +107,14 @@ namespace stan {
                                   window, logger);
 
 	// cross chain adaptation
-	sampler.set_cross_chain_adaptation_params(num_warmup,
+	sampler.set_cross_chain_adaptation_params(num_warmup, init_buffer, term_buffer,
 						  cross_chain_window, num_cross_chains,
 						  cross_chain_rhat, cross_chain_ess);
-	mcmc::mpi_auto_adaptation<Model> var_adapt(model, model.num_params_r(), num_warmup, cross_chain_window);
+	std::cout << "num warmup: " << num_warmup << std::endl;
+	std::cout << "cross chain window: " << cross_chain_window << std::endl;
+	mcmc::mpi_auto_adaptation<Model> var_adapt(model, model.num_params_r(),
+						   num_cross_chains, num_warmup,
+						   cross_chain_window, init_buffer);
 	sampler.set_cross_chain_metric_adaptation(&var_adapt);
 
         util::run_adaptive_sampler(sampler, model, cont_vector, num_warmup,

@@ -35,30 +35,32 @@ public:
       this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
 						s.accept_stat());
 
-      bool update;
       if (this -> use_cross_chain_adapt()) {
-	this -> add_cross_chain_sample(s.log_prob());
-	update = this -> cross_chain_adaptation(logger);
-	if (this -> is_cross_chain_adapted()) {
-	  update = false;
-	}
+        this -> add_cross_chain_sample(s.log_prob());
+        bool update = this -> cross_chain_adaptation(logger);
+        if (this -> is_cross_chain_adapted()) {
+          update = false;
+        }
+
+        if (update) {
+	  this->z_.is_diagonal_ = reinterpret_cast<mpi_auto_adaptation<Model> *>(this->metric_adapt)->is_diagonal_;
+
+          this->init_stepsize(logger);
+
+          this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
+          this->stepsize_adaptation_.restart();
+
+          this->set_cross_chain_stepsize();          
+        }
       } else {
-	update = this->covar_adaptation_.learn_covariance(this->z_.inv_e_metric_,
-							  this->z_.q);
-      }
+        bool update = this->covar_adaptation_.learn_covariance(this->z_.inv_e_metric_,
+							       this->z_.q);
+        if (update) {
+          this->init_stepsize(logger);
 
-      if (update) {
-	//std::cout << this->z_.inv_e_metric_ << std::endl;
-	this->z_.is_diagonal_ = reinterpret_cast<mpi_auto_adaptation<Model> *>(this->var_adapt)->is_diagonal_;
-
-	this->init_stepsize(logger);
-
-	this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
-	this->stepsize_adaptation_.restart();
-
-	if (this -> use_cross_chain_adapt()) {
-	  this->set_cross_chain_stepsize();          
-	}
+          this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
+          this->stepsize_adaptation_.restart();
+        }
       }
     }
     return s;

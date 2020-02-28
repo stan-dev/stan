@@ -7,7 +7,7 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/model/log_prob_grad.hpp>
-#include <stan/math/prim/arr/fun/sum.hpp>
+#include <stan/math/prim/fun/sum.hpp>
 #include <sstream>
 #include <string>
 #include <vector>

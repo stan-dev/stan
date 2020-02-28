@@ -2,7 +2,7 @@
 #define STAN_MCMC_HMC_HAMILTONIANS_AUTO_E_METRIC_HPP
 
 #include <stan/callbacks/logger.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/fun.hpp>
 #include <stan/mcmc/hmc/hamiltonians/base_hamiltonian.hpp>
 #include <stan/mcmc/hmc/hamiltonians/auto_e_point.hpp>
 #include <boost/random/variate_generator.hpp>

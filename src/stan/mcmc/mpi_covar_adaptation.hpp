@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_MPI_COVAR_ADAPTATION_HPP
 #define STAN_MCMC_MPI_COVAR_ADAPTATION_HPP
 
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/fun.hpp>
 #include <stan/mcmc/mpi_metric_adaptation.hpp>
 #include <vector>
 
@@ -13,7 +13,7 @@ namespace stan {
 
 namespace mcmc {
 
-  class mpi_covar_adaptation : public mpi_metric_adaptation {
+class mpi_covar_adaptation : public mpi_metric_adaptation {
 #ifdef STAN_LANG_MPI
   // using est_t = stan::math::mpi::mpi_covar_estimator;
   using est_t = stan::math::welford_covar_estimator;
@@ -37,23 +37,23 @@ public:
       num_draws(num_iterations / window_size, 0)
   {}
 
-    void reset_req() {
-      draw_req_counter_ = 0;
-      reqs.clear();
-      reqs.resize(window_size_);
-    }
+  void reset_req() {
+    draw_req_counter_ = 0;
+    reqs.clear();
+    reqs.resize(window_size_);
+  }
 
-    virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
-      const stan::math::mpi::Communicator& comm =
-        stan::math::mpi::Session::inter_chain_comm(num_chains_);
-      MPI_Iallgather(q.data(), q.size(), MPI_DOUBLE,
-                     draws[draw_req_counter_].data(), q.size(), MPI_DOUBLE,
-                     comm.comm(), &reqs[draw_req_counter_]);
-      draw_req_counter_++;
-      for (int win = 0; win < curr_win_count; ++win) {
-        num_draws[win]++;
-      }
+  virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
+    const stan::math::mpi::Communicator& comm =
+      stan::math::mpi::Session::inter_chain_comm(num_chains_);
+    MPI_Iallgather(q.data(), q.size(), MPI_DOUBLE,
+		   draws[draw_req_counter_].data(), q.size(), MPI_DOUBLE,
+		   comm.comm(), &reqs[draw_req_counter_]);
+    draw_req_counter_++;
+    for (int win = 0; win < curr_win_count; ++win) {
+      num_draws[win]++;
     }
+  }
 
   virtual void learn_metric(Eigen::MatrixXd& covar, int win, int curr_win_count,
                             const stan::math::mpi::Communicator& comm) {

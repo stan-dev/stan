@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_MPI_METRIC_ADAPTATION_HPP
 #define STAN_MCMC_MPI_METRIC_ADAPTATION_HPP
 
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/fun.hpp>
 #include <vector>
 
 #ifdef STAN_LANG_MPI

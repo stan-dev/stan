@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
-#include <stan/math/prim/scal.hpp>
+#include <stan/math/prim/fun.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <algorithm>

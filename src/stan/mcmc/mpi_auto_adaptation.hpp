@@ -1,13 +1,9 @@
 #ifndef STAN_MCMC_MPI_AUTO_ADAPTATION_HPP
 #define STAN_MCMC_MPI_AUTO_ADAPTATION_HPP
 
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim/fun.hpp>
 #include <stan/mcmc/mpi_metric_adaptation.hpp>
 #include <vector>
-
-#ifdef STAN_LANG_MPI
-#include <stan/math/mpi/mpi_covar_estimator.hpp>
-#endif
 
 namespace stan {
 
@@ -147,23 +143,60 @@ class mpi_auto_adaptation : public mpi_metric_adaptation {
 #ifdef STAN_LANG_MPI
   using est_t = stan::math::mpi::mpi_covar_estimator;
 
-  int window_size_;
+  int num_chains_;
   int n_params_;
+  int window_size_;
+  int init_buffer_;
+  int init_draw_counter_;
+  int num_iterations_;
+  int draw_req_counter_;
+  int draws_collected_counter_;
   Model& model_;
   std::deque<Eigen::VectorXd> last_qs_;
 public:
-  est_t estimator;
+  std::vector<MPI_Request> reqs;
+  std::vector<Eigen::MatrixXd> draws;
+  std::vector<size_t> num_draws;
+  Eigen::MatrixXd Y_;
   bool is_diagonal_;
 
-  mpi_auto_adaptation(Model& model, int n_params, int num_iterations, int window_size)
-    : window_size_(window_size),
+  mpi_auto_adaptation(Model& model, int n_params, int num_chains,
+		      int num_iterations, int window_size, int init_buffer)
+    : num_chains_(num_chains),
+      window_size_(window_size),
+      init_buffer_(init_buffer),
+      init_draw_counter_(0),
+      draw_req_counter_(0),
+      draws_collected_counter_(0),
       n_params_(n_params),
+      reqs(window_size),
+      num_iterations_(num_iterations),
       model_(model),
-      estimator(n_params, num_iterations),
-      is_diagonal_(false) {}
+      draws(window_size, Eigen::MatrixXd(n_params, num_chains)),
+      Y_(num_chains * num_iterations, n_params),
+      is_diagonal_(false) {
+    std::cout << "numchains " << num_chains_ <<
+      ", n_params " << n_params_ <<
+      ", num_iter " << num_iterations_ <<
+      ", window_size " << window_size_ <<
+      ", init_buffer " << init_buffer_ << std::endl;
+  }
+
+  void reset_req() {
+    draw_req_counter_ = 0;
+    reqs.clear();
+    reqs.resize(window_size_);
+  }
 
   virtual void add_sample(const Eigen::VectorXd& q, int curr_win_count) {
-    estimator.add_sample(q);
+    const stan::math::mpi::Communicator& comm =
+      stan::math::mpi::Session::inter_chain_comm(num_chains_);
+
+    MPI_Iallgather(q.data(), q.size(), MPI_DOUBLE,
+		   draws[draw_req_counter_].data(), q.size(), MPI_DOUBLE,
+		   comm.comm(), &reqs[draw_req_counter_]);
+    draw_req_counter_++;
+
     last_qs_.push_back(q);
     if(last_qs_.size() > 5) {
       last_qs_.pop_front();
@@ -172,9 +205,13 @@ public:
 
   virtual void learn_metric(Eigen::MatrixXd& covar, int win, int curr_win_count,
 			    const stan::math::mpi::Communicator& comm) {
-    int col_begin = std::max(win * window_size_, init_bufer_size);
-    int num_draws = std::max(curr_win_count * window_size_ - col_begin, 0);
+    //std::cout << "win: " << win << ", current_win_count: " << curr_win_count << std::endl << std::flush;
+    collect_draws(win, comm);
     
+    int first_draw = num_chains_ * (std::max(win - 1, 0) * window_size_ + (win > 0) * (window_size_ - init_buffer_));
+    int num_draws = std::max(num_chains_ * draws_collected_counter_ - first_draw, 0);
+    //std::cout << "first_draw: " << first_draw << ", num_draws: " << num_draws << std::endl << std::flush;
+
     int M = n_params_;
 
     try {
@@ -182,8 +219,6 @@ public:
       for(auto state : { "selection", "refinement" }) {
 	Eigen::MatrixXd cov_train = Eigen::MatrixXd::Zero(M, M);
 	Eigen::MatrixXd cov_test = Eigen::MatrixXd::Zero(M, M);
-
-	//std::cout << "col_begin: " << col_begin << ", num_draws: " << num_draws << std::endl;
 
 	int Ntest;
 	if(state == "selection") {
@@ -196,14 +231,14 @@ public:
 	    throw std::runtime_error("Each warmup stage must have at least 10 samples");
 	  }
 
-	  learn_covariance(cov_train, col_begin, num_draws - Ntest, comm);
-	  learn_covariance(cov_test, col_begin + num_draws - Ntest, Ntest, comm);
-	  //Ytrain = Y.block(0, 0, M, Y.cols() - Mtest);
-	  //Ytest = Y.block(0, Ytrain.cols(), M, Mtest);
+	  Eigen::MatrixXd Ytrain = Y_.block(first_draw, 0, num_draws - Ntest, n_params_);
+	  Eigen::MatrixXd Ytest = Y_.block(first_draw + num_draws - Ntest, 0, Ntest, n_params_);
+	  cov_train = internal::covariance(Ytrain);
+	  cov_test = internal::covariance(Ytest);
 	} else {
-	  learn_covariance(cov_train, col_begin, num_draws, comm);
 	  Ntest = 0;
-	  //Ytrain = Y;
+	  Eigen::MatrixXd Ytrain = Y_.block(first_draw, 0, num_draws, n_params_);
+	  cov_train = internal::covariance(Ytrain);
 	}
 	
 	Eigen::MatrixXd dense = ((num_draws - Ntest) / ((num_draws - Ntest) + 5.0)) * cov_train +
@@ -252,26 +287,34 @@ public:
       std::cout << e.what() << std::endl;
       std::cout << "Exception while using auto adaptation, falling back to diagonal" << std::endl;
       Eigen::MatrixXd cov = Eigen::MatrixXd::Zero(M, M);
-      learn_covariance(cov, col_begin, num_draws, comm);
       covar = ((num_draws / (num_draws + 5.0)) * cov.diagonal()
 	       + 1e-3 * (5.0 / (num_draws + 5.0)) * Eigen::VectorXd::Ones(cov.cols())).asDiagonal();
       is_diagonal_ = true;
     }
   }
 
-  void learn_covariance(Eigen::MatrixXd& covar,
-			int col_begin, int n_samples,
-			const stan::math::mpi::Communicator& comm) {
-    estimator.sample_covariance(covar, col_begin, n_samples, comm);
-    //double n = static_cast<double>(estimator.num_samples(comm));
-    //covar = (n / (n + 5.0)) * covar
-    //  + 1e-3 * (5.0 / (n + 5.0))
-    //  * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
-    // restart();
+  void collect_draws(int win, const stan::math::mpi::Communicator& comm) {
+    int finished = 0;
+    int index;
+    int flag = 0;
+
+    while(finished < draw_req_counter_) {
+      MPI_Testany(draw_req_counter_, reqs.data(), &index, &flag, MPI_STATUS_IGNORE);
+      if (flag) {
+        finished++;
+	for (int chain = 0; chain < num_chains_; ++chain) {
+	  Eigen::RowVectorXd draw = draws[index].col(chain).transpose();
+	  Y_.block((draws_collected_counter_ + index) * num_chains_ + chain, 0, 1, n_params_) = draw;
+	}
+      }
+    }
+
+    draws_collected_counter_ += draw_req_counter_;
+
+    reset_req();
   }
 
   virtual void restart() {
-    estimator.restart();
   }
 #else
 public:
