@@ -45,7 +45,8 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U y,
  * @param[in] depth Indexing depth (default 0; ignored
  */
 template <typename T, typename U,
-          typename = require_all_not_stan_scalar_t<U, T>>
+          typename = require_all_not_stan_scalar_t<U, T>,
+          typename = require_any_t<is_not_std_vector_t<U, T>, is_same_vt<U, T>>>
 inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x = std::forward<U>(y);
@@ -55,17 +56,18 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
  * Assign the specified standard vector rvalue to the specified
  * standard vector lvalue.
  *
- * @tparam T lvalue container element type
- * @tparam U rvalue container element type, which must be assignable to `T`
+ * @tparam Vec1 vector type to be assigned to
+ * @tparam Vec2 vector type with scalar that must be assignable to scalar out
+ *  `Vec1`.
  * @param[in] x lvalue variable
  * @param[in] y rvalue variable
  * @param[in] name name of lvalue variable (default "ANON").
  * @param[in] depth indexing depth (default 0).
  */
-template <typename T, typename U>
-inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
-                   const std::vector<U>& y, const char* name = "ANON",
-                   int depth = 0) {
+template <typename Vec1, typename Vec2,
+          typename = require_all_std_vector_t<Vec1, Vec2>>
+inline void assign(Vec1&& x, const nil_index_list& /* idxs */, Vec2&& y,
+                   const char* name = "ANON", int depth = 0) {
   x.resize(y.size());
   for (size_t i = 0; i < y.size(); ++i) {
     assign(x[i], nil_index_list(), y[i], name, depth + 1);
