@@ -44,10 +44,9 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U y,
  * @param[in] name Name of lvalue variable (default "ANON"); ignored
  * @param[in] depth Indexing depth (default 0; ignored
  */
-template <typename T, typename U,
-          typename = require_all_not_stan_scalar_t<U, T>,
-          typename = require_t<std::is_assignable<std::decay_t<T>,
-            std::decay_t<U>>>>
+template <
+    typename T, typename U, typename = require_all_not_stan_scalar_t<U, T>,
+    typename = require_t<std::is_assignable<std::decay_t<T>, std::decay_t<U>>>>
 inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x = std::forward<U>(y);
