@@ -32,12 +32,14 @@ class adapt_dense_e_static_hmc : public dense_e_static_hmc<Model, BaseRNG>,
                                                 s.accept_stat());
       this->update_L_();
 
-      bool update = this->covar_adaptation_.learn_covariance(
-          this->z_.inv_e_metric_, this->z_.q);
+      Eigen::MatrixXd inv_metric;
+      
+      bool update = this->covar_adaptation_.learn_covariance(inv_metric, this->z_.q);
 
       if (update) {
         this->init_stepsize(logger);
         this->update_L_();
+	this->z_.set_inv_metric(inv_metric);
 
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
         this->stepsize_adaptation_.restart();

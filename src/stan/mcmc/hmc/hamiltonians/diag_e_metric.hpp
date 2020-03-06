@@ -18,7 +18,7 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
       : base_hamiltonian<Model, diag_e_point, BaseRNG>(model) {}
 
   double T(diag_e_point& z) {
-    return 0.5 * z.p.dot(z.inv_e_metric_.cwiseProduct(z.p));
+    return 0.5 * z.p.dot(z.get_inv_metric().cwiseProduct(z.p));
   }
 
   double tau(diag_e_point& z) { return T(z); }
@@ -34,7 +34,7 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
   }
 
   Eigen::VectorXd dtau_dp(diag_e_point& z) {
-    return z.inv_e_metric_.cwiseProduct(z.p);
+    return z.get_inv_metric().cwiseProduct(z.p);
   }
 
   Eigen::VectorXd dphi_dq(diag_e_point& z, callbacks::logger& logger) {
@@ -46,7 +46,7 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
         rand_diag_gaus(rng, boost::normal_distribution<>());
 
     for (int i = 0; i < z.p.size(); ++i)
-      z.p(i) = rand_diag_gaus() / sqrt(z.inv_e_metric_(i));
+      z.p(i) = rand_diag_gaus() / sqrt(z.get_inv_metric()(i));
   }
 };
 

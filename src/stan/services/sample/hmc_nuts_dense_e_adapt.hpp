@@ -81,7 +81,7 @@ int hmc_nuts_dense_e_adapt(
 
   stan::mcmc::adapt_dense_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
 
-  sampler.set_metric(inv_metric);
+  sampler.set_inv_metric(inv_metric);
 
   sampler.set_nominal_stepsize(stepsize);
   sampler.set_stepsize_jitter(stepsize_jitter);
