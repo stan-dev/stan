@@ -34,7 +34,7 @@ class prob_grad {
         param_ranges_i__(std::vector<std::pair<int, int> >(0)) {}
 
   /**
-   * Construt a model base class with the specified number of
+   * Construct a model base class with the specified number of
    * unconstrained real parameters and integer parameter ranges.
    *
    * @param num_params_r number of unconstrained real parameters

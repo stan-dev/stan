@@ -292,7 +292,7 @@ class normal_meanfield : public base_family {
   }
 
   /**
-   * Return the transform of the sepcified vector using the
+   * Return the transform of the specified vector using the
    * Cholesky factor and mean vector.
    *
    * The transform is defined by

@@ -39,7 +39,7 @@ namespace optimize {
  * @param[in] tol_param convergence tolerance on changes in parameter
  *   value
  * @param[in] num_iterations maximum number of iterations
- * @param[in] save_iterations indicates whether all the interations should
+ * @param[in] save_iterations indicates whether all the iterations should
  *   be saved to the parameter_writer
  * @param[in] refresh how often to write output to logger
  * @param[in,out] interrupt callback to be called every iteration

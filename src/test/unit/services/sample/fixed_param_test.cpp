@@ -31,7 +31,7 @@ TEST_F(ServicesSamplesFixedParam, call_count) {
       interrupt, logger, init, parameter, diagnostic);
   EXPECT_EQ(0, return_code);
 
-  // Expecatations of message call counts
+  // Expectations of message call counts
   EXPECT_EQ(num_iterations, interrupt.call_count());
   EXPECT_EQ(1, parameter.call_count("vector_string"));
   EXPECT_EQ(num_iterations, parameter.call_count("vector_double"));

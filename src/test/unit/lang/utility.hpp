@@ -277,7 +277,7 @@ void expect_match(const std::string& model_name, const std::string& target,
 }
 
 /**
- * Thest that model of specified name in test/test-models/good
+ * Test that model of specified name in test/test-models/good
  * has exactly the specified number of matches
  *
  * @param[in] model_name Name of model file.

@@ -253,7 +253,7 @@ struct eval_elbo {
    * @return description
    */
   static std::string description() {
-    return "Number of interations between ELBO evaluations";
+    return "Number of iterations between ELBO evaluations";
   }
 
   /**

@@ -257,7 +257,7 @@ class reader {
    * the next scalars arranged in column-major order.
    *
    * Row-major reading means that if a matrix of <code>m=2</code>
-   * rows and <code>n=3</code> columns is reada and the next
+   * rows and <code>n=3</code> columns is read and the next
    * scalar values are <code>1,2,3,4,5,6</code>, the result is
    *
    * <pre>
