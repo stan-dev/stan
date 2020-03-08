@@ -540,6 +540,7 @@ TEST(io_reader, matrix) {
   EXPECT_FLOAT_EQ(13.0, a);
 }
 
+
 TEST(io_reader, matrix_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -563,6 +564,29 @@ TEST(io_reader, matrix_constrain) {
 
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(io_reader, sparse_matrix) {
+  int row_size = (rand() % 20) + 1;
+  int col_size = (rand() % 20) + 1;
+  int nonzero_size = (rand() % (row_size + col_size)) + 1;
+  std::vector<int> theta_rows(nonzero_size);
+  std::vector<int> theta_cols(nonzero_size);
+  std::vector<double> theta(nonzero_size);
+  for (int i = 0; i < nonzero_size; i++) {
+    theta_rows[i] = rand() % row_size;
+    theta_cols[i] = rand() % col_size;
+    theta[i] = (rand() % 20) + 1;
+  }
+  int max_row = *max_element(theta_rows.begin(), theta_rows.end());
+  int max_col = *max_element(theta_cols.begin(), theta_cols.end());
+  std::vector<int> theta_i;
+  stan::io::reader<double> reader(theta, theta_i);
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix(theta_rows,
+     theta_cols, max_row + 1, max_col + 1);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(theta[i], y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
 }
 
 TEST(io_reader, unit_vector) {
