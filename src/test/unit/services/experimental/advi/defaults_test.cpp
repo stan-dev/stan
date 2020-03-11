@@ -87,7 +87,7 @@ TEST(experimental_advi_defaults, adapt_iterations) {
 
 TEST(experimental_advi_defaults, eval_elbo) {
   using stan::services::experimental::advi::eval_elbo;
-  EXPECT_EQ("Number of interations between ELBO evaluations",
+  EXPECT_EQ("Number of iterations between ELBO evaluations",
             eval_elbo::description());
 
   EXPECT_NO_THROW(eval_elbo::validate(eval_elbo::default_value()));

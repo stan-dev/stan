@@ -23,7 +23,7 @@ namespace services {
  * @tparam Model type of model
  * @param[in] model model to query
  * @param[in, out] param_names sequence of parameter names
- * @param[in, out] param_dimss seqeunce of variable dimensionalities
+ * @param[in, out] param_dimss sequence of variable dimensionalities
  */
 template <class Model>
 void get_model_parameters(const Model &model,
@@ -54,7 +54,7 @@ void get_model_parameters(const Model &model,
 
 /**
  * Given a set of draws from a fitted model, generate corresponding
- * quantities of interes which are written to callback writer.
+ * quantities of interest which are written to callback writer.
  * Matrix of draws consists of one row per draw, one column per parameter.
  * Draws are processed one row at a time.
  * Return code indicates success or type of error.

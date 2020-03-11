@@ -65,7 +65,7 @@ struct located_exception : public E {
 
   /**
    * Return the character sequence describing the exception,
-   * including the original waht message and original type if
+   * including the original what message and original type if
    * constructed with such.
    *
    * @return Description of exception.

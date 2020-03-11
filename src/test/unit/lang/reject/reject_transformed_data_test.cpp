@@ -3,7 +3,7 @@
 #include <test/unit/lang/reject/reject_helper.hpp>
 #include <gtest/gtest.h>
 
-// test that reject() throws excception in transformed data
+// test that reject() throws exception in transformed data
 TEST(StanCommon, rejectTransformedData) {
   typedef reject_transformed_data_model_namespace ::
       reject_transformed_data_model model_t;

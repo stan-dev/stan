@@ -174,7 +174,7 @@ class writer {
    * correlation-constrained variable.
    *
    * <p>The unconstraining transform is <code>atanh(y)</code>, which
-   * reverses the transfrom in <code>corr_constrain()</code>.
+   * reverses the transform in <code>corr_constrain()</code>.
    *
    * @param y Correlation value.
    * @throw std::runtime_error if y is not between -1.0 and 1.0
@@ -222,7 +222,7 @@ class writer {
 
   /**
    * Write the unconstrained vector that corresponds to the specified
-   * postiive ascendingly ordered vector.
+   * positive ascendingly ordered vector.
    *
    * <p>The unconstraining transform is defined for input vector
    * <code>y</code> to produce an output vector <code>x</code> of
