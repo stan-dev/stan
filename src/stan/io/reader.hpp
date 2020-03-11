@@ -37,10 +37,10 @@ namespace io {
 template <typename T>
 class reader {
  private:
-  std::vector<T>& data_r_; // Real valued data.
-  std::vector<int>& data_i_; // Integer valued data.
-  size_t pos_{0}; // Current position of the reader for real values.
-  size_t int_pos_{0}; // Current position of the reader for integer values.
+  std::vector<T>& data_r_;    // Real valued data.
+  std::vector<int>& data_i_;  // Integer valued data.
+  size_t pos_{0};             // Current position of the reader for real values.
+  size_t int_pos_{0};  // Current position of the reader for integer values.
 
   /**
    * Return real value at current position.
@@ -81,13 +81,13 @@ class reader {
   }
 
  public:
-  using  matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
-  using  vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
-  using  row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
-
-  using  map_matrix_t = Eigen::Map<matrix_t>;
-  using  map_vector_t = Eigen::Map<vector_t>;
-  using  map_row_vector_t = Eigen::Map<row_vector_t>;
+  using matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+  using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
+  using row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
+  using sparse_matrix_t = Eigen::SparseMatrix<T>;
+  using map_matrix_t = Eigen::Map<matrix_t>;
+  using map_vector_t = Eigen::Map<vector_t>;
+  using map_row_vector_t = Eigen::Map<row_vector_t>;
 
   /**
    * Construct a variable reader using the specified vectors
@@ -100,9 +100,8 @@ class reader {
    * @param data_r Sequence of scalar values.
    * @param data_i Sequence of integer values.
    */
-  template <typename VecR, typename VecI,
-   typename = require_vector_t<VecR>,
-   typename = require_vector_vt<std::is_integral, VecI>>
+  template <typename VecR, typename VecI, typename = require_vector_t<VecR>,
+            typename = require_vector_vt<std::is_integral, VecI>>
   reader(VecR&& data_r, VecI&& data_i)
       : data_r_(std::forward<VecR>(data_r)),
         data_i_(std::forward<VecI>(data_i)) {}
@@ -151,7 +150,7 @@ class reader {
    *
    * @return Next integer value.
    */
-  inline int& integer_constrain(T & /*log_prob*/) { return this->integer(); }
+  inline int& integer_constrain(T& /*log_prob*/) { return this->integer(); }
 
   /**
    * Return the next scalar in the sequence.
@@ -183,7 +182,7 @@ class reader {
    * log_prob Reference to log probability variable to increment.
    * @return Next scalar.
    */
-  T& scalar_constrain(T & /*log_prob*/) { return this->scalar(); }
+  T& scalar_constrain(T& /*log_prob*/) { return this->scalar(); }
 
   /**
    * Return a standard library vector of the specified
@@ -198,7 +197,7 @@ class reader {
       return ret_vec;
     }
     std::copy(this->data_r_.begin() + this->pos_,
-      this->data_r_.begin() + this->pos_ + m, ret_vec.begin());
+              this->data_r_.begin() + this->pos_ + m, ret_vec.begin());
     this->pos_ += m;
     return ret_vec;
   }
@@ -225,9 +224,7 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  inline vector_t vector_constrain(size_t m) {
-    return this->vector(m);
-  }
+  inline vector_t vector_constrain(size_t m) { return this->vector(m); }
   /**
    * Return a column vector of specified dimensionality made up of
    * the next scalars.  The constraint and hence Jacobian are no-ops.
@@ -236,7 +233,7 @@ class reader {
    * lp Log probability to increment.
    * @return Column vector made up of the next scalars.
    */
-  inline vector_t vector_constrain(size_t m, T & /*lp*/) {
+  inline vector_t vector_constrain(size_t m, T& /*lp*/) {
     return this->vector(m);
   }
 
@@ -276,7 +273,7 @@ class reader {
    * lp Log probability to increment.
    * @return Column vector made up of the next scalars.
    */
-  inline row_vector_t row_vector_constrain(size_t m, T & /*lp*/) {
+  inline row_vector_t row_vector_constrain(size_t m, T& /*lp*/) {
     return this->row_vector(m);
   }
 
@@ -332,7 +329,7 @@ class reader {
    * lp Log probability to increment.
    * @return Matrix made up of the next scalars.
    */
-  inline matrix_t matrix_constrain(size_t n, size_t m, T & /*lp*/) {
+  inline matrix_t matrix_constrain(size_t n, size_t m, T& /*lp*/) {
     return this->matrix(n, m);
   }
 
@@ -350,9 +347,9 @@ class reader {
    * @return Eigen::Matrix made up of the next scalars.
    */
   template <typename VecR, typename VecC,
-   typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline Eigen::SparseMatrix<T> sparse_matrix(VecR&& vec_r, VecC&& vec_c,
-     size_t n, size_t m) {
+                                              size_t n, size_t m) {
     Eigen::SparseMatrix<T> ret_mat(n, m);
     if (m == 0 || n == 0) {
       return ret_mat;
@@ -360,8 +357,8 @@ class reader {
     using triplet_type = Eigen::Triplet<T>;
     std::vector<triplet_type> triplet_list(vec_r.size());
     for (auto i = 0; i < vec_r.size(); i++) {
-      triplet_list.emplace_back(triplet_type(vec_r[i], vec_c[i],
-         this->scalar_ptr_increment(1)));
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_ptr_increment(1)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;
@@ -381,11 +378,12 @@ class reader {
    * @return Eigen::Matrix made up of the next scalars.
    */
   template <typename VecR, typename VecC,
-   typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
-  inline Eigen::SparseMatrix<T> sparse_matrix_constrain(VecR&& vec_r, VecC&& vec_c,
-     size_t n, size_t m) {
-       return this->sparse_matrix(std::forward<VecR>(vec_r),
-        std::forward<VecC>(vec_c), n, m);
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline Eigen::SparseMatrix<T> sparse_matrix_constrain(VecR&& vec_r,
+                                                        VecC&& vec_c, size_t n,
+                                                        size_t m) {
+    return this->sparse_matrix(std::forward<VecR>(vec_r),
+                               std::forward<VecC>(vec_c), n, m);
   }
   /**
    * Return a sparse matrix of the specified dimensionality and number of
@@ -402,13 +400,13 @@ class reader {
    * @return Eigen::Matrix made up of the next scalars.
    */
   template <typename VecR, typename VecC,
-   typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
-  inline Eigen::SparseMatrix<T> sparse_matrix_constrain(VecR&& vec_r, VecC&& vec_c,
-     size_t n, size_t m, T& /* lp */) {
-       return this->sparse_matrix(std::forward<VecR>(vec_r),
-        std::forward<VecC>(vec_c), n, m);
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline Eigen::SparseMatrix<T> sparse_matrix_constrain(VecR&& vec_r,
+                                                        VecC&& vec_c, size_t n,
+                                                        size_t m, T& /* lp */) {
+    return this->sparse_matrix(std::forward<VecR>(vec_r),
+                               std::forward<VecC>(vec_c), n, m);
   }
-
 
   /**
    * Return the next integer, checking that it is greater than
@@ -446,7 +444,7 @@ class reader {
    * @throw std::runtime_error If the next integer read is not
    * greater than or equal to the lower bound.
    */
-  inline int integer_lb_constrain(int lb, T & /*lp*/) {
+  inline int integer_lb_constrain(int lb, T& /*lp*/) {
     return this->integer_lb(lb);
   }
 
@@ -486,7 +484,7 @@ class reader {
    * @throw std::runtime_error If the next integer read is not
    * less than or equal to the upper bound.
    */
-  int integer_ub_constrain(int ub, T & /*lp*/) { return this->integer_ub(ub); }
+  int integer_ub_constrain(int ub, T& /*lp*/) { return this->integer_ub(ub); }
 
   /**
    * Return the next integer, checking that it is less than
@@ -538,7 +536,7 @@ class reader {
    * @throw std::runtime_error If the next integer read is not
    * less than or equal to the upper bound.
    */
-  inline int integer_lub_constrain(int lb, int ub, T & /*lp*/) {
+  inline int integer_lub_constrain(int lb, int ub, T& /*lp*/) {
     return this->integer_lub(lb, ub);
   }
 
@@ -578,7 +576,7 @@ class reader {
    * @param lp Reference to log probability variable to increment.
    * @return The next scalar transformed to be positive.
    */
-  inline T scalar_pos_constrain(T &lp) {
+  inline T scalar_pos_constrain(T& lp) {
     return stan::math::positive_constrain(this->scalar(), lp);
   }
 
@@ -630,7 +628,7 @@ class reader {
    * @param lp Reference to log probability variable to increment.
    */
   template <typename TL>
-  inline T scalar_lb_constrain(const TL lb, T &lp) {
+  inline T scalar_lb_constrain(const TL lb, T& lp) {
     return stan::math::lb_constrain(this->scalar(), lb, lp);
   }
 
@@ -682,7 +680,7 @@ class reader {
    * @param lp Reference to log probability variable to increment.
    */
   template <typename TU>
-  inline T scalar_ub_constrain(const TU ub, T &lp) {
+  inline T scalar_ub_constrain(const TU ub, T& lp) {
     return stan::math::ub_constrain(this->scalar(), ub, lp);
   }
 
@@ -740,7 +738,7 @@ class reader {
    * @tparam TU Type of upper bound.
    */
   template <typename TL, typename TU>
-  inline T scalar_lub_constrain(TL lb, TU ub, T &lp) {
+  inline T scalar_lub_constrain(TL lb, TU ub, T& lp) {
     return stan::math::lub_constrain(this->scalar(), lb, ub, lp);
   }
 
@@ -795,9 +793,9 @@ class reader {
    * @tparam TS Type of multiplier.
    */
   template <typename TL, typename TS>
-  inline T scalar_offset_multiplier_constrain(TL offset, TS multiplier, T &lp) {
+  inline T scalar_offset_multiplier_constrain(TL offset, TS multiplier, T& lp) {
     return stan::math::offset_multiplier_constrain(this->scalar(), offset,
-     multiplier, lp);
+                                                   multiplier, lp);
   }
 
   /**
@@ -837,7 +835,7 @@ class reader {
    * @param lp Reference to log probability variable to increment.
    * @return The next scalar transformed to a probability.
    */
-  inline T prob_constrain(T &lp) {
+  inline T prob_constrain(T& lp) {
     return stan::math::prob_constrain(this->scalar(), lp);
   }
 
@@ -882,7 +880,7 @@ class reader {
    * probability to increment.
    * @return The next scalar transformed to a correlation.
    */
-  inline T corr_constrain(T &lp) {
+  inline T corr_constrain(T& lp) {
     return stan::math::corr_constrain(this->scalar(), lp);
   }
 
@@ -942,7 +940,7 @@ class reader {
    * @return The next unit_vector of the specified size.
    * @throw std::invalid_argument if k is zero
    */
-  inline vector_t unit_vector_constrain(size_t k, T &lp) {
+  inline vector_t unit_vector_constrain(size_t k, T& lp) {
     if (k == 0) {
       std::string msg
           = "io::unit_vector_constrain:"
@@ -1005,7 +1003,7 @@ class reader {
    * @return The next simplex of the specified size.
    * @throws std::invalid_argument if number of dimensions (`k`) is zero
    */
-  inline vector_t simplex_constrain(size_t k, T &lp) {
+  inline vector_t simplex_constrain(size_t k, T& lp) {
     if (k == 0) {
       std::string msg = "io::simplex_constrain: simplexes cannot be size 0.";
       throw std::invalid_argument(msg);
@@ -1053,7 +1051,7 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return Next ordered vector of the specified size.
    */
-  inline vector_t ordered_constrain(size_t k, T &lp) {
+  inline vector_t ordered_constrain(size_t k, T& lp) {
     return stan::math::ordered_constrain(this->vector(k), lp);
   }
 
@@ -1098,7 +1096,7 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return Next positive_ordered vector of the specified size.
    */
-  inline vector_t positive_ordered_constrain(size_t k, T &lp) {
+  inline vector_t positive_ordered_constrain(size_t k, T& lp) {
     return stan::math::positive_ordered_constrain(this->vector(k), lp);
   }
 
@@ -1113,7 +1111,7 @@ class reader {
    * Cholesky factor.
    */
   inline matrix_t cholesky_factor_cov(size_t n, size_t m) {
-    matrix_t y(this->matrix(n ,m));
+    matrix_t y(this->matrix(n, m));
     stan::math::check_cholesky_factor("stan::io::cholesky_factor_cov",
                                       "Constrained matrix", y);
     return y;
@@ -1148,7 +1146,7 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor.
    */
-  inline matrix_t cholesky_factor_cov_constrain(size_t n, size_t m, T &lp) {
+  inline matrix_t cholesky_factor_cov_constrain(size_t n, size_t m, T& lp) {
     return stan::math::cholesky_factor_constrain(
         this->vector((m * (m + 1)) / 2 + (n - m) * m), n, m, lp);
   }
@@ -1182,7 +1180,8 @@ class reader {
    *    Cholesky factor for a correlation matrix.
    */
   inline matrix_t cholesky_factor_corr_constrain(size_t K) {
-    return stan::math::cholesky_corr_constrain(this->vector((K * (K - 1)) / 2), K);
+    return stan::math::cholesky_corr_constrain(this->vector((K * (K - 1)) / 2),
+                                               K);
   }
 
   /**
@@ -1198,9 +1197,9 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor for a correlation matrix.
    */
-  inline matrix_t cholesky_factor_corr_constrain(size_t K, T &lp) {
-    return stan::math::cholesky_corr_constrain(this->vector((K * (K - 1)) / 2), K,
-                                               lp);
+  inline matrix_t cholesky_factor_corr_constrain(size_t K, T& lp) {
+    return stan::math::cholesky_corr_constrain(this->vector((K * (K - 1)) / 2),
+                                               K, lp);
   }
 
   /**
@@ -1230,7 +1229,8 @@ class reader {
    * @return Next covariance matrix of the specified dimensionality.
    */
   inline matrix_t cov_matrix_constrain(size_t k) {
-    return stan::math::cov_matrix_constrain(this->vector(k + (k * (k - 1)) / 2), k);
+    return stan::math::cov_matrix_constrain(this->vector(k + (k * (k - 1)) / 2),
+                                            k);
   }
 
   /**
@@ -1244,9 +1244,9 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return The next covariance matrix of the specified dimensionality.
    */
-  inline matrix_t cov_matrix_constrain(size_t k, T &lp) {
-    return stan::math::cov_matrix_constrain(this->vector(k + (k * (k - 1)) / 2), k,
-                                            lp);
+  inline matrix_t cov_matrix_constrain(size_t k, T& lp) {
+    return stan::math::cov_matrix_constrain(this->vector(k + (k * (k - 1)) / 2),
+                                            k, lp);
   }
 
   /**
@@ -1274,7 +1274,8 @@ class reader {
    * @return Next correlation matrix of the specified dimensionality.
    */
   inline matrix_t corr_matrix_constrain(size_t k) {
-    return stan::math::corr_matrix_constrain(this->vector((k * (k - 1)) / 2), k);
+    return stan::math::corr_matrix_constrain(this->vector((k * (k - 1)) / 2),
+                                             k);
   }
 
   /**
@@ -1288,8 +1289,9 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return The next correlation matrix of the specified dimensionality.
    */
-  inline matrix_t corr_matrix_constrain(size_t k, T &lp) {
-    return stan::math::corr_matrix_constrain(this->vector((k * (k - 1)) / 2), k, lp);
+  inline matrix_t corr_matrix_constrain(size_t k, T& lp) {
+    return stan::math::corr_matrix_constrain(this->vector((k * (k - 1)) / 2), k,
+                                             lp);
   }
 
   template <typename TL>
@@ -1309,7 +1311,7 @@ class reader {
   }
 
   template <typename TL>
-  inline vector_t vector_lb_constrain(const TL lb, size_t m, T &lp) {
+  inline vector_t vector_lb_constrain(const TL lb, size_t m, T& lp) {
     vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = this->scalar_lb_constrain(lb, lp);
@@ -1333,7 +1335,7 @@ class reader {
   }
 
   template <typename TL>
-  inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
+  inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m, T& lp) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = this->scalar_lb_constrain(lb, lp);
@@ -1359,7 +1361,7 @@ class reader {
   }
 
   template <typename TL>
-  inline matrix_t matrix_lb_constrain(const TL lb, size_t n, size_t m, T &lp) {
+  inline matrix_t matrix_lb_constrain(const TL lb, size_t n, size_t m, T& lp) {
     matrix_t v(n, m);
     for (size_t j = 0; j < m; ++j)
       for (size_t i = 0; i < n; ++i)
@@ -1367,80 +1369,204 @@ class reader {
     return v;
   }
 
+  template <typename TL, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_lb(const TL lb, VecR&& vec_r,
+                                          VecC&& vec_c, size_t n, size_t m) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_lb(lb)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
+  }
+
+  template <typename TL, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_lb_constrain(const TL lb, VecR&& vec_r,
+                                                    VecC&& vec_c, size_t n,
+                                                    size_t m) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_lb_constrain(lb)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
+  }
+
+  template <typename TL, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_lb_constrain(const TL lb, VecR&& vec_r,
+                                                    VecC&& vec_c, size_t n,
+                                                    size_t m, T& lp) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_lb_constrain(lb, lp)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
+  }
+
   template <typename TU>
   inline vector_t vector_ub(const TU ub, size_t m) {
     vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
+    for (size_t i = 0; i < m; ++i) {
       v(i) = this->scalar_ub(ub);
+    }
     return v;
   }
 
   template <typename TU>
   inline vector_t vector_ub_constrain(const TU ub, size_t m) {
     vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
+    for (size_t i = 0; i < m; ++i) {
       v(i) = this->scalar_ub_constrain(ub);
+    }
     return v;
   }
 
   template <typename TU>
-  inline vector_t vector_ub_constrain(const TU ub, size_t m, T &lp) {
+  inline vector_t vector_ub_constrain(const TU ub, size_t m, T& lp) {
     vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
+    for (size_t i = 0; i < m; ++i) {
       v(i) = this->scalar_ub_constrain(ub, lp);
+    }
     return v;
   }
 
   template <typename TU>
   inline row_vector_t row_vector_ub(const TU ub, size_t m) {
     row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
+    for (size_t i = 0; i < m; ++i) {
       v(i) = this->scalar_ub(ub);
+    }
     return v;
   }
 
   template <typename TU>
   inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m) {
     row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
+    for (size_t i = 0; i < m; ++i) {
       v(i) = this->scalar_ub_constrain(ub);
+    }
     return v;
   }
 
   template <typename TU>
-  inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
+  inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m, T& lp) {
     row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
+    for (size_t i = 0; i < m; ++i) {
       v(i) = this->scalar_ub_constrain(ub, lp);
+    }
     return v;
   }
 
   template <typename TU>
   inline matrix_t matrix_ub(const TU ub, size_t n, size_t m) {
     matrix_t v(n, m);
-    for (size_t j = 0; j < m; ++j)
-      for (size_t i = 0; i < n; ++i)
+    for (size_t j = 0; j < m; ++j) {
+      for (size_t i = 0; i < n; ++i) {
         v(i, j) = this->scalar_ub(ub);
+      }
+    }
     return v;
   }
 
   template <typename TU>
   inline matrix_t matrix_ub_constrain(const TU ub, const size_t n, size_t m) {
     matrix_t v(n, m);
-    for (size_t j = 0; j < m; ++j)
-      for (size_t i = 0; i < n; ++i)
+    for (size_t j = 0; j < m; ++j) {
+      for (size_t i = 0; i < n; ++i) {
         v(i, j) = this->scalar_ub_constrain(ub);
+      }
+    }
     return v;
   }
 
   template <typename TU>
   inline matrix_t matrix_ub_constrain(const TU ub, const size_t n, size_t m,
-                                      T &lp) {
+                                      T& lp) {
     matrix_t v(n, m);
-    for (size_t j = 0; j < m; ++j)
-      for (size_t i = 0; i < n; ++i)
+    for (size_t j = 0; j < m; ++j) {
+      for (size_t i = 0; i < n; ++i) {
         v(i, j) = this->scalar_ub_constrain(ub, lp);
+      }
+    }
     return v;
+  }
+
+  template <typename TL, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_ub(const TL lb, VecR&& vec_r,
+                                          VecC&& vec_c, size_t n, size_t m) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_ub(lb)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
+  }
+
+  template <typename TL, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_ub_constrain(const TL lb, VecR&& vec_r,
+                                                    VecC&& vec_c, size_t n,
+                                                    size_t m) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_ub_constrain(lb)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
+  }
+
+  template <typename TL, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_ub_constrain(const TL lb, VecR&& vec_r,
+                                                    VecC&& vec_c, size_t n,
+                                                    size_t m, T& lp) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_ub_constrain(lb, lp)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
   }
 
   template <typename TL, typename TU>
@@ -1461,7 +1587,7 @@ class reader {
 
   template <typename TL, typename TU>
   inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m,
-                                       T &lp) {
+                                       T& lp) {
     vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = this->scalar_lub_constrain(lb, ub, lp);
@@ -1486,7 +1612,7 @@ class reader {
 
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
-                                               size_t m, T &lp) {
+                                               size_t m, T& lp) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = this->scalar_lub_constrain(lb, ub, lp);
@@ -1514,12 +1640,70 @@ class reader {
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t n,
-                                       size_t m, T &lp) {
+                                       size_t m, T& lp) {
     matrix_t v(n, m);
     for (size_t j = 0; j < m; ++j)
       for (size_t i = 0; i < n; ++i)
         v(i, j) = this->scalar_lub_constrain(lb, ub, lp);
     return v;
+  }
+
+  template <typename TL, typename TU, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_lub(const TL lb, const TU ub,
+                                           VecR&& vec_r, VecC&& vec_c, size_t n,
+                                           size_t m) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_lub(lb, ub)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
+  }
+
+  template <typename TL, typename TU, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_lub_constrain(const TL lb, const TU ub,
+                                                     VecR&& vec_r, VecC&& vec_c,
+                                                     size_t n, size_t m) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_lub_constrain(lb, ub)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
+  }
+
+  template <typename TL, typename TU, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_lub_constrain(const TL lb, const TU ub,
+                                                     VecR&& vec_r, VecC&& vec_c,
+                                                     size_t n, size_t m,
+                                                     T& lp) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i], this->scalar_lub_constrain(lb, lp)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
   }
 
   template <typename TL, typename TS>
@@ -1544,7 +1728,7 @@ class reader {
   template <typename TL, typename TS>
   inline vector_t vector_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
-                                                     size_t m, T &lp) {
+                                                     size_t m, T& lp) {
     vector_t v(m);
     for (size_t i = 0; i < m; ++i)
       v(i) = this->scalar_offset_multiplier_constrain(offset, multiplier, lp);
@@ -1574,7 +1758,7 @@ class reader {
 
   template <typename TL, typename TS>
   inline row_vector_t row_vector_offset_multiplier_constrain(
-      const TL offset, const TS multiplier, size_t m, T &lp) {
+      const TL offset, const TS multiplier, size_t m, T& lp) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i) {
       v(i) = this->scalar_offset_multiplier_constrain(offset, multiplier, lp);
@@ -1609,12 +1793,75 @@ class reader {
   inline matrix_t matrix_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t n, size_t m,
-                                                     T &lp) {
+                                                     T& lp) {
     matrix_t v(n, m);
     for (size_t j = 0; j < m; ++j)
       for (size_t i = 0; i < n; ++i)
-        v(i, j) = this->scalar_offset_multiplier_constrain(offset, multiplier, lp);
+        v(i, j)
+            = this->scalar_offset_multiplier_constrain(offset, multiplier, lp);
     return v;
+  }
+
+  template <typename TL, typename TS, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_offset_multiplier(const TL offset,
+                                                         const TS multiplier,
+                                                         VecR&& vec_r,
+                                                         VecC&& vec_c, size_t n,
+                                                         size_t m) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i],
+                       this->scalar_offset_multiplier(offset, multiplier)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
+  }
+
+  template <typename TL, typename TS, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_offset_multiplier_constrain(
+      const TL offset, const TS multiplier, VecR&& vec_r, VecC&& vec_c,
+      size_t n, size_t m) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i],
+                       this->scalar_offset_multiplier(offset, multiplier)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
+  }
+
+  template <typename TL, typename TS, typename VecR, typename VecC,
+            typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
+  inline sparse_matrix_t sparse_matrix_offset_multiplier_constrain(
+      const TL offset, const TS multiplier, VecR&& vec_r, VecC&& vec_c,
+      size_t n, size_t m, T& lp) {
+    Eigen::SparseMatrix<T> ret_mat(n, m);
+    if (m == 0 || n == 0) {
+      return ret_mat;
+    }
+    using triplet_type = Eigen::Triplet<T>;
+    std::vector<triplet_type> triplet_list(vec_r.size());
+    for (auto i = 0; i < vec_r.size(); i++) {
+      triplet_list.emplace_back(
+          triplet_type(vec_r[i], vec_c[i],
+                       this->scalar_offset_multiplier(offset, multiplier, lp)));
+    }
+    ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+    return ret_mat;
   }
 };
 
