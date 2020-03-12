@@ -195,12 +195,11 @@ class reader {
   inline std::vector<T> std_vector(size_t m) {
     std::vector<T> ret_vec(m);
     if (m == 0) {
-      return ret_vec;
+      return std::vector<T>();
     }
-    std::copy(this->data_r_.begin() + this->pos_,
-              this->data_r_.begin() + this->pos_ + m, ret_vec.begin());
     this->pos_ += m;
-    return ret_vec;
+    return std::vector<T>(this->data_r_.begin() + this->pos_ - m,
+              this->data_r_.begin() + this->pos_);
   }
 
   /**
