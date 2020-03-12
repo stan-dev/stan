@@ -1374,13 +1374,15 @@ class reader {
   inline sparse_matrix_t sparse_matrix_lb(const TL lb, VecR&& vec_r,
                                           VecC&& vec_c, size_t n, size_t m) {
     Eigen::SparseMatrix<T> ret_mat(n, m);
+    ret_mat.reserve(vec_r.size());
     if (m == 0 || n == 0) {
       return ret_mat;
     }
     using triplet_type = Eigen::Triplet<T>;
-    std::vector<triplet_type> triplet_list(vec_r.size());
+    std::vector<triplet_type> triplet_list;
+    triplet_list.reserve(vec_r.size());
     for (auto i = 0; i < vec_r.size(); i++) {
-      triplet_list.emplace_back(
+      triplet_list.push_back(
           triplet_type(vec_r[i], vec_c[i], this->scalar_lb(lb)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
@@ -1700,7 +1702,7 @@ class reader {
     std::vector<triplet_type> triplet_list(vec_r.size());
     for (auto i = 0; i < vec_r.size(); i++) {
       triplet_list.emplace_back(
-          triplet_type(vec_r[i], vec_c[i], this->scalar_lub_constrain(lb, lp)));
+          triplet_type(vec_r[i], vec_c[i], this->scalar_lub_constrain(lb, ub, lp)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;
