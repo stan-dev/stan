@@ -1847,9 +1847,8 @@ class reader {
     using triplet_type = Eigen::Triplet<T>;
     std::vector<triplet_type> triplet_list(vec_r.size());
     for (auto i = 0; i < vec_r.size(); i++) {
-      triplet_list.emplace_back(
-          triplet_type(vec_r[i], vec_c[i],
-             this->scalar_lub_constrain(lb, ub, lp)));
+      triplet_list.emplace_back(triplet_type(
+          vec_r[i], vec_c[i], this->scalar_lub_constrain(lb, ub, lp)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;

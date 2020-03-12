@@ -117,7 +117,7 @@ class writer {
    * @param y Lower-bounded value.
    * @throw std::runtime_error if y is lower than the lower bound provided.
    */
-  void scalar_lb_unconstrain(double lb, const T& y) {
+  void scalar_lb_unconstrain(double lb, const T &y) {
     this->data_r_.push_back(stan::math::lb_free(y, lb));
   }
 
@@ -131,7 +131,7 @@ class writer {
    * @param y Constrained value.
    * @throw std::runtime_error if y is higher than the upper bound provided.
    */
-  void scalar_ub_unconstrain(double ub, const T& y) {
+  void scalar_ub_unconstrain(double ub, const T &y) {
     this->data_r_.push_back(stan::math::ub_free(y, ub));
   }
 
@@ -147,7 +147,7 @@ class writer {
    * @param y Bounded value.
    * @throw std::runtime_error if y is not between the lower and upper bounds
    */
-  void scalar_lub_unconstrain(double lb, double ub, const T& y) {
+  void scalar_lub_unconstrain(double lb, double ub, const T &y) {
     this->data_r_.push_back(stan::math::lub_free(y, lb, ub));
   }
 
@@ -163,7 +163,7 @@ class writer {
    * @param y Bounded value.
    */
   void scalar_offset_multiplier_unconstrain(double offset, double multiplier,
-                                            const T& y) {
+                                            const T &y) {
     this->data_r_.push_back(
         stan::math::offset_multiplier_free(y, offset, multiplier));
   }
@@ -327,7 +327,7 @@ class writer {
     }
   }
 
-  void sparse_matrix_lb_unconstrain(double lb, sparse_matrix_t& y) {
+  void sparse_matrix_lb_unconstrain(double lb, sparse_matrix_t &y) {
     for (int k = 0; k < y.outerSize(); ++k) {
       for (sparse_matrix_inner_iter_t it(y, k); it; ++it) {
         this->scalar_lb_unconstrain(lb, it.value());
@@ -385,8 +385,7 @@ class writer {
     }
   }
 
-  void sparse_matrix_lub_unconstrain(double lb, double ub,
-                                    sparse_matrix_t &y) {
+  void sparse_matrix_lub_unconstrain(double lb, double ub, sparse_matrix_t &y) {
     for (int k = 0; k < y.outerSize(); ++k) {
       for (sparse_matrix_inner_iter_t it(y, k); it; ++it) {
         this->scalar_lub_unconstrain(lb, ub, it.value());

@@ -328,7 +328,7 @@ TEST(io_writer, sparse_matrix_lub_unconstrain) {
   ASSERT_EQ(size_mat, writer.data_r().size());
   for (int i = 0; i < writer.data_r().size(); ++i) {
     EXPECT_FLOAT_EQ(stan::math::logit((i - lb) / (ub - lb)),
-     writer.data_r()[i]);
+                    writer.data_r()[i]);
   }
 }
 
