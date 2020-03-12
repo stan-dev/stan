@@ -34,8 +34,8 @@ inline const T& deep_copy(const T& x) {
  * matrix deep copy under assignment.
  *
  * @tparam T Scalar type.
- * @tparam R Row type specificiation.
- * @tparam C Column type specificiation.
+ * @tparam R Row type specification.
+ * @tparam C Column type specification.
  * @param a Input matrix, vector, or row vector.
  * @return Deep copy of input.
  */

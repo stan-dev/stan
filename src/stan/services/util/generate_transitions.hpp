@@ -28,7 +28,7 @@ namespace util {
  *   to the mcmc_writer. If false, transitions will not be written
  * @param[in] warmup indicates whether these transitions are warmup. Used
  *   for printing iteration number messages
- * @param[in,out] mcmc_writer writer to handle mcmc otuput
+ * @param[in,out] mcmc_writer writer to handle mcmc output
  * @param[in,out] init_s starts as the initial unconstrained parameter
  *   values. When the function completes, this will have the final
  *   iteration's unconstrained parameter values

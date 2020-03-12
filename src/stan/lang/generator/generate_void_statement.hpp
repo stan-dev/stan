@@ -15,7 +15,7 @@ namespace lang {
  *
  * @param[in] name variable name
  * @param[in] indent indentation level
- * @param[in,out] o stream for genering
+ * @param[in,out] o stream for generating
  */
 void generate_void_statement(const std::string& name, const size_t indent,
                              std::ostream& o) {

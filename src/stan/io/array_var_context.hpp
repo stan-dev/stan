@@ -40,7 +40,7 @@ class array_var_context : public var_context {
   /**
    * Search over the real variables to check if a name is in the map
    * @param name The name of the variable to search for
-   * @return logical indiciating if the variable was found in the map of reals.
+   * @return logical indicating if the variable was found in the map of reals.
    */
   bool contains_r_only(const std::string& name) const {
     return vars_r_.find(name) != vars_r_.end();

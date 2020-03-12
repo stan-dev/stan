@@ -10,7 +10,7 @@ namespace mcmc {
 /**
  * Hamiltonian Monte Carlo implementation using the endpoint
  * of trajectories with a static integration time with a
- * Gaussian-Euclidean disintegration and adative dense metric and
+ * Gaussian-Euclidean disintegration and adaptive dense metric and
  * adaptive step size
  */
 template <class Model, class BaseRNG>

@@ -68,7 +68,7 @@ inline void print_stanc_help(std::ostream* out_stream) {
 }
 
 /**
- * Delte the file at the specified path, writing messages to error
+ * Delete the file at the specified path, writing messages to error
  * stream if not possible.  Do nothing on zero size file name input.
  * Only write to error stream if it is non-null.
  *

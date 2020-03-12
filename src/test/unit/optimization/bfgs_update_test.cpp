@@ -21,7 +21,7 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
     bfgsUp.update(yk, sk, i == 0);
 
     // Because the constructed update vectors are all orthogonal the secant
-    // equation should be exactlty satisfied for all nDim updates.
+    // equation should be exactly satisfied for all nDim updates.
     for (int j = 0; j <= i; j++) {
       sk.setZero(nDim);
       yk.setZero(nDim);

@@ -15,7 +15,7 @@ namespace lang {
 struct idx_user_visgen : public visgen {
   /**
    * Construct a visitor for generating user-facing multiple
-   * indexex writing to the specified stream.
+   * index writing to the specified stream.
    *
    * @param[in,out] o stream for generating
    */
