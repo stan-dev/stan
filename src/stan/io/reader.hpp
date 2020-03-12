@@ -5,6 +5,7 @@
 #include <stan/math/prim.hpp>
 #include <Eigen/Sparse>
 #include <stdexcept>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <utility>
@@ -57,7 +58,7 @@ class reader {
    * @param m The amount to increment the iterator.
    */
   inline T& scalar_ptr_increment(size_t m) {
-    pos_ += m;
+    this->pos_ += m;
     return this->data_r_[this->pos_ - m];
   }
 
@@ -158,7 +159,7 @@ class reader {
    * @return Next scalar value.
    */
   inline T& scalar() {
-    if (pos_ >= data_r_.size())
+    if (this->pos_ >= this->data_r_.size())
       BOOST_THROW_EXCEPTION(std::runtime_error("no more scalars to read"));
     return this->data_r_[this->pos_++];
   }
@@ -1702,7 +1703,8 @@ class reader {
     std::vector<triplet_type> triplet_list(vec_r.size());
     for (auto i = 0; i < vec_r.size(); i++) {
       triplet_list.emplace_back(
-          triplet_type(vec_r[i], vec_c[i], this->scalar_lub_constrain(lb, ub, lp)));
+          triplet_type(vec_r[i], vec_c[i],
+             this->scalar_lub_constrain(lb, ub, lp)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;
