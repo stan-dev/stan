@@ -345,7 +345,7 @@ class reader {
    * @param vec_c columns corresponding the nonzero entries.
    * @param n Number of rows.
    * @param m Number of columns.
-   * @return Eigen::Matrix made up of the next scalars.
+   * @return Eigen::SparseMatrix made up of the next scalars.
    */
   template <typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
@@ -1370,6 +1370,21 @@ class reader {
     return v;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the next scalars arranged in
+   * column-major order. Throws if any scalar value is less than lb.
+   *
+   * @tparam TL the type of the lower bound.
+   * @tparam VecR Vector with an integral type
+   * @tparam VecC Vector with an integral type
+   * @param lb The lower bound to check all scalar values against
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline sparse_matrix_t sparse_matrix_lb(const TL lb, VecR&& vec_r,
@@ -1390,6 +1405,21 @@ class reader {
     return ret_mat;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the next scalars scaled to the lb arranged in
+   * column-major order.
+   *
+   * @tparam TL the type of the lower bound.
+   * @tparam VecR Vector with an integral type
+   * @tparam VecC Vector with an integral type
+   * @param lb The lower bound to check all scalar values against
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline sparse_matrix_t sparse_matrix_lb_constrain(const TL lb, VecR&& vec_r,
@@ -1409,6 +1439,22 @@ class reader {
     return ret_mat;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the next scalars scaled to the lb with respect
+   * to the log probability arranged in column-major order.
+   *
+   * @tparam TL the type of the upper bound.
+   * @tparam VecR Vector with an integral type
+   * @tparam VecC Vector with an integral type
+   * @param lb The upper bound to check all scalar values against
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @param lp The log probability
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline sparse_matrix_t sparse_matrix_lb_constrain(const TL lb, VecR&& vec_r,
@@ -1516,9 +1562,24 @@ class reader {
     return v;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the next scalars arranged in
+   * column-major order. Throws if any scalar value is less than ub.
+   *
+   * @tparam TL the type of the upper bound.
+   * @tparam VecR Vector with an integral type
+   * @tparam VecC Vector with an integral type
+   * @param ub The upper bound to check all scalar values against
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
-  inline sparse_matrix_t sparse_matrix_ub(const TL lb, VecR&& vec_r,
+  inline sparse_matrix_t sparse_matrix_ub(const TL ub, VecR&& vec_r,
                                           VecC&& vec_c, size_t n, size_t m) {
     Eigen::SparseMatrix<T> ret_mat(n, m);
     if (m == 0 || n == 0) {
@@ -1528,15 +1589,30 @@ class reader {
     std::vector<triplet_type> triplet_list(vec_r.size());
     for (auto i = 0; i < vec_r.size(); i++) {
       triplet_list.emplace_back(
-          triplet_type(vec_r[i], vec_c[i], this->scalar_ub(lb)));
+          triplet_type(vec_r[i], vec_c[i], this->scalar_ub(ub)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the next scalars scaled to the ub arranged in
+   * column-major order.
+   *
+   * @tparam TL the type of the upper bound.
+   * @tparam VecR Vector with an integral type
+   * @tparam VecC Vector with an integral type
+   * @param ub The upper bound to check all scalar values against
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
-  inline sparse_matrix_t sparse_matrix_ub_constrain(const TL lb, VecR&& vec_r,
+  inline sparse_matrix_t sparse_matrix_ub_constrain(const TL ub, VecR&& vec_r,
                                                     VecC&& vec_c, size_t n,
                                                     size_t m) {
     Eigen::SparseMatrix<T> ret_mat(n, m);
@@ -1547,15 +1623,31 @@ class reader {
     std::vector<triplet_type> triplet_list(vec_r.size());
     for (auto i = 0; i < vec_r.size(); i++) {
       triplet_list.emplace_back(
-          triplet_type(vec_r[i], vec_c[i], this->scalar_ub_constrain(lb)));
+          triplet_type(vec_r[i], vec_c[i], this->scalar_ub_constrain(ub)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the next scalars scaled to the ub
+   * and log probability arranged in column-major order.
+   *
+   * @tparam TL the type of the upper bound.
+   * @tparam VecR Vector with an integral type.
+   * @tparam VecC Vector with an integral type.
+   * @param ub The upper bound to check all scalar values against.
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @param lp The log probability.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
-  inline sparse_matrix_t sparse_matrix_ub_constrain(const TL lb, VecR&& vec_r,
+  inline sparse_matrix_t sparse_matrix_ub_constrain(const TL ub, VecR&& vec_r,
                                                     VecC&& vec_c, size_t n,
                                                     size_t m, T& lp) {
     Eigen::SparseMatrix<T> ret_mat(n, m);
@@ -1566,7 +1658,7 @@ class reader {
     std::vector<triplet_type> triplet_list(vec_r.size());
     for (auto i = 0; i < vec_r.size(); i++) {
       triplet_list.emplace_back(
-          triplet_type(vec_r[i], vec_c[i], this->scalar_ub_constrain(lb, lp)));
+          triplet_type(vec_r[i], vec_c[i], this->scalar_ub_constrain(ub, lp)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;
@@ -1651,6 +1743,24 @@ class reader {
     return v;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the next scalars scaled to the ub, lb,
+   * arranged in column-major order. Throws if any value is greather than ub
+   * or less than lb.
+   *
+   * @tparam TL the type of the lower bound.
+   * @tparam TU the type of the upper bound.
+   * @tparam VecR Vector with an integral type.
+   * @tparam VecC Vector with an integral type.
+   * @param lb The lower bound to check all scalar values against.
+   * @param ub The upper bound to check all scalar values against.
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename TU, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline sparse_matrix_t sparse_matrix_lub(const TL lb, const TU ub,
@@ -1670,6 +1780,23 @@ class reader {
     return ret_mat;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the next scalars scaled to the ub and lb
+   * arranged in column-major order.
+   *
+   * @tparam TL the type of the lower bound.
+   * @tparam TU the type of the upper bound.
+   * @tparam VecR Vector with an integral type.
+   * @tparam VecC Vector with an integral type.
+   * @param lb The lower bound to check all scalar values against.
+   * @param ub The upper bound to check all scalar values against.
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename TU, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline sparse_matrix_t sparse_matrix_lub_constrain(const TL lb, const TU ub,
@@ -1689,6 +1816,24 @@ class reader {
     return ret_mat;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the next scalars scaled to the ub, lb, and
+   * and log probability arranged in column-major order.
+   *
+   * @tparam TL the type of the lower bound.
+   * @tparam TU the type of the upper bound.
+   * @tparam VecR Vector with an integral type.
+   * @tparam VecC Vector with an integral type.
+   * @param lb The lower bound to check all scalar values against.
+   * @param ub The upper bound to check all scalar values against.
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @param lp The log probability.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename TU, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline sparse_matrix_t sparse_matrix_lub_constrain(const TL lb, const TU ub,
@@ -1806,6 +1951,27 @@ class reader {
     return v;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the the linearly transformed value for
+   * the next scalars and specified offset and multiplier
+   * <p>The transform applied is
+   *
+   * <p>\f$f(x) = mu + sigma * x\f$
+   *
+   * <p>where mu is the offset and sigma is the multiplier.
+   * @tparam TL the type of the offset.
+   * @tparam TS the type of the multiplier.
+   * @tparam VecR Vector with an integral type.
+   * @tparam VecC Vector with an integral type.
+   * @param offset The offset (mu)
+   * @param multiplier The multiplier (sigma)
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename TS, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline sparse_matrix_t sparse_matrix_offset_multiplier(const TL offset,
@@ -1828,6 +1994,27 @@ class reader {
     return ret_mat;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the the linearly transformed value for
+   * the next scalars and specified offset and multiplier.
+   * <p>The transform applied is
+   *
+   * <p>\f$f(x) = mu + sigma * x\f$
+   *
+   * <p>where mu is the offset and sigma is the multiplier.
+   * @tparam TL the type of the offset.
+   * @tparam TS the type of the multiplier.
+   * @tparam VecR Vector with an integral type.
+   * @tparam VecC Vector with an integral type.
+   * @param offset The offset (mu)
+   * @param multiplier The multiplier (sigma)
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename TS, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline sparse_matrix_t sparse_matrix_offset_multiplier_constrain(
@@ -1848,6 +2035,29 @@ class reader {
     return ret_mat;
   }
 
+  /**
+   * Return a sparse matrix of the specified dimensionality and number of
+   * nonzero elements made up of the the linearly transformed value for
+   * the next scalars and specified offset and multiplier with respect to
+   * the log probability.
+   * <p>The transform applied is
+   *
+   * <p>\f$f(x) = mu + sigma * x\f$
+   *
+   * <p>where mu is the offset and sigma is the multiplier.
+   * @tparam TL the type of the offset.
+   * @tparam TS the type of the multiplier.
+   * @tparam VecR Vector with an integral type.
+   * @tparam VecC Vector with an integral type.
+   * @param offset The offset (mu)
+   * @param multiplier The multiplier (sigma)
+   * @param vec_r rows corresponding the nonzero entries.
+   * @param vec_c columns corresponding the nonzero entries.
+   * @param n Number of rows.
+   * @param m Number of columns.
+   * @param lp The log probability.
+   * @return Eigen::SparseMatrix made up of the next scalars.
+   */
   template <typename TL, typename TS, typename VecR, typename VecC,
             typename = require_all_std_vector_vt<std::is_integral, VecR, VecC>>
   inline sparse_matrix_t sparse_matrix_offset_multiplier_constrain(
