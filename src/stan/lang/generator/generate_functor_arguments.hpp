@@ -15,7 +15,7 @@ namespace lang {
  *
  * @param[in] fun function declaration
  * @param[in] is_rng true if function is a random number generator
- * @param[in] is_lp true if function acceses log density
+ * @param[in] is_lp true if function accesses log density
  * accumulator
  * @param[in] is_log true if function is log probability function
  * @param[in,out] o stream for generating

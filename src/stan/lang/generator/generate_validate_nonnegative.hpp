@@ -18,12 +18,8 @@ namespace lang {
  * This check should precede the variable declaration in order to
  * avoid bad alloc runtime error.
  * Called by
- * <br />generate_validate_context_size - data variables
- * <br />generate_initialization - transformed data declarations
- * <br />generate_var_resiszing - initializes transformed data variables
- * <br />generate_local_var_decl_inits - local variables, transformed parameters
- *                              write array, generated quantities
- * <br/> generate_set_param_ranges - parameter variables
+ * <br />generate_validate_var_dims
+ * <br/> generate_set_param_ranges
  *
 
  * @param[in] name variable name

@@ -15,7 +15,7 @@ namespace lang {
 /**
  * Generate the specified statement with the specified indentation
  * level on the specified output stream.
- * Generated statement is preceeded by stmt updating global variable
+ * Generated statement is preceded by stmt updating global variable
  * `current_statement_begin__` to src file line number where stmt begins.
  *
  * @param[in] s statement to generate

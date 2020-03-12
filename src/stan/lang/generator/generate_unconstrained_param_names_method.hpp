@@ -15,7 +15,7 @@ namespace lang {
  * Generate the method <code>unconstrained_param_names</code> for
  * the specified program on the specified stream.
  *
- * @param[in] prog progam from which to generate
+ * @param[in] prog program from which to generate
  * @param[in,out] o stream for generating
  */
 void generate_unconstrained_param_names_method(const program& prog,

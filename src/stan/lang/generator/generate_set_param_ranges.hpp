@@ -18,7 +18,7 @@ namespace lang {
  * determine the size required for the vector of param ranges and
  * the range for each parameter in the model by iterating over the
  * list of parameter variable declarations.
- * Generated code is preceeded by stmt updating global variable
+ * Generated code is preceded by stmt updating global variable
  * `current_statement_begin__` to src file line number where
  * parameter variable is declared.
  *

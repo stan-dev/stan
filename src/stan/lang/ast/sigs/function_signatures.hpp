@@ -56,7 +56,7 @@ class function_signatures {
    * only available from function definition.
    *
    * @param name function name
-   * @param sig functionand sig
+   * @param sig function signature
    */
   function_signature_t get_definition(const std::string& name,
                                       const function_signature_t& sig);
@@ -204,8 +204,8 @@ class function_signatures {
   void add_unary(const ::std::string& name);
 
   /**
-   * Add built-in functions for all the vectorized form of a unary
-   * function with the speicifed name and a single real argument.
+   * Add built-in functions for all the vectorized forms of a unary
+   * function with the specified name and a single real argument.
    *
    * @param name function name
    */
@@ -239,7 +239,7 @@ class function_signatures {
    * Determine the return type of distributions' RNG function
    * based on the primitiveness of the arguments. If both
    * arguments are scalar, the return type is int or real
-   * depending on the distribtuion. Otherwise, the return type is
+   * depending on the distribution. Otherwise, the return type is
    * int[] for discrete distributions and real[] for continuous
    * ones.
    *
@@ -254,7 +254,7 @@ class function_signatures {
    * Determine the return type of distributions' RNG function
    * based on the primitiveness of the arguments. If both
    * arguments are scalar, the return type is int or real
-   * depending on the distribtuion. Otherwise, the return type is
+   * depending on the distribution. Otherwise, the return type is
    * int[] for discrete distributions and real[] for continuous
    * ones.
    *
@@ -271,7 +271,7 @@ class function_signatures {
    * Determine the return type of distributions' RNG function
    * based on the primitiveness of the arguments. If both
    * arguments are scalar, the return type is int or real
-   * depending on the distribtuion. Otherwise, the return type is
+   * depending on the distribution. Otherwise, the return type is
    * int[] for discrete distributions and real[] for continuous
    * ones.
    *
@@ -301,7 +301,7 @@ class function_signatures {
 
   /**
    * Return the result expression type resulting from applying a
-   * function of the speicified name and argument types, with
+   * function of the specified name and argument types, with
    * errors going to the specified error message string and a flag
    * to control error output.
    *

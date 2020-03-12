@@ -40,7 +40,7 @@ TEST_F(ComputeRhat, compute_potential_scale_reduction) {
       1.00077, 1.0021, 1.00262, 1.00308, 1.00197, 1.00246, 1.00085, 1.00047,
       1.00735;
 
-  // replicates calls to stan::anlayze::compute_effective_sample_size
+  // replicates calls to stan::analyze::compute_effective_sample_size
   // for any interface *without* access to chains class
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(
       chains.num_chains());
@@ -153,7 +153,7 @@ TEST_F(ComputeRhat, compute_split_potential_scale_reduction) {
       1.00077, 1.0021, 1.00262, 1.00308, 1.00197, 1.00246, 1.00085, 1.00047,
       1.00735;
 
-  // replicates calls to stan::anlayze::compute_effective_sample_size
+  // replicates calls to stan::analyze::compute_effective_sample_size
   // for any interface *without* access to chains class
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(
       chains.num_chains());

@@ -12,7 +12,7 @@ namespace lang {
  */
 struct while_statement {
   /**
-   * Construct an unitialized while statement with nil condition
+   * Construct an uninitialized while statement with nil condition
    * and body.
    */
   while_statement();

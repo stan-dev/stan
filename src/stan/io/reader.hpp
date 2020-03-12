@@ -282,7 +282,7 @@ class reader {
    * the next scalars arranged in column-major order.
    *
    * Row-major reading means that if a matrix of <code>m=2</code>
-   * rows and <code>n=3</code> columns is reada and the next
+   * rows and <code>n=3</code> columns is read and the next
    * scalar values are <code>1,2,3,4,5,6</code>, the result is
    *
    * <pre>
@@ -1846,9 +1846,8 @@ class reader {
     using triplet_type = Eigen::Triplet<T>;
     std::vector<triplet_type> triplet_list(vec_r.size());
     for (auto i = 0; i < vec_r.size(); i++) {
-      triplet_list.emplace_back(
-          triplet_type(vec_r[i], vec_c[i],
-             this->scalar_lub_constrain(lb, ub, lp)));
+      triplet_list.emplace_back(triplet_type(
+          vec_r[i], vec_c[i], this->scalar_lub_constrain(lb, ub, lp)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;

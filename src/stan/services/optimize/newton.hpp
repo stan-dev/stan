@@ -28,7 +28,7 @@ namespace optimize {
  * @param[in] chain chain id to advance the pseudo random number generator
  * @param[in] init_radius radius to initialize
  * @param[in] num_iterations maximum number of iterations
- * @param[in] save_iterations indicates whether all the interations should
+ * @param[in] save_iterations indicates whether all the iterations should
  *   be saved
  * @param[in,out] interrupt callback to be called every iteration
  * @param[in,out] logger Logger for messages
