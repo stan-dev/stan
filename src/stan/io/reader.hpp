@@ -199,7 +199,7 @@ class reader {
     }
     this->pos_ += m;
     return std::vector<T>(this->data_r_.begin() + this->pos_ - m,
-              this->data_r_.begin() + this->pos_);
+                          this->data_r_.begin() + this->pos_);
   }
 
   /**
