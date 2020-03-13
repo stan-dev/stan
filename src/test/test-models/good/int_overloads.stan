@@ -81,19 +81,6 @@ transformed data {
   transformed_data_real = trunc(d_real);
   transformed_data_real = round(d_int);
   transformed_data_real = round(d_real);
-
-  transformed_data_real = inv(d_int);
-  transformed_data_real = inv(d_real);
-  transformed_data_real = inv_sqrt(d_int);
-  transformed_data_real = inv_sqrt(d_real);
-  transformed_data_real = inv_square(d_int);
-  transformed_data_real = inv_square(d_real);
-  transformed_data_real = sqrt(d_int);
-  transformed_data_real = sqrt(d_real);
-  transformed_data_real = tan(d_int);
-  transformed_data_real = tan(d_real);
-  transformed_data_real = tanh(d_int);
-  transformed_data_real = tanh(d_real);
   transformed_data_real = trigamma(d_int);
   transformed_data_real = trigamma(d_real);
 }
