@@ -55,6 +55,7 @@ int lbfgs(Model& model, const stan::io::var_context& init,
           int history_size, double init_alpha, double tol_obj,
           double tol_rel_obj, double tol_grad, double tol_rel_grad,
           double tol_param, int num_iterations, bool save_iterations,
+	  int laplace_draws, double laplace_diag_shift,
           int refresh, callbacks::interrupt& interrupt,
           callbacks::logger& logger, callbacks::writer& init_writer,
           callbacks::writer& parameter_writer) {
@@ -165,6 +166,51 @@ int lbfgs(Model& model, const stan::io::var_context& init,
 
     values.insert(values.begin(), lp);
     parameter_writer(values);
+  }
+
+  if(laplace_draws > 0) {
+    Eigen::Map<Eigen::VectorXd> cont_eigen_vector(cont_vector.data(), cont_vector.size());
+  
+    auto f = [&](const Eigen::VectorXd& theta) {
+      std::stringstream msg;
+      Eigen::VectorXd theta_ = theta;
+      double nlp = -model.log_prob(theta_, &msg);
+      if (msg.str().length() > 0)
+	logger.info(msg);
+      return nlp;
+    };
+
+    double nlp;
+    Eigen::VectorXd grad_nlp;
+    Eigen::MatrixXd hess_nlp;
+  
+    stan::math::finite_diff_hessian_auto(f, cont_eigen_vector, nlp, grad_nlp, hess_nlp);
+
+    Eigen::MatrixXd hess_nlp_U = (hess_nlp + Eigen::MatrixXd::Identity(hess_nlp.rows(), hess_nlp.cols()) * laplace_diag_shift).eval().llt().matrixU();
+  
+    boost::variate_generator<decltype(rng)&, boost::normal_distribution<> >
+      rand_dense_gaus(rng, boost::normal_distribution<>());
+
+    parameter_writer("Draws from Laplace Approximation:");
+    names.erase(names.begin(), names.begin() + 1);
+    parameter_writer(names);
+    for(size_t n = 0; n < laplace_draws; ++n) {
+      std::vector<double> u_std_vector(cont_eigen_vector.size());
+      Eigen::Map<Eigen::VectorXd> u(u_std_vector.data(), u_std_vector.size());
+      std::vector<double> values;
+      std::stringstream msg;
+
+      for (size_t i = 0; i < u.size(); ++i)
+	u(i) = rand_dense_gaus();
+
+      u = hess_nlp_U.triangularView<Eigen::Upper>().solve(u).eval();
+
+      model.write_array(rng, u_std_vector, disc_vector, values, true, true, &msg);
+      if (msg.str().length() > 0)
+	logger.info(msg);
+
+      parameter_writer(values);
+    }
   }
 
   int return_code;
