@@ -42,7 +42,7 @@ public:
    *
    * @return reference to the inverse metric
    */
-  const Eigen::VectorXd& get_inv_metric() {
+  const Eigen::VectorXd& get_inv_metric() const {
     return inv_e_metric_;
   }
 

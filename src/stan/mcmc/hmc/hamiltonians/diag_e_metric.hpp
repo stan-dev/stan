@@ -45,8 +45,9 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
     boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
         rand_diag_gaus(rng, boost::normal_distribution<>());
 
-    for (int i = 0; i < z.p.size(); ++i)
-      z.p(i) = rand_diag_gaus() / sqrt(z.get_inv_metric()(i));
+    z.p = z.get_inv_metric().unaryExpr([&](auto&& x) {
+	return rand_diag_gaus() / sqrt(x);
+      });
   }
 };
 

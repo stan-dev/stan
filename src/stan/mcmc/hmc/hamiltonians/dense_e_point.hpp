@@ -47,7 +47,7 @@ public:
    *
    * @return reference to the inverse metric
    */
-  const Eigen::MatrixXd& get_inv_metric() {
+  const Eigen::MatrixXd& get_inv_metric() const {
     return inv_e_metric_;
   }
 
@@ -57,7 +57,7 @@ public:
    *
    * @return reference to transpose of Cholesky factor
    */
-  const Eigen::MatrixXd& get_transpose_llt_inv_metric() {
+  const Eigen::MatrixXd& get_transpose_llt_inv_metric() const {
     return inv_e_metric_llt_matrixU_;
   }
 
