@@ -203,7 +203,7 @@ int lbfgs(Model& model, const stan::io::var_context& init,
       for (size_t i = 0; i < u.size(); ++i)
 	u(i) = rand_dense_gaus();
 
-      u = hess_nlp_U.triangularView<Eigen::Upper>().solve(u).eval();
+      u = hess_nlp_U.triangularView<Eigen::Upper>().solve(u).eval() + cont_eigen_vector;
 
       model.write_array(rng, u_std_vector, disc_vector, values, true, true, &msg);
       if (msg.str().length() > 0)
