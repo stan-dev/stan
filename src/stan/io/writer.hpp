@@ -264,10 +264,9 @@ class writer {
    */
   void vector_unconstrain(const vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    const auto r_size = this->data_r_.size();
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
-      this->data_r_.push_back(y[i]);
+      this->data_r_.push_back(y.coeffRef(i));
     }
   }
 
@@ -278,8 +277,9 @@ class writer {
    */
   void row_vector_unconstrain(const vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
-      this->data_r_.push_back(y[i]);
+      this->data_r_.push_back(y.coeffRef(i));
     }
   }
 
@@ -290,11 +290,9 @@ class writer {
    */
   void matrix_unconstrain(const matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
-    for (idx_t j = 0; j < y.cols(); ++j) {
-      for (idx_t i = 0; i < y.rows(); ++i) {
-        this->data_r_.push_back(y(i, j));
-      }
+    this->data_r_.reserve(this->data_r_.size() + y.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+        this->data_r_.push_back(y.coeffRef(i));
     }
   }
 
@@ -313,24 +311,23 @@ class writer {
 
   void vector_lb_unconstrain(double lb, vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
-      this->scalar_lb_unconstrain(lb, y(i));
+      this->scalar_lb_unconstrain(lb, y.coeffRef(i));
     }
   }
   void row_vector_lb_unconstrain(double lb, row_vector_t &y) {
     typedef typename stan::math::index_type<row_vector_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
-      this->scalar_lb_unconstrain(lb, y(i));
+      this->scalar_lb_unconstrain(lb, y.coeffRef(i));
     }
   }
   void matrix_lb_unconstrain(double lb, matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
-    for (idx_t j = 0; j < y.cols(); ++j) {
-      for (idx_t i = 0; i < y.rows(); ++i) {
-        this->scalar_lb_unconstrain(lb, y(i, j));
-      }
+    this->data_r_.reserve(this->data_r_.size() + y.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->scalar_lb_unconstrain(lb, y.coeffRef(i));
     }
   }
 
@@ -344,25 +341,23 @@ class writer {
 
   void vector_ub_unconstrain(double ub, vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
-      this->scalar_ub_unconstrain(ub, y(i));
+      this->scalar_ub_unconstrain(ub, y.coeffRef(i));
     }
   }
   void row_vector_ub_unconstrain(double ub, row_vector_t &y) {
     typedef typename stan::math::index_type<row_vector_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
-      this->scalar_ub_unconstrain(ub, y(i));
+      this->scalar_ub_unconstrain(ub, y.coeffRef(i));
     }
   }
   void matrix_ub_unconstrain(double ub, matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
-    for (idx_t j = 0; j < y.cols(); ++j) {
-      for (idx_t i = 0; i < y.rows(); ++i) {
-        this->scalar_ub_unconstrain(ub, y(i, j));
-      }
+    this->data_r_.reserve(this->data_r_.size() + y.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->scalar_ub_unconstrain(ub, y.coeffRef(i));
     }
   }
 
@@ -376,30 +371,27 @@ class writer {
 
   void vector_lub_unconstrain(double lb, double ub, vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
-      this->scalar_lub_unconstrain(lb, ub, y(i));
+      this->scalar_lub_unconstrain(lb, ub, y.coeffRef(i));
     }
   }
   void row_vector_lub_unconstrain(double lb, double ub, row_vector_t &y) {
     typedef typename stan::math::index_type<row_vector_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
-      this->scalar_lub_unconstrain(lb, ub, y(i));
+      this->scalar_lub_unconstrain(lb, ub, y.coeffRef(i));
     }
   }
   void matrix_lub_unconstrain(double lb, double ub, matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
-    for (idx_t j = 0; j < y.cols(); ++j) {
-      for (idx_t i = 0; i < y.rows(); ++i) {
-        this->scalar_lub_unconstrain(lb, ub, y(i, j));
-      }
+    this->data_r_.reserve(this->data_r_.size() + y.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->scalar_lub_unconstrain(lb, ub, y.coeffRef(i));
     }
   }
 
   void sparse_matrix_lub_unconstrain(double lb, double ub, sparse_matrix_t &y) {
-    this->data_r_.reserve(r_size + y.size());
     for (int k = 0; k < y.outerSize(); ++k) {
       for (sparse_matrix_inner_iter_t it(y, k); it; ++it) {
         this->scalar_lub_unconstrain(lb, ub, it.value());
@@ -410,7 +402,7 @@ class writer {
   void vector_offset_multiplier_unconstrain(double offset, double multiplier,
                                             vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
       this->scalar_offset_multiplier_unconstrain(offset, multiplier, y(i));
     }
@@ -466,9 +458,9 @@ class writer {
                                   y);
     typedef typename stan::math::index_type<vector_t>::type idx_t;
     vector_t uy = stan::math::unit_vector_free(y);
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + uy.size());
     for (idx_t i = 0; i < uy.size(); ++i) {
-      this->data_r_.push_back(uy[i]);
+      this->data_r_.push_back(uy.coeffRef(i));
     }
   }
 
@@ -490,10 +482,10 @@ class writer {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
 
     stan::math::check_simplex("stan::io::simplex_unconstrain", "Vector", y);
-    this->data_r_.reserve(r_size + y.size());
     vector_t uy = stan::math::simplex_free(y);
+    this->data_r_.reserve(this->data_r_.size() + uy.size());
     for (idx_t i = 0; i < uy.size(); ++i) {
-      this->data_r_.push_back(uy[i]);
+      this->data_r_.push_back(uy.coeffRef(i));
     }
   }
 
@@ -514,9 +506,9 @@ class writer {
     // FIXME:  optimize by unrolling cholesky_factor_free
     Eigen::Matrix<T, Eigen::Dynamic, 1> y_free
         = stan::math::cholesky_factor_free(y);
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + y_free.size());
     for (idx_t i = 0; i < y_free.size(); ++i) {
-      this->data_r_.push_back(y_free[i]);
+      this->data_r_.push_back(y_free.coeffRef(i));
     }
   }
 
@@ -537,9 +529,9 @@ class writer {
     // FIXME:  optimize by unrolling cholesky_factor_free
     Eigen::Matrix<T, Eigen::Dynamic, 1> y_free
         = stan::math::cholesky_corr_free(y);
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + y_free.size());
     for (idx_t i = 0; i < y_free.size(); ++i) {
-      this->data_r_.push_back(y_free[i]);
+      this->data_r_.push_back(y_free.coeffRef(i));
     }
   }
 
@@ -563,11 +555,11 @@ class writer {
                              " y must be a square matrix"));
     }
     vector_t L_vec = stan::math::cov_matrix_free(y);
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + L_vec.size());
     int i = 0;
     for (idx_t m = 0; m < k; ++m) {
       for (idx_t n = 0; n <= m; ++n) {
-        this->data_r_.push_back(L_vec.coeff(i++));
+        this->data_r_.push_back(L_vec.coeffRef(i++));
       }
     }
   }
@@ -595,9 +587,9 @@ class writer {
     idx_t k = y.rows();
     idx_t k_choose_2 = (k * (k - 1)) / 2;
     vector_t cpcs = stan::math::corr_matrix_free(y);
-    this->data_r_.reserve(r_size + y.size());
+    this->data_r_.reserve(this->data_r_.size() + k_choose_2);
     for (idx_t i = 0; i < k_choose_2; ++i) {
-      this->data_r_.push_back(cpcs[i]);
+      this->data_r_.push_back(cpcs.coeffRef(i));
     }
   }
 };
