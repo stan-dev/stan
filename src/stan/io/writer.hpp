@@ -250,6 +250,7 @@ class writer {
     }
     stan::math::check_positive_ordered("stan::io::positive_ordered_unconstrain",
                                        "Vector", y);
+    this->data_r_.reserve(this->data_r_.size() + y.size());
     this->data_r_.push_back(log(y[0]));
     for (idx_t i = 1; i < y.size(); ++i) {
       this->data_r_.push_back(log(y[i] - y[i - 1]));
@@ -263,9 +264,11 @@ class writer {
    */
   void vector_unconstrain(const vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    auto r_size = this->data_r_.size();
+    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    this->data_r_.insert(this->data_r_.end(), y.data(), y.data() + y.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->data_r_.push_back(y[i]);
+    }
   }
 
   /**
@@ -275,9 +278,9 @@ class writer {
    */
   void row_vector_unconstrain(const vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    auto r_size = this->data_r_.size();
-    this->data_r_.reserve(r_size + y.size());
-    this->data_r_.insert(this->data_r_.end(), y.data(), y.data() + y.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->data_r_.push_back(y[i]);
+    }
   }
 
   /**
@@ -287,9 +290,12 @@ class writer {
    */
   void matrix_unconstrain(const matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
-    auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    this->data_r_.insert(this->data_r_.end(), y.data(), y.data() + y.size());
+    for (idx_t j = 0; j < y.cols(); ++j) {
+      for (idx_t i = 0; i < y.rows(); ++i) {
+        this->data_r_.push_back(y(i, j));
+      }
+    }
   }
 
   /**
@@ -307,24 +313,25 @@ class writer {
 
   void vector_lb_unconstrain(double lb, vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    auto r_size = this->data_r_.size();
-    this->data_r_.reserve(r_size + y.size());
-    const auto y_lb = stan::math::lb_free(y, lb);
-    this->data_r_.insert(this->data_r_.end(), y_lb.data(), y_lb.data() + y_lb.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->scalar_lb_unconstrain(lb, y(i));
+    }
   }
   void row_vector_lb_unconstrain(double lb, row_vector_t &y) {
     typedef typename stan::math::index_type<row_vector_t>::type idx_t;
-    auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    const auto y_lb = stan::math::lb_free(y, lb);
-    this->data_r_.insert(this->data_r_.end(), y_lb.data(), y_lb.data() + y_lb.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->scalar_lb_unconstrain(lb, y(i));
+    }
   }
   void matrix_lb_unconstrain(double lb, matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
-    auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    const auto y_lb = stan::math::lb_free(y, lb);
-    this->data_r_.insert(this->data_r_.end(), y_lb.data(), y_lb.data() + y_lb.size());
+    for (idx_t j = 0; j < y.cols(); ++j) {
+      for (idx_t i = 0; i < y.rows(); ++i) {
+        this->scalar_lb_unconstrain(lb, y(i, j));
+      }
+    }
   }
 
   void sparse_matrix_lb_unconstrain(double lb, sparse_matrix_t &y) {
@@ -337,24 +344,26 @@ class writer {
 
   void vector_ub_unconstrain(double ub, vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    const auto y_ub = stan::math::ub_free(y, ub);
-    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    this->data_r_.insert(this->data_r_.end(), y_ub.data(), y_ub.data() + y_ub.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->scalar_ub_unconstrain(ub, y(i));
+    }
   }
   void row_vector_ub_unconstrain(double ub, row_vector_t &y) {
     typedef typename stan::math::index_type<row_vector_t>::type idx_t;
-    const auto y_ub = stan::math::ub_free(y, ub);
-    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    this->data_r_.insert(this->data_r_.end(), y_ub.data(), y_ub.data() + y_ub.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->scalar_ub_unconstrain(ub, y(i));
+    }
   }
   void matrix_ub_unconstrain(double ub, matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
-    const auto y_ub = stan::math::ub_free(y, ub);
-    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    this->data_r_.insert(this->data_r_.end(), y_ub.data(), y_ub.data() + y_ub.size());
+    for (idx_t j = 0; j < y.cols(); ++j) {
+      for (idx_t i = 0; i < y.rows(); ++i) {
+        this->scalar_ub_unconstrain(ub, y(i, j));
+      }
+    }
   }
 
   void sparse_matrix_ub_unconstrain(double ub, sparse_matrix_t &y) {
@@ -367,27 +376,30 @@ class writer {
 
   void vector_lub_unconstrain(double lb, double ub, vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    const auto y_lub = stan::math::lub_free(y, lb, ub);
-    this->data_r_.insert(this->data_r_.end(), y_lub.data(), y_lub.data() + y_lub.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->scalar_lub_unconstrain(lb, ub, y(i));
+    }
   }
   void row_vector_lub_unconstrain(double lb, double ub, row_vector_t &y) {
     typedef typename stan::math::index_type<row_vector_t>::type idx_t;
-    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    const auto y_lub = stan::math::lub_free(y, lb, ub);
-    this->data_r_.insert(this->data_r_.end(), y_lub.data(), y_lub.data() + y_lub.size());
+    for (idx_t i = 0; i < y.size(); ++i) {
+      this->scalar_lub_unconstrain(lb, ub, y(i));
+    }
   }
   void matrix_lub_unconstrain(double lb, double ub, matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
-    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    const auto y_lub = stan::math::lub_free(y, lb, ub);
-    this->data_r_.insert(this->data_r_.end(), y_lub.data(), y_lub.data() + y_lub.size());
+    for (idx_t j = 0; j < y.cols(); ++j) {
+      for (idx_t i = 0; i < y.rows(); ++i) {
+        this->scalar_lub_unconstrain(lb, ub, y(i, j));
+      }
+    }
   }
 
   void sparse_matrix_lub_unconstrain(double lb, double ub, sparse_matrix_t &y) {
+    this->data_r_.reserve(r_size + y.size());
     for (int k = 0; k < y.outerSize(); ++k) {
       for (sparse_matrix_inner_iter_t it(y, k); it; ++it) {
         this->scalar_lub_unconstrain(lb, ub, it.value());
@@ -398,6 +410,7 @@ class writer {
   void vector_offset_multiplier_unconstrain(double offset, double multiplier,
                                             vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
+    this->data_r_.reserve(r_size + y.size());
     for (idx_t i = 0; i < y.size(); ++i) {
       this->scalar_offset_multiplier_unconstrain(offset, multiplier, y(i));
     }
@@ -452,10 +465,11 @@ class writer {
     stan::math::check_unit_vector("stan::io::unit_vector_unconstrain", "Vector",
                                   y);
     typedef typename stan::math::index_type<vector_t>::type idx_t;
-    const vector_t uy = stan::math::unit_vector_free(y);
-    const auto r_size = this->data_r_.size();
-    this->data_r_.reserve(r_size + uy.size());
-    this->data_r_.insert(this->data_r_.end(), uy.data(), uy.data() + uy.size());
+    vector_t uy = stan::math::unit_vector_free(y);
+    this->data_r_.reserve(r_size + y.size());
+    for (idx_t i = 0; i < uy.size(); ++i) {
+      this->data_r_.push_back(uy[i]);
+    }
   }
 
   /**
@@ -474,11 +488,13 @@ class writer {
    */
   void simplex_unconstrain(vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
+
     stan::math::check_simplex("stan::io::simplex_unconstrain", "Vector", y);
-    const vector_t uy = stan::math::simplex_free(y);
-    const auto r_size = this->data_r_.size();
-    this->data_r_.reserve(r_size + uy.size());
-    this->data_r_.insert(this->data_r_.end(), uy.data(), uy.data() + uy.size());
+    this->data_r_.reserve(r_size + y.size());
+    vector_t uy = stan::math::simplex_free(y);
+    for (idx_t i = 0; i < uy.size(); ++i) {
+      this->data_r_.push_back(uy[i]);
+    }
   }
 
   /**
@@ -494,12 +510,14 @@ class writer {
    */
   void cholesky_factor_cov_unconstrain(matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
+
     // FIXME:  optimize by unrolling cholesky_factor_free
-    const Eigen::Matrix<T, Eigen::Dynamic, 1> y_free
+    Eigen::Matrix<T, Eigen::Dynamic, 1> y_free
         = stan::math::cholesky_factor_free(y);
-    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    this->data_r_.insert(this->data_r_.end(), y_free.data(), y_free.data() + y_free.size());
+    for (idx_t i = 0; i < y_free.size(); ++i) {
+      this->data_r_.push_back(y_free[i]);
+    }
   }
 
   /**
@@ -515,12 +533,14 @@ class writer {
    */
   void cholesky_factor_corr_unconstrain(matrix_t &y) {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
+
     // FIXME:  optimize by unrolling cholesky_factor_free
     Eigen::Matrix<T, Eigen::Dynamic, 1> y_free
         = stan::math::cholesky_corr_free(y);
-    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    this->data_r_.insert(this->data_r_.end(), y_free.data(), y_free.data() + y_free.size());
+    for (idx_t i = 0; i < y_free.size(); ++i) {
+      this->data_r_.push_back(y_free[i]);
+    }
   }
 
   /**
@@ -542,9 +562,8 @@ class writer {
           std::runtime_error("y must have elements and"
                              " y must be a square matrix"));
     }
-    const auto r_size = this->data_r_.size();
-    this->data_r_.reserve(r_size + y.size());
     vector_t L_vec = stan::math::cov_matrix_free(y);
+    this->data_r_.reserve(r_size + y.size());
     int i = 0;
     for (idx_t m = 0; m < k; ++m) {
       for (idx_t n = 0; n <= m; ++n) {
@@ -576,9 +595,10 @@ class writer {
     idx_t k = y.rows();
     idx_t k_choose_2 = (k * (k - 1)) / 2;
     vector_t cpcs = stan::math::corr_matrix_free(y);
-    const auto r_size = this->data_r_.size();
     this->data_r_.reserve(r_size + y.size());
-    this->data_r_.insert(this->data_r_.end(), cpcs.data(), cpcs.data() + cpcs.size());
+    for (idx_t i = 0; i < k_choose_2; ++i) {
+      this->data_r_.push_back(cpcs[i]);
+    }
   }
 };
 }  // namespace io
