@@ -58,6 +58,22 @@ TEST(io_writer, integer) {
   EXPECT_EQ(integer, writer.data_i()[0]);
 }
 
+TEST(io_writer, vector_unconstrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta, theta_i);
+
+  int size = 3;
+  stan::math::vector_d rv(size);
+  for (int n = 0; n < size; n++)
+    rv(n) = n;
+
+  writer.vector_unconstrain(rv);
+  ASSERT_EQ(size, writer.data_r().size());
+  for (int n = 0; n < size; n++)
+    EXPECT_EQ(n, writer.data_r()[n]);
+}
+
 TEST(io_writer, row_vector_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -69,7 +85,7 @@ TEST(io_writer, row_vector_unconstrain) {
     rv(n) = n;
 
   writer.row_vector_unconstrain(rv);
-  ASSERT_EQ((size_t)size, writer.data_r().size());
+  ASSERT_EQ(size, writer.data_r().size());
   for (int n = 0; n < size; n++)
     EXPECT_EQ(n, writer.data_r()[n]);
 }

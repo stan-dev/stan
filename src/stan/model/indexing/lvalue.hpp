@@ -266,6 +266,33 @@ void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
 }
 
 /**
+ * Assign the specified Eigen sparse matrix at the specified pair of
+ * single indexes to the specified scalar value.
+ *
+ * Types:  sparse_mat[single, single] = scalar
+ *
+ * @tparam T Sparse Matrix scalar type.
+ * @tparam U Scalar type.
+ * @param[in] x Sparse Matrix variable to be assigned.
+ * @param[in] idxs Sequence of two single indexes (from 1).
+ * @param[in] y Value scalar.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If either of the indices are out of bounds.
+ */
+template <typename T, typename U>
+void assign(Eigen::SparseMatrix<T>& x,
+            const cons_index_list<
+                index_uni, cons_index_list<index_uni, nil_index_list> >& idxs,
+            const U& y, const char* name = "ANON", int depth = 0) {
+  int m = idxs.head_.n_;
+  int n = idxs.tail_.head_.n_;
+  math::check_range("sparse_matrix[uni,uni] assign range", name, x.rows(), m);
+  math::check_range("sparse_matrix[uni,uni] assign range", name, x.cols(), n);
+  x.insert(m - 1, n - 1) = y;
+}
+
+/**
  * Assign the specified Eigen matrix at the specified single and
  * multiple index to the specified row vector.
  *
@@ -304,6 +331,45 @@ assign(
 }
 
 /**
+ * Assign the specified Eigen sparse matrix at the specified single and
+ * multiple index to the specified row vector.
+ *
+ * Types:  sparse_mat[uni, multi] = rowvec
+ *
+ * @tparam T Assigned sparse matrix scalar type.
+ * @tparam I Multi-index type.
+ * @tparam U Value row vector scalar type (must be assignable to
+ * T).
+ * @param[in] x Sparse Matrix variable to be assigned.
+ * @param[in] idxs Sequence of single and multiple index (from 1).
+ * @param[in] y Value row vector.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ * @throw std::invalid_argument If the dimensions of the indexed
+ * matrix and right-hand side row vector do not match.
+ */
+template <typename T, typename I, typename U>
+inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
+assign(
+    Eigen::SparseMatrix<T>& x,
+    const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idxs,
+    const Eigen::Matrix<U, 1, Eigen::Dynamic>& y, const char* name = "ANON",
+    int depth = 0) {
+  int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
+  math::check_size_match("matrix[uni,multi] assign sizes", "lhs", x_idxs_cols,
+                         name, y.cols());
+  int m = idxs.head_.n_;
+  math::check_range("matrix[uni,multi] assign range", name, x.rows(), m);
+  for (int i = 0; i < y.size(); ++i) {
+    int n = rvalue_at(i, idxs.tail_.head_);
+    math::check_range("matrix[uni,multi] assign range", name, x.cols(), n);
+    x.insert(m - 1, n - 1) = y(i);
+  }
+}
+
+
+/**
  * Assign the specified Eigen matrix at the specified multiple and
  * single index to the specified vector.
  *
@@ -337,6 +403,43 @@ assign(
     int m = rvalue_at(i, idxs.head_);
     math::check_range("matrix[multi,uni] assign range", name, x.rows(), m);
     x(m - 1, n - 1) = y(i);
+  }
+}
+
+/**
+ * Assign the specified Eigen sparse matrix at the specified multiple and
+ * single index to the specified vector.
+ *
+ * Types:  sparse_mat[multi, uni] = vec
+ *
+ * @tparam T Assigned sparse matrix scalar type.
+ * @tparam I Multi-index type.
+ * @tparam U Value vector scalar type (must be assignable to T).
+ * @param[in] x Sparse Matrix variable to be assigned.
+ * @param[in] idxs Sequence of multiple and single index (from 1).
+ * @param[in] y Value vector.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ * @throw std::invalid_argument If the dimensions of the indexed
+ * matrix and right-hand side vector do not match.
+ */
+template <typename T, typename I, typename U>
+inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
+assign(
+    Eigen::SparseMatrix<T>& x,
+    const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idxs,
+    const Eigen::Matrix<U, Eigen::Dynamic, 1>& y, const char* name = "ANON",
+    int depth = 0) {
+  int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
+  math::check_size_match("matrix[multi,uni] assign sizes", "lhs", x_idxs_rows,
+                         name, y.rows());
+  int n = idxs.tail_.head_.n_;
+  math::check_range("matrix[multi,uni] assign range", name, x.cols(), n);
+  for (int i = 0; i < y.size(); ++i) {
+    int m = rvalue_at(i, idxs.head_);
+    math::check_range("matrix[multi,uni] assign range", name, x.rows(), m);
+    x.insert(m - 1, n - 1) = y(i);
   }
 }
 
