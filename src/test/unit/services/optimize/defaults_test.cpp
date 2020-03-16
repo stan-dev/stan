@@ -105,7 +105,7 @@ TEST(optimize_defaults, iter) {
 
 TEST(optimize_defaults, save_iterations) {
   using stan::services::optimize::save_iterations;
-  EXPECT_EQ("Save optimization interations to output.",
+  EXPECT_EQ("Save optimization iterations to output.",
             save_iterations::description());
 
   EXPECT_NO_THROW(save_iterations::validate(save_iterations::default_value()));

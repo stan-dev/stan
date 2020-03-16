@@ -20,7 +20,7 @@ namespace lang {
  *
  * @param[in] indent level of indentation
  * @param[in,out] o stream for generating
- * @param[in] var_decl block variable declaraton ast node
+ * @param[in] var_decl block variable declaration ast node
  */
 void generate_unconstrained_param_names_array(size_t indent, std::ostream& o,
                                               const block_var_decl& var_decl) {

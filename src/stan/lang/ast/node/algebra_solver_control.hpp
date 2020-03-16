@@ -60,7 +60,7 @@ struct algebra_solver_control {
   algebra_solver_control();
 
   /**
-   * Construt an algebraic solver with control parameters with
+   * Construct an algebraic solver with control parameters with
    * the specified values.
    *
    * @param system_function_name name of algebraic solver

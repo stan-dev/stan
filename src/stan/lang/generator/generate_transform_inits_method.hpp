@@ -42,7 +42,7 @@ void generate_method_begin(std::ostream& o) {
     << "writer__(params_r__, params_i__);" << EOL;
 
   o << INDENT2 << "size_t pos__;" << EOL;
-  o << INDENT2 << "(void) pos__; // dummy call to supress warning" << EOL;
+  o << INDENT2 << "(void) pos__; // dummy call to suppress warning" << EOL;
   o << INDENT2 << "std::vector<double> vals_r__;" << EOL;
   o << INDENT2 << "std::vector<int> vals_i__;" << EOL;
 }
@@ -166,7 +166,7 @@ void generate_transform_inits_method(const std::vector<block_var_decl>& vs,
     o << "}" << EOL;
     write_end_loop(vtype.array_dims(), indent, o);
 
-    // all done, add blank line for readibility
+    // all done, add blank line for readability
     o << EOL;
   }
   generate_method_end(o);
