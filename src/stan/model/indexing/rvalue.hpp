@@ -198,8 +198,7 @@ inline auto rvalue(const EigMat& a,
                    const cons_index_list<I, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   int n_rows = rvalue_index_size(idx.head_, a.rows());
-  typename EigMat::PlainObject
-      b(n_rows, a.cols());
+  typename EigMat::PlainObject b(n_rows, a.cols());
   const Eigen::Ref<const typename EigMat::PlainObject>& mat = a;
   for (int i = 0; i < n_rows; ++i) {
     int n = rvalue_at(i, idx.head_);
