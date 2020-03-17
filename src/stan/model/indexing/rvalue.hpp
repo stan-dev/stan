@@ -94,9 +94,7 @@ inline auto rvalue(const EigVec& v,
                    const char* name = "ANON", int depth = 0) {
   int size = rvalue_index_size(idx.head_, v.size());
   const Eigen::Ref<const typename EigVec::PlainObject>& vec = v;
-  Eigen::Matrix<scalar_type_t<EigVec>, EigVec::RowsAtCompileTime,
-                EigVec::ColsAtCompileTime>
-      a(size);
+  typename EigVec::PlainObject a(size);
   for (int i = 0; i < size; ++i) {
     int n = rvalue_at(i, idx.head_);
     math::check_range("vector[multi] indexing", name, v.size(), n);
@@ -200,8 +198,7 @@ inline auto rvalue(const EigMat& a,
                    const cons_index_list<I, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   int n_rows = rvalue_index_size(idx.head_, a.rows());
-  Eigen::Matrix<scalar_type_t<EigMat>, EigMat::RowsAtCompileTime,
-                EigMat::ColsAtCompileTime>
+  typename EigMat::PlainObject
       b(n_rows, a.cols());
   const Eigen::Ref<const typename EigMat::PlainObject>& mat = a;
   for (int i = 0; i < n_rows; ++i) {
