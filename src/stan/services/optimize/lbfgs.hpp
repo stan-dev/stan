@@ -55,7 +55,7 @@ int lbfgs(Model& model, const stan::io::var_context& init,
           int history_size, double init_alpha, double tol_obj,
           double tol_rel_obj, double tol_grad, double tol_rel_grad,
           double tol_param, int num_iterations, bool save_iterations,
-	  int laplace_draws, double laplace_diag_shift,
+	  int laplace_draws, double laplace_add_diag,
           int refresh, callbacks::interrupt& interrupt,
           callbacks::logger& logger, callbacks::writer& init_writer,
           callbacks::writer& parameter_writer) {
@@ -186,7 +186,7 @@ int lbfgs(Model& model, const stan::io::var_context& init,
   
     stan::math::finite_diff_hessian_auto(f, cont_eigen_vector, nlp, grad_nlp, hess_nlp);
 
-    Eigen::MatrixXd hess_nlp_U = (hess_nlp + Eigen::MatrixXd::Identity(hess_nlp.rows(), hess_nlp.cols()) * laplace_diag_shift).eval().llt().matrixU();
+    Eigen::MatrixXd hess_nlp_U = (hess_nlp + Eigen::MatrixXd::Identity(hess_nlp.rows(), hess_nlp.cols()) * laplace_add_diag).eval().llt().matrixU();
   
     boost::variate_generator<decltype(rng)&, boost::normal_distribution<> >
       rand_dense_gaus(rng, boost::normal_distribution<>());
@@ -228,7 +228,7 @@ int lbfgs(Model& model, const stan::io::var_context& init,
 	logger.info(msg);
 
       values.insert(values.begin(), { 0, log_p, log_g });
-      
+
       parameter_writer(values);
     }
   }
