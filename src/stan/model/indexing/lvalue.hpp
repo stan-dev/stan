@@ -340,7 +340,27 @@ inline void assign(
   for (int i = 0; i < y.size(); ++i) {
     int m = rvalue_at(i, idxs.head_);
     math::check_range("matrix[multi,uni] assign range", name, x.rows(), m);
-    x.coeffRef(m - 1, n - 1) = vec.coeff(i);
+    x.coeffRef(m - 1, n - 1) = vec.coeff(i, 0);
+  }
+}
+
+template <typename EigMat, typename T, typename I,
+          typename = require_eigen_t<EigMat>,
+          typename = require_not_eigen_vector_t<EigMat>,
+          typename = require_not_same_t<index_uni, I>>
+inline void assign(
+    EigMat& x,
+    const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idxs,
+    const Eigen::SparseMatrix<T>& y, const char* name = "ANON", int depth = 0) {
+  int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
+  math::check_size_match("matrix[multi,uni] assign sizes", "lhs", x_idxs_rows,
+                         name, y.rows());
+  int n = idxs.tail_.head_.n_;
+  math::check_range("matrix[multi,uni] assign range", name, x.cols(), n);
+  for (int i = 0; i < y.size(); ++i) {
+    int m = rvalue_at(i, idxs.head_);
+    math::check_range("matrix[multi,uni] assign range", name, x.rows(), m);
+    x.coeffRef(m - 1, n - 1) = y.coeff(i, 0);
   }
 }
 
@@ -384,7 +404,7 @@ inline void assign(
     for (int i = 0; i < y.rows(); ++i) {
       int m = rvalue_at(i, idxs.head_);
       math::check_range("matrix[multi,multi] assign range", name, x.rows(), m);
-      x.coeffRef(m - 1, n - 1) = mat.coeffRef(i, j);
+      x.coeffRef(m - 1, n - 1) = mat.coeff(i, j);
     }
   }
 }

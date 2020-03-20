@@ -343,7 +343,7 @@ TEST(model_indexing, assign_eigrowvec_eigrowvec_index_multi) {
   test_throw_ia(lhs_x, index_list(index_multi(ns)), rhs_y);
 }
 
-TEST(model_indexing, assign_eigmatrix_rowvec_uni_index) {
+TEST(model_indexing, assign_densemat_rowvec_uni_index) {
   MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
@@ -358,7 +358,7 @@ TEST(model_indexing, assign_eigmatrix_rowvec_uni_index) {
   test_throw(x, index_list(index_uni(5)), y);
 }
 
-TEST(model_indexing, assign_eigmatrix_eigmatrix_index_min) {
+TEST(model_indexing, assign_densemat_densemat_index_min) {
   MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
@@ -385,7 +385,7 @@ TEST(model_indexing, assign_eigmatrix_eigmatrix_index_min) {
   test_throw_ia(x, index_list(index_min(2)), z);
 }
 
-TEST(model_indexing, assign_eigmatrix_scalar_index_uni) {
+TEST(model_indexing, assign_densemat_scalar_index_uni) {
   MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
@@ -399,7 +399,21 @@ TEST(model_indexing, assign_eigmatrix_scalar_index_uni) {
   test_throw(x, index_list(index_uni(2), index_uni(5)), y);
 }
 
-TEST(model_indexing, assign_eigmatrix_eigrowvec_uni_index_min_max_index) {
+TEST(model_indexing, assign_sparsemat_scalar_index_uni) {
+  auto size_mat = 4;
+  Eigen::sparsemat<double> mat(size_mat, size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> triplet_list(size_mat);
+  for (auto i = 0; i < size_mat; ++i) {
+    triplet_list.emplace_back(triplet_type(i, i, i));
+  }
+  mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+  double y = 10.12;
+  assign(mat, index_list(index_uni(2), index_uni(3)), y);
+  EXPECT_FLOAT_EQ(y, mat.coeffRef(1, 2));
+}
+
+TEST(model_indexing, assign_densemat_eigrowvec_uni_index_min_max_index) {
   MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
@@ -445,7 +459,7 @@ TEST(model_indexing, assign_eigmatrix_eigrowvec_uni_index_min_max_index) {
   test_throw_ia(x, index_list(index_uni(3), index_multi(ns)), y);
 }
 
-TEST(model_indexing, assign_eigmatrix_eigvec_min_max_index_uni_index) {
+TEST(model_indexing, assign_densemat_eigvec_min_max_index_uni_index) {
   MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
@@ -486,7 +500,42 @@ TEST(model_indexing, assign_eigmatrix_eigvec_min_max_index_uni_index) {
   test_throw_ia(x, index_list(index_multi(ns), index_uni(3)), y);
 }
 
-TEST(model_indexing, assign_eigmatrix_eigmatrix_min_max_index_min_index) {
+TEST(model_indexing, assign_sparsemat_sparsemat_min_max_index_uni_index) {
+  auto size_mat = 4;
+  Eigen::sparsemat<double> mat(size_mat, size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> triplet_list(size_mat);
+  for (auto i = 0; i < size_mat; ++i) {
+    triplet_list.emplace_back(triplet_type(i, i, i));
+  }
+  mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+  auto rhs_size_mat = 3;
+  Eigen::sparsemat<double> rhs_mat(rhs_size_mat, 1);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> rhs_triplet_list(rhs_size_mat);
+  for (auto i = 0; i < rhs_size_mat; ++i) {
+    rhs_triplet_list.emplace_back(triplet_type(i, 0, i + 1));
+  }
+  rhs_mat.setFromTriplets(rhs_triplet_list.begin(), rhs_triplet_list.end());
+
+  assign(mat, index_list(index_min_max(1, 3), index_uni(2)), rhs_mat, "Sparse");
+  EXPECT_FLOAT_EQ(1.0, mat.coeffRef(0, 1));
+  EXPECT_FLOAT_EQ(2.0, mat.coeffRef(1, 1));
+  EXPECT_FLOAT_EQ(3.0, mat.coeffRef(2, 1));
+  EXPECT_FLOAT_EQ(0.0, mat.coeffRef(3, 1));
+
+  vector<int> ns;
+  ns.push_back(3);
+  ns.push_back(1);
+  ns.push_back(2);
+  assign(mat, index_list(index_multi(ns), index_uni(3)), rhs_mat);
+  EXPECT_FLOAT_EQ(2.0, mat.coeffRef(0, 2));
+  EXPECT_FLOAT_EQ(3.0, mat.coeffRef(1, 2));
+  EXPECT_FLOAT_EQ(1.0, mat.coeffRef(2, 2));
+  EXPECT_FLOAT_EQ(0.0, mat.coeffRef(3, 2));
+}
+
+TEST(model_indexing, assign_densemat_densemat_min_max_index_min_index) {
   MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
@@ -506,7 +555,31 @@ TEST(model_indexing, assign_eigmatrix_eigmatrix_min_max_index_min_index) {
   test_throw_ia(x, index_list(index_min_max(1, 3), index_min(2)), y);
 }
 
-TEST(model_indexing, assign_eigmatrix_eigmatrix_multi_index_multi_index) {
+TEST(model_indexing, assign_sparsemat_sparsemat_min_max_index_min_index) {
+  auto size_mat = 4;
+  Eigen::sparsemat<double> mat(size_mat, size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> triplet_list(size_mat);
+  for (auto i = 0; i < size_mat; ++i) {
+    triplet_list.emplace_back(triplet_type(i, i, i));
+  }
+  mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+  auto rhs_size_mat = 3;
+  Eigen::sparsemat<double> rhs_mat(rhs_size_mat, rhs_size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> rhs_triplet_list(rhs_size_mat);
+  for (auto i = 0; i < rhs_size_mat; ++i) {
+    rhs_triplet_list.emplace_back(triplet_type(i, i, i + 1));
+  }
+  rhs_mat.setFromTriplets(rhs_triplet_list.begin(), rhs_triplet_list.end());
+  assign(mat, index_list(index_min_max(1, 3), index_min(2)), rhs_mat, "Sparse");
+  EXPECT_FLOAT_EQ(1.0, mat.coeffRef(0, 1));
+  EXPECT_FLOAT_EQ(2.0, mat.coeffRef(1, 2));
+  EXPECT_FLOAT_EQ(3.0, mat.coeffRef(2, 3));
+  EXPECT_FLOAT_EQ(3.0, mat.coeffRef(3, 3));
+}
+
+TEST(model_indexing, assign_densemat_densemat_multi_index_multi_index) {
   MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
@@ -550,6 +623,40 @@ TEST(model_indexing, assign_eigmatrix_eigmatrix_multi_index_multi_index) {
   ns[ns.size() - 1] = 10;
   test_throw(x, index_list(index_multi(ms), index_multi(ns)), y);
 }
+
+TEST(model_indexing, assign_sparsemat_sparsemat_multi_index_multi_index) {
+  auto size_mat = 4;
+  Eigen::sparsemat<double> mat(size_mat, size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> triplet_list(size_mat);
+  for (auto i = 0; i < size_mat; ++i) {
+    triplet_list.emplace_back(triplet_type(i, i, i));
+  }
+  mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+  auto rhs_size_mat = 2;
+  Eigen::sparsemat<double> rhs_mat(rhs_size_mat, rhs_size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> rhs_triplet_list(rhs_size_mat);
+  for (auto i = 0; i < rhs_size_mat; ++i) {
+    rhs_triplet_list.emplace_back(triplet_type(i, i, i + 1));
+  }
+  rhs_mat.setFromTriplets(rhs_triplet_list.begin(), rhs_triplet_list.end());
+  vector<int> ms;
+  ms.push_back(3);
+  ms.push_back(1);
+
+  vector<int> ns;
+  ns.push_back(2);
+  ns.push_back(1);
+
+  assign(mat, index_list(index_multi(ms), index_multi(ns)), rhs_mat);
+  EXPECT_FLOAT_EQ(2.0, mat.coeffRef(0, 0));
+  EXPECT_FLOAT_EQ(1.0, mat.coeffRef(1, 1));
+  EXPECT_FLOAT_EQ(1.0, mat.coeffRef(2, 1));
+  EXPECT_FLOAT_EQ(2.0, mat.coeffRef(2, 2));
+  EXPECT_FLOAT_EQ(3.0, mat.coeffRef(3, 3));
+}
+
 TEST(model_indexing, assign_double_to_var) {
   using Eigen::Dynamic;
   using Eigen::Matrix;
