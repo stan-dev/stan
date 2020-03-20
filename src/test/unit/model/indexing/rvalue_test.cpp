@@ -516,7 +516,8 @@ TEST(model_indexing, rvalue_sparsematrix_uni) {
   mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
   // Check all the diagonals
   for (auto i = 1; i < size_mat; ++i) {
-    EXPECT_FLOAT_EQ(static_cast<double>(i - 1), rvalue(mat, index_list(index_uni(i))).coeffRef(i - 1));
+    EXPECT_FLOAT_EQ(static_cast<double>(i - 1),
+                    rvalue(mat, index_list(index_uni(i))).coeffRef(i - 1));
   }
 }
 
@@ -655,15 +656,14 @@ TEST(model_indexing, rvalue_eigmatrix_multi) {
   test_out_of_range(m, index_list(index_multi(ns)));
 }
 
-
-
 TEST(model_indexing, rvalue_eigmatrix_uni_uni) {
   Eigen::MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
   for (int m = 0; m < 3; ++m) {
     for (int n = 0; n < 4; ++n) {
-      EXPECT_FLOAT_EQ(m + n / 10.0, rvalue(x, index_list(index_uni(m + 1), index_uni(n + 1))));
+      EXPECT_FLOAT_EQ(m + n / 10.0, rvalue(x, index_list(index_uni(m + 1),
+                                                         index_uni(n + 1))));
     }
   }
 
@@ -691,15 +691,15 @@ TEST(model_indexing, rvalue_sparsematrix_uni_uni) {
   }
   mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
   for (int i = 0; i < size_mat; ++i) {
-      EXPECT_FLOAT_EQ(static_cast<double>(i),
-       rvalue(mat, index_list(index_uni(i + 1), index_uni(i + 1))));
+    EXPECT_FLOAT_EQ(
+        static_cast<double>(i),
+        rvalue(mat, index_list(index_uni(i + 1), index_uni(i + 1))));
   }
   test_out_of_range(mat, index_list(index_uni(0), index_uni(1)));
   test_out_of_range(mat, index_list(index_uni(0), index_uni(12)));
   test_out_of_range(mat, index_list(index_uni(1), index_uni(0)));
   test_out_of_range(mat, index_list(index_uni(1), index_uni(12)));
 }
-
 
 TEST(model_indexing, rvalue_eigmatrix_uni_multi) {
   Eigen::MatrixXd x(3, 4);
@@ -760,7 +760,6 @@ TEST(model_indexing, rvalue_sparsematrix_uni_multi) {
     }
   }
 }
-
 
 TEST(model_indexing, rvalue_eigmatrix_multi_uni) {
   Eigen::MatrixXd x(3, 4);
@@ -841,7 +840,6 @@ TEST(model_indexing, rvalue_eigmatrix_multi_multi) {
   test_out_of_range(x, index_list(index_min(0), index_min(3)));
   test_out_of_range(x, index_list(index_min(2), index_min(0)));
 }
-
 
 TEST(model_indexing, rvalue_sparsematrix_multi_multi) {
   auto size_mat = 10;
