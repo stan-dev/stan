@@ -57,6 +57,7 @@ TEST(io_writer, integer) {
 
   EXPECT_EQ(integer, writer.data_i()[0]);
 }
+
 TEST(io_writer, row_vector_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -72,6 +73,7 @@ TEST(io_writer, row_vector_unconstrain) {
   for (int n = 0; n < size; n++)
     EXPECT_EQ(n, writer.data_r()[n]);
 }
+
 TEST(io_writer, matrix_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -91,6 +93,27 @@ TEST(io_writer, matrix_unconstrain) {
   EXPECT_FLOAT_EQ(4, writer.data_r()[4]);
   EXPECT_FLOAT_EQ(5, writer.data_r()[5]);
 }
+
+TEST(io_writer, sparse_matrix_unconstrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta, theta_i);
+  auto size_mat = 10;
+  Eigen::SparseMatrix<double> mat(size_mat, size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> triplet_list(size_mat);
+  for (auto i = 0; i < size_mat; ++i) {
+    triplet_list.emplace_back(triplet_type(i, i, i));
+  }
+  mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+
+  writer.sparse_matrix_unconstrain(mat);
+  ASSERT_EQ(size_mat, writer.data_r().size());
+  for (int i = 0; i < writer.data_r().size(); ++i) {
+    EXPECT_FLOAT_EQ(i, writer.data_r()[i]);
+  }
+}
+
 TEST(io_writer, vector_lb_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -107,6 +130,7 @@ TEST(io_writer, vector_lb_unconstrain) {
   for (int n = 0; n < size; n++)
     EXPECT_FLOAT_EQ(log(n - lb), writer.data_r()[n]);
 }
+
 TEST(io_writer, row_vector_lb_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -123,6 +147,7 @@ TEST(io_writer, row_vector_lb_unconstrain) {
   for (int n = 0; n < size; n++)
     EXPECT_FLOAT_EQ(log(n - lb), writer.data_r()[n]);
 }
+
 TEST(io_writer, matrix_lb_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -138,6 +163,27 @@ TEST(io_writer, matrix_lb_unconstrain) {
   for (int n = 0; n < 6; n++)
     EXPECT_FLOAT_EQ(log(n - lb), writer.data_r()[n]);
 }
+
+TEST(io_writer, sparse_matrix_lb_unconstrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta, theta_i);
+  auto size_mat = 10;
+  Eigen::SparseMatrix<double> mat(size_mat, size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> triplet_list(size_mat);
+  for (auto i = 0; i < size_mat; ++i) {
+    triplet_list.emplace_back(triplet_type(i, i, i));
+  }
+  mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+  double lb = -1.5;
+  writer.sparse_matrix_lb_unconstrain(lb, mat);
+  ASSERT_EQ(size_mat, writer.data_r().size());
+  for (int i = 0; i < writer.data_r().size(); ++i) {
+    EXPECT_FLOAT_EQ(log(i - lb), writer.data_r()[i]);
+  }
+}
+
 TEST(io_writer, vector_ub_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -154,6 +200,7 @@ TEST(io_writer, vector_ub_unconstrain) {
   for (int n = 0; n < size; n++)
     EXPECT_FLOAT_EQ(log(ub - n), writer.data_r()[n]);
 }
+
 TEST(io_writer, row_vector_ub_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -170,6 +217,7 @@ TEST(io_writer, row_vector_ub_unconstrain) {
   for (int n = 0; n < size; n++)
     EXPECT_FLOAT_EQ(log(ub - n), writer.data_r()[n]);
 }
+
 TEST(io_writer, matrix_ub_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -185,6 +233,27 @@ TEST(io_writer, matrix_ub_unconstrain) {
   for (int n = 0; n < 6; n++)
     EXPECT_FLOAT_EQ(log(ub - n), writer.data_r()[n]);
 }
+
+TEST(io_writer, sparse_matrix_ub_unconstrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta, theta_i);
+  auto size_mat = 10;
+  Eigen::SparseMatrix<double> mat(size_mat, size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> triplet_list(size_mat);
+  for (auto i = 0; i < size_mat; ++i) {
+    triplet_list.emplace_back(triplet_type(i, i, i));
+  }
+  mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+  double ub = 12;
+  writer.sparse_matrix_ub_unconstrain(ub, mat);
+  ASSERT_EQ(size_mat, writer.data_r().size());
+  for (int i = 0; i < writer.data_r().size(); ++i) {
+    EXPECT_FLOAT_EQ(log(ub - i), writer.data_r()[i]);
+  }
+}
+
 TEST(io_writer, vector_lub_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -203,6 +272,7 @@ TEST(io_writer, vector_lub_unconstrain) {
     EXPECT_FLOAT_EQ(stan::math::logit((n - lb) / (ub - lb)),
                     writer.data_r()[n]);
 }
+
 TEST(io_writer, row_vector_lub_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -221,6 +291,7 @@ TEST(io_writer, row_vector_lub_unconstrain) {
     EXPECT_FLOAT_EQ(stan::math::logit((n - lb) / (ub - lb)),
                     writer.data_r()[n]);
 }
+
 TEST(io_writer, matrix_lub_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -237,6 +308,28 @@ TEST(io_writer, matrix_lub_unconstrain) {
   for (int n = 0; n < 6; n++)
     EXPECT_FLOAT_EQ(stan::math::logit((n - lb) / (ub - lb)),
                     writer.data_r()[n]);
+}
+
+TEST(io_writer, sparse_matrix_lub_unconstrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta, theta_i);
+  auto size_mat = 10;
+  Eigen::SparseMatrix<double> mat(size_mat, size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> triplet_list(size_mat);
+  for (auto i = 0; i < size_mat; ++i) {
+    triplet_list.emplace_back(triplet_type(i, i, i));
+  }
+  mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+  double ub = 12;
+  double lb = -1;
+  writer.sparse_matrix_lub_unconstrain(lb, ub, mat);
+  ASSERT_EQ(size_mat, writer.data_r().size());
+  for (int i = 0; i < writer.data_r().size(); ++i) {
+    EXPECT_FLOAT_EQ(stan::math::logit((i - lb) / (ub - lb)),
+                    writer.data_r()[i]);
+  }
 }
 
 TEST(io_writer, vector_offset_multiplier_unconstrain) {
@@ -256,6 +349,7 @@ TEST(io_writer, vector_offset_multiplier_unconstrain) {
   for (int n = 0; n < size; n++)
     EXPECT_FLOAT_EQ((n - offset) / multiplier, writer.data_r()[n]);
 }
+
 TEST(io_writer, row_vector_offset_multiplier_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -273,6 +367,7 @@ TEST(io_writer, row_vector_offset_multiplier_unconstrain) {
   for (int n = 0; n < size; n++)
     EXPECT_FLOAT_EQ(((n - offset) / (multiplier)), writer.data_r()[n]);
 }
+
 TEST(io_writer, matrix_offset_multiplier_unconstrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -290,6 +385,27 @@ TEST(io_writer, matrix_offset_multiplier_unconstrain) {
     EXPECT_FLOAT_EQ(((n - offset) / (multiplier)), writer.data_r()[n]);
 }
 
+TEST(io_writer, sparse_matrix_offset_multiplier_unconstrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta, theta_i);
+  auto size_mat = 10;
+  Eigen::SparseMatrix<double> mat(size_mat, size_mat);
+  using triplet_type = Eigen::Triplet<double>;
+  std::vector<triplet_type> triplet_list(size_mat);
+  for (auto i = 0; i < size_mat; ++i) {
+    triplet_list.emplace_back(triplet_type(i, i, i));
+  }
+  mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
+  double offset = -1;
+  double multiplier = 12;
+  writer.sparse_matrix_offset_multiplier_unconstrain(offset, multiplier, mat);
+  ASSERT_EQ(size_mat, writer.data_r().size());
+  for (int i = 0; i < writer.data_r().size(); ++i) {
+    EXPECT_FLOAT_EQ(((i - offset) / (multiplier)), writer.data_r()[i]);
+  }
+}
+
 TEST(io_writer, scalar_pos_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -302,6 +418,7 @@ TEST(io_writer, scalar_pos_unconstrain_exception) {
   y = -1.0;
   EXPECT_THROW(writer.scalar_pos_unconstrain(y), std::runtime_error);
 }
+
 TEST(io_writer, scalar_lb_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -314,6 +431,7 @@ TEST(io_writer, scalar_lb_unconstrain_exception) {
   y = -1.0;
   EXPECT_THROW(writer.scalar_lb_unconstrain(lb, y), std::domain_error);
 }
+
 TEST(io_writer, scalar_ub_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -326,6 +444,7 @@ TEST(io_writer, scalar_ub_unconstrain_exception) {
   y = 1.0;
   EXPECT_THROW(writer.scalar_ub_unconstrain(ub, y), std::domain_error);
 }
+
 TEST(io_writer, scalar_lub_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -342,6 +461,7 @@ TEST(io_writer, scalar_lub_unconstrain_exception) {
   y = -2.0;
   EXPECT_THROW(writer.scalar_lub_unconstrain(lb, ub, y), std::domain_error);
 }
+
 TEST(io_writer, scalar_offset_multiplier_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -354,6 +474,7 @@ TEST(io_writer, scalar_offset_multiplier_unconstrain_exception) {
   EXPECT_THROW(writer.scalar_lub_unconstrain(offset, -multiplier, y),
                std::domain_error);
 }
+
 TEST(io_writer, corr_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -368,6 +489,7 @@ TEST(io_writer, corr_unconstrain_exception) {
   y = -2.0;
   EXPECT_THROW(writer.corr_unconstrain(y), std::domain_error);
 }
+
 TEST(io_writer, prob_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -382,6 +504,7 @@ TEST(io_writer, prob_unconstrain_exception) {
   y = -0.5;
   EXPECT_THROW(writer.prob_unconstrain(y), std::domain_error);
 }
+
 TEST(io_writer, ordered_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -400,6 +523,7 @@ TEST(io_writer, ordered_unconstrain_exception) {
   y << 1.0, 0.1;
   EXPECT_THROW(writer.ordered_unconstrain(y), std::domain_error);
 }
+
 TEST(io_writer, positive_ordered_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -418,6 +542,7 @@ TEST(io_writer, positive_ordered_unconstrain_exception) {
   y << 1.0, 0.1;
   EXPECT_THROW(writer.positive_ordered_unconstrain(y), std::domain_error);
 }
+
 TEST(io_writer, unit_vector_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -437,6 +562,7 @@ TEST(io_writer, unit_vector_unconstrain_exception) {
   y.resize(0);
   EXPECT_THROW(writer.unit_vector_unconstrain(y), std::invalid_argument);
 }
+
 TEST(io_writer, simplex_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -456,6 +582,7 @@ TEST(io_writer, simplex_unconstrain_exception) {
   y.resize(0);
   EXPECT_THROW(writer.simplex_unconstrain(y), std::invalid_argument);
 }
+
 TEST(io_writer, corr_matrix_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -475,6 +602,7 @@ TEST(io_writer, corr_matrix_unconstrain_exception) {
   y.resize(1, 2);
   EXPECT_THROW(writer.corr_matrix_unconstrain(y), std::invalid_argument);
 }
+
 TEST(io_writer, cov_matrix_unconstrain_exception) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -531,6 +659,7 @@ TEST(io_writer, cholesky_factor_cov_unconstrain_exception) {
   y << 1, 0, 0, 2, 3, 0, -4, -5, 6;
   EXPECT_NO_THROW(writer.cholesky_factor_cov_unconstrain(y));
 }
+
 TEST(io_reader_writer, cholesky_factor_roundtrip) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -557,6 +686,7 @@ TEST(io_reader_writer, cholesky_factor_roundtrip) {
     for (int n = 0; n < 3; ++n)
       EXPECT_FLOAT_EQ(y(m, n), L(m, n));
 }
+
 TEST(io_reader_writer, cholesky_factor_roundtrip_asymmetric) {
   std::vector<int> theta_i;
   std::vector<double> theta;

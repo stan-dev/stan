@@ -1,6 +1,29 @@
 #include <gtest/gtest.h>
 #include <stan/io/reader.hpp>
+#include <tuple>
 
+namespace stan {
+namespace test {
+auto get_sparse_matrix_reader_pars() {
+  int row_size = (rand() % 20) + 1;
+  int col_size = (rand() % 20) + 1;
+  int nonzero_size = (rand() % (row_size + col_size)) + 1;
+  std::vector<int> theta_rows(nonzero_size);
+  std::vector<int> theta_cols(nonzero_size);
+  std::vector<double> theta(nonzero_size);
+  for (int i = 0; i < nonzero_size; i++) {
+    theta_rows[i] = i;
+    theta_cols[i] = i;
+    theta[i] = (rand() % 20) + 1;
+  }
+  int max_row = *max_element(theta_rows.begin(), theta_rows.end());
+  int max_col = *max_element(theta_cols.begin(), theta_cols.end());
+  std::vector<int> theta_i;
+  return std::make_tuple(theta_rows, theta_cols, theta, theta_i, nonzero_size,
+                         max_row, max_col);
+}
+}  // namespace test
+}  // namespace stan
 TEST(ioReader, zeroSizeVecs) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -563,6 +586,23 @@ TEST(io_reader, matrix_constrain) {
 
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(io_reader, sparse_matrix) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  Eigen::SparseMatrix<double> y
+      = reader.sparse_matrix(theta_rows, theta_cols, max_row + 1, max_col + 1);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(theta[i], y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
 }
 
 TEST(io_reader, unit_vector) {
@@ -1245,6 +1285,63 @@ TEST(io_reader, matrix_lb_constrain_lp) {
   EXPECT_FLOAT_EQ(13.0, a);
 }
 
+TEST(io_reader, sparse_matrix_lb) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  double lb = -1.5;
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix_lb(
+      lb, theta_rows, theta_cols, max_row + 1, max_col + 1);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(theta[i], y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
+}
+
+TEST(io_reader, sparse_matrix_lb_constrain) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  double lb = -1.5;
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix_lb_constrain(
+      lb, theta_rows, theta_cols, max_row + 1, max_col + 1);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(stan::math::lb_constrain(theta[i], lb),
+                    y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
+}
+
+TEST(io_reader, sparse_matrix_lb_constrain_lp) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  double lb = -1.5;
+  double lp = -5.0;
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix_lb_constrain(
+      lb, theta_rows, theta_cols, max_row + 1, max_col + 1, lp);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(stan::math::lb_constrain(theta[i], lb, lp),
+                    y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
+}
+
 TEST(io_reader, matrix_ub) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -1322,6 +1419,63 @@ TEST(io_reader, matrix_ub_constrain_lp) {
 
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(io_reader, sparse_matrix_ub) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  double ub = 200;
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix_ub(
+      ub, theta_rows, theta_cols, max_row + 1, max_col + 1);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(theta[i], y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
+}
+
+TEST(io_reader, sparse_matrix_ub_constrain) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  double ub = 200;
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix_ub_constrain(
+      ub, theta_rows, theta_cols, max_row + 1, max_col + 1);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(stan::math::ub_constrain(theta[i], ub),
+                    y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
+}
+
+TEST(io_reader, sparse_matrix_ub_constrain_lp) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  double ub = 200;
+  double lp = -5.0;
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix_ub_constrain(
+      ub, theta_rows, theta_cols, max_row + 1, max_col + 1, lp);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(stan::math::ub_constrain(theta[i], ub, lp),
+                    y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
 }
 
 TEST(io_reader, matrix_lub) {
@@ -1404,6 +1558,66 @@ TEST(io_reader, matrix_lub_constrain_lp) {
 
   double a = reader.scalar();
   EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(io_reader, sparse_matrix_lub) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  double ub = 200;
+  double lb = -10;
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix_lub(
+      lb, ub, theta_rows, theta_cols, max_row + 1, max_col + 1);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(theta[i], y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
+}
+
+TEST(io_reader, sparse_matrix_lub_constrain) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  double ub = 200;
+  double lb = -10;
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix_lub_constrain(
+      lb, ub, theta_rows, theta_cols, max_row + 1, max_col + 1);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(stan::math::lub_constrain(theta[i], lb, ub),
+                    y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
+}
+
+TEST(io_reader, sparse_matrix_lub_constrain_lp) {
+  auto sparse_pars = stan::test::get_sparse_matrix_reader_pars();
+  auto theta_rows = std::get<0>(sparse_pars);
+  auto theta_cols = std::get<1>(sparse_pars);
+  auto theta = std::get<2>(sparse_pars);
+  auto theta_i = std::get<3>(sparse_pars);
+  auto nonzero_size = std::get<4>(sparse_pars);
+  auto max_row = std::get<5>(sparse_pars);
+  auto max_col = std::get<6>(sparse_pars);
+  stan::io::reader<double> reader(theta, theta_i);
+  double lb = 4.1;
+  double ub = 12.1;
+  double lp = -5.0;
+  Eigen::SparseMatrix<double> y = reader.sparse_matrix_lub_constrain(
+      lb, ub, theta_rows, theta_cols, max_row + 1, max_col + 1, lp);
+  for (int i = 0; i < nonzero_size; i++) {
+    EXPECT_FLOAT_EQ(stan::math::lub_constrain(theta[i], lb, ub, lp),
+                    y.coeffRef(theta_rows[i], theta_cols[i]));
+  }
 }
 
 TEST(IoReader, SimplexThrows) {
