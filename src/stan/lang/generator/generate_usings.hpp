@@ -20,6 +20,7 @@ void generate_usings(std::ostream& o) {
   generate_using("std::string", o);
   generate_using("std::stringstream", o);
   generate_using("std::vector", o);
+  generate_using("std::pow", o);
   generate_using("stan::io::dump", o);
   generate_using("stan::math::lgamma", o);
   generate_using("stan::model::prob_grad", o);

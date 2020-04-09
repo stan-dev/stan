@@ -27,10 +27,10 @@ statement_2_grammar<Iterator>::statement_2_grammar(
   using boost::spirit::qi::_pass;
   using boost::spirit::qi::_val;
   using boost::spirit::qi::char_;
-  using boost::spirit::qi::labels::_r1;
-  using boost::spirit::qi::labels::_r2;
   using boost::spirit::qi::lit;
   using boost::spirit::qi::no_skip;
+  using boost::spirit::qi::labels::_r1;
+  using boost::spirit::qi::labels::_r2;
 
   //   _r1 var_scope
   //   _r2 true if in loop (allowing break/continue)

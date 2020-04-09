@@ -29,8 +29,8 @@ expression07_grammar<Iterator>::expression07_grammar(
   using boost::spirit::qi::_pass;
   using boost::spirit::qi::_val;
   using boost::spirit::qi::eps;
-  using boost::spirit::qi::labels::_r1;
   using boost::spirit::qi::lit;
+  using boost::spirit::qi::labels::_r1;
 
   expression07_r.name("expression");
   expression07_r
