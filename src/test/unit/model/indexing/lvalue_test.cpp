@@ -401,7 +401,7 @@ TEST(model_indexing, assign_densemat_scalar_index_uni) {
 
 TEST(model_indexing, assign_sparsemat_scalar_index_uni) {
   auto size_mat = 4;
-  Eigen::sparsemat<double> mat(size_mat, size_mat);
+  Eigen::SparseMatrix<double> mat(size_mat, size_mat);
   using triplet_type = Eigen::Triplet<double>;
   std::vector<triplet_type> triplet_list(size_mat);
   for (auto i = 0; i < size_mat; ++i) {
@@ -502,7 +502,7 @@ TEST(model_indexing, assign_densemat_eigvec_min_max_index_uni_index) {
 
 TEST(model_indexing, assign_sparsemat_sparsemat_min_max_index_uni_index) {
   auto size_mat = 4;
-  Eigen::sparsemat<double> mat(size_mat, size_mat);
+  Eigen::SparseMatrix<double> mat(size_mat, size_mat);
   using triplet_type = Eigen::Triplet<double>;
   std::vector<triplet_type> triplet_list(size_mat);
   for (auto i = 0; i < size_mat; ++i) {
@@ -510,7 +510,7 @@ TEST(model_indexing, assign_sparsemat_sparsemat_min_max_index_uni_index) {
   }
   mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
   auto rhs_size_mat = 3;
-  Eigen::sparsemat<double> rhs_mat(rhs_size_mat, 1);
+  Eigen::SparseMatrix<double> rhs_mat(rhs_size_mat, 1);
   using triplet_type = Eigen::Triplet<double>;
   std::vector<triplet_type> rhs_triplet_list(rhs_size_mat);
   for (auto i = 0; i < rhs_size_mat; ++i) {
@@ -557,7 +557,7 @@ TEST(model_indexing, assign_densemat_densemat_min_max_index_min_index) {
 
 TEST(model_indexing, assign_sparsemat_sparsemat_min_max_index_min_index) {
   auto size_mat = 4;
-  Eigen::sparsemat<double> mat(size_mat, size_mat);
+  Eigen::SparseMatrix<double> mat(size_mat, size_mat);
   using triplet_type = Eigen::Triplet<double>;
   std::vector<triplet_type> triplet_list(size_mat);
   for (auto i = 0; i < size_mat; ++i) {
@@ -565,7 +565,7 @@ TEST(model_indexing, assign_sparsemat_sparsemat_min_max_index_min_index) {
   }
   mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
   auto rhs_size_mat = 3;
-  Eigen::sparsemat<double> rhs_mat(rhs_size_mat, rhs_size_mat);
+  Eigen::SparseMatrix<double> rhs_mat(rhs_size_mat, rhs_size_mat);
   using triplet_type = Eigen::Triplet<double>;
   std::vector<triplet_type> rhs_triplet_list(rhs_size_mat);
   for (auto i = 0; i < rhs_size_mat; ++i) {
@@ -626,7 +626,7 @@ TEST(model_indexing, assign_densemat_densemat_multi_index_multi_index) {
 
 TEST(model_indexing, assign_sparsemat_sparsemat_multi_index_multi_index) {
   auto size_mat = 4;
-  Eigen::sparsemat<double> mat(size_mat, size_mat);
+  Eigen::SparseMatrix<double> mat(size_mat, size_mat);
   using triplet_type = Eigen::Triplet<double>;
   std::vector<triplet_type> triplet_list(size_mat);
   for (auto i = 0; i < size_mat; ++i) {
@@ -634,7 +634,7 @@ TEST(model_indexing, assign_sparsemat_sparsemat_multi_index_multi_index) {
   }
   mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
   auto rhs_size_mat = 2;
-  Eigen::sparsemat<double> rhs_mat(rhs_size_mat, rhs_size_mat);
+  Eigen::SparseMatrix<double> rhs_mat(rhs_size_mat, rhs_size_mat);
   using triplet_type = Eigen::Triplet<double>;
   std::vector<triplet_type> rhs_triplet_list(rhs_size_mat);
   for (auto i = 0; i < rhs_size_mat; ++i) {
