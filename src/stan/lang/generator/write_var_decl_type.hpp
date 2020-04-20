@@ -12,7 +12,7 @@ namespace lang {
  * Write the variable type declaration to the specified stream
  * using the specified cpp type string, which varies according
  * where in the generated model class this decl occurs.
- * Currently, member var decls and ctor use typdefs,
+ * Currently, member var decls and ctor use typedefs,
  * other methods have explicit types with typedef on
  * scalar double types.
  *

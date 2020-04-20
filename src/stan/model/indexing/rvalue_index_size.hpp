@@ -55,7 +55,7 @@ inline int rvalue_index_size(const index_max& idx, int size) {
 
 /**
  * Return size of specified min - max index.  If the maximum value
- * index is less than the minimun index, the size will be zero.
+ * index is less than the minimum index, the size will be zero.
  *
  * @param[in] idx Input index (from 1).
  * @param[in] size Size of container (ignored).

@@ -11,7 +11,7 @@ namespace lang {
 
 /**
  * Generate using statement for the specified namespace to the
- * specfied stream.
+ * specified stream.
  *
  * @param[in] ns namespace for which using statement is generated
  * @param[in,out] o stream for generating

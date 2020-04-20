@@ -7,7 +7,7 @@
 #include <stan/io/random_var_context.hpp>
 #include <stan/io/chained_var_context.hpp>
 #include <stan/model/log_prob_grad.hpp>
-#include <stan/math/prim/arr/fun/sum.hpp>
+#include <stan/math/prim.hpp>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -65,7 +65,7 @@ namespace util {
  * @return valid unconstrained parameters for the model
  */
 template <bool Jacobian = true, class Model, class RNG>
-std::vector<double> initialize(Model& model, stan::io::var_context& init,
+std::vector<double> initialize(Model& model, const stan::io::var_context& init,
                                RNG& rng, double init_radius, bool print_timing,
                                stan::callbacks::logger& logger,
                                stan::callbacks::writer& init_writer) {

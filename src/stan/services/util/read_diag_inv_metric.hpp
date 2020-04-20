@@ -23,9 +23,9 @@ namespace util {
  * @throws std::domain_error if the Euclidean metric is invalid
  * @return inv_metric vector of diagonal values
  */
-inline Eigen::VectorXd read_diag_inv_metric(stan::io::var_context& init_context,
-                                            size_t num_params,
-                                            callbacks::logger& logger) {
+inline Eigen::VectorXd read_diag_inv_metric(
+    const stan::io::var_context& init_context, size_t num_params,
+    callbacks::logger& logger) {
   Eigen::VectorXd inv_metric(num_params);
   try {
     init_context.validate_dims("read diag inv metric", "inv_metric", "vector_d",

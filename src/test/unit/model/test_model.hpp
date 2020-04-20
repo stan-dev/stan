@@ -1,7 +1,7 @@
 #ifndef TEST_UNIT_MODEL_TEST_MODEL_HPP
 #define TEST_UNIT_MODEL_TEST_MODEL_HPP
 
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/io/reader.hpp>
 
 class TestModel_uniform_01 {

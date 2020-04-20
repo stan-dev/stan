@@ -1,8 +1,7 @@
 #ifndef STAN_ANALYZE_MCMC_AUTOCOVARIANCE_HPP
 #define STAN_ANALYZE_MCMC_AUTOCOVARIANCE_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/variance.hpp>

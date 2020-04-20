@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <vector>
 #include <stan/model/indexing/lvalue.hpp>
-#include <stan/math/rev/mat.hpp>
+#include <stan/math/rev.hpp>
 #include <gtest/gtest.h>
 
 using Eigen::Dynamic;

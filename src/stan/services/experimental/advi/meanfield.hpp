@@ -48,7 +48,7 @@ namespace advi {
  * @return error_codes::OK if successful
  */
 template <class Model>
-int meanfield(Model& model, stan::io::var_context& init,
+int meanfield(Model& model, const stan::io::var_context& init,
               unsigned int random_seed, unsigned int chain, double init_radius,
               int grad_samples, int elbo_samples, int max_iterations,
               double tol_rel_obj, double eta, bool adapt_engaged,

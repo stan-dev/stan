@@ -98,7 +98,7 @@ class windowed_adaptation : public base_adaptation {
     if (adapt_next_window_ == num_warmup_ - adapt_term_buffer_ - 1)
       return;
 
-    // Bounday of the following window, not the window just computed
+    // Boundary of the following window, not the window just computed
     unsigned int next_window_boundary
         = adapt_next_window_ + 2 * adapt_window_size_;
 
