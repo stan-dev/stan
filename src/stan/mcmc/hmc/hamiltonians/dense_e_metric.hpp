@@ -20,7 +20,7 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
       : base_hamiltonian<Model, dense_e_point, BaseRNG>(model) {}
 
   double T(dense_e_point& z) {
-    return 0.5 * z.p.transpose() * z.inv_e_metric_ * z.p;
+    return 0.5 * z.p.transpose() * z.p;
   }
 
   double tau(dense_e_point& z) { return T(z); }
@@ -35,10 +35,12 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
     return Eigen::VectorXd::Zero(this->model_.num_params_r());
   }
 
-  Eigen::VectorXd dtau_dp(dense_e_point& z) { return z.inv_e_metric_ * z.p; }
+  Eigen::VectorXd dtau_dp(dense_e_point& z) {
+    return z.inv_e_metric_.transpose() * z.p;
+  }
 
   Eigen::VectorXd dphi_dq(dense_e_point& z, callbacks::logger& logger) {
-    return z.g;
+    return z.inv_e_metric_ * z.g;
   }
 
   void sample_p(dense_e_point& z, BaseRNG& rng) {
@@ -46,12 +48,8 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
     boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
         rand_dense_gaus(rng, boost::normal_distribution<>());
 
-    Eigen::VectorXd u(z.p.size());
-
-    for (idx_t i = 0; i < u.size(); ++i)
-      u(i) = rand_dense_gaus();
-
-    z.p = z.inv_e_metric_.llt().matrixU().solve(u);
+    for (idx_t i = 0; i < z.p.size(); ++i)
+      z.p(i) = rand_dense_gaus();
   }
 };
 

@@ -24,9 +24,10 @@ class covar_adaptation : public windowed_adaptation {
       estimator_.sample_covariance(covar);
 
       double n = static_cast<double>(estimator_.num_samples());
-      covar = (n / (n + 5.0)) * covar
-              + 1e-3 * (5.0 / (n + 5.0))
-                    * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
+      Eigen::MatrixXd cov = (n / (n + 5.0)) * covar
+        + 1e-3 * (5.0 / (n + 5.0))
+        * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
+      covar = cov.llt().matrixL();
 
       estimator_.restart();
 
