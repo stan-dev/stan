@@ -24,8 +24,9 @@ class var_adaptation : public windowed_adaptation {
       estimator_.sample_variance(var);
 
       double n = static_cast<double>(estimator_.num_samples());
-      var = (n / (n + 5.0)) * var
+      Eigen::VectorXd v = (n / (n + 5.0)) * var
             + 1e-3 * (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
+      var = v.cwiseSqrt().cwiseInverse();
 
       estimator_.restart();
 
