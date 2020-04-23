@@ -66,7 +66,7 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
  */
 template <typename Vec1, typename Vec2,
           typename = require_all_std_vector_t<Vec1, Vec2>>
-inline void assign(Vec1&& x, const nil_index_list& /* idxs */, Vec2&& y,
+inline void assign(Vec1& x, const nil_index_list& /* idxs */, const Vec2& y,
                    const char* name = "ANON", int depth = 0) {
   x.resize(y.size());
   for (size_t i = 0; i < y.size(); ++i) {
@@ -94,7 +94,7 @@ template <typename EigVec, typename Scalar,
           typename = require_stan_scalar_t<Scalar>>
 inline void assign(EigVec& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
-                   Scalar y, const char* name = "ANON", int depth = 0) {
+                   Scalar& y, const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("vector[uni] assign range", name, x.size(), i);
   x.coeffRef(i - 1) = y;
@@ -340,7 +340,7 @@ inline void assign(
   for (int i = 0; i < y.size(); ++i) {
     int m = rvalue_at(i, idxs.head_);
     math::check_range("matrix[multi,uni] assign range", name, x.rows(), m);
-    x.coeffRef(m - 1, n - 1) = vec.coeff(i, 0);
+    x.coeffRef(m - 1, n - 1) = vec.coeff(i);
   }
 }
 

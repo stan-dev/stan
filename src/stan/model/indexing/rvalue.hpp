@@ -98,7 +98,7 @@ inline auto rvalue(const EigVec& v,
   for (int i = 0; i < size; ++i) {
     int n = rvalue_at(i, idx.head_);
     math::check_range("vector[multi] indexing", name, v.size(), n);
-    a(i) = vec.coeffRef(n - 1);
+    a.coeffRef(i) = vec.coeff(n - 1);
   }
   return a;
 }
@@ -295,7 +295,7 @@ inline auto rvalue(
     int n = idx.tail_.head_.n_;
     math::check_range("matrix[multi,uni] index row", name, a.rows(), m);
     math::check_range("matrix[multi,uni] index col", name, a.cols(), n);
-    c(i) = mat.coeff(m - 1, n - 1);
+    c.coeffRef(i) = mat.coeff(m - 1, n - 1);
   }
   return c;
 }
@@ -335,7 +335,7 @@ inline auto rvalue(
       int n = rvalue_at(j, idx.tail_.head_);
       math::check_range("matrix[multi,multi] row index", name, mat.rows(), m);
       math::check_range("matrix[multi,multi] col index", name, mat.cols(), n);
-      c(i, j) = mat.coeff(m - 1, n - 1);
+      c.coeffRef(i, j) = mat.coeff(m - 1, n - 1);
     }
   }
   return c;
