@@ -93,7 +93,7 @@ inline T rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
  */
 template <typename T, typename I>
 inline typename std::enable_if<std::is_same<I, index_uni>::value,
-                                  Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
+                               Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
 rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
        const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
        int depth = 0) {
@@ -124,7 +124,7 @@ rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
  */
 template <typename T, typename I>
 inline typename std::enable_if<std::is_same<I, index_uni>::value,
-                                  Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
+                               Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
 rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
        const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
        int depth = 0) {
@@ -235,7 +235,7 @@ inline T rvalue(
  */
 template <typename T, typename I>
 inline typename std::enable_if<std::is_same<I, index_uni>::value,
-                                  Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
+                               Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
 rvalue(
     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idx,
@@ -263,7 +263,7 @@ rvalue(
  */
 template <typename T, typename I>
 inline typename std::enable_if<std::is_same<I, index_uni>::value,
-                                  Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
+                               Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
 rvalue(
     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idx,
@@ -297,8 +297,7 @@ rvalue(
  */
 template <typename T, typename I1, typename I2>
 inline typename std::enable_if_t<
-    std::is_same<I1, index_uni>::value
-        || std::is_same<I2, index_uni>::value,
+    std::is_same<I1, index_uni>::value || std::is_same<I2, index_uni>::value,
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >::type
 rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
        const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idx,

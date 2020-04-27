@@ -360,8 +360,8 @@ assign(
  */
 template <typename T, typename I1, typename I2, typename U>
 inline typename std::enable_if_t<std::is_same<I1, index_uni>::value
-                                        || std::is_same<I2, index_uni>::value,
-                                    void>::type
+                                     || std::is_same<I2, index_uni>::value,
+                                 void>::type
 assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
        const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idxs,
        const Eigen::Matrix<U, Eigen::Dynamic, Eigen::Dynamic>& y,
