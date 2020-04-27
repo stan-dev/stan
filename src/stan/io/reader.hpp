@@ -323,7 +323,7 @@ class reader {
     int i = integer();
     if (!(i >= lb)) {
       throw std::runtime_error("required value greater than or equal to lb");
-    } 
+    }
     return i;
   }
   /**
