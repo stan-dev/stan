@@ -103,7 +103,7 @@ class writer {
    */
   void scalar_pos_unconstrain(T &y) {
     if (y < 0.0)
-      BOOST_THROW_EXCEPTION(std::runtime_error("y is negative"));
+      throw std::runtime_error("y is negative");
     data_r_.push_back(log(y));
   }
 
@@ -460,9 +460,8 @@ class writer {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
     idx_t k = y.rows();
     if (k == 0 || y.cols() != k)
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("y must have elements and"
-                             " y must be a square matrix"));
+      throw std::runtime_error("y must have elements and"
+                             " y must be a square matrix");
     vector_t L_vec = stan::math::cov_matrix_free(y);
     int i = 0;
     for (idx_t m = 0; m < k; ++m) {

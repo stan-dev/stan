@@ -4,13 +4,13 @@
 #include <stan/io/validate_zero_buf.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim.hpp>
-#include <boost/lexical_cast.hpp>
 #include <iostream>
 #include <limits>
 #include <map>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include <cctype>
@@ -18,6 +18,7 @@
 namespace stan {
 namespace io {
 
+using Eigen::Dynamic;
 /**
  * Reads data from S-plus dump format.
  *
@@ -240,9 +241,9 @@ class dump_reader {
     }
     scan_optional_long();
     size_t d = 0;
-    try {
-      d = boost::lexical_cast<size_t>(buf_);
-    } catch (const boost::bad_lexical_cast& exc) {
+    std::istringstream int_read(buf_);
+    int_read >> d;
+    if (int_read.fail()) {
       std::string msg = "value " + buf_ + " beyond array dimension range";
       throw std::invalid_argument(msg);
     }
@@ -268,8 +269,8 @@ class dump_reader {
   int get_int() {
     int n = 0;
     try {
-      n = boost::lexical_cast<int>(buf_);
-    } catch (const boost::bad_lexical_cast& exc) {
+      n = std::stoi(buf_);
+    } catch (const std::logic_error& exc) {
       std::string msg = "value " + buf_ + " beyond int range";
       throw std::invalid_argument(msg);
     }
@@ -279,17 +280,17 @@ class dump_reader {
   double scan_double() {
     double x = 0;
     try {
-      x = boost::lexical_cast<double>(buf_);
+      x = std::stod(buf_);
       if (x == 0)
         validate_zero_buf(buf_);
-    } catch (const boost::bad_lexical_cast& exc) {
+    } catch (const std::logic_error& exc) {
       std::string msg = "value " + buf_ + " beyond numeric range";
       throw std::invalid_argument(msg);
     }
     return x;
   }
 
-  // scan number stores number or throws bad lexical cast exception
+  // scan number stores number or throws an invalid argument exception
   void scan_number(bool negate_val) {
     // must take longest first!
     if (scan_chars("Inf")) {

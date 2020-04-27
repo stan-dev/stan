@@ -1,7 +1,6 @@
 #ifndef STAN_CALLBACKS_WRITER_HPP
 #define STAN_CALLBACKS_WRITER_HPP
 
-#include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
 
