@@ -92,7 +92,7 @@ inline T rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
  * @return Result of indexing vector.
  */
 template <typename T, typename I>
-inline typename std::enable_if<std::is_same<I, index_uni>::value,
+inline typename std::enable_if<!std::is_same<I, index_uni>::value,
                                Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
 rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
        const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
@@ -123,7 +123,7 @@ rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
  * @return Result of indexing vector.
  */
 template <typename T, typename I>
-inline typename std::enable_if<std::is_same<I, index_uni>::value,
+inline typename std::enable_if<!std::is_same<I, index_uni>::value,
                                Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
 rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
        const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
@@ -177,7 +177,7 @@ inline Eigen::Matrix<T, 1, Eigen::Dynamic> rvalue(
  */
 template <typename T, typename I>
 inline typename std::enable_if<
-    std::is_same<I, index_uni>::value,
+    !std::is_same<I, index_uni>::value,
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >::type
 rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
        const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
@@ -234,7 +234,7 @@ inline T rvalue(
  * @return Result of indexing matrix.
  */
 template <typename T, typename I>
-inline typename std::enable_if<std::is_same<I, index_uni>::value,
+inline typename std::enable_if<!std::is_same<I, index_uni>::value,
                                Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
 rvalue(
     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
