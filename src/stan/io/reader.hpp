@@ -103,7 +103,7 @@ class reader {
   inline int integer() {
     if (int_pos_ >= data_i_.size()) {
       throw std::runtime_error("no more integers to read.");
-    }      
+    }
     return data_i_[int_pos_++];
   }
 
@@ -131,9 +131,9 @@ class reader {
    * @return Next scalar value.
    */
   inline T scalar() {
-    if (pos_ >= data_r_.size()){
+    if (pos_ >= data_r_.size()) {
       throw std::runtime_error("no more scalars to read");
-    }      
+    }
     return data_r_[pos_++];
   }
 
@@ -323,7 +323,7 @@ class reader {
     int i = integer();
     if (!(i >= lb)) {
       throw std::runtime_error("required value greater than or equal to lb");
-    }      
+    } 
     return i;
   }
   /**
@@ -403,14 +403,13 @@ class reader {
     int i = integer();
     if (lb > ub) {
       throw std::runtime_error("lower bound must be less than or equal to ub");
-    }      
+    }
     if (!(i >= lb)) {
       throw std::runtime_error("required value greater than or equal to lb");
-    }      
+    }
     if (!(i <= ub)) {
       throw std::runtime_error("required value less than or equal to ub");
     }
-      
     return i;
   }
   /**
