@@ -2,8 +2,8 @@
 #define STAN_OPTIMIZATION_LBFGS_UPDATE_HPP
 
 #include <Eigen/Dense>
-#include <boost/tuple/tuple.hpp>
 #include <boost/circular_buffer.hpp>
+#include <tuple>
 #include <vector>
 
 namespace stan {
@@ -19,7 +19,7 @@ class LBFGSUpdate {
   typedef Eigen::Matrix<Scalar, DimAtCompile, 1> VectorT;
   typedef Eigen::Matrix<Scalar, DimAtCompile, DimAtCompile> HessianT;
   // NOLINTNEXTLINE(build/include_what_you_use)
-  typedef boost::tuple<Scalar, VectorT, VectorT> UpdateT;
+  typedef std::tuple<Scalar, VectorT, VectorT> UpdateT;
 
   explicit LBFGSUpdate(size_t L = 5) : _buf(L) {}
 
@@ -57,7 +57,7 @@ class LBFGSUpdate {
     Scalar invskyk = 1.0 / skyk;
     _gammak = skyk / yk.squaredNorm();
     _buf.push_back();
-    _buf.back() = boost::tie(invskyk, yk, sk);
+    _buf.back() = std::tie(invskyk, yk, sk);
 
     return B0fact;
   }
@@ -81,9 +81,9 @@ class LBFGSUpdate {
     for (buf_rit = _buf.rbegin(), alpha_rit = alphas.rbegin();
          buf_rit != _buf.rend(); buf_rit++, alpha_rit++) {
       Scalar alpha;
-      const Scalar &rhoi(boost::get<0>(*buf_rit));
-      const VectorT &yi(boost::get<1>(*buf_rit));
-      const VectorT &si(boost::get<2>(*buf_rit));
+      const Scalar &rhoi(std::get<0>(*buf_rit));
+      const VectorT &yi(std::get<1>(*buf_rit));
+      const VectorT &si(std::get<2>(*buf_rit));
 
       alpha = rhoi * si.dot(pk);
       pk -= alpha * yi;
@@ -93,9 +93,9 @@ class LBFGSUpdate {
     for (buf_it = _buf.begin(), alpha_it = alphas.begin(); buf_it != _buf.end();
          buf_it++, alpha_it++) {
       Scalar beta;
-      const Scalar &rhoi(boost::get<0>(*buf_it));
-      const VectorT &yi(boost::get<1>(*buf_it));
-      const VectorT &si(boost::get<2>(*buf_it));
+      const Scalar &rhoi(std::get<0>(*buf_it));
+      const VectorT &yi(std::get<1>(*buf_it));
+      const VectorT &si(std::get<2>(*buf_it));
 
       beta = rhoi * yi.dot(pk);
       pk += (*alpha_it - beta) * si;

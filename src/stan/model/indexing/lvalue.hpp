@@ -1,13 +1,12 @@
 #ifndef STAN_MODEL_INDEXING_LVALUE_HPP
 #define STAN_MODEL_INDEXING_LVALUE_HPP
 
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <stan/math/prim.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
+#include <type_traits>
 #include <vector>
 
 namespace stan {
@@ -119,7 +118,7 @@ inline void assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
  * the indexed size.
  */
 template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
+inline typename std::enable_if<!std::is_same<I, index_uni>::value, void>::type
 assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
        const cons_index_list<I, nil_index_list>& idxs,
        const Eigen::Matrix<U, Eigen::Dynamic, 1>& y, const char* name = "ANON",
@@ -154,7 +153,7 @@ assign(Eigen::Matrix<T, Eigen::Dynamic, 1>& x,
  * the indexed size.
  */
 template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
+inline typename std::enable_if<!std::is_same<I, index_uni>::value, void>::type
 assign(Eigen::Matrix<T, 1, Eigen::Dynamic>& x,
        const cons_index_list<I, nil_index_list>& idxs,
        const Eigen::Matrix<U, 1, Eigen::Dynamic>& y, const char* name = "ANON",
@@ -219,7 +218,7 @@ void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
+inline typename std::enable_if<!std::is_same<I, index_uni>::value, void>::type
 assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
        const cons_index_list<I, nil_index_list>& idxs,
        const Eigen::Matrix<U, Eigen::Dynamic, Eigen::Dynamic>& y,
@@ -285,7 +284,7 @@ void assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
  * matrix and right-hand side row vector do not match.
  */
 template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
+inline typename std::enable_if<!std::is_same<I, index_uni>::value, void>::type
 assign(
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idxs,
@@ -322,7 +321,7 @@ assign(
  * matrix and right-hand side vector do not match.
  */
 template <typename T, typename I, typename U>
-inline typename boost::disable_if<boost::is_same<I, index_uni>, void>::type
+inline typename std::enable_if<!std::is_same<I, index_uni>::value, void>::type
 assign(
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idxs,
@@ -360,8 +359,8 @@ assign(
  * matrix and value matrix do not match.
  */
 template <typename T, typename I1, typename I2, typename U>
-inline typename boost::disable_if_c<boost::is_same<I1, index_uni>::value
-                                        || boost::is_same<I2, index_uni>::value,
+inline typename std::enable_if_t<std::is_same<I1, index_uni>::value
+                                        || std::is_same<I2, index_uni>::value,
                                     void>::type
 assign(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& x,
        const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idxs,
@@ -441,7 +440,7 @@ inline void assign(std::vector<T>& x, const cons_index_list<index_uni, L>& idxs,
  * the recursive tail assignment dimensions do not match.
  */
 template <typename T, typename I, typename L, typename U>
-typename boost::disable_if<boost::is_same<I, index_uni>, void>::
+typename std::enable_if<std::is_same<I, index_uni>::value, void>::
     type inline assign(std::vector<T>& x, const cons_index_list<I, L>& idxs,
                        const std::vector<U>& y, const char* name = "ANON",
                        int depth = 0) {

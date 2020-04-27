@@ -1,14 +1,13 @@
 #ifndef STAN_MODEL_INDEXING_RVALUE_HPP
 #define STAN_MODEL_INDEXING_RVALUE_HPP
 
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <stan/math/prim.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
 #include <stan/model/indexing/rvalue_return.hpp>
+#include <type_traits>
 #include <vector>
 
 namespace stan {
@@ -93,7 +92,7 @@ inline T rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
  * @return Result of indexing vector.
  */
 template <typename T, typename I>
-inline typename boost::disable_if<boost::is_same<I, index_uni>,
+inline typename std::enable_if<std::is_same<I, index_uni>::value,
                                   Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
 rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
        const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
@@ -124,7 +123,7 @@ rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
  * @return Result of indexing vector.
  */
 template <typename T, typename I>
-inline typename boost::disable_if<boost::is_same<I, index_uni>,
+inline typename std::enable_if<std::is_same<I, index_uni>::value,
                                   Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
 rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
        const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
@@ -177,8 +176,8 @@ inline Eigen::Matrix<T, 1, Eigen::Dynamic> rvalue(
  * @return Result of indexing matrix.
  */
 template <typename T, typename I>
-inline typename boost::disable_if<
-    boost::is_same<I, index_uni>,
+inline typename std::enable_if<
+    std::is_same<I, index_uni>::value,
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >::type
 rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
        const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
@@ -235,7 +234,7 @@ inline T rvalue(
  * @return Result of indexing matrix.
  */
 template <typename T, typename I>
-inline typename boost::disable_if<boost::is_same<I, index_uni>,
+inline typename std::enable_if<std::is_same<I, index_uni>::value,
                                   Eigen::Matrix<T, 1, Eigen::Dynamic> >::type
 rvalue(
     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
@@ -263,7 +262,7 @@ rvalue(
  * @return Result of indexing matrix.
  */
 template <typename T, typename I>
-inline typename boost::disable_if<boost::is_same<I, index_uni>,
+inline typename std::enable_if<std::is_same<I, index_uni>::value,
                                   Eigen::Matrix<T, Eigen::Dynamic, 1> >::type
 rvalue(
     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
@@ -297,9 +296,9 @@ rvalue(
  * @return Result of indexing matrix.
  */
 template <typename T, typename I1, typename I2>
-inline typename boost::disable_if_c<
-    boost::is_same<I1, index_uni>::value
-        || boost::is_same<I2, index_uni>::value,
+inline typename std::enable_if_t<
+    std::is_same<I1, index_uni>::value
+        || std::is_same<I2, index_uni>::value,
     Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >::type
 rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
        const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idx,
