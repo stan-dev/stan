@@ -36,11 +36,11 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
   }
 
   Eigen::VectorXd dtau_dp(dense_e_point& z) {
-    return z.inv_e_metric_ * z.p;
+    return z.inv_e_metric_.triangularView<Eigen::Lower> * z.p;
   }
 
   Eigen::VectorXd dphi_dq(dense_e_point& z, callbacks::logger& logger) {
-    return z.inv_e_metric_.transpose() * z.g;
+    return z.inv_e_metric_.triangularView<Eigen::Lower>.transpose() * z.g;
   }
 
   void sample_p(dense_e_point& z, BaseRNG& rng) {
