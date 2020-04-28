@@ -261,7 +261,7 @@ rvalue(
  * @return Result of indexing matrix.
  */
 template <typename T, typename I>
-inline std::enable_if_t<std::is_same<I, index_uni>::value,
+inline std::enable_if_t<!std::is_same<I, index_uni>::value,
                         Eigen::Matrix<T, Eigen::Dynamic, 1> >
 rvalue(
     const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
