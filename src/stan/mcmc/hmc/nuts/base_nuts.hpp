@@ -93,7 +93,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
     // Momentum and sharp momentum at forward end of forward subtree
     Eigen::VectorXd p_fwd_fwd = this->z_.p;
-    Eigen::VectorXd p_sharp_fwd_fwd = this->hamiltonian_.dtau_dp(this->z_);
+    Eigen::VectorXd p_sharp_fwd_fwd = this->z_.p; // this->hamiltonian_.dtau_dp(this->z_);
 
     // Momentum and sharp momentum at backward end of forward subtree
     Eigen::VectorXd p_fwd_bck = this->z_.p;
@@ -272,7 +272,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
       z_propose = this->z_;
 
-      p_sharp_beg = this->hamiltonian_.dtau_dp(this->z_);
+      p_sharp_beg = this->z_.p; // this->hamiltonian_.dtau_dp(this->z_);
       p_sharp_end = p_sharp_beg;
 
       rho += this->z_.p;
