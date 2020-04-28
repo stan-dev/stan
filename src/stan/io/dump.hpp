@@ -5,11 +5,6 @@
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/throw_exception.hpp>
-#include <boost/type_traits/is_floating_point.hpp>
-#include <boost/type_traits/is_integral.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -23,7 +18,6 @@
 namespace stan {
 namespace io {
 
-using Eigen::Dynamic;
 /**
  * Reads data from S-plus dump format.
  *
@@ -250,7 +244,7 @@ class dump_reader {
       d = boost::lexical_cast<size_t>(buf_);
     } catch (const boost::bad_lexical_cast& exc) {
       std::string msg = "value " + buf_ + " beyond array dimension range";
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+      throw std::invalid_argument(msg);
     }
     return d;
   }
@@ -277,7 +271,7 @@ class dump_reader {
       n = boost::lexical_cast<int>(buf_);
     } catch (const boost::bad_lexical_cast& exc) {
       std::string msg = "value " + buf_ + " beyond int range";
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+      throw std::invalid_argument(msg);
     }
     return n;
   }
@@ -290,7 +284,7 @@ class dump_reader {
         validate_zero_buf(buf_);
     } catch (const boost::bad_lexical_cast& exc) {
       std::string msg = "value " + buf_ + " beyond numeric range";
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+      throw std::invalid_argument(msg);
     }
     return x;
   }
@@ -574,11 +568,11 @@ class dump_reader {
       bool okSyntax = scan_value();  // set stack_r_, stack_i_, dims_
       if (!okSyntax) {
         std::string msg = "syntax error";
-        BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+        throw std::invalid_argument(msg);
       }
     } catch (const std::invalid_argument& e) {
       std::string msg = "data " + name_ + " " + e.what();
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+      throw std::invalid_argument(msg);
     }
     return true;
   }

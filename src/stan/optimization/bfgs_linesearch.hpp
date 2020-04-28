@@ -1,7 +1,6 @@
 #ifndef STAN_OPTIMIZATION_BFGS_LINESEARCH_HPP
 #define STAN_OPTIMIZATION_BFGS_LINESEARCH_HPP
 
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -134,7 +133,7 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
         d2 = -d2;
       alpha
           = ahi - (ahi - alo) * (ahiDFp + d2 - d1) / (ahiDFp - aloDFp + 2 * d2);
-      if (!boost::math::isfinite(alpha)
+      if (!std::isfinite(alpha)
           || alpha < std::min(alo, ahi) + 0.01 * std::fabs(alo - ahi)
           || alpha > std::max(alo, ahi) - 0.01 * std::fabs(alo - ahi))
         alpha = 0.5 * (alo + ahi);
