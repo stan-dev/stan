@@ -45,6 +45,7 @@ class writer {
    * @param[in] message A string
    */
   virtual void operator()(const std::string& message) {}
+  
 };
 
 }  // namespace callbacks

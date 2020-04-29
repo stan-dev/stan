@@ -53,7 +53,7 @@ namespace sample {
  * @param[in,out] diagnostic_writer Writer for diagnostic information
  * @return error_codes::OK if successful
  */
-template <class Model>
+template <class Model, typename Writer1, typename Writer2>
 int hmc_nuts_diag_e_adapt(
     Model& model, const stan::io::var_context& init,
     const stan::io::var_context& init_inv_metric, unsigned int random_seed,
@@ -63,7 +63,7 @@ int hmc_nuts_diag_e_adapt(
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
-    callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
+    Writer1& sample_writer, Writer2& diagnostic_writer, unsigned int n_chains) {
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
@@ -97,7 +97,7 @@ int hmc_nuts_diag_e_adapt(
 
   util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer);
+      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, n_chains);
 
   return error_codes::OK;
 }
@@ -133,7 +133,7 @@ int hmc_nuts_diag_e_adapt(
  * @param[in,out] diagnostic_writer Writer for diagnostic information
  * @return error_codes::OK if successful
  */
-template <class Model>
+template <class Model, typename Writer1, typename Writer2>
 int hmc_nuts_diag_e_adapt(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int chain, double init_radius, int num_warmup, int num_samples,
@@ -142,7 +142,7 @@ int hmc_nuts_diag_e_adapt(
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
-    callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
+    Writer1& sample_writer, Writer2& diagnostic_writer, unsigned int n_chains) {
   stan::io::dump dmp
       = util::create_unit_e_diag_inv_metric(model.num_params_r());
   stan::io::var_context& unit_e_metric = dmp;
@@ -151,8 +151,9 @@ int hmc_nuts_diag_e_adapt(
       model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init_writer, sample_writer, diagnostic_writer);
+      interrupt, logger, init_writer, sample_writer, diagnostic_writer, n_chains);
 }
+
 
 }  // namespace sample
 }  // namespace services

@@ -23,15 +23,18 @@ class stream_writer : public writer {
    * @param[in] comment_prefix string to stream before
    *   each comment line. Default is "".
    */
-  explicit stream_writer(std::ostream& output,
+  template <typename T, require_t<std::is_same<std::unique_ptr<std::fstream>, std::decay_t<T>>>* = nullptr>
+  explicit stream_writer(T&& output,
                          const std::string& comment_prefix = "")
-      : output_(output), comment_prefix_(comment_prefix) {}
+      : output_(std::move(output)), comment_prefix_(comment_prefix) {}
 
   /**
    * Virtual destructor
    */
   virtual ~stream_writer() {}
-
+  stream_writer();
+  stream_writer(stream_writer& other) : output_(std::move(other.output_)) {}
+  stream_writer(stream_writer&& other) : output_(std::move(other.output_)) {}
   /**
    * Writes a set of names on a single line in csv format followed
    * by a newline.
@@ -57,7 +60,7 @@ class stream_writer : public writer {
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
-  void operator()() { output_ << comment_prefix_ << std::endl; }
+  void operator()() { *output_.get() << comment_prefix_ << std::endl; }
 
   /**
    * Writes the comment_prefix then the message followed by a newline.
@@ -65,19 +68,20 @@ class stream_writer : public writer {
    * @param[in] message A string
    */
   void operator()(const std::string& message) {
-    output_ << comment_prefix_ << message << std::endl;
+    *output_.get() << comment_prefix_ << message << std::endl;
   }
 
- private:
   /**
    * Output stream
    */
-  std::ostream& output_;
+  std::unique_ptr<std::fstream> output_;
+
+ private:
 
   /**
    * Comment prefix to use when printing comments: strings and blank lines
    */
-  std::string comment_prefix_;
+  std::string comment_prefix_{"# "};
 
   /**
    * Writes a set of values in csv format followed by a newline.
@@ -97,8 +101,8 @@ class stream_writer : public writer {
 
     for (typename std::vector<T>::const_iterator it = v.begin(); it != last;
          ++it)
-      output_ << *it << ",";
-    output_ << v.back() << std::endl;
+    *output_.get() << *it << ",";
+    *output_.get() << v.back() << std::endl;
   }
 };
 

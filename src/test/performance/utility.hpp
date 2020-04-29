@@ -232,7 +232,7 @@ int command(int num_warmup, int num_samples, const std::string data_file,
       model, init_context, random_seed, id, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init_writer, sample_writer, diagnostic_writer);
+      interrupt, logger, init_writer, sample_writer, diagnostic_writer, 1);
 }
 
 }  // namespace performance

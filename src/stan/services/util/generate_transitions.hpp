@@ -44,7 +44,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
                           util::mcmc_writer& mcmc_writer,
                           stan::mcmc::sample& init_s, Model& model,
                           RNG& base_rng, callbacks::interrupt& callback,
-                          callbacks::logger& logger) {
+                          callbacks::logger& logger, unsigned int n_chain = 1) {
   for (int m = 0; m < num_iterations; ++m) {
     callback();
 
@@ -52,7 +52,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
         && (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
       int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
       std::stringstream message;
-      message << "Iteration: ";
+      message << "[" << n_chain << "] "<< "Iteration: ";
       message << std::setw(it_print_width) << m + 1 + start << " / " << finish;
       message << " [" << std::setw(3)
               << static_cast<int>((100.0 * (start + m + 1)) / finish) << "%] ";
