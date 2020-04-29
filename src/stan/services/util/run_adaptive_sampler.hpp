@@ -6,6 +6,7 @@
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <tbb/parallel_for.h>
+#include <tbb/partitioner.h>
 #include <tbb/blocked_range.h>
 #include <ctime>
 #include <vector>
@@ -114,10 +115,12 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   for (int i = 0; i < all_samps.size(); i++) {
     writers.push_back(services::util::mcmc_writer(sample_writer[i], diagnostic_writer[i], logger));
   }
-  tbb::parallel_for(tbb::blocked_range<size_t>(0, n_chains), [&](const tbb::blocked_range<size_t>& r) {
+  tbb::parallel_for(tbb::blocked_range<size_t>(0, n_chains, 1),
+   [&](const tbb::blocked_range<size_t>& r) {
     for (size_t i=r.begin(); i!=r.end(); ++i)  {
     // Initialize nested autodiff stack
     const stan::math::nested_rev_autodiff begin_nest;
+    stan::mcmc::sample s(cont_params, 0, 0);
 
     auto& samplerr = all_samps[i];
     auto& writer = writers[i];
@@ -130,7 +133,6 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
       logger.info(e.what());
       return;
     }
-    stan::mcmc::sample s(cont_params, 0, 0);
 
     // Headers
     writer.write_sample_names(s, samplerr, model);
@@ -156,7 +158,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
 
     writer.write_timing(warm_delta_t, sample_delta_t);
   }
-});
+}, tbb::simple_partitioner());
 
   double accum_warmup_time = stan::math::sum(warmup_times);
   double accum_sample_time = stan::math::sum(sampler_times);
