@@ -119,6 +119,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
    [&](const tbb::blocked_range<size_t>& r) {
     for (size_t i=r.begin(); i!=r.end(); ++i)  {
     // Initialize nested autodiff stack
+    const stan::math::nested_rev_autodiff begin_nest;
     stan::mcmc::sample s(cont_params, 0, 0);
 
     auto& samplerr = all_samps[i];
