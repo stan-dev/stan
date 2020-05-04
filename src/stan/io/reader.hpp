@@ -1,7 +1,6 @@
 #ifndef STAN_IO_READER_HPP
 #define STAN_IO_READER_HPP
 
-#include <boost/throw_exception.hpp>
 #include <stan/math/prim.hpp>
 #include <stdexcept>
 #include <string>
@@ -102,8 +101,9 @@ class reader {
    * @return Next integer value.
    */
   inline int integer() {
-    if (int_pos_ >= data_i_.size())
-      BOOST_THROW_EXCEPTION(std::runtime_error("no more integers to read."));
+    if (int_pos_ >= data_i_.size()) {
+      throw std::runtime_error("no more integers to read.");
+    }
     return data_i_[int_pos_++];
   }
 
@@ -131,8 +131,9 @@ class reader {
    * @return Next scalar value.
    */
   inline T scalar() {
-    if (pos_ >= data_r_.size())
-      BOOST_THROW_EXCEPTION(std::runtime_error("no more scalars to read"));
+    if (pos_ >= data_r_.size()) {
+      throw std::runtime_error("no more scalars to read");
+    }
     return data_r_[pos_++];
   }
 
@@ -320,9 +321,9 @@ class reader {
    */
   inline int integer_lb(int lb) {
     int i = integer();
-    if (!(i >= lb))
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("required value greater than or equal to lb"));
+    if (!(i >= lb)) {
+      throw std::runtime_error("required value greater than or equal to lb");
+    }
     return i;
   }
   /**
@@ -358,9 +359,9 @@ class reader {
    */
   inline int integer_ub(int ub) {
     int i = integer();
-    if (!(i <= ub))
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("required value less than or equal to ub"));
+    if (!(i <= ub)) {
+      throw std::runtime_error("required value less than or equal to ub");
+    }
     return i;
   }
   /**
@@ -400,15 +401,15 @@ class reader {
   inline int integer_lub(int lb, int ub) {
     // read first to make position deterministic [arbitrary choice]
     int i = integer();
-    if (lb > ub)
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("lower bound must be less than or equal to ub"));
-    if (!(i >= lb))
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("required value greater than or equal to lb"));
-    if (!(i <= ub))
-      BOOST_THROW_EXCEPTION(
-          std::runtime_error("required value less than or equal to ub"));
+    if (lb > ub) {
+      throw std::runtime_error("lower bound must be less than or equal to ub");
+    }
+    if (!(i >= lb)) {
+      throw std::runtime_error("required value greater than or equal to lb");
+    }
+    if (!(i <= ub)) {
+      throw std::runtime_error("required value less than or equal to ub");
+    }
     return i;
   }
   /**
