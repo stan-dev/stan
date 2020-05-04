@@ -27,7 +27,7 @@ namespace model {
  * @param[in] depth Indexing depth (default 0; ignored
  */
 template <typename T, typename U, typename = require_all_stan_scalar_t<U, T>>
-inline void assign(T& x, const nil_index_list& /* idxs */, U y,
+inline void assign(T& x, const nil_index_list& /* idxs */, const U& y,
                    const char* name = "ANON", int depth = 0) {
   x = y;
 }
@@ -44,9 +44,9 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U y,
  * @param[in] name Name of lvalue variable (default "ANON"); ignored
  * @param[in] depth Indexing depth (default 0; ignored
  */
-template <
-    typename T, typename U, typename = require_all_not_stan_scalar_t<U, T>,
-    typename = require_t<std::is_assignable<std::decay_t<T>, std::decay_t<U>>>>
+template <typename T, typename U,
+    require_all_not_stan_scalar_t<U, T>* = nullptr,
+    require_t<std::is_assignable<std::decay_t<T>, std::decay_t<U>>>* = nullptr>
 inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x = std::forward<U>(y);
@@ -65,7 +65,7 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
  * @param[in] depth indexing depth (default 0).
  */
 template <typename Vec1, typename Vec2,
-          typename = require_all_std_vector_t<Vec1, Vec2>>
+          require_all_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1& x, const nil_index_list& /* idxs */, const Vec2& y,
                    const char* name = "ANON", int depth = 0) {
   x.resize(y.size());
@@ -90,11 +90,11 @@ inline void assign(Vec1& x, const nil_index_list& /* idxs */, const Vec2& y,
  * @throw std::out_of_range If the index is out of bounds.
  */
 template <typename EigVec, typename Scalar,
-          typename = require_eigen_vector_t<EigVec>,
-          typename = require_stan_scalar_t<Scalar>>
+          require_eigen_vector_t<EigVec>* = nullptr,
+          require_stan_scalar_t<Scalar>* = nullptr>
 inline void assign(EigVec& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
-                   Scalar& y, const char* name = "ANON", int depth = 0) {
+                   Scalar&& y, const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("vector[uni] assign range", name, x.size(), i);
   x.coeffRef(i - 1) = y;
@@ -119,8 +119,8 @@ inline void assign(EigVec& x,
  * the indexed size.
  */
 template <typename LhsEigVec, typename RhsEigVec, typename I,
-          typename = require_not_same_t<index_uni, I>,
-          typename = require_all_eigen_vector_t<LhsEigVec, RhsEigVec>>
+          require_not_same_t<index_uni, I>* = nullptr,
+          require_all_eigen_vector_t<LhsEigVec, RhsEigVec>* = nullptr>
 inline void assign(LhsEigVec& x, const cons_index_list<I, nil_index_list>& idxs,
                    const RhsEigVec& y, const char* name = "ANON",
                    int depth = 0) {
@@ -152,9 +152,9 @@ inline void assign(LhsEigVec& x, const cons_index_list<I, nil_index_list>& idxs,
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename EigMat, typename RowVec, typename = require_eigen_t<EigMat>,
-          typename = require_not_eigen_vector_t<EigMat>,
-          typename = require_t<is_eigen_row_vector<RowVec>>>
+template <typename EigMat, typename RowVec, require_eigen_t<EigMat>* = nullptr,
+          require_not_eigen_vector_t<EigMat>* = nullptr,
+          require_eigen_row_vector_t<RowVec>* = nullptr>
 void assign(EigMat& x, const cons_index_list<index_uni, nil_index_list>& idxs,
             const RowVec& y, const char* name = "ANON", int depth = 0) {
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.cols(), name,
@@ -181,9 +181,9 @@ void assign(EigMat& x, const cons_index_list<index_uni, nil_index_list>& idxs,
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename EigMat, typename ColVec, typename = require_eigen_t<EigMat>,
-          typename = require_not_eigen_vector_t<EigMat>,
-          typename = require_t<is_eigen_col_vector<ColVec>>>
+template <typename EigMat, typename ColVec, require_eigen_t<EigMat>* = nullptr,
+          require_not_eigen_vector_t<EigMat>* = nullptr,
+          require_eigen_col_vector_t<ColVec>* = nullptr>
 void assign(EigMat& x,
             const cons_index_list<
                 index_omni, cons_index_list<index_uni, nil_index_list>>& idxs,
@@ -214,9 +214,9 @@ void assign(EigMat& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename LhsEigMat, typename I, typename RhsEigMat,
-          typename = require_all_eigen_t<LhsEigMat, RhsEigMat>,
-          typename = require_all_not_eigen_vector_t<LhsEigMat, RhsEigMat>,
-          typename = require_not_same_t<index_uni, I>>
+          require_all_eigen_t<LhsEigMat, RhsEigMat>* = nullptr,
+          require_all_not_eigen_vector_t<LhsEigMat, RhsEigMat>* = nullptr,
+          require_not_same_t<index_uni, I>* = nullptr>
 inline void assign(LhsEigMat& x, const cons_index_list<I, nil_index_list>& idxs,
                    const RhsEigMat& y, const char* name = "ANON",
                    int depth = 0) {
@@ -251,8 +251,8 @@ inline void assign(LhsEigMat& x, const cons_index_list<I, nil_index_list>& idxs,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If either of the indices are out of bounds.
  */
-template <typename EigMat, typename U, typename = require_eigen_t<EigMat>,
-          typename = require_not_eigen_vector_t<EigMat>>
+template <typename EigMat, typename U, require_eigen_t<EigMat>* = nullptr,
+          require_not_eigen_vector_t<EigMat>* = nullptr>
 void assign(EigMat& x,
             const cons_index_list<
                 index_uni, cons_index_list<index_uni, nil_index_list>>& idxs,
@@ -283,12 +283,10 @@ void assign(EigMat& x,
  * matrix and right-hand side row vector do not match.
  */
 template <typename EigMat, typename I, typename RowVec,
-          typename = require_eigen_t<EigMat>,
-          typename = require_not_eigen_vector_t<EigMat>,
-          typename = require_not_same_t<index_uni, I>,
-          typename = require_t<is_eigen_row_vector<RowVec>>>
-inline void assign(
-    EigMat& x,
+          require_eigen_t<EigMat>* = nullptr,
+          require_not_eigen_vector_t<EigMat>* = nullptr,
+          require_not_same_t<index_uni, I>* = nullptr>
+inline void assign(EigMat& x,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idxs,
     const RowVec& y, const char* name = "ANON", int depth = 0) {
   int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
@@ -323,10 +321,10 @@ inline void assign(
  * matrix and right-hand side vector do not match.
  */
 template <typename EigMat, typename I, typename ColVec,
-          typename = require_eigen_t<EigMat>,
-          typename = require_not_eigen_vector_t<EigMat>,
-          typename = require_not_same_t<index_uni, I>,
-          typename = require_t<is_eigen_col_vector<ColVec>>>
+          require_eigen_t<EigMat>* = nullptr,
+          require_not_eigen_vector_t<EigMat>* = nullptr,
+          require_not_same_t<index_uni, I>* = nullptr,
+          require_eigen_col_vector_t<ColVec>* = nullptr>
 inline void assign(
     EigMat& x,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idxs,
@@ -340,27 +338,48 @@ inline void assign(
   for (int i = 0; i < y.size(); ++i) {
     int m = rvalue_at(i, idxs.head_);
     math::check_range("matrix[multi,uni] assign range", name, x.rows(), m);
-    x.coeffRef(m - 1, n - 1) = vec.coeff(i);
+    x.coeffRef(m - 1, n - 1) = vec.coeff(i, 0);
   }
 }
 
-template <typename EigMat, typename T, typename I,
-          typename = require_eigen_t<EigMat>,
-          typename = require_not_eigen_vector_t<EigMat>,
-          typename = require_not_same_t<index_uni, I>>
+/**
+ * Assign the specified Eigen matrix at the specified pair of
+ * multiple indexes to the specified matrix.
+ *
+ * Types:  sparse_mat[multi, multi] = sparse_mat
+ *
+ * @tparam LhsEigMat Type of Eigen Sparse Matrix to assign to.
+ * @tparam I1 First multiple index type.
+ * @tparam I2 Second multiple index type.
+ * @tparam RhsEigMat Type of Eigen Sparse Matrix to be assigned from.
+ * @param[in] x Sparse Matrix variable to be assigned.
+ * @param[in] idxs Pair of multiple indexes (from 1).
+ * @param[in] y Sparse matrix to be assigned from.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ * @throw std::invalid_argument If the dimensions of the indexed
+ * matrix and value matrix do not match.
+ */
+template <typename LhsEigSparseMat, typename RhsEigSparseMat, typename I,
+          typename = require_all_t<
+           is_base_pointer_convertible<Eigen::SparseMatrixBase, LhsEigSparseMat>,
+           is_base_pointer_convertible<Eigen::SparseMatrixBase, RhsEigSparseMat>>,
+           require_not_same_t<index_uni, I>* = nullptr>
 inline void assign(
-    EigMat& x,
+    LhsEigSparseMat& x,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idxs,
-    const Eigen::SparseMatrix<T>& y, const char* name = "ANON", int depth = 0) {
+    const RhsEigSparseMat& y, const char* name = "ANON", int depth = 0) {
   int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
   math::check_size_match("matrix[multi,uni] assign sizes", "lhs", x_idxs_rows,
                          name, y.rows());
   int n = idxs.tail_.head_.n_;
   math::check_range("matrix[multi,uni] assign range", name, x.cols(), n);
-  for (int i = 0; i < y.size(); ++i) {
+  const Eigen::Ref<const typename RhsEigSparseMat::PlainObject>& mat = y;
+  for (int i = 0; i < mat.nonZeros(); ++i) {
     int m = rvalue_at(i, idxs.head_);
     math::check_range("matrix[multi,uni] assign range", name, x.rows(), m);
-    x.coeffRef(m - 1, n - 1) = y.coeff(i, 0);
+    x.coeffRef(m - 1, n - 1) = mat.coeff(i, 0);
   }
 }
 
@@ -384,9 +403,9 @@ inline void assign(
  * matrix and value matrix do not match.
  */
 template <typename LhsEigMat, typename I1, typename I2, typename RhsEigMat,
-          typename = require_all_eigen_t<LhsEigMat, RhsEigMat>,
-          typename = require_all_not_eigen_vector_t<LhsEigMat, RhsEigMat>,
-          typename = require_any_not_same_t<index_uni, I1, I2>>
+          require_all_eigen_t<LhsEigMat, RhsEigMat>* = nullptr,
+          require_all_not_eigen_vector_t<LhsEigMat, RhsEigMat>* = nullptr,
+          require_any_not_same_t<index_uni, I1, I2>* = nullptr>
 inline void assign(
     LhsEigMat& x,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idxs,
@@ -466,7 +485,7 @@ inline void assign(std::vector<T>& x, const cons_index_list<index_uni, L>& idxs,
  * the recursive tail assignment dimensions do not match.
  */
 template <typename T, typename I, typename L, typename U,
-          typename = require_not_same_t<index_uni, I>>
+          require_not_same_t<index_uni, I>* = nullptr>
 inline void assign(std::vector<T>& x, const cons_index_list<I, L>& idxs,
                    const std::vector<U>& y, const char* name = "ANON",
                    int depth = 0) {
