@@ -1,6 +1,7 @@
 #ifndef STAN_MODEL_STANDALONE_FUNCTIONS_HEADER_HPP
 #define STAN_MODEL_STANDALONE_FUNCTIONS_HEADER_HPP
 
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/math.hpp>
 
 #include <boost/random/additive_combine.hpp>
