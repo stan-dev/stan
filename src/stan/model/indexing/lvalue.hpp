@@ -363,8 +363,8 @@ inline void assign(
  */
 template <typename LhsEigSparseMat, typename RhsEigSparseMat, typename I,
           typename = require_all_t<
-           is_base_pointer_convertible<Eigen::SparseMatrixBase, LhsEigSparseMat>,
-           is_base_pointer_convertible<Eigen::SparseMatrixBase, RhsEigSparseMat>>,
+         is_base_pointer_convertible<Eigen::SparseMatrixBase, LhsEigSparseMat>,
+         is_base_pointer_convertible<Eigen::SparseMatrixBase, RhsEigSparseMat>>,
            require_not_same_t<index_uni, I>* = nullptr>
 inline void assign(
     LhsEigSparseMat& x,

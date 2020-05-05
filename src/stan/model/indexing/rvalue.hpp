@@ -28,8 +28,8 @@ namespace model {
  * @return Input value.
  */
 template <typename T, typename = require_stan_scalar_t<T>>
-inline T rvalue(const T& c, const nil_index_list& /*idx*/, const char* /*name*/ = "",
-                int /*depth*/ = 0) {
+inline T rvalue(const T& c, const nil_index_list& /*idx*/,
+                const char* /*name*/ = "", int /*depth*/ = 0) {
   return c;
 }
 
