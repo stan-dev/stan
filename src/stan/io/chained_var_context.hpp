@@ -58,21 +58,6 @@ class chained_var_context : public var_context {
     vc2_.names_i(names2);
     names.insert(names.end(), names2.begin(), names2.end());
   }
-
-  /**
-   * Check variable dimensions against variable declaration.
-   * Only used for data read in from file.
-   *
-   * @param stage stan program processing stage
-   * @param name variable name
-   * @param base_type declared stan variable type
-   * @param dims variable dimensions
-   * @throw std::runtime_error if mismatch between declared
-   *        dimensions and dimensions found in context.
-   */
-  void validate_dims(const std::string& stage, const std::string& name,
-                     const std::string& base_type,
-                     const std::vector<size_t>& dims_declared) const {}
 };
 }  // namespace io
 }  // namespace stan

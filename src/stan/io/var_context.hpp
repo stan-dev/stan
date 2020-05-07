@@ -112,6 +112,24 @@ class var_context {
   virtual void names_i(std::vector<std::string>& names) const = 0;
 
   /**
+
+  /**
+   * Append vector of dimensions to message string.
+   *
+   * @param msg message string
+   * @param dims array of dimension sizes
+   */
+  void add_vec(std::stringstream& msg, const std::vector<size_t>& dims) const {
+    msg << '(';
+    for (size_t i = 0; i < dims.size(); ++i) {
+      if (i > 0)
+        msg << ',';
+      msg << dims[i];
+    }
+    msg << ')';
+  }
+
+  /*
    * Check variable dimensions against variable declaration.
    *
    * @param stage stan program processing stage
@@ -121,25 +139,51 @@ class var_context {
    * @throw std::runtime_error if mismatch between declared
    *        dimensions and dimensions found in context.
    */
-  virtual void validate_dims(
-      const std::string& stage, const std::string& name,
-      const std::string& base_type,
-      const std::vector<size_t>& dims_declared) const = 0;
-
-  /**
-   * Append vector of dimensions to message string.
-   *
-   * @param msg message string
-   * @param dims array of dimension sizes
-   */
-  void dims_msg(std::stringstream& msg, const std::vector<size_t>& dims) const {
-    msg << '(';
-    for (size_t i = 0; i < dims.size(); ++i) {
-      if (i > 0)
-        msg << ',';
-      msg << dims[i];
+  void validate_dims(const std::string& stage, const std::string& name,
+                     const std::string& base_type,
+                     const std::vector<size_t>& dims_declared) const {
+    bool is_int_type = base_type == "int";
+    if (is_int_type) {
+      if (!contains_i(name)) {
+        std::stringstream msg;
+        msg << (contains_r(name) ? "int variable contained non-int values"
+                                 : "variable does not exist")
+            << "; processing stage=" << stage << "; variable name=" << name
+            << "; base type=" << base_type;
+        throw std::runtime_error(msg.str());
+      }
+    } else {
+      if (!contains_r(name)) {
+        std::stringstream msg;
+        msg << "variable does not exist"
+            << "; processing stage=" << stage << "; variable name=" << name
+            << "; base type=" << base_type;
+        throw std::runtime_error(msg.str());
+      }
     }
-    msg << ')';
+    std::vector<size_t> dims = dims_r(name);
+    if (dims.size() != dims_declared.size()) {
+      std::stringstream msg;
+      msg << "mismatch in number dimensions declared and found in context"
+          << "; processing stage=" << stage << "; variable name=" << name
+          << "; dims declared=";
+      add_vec(msg, dims_declared);
+      msg << "; dims found=";
+      add_vec(msg, dims);
+      throw std::runtime_error(msg.str());
+    }
+    for (size_t i = 0; i < dims.size(); ++i) {
+      if (dims_declared[i] != dims[i]) {
+        std::stringstream msg;
+        msg << "mismatch in dimension declared and found in context"
+            << "; processing stage=" << stage << "; variable name=" << name
+            << "; position=" << i << "; dims declared=";
+        add_vec(msg, dims_declared);
+        msg << "; dims found=";
+        add_vec(msg, dims);
+        throw std::runtime_error(msg.str());
+      }
+    }
   }
 
   static std::vector<size_t> to_vec() { return std::vector<size_t>(); }
