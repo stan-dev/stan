@@ -189,7 +189,7 @@ inline void rethrow_located(const std::exception& e, std::string location) {
 inline void rethrow_located(const std::exception& e, int line,
                             const io::program_reader& reader
                             = stan::io::program_reader()) {
-    stan::model::rethrow_located(e, line, reader);
+  stan::model::rethrow_located(e, line, reader);
 }
 }  // namespace lang
 }  // namespace stan
