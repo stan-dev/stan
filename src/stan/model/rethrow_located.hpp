@@ -163,6 +163,35 @@ inline void rethrow_located(const std::exception& e, int line,
 
 }  // namespace model
 
+namespace lang {
+/**
+ * Rethrow an exception of type specified by the dynamic type of
+ * the specified exception, adding the specified source file location to
+ * the specified exception's message.
+ *
+ * @param[in] e original exception
+ * @param[in] location string representing the source file location
+ */
+inline void rethrow_located(const std::exception& e, std::string location) {
+  stan::model::rethrow_located(e, location);
+}
+
+/**
+ * Rethrow an exception of type specified by the dynamic type of
+ * the specified exception, adding the specified line number to
+ * the specified exception's message.
+ *
+ * @param[in] e original exception
+ * @param[in] line line number in Stan source program where
+ *   exception originated
+ * @param[in] reader trace of how program was included from files
+ */
+inline void rethrow_located(const std::exception& e, int line,
+                            const io::program_reader& reader
+                            = stan::io::program_reader()) {
+    stan::model::rethrow_located(e, line, reader);
+}
+}  // namespace lang
 }  // namespace stan
 
 #endif
