@@ -1,5 +1,5 @@
-#ifndef STAN_LANG_RETHROW_LOCATED_HPP
-#define STAN_LANG_RETHROW_LOCATED_HPP
+#ifndef STAN_MODEL_RETHROW_LOCATED_HPP
+#define STAN_MODEL_RETHROW_LOCATED_HPP
 
 #include <stan/io/program_reader.hpp>
 #include <exception>
@@ -12,7 +12,7 @@
 
 namespace stan {
 
-namespace lang {
+namespace model {
 
 /**
  * Returns true if the specified exception can be dynamically

@@ -110,7 +110,7 @@ void generate_transform_inits_method(const std::vector<block_var_decl>& vs,
     generate_indent(indent, o);
     o << "if (!(context__.contains_r(\"" << var_name << "\")))" << EOL;
     generate_indent(indent + 1, o);
-    o << "stan::lang::rethrow_located("
+    o << "stan::model::rethrow_located("
       << "std::runtime_error(std::string(\"Variable " << var_name
       << " missing\")), current_statement_begin__, prog_reader__());" << EOL;
     // init context position
@@ -157,7 +157,7 @@ void generate_transform_inits_method(const std::vector<block_var_decl>& vs,
     generate_indent(indent + vtype.array_dims(), o);
     o << "} catch (const std::exception& e) {" << EOL;
     generate_indent(indent + vtype.array_dims() + 1, o);
-    o << "stan::lang::rethrow_located("
+    o << "stan::model::rethrow_located("
       << "std::runtime_error(std::string(\"Error transforming variable "
       << var_name
       << ": \") + e.what()), current_statement_begin__, prog_reader__());"

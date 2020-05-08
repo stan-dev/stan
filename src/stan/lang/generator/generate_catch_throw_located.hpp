@@ -21,7 +21,7 @@ void generate_catch_throw_located(int indent, std::ostream& o) {
   generate_indent(indent, o);
   o << "} catch (const std::exception& e) {" << EOL;
   generate_indent(indent + 1, o);
-  o << "stan::lang::rethrow_located(e, current_statement_begin__"
+  o << "stan::model::rethrow_located(e, current_statement_begin__"
     << ", prog_reader__());" << EOL;
   generate_comment("Next line prevents compiler griping about no return",
                    indent + 1, o);

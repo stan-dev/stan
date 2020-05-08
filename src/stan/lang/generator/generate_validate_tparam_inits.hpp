@@ -47,7 +47,7 @@ void generate_validate_tparam_inits(const block_var_decl decl, int indent,
   o << ";" << EOL;
 
   generate_indent(indent + decl.bare_type().num_dims() + 1, o);
-  o << "stan::lang::rethrow_located("
+  o << "stan::model::rethrow_located("
     << "std::runtime_error(std::string(\"Error initializing variable "
     << decl.name()
     << ": \") + msg__.str()), current_statement_begin__, prog_reader__());"
