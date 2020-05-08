@@ -161,7 +161,7 @@ inline void rethrow_located(const std::exception& e, int line,
   rethrow_located(e, s);
 }
 
-}  // namespace lang
+}  // namespace model
 
 }  // namespace stan
 
