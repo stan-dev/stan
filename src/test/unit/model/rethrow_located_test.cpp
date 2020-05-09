@@ -86,7 +86,7 @@ TEST(langRethrowLocated, allExpected) {
 }
 TEST(langRethrowLocated, locatedException) {
   // tests nested case
-  using stan::lang::located_exception;
+  using stan::model::located_exception;
   try {
     try {
       throw located_exception<located_exception<std::exception> >("foo", "bar");
