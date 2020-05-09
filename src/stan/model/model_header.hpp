@@ -15,7 +15,6 @@
 #include <stan/model/indexing.hpp>
 #include <stan/services/util/create_rng.hpp>
 
-#include <boost/exception/all.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <boost/random/linear_congruential.hpp>
 

@@ -146,7 +146,7 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
       logger.info(e.what());
       throw;
     }
-    if (!boost::math::isfinite(log_prob)) {
+    if (!std::isfinite(log_prob)) {
       logger.info("Rejecting initial value:");
       logger.info(
           "  Log probability evaluates to log(0),"
@@ -176,7 +176,7 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
     if (log_prob_msg.str().length() > 0)
       logger.info(log_prob_msg);
 
-    bool gradient_ok = boost::math::isfinite(stan::math::sum(gradient));
+    bool gradient_ok = std::isfinite(stan::math::sum(gradient));
 
     if (!gradient_ok) {
       logger.info("Rejecting initial value:");

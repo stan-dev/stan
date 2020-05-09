@@ -4,7 +4,6 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 #include <cmath>
 #include <limits>
@@ -55,7 +54,7 @@ class base_static_uniform
                                logger);
 
       double h = this->hamiltonian_.H(this->z_);
-      if (boost::math::isnan(h))
+      if (std::isnan(h))
         h = std::numeric_limits<double>::infinity();
 
       double prob = std::exp(H0 - h);
@@ -73,7 +72,7 @@ class base_static_uniform
                                logger);
 
       double h = this->hamiltonian_.H(this->z_);
-      if (boost::math::isnan(h))
+      if (std::isnan(h))
         h = std::numeric_limits<double>::infinity();
 
       double prob = std::exp(H0 - h);
