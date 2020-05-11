@@ -44,8 +44,8 @@ inline void assign(T& x, const nil_index_list& /* idxs */, const U& y,
  * @param[in] name Name of lvalue variable (default "ANON"); ignored
  * @param[in] depth Indexing depth (default 0; ignored
  */
-template <typename T, typename U,
-    require_all_not_stan_scalar_t<U, T>* = nullptr,
+template <
+    typename T, typename U, require_all_not_stan_scalar_t<U, T>* = nullptr,
     require_t<std::is_assignable<std::decay_t<T>, std::decay_t<U>>>* = nullptr>
 inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
@@ -286,7 +286,8 @@ template <typename EigMat, typename I, typename RowVec,
           require_eigen_t<EigMat>* = nullptr,
           require_not_eigen_vector_t<EigMat>* = nullptr,
           require_not_same_t<index_uni, I>* = nullptr>
-inline void assign(EigMat& x,
+inline void assign(
+    EigMat& x,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idxs,
     const RowVec& y, const char* name = "ANON", int depth = 0) {
   int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
@@ -361,11 +362,12 @@ inline void assign(
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
-template <typename LhsEigSparseMat, typename RhsEigSparseMat, typename I,
-          typename = require_all_t<
-         is_base_pointer_convertible<Eigen::SparseMatrixBase, LhsEigSparseMat>,
-         is_base_pointer_convertible<Eigen::SparseMatrixBase, RhsEigSparseMat>>,
-           require_not_same_t<index_uni, I>* = nullptr>
+template <
+    typename LhsEigSparseMat, typename RhsEigSparseMat, typename I,
+    typename = require_all_t<
+        is_base_pointer_convertible<Eigen::SparseMatrixBase, LhsEigSparseMat>,
+        is_base_pointer_convertible<Eigen::SparseMatrixBase, RhsEigSparseMat>>,
+    require_not_same_t<index_uni, I>* = nullptr>
 inline void assign(
     LhsEigSparseMat& x,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idxs,
