@@ -64,20 +64,20 @@ class reader {
   /**
    * Return integer value at current position.
    */
-  inline int& int_ptr() { return this->data_i_[this->int_pos_]; }
+  inline int& int_ptr() { return data_i_[int_pos_]; }
 
   /**
    * Return integer value at current position.
    */
-  inline int int_ptr() const { return this->data_i_[this->int_pos_]; }
+  inline int int_ptr() const { return data_i_[int_pos_]; }
 
   /**
    * Increment internal integer value iterator and return current integer value.
    * @param m The amount to increment the iterator.
    */
   inline int& int_ptr_increment(size_t m) {
-    this->int_pos_ += m;
-    return this->data_i_[this->int_pos_ - m];
+    int_pos_ += m;
+    return data_i_[int_pos_ - m];
   }
 
  public:
@@ -116,7 +116,7 @@ class reader {
    * @return Number of integers left to read.
    */
   inline size_t available_i() const {
-    return this->data_i_.size() - this->int_pos_;
+    return data_i_.size() - int_pos_;
   }
 
   /**
@@ -138,7 +138,7 @@ class reader {
    *
    * @return Next integer value.
    */
-  inline int& integer_constrain() { return this->integer(); }
+  inline int& integer_constrain() { return integer(); }
 
   /**
    * Return the next integer in the integer sequence.
@@ -147,7 +147,7 @@ class reader {
    *
    * @return Next integer value.
    */
-  inline int& integer_constrain(T& /*log_prob*/) { return this->integer(); }
+  inline int& integer_constrain(T& /*log_prob*/) { return integer(); }
 
   /**
    * Return the next scalar in the sequence.
@@ -167,7 +167,7 @@ class reader {
    *
    * @return Next scalar.
    */
-  inline T& scalar_constrain() { return this->scalar(); }
+  inline T& scalar_constrain() { return scalar(); }
 
   /**
    * Return the next scalar in the sequence, incrementing
@@ -180,7 +180,7 @@ class reader {
    * log_prob Reference to log probability variable to increment.
    * @return Next scalar.
    */
-  T& scalar_constrain(T& /*log_prob*/) { return this->scalar(); }
+  T& scalar_constrain(T& /*log_prob*/) { return scalar(); }
 
   /**
    * Return a standard library vector of the specified
@@ -221,7 +221,7 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  inline vector_t vector_constrain(size_t m) { return this->vector(m); }
+  inline vector_t vector_constrain(size_t m) { return vector(m); }
   /**
    * Return a column vector of specified dimensionality made up of
    * the next scalars.  The constraint and hence Jacobian are no-ops.
@@ -231,7 +231,7 @@ class reader {
    * @return Column vector made up of the next scalars.
    */
   inline vector_t vector_constrain(size_t m, T& /*lp*/) {
-    return this->vector(m);
+    return vector(m);
   }
 
   /**
@@ -258,7 +258,7 @@ class reader {
    * @return Column vector made up of the next scalars.
    */
   inline row_vector_t row_vector_constrain(size_t m) {
-    return this->row_vector(m);
+    return row_vector(m);
   }
 
   /**
@@ -271,7 +271,7 @@ class reader {
    * @return Column vector made up of the next scalars.
    */
   inline row_vector_t row_vector_constrain(size_t m, T& /*lp*/) {
-    return this->row_vector(m);
+    return row_vector(m);
   }
 
   /**
@@ -311,7 +311,7 @@ class reader {
    * @return Matrix made up of the next scalars.
    */
   inline matrix_t matrix_constrain(size_t n, size_t m) {
-    return this->matrix(n, m);
+    return matrix(n, m);
   }
 
   /**
@@ -327,7 +327,7 @@ class reader {
    * @return Matrix made up of the next scalars.
    */
   inline matrix_t matrix_constrain(size_t n, size_t m, T& /*lp*/) {
-    return this->matrix(n, m);
+    return matrix(n, m);
   }
 
   /**
@@ -379,7 +379,7 @@ class reader {
   inline Eigen::SparseMatrix<T> sparse_matrix_constrain(const VecR& vec_r,
                                                         const VecC& vec_c, size_t n,
                                                         size_t m) {
-    return this->sparse_matrix(std::forward<VecR>(vec_r),
+    return sparse_matrix(std::forward<VecR>(vec_r),
                                std::forward<VecC>(vec_c), n, m);
   }
   /**
@@ -401,7 +401,7 @@ class reader {
   inline Eigen::SparseMatrix<T> sparse_matrix_constrain(const VecR& vec_r,
                                                         const VecC& vec_c, size_t n,
                                                         size_t m, T& /* lp */) {
-    return this->sparse_matrix(std::forward<VecR>(vec_r),
+    return sparse_matrix(std::forward<VecR>(vec_r),
                                std::forward<VecC>(vec_c), n, m);
   }
 
@@ -547,7 +547,7 @@ class reader {
    * @throw std::runtime_error if x is not positive
    */
   inline T scalar_pos() {
-    T x(this->scalar());
+    T x(scalar());
     stan::math::check_positive("stan::io::scalar_pos", "Constrained scalar", x);
     return x;
   }
@@ -560,7 +560,7 @@ class reader {
    * @return The next scalar transformed to be positive.
    */
   inline T scalar_pos_constrain() {
-    return stan::math::positive_constrain(this->scalar());
+    return stan::math::positive_constrain(scalar());
   }
 
   /**
@@ -574,7 +574,7 @@ class reader {
    * @return The next scalar transformed to be positive.
    */
   inline T scalar_pos_constrain(T& lp) {
-    return stan::math::positive_constrain(this->scalar(), lp);
+    return stan::math::positive_constrain(scalar(), lp);
   }
 
   /**
@@ -591,7 +591,7 @@ class reader {
    */
   template <typename TL>
   inline T scalar_lb(const TL lb) {
-    T x(this->scalar());
+    T x(scalar());
     stan::math::check_greater_or_equal("stan::io::scalar_lb",
                                        "Constrained scalar", x, lb);
     return x;
@@ -610,7 +610,7 @@ class reader {
    */
   template <typename TL>
   inline T scalar_lb_constrain(const TL lb) {
-    return stan::math::lb_constrain(this->scalar(), lb);
+    return stan::math::lb_constrain(scalar(), lb);
   }
 
   /**
@@ -626,7 +626,7 @@ class reader {
    */
   template <typename TL>
   inline T scalar_lb_constrain(const TL lb, T& lp) {
-    return stan::math::lb_constrain(this->scalar(), lb, lp);
+    return stan::math::lb_constrain(scalar(), lb, lp);
   }
 
   /**
@@ -643,7 +643,7 @@ class reader {
    */
   template <typename TU>
   inline T scalar_ub(TU ub) {
-    T x(this->scalar());
+    T x(scalar());
     stan::math::check_less_or_equal("stan::io::scalar_ub", "Constrained scalar",
                                     x, ub);
     return x;
@@ -662,7 +662,7 @@ class reader {
    */
   template <typename TU>
   inline T scalar_ub_constrain(const TU ub) {
-    return stan::math::ub_constrain(this->scalar(), ub);
+    return stan::math::ub_constrain(scalar(), ub);
   }
 
   /**
@@ -678,7 +678,7 @@ class reader {
    */
   template <typename TU>
   inline T scalar_ub_constrain(const TU ub, T& lp) {
-    return stan::math::ub_constrain(this->scalar(), ub, lp);
+    return stan::math::ub_constrain(scalar(), ub, lp);
   }
 
   /**
@@ -697,7 +697,7 @@ class reader {
    */
   template <typename TL, typename TU>
   inline T scalar_lub(const TL lb, const TU ub) {
-    T x(this->scalar());
+    T x(scalar());
     stan::math::check_bounded<T, TL, TU>("stan::io::scalar_lub",
                                          "Constrained scalar", x, lb, ub);
     return x;
@@ -718,7 +718,7 @@ class reader {
    */
   template <typename TL, typename TU>
   inline T scalar_lub_constrain(const TL lb, const TU ub) {
-    return stan::math::lub_constrain(this->scalar(), lb, ub);
+    return stan::math::lub_constrain(scalar(), lb, ub);
   }
 
   /**
@@ -736,7 +736,7 @@ class reader {
    */
   template <typename TL, typename TU>
   inline T scalar_lub_constrain(TL lb, TU ub, T& lp) {
-    return stan::math::lub_constrain(this->scalar(), lb, ub, lp);
+    return stan::math::lub_constrain(scalar(), lb, ub, lp);
   }
 
   /**
@@ -750,7 +750,7 @@ class reader {
    */
   template <typename TL, typename TS>
   inline T scalar_offset_multiplier(const TL offset, const TS multiplier) {
-    T x(this->scalar());
+    T x(scalar());
     return x;
   }
 
@@ -771,7 +771,7 @@ class reader {
   template <typename TL, typename TS>
   inline T scalar_offset_multiplier_constrain(const TL offset,
                                               const TS multiplier) {
-    return stan::math::offset_multiplier_constrain(this->scalar(), offset,
+    return stan::math::offset_multiplier_constrain(scalar(), offset,
                                                    multiplier);
   }
 
@@ -791,7 +791,7 @@ class reader {
    */
   template <typename TL, typename TS>
   inline T scalar_offset_multiplier_constrain(TL offset, TS multiplier, T& lp) {
-    return stan::math::offset_multiplier_constrain(this->scalar(), offset,
+    return stan::math::offset_multiplier_constrain(scalar(), offset,
                                                    multiplier, lp);
   }
 
@@ -804,7 +804,7 @@ class reader {
    * @return Next probability value.
    */
   inline T prob() {
-    T x(this->scalar());
+    T x(scalar());
     stan::math::check_bounded<T, double, double>(
         "stan::io::prob", "Constrained probability", x, 0, 1);
     return x;
@@ -819,7 +819,7 @@ class reader {
    * @return The next scalar transformed to a probability.
    */
   inline T prob_constrain() {
-    return stan::math::prob_constrain(this->scalar());
+    return stan::math::prob_constrain(scalar());
   }
 
   /**
@@ -833,7 +833,7 @@ class reader {
    * @return The next scalar transformed to a probability.
    */
   inline T prob_constrain(T& lp) {
-    return stan::math::prob_constrain(this->scalar(), lp);
+    return stan::math::prob_constrain(scalar(), lp);
   }
 
   /**
@@ -848,7 +848,7 @@ class reader {
    *   for a correlation
    */
   inline T corr() {
-    T x(this->scalar());
+    T x(scalar());
     stan::math::check_bounded<T, double, double>("stan::io::corr",
                                                  "Correlation value", x, -1, 1);
     return x;
@@ -863,7 +863,7 @@ class reader {
    * @return The next scalar transformed to a correlation.
    */
   inline T corr_constrain() {
-    return stan::math::corr_constrain(this->scalar());
+    return stan::math::corr_constrain(scalar());
   }
 
   /**
@@ -878,7 +878,7 @@ class reader {
    * @return The next scalar transformed to a correlation.
    */
   inline T corr_constrain(T& lp) {
-    return stan::math::corr_constrain(this->scalar(), lp);
+    return stan::math::corr_constrain(scalar(), lp);
   }
 
   /**
@@ -897,7 +897,7 @@ class reader {
       std::string msg = "io::unit_vector: unit vectors cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    vector_t theta(this->vector(k));
+    vector_t theta(vector(k));
     stan::math::check_unit_vector("stan::io::unit_vector", "Constrained vector",
                                   theta);
     return theta;
@@ -921,7 +921,7 @@ class reader {
             " unit vectors cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    return stan::math::unit_vector_constrain(this->vector(k));
+    return stan::math::unit_vector_constrain(vector(k));
   }
 
   /**
@@ -944,7 +944,7 @@ class reader {
             " unit vectors cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    return stan::math::unit_vector_constrain(this->vector(k), lp);
+    return stan::math::unit_vector_constrain(vector(k), lp);
   }
 
   /**
@@ -963,7 +963,7 @@ class reader {
       std::string msg = "io::simplex: simplexes cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    vector_t theta(this->vector(k));
+    vector_t theta(vector(k));
     stan::math::check_simplex("stan::io::simplex", "Constrained vector", theta);
     return theta;
   }
@@ -984,7 +984,7 @@ class reader {
       std::string msg = "io::simplex_constrain: simplexes cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    return stan::math::simplex_constrain(this->vector(k - 1));
+    return stan::math::simplex_constrain(vector(k - 1));
   }
 
   /**
@@ -1005,7 +1005,7 @@ class reader {
       std::string msg = "io::simplex_constrain: simplexes cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    return stan::math::simplex_constrain(this->vector(k - 1), lp);
+    return stan::math::simplex_constrain(vector(k - 1), lp);
   }
 
   /**
@@ -1019,7 +1019,7 @@ class reader {
    * @return Vector of positive values in ascending order.
    */
   inline vector_t ordered(size_t k) {
-    vector_t x(this->vector(k));
+    vector_t x(vector(k));
     stan::math::check_ordered("stan::io::ordered", "Constrained vector", x);
     return x;
   }
@@ -1034,7 +1034,7 @@ class reader {
    * length.
    */
   inline vector_t ordered_constrain(size_t k) {
-    return stan::math::ordered_constrain(this->vector(k));
+    return stan::math::ordered_constrain(vector(k));
   }
 
   /**
@@ -1049,7 +1049,7 @@ class reader {
    * @return Next ordered vector of the specified size.
    */
   inline vector_t ordered_constrain(size_t k, T& lp) {
-    return stan::math::ordered_constrain(this->vector(k), lp);
+    return stan::math::ordered_constrain(vector(k), lp);
   }
 
   /**
@@ -1063,7 +1063,7 @@ class reader {
    * @return Vector of positive values in ascending order.
    */
   inline vector_t positive_ordered(size_t k) {
-    vector_t x(this->vector(k));
+    vector_t x(vector(k));
     stan::math::check_positive_ordered("stan::io::positive_ordered",
                                        "Constrained vector", x);
     return x;
@@ -1079,7 +1079,7 @@ class reader {
    * length.
    */
   inline vector_t positive_ordered_constrain(size_t k) {
-    return stan::math::positive_ordered_constrain(this->vector(k));
+    return stan::math::positive_ordered_constrain(vector(k));
   }
 
   /**
@@ -1094,7 +1094,7 @@ class reader {
    * @return Next positive_ordered vector of the specified size.
    */
   inline vector_t positive_ordered_constrain(size_t k, T& lp) {
-    return stan::math::positive_ordered_constrain(this->vector(k), lp);
+    return stan::math::positive_ordered_constrain(vector(k), lp);
   }
 
   /**
@@ -1108,7 +1108,7 @@ class reader {
    * Cholesky factor.
    */
   inline matrix_t cholesky_factor_cov(size_t n, size_t m) {
-    matrix_t y(this->matrix(n, m));
+    matrix_t y(matrix(n, m));
     stan::math::check_cholesky_factor("stan::io::cholesky_factor_cov",
                                       "Constrained matrix", y);
     return y;
@@ -1127,7 +1127,7 @@ class reader {
    */
   inline matrix_t cholesky_factor_cov_constrain(size_t n, size_t m) {
     return stan::math::cholesky_factor_constrain(
-        this->vector((m * (m + 1)) / 2 + (n - m) * m), n, m);
+        vector((m * (m + 1)) / 2 + (n - m) * m), n, m);
   }
 
   /**
@@ -1145,7 +1145,7 @@ class reader {
    */
   inline matrix_t cholesky_factor_cov_constrain(size_t n, size_t m, T& lp) {
     return stan::math::cholesky_factor_constrain(
-        this->vector((m * (m + 1)) / 2 + (n - m) * m), n, m, lp);
+        vector((m * (m + 1)) / 2 + (n - m) * m), n, m, lp);
   }
 
   /**
@@ -1160,7 +1160,7 @@ class reader {
    */
   inline matrix_t cholesky_factor_corr(size_t K) {
     using stan::math::check_cholesky_factor_corr;
-    matrix_t y(this->matrix(K, K));
+    matrix_t y(matrix(K, K));
     check_cholesky_factor_corr("stan::io::cholesky_factor_corr",
                                "Constrained matrix", y);
     return y;
@@ -1177,7 +1177,7 @@ class reader {
    *    Cholesky factor for a correlation matrix.
    */
   inline matrix_t cholesky_factor_corr_constrain(size_t K) {
-    return stan::math::cholesky_corr_constrain(this->vector((K * (K - 1)) / 2),
+    return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
                                                K);
   }
 
@@ -1195,7 +1195,7 @@ class reader {
    *    Cholesky factor for a correlation matrix.
    */
   inline matrix_t cholesky_factor_corr_constrain(size_t K, T& lp) {
-    return stan::math::cholesky_corr_constrain(this->vector((K * (K - 1)) / 2),
+    return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2),
                                                K, lp);
   }
 
@@ -1211,7 +1211,7 @@ class reader {
    *    covariance matrix
    */
   inline matrix_t cov_matrix(size_t k) {
-    matrix_t y(this->matrix(k, k));
+    matrix_t y(matrix(k, k));
     stan::math::check_cov_matrix("stan::io::cov_matrix", "Constrained matrix",
                                  y);
     return y;
@@ -1226,7 +1226,7 @@ class reader {
    * @return Next covariance matrix of the specified dimensionality.
    */
   inline matrix_t cov_matrix_constrain(size_t k) {
-    return stan::math::cov_matrix_constrain(this->vector(k + (k * (k - 1)) / 2),
+    return stan::math::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
                                             k);
   }
 
@@ -1242,7 +1242,7 @@ class reader {
    * @return The next covariance matrix of the specified dimensionality.
    */
   inline matrix_t cov_matrix_constrain(size_t k, T& lp) {
-    return stan::math::cov_matrix_constrain(this->vector(k + (k * (k - 1)) / 2),
+    return stan::math::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2),
                                             k, lp);
   }
 
@@ -1256,7 +1256,7 @@ class reader {
    * @throw std::runtime_error if the matrix is not a correlation matrix
    */
   inline matrix_t corr_matrix(size_t k) {
-    matrix_t x(this->matrix(k, k));
+    matrix_t x(matrix(k, k));
     stan::math::check_corr_matrix("stan::math::corr_matrix",
                                   "Constrained matrix", x);
     return x;
@@ -1271,7 +1271,7 @@ class reader {
    * @return Next correlation matrix of the specified dimensionality.
    */
   inline matrix_t corr_matrix_constrain(size_t k) {
-    return stan::math::corr_matrix_constrain(this->vector((k * (k - 1)) / 2),
+    return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2),
                                              k);
   }
 
@@ -1287,7 +1287,7 @@ class reader {
    * @return The next correlation matrix of the specified dimensionality.
    */
   inline matrix_t corr_matrix_constrain(size_t k, T& lp) {
-    return stan::math::corr_matrix_constrain(this->vector((k * (k - 1)) / 2), k,
+    return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k,
                                              lp);
   }
 
@@ -1855,7 +1855,7 @@ class reader {
                                            size_t m) {
     vector_t v(m);
     for (size_t i = 0; i < m; ++i)
-      v(i) = this->scalar_offset_multiplier(offset, multiplier);
+      v(i) = scalar_offset_multiplier(offset, multiplier);
     return v;
   }
 
@@ -1865,7 +1865,7 @@ class reader {
                                                      size_t m) {
     vector_t v(m);
     for (size_t i = 0; i < m; ++i)
-      v(i) = this->scalar_offset_multiplier_constrain(offset, multiplier);
+      v(i) = scalar_offset_multiplier_constrain(offset, multiplier);
     return v;
   }
 
@@ -1875,7 +1875,7 @@ class reader {
                                                      size_t m, T& lp) {
     vector_t v(m);
     for (size_t i = 0; i < m; ++i)
-      v(i) = this->scalar_offset_multiplier_constrain(offset, multiplier, lp);
+      v(i) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
     return v;
   }
 
@@ -1885,7 +1885,7 @@ class reader {
                                                    size_t m) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i) {
-      v(i) = this->scalar_offset_multiplier(offset, multiplier);
+      v(i) = scalar_offset_multiplier(offset, multiplier);
     }
     return v;
   }
@@ -1895,7 +1895,7 @@ class reader {
       const TL offset, const TS multiplier, size_t m) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i) {
-      v(i) = this->scalar_offset_multiplier_constrain(offset, multiplier);
+      v(i) = scalar_offset_multiplier_constrain(offset, multiplier);
     }
     return v;
   }
@@ -1905,7 +1905,7 @@ class reader {
       const TL offset, const TS multiplier, size_t m, T& lp) {
     row_vector_t v(m);
     for (size_t i = 0; i < m; ++i) {
-      v(i) = this->scalar_offset_multiplier_constrain(offset, multiplier, lp);
+      v(i) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
     }
     return v;
   }
@@ -1916,7 +1916,7 @@ class reader {
     matrix_t v(n, m);
     for (size_t j = 0; j < m; ++j) {
       for (size_t i = 0; i < n; ++i) {
-        v(i, j) = this->scalar_offset_multiplier(offset, multiplier);
+        v(i, j) = scalar_offset_multiplier(offset, multiplier);
       }
     }
     return v;
@@ -1929,7 +1929,7 @@ class reader {
     matrix_t v(n, m);
     for (size_t j = 0; j < m; ++j)
       for (size_t i = 0; i < n; ++i)
-        v(i, j) = this->scalar_offset_multiplier_constrain(offset, multiplier);
+        v(i, j) = scalar_offset_multiplier_constrain(offset, multiplier);
     return v;
   }
 
@@ -1942,7 +1942,7 @@ class reader {
     for (size_t j = 0; j < m; ++j)
       for (size_t i = 0; i < n; ++i)
         v(i, j)
-            = this->scalar_offset_multiplier_constrain(offset, multiplier, lp);
+            = scalar_offset_multiplier_constrain(offset, multiplier, lp);
     return v;
   }
 
@@ -1983,7 +1983,7 @@ class reader {
     for (auto i = 0; i < vec_r.size(); i++) {
       triplet_list.emplace_back(
           triplet_type(vec_r[i], vec_c[i],
-                       this->scalar_offset_multiplier(offset, multiplier)));
+                       scalar_offset_multiplier(offset, multiplier)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;
@@ -2024,7 +2024,7 @@ class reader {
     for (auto i = 0; i < vec_r.size(); i++) {
       triplet_list.emplace_back(
           triplet_type(vec_r[i], vec_c[i],
-                       this->scalar_offset_multiplier(offset, multiplier)));
+                       scalar_offset_multiplier(offset, multiplier)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;
@@ -2067,7 +2067,7 @@ class reader {
     for (auto i = 0; i < vec_r.size(); i++) {
       triplet_list.emplace_back(
           triplet_type(vec_r[i], vec_c[i],
-                       this->scalar_offset_multiplier(offset, multiplier, lp)));
+                       scalar_offset_multiplier(offset, multiplier, lp)));
     }
     ret_mat.setFromTriplets(triplet_list.begin(), triplet_list.end());
     return ret_mat;
