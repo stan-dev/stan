@@ -257,6 +257,7 @@ class writer {
    */
   void vector_unconstrain(const vector_t &y) {
     typedef typename stan::math::index_type<vector_t>::type idx_t;
+    data_r_.reserve(data_r_.size() + y.size());
     for (idx_t i = 0; i < y.size(); ++i)
       data_r_.push_back(y[i]);
   }

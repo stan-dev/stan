@@ -1188,232 +1188,193 @@ class reader {
 
   template <typename TL>
   inline vector_t vector_lb(const TL lb, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb(lb);
+    vector_t v = this->vector(m);
+    for (size_t i = 0; i < m; ++i) {
+      stan::math::check_greater_or_equal("stan::io::vector_lb",
+                                       "Constrained scalar", v.coeffRef(i), lb);
+    }
     return v;
   }
 
   template <typename TL>
   inline vector_t vector_lb_constrain(const TL lb, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb_constrain(lb);
-    return v;
+    return stan::math::lb_constrain(this->vector(m), lb);
   }
 
   template <typename TL>
   inline vector_t vector_lb_constrain(const TL lb, size_t m, T &lp) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb_constrain(lb, lp);
-    return v;
+    return stan::math::lb_constrain(this->vector(m), lb, lp);
   }
 
   template <typename TL>
   inline row_vector_t row_vector_lb(const TL lb, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb(lb);
+    row_vector_t v = this->row_vector(m);
+    for (size_t i = 0; i < m; ++i) {
+      stan::math::check_greater_or_equal("stan::io::row_vector_lb",
+                                       "Constrained row vector", v.coeffRef(i), lb);
+    }
     return v;
   }
 
   template <typename TL>
   inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb_constrain(lb);
-    return v;
+    return stan::math::lb_constrain(this->row_vector(m), lb);
   }
 
   template <typename TL>
   inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb_constrain(lb, lp);
-    return v;
+    return stan::math::lb_constrain(this->row_vector(m), lb, lp);
   }
 
   template <typename TL>
   inline matrix_t matrix_lb(const TL lb, const size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lb(lb);
-    return v;
+    matrix_t mat = this->matrix(m, n);
+    for (size_t j = 0; j < n; ++j) {
+      for (size_t i = 0; i < m; ++i) {
+        stan::math::check_greater_or_equal("stan::io::matrix_lb",
+                                         "Constrained row vector", mat.coeffRef(m, n), lb);
+      }
+    }
+    return mat;
   }
 
   template <typename TL>
   inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lb_constrain(lb);
-    return v;
+    return stan::math::lb_constrain(this->matrix(m, n), lb);
   }
 
   template <typename TL>
   inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lb_constrain(lb, lp);
-    return v;
+    return stan::math::lb_constrain(this->matrix(m, n), lb, lp);
   }
 
   template <typename TU>
   inline vector_t vector_ub(const TU ub, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub(ub);
+    vector_t v = this->vector(m);
+    for (size_t i = 0; i < m; ++i) {
+      stan::math::check_less_or_equal("stan::io::vector_ub", "Constrained scalar",
+                                      v.coeffRef(i), ub);
+    }
     return v;
   }
 
   template <typename TU>
   inline vector_t vector_ub_constrain(const TU ub, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub_constrain(ub);
-    return v;
+    return stan::math::ub_constrain(this->vector(m), ub);
   }
 
   template <typename TU>
   inline vector_t vector_ub_constrain(const TU ub, size_t m, T &lp) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub_constrain(ub, lp);
-    return v;
+    return stan::math::ub_constrain(this->vector(m), ub, lp);
   }
 
   template <typename TU>
   inline row_vector_t row_vector_ub(const TU ub, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub(ub);
+    row_vector_t v = this->row_vector(m);
+    for (size_t i = 0; i < m; ++i) {
+      stan::math::check_less_or_equal("stan::io::row_vector_ub", "Constrained scalar",
+                                      v.coeffRef(i), ub);
+    }
     return v;
   }
 
   template <typename TU>
   inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub_constrain(ub);
-    return v;
+    return stan::math::ub_constrain(this->row_vector(m), ub);
   }
 
   template <typename TU>
   inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub_constrain(ub, lp);
-    return v;
+    return stan::math::ub_constrain(this->row_vector(m), ub, lp);
   }
 
   template <typename TU>
   inline matrix_t matrix_ub(const TU ub, size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_ub(ub);
-    return v;
+    matrix_t mat = this->matrix(m, n);
+    for (size_t j = 0; j < n; ++j) {
+      for (size_t i = 0; i < m; ++i) {
+        stan::math::check_less_or_equal("stan::io::matrix_lb",
+                                         "Constrained row vector", mat.coeffRef(m, n), ub);
+      }
+    }
+    return mat;
   }
 
   template <typename TU>
   inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_ub_constrain(ub);
-    return v;
+    return stan::math::ub_constrain(this->matrix(m, n), ub);
   }
 
   template <typename TU>
   inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n,
                                       T &lp) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_ub_constrain(ub, lp);
-    return v;
+    return stan::math::ub_constrain(this->matrix(m, n), ub, lp);
   }
 
   template <typename TL, typename TU>
   inline vector_t vector_lub(const TL lb, const TU ub, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub(lb, ub);
+    vector_t v = this->vector(m);
+    for (size_t i = 0; i < m; ++i) {
+      stan::math::check_bounded<T, TL, TU>("stan::io::scalar_lub",
+                                           "Constrained scalar", v.coeffRef(i), lb, ub);
+    }
     return v;
   }
 
   template <typename TL, typename TU>
   inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub_constrain(lb, ub);
-    return v;
+    return stan::math::lub_constrain(this->vector(m), lb, ub);
   }
 
   template <typename TL, typename TU>
   inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m,
                                        T &lp) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub_constrain(lb, ub, lp);
-    return v;
+   return stan::math::lub_constrain(this->vector(m), lb, ub, lp);
   }
 
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub(const TL lb, const TU ub, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub(lb, ub);
+    row_vector_t v = this->vector(m);
+    for (size_t i = 0; i < m; ++i) {
+      stan::math::check_bounded<T, TL, TU>("stan::io::scalar_lub",
+                                           "Constrained scalar", v.coeffRef(i), lb, ub);
+    }
     return v;
   }
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
                                                size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub_constrain(lb, ub);
-    return v;
+   return stan::math::lub_constrain(this->row_vector(m), lb, ub);
   }
 
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
                                                size_t m, T &lp) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub_constrain(lb, ub, lp);
-    return v;
+   return stan::math::lub_constrain(this->row_vector(m), lb, ub, lp);
   }
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lub(lb, ub);
-    return v;
+    matrix_t mat = this->matrix(m, n);
+    for (size_t j = 0; j < n; ++j) {
+      for (size_t i = 0; i < m; ++i) {
+        stan::math::check_bounded<T, TL, TU>("stan::io::scalar_lub",
+                                             "Constrained scalar", mat.coeffRef(i, j), lb, ub);
+      }
+    }
+    return mat;
   }
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m,
                                        size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lub_constrain(lb, ub);
-    return v;
+   return stan::math::lub_constrain(this->matrix(m, n), lb, ub);
   }
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m,
                                        size_t n, T &lp) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lub_constrain(lb, ub, lp);
-    return v;
+   return stan::math::lub_constrain(this->matrix(m, n), lb, ub, lp);
   }
 
   template <typename TL, typename TS>
