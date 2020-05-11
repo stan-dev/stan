@@ -30,9 +30,9 @@ expression_grammar<Iterator>::expression_grammar(variable_map& var_map,
   using boost::spirit::qi::_val;
   using boost::spirit::qi::char_;
   using boost::spirit::qi::eps;
-  using boost::spirit::qi::labels::_r1;
   using boost::spirit::qi::lit;
   using boost::spirit::qi::no_skip;
+  using boost::spirit::qi::labels::_r1;
 
   expression_r.name("expression");
   expression_r %= (expression15_r(_r1) >> no_skip[!char_('?')] > eps)

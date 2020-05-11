@@ -5,8 +5,6 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
-#include <boost/random/variate_generator.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <cmath>
 #include <limits>
@@ -88,7 +86,7 @@ class base_hmc : public base_mcmc {
                              logger);
 
     double h = this->hamiltonian_.H(this->z_);
-    if (boost::math::isnan(h))
+    if (std::isnan(h))
       h = std::numeric_limits<double>::infinity();
 
     double delta_H = H0 - h;
@@ -107,7 +105,7 @@ class base_hmc : public base_mcmc {
                                logger);
 
       double h = this->hamiltonian_.H(this->z_);
-      if (boost::math::isnan(h))
+      if (std::isnan(h))
         h = std::numeric_limits<double>::infinity();
 
       double delta_H = H0 - h;
