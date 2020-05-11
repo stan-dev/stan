@@ -1,13 +1,12 @@
 #ifndef STAN_MODEL_INDEXING_LVALUE_HPP
 #define STAN_MODEL_INDEXING_LVALUE_HPP
 
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <stan/math/prim.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
+#include <type_traits>
 #include <vector>
 
 namespace stan {
@@ -94,7 +93,7 @@ template <typename EigVec, typename Scalar,
           require_stan_scalar_t<Scalar>* = nullptr>
 inline void assign(EigVec& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
-                   Scalar&& y, const char* name = "ANON", int depth = 0) {
+                   const Scalar& y, const char* name = "ANON", int depth = 0) {
   int i = idxs.head_.n_;
   math::check_range("vector[uni] assign range", name, x.size(), i);
   x.coeffRef(i - 1) = y;

@@ -1,14 +1,13 @@
 #ifndef STAN_MODEL_INDEXING_RVALUE_HPP
 #define STAN_MODEL_INDEXING_RVALUE_HPP
 
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_same.hpp>
 #include <stan/math/prim.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
 #include <stan/model/indexing/rvalue_return.hpp>
+#include <type_traits>
 #include <vector>
 
 namespace stan {
