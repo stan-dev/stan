@@ -178,9 +178,7 @@ class writer {
    * @param y Correlation value.
    * @throw std::runtime_error if y is not between -1.0 and 1.0
    */
-  void corr_unconstrain(T &y) {
-    data_r_.push_back(stan::math::corr_free(y));
-  }
+  void corr_unconstrain(T &y) { data_r_.push_back(stan::math::corr_free(y)); }
 
   /**
    * Write the unconstrained value corresponding to the
@@ -193,9 +191,7 @@ class writer {
    * @param y Probability value.
    * @throw std::runtime_error if y is not between 0.0 and 1.0
    */
-  void prob_unconstrain(T &y) {
-    data_r_.push_back(stan::math::prob_free(y));
-  }
+  void prob_unconstrain(T &y) { data_r_.push_back(stan::math::prob_free(y)); }
 
   /**
    * Write the unconstrained vector that corresponds to the specified
@@ -425,8 +421,7 @@ class writer {
                                                    sparse_matrix_t &y) {
     for (int k = 0; k < y.outerSize(); ++k) {
       for (sparse_matrix_inner_iter_t it(y, k); it; ++it) {
-        scalar_offset_multiplier_unconstrain(offset, multiplier,
-                                                   it.value());
+        scalar_offset_multiplier_unconstrain(offset, multiplier, it.value());
       }
     }
   }
@@ -539,8 +534,9 @@ class writer {
     typedef typename stan::math::index_type<matrix_t>::type idx_t;
     idx_t k = y.rows();
     if (k == 0 || y.cols() != k) {
-      throw std::runtime_error("y must have elements and"
-                             " y must be a square matrix");
+      throw std::runtime_error(
+          "y must have elements and"
+          " y must be a square matrix");
     }
     vector_t L_vec = stan::math::cov_matrix_free(y);
     int i = 0;
