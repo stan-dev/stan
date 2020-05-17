@@ -13,12 +13,13 @@
 #include <boost/circular_buffer.hpp>
 #include <boost/lexical_cast.hpp>
 #include <algorithm>
+#include <chrono>
 #include <limits>
 #include <numeric>
 #include <ostream>
-#include <vector>
 #include <queue>
 #include <string>
+#include <vector>
 
 namespace stan {
 
@@ -387,7 +388,7 @@ class advi {
            << delta_elbo_ave << "  " << std::setw(15) << std::fixed
            << std::setprecision(3) << delta_elbo_med;
         auto end = std::chrono::steady_clock::now();
-        std::chrono::duration<double> delta_t = end_warm - start_warm;
+        std::chrono::duration<double> delta_t = end - start;
 
         std::vector<double> print_vector;
         print_vector.clear();

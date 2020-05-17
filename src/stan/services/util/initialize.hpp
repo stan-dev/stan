@@ -8,6 +8,7 @@
 #include <stan/io/chained_var_context.hpp>
 #include <stan/model/log_prob_grad.hpp>
 #include <stan/math/prim.hpp>
+#include <chrono>
 #include <sstream>
 #include <string>
 #include <vector>

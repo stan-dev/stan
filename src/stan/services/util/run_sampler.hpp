@@ -4,7 +4,7 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
-#include <ctime>
+#include <chrono>
 #include <vector>
 
 namespace stan {

@@ -11,6 +11,7 @@
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
+#include <chrono>
 #include <vector>
 
 namespace stan {
