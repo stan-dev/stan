@@ -202,16 +202,10 @@ test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(shell 
 # the compiler using the -fsyntax-only flag
 ##
 test/integration/compile_models_test$(EXE): $(patsubst src/%.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
+test/performance/logistic_test$(EXE): test/integration/compile_models_test$(EXE)
 
 ##
 # Same trick as above for models, but for standalone functions, using
 # "src/test/test-models/good-standalone-functions/*.stanfuncs"
 ##
 test/integration/compile_standalone_functions_test$(EXE): $(patsubst src/%.stanfuncs,%.hpp-test,$(shell find src/test/test-models/good-standalone-functions -type f -name '*.stanfuncs'))
-
-##
-# Same trick as above for models, but for the performance model
-##
-src/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
-
-test/performance/logistic_test.o: $(patsubst src/%.stan,%.hpp-test,$(shell find src/test/test-models/performance -type f -name '*.stan'))
