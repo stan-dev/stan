@@ -171,7 +171,7 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
       throw;
     }
     auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double> diff = end-start;
+    std::chrono::duration<double> diff = end - start;
     double deltaT = diff.count();
     if (log_prob_msg.str().length() > 0)
       logger.info(log_prob_msg);

@@ -387,7 +387,7 @@ class advi {
            << delta_elbo_ave << "  " << std::setw(15) << std::fixed
            << std::setprecision(3) << delta_elbo_med;
         auto end = std::chrono::steady_clock::now();
-        std::chrono::duration<double> delta_t = end_warm-start_warm;
+        std::chrono::duration<double> delta_t = end_warm - start_warm;
 
         std::vector<double> print_vector;
         print_vector.clear();
