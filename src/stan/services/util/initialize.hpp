@@ -158,7 +158,7 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
     }
     std::stringstream log_prob_msg;
     std::vector<double> gradient;
-    clock_t start_check = clock();
+    auto start = std::chrono::steady_clock::now();
     try {
       // we evaluate this with propto=true since we're
       // evaluating with autodiff variables
@@ -170,9 +170,9 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
       logger.info(e.what());
       throw;
     }
-    clock_t end_check = clock();
-    double deltaT
-        = static_cast<double>(end_check - start_check) / CLOCKS_PER_SEC;
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> diff = end-start;
+    double deltaT = diff.count();
     if (log_prob_msg.str().length() > 0)
       logger.info(log_prob_msg);
 

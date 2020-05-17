@@ -48,24 +48,24 @@ void run_sampler(stan::mcmc::base_mcmc& sampler, Model& model,
   writer.write_sample_names(s, sampler, model);
   writer.write_diagnostic_names(s, sampler, model);
 
-  clock_t start = clock();
+  auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true, writer, s,
                              model, rng, interrupt, logger);
-  clock_t end = clock();
-  double warm_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+  auto end_warm = std::chrono::steady_clock::now();
+  std::chrono::duration<double> warm_delta_t = end_warm-start_warm;
 
   writer.write_adapt_finish(sampler);
   sampler.write_sampler_state(sample_writer);
 
-  start = clock();
+  auto start_sample = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_samples, num_warmup,
                              num_warmup + num_samples, num_thin, refresh, true,
                              false, writer, s, model, rng, interrupt, logger);
-  end = clock();
-  double sample_delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+  auto end_sample = std::chrono::steady_clock::now();
+  std::chrono::duration<double> sample_delta_t = end_warm-start_warm;
 
-  writer.write_timing(warm_delta_t, sample_delta_t);
+  writer.write_timing(warm_delta_t.count(), sample_delta_t.count());
 }
 }  // namespace util
 }  // namespace services

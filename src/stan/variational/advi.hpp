@@ -347,9 +347,7 @@ class advi {
         "   notes ");
 
     // Timing variables
-    clock_t start = clock();
-    clock_t end;
-    double delta_t;
+    auto start = std::chrono::steady_clock::now();
 
     // Main loop
     bool do_more_iterations = true;
@@ -388,14 +386,13 @@ class advi {
            << std::setw(16) << std::fixed << std::setprecision(3)
            << delta_elbo_ave << "  " << std::setw(15) << std::fixed
            << std::setprecision(3) << delta_elbo_med;
-
-        end = clock();
-        delta_t = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> delta_t = end_warm-start_warm;
 
         std::vector<double> print_vector;
         print_vector.clear();
         print_vector.push_back(iter_counter);
-        print_vector.push_back(delta_t);
+        print_vector.push_back(delta_t.count());
         print_vector.push_back(elbo);
         diagnostic_writer(print_vector);
 
