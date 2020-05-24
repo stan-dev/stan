@@ -8,7 +8,6 @@
 #include <boost/accumulators/statistics/stats.hpp>
 #include <boost/accumulators/statistics/mean.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -49,7 +48,7 @@ inline double compute_potential_scale_reduction(
         draws[chain], sizes[chain]);
 
     for (int n = 0; n < num_draws; n++) {
-      if (!boost::math::isfinite(draw(n))) {
+      if (!std::isfinite(draw(n))) {
         return std::numeric_limits<double>::quiet_NaN();
       }
     }
