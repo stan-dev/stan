@@ -34,7 +34,7 @@ struct assgn {
 
   /**
    * Return true if the statement is assignment only
-   * i.e., operator isn't a compound operator-assigment
+   * i.e., operator isn't a compound operator-assignment
    *
    * @return true if the statement is assignment only
    */

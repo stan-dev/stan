@@ -75,7 +75,7 @@ struct integrate_ode_control {
   integrate_ode_control();
 
   /**
-   * Construt an ODE integrator with control parameter with the
+   * Construct an ODE integrator with control parameter with the
    * specified values.
    *
    * @param integration_function_name name of integrator

@@ -13,7 +13,7 @@ namespace util {
  * Create a stan::dump object which contains vector "metric"
  * of specified size where all elements are ones.
  *
- * @param[in] num_params expected number of denseonal elements
+ * @param[in] num_params expected number of dense elements
  * @return var_context
  */
 inline stan::io::dump create_unit_e_dense_inv_metric(size_t num_params) {

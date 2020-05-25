@@ -86,7 +86,7 @@ class advi {
    * @return the evidence lower bound.
    * @throw std::domain_error If, after n_monte_carlo_elbo_ number of draws
    * from the variational distribution all give non-finite log joint
-   * evaluations. This means that the model is severly ill conditioned or
+   * evaluations. This means that the model is severely ill conditioned or
    * that the variational distribution has somehow collapsed.
    */
   double calc_ELBO(const Q& variational, callbacks::logger& logger) const {
@@ -294,7 +294,7 @@ class advi {
   /**
    * Runs stochastic gradient ascent with an adaptive stepsize sequence.
    *
-   * @param[in,out] variational initia variational distribution
+   * @param[in,out] variational initial variational distribution
    * @param[in] eta stepsize scaling parameter
    * @param[in] tol_rel_obj relative tolerance parameter for convergence
    * @param[in] max_iterations max number of iterations to run algorithm

@@ -1838,7 +1838,7 @@ void set_fun_type_named::operator()(expression &fun_result, fun &fun,
     return;
   }
 
-  // get function definition for this functiion
+  // get function definition for this function
   std::vector<bare_expr_type> fun_arg_types;
   for (size_t i = 0; i < fun.args_.size(); ++i)
     fun_arg_types.push_back(arg_types[i]);
@@ -2412,7 +2412,7 @@ void validate_definition::operator()(const scope &var_scope, const T &var_decl,
   if (is_nil(var_decl.def()))
     return;
 
-  // validate that assigment is allowed in this block
+  // validate that assignment is allowed in this block
   if (!var_scope.allows_assignment()) {
     error_msgs << "Variable definition not possible in this block."
                << std::endl;

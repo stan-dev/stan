@@ -2,12 +2,12 @@
 import org.stan.Utils
 
 def utils = new org.stan.Utils()
+def skipRemainingStages = false
 
 def setupCXX(failOnError = true) {
     errorStr = failOnError ? "-Werror " : ""
     writeFile(file: "make/local", text: "CXX=${env.CXX} ${errorStr}")
 }
-
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
     if (separateMakeStep) {
@@ -159,7 +159,37 @@ pipeline {
                 }
             }
         }
+        stage('Verify changes') {
+            agent { label 'linux' }
+            steps {
+                script {         
+
+                    retry(3) { checkout scm }
+                    sh 'git clean -xffd'
+
+                    // These paths will be passed to git diff
+                    // If there are changes to them, CI/CD will continue else skip
+                    def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
+                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
+                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
+                        'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
+                    ].join(" ")
+
+                    skipRemainingStages = utils.verifyChanges(paths)
+                }
+            }
+            post {
+                always {
+                    deleteDir()
+                }
+            }
+        }
         stage('Unit tests') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
             parallel {
                 stage('Windows Headers & Unit') {
                     agent { label 'windows' }
@@ -186,6 +216,11 @@ pipeline {
             }
         }
         stage('Integration') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
             agent any
             steps {
                 unstash 'StanSetup'
@@ -195,9 +230,14 @@ pipeline {
             post { always { deleteDir() } }
         }
         stage('Upstream CmdStan tests') {
-            when { expression { env.BRANCH_NAME ==~ /PR-\d+/ ||
-                                env.BRANCH_NAME == "downstream_tests" ||
-                                env.BRANCH_NAME == "downstream_hotfix" } }
+            when { 
+                    expression { 
+                        ( env.BRANCH_NAME ==~ /PR-\d+/ ||
+                        env.BRANCH_NAME == "downstream_tests" ||
+                        env.BRANCH_NAME == "downstream_hotfix" ) &&
+                        !skipRemainingStages 
+                    } 
+                }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
                       parameters: [string(name: 'stan_pr', value: stan_pr()),
@@ -205,6 +245,11 @@ pipeline {
             }
         }
         stage('Performance') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
             agent { label 'oldimac' }
             steps {
                 unstash 'StanSetup'
