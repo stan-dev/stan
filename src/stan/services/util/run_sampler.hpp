@@ -63,7 +63,7 @@ void run_sampler(stan::mcmc::base_mcmc& sampler, Model& model,
                              num_warmup + num_samples, num_thin, refresh, true,
                              false, writer, s, model, rng, interrupt, logger);
   auto end_sample = std::chrono::steady_clock::now();
-  std::chrono::duration<double> sample_delta_t = end_warm - start_warm;
+  std::chrono::duration<double> sample_delta_t = end_sample - start_sample;
 
   writer.write_timing(warm_delta_t.count(), sample_delta_t.count());
 }
