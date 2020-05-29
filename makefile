@@ -108,10 +108,10 @@ help:
 ##
 # Clean up.
 ##
-MODEL_SPECS := $(shell find src/test -type f -name '*.stan')
+MODEL_SPECS := $(call findfiles,src/test,*.stan)
 .PHONY: clean clean-demo clean-dox clean-models clean-all clean-deps
 clean:
-	$(RM) $(shell find src -type f -name '*.dSYM') $(shell find src -type f -name '*.d.*')
+	$(RM) $(call findfiles,src,*.dSYM) $(call findfiles,src,*.d.*)
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.hpp))
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%$(EXE)))
 	$(RM) $(wildcard $(MODEL_SPECS:%.stan=%.o))
@@ -122,12 +122,12 @@ clean-dox:
 
 clean-deps:
 	@echo '  removing dependency files'
-	$(shell find . -type f -name '*.d' -exec rm {} +)
+	$(RM) $(call findfiles,.,*.d)
 
 clean-all: clean clean-dox clean-deps clean-libraries
 	$(RM) -r test bin
 	@echo '  removing .o files'
-	$(shell find src -type f -name '*.o' -exec rm {} +)
+	$(RM) $(call findfiles,src,*.o)
 
 ##
 # Submodule related tasks
