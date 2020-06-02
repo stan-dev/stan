@@ -388,7 +388,8 @@ class advi {
            << delta_elbo_ave << "  " << std::setw(15) << std::fixed
            << std::setprecision(3) << delta_elbo_med;
         auto end = std::chrono::steady_clock::now();
-        double delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()/1000.0
+        double delta_t = std::chrono::duration_cast
+          <std::chrono::milliseconds>(end - start).count()/1000.0
 
         std::vector<double> print_vector;
         print_vector.clear();
