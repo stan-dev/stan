@@ -71,8 +71,10 @@ int fixed_param(Model& model, const stan::io::var_context& init,
                              refresh, true, false, writer, s, model, rng,
                              interrupt, logger);
   auto end = std::chrono::steady_clock::now();
-  double sample_delta_t = std::chrono::duration_cast
-    <std::chrono::milliseconds>(end - start).count()/1000.0;
+  double sample_delta_t
+      = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count()
+        / 1000.0;
   writer.write_timing(0.0, sample_delta_t);
 
   return error_codes::OK;
