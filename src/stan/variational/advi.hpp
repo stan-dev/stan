@@ -391,10 +391,8 @@ class advi {
         double delta_t
             = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
                   .count()
-              / 1000.0
-
-              std::vector<double>
-                  print_vector;
+              / 1000.0;
+        std::vector<double> print_vector;
         print_vector.clear();
         print_vector.push_back(iter_counter);
         print_vector.push_back(delta_t);

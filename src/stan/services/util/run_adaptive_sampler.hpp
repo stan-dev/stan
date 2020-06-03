@@ -71,9 +71,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   double warm_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                             end_warm - start_warm)
                             .count()
-                        / 1000.0
-
-                          sampler.disengage_adaptation();
+                        / 1000.0;
+  sampler.disengage_adaptation();
   writer.write_adapt_finish(sampler);
   sampler.write_sampler_state(sample_writer);
 
@@ -85,9 +84,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   double sample_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                               end_sample - start_sample)
                               .count()
-                          / 1000.0
-
-                            writer.write_timing(warm_delta_t, sample_delta_t);
+                          / 1000.0;
+  writer.write_timing(warm_delta_t, sample_delta_t);
 }
 }  // namespace util
 }  // namespace services
