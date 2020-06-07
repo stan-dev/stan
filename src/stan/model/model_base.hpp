@@ -583,6 +583,14 @@ class model_base : public prob_grad {
                            std::vector<double>& params_r_constrained,
                            bool include_tparams = true, bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
+
+  /**
+   * Returns the compile information of the model
+   * (stan version, used stanc flags and stan make flags).
+   *
+   * @return model name
+   */
+  virtual std::vector<std::string> model_compile_info() const = 0;
 };
 
 }  // namespace model
