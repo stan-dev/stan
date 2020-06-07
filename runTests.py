@@ -34,6 +34,8 @@ def processCLIArgs():
     tests_help_msg += "         'src/test/unit/version_test'"
     parser.add_argument("tests", nargs="+", type=str,
                         help=tests_help_msg)
+    parser.add_argument("-m", "--make-only", dest="make_only",
+                        action="store_true", help="Don't run tests, just try to make them.")
     # And parse the command line against those rules
     return parser.parse_args()
 
@@ -120,9 +122,10 @@ def main():
         modelHpp = modelDependencies(batch)        
         makeTest(" ".join(modelHpp), inputs.j)
         makeTest(" ".join(batch), inputs.j)
-
-    for t in tests:
-        runTest(t)
+    
+    if not inputs.make_only:
+        for t in tests:
+            runTest(t)
 
 
 if __name__ == "__main__":
