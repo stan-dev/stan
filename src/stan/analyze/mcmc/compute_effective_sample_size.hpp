@@ -1,10 +1,9 @@
 #ifndef STAN_ANALYZE_MCMC_COMPUTE_EFFECTIVE_SAMPLE_SIZE_HPP
 #define STAN_ANALYZE_MCMC_COMPUTE_EFFECTIVE_SAMPLE_SIZE_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/analyze/mcmc/autocovariance.hpp>
 #include <stan/analyze/mcmc/split_chains.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -51,7 +50,7 @@ inline double compute_effective_sample_size(std::vector<const double*> draws,
         draws[chain_idx], sizes[chain_idx]);
 
     for (int n = 0; n < num_draws; n++) {
-      if (!boost::math::isfinite(draw(n))) {
+      if (!std::isfinite(draw(n))) {
         return std::numeric_limits<double>::quiet_NaN();
       }
     }

@@ -37,7 +37,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_one_chain) {
       469.628, 479.458, 611.196, 483.301, 584.614, 500.264, 453.112, 646.067,
       72.1878, 1;
 
-  // replicates calls to stan::anlayze::compute_effective_sample_size
+  // replicates calls to stan::analyze::compute_effective_sample_size
   // for any interface *without* access to chains class
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(
       chains.num_chains());
@@ -76,7 +76,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_two_chains) {
       768.797, 725.527, 1078.467, 471.57, 956.357, 498.195, 582.663, 696.851,
       99.784, 80.52;
 
-  // replicates calls to stan::anlayze::compute_effective_sample_size
+  // replicates calls to stan::analyze::compute_effective_sample_size
   // for any interface *without* access to chains class
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(
       chains.num_chains());
@@ -152,7 +152,7 @@ TEST_F(ComputeEss, chains_compute_effective_sample_size) {
       768.797, 725.527, 1078.467, 471.57, 956.357, 498.195, 582.663, 696.851,
       99.784, 80.52;
 
-  // replicates calls to stan::anlayze::compute_effective_sample_size
+  // replicates calls to stan::analyze::compute_effective_sample_size
   // for any interface with access to chains class
   for (int index = 4; index < chains.num_params(); index++) {
     ASSERT_NEAR(n_eff(index - 4), chains.effective_sample_size(index), 1.0)
@@ -187,7 +187,7 @@ TEST_F(ComputeEss, compute_split_effective_sample_size) {
       776.03, 735.279, 1077.177, 475.252, 955.281, 503.045, 591.913, 715.97,
       95.594, 77.904;
 
-  // replicates calls to stan::anlayze::compute_effective_sample_size
+  // replicates calls to stan::analyze::compute_effective_sample_size
   // for any interface *without* access to chains class
   Eigen::Matrix<Eigen::VectorXd, Eigen::Dynamic, 1> samples(
       chains.num_chains());
@@ -265,7 +265,7 @@ TEST_F(ComputeEss, chains_compute_split_effective_sample_size) {
       776.03, 735.279, 1077.177, 475.252, 955.281, 503.045, 591.913, 715.97,
       95.594, 77.904;
 
-  // replicates calls to stan::anlayze::compute_effective_sample_size
+  // replicates calls to stan::analyze::compute_effective_sample_size
   // for any interface with access to chains class
   for (int index = 4; index < chains.num_params(); index++) {
     ASSERT_NEAR(n_eff(index - 4), chains.split_effective_sample_size(index),
@@ -282,9 +282,7 @@ TEST_F(ComputeEss, chains_compute_split_effective_sample_size) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_minimum_n) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 3, 1> draws;
   draws << 1.0, 2.0, 3.0;
@@ -296,9 +294,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_minimum_n) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_sufficient_n) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 4, 1> draws;
   draws << 1.0, 2.0, 3.0, 4.0;
@@ -310,9 +306,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_sufficient_n) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_nan) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> chains(param_names);
   Eigen::Matrix<double, 2, 1> draws;
   draws << 1.0, std::numeric_limits<double>::quiet_NaN();
@@ -324,9 +318,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_nan) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_constant) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> const_chains(param_names);
   Eigen::Matrix<double, 4, 1> const_draws;
   const_draws << 1.0, 1.0, 1.0, 1.0;
@@ -338,9 +330,7 @@ TEST_F(ComputeEss, compute_effective_sample_size_constant) {
 }
 
 TEST_F(ComputeEss, compute_effective_sample_size_not_constant) {
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> param_names(1);
-  param_names << "a";
-
+  std::vector<std::string> param_names{"a"};
   stan::mcmc::chains<> nonconst_chains(param_names);
   Eigen::Matrix<double, 4, 1> nonconst_draws;
   nonconst_draws << 1.0, 2.0, 3.0, 4.0;

@@ -2,6 +2,7 @@
 import org.stan.Utils
 
 def utils = new org.stan.Utils()
+def skipRemainingStages = false
 
 def setupCXX(failOnError = true, CXX = env.CXX) {
     errorStr = failOnError ? "-Werror " : ""
@@ -158,7 +159,37 @@ pipeline {
                 }
             }
         }
+        stage('Verify changes') {
+            agent { label 'linux' }
+            steps {
+                script {         
+
+                    retry(3) { checkout scm }
+                    sh 'git clean -xffd'
+
+                    // These paths will be passed to git diff
+                    // If there are changes to them, CI/CD will continue else skip
+                    def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
+                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
+                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
+                        'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
+                    ].join(" ")
+
+                    skipRemainingStages = utils.verifyChanges(paths)
+                }
+            }
+            post {
+                always {
+                    deleteDir()
+                }
+            }
+        }
         stage('Unit tests') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
             parallel {
                 stage('Windows Headers & Unit') {
                     agent { label 'windows' }
@@ -166,6 +197,7 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             setupCXX()
+                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             bat "mingw32-make -j${env.PARALLEL} test-headers"
                             setupCXX(false)
                             runTestsWin("src/test/unit")
@@ -196,19 +228,18 @@ pipeline {
 
         stage('Integration') {
             parallel {
-                // Windows is running out of memory: https://jenkins.mc-stan.org/blue/organizations/jenkins/Stan/detail/PR-2761/15/pipeline
-                //stage('Integration Windows') {
-                    //agent { label 'windows' }
-                    //steps {
-                        //deleteDirWin()
-                            //unstash 'StanSetup'
-                            //setupCXX()
-                            //bat "make -j${env.PARALLEL} test-headers"
-                            //setupCXX(false)
-                            //runTestsWin("src/test/integration")
-                    //}
-                    //post { always { deleteDirWin() } }
-                //}
+                stage('Integration Windows') {
+                    agent { label 'windows' }
+                    steps {
+                        deleteDirWin()
+                            unstash 'StanSetup'
+                            setupCXX()
+                            bat "make -j${env.PARALLEL} test-headers"
+                            setupCXX(false)
+                            runTestsWin("src/test/integration")
+                    }
+                    post { always { deleteDirWin() } }
+                }
                 stage('Integration Linux') {
                     agent { label 'linux' }
                     steps {
@@ -226,14 +257,24 @@ pipeline {
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
+                }        
+            }
+            when {
+                expression {
+                    !skipRemainingStages
                 }
             }
         }
 
         stage('Upstream CmdStan tests') {
-            when { expression { env.BRANCH_NAME ==~ /PR-\d+/ ||
-                                env.BRANCH_NAME == "downstream_tests" ||
-                                env.BRANCH_NAME == "downstream_hotfix" } }
+            when { 
+                    expression { 
+                        ( env.BRANCH_NAME ==~ /PR-\d+/ ||
+                        env.BRANCH_NAME == "downstream_tests" ||
+                        env.BRANCH_NAME == "downstream_hotfix" ) &&
+                        !skipRemainingStages 
+                    } 
+                }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
                       parameters: [string(name: 'stan_pr', value: stan_pr()),
@@ -241,6 +282,11 @@ pipeline {
             }
         }
         stage('Performance') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
             agent { label 'oldimac' }
             steps {
                 unstash 'StanSetup'

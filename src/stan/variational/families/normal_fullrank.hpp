@@ -2,7 +2,7 @@
 #define STAN_VARIATIONAL_NORMAL_FULLRANK_HPP
 
 #include <stan/callbacks/logger.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/model/gradient.hpp>
 #include <stan/variational/base_family.hpp>
 #include <algorithm>
@@ -329,7 +329,7 @@ class normal_fullrank : public base_family {
   }
 
   /**
-   * Return the transform of the sepcified vector using the
+   * Return the transform of the specified vector using the
    * Cholesky factor and mean vector.
    *
    * The transform is defined by
@@ -448,7 +448,7 @@ class normal_fullrank : public base_family {
           const char* msg2
               = "). Your model may be either severely "
                 "ill-conditioned or misspecified.";
-          stan::math::domain_error(function, name, y, msg1, msg2);
+          stan::math::throw_domain_error(function, name, y, msg1, msg2);
         }
       }
     }

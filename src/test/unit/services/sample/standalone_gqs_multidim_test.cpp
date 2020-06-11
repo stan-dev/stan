@@ -41,10 +41,10 @@ TEST_F(ServicesStandaloneGQ2, genDraws_gq_test_multidim) {
   csv_stream.close();
   EXPECT_EQ(12345U, multidim_csv.metadata.seed);
   ASSERT_EQ(247, multidim_csv.header.size());
-  EXPECT_EQ("p_ar_mat[1,1,1,1]", multidim_csv.header(7));
-  EXPECT_EQ("p_ar_mat[4,5,2,3]", multidim_csv.header(126));
-  EXPECT_EQ("gq_ar_mat[1,1,1,1]", multidim_csv.header(127));
-  EXPECT_EQ("gq_ar_mat[4,5,2,3]", multidim_csv.header(246));
+  EXPECT_EQ("p_ar_mat[1,1,1,1]", multidim_csv.header[7]);
+  EXPECT_EQ("p_ar_mat[4,5,2,3]", multidim_csv.header[126]);
+  EXPECT_EQ("gq_ar_mat[1,1,1,1]", multidim_csv.header[127]);
+  EXPECT_EQ("gq_ar_mat[4,5,2,3]", multidim_csv.header[246]);
   ASSERT_EQ(1000, multidim_csv.samples.rows());
   ASSERT_EQ(247, multidim_csv.samples.cols());
 

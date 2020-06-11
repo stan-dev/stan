@@ -1,7 +1,7 @@
 ################################################################################
 # libstanc build rules
 
-STANC_TEMPLATE_INSTANTIATION_CPP := $(shell find src/stan/lang -type f -name '*_inst.cpp') $(shell find src/stan/lang -type f -name '*_def.cpp')
+STANC_TEMPLATE_INSTANTIATION_CPP := $(call findfiles,src/stan/lang,*_inst.cpp) $(call findfiles,src/stan/lang,*_def.cpp)
 STANC_TEMPLATE_INSTANTIATION := $(STANC_TEMPLATE_INSTANTIATION_CPP:src/%.cpp=test/%.o)
 
 test/libstanc.a : $(STANC_TEMPLATE_INSTANTIATION)

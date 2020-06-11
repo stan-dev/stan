@@ -3,13 +3,8 @@
 
 #include <stan/io/validate_zero_buf.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/throw_exception.hpp>
-#include <boost/type_traits/is_floating_point.hpp>
-#include <boost/type_traits/is_integral.hpp>
-#include <boost/type_traits/is_arithmetic.hpp>
-#include <boost/utility/enable_if.hpp>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -23,7 +18,6 @@
 namespace stan {
 namespace io {
 
-using Eigen::Dynamic;
 /**
  * Reads data from S-plus dump format.
  *
@@ -250,7 +244,7 @@ class dump_reader {
       d = boost::lexical_cast<size_t>(buf_);
     } catch (const boost::bad_lexical_cast& exc) {
       std::string msg = "value " + buf_ + " beyond array dimension range";
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+      throw std::invalid_argument(msg);
     }
     return d;
   }
@@ -277,7 +271,7 @@ class dump_reader {
       n = boost::lexical_cast<int>(buf_);
     } catch (const boost::bad_lexical_cast& exc) {
       std::string msg = "value " + buf_ + " beyond int range";
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+      throw std::invalid_argument(msg);
     }
     return n;
   }
@@ -290,7 +284,7 @@ class dump_reader {
         validate_zero_buf(buf_);
     } catch (const boost::bad_lexical_cast& exc) {
       std::string msg = "value " + buf_ + " beyond numeric range";
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+      throw std::invalid_argument(msg);
     }
     return x;
   }
@@ -574,11 +568,11 @@ class dump_reader {
       bool okSyntax = scan_value();  // set stack_r_, stack_i_, dims_
       if (!okSyntax) {
         std::string msg = "syntax error";
-        BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+        throw std::invalid_argument(msg);
       }
     } catch (const std::invalid_argument& e) {
       std::string msg = "data " + name_ + " " + e.what();
-      BOOST_THROW_EXCEPTION(std::invalid_argument(msg));
+      throw std::invalid_argument(msg);
     }
     return true;
   }
@@ -764,6 +758,63 @@ class dump : public stan::io::var_context {
          = vars_i_.begin();
          it != vars_i_.end(); ++it)
       names.push_back((*it).first);
+  }
+
+  /**
+   * Check variable dimensions against variable declaration.
+   *
+   * @param stage stan program processing stage
+   * @param name variable name
+   * @param base_type declared stan variable type
+   * @param dims variable dimensions
+   * @throw std::runtime_error if mismatch between declared
+   *        dimensions and dimensions found in context.
+   */
+  void validate_dims(const std::string& stage, const std::string& name,
+                     const std::string& base_type,
+                     const std::vector<size_t>& dims_declared) const {
+    bool is_int_type = base_type == "int";
+    if (is_int_type) {
+      if (!contains_i(name)) {
+        std::stringstream msg;
+        msg << (contains_r(name) ? "int variable contained non-int values"
+                                 : "variable does not exist")
+            << "; processing stage=" << stage << "; variable name=" << name
+            << "; base type=" << base_type;
+        throw std::runtime_error(msg.str());
+      }
+    } else {
+      if (!contains_r(name)) {
+        std::stringstream msg;
+        msg << "variable does not exist"
+            << "; processing stage=" << stage << "; variable name=" << name
+            << "; base type=" << base_type;
+        throw std::runtime_error(msg.str());
+      }
+    }
+    std::vector<size_t> dims = dims_r(name);
+    if (dims.size() != dims_declared.size()) {
+      std::stringstream msg;
+      msg << "mismatch in number dimensions declared and found in context"
+          << "; processing stage=" << stage << "; variable name=" << name
+          << "; dims declared=";
+      dims_msg(msg, dims_declared);
+      msg << "; dims found=";
+      dims_msg(msg, dims);
+      throw std::runtime_error(msg.str());
+    }
+    for (size_t i = 0; i < dims.size(); ++i) {
+      if (dims_declared[i] != dims[i]) {
+        std::stringstream msg;
+        msg << "mismatch in dimension declared and found in context"
+            << "; processing stage=" << stage << "; variable name=" << name
+            << "; position=" << i << "; dims declared=";
+        dims_msg(msg, dims_declared);
+        msg << "; dims found=";
+        dims_msg(msg, dims);
+        throw std::runtime_error(msg.str());
+      }
+    }
   }
 
   /**

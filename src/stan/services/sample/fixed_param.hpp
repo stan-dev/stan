@@ -4,13 +4,14 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
+#include <chrono>
 #include <vector>
 
 namespace stan {
@@ -41,7 +42,7 @@ namespace sample {
  * @return error_codes::OK if successful
  */
 template <class Model>
-int fixed_param(Model& model, stan::io::var_context& init,
+int fixed_param(Model& model, const stan::io::var_context& init,
                 unsigned int random_seed, unsigned int chain,
                 double init_radius, int num_samples, int num_thin, int refresh,
                 callbacks::interrupt& interrupt, callbacks::logger& logger,
@@ -65,15 +66,16 @@ int fixed_param(Model& model, stan::io::var_context& init,
   writer.write_sample_names(s, sampler, model);
   writer.write_diagnostic_names(s, sampler, model);
 
-  clock_t start = clock();
-
+  auto start = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_samples, 0, num_samples, num_thin,
                              refresh, true, false, writer, s, model, rng,
                              interrupt, logger);
-  clock_t end = clock();
-
-  double sampleDeltaT = static_cast<double>(end - start) / CLOCKS_PER_SEC;
-  writer.write_timing(0.0, sampleDeltaT);
+  auto end = std::chrono::steady_clock::now();
+  double sample_delta_t
+      = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count()
+        / 1000.0;
+  writer.write_timing(0.0, sample_delta_t);
 
   return error_codes::OK;
 }

@@ -50,7 +50,7 @@ endif
 # needed by subset of unit tests that test stan compiler
 # all these tests are under stan/test/unit/lang
 ##
-STANC_TESTS_HEADERS := $(shell find src/test/unit/lang -type f -name '*_test.cpp')
+STANC_TESTS_HEADERS := $(call findfiles,src/test/unit/lang,*_test.cpp)
 STANC_TESTS_O := $(patsubst src/%.cpp,%.o,$(STANC_TESTS_HEADERS))
 STANC_TESTS := $(patsubst src/%.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 
@@ -64,7 +64,7 @@ $(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
 # Target to verify header files within Stan has
 # enough include calls
 ##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f))
+HEADER_TESTS := $(addsuffix -test,$(call findfiles,src/stan,*.hpp))
 
 ifeq ($(OS),Windows_NT)
   DEV_NULL = nul
@@ -160,7 +160,7 @@ test/test-models/stanc$(EXE) : %$(EXE) : %.o
 	@mkdir -p $(dir $@)
 	$(LINK.cpp) $< $(LDLIBS) $(OUTPUT_OPTION)
 
-TEST_MODELS = $(shell find src/test/test-models -type f -name '*.stan')
+TEST_MODELS = $(call findfiles,src/test/test-models,*.stan)
 $(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/test-models/%.stan test/test-models/stanc$(EXE)
 	@mkdir -p $(dir $@)
 	$(WINE) test/test-models/stanc$(EXE) $< --o=$@
@@ -168,7 +168,7 @@ $(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/
 ##
 # Generate C++ from Stan standalone functions
 ##
-TEST_FUNCTIONS = $(shell find src/test/test-models -type f -name '*.stanfuncs')
+TEST_FUNCTIONS = $(call findfiles,src/test/test-models,*.stanfuncs)
 $(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs test/test-models/stanc$(EXE)
 	@mkdir -p $(dir $@)
 	$(WINE) test/test-models/stanc$(EXE) $< --o=$@
@@ -193,7 +193,7 @@ test/unit/lang/stanc_helper_test.o: change-file-permissions
 # Add additional dependencies for tests that should translate Stan to hpp, but
 # isn't included in the source using `#include`.
 ##
-test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
+test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(call findfiles,src/test/test-models/good/parser-generator,*.stan))
 
 ##
 # Compile models depends on every model within
@@ -201,10 +201,10 @@ test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(shell 
 # be code-generated to a *.hpp, then passed through
 # the compiler using the -fsyntax-only flag
 ##
-test/integration/compile_models_test$(EXE): $(patsubst src/%.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
+test/integration/compile_models_test$(EXE): $(patsubst src/%.stan,%.hpp-test,$(call findfiles,src/test/test-models/good,*.stan))
 
 ##
 # Same trick as above for models, but for standalone functions, using
 # "src/test/test-models/good-standalone-functions/*.stanfuncs"
 ##
-test/integration/compile_standalone_functions_test$(EXE): $(patsubst src/%.stanfuncs,%.hpp-test,$(shell find src/test/test-models/good-standalone-functions -type f -name '*.stanfuncs'))
+test/integration/compile_standalone_functions_test$(EXE): $(patsubst src/%.stanfuncs,%.hpp-test,$(call findfiles,src/test/test-models/good-standalone-functions,*.stanfuncs))

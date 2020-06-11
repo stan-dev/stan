@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_MODEL_FUNCTIONAL_HPP
 #define STAN_MODEL_MODEL_FUNCTIONAL_HPP
 
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <iostream>
 
 namespace stan {

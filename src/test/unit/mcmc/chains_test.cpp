@@ -38,14 +38,14 @@ TEST_F(McmcChains, constructor) {
   EXPECT_EQ(0, chains1.num_chains());
   EXPECT_EQ(blocker1.header.size(), chains1.num_params());
   for (int i = 0; i < blocker1.header.size(); i++)
-    EXPECT_EQ(blocker1.header(i), chains1.param_name(i));
+    EXPECT_EQ(blocker1.header[i], chains1.param_name(i));
 
   // construct with stan_csv
   stan::mcmc::chains<> chains2(blocker1);
   EXPECT_EQ(1, chains2.num_chains());
   EXPECT_EQ(blocker1.header.size(), chains2.num_params());
   for (int i = 0; i < blocker1.header.size(); i++)
-    EXPECT_EQ(blocker1.header(i), chains2.param_name(i));
+    EXPECT_EQ(blocker1.header[i], chains2.param_name(i));
   EXPECT_EQ(0, chains2.warmup(0));
   EXPECT_EQ(1000, chains2.num_samples(0));
 }
@@ -231,7 +231,7 @@ TEST_F(McmcChains, blocker1_param_names) {
   ASSERT_EQ(blocker1.header.size(), chains.num_params());
   ASSERT_EQ(blocker1.header.size(), chains.param_names().size());
   for (int i = 0; i < blocker1.header.size(); i++) {
-    EXPECT_EQ(blocker1.header(i), chains.param_names()(i));
+    EXPECT_EQ(blocker1.header[i], chains.param_names()[i]);
   }
 }
 TEST_F(McmcChains, blocker1_param_name) {
@@ -243,7 +243,7 @@ TEST_F(McmcChains, blocker1_param_name) {
   stan::mcmc::chains<> chains(blocker1);
   ASSERT_EQ(blocker1.header.size(), chains.num_params());
   for (int i = 0; i < blocker1.header.size(); i++) {
-    EXPECT_EQ(blocker1.header(i), chains.param_name(i));
+    EXPECT_EQ(blocker1.header[i], chains.param_name(i));
   }
 }
 TEST_F(McmcChains, blocker1_index) {
@@ -255,7 +255,7 @@ TEST_F(McmcChains, blocker1_index) {
   stan::mcmc::chains<> chains(blocker1);
   ASSERT_EQ(blocker1.header.size(), chains.num_params());
   for (int i = 0; i < blocker1.header.size(); i++)
-    EXPECT_EQ(i, chains.index(blocker1.header(i)));
+    EXPECT_EQ(i, chains.index(blocker1.header[i]));
 }
 TEST_F(McmcChains, blocker1_warmup) {
   std::stringstream out;

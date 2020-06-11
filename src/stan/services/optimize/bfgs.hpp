@@ -1,12 +1,10 @@
 #ifndef STAN_SERVICES_OPTIMIZE_BFGS_HPP
 #define STAN_SERVICES_OPTIMIZE_BFGS_HPP
 
-#include <stan/io/var_context.hpp>
-#include <stan/io/chained_var_context.hpp>
 #include <stan/callbacks/interrupt.hpp>
-#include <stan/io/random_var_context.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/io/var_context.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/optimization/bfgs.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -41,7 +39,7 @@ namespace optimize {
  * @param[in] tol_param convergence tolerance on changes in parameter
  *   value
  * @param[in] num_iterations maximum number of iterations
- * @param[in] save_iterations indicates whether all the interations should
+ * @param[in] save_iterations indicates whether all the iterations should
  *   be saved to the parameter_writer
  * @param[in] refresh how often to write output to logger
  * @param[in,out] interrupt callback to be called every iteration
@@ -51,9 +49,9 @@ namespace optimize {
  * @return error_codes::OK if successful
  */
 template <class Model>
-int bfgs(Model& model, stan::io::var_context& init, unsigned int random_seed,
-         unsigned int chain, double init_radius, double init_alpha,
-         double tol_obj, double tol_rel_obj, double tol_grad,
+int bfgs(Model& model, const stan::io::var_context& init,
+         unsigned int random_seed, unsigned int chain, double init_radius,
+         double init_alpha, double tol_obj, double tol_rel_obj, double tol_grad,
          double tol_rel_grad, double tol_param, int num_iterations,
          bool save_iterations, int refresh, callbacks::interrupt& interrupt,
          callbacks::logger& logger, callbacks::writer& init_writer,
