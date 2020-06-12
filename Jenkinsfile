@@ -234,7 +234,7 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             setupCXX()
-                            bat "make -j${env.PARALLEL} test-headers"
+                            bat "make -j2 test-headers"
                             setupCXX(false)
                             runTestsWin("src/test/integration")
                     }
