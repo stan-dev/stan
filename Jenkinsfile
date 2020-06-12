@@ -17,10 +17,15 @@ def runTests(String testPath, Boolean separateMakeStep=true) {
     finally { junit 'test/**/*.xml' }
 }
 
-def runTestsWin(String testPath) {
+def runTestsWin(String testPath, Boolean reducedParallel=false) {
     withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
-       bat "runTests.py -j2 ${testPath} --make-only"
-       try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
+       if (reducedParallel) {
+        bat "runTests.py -j2 ${testPath} --make-only"
+        try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
+       } else {
+        bat "runTests.py -j2 ${testPath} --make-only"
+        try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
+       }
        finally { junit 'test/**/*.xml' }
     }
 }
@@ -184,47 +189,47 @@ pipeline {
                 }
             }
         }
-        // stage('Unit tests') {
-        //     when {
-        //         expression {
-        //             !skipRemainingStages
-        //         }
-        //     }
-        //     parallel {
-        //         stage('Windows Headers & Unit') {
-        //             agent { label 'windows' }
-        //             steps {
-        //                 deleteDirWin()
-        //                     unstash 'StanSetup'
-        //                     setupCXX()
-        //                     bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-        //                     bat "mingw32-make -j${env.PARALLEL} test-headers"
-        //                     setupCXX(false)
-        //                     runTestsWin("src/test/unit")
-        //             }
-        //             post { always { deleteDirWin() } }
-        //         }
-        //         stage('Linux Unit') {
-        //             agent { label 'linux' }
-        //             steps {
-        //                 unstash 'StanSetup'
-        //                 //setupCXX(false, env.GCC)
-        //                 setupCXX(false)
-        //                 runTests("src/test/unit")
-        //             }
-        //             post { always { deleteDir() } }
-        //         }
-        //         stage('Mac Unit') {
-        //             agent { label 'osx' }
-        //             steps {
-        //                 unstash 'StanSetup'
-        //                 setupCXX(false)
-        //                 runTests("src/test/unit")
-        //             }
-        //             post { always { deleteDir() } }
-        //         }
-        //     }
-        // }
+        stage('Unit tests') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
+            parallel {
+                stage('Windows Headers & Unit') {
+                    agent { label 'windows' }
+                    steps {
+                        deleteDirWin()
+                            unstash 'StanSetup'
+                            setupCXX()
+                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+                            bat "mingw32-make -j${env.PARALLEL} test-headers"
+                            setupCXX(false)
+                            runTestsWin("src/test/unit")
+                    }
+                    post { always { deleteDirWin() } }
+                }
+                stage('Linux Unit') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        //setupCXX(false, env.GCC)
+                        setupCXX(false)
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Mac Unit') {
+                    agent { label 'osx' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(false)
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
+            }
+        }
 
         stage('Integration') {
             parallel {
@@ -234,28 +239,28 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             setupCXX(false)
-                            runTestsWin("src/test/integration")
+                            runTestsWin("src/test/integration", true)
                     }
                     post { always { deleteDirWin() } }
                 }
-                // stage('Integration Linux') {
-                //     agent { label 'linux' }
-                //     steps {
-                //         unstash 'StanSetup'
-                //         setupCXX(true, env.GCC)
-                //         runTests("src/test/integration", separateMakeStep=false)
-                //     }
-                //     post { always { deleteDir() } }
-                // }
-                // stage('Integration Mac') {
-                //     agent { label 'osx' }
-                //     steps {
-                //         unstash 'StanSetup'
-                //         setupCXX()
-                //         runTests("src/test/integration", separateMakeStep=false)
-                //     }
-                //     post { always { deleteDir() } }
-                // }        
+                stage('Integration Linux') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(true, env.GCC)
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Integration Mac') {
+                    agent { label 'osx' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
             }
             when {
                 expression {
