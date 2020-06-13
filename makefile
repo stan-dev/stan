@@ -122,12 +122,12 @@ clean-dox:
 
 clean-deps:
 	@echo '  removing dependency files'
-	$(RM) $(call findfiles,.,*.d)
+	$(RM) $(call findfiles,./,*.d)
 
 clean-all: clean clean-dox clean-deps clean-libraries
 	$(RM) -r test bin
 	@echo '  removing .o files'
-	$(RM) $(call findfiles,src,*.o)
+	$(RM) $(call findfiles,src/,*.o)
 
 ##
 # Submodule related tasks

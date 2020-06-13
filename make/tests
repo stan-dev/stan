@@ -2,6 +2,9 @@
 # Build test executables
 ##
 
+src/stan/model/model_header.hpp.gch : src/stan/model/model_header.hpp
+	$(COMPILE.cpp) $< $(OUTPUT_OPTION)
+
 test/%$(EXE) : CXXFLAGS += $(CXXFLAGS_GTEST)
 test/%$(EXE) : CPPFLAGS += $(CPPFLAGS_GTEST)
 test/%$(EXE) : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(STAN),.)
@@ -94,8 +97,13 @@ test-headers: $(HEADER_TESTS)
 ##
 .PHONY: %.hpp-test
 test/test-models/good/%.hpp-test : O = 0
+test/test-models/good/%.hpp-test : src/stan/model/model_header.hpp.gch
 test/test-models/good/%.hpp-test : test/test-models/good/%.hpp test/test-model-main.cpp
+ifeq ($(CXX_TYPE),clang)
+	$(COMPILE.cpp) -include-pch src/stan/model/model_header.hpp.gch -o $(DEV_NULL) -include $^
+else
 	$(COMPILE.cpp) -o $(DEV_NULL) -include $^
+endif
 
 test/test-model-main.cpp:
 	@mkdir -p test
