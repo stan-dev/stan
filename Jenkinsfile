@@ -24,7 +24,7 @@ def runTestsWin(String testPath, Boolean reducedParallel=false) {
         try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
         finally { junit 'test/**/*.xml' }
        } else {
-        bat "runTests.py -j2 ${testPath} --make-only"
+        bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
         try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
         finally { junit 'test/**/*.xml' }
        }
