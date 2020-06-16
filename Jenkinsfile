@@ -209,6 +209,7 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, env.GCC)
+                        sh "g++ --version"
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
