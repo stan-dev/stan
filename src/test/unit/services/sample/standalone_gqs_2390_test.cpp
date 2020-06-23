@@ -61,7 +61,7 @@ TEST_F(ServicesStandaloneGQ4, genDraws_gq_test_vec_len_1) {
       *model, multidim_csv.samples.middleCols<1>(7), 12345, interrupt, logger,
       sample_writer);
   EXPECT_EQ(return_code, stan::services::error_codes::OK);
-  //  EXPECT_EQ(count_matches("gq_ar_mat", sample_ss.str()), 120);
-  //  EXPECT_EQ(count_matches("\n", sample_ss.str()), 1001);
-  //  match_csv_columns(multidim_csv.samples, sample_ss.str(), 1000, 120, 127);
+  EXPECT_EQ(count_matches("y_est", sample_ss.str()), 5);
+  EXPECT_EQ(count_matches("\n", sample_ss.str()), 1001);
+  match_csv_columns(multidim_csv.samples, sample_ss.str(), 1000, 0, 6);
 }
