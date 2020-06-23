@@ -1,7 +1,8 @@
-data {
-  int N;
-  int K;
-  matrix[N,K] X;
+transformed data {
+  int N = 5;
+  int K = 1;
+  int<lower=0,upper=1> y[5] = {1, 1, 1, 1, 0}; 
+  matrix[5,1] X = [[1], [1], [1], [1], [1]];
 }
 parameters {
   vector[K] b;
