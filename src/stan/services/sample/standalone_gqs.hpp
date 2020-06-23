@@ -35,7 +35,7 @@ void get_model_parameters(const Model &model,
   model.constrained_param_names(param_cols, false, false);
   std::string cur_name("");
   std::vector<std::string> splits;
-  for (size_t i=0; i < param_cols.size(); ++i) {
+  for (size_t i = 0; i < param_cols.size(); ++i) {
     boost::algorithm::split(splits, param_cols[i], boost::is_any_of("."));
     if (splits.size() == 1 || splits[0] != cur_name) {
       cur_name = splits[0];

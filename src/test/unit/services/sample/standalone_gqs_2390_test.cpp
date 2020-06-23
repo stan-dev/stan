@@ -31,7 +31,6 @@ class ServicesStandaloneGQ4 : public ::testing::Test {
   stan_model *model;
 };
 
-
 TEST_F(ServicesStandaloneGQ4, genDraws_gq_test_vec_len_1) {
   stan::io::stan_csv multidim_csv;
   std::stringstream out;
