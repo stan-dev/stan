@@ -9,8 +9,10 @@
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/gq_writer.hpp>
 #include <Eigen/Dense>
+#include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace stan {
 namespace services {
@@ -29,26 +31,22 @@ template <class Model>
 void get_model_parameters(const Model &model,
                           std::vector<std::string> &param_names,
                           std::vector<std::vector<size_t>> &param_dimss) {
-  std::vector<std::string> constrained_names;
-  model.constrained_param_names(constrained_names, false, false);
-  size_t num_params = constrained_names.size();
+  std::vector<std::string> param_cols;
+  model.constrained_param_names(param_cols, false, false);
+  std::string cur_name("");
+  std::vector<std::string> splits;
+  for (size_t i = 0; i < param_cols.size(); ++i) {
+    boost::algorithm::split(splits, param_cols[i], boost::is_any_of("."));
+    if (splits.size() == 1 || splits[0] != cur_name) {
+      cur_name = splits[0];
+      param_names.emplace_back(cur_name);
+    }
+  }
+  size_t num_params = param_names.size();
   std::vector<std::vector<size_t>> dimss;
   model.get_dims(dimss);
-  size_t total = 0;
-  for (size_t i = 0; i < dimss.size(); ++i) {
+  for (size_t i = 0; i < num_params; ++i) {
     param_dimss.emplace_back(dimss[i]);
-    int cur_param = 1;
-    for (int j = 0; j < dimss[i].size(); ++j)
-      cur_param *= dimss[i][j];
-    if (cur_param == 1) {
-      param_names.emplace_back(constrained_names[total]);
-    } else {
-      int idx = constrained_names[total].find('.');
-      param_names.emplace_back(constrained_names[total].substr(0, idx));
-    }
-    total += cur_param;
-    if (total == num_params)
-      break;
   }
 }
 
