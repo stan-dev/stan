@@ -28,14 +28,14 @@ TEST(commandStancHelper, printStancHelp) {
 
 bool create_test_file(const std::string& path, const std::string& program) {
   std::string cmd_setup = "mkdir -p test/test-models";
-  int return_code = system(cmd_setup.c_str());
+  (void) system(cmd_setup.c_str());
   std::string cmd = "echo ";
   cmd += "\"";
   cmd += program;
   cmd += "\"";
   cmd += " > ";
   cmd += path;
-  return_code = system(cmd.c_str());
+  int return_code = system(cmd.c_str());
   return return_code == 0;
 }
 
