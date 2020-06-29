@@ -151,7 +151,6 @@ TEST(commandStancHelper, includeSinglePathGood) {
   std::stringstream out;
   std::stringstream err;
   std::vector<const char*> argv_vec;
-
   argv_vec.push_back("main");
   argv_vec.push_back("--include_paths=src/test/test-models/included/");
   argv_vec.push_back(
