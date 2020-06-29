@@ -35,7 +35,7 @@ bool create_test_file(const std::string& path, const std::string& program) {
   cmd += "\"";
   cmd += " > ";
   cmd += path;
-  return_code = system(cmd.c_str());
+  return_code |= system(cmd.c_str());
   return return_code == 0;
 }
 
