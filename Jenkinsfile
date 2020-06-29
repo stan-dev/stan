@@ -4,9 +4,9 @@ import org.stan.Utils
 def utils = new org.stan.Utils()
 def skipRemainingStages = false
 
-def setupCXX(failOnError = true) {
+def setupCXX(failOnError = true, CXX = env.CXX) {
     errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CXX=${env.CXX} ${errorStr}")
+    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
 }
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
@@ -85,7 +85,7 @@ pipeline {
                     """
                     utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
-                    setupCXX()
+                    setupCXX(true, env.GCC)
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
@@ -204,8 +204,18 @@ pipeline {
                     }
                     post { always { deleteDirWin() } }
                 }
-                stage('Unit') {
-                    agent any
+                stage('Linux Unit') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(true, env.GCC)
+                        sh "g++ --version"
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Mac Unit') {
+                    agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(false)
@@ -216,18 +226,31 @@ pipeline {
             }
         }
         stage('Integration') {
+            parallel {
+                stage('Integration Linux') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(true, env.GCC)
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Integration Mac') {
+                    agent { label 'osx' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+            }
             when {
                 expression {
                     !skipRemainingStages
                 }
             }
-            agent any
-            steps {
-                unstash 'StanSetup'
-                setupCXX()
-                runTests("src/test/integration", separateMakeStep=false)
-            }
-            post { always { deleteDir() } }
         }
         stage('Upstream CmdStan tests') {
             when { 
