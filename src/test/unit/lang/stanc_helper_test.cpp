@@ -28,7 +28,7 @@ TEST(commandStancHelper, printStancHelp) {
 
 bool create_test_file(const std::string& path, const std::string& program) {
   std::string cmd_setup = "mkdir -p test/test-models";
-  (void) system(cmd_setup.c_str());
+  (void)system(cmd_setup.c_str());
   std::string cmd = "echo ";
   cmd += "\"";
   cmd += program;
