@@ -142,7 +142,8 @@ def main():
 
     for batch in batched(tests):
         modelHpp = modelDependencies(batch)
-        makeTest(" ".join(modelHpp), inputs.j)
+        if len(modelHpp) > 0:
+            makeTest(" ".join(modelHpp), inputs.j)
         makeTest(" ".join(batch), inputs.j)
 
     if not inputs.make_only:
