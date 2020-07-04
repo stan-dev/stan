@@ -64,8 +64,8 @@
 //   std::stringstream sample_ss;
 //   stan::callbacks::stream_writer sample_writer(sample_ss, "");
 //   int return_code = stan::services::standalone_generate(
-//       *model, multidim_csv.samples.middleCols<120>(7), 12345, interrupt, logger,
-//       sample_writer);
+//       *model, multidim_csv.samples.middleCols<120>(7), 12345, interrupt,
+//       logger, sample_writer);
 //   EXPECT_EQ(return_code, stan::services::error_codes::OK);
 //   EXPECT_EQ(count_matches("gq_ar_mat", sample_ss.str()), 120);
 //   EXPECT_EQ(count_matches("\n", sample_ss.str()), 1001);
