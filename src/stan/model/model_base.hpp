@@ -59,7 +59,7 @@ class model_base : public prob_grad {
    *
    * @return model name
    */
-  virtual std::vector<std::string> model_compile_info() = 0;
+  virtual std::vector<std::string> model_compile_info() const = 0;
 
   /**
    * Set the specified argument to sequence of parameters, transformed
