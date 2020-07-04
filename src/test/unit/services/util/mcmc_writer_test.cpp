@@ -11,11 +11,36 @@
 namespace test {
 // mock_throwing_model_in_write_array throws exception in the write_array()
 // method
-class throwing_model : public stan_model {
- public:
-  throwing_model(stan::io::var_context& context, std::ostream* pstream)
-      : stan_model(context, pstream) {}
+class throwing_model : public stan::model::model_base_crtp<throwing_model> {
 
+ private:
+  int pos__;
+ 
+ public:
+  ~throwing_model() { }
+  
+  std::string model_name() const final { return "throwing_model"; }
+
+  std::vector<std::string> model_compile_info() const {
+    std::vector<std::string> stanc_info;
+    stanc_info.push_back("stanc_version = stanc3 e010e06c");
+    stanc_info.push_back("stancflags = ");
+    return stanc_info;
+  }
+  
+  
+  throwing_model(stan::io::var_context& context__,
+                unsigned int random_seed__ = 0,
+                std::ostream* pstream__ = nullptr) : model_base_crtp(0) {
+  }
+
+  template <bool propto__, bool jacobian__, typename T__>
+  inline T__ log_prob(std::vector<T__>& params_r__,
+                      std::vector<int>& params_i__,
+                      std::ostream* pstream__ = nullptr) const {
+                        return 0.0;
+    } // log_prob() 
+    
   template <typename RNG>
   void write_array(RNG& base_rng__, std::vector<double>& params_r__,
                    std::vector<int>& params_i__, std::vector<double>& vars__,
@@ -26,15 +51,110 @@ class throwing_model : public stan_model {
       vars__.push_back(params_r__[i]);
     throw std::domain_error("throwing within write_array");
   }
+    
+  inline void transform_inits(const stan::io::var_context& context__,
+                              std::vector<int>& params_i__,
+                              std::vector<double>& vars__,
+                              std::ostream* pstream__) const
+    final {
+    
+    } // transform_inits() 
+    
+  inline void get_param_names(std::vector<std::string>& names__) const {
+    names__.clear();
+    names__.emplace_back("y");
+    names__.emplace_back("z");
+    names__.emplace_back("xgq");
+    } // get_param_names() 
+    
+  inline void get_dims(std::vector<std::vector<size_t>>& dimss__) const
+    final {
+    dimss__.clear();
+    dimss__.emplace_back(std::vector<size_t>{static_cast<size_t>(2)});
+    
+    dimss__.emplace_back(std::vector<size_t>{static_cast<size_t>(2)});
+    
+    dimss__.emplace_back(std::vector<size_t>{});
+    
+    } // get_dims() 
+    
+inline void constrained_param_names(
+                                      std::vector<std::string>& param_names__,
+                                      bool emit_transformed_parameters__ = true,
+                                      bool emit_generated_quantities__ = true) const
+    final {
+    
+    for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
+      {
+        param_names__.emplace_back(std::string() + "y" + '.' + std::to_string(sym1__));
+      }}
+    if (emit_transformed_parameters__) {
+      for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
+        {
+          param_names__.emplace_back(std::string() + "z" + '.' + std::to_string(sym1__));
+        }}
+    }
+    
+    if (emit_generated_quantities__) {
+      param_names__.emplace_back(std::string() + "xgq");
+    }
+    
+    } // constrained_param_names() 
+    
+  inline void unconstrained_param_names(
+                                        std::vector<std::string>& param_names__,
+                                        bool emit_transformed_parameters__ = true,
+                                        bool emit_generated_quantities__ = true) const
+    final {
+    
+    for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
+      {
+        param_names__.emplace_back(std::string() + "y" + '.' + std::to_string(sym1__));
+      }}
+    if (emit_transformed_parameters__) {
+      for (int sym1__ = 1; sym1__ <= 2; ++sym1__) {
+        {
+          param_names__.emplace_back(std::string() + "z" + '.' + std::to_string(sym1__));
+        }}
+    }
+    
+    if (emit_generated_quantities__) {
+      param_names__.emplace_back(std::string() + "xgq");
+    }
+    
+    } // unconstrained_param_names() 
+    
+  inline std::string get_constrained_sizedtypes() const {
+      return "";
+    } // get_constrained_sizedtypes() 
+    
+  inline std::string get_unconstrained_sizedtypes() const {
+    return "";
+    } // get_unconstrained_sizedtypes() 
+    
+  
+    // Begin method overload boilerplate
+    template <typename RNG>
+    void write_array(RNG& base_rng,
+                    Eigen::Matrix<double, Eigen::Dynamic, 1>& params_r,
+                    Eigen::Matrix<double, Eigen::Dynamic, 1>& vars,
+                    bool include_tparams = true, bool include_gqs = true,
+                    std::ostream* pstream = 0) const {
+      throw std::domain_error("throwing within write_array");
+    }
 
-  template <typename RNG>
-  void write_array(RNG& base_rng,
-                   Eigen::Matrix<double, Eigen::Dynamic, 1>& params_r,
-                   Eigen::Matrix<double, Eigen::Dynamic, 1>& vars,
-                   bool include_tparams = true, bool include_gqs = true,
-                   std::ostream* pstream = 0) const {
-    throw std::domain_error("throwing within write_array");
-  }
+    template <bool propto__, bool jacobian__, typename T_>
+    inline T_ log_prob(Eigen::Matrix<T_,Eigen::Dynamic,1>& params_r,
+               std::ostream* pstream = nullptr) const {
+      return 0.0;
+    }
+
+    inline void transform_inits(const stan::io::var_context& context,
+                         Eigen::Matrix<double, Eigen::Dynamic, 1>& params_r,
+                         std::ostream* pstream__ = nullptr) const {
+      
+    }
+
 };
 }  // namespace test
 
