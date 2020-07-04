@@ -17,10 +17,6 @@ else ifeq ($(OS),Darwin)
  OS_TAG := mac
 else ifeq ($(OS),Linux)
  OS_TAG := linux
-else ifeq ($(OS),missing-submodules)
- CMDSTAN_SUBMODULES = 0
-else
-  $(error  Cannot detect OS properly. $n This will impede automatically downloading the correct stanc. $n Please visit https://github.com/stan-dev/stanc3/releases and download a stanc binary for your OS and place it in ./bin/stanc. $n )
 endif
 
 ifneq ($(STANC3),)
