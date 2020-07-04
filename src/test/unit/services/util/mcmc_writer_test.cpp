@@ -42,8 +42,8 @@ class ServicesUtil : public ::testing::Test {
  public:
   ServicesUtil()
       : mcmc_writer(sample_writer, diagnostic_writer, logger),
-        model(context, &model_log),
-        throwing_model(context, &model_log) {}
+        model(context, 0, &model_log),
+        throwing_model(context, 0, &model_log) {}
 
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
   stan::test::unit::instrumented_logger logger;

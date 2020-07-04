@@ -16,7 +16,7 @@
 
 class ServicesSampleHmcNutsDenseEMassMatrix : public testing::Test {
  public:
-  ServicesSampleHmcNutsDenseEMassMatrix() : model(context, &model_log) {}
+  ServicesSampleHmcNutsDenseEMassMatrix() : model(context, 0, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;

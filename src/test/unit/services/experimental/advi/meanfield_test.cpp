@@ -6,7 +6,7 @@
 
 class ServicesExperimentalAdvi : public testing::Test {
  public:
-  ServicesExperimentalAdvi() : model(context, &model_log) {}
+  ServicesExperimentalAdvi() : model(context, 0, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_writer init, parameter, diagnostic;

@@ -58,7 +58,7 @@ class mock_sampler : public stan::mcmc::base_mcmc {
 class ServicesUtil : public testing::Test {
  public:
   ServicesUtil()
-      : model(context, &model_log),
+      : model(context, 0, &model_log),
         rng(stan::services::util::create_rng(0, 1)),
         num_warmup(0),
         num_samples(0),
