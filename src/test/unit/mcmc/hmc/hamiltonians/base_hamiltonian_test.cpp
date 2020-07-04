@@ -52,7 +52,7 @@ TEST(BaseHamiltonian, streams) {
       data_var_context, 0, static_cast<std::stringstream*>(0)));
   std::stringstream output;
   EXPECT_NO_THROW(
-      funnel_model_namespace::funnel_model model(data_var_context, &output));
+      funnel_model_namespace::funnel_model model(data_var_context, 0, &output));
   EXPECT_EQ("", output.str());
 
   stan::test::reset_std_streams();
