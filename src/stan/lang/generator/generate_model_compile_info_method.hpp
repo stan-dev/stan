@@ -15,7 +15,7 @@ namespace lang {
  * @param[in,out] o stream for generating
  */
 void generate_model_compile_info_method(std::ostream& o) {
-  o << INDENT << "std::vector<std::string> model_compile_info() {" << EOL
+  o << INDENT << "std::vector<std::string> model_compile_info() const {" << EOL
     << INDENT2 << "std::vector<std::string> stanc_info;" << EOL << INDENT2
     << "stanc_info.push_back(\"stanc_version = stanc2\");" << EOL << INDENT2
     << "return stanc_info;" << EOL << INDENT << "}" << EOL2;
