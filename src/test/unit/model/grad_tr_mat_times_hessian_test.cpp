@@ -15,7 +15,7 @@ TEST(ModelUtil, grad_tr_mat_times_hessian) {
 
   std::stringstream output;
 
-  valid_model_namespace::valid_model valid_model(data_var_context, &output);
+  valid_model_namespace::valid_model valid_model(data_var_context, 0, &output);
   EXPECT_NO_THROW(stan::model::grad_tr_mat_times_hessian(valid_model, x, X,
                                                          grad_tr_X_hess_f));
 
