@@ -211,7 +211,7 @@ int command(int num_warmup, int num_samples, const std::string data_file,
   callbacks::writer diagnostic_writer;
   callbacks::interrupt interrupt;
 
-  Model model(data_var_context, &std::cout);
+  Model model(data_var_context, 0, &std::cout);
   stan::io::empty_var_context init_context;
   double init_radius = 0;
   int id = 0;
