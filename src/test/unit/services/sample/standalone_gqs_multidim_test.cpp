@@ -48,7 +48,7 @@ TEST_F(ServicesStandaloneGQ2, genDraws_gq_test_multidim) {
   ASSERT_EQ(1000, multidim_csv.samples.rows());
   ASSERT_EQ(247, multidim_csv.samples.cols());
 
-  //model gq_test_multidim has 1 param, length 120
+  // model gq_test_multidim has 1 param, length 120
   std::vector<std::string> param_names;
   std::vector<std::vector<size_t>> param_dimss;
   stan::services::get_model_parameters(*model, param_names, param_dimss);
@@ -64,8 +64,8 @@ TEST_F(ServicesStandaloneGQ2, genDraws_gq_test_multidim) {
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   int return_code = stan::services::standalone_generate(
-      *model, multidim_csv.samples.middleCols<120>(7), 12345, interrupt,
-      logger, sample_writer);
+      *model, multidim_csv.samples.middleCols<120>(7), 12345, interrupt, logger,
+      sample_writer);
   EXPECT_EQ(return_code, stan::services::error_codes::OK);
   EXPECT_EQ(count_matches("gq_ar_mat", sample_ss.str()), 120);
   EXPECT_EQ(count_matches("\n", sample_ss.str()), 1001);
