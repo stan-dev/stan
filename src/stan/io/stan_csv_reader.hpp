@@ -175,7 +175,7 @@ class stan_csv_reader {
   }  // read_metadata
 
   static bool read_header(std::istream& in, std::vector<std::string>& header,
-                          std::ostream* out) {
+                          std::ostream* out, bool prettify_name = true) {
     std::string line;
 
     if (in.peek() != 'l')
@@ -192,7 +192,7 @@ class stan_csv_reader {
       boost::trim(token);
 
       int pos = token.find('.');
-      if (pos > 0) {
+      if (pos > 0 && prettify_name) {
         token.replace(pos, 1, "[");
         std::replace(token.begin(), token.end(), '.', ',');
         token += "]";
