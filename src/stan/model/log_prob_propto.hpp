@@ -35,10 +35,10 @@ double log_prob_propto(const M& model, std::vector<double>& params_r,
   using stan::math::var;
   using std::vector;
   try {
-  vector<var> ad_params_r;
-  ad_params_r.reserve(model.num_params_r());
-  for (size_t i = 0; i < model.num_params_r(); ++i)
-    ad_params_r.push_back(params_r[i]);
+    vector<var> ad_params_r;
+    ad_params_r.reserve(model.num_params_r());
+    for (size_t i = 0; i < model.num_params_r(); ++i)
+      ad_params_r.push_back(params_r[i]);
     double lp = model
                     .template log_prob<true, jacobian_adjust_transform>(
                         ad_params_r, params_i, msgs)
@@ -83,9 +83,9 @@ double log_prob_propto(const M& model, Eigen::VectorXd& params_r,
     for (size_t i = 0; i < model.num_params_r(); ++i)
       ad_params_r.push_back(params_r(i));
     double lp = model
-             .template log_prob<true, jacobian_adjust_transform>(ad_params_r,
-                                                                 params_i, msgs)
-             .val();
+                    .template log_prob<true, jacobian_adjust_transform>(
+                        ad_params_r, params_i, msgs)
+                    .val();
     stan::math::recover_memory();
     return lp;
   } catch (std::exception& ex) {
