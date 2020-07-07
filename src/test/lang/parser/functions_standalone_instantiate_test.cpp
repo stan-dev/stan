@@ -2,7 +2,8 @@
 #include <sstream>
 #include <test/test-models/good-standalone-functions/basic.hpp>
 #include <test/test-models/good-standalone-functions/special_functions.hpp>
-#include <test/test-models/good-standalone-functions/integrate.hpp>
+// integrate_* functions are no longer supported in stanc2 as of Stan 2.24
+// #include <test/test-models/good-standalone-functions/integrate.hpp>
 
 using namespace stan::math;
 
@@ -56,10 +57,11 @@ TEST(lang_parser, functions_standalone_instantiate_double_special) {
   expect_no_errors(error_stream);
 }
 
-TEST(lang_parser, functions_standalone_instantiate_numerical_integration) {
-  std::ostringstream error_stream;
+// integrate_* functions are no longer supported in stanc2 as of Stan 2.24
+// TEST(lang_parser, functions_standalone_instantiate_numerical_integration) {
+//   std::ostringstream error_stream;
 
-  // I am not interested in the results, just that the functions run
-  integrate_functions::ode_integrate(&error_stream);
-  expect_no_errors(error_stream);
-}
+//   // I am not interested in the results, just that the functions run
+//   integrate_functions::ode_integrate(&error_stream);
+//   expect_no_errors(error_stream);
+// }
