@@ -10,6 +10,7 @@ endif
 
 STANC_DL_RETRY = 5
 STANC_DL_DELAY = 10
+STANC3_TEST_BIN_URL ?= https://jenkins.mc-stan.org/job/stanc3-test-binaries/97/artifact
 
 ifeq ($(OS),Windows_NT)
  OS_TAG := windows
