@@ -41,6 +41,5 @@ TEST_F(ServicesUtilGQWriter, t2) {
   stan::services::util::gq_writer writer(sample_writer, logger, 2);
   writer.write_gq_values(model, rng1, draw);
   // model test_gq.stan generates 3 values, 2 commas
-  std::cout << sample_ss.str() << std::endl;
   EXPECT_EQ(count_matches(",", sample_ss.str()), 2);
 }
