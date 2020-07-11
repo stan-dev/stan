@@ -125,14 +125,6 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
 
   }  // unconstrained_param_names()
 
-  inline std::string get_constrained_sizedtypes() const {
-    return "";
-  }  // get_constrained_sizedtypes()
-
-  inline std::string get_unconstrained_sizedtypes() const {
-    return "";
-  }  // get_unconstrained_sizedtypes()
-
   // Begin method overload boilerplate
   template <typename RNG>
   void write_array(RNG& base_rng,
