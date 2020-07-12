@@ -31,7 +31,7 @@ void reject_test(const std::string& expected_msg1 = "",
 
   std::stringstream out;
   try {
-    M model(empty_data_context, &model_output);
+    M model(empty_data_context, 0, &model_output);
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
     double lp
@@ -66,7 +66,7 @@ void print_reject_test(const std::string& expected_msg1 = "") {
 
   std::stringstream ss;
   try {
-    M model(empty_data_context, &ss);
+    M model(empty_data_context, 0, &ss);
     std::vector<double> cont_vector(model.num_params_r(), 0.0);
     std::vector<int> disc_vector;
     double lp

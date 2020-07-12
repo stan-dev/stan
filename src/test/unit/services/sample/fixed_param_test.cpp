@@ -7,7 +7,7 @@
 
 class ServicesSamplesFixedParam : public testing::Test {
  public:
-  ServicesSamplesFixedParam() : model(context, &model_log) {}
+  ServicesSamplesFixedParam() : model(context, 0, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;

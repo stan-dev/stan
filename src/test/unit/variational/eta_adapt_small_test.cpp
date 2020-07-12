@@ -22,7 +22,7 @@ class eta_adapt_small_test : public ::testing::Test {
     std::stringstream data_stream(DATA);
     stan::io::dump data_var_context(data_stream);
 
-    model_ = new stan_model(data_var_context, &model_stream_);
+    model_ = new stan_model(data_var_context, 0, &model_stream_);
     cont_params_ = Eigen::VectorXd::Zero(model_->num_params_r());
     base_rng_.seed(727802408);
     model_stream_.str("");

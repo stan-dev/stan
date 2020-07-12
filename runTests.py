@@ -126,7 +126,7 @@ def findTests(base_path):
         for n in names
         if n.endswith(testsfx)
     ]
-    return map(mungeName, tests)
+    return list(map(mungeName, tests))
 
 
 def batched(tests):
