@@ -245,6 +245,15 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
+                stage('Math functions expressions test') {
+                    agent { label 'any' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        runTests("src/test/expressions", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
             }
             when {
                 expression {
