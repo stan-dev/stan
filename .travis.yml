@@ -20,14 +20,6 @@ linux_clang: &linux_clang
       sources: [ 'ubuntu-toolchain-r-test', 'llvm-toolchain-trusty-6.0' ]
       packages: [ 'clang-6.0', 'libc++-dev' ]
 
-linux_gcc: &linux_gcc
-  os: linux
-  compiler: "gcc-4.9"
-  addons:
-    apt:
-      sources: [ 'ubuntu-toolchain-r-test' ]
-      packages: [ 'g++-4.9' ]
-
 before_install: make math-revert
 
 matrix:
@@ -42,26 +34,6 @@ matrix:
     - <<: *linux_clang
       env:
         - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
-          TESTFOLDER="src/test/unit/lang/ast"
-          PARALLEL=2
-    - <<: *linux_clang
-      env:
-        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
-          TESTFOLDER="src/test/unit/lang/generator"
-          PARALLEL=2
-    - <<: *linux_clang
-      env:
-        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
-          TESTFOLDER="src/test/unit/lang/parser"
-          PARALLEL=2
-    - <<: *linux_clang
-      env:
-        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
-          TESTFOLDER="src/test/unit/lang/reject"
-          PARALLEL=2
-    - <<: *linux_clang
-      env:
-        - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/mcmc src/test/unit/model src/test/unit/optimization"
           PARALLEL=2
     - <<: *linux_clang
@@ -69,52 +41,6 @@ matrix:
         - MATRIX_EVAL="CXX=clang++-6.0 && CXXFLAGS_OS=-stdlib=libc++"
           TESTFOLDER="src/test/unit/services src/test/unit/variational src/test/unit/version_test.cpp"
           PARALLEL=2
-    - <<: *linux_gcc
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread && DEPFLAGS_OS='-M -E'"
-          TESTFOLDER="src/test/unit/callbacks src/test/unit/io"
-          PARALLEL=1
-    - <<: *linux_gcc
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread && DEPFLAGS_OS='-M -E'"
-          TESTFOLDER="src/test/unit/lang/*.cpp"
-          PARALLEL=1
-    - <<: *linux_gcc
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread && DEPFLAGS_OS='-M -E'"
-          TESTFOLDER="src/test/unit/lang/ast"
-          PARALLEL=1
-    - <<: *linux_gcc
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread && DEPFLAGS_OS='-M -E'"
-          TESTFOLDER="src/test/unit/lang/generator"
-          PARALLEL=1
-    - <<: *linux_gcc
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread && DEPFLAGS_OS='-M -E'"
-          TESTFOLDER="src/test/unit/lang/parser"
-          PARALLEL=1
-    - <<: *linux_gcc
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread && DEPFLAGS_OS='-M -E'"
-          TESTFOLDER="src/test/unit/lang/reject"
-          PARALLEL=1
-    - <<: *linux_gcc
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread && DEPFLAGS_OS='-M -E'"
-          TESTFOLDER="src/test/unit/mcmc src/test/unit/model src/test/unit/optimization"
-          PARALLEL=1
-    - <<: *linux_gcc
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread && DEPFLAGS_OS='-M -E'"
-          TESTFOLDER="src/test/unit/services  src/test/unit/version_test.cpp"
-          PARALLEL=1
-    - <<: *linux_gcc
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9 && CXXFLAGS_OS=-pthread && DEPFLAGS_OS='-M -E'"
-          TESTFOLDER="src/test/unit/variational"
-          PARALLEL=1
-
 
 script: ./runTests.py -j$PARALLEL $TESTFOLDER
 

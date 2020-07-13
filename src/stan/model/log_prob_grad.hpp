@@ -31,7 +31,6 @@ double log_prob_grad(const M& model, std::vector<double>& params_r,
                      std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
-  double lp;
   try {
     vector<var> ad_params_r(params_r.size());
     for (size_t i = 0; i < model.num_params_r(); ++i) {
@@ -40,14 +39,14 @@ double log_prob_grad(const M& model, std::vector<double>& params_r,
     }
     var adLogProb = model.template log_prob<propto, jacobian_adjust_transform>(
         ad_params_r, params_i, msgs);
-    lp = adLogProb.val();
+    double lp = adLogProb.val();
     adLogProb.grad(ad_params_r, gradient);
+    stan::math::recover_memory();
+    return lp;
   } catch (const std::exception& ex) {
     stan::math::recover_memory();
     throw;
   }
-  stan::math::recover_memory();
-  return lp;
 }
 
 /**
@@ -71,17 +70,17 @@ double log_prob_grad(const M& model, Eigen::VectorXd& params_r,
                      Eigen::VectorXd& gradient, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
-
-  Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r(params_r.size());
-  for (size_t i = 0; i < model.num_params_r(); ++i) {
-    stan::math::var var_i(params_r[i]);
-    ad_params_r[i] = var_i;
-  }
   try {
+    Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r(params_r.size());
+    for (size_t i = 0; i < model.num_params_r(); ++i) {
+      stan::math::var var_i(params_r[i]);
+      ad_params_r[i] = var_i;
+    }
     var adLogProb = model.template log_prob<propto, jacobian_adjust_transform>(
         ad_params_r, msgs);
     double val = adLogProb.val();
     stan::math::grad(adLogProb, ad_params_r, gradient);
+    stan::math::recover_memory();
     return val;
   } catch (std::exception& ex) {
     stan::math::recover_memory();

@@ -17,7 +17,7 @@ model {
   real v;
   print("In model block.");
   y ~ normal(0,1);
-  foo(v)
+  foo(v);
 }
 generated quantities {
   print("In generated quantities");

@@ -25,7 +25,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::impl_leapfrog<
       stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
@@ -76,7 +76,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::impl_leapfrog<
       stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
@@ -165,7 +165,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::impl_leapfrog<
       stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> >
@@ -216,7 +216,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::impl_leapfrog<
       stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> >

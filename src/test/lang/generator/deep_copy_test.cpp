@@ -37,7 +37,7 @@ TEST(lang, run_deep_copy) {
   std::stringstream model_output;
 
   // instantiate good test model parser-generator/deep-copy-warning
-  stan_model model(empty_data_context, &model_output);
+  stan_model model(empty_data_context, 0, &model_output);
 
   // check print stmts
   EXPECT_EQ(1, count_matches("y: 0.1", model_output.str()));

@@ -126,7 +126,7 @@ def findTests(base_path):
         for n in names
         if n.endswith(testsfx)
     ]
-    return map(mungeName, tests)
+    return list(map(mungeName, tests))
 
 
 def batched(tests):
@@ -142,7 +142,8 @@ def main():
 
     for batch in batched(tests):
         modelHpp = modelDependencies(batch)
-        makeTest(" ".join(modelHpp), inputs.j)
+        if len(modelHpp) > 0:
+            makeTest(" ".join(modelHpp), inputs.j)
         makeTest(" ".join(batch), inputs.j)
 
     if not inputs.make_only:
