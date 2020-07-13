@@ -9,8 +9,8 @@ if os.name == "nt":  # Windows
 else:
     make = "make"
 
-src_folder = "./src/test/unit/expressions/"
-build_folder = "./test/unit/expressions/"
+src_folder = "./src/test/expressions/"
+build_folder = "./test/expressions/"
 exceptions_list_location = "./lib/stan_math/test/expressions/stan_math_sigs_exceptions.expected"
 
 args2test = ["matrix", "vector", "row_vector"]
@@ -47,13 +47,13 @@ def get_signatures():
     if os.name == "nt":
         stanc3 = "bin/stanc.exe"
     else:
-        stanc3 = "bin/stanc"
+        stanc3 = "./bin/stanc"
     p = subprocess.Popen((make, stanc3))
     if p.wait() != 0:
         sys.stderr.write("Error in making stanc3!")
         sys.exit(-1)
 
-    p = subprocess.Popen((stanc3 + " --dump-stan-math-signatures"), stdout=subprocess.PIPE, universal_newlines=True)
+    p = subprocess.Popen((stanc3 + " --dump-stan-math-signatures"), stdout=subprocess.PIPE, universal_newlines=True, shell=True)
 
     res = []
     part_sig = ""
@@ -96,7 +96,7 @@ def save_tests_in_files(N_files, tests):
         start = i * len(tests) // N_files
         end = (i + 1) * len(tests) // N_files
         with open(src_folder + "tests%d_test.cpp" % i, "w") as out:
-            out.write("#include <test/unit/expressions/expression_test_helpers.hpp>\n\n")
+            out.write("#include <test/expressions/expression_test_helpers.hpp>\n\n")
             for test in tests[start:end]:
                 out.write(test)
 

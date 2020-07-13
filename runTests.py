@@ -145,7 +145,7 @@ def handleExpressionTests(tests, only_functions, n_test_files):
         import generateExpressionTests
         generateExpressionTests.main(only_functions, n_test_files)
         for i in range(n_test_files):
-            tests.append("test/unit/expressions/tests%d_test.cpp"%i)
+            tests.append("test/expressions/tests%d_test.cpp"%i)
     elif only_functions:
         stopErr("--only-functions can only be specified if running expression tests (test/expressions)", -1)
 
