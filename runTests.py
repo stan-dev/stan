@@ -43,8 +43,13 @@ def processCLIArgs():
         action="store_true",
         help="Don't run tests, just try to make them.",
     )
-    parser.add_argument("--only-functions", nargs="+", type=str, default=[],
-                        help="Function names to run expression tests for. Default: all functions")
+    parser.add_argument(
+        "--only-functions",
+        nargs="+",
+        type=str,
+        default=[],
+        help="Function names to run expression tests for. Default: all functions",
+    )
     # And parse the command line against those rules
     return parser.parse_args()
 
@@ -132,7 +137,7 @@ def findTests(base_path):
 
 
 def batched(tests):
-    return [tests[i: i + batchSize] for i in range(0, len(tests), batchSize)]
+    return [tests[i : i + batchSize] for i in range(0, len(tests), batchSize)]
 
 
 def handleExpressionTests(tests, only_functions, n_test_files):
@@ -143,11 +148,15 @@ def handleExpressionTests(tests, only_functions, n_test_files):
             expression_tests = True
     if expression_tests:
         import generateExpressionTests
+
         generateExpressionTests.main(only_functions, n_test_files)
         for i in range(n_test_files):
-            tests.append("test/expressions/tests%d_test.cpp"%i)
+            tests.append("test/expressions/tests%d_test.cpp" % i)
     elif only_functions:
-        stopErr("--only-functions can only be specified if running expression tests (test/expressions)", -1)
+        stopErr(
+            "--only-functions can only be specified if running expression tests (test/expressions)",
+            -1,
+        )
 
 
 def main():
