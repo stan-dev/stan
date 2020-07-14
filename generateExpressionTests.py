@@ -37,17 +37,18 @@ def get_ignored_signatures():
     part_sig = ""
     ignored = set()
     for signature in open(exceptions_list_location):
-        if not signature.endswith(")\n"):
-            part_sig += signature
-            continue
+        signature = part_sig + signature
         part_sig = ""
+        if not signature.endswith(")\n"):
+            part_sig = signature
+            continue
         ignored.add(signature)
     return ignored
 
 
 def get_signatures():
     if os.name == "nt":
-        stanc3 = "bin/stanc.exe"
+        stanc3 = ".\\bin\\stanc.exe"
     else:
         stanc3 = "./bin/stanc"
     p = subprocess.Popen((make, stanc3))
@@ -65,11 +66,12 @@ def get_signatures():
     res = []
     part_sig = ""
     for signature in p.stdout:
-        if not signature.endswith(")\n"):
-            part_sig += signature
-            continue
-        res.append(part_sig + signature)
+        signature = part_sig + signature
         part_sig = ""
+        if not signature.endswith(")\n"):
+            part_sig = signature
+            continue
+        res.append(signature)
 
     if p.wait() != 0:
         sys.stderr.write("Error in getting signatures from stanc3!\n")
