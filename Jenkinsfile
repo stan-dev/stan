@@ -246,7 +246,7 @@ pipeline {
                 //     post { always { deleteDir() } }
                 // }
                 stage('Math functions expressions test') {
-                    agent { label 'any' }
+                    agent any
                     steps {
                         unstash 'StanSetup'
                         setupCXX()
