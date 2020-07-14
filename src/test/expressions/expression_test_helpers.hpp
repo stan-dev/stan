@@ -8,53 +8,64 @@
 namespace stan {
 namespace test {
 
-template<typename Scal>
-struct counterOp{
+template <typename Scal>
+struct counterOp {
   int* counter_;
-  counterOp(int* counter){
-    counter_ = counter;
-  }
+  counterOp(int* counter) { counter_ = counter; }
   const Scal& operator()(const Scal& a) const {
     (*counter_)++;
     return a;
   }
 };
 
-template<typename T>
-auto recursive_sum(const T& a){
+template <typename T>
+auto recursive_sum(const T& a) {
   return math::sum(a);
 }
 
-template<typename T>
-auto recursive_sum(const std::vector<T>& a){
+template <typename T>
+auto recursive_sum(const std::vector<T>& a) {
   scalar_type_t<T> res = recursive_sum(a[0]);
-  for (int i=0;i<a.size();i++){
+  for (int i = 0; i < a.size(); i++) {
     res += recursive_sum(a[i]);
   }
   return res;
 }
 
-template<typename T, require_integral_t<T>* = nullptr> T make_arg() { return 1; }
-template<typename T, require_floating_point_t<T>* = nullptr> T make_arg() { return 0.4; }
-template<typename T, require_autodiff_t<T>* = nullptr> T make_arg() { return 0.4; }
-template<typename T, require_eigen_vector_t<T>* = nullptr> T make_arg() {
+template <typename T, require_integral_t<T>* = nullptr>
+T make_arg() {
+  return 1;
+}
+template <typename T, require_floating_point_t<T>* = nullptr>
+T make_arg() {
+  return 0.4;
+}
+template <typename T, require_autodiff_t<T>* = nullptr>
+T make_arg() {
+  return 0.4;
+}
+template <typename T, require_eigen_vector_t<T>* = nullptr>
+T make_arg() {
   T res(1);
   res << 0.1;
   return res;
 }
-template<typename T, require_eigen_matrix_t<T>* = nullptr> T make_arg() {
+template <typename T, require_eigen_matrix_t<T>* = nullptr>
+T make_arg() {
   T res(1, 1);
   res << 0.1;
   return res;
 }
-template<typename T, require_std_vector_t<T>* = nullptr> T make_arg() {
+template <typename T, require_std_vector_t<T>* = nullptr>
+T make_arg() {
   using V = value_type_t<T>;
   V tmp = make_arg<V>();
   T res;
   res.push_back(tmp);
   return res;
 }
-template<typename T, require_same_t<T, std::minstd_rand>* = nullptr> T make_arg() {
+template <typename T, require_same_t<T, std::minstd_rand>* = nullptr>
+T make_arg() {
   return std::minstd_rand(0);
 }
 
@@ -119,7 +130,7 @@ void expect_adj_eq(const T1& a, const T2& b, const char* msg) {
 
 template <typename T>
 void expect_adj_eq(const std::vector<T>& a, const std::vector<T>& b,
-                     const char* msg) {
+                   const char* msg) {
   EXPECT_EQ(a.size(), b.size()) << msg;
   for (int i = 0; i < a.size(); i++) {
     expect_adj_eq(a[i], b[i], msg);
@@ -129,11 +140,11 @@ void expect_adj_eq(const std::vector<T>& a, const std::vector<T>& b,
 #define TO_STRING_(x) #x
 #define TO_STRING(x) TO_STRING_(x)
 #define EXPECT_STAN_EQ(a, b) \
-  stan::test::expect_eq(      \
+  stan::test::expect_eq(     \
       a, b, "Error in file: " __FILE__ ", on line: " TO_STRING(__LINE__))
 #define EXPECT_STAN_ADJ_EQ(a, b) \
-  stan::test::expect_adj_eq(      \
+  stan::test::expect_adj_eq(     \
       a, b, "Error in file: " __FILE__ ", on line: " TO_STRING(__LINE__))
 
-}  // namespace math
+}  // namespace test
 }  // namespace stan
