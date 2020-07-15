@@ -30,7 +30,7 @@ namespace lang {
 void generate_function_instantiation(const function_decl_def& fun,
                                      const std::vector<std::string>& namespaces,
                                      std::ostream& out) {
-  // Do not generate anything for forward decalrations
+  // Do not generate anything for forward declarations
   if (fun.body_.is_no_op_statement()) {
     return;
   }

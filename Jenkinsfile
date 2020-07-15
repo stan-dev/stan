@@ -2,12 +2,12 @@
 import org.stan.Utils
 
 def utils = new org.stan.Utils()
+def skipRemainingStages = false
 
-def setupCXX(failOnError = true) {
+def setupCXX(failOnError = true, CXX = env.CXX) {
     errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CXX=${env.CXX} ${errorStr}")
+    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
 }
-
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
     if (separateMakeStep) {
@@ -28,24 +28,6 @@ def runTestsWin(String testPath) {
 def deleteDirWin() {
     bat "attrib -r -s /s /d"
     deleteDir()
-}
-
-def sourceCodePaths(){
-    // These paths will be passed to git diff
-    // If there are changes to them, CI/CD will continue else skip
-    def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
-        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
-        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
-        'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
-    ]
-    
-    def bashArray = ""
-
-    for(path in paths){
-        bashArray += path + (path != paths[paths.size() - 1] ? " " : "")
-    }
-
-    return bashArray
 }
 
 String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
@@ -72,9 +54,6 @@ pipeline {
                 + "e.g. PR-640.")
         string(defaultValue: 'downstream_tests', name: 'cmdstan_pr',
           description: 'PR to test CmdStan upstream against e.g. PR-630')
-    }
-    environment {
-        scPaths = sourceCodePaths()
     }
     options {
         skipDefaultCheckout()
@@ -106,7 +85,7 @@ pipeline {
                     """
                     utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
-                    setupCXX()
+                    setupCXX(true, env.GCC)
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
@@ -188,48 +167,15 @@ pipeline {
                     retry(3) { checkout scm }
                     sh 'git clean -xffd'
 
-                    def commitHash = sh(script: "git rev-parse HEAD | tr '\\n' ' '", returnStdout: true)
-                    def changeTarget = ""
+                    // These paths will be passed to git diff
+                    // If there are changes to them, CI/CD will continue else skip
+                    def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
+                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
+                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
+                        'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
+                    ].join(" ")
 
-                    if (env.CHANGE_TARGET) {
-                        println "This build is a PR, checking out target branch to compare changes."
-                        changeTarget = env.CHANGE_TARGET
-                        sh(script: "git pull && git checkout ${changeTarget}", returnStdout: false)
-                    }
-                    else{
-                        println "This build is not PR, checking out current branch and extract HEAD^1 commit to compare changes or develop when downstream_tests."
-                        if (env.BRANCH_NAME == "downstream_tests"){
-                            sh(script: "git checkout develop && git pull", returnStdout: false)
-                            changeTarget = sh(script: "git rev-parse HEAD^1 | tr '\\n' ' '", returnStdout: true)
-                            sh(script: "git checkout ${commitHash}", returnStdout: false)
-                        }
-                        else{
-                            sh(script: "git pull && git checkout ${env.BRANCH_NAME}", returnStdout: false)
-                            changeTarget = sh(script: "git rev-parse HEAD^1 | tr '\\n' ' '", returnStdout: true)
-                        }
-                    }
-
-                    println "Comparing differences between current ${commitHash} and target ${changeTarget}."
-
-                    def bashScript = """
-                        for i in ${env.scPaths};
-                        do
-                            git diff ${commitHash} ${changeTarget} -- \$i
-                        done
-                    """
-
-                    def differences = sh(script: bashScript, returnStdout: true)
-
-                    println differences
-
-                    if (differences?.trim()) {
-                        println "There are differences in the source code, CI/CD will run."
-                        skipRemainingStages = false
-                    }
-                    else{
-                        println "There aren't any differences in the source code, CI/CD will not run."
-                        skipRemainingStages = true
-                    }
+                    skipRemainingStages = utils.verifyChanges(paths)
                 }
             }
             post {
@@ -258,8 +204,18 @@ pipeline {
                     }
                     post { always { deleteDirWin() } }
                 }
-                stage('Unit') {
-                    agent any
+                stage('Linux Unit') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(true, env.GCC)
+                        sh "g++ --version"
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Mac Unit') {
+                    agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(false)
@@ -270,18 +226,31 @@ pipeline {
             }
         }
         stage('Integration') {
+            parallel {
+                stage('Integration Linux') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(true, env.GCC)
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Integration Mac') {
+                    agent { label 'osx' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+            }
             when {
                 expression {
                     !skipRemainingStages
                 }
             }
-            agent any
-            steps {
-                unstash 'StanSetup'
-                setupCXX()
-                runTests("src/test/integration", separateMakeStep=false)
-            }
-            post { always { deleteDir() } }
         }
         stage('Upstream CmdStan tests') {
             when { 

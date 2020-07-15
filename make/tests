@@ -1,3 +1,59 @@
+ifdef STANC2
+TEST_STANC=test/test-models/stanc2$(EXE)
+else
+TEST_STANC=bin/stanc$(EXE)
+endif
+
+##
+# Build/download stanc3
+##
+
+STANC_DL_RETRY = 5
+STANC_DL_DELAY = 10
+
+ifeq ($(OS),Windows_NT)
+ OS_TAG := windows
+else ifeq ($(OS),Darwin)
+ OS_TAG := mac
+else ifeq ($(OS),Linux)
+ OS_TAG := linux
+endif
+
+ifneq ($(STANC3),)
+  
+  # build stanc3 from local installation
+  bin/stanc$(EXE) : $(call findfiles,$(STANC3)/src/,*.ml*) $(STANC#)
+	@mkdir -p $(dir $@)
+	cd $(STANC3) && echo "--- Rebuilding stanc ---\n" && dune build @install
+	cp $(STANC3)/_build/default/src/stanc/stanc.exe $@
+	
+else ifneq ($(STANC3_TEST_BIN_URL),)
+
+# download stanc3 build from specific branch
+ifeq ($(OS_TAG),windows)
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	$(shell echo "curl -L $(STANC3_TEST_BIN_URL)/bin/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
+else
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	curl -L $(STANC3_TEST_BIN_URL)/bin/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
+	chmod +x bin/stanc$(EXE)
+endif # end download if/else
+
+else ifeq ($(OS_TAG),windows)
+# get latest stanc3 - Windows
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	$(shell echo "curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)")
+else
+# get latest stanc3 - Linux & MacOS
+    bin/stanc$(EXE) :
+	@mkdir -p $(dir $@)
+	curl -L https://github.com/stan-dev/stanc3/releases/download/nightly/$(OS_TAG)-stanc -o bin/stanc$(EXE) --retry $(STANC_DL_RETRY) --retry-delay $(STANC_DL_DELAY)
+	chmod +x bin/stanc$(EXE)
+endif
+
 ##
 # Build test executables
 ##
@@ -23,24 +79,24 @@ src/test/%.d : INC += $(INC_GTEST)
 src/test/%.d : DEPTARGETS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@
 
 ## this is for the $(STANC_TEMPLATE_INSTANTIATION) files
-src/stan/%.d : DEPTARGETS = -MT test/test-models/stanc$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@
+src/stan/%.d : DEPTARGETS = -MT test/test-models/stanc2$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@
 
 ifneq ($(filter test/%$(EXE),$(MAKECMDGOALS)),)
 -include $(patsubst test/%$(EXE),src/test/%.d,$(filter test/%,$(MAKECMDGOALS)))
 endif
 
 ifneq ($(filter test/unit/lang/%$(EXE),$(MAKECMDGOALS)),)
--include src/test/test-models/stanc.d
+-include src/test/test-models/stanc2.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
-ifneq ($(filter test/test-models/stanc$(EXE) test/test-models/stanc.o,$(MAKECMDGOALS)),)
--include src/test/test-models/stanc.d
+ifneq ($(filter test/test-models/stanc2$(EXE) test/test-models/stanc2.o,$(MAKECMDGOALS)),)
+-include src/test/test-models/stanc2.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
 ifneq ($(filter test/test-models/good/%.hpp test/test-models/good/%.hpp-test,$(MAKECMDGOALS)),)
--include src/test/test-models/stanc.d
+-include src/test/test-models/stanc2.d
 -include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
 endif
 
@@ -50,7 +106,7 @@ endif
 # needed by subset of unit tests that test stan compiler
 # all these tests are under stan/test/unit/lang
 ##
-STANC_TESTS_HEADERS := $(shell find src/test/unit/lang -type f -name '*_test.cpp')
+STANC_TESTS_HEADERS := $(call findfiles,src/test/unit/lang,*_test.cpp)
 STANC_TESTS_O := $(patsubst src/%.cpp,%.o,$(STANC_TESTS_HEADERS))
 STANC_TESTS := $(patsubst src/%.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 
@@ -64,7 +120,7 @@ $(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
 # Target to verify header files within Stan has
 # enough include calls
 ##
-HEADER_TESTS := $(addsuffix -test,$(shell find src/stan -name '*.hpp' -type f))
+HEADER_TESTS := $(addsuffix -test,$(call findfiles,src/stan,*.hpp))
 
 ifeq ($(OS),Windows_NT)
   DEV_NULL = nul
@@ -153,25 +209,25 @@ test/integration/multiple_translation_units_test$(EXE) : test/integration/libmtu
 ##
 # Use the stanc compiler to generate C++ from Stan programs
 ##
-test/test-models/stanc$(EXE) : O = $(O_STANC)
-test/test-models/stanc$(EXE) : test/libstanc.a
-test/test-models/stanc$(EXE) : LDLIBS += $(LDLIBS_STANC)
-test/test-models/stanc$(EXE) : %$(EXE) : %.o
+test/test-models/stanc2$(EXE) : O = $(O_STANC)
+test/test-models/stanc2$(EXE) : test/libstanc.a
+test/test-models/stanc2$(EXE) : LDLIBS += $(LDLIBS_STANC)
+test/test-models/stanc2$(EXE) : %$(EXE) : %.o
 	@mkdir -p $(dir $@)
 	$(LINK.cpp) $< $(LDLIBS) $(OUTPUT_OPTION)
 
-TEST_MODELS = $(shell find src/test/test-models -type f -name '*.stan')
-$(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/test-models/%.stan test/test-models/stanc$(EXE)
+TEST_MODELS = $(call findfiles,src/test/test-models,*.stan)
+$(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/test-models/%.stan $(TEST_STANC)
 	@mkdir -p $(dir $@)
-	$(WINE) test/test-models/stanc$(EXE) $< --o=$@
+	$(WINE) $(TEST_STANC) $< --o=$@
 
 ##
 # Generate C++ from Stan standalone functions
 ##
-TEST_FUNCTIONS = $(shell find src/test/test-models -type f -name '*.stanfuncs')
-$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs test/test-models/stanc$(EXE)
+TEST_FUNCTIONS = $(call findfiles,src/test/test-models,*.stanfuncs)
+$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs test/test-models/stanc2$(EXE)
 	@mkdir -p $(dir $@)
-	$(WINE) test/test-models/stanc$(EXE) $< --o=$@
+	$(WINE) test/test-models/stanc2$(EXE) $< --o=$@
 
 ##
 # src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.
@@ -193,7 +249,7 @@ test/unit/lang/stanc_helper_test.o: change-file-permissions
 # Add additional dependencies for tests that should translate Stan to hpp, but
 # isn't included in the source using `#include`.
 ##
-test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(shell find src/test/test-models/good/parser-generator -type f -name '*.stan'))
+test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(call findfiles,src/test/test-models/good/parser-generator,*.stan))
 
 ##
 # Compile models depends on every model within
@@ -201,10 +257,10 @@ test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(shell 
 # be code-generated to a *.hpp, then passed through
 # the compiler using the -fsyntax-only flag
 ##
-test/integration/compile_models_test$(EXE): $(patsubst src/%.stan,%.hpp-test,$(shell find src/test/test-models/good -type f -name '*.stan'))
+test/integration/compile_models_test$(EXE): $(patsubst src/%.stan,%.hpp-test,$(call findfiles,src/test/test-models/good,*.stan))
 
 ##
 # Same trick as above for models, but for standalone functions, using
 # "src/test/test-models/good-standalone-functions/*.stanfuncs"
 ##
-test/integration/compile_standalone_functions_test$(EXE): $(patsubst src/%.stanfuncs,%.hpp-test,$(shell find src/test/test-models/good-standalone-functions -type f -name '*.stanfuncs'))
+test/integration/compile_standalone_functions_test$(EXE): $(patsubst src/%.stanfuncs,%.hpp-test,$(call findfiles,src/test/test-models/good-standalone-functions,*.stanfuncs))

@@ -7,7 +7,7 @@ functions {
 transformed data {
   real v;
   print("In transformed data");
-  foo(v)
+  foo(v);
 }
 parameters {
   real y;

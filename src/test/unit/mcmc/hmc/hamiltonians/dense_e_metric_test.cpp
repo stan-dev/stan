@@ -78,7 +78,8 @@ TEST(McmcDenseEMetric, gradients) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  funnel_model_namespace::funnel_model model(data_var_context, &model_output);
+  funnel_model_namespace::funnel_model model(data_var_context, 0,
+                                             &model_output);
 
   stan::mcmc::dense_e_metric<funnel_model_namespace::funnel_model, rng_t>
       metric(model);

@@ -9,7 +9,7 @@
 namespace stan {
 namespace mcmc {
 /**
- * Exhausive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
+ * Exhaustive Hamiltonian Monte Carlo (XHMC) with multinomial sampling
  * with a Gaussian-Riemannian disintegration and SoftAbs metric
  */
 template <class Model, class BaseRNG>

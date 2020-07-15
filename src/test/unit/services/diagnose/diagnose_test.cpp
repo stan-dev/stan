@@ -9,7 +9,7 @@
 class ServicesDiagnose : public testing::Test {
  public:
   ServicesDiagnose()
-      : init(init_ss), parameter(parameter_ss), model(context, &model_ss) {}
+      : init(init_ss), parameter(parameter_ss), model(context, 0, &model_ss) {}
 
   std::stringstream init_ss, parameter_ss, model_ss;
   stan::test::unit::instrumented_logger logger;

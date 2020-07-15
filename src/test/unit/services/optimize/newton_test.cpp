@@ -39,7 +39,7 @@ class values : public stan::callbacks::stream_writer {
 class ServicesOptimizeNewton : public testing::Test {
  public:
   ServicesOptimizeNewton()
-      : init(init_ss), parameter(parameter_ss), model(context, &model_ss) {}
+      : init(init_ss), parameter(parameter_ss), model(context, 0, &model_ss) {}
 
   std::stringstream init_ss, parameter_ss, model_ss;
   stan::test::unit::instrumented_logger logger;
@@ -54,13 +54,13 @@ TEST_F(ServicesOptimizeNewton, rosenbrock) {
   unsigned int chain = 1;
   double init_radius = 0;
 
-  int num_interations = 1000;
+  int num_iterations = 1000;
   bool save_iterations = true;
   mock_callback callback;
 
   int return_code = stan::services::optimize::newton(
-      model, context, seed, chain, init_radius, num_interations,
-      save_iterations, callback, logger, init, parameter);
+      model, context, seed, chain, init_radius, num_iterations, save_iterations,
+      callback, logger, init, parameter);
 
   EXPECT_EQ(0, return_code);
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
@@ -91,13 +91,13 @@ TEST_F(ServicesOptimizeNewton, rosenbrock_no_save_iterations) {
   unsigned int chain = 1;
   double init_radius = 0;
 
-  int num_interations = 1000;
+  int num_iterations = 1000;
   bool save_iterations = false;
   mock_callback callback;
 
   int return_code = stan::services::optimize::newton(
-      model, context, seed, chain, init_radius, num_interations,
-      save_iterations, callback, logger, init, parameter);
+      model, context, seed, chain, init_radius, num_iterations, save_iterations,
+      callback, logger, init, parameter);
 
   EXPECT_EQ(0, return_code);
   EXPECT_EQ(logger.call_count(), logger.call_count_info())

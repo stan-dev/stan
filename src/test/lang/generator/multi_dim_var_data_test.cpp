@@ -29,7 +29,7 @@ TEST(lang, multidim_data_good) {
 
   // Instantiate model
   try {
-    stan_model my_model(data_var_context, &out);
+    stan_model my_model(data_var_context, 0, &out);
   } catch (std::exception& e) {
     FAIL();
   }
@@ -47,7 +47,7 @@ TEST(lang, multidim_data_bad) {
 
   // Instantiate model
   try {
-    stan_model my_model(data_var_context, &out);
+    stan_model my_model(data_var_context, 0, &out);
   } catch (std::exception& e) {
     EXPECT_EQ(
         1, count_matches("is 9.95238, but must be less than or equal to 1  (in "

@@ -11,7 +11,7 @@ namespace lang {
  * suffix indicating it is a probability function.
  *
  * @param[in] name function name
- * @return true if function anme has a suffix indicating it is a
+ * @return true if function name has a suffix indicating it is a
  * probability function
  */
 bool has_prob_fun_suffix(const std::string& name);

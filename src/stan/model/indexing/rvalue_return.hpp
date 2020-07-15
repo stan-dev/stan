@@ -44,7 +44,7 @@ struct rvalue_return<C, nil_index_list> {
 
 /**
  * Template class specialization for an Eigen matrix, vector or
- * rwo vector and one multiple index.
+ * row vector and one multiple index.
  *
  * @tparam T Type of scalar in matrix.
  * @tparam I Type of first index (only instantiated to multi

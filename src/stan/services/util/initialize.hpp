@@ -8,6 +8,7 @@
 #include <stan/io/chained_var_context.hpp>
 #include <stan/model/log_prob_grad.hpp>
 #include <stan/math/prim.hpp>
+#include <chrono>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -146,7 +147,7 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
       logger.info(e.what());
       throw;
     }
-    if (!boost::math::isfinite(log_prob)) {
+    if (!std::isfinite(log_prob)) {
       logger.info("Rejecting initial value:");
       logger.info(
           "  Log probability evaluates to log(0),"
@@ -158,7 +159,7 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
     }
     std::stringstream log_prob_msg;
     std::vector<double> gradient;
-    clock_t start_check = clock();
+    auto start = std::chrono::steady_clock::now();
     try {
       // we evaluate this with propto=true since we're
       // evaluating with autodiff variables
@@ -170,13 +171,15 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
       logger.info(e.what());
       throw;
     }
-    clock_t end_check = clock();
+    auto end = std::chrono::steady_clock::now();
     double deltaT
-        = static_cast<double>(end_check - start_check) / CLOCKS_PER_SEC;
+        = std::chrono::duration_cast<std::chrono::microseconds>(end - start)
+              .count()
+          / 1000000.0;
     if (log_prob_msg.str().length() > 0)
       logger.info(log_prob_msg);
 
-    bool gradient_ok = boost::math::isfinite(stan::math::sum(gradient));
+    bool gradient_ok = std::isfinite(stan::math::sum(gradient));
 
     if (!gradient_ok) {
       logger.info("Rejecting initial value:");

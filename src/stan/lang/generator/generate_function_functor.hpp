@@ -16,7 +16,7 @@ namespace stan {
 namespace lang {
 
 /**
- * Generate the functor to accompnay a function with the specified
+ * Generate the functor to accompany a function with the specified
  * declaration, writing to the specified stream.
  *
  * @param[in] fun function declaration

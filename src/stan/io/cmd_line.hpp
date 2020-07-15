@@ -256,7 +256,7 @@ class cmd_line {
   }
 };
 
-// explicit instantation for std::string to allow for spaces
+// explicit instantiation for std::string to allow for spaces
 // in bare_[n]
 template <>
 inline bool cmd_line::bare<std::string>(size_t n, std::string& x) const {
@@ -266,7 +266,7 @@ inline bool cmd_line::bare<std::string>(size_t n, std::string& x) const {
   return true;
 }
 
-// explicit instantation for std::string to allow for spaces
+// explicit instantiation for std::string to allow for spaces
 // in key_val_
 template <>
 inline bool cmd_line::val<std::string>(const std::string& key,

@@ -10,7 +10,7 @@
 class ServicesUtil : public testing::Test {
  public:
   ServicesUtil()
-      : model(context, &model_log),
+      : model(context, 0, &model_log),
         rng(stan::services::util::create_rng(0, 1)),
         sampler(model, rng),
         num_warmup(0),

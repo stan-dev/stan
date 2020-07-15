@@ -26,7 +26,7 @@ class advi_test : public ::testing::Test {
     stan::io::dump data_var_context(data_stream);
     data_stream.close();
 
-    model_ = new stan_model(data_var_context, &model_stream_);
+    model_ = new stan_model(data_var_context, 0, &model_stream_);
     cont_params_ = Eigen::VectorXd::Zero(model_->num_params_r());
     base_rng_.seed(3021828106u);
     model_stream_.str("");

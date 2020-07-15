@@ -15,7 +15,7 @@ TEST(ModelUtil, gradient_dot_vector) {
   data_stream.close();
 
   std::stringstream output;
-  valid_model_namespace::valid_model valid_model(data_var_context, &output);
+  valid_model_namespace::valid_model valid_model(data_var_context, 0, &output);
   EXPECT_NO_THROW(
       stan::model::gradient_dot_vector(valid_model, x, v, f, grad_f_dot_v));
 
