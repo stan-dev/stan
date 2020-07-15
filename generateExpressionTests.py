@@ -34,6 +34,10 @@ arg_types = {
 
 
 def get_ignored_signatures():
+    """
+    Loads list of ignored signatures from the file listing the exceptions.
+    :return: list of ignored signatures
+    """
     part_sig = ""
     ignored = set()
     for signature in open(exceptions_list_location):
@@ -47,6 +51,10 @@ def get_ignored_signatures():
 
 
 def get_signatures():
+    """
+    Retrieves function signatures from stanc3
+    :return: list of signatures
+    """
     if os.name == "nt":
         stanc3 = ".\\bin\\stanc.exe"
     else:
@@ -81,6 +89,11 @@ def get_signatures():
 
 
 def parse_signature(signature):
+    """
+    Parses one signature
+    :param signature: stanc3 function signature
+    :return: return type, fucntion name and list of function argument types
+    """
     return_type, rest = signature.split(" ", 1)
     function_name, rest = rest.split("(", 1)
     args = re.findall(r"(?:[(][^()]+[)][^,()]+)|(?:[^,()]+(?:,*[]])?)", rest)
@@ -89,6 +102,18 @@ def parse_signature(signature):
 
 
 def make_arg_code(arg, scalar, var_name, function_name):
+    """
+    Makes code for declaration and initialization of an argument to function.
+
+    Default argument range works for most function, but some need values outside this
+    range - these require special handling. Specific lambda is also hardcoded - if we
+    use more lambdas in future this may need to be extended.
+    :param arg: stan lang type of the argument
+    :param scalar: scalar type used in arguemnt
+    :param var_name: name of the variable to create
+    :param function_name: name of the function that will be tested using this argument
+    :return: code for declaration and initialization of an argument
+    """
     arg_type = arg_types[arg].replace("SCALAR", scalar)
     if arg == "(vector, vector, data real[], data int[]) => vector":
         return (
@@ -114,6 +139,11 @@ def make_arg_code(arg, scalar, var_name, function_name):
 
 
 def save_tests_in_files(N_files, tests):
+    """
+    Saves tests in files
+    :param N_files: number of files to distribute tests into
+    :param tests: list of test sources
+    """
     for i in range(N_files):
         start = i * len(tests) // N_files
         end = (i + 1) * len(tests) // N_files
@@ -124,6 +154,20 @@ def save_tests_in_files(N_files, tests):
 
 
 def main(functions=(), j=1):
+    """
+    Generates expression tests. Functions that do not support expressions yet are listed
+    in stan_math/tests/expressions/stan_math_sigs_exceptions.expected
+
+    For every signature prim, rev and fwd instantiations are tested (with all scalars
+    of type double/var/fvar<double>). Tests check the following:
+     - signatures can be compiled with expressions arguments
+     - results when given expressions are same as when given plain matrices
+       (including derivatives)
+     - functions evaluate expressions at most once
+
+    :param functions: functions to generate tests for. Default: all
+    :param j: number of files to split tests in
+    """
     ignored = get_ignored_signatures()
 
     test_n = {}
@@ -218,7 +262,8 @@ def main(functions=(), j=1):
 
 def processCLIArgs():
     """
-    Define and process the command line interface to the runTests.py script.
+    Define and process the command line interface to the generateExpressionTests
+    .py script.
     """
     parser = ArgumentParser(
         description="Generate and run stan math expression tests.",
