@@ -2,6 +2,7 @@
 #define STAN_MCMC_HMC_HAMILTONIANS_DIAG_E_POINT_HPP
 
 #include <stan/callbacks/writer.hpp>
+#include <stan/math/prim/err.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 
 namespace stan {
@@ -34,6 +35,8 @@ public:
    * @param inv_e_metric initial mass matrix
    */
   void set_inv_metric(const Eigen::VectorXd& inv_e_metric) {
+    math::check_size_match("set_inv_metric", "Number of rows in old inverse metric", inv_e_metric_.size(),
+			   "number of rows in new inverse metric", inv_e_metric.size());
     inv_e_metric_ = inv_e_metric;
   }
 
