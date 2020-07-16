@@ -15,7 +15,7 @@ exceptions_list_location = (
     "./lib/stan_math/test/expressions/stan_math_sigs_exceptions.expected"
 )
 
-args2test = ["matrix", "vector", "row_vector"]
+eigen_types = ["matrix", "vector", "row_vector"]
 arg_types = {
     "int": "int",
     "int[]": "std::vector<int>",
@@ -32,11 +32,25 @@ arg_types = {
     "rng": "std::minstd_rand",
 }
 
+test_code_template = """
+TEST(ExpressionTest{overload}, {function_name}{signature_number}) {{
+{matrix_argument_declarations}
+  auto res_mat = stan::math::{function_name}({matrix_argument_list});
+
+{expression_argument_declarations}
+  auto res_expr = stan::math::{function_name}({expression_argument_list});
+
+  EXPECT_STAN_EQ(res_expr, res_mat);
+
+{checks}
+}}
+"""
+
 
 def get_ignored_signatures():
     """
     Loads list of ignored signatures from the file listing the exceptions.
-    :return: list of ignored signatures
+    :return: set of ignored signatures
     """
     part_sig = ""
     ignored = set()
@@ -105,11 +119,12 @@ def make_arg_code(arg, scalar, var_name, function_name):
     """
     Makes code for declaration and initialization of an argument to function.
 
-    Default argument range works for most function, but some need values outside this
-    range - these require special handling. Specific lambda is also hardcoded - if we
-    use more lambdas in future this may need to be extended.
+    Default argument range (between 0 and 1) works for most function, but some need
+    values outside this range - these require special handling. Specific lambda is
+    also hardcoded - if we use more functor arguments in future this may need to be
+    extended.
     :param arg: stan lang type of the argument
-    :param scalar: scalar type used in arguemnt
+    :param scalar: scalar type used in argument
     :param var_name: name of the variable to create
     :param function_name: name of the function that will be tested using this argument
     :return: code for declaration and initialization of an argument
@@ -117,21 +132,21 @@ def make_arg_code(arg, scalar, var_name, function_name):
     arg_type = arg_types[arg].replace("SCALAR", scalar)
     if arg == "(vector, vector, data real[], data int[]) => vector":
         return (
-            "  %s %s = [](const auto& a, const auto&, const auto&, const auto&){return a;};"
+            "  %s %s = [](const auto& a, const auto&, const auto&, const auto&){return a;}"
             % (arg_type, var_name)
         )
     elif function_name == "acosh":
         return (
-            "  %s %s = stan::math::as_array_or_scalar(stan::test::make_arg<%s>())+1;\n"
+            "  %s %s = stan::math::as_array_or_scalar(stan::test::make_arg<%s>())+1"
             % (arg_type, var_name, arg_type)
         )
     elif function_name == "log1m_exp":
         return (
-            "  %s %s = stan::math::as_array_or_scalar(stan::test::make_arg<%s>())-1;\n"
+            "  %s %s = stan::math::as_array_or_scalar(stan::test::make_arg<%s>())-1"
             % (arg_type, var_name, arg_type)
         )
     else:
-        return "  %s %s = stan::test::make_arg<%s>();\n" % (
+        return "  %s %s = stan::test::make_arg<%s>()" % (
             arg_type,
             var_name,
             arg_type,
@@ -168,19 +183,28 @@ def main(functions=(), j=1):
     :param functions: functions to generate tests for. Default: all
     :param j: number of files to split tests in
     """
+    remaining_functions = set(functions)
     ignored = get_ignored_signatures()
 
     test_n = {}
     tests = []
-    for signature in get_signatures():
+    signatures = get_signatures()
+    if functions:
+        signatures.append("matrix bad_no_expressions(matrix)")
+        signatures.append("matrix bad_multiple_evaluations(matrix)")
+        signatures.append("real bad_wrong_value(matrix)")
+        signatures.append("real bad_wrong_derivatives(vector)")
+    for signature in signatures:
         return_type, function_name, function_args = parse_signature(signature)
-        if signature in ignored:
+        if signature in ignored and not functions:
             continue
-        for arg2test in args2test:
+        for arg2test in eigen_types:
             if arg2test in function_args:
                 break
         else:
             continue
+        if function_name in remaining_functions:
+            remaining_functions.remove(function_name)
         if functions and function_name not in functions:
             continue
         func_test_n = test_n.get(function_name, 0)
@@ -189,7 +213,6 @@ def main(functions=(), j=1):
         if function_name.endswith("_rng"):
             function_args.append("rng")
 
-        test_code = ""
         for overload, scalar in (
             ("Prim", "double"),
             ("Rev", "stan::math::var"),
@@ -197,66 +220,72 @@ def main(functions=(), j=1):
         ):
             if function_name.endswith("_rng") and overload != "Prim":
                 continue
-            test_code += "TEST(ExpressionTest%s, %s%d){\n" % (
-                overload,
-                function_name,
-                func_test_n,
-            )
 
+            mat_declarations = ""
             for n, arg in enumerate(function_args):
-                test_code += make_arg_code(arg, scalar, "arg_mat%d" % n, function_name)
-            test_code += "  auto res_mat = stan::math::%s(" % function_name
-            for n in range(len(function_args) - 1):
-                test_code += "arg_mat%d, " % n
-            test_code += "arg_mat%d);\n\n" % (len(function_args) - 1)
+                mat_declarations += make_arg_code(arg, scalar, "arg_mat%d" % n, function_name) + ";\n"
 
+            mat_arg_list = ", ".join("arg_mat%d" % n for n in range(len(function_args)))
+
+            expression_declarations = ""
             for n, arg in enumerate(function_args):
-                test_code += make_arg_code(arg, scalar, "arg_expr%d" % n, function_name)
+                expression_declarations += make_arg_code(arg, scalar, "arg_expr%d" % n, function_name) + ";\n"
                 if arg in arg2test:
-                    test_code += "  int counter%d = 0;\n" % n
-                    test_code += (
+                    expression_declarations += "  int counter%d = 0;\n" % n
+                    expression_declarations += (
                         "  stan::test::counterOp<%s> counter_op%d(&counter%d);\n"
                         % (scalar, n, n)
                     )
-            test_code += "  auto res_expr = stan::math::%s(" % function_name
+
+            expression_arg_list = ""
             for n, arg in enumerate(function_args[:-1]):
                 if arg in arg2test:
-                    test_code += "arg_expr%d.unaryExpr(counter_op%d), " % (n, n)
+                    expression_arg_list += "arg_expr%d.unaryExpr(counter_op%d), " % (n, n)
                 else:
-                    test_code += "arg_expr%d, " % n
+                    expression_arg_list += "arg_expr%d, " % n
             if function_args[-1] in arg2test:
-                test_code += "arg_expr%d.unaryExpr(counter_op%d));\n\n" % (
+                expression_arg_list += "arg_expr%d.unaryExpr(counter_op%d)" % (
                     len(function_args) - 1,
                     len(function_args) - 1,
                 )
             else:
-                test_code += "arg_expr%d);\n\n" % (len(function_args) - 1)
+                expression_arg_list += "arg_expr%d" % (len(function_args) - 1)
 
-            test_code += "  EXPECT_STAN_EQ(res_expr, res_mat);\n"
-
+            checks = ""
             for n, arg in enumerate(function_args):
                 if arg in arg2test:
+                    # besides evaluating its input rank also accesses one of the elements,
+                    # resulting in counter being incremented twice.
                     if function_name == "rank":
-                        test_code += "  EXPECT_LE(counter%d, 2);\n" % (n)
+                        checks += "  EXPECT_LE(counter%d, 2);\n" % n
                     else:
-                        test_code += "  EXPECT_LE(counter%d, 1);\n" % (n)
+                        checks += "  EXPECT_LE(counter%d, 1);\n" % n
             if overload == "Rev" and (
                 return_type.startswith("real")
                 or return_type.startswith("vector")
                 or return_type.startswith("row_vector")
                 or return_type.startswith("matrix")
             ):
-                test_code += "  (stan::test::recursive_sum(res_mat) + stan::test::recursive_sum(res_expr)).grad();\n"
+                checks += "  (stan::test::recursive_sum(res_mat) + stan::test::recursive_sum(res_expr)).grad();\n"
                 for n, arg in enumerate(function_args):
+                    # functors don't have adjoints to check
                     if arg == "(vector, vector, data real[], data int[]) => vector":
                         continue
-                    test_code += "  EXPECT_STAN_ADJ_EQ(arg_expr%d,arg_mat%d);\n" % (
+                    checks += "  EXPECT_STAN_ADJ_EQ(arg_expr%d,arg_mat%d);\n" % (
                         n,
                         n,
                     )
-            test_code += "}\n\n"
-        tests.append(test_code)
-
+            tests.append(test_code_template.format(overload=overload,
+                                                   function_name=function_name,
+                                                   signature_number=func_test_n,
+                                                   matrix_argument_declarations=mat_declarations,
+                                                   matrix_argument_list=mat_arg_list,
+                                                   expression_argument_declarations=expression_declarations,
+                                                   expression_argument_list=expression_arg_list,
+                                                   checks=checks,
+                                                   ))
+    if remaining_functions:
+        raise NameError("Functions not found: " + ", ".join(remaining_functions))
     save_tests_in_files(j, tests)
 
 

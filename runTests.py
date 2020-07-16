@@ -140,7 +140,10 @@ def batched(tests):
     return [tests[i : i + batchSize] for i in range(0, len(tests), batchSize)]
 
 
-def handleExpressionTests(tests, only_functions, n_test_files):
+def handleExpressionTests(tests, only_functions, j):
+    # for debugging we want single file, otherwise a large number to
+    # better distribute the compiling workload
+    n_test_files = 1 if j==1 else 2*j
     expression_tests = False
     for n, i in list(enumerate(tests))[::-1]:
         if "test/expressions" in i or "test\\expressions" in i:
@@ -164,7 +167,7 @@ def main():
 
     tests = inputs.tests
 
-    handleExpressionTests(tests, inputs.only_functions, inputs.j * 2)
+    handleExpressionTests(tests, inputs.only_functions, inputs.j)
 
     tests = findTests(tests)
     if not tests:

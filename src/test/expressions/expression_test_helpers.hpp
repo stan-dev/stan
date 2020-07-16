@@ -40,20 +40,24 @@ template <typename T, require_floating_point_t<T>* = nullptr>
 T make_arg() {
   return 0.4;
 }
-template <typename T, require_autodiff_t<T>* = nullptr>
+template <typename T, require_var_t<T>* = nullptr>
 T make_arg() {
   return 0.4;
+}
+template <typename T, require_fvar_t<T>* = nullptr>
+T make_arg() {
+  return {0.4,0.5};
 }
 template <typename T, require_eigen_vector_t<T>* = nullptr>
 T make_arg() {
   T res(1);
-  res << 0.1;
+  res << make_arg<value_type_t<T>>();
   return res;
 }
 template <typename T, require_eigen_matrix_t<T>* = nullptr>
 T make_arg() {
   T res(1, 1);
-  res << 0.1;
+  res << make_arg<value_type_t<T>>();
   return res;
 }
 template <typename T, require_std_vector_t<T>* = nullptr>
@@ -147,4 +151,35 @@ void expect_adj_eq(const std::vector<T>& a, const std::vector<T>& b,
       a, b, "Error in file: " __FILE__ ", on line: " TO_STRING(__LINE__))
 
 }  // namespace test
+
+namespace math {
+
+template <typename T>
+auto bad_no_expressions(const Eigen::Matrix<T, -1, -1>& a) {
+  return a;
+}
+
+template <typename T>
+auto bad_multiple_evaluations(const T& a) {
+  return a + a;
+}
+
+template <typename T>
+auto bad_wrong_value(const T& a) {
+  if (std::is_same<T, plain_type_t<T>>::value) {
+    return a(0, 0);
+  }
+  return a(0, 0) + 1;
+}
+
+template <typename T>
+auto bad_wrong_derivatives(const T& a) {
+  operands_and_partials<T> ops(a);
+  if (!is_constant<T>::value && std::is_same<T, plain_type_t<T>>::value) {
+    ops.edge1_.partials_[0] = 1234;
+  }
+  return ops.build(0);
+}
+
+}  // namespace math
 }  // namespace stan
