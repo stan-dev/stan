@@ -230,7 +230,7 @@ def main(functions=(), j=1):
             expression_declarations = ""
             for n, arg in enumerate(function_args):
                 expression_declarations += make_arg_code(arg, scalar, "arg_expr%d" % n, function_name) + ";\n"
-                if arg in arg2test:
+                if arg in eigen_types:
                     expression_declarations += "  int counter%d = 0;\n" % n
                     expression_declarations += (
                         "  stan::test::counterOp<%s> counter_op%d(&counter%d);\n"
@@ -239,11 +239,11 @@ def main(functions=(), j=1):
 
             expression_arg_list = ""
             for n, arg in enumerate(function_args[:-1]):
-                if arg in arg2test:
+                if arg in eigen_types:
                     expression_arg_list += "arg_expr%d.unaryExpr(counter_op%d), " % (n, n)
                 else:
                     expression_arg_list += "arg_expr%d, " % n
-            if function_args[-1] in arg2test:
+            if function_args[-1] in eigen_types:
                 expression_arg_list += "arg_expr%d.unaryExpr(counter_op%d)" % (
                     len(function_args) - 1,
                     len(function_args) - 1,
@@ -253,7 +253,7 @@ def main(functions=(), j=1):
 
             checks = ""
             for n, arg in enumerate(function_args):
-                if arg in arg2test:
+                if arg in eigen_types:
                     # besides evaluating its input rank also accesses one of the elements,
                     # resulting in counter being incremented twice.
                     if function_name == "rank":
