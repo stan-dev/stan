@@ -46,7 +46,7 @@ T make_arg() {
 }
 template <typename T, require_fvar_t<T>* = nullptr>
 T make_arg() {
-  return {0.4,0.5};
+  return {0.4, 0.5};
 }
 template <typename T, require_eigen_vector_t<T>* = nullptr>
 T make_arg() {
