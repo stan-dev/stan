@@ -16,7 +16,7 @@ actual stderr:
 
 class TestExpressionTestingFramework(unittest.TestCase):
     def runCommand(self, command):
-        p1 = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        p1 = subprocess.Popen(command, stdout = subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
         out, err = p1.communicate()
         return p1.returncode, out, err
 
