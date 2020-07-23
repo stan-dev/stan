@@ -253,8 +253,9 @@ pipeline {
                         script {
                             dir("lib/stan_math/") {
                                 withEnv(['PATH+TBB=./lib/tbb']) {
-                                    try { bat "./runTests.py -j${env.PARALLEL} test/expressions" }
-                                    finally { junit 'test/**/*.xml' }
+                                    bat "./runTests.py -j${env.PARALLEL} test/expressions"
+                                    //try { bat "./runTests.py -j${env.PARALLEL} test/expressions" }
+                                    //finally { junit 'test/**/*.xml' }
                                 }
                             }
                         }
