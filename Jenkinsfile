@@ -25,6 +25,13 @@ def runTestsWin(String testPath) {
     }
 }
 
+def runMathTests(String testPath) {
+    withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
+       try { bat "cd lib/stan_math; runTests.py -j${env.PARALLEL} ${testPath}; cd .." }
+       finally { junit 'lib/stan_math/test/**/*.xml' }
+    }
+}
+
 def deleteDirWin() {
     bat "attrib -r -s /s /d"
     deleteDir()
@@ -159,89 +166,98 @@ pipeline {
                 }
             }
         }
-        stage('Verify changes') {
-            agent { label 'linux' }
-            steps {
-                script {         
+        // stage('Verify changes') {
+        //     agent { label 'linux' }
+        //     steps {
+        //         script {         
 
-                    retry(3) { checkout scm }
-                    sh 'git clean -xffd'
+        //             retry(3) { checkout scm }
+        //             sh 'git clean -xffd'
 
-                    // These paths will be passed to git diff
-                    // If there are changes to them, CI/CD will continue else skip
-                    def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
-                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
-                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
-                        'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
-                    ].join(" ")
+        //             // These paths will be passed to git diff
+        //             // If there are changes to them, CI/CD will continue else skip
+        //             def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
+        //                 'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
+        //                 'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
+        //                 'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
+        //             ].join(" ")
 
-                    skipRemainingStages = utils.verifyChanges(paths)
-                }
-            }
-            post {
-                always {
-                    deleteDir()
-                }
-            }
-        }
-        stage('Unit tests') {
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
-            parallel {
-                stage('Windows Headers & Unit') {
-                    agent { label 'windows' }
-                    steps {
-                        deleteDirWin()
-                            unstash 'StanSetup'
-                            setupCXX()
-                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                            bat "mingw32-make -j${env.PARALLEL} test-headers"
-                            setupCXX(false)
-                            runTestsWin("src/test/unit")
-                    }
-                    post { always { deleteDirWin() } }
-                }
-                stage('Linux Unit') {
-                    agent { label 'linux' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
-                        sh "g++ --version"
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Mac Unit') {
-                    agent { label 'osx' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(false)
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
-            }
-        }
+        //             skipRemainingStages = utils.verifyChanges(paths)
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             deleteDir()
+        //         }
+        //     }
+        // }
+        // stage('Unit tests') {
+        //     when {
+        //         expression {
+        //             !skipRemainingStages
+        //         }
+        //     }
+        //     parallel {
+        //         stage('Windows Headers & Unit') {
+        //             agent { label 'windows' }
+        //             steps {
+        //                 deleteDirWin()
+        //                     unstash 'StanSetup'
+        //                     setupCXX()
+        //                     bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+        //                     bat "mingw32-make -j${env.PARALLEL} test-headers"
+        //                     setupCXX(false)
+        //                     runTestsWin("src/test/unit")
+        //             }
+        //             post { always { deleteDirWin() } }
+        //         }
+        //         stage('Linux Unit') {
+        //             agent { label 'linux' }
+        //             steps {
+        //                 unstash 'StanSetup'
+        //                 setupCXX(true, env.GCC)
+        //                 sh "g++ --version"
+        //                 runTests("src/test/unit")
+        //             }
+        //             post { always { deleteDir() } }
+        //         }
+        //         stage('Mac Unit') {
+        //             agent { label 'osx' }
+        //             steps {
+        //                 unstash 'StanSetup'
+        //                 setupCXX(false)
+        //                 runTests("src/test/unit")
+        //             }
+        //             post { always { deleteDir() } }
+        //         }
+        //     }
+        // }
         stage('Integration') {
             parallel {
-                stage('Integration Linux') {
-                    agent { label 'linux' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
-                        runTests("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Integration Mac') {
-                    agent { label 'osx' }
+                // stage('Integration Linux') {
+                //     agent { label 'linux' }
+                //     steps {
+                //         unstash 'StanSetup'
+                //         setupCXX(true, env.GCC)
+                //         runTests("src/test/integration", separateMakeStep=false)
+                //     }
+                //     post { always { deleteDir() } }
+                // }
+                // stage('Integration Mac') {
+                //     agent { label 'osx' }
+                //     steps {
+                //         unstash 'StanSetup'
+                //         setupCXX()
+                //         runTests("src/test/integration", separateMakeStep=false)
+                //     }
+                //     post { always { deleteDir() } }
+                // }
+                stage('Math functions expressions test') {
+                    agent any
                     steps {
                         unstash 'StanSetup'
                         setupCXX()
-                        runTests("src/test/integration", separateMakeStep=false)
+                        runMathTests("test/expressions", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
                 }
