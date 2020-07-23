@@ -257,7 +257,6 @@ pipeline {
                             }
                         }
                     }
-                    }
                     post { always { deleteDir() } }
                 }
             }
