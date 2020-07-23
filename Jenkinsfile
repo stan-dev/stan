@@ -25,13 +25,6 @@ def runTestsWin(String testPath) {
     }
 }
 
-def runMathTests(String testPath) {
-    withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
-       try { bat "cd lib/stan_math; runTests.py -j${env.PARALLEL} ${testPath}; cd .." }
-       finally { junit 'lib/stan_math/test/**/*.xml' }
-    }
-}
-
 def deleteDirWin() {
     bat "attrib -r -s /s /d"
     deleteDir()
@@ -257,7 +250,10 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX()
-                        runMathTests("test/expressions", separateMakeStep=false)
+                        withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
+                            try { bat "cd lib/stan_math; runTests.py -j${env.PARALLEL} test/expressions; cd .." }
+                            finally { junit 'lib/stan_math/test/**/*.xml' }
+                        }
                     }
                     post { always { deleteDir() } }
                 }
