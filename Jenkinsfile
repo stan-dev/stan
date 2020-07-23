@@ -250,12 +250,13 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX()
-                        script {
-                            withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
-                                try { bat "cd lib/stan_math; runTests.py -j${env.PARALLEL} test/expressions; cd .." }
-                                finally { junit 'lib/stan_math/test/**/*.xml' }
+                        dir("lib/stan_math/") {
+                            withEnv(['PATH+TBB=./lib/tbb']) {
+                                try { bat "./runTests.py -j${env.PARALLEL} test/expressions" }
+                                finally { junit 'test/**/*.xml' }
                             }
                         }
+                    }
                     }
                     post { always { deleteDir() } }
                 }
