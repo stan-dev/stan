@@ -252,10 +252,9 @@ pipeline {
                         setupCXX()
                         script {
                             dir("lib/stan_math/") {
-                                withEnv(['PATH+TBB=./lib/tbb']) {
-                                    bat "./runTests.py -j${env.PARALLEL} test/expressions"
-                                    //try { bat "./runTests.py -j${env.PARALLEL} test/expressions" }
-                                    //finally { junit 'test/**/*.xml' }
+                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                    try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
+                                    finally { junit 'test/**/*.xml' }
                                 }
                             }
                         }
