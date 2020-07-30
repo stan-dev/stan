@@ -15,6 +15,15 @@
 namespace stan {
 namespace mcmc {
 
+/**
+ * Base class for Hamiltonian samplers.
+ *
+ * @tparam Model The type of the Stan model.
+ * @tparam Hamiltonian The type of Hamiltonians over the (unconstrained)
+ * parameter space.
+ * @tparam Integrator The type of integrator (e.g. leapfrog).
+ * @tparam BaseRNG The type of random number generator.
+ */
 template <class Model, template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
 class base_hmc : public base_mcmc {
@@ -132,7 +141,21 @@ class base_hmc : public base_mcmc {
     this->z_.ps_point::operator=(z_init);
   }
 
+  /**
+   * Gets the current point in the (unconstrained) parameter space.
+   *
+   * @return The current point in the (unconstrained) parameter space.
+   */
   typename Hamiltonian<Model, BaseRNG>::PointType& z() { return z_; }
+
+  /**
+   * Gets the current point in the (unconstrained) parameters space.
+   *
+   * @return The current point in the (unconstrained) parameters space.
+   */
+  const typename Hamiltonian<Model, BaseRNG>::PointType& z() const noexcept {
+    return z_;
+  }
 
   virtual void set_nominal_stepsize(double e) {
     if (e > 0)
