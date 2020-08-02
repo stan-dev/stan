@@ -257,7 +257,7 @@ pipeline {
                                     finally { junit 'test/**/*.xml' }
                                 }
                                 withEnv(['PATH+TBB=./lib/tbb']) {           
-                                    sh "./test/expressions/test_expression_testing_framework.py"
+                                    sh "python ./test/expressions/test_expression_testing_framework.py"
                                 }
                             }
                         }
