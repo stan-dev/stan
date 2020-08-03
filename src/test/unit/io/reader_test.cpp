@@ -29,6 +29,18 @@ TEST(io_reader, scalar) {
   EXPECT_FLOAT_EQ(2.0, y);
   EXPECT_EQ(0U, reader.available());
 }
+TEST(io_reader, complex) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(1.0);
+  theta.push_back(2.0);
+  stan::io::reader<double> reader(theta, theta_i);
+  auto x = reader.complex();
+  EXPECT_FLOAT_EQ(1.0, x.real());
+  EXPECT_FLOAT_EQ(2.0, x.imag());
+  EXPECT_EQ(0U, reader.available());
+}
+
 TEST(io_reader, scalar_constrain) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -41,6 +53,7 @@ TEST(io_reader, scalar_constrain) {
   EXPECT_FLOAT_EQ(2.0, y);
   EXPECT_EQ(0U, reader.available());
 }
+
 TEST(io_reader, scalar_constrain_jacobian) {
   std::vector<int> theta_i;
   std::vector<double> theta;

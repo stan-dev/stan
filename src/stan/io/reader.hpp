@@ -54,13 +54,20 @@ class reader {
   }
 
  public:
-  typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
-  typedef Eigen::Matrix<T, Eigen::Dynamic, 1> vector_t;
-  typedef Eigen::Matrix<T, 1, Eigen::Dynamic> row_vector_t;
+  using matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+  using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
+  using row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
+  using complex_t = std::complex<T>;
+  using complex_matrix_t = Eigen::Matrix<complex_t, Eigen::Dynamic, Eigen::Dynamic>;
+  using complex_vector_t = Eigen::Matrix<complex_t, Eigen::Dynamic, 1>;
+  using complex_row_vector_t = Eigen::Matrix<complex_t, 1, Eigen::Dynamic>;
 
-  typedef Eigen::Map<matrix_t> map_matrix_t;
-  typedef Eigen::Map<vector_t> map_vector_t;
-  typedef Eigen::Map<row_vector_t> map_row_vector_t;
+  using map_matrix_t = Eigen::Map<matrix_t>;
+  using map_vector_t = Eigen::Map<vector_t>;
+  using map_row_vector_t = Eigen::Map<row_vector_t>;
+  using map_complex_matrix_t = Eigen::Map<complex_matrix_t>;
+  using map_complex_vector_t = Eigen::Map<complex_vector_t>;
+  using map_complex_row_vector_t = Eigen::Map<complex_row_vector_t>;
 
   /**
    * Construct a variable reader using the specified vectors
@@ -75,11 +82,6 @@ class reader {
    */
   reader(std::vector<T> &data_r, std::vector<int> &data_i)
       : data_r_(data_r), data_i_(data_i) {}
-
-  /**
-   * Destroy this variable reader.
-   */
-  ~reader() {}
 
   /**
    * Return the number of scalars remaining to be read.
@@ -159,6 +161,41 @@ class reader {
   T scalar_constrain(T & /*log_prob*/) { return scalar(); }
 
   /**
+   * Return the next scalar in the sequence as a complex type.
+   *
+   * @return Next scalar value.
+   */
+  inline auto complex() {
+    if (pos_ >= data_r_.size()) {
+      throw std::runtime_error("no more scalars to read");
+    }
+    auto real_val(data_r_[pos_++]);
+    auto imag_val(data_r_[pos_++]);
+    return complex_t(real_val, imag_val);
+  }
+
+  /**
+   * Return the next scalar as a complex type.  For arbitrary scalars,
+   * constraint is a no-op.
+   *
+   * @return Next scalar.
+   */
+  inline auto complex_constrain() { return complex_t(scalar(), scalar()); }
+
+  /**
+   * Return the next scalar in the sequence as a complex type, incrementing
+   * the specified reference with the log absolute Jacobian determinant.
+   *
+   * <p>With no transformation, the Jacobian increment is a no-op.
+   *
+   * <p>See <code>scalar_constrain()</code>.
+   *
+   * log_prob Reference to log probability variable to increment.
+   * @return Next scalar.
+   */
+  inline auto complex_constrain(T & /*log_prob*/) { return complex_t(scalar(), scalar()); }
+
+  /**
    * Return a standard library vector of the specified
    * dimensionality made up of the next scalars.
    *
@@ -212,6 +249,76 @@ class reader {
     return map_vector_t(&scalar_ptr_increment(m), m);
   }
 
+
+/**
+ * Return a standard library vector of the specified
+ * dimensionality made up of the next scalars as complex types.
+ *
+ * @param m Size of vector.
+ * @return Vector made up of the next scalars.
+ */
+inline std::vector<T> complex_std_vector(size_t m) {
+  if (m == 0)
+    return std::vector<std::complex<T>>();
+  std::vector<std::complex<T>> vec(m);
+  for (size_t i = 0; i < m; ++i) {
+    vec[i] = std::complex<T>(scalar(), scalar());
+  }
+  return vec;
+}
+
+/**
+ * Return a column vector of specified dimensionality made up of
+ * the next scalars as complex types.
+ *
+ * @param m Number of rows in the vector to read.
+ * @return Column vector made up of the next scalars.
+ */
+inline auto complex_vector(size_t m) {
+  if (m == 0)
+    return complex_vector_t();
+  complex_vector_t vec(m);
+  for (size_t i = 0; i < m; ++i) {
+    vec[i] = std::complex<T>(scalar(), scalar());
+  }
+  return vec;
+}
+
+/**
+ * Return a column vector of specified dimensionality made up of
+ * the next scalars as complex types.  The constraint is a no-op.
+ *
+ * @param m Number of rows in the vector to read.
+ * @return Column vector made up of the next scalars.
+ */
+inline auto complex_vector_constrain(size_t m) {
+  if (m == 0)
+    return complex_vector_t();
+  complex_vector_t vec(m);
+  for (size_t i = 0; i < m; ++i) {
+    vec[i] = std::complex<T>(scalar(), scalar());
+  }
+  return vec;
+}
+
+/**
+ * Return a column vector of specified dimensionality made up of
+ * the next scalars as complex types.  The constraint and hence Jacobian are no-ops.
+ *
+ * @param m Number of rows in the vector to read.
+ * lp Log probability to increment.
+ * @return Column vector made up of the next scalars.
+ */
+inline auto complex_vector_constrain(size_t m, T & /*lp*/) {
+  if (m == 0)
+    return complex_vector_t();
+  complex_vector_t vec(m);
+  for (size_t i = 0; i < m; ++i) {
+    vec[i] = std::complex<T>(scalar(), scalar());
+  }
+  return vec;
+}
+
   /**
    * Return a row vector of specified dimensionality made up of
    * the next scalars.
@@ -219,10 +326,10 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  inline row_vector_t row_vector(size_t m) {
+  inline auto row_vector(size_t m) {
     if (m == 0)
       return row_vector_t();
-    return map_row_vector_t(&scalar_ptr_increment(m), m);
+    return row_vector_t(map_row_vector_t(&scalar_ptr_increment(m), m));
   }
 
   /**
@@ -235,7 +342,7 @@ class reader {
   inline row_vector_t row_vector_constrain(size_t m) {
     if (m == 0)
       return row_vector_t();
-    return map_row_vector_t(&scalar_ptr_increment(m), m);
+    return row_vector_t(map_row_vector_t(&scalar_ptr_increment(m), m));
   }
 
   /**
@@ -250,7 +357,61 @@ class reader {
   inline row_vector_t row_vector_constrain(size_t m, T & /*lp*/) {
     if (m == 0)
       return row_vector_t();
-    return map_row_vector_t(&scalar_ptr_increment(m), m);
+    return row_vector_t(map_row_vector_t(&scalar_ptr_increment(m), m));
+  }
+
+
+  /**
+   * Return a row vector of specified dimensionality made up of
+   * the next scalars as a complex type.
+   *
+   * @param m Number of rows in the vector to read.
+   * @return Column vector made up of the next scalars.
+   */
+  inline auto complex_row_vector(size_t m) {
+    if (m == 0)
+      return complex_row_vector_t();
+    complex_row_vector_t vec(m);
+    for (size_t i = 0; i < m; ++i) {
+      vec[i] = std::complex<T>(scalar(), scalar());
+    }
+    return vec;
+  }
+
+  /**
+   * Return a row vector of specified dimensionality made up of
+   * the next scalars as complex types.  The constraint is a no-op.
+   *
+   * @param m Number of rows in the vector to read.
+   * @return Column vector made up of the next scalars.
+   */
+  inline auto complex_row_vector_constrain(size_t m) {
+    if (m == 0)
+      return complex_row_vector_t();
+    complex_row_vector_t vec(m);
+    for (size_t i = 0; i < m; ++i) {
+      vec[i] = std::complex<T>(scalar(), scalar());
+    }
+    return vec;
+  }
+
+  /**
+   * Return a row vector of specified dimensionality made up of
+   * the next scalars.  The constraint is a no-op, so the log
+   * probability is not incremented.
+   *
+   * @param m Number of rows in the vector to read.
+   * lp Log probability to increment.
+   * @return Column vector made up of the next scalars.
+   */
+  inline row_vector_t complex_row_vector_constrain(size_t m, T & /*lp*/) {
+    if (m == 0)
+      return complex_row_vector_t();
+    complex_row_vector_t vec(m);
+    for (size_t i = 0; i < m; ++i) {
+      vec[i] = std::complex<T>(scalar(), scalar());
+    }
+    return vec;
   }
 
   /**
@@ -309,6 +470,79 @@ class reader {
       return matrix_t(m, n);
     return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
   }
+
+//
+/**
+ * Return a matrix of the specified dimensionality made up of
+ * the next scalars arranged in column-major order.
+ *
+ * Row-major reading means that if a matrix of <code>m=2</code>
+ * rows and <code>n=3</code> columns is read and the next
+ * scalar values are <code>1,2,3,4,5,6</code>, the result is
+ *
+ * <pre>
+ * a = 1 4
+ *     2 5
+ *     3 6</pre>
+ *
+ * @param m Number of rows.
+ * @param n Number of columns.
+ * @return Eigen::Matrix made up of the next scalars.
+ */
+inline auto complex_matrix(size_t m, size_t n) {
+  if (m == 0 || n == 0)
+    return complex_matrix_t(m, n);
+  complex_matrix_t mat(m, n);
+  const auto iter_val = m * n;
+  for (size_t i = 0; i < iter_val; ++i) {
+    mat(i) = std::complex<T>(scalar(), scalar());
+  }
+  return mat;
+}
+
+/**
+ * Return a matrix of the specified dimensionality made up of
+ * the next scalars arranged in column-major order.  The
+ * constraint is a no-op.  See <code>matrix(size_t,
+ * size_t)</code> for more information.
+ *
+ * @param m Number of rows.
+ * @param n Number of columns.
+ * @return Matrix made up of the next scalars.
+ */
+inline auto complex_matrix_constrain(size_t m, size_t n) {
+  if (m == 0 || n == 0)
+    return complex_matrix_t(m, n);
+  complex_matrix_t mat(m, n);
+  const auto iter_val = m * n;
+  for (size_t i = 0; i < iter_val; ++i) {
+    mat(i) = std::complex<T>(scalar(), scalar());
+  }
+  return mat;
+}
+
+/**
+ * Return a matrix of the specified dimensionality made up of
+ * the next scalars arranged in column-major order.  The
+ * constraint is a no-op, hence the log probability is not
+ * incremented.  See <code>matrix(size_t, size_t)</code>
+ * for more information.
+ *
+ * @param m Number of rows.
+ * @param n Number of columns.
+ * lp Log probability to increment.
+ * @return Matrix made up of the next scalars.
+ */
+inline auto complex_matrix_constrain(size_t m, size_t n, T & /*lp*/) {
+  if (m == 0 || n == 0)
+    return complex_matrix_t(m, n);
+  complex_matrix_t mat(m, n);
+  const auto iter_val = m * n;
+  for (size_t i = 0; i < iter_val; ++i) {
+    mat(i) = std::complex<T>(scalar(), scalar());
+  }
+  return mat;
+}
 
   /**
    * Return the next integer, checking that it is greater than
@@ -482,6 +716,47 @@ class reader {
 
   /**
    * Return the next scalar, checking that it is
+   * positive.
+   *
+   * <p>See <code>stan::math::check_positive(T)</code>.
+   *
+   * @return Next positive scalar.
+   * @throw std::runtime_error if x is not positive
+   */
+  inline auto complex_pos() {
+    complex_t x(scalar(), scalar());
+    stan::math::check_positive("stan::io::scalar_pos", "Constrained scalar", x);
+    return x;
+  }
+
+  /**
+   * Return the next scalar, transformed to be positive.
+   *
+   * <p>See <code>stan::math::positive_constrain(T)</code>.
+   *
+   * @return The next scalar transformed to be positive.
+   */
+  inline auto complex_pos_constrain() {
+    return stan::math::positive_constrain(complex());
+  }
+
+  /**
+   * Return the next scalar transformed to be positive,
+   * incrementing the specified reference with the log absolute
+   * determinant of the Jacobian.
+   *
+   * <p>See <code>stan::math::positive_constrain(T,T&)</code>.
+   *
+   * @param lp Reference to log probability variable to increment.
+   * @return The next scalar transformed to be positive.
+   */
+  inline auto complex_pos_constrain(T &lp) {
+    return stan::math::positive_constrain(complex(), lp);
+  }
+
+
+  /**
+   * Return the next scalar, checking that it is
    * greater than or equal to the specified lower bound.
    *
    * <p>See <code>stan::math::check_greater_or_equal(T,double)</code>.
@@ -531,6 +806,59 @@ class reader {
   inline T scalar_lb_constrain(const TL lb, T &lp) {
     return stan::math::lb_constrain(scalar(), lb, lp);
   }
+
+
+/**
+ * Return the next scalar, checking that it is
+ * greater than or equal to the specified lower bound.
+ *
+ * <p>See <code>stan::math::check_greater_or_equal(T,double)</code>.
+ *
+ * @param lb Lower bound.
+ * @return Next scalar value.
+ * @tparam TL Type of lower bound.
+ * @throw std::runtime_error if the scalar is less than the
+ *    specified lower bound
+ */
+template <typename TL>
+inline auto complex_lb(const TL lb) {
+  complex_t x(complex());
+  stan::math::check_greater_or_equal("stan::io::scalar_lb",
+                                     "Constrained scalar", x, lb);
+  return x;
+}
+
+/**
+ * Return the next scalar transformed to have the
+ * specified lower bound.
+ *
+ * <p>See <code>stan::math::lb_constrain(T,double)</code>.
+ *
+ * @tparam TL Type of lower bound.
+ * @param lb Lower bound on values.
+ * @return Next scalar transformed to have the specified
+ * lower bound.
+ */
+template <typename TL>
+inline auto complex_lb_constrain(const TL lb) {
+  return stan::math::lb_constrain(complex(), lb);
+}
+
+/**
+ * Return the next scalar transformed to have the specified
+ * lower bound, incrementing the specified reference with the
+ * log of the absolute Jacobian determinant of the transform.
+ *
+ * <p>See <code>stan::math::lb_constrain(T,double,T&)</code>.
+ *
+ * @tparam TL Type of lower bound.
+ * @param lb Lower bound on result.
+ * @param lp Reference to log probability variable to increment.
+ */
+template <typename TL>
+inline auto complex_lb_constrain(const TL lb, T &lp) {
+  return stan::math::lb_constrain(complex(), lb, lp);
+}
 
   /**
    * Return the next scalar, checking that it is
@@ -583,6 +911,59 @@ class reader {
   inline T scalar_ub_constrain(const TU ub, T &lp) {
     return stan::math::ub_constrain(scalar(), ub, lp);
   }
+
+
+/**
+ * Return the next scalar, checking that it is
+ * less than or equal to the specified upper bound.
+ *
+ * <p>See <code>stan::math::check_less_or_equal(T,double)</code>.
+ *
+ * @tparam TU Type of upper bound.
+ * @param ub Upper bound.
+ * @return Next scalar value.
+ * @throw std::runtime_error if the scalar is greater than the
+ *    specified upper bound
+ */
+template <typename TU>
+inline auto complex_ub(TU ub) {
+  complex_t x(complex());
+  stan::math::check_less_or_equal("stan::io::scalar_ub", "Constrained scalar",
+                                  x, ub);
+  return x;
+}
+
+/**
+ * Return the next scalar transformed to have the
+ * specified upper bound.
+ *
+ * <p>See <code>stan::math::ub_constrain(T,double)</code>.
+ *
+ * @tparam TU Type of upper bound.
+ * @param ub Upper bound on values.
+ * @return Next scalar transformed to have the specified
+ * upper bound.
+ */
+template <typename TU>
+inline auto complex_ub_constrain(const TU ub) {
+  return stan::math::ub_constrain(complex(), ub);
+}
+
+/**
+ * Return the next scalar transformed to have the specified
+ * upper bound, incrementing the specified reference with the
+ * log of the absolute Jacobian determinant of the transform.
+ *
+ * <p>See <code>stan::math::ub_constrain(T,double,T&)</code>.
+ *
+ * @tparam TU Type of upper bound.
+ * @param ub Upper bound on result.
+ * @param lp Reference to log probability variable to increment.
+ */
+template <typename TU>
+inline auto complex_ub_constrain(const TU ub, T &lp) {
+  return stan::math::ub_constrain(complex(), ub, lp);
+}
 
   /**
    * Return the next scalar, checking that it is between
@@ -642,6 +1023,64 @@ class reader {
     return stan::math::lub_constrain(scalar(), lb, ub, lp);
   }
 
+/**
+ * Return the next scalar, checking that it is between
+ * the specified lower and upper bound.
+ *
+ * <p>See <code>stan::math::check_bounded(T, double, double)</code>.
+ *
+ * @tparam TL Type of lower bound.
+ * @tparam TU Type of upper bound.
+ * @param lb Lower bound.
+ * @param ub Upper bound.
+ * @return Next scalar value.
+ * @throw std::runtime_error if the scalar is not between the specified
+ *    lower and upper bounds.
+ */
+template <typename TL, typename TU>
+inline T complex_lub(const TL lb, const TU ub) {
+  complex_t x(complex());
+  stan::math::check_bounded<complex_t, TL, TU>("stan::io::scalar_lub",
+                                       "Constrained scalar", x, lb, ub);
+  return x;
+}
+
+/**
+ * Return the next scalar transformed to be between
+ * the specified lower and upper bounds.
+ *
+ * <p>See <code>stan::math::lub_constrain(T, double, double)</code>.
+ *
+ * @tparam TL Type of lower bound.
+ * @tparam TU Type of upper bound.
+ * @param lb Lower bound.
+ * @param ub Upper bound.
+ * @return Next scalar transformed to fall between the specified
+ * bounds.
+ */
+template <typename TL, typename TU>
+inline auto complex_lub_constrain(const TL lb, const TU ub) {
+  return stan::math::lub_constrain(complex(), lb, ub);
+}
+
+/**
+ * Return the next scalar transformed to be between the
+ * the specified lower and upper bounds.
+ *
+ * <p>See <code>stan::math::lub_constrain(T, double, double, T&)</code>.
+ *
+ * @param lb Lower bound.
+ * @param ub Upper bound.
+ * @param lp Reference to log probability variable to increment.
+ * @tparam T Type of scalar.
+ * @tparam TL Type of lower bound.
+ * @tparam TU Type of upper bound.
+ */
+template <typename TL, typename TU>
+inline auto complex_lub_constrain(TL lb, TU ub, T &lp) {
+  return stan::math::lub_constrain(complex(), lb, ub, lp);
+}
+
   /**
    * Return the next scalar.
    *
@@ -653,8 +1092,7 @@ class reader {
    */
   template <typename TL, typename TS>
   inline T scalar_offset_multiplier(const TL offset, const TS multiplier) {
-    T x(scalar());
-    return x;
+    return scalar();
   }
 
   /**
@@ -697,6 +1135,62 @@ class reader {
     return stan::math::offset_multiplier_constrain(scalar(), offset, multiplier,
                                                    lp);
   }
+
+
+/**
+ * Return the next scalar.
+ *
+ * @tparam TL type of offset
+ * @tparam TS type of multiplier
+ * @param offset offset
+ * @param multiplier multiplier
+ * @return next scalar value
+ */
+template <typename TL, typename TS>
+inline auto complex_offset_multiplier(const TL offset, const TS multiplier) {
+  return complex();
+}
+
+/**
+ * Return the next scalar transformed to have the specified offset and
+ * multiplier.
+ *
+ * <p>See <code>stan::math::offset_multiplier_constrain(T, double,
+ * double)</code>.
+ *
+ * @tparam TL Type of offset.
+ * @tparam TS Type of multiplier.
+ * @param offset Offset.
+ * @param multiplier Multiplier.
+ * @return Next scalar transformed to fall between the specified
+ * bounds.
+ */
+template <typename TL, typename TS>
+inline auto complex_offset_multiplier_constrain(const TL offset,
+                                            const TS multiplier) {
+  return stan::math::offset_multiplier_constrain(complex(), offset,
+                                                 multiplier);
+}
+
+/**
+ * Return the next scalar transformed to have the specified offset and
+ * multiplier.
+ *
+ * <p>See <code>stan::math::offset_multiplier_constrain(T, double, double,
+ * T&)</code>.
+ *
+ * @param offset Offset.
+ * @param multiplier Multiplier.
+ * @param lp Reference to log probability variable to increment.
+ * @tparam T Type of scalar.
+ * @tparam TL Type of offset.
+ * @tparam TS Type of multiplier.
+ */
+template <typename TL, typename TS>
+inline auto complex_offset_multiplier_constrain(TL offset, TS multiplier, T &lp) {
+  return stan::math::offset_multiplier_constrain(complex(), offset, multiplier,
+                                                 lp);
+}
 
   /**
    * Return the next scalar, checking that it is a valid value for
@@ -780,6 +1274,50 @@ class reader {
     return stan::math::corr_constrain(scalar(), lp);
   }
 
+//
+/**
+ * Return the next scalar, checking that it is a valid
+ * value for a correlation, between -1 (inclusive) and
+ * 1 (inclusive).
+ *
+ * <p>See <code>stan::math::check_bounded(T)</code>.
+ *
+ * @return Next correlation value.
+ * @throw std::runtime_error if the value is not valid
+ *   for a correlation
+ */
+inline auto complex_corr() {
+  complex_t x(complex());
+  stan::math::check_bounded<T, double, double>("stan::io::corr",
+                                               "Correlation value", x, -1, 1);
+  return x;
+}
+
+/**
+ * Return the next scalar transformed to be a correlation
+ * between -1 and 1.
+ *
+ * <p>See <code>stan::math::corr_constrain(T)</code>.
+ *
+ * @return The next scalar transformed to a correlation.
+ */
+inline auto complex_corr_constrain() { return stan::math::corr_constrain(complex()); }
+
+/**
+ * Return the next scalar transformed to be a (partial)
+ * correlation between -1 and 1, incrementing the specified
+ * reference with the log of the absolute Jacobian determinant.
+ *
+ * <p>See <code>stan::math::corr_constrain(T,T&)</code>.
+ *
+ * @param lp The reference to the variable holding the log
+ * probability to increment.
+ * @return The next scalar transformed to a correlation.
+ */
+inline auto complex_corr_constrain(T &lp) {
+  return stan::math::corr_constrain(complex(), lp);
+}
+//
   /**
    * Return a unit_vector of the specified size made up of the
    * next scalars.
@@ -1143,6 +1681,53 @@ class reader {
                                             lp);
   }
 
+
+/**
+ * Return the next covariance matrix with the specified
+ * dimensionality.
+ *
+ * <p>See <code>stan::math::check_cov_matrix(Matrix)</code>.
+ *
+ * @param k Dimensionality of covariance matrix.
+ * @return Next covariance matrix of the specified dimensionality.
+ * @throw std::runtime_error if the matrix is not a valid
+ *    covariance matrix
+ */
+inline auto complex_cov_matrix(size_t k) {
+  complex_matrix_t y(complex_matrix(k, k));
+  stan::math::check_cov_matrix("stan::io::cov_matrix", "Constrained matrix",
+                               y);
+  return y;
+}
+
+/**
+ * Return the next covariance matrix of the specified dimensionality.
+ *
+ * <p>See <code>stan::math::cov_matrix_constrain(Matrix)</code>.
+ *
+ * @param k Dimensionality of covariance matrix.
+ * @return Next covariance matrix of the specified dimensionality.
+ */
+inline auto complex_cov_matrix_constrain(size_t k) {
+  return stan::math::cov_matrix_constrain(complex_vector(k + (k * (k - 1)) / 2), k);
+}
+
+/**
+ * Return the next covariance matrix of the specified dimensionality,
+ * incrementing the specified reference with the log absolute Jacobian
+ * determinant.
+ *
+ * <p>See <code>stan::math::cov_matrix_constrain(Matrix,T&)</code>.
+ *
+ * @param k Dimensionality of the (square) covariance matrix.
+ * @param lp Log probability reference to increment.
+ * @return The next covariance matrix of the specified dimensionality.
+ */
+inline auto complex_cov_matrix_constrain(size_t k, T &lp) {
+  return stan::math::cov_matrix_constrain(complex_vector(k + (k * (k - 1)) / 2), k,
+                                          lp);
+}
+
   /**
    * Returns the next correlation matrix of the specified dimensionality.
    *
@@ -1185,6 +1770,50 @@ class reader {
   inline matrix_t corr_matrix_constrain(size_t k, T &lp) {
     return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k, lp);
   }
+
+
+/**
+ * Returns the next correlation matrix of the specified dimensionality.
+ *
+ * <p>See <code>stan::math::check_corr_matrix(Matrix)</code>.
+ *
+ * @param k Dimensionality of correlation matrix.
+ * @return Next correlation matrix of the specified dimensionality.
+ * @throw std::runtime_error if the matrix is not a correlation matrix
+ */
+inline auto complex_corr_matrix(size_t k) {
+  complex_matrix_t x(complex_matrix(k, k));
+  stan::math::check_corr_matrix("stan::math::corr_matrix",
+                                "Constrained matrix", x);
+  return x;
+}
+
+/**
+ * Return the next correlation matrix of the specified dimensionality.
+ *
+ * <p>See <code>stan::math::corr_matrix_constrain(Matrix)</code>.
+ *
+ * @param k Dimensionality of correlation matrix.
+ * @return Next correlation matrix of the specified dimensionality.
+ */
+inline auto complex_corr_matrix_constrain(size_t k) {
+  return stan::math::corr_matrix_constrain(complex_vector((k * (k - 1)) / 2), k);
+}
+
+/**
+ * Return the next correlation matrix of the specified dimensionality,
+ * incrementing the specified reference with the log absolute Jacobian
+ * determinant.
+ *
+ * <p>See <code>stan::math::corr_matrix_constrain(Matrix,T&)</code>.
+ *
+ * @param k Dimensionality of the (square) correlation matrix.
+ * @param lp Log probability reference to increment.
+ * @return The next correlation matrix of the specified dimensionality.
+ */
+inline auto complex_corr_matrix_constrain(size_t k, T &lp) {
+  return stan::math::corr_matrix_constrain(complex_vector((k * (k - 1)) / 2), k, lp);
+}
 
   template <typename TL>
   inline vector_t vector_lb(const TL lb, size_t m) {
