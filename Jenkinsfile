@@ -245,6 +245,25 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
+                stage('Math functions expressions test') {
+                    agent any
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        script {
+                            dir("lib/stan_math/") {
+                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                    try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
+                                    finally { junit 'test/**/*.xml' }
+                                }
+                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                    sh "python ./test/expressions/test_expression_testing_framework.py"
+                                }
+                            }
+                        }
+                    }
+                    post { always { deleteDir() } }
+                }
             }
             when {
                 expression {
