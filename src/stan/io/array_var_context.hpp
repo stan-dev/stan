@@ -2,6 +2,7 @@
 #define STAN_IO_ARRAY_VAR_CONTEXT_HPP
 
 #include <stan/io/var_context.hpp>
+#include <stan/io/validate_dims.hpp>
 #include <stan/math.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <map>
@@ -350,48 +351,7 @@ class array_var_context : public var_context {
   void validate_dims(const std::string& stage, const std::string& name,
                      const std::string& base_type,
                      const std::vector<size_t>& dims_declared) const {
-    bool is_int_type = base_type == "int";
-    if (is_int_type) {
-      if (!contains_i(name)) {
-        std::stringstream msg;
-        msg << (contains_r(name) ? "int variable contained non-int values"
-                                 : "variable does not exist")
-            << "; processing stage=" << stage << "; variable name=" << name
-            << "; base type=" << base_type;
-        throw std::runtime_error(msg.str());
-      }
-    } else {
-      if (!contains_r(name)) {
-        std::stringstream msg;
-        msg << "variable does not exist"
-            << "; processing stage=" << stage << "; variable name=" << name
-            << "; base type=" << base_type;
-        throw std::runtime_error(msg.str());
-      }
-    }
-    std::vector<size_t> dims = dims_r(name);
-    if (dims.size() != dims_declared.size()) {
-      std::stringstream msg;
-      msg << "mismatch in number dimensions declared and found in context"
-          << "; processing stage=" << stage << "; variable name=" << name
-          << "; dims declared=";
-      dims_msg(msg, dims_declared);
-      msg << "; dims found=";
-      dims_msg(msg, dims);
-      throw std::runtime_error(msg.str());
-    }
-    for (size_t i = 0; i < dims.size(); ++i) {
-      if (dims_declared[i] != dims[i]) {
-        std::stringstream msg;
-        msg << "mismatch in dimension declared and found in context"
-            << "; processing stage=" << stage << "; variable name=" << name
-            << "; position=" << i << "; dims declared=";
-        dims_msg(msg, dims_declared);
-        msg << "; dims found=";
-        dims_msg(msg, dims);
-        throw std::runtime_error(msg.str());
-      }
-    }
+    validate_dims(*this, stage, name, base_type, dims_declared);
   }
 
   /**
