@@ -27,8 +27,8 @@ namespace io {
     if (is_int_type) {
       if (!context.contains_i(name)) {
         std::stringstream msg;
-        msg << (context.contains_r(name) ? "int variable contained non-int values"
-                                 : "variable does not exist")
+        msg << (context.contains_r(name) ?
+           "int variable contained non-int values" : "variable does not exist")
             << "; processing stage=" << stage << "; variable name=" << name
             << "; base type=" << base_type;
         throw std::runtime_error(msg.str());
