@@ -93,7 +93,7 @@ class empty_var_context : public var_context {
   void validate_dims(const std::string& stage, const std::string& name,
                      const std::string& base_type,
                      const std::vector<size_t>& dims_declared) const {
-    validate_dims(*this, stage, name, base_type, dims_declared); 
+    stan::io::validate_dims(*this, stage, name, base_type, dims_declared); 
   }
 
   /**
