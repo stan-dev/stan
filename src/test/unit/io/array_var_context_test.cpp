@@ -214,29 +214,23 @@ TEST(array_var_context, invalid_context_validate) {
   std::vector<std::string> names;
   stan::io::array_var_context avc(names, a, dims);
   // invalid - empty
-  EXPECT_THROW(
-    bernoulli_model_namespace::bernoulli_model(avc, 0, &std::cout),
-    std::runtime_error
-  );
+  EXPECT_THROW(bernoulli_model_namespace::bernoulli_model(avc, 0, &std::cout),
+               std::runtime_error);
   // invalid - missing N and y
   a.push_back(0);
   std::vector<size_t> scalar_dim;
   dims.push_back(scalar_dim);
   names.push_back("K");
   stan::io::array_var_context avc1(names, a, dims);
-  EXPECT_THROW(
-    bernoulli_model_namespace::bernoulli_model(avc1, 0, &std::cout),
-    std::runtime_error
-  );
+  EXPECT_THROW(bernoulli_model_namespace::bernoulli_model(avc1, 0, &std::cout),
+               std::runtime_error);
   // invalid - missing y
   a.push_back(1);
   dims.push_back(scalar_dim);
   names.push_back("N");
   stan::io::array_var_context avc2(names, a, dims);
-  EXPECT_THROW(
-    bernoulli_model_namespace::bernoulli_model(avc2, 0, &std::cout),
-    std::runtime_error
-  );
+  EXPECT_THROW(bernoulli_model_namespace::bernoulli_model(avc2, 0, &std::cout),
+               std::runtime_error);
   // OK
   a.push_back(1);
   std::vector<size_t> arr_dim;
@@ -244,5 +238,6 @@ TEST(array_var_context, invalid_context_validate) {
   dims.push_back(arr_dim);
   names.push_back("y");
   stan::io::array_var_context avc3(names, a, dims);
-  EXPECT_NO_THROW(bernoulli_model_namespace::bernoulli_model(avc3, 0, &std::cout));
+  EXPECT_NO_THROW(
+      bernoulli_model_namespace::bernoulli_model(avc3, 0, &std::cout));
 }
