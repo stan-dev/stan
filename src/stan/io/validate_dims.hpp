@@ -19,7 +19,7 @@ namespace io {
  * @throw std::runtime_error if mismatch between declared
  *        dimensions and dimensions found in context.
  */
-void validate_dims(const stan::io::var_context& context,
+inline void validate_dims(const stan::io::var_context& context,
                    const std::string& stage, const std::string& name,
                    const std::string& base_type,
                    const std::vector<size_t>& dims_declared) {
