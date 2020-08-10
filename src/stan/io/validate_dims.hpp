@@ -20,9 +20,9 @@ namespace io {
  *        dimensions and dimensions found in context.
  */
 inline void validate_dims(const stan::io::var_context& context,
-                   const std::string& stage, const std::string& name,
-                   const std::string& base_type,
-                   const std::vector<size_t>& dims_declared) {
+                          const std::string& stage, const std::string& name,
+                          const std::string& base_type,
+                          const std::vector<size_t>& dims_declared) {
   bool is_int_type = base_type == "int";
   if (is_int_type) {
     if (!context.contains_i(name)) {
