@@ -22,7 +22,7 @@ namespace model {
  * @tparam C Type of container or scalar.
  * @tparam L Type of index list.
  */
-template <typename C, typename L>
+template <typename C, typename L, typename = void>
 struct rvalue_return {};
 
 /**
@@ -209,6 +209,9 @@ struct rvalue_return<std::vector<C>, cons_index_list<index_uni, L> > {
    */
   typedef typename rvalue_return<C, L>::type type;
 };
+
+template <typename... Ts>
+using rvalue_return_t = typename rvalue_return<std::decay_t<Ts>...>::type;
 
 }  // namespace model
 }  // namespace stan

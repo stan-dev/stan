@@ -2,7 +2,7 @@
 #define STAN_MODEL_INDEXING_INDEX_HPP
 
 #include <vector>
-
+#include <stan/math/prim/meta.hpp>
 namespace stan {
 
 namespace model {
@@ -22,7 +22,7 @@ struct index_uni {
    *
    * @param n single index.
    */
-  explicit index_uni(int n) : n_(n) {}
+  explicit constexpr index_uni(int n) : n_(n) {}
 };
 
 // MULTIPLE INDEXING (does not reduce dimensionality)
@@ -39,7 +39,8 @@ struct index_multi {
    *
    * @param ns multiple indexes.
    */
-  explicit index_multi(const std::vector<int>& ns) : ns_(ns) {}
+  template <typename T, require_not_same_t<T, index_multi>* = nullptr>
+  explicit constexpr index_multi(T&& ns) : ns_(std::forward<T>(ns)) {}
 };
 
 /**
@@ -60,7 +61,7 @@ struct index_min {
    *
    * @param min minimum index (inclusive).
    */
-  explicit index_min(int min) : min_(min) {}
+  explicit constexpr index_min(int min) : min_(min) {}
 };
 
 /**
@@ -76,7 +77,7 @@ struct index_max {
    *
    * @param max maximum index (inclusive).
    */
-  explicit index_max(int max) : max_(max) {}
+  explicit constexpr index_max(int max) : max_(max) {}
 };
 
 /**

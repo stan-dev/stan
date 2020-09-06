@@ -18,8 +18,8 @@ struct nil_index_list {};
  */
 template <typename H, typename T>
 struct cons_index_list {
-  const H head_;
-  const T tail_;
+  H head_;
+  T tail_;
 
   /**
    * Construct a non-empty index list with the specified index for
@@ -28,34 +28,32 @@ struct cons_index_list {
    * @param head Index for head.
    * @param tail Index list for tail.
    */
-  explicit cons_index_list(const H& head, const T& tail)
-      : head_(head), tail_(tail) {}
+  template <typename Head, typename Tail>
+  explicit constexpr cons_index_list(Head&& head, Tail&& tail)
+      : head_(std::forward<Head>(head)), tail_(std::forward<Tail>(tail)) {}
 };
 
 // factory-like function does type inference for I and T
 template <typename I, typename T>
-inline cons_index_list<I, T> cons_list(const I& idx1, const T& t) {
-  return cons_index_list<I, T>(idx1, t);
+inline constexpr auto cons_list(I&& idx1, T&& t) {
+  return cons_index_list<I, T>(std::forward<I>(idx1), std::forward<T>(t));
 }
 
-inline nil_index_list index_list() { return nil_index_list(); }
+inline constexpr auto index_list() { return nil_index_list(); }
 
 template <typename I>
-inline cons_index_list<I, nil_index_list> index_list(const I& idx) {
-  return cons_list(idx, index_list());
+inline constexpr auto index_list(I&& idx) {
+  return cons_list(std::forward<I>(idx), index_list());
 }
 
 template <typename I1, typename I2>
-inline cons_index_list<I1, cons_index_list<I2, nil_index_list> > index_list(
-    const I1& idx1, const I2& idx2) {
-  return cons_list(idx1, index_list(idx2));
+inline constexpr auto index_list(I1&& idx1, I2&& idx2) {
+  return cons_list(std::forward<I1>(idx1), index_list(std::forward<I2>(idx2)));
 }
 
 template <typename I1, typename I2, typename I3>
-inline cons_index_list<
-    I1, cons_index_list<I2, cons_index_list<I3, nil_index_list> > >
-index_list(const I1& idx1, const I2& idx2, const I3& idx3) {
-  return cons_list(idx1, index_list(idx2, idx3));
+inline constexpr auto index_list(I1&& idx1, I2&& idx2, I3&& idx3) {
+  return cons_list(std::forward<I1>(idx1), index_list(std::forward<I2>(idx2), std::forward<I3>(idx3)));
 }
 
 }  // namespace model
