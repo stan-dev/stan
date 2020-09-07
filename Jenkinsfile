@@ -245,6 +245,18 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
+                stage('Integration Windows') {
+                    agent { label 'windows' }
+                    steps {
+                        deleteDirWin()
+                            unstash 'StanSetup'
+                            setupCXX()
+                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+                            setupCXX(false)
+                            runTestsWin("src/test/integration")
+                    }
+                    post { always { deleteDirWin() } }
+                }
                 stage('Math functions expressions test') {
                     agent any
                     steps {
