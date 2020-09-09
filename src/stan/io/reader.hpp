@@ -34,33 +34,33 @@ namespace io {
 template <typename T>
 class reader {
  private:
-  std::vector<T> &data_r_;
-  std::vector<int> &data_i_;
+  Eigen::Map<Eigen::Matrix<T, -1, 1>, Eigen::Aligned8, Eigen::Stride<0, 0>> data_r_;
+  Eigen::Map<Eigen::Matrix<int, -1, 1>, Eigen::Aligned8, Eigen::Stride<0, 0>> data_i_;
   size_t pos_{0};
   size_t int_pos_{0};
 
-  inline T &scalar_ptr() { return data_r_[pos_]; }
+  inline T &scalar_ptr() { return data_r_.coeffRef(pos_); }
 
   inline T &scalar_ptr_increment(size_t m) {
     pos_ += m;
-    return data_r_[pos_ - m];
+    return data_r_.coeffRef(pos_ - m);
   }
 
-  inline int &int_ptr() { return data_i_[int_pos_]; }
+  inline int& int_ptr() { return data_i_.coeffRef(int_pos_); }
 
-  inline int &int_ptr_increment(size_t m) {
+  inline int& int_ptr_increment(size_t m) {
     int_pos_ += m;
-    return data_i_[int_pos_ - m];
+    return data_i_.coeffRef(int_pos_ - m);
   }
 
  public:
-  typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
-  typedef Eigen::Matrix<T, Eigen::Dynamic, 1> vector_t;
-  typedef Eigen::Matrix<T, 1, Eigen::Dynamic> row_vector_t;
+  using matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+  using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
+  using row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
 
-  typedef Eigen::Map<matrix_t> map_matrix_t;
-  typedef Eigen::Map<vector_t> map_vector_t;
-  typedef Eigen::Map<row_vector_t> map_row_vector_t;
+  using map_matrix_t = Eigen::Map<matrix_t>;
+  using map_vector_t = Eigen::Map<vector_t>;
+  using map_row_vector_t = Eigen::Map<row_vector_t>;
 
   /**
    * Construct a variable reader using the specified vectors
@@ -73,27 +73,24 @@ class reader {
    * @param data_r Sequence of scalar values.
    * @param data_i Sequence of integer values.
    */
-  reader(std::vector<T> &data_r, std::vector<int> &data_i)
-      : data_r_(data_r), data_i_(data_i) {}
-
-  /**
-   * Destroy this variable reader.
-   */
-  ~reader() {}
+  template <typename RVec, typename IntVec,
+   require_all_vector_like_t<RVec, IntVec>* = nullptr>
+  reader(RVec& data_r, IntVec& data_i)
+      : data_r_(data_r.data(), data_r.size()), data_i_(data_i.data(), data_i.size()) {}
 
   /**
    * Return the number of scalars remaining to be read.
    *
    * @return Number of scalars left to read.
    */
-  inline size_t available() { return data_r_.size() - pos_; }
+  inline size_t available() const { return data_r_.size() - pos_; }
 
   /**
    * Return the number of integers remaining to be read.
    *
    * @return Number of integers left to read.
    */
-  inline size_t available_i() { return data_i_.size() - int_pos_; }
+  inline size_t available_i() const { return data_i_.size() - int_pos_; }
 
   /**
    * Return the next integer in the integer sequence.
@@ -104,7 +101,7 @@ class reader {
     if (int_pos_ >= data_i_.size()) {
       throw std::runtime_error("no more integers to read.");
     }
-    return data_i_[int_pos_++];
+    return data_i_.coeffRef(int_pos_++);
   }
 
   /**
@@ -134,7 +131,7 @@ class reader {
     if (pos_ >= data_r_.size()) {
       throw std::runtime_error("no more scalars to read");
     }
-    return data_r_[pos_++];
+    return data_r_.coeffRef(pos_++);
   }
 
   /**
@@ -156,7 +153,7 @@ class reader {
    * log_prob Reference to log probability variable to increment.
    * @return Next scalar.
    */
-  T scalar_constrain(T & /*log_prob*/) { return scalar(); }
+  inline T scalar_constrain(T & /*log_prob*/) { return scalar(); }
 
   /**
    * Return a standard library vector of the specified
@@ -168,10 +165,10 @@ class reader {
   inline std::vector<T> std_vector(size_t m) {
     if (m == 0)
       return std::vector<T>();
-    std::vector<T> vec(&this->data_r_[this->pos_],
-                       &this->data_r_[this->pos_ + m]);
+    const auto* start_pos = &this->data_r_.coeffRef(this->pos_);
+    const auto* end_pos = &this->data_r_.coeffRef(this->pos_ + m);
     this->pos_ += m;
-    return vec;
+    return std::vector<T>(start_pos, end_pos);
   }
 
   /**
@@ -184,7 +181,7 @@ class reader {
   inline vector_t vector(size_t m) {
     if (m == 0)
       return vector_t();
-    return map_vector_t(&scalar_ptr_increment(m), m);
+    return vector_t(map_vector_t(&scalar_ptr_increment(m), m));
   }
   /**
    * Return a column vector of specified dimensionality made up of
@@ -196,7 +193,7 @@ class reader {
   inline vector_t vector_constrain(size_t m) {
     if (m == 0)
       return vector_t();
-    return map_vector_t(&scalar_ptr_increment(m), m);
+    return vector_t(map_vector_t(&scalar_ptr_increment(m), m));
   }
   /**
    * Return a column vector of specified dimensionality made up of
@@ -209,7 +206,7 @@ class reader {
   inline vector_t vector_constrain(size_t m, T & /*lp*/) {
     if (m == 0)
       return vector_t();
-    return map_vector_t(&scalar_ptr_increment(m), m);
+    return vector_t(map_vector_t(&scalar_ptr_increment(m), m));
   }
 
   /**
@@ -222,7 +219,7 @@ class reader {
   inline row_vector_t row_vector(size_t m) {
     if (m == 0)
       return row_vector_t();
-    return map_row_vector_t(&scalar_ptr_increment(m), m);
+    return row_vector_t(map_row_vector_t(&scalar_ptr_increment(m), m));
   }
 
   /**
@@ -235,7 +232,7 @@ class reader {
   inline row_vector_t row_vector_constrain(size_t m) {
     if (m == 0)
       return row_vector_t();
-    return map_row_vector_t(&scalar_ptr_increment(m), m);
+    return row_vector_t(map_row_vector_t(&scalar_ptr_increment(m), m));
   }
 
   /**
@@ -250,7 +247,7 @@ class reader {
   inline row_vector_t row_vector_constrain(size_t m, T & /*lp*/) {
     if (m == 0)
       return row_vector_t();
-    return map_row_vector_t(&scalar_ptr_increment(m), m);
+    return row_vector_t(map_row_vector_t(&scalar_ptr_increment(m), m));
   }
 
   /**
@@ -273,7 +270,7 @@ class reader {
   inline matrix_t matrix(size_t m, size_t n) {
     if (m == 0 || n == 0)
       return matrix_t(m, n);
-    return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
+    return matrix_t(map_matrix_t(&scalar_ptr_increment(m * n), m, n));
   }
 
   /**
@@ -289,7 +286,7 @@ class reader {
   inline matrix_t matrix_constrain(size_t m, size_t n) {
     if (m == 0 || n == 0)
       return matrix_t(m, n);
-    return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
+    return matrix_t(map_matrix_t(&scalar_ptr_increment(m * n), m, n));
   }
 
   /**
@@ -307,7 +304,7 @@ class reader {
   inline matrix_t matrix_constrain(size_t m, size_t n, T & /*lp*/) {
     if (m == 0 || n == 0)
       return matrix_t(m, n);
-    return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
+    return matrix_t(map_matrix_t(&scalar_ptr_increment(m * n), m, n));
   }
 
   /**
@@ -384,7 +381,7 @@ class reader {
    * @throw std::runtime_error If the next integer read is not
    * less than or equal to the upper bound.
    */
-  int integer_ub_constrain(int ub, T & /*lp*/) { return integer_ub(ub); }
+  inline int integer_ub_constrain(int ub, T & /*lp*/) { return integer_ub(ub); }
 
   /**
    * Return the next integer, checking that it is less than
@@ -813,7 +810,7 @@ class reader {
    * @return unit_vector derived from next <code>k</code> scalars.
    * @throw std::invalid_argument if k is zero
    */
-  inline Eigen::Matrix<T, Eigen::Dynamic, 1> unit_vector_constrain(size_t k) {
+  inline vector_t unit_vector_constrain(size_t k) {
     if (k == 0) {
       std::string msg
           = "io::unit_vector_constrain:"
@@ -1188,310 +1185,226 @@ class reader {
 
   template <typename TL>
   inline vector_t vector_lb(const TL lb, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb(lb);
+    vector_t v(vector(m));
+    stan::math::check_greater_or_equal("stan::io::vector_lb",
+                                       "Constrained vector", v, lb);
     return v;
   }
 
   template <typename TL>
   inline vector_t vector_lb_constrain(const TL lb, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb_constrain(lb);
-    return v;
+    return stan::math::lb_constrain(vector(m), lb);
   }
 
   template <typename TL>
   inline vector_t vector_lb_constrain(const TL lb, size_t m, T &lp) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb_constrain(lb, lp);
-    return v;
+    return stan::math::lb_constrain(vector(m), lb, lp);
   }
 
   template <typename TL>
   inline row_vector_t row_vector_lb(const TL lb, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb(lb);
+    row_vector_t v(row_vector(m));
+    stan::math::check_greater_or_equal("stan::io::row_vector_lb",
+                                       "Constrained row vector", v, lb);
     return v;
   }
 
   template <typename TL>
   inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb_constrain(lb);
-    return v;
+    return stan::math::lb_constrain(row_vector(m), lb);
   }
 
   template <typename TL>
   inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lb_constrain(lb, lp);
-    return v;
+    return stan::math::lb_constrain(row_vector(m), lb, lp);
   }
 
   template <typename TL>
   inline matrix_t matrix_lb(const TL lb, const size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lb(lb);
-    return v;
+    matrix_t mat(matrix(m, n));
+    stan::math::check_greater_or_equal("stan::io::matrix_lb",
+                                       "Constrained matrix", mat, lb);
+    return mat;
   }
 
   template <typename TL>
   inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lb_constrain(lb);
-    return v;
+    return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::lb_constrain(x, lb);});
   }
 
   template <typename TL>
   inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lb_constrain(lb, lp);
-    return v;
+    return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::lb_constrain(x, lb, lp);});
   }
 
   template <typename TU>
   inline vector_t vector_ub(const TU ub, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub(ub);
+    vector_t v(vector(m));
+    stan::math::check_less_or_equal("stan::io::vector_ub", "Constrained vector",
+                                    v, ub);
     return v;
   }
 
   template <typename TU>
   inline vector_t vector_ub_constrain(const TU ub, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub_constrain(ub);
-    return v;
+    return stan::math::ub_constrain(vector(m), ub);
   }
 
   template <typename TU>
   inline vector_t vector_ub_constrain(const TU ub, size_t m, T &lp) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub_constrain(ub, lp);
-    return v;
+    return stan::math::ub_constrain(vector(m), ub, lp);
   }
 
   template <typename TU>
   inline row_vector_t row_vector_ub(const TU ub, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub(ub);
+    row_vector_t v(row_vector(m));
+    stan::math::check_less_or_equal("stan::io::row_vector_ub", "Constrained row vector",
+                                    v, ub);
     return v;
   }
 
   template <typename TU>
   inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub_constrain(ub);
-    return v;
+    return stan::math::ub_constrain(row_vector(m), ub);
   }
 
   template <typename TU>
   inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_ub_constrain(ub, lp);
-    return v;
+    return stan::math::ub_constrain(row_vector(m), ub, lp);
   }
 
   template <typename TU>
   inline matrix_t matrix_ub(const TU ub, size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_ub(ub);
-    return v;
+    matrix_t mat(matrix(m, n));
+    stan::math::check_less_or_equal("stan::io::matrix_ub",
+                                       "Constrained matrix", mat, ub);
+    return mat;
   }
 
   template <typename TU>
   inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_ub_constrain(ub);
-    return v;
+    return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::ub_constrain(x, ub);});
   }
 
   template <typename TU>
   inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n,
                                       T &lp) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_ub_constrain(ub, lp);
-    return v;
+    return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::ub_constrain(x, ub, lp);});
   }
 
   template <typename TL, typename TU>
   inline vector_t vector_lub(const TL lb, const TU ub, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub(lb, ub);
+    vector_t v(vector(m));
+    stan::math::check_bounded<vector_t, TL, TU>("stan::io::vector_lub",
+                                         "Constrained vector", v, lb, ub);
     return v;
   }
 
   template <typename TL, typename TU>
   inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub_constrain(lb, ub);
-    return v;
+    return stan::math::lub_constrain(vector(m), lb, ub);
   }
 
   template <typename TL, typename TU>
   inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m,
                                        T &lp) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub_constrain(lb, ub, lp);
-    return v;
+     return stan::math::lub_constrain(vector(m), lb, ub, lp);
   }
 
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub(const TL lb, const TU ub, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub(lb, ub);
+    row_vector_t v(row_vector_t(m));
+    stan::math::check_bounded<row_vector_t, TL, TU>("stan::io::row_vector_lub",
+                                         "Constrained row vector", v, lb, ub);
     return v;
   }
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
                                                size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub_constrain(lb, ub);
-    return v;
+   return stan::math::lub_constrain(row_vector(m), lb, ub);
   }
 
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
                                                size_t m, T &lp) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_lub_constrain(lb, ub, lp);
-    return v;
+   return stan::math::lub_constrain(row_vector(m), lb, ub, lp);
   }
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lub(lb, ub);
-    return v;
+    matrix_t mat(matrix(m, n));
+    stan::math::check_bounded<matrix_t, TL, TU>("stan::io::row_vector_lub",
+                                         "Constrained row vector", mat, lb, ub);
+    return mat;
   }
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m,
                                        size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lub_constrain(lb, ub);
-    return v;
+   return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::lub_constrain(x, lb, ub);});
   }
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m,
                                        size_t n, T &lp) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_lub_constrain(lb, ub, lp);
-    return v;
+   return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::lub_constrain(x, lb, ub, lp);});
   }
 
   template <typename TL, typename TS>
   inline vector_t vector_offset_multiplier(const TL offset, const TS multiplier,
                                            size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_offset_multiplier(offset, multiplier);
-    return v;
+    return vector(m);
   }
 
   template <typename TL, typename TS>
   inline vector_t vector_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_offset_multiplier_constrain(offset, multiplier);
-    return v;
+   return stan::math::offset_multiplier_constrain(vector(m), offset,
+                                                  multiplier);
   }
 
   template <typename TL, typename TS>
   inline vector_t vector_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m, T &lp) {
-    vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
-    return v;
+     return stan::math::offset_multiplier_constrain(vector(m), offset,
+                                                    multiplier, lp);
   }
 
   template <typename TL, typename TS>
   inline row_vector_t row_vector_offset_multiplier(const TL offset,
                                                    const TS multiplier,
                                                    size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_offset_multiplier(offset, multiplier);
-    return v;
+   return row_vector(m);
   }
 
   template <typename TL, typename TS>
   inline row_vector_t row_vector_offset_multiplier_constrain(
       const TL offset, const TS multiplier, size_t m) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_offset_multiplier_constrain(offset, multiplier);
-    return v;
+    return stan::math::offset_multiplier_constrain(row_vector(m), offset,
+                                                   multiplier);
   }
 
   template <typename TL, typename TS>
   inline row_vector_t row_vector_offset_multiplier_constrain(
       const TL offset, const TS multiplier, size_t m, T &lp) {
-    row_vector_t v(m);
-    for (size_t i = 0; i < m; ++i)
-      v(i) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
-    return v;
+    return stan::math::offset_multiplier_constrain(row_vector(m), offset,
+                                                   multiplier, lp);
   }
 
   template <typename TL, typename TS>
   inline matrix_t matrix_offset_multiplier(const TL offset, const TS multiplier,
                                            size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_offset_multiplier(offset, multiplier);
-    return v;
+    return matrix(m, n);
   }
 
   template <typename TL, typename TS>
   inline matrix_t matrix_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m, size_t n) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_offset_multiplier_constrain(offset, multiplier);
-    return v;
+     return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
+                                                    multiplier);
   }
 
   template <typename TL, typename TS>
@@ -1499,11 +1412,8 @@ class reader {
                                                      const TS multiplier,
                                                      size_t m, size_t n,
                                                      T &lp) {
-    matrix_t v(m, n);
-    for (size_t j = 0; j < n; ++j)
-      for (size_t i = 0; i < m; ++i)
-        v(i, j) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
-    return v;
+   return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
+                                                  multiplier, lp);
   }
 };
 
