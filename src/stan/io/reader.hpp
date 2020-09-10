@@ -1320,7 +1320,7 @@ class reader {
 
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub(const TL lb, const TU ub, size_t m) {
-    row_vector_t v(row_vector_t(m));
+    row_vector_t v(row_vector(m));
     stan::math::check_bounded<row_vector_t, TL, TU>(
         "stan::io::row_vector_lub", "Constrained row vector", v, lb, ub);
     return v;
