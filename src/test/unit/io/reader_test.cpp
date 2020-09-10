@@ -1,7 +1,6 @@
 #include <stan/io/reader.hpp>
 #include <gtest/gtest.h>
 
-
 TEST(io_reader, eigen_input) {
   Eigen::Matrix<int, -1, 1> theta_i(1);
   Eigen::VectorXd theta(2);

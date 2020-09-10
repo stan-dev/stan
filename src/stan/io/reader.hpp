@@ -34,8 +34,10 @@ namespace io {
 template <typename T>
 class reader {
  private:
-  Eigen::Map<Eigen::Matrix<T, -1, 1>, Eigen::Aligned8, Eigen::Stride<0, 0>> data_r_;
-  Eigen::Map<Eigen::Matrix<int, -1, 1>, Eigen::Aligned8, Eigen::Stride<0, 0>> data_i_;
+  Eigen::Map<Eigen::Matrix<T, -1, 1>, Eigen::Aligned8, Eigen::Stride<0, 0>>
+      data_r_;
+  Eigen::Map<Eigen::Matrix<int, -1, 1>, Eigen::Aligned8, Eigen::Stride<0, 0>>
+      data_i_;
   size_t pos_{0};
   size_t int_pos_{0};
 
@@ -46,9 +48,9 @@ class reader {
     return data_r_.coeffRef(pos_ - m);
   }
 
-  inline int& int_ptr() { return data_i_.coeffRef(int_pos_); }
+  inline int &int_ptr() { return data_i_.coeffRef(int_pos_); }
 
-  inline int& int_ptr_increment(size_t m) {
+  inline int &int_ptr_increment(size_t m) {
     int_pos_ += m;
     return data_i_.coeffRef(int_pos_ - m);
   }
@@ -74,9 +76,10 @@ class reader {
    * @param data_i Sequence of integer values.
    */
   template <typename RVec, typename IntVec,
-   require_all_vector_like_t<RVec, IntVec>* = nullptr>
-  reader(RVec& data_r, IntVec& data_i)
-      : data_r_(data_r.data(), data_r.size()), data_i_(data_i.data(), data_i.size()) {}
+            require_all_vector_like_t<RVec, IntVec> * = nullptr>
+  reader(RVec &data_r, IntVec &data_i)
+      : data_r_(data_r.data(), data_r.size()),
+        data_i_(data_i.data(), data_i.size()) {}
 
   /**
    * Return the number of scalars remaining to be read.
@@ -165,8 +168,8 @@ class reader {
   inline std::vector<T> std_vector(size_t m) {
     if (m == 0)
       return std::vector<T>();
-    const auto* start_pos = &this->data_r_.coeffRef(this->pos_);
-    const auto* end_pos = &this->data_r_.coeffRef(this->pos_ + m);
+    const auto *start_pos = &this->data_r_.coeffRef(this->pos_);
+    const auto *end_pos = &this->data_r_.coeffRef(this->pos_ + m);
     this->pos_ += m;
     return std::vector<T>(start_pos, end_pos);
   }
@@ -1229,12 +1232,14 @@ class reader {
 
   template <typename TL>
   inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n) {
-    return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::lb_constrain(x, lb);});
+    return matrix(m, n).unaryExpr(
+        [&](auto &x) { return stan::math::lb_constrain(x, lb); });
   }
 
   template <typename TL>
   inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
-    return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::lb_constrain(x, lb, lp);});
+    return matrix(m, n).unaryExpr(
+        [&](auto &x) { return stan::math::lb_constrain(x, lb, lp); });
   }
 
   template <typename TU>
@@ -1258,8 +1263,8 @@ class reader {
   template <typename TU>
   inline row_vector_t row_vector_ub(const TU ub, size_t m) {
     row_vector_t v(row_vector(m));
-    stan::math::check_less_or_equal("stan::io::row_vector_ub", "Constrained row vector",
-                                    v, ub);
+    stan::math::check_less_or_equal("stan::io::row_vector_ub",
+                                    "Constrained row vector", v, ub);
     return v;
   }
 
@@ -1276,27 +1281,29 @@ class reader {
   template <typename TU>
   inline matrix_t matrix_ub(const TU ub, size_t m, size_t n) {
     matrix_t mat(matrix(m, n));
-    stan::math::check_less_or_equal("stan::io::matrix_ub",
-                                       "Constrained matrix", mat, ub);
+    stan::math::check_less_or_equal("stan::io::matrix_ub", "Constrained matrix",
+                                    mat, ub);
     return mat;
   }
 
   template <typename TU>
   inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
-    return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::ub_constrain(x, ub);});
+    return matrix(m, n).unaryExpr(
+        [&](auto &x) { return stan::math::ub_constrain(x, ub); });
   }
 
   template <typename TU>
   inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n,
                                       T &lp) {
-    return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::ub_constrain(x, ub, lp);});
+    return matrix(m, n).unaryExpr(
+        [&](auto &x) { return stan::math::ub_constrain(x, ub, lp); });
   }
 
   template <typename TL, typename TU>
   inline vector_t vector_lub(const TL lb, const TU ub, size_t m) {
     vector_t v(vector(m));
-    stan::math::check_bounded<vector_t, TL, TU>("stan::io::vector_lub",
-                                         "Constrained vector", v, lb, ub);
+    stan::math::check_bounded<vector_t, TL, TU>(
+        "stan::io::vector_lub", "Constrained vector", v, lb, ub);
     return v;
   }
 
@@ -1308,46 +1315,48 @@ class reader {
   template <typename TL, typename TU>
   inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m,
                                        T &lp) {
-     return stan::math::lub_constrain(vector(m), lb, ub, lp);
+    return stan::math::lub_constrain(vector(m), lb, ub, lp);
   }
 
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub(const TL lb, const TU ub, size_t m) {
     row_vector_t v(row_vector_t(m));
-    stan::math::check_bounded<row_vector_t, TL, TU>("stan::io::row_vector_lub",
-                                         "Constrained row vector", v, lb, ub);
+    stan::math::check_bounded<row_vector_t, TL, TU>(
+        "stan::io::row_vector_lub", "Constrained row vector", v, lb, ub);
     return v;
   }
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
                                                size_t m) {
-   return stan::math::lub_constrain(row_vector(m), lb, ub);
+    return stan::math::lub_constrain(row_vector(m), lb, ub);
   }
 
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
                                                size_t m, T &lp) {
-   return stan::math::lub_constrain(row_vector(m), lb, ub, lp);
+    return stan::math::lub_constrain(row_vector(m), lb, ub, lp);
   }
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
     matrix_t mat(matrix(m, n));
-    stan::math::check_bounded<matrix_t, TL, TU>("stan::io::row_vector_lub",
-                                         "Constrained row vector", mat, lb, ub);
+    stan::math::check_bounded<matrix_t, TL, TU>(
+        "stan::io::row_vector_lub", "Constrained row vector", mat, lb, ub);
     return mat;
   }
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m,
                                        size_t n) {
-   return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::lub_constrain(x, lb, ub);});
+    return matrix(m, n).unaryExpr(
+        [&](auto &x) { return stan::math::lub_constrain(x, lb, ub); });
   }
 
   template <typename TL, typename TU>
   inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m,
                                        size_t n, T &lp) {
-   return matrix(m, n).unaryExpr([&](auto& x) { return stan::math::lub_constrain(x, lb, ub, lp);});
+    return matrix(m, n).unaryExpr(
+        [&](auto &x) { return stan::math::lub_constrain(x, lb, ub, lp); });
   }
 
   template <typename TL, typename TS>
@@ -1360,23 +1369,23 @@ class reader {
   inline vector_t vector_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m) {
-   return stan::math::offset_multiplier_constrain(vector(m), offset,
-                                                  multiplier);
+    return stan::math::offset_multiplier_constrain(vector(m), offset,
+                                                   multiplier);
   }
 
   template <typename TL, typename TS>
   inline vector_t vector_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m, T &lp) {
-     return stan::math::offset_multiplier_constrain(vector(m), offset,
-                                                    multiplier, lp);
+    return stan::math::offset_multiplier_constrain(vector(m), offset,
+                                                   multiplier, lp);
   }
 
   template <typename TL, typename TS>
   inline row_vector_t row_vector_offset_multiplier(const TL offset,
                                                    const TS multiplier,
                                                    size_t m) {
-   return row_vector(m);
+    return row_vector(m);
   }
 
   template <typename TL, typename TS>
@@ -1403,8 +1412,8 @@ class reader {
   inline matrix_t matrix_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m, size_t n) {
-     return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
-                                                    multiplier);
+    return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
+                                                   multiplier);
   }
 
   template <typename TL, typename TS>
@@ -1412,8 +1421,8 @@ class reader {
                                                      const TS multiplier,
                                                      size_t m, size_t n,
                                                      T &lp) {
-   return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
-                                                  multiplier, lp);
+    return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
+                                                   multiplier, lp);
   }
 };
 
