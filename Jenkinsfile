@@ -72,45 +72,6 @@ pipeline {
                 }
             }
         }
-        stage('Linting & Doc checks') {
-            agent any
-            steps {
-                script {
-                    sh "printenv"
-                    retry(3) { checkout scm }
-                    sh """
-                       make math-revert
-                       make clean-all
-                       git clean -xffd
-                    """
-                    utils.checkout_pr("math", "lib/stan_math", params.math_pr)
-                    stash 'StanSetup'
-                    setupCXX(true, env.GCC)
-                    parallel(
-                        CppLint: { sh "make cpplint" },
-                        API_docs: { sh 'make doxygen' },
-                    )
-                }
-            }
-            post {
-                always {
-
-                    recordIssues id: "lint_doc_checks",
-                    name: "Linting & Doc checks",
-                    enabledForFailure: true,
-                    aggregatingResults : true,
-                    tools: [
-                        cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
-                    ],
-                    blameDisabled: false,
-                    qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                    referenceJobName: env.BRANCH_NAME
-
-                    deleteDir()
-                }
-            }
-        }
         stage("Clang-format") {
             agent any
             steps {
@@ -159,10 +120,49 @@ pipeline {
                 }
             }
         }
+        stage('Linting & Doc checks') {
+            agent any
+            steps {
+                script {
+                    sh "printenv"
+                    retry(3) { checkout scm }
+                    sh """
+                       make math-revert
+                       make clean-all
+                       git clean -xffd
+                    """
+                    utils.checkout_pr("math", "lib/stan_math", params.math_pr)
+                    stash 'StanSetup'
+                    setupCXX(true, env.GCC)
+                    parallel(
+                        CppLint: { sh "make cpplint" },
+                        API_docs: { sh 'make doxygen' },
+                    )
+                }
+            }
+            post {
+                always {
+
+                    recordIssues id: "lint_doc_checks",
+                    name: "Linting & Doc checks",
+                    enabledForFailure: true,
+                    aggregatingResults : true,
+                    tools: [
+                        cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
+                    ],
+                    blameDisabled: false,
+                    qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                    referenceJobName: env.BRANCH_NAME
+
+                    deleteDir()
+                }
+            }
+        }
         stage('Verify changes') {
             agent { label 'linux' }
             steps {
-                script {         
+                script {
 
                     retry(3) { checkout scm }
                     sh 'git clean -xffd'
@@ -170,8 +170,8 @@ pipeline {
                     // These paths will be passed to git diff
                     // If there are changes to them, CI/CD will continue else skip
                     def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
-                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
-                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
+                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test',
+                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile',
                         'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
                     ].join(" ")
 
@@ -252,11 +252,11 @@ pipeline {
                         setupCXX()
                         script {
                             dir("lib/stan_math/") {
-                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                withEnv(['PATH+TBB=./lib/tbb']) {
                                     try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
                                     finally { junit 'test/**/*.xml' }
                                 }
-                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                withEnv(['PATH+TBB=./lib/tbb']) {
                                     sh "python ./test/expressions/test_expression_testing_framework.py"
                                 }
                             }
@@ -272,13 +272,13 @@ pipeline {
             }
         }
         stage('Upstream CmdStan tests') {
-            when { 
-                    expression { 
+            when {
+                    expression {
                         ( env.BRANCH_NAME ==~ /PR-\d+/ ||
                         env.BRANCH_NAME == "downstream_tests" ||
                         env.BRANCH_NAME == "downstream_hotfix" ) &&
-                        !skipRemainingStages 
-                    } 
+                        !skipRemainingStages
+                    }
                 }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
