@@ -208,7 +208,8 @@ class reader {
    */
   inline auto vector_constrain(size_t m, T & /*lp*/) {
     if (m == 0)
-      return map_vector_t(nullptr, m);;
+      return map_vector_t(nullptr, m);
+    ;
     return map_vector_t(&scalar_ptr_increment(m), m);
   }
 
@@ -1232,14 +1233,16 @@ class reader {
 
   template <typename TL>
   inline auto matrix_lb_constrain(const TL lb, size_t m, size_t n) {
-    return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::lb_constrain(x, lb); }).eval();
+    return matrix(m, n)
+        .unaryExpr([&](auto &x) { return stan::math::lb_constrain(x, lb); })
+        .eval();
   }
 
   template <typename TL>
   inline auto matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
-    return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::lb_constrain(x, lb, lp); }).eval();
+    return matrix(m, n)
+        .unaryExpr([&](auto &x) { return stan::math::lb_constrain(x, lb, lp); })
+        .eval();
   }
 
   template <typename TU>
@@ -1288,15 +1291,17 @@ class reader {
 
   template <typename TU>
   inline auto matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
-    return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::ub_constrain(x, ub); }).eval();
+    return matrix(m, n)
+        .unaryExpr([&](auto &x) { return stan::math::ub_constrain(x, ub); })
+        .eval();
   }
 
   template <typename TU>
   inline auto matrix_ub_constrain(const TU ub, const size_t m, size_t n,
-                                      T &lp) {
-    return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::ub_constrain(x, ub, lp); }).eval();
+                                  T &lp) {
+    return matrix(m, n)
+        .unaryExpr([&](auto &x) { return stan::math::ub_constrain(x, ub, lp); })
+        .eval();
   }
 
   template <typename TL, typename TU>
@@ -1313,8 +1318,7 @@ class reader {
   }
 
   template <typename TL, typename TU>
-  inline auto vector_lub_constrain(const TL lb, const TU ub, size_t m,
-                                       T &lp) {
+  inline auto vector_lub_constrain(const TL lb, const TU ub, size_t m, T &lp) {
     return stan::math::lub_constrain(vector(m), lb, ub, lp);
   }
 
@@ -1347,80 +1351,86 @@ class reader {
 
   template <typename TL, typename TU>
   inline auto matrix_lub_constrain(const TL lb, const TU ub, size_t m,
-                                       size_t n) {
-    return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::lub_constrain(x, lb, ub); }).eval();
+                                   size_t n) {
+    return matrix(m, n)
+        .unaryExpr(
+            [&](auto &x) { return stan::math::lub_constrain(x, lb, ub); })
+        .eval();
   }
 
   template <typename TL, typename TU>
-  inline auto matrix_lub_constrain(const TL lb, const TU ub, size_t m,
-                                       size_t n, T &lp) {
-    return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::lub_constrain(x, lb, ub, lp); }).eval();
+  inline auto matrix_lub_constrain(const TL lb, const TU ub, size_t m, size_t n,
+                                   T &lp) {
+    return matrix(m, n)
+        .unaryExpr(
+            [&](auto &x) { return stan::math::lub_constrain(x, lb, ub, lp); })
+        .eval();
   }
 
   template <typename TL, typename TS>
-  inline map_vector_t vector_offset_multiplier(const TL offset, const TS multiplier,
-                                           size_t m) {
+  inline map_vector_t vector_offset_multiplier(const TL offset,
+                                               const TS multiplier, size_t m) {
     return vector(m);
   }
 
   template <typename TL, typename TS>
   inline auto vector_offset_multiplier_constrain(const TL offset,
-                                                     const TS multiplier,
-                                                     size_t m) {
+                                                 const TS multiplier,
+                                                 size_t m) {
     return stan::math::offset_multiplier_constrain(vector(m), offset,
                                                    multiplier);
   }
 
   template <typename TL, typename TS>
   inline auto vector_offset_multiplier_constrain(const TL offset,
-                                                     const TS multiplier,
-                                                     size_t m, T &lp) {
+                                                 const TS multiplier, size_t m,
+                                                 T &lp) {
     return stan::math::offset_multiplier_constrain(vector(m), offset,
                                                    multiplier, lp);
   }
 
   template <typename TL, typename TS>
   inline map_row_vector_t row_vector_offset_multiplier(const TL offset,
-                                                   const TS multiplier,
-                                                   size_t m) {
+                                                       const TS multiplier,
+                                                       size_t m) {
     return row_vector(m);
   }
 
   template <typename TL, typename TS>
-  inline auto row_vector_offset_multiplier_constrain(
-      const TL offset, const TS multiplier, size_t m) {
+  inline auto row_vector_offset_multiplier_constrain(const TL offset,
+                                                     const TS multiplier,
+                                                     size_t m) {
     return stan::math::offset_multiplier_constrain(row_vector(m), offset,
                                                    multiplier);
   }
 
   template <typename TL, typename TS>
-  inline auto row_vector_offset_multiplier_constrain(
-      const TL offset, const TS multiplier, size_t m, T &lp) {
+  inline auto row_vector_offset_multiplier_constrain(const TL offset,
+                                                     const TS multiplier,
+                                                     size_t m, T &lp) {
     return stan::math::offset_multiplier_constrain(row_vector(m), offset,
                                                    multiplier, lp);
   }
 
   template <typename TL, typename TS>
-  inline map_matrix_t matrix_offset_multiplier(const TL offset, const TS multiplier,
-                                           size_t m, size_t n) {
+  inline map_matrix_t matrix_offset_multiplier(const TL offset,
+                                               const TS multiplier, size_t m,
+                                               size_t n) {
     return matrix(m, n);
   }
 
   template <typename TL, typename TS>
   inline auto matrix_offset_multiplier_constrain(const TL offset,
-                                                     const TS multiplier,
-                                                     size_t m, size_t n) {
+                                                 const TS multiplier, size_t m,
+                                                 size_t n) {
     return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
                                                    multiplier);
   }
 
   template <typename TL, typename TS>
   inline auto matrix_offset_multiplier_constrain(const TL offset,
-                                                     const TS multiplier,
-                                                     size_t m, size_t n,
-                                                     T &lp) {
+                                                 const TS multiplier, size_t m,
+                                                 size_t n, T &lp) {
     return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
                                                    multiplier, lp);
   }
