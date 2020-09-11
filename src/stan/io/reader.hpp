@@ -181,10 +181,10 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  inline vector_t vector(size_t m) {
+  inline auto vector(size_t m) {
     if (m == 0)
-      return vector_t();
-    return vector_t(map_vector_t(&scalar_ptr_increment(m), m));
+      return map_vector_t(nullptr, m);
+    return map_vector_t(&scalar_ptr_increment(m), m);
   }
   /**
    * Return a column vector of specified dimensionality made up of
@@ -193,10 +193,10 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  inline vector_t vector_constrain(size_t m) {
+  inline auto vector_constrain(size_t m) {
     if (m == 0)
-      return vector_t();
-    return vector_t(map_vector_t(&scalar_ptr_increment(m), m));
+      return map_vector_t(nullptr, m);
+    return map_vector_t(&scalar_ptr_increment(m), m);
   }
   /**
    * Return a column vector of specified dimensionality made up of
@@ -206,10 +206,10 @@ class reader {
    * lp Log probability to increment.
    * @return Column vector made up of the next scalars.
    */
-  inline vector_t vector_constrain(size_t m, T & /*lp*/) {
+  inline auto vector_constrain(size_t m, T & /*lp*/) {
     if (m == 0)
-      return vector_t();
-    return vector_t(map_vector_t(&scalar_ptr_increment(m), m));
+      return map_vector_t(nullptr, m);;
+    return map_vector_t(&scalar_ptr_increment(m), m);
   }
 
   /**
@@ -219,10 +219,10 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  inline row_vector_t row_vector(size_t m) {
+  inline auto row_vector(size_t m) {
     if (m == 0)
-      return row_vector_t();
-    return row_vector_t(map_row_vector_t(&scalar_ptr_increment(m), m));
+      return map_row_vector_t(nullptr, m);
+    return map_row_vector_t(&scalar_ptr_increment(m), m);
   }
 
   /**
@@ -232,10 +232,10 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  inline row_vector_t row_vector_constrain(size_t m) {
+  inline auto row_vector_constrain(size_t m) {
     if (m == 0)
-      return row_vector_t();
-    return row_vector_t(map_row_vector_t(&scalar_ptr_increment(m), m));
+      return map_row_vector_t(nullptr, m);
+    return map_row_vector_t(&scalar_ptr_increment(m), m);
   }
 
   /**
@@ -247,10 +247,10 @@ class reader {
    * lp Log probability to increment.
    * @return Column vector made up of the next scalars.
    */
-  inline row_vector_t row_vector_constrain(size_t m, T & /*lp*/) {
+  inline auto row_vector_constrain(size_t m, T & /*lp*/) {
     if (m == 0)
-      return row_vector_t();
-    return row_vector_t(map_row_vector_t(&scalar_ptr_increment(m), m));
+      return map_row_vector_t(nullptr, m);
+    return map_row_vector_t(&scalar_ptr_increment(m), m);
   }
 
   /**
@@ -270,10 +270,10 @@ class reader {
    * @param n Number of columns.
    * @return Eigen::Matrix made up of the next scalars.
    */
-  inline matrix_t matrix(size_t m, size_t n) {
+  inline auto matrix(size_t m, size_t n) {
     if (m == 0 || n == 0)
-      return matrix_t(m, n);
-    return matrix_t(map_matrix_t(&scalar_ptr_increment(m * n), m, n));
+      return map_matrix_t(nullptr, m, n);
+    return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
   }
 
   /**
@@ -286,10 +286,10 @@ class reader {
    * @param n Number of columns.
    * @return Matrix made up of the next scalars.
    */
-  inline matrix_t matrix_constrain(size_t m, size_t n) {
+  inline auto matrix_constrain(size_t m, size_t n) {
     if (m == 0 || n == 0)
-      return matrix_t(m, n);
-    return matrix_t(map_matrix_t(&scalar_ptr_increment(m * n), m, n));
+      return map_matrix_t(nullptr, m, n);
+    return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
   }
 
   /**
@@ -304,10 +304,10 @@ class reader {
    * lp Log probability to increment.
    * @return Matrix made up of the next scalars.
    */
-  inline matrix_t matrix_constrain(size_t m, size_t n, T & /*lp*/) {
+  inline auto matrix_constrain(size_t m, size_t n, T & /*lp*/) {
     if (m == 0 || n == 0)
-      return matrix_t(m, n);
-    return matrix_t(map_matrix_t(&scalar_ptr_increment(m * n), m, n));
+      return map_matrix_t(nullptr, m, n);
+    return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
   }
 
   /**
@@ -791,12 +791,12 @@ class reader {
    * @throw std::runtime_error if the next k values is not a unit_vector
    * @throw std::invalid_argument if k is zero
    */
-  inline vector_t unit_vector(size_t k) {
+  inline map_vector_t unit_vector(size_t k) {
     if (k == 0) {
       std::string msg = "io::unit_vector: unit vectors cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    vector_t theta(vector(k));
+    map_vector_t theta(vector(k));
     stan::math::check_unit_vector("stan::io::unit_vector", "Constrained vector",
                                   theta);
     return theta;
@@ -813,7 +813,7 @@ class reader {
    * @return unit_vector derived from next <code>k</code> scalars.
    * @throw std::invalid_argument if k is zero
    */
-  inline vector_t unit_vector_constrain(size_t k) {
+  inline auto unit_vector_constrain(size_t k) {
     if (k == 0) {
       std::string msg
           = "io::unit_vector_constrain:"
@@ -836,7 +836,7 @@ class reader {
    * @return The next unit_vector of the specified size.
    * @throw std::invalid_argument if k is zero
    */
-  inline vector_t unit_vector_constrain(size_t k, T &lp) {
+  inline auto unit_vector_constrain(size_t k, T &lp) {
     if (k == 0) {
       std::string msg
           = "io::unit_vector_constrain:"
@@ -857,12 +857,12 @@ class reader {
    * @throw std::runtime_error if the k values is not a simplex.
    * @throw std::invalid_argument if k is zero
    */
-  inline vector_t simplex(size_t k) {
+  inline map_vector_t simplex(size_t k) {
     if (k == 0) {
       std::string msg = "io::simplex: simplexes cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    vector_t theta(vector(k));
+    map_vector_t theta(vector(k));
     stan::math::check_simplex("stan::io::simplex", "Constrained vector", theta);
     return theta;
   }
@@ -878,7 +878,7 @@ class reader {
    * @return simplex derived from next `k - 1` scalars
    * @throws std::invalid_argument if number of dimensions (`k`) is zero
    */
-  inline Eigen::Matrix<T, Eigen::Dynamic, 1> simplex_constrain(size_t k) {
+  inline auto simplex_constrain(size_t k) {
     if (k == 0) {
       std::string msg = "io::simplex_constrain: simplexes cannot be size 0.";
       throw std::invalid_argument(msg);
@@ -899,7 +899,7 @@ class reader {
    * @return The next simplex of the specified size.
    * @throws std::invalid_argument if number of dimensions (`k`) is zero
    */
-  inline vector_t simplex_constrain(size_t k, T &lp) {
+  inline auto simplex_constrain(size_t k, T &lp) {
     if (k == 0) {
       std::string msg = "io::simplex_constrain: simplexes cannot be size 0.";
       throw std::invalid_argument(msg);
@@ -917,8 +917,8 @@ class reader {
    * @param k Size of returned vector.
    * @return Vector of positive values in ascending order.
    */
-  inline vector_t ordered(size_t k) {
-    vector_t x(vector(k));
+  inline map_vector_t ordered(size_t k) {
+    map_vector_t x(vector(k));
     stan::math::check_ordered("stan::io::ordered", "Constrained vector", x);
     return x;
   }
@@ -932,7 +932,7 @@ class reader {
    * @return Next ordered vector of the specified
    * length.
    */
-  inline vector_t ordered_constrain(size_t k) {
+  inline auto ordered_constrain(size_t k) {
     return stan::math::ordered_constrain(vector(k));
   }
 
@@ -947,7 +947,7 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return Next ordered vector of the specified size.
    */
-  inline vector_t ordered_constrain(size_t k, T &lp) {
+  inline auto ordered_constrain(size_t k, T &lp) {
     return stan::math::ordered_constrain(vector(k), lp);
   }
 
@@ -961,8 +961,8 @@ class reader {
    * @param k Size of returned vector.
    * @return Vector of positive values in ascending order.
    */
-  inline vector_t positive_ordered(size_t k) {
-    vector_t x(vector(k));
+  inline map_vector_t positive_ordered(size_t k) {
+    map_vector_t x(vector(k));
     stan::math::check_positive_ordered("stan::io::positive_ordered",
                                        "Constrained vector", x);
     return x;
@@ -977,7 +977,7 @@ class reader {
    * @return Next positive_ordered vector of the specified
    * length.
    */
-  inline vector_t positive_ordered_constrain(size_t k) {
+  inline auto positive_ordered_constrain(size_t k) {
     return stan::math::positive_ordered_constrain(vector(k));
   }
 
@@ -992,7 +992,7 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return Next positive_ordered vector of the specified size.
    */
-  inline vector_t positive_ordered_constrain(size_t k, T &lp) {
+  inline auto positive_ordered_constrain(size_t k, T &lp) {
     return stan::math::positive_ordered_constrain(vector(k), lp);
   }
 
@@ -1006,8 +1006,8 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    * Cholesky factor.
    */
-  inline matrix_t cholesky_factor_cov(size_t M, size_t N) {
-    matrix_t y(matrix(M, N));
+  inline map_matrix_t cholesky_factor_cov(size_t M, size_t N) {
+    map_matrix_t y(matrix(M, N));
     stan::math::check_cholesky_factor("stan::io::cholesky_factor_cov",
                                       "Constrained matrix", y);
     return y;
@@ -1024,7 +1024,7 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor.
    */
-  inline matrix_t cholesky_factor_cov_constrain(size_t M, size_t N) {
+  inline auto cholesky_factor_cov_constrain(size_t M, size_t N) {
     return stan::math::cholesky_factor_constrain(
         vector((N * (N + 1)) / 2 + (M - N) * N), M, N);
   }
@@ -1042,7 +1042,7 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor.
    */
-  inline matrix_t cholesky_factor_cov_constrain(size_t M, size_t N, T &lp) {
+  inline auto cholesky_factor_cov_constrain(size_t M, size_t N, T &lp) {
     return stan::math::cholesky_factor_constrain(
         vector((N * (N + 1)) / 2 + (M - N) * N), M, N, lp);
   }
@@ -1057,9 +1057,9 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    * Cholesky factor for a correlation matrix.
    */
-  inline matrix_t cholesky_factor_corr(size_t K) {
+  inline map_matrix_t cholesky_factor_corr(size_t K) {
     using stan::math::check_cholesky_factor_corr;
-    matrix_t y(matrix(K, K));
+    map_matrix_t y(matrix(K, K));
     check_cholesky_factor_corr("stan::io::cholesky_factor_corr",
                                "Constrained matrix", y);
     return y;
@@ -1075,7 +1075,7 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor for a correlation matrix.
    */
-  inline matrix_t cholesky_factor_corr_constrain(size_t K) {
+  inline auto cholesky_factor_corr_constrain(size_t K) {
     return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K);
   }
 
@@ -1092,7 +1092,7 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor for a correlation matrix.
    */
-  inline matrix_t cholesky_factor_corr_constrain(size_t K, T &lp) {
+  inline auto cholesky_factor_corr_constrain(size_t K, T &lp) {
     return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K,
                                                lp);
   }
@@ -1108,8 +1108,8 @@ class reader {
    * @throw std::runtime_error if the matrix is not a valid
    *    covariance matrix
    */
-  inline matrix_t cov_matrix(size_t k) {
-    matrix_t y(matrix(k, k));
+  inline map_matrix_t cov_matrix(size_t k) {
+    map_matrix_t y(matrix(k, k));
     stan::math::check_cov_matrix("stan::io::cov_matrix", "Constrained matrix",
                                  y);
     return y;
@@ -1123,7 +1123,7 @@ class reader {
    * @param k Dimensionality of covariance matrix.
    * @return Next covariance matrix of the specified dimensionality.
    */
-  inline matrix_t cov_matrix_constrain(size_t k) {
+  inline auto cov_matrix_constrain(size_t k) {
     return stan::math::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2), k);
   }
 
@@ -1138,7 +1138,7 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return The next covariance matrix of the specified dimensionality.
    */
-  inline matrix_t cov_matrix_constrain(size_t k, T &lp) {
+  inline auto cov_matrix_constrain(size_t k, T &lp) {
     return stan::math::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2), k,
                                             lp);
   }
@@ -1152,8 +1152,8 @@ class reader {
    * @return Next correlation matrix of the specified dimensionality.
    * @throw std::runtime_error if the matrix is not a correlation matrix
    */
-  inline matrix_t corr_matrix(size_t k) {
-    matrix_t x(matrix(k, k));
+  inline map_matrix_t corr_matrix(size_t k) {
+    map_matrix_t x(matrix(k, k));
     stan::math::check_corr_matrix("stan::math::corr_matrix",
                                   "Constrained matrix", x);
     return x;
@@ -1167,7 +1167,7 @@ class reader {
    * @param k Dimensionality of correlation matrix.
    * @return Next correlation matrix of the specified dimensionality.
    */
-  inline matrix_t corr_matrix_constrain(size_t k) {
+  inline auto corr_matrix_constrain(size_t k) {
     return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k);
   }
 
@@ -1182,146 +1182,146 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return The next correlation matrix of the specified dimensionality.
    */
-  inline matrix_t corr_matrix_constrain(size_t k, T &lp) {
+  inline auto corr_matrix_constrain(size_t k, T &lp) {
     return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k, lp);
   }
 
   template <typename TL>
-  inline vector_t vector_lb(const TL lb, size_t m) {
-    vector_t v(vector(m));
+  inline map_vector_t vector_lb(const TL lb, size_t m) {
+    map_vector_t v(vector(m));
     stan::math::check_greater_or_equal("stan::io::vector_lb",
                                        "Constrained vector", v, lb);
     return v;
   }
 
   template <typename TL>
-  inline vector_t vector_lb_constrain(const TL lb, size_t m) {
+  inline auto vector_lb_constrain(const TL lb, size_t m) {
     return stan::math::lb_constrain(vector(m), lb);
   }
 
   template <typename TL>
-  inline vector_t vector_lb_constrain(const TL lb, size_t m, T &lp) {
+  inline auto vector_lb_constrain(const TL lb, size_t m, T &lp) {
     return stan::math::lb_constrain(vector(m), lb, lp);
   }
 
   template <typename TL>
-  inline row_vector_t row_vector_lb(const TL lb, size_t m) {
-    row_vector_t v(row_vector(m));
+  inline map_row_vector_t row_vector_lb(const TL lb, size_t m) {
+    map_row_vector_t v(row_vector(m));
     stan::math::check_greater_or_equal("stan::io::row_vector_lb",
                                        "Constrained row vector", v, lb);
     return v;
   }
 
   template <typename TL>
-  inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m) {
+  inline auto row_vector_lb_constrain(const TL lb, size_t m) {
     return stan::math::lb_constrain(row_vector(m), lb);
   }
 
   template <typename TL>
-  inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
+  inline auto row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
     return stan::math::lb_constrain(row_vector(m), lb, lp);
   }
 
   template <typename TL>
-  inline matrix_t matrix_lb(const TL lb, const size_t m, size_t n) {
-    matrix_t mat(matrix(m, n));
+  inline map_matrix_t matrix_lb(const TL lb, const size_t m, size_t n) {
+    map_matrix_t mat(matrix(m, n));
     stan::math::check_greater_or_equal("stan::io::matrix_lb",
                                        "Constrained matrix", mat, lb);
     return mat;
   }
 
   template <typename TL>
-  inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n) {
+  inline auto matrix_lb_constrain(const TL lb, size_t m, size_t n) {
     return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::lb_constrain(x, lb); });
+        [&](auto &x) { return stan::math::lb_constrain(x, lb); }).eval();
   }
 
   template <typename TL>
-  inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
+  inline auto matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
     return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::lb_constrain(x, lb, lp); });
+        [&](auto &x) { return stan::math::lb_constrain(x, lb, lp); }).eval();
   }
 
   template <typename TU>
-  inline vector_t vector_ub(const TU ub, size_t m) {
-    vector_t v(vector(m));
+  inline map_vector_t vector_ub(const TU ub, size_t m) {
+    map_vector_t v(vector(m));
     stan::math::check_less_or_equal("stan::io::vector_ub", "Constrained vector",
                                     v, ub);
     return v;
   }
 
   template <typename TU>
-  inline vector_t vector_ub_constrain(const TU ub, size_t m) {
+  inline auto vector_ub_constrain(const TU ub, size_t m) {
     return stan::math::ub_constrain(vector(m), ub);
   }
 
   template <typename TU>
-  inline vector_t vector_ub_constrain(const TU ub, size_t m, T &lp) {
+  inline auto vector_ub_constrain(const TU ub, size_t m, T &lp) {
     return stan::math::ub_constrain(vector(m), ub, lp);
   }
 
   template <typename TU>
-  inline row_vector_t row_vector_ub(const TU ub, size_t m) {
-    row_vector_t v(row_vector(m));
+  inline map_row_vector_t row_vector_ub(const TU ub, size_t m) {
+    map_row_vector_t v(row_vector(m));
     stan::math::check_less_or_equal("stan::io::row_vector_ub",
                                     "Constrained row vector", v, ub);
     return v;
   }
 
   template <typename TU>
-  inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m) {
+  inline auto row_vector_ub_constrain(const TU ub, size_t m) {
     return stan::math::ub_constrain(row_vector(m), ub);
   }
 
   template <typename TU>
-  inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
+  inline auto row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
     return stan::math::ub_constrain(row_vector(m), ub, lp);
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub(const TU ub, size_t m, size_t n) {
-    matrix_t mat(matrix(m, n));
+  inline map_matrix_t matrix_ub(const TU ub, size_t m, size_t n) {
+    map_matrix_t mat(matrix(m, n));
     stan::math::check_less_or_equal("stan::io::matrix_ub", "Constrained matrix",
                                     mat, ub);
     return mat;
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
+  inline auto matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
     return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::ub_constrain(x, ub); });
+        [&](auto &x) { return stan::math::ub_constrain(x, ub); }).eval();
   }
 
   template <typename TU>
-  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n,
+  inline auto matrix_ub_constrain(const TU ub, const size_t m, size_t n,
                                       T &lp) {
     return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::ub_constrain(x, ub, lp); });
+        [&](auto &x) { return stan::math::ub_constrain(x, ub, lp); }).eval();
   }
 
   template <typename TL, typename TU>
-  inline vector_t vector_lub(const TL lb, const TU ub, size_t m) {
-    vector_t v(vector(m));
-    stan::math::check_bounded<vector_t, TL, TU>(
+  inline map_vector_t vector_lub(const TL lb, const TU ub, size_t m) {
+    map_vector_t v(vector(m));
+    stan::math::check_bounded<map_vector_t, TL, TU>(
         "stan::io::vector_lub", "Constrained vector", v, lb, ub);
     return v;
   }
 
   template <typename TL, typename TU>
-  inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m) {
+  inline auto vector_lub_constrain(const TL lb, const TU ub, size_t m) {
     return stan::math::lub_constrain(vector(m), lb, ub);
   }
 
   template <typename TL, typename TU>
-  inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m,
+  inline auto vector_lub_constrain(const TL lb, const TU ub, size_t m,
                                        T &lp) {
     return stan::math::lub_constrain(vector(m), lb, ub, lp);
   }
 
   template <typename TL, typename TU>
-  inline row_vector_t row_vector_lub(const TL lb, const TU ub, size_t m) {
-    row_vector_t v(row_vector(m));
-    stan::math::check_bounded<row_vector_t, TL, TU>(
+  inline map_row_vector_t row_vector_lub(const TL lb, const TU ub, size_t m) {
+    map_row_vector_t v(row_vector(m));
+    stan::math::check_bounded<map_row_vector_t, TL, TU>(
         "stan::io::row_vector_lub", "Constrained row vector", v, lb, ub);
     return v;
   }
@@ -1338,35 +1338,35 @@ class reader {
   }
 
   template <typename TL, typename TU>
-  inline matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
-    matrix_t mat(matrix(m, n));
-    stan::math::check_bounded<matrix_t, TL, TU>(
+  inline map_matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
+    map_matrix_t mat(matrix(m, n));
+    stan::math::check_bounded<map_matrix_t, TL, TU>(
         "stan::io::row_vector_lub", "Constrained row vector", mat, lb, ub);
     return mat;
   }
 
   template <typename TL, typename TU>
-  inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m,
+  inline auto matrix_lub_constrain(const TL lb, const TU ub, size_t m,
                                        size_t n) {
     return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::lub_constrain(x, lb, ub); });
+        [&](auto &x) { return stan::math::lub_constrain(x, lb, ub); }).eval();
   }
 
   template <typename TL, typename TU>
-  inline matrix_t matrix_lub_constrain(const TL lb, const TU ub, size_t m,
+  inline auto matrix_lub_constrain(const TL lb, const TU ub, size_t m,
                                        size_t n, T &lp) {
     return matrix(m, n).unaryExpr(
-        [&](auto &x) { return stan::math::lub_constrain(x, lb, ub, lp); });
+        [&](auto &x) { return stan::math::lub_constrain(x, lb, ub, lp); }).eval();
   }
 
   template <typename TL, typename TS>
-  inline vector_t vector_offset_multiplier(const TL offset, const TS multiplier,
+  inline map_vector_t vector_offset_multiplier(const TL offset, const TS multiplier,
                                            size_t m) {
     return vector(m);
   }
 
   template <typename TL, typename TS>
-  inline vector_t vector_offset_multiplier_constrain(const TL offset,
+  inline auto vector_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m) {
     return stan::math::offset_multiplier_constrain(vector(m), offset,
@@ -1374,7 +1374,7 @@ class reader {
   }
 
   template <typename TL, typename TS>
-  inline vector_t vector_offset_multiplier_constrain(const TL offset,
+  inline auto vector_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m, T &lp) {
     return stan::math::offset_multiplier_constrain(vector(m), offset,
@@ -1382,34 +1382,34 @@ class reader {
   }
 
   template <typename TL, typename TS>
-  inline row_vector_t row_vector_offset_multiplier(const TL offset,
+  inline map_row_vector_t row_vector_offset_multiplier(const TL offset,
                                                    const TS multiplier,
                                                    size_t m) {
     return row_vector(m);
   }
 
   template <typename TL, typename TS>
-  inline row_vector_t row_vector_offset_multiplier_constrain(
+  inline auto row_vector_offset_multiplier_constrain(
       const TL offset, const TS multiplier, size_t m) {
     return stan::math::offset_multiplier_constrain(row_vector(m), offset,
                                                    multiplier);
   }
 
   template <typename TL, typename TS>
-  inline row_vector_t row_vector_offset_multiplier_constrain(
+  inline auto row_vector_offset_multiplier_constrain(
       const TL offset, const TS multiplier, size_t m, T &lp) {
     return stan::math::offset_multiplier_constrain(row_vector(m), offset,
                                                    multiplier, lp);
   }
 
   template <typename TL, typename TS>
-  inline matrix_t matrix_offset_multiplier(const TL offset, const TS multiplier,
+  inline map_matrix_t matrix_offset_multiplier(const TL offset, const TS multiplier,
                                            size_t m, size_t n) {
     return matrix(m, n);
   }
 
   template <typename TL, typename TS>
-  inline matrix_t matrix_offset_multiplier_constrain(const TL offset,
+  inline auto matrix_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m, size_t n) {
     return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
@@ -1417,7 +1417,7 @@ class reader {
   }
 
   template <typename TL, typename TS>
-  inline matrix_t matrix_offset_multiplier_constrain(const TL offset,
+  inline auto matrix_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m, size_t n,
                                                      T &lp) {
