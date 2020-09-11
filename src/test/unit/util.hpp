@@ -1,10 +1,10 @@
-#ifndef TEST__UNIT__UTIL_HPP
-#define TEST__UNIT__UTIL_HPP
+#ifndef TEST_UNIT_UTIL_HPP
+#define TEST_UNIT_UTIL_HPP
 
 #include <stan/io/stan_csv_reader.hpp>
 
 #include <boost/algorithm/string.hpp>
-#include <Eigen/Dense>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>

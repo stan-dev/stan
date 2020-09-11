@@ -4,7 +4,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <boost/lexical_cast.hpp>
-#include <Eigen/Dense>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <string>
 #include <vector>
 

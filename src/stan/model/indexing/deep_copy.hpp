@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_INDEXING_DEEP_COPY_HPP
 #define STAN_MODEL_INDEXING_DEEP_COPY_HPP
 
-#include <Eigen/Dense>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <vector>
 
 namespace stan {

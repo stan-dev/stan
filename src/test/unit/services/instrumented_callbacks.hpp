@@ -4,7 +4,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/interrupt.hpp>
-#include <Eigen/Dense>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <map>
 #include <string>
 #include <iostream>
