@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <vector>
 #include <stan/model/indexing/rvalue.hpp>
+#include <stan/math.hpp>
 #include <gtest/gtest.h>
 
 using stan::model::cons_index_list;
@@ -29,6 +30,21 @@ TEST(ModelIndexing, rvalue_vector_nil) {
   EXPECT_FLOAT_EQ(2.2, rx[1]);
 }
 
+TEST(ModelIndexing, rvalue_varvector_nil) {
+  using stan::math::var_value;
+  Eigen::VectorXd x(3);
+  x(0) = 1.1;
+  x(1) = 2.2;
+  x(2) = 3.3;
+  var_value<Eigen::VectorXd> xv(x);
+  var_value<Eigen::VectorXd> rx = rvalue(xv, nil_index_list());
+  EXPECT_EQ(3, rx.size());
+  EXPECT_FLOAT_EQ(1.1, rx.val()(0));
+  EXPECT_FLOAT_EQ(2.2, rx.val()(1));
+  EXPECT_FLOAT_EQ(3.3, rx.val()(2));
+  stan::math::recover_memory();
+}
+
 TEST(ModelIndexing, rvalue_vector_uni_nil) {
   std::vector<double> x;
   x.push_back(1.1);
@@ -41,6 +57,23 @@ TEST(ModelIndexing, rvalue_vector_uni_nil) {
   test_out_of_range(x, index_list(index_uni(-1)));
   test_out_of_range(x, index_list(index_uni(0)));
   test_out_of_range(x, index_list(index_uni(4)));
+}
+
+TEST(ModelIndexing, rvalue_varvector_uni_nil) {
+  using stan::math::var_value;
+  Eigen::VectorXd x(3);
+  x(0) = 1.1;
+  x(1) = 2.2;
+  x(2) = 3.3;
+  var_value<Eigen::VectorXd> xv(x);
+
+  for (size_t k = 0; k < x.size(); ++k)
+    EXPECT_EQ(x[k], rvalue(xv, index_list(index_uni(k + 1))).val());
+
+  test_out_of_range(x, index_list(index_uni(-1)));
+  test_out_of_range(x, index_list(index_uni(0)));
+  test_out_of_range(x, index_list(index_uni(4)));
+  stan::math::recover_memory();
 }
 
 TEST(ModelIndexing, rvalue_vector_multi_nil) {
@@ -144,6 +177,75 @@ TEST(ModelIndexing, rvalue_vector_min_max_nil) {
   test_out_of_range(x, index_list(index_min_max(2, 5)));
 }
 
+TEST(ModelIndexing, rvalue_eigenvec_min_max_nil) {
+  Eigen::Matrix<double, -1, 1> x(4);
+  x(0) = 1.1;
+  x(1) = 2.2;
+  x(2) = 3.3;
+  x(3) = 4.4;
+  // min > max
+  for (int mn = 0; mn < 4; ++mn) {
+    for (int mx = mn; mx < 4; ++mx) {
+      Eigen::Matrix<double, -1, 1> rx
+          = rvalue(x, index_list(index_min_max(mn + 1, mx + 1)));
+      EXPECT_FLOAT_EQ(mx - mn + 1, rx.size());
+      for (int n = mn; n <= mx; ++n)
+        EXPECT_FLOAT_EQ(x[n], rx[n - mn]);
+    }
+  }
+
+  // max > min
+  for (int mn = 3; mn > -1; --mn) {
+    for (int mx = mn; mx > -1; --mx) {
+      Eigen::Matrix<double, -1, 1> rx
+          = rvalue(x, index_list(index_min_max(mn + 1, mx + 1)));
+      EXPECT_FLOAT_EQ(mn - mx + 1, rx.size());
+      for (int n = mn; n <= mx; ++n)
+        EXPECT_FLOAT_EQ(x[n], rx[n - mn]);
+    }
+  }
+
+  test_out_of_range(x, index_list(index_min_max(0, 2)));
+  test_out_of_range(x, index_list(index_min_max(2, 5)));
+}
+
+
+TEST(ModelIndexing, rvalue_vector_varmat_min_max_nil) {
+  using stan::math::var_value;
+  Eigen::VectorXd x(4);
+  x(0) = 1.1;
+  x(1) = 2.2;
+  x(2) = 3.3;
+  x(3) = 4.4;
+  var_value<Eigen::VectorXd> xv(x);
+
+  // min > max
+  for (int mn = 0; mn < 4; ++mn) {
+    for (int mx = mn; mx < 4; ++mx) {
+      var_value<Eigen::VectorXd> rx
+          = rvalue(xv, index_list(index_min_max(mn + 1, mx + 1)));
+      EXPECT_FLOAT_EQ(mx - mn + 1, rx.size());
+      for (int n = mn; n <= mx; ++n)
+        EXPECT_FLOAT_EQ(x[n], rx.val()[n - mn]);
+    }
+  }
+
+  // max > min
+  for (int mn = 3; mn > -1; --mn) {
+    for (int mx = mn; mx > -1; --mx) {
+      var_value<Eigen::VectorXd> rx
+          = rvalue(xv, index_list(index_min_max(mn + 1, mx + 1)));
+      EXPECT_FLOAT_EQ(mn - mx + 1, rx.size());
+      for (int n = mn; n <= mx; ++n)
+        EXPECT_FLOAT_EQ(x[n], rx.val()[n - mn]);
+    }
+  }
+
+  test_out_of_range(xv, index_list(index_min_max(0, 2)));
+  test_out_of_range(xv, index_list(index_min_max(2, 5)));
+  stan::math::recover_memory();
+}
+
 TEST(ModelIndexing, rvalue_doubless_uni_uni) {
   using std::vector;
 
@@ -242,6 +344,66 @@ TEST(ModelIndexing, rvalue_doubless_uni_multi) {
 
   ns[ns.size() - 1] = 20;
   test_out_of_range(x, index_list(index_uni(1), index_multi(ns)));
+}
+
+TEST(ModelIndexing, rvalue_varmat_uni_multi) {
+  using stan::math::var_value;
+
+  Eigen::Matrix<double, -1, 1> xd0(3);
+  xd0(0) = 0.0;
+  xd0(1) = 0.1;
+  xd0(2) = 0.2;
+  var_value<Eigen::Matrix<double, -1, 1>> x0(xd0);
+
+  Eigen::Matrix<double, -1, 1> xd1(3);
+  xd1(0) = 1.0;
+  xd1(1) = 1.1;
+  xd1(2) = 1.2;
+  var_value<Eigen::Matrix<double, -1, 1>> x1(xd1);
+
+  Eigen::Matrix<double, -1, 1> xd2(3);
+  xd2(0) = 2.0;
+  xd2(1) = 2.1;
+  xd2(2) = 2.2;
+  var_value<Eigen::Matrix<double, -1, 1>> x2(xd2);
+  std::vector<var_value<Eigen::Matrix<double, -1, 1>>> x;
+
+  x.push_back(x0);
+  x.push_back(x1);
+  x.push_back(x2);
+  var_value<Eigen::Matrix<double, -1, 1>> y = rvalue(x, index_list(index_uni(1), index_min(2)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(0.1, y.val()[0]);
+  EXPECT_FLOAT_EQ(0.2, y.val()[1]);
+  test_out_of_range(x, index_list(index_uni(0), index_min(2)));
+  test_out_of_range(x, index_list(index_uni(1), index_min(0)));
+  // TODO: Test reverse pass for adjoint propogration
+  y = rvalue(x, index_list(index_uni(2), index_max(2)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.0, y.val()[0]);
+  EXPECT_FLOAT_EQ(1.1, y.val()[1]);
+  test_out_of_range(x, index_list(index_uni(0), index_max(2)));
+  test_out_of_range(x, index_list(index_uni(1), index_max(15)));
+
+  y = rvalue(x, index_list(index_uni(2), index_min_max(2, 3)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.1, y.val()[0]);
+  EXPECT_FLOAT_EQ(1.2, y.val()[1]);
+  test_out_of_range(x, index_list(index_uni(0), index_min_max(2, 3)));
+  test_out_of_range(x, index_list(index_uni(10), index_min_max(2, 3)));
+  test_out_of_range(x, index_list(index_uni(1), index_min_max(0, 3)));
+  test_out_of_range(x, index_list(index_uni(1), index_min_max(2, 15)));
+
+  y = rvalue(x, index_list(index_uni(2), index_min_max(2, 2)));
+  EXPECT_EQ(1, y.size());
+  EXPECT_FLOAT_EQ(1.1, y.val()[0]);
+
+  y = rvalue(x, index_list(index_uni(3), index_omni()));
+  EXPECT_EQ(3, y.size());
+  EXPECT_FLOAT_EQ(2.0, y.val()[0]);
+  EXPECT_FLOAT_EQ(2.1, y.val()[1]);
+  EXPECT_FLOAT_EQ(2.2, y.val()[2]);
+  test_out_of_range(x, index_list(index_uni(0), index_omni()));
 }
 
 TEST(ModelIndexing, rvalue_doubless_multi_uni) {

@@ -2,6 +2,7 @@
 #define STAN_MODEL_INDEXING_RVALUE_HPP
 
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
@@ -54,6 +55,14 @@ inline auto&& rvalue(const EigVec& v,
   return v_ref.coeffRef(idx.head_.n_ - 1);
 }
 
+template <typename VarMat, require_var_vt<is_eigen_vector, VarMat>* = nullptr>
+inline auto rvalue(VarMat&& v,
+                const cons_index_list<index_uni, nil_index_list>& idx,
+                const char* name = "ANON", int depth = 0) {
+  math::check_range("vector[single] indexing", name, v.size(), idx.head_.n_);
+  return v.coeffRef(idx.head_.n_ - 1);
+}
+
 /**
  * Return the result of indexing the specified Eigen vector with a
  * sequence containing one single index, returning a scalar.
@@ -73,10 +82,23 @@ inline auto rvalue(const EigVec& v,
                 const char* name = "ANON", int depth = 0) {
   math::check_range("vector[min_max] min indexing", name, v.size(), idx.head_.min_);
   math::check_range("vector[min_max] max indexing", name, v.size(), idx.head_.max_);
-  if (idx.head_.min_ <= idx.head_.max_) {
-    return v.segment(idx.head_.min_ - 1, idx.head_.max_ - 1).eval();
+  if (idx.head_.min_ < idx.head_.max_) {
+    return v.segment(idx.head_.min_ - 1, idx.head_.max_ - (idx.head_.min_ - 1)).eval();
   } else {
-    return v.segment(idx.head_.max_ - 1, idx.head_.min_ - 1).reverse().eval();
+    return v.segment(idx.head_.max_ - 1, idx.head_.min_ - (idx.head_.max_ - 1)).reverse().eval();
+  }
+}
+
+template <typename VarMat, require_var_vt<is_eigen_vector, VarMat>* = nullptr>
+inline std::decay_t<VarMat> rvalue(VarMat&& v,
+                const cons_index_list<index_min_max, nil_index_list>& idx,
+                const char* name = "ANON", int depth = 0) {
+  math::check_range("var_vector[min_max] min indexing", name, v.size(), idx.head_.min_);
+  math::check_range("var_vector[min_max] max indexing", name, v.size(), idx.head_.max_);
+  if (idx.head_.min_ < idx.head_.max_) {
+    return v.segment(idx.head_.min_ - 1, idx.head_.max_ - (idx.head_.min_ - 1)).eval();
+  } else {
+    return v.segment(idx.head_.max_ - 1, idx.head_.min_ - (idx.head_.max_ - 1)).reverse().eval();
   }
 }
 
@@ -100,7 +122,7 @@ template <typename EigVec, typename I,
 inline plain_type_t<EigVec>
 rvalue(const EigVec& v, const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
        int depth = 0) {
-  int size = rvalue_index_size(idx.head_, v.size());
+  const int size = rvalue_index_size(idx.head_, v.size());
   const auto& v_ref = stan::math::to_ref(v);
   plain_type_t<EigVec> a(size);
   for (int i = 0; i < size; ++i) {
@@ -109,6 +131,30 @@ rvalue(const EigVec& v, const cons_index_list<I, nil_index_list>& idx, const cha
     a.coeffRef(i) = v_ref.coeff(n - 1);
   }
   return a;
+}
+
+template <typename VarMat, typename I,
+ require_var_vt<is_eigen_vector, VarMat>* = nullptr,
+ require_not_same_t<I, index_uni>* = nullptr>
+inline plain_type_t<VarMat>
+rvalue(VarMat&& v, const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
+       int depth = 0) {
+  const int size = rvalue_index_size(idx.head_, v.size());
+  arena_t<value_type_t<VarMat>> a(size);
+  arena_t<std::vector<int>> index_vec;
+  for (int i = 0; i < size; ++i) {
+    int n = rvalue_at(i, idx.head_);
+    math::check_range("vector[multi] indexing", name, v.val().size(), n);
+    a.coeffRef(i) = v.val().coeffRef(n - 1);
+    index_vec.push_back(n - 1);
+  }
+  std::decay_t<VarMat> ret_a(a);
+  stan::math::reverse_pass_callback([index_vec, v, ret_a]() mutable {
+    for (auto& ind : index_vec) {
+      const_cast<std::decay_t<VarMat>&>(v).adj()(ind) += ret_a.adj()(ind);
+    }
+  });
+  return ret_a;
 }
 
 /**
@@ -126,6 +172,14 @@ rvalue(const EigVec& v, const cons_index_list<I, nil_index_list>& idx, const cha
  */
 template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
 inline auto rvalue(const EigMat& a,
+    const cons_index_list<index_uni, cons_index_list<index_omni, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
+  return a.row(idx.head_.n_ - 1).eval();
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(VarMat&& a,
     const cons_index_list<index_uni, cons_index_list<index_omni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
@@ -377,11 +431,11 @@ inline plain_type_t<EigMat> rvalue(const EigMat& a,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing array.
  */
-template <typename T, typename L>
-inline rvalue_return_t<std::vector<T>, cons_index_list<index_uni, L>>
-    rvalue(const std::vector<T>& c, const cons_index_list<index_uni, L>& idx,
+ template <typename StdVec, typename L, require_std_vector_t<StdVec>* = nullptr>
+inline rvalue_return_t<std::decay_t<StdVec>, cons_index_list<index_uni, L>>
+    rvalue(StdVec&& c, const cons_index_list<index_uni, L>& idx,
            const char* name = "ANON", int depth = 0) {
-  int n = idx.head_.n_;
+  const int n = idx.head_.n_;
   math::check_range("array[uni,...] index", name, c.size(), n);
   return rvalue(c[n - 1], idx.tail_, name, depth + 1);
 }
@@ -402,12 +456,16 @@ inline rvalue_return_t<std::vector<T>, cons_index_list<index_uni, L>>
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing array.
  */
-template <typename T, typename I, typename L>
-inline rvalue_return_t<std::vector<T>, cons_index_list<I, L>>
-rvalue(const std::vector<T>& c, const cons_index_list<I, L>& idx,
+template <typename StdVec, typename I, typename L, require_std_vector_t<StdVec>* = nullptr>
+inline rvalue_return_t<std::decay_t<StdVec>, cons_index_list<I, L>>
+rvalue(StdVec&& c, const cons_index_list<I, L>& idx,
        const char* name = "ANON", int depth = 0) {
-  typename rvalue_return<std::vector<T>, cons_index_list<I, L> >::type result;
-  for (int i = 0; i < rvalue_index_size(idx.head_, c.size()); ++i) {
+  rvalue_return_t<std::decay_t<StdVec>, cons_index_list<I, L>> result;
+  const int index_size = rvalue_index_size(idx.head_, c.size());
+  if (index_size > 0) {
+    result.reserve(index_size);
+  }
+  for (int i = 0; i < index_size; ++i) {
     int n = rvalue_at(i, idx.head_);
     math::check_range("array[multi,...] index", name, c.size(), n);
     result.push_back(rvalue(c[n - 1], idx.tail_, name, depth + 1));
