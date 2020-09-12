@@ -209,7 +209,6 @@ class reader {
   inline auto vector_constrain(size_t m, T & /*lp*/) {
     if (m == 0)
       return map_vector_t(nullptr, m);
-    ;
     return map_vector_t(&scalar_ptr_increment(m), m);
   }
 
