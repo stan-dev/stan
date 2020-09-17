@@ -29,8 +29,115 @@ namespace model {
  */
 template <typename T>
 inline decltype(auto) rvalue(T&& c, const nil_index_list& /*idx*/,
-                const char* /*name*/ = "", int /*depth*/ = 0) {
+                             const char* /*name*/ = "", int /*depth*/ = 0) {
   return std::forward<T>(c);
+}
+
+/**
+ * Return the result of indexing a type without taking a subset. Mostly used as
+ * an intermediary rvalue function when doing multiple subsets.
+ *
+ * Types:  type[,] : type
+ *
+ * @tparam T Any type.
+ * @param[in] an object.
+ * @param[in] idx Index consisting of one omni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename T>
+inline decltype(auto) rvalue(
+    T&& a, const cons_index_list<index_omni, nil_index_list>& idx,
+    const char* name = "ANON", int depth = 0) {
+  return std::forward<T>(a);
+}
+
+/**
+ * Return the result of indexing a type without taking a subset
+ *
+ * Types:  type[,] : type
+ *
+ * @tparam T Any type.
+ * @param[in] an object.
+ * @param[in] idx Index consisting of one omni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename T>
+inline decltype(auto) rvalue(
+    T&& a,
+    const cons_index_list<index_omni,
+                          cons_index_list<index_omni, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  return std::forward<T>(a);
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a
+ * sequence consisting of one single index, returning a row vector.
+ *
+ * Types:  mat[single,] : rowvec
+ *
+ * @tparam T Scalar type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+inline auto rvalue(
+    const EigMat& a,
+    const cons_index_list<index_uni,
+                          cons_index_list<index_omni, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
+  return a.row(idx.head_.n_ - 1).eval();
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(
+    VarMat&& a,
+    const cons_index_list<index_uni,
+                          cons_index_list<index_omni, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
+  return a.row(idx.head_.n_ - 1).eval();
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a
+ * sequence consisting of one single index, returning a vector.
+ *
+ * Types:  mat[,single] : rowvec
+ *
+ * @tparam T Scalar type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+inline auto rvalue(
+    const EigMat& a,
+    const cons_index_list<index_omni,
+                          cons_index_list<index_uni, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni] indexing", name, a.cols(), idx.tail_.head_.n_);
+  return a.col(idx.tail_.head_.n_ - 1).eval();
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(
+    VarMat&& a,
+    const cons_index_list<index_omni,
+                          cons_index_list<index_uni, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni] indexing", name, a.cols(), idx.tail_.head_.n_);
+  return a.col(idx.tail_.head_.n_ - 1).eval();
 }
 
 /**
@@ -48,8 +155,8 @@ inline decltype(auto) rvalue(T&& c, const nil_index_list& /*idx*/,
  */
 template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
 inline auto&& rvalue(const EigVec& v,
-                const cons_index_list<index_uni, nil_index_list>& idx,
-                const char* name = "ANON", int depth = 0) {
+                     const cons_index_list<index_uni, nil_index_list>& idx,
+                     const char* name = "ANON", int depth = 0) {
   math::check_range("vector[single] indexing", name, v.size(), idx.head_.n_);
   const auto& v_ref = stan::math::to_ref(v);
   return v_ref.coeffRef(idx.head_.n_ - 1);
@@ -57,10 +164,39 @@ inline auto&& rvalue(const EigVec& v,
 
 template <typename VarMat, require_var_vt<is_eigen_vector, VarMat>* = nullptr>
 inline auto rvalue(VarMat&& v,
-                const cons_index_list<index_uni, nil_index_list>& idx,
-                const char* name = "ANON", int depth = 0) {
+                   const cons_index_list<index_uni, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
   math::check_range("vector[single] indexing", name, v.size(), idx.head_.n_);
   return v.coeffRef(idx.head_.n_ - 1);
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a
+ * sequence consisting of one single index, returning a row vector.
+ *
+ * Types:  mat[single] : rowvec
+ *
+ * @tparam T Scalar type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+inline auto rvalue(const EigMat& a,
+                   const cons_index_list<index_uni, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
+  return a.row(idx.head_.n_ - 1);
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(VarMat&& a,
+                   const cons_index_list<index_uni, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("varmatrix[uni] indexing", name, a.rows(), idx.head_.n_);
+  return a.row(idx.head_.n_ - 1);
 }
 
 /**
@@ -78,27 +214,77 @@ inline auto rvalue(VarMat&& v,
  */
 template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
 inline auto rvalue(const EigVec& v,
-                const cons_index_list<index_min_max, nil_index_list>& idx,
-                const char* name = "ANON", int depth = 0) {
-  math::check_range("vector[min_max] min indexing", name, v.size(), idx.head_.min_);
-  math::check_range("vector[min_max] max indexing", name, v.size(), idx.head_.max_);
-  if (idx.head_.min_ < idx.head_.max_) {
-    return v.segment(idx.head_.min_ - 1, idx.head_.max_ - (idx.head_.min_ - 1)).eval();
+                   const cons_index_list<index_min_max, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("vector[min_max] min indexing", name, v.size(),
+                    idx.head_.min_);
+  math::check_range("vector[min_max] max indexing", name, v.size(),
+                    idx.head_.max_);
+  if (idx.head_.min_ <= idx.head_.max_) {
+    return v.segment(idx.head_.min_ - 1, idx.head_.max_ - (idx.head_.min_ - 1))
+        .eval();
   } else {
-    return v.segment(idx.head_.max_ - 1, idx.head_.min_ - (idx.head_.max_ - 1)).reverse().eval();
+    return v.segment(idx.head_.max_ - 1, idx.head_.min_ - (idx.head_.max_ - 1))
+        .reverse()
+        .eval();
   }
 }
 
 template <typename VarMat, require_var_vt<is_eigen_vector, VarMat>* = nullptr>
-inline std::decay_t<VarMat> rvalue(VarMat&& v,
-                const cons_index_list<index_min_max, nil_index_list>& idx,
-                const char* name = "ANON", int depth = 0) {
-  math::check_range("var_vector[min_max] min indexing", name, v.size(), idx.head_.min_);
-  math::check_range("var_vector[min_max] max indexing", name, v.size(), idx.head_.max_);
-  if (idx.head_.min_ < idx.head_.max_) {
-    return v.segment(idx.head_.min_ - 1, idx.head_.max_ - (idx.head_.min_ - 1)).eval();
+inline std::decay_t<VarMat> rvalue(
+    VarMat&& v, const cons_index_list<index_min_max, nil_index_list>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("var_vector[min_max] min indexing", name, v.size(),
+                    idx.head_.min_);
+  math::check_range("var_vector[min_max] max indexing", name, v.size(),
+                    idx.head_.max_);
+  if (idx.head_.min_ <= idx.head_.max_) {
+    return v.segment(idx.head_.min_ - 1, idx.head_.max_ - (idx.head_.min_ - 1))
+        .eval();
   } else {
-    return v.segment(idx.head_.max_ - 1, idx.head_.min_ - (idx.head_.max_ - 1)).reverse().eval();
+    return v.segment(idx.head_.max_ - 1, idx.head_.min_ - (idx.head_.max_ - 1))
+        .reverse()
+        .eval();
+  }
+}
+
+template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+inline EigMat rvalue(const EigMat& a,
+                     const cons_index_list<index_min_max, nil_index_list>& idx,
+                     const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.head_.min_ - 1);
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.head_.max_ - 1);
+  if (idx.head_.min_ <= idx.head_.max_) {
+    return a.block(idx.head_.min_ - 1, 0, idx.head_.max_ - (idx.head_.min_ - 1),
+                   a.cols());
+  } else {
+    return a
+        .block(idx.head_.max_ - 1, 0, idx.head_.min_ - (idx.head_.max_ - 1),
+               a.cols())
+        .rowwise()
+        .reverse();
+  }
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline std::decay_t<VarMat> rvalue(
+    VarMat&& a, const cons_index_list<index_min_max, nil_index_list>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.head_.min_ - 1);
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.head_.max_ - 1);
+  if (idx.head_.min_ <= idx.head_.max_) {
+    return a.block(idx.head_.min_ - 1, 0, idx.head_.max_ - (idx.head_.min_ - 1),
+                   a.cols());
+  } else {
+    return a
+        .block(idx.head_.max_ - 1, 0, idx.head_.min_ - (idx.head_.max_ - 1),
+               a.cols())
+        .rowwise()
+        .reverse();
   }
 }
 
@@ -117,11 +303,10 @@ inline std::decay_t<VarMat> rvalue(VarMat&& v,
  * @return Result of indexing vector.
  */
 template <typename EigVec, typename I,
- require_eigen_vector_t<EigVec>* = nullptr,
- require_not_same_t<I, index_uni>* = nullptr>
-inline plain_type_t<EigVec>
-rvalue(const EigVec& v, const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
-       int depth = 0) {
+          require_eigen_vector_t<EigVec>* = nullptr>
+inline plain_type_t<EigVec> rvalue(
+    const EigVec& v, const cons_index_list<I, nil_index_list>& idx,
+    const char* name = "ANON", int depth = 0) {
   const int size = rvalue_index_size(idx.head_, v.size());
   const auto& v_ref = stan::math::to_ref(v);
   plain_type_t<EigVec> a(size);
@@ -134,11 +319,10 @@ rvalue(const EigVec& v, const cons_index_list<I, nil_index_list>& idx, const cha
 }
 
 template <typename VarMat, typename I,
- require_var_vt<is_eigen_vector, VarMat>* = nullptr,
- require_not_same_t<I, index_uni>* = nullptr>
-inline plain_type_t<VarMat>
-rvalue(VarMat&& v, const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
-       int depth = 0) {
+          require_var_vt<is_eigen_vector, VarMat>* = nullptr>
+inline stan::math::var_value<plain_type_t<value_type_t<VarMat>>> rvalue(
+    VarMat&& v, const cons_index_list<I, nil_index_list>& idx,
+    const char* name = "ANON", int depth = 0) {
   const int size = rvalue_index_size(idx.head_, v.size());
   arena_t<value_type_t<VarMat>> a(size);
   arena_t<std::vector<int>> index_vec;
@@ -148,120 +332,13 @@ rvalue(VarMat&& v, const cons_index_list<I, nil_index_list>& idx, const char* na
     a.coeffRef(i) = v.val().coeffRef(n - 1);
     index_vec.push_back(n - 1);
   }
-  std::decay_t<VarMat> ret_a(a);
+  stan::math::var_value<plain_type_t<value_type_t<VarMat>>> ret_a(a);
   stan::math::reverse_pass_callback([index_vec, v, ret_a]() mutable {
     for (auto& ind : index_vec) {
       const_cast<std::decay_t<VarMat>&>(v).adj()(ind) += ret_a.adj()(ind);
     }
   });
   return ret_a;
-}
-
-/**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of one single index, returning a row vector.
- *
- * Types:  mat[single,] : rowvec
- *
- * @tparam T Scalar type.
- * @param[in] a Eigen matrix.
- * @param[in] idx Index consisting of one uni-index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing matrix.
- */
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
-inline auto rvalue(const EigMat& a,
-    const cons_index_list<index_uni, cons_index_list<index_omni, nil_index_list>>& idx,
-    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
-  return a.row(idx.head_.n_ - 1).eval();
-}
-
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
-inline auto rvalue(VarMat&& a,
-    const cons_index_list<index_uni, cons_index_list<index_omni, nil_index_list>>& idx,
-    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
-  return a.row(idx.head_.n_ - 1).eval();
-}
-
-/**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of one single index, returning a row vector.
- *
- * Types:  mat[single,] : rowvec
- *
- * @tparam T Scalar type.
- * @param[in] a Eigen matrix.
- * @param[in] idx Index consisting of one uni-index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing matrix.
- */
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
-inline auto rvalue(const EigMat& a,
-    const cons_index_list<index_omni, cons_index_list<index_uni, nil_index_list>>& idx,
-    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni] indexing", name, a.cols(), idx.tail_.head_.n_);
-  return a.col(idx.tail_.head_.n_ - 1).eval();
-}
-
-/**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of one single index, returning a row vector.
- *
- * Types:  mat[single,] : rowvec
- *
- * @tparam T Scalar type.
- * @param[in] a Eigen matrix.
- * @param[in] idx Index consisting of one uni-index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing matrix.
- */
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
-inline auto rvalue(const EigMat& mat,
-    const cons_index_list<index_min_max, cons_index_list<index_min_max, nil_index_list>>& idx,
-    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[min_max, min_max] min row indexing", name, mat.rows(), idx.head_.min_);
-  math::check_range("matrix[min_max, min_max] max row indexing", name, mat.rows(), idx.head_.min_);
-  math::check_range("matrix[min_max, min_max] min column indexing", name, mat.rows(), idx.tail_.head_.min_);
-  math::check_range("matrix[min_max, min_max] max column indexing", name, mat.rows(), idx.tail_.head_.min_);
-  if (idx.head_.min_ <= idx.head_.max_) {
-    if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
-      return mat.block(idx.head_.min_ - 1, idx.tail_.head_.min_ - 1, idx.head_.max_ - 1, idx.tail_.head_.max_ - 1).eval();
-    } else {
-      return mat.block(idx.head_.min_ - 1, idx.tail_.head_.max_ - 1, idx.head_.max_ - 1, idx.tail_.head_.min_ - 1).colwise().reverse().eval();
-    }
-  } else {
-    if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
-      return mat.block(idx.head_.max_ - 1, idx.tail_.head_.min_ - 1, idx.head_.min_ - 1, idx.tail_.head_.max_ - 1).rowwise().reverse().eval();
-    } else {
-      return mat.block(idx.head_.max_ - 1, idx.tail_.head_.max_ - 1, idx.head_.min_ - 1, idx.tail_.head_.min_ - 1).rowwise().reverse().colwise().reverse().eval();
-    }
-  }
-}
-
-/**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of one single index, returning a row vector.
- *
- * Types:  mat[single] : rowvec
- *
- * @tparam T Scalar type.
- * @param[in] a Eigen matrix.
- * @param[in] idx Index consisting of one uni-index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing matrix.
- */
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
-inline auto rvalue(const EigMat& a,
-    const cons_index_list<index_uni, nil_index_list>& idx,
-    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
-  return a.row(idx.head_.n_ - 1);
 }
 
 /**
@@ -279,11 +356,10 @@ inline auto rvalue(const EigMat& a,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I,
-require_eigen_matrix_t<EigMat>* = nullptr,
-require_not_same_t<I, index_uni> * = nullptr>
+          require_eigen_matrix_t<EigMat>* = nullptr>
 inline auto rvalue(const EigMat& a,
-       const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
-       int depth = 0) {
+                   const cons_index_list<I, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
   const int n_rows = rvalue_index_size(idx.head_, a.rows());
   const auto& a_ref = stan::math::to_ref(a);
   plain_type_t<EigMat> b(n_rows, a_ref.cols());
@@ -293,6 +369,177 @@ inline auto rvalue(const EigMat& a,
     b.row(i) = a_ref.row(n - 1);
   }
   return b;
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a
+ * sequence consisting of one single index, returning a row vector.
+ *
+ * Types:  mat[single,] : rowvec
+ *
+ * @tparam T Scalar type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+inline auto rvalue(
+    const EigMat& mat,
+    const cons_index_list<index_min_max,
+                          cons_index_list<index_min_max, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[min_max, min_max] min row indexing", name,
+                    mat.rows(), idx.head_.min_);
+  math::check_range("matrix[min_max, min_max] max row indexing", name,
+                    mat.rows(), idx.head_.min_);
+  math::check_range("matrix[min_max, min_max] min column indexing", name,
+                    mat.rows(), idx.tail_.head_.min_);
+  math::check_range("matrix[min_max, min_max] max column indexing", name,
+                    mat.rows(), idx.tail_.head_.min_);
+  if (idx.head_.min_ <= idx.head_.max_) {
+    if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
+      return mat
+          .block(idx.head_.min_ - 1, idx.tail_.head_.min_ - 1,
+                 idx.head_.max_ - (idx.head_.min_ - 1),
+                 idx.tail_.head_.max_ - (idx.tail_.head_.min_ - 1))
+          .eval();
+    } else {
+      return mat
+          .block(idx.head_.min_ - 1, idx.tail_.head_.max_ - 1,
+                 idx.head_.max_ - (idx.head_.min_ - 1),
+                 idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
+          .colwise()
+          .reverse()
+          .eval();
+    }
+  } else {
+    if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
+      return mat
+          .block(idx.head_.max_ - 1, idx.tail_.head_.min_ - 1,
+                 idx.head_.min_ - (idx.head_.max_ - 1),
+                 idx.tail_.head_.max_ - (idx.tail_.head_.min_ - 1))
+          .rowwise()
+          .reverse()
+          .eval();
+    } else {
+      return mat
+          .block(idx.head_.max_ - 1, idx.tail_.head_.max_ - 1,
+                 idx.head_.min_ - (idx.head_.max_ - 1),
+                 idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
+          .rowwise()
+          .reverse()
+          .colwise()
+          .reverse()
+          .eval();
+    }
+  }
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline VarMat rvalue(
+    VarMat&& mat,
+    const cons_index_list<index_min_max,
+                          cons_index_list<index_min_max, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[min_max, min_max] min row indexing", name,
+                    mat.rows(), idx.head_.min_);
+  math::check_range("matrix[min_max, min_max] max row indexing", name,
+                    mat.rows(), idx.head_.min_);
+  math::check_range("matrix[min_max, min_max] min column indexing", name,
+                    mat.rows(), idx.tail_.head_.min_);
+  math::check_range("matrix[min_max, min_max] max column indexing", name,
+                    mat.rows(), idx.tail_.head_.min_);
+  if (idx.head_.min_ <= idx.head_.max_) {
+    if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
+      return mat
+          .block(idx.head_.min_ - 1, idx.tail_.head_.min_ - 1,
+                 idx.head_.max_ - (idx.head_.min_ - 1),
+                 idx.tail_.head_.max_ - (idx.tail_.head_.min_ - 1))
+          .eval();
+    } else {
+      return mat
+          .block(idx.head_.min_ - 1, idx.tail_.head_.max_ - 1,
+                 idx.head_.max_ - (idx.head_.min_ - 1),
+                 idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
+          .colwise()
+          .reverse()
+          .eval();
+    }
+  } else {
+    if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
+      return mat
+          .block(idx.head_.max_ - 1, idx.tail_.head_.min_ - 1,
+                 idx.head_.min_ - (idx.head_.max_ - 1),
+                 idx.tail_.head_.max_ - (idx.tail_.head_.min_ - 1))
+          .rowwise()
+          .reverse()
+          .eval();
+    } else {
+      return mat
+          .block(idx.head_.max_ - 1, idx.tail_.head_.max_ - 1,
+                 idx.head_.min_ - (idx.head_.max_ - 1),
+                 idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
+          .rowwise()
+          .reverse()
+          .colwise()
+          .reverse()
+          .eval();
+    }
+  }
+}
+
+template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+inline auto rvalue(const EigMat& a,
+                   const cons_index_list<index_min, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.head_.min_ - 1);
+  return a.block(idx.head_.min_ - 1, 0, a.rows() - (idx.head_.min_ - 1),
+                 a.cols());
+}
+
+template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+inline auto rvalue(const EigMat& a,
+                   const cons_index_list<index_max, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.head_.max_ - 1);
+  return a.block(0, 0, idx.head_.max_, a.cols());
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(VarMat&& a,
+                   const cons_index_list<index_min, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.head_.min_ - 1);
+  return a.block(idx.head_.min_ - 1, 0, a.rows() - (idx.head_.min_ - 1),
+                 a.cols());
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(VarMat&& a,
+                   const cons_index_list<index_max, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.head_.max_ - 1);
+  return a.block(0, 0, idx.head_.max_, a.cols());
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(VarMat&& a,
+                   const cons_index_list<index_multi, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  const int n_rows = rvalue_index_size(idx.head_, a.rows());
+  plain_type_t<value_type_t<VarMat>> b(n_rows, a.cols());
+  for (int i = 0; i < n_rows; ++i) {
+    const int n = rvalue_at(i, idx.head_);
+    math::check_range("matrix[multi] indexing", name, a.rows(), n);
+    b.row(i) = a.val().row(n - 1);
+  }
+  return std::decay_t<VarMat>(b);
 }
 
 /**
@@ -309,13 +556,30 @@ inline auto rvalue(const EigMat& a,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, require_eigen_t<EigMat>* = nullptr>
-inline auto&& rvalue(const EigMat& a,
-    const cons_index_list<index_uni, cons_index_list<index_uni, nil_index_list>>& idx,
+inline auto&& rvalue(
+    const EigMat& a,
+    const cons_index_list<index_uni,
+                          cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni,uni] indexing, row", name, a.rows(), idx.head_.n_);
-  math::check_range("matrix[uni,uni] indexing, col", name, a.cols(), idx.tail_.head_.n_);
+  math::check_range("matrix[uni,uni] indexing, row", name, a.rows(),
+                    idx.head_.n_);
+  math::check_range("matrix[uni,uni] indexing, col", name, a.cols(),
+                    idx.tail_.head_.n_);
   const auto& a_ref = stan::math::to_ref(a);
   return a_ref.coeffRef(idx.head_.n_ - 1, idx.tail_.head_.n_ - 1);
+}
+
+template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(
+    VarMat&& a,
+    const cons_index_list<index_uni,
+                          cons_index_list<index_uni, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni,uni] indexing, row", name, a.rows(),
+                    idx.head_.n_);
+  math::check_range("matrix[uni,uni] indexing, col", name, a.cols(),
+                    idx.tail_.head_.n_);
+  return a.coeffRef(idx.head_.n_ - 1, idx.tail_.head_.n_ - 1);
 }
 
 /**
@@ -334,16 +598,26 @@ inline auto&& rvalue(const EigMat& a,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I,
- require_eigen_matrix_t<EigMat>* = nullptr,
- require_not_same_t<I, index_uni>* = nullptr>
-inline auto rvalue(const EigMat& a,
-    const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idx,
+          require_eigen_matrix_t<EigMat>* = nullptr>
+inline auto rvalue(
+    const EigMat& a,
+    const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
   return rvalue(a.row(m - 1), idx.tail_);
 }
 
+template <typename VarMat, typename I,
+          require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(
+    VarMat&& a,
+    const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  int m = idx.head_.n_;
+  math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
+  return rvalue(a.row(m - 1), idx.tail_);
+}
 /**
  * Return the result of indexing the specified Eigen matrix with a
  * sequence consisting of a multiple index and a single index,
@@ -360,22 +634,25 @@ inline auto rvalue(const EigMat& a,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I,
- require_eigen_matrix_t<EigMat>* = nullptr,
- require_not_same_t<index_uni, I>* = nullptr>
-inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1>  rvalue(const EigMat& a,
-    const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idx,
+          require_eigen_matrix_t<EigMat>* = nullptr>
+inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
+    const EigMat& a,
+    const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
-  const auto& a_ref = stan::math::to_ref(a);
-  const int rows = rvalue_index_size(idx.head_, a_ref.rows());
-  Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> c(rows);
-  for (int i = 0; i < rows; ++i) {
-    const int m = rvalue_at(i, idx.head_);
-    const int n = idx.tail_.head_.n_;
-    math::check_range("matrix[multi,uni] index row", name, a.rows(), m);
-    math::check_range("matrix[multi,uni] index col", name, a.cols(), n);
-    c.coeffRef(i) = a_ref.coeffRef(m - 1, n - 1);
-  }
-  return c;
+  const int m = idx.tail_.head_.n_;
+  math::check_range("matrix[multi,uni] index col", name, a.cols(), m);
+  return rvalue(a.col(m - 1), index_list(idx.head_));
+}
+
+template <typename VarMat, typename I,
+          require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(
+    VarMat&& a,
+    const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  const int m = idx.tail_.head_.n_;
+  math::check_range("matrix[multi,uni] index col", name, a.cols(), m);
+  return rvalue(a.col(m - 1), index_list(idx.head_));
 }
 
 /**
@@ -393,12 +670,12 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1>  rvalue(const EigM
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
- template <typename EigMat, typename I1, typename I2,
-  require_eigen_matrix_t<EigMat>* = nullptr,
-  require_all_not_same_t<index_uni, I1, I2>* = nullptr>
-inline plain_type_t<EigMat> rvalue(const EigMat& a,
-       const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idx,
-       const char* name = "ANON", int depth = 0) {
+template <typename EigMat, typename I1, typename I2,
+          require_eigen_matrix_t<EigMat>* = nullptr>
+inline plain_type_t<EigMat> rvalue(
+    const EigMat& a,
+    const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
   const auto& a_ref = stan::math::to_ref(a);
   const int rows = rvalue_index_size(idx.head_, a_ref.rows());
   const int cols = rvalue_index_size(idx.tail_.head_, a_ref.cols());
@@ -413,6 +690,40 @@ inline plain_type_t<EigMat> rvalue(const EigMat& a,
     }
   }
   return c;
+}
+
+template <typename VarMat, typename I1, typename I2,
+          require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+inline auto rvalue(
+    VarMat&& a,
+    const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  const int rows = rvalue_index_size(idx.head_, a.rows());
+  const int cols = rvalue_index_size(idx.tail_.head_, a.cols());
+  plain_type_t<value_type_t<VarMat>> c(rows, cols);
+  arena_t<std::vector<int>> m_slice;
+  arena_t<std::vector<int>> n_slice;
+  for (int j = 0; j < cols; ++j) {
+    for (int i = 0; i < rows; ++i) {
+      int m = rvalue_at(i, idx.head_);
+      int n = rvalue_at(j, idx.tail_.head_);
+      math::check_range("matrix[multi,multi] row index", name, a.rows(), m);
+      math::check_range("matrix[multi,multi] col index", name, a.cols(), n);
+      c.coeffRef(i, j) = a.val().coeffRef(m - 1, n - 1);
+      m_slice.push_back(m - 1);
+      n_slice.push_back(n - 1);
+    }
+  }
+  stan::math::var_value<plain_type_t<value_type_t<VarMat>>> a_ret(c);
+  stan::math::reverse_pass_callback([cols, rows, m_slice, n_slice, a,
+                                     a_ret]() mutable {
+    for (int j = 0; j < cols; ++j) {
+      for (int i = 0; i < rows; ++i) {
+        a.adj().coeffRef(m_slice[i], n_slice[j]) = a_ret.adj().coeffRef(i, j);
+      }
+    }
+  });
+  return a_ret;
 }
 
 /**
@@ -431,10 +742,9 @@ inline plain_type_t<EigMat> rvalue(const EigMat& a,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing array.
  */
- template <typename StdVec, typename L, require_std_vector_t<StdVec>* = nullptr>
-inline rvalue_return_t<std::decay_t<StdVec>, cons_index_list<index_uni, L>>
-    rvalue(StdVec&& c, const cons_index_list<index_uni, L>& idx,
-           const char* name = "ANON", int depth = 0) {
+template <typename StdVec, typename L, require_std_vector_t<StdVec>* = nullptr>
+inline auto rvalue(StdVec&& c, const cons_index_list<index_uni, L>& idx,
+                   const char* name = "ANON", int depth = 0) {
   const int n = idx.head_.n_;
   math::check_range("array[uni,...] index", name, c.size(), n);
   return rvalue(c[n - 1], idx.tail_, name, depth + 1);
@@ -456,10 +766,11 @@ inline rvalue_return_t<std::decay_t<StdVec>, cons_index_list<index_uni, L>>
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing array.
  */
-template <typename StdVec, typename I, typename L, require_std_vector_t<StdVec>* = nullptr>
-inline rvalue_return_t<std::decay_t<StdVec>, cons_index_list<I, L>>
-rvalue(StdVec&& c, const cons_index_list<I, L>& idx,
-       const char* name = "ANON", int depth = 0) {
+template <typename StdVec, typename I, typename L,
+          require_std_vector_t<StdVec>* = nullptr>
+inline rvalue_return_t<std::decay_t<StdVec>, cons_index_list<I, L>> rvalue(
+    StdVec&& c, const cons_index_list<I, L>& idx, const char* name = "ANON",
+    int depth = 0) {
   rvalue_return_t<std::decay_t<StdVec>, cons_index_list<I, L>> result;
   const int index_size = rvalue_index_size(idx.head_, c.size());
   if (index_size > 0) {

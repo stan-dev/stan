@@ -15,7 +15,7 @@ using stan::model::index_uni;
 using stan::model::nil_index_list;
 
 template <typename C, typename I>
-void test_out_of_range(const C& c, const I& idxs) {
+void test_out_of_range(C&& c, I&& idxs) {
   EXPECT_THROW(stan::model::rvalue(c, idxs), std::out_of_range);
 }
 
@@ -540,6 +540,26 @@ TEST(ModelIndexing, rvalueRowVectorUni) {
 }
 
 template <typename T>
+void varvector_uni_test() {
+  T v(3);
+  v << 0, 1, 2;
+  stan::math::var_value<T> rv(v);
+  EXPECT_FLOAT_EQ(0, rvalue(rv, index_list(index_uni(1))).val());
+  EXPECT_FLOAT_EQ(1, rvalue(rv, index_list(index_uni(2))).val());
+  EXPECT_FLOAT_EQ(2, rvalue(rv, index_list(index_uni(3))).val());
+
+  test_out_of_range(rv, index_list(index_uni(0)));
+  test_out_of_range(rv, index_list(index_uni(20)));
+}
+
+TEST(ModelIndexing, rvalueVarVectorUni) { varvector_uni_test<Eigen::VectorXd>(); }
+
+TEST(ModelIndexing, rvalueVarRowVectorUni) {
+  varvector_uni_test<Eigen::RowVectorXd>();
+}
+
+
+template <typename T>
 void vector_multi_test() {
   T v(5);
   v << 0, 1, 2, 3, 4;
@@ -598,6 +618,66 @@ TEST(ModelIndexing, rvalueRowVectorMulti) {
   vector_multi_test<Eigen::RowVectorXd>();
 }
 
+template <typename T>
+void varvector_multi_test() {
+  using stan::math::var_value;
+  T v(5);
+  v << 0, 1, 2, 3, 4;
+  var_value<T> rv(v);
+  var_value<T> vi = rvalue(rv, index_list(index_omni()));
+  EXPECT_EQ(5, vi.size());
+  EXPECT_FLOAT_EQ(0, vi(0).val());
+  EXPECT_FLOAT_EQ(2, vi(2).val());
+  EXPECT_FLOAT_EQ(4, vi(4).val());
+
+  vi = rvalue(rv, index_list(index_min(3)));
+  EXPECT_EQ(3, vi.size());
+  EXPECT_FLOAT_EQ(2, vi(0).val());
+  EXPECT_FLOAT_EQ(4, vi(2).val());
+  test_out_of_range(rv, index_list(index_min(0)));
+
+  vi = rvalue(rv, index_list(index_max(3)));
+  EXPECT_EQ(3, vi.size());
+  EXPECT_FLOAT_EQ(0, vi(0).val());
+  EXPECT_FLOAT_EQ(2, vi(2).val());
+  test_out_of_range(rv, index_list(index_max(15)));
+
+  vi = rvalue(rv, index_list(index_min_max(2, 4)));
+  EXPECT_EQ(3, vi.size());
+  EXPECT_FLOAT_EQ(1, vi(0).val());
+  EXPECT_FLOAT_EQ(3, vi(2).val());
+  test_out_of_range(rv, index_list(index_min_max(0, 4)));
+  test_out_of_range(rv, index_list(index_min_max(2, 15)));
+
+  std::vector<int> ns;
+  ns.push_back(4);
+  ns.push_back(2);
+  ns.push_back(2);
+  ns.push_back(1);
+  ns.push_back(5);
+  ns.push_back(2);
+  ns.push_back(4);
+
+  vi = rvalue(rv, index_list(index_multi(ns)));
+  EXPECT_EQ(7, vi.size());
+  EXPECT_FLOAT_EQ(3.0, vi(0).val());
+  EXPECT_FLOAT_EQ(1.0, vi(2).val());
+  EXPECT_FLOAT_EQ(4.0, vi(4).val());
+  EXPECT_FLOAT_EQ(3.0, vi(6).val());
+
+  ns.push_back(0);
+  test_out_of_range(rv, index_list(index_multi(ns)));
+
+  ns[ns.size() - 1] = 15;
+  test_out_of_range(rv, index_list(index_multi(ns)));
+}
+
+TEST(ModelIndexing, rvalueVarVectorMulti) { varvector_multi_test<Eigen::VectorXd>(); }
+
+TEST(ModelIndexing, rvalueVarRowVectorMulti) {
+  varvector_multi_test<Eigen::RowVectorXd>();
+}
+
 TEST(ModelIndexing, rvalueMatrixUni) {
   using Eigen::MatrixXd;
   using Eigen::RowVectorXd;
@@ -622,6 +702,33 @@ TEST(ModelIndexing, rvalueMatrixUni) {
   EXPECT_FLOAT_EQ(1.1, v(1));
   EXPECT_FLOAT_EQ(1.2, v(2));
 }
+
+TEST(ModelIndexing, rvalueVarMatrixUni) {
+  using stan::math::var_value;
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+
+  MatrixXd m(4, 3);
+  m << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
+  var_value<MatrixXd> rm(m);
+  // FIXME
+
+  var_value<RowVectorXd> v = rvalue(rm, index_list(index_uni(1)));
+  EXPECT_EQ(3, v.size());
+  EXPECT_FLOAT_EQ(0.0, v(0).val());
+  EXPECT_FLOAT_EQ(0.1, v(1).val());
+  EXPECT_FLOAT_EQ(0.2, v(2).val());
+  test_out_of_range(rm, index_list(index_uni(0)));
+  test_out_of_range(rm, index_list(index_uni(15)));
+
+  v = rvalue(rm, index_list(index_uni(2)));
+  EXPECT_EQ(3, v.size());
+  EXPECT_FLOAT_EQ(1.0, v(0).val());
+  EXPECT_FLOAT_EQ(1.1, v(1).val());
+  EXPECT_FLOAT_EQ(1.2, v(2).val());
+}
+
 
 TEST(ModelIndexing, rvalueMatrixMulti) {
   using Eigen::MatrixXd;
@@ -662,6 +769,15 @@ TEST(ModelIndexing, rvalueMatrixMulti) {
   EXPECT_FLOAT_EQ(2.0, a(1, 0));
   EXPECT_FLOAT_EQ(2.1, a(1, 1));
   EXPECT_FLOAT_EQ(2.2, a(1, 2));
+  a = rvalue(m, index_list(index_min_max(3, 2)));
+  EXPECT_EQ(2, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(1.2, a(0, 0));
+  EXPECT_FLOAT_EQ(1.1, a(0, 1));
+  EXPECT_FLOAT_EQ(1.0, a(0, 2));
+  EXPECT_FLOAT_EQ(2.2, a(1, 0));
+  EXPECT_FLOAT_EQ(2.1, a(1, 1));
+  EXPECT_FLOAT_EQ(2.0, a(1, 2));
   test_out_of_range(m, index_list(index_min_max(0, 3)));
   test_out_of_range(m, index_list(index_min_max(2, 15)));
 
@@ -703,6 +819,96 @@ TEST(ModelIndexing, rvalueMatrixMulti) {
   test_out_of_range(m, index_list(index_multi(ns)));
 }
 
+TEST(ModelIndexing, rvalueVarMatrixMulti) {
+  using stan::math::var_value;
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  MatrixXd m(4, 3);
+  m << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
+  var_value<MatrixXd> rm(m);
+  var_value<MatrixXd> a = rvalue(rm, index_list(index_min(3)));
+  EXPECT_EQ(2, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(2.0, a(0, 0).val());
+  EXPECT_FLOAT_EQ(2.1, a(0, 1).val());
+  EXPECT_FLOAT_EQ(2.2, a(0, 2).val());
+  EXPECT_FLOAT_EQ(3.0, a(1, 0).val());
+  EXPECT_FLOAT_EQ(3.1, a(1, 1).val());
+  EXPECT_FLOAT_EQ(3.2, a(1, 2).val());
+  test_out_of_range(rm, index_list(index_min(0)));
+
+  a = rvalue(rm, index_list(index_max(2)));
+  EXPECT_EQ(2, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(0.0, a(0, 0).val());
+  EXPECT_FLOAT_EQ(0.1, a(0, 1).val());
+  EXPECT_FLOAT_EQ(0.2, a(0, 2).val());
+  EXPECT_FLOAT_EQ(1.0, a(1, 0).val());
+  EXPECT_FLOAT_EQ(1.1, a(1, 1).val());
+  EXPECT_FLOAT_EQ(1.2, a(1, 2).val());
+  test_out_of_range(rm, index_list(index_max(15)));
+
+  a = rvalue(rm, index_list(index_min_max(2, 3)));
+  EXPECT_EQ(2, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(1.0, a(0, 0).val());
+  EXPECT_FLOAT_EQ(1.1, a(0, 1).val());
+  EXPECT_FLOAT_EQ(1.2, a(0, 2).val());
+  EXPECT_FLOAT_EQ(2.0, a(1, 0).val());
+  EXPECT_FLOAT_EQ(2.1, a(1, 1).val());
+  EXPECT_FLOAT_EQ(2.2, a(1, 2).val());
+  a = rvalue(rm, index_list(index_min_max(3, 2)));
+  EXPECT_EQ(2, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(1.2, a(0, 0).val());
+  EXPECT_FLOAT_EQ(1.1, a(0, 1).val());
+  EXPECT_FLOAT_EQ(1.0, a(0, 2).val());
+  EXPECT_FLOAT_EQ(2.2, a(1, 0).val());
+  EXPECT_FLOAT_EQ(2.1, a(1, 1).val());
+  EXPECT_FLOAT_EQ(2.0, a(1, 2).val());
+
+  test_out_of_range(rm, index_list(index_min_max(0, 3)));
+  test_out_of_range(rm, index_list(index_min_max(2, 15)));
+
+  a = rvalue(rm, index_list(index_omni()));
+  EXPECT_EQ(4, a.rows());
+  EXPECT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(0.0, a(0, 0).val());
+  EXPECT_FLOAT_EQ(0.1, a(0, 1).val());
+  EXPECT_FLOAT_EQ(0.2, a(0, 2).val());
+  EXPECT_FLOAT_EQ(3.0, a(3, 0).val());
+  EXPECT_FLOAT_EQ(3.1, a(3, 1).val());
+  EXPECT_FLOAT_EQ(3.2, a(3, 2).val());
+
+  std::vector<int> ns;
+  ns.push_back(3);
+  ns.push_back(4);
+  ns.push_back(1);
+  ns.push_back(4);
+  ns.push_back(1);
+  ns.push_back(4);
+  ns.push_back(1);
+  a = rvalue(rm, index_list(index_multi(ns)));
+  EXPECT_FLOAT_EQ(7, a.rows());
+  EXPECT_FLOAT_EQ(3, a.cols());
+  EXPECT_FLOAT_EQ(2.0, a(0, 0).val());
+  EXPECT_FLOAT_EQ(2.1, a(0, 1).val());
+  EXPECT_FLOAT_EQ(2.2, a(0, 2).val());
+  EXPECT_FLOAT_EQ(3.0, a(5, 0).val());
+  EXPECT_FLOAT_EQ(3.1, a(5, 1).val());
+  EXPECT_FLOAT_EQ(3.2, a(5, 2).val());
+  EXPECT_FLOAT_EQ(0.0, a(6, 0).val());
+  EXPECT_FLOAT_EQ(0.1, a(6, 1).val());
+  EXPECT_FLOAT_EQ(0.2, a(6, 2).val());
+
+  ns.push_back(0);
+  test_out_of_range(rm, index_list(index_multi(ns)));
+
+  ns[ns.size() - 1] = 15;
+  test_out_of_range(rm, index_list(index_multi(ns)));
+}
+
 TEST(ModelIndexing, rvalueMatrixSingleSingle) {
   Eigen::MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
@@ -715,6 +921,20 @@ TEST(ModelIndexing, rvalueMatrixSingleSingle) {
   test_out_of_range(x, index_list(index_uni(0), index_uni(10)));
   test_out_of_range(x, index_list(index_uni(1), index_uni(0)));
   test_out_of_range(x, index_list(index_uni(1), index_uni(10)));
+}
+
+TEST(ModelIndexing, rvalueVarMatrixSingleSingle) {
+  Eigen::MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  stan::math::var_value<Eigen::MatrixXd> rx(x);
+  for (int m = 0; m < 3; ++m)
+    for (int n = 0; n < 4; ++n)
+      EXPECT_FLOAT_EQ(m + n / 10.0, rvalue(rx, index_list(index_uni(m + 1),
+                                                         index_uni(n + 1))).val());
+  test_out_of_range(rx, index_list(index_uni(0), index_uni(1)));
+  test_out_of_range(rx, index_list(index_uni(0), index_uni(10)));
+  test_out_of_range(rx, index_list(index_uni(1), index_uni(0)));
+  test_out_of_range(rx, index_list(index_uni(1), index_uni(10)));
 }
 
 TEST(ModelIndexing, rvalueMatrixSingleMulti) {
@@ -736,6 +956,27 @@ TEST(ModelIndexing, rvalueMatrixSingleMulti) {
   test_out_of_range(x, index_list(index_uni(1), index_min(0)));
 }
 
+TEST(ModelIndexing, rvalueVarMatrixSingleMulti) {
+  using stan::math::var_value;
+  Eigen::MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  var_value<Eigen::MatrixXd> vx(x);
+  var_value<Eigen::RowVectorXd> vr = rvalue(vx, index_list(index_uni(2), index_omni()));
+  EXPECT_EQ(4, vr.size());
+  for (int i = 0; i < 4; ++i)
+    EXPECT_FLOAT_EQ(vr.val()(i), vx.val()(1, i));
+  test_out_of_range(vx, index_list(index_uni(0), index_omni()));
+  test_out_of_range(vx, index_list(index_uni(10), index_omni()));
+
+  vr = rvalue(vx, index_list(index_uni(3), index_min(2)));
+  EXPECT_EQ(3, vr.size());
+  for (int i = 0; i < 3; ++i)
+    EXPECT_FLOAT_EQ(vr.val()(i), vx.val()(2, i + 1));
+  test_out_of_range(vx, index_list(index_uni(0), index_min(2)));
+  test_out_of_range(vx, index_list(index_uni(1), index_min(0)));
+}
+
+
 TEST(ModelIndexing, rvalueMatrixMultiSingle) {
   Eigen::MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
@@ -754,6 +995,26 @@ TEST(ModelIndexing, rvalueMatrixMultiSingle) {
   test_out_of_range(x, index_list(index_min(0), index_uni(3)));
   test_out_of_range(x, index_list(index_min(2), index_uni(0)));
   test_out_of_range(x, index_list(index_min(2), index_uni(30)));
+}
+
+TEST(ModelIndexing, rvalueVarMatrixMultiSingle) {
+  Eigen::MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  stan::math::var_value<Eigen::MatrixXd> rx(x);
+  stan::math::var_value<Eigen::VectorXd> rv = rvalue(x, index_list(index_omni(), index_uni(2)));
+  EXPECT_EQ(3, rv.size());
+  for (int j = 0; j < 3; ++j)
+    EXPECT_FLOAT_EQ(j + 0.1, rv(j).val());
+  test_out_of_range(rx, index_list(index_omni(), index_uni(0)));
+  test_out_of_range(rx, index_list(index_omni(), index_uni(20)));
+
+  rv = rvalue(rx, index_list(index_min(2), index_uni(3)));
+  EXPECT_EQ(2, rv.size());
+  for (int j = 0; j < 2; ++j)
+    EXPECT_EQ(1 + j + 0.2, rv(j).val());
+  test_out_of_range(rx, index_list(index_min(0), index_uni(3)));
+  test_out_of_range(rx, index_list(index_min(2), index_uni(0)));
+  test_out_of_range(rx, index_list(index_min(2), index_uni(30)));
 }
 
 TEST(ModelIndexing, rvalueMatrixMultiMulti) {
@@ -775,4 +1036,25 @@ TEST(ModelIndexing, rvalueMatrixMultiMulti) {
       EXPECT_FLOAT_EQ(i + 1 + (j + 2) / 10.0, y(i, j));
   test_out_of_range(x, index_list(index_min(0), index_min(3)));
   test_out_of_range(x, index_list(index_min(2), index_min(0)));
+}
+
+TEST(ModelIndexing, rvalueVarMatrixMultiMulti) {
+  Eigen::MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  stan::math::var_value<Eigen::MatrixXd> rx(x);
+  stan::math::var_value<Eigen::MatrixXd> ry = rvalue(rx, index_list(index_omni(), index_omni()));
+  EXPECT_EQ(rx.rows(), ry.rows());
+  EXPECT_EQ(rx.cols(), ry.cols());
+  for (int i = 0; i < rx.rows(); ++i)
+    for (int j = 0; j < rx.cols(); ++j)
+      EXPECT_FLOAT_EQ(rx(i, j).val(), ry(i, j).val());
+
+  ry = rvalue(rx, index_list(index_min(2), index_min(3)));
+  EXPECT_EQ(2, ry.rows());
+  EXPECT_EQ(2, ry.cols());
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 2; ++j)
+      EXPECT_FLOAT_EQ(i + 1 + (j + 2) / 10.0, ry(i, j).val());
+  test_out_of_range(rx, index_list(index_min(0), index_min(3)));
+  test_out_of_range(rx, index_list(index_min(2), index_min(0)));
 }

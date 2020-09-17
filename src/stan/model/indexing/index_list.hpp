@@ -18,8 +18,8 @@ struct nil_index_list {};
  */
 template <typename H, typename T>
 struct cons_index_list {
-  H head_;
-  T tail_;
+  std::decay_t<H> head_;
+  std::decay_t<T> tail_;
 
   /**
    * Construct a non-empty index list with the specified index for
@@ -36,7 +36,7 @@ struct cons_index_list {
 // factory-like function does type inference for I and T
 template <typename I, typename T>
 inline constexpr auto cons_list(I&& idx1, T&& t) {
-  return cons_index_list<I, T>(std::forward<I>(idx1), std::forward<T>(t));
+  return cons_index_list<std::decay_t<I>, std::decay_t<T>>(std::forward<I>(idx1), std::forward<T>(t));
 }
 
 inline constexpr auto index_list() { return nil_index_list(); }
