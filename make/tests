@@ -149,7 +149,12 @@ test-headers: $(HEADER_TESTS)
 # compiles
 ##
 .PHONY: %.hpp-test
+
+ifneq ($(OS),Windows_NT)
 test/test-models/good/%.hpp-test : O = 0
+else
+test/test-models/good/%.hpp-test : O = 2
+endif
 test/test-models/good/%.hpp-test : test/test-models/good/%.hpp test/test-model-main.cpp
 	$(COMPILE.cpp) -o $(DEV_NULL) -include $^
 
@@ -191,9 +196,12 @@ test/integration/mtu/%_2.cpp : src/test/integration/mtu/%.cpp test/integration/m
 	cp $< $@
 
 ifneq ($(OS),Windows_NT)
+test/test-models/good/%.hpp-test : O = 0
+else
 test/integration/mtu/%.o : CXXFLAGS += -fPIC
+test/test-models/good/%.hpp-test : O = 2
 endif
-test/integration/mtu/%.o : O = 0
+
 test/integration/mtu/%.o : %.cpp
 	$(COMPILE.cpp) -pipe -o $(DEV_NULL) -include $^
 
