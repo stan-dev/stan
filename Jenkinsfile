@@ -17,9 +17,11 @@ def runTests(String testPath, Boolean separateMakeStep=true) {
     finally { junit 'test/**/*.xml' }
 }
 
-def runTestsWin(String testPath) {
+def runTestsWin(String testPath, Boolean separateMakeStep=true) {
     withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
-       bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+       if (separateMakeStep) {
+           bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+       }
        try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
        finally { junit 'test/**/*.xml' }
     }
@@ -253,7 +255,7 @@ pipeline {
                             setupCXX()
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             setupCXX(false)
-                            runTestsWin("src/test/integration")
+                            runTestsWin("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDirWin() } }
                 }
