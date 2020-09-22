@@ -196,10 +196,10 @@ test/integration/mtu/%_2.cpp : src/test/integration/mtu/%.cpp test/integration/m
 	cp $< $@
 
 ifneq ($(OS),Windows_NT)
-test/test-models/good/%.hpp-test : O = 0
-else
 test/integration/mtu/%.o : CXXFLAGS += -fPIC
-test/test-models/good/%.hpp-test : O = 2
+test/integration/mtu/%.o : O = 0
+else
+test/integration/mtu/%.o : O = 2
 endif
 
 test/integration/mtu/%.o : %.cpp
