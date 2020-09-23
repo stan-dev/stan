@@ -153,7 +153,7 @@ test-headers: $(HEADER_TESTS)
 ifneq ($(OS),Windows_NT)
 test/test-models/good/%.hpp-test : O = 0
 else
-test/test-models/good/%.hpp-test : O = 2
+test/test-models/good/%.hpp-test : O = 1
 endif
 test/test-models/good/%.hpp-test : test/test-models/good/%.hpp test/test-model-main.cpp
 	$(COMPILE.cpp) -o $(DEV_NULL) -include $^
@@ -199,7 +199,7 @@ ifneq ($(OS),Windows_NT)
 test/integration/mtu/%.o : CXXFLAGS += -fPIC
 test/integration/mtu/%.o : O = 0
 else
-test/integration/mtu/%.o : O = 2
+test/integration/mtu/%.o : O = 1
 endif
 
 test/integration/mtu/%.o : %.cpp
