@@ -146,7 +146,7 @@ inline void assign(Vec1& x, const cons_index_list<index_min_max, nil_index_list>
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename Mat, typename RowVec, require_eigen_matrix_t<Mat>* = nullptr,
+template <typename Mat, typename RowVec, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
  require_eigen_row_vector_t<RowVec>* = nullptr>
 inline void assign(Mat& x,
             const cons_index_list<index_uni, nil_index_list>& idxs,
@@ -177,7 +177,7 @@ inline void assign(Mat& x,
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename Mat, typename ColVec, require_eigen_matrix_t<Mat>* = nullptr,
+template <typename Mat, typename ColVec, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
  require_eigen_col_vector_t<ColVec>* = nullptr>
 inline void assign(Mat& x,
             const cons_index_list<index_omni, cons_index_list<index_uni, nil_index_list>>& idxs,
@@ -207,7 +207,7 @@ inline void assign(Mat& x,
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename Mat, typename RowVec, require_eigen_matrix_t<Mat>* = nullptr,
+template <typename Mat, typename RowVec, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
  require_eigen_row_vector_t<RowVec>* = nullptr>
 inline void assign(Mat& x,
             const cons_index_list<index_uni, cons_index_list<index_omni, nil_index_list>>& idxs,
@@ -237,7 +237,7 @@ inline void assign(Mat& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename I, typename Mat2,
-  require_all_eigen_matrix_t<Mat2, Mat2>* = nullptr,
+  require_all_eigen_matrix_dynamic_t<Mat2, Mat2>* = nullptr,
   require_not_same_t<I, index_uni>* = nullptr>
 inline void assign(Mat1& x, const cons_index_list<I, nil_index_list>& idxs,
     const Mat2& y, const char* name = "ANON", int depth = 0) {
@@ -255,7 +255,7 @@ inline void assign(Mat1& x, const cons_index_list<I, nil_index_list>& idxs,
 }
 
 template <typename Mat1, typename Mat2,
-  require_all_eigen_matrix_t<Mat2, Mat2>* = nullptr>
+  require_all_eigen_matrix_dynamic_t<Mat2, Mat2>* = nullptr>
 inline void assign(Mat1& x,
    const cons_index_list<index_min_max, cons_index_list<index_min_max, nil_index_list>>& idxs,
     const Mat2& y, const char* name = "ANON", int depth = 0) {
@@ -302,7 +302,7 @@ inline void assign(Mat1& x,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If either of the indices are out of bounds.
  */
-template <typename Mat, typename U, require_eigen_matrix_t<Mat>* = nullptr>
+template <typename Mat, typename U, require_eigen_matrix_dynamic_t<Mat>* = nullptr>
 inline void assign(Mat& x,
             const cons_index_list<
                 index_uni, cons_index_list<index_uni, nil_index_list> >& idxs,
@@ -334,7 +334,7 @@ inline void assign(Mat& x,
  * matrix and right-hand side row vector do not match.
  */
 template <typename Mat, typename I, typename Vec,
-  require_eigen_matrix_t<Mat>* = nullptr,
+  require_eigen_matrix_dynamic_t<Mat>* = nullptr,
   require_eigen_row_vector_t<Vec>* = nullptr,
   require_not_same_t<I, index_uni>* = nullptr>
 inline void assign(Mat& x,
@@ -373,7 +373,7 @@ inline void assign(Mat& x,
  * matrix and right-hand side vector do not match.
  */
 template <typename Mat, typename I, typename ColVec,
-  require_eigen_matrix_t<Mat>* = nullptr,
+  require_eigen_matrix_dynamic_t<Mat>* = nullptr,
   require_eigen_col_vector_t<ColVec>* = nullptr,
   require_not_same_t<I, index_uni>* = nullptr>
 inline void assign(Mat& x,
@@ -412,7 +412,7 @@ inline void assign(Mat& x,
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename I1, typename I2, typename Mat2,
- require_all_eigen_matrix_t<Mat1, Mat2>* = nullptr,
+ require_all_eigen_matrix_dynamic_t<Mat1, Mat2>* = nullptr,
  require_all_not_same_t<index_uni, I1, I2>* = nullptr>
 inline void assign(Mat1& x,
        const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idxs,

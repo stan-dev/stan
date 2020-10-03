@@ -1,7 +1,7 @@
 #ifndef STAN_MODEL_INDEXING_DEEP_COPY_HPP
 #define STAN_MODEL_INDEXING_DEEP_COPY_HPP
 
-#include <Eigen/Dense>
+#include <stan/math/prim.hpp>
 #include <vector>
 
 namespace stan {
@@ -20,9 +20,19 @@ namespace model {
  * @param x Input value.
  * @return Constant reference to input.
  */
-template <typename T>
+template <typename T, require_stan_scalar_t<T>* = nullptr>
 inline const T& deep_copy(const T& x) {
   return x;
+}
+
+template <typename T, require_stan_scalar_t<T>* = nullptr>
+inline T& deep_copy(T& x) {
+  return x;
+}
+
+template <typename T, require_stan_scalar_t<T>* = nullptr>
+inline T deep_copy(T&& x) {
+  return std::forward<T>(x);
 }
 
 /**
@@ -39,10 +49,9 @@ inline const T& deep_copy(const T& x) {
  * @param a Input matrix, vector, or row vector.
  * @return Deep copy of input.
  */
-template <typename T, int R, int C>
-inline Eigen::Matrix<T, R, C> deep_copy(const Eigen::Matrix<T, R, C>& a) {
-  Eigen::Matrix<T, R, C> result(a);
-  return result;
+template <typename EigMat, require_eigen_t<EigMat>* = nullptr>
+inline plain_type_t<EigMat> deep_copy(EigMat&& a) {
+  return plain_type_t<EigMat>(std::forward<EigMat>(a));
 }
 
 /**
@@ -57,10 +66,9 @@ inline Eigen::Matrix<T, R, C> deep_copy(const Eigen::Matrix<T, R, C>& a) {
  * @param v Input vector.
  * @return Deep copy of input.
  */
-template <typename T>
-inline std::vector<T> deep_copy(const std::vector<T>& v) {
-  std::vector<T> result(v);
-  return result;
+template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+inline std::decay_t<StdVec> deep_copy(StdVec&& v) {
+  return {std::forward<StdVec>(v)};
 }
 
 }  // namespace model

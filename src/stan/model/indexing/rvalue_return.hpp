@@ -1,7 +1,8 @@
 #ifndef STAN_MODEL_INDEXING_RVALUE_RETURN_HPP
 #define STAN_MODEL_INDEXING_RVALUE_RETURN_HPP
 
-#include <Eigen/Dense>
+#include <stan/math/prim.hpp>
+#include <stan/math/rev/core/var.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <vector>

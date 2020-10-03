@@ -74,6 +74,7 @@ inline T rvalue(
   return std::forward<T>(a);
 }
 
+
 /**
  * Return the result of indexing the specified Eigen matrix with a
  * sequence consisting of one single index, returning a row vector.
@@ -87,7 +88,7 @@ inline T rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     const EigMat& a,
     const cons_index_list<index_uni,
@@ -97,7 +98,7 @@ inline auto rvalue(
   return a.row(idx.head_.n_ - 1).eval();
 }
 
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& a,
     const cons_index_list<index_uni,
@@ -120,7 +121,7 @@ inline auto rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     const EigMat& a,
     const cons_index_list<index_omni,
@@ -130,7 +131,7 @@ inline auto rvalue(
   return a.col(idx.tail_.head_.n_ - 1).eval();
 }
 
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& a,
     const cons_index_list<index_omni,
@@ -183,7 +184,7 @@ inline auto rvalue(VarMat&& v,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(const EigMat& a,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -191,7 +192,7 @@ inline auto rvalue(const EigMat& a,
   return a.row(idx.head_.n_ - 1);
 }
 
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(VarMat&& a,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -227,7 +228,7 @@ inline auto&& rvalue(
   return a_ref.coeffRef(idx.head_.n_ - 1, idx.tail_.head_.n_ - 1);
 }
 
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& a,
     const cons_index_list<index_uni,
@@ -256,7 +257,7 @@ inline auto rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I,
-          require_eigen_matrix_t<EigMat>* = nullptr>
+          require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     const EigMat& a,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
@@ -267,7 +268,7 @@ inline auto rvalue(
 }
 
 template <typename VarMat, typename I,
-          require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& a,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
@@ -292,7 +293,7 @@ inline auto rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I,
-          require_eigen_matrix_t<EigMat>* = nullptr>
+          require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
     const EigMat& a,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idx,
@@ -303,7 +304,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
 }
 
 template <typename VarMat, typename I,
-          require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& a,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idx,
@@ -362,7 +363,7 @@ inline std::decay_t<VarMat> rvalue(
   }
 }
 
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline EigMat rvalue(const EigMat& a,
                      const cons_index_list<index_min_max, nil_index_list>& idx,
                      const char* name = "ANON", int depth = 0) {
@@ -376,13 +377,11 @@ inline EigMat rvalue(const EigMat& a,
   } else {
     return a
         .block(idx.head_.max_ - 1, 0, idx.head_.min_ - (idx.head_.max_ - 1),
-               a.cols())
-        .rowwise()
-        .reverse();
+               a.cols()).rowwise().reverse();
   }
 }
 
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline std::decay_t<VarMat> rvalue(
     VarMat&& a, const cons_index_list<index_min_max, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -397,8 +396,7 @@ inline std::decay_t<VarMat> rvalue(
     return a
         .block(idx.head_.max_ - 1, 0, idx.head_.min_ - (idx.head_.max_ - 1),
                a.cols())
-        .rowwise()
-        .reverse();
+        .rowwise_reverse();
   }
 }
 
@@ -415,7 +413,7 @@ inline std::decay_t<VarMat> rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     const EigMat& mat,
     const cons_index_list<index_min_max,
@@ -459,16 +457,13 @@ inline auto rvalue(
           .block(idx.head_.max_ - 1, idx.tail_.head_.max_ - 1,
                  idx.head_.min_ - (idx.head_.max_ - 1),
                  idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
-          .rowwise()
-          .reverse()
-          .colwise()
           .reverse()
           .eval();
     }
   }
 }
 
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline VarMat rvalue(
     VarMat&& mat,
     const cons_index_list<index_min_max,
@@ -494,9 +489,7 @@ inline VarMat rvalue(
           .block(idx.head_.min_ - 1, idx.tail_.head_.max_ - 1,
                  idx.head_.max_ - (idx.head_.min_ - 1),
                  idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
-          .colwise()
-          .reverse()
-          .eval();
+          .colwise_reverse().eval();
     }
   } else {
     if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
@@ -504,24 +497,19 @@ inline VarMat rvalue(
           .block(idx.head_.max_ - 1, idx.tail_.head_.min_ - 1,
                  idx.head_.min_ - (idx.head_.max_ - 1),
                  idx.tail_.head_.max_ - (idx.tail_.head_.min_ - 1))
-          .rowwise()
-          .reverse()
-          .eval();
+          .rowwise_reverse().eval();
     } else {
       return mat
           .block(idx.head_.max_ - 1, idx.tail_.head_.max_ - 1,
                  idx.head_.min_ - (idx.head_.max_ - 1),
                  idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
-          .rowwise()
-          .reverse()
-          .colwise()
           .reverse()
           .eval();
     }
   }
 }
 
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(const EigMat& a,
                    const cons_index_list<index_min, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -531,7 +519,7 @@ inline auto rvalue(const EigMat& a,
                  a.cols());
 }
 
-template <typename EigMat, require_eigen_matrix_t<EigMat>* = nullptr>
+template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(const EigMat& a,
                    const cons_index_list<index_max, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -540,7 +528,7 @@ inline auto rvalue(const EigMat& a,
   return a.block(0, 0, idx.head_.max_, a.cols());
 }
 
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(VarMat&& a,
                    const cons_index_list<index_min, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -550,7 +538,7 @@ inline auto rvalue(VarMat&& a,
                  a.cols());
 }
 
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(VarMat&& a,
                    const cons_index_list<index_max, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -595,7 +583,8 @@ inline stan::math::var_value<plain_type_t<value_type_t<VarMat>>> rvalue(
     VarMat&& v, const cons_index_list<I, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
   const int size = rvalue_index_size(idx.head_, v.size());
-  arena_t<value_type_t<VarMat>> a(size);
+  using var_plain_type = plain_type_t<value_type_t<VarMat>>;
+  arena_t<var_plain_type> a(size);
   arena_t<std::vector<int>> index_vec;
   for (int i = 0; i < size; ++i) {
     const int n = rvalue_at(i, idx.head_);
@@ -603,7 +592,7 @@ inline stan::math::var_value<plain_type_t<value_type_t<VarMat>>> rvalue(
     a.coeffRef(i) = v.val().coeffRef(n - 1);
     index_vec.push_back(n - 1);
   }
-  stan::math::var_value<plain_type_t<value_type_t<VarMat>>> ret_a(a);
+  stan::math::var_value<var_plain_type> ret_a(a);
   stan::math::reverse_pass_callback([index_vec, v, ret_a]() mutable {
     for (int i = 0; i < index_vec.size(); ++i) {
       v.adj()(index_vec[i]) += ret_a.adj()(i);
@@ -613,7 +602,7 @@ inline stan::math::var_value<plain_type_t<value_type_t<VarMat>>> rvalue(
 }
 
 
-template <typename VarMat, require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(VarMat&& a,
                    const cons_index_list<index_multi, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -647,7 +636,7 @@ inline auto rvalue(VarMat&& a,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I,
-          require_eigen_matrix_t<EigMat>* = nullptr>
+          require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(const EigMat& a,
                    const cons_index_list<I, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -678,7 +667,7 @@ inline auto rvalue(const EigMat& a,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I1, typename I2,
-          require_eigen_matrix_t<EigMat>* = nullptr>
+          require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline plain_type_t<EigMat> rvalue(
     const EigMat& a,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idx,
@@ -700,7 +689,7 @@ inline plain_type_t<EigMat> rvalue(
 }
 
 template <typename VarMat, typename I1, typename I2,
-          require_var_vt<is_eigen_matrix, VarMat>* = nullptr>
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& a,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idx,
