@@ -78,6 +78,8 @@ src/test/%.d : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(ST
 src/test/%.d : INC += $(INC_GTEST)
 src/test/%.d : DEPTARGETS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@
 
+ifdef STANC2
+
 ## this is for the $(STANC_TEMPLATE_INSTANTIATION) files
 src/stan/%.d : DEPTARGETS = -MT test/test-models/stanc2$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@
 
@@ -113,7 +115,7 @@ STANC_TESTS := $(patsubst src/%.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 # add additional dependency to libstanc.a
 $(STANC_TESTS_O) : test/libstanc.a
 $(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
-
+endif
 
 ############################################################
 ##
@@ -233,9 +235,9 @@ $(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/
 # Generate C++ from Stan standalone functions
 ##
 TEST_FUNCTIONS = $(call findfiles,src/test/test-models,*.stanfuncs)
-$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs test/test-models/stanc2$(EXE)
+$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs $(TEST_STANC)
 	@mkdir -p $(dir $@)
-	$(WINE) test/test-models/stanc2$(EXE) $< --o=$@
+	$(WINE) $(TEST_STANC) --standalone-functions $< --o=$@
 
 ##
 # src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.
