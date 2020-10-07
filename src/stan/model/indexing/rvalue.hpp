@@ -56,11 +56,11 @@ inline T rvalue(
 /**
  * Return the result of indexing a type without taking a subset
  *
- * Types:  type[,] : type
+ * Types:  type[omni, omni] : type
  *
  * @tparam T Any type.
  * @param[in] an object.
- * @param[in] idx Index consisting of one omni-index.
+ * @param[in] idx Index consisting of two omni-indices.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
@@ -81,7 +81,7 @@ inline T rvalue(
  *
  * Types:  mat[single,] : rowvec
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen matrix
  * @param[in] a Eigen matrix.
  * @param[in] idx Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -98,9 +98,21 @@ inline auto rvalue(
   return a.row(idx.head_.n_ - 1).eval();
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a
+ * sequence consisting of one single index, returning a row vector.
+ *
+ * Types:  mat[single,] : rowvec
+ *
+ * @tparam VarMat a `var_value` with underlying eigen matrix type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(
-    VarMat&& a,
+inline auto rvalue(const VarMat& a,
     const cons_index_list<index_uni,
                           cons_index_list<index_omni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -112,9 +124,9 @@ inline auto rvalue(
  * Return the result of indexing the specified Eigen matrix with a
  * sequence consisting of one single index, returning a vector.
  *
- * Types:  mat[,single] : rowvec
+ * Types:  mat[,single] : vec
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen matrix
  * @param[in] a Eigen matrix.
  * @param[in] idx Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -122,8 +134,7 @@ inline auto rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline auto rvalue(
-    const EigMat& a,
+inline auto rvalue(const EigMat& a,
     const cons_index_list<index_omni,
                           cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -131,9 +142,22 @@ inline auto rvalue(
   return a.col(idx.tail_.head_.n_ - 1).eval();
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a
+ * sequence consisting of one single index, returning a vector.
+ *
+ * Types:  mat[,single] : vec
+ *
+ * @tparam VarMat a `var_value` with underlying eigen matrix type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    VarMat&& a,
+    const VarMat& a,
     const cons_index_list<index_omni,
                           cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -147,7 +171,7 @@ inline auto rvalue(
  *
  * Types:  vec[single] : scal
  *
- * @tparam T Scalar type.
+ * @tparam EigVec An eigen vector
  * @param[in] v Vector being indexed.
  * @param[in] idx One single index.
  * @param[in] name String form of expression being evaluated.
@@ -163,8 +187,21 @@ inline auto&& rvalue(const EigVec& v,
   return v_ref.coeffRef(idx.head_.n_ - 1);
 }
 
-template <typename VarMat, require_var_vt<is_eigen_vector, VarMat>* = nullptr>
-inline auto rvalue(VarMat&& v,
+/**
+ * Return the result of indexing the specified Eigen vector with a
+ * sequence containing one single index, returning a scalar.
+ *
+ * Types:  vec[single] : scal
+ *
+ * @tparam VarVec a `var_value` with underlying vector type.
+ * @param[in] v Vector being indexed.
+ * @param[in] idx One single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing vector.
+ */
+template <typename VarVec, require_var_vt<is_eigen_vector, VarVec>* = nullptr>
+inline auto rvalue(const VarVec& v,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("vector[single] indexing", name, v.size(), idx.head_.n_);
@@ -177,7 +214,7 @@ inline auto rvalue(VarMat&& v,
  *
  * Types:  mat[single] : rowvec
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen matrix
  * @param[in] a Eigen matrix.
  * @param[in] idx Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -192,8 +229,21 @@ inline auto rvalue(const EigMat& a,
   return a.row(idx.head_.n_ - 1);
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a
+ * sequence consisting of one single index, returning a row vector.
+ *
+ * Types:  mat[single] : rowvec
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @param[in] a var matrix
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(VarMat&& a,
+inline auto rvalue(const VarMat& a,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("varmatrix[uni] indexing", name, a.rows(), idx.head_.n_);
@@ -207,7 +257,7 @@ inline auto rvalue(VarMat&& a,
  *
  * Types:  mat[single,single] : scalar
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen type
  * @param[in] a Matrix to index.
  * @param[in] idx Pair of single indexes.
  * @param[in] name String form of expression being evaluated.
@@ -215,7 +265,7 @@ inline auto rvalue(VarMat&& a,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, require_eigen_t<EigMat>* = nullptr>
-inline auto&& rvalue(
+inline auto& rvalue(
     const EigMat& a,
     const cons_index_list<index_uni,
                           cons_index_list<index_uni, nil_index_list>>& idx,
@@ -228,9 +278,22 @@ inline auto&& rvalue(
   return a_ref.coeffRef(idx.head_.n_ - 1, idx.tail_.head_.n_ - 1);
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a
+ * sequence consisting of two single indexes, returning a scalar.
+ *
+ * Types:  mat[single, single] : scalar
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @param[in] a Matrix to index.
+ * @param[in] idx Pair of single indexes.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    VarMat&& a,
+    const VarMat& a,
     const cons_index_list<index_uni,
                           cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -246,9 +309,9 @@ inline auto rvalue(
  * sequence consisting of a single index and multiple index,
  * returning a row vector.
  *
- * Types:  mat[single,multiple] : row vector
+ * Types:  mat[single, multiple] : row vector
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen matrix
  * @tparam I Type of multiple index.
  * @param[in] a Matrix to index.
  * @param[in] idx Pair of single index and multiple index.
@@ -267,24 +330,40 @@ inline auto rvalue(
   return rvalue(a.row(m - 1), idx.tail_);
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a
+ * sequence consisting of a single index and multiple index,
+ * returning a row vector.
+ *
+ * Types:  mat[single, multiple] : row vector
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @tparam I Type of multiple index.
+ * @param[in] a Matrix to index.
+ * @param[in] idx Pair of single index and multiple index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, typename I,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    VarMat&& a,
+    const VarMat& a,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
   math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
   return rvalue(a.row(m - 1), idx.tail_);
 }
+
 /**
  * Return the result of indexing the specified Eigen matrix with a
  * sequence consisting of a multiple index and a single index,
  * returning a vector.
  *
- * Types:  mat[multiple,single] : vector
+ * Types:  mat[multiple, single] : vector
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen matrix
  * @tparam I Type of multiple index.
  * @param[in] a Matrix to index.
  * @param[in] idx Pair multiple index and single index.
@@ -303,10 +382,25 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
   return rvalue(a.col(m - 1), index_list(idx.head_));
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a
+ * sequence consisting of a multiple index and a single index,
+ * returning a vector.
+ *
+ * Types:  mat[multiple, single] : vector
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @tparam I Type of multiple index.
+ * @param[in] a Matrix to index.
+ * @param[in] idx Pair multiple index and single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, typename I,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    VarMat&& a,
+    const VarMat& a,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   const int m = idx.tail_.head_.n_;
@@ -315,12 +409,12 @@ inline auto rvalue(
 }
 
 /**
- * Return the result of indexing the specified Eigen vector with a
- * sequence containing one single index, returning a scalar.
+ * Return the result of indexing the specified Eigen vector min_max index,
+ *  returning a vector
  *
- * Types:  vec[single] : scal
+ * Types:  vec[min_max] : vector
  *
- * @tparam T Scalar type.
+ * @tparam EigVec An eigen vector
  * @param[in] v Vector being indexed.
  * @param[in] idx One single index.
  * @param[in] name String form of expression being evaluated.
@@ -345,9 +439,22 @@ inline auto rvalue(const EigVec& v,
   }
 }
 
-template <typename VarMat, require_var_vt<is_eigen_vector, VarMat>* = nullptr>
-inline std::decay_t<VarMat> rvalue(
-    VarMat&& v, const cons_index_list<index_min_max, nil_index_list>& idx,
+/**
+ * Return the result of indexing the specified var vector min_max index,
+ *  returning a vector
+ *
+ * Types:  vec[min_max] : vector
+ *
+ * @tparam VarVec a `var_value` with underlying vector type.
+ * @param[in] v Vector being indexed.
+ * @param[in] idx One single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing vector.
+ */
+template <typename VarVec, require_var_vt<is_eigen_vector, VarVec>* = nullptr>
+inline std::decay_t<VarVec> rvalue(
+    const VarVec& v, const cons_index_list<index_min_max, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
   math::check_range("var_vector[min_max] min indexing", name, v.size(),
                     idx.head_.min_);
@@ -363,6 +470,20 @@ inline std::decay_t<VarMat> rvalue(
   }
 }
 
+/**
+ * Return the result of indexing the specified Eigen matrix with a
+ * min_max_index returning a block from max to min.
+ *
+ * Types:  mat[min_max] : matrix
+ *
+ * @tparam EigMat An eigen matrix
+ * @tparam I Type of multiple index.
+ * @param[in] a Matrix to index.
+ * @param[in] idx Pair multiple index and single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline EigMat rvalue(const EigMat& a,
                      const cons_index_list<index_min_max, nil_index_list>& idx,
@@ -381,9 +502,23 @@ inline EigMat rvalue(const EigMat& a,
   }
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a
+ * min_max_index returning a block from max to min.
+ *
+ * Types:  mat[min_max] : matrix
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @tparam I Type of multiple index.
+ * @param[in] a Matrix to index.
+ * @param[in] idx Pair multiple index and single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline std::decay_t<VarMat> rvalue(
-    VarMat&& a, const cons_index_list<index_min_max, nil_index_list>& idx,
+    const VarMat& a, const cons_index_list<index_min_max, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
                     idx.head_.min_ - 1);
@@ -401,12 +536,12 @@ inline std::decay_t<VarMat> rvalue(
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of one single index, returning a row vector.
+ * Return the result of indexing the specified Eigen matrix with two min_max
+ * indices, returning back a block of the Eigen matrix.
  *
- * Types:  mat[single,] : rowvec
+ * Types:  mat[min_max, min_max] : matrix
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen matrix
  * @param[in] a Eigen matrix.
  * @param[in] idx Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -463,9 +598,22 @@ inline auto rvalue(
   }
 }
 
+/**
+ * Return the result of indexing the specified var matrix with two min_max
+ * indices, returning back a block of the Eigen matrix.
+ *
+ * Types:  mat[min_max, min_max] : matrix
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline VarMat rvalue(
-    VarMat&& mat,
+    const VarMat& mat,
     const cons_index_list<index_min_max,
                           cons_index_list<index_min_max, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -509,6 +657,19 @@ inline VarMat rvalue(
   }
 }
 
+/**
+ * Return the result of indexing the specified Eigen matrix with a min index
+ * returning back a block of rows min:N and all cols
+ *
+ * Types:  mat[min:] : matrix
+ *
+ * @tparam EigMat An eigen matrix
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(const EigMat& a,
                    const cons_index_list<index_min, nil_index_list>& idx,
@@ -519,6 +680,42 @@ inline auto rvalue(const EigMat& a,
                  a.cols());
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a min index
+ * returning back a block of rows min:N and all cols
+ *
+ * Types:  mat[min:] : matrix
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+inline auto rvalue(const VarMat& a,
+                   const cons_index_list<index_min, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.head_.min_ - 1);
+  return a.block(idx.head_.min_ - 1, 0, a.rows() - (idx.head_.min_ - 1),
+                 a.cols());
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a max index
+ * returning back a block of rows 1:max and all columns
+ *
+ * Types:  mat[:max] : matrix
+ *
+ * @tparam EigMat An eigen matrix
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(const EigMat& a,
                    const cons_index_list<index_max, nil_index_list>& idx,
@@ -528,18 +725,21 @@ inline auto rvalue(const EigMat& a,
   return a.block(0, 0, idx.head_.max_, a.cols());
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a max index
+ * returning back a block of rows 1:max and all columns
+ *
+ * Types:  mat[:max] : matrix
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @param[in] a Eigen matrix.
+ * @param[in] idx Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(VarMat&& a,
-                   const cons_index_list<index_min, nil_index_list>& idx,
-                   const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[multi] indexing", name, a.rows(),
-                    idx.head_.min_ - 1);
-  return a.block(idx.head_.min_ - 1, 0, a.rows() - (idx.head_.min_ - 1),
-                 a.cols());
-}
-
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(VarMat&& a,
+inline auto rvalue(const VarMat& a,
                    const cons_index_list<index_max, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
@@ -553,7 +753,7 @@ inline auto rvalue(VarMat&& a,
  *
  * Types: vec[multiple] : vec
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen vector
  * @tparam I Multi-index type.
  * @param[in] v Eigen vector.
  * @param[in] idx Index consisting of one multi-index.
@@ -577,13 +777,27 @@ inline plain_type_t<EigVec> rvalue(
   return a;
 }
 
-template <typename VarMat, typename I,
-          require_var_vt<is_eigen_vector, VarMat>* = nullptr>
-inline stan::math::var_value<plain_type_t<value_type_t<VarMat>>> rvalue(
-    VarMat&& v, const cons_index_list<I, nil_index_list>& idx,
+/**
+ * Return the result of indexing the specified Eigen vector with a
+ * sequence containing one multiple index, returning a vector.
+ *
+ * Types: vec[multiple] : vec
+ *
+ * @tparam VarVec a `var_value` with underlying vector type.
+ * @tparam I Multi-index type.
+ * @param[in] v Eigen vector.
+ * @param[in] idx Index consisting of one multi-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing vector.
+ */
+template <typename VarVec, typename I,
+          require_var_vt<is_eigen_vector, VarVec>* = nullptr>
+inline stan::math::var_value<plain_type_t<value_type_t<VarVec>>> rvalue(
+    const VarVec& v, const cons_index_list<I, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
   const int size = rvalue_index_size(idx.head_, v.size());
-  using var_plain_type = plain_type_t<value_type_t<VarMat>>;
+  using var_plain_type = plain_type_t<value_type_t<VarVec>>;
   arena_t<var_plain_type> a(size);
   arena_t<std::vector<int>> index_vec;
   for (int i = 0; i < size; ++i) {
@@ -595,31 +809,11 @@ inline stan::math::var_value<plain_type_t<value_type_t<VarMat>>> rvalue(
   stan::math::var_value<var_plain_type> ret_a(a);
   stan::math::reverse_pass_callback([index_vec, v, ret_a]() mutable {
     for (int i = 0; i < index_vec.size(); ++i) {
-      v.adj()(index_vec[i]) += ret_a.adj()(i);
+      v.adj().coeffRef(index_vec[i]) += ret_a.adj().coeffRef(i);
     }
   });
   return ret_a;
 }
-
-
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(VarMat&& a,
-                   const cons_index_list<index_multi, nil_index_list>& idx,
-                   const char* name = "ANON", int depth = 0) {
-  const int n_rows = rvalue_index_size(idx.head_, a.rows());
-  plain_type_t<value_type_t<VarMat>> b(n_rows, a.cols());
-  for (int i = 0; i < n_rows; ++i) {
-    const int n = rvalue_at(i, idx.head_);
-    math::check_range("matrix[multi] indexing", name, a.rows(), n);
-    b.row(i) = a.val().row(n - 1);
-  }
-  stan::math::var_value<value_type_t<VarMat>> a_ret(b);
-  stan::math::reverse_pass_callback([a, a_ret]() {
-    a.vi_->adj_ += a_ret.vi_->adj_;
-  });
-  return a_ret;
-}
-
 
 /**
  * Return the result of indexing the specified Eigen matrix with a
@@ -627,7 +821,7 @@ inline auto rvalue(VarMat&& a,
  *
  * Types:  mat[multiple] : mat
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen matrix
  * @tparam I Type of multiple index.
  * @param[in] a Matrix to index.
  * @param[in] idx Index consisting of single multiple index.
@@ -652,13 +846,47 @@ inline auto rvalue(const EigMat& a,
 }
 
 /**
+ * Return the result of indexing the specified var matrix with a
+ * sequence containing one multiple index, returning a vector.
+ *
+ * Types: matrix[multiple] : matrix
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @tparam I Multi-index type.
+ * @param[in] v Eigen vector.
+ * @param[in] idx Index consisting of one multi-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing vector.
+ */
+template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+inline auto rvalue(const VarMat& a,
+                   const cons_index_list<index_multi, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  const int n_rows = rvalue_index_size(idx.head_, a.rows());
+  using var_plain_type = plain_type_t<value_type_t<VarMat>>;
+  arena_t<var_plain_type> b(n_rows, a.cols());
+  for (int i = 0; i < n_rows; ++i) {
+    const int n = rvalue_at(i, idx.head_);
+    math::check_range("matrix[multi] indexing", name, a.rows(), n);
+    b.row(i) = a.val().row(n - 1);
+  }
+  stan::math::var_value<var_plain_type> a_ret(b);
+  stan::math::reverse_pass_callback([a, a_ret]() {
+    a.vi_->adj_ += a_ret.vi_->adj_;
+  });
+  return a_ret;
+}
+
+
+/**
  * Return the result of indexing the specified Eigen matrix with a
  * sequence consisting of a pair o multiple indexes, returning a
  * a matrix.
  *
  * Types:  mat[multiple,multiple] : mat
  *
- * @tparam T Scalar type.
+ * @tparam EigMat An eigen matrix
  * @tparam I Type of multiple index.
  * @param[in] a Matrix to index.
  * @param[in] idx Pair of multiple indexes.
@@ -688,15 +916,31 @@ inline plain_type_t<EigMat> rvalue(
   return c;
 }
 
+/**
+ * Return the result of indexing the specified var matrix with a
+ * sequence consisting of a pair o multiple indexes, returning a
+ * a matrix.
+ *
+ * Types:  mat[multiple,multiple] : mat
+ *
+ * @tparam VarMat a `var_value` with underlying matrix type.
+ * @tparam I Type of multiple index.
+ * @param[in] a Matrix to index.
+ * @param[in] idx Pair of multiple indexes.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
 template <typename VarMat, typename I1, typename I2,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    VarMat&& a,
+    const VarMat& a,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   const int rows = rvalue_index_size(idx.head_, a.rows());
   const int cols = rvalue_index_size(idx.tail_.head_, a.cols());
-  plain_type_t<value_type_t<VarMat>> c(rows, cols);
+  using var_plain_type = plain_type_t<value_type_t<VarMat>>;
+  arena_t<plain_type_t<var_plain_type>> c(rows, cols);
   arena_t<std::vector<int>> m_slice;
   arena_t<std::vector<int>> n_slice;
   for (int j = 0; j < cols; ++j) {
@@ -710,7 +954,7 @@ inline auto rvalue(
       n_slice.push_back(n - 1);
     }
   }
-  stan::math::var_value<plain_type_t<value_type_t<VarMat>>> a_ret(c);
+  stan::math::var_value<var_plain_type> a_ret(c);
   stan::math::reverse_pass_callback([cols, rows, m_slice, n_slice, a,
                                      a_ret]() mutable {
     for (int j = 0; j < cols; ++j) {
@@ -744,6 +988,27 @@ inline auto rvalue(StdVec&& c, const cons_index_list<index_uni, L>& idx,
   const int n = idx.head_.n_;
   math::check_range("array[uni,...] index", name, c.size(), n);
   return rvalue(c[n - 1], idx.tail_, name, depth + 1);
+}
+
+/**
+ * Return the result of indexing the specified array with
+ * a single index.
+ *
+ * Types:  std::vector<T>[single] : T
+ *
+ * @tparam StdVec a standard vector
+ * @param[in] c Container of list elements.
+ * @param[in] idx Index list beginning with single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing array.
+ */
+template <typename StdVec, typename L, require_std_vector_t<StdVec>* = nullptr>
+inline auto rvalue(StdVec&& c, const cons_index_list<index_uni, nil_index_list>& idx,
+                   const char* name = "ANON", int depth = 0) {
+  const int n = idx.head_.n_;
+  math::check_range("array[uni,...] index", name, c.size(), n);
+  return std::forward<StdVec>(c)[n - 1];
 }
 
 /**

@@ -95,7 +95,7 @@ struct index_min_max {
    * @param min minimum index (inclusive).
    * @param max maximum index (inclusive).
    */
-  explicit index_min_max(int min, int max) : min_(min), max_(max) {}
+  explicit constexpr index_min_max(int min, int max) : min_(min), max_(max) {}
 };
 
 }  // namespace model
