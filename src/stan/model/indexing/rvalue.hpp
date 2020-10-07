@@ -28,8 +28,8 @@ namespace model {
  * @return Input value.
  */
 template <typename T>
-inline T rvalue(T&& c, const nil_index_list& /*idx*/,
-                             const char* /*name*/ = "", int /*depth*/ = 0) {
+inline T rvalue(T&& c, const nil_index_list& /*idx*/, const char* /*name*/ = "",
+                int /*depth*/ = 0) {
   return std::forward<T>(c);
 }
 
@@ -47,9 +47,8 @@ inline T rvalue(T&& c, const nil_index_list& /*idx*/,
  * @return Result of indexing matrix.
  */
 template <typename T>
-inline T rvalue(
-    T&& a, const cons_index_list<index_omni, nil_index_list>& idx,
-    const char* name = "ANON", int depth = 0) {
+inline T rvalue(T&& a, const cons_index_list<index_omni, nil_index_list>& idx,
+                const char* name = "ANON", int depth = 0) {
   return std::forward<T>(a);
 }
 
@@ -73,7 +72,6 @@ inline T rvalue(
     const char* name = "ANON", int depth = 0) {
   return std::forward<T>(a);
 }
-
 
 /**
  * Return the result of indexing the specified Eigen matrix with a
@@ -111,8 +109,10 @@ inline auto rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(const VarMat& a,
+template <typename VarMat,
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+inline auto rvalue(
+    const VarMat& a,
     const cons_index_list<index_uni,
                           cons_index_list<index_omni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -134,7 +134,8 @@ inline auto rvalue(const VarMat& a,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline auto rvalue(const EigMat& a,
+inline auto rvalue(
+    const EigMat& a,
     const cons_index_list<index_omni,
                           cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -155,7 +156,8 @@ inline auto rvalue(const EigMat& a,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+template <typename VarMat,
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
     const VarMat& a,
     const cons_index_list<index_omni,
@@ -242,14 +244,14 @@ inline auto rvalue(const EigMat& a,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+template <typename VarMat,
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(const VarMat& a,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("varmatrix[uni] indexing", name, a.rows(), idx.head_.n_);
   return a.row(idx.head_.n_ - 1);
 }
-
 
 /**
  * Return the result of indexing the specified Eigen matrix with a
@@ -291,7 +293,8 @@ inline auto& rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+template <typename VarMat,
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
     const VarMat& a,
     const cons_index_list<index_uni,
@@ -498,7 +501,9 @@ inline EigMat rvalue(const EigMat& a,
   } else {
     return a
         .block(idx.head_.max_ - 1, 0, idx.head_.min_ - (idx.head_.max_ - 1),
-               a.cols()).rowwise().reverse();
+               a.cols())
+        .rowwise()
+        .reverse();
   }
 }
 
@@ -516,7 +521,8 @@ inline EigMat rvalue(const EigMat& a,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+template <typename VarMat,
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline std::decay_t<VarMat> rvalue(
     const VarMat& a, const cons_index_list<index_min_max, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -611,7 +617,8 @@ inline auto rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+template <typename VarMat,
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline VarMat rvalue(
     const VarMat& mat,
     const cons_index_list<index_min_max,
@@ -637,7 +644,8 @@ inline VarMat rvalue(
           .block(idx.head_.min_ - 1, idx.tail_.head_.max_ - 1,
                  idx.head_.max_ - (idx.head_.min_ - 1),
                  idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
-          .colwise_reverse().eval();
+          .colwise_reverse()
+          .eval();
     }
   } else {
     if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
@@ -645,7 +653,8 @@ inline VarMat rvalue(
           .block(idx.head_.max_ - 1, idx.tail_.head_.min_ - 1,
                  idx.head_.min_ - (idx.head_.max_ - 1),
                  idx.tail_.head_.max_ - (idx.tail_.head_.min_ - 1))
-          .rowwise_reverse().eval();
+          .rowwise_reverse()
+          .eval();
     } else {
       return mat
           .block(idx.head_.max_ - 1, idx.tail_.head_.max_ - 1,
@@ -693,7 +702,8 @@ inline auto rvalue(const EigMat& a,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+template <typename VarMat,
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(const VarMat& a,
                    const cons_index_list<index_min, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -738,7 +748,8 @@ inline auto rvalue(const EigMat& a,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+template <typename VarMat,
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(const VarMat& a,
                    const cons_index_list<index_max, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -859,7 +870,8 @@ inline auto rvalue(const EigMat& a,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing vector.
  */
-template <typename VarMat, require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
+template <typename VarMat,
+          require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(const VarMat& a,
                    const cons_index_list<index_multi, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -872,12 +884,10 @@ inline auto rvalue(const VarMat& a,
     b.row(i) = a.val().row(n - 1);
   }
   stan::math::var_value<var_plain_type> a_ret(b);
-  stan::math::reverse_pass_callback([a, a_ret]() {
-    a.vi_->adj_ += a_ret.vi_->adj_;
-  });
+  stan::math::reverse_pass_callback(
+      [a, a_ret]() { a.vi_->adj_ += a_ret.vi_->adj_; });
   return a_ret;
 }
-
 
 /**
  * Return the result of indexing the specified Eigen matrix with a
@@ -1004,7 +1014,8 @@ inline auto rvalue(StdVec&& c, const cons_index_list<index_uni, L>& idx,
  * @return Result of indexing array.
  */
 template <typename StdVec, typename L, require_std_vector_t<StdVec>* = nullptr>
-inline auto rvalue(StdVec&& c, const cons_index_list<index_uni, nil_index_list>& idx,
+inline auto rvalue(StdVec&& c,
+                   const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   const int n = idx.head_.n_;
   math::check_range("array[uni,...] index", name, c.size(), n);
