@@ -1,7 +1,7 @@
 #ifndef STAN_OPTIMIZATION_BFGS_UPDATE_HPP
 #define STAN_OPTIMIZATION_BFGS_UPDATE_HPP
 
-#include <Eigen/Dense>
+#include <stan/math/prim/fun/Eigen.hpp>
 
 namespace stan {
 namespace optimization {

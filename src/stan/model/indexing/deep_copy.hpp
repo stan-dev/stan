@@ -1,7 +1,8 @@
 #ifndef STAN_MODEL_INDEXING_DEEP_COPY_HPP
 #define STAN_MODEL_INDEXING_DEEP_COPY_HPP
 
-#include <stan/math/prim.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <vector>
 
 namespace stan {
