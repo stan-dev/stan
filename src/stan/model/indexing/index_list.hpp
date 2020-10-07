@@ -36,7 +36,8 @@ struct cons_index_list {
 // factory-like function does type inference for I and T
 template <typename I, typename T>
 inline constexpr auto cons_list(I&& idx1, T&& t) {
-  return cons_index_list<std::decay_t<I>, std::decay_t<T>>(std::forward<I>(idx1), std::forward<T>(t));
+  return cons_index_list<std::decay_t<I>, std::decay_t<T>>(
+      std::forward<I>(idx1), std::forward<T>(t));
 }
 
 /**
@@ -53,7 +54,8 @@ inline constexpr auto index_list() { return nil_index_list(); }
  */
 template <typename I1, typename... I2>
 inline constexpr auto index_list(I1&& idx1, I2&&... idx2) {
-  return cons_list(std::forward<I1>(idx1), index_list(std::forward<I2>(idx2)...));
+  return cons_list(std::forward<I1>(idx1),
+                   index_list(std::forward<I2>(idx2)...));
 }
 
 }  // namespace model

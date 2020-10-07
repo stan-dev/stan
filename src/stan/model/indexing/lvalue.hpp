@@ -66,8 +66,7 @@ inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If the index is out of bounds.
  */
-template <typename Vec1, typename U,
- require_eigen_vector_t<Vec1>* = nullptr>
+template <typename Vec1, typename U, require_eigen_vector_t<Vec1>* = nullptr>
 inline void assign(Vec1& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const U& y, const char* name = "ANON", int depth = 0) {
@@ -94,11 +93,11 @@ inline void assign(Vec1& x,
  * the indexed size.
  */
 template <typename Vec1, typename Vec2, typename I,
-  require_all_eigen_vector_t<Vec1, Vec2>* = nullptr,
-  require_not_same_t<I, index_uni>* = nullptr>
+          require_all_eigen_vector_t<Vec1, Vec2>* = nullptr,
+          require_not_same_t<I, index_uni>* = nullptr>
 inline void assign(Vec1& x, const cons_index_list<I, nil_index_list>& idxs,
-  const Vec2& y, const char* name = "ANON", int depth = 0) {
-    const auto& y_ref = stan::math::to_ref(y);
+                   const Vec2& y, const char* name = "ANON", int depth = 0) {
+  const auto& y_ref = stan::math::to_ref(y);
   math::check_size_match("vector[multi] assign sizes", "lhs",
                          rvalue_index_size(idxs.head_, x.size()), name,
                          y_ref.size());
@@ -110,15 +109,18 @@ inline void assign(Vec1& x, const cons_index_list<I, nil_index_list>& idxs,
 }
 
 template <typename Vec1, typename Vec2, typename I,
-  require_all_eigen_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1& x, const cons_index_list<index_min_max, nil_index_list>& idxs,
-  const Vec2& y, const char* name = "ANON", int depth = 0) {
-    const auto& y_ref = stan::math::to_ref(y);
+          require_all_eigen_vector_t<Vec1, Vec2>* = nullptr>
+inline void assign(Vec1& x,
+                   const cons_index_list<index_min_max, nil_index_list>& idxs,
+                   const Vec2& y, const char* name = "ANON", int depth = 0) {
+  const auto& y_ref = stan::math::to_ref(y);
   math::check_size_match("vector[multi] assign sizes", "lhs",
                          rvalue_index_size(idxs.head_, x.size()), name,
                          y_ref.size());
-  math::check_range("vector[min_max] min assign", name, x.size(), idxs.head_.min_);
-  math::check_range("vector[min_max] max assign", name, x.size(), idxs.head_.max_);
+  math::check_range("vector[min_max] min assign", name, x.size(),
+                    idxs.head_.min_);
+  math::check_range("vector[min_max] max assign", name, x.size(),
+                    idxs.head_.max_);
   if (idxs.head_.min_ <= idxs.head_.max_) {
     x.segment(idxs.head_.min_ - 1, idxs.head_.max_ - 1) = y;
     return;
@@ -146,18 +148,17 @@ inline void assign(Vec1& x, const cons_index_list<index_min_max, nil_index_list>
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename Mat, typename RowVec, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
- require_eigen_row_vector_t<RowVec>* = nullptr>
+template <typename Mat, typename RowVec,
+          require_eigen_matrix_dynamic_t<Mat>* = nullptr,
+          require_eigen_row_vector_t<RowVec>* = nullptr>
 inline void assign(Mat& x,
-            const cons_index_list<index_uni, nil_index_list>& idxs,
-            const RowVec& y,
-            const char* name = "ANON", int depth = 0) {
+                   const cons_index_list<index_uni, nil_index_list>& idxs,
+                   const RowVec& y, const char* name = "ANON", int depth = 0) {
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.cols(), name,
                          y.cols());
   math::check_range("matrix[uni] assign range", name, x.rows(), idxs.head_.n_);
   x.row(idxs.head_.n_ - 1) = y;
 }
-
 
 /**
  * Assign the specified Eigen matrix at the specified single index
@@ -177,15 +178,18 @@ inline void assign(Mat& x,
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename Mat, typename ColVec, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
- require_eigen_col_vector_t<ColVec>* = nullptr>
-inline void assign(Mat& x,
-            const cons_index_list<index_omni, cons_index_list<index_uni, nil_index_list>>& idxs,
-            const ColVec& y,
-            const char* name = "ANON", int depth = 0) {
+template <typename Mat, typename ColVec,
+          require_eigen_matrix_dynamic_t<Mat>* = nullptr,
+          require_eigen_col_vector_t<ColVec>* = nullptr>
+inline void assign(
+    Mat& x,
+    const cons_index_list<index_omni,
+                          cons_index_list<index_uni, nil_index_list>>& idxs,
+    const ColVec& y, const char* name = "ANON", int depth = 0) {
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.rows(), name,
                          y.rows());
-  math::check_range("matrix[uni] assign range", name, x.cols(), idxs.tail_.head_.n_);
+  math::check_range("matrix[uni] assign range", name, x.cols(),
+                    idxs.tail_.head_.n_);
   x.col(idxs.tail_.head_.n_ - 1) = y;
 }
 
@@ -207,12 +211,14 @@ inline void assign(Mat& x,
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
  */
-template <typename Mat, typename RowVec, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
- require_eigen_row_vector_t<RowVec>* = nullptr>
-inline void assign(Mat& x,
-            const cons_index_list<index_uni, cons_index_list<index_omni, nil_index_list>>& idxs,
-            const RowVec& y,
-            const char* name = "ANON", int depth = 0) {
+template <typename Mat, typename RowVec,
+          require_eigen_matrix_dynamic_t<Mat>* = nullptr,
+          require_eigen_row_vector_t<RowVec>* = nullptr>
+inline void assign(
+    Mat& x,
+    const cons_index_list<index_uni,
+                          cons_index_list<index_omni, nil_index_list>>& idxs,
+    const RowVec& y, const char* name = "ANON", int depth = 0) {
   math::check_size_match("matrix[uni] assign sizes", "lhs", x.cols(), name,
                          y.cols());
   x.row(idxs.head_.n_ - 1) = y;
@@ -237,10 +243,10 @@ inline void assign(Mat& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename I, typename Mat2,
-  require_all_eigen_matrix_dynamic_t<Mat2, Mat2>* = nullptr,
-  require_not_same_t<I, index_uni>* = nullptr>
+          require_all_eigen_matrix_dynamic_t<Mat2, Mat2>* = nullptr,
+          require_not_same_t<I, index_uni>* = nullptr>
 inline void assign(Mat1& x, const cons_index_list<I, nil_index_list>& idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+                   const Mat2& y, const char* name = "ANON", int depth = 0) {
   const int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
   const auto& y_ref = stan::math::to_ref(y);
   math::check_size_match("matrix[multi] assign row sizes", "lhs", x_idx_rows,
@@ -255,9 +261,11 @@ inline void assign(Mat1& x, const cons_index_list<I, nil_index_list>& idxs,
 }
 
 template <typename Mat1, typename Mat2,
-  require_all_eigen_matrix_dynamic_t<Mat2, Mat2>* = nullptr>
-inline void assign(Mat1& x,
-   const cons_index_list<index_min_max, cons_index_list<index_min_max, nil_index_list>>& idxs,
+          require_all_eigen_matrix_dynamic_t<Mat2, Mat2>* = nullptr>
+inline void assign(
+    Mat1& x,
+    const cons_index_list<index_min_max,
+                          cons_index_list<index_min_max, nil_index_list>>& idxs,
     const Mat2& y, const char* name = "ANON", int depth = 0) {
   const int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
   const int x_idx_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
@@ -266,26 +274,39 @@ inline void assign(Mat1& x,
   math::check_size_match("matrix[multi] assign col sizes", "lhs", x_idx_cols,
                          name, y.cols());
   if (idxs.head_.min_ <= idxs.head_.max_) {
-   if (idxs.tail_.head_.min_ <= idxs.tail_.head_.max_) {
-     x.block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1, idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1) = y;
-     return;
-   } else {
-     x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1, idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1).colwise().reverse() = y;
-     return;
-   }
+    if (idxs.tail_.head_.min_ <= idxs.tail_.head_.max_) {
+      x.block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1,
+              idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1)
+          = y;
+      return;
+    } else {
+      x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1,
+              idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1)
+          .colwise()
+          .reverse()
+          = y;
+      return;
+    }
   } else {
-   if (idxs.tail_.head_.min_ <= idxs.tail_.head_.max_) {
-     x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1, idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1).rowwise().reverse() = y;
-     return;
-   } else {
-     x.block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1, idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1).rowwise().reverse().colwise().reverse() = y;
-     return;
-   }
+    if (idxs.tail_.head_.min_ <= idxs.tail_.head_.max_) {
+      x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1,
+              idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1)
+          .rowwise()
+          .reverse()
+          = y;
+      return;
+    } else {
+      x.block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1,
+              idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1)
+          .rowwise()
+          .reverse()
+          .colwise()
+          .reverse()
+          = y;
+      return;
+    }
   }
-
 }
-
-
 
 /**
  * Assign the specified Eigen matrix at the specified pair of
@@ -302,11 +323,13 @@ inline void assign(Mat1& x,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If either of the indices are out of bounds.
  */
-template <typename Mat, typename U, require_eigen_matrix_dynamic_t<Mat>* = nullptr>
-inline void assign(Mat& x,
-            const cons_index_list<
-                index_uni, cons_index_list<index_uni, nil_index_list> >& idxs,
-            const U& y, const char* name = "ANON", int depth = 0) {
+template <typename Mat, typename U,
+          require_eigen_matrix_dynamic_t<Mat>* = nullptr>
+inline void assign(
+    Mat& x,
+    const cons_index_list<index_uni,
+                          cons_index_list<index_uni, nil_index_list>>& idxs,
+    const U& y, const char* name = "ANON", int depth = 0) {
   const int m = idxs.head_.n_;
   const int n = idxs.tail_.head_.n_;
   math::check_range("matrix[uni,uni] assign range", name, x.rows(), m);
@@ -334,13 +357,13 @@ inline void assign(Mat& x,
  * matrix and right-hand side row vector do not match.
  */
 template <typename Mat, typename I, typename Vec,
-  require_eigen_matrix_dynamic_t<Mat>* = nullptr,
-  require_eigen_row_vector_t<Vec>* = nullptr,
-  require_not_same_t<I, index_uni>* = nullptr>
-inline void assign(Mat& x,
-    const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idxs,
-    const Vec& y, const char* name = "ANON",
-    int depth = 0) {
+          require_eigen_matrix_dynamic_t<Mat>* = nullptr,
+          require_eigen_row_vector_t<Vec>* = nullptr,
+          require_not_same_t<I, index_uni>* = nullptr>
+inline void assign(
+    Mat& x,
+    const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idxs,
+    const Vec& y, const char* name = "ANON", int depth = 0) {
   const auto& y_ref = stan::math::to_ref(y);
   const int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
   math::check_size_match("matrix[uni,multi] assign sizes", "lhs", x_idxs_cols,
@@ -373,11 +396,12 @@ inline void assign(Mat& x,
  * matrix and right-hand side vector do not match.
  */
 template <typename Mat, typename I, typename ColVec,
-  require_eigen_matrix_dynamic_t<Mat>* = nullptr,
-  require_eigen_col_vector_t<ColVec>* = nullptr,
-  require_not_same_t<I, index_uni>* = nullptr>
-inline void assign(Mat& x,
-  const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idxs,
+          require_eigen_matrix_dynamic_t<Mat>* = nullptr,
+          require_eigen_col_vector_t<ColVec>* = nullptr,
+          require_not_same_t<I, index_uni>* = nullptr>
+inline void assign(
+    Mat& x,
+    const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idxs,
     const ColVec& y, const char* name = "ANON", int depth = 0) {
   const int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
   const auto& y_ref = stan::math::to_ref(y);
@@ -412,12 +436,12 @@ inline void assign(Mat& x,
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename I1, typename I2, typename Mat2,
- require_all_eigen_matrix_dynamic_t<Mat1, Mat2>* = nullptr,
- require_all_not_same_t<index_uni, I1, I2>* = nullptr>
-inline void assign(Mat1& x,
-       const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idxs,
-       const Mat2& y,
-       const char* name = "ANON", int depth = 0) {
+          require_all_eigen_matrix_dynamic_t<Mat1, Mat2>* = nullptr,
+          require_all_not_same_t<index_uni, I1, I2>* = nullptr>
+inline void assign(
+    Mat1& x,
+    const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idxs,
+    const Mat2& y, const char* name = "ANON", int depth = 0) {
   const int x_idxs_rows = rvalue_index_size(idxs.head_, x.rows());
   const int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
   const auto& y_ref = stan::math::to_ref(y);
@@ -462,7 +486,8 @@ inline void assign(Mat1& x,
 template <typename T, typename L, typename U>
 inline void assign(std::vector<T>& x, const cons_index_list<index_uni, L>& idxs,
                    const U& y, const char* name = "ANON", int depth = 0) {
-  math::check_range("vector[uni,...] assign range", name, x.size(), idxs.head_.n_);
+  math::check_range("vector[uni,...] assign range", name, x.size(),
+                    idxs.head_.n_);
   assign(x[idxs.head_.n_ - 1], idxs.tail_, y, name, depth + 1);
 }
 
@@ -492,9 +517,10 @@ inline void assign(std::vector<T>& x, const cons_index_list<index_uni, L>& idxs,
  * the recursive tail assignment dimensions do not match.
  */
 template <typename T, typename I, typename L, typename U,
- require_not_same_t<I, index_uni>* = nullptr>
+          require_not_same_t<I, index_uni>* = nullptr>
 inline void assign(std::vector<T>& x, const cons_index_list<I, L>& idxs,
-    const std::vector<U>& y, const char* name = "ANON", int depth = 0) {
+                   const std::vector<U>& y, const char* name = "ANON",
+                   int depth = 0) {
   int x_idx_size = rvalue_index_size(idxs.head_, x.size());
   math::check_size_match("vector[multi,...] assign sizes", "lhs", x_idx_size,
                          name, y.size());

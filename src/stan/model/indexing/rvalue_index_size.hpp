@@ -28,7 +28,9 @@ inline int rvalue_index_size(const index_multi& idx, int size) {
  * @param[in] size Size of container.
  * @return Size of result.
  */
-inline constexpr int rvalue_index_size(const index_omni& idx, int size) { return size; }
+inline constexpr int rvalue_index_size(const index_omni& idx, int size) {
+  return size;
+}
 
 /**
  * Return size of specified min index for specified size of

@@ -26,7 +26,6 @@ inline plain_type_t<T> deep_copy(T&& x) {
   return std::forward<T>(x);
 }
 
-
 }  // namespace model
 }  // namespace stan
 #endif
