@@ -39,21 +39,21 @@ inline constexpr auto cons_list(I&& idx1, T&& t) {
   return cons_index_list<std::decay_t<I>, std::decay_t<T>>(std::forward<I>(idx1), std::forward<T>(t));
 }
 
+/**
+ * Expansion stop for index_list returning back a `nul_index_list`
+ */
 inline constexpr auto index_list() { return nil_index_list(); }
 
-template <typename I>
-inline constexpr auto index_list(I&& idx) {
-  return cons_list(std::forward<I>(idx), index_list());
-}
-
-template <typename I1, typename I2>
-inline constexpr auto index_list(I1&& idx1, I2&& idx2) {
-  return cons_list(std::forward<I1>(idx1), index_list(std::forward<I2>(idx2)));
-}
-
-template <typename I1, typename I2, typename I3>
-inline constexpr auto index_list(I1&& idx1, I2&& idx2, I3&& idx3) {
-  return cons_list(std::forward<I1>(idx1), index_list(std::forward<I2>(idx2), std::forward<I3>(idx3)));
+/**
+ * @tparam I1 First index type
+ * @tparam I2 Parameter pack of index types.
+ * @param idx1 First index to construct the cons_index_list.
+ * @param idx2 A parameter pack expanded and recursivly called into
+ *  `index_list()`
+ */
+template <typename I1, typename... I2>
+inline constexpr auto index_list(I1&& idx1, I2&&... idx2) {
+  return cons_list(std::forward<I1>(idx1), index_list(std::forward<I2>(idx2)...));
 }
 
 }  // namespace model
