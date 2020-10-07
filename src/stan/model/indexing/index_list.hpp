@@ -1,6 +1,9 @@
 #ifndef STAN_MODEL_INDEXING_INDEX_LIST_HPP
 #define STAN_MODEL_INDEXING_INDEX_LIST_HPP
 
+#include <utility>
+#include <type_traits>
+
 namespace stan {
 namespace model {
 
