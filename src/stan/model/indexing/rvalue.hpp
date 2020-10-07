@@ -37,7 +37,7 @@ inline T rvalue(T&& c, const nil_index_list& /*idx*/, const char* /*name*/ = "",
  * Return the result of indexing a type without taking a subset. Mostly used as
  * an intermediary rvalue function when doing multiple subsets.
  *
- * Types:  type[,] : type
+ * Types:  type[omni] : type
  *
  * @tparam T Any type.
  * @param[in] an object.
@@ -228,7 +228,7 @@ inline auto rvalue(const EigMat& a,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
-  return a.row(idx.head_.n_ - 1);
+  return a.row(idx.head_.n_ - 1).eval();
 }
 
 /**
@@ -686,7 +686,7 @@ inline auto rvalue(const EigMat& a,
   math::check_range("matrix[multi] indexing", name, a.rows(),
                     idx.head_.min_ - 1);
   return a.block(idx.head_.min_ - 1, 0, a.rows() - (idx.head_.min_ - 1),
-                 a.cols());
+                 a.cols()).eval();
 }
 
 /**
@@ -732,7 +732,7 @@ inline auto rvalue(const EigMat& a,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
                     idx.head_.max_ - 1);
-  return a.block(0, 0, idx.head_.max_, a.cols());
+  return a.block(0, 0, idx.head_.max_, a.cols()).eval();
 }
 
 /**
@@ -1040,9 +1040,8 @@ inline auto rvalue(StdVec&& c,
  */
 template <typename StdVec, typename I, typename L,
           require_std_vector_t<StdVec>* = nullptr>
-inline rvalue_return_t<std::decay_t<StdVec>, cons_index_list<I, L>> rvalue(
-    StdVec&& c, const cons_index_list<I, L>& idx, const char* name = "ANON",
-    int depth = 0) {
+inline auto rvalue(StdVec&& c, const cons_index_list<I, L>& idx,
+   const char* name = "ANON", int depth = 0) {
   rvalue_return_t<std::decay_t<StdVec>, cons_index_list<I, L>> result;
   const int index_size = rvalue_index_size(idx.head_, c.size());
   if (index_size > 0) {
