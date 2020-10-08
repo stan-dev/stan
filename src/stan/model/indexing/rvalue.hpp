@@ -88,7 +88,7 @@ inline T rvalue(
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
-    const EigMat& a,
+    EigMat&& a,
     const cons_index_list<index_uni,
                           cons_index_list<index_omni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -112,7 +112,7 @@ inline auto rvalue(
 template <typename VarMat,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    const VarMat& a,
+    VarMat&& a,
     const cons_index_list<index_uni,
                           cons_index_list<index_omni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -135,7 +135,7 @@ inline auto rvalue(
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
-    const EigMat& a,
+    EigMat&& a,
     const cons_index_list<index_omni,
                           cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -159,7 +159,7 @@ inline auto rvalue(
 template <typename VarMat,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    const VarMat& a,
+    VarMat&& a,
     const cons_index_list<index_omni,
                           cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -181,7 +181,7 @@ inline auto rvalue(
  * @return Result of indexing vector.
  */
 template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
-inline auto&& rvalue(const EigVec& v,
+inline auto&& rvalue(EigVec&& v,
                      const cons_index_list<index_uni, nil_index_list>& idx,
                      const char* name = "ANON", int depth = 0) {
   math::check_range("vector[single] indexing", name, v.size(), idx.head_.n_);
@@ -203,7 +203,7 @@ inline auto&& rvalue(const EigVec& v,
  * @return Result of indexing vector.
  */
 template <typename VarVec, require_var_vt<is_eigen_vector, VarVec>* = nullptr>
-inline auto rvalue(const VarVec& v,
+inline auto rvalue(VarVec&& v,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("vector[single] indexing", name, v.size(), idx.head_.n_);
@@ -224,7 +224,7 @@ inline auto rvalue(const VarVec& v,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline auto rvalue(const EigMat& a,
+inline auto rvalue(EigMat&& a,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[uni] indexing", name, a.rows(), idx.head_.n_);
@@ -246,7 +246,7 @@ inline auto rvalue(const EigMat& a,
  */
 template <typename VarMat,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(const VarMat& a,
+inline auto rvalue(VarMat&& a,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("varmatrix[uni] indexing", name, a.rows(), idx.head_.n_);
@@ -268,7 +268,7 @@ inline auto rvalue(const VarMat& a,
  */
 template <typename EigMat, require_eigen_t<EigMat>* = nullptr>
 inline auto& rvalue(
-    const EigMat& a,
+    EigMat&& a,
     const cons_index_list<index_uni,
                           cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -296,7 +296,7 @@ inline auto& rvalue(
 template <typename VarMat,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    const VarMat& a,
+    VarMat&& a,
     const cons_index_list<index_uni,
                           cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -325,7 +325,7 @@ inline auto rvalue(
 template <typename EigMat, typename I,
           require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
-    const EigMat& a,
+    EigMat&& a,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
@@ -351,7 +351,7 @@ inline auto rvalue(
 template <typename VarMat, typename I,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    const VarMat& a,
+    VarMat&& a,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   int m = idx.head_.n_;
@@ -377,7 +377,7 @@ inline auto rvalue(
 template <typename EigMat, typename I,
           require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
-    const EigMat& a,
+    EigMat&& a,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   const int m = idx.tail_.head_.n_;
@@ -403,7 +403,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
 template <typename VarMat, typename I,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    const VarMat& a,
+    VarMat&& a,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   const int m = idx.tail_.head_.n_;
@@ -425,7 +425,7 @@ inline auto rvalue(
  * @return Result of indexing vector.
  */
 template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
-inline auto rvalue(const EigVec& v,
+inline auto rvalue(EigVec&& v,
                    const cons_index_list<index_min_max, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("vector[min_max] min indexing", name, v.size(),
@@ -457,7 +457,7 @@ inline auto rvalue(const EigVec& v,
  */
 template <typename VarVec, require_var_vt<is_eigen_vector, VarVec>* = nullptr>
 inline std::decay_t<VarVec> rvalue(
-    const VarVec& v, const cons_index_list<index_min_max, nil_index_list>& idx,
+    VarVec&& v, const cons_index_list<index_min_max, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
   math::check_range("var_vector[min_max] min indexing", name, v.size(),
                     idx.head_.min_);
@@ -488,7 +488,7 @@ inline std::decay_t<VarVec> rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline EigMat rvalue(const EigMat& a,
+inline EigMat rvalue(EigMat&& a,
                      const cons_index_list<index_min_max, nil_index_list>& idx,
                      const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
@@ -524,7 +524,7 @@ inline EigMat rvalue(const EigMat& a,
 template <typename VarMat,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline std::decay_t<VarMat> rvalue(
-    const VarMat& a, const cons_index_list<index_min_max, nil_index_list>& idx,
+    VarMat&& a, const cons_index_list<index_min_max, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
                     idx.head_.min_ - 1);
@@ -556,7 +556,7 @@ inline std::decay_t<VarMat> rvalue(
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
-    const EigMat& mat,
+    EigMat&& mat,
     const cons_index_list<index_min_max,
                           cons_index_list<index_min_max, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -620,7 +620,7 @@ inline auto rvalue(
 template <typename VarMat,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline VarMat rvalue(
-    const VarMat& mat,
+    VarMat&& mat,
     const cons_index_list<index_min_max,
                           cons_index_list<index_min_max, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -680,7 +680,7 @@ inline VarMat rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline auto rvalue(const EigMat& a,
+inline auto rvalue(EigMat&& a,
                    const cons_index_list<index_min, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
@@ -705,7 +705,7 @@ inline auto rvalue(const EigMat& a,
  */
 template <typename VarMat,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(const VarMat& a,
+inline auto rvalue(VarMat&& a,
                    const cons_index_list<index_min, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
@@ -728,7 +728,7 @@ inline auto rvalue(const VarMat& a,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline auto rvalue(const EigMat& a,
+inline auto rvalue(EigMat&& a,
                    const cons_index_list<index_max, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
@@ -751,7 +751,7 @@ inline auto rvalue(const EigMat& a,
  */
 template <typename VarMat,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(const VarMat& a,
+inline auto rvalue(VarMat&& a,
                    const cons_index_list<index_max, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
@@ -776,7 +776,7 @@ inline auto rvalue(const VarMat& a,
 template <typename EigVec, typename I,
           require_eigen_vector_t<EigVec>* = nullptr>
 inline plain_type_t<EigVec> rvalue(
-    const EigVec& v, const cons_index_list<I, nil_index_list>& idx,
+    EigVec&& v, const cons_index_list<I, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
   const int size = rvalue_index_size(idx.head_, v.size());
   const auto& v_ref = stan::math::to_ref(v);
@@ -806,7 +806,7 @@ inline plain_type_t<EigVec> rvalue(
 template <typename VarVec, typename I,
           require_var_vt<is_eigen_vector, VarVec>* = nullptr>
 inline stan::math::var_value<plain_type_t<value_type_t<VarVec>>> rvalue(
-    const VarVec& v, const cons_index_list<I, nil_index_list>& idx,
+    VarVec&& v, const cons_index_list<I, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
   const int size = rvalue_index_size(idx.head_, v.size());
   using var_plain_type = plain_type_t<value_type_t<VarVec>>;
@@ -843,7 +843,7 @@ inline stan::math::var_value<plain_type_t<value_type_t<VarVec>>> rvalue(
  */
 template <typename EigMat, typename I,
           require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline auto rvalue(const EigMat& a,
+inline auto rvalue(EigMat&& a,
                    const cons_index_list<I, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   const int n_rows = rvalue_index_size(idx.head_, a.rows());
@@ -873,7 +873,7 @@ inline auto rvalue(const EigMat& a,
  */
 template <typename VarMat,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
-inline auto rvalue(const VarMat& a,
+inline auto rvalue(VarMat&& a,
                    const cons_index_list<index_multi, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   const int n_rows = rvalue_index_size(idx.head_, a.rows());
@@ -908,7 +908,7 @@ inline auto rvalue(const VarMat& a,
 template <typename EigMat, typename I1, typename I2,
           require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline plain_type_t<EigMat> rvalue(
-    const EigMat& a,
+    EigMat&& a,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   const auto& a_ref = stan::math::to_ref(a);
@@ -945,7 +945,7 @@ inline plain_type_t<EigMat> rvalue(
 template <typename VarMat, typename I1, typename I2,
           require_var_vt<is_eigen_matrix_dynamic, VarMat>* = nullptr>
 inline auto rvalue(
-    const VarMat& a,
+    VarMat&& a,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idx,
     const char* name = "ANON", int depth = 0) {
   const int rows = rvalue_index_size(idx.head_, a.rows());
