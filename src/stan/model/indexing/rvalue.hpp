@@ -843,8 +843,7 @@ inline stan::math::var_value<plain_type_t<value_type_t<VarVec>>> rvalue(
  */
 template <typename EigMat, typename I,
           require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline auto rvalue(EigMat&& a,
-                   const cons_index_list<I, nil_index_list>& idx,
+inline auto rvalue(EigMat&& a, const cons_index_list<I, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   const int n_rows = rvalue_index_size(idx.head_, a.rows());
   const auto& a_ref = stan::math::to_ref(a);
