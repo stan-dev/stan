@@ -42,7 +42,8 @@ inline void assign(T& x, const nil_index_list& /* idxs */, U&& y,
  * @param[in] name name of lvalue variable (default "ANON").
  * @param[in] depth indexing depth (default 0).
  */
-template <typename T, typename U, require_std_vector_t<U>* = nullptr>
+template <typename T, typename U, require_std_vector_t<U>* = nullptr,
+  require_not_same_t<T, value_type_t<U>>* = nullptr>
 inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */,
                    U&& y, const char* name = "ANON",
                    int depth = 0) {
