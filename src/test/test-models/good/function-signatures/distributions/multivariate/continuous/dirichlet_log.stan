@@ -6,7 +6,7 @@ data {
 transformed data {
   real transformed_data_real;
 
-  transformed_data_real <- dirichlet_log(d_vector, d_vector);
+  transformed_data_real = dirichlet_log(d_vector, d_vector);
 }
 parameters {
   vector[d_int] p_vector;
@@ -17,10 +17,10 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- dirichlet_log(d_vector, d_vector);
-  transformed_param_real <- dirichlet_log(d_vector, p_vector);
-  transformed_param_real <- dirichlet_log(p_vector, d_vector);
-  transformed_param_real <- dirichlet_log(p_vector, p_vector);
+  transformed_param_real = dirichlet_log(d_vector, d_vector);
+  transformed_param_real = dirichlet_log(d_vector, p_vector);
+  transformed_param_real = dirichlet_log(p_vector, d_vector);
+  transformed_param_real = dirichlet_log(p_vector, p_vector);
 }
 model {  
   y_p ~ normal(0,1);

@@ -3,7 +3,7 @@ parameters {
 }
 generated quantities {
   int n;
-  n <- 2;
+  n = 2;
 }
 model {
 }

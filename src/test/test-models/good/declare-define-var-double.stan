@@ -19,12 +19,12 @@ data {
 } 
 transformed data {
   int td0 = 3;
-  real td1 = 123;     // real_d <- int_d
-  real td2 = 2.0;   // real_d <- real_d
+  real td1 = 123;     // real_d = int_d
+  real td2 = 2.0;   // real_d = real_d
   real td3 = td0;
   real td4 = td3;
   real td_a1[3];
-  real td_a2[3] = td_a1;  // real_arr_d <- real_arr_d
+  real td_a2[3] = td_a1;  // real_arr_d = real_arr_d
   real td5 = td_a2[1];
   real td_a3[3, 3] = d;
   real td_a4[3] = td_a3[2];
@@ -36,8 +36,8 @@ transformed data {
   print("td_a2: ",td_a2);
   print("td_a4: ",td_a4);
   {
-    real ltd1 = 1;      // real_d <- int_d 
-    real ltd2 = 2.0;    // real_d <- real_d
+    real ltd1 = 1;      // real_d = int_d 
+    real ltd2 = 2.0;    // real_d = real_d
     real ltd3 = td1;
     real ltd4[td0];
     real ltd5[td0] = ltd4;
@@ -65,9 +65,9 @@ transformed parameters {
   real p_tp_a2[3] = d_tp_a3[3];
 
 
-  real tp1 = 1;       // real_p <- int_d 
-  real tp2 = 2.0;     // real_p <- real_d
-  real tp3 = tp2;      // real_p <- real_p
+  real tp1 = 1;       // real_p = int_d 
+  real tp2 = 2.0;     // real_p = real_d
+  real tp3 = tp2;      // real_p = real_p
   real tp4[td0];
   real tp5[td0] = tp4;
 
@@ -91,9 +91,9 @@ transformed parameters {
   tp1 = foo(tp3);
   print("tp1: ",tp1);
   {
-    real lp1 = td0;      // real_p <- int_d 
-    real lp2 = 9.0;    // real_p <- real_d
-    real lp3 = tp2;      // real_p <- real_p
+    real lp1 = td0;      // real_p = int_d 
+    real lp2 = 9.0;    // real_p = real_d
+    real lp3 = tp2;      // real_p = real_p
     real lp4[td0];
     real lp5[td0] = lp4;
     print("lp1: ",lp1);
@@ -104,9 +104,9 @@ transformed parameters {
 }
 model {
   // local variables
-  real lm1 = 1;      // real_p <- int_d 
-  real lm2 = 2.0;    // real_p <- real_d
-  real lm3 = tp2;      // real_p <- real_p
+  real lm1 = 1;      // real_p = int_d 
+  real lm2 = 2.0;    // real_p = real_d
+  real lm3 = tp2;      // real_p = real_p
   theta ~ beta(1,1);
   for (n in 1:N) 
     y[n] ~ bernoulli(theta);
@@ -137,8 +137,8 @@ generated quantities {
   print("gq_p_tp_a1 = ", gq_p_tp_a1);
   print("gq_p_tp_a2 = ", gq_p_tp_a2);
   {
-    real lgq1 = 1;     // real_d <- int_d
-    real lgq2 = 2.0;   // real_d <- real_d
+    real lgq1 = 1;     // real_d = int_d
+    real lgq2 = 2.0;   // real_d = real_d
     real lqd2a = lgq2;
     real lgq3[td0];
     real lgq3a = lgq3[1];

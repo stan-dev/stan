@@ -11,5 +11,5 @@ model {
 }
 generated quantities {
   real z;
-  z <- barfoo_lp(1.3);
+  z = barfoo_lp(1.3);
 }

@@ -11,8 +11,8 @@ transformed data {
   real transformed_data_real;
   matrix[d_int,d_int] transformed_data_matrix;
 
-  transformed_data_real <- quad_form(d_matrix,d_vector);
-  transformed_data_matrix <- quad_form(d_matrix,d_matrix);
+  transformed_data_real = quad_form(d_matrix,d_vector);
+  transformed_data_matrix = quad_form(d_matrix,d_matrix);
 }
 parameters {
   real p_real;
@@ -26,17 +26,17 @@ transformed parameters {
   real transformed_param_real;
   matrix[d_int,d_int] transformed_param_matrix;
 
-  transformed_param_real <- quad_form(d_matrix,d_vector);
-  transformed_param_matrix <- quad_form(d_matrix,d_matrix);
+  transformed_param_real = quad_form(d_matrix,d_vector);
+  transformed_param_matrix = quad_form(d_matrix,d_matrix);
 
-  transformed_param_real <- quad_form(d_matrix,p_vector);
-  transformed_param_matrix <- quad_form(d_matrix,p_matrix);
+  transformed_param_real = quad_form(d_matrix,p_vector);
+  transformed_param_matrix = quad_form(d_matrix,p_matrix);
 
-  transformed_param_real <- quad_form(p_matrix,d_vector);
-  transformed_param_matrix <- quad_form(p_matrix,d_matrix);
+  transformed_param_real = quad_form(p_matrix,d_vector);
+  transformed_param_matrix = quad_form(p_matrix,d_matrix);
 
-  transformed_param_real <- quad_form(p_matrix,p_vector);
-  transformed_param_matrix <- quad_form(p_matrix,p_matrix);
+  transformed_param_real = quad_form(p_matrix,p_vector);
+  transformed_param_matrix = quad_form(p_matrix,p_matrix);
 }
 model {  
   y_p ~ normal(0,1);

@@ -6,7 +6,7 @@ data {
 transformed data {
   real transformed_data_real_array_2[d_int, d_int];
 
-  transformed_data_real_array_2 <- to_array_2d(d_matrix);
+  transformed_data_real_array_2 = to_array_2d(d_matrix);
 }
 parameters {
   real y_p;
@@ -15,8 +15,8 @@ parameters {
 transformed parameters {
   real transformed_param_real_array_2[d_int, d_int];
 
-  transformed_param_real_array_2 <- to_array_2d(d_matrix);
-  transformed_param_real_array_2 <- to_array_2d(p_matrix);
+  transformed_param_real_array_2 = to_array_2d(d_matrix);
+  transformed_param_real_array_2 = to_array_2d(p_matrix);
 }
 model {  
   y_p ~ normal(0,1);

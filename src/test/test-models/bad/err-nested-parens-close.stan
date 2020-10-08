@@ -1,4 +1,4 @@
 transformed data {
   real x;
-  x <- (2 + 3;
+  x = (2 + 3;
 }

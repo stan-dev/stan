@@ -6,7 +6,7 @@ data {
 transformed data {
   row_vector[d_int] transformed_data_row_vector;
 
-  transformed_data_row_vector <- row(d_matrix, d_int);
+  transformed_data_row_vector = row(d_matrix, d_int);
 }
 parameters {
   real y_p;
@@ -15,8 +15,8 @@ parameters {
 transformed parameters {
   row_vector[d_int] transformed_param_row_vector;
 
-  transformed_param_row_vector <- row(d_matrix, d_int);
-  transformed_param_row_vector <- row(p_matrix, d_int);
+  transformed_param_row_vector = row(d_matrix, d_int);
+  transformed_param_row_vector = row(p_matrix, d_int);
 }
 model {  
   y_p ~ normal(0,1);

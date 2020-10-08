@@ -42,24 +42,24 @@ transformed data {
   row_vector[2] trans_x4w[3,4,5];
   matrix[2,3] trans_x5w[3,4,5];
 
-  transformed_data_matrix <- Phi_approx(d_matrix);
-  transformed_data_vector <- Phi_approx(d_vector);
-  transformed_data_row_vector <- Phi_approx(d_row_vector);
-  trans_x3y <- Phi_approx(x3y);
-  trans_x4y <- Phi_approx(x4y);
-  trans_x5y <- Phi_approx(x5y);
+  transformed_data_matrix = Phi_approx(d_matrix);
+  transformed_data_vector = Phi_approx(d_vector);
+  transformed_data_row_vector = Phi_approx(d_row_vector);
+  trans_x3y = Phi_approx(x3y);
+  trans_x4y = Phi_approx(x4y);
+  trans_x5y = Phi_approx(x5y);
 
-  trans_x2z <- Phi_approx(x1z);
-  trans_x2z <- Phi_approx(x2z);
-  trans_x3z <- Phi_approx(x3z);
-  trans_x4z <- Phi_approx(x4z);
-  trans_x5z <- Phi_approx(x5z);
+  trans_x2z = Phi_approx(x1z);
+  trans_x2z = Phi_approx(x2z);
+  trans_x3z = Phi_approx(x3z);
+  trans_x4z = Phi_approx(x4z);
+  trans_x5z = Phi_approx(x5z);
 
-  trans_x2w <- Phi_approx(x1w);
-  trans_x2w <- Phi_approx(x2w);
-  trans_x3w <- Phi_approx(x3w);
-  trans_x4w <- Phi_approx(x4w);
-  trans_x5w <- Phi_approx(x5w);
+  trans_x2w = Phi_approx(x1w);
+  trans_x2w = Phi_approx(x2w);
+  trans_x3w = Phi_approx(x3w);
+  trans_x4w = Phi_approx(x4w);
+  trans_x5w = Phi_approx(x5w);
 }
 parameters {
   real p_real;
@@ -101,26 +101,26 @@ transformed parameters {
   row_vector[2] trans_p_x4w[3,4,5];
   matrix[2,3] trans_p_x5w[3,4,5];
 
-  transformed_param_matrix <- Phi_approx(d_matrix);
-  transformed_param_vector <- Phi_approx(d_vector);
-  transformed_param_row_vector <- Phi_approx(d_row_vector);
-  transformed_param_matrix <- Phi_approx(p_matrix);
-  transformed_param_vector <- Phi_approx(p_vector);
-  transformed_param_row_vector <- Phi_approx(p_row_vector);
+  transformed_param_matrix = Phi_approx(d_matrix);
+  transformed_param_vector = Phi_approx(d_vector);
+  transformed_param_row_vector = Phi_approx(d_row_vector);
+  transformed_param_matrix = Phi_approx(p_matrix);
+  transformed_param_vector = Phi_approx(p_vector);
+  transformed_param_row_vector = Phi_approx(p_row_vector);
 
-  trans_p_x3y <- Phi_approx(p_x3y);
-  trans_p_x4y <- Phi_approx(p_x4y);
-  trans_p_x5y <- Phi_approx(p_x5y);
+  trans_p_x3y = Phi_approx(p_x3y);
+  trans_p_x4y = Phi_approx(p_x4y);
+  trans_p_x5y = Phi_approx(p_x5y);
 
-  trans_p_x2z <- Phi_approx(p_x2z);
-  trans_p_x3z <- Phi_approx(p_x3z);
-  trans_p_x4z <- Phi_approx(p_x4z);
-  trans_p_x5z <- Phi_approx(p_x5z);
+  trans_p_x2z = Phi_approx(p_x2z);
+  trans_p_x3z = Phi_approx(p_x3z);
+  trans_p_x4z = Phi_approx(p_x4z);
+  trans_p_x5z = Phi_approx(p_x5z);
 
-  trans_p_x2w <- Phi_approx(p_x2w);
-  trans_p_x3w <- Phi_approx(p_x3w);
-  trans_p_x4w <- Phi_approx(p_x4w);
-  trans_p_x5w <- Phi_approx(p_x5w);
+  trans_p_x2w = Phi_approx(p_x2w);
+  trans_p_x3w = Phi_approx(p_x3w);
+  trans_p_x4w = Phi_approx(p_x4w);
+  trans_p_x5w = Phi_approx(p_x5w);
 }
 model {  
   y_p ~ normal(0,1);
