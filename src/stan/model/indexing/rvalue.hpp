@@ -205,7 +205,8 @@ inline auto rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr,
+          require_same_t<std::decay_t<I>, I>* = nullptr>
 inline auto rvalue(
     EigMat&& a,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
@@ -430,7 +431,8 @@ inline auto rvalue(EigMat&& a,
  * @return Result of indexing vector.
  */
 template <typename EigVec, typename I,
-          require_eigen_vector_t<EigVec>* = nullptr>
+          require_eigen_vector_t<EigVec>* = nullptr,
+          require_same_t<std::decay_t<I>, I>* = nullptr>
 inline plain_type_t<EigVec> rvalue(
     EigVec&& v, const cons_index_list<I, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
@@ -460,7 +462,8 @@ inline plain_type_t<EigVec> rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr,
+          require_same_t<std::decay_t<I>, I>* = nullptr>
 inline auto rvalue(EigMat&& a, const cons_index_list<I, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
   const int n_rows = rvalue_index_size(idx.head_, a.rows());
@@ -490,7 +493,9 @@ inline auto rvalue(EigMat&& a, const cons_index_list<I, nil_index_list>& idx,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename I1, typename I2,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr,
+          require_same_t<std::decay_t<I1>, I1>* = nullptr,
+          require_same_t<std::decay_t<I2>, I2>* = nullptr>
 inline plain_type_t<EigMat> rvalue(
     EigMat&& a,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idx,
@@ -527,7 +532,8 @@ inline plain_type_t<EigMat> rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing array.
  */
-template <typename StdVec, typename L, require_std_vector_t<StdVec>* = nullptr>
+template <typename StdVec, typename L, require_std_vector_t<StdVec>* = nullptr,
+          require_same_t<std::decay_t<L>, L>* = nullptr>
 inline auto rvalue(StdVec&& c, const cons_index_list<index_uni, L>& idx,
                    const char* name = "ANON", int depth = 0) {
   const int n = idx.head_.n_;
@@ -548,7 +554,8 @@ inline auto rvalue(StdVec&& c, const cons_index_list<index_uni, L>& idx,
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing array.
  */
-template <typename StdVec, typename L, require_std_vector_t<StdVec>* = nullptr>
+template <typename StdVec, typename L, require_std_vector_t<StdVec>* = nullptr,
+          require_same_t<std::decay_t<L>, L>* = nullptr>
 inline auto rvalue(StdVec&& c,
                    const cons_index_list<index_uni, nil_index_list>& idx,
                    const char* name = "ANON", int depth = 0) {
@@ -574,7 +581,9 @@ inline auto rvalue(StdVec&& c,
  * @return Result of indexing array.
  */
 template <typename StdVec, typename I, typename L,
-          require_std_vector_t<StdVec>* = nullptr>
+          require_std_vector_t<StdVec>* = nullptr,
+          require_same_t<std::decay_t<I>, I>* = nullptr,
+          require_same_t<std::decay_t<L>, L>* = nullptr>
 inline auto rvalue(StdVec&& c, const cons_index_list<I, L>& idx,
                    const char* name = "ANON", int depth = 0) {
   rvalue_return_t<std::decay_t<StdVec>, cons_index_list<I, L>> result;

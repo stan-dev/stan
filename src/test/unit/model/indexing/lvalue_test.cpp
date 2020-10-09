@@ -640,6 +640,24 @@ TEST(ModelIndexing, resultSizeNegIndexing) {
   EXPECT_EQ(0, lhs.size());
 }
 
+TEST(ModelIndexing, resultSizeNegIndexingEigen) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::VectorXd lhs(5);
+  lhs << 1, 2, 3, 4, 5;
+  Eigen::VectorXd rhs(3);
+  rhs << 1, 2, 3;
+  assign(lhs, cons_list(index_min_max(4, 1), nil_index_list()), rhs);
+  EXPECT_FLOAT_EQ(lhs(0), 3);
+  EXPECT_FLOAT_EQ(lhs(1), 2);
+  EXPECT_FLOAT_EQ(lhs(2), 1);
+  EXPECT_FLOAT_EQ(lhs(3), 4);
+  EXPECT_FLOAT_EQ(lhs(4), 5);
+}
+
 TEST(modelIndexing, doubleToVarSimple) {
   using stan::math::var;
   using stan::model::nil_index_list;

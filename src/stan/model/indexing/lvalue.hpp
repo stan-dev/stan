@@ -59,7 +59,7 @@ inline void assign(T&& x, const nil_index_list& /* idxs */, U&& y,
  *
  * Types: vec[uni] <- scalar
  *
- * @tparam T Type of assigned vector scalar.
+ * @tparam Vec1 Eigen type with either dynamic rows or columns, but not both.
  * @tparam U Type of value (must be assignable to T).
  * @param[in] x Vector variable to be assigned.
  * @param[in] idxs Sequence of one single index (from 1).
@@ -82,9 +82,9 @@ inline void assign(Vec1&& x,
  *
  * Types:  vec[multi] <- vec
  *
- * @tparam T Type of assigned vector scalar.
+ * @tparam Vec1 Eigen type with either dynamic rows or columns, but not both.
  * @tparam I Type of multiple index.
- * @tparam U Type of vector value scalar (must be assignable to T).
+ * @tparam Vec2 Eigen type with either dynamic rows or columns, but not both.
  * @param[in] x Row vector variable to be assigned.
  * @param[in] idxs Sequence of one single index (from 1).
  * @param[in] y Value vector.
@@ -96,7 +96,7 @@ inline void assign(Vec1&& x,
  */
 template <typename Vec1, typename Vec2, typename I,
           require_all_eigen_vector_t<Vec1, Vec2>* = nullptr,
-          require_not_same_t<I, index_uni>* = nullptr>
+          require_same_t<std::decay_t<I>, I>* = nullptr>
 inline void assign(Vec1&& x, const cons_index_list<I, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
   const auto& y_ref = stan::math::to_ref(y);
@@ -110,24 +110,41 @@ inline void assign(Vec1&& x, const cons_index_list<I, nil_index_list>& idxs,
   }
 }
 
-template <typename Vec1, typename Vec2, typename I,
+/**
+ * Assign the specified Eigen vector at the specified min_max
+ * index to the specified value.
+ *
+ * Types:  vec[min_max] <- vec
+ *
+ * @tparam Vec1 Eigen type with either dynamic rows or columns, but not both.
+ * @tparam Vec2 Eigen type with either dynamic rows or columns, but not both.
+ * @param[in] x vector variable to be assigned.
+ * @param[in] idxs An `index_min_max`
+ * @param[in] y Value vector.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ * @throw std::invalid_argument If the value size isn't the same as
+ * the indexed size.
+ */
+template <typename Vec1, typename Vec2,
           require_all_eigen_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
-  const auto& y_ref = stan::math::to_ref(y);
-  math::check_size_match("vector[multi] assign sizes", "lhs",
-                         rvalue_index_size(idxs.head_, x.size()), name,
-                         y_ref.size());
   math::check_range("vector[min_max] min assign", name, x.size(),
                     idxs.head_.min_);
   math::check_range("vector[min_max] max assign", name, x.size(),
                     idxs.head_.max_);
   if (idxs.head_.min_ <= idxs.head_.max_) {
+    math::check_size_match("vector[min_max] assign sizes", "lhs and rhs", idxs.head_.max_ - 1, name,
+                           y.size());
     x.segment(idxs.head_.min_ - 1, idxs.head_.max_ - 1) = y;
     return;
   } else {
-    x.segment(idxs.head_.max_ - 1, idxs.head_.min_ - 1).reverse() = y;
+    math::check_size_match("vector[min_max] assign sizes", "lhs and rhs", idxs.head_.min_ - 1, name,
+                           y.size());
+    x.segment(idxs.head_.max_ - 1, idxs.head_.min_ - 1) = y.reverse();
     return;
   }
 }
@@ -138,9 +155,8 @@ inline void assign(Vec1&& x,
  *
  * Types:  mat[uni] = rowvec
  *
- * @tparam T Assigned matrix scalar type.
- * @tparam U Type of value scalar for row vector (must be
- * assignable to T).
+ * @tparam Mat Eigen type with dynamic rows and columns.
+ * @tparam RowVec Eigen type with dynamic columns and a compile time rows equal to 1.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of one single index (from 1).
  * @param[in] y Value row vector.
@@ -166,14 +182,13 @@ inline void assign(Mat&& x,
  * Assign the specified Eigen matrix at the specified single index
  * to the specified row vector value.
  *
- * Types:  mat[uni] = rowvec
+ * Types:  mat[,uni] = colvec
  *
- * @tparam T Assigned matrix scalar type.
- * @tparam U Type of value scalar for row vector (must be
- * assignable to T).
- * @param[in] x Matrix variable to be assigned.
+ * @tparam Mat Eigen type with dynamic rows and columns.
+ * @tparam RowVec Eigen type with dynamic rows and a compile time colums equal to 1.
+ * @param[in] x Matrix to be assigned.
  * @param[in] idxs Sequence of one single index (from 1).
- * @param[in] y Value row vector.
+ * @param[in] y row vector.
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
@@ -199,14 +214,13 @@ inline void assign(
  * Assign the specified Eigen matrix at the specified single index
  * to the specified row vector value.
  *
- * Types:  mat[uni] = rowvec
+ * Types:  mat[uni,] = rowvec
  *
- * @tparam T Assigned matrix scalar type.
- * @tparam U Type of value scalar for row vector (must be
- * assignable to T).
- * @param[in] x Matrix variable to be assigned.
+ * @tparam Mat Eigen type with dynamic rows and columns.
+ * @tparam RowVec Eigen type with compile time rows of 1 and dynamic columns.
+ * @param[in] x Matrix to be assigned.
  * @param[in] idxs Sequence of one single index (from 1).
- * @param[in] y Value row vector.
+ * @param[in] y row vector.
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
@@ -232,9 +246,9 @@ inline void assign(
  *
  * Types:  mat[multi] = mat
  *
- * @tparam T Assigned matrix scalar type.
+ * @tparam Mat1 Eigen type with dynamic rows and columns.
  * @tparam I Multiple index type.
- * @tparam U Value matrix scalar type (must be assignable to T).
+ * @tparam Mat2 Eigen type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of one multiple index (from 1).
  * @param[in] y Value matrix.
@@ -246,7 +260,7 @@ inline void assign(
  */
 template <typename Mat1, typename I, typename Mat2,
           stan::internal::require_all_eigen_dense_dynamic_t<Mat2, Mat2>* = nullptr,
-          require_not_same_t<I, index_uni>* = nullptr>
+          require_same_t<std::decay_t<I>, I>* = nullptr>
 inline void assign(Mat1&& x, const cons_index_list<I, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
   const int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
@@ -262,8 +276,26 @@ inline void assign(Mat1&& x, const cons_index_list<I, nil_index_list>& idxs,
   }
 }
 
+/**
+ * Assign the specified Eigen matrix at the specified multiple
+ * index to the specified matrix value.
+ *
+ * Types:  mat[min_max, min_max] = mat
+ *
+ * @tparam Mat1 Eigen type with dynamic rows and columns.
+ * @tparam I Multiple index type.
+ * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @param[in] x Matrix variable to be assigned.
+ * @param[in] idxs Sequence of one multiple index (from 1).
+ * @param[in] x Matrix variable to assign from.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ * @throw std::invalid_argument If the dimensions of the indexed
+ * matrix and right-hand side matrix do not match.
+ */
 template <typename Mat1, typename Mat2,
-          stan::internal::require_all_eigen_dense_dynamic_t<Mat2, Mat2>* = nullptr>
+          stan::internal::require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<index_min_max,
@@ -284,27 +316,19 @@ inline void assign(
     } else {
       x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1,
               idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1)
-          .colwise()
-          .reverse()
-          = y;
+          = y.colwise().reverse();
       return;
     }
   } else {
     if (idxs.tail_.head_.min_ <= idxs.tail_.head_.max_) {
       x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1,
               idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1)
-          .rowwise()
-          .reverse()
-          = y;
+          = y.rowwise().reverse();
       return;
     } else {
       x.block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1,
               idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1)
-          .rowwise()
-          .reverse()
-          .colwise()
-          .reverse()
-          = y;
+          = y.reverse();
       return;
     }
   }
@@ -316,7 +340,7 @@ inline void assign(
  *
  * Types:  mat[single, single] = scalar
  *
- * @tparam T Matrix scalar type.
+ * @tparam Mat Eigen type with dynamic rows and columns.
  * @tparam U Scalar type.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of two single indexes (from 1).
@@ -345,10 +369,9 @@ inline void assign(
  *
  * Types:  mat[uni, multi] = rowvec
  *
- * @tparam T Assigned matrix scalar type.
+ * @tparam Mat Eigen type with dynamic rows and columns.
  * @tparam I Multi-index type.
- * @tparam U Value row vector scalar type (must be assignable to
- * T).
+ * @tparam RowVec Eigen type with dynamic columns and a compile time rows equal to 1.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of single and multiple index (from 1).
  * @param[in] y Value row vector.
@@ -358,14 +381,14 @@ inline void assign(
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side row vector do not match.
  */
-template <typename Mat, typename I, typename Vec,
+template <typename Mat, typename I, typename RowVec,
           stan::internal::require_eigen_dense_dynamic_t<Mat>* = nullptr,
-          require_eigen_row_vector_t<Vec>* = nullptr,
-          require_not_same_t<I, index_uni>* = nullptr>
+          require_eigen_row_vector_t<RowVec>* = nullptr,
+          require_same_t<std::decay_t<I>, I>* = nullptr>
 inline void assign(
     Mat&& x,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idxs,
-    const Vec& y, const char* name = "ANON", int depth = 0) {
+    const RowVec& y, const char* name = "ANON", int depth = 0) {
   const auto& y_ref = stan::math::to_ref(y);
   const int x_idxs_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
   math::check_size_match("matrix[uni,multi] assign sizes", "lhs", x_idxs_cols,
@@ -385,9 +408,9 @@ inline void assign(
  *
  * Types:  mat[multi, uni] = vec
  *
- * @tparam T Assigned matrix scalar type.
+ * @tparam Mat Eigen type with dynamic rows and columns.
  * @tparam I Multi-index type.
- * @tparam U Value vector scalar type (must be assignable to T).
+ * @tparam Vec Eigen type with dynamic rows and a compile time columns equal to 1.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Sequence of multiple and single index (from 1).
  * @param[in] y Value vector.
@@ -400,7 +423,7 @@ inline void assign(
 template <typename Mat, typename I, typename ColVec,
           stan::internal::require_eigen_dense_dynamic_t<Mat>* = nullptr,
           require_eigen_col_vector_t<ColVec>* = nullptr,
-          require_not_same_t<I, index_uni>* = nullptr>
+          require_same_t<std::decay_t<I>, I>* = nullptr>
 inline void assign(
     Mat&& x,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idxs,
@@ -424,10 +447,10 @@ inline void assign(
  *
  * Types:  mat[multi, multi] = mat
  *
- * @tparam T Assigned matrix scalar type.
+ * @tparam Mat1 Eigen type with dynamic rows and columns.
  * @tparam I1 First multiple index type.
  * @tparam I2 Second multiple index type.
- * @tparam U Value matrix scalar type (must be assignable to T).
+ * @tparam Mat2 Eigen type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Pair of multiple indexes (from 1).
  * @param[in] y Value matrix.
@@ -439,7 +462,8 @@ inline void assign(
  */
 template <typename Mat1, typename I1, typename I2, typename Mat2,
           stan::internal::require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr,
-          require_all_not_same_t<index_uni, I1, I2>* = nullptr>
+          require_same_t<std::decay_t<I1>, I1>* = nullptr,
+          require_same_t<std::decay_t<I2>, I2>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idxs,
@@ -471,10 +495,9 @@ inline void assign(
  *
  * Types:  x[uni | L] = y
  *
- * @tparam T Assigned vector member type.
+ * @tparam StdVec A standard vector
  * @tparam L Type of tail of index list.
- * @tparam U Value scalar type (must be assignable to indexed
- * variable).
+ * @tparam U A type assignable to the value type of `StdVec`
  * @param[in] x Array variable to be assigned.
  * @param[in] idxs List of indexes beginning with single index
  * (from 1).
@@ -485,8 +508,9 @@ inline void assign(
  * @throw std::invalid_argument If the dimensions do not match in the
  * tail assignment.
  */
-template <typename T, typename L, typename U,  require_std_vector_t<T>* = nullptr>
-inline void assign(T&& x, const cons_index_list<index_uni, L>& idxs,
+template <typename StdVec, typename L, typename U,  require_std_vector_t<StdVec>* = nullptr,
+ require_same_t<std::decay_t<L>, L>* = nullptr>
+inline void assign(StdVec&& x, const cons_index_list<index_uni, L>& idxs,
                    U&& y, const char* name = "ANON", int depth = 0) {
   math::check_range("vector[uni,...] assign range", name, x.size(),
                     idxs.head_.n_);
@@ -502,11 +526,10 @@ inline void assign(T&& x, const cons_index_list<index_uni, L>& idxs,
  *
  * Types:  x[multi | L] = y
  *
- * @tparam T Assigned vector member type.
+ * @tparam T A standard vector.
  * @tparam I Type of multiple index heading index list.
  * @tparam L Type of tail of index list.
- * @tparam U Value scalar type (must be assignable to indexed
- * variable).
+ * @tparam U A standard vector
  * @param[in] x Array variable to be assigned.
  * @param[in] idxs List of indexes beginning with multiple index
  * (from 1).
@@ -519,7 +542,9 @@ inline void assign(T&& x, const cons_index_list<index_uni, L>& idxs,
  * the recursive tail assignment dimensions do not match.
  */
 template <typename T, typename I, typename L, typename U,
- require_all_std_vector_t<T, U>* = nullptr>
+ require_all_std_vector_t<T, U>* = nullptr,
+ require_same_t<std::decay_t<I>, I>* = nullptr,
+ require_same_t<std::decay_t<L>, L>* = nullptr>
 inline void assign(T&& x, const cons_index_list<I, L>& idxs,
                    U&& y, const char* name = "ANON",
                    int depth = 0) {
