@@ -5,6 +5,19 @@
 
 namespace stan {
 
+  namespace internal {
+
+  template <typename T>
+  using is_eigen_dense_dynamic = stan::internal::is_eigen_matrix_dynamic_impl<std::decay_t<T>, stan::is_eigen_dense_base<T>::value>;
+
+  template <typename T>
+  using require_eigen_dense_dynamic_t = require_t<is_eigen_dense_dynamic<T>>;
+
+  template <typename... Types>
+  using require_all_eigen_dense_dynamic_t = require_all_t<is_eigen_dense_dynamic<Types>...>;
+
+  }
+
 namespace model {
 
 // relative indexing from 0; multi-indexing and return from 1
