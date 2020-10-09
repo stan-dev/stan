@@ -6,8 +6,8 @@ transformed data {
   int transformed_data_int;
   real transformed_data_real;
  
-  transformed_data_real <- log(d_int);
-  transformed_data_real <- log(d_real);
+  transformed_data_real = log(d_int);
+  transformed_data_real = log(d_real);
 }
 parameters {
   real p_real;
@@ -16,9 +16,9 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- log(d_int);
-  transformed_param_real <- log(d_real);
-  transformed_param_real <- log(p_real);
+  transformed_param_real = log(d_int);
+  transformed_param_real = log(d_real);
+  transformed_param_real = log(p_real);
 }
 model {  
   y_p ~ normal(0,1);

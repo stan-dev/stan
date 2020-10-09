@@ -11,12 +11,12 @@ parameters {
 }
 transformed parameters {
   matrix[100,11] beta;
-  beta <- (diag_pre_multiply(std,L) * beta_std)';
+  beta = (diag_pre_multiply(std,L) * beta_std)';
 }
 model {
   vector[N] mu;
   for(i in 1:N)
-    mu[i] <- X[i] * beta[ids[i]]';
+    mu[i] = X[i] * beta[ids[i]]';
   y ~ bernoulli_logit(mu);
   to_vector(beta_std) ~ normal(0,1);
   std ~ normal(0,1);

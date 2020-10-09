@@ -15,25 +15,25 @@ transformed data {
   vector[d_int] transformed_data_vector_array[d_int];
   row_vector[d_int] transformed_data_row_vector_array[d_int];
 
-  transformed_data_real <- multi_normal_log(d_vector_array[1], d_vector_array[1], d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_vector_array[1], d_vector_array, d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_vector_array, d_vector_array[1], d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_vector_array, d_vector_array, d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_vector_array[1], d_vector_array[1], d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_vector_array[1], d_vector_array, d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_vector_array, d_vector_array[1], d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_vector_array, d_vector_array, d_matrix_array[1]);
 
-  transformed_data_real <- multi_normal_log(d_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_vector_array[1], d_row_vector_array, d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_vector_array, d_row_vector_array[1], d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_vector_array, d_row_vector_array, d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_vector_array[1], d_row_vector_array, d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_vector_array, d_row_vector_array[1], d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_vector_array, d_row_vector_array, d_matrix_array[1]);
 
-  transformed_data_real <- multi_normal_log(d_row_vector_array[1], d_vector_array[1], d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_row_vector_array[1], d_vector_array, d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_row_vector_array, d_vector_array[1], d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_row_vector_array, d_vector_array, d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_row_vector_array[1], d_vector_array[1], d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_row_vector_array[1], d_vector_array, d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_row_vector_array, d_vector_array[1], d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_row_vector_array, d_vector_array, d_matrix_array[1]);
 
-  transformed_data_real <- multi_normal_log(d_row_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_row_vector_array[1], d_row_vector_array, d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_row_vector_array, d_row_vector_array[1], d_matrix_array[1]);
-  transformed_data_real <- multi_normal_log(d_row_vector_array, d_row_vector_array, d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_row_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_row_vector_array[1], d_row_vector_array, d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_row_vector_array, d_row_vector_array[1], d_matrix_array[1]);
+  transformed_data_real = multi_normal_log(d_row_vector_array, d_row_vector_array, d_matrix_array[1]);
 }
 parameters {
   real p_real;
@@ -50,189 +50,189 @@ transformed parameters {
   row_vector[d_int] transformed_param_row_vector_array[d_int];
 
   
-  transformed_param_real <- multi_normal_log(p_vector_array[1], p_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array[1], p_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, p_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, p_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], p_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], p_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, p_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, p_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(p_vector_array[1], p_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array[1], p_row_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, p_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, p_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], p_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], p_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, p_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, p_row_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], p_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], p_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, p_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, p_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], p_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], p_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, p_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, p_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], p_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], p_row_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, p_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, p_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], p_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], p_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, p_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, p_row_vector_array, p_matrix_array[1]);
 
 
   //------------------------------------------------------------
 
   
-  transformed_param_real <- multi_normal_log(p_vector_array[1], p_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array[1], p_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, p_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, p_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], p_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], p_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, p_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, p_vector_array, d_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(p_vector_array[1], p_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array[1], p_row_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, p_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, p_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], p_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], p_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, p_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, p_row_vector_array, d_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], p_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], p_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, p_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, p_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], p_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], p_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, p_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, p_vector_array, d_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], p_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], p_row_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, p_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, p_row_vector_array, d_matrix_array[1]);
-
-
-  //------------------------------------------------------------
-
-    transformed_param_real <- multi_normal_log(p_vector_array[1], d_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array[1], d_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, d_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, d_vector_array, p_matrix_array[1]);
-
-  transformed_param_real <- multi_normal_log(p_vector_array[1], d_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array[1], d_row_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, d_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, d_row_vector_array, p_matrix_array[1]);
-
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], d_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], d_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, d_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, d_vector_array, p_matrix_array[1]);
-
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], d_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], d_row_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, d_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, d_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], p_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], p_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, p_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, p_row_vector_array, d_matrix_array[1]);
 
 
   //------------------------------------------------------------
 
-  transformed_param_real <- multi_normal_log(p_vector_array[1], d_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array[1], d_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, d_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, d_vector_array, d_matrix_array[1]);
+    transformed_param_real = multi_normal_log(p_vector_array[1], d_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], d_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, d_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, d_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(p_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array[1], d_row_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, d_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_vector_array, d_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], d_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], d_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, d_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, d_row_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], d_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], d_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, d_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, d_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], d_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], d_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, d_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, d_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array[1], d_row_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, d_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(p_row_vector_array, d_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], d_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], d_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, d_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, d_row_vector_array, p_matrix_array[1]);
+
+
+  //------------------------------------------------------------
+
+  transformed_param_real = multi_normal_log(p_vector_array[1], d_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], d_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, d_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, d_vector_array, d_matrix_array[1]);
+
+  transformed_param_real = multi_normal_log(p_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array[1], d_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, d_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_vector_array, d_row_vector_array, d_matrix_array[1]);
+
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], d_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], d_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, d_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, d_vector_array, d_matrix_array[1]);
+
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array[1], d_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, d_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(p_row_vector_array, d_row_vector_array, d_matrix_array[1]);
 
 
   //------------------------------------------------------------
 
     
-  transformed_param_real <- multi_normal_log(d_vector_array[1], p_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array[1], p_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, p_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, p_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], p_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], p_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, p_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, p_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(d_vector_array[1], p_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array[1], p_row_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, p_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, p_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], p_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], p_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, p_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, p_row_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], p_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], p_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, p_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, p_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], p_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], p_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, p_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, p_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], p_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], p_row_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, p_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, p_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], p_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], p_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, p_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, p_row_vector_array, p_matrix_array[1]);
 
 
   //------------------------------------------------------------
 
   
-  transformed_param_real <- multi_normal_log(d_vector_array[1], p_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array[1], p_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, p_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, p_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], p_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], p_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, p_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, p_vector_array, d_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(d_vector_array[1], p_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array[1], p_row_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, p_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, p_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], p_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], p_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, p_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, p_row_vector_array, d_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], p_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], p_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, p_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, p_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], p_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], p_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, p_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, p_vector_array, d_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], p_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], p_row_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, p_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, p_row_vector_array, d_matrix_array[1]);
-
-
-  //------------------------------------------------------------
-
-    transformed_param_real <- multi_normal_log(d_vector_array[1], d_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array[1], d_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, d_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, d_vector_array, p_matrix_array[1]);
-
-  transformed_param_real <- multi_normal_log(d_vector_array[1], d_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array[1], d_row_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, d_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, d_row_vector_array, p_matrix_array[1]);
-
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], d_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], d_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, d_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, d_vector_array, p_matrix_array[1]);
-
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], d_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], d_row_vector_array, p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, d_row_vector_array[1], p_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, d_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], p_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], p_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, p_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, p_row_vector_array, d_matrix_array[1]);
 
 
   //------------------------------------------------------------
 
-  transformed_param_real <- multi_normal_log(d_vector_array[1], d_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array[1], d_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, d_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, d_vector_array, d_matrix_array[1]);
+    transformed_param_real = multi_normal_log(d_vector_array[1], d_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], d_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, d_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, d_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(d_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array[1], d_row_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, d_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_vector_array, d_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], d_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], d_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, d_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, d_row_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], d_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], d_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, d_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, d_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], d_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], d_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, d_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, d_vector_array, p_matrix_array[1]);
 
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array[1], d_row_vector_array, d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, d_row_vector_array[1], d_matrix_array[1]);
-  transformed_param_real <- multi_normal_log(d_row_vector_array, d_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], d_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], d_row_vector_array, p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, d_row_vector_array[1], p_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, d_row_vector_array, p_matrix_array[1]);
+
+
+  //------------------------------------------------------------
+
+  transformed_param_real = multi_normal_log(d_vector_array[1], d_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], d_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, d_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, d_vector_array, d_matrix_array[1]);
+
+  transformed_param_real = multi_normal_log(d_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array[1], d_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, d_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_vector_array, d_row_vector_array, d_matrix_array[1]);
+
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], d_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], d_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, d_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, d_vector_array, d_matrix_array[1]);
+
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], d_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array[1], d_row_vector_array, d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, d_row_vector_array[1], d_matrix_array[1]);
+  transformed_param_real = multi_normal_log(d_row_vector_array, d_row_vector_array, d_matrix_array[1]);
 }
 
 

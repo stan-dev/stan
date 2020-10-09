@@ -10,11 +10,11 @@ data {
 transformed data {
   vector[d_int] transformed_data_vector;
 
-  transformed_data_vector <- to_vector(d_matrix);
-  transformed_data_vector <- to_vector(d_vector);
-  transformed_data_vector <- to_vector(d_row_vector);
-  transformed_data_vector <- to_vector(d_int_array);
-  transformed_data_vector <- to_vector(d_real_array);
+  transformed_data_vector = to_vector(d_matrix);
+  transformed_data_vector = to_vector(d_vector);
+  transformed_data_vector = to_vector(d_row_vector);
+  transformed_data_vector = to_vector(d_int_array);
+  transformed_data_vector = to_vector(d_real_array);
 }
 parameters {
   real p_real;
@@ -27,15 +27,15 @@ parameters {
 transformed parameters {
   vector[d_int] transformed_param_vector;
 
-  transformed_param_vector <- to_vector(d_matrix);
-  transformed_param_vector <- to_vector(d_vector);
-  transformed_param_vector <- to_vector(d_row_vector);
-  transformed_param_vector <- to_vector(d_int_array);
-  transformed_param_vector <- to_vector(d_real_array);
-  transformed_param_vector <- to_vector(p_matrix);
-  transformed_param_vector <- to_vector(p_vector);
-  transformed_param_vector <- to_vector(p_row_vector);
-  transformed_param_vector <- to_vector(p_real_array);
+  transformed_param_vector = to_vector(d_matrix);
+  transformed_param_vector = to_vector(d_vector);
+  transformed_param_vector = to_vector(d_row_vector);
+  transformed_param_vector = to_vector(d_int_array);
+  transformed_param_vector = to_vector(d_real_array);
+  transformed_param_vector = to_vector(p_matrix);
+  transformed_param_vector = to_vector(p_vector);
+  transformed_param_vector = to_vector(p_row_vector);
+  transformed_param_vector = to_vector(p_real_array);
 }
 model {  
   y_p ~ normal(0,1);

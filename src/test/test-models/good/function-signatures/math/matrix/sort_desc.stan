@@ -12,10 +12,10 @@ transformed data {
   vector[d_int] transformed_data_vector;
   row_vector[d_int] transformed_data_row_vector;
 
-  transformed_data_int_array <- sort_desc(d_int_array);
-  transformed_data_real_array <- sort_desc(d_real_array);
-  transformed_data_vector <- sort_desc(d_vector);
-  transformed_data_row_vector <- sort_desc(d_row_vector);
+  transformed_data_int_array = sort_desc(d_int_array);
+  transformed_data_real_array = sort_desc(d_real_array);
+  transformed_data_vector = sort_desc(d_vector);
+  transformed_data_row_vector = sort_desc(d_row_vector);
 }
 parameters {
   real y_p;
@@ -28,13 +28,13 @@ transformed parameters {
   vector[d_int] transformed_param_vector;
   row_vector[d_int] transformed_param_row_vector;
 
-  transformed_param_real_array <- sort_desc(d_real_array);
-  transformed_param_vector <- sort_desc(d_vector);
-  transformed_param_row_vector <- sort_desc(d_row_vector);
+  transformed_param_real_array = sort_desc(d_real_array);
+  transformed_param_vector = sort_desc(d_vector);
+  transformed_param_row_vector = sort_desc(d_row_vector);
 
-  transformed_param_real_array <- sort_desc(p_real_array);
-  transformed_param_vector <- sort_desc(p_vector);
-  transformed_param_row_vector <- sort_desc(p_row_vector);
+  transformed_param_real_array = sort_desc(p_real_array);
+  transformed_param_vector = sort_desc(p_vector);
+  transformed_param_row_vector = sort_desc(p_row_vector);
 }
 model {  
   y_p ~ normal(0, 1);

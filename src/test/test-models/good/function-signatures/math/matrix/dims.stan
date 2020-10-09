@@ -36,29 +36,29 @@ transformed data {
   int val9[9];
   int val10[10];
 
-  val0 <- dims(x1x);
-  val0 <- dims(x2x);
-  val1 <- dims(x3x);
-  val1 <- dims(x4x);
-  val2 <- dims(x5x);
+  val0 = dims(x1x);
+  val0 = dims(x2x);
+  val1 = dims(x3x);
+  val1 = dims(x4x);
+  val2 = dims(x5x);
 
-  val1 <- dims(x1y);
-  val1 <- dims(x2y);
-  val2 <- dims(x3y);
-  val2 <- dims(x4y);
-  val3 <- dims(x5y);
+  val1 = dims(x1y);
+  val1 = dims(x2y);
+  val2 = dims(x3y);
+  val2 = dims(x4y);
+  val3 = dims(x5y);
 
-  val2 <- dims(x1z);
-  val2 <- dims(x2z);
-  val3 <- dims(x3z);
-  val3 <- dims(x4z);
-  val4 <- dims(x5z);
+  val2 = dims(x1z);
+  val2 = dims(x2z);
+  val3 = dims(x3z);
+  val3 = dims(x4z);
+  val4 = dims(x5z);
 
-  val3 <- dims(x1w);
-  val3 <- dims(x2w);
-  val4 <- dims(x3w);
-  val4 <- dims(x4w);
-  val5 <- dims(x5w);
+  val3 = dims(x1w);
+  val3 = dims(x2w);
+  val4 = dims(x3w);
+  val4 = dims(x4w);
+  val5 = dims(x5w);
 
 }
 parameters {
@@ -101,53 +101,53 @@ transformed parameters {
   real p_val9[9];
   real p_val10[10];
 
-  p_val0 <- dims(x1x);
-  p_val0 <- dims(x2x);
-  p_val1 <- dims(x3x);
-  p_val1 <- dims(x4x);
-  p_val2 <- dims(x5x);
+  p_val0 = dims(x1x);
+  p_val0 = dims(x2x);
+  p_val1 = dims(x3x);
+  p_val1 = dims(x4x);
+  p_val2 = dims(x5x);
 
-  p_val1 <- dims(x1y);
-  p_val1 <- dims(x2y);
-  p_val2 <- dims(x3y);
-  p_val2 <- dims(x4y);
-  p_val3 <- dims(x5y);
+  p_val1 = dims(x1y);
+  p_val1 = dims(x2y);
+  p_val2 = dims(x3y);
+  p_val2 = dims(x4y);
+  p_val3 = dims(x5y);
 
-  p_val2 <- dims(x1z);
-  p_val2 <- dims(x2z);
-  p_val3 <- dims(x3z);
-  p_val3 <- dims(x4z);
-  p_val4 <- dims(x5z);
+  p_val2 = dims(x1z);
+  p_val2 = dims(x2z);
+  p_val3 = dims(x3z);
+  p_val3 = dims(x4z);
+  p_val4 = dims(x5z);
 
-  p_val3 <- dims(x1w);
-  p_val3 <- dims(x2w);
-  p_val4 <- dims(x3w);
-  p_val4 <- dims(x4w);
-  p_val5 <- dims(x5w);
+  p_val3 = dims(x1w);
+  p_val3 = dims(x2w);
+  p_val4 = dims(x3w);
+  p_val4 = dims(x4w);
+  p_val5 = dims(x5w);
 
-  p_val0 <- dims(p_x1x);
-  p_val0 <- dims(p_x2x);
-  p_val1 <- dims(p_x3x);
-  p_val1 <- dims(p_x4x);
-  p_val2 <- dims(p_x5x);
+  p_val0 = dims(p_x1x);
+  p_val0 = dims(p_x2x);
+  p_val1 = dims(p_x3x);
+  p_val1 = dims(p_x4x);
+  p_val2 = dims(p_x5x);
 
-  p_val1 <- dims(p_x1y);
-  p_val1 <- dims(p_x2y);
-  p_val2 <- dims(p_x3y);
-  p_val2 <- dims(p_x4y);
-  p_val3 <- dims(p_x5y);
+  p_val1 = dims(p_x1y);
+  p_val1 = dims(p_x2y);
+  p_val2 = dims(p_x3y);
+  p_val2 = dims(p_x4y);
+  p_val3 = dims(p_x5y);
 
-  p_val2 <- dims(p_x1z);
-  p_val2 <- dims(p_x2z);
-  p_val3 <- dims(p_x3z);
-  p_val3 <- dims(p_x4z);
-  p_val4 <- dims(p_x5z);
+  p_val2 = dims(p_x1z);
+  p_val2 = dims(p_x2z);
+  p_val3 = dims(p_x3z);
+  p_val3 = dims(p_x4z);
+  p_val4 = dims(p_x5z);
 
-  p_val3 <- dims(p_x1w);
-  p_val3 <- dims(p_x2w);
-  p_val4 <- dims(p_x3w);
-  p_val4 <- dims(p_x4w);
-  p_val5 <- dims(p_x5w);
+  p_val3 = dims(p_x1w);
+  p_val3 = dims(p_x2w);
+  p_val4 = dims(p_x3w);
+  p_val4 = dims(p_x4w);
+  p_val5 = dims(p_x5w);
 }
 model {
   y ~ normal(0,1);
