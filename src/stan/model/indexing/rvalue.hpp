@@ -287,9 +287,9 @@ inline auto rvalue(EigVec&& v,
  * @return Result of indexing matrix.
  */
 template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline plain_type_t<EigMat> rvalue(EigMat&& a,
-                     const cons_index_list<index_min_max, nil_index_list>& idx,
-                     const char* name = "ANON", int depth = 0) {
+inline plain_type_t<EigMat> rvalue(
+    EigMat&& a, const cons_index_list<index_min_max, nil_index_list>& idx,
+    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(),
                     idx.head_.min_ - 1);
   math::check_range("matrix[multi] indexing", name, a.rows(),

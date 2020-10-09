@@ -594,7 +594,6 @@ TEST(ModelIndexing, rvalueMatrixSingleSingle) {
   test_out_of_range(x, index_list(index_uni(1), index_uni(10)));
 }
 
-
 TEST(ModelIndexing, rvalueMatrixSingleMulti) {
   Eigen::MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
