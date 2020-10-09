@@ -39,7 +39,7 @@ struct index_multi {
    *
    * @param ns multiple indexes.
    */
-  template <typename T, require_not_same_t<T, index_multi>* = nullptr>
+  template <typename T, require_std_vector_vt<std::is_integral, T>* = nullptr>
   explicit constexpr index_multi(T&& ns) : ns_(std::forward<T>(ns)) {}
 };
 

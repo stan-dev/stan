@@ -49,6 +49,7 @@ inline constexpr auto cons_list(I&& idx1, T&& t) {
 inline constexpr auto index_list() { return nil_index_list(); }
 
 /**
+ * Factory-like function to construct a `cons_index_list` of `cons_index_list`s
  * @tparam I1 First index type
  * @tparam I2 Parameter pack of index types.
  * @param idx1 First index to construct the cons_index_list.

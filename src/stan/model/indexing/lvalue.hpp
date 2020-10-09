@@ -48,7 +48,7 @@ inline void assign(std::vector<T>& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x.resize(y.size());
   for (size_t i = 0; i < y.size(); ++i)
-    assign(x[i], nil_index_list(), std::forward<U>(y)[i], name, depth + 1);
+    assign(x[i], nil_index_list(), y[i], name, depth + 1);
 }
 
 /**

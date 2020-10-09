@@ -61,6 +61,20 @@ TEST(ModelIndexing, lvalueUni) {
   test_throw(xs, index_list(index_uni(4)), y);
 }
 
+TEST(ModelIndexing, lvalueUniEigen) {
+  Eigen::VectorXd xs(3);
+  xs << 3, 5, 7;
+  double y = 15;
+  assign(xs, index_list(index_uni(2)), y);
+  EXPECT_FLOAT_EQ(y, xs[1]);
+  double z = 10;
+  assign(xs.segment(0, 1), index_list(index_uni(2)), y);
+  EXPECT_FLOAT_EQ(z, xs[1]);
+
+  test_throw(xs, index_list(index_uni(0)), y);
+  test_throw(xs, index_list(index_uni(4)), y);
+}
+
 TEST(ModelIndexing, lvalueUniUni) {
   vector<double> xs0;
   xs0.push_back(0.0);
