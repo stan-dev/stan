@@ -5,8 +5,8 @@ functions {
                       real[] x,         // data
                       int[] x_int) {    // integer data
     real dydt[2];
-    dydt[1] <- x[1] * y[2];
-    dydt[2] <- -y[1] - theta[1] * y[2];
+    dydt[1] = x[1] * y[2];
+    dydt[2] = -y[1] - theta[1] * y[2];
     return dydt;
   }
 }
@@ -24,7 +24,7 @@ parameters {
 }
 transformed parameters {
   real y_hat[10,2];
-  y_hat <- integrate_ode(harm_osc_ode,  // system
+  y_hat = integrate_ode(harm_osc_ode,  // system
                      y0,            // initial state
                      t0,            // initial time
                      ts,            // solution times

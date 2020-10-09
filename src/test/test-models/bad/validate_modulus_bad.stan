@@ -4,7 +4,7 @@ data {
 }
 transformed data {
   real k;
-  k <- i % j;  // real, real
+  k = i % j;  // real, real
 }
 parameters {
   real y;

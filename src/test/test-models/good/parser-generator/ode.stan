@@ -5,8 +5,8 @@ functions {
              real[] x,
              int[] x_int) {
     real dydt[2];
-    dydt[1] <- y[2];
-    dydt[2] <- -y[1] - theta[1] * y[2];
+    dydt[1] = y[2];
+    dydt[2] = -y[1] - theta[1] * y[2];
     return dydt;
   }
 }
@@ -25,11 +25,11 @@ model {
 }
 generated quantities {
   real y_hat[T,2];
-  y_hat <- integrate_ode(sho, y0, t0, ts, theta, x, x_int );
+  y_hat = integrate_ode(sho, y0, t0, ts, theta, x, x_int );
 
   // add measurement error
   for (t in 1:T) {
-    y_hat[t,1] <- y_hat[t,1] + normal_rng(0,0.1);
-    y_hat[t,2] <- y_hat[t,2] + normal_rng(0,0.1);
+    y_hat[t,1] = y_hat[t,1] + normal_rng(0,0.1);
+    y_hat[t,2] = y_hat[t,2] + normal_rng(0,0.1);
   }
 }

@@ -6,7 +6,7 @@ data {
 transformed data {
   vector[d_int] transformed_data_vector;
 
-  transformed_data_vector <- singular_values(d_matrix);
+  transformed_data_vector = singular_values(d_matrix);
 }
 parameters {
   real y_p;
@@ -15,8 +15,8 @@ parameters {
 transformed parameters {
   vector[d_int] transformed_param_vector;
 
-  transformed_param_vector <- singular_values(d_matrix);
-  transformed_param_vector <- singular_values(p_matrix);
+  transformed_param_vector = singular_values(d_matrix);
+  transformed_param_vector = singular_values(p_matrix);
 }
 model {  
   y_p ~ normal(0,1);

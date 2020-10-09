@@ -7,6 +7,6 @@ model {
 generated quantities {
   int a;
   real b;
-  b <- 3.2;
-  a <- b;
+  b = 3.2;
+  a = b;
 }

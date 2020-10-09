@@ -42,24 +42,24 @@ transformed data {
   row_vector[2] trans_x4w[3,4,5];
   matrix[2,3] trans_x5w[3,4,5];
 
-  transformed_data_matrix <- trigamma(d_matrix);
-  transformed_data_vector <- trigamma(d_vector);
-  transformed_data_row_vector <- trigamma(d_row_vector);
-  trans_x3y <- trigamma(x3y);
-  trans_x4y <- trigamma(x4y);
-  trans_x5y <- trigamma(x5y);
+  transformed_data_matrix = trigamma(d_matrix);
+  transformed_data_vector = trigamma(d_vector);
+  transformed_data_row_vector = trigamma(d_row_vector);
+  trans_x3y = trigamma(x3y);
+  trans_x4y = trigamma(x4y);
+  trans_x5y = trigamma(x5y);
 
-  trans_x2z <- trigamma(x1z);
-  trans_x2z <- trigamma(x2z);
-  trans_x3z <- trigamma(x3z);
-  trans_x4z <- trigamma(x4z);
-  trans_x5z <- trigamma(x5z);
+  trans_x2z = trigamma(x1z);
+  trans_x2z = trigamma(x2z);
+  trans_x3z = trigamma(x3z);
+  trans_x4z = trigamma(x4z);
+  trans_x5z = trigamma(x5z);
 
-  trans_x2w <- trigamma(x1w);
-  trans_x2w <- trigamma(x2w);
-  trans_x3w <- trigamma(x3w);
-  trans_x4w <- trigamma(x4w);
-  trans_x5w <- trigamma(x5w);
+  trans_x2w = trigamma(x1w);
+  trans_x2w = trigamma(x2w);
+  trans_x3w = trigamma(x3w);
+  trans_x4w = trigamma(x4w);
+  trans_x5w = trigamma(x5w);
 }
 parameters {
   real p_real;
@@ -101,26 +101,26 @@ transformed parameters {
   row_vector[2] trans_p_x4w[3,4,5];
   matrix[2,3] trans_p_x5w[3,4,5];
 
-  transformed_param_matrix <- trigamma(d_matrix);
-  transformed_param_vector <- trigamma(d_vector);
-  transformed_param_row_vector <- trigamma(d_row_vector);
-  transformed_param_matrix <- trigamma(p_matrix);
-  transformed_param_vector <- trigamma(p_vector);
-  transformed_param_row_vector <- trigamma(p_row_vector);
+  transformed_param_matrix = trigamma(d_matrix);
+  transformed_param_vector = trigamma(d_vector);
+  transformed_param_row_vector = trigamma(d_row_vector);
+  transformed_param_matrix = trigamma(p_matrix);
+  transformed_param_vector = trigamma(p_vector);
+  transformed_param_row_vector = trigamma(p_row_vector);
 
-  trans_p_x3y <- trigamma(p_x3y);
-  trans_p_x4y <- trigamma(p_x4y);
-  trans_p_x5y <- trigamma(p_x5y);
+  trans_p_x3y = trigamma(p_x3y);
+  trans_p_x4y = trigamma(p_x4y);
+  trans_p_x5y = trigamma(p_x5y);
 
-  trans_p_x2z <- trigamma(p_x2z);
-  trans_p_x3z <- trigamma(p_x3z);
-  trans_p_x4z <- trigamma(p_x4z);
-  trans_p_x5z <- trigamma(p_x5z);
+  trans_p_x2z = trigamma(p_x2z);
+  trans_p_x3z = trigamma(p_x3z);
+  trans_p_x4z = trigamma(p_x4z);
+  trans_p_x5z = trigamma(p_x5z);
 
-  trans_p_x2w <- trigamma(p_x2w);
-  trans_p_x3w <- trigamma(p_x3w);
-  trans_p_x4w <- trigamma(p_x4w);
-  trans_p_x5w <- trigamma(p_x5w);
+  trans_p_x2w = trigamma(p_x2w);
+  trans_p_x3w = trigamma(p_x3w);
+  trans_p_x4w = trigamma(p_x4w);
+  trans_p_x5w = trigamma(p_x5w);
 }
 model {  
   y_p ~ normal(0,1);

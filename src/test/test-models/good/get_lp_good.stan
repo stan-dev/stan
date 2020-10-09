@@ -15,10 +15,10 @@ parameters {
 }
 transformed parameters {
   real z;
-  z <- get_lp();  
+  z = get_lp();  
 }
 model {
   real w;
-  w <- get_lp();
+  w = get_lp();
   y ~ normal(0,1);
 }

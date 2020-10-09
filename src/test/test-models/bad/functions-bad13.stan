@@ -1,6 +1,6 @@
 functions {
   real badassign(real x) {
-    x <- 5;
+    x = 5;
     return x;
   }
 }

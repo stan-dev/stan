@@ -3,7 +3,7 @@ data {
 }
 transformed data {
   real z[5];
-  z <- y;
+  z = y;
 }
 parameters {
   real x;

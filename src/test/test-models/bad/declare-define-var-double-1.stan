@@ -2,7 +2,7 @@ data {
   real a1[2];
 }
 transformed data {
-  real td_a1 = a1;   // scalar <- array - bad
+  real td_a1 = a1;   // scalar = array - bad
 }
 parameters {
   real y;
