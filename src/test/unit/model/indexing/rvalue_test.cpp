@@ -342,7 +342,6 @@ TEST(ModelIndexing, rvalue_doubless_minmax_minmax_eigen) {
   test_out_of_range(x, index_list(index_uni(1), index_min(0)));
 }
 
-
 TEST(ModelIndexing, rvalue_doubless_multi_uni) {
   using std::vector;
 
@@ -533,7 +532,6 @@ TEST(ModelIndexing, rvalue_doubless_multi_multi_eigen) {
   test_out_of_range(x, index_list(index_max(2), index_min(0)));
 }
 
-
 template <typename T>
 void vector_uni_test() {
   T v(3);
@@ -662,7 +660,7 @@ TEST(ModelIndexing, rvalueMatrixUni) {
   EXPECT_EQ(3, v.size());
   EXPECT_FLOAT_EQ(1.0, v(0));
   EXPECT_FLOAT_EQ(1.1, v(1));
-  EXPECT_FLOAT_EQ(1.2, v(2));\
+  EXPECT_FLOAT_EQ(1.2, v(2));
 
   v = rvalue(m.array() + 2, index_list(index_uni(2)));
   EXPECT_EQ(3, v.size());
@@ -819,7 +817,6 @@ TEST(ModelIndexing, rvalueMatrixMulti) {
   EXPECT_FLOAT_EQ(0.1, a(6, 1));
   EXPECT_FLOAT_EQ(0.2, a(6, 2));
 
-
   ns.push_back(0);
   test_out_of_range(m, index_list(index_multi(ns)));
 
@@ -840,8 +837,9 @@ TEST(ModelIndexing, rvalueMatrixSingleSingle) {
 
   for (int m = 0; m < 3; ++m) {
     for (int n = 0; n < 4; ++n) {
-      EXPECT_FLOAT_EQ((m + n / 10.0) + 2, rvalue(x.array() + 2, index_list(index_uni(m + 1),
-                                                         index_uni(n + 1))));
+      EXPECT_FLOAT_EQ((m + n / 10.0) + 2,
+                      rvalue(x.array() + 2,
+                             index_list(index_uni(m + 1), index_uni(n + 1))));
     }
   }
   test_out_of_range(x, index_list(index_uni(0), index_uni(1)));
@@ -931,8 +929,8 @@ TEST(ModelIndexing, rvalueMatrixMultiMulti) {
   test_out_of_range(x, index_list(index_min(0), index_min(3)));
   test_out_of_range(x, index_list(index_min(2), index_min(0)));
 
-
-  y = rvalue(x.block(0, 0, 3, 4).array() + 2, index_list(index_min(2), index_min(3)));
+  y = rvalue(x.block(0, 0, 3, 4).array() + 2,
+             index_list(index_min(2), index_min(3)));
   EXPECT_EQ(2, y.rows());
   EXPECT_EQ(2, y.cols());
   for (int i = 0; i < 2; ++i) {
@@ -940,6 +938,4 @@ TEST(ModelIndexing, rvalueMatrixMultiMulti) {
       EXPECT_FLOAT_EQ(2 + i + 1 + (j + 2) / 10.0, y(i, j));
     }
   }
-
-
 }

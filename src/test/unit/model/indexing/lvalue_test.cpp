@@ -76,7 +76,6 @@ TEST(ModelIndexing, lvalueUniEigen) {
   test_throw(xs, index_list(index_uni(4)), y);
 }
 
-
 TEST(model_indexing, assign_eigvec_scalar_uni_index_segment) {
   VectorXd lhs_x(5);
   lhs_x << 0, 1, 2, 3, 4;
@@ -273,7 +272,6 @@ TEST(ModelIndexing, lvalueMultiMultiEigen) {
   test_throw_ia(xs, index_list(index_min(7), index_max(3)), ys);
   test_throw_ia(xs, index_list(index_min(9), index_max(2)), ys);
 }
-
 
 TEST(ModelIndexing, lvalueUniMulti) {
   vector<vector<double> > xs;
@@ -677,7 +675,8 @@ TEST(ModelIndexing, resultSizePosMinMaxPosMinMaxEigenMatrix) {
     std::cout << "\nx_rev: \n" << x_rev << "\n";
     std::cout << "\nx before: \n" << x << "\n";
     Eigen::MatrixXd x_colwise_rev = x_rev.block(0, 0, i + 1, i + 1);
-    assign(x, index_list(index_min_max(1, i + 1), index_min_max(1, i + 1)),x_rev.block(0, 0, i + 1, i + 1)) ;
+    assign(x, index_list(index_min_max(1, i + 1), index_min_max(1, i + 1)),
+           x_rev.block(0, 0, i + 1, i + 1));
     std::cout << "\nx after: \n" << x << "\n";
     for (int kk = 0; kk < i; ++kk) {
       for (int jj = 0; jj < i; ++jj) {
@@ -707,8 +706,10 @@ TEST(ModelIndexing, resultSizePosMinMaxNegMinMaxEigenMatrix) {
   for (int i = 0; i < x.rows(); ++i) {
     std::cout << "\nx_rev: \n" << x_rev << "\n";
     std::cout << "\nx before: \n" << x << "\n";
-    Eigen::MatrixXd x_rowwise_reverse = x_rev.block(0, 0, i + 1, i + 1).rowwise().reverse();
-    assign(x, index_list(index_min_max(1, i + 1), index_min_max(i + 1, 1)), x_rev.block(0, 0, i + 1, i + 1));
+    Eigen::MatrixXd x_rowwise_reverse
+        = x_rev.block(0, 0, i + 1, i + 1).rowwise().reverse();
+    assign(x, index_list(index_min_max(1, i + 1), index_min_max(i + 1, 1)),
+           x_rev.block(0, 0, i + 1, i + 1));
     std::cout << "\nx after: \n" << x << "\n";
     for (int kk = 0; kk < i; ++kk) {
       for (int jj = 0; jj < i; ++jj) {
@@ -738,8 +739,10 @@ TEST(ModelIndexing, resultSizeNigMinMaxPosMinMaxEigenMatrix) {
   for (int i = 0; i < x.rows(); ++i) {
     std::cout << "\nx_rev: \n" << x_rev << "\n";
     std::cout << "\nx before: \n" << x << "\n";
-    Eigen::MatrixXd x_colwise_reverse = x_rev.block(0, 0, i + 1, i + 1).colwise().reverse();
-    assign(x, index_list(index_min_max(i + 1, 1), index_min_max(1, i + 1)), x_rev.block(0, 0, i + 1, i + 1));
+    Eigen::MatrixXd x_colwise_reverse
+        = x_rev.block(0, 0, i + 1, i + 1).colwise().reverse();
+    assign(x, index_list(index_min_max(i + 1, 1), index_min_max(1, i + 1)),
+           x_rev.block(0, 0, i + 1, i + 1));
     std::cout << "\nx after: \n" << x << "\n";
     for (int kk = 0; kk < i; ++kk) {
       for (int jj = 0; jj < i; ++jj) {
@@ -770,7 +773,8 @@ TEST(ModelIndexing, resultSizeNegMinMaxNegMinMaxEigenMatrix) {
     std::cout << "\nx_rev: \n" << x_rev << "\n";
     std::cout << "\nx before: \n" << x << "\n";
     Eigen::MatrixXd x_reverse = x_rev.block(0, 0, i + 1, i + 1).reverse();
-    assign(x, index_list(index_min_max(i + 1, 1), index_min_max(i + 1, 1)), x_rev.block(0, 0, i + 1, i + 1));
+    assign(x, index_list(index_min_max(i + 1, 1), index_min_max(i + 1, 1)),
+           x_rev.block(0, 0, i + 1, i + 1));
     std::cout << "\nx after: \n" << x << "\n";
     for (int kk = 0; kk < i; ++kk) {
       for (int jj = 0; jj < i; ++jj) {
@@ -782,8 +786,6 @@ TEST(ModelIndexing, resultSizeNegMinMaxNegMinMaxEigenMatrix) {
     }
   }
 }
-
-
 
 TEST(modelIndexing, doubleToVarSimple) {
   using stan::math::var;
@@ -798,7 +800,6 @@ TEST(modelIndexing, doubleToVarSimple) {
   for (int i = 0; i < a.size(); ++i)
     EXPECT_FLOAT_EQ(a(i), b(i).val());
 }
-
 
 TEST(model_indexing, assign_eigvec_eigvec_index_min) {
   VectorXd lhs_x(5);
@@ -952,7 +953,6 @@ TEST(model_indexing, assign_densemat_scalar_index_uni) {
   test_throw(x, index_list(index_uni(2), index_uni(5)), y);
 }
 
-
 TEST(model_indexing, assign_densemat_eigrowvec_uni_index_min_max_index) {
   MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
@@ -1026,7 +1026,8 @@ TEST(model_indexing, assign_densemat_eigvec_min_max_index_uni_index) {
   EXPECT_FLOAT_EQ(y(0), x(2, 2));
   EXPECT_FLOAT_EQ(y(1), x(0, 2));
 
-  assign(x.block(0, 0, 3, 3), index_list(index_multi(ns), index_uni(3)), y.array() + 2);
+  assign(x.block(0, 0, 3, 3), index_list(index_multi(ns), index_uni(3)),
+         y.array() + 2);
   EXPECT_FLOAT_EQ(y(0) + 2, x(2, 2));
   EXPECT_FLOAT_EQ(y(1) + 2, x(0, 2));
 
@@ -1055,7 +1056,8 @@ TEST(model_indexing, assign_densemat_densemat_min_max_index_min_index) {
   EXPECT_FLOAT_EQ(y(1, 1), x(2, 2));
   EXPECT_FLOAT_EQ(y(1, 2), x(2, 3));
 
-  assign(x.block(0, 0, 3, 3), index_list(index_min_max(2, 3), index_min(2)), y.block(0, 0, 2, 2));
+  assign(x.block(0, 0, 3, 3), index_list(index_min_max(2, 3), index_min(2)),
+         y.block(0, 0, 2, 2));
   EXPECT_FLOAT_EQ(y(0, 0), x(1, 1));
   EXPECT_FLOAT_EQ(y(0, 1), x(1, 2));
   EXPECT_FLOAT_EQ(y(0, 2), x(1, 3));
@@ -1067,7 +1069,6 @@ TEST(model_indexing, assign_densemat_densemat_min_max_index_min_index) {
   test_throw_ia(x, index_list(index_min_max(2, 3), index_min(10)), y);
   test_throw_ia(x, index_list(index_min_max(1, 3), index_min(2)), y);
 }
-
 
 TEST(model_indexing, assign_densemat_densemat_multi_index_multi_index) {
   MatrixXd x(3, 4);
@@ -1092,7 +1093,8 @@ TEST(model_indexing, assign_densemat_densemat_multi_index_multi_index) {
   EXPECT_FLOAT_EQ(y(1, 2), x(0, 0));
 
   MatrixXd y2 = y.array() + 2;
-  assign(x.block(0, 0, 3, 4), index_list(index_multi(ms), index_multi(ns)), y.array() + 2);
+  assign(x.block(0, 0, 3, 4), index_list(index_multi(ms), index_multi(ns)),
+         y.array() + 2);
   EXPECT_FLOAT_EQ(y2(0, 0), x(2, 1));
   EXPECT_FLOAT_EQ(y2(0, 1), x(2, 2));
   EXPECT_FLOAT_EQ(y2(0, 2), x(2, 0));
