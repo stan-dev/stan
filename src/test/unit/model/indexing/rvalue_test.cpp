@@ -742,26 +742,53 @@ TEST(ModelIndexing, rvalueMatrixMulti) {
   a = rvalue(m, index_list(index_min_max(3, 2)));
   EXPECT_EQ(2, a.rows());
   EXPECT_EQ(3, a.cols());
-  EXPECT_FLOAT_EQ(1.2, a(0, 0));
-  EXPECT_FLOAT_EQ(1.1, a(0, 1));
-  EXPECT_FLOAT_EQ(1.0, a(0, 2));
-  EXPECT_FLOAT_EQ(2.2, a(1, 0));
-  EXPECT_FLOAT_EQ(2.1, a(1, 1));
-  EXPECT_FLOAT_EQ(2.0, a(1, 2));
+  EXPECT_FLOAT_EQ(2, a(0, 0));
+  EXPECT_FLOAT_EQ(2.1, a(0, 1));
+  EXPECT_FLOAT_EQ(2.2, a(0, 2));
+  EXPECT_FLOAT_EQ(1, a(1, 0));
+  EXPECT_FLOAT_EQ(1.1, a(1, 1));
+  EXPECT_FLOAT_EQ(1.2, a(1, 2));
   test_out_of_range(m.array(), index_list(index_min_max(0, 3)));
   test_out_of_range(m.array(), index_list(index_min_max(2, 15)));
 
-  a = rvalue(m.array(), index_list(index_min_max(3, 2)));
+  a = rvalue(m.block(0, 0, 4, 3).array() + 2, index_list(index_min_max(3, 2)));
   EXPECT_EQ(2, a.rows());
   EXPECT_EQ(3, a.cols());
-  EXPECT_FLOAT_EQ(1.2, a(0, 0));
-  EXPECT_FLOAT_EQ(1.1, a(0, 1));
-  EXPECT_FLOAT_EQ(1.0, a(0, 2));
-  EXPECT_FLOAT_EQ(2.2, a(1, 0));
-  EXPECT_FLOAT_EQ(2.1, a(1, 1));
-  EXPECT_FLOAT_EQ(2.0, a(1, 2));
+  EXPECT_FLOAT_EQ(4, a(0, 0));
+  EXPECT_FLOAT_EQ(4.1, a(0, 1));
+  EXPECT_FLOAT_EQ(4.2, a(0, 2));
+  EXPECT_FLOAT_EQ(3, a(1, 0));
+  EXPECT_FLOAT_EQ(3.1, a(1, 1));
+  EXPECT_FLOAT_EQ(3.2, a(1, 2));
   test_out_of_range(m.array(), index_list(index_min_max(0, 3)));
   test_out_of_range(m.array(), index_list(index_min_max(2, 15)));
+
+  a = rvalue(m, index_list(index_omni(), index_min_max(2, 3)));
+  EXPECT_EQ(2, a.cols());
+  EXPECT_EQ(4, a.rows());
+  EXPECT_FLOAT_EQ(0.1, a(0, 0));
+  EXPECT_FLOAT_EQ(1.1, a(1, 0));
+  EXPECT_FLOAT_EQ(2.1, a(2, 0));
+  EXPECT_FLOAT_EQ(3.1, a(3, 0));
+  EXPECT_FLOAT_EQ(0.2, a(0, 1));
+  EXPECT_FLOAT_EQ(1.2, a(1, 1));
+  EXPECT_FLOAT_EQ(2.2, a(2, 1));
+  EXPECT_FLOAT_EQ(3.2, a(3, 1));
+
+  a = rvalue(m, index_list(index_omni(), index_min_max(3, 2)));
+  EXPECT_EQ(2, a.cols());
+  EXPECT_EQ(4, a.rows());
+  EXPECT_FLOAT_EQ(0.2, a(0, 0));
+  EXPECT_FLOAT_EQ(1.2, a(1, 0));
+  EXPECT_FLOAT_EQ(2.2, a(2, 0));
+  EXPECT_FLOAT_EQ(3.2, a(3, 0));
+  EXPECT_FLOAT_EQ(0.1, a(0, 1));
+  EXPECT_FLOAT_EQ(1.1, a(1, 1));
+  EXPECT_FLOAT_EQ(2.1, a(2, 1));
+  EXPECT_FLOAT_EQ(3.1, a(3, 1));
+  test_out_of_range(m.array(), index_list(index_min_max(0, 3)));
+  test_out_of_range(m.array(), index_list(index_min_max(2, 15)));
+
 
   a = rvalue(m, index_list(index_omni()));
   EXPECT_EQ(4, a.rows());

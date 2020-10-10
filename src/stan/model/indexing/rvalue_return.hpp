@@ -24,7 +24,7 @@ namespace model {
  * @tparam C Type of container or scalar.
  * @tparam L Type of index list.
  */
-template <typename C, typename L, typename = void>
+template <typename C, typename L>
 struct rvalue_return {};
 
 /**
@@ -196,27 +196,6 @@ struct rvalue_return<std::vector<C>, cons_index_list<I, L>> {
 
 /**
  * Template specialization for a standard vector whose index list
- * starts with a multiple index.
- *
- * @tparam C Element type for standard vector (container or
- * scalar).
- * @tparam I Multiple index type.
- * @tparam L Following index types.
- */
-template <typename C, typename I, typename L>
-struct rvalue_return<std::vector<stan::math::var_value<C>>,
-                     cons_index_list<I, L>> {
-  /**
-   * Return type is calculated recursively as a standard vector of
-   * the rvalue return for the element type C and following index
-   * types L.
-   */
-  typedef std::vector<stan::math::var_value<typename rvalue_return<C, L>::type>>
-      type;
-};
-
-/**
- * Template specialization for a standard vector whose index list
  * starts with a single index.
  *
  * @tparam C Element type for standard vector (container or
@@ -230,24 +209,6 @@ struct rvalue_return<std::vector<C>, cons_index_list<index_uni, L>> {
    * for the element type C and following index types L.
    */
   typedef typename rvalue_return<C, L>::type type;
-};
-
-/**
- * Template specialization for a standard vector whose index list
- * starts with a single index.
- *
- * @tparam C Element type for standard vector (container or
- * scalar).
- * @tparam L Following index types.
- */
-template <typename C, typename L>
-struct rvalue_return<std::vector<stan::math::var_value<C>>,
-                     cons_index_list<index_uni, L>> {
-  /**
-   * Return type is calculated recursively as the rvalue return
-   * for the element type C and following index types L.
-   */
-  typedef stan::math::var_value<typename rvalue_return<C, L>::type> type;
 };
 
 template <typename... Ts>

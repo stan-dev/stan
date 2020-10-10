@@ -3,11 +3,11 @@
 
 #include <stan/math/prim.hpp>
 #include <stan/math/rev.hpp>
+#include <stan/model/indexing/deep_copy.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
-#include <stan/model/indexing/rvalue_return.hpp>
 #include <type_traits>
 #include <vector>
 
@@ -194,33 +194,6 @@ inline auto rvalue(
 
 /**
  * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of a single index and multiple index,
- * returning a row vector.
- *
- * Types:  mat[single, multiple] : row vector
- *
- * @tparam EigMat An eigen matrix
- * @tparam I Type of multiple index.
- * @param[in] a Matrix to index.
- * @param[in] idx Pair of single index and multiple index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing matrix.
- */
-template <typename EigMat, typename I,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr,
-          require_same_t<std::decay_t<I>, I>* = nullptr>
-inline auto rvalue(
-    EigMat&& a,
-    const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
-    const char* name = "ANON", int depth = 0) {
-  int m = idx.head_.n_;
-  math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
-  return rvalue(a.row(m - 1), idx.tail_);
-}
-
-/**
- * Return the result of indexing the specified Eigen matrix with a
  * sequence consisting of a multiple index and a single index,
  * returning a vector.
  *
@@ -295,20 +268,90 @@ template <typename EigMat,
 inline plain_type_t<EigMat> rvalue(
     EigMat&& a, const cons_index_list<index_min_max, nil_index_list>& idx,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[multi] indexing", name, a.rows(),
-                    idx.head_.min_ - 1);
-  math::check_range("matrix[multi] indexing", name, a.rows(),
-                    idx.head_.max_ - 1);
+  math::check_range("matrix[multi] indexing", name, a.rows(), idx.head_.min_);
+  math::check_range("matrix[multi] indexing", name, a.rows(), idx.head_.max_);
   if (idx.head_.min_ <= idx.head_.max_) {
-    return a.block(idx.head_.min_ - 1, 0, idx.head_.max_ - (idx.head_.min_ - 1),
-                   a.cols());
+    return a
+        .block(idx.head_.min_ - 1, 0, idx.head_.max_ - (idx.head_.min_ - 1),
+               a.cols())
+        .eval();
   } else {
     return a
         .block(idx.head_.max_ - 1, 0, idx.head_.min_ - (idx.head_.max_ - 1),
                a.cols())
-        .rowwise()
-        .reverse();
+        .colwise()
+        .reverse()
+        .eval();
   }
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a
+ * min_max_index returning a block from max to min.
+ *
+ * Types:  mat[min_max] : matrix
+ *
+ * @tparam EigMat An eigen matrix
+ * @tparam I Type of multiple index.
+ * @param[in] a Matrix to index.
+ * @param[in] idx Pair multiple index and single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, typename L,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr,
+          require_same_t<std::decay_t<L>, L>* = nullptr>
+inline auto rvalue(
+    EigMat&& a,
+    const cons_index_list<L, cons_index_list<index_min_max, nil_index_list>>&
+        idx,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.tail_.head_.min_);
+  math::check_range("matrix[multi] indexing", name, a.rows(),
+                    idx.tail_.head_.max_);
+  if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
+    return deep_copy(
+        rvalue(a.block(0, idx.tail_.head_.min_ - 1, a.rows(),
+                       idx.tail_.head_.max_ - (idx.tail_.head_.min_ - 1)),
+               index_list(idx.head_), name, depth + 1));
+  } else {
+    return deep_copy(
+        rvalue(a.block(0, idx.tail_.head_.max_ - 1, a.rows(),
+                       idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
+                   .rowwise()
+                   .reverse(),
+               index_list(idx.head_), name, depth + 1));
+  }
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a
+ * sequence consisting of a single index and multiple index,
+ * returning a row vector.
+ *
+ * Types:  mat[single, multiple] : row vector
+ *
+ * @tparam EigMat An eigen matrix
+ * @tparam I Type of multiple index.
+ * @param[in] a Matrix to index.
+ * @param[in] idx Pair of single index and multiple index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, typename I,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr,
+          require_same_t<std::decay_t<I>, I>* = nullptr,
+          require_not_same_t<I, index_min_max>* = nullptr>
+inline auto rvalue(
+    EigMat&& a,
+    const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idx,
+    const char* name = "ANON", int depth = 0) {
+  int m = idx.head_.n_;
+  math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
+  return rvalue(a.row(m - 1), idx.tail_);
 }
 
 /**
@@ -593,7 +636,9 @@ template <typename StdVec, typename I, typename L,
           require_same_t<std::decay_t<L>, L>* = nullptr>
 inline auto rvalue(StdVec&& c, const cons_index_list<I, L>& idx,
                    const char* name = "ANON", int depth = 0) {
-  rvalue_return_t<std::decay_t<StdVec>, cons_index_list<I, L>> result;
+  using inner_type = plain_type_t<decltype(
+      rvalue(c[rvalue_at(0, idx.head_) - 1], idx.tail_))>;
+  std::vector<inner_type> result;
   const int index_size = rvalue_index_size(idx.head_, c.size());
   if (index_size > 0) {
     result.reserve(index_size);

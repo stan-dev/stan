@@ -670,14 +670,10 @@ TEST(ModelIndexing, resultSizePosMinMaxPosMinMaxEigenMatrix) {
     x_rev(i) = x.size() - i - 1;
   }
 
-  // min > max
   for (int i = 0; i < x.rows(); ++i) {
-    std::cout << "\nx_rev: \n" << x_rev << "\n";
-    std::cout << "\nx before: \n" << x << "\n";
     Eigen::MatrixXd x_colwise_rev = x_rev.block(0, 0, i + 1, i + 1);
     assign(x, index_list(index_min_max(1, i + 1), index_min_max(1, i + 1)),
            x_rev.block(0, 0, i + 1, i + 1));
-    std::cout << "\nx after: \n" << x << "\n";
     for (int kk = 0; kk < i; ++kk) {
       for (int jj = 0; jj < i; ++jj) {
         EXPECT_FLOAT_EQ(x(kk, jj), x_rev(kk, jj));
@@ -702,15 +698,11 @@ TEST(ModelIndexing, resultSizePosMinMaxNegMinMaxEigenMatrix) {
     x_rev(i) = x.size() - i - 1;
   }
 
-  // min > max
   for (int i = 0; i < x.rows(); ++i) {
-    std::cout << "\nx_rev: \n" << x_rev << "\n";
-    std::cout << "\nx before: \n" << x << "\n";
     Eigen::MatrixXd x_rowwise_reverse
         = x_rev.block(0, 0, i + 1, i + 1).rowwise().reverse();
     assign(x, index_list(index_min_max(1, i + 1), index_min_max(i + 1, 1)),
            x_rev.block(0, 0, i + 1, i + 1));
-    std::cout << "\nx after: \n" << x << "\n";
     for (int kk = 0; kk < i; ++kk) {
       for (int jj = 0; jj < i; ++jj) {
         EXPECT_FLOAT_EQ(x(kk, jj), x_rowwise_reverse(kk, jj));
@@ -735,15 +727,11 @@ TEST(ModelIndexing, resultSizeNigMinMaxPosMinMaxEigenMatrix) {
     x_rev(i) = x.size() - i - 1;
   }
 
-  // min > max
   for (int i = 0; i < x.rows(); ++i) {
-    std::cout << "\nx_rev: \n" << x_rev << "\n";
-    std::cout << "\nx before: \n" << x << "\n";
     Eigen::MatrixXd x_colwise_reverse
         = x_rev.block(0, 0, i + 1, i + 1).colwise().reverse();
     assign(x, index_list(index_min_max(i + 1, 1), index_min_max(1, i + 1)),
            x_rev.block(0, 0, i + 1, i + 1));
-    std::cout << "\nx after: \n" << x << "\n";
     for (int kk = 0; kk < i; ++kk) {
       for (int jj = 0; jj < i; ++jj) {
         EXPECT_FLOAT_EQ(x(kk, jj), x_colwise_reverse(kk, jj));
@@ -768,14 +756,10 @@ TEST(ModelIndexing, resultSizeNegMinMaxNegMinMaxEigenMatrix) {
     x_rev(i) = x.size() - i - 1;
   }
 
-  // min > max
   for (int i = 0; i < x.rows(); ++i) {
-    std::cout << "\nx_rev: \n" << x_rev << "\n";
-    std::cout << "\nx before: \n" << x << "\n";
     Eigen::MatrixXd x_reverse = x_rev.block(0, 0, i + 1, i + 1).reverse();
     assign(x, index_list(index_min_max(i + 1, 1), index_min_max(i + 1, 1)),
            x_rev.block(0, 0, i + 1, i + 1));
-    std::cout << "\nx after: \n" << x << "\n";
     for (int kk = 0; kk < i; ++kk) {
       for (int jj = 0; jj < i; ++jj) {
         EXPECT_FLOAT_EQ(x(kk, jj), x_reverse(kk, jj));
