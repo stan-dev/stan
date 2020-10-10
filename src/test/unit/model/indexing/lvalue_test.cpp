@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <vector>
 #include <stan/model/indexing/lvalue.hpp>
+#include <stan/model/indexing/rvalue.hpp>
 #include <stan/math/rev.hpp>
 #include <gtest/gtest.h>
 
@@ -657,6 +658,132 @@ TEST(ModelIndexing, resultSizeNegIndexingEigen) {
   EXPECT_FLOAT_EQ(lhs(3), 4);
   EXPECT_FLOAT_EQ(lhs(4), 5);
 }
+
+TEST(ModelIndexing, resultSizePosMinMaxPosMinMaxEigenMatrix) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::Matrix<double, -1, -1> x(5, 5);
+  Eigen::Matrix<double, -1, -1> x_rev(5, 5);
+  for (int i = 0; i < x.size(); ++i) {
+    x(i) = i;
+    x_rev(i) = x.size() - i - 1;
+  }
+
+  // min > max
+  for (int i = 0; i < x.rows(); ++i) {
+    std::cout << "\nx_rev: \n" << x_rev << "\n";
+    std::cout << "\nx before: \n" << x << "\n";
+    Eigen::MatrixXd x_colwise_rev = x_rev.block(0, 0, i + 1, i + 1);
+    assign(x, index_list(index_min_max(1, i + 1), index_min_max(1, i + 1)),x_rev.block(0, 0, i + 1, i + 1)) ;
+    std::cout << "\nx after: \n" << x << "\n";
+    for (int kk = 0; kk < i; ++kk) {
+      for (int jj = 0; jj < i; ++jj) {
+        EXPECT_FLOAT_EQ(x(kk, jj), x_rev(kk, jj));
+      }
+    }
+    for (int j = 0; j < x.size(); ++j) {
+      x(j) = j;
+    }
+  }
+}
+
+TEST(ModelIndexing, resultSizePosMinMaxNegMinMaxEigenMatrix) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::Matrix<double, -1, -1> x(5, 5);
+  Eigen::Matrix<double, -1, -1> x_rev(5, 5);
+  for (int i = 0; i < x.size(); ++i) {
+    x(i) = i;
+    x_rev(i) = x.size() - i - 1;
+  }
+
+  // min > max
+  for (int i = 0; i < x.rows(); ++i) {
+    std::cout << "\nx_rev: \n" << x_rev << "\n";
+    std::cout << "\nx before: \n" << x << "\n";
+    Eigen::MatrixXd x_rowwise_reverse = x_rev.block(0, 0, i + 1, i + 1).rowwise().reverse();
+    assign(x, index_list(index_min_max(1, i + 1), index_min_max(i + 1, 1)), x_rev.block(0, 0, i + 1, i + 1));
+    std::cout << "\nx after: \n" << x << "\n";
+    for (int kk = 0; kk < i; ++kk) {
+      for (int jj = 0; jj < i; ++jj) {
+        EXPECT_FLOAT_EQ(x(kk, jj), x_rowwise_reverse(kk, jj));
+      }
+    }
+    for (int j = 0; j < x.size(); ++j) {
+      x(j) = j;
+    }
+  }
+}
+
+TEST(ModelIndexing, resultSizeNigMinMaxPosMinMaxEigenMatrix) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::Matrix<double, -1, -1> x(5, 5);
+  Eigen::Matrix<double, -1, -1> x_rev(5, 5);
+  for (int i = 0; i < x.size(); ++i) {
+    x(i) = i;
+    x_rev(i) = x.size() - i - 1;
+  }
+
+  // min > max
+  for (int i = 0; i < x.rows(); ++i) {
+    std::cout << "\nx_rev: \n" << x_rev << "\n";
+    std::cout << "\nx before: \n" << x << "\n";
+    Eigen::MatrixXd x_colwise_reverse = x_rev.block(0, 0, i + 1, i + 1).colwise().reverse();
+    assign(x, index_list(index_min_max(i + 1, 1), index_min_max(1, i + 1)), x_rev.block(0, 0, i + 1, i + 1));
+    std::cout << "\nx after: \n" << x << "\n";
+    for (int kk = 0; kk < i; ++kk) {
+      for (int jj = 0; jj < i; ++jj) {
+        EXPECT_FLOAT_EQ(x(kk, jj), x_colwise_reverse(kk, jj));
+      }
+    }
+    for (int j = 0; j < x.size(); ++j) {
+      x(j) = j;
+    }
+  }
+}
+
+TEST(ModelIndexing, resultSizeNegMinMaxNegMinMaxEigenMatrix) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::Matrix<double, -1, -1> x(5, 5);
+  Eigen::Matrix<double, -1, -1> x_rev(5, 5);
+  for (int i = 0; i < x.size(); ++i) {
+    x(i) = i;
+    x_rev(i) = x.size() - i - 1;
+  }
+
+  // min > max
+  for (int i = 0; i < x.rows(); ++i) {
+    std::cout << "\nx_rev: \n" << x_rev << "\n";
+    std::cout << "\nx before: \n" << x << "\n";
+    Eigen::MatrixXd x_reverse = x_rev.block(0, 0, i + 1, i + 1).reverse();
+    assign(x, index_list(index_min_max(i + 1, 1), index_min_max(i + 1, 1)), x_rev.block(0, 0, i + 1, i + 1));
+    std::cout << "\nx after: \n" << x << "\n";
+    for (int kk = 0; kk < i; ++kk) {
+      for (int jj = 0; jj < i; ++jj) {
+        EXPECT_FLOAT_EQ(x(kk, jj), x_reverse(kk, jj));
+      }
+    }
+    for (int j = 0; j < x.size(); ++j) {
+      x(j) = j;
+    }
+  }
+}
+
+
 
 TEST(modelIndexing, doubleToVarSimple) {
   using stan::math::var;

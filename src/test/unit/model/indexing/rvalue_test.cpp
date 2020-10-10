@@ -277,6 +277,72 @@ TEST(ModelIndexing, rvalue_doubless_uni_multi) {
   test_out_of_range(x, index_list(index_uni(1), index_multi(ns)));
 }
 
+TEST(ModelIndexing, rvalue_doubless_uni_multi_eigen) {
+  Eigen::MatrixXd x(3, 3);
+  x << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2;
+  Eigen::VectorXd y = rvalue(x, index_list(index_uni(1), index_min(2)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(0.1, y[0]);
+  EXPECT_FLOAT_EQ(0.2, y[1]);
+  test_out_of_range(x, index_list(index_uni(0), index_min(2)));
+  test_out_of_range(x, index_list(index_uni(1), index_min(0)));
+
+  y = rvalue(x, index_list(index_uni(2), index_max(2)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.0, y[0]);
+  EXPECT_FLOAT_EQ(1.1, y[1]);
+  test_out_of_range(x, index_list(index_uni(0), index_max(2)));
+  test_out_of_range(x, index_list(index_uni(1), index_max(15)));
+
+  y = rvalue(x, index_list(index_uni(2), index_min_max(2, 3)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.1, y[0]);
+  EXPECT_FLOAT_EQ(1.2, y[1]);
+  test_out_of_range(x, index_list(index_uni(0), index_min_max(2, 3)));
+  test_out_of_range(x, index_list(index_uni(10), index_min_max(2, 3)));
+  test_out_of_range(x, index_list(index_uni(1), index_min_max(0, 3)));
+  test_out_of_range(x, index_list(index_uni(1), index_min_max(2, 15)));
+
+  y = rvalue(x, index_list(index_uni(2), index_min_max(2, 2)));
+  EXPECT_EQ(1, y.size());
+  EXPECT_FLOAT_EQ(1.1, y[0]);
+
+  y = rvalue(x, index_list(index_uni(3), index_omni()));
+  EXPECT_EQ(3, y.size());
+  EXPECT_FLOAT_EQ(2.0, y[0]);
+  EXPECT_FLOAT_EQ(2.1, y[1]);
+  EXPECT_FLOAT_EQ(2.2, y[2]);
+  test_out_of_range(x, index_list(index_uni(0), index_omni()));
+
+  std::vector<int> ns;
+  ns.push_back(3);
+  ns.push_back(1);
+  y = rvalue(x, index_list(index_uni(1), index_multi(ns)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(0.2, y[0]);
+  EXPECT_FLOAT_EQ(0.0, y[1]);
+  test_out_of_range(x, index_list(index_uni(0), index_multi(ns)));
+  test_out_of_range(x, index_list(index_uni(10), index_multi(ns)));
+
+  ns.push_back(0);
+  test_out_of_range(x, index_list(index_uni(1), index_multi(ns)));
+
+  ns[ns.size() - 1] = 20;
+  test_out_of_range(x, index_list(index_uni(1), index_multi(ns)));
+}
+
+TEST(ModelIndexing, rvalue_doubless_minmax_minmax_eigen) {
+  Eigen::MatrixXd x(3, 3);
+  x << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2;
+  Eigen::VectorXd y = rvalue(x, index_list(index_uni(1), index_min(2)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(0.1, y[0]);
+  EXPECT_FLOAT_EQ(0.2, y[1]);
+  test_out_of_range(x, index_list(index_uni(0), index_min(2)));
+  test_out_of_range(x, index_list(index_uni(1), index_min(0)));
+}
+
+
 TEST(ModelIndexing, rvalue_doubless_multi_uni) {
   using std::vector;
 
@@ -301,6 +367,66 @@ TEST(ModelIndexing, rvalue_doubless_multi_uni) {
   x.push_back(x2);
 
   vector<double> y = rvalue(x, index_list(index_min(2), index_uni(1)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.0, y[0]);
+  EXPECT_FLOAT_EQ(2.0, y[1]);
+  test_out_of_range(x, index_list(index_min(0), index_uni(1)));
+  test_out_of_range(x, index_list(index_min(2), index_uni(0)));
+  test_out_of_range(x, index_list(index_min(2), index_uni(10)));
+
+  y = rvalue(x, index_list(index_max(2), index_uni(3)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(0.2, y[0]);
+  EXPECT_FLOAT_EQ(1.2, y[1]);
+  test_out_of_range(x, index_list(index_max(10), index_uni(3)));
+  test_out_of_range(x, index_list(index_max(2), index_uni(0)));
+  test_out_of_range(x, index_list(index_max(2), index_uni(15)));
+
+  y = rvalue(x, index_list(index_min_max(2, 3), index_uni(2)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(1.1, y[0]);
+  EXPECT_FLOAT_EQ(2.1, y[1]);
+  test_out_of_range(x, index_list(index_min_max(0, 3), index_uni(2)));
+  test_out_of_range(x, index_list(index_min_max(2, 15), index_uni(2)));
+  test_out_of_range(x, index_list(index_min_max(2, 3), index_uni(0)));
+  test_out_of_range(x, index_list(index_min_max(2, 3), index_uni(10)));
+
+  y = rvalue(x, index_list(index_min_max(2, 2), index_uni(2)));
+  EXPECT_EQ(1, y.size());
+  EXPECT_FLOAT_EQ(1.1, y[0]);
+  test_out_of_range(x, index_list(index_min_max(0, 2), index_uni(2)));
+  test_out_of_range(x, index_list(index_min_max(2, 12), index_uni(2)));
+  test_out_of_range(x, index_list(index_min_max(2, 2), index_uni(0)));
+  test_out_of_range(x, index_list(index_min_max(2, 2), index_uni(15)));
+
+  y = rvalue(x, index_list(index_omni(), index_uni(3)));
+  EXPECT_EQ(3, y.size());
+  EXPECT_FLOAT_EQ(0.2, y[0]);
+  EXPECT_FLOAT_EQ(1.2, y[1]);
+  EXPECT_FLOAT_EQ(2.2, y[2]);
+  test_out_of_range(x, index_list(index_omni(), index_uni(0)));
+  test_out_of_range(x, index_list(index_omni(), index_uni(10)));
+
+  vector<int> ns;
+  ns.push_back(3);
+  ns.push_back(1);
+  y = rvalue(x, index_list(index_multi(ns), index_uni(1)));
+  EXPECT_EQ(2, y.size());
+  EXPECT_FLOAT_EQ(2.0, y[0]);
+  EXPECT_FLOAT_EQ(0.0, y[1]);
+
+  ns.push_back(0);
+  test_out_of_range(x, index_list(index_multi(ns), index_uni(1)));
+
+  ns[ns.size() - 1] = 15;
+  test_out_of_range(x, index_list(index_multi(ns), index_uni(1)));
+}
+
+TEST(ModelIndexing, rvalue_doubless_multi_uni_eigen) {
+  using std::vector;
+  Eigen::MatrixXd x(3, 3);
+  x << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2;
+  Eigen::VectorXd y = rvalue(x, index_list(index_min(2), index_uni(1)));
   EXPECT_EQ(2, y.size());
   EXPECT_FLOAT_EQ(1.0, y[0]);
   EXPECT_FLOAT_EQ(2.0, y[1]);
@@ -390,6 +516,23 @@ TEST(ModelIndexing, rvalue_doubless_multi_multi) {
   test_out_of_range(x, index_list(index_max(20), index_min(2)));
   test_out_of_range(x, index_list(index_max(2), index_min(0)));
 }
+
+TEST(ModelIndexing, rvalue_doubless_multi_multi_eigen) {
+  Eigen::MatrixXd x(3, 3);
+  x << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2;
+
+  Eigen::MatrixXd y = rvalue(x, index_list(index_max(2), index_min(2)));
+  EXPECT_EQ(4, y.size());
+  EXPECT_EQ(2, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(0.1, y(0, 0));
+  EXPECT_FLOAT_EQ(0.2, y(0, 1));
+  EXPECT_FLOAT_EQ(1.1, y(1, 0));
+  EXPECT_FLOAT_EQ(1.2, y(1, 1));
+  test_out_of_range(x, index_list(index_max(20), index_min(2)));
+  test_out_of_range(x, index_list(index_max(2), index_min(0)));
+}
+
 
 template <typename T>
 void vector_uni_test() {

@@ -331,9 +331,9 @@ inline auto rvalue(
   math::check_range("matrix[min_max, min_max] max row indexing", name,
                     mat.rows(), idx.head_.min_);
   math::check_range("matrix[min_max, min_max] min column indexing", name,
-                    mat.rows(), idx.tail_.head_.min_);
+                    mat.cols(), idx.tail_.head_.min_);
   math::check_range("matrix[min_max, min_max] max column indexing", name,
-                    mat.rows(), idx.tail_.head_.min_);
+                    mat.cols(), idx.tail_.head_.min_);
   if (idx.head_.min_ <= idx.head_.max_) {
     if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
       return mat
@@ -346,7 +346,7 @@ inline auto rvalue(
           .block(idx.head_.min_ - 1, idx.tail_.head_.max_ - 1,
                  idx.head_.max_ - (idx.head_.min_ - 1),
                  idx.tail_.head_.min_ - (idx.tail_.head_.max_ - 1))
-          .colwise()
+          .rowwise()
           .reverse()
           .eval();
     }
@@ -356,7 +356,7 @@ inline auto rvalue(
           .block(idx.head_.max_ - 1, idx.tail_.head_.min_ - 1,
                  idx.head_.min_ - (idx.head_.max_ - 1),
                  idx.tail_.head_.max_ - (idx.tail_.head_.min_ - 1))
-          .rowwise()
+          .colwise()
           .reverse()
           .eval();
     } else {

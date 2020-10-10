@@ -301,33 +301,48 @@ inline void assign(
     const cons_index_list<index_min_max,
                           cons_index_list<index_min_max, nil_index_list>>& idxs,
     const Mat2& y, const char* name = "ANON", int depth = 0) {
-  const int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
-  const int x_idx_cols = rvalue_index_size(idxs.tail_.head_, x.cols());
-  math::check_size_match("matrix[multi] assign row sizes", "lhs", x_idx_rows,
-                         name, y.rows());
-  math::check_size_match("matrix[multi] assign col sizes", "lhs", x_idx_cols,
-                         name, y.cols());
   if (idxs.head_.min_ <= idxs.head_.max_) {
     if (idxs.tail_.head_.min_ <= idxs.tail_.head_.max_) {
+       auto row_size = idxs.head_.max_ - (idxs.head_.min_ - 1);
+       auto col_size = idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1);
+      math::check_size_match("matrix[min_max, min_max] assign row sizes", "lhs", row_size,
+                             name, y.rows());
+      math::check_size_match("matrix[min_max, min_max] assign col sizes", "lhs", col_size,
+                             name, y.cols());
       x.block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1,
-              idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1)
+             row_size, col_size)
           = y;
       return;
     } else {
-      x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1,
-              idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1)
-          = y.colwise().reverse();
+      auto row_size = idxs.head_.max_ - (idxs.head_.min_ - 1);
+      auto col_size = idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1);
+      math::check_size_match("matrix[min_max, reverse_min_max] assign row sizes", "lhs", row_size,
+                             name, y.rows());
+      math::check_size_match("matrix[min_max, reverse_min_max] assign col sizes", "lhs", col_size,
+                             name, y.cols());
+      x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1, row_size, col_size).rowwise().reverse()
+          = y;
       return;
     }
   } else {
     if (idxs.tail_.head_.min_ <= idxs.tail_.head_.max_) {
-      x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1,
-              idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1)
-          = y.rowwise().reverse();
+      auto row_size = idxs.head_.min_ - (idxs.head_.max_ - 1);
+      auto col_size = idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1);
+      math::check_size_match("matrix[reverse_min_max, min_max] assign row sizes", "lhs", row_size,
+                             name, y.rows());
+      math::check_size_match("matrix[reverse_min_max, min_max] assign col sizes", "lhs", col_size,
+                             name, y.cols());
+      x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1, row_size, col_size)
+          = y.colwise().reverse();
       return;
     } else {
-      x.block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1,
-              idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1)
+      auto row_size = idxs.head_.min_ - (idxs.head_.max_ - 1);
+      auto col_size = idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1);
+      math::check_size_match("matrix[reverse_min_max, reverse_min_max] assign row sizes", "lhs", row_size,
+                             name, y.rows());
+      math::check_size_match("matrix[reverse_min_max, reverse_min_max] assign col sizes", "lhs", col_size,
+                             name, y.cols());
+      x.block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1, row_size, col_size)
           = y.reverse();
       return;
     }
