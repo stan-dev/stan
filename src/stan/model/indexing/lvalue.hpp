@@ -44,10 +44,8 @@ inline void assign(T&& x, const nil_index_list& /* idxs */, U&& y,
  * @param[in] name name of lvalue variable (default "ANON").
  * @param[in] depth indexing depth (default 0).
  */
-template <typename T, typename U, require_std_vector_t<U>* = nullptr,
-          require_not_t<
-              std::is_assignable<std::decay_t<T>&, std::decay_t<U>>>* = nullptr,
-          require_std_vector_t<T>* = nullptr>
+template <typename T, typename U, require_all_std_vector_t<T, U>* = nullptr,
+          require_not_t<std::is_assignable<std::decay_t<T>&, std::decay_t<U>>>* = nullptr>
 inline void assign(T&& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x.resize(y.size());
@@ -97,8 +95,7 @@ inline void assign(Vec1&& x,
  * the indexed size.
  */
 template <typename Vec1, typename Vec2, typename I,
-          require_all_eigen_vector_t<Vec1, Vec2>* = nullptr,
-          require_same_t<std::decay_t<I>, I>* = nullptr>
+          require_all_eigen_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x, const cons_index_list<I, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
   const auto& y_ref = stan::math::to_ref(y);
@@ -264,8 +261,7 @@ inline void assign(
  */
 template <
     typename Mat1, typename I, typename Mat2,
-    stan::internal::require_all_eigen_dense_dynamic_t<Mat2, Mat2>* = nullptr,
-    require_same_t<std::decay_t<I>, I>* = nullptr>
+    stan::internal::require_all_eigen_dense_dynamic_t<Mat2, Mat2>* = nullptr>
 inline void assign(Mat1&& x, const cons_index_list<I, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
   const int x_idx_rows = rvalue_index_size(idxs.head_, x.rows());
@@ -416,8 +412,7 @@ inline void assign(
  */
 template <typename Mat, typename I, typename RowVec,
           stan::internal::require_eigen_dense_dynamic_t<Mat>* = nullptr,
-          require_eigen_row_vector_t<RowVec>* = nullptr,
-          require_same_t<std::decay_t<I>, I>* = nullptr>
+          require_eigen_row_vector_t<RowVec>* = nullptr>
 inline void assign(
     Mat&& x,
     const cons_index_list<index_uni, cons_index_list<I, nil_index_list>>& idxs,
@@ -456,8 +451,7 @@ inline void assign(
  */
 template <typename Mat, typename I, typename ColVec,
           stan::internal::require_eigen_dense_dynamic_t<Mat>* = nullptr,
-          require_eigen_col_vector_t<ColVec>* = nullptr,
-          require_same_t<std::decay_t<I>, I>* = nullptr>
+          require_eigen_col_vector_t<ColVec>* = nullptr>
 inline void assign(
     Mat&& x,
     const cons_index_list<I, cons_index_list<index_uni, nil_index_list>>& idxs,
@@ -496,9 +490,7 @@ inline void assign(
  */
 template <
     typename Mat1, typename I1, typename I2, typename Mat2,
-    stan::internal::require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr,
-    require_same_t<std::decay_t<I1>, I1>* = nullptr,
-    require_same_t<std::decay_t<I2>, I2>* = nullptr>
+    stan::internal::require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idxs,
@@ -544,8 +536,7 @@ inline void assign(
  * tail assignment.
  */
 template <typename StdVec, typename L, typename U,
-          require_std_vector_t<StdVec>* = nullptr,
-          require_same_t<std::decay_t<L>, L>* = nullptr>
+          require_std_vector_t<StdVec>* = nullptr>
 inline void assign(StdVec&& x, const cons_index_list<index_uni, L>& idxs, U&& y,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("vector[uni,...] assign range", name, x.size(),
@@ -578,9 +569,7 @@ inline void assign(StdVec&& x, const cons_index_list<index_uni, L>& idxs, U&& y,
  * the recursive tail assignment dimensions do not match.
  */
 template <typename T, typename I, typename L, typename U,
-          require_all_std_vector_t<T, U>* = nullptr,
-          require_same_t<std::decay_t<I>, I>* = nullptr,
-          require_same_t<std::decay_t<L>, L>* = nullptr>
+          require_all_std_vector_t<T, U>* = nullptr>
 inline void assign(T&& x, const cons_index_list<I, L>& idxs, U&& y,
                    const char* name = "ANON", int depth = 0) {
   int x_idx_size = rvalue_index_size(idxs.head_, x.size());
