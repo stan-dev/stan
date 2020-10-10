@@ -239,7 +239,7 @@ inline auto rvalue(EigVec&& v,
                     idx.head_.min_);
   math::check_range("vector[min_max] max indexing", name, v.size(),
                     idx.head_.max_);
-  if (idx.head_.min_ <= idx.head_.max_) {
+  if (idx.head_.positive_idx_) {
     return v.segment(idx.head_.min_ - 1, idx.head_.max_ - (idx.head_.min_ - 1))
         .eval();
   } else {
@@ -270,7 +270,7 @@ inline plain_type_t<EigMat> rvalue(
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi] indexing", name, a.rows(), idx.head_.min_);
   math::check_range("matrix[multi] indexing", name, a.rows(), idx.head_.max_);
-  if (idx.head_.min_ <= idx.head_.max_) {
+  if (idx.head_.positive_idx_) {
     return a
         .block(idx.head_.min_ - 1, 0, idx.head_.max_ - (idx.head_.min_ - 1),
                a.cols())
@@ -310,7 +310,7 @@ inline auto rvalue(
                     idx.tail_.head_.min_);
   math::check_range("matrix[multi] indexing", name, a.rows(),
                     idx.tail_.head_.max_);
-  if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
+  if (idx.tail_.head_.positive_idx_) {
     return deep_copy(
         rvalue(a.block(0, idx.tail_.head_.min_ - 1, a.rows(),
                        idx.tail_.head_.max_ - (idx.tail_.head_.min_ - 1)),
@@ -380,8 +380,8 @@ inline auto rvalue(
                     mat.cols(), idx.tail_.head_.min_);
   math::check_range("matrix[min_max, min_max] max column indexing", name,
                     mat.cols(), idx.tail_.head_.min_);
-  if (idx.head_.min_ <= idx.head_.max_) {
-    if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
+  if (idx.head_.positive_idx_) {
+    if (idx.tail_.head_.positive_idx_) {
       return mat
           .block(idx.head_.min_ - 1, idx.tail_.head_.min_ - 1,
                  idx.head_.max_ - (idx.head_.min_ - 1),
@@ -397,7 +397,7 @@ inline auto rvalue(
           .eval();
     }
   } else {
-    if (idx.tail_.head_.min_ <= idx.tail_.head_.max_) {
+    if (idx.tail_.head_.positive_idx_) {
       return mat
           .block(idx.head_.max_ - 1, idx.tail_.head_.min_ - 1,
                  idx.head_.min_ - (idx.head_.max_ - 1),

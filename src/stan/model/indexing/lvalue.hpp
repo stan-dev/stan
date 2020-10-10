@@ -135,7 +135,7 @@ inline void assign(Vec1&& x,
                     idxs.head_.min_);
   math::check_range("vector[min_max] max assign", name, x.size(),
                     idxs.head_.max_);
-  if (idxs.head_.min_ <= idxs.head_.max_) {
+  if (idxs.head_.positive_idx_) {
     math::check_size_match("vector[min_max] assign sizes", "lhs and rhs",
                            idxs.head_.max_ - 1, name, y.size());
     x.segment(idxs.head_.min_ - 1, idxs.head_.max_ - 1) = y;
@@ -303,8 +303,8 @@ inline void assign(
     const cons_index_list<index_min_max,
                           cons_index_list<index_min_max, nil_index_list>>& idxs,
     const Mat2& y, const char* name = "ANON", int depth = 0) {
-  if (idxs.head_.min_ <= idxs.head_.max_) {
-    if (idxs.tail_.head_.min_ <= idxs.tail_.head_.max_) {
+  if (idxs.head_.positive_idx_) {
+    if (idxs.tail_.head_.positive_idx_) {
       auto row_size = idxs.head_.max_ - (idxs.head_.min_ - 1);
       auto col_size = idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1);
       math::check_size_match("matrix[min_max, min_max] assign row sizes", "lhs",
@@ -332,7 +332,7 @@ inline void assign(
       return;
     }
   } else {
-    if (idxs.tail_.head_.min_ <= idxs.tail_.head_.max_) {
+    if (idxs.tail_.head_.positive_idx_) {
       auto row_size = idxs.head_.min_ - (idxs.head_.max_ - 1);
       auto col_size = idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1);
       math::check_size_match(

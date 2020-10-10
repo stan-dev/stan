@@ -87,7 +87,7 @@ struct index_max {
 struct index_min_max {
   int min_;
   int max_;
-
+  bool positive_idx_{true}; // If true min <= max
   /**
    * Construct an indexing from the specified minimum index
    * (inclusive) and maximum index (inclusive).
@@ -95,7 +95,7 @@ struct index_min_max {
    * @param min minimum index (inclusive).
    * @param max maximum index (inclusive).
    */
-  explicit constexpr index_min_max(int min, int max) : min_(min), max_(max) {}
+  explicit constexpr index_min_max(int min, int max) : min_(min), max_(max), positive_idx_(min <= max) {}
 };
 
 }  // namespace model
