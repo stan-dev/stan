@@ -673,7 +673,7 @@ inline auto rvalue(StdVec&& c, const cons_index_list<I, L>& idx,
   for (int i = 0; i < index_size; ++i) {
     int n = rvalue_at(i, idx.head_);
     math::check_range("array[multi,...] index", name, c.size(), n);
-    result.push_back(rvalue(c[n - 1], idx.tail_, name, depth + 1));
+    result.emplace_back(rvalue(c[n - 1], idx.tail_, name, depth + 1));
   }
   return result;
 }
