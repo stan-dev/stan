@@ -789,7 +789,6 @@ TEST(ModelIndexing, rvalueMatrixMulti) {
   test_out_of_range(m.array(), index_list(index_min_max(0, 3)));
   test_out_of_range(m.array(), index_list(index_min_max(2, 15)));
 
-
   a = rvalue(m, index_list(index_omni()));
   EXPECT_EQ(4, a.rows());
   EXPECT_EQ(3, a.cols());
