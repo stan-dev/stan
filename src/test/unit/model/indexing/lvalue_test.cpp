@@ -459,22 +459,30 @@ TEST(ModelIndexing, lvalueMatrixUniMulti) {
 
   RowVectorXd y(3);
   y << 10, 11, 12;
-
+  puts("1");
   assign(x, index_list(index_uni(2), index_min_max(2, 4)), y);
   EXPECT_FLOAT_EQ(y(0), x(1, 1));
   EXPECT_FLOAT_EQ(y(1), x(1, 2));
   EXPECT_FLOAT_EQ(y(2), x(1, 3));
 
+  puts("2");
   test_throw(x, index_list(index_uni(0), index_min_max(2, 4)), y);
+  puts("3");
   test_throw(x, index_list(index_uni(5), index_min_max(2, 4)), y);
+  puts("4");
   test_throw(x, index_list(index_uni(2), index_min_max(0, 2)), y);
+  puts("5");
   test_throw_ia(x, index_list(index_uni(2), index_min_max(2, 5)), y);
 
   vector<int> ns;
   ns.push_back(4);
   ns.push_back(1);
   ns.push_back(3);
+  puts("6");
+  std::cout << "\nx: \n" << x << "\n";
   assign(x, index_list(index_uni(3), index_multi(ns)), y);
+  std::cout << "\nnewx: \n" << x << "\n";
+  std::cout << "\ny: \n" << y << "\n";
   EXPECT_FLOAT_EQ(y(0), x(2, 3));
   EXPECT_FLOAT_EQ(y(1), x(2, 0));
   EXPECT_FLOAT_EQ(y(2), x(2, 2));
@@ -495,7 +503,7 @@ TEST(ModelIndexing, lvalueMatrixMultiUni) {
 
   VectorXd y(2);
   y << 10, 11;
-
+  puts("get1");
   assign(x, index_list(index_min_max(2, 3), index_uni(4)), y);
   EXPECT_FLOAT_EQ(y(0), x(1, 3));
   EXPECT_FLOAT_EQ(y(1), x(2, 3));
@@ -508,6 +516,7 @@ TEST(ModelIndexing, lvalueMatrixMultiUni) {
   vector<int> ns;
   ns.push_back(3);
   ns.push_back(1);
+  puts("get2");
   assign(x, index_list(index_multi(ns), index_uni(3)), y);
   EXPECT_FLOAT_EQ(y(0), x(2, 2));
   EXPECT_FLOAT_EQ(y(1), x(0, 2));
@@ -528,7 +537,6 @@ TEST(ModelIndexing, lvalueMatrixMultiMulti) {
 
   MatrixXd y(2, 3);
   y << 10, 11, 12, 20, 21, 22;
-
   assign(x, index_list(index_min_max(2, 3), index_min(2)), y);
   EXPECT_FLOAT_EQ(y(0, 0), x(1, 1));
   EXPECT_FLOAT_EQ(y(0, 1), x(1, 2));
@@ -639,6 +647,24 @@ TEST(ModelIndexing, resultSizeNegIndexing) {
   EXPECT_EQ(0, lhs.size());
 }
 
+TEST(ModelIndexing, resultSizeIndexingEigen) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::VectorXd lhs(5);
+  lhs << 1, 2, 3, 4, 5;
+  Eigen::VectorXd rhs(4);
+  rhs << 4, 3, 2, 1;
+  assign(lhs, cons_list(index_min_max(1, 4), nil_index_list()), rhs);
+  EXPECT_FLOAT_EQ(lhs(0), 4);
+  EXPECT_FLOAT_EQ(lhs(1), 3);
+  EXPECT_FLOAT_EQ(lhs(2), 2);
+  EXPECT_FLOAT_EQ(lhs(3), 1);
+  EXPECT_FLOAT_EQ(lhs(4), 5);
+}
+
 TEST(ModelIndexing, resultSizeNegIndexingEigen) {
   using stan::model::assign;
   using stan::model::cons_list;
@@ -647,13 +673,13 @@ TEST(ModelIndexing, resultSizeNegIndexingEigen) {
   using std::vector;
   Eigen::VectorXd lhs(5);
   lhs << 1, 2, 3, 4, 5;
-  Eigen::VectorXd rhs(3);
-  rhs << 1, 2, 3;
+  Eigen::VectorXd rhs(4);
+  rhs << 1, 2, 3, 4;
   assign(lhs, cons_list(index_min_max(4, 1), nil_index_list()), rhs);
-  EXPECT_FLOAT_EQ(lhs(0), 3);
-  EXPECT_FLOAT_EQ(lhs(1), 2);
-  EXPECT_FLOAT_EQ(lhs(2), 1);
-  EXPECT_FLOAT_EQ(lhs(3), 4);
+  EXPECT_FLOAT_EQ(lhs(0), 4);
+  EXPECT_FLOAT_EQ(lhs(1), 3);
+  EXPECT_FLOAT_EQ(lhs(2), 2);
+  EXPECT_FLOAT_EQ(lhs(3), 1);
   EXPECT_FLOAT_EQ(lhs(4), 5);
 }
 
@@ -943,7 +969,6 @@ TEST(model_indexing, assign_densemat_eigrowvec_uni_index_min_max_index) {
 
   RowVectorXd y(3);
   y << 10, 11, 12;
-
   assign(x, index_list(index_uni(2), index_min_max(2, 4)), y);
   EXPECT_FLOAT_EQ(y(0), x(1, 1));
   EXPECT_FLOAT_EQ(y(1), x(1, 2));
