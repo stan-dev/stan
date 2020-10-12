@@ -249,6 +249,13 @@ pipeline {
                 }
                 stage('Integration Windows') {
                     agent { label 'windows' }
+                    when { 
+                        expression { 
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ) &&
+                            !skipRemainingStages 
+                        }
+                    }
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
