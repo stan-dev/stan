@@ -20,13 +20,13 @@ else ifeq ($(OS),Linux)
 endif
 
 ifneq ($(STANC3),)
-  
+
   # build stanc3 from local installation
   bin/stanc$(EXE) : $(call findfiles,$(STANC3)/src/,*.ml*) $(STANC#)
 	@mkdir -p $(dir $@)
 	cd $(STANC3) && echo "--- Rebuilding stanc ---\n" && dune build @install
 	cp $(STANC3)/_build/default/src/stanc/stanc.exe $@
-	
+
 else ifneq ($(STANC3_TEST_BIN_URL),)
 
 # download stanc3 build from specific branch
