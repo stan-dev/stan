@@ -22,7 +22,7 @@ struct index_uni {
    *
    * @param n single index.
    */
-  explicit constexpr index_uni(int n) : n_(n) {}
+  explicit constexpr index_uni(int n) noexcept : n_(n) {}
 };
 
 // MULTIPLE INDEXING (does not reduce dimensionality)
@@ -40,7 +40,7 @@ struct index_multi {
    * @param ns multiple indexes.
    */
   template <typename T, require_std_vector_vt<std::is_integral, T>* = nullptr>
-  explicit constexpr index_multi(T&& ns) : ns_(std::forward<T>(ns)) {}
+  explicit constexpr index_multi(T&& ns) noexcept : ns_(std::forward<T>(ns)) {}
 };
 
 /**
@@ -61,7 +61,7 @@ struct index_min {
    *
    * @param min minimum index (inclusive).
    */
-  explicit constexpr index_min(int min) : min_(min) {}
+  explicit constexpr index_min(int min) noexcept : min_(min) {}
 };
 
 /**
@@ -77,7 +77,7 @@ struct index_max {
    *
    * @param max maximum index (inclusive).
    */
-  explicit constexpr index_max(int max) : max_(max) {}
+  explicit constexpr index_max(int max) noexcept : max_(max) {}
 };
 
 /**
@@ -87,7 +87,10 @@ struct index_max {
 struct index_min_max {
   int min_;
   int max_;
-  bool positive_idx_{true};  // If true min <= max
+  /**
+   * Return whether the index is positive or negative
+   */
+  bool is_positive_idx() const { return min_ <= max_; }
   /**
    * Construct an indexing from the specified minimum index
    * (inclusive) and maximum index (inclusive).
@@ -95,8 +98,7 @@ struct index_min_max {
    * @param min minimum index (inclusive).
    * @param max maximum index (inclusive).
    */
-  explicit constexpr index_min_max(int min, int max)
-      : min_(min), max_(max), positive_idx_(min <= max) {}
+  constexpr index_min_max(int min, int max) noexcept : min_(min), max_(max) {}
 };
 
 }  // namespace model
