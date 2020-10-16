@@ -90,7 +90,7 @@ struct index_min_max {
   /**
    * Return whether the index is positive or negative
    */
-  bool is_positive_idx() const { return min_ <= max_; }
+  bool is_ascending() const { return min_ <= max_; }
   /**
    * Construct an indexing from the specified minimum index
    * (inclusive) and maximum index (inclusive).
