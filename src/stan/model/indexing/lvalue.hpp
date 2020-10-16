@@ -173,7 +173,8 @@ inline void assign(Vec1&& x,
  */
 template <typename Vec1, typename Vec2,
           require_all_eigen_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x, const cons_index_list<index_min, nil_index_list>& idxs,
+inline void assign(Vec1&& x,
+                   const cons_index_list<index_min, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_range("vector[min] assign range", name, x.size(),
                           idxs.head_.min_);
@@ -200,7 +201,8 @@ inline void assign(Vec1&& x, const cons_index_list<index_min, nil_index_list>& i
  */
 template <typename Vec1, typename Vec2,
           require_all_eigen_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x, const cons_index_list<index_max, nil_index_list>& idxs,
+inline void assign(Vec1&& x,
+                   const cons_index_list<index_max, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_range("vector[min] assign range", name, x.size(),
                           idxs.head_.max_);
@@ -226,14 +228,13 @@ inline void assign(Vec1&& x, const cons_index_list<index_max, nil_index_list>& i
  */
 template <typename Vec1, typename Vec2,
           require_all_eigen_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x, const cons_index_list<index_omni, nil_index_list>& idxs,
+inline void assign(Vec1&& x,
+                   const cons_index_list<index_omni, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_size_match("vector[min] assign sizes", "lhs",
-                               x.size(), name, y.size());
+  stan::math::check_size_match("vector[min] assign sizes", "lhs", x.size(),
+                               name, y.size());
   x = y;
 }
-
-
 
 /**
  * Assign a row vector to a row of an eigen matrix.
@@ -319,10 +320,10 @@ template <
 inline void assign(Mat1&& x,
                    const cons_index_list<index_omni, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_size_match("matrix[max] assign row sizes", "lhs",
-                               x.rows(), name, y.rows());
+  stan::math::check_size_match("matrix[max] assign row sizes", "lhs", x.rows(),
+                               name, y.rows());
   stan::math::check_size_match("matrix[max] assign column sizes", "lhs",
-                                x.cols(), name, y.cols());
+                               x.cols(), name, y.cols());
   x = y;
 }
 
@@ -593,8 +594,7 @@ inline void assign(
   for (int i = 0; i < idxs.tail_.head_.ns_.size(); ++i) {
     stan::math::check_range("matrix[uni, multi] assign range", name, x.cols(),
                             idxs.tail_.head_.ns_[i]);
-    x.coeffRef(idxs.head_.n_ - 1, idxs.tail_.head_.ns_[i] - 1)
-        = y_ref.coeff(i);
+    x.coeffRef(idxs.head_.n_ - 1, idxs.tail_.head_.ns_[i] - 1) = y_ref.coeff(i);
   }
 }
 
@@ -666,7 +666,8 @@ inline void assign(
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_range("matrix[multi, uni] assign range", name, x.cols(),
                           idxs.tail_.head_.n_);
-  assign(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), y_ref, name, depth + 1);
+  assign(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), y_ref, name,
+         depth + 1);
 }
 
 /**
@@ -791,8 +792,7 @@ inline void assign(
   const auto col_size = x.cols() - start_col;
   stan::math::check_size_match("matrix[..., min] assign col sizes", "lhs",
                                col_size, name, y.cols());
-  assign(x.rightCols(col_size), index_list(idxs.head_), y,
-         name, depth + 1);
+  assign(x.rightCols(col_size), index_list(idxs.head_), y, name, depth + 1);
 }
 
 /**
@@ -822,8 +822,8 @@ inline void assign(
     const Mat2& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_size_match("matrix[..., max] assign col size", "lhs",
                                idxs.tail_.head_.max_, name, y.cols());
-  assign(x.leftCols(idxs.tail_.head_.max_ - 1),
-         index_list(idxs.head_), y, name, depth + 1);
+  assign(x.leftCols(idxs.tail_.head_.max_ - 1), index_list(idxs.head_), y, name,
+         depth + 1);
 }
 
 /**
@@ -858,8 +858,8 @@ inline void assign(
                             idxs.tail_.head_.max_, x.cols());
     stan::math::check_size_match("matrix[..., min_max] assign col size", "lhs",
                                  idxs.tail_.head_.max_, name, x.cols());
-    assign(x.middleCols(col_start, col_size), index_list(idxs.head_), y,
-           name, depth + 1);
+    assign(x.middleCols(col_start, col_size), index_list(idxs.head_), y, name,
+           depth + 1);
     return;
   } else {
     const auto col_start = idxs.tail_.head_.max_ - 1;
@@ -945,7 +945,7 @@ inline void assign(StdVec&& x, const cons_index_list<index_uni, Idx>& idxs,
  * tail assignment.
  */
 template <typename StdVec, typename U, require_std_vector_t<StdVec>* = nullptr,
- require_t<std::is_assignable<value_type_t<StdVec>&, U>>* = nullptr>
+          require_t<std::is_assignable<value_type_t<StdVec>&, U>>* = nullptr>
 inline void assign(StdVec&& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    U&& y, const char* name = "ANON", int depth = 0) {
