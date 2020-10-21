@@ -668,8 +668,8 @@ inline void assign(
     Mat2&& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_range("matrix[..., uni] assign range", name, x.cols(),
                           idxs.tail_.head_.n_);
-  assign(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), y,
-   name, depth + 1);
+  assign(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), y, name,
+         depth + 1);
   return;
 }
 
