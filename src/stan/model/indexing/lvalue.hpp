@@ -563,7 +563,7 @@ inline void assign(
 }
 
 /**
- * assign multiple possibly unordered cells of row vector to a row of an eigen
+ * Assign multiple possibly unordered cells of row vector to a row of an eigen
  * matrix.
  *
  * Types:  mat[uni, multi] = row_vector
@@ -600,7 +600,7 @@ inline void assign(
 }
 
 /**
- * assign to multiple possibly unordered cell's of a matrix from an input
+ * Assign to multiple possibly unordered cell's of a matrix from an input
  * matrix.
  *
  * Types:  mat[multi, multi] = mat
@@ -648,7 +648,7 @@ inline void assign(
  * Types:  mat[Idx, uni] = mat
  *
  * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat2 Eigen type
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Container holding row index and a min_max index.
@@ -668,8 +668,8 @@ inline void assign(
     Mat2&& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_range("matrix[..., uni] assign range", name, x.cols(),
                           idxs.tail_.head_.n_);
-  assign(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_),
-         std::forward<Mat2>(y), name, depth + 1);
+  assign(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), y,
+   name, depth + 1);
   return;
 }
 
@@ -679,7 +679,7 @@ inline void assign(
  * Types:  mat[Idx, multi] = mat
  *
  * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat2 Eigen type
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Pair of multiple indexes (from 1).
@@ -714,7 +714,7 @@ inline void assign(
  * Types:  mat[Idx, omni] = mat
  *
  * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat2 Eigen type
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Pair of multiple indexes (from 1).
@@ -732,7 +732,7 @@ inline void assign(
     const cons_index_list<Idx, cons_index_list<index_omni, nil_index_list>>&
         idxs,
     Mat2&& y, const char* name = "ANON", int depth = 0) {
-  assign(x, index_list(idxs.head_), std::forward<Mat2>(y), name, depth + 1);
+  assign(x, index_list(idxs.head_), y, name, depth + 1);
 }
 
 /**
@@ -741,7 +741,7 @@ inline void assign(
  * Types:  mat[Idx, min] = mat
  *
  * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat2 Eigen type
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Container holding a row index and an index from a minimum
@@ -773,7 +773,7 @@ inline void assign(
  * Types:  mat[Idx, max] = mat
  *
  * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat2 Eigen type
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Index holding a row index and an index from the start of the
@@ -804,7 +804,7 @@ inline void assign(
  * Types:  mat[Idx, min_max] = mat
  *
  * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat2 Eigen type
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Container holding row index and a min_max index.
@@ -867,8 +867,14 @@ template <typename T, typename U, require_all_std_vector_t<T, U>* = nullptr,
 inline void assign(T&& x, const nil_index_list& /* idxs */, U&& y,
                    const char* name = "ANON", int depth = 0) {
   x.resize(y.size());
-  for (size_t i = 0; i < y.size(); ++i) {
-    assign(x[i], nil_index_list(), y[i], name, depth + 1);
+  if (std::is_rvalue_reference<U>::value) {
+    for (size_t i = 0; i < y.size(); ++i) {
+      assign(x[i], nil_index_list(), std::move(y[i]), name, depth + 1);
+    }
+  } else {
+    for (size_t i = 0; i < y.size(); ++i) {
+      assign(x[i], nil_index_list(), y[i], name, depth + 1);
+    }
   }
 }
 
@@ -958,7 +964,11 @@ inline void assign(T&& x, const cons_index_list<Idx1, Idx2>& idxs, U&& y,
     int i = rvalue_at(n, idxs.head_);
     stan::math::check_range("vector[multi,...] assign range", name, x.size(),
                             i);
-    assign(x[i - 1], idxs.tail_, y[n], name, depth + 1);
+    if (std::is_rvalue_reference<U>::value) {
+      assign(x[i - 1], idxs.tail_, std::move(y[n]), name, depth + 1);
+    } else {
+      assign(x[i - 1], idxs.tail_, y[n], name, depth + 1);
+    }
   }
 }
 
