@@ -114,7 +114,6 @@ STANC_TESTS := $(patsubst src/%.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 $(STANC_TESTS_O) : test/libstanc.a
 $(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
 
-
 ############################################################
 ##
 # Target to verify header files within Stan has
@@ -233,9 +232,9 @@ $(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/
 # Generate C++ from Stan standalone functions
 ##
 TEST_FUNCTIONS = $(call findfiles,src/test/test-models,*.stanfuncs)
-$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs test/test-models/stanc2$(EXE)
+$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs $(TEST_STANC)
 	@mkdir -p $(dir $@)
-	$(WINE) test/test-models/stanc2$(EXE) $< --o=$@
+	$(WINE) $(TEST_STANC) --standalone-functions $< --o=$@
 
 ##
 # src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.
