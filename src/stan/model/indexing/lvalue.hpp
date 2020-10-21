@@ -794,7 +794,7 @@ inline void assign(
     const Mat2& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_size_match("matrix[..., max] assign col size", "lhs",
                                idxs.tail_.head_.max_, name, y.cols());
-  assign(x.leftCols(idxs.tail_.head_.max_ - 1), index_list(idxs.head_), y, name,
+  assign(x.leftCols(idxs.tail_.head_.max_), index_list(idxs.head_), y, name,
          depth + 1);
 }
 
