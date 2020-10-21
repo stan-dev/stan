@@ -351,8 +351,7 @@ template <
 inline void assign(Mat1&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
-  const auto start_row = idxs.head_.min_ - 1;
-  const auto row_size = x.rows() - start_row;
+  const auto row_size = x.rows() - (idxs.head_.min_ - 1);
   stan::math::check_range("matrix[min] assign range", name, x.rows(), row_size);
   stan::math::check_size_match("matrix[min] assign row sizes", "lhs", row_size,
                                name, y.rows());
@@ -794,7 +793,7 @@ inline void assign(
     const Mat2& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_size_match("matrix[..., max] assign col size", "lhs",
                                idxs.tail_.head_.max_, name, y.cols());
-  assign(x.leftCols(idxs.tail_.head_.max_ - 1), index_list(idxs.head_), y, name,
+  assign(x.leftCols(idxs.tail_.head_.max_), index_list(idxs.head_), y, name,
          depth + 1);
 }
 

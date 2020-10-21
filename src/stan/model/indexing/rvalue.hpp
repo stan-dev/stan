@@ -288,7 +288,7 @@ inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
  const auto row_size = x.rows() - (idxs.head_.min_ - 1);
-  math::check_range("matrix[min] indexing", name, x.rows(), idxs.head_.min_);
+  math::check_range("matrix[min] indexing", name, x.rows(), row_size);
   return x.bottomRows(row_size).eval();
 }
 
