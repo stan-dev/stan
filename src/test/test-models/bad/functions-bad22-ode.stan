@@ -17,7 +17,7 @@ functions {
 
   real[,] do_integration(real[] y0, real t0, real[] ts, real[] theta, matrix xmat_r, real[] x_r) {
     matrix[2,2] xmat_sub_r;
-    xmat_sub_r <- block(xmat_r, 1, 1, 2, 2);
+    xmat_sub_r = block(xmat_r, 1, 1, 2, 2);
     return(do_integration_nested(y0, t0, ts, theta, xmat_sub_r));
   }
 }

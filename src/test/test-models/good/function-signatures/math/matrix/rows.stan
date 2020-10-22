@@ -9,12 +9,12 @@ transformed data {
   int transformed_data_int;
   real transformed_data_real;
 
-  transformed_data_int <- rows(d_vector);
-  transformed_data_int <- rows(d_row_vector);
-  transformed_data_int <- rows(d_matrix);
-  transformed_data_real <- rows(d_vector);
-  transformed_data_real <- rows(d_row_vector);
-  transformed_data_real <- rows(d_matrix);
+  transformed_data_int = rows(d_vector);
+  transformed_data_int = rows(d_row_vector);
+  transformed_data_int = rows(d_matrix);
+  transformed_data_real = rows(d_vector);
+  transformed_data_real = rows(d_row_vector);
+  transformed_data_real = rows(d_matrix);
 }
 parameters {
   real y_p;
@@ -25,12 +25,12 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- rows(d_vector);
-  transformed_param_real <- rows(d_row_vector);
-  transformed_param_real <- rows(d_matrix);
-  transformed_param_real <- rows(p_vector);
-  transformed_param_real <- rows(p_row_vector);
-  transformed_param_real <- rows(p_matrix);
+  transformed_param_real = rows(d_vector);
+  transformed_param_real = rows(d_row_vector);
+  transformed_param_real = rows(d_matrix);
+  transformed_param_real = rows(p_vector);
+  transformed_param_real = rows(p_row_vector);
+  transformed_param_real = rows(p_matrix);
 }
 model {  
   y_p ~ normal(0,1);

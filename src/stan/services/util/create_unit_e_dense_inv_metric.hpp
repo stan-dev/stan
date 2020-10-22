@@ -2,7 +2,7 @@
 #define STAN_SERVICES_UTIL_CREATE_UNIT_E_DENSE_INV_METRIC_HPP
 
 #include <stan/io/dump.hpp>
-#include <Eigen/Dense>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <sstream>
 
 namespace stan {

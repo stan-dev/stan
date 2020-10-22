@@ -114,7 +114,6 @@ STANC_TESTS := $(patsubst src/%.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
 $(STANC_TESTS_O) : test/libstanc.a
 $(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
 
-
 ############################################################
 ##
 # Target to verify header files within Stan has
@@ -149,7 +148,12 @@ test-headers: $(HEADER_TESTS)
 # compiles
 ##
 .PHONY: %.hpp-test
+
+ifneq ($(OS),Windows_NT)
 test/test-models/good/%.hpp-test : O = 0
+else
+test/test-models/good/%.hpp-test : O = 1
+endif
 test/test-models/good/%.hpp-test : test/test-models/good/%.hpp test/test-model-main.cpp
 	$(COMPILE.cpp) -o $(DEV_NULL) -include $^
 
@@ -192,8 +196,11 @@ test/integration/mtu/%_2.cpp : src/test/integration/mtu/%.cpp test/integration/m
 
 ifneq ($(OS),Windows_NT)
 test/integration/mtu/%.o : CXXFLAGS += -fPIC
-endif
 test/integration/mtu/%.o : O = 0
+else
+test/integration/mtu/%.o : O = 1
+endif
+
 test/integration/mtu/%.o : %.cpp
 	$(COMPILE.cpp) -pipe -o $(DEV_NULL) -include $^
 
@@ -225,9 +232,9 @@ $(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/
 # Generate C++ from Stan standalone functions
 ##
 TEST_FUNCTIONS = $(call findfiles,src/test/test-models,*.stanfuncs)
-$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs test/test-models/stanc2$(EXE)
+$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs $(TEST_STANC)
 	@mkdir -p $(dir $@)
-	$(WINE) test/test-models/stanc2$(EXE) $< --o=$@
+	$(WINE) $(TEST_STANC) --standalone-functions $< --o=$@
 
 ##
 # src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.

@@ -8,8 +8,8 @@ data {
 transformed data {
   matrix[d_int,d_int] transformed_data_matrix;
 
-  transformed_data_matrix <- diag_pre_multiply(d_vector, d_matrix);
-  transformed_data_matrix <- diag_pre_multiply(d_row_vector, d_matrix);
+  transformed_data_matrix = diag_pre_multiply(d_vector, d_matrix);
+  transformed_data_matrix = diag_pre_multiply(d_row_vector, d_matrix);
 }
 parameters {
   real y_p;
@@ -20,17 +20,17 @@ parameters {
 transformed parameters {
   matrix[d_int,d_int] transformed_param_matrix;
 
-  transformed_param_matrix <- diag_pre_multiply(d_vector, d_matrix);
-  transformed_param_matrix <- diag_pre_multiply(d_row_vector, d_matrix);
+  transformed_param_matrix = diag_pre_multiply(d_vector, d_matrix);
+  transformed_param_matrix = diag_pre_multiply(d_row_vector, d_matrix);
 
-  transformed_param_matrix <- diag_pre_multiply(p_vector, d_matrix);
-  transformed_param_matrix <- diag_pre_multiply(p_row_vector, d_matrix);
+  transformed_param_matrix = diag_pre_multiply(p_vector, d_matrix);
+  transformed_param_matrix = diag_pre_multiply(p_row_vector, d_matrix);
 
-  transformed_param_matrix <- diag_pre_multiply(d_vector, p_matrix);
-  transformed_param_matrix <- diag_pre_multiply(d_row_vector, p_matrix);
+  transformed_param_matrix = diag_pre_multiply(d_vector, p_matrix);
+  transformed_param_matrix = diag_pre_multiply(d_row_vector, p_matrix);
 
-  transformed_param_matrix <- diag_pre_multiply(p_vector, p_matrix);
-  transformed_param_matrix <- diag_pre_multiply(p_row_vector, p_matrix);
+  transformed_param_matrix = diag_pre_multiply(p_vector, p_matrix);
+  transformed_param_matrix = diag_pre_multiply(p_row_vector, p_matrix);
 }
 model {  
   y_p ~ normal(0,1);

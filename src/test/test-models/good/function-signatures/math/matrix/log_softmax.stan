@@ -6,7 +6,7 @@ data {
 transformed data {
   vector[d_int] transformed_data_vector;
 
-  transformed_data_vector <- log_softmax(d_vector);
+  transformed_data_vector = log_softmax(d_vector);
 }
 parameters {
   real y_p;
@@ -15,8 +15,8 @@ parameters {
 transformed parameters {
   vector[d_int] transformed_param_vector;
 
-  transformed_param_vector <- log_softmax(d_vector);
-  transformed_param_vector <- log_softmax(p_vector);
+  transformed_param_vector = log_softmax(d_vector);
+  transformed_param_vector = log_softmax(p_vector);
 }
 model {  
   y_p ~ normal(0,1);
