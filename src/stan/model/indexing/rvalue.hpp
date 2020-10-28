@@ -124,7 +124,7 @@ inline auto rvalue(EigVec&& v,
  * Types:  vec[multi] : vec
  *
  * @tparam Vec Eigen type with either dynamic rows or columns, but not both.
- * @param[in] x Eigen vector type.
+ * @param[in] v Eigen vector type.
  * @param[in] idxs Sequence of integers.
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
@@ -163,16 +163,17 @@ inline auto rvalue(EigVec&& v,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("vector[min_max] min indexing", name, v.size(),
-                    idxs.head_.min_);
+                   idxs.head_.min_);
   math::check_range("vector[min_max] max indexing", name, v.size(),
-                    idxs.head_.max_);
+                   idxs.head_.max_);
   if (idxs.head_.is_ascending()) {
-    return v.segment(idxs.head_.min_ - 1, idxs.head_.max_ - (idxs.head_.min_ - 1))
-        .eval();
+    const auto slice_start = idxs.head_.min_ - 1;
+    const auto slice_size = idxs.head_.max_ - slice_start;
+    return v.segment(slice_start, slice_size).eval();
   } else {
-    return v.segment(idxs.head_.max_ - 1, idxs.head_.min_ - (idxs.head_.max_ - 1))
-        .reverse()
-        .eval();
+    const auto slice_start = idxs.head_.max_ - 1;
+    const auto slice_size = idxs.head_.min_ - slice_start;
+    return v.segment(slice_start, slice_size).reverse().eval();
   }
 }
 
@@ -293,7 +294,7 @@ inline auto rvalue(EigMat&& x,
 }
 
 /**
- * Return the Eigen matrix at the specified max index
+ * Return the 1:max rows of an Eigen matrix.
  *
  * Types:  mat[:max] = mat
  *
@@ -310,13 +311,13 @@ template <typename EigMat,
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[max] indexing range", name, x.cols(),
+  math::check_range("matrix[max] indexing", name, x.cols(),
                     idxs.head_.max_);
   return x.topRows(idxs.head_.max_).eval();
 }
 
 /**
- * Return the Eigen matrix at the specified min_max index.
+ * Return a range of rows for an Eigen matrix.
  *
  * Types:  mat[min_max] = mat
  *
@@ -333,10 +334,10 @@ template <typename EigMat,
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[min_max] max row indexing", name, x.rows(),
-                    idxs.head_.max_);
-  math::check_range("matrix[min_max] min row indexing", name, x.rows(),
-                    idxs.head_.min_);
+   math::check_range("matrix[min_max] max row indexing", name, x.rows(),
+                     idxs.head_.max_);
+   math::check_range("matrix[min_max] min row indexing", name, x.rows(),
+                     idxs.head_.min_);
   if (idxs.head_.is_ascending()) {
     return x.middleRows(idxs.head_.min_ - 1, idxs.head_.max_ - 1).eval();
   } else {
@@ -405,8 +406,7 @@ inline auto rvalue(
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of two single indexes, returning a scalar.
+ * Return a scalar from an Eigen matrix
  *
  * Types:  mat[single,single] : scalar
  *
@@ -431,7 +431,7 @@ inline auto rvalue(
 }
 
 /**
- * Random access to a vector's cells to a row of an eigen matrix.
+ * Return a row of an Eigen matrix with possibly unordered cells.
  *
  * Types:  mat[uni, multi] = vector
  *
@@ -464,7 +464,9 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, -1> rvalue(
 }
 
 /**
- * Random access of a matrix column with a multi index on the row.
+ * Return a column of an Eigen matrix that is a possibly non-contiguous subset
+ *  of the input Eigen matrix.
+ *
  * Types:  mat[multi, uni] = vector
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
@@ -484,7 +486,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, -1, 1> rvalue(
   math::check_range("matrix[multi, uni] rvalue range", name, x.cols(),
                     idxs.tail_.head_.n_);
   const auto& x_ref = stan::math::to_ref(x);
-  Eigen::Matrix<value_type_t<EigMat>, -1, 1> x_ret(idxs.head_.ns_.size(), 1);
+  Eigen::Matrix<value_type_t<EigMat>, -1, 1> x_ret(idxs.head_.ns_.size());
   for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
     math::check_range("matrix[multi, uni] rvalue range", name, x_ref.rows(),
                       idxs.head_.ns_[i]);
@@ -495,9 +497,8 @@ inline Eigen::Matrix<value_type_t<EigMat>, -1, 1> rvalue(
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of a pair of multiple indexes, returning a
- * a matrix.
+ * Return an Eigen matrix that is a possibly non-contiguous subset of the input
+ *  Eigen matrix.
  *
  * Types:  mat[multi, multi] : mat
  *
@@ -532,8 +533,8 @@ inline plain_type_t<EigMat> rvalue(
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of one single index.
+ * Return a column of an Eigen matrix with the range of the column specificed
+ *  by another index.
  *
  * Types:  mat[Idx, uni] : vec
  *
@@ -556,8 +557,8 @@ inline auto rvalue(
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of multi index.
+ * Return an Eigen matrix of possibly unordered columns with each column
+ *  range specified by another index.
  *
  * Types:  mat[Idx, multi] : vec
  *
@@ -610,8 +611,8 @@ inline auto rvalue(
 }
 
 /**
- * Return the Eigen matrix at the specified min
- * index to the specified matrix value.
+ * Return columns min:N of the Eigen matrix with the range of the columns
+ *  defined by another index.
  *
  * Types:  mat[Idx, min] = mat
  *
@@ -638,7 +639,8 @@ inline auto rvalue(
 }
 
 /**
- * Return the Eigen matrix at the specified max index
+ * Return columns 1:max of input Eigen matrix with the range of the columns
+ *  defined by another index.
  *
  * Types:  mat[Idx, max] = mat
  *
@@ -722,7 +724,11 @@ template <typename StdVec, typename Idx, require_std_vector_t<StdVec>* = nullptr
 inline auto rvalue(StdVec&& v, const cons_index_list<index_uni, Idx>& idxs,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("array[uni, ...] index", name, v.size(), idxs.head_.n_);
-  return rvalue(v[idxs.head_.n_ - 1], idxs.tail_, name, depth + 1);
+  if (std::is_rvalue_reference<StdVec>::value) {
+    return rvalue(std::move(v[idxs.head_.n_ - 1]), idxs.tail_, name, depth + 1);
+  } else {
+    return rvalue(v[idxs.head_.n_ - 1], idxs.tail_, name, depth + 1);
+  }
 }
 
 /**
@@ -777,7 +783,11 @@ inline auto rvalue(StdVec&& v, const cons_index_list<Idx1, Idx2>& idxs,
   for (int i = 0; i < index_size; ++i) {
     const int n = rvalue_at(i, idxs.head_);
     math::check_range("array[..., ...] index", name, v.size(), n);
-    result.emplace_back(rvalue(v[n - 1], idxs.tail_, name, depth + 1));
+    if (std::is_rvalue_reference<StdVec>::value) {
+      result.emplace_back(rvalue(std::move(v[n - 1]), idxs.tail_, name, depth + 1));
+    } else {
+      result.emplace_back(rvalue(v[n - 1], idxs.tail_, name, depth + 1));
+    }
   }
   return result;
 }
