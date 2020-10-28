@@ -22,8 +22,8 @@ class dense_e_nuts_classic
   // here since start.inv_e_metric_ = finish.inv_e_metric_
   bool compute_criterion(ps_point& start, dense_e_point& finish,
                          Eigen::VectorXd& rho) {
-    return finish.p.transpose() * finish.inv_e_metric_ * (rho - finish.p) > 0
-           && start.p.transpose() * finish.inv_e_metric_ * (rho - start.p) > 0;
+    return finish.p.transpose() * finish.get_inv_metric() * (rho - finish.p) > 0
+      && start.p.transpose() * finish.get_inv_metric() * (rho - start.p) > 0;
   }
 };
 
