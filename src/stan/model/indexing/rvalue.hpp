@@ -41,7 +41,6 @@ namespace model {
  *  - General overload for nested std vectors.
  */
 
-
 /**
  * Return the result of indexing a specified value with
  * a nil index list, which just returns the value.
@@ -90,7 +89,8 @@ inline T rvalue(T&& x, const cons_index_list<index_omni, nil_index_list>& idxs,
  * @return Result of indexing matrix.
  */
 template <typename T>
-inline T rvalue(T&& x,
+inline T rvalue(
+    T&& x,
     const cons_index_list<index_omni,
                           cons_index_list<index_omni, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
@@ -133,7 +133,8 @@ inline auto rvalue(EigVec&& v,
  * the indexed size.
  */
 template <typename Vec, require_eigen_vector_t<Vec>* = nullptr>
-inline plain_type_t<Vec> rvalue(Vec&& v, const cons_index_list<index_multi, nil_index_list>& idxs,
+inline plain_type_t<Vec> rvalue(
+    Vec&& v, const cons_index_list<index_multi, nil_index_list>& idxs,
     const char* name = "ANON", int depth = 0) {
   const auto v_size = v.size();
   const auto& v_ref = stan::math::to_ref(v);
@@ -163,9 +164,9 @@ inline auto rvalue(EigVec&& v,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("vector[min_max] min indexing", name, v.size(),
-                   idxs.head_.min_);
+                    idxs.head_.min_);
   math::check_range("vector[min_max] max indexing", name, v.size(),
-                   idxs.head_.max_);
+                    idxs.head_.max_);
   if (idxs.head_.is_ascending()) {
     const auto slice_start = idxs.head_.min_ - 1;
     const auto slice_size = idxs.head_.max_ - slice_start;
@@ -210,8 +211,7 @@ inline auto rvalue(Vec&& x,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename Vec,
-          require_all_eigen_vector_t<Vec>* = nullptr>
+template <typename Vec, require_all_eigen_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -288,7 +288,7 @@ template <typename EigMat,
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
- const auto row_size = x.rows() - (idxs.head_.min_ - 1);
+  const auto row_size = x.rows() - (idxs.head_.min_ - 1);
   math::check_range("matrix[min] indexing", name, x.rows(), row_size);
   return x.bottomRows(row_size).eval();
 }
@@ -311,8 +311,7 @@ template <typename EigMat,
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[max] indexing", name, x.cols(),
-                    idxs.head_.max_);
+  math::check_range("matrix[max] indexing", name, x.cols(), idxs.head_.max_);
   return x.topRows(idxs.head_.max_).eval();
 }
 
@@ -334,14 +333,17 @@ template <typename EigMat,
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-   math::check_range("matrix[min_max] max row indexing", name, x.rows(),
-                     idxs.head_.max_);
-   math::check_range("matrix[min_max] min row indexing", name, x.rows(),
-                     idxs.head_.min_);
+  math::check_range("matrix[min_max] max row indexing", name, x.rows(),
+                    idxs.head_.max_);
+  math::check_range("matrix[min_max] min row indexing", name, x.rows(),
+                    idxs.head_.min_);
   if (idxs.head_.is_ascending()) {
     return x.middleRows(idxs.head_.min_ - 1, idxs.head_.max_ - 1).eval();
   } else {
-    return x.middleRows(idxs.head_.max_ - 1, idxs.head_.min_ - 1).colwise().reverse().eval();
+    return x.middleRows(idxs.head_.max_ - 1, idxs.head_.min_ - 1)
+        .colwise()
+        .reverse()
+        .eval();
   }
 }
 
@@ -365,22 +367,24 @@ inline auto rvalue(
     const cons_index_list<index_min_max,
                           cons_index_list<index_min_max, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[min_max, min_max] min row indexing", name,
-                    x.rows(), idxs.head_.min_);
-  math::check_range("matrix[min_max, min_max] max row indexing", name,
-                    x.rows(), idxs.head_.max_);
+  math::check_range("matrix[min_max, min_max] min row indexing", name, x.rows(),
+                    idxs.head_.min_);
+  math::check_range("matrix[min_max, min_max] max row indexing", name, x.rows(),
+                    idxs.head_.max_);
   math::check_range("matrix[min_max, min_max] min column indexing", name,
                     x.cols(), idxs.tail_.head_.min_);
   math::check_range("matrix[min_max, min_max] max column indexing", name,
                     x.cols(), idxs.tail_.head_.max_);
   if (idxs.head_.is_ascending()) {
     if (idxs.tail_.head_.is_ascending()) {
-      return x.block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1,
+      return x
+          .block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1,
                  idxs.head_.max_ - (idxs.head_.min_ - 1),
                  idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1))
           .eval();
     } else {
-      return x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1,
+      return x
+          .block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1,
                  idxs.head_.max_ - (idxs.head_.min_ - 1),
                  idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1))
           .rowwise()
@@ -389,14 +393,16 @@ inline auto rvalue(
     }
   } else {
     if (idxs.tail_.head_.is_ascending()) {
-      return x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1,
+      return x
+          .block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1,
                  idxs.head_.min_ - (idxs.head_.max_ - 1),
                  idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1))
           .colwise()
           .reverse()
           .eval();
     } else {
-      return x.block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1,
+      return x
+          .block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1,
                  idxs.head_.min_ - (idxs.head_.max_ - 1),
                  idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1))
           .reverse()
@@ -548,12 +554,13 @@ template <typename EigMat, typename Idx,
           stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
-    const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>& idxs,
+    const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
+        idxs,
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[..., uni] indexing", name, x.cols(),
                     idxs.tail_.head_.n_);
-  return deep_copy(rvalue(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_),
-                          name, depth + 1));
+  return deep_copy(rvalue(x.col(idxs.tail_.head_.n_ - 1),
+                          index_list(idxs.head_), name, depth + 1));
 }
 
 /**
@@ -574,7 +581,8 @@ template <typename EigMat, typename Idx,
           require_not_same_t<std::decay_t<Idx>, index_uni>* = nullptr>
 inline plain_type_t<EigMat> rvalue(
     EigMat&& x,
-    const cons_index_list<Idx, cons_index_list<index_multi, nil_index_list>>& idxs,
+    const cons_index_list<Idx, cons_index_list<index_multi, nil_index_list>>&
+        idxs,
     const char* name = "ANON", int depth = 0) {
   const auto& x_ref = stan::math::to_ref(x);
   const int rows = rvalue_index_size(idxs.head_, x_ref.rows());
@@ -605,9 +613,11 @@ template <typename EigMat, typename Idx,
           stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
-    const cons_index_list<Idx, cons_index_list<index_omni, nil_index_list>>& idxs,
+    const cons_index_list<Idx, cons_index_list<index_omni, nil_index_list>>&
+        idxs,
     const char* name = "ANON", int depth = 0) {
-  return deep_copy(rvalue(std::forward<EigMat>(x), index_list(idxs.head_), name, depth + 1));
+  return deep_copy(
+      rvalue(std::forward<EigMat>(x), index_list(idxs.head_), name, depth + 1));
 }
 
 /**
@@ -629,13 +639,14 @@ template <typename EigMat, typename Idx,
           stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
-    const cons_index_list<Idx, cons_index_list<index_min, nil_index_list>>& idxs,
+    const cons_index_list<Idx, cons_index_list<index_min, nil_index_list>>&
+        idxs,
     const char* name = "ANON", int depth = 0) {
   const auto col_size = x.cols() - (idxs.tail_.head_.min_ - 1);
   math::check_range("matrix[..., min] indexing", name, x.cols(),
                     idxs.tail_.head_.min_);
-  return deep_copy(rvalue(x.rightCols(col_size),
-                          index_list(idxs.head_), name, depth + 1));
+  return deep_copy(
+      rvalue(x.rightCols(col_size), index_list(idxs.head_), name, depth + 1));
 }
 
 /**
@@ -657,7 +668,8 @@ template <typename EigMat, typename Idx,
           stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
-    const cons_index_list<Idx, cons_index_list<index_max, nil_index_list>>& idxs,
+    const cons_index_list<Idx, cons_index_list<index_max, nil_index_list>>&
+        idxs,
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[..., max] indexing", name, x.cols(),
                     idxs.tail_.head_.max_);
@@ -698,11 +710,12 @@ inline auto rvalue(
   } else {
     const auto col_start = idxs.tail_.head_.max_ - 1;
     return deep_copy(
-        rvalue(x.middleCols(col_start, idxs.tail_.head_.min_ - col_start).rowwise().reverse(),
+        rvalue(x.middleCols(col_start, idxs.tail_.head_.min_ - col_start)
+                   .rowwise()
+                   .reverse(),
                index_list(idxs.head_), name, depth + 1));
   }
 }
-
 
 /**
  * Return the result of indexing the specified array with
@@ -720,7 +733,8 @@ inline auto rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing array.
  */
-template <typename StdVec, typename Idx, require_std_vector_t<StdVec>* = nullptr>
+template <typename StdVec, typename Idx,
+          require_std_vector_t<StdVec>* = nullptr>
 inline auto rvalue(StdVec&& v, const cons_index_list<index_uni, Idx>& idxs,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("array[uni, ...] index", name, v.size(), idxs.head_.n_);
@@ -784,7 +798,8 @@ inline auto rvalue(StdVec&& v, const cons_index_list<Idx1, Idx2>& idxs,
     const int n = rvalue_at(i, idxs.head_);
     math::check_range("array[..., ...] index", name, v.size(), n);
     if (std::is_rvalue_reference<StdVec>::value) {
-      result.emplace_back(rvalue(std::move(v[n - 1]), idxs.tail_, name, depth + 1));
+      result.emplace_back(
+          rvalue(std::move(v[n - 1]), idxs.tail_, name, depth + 1));
     } else {
       result.emplace_back(rvalue(v[n - 1], idxs.tail_, name, depth + 1));
     }
