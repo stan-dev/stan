@@ -7,8 +7,8 @@ data {
 transformed data {
   real transformed_data_real;
 
-  transformed_data_real <- multi_gp_cholesky_log(d_matrix, d_cov, d_vector);
-  transformed_data_real <- multi_gp_cholesky_log(d_matrix, d_matrix, d_vector);
+  transformed_data_real = multi_gp_cholesky_log(d_matrix, d_cov, d_vector);
+  transformed_data_real = multi_gp_cholesky_log(d_matrix, d_matrix, d_vector);
 }
 parameters {
   matrix[d_int,d_int] p_matrix;
@@ -19,22 +19,22 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- multi_gp_cholesky_log(d_matrix, d_matrix, d_vector);
-  transformed_param_real <- multi_gp_cholesky_log(p_matrix, d_matrix, d_vector);
-  transformed_param_real <- multi_gp_cholesky_log(d_matrix, p_matrix, d_vector);
-  transformed_param_real <- multi_gp_cholesky_log(d_matrix, d_matrix, p_vector);
-  transformed_param_real <- multi_gp_cholesky_log(p_matrix, p_matrix, d_vector);
-  transformed_param_real <- multi_gp_cholesky_log(p_matrix, d_matrix, p_vector);
-  transformed_param_real <- multi_gp_cholesky_log(p_matrix, p_matrix, p_vector);
-  transformed_param_real <- multi_gp_cholesky_log(d_matrix, p_matrix, p_vector);
-  transformed_param_real <- multi_gp_cholesky_log(d_matrix, d_cov, d_vector);
-  transformed_param_real <- multi_gp_cholesky_log(p_matrix, d_cov, d_vector);
-  transformed_param_real <- multi_gp_cholesky_log(d_matrix, p_cov, d_vector);
-  transformed_param_real <- multi_gp_cholesky_log(d_matrix, d_cov, p_vector);
-  transformed_param_real <- multi_gp_cholesky_log(p_matrix, p_cov, d_vector);
-  transformed_param_real <- multi_gp_cholesky_log(p_matrix, d_cov, p_vector);
-  transformed_param_real <- multi_gp_cholesky_log(p_matrix, p_cov, p_vector);
-  transformed_param_real <- multi_gp_cholesky_log(d_matrix, p_cov, p_vector);
+  transformed_param_real = multi_gp_cholesky_log(d_matrix, d_matrix, d_vector);
+  transformed_param_real = multi_gp_cholesky_log(p_matrix, d_matrix, d_vector);
+  transformed_param_real = multi_gp_cholesky_log(d_matrix, p_matrix, d_vector);
+  transformed_param_real = multi_gp_cholesky_log(d_matrix, d_matrix, p_vector);
+  transformed_param_real = multi_gp_cholesky_log(p_matrix, p_matrix, d_vector);
+  transformed_param_real = multi_gp_cholesky_log(p_matrix, d_matrix, p_vector);
+  transformed_param_real = multi_gp_cholesky_log(p_matrix, p_matrix, p_vector);
+  transformed_param_real = multi_gp_cholesky_log(d_matrix, p_matrix, p_vector);
+  transformed_param_real = multi_gp_cholesky_log(d_matrix, d_cov, d_vector);
+  transformed_param_real = multi_gp_cholesky_log(p_matrix, d_cov, d_vector);
+  transformed_param_real = multi_gp_cholesky_log(d_matrix, p_cov, d_vector);
+  transformed_param_real = multi_gp_cholesky_log(d_matrix, d_cov, p_vector);
+  transformed_param_real = multi_gp_cholesky_log(p_matrix, p_cov, d_vector);
+  transformed_param_real = multi_gp_cholesky_log(p_matrix, d_cov, p_vector);
+  transformed_param_real = multi_gp_cholesky_log(p_matrix, p_cov, p_vector);
+  transformed_param_real = multi_gp_cholesky_log(d_matrix, p_cov, p_vector);
 }
 model {  
   d_matrix ~ multi_gp_cholesky(p_matrix, p_vector);

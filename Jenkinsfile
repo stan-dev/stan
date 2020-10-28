@@ -17,9 +17,11 @@ def runTests(String testPath, Boolean separateMakeStep=true) {
     finally { junit 'test/**/*.xml' }
 }
 
-def runTestsWin(String testPath) {
+def runTestsWin(String testPath, Boolean separateMakeStep=true) {
     withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
-       bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+       if (separateMakeStep) {
+           bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+       }
        try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
        finally { junit 'test/**/*.xml' }
     }
@@ -242,6 +244,44 @@ pipeline {
                         unstash 'StanSetup'
                         setupCXX()
                         runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Integration Windows') {
+                    agent { label 'windows' }
+                    when { 
+                        expression { 
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ) &&
+                            !skipRemainingStages 
+                        }
+                    }
+                    steps {
+                        deleteDirWin()
+                            unstash 'StanSetup'
+                            setupCXX()
+                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+                            setupCXX(false)
+                            runTestsWin("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDirWin() } }
+                }
+                stage('Math functions expressions test') {
+                    agent any
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        script {
+                            dir("lib/stan_math/") {
+                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                    try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
+                                    finally { junit 'test/**/*.xml' }
+                                }
+                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                    sh "python ./test/expressions/test_expression_testing_framework.py"
+                                }
+                            }
+                        }
                     }
                     post { always { deleteDir() } }
                 }

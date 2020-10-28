@@ -8,7 +8,7 @@ functions {
 }
 transformed data {
   vector[3] x;
-  x <- rep_vector(0,3);
+  x = rep_vector(0,3);
 }
 parameters {
   real y;

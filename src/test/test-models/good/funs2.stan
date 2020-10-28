@@ -11,5 +11,5 @@ model {
 }
 generated quantities {
   real z;
-  z <- unit_normal_rng();
+  z = unit_normal_rng();
 }

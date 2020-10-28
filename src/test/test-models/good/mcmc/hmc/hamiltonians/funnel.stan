@@ -1,6 +1,6 @@
 transformed data {
   int N;
-  N <- 10;
+  N = 10;
 }
 
 parameters {

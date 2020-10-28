@@ -46,6 +46,13 @@ TEST(McmcBaseHMC, point_construction) {
   EXPECT_EQ(static_cast<int>(q.size()), sampler.z().g.size());
 }
 
+TEST(McmcBaseHMC, point_access_from_const_hmc) {
+  rng_t base_rng(0);
+  const stan::mcmc::mock_hmc sampler(stan::mcmc::mock_model(2), base_rng);
+  EXPECT_EQ(2, sampler.z().q.size());
+  EXPECT_EQ(2, sampler.z().g.size());
+}
+
 TEST(McmcBaseHMC, seed) {
   rng_t base_rng(0);
 

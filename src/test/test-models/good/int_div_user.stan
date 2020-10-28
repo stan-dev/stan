@@ -4,7 +4,7 @@ data {
 }
 transformed data {
   int c;
-  c <- a[1] / b[2];
+  c = a[1] / b[2];
 }
 model {
 }

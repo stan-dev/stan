@@ -14,7 +14,7 @@ functions {
 transformed data {
   real y;
   real t[2,2];
-  y <- integrate_ode(foo,
+  y = integrate_ode(foo,
                      rep_array(1.0,1),
                      1.0,
                      t[1],          

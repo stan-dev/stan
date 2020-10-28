@@ -11,10 +11,10 @@ transformed data {
   int transformed_data_int;
   real transformed_data_real;
 
-  transformed_data_real <- variance(d_real_array);
-  transformed_data_real <- variance(d_matrix);
-  transformed_data_real <- variance(d_vector);
-  transformed_data_real <- variance(d_row_vector);
+  transformed_data_real = variance(d_real_array);
+  transformed_data_real = variance(d_matrix);
+  transformed_data_real = variance(d_vector);
+  transformed_data_real = variance(d_row_vector);
 }
 parameters {
   real p_real;
@@ -27,14 +27,14 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- variance(d_real_array);
-  transformed_param_real <- variance(d_matrix);
-  transformed_param_real <- variance(d_vector);
-  transformed_param_real <- variance(d_row_vector);
-  transformed_param_real <- variance(p_real_array);
-  transformed_param_real <- variance(p_matrix);
-  transformed_param_real <- variance(p_vector);
-  transformed_param_real <- variance(p_row_vector);
+  transformed_param_real = variance(d_real_array);
+  transformed_param_real = variance(d_matrix);
+  transformed_param_real = variance(d_vector);
+  transformed_param_real = variance(d_row_vector);
+  transformed_param_real = variance(p_real_array);
+  transformed_param_real = variance(p_matrix);
+  transformed_param_real = variance(p_vector);
+  transformed_param_real = variance(p_row_vector);
 }
 model {  
   y_p ~ normal(0,1);

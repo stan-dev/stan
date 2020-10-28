@@ -6,8 +6,8 @@ transformed data {
   int transformed_data_int;
   real transformed_data_real;
 
-  transformed_data_real <- Phi_approx(d_int);
-  transformed_data_real <- Phi_approx(d_real);
+  transformed_data_real = Phi_approx(d_int);
+  transformed_data_real = Phi_approx(d_real);
 }
 parameters {
   real p_real;
@@ -16,9 +16,9 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- Phi_approx(d_int);
-  transformed_param_real <- Phi_approx(d_real);
-  transformed_param_real <- Phi_approx(p_real);
+  transformed_param_real = Phi_approx(d_int);
+  transformed_param_real = Phi_approx(d_real);
+  transformed_param_real = Phi_approx(p_real);
 }
 model {  
   y_p ~ normal(0,1);

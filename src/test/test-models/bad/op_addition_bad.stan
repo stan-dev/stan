@@ -4,5 +4,5 @@ parameters {
 }
 model {
   matrix[3,3] c;
-  c <- a + b;
+  c = a + b;
 }

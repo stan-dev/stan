@@ -5,6 +5,14 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.24.0 (28 July 2020)
+======================================================================
+
+- `std::chrono` is now used for all timing purposes
+- fixed a bug with generated quantities for vectors of length 1
+- added `recover_memory` for normal exit of `log_prob_grad`
+- replaced the use of `boost::` functions/metaprograms in favor of `std::` where applicable
+
 v.2.23.0 (22 April 2020)
 ======================================================================
 

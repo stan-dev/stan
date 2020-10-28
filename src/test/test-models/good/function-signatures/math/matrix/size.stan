@@ -26,23 +26,23 @@ data {
 transformed data {
   int val;
 
-  val <- size(x1y);
-  val <- size(x2y);
-  val <- size(x3y);
-  val <- size(x4y);
-  val <- size(x5y);
+  val = size(x1y);
+  val = size(x2y);
+  val = size(x3y);
+  val = size(x4y);
+  val = size(x5y);
 
-  val <- size(x1z);
-  val <- size(x2z);
-  val <- size(x3z);
-  val <- size(x4z);
-  val <- size(x5z);
+  val = size(x1z);
+  val = size(x2z);
+  val = size(x3z);
+  val = size(x4z);
+  val = size(x5z);
 
-  val <- size(x1w);
-  val <- size(x2w);
-  val <- size(x3w);
-  val <- size(x4w);
-  val <- size(x5w);
+  val = size(x1w);
+  val = size(x2w);
+  val = size(x3w);
+  val = size(x4w);
+  val = size(x5w);
 }
 parameters {
   real y;
@@ -74,41 +74,41 @@ parameters {
 transformed parameters {
   real p_val;
 
-  p_val <- size(x1y);
-  p_val <- size(x2y);
-  p_val <- size(x3y);
-  p_val <- size(x4y);
-  p_val <- size(x5y);
+  p_val = size(x1y);
+  p_val = size(x2y);
+  p_val = size(x3y);
+  p_val = size(x4y);
+  p_val = size(x5y);
 
-  p_val <- size(x1z);
-  p_val <- size(x2z);
-  p_val <- size(x3z);
-  p_val <- size(x4z);
-  p_val <- size(x5z);
+  p_val = size(x1z);
+  p_val = size(x2z);
+  p_val = size(x3z);
+  p_val = size(x4z);
+  p_val = size(x5z);
 
-  p_val <- size(x1w);
-  p_val <- size(x2w);
-  p_val <- size(x3w);
-  p_val <- size(x4w);
-  p_val <- size(x5w);
+  p_val = size(x1w);
+  p_val = size(x2w);
+  p_val = size(x3w);
+  p_val = size(x4w);
+  p_val = size(x5w);
 
-  p_val <- size(p_x1y);
-  p_val <- size(p_x2y);
-  p_val <- size(p_x3y);
-  p_val <- size(p_x4y);
-  p_val <- size(p_x5y);
+  p_val = size(p_x1y);
+  p_val = size(p_x2y);
+  p_val = size(p_x3y);
+  p_val = size(p_x4y);
+  p_val = size(p_x5y);
 
-  p_val <- size(p_x1z);
-  p_val <- size(p_x2z);
-  p_val <- size(p_x3z);
-  p_val <- size(p_x4z);
-  p_val <- size(p_x5z);
+  p_val = size(p_x1z);
+  p_val = size(p_x2z);
+  p_val = size(p_x3z);
+  p_val = size(p_x4z);
+  p_val = size(p_x5z);
 
-  p_val <- size(p_x1w);
-  p_val <- size(p_x2w);
-  p_val <- size(p_x3w);
-  p_val <- size(p_x4w);
-  p_val <- size(p_x5w);
+  p_val = size(p_x1w);
+  p_val = size(p_x2w);
+  p_val = size(p_x3w);
+  p_val = size(p_x4w);
+  p_val = size(p_x5w);
 }
 model {
   y ~ normal(0,1);

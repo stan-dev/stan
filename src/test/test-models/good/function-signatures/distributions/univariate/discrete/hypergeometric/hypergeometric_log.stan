@@ -4,7 +4,7 @@ data {
 transformed data {
   real transformed_data_real;
 
-  transformed_data_real <- hypergeometric_log(d_int, d_int, d_int, d_int);
+  transformed_data_real = hypergeometric_log(d_int, d_int, d_int, d_int);
 }
 parameters {
   real y_p;
@@ -12,7 +12,7 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- hypergeometric_log(d_int, d_int, d_int, d_int);
+  transformed_param_real = hypergeometric_log(d_int, d_int, d_int, d_int);
 }
 model {  
   y_p ~ normal(0,1); // in case anyone tries to run it

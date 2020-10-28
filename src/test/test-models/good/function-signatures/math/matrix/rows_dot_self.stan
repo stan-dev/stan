@@ -7,9 +7,9 @@ data {
 transformed data {
   vector[d_int] transformed_data_vector;
 
-  transformed_data_vector <- rows_dot_self(d_vector);
-  transformed_data_vector <- rows_dot_self(d_row_vector);
-  transformed_data_vector <- rows_dot_self(d_matrix);
+  transformed_data_vector = rows_dot_self(d_vector);
+  transformed_data_vector = rows_dot_self(d_row_vector);
+  transformed_data_vector = rows_dot_self(d_matrix);
 }
 parameters {
   matrix[d_int,d_int] p_matrix;
@@ -20,13 +20,13 @@ parameters {
 transformed parameters {
   vector[d_int] transformed_param_vector;
 
-  transformed_param_vector <- rows_dot_self(d_vector);
-  transformed_param_vector <- rows_dot_self(d_row_vector);
-  transformed_param_vector <- rows_dot_self(d_matrix);
+  transformed_param_vector = rows_dot_self(d_vector);
+  transformed_param_vector = rows_dot_self(d_row_vector);
+  transformed_param_vector = rows_dot_self(d_matrix);
 
-  transformed_param_vector <- rows_dot_self(p_vector);
-  transformed_param_vector <- rows_dot_self(p_row_vector);
-  transformed_param_vector <- rows_dot_self(p_matrix);
+  transformed_param_vector = rows_dot_self(p_vector);
+  transformed_param_vector = rows_dot_self(p_row_vector);
+  transformed_param_vector = rows_dot_self(p_matrix);
 }
 model {  
   y_p ~ normal(0,1);

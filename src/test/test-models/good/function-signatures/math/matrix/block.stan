@@ -6,7 +6,7 @@ data {
 transformed data {
   matrix[d_int,d_int] transformed_data_matrix;
 
-  transformed_data_matrix <- block(d_matrix, d_int, d_int, d_int, d_int);
+  transformed_data_matrix = block(d_matrix, d_int, d_int, d_int, d_int);
 }
 parameters {
   real y_p;
@@ -15,8 +15,8 @@ parameters {
 transformed parameters {
   matrix[d_int,d_int] transformed_param_matrix;
 
-  transformed_param_matrix <- block(d_matrix, d_int, d_int, d_int, d_int);
-  transformed_param_matrix <- block(p_matrix, d_int, d_int, d_int, d_int);
+  transformed_param_matrix = block(d_matrix, d_int, d_int, d_int, d_int);
+  transformed_param_matrix = block(p_matrix, d_int, d_int, d_int, d_int);
 }
 model {  
   y_p ~ normal(0,1);
