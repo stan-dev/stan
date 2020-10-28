@@ -664,11 +664,11 @@ inline void assign(
     Mat1&& x,
     const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
         idxs,
-    Mat2&& y, const char* name = "ANON", int depth = 0) {
+    const Mat2& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_range("matrix[..., uni] assign range", name, x.cols(),
                           idxs.tail_.head_.n_);
-  assign(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), y,
-   name, depth + 1);
+  assign(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), y, name,
+         depth + 1);
   return;
 }
 
@@ -731,7 +731,7 @@ inline void assign(
     const cons_index_list<Idx, cons_index_list<index_omni, nil_index_list>>&
         idxs,
     Mat2&& y, const char* name = "ANON", int depth = 0) {
-  assign(x, index_list(idxs.head_), y, name, depth + 1);
+  assign(x, index_list(idxs.head_), std::forward<Mat2>(y), name, depth + 1);
 }
 
 /**
