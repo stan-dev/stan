@@ -10,7 +10,7 @@ TEST(McmcVarAdaptation, learn_covariance_pick_diagonal) {
 
   std::stringstream output;
   independent_gaussian_model_namespace::independent_gaussian_model
-    independent_gaussian_model(data_var_context, &output);
+    independent_gaussian_model(data_var_context, 0, &output);
 
   stan::test::unit::instrumented_logger logger;
 

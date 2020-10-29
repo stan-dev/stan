@@ -1,7 +1,7 @@
 #ifndef STAN_MCMC_AUTO_ADAPTATION_HPP
 #define STAN_MCMC_AUTO_ADAPTATION_HPP
 
-#include <stan/math/rev/mat.hpp>
+#include <stan/math.hpp>
 #include <stan/mcmc/windowed_adaptation.hpp>
 #include <vector>
 
