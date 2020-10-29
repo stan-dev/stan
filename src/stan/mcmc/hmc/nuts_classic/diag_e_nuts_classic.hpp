@@ -22,8 +22,10 @@ class diag_e_nuts_classic
   // since start.get_inv_metric() = finish.get_inv_metric()
   bool compute_criterion(ps_point& start, diag_e_point& finish,
                          Eigen::VectorXd& rho) {
-    return finish.get_inv_metric().cwiseProduct(finish.p).dot(rho - finish.p) > 0
-           && finish.get_inv_metric().cwiseProduct(start.p).dot(rho - start.p) > 0;
+    return finish.get_inv_metric().cwiseProduct(finish.p).dot(rho - finish.p)
+        > 0
+      && finish.get_inv_metric().cwiseProduct(start.p).dot(rho - start.p)
+        > 0;
   }
 };
 

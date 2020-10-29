@@ -50,7 +50,8 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
     for (idx_t i = 0; i < u.size(); ++i)
       u(i) = rand_dense_gaus();
 
-    z.p = z.get_transpose_llt_inv_metric().triangularView<Eigen::Upper>().solve(u);
+    z.p = z.get_transpose_llt_inv_metric().triangularView<Eigen::Upper>()
+      .solve(u);
   }
 };
 
