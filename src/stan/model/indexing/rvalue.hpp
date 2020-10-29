@@ -349,7 +349,7 @@ inline auto rvalue(EigMat&& x,
 
 /**
  * Return the result of indexing an Eigen matrix with two min_max
- * indices, returning back a block of the Eigen matrix.
+ * indices, returning back a block of an Eigen matrix.
  *
  * Types:  mat[min_max, min_max] : matrix
  *
