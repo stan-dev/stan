@@ -11,7 +11,7 @@ namespace mcmc {
 template <typename Model>
 struct log_prob_wrapper_covar {
   const Model& model_;
-  log_prob_wrapper_covar(const Model& model) : model_(model) {}
+  explicit log_prob_wrapper_covar(const Model& model) : model_(model) {}
 
   template <typename T>
   T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& q) const {
