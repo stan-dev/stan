@@ -41,11 +41,11 @@ namespace stan {
       }
 
       Eigen::VectorXd dtau_dp(auto_e_point& z) {
-	if(z.is_diagonal_) {
-	  return z.inv_e_metric_.diagonal().cwiseProduct(z.p);
-	} else {
-	  return z.inv_e_metric_ * z.p;
-	}
+        if(z.is_diagonal_) {
+          return z.inv_e_metric_.diagonal().cwiseProduct(z.p);
+        } else {
+          return z.inv_e_metric_ * z.p;
+        }
       }
 
       Eigen::VectorXd dphi_dq(auto_e_point& z, callbacks::logger& logger) {
@@ -57,17 +57,17 @@ namespace stan {
         boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
           rand_gaus(rng, boost::normal_distribution<>());
 
-	if(z.is_diagonal_) {
-	  for (int i = 0; i < z.p.size(); ++i)
-	    z.p(i) = rand_gaus() / sqrt(z.inv_e_metric_(i, i));
-	} else {
-	  Eigen::VectorXd u(z.p.size());
+          if(z.is_diagonal_) {
+            for (int i = 0; i < z.p.size(); ++i)
+              z.p(i) = rand_gaus() / sqrt(z.inv_e_metric_(i, i));
+          } else {
+            Eigen::VectorXd u(z.p.size());
 
-	  for (idx_t i = 0; i < u.size(); ++i)
-	    u(i) = rand_gaus();
+            for (idx_t i = 0; i < u.size(); ++i)
+              u(i) = rand_gaus();
 
-	  z.p = z.inv_e_metric_.llt().matrixU().solve(u);
-	}
+            z.p = z.inv_e_metric_.llt().matrixU().solve(u);
+          }
       }
     };
 
