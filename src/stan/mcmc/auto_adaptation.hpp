@@ -11,7 +11,7 @@ namespace stan {
     template <typename Model>
     struct log_prob_wrapper_covar {
       const Model& model_;
-      log_prob_wrapper_covar(const Model& model) : model_(model) {}
+      explicit log_prob_wrapper_covar(const Model& model) : model_(model) {}
       
       template <typename T>
       T operator()(const Eigen::Matrix<T, Eigen::Dynamic, 1>& q) const {
@@ -180,7 +180,7 @@ namespace stan {
 
 	      if(state == "selection") {
 		int Mtest;
-		Mtest = int(0.2 * Y.cols());
+		Mtest = static_cast<int>(0.2 * Y.cols());
 		if(Mtest < 5) {
 		  Mtest = 5;
 		}
