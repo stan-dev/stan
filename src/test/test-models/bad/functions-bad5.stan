@@ -8,6 +8,6 @@ parameters {
 }
 model {
   real z;
-  z <- baz(y); // illegal use of void function as expression
+  z = baz(y); // illegal use of void function as expression
   y ~ normal(0,1);
 }

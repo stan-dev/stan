@@ -1,11 +1,11 @@
 transformed data {
   matrix[2,2] X;
   row_vector[2] y;
-  y[1] <- 10;
-  y[2] <- 100;
+  y[1] = 10;
+  y[2] = 100;
 
-  X[1] <- y;
-  X[2] <- y;
+  X[1] = y;
+  X[2] = y;
   print("X=",X);
 }
 parameters {
@@ -16,14 +16,14 @@ transformed parameters {
   matrix[2,2] Xvar2;
   row_vector[2] yvar;
   
-  yvar[1] <- 15.9;
-  yvar[2] <- 42.7;
+  yvar[1] = 15.9;
+  yvar[2] = 42.7;
 
-  Xvar[1] <- y;
-  Xvar[2] <- y;
+  Xvar[1] = y;
+  Xvar[2] = y;
 
-  Xvar2[1] <- yvar;
-  Xvar2[2] <- yvar;
+  Xvar2[1] = yvar;
+  Xvar2[2] = yvar;
 }
 model {
   z ~ normal(0,1);

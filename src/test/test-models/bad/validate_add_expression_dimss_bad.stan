@@ -1,7 +1,7 @@
 transformed data {
   real x;
   vector[3] v;
-  x <- v[1][2];
+  x = v[1][2];
 }
 parameters {
   real y;

@@ -10,15 +10,15 @@ transformed data {
   int transformed_data_int;
   real transformed_data_real;
 
-  transformed_data_int <- rank(d_int_array, d_int);
-  transformed_data_int <- rank(d_real_array, d_int);
-  transformed_data_int <- rank(d_vector, d_int);
-  transformed_data_int <- rank(d_row_vector, d_int);
+  transformed_data_int = rank(d_int_array, d_int);
+  transformed_data_int = rank(d_real_array, d_int);
+  transformed_data_int = rank(d_vector, d_int);
+  transformed_data_int = rank(d_row_vector, d_int);
 
-  transformed_data_real <- rank(d_int_array, d_int);
-  transformed_data_real <- rank(d_real_array, d_int);
-  transformed_data_real <- rank(d_vector, d_int);
-  transformed_data_real <- rank(d_row_vector, d_int);
+  transformed_data_real = rank(d_int_array, d_int);
+  transformed_data_real = rank(d_real_array, d_int);
+  transformed_data_real = rank(d_vector, d_int);
+  transformed_data_real = rank(d_row_vector, d_int);
 }
 parameters {
   real y_p;
@@ -29,14 +29,14 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- rank(d_int_array, d_int);
-  transformed_param_real <- rank(d_real_array, d_int);
-  transformed_param_real <- rank(d_vector, d_int);
-  transformed_param_real <- rank(d_row_vector, d_int);
+  transformed_param_real = rank(d_int_array, d_int);
+  transformed_param_real = rank(d_real_array, d_int);
+  transformed_param_real = rank(d_vector, d_int);
+  transformed_param_real = rank(d_row_vector, d_int);
 
-  transformed_param_real <- rank(p_real_array, d_int);
-  transformed_param_real <- rank(p_vector, d_int);
-  transformed_param_real <- rank(p_row_vector, d_int);
+  transformed_param_real = rank(p_real_array, d_int);
+  transformed_param_real = rank(p_vector, d_int);
+  transformed_param_real = rank(p_row_vector, d_int);
 }
 model {  
   y_p ~ normal(0,1);

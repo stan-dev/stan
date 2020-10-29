@@ -20,7 +20,7 @@ namespace lang {
  * Generate local variable declarations, including
  * initializations, for the specified declarations, indentation
  * level, writing to the specified stream.
- * Generated code is preceeded by stmt updating global variable
+ * Generated code is preceded by stmt updating global variable
  * `current_statement_begin__` to src file line number where
  * variable is declared.
  *

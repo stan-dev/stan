@@ -16,9 +16,8 @@ transformed data {
   int x = 10;
   real y = 20;
   print("in transformed data");
-  print("x: ", x)
-  x += 1;  // scalar int
-  print("x += 1: ", x)
+    x += 1;  // scalar int
+  print("x += 1: ", x);
   print("y: ", y);
   y += 1;  // scalar double
   print("y += 1: ", y);

@@ -1,6 +1,6 @@
 transformed data {
   vector[3] v;
-  v <- !v;
+  v = !v;
 }
 parameters {
   real y;

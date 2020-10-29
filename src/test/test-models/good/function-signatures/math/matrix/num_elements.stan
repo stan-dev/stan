@@ -24,26 +24,26 @@ data {
 transformed data {
   int val;
 
-  val <- num_elements(x4x);
-  val <- num_elements(x5x);
+  val = num_elements(x4x);
+  val = num_elements(x5x);
 
-  val <- num_elements(x1y);
-  val <- num_elements(x2y);
-  val <- num_elements(x3y);
-  val <- num_elements(x4y);
-  val <- num_elements(x5y);
+  val = num_elements(x1y);
+  val = num_elements(x2y);
+  val = num_elements(x3y);
+  val = num_elements(x4y);
+  val = num_elements(x5y);
 
-  val <- num_elements(x1z);
-  val <- num_elements(x2z);
-  val <- num_elements(x3z);
-  val <- num_elements(x4z);
-  val <- num_elements(x5z);
+  val = num_elements(x1z);
+  val = num_elements(x2z);
+  val = num_elements(x3z);
+  val = num_elements(x4z);
+  val = num_elements(x5z);
 
-  val <- num_elements(x1w);
-  val <- num_elements(x2w);
-  val <- num_elements(x3w);
-  val <- num_elements(x4w);
-  val <- num_elements(x5w);
+  val = num_elements(x1w);
+  val = num_elements(x2w);
+  val = num_elements(x3w);
+  val = num_elements(x4w);
+  val = num_elements(x5w);
 }
 parameters {
   real y;
@@ -73,45 +73,45 @@ parameters {
 transformed parameters {
   real p_val;
 
-  p_val <- num_elements(x3x);
-  p_val <- num_elements(x4x);
-  p_val <- num_elements(x5x);
+  p_val = num_elements(x3x);
+  p_val = num_elements(x4x);
+  p_val = num_elements(x5x);
 
-  p_val <- num_elements(x1y);
-  p_val <- num_elements(x2y);
-  p_val <- num_elements(x3y);
-  p_val <- num_elements(x4y);
-  p_val <- num_elements(x5y);
+  p_val = num_elements(x1y);
+  p_val = num_elements(x2y);
+  p_val = num_elements(x3y);
+  p_val = num_elements(x4y);
+  p_val = num_elements(x5y);
 
-  p_val <- num_elements(x1z);
-  p_val <- num_elements(x2z);
-  p_val <- num_elements(x3z);
-  p_val <- num_elements(x4z);
-  p_val <- num_elements(x5z);
+  p_val = num_elements(x1z);
+  p_val = num_elements(x2z);
+  p_val = num_elements(x3z);
+  p_val = num_elements(x4z);
+  p_val = num_elements(x5z);
 
-  p_val <- num_elements(x1w);
-  p_val <- num_elements(x2w);
-  p_val <- num_elements(x3w);
-  p_val <- num_elements(x4w);
-  p_val <- num_elements(x5w);
+  p_val = num_elements(x1w);
+  p_val = num_elements(x2w);
+  p_val = num_elements(x3w);
+  p_val = num_elements(x4w);
+  p_val = num_elements(x5w);
 
-  p_val <- num_elements(p_x1y);
-  p_val <- num_elements(p_x2y);
-  p_val <- num_elements(p_x3y);
-  p_val <- num_elements(p_x4y);
-  p_val <- num_elements(p_x5y);
+  p_val = num_elements(p_x1y);
+  p_val = num_elements(p_x2y);
+  p_val = num_elements(p_x3y);
+  p_val = num_elements(p_x4y);
+  p_val = num_elements(p_x5y);
 
-  p_val <- num_elements(p_x1z);
-  p_val <- num_elements(p_x2z);
-  p_val <- num_elements(p_x3z);
-  p_val <- num_elements(p_x4z);
-  p_val <- num_elements(p_x5z);
+  p_val = num_elements(p_x1z);
+  p_val = num_elements(p_x2z);
+  p_val = num_elements(p_x3z);
+  p_val = num_elements(p_x4z);
+  p_val = num_elements(p_x5z);
 
-  p_val <- num_elements(p_x1w);
-  p_val <- num_elements(p_x2w);
-  p_val <- num_elements(p_x3w);
-  p_val <- num_elements(p_x4w);
-  p_val <- num_elements(p_x5w);
+  p_val = num_elements(p_x1w);
+  p_val = num_elements(p_x2w);
+  p_val = num_elements(p_x3w);
+  p_val = num_elements(p_x4w);
+  p_val = num_elements(p_x5w);
 }
 model {
   y ~ normal(0,1);

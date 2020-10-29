@@ -5,6 +5,49 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.24.0 (28 July 2020)
+======================================================================
+
+- `std::chrono` is now used for all timing purposes
+- fixed a bug with generated quantities for vectors of length 1
+- added `recover_memory` for normal exit of `log_prob_grad`
+- replaced the use of `boost::` functions/metaprograms in favor of `std::` where applicable
+
+v.2.23.0 (22 April 2020)
+======================================================================
+
+- updated Stan Math to 3.2
+- `rvalue` and `assign` now accept generic Eigen expressions
+
+v.2.22.0 (24 January 2020)
+======================================================================
+
+New Features
+------------
+
+- validate_dims in stan::io::var_context vas made a virtual function which allows its implementation for JSON data which is needed to accepts arrays where any dimension is size 0
+- replaced Eigen vectors of strings with std::vector<std::string>
+- replaced stan::math::domain_error with throw_domain_error
+- added const noexcept accessors to the stepsize adaptation class which allows developers to query the adaptation parameters in contexts where it's natural to have a const sampler (logging, serialization, ...)
+
+v.2.21.0 (18 October 2019)
+======================================================================
+
+New Features
+------------
+- Add Intel TBB (#2769)
+- Add automated maintanence and cleanup via clang-tools to makefile (#2805)
+- Use Welford's algorithm for Variance Estimates in src/stan/analyze (#2819)
+- Adds additional no-u-turn checks across subtrees to avoid missing u-turns for approximately iid normal models (#2800)
+- Add gp kernels to language (#2739)
+- Update rhat and ess (#2794)
+
+Bug Fixes
+---------
+- Fix const logic and size check (#2822)
+- Add ifdef for R new_model (#2798)
+- Add g_ to name of g vector name in ps_point (#2832)
+
 v.2.20.0 (18 July 2019)
 ======================================================================
 

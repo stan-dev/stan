@@ -67,3 +67,6 @@ stan.kdev4
 
 # clangd compiler database
 compile_commands.json
+
+# gdb
+.gdb_history

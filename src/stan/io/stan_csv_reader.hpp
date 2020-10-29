@@ -2,11 +2,12 @@
 #define STAN_IO_STAN_CSV_READER_HPP
 
 #include <boost/algorithm/string.hpp>
-#include <stan/math/prim/mat/fun/Eigen.hpp>
+#include <stan/math/prim.hpp>
 #include <istream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace stan {
 namespace io {
@@ -69,7 +70,7 @@ struct stan_csv_timing {
 
 struct stan_csv {
   stan_csv_metadata metadata;
-  Eigen::Matrix<std::string, Eigen::Dynamic, 1> header;
+  std::vector<std::string> header;
   stan_csv_adaptation adaptation;
   Eigen::MatrixXd samples;
   stan_csv_timing timing;
@@ -173,9 +174,8 @@ class stan_csv_reader {
     return true;
   }  // read_metadata
 
-  static bool read_header(std::istream& in,
-                          Eigen::Matrix<std::string, Eigen::Dynamic, 1>& header,
-                          std::ostream* out) {
+  static bool read_header(std::istream& in, std::vector<std::string>& header,
+                          std::ostream* out, bool prettify_name = true) {
     std::string line;
 
     if (in.peek() != 'l')
@@ -192,12 +192,12 @@ class stan_csv_reader {
       boost::trim(token);
 
       int pos = token.find('.');
-      if (pos > 0) {
+      if (pos > 0 && prettify_name) {
         token.replace(pos, 1, "[");
         std::replace(token.begin(), token.end(), '.', ',');
         token += "]";
       }
-      header(idx++) = token;
+      header[idx++] = token;
     }
     return true;
   }

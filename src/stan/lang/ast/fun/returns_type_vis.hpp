@@ -197,7 +197,7 @@ struct returns_type_vis : public boost::static_visitor<bool> {
    * time.
    *
    * @param[in] st statement
-   * @return true if the specifieid return type returns an
+   * @return true if the specified return type returns an
    * expression of the type specified at construction time
    */
   bool operator()(const return_statement& st) const;

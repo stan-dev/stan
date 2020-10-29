@@ -5,7 +5,7 @@ functions {
 }
 transformed data {
   real z;
-  z <- foo_lp(1.3);
+  z = foo_lp(1.3);
 }
 parameters {
   real y;

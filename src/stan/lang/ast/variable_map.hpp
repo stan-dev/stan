@@ -76,7 +76,7 @@ struct variable_map {
            const scope& scope_decl);
 
   /**
-   * Remove the declaraiton for the variable with the specified
+   * Remove the declaration for the variable with the specified
    * name.  If the variable had not already been declared, it
    * the function exits silently.
    *

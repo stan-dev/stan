@@ -11,7 +11,7 @@
 
 class ServicesUtilGQWriter : public testing::Test {
  public:
-  ServicesUtilGQWriter() : model(context, &model_log) {}
+  ServicesUtilGQWriter() : model(context, 0, &model_log) {}
   std::stringstream model_log;
   stan::io::empty_var_context context;
   std::stringstream sample_ss, logger_ss;

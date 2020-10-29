@@ -5,8 +5,8 @@ transformed parameters {
   real w;
   real<lower=0> z[2];
   w = y[1];
-  z[1] <- exp(y[1]);
-  z[2] <- exp(y[2]) * exp(y[1]);
+  z[1] = exp(y[1]);
+  z[2] = exp(y[2]) * exp(y[1]);
 }
 model {
   y ~ normal(0,1);

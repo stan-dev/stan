@@ -15,7 +15,7 @@ TEST(ModelUtil, hessian) {
   data_stream.close();
 
   std::stringstream output;
-  valid_model_namespace::valid_model valid_model(data_var_context, &output);
+  valid_model_namespace::valid_model valid_model(data_var_context, 0, &output);
   EXPECT_NO_THROW(stan::model::hessian(valid_model, x, f, grad_f, hess_f));
 
   EXPECT_FLOAT_EQ(dim, x.size());

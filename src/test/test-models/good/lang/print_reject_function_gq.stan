@@ -21,5 +21,5 @@ model {
 generated quantities {
   real v;
   print("In generated quantities");
-  foo(v)
+  foo(v);
 }

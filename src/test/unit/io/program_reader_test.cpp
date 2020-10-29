@@ -132,7 +132,7 @@ TEST(prog_reader, two) {
       "}\n"              // 5, 3 foo
       "parameters {\n"   // 6, 4 foo, 1 include
       "  real y;\n"      // 7, 4 foo, 2 include
-      "}\n"              // 8, 4 foo, 3 indluce
+      "}\n"              // 8, 4 foo, 3 include
       "model {\n"        // 9, 5 foo
       "}\n",             // 10, 6 foo
       reader.program());
@@ -220,7 +220,7 @@ TEST(prog_reader, four) {
       "}\n"              // 5, 3 foo
       "parameters {\n"   // 6, 4 foo, 1 include
       "  real y;\n"      // 7, 4 foo, 2 include
-      "}\n"              // 8, 4 foo, 3 indluce
+      "}\n"              // 8, 4 foo, 3 include
       "model {\n"        // 9, 5 foo
       "}\n",             // 10, 6 foo
       reader.program());

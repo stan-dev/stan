@@ -65,7 +65,7 @@ class scope {
 
   /**
    * Flags local scopes which permit parameter variables.
-   * Allows local blocks in functions, transfromed parameter,
+   * Allows local blocks in functions, transformed parameter,
    * and model blocks; disallows local blocks in transformed data
    * and generated quantities program blocks.
    *

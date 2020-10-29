@@ -226,7 +226,7 @@ struct expression_visgen : public visgen {
     generate_expression(fx.x_r_, user_facing_, o_);
     o_ << ", ";
     generate_expression(fx.x_i_, user_facing_, o_);
-    o_ << ", *pstream__, ";
+    o_ << ", pstream__, ";
     generate_expression(fx.rel_tol_, user_facing_, o_);
     o_ << ")";
   }

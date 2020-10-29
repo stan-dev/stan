@@ -3,11 +3,11 @@ transformed data {
     real mu0;
     real sigma;
 
-    y[1]  <- 1.6;
-    y[2]  <- 1.4;
+    y[1]  = 1.6;
+    y[2]  = 1.4;
 
-    mu0   <- 1.5;
-    sigma <- 1.0;
+    mu0   = 1.5;
+    sigma = 1.0;
 }
 
 parameters {

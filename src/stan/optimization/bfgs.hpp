@@ -1,13 +1,12 @@
 #ifndef STAN_OPTIMIZATION_BFGS_HPP
 #define STAN_OPTIMIZATION_BFGS_HPP
 
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/model/log_prob_propto.hpp>
 #include <stan/model/log_prob_grad.hpp>
 #include <stan/optimization/bfgs_linesearch.hpp>
 #include <stan/optimization/bfgs_update.hpp>
 #include <stan/optimization/lbfgs_update.hpp>
-#include <boost/math/special_functions/fpclassify.hpp>
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -323,7 +322,7 @@ class ModelAdaptor {
       return 1;
     }
 
-    if (boost::math::isfinite(f)) {
+    if (std::isfinite(f)) {
       return 0;
     } else {
       if (_msgs)
@@ -357,7 +356,7 @@ class ModelAdaptor {
 
     g.resize(_g.size());
     for (size_t i = 0; i < _g.size(); i++) {
-      if (!boost::math::isfinite(_g[i])) {
+      if (!std::isfinite(_g[i])) {
         if (_msgs)
           *_msgs << "Error evaluating model log probability: "
                     "Non-finite gradient."
@@ -367,7 +366,7 @@ class ModelAdaptor {
       g[i] = -_g[i];
     }
 
-    if (boost::math::isfinite(f)) {
+    if (std::isfinite(f)) {
       return 0;
     } else {
       if (_msgs)

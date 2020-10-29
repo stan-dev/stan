@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <limits>
 #include <sstream>
 #include <string>
@@ -23,7 +23,7 @@ namespace util {
  * @return inv_metric
  */
 inline Eigen::MatrixXd read_dense_inv_metric(
-    stan::io::var_context& init_context, size_t num_params,
+    const stan::io::var_context& init_context, size_t num_params,
     callbacks::logger& logger) {
   Eigen::MatrixXd inv_metric;
   try {

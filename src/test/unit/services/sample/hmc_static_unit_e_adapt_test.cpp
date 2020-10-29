@@ -7,7 +7,7 @@
 
 class ServicesSampleHmcStaticUnitEAdapt : public testing::Test {
  public:
-  ServicesSampleHmcStaticUnitEAdapt() : model(context, &model_log) {}
+  ServicesSampleHmcStaticUnitEAdapt() : model(context, 0, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
@@ -51,7 +51,7 @@ TEST_F(ServicesSampleHmcStaticUnitEAdapt, call_count) {
   std::vector<std::vector<double> > diagnostic_values;
   diagnostic_values = diagnostic.vector_double_values();
 
-  // Expecatations of message call counts
+  // Expectations of message call counts
   int num_output_lines = (num_warmup + num_samples) / num_thin;
   EXPECT_EQ(num_warmup + num_samples, interrupt.call_count());
   EXPECT_EQ(1, parameter.call_count("vector_string"));

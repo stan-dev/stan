@@ -10,7 +10,7 @@ data {
 transformed data {
   real transformed_data_real;
 
-  transformed_data_real <- trace_gen_quad_form(d_matrix,d_matrix,d_matrix);
+  transformed_data_real = trace_gen_quad_form(d_matrix,d_matrix,d_matrix);
 }
 parameters {
   real p_real;
@@ -23,14 +23,14 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- trace_gen_quad_form(d_matrix,d_matrix,d_matrix);
-  transformed_param_real <- trace_gen_quad_form(d_matrix,p_matrix,d_matrix);
-  transformed_param_real <- trace_gen_quad_form(d_matrix,d_matrix,p_matrix);
-  transformed_param_real <- trace_gen_quad_form(d_matrix,p_matrix,p_matrix);
-  transformed_param_real <- trace_gen_quad_form(p_matrix,d_matrix,d_matrix);
-  transformed_param_real <- trace_gen_quad_form(p_matrix,p_matrix,d_matrix);
-  transformed_param_real <- trace_gen_quad_form(p_matrix,d_matrix,p_matrix);
-  transformed_param_real <- trace_gen_quad_form(p_matrix,p_matrix,p_matrix);
+  transformed_param_real = trace_gen_quad_form(d_matrix,d_matrix,d_matrix);
+  transformed_param_real = trace_gen_quad_form(d_matrix,p_matrix,d_matrix);
+  transformed_param_real = trace_gen_quad_form(d_matrix,d_matrix,p_matrix);
+  transformed_param_real = trace_gen_quad_form(d_matrix,p_matrix,p_matrix);
+  transformed_param_real = trace_gen_quad_form(p_matrix,d_matrix,d_matrix);
+  transformed_param_real = trace_gen_quad_form(p_matrix,p_matrix,d_matrix);
+  transformed_param_real = trace_gen_quad_form(p_matrix,d_matrix,p_matrix);
+  transformed_param_real = trace_gen_quad_form(p_matrix,p_matrix,p_matrix);
 }
 model {  
   y_p ~ normal(0,1);

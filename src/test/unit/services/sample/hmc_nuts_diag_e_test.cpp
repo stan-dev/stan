@@ -1,4 +1,4 @@
-#include <stan/math/prim/mat.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/services/sample/hmc_nuts_diag_e.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
@@ -8,7 +8,7 @@
 
 class ServicesSampleHmcNutsDiagE : public testing::Test {
  public:
-  ServicesSampleHmcNutsDiagE() : model(context, &model_log) {}
+  ServicesSampleHmcNutsDiagE() : model(context, 0, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
