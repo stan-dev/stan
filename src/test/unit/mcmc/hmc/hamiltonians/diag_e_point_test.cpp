@@ -10,9 +10,8 @@ TEST(McmcDiagEPoint, inv_metric_wrong_size) {
 
   Eigen::VectorXd inv_metric_large(2 * N);
 
-  EXPECT_THROW_MSG(z.set_inv_metric(inv_metric_large),
-		   std::invalid_argument,
-		   "number of rows in new inverse metric");
+  EXPECT_THROW_MSG(z.set_inv_metric(inv_metric_large), std::invalid_argument,
+                   "number of rows in new inverse metric");
 }
 
 TEST(McmcDiagEPoint, inv_metric) {
@@ -28,6 +27,6 @@ TEST(McmcDiagEPoint, inv_metric) {
 
   Eigen::VectorXd z_inv_metric = z.get_inv_metric();
   EXPECT_EQ(z_inv_metric.size(), inv_metric.size());
-  for(size_t i = 0; i < inv_metric.size(); ++i)
+  for (size_t i = 0; i < inv_metric.size(); ++i)
     EXPECT_FLOAT_EQ(z_inv_metric(i), inv_metric(i));
 }

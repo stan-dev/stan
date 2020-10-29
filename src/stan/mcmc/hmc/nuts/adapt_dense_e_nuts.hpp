@@ -31,8 +31,8 @@ class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
 
       Eigen::MatrixXd inv_metric;
 
-      bool update = this->covar_adaptation_.learn_covariance(inv_metric,
-        this->z_.q);
+      bool update
+          = this->covar_adaptation_.learn_covariance(inv_metric, this->z_.q);
 
       if (update) {
         this->init_stepsize(logger);

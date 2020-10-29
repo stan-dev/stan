@@ -33,8 +33,8 @@ class adapt_diag_e_static_uniform
 
       Eigen::VectorXd inv_metric;
 
-      bool update = this->var_adaptation_.learn_variance(inv_metric,
-        this->z_.q);
+      bool update
+          = this->var_adaptation_.learn_variance(inv_metric, this->z_.q);
       if (update) {
         this->init_stepsize(logger);
 

@@ -12,23 +12,22 @@ namespace mcmc {
  * Euclidean manifold with dense metric
  */
 class dense_e_point : public ps_point {
-private:
+ private:
   /**
    * Inverse mass matrix.
    */
   Eigen::MatrixXd inv_e_metric_;
   Eigen::MatrixXd inv_e_metric_llt_matrixU_;
 
-public:
+ public:
   /**
    * Construct a dense point in n-dimensional phase space
    * with identity matrix as inverse mass matrix.
    *
    * @param n number of dimensions
    */
-  explicit dense_e_point(int n) : ps_point(n),
-                                  inv_e_metric_(n, n),
-                                  inv_e_metric_llt_matrixU_(n, n) {
+  explicit dense_e_point(int n)
+      : ps_point(n), inv_e_metric_(n, n), inv_e_metric_llt_matrixU_(n, n) {
     inv_e_metric_.setIdentity();
     inv_e_metric_llt_matrixU_.setIdentity();
   }
@@ -48,9 +47,7 @@ public:
    *
    * @return reference to the inverse metric
    */
-  const Eigen::MatrixXd& get_inv_metric() const {
-    return inv_e_metric_;
-  }
+  const Eigen::MatrixXd& get_inv_metric() const { return inv_e_metric_; }
 
   /**
    * Get the transpose of the lower Cholesky factor

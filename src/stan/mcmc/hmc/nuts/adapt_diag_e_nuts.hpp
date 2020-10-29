@@ -31,8 +31,8 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
 
       Eigen::VectorXd inv_metric;
 
-      bool update = this->var_adaptation_.learn_variance(inv_metric,
-        this->z_.q);
+      bool update
+          = this->var_adaptation_.learn_variance(inv_metric, this->z_.q);
 
       if (update) {
         this->init_stepsize(logger);

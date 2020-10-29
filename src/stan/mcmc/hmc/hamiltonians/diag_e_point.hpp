@@ -12,13 +12,13 @@ namespace mcmc {
  * Euclidean manifold with diagonal metric
  */
 class diag_e_point : public ps_point {
-private:
+ private:
   /**
    * Vector of diagonal elements of inverse mass matrix.
    */
   Eigen::VectorXd inv_e_metric_;
 
-public:
+ public:
   /**
    * Construct a diag point in n-dimensional phase space
    * with vector of ones for diagonal elements of inverse mass matrix.
@@ -35,9 +35,10 @@ public:
    * @param inv_e_metric initial mass matrix
    */
   void set_inv_metric(const Eigen::VectorXd& inv_e_metric) {
-    math::check_size_match("set_inv_metric",
-    "Number of rows in old inverse metric", inv_e_metric_.size(),
-    "number of rows in new inverse metric", inv_e_metric.size());
+    math::check_size_match(
+        "set_inv_metric", "Number of rows in old inverse metric",
+        inv_e_metric_.size(), "number of rows in new inverse metric",
+        inv_e_metric.size());
     inv_e_metric_ = inv_e_metric;
   }
 
@@ -46,9 +47,7 @@ public:
    *
    * @return reference to the inverse metric
    */
-  const Eigen::VectorXd& get_inv_metric() const {
-    return inv_e_metric_;
-  }
+  const Eigen::VectorXd& get_inv_metric() const { return inv_e_metric_; }
 
   /**
    * Write elements of mass matrix to string and handoff to writer.
