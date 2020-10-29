@@ -28,8 +28,8 @@ TEST(McmcAutoAdaptation, test_covariance_one_row_one_col) {
 
   ASSERT_EQ(cov2.rows(), 1);
   ASSERT_EQ(cov2.cols(), 1);
-  
-  for(int i = 0; i < cov1.size(); ++i) {
+
+  for (int i = 0; i < cov1.size(); ++i) {
     ASSERT_FLOAT_EQ(cov1(i), 0.0);
   }
 
@@ -39,7 +39,7 @@ TEST(McmcAutoAdaptation, test_covariance_one_row_one_col) {
 TEST(McmcAutoAdaptation, test_covariance) {
   Eigen::MatrixXd X1(3, 2);
   Eigen::MatrixXd X2(2, 3);
-  
+
   X1 << 0.0, -1.0, 0.5, -2.7, 3.0, 5.0;
   X2 << 0.0, 3, -2.7, 0.5, -1, 5.0;
 
@@ -49,24 +49,22 @@ TEST(McmcAutoAdaptation, test_covariance) {
   Eigen::MatrixXd cov1_ref(2, 2);
   Eigen::MatrixXd cov2_ref(3, 3);
 
-  cov1_ref << 2.5833333333333335, 6.0666666666666664,
-    6.0666666666666664, 16.3633333333333333;
+  cov1_ref << 2.5833333333333335, 6.0666666666666664, 6.0666666666666664,
+      16.3633333333333333;
 
-  cov2_ref << 0.125, -1.0, 1.925,
-    -1.000, 8.0, -15.4,
-    1.925, -15.4, 29.645;
+  cov2_ref << 0.125, -1.0, 1.925, -1.000, 8.0, -15.4, 1.925, -15.4, 29.645;
 
   ASSERT_EQ(cov1.rows(), cov1_ref.rows());
   ASSERT_EQ(cov1.cols(), cov1_ref.cols());
 
   ASSERT_EQ(cov2.rows(), cov2_ref.rows());
   ASSERT_EQ(cov2.cols(), cov2_ref.cols());
-  
-  for(int i = 0; i < cov1_ref.size(); ++i) {
+
+  for (int i = 0; i < cov1_ref.size(); ++i) {
     ASSERT_FLOAT_EQ(cov1(i), cov1_ref(i));
   }
 
-  for(int i = 0; i < cov2_ref.size(); ++i) {
+  for (int i = 0; i < cov2_ref.size(); ++i) {
     ASSERT_FLOAT_EQ(cov2(i), cov2_ref(i));
   }
 }
@@ -77,7 +75,7 @@ TEST(McmcAutoAdaptation, power_method) {
 
   X << 2.0, 0.5, 0.5, 1.0;
   x0 << 1.0, 0.0;
-  
+
   const int max_iterations = 10;
   const double tol = 1e-10;
 
@@ -85,9 +83,10 @@ TEST(McmcAutoAdaptation, power_method) {
 
   int max_iterations_1 = max_iterations;
   double tol_1 = tol;
-  
-  double eval = stan::mcmc::internal::power_method(Av, x0, max_iterations_1, tol_1);
- 
+
+  double eval
+      = stan::mcmc::internal::power_method(Av, x0, max_iterations_1, tol_1);
+
   EXPECT_FLOAT_EQ(eval, 2.20710678118654746);
 }
 
@@ -105,8 +104,9 @@ TEST(McmcAutoAdaptation, power_method_tol_check) {
 
   int max_iterations_1 = max_iterations;
   double tol_1 = tol;
-  double eval = stan::mcmc::internal::power_method(Av, x0, max_iterations_1, tol_1);
-  
+  double eval
+      = stan::mcmc::internal::power_method(Av, x0, max_iterations_1, tol_1);
+
   EXPECT_LT(tol_1, tol);
 }
 
@@ -124,8 +124,9 @@ TEST(McmcAutoAdaptation, power_method_iter_check) {
 
   int max_iterations_1 = max_iterations;
   double tol_1 = tol;
-  double eval = stan::mcmc::internal::power_method(Av, x0, max_iterations_1, tol_1);
-  
+  double eval
+      = stan::mcmc::internal::power_method(Av, x0, max_iterations_1, tol_1);
+
   EXPECT_GT(tol_1, tol);
   EXPECT_EQ(max_iterations_1, max_iterations);
 }
@@ -157,14 +158,16 @@ TEST(McmcAutoAdaptation, eigenvalue_scaled_hessian) {
   data_stream.close();
 
   std::stringstream output;
-  known_hessian_model_namespace::known_hessian_model known_hessian_model(data_var_context, &output);
+  known_hessian_model_namespace::known_hessian_model known_hessian_model(
+      data_var_context, &output);
 
   Eigen::MatrixXd L(3, 3);
   Eigen::VectorXd q(3);
   L << 2.0, 0.0, 0.0, 0.7, 1.3, 0.0, -1.5, 2.0, 4.0;
   q << 0.0, 0.0, 0.0;
 
-  double eval = stan::mcmc::internal::eigenvalue_scaled_hessian(known_hessian_model, L, q);
+  double eval = stan::mcmc::internal::eigenvalue_scaled_hessian(
+      known_hessian_model, L, q);
 
   EXPECT_LT(std::abs(eval - 22.8141075806892850) / eval, 1e-2);
 }

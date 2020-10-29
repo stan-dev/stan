@@ -6,55 +6,52 @@
 #include <stan/mcmc/hmc/nuts/auto_e_nuts.hpp>
 
 namespace stan {
-  namespace mcmc {
-    /**
-     * The No-U-Turn sampler (NUTS) with multinomial sampling
-     * with a Gaussian-Euclidean disintegration and adaptive
-     * dense metric and adaptive step size
-     */
-    template <class Model, class BaseRNG>
-    class adapt_auto_e_nuts : public auto_e_nuts<Model, BaseRNG>,
-				   public stepsize_auto_adapter {
-    protected:
-      const Model& model_;
-    public:
-      adapt_auto_e_nuts(const Model& model, BaseRNG& rng)
-        : model_(model), auto_e_nuts<Model, BaseRNG>(model, rng),
+namespace mcmc {
+/**
+ * The No-U-Turn sampler (NUTS) with multinomial sampling
+ * with a Gaussian-Euclidean disintegration and adaptive
+ * dense metric and adaptive step size
+ */
+template <class Model, class BaseRNG>
+class adapt_auto_e_nuts : public auto_e_nuts<Model, BaseRNG>,
+                          public stepsize_auto_adapter {
+ protected:
+  const Model& model_;
+
+ public:
+  adapt_auto_e_nuts(const Model& model, BaseRNG& rng)
+      : model_(model),
+        auto_e_nuts<Model, BaseRNG>(model, rng),
         stepsize_auto_adapter(model.num_params_r()) {}
 
-      ~adapt_auto_e_nuts() {}
+  ~adapt_auto_e_nuts() {}
 
-      sample
-      transition(sample& init_sample, callbacks::logger& logger) {
-        sample s = auto_e_nuts<Model, BaseRNG>::transition(init_sample,
-								logger);
+  sample transition(sample& init_sample, callbacks::logger& logger) {
+    sample s = auto_e_nuts<Model, BaseRNG>::transition(init_sample, logger);
 
-        if (this->adapt_flag_) {
-          this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
-                                                    s.accept_stat());
+    if (this->adapt_flag_) {
+      this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
+                                                s.accept_stat());
 
-          bool update = this->auto_adaptation_.learn_covariance(
-						model_,
-                                                this->z_.inv_e_metric_,
-						this->z_.is_diagonal_,
-                                                this->z_.q);
+      bool update = this->auto_adaptation_.learn_covariance(
+          model_, this->z_.inv_e_metric_, this->z_.is_diagonal_, this->z_.q);
 
-          if (update) {
-            this->init_stepsize(logger);
+      if (update) {
+        this->init_stepsize(logger);
 
-            this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
-            this->stepsize_adaptation_.restart();
-          }
-        }
-        return s;
+        this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
+        this->stepsize_adaptation_.restart();
       }
+    }
+    return s;
+  }
 
-      void disengage_adaptation() {
-        base_adapter::disengage_adaptation();
-        this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
-      }
-    };
+  void disengage_adaptation() {
+    base_adapter::disengage_adaptation();
+    this->stepsize_adaptation_.complete_adaptation(this->nom_epsilon_);
+  }
+};
 
-  }  // mcmc
-}  // stan
+}  // namespace mcmc
+}  // namespace stan
 #endif
