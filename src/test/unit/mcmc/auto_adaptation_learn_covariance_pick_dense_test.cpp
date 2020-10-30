@@ -10,7 +10,7 @@ TEST(McmcVarAdaptation, learn_covariance_pick_dense) {
 
   std::stringstream output;
   correlated_gaussian_model_namespace::correlated_gaussian_model
-      correlated_gaussian_model(data_var_context, &output);
+    correlated_gaussian_model(data_var_context, 0, &output);
 
   stan::test::unit::instrumented_logger logger;
 
