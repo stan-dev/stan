@@ -1,6 +1,9 @@
 #ifndef STAN_MODEL_INDEXING_INDEX_LIST_HPP
 #define STAN_MODEL_INDEXING_INDEX_LIST_HPP
 
+#include <utility>
+#include <type_traits>
+
 namespace stan {
 namespace model {
 
@@ -18,8 +21,8 @@ struct nil_index_list {};
  */
 template <typename H, typename T>
 struct cons_index_list {
-  const H head_;
-  const T tail_;
+  std::decay_t<H> head_;
+  std::decay_t<T> tail_;
 
   /**
    * Construct a non-empty index list with the specified index for
@@ -28,34 +31,41 @@ struct cons_index_list {
    * @param head Index for head.
    * @param tail Index list for tail.
    */
-  explicit cons_index_list(const H& head, const T& tail)
-      : head_(head), tail_(tail) {}
+  template <typename Head, typename Tail>
+  explicit constexpr cons_index_list(Head&& head, Tail&& tail)
+      : head_(std::forward<Head>(head)), tail_(std::forward<Tail>(tail)) {}
 };
 
-// factory-like function does type inference for I and T
-template <typename I, typename T>
-inline cons_index_list<I, T> cons_list(const I& idx1, const T& t) {
-  return cons_index_list<I, T>(idx1, t);
+/**
+ * Construct a pack of indices.
+ * @tparam T1 The first index type.
+ * @tparam T2 The second index type.
+ * @param idx1 first index placed in `head_`
+ * @param idx2 second index placed in `tail_`
+ */
+template <typename T1, typename T2>
+inline constexpr auto cons_list(T1&& idx1, T2&& idx2) {
+  return cons_index_list<std::decay_t<T1>, std::decay_t<T2>>(
+      std::forward<T1>(idx1), std::forward<T2>(idx2));
 }
 
-inline nil_index_list index_list() { return nil_index_list(); }
+/**
+ * Expansion stop for index_list returning back a `nul_index_list`
+ */
+inline constexpr auto index_list() { return nil_index_list(); }
 
-template <typename I>
-inline cons_index_list<I, nil_index_list> index_list(const I& idx) {
-  return cons_list(idx, index_list());
-}
-
-template <typename I1, typename I2>
-inline cons_index_list<I1, cons_index_list<I2, nil_index_list> > index_list(
-    const I1& idx1, const I2& idx2) {
-  return cons_list(idx1, index_list(idx2));
-}
-
-template <typename I1, typename I2, typename I3>
-inline cons_index_list<
-    I1, cons_index_list<I2, cons_index_list<I3, nil_index_list> > >
-index_list(const I1& idx1, const I2& idx2, const I3& idx3) {
-  return cons_list(idx1, index_list(idx2, idx3));
+/**
+ * Factory-like function to construct a `cons_index_list` of `cons_index_list`s
+ * @tparam I1 First index type
+ * @tparam I2 Parameter pack of index types.
+ * @param idx1 First index to construct the cons_index_list.
+ * @param idx2 A parameter pack expanded and recursivly called into
+ *  `index_list()`
+ */
+template <typename T, typename... Types>
+inline constexpr auto index_list(T&& idx1, Types&&... idx2) {
+  return cons_list(std::forward<T>(idx1),
+                   index_list(std::forward<Types>(idx2)...));
 }
 
 }  // namespace model
