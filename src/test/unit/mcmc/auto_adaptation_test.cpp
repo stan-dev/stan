@@ -158,7 +158,8 @@ TEST(McmcAutoAdaptation, eigenvalue_scaled_hessian) {
   data_stream.close();
 
   std::stringstream output;
-  known_hessian_model_namespace::known_hessian_model known_hessian_model(data_var_context, 0, &output);
+  known_hessian_model_namespace::known_hessian_model known_hessian_model(
+      data_var_context, 0, &output);
 
   Eigen::MatrixXd L(3, 3);
   Eigen::VectorXd q(3);
