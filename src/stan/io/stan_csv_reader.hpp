@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <ctype.h>
 
 namespace stan {
 namespace io {
@@ -178,7 +179,7 @@ class stan_csv_reader {
                           std::ostream* out, bool prettify_name = true) {
     std::string line;
 
-    if (in.peek() != 'l')
+    if (!isalpha(in.peek()))
       return false;
 
     std::getline(in, line);
