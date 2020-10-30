@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/io/var_context.hpp>
-#include <Eigen/Dense>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <limits>
 #include <sstream>
 #include <string>

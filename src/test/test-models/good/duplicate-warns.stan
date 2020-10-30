@@ -1,6 +1,6 @@
 model {
   real foo;
-  foo <- 1;
+  foo = 1;
   increment_log_prob(0);
   foo = get_lp();
   foo = multiply_log(1, 1);

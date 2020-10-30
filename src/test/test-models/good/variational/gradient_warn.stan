@@ -12,7 +12,7 @@ parameters {
 model {
     int grpi;
     for (i in 1:N){
-        grpi <- grp_index[i];
+        grpi = grp_index[i];
         p[i] ~ logistic(muGrp[grpi], sigmaGrp[grpi]);
     };
 }

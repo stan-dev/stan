@@ -4,9 +4,9 @@ import org.stan.Utils
 def utils = new org.stan.Utils()
 def skipRemainingStages = false
 
-def setupCXX(failOnError = true) {
+def setupCXX(failOnError = true, CXX = env.CXX) {
     errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CXX=${env.CXX} ${errorStr}")
+    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
 }
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
@@ -17,9 +17,11 @@ def runTests(String testPath, Boolean separateMakeStep=true) {
     finally { junit 'test/**/*.xml' }
 }
 
-def runTestsWin(String testPath) {
+def runTestsWin(String testPath, Boolean separateMakeStep=true) {
     withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
-       bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+       if (separateMakeStep) {
+           bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+       }
        try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
        finally { junit 'test/**/*.xml' }
     }
@@ -85,7 +87,7 @@ pipeline {
                     """
                     utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
-                    setupCXX()
+                    setupCXX(true, env.GCC)
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
@@ -204,8 +206,18 @@ pipeline {
                     }
                     post { always { deleteDirWin() } }
                 }
-                stage('Unit') {
-                    agent any
+                stage('Linux Unit') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(true, env.GCC)
+                        sh "g++ --version"
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Mac Unit') {
+                    agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(false)
@@ -216,18 +228,69 @@ pipeline {
             }
         }
         stage('Integration') {
+            parallel {
+                stage('Integration Linux') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(true, env.GCC)
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Integration Mac') {
+                    agent { label 'osx' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        runTests("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Integration Windows') {
+                    agent { label 'windows' }
+                    when { 
+                        expression { 
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ) &&
+                            !skipRemainingStages 
+                        }
+                    }
+                    steps {
+                        deleteDirWin()
+                            unstash 'StanSetup'
+                            setupCXX()
+                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+                            setupCXX(false)
+                            runTestsWin("src/test/integration", separateMakeStep=false)
+                    }
+                    post { always { deleteDirWin() } }
+                }
+                stage('Math functions expressions test') {
+                    agent any
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX()
+                        script {
+                            dir("lib/stan_math/") {
+                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                    try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
+                                    finally { junit 'test/**/*.xml' }
+                                }
+                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                    sh "python ./test/expressions/test_expression_testing_framework.py"
+                                }
+                            }
+                        }
+                    }
+                    post { always { deleteDir() } }
+                }
+            }
             when {
                 expression {
                     !skipRemainingStages
                 }
             }
-            agent any
-            steps {
-                unstash 'StanSetup'
-                setupCXX()
-                runTests("src/test/integration", separateMakeStep=false)
-            }
-            post { always { deleteDir() } }
         }
         stage('Upstream CmdStan tests') {
             when { 

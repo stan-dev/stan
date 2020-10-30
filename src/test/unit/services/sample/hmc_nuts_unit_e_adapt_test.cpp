@@ -7,7 +7,7 @@
 
 class ServicesSampleHmcNutsUnitEAdapt : public testing::Test {
  public:
-  ServicesSampleHmcNutsUnitEAdapt() : model(context, &model_log) {}
+  ServicesSampleHmcNutsUnitEAdapt() : model(context, 0, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;

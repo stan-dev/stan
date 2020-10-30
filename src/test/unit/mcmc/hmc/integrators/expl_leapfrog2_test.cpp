@@ -22,7 +22,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::expl_leapfrog<
       stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
@@ -73,7 +73,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::expl_leapfrog<
       stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >

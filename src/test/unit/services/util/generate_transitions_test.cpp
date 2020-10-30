@@ -11,7 +11,7 @@
 
 class ServicesSamplesGenerateTransitions : public testing::Test {
  public:
-  ServicesSamplesGenerateTransitions() : model(context, &model_log) {}
+  ServicesSamplesGenerateTransitions() : model(context, 0, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_writer init;

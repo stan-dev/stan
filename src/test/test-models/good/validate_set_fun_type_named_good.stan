@@ -1,6 +1,6 @@
 transformed data {
   real x;
-  x <- exp(x);
+  x = exp(x);
 }
 parameters {
   real y;

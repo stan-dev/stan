@@ -91,7 +91,7 @@ class random_var_context : public testing::Test {
  public:
   random_var_context()
       : empty_context(),
-        model(empty_context, static_cast<std::stringstream*>(0)),
+        model(empty_context, 0, static_cast<std::stringstream*>(0)),
         rng(0),
         throwing_model() {}
 

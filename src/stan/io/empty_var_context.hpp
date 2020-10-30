@@ -2,6 +2,7 @@
 #define STAN_IO_EMPTY_VAR_CONTEXT_HPP
 
 #include <stan/io/var_context.hpp>
+#include <stan/io/validate_dims.hpp>
 #include <string>
 #include <vector>
 
@@ -91,7 +92,9 @@ class empty_var_context : public var_context {
    */
   void validate_dims(const std::string& stage, const std::string& name,
                      const std::string& base_type,
-                     const std::vector<size_t>& dims_declared) const {}
+                     const std::vector<size_t>& dims_declared) const {
+    stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
+  }
 
   /**
    * Fill a list of the names of the floating point variables in

@@ -15,7 +15,7 @@ TEST(ModelUtil, hessian_times_vector) {
   data_stream.close();
 
   std::stringstream output;
-  valid_model_namespace::valid_model valid_model(data_var_context, &output);
+  valid_model_namespace::valid_model valid_model(data_var_context, 0, &output);
   EXPECT_NO_THROW(
       stan::model::hessian_times_vector(valid_model, x, v, f, hess_f_dot_v));
 

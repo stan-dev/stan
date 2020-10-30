@@ -8,8 +8,8 @@ data {
 transformed data {
   real transformed_data_real;
 
-  transformed_data_real <- wishart_log(d_matrix, d_real, d_matrix);
-  transformed_data_real <- wishart_log(d_matrix, d_int, d_matrix);
+  transformed_data_real = wishart_log(d_matrix, d_real, d_matrix);
+  transformed_data_real = wishart_log(d_matrix, d_int, d_matrix);
 }
 parameters {
   matrix[d_int,d_int] p_matrix;
@@ -21,19 +21,19 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- wishart_log(d_matrix, d_real, d_matrix);
-  transformed_param_real <- wishart_log(d_matrix, d_real, p_matrix);
-  transformed_param_real <- wishart_log(d_matrix, p_real, d_matrix);
-  transformed_param_real <- wishart_log(d_matrix, p_real, p_matrix);
-  transformed_param_real <- wishart_log(p_matrix, d_real, d_matrix);
-  transformed_param_real <- wishart_log(p_matrix, d_real, p_matrix);
-  transformed_param_real <- wishart_log(p_matrix, p_real, d_matrix);
-  transformed_param_real <- wishart_log(p_matrix, p_real, p_matrix);
+  transformed_param_real = wishart_log(d_matrix, d_real, d_matrix);
+  transformed_param_real = wishart_log(d_matrix, d_real, p_matrix);
+  transformed_param_real = wishart_log(d_matrix, p_real, d_matrix);
+  transformed_param_real = wishart_log(d_matrix, p_real, p_matrix);
+  transformed_param_real = wishart_log(p_matrix, d_real, d_matrix);
+  transformed_param_real = wishart_log(p_matrix, d_real, p_matrix);
+  transformed_param_real = wishart_log(p_matrix, p_real, d_matrix);
+  transformed_param_real = wishart_log(p_matrix, p_real, p_matrix);
 
-  transformed_param_real <- wishart_log(d_matrix, d_int, d_matrix);
-  transformed_param_real <- wishart_log(d_matrix, d_int, p_matrix);
-  transformed_param_real <- wishart_log(p_matrix, d_int, d_matrix);
-  transformed_param_real <- wishart_log(p_matrix, d_int, p_matrix);
+  transformed_param_real = wishart_log(d_matrix, d_int, d_matrix);
+  transformed_param_real = wishart_log(d_matrix, d_int, p_matrix);
+  transformed_param_real = wishart_log(p_matrix, d_int, d_matrix);
+  transformed_param_real = wishart_log(p_matrix, d_int, p_matrix);
 }
 model {  
   y_p ~ normal(0,1);

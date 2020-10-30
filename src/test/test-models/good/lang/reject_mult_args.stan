@@ -1,13 +1,13 @@
 functions {
-  real relative_diff(real x, real y, real max, real min) {
+  real relative_diff(real x, real y, real max_v, real min_v) {
     real abs_diff;
     real avg_scale;
     abs_diff = fabs(x - y);
     avg_scale = (fabs(x) + fabs(y)) / 2;
-    if ((abs_diff / avg_scale) > max)
-      reject("user-specified rejection, difference above ",max," x:",x," y:",y);
-    if ((abs_diff / avg_scale) < min)
-      reject("user-specified rejection, difference below ",min," x:",x," y:",y);
+    if ((abs_diff / avg_scale) > max_v)
+      reject("user-specified rejection, difference above ",max_v," x:",x," y:",y);
+    if ((abs_diff / avg_scale) < min_v)
+      reject("user-specified rejection, difference below ",min_v," x:",x," y:",y);
     return abs_diff / avg_scale;
   }    
 }

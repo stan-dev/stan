@@ -39,7 +39,7 @@ class values : public stan::callbacks::stream_writer {
 class ServicesOptimizeLbfgs : public testing::Test {
  public:
   ServicesOptimizeLbfgs()
-      : init(init_ss), parameter(parameter_ss), model(context, &model_ss) {}
+      : init(init_ss), parameter(parameter_ss), model(context, 0, &model_ss) {}
 
   std::stringstream init_ss, parameter_ss, model_ss;
   stan::callbacks::stream_writer init;

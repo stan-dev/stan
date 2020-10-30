@@ -4,7 +4,7 @@ data {
 }
 transformed data {
   int z;
-  z <- i ^ j;  // int, int
+  z = i ^ j;  // int, int
 }
 parameters {
   real y;

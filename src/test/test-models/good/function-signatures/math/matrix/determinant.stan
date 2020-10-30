@@ -6,7 +6,7 @@ data {
 transformed data {
   real transformed_data_real;
 
-  transformed_data_real <- determinant(d_matrix);
+  transformed_data_real = determinant(d_matrix);
 }
 parameters {
   real y_p;
@@ -15,8 +15,8 @@ parameters {
 transformed parameters {
   real transformed_param_real;
 
-  transformed_param_real <- determinant(d_matrix);
-  transformed_param_real <- determinant(p_matrix);
+  transformed_param_real = determinant(d_matrix);
+  transformed_param_real = determinant(p_matrix);
 }
 model {  
   y_p ~ normal(0,1);

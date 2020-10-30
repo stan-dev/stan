@@ -13,7 +13,7 @@ parameters {
 transformed parameters {
   real v;
   print("In transformed parameters");
-  foo(v)
+  foo(v);
 }
 model {
   print("In model block.");

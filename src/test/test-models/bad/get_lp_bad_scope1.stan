@@ -1,6 +1,6 @@
 transformed data {
   real y;
-  y <- get_lp();
+  y = get_lp();
 }
 parameters {
   real z;

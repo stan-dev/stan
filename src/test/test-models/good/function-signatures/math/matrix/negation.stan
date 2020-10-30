@@ -12,9 +12,9 @@ transformed data {
   vector[d_int] transformed_data_vector;
   row_vector[d_int] transformed_data_row_vector;
 
-  transformed_data_vector <- -d_vector;
-  transformed_data_row_vector <- -d_row_vector;
-  transformed_data_matrix <- -d_matrix;
+  transformed_data_vector = -d_vector;
+  transformed_data_row_vector = -d_row_vector;
+  transformed_data_matrix = -d_matrix;
 }
 parameters {
   real p_real;
@@ -29,12 +29,12 @@ transformed parameters {
   vector[d_int] transformed_param_vector;
   row_vector[d_int] transformed_param_row_vector;
 
-  transformed_param_vector <- -d_vector;
-  transformed_param_row_vector <- -d_row_vector;
-  transformed_param_matrix <- -d_matrix;
-  transformed_param_vector <- -p_vector;
-  transformed_param_row_vector <- -p_row_vector;
-  transformed_param_matrix <- -p_matrix;
+  transformed_param_vector = -d_vector;
+  transformed_param_row_vector = -d_row_vector;
+  transformed_param_matrix = -d_matrix;
+  transformed_param_vector = -p_vector;
+  transformed_param_row_vector = -p_row_vector;
+  transformed_param_matrix = -p_matrix;
 }
 model {  
   y_p ~ normal(0,1);

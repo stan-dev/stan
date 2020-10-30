@@ -7,7 +7,6 @@
 #include <stan/mcmc/hmc/hamiltonians/dense_e_point.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
-#include <Eigen/Cholesky>
 
 namespace stan {
 namespace mcmc {

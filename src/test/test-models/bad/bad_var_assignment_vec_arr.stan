@@ -6,8 +6,8 @@ transformed data {
   vector<lower=0>[K-1] a1;
   real<lower=0> a2[K-1];
 
-  a1 <- tail(v, K-1) - head(v, K-1);
-  a2 <- tail(v, K-1) - head(v, K-1);
+  a1 = tail(v, K-1) - head(v, K-1);
+  a2 = tail(v, K-1) - head(v, K-1);
 }
 parameters {
   real x;
