@@ -3,12 +3,12 @@
 
 #include <boost/algorithm/string.hpp>
 #include <stan/math/prim.hpp>
+#include <cctype>
 #include <istream>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <ctype>
 
 namespace stan {
 namespace io {
