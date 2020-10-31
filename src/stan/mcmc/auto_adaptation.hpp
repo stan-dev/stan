@@ -192,11 +192,14 @@ class auto_adaptation : public windowed_adaptation {
 
       try {
         bool use_dense = false;
-        for (auto state : {"selection", "refinement"}) {
+	// 's' stands for selection
+	// 'r' stands for refinement
+        for (char state : { 's', 'r' }) {
           Eigen::MatrixXd Ytrain;
           Eigen::MatrixXd Ytest;
 
-          if (state == "selection") {
+	  // If in selection state
+          if (state == 's') {
             int Mtest;
             Mtest = static_cast<int>(0.2 * Y.cols());
             if (Mtest < 5) {
@@ -231,7 +234,8 @@ class auto_adaptation : public windowed_adaptation {
 
           covar = dense;
 
-          if (state == "selection") {
+	  // If in selection state
+          if (state == 's') {
             Eigen::MatrixXd L_dense = dense.llt().matrixL();
             Eigen::MatrixXd L_diag
                 = diag.diagonal().array().sqrt().matrix().asDiagonal();
