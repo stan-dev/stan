@@ -109,8 +109,8 @@ double eigenvalue_scaled_covariance(const Eigen::MatrixXd& L,
 
   auto Sx = [&](Eigen::VectorXd x) -> Eigen::VectorXd { return S * x; };
 
-  int max_iterations = 100;
-  double tol = 1e-3;
+  int max_iterations = 200;
+  double tol = 1e-5;
 
   return internal::power_method(Sx, Eigen::VectorXd::Random(Sigma.cols()),
                                 max_iterations, tol);
@@ -147,8 +147,8 @@ double eigenvalue_scaled_hessian(const Model& model, const Eigen::MatrixXd& L,
     return L.transpose() * (grad1 - grad2) / dx;
   };
 
-  int max_iterations = 100;
-  double tol = 1e-3;
+  int max_iterations = 200;
+  double tol = 1e-5;
 
   return internal::power_method(
       hessian_vector, Eigen::VectorXd::Random(q.size()), max_iterations, tol);
