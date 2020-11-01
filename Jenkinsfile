@@ -74,45 +74,6 @@ pipeline {
                 }
             }
         }
-        stage('Linting & Doc checks') {
-            agent any
-            steps {
-                script {
-                    sh "printenv"
-                    retry(3) { checkout scm }
-                    sh """
-                       make math-revert
-                       make clean-all
-                       git clean -xffd
-                    """
-                    utils.checkout_pr("math", "lib/stan_math", params.math_pr)
-                    stash 'StanSetup'
-                    setupCXX(true, env.GCC)
-                    parallel(
-                        CppLint: { sh "make cpplint" },
-                        API_docs: { sh 'make doxygen' },
-                    )
-                }
-            }
-            post {
-                always {
-
-                    recordIssues id: "lint_doc_checks",
-                    name: "Linting & Doc checks",
-                    enabledForFailure: true,
-                    aggregatingResults : true,
-                    tools: [
-                        cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
-                    ],
-                    blameDisabled: false,
-                    qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                    referenceJobName: env.BRANCH_NAME
-
-                    deleteDir()
-                }
-            }
-        }
         stage("Clang-format") {
             agent any
             steps {
@@ -158,6 +119,45 @@ pipeline {
                             to: "${env.CHANGE_AUTHOR_EMAIL}"
                         )
                     }
+                }
+            }
+        }
+        stage('Linting & Doc checks') {
+            agent any
+            steps {
+                script {
+                    sh "printenv"
+                    retry(3) { checkout scm }
+                    sh """
+                       make math-revert
+                       make clean-all
+                       git clean -xffd
+                    """
+                    utils.checkout_pr("math", "lib/stan_math", params.math_pr)
+                    stash 'StanSetup'
+                    setupCXX(true, env.GCC)
+                    parallel(
+                        CppLint: { sh "make cpplint" },
+                        API_docs: { sh 'make doxygen' },
+                    )
+                }
+            }
+            post {
+                always {
+
+                    recordIssues id: "lint_doc_checks",
+                    name: "Linting & Doc checks",
+                    enabledForFailure: true,
+                    aggregatingResults : true,
+                    tools: [
+                        cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
+                    ],
+                    blameDisabled: false,
+                    qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                    referenceJobName: env.BRANCH_NAME
+
+                    deleteDir()
                 }
             }
         }
