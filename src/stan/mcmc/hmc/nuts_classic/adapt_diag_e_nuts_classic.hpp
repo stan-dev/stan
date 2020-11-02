@@ -36,9 +36,9 @@ class adapt_diag_e_nuts_classic : public diag_e_nuts_classic<Model, BaseRNG>,
           = this->var_adaptation_.learn_variance(inv_metric, this->z_.q);
 
       if (update) {
-        this->init_stepsize(logger);
-
         this->z_.set_inv_metric(inv_metric);
+
+        this->init_stepsize(logger);
 
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
         this->stepsize_adaptation_.restart();
