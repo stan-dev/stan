@@ -89,11 +89,11 @@ inline T rvalue(T&& x, const cons_index_list<index_omni, nil_index_list>& idxs,
  * @return Result of evaluating the expression.
  */
 template <typename T, require_not_plain_type_t<T>* = nullptr>
-inline auto rvalue(T&& x, const cons_index_list<index_omni, nil_index_list>& idxs,
-                const char* name = "ANON", int depth = 0) {
+inline auto rvalue(T&& x,
+                   const cons_index_list<index_omni, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
   return x.eval();
 }
-
 
 /**
  * Return the result of indexing a type without taking a subset
