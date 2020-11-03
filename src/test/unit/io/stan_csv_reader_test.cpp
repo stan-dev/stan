@@ -11,14 +11,11 @@ class StanIoStanCsvReader : public testing::Test {
     metadata1_stream.open("src/test/unit/io/test_csv_files/metadata1.csv");
     metadata3_stream.open("src/test/unit/io/test_csv_files/metadata3.csv");
     header1_stream.open("src/test/unit/io/test_csv_files/header1.csv");
+    header2_stream.open("src/test/unit/io/test_csv_files/header2.csv");
     adaptation1_stream.open("src/test/unit/io/test_csv_files/adaptation1.csv");
     samples1_stream.open("src/test/unit/io/test_csv_files/samples1.csv");
 
     epil0_stream.open("src/test/unit/io/test_csv_files/epil.0.csv");
-    metadata2_stream.open("src/test/unit/io/test_csv_files/metadata2.csv");
-    header2_stream.open("src/test/unit/io/test_csv_files/header2.csv");
-    adaptation2_stream.open("src/test/unit/io/test_csv_files/adaptation2.csv");
-    samples2_stream.open("src/test/unit/io/test_csv_files/samples2.csv");
 
     blocker_nondiag0_stream.open(
         "src/test/unit/io/test_csv_files/blocker_nondiag.0.csv");
@@ -31,14 +28,11 @@ class StanIoStanCsvReader : public testing::Test {
     metadata1_stream.close();
     metadata3_stream.close();
     header1_stream.close();
+    header2_stream.close();
     adaptation1_stream.close();
     samples1_stream.close();
 
     epil0_stream.close();
-    metadata2_stream.close();
-    header2_stream.close();
-    adaptation2_stream.close();
-    samples2_stream.close();
 
     blocker_nondiag0_stream.close();
   }
@@ -47,9 +41,7 @@ class StanIoStanCsvReader : public testing::Test {
   std::ifstream blocker_nondiag0_stream;
   std::ifstream metadata1_stream, header1_stream, adaptation1_stream,
       samples1_stream;
-  std::ifstream metadata3_stream;
-  std::ifstream metadata2_stream, header2_stream, adaptation2_stream,
-      samples2_stream;
+  std::ifstream metadata3_stream, header2_stream;
   std::ifstream eight_schools_stream;
 };
 
@@ -133,6 +125,21 @@ TEST_F(StanIoStanCsvReader, read_header1) {
     EXPECT_EQ(ss.str(), header[30 + i]);
   }
   EXPECT_EQ("sigma_delta", header[54]);
+}
+
+TEST_F(StanIoStanCsvReader, read_header2) {
+  std::vector<std::string> header;
+  EXPECT_TRUE(
+      stan::io::stan_csv_reader::read_header(header2_stream, header, 0));
+
+  ASSERT_EQ(5, header.size());
+  EXPECT_EQ("d", header[0]);
+  EXPECT_EQ("sigmasq_delta", header[1]);
+  for (int i = 1; i <= 3; ++i) {
+    std::stringstream ss;
+    ss << "mu[" << i << "]";
+    EXPECT_EQ(ss.str(), header[1 + i]);
+  }
 }
 
 TEST_F(StanIoStanCsvReader, read_adaptation1) {
