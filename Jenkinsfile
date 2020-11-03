@@ -50,7 +50,6 @@ String branchName() { isPR() ? env.CHANGE_BRANCH :env.BRANCH_NAME }
 
 pipeline {
     agent none
-    options {parallelsAlwaysFailFast()}
     parameters {
         string(defaultValue: '', name: 'math_pr', description: "Leave blank "
                 + "unless testing against a specific math repo pull request, "
@@ -61,6 +60,7 @@ pipeline {
     options {
         skipDefaultCheckout()
         preserveStashes(buildCount: 7)
+        parallelsAlwaysFailFast()
     }
     stages {
         stage('Kill previous builds') {
