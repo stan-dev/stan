@@ -50,6 +50,7 @@ String branchName() { isPR() ? env.CHANGE_BRANCH :env.BRANCH_NAME }
 
 pipeline {
     agent none
+    options {parallelsAlwaysFailFast()}
     parameters {
         string(defaultValue: '', name: 'math_pr', description: "Leave blank "
                 + "unless testing against a specific math repo pull request, "
@@ -240,6 +241,13 @@ pipeline {
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
+                    when { 
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX()
