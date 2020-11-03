@@ -3,7 +3,6 @@
 
 #include <stan/math/prim.hpp>
 #include <stan/math/rev.hpp>
-#include <stan/model/indexing/deep_copy.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
@@ -61,20 +60,40 @@ inline T rvalue(T&& x, const nil_index_list& /*idx*/, const char* /*name*/ = "",
  * Return the result of indexing a type without taking a subset. Mostly used as
  * an intermediary rvalue function when doing multiple subsets.
  *
- * Types:  type[omni] : type
+ * Types:  plain_type[omni] : plain_type
  *
- * @tparam T Any type.
+ * @tparam T A type that is a plain object.
  * @param[in] x an object.
  * @param[in] idxs Index consisting of one omni-index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename T>
+template <typename T, require_plain_type_t<T>* = nullptr>
 inline T rvalue(T&& x, const cons_index_list<index_omni, nil_index_list>& idxs,
                 const char* name = "ANON", int depth = 0) {
   return std::forward<T>(x);
 }
+
+/**
+ * Return the result of indexing an eigen expression type without
+ * taking a subset.
+ *
+ * Types:  expr[omni] : plain_type
+ *
+ * @tparam T A type that is an expression.
+ * @param[in] x an eigen expression.
+ * @param[in] idxs Index consisting of one omni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of evaluating the expression.
+ */
+template <typename T, require_not_plain_type_t<T>* = nullptr>
+inline auto rvalue(T&& x, const cons_index_list<index_omni, nil_index_list>& idxs,
+                const char* name = "ANON", int depth = 0) {
+  return x.eval();
+}
+
 
 /**
  * Return the result of indexing a type without taking a subset
@@ -100,7 +119,7 @@ inline T rvalue(
 /**
  * Return a single element of an Eigen Vector.
  *
- * Types:  vec[uni] : scal
+ * Types:  vector[uni] : scaler
  *
  * @tparam EigVec An eigen vector
  * @param[in] v Vector being indexed.
@@ -121,7 +140,7 @@ inline auto rvalue(EigVec&& v,
 /**
  * Return a non-contiguous subset of elements in a vector.
  *
- * Types:  vec[multi] : vec
+ * Types:  vector[multi] = vector
  *
  * @tparam Vec Eigen type with either dynamic rows or columns, but not both.
  * @param[in] v Eigen vector type.
@@ -150,7 +169,7 @@ inline plain_type_t<Vec> rvalue(
 /**
  * Return a range of an Eigen vector
  *
- * Types:  vec[min_max] : vector
+ * Types:  vector[min_max] = vector
  *
  * @tparam EigVec An eigen vector
  * @param[in] v Vector being indexed.
@@ -181,7 +200,7 @@ inline auto rvalue(EigVec&& v,
 /**
  * Return a tail slice of a vector
  *
- * Types:  vector[min:N] : vector
+ * Types:  vector[min:N] = vector
  *
  * @tparam Vec Eigen type with either dynamic rows or columns, but not both.
  * @param[in] x vector
@@ -224,7 +243,7 @@ inline auto rvalue(Vec&& x,
  * Return the result of indexing the Eigen matrix with a
  * sequence consisting of one single index, returning a row vector.
  *
- * Types:  mat[uni] : rowvec
+ * Types:  matrix[uni] : row vector
  *
  * @tparam EigMat An eigen matrix
  * @param[in] x Eigen matrix.
@@ -245,7 +264,7 @@ inline auto rvalue(EigMat&& x,
 /**
  * Return the specified Eigen matrix at the specified multi index.
  *
- * Types:  mat[multi] = mat
+ * Types:  matrix[multi] = matrix
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Eigen type
@@ -274,7 +293,7 @@ inline plain_type_t<EigMat> rvalue(
  * Return the result of indexing the Eigen matrix with a min index
  * returning back a block of rows min:N and all cols
  *
- * Types:  mat[min:N] : matrix
+ * Types:  matrix[min:N] = matrix
  *
  * @tparam EigMat An eigen matrix
  * @param[in] x Eigen matrix.
@@ -296,7 +315,7 @@ inline auto rvalue(EigMat&& x,
 /**
  * Return the 1:max rows of an Eigen matrix.
  *
- * Types:  mat[:max] = mat
+ * Types:  matrix[:max] = matrix
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Eigen type
@@ -318,7 +337,7 @@ inline auto rvalue(EigMat&& x,
 /**
  * Return a range of rows for an Eigen matrix.
  *
- * Types:  mat[min_max] = mat
+ * Types:  matrix[min_max] = matrix
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Eigen type
@@ -351,7 +370,7 @@ inline auto rvalue(EigMat&& x,
  * Return the result of indexing an Eigen matrix with two min_max
  * indices, returning back a block of an Eigen matrix.
  *
- * Types:  mat[min_max, min_max] : matrix
+ * Types:  matrix[min_max, min_max] = matrix
  *
  * @tparam EigMat An eigen matrix
  * @param[in] x Eigen matrix.
@@ -414,7 +433,7 @@ inline auto rvalue(
 /**
  * Return a scalar from an Eigen matrix
  *
- * Types:  mat[single,single] : scalar
+ * Types:  matrix[single,single] : scalar
  *
  * @tparam EigMat An eigen type
  * @param[in] x Matrix to index.
@@ -439,7 +458,7 @@ inline auto rvalue(
 /**
  * Return a row of an Eigen matrix with possibly unordered cells.
  *
- * Types:  mat[uni, multi] = vector
+ * Types:  matrix[uni, multi] = row vector
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Matrix to index.
@@ -450,7 +469,7 @@ inline auto rvalue(
  */
 template <typename EigMat,
           stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
-inline Eigen::Matrix<value_type_t<EigMat>, 1, -1> rvalue(
+inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
     EigMat&& x,
     const cons_index_list<index_uni,
                           cons_index_list<index_multi, nil_index_list>>& idxs,
@@ -458,8 +477,8 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, -1> rvalue(
   math::check_range("matrix[uni, multi] index range", name, x.cols(),
                     idxs.head_.n_);
   const auto& x_ref = stan::math::to_ref(x);
-  Eigen::Matrix<value_type_t<EigMat>, 1, -1> x_ret(1,
-                                                   idxs.tail_.head_.ns_.size());
+  Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> x_ret(
+      1, idxs.tail_.head_.ns_.size());
   for (int i = 0; i < idxs.tail_.head_.ns_.size(); ++i) {
     math::check_range("matrix[uni, multi] index range", name, x.cols(),
                       idxs.tail_.head_.ns_[i]);
@@ -473,7 +492,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, -1> rvalue(
  * Return a column of an Eigen matrix that is a possibly non-contiguous subset
  *  of the input Eigen matrix.
  *
- * Types:  mat[multi, uni] = vector
+ * Types:  matrix[multi, uni] = vector
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Matrix to index.
@@ -484,7 +503,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, -1> rvalue(
  */
 template <typename EigMat,
           stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
-inline Eigen::Matrix<value_type_t<EigMat>, -1, 1> rvalue(
+inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
     EigMat&& x,
     const cons_index_list<index_multi,
                           cons_index_list<index_uni, nil_index_list>>& idxs,
@@ -492,7 +511,8 @@ inline Eigen::Matrix<value_type_t<EigMat>, -1, 1> rvalue(
   math::check_range("matrix[multi, uni] rvalue range", name, x.cols(),
                     idxs.tail_.head_.n_);
   const auto& x_ref = stan::math::to_ref(x);
-  Eigen::Matrix<value_type_t<EigMat>, -1, 1> x_ret(idxs.head_.ns_.size());
+  Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> x_ret(
+      idxs.head_.ns_.size());
   for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
     math::check_range("matrix[multi, uni] rvalue range", name, x_ref.rows(),
                       idxs.head_.ns_[i]);
@@ -506,7 +526,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, -1, 1> rvalue(
  * Return an Eigen matrix that is a possibly non-contiguous subset of the input
  *  Eigen matrix.
  *
- * Types:  mat[multi, multi] : mat
+ * Types:  matrix[multi, multi] = matrix
  *
  * @tparam EigMat An eigen matrix
  * @param[in] x Matrix to index.
@@ -542,7 +562,7 @@ inline plain_type_t<EigMat> rvalue(
  * Return a column of an Eigen matrix with the range of the column specificed
  *  by another index.
  *
- * Types:  mat[Idx, uni] : vec
+ * Types:  matrix[Idx, uni] = vector
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Eigen matrix.
@@ -559,15 +579,15 @@ inline auto rvalue(
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[..., uni] indexing", name, x.cols(),
                     idxs.tail_.head_.n_);
-  return deep_copy(rvalue(x.col(idxs.tail_.head_.n_ - 1),
-                          index_list(idxs.head_), name, depth + 1));
+  return rvalue(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), name,
+                depth + 1);
 }
 
 /**
  * Return an Eigen matrix of possibly unordered columns with each column
  *  range specified by another index.
  *
- * Types:  mat[Idx, multi] : vec
+ * Types:  matrix[Idx, multi] = matrix
  *
  * @tparam EigMat An eigen matrix
  * @param[in] x Eigen matrix.
@@ -600,7 +620,7 @@ inline plain_type_t<EigMat> rvalue(
 /**
  * Return the Eigen matrix with all columns and a slice of rows.
  *
- * Types:  mat[Idx, omni] = mat
+ * Types:  matrix[Idx, omni] = matrix
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Eigen type
@@ -616,15 +636,15 @@ inline auto rvalue(
     const cons_index_list<Idx, cons_index_list<index_omni, nil_index_list>>&
         idxs,
     const char* name = "ANON", int depth = 0) {
-  return deep_copy(
-      rvalue(std::forward<EigMat>(x), index_list(idxs.head_), name, depth + 1));
+  return rvalue(std::forward<EigMat>(x), index_list(idxs.head_), name,
+                depth + 1);
 }
 
 /**
  * Return columns min:N of the Eigen matrix with the range of the columns
  *  defined by another index.
  *
- * Types:  mat[Idx, min] = mat
+ * Types:  matrix[Idx, min] = matrix
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @tparam Idx An index.
@@ -645,15 +665,14 @@ inline auto rvalue(
   const auto col_size = x.cols() - (idxs.tail_.head_.min_ - 1);
   math::check_range("matrix[..., min] indexing", name, x.cols(),
                     idxs.tail_.head_.min_);
-  return deep_copy(
-      rvalue(x.rightCols(col_size), index_list(idxs.head_), name, depth + 1));
+  return rvalue(x.rightCols(col_size), index_list(idxs.head_), name, depth + 1);
 }
 
 /**
  * Return columns 1:max of input Eigen matrix with the range of the columns
  *  defined by another index.
  *
- * Types:  mat[Idx, max] = mat
+ * Types:  matrix[Idx, max] = matrix
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @tparam Idx An index.
@@ -673,15 +692,15 @@ inline auto rvalue(
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[..., max] indexing", name, x.cols(),
                     idxs.tail_.head_.max_);
-  return deep_copy(rvalue(x.leftCols(idxs.tail_.head_.max_),
-                          index_list(idxs.head_), name, depth + 1));
+  return rvalue(x.leftCols(idxs.tail_.head_.max_), index_list(idxs.head_), name,
+                depth + 1);
 }
 
 /**
  * Return the result of indexing the specified Eigen matrix with a
  * min_max_index returning a block from min to max.
  *
- * Types:  mat[Idx, min_max] : matrix
+ * Types:  matrix[Idx, min_max] = matrix
  *
  * @tparam EigMat An eigen matrix
  * @tparam Idx Type of index.
@@ -704,16 +723,14 @@ inline auto rvalue(
                     idxs.tail_.head_.max_);
   if (idxs.tail_.head_.is_ascending()) {
     const auto col_start = idxs.tail_.head_.min_ - 1;
-    return deep_copy(
-        rvalue(x.middleCols(col_start, idxs.tail_.head_.max_ - col_start),
-               index_list(idxs.head_), name, depth + 1));
+    return rvalue(x.middleCols(col_start, idxs.tail_.head_.max_ - col_start),
+                  index_list(idxs.head_), name, depth + 1);
   } else {
     const auto col_start = idxs.tail_.head_.max_ - 1;
-    return deep_copy(
-        rvalue(x.middleCols(col_start, idxs.tail_.head_.min_ - col_start)
-                   .rowwise()
-                   .reverse(),
-               index_list(idxs.head_), name, depth + 1));
+    return rvalue(x.middleCols(col_start, idxs.tail_.head_.min_ - col_start)
+                      .rowwise()
+                      .reverse(),
+                  index_list(idxs.head_), name, depth + 1);
   }
 }
 
