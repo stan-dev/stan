@@ -433,7 +433,7 @@ inline auto rvalue(
 /**
  * Return a scalar from an Eigen matrix
  *
- * Types:  matrix[single,single] : scalar
+ * Types:  matrix[uni,uni] : scalar
  *
  * @tparam EigMat An eigen type
  * @param[in] x Matrix to index.
@@ -740,7 +740,7 @@ inline auto rvalue(
  * determined recursively.  Note that arrays are represented as
  * standard library vectors.
  *
- * Types:  std::vector<T>[single | Idx] : T[Idx]
+ * Types:  std::vector<T>[uni | Idx] : T[Idx]
  *
  * @tparam T Type of list elements.
  * @tparam Idx Index list type for indexes after first index.
@@ -766,7 +766,7 @@ inline auto rvalue(StdVec&& v, const cons_index_list<index_uni, Idx>& idxs,
  * Return the result of indexing the specified array with
  * a single index.
  *
- * Types:  std::vector<T>[single] : T
+ * Types:  std::vector<T>[uni] : T
  *
  * @tparam StdVec a standard vector
  * @param[in] c Container of list elements.
