@@ -60,6 +60,7 @@ pipeline {
     options {
         skipDefaultCheckout()
         preserveStashes(buildCount: 7)
+        parallelsAlwaysFailFast()
     }
     stages {
         stage('Kill previous builds') {
@@ -240,6 +241,13 @@ pipeline {
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
+                    when { 
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX()
