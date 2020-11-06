@@ -128,7 +128,8 @@ inline T rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing vector.
  */
-template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
+template <typename EigVec, require_vector_t<EigVec>* = nullptr,
+ require_not_std_vector_t<EigVec>* = nullptr>
 inline auto rvalue(EigVec&& v,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -178,7 +179,8 @@ inline plain_type_t<Vec> rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing vector.
  */
-template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
+template <typename EigVec, require_vector_t<EigVec>* = nullptr,
+ require_not_std_vector_t<EigVec>* = nullptr>
 inline auto rvalue(EigVec&& v,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -209,7 +211,8 @@ inline auto rvalue(EigVec&& v,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename Vec, require_eigen_vector_t<Vec>* = nullptr>
+template <typename Vec, require_vector_t<Vec>* = nullptr,
+ require_not_std_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -230,7 +233,8 @@ inline auto rvalue(Vec&& x,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename Vec, require_all_eigen_vector_t<Vec>* = nullptr>
+template <typename Vec, require_vector_t<Vec>* = nullptr,
+ require_not_std_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -253,7 +257,7 @@ inline auto rvalue(Vec&& x,
  * @return Result of indexing matrix.
  */
 template <typename EigMat,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -275,7 +279,7 @@ inline auto rvalue(EigMat&& x,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat,
-          stan::internal::require_all_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_all_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline plain_type_t<EigMat> rvalue(
     EigMat&& x, const cons_index_list<index_multi, nil_index_list>& idxs,
     const char* name = "ANON", int depth = 0) {
@@ -303,7 +307,7 @@ inline plain_type_t<EigMat> rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -326,7 +330,7 @@ inline auto rvalue(EigMat&& x,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat,
-          stan::internal::require_all_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_all_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -348,7 +352,7 @@ inline auto rvalue(EigMat&& x,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat,
-          stan::internal::require_all_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_all_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -380,7 +384,7 @@ inline auto rvalue(EigMat&& x,
  * @return Result of indexing matrix.
  */
 template <typename EigMat,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
     const cons_index_list<index_min_max,
@@ -442,7 +446,7 @@ inline auto rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename EigMat, require_eigen_t<EigMat>* = nullptr>
+template <typename EigMat, require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
     const cons_index_list<index_uni,
@@ -468,13 +472,13 @@ inline auto rvalue(
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
     EigMat&& x,
     const cons_index_list<index_uni,
                           cons_index_list<index_multi, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni, multi] index range", name, x.cols(),
+  math::check_range("matrix[uni, multi] index range", name, x.rows(),
                     idxs.head_.n_);
   const auto& x_ref = stan::math::to_ref(x);
   Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> x_ret(
@@ -502,7 +506,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
     EigMat&& x,
     const cons_index_list<index_multi,
@@ -536,7 +540,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline plain_type_t<EigMat> rvalue(
     EigMat&& x,
     const cons_index_list<index_multi,
@@ -571,7 +575,7 @@ inline plain_type_t<EigMat> rvalue(
  * @param[in] depth Depth of indexing dimension.
  */
 template <typename EigMat, typename Idx,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
     const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
@@ -597,7 +601,7 @@ inline auto rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename Idx,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr,
+          require_eigen_dense_dynamic_t<EigMat>* = nullptr,
           require_not_same_t<std::decay_t<Idx>, index_uni>* = nullptr>
 inline plain_type_t<EigMat> rvalue(
     EigMat&& x,
@@ -630,7 +634,7 @@ inline plain_type_t<EigMat> rvalue(
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat, typename Idx,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
     const cons_index_list<Idx, cons_index_list<index_omni, nil_index_list>>&
@@ -656,7 +660,7 @@ inline auto rvalue(
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat, typename Idx,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
     const cons_index_list<Idx, cons_index_list<index_min, nil_index_list>>&
@@ -684,7 +688,7 @@ inline auto rvalue(
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat, typename Idx,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
     const cons_index_list<Idx, cons_index_list<index_max, nil_index_list>>&
@@ -711,7 +715,7 @@ inline auto rvalue(
  * @return Result of indexing matrix.
  */
 template <typename EigMat, typename Idx,
-          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
     const cons_index_list<Idx, cons_index_list<index_min_max, nil_index_list>>&
