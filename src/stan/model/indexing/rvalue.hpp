@@ -330,7 +330,7 @@ template <typename EigMat,
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[max] indexing", name, x.cols(), idxs.head_.max_);
+  math::check_range("matrix[max] indexing", name, x.rows(), idxs.head_.max_);
   return x.topRows(idxs.head_.max_).eval();
 }
 
@@ -474,7 +474,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
     const cons_index_list<index_uni,
                           cons_index_list<index_multi, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni, multi] index range", name, x.cols(),
+  math::check_range("matrix[uni, multi] index range", name, x.rows(),
                     idxs.head_.n_);
   const auto& x_ref = stan::math::to_ref(x);
   Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> x_ret(
