@@ -587,7 +587,7 @@ inline void assign(
                           cons_index_list<index_multi, nil_index_list>>& idxs,
     const Vec& y, const char* name = "ANON", int depth = 0) {
   const auto& y_ref = stan::math::to_ref(y);
-  stan::math::check_range("matrix[uni, multi] assign range", name, x.cols(),
+  stan::math::check_range("matrix[uni, multi] assign range", name, x.rows(),
                           idxs.head_.n_);
   stan::math::check_size_match("matrix[uni, multi] assign sizes", "lhs",
                                idxs.tail_.head_.ns_.size(), name, y_ref.size());
