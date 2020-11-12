@@ -76,7 +76,8 @@ bool check_duplicate(const arena_t<std::vector<int>>& x_idx, int i) {
  * @throw std::out_of_range If the index is out of bounds.
  */
 template <typename VarVec, typename U, require_var_vector_t<VarVec>* = nullptr,
-          require_var_t<U>* = nullptr>
+          require_var_t<U>* = nullptr,
+          require_floating_point_t<value_type_t<U>>* = nullptr>
 inline void assign(VarVec&& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const U& y, const char* name = "ANON", int depth = 0) {

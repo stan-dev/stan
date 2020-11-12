@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <vector>
 #include <stan/model/indexing/lvalue_varmat.hpp>
+#include <stan/model/indexing/lvalue.hpp>
 #include <stan/model/indexing/rvalue.hpp>
 #include <stan/math/rev.hpp>
 #include <gtest/gtest.h>
@@ -255,6 +256,41 @@ TEST_F(VarAssign, max_rowvec) {
   test_max_vec<false>();
 }
 
+
+TEST_F(VarAssign, min_vec) {
+  VectorXd lhs_x(5);
+  lhs_x << 0, 1, 2, 3, 4;
+  VectorXd rhs_y(3);
+  rhs_y << 10, 11, 12;
+  assign(lhs_x, index_list(index_min(3)), rhs_y);
+  EXPECT_FLOAT_EQ(rhs_y(0), lhs_x(2));
+  EXPECT_FLOAT_EQ(rhs_y(1), lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(2), lhs_x(4));
+  test_throw_out_of_range(lhs_x, index_list(index_min(0)), rhs_y);
+
+  assign(lhs_x, index_list(index_min(3)), rhs_y.array() + 1.0);
+  EXPECT_FLOAT_EQ(rhs_y(0) + 1.0, lhs_x(2));
+  EXPECT_FLOAT_EQ(rhs_y(1) + 1.0, lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(2) + 1.0, lhs_x(4));
+}
+
+TEST_F(VarAssign, min_rowvec) {
+  RowVectorXd lhs_x(5);
+  lhs_x << 0, 1, 2, 3, 4;
+  RowVectorXd rhs_y(3);
+  rhs_y << 10, 11, 12;
+  assign(lhs_x, index_list(index_min(3)), rhs_y);
+  EXPECT_FLOAT_EQ(rhs_y(0), lhs_x(2));
+  EXPECT_FLOAT_EQ(rhs_y(1), lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(2), lhs_x(4));
+  test_throw_out_of_range(lhs_x, index_list(index_min(0)), rhs_y);
+
+  assign(lhs_x, index_list(index_min(3)), rhs_y.array() + 1.0);
+  EXPECT_FLOAT_EQ(rhs_y(0) + 1.0, lhs_x(2));
+  EXPECT_FLOAT_EQ(rhs_y(1) + 1.0, lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(2) + 1.0, lhs_x(4));
+}
+
 template <bool ColVec>
 void test_omni_vec() {
   using stan::math::var_value;
@@ -329,15 +365,88 @@ void test_eigvec_var_uni_index_seg() {
       EXPECT_FLOAT_EQ(lhs_x.adj()(i), 1);
     }
   }
+  EXPECT_FLOAT_EQ(y.adj(), 1);
   test_throw_out_of_range(lhs_x, index_list(index_uni(0)), y);
   test_throw_out_of_range(lhs_x, index_list(index_uni(6)), y);
 }
 
-TEST(model_indexing, uni_vec_segment) {
+TEST_F(VarAssign, uni_vec_segment) {
   test_eigvec_var_uni_index_seg<Eigen::VectorXd>();
 }
-TEST(model_indexing, uni_rowvec_segment) {
+TEST_F(VarAssign, uni_rowvec_segment) {
   test_eigvec_var_uni_index_seg<Eigen::RowVectorXd>();
+}
+
+TEST_F(VarAssign, positive_minmax_vec) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using stan::math::var_value;
+  using stan::math::sum;
+  Eigen::VectorXd lhs_val(5);
+  lhs_val << 1, 2, 3, 4, 5;
+  Eigen::VectorXd rhs_val(4);
+  rhs_val << 4, 3, 2, 1;
+  var_value<Eigen::VectorXd> lhs(lhs_val);
+  var_value<Eigen::VectorXd> rhs(rhs_val);
+
+  assign(lhs, index_list(index_min_max(1, 4)), rhs);
+  EXPECT_FLOAT_EQ(lhs.val()(0), 4);
+  EXPECT_FLOAT_EQ(lhs.val()(1), 3);
+  EXPECT_FLOAT_EQ(lhs.val()(2), 2);
+  EXPECT_FLOAT_EQ(lhs.val()(3), 1);
+  EXPECT_FLOAT_EQ(lhs.val()(4), 5);
+  sum(lhs).grad();
+  for (Eigen::Index i = 0; i < lhs.size(); ++i) {
+    EXPECT_FLOAT_EQ(lhs_val(i), lhs.val()(i));
+    if (i < lhs.size() - 1) {
+      EXPECT_FLOAT_EQ(lhs.adj()(i), 0);
+    } else {
+      EXPECT_FLOAT_EQ(lhs.adj()(i), 1);
+    }
+  }
+  for (Eigen::Index i = 0; i < rhs.size(); ++i) {
+    EXPECT_FLOAT_EQ(rhs.adj()(i), 1);
+  }
+  test_throw_out_of_range(lhs, index_list(index_min_max(0, 3)), rhs);
+  test_throw_out_of_range(lhs, index_list(index_min_max(1, 8)), rhs);
+
+}
+TEST_F(VarAssign, negative_minmax_vec) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using stan::math::var_value;
+  using stan::math::sum;
+  Eigen::VectorXd lhs_val(5);
+  lhs_val << 1, 2, 3, 4, 5;
+  Eigen::VectorXd rhs_val(4);
+  rhs_val << 1, 2, 3, 4;
+  var_value<Eigen::VectorXd> lhs(lhs_val);
+  var_value<Eigen::VectorXd> rhs(rhs_val);
+
+  assign(lhs, index_list(index_min_max(4, 1)), rhs);
+  EXPECT_FLOAT_EQ(lhs.val()(0), 4);
+  EXPECT_FLOAT_EQ(lhs.val()(1), 3);
+  EXPECT_FLOAT_EQ(lhs.val()(2), 2);
+  EXPECT_FLOAT_EQ(lhs.val()(3), 1);
+  EXPECT_FLOAT_EQ(lhs.val()(4), 5);
+  sum(lhs).grad();
+  for (Eigen::Index i = 0; i < lhs.size(); ++i) {
+    EXPECT_FLOAT_EQ(lhs_val(i), lhs.val()(i));
+    if (i < lhs.size() - 1) {
+      EXPECT_FLOAT_EQ(lhs.adj()(i), 0);
+    } else {
+      EXPECT_FLOAT_EQ(lhs.adj()(i), 1);
+    }
+  }
+  for (Eigen::Index i = 0; i < rhs.size(); ++i) {
+    EXPECT_FLOAT_EQ(rhs.adj()(i), 1);
+  }
+  test_throw_out_of_range(lhs, index_list(index_min_max(3, 0)), rhs);
+  test_throw_out_of_range(lhs, index_list(index_min_max(8, 1)), rhs);
 }
 
 template <typename Vec>
@@ -385,16 +494,16 @@ void test_uni_uni_vec_eigvec() {
   test_throw_out_of_range(xs, index_list(index_uni(2), index_uni(10)), y);
 }
 
-TEST_F(VarAssign, uniuni_std_vecvec) {
+TEST_F(VarAssign, uni_uni_std_vecvec) {
   test_uni_uni_vec_eigvec<Eigen::VectorXd>();
 }
 
-TEST_F(VarAssign, uniuni_std_vecrowvec) {
+TEST_F(VarAssign, uni_uni_std_vecrowvec) {
   test_uni_uni_vec_eigvec<Eigen::RowVectorXd>();
 }
 
-
-TEST_F(VarAssign, uni_matrix_rowvec) {
+// Uni Assigns
+TEST_F(VarAssign, uni_matrix) {
   using stan::math::var_value;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
@@ -444,7 +553,135 @@ TEST_F(VarAssign, uni_matrix_rowvec) {
 */
 }
 
-TEST_F(VarAssign, multi_matrix_rowvec) {
+TEST_F(VarAssign, uni_minmax_matrix) {
+  using stan::math::var_value;
+  using stan::math::sum;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  RowVectorXd y_val(3);
+  y_val << 10, 11, 12;
+  var_value<MatrixXd> x(x_val);
+  var_value<RowVectorXd> y(y_val);
+  assign(x, index_list(index_uni(2), index_min_max(2, 4)), y);
+  EXPECT_FLOAT_EQ(y_val(0), x.val()(1, 1));
+  EXPECT_FLOAT_EQ(y_val(1), x.val()(1, 2));
+  EXPECT_FLOAT_EQ(y_val(2), x.val()(1, 3));
+
+  test_throw_out_of_range(x, index_list(index_uni(0), index_min_max(2, 4)), y);
+  test_throw_out_of_range(x, index_list(index_uni(5), index_min_max(2, 4)), y);
+  test_throw_out_of_range(x, index_list(index_uni(2), index_min_max(0, 2)), y);
+  test_throw_invalid_arg(x, index_list(index_uni(2), index_min_max(2, 5)), y);
+  std::cout << "\n before x.val(): \n" << x.val() << "\n";
+  std::cout << "\n before y.val(): \n" << y.val() << "\n";
+
+  sum(x).grad();
+  std::cout << "\n after x.val(): \n" << x.val() << "\n";
+  std::cout << "\n after y.val(): \n" << y.val() << "\n";
+  std::cout << "\n after x.adj(): \n" << x.adj() << "\n";
+  std::cout << "\n after y.adj(): \n" << y.adj() << "\n";
+
+  for (Eigen::Index j = 0; j < x.cols(); ++j) {
+    for (Eigen::Index i = 0; i < x.rows(); ++i) {
+      EXPECT_FLOAT_EQ(x.val()(i, j), x_val(i, j));
+      if (i == 1) {
+        if (j > 0 && j < 4) {
+          EXPECT_FLOAT_EQ(x.adj()(i, j), 0) << "Failed for (i, j): (" << i << ", " << j << ")";
+        }
+      } else {
+        EXPECT_FLOAT_EQ(x.adj()(i, j), 1) << "Failed for (i, j): (" << i << ", " << j << ")";
+      }
+    }
+  }
+  for (Eigen::Index i = 0; i < y.size(); ++i) {
+    EXPECT_FLOAT_EQ(y.adj()(i), 1) << "Failed for (i): (" << i << ")";
+  }
+
+}
+
+TEST_F(VarAssign, uni_uni_matrix) {
+  using stan::math::var_value;
+  using stan::math::var;
+  using stan::math::sum;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  var_value<MatrixXd> x(x_val);
+  var y = 10.12;
+  assign(x, index_list(index_uni(2), index_uni(3)), y);
+  EXPECT_FLOAT_EQ(y.val(), x.val()(1, 2));
+
+  test_throw_out_of_range(x, index_list(index_uni(0), index_uni(3)), y);
+  test_throw_out_of_range(x, index_list(index_uni(2), index_uni(0)), y);
+  test_throw_out_of_range(x, index_list(index_uni(4), index_uni(3)), y);
+  test_throw_out_of_range(x, index_list(index_uni(2), index_uni(5)), y);
+  sum(x).grad();
+  for (Eigen::Index j = 0; j < x.cols(); ++j) {
+    for (Eigen::Index i = 0; i < x.rows(); ++i) {
+      EXPECT_FLOAT_EQ(x.val()(i, j), x_val(i, j));
+      if (i == 1) {
+        if (j == 2) {
+          EXPECT_FLOAT_EQ(x.adj()(i, j), 0) << "Failed for (i, j): (" << i << ", " << j << ")";
+        }
+      } else {
+        EXPECT_FLOAT_EQ(x.adj()(i, j), 1) << "Failed for (i, j): (" << i << ", " << j << ")";
+      }
+    }
+  }
+  EXPECT_FLOAT_EQ(y.adj(), 1);
+}
+
+TEST_F(VarAssign, uni_multi_matrix) {
+  using stan::math::var_value;
+  using stan::math::sum;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  RowVectorXd y_val(3);
+  y_val << 10, 11, 12;
+
+  var_value<MatrixXd> x(x_val);
+  var_value<RowVectorXd> y(y_val);
+
+  vector<int> ns;
+  ns.push_back(4);
+  ns.push_back(1);
+  ns.push_back(3);
+  assign(x, index_list(index_uni(3), index_multi(ns)), y);
+  EXPECT_FLOAT_EQ(y_val(0), x.val()(2, 3));
+  EXPECT_FLOAT_EQ(y_val(1), x.val()(2, 0));
+  EXPECT_FLOAT_EQ(y_val(2), x.val()(2, 2));
+
+  ns[ns.size() - 1] = 0;
+  test_throw_out_of_range(x, index_list(index_uni(3), index_multi(ns)), y);
+
+  ns[ns.size() - 1] = 20;
+  test_throw_out_of_range(x, index_list(index_uni(3), index_multi(ns)), y);
+
+  ns.push_back(2);
+  test_throw_invalid_arg(x, index_list(index_uni(3), index_multi(ns)), y);
+
+  stan::math::sum(x).grad();
+  for (Eigen::Index j = 0; j < x.cols(); ++j) {
+    for (Eigen::Index i = 0; i < x.rows(); ++i) {
+      EXPECT_FLOAT_EQ(x.val()(i, j), x_val(i, j)) << "Failed for (i, j): (" << i << ", " << j << ")";
+      if (i == 2) {
+        if (j == 0 || j == 2 || j == 3) {
+          EXPECT_FLOAT_EQ(x.adj()(i, j), 0) << "Failed for (i, j): (" << i << ", " << j << ")";
+        }
+      } else {
+        EXPECT_FLOAT_EQ(x.adj()(i, j), 1) << "Failed for (i, j): (" << i << ", " << j << ")";
+      }
+    }
+  }
+  for (Eigen::Index i = 0; i < y.size(); ++i) {
+    EXPECT_FLOAT_EQ(y.adj()(i), 1) << "Failed for (i): (" << i << ")";
+  }
+
+}
+
+// Multi assigns
+TEST_F(VarAssign, multi_matrix) {
   using stan::math::var_value;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
@@ -529,6 +766,37 @@ TEST_F(VarAssign, multi_matrix_rowvec) {
   */
 }
 
+TEST_F(VarAssign, multi_uni_matrix) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  VectorXd y(2);
+  y << 10, 11;
+  assign(x, index_list(index_min_max(2, 3), index_uni(4)), y);
+  EXPECT_FLOAT_EQ(y(0), x(1, 3));
+  EXPECT_FLOAT_EQ(y(1), x(2, 3));
+
+  test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_uni(0)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_uni(5)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(0, 1), index_uni(4)), y);
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_uni(4)), y);
+
+  vector<int> ns;
+  ns.push_back(3);
+  ns.push_back(1);
+  assign(x, index_list(index_multi(ns), index_uni(3)), y);
+  EXPECT_FLOAT_EQ(y(0), x(2, 2));
+  EXPECT_FLOAT_EQ(y(1), x(0, 2));
+
+  ns[ns.size() - 1] = 0;
+  test_throw_out_of_range(x, index_list(index_multi(ns), index_uni(3)), y);
+
+  ns[ns.size() - 1] = 20;
+  test_throw_out_of_range(x, index_list(index_multi(ns), index_uni(3)), y);
+
+  ns.push_back(2);
+  test_throw_invalid_arg(x, index_list(index_multi(ns), index_uni(3)), y);
+}
 
 TEST_F(VarAssign, multi_multi_matrix) {
   using stan::math::var_value;
@@ -639,42 +907,47 @@ TEST_F(VarAssign, multi_multi_matrix) {
   */
 }
 
-
-TEST_F(VarAssign, uni_minmax_matrix) {
+// Min assigns
+TEST_F(VarAssign, min_matrix) {
   using stan::math::var_value;
   using stan::math::sum;
   MatrixXd x_val(3, 4);
   x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
-  RowVectorXd y_val(3);
-  y_val << 10, 11, 12;
+  MatrixXd y_val(2, 4);
+  y_val << 10.0, 10.1, 10.2, 10.3, 11.0, 11.1, 11.2, 11.3;
   var_value<MatrixXd> x(x_val);
-  var_value<RowVectorXd> y(y_val);
-  assign(x, index_list(index_uni(2), index_min_max(2, 4)), y);
-  EXPECT_FLOAT_EQ(y_val(0), x.val()(1, 1));
-  EXPECT_FLOAT_EQ(y_val(1), x.val()(1, 2));
-  EXPECT_FLOAT_EQ(y_val(2), x.val()(1, 3));
+  var_value<MatrixXd> y(y_val);
 
-  test_throw_out_of_range(x, index_list(index_uni(0), index_min_max(2, 4)), y);
-  test_throw_out_of_range(x, index_list(index_uni(5), index_min_max(2, 4)), y);
-  test_throw_out_of_range(x, index_list(index_uni(2), index_min_max(0, 2)), y);
-  test_throw_invalid_arg(x, index_list(index_uni(2), index_min_max(2, 5)), y);
+  assign(x, index_list(index_min(2)), y);
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_FLOAT_EQ(y.val()(i, j), x.val()(i + 1, j));
+    }
+  }
+  test_throw_invalid_arg(x, index_list(index_min(1)), y);
+
+  MatrixXd z_val(1, 2);
+  z_val << 10, 20;
+  var_value<MatrixXd> z(z_val);
+  test_throw_invalid_arg(x, index_list(index_min(1)), z);
+  test_throw_invalid_arg(x, index_list(index_min(2)), z);
+  /*
   std::cout << "\n before x.val(): \n" << x.val() << "\n";
   std::cout << "\n before y.val(): \n" << y.val() << "\n";
-
+  */
   sum(x).grad();
+  /*
   std::cout << "\n after x.val(): \n" << x.val() << "\n";
   std::cout << "\n after y.val(): \n" << y.val() << "\n";
   std::cout << "\n after x.adj(): \n" << x.adj() << "\n";
   std::cout << "\n after y.adj(): \n" << y.adj() << "\n";
-
+  */
   for (Eigen::Index j = 0; j < x.cols(); ++j) {
     for (Eigen::Index i = 0; i < x.rows(); ++i) {
       EXPECT_FLOAT_EQ(x.val()(i, j), x_val(i, j));
-      if (i == 1) {
-        if (j > 0 && j < 4) {
+      if (i > 0) {
           EXPECT_FLOAT_EQ(x.adj()(i, j), 0) << "Failed for (i, j): (" << i << ", " << j << ")";
-        }
       } else {
         EXPECT_FLOAT_EQ(x.adj()(i, j), 1) << "Failed for (i, j): (" << i << ", " << j << ")";
       }
@@ -686,173 +959,7 @@ TEST_F(VarAssign, uni_minmax_matrix) {
 
 }
 
-TEST_F(VarAssign, uni_multi_matrix) {
-  using stan::math::var_value;
-  using stan::math::sum;
-  MatrixXd x_val(3, 4);
-  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  RowVectorXd y_val(3);
-  y_val << 10, 11, 12;
-
-  var_value<MatrixXd> x(x_val);
-  var_value<RowVectorXd> y(y_val);
-
-  vector<int> ns;
-  ns.push_back(4);
-  ns.push_back(1);
-  ns.push_back(3);
-  assign(x, index_list(index_uni(3), index_multi(ns)), y);
-  EXPECT_FLOAT_EQ(y_val(0), x.val()(2, 3));
-  EXPECT_FLOAT_EQ(y_val(1), x.val()(2, 0));
-  EXPECT_FLOAT_EQ(y_val(2), x.val()(2, 2));
-
-  ns[ns.size() - 1] = 0;
-  test_throw_out_of_range(x, index_list(index_uni(3), index_multi(ns)), y);
-
-  ns[ns.size() - 1] = 20;
-  test_throw_out_of_range(x, index_list(index_uni(3), index_multi(ns)), y);
-
-  ns.push_back(2);
-  test_throw_invalid_arg(x, index_list(index_uni(3), index_multi(ns)), y);
-
-  stan::math::sum(x).grad();
-  for (Eigen::Index j = 0; j < x.cols(); ++j) {
-    for (Eigen::Index i = 0; i < x.rows(); ++i) {
-      EXPECT_FLOAT_EQ(x.val()(i, j), x_val(i, j)) << "Failed for (i, j): (" << i << ", " << j << ")";
-      if (i == 2) {
-        if (j == 0 || j == 2 || j == 3) {
-          EXPECT_FLOAT_EQ(x.adj()(i, j), 0) << "Failed for (i, j): (" << i << ", " << j << ")";
-        }
-      } else {
-        EXPECT_FLOAT_EQ(x.adj()(i, j), 1) << "Failed for (i, j): (" << i << ", " << j << ")";
-      }
-    }
-  }
-  for (Eigen::Index i = 0; i < y.size(); ++i) {
-    EXPECT_FLOAT_EQ(y.adj()(i), 1) << "Failed for (i): (" << i << ")";
-  }
-
-}
-/*
-TEST_F(VarAssign, uni_matrix) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  RowVectorXd y(4);
-  y << 10.0, 10.1, 10.2, 10.3;
-
-  assign(x, index_list(index_uni(3)), y);
-  for (int j = 0; j < 4; ++j)
-    EXPECT_FLOAT_EQ(x(2, j), y(j));
-
-  test_throw_out_of_range(x, index_list(index_uni(0)), y);
-  test_throw_out_of_range(x, index_list(index_uni(5)), y);
-}
-
-TEST_F(VarAssign, min_matrix) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  MatrixXd y(2, 4);
-  y << 10.0, 10.1, 10.2, 10.3, 11.0, 11.1, 11.2, 11.3;
-
-  assign(x, index_list(index_min(2)), y);
-  for (int i = 0; i < 2; ++i)
-    for (int j = 0; j < 4; ++j)
-      EXPECT_FLOAT_EQ(y(i, j), x(i + 1, j));
-  test_throw_invalid_arg(x, index_list(index_min(1)), y);
-
-  MatrixXd z(1, 2);
-  z << 10, 20;
-  test_throw_invalid_arg(x, index_list(index_min(1)), z);
-  test_throw_invalid_arg(x, index_list(index_min(2)), z);
-}
-
-TEST_F(VarAssign, uni_uni_matrix) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  double y = 10.12;
-  assign(x, index_list(index_uni(2), index_uni(3)), y);
-  EXPECT_FLOAT_EQ(y, x(1, 2));
-
-  test_throw_out_of_range(x, index_list(index_uni(0), index_uni(3)), y);
-  test_throw_out_of_range(x, index_list(index_uni(2), index_uni(0)), y);
-  test_throw_out_of_range(x, index_list(index_uni(4), index_uni(3)), y);
-  test_throw_out_of_range(x, index_list(index_uni(2), index_uni(5)), y);
-}
-
-TEST_F(VarAssign, multi_uni_matrix) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  VectorXd y(2);
-  y << 10, 11;
-  assign(x, index_list(index_min_max(2, 3), index_uni(4)), y);
-  EXPECT_FLOAT_EQ(y(0), x(1, 3));
-  EXPECT_FLOAT_EQ(y(1), x(2, 3));
-
-  test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_uni(0)), y);
-  test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_uni(5)), y);
-  test_throw_out_of_range(x, index_list(index_min_max(0, 1), index_uni(4)), y);
-  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_uni(4)), y);
-
-  vector<int> ns;
-  ns.push_back(3);
-  ns.push_back(1);
-  assign(x, index_list(index_multi(ns), index_uni(3)), y);
-  EXPECT_FLOAT_EQ(y(0), x(2, 2));
-  EXPECT_FLOAT_EQ(y(1), x(0, 2));
-
-  ns[ns.size() - 1] = 0;
-  test_throw_out_of_range(x, index_list(index_multi(ns), index_uni(3)), y);
-
-  ns[ns.size() - 1] = 20;
-  test_throw_out_of_range(x, index_list(index_multi(ns), index_uni(3)), y);
-
-  ns.push_back(2);
-  test_throw_invalid_arg(x, index_list(index_multi(ns), index_uni(3)), y);
-}
-
-
-
-TEST_F(VarAssign, positive_minmax_vec) {
-  using stan::model::assign;
-  using stan::model::cons_list;
-  using stan::model::index_min_max;
-  using stan::model::nil_index_list;
-  using std::vector;
-  Eigen::VectorXd lhs(5);
-  lhs << 1, 2, 3, 4, 5;
-  Eigen::VectorXd rhs(4);
-  rhs << 4, 3, 2, 1;
-  assign(lhs, cons_list(index_min_max(1, 4), nil_index_list()), rhs);
-  EXPECT_FLOAT_EQ(lhs(0), 4);
-  EXPECT_FLOAT_EQ(lhs(1), 3);
-  EXPECT_FLOAT_EQ(lhs(2), 2);
-  EXPECT_FLOAT_EQ(lhs(3), 1);
-  EXPECT_FLOAT_EQ(lhs(4), 5);
-}
-
-TEST_F(VarAssign, negative_minmax_vec) {
-  using stan::model::assign;
-  using stan::model::cons_list;
-  using stan::model::index_min_max;
-  using stan::model::nil_index_list;
-  using std::vector;
-  Eigen::VectorXd lhs(5);
-  lhs << 1, 2, 3, 4, 5;
-  Eigen::VectorXd rhs(4);
-  rhs << 1, 2, 3, 4;
-  assign(lhs, cons_list(index_min_max(4, 1), nil_index_list()), rhs);
-  EXPECT_FLOAT_EQ(lhs(0), 4);
-  EXPECT_FLOAT_EQ(lhs(1), 3);
-  EXPECT_FLOAT_EQ(lhs(2), 2);
-  EXPECT_FLOAT_EQ(lhs(3), 1);
-  EXPECT_FLOAT_EQ(lhs(4), 5);
-}
-
+// minmax assigns
 TEST_F(VarAssign, positive_minmax_positive_minmax_matrix) {
   using stan::model::assign;
   using stan::model::cons_list;
@@ -967,210 +1074,207 @@ TEST_F(VarAssign, negative_minmax_negative_minmax_matrix) {
   }
 }
 
-TEST(model_indexing, min_vec) {
-  VectorXd lhs_x(5);
-  lhs_x << 0, 1, 2, 3, 4;
-  VectorXd rhs_y(3);
-  rhs_y << 10, 11, 12;
-  assign(lhs_x, index_list(index_min(3)), rhs_y);
-  EXPECT_FLOAT_EQ(rhs_y(0), lhs_x(2));
-  EXPECT_FLOAT_EQ(rhs_y(1), lhs_x(3));
-  EXPECT_FLOAT_EQ(rhs_y(2), lhs_x(4));
-  test_throw_out_of_range(lhs_x, index_list(index_min(0)), rhs_y);
+TEST_F(VarAssign, minmax_uni_matrix) {
+  using stan::math::var_value;
+  using stan::math::sum;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
-  assign(lhs_x, index_list(index_min(3)), rhs_y.array() + 1.0);
-  EXPECT_FLOAT_EQ(rhs_y(0) + 1.0, lhs_x(2));
-  EXPECT_FLOAT_EQ(rhs_y(1) + 1.0, lhs_x(3));
-  EXPECT_FLOAT_EQ(rhs_y(2) + 1.0, lhs_x(4));
-}
+  VectorXd y_val(2);
+  y_val << 10, 11;
 
-TEST(model_indexing, min_rowvec) {
-  RowVectorXd lhs_x(5);
-  lhs_x << 0, 1, 2, 3, 4;
-  RowVectorXd rhs_y(3);
-  rhs_y << 10, 11, 12;
-  assign(lhs_x, index_list(index_min(3)), rhs_y);
-  EXPECT_FLOAT_EQ(rhs_y(0), lhs_x(2));
-  EXPECT_FLOAT_EQ(rhs_y(1), lhs_x(3));
-  EXPECT_FLOAT_EQ(rhs_y(2), lhs_x(4));
-  test_throw_out_of_range(lhs_x, index_list(index_min(0)), rhs_y);
-
-  assign(lhs_x, index_list(index_min(3)), rhs_y.array() + 1.0);
-  EXPECT_FLOAT_EQ(rhs_y(0) + 1.0, lhs_x(2));
-  EXPECT_FLOAT_EQ(rhs_y(1) + 1.0, lhs_x(3));
-  EXPECT_FLOAT_EQ(rhs_y(2) + 1.0, lhs_x(4));
-}
-
-TEST(model_indexing, uni_mat) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  RowVectorXd y(4);
-  y << 10.0, 10.1, 10.2, 10.3;
-
-  assign(x, index_list(index_uni(3)), y.array() + 3);
-  for (int j = 0; j < 4; ++j)
-    EXPECT_FLOAT_EQ(x(2, j), y(j) + 3);
-
-  test_throw_out_of_range(x, index_list(index_uni(0)), y);
-  test_throw_out_of_range(x, index_list(index_uni(5)), y);
-}
-
-TEST(model_indexing, min_mat) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  MatrixXd y(2, 4);
-  y << 10.0, 10.1, 10.2, 10.3, 11.0, 11.1, 11.2, 11.3;
-
-  assign(x, index_list(index_min(2)), y);
-  for (int i = 0; i < 2; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      EXPECT_FLOAT_EQ(y(i, j), x(i + 1, j));
-    }
-  }
-  assign(x, index_list(index_min(2)), y.transpose().transpose());
-  for (int i = 0; i < 2; ++i) {
-    for (int j = 0; j < 4; ++j) {
-      EXPECT_FLOAT_EQ(y(i, j), x(i + 1, j));
-    }
-  }
-  test_throw_invalid_arg(x, index_list(index_min(1)), y);
-
-  MatrixXd z(1, 2);
-  z << 10, 20;
-  test_throw_invalid_arg(x, index_list(index_min(1)), z);
-  test_throw_invalid_arg(x, index_list(index_min(2)), z);
-}
-
-TEST(model_indexing, uni_uni_mat) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  double y = 10.12;
-  assign(x, index_list(index_uni(2), index_uni(3)), y);
-  EXPECT_FLOAT_EQ(y, x(1, 2));
-
-  test_throw_out_of_range(x, index_list(index_uni(0), index_uni(3)), y);
-  test_throw_out_of_range(x, index_list(index_uni(2), index_uni(0)), y);
-  test_throw_out_of_range(x, index_list(index_uni(4), index_uni(3)), y);
-  test_throw_out_of_range(x, index_list(index_uni(2), index_uni(5)), y);
-}
-
-TEST(model_indexing, uni_minmax_mat_rowvec) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  RowVectorXd y(3);
-  y << 10, 11, 12;
-  assign(x, index_list(index_uni(2), index_min_max(2, 4)), y);
-  EXPECT_FLOAT_EQ(y(0), x(1, 1));
-  EXPECT_FLOAT_EQ(y(1), x(1, 2));
-  EXPECT_FLOAT_EQ(y(2), x(1, 3));
-
-  assign(x, index_list(index_uni(2), index_min_max(2, 4)), y.array() + 2);
-  EXPECT_FLOAT_EQ(y(0) + 2, x(1, 1));
-  EXPECT_FLOAT_EQ(y(1) + 2, x(1, 2));
-  EXPECT_FLOAT_EQ(y(2) + 2, x(1, 3));
-
-  test_throw_out_of_range(x, index_list(index_uni(0), index_min_max(2, 4)), y);
-  test_throw_out_of_range(x, index_list(index_uni(5), index_min_max(2, 4)), y);
-  test_throw_out_of_range(x, index_list(index_uni(2), index_min_max(0, 2)), y);
-  test_throw_invalid_arg(x, index_list(index_uni(2), index_min_max(2, 5)), y);
-
-  vector<int> ns;
-  ns.push_back(4);
-  ns.push_back(1);
-  ns.push_back(3);
-  assign(x, index_list(index_uni(3), index_multi(ns)), y);
-  EXPECT_FLOAT_EQ(y(0), x(2, 3));
-  EXPECT_FLOAT_EQ(y(1), x(2, 0));
-  EXPECT_FLOAT_EQ(y(2), x(2, 2));
-
-  assign(x, index_list(index_uni(3), index_multi(ns)), y.array() + 2);
-  EXPECT_FLOAT_EQ(y(0) + 2, x(2, 3));
-  EXPECT_FLOAT_EQ(y(1) + 2, x(2, 0));
-  EXPECT_FLOAT_EQ(y(2) + 2, x(2, 2));
-
-  ns[ns.size() - 1] = 0;
-  test_throw_out_of_range(x, index_list(index_uni(3), index_multi(ns)), y);
-
-  ns[ns.size() - 1] = 20;
-  test_throw_out_of_range(x, index_list(index_uni(3), index_multi(ns)), y);
-
-  ns.push_back(2);
-  test_throw_invalid_arg(x, index_list(index_uni(3), index_multi(ns)), y);
-}
-
-TEST(model_indexing, minmax_uni_mat) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-
-  VectorXd y(2);
-  y << 10, 11;
+  var_value<Eigen::MatrixXd> x(x_val);
+  var_value<Eigen::VectorXd> y(y_val);
 
   assign(x, index_list(index_min_max(2, 3), index_uni(4)), y);
-  EXPECT_FLOAT_EQ(y(0), x(1, 3));
-  EXPECT_FLOAT_EQ(y(1), x(2, 3));
-
-  assign(x, index_list(index_min_max(2, 3), index_uni(4)), y.array() + 2);
-  EXPECT_FLOAT_EQ(y(0) + 2, x(1, 3));
-  EXPECT_FLOAT_EQ(y(1) + 2, x(2, 3));
+  EXPECT_FLOAT_EQ(y.val()(0), x.val()(1, 3));
+  EXPECT_FLOAT_EQ(y.val()(1), x.val()(2, 3));
+  /*
+   std::cout << "\n post-assign \n";
+   std::cout << "\nx val: \n" << x.val() << "\n";
+   std::cout << "x adj: \n" << x.adj() << "\n";
+   std::cout << "y val: \n" << y.val() << "\n";
+   std::cout << "y adj: \n" << y.adj() << "\n";
+  */
+  sum(x).grad();
+  /*
+  std::cout << "\n post-grad \n";
+  std::cout << "\nx val: \n" << x.val() << "\n";
+  std::cout << "x adj: \n" << x.adj() << "\n";
+  std::cout << "y val: \n" << y.val() << "\n";
+  std::cout << "y adj: \n" << y.adj() << "\n";
+  */
+  for (Eigen::Index i = 0; i < x.size(); ++i) {
+    EXPECT_FLOAT_EQ(x.val()(i), x_val(i));
+  }
+  for (Eigen::Index j = 0; j < x.cols(); ++j) {
+    for (Eigen::Index i = 0; i < x.rows(); ++i) {
+      if (j == 3) {
+        if (i == 1 || i == 2) {
+          EXPECT_FLOAT_EQ(x.adj()(i, j), 0);
+        } else {
+          EXPECT_FLOAT_EQ(x.adj()(i, j), 1);
+        }
+      } else {
+        EXPECT_FLOAT_EQ(x.adj()(i, j), 1);
+      }
+    }
+  }
+  EXPECT_FLOAT_EQ(y.adj()(0), 1);
+  EXPECT_FLOAT_EQ(y.adj()(1), 1);
 
   test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_uni(0)), y);
   test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_uni(5)), y);
   test_throw_out_of_range(x, index_list(index_min_max(0, 1), index_uni(4)), y);
   test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_uni(4)), y);
-
-  vector<int> ns;
-  ns.push_back(3);
-  ns.push_back(1);
-  assign(x, index_list(index_multi(ns), index_uni(3)), y);
-  EXPECT_FLOAT_EQ(y(0), x(2, 2));
-  EXPECT_FLOAT_EQ(y(1), x(0, 2));
-
-  assign(x.block(0, 0, 3, 3), index_list(index_multi(ns), index_uni(3)),
-         y.array() + 2);
-  EXPECT_FLOAT_EQ(y(0) + 2, x(2, 2));
-  EXPECT_FLOAT_EQ(y(1) + 2, x(0, 2));
-
-  ns[ns.size() - 1] = 0;
-  test_throw_out_of_range(x, index_list(index_multi(ns), index_uni(3)), y);
-
-  ns[ns.size() - 1] = 20;
-  test_throw_out_of_range(x, index_list(index_multi(ns), index_uni(3)), y);
-
-  ns.push_back(2);
-  test_throw_invalid_arg(x, index_list(index_multi(ns), index_uni(3)), y);
 }
 
-TEST(model_indexing, minmax_min_mat) {
-  MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+TEST_F(VarAssign, minmax_min_matrix) {
+  using stan::math::var_value;
+  using stan::math::sum;
 
-  MatrixXd y(2, 3);
-  y << 10, 11, 12, 20, 21, 22;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  MatrixXd y_val(2, 3);
+  y_val << 10, 11, 12, 20, 21, 22;
+  var_value<Eigen::MatrixXd> x(x_val);
+  var_value<Eigen::MatrixXd> y(y_val);
 
   assign(x, index_list(index_min_max(2, 3), index_min(2)), y);
-  EXPECT_FLOAT_EQ(y(0, 0), x(1, 1));
-  EXPECT_FLOAT_EQ(y(0, 1), x(1, 2));
-  EXPECT_FLOAT_EQ(y(0, 2), x(1, 3));
-  EXPECT_FLOAT_EQ(y(1, 0), x(2, 1));
-  EXPECT_FLOAT_EQ(y(1, 1), x(2, 2));
-  EXPECT_FLOAT_EQ(y(1, 2), x(2, 3));
+  EXPECT_FLOAT_EQ(y.val()(0, 0), x.val()(1, 1));
+  EXPECT_FLOAT_EQ(y.val()(0, 1), x.val()(1, 2));
+  EXPECT_FLOAT_EQ(y.val()(0, 2), x.val()(1, 3));
+  EXPECT_FLOAT_EQ(y.val()(1, 0), x.val()(2, 1));
+  EXPECT_FLOAT_EQ(y.val()(1, 1), x.val()(2, 2));
+  EXPECT_FLOAT_EQ(y.val()(1, 2), x.val()(2, 3));
+  sum(x).grad();
+  for (Eigen::Index i = 0; i < x_val.size(); ++i) {
+    EXPECT_FLOAT_EQ(x.val()(i), x_val(i));
+  }
+  EXPECT_FLOAT_EQ(0, x.adj()(1, 1));
+  EXPECT_FLOAT_EQ(0, x.adj()(1, 2));
+  EXPECT_FLOAT_EQ(0, x.adj()(1, 3));
+  EXPECT_FLOAT_EQ(0, x.adj()(2, 1));
+  EXPECT_FLOAT_EQ(0, x.adj()(2, 2));
+  EXPECT_FLOAT_EQ(0, x.adj()(2, 3));
 
+  EXPECT_FLOAT_EQ(y.adj()(0, 0), 1);
+  EXPECT_FLOAT_EQ(y.adj()(0, 1), 1);
+  EXPECT_FLOAT_EQ(y.adj()(0, 2), 1);
+  EXPECT_FLOAT_EQ(y.adj()(1, 0), 1);
+  EXPECT_FLOAT_EQ(y.adj()(1, 1), 1);
+  EXPECT_FLOAT_EQ(y.adj()(1, 2), 1);
+
+}
+
+TEST_F(VarAssign, minmax_min_block_matrix) {
+  using stan::math::var_value;
+  using stan::math::sum;
+
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  MatrixXd y_val(2, 3);
+  y_val << 10, 11, 12, 20, 21, 22;
+  var_value<Eigen::MatrixXd> x(x_val);
+  var_value<Eigen::MatrixXd> y(y_val);
+/*
+  std::cout << "\n pre-assign \n";
+  std::cout << "\nx val: \n" << x.val() << "\n";
+  std::cout << "x adj: \n" << x.adj() << "\n";
+  std::cout << "y val: \n" << y.val() << "\n";
+  std::cout << "y adj: \n" << y.adj() << "\n";
+*/
   assign(x.block(0, 0, 3, 3), index_list(index_min_max(2, 3), index_min(2)),
          y.block(0, 0, 2, 2));
-  EXPECT_FLOAT_EQ(y(0, 0), x(1, 1));
-  EXPECT_FLOAT_EQ(y(0, 1), x(1, 2));
-  EXPECT_FLOAT_EQ(y(0, 2), x(1, 3));
-  EXPECT_FLOAT_EQ(y(1, 0), x(2, 1));
-  EXPECT_FLOAT_EQ(y(1, 1), x(2, 2));
-  EXPECT_FLOAT_EQ(y(1, 2), x(2, 3));
+/*
+ std::cout << "\n post-assign \n";
+ std::cout << "\nx val: \n" << x.val() << "\n";
+ std::cout << "x adj: \n" << x.adj() << "\n";
+ std::cout << "y val: \n" << y.val() << "\n";
+ std::cout << "y adj: \n" << y.adj() << "\n";
+*/
+  EXPECT_FLOAT_EQ(y.val()(0, 0), x.val()(1, 1));
+  EXPECT_FLOAT_EQ(y.val()(0, 1), x.val()(1, 2));
+  EXPECT_FLOAT_EQ(y.val()(1, 0), x.val()(2, 1));
+  EXPECT_FLOAT_EQ(y.val()(1, 1), x.val()(2, 2));
+
+  sum(x).grad();
+  /*
+  std::cout << "\n post-grad \n";
+  std::cout << "\nx val: \n" << x.val() << "\n";
+  std::cout << "x adj: \n" << x.adj() << "\n";
+  std::cout << "y val: \n" << y.val() << "\n";
+  std::cout << "y adj: \n" << y.adj() << "\n";
+  */
+  auto x_block = x.val().block(0, 0, 3, 3).eval();
+  auto x_block_val = x_val.block(0, 0, 3, 3).eval();
+  for (Eigen::Index i = 0; i < x_block.size(); ++i) {
+    EXPECT_FLOAT_EQ(x_block(i), x_block_val(i));
+  }
+  EXPECT_FLOAT_EQ(x.adj()(1, 1), 0);
+  EXPECT_FLOAT_EQ(x.adj()(1, 2), 0);
+  EXPECT_FLOAT_EQ(x.adj()(2, 1), 0);
+  EXPECT_FLOAT_EQ(x.adj()(2, 2), 0);
+
+  EXPECT_FLOAT_EQ(y.adj()(0, 0), 1);
+  EXPECT_FLOAT_EQ(y.adj()(0, 1), 1);
+  EXPECT_FLOAT_EQ(y.adj()(1, 0), 1);
+  EXPECT_FLOAT_EQ(y.adj()(1, 1), 1);
 
   test_throw_invalid_arg(x, index_list(index_min_max(2, 3), index_min(0)), y);
   test_throw_invalid_arg(x, index_list(index_min_max(2, 3), index_min(10)), y);
   test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_min(2)), y);
 }
 
+// omni assigns
+TEST_F(VarAssign, omni_uni_matrix) {
+  using stan::math::var_value;
+  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::generate_linear_var_vector;
+
+  auto x = generate_linear_var_matrix(5, 5);
+  auto y = generate_linear_var_vector<true>(5, 10);
+  assign(x, index_list(index_omni(), index_uni(1)), y);
+  EXPECT_FLOAT_EQ(y.val()(0), x.val()(0, 0));
+  EXPECT_FLOAT_EQ(y.val()(1), x.val()(1, 0));
+  EXPECT_FLOAT_EQ(y.val()(2), x.val()(2, 0));
+  EXPECT_FLOAT_EQ(y.val()(3), x.val()(3, 0));
+  EXPECT_FLOAT_EQ(y.val()(4), x.val()(4, 0));
+  y.adj()(0) = 10;
+  y.adj()(1) = 20;
+  y.adj()(2) = 30;
+  y.adj()(3) = 40;
+  y.adj()(4) = 50;
+  x.adj()(0, 0) = 50;
+  x.adj()(1, 0) = 40;
+  x.adj()(2, 0) = 30;
+  x.adj()(3, 0) = 20;
+  x.adj()(4, 0) = 10;
+/*
+  std::cout << "\n pre-grad \n";
+  std::cout << "\nx val: \n" << x.val() << "\n";
+  std::cout << "x adj: \n" << x.adj() << "\n";
+  std::cout << "y val: \n" << y.val() << "\n";
+  std::cout << "y adj: \n" << y.adj() << "\n";
 */
+  stan::math::grad();
+  EXPECT_FLOAT_EQ(y.adj()(0), 60);
+  EXPECT_FLOAT_EQ(y.adj()(0), 60);
+  EXPECT_FLOAT_EQ(y.adj()(0), 60);
+  EXPECT_FLOAT_EQ(y.adj()(0), 60);
+  EXPECT_FLOAT_EQ(y.adj()(0), 60);
+  EXPECT_FLOAT_EQ(x.adj()(0, 0), 0);
+  EXPECT_FLOAT_EQ(x.adj()(1, 0), 0);
+  EXPECT_FLOAT_EQ(x.adj()(2, 0), 0);
+  EXPECT_FLOAT_EQ(x.adj()(3, 0), 0);
+  EXPECT_FLOAT_EQ(x.adj()(4, 0), 0);
+/*
+  std::cout << "\n pre-grad \n";
+  std::cout << "\nx val: \n" << x.val() << "\n";
+  std::cout << "x adj: \n" << x.adj() << "\n";
+  std::cout << "y val: \n" << y.val() << "\n";
+  std::cout << "y adj: \n" << y.adj() << "\n";
+*/
+}
