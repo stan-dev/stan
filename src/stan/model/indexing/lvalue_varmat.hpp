@@ -530,7 +530,7 @@ inline void assign(Mat1&& x,
     stan::math::check_size_match("matrix[..., min_max] assign col size", "lhs",
                                  idxs.tail_.head_.min_, name, x.cols());
     assign(x.middleCols(col_start, col_size), index_list(idxs.head_),
-           y.rowwise().reverse(), name, depth + 1);
+           y.rowwise_reverse(), name, depth + 1);
     return;
   }
 }
