@@ -283,8 +283,7 @@ inline void assign(Mat&& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename EigMat1, typename EigMat2,
-          require_all_eigen_dense_dynamic_t<EigMat1,
-                                                            EigMat2>* = nullptr>
+          require_all_eigen_dense_dynamic_t<EigMat1, EigMat2>* = nullptr>
 inline void assign(EigMat1&& x,
                    const cons_index_list<index_multi, nil_index_list>& idxs,
                    const EigMat2& y, const char* name = "ANON", int depth = 0) {
@@ -314,9 +313,8 @@ inline void assign(EigMat1&& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
-template <
-    typename Mat1, typename Mat2,
-    require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+template <typename Mat1, typename Mat2,
+          require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(Mat1&& x,
                    const cons_index_list<index_omni, nil_index_list>& idxs,
                    Mat2&& y, const char* name = "ANON", int depth = 0) {
@@ -344,10 +342,9 @@ inline void assign(Mat1&& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
-template <
-    typename Mat1, typename Mat2,
-    require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr,
-    require_eigen_t<Mat2>* = nullptr>
+template <typename Mat1, typename Mat2,
+          require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr,
+          require_eigen_t<Mat2>* = nullptr>
 inline void assign(Mat1&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
@@ -377,9 +374,8 @@ inline void assign(Mat1&& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
-template <
-    typename Mat1, typename Mat2,
-    require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+template <typename Mat1, typename Mat2,
+          require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(Mat1&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
@@ -407,8 +403,7 @@ inline void assign(Mat1&& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename EigMat1, typename EigMat2,
-          require_all_eigen_dense_dynamic_t<EigMat1,
-                                                            EigMat2>* = nullptr>
+          require_all_eigen_dense_dynamic_t<EigMat1, EigMat2>* = nullptr>
 inline void assign(EigMat1&& x,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const EigMat2& y, const char* name = "ANON", int depth = 0) {
@@ -615,9 +610,8 @@ inline void assign(
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
-template <
-    typename Mat1, typename Mat2,
-    require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+template <typename Mat1, typename Mat2,
+          require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<index_multi,

@@ -715,13 +715,15 @@ inline auto rvalue(
   if (idxs.tail_.head_.is_ascending()) {
     const auto col_start = idxs.tail_.head_.min_ - 1;
     return rvalue(x.middleCols(col_start, idxs.tail_.head_.max_ - col_start),
-                  index_list(idxs.head_), name, depth + 1).eval();
+                  index_list(idxs.head_), name, depth + 1)
+        .eval();
   } else {
     const auto col_start = idxs.tail_.head_.max_ - 1;
     return rvalue(x.middleCols(col_start, idxs.tail_.head_.min_ - col_start)
                       .rowwise()
                       .reverse(),
-                  index_list(idxs.head_), name, depth + 1).eval();
+                  index_list(idxs.head_), name, depth + 1)
+        .eval();
   }
 }
 
