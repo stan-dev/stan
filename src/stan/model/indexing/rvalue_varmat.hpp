@@ -5,6 +5,7 @@
 #include <stan/math/rev.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
+#include <stan/model/indexing/rvalue.hpp>
 #include <type_traits>
 #include <vector>
 
@@ -51,7 +52,8 @@ namespace model {
  * @param[in] depth Depth of indexing dimension.
  * @return Result of evaluating the expression.
  */
-template <typename T, require_var_matrix_t<T>* = nullptr>
+template <typename T, require_var_matrix_t<T>* = nullptr,
+ require_not_plain_type_t<value_type_t<T>>* = nullptr>
 inline auto rvalue(T&& x,
                    const cons_index_list<index_omni, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -73,23 +75,22 @@ inline auto rvalue(T&& x,
  * the indexed size.
  */
 template <typename Vec, require_var_vector_t<Vec>* = nullptr>
-inline auto rvalue(
-    Vec&& v, const cons_index_list<index_multi, nil_index_list>& idxs,
-    const char* name = "ANON", int depth = 0) {
-  const auto x_size = x.size();
-  arena_t<value_type_t<Vec>> x_ret_vals(idxs.head_.ns_.size());
-  arena_t<std::vector<int>> multi_idx(idxs.head_.ns_.size());
-  for (int n = 0; n < y.size(); ++n) {
-    const auto coeff_idx = idxs.head_.ns_[n] - 1;
+inline auto rvalue(Vec&& x, const cons_index_list<index_multi, nil_index_list>& idxs, const char* name = "ANON", int depth = 0) {
+  const Eigen::Index x_size = x.size();
+  const auto ret_size = idxs.head_.ns_.size();
+  arena_t<value_type_t<Vec>> x_ret_vals(ret_size);
+  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
+  arena_t<Eigen::Matrix<int, -1, 1>> row_idx(multi_map(idxs.head_.ns_.data(), ret_size).eval());
+  for (int i = 0; i < ret_size; ++i) {
     stan::math::check_range("vector[multi] assign range", name, x_size,
-                            coeff_idx + 1);
-    multi_idx[n] = coeff_idx;
-    x_ret_vals.coeffRef(n) = x.vi_->val_.coeffRef(coeff_idx);
+                            row_idx[i]);
+    --row_idx[i];
+    x_ret_vals.coeffRef(i) = x.vi_->val_.coeffRef(row_idx[i]);
   }
   stan::math::var_value<plain_type_t<value_type_t<Vec>>> x_ret(x_ret_vals);
-  stan::math::reverse_pass_callback([x_vi = x.vi_, ret_vi = x_ret.vi_, multi_idx]() mutable {
-    for (Eigen::Index i = 0; i < multi_idx.size(); ++i) {
-      x_vi->adj_.coeffRef(multi_idx[i]) += ret_vi->adj_.coeffRef(i);
+  stan::math::reverse_pass_callback([x, x_ret, row_idx]() mutable {
+    for (Eigen::Index i = 0; i < row_idx.size(); ++i) {
+      x.adj().coeffRef(row_idx[i]) += x_ret.adj().coeffRef(i);
     }
   });
   return x_ret;
@@ -113,21 +114,117 @@ template <typename VarMat,
           require_eigen_dense_dynamic_t<value_type_t<VarMat>>* = nullptr>
 inline auto rvalue(VarMat&& x, const cons_index_list<index_multi, nil_index_list>& idxs,
     const char* name = "ANON", int depth = 0) {
-  arena_t<value_type_t<VarMat>> x_ret_vals(idxs.head_.ns_.size(), x.cols());
-  arena_t<std::vector<int>> multi_idx(idxs.head_.ns_.size());
-  for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
-    const int n = idxs.head_.ns_[i];
-    multi_idx[n] = n;
-    math::check_range("matrix[multi] subset range", name, x_ref.rows(), n);
-    x_ret_vals.row(i) = x.val().row(n - 1);
+  const auto ret_rows = idxs.head_.ns_.size();
+  arena_t<value_type_t<VarMat>> x_ret_vals(ret_rows, x.cols());
+  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
+  arena_t<Eigen::Matrix<int, -1, 1>> row_idx(multi_map(idxs.head_.ns_.data(), ret_rows).eval());
+  for (int i = 0; i < ret_rows; ++i) {
+    math::check_range("matrix[multi] subset range", name, x.rows(), row_idx[i]);
+    --row_idx[i];
+    x_ret_vals.row(i) = x.val().row(row_idx[i]);
   }
-  stan::math::var_value<plain_type_t<value_type_t<Var>>> x_ret(x_ret_vals);
-  stan::math::reverse_pass_callback([x_vi = x.vi_, ret_vi = x_ret.vi_, multi_idx]() mutable {
-    for (Eigen::Index i = 0; i < multi_idx.size(); ++i) {
-      x_vi->adj_.coeffRef(multi_idx[i]) += ret_vi->adj_.coeffRef(i);
+  stan::math::var_value<plain_type_t<value_type_t<VarMat>>> x_ret(x_ret_vals);
+  stan::math::reverse_pass_callback([x, x_ret, row_idx]() mutable {
+    for (Eigen::Index i = 0; i < row_idx.size(); ++i) {
+      x.adj().row(row_idx[i]) += x_ret.adj().row(i);
     }
   });
   return x_ret;
+}
+
+/**
+ * Return a range of rows for an Eigen matrix.
+ *
+ * Types:  matrix[min_max] = matrix
+ *
+ * @tparam Mat Eigen type with dynamic rows and columns.
+ * @param[in] x Eigen type
+ * @param[in] idxs An indexing from the start of the container up to
+ * the specified maximum index (inclusive).
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename Mat,
+          require_var_matrix_t<Mat>* = nullptr,
+          require_eigen_dense_dynamic_t<value_type_t<Mat>>* = nullptr>
+inline auto rvalue(Mat&& x,
+                   const cons_index_list<index_min_max, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[min_max] max row indexing", name, x.rows(),
+                    idxs.head_.max_);
+  math::check_range("matrix[min_max] min row indexing", name, x.rows(),
+                    idxs.head_.min_);
+  if (idxs.head_.is_ascending()) {
+    return x.middleRows(idxs.head_.min_ - 1, idxs.head_.max_ - 1).eval();
+  } else {
+    return x.middleRows(idxs.head_.max_ - 1, idxs.head_.min_ - 1)
+        .colwise_reverse()
+        .eval();
+  }
+}
+
+/**
+ * Return the result of indexing an Eigen matrix with two min_max
+ * indices, returning back a block of an Eigen matrix.
+ *
+ * Types:  matrix[min_max, min_max] = matrix
+ *
+ * @tparam Mat An eigen matrix
+ * @param[in] x Eigen matrix.
+ * @param[in] idxs Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename Mat,
+  require_var_matrix_t<Mat>* = nullptr,
+  require_eigen_dense_dynamic_t<value_type_t<Mat>>* = nullptr>
+inline auto rvalue(
+    Mat&& x,
+    const cons_index_list<index_min_max,
+                          cons_index_list<index_min_max, nil_index_list>>& idxs,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[min_max, min_max] min row indexing", name, x.rows(),
+                    idxs.head_.min_);
+  math::check_range("matrix[min_max, min_max] max row indexing", name, x.rows(),
+                    idxs.head_.max_);
+  math::check_range("matrix[min_max, min_max] min column indexing", name,
+                    x.cols(), idxs.tail_.head_.min_);
+  math::check_range("matrix[min_max, min_max] max column indexing", name,
+                    x.cols(), idxs.tail_.head_.max_);
+  if (idxs.head_.is_ascending()) {
+    if (idxs.tail_.head_.is_ascending()) {
+      return x
+          .block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1,
+                 idxs.head_.max_ - (idxs.head_.min_ - 1),
+                 idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1))
+          .eval();
+    } else {
+      return x
+          .block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1,
+                 idxs.head_.max_ - (idxs.head_.min_ - 1),
+                 idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1))
+          .rowwise_reverse()
+          .eval();
+    }
+  } else {
+    if (idxs.tail_.head_.is_ascending()) {
+      return x
+          .block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1,
+                 idxs.head_.min_ - (idxs.head_.max_ - 1),
+                 idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1))
+          .colwise_reverse()
+          .eval();
+    } else {
+      return x
+          .block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1,
+                 idxs.head_.min_ - (idxs.head_.max_ - 1),
+                 idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1))
+          .reverse()
+          .eval();
+    }
+  }
 }
 
 /**
@@ -143,7 +240,8 @@ inline auto rvalue(VarMat&& x, const cons_index_list<index_multi, nil_index_list
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename VarMat,
-          require_var_matrix_t<VarMat>* = nullptr>
+  require_var_matrix_t<VarMat>* = nullptr,
+  require_eigen_dense_dynamic_t<value_type_t<VarMat>>* = nullptr>
 inline Eigen::Matrix<value_type_t<VarMat>, 1, Eigen::Dynamic> rvalue(
     VarMat&& x,
     const cons_index_list<index_uni,
@@ -151,19 +249,20 @@ inline Eigen::Matrix<value_type_t<VarMat>, 1, Eigen::Dynamic> rvalue(
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[uni, multi] index range", name, x.rows(),
                     idxs.head_.n_);
-  arena_t<Eigen::Matrix<double, 1, Eigen::Dynamic>> x_ret_vals(1, idxs.head_.ns_.size());
-  arena_t<std::vector<int>> multi_idx(idxs.tail_.head_.ns_.size());
-  const int n = idxs.head_.n_ - 1
-  for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
-    const int m = idxs.tail_.head_.ns_[i] - 1;
-    math::check_range("matrix[multi] subset range", name, x_ref.cols(), m + 1);
-    multi_idx[n] = m;
-    x_ret_vals.coeffRef(i) = x.val().coeffRef(n, m);
+  const auto ret_size = idxs.tail_.head_.ns_.size();
+  arena_t<Eigen::Matrix<double, 1, Eigen::Dynamic>> x_ret_vals(ret_size);
+  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
+  arena_t<Eigen::Matrix<int, -1, 1>> col_idx(multi_map(idxs.tail_.head_.ns_.data(), ret_size).eval());
+  const int row_idx = idxs.head_.n_ - 1;
+  for (int i = 0; i < ret_size; ++i) {
+    math::check_range("matrix[multi] subset range", name, x.cols(), col_idx[i]);
+    --col_idx[i];
+    x_ret_vals.coeffRef(i) = x.val().coeffRef(row_idx, col_idx[i]);
   }
   stan::math::var_value<Eigen::Matrix<double, 1, Eigen::Dynamic>> x_ret(x_ret_vals);
-  stan::math::reverse_pass_callback([x_vi = x.vi_, ret_vi = x_ret.vi_, n, multi_idx]() mutable {
-    for (Eigen::Index i = 0; i < multi_idx.size(); ++i) {
-      x_vi->adj_.coeffRef(n, multi_idx[i]) += ret_vi->adj_.coeffRef(i);
+  stan::math::reverse_pass_callback([x, x_ret, row_idx, col_idx]() mutable {
+    for (Eigen::Index i = 0; i < col_idx.size(); ++i) {
+      x.adj().coeffRef(row_idx, col_idx[i]) += x_ret.adj().coeffRef(i);
     }
   });
   return x_ret;
@@ -183,26 +282,28 @@ inline Eigen::Matrix<value_type_t<VarMat>, 1, Eigen::Dynamic> rvalue(
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename VarMat,
-          require_var_matrix_t<VarMat>* = nullptr>
+  require_var_matrix_t<VarMat>* = nullptr,
+  require_eigen_dense_dynamic_t<value_type_t<VarMat>>* = nullptr>
 inline auto rvalue(VarMat&& x,
     const cons_index_list<index_multi,
                           cons_index_list<index_uni, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[multi, uni] rvalue range", name, x.cols(),
                     idxs.tail_.head_.n_);
-  arena_t<Eigen::Matrix<double, Eigen::Dynamic, 1>> x_ret_val(idxs.head_.ns_.size());
-  arena_t<std::vector<int>> multi_idx(idxs.head_.ns_.size());
-  const int m = idxs.tail_.head_.n_ - 1;
-  for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
-    const int n = idxs.head_.ns_[i] - 1;
-    math::check_range("matrix[multi, uni] rvalue range", name, x_ref.rows(), n + 1);
-    multi_idx[i] = n;
-    x_ret_val.coeffRef(i) = x.val().coeffRef(n, m);
+  const auto ret_size = idxs.head_.ns_.size();
+  arena_t<Eigen::Matrix<double, Eigen::Dynamic, 1>> x_ret_val(ret_size);
+  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
+  arena_t<Eigen::Matrix<int, -1, 1>> row_idx(multi_map(idxs.head_.ns_.data(), ret_size).eval());
+  const int col_idx = idxs.tail_.head_.n_ - 1;
+  for (int i = 0; i < ret_size; ++i) {
+    math::check_range("matrix[multi, uni] rvalue range", name, x.rows(), row_idx[i]);
+    --row_idx[i];
+    x_ret_val.coeffRef(i) = x.val().coeffRef(row_idx[i], col_idx);
   }
   stan::math::var_value<Eigen::Matrix<double, Eigen::Dynamic, 1>> x_ret(x_ret_val);
-  stan::math::reverse_pass_callback([x_vi = x.vi_, ret_vi = x_ret.vi_, m, multi_idx](){
-    for (Eigen::Index i = 0; i < multi_idx.size(); ++i) {
-      x_vi->adj_.coeffRef(multi_idx[i], m) += ret_vi->adj_.coeffRef(i);
+  stan::math::reverse_pass_callback([x, x_ret, col_idx, row_idx]() mutable {
+    for (Eigen::Index i = 0; i < row_idx.size(); ++i) {
+      x.adj().coeffRef(row_idx[i], col_idx) += x_ret.adj().coeffRef(i);
     }
   });
   return x_ret;
@@ -222,33 +323,39 @@ inline auto rvalue(VarMat&& x,
  * @return Result of indexing matrix.
  */
 template <typename VarMat,
-          require_var_matrix_t<VarMat>* = nullptr>
+  require_var_matrix_t<VarMat>* = nullptr,
+  require_eigen_dense_dynamic_t<value_type_t<VarMat>>* = nullptr>
 inline auto rvalue(VarMat&& x,
     const cons_index_list<index_multi,
                           cons_index_list<index_multi, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  const int rows = idxs.head_.ns_.size();
-  const int cols = idxs.tail_.head_.ns_.size();
-  arena_t<value_type_t<VarMat>> x_ret_val(rows, cols);
-  arena_t<std::vector<std::array<int, 2>>> multi_idx(idxs.head_.ns_.size());
-  for (int j = 0; j < cols; ++j) {
-    const int n = idxs.tail_.head_.ns_[j];
-    for (int i = 0; i < rows; ++i) {
-      const int m = idxs.head_.ns_[i];
-      multi_idx.push_back(std::array<int, 2>{m, n});
-      math::check_range("matrix[multi,multi] row index", name, x.rows(), m);
-      x_ret_val.coeffRef(i, j) = x.val().coeff(m - 1, n - 1);
+  const auto ret_rows = idxs.head_.ns_.size();
+  const auto ret_cols = idxs.tail_.head_.ns_.size();
+  const Eigen::Index x_rows = x.rows();
+  const Eigen::Index x_cols = x.cols();
+  arena_t<value_type_t<VarMat>> x_ret_val(ret_rows, ret_cols);
+  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
+  arena_t<Eigen::Matrix<int, -1, 1>> row_idx(multi_map(idxs.head_.ns_.data(), ret_rows).eval());
+  arena_t<Eigen::Matrix<int, -1, 1>> col_idx(multi_map(idxs.tail_.head_.ns_.data(), ret_cols).eval());
+  // We only want to check these once
+  for (int i = 0; i < ret_rows; ++i) {
+    math::check_range("matrix[multi,multi] row index", name, x_rows, row_idx[i]);
+    --row_idx[i];
+  }
+  for (int j = 0; j < ret_cols; ++j) {
+    math::check_range("matrix[multi,multi] col index", name, x.cols(), col_idx[j]);
+    --col_idx[j];
+    for (int i = 0; i < ret_rows; ++i) {
+      x_ret_val.coeffRef(i, j) = x.val().coeff(row_idx[i], col_idx[j]);
     }
   }
   stan::math::var_value<plain_type_t<value_type_t<VarMat>>> x_ret(x_ret_val);
-  stan::math::reverse_pass_callback([x_vi = x.vi_, ret_vi = x_ret.vi_, multi_idx](){
-    for (int j = 0; j < multi_idx.size(); ++j) {
-      const auto idx = multi_idx[j];
-      const int n = idx[0];
-      const int m = idx[1];
-      x_vi->adj_.coeffRef(m - 1, n - 1) = ret_vi->adj_.coeffRef(j);
+  stan::math::reverse_pass_callback([x, x_ret, col_idx, row_idx]() mutable {
+    for (int j = 0; j < col_idx.size(); ++j) {
+      for (int i = 0; i < row_idx.size(); ++i) {
+        x.adj().coeffRef(row_idx[i], col_idx[j]) += x_ret.adj().coeffRef(i, j);
+      }
     }
-
   });
   return x_ret;
 }
@@ -268,29 +375,67 @@ inline auto rvalue(VarMat&& x,
  * @return Result of indexing matrix.
  */
 template <typename VarMat, typename Idx,
-          require_dense_dynamic_t<VarMat>* = nullptr,
-          require_not_same_t<std::decay_t<Idx>, index_uni>* = nullptr>
+  require_var_matrix_t<VarMat>* = nullptr,
+  require_eigen_dense_dynamic_t<value_type_t<VarMat>>* = nullptr>
 inline auto rvalue(VarMat&& x,
     const cons_index_list<Idx, cons_index_list<index_multi, nil_index_list>>&
         idxs,
     const char* name = "ANON", int depth = 0) {
-  const int rows = rvalue_index_size(idxs.head_, x.rows());
-  const int cols = rvalue_index_size(idxs.tail_.head_, x.cols());
-  arena_t<value_type_t<VarMat>> x_ret_val(rows, cols);
-  arena_t<std::vector<int>> multi_idx(idxs.head_.ns_.size());
-  for (int j = 0; j < idxs.tail_.head_.ns_.size(); ++j) {
-    const int n = idxs.tail_.head_.ns_[j] - 1;
-    multi_idx.push_back(n);
-    math::check_range("matrix[..., multi] col index", name, x.cols(), n + 1);
-    x_ret_val.col(j) = rvalue(x.val().col(n - 1), index_list(idxs.head_), name, depth + 1);
+  const auto ret_rows = rvalue_index_size(idxs.head_, x.rows());
+  const auto ret_cols = idxs.tail_.head_.ns_.size();
+  arena_t<value_type_t<VarMat>> x_ret_val(ret_rows, ret_cols);
+  arena_t<Eigen::Matrix<int, -1, 1>> col_idx(multi_map(idxs.tail_.head_.ns_.data(), ret_cols).eval());
+  for (int j = 0; j < ret_cols; ++j) {
+    math::check_range("matrix[..., multi] col index", name, x.cols(), col_idx[j]);
+    --col_idx[j];
+    x_ret_val.col(j) = rvalue(x.val().col(col_idx), index_list(idxs.head_), name, depth + 1);
   }
-  var_value<Eigen::MatrixXd<double, -1, -1>> x_ret(rows, idxs.tail_.head_.ns_.size());
-  stan::math::reverse_pass_callback([x_vi = x.vi_, ret_vi = x_ret.vi_, multi_idx, head = idxs.head_](){
-    for (size_t i = 0; i < multi_idx[i]; ++i) {
-      x_vi->adj_.col(multi_idx[i]) += rvalue(ret_vi->adj_.col(i), index_list(idxs.head_), name, depth + 1);      
+  stan::math::var_value<Eigen::Matrix<double, -1, -1>> x_ret(x_ret_val);
+  // index_multi is the only index with dynamic memory so head is safe
+  stan::math::reverse_pass_callback([head = idxs.head_, x, x_ret, col_idx, name, depth]() mutable {
+    for (size_t j = 0; j < col_idx.size(); ++j) {
+      x.adj().col(col_idx[j]) += rvalue(x_ret.adj().col(j), index_list(head), name, depth + 1);
     }
   });
   return x_ret;
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a
+ * min_max_index returning a block from min to max.
+ *
+ * Types:  matrix[Idx, min_max] = matrix
+ *
+ * @tparam Mat An eigen matrix
+ * @tparam Idx Type of index.
+ * @param[in] x Matrix to index.
+ * @param[in] idxs Pair multiple index and single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename Mat, typename Idx,
+  require_var_matrix_t<Mat>* = nullptr,
+  require_eigen_dense_dynamic_t<value_type_t<Mat>>* = nullptr>
+inline auto rvalue(
+    Mat&& x,
+    const cons_index_list<Idx, cons_index_list<index_min_max, nil_index_list>>&
+        idxs,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[..., min_max] indexing", name, x.rows(),
+                    idxs.tail_.head_.min_);
+  math::check_range("matrix[..., min_max] indexing", name, x.rows(),
+                    idxs.tail_.head_.max_);
+  if (idxs.tail_.head_.is_ascending()) {
+    const auto col_start = idxs.tail_.head_.min_ - 1;
+    return rvalue(x.middleCols(col_start, idxs.tail_.head_.max_ - col_start),
+                  index_list(idxs.head_), name, depth + 1);
+  } else {
+    const auto col_start = idxs.tail_.head_.max_ - 1;
+    return rvalue(x.middleCols(col_start, idxs.tail_.head_.min_ - col_start)
+                      .rowwise_reverse(),
+                  index_list(idxs.head_), name, depth + 1);
+  }
 }
 
 

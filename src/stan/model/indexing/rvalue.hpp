@@ -69,7 +69,8 @@ inline T rvalue(T&& x, const nil_index_list& /*idx*/, const char* /*name*/ = "",
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename T, require_plain_type_t<T>* = nullptr>
+template <typename T, require_plain_type_t<T>* = nullptr,
+ require_plain_type_t<value_type_t<T>>* = nullptr>
 inline T rvalue(T&& x, const cons_index_list<index_omni, nil_index_list>& idxs,
                 const char* name = "ANON", int depth = 0) {
   return std::forward<T>(x);
@@ -279,7 +280,7 @@ inline auto rvalue(EigMat&& x,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat,
-          require_all_eigen_dense_dynamic_t<EigMat>* = nullptr>
+          require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline plain_type_t<EigMat> rvalue(
     EigMat&& x, const cons_index_list<index_multi, nil_index_list>& idxs,
     const char* name = "ANON", int depth = 0) {
@@ -330,7 +331,7 @@ inline auto rvalue(EigMat&& x,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat,
-          require_all_dense_dynamic_t<EigMat>* = nullptr>
+          require_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -352,7 +353,7 @@ inline auto rvalue(EigMat&& x,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename EigMat,
-          require_all_dense_dynamic_t<EigMat>* = nullptr>
+          require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -384,7 +385,7 @@ inline auto rvalue(EigMat&& x,
  * @return Result of indexing matrix.
  */
 template <typename EigMat,
-          require_dense_dynamic_t<EigMat>* = nullptr>
+          require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline auto rvalue(
     EigMat&& x,
     const cons_index_list<index_min_max,
