@@ -39,6 +39,29 @@ namespace model {
  *  - General overload for nested std vectors.
  */
 
+namespace internal {
+  // Internal helpers so we can reuse min_max index assign for Eigen/var<Eigen>
+  template <typename T, require_var_matrix_t<T>* = nullptr>
+  auto rowwise_reverse(T&& x) {
+    return std::forward<T>(x).rowwise_reverse();
+  }
+
+  template <typename T, require_eigen_t<T>* = nullptr>
+  auto rowwise_reverse(T&& x) {
+    return std::forward<T>(x).rowwise().reverse();
+  }
+
+  template <typename T, require_var_matrix_t<T>* = nullptr>
+  auto colwise_reverse(T&& x) {
+    return std::forward<T>(x).colwise_reverse();
+  }
+
+  template <typename T, require_eigen_t<T>* = nullptr>
+  auto colwise_reverse(T&& x) {
+    return std::forward<T>(x).colwise().reverse();
+  }
+}
+
 /**
  * Assign one object to another.
  *
@@ -394,8 +417,8 @@ inline void assign(Mat1&& x,
  *
  * Types:  mat[min_max] = mat
  *
- * @tparam Mat Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs An index for a min_max range of rows
  * @param[in] y Value matrix.
@@ -405,11 +428,11 @@ inline void assign(Mat1&& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
-template <typename EigMat1, typename EigMat2,
-          require_all_eigen_dense_dynamic_t<EigMat1, EigMat2>* = nullptr>
-inline void assign(EigMat1&& x,
+template <typename Mat1, typename Mat2,
+          require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+inline void assign(Mat1&& x,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
-                   const EigMat2& y, const char* name = "ANON", int depth = 0) {
+                   Mat2&& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_range("matrix[min_max] max row indexing", name, x.rows(),
                           idxs.head_.max_);
   stan::math::check_range("matrix[min_max] min row indexing", name, x.rows(),
@@ -417,13 +440,13 @@ inline void assign(EigMat1&& x,
   if (idxs.head_.is_ascending()) {
     stan::math::check_size_match("matrix[min_max] assign row sizes", "lhs",
                                  idxs.head_.min_, name, y.rows());
-    x.middleRows(idxs.head_.min_ - 1, idxs.head_.max_ - 1) = y;
+    x.middleRows(idxs.head_.min_ - 1, idxs.head_.max_ - 1) = std::forward<Mat2>(y);
     return;
   } else {
     stan::math::check_size_match("matrix[reverse_min_max] assign row sizes",
                                  "lhs", idxs.head_.max_, name, y.rows());
     x.middleRows(idxs.head_.max_ - 1, idxs.head_.min_ - 1)
-        = y.colwise().reverse();
+        = internal::colwise_reverse(std::forward<Mat2>(y));
     return;
   }
 }
@@ -433,8 +456,8 @@ inline void assign(EigMat1&& x,
  *
  * Types:  mat[min_max, min_max] = mat
  *
- * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs An index list containing two min_max indices
  * @param[in] y Matrix variable to assign from.
@@ -445,12 +468,12 @@ inline void assign(EigMat1&& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2,
-          require_eigen_dense_dynamic_t<Mat1>* = nullptr>
+          require_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<index_min_max,
                           cons_index_list<index_min_max, nil_index_list>>& idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+    Mat2&& y, const char* name = "ANON", int depth = 0) {
   if (idxs.head_.is_ascending()) {
     if (idxs.tail_.head_.is_ascending()) {
       auto row_size = idxs.head_.max_ - (idxs.head_.min_ - 1);
@@ -465,7 +488,7 @@ inline void assign(
                                    "lhs", col_size, name, y.cols());
       x.block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1, row_size,
               col_size)
-          = y;
+          = std::forward<Mat2>(y);
       return;
     } else {
       auto row_size = idxs.head_.max_ - (idxs.head_.min_ - 1);
@@ -484,7 +507,7 @@ inline void assign(
           name, y.cols());
       x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1, row_size,
               col_size)
-          = y.rowwise().reverse();
+          = internal::rowwise_reverse(std::forward<Mat2>(y));
       return;
     }
   } else {
@@ -505,7 +528,7 @@ inline void assign(
           name, y.cols());
       x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1, row_size,
               col_size)
-          = y.colwise().reverse();
+          = internal::colwise_reverse(std::forward<Mat2>(y));
       return;
     } else {
       auto row_size = idxs.head_.min_ - (idxs.head_.max_ - 1);
@@ -524,7 +547,7 @@ inline void assign(
           col_size, name, y.cols());
       x.block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1, row_size,
               col_size)
-          = y.reverse();
+          = std::forward<Mat2>(y).reverse();
       return;
     }
   }
@@ -811,12 +834,12 @@ inline void assign(
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2, typename Idx,
-          require_eigen_dense_dynamic_t<Mat1>* = nullptr>
+          require_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<Idx, cons_index_list<index_min_max, nil_index_list>>&
         idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+    Mat2&& y, const char* name = "ANON", int depth = 0) {
   if (idxs.tail_.head_.is_ascending()) {
     const auto col_start = idxs.tail_.head_.min_ - 1;
     const auto col_size = idxs.tail_.head_.max_ - col_start;
@@ -826,7 +849,7 @@ inline void assign(
                             idxs.tail_.head_.max_, x.cols());
     stan::math::check_size_match("matrix[..., min_max] assign col size", "lhs",
                                  idxs.tail_.head_.max_, name, x.cols());
-    assign(x.middleCols(col_start, col_size), index_list(idxs.head_), y, name,
+    assign(x.middleCols(col_start, col_size), index_list(idxs.head_), std::forward<Mat2>(y), name,
            depth + 1);
     return;
   } else {
@@ -839,7 +862,7 @@ inline void assign(
     stan::math::check_size_match("matrix[..., min_max] assign col size", "lhs",
                                  idxs.tail_.head_.min_, name, x.cols());
     assign(x.middleCols(col_start, col_size), index_list(idxs.head_),
-           y.rowwise().reverse(), name, depth + 1);
+           internal::rowwise_reverse(std::forward<Mat2>(y)), name, depth + 1);
     return;
   }
 }
