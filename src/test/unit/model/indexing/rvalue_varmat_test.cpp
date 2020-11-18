@@ -31,7 +31,7 @@ void test_out_of_range(C&& c, I&& idxs) {
   EXPECT_THROW(stan::model::rvalue(c, idxs), std::out_of_range);
 }
 
-TEST_F(RvalueRev, rvalue_vector_nil) {
+TEST_F(RvalueRev, nil_vec) {
   using stan::math::var_value;
   Eigen::VectorXd x(3);
   x(0) = 1.1;
@@ -45,62 +45,92 @@ TEST_F(RvalueRev, rvalue_vector_nil) {
   EXPECT_FLOAT_EQ(3.3, rx.val()(2));
 }
 
-TEST_F(RvalueRev, rvalue_vector_uni_nil) {
+TEST_F(RvalueRev, uni_nil_vec) {
   using stan::math::var_value;
-  Eigen::VectorXd x(3);
-  x(0) = 1.1;
-  x(1) = 2.2;
-  x(2) = 3.3;
-  var_value<Eigen::VectorXd> xv(x);
+  Eigen::VectorXd x_val(3);
+  x_val(0) = 1.1;
+  x_val(1) = 2.2;
+  x_val(2) = 3.3;
+  var_value<Eigen::VectorXd> x(x_val);
 
-  for (size_t k = 0; k < x.size(); ++k)
-    EXPECT_EQ(x[k], rvalue(xv, index_list(index_uni(k + 1))).val());
+  for (size_t i = 0; i < x.size(); ++i) {
+    auto x_uni = rvalue(x, index_list(index_uni(i + 1)));
+    EXPECT_EQ(x_val[i], x_uni.val());
+    x_uni.grad();
+    EXPECT_EQ(x_uni.adj(), x.adj()(i));
+    stan::math::zero_adjoints();
+  }
 
   test_out_of_range(x, index_list(index_uni(-1)));
   test_out_of_range(x, index_list(index_uni(0)));
   test_out_of_range(x, index_list(index_uni(4)));
-  stan::math::recover_memory();
 }
 
-TEST_F(RvalueRev, rvalue_vector_varmat_min_max_nil) {
+TEST_F(RvalueRev, min_max_vec) {
+  using stan::math::sum;
   using stan::math::var_value;
-  Eigen::VectorXd x(4);
-  x(0) = 1.1;
-  x(1) = 2.2;
-  x(2) = 3.3;
-  x(3) = 4.4;
-  var_value<Eigen::VectorXd> xv(x);
+  Eigen::VectorXd x_val(4);
+  x_val(0) = 1.1;
+  x_val(1) = 2.2;
+  x_val(2) = 3.3;
+  x_val(3) = 4.4;
 
   // min > max
   for (int mn = 0; mn < 4; ++mn) {
     for (int mx = mn; mx < 4; ++mx) {
+      var_value<Eigen::VectorXd> x(x_val);
       var_value<Eigen::VectorXd> rx
-          = rvalue(xv, index_list(index_min_max(mn + 1, mx + 1)));
+          = rvalue(x, index_list(index_min_max(mn + 1, mx + 1)));
       EXPECT_FLOAT_EQ(mx - mn + 1, rx.size());
-      for (int n = mn; n <= mx; ++n)
-        EXPECT_FLOAT_EQ(x[n], rx.val()[n - mn]);
+      for (int n = mn; n <= mx; ++n) {
+        EXPECT_FLOAT_EQ(x.val()[n], rx.val()[n - mn]);
+      }
+      sum(rx).grad();
+      for (int n = mn; n <= mx; ++n) {
+        EXPECT_FLOAT_EQ(x.adj()[n], rx.adj()[n - mn]);
+      }
+      stan::math::recover_memory();
     }
   }
+  var_value<Eigen::VectorXd> x(x_val);
+  test_out_of_range(x, index_list(index_min_max(0, 2)));
+  test_out_of_range(x, index_list(index_min_max(2, 5)));
+}
+
+TEST_F(RvalueRev, negative_min_max_vec) {
+  using stan::math::sum;
+  using stan::math::var_value;
+  Eigen::VectorXd x_val(4);
+  x_val(0) = 1.1;
+  x_val(1) = 2.2;
+  x_val(2) = 3.3;
+  x_val(3) = 4.4;
 
   // max > min
   for (int mn = 3; mn > -1; --mn) {
     for (int mx = mn; mx > -1; --mx) {
+      var_value<Eigen::VectorXd> x(x_val);
       var_value<Eigen::VectorXd> rx
-          = rvalue(xv, index_list(index_min_max(mn + 1, mx + 1)));
+          = rvalue(x, index_list(index_min_max(mn + 1, mx + 1)));
       EXPECT_FLOAT_EQ(mn - mx + 1, rx.size());
-      for (int n = mn; n <= mx; ++n)
-        EXPECT_FLOAT_EQ(x[n], rx.val()[n - mn]);
+      for (int n = mn; n <= mx; ++n) {
+        EXPECT_FLOAT_EQ(x.val()[n], rx.val()[n - mn]);
+      }
+      sum(rx).grad();
+      for (int n = mn; n <= mx; ++n) {
+        EXPECT_FLOAT_EQ(x.adj()[n], rx.adj()[n - mn]);
+      }
+      stan::math::recover_memory();
     }
   }
-
-  test_out_of_range(xv, index_list(index_min_max(0, 2)));
-  test_out_of_range(xv, index_list(index_min_max(2, 5)));
-  stan::math::recover_memory();
+  var_value<Eigen::VectorXd> x(x_val);
+  test_out_of_range(x, index_list(index_min_max(2, 0)));
+  test_out_of_range(x, index_list(index_min_max(5, 2)));
 }
 
-TEST_F(RvalueRev, rvalue_varmat_uni_multi) {
+auto make_std_varvec() {
+  using stan::math::sum;
   using stan::math::var_value;
-
   Eigen::Matrix<double, -1, 1> xd0(3);
   xd0(0) = 0.0;
   xd0(1) = 0.1;
@@ -123,63 +153,114 @@ TEST_F(RvalueRev, rvalue_varmat_uni_multi) {
   x.push_back(x0);
   x.push_back(x1);
   x.push_back(x2);
-  var_value<Eigen::Matrix<double, -1, 1>> y
-      = rvalue(x, index_list(index_uni(1), index_min(2)));
+  return x;
+}
+
+template <typename Check1, typename Check2, typename StdVecVar>
+void check_std_vec_adjs(Check1&& i_check, Check2&& j_check,
+                        const StdVecVar& x) {
+  for (Eigen::Index i = 0; i < x.size(); ++i) {
+    for (Eigen::Index j = 0; j < x[i].size(); ++j) {
+      if (i_check(i)) {
+        if (j_check(j)) {
+          EXPECT_FLOAT_EQ(x[i].adj()[j], 1)
+              << "Failed for (i, j): (" << i << ", " << j << ")";
+        } else {
+          EXPECT_FLOAT_EQ(x[i].adj()[j], 0)
+              << "Failed for (i, j): (" << i << ", " << j << ")";
+        }
+      } else {
+        EXPECT_FLOAT_EQ(x[i].adj()[j], 0)
+            << "Failed for (i, j): (" << i << ", " << j << ")";
+      }
+    }
+  }
+}
+
+TEST_F(RvalueRev, uni_stdvec_min_vec) {
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  auto x = make_std_varvec();
+  var_value<VectorXd> y = rvalue(x, index_list(index_uni(1), index_min(2)));
   EXPECT_EQ(2, y.size());
   EXPECT_FLOAT_EQ(0.1, y.val()[0]);
   EXPECT_FLOAT_EQ(0.2, y.val()[1]);
+  sum(y).grad();
+  auto i_check = [](Eigen::Index i) { return i == 0; };
+  auto j_check = [](Eigen::Index j) { return j > 0; };
+  check_std_vec_adjs(i_check, j_check, x);
   test_out_of_range(x, index_list(index_uni(0), index_min(2)));
   test_out_of_range(x, index_list(index_uni(1), index_min(0)));
-  // TODO: Test reverse pass for adjoint propogration
-  y = rvalue(x, index_list(index_uni(2), index_max(2)));
+}
+TEST_F(RvalueRev, uni_stdvec_max_vec) {
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  auto x = make_std_varvec();
+  var_value<VectorXd> y = rvalue(x, index_list(index_uni(2), index_max(2)));
   EXPECT_EQ(2, y.size());
   EXPECT_FLOAT_EQ(1.0, y.val()[0]);
   EXPECT_FLOAT_EQ(1.1, y.val()[1]);
+  sum(y).grad();
+  auto i_check = [](Eigen::Index i) { return i == 1; };
+  auto j_check = [](Eigen::Index j) { return j < 2; };
+  check_std_vec_adjs(i_check, j_check, x);
   test_out_of_range(x, index_list(index_uni(0), index_max(2)));
   test_out_of_range(x, index_list(index_uni(1), index_max(15)));
-
-  y = rvalue(x, index_list(index_uni(2), index_min_max(2, 3)));
+}
+TEST_F(RvalueRev, uni_stdvec_positive_minmax_vec) {
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  auto x = make_std_varvec();
+  var_value<VectorXd> y
+      = rvalue(x, index_list(index_uni(2), index_min_max(2, 3)));
   EXPECT_EQ(2, y.size());
   EXPECT_FLOAT_EQ(1.1, y.val()[0]);
   EXPECT_FLOAT_EQ(1.2, y.val()[1]);
+  sum(y).grad();
+  auto i_check = [](Eigen::Index i) { return i == 1; };
+  auto j_check = [](Eigen::Index j) { return j == 1 || j == 2; };
+  check_std_vec_adjs(i_check, j_check, x);
   test_out_of_range(x, index_list(index_uni(0), index_min_max(2, 3)));
-  test_out_of_range(x, index_list(index_uni(10), index_min_max(2, 3)));
-  test_out_of_range(x, index_list(index_uni(1), index_min_max(0, 3)));
-  test_out_of_range(x, index_list(index_uni(1), index_min_max(2, 15)));
-
-  y = rvalue(x, index_list(index_uni(2), index_min_max(2, 2)));
-  EXPECT_EQ(1, y.size());
+  test_out_of_range(x, index_list(index_uni(10), index_min_max(2, 15)));
+}
+TEST_F(RvalueRev, uni_stdvec_negative_minmax_vec) {
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  auto x = make_std_varvec();
+  var_value<VectorXd> y
+      = rvalue(x, index_list(index_uni(2), index_min_max(2, 1)));
+  EXPECT_EQ(2, y.size());
   EXPECT_FLOAT_EQ(1.1, y.val()[0]);
-
-  y = rvalue(x, index_list(index_uni(3), index_omni()));
+  sum(y).grad();
+  auto i_check = [](Eigen::Index i) { return i == 1; };
+  auto j_check = [](Eigen::Index j) { return j == 0 || j == 1; };
+  check_std_vec_adjs(i_check, j_check, x);
+  test_out_of_range(x, index_list(index_uni(1), index_min_max(3, 0)));
+  test_out_of_range(x, index_list(index_uni(1), index_min_max(15, 2)));
+}
+TEST_F(RvalueRev, uni_stdvec_omni_vec) {
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  auto x = make_std_varvec();
+  var_value<VectorXd> y = rvalue(x, index_list(index_uni(3), index_omni()));
   EXPECT_EQ(3, y.size());
   EXPECT_FLOAT_EQ(2.0, y.val()[0]);
   EXPECT_FLOAT_EQ(2.1, y.val()[1]);
   EXPECT_FLOAT_EQ(2.2, y.val()[2]);
+  sum(y).grad();
+  auto i_check = [](Eigen::Index i) { return i == 2; };
+  auto j_check = [](Eigen::Index j) { return true; };
+  check_std_vec_adjs(i_check, j_check, x);
   test_out_of_range(x, index_list(index_uni(0), index_omni()));
 }
 
 template <typename T>
-void varvector_uni_test() {
-  T v(3);
-  v << 0, 1, 2;
-  stan::math::var_value<T> rv(v);
-  EXPECT_FLOAT_EQ(0, rvalue(rv, index_list(index_uni(1))).val());
-  EXPECT_FLOAT_EQ(1, rvalue(rv, index_list(index_uni(2))).val());
-  EXPECT_FLOAT_EQ(2, rvalue(rv, index_list(index_uni(3))).val());
-
-  test_out_of_range(rv, index_list(index_uni(0)));
-  test_out_of_range(rv, index_list(index_uni(20)));
-}
-
-TEST_F(RvalueRev, rvalueVectorUni) { varvector_uni_test<Eigen::VectorXd>(); }
-
-TEST_F(RvalueRev, rvalueRowVectorUni) {
-  varvector_uni_test<Eigen::RowVectorXd>();
-}
-
-template <typename T>
-void varvector_multi_test() {
+void test_omni_varvector() {
   using stan::math::var_value;
   T v(5);
   v << 0, 1, 2, 3, 4;
@@ -200,9 +281,20 @@ void varvector_multi_test() {
   EXPECT_FLOAT_EQ(1.0, rv.adj()(2));
   EXPECT_FLOAT_EQ(1.0, rv.adj()(3));
   EXPECT_FLOAT_EQ(1.0, rv.adj()(4));
-  stan::math::set_zero_all_adjoints();
+}
 
-  vi = rvalue(rv, index_list(index_min(3)));
+TEST_F(RvalueRev, omni_vec) { test_omni_varvector<Eigen::VectorXd>(); }
+
+TEST_F(RvalueRev, omni_rowvec) { test_omni_varvector<Eigen::RowVectorXd>(); }
+
+// min
+template <typename T>
+void test_min_varvector() {
+  using stan::math::var_value;
+  T v(5);
+  v << 0, 1, 2, 3, 4;
+  var_value<T> rv(v);
+  var_value<T> vi = rvalue(rv, index_list(index_min(3)));
   EXPECT_EQ(3, vi.size());
   EXPECT_FLOAT_EQ(2, vi.val()(0));
   EXPECT_FLOAT_EQ(4, vi.val()(2));
@@ -219,9 +311,20 @@ void varvector_multi_test() {
   EXPECT_FLOAT_EQ(1.0, rv.adj()(2));
   EXPECT_FLOAT_EQ(1.0, rv.adj()(3));
   EXPECT_FLOAT_EQ(1.0, rv.adj()(4));
-  stan::math::set_zero_all_adjoints();
+}
 
-  vi = rvalue(rv, index_list(index_max(3)));
+TEST_F(RvalueRev, min_vec) { test_min_varvector<Eigen::VectorXd>(); }
+
+TEST_F(RvalueRev, min_rowvec) { test_min_varvector<Eigen::RowVectorXd>(); }
+
+// max
+template <typename T>
+void test_max_varvector() {
+  using stan::math::var_value;
+  T v(5);
+  v << 0, 1, 2, 3, 4;
+  var_value<T> rv(v);
+  var_value<T> vi = rvalue(rv, index_list(index_max(3)));
   EXPECT_EQ(3, vi.size());
   EXPECT_FLOAT_EQ(0, vi.val()(0));
   EXPECT_FLOAT_EQ(2, vi.val()(2));
@@ -237,9 +340,20 @@ void varvector_multi_test() {
   EXPECT_FLOAT_EQ(1.0, rv.adj()(2));
   EXPECT_FLOAT_EQ(0.0, rv.adj()(3));
   EXPECT_FLOAT_EQ(0.0, rv.adj()(4));
-  stan::math::set_zero_all_adjoints();
+}
 
-  vi = rvalue(rv, index_list(index_min_max(2, 4)));
+TEST_F(RvalueRev, max_vec) { test_max_varvector<Eigen::VectorXd>(); }
+
+TEST_F(RvalueRev, max_rowvec) { test_max_varvector<Eigen::RowVectorXd>(); }
+
+// positive minmax
+template <typename T>
+void test_positive_minmax_varvector() {
+  using stan::math::var_value;
+  T v(5);
+  v << 0, 1, 2, 3, 4;
+  var_value<T> rv(v);
+  var_value<T> vi = rvalue(rv, index_list(index_min_max(2, 4)));
   EXPECT_EQ(3, vi.size());
   EXPECT_FLOAT_EQ(1, vi.val()(0));
   EXPECT_FLOAT_EQ(3, vi.val()(2));
@@ -256,8 +370,23 @@ void varvector_multi_test() {
   EXPECT_FLOAT_EQ(1.0, rv.adj()(2));
   EXPECT_FLOAT_EQ(1.0, rv.adj()(3));
   EXPECT_FLOAT_EQ(0.0, rv.adj()(4));
-  stan::math::set_zero_all_adjoints();
+}
 
+TEST_F(RvalueRev, positive_minmax_vec) {
+  test_positive_minmax_varvector<Eigen::VectorXd>();
+}
+
+TEST_F(RvalueRev, positive_minmax_rowvec) {
+  test_positive_minmax_varvector<Eigen::RowVectorXd>();
+}
+
+// multi
+template <typename T>
+void test_multi_varvector() {
+  using stan::math::var_value;
+  T v(5);
+  v << 0, 1, 2, 3, 4;
+  var_value<T> rv(v);
   std::vector<int> ns;
   ns.push_back(4);
   ns.push_back(2);
@@ -266,11 +395,7 @@ void varvector_multi_test() {
   ns.push_back(5);
   ns.push_back(2);
   ns.push_back(4);
-  std::cout << "\n before vi_val: \n" << vi.val() << "\n";
-  std::cout << "\n before rv_val: \n" << rv.val() << "\n";
-  vi = rvalue(rv, index_list(index_multi(ns)));
-  std::cout << "\n after vi_val: \n" << vi.val() << "\n";
-  std::cout << "\n after rv_val: \n" << rv.val() << "\n";
+  var_value<T> vi = rvalue(rv, index_list(index_multi(ns)));
   EXPECT_EQ(7, vi.size());
   EXPECT_FLOAT_EQ(3.0, vi.val()(0));
   EXPECT_FLOAT_EQ(1.0, vi.val()(1));
@@ -285,11 +410,7 @@ void varvector_multi_test() {
 
   ns[ns.size() - 1] = 15;
   test_out_of_range(rv, index_list(index_multi(ns)));
-  std::cout << "\n before vi_adj: \n" << vi.adj() << "\n";
-  std::cout << "\n before rv_adj: \n" << rv.adj() << "\n";
   stan::math::sum(vi).grad();
-  std::cout << "\n after vi_adj: \n" << vi.adj() << "\n";
-  std::cout << "\n after rv_adj: \n" << rv.adj() << "\n";
   for (int i = 0; i < vi.size(); ++i) {
     EXPECT_FLOAT_EQ(1, vi.adj()(i));
   }
@@ -301,242 +422,387 @@ void varvector_multi_test() {
   EXPECT_FLOAT_EQ(1.0, rv.adj()(4));
 }
 
-TEST_F(RvalueRev, rvalueVectorMulti) {
-  varvector_multi_test<Eigen::VectorXd>();
+TEST_F(RvalueRev, multi_vec) { test_multi_varvector<Eigen::VectorXd>(); }
+
+TEST_F(RvalueRev, multi_rowvec) { test_multi_varvector<Eigen::RowVectorXd>(); }
+
+template <typename Check1, typename Check2, typename VarMat>
+void check_matrix_adjs(Check1&& i_check, Check2&& j_check, const VarMat& x) {
+  for (Eigen::Index j = 0; j < x.cols(); ++j) {
+    for (Eigen::Index i = 0; i < x.rows(); ++i) {
+      if (i_check(i)) {
+        if (j_check(j)) {
+          EXPECT_FLOAT_EQ(x.adj()(i, j), 1)
+              << "Failed for (i, j): (" << i << ", " << j << ")";
+        } else {
+          EXPECT_FLOAT_EQ(x.adj()(i, j), 0)
+              << "Failed for (i, j): (" << i << ", " << j << ")";
+        }
+      } else {
+        EXPECT_FLOAT_EQ(x.adj()(i, j), 0)
+            << "Failed for (i, j): (" << i << ", " << j << ")";
+      }
+    }
+  }
 }
 
-TEST_F(RvalueRev, rvalueRowVectorMulti) {
-  varvector_multi_test<Eigen::RowVectorXd>();
-}
-
-TEST(ModelIndexing, rvalueMatrixUni) {
+TEST_F(RvalueRev, uni_mat) {
   using Eigen::MatrixXd;
   using Eigen::RowVectorXd;
   using Eigen::VectorXd;
-
-  MatrixXd m(4, 3);
-  m << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
-  RowVectorXd v = rvalue(m, index_list(index_uni(1)));
-  EXPECT_EQ(3, v.size());
-  EXPECT_FLOAT_EQ(0.0, v(0));
-  EXPECT_FLOAT_EQ(0.1, v(1));
-  EXPECT_FLOAT_EQ(0.2, v(2));
-  test_out_of_range(m, index_list(index_uni(0)));
-  test_out_of_range(m, index_list(index_uni(15)));
-
-  v = rvalue(m, index_list(index_uni(2)));
-  EXPECT_EQ(3, v.size());
-  EXPECT_FLOAT_EQ(1.0, v(0));
-  EXPECT_FLOAT_EQ(1.1, v(1));
-  EXPECT_FLOAT_EQ(1.2, v(2));
-}
-
-TEST_F(RvalueRev, rvalueMatrixUni) {
-  using Eigen::MatrixXd;
-  using Eigen::RowVectorXd;
-  using Eigen::VectorXd;
+  using stan::math::sum;
   using stan::math::var_value;
 
   MatrixXd m(4, 3);
   m << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
-  var_value<MatrixXd> rm(m);
-  var_value<RowVectorXd> v = rvalue(rm, index_list(index_uni(1)));
+  var_value<MatrixXd> x(m);
+  var_value<RowVectorXd> v = rvalue(x, index_list(index_uni(1)));
   EXPECT_EQ(3, v.size());
   EXPECT_FLOAT_EQ(0.0, v.val()(0));
   EXPECT_FLOAT_EQ(0.1, v.val()(1));
   EXPECT_FLOAT_EQ(0.2, v.val()(2));
-  test_out_of_range(rm, index_list(index_uni(0)));
-  test_out_of_range(rm, index_list(index_uni(15)));
+  sum(v).grad();
+  auto check_i = [](int i) { return i == 0; };
+  auto check_j = [](int j) { return true; };
+  check_matrix_adjs(check_i, check_j, x);
 
-  v = rvalue(rm, index_list(index_uni(2)));
-  EXPECT_EQ(3, v.size());
-  EXPECT_FLOAT_EQ(1.0, v.val()(0));
-  EXPECT_FLOAT_EQ(1.1, v.val()(1));
-  EXPECT_FLOAT_EQ(1.2, v.val()(2));
+  test_out_of_range(x, index_list(index_uni(0)));
+  test_out_of_range(x, index_list(index_uni(15)));
 }
 
-TEST_F(RvalueRev, rvalueMatrixMulti) {
+TEST_F(RvalueRev, uni_uni_mat) {
+  Eigen::MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  for (int m = 0; m < 3; ++m) {
+    for (int n = 0; n < 4; ++n) {
+      stan::math::var_value<Eigen::MatrixXd> x(x_val);
+      auto x_sub = rvalue(x, index_list(index_uni(m + 1), index_uni(n + 1)));
+      EXPECT_FLOAT_EQ(m + n / 10.0, x_sub.val());
+      x_sub.grad();
+      auto check_i = [m](int i) { return m == i; };
+      auto check_j = [n](int j) { return n == j; };
+      check_matrix_adjs(check_i, check_j, x);
+      stan::math::recover_memory();
+    }
+  }
+  stan::math::var_value<Eigen::MatrixXd> x(x_val);
+  test_out_of_range(x, index_list(index_uni(0), index_uni(1)));
+  test_out_of_range(x, index_list(index_uni(0), index_uni(10)));
+  test_out_of_range(x, index_list(index_uni(1), index_uni(0)));
+  test_out_of_range(x, index_list(index_uni(1), index_uni(10)));
+}
+
+TEST_F(RvalueRev, uni_omni_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  var_value<MatrixXd> x(x_val);
+  var_value<RowVectorXd> y = rvalue(x, index_list(index_uni(2), index_omni()));
+  EXPECT_EQ(4, y.size());
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_FLOAT_EQ(y.val()(i), x.val()(1, i));
+  }
+  sum(y).grad();
+  auto check_i = [](int i) { return 1 == i; };
+  auto check_j = [](int j) { return true; };
+  check_matrix_adjs(check_i, check_j, x);
+
+  test_out_of_range(x, index_list(index_uni(0), index_omni()));
+  test_out_of_range(x, index_list(index_uni(10), index_omni()));
+}
+
+TEST_F(RvalueRev, uni_min_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  var_value<MatrixXd> x(x_val);
+  var_value<RowVectorXd> y = rvalue(x, index_list(index_uni(3), index_min(2)));
+  EXPECT_EQ(3, y.size());
+  for (int i = 0; i < 3; ++i) {
+    EXPECT_FLOAT_EQ(y.val()(i), x.val()(2, i + 1));
+  }
+  sum(y).grad();
+  auto check_i = [](int i) { return 2 == i; };
+  auto check_j = [](int j) { return j > 0; };
+  check_matrix_adjs(check_i, check_j, x);
+  test_out_of_range(x, index_list(index_uni(0), index_min(2)));
+  test_out_of_range(x, index_list(index_uni(1), index_min(0)));
+}
+
+TEST_F(RvalueRev, min_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(4, 3);
+  x_val << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
+  var_value<MatrixXd> x(x_val);
+  var_value<MatrixXd> y = rvalue(x, index_list(index_min(3)));
+  EXPECT_EQ(2, y.rows());
+  EXPECT_EQ(3, y.cols());
+  EXPECT_FLOAT_EQ(2.0, y.val()(0, 0));
+  EXPECT_FLOAT_EQ(2.1, y.val()(0, 1));
+  EXPECT_FLOAT_EQ(2.2, y.val()(0, 2));
+  EXPECT_FLOAT_EQ(3.0, y.val()(1, 0));
+  EXPECT_FLOAT_EQ(3.1, y.val()(1, 1));
+  EXPECT_FLOAT_EQ(3.2, y.val()(1, 2));
+  sum(y).grad();
+  auto check_i = [](int i) { return i > 1; };
+  auto check_j = [](int j) { return true; };
+  check_matrix_adjs(check_i, check_j, x);
+  test_out_of_range(x, index_list(index_min(0)));
+}
+
+TEST_F(RvalueRev, min_uni_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  var_value<MatrixXd> x(x_val);
+  var_value<VectorXd> y = rvalue(x, index_list(index_min(2), index_uni(3)));
+  EXPECT_EQ(2, y.size());
+  for (int j = 0; j < 2; ++j) {
+    EXPECT_EQ(1 + j + 0.2, y.val()(j));
+  }
+  sum(y).grad();
+  auto check_i = [](int i) { return i > 0; };
+  auto check_j = [](int j) { return j == 2; };
+  check_matrix_adjs(check_i, check_j, x);
+
+  test_out_of_range(x, index_list(index_min(0), index_uni(3)));
+  test_out_of_range(x, index_list(index_min(2), index_uni(0)));
+  test_out_of_range(x, index_list(index_min(2), index_uni(30)));
+}
+
+TEST_F(RvalueRev, min_min_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  stan::math::var_value<Eigen::MatrixXd> x(x_val);
+  stan::math::var_value<Eigen::MatrixXd> y
+      = rvalue(x, index_list(index_min(2), index_min(3)));
+  EXPECT_EQ(2, y.rows());
+  EXPECT_EQ(2, y.cols());
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < 2; ++j) {
+      EXPECT_FLOAT_EQ(i + 1 + (j + 2) / 10.0, y.val()(i, j));
+    }
+  }
+  sum(y).grad();
+  auto check_i = [](int i) { return i > 0; };
+  auto check_j = [](int j) { return j > 1; };
+  check_matrix_adjs(check_i, check_j, x);
+  test_out_of_range(x, index_list(index_min(0), index_min(3)));
+  test_out_of_range(x, index_list(index_min(2), index_min(0)));
+}
+
+TEST_F(RvalueRev, max_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(4, 3);
+  x_val << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
+  var_value<MatrixXd> x(x_val);
+  var_value<MatrixXd> y = rvalue(x, index_list(index_max(2)));
+  EXPECT_EQ(2, y.rows());
+  EXPECT_EQ(3, y.cols());
+  EXPECT_FLOAT_EQ(0.0, y.val()(0, 0));
+  EXPECT_FLOAT_EQ(0.1, y.val()(0, 1));
+  EXPECT_FLOAT_EQ(0.2, y.val()(0, 2));
+  EXPECT_FLOAT_EQ(1.0, y.val()(1, 0));
+  EXPECT_FLOAT_EQ(1.1, y.val()(1, 1));
+  EXPECT_FLOAT_EQ(1.2, y.val()(1, 2));
+  sum(y).grad();
+  auto check_i = [](int i) { return i < 2; };
+  auto check_j = [](int j) { return true; };
+  check_matrix_adjs(check_i, check_j, x);
+  test_out_of_range(x, index_list(index_max(15)));
+}
+
+TEST_F(RvalueRev, positive_min_max_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(4, 3);
+  x_val << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
+  var_value<MatrixXd> x(x_val);
+  var_value<MatrixXd> y = rvalue(x, index_list(index_min_max(2, 3)));
+  EXPECT_EQ(2, y.rows());
+  EXPECT_EQ(3, y.cols());
+  EXPECT_FLOAT_EQ(1.0, y.val()(0, 0));
+  EXPECT_FLOAT_EQ(1.1, y.val()(0, 1));
+  EXPECT_FLOAT_EQ(1.2, y.val()(0, 2));
+  EXPECT_FLOAT_EQ(2.0, y.val()(1, 0));
+  EXPECT_FLOAT_EQ(2.1, y.val()(1, 1));
+  EXPECT_FLOAT_EQ(2.2, y.val()(1, 2));
+  sum(y).grad();
+  auto check_i = [](int i) { return i > 0 && i < 3; };
+  auto check_j = [](int j) { return true; };
+  check_matrix_adjs(check_i, check_j, x);
+  test_out_of_range(x, index_list(index_min_max(1, 15)));
+  test_out_of_range(x, index_list(index_min_max(0, 2)));
+}
+
+TEST_F(RvalueRev, negative_min_max_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(4, 3);
+  x_val << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
+  var_value<MatrixXd> x(x_val);
+  var_value<MatrixXd> y = rvalue(x, index_list(index_min_max(3, 2)));
+  EXPECT_EQ(2, y.rows());
+  EXPECT_EQ(3, y.cols());
+  EXPECT_FLOAT_EQ(2, y.val()(0, 0));
+  EXPECT_FLOAT_EQ(2.1, y.val()(0, 1));
+  EXPECT_FLOAT_EQ(2.2, y.val()(0, 2));
+  EXPECT_FLOAT_EQ(1, y.val()(1, 0));
+  EXPECT_FLOAT_EQ(1.1, y.val()(1, 1));
+  EXPECT_FLOAT_EQ(1.2, y.val()(1, 2));
+  sum(y).grad();
+  auto check_i = [](int i) { return i > 0 && i < 3; };
+  auto check_j = [](int j) { return true; };
+  check_matrix_adjs(check_i, check_j, x);
+  test_out_of_range(x, index_list(index_min_max(3, 0)));
+  test_out_of_range(x, index_list(index_min_max(15, 2)));
+}
+
+TEST_F(RvalueRev, omni_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(4, 3);
+  x_val << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
+  var_value<MatrixXd> x(x_val);
+  var_value<MatrixXd> y = rvalue(x, index_list(index_omni()));
+  EXPECT_EQ(4, y.rows());
+  EXPECT_EQ(3, y.cols());
+  EXPECT_FLOAT_EQ(0.0, y.val()(0, 0));
+  EXPECT_FLOAT_EQ(0.1, y.val()(0, 1));
+  EXPECT_FLOAT_EQ(0.2, y.val()(0, 2));
+  EXPECT_FLOAT_EQ(3.0, y.val()(3, 0));
+  EXPECT_FLOAT_EQ(3.1, y.val()(3, 1));
+  EXPECT_FLOAT_EQ(3.2, y.val()(3, 2));
+  sum(y).grad();
+  auto check_i = [](int i) { return true; };
+  auto check_j = [](int j) { return true; };
+  check_matrix_adjs(check_i, check_j, x);
+}
+
+TEST_F(RvalueRev, omni_uni_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  var_value<MatrixXd> x(x_val);
+  var_value<VectorXd> y = rvalue(x, index_list(index_omni(), index_uni(2)));
+  EXPECT_EQ(3, y.size());
+  for (int j = 0; j < 3; ++j) {
+    EXPECT_FLOAT_EQ(j + 0.1, y.val()(j));
+  }
+  sum(y).grad();
+  auto check_i = [](int i) { return true; };
+  auto check_j = [](int j) { return j == 1; };
+  check_matrix_adjs(check_i, check_j, x);
+  test_out_of_range(x, index_list(index_omni(), index_uni(0)));
+  test_out_of_range(x, index_list(index_omni(), index_uni(20)));
+}
+
+TEST_F(RvalueRev, omni_omni_mat) {
+  using Eigen::MatrixXd;
+  using Eigen::RowVectorXd;
+  using Eigen::VectorXd;
+  using stan::math::sum;
+  using stan::math::var_value;
+  MatrixXd x_val(3, 4);
+  x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+  var_value<MatrixXd> x(x_val);
+  var_value<MatrixXd> y = rvalue(x, index_list(index_omni(), index_omni()));
+  EXPECT_EQ(x.rows(), y.rows());
+  EXPECT_EQ(x.cols(), y.cols());
+  for (int i = 0; i < x.rows(); ++i) {
+    for (int j = 0; j < x.cols(); ++j) {
+      EXPECT_FLOAT_EQ(x.val()(i, j), y.val()(i, j));
+    }
+  }
+  sum(y).grad();
+  auto check_i = [](int i) { return true; };
+  auto check_j = [](int j) { return true; };
+  check_matrix_adjs(check_i, check_j, x);
+}
+
+TEST_F(RvalueRev, multi_mat) {
   using Eigen::MatrixXd;
   using Eigen::RowVectorXd;
   using Eigen::VectorXd;
   using stan::math::var_value;
-  MatrixXd m(4, 3);
-  m << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
-  var_value<MatrixXd> rm(m);
-  var_value<MatrixXd> a = rvalue(rm, index_list(index_min(3)));
-  EXPECT_EQ(2, a.rows());
-  EXPECT_EQ(3, a.cols());
-  EXPECT_FLOAT_EQ(2.0, a.val()(0, 0));
-  EXPECT_FLOAT_EQ(2.1, a.val()(0, 1));
-  EXPECT_FLOAT_EQ(2.2, a.val()(0, 2));
-  EXPECT_FLOAT_EQ(3.0, a.val()(1, 0));
-  EXPECT_FLOAT_EQ(3.1, a.val()(1, 1));
-  EXPECT_FLOAT_EQ(3.2, a.val()(1, 2));
-  test_out_of_range(rm, index_list(index_min(0)));
+  MatrixXd x_val(4, 3);
+  x_val << 0.0, 0.1, 0.2, 1.0, 1.1, 1.2, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2;
+  var_value<MatrixXd> x(x_val);
+  std::vector<int> row_idx;
+  row_idx.push_back(3);
+  row_idx.push_back(4);
+  row_idx.push_back(1);
+  row_idx.push_back(4);
+  row_idx.push_back(1);
+  row_idx.push_back(4);
+  row_idx.push_back(1);
+  var_value<MatrixXd> y = rvalue(x, index_list(index_multi(row_idx)));
+  EXPECT_FLOAT_EQ(7, y.rows());
+  EXPECT_FLOAT_EQ(3, y.cols());
+  Eigen::MatrixXd touch_count = Eigen::MatrixXd::Zero(4, 3);
+  for (int j = 0; j < y.cols(); ++j) {
+    for (int i = 0; i < row_idx.size(); ++i) {
+      EXPECT_FLOAT_EQ(y.val()(i, j), x.val()(row_idx[i] - 1, j))
+          << "Failed for i: (row_idx[i], j): (" << i << ": (" << row_idx[i]
+          << ", " << j << ")";
+      touch_count(row_idx[i] - 1, j) += 1;
+    }
+  }
 
-  a = rvalue(rm, index_list(index_max(2)));
-  EXPECT_EQ(2, a.rows());
-  EXPECT_EQ(3, a.cols());
-  EXPECT_FLOAT_EQ(0.0, a.val()(0, 0));
-  EXPECT_FLOAT_EQ(0.1, a.val()(0, 1));
-  EXPECT_FLOAT_EQ(0.2, a.val()(0, 2));
-  EXPECT_FLOAT_EQ(1.0, a.val()(1, 0));
-  EXPECT_FLOAT_EQ(1.1, a.val()(1, 1));
-  EXPECT_FLOAT_EQ(1.2, a.val()(1, 2));
-  test_out_of_range(rm, index_list(index_max(15)));
+  sum(y).grad();
+  for (int j = 0; j < x.cols(); ++j) {
+    for (int i = 0; i < x.rows(); ++i) {
+      EXPECT_FLOAT_EQ(x.adj()(i, j), touch_count.coeffRef(i, j))
+          << "Failed for (i, j): (" << i << ", " << j << ")";
+    }
+  }
+  row_idx.push_back(0);
+  test_out_of_range(x, index_list(index_multi(row_idx)));
 
-  a = rvalue(rm, index_list(index_min_max(2, 3)));
-  EXPECT_EQ(2, a.rows());
-  EXPECT_EQ(3, a.cols());
-  EXPECT_FLOAT_EQ(1.0, a.val()(0, 0));
-  EXPECT_FLOAT_EQ(1.1, a.val()(0, 1));
-  EXPECT_FLOAT_EQ(1.2, a.val()(0, 2));
-  EXPECT_FLOAT_EQ(2.0, a.val()(1, 0));
-  EXPECT_FLOAT_EQ(2.1, a.val()(1, 1));
-  EXPECT_FLOAT_EQ(2.2, a.val()(1, 2));
-  std::cout << "\n before rm_val: \n" << rm.val() << "\n";
-  std::cout << "\n before a_val: \n" << a.val() << "\n";
-
-  a = rvalue(rm, index_list(index_min_max(3, 2)));
-  std::cout << "\n after rm_val: \n" << rm.val() << "\n";
-  std::cout << "\n after a_val: \n" << a.val() << "\n";
-  EXPECT_EQ(2, a.rows());
-  EXPECT_EQ(3, a.cols());
-  EXPECT_FLOAT_EQ(2, a.val()(0, 0));
-  EXPECT_FLOAT_EQ(2.1, a.val()(0, 1));
-  EXPECT_FLOAT_EQ(2.2, a.val()(0, 2));
-  EXPECT_FLOAT_EQ(1, a.val()(1, 0));
-  EXPECT_FLOAT_EQ(1.1, a.val()(1, 1));
-  EXPECT_FLOAT_EQ(1.2, a.val()(1, 2));
-
-  test_out_of_range(rm, index_list(index_min_max(0, 3)));
-  test_out_of_range(rm, index_list(index_min_max(2, 15)));
-
-  a = rvalue(rm, index_list(index_omni()));
-  EXPECT_EQ(4, a.rows());
-  EXPECT_EQ(3, a.cols());
-  EXPECT_FLOAT_EQ(0.0, a.val()(0, 0));
-  EXPECT_FLOAT_EQ(0.1, a.val()(0, 1));
-  EXPECT_FLOAT_EQ(0.2, a.val()(0, 2));
-  EXPECT_FLOAT_EQ(3.0, a.val()(3, 0));
-  EXPECT_FLOAT_EQ(3.1, a.val()(3, 1));
-  EXPECT_FLOAT_EQ(3.2, a.val()(3, 2));
-
-  std::vector<int> ns;
-  ns.push_back(3);
-  ns.push_back(4);
-  ns.push_back(1);
-  ns.push_back(4);
-  ns.push_back(1);
-  ns.push_back(4);
-  ns.push_back(1);
-  a = rvalue(rm, index_list(index_multi(ns)));
-  EXPECT_FLOAT_EQ(7, a.rows());
-  EXPECT_FLOAT_EQ(3, a.cols());
-  EXPECT_FLOAT_EQ(2.0, a.val()(0, 0));
-  EXPECT_FLOAT_EQ(2.1, a.val()(0, 1));
-  EXPECT_FLOAT_EQ(2.2, a.val()(0, 2));
-  EXPECT_FLOAT_EQ(3.0, a.val()(5, 0));
-  EXPECT_FLOAT_EQ(3.1, a.val()(5, 1));
-  EXPECT_FLOAT_EQ(3.2, a.val()(5, 2));
-  EXPECT_FLOAT_EQ(0.0, a.val()(6, 0));
-  EXPECT_FLOAT_EQ(0.1, a.val()(6, 1));
-  EXPECT_FLOAT_EQ(0.2, a.val()(6, 2));
-
-  ns.push_back(0);
-  test_out_of_range(rm, index_list(index_multi(ns)));
-
-  ns[ns.size() - 1] = 15;
-  test_out_of_range(rm, index_list(index_multi(ns)));
+  row_idx[row_idx.size() - 1] = 15;
+  test_out_of_range(x, index_list(index_multi(row_idx)));
 }
 
-TEST_F(RvalueRev, rvalueMatrixSingleSingle) {
-  Eigen::MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-  stan::math::var_value<Eigen::MatrixXd> rx(x);
-  for (int m = 0; m < 3; ++m)
-    for (int n = 0; n < 4; ++n)
-      EXPECT_FLOAT_EQ(
-          m + n / 10.0,
-          rvalue(rx, index_list(index_uni(m + 1), index_uni(n + 1))).val());
-  test_out_of_range(rx, index_list(index_uni(0), index_uni(1)));
-  test_out_of_range(rx, index_list(index_uni(0), index_uni(10)));
-  test_out_of_range(rx, index_list(index_uni(1), index_uni(0)));
-  test_out_of_range(rx, index_list(index_uni(1), index_uni(10)));
-}
-
-TEST_F(RvalueRev, rvalueMatrixSingleMulti) {
-  using stan::math::var_value;
-  Eigen::MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-  var_value<Eigen::MatrixXd> vx(x);
-  var_value<Eigen::RowVectorXd> vr
-      = rvalue(vx, index_list(index_uni(2), index_omni()));
-  EXPECT_EQ(4, vr.size());
-  for (int i = 0; i < 4; ++i)
-    EXPECT_FLOAT_EQ(vr.val()(i), vx.val()(1, i));
-  test_out_of_range(vx, index_list(index_uni(0), index_omni()));
-  test_out_of_range(vx, index_list(index_uni(10), index_omni()));
-
-  vr = rvalue(vx, index_list(index_uni(3), index_min(2)));
-  EXPECT_EQ(3, vr.size());
-  for (int i = 0; i < 3; ++i)
-    EXPECT_FLOAT_EQ(vr.val()(i), vx.val()(2, i + 1));
-  test_out_of_range(vx, index_list(index_uni(0), index_min(2)));
-  test_out_of_range(vx, index_list(index_uni(1), index_min(0)));
-}
-
-TEST_F(RvalueRev, rvalueMatrixMultiSingle) {
-  Eigen::MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-  stan::math::var_value<Eigen::MatrixXd> rx(x);
-  stan::math::var_value<Eigen::VectorXd> rv
-      = rvalue(x, index_list(index_omni(), index_uni(2)));
-  EXPECT_EQ(3, rv.size());
-  for (int j = 0; j < 3; ++j)
-    EXPECT_FLOAT_EQ(j + 0.1, rv.val()(j));
-  test_out_of_range(rx, index_list(index_omni(), index_uni(0)));
-  test_out_of_range(rx, index_list(index_omni(), index_uni(20)));
-
-  rv = rvalue(rx, index_list(index_min(2), index_uni(3)));
-  EXPECT_EQ(2, rv.size());
-  for (int j = 0; j < 2; ++j)
-    EXPECT_EQ(1 + j + 0.2, rv.val()(j));
-  test_out_of_range(rx, index_list(index_min(0), index_uni(3)));
-  test_out_of_range(rx, index_list(index_min(2), index_uni(0)));
-  test_out_of_range(rx, index_list(index_min(2), index_uni(30)));
-}
-
-TEST_F(RvalueRev, rvalueMatrixOmniOmni) {
-  Eigen::MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-  stan::math::var_value<Eigen::MatrixXd> rx(x);
-  stan::math::var_value<Eigen::MatrixXd> ry
-      = rvalue(rx, index_list(index_omni(), index_omni()));
-  EXPECT_EQ(rx.rows(), ry.rows());
-  EXPECT_EQ(rx.cols(), ry.cols());
-  for (int i = 0; i < rx.rows(); ++i)
-    for (int j = 0; j < rx.cols(); ++j)
-      EXPECT_FLOAT_EQ(rx.val()(i, j), ry.val()(i, j));
-}
-
-TEST_F(RvalueRev, rvalueMatrixMinMaxMaxMin) {
-  Eigen::MatrixXd x(3, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
-  stan::math::var_value<Eigen::MatrixXd> rx(x);
-  stan::math::var_value<Eigen::MatrixXd> ry = rvalue(rx, index_list(index_min(2), index_min(3)));
-  EXPECT_EQ(2, ry.rows());
-  EXPECT_EQ(2, ry.cols());
-  for (int i = 0; i < 2; ++i)
-    for (int j = 0; j < 2; ++j)
-      EXPECT_FLOAT_EQ(i + 1 + (j + 2) / 10.0, ry.val()(i, j));
-  test_out_of_range(rx, index_list(index_min(0), index_min(3)));
-  test_out_of_range(rx, index_list(index_min(2), index_min(0)));
-}
-
-TEST_F(RvalueRev, rvalueMatrixMultiMulti) {
+TEST_F(RvalueRev, multi_multi_mat) {
   Eigen::MatrixXd x(4, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3, 3.0, 3.1, 3.2, 3.3;
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3, 3.0, 3.1,
+      3.2, 3.3;
   stan::math::var_value<Eigen::MatrixXd> rx(x);
 
   std::vector<int> row_idx;
@@ -556,9 +822,8 @@ TEST_F(RvalueRev, rvalueMatrixMultiMulti) {
   row_idx.push_back(1);
   col_idx.push_back(1);
 
-  stan::math::var_value<Eigen::MatrixXd> ry = rvalue(rx, index_list(index_multi(row_idx), index_multi(col_idx)));
-  std::cout << "\n after rx.val(): \n" << rx.val() << "\n";
-  std::cout << "\n after ry.val(): \n" << ry.val() << "\n";
+  stan::math::var_value<Eigen::MatrixXd> ry
+      = rvalue(rx, index_list(index_multi(row_idx), index_multi(col_idx)));
   EXPECT_EQ(7, ry.rows());
   EXPECT_EQ(7, ry.cols());
   // We use these to check the adjoints
@@ -572,20 +837,14 @@ TEST_F(RvalueRev, rvalueMatrixMultiMulti) {
   }
 
   stan::math::sum(ry).grad();
-  std::cout << "\n after rx.adj(): \n" << rx.adj() << "\n";
-  std::cout << "\n after ry.adj(): \n" << ry.adj() << "\n";
-  std::cout << "\n after touches: \n" << touch_count << "\n";
   for (int j = 0; j < rx.cols(); ++j) {
     for (int i = 0; i < rx.rows(); ++i) {
       EXPECT_FLOAT_EQ(rx.adj()(i, j), touch_count.coeffRef(i, j));
     }
   }
-  puts("Pass1");
   row_idx.push_back(19);
   row_idx.push_back(22);
   test_out_of_range(rx, index_list(index_multi(row_idx), index_multi(col_idx)));
-  row_idx.pop_back();
-  row_idx.pop_back();
   col_idx.push_back(19);
   col_idx.push_back(22);
   test_out_of_range(rx, index_list(index_multi(row_idx), index_multi(col_idx)));

@@ -1058,12 +1058,6 @@ TEST(model_indexing, assign_densemat_densemat_min_max_index_min_index) {
 
   assign(x.block(0, 0, 3, 3), index_list(index_min_max(2, 3), index_min(2)),
          y.block(0, 0, 2, 2));
-         std::cout << "\n post-assign \n";
-         std::cout << "\nx val: \n" << x.val() << "\n";
-         std::cout << "x adj: \n" << x.adj() << "\n";
-         std::cout << "y val: \n" << y.val() << "\n";
-         std::cout << "y adj: \n" << y.adj() << "\n";
-
   EXPECT_FLOAT_EQ(y(0, 0), x(1, 1));
   EXPECT_FLOAT_EQ(y(0, 1), x(1, 2));
   EXPECT_FLOAT_EQ(y(0, 2), x(1, 3));

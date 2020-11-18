@@ -118,8 +118,8 @@ inline void assign(Vec1&& x,
  *
  * Types:  vector[min_max] <- vector
  *
- * @tparam Vec1 Eigen type with either dynamic rows or columns, but not both.
- * @tparam Vec2 Eigen type with either dynamic rows or columns, but not both.
+ * @tparam Vec1 A type with either dynamic rows or columns, but not both.
+ * @tparam Vec2 A type with either dynamic rows or columns, but not both.
  * @param[in] x vector variable to be assigned.
  * @param[in] idxs List holding a single `index_min_max`.
  * @param[in] y Value vector.
@@ -161,8 +161,8 @@ inline void assign(Vec1&& x,
  *
  * Types:  vector[min:N] <- vector
  *
- * @tparam Vec1 Eigen type with either dynamic rows or columns, but not both.
- * @tparam Vec2 Eigen type with either dynamic rows or columns, but not both.
+ * @tparam Vec1 A type with either dynamic rows or columns, but not both.
+ * @tparam Vec2 A type with either dynamic rows or columns, but not both.
  * @param[in] x vector to be assigned to.
  * @param[in] idxs An index.
  * @param[in] y Value vector.
@@ -173,8 +173,8 @@ inline void assign(Vec1&& x,
  * the indexed size.
  */
 template <typename Vec1, typename Vec2,
-  require_all_vector_t<Vec1, Vec2>* = nullptr,
-  require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
+          require_all_vector_t<Vec1, Vec2>* = nullptr,
+          require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
@@ -190,8 +190,8 @@ inline void assign(Vec1&& x,
  *
  * Types:  vector[1:max] <- vector
  *
- * @tparam Vec1 Eigen type with either dynamic rows or columns, but not both.
- * @tparam Vec2 Eigen type with either dynamic rows or columns, but not both.
+ * @tparam Vec1 A type with either dynamic rows or columns, but not both.
+ * @tparam Vec2 A type with either dynamic rows or columns, but not both.
  * @param[in] x vector to be assigned to.
  * @param[in] idxs An index.
  * @param[in] y Value vector.
@@ -202,8 +202,8 @@ inline void assign(Vec1&& x,
  * the indexed size.
  */
 template <typename Vec1, typename Vec2,
-  require_all_vector_t<Vec1, Vec2>* = nullptr,
-  require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
+          require_all_vector_t<Vec1, Vec2>* = nullptr,
+          require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
@@ -219,8 +219,8 @@ inline void assign(Vec1&& x,
  *
  * Types:  vector[omni] <- vector
  *
- * @tparam Vec1 Eigen type with either dynamic rows or columns, but not both.
- * @tparam Vec2 Eigen type with either dynamic rows or columns, but not both.
+ * @tparam Vec1 A type with either dynamic rows or columns, but not both.
+ * @tparam Vec2 A type with either dynamic rows or columns, but not both.
  * @param[in] x vector to be assigned to.
  * @param[in] idxs An index.
  * @param[in] y Value vector.
@@ -230,8 +230,8 @@ inline void assign(Vec1&& x,
  * the indexed size.
  */
 template <typename Vec1, typename Vec2,
-  require_all_vector_t<Vec1, Vec2>* = nullptr,
-  require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
+          require_all_vector_t<Vec1, Vec2>* = nullptr,
+          require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x,
                    const cons_index_list<index_omni, nil_index_list>& idxs,
                    Vec2&& y, const char* name = "ANON", int depth = 0) {
@@ -245,8 +245,8 @@ inline void assign(Vec1&& x,
  *
  * Types:  mat[uni] = row_vector
  *
- * @tparam Mat Eigen type with dynamic rows and columns.
- * @tparam RowVec Eigen type with dynamic columns and a compile time rows equal
+ * @tparam Mat A type with dynamic rows and columns.
+ * @tparam RowVec A type with dynamic columns and a compile time rows equal
  * to 1.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs An index holding the row to be assigned to.
@@ -275,8 +275,8 @@ inline void assign(Mat&& x,
  *
  * Types:  mat[multi] = mat
  *
- * @tparam Mat Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat An Eigen type with dynamic rows and columns.
+ * @tparam Mat2 An Eigen type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs List holding a multi index.
  * @param[in] y Value matrix.
@@ -286,11 +286,11 @@ inline void assign(Mat&& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
-template <typename EigMat1, typename EigMat2,
-          require_all_dense_dynamic_t<EigMat1, EigMat2>* = nullptr>
-inline void assign(EigMat1&& x,
+template <typename Mat1, typename Mat2,
+          require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+inline void assign(Mat1&& x,
                    const cons_index_list<index_multi, nil_index_list>& idxs,
-                   const EigMat2& y, const char* name = "ANON", int depth = 0) {
+                   const Mat2& y, const char* name = "ANON", int depth = 0) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_size_match("matrix[multi] assign row sizes", "lhs",
                                idxs.head_.ns_.size(), name, y.rows());
@@ -306,8 +306,8 @@ inline void assign(EigMat1&& x,
  *
  * Types:  mat[omni] = mat
  *
- * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs List holding an omni index.
  * @param[in] y Value matrix.
@@ -317,9 +317,8 @@ inline void assign(EigMat1&& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
-template <
-    typename Mat1, typename Mat2,
-    require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+template <typename Mat1, typename Mat2,
+          require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(Mat1&& x,
                    const cons_index_list<index_omni, nil_index_list>& idxs,
                    Mat2&& y, const char* name = "ANON", int depth = 0) {
@@ -335,8 +334,8 @@ inline void assign(Mat1&& x,
  *
  * Types:  mat[min] = mat
  *
- * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs An indexing from a minimum index (inclusive) to
  * the end of a container.
@@ -347,9 +346,8 @@ inline void assign(Mat1&& x,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
-template <
-    typename Mat1, typename Mat2,
-    require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+template <typename Mat1, typename Mat2,
+          require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(Mat1&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
@@ -367,8 +365,8 @@ inline void assign(Mat1&& x,
  *
  * Types:  mat[max] = mat
  *
- * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type with dynamic rows and columns.
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs An indexing from the start of the container up to
  * the specified maximum index (inclusive).
@@ -380,7 +378,7 @@ inline void assign(Mat1&& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2,
- require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+          require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(Mat1&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
@@ -408,7 +406,7 @@ inline void assign(Mat1&& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename EigMat1, typename EigMat2,
- require_all_eigen_dense_dynamic_t<EigMat1, EigMat2>* = nullptr>
+          require_all_eigen_dense_dynamic_t<EigMat1, EigMat2>* = nullptr>
 inline void assign(EigMat1&& x,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const EigMat2& y, const char* name = "ANON", int depth = 0) {
@@ -447,7 +445,7 @@ inline void assign(EigMat1&& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2,
-          require_dense_dynamic_t<Mat1>* = nullptr>
+          require_eigen_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<index_min_max,
@@ -614,9 +612,8 @@ inline void assign(
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
-template <
-    typename Mat1, typename Mat2,
-    require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+template <typename Mat1, typename Mat2,
+          require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<index_multi,
@@ -645,8 +642,8 @@ inline void assign(
  *
  * Types:  mat[Idx, uni] = mat
  *
- * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type that's assignable to the indexed matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Container holding row index and a min_max index.
@@ -711,8 +708,8 @@ inline void assign(
  *
  * Types:  mat[Idx, omni] = mat
  *
- * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type assignable to the slice of the matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Pair of multiple indexes (from 1).
@@ -738,8 +735,8 @@ inline void assign(
  *
  * Types:  mat[Idx, min] = mat
  *
- * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type assignable to the slice of the matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Container holding a row index and an index from a minimum
@@ -770,8 +767,8 @@ inline void assign(
  *
  * Types:  mat[Idx, max] = mat
  *
- * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type assignable to the slice of the matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Index holding a row index and an index from the start of the
@@ -801,8 +798,8 @@ inline void assign(
  *
  * Types:  mat[Idx, min_max] = mat
  *
- * @tparam Mat1 Eigen type with dynamic rows and columns.
- * @tparam Mat2 Eigen type
+ * @tparam Mat1 A type with dynamic rows and columns.
+ * @tparam Mat2 A type assignable to the slice of the matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs Container holding row index and a min_max index.
