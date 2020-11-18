@@ -40,27 +40,27 @@ namespace model {
  */
 
 namespace internal {
-  // Internal helpers so we can reuse min_max index assign for Eigen/var<Eigen>
-  template <typename T, require_var_matrix_t<T>* = nullptr>
-  auto rowwise_reverse(T&& x) {
-    return std::forward<T>(x).rowwise_reverse();
-  }
-
-  template <typename T, require_eigen_t<T>* = nullptr>
-  auto rowwise_reverse(T&& x) {
-    return std::forward<T>(x).rowwise().reverse();
-  }
-
-  template <typename T, require_var_matrix_t<T>* = nullptr>
-  auto colwise_reverse(T&& x) {
-    return std::forward<T>(x).colwise_reverse();
-  }
-
-  template <typename T, require_eigen_t<T>* = nullptr>
-  auto colwise_reverse(T&& x) {
-    return std::forward<T>(x).colwise().reverse();
-  }
+// Internal helpers so we can reuse min_max index assign for Eigen/var<Eigen>
+template <typename T, require_var_matrix_t<T>* = nullptr>
+auto rowwise_reverse(T&& x) {
+  return std::forward<T>(x).rowwise_reverse();
 }
+
+template <typename T, require_eigen_t<T>* = nullptr>
+auto rowwise_reverse(T&& x) {
+  return std::forward<T>(x).rowwise().reverse();
+}
+
+template <typename T, require_var_matrix_t<T>* = nullptr>
+auto colwise_reverse(T&& x) {
+  return std::forward<T>(x).colwise_reverse();
+}
+
+template <typename T, require_eigen_t<T>* = nullptr>
+auto colwise_reverse(T&& x) {
+  return std::forward<T>(x).colwise().reverse();
+}
+}  // namespace internal
 
 /**
  * Assign one object to another.
@@ -440,7 +440,8 @@ inline void assign(Mat1&& x,
   if (idxs.head_.is_ascending()) {
     stan::math::check_size_match("matrix[min_max] assign row sizes", "lhs",
                                  idxs.head_.min_, name, y.rows());
-    x.middleRows(idxs.head_.min_ - 1, idxs.head_.max_ - 1) = std::forward<Mat2>(y);
+    x.middleRows(idxs.head_.min_ - 1, idxs.head_.max_ - 1)
+        = std::forward<Mat2>(y);
     return;
   } else {
     stan::math::check_size_match("matrix[reverse_min_max] assign row sizes",
@@ -849,8 +850,8 @@ inline void assign(
                             idxs.tail_.head_.max_, x.cols());
     stan::math::check_size_match("matrix[..., min_max] assign col size", "lhs",
                                  idxs.tail_.head_.max_, name, x.cols());
-    assign(x.middleCols(col_start, col_size), index_list(idxs.head_), std::forward<Mat2>(y), name,
-           depth + 1);
+    assign(x.middleCols(col_start, col_size), index_list(idxs.head_),
+           std::forward<Mat2>(y), name, depth + 1);
     return;
   } else {
     const auto col_start = idxs.tail_.head_.max_ - 1;
