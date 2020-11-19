@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <vector>
 #include <stan/model/indexing/lvalue.hpp>
+#include <stan/model/indexing/rvalue.hpp>
 #include <stan/math/rev.hpp>
 #include <gtest/gtest.h>
 
@@ -61,6 +62,43 @@ TEST(ModelIndexing, lvalueUni) {
   test_throw(xs, index_list(index_uni(4)), y);
 }
 
+TEST(ModelIndexing, lvalueUniEigen) {
+  Eigen::VectorXd xs(3);
+  xs << 3, 5, 7;
+  double y = 15;
+  assign(xs, index_list(index_uni(2)), y);
+  EXPECT_FLOAT_EQ(y, xs[1]);
+  double z = 10;
+  assign(xs.segment(0, 3), index_list(index_uni(2)), z);
+  EXPECT_FLOAT_EQ(z, xs[1]);
+  assign(xs.segment(0, 3).array(), index_list(index_uni(2)), z);
+  EXPECT_FLOAT_EQ(z, xs[1]);
+
+  test_throw(xs, index_list(index_uni(0)), y);
+  test_throw(xs, index_list(index_uni(4)), y);
+}
+
+TEST(model_indexing, assign_eigvec_scalar_uni_index_segment) {
+  VectorXd lhs_x(5);
+  lhs_x << 0, 1, 2, 3, 4;
+  double y = 13;
+  assign(lhs_x.segment(0, 5), index_list(index_uni(3)), y);
+  EXPECT_FLOAT_EQ(y, lhs_x(2));
+
+  test_throw(lhs_x, index_list(index_uni(0)), y);
+  test_throw(lhs_x, index_list(index_uni(6)), y);
+}
+
+TEST(model_indexing, assign_eigrowvec_scalar_uni_index_segment) {
+  RowVectorXd lhs_x(5);
+  lhs_x << 0, 1, 2, 3, 4;
+  double y = 13;
+  assign(lhs_x.segment(0, 5), index_list(index_uni(3)), y);
+  EXPECT_FLOAT_EQ(y, lhs_x(2));
+  test_throw(lhs_x, index_list(index_uni(0)), y);
+  test_throw(lhs_x, index_list(index_uni(6)), y);
+}
+
 TEST(ModelIndexing, lvalueUniUni) {
   vector<double> xs0;
   xs0.push_back(0.0);
@@ -73,6 +111,27 @@ TEST(ModelIndexing, lvalueUniUni) {
   xs1.push_back(1.2);
 
   vector<vector<double> > xs;
+  xs.push_back(xs0);
+  xs.push_back(xs1);
+
+  double y = 15;
+  assign(xs, index_list(index_uni(2), index_uni(3)), y);
+  EXPECT_FLOAT_EQ(y, xs[1][2]);
+
+  test_throw(xs, index_list(index_uni(0), index_uni(3)), y);
+  test_throw(xs, index_list(index_uni(2), index_uni(0)), y);
+  test_throw(xs, index_list(index_uni(10), index_uni(3)), y);
+  test_throw(xs, index_list(index_uni(2), index_uni(10)), y);
+}
+
+TEST(ModelIndexing, lvalueUniUniEigen) {
+  Eigen::VectorXd xs0(3);
+  xs0 << 0.0, 0.1, 0.2;
+
+  Eigen::VectorXd xs1(3);
+  xs1 << 1.0, 1.1, 1.2;
+
+  vector<Eigen::VectorXd> xs;
   xs.push_back(xs0);
   xs.push_back(xs1);
 
@@ -123,6 +182,43 @@ TEST(ModelIndexing, lvalueMulti) {
   test_throw_ia(x, index_list(index_multi(ns)), y);
 }
 
+TEST(ModelIndexing, lvalueMultiEigen) {
+  Eigen::VectorXd x(10);
+  for (int i = 0; i < 10; ++i) {
+    x(i) = i;
+  }
+
+  Eigen::VectorXd y(2);
+  y << 8.1, 9.1;
+
+  assign(x, index_list(index_min(9)), y);
+  EXPECT_FLOAT_EQ(y[0], x[8]);
+  EXPECT_FLOAT_EQ(y[1], x[9]);
+  test_throw(x, index_list(index_min(0)), y);
+
+  assign(x, index_list(index_max(2)), y);
+  EXPECT_FLOAT_EQ(y[0], x[0]);
+  EXPECT_FLOAT_EQ(y[1], x[1]);
+  EXPECT_FLOAT_EQ(2, x[2]);
+  test_throw_ia(x, index_list(index_max(10)), y);
+
+  vector<int> ns;
+  ns.push_back(4);
+  ns.push_back(6);
+  assign(x, index_list(index_multi(ns)), y);
+  EXPECT_FLOAT_EQ(y[0], x[3]);
+  EXPECT_FLOAT_EQ(y[1], x[5]);
+
+  ns[0] = 0;
+  test_throw(x, index_list(index_multi(ns)), y);
+
+  ns[0] = 11;
+  test_throw(x, index_list(index_multi(ns)), y);
+
+  ns.push_back(3);
+  test_throw_ia(x, index_list(index_multi(ns)), y);
+}
+
 TEST(ModelIndexing, lvalueMultiMulti) {
   vector<vector<double> > xs;
   for (int i = 0; i < 10; ++i) {
@@ -137,6 +233,35 @@ TEST(ModelIndexing, lvalueMultiMulti) {
     vector<double> ysi;
     for (int j = 0; j < 3; ++j)
       ysi.push_back(10 + i + j / 10.0);
+    ys.push_back(ysi);
+  }
+
+  assign(xs, index_list(index_min(9), index_max(3)), ys);
+
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 3; ++j)
+      EXPECT_FLOAT_EQ(ys[i][j], xs[8 + i][j]);
+
+  test_throw_ia(xs, index_list(index_min(7), index_max(3)), ys);
+  test_throw_ia(xs, index_list(index_min(9), index_max(2)), ys);
+}
+
+TEST(ModelIndexing, lvalueMultiMultiEigen) {
+  vector<Eigen::VectorXd> xs;
+  for (int i = 0; i < 10; ++i) {
+    Eigen::VectorXd xsi(20);
+    for (int j = 0; j < 20; ++j) {
+      xsi(j) = (i + j / 10.0);
+    }
+    xs.push_back(xsi);
+  }
+
+  vector<Eigen::VectorXd> ys;
+  for (int i = 0; i < 2; ++i) {
+    Eigen::VectorXd ysi(3);
+    for (int j = 0; j < 3; ++j) {
+      ysi(j) = (10 + i + j / 10.0);
+    }
     ys.push_back(ysi);
   }
 
@@ -226,7 +351,7 @@ TEST(ModelIndexing, lvalueVecMulti) {
   EXPECT_FLOAT_EQ(ys(0), xs(2));
   EXPECT_FLOAT_EQ(ys(1), xs(3));
   EXPECT_FLOAT_EQ(ys(2), xs(4));
-  test_throw_ia(xs, index_list(index_min(0)), ys);
+  test_throw(xs, index_list(index_min(0)), ys);
 
   xs << 0, 1, 2, 3, 4;
   vector<int> ns;
@@ -259,7 +384,7 @@ TEST(ModelIndexing, lvalueRowVecMulti) {
   EXPECT_FLOAT_EQ(ys(1), xs(3));
   EXPECT_FLOAT_EQ(ys(2), xs(4));
   test_throw_ia(xs, index_list(index_min(2)), ys);
-  test_throw_ia(xs, index_list(index_min(0)), ys);
+  test_throw(xs, index_list(index_min(0)), ys);
 
   xs << 0, 1, 2, 3, 4;
   vector<int> ns;
@@ -336,7 +461,6 @@ TEST(ModelIndexing, lvalueMatrixUniMulti) {
 
   RowVectorXd y(3);
   y << 10, 11, 12;
-
   assign(x, index_list(index_uni(2), index_min_max(2, 4)), y);
   EXPECT_FLOAT_EQ(y(0), x(1, 1));
   EXPECT_FLOAT_EQ(y(1), x(1, 2));
@@ -372,7 +496,6 @@ TEST(ModelIndexing, lvalueMatrixMultiUni) {
 
   VectorXd y(2);
   y << 10, 11;
-
   assign(x, index_list(index_min_max(2, 3), index_uni(4)), y);
   EXPECT_FLOAT_EQ(y(0), x(1, 3));
   EXPECT_FLOAT_EQ(y(1), x(2, 3));
@@ -405,7 +528,6 @@ TEST(ModelIndexing, lvalueMatrixMultiMulti) {
 
   MatrixXd y(2, 3);
   y << 10, 11, 12, 20, 21, 22;
-
   assign(x, index_list(index_min_max(2, 3), index_min(2)), y);
   EXPECT_FLOAT_EQ(y(0, 0), x(1, 1));
   EXPECT_FLOAT_EQ(y(0, 1), x(1, 2));
@@ -483,7 +605,7 @@ TEST(ModelIndexing, doubleToVar) {
   vector<int> is;
   is.push_back(2);
   is.push_back(3);
-  assign(a, cons_list(index_multi(is), nil_index_list()), b);
+  assign(a, index_list(index_multi(is)), b);
   for (int i = 0; i < 2; ++i)
     for (int j = 0; j < 3; ++j)
       EXPECT_FLOAT_EQ(a(i + 1, j).val(), b(i, j));
@@ -516,6 +638,156 @@ TEST(ModelIndexing, resultSizeNegIndexing) {
   EXPECT_EQ(0, lhs.size());
 }
 
+TEST(ModelIndexing, resultSizeIndexingEigen) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::VectorXd lhs(5);
+  lhs << 1, 2, 3, 4, 5;
+  Eigen::VectorXd rhs(4);
+  rhs << 4, 3, 2, 1;
+  assign(lhs, cons_list(index_min_max(1, 4), nil_index_list()), rhs);
+  EXPECT_FLOAT_EQ(lhs(0), 4);
+  EXPECT_FLOAT_EQ(lhs(1), 3);
+  EXPECT_FLOAT_EQ(lhs(2), 2);
+  EXPECT_FLOAT_EQ(lhs(3), 1);
+  EXPECT_FLOAT_EQ(lhs(4), 5);
+}
+
+TEST(ModelIndexing, resultSizeNegIndexingEigen) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::VectorXd lhs(5);
+  lhs << 1, 2, 3, 4, 5;
+  Eigen::VectorXd rhs(4);
+  rhs << 1, 2, 3, 4;
+  assign(lhs, cons_list(index_min_max(4, 1), nil_index_list()), rhs);
+  EXPECT_FLOAT_EQ(lhs(0), 4);
+  EXPECT_FLOAT_EQ(lhs(1), 3);
+  EXPECT_FLOAT_EQ(lhs(2), 2);
+  EXPECT_FLOAT_EQ(lhs(3), 1);
+  EXPECT_FLOAT_EQ(lhs(4), 5);
+}
+
+TEST(ModelIndexing, resultSizePosMinMaxPosMinMaxEigenMatrix) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::Matrix<double, -1, -1> x(5, 5);
+  Eigen::Matrix<double, -1, -1> x_rev(5, 5);
+  for (int i = 0; i < x.size(); ++i) {
+    x(i) = i;
+    x_rev(i) = x.size() - i - 1;
+  }
+
+  for (int i = 0; i < x.rows(); ++i) {
+    Eigen::MatrixXd x_colwise_rev = x_rev.block(0, 0, i + 1, i + 1);
+    assign(x, index_list(index_min_max(1, i + 1), index_min_max(1, i + 1)),
+           x_rev.block(0, 0, i + 1, i + 1));
+    for (int kk = 0; kk < i; ++kk) {
+      for (int jj = 0; jj < i; ++jj) {
+        EXPECT_FLOAT_EQ(x(kk, jj), x_rev(kk, jj));
+      }
+    }
+    for (int j = 0; j < x.size(); ++j) {
+      x(j) = j;
+    }
+  }
+}
+
+TEST(ModelIndexing, resultSizePosMinMaxNegMinMaxEigenMatrix) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::Matrix<double, -1, -1> x(5, 5);
+  Eigen::Matrix<double, -1, -1> x_rev(5, 5);
+  for (int i = 0; i < x.size(); ++i) {
+    x(i) = i;
+    x_rev(i) = x.size() - i - 1;
+  }
+
+  for (int i = 0; i < x.rows(); ++i) {
+    Eigen::MatrixXd x_rowwise_reverse
+        = x_rev.block(0, 0, i + 1, i + 1).rowwise().reverse();
+    assign(x, index_list(index_min_max(1, i + 1), index_min_max(i + 1, 1)),
+           x_rev.block(0, 0, i + 1, i + 1));
+    for (int kk = 0; kk < i; ++kk) {
+      for (int jj = 0; jj < i; ++jj) {
+        EXPECT_FLOAT_EQ(x(kk, jj), x_rowwise_reverse(kk, jj));
+      }
+    }
+    for (int j = 0; j < x.size(); ++j) {
+      x(j) = j;
+    }
+  }
+}
+
+TEST(ModelIndexing, resultSizeNigMinMaxPosMinMaxEigenMatrix) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::Matrix<double, -1, -1> x(5, 5);
+  Eigen::Matrix<double, -1, -1> x_rev(5, 5);
+  for (int i = 0; i < x.size(); ++i) {
+    x(i) = i;
+    x_rev(i) = x.size() - i - 1;
+  }
+
+  for (int i = 0; i < x.rows(); ++i) {
+    Eigen::MatrixXd x_colwise_reverse
+        = x_rev.block(0, 0, i + 1, i + 1).colwise().reverse();
+    assign(x, index_list(index_min_max(i + 1, 1), index_min_max(1, i + 1)),
+           x_rev.block(0, 0, i + 1, i + 1));
+    for (int kk = 0; kk < i; ++kk) {
+      for (int jj = 0; jj < i; ++jj) {
+        EXPECT_FLOAT_EQ(x(kk, jj), x_colwise_reverse(kk, jj));
+      }
+    }
+    for (int j = 0; j < x.size(); ++j) {
+      x(j) = j;
+    }
+  }
+}
+
+TEST(ModelIndexing, resultSizeNegMinMaxNegMinMaxEigenMatrix) {
+  using stan::model::assign;
+  using stan::model::cons_list;
+  using stan::model::index_min_max;
+  using stan::model::nil_index_list;
+  using std::vector;
+  Eigen::Matrix<double, -1, -1> x(5, 5);
+  Eigen::Matrix<double, -1, -1> x_rev(5, 5);
+  for (int i = 0; i < x.size(); ++i) {
+    x(i) = i;
+    x_rev(i) = x.size() - i - 1;
+  }
+
+  for (int i = 0; i < x.rows(); ++i) {
+    Eigen::MatrixXd x_reverse = x_rev.block(0, 0, i + 1, i + 1).reverse();
+    assign(x, index_list(index_min_max(i + 1, 1), index_min_max(i + 1, 1)),
+           x_rev.block(0, 0, i + 1, i + 1));
+    for (int kk = 0; kk < i; ++kk) {
+      for (int jj = 0; jj < i; ++jj) {
+        EXPECT_FLOAT_EQ(x(kk, jj), x_reverse(kk, jj));
+      }
+    }
+    for (int j = 0; j < x.size(); ++j) {
+      x(j) = j;
+    }
+  }
+}
+
 TEST(modelIndexing, doubleToVarSimple) {
   using stan::math::var;
   using stan::model::nil_index_list;
@@ -528,4 +800,318 @@ TEST(modelIndexing, doubleToVarSimple) {
   assign(b, nil_index_list(), a);
   for (int i = 0; i < a.size(); ++i)
     EXPECT_FLOAT_EQ(a(i), b(i).val());
+}
+
+TEST(model_indexing, assign_eigvec_eigvec_index_min) {
+  VectorXd lhs_x(5);
+  lhs_x << 0, 1, 2, 3, 4;
+  VectorXd rhs_y(3);
+  rhs_y << 10, 11, 12;
+  assign(lhs_x, index_list(index_min(3)), rhs_y);
+  EXPECT_FLOAT_EQ(rhs_y(0), lhs_x(2));
+  EXPECT_FLOAT_EQ(rhs_y(1), lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(2), lhs_x(4));
+  test_throw(lhs_x, index_list(index_min(0)), rhs_y);
+
+  assign(lhs_x, index_list(index_min(3)), rhs_y.array() + 1.0);
+  EXPECT_FLOAT_EQ(rhs_y(0) + 1.0, lhs_x(2));
+  EXPECT_FLOAT_EQ(rhs_y(1) + 1.0, lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(2) + 1.0, lhs_x(4));
+}
+
+TEST(model_indexing, assign_eigvec_eigvec_index_multi) {
+  VectorXd lhs_x(5);
+  lhs_x << 0, 1, 2, 3, 4;
+  VectorXd rhs_y(3);
+  rhs_y << 10, 11, 12;
+
+  vector<int> ns;
+  ns.push_back(4);
+  ns.push_back(1);
+  ns.push_back(3);
+  assign(lhs_x, index_list(index_multi(ns)), rhs_y);
+  EXPECT_FLOAT_EQ(rhs_y(0), lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(1), lhs_x(0));
+  EXPECT_FLOAT_EQ(rhs_y(2), lhs_x(2));
+
+  assign(lhs_x, index_list(index_multi(ns)), rhs_y.array() + 4);
+  EXPECT_FLOAT_EQ(rhs_y(0) + 4, lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(1) + 4, lhs_x(0));
+  EXPECT_FLOAT_EQ(rhs_y(2) + 4, lhs_x(2));
+
+  ns[ns.size() - 1] = 0;
+  test_throw(lhs_x, index_list(index_multi(ns)), rhs_y);
+
+  ns[ns.size() - 1] = 10;
+  test_throw(lhs_x, index_list(index_multi(ns)), rhs_y);
+
+  ns[ns.size() - 1] = 3;
+  ns.push_back(1);
+  test_throw_ia(lhs_x, index_list(index_multi(ns)), rhs_y);
+}
+
+TEST(model_indexing, assign_eigrowvec_eigrowvec_index_min) {
+  RowVectorXd lhs_x(5);
+  lhs_x << 0, 1, 2, 3, 4;
+  RowVectorXd rhs_y(3);
+  rhs_y << 10, 11, 12;
+  assign(lhs_x, index_list(index_min(3)), rhs_y);
+  EXPECT_FLOAT_EQ(rhs_y(0), lhs_x(2));
+  EXPECT_FLOAT_EQ(rhs_y(1), lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(2), lhs_x(4));
+  test_throw(lhs_x, index_list(index_min(0)), rhs_y);
+
+  assign(lhs_x, index_list(index_min(3)), rhs_y.array() + 1.0);
+  EXPECT_FLOAT_EQ(rhs_y(0) + 1.0, lhs_x(2));
+  EXPECT_FLOAT_EQ(rhs_y(1) + 1.0, lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(2) + 1.0, lhs_x(4));
+}
+
+TEST(model_indexing, assign_eigrowvec_eigrowvec_index_multi) {
+  RowVectorXd lhs_x(5);
+  lhs_x << 0, 1, 2, 3, 4;
+  RowVectorXd rhs_y(3);
+  rhs_y << 10, 11, 12;
+
+  vector<int> ns;
+  ns.push_back(4);
+  ns.push_back(1);
+  ns.push_back(3);
+  assign(lhs_x, index_list(index_multi(ns)), rhs_y);
+  EXPECT_FLOAT_EQ(rhs_y(0), lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(1), lhs_x(0));
+  EXPECT_FLOAT_EQ(rhs_y(2), lhs_x(2));
+
+  assign(lhs_x, index_list(index_multi(ns)), rhs_y.array() + 4);
+  EXPECT_FLOAT_EQ(rhs_y(0) + 4, lhs_x(3));
+  EXPECT_FLOAT_EQ(rhs_y(1) + 4, lhs_x(0));
+  EXPECT_FLOAT_EQ(rhs_y(2) + 4, lhs_x(2));
+
+  ns[ns.size() - 1] = 0;
+  test_throw(lhs_x, index_list(index_multi(ns)), rhs_y);
+
+  ns[ns.size() - 1] = 10;
+  test_throw(lhs_x, index_list(index_multi(ns)), rhs_y);
+
+  ns[ns.size() - 1] = 3;
+  ns.push_back(1);
+  test_throw_ia(lhs_x, index_list(index_multi(ns)), rhs_y);
+}
+
+TEST(model_indexing, assign_densemat_rowvec_uni_index) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  RowVectorXd y(4);
+  y << 10.0, 10.1, 10.2, 10.3;
+
+  assign(x, index_list(index_uni(3)), y.array() + 3);
+  for (int j = 0; j < 4; ++j)
+    EXPECT_FLOAT_EQ(x(2, j), y(j) + 3);
+
+  test_throw(x, index_list(index_uni(0)), y);
+  test_throw(x, index_list(index_uni(5)), y);
+}
+
+TEST(model_indexing, assign_densemat_densemat_index_min) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  MatrixXd y(2, 4);
+  y << 10.0, 10.1, 10.2, 10.3, 11.0, 11.1, 11.2, 11.3;
+
+  assign(x, index_list(index_min(2)), y);
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_FLOAT_EQ(y(i, j), x(i + 1, j));
+    }
+  }
+  assign(x, index_list(index_min(2)), y.transpose().transpose());
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_FLOAT_EQ(y(i, j), x(i + 1, j));
+    }
+  }
+  test_throw_ia(x, index_list(index_min(1)), y);
+
+  MatrixXd z(1, 2);
+  z << 10, 20;
+  test_throw_ia(x, index_list(index_min(1)), z);
+  test_throw_ia(x, index_list(index_min(2)), z);
+}
+
+TEST(model_indexing, assign_densemat_scalar_index_uni) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  double y = 10.12;
+  assign(x, index_list(index_uni(2), index_uni(3)), y);
+  EXPECT_FLOAT_EQ(y, x(1, 2));
+
+  test_throw(x, index_list(index_uni(0), index_uni(3)), y);
+  test_throw(x, index_list(index_uni(2), index_uni(0)), y);
+  test_throw(x, index_list(index_uni(4), index_uni(3)), y);
+  test_throw(x, index_list(index_uni(2), index_uni(5)), y);
+}
+
+TEST(model_indexing, assign_densemat_eigrowvec_uni_index_min_max_index) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  RowVectorXd y(3);
+  y << 10, 11, 12;
+  assign(x, index_list(index_uni(2), index_min_max(2, 4)), y);
+  EXPECT_FLOAT_EQ(y(0), x(1, 1));
+  EXPECT_FLOAT_EQ(y(1), x(1, 2));
+  EXPECT_FLOAT_EQ(y(2), x(1, 3));
+
+  assign(x, index_list(index_uni(2), index_min_max(2, 4)), y.array() + 2);
+  EXPECT_FLOAT_EQ(y(0) + 2, x(1, 1));
+  EXPECT_FLOAT_EQ(y(1) + 2, x(1, 2));
+  EXPECT_FLOAT_EQ(y(2) + 2, x(1, 3));
+
+  test_throw(x, index_list(index_uni(0), index_min_max(2, 4)), y);
+  test_throw(x, index_list(index_uni(5), index_min_max(2, 4)), y);
+  test_throw(x, index_list(index_uni(2), index_min_max(0, 2)), y);
+  test_throw_ia(x, index_list(index_uni(2), index_min_max(2, 5)), y);
+
+  vector<int> ns;
+  ns.push_back(4);
+  ns.push_back(1);
+  ns.push_back(3);
+  assign(x, index_list(index_uni(3), index_multi(ns)), y);
+  EXPECT_FLOAT_EQ(y(0), x(2, 3));
+  EXPECT_FLOAT_EQ(y(1), x(2, 0));
+  EXPECT_FLOAT_EQ(y(2), x(2, 2));
+
+  assign(x, index_list(index_uni(3), index_multi(ns)), y.array() + 2);
+  EXPECT_FLOAT_EQ(y(0) + 2, x(2, 3));
+  EXPECT_FLOAT_EQ(y(1) + 2, x(2, 0));
+  EXPECT_FLOAT_EQ(y(2) + 2, x(2, 2));
+
+  ns[ns.size() - 1] = 0;
+  test_throw(x, index_list(index_uni(3), index_multi(ns)), y);
+
+  ns[ns.size() - 1] = 20;
+  test_throw(x, index_list(index_uni(3), index_multi(ns)), y);
+
+  ns.push_back(2);
+  test_throw_ia(x, index_list(index_uni(3), index_multi(ns)), y);
+}
+
+TEST(model_indexing, assign_densemat_eigvec_min_max_index_uni_index) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  VectorXd y(2);
+  y << 10, 11;
+
+  assign(x, index_list(index_min_max(2, 3), index_uni(4)), y);
+  EXPECT_FLOAT_EQ(y(0), x(1, 3));
+  EXPECT_FLOAT_EQ(y(1), x(2, 3));
+
+  assign(x, index_list(index_min_max(2, 3), index_uni(4)), y.array() + 2);
+  EXPECT_FLOAT_EQ(y(0) + 2, x(1, 3));
+  EXPECT_FLOAT_EQ(y(1) + 2, x(2, 3));
+
+  test_throw(x, index_list(index_min_max(2, 3), index_uni(0)), y);
+  test_throw(x, index_list(index_min_max(2, 3), index_uni(5)), y);
+  test_throw(x, index_list(index_min_max(0, 1), index_uni(4)), y);
+  test_throw_ia(x, index_list(index_min_max(1, 3), index_uni(4)), y);
+
+  vector<int> ns;
+  ns.push_back(3);
+  ns.push_back(1);
+  assign(x, index_list(index_multi(ns), index_uni(3)), y);
+  EXPECT_FLOAT_EQ(y(0), x(2, 2));
+  EXPECT_FLOAT_EQ(y(1), x(0, 2));
+
+  assign(x.block(0, 0, 3, 3), index_list(index_multi(ns), index_uni(3)),
+         y.array() + 2);
+  EXPECT_FLOAT_EQ(y(0) + 2, x(2, 2));
+  EXPECT_FLOAT_EQ(y(1) + 2, x(0, 2));
+
+  ns[ns.size() - 1] = 0;
+  test_throw(x, index_list(index_multi(ns), index_uni(3)), y);
+
+  ns[ns.size() - 1] = 20;
+  test_throw(x, index_list(index_multi(ns), index_uni(3)), y);
+
+  ns.push_back(2);
+  test_throw_ia(x, index_list(index_multi(ns), index_uni(3)), y);
+}
+
+TEST(model_indexing, assign_densemat_densemat_min_max_index_min_index) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  MatrixXd y(2, 3);
+  y << 10, 11, 12, 20, 21, 22;
+
+  assign(x, index_list(index_min_max(2, 3), index_min(2)), y);
+  EXPECT_FLOAT_EQ(y(0, 0), x(1, 1));
+  EXPECT_FLOAT_EQ(y(0, 1), x(1, 2));
+  EXPECT_FLOAT_EQ(y(0, 2), x(1, 3));
+  EXPECT_FLOAT_EQ(y(1, 0), x(2, 1));
+  EXPECT_FLOAT_EQ(y(1, 1), x(2, 2));
+  EXPECT_FLOAT_EQ(y(1, 2), x(2, 3));
+
+  assign(x.block(0, 0, 3, 3), index_list(index_min_max(2, 3), index_min(2)),
+         y.block(0, 0, 2, 2));
+  EXPECT_FLOAT_EQ(y(0, 0), x(1, 1));
+  EXPECT_FLOAT_EQ(y(0, 1), x(1, 2));
+  EXPECT_FLOAT_EQ(y(0, 2), x(1, 3));
+  EXPECT_FLOAT_EQ(y(1, 0), x(2, 1));
+  EXPECT_FLOAT_EQ(y(1, 1), x(2, 2));
+  EXPECT_FLOAT_EQ(y(1, 2), x(2, 3));
+
+  test_throw_ia(x, index_list(index_min_max(2, 3), index_min(0)), y);
+  test_throw_ia(x, index_list(index_min_max(2, 3), index_min(10)), y);
+  test_throw_ia(x, index_list(index_min_max(1, 3), index_min(2)), y);
+}
+
+TEST(model_indexing, assign_densemat_densemat_multi_index_multi_index) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  MatrixXd y(2, 3);
+  y << 10, 11, 12, 20, 21, 22;
+  vector<int> ms;
+  ms.push_back(3);
+  ms.push_back(1);
+
+  vector<int> ns;
+  ns.push_back(2);
+  ns.push_back(3);
+  ns.push_back(1);
+  assign(x, index_list(index_multi(ms), index_multi(ns)), y);
+  EXPECT_FLOAT_EQ(y(0, 0), x(2, 1));
+  EXPECT_FLOAT_EQ(y(0, 1), x(2, 2));
+  EXPECT_FLOAT_EQ(y(0, 2), x(2, 0));
+  EXPECT_FLOAT_EQ(y(1, 0), x(0, 1));
+  EXPECT_FLOAT_EQ(y(1, 1), x(0, 2));
+  EXPECT_FLOAT_EQ(y(1, 2), x(0, 0));
+
+  MatrixXd y2 = y.array() + 2;
+  assign(x.block(0, 0, 3, 4), index_list(index_multi(ms), index_multi(ns)),
+         y.array() + 2);
+  EXPECT_FLOAT_EQ(y2(0, 0), x(2, 1));
+  EXPECT_FLOAT_EQ(y2(0, 1), x(2, 2));
+  EXPECT_FLOAT_EQ(y2(0, 2), x(2, 0));
+  EXPECT_FLOAT_EQ(y2(1, 0), x(0, 1));
+  EXPECT_FLOAT_EQ(y2(1, 1), x(0, 2));
+  EXPECT_FLOAT_EQ(y2(1, 2), x(0, 0));
+
+  ms[ms.size() - 1] = 0;
+  test_throw(x, index_list(index_multi(ms), index_multi(ns)), y);
+
+  ms[ms.size() - 1] = 10;
+  test_throw(x, index_list(index_multi(ms), index_multi(ns)), y);
+
+  ms[ms.size() - 1] = 1;  // back to original valid value
+  ns[ns.size() - 1] = 0;
+  test_throw(x, index_list(index_multi(ms), index_multi(ns)), y);
+
+  ns[ns.size() - 1] = 10;
+  test_throw(x, index_list(index_multi(ms), index_multi(ns)), y);
 }

@@ -60,6 +60,7 @@ pipeline {
     options {
         skipDefaultCheckout()
         preserveStashes(buildCount: 7)
+        parallelsAlwaysFailFast()
     }
     stages {
         stage('Kill previous builds') {
@@ -240,6 +241,13 @@ pipeline {
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX()
@@ -249,11 +257,11 @@ pipeline {
                 }
                 stage('Integration Windows') {
                     agent { label 'windows' }
-                    when { 
-                        expression { 
+                    when {
+                        expression {
                             ( env.BRANCH_NAME == "develop" ||
                             env.BRANCH_NAME == "master" ) &&
-                            !skipRemainingStages 
+                            !skipRemainingStages
                         }
                     }
                     steps {
@@ -273,6 +281,7 @@ pipeline {
                         setupCXX()
                         script {
                             dir("lib/stan_math/") {
+                                sh "echo O=0 > make/local"
                                 withEnv(['PATH+TBB=./lib/tbb']) {
                                     try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
                                     finally { junit 'test/**/*.xml' }
