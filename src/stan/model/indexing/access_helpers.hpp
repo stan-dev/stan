@@ -49,6 +49,6 @@ bool check_duplicate(const arena_t<std::vector<int>>& x_idx, int i) {
 }
 
 }  // namespace internal
-}
-}
+}  // namespace model
+}  // namespace stan
 #endif

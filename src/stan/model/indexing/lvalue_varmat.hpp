@@ -45,7 +45,8 @@ namespace model {
  *
  * Types: vector[uni] <- scalar
  *
- * @tparam Vec `var_value` with inner Eigen type with either dynamic rows or columns, but not both.
+ * @tparam Vec `var_value` with inner Eigen type with either dynamic rows or
+ * columns, but not both.
  * @tparam U Type of value (must be assignable to T).
  * @param[in] x Vector variable to be assigned.
  * @param[in] idxs index holding which cell to assign to.
@@ -78,8 +79,10 @@ inline void assign(VarVec&& x,
  *
  * Types:  vector[multi] <- vector
  *
- * @tparam Vec1 `var_value` with inner Eigen type with either dynamic rows or columns, but not both.
- * @tparam Vec2 `var_value` with inner Eigen type with either dynamic rows or columns, but not both.
+ * @tparam Vec1 `var_value` with inner Eigen type with either dynamic rows or
+ * columns, but not both.
+ * @tparam Vec2 `var_value` with inner Eigen type with either dynamic rows or
+ * columns, but not both.
  * @param[in] x Vector to be assigned.
  * @param[in] idxs Index holding an `std::vector` of cells to assign to.
  * @param[in] y Value vector.
@@ -126,7 +129,6 @@ inline void assign(Vec1&& x,
   });
 }
 
-
 /**
  * Assign to a cell of an Eigen Matrix.
  *
@@ -172,7 +174,8 @@ inline void assign(
  * Types:  mat[uni, multi] = row_vector
  *
  * @tparam Mat1 `var_value` with inner Eigen type with dynamic rows and columns.
- * @tparam Vec `var_value` with inner Eigen type with dynamic columns and compile time rows of 1.
+ * @tparam Vec `var_value` with inner Eigen type with dynamic columns and
+ * compile time rows of 1.
  * @param[in] x Matrix variable to be assigned.
  * @param[in] idxs A list with a uni index for rows and multi index for columns.
  * @param[in] y Row vector.
@@ -243,10 +246,9 @@ inline void assign(
  */
 template <typename Mat1, typename Mat2,
           require_all_var_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<index_multi, nil_index_list>& idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x,
+                   const cons_index_list<index_multi, nil_index_list>& idxs,
+                   const Mat2& y, const char* name = "ANON", int depth = 0) {
   const auto assign_rows = idxs.head_.ns_.size();
   stan::math::check_size_match("matrix[multi,multi] assign sizes", "lhs",
                                assign_rows, name, y.rows());
@@ -388,7 +390,6 @@ inline void assign(
            depth + 1);
   }
 }
-
 
 }  // namespace model
 }  // namespace stan

@@ -81,8 +81,9 @@ void match_csv_columns(const Eigen::MatrixXd& samples,
     EXPECT_EQ(A_eval.cols(), B_eval.cols());                          \
     for (int j = 0; j < A_eval.cols(); j++) {                         \
       for (int i = 0; i < A_eval.rows(); i++) {                       \
-        EXPECT_EQ(A_eval(i, j), B_eval(i, j)) << "Failed at " <<      \
-       "(i, j): (" << i << ", " << j << ")";                          \
+        EXPECT_EQ(A_eval(i, j), B_eval(i, j))                         \
+            << "Failed at "                                           \
+            << "(i, j): (" << i << ", " << j << ")";                  \
       }                                                               \
     }                                                                 \
   }
