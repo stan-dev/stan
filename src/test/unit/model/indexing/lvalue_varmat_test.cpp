@@ -5,7 +5,7 @@
 #include <stan/model/indexing/lvalue.hpp>
 #include <stan/model/indexing/rvalue.hpp>
 #include <stan/math/rev.hpp>
-#include<test/unit/util.hpp>
+#include <test/unit/util.hpp>
 #include <test/unit/model/indexing/util.hpp>
 #include <gtest/gtest.h>
 
@@ -63,8 +63,8 @@ TEST_F(VarAssign, nil) {
 
 template <typename Vec>
 void test_uni_vec() {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec>(5);
@@ -74,7 +74,7 @@ void test_uni_vec() {
   EXPECT_FLOAT_EQ(y.val(), x.val()[1]);
   stan::math::sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return i != 1;};
+  auto check_i = [](int i) { return i != 1; };
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_FLOAT_EQ(y.adj(), 1);
   test_throw_out_of_range(x, index_list(index_uni(0)), y);
@@ -87,8 +87,8 @@ TEST_F(VarAssign, uni_rowvec) { test_uni_vec<Eigen::RowVectorXd>(); }
 
 template <typename Vec>
 void test_multi_vec() {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec>(5);
@@ -103,9 +103,9 @@ void test_multi_vec() {
   EXPECT_FLOAT_EQ(y.val()[2], x.val()[1]);
   stan::math::sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i_x = [](int i) { return i == 1 || i == 3;};
+  auto check_i_x = [](int i) { return i == 1 || i == 3; };
   check_vector_adjs(check_i_x, x, "lhs", 0);
-  auto check_i_y = [](int i) { return i > 0;};
+  auto check_i_y = [](int i) { return i > 0; };
   check_vector_adjs(check_i_y, y, "rhs", 1);
 }
 
@@ -115,8 +115,8 @@ TEST_F(VarAssign, multi_rowvec) { test_multi_vec<Eigen::RowVectorXd>(); }
 
 template <typename Vec>
 void test_minmax_vec() {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec>(5);
@@ -128,7 +128,7 @@ void test_minmax_vec() {
   EXPECT_FLOAT_EQ(y.val()[1], x.val()[2]);
   stan::math::sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return !(i > 0 && i < 3);};
+  auto check_i = [](int i) { return !(i > 0 && i < 3); };
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(2));
 }
@@ -139,8 +139,8 @@ TEST_F(VarAssign, minmax_rowvec) { test_minmax_vec<Eigen::RowVectorXd>(); }
 
 template <typename Vec>
 void test_max_vec() {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec>(5);
@@ -152,7 +152,7 @@ void test_max_vec() {
   EXPECT_FLOAT_EQ(y.val()[1], x.val()[1]);
   stan::math::sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return i > 1;};
+  auto check_i = [](int i) { return i > 1; };
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(2));
 }
@@ -163,8 +163,8 @@ TEST_F(VarAssign, max_rowvec) { test_max_vec<Eigen::RowVectorXd>(); }
 
 template <typename Vec>
 void test_min_vec() {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec>(5);
@@ -176,7 +176,7 @@ void test_min_vec() {
   EXPECT_FLOAT_EQ(x.val()(4), y.val()(2));
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return i < 2;};
+  auto check_i = [](int i) { return i < 2; };
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(3));
   test_throw_out_of_range(x, index_list(index_min(0)), y);
@@ -187,8 +187,8 @@ TEST_F(VarAssign, min_rowvec) { test_min_vec<Eigen::RowVectorXd>(); }
 
 template <typename Vec>
 void test_omni_vec() {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec>(5);
@@ -203,7 +203,7 @@ void test_omni_vec() {
   EXPECT_FLOAT_EQ(y.val()[4], x.val()[4]);
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), y_val);
-  auto check_i = [](int i) { return true;};
+  auto check_i = [](int i) { return true; };
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(5));
 }
@@ -214,8 +214,8 @@ TEST_F(VarAssign, omni_rowvec) { test_omni_vec<Eigen::RowVectorXd>(); }
 
 template <typename Vec>
 void test_positive_minmax_varvector() {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec>(5);
@@ -230,7 +230,7 @@ void test_positive_minmax_varvector() {
   EXPECT_FLOAT_EQ(x.val()(4), 4);
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return (i > 3);};
+  auto check_i = [](int i) { return (i > 3); };
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(4));
   test_throw_out_of_range(x, index_list(index_min_max(0, 3)), y);
@@ -247,8 +247,8 @@ TEST_F(VarAssign, positive_minmax_rowvec) {
 
 template <typename Vec>
 void test_negative_minmax_varvector() {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec>(5);
@@ -263,7 +263,7 @@ void test_negative_minmax_varvector() {
   EXPECT_FLOAT_EQ(x.val()(4), 4);
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return (i > 3);};
+  auto check_i = [](int i) { return (i > 3); };
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(4));
   test_throw_out_of_range(x, index_list(index_min_max(3, 0)), y);
@@ -333,10 +333,10 @@ TEST_F(VarAssign, uni_uni_std_vecrowvec) {
 
 // Uni Assigns
 TEST_F(VarAssign, uni_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
-  using stan::model::test::check_vector_adjs;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
+  using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
@@ -348,17 +348,16 @@ TEST_F(VarAssign, uni_matrix) {
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
   auto check_i = [](int i) { return i != 0; };
-  auto check_j = [](int j) { return true;};
+  auto check_j = [](int j) { return true; };
   check_matrix_adjs(check_i, check_j, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Eigen::RowVectorXd::Ones(5));
-
 }
 
 TEST_F(VarAssign, uni_minmax_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
-  using stan::model::test::check_vector_adjs;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
+  using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
@@ -369,8 +368,8 @@ TEST_F(VarAssign, uni_minmax_matrix) {
   EXPECT_MATRIX_EQ(y.val().segment(0, 3), x.val().row(1).segment(1, 3));
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return i == 1;};
-  auto check_j = [](int j) { return (j > 0 && j < 4);};
+  auto check_i = [](int i) { return i == 1; };
+  auto check_j = [](int j) { return (j > 0 && j < 4); };
   check_matrix_adjs(check_i, check_j, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), Eigen::RowVectorXd::Ones(3));
   test_throw_out_of_range(x, index_list(index_uni(0), index_min_max(2, 4)), y);
@@ -379,9 +378,9 @@ TEST_F(VarAssign, uni_minmax_matrix) {
 }
 
 TEST_F(VarAssign, uni_uni_matrix) {
-  using stan::math::var_value;
-  using stan::math::var;
   using stan::math::sum;
+  using stan::math::var;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
   using stan::model::test::generate_linear_var_matrix;
   auto x = generate_linear_var_matrix(5, 5);
@@ -391,8 +390,8 @@ TEST_F(VarAssign, uni_uni_matrix) {
   EXPECT_FLOAT_EQ(y.val(), x.val()(1, 2));
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return i == 1;};
-  auto check_j = [](int j) { return j == 2;};
+  auto check_i = [](int i) { return i == 1; };
+  auto check_j = [](int j) { return j == 2; };
   check_matrix_adjs(check_i, check_j, x, "lhs", 0);
   EXPECT_FLOAT_EQ(y.adj(), 1);
 
@@ -403,10 +402,10 @@ TEST_F(VarAssign, uni_uni_matrix) {
 }
 
 TEST_F(VarAssign, uni_multi_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
-  using stan::model::test::check_vector_adjs;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
+  using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
@@ -426,10 +425,10 @@ TEST_F(VarAssign, uni_multi_matrix) {
 
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i_x = [](int i) { return i == 2;};
-  auto check_j_x = [](int j) { return (j == 0 || j == 2 || j == 3);};
+  auto check_i_x = [](int i) { return i == 2; };
+  auto check_j_x = [](int j) { return (j == 0 || j == 2 || j == 3); };
   check_matrix_adjs(check_i_x, check_j_x, x, "lhs", 0);
-  auto check_i_y = [](int i) { return i != 2;};
+  auto check_i_y = [](int i) { return i != 2; };
   check_vector_adjs(check_i_y, y, "rhs", 1);
   ns[ns.size() - 1] = 0;
   test_throw_out_of_range(x, index_list(index_uni(3), index_multi(ns)), y);
@@ -437,14 +436,13 @@ TEST_F(VarAssign, uni_multi_matrix) {
   test_throw_out_of_range(x, index_list(index_uni(3), index_multi(ns)), y);
   ns.push_back(2);
   test_throw_invalid_arg(x, index_list(index_uni(3), index_multi(ns)), y);
-
 }
 
 TEST_F(VarAssign, multi_uni_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
-  using stan::model::test::check_vector_adjs;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
+  using stan::model::test::check_vector_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
@@ -461,10 +459,10 @@ TEST_F(VarAssign, multi_uni_matrix) {
   EXPECT_FLOAT_EQ(y.val()(2), x.val()(0, 2));
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i_x = [](int i) { return (i == 0 || i == 2);};
+  auto check_i_x = [](int i) { return (i == 0 || i == 2); };
   auto check_j_x = [](int j) { return j == 2; };
   check_matrix_adjs(check_i_x, check_j_x, x, "lhs", 0);
-  auto check_i_y = [](int i) { return i != 1;};
+  auto check_i_y = [](int i) { return i != 1; };
   check_vector_adjs(check_i_y, y, "rhs", 1);
 
   ns[ns.size() - 1] = 0;
@@ -476,8 +474,8 @@ TEST_F(VarAssign, multi_uni_matrix) {
 }
 
 TEST_F(VarAssign, multi_multi_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
   using stan::model::test::generate_linear_var_matrix;
 
@@ -525,12 +523,12 @@ TEST_F(VarAssign, multi_multi_matrix) {
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
   // We don't assign to row 1
-  auto check_i_x = [](int i) { return i == 1;};
-  auto check_j_x = [](int j) { return true;};
+  auto check_i_x = [](int i) { return i == 1; };
+  auto check_j_x = [](int j) { return true; };
   check_matrix_adjs(check_i_x, check_j_x, x, "lhs", 1);
 
-  auto check_i_y = [](int i) { return (i == 0 || i > 3);};
-  auto check_j_y = [](int j) { return (j > 1);};
+  auto check_i_y = [](int i) { return (i == 0 || i > 3); };
+  auto check_j_y = [](int j) { return (j > 1); };
   check_matrix_adjs(check_i_y, check_j_y, y, "rhs", 1);
   col_idx.pop_back();
   test_throw_invalid_arg(
@@ -551,8 +549,8 @@ TEST_F(VarAssign, multi_multi_matrix) {
 
 // Min assigns
 TEST_F(VarAssign, min_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
   using stan::model::test::generate_linear_var_matrix;
 
@@ -564,8 +562,8 @@ TEST_F(VarAssign, min_matrix) {
   EXPECT_MATRIX_EQ(x.val().bottomRows(2), y.val());
   sum(x).grad();
   // We don't assign to row 1
-  auto check_i_x = [](int i) { return i > 0;};
-  auto check_j_x = [](int j) { return true;};
+  auto check_i_x = [](int i) { return i > 0; };
+  auto check_j_x = [](int j) { return true; };
   check_matrix_adjs(check_i_x, check_j_x, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Ones(2, 4));
   test_throw_invalid_arg(x, index_list(index_min(1)), y);
@@ -576,8 +574,8 @@ TEST_F(VarAssign, min_matrix) {
 
 // minmax assigns
 TEST_F(VarAssign, positive_minmax_positive_minmax_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
   using stan::model::test::generate_linear_var_matrix;
   Eigen::Matrix<double, -1, -1> x_val(5, 5);
@@ -597,8 +595,8 @@ TEST_F(VarAssign, positive_minmax_positive_minmax_matrix) {
     auto x_rev_val_check = x_rev.val().block(0, 0, ii, ii);
     EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
     sum(x).grad();
-    auto check_i = [i](int kk) { return kk <= i;};
-    auto check_j = [i](int jj) { return jj <= i;};
+    auto check_i = [i](int kk) { return kk <= i; };
+    auto check_j = [i](int jj) { return jj <= i; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
     stan::math::recover_memory();
@@ -606,8 +604,8 @@ TEST_F(VarAssign, positive_minmax_positive_minmax_matrix) {
 }
 
 TEST_F(VarAssign, positive_minmax_negative_minmax_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
   using std::vector;
   Eigen::Matrix<double, -1, -1> x_val(5, 5);
@@ -627,8 +625,8 @@ TEST_F(VarAssign, positive_minmax_negative_minmax_matrix) {
     auto x_rev_val_check = x_rev.val().block(0, 0, ii, ii).rowwise().reverse();
     EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
     sum(x).grad();
-    auto check_i = [i](int kk) { return kk <= i;};
-    auto check_j = [i](int jj) { return jj <= i;};
+    auto check_i = [i](int kk) { return kk <= i; };
+    auto check_j = [i](int jj) { return jj <= i; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
     stan::math::recover_memory();
@@ -636,8 +634,8 @@ TEST_F(VarAssign, positive_minmax_negative_minmax_matrix) {
 }
 
 TEST_F(VarAssign, negative_minmax_positive_minmax_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
   using std::vector;
   Eigen::Matrix<double, -1, -1> x_val(5, 5);
@@ -657,8 +655,8 @@ TEST_F(VarAssign, negative_minmax_positive_minmax_matrix) {
     auto x_rev_val_check = x_rev.val().block(0, 0, ii, ii).colwise().reverse();
     EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
     sum(x).grad();
-    auto check_i = [i](int kk) { return kk <= i;};
-    auto check_j = [i](int jj) { return jj <= i;};
+    auto check_i = [i](int kk) { return kk <= i; };
+    auto check_j = [i](int jj) { return jj <= i; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
     stan::math::recover_memory();
@@ -666,8 +664,8 @@ TEST_F(VarAssign, negative_minmax_positive_minmax_matrix) {
 }
 
 TEST_F(VarAssign, negative_minmax_negative_minmax_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
   using std::vector;
   Eigen::Matrix<double, -1, -1> x_val(5, 5);
@@ -687,8 +685,8 @@ TEST_F(VarAssign, negative_minmax_negative_minmax_matrix) {
     auto x_rev_val_check = x_rev.val().block(0, 0, ii, ii).reverse();
     EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
     sum(x).grad();
-    auto check_i = [i](int kk) { return kk <= i;};
-    auto check_j = [i](int jj) { return jj <= i;};
+    auto check_i = [i](int kk) { return kk <= i; };
+    auto check_j = [i](int jj) { return jj <= i; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
     stan::math::recover_memory();
@@ -696,8 +694,8 @@ TEST_F(VarAssign, negative_minmax_negative_minmax_matrix) {
 }
 
 TEST_F(VarAssign, minmax_uni_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
@@ -710,8 +708,8 @@ TEST_F(VarAssign, minmax_uni_matrix) {
   EXPECT_MATRIX_EQ(y.val(), x.val().col(3).segment(1, 2));
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return (i == 1 || i == 2);};
-  auto check_j = [](int j) { return j == 3;};
+  auto check_i = [](int i) { return (i == 1 || i == 2); };
+  auto check_j = [](int j) { return j == 3; };
   check_matrix_adjs(check_i, check_j, x, "lhs", 0);
   EXPECT_FLOAT_EQ(y.adj()(0), 1);
   EXPECT_FLOAT_EQ(y.adj()(1), 1);
@@ -723,8 +721,8 @@ TEST_F(VarAssign, minmax_uni_matrix) {
 }
 
 TEST_F(VarAssign, minmax_min_matrix) {
-  using stan::math::var_value;
   using stan::math::sum;
+  using stan::math::var_value;
   using stan::model::test::check_matrix_adjs;
   using stan::model::test::generate_linear_var_matrix;
 
@@ -735,7 +733,7 @@ TEST_F(VarAssign, minmax_min_matrix) {
   EXPECT_MATRIX_EQ(y.val(), x.val().block(1, 1, 2, 3));
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return (i == 1 || i == 2);};
+  auto check_i = [](int i) { return (i == 1 || i == 2); };
   auto check_j = [](int j) { return j > 0; };
   check_matrix_adjs(check_i, check_j, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), MatrixXd::Ones(2, 3));
@@ -744,9 +742,9 @@ TEST_F(VarAssign, minmax_min_matrix) {
 // omni assigns
 TEST_F(VarAssign, omni_uni_matrix) {
   using stan::math::var_value;
+  using stan::model::test::check_matrix_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
-  using stan::model::test::check_matrix_adjs;
 
   auto x = generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
@@ -755,8 +753,8 @@ TEST_F(VarAssign, omni_uni_matrix) {
   EXPECT_MATRIX_EQ(y.val(), x.val().col(0));
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return true;};
-  auto check_j = [](int j) { return j == 0;};
+  auto check_i = [](int i) { return true; };
+  auto check_j = [](int j) { return j == 0; };
   check_matrix_adjs(check_i, check_j, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), Eigen::VectorXd::Ones(5));
 }

@@ -29,6 +29,6 @@ auto colwise_reverse(T&& x) {
   return std::forward<T>(x).colwise().reverse();
 }
 }  // namespace internal
-}
-}
+}  // namespace model
+}  // namespace stan
 #endif
