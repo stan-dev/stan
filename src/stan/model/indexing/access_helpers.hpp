@@ -28,6 +28,26 @@ template <typename T, require_eigen_t<T>* = nullptr>
 auto colwise_reverse(T&& x) {
   return std::forward<T>(x).colwise().reverse();
 }
+
+bool check_duplicate(const arena_t<std::vector<std::array<int, 2>>>& x_idx,
+                     int i, int j) {
+  for (size_t k = 0; k < x_idx.size(); ++k) {
+    if (x_idx[k][0] == i && x_idx[k][1] == j) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool check_duplicate(const arena_t<std::vector<int>>& x_idx, int i) {
+  for (size_t k = 0; k < x_idx.size(); ++k) {
+    if (x_idx[k] == i) {
+      return true;
+    }
+  }
+  return false;
+}
+
 }  // namespace internal
 }
 }
