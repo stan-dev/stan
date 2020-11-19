@@ -308,7 +308,8 @@ inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
   const auto row_size = x.rows() - (idxs.head_.min_ - 1);
-  math::check_range("matrix[min] row indexing", name, x.rows(), idxs.head_.min_);
+  math::check_range("matrix[min] row indexing", name, x.rows(),
+                    idxs.head_.min_);
   return x.bottomRows(row_size).eval();
 }
 
@@ -330,7 +331,8 @@ template <typename EigMat,
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[max] row indexing", name, x.rows(), idxs.head_.max_);
+  math::check_range("matrix[max] row indexing", name, x.rows(),
+                    idxs.head_.max_);
   return x.topRows(idxs.head_.max_).eval();
 }
 
@@ -550,8 +552,10 @@ inline plain_type_t<EigMat> rvalue(
     for (int i = 0; i < rows; ++i) {
       const int m = idxs.head_.ns_[i];
       const int n = idxs.tail_.head_.ns_[j];
-      math::check_range("matrix[multi,multi] row indexing", name, x_ref.rows(), m);
-      math::check_range("matrix[multi,multi] column indexing", name, x_ref.cols(), n);
+      math::check_range("matrix[multi,multi] row indexing", name, x_ref.rows(),
+                        m);
+      math::check_range("matrix[multi,multi] column indexing", name,
+                        x_ref.cols(), n);
       x_ret.coeffRef(i, j) = x_ref.coeff(m - 1, n - 1);
     }
   }
@@ -610,7 +614,8 @@ inline plain_type_t<EigMat> rvalue(
   plain_type_t<EigMat> x_ret(rows, idxs.tail_.head_.ns_.size());
   for (int j = 0; j < idxs.tail_.head_.ns_.size(); ++j) {
     const int n = idxs.tail_.head_.ns_[j];
-    math::check_range("matrix[..., multi] column indexing", name, x_ref.cols(), n);
+    math::check_range("matrix[..., multi] column indexing", name, x_ref.cols(),
+                      n);
     x_ret.col(j)
         = rvalue(x_ref.col(n - 1), index_list(idxs.head_), name, depth + 1);
   }

@@ -473,7 +473,8 @@ TEST(ModelIndexing, lvalueMatrixUniMulti) {
   test_throw(x, index_list(index_uni(5), index_min_max(2, 4)), y);
   test_throw(x, index_list(index_uni(2), index_min_max(0, 2)), y);
   test_throw(x, index_list(index_uni(2), index_min_max(2, 5)), y);
-  test_throw_ia(x, index_list(index_uni(2), index_min_max(2, 4)), RowVectorXd::Ones(4));
+  test_throw_ia(x, index_list(index_uni(2), index_min_max(2, 4)),
+                RowVectorXd::Ones(4));
 
   vector<int> ns;
   ns.push_back(4);
