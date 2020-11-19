@@ -352,6 +352,7 @@ TEST(ModelIndexing, lvalueVecMulti) {
   EXPECT_FLOAT_EQ(ys(1), xs(3));
   EXPECT_FLOAT_EQ(ys(2), xs(4));
   test_throw(xs, index_list(index_min(0)), ys);
+  test_throw_ia(xs, index_list(index_min(1)), VectorXd::Ones(7));
 
   xs << 0, 1, 2, 3, 4;
   vector<int> ns;
@@ -362,6 +363,7 @@ TEST(ModelIndexing, lvalueVecMulti) {
   EXPECT_FLOAT_EQ(ys(0), xs(3));
   EXPECT_FLOAT_EQ(ys(1), xs(0));
   EXPECT_FLOAT_EQ(ys(2), xs(2));
+  test_throw_ia(xs, index_list(index_multi(ns)), VectorXd::Ones(7));
 
   ns[ns.size() - 1] = 0;
   test_throw(xs, index_list(index_multi(ns)), ys);
@@ -384,6 +386,7 @@ TEST(ModelIndexing, lvalueRowVecMulti) {
   EXPECT_FLOAT_EQ(ys(1), xs(3));
   EXPECT_FLOAT_EQ(ys(2), xs(4));
   test_throw_ia(xs, index_list(index_min(2)), ys);
+  test_throw_ia(xs, index_list(index_min(3)), RowVectorXd::Ones(4));
   test_throw(xs, index_list(index_min(0)), ys);
 
   xs << 0, 1, 2, 3, 4;
@@ -469,7 +472,8 @@ TEST(ModelIndexing, lvalueMatrixUniMulti) {
   test_throw(x, index_list(index_uni(0), index_min_max(2, 4)), y);
   test_throw(x, index_list(index_uni(5), index_min_max(2, 4)), y);
   test_throw(x, index_list(index_uni(2), index_min_max(0, 2)), y);
-  test_throw_ia(x, index_list(index_uni(2), index_min_max(2, 5)), y);
+  test_throw(x, index_list(index_uni(2), index_min_max(2, 5)), y);
+  test_throw_ia(x, index_list(index_uni(2), index_min_max(2, 4)), RowVectorXd::Ones(4));
 
   vector<int> ns;
   ns.push_back(4);
@@ -536,8 +540,8 @@ TEST(ModelIndexing, lvalueMatrixMultiMulti) {
   EXPECT_FLOAT_EQ(y(1, 1), x(2, 2));
   EXPECT_FLOAT_EQ(y(1, 2), x(2, 3));
 
-  test_throw_ia(x, index_list(index_min_max(2, 3), index_min(0)), y);
-  test_throw_ia(x, index_list(index_min_max(2, 3), index_min(10)), y);
+  test_throw(x, index_list(index_min_max(2, 3), index_min(0)), y);
+  test_throw(x, index_list(index_min_max(2, 3), index_min(10)), y);
   test_throw_ia(x, index_list(index_min_max(1, 3), index_min(2)), y);
 
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
@@ -973,7 +977,7 @@ TEST(model_indexing, assign_densemat_eigrowvec_uni_index_min_max_index) {
   test_throw(x, index_list(index_uni(0), index_min_max(2, 4)), y);
   test_throw(x, index_list(index_uni(5), index_min_max(2, 4)), y);
   test_throw(x, index_list(index_uni(2), index_min_max(0, 2)), y);
-  test_throw_ia(x, index_list(index_uni(2), index_min_max(2, 5)), y);
+  test_throw(x, index_list(index_uni(2), index_min_max(2, 5)), y);
 
   vector<int> ns;
   ns.push_back(4);
@@ -1065,8 +1069,8 @@ TEST(model_indexing, assign_densemat_densemat_min_max_index_min_index) {
   EXPECT_FLOAT_EQ(y(1, 1), x(2, 2));
   EXPECT_FLOAT_EQ(y(1, 2), x(2, 3));
 
-  test_throw_ia(x, index_list(index_min_max(2, 3), index_min(0)), y);
-  test_throw_ia(x, index_list(index_min_max(2, 3), index_min(10)), y);
+  test_throw(x, index_list(index_min_max(2, 3), index_min(0)), y);
+  test_throw(x, index_list(index_min_max(2, 3), index_min(10)), y);
   test_throw_ia(x, index_list(index_min_max(1, 3), index_min(2)), y);
 }
 

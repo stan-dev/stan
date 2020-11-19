@@ -213,7 +213,7 @@ template <typename Vec, require_eigen_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("vector[min] indexing range", name, x.size(),
+  stan::math::check_range("vector[min] indexing", name, x.size(),
                           idxs.head_.min_);
   return x.tail(x.size() - idxs.head_.min_ + 1).eval();
 }
@@ -234,7 +234,7 @@ template <typename Vec, require_all_eigen_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("vector[min] indexing range", name, x.size(),
+  stan::math::check_range("vector[max] indexing", name, x.size(),
                           idxs.head_.max_);
   return x.head(idxs.head_.max_).eval();
 }
@@ -283,7 +283,7 @@ inline plain_type_t<EigMat> rvalue(
   plain_type_t<EigMat> x_ret(idxs.head_.ns_.size(), x.cols());
   for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
     const int n = idxs.head_.ns_[i];
-    math::check_range("matrix[multi] subset range", name, x_ref.rows(), n);
+    math::check_range("matrix[multi] row indexing", name, x_ref.rows(), n);
     x_ret.row(i) = x_ref.row(n - 1);
   }
   return x_ret;
@@ -308,7 +308,7 @@ inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
   const auto row_size = x.rows() - (idxs.head_.min_ - 1);
-  math::check_range("matrix[min] indexing", name, x.rows(), row_size);
+  math::check_range("matrix[min] row indexing", name, x.rows(), idxs.head_.min_);
   return x.bottomRows(row_size).eval();
 }
 
@@ -330,12 +330,12 @@ template <typename EigMat,
 inline auto rvalue(EigMat&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[max] indexing", name, x.rows(), idxs.head_.max_);
+  math::check_range("matrix[max] row indexing", name, x.rows(), idxs.head_.max_);
   return x.topRows(idxs.head_.max_).eval();
 }
 
 /**
- * Return a range of rows for an Eigen matrix.
+ * Return a of rows for an Eigen matrix.
  *
  * Types:  matrix[min_max] = matrix
  *
@@ -448,9 +448,9 @@ inline auto rvalue(
     const cons_index_list<index_uni,
                           cons_index_list<index_uni, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni,uni] indexing, row", name, x.rows(),
+  math::check_range("matrix[uni,uni] row indexing", name, x.rows(),
                     idxs.head_.n_);
-  math::check_range("matrix[uni,uni] indexing, col", name, x.cols(),
+  math::check_range("matrix[uni,uni] column indexing", name, x.cols(),
                     idxs.tail_.head_.n_);
   return x.coeff(idxs.head_.n_ - 1, idxs.tail_.head_.n_ - 1);
 }
@@ -474,13 +474,13 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
     const cons_index_list<index_uni,
                           cons_index_list<index_multi, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni, multi] index range", name, x.rows(),
+  math::check_range("matrix[uni, multi] row indexing", name, x.rows(),
                     idxs.head_.n_);
   const auto& x_ref = stan::math::to_ref(x);
   Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> x_ret(
       1, idxs.tail_.head_.ns_.size());
   for (int i = 0; i < idxs.tail_.head_.ns_.size(); ++i) {
-    math::check_range("matrix[uni, multi] index range", name, x.cols(),
+    math::check_range("matrix[uni, multi] column indexing", name, x.cols(),
                       idxs.tail_.head_.ns_[i]);
     x_ret.coeffRef(i)
         = x_ref.coeff(idxs.head_.n_ - 1, idxs.tail_.head_.ns_[i] - 1);
@@ -508,13 +508,13 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
     const cons_index_list<index_multi,
                           cons_index_list<index_uni, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[multi, uni] rvalue range", name, x.cols(),
+  math::check_range("matrix[multi, uni] column indexing", name, x.cols(),
                     idxs.tail_.head_.n_);
   const auto& x_ref = stan::math::to_ref(x);
   Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> x_ret(
       idxs.head_.ns_.size());
   for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
-    math::check_range("matrix[multi, uni] rvalue range", name, x_ref.rows(),
+    math::check_range("matrix[multi, uni] row indexing", name, x_ref.rows(),
                       idxs.head_.ns_[i]);
     x_ret.coeffRef(i)
         = x_ref.coeffRef(idxs.head_.ns_[i] - 1, idxs.tail_.head_.n_ - 1);
@@ -550,8 +550,8 @@ inline plain_type_t<EigMat> rvalue(
     for (int i = 0; i < rows; ++i) {
       const int m = idxs.head_.ns_[i];
       const int n = idxs.tail_.head_.ns_[j];
-      math::check_range("matrix[multi,multi] row index", name, x_ref.rows(), m);
-      math::check_range("matrix[multi,multi] col index", name, x_ref.cols(), n);
+      math::check_range("matrix[multi,multi] row indexing", name, x_ref.rows(), m);
+      math::check_range("matrix[multi,multi] column indexing", name, x_ref.cols(), n);
       x_ret.coeffRef(i, j) = x_ref.coeff(m - 1, n - 1);
     }
   }
@@ -577,7 +577,7 @@ inline auto rvalue(
     const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
         idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[..., uni] indexing", name, x.cols(),
+  math::check_range("matrix[..., uni] column indexing", name, x.cols(),
                     idxs.tail_.head_.n_);
   return rvalue(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), name,
                 depth + 1);
@@ -610,7 +610,7 @@ inline plain_type_t<EigMat> rvalue(
   plain_type_t<EigMat> x_ret(rows, idxs.tail_.head_.ns_.size());
   for (int j = 0; j < idxs.tail_.head_.ns_.size(); ++j) {
     const int n = idxs.tail_.head_.ns_[j];
-    math::check_range("matrix[..., multi] col index", name, x_ref.cols(), n);
+    math::check_range("matrix[..., multi] column indexing", name, x_ref.cols(), n);
     x_ret.col(j)
         = rvalue(x_ref.col(n - 1), index_list(idxs.head_), name, depth + 1);
   }
@@ -663,7 +663,7 @@ inline auto rvalue(
         idxs,
     const char* name = "ANON", int depth = 0) {
   const auto col_size = x.cols() - (idxs.tail_.head_.min_ - 1);
-  math::check_range("matrix[..., min] indexing", name, x.cols(),
+  math::check_range("matrix[..., min] column indexing", name, x.cols(),
                     idxs.tail_.head_.min_);
   return rvalue(x.rightCols(col_size), index_list(idxs.head_), name, depth + 1);
 }
@@ -690,7 +690,7 @@ inline auto rvalue(
     const cons_index_list<Idx, cons_index_list<index_max, nil_index_list>>&
         idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[..., max] indexing", name, x.cols(),
+  math::check_range("matrix[..., max] column indexing", name, x.cols(),
                     idxs.tail_.head_.max_);
   return rvalue(x.leftCols(idxs.tail_.head_.max_), index_list(idxs.head_), name,
                 depth + 1);
@@ -717,9 +717,9 @@ inline auto rvalue(
     const cons_index_list<Idx, cons_index_list<index_min_max, nil_index_list>>&
         idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[..., min_max] indexing", name, x.rows(),
+  math::check_range("matrix[..., min_max] min column indexing", name, x.cols(),
                     idxs.tail_.head_.min_);
-  math::check_range("matrix[..., min_max] indexing", name, x.rows(),
+  math::check_range("matrix[..., min_max] max column indexing", name, x.cols(),
                     idxs.tail_.head_.max_);
   if (idxs.tail_.head_.is_ascending()) {
     const auto col_start = idxs.tail_.head_.min_ - 1;
