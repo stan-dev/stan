@@ -30,8 +30,8 @@ inline auto colwise_reverse(T&& x) {
   return std::forward<T>(x).colwise().reverse();
 }
 
-inline bool check_duplicate(
-    const arena_t<std::vector<std::array<int, 2>>>& x_idx, int i, int j) {
+inline bool check_duplicate(const arena_t<std::vector<std::array<int, 2>>>& x_idx,
+                     int i, int j) {
   for (size_t k = 0; k < x_idx.size(); ++k) {
     if (x_idx[k][0] == i && x_idx[k][1] == j) {
       return true;
@@ -48,8 +48,7 @@ inline bool check_duplicate(const arena_t<std::vector<int>>& x_idx, int i) {
   }
   return false;
 }
-
 }  // namespace internal
-}  // namespace model
-}  // namespace stan
+}
+}
 #endif
