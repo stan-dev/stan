@@ -2,6 +2,7 @@
 #define STAN_MODEL_INDEXING_LVALUE_HPP
 
 #include <stan/math/prim.hpp>
+#include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
@@ -38,29 +39,6 @@ namespace model {
  *  - single element and elementwise overloads
  *  - General overload for nested std vectors.
  */
-
-namespace internal {
-// Internal helpers so we can reuse min_max index assign for Eigen/var<Eigen>
-template <typename T, require_var_matrix_t<T>* = nullptr>
-auto rowwise_reverse(T&& x) {
-  return std::forward<T>(x).rowwise_reverse();
-}
-
-template <typename T, require_eigen_t<T>* = nullptr>
-auto rowwise_reverse(T&& x) {
-  return std::forward<T>(x).rowwise().reverse();
-}
-
-template <typename T, require_var_matrix_t<T>* = nullptr>
-auto colwise_reverse(T&& x) {
-  return std::forward<T>(x).colwise_reverse();
-}
-
-template <typename T, require_eigen_t<T>* = nullptr>
-auto colwise_reverse(T&& x) {
-  return std::forward<T>(x).colwise().reverse();
-}
-}  // namespace internal
 
 /**
  * Assign one object to another.
@@ -844,12 +822,12 @@ inline void assign(
   if (idxs.tail_.head_.is_ascending()) {
     const auto col_start = idxs.tail_.head_.min_ - 1;
     const auto col_size = idxs.tail_.head_.max_ - col_start;
-    stan::math::check_range("matrix[..., min_max] assign range", name, x.cols(),
-                            idxs.tail_.head_.min_);
-    stan::math::check_range("matrix[..., min_max] assign range", name,
-                            idxs.tail_.head_.max_, x.cols());
-    stan::math::check_size_match("matrix[..., min_max] assign col size", "lhs",
-                                 idxs.tail_.head_.max_, name, x.cols());
+    stan::math::check_range("matrix[..., min_max] assign min range", name,
+                            x.cols(), idxs.tail_.head_.min_);
+    stan::math::check_range("matrix[..., min_max] assign max range", name,
+                            x.cols(), idxs.tail_.head_.max_);
+    stan::math::check_size_match("matrix[..., min_max] assign", "column size",
+                                 col_size, name, y.cols());
     assign(x.middleCols(col_start, col_size), index_list(idxs.head_),
            std::forward<Mat2>(y), name, depth + 1);
     return;

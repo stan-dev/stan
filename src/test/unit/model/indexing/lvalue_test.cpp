@@ -469,7 +469,7 @@ TEST(ModelIndexing, lvalueMatrixUniMulti) {
   test_throw(x, index_list(index_uni(0), index_min_max(2, 4)), y);
   test_throw(x, index_list(index_uni(5), index_min_max(2, 4)), y);
   test_throw(x, index_list(index_uni(2), index_min_max(0, 2)), y);
-  test_throw_ia(x, index_list(index_uni(2), index_min_max(2, 5)), y);
+  test_throw(x, index_list(index_uni(2), index_min_max(2, 5)), y);
 
   vector<int> ns;
   ns.push_back(4);
@@ -973,7 +973,7 @@ TEST(model_indexing, assign_densemat_eigrowvec_uni_index_min_max_index) {
   test_throw(x, index_list(index_uni(0), index_min_max(2, 4)), y);
   test_throw(x, index_list(index_uni(5), index_min_max(2, 4)), y);
   test_throw(x, index_list(index_uni(2), index_min_max(0, 2)), y);
-  test_throw_ia(x, index_list(index_uni(2), index_min_max(2, 5)), y);
+  test_throw(x, index_list(index_uni(2), index_min_max(2, 5)), y);
 
   vector<int> ns;
   ns.push_back(4);
