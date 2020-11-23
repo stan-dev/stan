@@ -34,10 +34,8 @@ namespace io {
 template <typename T>
 class reader {
  private:
-  Eigen::Map<Eigen::Matrix<T, -1, 1>, Eigen::Aligned8, Eigen::Stride<0, 0>>
-      data_r_;
-  Eigen::Map<Eigen::Matrix<int, -1, 1>, Eigen::Aligned8, Eigen::Stride<0, 0>>
-      data_i_;
+  Eigen::Map<Eigen::Matrix<T, -1, 1>> data_r_;
+  Eigen::Map<Eigen::Matrix<int, -1, 1>> data_i_;
   size_t pos_{0};
   size_t int_pos_{0};
 
