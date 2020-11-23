@@ -1430,7 +1430,6 @@ TEST(IoReader, UnitVectorThrows) {
   EXPECT_THROW(reader.unit_vector_constrain(x, lp), std::invalid_argument);
 }
 
-
 TEST(IoReader, var_vector) {
   using stan::math::var;
   using stan::math::var_value;
@@ -1453,7 +1452,9 @@ TEST(IoReader, var_vector_double) {
   std::vector<int> theta_i;
   stan::io::reader<double> reader(theta, theta_i);
   auto vec_x = reader.var_vector(5);
-  EXPECT_TRUE((stan::is_eigen_vector<decltype(vec_x)>::value && std::is_arithmetic<stan::value_type_t<decltype(vec_x)>>::value));
+  EXPECT_TRUE(
+      (stan::is_eigen_vector<decltype(vec_x)>::value
+       && std::is_arithmetic<stan::value_type_t<decltype(vec_x)>>::value));
   for (int i = 0; i < 5; ++i) {
     EXPECT_EQ(vec_x.val()(i), i);
   }
@@ -1480,7 +1481,9 @@ TEST(IoReader, var_row_vector_double) {
   std::vector<int> theta_i;
   stan::io::reader<double> reader(theta, theta_i);
   auto vec_x = reader.var_row_vector(5);
-  EXPECT_TRUE((stan::is_eigen_row_vector<decltype(vec_x)>::value && std::is_arithmetic<stan::value_type_t<decltype(vec_x)>>::value));
+  EXPECT_TRUE(
+      (stan::is_eigen_row_vector<decltype(vec_x)>::value
+       && std::is_arithmetic<stan::value_type_t<decltype(vec_x)>>::value));
   for (int i = 0; i < 5; ++i) {
     EXPECT_EQ(vec_x.val()(i), i);
   }
@@ -1508,7 +1511,9 @@ TEST(IoReader, var_matrix_double) {
   std::vector<int> theta_i;
   stan::io::reader<double> reader(theta, theta_i);
   auto mat_x = reader.var_matrix(3, 3);
-  EXPECT_TRUE((stan::is_eigen_dense_dynamic<decltype(mat_x)>::value && std::is_arithmetic<stan::value_type_t<decltype(mat_x)>>::value));
+  EXPECT_TRUE(
+      (stan::is_eigen_dense_dynamic<decltype(mat_x)>::value
+       && std::is_arithmetic<stan::value_type_t<decltype(mat_x)>>::value));
   for (int i = 0; i < 9; ++i) {
     EXPECT_EQ(mat_x.val()(i), i);
   }

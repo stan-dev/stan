@@ -55,16 +55,19 @@ class reader {
 
  public:
   using matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
-  using vector_t =  Eigen::Matrix<T, Eigen::Dynamic, 1>;
+  using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
   using row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
 
   using map_matrix_t = Eigen::Map<matrix_t>;
   using map_vector_t = Eigen::Map<vector_t>;
   using map_row_vector_t = Eigen::Map<row_vector_t>;
 
-  using var_matrix_t = stan::math::var_value<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>;
-  using var_vector_t =  stan::math::var_value<Eigen::Matrix<double, Eigen::Dynamic, 1>>;
-  using var_row_vector_t = stan::math::var_value<Eigen::Matrix<double, 1, Eigen::Dynamic>>;
+  using var_matrix_t = stan::math::var_value<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>;
+  using var_vector_t
+      = stan::math::var_value<Eigen::Matrix<double, Eigen::Dynamic, 1>>;
+  using var_row_vector_t
+      = stan::math::var_value<Eigen::Matrix<double, 1, Eigen::Dynamic>>;
 
   /**
    * Construct a variable reader using the specified vectors
@@ -198,7 +201,7 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  template <typename T_ = T, require_st_var<T_>* = nullptr>
+  template <typename T_ = T, require_st_var<T_> * = nullptr>
   inline var_vector_t var_vector(size_t m) {
     if (m == 0)
       return var_vector_t(Eigen::VectorXd(0));
@@ -212,7 +215,7 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  template <typename T_ = T, require_st_arithmetic<T_>* = nullptr>
+  template <typename T_ = T, require_st_arithmetic<T_> * = nullptr>
   inline vector_t var_vector(size_t m) {
     return this->vector(m);
   }
@@ -263,11 +266,12 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  template <typename T_ = T, require_st_var<T_>* = nullptr>
+  template <typename T_ = T, require_st_var<T_> * = nullptr>
   inline var_row_vector_t var_row_vector(size_t m) {
     if (m == 0)
       return var_row_vector_t(Eigen::RowVectorXd(0));
-    return stan::math::to_var_value(map_row_vector_t(&scalar_ptr_increment(m), m));
+    return stan::math::to_var_value(
+        map_row_vector_t(&scalar_ptr_increment(m), m));
   }
 
   /**
@@ -277,7 +281,7 @@ class reader {
    * @param m Number of rows in the vector to read.
    * @return Column vector made up of the next scalars.
    */
-  template <typename T_ = T, require_st_arithmetic<T_>* = nullptr>
+  template <typename T_ = T, require_st_arithmetic<T_> * = nullptr>
   inline row_vector_t var_row_vector(size_t m) {
     return this->row_vector(m);
   }
@@ -350,11 +354,12 @@ class reader {
    * @param n Number of columns.
    * @return Eigen::Matrix made up of the next scalars.
    */
-  template <typename T_ = T, require_st_var<T_>* = nullptr>
+  template <typename T_ = T, require_st_var<T_> * = nullptr>
   inline var_matrix_t var_matrix(size_t m, size_t n) {
     if (m == 0 || n == 0)
       return var_matrix_t(Eigen::MatrixXd(0, 0));
-    return stan::math::to_var_value(map_matrix_t(&scalar_ptr_increment(m * n), m, n));
+    return stan::math::to_var_value(
+        map_matrix_t(&scalar_ptr_increment(m * n), m, n));
   }
 
   /**
@@ -374,7 +379,7 @@ class reader {
    * @param n Number of columns.
    * @return Eigen::Matrix made up of the next scalars.
    */
-  template <typename T_ = T, require_st_arithmetic<T_>* = nullptr>
+  template <typename T_ = T, require_st_arithmetic<T_> * = nullptr>
   inline matrix_t var_matrix(size_t m, size_t n) {
     return this->matrix(m, n);
   }
