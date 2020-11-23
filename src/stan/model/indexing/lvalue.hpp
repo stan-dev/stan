@@ -323,9 +323,8 @@ inline void assign(Mat1&& x,
                    Mat2&& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_size_match("matrix[omni] assign", "left hand side rows",
                                x.rows(), name, y.rows());
-  stan::math::check_size_match("matrix[omni] assign",
-                               "left hand side columns", x.cols(), name,
-                               y.cols());
+  stan::math::check_size_match("matrix[omni] assign", "left hand side columns",
+                               x.cols(), name, y.cols());
   x = std::forward<Mat2>(y);
 }
 
@@ -436,8 +435,7 @@ inline void assign(EigMat1&& x,
     stan::math::check_size_match("matrix[reverse_min_max] assign",
                                  "left hand side rows", row_size, name,
                                  y.rows());
-    x.middleRows(idxs.head_.max_ - 1, row_size)
-        = y.colwise().reverse();
+    x.middleRows(idxs.head_.max_ - 1, row_size) = y.colwise().reverse();
     return;
   }
 }

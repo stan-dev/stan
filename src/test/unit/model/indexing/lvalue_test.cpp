@@ -524,7 +524,7 @@ TEST(ModelIndexing, lvalueMatrixMinMaxRow) {
   assign(x, index_list(index_min_max(1, 2)), y);
   for (int i = 0; i < 2; ++i) {
     for (int j = 0; j < 4; ++j) {
-      EXPECT_EQ(x(i, j), y(i,j));
+      EXPECT_EQ(x(i, j), y(i, j));
     }
   }
   test_throw(x, index_list(index_min_max(2, 4)), y);
@@ -534,20 +534,20 @@ TEST(ModelIndexing, lvalueMatrixMinMaxRow) {
 
 TEST(ModelIndexing, lvalueMatrixNegativeMinMaxRow) {
   MatrixXd x(5, 4);
-  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3, 3.0, 3.1, 3.2, 3.3, 4.0, 4.1, 4.2, 4.3;
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3, 3.0, 3.1,
+      3.2, 3.3, 4.0, 4.1, 4.2, 4.3;
 
   MatrixXd y = MatrixXd::Ones(3, 4);
   assign(x, index_list(index_min_max(3, 1)), y);
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 4; ++j) {
-      EXPECT_EQ(x(i, j), y(i,j));
+      EXPECT_EQ(x(i, j), y(i, j));
     }
   }
   test_throw(x, index_list(index_min_max(2, 6)), y);
   test_throw(x, index_list(index_min_max(1, 0)), y);
   test_throw_ia(x, index_list(index_min_max(2, 1)), y);
 }
-
 
 TEST(ModelIndexing, lvalueMatrixMultiUni) {
   MatrixXd x(3, 4);
