@@ -258,7 +258,7 @@ template <typename Mat, typename RowVec,
 inline void assign(Mat&& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const RowVec& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_size_match("matrix[uni] assign", "left hand side column",
+  stan::math::check_size_match("matrix[uni] assign", "left hand side columns",
                                x.cols(), name, y.size());
   stan::math::check_range("matrix[uni] assign row", name, x.rows(),
                           idxs.head_.n_);
@@ -323,7 +323,7 @@ inline void assign(Mat1&& x,
                    Mat2&& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_size_match("matrix[omni] assign", "left hand side rows",
                                x.rows(), name, y.rows());
-  stan::math::check_size_match("matrix[omni] assign column sizes",
+  stan::math::check_size_match("matrix[omni] assign",
                                "left hand side columns", x.cols(), name,
                                y.cols());
   x = std::forward<Mat2>(y);
@@ -421,19 +421,22 @@ inline void assign(EigMat1&& x,
                           idxs.head_.max_);
   stan::math::check_range("matrix[min_max] min row indexing", name, x.rows(),
                           idxs.head_.min_);
-  stan::math::check_size_match("matrix[max] assign", "left hand side columns",
-                               x.cols(), name, y.cols());
+  stan::math::check_size_match("matrix[min_max] assign",
+                               "left hand side columns", x.cols(), name,
+                               y.cols());
   if (idxs.head_.is_ascending()) {
+    const auto row_size = idxs.head_.max_ - idxs.head_.min_ + 1;
     stan::math::check_size_match("matrix[min_max] assign",
-                                 "left hand side rows", idxs.head_.min_, name,
+                                 "left hand side rows", row_size, name,
                                  y.rows());
-    x.middleRows(idxs.head_.min_ - 1, idxs.head_.max_ - 1) = y;
+    x.middleRows(idxs.head_.min_ - 1, row_size) = y;
     return;
   } else {
+    const auto row_size = idxs.head_.min_ - idxs.head_.max_ + 1;
     stan::math::check_size_match("matrix[reverse_min_max] assign",
-                                 "left hand side rows", idxs.head_.max_, name,
+                                 "left hand side rows", row_size, name,
                                  y.rows());
-    x.middleRows(idxs.head_.max_ - 1, idxs.head_.min_ - 1)
+    x.middleRows(idxs.head_.max_ - 1, row_size)
         = y.colwise().reverse();
     return;
   }

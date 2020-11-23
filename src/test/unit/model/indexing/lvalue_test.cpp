@@ -425,7 +425,7 @@ TEST(ModelIndexing, lvalueMatrixUni) {
   test_throw(x, index_list(index_uni(5)), y);
 }
 
-TEST(ModelIndexing, lvalueMatrixMulti) {
+TEST(ModelIndexing, lvalueMatrixMin) {
   MatrixXd x(3, 4);
   x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
 
@@ -442,6 +442,27 @@ TEST(ModelIndexing, lvalueMatrixMulti) {
   z << 10, 20;
   test_throw_ia(x, index_list(index_min(1)), z);
   test_throw_ia(x, index_list(index_min(2)), z);
+}
+
+TEST(ModelIndexing, lvalueMatrixMax) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  MatrixXd y(2, 4);
+  y << 10.0, 10.1, 10.2, 10.3, 11.0, 11.1, 11.2, 11.3;
+
+  assign(x, index_list(index_max(2)), y);
+  for (int i = 0; i < 2; ++i)
+    for (int j = 0; j < 4; ++j)
+      EXPECT_FLOAT_EQ(y(i, j), x(i, j));
+  test_throw(x, index_list(index_max(0)), y);
+  test_throw(x, index_list(index_max(8)), y);
+  test_throw_ia(x, index_list(index_max(1)), y);
+
+  MatrixXd z(1, 2);
+  z << 10, 20;
+  test_throw_ia(x, index_list(index_max(1)), z);
+  test_throw_ia(x, index_list(index_max(2)), z);
 }
 
 TEST(ModelIndexing, lvalueMatrixUniUni) {
@@ -494,6 +515,39 @@ TEST(ModelIndexing, lvalueMatrixUniMulti) {
   ns.push_back(2);
   test_throw_ia(x, index_list(index_uni(3), index_multi(ns)), y);
 }
+
+TEST(ModelIndexing, lvalueMatrixMinMaxRow) {
+  MatrixXd x(3, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
+
+  MatrixXd y = MatrixXd::Ones(2, 4);
+  assign(x, index_list(index_min_max(1, 2)), y);
+  for (int i = 0; i < 2; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_EQ(x(i, j), y(i,j));
+    }
+  }
+  test_throw(x, index_list(index_min_max(2, 4)), y);
+  test_throw(x, index_list(index_min_max(0, 1)), y);
+  test_throw_ia(x, index_list(index_min_max(1, 3)), y);
+}
+
+TEST(ModelIndexing, lvalueMatrixNegativeMinMaxRow) {
+  MatrixXd x(5, 4);
+  x << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3, 3.0, 3.1, 3.2, 3.3, 4.0, 4.1, 4.2, 4.3;
+
+  MatrixXd y = MatrixXd::Ones(3, 4);
+  assign(x, index_list(index_min_max(3, 1)), y);
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 4; ++j) {
+      EXPECT_EQ(x(i, j), y(i,j));
+    }
+  }
+  test_throw(x, index_list(index_min_max(2, 6)), y);
+  test_throw(x, index_list(index_min_max(1, 0)), y);
+  test_throw_ia(x, index_list(index_min_max(2, 1)), y);
+}
+
 
 TEST(ModelIndexing, lvalueMatrixMultiUni) {
   MatrixXd x(3, 4);

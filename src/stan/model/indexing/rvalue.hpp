@@ -337,7 +337,7 @@ inline auto rvalue(EigMat&& x,
 }
 
 /**
- * Return a of rows for an Eigen matrix.
+ * Return a range of rows for an Eigen matrix.
  *
  * Types:  matrix[min_max] = matrix
  *
@@ -359,9 +359,11 @@ inline auto rvalue(EigMat&& x,
   math::check_range("matrix[min_max] min row indexing", name, x.rows(),
                     idxs.head_.min_);
   if (idxs.head_.is_ascending()) {
-    return x.middleRows(idxs.head_.min_ - 1, idxs.head_.max_ - 1).eval();
+    const auto row_size = idxs.head_.max_ - idxs.head_.min_ + 1;
+    return x.middleRows(idxs.head_.min_ - 1, row_size).eval();
   } else {
-    return x.middleRows(idxs.head_.max_ - 1, idxs.head_.min_ - 1)
+    const auto row_size = idxs.head_.min_ - idxs.head_.max_ + 1;
+    return x.middleRows(idxs.head_.max_ - 1, row_size)
         .colwise()
         .reverse()
         .eval();
