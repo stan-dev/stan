@@ -61,7 +61,7 @@ template <typename VarVec, typename U, require_var_vector_t<VarVec>* = nullptr,
 inline void assign(VarVec&& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const U& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("var_vector[uni] assign range", name, x.size(),
+  stan::math::check_range("var_vector[uni] assign", name, x.size(),
                           idxs.head_.n_);
   const auto coeff_idx = idxs.head_.n_ - 1;
   double prev_val = x.val().coeffRef(coeff_idx);
@@ -97,7 +97,7 @@ template <typename Vec1, typename Vec2,
 inline void assign(Vec1&& x,
                    const cons_index_list<index_multi, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_size_match("vector[multi] assign sizes", "lhs",
+  stan::math::check_size_match("vector[multi] assign", "left hand side",
                                idxs.head_.ns_.size(), name, y.size());
   const auto x_size = x.size();
   const auto assign_size = idxs.head_.ns_.size();
@@ -106,7 +106,7 @@ inline void assign(Vec1&& x,
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int i = assign_size - 1; i >= 0; --i) {
     if (!internal::check_duplicate(x_idx, idxs.head_.ns_[i] - 1)) {
-      stan::math::check_range("vector[multi] assign range", name, x_size,
+      stan::math::check_range("vector[multi] assign", name, x_size,
                               idxs.head_.ns_[i]);
       y_idx.push_back(i);
       x_idx.push_back(idxs.head_.ns_[i] - 1);
@@ -150,12 +150,12 @@ inline void assign(
     const cons_index_list<index_uni,
                           cons_index_list<index_uni, nil_index_list>>& idxs,
     const U& y, const char* name = "ANON", int depth = 0) {
+  stan::math::check_range("matrix[uni,uni] assign", name, x.rows(),
+                          idxs.head_.n_);
+  stan::math::check_range("matrix[uni,uni] assign", name, x.cols(),
+                          idxs.tail_.head_.n_);
   const int row_idx = idxs.head_.n_ - 1;
   const int col_idx = idxs.tail_.head_.n_ - 1;
-  stan::math::check_range("matrix[uni,uni] assign range", name, x.rows(),
-                          row_idx + 1);
-  stan::math::check_range("matrix[uni,uni] assign range", name, x.cols(),
-                          col_idx + 1);
   double prev_val = x.val().coeffRef(row_idx, col_idx);
   x.vi_->val_.coeffRef(row_idx, col_idx) = y.val();
   stan::math::reverse_pass_callback(
@@ -194,10 +194,10 @@ inline void assign(
     const cons_index_list<index_uni,
                           cons_index_list<index_multi, nil_index_list>>& idxs,
     const Vec& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("matrix[uni, multi] assign range", name, x.cols(),
+  stan::math::check_range("matrix[uni, multi] assign", name, x.rows(),
                           idxs.head_.n_);
   const auto assign_cols = idxs.tail_.head_.ns_.size();
-  stan::math::check_size_match("matrix[uni, multi] assign sizes", "lhs",
+  stan::math::check_size_match("matrix[uni, multi] assign", "left hand side",
                                assign_cols, name, y.size());
   const int row_idx = idxs.head_.n_ - 1;
   arena_t<std::vector<int>> x_idx;
@@ -206,7 +206,7 @@ inline void assign(
   for (int i = assign_cols - 1; i >= 0; --i) {
     if (!internal::check_duplicate(x_idx, idxs.tail_.head_.ns_[i] - 1)) {
       y_idx.push_back(i);
-      stan::math::check_range("matrix[uni, multi] assign range", name, x.cols(),
+      stan::math::check_range("matrix[uni, multi] assign", name, x.cols(),
                               idxs.tail_.head_.ns_[i]);
       x_idx.push_back(idxs.tail_.head_.ns_[i] - 1);
     }
@@ -250,7 +250,7 @@ inline void assign(Mat1&& x,
                    const cons_index_list<index_multi, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
   const auto assign_rows = idxs.head_.ns_.size();
-  stan::math::check_size_match("matrix[multi,multi] assign sizes", "lhs",
+  stan::math::check_size_match("matrix[multi,multi] assign", "left hand side",
                                assign_rows, name, y.rows());
   arena_t<std::vector<int>> x_idx;
   arena_t<std::vector<int>> y_idx;
@@ -260,7 +260,7 @@ inline void assign(Mat1&& x,
   for (int i = assign_rows - 1; i >= 0; --i) {
     if (!internal::check_duplicate(x_idx, idxs.head_.ns_[i] - 1)) {
       y_idx.push_back(i);
-      stan::math::check_range("matrix[multi, multi] assign row range", name,
+      stan::math::check_range("matrix[multi, multi] assign row", name,
                               x.rows(), idxs.head_.ns_[i]);
       x_idx.push_back(idxs.head_.ns_[i] - 1);
     }
@@ -306,9 +306,9 @@ inline void assign(
     const Mat2& y, const char* name = "ANON", int depth = 0) {
   const auto assign_rows = idxs.head_.ns_.size();
   const auto assign_cols = idxs.tail_.head_.ns_.size();
-  stan::math::check_size_match("matrix[multi,multi] assign sizes", "lhs",
+  stan::math::check_size_match("matrix[multi,multi] assign", "left hand side",
                                assign_rows, name, y.rows());
-  stan::math::check_size_match("matrix[multi,multi] assign sizes", "lhs",
+  stan::math::check_size_match("matrix[multi,multi] assign", "left hand side",
                                assign_cols, name, y.cols());
   arena_t<std::vector<std::array<int, 2>>> x_idx;
   arena_t<std::vector<std::array<int, 2>>> y_idx;
@@ -320,9 +320,9 @@ inline void assign(
       if (!internal::check_duplicate(x_idx, idxs.head_.ns_[i] - 1,
                                      idxs.tail_.head_.ns_[j] - 1)) {
         y_idx.push_back(std::array<int, 2>{i, j});
-        stan::math::check_range("matrix[multi, multi] assign row range", name,
+        stan::math::check_range("matrix[multi, multi] assign row", name,
                                 x.rows(), idxs.head_.ns_[i]);
-        stan::math::check_range("matrix[multi, multi] assign col range", name,
+        stan::math::check_range("matrix[multi, multi] assign col", name,
                                 x.cols(), idxs.tail_.head_.ns_[j]);
         x_idx.push_back(std::array<int, 2>{idxs.head_.ns_[i] - 1,
                                            idxs.tail_.head_.ns_[j] - 1});
@@ -370,7 +370,7 @@ inline void assign(
         idxs,
     const Mat2& y, const char* name = "ANON", int depth = 0) {
   const auto assign_cols = idxs.tail_.head_.ns_.size();
-  stan::math::check_size_match("matrix[..., multi] assign sizes", "lhs",
+  stan::math::check_size_match("matrix[..., multi] assign", "left hand side",
                                assign_cols, name, y.cols());
   std::vector<int> x_idx;
   std::vector<int> y_idx;
@@ -380,7 +380,7 @@ inline void assign(
   for (int j = assign_cols - 1; j >= 0; --j) {
     if (!internal::check_duplicate(x_idx, idxs.tail_.head_.ns_[j] - 1)) {
       y_idx.push_back(j);
-      stan::math::check_range("matrix[multi, multi] assign col range", name,
+      stan::math::check_range("matrix[multi, multi] assign col", name,
                               x.cols(), idxs.tail_.head_.ns_[j]);
       x_idx.push_back(idxs.tail_.head_.ns_[j] - 1);
     }
