@@ -16,6 +16,7 @@
 #include <stan/lang/generator/generate_log_prob.hpp>
 #include <stan/lang/generator/generate_member_var_decls_all.hpp>
 #include <stan/lang/generator/generate_model_name_method.hpp>
+#include <stan/lang/generator/generate_model_compile_info_method.hpp>
 #include <stan/lang/generator/generate_model_typedef.hpp>
 #include <stan/lang/generator/generate_namespace_end.hpp>
 #include <stan/lang/generator/generate_namespace_start.hpp>
@@ -70,6 +71,7 @@ void generate_cpp(const program& prog, const std::string& model_name,
   generate_dims_method(prog, o);
   generate_write_array_method(prog, model_name, o);
   generate_model_name_method(model_name, o);
+  generate_model_compile_info_method(o);
   generate_constrained_param_names_method(prog, o);
   generate_unconstrained_param_names_method(prog, o);
   generate_class_decl_end(o);

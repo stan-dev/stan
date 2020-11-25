@@ -13,6 +13,12 @@ struct mock_model : public stan::model::model_base {
 
   std::string model_name() const override { return "mock_model"; }
 
+  std::vector<std::string> model_compile_info() const {
+    std::vector<std::string> stanc_info;
+    stanc_info.push_back("stanc_version = stanc2");
+    return stanc_info;
+  }
+
   void get_param_names(std::vector<std::string>& names) const override {}
   void get_dims(std::vector<std::vector<size_t> >& dimss) const override {}
 
