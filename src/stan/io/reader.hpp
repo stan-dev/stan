@@ -39,16 +39,16 @@ class reader {
   size_t pos_{0};
   size_t int_pos_{0};
 
-  inline const T& scalar_ptr() { return data_r_.coeffRef(pos_); }
+  inline const T &scalar_ptr() { return data_r_.coeffRef(pos_); }
 
-  inline const T& scalar_ptr_increment(size_t m) {
+  inline const T &scalar_ptr_increment(size_t m) {
     pos_ += m;
     return data_r_.coeffRef(pos_ - m);
   }
 
-  inline const int& int_ptr() { return data_i_.coeffRef(int_pos_); }
+  inline const int &int_ptr() { return data_i_.coeffRef(int_pos_); }
 
-  inline const int& int_ptr_increment(size_t m) {
+  inline const int &int_ptr_increment(size_t m) {
     int_pos_ += m;
     return data_i_.coeffRef(int_pos_ - m);
   }
@@ -1231,14 +1231,15 @@ class reader {
   template <typename TL>
   inline auto matrix_lb_constrain(const TL lb, size_t m, size_t n) {
     return matrix(m, n)
-        .unaryExpr([&](auto&& x) { return stan::math::lb_constrain(x, lb); })
+        .unaryExpr([&](auto &&x) { return stan::math::lb_constrain(x, lb); })
         .eval();
   }
 
   template <typename TL>
   inline auto matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
     return matrix(m, n)
-        .unaryExpr([&](auto&& x) { return stan::math::lb_constrain(x, lb, lp); })
+        .unaryExpr(
+            [&](auto &&x) { return stan::math::lb_constrain(x, lb, lp); })
         .eval();
   }
 
@@ -1289,7 +1290,7 @@ class reader {
   template <typename TU>
   inline auto matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
     return matrix(m, n)
-        .unaryExpr([&](auto&& x) { return stan::math::ub_constrain(x, ub); })
+        .unaryExpr([&](auto &&x) { return stan::math::ub_constrain(x, ub); })
         .eval();
   }
 
@@ -1297,7 +1298,8 @@ class reader {
   inline auto matrix_ub_constrain(const TU ub, const size_t m, size_t n,
                                   T &lp) {
     return matrix(m, n)
-        .unaryExpr([&](auto&& x) { return stan::math::ub_constrain(x, ub, lp); })
+        .unaryExpr(
+            [&](auto &&x) { return stan::math::ub_constrain(x, ub, lp); })
         .eval();
   }
 
@@ -1351,7 +1353,7 @@ class reader {
                                    size_t n) {
     return matrix(m, n)
         .unaryExpr(
-            [&](auto&& x) { return stan::math::lub_constrain(x, lb, ub); })
+            [&](auto &&x) { return stan::math::lub_constrain(x, lb, ub); })
         .eval();
   }
 
@@ -1360,7 +1362,7 @@ class reader {
                                    T &lp) {
     return matrix(m, n)
         .unaryExpr(
-            [&](auto&& x) { return stan::math::lub_constrain(x, lb, ub, lp); })
+            [&](auto &&x) { return stan::math::lub_constrain(x, lb, ub, lp); })
         .eval();
   }
 
