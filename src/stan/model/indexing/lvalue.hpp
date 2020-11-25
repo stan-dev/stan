@@ -434,8 +434,8 @@ inline void assign(Mat1&& x,
     stan::math::check_size_match("matrix[reverse_min_max] assign",
                                  "left hand side rows", row_size, name,
                                  y.rows());
-    x.middleRows(idxs.head_.max_ - 1, row_size) =
-     internal::colwise_reverse(std::forward<Mat2>(y));
+    x.middleRows(idxs.head_.max_ - 1, row_size)
+        = internal::colwise_reverse(std::forward<Mat2>(y));
     return;
   }
 }

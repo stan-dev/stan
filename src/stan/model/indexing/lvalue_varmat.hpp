@@ -260,8 +260,8 @@ inline void assign(Mat1&& x,
   for (int i = assign_rows - 1; i >= 0; --i) {
     if (!internal::check_duplicate(x_idx, idxs.head_.ns_[i] - 1)) {
       y_idx.push_back(i);
-      stan::math::check_range("matrix[multi, multi] assign row", name,
-                              x.rows(), idxs.head_.ns_[i]);
+      stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(),
+                              idxs.head_.ns_[i]);
       x_idx.push_back(idxs.head_.ns_[i] - 1);
     }
   }
@@ -380,8 +380,8 @@ inline void assign(
   for (int j = assign_cols - 1; j >= 0; --j) {
     if (!internal::check_duplicate(x_idx, idxs.tail_.head_.ns_[j] - 1)) {
       y_idx.push_back(j);
-      stan::math::check_range("matrix[multi, multi] assign col", name,
-                              x.cols(), idxs.tail_.head_.ns_[j]);
+      stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
+                              idxs.tail_.head_.ns_[j]);
       x_idx.push_back(idxs.tail_.head_.ns_[j] - 1);
     }
   }
