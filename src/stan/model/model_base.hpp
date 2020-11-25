@@ -54,6 +54,14 @@ class model_base : public prob_grad {
   virtual std::string model_name() const = 0;
 
   /**
+   * Returns the compile information of the model:
+   * stanc version and stanc flags used to compile the model.
+   *
+   * @return model name
+   */
+  virtual std::vector<std::string> model_compile_info() const = 0;
+
+  /**
    * Set the specified argument to sequence of parameters, transformed
    * parameters, and generated quantities in the order in which they
    * were declared.  The input sequence is cleared and resized.
