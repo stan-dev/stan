@@ -434,7 +434,8 @@ inline void assign(Mat1&& x,
     stan::math::check_size_match("matrix[reverse_min_max] assign",
                                  "left hand side rows", row_size, name,
                                  y.rows());
-    x.middleRows(idxs.head_.max_ - 1, row_size) = y.colwise().reverse();
+    x.middleRows(idxs.head_.max_ - 1, row_size) =
+     internal::colwise_reverse(std::forward<Mat2>(y));
     return;
   }
 }
@@ -461,7 +462,7 @@ inline void assign(
     Mat1&& x,
     const cons_index_list<index_min_max,
                           cons_index_list<index_min_max, nil_index_list>>& idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+    Mat2&& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_range("matrix[min_max, min_max] assign max row", name,
                           x.rows(), idxs.head_.max_);
   stan::math::check_range("matrix[min_max, min_max] assign min row", name,
@@ -823,7 +824,7 @@ inline void assign(
     Mat1&& x,
     const cons_index_list<Idx, cons_index_list<index_min_max, nil_index_list>>&
         idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+    Mat2&& y, const char* name = "ANON", int depth = 0) {
   stan::math::check_range("matrix[..., min_max] assign min column", name,
                           x.cols(), idxs.tail_.head_.min_);
   stan::math::check_range("matrix[..., min_max] assign max column", name,
