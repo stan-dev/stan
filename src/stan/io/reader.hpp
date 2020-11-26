@@ -1,7 +1,7 @@
 #ifndef STAN_IO_READER_HPP
 #define STAN_IO_READER_HPP
 
-#include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -54,13 +54,20 @@ class reader {
   }
 
  public:
-  typedef Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix_t;
-  typedef Eigen::Matrix<T, Eigen::Dynamic, 1> vector_t;
-  typedef Eigen::Matrix<T, 1, Eigen::Dynamic> row_vector_t;
+  using matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+  using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
+  using row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
 
-  typedef Eigen::Map<matrix_t> map_matrix_t;
-  typedef Eigen::Map<vector_t> map_vector_t;
-  typedef Eigen::Map<row_vector_t> map_row_vector_t;
+  using map_matrix_t = Eigen::Map<matrix_t>;
+  using map_vector_t = Eigen::Map<vector_t>;
+  using map_row_vector_t = Eigen::Map<row_vector_t>;
+
+  using var_matrix_t = stan::math::var_value<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>;
+  using var_vector_t
+      = stan::math::var_value<Eigen::Matrix<double, Eigen::Dynamic, 1>>;
+  using var_row_vector_t
+      = stan::math::var_value<Eigen::Matrix<double, 1, Eigen::Dynamic>>;
 
   /**
    * Construct a variable reader using the specified vectors
@@ -186,6 +193,33 @@ class reader {
       return vector_t();
     return map_vector_t(&scalar_ptr_increment(m), m);
   }
+
+  /**
+   * Return a `var_value` with inner type column vector with specified
+   * dimensionality made up of the next scalars.
+   *
+   * @param m Number of rows in the vector to read.
+   * @return Column vector made up of the next scalars.
+   */
+  template <typename T_ = T, require_st_var<T_> * = nullptr>
+  inline var_vector_t var_vector(size_t m) {
+    if (m == 0)
+      return var_vector_t(Eigen::VectorXd(0));
+    return stan::math::to_var_value(map_vector_t(&scalar_ptr_increment(m), m));
+  }
+
+  /**
+   * Return a column vector of specified dimensionality made up of
+   * the next scalars.
+   *
+   * @param m Number of rows in the vector to read.
+   * @return Column vector made up of the next scalars.
+   */
+  template <typename T_ = T, require_st_arithmetic<T_> * = nullptr>
+  inline vector_t var_vector(size_t m) {
+    return this->vector(m);
+  }
+
   /**
    * Return a column vector of specified dimensionality made up of
    * the next scalars.  The constraint is a no-op.
@@ -223,6 +257,33 @@ class reader {
     if (m == 0)
       return row_vector_t();
     return map_row_vector_t(&scalar_ptr_increment(m), m);
+  }
+
+  /**
+   * Return a `var_value` with inner type as a row vector with specified
+   * dimensionality made up of the next scalars.
+   *
+   * @param m Number of rows in the vector to read.
+   * @return Column vector made up of the next scalars.
+   */
+  template <typename T_ = T, require_st_var<T_> * = nullptr>
+  inline var_row_vector_t var_row_vector(size_t m) {
+    if (m == 0)
+      return var_row_vector_t(Eigen::RowVectorXd(0));
+    return stan::math::to_var_value(
+        map_row_vector_t(&scalar_ptr_increment(m), m));
+  }
+
+  /**
+   * Return a row vector of specified dimensionality made up of
+   * the next scalars.
+   *
+   * @param m Number of rows in the vector to read.
+   * @return Column vector made up of the next scalars.
+   */
+  template <typename T_ = T, require_st_arithmetic<T_> * = nullptr>
+  inline row_vector_t var_row_vector(size_t m) {
+    return this->row_vector(m);
   }
 
   /**
@@ -274,6 +335,53 @@ class reader {
     if (m == 0 || n == 0)
       return matrix_t(m, n);
     return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
+  }
+
+  /**
+   * Return a `var_value` with inner type matrix with the specified
+   * dimensionality made up of  the next scalars arranged in column-major order.
+   *
+   * Row-major reading means that if a matrix of <code>m=2</code>
+   * rows and <code>n=3</code> columns is read and the next
+   * scalar values are <code>1,2,3,4,5,6</code>, the result is
+   *
+   * <pre>
+   * a = 1 4
+   *     2 5
+   *     3 6</pre>
+   *
+   * @param m Number of rows.
+   * @param n Number of columns.
+   * @return Eigen::Matrix made up of the next scalars.
+   */
+  template <typename T_ = T, require_st_var<T_> * = nullptr>
+  inline var_matrix_t var_matrix(size_t m, size_t n) {
+    if (m == 0 || n == 0)
+      return var_matrix_t(Eigen::MatrixXd(0, 0));
+    return stan::math::to_var_value(
+        map_matrix_t(&scalar_ptr_increment(m * n), m, n));
+  }
+
+  /**
+   * Return a matrix of the specified dimensionality made up of
+   * the next scalars arranged in column-major order.
+   *
+   * Row-major reading means that if a matrix of <code>m=2</code>
+   * rows and <code>n=3</code> columns is read and the next
+   * scalar values are <code>1,2,3,4,5,6</code>, the result is
+   *
+   * <pre>
+   * a = 1 4
+   *     2 5
+   *     3 6</pre>
+   *
+   * @param m Number of rows.
+   * @param n Number of columns.
+   * @return Eigen::Matrix made up of the next scalars.
+   */
+  template <typename T_ = T, require_st_arithmetic<T_> * = nullptr>
+  inline matrix_t var_matrix(size_t m, size_t n) {
+    return this->matrix(m, n);
   }
 
   /**
