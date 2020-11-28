@@ -2,11 +2,11 @@
 #define STAN_MODEL_INDEXING_RVALUE_HPP
 
 #include <stan/math/prim.hpp>
+#include <stan/math/rev.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
-#include <stan/model/indexing/rvalue_return.hpp>
 #include <type_traits>
 #include <vector>
 
@@ -14,7 +14,31 @@ namespace stan {
 
 namespace model {
 
-// all indexing from 1
+/**
+ * Indexing Notes:
+ * The different index types:
+ * index_uni - A single cell.
+ * index_multi - Access multiple cells.
+ * index_omni - A no-op for all indices along a dimension.
+ * index_min - index from min:N
+ * index_max - index from 1:max
+ * index_min_max - index from min:max
+ * nil_index_list - no-op
+ * The order of the overloads are
+ * vector / row_vector:
+ *  - all index overloads
+ * matrix:
+ *  - all row index overloads
+ *    - Return a subset of rows.
+ *  - column/row overloads
+ *    - overload on both the row and column indices.
+ *  - column overloads
+ *    - These take a subset of columns and then call the row slice rvalue
+ *       over the column subset.
+ * Std vector:
+ *  - single element and elementwise overloads
+ *  - General overload for nested std vectors.
+ */
 
 /**
  * Return the result of indexing a specified value with
@@ -23,297 +47,698 @@ namespace model {
  * Types:  T[] : T
  *
  * @tparam T Scalar type.
- * @param[in] c Value to index.
+ * @param[in] x Value to index.
  * @return Input value.
  */
 template <typename T>
-inline T rvalue(const T& c, const nil_index_list& /*idx*/,
-                const char* /*name*/ = "", int /*depth*/ = 0) {
-  return c;
+inline T rvalue(T&& x, const nil_index_list& /*idx*/, const char* /*name*/ = "",
+                int /*depth*/ = 0) {
+  return std::forward<T>(x);
 }
 
 /**
- * Return the result of indexing the specified Eigen vector with a
- * sequence containing one single index, returning a scalar.
+ * Return the result of indexing a type without taking a subset. Mostly used as
+ * an intermediary rvalue function when doing multiple subsets.
  *
- * Types:  vec[single] : scal
+ * Types:  plain_type[omni] : plain_type
  *
- * @tparam T Scalar type.
- * @param[in] v Vector being indexed.
- * @param[in] idx One single index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing vector.
- */
-template <typename T>
-inline T rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
-                const cons_index_list<index_uni, nil_index_list>& idx,
-                const char* name = "ANON", int depth = 0) {
-  int ones_idx = idx.head_.n_;
-  math::check_range("vector[single] indexing", name, v.size(), ones_idx);
-  return v.coeff(ones_idx - 1);
-}
-
-/**
- * Return the result of indexing the specified Eigen row vector
- * with a sequence containing one single index, returning a
- * scalar.
- *
- * Types:  rowvec[single] : scal
- *
- * @tparam T Scalar type.
- * @param[in] rv Row vector being indexed.
- * @param[in] idx One single index in list.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing row vector.
- */
-template <typename T>
-inline T rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
-                const cons_index_list<index_uni, nil_index_list>& idx,
-                const char* name = "ANON", int depth = 0) {
-  int n = idx.head_.n_;
-  math::check_range("row_vector[single] indexing", name, rv.size(), n);
-  return rv.coeff(n - 1);
-}
-
-/**
- * Return the result of indexing the specified Eigen vector with a
- * sequence containing one multiple index, returning a vector.
- *
- * Types: vec[multiple] : vec
- *
- * @tparam T Scalar type.
- * @tparam I Multi-index type.
- * @param[in] v Eigen vector.
- * @param[in] idx Index consisting of one multi-index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing vector.
- */
-template <typename T, typename I>
-inline std::enable_if_t<!std::is_same<I, index_uni>::value,
-                        Eigen::Matrix<T, Eigen::Dynamic, 1> >
-rvalue(const Eigen::Matrix<T, Eigen::Dynamic, 1>& v,
-       const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
-       int depth = 0) {
-  int size = rvalue_index_size(idx.head_, v.size());
-  Eigen::Matrix<T, Eigen::Dynamic, 1> a(size);
-  for (int i = 0; i < size; ++i) {
-    int n = rvalue_at(i, idx.head_);
-    math::check_range("vector[multi] indexing", name, v.size(), n);
-    a(i) = v.coeff(n - 1);
-  }
-  return a;
-}
-
-/**
- * Return the result of indexing the specified Eigen row vector
- * with a sequence containing one multiple index, returning a row
- * vector.
- *
- * Types:  row_vec[multiple] : rowvec
- *
- * @tparam T Scalar type.
- * @tparam I Multi-index type.
- * @param[in] rv Eigen row vector.
- * @param[in] idx Index consisting of one multi-index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing vector.
- */
-template <typename T, typename I>
-inline std::enable_if_t<!std::is_same<I, index_uni>::value,
-                        Eigen::Matrix<T, 1, Eigen::Dynamic> >
-rvalue(const Eigen::Matrix<T, 1, Eigen::Dynamic>& rv,
-       const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
-       int depth = 0) {
-  int size = rvalue_index_size(idx.head_, rv.size());
-  Eigen::Matrix<T, 1, Eigen::Dynamic> a(size);
-  for (int i = 0; i < size; ++i) {
-    int n = rvalue_at(i, idx.head_);
-    math::check_range("row_vector[multi] indexing", name, rv.size(), n);
-    a(i) = rv.coeff(n - 1);
-  }
-  return a;
-}
-
-/**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of one single index, returning a row vector.
- *
- * Types:  mat[single] : rowvec
- *
- * @tparam T Scalar type.
- * @param[in] a Eigen matrix.
- * @param[in] idx Index consisting of one uni-index.
+ * @tparam T A type that is a plain object.
+ * @param[in] x an object.
+ * @param[in] idxs Index consisting of one omni-index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename T>
-inline Eigen::Matrix<T, 1, Eigen::Dynamic> rvalue(
-    const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-    const cons_index_list<index_uni, nil_index_list>& idx,
-    const char* name = "ANON", int depth = 0) {
-  int n = idx.head_.n_;
-  math::check_range("matrix[uni] indexing", name, a.rows(), n);
-  return a.row(n - 1);
+template <typename T, require_plain_type_t<T>* = nullptr>
+inline T rvalue(T&& x, const cons_index_list<index_omni, nil_index_list>& idxs,
+                const char* name = "ANON", int depth = 0) {
+  return std::forward<T>(x);
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of a one multiple index, returning a matrix.
+ * Return the result of indexing an eigen expression type without
+ * taking a subset.
  *
- * Types:  mat[multiple] : mat
+ * Types:  expr[omni] : plain_type
  *
- * @tparam T Scalar type.
- * @tparam I Type of multiple index.
- * @param[in] a Matrix to index.
- * @param[in] idx Index consisting of single multiple index.
+ * @tparam T A type that is an expression.
+ * @param[in] x an eigen expression.
+ * @param[in] idxs Index consisting of one omni-index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing matrix.
+ * @return Result of evaluating the expression.
  */
-template <typename T, typename I>
-inline std::enable_if_t<!std::is_same<I, index_uni>::value,
-                        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >
-rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-       const cons_index_list<I, nil_index_list>& idx, const char* name = "ANON",
-       int depth = 0) {
-  int n_rows = rvalue_index_size(idx.head_, a.rows());
-  Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> b(n_rows, a.cols());
-  for (int i = 0; i < n_rows; ++i) {
-    int n = rvalue_at(i, idx.head_);
-    math::check_range("matrix[multi] indexing", name, a.rows(), n);
-    b.row(i) = a.row(n - 1);
-  }
-  return b;
+template <typename T, require_not_plain_type_t<T>* = nullptr>
+inline auto rvalue(T&& x,
+                   const cons_index_list<index_omni, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  return x.eval();
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of two single indexes, returning a scalar.
+ * Return the result of indexing a type without taking a subset
  *
- * Types:  mat[single,single] : scalar
+ * Types:  type[omni, omni] : type
  *
- * @tparam T Scalar type.
- * @param[in] a Matrix to index.
- * @param[in] idx Pair of single indexes.
+ * @tparam T Any type.
+ * @param[in] x an object.
+ * @param[in] idxs Index consisting of two omni-indices.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
 template <typename T>
 inline T rvalue(
-    const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-    const cons_index_list<index_uni,
-                          cons_index_list<index_uni, nil_index_list> >& idx,
+    T&& x,
+    const cons_index_list<index_omni,
+                          cons_index_list<index_omni, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  int m = idx.head_.n_;
-  int n = idx.tail_.head_.n_;
-  math::check_range("matrix[uni,uni] indexing, row", name, a.rows(), m);
-  math::check_range("matrix[uni,uni] indexing, col", name, a.cols(), n);
-  return a.coeff(m - 1, n - 1);
+  return std::forward<T>(x);
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of a single index and multiple index,
- * returning a row vector.
+ * Return a single element of an Eigen Vector.
  *
- * Types:  mat[single,multiple] : row vector
+ * Types:  vector[uni] : scaler
  *
- * @tparam T Scalar type.
- * @tparam I Type of multiple index.
- * @param[in] a Matrix to index.
- * @param[in] idx Pair of single index and multiple index.
+ * @tparam EigVec An eigen vector
+ * @param[in] v Vector being indexed.
+ * @param[in] idxs One single index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing matrix.
+ * @return Result of indexing vector.
  */
-template <typename T, typename I>
-inline std::enable_if_t<!std::is_same<I, index_uni>::value,
-                        Eigen::Matrix<T, 1, Eigen::Dynamic> >
-rvalue(
-    const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-    const cons_index_list<index_uni, cons_index_list<I, nil_index_list> >& idx,
-    const char* name = "ANON", int depth = 0) {
-  int m = idx.head_.n_;
-  math::check_range("matrix[uni,multi] indexing, row", name, a.rows(), m);
-  Eigen::Matrix<T, 1, Eigen::Dynamic> r = a.row(m - 1);
-  return rvalue(r, idx.tail_);
+template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
+inline auto rvalue(EigVec&& v,
+                   const cons_index_list<index_uni, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  using stan::math::to_ref;
+  math::check_range("vector[uni] indexing", name, v.size(), idxs.head_.n_);
+  return v.coeff(idxs.head_.n_ - 1);
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of a multiple index and a single index,
- * returning a vector.
+ * Return a non-contiguous subset of elements in a vector.
  *
- * Types:  mat[multiple,single] : vector
+ * Types:  vector[multi] = vector
  *
- * @tparam T Scalar type.
- * @tparam I Type of multiple index.
- * @param[in] a Matrix to index.
- * @param[in] idx Pair multiple index and single index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of indexing matrix.
+ * @tparam Vec Eigen type with either dynamic rows or columns, but not both.
+ * @param[in] v Eigen vector type.
+ * @param[in] idxs Sequence of integers.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ * @throw std::invalid_argument If the value size isn't the same as
+ * the indexed size.
  */
-template <typename T, typename I>
-inline std::enable_if_t<!std::is_same<I, index_uni>::value,
-                        Eigen::Matrix<T, Eigen::Dynamic, 1> >
-rvalue(
-    const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-    const cons_index_list<I, cons_index_list<index_uni, nil_index_list> >& idx,
+template <typename Vec, require_eigen_vector_t<Vec>* = nullptr>
+inline plain_type_t<Vec> rvalue(
+    Vec&& v, const cons_index_list<index_multi, nil_index_list>& idxs,
     const char* name = "ANON", int depth = 0) {
-  int rows = rvalue_index_size(idx.head_, a.rows());
-  Eigen::Matrix<T, Eigen::Dynamic, 1> c(rows);
-  for (int i = 0; i < rows; ++i) {
-    int m = rvalue_at(i, idx.head_);
-    int n = idx.tail_.head_.n_;
-    math::check_range("matrix[multi,uni] index row", name, a.rows(), m);
-    math::check_range("matrix[multi,uni] index col", name, a.cols(), n);
-    c(i) = a.coeff(m - 1, n - 1);
+  const auto v_size = v.size();
+  const auto& v_ref = stan::math::to_ref(v);
+  plain_type_t<Vec> ret_v(idxs.head_.ns_.size());
+  for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
+    math::check_range("vector[multi] indexing", name, v_ref.size(),
+                      idxs.head_.ns_[i]);
+    ret_v.coeffRef(i) = v_ref.coeff(idxs.head_.ns_[i] - 1);
   }
-  return c;
+  return ret_v;
 }
 
 /**
- * Return the result of indexing the specified Eigen matrix with a
- * sequence consisting of a pair o multiple indexes, returning a
- * a matrix.
+ * Return a range of an Eigen vector
  *
- * Types:  mat[multiple,multiple] : mat
+ * Types:  vector[min_max] = vector
  *
- * @tparam T Scalar type.
- * @tparam I Type of multiple index.
- * @param[in] a Matrix to index.
- * @param[in] idx Pair of multiple indexes.
+ * @tparam EigVec An eigen vector
+ * @param[in] v Vector being indexed.
+ * @param[in] idxs One single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing vector.
+ */
+template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
+inline auto rvalue(EigVec&& v,
+                   const cons_index_list<index_min_max, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("vector[min_max] min indexing", name, v.size(),
+                    idxs.head_.min_);
+  math::check_range("vector[min_max] max indexing", name, v.size(),
+                    idxs.head_.max_);
+  if (idxs.head_.is_ascending()) {
+    const auto slice_start = idxs.head_.min_ - 1;
+    const auto slice_size = idxs.head_.max_ - slice_start;
+    return v.segment(slice_start, slice_size).eval();
+  } else {
+    const auto slice_start = idxs.head_.max_ - 1;
+    const auto slice_size = idxs.head_.min_ - slice_start;
+    return v.segment(slice_start, slice_size).reverse().eval();
+  }
+}
+
+/**
+ * Return a tail slice of a vector
+ *
+ * Types:  vector[min:N] = vector
+ *
+ * @tparam Vec Eigen type with either dynamic rows or columns, but not both.
+ * @param[in] x vector
+ * @param[in] idxs An index.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename Vec, require_eigen_vector_t<Vec>* = nullptr>
+inline auto rvalue(Vec&& x,
+                   const cons_index_list<index_min, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  stan::math::check_range("vector[min] indexing", name, x.size(),
+                          idxs.head_.min_);
+  return x.tail(x.size() - idxs.head_.min_ + 1).eval();
+}
+
+/**
+ * Return a head slice of a vector
+ *
+ * Types:  vector[1:max] <- vector
+ *
+ * @tparam Vec Eigen type with either dynamic rows or columns, but not both.
+ * @param[in] x Eigen vector type.
+ * @param[in] idxs An index.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename Vec, require_all_eigen_vector_t<Vec>* = nullptr>
+inline auto rvalue(Vec&& x,
+                   const cons_index_list<index_max, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  stan::math::check_range("vector[max] indexing", name, x.size(),
+                          idxs.head_.max_);
+  return x.head(idxs.head_.max_).eval();
+}
+
+/**
+ * Return the result of indexing the Eigen matrix with a
+ * sequence consisting of one single index, returning a row vector.
+ *
+ * Types:  matrix[uni] : row vector
+ *
+ * @tparam EigMat An eigen matrix
+ * @param[in] x Eigen matrix.
+ * @param[in] idxs Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename T, typename I1, typename I2>
-inline std::enable_if_t<!std::is_same<I1, index_uni>::value
-                            && !std::is_same<I2, index_uni>::value,
-                        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> >
-rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
-       const cons_index_list<I1, cons_index_list<I2, nil_index_list> >& idx,
-       const char* name = "ANON", int depth = 0) {
-  int rows = rvalue_index_size(idx.head_, a.rows());
-  int cols = rvalue_index_size(idx.tail_.head_, a.cols());
-  Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> c(rows, cols);
-  for (int j = 0; j < cols; ++j) {
-    for (int i = 0; i < rows; ++i) {
-      int m = rvalue_at(i, idx.head_);
-      int n = rvalue_at(j, idx.tail_.head_);
-      math::check_range("matrix[multi,multi] row index", name, a.rows(), m);
-      math::check_range("matrix[multi,multi] col index", name, a.cols(), n);
-      c(i, j) = a.coeff(m - 1, n - 1);
+template <typename EigMat,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(EigMat&& x,
+                   const cons_index_list<index_uni, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni] indexing", name, x.rows(), idxs.head_.n_);
+  return x.row(idxs.head_.n_ - 1).eval();
+}
+
+/**
+ * Return the specified Eigen matrix at the specified multi index.
+ *
+ * Types:  matrix[multi] = matrix
+ *
+ * @tparam EigMat Eigen type with dynamic rows and columns.
+ * @param[in] x Eigen type
+ * @param[in] idxs An indexing from the start of the container up to
+ * the specified maximum index (inclusive).
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename EigMat,
+          stan::internal::require_all_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline plain_type_t<EigMat> rvalue(
+    EigMat&& x, const cons_index_list<index_multi, nil_index_list>& idxs,
+    const char* name = "ANON", int depth = 0) {
+  const auto& x_ref = stan::math::to_ref(x);
+  plain_type_t<EigMat> x_ret(idxs.head_.ns_.size(), x.cols());
+  for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
+    const int n = idxs.head_.ns_[i];
+    math::check_range("matrix[multi] row indexing", name, x_ref.rows(), n);
+    x_ret.row(i) = x_ref.row(n - 1);
+  }
+  return x_ret;
+}
+
+/**
+ * Return the result of indexing the Eigen matrix with a min index
+ * returning back a block of rows min:N and all cols
+ *
+ * Types:  matrix[min:N] = matrix
+ *
+ * @tparam EigMat An eigen matrix
+ * @param[in] x Eigen matrix.
+ * @param[in] idxs Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(EigMat&& x,
+                   const cons_index_list<index_min, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  const auto row_size = x.rows() - (idxs.head_.min_ - 1);
+  math::check_range("matrix[min] row indexing", name, x.rows(),
+                    idxs.head_.min_);
+  return x.bottomRows(row_size).eval();
+}
+
+/**
+ * Return the 1:max rows of an Eigen matrix.
+ *
+ * Types:  matrix[:max] = matrix
+ *
+ * @tparam EigMat Eigen type with dynamic rows and columns.
+ * @param[in] x Eigen type
+ * @param[in] idxs An indexing from the start of the container up to
+ * the specified maximum index (inclusive).
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename EigMat,
+          stan::internal::require_all_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(EigMat&& x,
+                   const cons_index_list<index_max, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[max] row indexing", name, x.rows(),
+                    idxs.head_.max_);
+  return x.topRows(idxs.head_.max_).eval();
+}
+
+/**
+ * Return a range of rows for an Eigen matrix.
+ *
+ * Types:  matrix[min_max] = matrix
+ *
+ * @tparam EigMat Eigen type with dynamic rows and columns.
+ * @param[in] x Eigen type
+ * @param[in] idxs An indexing from the start of the container up to
+ * the specified maximum index (inclusive).
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename EigMat,
+          stan::internal::require_all_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(EigMat&& x,
+                   const cons_index_list<index_min_max, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[min_max] max row indexing", name, x.rows(),
+                    idxs.head_.max_);
+  math::check_range("matrix[min_max] min row indexing", name, x.rows(),
+                    idxs.head_.min_);
+  if (idxs.head_.is_ascending()) {
+    const auto row_size = idxs.head_.max_ - idxs.head_.min_ + 1;
+    return x.middleRows(idxs.head_.min_ - 1, row_size).eval();
+  } else {
+    const auto row_size = idxs.head_.min_ - idxs.head_.max_ + 1;
+    return x.middleRows(idxs.head_.max_ - 1, row_size)
+        .colwise()
+        .reverse()
+        .eval();
+  }
+}
+
+/**
+ * Return the result of indexing an Eigen matrix with two min_max
+ * indices, returning back a block of an Eigen matrix.
+ *
+ * Types:  matrix[min_max, min_max] = matrix
+ *
+ * @tparam EigMat An eigen matrix
+ * @param[in] x Eigen matrix.
+ * @param[in] idxs Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(
+    EigMat&& x,
+    const cons_index_list<index_min_max,
+                          cons_index_list<index_min_max, nil_index_list>>& idxs,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[min_max, min_max] min row indexing", name, x.rows(),
+                    idxs.head_.min_);
+  math::check_range("matrix[min_max, min_max] max row indexing", name, x.rows(),
+                    idxs.head_.max_);
+  math::check_range("matrix[min_max, min_max] min column indexing", name,
+                    x.cols(), idxs.tail_.head_.min_);
+  math::check_range("matrix[min_max, min_max] max column indexing", name,
+                    x.cols(), idxs.tail_.head_.max_);
+  if (idxs.head_.is_ascending()) {
+    if (idxs.tail_.head_.is_ascending()) {
+      return x
+          .block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1,
+                 idxs.head_.max_ - (idxs.head_.min_ - 1),
+                 idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1))
+          .eval();
+    } else {
+      return x
+          .block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1,
+                 idxs.head_.max_ - (idxs.head_.min_ - 1),
+                 idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1))
+          .rowwise()
+          .reverse()
+          .eval();
+    }
+  } else {
+    if (idxs.tail_.head_.is_ascending()) {
+      return x
+          .block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1,
+                 idxs.head_.min_ - (idxs.head_.max_ - 1),
+                 idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1))
+          .colwise()
+          .reverse()
+          .eval();
+    } else {
+      return x
+          .block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1,
+                 idxs.head_.min_ - (idxs.head_.max_ - 1),
+                 idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1))
+          .reverse()
+          .eval();
     }
   }
-  return c;
+}
+
+/**
+ * Return a scalar from an Eigen matrix
+ *
+ * Types:  matrix[uni,uni] : scalar
+ *
+ * @tparam EigMat An eigen type
+ * @param[in] x Matrix to index.
+ * @param[in] idxs Pair of single indexes.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, require_eigen_t<EigMat>* = nullptr>
+inline auto rvalue(
+    EigMat&& x,
+    const cons_index_list<index_uni,
+                          cons_index_list<index_uni, nil_index_list>>& idxs,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni,uni] row indexing", name, x.rows(),
+                    idxs.head_.n_);
+  math::check_range("matrix[uni,uni] column indexing", name, x.cols(),
+                    idxs.tail_.head_.n_);
+  return x.coeff(idxs.head_.n_ - 1, idxs.tail_.head_.n_ - 1);
+}
+
+/**
+ * Return a row of an Eigen matrix with possibly unordered cells.
+ *
+ * Types:  matrix[uni, multi] = row vector
+ *
+ * @tparam EigMat Eigen type with dynamic rows and columns.
+ * @param[in] x Matrix to index.
+ * @param[in] idxs Pair of multiple indexes (from 1).
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename EigMat,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
+    EigMat&& x,
+    const cons_index_list<index_uni,
+                          cons_index_list<index_multi, nil_index_list>>& idxs,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[uni, multi] row indexing", name, x.rows(),
+                    idxs.head_.n_);
+  const auto& x_ref = stan::math::to_ref(x);
+  Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> x_ret(
+      1, idxs.tail_.head_.ns_.size());
+  for (int i = 0; i < idxs.tail_.head_.ns_.size(); ++i) {
+    math::check_range("matrix[uni, multi] column indexing", name, x.cols(),
+                      idxs.tail_.head_.ns_[i]);
+    x_ret.coeffRef(i)
+        = x_ref.coeff(idxs.head_.n_ - 1, idxs.tail_.head_.ns_[i] - 1);
+  }
+  return x_ret;
+}
+
+/**
+ * Return a column of an Eigen matrix that is a possibly non-contiguous subset
+ *  of the input Eigen matrix.
+ *
+ * Types:  matrix[multi, uni] = vector
+ *
+ * @tparam EigMat Eigen type with dynamic rows and columns.
+ * @param[in] x Matrix to index.
+ * @param[in] idxs Pair of multiple indexes (from 1).
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename EigMat,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
+    EigMat&& x,
+    const cons_index_list<index_multi,
+                          cons_index_list<index_uni, nil_index_list>>& idxs,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[multi, uni] column indexing", name, x.cols(),
+                    idxs.tail_.head_.n_);
+  const auto& x_ref = stan::math::to_ref(x);
+  Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> x_ret(
+      idxs.head_.ns_.size());
+  for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
+    math::check_range("matrix[multi, uni] row indexing", name, x_ref.rows(),
+                      idxs.head_.ns_[i]);
+    x_ret.coeffRef(i)
+        = x_ref.coeffRef(idxs.head_.ns_[i] - 1, idxs.tail_.head_.n_ - 1);
+  }
+  return x_ret;
+}
+
+/**
+ * Return an Eigen matrix that is a possibly non-contiguous subset of the input
+ *  Eigen matrix.
+ *
+ * Types:  matrix[multi, multi] = matrix
+ *
+ * @tparam EigMat An eigen matrix
+ * @param[in] x Matrix to index.
+ * @param[in] idxs Pair of multiple indexes.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline plain_type_t<EigMat> rvalue(
+    EigMat&& x,
+    const cons_index_list<index_multi,
+                          cons_index_list<index_multi, nil_index_list>>& idxs,
+    const char* name = "ANON", int depth = 0) {
+  const auto& x_ref = stan::math::to_ref(x);
+  const int rows = idxs.head_.ns_.size();
+  const int cols = idxs.tail_.head_.ns_.size();
+  plain_type_t<EigMat> x_ret(rows, cols);
+  for (int j = 0; j < cols; ++j) {
+    for (int i = 0; i < rows; ++i) {
+      const int m = idxs.head_.ns_[i];
+      const int n = idxs.tail_.head_.ns_[j];
+      math::check_range("matrix[multi,multi] row indexing", name, x_ref.rows(),
+                        m);
+      math::check_range("matrix[multi,multi] column indexing", name,
+                        x_ref.cols(), n);
+      x_ret.coeffRef(i, j) = x_ref.coeff(m - 1, n - 1);
+    }
+  }
+  return x_ret;
+}
+
+/**
+ * Return a column of an Eigen matrix with the range of the column specificed
+ *  by another index.
+ *
+ * Types:  matrix[Idx, uni] = vector
+ *
+ * @tparam EigMat Eigen type with dynamic rows and columns.
+ * @param[in] x Eigen matrix.
+ * @param[in] idxs Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ */
+template <typename EigMat, typename Idx,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(
+    EigMat&& x,
+    const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
+        idxs,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[..., uni] column indexing", name, x.cols(),
+                    idxs.tail_.head_.n_);
+  return rvalue(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), name,
+                depth + 1);
+}
+
+/**
+ * Return an Eigen matrix of possibly unordered columns with each column
+ *  range specified by another index.
+ *
+ * Types:  matrix[Idx, multi] = matrix
+ *
+ * @tparam EigMat An eigen matrix
+ * @param[in] x Eigen matrix.
+ * @param[in] idxs Index consisting of one uni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, typename Idx,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr,
+          require_not_same_t<std::decay_t<Idx>, index_uni>* = nullptr>
+inline plain_type_t<EigMat> rvalue(
+    EigMat&& x,
+    const cons_index_list<Idx, cons_index_list<index_multi, nil_index_list>>&
+        idxs,
+    const char* name = "ANON", int depth = 0) {
+  const auto& x_ref = stan::math::to_ref(x);
+  const int rows = rvalue_index_size(idxs.head_, x_ref.rows());
+  const int cols = rvalue_index_size(idxs.tail_.head_, x_ref.cols());
+  plain_type_t<EigMat> x_ret(rows, idxs.tail_.head_.ns_.size());
+  for (int j = 0; j < idxs.tail_.head_.ns_.size(); ++j) {
+    const int n = idxs.tail_.head_.ns_[j];
+    math::check_range("matrix[..., multi] column indexing", name, x_ref.cols(),
+                      n);
+    x_ret.col(j)
+        = rvalue(x_ref.col(n - 1), index_list(idxs.head_), name, depth + 1);
+  }
+  return x_ret;
+}
+
+/**
+ * Return the Eigen matrix with all columns and a slice of rows.
+ *
+ * Types:  matrix[Idx, omni] = matrix
+ *
+ * @tparam EigMat Eigen type with dynamic rows and columns.
+ * @param[in] x Eigen type
+ * @param[in] idxs Pair of multiple indexes (from 1).
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename EigMat, typename Idx,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(
+    EigMat&& x,
+    const cons_index_list<Idx, cons_index_list<index_omni, nil_index_list>>&
+        idxs,
+    const char* name = "ANON", int depth = 0) {
+  return rvalue(std::forward<EigMat>(x), index_list(idxs.head_), name,
+                depth + 1);
+}
+
+/**
+ * Return columns min:N of the Eigen matrix with the range of the columns
+ *  defined by another index.
+ *
+ * Types:  matrix[Idx, min] = matrix
+ *
+ * @tparam EigMat Eigen type with dynamic rows and columns.
+ * @tparam Idx An index.
+ * @param[in] x Eigen type
+ * @param[in] idxs Container holding a row index and an index from a minimum
+ * index (inclusive) to the end of a container.
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename EigMat, typename Idx,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(
+    EigMat&& x,
+    const cons_index_list<Idx, cons_index_list<index_min, nil_index_list>>&
+        idxs,
+    const char* name = "ANON", int depth = 0) {
+  const auto col_size = x.cols() - (idxs.tail_.head_.min_ - 1);
+  math::check_range("matrix[..., min] column indexing", name, x.cols(),
+                    idxs.tail_.head_.min_);
+  return rvalue(x.rightCols(col_size), index_list(idxs.head_), name, depth + 1);
+}
+
+/**
+ * Return columns 1:max of input Eigen matrix with the range of the columns
+ *  defined by another index.
+ *
+ * Types:  matrix[Idx, max] = matrix
+ *
+ * @tparam EigMat Eigen type with dynamic rows and columns.
+ * @tparam Idx An index.
+ * @param[in] x Eigen type
+ * @param[in] idxs Index holding a row index and an index from the start of the
+ * container up to the specified maximum index (inclusive).
+ * @param[in] name Name of variable (default "ANON").
+ * @param[in] depth Indexing depth (default 0).
+ * @throw std::out_of_range If any of the indices are out of bounds.
+ */
+template <typename EigMat, typename Idx,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(
+    EigMat&& x,
+    const cons_index_list<Idx, cons_index_list<index_max, nil_index_list>>&
+        idxs,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[..., max] column indexing", name, x.cols(),
+                    idxs.tail_.head_.max_);
+  return rvalue(x.leftCols(idxs.tail_.head_.max_), index_list(idxs.head_), name,
+                depth + 1);
+}
+
+/**
+ * Return the result of indexing the specified Eigen matrix with a
+ * min_max_index returning a block from min to max.
+ *
+ * Types:  matrix[Idx, min_max] = matrix
+ *
+ * @tparam EigMat An eigen matrix
+ * @tparam Idx Type of index.
+ * @param[in] x Matrix to index.
+ * @param[in] idxs Pair multiple index and single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing matrix.
+ */
+template <typename EigMat, typename Idx,
+          stan::internal::require_eigen_dense_dynamic_t<EigMat>* = nullptr>
+inline auto rvalue(
+    EigMat&& x,
+    const cons_index_list<Idx, cons_index_list<index_min_max, nil_index_list>>&
+        idxs,
+    const char* name = "ANON", int depth = 0) {
+  math::check_range("matrix[..., min_max] min column indexing", name, x.cols(),
+                    idxs.tail_.head_.min_);
+  math::check_range("matrix[..., min_max] max column indexing", name, x.cols(),
+                    idxs.tail_.head_.max_);
+  if (idxs.tail_.head_.is_ascending()) {
+    const auto col_start = idxs.tail_.head_.min_ - 1;
+    return rvalue(x.middleCols(col_start, idxs.tail_.head_.max_ - col_start),
+                  index_list(idxs.head_), name, depth + 1);
+  } else {
+    const auto col_start = idxs.tail_.head_.max_ - 1;
+    return rvalue(x.middleCols(col_start, idxs.tail_.head_.min_ - col_start)
+                      .rowwise()
+                      .reverse(),
+                  index_list(idxs.head_), name, depth + 1);
+  }
 }
 
 /**
@@ -322,24 +747,47 @@ rvalue(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& a,
  * determined recursively.  Note that arrays are represented as
  * standard library vectors.
  *
- * Types:  std::vector<T>[single | L] : T[L]
+ * Types:  std::vector<T>[uni | Idx] : T[Idx]
  *
  * @tparam T Type of list elements.
- * @tparam L Index list type for indexes after first index.
- * @param[in] c Container of list elements.
- * @param[in] idx Index list beginning with single index.
+ * @tparam Idx Index list type for indexes after first index.
+ * @param[in] v Container of list elements.
+ * @param[in] idxs Index list beginning with single index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing array.
  */
-template <typename T, typename L>
-inline
-    typename rvalue_return<std::vector<T>, cons_index_list<index_uni, L> >::type
-    rvalue(const std::vector<T>& c, const cons_index_list<index_uni, L>& idx,
-           const char* name = "ANON", int depth = 0) {
-  int n = idx.head_.n_;
-  math::check_range("array[uni,...] index", name, c.size(), n);
-  return rvalue(c[n - 1], idx.tail_, name, depth + 1);
+template <typename StdVec, typename Idx,
+          require_std_vector_t<StdVec>* = nullptr>
+inline auto rvalue(StdVec&& v, const cons_index_list<index_uni, Idx>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("array[uni, ...] index", name, v.size(), idxs.head_.n_);
+  if (std::is_rvalue_reference<StdVec>::value) {
+    return rvalue(std::move(v[idxs.head_.n_ - 1]), idxs.tail_, name, depth + 1);
+  } else {
+    return rvalue(v[idxs.head_.n_ - 1], idxs.tail_, name, depth + 1);
+  }
+}
+
+/**
+ * Return the result of indexing the specified array with
+ * a single index.
+ *
+ * Types:  std::vector<T>[uni] : T
+ *
+ * @tparam StdVec a standard vector
+ * @param[in] c Container of list elements.
+ * @param[in] idxs Index list beginning with single index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of indexing array.
+ */
+template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+inline auto rvalue(StdVec&& v,
+                   const cons_index_list<index_uni, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  math::check_range("array[uni, ...] index", name, v.size(), idxs.head_.n_);
+  return v[idxs.head_.n_ - 1];
 }
 
 /**
@@ -348,25 +796,37 @@ inline
  * determined recursively.  Note that arrays are represented as
  * standard library vectors.
  *
- * Types:  std::vector<T>[multiple | L] : std::vector<T[L]>
+ * Types:  std::vector<T>[Idx1, Idx2] : std::vector<T>[Idx2]
  *
  * @tparam T Type of list elements.
- * @tparam L Index list type for indexes after first index.
- * @param[in] c Container of list elements.
- * @param[in] idx Index list beginning with multiple index.
+ * @tparam Idx1 Index list type for first index.
+ * @tparam Idx2 Index list type for second index index.
+ * @param[in] v Container of list elements.
+ * @param[in] idxs Index list beginning with multiple index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing array.
  */
-template <typename T, typename I, typename L>
-inline typename rvalue_return<std::vector<T>, cons_index_list<I, L> >::type
-rvalue(const std::vector<T>& c, const cons_index_list<I, L>& idx,
-       const char* name = "ANON", int depth = 0) {
-  typename rvalue_return<std::vector<T>, cons_index_list<I, L> >::type result;
-  for (int i = 0; i < rvalue_index_size(idx.head_, c.size()); ++i) {
-    int n = rvalue_at(i, idx.head_);
-    math::check_range("array[multi,...] index", name, c.size(), n);
-    result.push_back(rvalue(c[n - 1], idx.tail_, name, depth + 1));
+template <typename StdVec, typename Idx1, typename Idx2,
+          require_std_vector_t<StdVec>* = nullptr>
+inline auto rvalue(StdVec&& v, const cons_index_list<Idx1, Idx2>& idxs,
+                   const char* name = "ANON", int depth = 0) {
+  using inner_type = plain_type_t<decltype(
+      rvalue(v[rvalue_at(0, idxs.head_) - 1], idxs.tail_))>;
+  std::vector<inner_type> result;
+  const int index_size = rvalue_index_size(idxs.head_, v.size());
+  if (index_size > 0) {
+    result.reserve(index_size);
+  }
+  for (int i = 0; i < index_size; ++i) {
+    const int n = rvalue_at(i, idxs.head_);
+    math::check_range("array[..., ...] index", name, v.size(), n);
+    if (std::is_rvalue_reference<StdVec>::value) {
+      result.emplace_back(
+          rvalue(std::move(v[n - 1]), idxs.tail_, name, depth + 1));
+    } else {
+      result.emplace_back(rvalue(v[n - 1], idxs.tail_, name, depth + 1));
+    }
   }
   return result;
 }
