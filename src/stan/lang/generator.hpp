@@ -70,6 +70,7 @@
 #include <stan/lang/generator/generate_member_var_decls.hpp>
 #include <stan/lang/generator/generate_member_var_decls_all.hpp>
 #include <stan/lang/generator/generate_model_name_method.hpp>
+#include <stan/lang/generator/generate_model_compile_info_method.hpp>
 #include <stan/lang/generator/generate_model_typedef.hpp>
 #include <stan/lang/generator/generate_namespace_end.hpp>
 #include <stan/lang/generator/generate_namespace_start.hpp>

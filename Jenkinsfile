@@ -60,6 +60,7 @@ pipeline {
     options {
         skipDefaultCheckout()
         preserveStashes(buildCount: 7)
+        parallelsAlwaysFailFast()
     }
     stages {
         stage('Kill previous builds') {
@@ -71,45 +72,6 @@ pipeline {
             steps {
                 script {
                     utils.killOldBuilds()
-                }
-            }
-        }
-        stage('Linting & Doc checks') {
-            agent any
-            steps {
-                script {
-                    sh "printenv"
-                    retry(3) { checkout scm }
-                    sh """
-                       make math-revert
-                       make clean-all
-                       git clean -xffd
-                    """
-                    utils.checkout_pr("math", "lib/stan_math", params.math_pr)
-                    stash 'StanSetup'
-                    setupCXX(true, env.GCC)
-                    parallel(
-                        CppLint: { sh "make cpplint" },
-                        API_docs: { sh 'make doxygen' },
-                    )
-                }
-            }
-            post {
-                always {
-
-                    recordIssues id: "lint_doc_checks",
-                    name: "Linting & Doc checks",
-                    enabledForFailure: true,
-                    aggregatingResults : true,
-                    tools: [
-                        cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
-                    ],
-                    blameDisabled: false,
-                    qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
-                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
-                    referenceJobName: env.BRANCH_NAME
-
-                    deleteDir()
                 }
             }
         }
@@ -158,6 +120,45 @@ pipeline {
                             to: "${env.CHANGE_AUTHOR_EMAIL}"
                         )
                     }
+                }
+            }
+        }
+        stage('Linting & Doc checks') {
+            agent any
+            steps {
+                script {
+                    sh "printenv"
+                    retry(3) { checkout scm }
+                    sh """
+                       make math-revert
+                       make clean-all
+                       git clean -xffd
+                    """
+                    utils.checkout_pr("math", "lib/stan_math", params.math_pr)
+                    stash 'StanSetup'
+                    setupCXX(true, env.GCC)
+                    parallel(
+                        CppLint: { sh "make cpplint" },
+                        API_docs: { sh 'make doxygen' },
+                    )
+                }
+            }
+            post {
+                always {
+
+                    recordIssues id: "lint_doc_checks",
+                    name: "Linting & Doc checks",
+                    enabledForFailure: true,
+                    aggregatingResults : true,
+                    tools: [
+                        cppLint(id: "cpplint", name: "Linting & Doc checks@CPPLINT")
+                    ],
+                    blameDisabled: false,
+                    qualityGates: [[threshold: 1, type: 'TOTAL', unstable: true]],
+                    healthy: 10, unhealthy: 100, minimumSeverity: 'HIGH',
+                    referenceJobName: env.BRANCH_NAME
+
+                    deleteDir()
                 }
             }
         }
@@ -240,6 +241,13 @@ pipeline {
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
+                    when { 
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX()
@@ -273,6 +281,7 @@ pipeline {
                         setupCXX()
                         script {
                             dir("lib/stan_math/") {
+                                sh "echo O=0 > make/local"
                                 withEnv(['PATH+TBB=./lib/tbb']) {           
                                     try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
                                     finally { junit 'test/**/*.xml' }
