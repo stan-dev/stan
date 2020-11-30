@@ -308,18 +308,18 @@ TEST_F(VarAssign, uni_uni_std_vecrowvec) {
 }
 
 /**
-  * Tests are not exhaustive. They cover each index individually and each
-  * index as the right hand side of a double index.
-  * index_uni - A single cell.
-  * index_multi - Access multiple cells.
-  * index_omni - A no-op for all indices along a dimension.
-  * index_min - index from min:N
-  * index_max - index from 1:max
-  * index_min_max - index from min:max
-  * nil_index_list - no-op
-  * Tests are sorted in the above order and first call the individual index
-  * and then with the index on the right hand side of an index list.
-  */
+ * Tests are not exhaustive. They cover each index individually and each
+ * index as the right hand side of a double index.
+ * index_uni - A single cell.
+ * index_multi - Access multiple cells.
+ * index_omni - A no-op for all indices along a dimension.
+ * index_min - index from min:N
+ * index_max - index from 1:max
+ * index_min_max - index from min:max
+ * nil_index_list - no-op
+ * Tests are sorted in the above order and first call the individual index
+ * and then with the index on the right hand side of an index list.
+ */
 
 // uni
 TEST_F(VarAssign, uni_matrix) {
@@ -774,8 +774,7 @@ TEST_F(VarAssign, positive_minmax_matrix) {
     var_value<Eigen::MatrixXd> x(x_val);
     var_value<Eigen::MatrixXd> x_rev(x_rev_val);
     const int ii = i + 1;
-    assign(x, index_list(index_min_max(1, ii)),
-           x_rev.block(0, 0, ii, 5));
+    assign(x, index_list(index_min_max(1, ii)), x_rev.block(0, 0, ii, 5));
     auto x_val_check = x.val().block(0, 0, ii, 5);
     auto x_rev_val_check = x_rev.val().block(0, 0, ii, 5);
     EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
