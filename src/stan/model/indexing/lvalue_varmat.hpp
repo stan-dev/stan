@@ -68,9 +68,8 @@ inline void assign(VarVec&& x,
   x.vi_->val_.coeffRef(coeff_idx) = y.val();
   stan::math::reverse_pass_callback([x, y, coeff_idx, prev_val]() mutable {
     x.vi_->val_.coeffRef(coeff_idx) = prev_val;
-    prev_val = x.adj().coeffRef(coeff_idx);
+    y.adj() += x.adj().coeffRef(coeff_idx);
     x.adj().coeffRef(coeff_idx) = 0.0;
-    y.adj() += prev_val;
   });
 }
 
@@ -115,8 +114,6 @@ inline void assign(Vec1&& x,
   arena_t<Eigen::Matrix<double, -1, 1>> prev_vals(x_idx.size());
   for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
     prev_vals.coeffRef(i) = x.vi_->val_.coeffRef(x_idx[i]);
-  }
-  for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
     x.vi_->val_.coeffRef(x_idx[i]) = y.vi_->val_.coeff(y_idx[i]);
   }
   stan::math::reverse_pass_callback([x, y, x_idx, y_idx, prev_vals]() mutable {
@@ -161,9 +158,8 @@ inline void assign(
   stan::math::reverse_pass_callback(
       [x, y, row_idx, col_idx, prev_val]() mutable {
         x.vi_->val_.coeffRef(row_idx, col_idx) = prev_val;
-        prev_val = x.adj().coeffRef(row_idx, col_idx);
+        y.adj() += x.adj().coeffRef(row_idx, col_idx);
         x.adj().coeffRef(row_idx, col_idx) = 0.0;
-        y.adj() += prev_val;
       });
 }
 
@@ -274,7 +270,7 @@ inline void assign(Mat1&& x,
     for (size_t i = 0; i < y_idx.size(); ++i) {
       x.vi_->val_.row(x_idx[i]) = prev_vals.row(i);
       prev_vals.row(i) = x.adj().row(x_idx[i]);
-      x.adj().row(x_idx[i]) = 0;
+      x.adj().row(x_idx[i]).fill(0);
       y.adj().row(y_idx[i]) += prev_vals.row(i);
     }
   });
