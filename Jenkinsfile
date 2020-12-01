@@ -165,7 +165,7 @@ pipeline {
         stage('Verify changes') {
             agent { label 'linux' }
             steps {
-                script {         
+                script {
 
                     retry(3) { checkout scm }
                     sh 'git clean -xffd'
@@ -173,8 +173,8 @@ pipeline {
                     // These paths will be passed to git diff
                     // If there are changes to them, CI/CD will continue else skip
                     def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
-                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
-                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
+                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test',
+                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile',
                         'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
                     ].join(" ")
 
@@ -241,7 +241,7 @@ pipeline {
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
-                    when { 
+                    when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
                             env.BRANCH_NAME == "master" ) &&
@@ -257,11 +257,11 @@ pipeline {
                 }
                 stage('Integration Windows') {
                     agent { label 'windows' }
-                    when { 
-                        expression { 
+                    when {
+                        expression {
                             ( env.BRANCH_NAME == "develop" ||
                             env.BRANCH_NAME == "master" ) &&
-                            !skipRemainingStages 
+                            !skipRemainingStages
                         }
                     }
                     steps {
@@ -282,11 +282,11 @@ pipeline {
                         script {
                             dir("lib/stan_math/") {
                                 sh "echo O=0 > make/local"
-                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                withEnv(['PATH+TBB=./lib/tbb']) {
                                     try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
                                     finally { junit 'test/**/*.xml' }
                                 }
-                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                withEnv(['PATH+TBB=./lib/tbb']) {
                                     sh "python ./test/expressions/test_expression_testing_framework.py"
                                 }
                             }
@@ -302,13 +302,13 @@ pipeline {
             }
         }
         stage('Upstream CmdStan tests') {
-            when { 
-                    expression { 
+            when {
+                    expression {
                         ( env.BRANCH_NAME ==~ /PR-\d+/ ||
                         env.BRANCH_NAME == "downstream_tests" ||
                         env.BRANCH_NAME == "downstream_hotfix" ) &&
-                        !skipRemainingStages 
-                    } 
+                        !skipRemainingStages
+                    }
                 }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
