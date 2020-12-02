@@ -36,6 +36,25 @@ struct VarAssign : public testing::Test {
   }
 };
 
+inline bool check_multi_duplicate(
+    const stan::arena_t<std::vector<std::array<int, 2>>>& x_idx, int i, int j) {
+  for (size_t k = 0; k < x_idx.size(); ++k) {
+    if (x_idx[k][0] == i && x_idx[k][1] == j) {
+      return true;
+    }
+  }
+  return false;
+}
+
+inline bool check_multi_duplicate(const stan::arena_t<std::vector<int>>& x_idx, int i) {
+  for (size_t k = 0; k < x_idx.size(); ++k) {
+    if (x_idx[k] == i) {
+      return true;
+    }
+  }
+  return false;
+}
+
 template <typename T1, typename I, typename T2>
 void test_throw_out_of_range(T1& lhs, const I& idxs, const T2& rhs) {
   EXPECT_THROW(stan::model::assign(lhs, idxs, rhs), std::out_of_range);
@@ -470,7 +489,7 @@ TEST_F(VarAssign, multi_matrix) {
   stan::arena_t<std::vector<int>> y_idx;
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int i = row_idx.size() - 1; i >= 0; --i) {
-    if (!stan::model::internal::check_duplicate(x_idx, row_idx[i] - 1)) {
+    if (!check_multi_duplicate(x_idx, row_idx[i] - 1)) {
       y_idx.push_back(i);
       x_idx.push_back(row_idx[i] - 1);
     }
@@ -564,7 +583,7 @@ TEST_F(VarAssign, multi_multi_matrix) {
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int j = col_idx.size() - 1; j >= 0; --j) {
     for (int i = row_idx.size() - 1; i >= 0; --i) {
-      if (!stan::model::internal::check_duplicate(x_idx, row_idx[i] - 1,
+      if (!check_multi_duplicate(x_idx, row_idx[i] - 1,
                                                   col_idx[j] - 1)) {
         y_idx.push_back(std::array<int, 2>{i, j});
         x_idx.push_back(std::array<int, 2>{row_idx[i] - 1, col_idx[j] - 1});
