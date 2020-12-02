@@ -311,7 +311,8 @@ inline void assign(
                                assign_cols, name, y.cols());
   using arena_vec = std::vector<int, stan::math::arena_allocator<int>>;
   using pair_type = std::pair<int, arena_vec>;
-  std::vector<pair_type, stan::math::arena_allocator<pair_type>> x_idx(assign_cols);
+  std::vector<pair_type, stan::math::arena_allocator<pair_type>> x_idx(
+      assign_cols);
   std::unordered_set<int> x_set;
   x_set.reserve(assign_cols);
   std::unordered_set<int> x_row_set;
@@ -320,15 +321,16 @@ inline void assign(
   // Need to remove duplicates for cases like {{2, 3, 2, 2}, {1, 2, 2}}
   for (int j = assign_cols - 1; j >= 0; --j) {
     if (likely(x_set.insert(idxs.tail_.head_.ns_[j]).second)) {
-      stan::math::check_range("matrix[multi, multi] assign col", name,
-                              x.cols(), idxs.tail_.head_.ns_[j]);
+      stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
+                              idxs.tail_.head_.ns_[j]);
       x_idx[j] = pair_type{idxs.tail_.head_.ns_[j] - 1, arena_vec(assign_rows)};
       for (int i = assign_rows - 1; i >= 0; --i) {
         if (likely(x_row_set.insert(idxs.head_.ns_[i]).second)) {
           stan::math::check_range("matrix[multi, multi] assign row", name,
                                   x.rows(), idxs.head_.ns_[i]);
           x_idx[j].second[i] = idxs.head_.ns_[i] - 1;
-          prev_vals.coeffRef(i, j) = x.vi_->val_(x_idx[j].second[i], x_idx[j].first);
+          prev_vals.coeffRef(i, j)
+              = x.vi_->val_(x_idx[j].second[i], x_idx[j].first);
           x.vi_->val_(x_idx[j].second[i], x_idx[j].first) = y.vi_->val_(i, j);
         } else {
           x_idx[j].second[i] = -1;
@@ -344,8 +346,10 @@ inline void assign(
       if (likely(x_idx[j].first != -1)) {
         for (int i = 0; i < x_idx[j].second.size(); ++i) {
           if (likely(x_idx[j].second[i] != -1)) {
-            x.vi_->val_(x_idx[j].second[i], x_idx[j].first) = prev_vals.coeffRef(i, j);
-            prev_vals.coeffRef(i, j) = x.adj()(x_idx[j].second[i], x_idx[j].first);
+            x.vi_->val_(x_idx[j].second[i], x_idx[j].first)
+                = prev_vals.coeffRef(i, j);
+            prev_vals.coeffRef(i, j)
+                = x.adj()(x_idx[j].second[i], x_idx[j].first);
             x.adj()(x_idx[j].second[i], x_idx[j].first) = 0;
             y.adj()(i, j) += prev_vals.coeffRef(i, j);
           }
@@ -389,8 +393,8 @@ inline void assign(
     if (likely(x_set.insert(idxs.tail_.head_.ns_[j]).second)) {
       stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
                               idxs.tail_.head_.ns_[j]);
-      assign(x.col(idxs.tail_.head_.ns_[j] - 1), index_list(idxs.head_), y.col(j), name,
-             depth + 1);
+      assign(x.col(idxs.tail_.head_.ns_[j] - 1), index_list(idxs.head_),
+             y.col(j), name, depth + 1);
     }
   }
 }
