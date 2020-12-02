@@ -46,7 +46,8 @@ inline bool check_multi_duplicate(
   return false;
 }
 
-inline bool check_multi_duplicate(const stan::arena_t<std::vector<int>>& x_idx, int i) {
+inline bool check_multi_duplicate(const stan::arena_t<std::vector<int>>& x_idx,
+                                  int i) {
   for (size_t k = 0; k < x_idx.size(); ++k) {
     if (x_idx[k] == i) {
       return true;
@@ -583,8 +584,7 @@ TEST_F(VarAssign, multi_multi_matrix) {
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int j = col_idx.size() - 1; j >= 0; --j) {
     for (int i = row_idx.size() - 1; i >= 0; --i) {
-      if (!check_multi_duplicate(x_idx, row_idx[i] - 1,
-                                                  col_idx[j] - 1)) {
+      if (!check_multi_duplicate(x_idx, row_idx[i] - 1, col_idx[j] - 1)) {
         y_idx.push_back(std::array<int, 2>{i, j});
         x_idx.push_back(std::array<int, 2>{row_idx[i] - 1, col_idx[j] - 1});
       }
