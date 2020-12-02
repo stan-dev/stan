@@ -311,46 +311,46 @@ inline void assign(
                                assign_cols, name, y.cols());
   using arena_vec = std::vector<int, stan::math::arena_allocator<int>>;
   using pair_type = std::pair<int, arena_vec>;
-  std::vector<pair_type, stan::math::arena_allocator<pair_type>> x_idx(
-      assign_cols);
+  arena_vec x_col_idx(assign_cols);
+  arena_vec x_row_idx(assign_rows);
   std::unordered_set<int> x_set;
   x_set.reserve(assign_cols);
   std::unordered_set<int> x_row_set;
   x_row_set.reserve(assign_rows);
   arena_t<Eigen::Matrix<double, -1, -1>> prev_vals(assign_rows, assign_cols);
   // Need to remove duplicates for cases like {{2, 3, 2, 2}, {1, 2, 2}}
+  for (int i = assign_rows - 1; i >= 0; --i) {
+    if (likely(x_row_set.insert(idxs.head_.ns_[i]).second)) {
+      stan::math::check_range("matrix[multi, multi] assign row", name,
+                              x.rows(), idxs.head_.ns_[i]);
+      x_row_idx[i] = idxs.head_.ns_[i] - 1;
+    } else {
+      x_row_idx[i] = -1;
+    }
+  }
   for (int j = assign_cols - 1; j >= 0; --j) {
     if (likely(x_set.insert(idxs.tail_.head_.ns_[j]).second)) {
       stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
                               idxs.tail_.head_.ns_[j]);
-      x_idx[j] = pair_type{idxs.tail_.head_.ns_[j] - 1, arena_vec(assign_rows)};
+      x_col_idx[j] = idxs.tail_.head_.ns_[j] - 1;
       for (int i = assign_rows - 1; i >= 0; --i) {
-        if (likely(x_row_set.insert(idxs.head_.ns_[i]).second)) {
-          stan::math::check_range("matrix[multi, multi] assign row", name,
-                                  x.rows(), idxs.head_.ns_[i]);
-          x_idx[j].second[i] = idxs.head_.ns_[i] - 1;
-          prev_vals.coeffRef(i, j)
-              = x.vi_->val_(x_idx[j].second[i], x_idx[j].first);
-          x.vi_->val_(x_idx[j].second[i], x_idx[j].first) = y.vi_->val_(i, j);
-        } else {
-          x_idx[j].second[i] = -1;
+        if (likely(x_row_idx[i] != -1)) {
+          prev_vals.coeffRef(i, j) = x.vi_->val_(x_row_idx[i], x_col_idx[j]);
+          x.vi_->val_(x_row_idx[i], x_col_idx[j]) = y.vi_->val_(i, j);
         }
       }
-      x_row_set.clear();
     } else {
-      x_idx[j] = pair_type{-1, arena_vec()};
+      x_col_idx[j] = -1;
     }
   }
-  stan::math::reverse_pass_callback([x, y, prev_vals, x_idx]() mutable {
-    for (int j = 0; j < x_idx.size(); ++j) {
-      if (likely(x_idx[j].first != -1)) {
-        for (int i = 0; i < x_idx[j].second.size(); ++i) {
-          if (likely(x_idx[j].second[i] != -1)) {
-            x.vi_->val_(x_idx[j].second[i], x_idx[j].first)
-                = prev_vals.coeffRef(i, j);
-            prev_vals.coeffRef(i, j)
-                = x.adj()(x_idx[j].second[i], x_idx[j].first);
-            x.adj()(x_idx[j].second[i], x_idx[j].first) = 0;
+  stan::math::reverse_pass_callback([x, y, prev_vals, x_col_idx, x_row_idx]() mutable {
+    for (int j = 0; j < x_col_idx.size(); ++j) {
+      if (likely(x_col_idx[j] != -1)) {
+        for (int i = 0; i < x_row_idx.size(); ++i) {
+          if (likely(x_row_idx[i] != -1)) {
+            x.vi_->val_(x_row_idx[i], x_col_idx[j]) = prev_vals.coeffRef(i, j);
+            prev_vals.coeffRef(i, j) = x.adj()(x_row_idx[i], x_col_idx[j]);
+            x.adj()(x_row_idx[i], x_col_idx[j]) = 0;
             y.adj()(i, j) += prev_vals.coeffRef(i, j);
           }
         }
