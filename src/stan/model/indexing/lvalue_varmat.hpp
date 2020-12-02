@@ -321,8 +321,8 @@ inline void assign(
   // Need to remove duplicates for cases like {{2, 3, 2, 2}, {1, 2, 2}}
   for (int i = assign_rows - 1; i >= 0; --i) {
     if (likely(x_row_set.insert(idxs.head_.ns_[i]).second)) {
-      stan::math::check_range("matrix[multi, multi] assign row", name,
-                              x.rows(), idxs.head_.ns_[i]);
+      stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(),
+                              idxs.head_.ns_[i]);
       x_row_idx[i] = idxs.head_.ns_[i] - 1;
     } else {
       x_row_idx[i] = -1;
@@ -343,7 +343,8 @@ inline void assign(
       x_col_idx[j] = -1;
     }
   }
-  stan::math::reverse_pass_callback([x, y, prev_vals, x_col_idx, x_row_idx]() mutable {
+  stan::math::reverse_pass_callback([x, y, prev_vals, x_col_idx,
+                                     x_row_idx]() mutable {
     for (int j = 0; j < x_col_idx.size(); ++j) {
       if (likely(x_col_idx[j] != -1)) {
         for (int i = 0; i < x_row_idx.size(); ++i) {
