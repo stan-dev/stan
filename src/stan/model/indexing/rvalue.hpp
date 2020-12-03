@@ -93,7 +93,7 @@ template <typename T, require_not_plain_type_t<T>* = nullptr>
 inline auto rvalue(T&& x,
                    const cons_index_list<index_omni, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
-  return x.eval();
+  return x;
 }
 
 /**
@@ -219,7 +219,7 @@ inline auto rvalue(Vec&& x,
                    const char* name = "ANON", int depth = 0) {
   stan::math::check_range("vector[min] indexing", name, x.size(),
                           idxs.head_.min_);
-  return x.tail(x.size() - idxs.head_.min_ + 1).eval();
+  return x.tail(x.size() - idxs.head_.min_ + 1);
 }
 
 /**
@@ -241,7 +241,7 @@ inline auto rvalue(Vec&& x,
                    const char* name = "ANON", int depth = 0) {
   stan::math::check_range("vector[max] indexing", name, x.size(),
                           idxs.head_.max_);
-  return x.head(idxs.head_.max_).eval();
+  return x.head(idxs.head_.max_);
 }
 
 /**
@@ -262,7 +262,7 @@ inline auto rvalue(Mat&& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[uni] indexing", name, x.rows(), idxs.head_.n_);
-  return x.row(idxs.head_.n_ - 1).eval();
+  return x.row(idxs.head_.n_ - 1);
 }
 
 /**
@@ -312,7 +312,7 @@ inline auto rvalue(Mat&& x,
   const auto row_size = x.rows() - (idxs.head_.min_ - 1);
   math::check_range("matrix[min] row indexing", name, x.rows(),
                     idxs.head_.min_);
-  return x.bottomRows(row_size).eval();
+  return x.bottomRows(row_size);
 }
 
 /**
@@ -727,13 +727,15 @@ inline auto rvalue(
   if (idxs.tail_.head_.is_ascending()) {
     const auto col_start = idxs.tail_.head_.min_ - 1;
     return rvalue(x.middleCols(col_start, idxs.tail_.head_.max_ - col_start),
-                  index_list(idxs.head_), name, depth + 1);
+                  index_list(idxs.head_), name, depth + 1)
+        .eval();
   } else {
     const auto col_start = idxs.tail_.head_.max_ - 1;
     return rvalue(x.middleCols(col_start, idxs.tail_.head_.min_ - col_start)
                       .rowwise()
                       .reverse(),
-                  index_list(idxs.head_), name, depth + 1);
+                  index_list(idxs.head_), name, depth + 1)
+        .eval();
   }
 }
 

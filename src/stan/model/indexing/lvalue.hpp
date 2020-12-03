@@ -434,8 +434,7 @@ inline void assign(Mat1&& x,
     stan::math::check_size_match("matrix[reverse_min_max] assign",
                                  "left hand side rows", row_size, name,
                                  y.rows());
-    x.middleRows(idxs.head_.max_ - 1, row_size) =
-     internal::colwise_reverse(std::forward<Mat2>(y));
+    x.middleRows(idxs.head_.max_ - 1, row_size) = internal::colwise_reverse(y);
     return;
   }
 }
@@ -483,7 +482,7 @@ inline void assign(
                                    y.cols());
       x.block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1, row_size,
               col_size)
-          = std::forward<Mat2>(y);
+          = y;
       return;
     } else {
       auto row_size = idxs.head_.max_ - (idxs.head_.min_ - 1);
@@ -496,7 +495,7 @@ inline void assign(
                                    y.cols());
       x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1, row_size,
               col_size)
-          = internal::rowwise_reverse(std::forward<Mat2>(y));
+          = internal::rowwise_reverse(y);
       return;
     }
   } else {
@@ -511,7 +510,7 @@ inline void assign(
                                    y.cols());
       x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1, row_size,
               col_size)
-          = internal::colwise_reverse(std::forward<Mat2>(y));
+          = internal::colwise_reverse(y);
       return;
     } else {
       auto row_size = idxs.head_.min_ - (idxs.head_.max_ - 1);
@@ -524,7 +523,7 @@ inline void assign(
           "left hand side columns", col_size, name, y.cols());
       x.block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1, row_size,
               col_size)
-          = std::forward<Mat2>(y).reverse();
+          = y.reverse();
       return;
     }
   }
@@ -843,7 +842,7 @@ inline void assign(
     stan::math::check_size_match("matrix[..., min_max] assign column size",
                                  "left hand side", col_size, name, y.cols());
     assign(x.middleCols(col_start, col_size), index_list(idxs.head_),
-           internal::rowwise_reverse(std::forward<Mat2>(y)), name, depth + 1);
+           internal::rowwise_reverse(y), name, depth + 1);
     return;
   }
 }
