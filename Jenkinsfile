@@ -187,83 +187,83 @@ pipeline {
                 }
             }
         }
-        stage('Unit tests') {
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
-            parallel {
-                stage('Windows Headers & Unit') {
-                    agent { label 'windows' }
-                    steps {
-                        deleteDirWin()
-                            unstash 'StanSetup'
-                            setupCXX()
-                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                            bat "mingw32-make -j${env.PARALLEL} test-headers"
-                            setupCXX(false)
-                            runTestsWin("src/test/unit")
-                    }
-                    post { always { deleteDirWin() } }
-                }
-                stage('Linux Unit') {
-                    agent { label 'linux' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
-                        sh "g++ --version"
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Mac Unit') {
-                    agent { label 'osx' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(false)
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
-            }
-        }
+        // stage('Unit tests') {
+        //     when {
+        //         expression {
+        //             !skipRemainingStages
+        //         }
+        //     }
+        //     parallel {
+        //         stage('Windows Headers & Unit') {
+        //             agent { label 'windows' }
+        //             steps {
+        //                 deleteDirWin()
+        //                     unstash 'StanSetup'
+        //                     setupCXX()
+        //                     bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+        //                     bat "mingw32-make -j${env.PARALLEL} test-headers"
+        //                     setupCXX(false)
+        //                     runTestsWin("src/test/unit")
+        //             }
+        //             post { always { deleteDirWin() } }
+        //         }
+        //         stage('Linux Unit') {
+        //             agent { label 'linux' }
+        //             steps {
+        //                 unstash 'StanSetup'
+        //                 setupCXX(true, env.GCC)
+        //                 sh "g++ --version"
+        //                 runTests("src/test/unit")
+        //             }
+        //             post { always { deleteDir() } }
+        //         }
+        //         stage('Mac Unit') {
+        //             agent { label 'osx' }
+        //             steps {
+        //                 unstash 'StanSetup'
+        //                 setupCXX(false)
+        //                 runTests("src/test/unit")
+        //             }
+        //             post { always { deleteDir() } }
+        //         }
+        //     }
+        // }
         stage('Integration') {
             parallel {
-                stage('Integration Linux') {
-                    agent { label 'linux' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
-                        runTests("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Integration Mac') {
-                    agent { label 'osx' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ) &&
-                            !skipRemainingStages
-                        }
-                    }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX()
-                        runTests("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDir() } }
-                }
+                // stage('Integration Linux') {
+                //     agent { label 'linux' }
+                //     steps {
+                //         unstash 'StanSetup'
+                //         setupCXX(true, env.GCC)
+                //         runTests("src/test/integration", separateMakeStep=false)
+                //     }
+                //     post { always { deleteDir() } }
+                // }
+                // stage('Integration Mac') {
+                //     agent { label 'osx' }
+                //     when {
+                //         expression {
+                //             ( env.BRANCH_NAME == "develop" ||
+                //             env.BRANCH_NAME == "master" ) &&
+                //             !skipRemainingStages
+                //         }
+                //     }
+                //     steps {
+                //         unstash 'StanSetup'
+                //         setupCXX()
+                //         runTests("src/test/integration", separateMakeStep=false)
+                //     }
+                //     post { always { deleteDir() } }
+                // }
                 stage('Integration Windows') {
-                    agent { label 'windows' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ) &&
-                            !skipRemainingStages
-                        }
-                    }
+                    agent { label 'gelman-group-win2' }
+                    // when {
+                    //     expression {
+                    //         ( env.BRANCH_NAME == "develop" ||
+                    //         env.BRANCH_NAME == "master" ) &&
+                    //         !skipRemainingStages
+                    //     }
+                    // }
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
@@ -274,26 +274,26 @@ pipeline {
                     }
                     post { always { deleteDirWin() } }
                 }
-                stage('Math functions expressions test') {
-                    agent any
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX()
-                        script {
-                            dir("lib/stan_math/") {
-                                sh "echo O=0 > make/local"
-                                withEnv(['PATH+TBB=./lib/tbb']) {
-                                    try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
-                                    finally { junit 'test/**/*.xml' }
-                                }
-                                withEnv(['PATH+TBB=./lib/tbb']) {
-                                    sh "python ./test/expressions/test_expression_testing_framework.py"
-                                }
-                            }
-                        }
-                    }
-                    post { always { deleteDir() } }
-                }
+                // stage('Math functions expressions test') {
+                //     agent any
+                //     steps {
+                //         unstash 'StanSetup'
+                //         setupCXX()
+                //         script {
+                //             dir("lib/stan_math/") {
+                //                 sh "echo O=0 > make/local"
+                //                 withEnv(['PATH+TBB=./lib/tbb']) {
+                //                     try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
+                //                     finally { junit 'test/**/*.xml' }
+                //                 }
+                //                 withEnv(['PATH+TBB=./lib/tbb']) {
+                //                     sh "python ./test/expressions/test_expression_testing_framework.py"
+                //                 }
+                //             }
+                //         }
+                //     }
+                //     post { always { deleteDir() } }
+                // }
             }
             when {
                 expression {
