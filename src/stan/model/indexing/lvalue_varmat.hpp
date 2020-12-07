@@ -307,10 +307,6 @@ inline void assign(Mat1&& x,
     }
     for (size_t i = 0; i < x_idx.size(); ++i) {
       if (likely(x_idx[i] != -1)) {
-      }
-    }
-    for (size_t i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
         y.adj().row(i) += prev_vals.row(i);
       }
     }
