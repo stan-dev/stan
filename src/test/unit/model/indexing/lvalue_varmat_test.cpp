@@ -133,7 +133,6 @@ TEST_F(VarAssign, multi_vec) { test_multi_vec<Eigen::VectorXd>(); }
 
 TEST_F(VarAssign, multi_rowvec) { test_multi_vec<Eigen::RowVectorXd>(); }
 
-
 template <typename Vec>
 void test_multi_alias_vec() {
   using stan::math::sum;
@@ -531,7 +530,6 @@ TEST_F(VarAssign, multi_matrix) {
   test_throw_out_of_range(x, index_list(index_multi(row_idx)), y);
 }
 
-
 TEST_F(VarAssign, multi_alias_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
@@ -681,7 +679,8 @@ TEST_F(VarAssign, multi_multi_alias_matrix) {
   Eigen::MatrixXd x_val = x.val();
   std::vector<int> row_idx{1, 2, 2, 4};
   std::vector<int> col_idx{1, 2, 2, 3};
-  assign(x, index_list(index_multi(row_idx), index_multi(col_idx)), x.block(0, 0, 4, 4).eval());
+  assign(x, index_list(index_multi(row_idx), index_multi(col_idx)),
+         x.block(0, 0, 4, 4).eval());
   Eigen::MatrixXd x_val_tmp(5, 5);
   /* clang-format off */
   x_val_tmp << 0, 10, 15, 15, 20,
@@ -733,11 +732,14 @@ TEST_F(VarAssign, minmax_multi_matrix) {
   auto check_j_y = [](int j) { return j != 2; };
   check_matrix_adjs(check_i_y, check_j_y, y, "lhs", 1);
   ns[ns.size() - 1] = 0;
-  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)),
+                          y);
   ns[ns.size() - 1] = 20;
-  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)),
+                          y);
   ns.push_back(2);
-  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_multi(ns)), y);
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_multi(ns)),
+                         y);
 }
 
 TEST_F(VarAssign, minmax_multi_alias_matrix) {
@@ -752,7 +754,8 @@ TEST_F(VarAssign, minmax_multi_alias_matrix) {
   Eigen::MatrixXd x_val = x.val();
 
   vector<int> ns{4, 1, 3, 3};
-  assign(x, index_list(index_min_max(1, 3), index_multi(ns)), x.block(0, 0, 3, 4));
+  assign(x, index_list(index_min_max(1, 3), index_multi(ns)),
+         x.block(0, 0, 3, 4));
   Eigen::MatrixXd x_val_tmp = x_val;
   x_val_tmp.col(0).segment(0, 3) = x_val.col(1).segment(0, 3);
   x_val_tmp.col(2).segment(0, 3) = x_val.col(3).segment(0, 3);
@@ -764,9 +767,7 @@ TEST_F(VarAssign, minmax_multi_alias_matrix) {
   exp_adj.col(1).segment(0, 3).array() = 2;
   exp_adj.col(2).segment(0, 3).array() = 0;
   EXPECT_MATRIX_EQ(x.adj(), exp_adj);
-
 }
-
 
 // omni
 TEST_F(VarAssign, omni_matrix) {

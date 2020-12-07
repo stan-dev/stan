@@ -155,8 +155,8 @@ inline void assign(Vec1&& x,
  * @throw std::out_of_range If either of the indices are out of bounds.
  */
 template <typename Mat, typename U, require_var_dense_dynamic_t<Mat>* = nullptr,
-  require_var_t<U>* = nullptr,
-  require_floating_point_t<value_type_t<U>>* = nullptr>
+          require_var_t<U>* = nullptr,
+          require_floating_point_t<value_type_t<U>>* = nullptr>
 inline void assign(
     Mat&& x,
     const cons_index_list<index_uni,
