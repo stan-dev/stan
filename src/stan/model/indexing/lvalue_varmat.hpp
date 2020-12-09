@@ -103,25 +103,37 @@ inline void assign(Vec1&& x,
   const auto assign_size = idxs.head_.ns_.size();
   arena_t<std::vector<int>> x_idx(assign_size);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_vals(assign_size);
+  Eigen::Matrix<double, -1, 1> y_vals(assign_size);
   std::unordered_set<int> x_set;
   x_set.reserve(assign_size);
+  // We have to use two loops to avoid aliasing issues.
   for (int i = assign_size - 1; i >= 0; --i) {
     if (likely(x_set.insert(idxs.head_.ns_[i]).second)) {
       stan::math::check_range("vector[multi] assign", name, x_size,
                               idxs.head_.ns_[i]);
       x_idx[i] = idxs.head_.ns_[i] - 1;
       prev_vals.coeffRef(i) = x.vi_->val_.coeffRef(x_idx[i]);
-      x.vi_->val_.coeffRef(x_idx[i]) = y.vi_->val_.coeff(i);
+      y_vals.coeffRef(i) = y.vi_->val_.coeff(i);
     } else {
       x_idx[i] = -1;
     }
   }
+  for (int i = assign_size - 1; i >= 0; --i) {
+    if (likely(x_idx[i] != -1)) {
+      x.vi_->val_.coeffRef(x_idx[i]) = y_vals.coeff(i);
+    }
+  }
+
   stan::math::reverse_pass_callback([x, y, x_idx, prev_vals]() mutable {
     for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
       if (likely(x_idx[i] != -1)) {
         x.vi_->val_.coeffRef(x_idx[i]) = prev_vals.coeffRef(i);
         prev_vals.coeffRef(i) = x.adj().coeffRef(x_idx[i]);
         x.adj().coeffRef(x_idx[i]) = 0.0;
+      }
+    }
+    for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
+      if (likely(x_idx[i] != -1)) {
         y.adj().coeffRef(i) += prev_vals.coeffRef(i);
       }
     }
@@ -143,7 +155,8 @@ inline void assign(Vec1&& x,
  * @throw std::out_of_range If either of the indices are out of bounds.
  */
 template <typename Mat, typename U, require_var_dense_dynamic_t<Mat>* = nullptr,
-          require_var_t<U>* = nullptr>
+          require_var_t<U>* = nullptr,
+          require_floating_point_t<value_type_t<U>>* = nullptr>
 inline void assign(
     Mat&& x,
     const cons_index_list<index_uni,
@@ -200,6 +213,7 @@ inline void assign(
   const int row_idx = idxs.head_.n_ - 1;
   arena_t<std::vector<int>> x_idx(assign_cols);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_val(assign_cols);
+  Eigen::Matrix<double, -1, 1> y_vals(assign_cols);
   std::unordered_set<int> x_set;
   x_set.reserve(assign_cols);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
@@ -209,9 +223,14 @@ inline void assign(
                               idxs.tail_.head_.ns_[i]);
       x_idx[i] = idxs.tail_.head_.ns_[i] - 1;
       prev_val.coeffRef(i) = x.val().coeffRef(row_idx, x_idx[i]);
-      x.vi_->val_.coeffRef(row_idx, x_idx[i]) = y.val().coeff(i);
+      y_vals.coeffRef(i) = y.val().coeff(i);
     } else {
       x_idx[i] = -1;
+    }
+  }
+  for (int i = assign_cols - 1; i >= 0; --i) {
+    if (likely(x_idx[i] != -1)) {
+      x.vi_->val_.coeffRef(row_idx, x_idx[i]) = y_vals.coeff(i);
     }
   }
   stan::math::reverse_pass_callback([x, y, row_idx, x_idx, prev_val]() mutable {
@@ -220,6 +239,10 @@ inline void assign(
         x.vi_->val_.coeffRef(row_idx, x_idx[i]) = prev_val.coeff(i);
         prev_val.coeffRef(i) = x.adj().coeffRef(row_idx, x_idx[i]);
         x.adj().coeffRef(row_idx, x_idx[i]) = 0.0;
+      }
+    }
+    for (size_t i = 0; i < x_idx.size(); ++i) {
+      if (likely(x_idx[i] != -1)) {
         y.adj().coeffRef(i) += prev_val.coeffRef(i);
       }
     }
@@ -253,6 +276,7 @@ inline void assign(Mat1&& x,
                                assign_rows, name, y.rows());
   arena_t<std::vector<int>> x_idx(assign_rows);
   arena_t<Eigen::Matrix<double, -1, -1>> prev_vals(assign_rows, x.cols());
+  Eigen::Matrix<double, -1, -1> y_vals(assign_rows, x.cols());
   std::unordered_set<int> x_set;
   x_set.reserve(assign_rows);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
@@ -262,17 +286,27 @@ inline void assign(Mat1&& x,
                               idxs.head_.ns_[i]);
       x_idx[i] = idxs.head_.ns_[i] - 1;
       prev_vals.row(i) = x.vi_->val_.row(x_idx[i]);
-      x.vi_->val_.row(x_idx[i]) = y.vi_->val_.row(i);
+      y_vals.row(i) = y.vi_->val_.row(i);
     } else {
       x_idx[i] = -1;
     }
   }
+  for (int i = assign_rows - 1; i >= 0; --i) {
+    if (likely(x_idx[i] != -1)) {
+      x.vi_->val_.row(x_idx[i]) = y_vals.row(i);
+    }
+  }
+
   stan::math::reverse_pass_callback([x, y, prev_vals, x_idx]() mutable {
     for (size_t i = 0; i < x_idx.size(); ++i) {
       if (likely(x_idx[i] != -1)) {
         x.vi_->val_.row(x_idx[i]) = prev_vals.row(i);
         prev_vals.row(i) = x.adj().row(x_idx[i]);
         x.adj().row(x_idx[i]).fill(0);
+      }
+    }
+    for (size_t i = 0; i < x_idx.size(); ++i) {
+      if (likely(x_idx[i] != -1)) {
         y.adj().row(i) += prev_vals.row(i);
       }
     }
@@ -318,6 +352,7 @@ inline void assign(
   std::unordered_set<int> x_row_set;
   x_row_set.reserve(assign_rows);
   arena_t<Eigen::Matrix<double, -1, -1>> prev_vals(assign_rows, assign_cols);
+  Eigen::Matrix<double, -1, -1> y_vals(assign_rows, assign_cols);
   // Need to remove duplicates for cases like {{2, 3, 2, 2}, {1, 2, 2}}
   for (int i = assign_rows - 1; i >= 0; --i) {
     if (likely(x_row_set.insert(idxs.head_.ns_[i]).second)) {
@@ -336,11 +371,20 @@ inline void assign(
       for (int i = assign_rows - 1; i >= 0; --i) {
         if (likely(x_row_idx[i] != -1)) {
           prev_vals.coeffRef(i, j) = x.vi_->val_(x_row_idx[i], x_col_idx[j]);
-          x.vi_->val_(x_row_idx[i], x_col_idx[j]) = y.vi_->val_(i, j);
+          y_vals(i, j) = y.vi_->val_(i, j);
         }
       }
     } else {
       x_col_idx[j] = -1;
+    }
+  }
+  for (int j = assign_cols - 1; j >= 0; --j) {
+    if (likely(x_col_idx[j] != -1)) {
+      for (int i = assign_rows - 1; i >= 0; --i) {
+        if (likely(x_row_idx[i] != -1)) {
+          x.vi_->val_(x_row_idx[i], x_col_idx[j]) = y_vals(i, j);
+        }
+      }
     }
   }
   stan::math::reverse_pass_callback([x, y, prev_vals, x_col_idx,
@@ -352,6 +396,14 @@ inline void assign(
             x.vi_->val_(x_row_idx[i], x_col_idx[j]) = prev_vals.coeffRef(i, j);
             prev_vals.coeffRef(i, j) = x.adj()(x_row_idx[i], x_col_idx[j]);
             x.adj()(x_row_idx[i], x_col_idx[j]) = 0;
+          }
+        }
+      }
+    }
+    for (int j = 0; j < x_col_idx.size(); ++j) {
+      if (likely(x_col_idx[j] != -1)) {
+        for (int i = 0; i < x_row_idx.size(); ++i) {
+          if (likely(x_row_idx[i] != -1)) {
             y.adj()(i, j) += prev_vals.coeffRef(i, j);
           }
         }
@@ -388,14 +440,15 @@ inline void assign(
   stan::math::check_size_match("matrix[..., multi] assign", "left hand side",
                                assign_cols, name, y.cols());
   std::unordered_set<int> x_set;
+  auto y_eval = y.eval();
   x_set.reserve(assign_cols);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int j = assign_cols - 1; j >= 0; --j) {
     if (likely(x_set.insert(idxs.tail_.head_.ns_[j]).second)) {
-      stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
+      stan::math::check_range("matrix[..., multi] assign col", name, x.cols(),
                               idxs.tail_.head_.ns_[j]);
       assign(x.col(idxs.tail_.head_.ns_[j] - 1), index_list(idxs.head_),
-             y.col(j), name, depth + 1);
+             y_eval.col(j), name, depth + 1);
     }
   }
 }

@@ -134,6 +134,27 @@ TEST_F(VarAssign, multi_vec) { test_multi_vec<Eigen::VectorXd>(); }
 TEST_F(VarAssign, multi_rowvec) { test_multi_vec<Eigen::RowVectorXd>(); }
 
 template <typename Vec>
+void test_multi_alias_vec() {
+  using stan::math::sum;
+  using stan::math::var_value;
+  using stan::model::test::check_vector_adjs;
+  using stan::model::test::generate_linear_var_vector;
+  auto x = generate_linear_var_vector<Eigen::VectorXd>(5, 1);
+  Eigen::VectorXd x_val = x.val();
+  vector<int> ns{1, 1, 2, 3};
+  assign(x, index_list(index_multi(ns)), x.segment(1, 4));
+  EXPECT_MATRIX_EQ(x.val().segment(0, 3), x_val.segment(2, 3));
+  EXPECT_MATRIX_EQ(x.val().segment(3, 2), x_val.segment(3, 2));
+  stan::math::sum(x).grad();
+  EXPECT_MATRIX_EQ(x.val(), x_val);
+  Eigen::VectorXd exp_adj(5);
+  exp_adj << 0, 0, 1, 2, 2;
+  EXPECT_MATRIX_EQ(x.adj(), exp_adj);
+}
+
+TEST_F(VarAssign, multi_alias_vec) { test_multi_alias_vec<Eigen::VectorXd>(); }
+
+template <typename Vec>
 void test_omni_vec() {
   using stan::math::sum;
   using stan::math::var_value;
@@ -478,14 +499,7 @@ TEST_F(VarAssign, multi_matrix) {
   auto x = generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
   auto y = generate_linear_var_matrix(7, 5, 10);
-  std::vector<int> row_idx;
-  row_idx.push_back(3);
-  row_idx.push_back(4);
-  row_idx.push_back(1);
-  row_idx.push_back(4);
-  row_idx.push_back(1);
-  row_idx.push_back(4);
-  row_idx.push_back(5);
+  std::vector<int> row_idx{3, 4, 1, 4, 1, 4, 5};
   stan::arena_t<std::vector<int>> x_idx;
   stan::arena_t<std::vector<int>> y_idx;
   // Need to remove duplicates for cases like {2, 3, 2, 2}
@@ -516,6 +530,28 @@ TEST_F(VarAssign, multi_matrix) {
   test_throw_out_of_range(x, index_list(index_multi(row_idx)), y);
 }
 
+TEST_F(VarAssign, multi_alias_matrix) {
+  using stan::math::sum;
+  using stan::math::var_value;
+  using stan::model::test::check_matrix_adjs;
+  using stan::model::test::generate_linear_var_matrix;
+
+  auto x = generate_linear_var_matrix(5, 5);
+  Eigen::MatrixXd x_val = x.val();
+  std::vector<int> row_idx{2, 3, 1, 3};
+  assign(x, index_list(index_multi(row_idx)), x.block(0, 0, 4, 5));
+  Eigen::MatrixXd x_val_tmp = x_val;
+  x_val_tmp.row(0) = x_val.row(2);
+  x_val_tmp.row(1) = x_val.row(0);
+  x_val_tmp.row(2) = x_val.row(3);
+  EXPECT_MATRIX_EQ(x.val(), x_val_tmp);
+  sum(x).grad();
+  Eigen::MatrixXd exp_adj = Eigen::MatrixXd::Ones(5, 5);
+  exp_adj.row(1) = Eigen::RowVectorXd::Zero(5);
+  exp_adj.row(3) = Eigen::RowVectorXd::Constant(5, 2);
+  EXPECT_MATRIX_EQ(x.adj(), exp_adj);
+}
+
 TEST_F(VarAssign, uni_multi_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
@@ -528,11 +564,7 @@ TEST_F(VarAssign, uni_multi_matrix) {
   Eigen::MatrixXd x_val = x.val();
   auto y = generate_linear_var_vector<Eigen::RowVectorXd>(4, 10);
 
-  vector<int> ns;
-  ns.push_back(4);
-  ns.push_back(1);
-  ns.push_back(3);
-  ns.push_back(3);
+  vector<int> ns{4, 1, 3, 3};
   assign(x, index_list(index_uni(3), index_multi(ns)), y);
   EXPECT_FLOAT_EQ(y.val()(0), x.val()(2, 3));
   EXPECT_FLOAT_EQ(y.val()(1), x.val()(2, 0));
@@ -553,6 +585,31 @@ TEST_F(VarAssign, uni_multi_matrix) {
   test_throw_invalid_arg(x, index_list(index_uni(3), index_multi(ns)), y);
 }
 
+TEST_F(VarAssign, uni_multi_alias_matrix) {
+  using stan::math::sum;
+  using stan::math::var_value;
+  using stan::model::test::check_matrix_adjs;
+  using stan::model::test::check_vector_adjs;
+  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::generate_linear_var_vector;
+
+  auto x = generate_linear_var_matrix(5, 5);
+  Eigen::MatrixXd x_val = x.val();
+  vector<int> ns{1, 1, 2, 3};
+  assign(x, index_list(index_uni(3), index_multi(ns)), x.row(2).segment(0, 4));
+  Eigen::MatrixXd x_val_tmp = x_val;
+  x_val_tmp(2, 0) = 7;
+  x_val_tmp(2, 1) = 12;
+  x_val_tmp(2, 2) = 17;
+  EXPECT_MATRIX_EQ(x.val(), x_val_tmp);
+  sum(x).grad();
+  EXPECT_MATRIX_EQ(x.val(), x_val);
+  Eigen::MatrixXd exp_adj = Eigen::MatrixXd::Ones(5, 5);
+  exp_adj(2, 0) = 0;
+  exp_adj(2, 3) = 2;
+  EXPECT_MATRIX_EQ(x.adj(), exp_adj);
+}
+
 TEST_F(VarAssign, multi_multi_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
@@ -562,23 +619,9 @@ TEST_F(VarAssign, multi_multi_matrix) {
   auto x = generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
   auto y = generate_linear_var_matrix(7, 7, 10);
-  std::vector<int> row_idx;
-  std::vector<int> col_idx;
-  row_idx.push_back(3);
-  row_idx.push_back(4);
-  row_idx.push_back(1);
-  row_idx.push_back(4);
-  row_idx.push_back(1);
-  row_idx.push_back(4);
-  row_idx.push_back(5);
+  std::vector<int> row_idx{3, 4, 1, 4, 1, 4, 5};
+  std::vector<int> col_idx{1, 4, 4, 3, 2, 1, 5};
 
-  col_idx.push_back(1);
-  col_idx.push_back(4);
-  col_idx.push_back(4);
-  col_idx.push_back(3);
-  col_idx.push_back(2);
-  col_idx.push_back(1);
-  col_idx.push_back(5);
   stan::arena_t<std::vector<std::array<int, 2>>> x_idx;
   stan::arena_t<std::vector<std::array<int, 2>>> y_idx;
   // Need to remove duplicates for cases like {2, 3, 2, 2}
@@ -624,6 +667,106 @@ TEST_F(VarAssign, multi_multi_matrix) {
   row_idx.push_back(22);
   test_throw_out_of_range(
       x, index_list(index_multi(row_idx), index_multi(col_idx)), y);
+}
+
+TEST_F(VarAssign, multi_multi_alias_matrix) {
+  using stan::math::sum;
+  using stan::math::var_value;
+  using stan::model::test::check_matrix_adjs;
+  using stan::model::test::generate_linear_var_matrix;
+
+  auto x = generate_linear_var_matrix(5, 5);
+  Eigen::MatrixXd x_val = x.val();
+  std::vector<int> row_idx{1, 2, 2, 4};
+  std::vector<int> col_idx{1, 2, 2, 3};
+  assign(x, index_list(index_multi(row_idx), index_multi(col_idx)),
+         x.block(0, 0, 4, 4).eval());
+  Eigen::MatrixXd x_val_tmp(5, 5);
+  /* clang-format off */
+  x_val_tmp << 0, 10, 15, 15, 20,
+               2, 12, 17, 16, 21,
+               2,  7, 12, 17, 22,
+               3, 13, 18, 18, 23,
+               4,  9, 14, 19, 24;
+  /* clang-format on */
+
+  EXPECT_MATRIX_EQ(x.val(), x_val_tmp);
+  sum(x).grad();
+  EXPECT_MATRIX_EQ(x.val(), x_val);
+  Eigen::MatrixXd exp_adj(5, 5);
+  /* clang-format off */
+  exp_adj << 1, 0, 1, 2, 1,
+             0, 0, 0, 1, 1,
+             2, 1, 2, 2, 1,
+             1, 0, 1, 2, 1,
+             1, 1, 1, 1, 1;
+  /* clang-format on */
+  EXPECT_MATRIX_EQ(x.adj(), exp_adj);
+}
+
+TEST_F(VarAssign, minmax_multi_matrix) {
+  using stan::math::sum;
+  using stan::math::var_value;
+  using stan::model::test::check_matrix_adjs;
+  using stan::model::test::check_vector_adjs;
+  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::generate_linear_var_vector;
+
+  auto x = generate_linear_var_matrix(5, 5);
+  Eigen::MatrixXd x_val = x.val();
+  auto y = generate_linear_var_matrix(3, 4, 25);
+
+  vector<int> ns{4, 1, 3, 3};
+  assign(x, index_list(index_min_max(1, 3), index_multi(ns)), y);
+  Eigen::MatrixXd x_val_tmp = x_val;
+  x_val_tmp.col(0).segment(0, 3) = y.val().col(1);
+  x_val_tmp.col(2).segment(0, 3) = y.val().col(3);
+  x_val_tmp.col(3).segment(0, 3) = y.val().col(0);
+  EXPECT_MATRIX_EQ(x.val(), x_val_tmp);
+  sum(x).grad();
+  EXPECT_MATRIX_EQ(x.val(), x_val);
+  auto check_i_x = [](int i) { return i < 3; };
+  auto check_j_x = [](int j) { return (j == 0 || j == 2 || j == 3); };
+  check_matrix_adjs(check_i_x, check_j_x, x, "lhs", 0);
+  auto check_i_y = [](int i) { return true; };
+  auto check_j_y = [](int j) { return j != 2; };
+  check_matrix_adjs(check_i_y, check_j_y, y, "lhs", 1);
+  ns[ns.size() - 1] = 0;
+  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)),
+                          y);
+  ns[ns.size() - 1] = 20;
+  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)),
+                          y);
+  ns.push_back(2);
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_multi(ns)),
+                         y);
+}
+
+TEST_F(VarAssign, minmax_multi_alias_matrix) {
+  using stan::math::sum;
+  using stan::math::var_value;
+  using stan::model::test::check_matrix_adjs;
+  using stan::model::test::check_vector_adjs;
+  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::generate_linear_var_vector;
+
+  auto x = generate_linear_var_matrix(5, 5);
+  Eigen::MatrixXd x_val = x.val();
+
+  vector<int> ns{4, 1, 3, 3};
+  assign(x, index_list(index_min_max(1, 3), index_multi(ns)),
+         x.block(0, 0, 3, 4));
+  Eigen::MatrixXd x_val_tmp = x_val;
+  x_val_tmp.col(0).segment(0, 3) = x_val.col(1).segment(0, 3);
+  x_val_tmp.col(2).segment(0, 3) = x_val.col(3).segment(0, 3);
+  x_val_tmp.col(3).segment(0, 3) = x_val.col(0).segment(0, 3);
+  EXPECT_MATRIX_EQ(x.val(), x_val_tmp);
+  sum(x).grad();
+  EXPECT_MATRIX_EQ(x.val(), x_val);
+  Eigen::MatrixXd exp_adj = Eigen::MatrixXd::Ones(5, 5);
+  exp_adj.col(1).segment(0, 3).array() = 2;
+  exp_adj.col(2).segment(0, 3).array() = 0;
+  EXPECT_MATRIX_EQ(x.adj(), exp_adj);
 }
 
 // omni
