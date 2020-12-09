@@ -149,7 +149,11 @@ test-headers: $(HEADER_TESTS)
 ##
 .PHONY: %.hpp-test
 
+ifneq ($(OS),Windows_NT)
 test/test-models/good/%.hpp-test : O = 0
+else
+test/test-models/good/%.hpp-test : O = 1
+endif
 test/test-models/good/%.hpp-test : test/test-models/good/%.hpp test/test-model-main.cpp
 	$(COMPILE.cpp) -o $(DEV_NULL) -include $^
 
