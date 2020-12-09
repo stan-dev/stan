@@ -20,9 +20,9 @@ def runTests(String testPath, Boolean separateMakeStep=true) {
 def runTestsWin(String testPath, Boolean separateMakeStep=true) {
     withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
        if (separateMakeStep) {
-           bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+           bat "runTests.py -j8 ${testPath} --make-only"
        }
-       try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
+       try { bat "runTests.py -j8 ${testPath}" }
        finally { junit 'test/**/*.xml' }
     }
 }
