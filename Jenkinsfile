@@ -86,7 +86,7 @@ pipeline {
                     sh """#!/bin/bash
                         set -x
                         git checkout -b ${branchName()}
-                        clang-format --version
+                        dlang-format --version
                         find src -name '*.hpp' -o -name '*.cpp' | xargs -n20 -P${env.PARALLEL} clang-format -i
                         if [[ `git diff` != "" ]]; then
                             git config --global user.email "mc.stanislaw@gmail.com"
