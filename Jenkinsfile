@@ -86,7 +86,7 @@ pipeline {
                     sh """#!/bin/bash
                         set -x
                         git checkout -b ${branchName()}
-                        dlang-format --version
+                        clang-format --version
                         find src -name '*.hpp' -o -name '*.cpp' | xargs -n20 -P${env.PARALLEL} clang-format -i
                         if [[ `git diff` != "" ]]; then
                             git config --global user.email "mc.stanislaw@gmail.com"
@@ -169,7 +169,7 @@ pipeline {
 
                     retry(3) { checkout scm }
                     sh 'git clean -xffd'
-
+                    sh 'exit 1'
                     // These paths will be passed to git diff
                     // If there are changes to them, CI/CD will continue else skip
                     def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
