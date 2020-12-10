@@ -256,7 +256,7 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Integration Windows') {
-                    agent { label 'windows' }
+                    agent { label 'windows-ec2' }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
