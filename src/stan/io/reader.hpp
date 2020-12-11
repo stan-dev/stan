@@ -39,16 +39,16 @@ class reader {
   size_t pos_{0};
   size_t int_pos_{0};
 
-  inline T& scalar_ptr() { return data_r_.coeffRef(pos_); }
+  inline T &scalar_ptr() { return data_r_.coeffRef(pos_); }
 
-  inline T& scalar_ptr_increment(size_t m) {
+  inline T &scalar_ptr_increment(size_t m) {
     pos_ += m;
     return data_r_.coeffRef(pos_ - m);
   }
 
-  inline int& int_ptr() { return data_i_.coeffRef(int_pos_); }
+  inline int &int_ptr() { return data_i_.coeffRef(int_pos_); }
 
-  inline int& int_ptr_increment(size_t m) {
+  inline int &int_ptr_increment(size_t m) {
     int_pos_ += m;
     return data_i_.coeffRef(int_pos_ - m);
   }
