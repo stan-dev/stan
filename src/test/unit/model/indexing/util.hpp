@@ -59,7 +59,7 @@ void check_std_vec_adjs(Check1&& i_check, Check2&& j_check, const StdVecVar& x,
  */
 template <typename Check1, typename Check2, typename VarMat>
 void check_matrix_adjs(Check1&& i_check, Check2&& j_check, const VarMat& x,
-                       const char* name, int check_val = 1) {
+                       const char* name = "", int check_val = 1) {
   for (Eigen::Index j = 0; j < x.cols(); ++j) {
     for (Eigen::Index i = 0; i < x.rows(); ++i) {
       if (i_check(i)) {
