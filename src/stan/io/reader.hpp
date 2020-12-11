@@ -34,21 +34,21 @@ namespace io {
 template <typename T>
 class reader {
  private:
-  Eigen::Map<const Eigen::Matrix<T, -1, 1>> data_r_;
-  Eigen::Map<const Eigen::Matrix<int, -1, 1>> data_i_;
+  Eigen::Map<Eigen::Matrix<T, -1, 1>> data_r_;
+  Eigen::Map<Eigen::Matrix<int, -1, 1>> data_i_;
   size_t pos_{0};
   size_t int_pos_{0};
 
-  inline const T &scalar_ptr() { return data_r_.coeffRef(pos_); }
+  inline T& scalar_ptr() { return data_r_.coeffRef(pos_); }
 
-  inline const T &scalar_ptr_increment(size_t m) {
+  inline T& scalar_ptr_increment(size_t m) {
     pos_ += m;
     return data_r_.coeffRef(pos_ - m);
   }
 
-  inline const int &int_ptr() { return data_i_.coeffRef(int_pos_); }
+  inline int& int_ptr() { return data_i_.coeffRef(int_pos_); }
 
-  inline const int &int_ptr_increment(size_t m) {
+  inline int& int_ptr_increment(size_t m) {
     int_pos_ += m;
     return data_i_.coeffRef(int_pos_ - m);
   }
@@ -58,9 +58,9 @@ class reader {
   using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
   using row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
 
-  using map_matrix_t = Eigen::Map<const matrix_t>;
-  using map_vector_t = Eigen::Map<const vector_t>;
-  using map_row_vector_t = Eigen::Map<const row_vector_t>;
+  using map_matrix_t = Eigen::Map<matrix_t>;
+  using map_vector_t = Eigen::Map<vector_t>;
+  using map_row_vector_t = Eigen::Map<row_vector_t>;
 
   using var_matrix_t = stan::math::var_value<
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>;
