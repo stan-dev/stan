@@ -13,7 +13,7 @@
 
 #define STAN_MAJOR 2
 #define STAN_MINOR 25
-#define STAN_PATCH 999
+#define STAN_PATCH 9999
 
 namespace stan {
 
