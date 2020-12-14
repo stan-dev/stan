@@ -23,5 +23,8 @@ Describe what you expect the output to be. Knowing the correct behavior is also 
 #### Additional Information:
 Provide any additional information here.
 
-#### Current Version:
-v2.24.0
+#### Current Stable Version:
+v2.25.0
+
+#### Current Development Version:
+v2.25.999
