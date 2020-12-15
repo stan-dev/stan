@@ -349,7 +349,8 @@ inline void assign(Mat1&& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2,
-          require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+          require_dense_dynamic_t<Mat1>* = nullptr,
+          require_matrix_t<Mat2>* = nullptr>
 inline void assign(Mat1&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
@@ -381,7 +382,8 @@ inline void assign(Mat1&& x,
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2,
-          require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+          require_dense_dynamic_t<Mat1>* = nullptr,
+          require_matrix_t<Mat2>* = nullptr>
 inline void assign(Mat1&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
