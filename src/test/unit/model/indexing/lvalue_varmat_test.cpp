@@ -127,6 +127,15 @@ void test_multi_vec() {
   check_vector_adjs(check_i_x, x, "lhs", 0);
   auto check_i_y = [](int i) { return i > 0; };
   check_vector_adjs(check_i_y, y, "rhs", 1);
+  ns[2] = 20;
+  test_throw_out_of_range(x, index_list(index_multi(ns)), y);
+  ns[2] = 0;
+  test_throw_out_of_range(x, index_list(index_multi(ns)), y);
+  ns.push_back(2);
+  test_throw_invalid_arg(x, index_list(index_multi(ns)), y);
+  ns.pop_back();
+  test_throw_invalid_arg(x, index_list(index_multi(ns)), generate_linear_var_vector<Vec>(4));
+  test_throw_invalid_arg(x, index_list(index_multi(ns)), generate_linear_var_vector<Vec>(2));
 }
 
 TEST_F(VarAssign, multi_vec) { test_multi_vec<Eigen::VectorXd>(); }
@@ -175,6 +184,8 @@ void test_omni_vec() {
   auto check_i = [](int i) { return true; };
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(5));
+  test_throw_invalid_arg(x, index_list(index_omni()), generate_linear_var_vector<Vec>(4));
+  test_throw_invalid_arg(x, index_list(index_omni()), generate_linear_var_vector<Vec>(6));
 }
 
 TEST_F(VarAssign, omni_vec) { test_omni_vec<Eigen::VectorXd>(); }
@@ -200,6 +211,9 @@ void test_min_vec() {
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(3));
   test_throw_out_of_range(x, index_list(index_min(0)), y);
+  test_throw_out_of_range(x, index_list(index_min(6)), y);
+  test_throw_invalid_arg(x, index_list(index_min(3)), generate_linear_var_vector<Vec>(4));
+  test_throw_invalid_arg(x, index_list(index_min(3)), generate_linear_var_vector<Vec>(2));
 }
 TEST_F(VarAssign, min_vec) { test_min_vec<Eigen::VectorXd>(); }
 
@@ -223,6 +237,10 @@ void test_max_vec() {
   auto check_i = [](int i) { return i > 1; };
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(2));
+  test_throw_out_of_range(x, index_list(index_max(0)), y);
+  test_throw_out_of_range(x, index_list(index_max(6)), y);
+  test_throw_invalid_arg(x, index_list(index_max(2)), generate_linear_var_vector<Vec>(3));
+  test_throw_invalid_arg(x, index_list(index_max(2)), generate_linear_var_vector<Vec>(1));
 }
 
 TEST_F(VarAssign, max_vec) { test_max_vec<Eigen::VectorXd>(); }
@@ -251,7 +269,9 @@ void test_positive_minmax_varvector() {
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(4));
   test_throw_out_of_range(x, index_list(index_min_max(0, 3)), y);
-  test_throw_out_of_range(x, index_list(index_min_max(1, 8)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(1, 6)), y);
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 4)), generate_linear_var_vector<Vec>(5));
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 4)), generate_linear_var_vector<Vec>(3));
 }
 
 TEST_F(VarAssign, positive_minmax_vec) {
@@ -284,7 +304,9 @@ void test_negative_minmax_varvector() {
   check_vector_adjs(check_i, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Vec::Ones(4));
   test_throw_out_of_range(x, index_list(index_min_max(3, 0)), y);
-  test_throw_out_of_range(x, index_list(index_min_max(8, 1)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(6, 1)), y);
+  test_throw_invalid_arg(x, index_list(index_min_max(4, 1)), generate_linear_var_vector<Vec>(5));
+  test_throw_invalid_arg(x, index_list(index_min_max(4, 1)), generate_linear_var_vector<Vec>(3));
 }
 
 TEST_F(VarAssign, negative_minmax_vec) {
@@ -382,6 +404,8 @@ TEST_F(VarAssign, uni_matrix) {
   auto check_j = [](int j) { return true; };
   check_matrix_adjs(check_i, check_j, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Eigen::RowVectorXd::Ones(5));
+  test_throw_out_of_range(x, index_list(index_uni(0)), y);
+  test_throw_out_of_range(x, index_list(index_uni(6)), y);
 }
 
 TEST_F(VarAssign, uni_uni_matrix) {
@@ -437,7 +461,7 @@ TEST_F(VarAssign, multi_uni_matrix) {
 
   ns[ns.size() - 1] = 0;
   test_throw_out_of_range(x, index_list(index_multi(ns), index_uni(3)), y);
-  ns[ns.size() - 1] = 20;
+  ns[ns.size() - 1] = 4;
   test_throw_out_of_range(x, index_list(index_multi(ns), index_uni(3)), y);
   ns.push_back(2);
   test_throw_invalid_arg(x, index_list(index_multi(ns), index_uni(3)), y);
@@ -460,6 +484,11 @@ TEST_F(VarAssign, omni_uni_matrix) {
   auto check_j = [](int j) { return j == 0; };
   check_matrix_adjs(check_i, check_j, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), Eigen::VectorXd::Ones(5));
+  test_throw_out_of_range(x, index_list(index_omni(), index_uni(0)), y);
+  test_throw_out_of_range(x, index_list(index_omni(), index_uni(6)), y);
+  test_throw_invalid_arg(x, index_list(index_omni(), index_uni(1)), generate_linear_var_vector<Eigen::VectorXd>(6));
+  test_throw_invalid_arg(x, index_list(index_omni(), index_uni(1)), generate_linear_var_vector<Eigen::VectorXd>(4));
+
 }
 
 TEST_F(VarAssign, minmax_uni_matrix) {
@@ -486,7 +515,9 @@ TEST_F(VarAssign, minmax_uni_matrix) {
   test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_uni(0)), y);
   test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_uni(5)), y);
   test_throw_out_of_range(x, index_list(index_min_max(0, 1), index_uni(4)), y);
-  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_uni(4)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(2, 4), index_uni(4)), y);
+  test_throw_invalid_arg(x, index_list(index_min_max(2, 3), index_uni(4)), generate_linear_var_vector(1, 10));
+  test_throw_invalid_arg(x, index_list(index_min_max(2, 3), index_uni(4)), generate_linear_var_vector(3, 10));
 }
 
 // multi
@@ -524,10 +555,15 @@ TEST_F(VarAssign, multi_matrix) {
   auto check_i_y = [](int i) { return (i == 0 || i > 3); };
   auto check_j_y = [](int j) { return true; };
   check_matrix_adjs(check_i_y, check_j_y, y, "rhs", 1);
-  row_idx.pop_back();
-  test_throw_invalid_arg(x, index_list(index_multi(row_idx)), y);
-  row_idx.push_back(22);
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx)), generate_linear_var_matrix(8, 5, 10));
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx)), generate_linear_var_matrix(6, 5, 10));
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx)), generate_linear_var_matrix(7, 4, 10));
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx)), generate_linear_var_matrix(7, 6, 10));
+  row_idx[3] = 20;
   test_throw_out_of_range(x, index_list(index_multi(row_idx)), y);
+  row_idx[3] = 2;
+  row_idx.push_back(2);
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx)), y);
 }
 
 TEST_F(VarAssign, multi_alias_matrix) {
@@ -577,6 +613,10 @@ TEST_F(VarAssign, uni_multi_matrix) {
   check_matrix_adjs(check_i_x, check_j_x, x, "lhs", 0);
   auto check_i_y = [](int i) { return i != 2; };
   check_vector_adjs(check_i_y, y, "rhs", 1);
+  test_throw_invalid_arg(x, index_list(index_uni(3), index_multi(ns)), generate_linear_var_vector<Eigen::RowVectorXd>(5, 10));
+  test_throw_invalid_arg(x, index_list(index_uni(3), index_multi(ns)), generate_linear_var_vector<Eigen::RowVectorXd>(3, 10));
+  test_throw_out_of_range(x, index_list(index_uni(0), index_multi(ns)), y);
+  test_throw_out_of_range(x, index_list(index_uni(6), index_multi(ns)), y);
   ns[ns.size() - 1] = 0;
   test_throw_out_of_range(x, index_list(index_uni(3), index_multi(ns)), y);
   ns[ns.size() - 1] = 20;
@@ -652,21 +692,22 @@ TEST_F(VarAssign, multi_multi_matrix) {
   auto check_i_y = [](int i) { return (i == 0 || i > 3); };
   auto check_j_y = [](int j) { return (j > 1); };
   check_matrix_adjs(check_i_y, check_j_y, y, "rhs", 1);
+
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx), index_multi(col_idx)), generate_linear_var_matrix(6, 7, 10));
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx), index_multi(col_idx)), generate_linear_var_matrix(8, 7, 10));
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx), index_multi(col_idx)), generate_linear_var_matrix(7, 6, 10));
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx), index_multi(col_idx)), generate_linear_var_matrix(7, 8, 10));
   col_idx.pop_back();
-  test_throw_invalid_arg(
-      x, index_list(index_multi(row_idx), index_multi(col_idx)), y);
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx), index_multi(col_idx)), y);
   col_idx.push_back(22);
-  test_throw_out_of_range(
-      x, index_list(index_multi(row_idx), index_multi(col_idx)), y);
+  test_throw_out_of_range(x, index_list(index_multi(row_idx), index_multi(col_idx)), y);
   col_idx.pop_back();
   col_idx.push_back(5);
 
   row_idx.pop_back();
-  test_throw_invalid_arg(
-      x, index_list(index_multi(row_idx), index_multi(col_idx)), y);
+  test_throw_invalid_arg(x, index_list(index_multi(row_idx), index_multi(col_idx)), y);
   row_idx.push_back(22);
-  test_throw_out_of_range(
-      x, index_list(index_multi(row_idx), index_multi(col_idx)), y);
+  test_throw_out_of_range(x, index_list(index_multi(row_idx), index_multi(col_idx)), y);
 }
 
 TEST_F(VarAssign, multi_multi_alias_matrix) {
@@ -731,15 +772,19 @@ TEST_F(VarAssign, minmax_multi_matrix) {
   auto check_i_y = [](int i) { return true; };
   auto check_j_y = [](int j) { return j != 2; };
   check_matrix_adjs(check_i_y, check_j_y, y, "lhs", 1);
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_multi(ns)), generate_linear_var_matrix(3, 5, 10));
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_multi(ns)), generate_linear_var_matrix(3, 3, 10));
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_multi(ns)), generate_linear_var_matrix(4, 4, 10));
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_multi(ns)), generate_linear_var_matrix(2, 4, 10));
+
+  test_throw_out_of_range(x, index_list(index_min_max(0, 3), index_multi(ns)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(1, 6), index_multi(ns)), y);
   ns[ns.size() - 1] = 0;
-  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)),
-                          y);
+  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)), y);
   ns[ns.size() - 1] = 20;
-  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)),
-                          y);
+  test_throw_out_of_range(x, index_list(index_min_max(1, 3), index_multi(ns)), y);
   ns.push_back(2);
-  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_multi(ns)),
-                         y);
+  test_throw_invalid_arg(x, index_list(index_min_max(1, 3), index_multi(ns)), y);
 }
 
 TEST_F(VarAssign, minmax_multi_alias_matrix) {
@@ -785,6 +830,10 @@ TEST_F(VarAssign, omni_matrix) {
   EXPECT_MATRIX_EQ(x.val(), y.val());
   EXPECT_MATRIX_EQ(x.adj(), Eigen::MatrixXd::Ones(5, 5));
   EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Ones(5, 5));
+  test_throw_invalid_arg(x, index_list(index_omni()), generate_linear_var_matrix(5, 6, 10));
+  test_throw_invalid_arg(x, index_list(index_omni()), generate_linear_var_matrix(5, 4, 10));
+  test_throw_invalid_arg(x, index_list(index_omni()), generate_linear_var_matrix(6, 5, 10));
+  test_throw_invalid_arg(x, index_list(index_omni()), generate_linear_var_matrix(4, 5, 10));
 }
 
 TEST_F(VarAssign, omni_omni_matrix) {
@@ -802,6 +851,10 @@ TEST_F(VarAssign, omni_omni_matrix) {
   EXPECT_MATRIX_EQ(x.val(), y.val());
   EXPECT_MATRIX_EQ(x.adj(), Eigen::MatrixXd::Ones(5, 5));
   EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Ones(5, 5));
+  test_throw_invalid_arg(x, index_list(index_omni(), index_omni()), generate_linear_var_matrix(5, 6, 10));
+  test_throw_invalid_arg(x, index_list(index_omni(), index_omni()), generate_linear_var_matrix(5, 4, 10));
+  test_throw_invalid_arg(x, index_list(index_omni(), index_omni()), generate_linear_var_matrix(6, 5, 10));
+  test_throw_invalid_arg(x, index_list(index_omni(), index_omni()), generate_linear_var_matrix(4, 5, 10));
 }
 
 TEST_F(VarAssign, uni_omni_matrix) {
@@ -823,6 +876,11 @@ TEST_F(VarAssign, uni_omni_matrix) {
   auto check_j = [](int j) { return true; };
   check_matrix_adjs(check_i, check_j, x, "lhs");
   EXPECT_MATRIX_EQ(y.adj(), Eigen::RowVectorXd::Ones(5));
+
+  test_throw_invalid_arg(x, index_list(index_uni(1), index_omni()), generate_linear_var_vector<Eigen::RowVectorXd>(4, 10));
+  test_throw_invalid_arg(x, index_list(index_uni(1), index_omni()), generate_linear_var_vector<Eigen::RowVectorXd>(6, 10));
+  test_throw_out_of_range(x, index_list(index_uni(0), index_omni()), y);
+  test_throw_out_of_range(x, index_list(index_uni(6), index_omni()), y);
 }
 
 // min
@@ -844,9 +902,10 @@ TEST_F(VarAssign, min_matrix) {
   auto check_j_x = [](int j) { return true; };
   check_matrix_adjs(check_i_x, check_j_x, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Ones(2, 4));
+  test_throw_out_of_range(x, index_list(index_min(0)), y);
+  test_throw_out_of_range(x, index_list(index_min(4)), y);
   test_throw_invalid_arg(x, index_list(index_min(1)), y);
   var_value<MatrixXd> z(MatrixXd::Ones(1, 2));
-  test_throw_invalid_arg(x, index_list(index_min(1)), z);
   test_throw_invalid_arg(x, index_list(index_min(2)), z);
 }
 
@@ -867,6 +926,13 @@ TEST_F(VarAssign, minmax_min_matrix) {
   auto check_j = [](int j) { return j > 0; };
   check_matrix_adjs(check_i, check_j, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), MatrixXd::Ones(2, 3));
+
+  test_throw_out_of_range(x, index_list(index_min_max(0, 3), index_min(2)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(2, 4), index_min(2)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_min(0)), y);
+  test_throw_out_of_range(x, index_list(index_min_max(2, 3), index_min(5)), y);
+  test_throw_invalid_arg(x, index_list(index_min_max(2, 3), index_min(2)),  generate_linear_var_matrix(1, 3, 10));
+  test_throw_invalid_arg(x, index_list(index_min_max(2, 3), index_min(2)),  generate_linear_var_matrix(2, 5, 10));
 }
 
 // max
@@ -888,10 +954,12 @@ TEST_F(VarAssign, max_matrix) {
   auto check_j_x = [](int j) { return true; };
   check_matrix_adjs(check_i_x, check_j_x, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Ones(2, 4));
+  test_throw_out_of_range(x, index_list(index_max(0)), y);
+  test_throw_out_of_range(x, index_list(index_max(4)), y);
   test_throw_invalid_arg(x, index_list(index_max(1)), y);
-  var_value<MatrixXd> z(MatrixXd::Ones(1, 4));
+  var_value<MatrixXd> z(MatrixXd::Ones(1, 2));
   test_throw_invalid_arg(x, index_list(index_max(2)), z);
-  test_throw_invalid_arg(x, index_list(index_max(3)), z);
+
 }
 
 TEST_F(VarAssign, min_max_matrix) {
@@ -913,10 +981,15 @@ TEST_F(VarAssign, min_max_matrix) {
   auto check_j_x = [](int j) { return j < 2; };
   check_matrix_adjs(check_i_x, check_j_x, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Ones(2, 2));
+  test_throw_out_of_range(x, index_list(index_min(0), index_max(2)), y);
+  test_throw_out_of_range(x, index_list(index_min(5), index_max(2)), y);
+  test_throw_out_of_range(x, index_list(index_min(2), index_max(0)), y);
+  test_throw_out_of_range(x, index_list(index_min(2), index_max(5)), y);
   test_throw_invalid_arg(x, index_list(index_min(2), index_max(1)), y);
   var_value<MatrixXd> z(MatrixXd::Ones(1, 4));
   test_throw_invalid_arg(x, index_list(index_min(2), index_max(2)), z);
   test_throw_invalid_arg(x, index_list(index_min(2), index_max(3)), z);
+
 }
 
 // minmax
@@ -945,6 +1018,10 @@ TEST_F(VarAssign, positive_minmax_matrix) {
     auto check_j = [i](int jj) { return true; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
+    test_throw_out_of_range(x, index_list(index_min_max(0, ii)), x_rev.block(0, 0, ii, 5));
+    test_throw_out_of_range(x, index_list(index_min_max(1, ii + x.rows())), x_rev.block(0, 0, ii, 5));
+    test_throw_invalid_arg(x, index_list(index_min_max(2, ii)), x_rev.block(0, 0, ii, 5));
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii)), x_rev.block(0, 0, ii, 4));
     stan::math::recover_memory();
   }
 }
@@ -974,6 +1051,10 @@ TEST_F(VarAssign, negative_minmax_matrix) {
     auto check_j = [i](int jj) { return true; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
+    test_throw_out_of_range(x, index_list(index_min_max(ii, 0)), x_rev.block(0, 0, ii, 5));
+    test_throw_out_of_range(x, index_list(index_min_max(ii + x.rows(), 1)), x_rev.block(0, 0, ii, 5));
+    test_throw_invalid_arg(x, index_list(index_min_max(ii, 2)), x_rev.block(0, 0, ii, 5));
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii)), x_rev.block(0, 0, ii, 4));
     stan::math::recover_memory();
   }
 }
@@ -1004,6 +1085,16 @@ TEST_F(VarAssign, positive_minmax_positive_minmax_matrix) {
     auto check_j = [i](int jj) { return jj <= i; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
+    test_throw_out_of_range(x, index_list(index_min_max(0, ii), index_min_max(1, ii)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(1, ii), index_min_max(0, ii)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(1, x.rows() + 1), index_min_max(1, ii)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(1, ii), index_min_max(1, x.rows() + 1)), x_rev.block(0, 0, ii, ii));
+    // We don't want to go out of bounds when making the eigen block.
+    auto ii_range_high = ii == 5 ? 4 : ii + 1;
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii), index_min_max(1, ii)), x_rev.block(0, 0, ii - 1, ii));
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii), index_min_max(1, ii)), x_rev.block(0, 0, ii_range_high, ii));
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii), index_min_max(1, ii)), x_rev.block(0, 0, ii, ii - 1));
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii), index_min_max(1, ii)), x_rev.block(0, 0, ii, ii_range_high));
     stan::math::recover_memory();
   }
 }
@@ -1034,6 +1125,16 @@ TEST_F(VarAssign, positive_minmax_negative_minmax_matrix) {
     auto check_j = [i](int jj) { return jj <= i; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
+    test_throw_out_of_range(x, index_list(index_min_max(0, ii), index_min_max(ii, 1)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(1, ii), index_min_max(ii, 0)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(1, x.rows() + 1), index_min_max(1, ii)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(1, ii), index_min_max(1, x.rows() + 1)), x_rev.block(0, 0, ii, ii));
+    // We don't want to go out of bounds when making the eigen block.
+    auto ii_range_high = ii == 5 ? 4 : ii + 1;
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii), index_min_max(ii, 1)), x_rev.block(0, 0, ii - 1, ii));
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii), index_min_max(ii, 1)), x_rev.block(0, 0, ii_range_high, ii));
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii), index_min_max(ii, 1)), x_rev.block(0, 0, ii, ii - 1));
+    test_throw_invalid_arg(x, index_list(index_min_max(1, ii), index_min_max(ii, 1)), x_rev.block(0, 0, ii, ii_range_high));
     stan::math::recover_memory();
   }
 }
@@ -1064,6 +1165,16 @@ TEST_F(VarAssign, negative_minmax_positive_minmax_matrix) {
     auto check_j = [i](int jj) { return jj <= i; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
+    test_throw_out_of_range(x, index_list(index_min_max(ii, 0), index_min_max(1, ii)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(ii, 1), index_min_max(0, ii)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(x.rows() + 1, 1), index_min_max(1, ii)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(ii, 1), index_min_max(1, x.rows() + 1)), x_rev.block(0, 0, ii, ii));
+    // We don't want to go out of bounds when making the eigen block.
+    auto ii_range_high = ii == 5 ? 4 : ii + 1;
+    test_throw_invalid_arg(x, index_list(index_min_max(ii, 1), index_min_max(1, ii)), x_rev.block(0, 0, ii - 1, ii));
+    test_throw_invalid_arg(x, index_list(index_min_max(ii, 1), index_min_max(1, ii)), x_rev.block(0, 0, ii_range_high, ii));
+    test_throw_invalid_arg(x, index_list(index_min_max(ii, 1), index_min_max(1, ii)), x_rev.block(0, 0, ii, ii - 1));
+    test_throw_invalid_arg(x, index_list(index_min_max(ii, 1), index_min_max(1, ii)), x_rev.block(0, 0, ii, ii_range_high));
     stan::math::recover_memory();
   }
 }
@@ -1094,6 +1205,16 @@ TEST_F(VarAssign, negative_minmax_negative_minmax_matrix) {
     auto check_j = [i](int jj) { return jj <= i; };
     check_matrix_adjs(check_i, check_j, x, "lhs", 0);
     check_matrix_adjs(check_i, check_j, x_rev, "rhs", 1);
+    test_throw_out_of_range(x, index_list(index_min_max(ii, 0), index_min_max(ii, 1)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(ii, 1), index_min_max(ii, 0)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(x.rows() + 1, 1), index_min_max(ii, 1)), x_rev.block(0, 0, ii, ii));
+    test_throw_out_of_range(x, index_list(index_min_max(ii, 1), index_min_max(x.rows() + 1, 1)), x_rev.block(0, 0, ii, ii));
+    // We don't want to go out of bounds when making the eigen block.
+    auto ii_range_high = ii == 5 ? 4 : ii + 1;
+    test_throw_invalid_arg(x, index_list(index_min_max(ii, 1), index_min_max(ii, 1)), x_rev.block(0, 0, ii - 1, ii));
+    test_throw_invalid_arg(x, index_list(index_min_max(ii, 1), index_min_max(ii, 1)), x_rev.block(0, 0, ii_range_high, ii));
+    test_throw_invalid_arg(x, index_list(index_min_max(ii, 1), index_min_max(ii, 1)), x_rev.block(0, 0, ii, ii - 1));
+    test_throw_invalid_arg(x, index_list(index_min_max(ii, 1), index_min_max(ii, 1)), x_rev.block(0, 0, ii, ii_range_high));
     stan::math::recover_memory();
   }
 }
@@ -1118,8 +1239,11 @@ TEST_F(VarAssign, uni_minmax_matrix) {
   check_matrix_adjs(check_i, check_j, x, "lhs", 0);
   EXPECT_MATRIX_EQ(y.adj(), Eigen::RowVectorXd::Ones(3));
   test_throw_out_of_range(x, index_list(index_uni(0), index_min_max(2, 4)), y);
-  test_throw_out_of_range(x, index_list(index_uni(7), index_min_max(2, 4)), y);
+  test_throw_out_of_range(x, index_list(index_uni(6), index_min_max(2, 4)), y);
   test_throw_out_of_range(x, index_list(index_uni(2), index_min_max(0, 2)), y);
+  test_throw_out_of_range(x, index_list(index_uni(2), index_min_max(1, 6)), y);
+  test_throw_invalid_arg(x, index_list(index_uni(2), index_min_max(2, 4)), generate_linear_var_vector<Eigen::RowVectorXd>(2, 10));
+  test_throw_invalid_arg(x, index_list(index_uni(2), index_min_max(2, 4)), generate_linear_var_vector<Eigen::RowVectorXd>(4, 10));
 }
 
 // nil only shows up as a single index

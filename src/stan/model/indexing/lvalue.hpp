@@ -207,9 +207,9 @@ template <typename Vec1, typename Vec2,
 inline void assign(Vec1&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const Vec2& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("vector[min] assign", name, x.size(),
+  stan::math::check_range("vector[max] assign", name, x.size(),
                           idxs.head_.max_);
-  stan::math::check_size_match("vector[min] assign", "left hand side",
+  stan::math::check_size_match("vector[max] assign", "left hand side",
                                idxs.head_.max_, name, y.size());
   x.head(idxs.head_.max_) = y;
 }
@@ -235,7 +235,7 @@ template <typename Vec1, typename Vec2,
 inline void assign(Vec1&& x,
                    const cons_index_list<index_omni, nil_index_list>& idxs,
                    Vec2&& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_size_match("vector[min] assign", "left hand side", x.size(),
+  stan::math::check_size_match("vector[omni] assign", "left hand side", x.size(),
                                name, y.size());
   x = std::forward<Vec2>(y);
 }
