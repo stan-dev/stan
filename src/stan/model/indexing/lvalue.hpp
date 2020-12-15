@@ -235,8 +235,8 @@ template <typename Vec1, typename Vec2,
 inline void assign(Vec1&& x,
                    const cons_index_list<index_omni, nil_index_list>& idxs,
                    Vec2&& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_size_match("vector[omni] assign", "left hand side", x.size(),
-                               name, y.size());
+  stan::math::check_size_match("vector[omni] assign", "left hand side",
+                               x.size(), name, y.size());
   x = std::forward<Vec2>(y);
 }
 
