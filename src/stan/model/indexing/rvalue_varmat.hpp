@@ -309,9 +309,9 @@ inline auto rvalue(
   const auto ret_rows = rvalue_index_size(idxs.head_, x.rows());
   const auto ret_cols = idxs.tail_.head_.ns_.size();
   arena_t<value_type_t<VarMat>> x_ret_val(ret_rows, ret_cols);
-  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
-  arena_t<Eigen::Matrix<int, -1, 1>> col_idx(
-      multi_map(idxs.tail_.head_.ns_.data(), ret_cols).eval());
+  using eigen_idx = Eigen::Matrix<int, -1, 1>;
+  using multi_map = Eigen::Map<const eigen_idx>;
+  arena_t<eigen_idx> col_idx(multi_map(idxs.tail_.head_.ns_.data(), ret_cols).eval());
   for (int j = 0; j < ret_cols; ++j) {
     math::check_range("matrix[..., multi] col index", name, x.cols(),
                       col_idx[j]);
@@ -324,8 +324,10 @@ inline auto rvalue(
   stan::math::reverse_pass_callback(
       [head = idxs.head_, x, x_ret, col_idx, name, depth]() mutable {
         for (size_t j = 0; j < col_idx.size(); ++j) {
-          x.adj().col(col_idx[j])
-              += rvalue(x_ret.adj().col(j), index_list(head), name, depth + 1);
+          for (size_t i = 0; i < x_ret.rows(); ++i) {
+            const int n = rvalue_at(i, head) - 1;
+            x.adj().coeffRef(n, col_idx[j]) += x_ret.adj().coeffRef(i, j);
+          }
         }
       });
   return x_ret;

@@ -129,7 +129,8 @@ inline T rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing vector.
  */
-template <typename EigVec, require_vector_t<EigVec>* = nullptr>
+template <typename EigVec, require_vector_t<EigVec>* = nullptr,
+ require_not_std_vector_t<EigVec>* = nullptr>
 inline auto rvalue(EigVec&& v,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -179,8 +180,9 @@ inline plain_type_t<Vec> rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing vector.
  */
-template <typename EigVec, require_vector_t<EigVec>* = nullptr>
-inline auto rvalue(EigVec&& v,
+template <typename Vec, require_vector_t<Vec>* = nullptr,
+require_not_std_vector_t<Vec>* = nullptr>
+inline auto rvalue(Vec&& v,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("vector[min_max] min indexing", name, v.size(),
@@ -210,7 +212,8 @@ inline auto rvalue(EigVec&& v,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename Vec, require_vector_t<Vec>* = nullptr>
+template <typename Vec, require_vector_t<Vec>* = nullptr,
+require_not_std_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -231,7 +234,8 @@ inline auto rvalue(Vec&& x,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename Vec, require_vector_t<Vec>* = nullptr>
+template <typename Vec, require_vector_t<Vec>* = nullptr,
+  require_not_std_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {

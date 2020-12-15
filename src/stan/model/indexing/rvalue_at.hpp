@@ -67,7 +67,11 @@ inline constexpr int rvalue_at(int n, const index_max& idx) { return n + 1; }
  * @return Underlying index position (from 1).
  */
 inline constexpr int rvalue_at(int n, const index_min_max& idx) {
-  return idx.min_ + n;
+  if (idx.min_ < idx.max_) {
+    return idx.min_ + n;
+  } else {
+    return idx.max_ + n;
+  }
 }
 
 }  // namespace model
