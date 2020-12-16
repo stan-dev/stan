@@ -1517,15 +1517,8 @@ inline void assign_tester(T1&& x,
   stan::math::recover_memory();
 }
 
-}
-}
-}
-
-
-TEST_F(VarAssign, all_types) {
-  using stan::model::test::generate_linear_matrix;
-  using stan::model::test::assign_tester;
-  Eigen::MatrixXd x = generate_linear_matrix(4, 4);
+template <typename T1>
+inline void all_assign_tests(T1&& x) {
   std::vector<int> multi_ns{1, 2, 3};
   // uni
   // uni uni is explicitly tested and would otherwise need a specialization
@@ -1575,5 +1568,19 @@ TEST_F(VarAssign, all_types) {
   assign_tester(x, index_list(index_min(2), index_min_max(1, 2)));
   assign_tester(x, index_list(index_max(2), index_min_max(1, 2)));
   assign_tester(x, index_list(index_min_max(1, 2), index_min_max(1, 2)));
+}
+}
+}
+}
 
+
+TEST_F(VarAssign, all_types) {
+  using stan::model::test::generate_linear_matrix;
+  using stan::model::test::all_assign_tests;
+  Eigen::MatrixXd x = generate_linear_matrix(4, 4);
+  all_assign_tests(x);
+  Eigen::MatrixXd x_wide = generate_linear_matrix(5, 6);
+  all_assign_tests(x_wide);
+  Eigen::MatrixXd x_long = generate_linear_matrix(7, 4);
+  all_assign_tests(x_long);
 }
