@@ -1593,14 +1593,13 @@ inline void all_assign_tests(T1&& x) {
   assign_tester(x, index_list(index_max(2), index_min_max(1, 2)));
   assign_tester(x, index_list(index_min_max(1, 2), index_min_max(1, 2)));
 }
-}
-}
-}
-
+}  // namespace test
+}  // namespace model
+}  // namespace stan
 
 TEST_F(VarAssign, all_types) {
-  using stan::model::test::generate_linear_matrix;
   using stan::model::test::all_assign_tests;
+  using stan::model::test::generate_linear_matrix;
   Eigen::MatrixXd x = generate_linear_matrix(4, 4);
   all_assign_tests(x);
   Eigen::MatrixXd x_wide = generate_linear_matrix(5, 6);
