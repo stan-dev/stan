@@ -333,7 +333,7 @@ inline void assign(Mat1&& x,
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2,
-          require_all_var_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+          require_all_var_matrix_t<Mat1, Mat2>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<index_multi,

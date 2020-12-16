@@ -1389,3 +1389,191 @@ TEST_F(VarAssign, nil_matrix) {
   EXPECT_MATRIX_EQ(x.adj(), Eigen::MatrixXd::Ones(5, 5));
   EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Ones(5, 5));
 }
+
+namespace stan {
+namespace model {
+namespace test {
+
+template <typename T>
+inline auto convert_to_multi(const index_multi& idx, const T& x, bool row_or_col) {
+  return idx;
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_omni& idx, const T& x, bool row_or_col) {
+  std::vector<int> v;
+  if (row_or_col) {
+    for (int i = 1; i <= x.cols(); ++i) {
+      v.push_back(i);
+    }
+  } else {
+    for (int i = 1; i <= x.rows(); ++i) {
+      v.push_back(i);
+    }
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_min& idx, const T& x, bool row_or_col) {
+  std::vector<int> v;
+  if (row_or_col) {
+    for (int i = idx.min_; i <= x.cols(); ++i) {
+      v.push_back(i);
+    }
+  } else {
+    for (int i = idx.min_; i <= x.rows(); ++i) {
+      v.push_back(i);
+    }
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_max& idx, const T& x, bool row_or_col) {
+  std::vector<int> v;
+  for (int i = 1; i <= idx.max_; ++i) {
+    v.push_back(i);
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_min_max& idx, const T& x, bool row_or_col) {
+  std::vector<int> v;
+  for (int i = idx.min_; i <= idx.max_; ++i) {
+    v.push_back(i);
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_uni& idx, const T& x, bool row_or_col) {
+  std::vector<int> v;
+  v.push_back(idx.n_);
+  return index_multi(v);
+}
+
+template <typename T1, typename I1, typename I2>
+inline void assign_tester(T1&& x,
+       const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idxs, const char* name = "ANON", int depth = 0) {
+  using stan::math::var_value;
+  using stan::model::test::generate_linear_matrix;
+  auto multi_multi_idx = index_list(convert_to_multi(idxs.head_, x, false), convert_to_multi(idxs.tail_.head_, x, true));
+  var_value<std::decay_t<T1>> x1(x);
+  var_value<std::decay_t<T1>> x2(x);
+  Eigen::MatrixXd y_val = generate_linear_matrix(multi_multi_idx.head_.ns_.size(), multi_multi_idx.tail_.head_.ns_.size(), 10);
+  var_value<Eigen::MatrixXd> y(y_val);
+  assign(x1, idxs, y);
+  assign(x2, multi_multi_idx, y);
+  EXPECT_MATRIX_EQ(x1.val(), x2.val());
+  stan::math::sum(stan::math::add(x1, x2)).grad();
+  // Since this just moves the pointer x1 omni is diff than multi
+  if (!std::is_same<I1, index_omni>::value && !std::is_same<I2, index_omni>::value) {
+    EXPECT_MATRIX_EQ(x1.val(), x2.val());
+    EXPECT_MATRIX_EQ(x1.adj(), x2.adj());
+    EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Constant(y.rows(), y.cols(), 2).eval());
+  }
+  stan::math::recover_memory();
+}
+
+template <typename T1, typename I1>
+inline void assign_tester(T1&& x,
+       const cons_index_list<I1, cons_index_list<index_uni, nil_index_list>>& idxs, const char* name = "ANON", int depth = 0) {
+  using stan::math::var_value;
+  using stan::model::test::generate_linear_vector;
+  auto multi_multi_idx = index_list(convert_to_multi(idxs.head_, x, false), convert_to_multi(idxs.tail_.head_, x, true));
+  var_value<std::decay_t<T1>> x1(x);
+  var_value<std::decay_t<T1>> x2(x);
+  Eigen::VectorXd y_val = generate_linear_vector<Eigen::VectorXd>(multi_multi_idx.head_.ns_.size(), 10);
+  var_value<Eigen::VectorXd> y(y_val);
+  assign(x1, idxs, y);
+  assign(x2, multi_multi_idx, y);
+  EXPECT_MATRIX_EQ(x1.val(), x2.val());
+  stan::math::sum(stan::math::add(x1, x2)).grad();
+  EXPECT_MATRIX_EQ(x1.val(), x2.val());
+  EXPECT_MATRIX_EQ(x1.adj(), x2.adj());
+  EXPECT_MATRIX_EQ(y.adj(), Eigen::VectorXd::Constant(y.size(), 2).eval());
+  stan::math::recover_memory();
+}
+
+template <typename T1, typename I2>
+inline void assign_tester(T1&& x,
+       const cons_index_list<index_uni, cons_index_list<I2, nil_index_list>>& idxs, const char* name = "ANON", int depth = 0) {
+  using stan::math::var_value;
+  using stan::model::test::generate_linear_vector;
+  auto multi_multi_idx = index_list(convert_to_multi(idxs.head_, x, false), convert_to_multi(idxs.tail_.head_, x, true));
+  var_value<std::decay_t<T1>> x1(x);
+  var_value<std::decay_t<T1>> x2(x);
+  Eigen::RowVectorXd y_val = generate_linear_vector<Eigen::RowVectorXd>(multi_multi_idx.tail_.head_.ns_.size(), 10);
+  var_value<Eigen::RowVectorXd> y(y_val);
+  assign(x1, idxs, y);
+  assign(x2, multi_multi_idx, y);
+  EXPECT_MATRIX_EQ(x1.val(), x2.val());
+  stan::math::sum(stan::math::add(x1, x2)).grad();
+  EXPECT_MATRIX_EQ(x1.val(), x2.val());
+  EXPECT_MATRIX_EQ(x1.adj(), x2.adj());
+  EXPECT_MATRIX_EQ(y.adj(), Eigen::RowVectorXd::Constant(y.size(), 2).eval());
+  stan::math::recover_memory();
+}
+
+}
+}
+}
+
+
+TEST_F(VarAssign, all_types) {
+  using stan::model::test::generate_linear_matrix;
+  using stan::model::test::assign_tester;
+  Eigen::MatrixXd x = generate_linear_matrix(4, 4);
+  std::vector<int> multi_ns{1, 2, 3};
+  // uni
+  // uni uni is explicitly tested and would otherwise need a specialization
+  // assign_tester(x, index_list(index_uni(1), index_uni(1)));
+  assign_tester(x, index_list(index_multi(multi_ns), index_uni(1)));
+  assign_tester(x, index_list(index_omni(), index_uni(1)));
+  assign_tester(x, index_list(index_min(2), index_uni(1)));
+  assign_tester(x, index_list(index_max(2), index_uni(1)));
+  assign_tester(x, index_list(index_min_max(1, 2), index_uni(1)));
+
+  // multi
+  assign_tester(x, index_list(index_uni(1), index_multi(multi_ns)));
+  assign_tester(x, index_list(index_multi(multi_ns), index_multi(multi_ns)));
+  assign_tester(x, index_list(index_omni(), index_multi(multi_ns)));
+  assign_tester(x, index_list(index_min(2), index_multi(multi_ns)));
+  assign_tester(x, index_list(index_max(2), index_multi(multi_ns)));
+  assign_tester(x, index_list(index_min_max(1, 2), index_multi(multi_ns)));
+
+  // omni
+  assign_tester(x, index_list(index_uni(1), index_omni()));
+  assign_tester(x, index_list(index_multi(multi_ns), index_omni()));
+  assign_tester(x, index_list(index_omni(), index_omni()));
+  assign_tester(x, index_list(index_min(2), index_omni()));
+  assign_tester(x, index_list(index_max(2), index_omni()));
+  assign_tester(x, index_list(index_min_max(1, 2), index_omni()));
+
+  // min
+  assign_tester(x, index_list(index_uni(1), index_min(2)));
+  assign_tester(x, index_list(index_multi(multi_ns), index_min(2)));
+  assign_tester(x, index_list(index_omni(), index_min(2)));
+  assign_tester(x, index_list(index_min(2), index_min(2)));
+  assign_tester(x, index_list(index_max(2), index_min(2)));
+  assign_tester(x, index_list(index_min_max(1, 2), index_min(2)));
+
+  // max
+  assign_tester(x, index_list(index_uni(1), index_max(2)));
+  assign_tester(x, index_list(index_multi(multi_ns), index_max(2)));
+  assign_tester(x, index_list(index_omni(), index_max(2)));
+  assign_tester(x, index_list(index_min(2), index_max(2)));
+  assign_tester(x, index_list(index_max(2), index_max(2)));
+  assign_tester(x, index_list(index_min_max(1, 2), index_max(2)));
+
+  // min_max
+  assign_tester(x, index_list(index_uni(1), index_min_max(1, 2)));
+  assign_tester(x, index_list(index_multi(multi_ns), index_min_max(1, 2)));
+  assign_tester(x, index_list(index_omni(), index_min_max(1, 2)));
+  assign_tester(x, index_list(index_min(2), index_min_max(1, 2)));
+  assign_tester(x, index_list(index_max(2), index_min_max(1, 2)));
+  assign_tester(x, index_list(index_min_max(1, 2), index_min_max(1, 2)));
+
+}
