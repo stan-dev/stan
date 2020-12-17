@@ -1104,3 +1104,93 @@ TEST_F(RvalueRev, nil_matrix) {
   EXPECT_MATRIX_EQ(x.adj(), Eigen::MatrixXd::Ones(5, 5));
   EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Ones(5, 5));
 }
+
+
+namespace stan {
+namespace model {
+namespace test {
+
+template <typename T1, typename I1, typename I2>
+inline void rvalue_tester(
+    T1&& x,
+    const cons_index_list<I1, cons_index_list<I2, nil_index_list>>& idxs,
+    const char* name = "ANON", int depth = 0) {
+  using stan::math::var_value;
+  var_value<std::decay_t<T1>> x1(x);
+  var_value<std::decay_t<T1>> x2(x);
+  plain_type_t<decltype(rvalue(x1, idxs))> y1 = rvalue(x1, idxs);
+  plain_type_t<decltype(rvalue(x2, idxs))> y2 = rvalue(x2, idxs);
+  EXPECT_MATRIX_EQ(x1.val(), x2.val());
+  EXPECT_MATRIX_EQ(y1.val(), y2.val());
+  stan::math::sum(stan::math::add(y1, y2)).grad();
+  EXPECT_MATRIX_EQ(x1.adj(), x2.adj());
+  EXPECT_MATRIX_EQ(y1.adj(), y2.adj());
+  stan::math::recover_memory();
+}
+
+template <typename T1>
+inline void all_rvalue_tests(T1&& x) {
+  std::vector<int> multi_ns{1, 2, 3};
+  // uni
+  // uni uni is explicitly tested and would otherwise need a specialization
+  // rvalue_tester(x, index_list(index_uni(1), index_uni(1)));
+  rvalue_tester(x, index_list(index_multi(multi_ns), index_uni(1)));
+  rvalue_tester(x, index_list(index_omni(), index_uni(1)));
+  rvalue_tester(x, index_list(index_min(2), index_uni(1)));
+  rvalue_tester(x, index_list(index_max(2), index_uni(1)));
+  rvalue_tester(x, index_list(index_min_max(1, 2), index_uni(1)));
+
+  // multi
+  rvalue_tester(x, index_list(index_uni(1), index_multi(multi_ns)));
+  rvalue_tester(x, index_list(index_multi(multi_ns), index_multi(multi_ns)));
+  rvalue_tester(x, index_list(index_omni(), index_multi(multi_ns)));
+  rvalue_tester(x, index_list(index_min(2), index_multi(multi_ns)));
+  rvalue_tester(x, index_list(index_max(2), index_multi(multi_ns)));
+  rvalue_tester(x, index_list(index_min_max(1, 2), index_multi(multi_ns)));
+
+  // omni
+  rvalue_tester(x, index_list(index_uni(1), index_omni()));
+  rvalue_tester(x, index_list(index_multi(multi_ns), index_omni()));
+  rvalue_tester(x, index_list(index_omni(), index_omni()));
+  rvalue_tester(x, index_list(index_min(2), index_omni()));
+  rvalue_tester(x, index_list(index_max(2), index_omni()));
+  rvalue_tester(x, index_list(index_min_max(1, 2), index_omni()));
+
+  // min
+  rvalue_tester(x, index_list(index_uni(1), index_min(2)));
+  rvalue_tester(x, index_list(index_multi(multi_ns), index_min(2)));
+  rvalue_tester(x, index_list(index_omni(), index_min(2)));
+  rvalue_tester(x, index_list(index_min(2), index_min(2)));
+  rvalue_tester(x, index_list(index_max(2), index_min(2)));
+  rvalue_tester(x, index_list(index_min_max(1, 2), index_min(2)));
+
+  // max
+  rvalue_tester(x, index_list(index_uni(1), index_max(2)));
+  rvalue_tester(x, index_list(index_multi(multi_ns), index_max(2)));
+  rvalue_tester(x, index_list(index_omni(), index_max(2)));
+  rvalue_tester(x, index_list(index_min(2), index_max(2)));
+  rvalue_tester(x, index_list(index_max(2), index_max(2)));
+  rvalue_tester(x, index_list(index_min_max(1, 2), index_max(2)));
+
+  // min_max
+  rvalue_tester(x, index_list(index_uni(1), index_min_max(1, 2)));
+  rvalue_tester(x, index_list(index_multi(multi_ns), index_min_max(1, 2)));
+  rvalue_tester(x, index_list(index_omni(), index_min_max(1, 2)));
+  rvalue_tester(x, index_list(index_min(2), index_min_max(1, 2)));
+  rvalue_tester(x, index_list(index_max(2), index_min_max(1, 2)));
+  rvalue_tester(x, index_list(index_min_max(1, 2), index_min_max(1, 2)));
+}
+}  // namespace test
+}  // namespace model
+}  // namespace stan
+
+TEST_F(RvalueRev, all_types) {
+  using stan::model::test::all_rvalue_tests;
+  using stan::model::test::generate_linear_matrix;
+  Eigen::MatrixXd x = generate_linear_matrix(4, 4);
+  all_rvalue_tests(x);
+  Eigen::MatrixXd x_wide = generate_linear_matrix(5, 6);
+  all_rvalue_tests(x_wide);
+  Eigen::MatrixXd x_long = generate_linear_matrix(7, 4);
+  all_rvalue_tests(x_long);
+}

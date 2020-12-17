@@ -40,13 +40,13 @@ namespace model {
  */
 
 /**
- * Return the result of indexing an eigen expression type without
+ * Return the result of indexing an `var_value` type without
  * taking a subset.
  *
- * Types:  expr[omni] : plain_type
+ * Types:  var_value<expr>[omni] : plain_type
  *
- * @tparam T A type that is an expression.
- * @param[in] x an eigen expression.
+ * @tparam T A `var_value` with an inner type that is an expression.
+ * @param[in] x a var value.
  * @param[in] idxs Index consisting of one omni-index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
@@ -60,6 +60,19 @@ inline auto rvalue(T&& x,
   return x.eval();
 }
 
+/**
+ * Return the result of indexing a `var_value` type without
+ * taking a subset.
+ *
+ * Types:  var_value<plain_type>[omni] : var_value<plain_type>
+ *
+ * @tparam T A `var_value` with an inner type that is an expression.
+ * @param[in] x a var value.
+ * @param[in] idxs Index consisting of one omni-index.
+ * @param[in] name String form of expression being evaluated.
+ * @param[in] depth Depth of indexing dimension.
+ * @return Result of evaluating the expression.
+ */
 template <typename T, require_var_matrix_t<T>* = nullptr,
           require_plain_type_t<value_type_t<T>>* = nullptr>
 inline auto rvalue(T&& x,
@@ -86,20 +99,23 @@ template <typename Vec, require_var_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_multi, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
+  using stan::math::check_range;
+  using stan::math::var_value;
+  using stan::math::reverse_pass_callback;
+  using stan::math::arena_allocator;
+  using arena_std_vec = std::vector<int, arena_allocator<int>>;
   const Eigen::Index x_size = x.size();
   const auto ret_size = idxs.head_.ns_.size();
   arena_t<value_type_t<Vec>> x_ret_vals(ret_size);
-  using idx_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
-  arena_t<Eigen::Matrix<int, -1, 1>> row_idx(
-      idx_map(idxs.head_.ns_.data(), ret_size).eval());
+  arena_std_vec row_idx(idxs.head_.ns_.begin(), idxs.head_.ns_.end());
   for (int i = 0; i < ret_size; ++i) {
-    stan::math::check_range("vector[multi] assign range", name, x_size,
+    check_range("vector[multi] assign range", name, x_size,
                             row_idx[i]);
     --row_idx[i];
     x_ret_vals.coeffRef(i) = x.vi_->val_.coeffRef(row_idx[i]);
   }
-  stan::math::var_value<plain_type_t<value_type_t<Vec>>> x_ret(x_ret_vals);
-  stan::math::reverse_pass_callback([x, x_ret, row_idx]() mutable {
+  var_value<plain_type_t<value_type_t<Vec>>> x_ret(x_ret_vals);
+  reverse_pass_callback([x, x_ret, row_idx]() mutable {
     for (Eigen::Index i = 0; i < row_idx.size(); ++i) {
       x.adj().coeffRef(row_idx[i]) += x_ret.adj().coeffRef(i);
     }
@@ -108,7 +124,7 @@ inline auto rvalue(Vec&& x,
 }
 
 /**
- * Return the specified Eigen matrix at the specified multi index.
+ * Return the specified matrix at the specified multi index.
  *
  * Types:  matrix[multi] = matrix
  *
@@ -125,18 +141,21 @@ template <typename VarMat, require_var_matrix_t<VarMat>* = nullptr,
 inline auto rvalue(VarMat&& x,
                    const cons_index_list<index_multi, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
+  using stan::math::check_range;
+  using stan::math::var_value;
+  using stan::math::reverse_pass_callback;
+  using stan::math::arena_allocator;
+  using arena_std_vec = std::vector<int, arena_allocator<int>>;
   const auto ret_rows = idxs.head_.ns_.size();
   arena_t<value_type_t<VarMat>> x_ret_vals(ret_rows, x.cols());
-  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
-  arena_t<Eigen::Matrix<int, -1, 1>> row_idx(
-      multi_map(idxs.head_.ns_.data(), ret_rows).eval());
+  arena_std_vec row_idx(idxs.head_.ns_.begin(), idxs.head_.ns_.end());
   for (int i = 0; i < ret_rows; ++i) {
-    math::check_range("matrix[multi] subset range", name, x.rows(), row_idx[i]);
+    check_range("matrix[multi] subset range", name, x.rows(), row_idx[i]);
     --row_idx[i];
     x_ret_vals.row(i) = x.val().row(row_idx[i]);
   }
-  stan::math::var_value<plain_type_t<value_type_t<VarMat>>> x_ret(x_ret_vals);
-  stan::math::reverse_pass_callback([x, x_ret, row_idx]() mutable {
+  var_value<plain_type_t<value_type_t<VarMat>>> x_ret(x_ret_vals);
+  reverse_pass_callback([x, x_ret, row_idx]() mutable {
     for (Eigen::Index i = 0; i < row_idx.size(); ++i) {
       x.adj().row(row_idx[i]) += x_ret.adj().row(i);
     }
@@ -145,7 +164,7 @@ inline auto rvalue(VarMat&& x,
 }
 
 /**
- * Return a row of an Eigen matrix with possibly unordered cells.
+ * Return a row of a matrix with possibly unordered cells.
  *
  * Types:  matrix[uni, multi] = row vector
  *
@@ -156,29 +175,31 @@ inline auto rvalue(VarMat&& x,
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename VarMat, require_var_matrix_t<VarMat>* = nullptr,
-          require_eigen_dense_dynamic_t<value_type_t<VarMat>>* = nullptr>
+template <typename VarMat, require_var_dense_dynamic_t<VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& x,
     const cons_index_list<index_uni,
                           cons_index_list<index_multi, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[uni, multi] index range", name, x.rows(),
+  using stan::math::check_range;
+  using stan::math::var_value;
+  using stan::math::reverse_pass_callback;
+  using stan::math::arena_allocator;
+  using arena_std_vec = std::vector<int, arena_allocator<int>>;
+  check_range("matrix[uni, multi] index range", name, x.rows(),
                     idxs.head_.n_);
   const auto ret_size = idxs.tail_.head_.ns_.size();
   arena_t<Eigen::Matrix<double, 1, Eigen::Dynamic>> x_ret_vals(ret_size);
-  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
-  arena_t<Eigen::Matrix<int, -1, 1>> col_idx(
-      multi_map(idxs.tail_.head_.ns_.data(), ret_size).eval());
+  arena_std_vec col_idx(idxs.tail_.head_.ns_.begin(), idxs.tail_.head_.ns_.end());
   const int row_idx = idxs.head_.n_ - 1;
   for (int i = 0; i < ret_size; ++i) {
-    math::check_range("matrix[multi] subset range", name, x.cols(), col_idx[i]);
+    check_range("matrix[multi] subset range", name, x.cols(), col_idx[i]);
     --col_idx[i];
     x_ret_vals.coeffRef(i) = x.val().coeffRef(row_idx, col_idx[i]);
   }
-  stan::math::var_value<Eigen::Matrix<double, 1, Eigen::Dynamic>> x_ret(
+  var_value<Eigen::Matrix<double, 1, Eigen::Dynamic>> x_ret(
       x_ret_vals);
-  stan::math::reverse_pass_callback([x, x_ret, row_idx, col_idx]() mutable {
+  reverse_pass_callback([x, x_ret, row_idx, col_idx]() mutable {
     for (Eigen::Index i = 0; i < col_idx.size(); ++i) {
       x.adj().coeffRef(row_idx, col_idx[i]) += x_ret.adj().coeffRef(i);
     }
@@ -187,8 +208,8 @@ inline auto rvalue(
 }
 
 /**
- * Return a column of an Eigen matrix that is a possibly non-contiguous subset
- *  of the input Eigen matrix.
+ * Return a column of a matrix that is a possibly non-contiguous subset
+ *  of the input matrix.
  *
  * Types:  matrix[multi, uni] = vector
  *
@@ -199,30 +220,30 @@ inline auto rvalue(
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename VarMat, require_var_matrix_t<VarMat>* = nullptr,
-          require_eigen_dense_dynamic_t<value_type_t<VarMat>>* = nullptr>
+template <typename VarMat, require_var_dense_dynamic_t<VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& x,
     const cons_index_list<index_multi,
                           cons_index_list<index_uni, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
-  math::check_range("matrix[multi, uni] rvalue range", name, x.cols(),
+  using stan::math::check_range;
+  using stan::math::var_value;
+  using stan::math::reverse_pass_callback;
+  using stan::math::arena_allocator;
+  using arena_std_vec = std::vector<int, arena_allocator<int>>;
+  check_range("matrix[multi, uni] rvalue range", name, x.cols(),
                     idxs.tail_.head_.n_);
   const auto ret_size = idxs.head_.ns_.size();
   arena_t<Eigen::Matrix<double, Eigen::Dynamic, 1>> x_ret_val(ret_size);
-  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
-  arena_t<Eigen::Matrix<int, -1, 1>> row_idx(
-      multi_map(idxs.head_.ns_.data(), ret_size).eval());
+  arena_std_vec row_idx(idxs.head_.ns_.begin(), idxs.head_.ns_.end());
   const int col_idx = idxs.tail_.head_.n_ - 1;
   for (int i = 0; i < ret_size; ++i) {
-    math::check_range("matrix[multi, uni] rvalue range", name, x.rows(),
-                      row_idx[i]);
+    check_range("matrix[multi, uni] rvalue range", name, x.rows(), row_idx[i]);
     --row_idx[i];
     x_ret_val.coeffRef(i) = x.val().coeffRef(row_idx[i], col_idx);
   }
-  stan::math::var_value<Eigen::Matrix<double, Eigen::Dynamic, 1>> x_ret(
-      x_ret_val);
-  stan::math::reverse_pass_callback([x, x_ret, col_idx, row_idx]() mutable {
+  var_value<Eigen::Matrix<double, Eigen::Dynamic, 1>> x_ret(x_ret_val);
+  reverse_pass_callback([x, x_ret, col_idx, row_idx]() mutable {
     for (Eigen::Index i = 0; i < row_idx.size(); ++i) {
       x.adj().coeffRef(row_idx[i], col_idx) += x_ret.adj().coeffRef(i);
     }
@@ -231,54 +252,55 @@ inline auto rvalue(
 }
 
 /**
- * Return an Eigen matrix that is a possibly non-contiguous subset of the input
- *  Eigen matrix.
+ * Return a matrix that is a possibly non-contiguous subset of the input
+ *  matrix.
  *
  * Types:  matrix[multi, multi] = matrix
  *
- * @tparam VarMat `var_value` with inner an inner eigen matrix
+ * @tparam VarMat `var_value` with an inner eigen matrix
  * @param[in] x `var_value` to index.
- * @param[in] idxs Pair of multiple indexes.
+ * @param[in] idxs Pair of multi indexes.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename VarMat, require_var_matrix_t<VarMat>* = nullptr,
-          require_eigen_dense_dynamic_t<value_type_t<VarMat>>* = nullptr>
+template <typename VarMat, require_var_dense_dynamic_t<VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& x,
     const cons_index_list<index_multi,
                           cons_index_list<index_multi, nil_index_list>>& idxs,
     const char* name = "ANON", int depth = 0) {
+  using stan::math::check_range;
+  using stan::math::var_value;
+  using stan::math::reverse_pass_callback;
+  using stan::math::arena_allocator;
+  using arena_std_vec = std::vector<int, arena_allocator<int>>;
   const auto ret_rows = idxs.head_.ns_.size();
   const auto ret_cols = idxs.tail_.head_.ns_.size();
   const Eigen::Index x_rows = x.rows();
   const Eigen::Index x_cols = x.cols();
-  arena_t<value_type_t<VarMat>> x_ret_val(ret_rows, ret_cols);
-  using multi_map = Eigen::Map<const Eigen::Matrix<int, -1, 1>>;
-  arena_t<Eigen::Matrix<int, -1, 1>> row_idx(
-      multi_map(idxs.head_.ns_.data(), ret_rows).eval());
-  arena_t<Eigen::Matrix<int, -1, 1>> col_idx(
-      multi_map(idxs.tail_.head_.ns_.data(), ret_cols).eval());
+  arena_t<plain_type_t<value_type_t<VarMat>>> x_ret_val(ret_rows, ret_cols);
+  arena_std_vec row_idx(idxs.head_.ns_.begin(), idxs.head_.ns_.end());
+  arena_std_vec col_idx(idxs.tail_.head_.ns_.begin(), idxs.tail_.head_.ns_.end());
   // We only want to check these once
   for (int i = 0; i < ret_rows; ++i) {
-    math::check_range("matrix[multi,multi] row index", name, x_rows,
+    check_range("matrix[multi,multi] row index", name, x_rows,
                       row_idx[i]);
     --row_idx[i];
   }
   for (int j = 0; j < ret_cols; ++j) {
-    math::check_range("matrix[multi,multi] col index", name, x.cols(),
+    check_range("matrix[multi,multi] col index", name, x.cols(),
                       col_idx[j]);
     --col_idx[j];
     for (int i = 0; i < ret_rows; ++i) {
       x_ret_val.coeffRef(i, j) = x.val().coeff(row_idx[i], col_idx[j]);
     }
   }
-  stan::math::var_value<plain_type_t<value_type_t<VarMat>>> x_ret(x_ret_val);
-  stan::math::reverse_pass_callback([x, x_ret, col_idx, row_idx]() mutable {
+  var_value<plain_type_t<value_type_t<VarMat>>> x_ret(x_ret_val);
+  reverse_pass_callback([x, x_ret, col_idx, row_idx]() mutable {
     for (int j = 0; j < col_idx.size(); ++j) {
       for (int i = 0; i < row_idx.size(); ++i) {
-        x.adj().coeffRef(row_idx[i], col_idx[j]) += x_ret.adj().coeffRef(i, j);
+        x.adj().coeffRef(row_idx[i], col_idx[j]) += x_ret.adj().coeff(i, j);
       }
     }
   });
@@ -286,7 +308,7 @@ inline auto rvalue(
 }
 
 /**
- * Return an Eigen matrix of possibly unordered columns with each column
+ * Return a matrix of possibly unordered columns with each column
  *  range specified by another index.
  *
  * Types:  matrix[Idx, multi] = matrix
@@ -299,29 +321,30 @@ inline auto rvalue(
  * @return Result of indexing matrix.
  */
 template <typename VarMat, typename Idx,
-          require_var_matrix_t<VarMat>* = nullptr,
-          require_eigen_dense_dynamic_t<value_type_t<VarMat>>* = nullptr>
+          require_var_dense_dynamic_t<VarMat>* = nullptr>
 inline auto rvalue(
     VarMat&& x,
     const cons_index_list<Idx, cons_index_list<index_multi, nil_index_list>>&
         idxs,
     const char* name = "ANON", int depth = 0) {
+  using stan::math::check_range;
+  using stan::math::var_value;
+  using stan::math::reverse_pass_callback;
+  using stan::math::arena_allocator;
+  using arena_std_vec = std::vector<int, arena_allocator<int>>;
   const auto ret_rows = rvalue_index_size(idxs.head_, x.rows());
   const auto ret_cols = idxs.tail_.head_.ns_.size();
   arena_t<value_type_t<VarMat>> x_ret_val(ret_rows, ret_cols);
-  using eigen_idx = Eigen::Matrix<int, -1, 1>;
-  using multi_map = Eigen::Map<const eigen_idx>;
-  arena_t<eigen_idx> col_idx(multi_map(idxs.tail_.head_.ns_.data(), ret_cols).eval());
+  arena_std_vec col_idx(idxs.tail_.head_.ns_.begin(), idxs.tail_.head_.ns_.end());
   for (int j = 0; j < ret_cols; ++j) {
-    math::check_range("matrix[..., multi] col index", name, x.cols(),
-                      col_idx[j]);
+    check_range("matrix[..., multi] col index", name, x.cols(), col_idx[j]);
     --col_idx[j];
     x_ret_val.col(j)
         = rvalue(x.val().col(col_idx[j]), index_list(idxs.head_), name, depth + 1);
   }
-  stan::math::var_value<Eigen::Matrix<double, -1, -1>> x_ret(x_ret_val);
+  var_value<Eigen::Matrix<double, -1, -1>> x_ret(x_ret_val);
   // index_multi is the only index with dynamic memory so head is safe
-  stan::math::reverse_pass_callback(
+  reverse_pass_callback(
       [head = idxs.head_, x, x_ret, col_idx, name, depth]() mutable {
         for (size_t j = 0; j < col_idx.size(); ++j) {
           for (size_t i = 0; i < x_ret.rows(); ++i) {

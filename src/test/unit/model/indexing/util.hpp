@@ -162,6 +162,72 @@ auto generate_linear_var_vector(Eigen::Index n, double start = 0) {
   return ret_t(generate_linear_vector<Vec>(n, start));
 }
 
+template <typename T>
+inline auto convert_to_multi(const index_multi& idx, const T& x,
+                             bool row_or_col) {
+  return idx;
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_omni& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  if (row_or_col) {
+    for (int i = 1; i <= x.cols(); ++i) {
+      v.push_back(i);
+    }
+  } else {
+    for (int i = 1; i <= x.rows(); ++i) {
+      v.push_back(i);
+    }
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_min& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  if (row_or_col) {
+    for (int i = idx.min_; i <= x.cols(); ++i) {
+      v.push_back(i);
+    }
+  } else {
+    for (int i = idx.min_; i <= x.rows(); ++i) {
+      v.push_back(i);
+    }
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_max& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  for (int i = 1; i <= idx.max_; ++i) {
+    v.push_back(i);
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_min_max& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  for (int i = idx.min_; i <= idx.max_; ++i) {
+    v.push_back(i);
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_uni& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  v.push_back(idx.n_);
+  return index_multi(v);
+}
+
 }  // namespace test
 }  // namespace model
 }  // namespace stan
