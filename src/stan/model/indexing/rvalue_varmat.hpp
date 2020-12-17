@@ -40,48 +40,6 @@ namespace model {
  */
 
 /**
- * Return the result of indexing an `var_value` type without
- * taking a subset.
- *
- * Types:  var_value<expr>[omni] : plain_type
- *
- * @tparam T A `var_value` with an inner type that is an expression.
- * @param[in] x a var value.
- * @param[in] idxs Index consisting of one omni-index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of evaluating the expression.
- */
-template <typename T, require_var_matrix_t<T>* = nullptr,
-          require_not_plain_type_t<value_type_t<T>>* = nullptr>
-inline auto rvalue(T&& x,
-                   const cons_index_list<index_omni, nil_index_list>& idxs,
-                   const char* name = "ANON", int depth = 0) {
-  return x.eval();
-}
-
-/**
- * Return the result of indexing a `var_value` type without
- * taking a subset.
- *
- * Types:  var_value<plain_type>[omni] : var_value<plain_type>
- *
- * @tparam T A `var_value` with an inner type that is an expression.
- * @param[in] x a var value.
- * @param[in] idxs Index consisting of one omni-index.
- * @param[in] name String form of expression being evaluated.
- * @param[in] depth Depth of indexing dimension.
- * @return Result of evaluating the expression.
- */
-template <typename T, require_var_matrix_t<T>* = nullptr,
-          require_plain_type_t<value_type_t<T>>* = nullptr>
-inline auto rvalue(T&& x,
-                   const cons_index_list<index_omni, nil_index_list>& idxs,
-                   const char* name = "ANON", int depth = 0) {
-  return x;
-}
-
-/**
  * Return a non-contiguous subset of elements in a vector.
  *
  * Types:  vector[multi] = vector
