@@ -272,8 +272,10 @@ inline void assign(Mat1&& x,
                    const cons_index_list<index_multi, nil_index_list>& idxs,
                    const Mat2& y, const char* name = "ANON", int depth = 0) {
   const auto assign_rows = idxs.head_.ns_.size();
-  stan::math::check_size_match("matrix[multi,multi] assign", "left hand side",
+  stan::math::check_size_match("matrix[multi] assign", "left hand side rows",
                                assign_rows, name, y.rows());
+  stan::math::check_size_match("matrix[multi] assign", "left hand side columns",
+                               x.cols(), name, y.cols());
   arena_t<std::vector<int>> x_idx(assign_rows);
   arena_t<Eigen::Matrix<double, -1, -1>> prev_vals(assign_rows, x.cols());
   Eigen::Matrix<double, -1, -1> y_vals(assign_rows, x.cols());
@@ -331,7 +333,7 @@ inline void assign(Mat1&& x,
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2,
-          require_all_var_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+          require_all_var_matrix_t<Mat1, Mat2>* = nullptr>
 inline void assign(
     Mat1&& x,
     const cons_index_list<index_multi,
