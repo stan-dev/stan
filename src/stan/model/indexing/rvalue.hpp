@@ -110,7 +110,7 @@ inline T rvalue(
  * @return Result of indexing vector.
  */
 template <typename Vec, require_vector_t<Vec>* = nullptr,
- require_not_std_vector_t<Vec>* = nullptr>
+          require_not_std_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& v,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -161,7 +161,7 @@ inline plain_type_t<EigVec> rvalue(
  * @return Result of indexing vector.
  */
 template <typename Vec, require_vector_t<Vec>* = nullptr,
-require_not_std_vector_t<Vec>* = nullptr>
+          require_not_std_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& v,
                    const cons_index_list<index_min_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -193,7 +193,7 @@ inline auto rvalue(Vec&& v,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename Vec, require_vector_t<Vec>* = nullptr,
-require_not_std_vector_t<Vec>* = nullptr>
+          require_not_std_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -215,7 +215,7 @@ inline auto rvalue(Vec&& x,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename Vec, require_vector_t<Vec>* = nullptr,
-  require_not_std_vector_t<Vec>* = nullptr>
+          require_not_std_vector_t<Vec>* = nullptr>
 inline auto rvalue(Vec&& x,
                    const cons_index_list<index_max, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
@@ -230,7 +230,8 @@ inline auto rvalue(Vec&& x,
  *
  * Types:  matrix[uni] : row vector
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @param[in] x matrix.
  * @param[in] idxs Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -278,7 +279,8 @@ inline plain_type_t<EigMat> rvalue(
  *
  * Types:  matrix[min:N] = matrix
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @param[in] x matrix.
  * @param[in] idxs Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -300,7 +302,8 @@ inline auto rvalue(Mat&& x,
  *
  * Types:  matrix[:max] = matrix
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @param[in] x matrix
  * @param[in] idxs An indexing from the start of the container up to
  * the specified maximum index (inclusive).
@@ -322,7 +325,8 @@ inline auto rvalue(Mat&& x,
  *
  * Types:  matrix[min_max] = matrix
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @param[in] x Dense matrix
  * @param[in] idxs An indexing from the start of the container up to
  * the specified maximum index (inclusive).
@@ -343,7 +347,9 @@ inline auto rvalue(Mat&& x,
     return x.middleRows(idxs.head_.min_ - 1, row_size).eval();
   } else {
     const auto row_size = idxs.head_.min_ - idxs.head_.max_ + 1;
-    return internal::colwise_reverse(x.middleRows(idxs.head_.max_ - 1, row_size)).eval();
+    return internal::colwise_reverse(
+               x.middleRows(idxs.head_.max_ - 1, row_size))
+        .eval();
   }
 }
 
@@ -353,7 +359,8 @@ inline auto rvalue(Mat&& x,
  *
  * Types:  matrix[min_max, min_max] = matrix
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @param[in] x Eigen matrix.
  * @param[in] idxs Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
@@ -382,17 +389,19 @@ inline auto rvalue(
                  idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1))
           .eval();
     } else {
-      return internal::rowwise_reverse(x
-          .block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1,
-                 idxs.head_.max_ - (idxs.head_.min_ - 1),
-                 idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1))).eval();
+      return internal::rowwise_reverse(
+                 x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1,
+                         idxs.head_.max_ - (idxs.head_.min_ - 1),
+                         idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1)))
+          .eval();
     }
   } else {
     if (idxs.tail_.head_.is_ascending()) {
-      return internal::colwise_reverse(x
-          .block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1,
-                 idxs.head_.min_ - (idxs.head_.max_ - 1),
-                 idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1))).eval();
+      return internal::colwise_reverse(
+                 x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1,
+                         idxs.head_.min_ - (idxs.head_.max_ - 1),
+                         idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1)))
+          .eval();
     } else {
       return x
           .block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1,
@@ -409,7 +418,8 @@ inline auto rvalue(
  *
  * Types:  matrix[uni,uni] : scalar
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @param[in] x Matrix to index.
  * @param[in] idxs Pair of single indexes.
  * @param[in] name String form of expression being evaluated.
@@ -537,14 +547,14 @@ inline plain_type_t<EigMat> rvalue(
  *
  * Types:  matrix[Idx, uni] = vector
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @param[in] x matrix.
  * @param[in] idxs Index consisting of one uni-index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  */
-template <typename Mat, typename Idx,
-          require_dense_dynamic_t<Mat>* = nullptr>
+template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(
     Mat&& x,
     const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
@@ -596,22 +606,21 @@ inline plain_type_t<EigMat> rvalue(
  *
  * Types:  matrix[Idx, omni] = matrix
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @param[in] x type
  * @param[in] idxs Pair of multiple indexes (from 1).
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename Mat, typename Idx,
-          require_dense_dynamic_t<Mat>* = nullptr>
+template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(
     Mat&& x,
     const cons_index_list<Idx, cons_index_list<index_omni, nil_index_list>>&
         idxs,
     const char* name = "ANON", int depth = 0) {
-  return rvalue(std::forward<Mat>(x), index_list(idxs.head_), name,
-                depth + 1);
+  return rvalue(std::forward<Mat>(x), index_list(idxs.head_), name, depth + 1);
 }
 
 /**
@@ -620,7 +629,8 @@ inline auto rvalue(
  *
  * Types:  matrix[Idx, min] = matrix
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @tparam Idx An index.
  * @param[in] x type
  * @param[in] idxs Container holding a row index and an index from a minimum
@@ -629,8 +639,7 @@ inline auto rvalue(
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename Mat, typename Idx,
-          require_dense_dynamic_t<Mat>* = nullptr>
+template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(
     Mat&& x,
     const cons_index_list<Idx, cons_index_list<index_min, nil_index_list>>&
@@ -648,7 +657,8 @@ inline auto rvalue(
  *
  * Types:  matrix[Idx, max] = matrix
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @tparam Idx An index.
  * @param[in] x Eigen type
  * @param[in] idxs Index holding a row index and an index from the start of the
@@ -657,8 +667,7 @@ inline auto rvalue(
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
-template <typename Mat, typename Idx,
-          require_dense_dynamic_t<Mat>* = nullptr>
+template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(
     Mat&& x,
     const cons_index_list<Idx, cons_index_list<index_max, nil_index_list>>&
@@ -676,7 +685,8 @@ inline auto rvalue(
  *
  * Types:  matrix[Idx, min_max] = matrix
  *
- * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen matrix.
+ * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
+ * matrix.
  * @tparam Idx Type of index.
  * @param[in] x Matrix to index.
  * @param[in] idxs Pair multiple index and single index.
@@ -684,8 +694,7 @@ inline auto rvalue(
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
  */
-template <typename Mat, typename Idx,
-          require_dense_dynamic_t<Mat>* = nullptr>
+template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(
     Mat&& x,
     const cons_index_list<Idx, cons_index_list<index_min_max, nil_index_list>>&
@@ -702,8 +711,10 @@ inline auto rvalue(
         .eval();
   } else {
     const auto col_start = idxs.tail_.head_.max_ - 1;
-    return rvalue(internal::rowwise_reverse(x.middleCols(col_start, idxs.tail_.head_.min_ - col_start)),
-                  index_list(idxs.head_), name, depth + 1).eval();
+    return rvalue(internal::rowwise_reverse(x.middleCols(
+                      col_start, idxs.tail_.head_.min_ - col_start)),
+                  index_list(idxs.head_), name, depth + 1)
+        .eval();
   }
 }
 
