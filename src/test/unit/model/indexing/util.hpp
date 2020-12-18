@@ -59,7 +59,7 @@ void check_std_vec_adjs(Check1&& i_check, Check2&& j_check, const StdVecVar& x,
  */
 template <typename Check1, typename Check2, typename VarMat>
 void check_matrix_adjs(Check1&& i_check, Check2&& j_check, const VarMat& x,
-                       const char* name, int check_val = 1) {
+                       const char* name = "", int check_val = 1) {
   for (Eigen::Index j = 0; j < x.cols(); ++j) {
     for (Eigen::Index i = 0; i < x.rows(); ++i) {
       if (i_check(i)) {
@@ -160,6 +160,72 @@ template <typename Vec = Eigen::Matrix<double, -1, 1>>
 auto generate_linear_var_vector(Eigen::Index n, double start = 0) {
   using ret_t = stan::math::var_value<Vec>;
   return ret_t(generate_linear_vector<Vec>(n, start));
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_multi& idx, const T& x,
+                             bool row_or_col) {
+  return idx;
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_omni& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  if (row_or_col) {
+    for (int i = 1; i <= x.cols(); ++i) {
+      v.push_back(i);
+    }
+  } else {
+    for (int i = 1; i <= x.rows(); ++i) {
+      v.push_back(i);
+    }
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_min& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  if (row_or_col) {
+    for (int i = idx.min_; i <= x.cols(); ++i) {
+      v.push_back(i);
+    }
+  } else {
+    for (int i = idx.min_; i <= x.rows(); ++i) {
+      v.push_back(i);
+    }
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_max& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  for (int i = 1; i <= idx.max_; ++i) {
+    v.push_back(i);
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_min_max& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  for (int i = idx.min_; i <= idx.max_; ++i) {
+    v.push_back(i);
+  }
+  return index_multi(v);
+}
+
+template <typename T>
+inline auto convert_to_multi(const index_uni& idx, const T& x,
+                             bool row_or_col) {
+  std::vector<int> v;
+  v.push_back(idx.n_);
+  return index_multi(v);
 }
 
 }  // namespace test
