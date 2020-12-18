@@ -60,6 +60,7 @@ class chained_var_context : public var_context {
     names.insert(names.end(), names2.begin(), names2.end());
   }
 
+#ifdef USE_STANC3
   /**
    * Check variable dimensions against variable declaration.
    * Only used for data read in from file.
@@ -76,6 +77,7 @@ class chained_var_context : public var_context {
                      const std::vector<size_t>& dims_declared) const {
     stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
   }
+#endif
 };
 }  // namespace io
 }  // namespace stan

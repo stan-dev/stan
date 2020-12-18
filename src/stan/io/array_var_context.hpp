@@ -337,6 +337,7 @@ class array_var_context : public var_context {
     return empty_vec_ui_;
   }
 
+#ifdef USE_STANC3
   /**
    * Check variable dimensions against variable declaration.
    * Only used for data read in from file.
@@ -353,6 +354,7 @@ class array_var_context : public var_context {
                      const std::vector<size_t>& dims_declared) const {
     stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
   }
+#endif
 
   /**
    * Return a list of the names of the floating point variables in

@@ -79,6 +79,7 @@ class empty_var_context : public var_context {
     return std::vector<size_t>();
   }
 
+#ifdef USE_STANC3
   /**
    * Check variable dimensions against variable declaration.
    * This context has no variables.
@@ -95,6 +96,7 @@ class empty_var_context : public var_context {
                      const std::vector<size_t>& dims_declared) const {
     stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
   }
+#endif
 
   /**
    * Fill a list of the names of the floating point variables in

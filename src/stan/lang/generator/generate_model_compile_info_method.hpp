@@ -1,3 +1,5 @@
+#ifdef USE_STANC3
+
 #ifndef STAN_LANG_GENERATOR_GENERATE_MODEL_COMPILE_INFO_METHOD_HPP
 #define STAN_LANG_GENERATOR_GENERATE_MODEL_COMPILE_INFO_METHOD_HPP
 
@@ -23,4 +25,6 @@ void generate_model_compile_info_method(std::ostream& o) {
 
 }  // namespace lang
 }  // namespace stan
+#endif
+
 #endif

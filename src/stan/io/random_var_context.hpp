@@ -179,6 +179,7 @@ class random_var_context : public var_context {
    */
   void names_i(std::vector<std::string>& names) const { names.clear(); }
 
+#ifdef USE_STANC3
   /**
    * Check variable dimensions against variable declaration.
    * Only used for data read in from file.
@@ -195,6 +196,7 @@ class random_var_context : public var_context {
                      const std::vector<size_t>& dims_declared) const {
     stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
   }
+#endif
 
   /**
    * Return the random initialization on the unconstrained scale.
