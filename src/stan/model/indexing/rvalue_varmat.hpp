@@ -107,7 +107,8 @@ inline auto rvalue(VarMat&& x,
   arena_t<value_type_t<VarMat>> x_ret_vals(ret_rows, x.cols());
   arena_std_vec row_idx(ret_rows);
   for (int i = 0; i < ret_rows; ++i) {
-    check_range("matrix[multi] subset range", name, x.rows(), idxs.head_.ns_[i]);
+    check_range("matrix[multi] subset range", name, x.rows(),
+                idxs.head_.ns_[i]);
     row_idx[i] = idxs.head_.ns_[i] - 1;
     x_ret_vals.row(i) = x.val().row(row_idx[i]);
   }
@@ -150,7 +151,8 @@ inline auto rvalue(
   arena_std_vec col_idx(ret_size);
   const int row_idx = idxs.head_.n_ - 1;
   for (int j = 0; j < ret_size; ++j) {
-    check_range("matrix[multi] subset range", name, x.cols(), idxs.tail_.head_.ns_[j]);
+    check_range("matrix[multi] subset range", name, x.cols(),
+                idxs.tail_.head_.ns_[j]);
     col_idx[j] = idxs.tail_.head_.ns_[j] - 1;
     x_ret_vals.coeffRef(j) = x.val().coeff(row_idx, col_idx[j]);
   }
@@ -195,7 +197,8 @@ inline auto rvalue(
   arena_std_vec row_idx(ret_size);
   const int col_idx = idxs.tail_.head_.n_ - 1;
   for (int i = 0; i < ret_size; ++i) {
-    check_range("matrix[multi, uni] rvalue range", name, x.rows(), idxs.head_.ns_[i]);
+    check_range("matrix[multi, uni] rvalue range", name, x.rows(),
+                idxs.head_.ns_[i]);
     row_idx[i] = idxs.head_.ns_[i] - 1;
     x_ret_val.coeffRef(i) = x.val().coeff(row_idx[i], col_idx);
   }
@@ -241,11 +244,13 @@ inline auto rvalue(
   arena_std_vec col_idx(ret_cols);
   // We only want to check these once
   for (int i = 0; i < ret_rows; ++i) {
-    check_range("matrix[multi,multi] row index", name, x_rows, idxs.head_.ns_[i]);
+    check_range("matrix[multi,multi] row index", name, x_rows,
+                idxs.head_.ns_[i]);
     row_idx[i] = idxs.head_.ns_[i] - 1;
   }
   for (int j = 0; j < ret_cols; ++j) {
-    check_range("matrix[multi,multi] col index", name, x.cols(), idxs.tail_.head_.ns_[j]);
+    check_range("matrix[multi,multi] col index", name, x.cols(),
+                idxs.tail_.head_.ns_[j]);
     col_idx[j] = idxs.tail_.head_.ns_[j] - 1;
     for (int i = 0; i < ret_rows; ++i) {
       x_ret_val.coeffRef(i, j) = x.val().coeff(row_idx[i], col_idx[j]);
@@ -292,22 +297,22 @@ inline auto rvalue(
   arena_t<value_type_t<VarMat>> x_ret_val(ret_rows, ret_cols);
   arena_std_vec col_idx(ret_cols);
   for (int j = 0; j < ret_cols; ++j) {
-    check_range("matrix[..., multi] col index", name, x.cols(), idxs.tail_.head_.ns_[j]);
+    check_range("matrix[..., multi] col index", name, x.cols(),
+                idxs.tail_.head_.ns_[j]);
     col_idx[j] = idxs.tail_.head_.ns_[j] - 1;
     x_ret_val.col(j) = rvalue(x.val().col(col_idx[j]), index_list(idxs.head_),
                               name, depth + 1);
   }
   var_value<Eigen::Matrix<double, -1, -1>> x_ret(x_ret_val);
   // index_multi is the only index with dynamic memory so head is safe
-  reverse_pass_callback(
-      [head = idxs.head_, x, x_ret, col_idx]() mutable {
-        for (size_t j = 0; j < col_idx.size(); ++j) {
-          for (size_t i = 0; i < x_ret.rows(); ++i) {
-            const int n = rvalue_at(i, head) - 1;
-            x.adj().coeffRef(n, col_idx[j]) += x_ret.adj().coeff(i, j);
-          }
-        }
-      });
+  reverse_pass_callback([head = idxs.head_, x, x_ret, col_idx]() mutable {
+    for (size_t j = 0; j < col_idx.size(); ++j) {
+      for (size_t i = 0; i < x_ret.rows(); ++i) {
+        const int n = rvalue_at(i, head) - 1;
+        x.adj().coeffRef(n, col_idx[j]) += x_ret.adj().coeff(i, j);
+      }
+    }
+  });
   return x_ret;
 }
 
