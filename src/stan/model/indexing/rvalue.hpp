@@ -155,7 +155,7 @@ inline plain_type_t<EigVec> rvalue(
  *
  * @tparam Vec An Eigen vector or `var_value<T>` where `T` is an eigen vector.
  * @param[in] v Vector being indexed.
- * @param[in] idxs One single index.
+ * @param[in] idxs An index to select from a minimum to maximum range.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing vector.
@@ -187,7 +187,8 @@ inline auto rvalue(Vec&& v,
  *
  * @tparam Vec An Eigen vector or `var_value<T>` where `T` is an eigen vector.
  * @param[in] x vector
- * @param[in] idxs An index.
+ * @param[in] idxs An indexing from a specific minimum index to the end out
+ *  of a bottom row of a matrix
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
@@ -209,7 +210,8 @@ inline auto rvalue(Vec&& x,
  *
  * @tparam Vec An Eigen vector or `var_value<T>` where `T` is an eigen vector.
  * @param[in] x vector.
- * @param[in] idxs An index.
+ * @param[in] idxs An indexing from the start of the container up to
+ * the specified maximum index (inclusive).
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
@@ -253,8 +255,7 @@ inline auto rvalue(Mat&& x,
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Eigen type
- * @param[in] idxs An indexing from the start of the container up to
- * the specified maximum index (inclusive).
+ * @param[in] idxs A multi index for selecting a set of rows.
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
@@ -328,8 +329,7 @@ inline auto rvalue(Mat&& x,
  * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
  * matrix.
  * @param[in] x Dense matrix
- * @param[in] idxs An indexing from the start of the container up to
- * the specified maximum index (inclusive).
+ * @param[in] idxs A min max index to select a range of rows.
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
@@ -362,7 +362,7 @@ inline auto rvalue(Mat&& x,
  * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
  * matrix.
  * @param[in] x Eigen matrix.
- * @param[in] idxs Index consisting of one uni-index.
+ * @param[in] idxs Two min max indices for selecting a block of the matrix.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
@@ -446,7 +446,7 @@ inline auto rvalue(
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Matrix to index.
- * @param[in] idxs Pair of multiple indexes (from 1).
+ * @param[in] idxs A uni index for the row and multi index for the columns
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
@@ -479,7 +479,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
  *
  * @tparam EigMat Eigen type with dynamic rows and columns.
  * @param[in] x Matrix to index.
- * @param[in] idxs Pair of multiple indexes (from 1).
+ * @param[in] idxs A multi index for the rows and a uni index for the column
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
@@ -499,7 +499,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
     math::check_range("matrix[multi, uni] row indexing", name, x_ref.rows(),
                       idxs.head_.ns_[i]);
     x_ret.coeffRef(i)
-        = x_ref.coeffRef(idxs.head_.ns_[i] - 1, idxs.tail_.head_.n_ - 1);
+        = x_ref.coeff(idxs.head_.ns_[i] - 1, idxs.tail_.head_.n_ - 1);
   }
   return x_ret;
 }
@@ -550,7 +550,7 @@ inline plain_type_t<EigMat> rvalue(
  * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
  * matrix.
  * @param[in] x matrix.
- * @param[in] idxs Index consisting of one uni-index.
+ * @param[in] idxs Any index for the rows and a uni index for the columns
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  */
@@ -574,7 +574,7 @@ inline auto rvalue(
  *
  * @tparam EigMat An eigen matrix
  * @param[in] x Eigen matrix.
- * @param[in] idxs Index consisting of one uni-index.
+ * @param[in] idxs Any index for the rows and a multi index for the columns
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
@@ -609,7 +609,7 @@ inline plain_type_t<EigMat> rvalue(
  * @tparam Mat An eigen matrix or `var_value<T>` whose inner type is an Eigen
  * matrix.
  * @param[in] x type
- * @param[in] idxs Pair of multiple indexes (from 1).
+ * @param[in] idxs Any index for the rows and omni index for the columns
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).
  * @throw std::out_of_range If any of the indices are out of bounds.
@@ -689,7 +689,7 @@ inline auto rvalue(
  * matrix.
  * @tparam Idx Type of index.
  * @param[in] x Matrix to index.
- * @param[in] idxs Pair multiple index and single index.
+ * @param[in] idxs Any index for the rows and a min max index for the columns
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.
  * @return Result of indexing matrix.
