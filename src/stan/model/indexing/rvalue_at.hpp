@@ -40,9 +40,7 @@ inline int rvalue_at(int n, const index_omni& idx) { return n + 1; }
  * @param[in] idx Index (from 1)
  * @return Underlying index position (from 1).
  */
-inline int rvalue_at(int n, const index_min& idx) {
-  return idx.min_ + n;
-}
+inline int rvalue_at(int n, const index_min& idx) { return idx.min_ + n; }
 
 /**
  * Return the index in the underlying array corresponding to the
