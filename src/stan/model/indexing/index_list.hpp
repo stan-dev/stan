@@ -32,7 +32,7 @@ struct cons_index_list {
    * @param tail Index list for tail.
    */
   template <typename Head, typename Tail>
-  explicit constexpr cons_index_list(Head&& head, Tail&& tail)
+  explicit cons_index_list(Head&& head, Tail&& tail)
       : head_(std::forward<Head>(head)), tail_(std::forward<Tail>(tail)) {}
 };
 
@@ -44,7 +44,7 @@ struct cons_index_list {
  * @param idx2 second index placed in `tail_`
  */
 template <typename T1, typename T2>
-inline constexpr auto cons_list(T1&& idx1, T2&& idx2) {
+inline auto cons_list(T1&& idx1, T2&& idx2) {
   return cons_index_list<std::decay_t<T1>, std::decay_t<T2>>(
       std::forward<T1>(idx1), std::forward<T2>(idx2));
 }
@@ -52,7 +52,7 @@ inline constexpr auto cons_list(T1&& idx1, T2&& idx2) {
 /**
  * Expansion stop for index_list returning back a `nul_index_list`
  */
-inline constexpr auto index_list() { return nil_index_list(); }
+inline auto index_list() { return nil_index_list(); }
 
 /**
  * Factory-like function to construct a `cons_index_list` of `cons_index_list`s
@@ -63,7 +63,7 @@ inline constexpr auto index_list() { return nil_index_list(); }
  *  `index_list()`
  */
 template <typename T, typename... Types>
-inline constexpr auto index_list(T&& idx1, Types&&... idx2) {
+inline auto index_list(T&& idx1, Types&&... idx2) {
   return cons_list(std::forward<T>(idx1),
                    index_list(std::forward<Types>(idx2)...));
 }
