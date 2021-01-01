@@ -414,7 +414,7 @@ class reader {
    */
   template <typename T_ = T, require_st_arithmetic<T_> * = nullptr>
   inline matrix_t var_matrix(size_t m, size_t n) {
-    return this->matrix(m, n);
+    return this->var_matrix(m, n);
   }
 
   /**
@@ -985,8 +985,9 @@ public:
       unit_vector_size_zero_error();
     }
     auto theta = this->var_vector(k);
+    using stan::math::value_of;
     stan::math::check_unit_vector("stan::io::unit_vector", "Constrained vector",
-                                  theta);
+                                  value_of(theta));
     return theta;
   }
 
@@ -1079,7 +1080,7 @@ public:
    */
   inline map_vector_t simplex(size_t k) {
     if (unlikely(k == 0)) {
-      simplex_size_zero_error()
+      simplex_size_zero_error();
     }
     map_vector_t theta(vector(k));
     stan::math::check_simplex("stan::io::simplex", "Constrained vector", theta);
@@ -1099,7 +1100,8 @@ public:
       simplex_size_zero_error();
     }
     auto theta = this->var_vector(k);
-    stan::math::check_simplex("stan::io::simplex", "Constrained vector", theta);
+    using stan::math::value_of;
+    stan::math::check_simplex("stan::io::simplex", "Constrained vector", value_of(theta));
     return theta;
   }
 
@@ -1189,7 +1191,8 @@ public:
    */
   inline auto var_ordered(size_t k) {
     auto x = this->var_vector(k);
-    stan::math::check_ordered("stan::io::ordered", "Constrained vector", x);
+    using stan::math::value_of;
+    stan::math::check_ordered("stan::io::ordered", "Constrained vector", value_of(x));
     return x;
   }
 
@@ -1267,8 +1270,9 @@ public:
    */
   inline auto var_positive_ordered(size_t k) {
     auto x = this->var_vector(k);
+    using stan::math::value_of;
     stan::math::check_positive_ordered("stan::io::positive_ordered",
-                                       "Constrained vector", x);
+                                       "Constrained vector", value_of(x));
     return x;
   }
 
@@ -1317,7 +1321,7 @@ public:
    * @return Next positive_ordered vector of the specified size.
    */
   inline auto var_positive_ordered_constrain(size_t k, T &lp) {
-    return stan::math::positive_ordered_constrain(this->vector(k), lp);
+    return stan::math::positive_ordered_constrain(this->var_vector(k), lp);
   }
 
   /**
@@ -1347,8 +1351,9 @@ public:
    */
   inline auto var_cholesky_factor_cov(size_t M, size_t N) {
     auto y = this->var_matrix(M, N);
+    using stan::math::value_of;
     stan::math::check_cholesky_factor("stan::io::cholesky_factor_cov",
-                                      "Constrained matrix", y);
+                                      "Constrained matrix", value_of(y));
     return y;
   }
 
@@ -1444,8 +1449,9 @@ public:
   inline auto var_cholesky_factor_corr(size_t K) {
     using stan::math::check_cholesky_factor_corr;
     auto y = var_matrix(K, K);
+    using stan::math::value_of;
     check_cholesky_factor_corr("stan::io::cholesky_factor_corr",
-                               "Constrained matrix", y);
+                               "Constrained matrix", value_of(y));
     return y;
   }
 
@@ -1532,8 +1538,9 @@ public:
    */
   inline auto var_cov_matrix(size_t k) {
     auto y = this->var_matrix(k, k);
+    using stan::math::value_of;
     stan::math::check_cov_matrix("stan::io::cov_matrix", "Constrained matrix",
-                                 y);
+                                 value_of(y));
     return y;
   }
 
@@ -1608,8 +1615,9 @@ public:
    */
   inline auto var_corr_matrix(size_t k) {
     auto x = this->var_matrix(k, k);
+    using stan::math::value_of;
     stan::math::check_corr_matrix("stan::math::corr_matrix",
-                                  "Constrained matrix", x);
+                                  "Constrained matrix", value_of(x));
     return x;
   }
 
@@ -1670,8 +1678,9 @@ public:
   template <typename TL>
   inline auto var_vector_lb(const TL lb, size_t m) {
     auto v = this->var_vector(m);
+    using stan::math::value_of;
     stan::math::check_greater_or_equal("stan::io::vector_lb",
-                                       "Constrained vector", v, lb);
+                                       "Constrained vector", value_of(v), value_of(lb));
     return v;
   }
 
@@ -1706,8 +1715,9 @@ public:
   template <typename TL>
   inline auto var_row_vector_lb(const TL lb, size_t m) {
     auto v = this->var_row_vector(m);
+    using stan::math::value_of;
     stan::math::check_greater_or_equal("stan::io::row_vector_lb",
-                                       "Constrained row vector", v, lb);
+                                       "Constrained row vector", value_of(v), value_of(lb));
     return v;
   }
 
@@ -1742,8 +1752,9 @@ public:
   template <typename TL>
   inline auto var_matrix_lb(const TL lb, const size_t m, size_t n) {
     auto mat = this->var_matrix(m, n);
+    using stan::math::value_of;
     stan::math::check_greater_or_equal("stan::io::matrix_lb",
-                                       "Constrained matrix", mat, lb);
+                                       "Constrained matrix", value_of(mat), value_of(lb));
     return mat;
   }
 
@@ -1783,8 +1794,9 @@ public:
   template <typename TU>
   inline auto var_vector_ub(const TU ub, size_t m) {
     auto v = this->var_vector(m);
+    using stan::math::value_of;
     stan::math::check_less_or_equal("stan::io::vector_ub", "Constrained vector",
-                                    v, ub);
+                                    value_of(v), value_of(ub));
     return v;
   }
 
@@ -1819,8 +1831,9 @@ public:
   template <typename TU>
   inline auto var_row_vector_ub(const TU ub, size_t m) {
     auto v = this->var_row_vector(m);
+    using stan::math::value_of;
     stan::math::check_less_or_equal("stan::io::row_vector_ub",
-                                    "Constrained row vector", v, ub);
+                                    "Constrained row vector", value_of(v), value_of(ub));
     return v;
   }
 
@@ -1855,8 +1868,9 @@ public:
   template <typename TU>
   inline auto var_matrix_ub(const TU ub, size_t m, size_t n) {
     auto mat = this->var_matrix(m, n);
+    using stan::math::value_of;
     stan::math::check_less_or_equal("stan::io::matrix_ub", "Constrained matrix",
-                                    mat, ub);
+                                    value_of(mat), value_of(ub));
     return mat;
   }
 
@@ -1898,8 +1912,9 @@ public:
   template <typename TL, typename TU>
   inline auto var_vector_lub(const TL lb, const TU ub, size_t m) {
     auto v = this->var_vector(m);
+    using stan::math::value_of;
     stan::math::check_bounded<map_vector_t, TL, TU>(
-        "stan::io::vector_lub", "Constrained vector", v, lb, ub);
+        "stan::io::vector_lub", "Constrained vector", value_of(v), value_of(lb), value_of(ub));
     return v;
   }
 
@@ -1934,8 +1949,9 @@ public:
   template <typename TL, typename TU>
   inline auto var_row_vector_lub(const TL lb, const TU ub, size_t m) {
     auto v = this->var_row_vector(m);
+    using stan::math::value_of;
     stan::math::check_bounded<map_row_vector_t, TL, TU>(
-        "stan::io::row_vector_lub", "Constrained row vector", v, lb, ub);
+        "stan::io::row_vector_lub", "Constrained row vector", value_of(v), value_of(lb), value_of(ub));
     return v;
   }
 
@@ -1974,8 +1990,9 @@ public:
   template <typename TL, typename TU>
   inline auto var_matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
     auto mat = this->var_matrix(m, n);
+    using stan::math::value_of;
     stan::math::check_bounded<map_matrix_t, TL, TU>(
-        "stan::io::row_vector_lub", "Constrained row vector", mat, lb, ub);
+        "stan::io::row_vector_lub", "Constrained row vector", value_of(mat), value_of(lb), value_of(ub));
     return mat;
   }
 
@@ -2141,7 +2158,7 @@ public:
   inline auto var_matrix_offset_multiplier_constrain(const TL offset,
                                                  const TS multiplier, size_t m,
                                                  size_t n, T &lp) {
-    return stan::math::offset_multiplier_constrain(this->matrix(m, n), offset,
+    return stan::math::offset_multiplier_constrain(this->var_matrix(m, n), offset,
                                                    multiplier, lp);
   }
 
