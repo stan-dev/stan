@@ -965,9 +965,9 @@ inline void assign(T&& x, const cons_index_list<Idx1, Idx2>& idxs, U&& y,
     int i = rvalue_at(n, idxs.head_);
     stan::math::check_range("vector[multi,...] assign", name, x.size(), i);
     if (std::is_rvalue_reference<U>::value) {
-      assign(x[i - 1], idxs.tail_, std::move(y[n]), name, depth + 1);
+      assign(x[i - 1], index_list(idxs.tail_), std::move(y[n]), name, depth + 1);
     } else {
-      assign(x[i - 1], idxs.tail_, y[n], name, depth + 1);
+      assign(x[i - 1], index_list(idxs.tail_), y[n], name, depth + 1);
     }
   }
 }

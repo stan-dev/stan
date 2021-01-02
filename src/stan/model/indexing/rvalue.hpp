@@ -800,9 +800,9 @@ inline auto rvalue(StdVec&& v, const cons_index_list<Idx1, Idx2>& idxs,
     math::check_range("array[..., ...] index", name, v.size(), n);
     if (std::is_rvalue_reference<StdVec>::value) {
       result.emplace_back(
-          rvalue(std::move(v[n - 1]), idxs.tail_, name, depth + 1));
+          rvalue(std::move(v[n - 1]), index_list(idxs.tail_), name, depth + 1));
     } else {
-      result.emplace_back(rvalue(v[n - 1], idxs.tail_, name, depth + 1));
+      result.emplace_back(rvalue(v[n - 1], index_list(idxs.tail_), name, depth + 1));
     }
   }
   return result;
