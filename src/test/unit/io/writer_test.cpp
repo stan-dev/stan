@@ -7,46 +7,6 @@
 
 #include <stan/math/prim.hpp>
 
-TEST(ioWriter, infBounds) {
-  std::vector<int> theta_i;
-  std::vector<double> theta;
-  stan::io::writer<double> writer(theta, theta_i);
-
-  // lub
-
-  // lb finite; ub = +inf
-  double y = 12;
-  writer.scalar_lub_unconstrain(0, std::numeric_limits<double>::infinity(), y);
-  writer.scalar_lb_unconstrain(0, y);
-  EXPECT_FLOAT_EQ(writer.data_r()[0], writer.data_r()[1]);
-
-  // lb = -inf; ub finite
-  double z = -7.7;
-  writer.scalar_lub_unconstrain(-std::numeric_limits<double>::infinity(), -1.9,
-                                z);
-  writer.scalar_ub_unconstrain(-1.9, z);
-  EXPECT_FLOAT_EQ(writer.data_r()[2], writer.data_r()[3]);
-
-  // lb = -inf;  ub = +inf
-  double w = 197.345;
-  writer.scalar_lub_unconstrain(-std::numeric_limits<double>::infinity(),
-                                std::numeric_limits<double>::infinity(), w);
-  writer.scalar_unconstrain(w);
-  EXPECT_FLOAT_EQ(writer.data_r()[4], writer.data_r()[5]);
-
-  // ub = inf
-  double u = 9283475;
-  writer.scalar_ub_unconstrain(std::numeric_limits<double>::infinity(), u);
-  writer.scalar_unconstrain(u);
-  EXPECT_FLOAT_EQ(writer.data_r()[6], writer.data_r()[7]);
-
-  // lb = -inf
-  double v = -7464.737474;
-  writer.scalar_lb_unconstrain(-std::numeric_limits<double>::infinity(), v);
-  writer.scalar_unconstrain(v);
-  EXPECT_FLOAT_EQ(writer.data_r()[8], writer.data_r()[9]);
-}
-
 TEST(io_writer, integer) {
   std::vector<int> theta_i;
   std::vector<double> theta;
