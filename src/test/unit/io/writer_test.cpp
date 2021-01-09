@@ -7,6 +7,36 @@
 
 #include <stan/math/prim.hpp>
 
+TEST(ioWriter, infBounds) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  stan::io::writer<double> writer(theta, theta_i);
+
+  // lub
+
+  // lb finite; ub = +inf
+  double y = 12;
+  EXPECT_THROW(writer.scalar_lub_unconstrain(0, std::numeric_limits<double>::infinity(), y), std::domain_error);
+
+  // lb = -inf; ub finite
+  double z = -7.7;
+  EXPECT_THROW(writer.scalar_lub_unconstrain(-std::numeric_limits<double>::infinity(), -1.9,
+					     z), std::domain_error);
+
+  // lb = -inf;  ub = +inf
+  double w = 197.345;
+  EXPECT_THROW(writer.scalar_lub_unconstrain(-std::numeric_limits<double>::infinity(),
+                                std::numeric_limits<double>::infinity(), w), std::domain_error);
+
+  // ub = inf
+  double u = 9283475;
+  EXPECT_THROW(writer.scalar_ub_unconstrain(std::numeric_limits<double>::infinity(), u), std::domain_error);
+
+  // lb = -inf
+  double v = -7464.737474;
+  EXPECT_THROW(writer.scalar_lb_unconstrain(-std::numeric_limits<double>::infinity(), v), std::domain_error);
+}
+
 TEST(io_writer, integer) {
   std::vector<int> theta_i;
   std::vector<double> theta;
