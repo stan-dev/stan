@@ -62,6 +62,13 @@ class model_base : public prob_grad {
   virtual std::vector<std::string> model_compile_info() const = 0;
 
   /**
+   * Returns a map of profiling data from the model.
+   *
+   * @return the map of profiling data.
+   */
+  virtual stan::math::profile_map get_profile_data() = 0;
+
+  /**
    * Set the specified argument to sequence of parameters, transformed
    * parameters, and generated quantities in the order in which they
    * were declared.  The input sequence is cleared and resized.
