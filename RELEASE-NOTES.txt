@@ -5,6 +5,13 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.25.0 (26 October 2020)
+======================================================================
+
+- added a const accessor to _z in base_hmc.hpp
+- bugfixed validate_dims in array_var_context
+- cleaned up includes of Eigen
+
 v.2.24.0 (28 July 2020)
 ======================================================================
 
