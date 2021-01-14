@@ -13,6 +13,8 @@ struct mock_model : public stan::model::model_base {
 
   std::string model_name() const override { return "mock_model"; }
 
+  stan::math::profile_map get_profile_data() { return {}; }
+
   std::vector<std::string> model_compile_info() const {
     std::vector<std::string> stanc_info;
     stanc_info.push_back("stanc_version = stanc2");
