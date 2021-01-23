@@ -354,7 +354,7 @@ class stan_csv_reader {
 
     if (!read_adaptation(in, data.adaptation, out)) {
       if (out)
-        *out << "Warning: non-fatal error reading adapation data" << std::endl;
+        *out << "Warning: non-fatal error reading adaptation data" << std::endl;
     }
 
     data.timing.warmup = 0;
