@@ -5,6 +5,18 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v.2.26.0 (26 January 2021)
+======================================================================
+
+- Improved performance for assigning to slices of matrices and vectors and vector-style indexing (#2962, #2964, #2965, #2973).
+- Improved error messages on range checks. (#2978)
+- Allowed Stan CSV files to have first column be any Stan variable name, not just "lp__".
+- Removed .eval() in rvalue() where applicable. (#2974)
+- Allowed reader to accept Eigen vector and use Eigen Map to access inputs. (#2955)
+- Allowed functions in reader to output a `var_value<Eigen::Matrix<T, R, C>>`.
+- Added assignment to `var_value<Eigen::Matrix<T, R, C>>`.
+- Added rvalue overloads for `var_value<Eigen::Matrix<T, R, C>>`.
+
 v.2.25.0 (26 October 2020)
 ======================================================================
 
