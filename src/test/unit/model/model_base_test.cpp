@@ -15,7 +15,7 @@ struct mock_model : public stan::model::model_base {
 
   std::vector<std::string> model_compile_info() const {
     std::vector<std::string> stanc_info;
-    stanc_info.push_back("stanc_version = stanc2");
+    stanc_info.push_back("stanc_version = stanc3");
     return stanc_info;
   }
 
