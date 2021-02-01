@@ -187,93 +187,93 @@ pipeline {
                 }
             }
         }
-        stage('Unit tests') {
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
-            parallel {
-                stage('Windows Headers & Unit') {
-                    agent { label 'windows' }
-                    steps {
-                        deleteDirWin()
-                            unstash 'StanSetup'
-                            setupCXX()
-                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                            bat "mingw32-make -j${env.PARALLEL} test-headers"
-                            setupCXX(false)
-                            runTestsWin("src/test/unit")
-                    }
-                    post { always { deleteDirWin() } }
-                }
-                stage('Linux Unit') {
-                    agent { label 'linux' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
-                        sh "g++ --version"
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Mac Unit') {
-                    agent { label 'osx' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(false)
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
-            }
-        }
+        // stage('Unit tests') {
+        //     when {
+        //         expression {
+        //             !skipRemainingStages
+        //         }
+        //     }
+        //     parallel {
+        //         stage('Windows Headers & Unit') {
+        //             agent { label 'windows' }
+        //             steps {
+        //                 deleteDirWin()
+        //                     unstash 'StanSetup'
+        //                     setupCXX()
+        //                     bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+        //                     bat "mingw32-make -j${env.PARALLEL} test-headers"
+        //                     setupCXX(false)
+        //                     runTestsWin("src/test/unit")
+        //             }
+        //             post { always { deleteDirWin() } }
+        //         }
+        //         stage('Linux Unit') {
+        //             agent { label 'linux' }
+        //             steps {
+        //                 unstash 'StanSetup'
+        //                 setupCXX(true, env.GCC)
+        //                 sh "g++ --version"
+        //                 runTests("src/test/unit")
+        //             }
+        //             post { always { deleteDir() } }
+        //         }
+        //         stage('Mac Unit') {
+        //             agent { label 'osx' }
+        //             steps {
+        //                 unstash 'StanSetup'
+        //                 setupCXX(false)
+        //                 runTests("src/test/unit")
+        //             }
+        //             post { always { deleteDir() } }
+        //         }
+        //     }
+        // }
         stage('Integration') {
             parallel {
-                stage('Integration Linux') {
-                    agent { label 'linux' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
-                        runTests("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Integration Mac') {
-                    agent { label 'osx' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ) &&
-                            !skipRemainingStages
-                        }
-                    }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX()
-                        runTests("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Integration Windows') {
-                    agent { label 'windows-ec2' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ) &&
-                            !skipRemainingStages
-                        }
-                    }
-                    steps {
-                        deleteDirWin()
-                            unstash 'StanSetup'
-                            setupCXX()
-                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                            setupCXX(false)
-                            runTestsWin("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDirWin() } }
-                }
+                // stage('Integration Linux') {
+                //     agent { label 'linux' }
+                //     steps {
+                //         unstash 'StanSetup'
+                //         setupCXX(true, env.GCC)
+                //         runTests("src/test/integration", separateMakeStep=false)
+                //     }
+                //     post { always { deleteDir() } }
+                // }
+                // stage('Integration Mac') {
+                //     agent { label 'osx' }
+                //     when {
+                //         expression {
+                //             ( env.BRANCH_NAME == "develop" ||
+                //             env.BRANCH_NAME == "master" ) &&
+                //             !skipRemainingStages
+                //         }
+                //     }
+                //     steps {
+                //         unstash 'StanSetup'
+                //         setupCXX()
+                //         runTests("src/test/integration", separateMakeStep=false)
+                //     }
+                //     post { always { deleteDir() } }
+                // }
+                // stage('Integration Windows') {
+                //     agent { label 'windows-ec2' }
+                //     when {
+                //         expression {
+                //             ( env.BRANCH_NAME == "develop" ||
+                //             env.BRANCH_NAME == "master" ) &&
+                //             !skipRemainingStages
+                //         }
+                //     }
+                //     steps {
+                //         deleteDirWin()
+                //             unstash 'StanSetup'
+                //             setupCXX()
+                //             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+                //             setupCXX(false)
+                //             runTestsWin("src/test/integration", separateMakeStep=false)
+                //     }
+                //     post { always { deleteDirWin() } }
+                // }
                 stage('Math functions expressions test') {
                     agent any
                     steps {
@@ -301,48 +301,48 @@ pipeline {
                 }
             }
         }
-        stage('Upstream CmdStan tests') {
-            when {
-                    expression {
-                        ( env.BRANCH_NAME ==~ /PR-\d+/ ||
-                        env.BRANCH_NAME == "downstream_tests" ||
-                        env.BRANCH_NAME == "downstream_hotfix" ) &&
-                        !skipRemainingStages
-                    }
-                }
-            steps {
-                build(job: "CmdStan/${cmdstan_pr()}",
-                      parameters: [string(name: 'stan_pr', value: stan_pr()),
-                                   string(name: 'math_pr', value: params.math_pr)])
-            }
-        }
-        stage('Performance') {
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
-            agent { label 'oldimac' }
-            steps {
-                unstash 'StanSetup'
-                setupCXX()
-                sh """
-                    ./runTests.py -j${env.PARALLEL} src/test/performance
-                    cd test/performance
-                    RScript ../../src/test/performance/plot_performance.R
-                """
-            }
-            post {
-                always {
-                    retry(2) {
-                        junit 'test/**/*.xml'
-                        archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
-                        perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
-                    }
-                    deleteDir()
-                }
-            }
-        }
+        // stage('Upstream CmdStan tests') {
+        //     when {
+        //             expression {
+        //                 ( env.BRANCH_NAME ==~ /PR-\d+/ ||
+        //                 env.BRANCH_NAME == "downstream_tests" ||
+        //                 env.BRANCH_NAME == "downstream_hotfix" ) &&
+        //                 !skipRemainingStages
+        //             }
+        //         }
+        //     steps {
+        //         build(job: "CmdStan/${cmdstan_pr()}",
+        //               parameters: [string(name: 'stan_pr', value: stan_pr()),
+        //                            string(name: 'math_pr', value: params.math_pr)])
+        //     }
+        // }
+        // stage('Performance') {
+        //     when {
+        //         expression {
+        //             !skipRemainingStages
+        //         }
+        //     }
+        //     agent { label 'oldimac' }
+        //     steps {
+        //         unstash 'StanSetup'
+        //         setupCXX()
+        //         sh """
+        //             ./runTests.py -j${env.PARALLEL} src/test/performance
+        //             cd test/performance
+        //             RScript ../../src/test/performance/plot_performance.R
+        //         """
+        //     }
+        //     post {
+        //         always {
+        //             retry(2) {
+        //                 junit 'test/**/*.xml'
+        //                 archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
+        //                 perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
+        //             }
+        //             deleteDir()
+        //         }
+        //     }
+        // }
     }
     post {
         always {
