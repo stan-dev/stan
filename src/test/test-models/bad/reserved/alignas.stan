@@ -1,5 +1,0 @@
-data {
-  real alignas;
-}
-model {
-}

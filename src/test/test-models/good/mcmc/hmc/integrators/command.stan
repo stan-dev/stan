@@ -5,5 +5,6 @@ parameters {
   real mu;
 }
 model {
-  y ~ normal(mu,1);
+  y ~ normal(mu, 1);
 }
+

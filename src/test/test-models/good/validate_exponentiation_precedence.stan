@@ -1,4 +1,5 @@
 data {
+
 }
 transformed data {
   vector[3] a;
@@ -24,5 +25,6 @@ parameters {
   real y;
 }
 model {
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
+

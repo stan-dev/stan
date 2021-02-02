@@ -1,81 +1,65 @@
 transformed data {
   int n;
-  int nn[2];
-  int nnn[3,4];
-  
+  array[2] int nn;
+  array[3, 4] int nnn;
   real x;
-  real xx[5];
-  real xxx[6,7];
-  real xxxx[8,9,10];
-
+  array[5] real xx;
+  array[6, 7] real xxx;
+  array[8, 9, 10] real xxxx;
   vector[2] v;
-  vector[3] vv[4];
-  vector[4] vvv[5,6];
-
+  array[4] vector[3] vv;
+  array[5, 6] vector[4] vvv;
   row_vector[2] rv;
-  row_vector[3] rvv[4];
-  row_vector[4] rvvv[5,6];
-
-  matrix[7,8] m;
-  matrix[7,8] mm[2];
-  matrix[7,8] mmm[3,4];
+  array[4] row_vector[3] rvv;
+  array[5, 6] row_vector[4] rvvv;
+  matrix[7, 8] m;
+  array[2] matrix[7, 8] mm;
+  array[3, 4] matrix[7, 8] mmm;
 }
 parameters {
   real p_x;
-  real p_xx[5];
-  real p_xxx[6,7];
-  real p_xxxx[8,9,10];
-
+  array[5] real p_xx;
+  array[6, 7] real p_xxx;
+  array[8, 9, 10] real p_xxxx;
   vector[2] p_v;
-  vector[3] p_vv[4];
-  vector[4] p_vvv[5,6];
-
+  array[4] vector[3] p_vv;
+  array[5, 6] vector[4] p_vvv;
   row_vector[2] p_rv;
-  row_vector[3] p_rvv[4];
-  row_vector[4] p_rvvv[5,6];
-
-  matrix[7,8] p_m;
-  matrix[7,8] p_mm[2];
-  matrix[7,8] p_mmm[3,4];
+  array[4] row_vector[3] p_rvv;
+  array[5, 6] row_vector[4] p_rvvv;
+  matrix[7, 8] p_m;
+  array[2] matrix[7, 8] p_mm;
+  array[3, 4] matrix[7, 8] p_mmm;
 }
 model {
-  increment_log_prob(n);
-  increment_log_prob(nn);
-  increment_log_prob(nnn);
-
-  increment_log_prob(x);
-  increment_log_prob(xx);
-  increment_log_prob(xxx);
-  increment_log_prob(xxxx);
-
-  increment_log_prob(v);
-  increment_log_prob(vv);
-  increment_log_prob(vvv);
-
-  increment_log_prob(rv);
-  increment_log_prob(rvv);
-  increment_log_prob(rvvv);
-
-  increment_log_prob(m);
-  increment_log_prob(mm);
-  increment_log_prob(mmm);
-
-
-  increment_log_prob(p_x);
-  increment_log_prob(p_xx);
-  increment_log_prob(p_xxx);
-  increment_log_prob(p_xxxx);
-
-  increment_log_prob(p_v);
-  increment_log_prob(p_vv);
-  increment_log_prob(p_vvv);
-
-  increment_log_prob(p_rv);
-  increment_log_prob(p_rvv);
-  increment_log_prob(p_rvvv);
-
-  increment_log_prob(p_m);
-  increment_log_prob(p_mm);
-  increment_log_prob(p_mmm);
-
+  target += n;
+  target += nn;
+  target += nnn;
+  target += x;
+  target += xx;
+  target += xxx;
+  target += xxxx;
+  target += v;
+  target += vv;
+  target += vvv;
+  target += rv;
+  target += rvv;
+  target += rvvv;
+  target += m;
+  target += mm;
+  target += mmm;
+  target += p_x;
+  target += p_xx;
+  target += p_xxx;
+  target += p_xxxx;
+  target += p_v;
+  target += p_vv;
+  target += p_vvv;
+  target += p_rv;
+  target += p_rvv;
+  target += p_rvvv;
+  target += p_m;
+  target += p_mm;
+  target += p_mmm;
 }
+

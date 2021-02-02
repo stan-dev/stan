@@ -13,3 +13,4 @@ parameters {
 model {
   theta ~ normal(0, 1);
 }
+

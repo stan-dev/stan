@@ -1,10 +1,9 @@
-data { 
+data {
   int d_int;
   real d_real;
 }
 transformed data {
   real transformed_data_real;
-
   transformed_data_real = pi();
   transformed_data_real = e();
   transformed_data_real = sqrt2();
@@ -17,13 +16,13 @@ parameters {
 }
 transformed parameters {
   real transformed_param_real;
-
   transformed_param_real = pi();
   transformed_param_real = e();
   transformed_param_real = sqrt2();
   transformed_param_real = log2();
   transformed_param_real = log10();
 }
-model {  
-  y_p ~ normal(0,1);
+model {
+  y_p ~ normal(0, 1);
 }
+

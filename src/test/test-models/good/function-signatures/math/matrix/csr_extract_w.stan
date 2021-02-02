@@ -1,5 +1,5 @@
-data { 
-  matrix[3,4] a_d;
+data {
+  matrix[3, 4] a_d;
 }
 transformed data {
   vector[3] w_d;
@@ -7,13 +7,14 @@ transformed data {
 }
 parameters {
   real y;
-  matrix[3,4] a_p;
+  matrix[3, 4] a_p;
 }
 transformed parameters {
   vector[3] w_p;
   w_p = csr_extract_w(a_d);
   w_p = csr_extract_w(a_p);
 }
-model {  
+model {
   y ~ normal(0, 1);
 }
+

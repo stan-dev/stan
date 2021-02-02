@@ -1,7 +1,7 @@
 transformed data {
   int n;
   real x;
-  matrix[3,3] m;
+  matrix[3, 3] m;
   vector[3] v;
   row_vector[3] rv;
   n = -n;
@@ -15,7 +15,7 @@ parameters {
 }
 transformed parameters {
   real xt;
-  matrix[3,3] mt;
+  matrix[3, 3] mt;
   vector[3] vt;
   row_vector[3] rvt;
   xt = -xt;
@@ -24,5 +24,6 @@ transformed parameters {
   rvt = -rvt;
 }
 model {
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
+

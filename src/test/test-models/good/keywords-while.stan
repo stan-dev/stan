@@ -2,5 +2,6 @@ parameters {
   real whiley;
 }
 model {
-  whiley ~ normal(0,1);
+  whiley ~ normal(0, 1);
 }
+

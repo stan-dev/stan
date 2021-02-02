@@ -13,10 +13,11 @@ transformed parameters {
   }
 }
 model {
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
 generated quantities {
   {
     int y_tilde = categorical_rng(rep_vector(0.1, 10));
   }
 }
+

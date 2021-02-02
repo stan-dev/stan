@@ -1,5 +1,9 @@
 functions {
-  real foo(real x) { return x; }
+  real foo(real x) {
+    return x;
+  }
 }
 model {
+
 }
+

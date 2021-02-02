@@ -2,5 +2,6 @@ parameters {
   real iffy;
 }
 model {
-  iffy ~ normal(0,1);
+  iffy ~ normal(0, 1);
 }
+

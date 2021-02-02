@@ -2,33 +2,31 @@ parameters {
   real y;
 }
 model {
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
 generated quantities {
   int n;
   real z;
-  real x[3];
-  real u[3];
+  array[3] real x;
+  array[3] real u;
   vector[3] theta;
   vector[3] alpha;
   row_vector[3] nu;
-  row_vector[3] nu_array[3];
+  array[3] row_vector[3] nu_array;
   vector[3] v;
-  vector[3] v_array[3];
+  array[3] vector[3] v_array;
   vector[3] mu;
-  vector[3] mu_array[3];
-  matrix[3,3] Sigma;
-  matrix[3,3] L;
-  int ns[3];
-  int N[3];
-
+  array[3] vector[3] mu_array;
+  matrix[3, 3] Sigma;
+  matrix[3, 3] L;
+  array[3] int ns;
+  array[3] int N;
   n = bernoulli_logit_rng(0.0);
   N = bernoulli_logit_rng(alpha);
   N = bernoulli_logit_rng(nu);
   N = bernoulli_logit_rng(ns);
   N = bernoulli_logit_rng(u);
   n = bernoulli_logit_rng(3);
-
   N = binomial_rng(ns, alpha);
   N = binomial_rng(ns, nu);
   N = binomial_rng(ns, ns);
@@ -41,7 +39,6 @@ generated quantities {
   N = binomial_rng(3, u);
   n = binomial_rng(3, 3);
   n = binomial_rng(3, 3.5);
-
   N = neg_binomial_2_log_rng(alpha, alpha);
   N = neg_binomial_2_log_rng(alpha, nu);
   N = neg_binomial_2_log_rng(alpha, ns);
@@ -150,7 +147,6 @@ generated quantities {
   N = neg_binomial_rng(3.5, u);
   n = neg_binomial_rng(3.5, 3);
   n = neg_binomial_rng(3.5, 3.5);
-
   x = uniform_rng(alpha, alpha);
   x = uniform_rng(alpha, nu);
   x = uniform_rng(alpha, ns);
@@ -187,7 +183,6 @@ generated quantities {
   x = uniform_rng(3.5, u);
   z = uniform_rng(3.5, 3);
   z = uniform_rng(3.5, 3.5);
-
   x = von_mises_rng(alpha, alpha);
   x = von_mises_rng(alpha, nu);
   x = von_mises_rng(alpha, ns);
@@ -224,9 +219,6 @@ generated quantities {
   x = von_mises_rng(3.5, u);
   z = von_mises_rng(3.5, 3);
   z = von_mises_rng(3.5, 3.5);
-
-  // n = binomial_logit_rng(15,-1.2);
-  
   N = beta_binomial_rng(ns, alpha, alpha);
   N = beta_binomial_rng(ns, alpha, nu);
   N = beta_binomial_rng(ns, alpha, ns);
@@ -299,63 +291,53 @@ generated quantities {
   N = beta_binomial_rng(3, 3.5, u);
   n = beta_binomial_rng(3, 3.5, 3);
   n = beta_binomial_rng(3, 3.5, 3.5);
-
-  n = hypergeometric_rng(5,4,9);
-  n = ordered_logistic_rng(1.9,theta);
-
+  n = hypergeometric_rng(5, 4, 9);
+  n = ordered_logistic_rng(1.9, theta);
   N = bernoulli_rng(alpha);
   N = bernoulli_rng(nu);
   N = bernoulli_rng(ns);
   N = bernoulli_rng(u);
   n = bernoulli_rng(3);
   n = bernoulli_rng(3.5);
-  
   N = poisson_rng(alpha);
   N = poisson_rng(nu);
   N = poisson_rng(ns);
   N = poisson_rng(u);
   n = poisson_rng(3);
   n = poisson_rng(3.5);
-  
   N = poisson_log_rng(alpha);
   N = poisson_log_rng(nu);
   N = poisson_log_rng(ns);
   N = poisson_log_rng(u);
   n = poisson_log_rng(3);
   n = poisson_log_rng(3.5);
-  
   n = categorical_rng(theta);
   n = categorical_logit_rng(theta);
-  ns = multinomial_rng(theta,20);
-
+  ns = multinomial_rng(theta, 20);
   x = chi_square_rng(alpha);
   x = chi_square_rng(nu);
   x = chi_square_rng(ns);
   x = chi_square_rng(u);
   z = chi_square_rng(3);
   z = chi_square_rng(3.5);
-  
   x = inv_chi_square_rng(alpha);
   x = inv_chi_square_rng(nu);
   x = inv_chi_square_rng(ns);
   x = inv_chi_square_rng(u);
   z = inv_chi_square_rng(3);
   z = inv_chi_square_rng(3.5);
-  
   x = exponential_rng(alpha);
   x = exponential_rng(nu);
   x = exponential_rng(ns);
   x = exponential_rng(u);
   z = exponential_rng(3);
   z = exponential_rng(3.5);
-  
   x = rayleigh_rng(alpha);
   x = rayleigh_rng(nu);
   x = rayleigh_rng(ns);
   x = rayleigh_rng(u);
   z = rayleigh_rng(3);
   z = rayleigh_rng(3.5);
-
   x = beta_rng(alpha, alpha);
   x = beta_rng(alpha, nu);
   x = beta_rng(alpha, ns);
@@ -392,7 +374,6 @@ generated quantities {
   x = beta_rng(0.35, u);
   z = beta_rng(0.35, 0.3);
   z = beta_rng(0.35, 0.35);
-
   x = beta_proportion_rng(alpha, alpha);
   x = beta_proportion_rng(alpha, nu);
   x = beta_proportion_rng(alpha, ns);
@@ -423,7 +404,6 @@ generated quantities {
   x = beta_proportion_rng(0.35, u);
   z = beta_proportion_rng(0.35, 0.3);
   z = beta_proportion_rng(0.35, 0.35);
-  
   x = normal_rng(alpha, alpha);
   x = normal_rng(alpha, nu);
   x = normal_rng(alpha, ns);
@@ -460,7 +440,6 @@ generated quantities {
   x = normal_rng(3.5, u);
   z = normal_rng(3.5, 3);
   z = normal_rng(3.5, 3.5);
-  
   x = cauchy_rng(alpha, alpha);
   x = cauchy_rng(alpha, nu);
   x = cauchy_rng(alpha, ns);
@@ -497,7 +476,6 @@ generated quantities {
   x = cauchy_rng(3.5, u);
   z = cauchy_rng(3.5, 3);
   z = cauchy_rng(3.5, 3.5);
-  
   x = double_exponential_rng(alpha, alpha);
   x = double_exponential_rng(alpha, nu);
   x = double_exponential_rng(alpha, ns);
@@ -534,7 +512,6 @@ generated quantities {
   x = double_exponential_rng(3.5, u);
   z = double_exponential_rng(3.5, 3);
   z = double_exponential_rng(3.5, 3.5);
-  
   x = logistic_rng(alpha, alpha);
   x = logistic_rng(alpha, nu);
   x = logistic_rng(alpha, ns);
@@ -571,7 +548,6 @@ generated quantities {
   x = logistic_rng(3.5, u);
   z = logistic_rng(3.5, 3);
   z = logistic_rng(3.5, 3.5);
-  
   x = gumbel_rng(alpha, alpha);
   x = gumbel_rng(alpha, nu);
   x = gumbel_rng(alpha, ns);
@@ -608,7 +584,6 @@ generated quantities {
   x = gumbel_rng(3.5, u);
   z = gumbel_rng(3.5, 3);
   z = gumbel_rng(3.5, 3.5);
-  
   x = lognormal_rng(alpha, alpha);
   x = lognormal_rng(alpha, nu);
   x = lognormal_rng(alpha, ns);
@@ -645,7 +620,6 @@ generated quantities {
   x = lognormal_rng(3.5, u);
   z = lognormal_rng(3.5, 3);
   z = lognormal_rng(3.5, 3.5);
-  
   x = scaled_inv_chi_square_rng(alpha, alpha);
   x = scaled_inv_chi_square_rng(alpha, nu);
   x = scaled_inv_chi_square_rng(alpha, ns);
@@ -682,7 +656,6 @@ generated quantities {
   x = scaled_inv_chi_square_rng(3.5, u);
   z = scaled_inv_chi_square_rng(3.5, 3);
   z = scaled_inv_chi_square_rng(3.5, 3.5);
-  
   x = gamma_rng(alpha, alpha);
   x = gamma_rng(alpha, nu);
   x = gamma_rng(alpha, ns);
@@ -719,7 +692,6 @@ generated quantities {
   x = gamma_rng(3.5, u);
   z = gamma_rng(3.5, 3);
   z = gamma_rng(3.5, 3.5);
-  
   x = inv_gamma_rng(alpha, alpha);
   x = inv_gamma_rng(alpha, nu);
   x = inv_gamma_rng(alpha, ns);
@@ -756,7 +728,6 @@ generated quantities {
   x = inv_gamma_rng(3.5, u);
   z = inv_gamma_rng(3.5, 3);
   z = inv_gamma_rng(3.5, 3.5);
-  
   x = weibull_rng(alpha, alpha);
   x = weibull_rng(alpha, nu);
   x = weibull_rng(alpha, ns);
@@ -793,7 +764,6 @@ generated quantities {
   x = weibull_rng(3.5, u);
   z = weibull_rng(3.5, 3);
   z = weibull_rng(3.5, 3.5);
-  
   x = frechet_rng(alpha, alpha);
   x = frechet_rng(alpha, nu);
   x = frechet_rng(alpha, ns);
@@ -830,7 +800,6 @@ generated quantities {
   x = frechet_rng(3.5, u);
   z = frechet_rng(3.5, 3);
   z = frechet_rng(3.5, 3.5);
-  
   x = pareto_rng(alpha, alpha);
   x = pareto_rng(alpha, nu);
   x = pareto_rng(alpha, ns);
@@ -867,7 +836,6 @@ generated quantities {
   x = pareto_rng(3.5, u);
   z = pareto_rng(3.5, 3);
   z = pareto_rng(3.5, 3.5);
-
   x = exp_mod_normal_rng(alpha, alpha, alpha);
   x = exp_mod_normal_rng(alpha, alpha, nu);
   x = exp_mod_normal_rng(alpha, alpha, ns);
@@ -1084,7 +1052,6 @@ generated quantities {
   x = exp_mod_normal_rng(3.5, 3.5, u);
   z = exp_mod_normal_rng(3.5, 3.5, 3);
   z = exp_mod_normal_rng(3.5, 3.5, 3.5);
-  
   x = pareto_type_2_rng(alpha, alpha, alpha);
   x = pareto_type_2_rng(alpha, alpha, nu);
   x = pareto_type_2_rng(alpha, alpha, ns);
@@ -1301,7 +1268,6 @@ generated quantities {
   x = pareto_type_2_rng(3.5, 3.5, u);
   z = pareto_type_2_rng(3.5, 3.5, 3);
   z = pareto_type_2_rng(3.5, 3.5, 3.5);
-  
   x = skew_normal_rng(alpha, alpha, alpha);
   x = skew_normal_rng(alpha, alpha, nu);
   x = skew_normal_rng(alpha, alpha, ns);
@@ -1518,7 +1484,6 @@ generated quantities {
   x = skew_normal_rng(3.5, 3.5, u);
   z = skew_normal_rng(3.5, 3.5, 3);
   z = skew_normal_rng(3.5, 3.5, 3.5);
-  
   x = student_t_rng(alpha, alpha, alpha);
   x = student_t_rng(alpha, alpha, nu);
   x = student_t_rng(alpha, alpha, ns);
@@ -1735,28 +1700,22 @@ generated quantities {
   x = student_t_rng(3.5, 3.5, u);
   z = student_t_rng(3.5, 3.5, 3);
   z = student_t_rng(3.5, 3.5, 3.5);
-
   theta = dirichlet_rng(alpha);
-  
   v = multi_normal_rng(mu, Sigma);
   v = multi_normal_rng(nu, Sigma);
   v_array = multi_normal_rng(mu_array, Sigma);
   v_array = multi_normal_rng(nu_array, Sigma);
-
   v = multi_normal_cholesky_rng(mu, Sigma);
   v = multi_normal_cholesky_rng(nu, Sigma);
   v_array = multi_normal_cholesky_rng(mu_array, Sigma);
   v_array = multi_normal_cholesky_rng(nu_array, Sigma);
-
   v = multi_student_t_rng(3.0, mu, Sigma);
   v = multi_student_t_rng(3.0, nu, Sigma);
   v_array = multi_student_t_rng(3.0, mu_array, Sigma);
   v_array = multi_student_t_rng(3.0, nu_array, Sigma);
-  
-  // v = multi_normal_prec_rng(mu,Sigma);
-  Sigma = wishart_rng(3.0,Sigma);
-  Sigma = inv_wishart_rng(3.0,Sigma);
-  Sigma = lkj_corr_rng(3,2.5);
-  L = lkj_corr_cholesky_rng(3,3.0);
-  // DEPRECATE:  Sigma = lkj_cov_rng(Sigma, mu, alpha, 2.0);
+  Sigma = wishart_rng(3.0, Sigma);
+  Sigma = inv_wishart_rng(3.0, Sigma);
+  Sigma = lkj_corr_rng(3, 2.5);
+  L = lkj_corr_cholesky_rng(3, 3.0);
 }
+

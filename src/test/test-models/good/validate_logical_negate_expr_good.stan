@@ -12,5 +12,6 @@ transformed parameters {
   xt = !xt;
 }
 model {
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
+
