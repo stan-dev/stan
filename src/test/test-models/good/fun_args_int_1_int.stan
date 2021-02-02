@@ -1,1 +1,9 @@
-functions { int foo(int x) { return x; } } model { }
+functions {
+  int foo(int x) {
+    return x;
+  }
+}
+model {
+
+}
+

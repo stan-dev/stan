@@ -4,7 +4,9 @@ parameters {
 }
 model {
   if (1 > 2) {
-    a ~ normal(0,1);
-  } 
-  else if2 ~ normal(0,1);
+    a ~ normal(0, 1);
+  }
+  else 
+    if2 ~ normal(0, 1);
 }
+

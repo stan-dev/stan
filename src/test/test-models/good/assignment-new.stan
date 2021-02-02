@@ -10,3 +10,4 @@ parameters {
 model {
   y ~ normal(mu, sigma);
 }
+

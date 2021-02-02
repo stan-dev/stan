@@ -19,3 +19,4 @@ model {
   t1 ~ exponential(lambda1);
   t2 ~ exponential(nu);
 }
+

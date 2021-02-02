@@ -1,4 +1,6 @@
-functions {}
+functions {
+
+}
 data {
   int<lower=1> N;
   matrix[N, N] K;
@@ -14,7 +16,7 @@ transformed data {
   K2 = add_diag(K, vec);
   K3 = add_diag(K, scalar);
 }
-parameters {  
+parameters {
   matrix[N, N] Kp;
   row_vector[N] row_vec_p;
   vector[N] vec_p;
@@ -31,4 +33,7 @@ model {
   matrix[N, N] K11 = add_diag(Kp, vec);
   matrix[N, N] K12 = add_diag(Kp, scalar);
 }
-generated quantities {}
+generated quantities {
+
+}
+

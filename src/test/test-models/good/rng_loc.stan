@@ -8,10 +8,13 @@ transformed data {
   y = normal_rng(0, 1);
 }
 parameters {
+
 }
 model {
+
 }
 generated quantities {
   real z;
   z = normal_rng(0, 1);
 }
+

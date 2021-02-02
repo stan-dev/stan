@@ -1,6 +1,3 @@
-// test via printf, compile and then run (cmdstan):
-// > stan/src/test/test-models/good/compound-assign/plus_equals_prim_print sample algorithm=fixed_param num_warmup=0 num_samples=1
-
 functions {
   real foo(real a1) {
     real b = a1;
@@ -16,10 +13,10 @@ transformed data {
   int x = 10;
   real y = 20;
   print("in transformed data");
-    x += 1;  // scalar int
+  x += 1;
   print("x += 1: ", x);
   print("y: ", y);
-  y += 1;  // scalar double
+  y += 1;
   print("y += 1: ", y);
 }
 transformed parameters {
@@ -30,7 +27,7 @@ transformed parameters {
   print("w += y: ", w);
   w += foo(w);
   print("w += foo(w): ", w);
-}  
+}
 model {
   real v = 7;
   print("in model block");
@@ -54,3 +51,4 @@ generated quantities {
   z += foo(y);
   print("z += foo(y): ", z);
 }
+

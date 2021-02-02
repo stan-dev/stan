@@ -1,17 +1,17 @@
 data {
   real a;
   vector[3] b;
-  real c[7];
-  real d[8, 9];
+  array[7] real c;
+  array[8, 9] real d;
 }
 parameters {
   real e;
   vector[3] f;
-  real g[7];
-  real h[8, 9];
+  array[7] real g;
+  array[8, 9] real h;
 }
 model {
-  target += -e^2 / 2;
+  target += -e ^ 2 / 2;
   target += a;
   target += b;
   target += b;
@@ -22,3 +22,4 @@ model {
   target += g;
   target += h;
 }
+

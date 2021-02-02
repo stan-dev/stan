@@ -1,5 +1,5 @@
 transformed data {
-  matrix[3,3] m;
+  matrix[3, 3] m;
   vector[3] v;
   row_vector[3] rv;
   real c;
@@ -17,7 +17,7 @@ parameters {
   real y;
 }
 transformed parameters {
-  matrix[3,3] mt;
+  matrix[3, 3] mt;
   vector[3] vt;
   row_vector[3] rvt;
   real ct;
@@ -32,5 +32,6 @@ transformed parameters {
   rvt = rvt ./ ct;
 }
 model {
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
+

@@ -1,13 +1,6 @@
-/**
- * get_lp() allowed in:
- *  - functions ending in _lp
- *  transformed parameter block
- *  model block
- */
 functions {
-  // allowed in functions ending in _lp
   real foo_lp(real x) {
-    return x + get_lp();
+    return x + target();
   }
 }
 parameters {
@@ -15,10 +8,11 @@ parameters {
 }
 transformed parameters {
   real z;
-  z = get_lp();  
+  z = target();
 }
 model {
   real w;
-  w = get_lp();
-  y ~ normal(0,1);
+  w = target();
+  y ~ normal(0, 1);
 }
+

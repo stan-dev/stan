@@ -11,5 +11,6 @@ transformed parameters {
   foo_bar();
 }
 model {
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
+

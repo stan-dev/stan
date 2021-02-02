@@ -2,5 +2,6 @@ parameters {
   real force;
 }
 model {
-  force ~ normal(0,1);
+  force ~ normal(0, 1);
 }
+
