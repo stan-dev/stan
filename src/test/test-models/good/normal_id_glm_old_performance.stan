@@ -1,8 +1,3 @@
-Info: Found int division at 'src/test/test-models/good/normal_id_glm_old_performance.stan', line 11, column 19 to column 20:
-  j / M
-Values will be rounded towards zero. If rounding is not desired you can write
-the division as
-  j * 1.0 / M
 transformed data {
   int<lower=0> N = 50;
   int<lower=0> M = 100;
@@ -30,5 +25,3 @@ model {
   alpha_inferred ~ normal(0, 4);
   y ~ normal(x * beta_inferred + alpha_inferred, sigma);
 }
-
-If rounding is intended please use the integer division operator %/%.

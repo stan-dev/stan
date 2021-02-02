@@ -1,8 +1,3 @@
-Info: Found int division at 'src/test/test-models/good/validate_division_good.stan', line 19, column 7 to column 8:
-  2 / 3
-Values will be rounded towards zero. If rounding is not desired you can write
-the division as
-  2.0 / 3
 transformed data {
   real u;
   matrix[3, 3] m;
@@ -32,4 +27,3 @@ model {
   y ~ normal(0, 1);
 }
 
-If rounding is intended please use the integer division operator %/%.
