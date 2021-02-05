@@ -3,10 +3,11 @@ parameters {
 }
 transformed parameters {
   print("target = ", target());
-  print("get_lp = ", get_lp());
+  print("get_lp = ", target());
 }
 model {
   print("target = ", target());
-  print("get_lp = ", get_lp());
+  print("get_lp = ", target());
   y ~ normal(0, 1);
 }
+

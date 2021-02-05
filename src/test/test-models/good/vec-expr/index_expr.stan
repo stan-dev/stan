@@ -1,8 +1,11 @@
 functions {
   void foo(int N) {
-    int c[4];
-    int d[3];
-    c[2:10] = d;
+    array[4] int c;
+    array[3] int d;
+    c[2 : 10] = d;
   }
 }
-model {}
+model {
+
+}
+

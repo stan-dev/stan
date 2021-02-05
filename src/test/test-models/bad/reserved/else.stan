@@ -1,5 +1,0 @@
-data {
-  real else;
-}
-model {
-}

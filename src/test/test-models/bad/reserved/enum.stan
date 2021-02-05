@@ -1,5 +1,0 @@
-data {
-  real enum;
-}
-model {
-}

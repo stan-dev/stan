@@ -1,8 +1,8 @@
-data { 
+data {
   matrix[3, 4] a_d;
 }
 transformed data {
-  int u[5];
+  array[5] int u;
   u = csr_extract_u(a_d);
 }
 parameters {
@@ -11,15 +11,14 @@ parameters {
 }
 transformed parameters {
   real v;
-  { 
-    int u_p[5];
+  {
+    array[5] int u_p;
     u_p = csr_extract_u(a_d);
     u_p = csr_extract_u(a_p);
     v = 3;
   }
 }
-model {  
+model {
   y ~ normal(0, 1);
 }
-
 

@@ -1,13 +1,12 @@
-data { 
+data {
   int d_int;
   real d_real;
 }
 transformed data {
   int transformed_data_int;
   real transformed_data_real;
- 
-   transformed_data_real = trunc(d_int);
-   transformed_data_real = trunc(d_real);
+  transformed_data_real = trunc(d_int);
+  transformed_data_real = trunc(d_real);
 }
 parameters {
   real p_real;
@@ -15,11 +14,11 @@ parameters {
 }
 transformed parameters {
   real transformed_param_real;
-
   transformed_param_real = trunc(d_int);
   transformed_param_real = trunc(d_real);
   transformed_param_real = trunc(p_real);
 }
-model {  
-  y_p ~ normal(0,1);
+model {
+  y_p ~ normal(0, 1);
 }
+

@@ -8,5 +8,6 @@ parameters {
 }
 model {
   foo(y);
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
+

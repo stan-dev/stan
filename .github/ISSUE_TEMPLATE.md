@@ -24,4 +24,4 @@ Describe what you expect the output to be. Knowing the correct behavior is also 
 Provide any additional information here.
 
 #### Current Version:
-v2.25.0
+v2.26.0

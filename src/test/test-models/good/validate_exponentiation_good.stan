@@ -6,10 +6,10 @@ data {
 }
 transformed data {
   real z;
-  z = x ^ y;  // double, double
-  z = x ^ j;  // double, int
-  z = j ^ x;  // int, double
-  z = i ^ j;  // int, int
+  z = x ^ y;
+  z = x ^ j;
+  z = j ^ x;
+  z = i ^ j;
 }
 parameters {
   real a;
@@ -18,16 +18,17 @@ parameters {
 transformed parameters {
   real z2;
   z2 = a * b;
-  z2 = x ^ y;  // double, double
-  z2 = x ^ j;  // double, int
-  z2 = x ^ a;  // double, var
-  z2 = i ^ x;  // int, double
-  z2 = i ^ j;  // int, int
-  z2 = i ^ b;  // int, var
-  z2 = a ^ x;  // var, double
-  z2 = a ^ j;  // var, int
-  z2 = a ^ b;  // var, var
+  z2 = x ^ y;
+  z2 = x ^ j;
+  z2 = x ^ a;
+  z2 = i ^ x;
+  z2 = i ^ j;
+  z2 = i ^ b;
+  z2 = a ^ x;
+  z2 = a ^ j;
+  z2 = a ^ b;
 }
 model {
-  a ~ normal(0,1);
+  a ~ normal(0, 1);
 }
+
