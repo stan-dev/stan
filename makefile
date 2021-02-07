@@ -29,6 +29,8 @@ include make/cpplint                      # cpplint
 include make/tests                        # tests
 include make/clang-tidy
 
+CPPFLAGS += -DUSE_STANC3
+
 INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I ./src/
 LDLIBS_STANC ?= -Ltest -lstanc
 
