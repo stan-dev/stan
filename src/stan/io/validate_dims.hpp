@@ -1,3 +1,5 @@
+#ifdef USE_STANC3
+
 #ifndef STAN_IO_VALIDATE_DIMS_HPP
 #define STAN_IO_VALIDATE_DIMS_HPP
 
@@ -69,4 +71,6 @@ inline void validate_dims(const stan::io::var_context& context,
 
 }  // namespace io
 }  // namespace stan
+#endif
+
 #endif

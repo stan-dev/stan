@@ -761,6 +761,7 @@ class dump : public stan::io::var_context {
       names.push_back((*it).first);
   }
 
+#ifdef USE_STANC3
   /**
    * Check variable dimensions against variable declaration.
    *
@@ -776,6 +777,7 @@ class dump : public stan::io::var_context {
                      const std::vector<size_t>& dims_declared) const {
     stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
   }
+#endif
 
   /**
    * Remove variable from the object.

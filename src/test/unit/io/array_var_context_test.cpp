@@ -3,7 +3,9 @@
 #include <stan/io/array_var_context.hpp>
 #include <gtest/gtest.h>
 #include <boost/math/special_functions/fpclassify.hpp>
+#ifdef USE_STANC3
 #include <test/test-models/good/services/bernoulli.hpp>
+#endif
 #include <Eigen/Dense>
 
 TEST(array_var_context, ctor_int) {
@@ -208,6 +210,7 @@ TEST(array_var_context, invalid_input2) {
   FAIL();
 }
 
+#ifdef USE_STANC3
 TEST(array_var_context, invalid_context_validate) {
   std::vector<int> a;
   std::vector<std::vector<size_t> > dims;
@@ -241,3 +244,4 @@ TEST(array_var_context, invalid_context_validate) {
   EXPECT_NO_THROW(
       bernoulli_model_namespace::bernoulli_model(avc3, 0, &std::cout));
 }
+#endif

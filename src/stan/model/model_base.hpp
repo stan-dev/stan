@@ -53,6 +53,7 @@ class model_base : public prob_grad {
    */
   virtual std::string model_name() const = 0;
 
+#ifdef USE_STANC3
   /**
    * Returns the compile information of the model:
    * stanc version and stanc flags used to compile the model.
@@ -60,6 +61,7 @@ class model_base : public prob_grad {
    * @return model name
    */
   virtual std::vector<std::string> model_compile_info() const = 0;
+#endif
 
   /**
    * Set the specified argument to sequence of parameters, transformed

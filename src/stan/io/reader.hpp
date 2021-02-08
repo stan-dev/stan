@@ -1300,6 +1300,7 @@ class reader {
     return v;
   }
 
+#ifdef USE_STANC3
   template <typename TL>
   inline auto vector_lb_constrain(const TL lb, size_t m) {
     return stan::math::lb_constrain(vector(m), lb);
@@ -1327,6 +1328,47 @@ class reader {
   inline auto row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
     return stan::math::lb_constrain(row_vector(m), lb, lp);
   }
+#else
+  template <typename TL>
+  inline vector_t vector_lb_constrain(const TL lb, size_t m) {
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lb_constrain(lb);
+    return v;
+  }
+
+  template <typename TL>
+  inline vector_t vector_lb_constrain(const TL lb, size_t m, T &lp) {
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lb_constrain(lb, lp);
+    return v;
+  }
+
+  template <typename TL>
+  inline row_vector_t row_vector_lb(const TL lb, size_t m) {
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lb(lb);
+    return v;
+  }
+
+  template <typename TL>
+  inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m) {
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lb_constrain(lb);
+    return v;
+  }
+
+  template <typename TL>
+  inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lb_constrain(lb, lp);
+    return v;
+  }
+#endif
 
   template <typename TL>
   inline map_matrix_t matrix_lb(const TL lb, const size_t m, size_t n) {
@@ -1351,6 +1393,7 @@ class reader {
         .eval();
   }
 
+#ifdef USE_STANC3
   template <typename TU>
   inline map_vector_t vector_ub(const TU ub, size_t m) {
     map_vector_t v(vector(m));
@@ -1386,6 +1429,55 @@ class reader {
   inline auto row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
     return stan::math::ub_constrain(row_vector(m), ub, lp);
   }
+#else
+  template <typename TU>
+  inline vector_t vector_ub(const TU ub, size_t m) {
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_ub(ub);
+    return v;
+  }
+
+  template <typename TU>
+  inline vector_t vector_ub_constrain(const TU ub, size_t m) {
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_ub_constrain(ub);
+    return v;
+  }
+
+  template <typename TU>
+  inline vector_t vector_ub_constrain(const TU ub, size_t m, T &lp) {
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_ub_constrain(ub, lp);
+    return v;
+  }
+
+  template <typename TU>
+  inline row_vector_t row_vector_ub(const TU ub, size_t m) {
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_ub(ub);
+    return v;
+  }
+
+  template <typename TU>
+  inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m) {
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_ub_constrain(ub);
+    return v;
+  }
+
+  template <typename TU>
+  inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_ub_constrain(ub, lp);
+    return v;
+  }
+#endif
 
   template <typename TU>
   inline map_matrix_t matrix_ub(const TU ub, size_t m, size_t n) {
@@ -1419,6 +1511,7 @@ class reader {
     return v;
   }
 
+#ifdef USE_STANC3
   template <typename TL, typename TU>
   inline auto vector_lub_constrain(const TL lb, const TU ub, size_t m) {
     return stan::math::lub_constrain(vector(m), lb, ub);
@@ -1447,6 +1540,57 @@ class reader {
                                                size_t m, T &lp) {
     return stan::math::lub_constrain(row_vector(m), lb, ub, lp);
   }
+#else
+  template <typename TL, typename TU>
+  inline vector_t vector_lub(const TL lb, const TU ub, size_t m) {
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lub(lb, ub);
+    return v;
+  }
+
+  template <typename TL, typename TU>
+  inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m) {
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lub_constrain(lb, ub);
+    return v;
+  }
+
+  template <typename TL, typename TU>
+  inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m,
+                                       T &lp) {
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lub_constrain(lb, ub, lp);
+    return v;
+  }
+
+  template <typename TL, typename TU>
+  inline row_vector_t row_vector_lub(const TL lb, const TU ub, size_t m) {
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lub(lb, ub);
+    return v;
+  }
+  template <typename TL, typename TU>
+  inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
+                                               size_t m) {
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lub_constrain(lb, ub);
+    return v;
+  }
+
+  template <typename TL, typename TU>
+  inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
+                                               size_t m, T &lp) {
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_lub_constrain(lb, ub, lp);
+    return v;
+  }
+#endif
 
   template <typename TL, typename TU>
   inline map_matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
