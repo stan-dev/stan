@@ -2,7 +2,6 @@
 #define STAN_IO_DUMP_HPP
 
 #include <stan/io/validate_zero_buf.hpp>
-#include <stan/io/validate_dims.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim.hpp>
 #include <boost/lexical_cast.hpp>
@@ -759,22 +758,6 @@ class dump : public stan::io::var_context {
          = vars_i_.begin();
          it != vars_i_.end(); ++it)
       names.push_back((*it).first);
-  }
-
-  /**
-   * Check variable dimensions against variable declaration.
-   *
-   * @param stage stan program processing stage
-   * @param name variable name
-   * @param base_type declared stan variable type
-   * @param dims variable dimensions
-   * @throw std::runtime_error if mismatch between declared
-   *        dimensions and dimensions found in context.
-   */
-  void validate_dims(const std::string& stage, const std::string& name,
-                     const std::string& base_type,
-                     const std::vector<size_t>& dims_declared) const {
-    stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
   }
 
   /**
