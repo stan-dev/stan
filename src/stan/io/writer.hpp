@@ -445,6 +445,12 @@ class writer {
       data_r_.push_back(y_free[i]);
   }
 
+#ifndef USE_STANC3
+  void cholesky_corr_unconstrain(matrix_t &y) {
+    return cholesky_factor_corr_unconstrain(y);
+  }
+#endif
+
   /**
    * Writes the unconstrained covariance matrix corresponding
    * to the specified constrained correlation matrix.
