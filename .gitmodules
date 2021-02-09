@@ -1,5 +1,5 @@
 [submodule "lib/stan_math"]
 	path = lib/stan_math
-	url = https://github.com/stan-dev/math.git
+	url = https://github.com/hsbadr/math.git
 	branch = StanHeaders_2.26
 	ignore = dirty
