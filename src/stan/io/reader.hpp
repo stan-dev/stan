@@ -34,8 +34,8 @@ namespace io {
 template <typename T>
 class reader {
  private:
-  Eigen::Map<const Eigen::Matrix<T, -1, 1>> data_r_;
-  Eigen::Map<const Eigen::Matrix<int, -1, 1>> data_i_;
+  Eigen::Map<Eigen::Matrix<T, -1, 1>> data_r_;
+  Eigen::Map<Eigen::Matrix<int, -1, 1>> data_i_;
   size_t pos_{0};
   size_t int_pos_{0};
 
@@ -161,6 +161,7 @@ class reader {
    * log_prob Reference to log probability variable to increment.
    * @return Next scalar.
    */
+  template <bool Jacobian = true>
   inline T scalar_constrain(T & /*log_prob*/) { return scalar(); }
 
   /**
@@ -226,9 +227,7 @@ class reader {
    * @return Column vector made up of the next scalars.
    */
   inline auto vector_constrain(size_t m) {
-    if (m == 0)
-      return map_vector_t(nullptr, m);
-    return map_vector_t(&scalar_ptr_increment(m), m);
+    return this->vector(m);
   }
   /**
    * Return a column vector of specified dimensionality made up of
@@ -238,10 +237,35 @@ class reader {
    * lp Log probability to increment.
    * @return Column vector made up of the next scalars.
    */
+  template <bool Jacobian = true>
   inline auto vector_constrain(size_t m, T & /*lp*/) {
-    if (m == 0)
-      return map_vector_t(nullptr, m);
-    return map_vector_t(&scalar_ptr_increment(m), m);
+    return this->vector(m);
+  }
+
+  /**
+   * Return a column vector of specified dimensionality made up of
+   * the next scalars.  The constraint and hence Jacobian are no-ops.
+   *
+   * @param m Number of rows in the vector to read.
+   * lp Log probability to increment.
+   * @return Column vector made up of the next scalars.
+   */
+  template <bool Jacobian = true, typename T_ = T, require_st_arithmetic<T_>* = nullptr>
+  inline auto var_vector_constrain(size_t m, T & /*lp*/) {
+    return this->vector(m);
+  }
+
+  /**
+   * Return a column vector of specified dimensionality made up of
+   * the next scalars.  The constraint and hence Jacobian are no-ops.
+   *
+   * @param m Number of rows in the vector to read.
+   * lp Log probability to increment.
+   * @return Column vector made up of the next scalars.
+   */
+  template <bool Jacobian = true, typename T_ = T, require_st_var<T_>* = nullptr>
+  inline auto var_vector_constrain(size_t m, T & /*lp*/) {
+    return this->var_vector(m);
   }
 
   /**
@@ -292,9 +316,7 @@ class reader {
    * @return Column vector made up of the next scalars.
    */
   inline auto row_vector_constrain(size_t m) {
-    if (m == 0)
-      return map_row_vector_t(nullptr, m);
-    return map_row_vector_t(&scalar_ptr_increment(m), m);
+    return this->row_vector(m);
   }
 
   /**
@@ -306,10 +328,37 @@ class reader {
    * lp Log probability to increment.
    * @return Column vector made up of the next scalars.
    */
+  template <bool Jacobian = true>
   inline auto row_vector_constrain(size_t m, T & /*lp*/) {
-    if (m == 0)
-      return map_row_vector_t(nullptr, m);
-    return map_row_vector_t(&scalar_ptr_increment(m), m);
+    return this->row_vector(m);
+  }
+
+  /**
+   * Return a row vector of specified dimensionality made up of
+   * the next scalars.  The constraint is a no-op, so the log
+   * probability is not incremented.
+   *
+   * @param m Number of rows in the vector to read.
+   * lp Log probability to increment.
+   * @return Column vector made up of the next scalars.
+   */
+  template <bool Jacobian = true, typename T_ = T, require_st_var<T_>* = nullptr>
+  inline auto var_row_vector_constrain(size_t m, T & /*lp*/) {
+    return this->var_row_vector(m);
+  }
+
+  /**
+   * Return a row vector of specified dimensionality made up of
+   * the next scalars.  The constraint is a no-op, so the log
+   * probability is not incremented.
+   *
+   * @param m Number of rows in the vector to read.
+   * lp Log probability to increment.
+   * @return Column vector made up of the next scalars.
+   */
+  template <bool Jacobian = true, typename T_ = T, require_st_arithmetic<T_>* = nullptr>
+  inline auto var_row_vector_constrain(size_t m, T & /*lp*/) {
+    return this->var_row_vector(m);
   }
 
   /**
@@ -330,9 +379,11 @@ class reader {
    * @return Eigen::Matrix made up of the next scalars.
    */
   inline auto matrix(size_t m, size_t n) {
-    if (m == 0 || n == 0)
+    if (m == 0 || n == 0) {
       return map_matrix_t(nullptr, m, n);
-    return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
+    } else {
+      return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
+    }
   }
 
   /**
@@ -354,10 +405,12 @@ class reader {
    */
   template <typename T_ = T, require_st_var<T_> * = nullptr>
   inline var_matrix_t var_matrix(size_t m, size_t n) {
-    if (m == 0 || n == 0)
+    if (m == 0 || n == 0) {
       return var_matrix_t(Eigen::MatrixXd(0, 0));
-    return stan::math::to_var_value(
-        map_matrix_t(&scalar_ptr_increment(m * n), m, n));
+    } else {
+      return stan::math::to_var_value(
+          map_matrix_t(&scalar_ptr_increment(m * n), m, n));
+    }
   }
 
   /**
@@ -393,9 +446,7 @@ class reader {
    * @return Matrix made up of the next scalars.
    */
   inline auto matrix_constrain(size_t m, size_t n) {
-    if (m == 0 || n == 0)
-      return map_matrix_t(nullptr, m, n);
-    return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
+    return this->matrix(m, n);
   }
 
   /**
@@ -410,10 +461,43 @@ class reader {
    * lp Log probability to increment.
    * @return Matrix made up of the next scalars.
    */
+  template <bool Jacobian = true>
   inline auto matrix_constrain(size_t m, size_t n, T & /*lp*/) {
-    if (m == 0 || n == 0)
-      return map_matrix_t(nullptr, m, n);
-    return map_matrix_t(&scalar_ptr_increment(m * n), m, n);
+    return this->matrix(m, n);
+  }
+
+  /**
+   * Return a matrix of the specified dimensionality made up of
+   * the next scalars arranged in column-major order.  The
+   * constraint is a no-op, hence the log probability is not
+   * incremented.  See <code>matrix(size_t, size_t)</code>
+   * for more information.
+   *
+   * @param m Number of rows.
+   * @param n Number of columns.
+   * lp Log probability to increment.
+   * @return Matrix made up of the next scalars.
+   */
+  template <bool Jacobian = true, typename T_ = T, require_st_arithmetic<T_>* = nullptr>
+  inline auto var_matrix_constrain(size_t m, size_t n, T & /*lp*/) {
+    return this->matrix(m, n);
+  }
+
+  /**
+   * Return a matrix of the specified dimensionality made up of
+   * the next scalars arranged in column-major order.  The
+   * constraint is a no-op, hence the log probability is not
+   * incremented.  See <code>matrix(size_t, size_t)</code>
+   * for more information.
+   *
+   * @param m Number of rows.
+   * @param n Number of columns.
+   * lp Log probability to increment.
+   * @return Matrix made up of the next scalars.
+   */
+  template <bool Jacobian = true, typename T_ = T, require_st_var<T_>* = nullptr>
+  inline auto var_matrix_constrain(size_t m, size_t n, T & /*lp*/) {
+    return this->var_matrix(m, n);
   }
 
   /**
@@ -452,6 +536,7 @@ class reader {
    * @throw std::runtime_error If the next integer read is not
    * greater than or equal to the lower bound.
    */
+  template <bool Jacobian = true>
   inline int integer_lb_constrain(int lb, T & /*lp*/) { return integer_lb(lb); }
 
   /**
@@ -490,6 +575,7 @@ class reader {
    * @throw std::runtime_error If the next integer read is not
    * less than or equal to the upper bound.
    */
+  template <bool Jacobian = true>
   inline int integer_ub_constrain(int ub, T & /*lp*/) { return integer_ub(ub); }
 
   /**
@@ -542,6 +628,7 @@ class reader {
    * @throw std::runtime_error If the next integer read is not
    * less than or equal to the upper bound.
    */
+  template <bool Jacobian = true>
   inline int integer_lub_constrain(int lb, int ub, T & /*lp*/) {
     return integer_lub(lb, ub);
   }
@@ -582,8 +669,13 @@ class reader {
    * @param lp Reference to log probability variable to increment.
    * @return The next scalar transformed to be positive.
    */
+  template <bool Jacobian = true>
   inline T scalar_pos_constrain(T &lp) {
-    return stan::math::positive_constrain(scalar(), lp);
+    if (Jacobian) {
+      return stan::math::positive_constrain(scalar(), lp);
+    } else {
+      return stan::math::positive_constrain(scalar());
+    }
   }
 
   /**
@@ -633,9 +725,13 @@ class reader {
    * @param lb Lower bound on result.
    * @param lp Reference to log probability variable to increment.
    */
-  template <typename TL>
+  template <bool Jacobian = true, typename TL>
   inline T scalar_lb_constrain(const TL lb, T &lp) {
-    return stan::math::lb_constrain(scalar(), lb, lp);
+    if (Jacobian) {
+      return stan::math::lb_constrain(scalar(), lb, lp);
+    } else {
+      return stan::math::lb_constrain(scalar(), lb);
+    }
   }
 
   /**
@@ -685,9 +781,13 @@ class reader {
    * @param ub Upper bound on result.
    * @param lp Reference to log probability variable to increment.
    */
-  template <typename TU>
+  template <bool Jacobian = true, typename TU>
   inline T scalar_ub_constrain(const TU ub, T &lp) {
-    return stan::math::ub_constrain(scalar(), ub, lp);
+    if (Jacobian) {
+      return stan::math::ub_constrain(scalar(), ub, lp);
+    } else {
+      return stan::math::ub_constrain(scalar(), ub);
+    }
   }
 
   /**
@@ -743,9 +843,13 @@ class reader {
    * @tparam TL Type of lower bound.
    * @tparam TU Type of upper bound.
    */
-  template <typename TL, typename TU>
+  template <bool Jacobian = true, typename TL, typename TU>
   inline T scalar_lub_constrain(TL lb, TU ub, T &lp) {
-    return stan::math::lub_constrain(scalar(), lb, ub, lp);
+    if (Jacobian) {
+      return stan::math::lub_constrain(scalar(), lb, ub, lp);
+    } else {
+      return stan::math::lub_constrain(scalar(), lb, ub);
+    }
   }
 
   /**
@@ -759,8 +863,7 @@ class reader {
    */
   template <typename TL, typename TS>
   inline T scalar_offset_multiplier(const TL offset, const TS multiplier) {
-    T x(scalar());
-    return x;
+    return scalar();
   }
 
   /**
@@ -798,10 +901,14 @@ class reader {
    * @tparam TL Type of offset.
    * @tparam TS Type of multiplier.
    */
-  template <typename TL, typename TS>
+  template <bool Jacobian = true, typename TL, typename TS>
   inline T scalar_offset_multiplier_constrain(TL offset, TS multiplier, T &lp) {
-    return stan::math::offset_multiplier_constrain(scalar(), offset, multiplier,
-                                                   lp);
+    if (Jacobian) {
+      return stan::math::offset_multiplier_constrain(scalar(), offset, multiplier,
+                                                     lp);
+    } else {
+      return stan::math::offset_multiplier_constrain(scalar(), offset, multiplier);
+    }
   }
 
   /**
@@ -839,8 +946,13 @@ class reader {
    * @param lp Reference to log probability variable to increment.
    * @return The next scalar transformed to a probability.
    */
+  template <bool Jacobian = true>
   inline T prob_constrain(T &lp) {
-    return stan::math::prob_constrain(scalar(), lp);
+    if (Jacobian) {
+      return stan::math::prob_constrain(scalar(), lp);
+    } else {
+      return stan::math::prob_constrain(scalar());
+    }
   }
 
   /**
@@ -882,8 +994,13 @@ class reader {
    * probability to increment.
    * @return The next scalar transformed to a correlation.
    */
+  template <bool Jacobian = true>
   inline T corr_constrain(T &lp) {
-    return stan::math::corr_constrain(scalar(), lp);
+    if (Jacobian) {
+      return stan::math::corr_constrain(scalar(), lp);
+    } else {
+      return stan::math::corr_constrain(scalar());
+    }
   }
 
   /**
@@ -905,6 +1022,29 @@ class reader {
     map_vector_t theta(vector(k));
     stan::math::check_unit_vector("stan::io::unit_vector", "Constrained vector",
                                   theta);
+    return theta;
+  }
+
+  /**
+   * Return a unit_vector of the specified size made up of the
+   * next scalars.
+   *
+   * <p>See <code>stan::math::check_unit_vector</code>.
+   *
+   * @param k Size of returned unit_vector
+   * @return unit_vector read from the specified size number of scalars
+   * @throw std::runtime_error if the next k values is not a unit_vector
+   * @throw std::invalid_argument if k is zero
+   */
+  inline var_vector_t var_unit_vector(size_t k) {
+    using stan::math::value_of;
+    if (k == 0) {
+      std::string msg = "io::unit_vector: unit vectors cannot be size 0.";
+      throw std::invalid_argument(msg);
+    }
+    var_vector_t theta(var_vector(k));
+    stan::math::check_unit_vector("stan::io::unit_vector", "Constrained vector",
+                                  value_of(theta));
     return theta;
   }
 
@@ -942,14 +1082,47 @@ class reader {
    * @return The next unit_vector of the specified size.
    * @throw std::invalid_argument if k is zero
    */
-  inline auto unit_vector_constrain(size_t k, T &lp) {
+  template <bool Jacobian = true>
+  inline vector_t unit_vector_constrain(size_t k, T &lp) {
     if (k == 0) {
       std::string msg
           = "io::unit_vector_constrain:"
             " unit vectors cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    return stan::math::unit_vector_constrain(vector(k), lp);
+    if (Jacobian) {
+      return stan::math::unit_vector_constrain(vector(k), lp);
+    } else {
+      return stan::math::unit_vector_constrain(vector(k));
+    }
+  }
+
+  /**
+   * Return the next unit_vector of the specified size (using one fewer
+   * unconstrained scalars), incrementing the specified reference with the
+   * log absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::unit_vector_constrain(Eigen::Matrix,T&)</code>.
+   *
+   * @param k Size of unit_vector.
+   * @param lp Log probability to increment with log absolute
+   * Jacobian determinant.
+   * @return The next unit_vector of the specified size.
+   * @throw std::invalid_argument if k is zero
+   */
+  template <bool Jacobian = true>
+  inline var_vector_t var_unit_vector_constrain(size_t k, T &lp) {
+    if (k == 0) {
+      std::string msg
+          = "io::unit_vector_constrain:"
+            " unit vectors cannot be size 0.";
+      throw std::invalid_argument(msg);
+    }
+    if (Jacobian) {
+      return stan::math::unit_vector_constrain(var_vector(k), lp);
+    } else {
+      return stan::math::unit_vector_constrain(var_vector(k));
+    }
   }
 
   /**
@@ -970,6 +1143,28 @@ class reader {
     }
     map_vector_t theta(vector(k));
     stan::math::check_simplex("stan::io::simplex", "Constrained vector", theta);
+    return theta;
+  }
+
+  /**
+   * Return a simplex of the specified size made up of the
+   * next scalars.
+   *
+   * <p>See <code>stan::math::check_simplex</code>.
+   *
+   * @param k Size of returned simplex.
+   * @return Simplex read from the specified size number of scalars.
+   * @throw std::runtime_error if the k values is not a simplex.
+   * @throw std::invalid_argument if k is zero
+   */
+  inline var_vector_t var_simplex(size_t k) {
+    using stan::math::value_of;
+    if (k == 0) {
+      std::string msg = "io::simplex: simplexes cannot be size 0.";
+      throw std::invalid_argument(msg);
+    }
+    var_vector_t theta(var_vector(k));
+    stan::math::check_simplex("stan::io::simplex", "Constrained vector", value_of(theta));
     return theta;
   }
 
@@ -1005,12 +1200,43 @@ class reader {
    * @return The next simplex of the specified size.
    * @throws std::invalid_argument if number of dimensions (`k`) is zero
    */
-  inline auto simplex_constrain(size_t k, T &lp) {
+  template <bool Jacobian = true>
+  inline vector_t simplex_constrain(size_t k, T &lp) {
     if (k == 0) {
       std::string msg = "io::simplex_constrain: simplexes cannot be size 0.";
       throw std::invalid_argument(msg);
     }
-    return stan::math::simplex_constrain(vector(k - 1), lp);
+    if (Jacobian) {
+      return stan::math::simplex_constrain(vector(k - 1), lp);
+    } else {
+      return stan::math::simplex_constrain(vector(k - 1));
+    }
+  }
+
+  /**
+   * Return the next simplex of the specified size (using one fewer
+   * unconstrained scalars), incrementing the specified reference with the
+   * log absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::simplex_constrain(Eigen::Matrix,T&)</code>.
+   *
+   * @param k Size of simplex.
+   * @param lp Log probability to increment with log absolute
+   * Jacobian determinant.
+   * @return The next simplex of the specified size.
+   * @throws std::invalid_argument if number of dimensions (`k`) is zero
+   */
+  template <bool Jacobian = true>
+  inline var_vector_t var_simplex_constrain(size_t k, T &lp) {
+    if (k == 0) {
+      std::string msg = "io::simplex_constrain: simplexes cannot be size 0.";
+      throw std::invalid_argument(msg);
+    }
+    if (Jacobian) {
+      return stan::math::simplex_constrain(var_vector(k - 1), lp);
+    } else {
+      return stan::math::simplex_constrain(var_vector(k - 1));
+    }
   }
 
   /**
@@ -1026,6 +1252,23 @@ class reader {
   inline map_vector_t ordered(size_t k) {
     map_vector_t x(vector(k));
     stan::math::check_ordered("stan::io::ordered", "Constrained vector", x);
+    return x;
+  }
+
+  /**
+   * Return the next vector of specified size containing
+   * values in ascending order.
+   *
+   * <p>See <code>stan::math::check_ordered(T)</code> for
+   * behavior on failure.
+   *
+   * @param k Size of returned vector.
+   * @return Vector of positive values in ascending order.
+   */
+  inline var_vector_t var_ordered(size_t k) {
+    using stan::math::value_of;
+    var_vector_t x(var_vector(k));
+    stan::math::check_ordered("stan::io::ordered", "Constrained vector", value_of(x));
     return x;
   }
 
@@ -1053,8 +1296,33 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return Next ordered vector of the specified size.
    */
-  inline auto ordered_constrain(size_t k, T &lp) {
-    return stan::math::ordered_constrain(vector(k), lp);
+  template <bool Jacobian = true>
+  inline vector_t ordered_constrain(size_t k, T &lp) {
+    if (Jacobian) {
+      return stan::math::ordered_constrain(vector(k), lp);
+    } else {
+      return stan::math::ordered_constrain(vector(k));
+    }
+  }
+
+  /**
+   * Return the next ordered vector of the specified
+   * size, incrementing the specified reference with the log
+   * absolute Jacobian of the determinant.
+   *
+   * <p>See <code>stan::math::ordered_constrain(Matrix,T&)</code>.
+   *
+   * @param k Size of vector.
+   * @param lp Log probability reference to increment.
+   * @return Next ordered vector of the specified size.
+   */
+  template <bool Jacobian = true>
+  inline var_vector_t var_ordered_constrain(size_t k, T &lp) {
+    if (Jacobian) {
+      return stan::math::ordered_constrain(var_vector(k), lp);
+    } else {
+      return stan::math::ordered_constrain(var_vector(k));
+    }
   }
 
   /**
@@ -1075,6 +1343,25 @@ class reader {
   }
 
   /**
+   * Return the next vector of specified size containing
+   * positive values in ascending order.
+   *
+   * <p>See <code>stan::math::check_positive_ordered(T)</code> for
+   * behavior on failure.
+   *
+   * @param k Size of returned vector.
+   * @return Vector of positive values in ascending order.
+   */
+  inline var_vector_t var_positive_ordered(size_t k) {
+    using stan::math::value_of;
+    var_vector_t x(var_vector(k));
+    stan::math::check_positive_ordered("stan::io::positive_ordered",
+                                       "Constrained vector", value_of(x));
+    return x;
+  }
+
+
+  /**
    * Return the next positive ordered vector of the specified length.
    *
    * <p>See <code>stan::math::positive_ordered_constrain(Matrix)</code>.
@@ -1085,6 +1372,20 @@ class reader {
    */
   inline auto positive_ordered_constrain(size_t k) {
     return stan::math::positive_ordered_constrain(vector(k));
+  }
+
+
+  /**
+   * Return the next positive ordered vector of the specified length.
+   *
+   * <p>See <code>stan::math::positive_ordered_constrain(Matrix)</code>.
+   *
+   * @param k Length of returned vector.
+   * @return Next positive_ordered vector of the specified
+   * length.
+   */
+  inline auto var_positive_ordered_constrain(size_t k) {
+    return stan::math::positive_ordered_constrain(var_vector(k));
   }
 
   /**
@@ -1098,8 +1399,33 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return Next positive_ordered vector of the specified size.
    */
-  inline auto positive_ordered_constrain(size_t k, T &lp) {
-    return stan::math::positive_ordered_constrain(vector(k), lp);
+  template <bool Jacobian = true>
+  inline vector_t positive_ordered_constrain(size_t k, T &lp) {
+    if (Jacobian) {
+      return stan::math::positive_ordered_constrain(vector(k), lp);
+    } else {
+      return stan::math::positive_ordered_constrain(vector(k));
+    }
+  }
+
+  /**
+   * Return the next positive_ordered vector of the specified
+   * size, incrementing the specified reference with the log
+   * absolute Jacobian of the determinant.
+   *
+   * <p>See <code>stan::math::positive_ordered_constrain(Matrix,T&)</code>.
+   *
+   * @param k Size of vector.
+   * @param lp Log probability reference to increment.
+   * @return Next positive_ordered vector of the specified size.
+   */
+  template <bool Jacobian = true>
+  inline var_vector_t var_positive_ordered_constrain(size_t k, T &lp) {
+    if (Jacobian) {
+      return stan::math::positive_ordered_constrain(var_vector(k), lp);
+    } else {
+      return stan::math::positive_ordered_constrain(var_vector(k));
+    }
   }
 
   /**
@@ -1116,6 +1442,23 @@ class reader {
     map_matrix_t y(matrix(M, N));
     stan::math::check_cholesky_factor("stan::io::cholesky_factor_cov",
                                       "Constrained matrix", y);
+    return y;
+  }
+
+  /**
+   * Return the next Cholesky factor with the specified
+   * dimensionality, reading it directly without transforms.
+   *
+   * @param M Rows of Cholesky factor
+   * @param N Columns of Cholesky factor
+   * @return Next Cholesky factor.
+   * @throw std::domain_error if the matrix is not a valid
+   * Cholesky factor.
+   */
+  inline var_matrix_t var_cholesky_factor_cov(size_t M, size_t N) {
+    var_matrix_t y(var_matrix(M, N));
+    stan::math::check_cholesky_factor("stan::io::cholesky_factor_cov",
+                                      "Constrained matrix", value_of(y));
     return y;
   }
 
@@ -1148,9 +1491,39 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor.
    */
-  inline auto cholesky_factor_cov_constrain(size_t M, size_t N, T &lp) {
-    return stan::math::cholesky_factor_constrain(
-        vector((N * (N + 1)) / 2 + (M - N) * N), M, N, lp);
+  template <bool Jacobian = true>
+  inline matrix_t cholesky_factor_cov_constrain(size_t M, size_t N, T &lp) {
+    if (Jacobian) {
+      return stan::math::cholesky_factor_constrain(
+          vector((N * (N + 1)) / 2 + (M - N) * N), M, N, lp);
+    } else {
+      return stan::math::cholesky_factor_constrain(
+          vector((N * (N + 1)) / 2 + (M - N) * N), M, N);
+    }
+  }
+
+  /**
+   * Return the next Cholesky factor with the specified
+   * dimensionality, reading from an unconstrained vector of the
+   * appropriate size, and increment the log probability reference
+   * with the log Jacobian adjustment for the transform.
+   *
+   * @param M Rows of Cholesky factor
+   * @param N Columns of Cholesky factor
+   * @param[in,out] lp log probability
+   * @return Next Cholesky factor.
+   * @throw std::domain_error if the matrix is not a valid
+   *    Cholesky factor.
+   */
+  template <bool Jacobian = true>
+  inline var_matrix_t var_cholesky_factor_cov_constrain(size_t M, size_t N, T &lp) {
+    if (Jacobian) {
+      return stan::math::cholesky_factor_constrain(
+          var_vector((N * (N + 1)) / 2 + (M - N) * N), M, N, lp);
+    } else {
+      return stan::math::cholesky_factor_constrain(
+          var_vector((N * (N + 1)) / 2 + (M - N) * N), M, N);
+    }
   }
 
   /**
@@ -1173,6 +1546,24 @@ class reader {
 
   /**
    * Return the next Cholesky factor for a correlation matrix with
+   * the specified dimensionality, reading it directly without
+   * transforms.
+   *
+   * @param K Rows and columns of Cholesky factor
+   * @return Next Cholesky factor for a correlation matrix.
+   * @throw std::domain_error if the matrix is not a valid
+   * Cholesky factor for a correlation matrix.
+   */
+  inline var_matrix_t var_cholesky_factor_corr(size_t K) {
+    using stan::math::check_cholesky_factor_corr;
+    var_matrix_t y(var_matrix(K, K));
+    check_cholesky_factor_corr("stan::io::cholesky_factor_corr",
+                               "Constrained matrix", value_of(y));
+    return y;
+  }
+
+  /**
+   * Return the next Cholesky factor for a correlation matrix with
    * the specified dimensionality, reading from an unconstrained
    * vector of the appropriate size.
    *
@@ -1188,6 +1579,19 @@ class reader {
   /**
    * Return the next Cholesky factor for a correlation matrix with
    * the specified dimensionality, reading from an unconstrained
+   * vector of the appropriate size.
+   *
+   * @param K Rows and columns of Cholesky factor.
+   * @return Next Cholesky factor for a correlation matrix.
+   * @throw std::domain_error if the matrix is not a valid
+   *    Cholesky factor for a correlation matrix.
+   */
+  inline auto var_cholesky_factor_corr_constrain(size_t K) {
+    return stan::math::cholesky_corr_constrain(var_vector((K * (K - 1)) / 2), K);
+  }
+  /**
+   * Return the next Cholesky factor for a correlation matrix with
+   * the specified dimensionality, reading from an unconstrained
    * vector of the appropriate size, and increment the log
    * probability reference with the log Jacobian adjustment for
    * the transform.
@@ -1198,9 +1602,39 @@ class reader {
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor for a correlation matrix.
    */
-  inline auto cholesky_factor_corr_constrain(size_t K, T &lp) {
-    return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K,
-                                               lp);
+  template <bool Jacobian = true>
+  inline matrix_t cholesky_factor_corr_constrain(size_t K, T &lp) {
+    if (Jacobian) {
+      return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K,
+                                                 lp);
+    } else {
+      return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K,
+                                                 lp);
+    }
+  }
+
+  /**
+   * Return the next Cholesky factor for a correlation matrix with
+   * the specified dimensionality, reading from an unconstrained
+   * vector of the appropriate size, and increment the log
+   * probability reference with the log Jacobian adjustment for
+   * the transform.
+   *
+   * @param K Rows and columns of Cholesky factor
+   * @param lp Log probability reference to increment.
+   * @return Next Cholesky factor for a correlation matrix.
+   * @throw std::domain_error if the matrix is not a valid
+   *    Cholesky factor for a correlation matrix.
+   */
+  template <bool Jacobian = true>
+  inline var_matrix_t var_cholesky_factor_corr_constrain(size_t K, T &lp) {
+    if (Jacobian) {
+      return stan::math::cholesky_corr_constrain(var_vector((K * (K - 1)) / 2), K,
+                                                 lp);
+    } else {
+      return stan::math::cholesky_corr_constrain(var_vector((K * (K - 1)) / 2), K,
+                                                 lp);
+    }
   }
 
   /**
@@ -1215,9 +1649,10 @@ class reader {
    *    covariance matrix
    */
   inline map_matrix_t cov_matrix(size_t k) {
+    using stan::math::value_of;
     map_matrix_t y(matrix(k, k));
     stan::math::check_cov_matrix("stan::io::cov_matrix", "Constrained matrix",
-                                 y);
+                                 value_of(y));
     return y;
   }
 
@@ -1244,9 +1679,35 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return The next covariance matrix of the specified dimensionality.
    */
-  inline auto cov_matrix_constrain(size_t k, T &lp) {
-    return stan::math::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2), k,
-                                            lp);
+  template <bool Jacobian = true>
+  inline matrix_t cov_matrix_constrain(size_t k, T &lp) {
+    if (Jacobian) {
+      return stan::math::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2), k,
+                                              lp);
+    } else {
+      return stan::math::cov_matrix_constrain(vector(k + (k * (k - 1)) / 2), k);
+    }
+  }
+
+  /**
+   * Return the next covariance matrix of the specified dimensionality,
+   * incrementing the specified reference with the log absolute Jacobian
+   * determinant.
+   *
+   * <p>See <code>stan::math::cov_matrix_constrain(Matrix,T&)</code>.
+   *
+   * @param k Dimensionality of the (square) covariance matrix.
+   * @param lp Log probability reference to increment.
+   * @return The next covariance matrix of the specified dimensionality.
+   */
+  template <bool Jacobian = true>
+  inline var_matrix_t var_cov_matrix_constrain(size_t k, T &lp) {
+    if (Jacobian) {
+      return stan::math::cov_matrix_constrain(var_vector(k + (k * (k - 1)) / 2), k,
+                                              lp);
+    } else {
+      return stan::math::cov_matrix_constrain(var_vector(k + (k * (k - 1)) / 2), k);
+    }
   }
 
   /**
@@ -1266,6 +1727,23 @@ class reader {
   }
 
   /**
+   * Returns the next correlation matrix of the specified dimensionality.
+   *
+   * <p>See <code>stan::math::check_corr_matrix(Matrix)</code>.
+   *
+   * @param k Dimensionality of correlation matrix.
+   * @return Next correlation matrix of the specified dimensionality.
+   * @throw std::runtime_error if the matrix is not a correlation matrix
+   */
+  inline var_matrix_t var_corr_matrix(size_t k) {
+    using stan::math::value_of;
+    var_matrix_t x(var_matrix(k, k));
+    stan::math::check_corr_matrix("stan::math::corr_matrix",
+                                  "Constrained matrix", value_of(x));
+    return x;
+  }
+
+  /**
    * Return the next correlation matrix of the specified dimensionality.
    *
    * <p>See <code>stan::math::corr_matrix_constrain(Matrix)</code>.
@@ -1275,6 +1753,18 @@ class reader {
    */
   inline auto corr_matrix_constrain(size_t k) {
     return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k);
+  }
+
+  /**
+   * Return the next correlation matrix of the specified dimensionality.
+   *
+   * <p>See <code>stan::math::corr_matrix_constrain(Matrix)</code>.
+   *
+   * @param k Dimensionality of correlation matrix.
+   * @return Next correlation matrix of the specified dimensionality.
+   */
+  inline auto var_corr_matrix_constrain(size_t k) {
+    return stan::math::corr_matrix_constrain(var_vector((k * (k - 1)) / 2), k);
   }
 
   /**
@@ -1288,8 +1778,33 @@ class reader {
    * @param lp Log probability reference to increment.
    * @return The next correlation matrix of the specified dimensionality.
    */
-  inline auto corr_matrix_constrain(size_t k, T &lp) {
-    return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k, lp);
+  template <bool Jacobian = true>
+  inline matrix_t corr_matrix_constrain(size_t k, T &lp) {
+    if (Jacobian) {
+      return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k, lp);
+    } else {
+      return stan::math::corr_matrix_constrain(vector((k * (k - 1)) / 2), k);
+    }
+  }
+
+  /**
+   * Return the next correlation matrix of the specified dimensionality,
+   * incrementing the specified reference with the log absolute Jacobian
+   * determinant.
+   *
+   * <p>See <code>stan::math::corr_matrix_constrain(Matrix,T&)</code>.
+   *
+   * @param k Dimensionality of the (square) correlation matrix.
+   * @param lp Log probability reference to increment.
+   * @return The next correlation matrix of the specified dimensionality.
+   */
+  template <bool Jacobian = true>
+  inline var_matrix_t var_corr_matrix_constrain(size_t k, T &lp) {
+    if (Jacobian) {
+      return stan::math::corr_matrix_constrain(var_vector((k * (k - 1)) / 2), k, lp);
+    } else {
+      return stan::math::corr_matrix_constrain(var_vector((k * (k - 1)) / 2), k);
+    }
   }
 
   template <typename TL>
@@ -1301,13 +1816,40 @@ class reader {
   }
 
   template <typename TL>
+  inline var_vector_t vector_lb(const TL lb, size_t m) {
+    using stan::math::value_of;
+    var_vector_t v(var_vector(m));
+    stan::math::check_greater_or_equal("stan::io::vector_lb",
+                                       "Constrained vector", value_of(v), lb);
+    return v;
+  }
+
+  template <typename TL>
   inline auto vector_lb_constrain(const TL lb, size_t m) {
     return stan::math::lb_constrain(vector(m), lb);
   }
 
   template <typename TL>
-  inline auto vector_lb_constrain(const TL lb, size_t m, T &lp) {
-    return stan::math::lb_constrain(vector(m), lb, lp);
+  inline auto var_vector_lb_constrain(const TL lb, size_t m) {
+    return stan::math::lb_constrain(var_vector(m), lb);
+  }
+
+  template <bool Jacobian = true, typename TL>
+  inline vector_t vector_lb_constrain(const TL lb, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::lb_constrain(vector(m), lb, lp);
+    } else {
+      return stan::math::lb_constrain(vector(m), lb);
+    }
+  }
+
+  template <bool Jacobian = true, typename TL>
+  inline var_vector_t var_vector_lb_constrain(const TL lb, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::lb_constrain(var_vector(m), lb, lp);
+    } else {
+      return stan::math::lb_constrain(var_vector(m), lb);
+    }
   }
 
   template <typename TL>
@@ -1319,13 +1861,40 @@ class reader {
   }
 
   template <typename TL>
+  inline var_row_vector_t var_row_vector_lb(const TL lb, size_t m) {
+    using stan::math::value_of;
+    var_row_vector_t v(var_row_vector(m));
+    stan::math::check_greater_or_equal("stan::io::row_vector_lb",
+                                       "Constrained row vector", value_of(v), lb);
+    return v;
+  }
+
+  template <typename TL>
   inline auto row_vector_lb_constrain(const TL lb, size_t m) {
     return stan::math::lb_constrain(row_vector(m), lb);
   }
 
   template <typename TL>
-  inline auto row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
-    return stan::math::lb_constrain(row_vector(m), lb, lp);
+  inline auto var_row_vector_lb_constrain(const TL lb, size_t m) {
+    return stan::math::lb_constrain(var_row_vector(m), lb);
+  }
+
+  template <bool Jacobian = true, typename TL>
+  inline row_vector_t row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::lb_constrain(row_vector(m), lb, lp);
+    } else {
+      return stan::math::lb_constrain(row_vector(m), lb);
+    }
+  }
+
+  template <bool Jacobian = true, typename TL>
+  inline var_row_vector_t var_row_vector_lb_constrain(const TL lb, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::lb_constrain(var_row_vector(m), lb, lp);
+    } else {
+      return stan::math::lb_constrain(var_row_vector(m), lb);
+    }
   }
 
   template <typename TL>
@@ -1337,18 +1906,40 @@ class reader {
   }
 
   template <typename TL>
-  inline auto matrix_lb_constrain(const TL lb, size_t m, size_t n) {
-    return matrix(m, n)
-        .unaryExpr([&](auto &&x) { return stan::math::lb_constrain(x, lb); })
-        .eval();
+  inline var_matrix_t var_matrix_lb(const TL lb, const size_t m, size_t n) {
+    using stan::math::value_of;
+    var_matrix_t mat(var_matrix(m, n));
+    stan::math::check_greater_or_equal("stan::io::matrix_lb",
+                                       "Constrained matrix", value_of(mat), lb);
+    return mat;
   }
 
   template <typename TL>
-  inline auto matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
-    return matrix(m, n)
-        .unaryExpr(
-            [&](auto &&x) { return stan::math::lb_constrain(x, lb, lp); })
-        .eval();
+  inline auto matrix_lb_constrain(const TL lb, size_t m, size_t n) {
+    return stan::math::lb_constrain(matrix(m, n), lb);
+  }
+
+  template <typename TL>
+  inline auto var_matrix_lb_constrain(const TL lb, size_t m, size_t n) {
+    return stan::math::lb_constrain(var_matrix(m, n), lb);
+  }
+
+  template <bool Jacobian = true, typename TL>
+  inline matrix_t matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
+    if (Jacobian) {
+      return stan::math::lb_constrain(matrix(m, n), lb, lp).eval();
+    } else {
+      return stan::math::lb_constrain(matrix(m, n), lb).eval();
+    }
+  }
+
+  template <bool Jacobian = true, typename TL>
+  inline var_matrix_t var_matrix_lb_constrain(const TL lb, size_t m, size_t n, T &lp) {
+    if (Jacobian) {
+      return stan::math::lb_constrain(var_matrix(m, n), lb, lp).eval();
+    } else {
+      return stan::math::lb_constrain(var_matrix(m, n), lb).eval();
+    }
   }
 
   template <typename TU>
@@ -1360,13 +1951,40 @@ class reader {
   }
 
   template <typename TU>
+  inline var_vector_t var_vector_ub(const TU ub, size_t m) {
+    using stan::math::value_of;
+    var_vector_t v(vector(m));
+    stan::math::check_less_or_equal("stan::io::vector_ub", "Constrained vector",
+                                    value_of(v), ub);
+    return v;
+  }
+
+  template <typename TU>
   inline auto vector_ub_constrain(const TU ub, size_t m) {
     return stan::math::ub_constrain(vector(m), ub);
   }
 
   template <typename TU>
-  inline auto vector_ub_constrain(const TU ub, size_t m, T &lp) {
-    return stan::math::ub_constrain(vector(m), ub, lp);
+  inline auto var_vector_ub_constrain(const TU ub, size_t m) {
+    return stan::math::ub_constrain(var_vector(m), ub);
+  }
+
+  template <bool Jacobian = true, typename TU>
+  inline vector_t vector_ub_constrain(const TU ub, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::ub_constrain(vector(m), ub, lp);
+    } else {
+      return stan::math::ub_constrain(vector(m), ub);
+    }
+  }
+
+  template <bool Jacobian = true, typename TU>
+  inline var_vector_t var_vector_ub_constrain(const TU ub, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::ub_constrain(var_vector(m), ub, lp);
+    } else {
+      return stan::math::ub_constrain(var_vector(m), ub);
+    }
   }
 
   template <typename TU>
@@ -1378,13 +1996,40 @@ class reader {
   }
 
   template <typename TU>
+  inline var_row_vector_t var_row_vector_ub(const TU ub, size_t m) {
+    using stan::math::value_of;
+    var_row_vector_t v(var_row_vector(m));
+    stan::math::check_less_or_equal("stan::io::row_vector_ub",
+                                    "Constrained row vector", value_of(v), ub);
+    return v;
+  }
+
+  template <typename TU>
   inline auto row_vector_ub_constrain(const TU ub, size_t m) {
     return stan::math::ub_constrain(row_vector(m), ub);
   }
 
   template <typename TU>
-  inline auto row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
-    return stan::math::ub_constrain(row_vector(m), ub, lp);
+  inline auto var_row_vector_ub_constrain(const TU ub, size_t m) {
+    return stan::math::ub_constrain(var_row_vector(m), ub);
+  }
+
+  template <bool Jacobian = true, typename TU>
+  inline row_vector_t row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::ub_constrain(row_vector(m), ub, lp);
+    } else {
+      return stan::math::ub_constrain(row_vector(m), ub);
+    }
+  }
+
+  template <bool Jacobian = true, typename TU>
+  inline var_row_vector_t var_row_vector_ub_constrain(const TU ub, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::ub_constrain(var_row_vector(m), ub, lp);
+    } else {
+      return stan::math::ub_constrain(var_row_vector(m), ub);
+    }
   }
 
   template <typename TU>
@@ -1396,19 +2041,42 @@ class reader {
   }
 
   template <typename TU>
-  inline auto matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
-    return matrix(m, n)
-        .unaryExpr([&](auto &&x) { return stan::math::ub_constrain(x, ub); })
-        .eval();
+  inline var_matrix_t var_matrix_ub(const TU ub, size_t m, size_t n) {
+    using stan::math::value_of;
+    var_matrix_t mat(var_matrix(m, n));
+    stan::math::check_less_or_equal("stan::io::matrix_ub", "Constrained matrix",
+                                    value_of(mat), ub);
+    return mat;
   }
 
   template <typename TU>
-  inline auto matrix_ub_constrain(const TU ub, const size_t m, size_t n,
+  inline auto matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
+    return stan::math::ub_constrain(matrix(m, n), ub);
+  }
+
+  template <typename TU>
+  inline auto var_matrix_ub_constrain(const TU ub, const size_t m, size_t n) {
+    return stan::math::ub_constrain(var_matrix(m, n), ub);
+  }
+
+  template <bool Jacobian = true, typename TU>
+  inline matrix_t matrix_ub_constrain(const TU ub, const size_t m, size_t n,
                                   T &lp) {
-    return matrix(m, n)
-        .unaryExpr(
-            [&](auto &&x) { return stan::math::ub_constrain(x, ub, lp); })
-        .eval();
+    if (Jacobian) {
+      return stan::math::ub_constrain(matrix(m, n), ub, lp);
+    } else {
+      return stan::math::ub_constrain(matrix(m, n), ub);
+    }
+  }
+
+  template <bool Jacobian = true, typename TU>
+  inline var_matrix_t var_matrix_ub_constrain(const TU ub, const size_t m, size_t n,
+                                  T &lp) {
+    if (Jacobian) {
+      return stan::math::ub_constrain(var_matrix(m, n), ub, lp);
+    } else {
+      return stan::math::ub_constrain(var_matrix(m, n), ub);
+    }
   }
 
   template <typename TL, typename TU>
@@ -1420,13 +2088,40 @@ class reader {
   }
 
   template <typename TL, typename TU>
+  inline var_vector_t var_vector_lub(const TL lb, const TU ub, size_t m) {
+    using stan::math::value_of;
+    var_vector_t v(var_vector(m));
+    stan::math::check_bounded<map_vector_t, TL, TU>(
+        "stan::io::vector_lub", "Constrained vector", value_of(v), lb, ub);
+    return v;
+  }
+
+  template <typename TL, typename TU>
   inline auto vector_lub_constrain(const TL lb, const TU ub, size_t m) {
     return stan::math::lub_constrain(vector(m), lb, ub);
   }
 
   template <typename TL, typename TU>
-  inline auto vector_lub_constrain(const TL lb, const TU ub, size_t m, T &lp) {
-    return stan::math::lub_constrain(vector(m), lb, ub, lp);
+  inline auto var_vector_lub_constrain(const TL lb, const TU ub, size_t m) {
+    return stan::math::lub_constrain(var_vector(m), lb, ub);
+  }
+
+  template <bool Jacobian = true, typename TL, typename TU>
+  inline vector_t vector_lub_constrain(const TL lb, const TU ub, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::lub_constrain(vector(m), lb, ub, lp);
+    } else {
+      return stan::math::lub_constrain(vector(m), lb, ub);
+    }
+  }
+
+  template <bool Jacobian = true, typename TL, typename TU>
+  inline var_vector_t var_vector_lub_constrain(const TL lb, const TU ub, size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::lub_constrain(var_vector(m), lb, ub, lp);
+    } else {
+      return stan::math::lub_constrain(var_vector(m), lb, ub);
+    }
   }
 
   template <typename TL, typename TU>
@@ -1436,6 +2131,16 @@ class reader {
         "stan::io::row_vector_lub", "Constrained row vector", v, lb, ub);
     return v;
   }
+
+  template <typename TL, typename TU>
+  inline var_row_vector_t var_row_vector_lub(const TL lb, const TU ub, size_t m) {
+    using stan::math::value_of;
+    var_row_vector_t v(var_row_vector(m));
+    stan::math::check_bounded<map_row_vector_t, TL, TU>(
+        "stan::io::row_vector_lub", "Constrained row vector", value_of(v), lb, ub);
+    return v;
+  }
+
   template <typename TL, typename TU>
   inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
                                                size_t m) {
@@ -1443,41 +2148,83 @@ class reader {
   }
 
   template <typename TL, typename TU>
+  inline var_row_vector_t var_row_vector_lub_constrain(const TL lb, const TU ub,
+                                               size_t m) {
+    return stan::math::lub_constrain(var_row_vector(m), lb, ub);
+  }
+
+  template <bool Jacobian = true, typename TL, typename TU>
   inline row_vector_t row_vector_lub_constrain(const TL lb, const TU ub,
                                                size_t m, T &lp) {
-    return stan::math::lub_constrain(row_vector(m), lb, ub, lp);
+    if (Jacobian) {
+      return stan::math::lub_constrain(row_vector(m), lb, ub, lp);
+    } else {
+      return stan::math::lub_constrain(row_vector(m), lb, ub);
+    }
+  }
+
+  template <bool Jacobian = true, typename TL, typename TU>
+  inline var_row_vector_t var_row_vector_lub_constrain(const TL lb, const TU ub,
+                                               size_t m, T &lp) {
+    if (Jacobian) {
+      return stan::math::lub_constrain(var_row_vector(m), lb, ub, lp);
+    } else {
+      return stan::math::lub_constrain(var_row_vector(m), lb, ub);
+    }
   }
 
   template <typename TL, typename TU>
   inline map_matrix_t matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
+    using stan::math::value_of;
     map_matrix_t mat(matrix(m, n));
     stan::math::check_bounded<map_matrix_t, TL, TU>(
-        "stan::io::row_vector_lub", "Constrained row vector", mat, lb, ub);
+        "stan::io::row_vector_lub", "Constrained row vector", value_of(mat), lb, ub);
+    return mat;
+  }
+
+  template <typename TL, typename TU>
+  inline var_matrix_t var_matrix_lub(const TL lb, const TU ub, size_t m, size_t n) {
+    using stan::math::value_of;
+    var_matrix_t mat(var_matrix(m, n));
+    stan::math::check_bounded<map_matrix_t, TL, TU>(
+        "stan::io::row_vector_lub", "Constrained row vector", value_of(mat), lb, ub);
     return mat;
   }
 
   template <typename TL, typename TU>
   inline auto matrix_lub_constrain(const TL lb, const TU ub, size_t m,
                                    size_t n) {
-    return matrix(m, n)
-        .unaryExpr(
-            [&](auto &&x) { return stan::math::lub_constrain(x, lb, ub); })
-        .eval();
+    return stan::math::lub_constrain(matrix(m, n), lb, ub);
   }
 
   template <typename TL, typename TU>
+  inline auto var_matrix_lub_constrain(const TL lb, const TU ub, size_t m,
+                                   size_t n) {
+    return stan::math::lub_constrain(var_matrix(m, n), lb, ub);
+  }
+
+  template <bool Jacobian = true, typename TL, typename TU>
   inline auto matrix_lub_constrain(const TL lb, const TU ub, size_t m, size_t n,
                                    T &lp) {
-    return matrix(m, n)
-        .unaryExpr(
-            [&](auto &&x) { return stan::math::lub_constrain(x, lb, ub, lp); })
-        .eval();
+    return stan::math::lub_constrain(matrix(m, n), lb, ub, lp);
+  }
+
+  template <bool Jacobian = true, typename TL, typename TU>
+  inline auto var_matrix_lub_constrain(const TL lb, const TU ub, size_t m, size_t n,
+                                   T &lp) {
+    return stan::math::lub_constrain(var_matrix(m, n), lb, ub, lp);
   }
 
   template <typename TL, typename TS>
   inline map_vector_t vector_offset_multiplier(const TL offset,
                                                const TS multiplier, size_t m) {
     return vector(m);
+  }
+
+  template <typename TL, typename TS>
+  inline auto var_vector_offset_multiplier(const TL offset,
+                                               const TS multiplier, size_t m) {
+    return var_vector(m);
   }
 
   template <typename TL, typename TS>
@@ -1489,11 +2236,33 @@ class reader {
   }
 
   template <typename TL, typename TS>
-  inline auto vector_offset_multiplier_constrain(const TL offset,
+  inline auto var_vector_offset_multiplier_constrain(const TL offset,
+                                                 const TS multiplier,
+                                                 size_t m) {
+    return stan::math::offset_multiplier_constrain(var_vector(m), offset,
+                                                   multiplier);
+  }
+
+  template <bool Jacobian = true, typename TL, typename TS>
+  inline vector_t vector_offset_multiplier_constrain(const TL offset,
                                                  const TS multiplier, size_t m,
                                                  T &lp) {
-    return stan::math::offset_multiplier_constrain(vector(m), offset,
-                                                   multiplier, lp);
+    if (Jacobian) {
+      return stan::math::offset_multiplier_constrain(vector(m), offset, multiplier, lp);
+    } else {
+      return stan::math::offset_multiplier_constrain(vector(m), offset, multiplier);
+    }
+  }
+
+  template <bool Jacobian = true, typename TL, typename TS>
+  inline var_vector_t var_vector_offset_multiplier_constrain(const TL offset,
+                                                 const TS multiplier, size_t m,
+                                                 T &lp) {
+    if (Jacobian) {
+      return stan::math::offset_multiplier_constrain(var_vector(m), offset, multiplier, lp);
+    } else {
+      return stan::math::offset_multiplier_constrain(var_vector(m), offset, multiplier);
+    }
   }
 
   template <typename TL, typename TS>
@@ -1504,42 +2273,68 @@ class reader {
   }
 
   template <typename TL, typename TS>
-  inline auto row_vector_offset_multiplier_constrain(const TL offset,
-                                                     const TS multiplier,
-                                                     size_t m) {
-    return stan::math::offset_multiplier_constrain(row_vector(m), offset,
-                                                   multiplier);
+  inline var_row_vector_t var_row_vector_offset_multiplier(const TL offset,
+                                                       const TS multiplier,
+                                                       size_t m) {
+    return var_row_vector(m);
   }
 
   template <typename TL, typename TS>
-  inline auto row_vector_offset_multiplier_constrain(const TL offset,
-                                                     const TS multiplier,
-                                                     size_t m, T &lp) {
-    return stan::math::offset_multiplier_constrain(row_vector(m), offset,
-                                                   multiplier, lp);
+  inline auto row_vector_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m) {
+    return stan::math::offset_multiplier_constrain(row_vector(m), offset, multiplier);
   }
 
   template <typename TL, typename TS>
-  inline map_matrix_t matrix_offset_multiplier(const TL offset,
-                                               const TS multiplier, size_t m,
-                                               size_t n) {
+  inline auto var_row_vector_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m) {
+    return stan::math::offset_multiplier_constrain(var_row_vector(m), offset, multiplier);
+  }
+
+  template <bool Jacobian = true, typename TL, typename TS>
+  inline row_vector_t row_vector_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m, T &lp) {
+    return stan::math::offset_multiplier_constrain(row_vector(m), offset, multiplier, lp);
+  }
+
+  template <bool Jacobian = true, typename TL, typename TS>
+  inline var_row_vector_t var_row_vector_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m, T &lp) {
+    return stan::math::offset_multiplier_constrain(var_row_vector(m), offset, multiplier, lp);
+  }
+
+  template <typename TL, typename TS>
+  inline map_matrix_t matrix_offset_multiplier(const TL offset, const TS multiplier, size_t m, size_t n) {
     return matrix(m, n);
   }
 
   template <typename TL, typename TS>
-  inline auto matrix_offset_multiplier_constrain(const TL offset,
-                                                 const TS multiplier, size_t m,
-                                                 size_t n) {
-    return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
-                                                   multiplier);
+  inline var_matrix_t var_matrix_offset_multiplier(const TL offset, const TS multiplier, size_t m, size_t n) {
+    return var_matrix(m, n);
   }
 
   template <typename TL, typename TS>
-  inline auto matrix_offset_multiplier_constrain(const TL offset,
-                                                 const TS multiplier, size_t m,
-                                                 size_t n, T &lp) {
-    return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
-                                                   multiplier, lp);
+  inline auto matrix_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m, size_t n) {
+    return stan::math::offset_multiplier_constrain(matrix(m, n), offset, multiplier);
+  }
+
+  template <typename TL, typename TS>
+  inline auto var_matrix_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m, size_t n) {
+    return stan::math::offset_multiplier_constrain(var_matrix(m, n), offset, multiplier);
+  }
+
+  template <bool Jacobian = true, typename TL, typename TS>
+  inline matrix_t matrix_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m, size_t n, T &lp) {
+    if (Jacobian) {
+      return stan::math::offset_multiplier_constrain(matrix(m, n), offset, multiplier, lp);
+    } else {
+      return stan::math::offset_multiplier_constrain(matrix(m, n), offset, multiplier);
+    }
+  }
+
+  template <bool Jacobian = true, typename TL, typename TS>
+  inline var_matrix_t var_matrix_offset_multiplier_constrain(const TL offset, const TS multiplier, size_t m, size_t n, T &lp) {
+    if (Jacobian) {
+      return stan::math::offset_multiplier_constrain(var_matrix(m, n), offset, multiplier, lp);
+    } else {
+      return stan::math::offset_multiplier_constrain(var_matrix(m, n), offset, multiplier);
+    }
   }
 };
 
