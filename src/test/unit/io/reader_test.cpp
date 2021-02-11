@@ -107,20 +107,6 @@ TEST(io_reader, scalar_pos_constrain) {
   EXPECT_FLOAT_EQ(exp(-1.0), reader.scalar_pos_constrain());
   EXPECT_FLOAT_EQ(exp(0.0), reader.scalar_pos_constrain());
 }
-TEST(io_reader, scalar_pos_constrain_falselp) {
-  std::vector<int> theta_i;
-  std::vector<double> theta;
-  theta.push_back(-2.0);
-  theta.push_back(3.0);
-  theta.push_back(-1.0);
-  theta.push_back(0.0);
-  stan::io::reader<double> reader(theta, theta_i);
-  double lp = -1.2;
-  EXPECT_FLOAT_EQ(exp(-2.0), reader.scalar_pos_constrain<false>(lp));
-  EXPECT_FLOAT_EQ(exp(3.0), reader.scalar_pos_constrain<false>(lp));
-  EXPECT_FLOAT_EQ(exp(-1.0), reader.scalar_pos_constrain<false>(lp));
-  EXPECT_FLOAT_EQ(exp(0.0), reader.scalar_pos_constrain<false>(lp));
-}
 TEST(io_reader, scalar_pos_constrain_jacobian) {
   std::vector<int> theta_i;
   std::vector<double> theta;
