@@ -236,10 +236,17 @@ TEST_F(stochastic_gradient_ascent_test,
           mock_model, stan::variational::normal_fullrank, mock_rng>(
           model, cont_params, rng, 1, 100, 100, 1);
 
+  size_t rank = 1;
+  stan::variational::advi_lowrank<mock_model, mock_rng>* advi_lowrank
+      = new stan::variational::advi_lowrank<mock_model, mock_rng>(
+          model, cont_params, rng, rank, 1, 100, 100, 1);
+
   stan::variational::normal_meanfield meanfield_init
       = stan::variational::normal_meanfield(cont_params);
   stan::variational::normal_fullrank fullrank_init
       = stan::variational::normal_fullrank(cont_params);
+  stan::variational::normal_lowrank lowrank_init
+      = stan::variational::normal_lowrank(cont_params, rank);
 
   std::string error
       = "stan::variational::advi::calc_ELBO: "
@@ -254,9 +261,13 @@ TEST_F(stochastic_gradient_ascent_test,
   EXPECT_THROW_MSG(advi_fullrank->stochastic_gradient_ascent(
                        fullrank_init, 1.0, 0.01, 1000, logger, writer),
                    std::domain_error, error);
+  EXPECT_THROW_MSG(advi_lowrank->stochastic_gradient_ascent(
+                       lowrank_init, 1.0, 0.01, 1000, logger, writer),
+                   std::domain_error, error);
 
   delete advi_meanfield;
   delete advi_fullrank;
+  delete advi_lowrank;
 }
 
 TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
@@ -277,10 +288,17 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
           mock_throwing_model, stan::variational::normal_fullrank, mock_rng>(
           throwing_model, cont_params, rng, 1, 100, 100, 1);
 
+  size_t rank = 1;
+  stan::variational::advi_lowrank<mock_throwing_model, mock_rng>* advi_lowrank
+      = new stan::variational::advi_lowrank<mock_throwing_model, mock_rng>(
+          throwing_model, cont_params, rng, rank, 1, 100, 100, 1);
+
   stan::variational::normal_meanfield meanfield_init
       = stan::variational::normal_meanfield(cont_params);
   stan::variational::normal_fullrank fullrank_init
       = stan::variational::normal_fullrank(cont_params);
+  stan::variational::normal_lowrank lowrank_init
+      = stan::variational::normal_lowrank(cont_params, rank);
 
   std::string error
       = "stan::variational::normal_meanfield::calc_grad: "
@@ -304,6 +322,18 @@ TEST_F(stochastic_gradient_ascent_test, initialize_state_zero_grad_error) {
                        fullrank_init, 1.0, 0.01, 1000, logger, writer),
                    std::domain_error, error);
 
+  error
+      = "stan::variational::normal_lowrank::calc_grad: "
+        "The number of dropped evaluations "
+        "has reached its maximum amount (10). "
+        "Your model may be either severely "
+        "ill-conditioned or misspecified.";
+
+  EXPECT_THROW_MSG(advi_lowrank->stochastic_gradient_ascent(
+                       lowrank_init, 1.0, 0.01, 1000, logger, writer),
+                   std::domain_error, error);
+
   delete advi_meanfield;
   delete advi_fullrank;
+  delete advi_lowrank;
 }

@@ -34,11 +34,15 @@ class eta_adapt_big_test : public ::testing::Test {
     advi_fullrank_ = new stan::variational::advi<
         stan_model, stan::variational::normal_fullrank, rng_t>(
         *model_, cont_params_, base_rng_, 1, 100, 100, 1);
+
+    advi_lowrank_ = new stan::variational::advi_lowrank<stan_model, rng_t>(
+        *model_, cont_params_, base_rng_, 1, 1, 100, 100, 1);
   }
 
   void TearDown() {
     delete advi_meanfield_;
     delete advi_fullrank_;
+    delete advi_lowrank_;
     delete model_;
   }
 
@@ -46,6 +50,7 @@ class eta_adapt_big_test : public ::testing::Test {
                           rng_t> *advi_meanfield_;
   stan::variational::advi<stan_model, stan::variational::normal_fullrank, rng_t>
       *advi_fullrank_;
+  stan::variational::advi_lowrank<stan_model, rng_t> *advi_lowrank_;
   std::stringstream model_stream_;
   std::stringstream log_stream_;
   stan::callbacks::stream_logger logger;
@@ -60,7 +65,10 @@ TEST_F(eta_adapt_big_test, eta_should_be_big) {
       = stan::variational::normal_meanfield(cont_params_);
   stan::variational::normal_fullrank fullrank_init
       = stan::variational::normal_fullrank(cont_params_);
+  stan::variational::normal_lowrank lowrank_init
+      = stan::variational::normal_lowrank(cont_params_, 1);
 
   EXPECT_EQ(100.0, advi_meanfield_->adapt_eta(meanfield_init, 50, logger));
   EXPECT_EQ(100.0, advi_fullrank_->adapt_eta(fullrank_init, 50, logger));
+  EXPECT_EQ(100.0, advi_lowrank_->adapt_eta(lowrank_init, 50, logger));
 }
