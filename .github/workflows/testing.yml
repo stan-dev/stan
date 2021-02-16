@@ -1,0 +1,31 @@
+name: Testing
+
+on:
+  pull_request:
+    branches: [ develop, master ]
+  push:
+    branches: [ develop, master ]
+    paths-ignore:
+      - 'licenses/**'
+      - 'LICENSE.md'
+      - 'README.md'
+      - 'RELEASE-NOTES.txt'
+        
+jobs:
+  run-tests:
+    name: run stan tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04-clang-6.0]
+        python-version: [3.8]
+      fail-fast: false
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v
+        with:
+          submodules:  true
+      - name: Create release branch
+        env:
+          CXX: clang++-6.0
+        run: runTests.py src/test/unit
