@@ -8,7 +8,7 @@ on:
   pull_request:
     branches: [ develop, master ]
   push:
-    branches: [ develop, master, gh-actions-tests ]
+    branches: [ develop, master ]
     paths-ignore:
       - 'licenses/**'
       - 'LICENSE.md'
@@ -34,4 +34,4 @@ jobs:
       - name: Run tests
         env:
           CXX: clang++-${{ env.clangppDefaultValue }}
-        run: runTests.py -j 2 src/test/unit
+        run: python runTests.py -j 2 src/test/unit
