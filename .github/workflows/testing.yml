@@ -1,8 +1,6 @@
 name: Testing
 
 env:
-  operatingSystems: [ubuntu-latest]
-  pythonVersions: [3.8]
   clangppVersion: '6.0'
 
 on:
@@ -23,8 +21,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: env.operatingSystems
-        python-version: env.pythonVersions
+        os: [ubuntu-latest]
+        python-version: [3.8]
       fail-fast: false
     steps:
       - name: Check out source code
