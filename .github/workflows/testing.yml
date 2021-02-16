@@ -2,9 +2,9 @@ name: Testing
 
 on:
   pull_request:
-    branches: [ develop, master ]
+    branches: [ develop, master, gh-actions-tests ]
   push:
-    branches: [ develop, master ]
+    branches: [ develop, master, gh-actions-tests ]
     paths-ignore:
       - 'licenses/**'
       - 'LICENSE.md'
@@ -22,10 +22,10 @@ jobs:
       fail-fast: false
     steps:
       - name: Check out source code
-        uses: actions/checkout@v
+        uses: actions/checkout@v2
         with:
           submodules:  true
-      - name: Create release branch
+      - name: Run tests
         env:
           CXX: clang++-6.0
-        run: runTests.py src/test/unit
+        run: runTests.py -j 2 src/test/unit
