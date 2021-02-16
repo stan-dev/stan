@@ -1,0 +1,26 @@
+name: Run Tests
+
+on:
+  # Triggers the workflow on push or pull request events for master and develop branches
+  push:
+    branches: [ develop, master ]
+  pull_request:
+    branches: [ develop, master ]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      CXX: clang-6.0
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Setup make/local
+        run: |
+          echo "CXX=clang-6.0" >> make/local
+          echo "O=0" >> make/local
+      - name: Run tests
+        run: ./runTests.py -j 2 src/test/unit
