@@ -1,8 +1,9 @@
 name: Testing
 
 env:
-  pythonDefaultValue: '3.8'
-  clangppDefaultValue: '6.0'
+  operatingSystems: [ubuntu-latest]
+  pythonVersions: [3.8]
+  clangppVersion: '6.0'
 
 on:
   pull_request:
@@ -22,8 +23,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python-version: [env.pythonDefaultValue]
+        os: env.operatingSystems
+        python-version: env.pythonVersions
       fail-fast: false
     steps:
       - name: Check out source code
@@ -31,9 +32,9 @@ jobs:
         with:
           submodules:  true
       - name: Install clang++
-        run: sudo apt-get install clang-${{ env.clangppDefaultValue }}++
+        run: sudo apt-get install clang-${{ env.clangppVersion }}++
       - name: Run tests
         run: |
-          echo "CXX=clang-${{ env.clangppDefaultValue }}" >> make/local
+          echo "CXX=clang-${{ env.clangppVersion }}" >> make/local
           echo "O=0" >> make/local
           python runTests.py -j 2 src/test/unit
