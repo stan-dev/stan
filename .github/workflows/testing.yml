@@ -1,5 +1,9 @@
 name: Testing
 
+env:
+  pythonDefaultValue: 3.8
+  clangppDefaultValue: 6.0
+
 on:
   pull_request:
     branches: [ develop, master, gh-actions-tests ]
@@ -15,11 +19,11 @@ on:
       pythonVersion:
         description: 'Python version'     
         required: false
-        default: 3.8
+        default: env.pythonDefaultValue
       clangppVersion:
         description: 'Clang++ version'     
         required: false
-        default: 6.0
+        default: env.clangppDefaultValue
 
 jobs:
   run-tests:
