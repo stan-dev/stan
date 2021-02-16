@@ -292,8 +292,7 @@ pipeline {
                                 sh "make clean-all"
                                 sh "echo STAN_THREADS=true > make/local"
                                 withEnv(['PATH+TBB=./lib/tbb']) {
-                                    sh "./runTests.py test/expressions --only-function 'reduce_sum'"
-                                    sh "./runTests.py test/expressions --only-function 'map_rect'"
+                                    sh "./runTests.py -j${env.PARALLEL} test/expressions"
                                 }
                             }
                         }
