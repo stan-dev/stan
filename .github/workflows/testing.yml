@@ -6,7 +6,7 @@ env:
 
 on:
   pull_request:
-    branches: [ develop, master, gh-actions-tests ]
+    branches: [ develop, master ]
   push:
     branches: [ develop, master, gh-actions-tests ]
     paths-ignore:
@@ -14,16 +14,6 @@ on:
       - 'LICENSE.md'
       - 'README.md'
       - 'RELEASE-NOTES.txt'
-  workflow_dispatch:
-    inputs:
-      pythonVersion:
-        description: 'Python version'     
-        required: false
-        default: env.pythonDefaultValue
-      clangppVersion:
-        description: 'Clang++ version'     
-        required: false
-        default: env.clangppDefaultValue
 
 jobs:
   run-tests:
@@ -32,16 +22,16 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [github.event.inputs.pythonVersion]
+        python-version: [env.pythonDefaultValue]
       fail-fast: false
     steps:
       - name: Check out source code
         uses: actions/checkout@v2
         with:
           submodules:  true
-      - name: Install clang++-${{ github.event.inputs.clangppVersion }}
-        run: sudo apt-get install clang-${{ github.event.inputs.clangppVersion }}++
+      - name: Install clang++
+        run: sudo apt-get install clang-${{ env.clangppDefaultValue }}++
       - name: Run tests
         env:
-          CXX: clang++-${{ github.event.inputs.clangppVersion }}
+          CXX: clang++-${{ env.clangppDefaultValue }}
         run: runTests.py -j 2 src/test/unit
