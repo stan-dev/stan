@@ -1,8 +1,8 @@
 name: Testing
 
 env:
-  pythonDefaultValue: 3.8
-  clangppDefaultValue: 6.0
+  pythonDefaultValue: '3.8'
+  clangppDefaultValue: '6.0'
 
 on:
   pull_request:
