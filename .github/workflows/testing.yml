@@ -35,6 +35,6 @@ jobs:
         run: sudo apt-get install clang-${{ env.clangppVersion }}++
       - name: Run tests
         run: |
-          echo "CXX=clang-${{ env.clangppVersion }}" >> make/local
+          echo "CXX=clang++-${{ env.clangppVersion }}" >> make/local
           echo "O=0" >> make/local
           python runTests.py -j 2 src/test/unit
