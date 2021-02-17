@@ -1,11 +1,10 @@
-data { 
+data {
   int d_int;
   real d_real;
 }
 transformed data {
   int transformed_data_int;
   real transformed_data_real;
- 
   transformed_data_real = log1m_exp(d_int);
   transformed_data_real = log1m_exp(d_real);
 }
@@ -15,11 +14,11 @@ parameters {
 }
 transformed parameters {
   real transformed_param_real;
-
   transformed_param_real = log1m_exp(d_int);
   transformed_param_real = log1m_exp(d_real);
   transformed_param_real = log1m_exp(p_real);
 }
-model {  
-  y_p ~ normal(0,1);
+model {
+  y_p ~ normal(0, 1);
 }
+

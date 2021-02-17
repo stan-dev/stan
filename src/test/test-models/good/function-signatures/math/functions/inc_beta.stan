@@ -8,7 +8,7 @@ transformed data {
   a = inc_beta(2.7, 1, 2.7);
   a = inc_beta(2.7, 2.7, 1);
   a = inc_beta(2.7, 2.7, 2.7);
-}  
+}
 parameters {
   real b;
 }
@@ -25,4 +25,4 @@ transformed parameters {
 model {
   b ~ normal(0, 1);
 }
-  
+

@@ -1,5 +1,5 @@
 #include <stan/io/program_reader.hpp>
-#include <stan/lang/rethrow_located.hpp>
+#include <stan/model/rethrow_located.hpp>
 #include <gtest/gtest.h>
 
 stan::io::program_reader stub_reader() {

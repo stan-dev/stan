@@ -65,3 +65,4 @@ generated quantities {
   gq_rv3_b /= d_real_a;
   gq_mat33_b /= d_real_a;
 }
+

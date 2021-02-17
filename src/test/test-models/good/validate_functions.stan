@@ -30,3 +30,4 @@ generated quantities {
   real gq_d2 = my_fun(gq_d1);
   gq_d2 = my_fun3(gq_d1);
 }
+

@@ -14,8 +14,8 @@ data {
 transformed data {
   int x = 10;
   real y = 20;
-  int ax[3] = { 1, 2, 3 };
-  real ay[3] = { 1.0, 2.0, 3.0 };
+  array[3] int ax = {1, 2, 3};
+  array[3] real ay = {1.0, 2.0, 3.0};
   x /= 1;
   x /= c;
   x /= ax[1];
@@ -36,7 +36,7 @@ transformed parameters {
   w /= ax[1];
   w /= ay[1];
   w /= foo(w);
-}  
+}
 model {
   real v = 7;
   v /= b;
@@ -61,3 +61,4 @@ generated quantities {
   z /= y;
   z /= foo(y);
 }
+

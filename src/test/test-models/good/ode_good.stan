@@ -1,81 +1,39 @@
 functions {
-  real[] harm_osc_ode(real t,
-                      real[] y,         // state
-                      real[] theta,     // parameters
-                      real[] x,         // data
-                      int[] x_int) {    // integer data
-    real dydt[2];
+  array[] real harm_osc_ode(real t, array[] real y, array[] real theta,
+                            array[] real x, array[] int x_int) {
+    array[2] real dydt;
     dydt[1] = x[1] * y[2];
     dydt[2] = -y[1] - theta[1] * y[2];
     return dydt;
   }
 }
 data {
-  real y0[2];
+  array[2] real y0;
   real t0;
-  real ts[10];
-  real x[1];   
-  int x_int[0];
-  real y[10,2];
+  array[10] real ts;
+  array[1] real x;
+  array[0] int x_int;
+  array[10, 2] real y;
 }
 parameters {
-  real theta[1];
+  array[1] real theta;
   real<lower=0> sigma;
 }
 transformed parameters {
-  real y_hat[10,2];
-  y_hat = integrate_ode(harm_osc_ode,  // system
-                         y0,            // initial state
-                         t0,            // initial time
-                         ts,            // solution times
-                         theta,         // parameters
-                         x,             // data
-                         x_int);        // integer data
-  y_hat = integrate_ode_rk45(harm_osc_ode,  // system
-                              y0,            // initial state
-                              t0,            // initial time
-                              ts,            // solution times
-                              theta,         // parameters
-                              x,             // data
-                              x_int);        // integer data
-  y_hat = integrate_ode_bdf(harm_osc_ode,  // system
-                             y0,            // initial state
-                             t0,            // initial time
-                             ts,            // solution times
-                             theta,         // parameters
-                             x,             // data
-                             x_int);        // integer data
-  y_hat = integrate_ode_adams(harm_osc_ode,  // system
-                               y0,            // initial state
-                               t0,            // initial time
-                               ts,            // solution times
-                               theta,         // parameters
-                               x,             // data
-                               x_int);        // integer data
-  y_hat = integrate_ode_rk45(harm_osc_ode,  // system
-                              y0,            // initial state
-                              t0,            // initial time
-                              ts,            // solution times
-                              theta,         // parameters
-                              x,             // data
-                              x_int, 0.01, 0.01, 10); // integer data
-  y_hat = integrate_ode_bdf(harm_osc_ode,  // system
-                             y0,            // initial state
-                             t0,            // initial time
-                             ts,            // solution times
-                             theta,         // parameters
-                             x,             // data
-                             x_int, 0.01, 0.01, 10); // integer data
-  y_hat = integrate_ode_adams(harm_osc_ode,  // system
-                               y0,            // initial state
-                               t0,            // initial time
-                               ts,            // solution times
-                               theta,         // parameters
-                               x,             // data
-                               x_int, 0.01, 0.01, 10); // integer data
-  
+  array[10, 2] real y_hat;
+  y_hat = integrate_ode(harm_osc_ode, y0, t0, ts, theta, x, x_int);
+  y_hat = integrate_ode_rk45(harm_osc_ode, y0, t0, ts, theta, x, x_int);
+  y_hat = integrate_ode_bdf(harm_osc_ode, y0, t0, ts, theta, x, x_int);
+  y_hat = integrate_ode_adams(harm_osc_ode, y0, t0, ts, theta, x, x_int);
+  y_hat = integrate_ode_rk45(harm_osc_ode, y0, t0, ts, theta, x, x_int, 0.01,
+                             0.01, 10);
+  y_hat = integrate_ode_bdf(harm_osc_ode, y0, t0, ts, theta, x, x_int, 0.01,
+                            0.01, 10);
+  y_hat = integrate_ode_adams(harm_osc_ode, y0, t0, ts, theta, x, x_int,
+                              0.01, 0.01, 10);
 }
 model {
-  for (t in 1:10)
-    y[t] ~ normal(y_hat[t], sigma);  // independent normal noise
+  for (t in 1 : 10) 
+    y[t] ~ normal(y_hat[t], sigma);
 }
+

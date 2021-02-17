@@ -1,5 +1,0 @@
-data {
-  real xor;
-}
-model {
-}

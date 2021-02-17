@@ -14,17 +14,18 @@ parameters {
   real corr_matrix_x;
 }
 model {
-  int_x ~ normal(0,1);
-  real_x ~ normal(0,1);
-  vector_x ~ normal(0,1);
-  row_vector_x ~ normal(0,1);
-  matrix_x ~ normal(0,1);
-  unit_vector_x ~ normal(0,1);
-  simplex_x ~ normal(0,1);
-  ordered_x ~ normal(0,1);
-  positive_ordered_x ~ normal(0,1);
-  cholesky_factor_cov_x ~ normal(0,1);
-  cholesky_factor_corr_x ~ normal(0,1);
-  cov_matrix_x ~ normal(0,1);
-  corr_matrix_x ~ normal(0,1);
+  int_x ~ normal(0, 1);
+  real_x ~ normal(0, 1);
+  vector_x ~ normal(0, 1);
+  row_vector_x ~ normal(0, 1);
+  matrix_x ~ normal(0, 1);
+  unit_vector_x ~ normal(0, 1);
+  simplex_x ~ normal(0, 1);
+  ordered_x ~ normal(0, 1);
+  positive_ordered_x ~ normal(0, 1);
+  cholesky_factor_cov_x ~ normal(0, 1);
+  cholesky_factor_corr_x ~ normal(0, 1);
+  cov_matrix_x ~ normal(0, 1);
+  corr_matrix_x ~ normal(0, 1);
 }
+
