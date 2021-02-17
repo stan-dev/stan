@@ -1,8 +1,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-#include <stan/model/indexing/lvalue_varmat.hpp>
-#include <stan/model/indexing/lvalue.hpp>
+#include <stan/model/indexing/assign_varmat.hpp>
+#include <stan/model/indexing/assign.hpp>
 #include <stan/model/indexing/rvalue.hpp>
 #include <stan/math/rev.hpp>
 #include <test/unit/util.hpp>
