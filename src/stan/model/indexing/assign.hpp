@@ -4,7 +4,6 @@
 #include <stan/math/prim.hpp>
 #include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
-#include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
 #include <type_traits>

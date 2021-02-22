@@ -632,7 +632,6 @@ TEST(ModelIndexing, doubleToVar) {
   using Eigen::Matrix;
   using stan::math::var;
   using stan::model::assign;
-  using stan::model::cons_list;
   using stan::model::index_omni;
   using std::vector;
 
@@ -679,7 +678,6 @@ TEST(ModelIndexing, doubleToVar) {
 }
 TEST(ModelIndexing, resultSizeNegIndexing) {
   using stan::model::assign;
-  using stan::model::cons_list;
   using stan::model::index_min_max;
   using std::vector;
 
@@ -695,7 +693,6 @@ TEST(ModelIndexing, resultSizeNegIndexing) {
 
 TEST(ModelIndexing, resultSizeIndexingEigen) {
   using stan::model::assign;
-  using stan::model::cons_list;
   using stan::model::index_min_max;
   using std::vector;
   Eigen::VectorXd lhs(5);
@@ -712,7 +709,6 @@ TEST(ModelIndexing, resultSizeIndexingEigen) {
 
 TEST(ModelIndexing, resultSizeNegIndexingEigen) {
   using stan::model::assign;
-  using stan::model::cons_list;
   using stan::model::index_min_max;
   using std::vector;
   Eigen::VectorXd lhs(5);
@@ -729,7 +725,6 @@ TEST(ModelIndexing, resultSizeNegIndexingEigen) {
 
 TEST(ModelIndexing, resultSizePosMinMaxPosMinMaxEigenMatrix) {
   using stan::model::assign;
-  using stan::model::cons_list;
   using stan::model::index_min_max;
   using std::vector;
   Eigen::Matrix<double, -1, -1> x(5, 5);
@@ -756,7 +751,6 @@ TEST(ModelIndexing, resultSizePosMinMaxPosMinMaxEigenMatrix) {
 
 TEST(ModelIndexing, resultSizePosMinMaxNegMinMaxEigenMatrix) {
   using stan::model::assign;
-  using stan::model::cons_list;
   using stan::model::index_min_max;
   using std::vector;
   Eigen::Matrix<double, -1, -1> x(5, 5);
@@ -784,7 +778,6 @@ TEST(ModelIndexing, resultSizePosMinMaxNegMinMaxEigenMatrix) {
 
 TEST(ModelIndexing, resultSizeNigMinMaxPosMinMaxEigenMatrix) {
   using stan::model::assign;
-  using stan::model::cons_list;
   using stan::model::index_min_max;
   using std::vector;
   Eigen::Matrix<double, -1, -1> x(5, 5);
@@ -812,7 +805,6 @@ TEST(ModelIndexing, resultSizeNigMinMaxPosMinMaxEigenMatrix) {
 
 TEST(ModelIndexing, resultSizeNegMinMaxNegMinMaxEigenMatrix) {
   using stan::model::assign;
-  using stan::model::cons_list;
   using stan::model::index_min_max;
   using std::vector;
   Eigen::Matrix<double, -1, -1> x(5, 5);
