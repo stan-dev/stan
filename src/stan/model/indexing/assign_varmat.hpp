@@ -218,20 +218,21 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
       x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = y_vals.coeff(i);
     }
   }
-  stan::math::reverse_pass_callback([x, y, row_idx_val, x_idx, prev_val]() mutable {
-    for (size_t i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = prev_val.coeff(i);
-        prev_val.coeffRef(i) = x.adj().coeffRef(row_idx_val, x_idx[i]);
-        x.adj().coeffRef(row_idx_val, x_idx[i]) = 0.0;
-      }
-    }
-    for (size_t i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        y.adj().coeffRef(i) += prev_val.coeffRef(i);
-      }
-    }
-  });
+  stan::math::reverse_pass_callback(
+      [x, y, row_idx_val, x_idx, prev_val]() mutable {
+        for (size_t i = 0; i < x_idx.size(); ++i) {
+          if (likely(x_idx[i] != -1)) {
+            x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = prev_val.coeff(i);
+            prev_val.coeffRef(i) = x.adj().coeffRef(row_idx_val, x_idx[i]);
+            x.adj().coeffRef(row_idx_val, x_idx[i]) = 0.0;
+          }
+        }
+        for (size_t i = 0; i < x_idx.size(); ++i) {
+          if (likely(x_idx[i] != -1)) {
+            y.adj().coeffRef(i) += prev_val.coeffRef(i);
+          }
+        }
+      });
 }
 
 /**

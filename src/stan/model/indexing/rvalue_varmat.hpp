@@ -54,8 +54,7 @@ namespace model {
  * the indexed size.
  */
 template <typename Vec, require_var_vector_t<Vec>* = nullptr>
-inline auto rvalue(Vec&& x,
-                   const char* name, const index_multi& idx) {
+inline auto rvalue(Vec&& x, const char* name, const index_multi& idx) {
   using stan::math::arena_allocator;
   using stan::math::check_range;
   using stan::math::reverse_pass_callback;
@@ -92,8 +91,7 @@ inline auto rvalue(Vec&& x,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename VarMat, require_var_dense_dynamic_t<VarMat>* = nullptr>
-inline auto rvalue(VarMat&& x,
-                   const char* name, const index_multi& idx) {
+inline auto rvalue(VarMat&& x, const char* name, const index_multi& idx) {
   using stan::math::arena_allocator;
   using stan::math::check_range;
   using stan::math::reverse_pass_callback;
@@ -103,8 +101,7 @@ inline auto rvalue(VarMat&& x,
   arena_t<value_type_t<VarMat>> x_ret_vals(ret_rows, x.cols());
   arena_std_vec row_idx(ret_rows);
   for (int i = 0; i < ret_rows; ++i) {
-    check_range("matrix[multi] subset range", name, x.rows(),
-                idx.ns_[i]);
+    check_range("matrix[multi] subset range", name, x.rows(), idx.ns_[i]);
     row_idx[i] = idx.ns_[i] - 1;
     x_ret_vals.row(i) = x.val().row(row_idx[i]);
   }
@@ -131,9 +128,8 @@ inline auto rvalue(VarMat&& x,
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename VarMat, require_var_dense_dynamic_t<VarMat>* = nullptr>
-inline auto rvalue(
-    VarMat&& x,
-    const char* name, index_uni row_idx, const index_multi& col_idx) {
+inline auto rvalue(VarMat&& x, const char* name, index_uni row_idx,
+                   const index_multi& col_idx) {
   using stan::math::arena_allocator;
   using stan::math::check_range;
   using stan::math::reverse_pass_callback;
@@ -145,8 +141,7 @@ inline auto rvalue(
   arena_std_vec col_idx_vals(ret_size);
   const int row_idx_val = row_idx.n_ - 1;
   for (int j = 0; j < ret_size; ++j) {
-    check_range("matrix[multi] subset range", name, x.cols(),
-                col_idx.ns_[j]);
+    check_range("matrix[multi] subset range", name, x.cols(), col_idx.ns_[j]);
     col_idx_vals[j] = col_idx.ns_[j] - 1;
     x_ret_vals.coeffRef(j) = x.val().coeff(row_idx_val, col_idx_vals[j]);
   }
@@ -174,16 +169,14 @@ inline auto rvalue(
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename VarMat, require_var_dense_dynamic_t<VarMat>* = nullptr>
-inline auto rvalue(
-    VarMat&& x,
-    const char* name, const index_multi& row_idx, index_uni col_idx) {
+inline auto rvalue(VarMat&& x, const char* name, const index_multi& row_idx,
+                   index_uni col_idx) {
   using stan::math::arena_allocator;
   using stan::math::check_range;
   using stan::math::reverse_pass_callback;
   using stan::math::var_value;
   using arena_std_vec = std::vector<int, arena_allocator<int>>;
-  check_range("matrix[multi, uni] rvalue range", name, x.cols(),
-              col_idx.n_);
+  check_range("matrix[multi, uni] rvalue range", name, x.cols(), col_idx.n_);
   const auto ret_size = row_idx.ns_.size();
   arena_t<Eigen::Matrix<double, Eigen::Dynamic, 1>> x_ret_val(ret_size);
   arena_std_vec row_idx_vals(ret_size);
@@ -217,9 +210,8 @@ inline auto rvalue(
  * @return Result of indexing matrix.
  */
 template <typename VarMat, require_var_dense_dynamic_t<VarMat>* = nullptr>
-inline auto rvalue(
-    VarMat&& x,
-    const char* name, const index_multi& row_idx, const index_multi& col_idx) {
+inline auto rvalue(VarMat&& x, const char* name, const index_multi& row_idx,
+                   const index_multi& col_idx) {
   using stan::math::arena_allocator;
   using stan::math::check_range;
   using stan::math::reverse_pass_callback;
@@ -234,8 +226,7 @@ inline auto rvalue(
   arena_std_vec col_idx_vals(ret_cols);
   // We only want to check these once
   for (int i = 0; i < ret_rows; ++i) {
-    check_range("matrix[multi,multi] row index", name, x_rows,
-                row_idx.ns_[i]);
+    check_range("matrix[multi,multi] row index", name, x_rows, row_idx.ns_[i]);
     row_idx_vals[i] = row_idx.ns_[i] - 1;
   }
   for (int j = 0; j < ret_cols; ++j) {
@@ -243,14 +234,16 @@ inline auto rvalue(
                 col_idx.ns_[j]);
     col_idx_vals[j] = col_idx.ns_[j] - 1;
     for (int i = 0; i < ret_rows; ++i) {
-      x_ret_val.coeffRef(i, j) = x.val().coeff(row_idx_vals[i], col_idx_vals[j]);
+      x_ret_val.coeffRef(i, j)
+          = x.val().coeff(row_idx_vals[i], col_idx_vals[j]);
     }
   }
   var_value<plain_type_t<value_type_t<VarMat>>> x_ret(x_ret_val);
   reverse_pass_callback([x, x_ret, col_idx_vals, row_idx_vals]() mutable {
     for (int j = 0; j < col_idx_vals.size(); ++j) {
       for (int i = 0; i < row_idx_vals.size(); ++i) {
-        x.adj().coeffRef(row_idx_vals[i], col_idx_vals[j]) += x_ret.adj().coeff(i, j);
+        x.adj().coeffRef(row_idx_vals[i], col_idx_vals[j])
+            += x_ret.adj().coeff(i, j);
       }
     }
   });
@@ -272,9 +265,8 @@ inline auto rvalue(
  */
 template <typename VarMat, typename Idx,
           require_var_dense_dynamic_t<VarMat>* = nullptr>
-inline auto rvalue(
-    VarMat&& x,
-    const char* name, const Idx& row_idx, const index_multi& col_idx) {
+inline auto rvalue(VarMat&& x, const char* name, const Idx& row_idx,
+                   const index_multi& col_idx) {
   using stan::math::arena_allocator;
   using stan::math::check_range;
   using stan::math::reverse_pass_callback;
@@ -285,11 +277,9 @@ inline auto rvalue(
   arena_t<value_type_t<VarMat>> x_ret_val(ret_rows, ret_cols);
   arena_std_vec col_idx_vals(ret_cols);
   for (int j = 0; j < ret_cols; ++j) {
-    check_range("matrix[..., multi] col index", name, x.cols(),
-                col_idx.ns_[j]);
+    check_range("matrix[..., multi] col index", name, x.cols(), col_idx.ns_[j]);
     col_idx_vals[j] = col_idx.ns_[j] - 1;
-    x_ret_val.col(j) = rvalue(x.val().col(col_idx_vals[j]),
-                              name, row_idx);
+    x_ret_val.col(j) = rvalue(x.val().col(col_idx_vals[j]), name, row_idx);
   }
   var_value<Eigen::Matrix<double, -1, -1>> x_ret(x_ret_val);
   // index_multi is the only index with dynamic memory so row_idx is safe

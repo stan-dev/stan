@@ -71,8 +71,7 @@ inline void assign(T&& x, U&& y, const char* name) {
  */
 template <typename Vec, typename U, require_eigen_vector_t<Vec>* = nullptr,
           require_stan_scalar_t<U>* = nullptr>
-inline void assign(Vec&& x,
-                   const U& y, const char* name, index_uni idx) {
+inline void assign(Vec&& x, const U& y, const char* name, index_uni idx) {
   stan::math::check_range("vector[uni] assign", name, x.size(), idx.n_);
   x.coeffRef(idx.n_ - 1) = y;
 }
@@ -94,15 +93,14 @@ inline void assign(Vec&& x,
  */
 template <typename Vec1, typename Vec2,
           require_all_eigen_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const Vec2& y, const char* name, const index_multi& idx) {
+inline void assign(Vec1&& x, const Vec2& y, const char* name,
+                   const index_multi& idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_size_match("vector[multi] assign", "left hand side",
                                idx.ns_.size(), name, y_ref.size());
   const auto x_size = x.size();
   for (int n = 0; n < y_ref.size(); ++n) {
-    stan::math::check_range("vector[multi] assign", name, x_size,
-                            idx.ns_[n]);
+    stan::math::check_range("vector[multi] assign", name, x_size, idx.ns_[n]);
     x.coeffRef(idx.ns_[n] - 1) = y_ref.coeff(n);
   }
 }
@@ -125,8 +123,8 @@ inline void assign(Vec1&& x,
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const Vec2& y, const char* name, index_min_max idx) {
+inline void assign(Vec1&& x, const Vec2& y, const char* name,
+                   index_min_max idx) {
   stan::math::check_range("vector[min_max] min assign", name, x.size(),
                           idx.min_);
   stan::math::check_range("vector[min_max] max assign", name, x.size(),
@@ -164,10 +162,8 @@ inline void assign(Vec1&& x,
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const Vec2& y, const char* name, index_min idx) {
-  stan::math::check_range("vector[min] assign", name, x.size(),
-                          idx.min_);
+inline void assign(Vec1&& x, const Vec2& y, const char* name, index_min idx) {
+  stan::math::check_range("vector[min] assign", name, x.size(), idx.min_);
   stan::math::check_size_match("vector[min] assign", "left hand side",
                                x.size() - idx.min_ + 1, name, y.size());
   x.tail(x.size() - idx.min_ + 1) = y;
@@ -191,12 +187,10 @@ inline void assign(Vec1&& x,
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const Vec2& y, const char* name, index_max idx) {
-  stan::math::check_range("vector[max] assign", name, x.size(),
-                          idx.max_);
-  stan::math::check_size_match("vector[max] assign", "left hand side",
-                               idx.max_, name, y.size());
+inline void assign(Vec1&& x, const Vec2& y, const char* name, index_max idx) {
+  stan::math::check_range("vector[max] assign", name, x.size(), idx.max_);
+  stan::math::check_size_match("vector[max] assign", "left hand side", idx.max_,
+                               name, y.size());
   x.head(idx.max_) = y;
 }
 
@@ -216,8 +210,7 @@ inline void assign(Vec1&& x,
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   Vec2&& y, const char* name, index_omni) {
+inline void assign(Vec1&& x, Vec2&& y, const char* name, index_omni) {
   stan::math::check_size_match("vector[omni] assign", "left hand side",
                                x.size(), name, y.size());
   x = std::forward<Vec2>(y);
@@ -242,12 +235,10 @@ inline void assign(Vec1&& x,
 template <typename Mat, typename RowVec,
           require_dense_dynamic_t<Mat>* = nullptr,
           require_row_vector_t<RowVec>* = nullptr>
-inline void assign(Mat&& x,
-                   const RowVec& y, const char* name, index_uni idx) {
+inline void assign(Mat&& x, const RowVec& y, const char* name, index_uni idx) {
   stan::math::check_size_match("matrix[uni] assign", "left hand side columns",
                                x.cols(), name, y.size());
-  stan::math::check_range("matrix[uni] assign row", name, x.rows(),
-                          idx.n_);
+  stan::math::check_range("matrix[uni] assign row", name, x.rows(), idx.n_);
   x.row(idx.n_ - 1) = y;
 }
 
@@ -268,8 +259,8 @@ inline void assign(Mat&& x,
  */
 template <typename Mat1, typename Mat2,
           require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   const Mat2& y, const char* name, const index_multi& idx) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const index_multi& idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_size_match("matrix[multi] assign", "left hand side rows",
                                idx.ns_.size(), name, y.rows());
@@ -298,8 +289,7 @@ inline void assign(Mat1&& x,
  */
 template <typename Mat1, typename Mat2,
           require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   Mat2&& y, const char* name, index_omni) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, index_omni) {
   stan::math::check_size_match("matrix[omni] assign", "left hand side rows",
                                x.rows(), name, y.rows());
   stan::math::check_size_match("matrix[omni] assign", "left hand side columns",
@@ -325,11 +315,9 @@ inline void assign(Mat1&& x,
 template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr,
           require_matrix_t<Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   const Mat2& y, const char* name, index_min idx) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name, index_min idx) {
   const auto row_size = x.rows() - (idx.min_ - 1);
-  stan::math::check_range("matrix[min] assign row", name, x.rows(),
-                          idx.min_);
+  stan::math::check_range("matrix[min] assign row", name, x.rows(), idx.min_);
   stan::math::check_size_match("matrix[min] assign", "left hand side rows",
                                row_size, name, y.rows());
   stan::math::check_size_match("matrix[min] assign", "left hand side columns",
@@ -355,10 +343,8 @@ inline void assign(Mat1&& x,
 template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr,
           require_matrix_t<Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   const Mat2& y, const char* name, index_max idx) {
-  stan::math::check_range("matrix[max] assign row", name, x.rows(),
-                          idx.max_);
+inline void assign(Mat1&& x, const Mat2& y, const char* name, index_max idx) {
+  stan::math::check_range("matrix[max] assign row", name, x.rows(), idx.max_);
   stan::math::check_size_match("matrix[max] assign", "left hand side rows",
                                idx.max_, name, y.rows());
   stan::math::check_size_match("matrix[max] assign", "left hand side columns",
@@ -384,8 +370,7 @@ inline void assign(Mat1&& x,
 template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr,
           require_matrix_t<Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   Mat2&& y, const char* name, index_min_max idx) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max idx) {
   stan::math::check_range("matrix[min_max] max row indexing", name, x.rows(),
                           idx.max_);
   stan::math::check_range("matrix[min_max] min row indexing", name, x.rows(),
@@ -428,9 +413,8 @@ inline void assign(Mat1&& x,
  */
 template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    Mat2&& y, const char* name, index_min_max row_idx, index_min_max col_idx) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
+                   index_min_max col_idx) {
   stan::math::check_range("matrix[min_max, min_max] assign max row", name,
                           x.rows(), row_idx.max_);
   stan::math::check_range("matrix[min_max, min_max] assign min row", name,
@@ -449,9 +433,7 @@ inline void assign(
       stan::math::check_size_match("matrix[min_max, min_max] assign",
                                    "left hand side columns", col_size, name,
                                    y.cols());
-      x.block(row_idx.min_ - 1, col_idx.min_ - 1, row_size,
-              col_size)
-          = y;
+      x.block(row_idx.min_ - 1, col_idx.min_ - 1, row_size, col_size) = y;
       return;
     } else {
       auto row_size = row_idx.max_ - (row_idx.min_ - 1);
@@ -462,8 +444,7 @@ inline void assign(
       stan::math::check_size_match("matrix[min_max, reverse_min_max] assign",
                                    "left hand side columns", col_size, name,
                                    y.cols());
-      x.block(row_idx.min_ - 1, col_idx.max_ - 1, row_size,
-              col_size)
+      x.block(row_idx.min_ - 1, col_idx.max_ - 1, row_size, col_size)
           = internal::rowwise_reverse(y);
       return;
     }
@@ -477,8 +458,7 @@ inline void assign(
       stan::math::check_size_match("matrix[reverse_min_max, min_max] assign",
                                    "left hand side columns", col_size, name,
                                    y.cols());
-      x.block(row_idx.max_ - 1, col_idx.min_ - 1, row_size,
-              col_size)
+      x.block(row_idx.max_ - 1, col_idx.min_ - 1, row_size, col_size)
           = internal::colwise_reverse(y);
       return;
     } else {
@@ -490,8 +470,7 @@ inline void assign(
       stan::math::check_size_match(
           "matrix[reverse_min_max, reverse_min_max] assign",
           "left hand side columns", col_size, name, y.cols());
-      x.block(row_idx.max_ - 1, col_idx.max_ - 1, row_size,
-              col_size)
+      x.block(row_idx.max_ - 1, col_idx.max_ - 1, row_size, col_size)
           = y.reverse();
       return;
     }
@@ -514,13 +493,12 @@ inline void assign(
  */
 template <typename Mat, typename U,
           require_eigen_dense_dynamic_t<Mat>* = nullptr>
-inline void assign(
-    Mat&& x,
-    const U& y, const char* name, index_uni row_idx, index_uni col_idx) {
+inline void assign(Mat&& x, const U& y, const char* name, index_uni row_idx,
+                   index_uni col_idx) {
   stan::math::check_range("matrix[uni,uni] assign row", name, x.rows(),
-                         row_idx.n_);
+                          row_idx.n_);
   stan::math::check_range("matrix[uni,uni] assign column", name, x.cols(),
-                         col_idx.n_);
+                          col_idx.n_);
   x.coeffRef(row_idx.n_ - 1, col_idx.n_ - 1) = y;
 }
 
@@ -544,9 +522,8 @@ inline void assign(
 template <typename Mat1, typename Vec,
           require_eigen_dense_dynamic_t<Mat1>* = nullptr,
           require_eigen_row_vector_t<Vec>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const Vec& y, const char* name, index_uni row_idx, const index_multi& col_idx) {
+inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
+                   const index_multi& col_idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_range("matrix[uni, multi] assign row", name, x.rows(),
                           row_idx.n_);
@@ -578,16 +555,15 @@ inline void assign(
  */
 template <typename Mat1, typename Mat2,
           require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const Mat2& y, const char* name, const index_multi& row_idx, const index_multi& col_idx) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const index_multi& row_idx, const index_multi& col_idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_size_match("matrix[multi,multi] assign row sizes",
                                "left hand side", row_idx.ns_.size(), name,
                                y_ref.rows());
   stan::math::check_size_match("matrix[multi,multi] assign column sizes",
-                               "left hand side", col_idx.ns_.size(),
-                               name, y_ref.cols());
+                               "left hand side", col_idx.ns_.size(), name,
+                               y_ref.cols());
   for (int j = 0; j < y_ref.cols(); ++j) {
     const int n = col_idx.ns_[j];
     stan::math::check_range("matrix[multi,multi] assign column", name, x.cols(),
@@ -620,9 +596,8 @@ inline void assign(
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const Mat2& y, const char* name, const Idx& row_idx, index_uni col_idx) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const Idx& row_idx, index_uni col_idx) {
   stan::math::check_range("matrix[..., uni] assign column", name, x.cols(),
                           col_idx.n_);
   assign(x.col(col_idx.n_ - 1), y, name, row_idx);
@@ -647,13 +622,12 @@ inline void assign(
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_eigen_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const Mat2& y, const char* name, const Idx& row_idx, const index_multi& col_idx) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const Idx& row_idx, const index_multi& col_idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_size_match("matrix[..., multi] assign column sizes",
-                               "left hand side", col_idx.ns_.size(),
-                               name, y_ref.cols());
+                               "left hand side", col_idx.ns_.size(), name,
+                               y_ref.cols());
   for (int j = 0; j < col_idx.ns_.size(); ++j) {
     const int n = col_idx.ns_[j];
     stan::math::check_range("matrix[..., multi] assign column", name, x.cols(),
@@ -681,9 +655,8 @@ inline void assign(
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    Mat2&& y, const char* name, const Idx& row_idx, index_omni) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, const Idx& row_idx,
+                   index_omni) {
   assign(x, std::forward<Mat2>(y), name, row_idx);
 }
 
@@ -707,13 +680,12 @@ inline void assign(
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const Mat2& y, const char* name, const Idx& row_idx, index_min col_idx) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const Idx& row_idx, index_min col_idx) {
   const auto start_col = col_idx.min_ - 1;
   const auto col_size = x.cols() - start_col;
   stan::math::check_range("matrix[..., min] assign column", name, x.cols(),
-                         col_idx.min_);
+                          col_idx.min_);
   stan::math::check_size_match("matrix[..., min] assign column sizes",
                                "left hand side", col_size, name, y.cols());
   assign(x.rightCols(col_size), y, name, row_idx);
@@ -739,16 +711,13 @@ inline void assign(
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const Mat2& y, const char* name, const Idx& row_idx, index_max col_idx) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const Idx& row_idx, index_max col_idx) {
   stan::math::check_range("matrix[..., max] assign", name, x.cols(),
                           col_idx.max_);
   stan::math::check_size_match("matrix[..., max] assign column size",
-                               "left hand side", col_idx.max_, name,
-                               y.cols());
-  assign(x.leftCols(col_idx.max_), y, name,
-         row_idx);
+                               "left hand side", col_idx.max_, name, y.cols());
+  assign(x.leftCols(col_idx.max_), y, name, row_idx);
 }
 
 /**
@@ -770,9 +739,8 @@ inline void assign(
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    Mat2&& y, const char* name, const Idx& row_idx, index_min_max col_idx) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, const Idx& row_idx,
+                   index_min_max col_idx) {
   stan::math::check_range("matrix[..., min_max] assign min column", name,
                           x.cols(), col_idx.min_);
   stan::math::check_range("matrix[..., min_max] assign max column", name,
@@ -782,15 +750,14 @@ inline void assign(
     const auto col_size = col_idx.max_ - col_start;
     stan::math::check_size_match("matrix[..., min_max] assign column size",
                                  "left hand side", col_size, name, y.cols());
-    assign(x.middleCols(col_start, col_size), y, name,
-           row_idx);
+    assign(x.middleCols(col_start, col_size), y, name, row_idx);
   } else {
     const auto col_start = col_idx.max_ - 1;
     const auto col_size = col_idx.min_ - col_start;
     stan::math::check_size_match("matrix[..., min_max] assign column size",
                                  "left hand side", col_size, name, y.cols());
-    assign(x.middleCols(col_start, col_size),
-           internal::rowwise_reverse(y), name, row_idx);
+    assign(x.middleCols(col_start, col_size), internal::rowwise_reverse(y),
+           name, row_idx);
   }
 }
 
@@ -808,8 +775,7 @@ inline void assign(
 template <typename T, typename U, require_all_std_vector_t<T, U>* = nullptr,
           require_not_t<
               std::is_assignable<std::decay_t<T>&, std::decay_t<U>>>* = nullptr>
-inline void assign(T&& x, U&& y,
-                   const char* name) {
+inline void assign(T&& x, U&& y, const char* name) {
   x.resize(y.size());
   if (std::is_rvalue_reference<U>::value) {
     for (size_t i = 0; i < y.size(); ++i) {
@@ -842,10 +808,9 @@ inline void assign(T&& x, U&& y,
  */
 template <typename StdVec, typename U, typename... Idxes,
           require_std_vector_t<StdVec>* = nullptr>
-inline void assign(StdVec&& x,
-                   U&& y, const char* name, index_uni idx1, const Idxes& ... idxes) {
-  stan::math::check_range("vector[uni,...] assign", name, x.size(),
-                          idx1.n_);
+inline void assign(StdVec&& x, U&& y, const char* name, index_uni idx1,
+                   const Idxes&... idxes) {
+  stan::math::check_range("vector[uni,...] assign", name, x.size(), idx1.n_);
   assign(x[idx1.n_ - 1], std::forward<U>(y), name, idxes...);
 }
 
@@ -867,10 +832,8 @@ inline void assign(StdVec&& x,
  */
 template <typename StdVec, typename U, require_std_vector_t<StdVec>* = nullptr,
           require_t<std::is_assignable<value_type_t<StdVec>&, U>>* = nullptr>
-inline void assign(StdVec&& x,
-                   U&& y, const char* name, index_uni idx) {
-  stan::math::check_range("vector[uni,...] assign", name, x.size(),
-                          idx.n_);
+inline void assign(StdVec&& x, U&& y, const char* name, index_uni idx) {
+  stan::math::check_range("vector[uni,...] assign", name, x.size(), idx.n_);
   x[idx.n_ - 1] = std::forward<U>(y);
 }
 
@@ -897,8 +860,8 @@ inline void assign(StdVec&& x,
 template <typename T, typename Idx1, typename... Idxes, typename U,
           require_all_std_vector_t<T, U>* = nullptr,
           require_not_same_t<Idx1, index_uni>* = nullptr>
-inline void assign(T&& x, U&& y,
-                   const char* name,const Idx1& idx1, const Idxes&... idxes) {
+inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
+                   const Idxes&... idxes) {
   int x_idx_size = rvalue_index_size(idx1, x.size());
   stan::math::check_size_match("vector[multi,...] assign", "left hand side",
                                x_idx_size, name, y.size());
