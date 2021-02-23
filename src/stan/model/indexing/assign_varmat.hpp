@@ -3,7 +3,7 @@
 
 #include <stan/math/rev.hpp>
 #include <stan/model/indexing/index.hpp>
-#include <stan/model/indexing/lvalue.hpp>
+#include <stan/model/indexing/assign.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
 #include <type_traits>
