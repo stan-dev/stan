@@ -31,26 +31,42 @@ namespace io {
 template <typename T>
 class deserializer {
  private:
-  Eigen::Map<const Eigen::Matrix<T, -1, 1>> data_r_;
-  Eigen::Map<const Eigen::Matrix<int, -1, 1>> data_i_;
-  size_t r_size_{0};
-  size_t i_size_{0};
-  size_t pos_r_{0};
-  size_t pos_i_{0};
+  Eigen::Map<Eigen::Matrix<T, -1, 1>> data_r_; // map of reals.
+  Eigen::Map<Eigen::Matrix<int, -1, 1>> data_i_; // map of integers.
+  size_t r_size_{0}; // size of reals available.
+  size_t i_size_{0}; // size of integers available.
+  size_t pos_r_{0}; // current position in map of reals.
+  size_t pos_i_{0}; // current position in map of integers.
+  /**
+   * Return pointer to current scalar.
+   */
+  inline T& scalar_ptr() { return data_r_.coeffRef(pos_r_); }
 
-  inline const T& scalar_ptr() { return data_r_.coeffRef(pos_r_); }
-
-  inline const T& scalar_ptr_increment(size_t m) {
+  /**
+   * Return pointer to current scalar and incriment the internal counter.
+   * @param m amount to move `pos_r_` up.
+   */
+  inline T& scalar_ptr_increment(size_t m) {
     pos_r_ += m;
     return data_r_.coeffRef(pos_r_ - m);
   }
 
-  inline const int& int_ptr() { return data_i_.coeffRef(pos_i_); }
+  /**
+   * Return pointer to current integer.
+   */
+  inline int& int_ptr() { return data_i_.coeffRef(pos_i_); }
 
-  inline const int& int_ptr_increment(size_t m) {
+  /**
+   * Return pointer to current integer and incriment the internal counter.
+   * @param m amount to move `pos_i_` up.
+   */
+  inline int& int_ptr_increment(size_t m) {
     pos_i_ += m;
     return data_i_.coeffRef(pos_i_ - m);
   }
+  /**
+   * The that there is anything left to read for scalars.
+   */
   void check_r_capacity() const {
     if (pos_r_ >= r_size_) {
       []() STAN_COLD_PATH {
@@ -59,6 +75,9 @@ class deserializer {
     }
   }
 
+  /**
+   * The that there is anything left to read for integers.
+   */
   void check_i_capacity() const {
     if (pos_i_ >= i_size_) {
       []() STAN_COLD_PATH {
@@ -116,6 +135,11 @@ class deserializer {
    */
   inline size_t available_i() const noexcept { return i_size_ - pos_i_; }
 
+  /**
+   * Return the next scalar in the sequence.
+   *
+   * @return Next scalar value.
+   */
   template <typename Ret, require_any_t<std::is_floating_point<Ret>,
                                         is_autodiff<Ret>>* = nullptr>
   auto read() {
@@ -130,14 +154,24 @@ class deserializer {
                            data_r_.coeffRef(pos_r_++));
   }
 
+  /**
+   * Return the next integer in the integer sequence.
+   *
+   * @return Next integer value.
+   */
   template <typename Ret, require_integral_t<Ret>* = nullptr>
   auto read() {
     check_i_capacity();
     return data_i_.coeffRef(pos_i_++);
   }
 
+  /**
+   * Return an Eigen column vector of size `m`.
+   * @tparam Ret The type to return.
+   */
   template <typename Ret, typename Size,
-            require_eigen_col_vector_t<Ret>* = nullptr>
+            require_eigen_col_vector_t<Ret>* = nullptr,
+            require_not_vt_complex<Ret>* = nullptr>
   auto read(Size m) {
     if (unlikely(m == 0)) {
       return map_vector_t(nullptr, m);
@@ -146,8 +180,32 @@ class deserializer {
     }
   }
 
+  /**
+   * Return an Eigen column vector of size `m` with inner complex type.
+   * @tparam Ret The type to return.
+   */
   template <typename Ret, typename Size,
-            require_eigen_row_vector_t<Ret>* = nullptr>
+            require_eigen_col_vector_t<Ret>* = nullptr,
+            require_vt_complex<Ret>* = nullptr>
+  auto read(Size m) {
+    if (unlikely(m == 0)) {
+      return Ret(map_vector_t(nullptr, m));
+    } else {
+      Ret ret(m);
+      for (Eigen::Index i = 0; i < m; ++i) {
+        ret.coeffRef(i) = std::complex<T>(data_r_.coeffRef(pos_r_++),
+                               data_r_.coeffRef(pos_r_++));
+      }
+    }
+  }
+
+  /**
+   * Return an Eigen row vector of size `m`.
+   * @tparam Ret The type to return.
+   */
+  template <typename Ret, typename Size,
+            require_eigen_row_vector_t<Ret>* = nullptr,
+            require_not_vt_complex<Ret>* = nullptr>
   auto read(Size m) {
     if (unlikely(m == 0)) {
       return map_row_vector_t(nullptr, m);
@@ -156,8 +214,32 @@ class deserializer {
     }
   }
 
+  /**
+   * Return an Eigen row vector of size `m` with inner complex type.
+   * @tparam Ret The type to return.
+   */
+  template <typename Ret, typename Size,
+            require_eigen_row_vector_t<Ret>* = nullptr,
+            require_vt_complex<Ret>* = nullptr>
+  auto read(Size m) {
+    if (unlikely(m == 0)) {
+      return Ret(map_row_vector_t(nullptr, m));
+    } else {
+      Ret ret(m);
+      for (Eigen::Index i = 0; i < m; ++i) {
+        ret.coeffRef(i) = std::complex<T>(data_r_.coeffRef(pos_r_++),
+                               data_r_.coeffRef(pos_r_++));
+      }
+    }
+  }
+
+  /**
+   * Return an Eigen matrix of size `(rows, cols)`.
+   * @tparam Ret The type to return.
+   */
   template <typename Ret, typename Rows, typename Cols,
-            require_eigen_matrix_dynamic_t<Ret>* = nullptr>
+            require_eigen_matrix_dynamic_t<Ret>* = nullptr,
+            require_not_vt_complex<Ret>* = nullptr>
   auto read(Rows rows, Cols cols) {
     if (rows == 0 || cols == 0) {
       return map_matrix_t(nullptr, rows, cols);
@@ -166,6 +248,29 @@ class deserializer {
     }
   }
 
+  /**
+   * Return an Eigen matrix of size `(rows, cols)` with complex inner type.
+   * @tparam Ret The type to return.
+   */
+  template <typename Ret, typename Rows, typename Cols,
+            require_eigen_matrix_dynamic_t<Ret>* = nullptr,
+            require_vt_complex<Ret>* = nullptr>
+  auto read(Rows rows, Cols cols) {
+    if (rows == 0 || cols == 0) {
+      return Ret(map_matrix_t(nullptr, rows, cols));
+    } else {
+      Ret ret(rows, cols);
+      for (Eigen::Index i = 0; i < rows * cols; ++i) {
+        ret.coeffRef(i) = std::complex<T>(data_r_.coeffRef(pos_r_++),
+                               data_r_.coeffRef(pos_r_++));
+      }
+    }
+  }
+
+  /**
+   * Return a `var_value` with inner Eigen type.
+   * @tparam Ret The type to return.
+   */
   template <typename Ret, typename T_ = T, typename... Sizes,
             require_var_t<T_>* = nullptr, require_var_matrix_t<Ret>* = nullptr>
   auto read(Sizes... sizes) {
@@ -173,6 +278,10 @@ class deserializer {
     return stan::math::to_var_value(this->read<value_t>(sizes...));
   }
 
+  /**
+   * Return an Eigen type when the deserializers inner class is not var.
+   * @tparam Ret The type to return.
+   */
   template <typename Ret, typename T_ = T, typename... Sizes,
             require_not_var_t<T_>* = nullptr,
             require_var_matrix_t<Ret>* = nullptr>
@@ -181,6 +290,14 @@ class deserializer {
     return this->read<value_t>(sizes...);
   }
 
+  /**
+   * Return an `std::vector`
+   * @tparam Ret The type to return.
+   * @tparam Size an integral type.
+   * @tparam Sizes types of additional inner containers
+   * @param m The size of the vector.
+   * @param dims a possible set of inner container sizes passed to subsequent `read` functions.
+   */
   template <typename Ret, typename Size, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   inline auto read(Size m, Sizes... dims) {
@@ -197,6 +314,20 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next object, checking that it's elements are
+   * greater than or equal to the specified lower bound.
+   *
+   * <p>See <code>stan::math::check_greater_or_equal(T,double)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam LB Type of lower bound.
+   * @tparam Sizes A pack of possible sizes to construct the object from.
+   * @param lb Lower bound.
+   * @param sizes a pack of sizes to use to construct the return.
+   * @throw std::runtime_error if the scalar is less than the
+   *    specified lower bound
+   */
   template <typename Ret, typename LB, typename... Sizes>
   auto read_lb(const LB& lb, Sizes... sizes) {
     using stan::math::check_greater_or_equal;
@@ -205,9 +336,24 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next scalar transformed to have the specified
+   * lower bound, possibly incrementing the specified reference with the
+   * log of the absolute Jacobian determinant of the transform.
+   *
+   * <p>See <code>stan::math::lb_constrain(T,double,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian determinant of the transform.
+   * @tparam LB Type of lower bound.
+   * @tparam LP Type of log prob.
+   * @param lb Lower bound on result.
+   * @param lp Reference to log probability variable to increment.
+   * @param sizes a pack of sizes to use to construct the return.
+   */
   template <typename Ret, bool Jacobian, typename LB, typename LP,
             typename... Sizes>
-  auto read_lb_constrain(const LB& lb, LP& lp, Sizes... sizes) {
+  auto read_lb(const LB& lb, LP& lp, Sizes... sizes) {
     if (Jacobian) {
       return stan::math::lb_constrain(this->read<Ret>(sizes...), lb, lp);
     } else {
@@ -215,6 +361,18 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next object, checking that it is
+   * less than or equal to the specified upper bound.
+   *
+   * <p>See <code>stan::math::check_less_or_equal(T,double)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam UB Type of upper bound.
+   * @param ub Lower bound.
+   * @throw std::runtime_error if the scalar is less than the
+   *    specified lower bound
+   */
   template <typename Ret, typename UB, typename... Sizes>
   auto read_ub(const UB& ub, Sizes... sizes) {
     using stan::math::check_less_or_equal;
@@ -223,9 +381,24 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next object transformed to have the specified
+   * upper bound, possibly incrementing the specified reference with the
+   * log of the absolute Jacobian determinant of the transform.
+   *
+   * <p>See <code>stan::math::ub_constrain(T,double,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian determinant of the transform.
+   * @tparam UB Type of upper bound.
+   * @tparam LP Type of log prob.
+   * @param ub Upper bound on result.
+   * @param lp Reference to log probability variable to increment.
+   * @param sizes a pack of sizes to use to construct the return.
+   */
   template <typename Ret, bool Jacobian, typename UB, typename LP,
             typename... Sizes>
-  auto read_ub_constrain(const UB& ub, LP& lp, Sizes... sizes) {
+  auto read_ub(const UB& ub, LP& lp, Sizes... sizes) {
     if (Jacobian) {
       return stan::math::ub_constrain(this->read<Ret>(sizes...), ub, lp);
     } else {
@@ -233,6 +406,20 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next object, checking that it's elements is between
+   * the specified lower and upper bound.
+   *
+   * <p>See <code>stan::math::check_bounded(T, LB, UB)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam LB Type of lower bound.
+   * @tparam UB Type of upper bound.
+   * @param lb Lower bound.
+   * @param ub Upper bound.
+   * @throw std::runtime_error if the scalar is not between the specified
+   *    lower and upper bounds.
+   */
   template <typename Ret, typename LB, typename UB, typename... Sizes>
   auto read_lub(const LB& lb, const UB& ub, Sizes... sizes) {
     using stan::math::check_bounded;
@@ -242,9 +429,24 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next object transformed to be between the
+   * the specified lower and upper bounds.
+   *
+   * <p>See <code>stan::math::lub_constrain(T, double, double, T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian determinant of the transform.
+   * @tparam T Type of scalar.
+   * @tparam LB Type of lower bound.
+   * @tparam UB Type of upper bound.
+   * @param lb Lower bound.
+   * @param ub Upper bound.
+   * @param lp Reference to log probability variable to increment.
+   */
   template <typename Ret, bool Jacobian, typename LB, typename UB, typename LP,
             typename... Sizes>
-  auto read_lub_constrain(const LB& lb, const UB& ub, LP& lp, Sizes... sizes) {
+  auto read_lub(const LB& lb, const UB& ub, LP& lp, Sizes... sizes) {
     if (Jacobian) {
       return stan::math::lub_constrain(this->read<Ret>(sizes...), lb, ub, lp);
     } else {
@@ -255,10 +457,11 @@ class deserializer {
   template <typename Ret, typename... Sizes>
   auto read_pos(const Sizes&... sizes) {
     auto ret = read<Ret>(sizes...);
-    stan::math::check_positive("stan::io::deserializer", "Positive Constrained",
+    stan::math::check_positive("deserializer", "Positive Constrained",
                                ret);
     return ret;
   }
+
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   auto read_pos(LP& lp, const Sizes&... sizes) {
@@ -322,7 +525,7 @@ class deserializer {
   auto read_prob(const Sizes&... sizes) {
     auto ret = read<Ret>(sizes...);
     stan::math::check_bounded<Ret, double, double>(
-        "stan::io::deserializer", "Constrained probability", ret, 0, 1);
+        "deserializer", "Constrained probability", ret, 0, 1);
     return ret;
   }
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
@@ -352,7 +555,7 @@ class deserializer {
   auto read_corr(const Sizes&... sizes) {
     auto ret = read<Ret>(sizes...);
     stan::math::check_bounded<T, double, double>(
-        "stan::io::deserializer", "Correlation value", ret, -1, 1);
+        "deserializer", "Correlation value", ret, -1, 1);
     return ret;
   }
 
@@ -407,7 +610,7 @@ class deserializer {
       throw std::invalid_argument(msg);
     }
     auto ret = read<Ret>(k);
-    stan::math::check_unit_vector("stan::io::deserializer", "Unit Vector", ret);
+    stan::math::check_unit_vector("deserializer", "Unit Vector", ret);
     return ret;
   }
 
@@ -453,7 +656,7 @@ class deserializer {
       throw std::invalid_argument(msg);
     }
     auto ret = read<Ret>(k);
-    stan::math::check_simplex("stan::io::deserializer", "Simplex", ret);
+    stan::math::check_simplex("deserializer", "Simplex", ret);
     return ret;
   }
 
@@ -495,7 +698,7 @@ class deserializer {
   auto read_ordered(const Sizes&... sizes) {
     using stan::math::check_ordered;
     auto ret = read<Ret>(sizes...);
-    check_ordered("stan::io::deserializer", "Ordered", ret);
+    check_ordered("deserializer", "Ordered", ret);
     return ret;
   }
 
@@ -526,7 +729,7 @@ class deserializer {
   auto read_positive_ordered(const Sizes&... sizes) {
     using stan::math::check_positive_ordered;
     auto ret = read<Ret>(sizes...);
-    check_positive_ordered("stan::io::deserializer", "Positive Ordered", ret);
+    check_positive_ordered("deserializer", "Positive Ordered", ret);
     return ret;
   }
 
@@ -559,7 +762,7 @@ class deserializer {
   auto read_cholesky_factor_cov(size_t M, size_t N) {
     using stan::math::check_cholesky_factor;
     auto ret = read<Ret>(M, N);
-    check_cholesky_factor("stan::io::deserializer", "Cholesky Factor Cov", ret);
+    check_cholesky_factor("deserializer", "Cholesky Factor Cov", ret);
     return ret;
   }
 
@@ -602,11 +805,11 @@ class deserializer {
   // SDF
 
   template <typename Ret, require_matrix_t<Ret>* = nullptr>
-  auto read_cholesky_factor_corr(size_t M, size_t N) {
-    using stan::math::check_cholesky_factor;
-    auto ret = read<Ret>(M, N);
-    check_cholesky_factor_corr("stan::io::cholesky_factor_corr",
-                               "Constrained matrix", ret);
+  auto read_cholesky_factor_corr(size_t K) {
+    using stan::math::check_cholesky_factor_corr;
+    auto ret = read<Ret>(K, K);
+    check_cholesky_factor_corr("deserializer",
+                               "Cholesky Factor Corr Matrix", ret);
     return ret;
   }
 

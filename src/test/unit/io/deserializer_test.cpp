@@ -33,17 +33,29 @@ TEST(deserializer, zeroSizeVecs) {
   EXPECT_EQ(0, deserializer.read<std::vector<std::vector<Eigen::MatrixXd>>>(0, 0, 0, 0).size());
 }
 
-TEST(deserializer_scalar, read) {
-  std::vector<int> theta_i;
+
+TEST(deserializer, eos_exception) {
   std::vector<double> theta;
   theta.push_back(1.0);
   theta.push_back(2.0);
+  std::vector<int> theta_i;
+  theta_i.push_back(1);
   stan::io::deserializer<double> deserializer(theta, theta_i);
-  double x = deserializer.read<double>();
-  EXPECT_FLOAT_EQ(1.0, x);
-  double y = deserializer.read<double>();
-  EXPECT_FLOAT_EQ(2.0, y);
-  EXPECT_EQ(0U, deserializer.available());
+
+  EXPECT_EQ(2U, deserializer.available());
+  EXPECT_EQ(1U, deserializer.available_i());
+
+  EXPECT_NO_THROW(deserializer.read<double>());
+  EXPECT_NO_THROW(deserializer.read<double>());
+  EXPECT_THROW(deserializer.read<double>(), std::runtime_error);
+
+  // should go back to working
+  EXPECT_NO_THROW(deserializer.read<int>());
+  EXPECT_THROW(deserializer.read<int>(), std::runtime_error);
+
+  // should keep throwing
+  EXPECT_THROW(deserializer.read<double>(), std::runtime_error);
+  EXPECT_THROW(deserializer.read<size_t>(), std::runtime_error);
 }
 
 TEST(deserializer_rowvector, read) {
@@ -110,8 +122,20 @@ TEST(deserializer_stdvec, std_vector_std_vector_matrix) {
   }
 }
 
-// lower bounds
+// scalar bounds
 
+TEST(deserializer_scalar, read) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(1.0);
+  theta.push_back(2.0);
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double x = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(1.0, x);
+  double y = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(2.0, y);
+  EXPECT_EQ(0U, deserializer.available());
+}
 
 TEST(deserializer_scalar, read_lb) {
   std::vector<int> theta_i;
@@ -143,10 +167,10 @@ TEST(deserializer_scalar, read_lb_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0.0;
-  EXPECT_FLOAT_EQ(1.0 + exp(-2.0), (deserializer.read_lb_constrain<double, false>(1.0, lp)));
-  EXPECT_FLOAT_EQ(5.0 + exp(3.0), (deserializer.read_lb_constrain<double, false>(5.0, lp)));
-  EXPECT_FLOAT_EQ(-2.0 + exp(-1.0), (deserializer.read_lb_constrain<double, false>(-2.0, lp)));
-  EXPECT_FLOAT_EQ(15.0 + exp(0.0), (deserializer.read_lb_constrain<double, false>(15.0, lp)));
+  EXPECT_FLOAT_EQ(1.0 + exp(-2.0), (deserializer.read_lb<double, false>(1.0, lp)));
+  EXPECT_FLOAT_EQ(5.0 + exp(3.0), (deserializer.read_lb<double, false>(5.0, lp)));
+  EXPECT_FLOAT_EQ(-2.0 + exp(-1.0), (deserializer.read_lb<double, false>(-2.0, lp)));
+  EXPECT_FLOAT_EQ(15.0 + exp(0.0), (deserializer.read_lb<double, false>(15.0, lp)));
 }
 TEST(deserializer_scalar, read_lb_constrain_jacobian) {
   std::vector<int> theta_i;
@@ -157,10 +181,10 @@ TEST(deserializer_scalar, read_lb_constrain_jacobian) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = -1.5;
-  EXPECT_FLOAT_EQ(1.0 + exp(-2.0), (deserializer.read_lb_constrain<double, true>(1.0, lp)));
-  EXPECT_FLOAT_EQ(5.0 + exp(3.0), (deserializer.read_lb_constrain<double, true>(5.0, lp)));
-  EXPECT_FLOAT_EQ(-2.0 + exp(-1.0), (deserializer.read_lb_constrain<double, true>(-2.0, lp)));
-  EXPECT_FLOAT_EQ(15.0 + exp(0.0), (deserializer.read_lb_constrain<double, true>(15.0, lp)));
+  EXPECT_FLOAT_EQ(1.0 + exp(-2.0), (deserializer.read_lb<double, true>(1.0, lp)));
+  EXPECT_FLOAT_EQ(5.0 + exp(3.0), (deserializer.read_lb<double, true>(5.0, lp)));
+  EXPECT_FLOAT_EQ(-2.0 + exp(-1.0), (deserializer.read_lb<double, true>(-2.0, lp)));
+  EXPECT_FLOAT_EQ(15.0 + exp(0.0), (deserializer.read_lb<double, true>(15.0, lp)));
   EXPECT_FLOAT_EQ(-1.5 - 2.0 + 3.0 - 1.0, lp);
 }
 
@@ -197,10 +221,10 @@ TEST(deserializer_scalar, read_ub_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  EXPECT_FLOAT_EQ(1.0 - exp(-2.0), (deserializer.read_ub_constrain<double, false>(1.0, lp)));
-  EXPECT_FLOAT_EQ(5.0 - exp(3.0), (deserializer.read_ub_constrain<double, false>(5.0, lp)));
-  EXPECT_FLOAT_EQ(-2.0 - exp(-1.0), (deserializer.read_ub_constrain<double, false>(-2.0, lp)));
-  EXPECT_FLOAT_EQ(15.0 - exp(0.0), (deserializer.read_ub_constrain<double, false>(15.0, lp)));
+  EXPECT_FLOAT_EQ(1.0 - exp(-2.0), (deserializer.read_ub<double, false>(1.0, lp)));
+  EXPECT_FLOAT_EQ(5.0 - exp(3.0), (deserializer.read_ub<double, false>(5.0, lp)));
+  EXPECT_FLOAT_EQ(-2.0 - exp(-1.0), (deserializer.read_ub<double, false>(-2.0, lp)));
+  EXPECT_FLOAT_EQ(15.0 - exp(0.0), (deserializer.read_ub<double, false>(15.0, lp)));
 }
 TEST(deserializer_scalar, read_ub_constrain_jacobian) {
   std::vector<int> theta_i;
@@ -211,10 +235,10 @@ TEST(deserializer_scalar, read_ub_constrain_jacobian) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = -12.9;
-  EXPECT_FLOAT_EQ(1.0 - exp(-2.0), (deserializer.read_ub_constrain<double, true>(1.0, lp)));
-  EXPECT_FLOAT_EQ(5.0 - exp(3.0), (deserializer.read_ub_constrain<double, true>(5.0, lp)));
-  EXPECT_FLOAT_EQ(-2.0 - exp(-1.0), (deserializer.read_ub_constrain<double, true>(-2.0, lp)));
-  EXPECT_FLOAT_EQ(15.0 - exp(0.0), (deserializer.read_ub_constrain<double, true>(15.0, lp)));
+  EXPECT_FLOAT_EQ(1.0 - exp(-2.0), (deserializer.read_ub<double, true>(1.0, lp)));
+  EXPECT_FLOAT_EQ(5.0 - exp(3.0), (deserializer.read_ub<double, true>(5.0, lp)));
+  EXPECT_FLOAT_EQ(-2.0 - exp(-1.0), (deserializer.read_ub<double, true>(-2.0, lp)));
+  EXPECT_FLOAT_EQ(15.0 - exp(0.0), (deserializer.read_ub<double, true>(15.0, lp)));
   EXPECT_FLOAT_EQ(-12.9 - 2.0 + 3.0 - 1.0, lp);
 }
 
@@ -257,13 +281,13 @@ TEST(deserializer_scalar, read_lub_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  EXPECT_FLOAT_EQ(inv_logit_m2, (deserializer.read_lub_constrain<double, false>(0.0, 1.0, lp)));
+  EXPECT_FLOAT_EQ(inv_logit_m2, (deserializer.read_lub<double, false>(0.0, 1.0, lp)));
   EXPECT_FLOAT_EQ(3.0 + 2.0 * inv_logit_3,
-                  (deserializer.read_lub_constrain<double, false>(3.0, 5.0, lp)));
+                  (deserializer.read_lub<double, false>(3.0, 5.0, lp)));
   EXPECT_FLOAT_EQ(-3.0 + 5.0 * inv_logit_m1,
-                  (deserializer.read_lub_constrain<double, false>(-3.0, 2.0, lp)));
+                  (deserializer.read_lub<double, false>(-3.0, 2.0, lp)));
   EXPECT_FLOAT_EQ(-15.0 + 30.0 * inv_logit_0,
-                  (deserializer.read_lub_constrain<double, false>(-15.0, 15.0, lp)));
+                  (deserializer.read_lub<double, false>(-15.0, 15.0, lp)));
 }
 TEST(deserializer_scalar, read_lub_constrain_jacobian) {
   std::vector<int> theta_i;
@@ -275,13 +299,13 @@ TEST(deserializer_scalar, read_lub_constrain_jacobian) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = -7.2;
   EXPECT_FLOAT_EQ(0.0 + 1.0 * inv_logit_m2,
-                  (deserializer.read_lub_constrain<double, true>(0.0, 1.0, lp)));
+                  (deserializer.read_lub<double, true>(0.0, 1.0, lp)));
   EXPECT_FLOAT_EQ(3.0 + 2.0 * inv_logit_3,
-                  (deserializer.read_lub_constrain<double, true>(3.0, 5.0, lp)));
+                  (deserializer.read_lub<double, true>(3.0, 5.0, lp)));
   EXPECT_FLOAT_EQ(-3.0 + 5.0 * inv_logit_m1,
-                  (deserializer.read_lub_constrain<double, true>(-3.0, 2.0, lp)));
+                  (deserializer.read_lub<double, true>(-3.0, 2.0, lp)));
   EXPECT_FLOAT_EQ(-15.0 + 30.0 * inv_logit_0,
-                  (deserializer.read_lub_constrain<double, true>(-15.0, 15.0, lp)));
+                  (deserializer.read_lub<double, true>(-15.0, 15.0, lp)));
   double expected_lp = -7.2
                        + log((1.0 - 0.0) * inv_logit_m2 * (1 - inv_logit_m2))
                        + log((5.0 - 3.0) * inv_logit_3 * (1 - inv_logit_3))
@@ -709,6 +733,249 @@ TEST(deserializer_matrix, read) {
 }
 
 
+TEST(deserializer_matrix, matrix_lb) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  double lb = -1.5;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y
+      = deserializer.read_lb<Eigen::MatrixXd>(lb, 3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(7.0, y(0, 0));
+  EXPECT_FLOAT_EQ(8.0, y(1, 0));
+  EXPECT_FLOAT_EQ(9.0, y(2, 0));
+  EXPECT_FLOAT_EQ(10.0, y(0, 1));
+  EXPECT_FLOAT_EQ(11.0, y(1, 1));
+  EXPECT_FLOAT_EQ(12.0, y(2, 1));
+
+  double a = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(deserializer_matrix, matrix_lb_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  double lb = -1.5;
+  double lp = 0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y
+      = deserializer.read_lb<Eigen::MatrixXd, false>(lb, lp, 3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(7.0, lb), y(0, 0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(8.0, lb), y(1, 0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(9.0, lb), y(2, 0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(10.0, lb), y(0, 1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(11.0, lb), y(1, 1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(12.0, lb), y(2, 1));
+
+  double a = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(deserializer_matrix, matrix_lb_constrain_lp) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  double lb = -1.5;
+  double lp = -5.0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y
+      = deserializer.read_lb<Eigen::MatrixXd, true>(lb, lp, 3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(7.0, lb, lp), y(0, 0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(8.0, lb, lp), y(1, 0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(9.0, lb, lp), y(2, 0));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(10.0, lb, lp), y(0, 1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(11.0, lb, lp), y(1, 1));
+  EXPECT_FLOAT_EQ(stan::math::lb_constrain(12.0, lb, lp), y(2, 1));
+
+  double a = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(deserializer_matrix, matrix_ub) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  double ub = 12.5;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y
+      = deserializer.read_ub<Eigen::MatrixXd>(ub, 3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(7.0, y(0, 0));
+  EXPECT_FLOAT_EQ(8.0, y(1, 0));
+  EXPECT_FLOAT_EQ(9.0, y(2, 0));
+  EXPECT_FLOAT_EQ(10.0, y(0, 1));
+  EXPECT_FLOAT_EQ(11.0, y(1, 1));
+  EXPECT_FLOAT_EQ(12.0, y(2, 1));
+
+  double a = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(deserializer_matrix, matrix_ub_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  double ub = 14.1;
+  double lp = 0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y
+      = deserializer.read_ub<Eigen::MatrixXd, false>(ub, lp, 3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(7.0, ub), y(0, 0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(8.0, ub), y(1, 0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(9.0, ub), y(2, 0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(10.0, ub), y(0, 1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(11.0, ub), y(1, 1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(12.0, ub), y(2, 1));
+
+  double a = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(deserializer_matrix, matrix_ub_constrain_lp) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  double ub = 12.1;
+  double lp = -5.0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y
+      = deserializer.read_ub<Eigen::MatrixXd, true>(ub, lp, 3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(7.0, ub, lp), y(0, 0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(8.0, ub, lp), y(1, 0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(9.0, ub, lp), y(2, 0));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(10.0, ub, lp), y(0, 1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(11.0, ub, lp), y(1, 1));
+  EXPECT_FLOAT_EQ(stan::math::ub_constrain(12.0, ub, lp), y(2, 1));
+
+  double a = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(deserializer_matrix, matrix_lub) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  double lb = 6.9;
+  double ub = 12.5;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y
+      = deserializer.read_lub<Eigen::MatrixXd>(lb, ub, 3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(7.0, y(0, 0));
+  EXPECT_FLOAT_EQ(8.0, y(1, 0));
+  EXPECT_FLOAT_EQ(9.0, y(2, 0));
+  EXPECT_FLOAT_EQ(10.0, y(0, 1));
+  EXPECT_FLOAT_EQ(11.0, y(1, 1));
+  EXPECT_FLOAT_EQ(12.0, y(2, 1));
+
+  double a = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(deserializer_matrix, matrix_lub_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  double lb = 3.5;
+  double ub = 14.1;
+  double lp = 0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y
+      = deserializer.read_lub<Eigen::MatrixXd, false>(lb, ub, lp, 3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(7.0, lb, ub), y(0, 0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(8.0, lb, ub), y(1, 0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(9.0, lb, ub), y(2, 0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(10.0, lb, ub), y(0, 1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(11.0, lb, ub), y(1, 1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(12.0, lb, ub), y(2, 1));
+
+  double a = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(deserializer_matrix, matrix_lub_constrain_lp) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  double lb = 4.1;
+  double ub = 12.1;
+  double lp = -5.0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> y
+      = deserializer.read_lub<Eigen::MatrixXd, true>(lb, ub, lp, 3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(7.0, lb, ub, lp), y(0, 0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(8.0, lb, ub, lp), y(1, 0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(9.0, lb, ub, lp), y(2, 0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(10.0, lb, ub, lp), y(0, 1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(11.0, lb, ub, lp), y(1, 1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(12.0, lb, ub, lp), y(2, 1));
+
+  double a = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(13.0, a);
+}
+
 TEST(deserializer_matrix, corr_matrix) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -799,6 +1066,295 @@ TEST(deserializer_matrix, corr_matrix_constrain_jacobian) {
       solver(R, Eigen::EigenvaluesOnly);
   assert(solver.eigenvalues()[0] > 1E-10);
   // FIXME: test jacobian
+}
+
+TEST(deserializer_matrix, cov_matrix) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  theta[0] = 6.3295234356180128;
+  theta[1] = 0.6351775806192667;
+  theta[2] = 3.8081029582054304;
+  theta[3] = 0.6351775806192667;
+  theta[4] = 1.9293554162496527;
+  theta[5] = 0.5483126868366485;
+  theta[6] = 3.8081029582054304;
+  theta[7] = 0.5483126868366485;
+  theta[8] = 3.0827514661973088;
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> S
+  = deserializer.read_cov_matrix<Eigen::MatrixXd>(3);
+  EXPECT_FLOAT_EQ(theta[0], S(0, 0));
+  EXPECT_FLOAT_EQ(theta[1], S(1, 0));
+  EXPECT_FLOAT_EQ(theta[7], S(2, 1));
+  EXPECT_FLOAT_EQ(theta[8], S(2, 2));
+}
+TEST(deserializer_matrix, cov_matrix_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  theta[0] = 6.3;
+  theta[1] = 0.7;
+  theta[2] = 0.6;
+  theta[3] = 1.9;
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  EXPECT_THROW(deserializer.read_cov_matrix<Eigen::MatrixXd>(2), std::domain_error);
+  EXPECT_THROW(deserializer.read_cov_matrix<Eigen::MatrixXd>(0), std::invalid_argument);
+}
+TEST(deserializer_matrix, cov_matrix_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-2.0);
+  theta.push_back(-1.0);
+  theta.push_back(0.0);
+  theta.push_back(0.5);
+  theta.push_back(1.0);
+  theta.push_back(2.0);
+  theta.push_back(1.0);
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = 0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> S(
+      deserializer.read_cov_matrix<Eigen::MatrixXd, false>(lp, 3U));
+  EXPECT_EQ(3, S.rows());
+  EXPECT_EQ(3, S.cols());
+  EXPECT_EQ(9, S.size());
+  EXPECT_EQ(1U, deserializer.available());
+  for (size_t i = 0; i < 3U; ++i)
+    for (size_t j = i + 1; j < 3U; ++j)
+      EXPECT_FLOAT_EQ(S(i, j), S(j, i));
+  Eigen::SelfAdjointEigenSolver<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>
+      solver(S, Eigen::EigenvaluesOnly);
+  assert(solver.eigenvalues()[0]
+         > 1E-10);  // check positive definite with smallest eigenvalue > 0
+}
+TEST(deserializer_matrix, cov_matrix_constrain_jacobian) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(-2.0);
+  theta.push_back(-1.0);
+  theta.push_back(0.0);
+  theta.push_back(0.5);
+  theta.push_back(1.0);
+  theta.push_back(2.0);
+  theta.push_back(1.0);
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = -3.1;
+
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> S(
+      deserializer.read_cov_matrix<Eigen::MatrixXd, true>(lp, 3U));
+
+  EXPECT_EQ(3, S.rows());
+  EXPECT_EQ(3, S.cols());
+  EXPECT_EQ(9, S.size());
+  EXPECT_EQ(1U, deserializer.available());
+  for (size_t i = 0; i < 3U; ++i)
+    for (size_t j = i + 1; j < 3U; ++j)
+      EXPECT_FLOAT_EQ(S(i, j), S(j, i));
+  Eigen::SelfAdjointEigenSolver<
+      Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>
+      solver(S, Eigen::EigenvaluesOnly);
+  assert(solver.eigenvalues()[0]
+         > 1E-10);  // check positive definite with smallest eigenvalue > 0
+  // FIXME: test Jacobian
+}
+
+TEST(deserializer_matrix, cholesky_factor_cov) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  // column major
+  theta[0] = 1;
+  theta[1] = 2;
+  theta[2] = 3;
+
+  theta[3] = 0;
+  theta[4] = 4;
+  theta[5] = 5;
+
+  theta[6] = 0;
+  theta[7] = 0;
+  theta[8] = 6;
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> S
+      = deserializer.read_cholesky_factor_cov<Eigen::MatrixXd>(3, 3);
+  EXPECT_FLOAT_EQ(theta[0], S(0, 0));
+  EXPECT_FLOAT_EQ(theta[1], S(1, 0));
+  EXPECT_FLOAT_EQ(theta[7], S(1, 2));
+  EXPECT_FLOAT_EQ(theta[8], S(2, 2));
+}
+TEST(deserializer_matrix, cholesky_factor_cov_asymmetric) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  // column major
+  theta[0] = 1;
+  theta[1] = 2;
+  theta[2] = 3;
+
+  theta[3] = 0;
+  theta[4] = 4;
+  theta[5] = 5;
+
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> S
+      = deserializer.read_cholesky_factor_cov<Eigen::MatrixXd>(3, 2);
+  EXPECT_FLOAT_EQ(theta[0], S(0, 0));
+  EXPECT_FLOAT_EQ(theta[1], S(1, 0));
+  EXPECT_FLOAT_EQ(theta[2], S(2, 0));
+
+  EXPECT_FLOAT_EQ(theta[3], S(0, 1));
+  EXPECT_FLOAT_EQ(theta[4], S(1, 1));
+  EXPECT_FLOAT_EQ(theta[5], S(2, 1));
+}
+
+TEST(deserializer_matrix, cholesky_factor_cov_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  theta[0] = -6.3;
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  EXPECT_THROW(deserializer.read_cholesky_factor_cov<Eigen::MatrixXd>(2, 2), std::domain_error);
+  EXPECT_THROW(deserializer.read_cholesky_factor_cov<Eigen::MatrixXd>(0, 0), std::domain_error);
+
+  theta[0] = 1;
+  EXPECT_THROW(deserializer.read_cholesky_factor_cov<Eigen::MatrixXd>(2, 3), std::domain_error);
+}
+TEST(deserializer_matrix, cholesky_factor_cov_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 8; ++i)
+    theta.push_back(-static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = 0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> L(
+      deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, false>(lp, 3U, 3U));
+  EXPECT_NO_THROW(stan::math::check_cholesky_factor(
+      "test_cholesky_factor_constrain", "L", L));
+  EXPECT_EQ(3, L.rows());
+  EXPECT_EQ(3, L.cols());
+  EXPECT_EQ(9, L.size());
+  EXPECT_EQ(2U, deserializer.available());
+}
+
+
+TEST(deserializer_matrix, cholesky_factor_cov_constrain_asymmetric) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 8; ++i)
+    theta.push_back(-static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = 0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> L(
+      deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, false>(lp, 3U, 2U));
+  EXPECT_NO_THROW(stan::math::check_cholesky_factor(
+      "test_cholesky_factor_constrain", "L", L));
+  EXPECT_EQ(3, L.rows());
+  EXPECT_EQ(2, L.cols());
+  EXPECT_EQ(6, L.size());
+  EXPECT_EQ(3U, deserializer.available());
+}
+TEST(deserializer_matrix, cholesky_factor_cov_constrain_jacobian) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 8; ++i)
+    theta.push_back(-static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = 1.9;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> L(
+      deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, true>(lp, 3U, 3U));
+  EXPECT_NO_THROW(stan::math::check_cholesky_factor(
+      "test_cholesky_factor_constrain", "L", L));
+  EXPECT_EQ(3, L.rows());
+  EXPECT_EQ(3, L.cols());
+  EXPECT_EQ(9, L.size());
+  EXPECT_EQ(2U, deserializer.available());
+  EXPECT_EQ(1.9 + log(L(0, 0)) + log(L(1, 1)) + log(L(2, 2)), lp);
+}
+TEST(deserializer_matrix, cholesky_factor_cov_constrain_jacobian_asymmetric) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 12; ++i)
+    theta.push_back(-static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = 1.9;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> L(
+      deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, true>(lp, 4U, 3U));
+  EXPECT_NO_THROW(stan::math::check_cholesky_factor(
+      "test_cholesky_factor_constrain", "L", L));
+  EXPECT_EQ(4, L.rows());
+  EXPECT_EQ(3, L.cols());
+  EXPECT_EQ(12, L.size());
+  EXPECT_EQ(3U, deserializer.available());
+  EXPECT_EQ(1.9 + log(L(0, 0)) + log(L(1, 1)) + log(L(2, 2)), lp);
+}
+
+TEST(deserializer_matrix, cholesky_factor_corr) {
+  std::vector<int> theta_i;
+  std::vector<double> theta(9);
+  // column major
+  theta[0] = 1;
+  theta[1] = 0;
+  theta[2] = 0;
+
+  theta[3] = 0;
+  theta[4] = 1;
+  theta[5] = 0;
+
+  theta[6] = 0;
+  theta[7] = 0;
+  theta[8] = 1;
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> S
+      = deserializer.read_cholesky_factor_corr<Eigen::MatrixXd>(3);
+  EXPECT_FLOAT_EQ(theta[0], S(0, 0));
+  EXPECT_FLOAT_EQ(theta[1], S(1, 0));
+  EXPECT_FLOAT_EQ(theta[4], S(1, 1));
+  EXPECT_FLOAT_EQ(theta[7], S(1, 2));
+  EXPECT_FLOAT_EQ(theta[8], S(2, 2));
+}
+
+TEST(deserializer_matrix, cholesky_factor_corr_exception) {
+  std::vector<int> theta_i;
+  std::vector<double> theta(9);
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> S;
+
+  // non lower-triangular matrix (column major)
+  // the rest of these tests are with check_cholesky_factor_corr
+  theta[0] = 1;
+  theta[1] = 0;
+  theta[2] = 0;
+
+  theta[3] = 0.5;
+  theta[4] = 1;
+  theta[5] = 0;
+
+  theta[6] = 0;
+  theta[7] = 0;
+  theta[8] = 1;
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  EXPECT_THROW(deserializer.read_cholesky_factor_corr<Eigen::MatrixXd>(3), std::domain_error);
+}
+TEST(deserializer_matrix, cholesky_factor_corr_constrain) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (int i = 0; i < 8; ++i)
+    theta.push_back(-static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  double lp = 0;
+  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> L(
+      deserializer.read_cholesky_factor_corr<Eigen::MatrixXd, false>(lp, 3U));
+  EXPECT_NO_THROW(stan::math::check_cholesky_factor_corr(
+      "test_cholesky_factor_corr_constrain", "L", L));
+  EXPECT_EQ(3, L.rows());
+  EXPECT_EQ(3, L.cols());
+  EXPECT_EQ(9, L.size());
+  EXPECT_EQ(5U, deserializer.available());
 }
 
 // var matrix
