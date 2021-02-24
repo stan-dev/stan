@@ -454,6 +454,14 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next object, checking that it's elements are positive.
+   *
+   * <p>See <code>stan::math::check_positive(T)</code>.
+   *
+   * @return Next positive scalar.
+   * @throw std::runtime_error if x is not positive
+   */
   template <typename Ret, typename... Sizes>
   auto read_pos(const Sizes&... sizes) {
     auto ret = read<Ret>(sizes...);
@@ -462,6 +470,15 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next object transformed to be positive, possibly
+   * incrementing the specified reference with the log absolute
+   * determinant of the Jacobian.
+   *
+   * <p>See <code>stan::math::positive_constrain(T,T&)</code>.
+   *
+   * @param lp Reference to log probability variable to increment.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   auto read_pos(LP& lp, const Sizes&... sizes) {
@@ -472,6 +489,10 @@ class deserializer {
     }
   }
 
+  /**
+   * Specialization for `std::vector` that calls itself recursivly for
+   * each element.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_pos(LP& lp, const size_t vecsize, const Sizes&... sizes) {
@@ -484,12 +505,29 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * This is just returns the requested type as there's nothing to check.
+   */
   template <typename Ret, typename Offset, typename Mult, typename... Sizes>
   auto read_offset_multiplier(const Offset& offset, const Mult& multiplier,
                               const Sizes&... sizes) {
     return read<Ret>(sizes...);
   }
 
+  /**
+   * Return the next scalar transformed to have the specified offset and
+   * multiplier.
+   *
+   * <p>See <code>stan::math::offset_multiplier_constrain(T, double,
+   * double)</code>.
+   *
+   * @tparam TL Type of offset.
+   * @tparam TS Type of multiplier.
+   * @param offset Offset.
+   * @param multiplier Multiplier.
+   * @return Next scalar transformed to fall between the specified
+   * bounds.
+   */
   template <typename Ret, bool Jacobian, typename Offset, typename Mult,
             typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
@@ -505,6 +543,20 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next scalar transformed to have the specified offset and
+   * multiplier.
+   *
+   * <p>See <code>stan::math::offset_multiplier_constrain(T, double,
+   * double)</code>.
+   *
+   * @tparam TL Type of offset.
+   * @tparam TS Type of multiplier.
+   * @param offset Offset.
+   * @param multiplier Multiplier.
+   * @return Next scalar transformed to fall between the specified
+   * bounds.
+   */
   template <typename Ret, bool Jacobian, typename Offset, typename Mult,
             typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
@@ -521,6 +573,14 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next scalar, checking that it is a valid value for
+   * a probability, between 0 (inclusive) and 1 (inclusive).
+   *
+   * <p>See <code>stan::math::check_bounded(T)</code>.
+   *
+   * @return Next probability value.
+   */
   template <typename Ret, typename... Sizes>
   auto read_prob(const Sizes&... sizes) {
     auto ret = read<Ret>(sizes...);
@@ -528,6 +588,17 @@ class deserializer {
         "deserializer", "Constrained probability", ret, 0, 1);
     return ret;
   }
+
+  /**
+   * Return the next scalar transformed to be a probability
+   * between 0 and 1, incrementing the specified reference with
+   * the log of the absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::prob_constrain(T)</code>.
+   *
+   * @param lp Reference to log probability variable to increment.
+   * @return The next scalar transformed to a probability.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   auto read_prob(LP& lp, const Sizes&... sizes) {
@@ -538,6 +609,17 @@ class deserializer {
     }
   }
 
+
+  /**
+   * Return the next scalar transformed to be a probability
+   * between 0 and 1, incrementing the specified reference with
+   * the log of the absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::prob_constrain(T)</code>.
+   *
+   * @param lp Reference to log probability variable to increment.
+   * @return The next scalar transformed to a probability.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_prob(LP& lp, const size_t vecsize, const Sizes&... sizes) {
@@ -550,6 +632,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next scalar, checking that it is a valid
+   * value for a correlation, between -1 (inclusive) and
+   * 1 (inclusive).
+   *
+   * <p>See <code>stan::math::check_bounded(T)</code>.
+   *
+   * @return Next correlation value.
+   * @throw std::runtime_error if the value is not valid
+   *   for a correlation
+   */
   template <typename Ret, typename... Sizes,
             require_not_matrix_t<Ret>* = nullptr>
   auto read_corr(const Sizes&... sizes) {
@@ -559,6 +652,15 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Returns the next correlation matrix of the specified dimensionality.
+   *
+   * <p>See <code>stan::math::check_corr_matrix(Matrix)</code>.
+   *
+   * @param k Dimensionality of correlation matrix.
+   * @return Next correlation matrix of the specified dimensionality.
+   * @throw std::runtime_error if the matrix is not a correlation matrix
+   */
   template <typename Ret, require_matrix_t<Ret>* = nullptr>
   auto read_corr(size_t k) {
     using stan::math::check_corr_matrix;
@@ -567,6 +669,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next scalar transformed to be a (partial)
+   * correlation between -1 and 1, incrementing the specified
+   * reference with the log of the absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::corr_constrain(T,T&)</code>.
+   *
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @return The next scalar transformed to a correlation.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr,
             require_not_matrix_t<Ret>* = nullptr>
@@ -579,6 +692,17 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next correlation matrix of the specified dimensionality,
+   * incrementing the specified reference with the log absolute Jacobian
+   * determinant.
+   *
+   * <p>See <code>stan::math::corr_matrix_constrain(Matrix,T&)</code>.
+   *
+   * @param k Dimensionality of the (square) correlation matrix.
+   * @param lp Log probability reference to increment.
+   * @return The next correlation matrix of the specified dimensionality.
+   */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr,
             require_matrix_t<Ret>* = nullptr>
@@ -592,6 +716,17 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next scalar transformed to be a (partial)
+   * correlation between -1 and 1, incrementing the specified
+   * reference with the log of the absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::corr_constrain(T,T&)</code>.
+   *
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   * @return The next scalar transformed to a correlation.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_corr(LP& lp, const size_t vecsize, const Sizes&... sizes) {
@@ -603,6 +738,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return a unit_vector of the specified size made up of the
+   * next scalars.
+   *
+   * <p>See <code>stan::math::check_unit_vector</code>.
+   *
+   * @param k Size of returned unit_vector
+   * @return unit_vector read from the specified size number of scalars
+   * @throw std::runtime_error if the next k values is not a unit_vector
+   * @throw std::invalid_argument if k is zero
+   */
   template <typename Ret, require_vector_t<Ret>* = nullptr>
   auto read_unit_vector(size_t k) {
     if (unlikely(k == 0)) {
@@ -614,6 +760,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return a unit_vector of the specified size made up of the
+   * next scalars.
+   *
+   * <p>See <code>stan::math::check_unit_vector</code>.
+   *
+   * @param k Size of returned unit_vector
+   * @return unit_vector read from the specified size number of scalars
+   * @throw std::runtime_error if the next k values is not a unit_vector
+   * @throw std::invalid_argument if k is zero
+   */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_unit_vector(size_t vecsize, Sizes... sizes) {
@@ -625,6 +782,19 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next unit_vector of the specified size (using one fewer
+   * unconstrained scalars), incrementing the specified reference with the
+   * log absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::unit_vector_constrain(Eigen::Matrix,T&)</code>.
+   *
+   * @param k Size of unit_vector.
+   * @param lp Log probability to increment with log absolute
+   * Jacobian determinant.
+   * @return The next unit_vector of the specified size.
+   * @throw std::invalid_argument if k is zero
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   auto read_unit_vector(LP& lp, const Sizes&... sizes) {
@@ -636,6 +806,19 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next unit_vector of the specified size (using one fewer
+   * unconstrained scalars), incrementing the specified reference with the
+   * log absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::unit_vector_constrain(Eigen::Matrix,T&)</code>.
+   *
+   * @param k Size of unit_vector.
+   * @param lp Log probability to increment with log absolute
+   * Jacobian determinant.
+   * @return The next unit_vector of the specified size.
+   * @throw std::invalid_argument if k is zero
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_unit_vector(LP& lp, const size_t vecsize, const Sizes&... sizes) {
@@ -649,6 +832,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return a simplex of the specified size made up of the
+   * next scalars.
+   *
+   * <p>See <code>stan::math::check_simplex</code>.
+   *
+   * @param k Size of returned simplex.
+   * @return Simplex read from the specified size number of scalars.
+   * @throw std::runtime_error if the k values is not a simplex.
+   * @throw std::invalid_argument if k is zero
+   */
   template <typename Ret, require_vector_t<Ret>* = nullptr>
   auto read_simplex(size_t k) {
     if (unlikely(k == 0)) {
@@ -660,6 +854,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return a simplex of the specified size made up of the
+   * next scalars.
+   *
+   * <p>See <code>stan::math::check_simplex</code>.
+   *
+   * @param k Size of returned simplex.
+   * @return Simplex read from the specified size number of scalars.
+   * @throw std::runtime_error if the k values is not a simplex.
+   * @throw std::invalid_argument if k is zero
+   */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_simplex(size_t vecsize, Sizes... sizes) {
@@ -671,6 +876,19 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next simplex of the specified size (using one fewer
+   * unconstrained scalars), incrementing the specified reference with the
+   * log absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::simplex_constrain(Eigen::Matrix,T&)</code>.
+   *
+   * @param k Size of simplex.
+   * @param lp Log probability to increment with log absolute
+   * Jacobian determinant.
+   * @return The next simplex of the specified size.
+   * @throws std::invalid_argument if number of dimensions (`k`) is zero
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   auto read_simplex(LP& lp, const Sizes&... sizes) {
@@ -682,6 +900,19 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next simplex of the specified size (using one fewer
+   * unconstrained scalars), incrementing the specified reference with the
+   * log absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::simplex_constrain(Eigen::Matrix,T&)</code>.
+   *
+   * @param k Size of simplex.
+   * @param lp Log probability to increment with log absolute
+   * Jacobian determinant.
+   * @return The next simplex of the specified size.
+   * @throws std::invalid_argument if number of dimensions (`k`) is zero
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_simplex(LP& lp, const size_t vecsize, const Sizes&... sizes) {
@@ -694,6 +925,16 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next vector of specified size containing
+   * values in ascending order.
+   *
+   * <p>See <code>stan::math::check_ordered(T)</code> for
+   * behavior on failure.
+   *
+   * @param k Size of returned vector.
+   * @return Vector of positive values in ascending order.
+   */
   template <typename Ret, typename... Sizes>
   auto read_ordered(const Sizes&... sizes) {
     using stan::math::check_ordered;
@@ -702,6 +943,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next ordered vector of the specified
+   * size, incrementing the specified reference with the log
+   * absolute Jacobian of the determinant.
+   *
+   * <p>See <code>stan::math::ordered_constrain(Matrix,T&)</code>.
+   *
+   * @param k Size of vector.
+   * @param lp Log probability reference to increment.
+   * @return Next ordered vector of the specified size.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   auto read_ordered(LP& lp, const Sizes&... sizes) {
@@ -713,6 +965,17 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next ordered vector of the specified
+   * size, incrementing the specified reference with the log
+   * absolute Jacobian of the determinant.
+   *
+   * <p>See <code>stan::math::ordered_constrain(Matrix,T&)</code>.
+   *
+   * @param k Size of vector.
+   * @param lp Log probability reference to increment.
+   * @return Next ordered vector of the specified size.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_ordered(LP& lp, const size_t vecsize, const Sizes&... sizes) {
@@ -725,6 +988,16 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next vector of specified size containing
+   * positive values in ascending order.
+   *
+   * <p>See <code>stan::math::check_positive_ordered(T)</code> for
+   * behavior on failure.
+   *
+   * @param k Size of returned vector.
+   * @return Vector of positive values in ascending order.
+   */
   template <typename Ret, typename... Sizes>
   auto read_positive_ordered(const Sizes&... sizes) {
     using stan::math::check_positive_ordered;
@@ -733,6 +1006,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next positive_ordered vector of the specified
+   * size, incrementing the specified reference with the log
+   * absolute Jacobian of the determinant.
+   *
+   * <p>See <code>stan::math::positive_ordered_constrain(Matrix,T&)</code>.
+   *
+   * @param k Size of vector.
+   * @param lp Log probability reference to increment.
+   * @return Next positive_ordered vector of the specified size.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
   auto read_positive_ordered(LP& lp, const Sizes&... sizes) {
@@ -744,6 +1028,17 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next positive_ordered vector of the specified
+   * size, incrementing the specified reference with the log
+   * absolute Jacobian of the determinant.
+   *
+   * <p>See <code>stan::math::positive_ordered_constrain(Matrix,T&)</code>.
+   *
+   * @param k Size of vector.
+   * @param lp Log probability reference to increment.
+   * @return Next positive_ordered vector of the specified size.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_positive_ordered(LP& lp, const size_t vecsize,
@@ -758,6 +1053,16 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next Cholesky factor with the specified
+   * dimensionality, reading it directly without transforms.
+   *
+   * @param M Rows of Cholesky factor
+   * @param N Columns of Cholesky factor
+   * @return Next Cholesky factor.
+   * @throw std::domain_error if the matrix is not a valid
+   * Cholesky factor.
+   */
   template <typename Ret, require_matrix_t<Ret>* = nullptr>
   auto read_cholesky_factor_cov(size_t M, size_t N) {
     using stan::math::check_cholesky_factor;
@@ -766,6 +1071,16 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next Cholesky factor with the specified
+   * dimensionality, reading it directly without transforms.
+   *
+   * @param M Rows of Cholesky factor
+   * @param N Columns of Cholesky factor
+   * @return Next Cholesky factor.
+   * @throw std::domain_error if the matrix is not a valid
+   * Cholesky factor.
+   */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_cholesky_factor_cov(size_t vecsize, Sizes... sizes) {
@@ -777,6 +1092,19 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next Cholesky factor with the specified
+   * dimensionality, reading from an unconstrained vector of the
+   * appropriate size, and increment the log probability reference
+   * with the log Jacobian adjustment for the transform.
+   *
+   * @param M Rows of Cholesky factor
+   * @param N Columns of Cholesky factor
+   * @param[in,out] lp log probability
+   * @return Next Cholesky factor.
+   * @throw std::domain_error if the matrix is not a valid
+   *    Cholesky factor.
+   */
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
   auto read_cholesky_factor_cov(LP& lp, size_t M, size_t N) {
@@ -789,6 +1117,19 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next Cholesky factor with the specified
+   * dimensionality, reading from an unconstrained vector of the
+   * appropriate size, and increment the log probability reference
+   * with the log Jacobian adjustment for the transform.
+   *
+   * @param M Rows of Cholesky factor
+   * @param N Columns of Cholesky factor
+   * @param[in,out] lp log probability
+   * @return Next Cholesky factor.
+   * @throw std::domain_error if the matrix is not a valid
+   *    Cholesky factor.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_cholesky_factor_cov(LP& lp, const size_t vecsize,
@@ -802,8 +1143,16 @@ class deserializer {
     return ret;
   }
 
-  // SDF
-
+  /**
+   * Return the next Cholesky factor for a correlation matrix with
+   * the specified dimensionality, reading it directly without
+   * transforms.
+   *
+   * @param K Rows and columns of Cholesky factor
+   * @return Next Cholesky factor for a correlation matrix.
+   * @throw std::domain_error if the matrix is not a valid
+   * Cholesky factor for a correlation matrix.
+   */
   template <typename Ret, require_matrix_t<Ret>* = nullptr>
   auto read_cholesky_factor_corr(size_t K) {
     using stan::math::check_cholesky_factor_corr;
@@ -813,6 +1162,16 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next Cholesky factor for a correlation matrix with
+   * the specified dimensionality, reading it directly without
+   * transforms.
+   *
+   * @param K Rows and columns of Cholesky factor
+   * @return Next Cholesky factor for a correlation matrix.
+   * @throw std::domain_error if the matrix is not a valid
+   * Cholesky factor for a correlation matrix.
+   */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_cholesky_factor_corr(size_t vecsize, Sizes... sizes) {
@@ -824,6 +1183,19 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next Cholesky factor for a correlation matrix with
+   * the specified dimensionality, reading from an unconstrained
+   * vector of the appropriate size, and increment the log
+   * probability reference with the log Jacobian adjustment for
+   * the transform.
+   *
+   * @param K Rows and columns of Cholesky factor
+   * @param lp Log probability reference to increment.
+   * @return Next Cholesky factor for a correlation matrix.
+   * @throw std::domain_error if the matrix is not a valid
+   *    Cholesky factor for a correlation matrix.
+   */
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
   auto read_cholesky_factor_corr(LP& lp, size_t K) {
@@ -837,6 +1209,19 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next Cholesky factor for a correlation matrix with
+   * the specified dimensionality, reading from an unconstrained
+   * vector of the appropriate size, and increment the log
+   * probability reference with the log Jacobian adjustment for
+   * the transform.
+   *
+   * @param K Rows and columns of Cholesky factor
+   * @param lp Log probability reference to increment.
+   * @return Next Cholesky factor for a correlation matrix.
+   * @throw std::domain_error if the matrix is not a valid
+   *    Cholesky factor for a correlation matrix.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_cholesky_factor_corr(LP& lp, const size_t vecsize,
@@ -850,8 +1235,17 @@ class deserializer {
     return ret;
   }
 
-  // cov matrix
-
+  /**
+   * Return the next covariance matrix with the specified
+   * dimensionality.
+   *
+   * <p>See <code>stan::math::check_cov_matrix(Matrix)</code>.
+   *
+   * @param k Dimensionality of covariance matrix.
+   * @return Next covariance matrix of the specified dimensionality.
+   * @throw std::runtime_error if the matrix is not a valid
+   *    covariance matrix
+   */
   template <typename Ret, require_matrix_t<Ret>* = nullptr>
   auto read_cov_matrix(size_t k) {
     using stan::math::check_cov_matrix;
@@ -860,6 +1254,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next covariance matrix with the specified
+   * dimensionality.
+   *
+   * <p>See <code>stan::math::check_cov_matrix(Matrix)</code>.
+   *
+   * @param k Dimensionality of covariance matrix.
+   * @return Next covariance matrix of the specified dimensionality.
+   * @throw std::runtime_error if the matrix is not a valid
+   *    covariance matrix
+   */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_cov_matrix(size_t vecsize, Sizes... sizes) {
@@ -871,6 +1276,17 @@ class deserializer {
     return ret;
   }
 
+  /**
+   * Return the next covariance matrix of the specified dimensionality,
+   * incrementing the specified reference with the log absolute Jacobian
+   * determinant.
+   *
+   * <p>See <code>stan::math::cov_matrix_constrain(Matrix,T&)</code>.
+   *
+   * @param k Dimensionality of the (square) covariance matrix.
+   * @param lp Log probability reference to increment.
+   * @return The next covariance matrix of the specified dimensionality.
+   */
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
   auto read_cov_matrix(LP& lp, size_t k) {
@@ -884,6 +1300,17 @@ class deserializer {
     }
   }
 
+  /**
+   * Return the next covariance matrix of the specified dimensionality,
+   * incrementing the specified reference with the log absolute Jacobian
+   * determinant.
+   *
+   * <p>See <code>stan::math::cov_matrix_constrain(Matrix,T&)</code>.
+   *
+   * @param k Dimensionality of the (square) covariance matrix.
+   * @param lp Log probability reference to increment.
+   * @return The next covariance matrix of the specified dimensionality.
+   */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
   auto read_cov_matrix(LP& lp, const size_t vecsize, const Sizes&... sizes) {
