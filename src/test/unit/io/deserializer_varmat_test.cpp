@@ -53,8 +53,10 @@ TEST(deserializer_var_vector, unit_vector_exception) {
   theta[4] = sqrt(1.0);
   theta[5] = sqrt(1.0);
   EXPECT_NO_THROW(deserializer.read_unit_vector<var_vector_t>(4));
-  EXPECT_THROW(deserializer.read_unit_vector<var_vector_t>(2), std::domain_error);
-  EXPECT_THROW(deserializer.read_unit_vector<var_vector_t>(0), std::invalid_argument);
+  EXPECT_THROW(deserializer.read_unit_vector<var_vector_t>(2),
+               std::domain_error);
+  EXPECT_THROW(deserializer.read_unit_vector<var_vector_t>(0),
+               std::invalid_argument);
 }
 
 TEST(deserializer_var_vector, simplex) {
@@ -82,7 +84,8 @@ TEST(deserializer_var_vector, simplex_exception) {
   theta[5] = 1.0;
   EXPECT_NO_THROW(deserializer.read_simplex<var_vector_t>(4));
   EXPECT_THROW(deserializer.read_simplex<var_vector_t>(2), std::domain_error);
-  EXPECT_THROW(deserializer.read_simplex<var_vector_t>(0), std::invalid_argument);
+  EXPECT_THROW(deserializer.read_simplex<var_vector_t>(0),
+               std::invalid_argument);
 }
 
 TEST(deserializer_var_vector, ordered) {
@@ -91,7 +94,8 @@ TEST(deserializer_var_vector, ordered) {
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  EXPECT_FLOAT_EQ(0.0, deserializer.read<stan::math::var>().val());  // throw away theta[0]
+  EXPECT_FLOAT_EQ(
+      0.0, deserializer.read<stan::math::var>().val());  // throw away theta[0]
   var_vector_t y = deserializer.read_ordered<var_vector_t>(5);
   EXPECT_EQ(5, y.size());
   EXPECT_FLOAT_EQ(1.0, y.val()[0]);
@@ -105,7 +109,8 @@ TEST(deserializer_var_vector, ordered_exception) {
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  EXPECT_FLOAT_EQ(0.0, deserializer.read<stan::math::var>().val());  // throw away theta[0]
+  EXPECT_FLOAT_EQ(
+      0.0, deserializer.read<stan::math::var>().val());  // throw away theta[0]
   var_vector_t y = deserializer.read_ordered<var_vector_t>(5);
   EXPECT_EQ(5, y.size());
   EXPECT_FLOAT_EQ(1.0, y.val()[0]);
@@ -160,7 +165,8 @@ TEST(deserializer_var_vector, positive_ordered) {
   for (int i = 0; i < 100.0; ++i)
     theta.push_back(static_cast<double>(i));
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  EXPECT_FLOAT_EQ(0.0, deserializer.read<stan::math::var>().val());  // throw away theta[0]
+  EXPECT_FLOAT_EQ(
+      0.0, deserializer.read<stan::math::var>().val());  // throw away theta[0]
   var_vector_t y = deserializer.read_positive_ordered<var_vector_t>(5);
   EXPECT_EQ(5, y.size());
   EXPECT_FLOAT_EQ(1.0, y.val()[0]);
@@ -239,7 +245,6 @@ TEST(deserializer_var_matrix, read) {
   EXPECT_FLOAT_EQ(13.0, a.val());
 }
 
-
 TEST(deserializer_var_matrix, matrix_lb) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
@@ -277,8 +282,7 @@ TEST(deserializer_var_matrix, matrix_lb_constrain) {
   }
   stan::math::var lb = -1.5;
   stan::math::var lp = 0;
-  var_matrix_t y
-      = deserializer.read_lb<var_matrix_t, false>(lb, lp, 3, 2);
+  var_matrix_t y = deserializer.read_lb<var_matrix_t, false>(lb, lp, 3, 2);
   EXPECT_EQ(3, y.rows());
   EXPECT_EQ(2, y.cols());
   EXPECT_FLOAT_EQ(stan::math::lb_constrain(7.0, lb).val(), y.val()(0, 0));
@@ -304,8 +308,7 @@ TEST(deserializer_var_matrix, matrix_lb_constrain_lp) {
   }
   stan::math::var lb = -1.5;
   stan::math::var lp = -5.0;
-  var_matrix_t y
-      = deserializer.read_lb<var_matrix_t, true>(lb, lp, 3, 2);
+  var_matrix_t y = deserializer.read_lb<var_matrix_t, true>(lb, lp, 3, 2);
   EXPECT_EQ(3, y.rows());
   EXPECT_EQ(2, y.cols());
   EXPECT_FLOAT_EQ(stan::math::lb_constrain(7.0, lb, lp).val(), y.val()(0, 0));
@@ -330,8 +333,7 @@ TEST(deserializer_var_matrix, matrix_ub) {
     EXPECT_FLOAT_EQ(static_cast<double>(i), x.val());
   }
   stan::math::var ub = 12.5;
-  var_matrix_t y
-      = deserializer.read_ub<var_matrix_t>(ub, 3, 2);
+  var_matrix_t y = deserializer.read_ub<var_matrix_t>(ub, 3, 2);
   EXPECT_EQ(3, y.rows());
   EXPECT_EQ(2, y.cols());
   EXPECT_FLOAT_EQ(7.0, y.val()(0, 0));
@@ -357,8 +359,7 @@ TEST(deserializer_var_matrix, matrix_ub_constrain) {
   }
   stan::math::var ub = 14.1;
   stan::math::var lp = 0;
-  var_matrix_t y
-      = deserializer.read_ub<var_matrix_t, false>(ub, lp, 3, 2);
+  var_matrix_t y = deserializer.read_ub<var_matrix_t, false>(ub, lp, 3, 2);
   EXPECT_EQ(3, y.rows());
   EXPECT_EQ(2, y.cols());
   EXPECT_FLOAT_EQ(stan::math::ub_constrain(7.0, ub).val(), y.val()(0, 0));
@@ -384,8 +385,7 @@ TEST(deserializer_var_matrix, matrix_ub_constrain_lp) {
   }
   stan::math::var ub = 12.1;
   stan::math::var lp = -5.0;
-  var_matrix_t y
-      = deserializer.read_ub<var_matrix_t, true>(ub, lp, 3, 2);
+  var_matrix_t y = deserializer.read_ub<var_matrix_t, true>(ub, lp, 3, 2);
   EXPECT_EQ(3, y.rows());
   EXPECT_EQ(2, y.cols());
   EXPECT_FLOAT_EQ(stan::math::ub_constrain(7.0, ub, lp).val(), y.val()(0, 0));
@@ -438,8 +438,7 @@ TEST(deserializer_var_matrix, matrix_lub_constrain) {
   stan::math::var lb = 3.5;
   stan::math::var ub = 14.1;
   stan::math::var lp = 0;
-  var_matrix_t y
-      = deserializer.read_lub<var_matrix_t, false>(lb, ub, lp, 3, 2);
+  var_matrix_t y = deserializer.read_lub<var_matrix_t, false>(lb, ub, lp, 3, 2);
   EXPECT_EQ(3, y.rows());
   EXPECT_EQ(2, y.cols());
   EXPECT_FLOAT_EQ(stan::math::lub_constrain(7.0, lb, ub).val(), y.val()(0, 0));
@@ -466,16 +465,21 @@ TEST(deserializer_var_matrix, matrix_lub_constrain_lp) {
   stan::math::var lb = 4.1;
   stan::math::var ub = 12.1;
   stan::math::var lp = -5.0;
-  var_matrix_t y
-      = deserializer.read_lub<var_matrix_t, true>(lb, ub, lp, 3, 2);
+  var_matrix_t y = deserializer.read_lub<var_matrix_t, true>(lb, ub, lp, 3, 2);
   EXPECT_EQ(3, y.rows());
   EXPECT_EQ(2, y.cols());
-  EXPECT_FLOAT_EQ(stan::math::lub_constrain(7.0, lb, ub, lp).val(), y.val()(0, 0));
-  EXPECT_FLOAT_EQ(stan::math::lub_constrain(8.0, lb, ub, lp).val(), y.val()(1, 0));
-  EXPECT_FLOAT_EQ(stan::math::lub_constrain(9.0, lb, ub, lp).val(), y.val()(2, 0));
-  EXPECT_FLOAT_EQ(stan::math::lub_constrain(10.0, lb, ub, lp).val(), y.val()(0, 1));
-  EXPECT_FLOAT_EQ(stan::math::lub_constrain(11.0, lb, ub, lp).val(), y.val()(1, 1));
-  EXPECT_FLOAT_EQ(stan::math::lub_constrain(12.0, lb, ub, lp).val(), y.val()(2, 1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(7.0, lb, ub, lp).val(),
+                  y.val()(0, 0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(8.0, lb, ub, lp).val(),
+                  y.val()(1, 0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(9.0, lb, ub, lp).val(),
+                  y.val()(2, 0));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(10.0, lb, ub, lp).val(),
+                  y.val()(0, 1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(11.0, lb, ub, lp).val(),
+                  y.val()(1, 1));
+  EXPECT_FLOAT_EQ(stan::math::lub_constrain(12.0, lb, ub, lp).val(),
+                  y.val()(2, 1));
 
   stan::math::var a = deserializer.read<stan::math::var>();
   EXPECT_FLOAT_EQ(13.0, a.val());
@@ -603,8 +607,10 @@ TEST(deserializer_var_matrix, cov_matrix_exception) {
   theta[2] = 0.6;
   theta[3] = 1.9;
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  EXPECT_THROW(deserializer.read_cov_matrix<var_matrix_t>(2), std::domain_error);
-  EXPECT_THROW(deserializer.read_cov_matrix<var_matrix_t>(0), std::invalid_argument);
+  EXPECT_THROW(deserializer.read_cov_matrix<var_matrix_t>(2),
+               std::domain_error);
+  EXPECT_THROW(deserializer.read_cov_matrix<var_matrix_t>(0),
+               std::invalid_argument);
 }
 TEST(deserializer_var_matrix, cov_matrix_constrain) {
   std::vector<int> theta_i;
@@ -618,8 +624,7 @@ TEST(deserializer_var_matrix, cov_matrix_constrain) {
   theta.push_back(1.0);
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
   stan::math::var lp = 0;
-  var_matrix_t S(
-      deserializer.read_cov_matrix<var_matrix_t, false>(lp, 3U));
+  var_matrix_t S(deserializer.read_cov_matrix<var_matrix_t, false>(lp, 3U));
   EXPECT_EQ(3, S.rows());
   EXPECT_EQ(3, S.cols());
   EXPECT_EQ(9, S.size());
@@ -683,8 +688,7 @@ TEST(deserializer_var_matrix, cholesky_factor_cov) {
   theta[7] = 0;
   theta[8] = 6;
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  var_matrix_t S
-      = deserializer.read_cholesky_factor_cov<var_matrix_t>(3, 3);
+  var_matrix_t S = deserializer.read_cholesky_factor_cov<var_matrix_t>(3, 3);
   EXPECT_FLOAT_EQ(theta[0].val(), S.val()(0, 0));
   EXPECT_FLOAT_EQ(theta[1].val(), S.val()(1, 0));
   EXPECT_FLOAT_EQ(theta[7].val(), S.val()(1, 2));
@@ -705,8 +709,7 @@ TEST(deserializer_var_matrix, cholesky_factor_cov_asymmetric) {
   theta[5] = 5;
 
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  var_matrix_t S
-      = deserializer.read_cholesky_factor_cov<var_matrix_t>(3, 2);
+  var_matrix_t S = deserializer.read_cholesky_factor_cov<var_matrix_t>(3, 2);
   EXPECT_FLOAT_EQ(theta[0].val(), S.val()(0, 0));
   EXPECT_FLOAT_EQ(theta[1].val(), S.val()(1, 0));
   EXPECT_FLOAT_EQ(theta[2].val(), S.val()(2, 0));
@@ -723,11 +726,14 @@ TEST(deserializer_var_matrix, cholesky_factor_cov_exception) {
     theta.push_back(static_cast<double>(i));
   theta[0] = -6.3;
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  EXPECT_THROW(deserializer.read_cholesky_factor_cov<var_matrix_t>(2, 2), std::domain_error);
-  EXPECT_THROW(deserializer.read_cholesky_factor_cov<var_matrix_t>(0, 0), std::domain_error);
+  EXPECT_THROW(deserializer.read_cholesky_factor_cov<var_matrix_t>(2, 2),
+               std::domain_error);
+  EXPECT_THROW(deserializer.read_cholesky_factor_cov<var_matrix_t>(0, 0),
+               std::domain_error);
 
   theta[0] = 1;
-  EXPECT_THROW(deserializer.read_cholesky_factor_cov<var_matrix_t>(2, 3), std::domain_error);
+  EXPECT_THROW(deserializer.read_cholesky_factor_cov<var_matrix_t>(2, 3),
+               std::domain_error);
 }
 TEST(deserializer_var_matrix, cholesky_factor_cov_constrain) {
   std::vector<int> theta_i;
@@ -745,7 +751,6 @@ TEST(deserializer_var_matrix, cholesky_factor_cov_constrain) {
   EXPECT_EQ(9, L.size());
   EXPECT_EQ(2U, deserializer.available());
 }
-
 
 TEST(deserializer_var_matrix, cholesky_factor_cov_constrain_asymmetric) {
   std::vector<int> theta_i;
@@ -778,9 +783,11 @@ TEST(deserializer_var_matrix, cholesky_factor_cov_constrain_jacobian) {
   EXPECT_EQ(3, L.cols());
   EXPECT_EQ(9, L.size());
   EXPECT_EQ(2U, deserializer.available());
-  EXPECT_EQ(1.9 + log(L.val()(0, 0)) + log(L.val()(1, 1)) + log(L.val()(2, 2)), lp.val());
+  EXPECT_EQ(1.9 + log(L.val()(0, 0)) + log(L.val()(1, 1)) + log(L.val()(2, 2)),
+            lp.val());
 }
-TEST(deserializer_var_matrix, cholesky_factor_cov_constrain_jacobian_asymmetric) {
+TEST(deserializer_var_matrix,
+     cholesky_factor_cov_constrain_jacobian_asymmetric) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   for (int i = 0; i < 12; ++i)
@@ -795,7 +802,8 @@ TEST(deserializer_var_matrix, cholesky_factor_cov_constrain_jacobian_asymmetric)
   EXPECT_EQ(3, L.cols());
   EXPECT_EQ(12, L.size());
   EXPECT_EQ(3U, deserializer.available());
-  EXPECT_EQ(1.9 + log(L.val()(0, 0)) + log(L.val()(1, 1)) + log(L.val()(2, 2)), lp.val());
+  EXPECT_EQ(1.9 + log(L.val()(0, 0)) + log(L.val()(1, 1)) + log(L.val()(2, 2)),
+            lp.val());
 }
 
 TEST(deserializer_var_matrix, cholesky_factor_corr) {
@@ -814,8 +822,7 @@ TEST(deserializer_var_matrix, cholesky_factor_corr) {
   theta[7] = 0;
   theta[8] = 1;
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  var_matrix_t S
-      = deserializer.read_cholesky_factor_corr<var_matrix_t>(3);
+  var_matrix_t S = deserializer.read_cholesky_factor_corr<var_matrix_t>(3);
   EXPECT_FLOAT_EQ(theta[0].val(), S.val()(0, 0));
   EXPECT_FLOAT_EQ(theta[1].val(), S.val()(1, 0));
   EXPECT_FLOAT_EQ(theta[4].val(), S.val()(1, 1));
@@ -842,7 +849,8 @@ TEST(deserializer_var_matrix, cholesky_factor_corr_exception) {
   theta[7] = 0;
   theta[8] = 1;
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  EXPECT_THROW(deserializer.read_cholesky_factor_corr<var_matrix_t>(3), std::domain_error);
+  EXPECT_THROW(deserializer.read_cholesky_factor_corr<var_matrix_t>(3),
+               std::domain_error);
 }
 TEST(deserializer_var_matrix, cholesky_factor_corr_constrain) {
   std::vector<int> theta_i;
