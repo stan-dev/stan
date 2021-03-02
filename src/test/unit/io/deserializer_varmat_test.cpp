@@ -219,6 +219,58 @@ TEST(deserializer_var_vector, positive_ordered_constrain_jacobian) {
   EXPECT_FLOAT_EQ(expected_lp, lp.val());
 }
 
+
+TEST(deserializer_vector, offset_multiplier) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  var_vector_t phi(
+      deserializer.read_offset_multiplier<var_vector_t>(0, 1, 4));
+  EXPECT_FLOAT_EQ(theta[0].val(), phi.val()[0]);
+  EXPECT_FLOAT_EQ(theta[1].val(), phi.val()[1]);
+  EXPECT_FLOAT_EQ(theta[2].val(), phi.val()[2]);
+  EXPECT_FLOAT_EQ(theta[3].val(), phi.val()[3]);
+}
+
+TEST(deserializer_vector, offset_multiplier_constrain) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  stan::math::var lp = 0;
+  var_vector_t phi(
+      deserializer.read_offset_multiplier<var_vector_t, false>(0, 1, lp, 4));
+  EXPECT_FLOAT_EQ(theta[0].val(), phi.val()[0]);
+  EXPECT_FLOAT_EQ(theta[1].val(), phi.val()[1]);
+  EXPECT_FLOAT_EQ(theta[2].val(), phi.val()[2]);
+  EXPECT_FLOAT_EQ(theta[3].val(), phi.val()[3]);
+}
+
+TEST(deserializer_vector, offset_multiplier_constrain_lp) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  stan::math::var lp = 0;
+  var_vector_t phi(
+      deserializer.read_offset_multiplier<var_vector_t, true>(0, 2, lp, 4));
+  EXPECT_FLOAT_EQ(theta[0].val() * 2, phi.val()[0]);
+  EXPECT_FLOAT_EQ(theta[1].val() * 2, phi.val()[1]);
+  EXPECT_FLOAT_EQ(theta[2].val() * 2, phi.val()[2]);
+  EXPECT_FLOAT_EQ(theta[3].val() * 2, phi.val()[3]);
+  EXPECT_FLOAT_EQ(lp.val(), std::log(2) * 4);
+}
+
 // matrix
 
 TEST(deserializer_var_matrix, read) {
@@ -867,4 +919,55 @@ TEST(deserializer_var_matrix, cholesky_factor_corr_constrain) {
   EXPECT_EQ(3, L.cols());
   EXPECT_EQ(9, L.size());
   EXPECT_EQ(5U, deserializer.available());
+}
+
+TEST(deserializer_var_matrix, offset_multiplier) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  var_matrix_t phi(
+      deserializer.read_offset_multiplier<var_matrix_t>(0, 1, 2, 2));
+  EXPECT_FLOAT_EQ(theta[0].val(), phi.val()(0, 0));
+  EXPECT_FLOAT_EQ(theta[1].val(), phi.val()(1, 0));
+  EXPECT_FLOAT_EQ(theta[2].val(), phi.val()(0, 1));
+  EXPECT_FLOAT_EQ(theta[3].val(), phi.val()(1, 1));
+}
+
+TEST(deserializer_var_matrix, offset_multiplier_constrain) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  stan::math::var lp = 0;
+  var_matrix_t phi(
+      deserializer.read_offset_multiplier<var_matrix_t, false>(0, 1, lp, 2, 2));
+  EXPECT_FLOAT_EQ(theta[0].val(), phi.val()(0, 0));
+  EXPECT_FLOAT_EQ(theta[1].val(), phi.val()(1, 0));
+  EXPECT_FLOAT_EQ(theta[2].val(), phi.val()(0, 1));
+  EXPECT_FLOAT_EQ(theta[3].val(), phi.val()(1, 1));
+}
+
+TEST(deserializer_var_matrix, offset_multiplier_constrain_lp) {
+  std::vector<int> theta_i;
+  std::vector<stan::math::var> theta;
+  theta.push_back(3.0);
+  theta.push_back(-1.0);
+  theta.push_back(-2.0);
+  theta.push_back(0.0);
+  stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
+  stan::math::var lp = 0;
+  var_matrix_t phi(
+      deserializer.read_offset_multiplier<var_matrix_t, true>(0, 2, lp, 2, 2));
+  EXPECT_FLOAT_EQ(theta[0].val() * 2, phi.val()(0, 0));
+  EXPECT_FLOAT_EQ(theta[1].val() * 2, phi.val()(1, 0));
+  EXPECT_FLOAT_EQ(theta[2].val() * 2, phi.val()(0, 1));
+  EXPECT_FLOAT_EQ(theta[3].val() * 2, phi.val()(1, 1));
+  EXPECT_FLOAT_EQ(lp.val(), std::log(2) * 4);
 }
