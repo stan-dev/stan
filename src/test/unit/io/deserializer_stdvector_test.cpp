@@ -712,7 +712,6 @@ TEST(deserializer_stdvec_vector, positive_ordered_constrain_jacobian) {
   EXPECT_FLOAT_EQ(expected_lp, lp);
 }
 
-
 TEST(deserializer_stdvec_vector, offset_multiplier) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -725,7 +724,8 @@ TEST(deserializer_stdvec_vector, offset_multiplier) {
   theta.push_back(-2.0);
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
-  auto phi(deserializer.read_offset_multiplier<std::vector<Eigen::VectorXd>>(0, 1, 2, 4));
+  auto phi(deserializer.read_offset_multiplier<std::vector<Eigen::VectorXd>>(
+      0, 1, 2, 4));
   for (int i = 0; i < 2; ++i) {
     EXPECT_FLOAT_EQ(theta[0], phi[i][0]);
     EXPECT_FLOAT_EQ(theta[1], phi[i][1]);
@@ -747,7 +747,9 @@ TEST(deserializer_stdvec_vector, offset_multiplier_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  auto phi(deserializer.read_offset_multiplier<std::vector<Eigen::VectorXd>, false>(0, 1, lp, 2, 4));
+  auto phi(
+      deserializer.read_offset_multiplier<std::vector<Eigen::VectorXd>, false>(
+          0, 1, lp, 2, 4));
   for (int i = 0; i < 2; ++i) {
     EXPECT_FLOAT_EQ(theta[0], phi[i][0]);
     EXPECT_FLOAT_EQ(theta[1], phi[i][1]);
@@ -769,7 +771,9 @@ TEST(deserializer_stdvec_vector, offset_multiplier_constrain_lp) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  auto phi(deserializer.read_offset_multiplier<std::vector<Eigen::VectorXd>, true>(0, 2, lp, 2, 4));
+  auto phi(
+      deserializer.read_offset_multiplier<std::vector<Eigen::VectorXd>, true>(
+          0, 2, lp, 2, 4));
   for (int i = 0; i < 2; ++i) {
     EXPECT_FLOAT_EQ(theta[0] * 2, phi[i][0]);
     EXPECT_FLOAT_EQ(theta[1] * 2, phi[i][1]);
@@ -1539,8 +1543,6 @@ TEST(deserializer_stdvec_matrix, cholesky_factor_corr_constrain) {
   EXPECT_EQ(9, L[0].size());
 }
 
-
-
 TEST(deserializer_stdvec_matrix, offset_multiplier) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -1553,8 +1555,8 @@ TEST(deserializer_stdvec_matrix, offset_multiplier) {
   theta.push_back(-2.0);
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
-  auto phi(
-      deserializer.read_offset_multiplier<std::vector<Eigen::MatrixXd>>(0, 1, 2, 2, 2));
+  auto phi(deserializer.read_offset_multiplier<std::vector<Eigen::MatrixXd>>(
+      0, 1, 2, 2, 2));
   for (int i = 0; i < 2; ++i) {
     EXPECT_FLOAT_EQ(theta[0], phi[i](0, 0));
     EXPECT_FLOAT_EQ(theta[1], phi[i](1, 0));
@@ -1577,7 +1579,8 @@ TEST(deserializer_stdvec_matrix, offset_multiplier_constrain) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
   auto phi(
-      deserializer.read_offset_multiplier<std::vector<Eigen::MatrixXd>, false>(0, 1, lp, 2, 2, 2));
+      deserializer.read_offset_multiplier<std::vector<Eigen::MatrixXd>, false>(
+          0, 1, lp, 2, 2, 2));
   for (int i = 0; i < 2; ++i) {
     EXPECT_FLOAT_EQ(theta[0], phi[i](0, 0));
     EXPECT_FLOAT_EQ(theta[1], phi[i](1, 0));
@@ -1600,7 +1603,8 @@ TEST(deserializer_stdvec_matrix, offset_multiplier_constrain_lp) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
   auto phi(
-      deserializer.read_offset_multiplier<std::vector<Eigen::MatrixXd>, true>(0, 2, lp, 2, 2, 2));
+      deserializer.read_offset_multiplier<std::vector<Eigen::MatrixXd>, true>(
+          0, 2, lp, 2, 2, 2));
   for (int i = 0; i < 2; ++i) {
     EXPECT_FLOAT_EQ(theta[0] * 2, phi[i](0, 0));
     EXPECT_FLOAT_EQ(theta[1] * 2, phi[i](1, 0));
