@@ -768,7 +768,8 @@ TEST(deserializer_vector, offset_multiplier_constrain) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
   Eigen::Matrix<double, Eigen::Dynamic, 1> phi(
-      deserializer.read_offset_multiplier<Eigen::VectorXd, false>(0.0, 1.0, lp, 4));
+      deserializer.read_offset_multiplier<Eigen::VectorXd, false>(0.0, 1.0, lp,
+                                                                  4));
   EXPECT_FLOAT_EQ(theta[0], phi[0]);
   EXPECT_FLOAT_EQ(theta[1], phi[1]);
   EXPECT_FLOAT_EQ(theta[2], phi[2]);
@@ -830,7 +831,8 @@ TEST(deserializer_matrix, complex_read) {
     double x = deserializer.read<double>();
     EXPECT_FLOAT_EQ(static_cast<double>(i), x);
   }
-  using eig_mat = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic>;
+  using eig_mat
+      = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic>;
   eig_mat y = deserializer.read<eig_mat>(3, 2);
   EXPECT_EQ(3, y.rows());
   EXPECT_EQ(2, y.cols());
