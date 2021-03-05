@@ -158,8 +158,8 @@ class deserializer {
   template <typename Ret, require_complex_t<Ret>* = nullptr>
   auto read() {
     check_r_capacity();
-    return std::complex<T>(data_r_.coeffRef(pos_r_++),
-                           data_r_.coeffRef(pos_r_++));
+    return std::complex<T>{data_r_.coeffRef(pos_r_++),
+                           data_r_.coeffRef(pos_r_++)};
   }
 
   /**
@@ -205,9 +205,10 @@ class deserializer {
     } else {
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
-        ret.coeffRef(i) = std::complex<T>(data_r_.coeffRef(pos_r_++),
-                                          data_r_.coeffRef(pos_r_++));
+        ret.coeffRef(i) = std::complex<T>{data_r_.coeffRef(pos_r_++),
+                                          data_r_.coeffRef(pos_r_++)};
       }
+      return ret;
     }
   }
 
@@ -243,9 +244,10 @@ class deserializer {
     } else {
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
-        ret.coeffRef(i) = std::complex<T>(data_r_.coeffRef(pos_r_++),
-                                          data_r_.coeffRef(pos_r_++));
+        ret.coeffRef(i) = std::complex<T>{data_r_.coeffRef(pos_r_++),
+                                          data_r_.coeffRef(pos_r_++)};
       }
+      return ret;
     }
   }
 
@@ -285,9 +287,10 @@ class deserializer {
     } else {
       Ret ret(rows, cols);
       for (Eigen::Index i = 0; i < rows * cols; ++i) {
-        ret.coeffRef(i) = std::complex<T>(data_r_.coeffRef(pos_r_++),
-                                          data_r_.coeffRef(pos_r_++));
+        ret.coeffRef(i) = std::complex<T>{data_r_.coeffRef(pos_r_++),
+                                          data_r_.coeffRef(pos_r_++)};
       }
+      return ret;
     }
   }
 

@@ -97,6 +97,23 @@ TEST(deserializer_scalar, read) {
   EXPECT_EQ(0U, deserializer.available());
 }
 
+TEST(deserializer_scalar, complex_read) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  theta.push_back(1.0);
+  theta.push_back(2.0);
+  theta.push_back(3.0);
+  theta.push_back(4.0);
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  std::complex<double> x = deserializer.read<std::complex<double>>();
+  EXPECT_FLOAT_EQ(1.0, x.real());
+  EXPECT_FLOAT_EQ(2.0, x.imag());
+  std::complex<double> y = deserializer.read<std::complex<double>>();
+  EXPECT_FLOAT_EQ(3.0, y.real());
+  EXPECT_FLOAT_EQ(4.0, y.imag());
+  EXPECT_EQ(0U, deserializer.available());
+}
+
 TEST(deserializer_scalar, read_lb) {
   std::vector<int> theta_i;
   std::vector<double> theta;
@@ -503,6 +520,33 @@ TEST(deserializer_vector, read) {
   EXPECT_FLOAT_EQ(11.0, z);
 }
 
+TEST(deserializer_vector, complex_read) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100U; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (size_t i = 0; i < 7U; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  using complex_vec = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, 1>;
+  complex_vec y = deserializer.read<complex_vec>(4);
+  EXPECT_EQ(4, y.rows());
+  EXPECT_EQ(1, y.cols());
+  EXPECT_EQ(4, y.size());
+  double sentinal = 7;
+  for (int i = 0; i < y.size(); ++i) {
+    EXPECT_FLOAT_EQ(sentinal, y[i].real());
+    ++sentinal;
+    EXPECT_FLOAT_EQ(sentinal, y[i].imag());
+    ++sentinal;
+  }
+
+  double z = deserializer.read<double>();
+  EXPECT_FLOAT_EQ(15.0, z);
+}
+
 TEST(deserializer_vector, unit_vector) {
   std::vector<int> theta_i(0);
   std::vector<double> theta(4, sqrt(0.25));
@@ -724,7 +768,7 @@ TEST(deserializer_vector, offset_multiplier_constrain) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
   Eigen::Matrix<double, Eigen::Dynamic, 1> phi(
-      deserializer.read_offset_multiplier<Eigen::VectorXd, false>(0, 1, lp, 4));
+      deserializer.read_offset_multiplier<Eigen::VectorXd, false>(0.0, 1.0, lp, 4));
   EXPECT_FLOAT_EQ(theta[0], phi[0]);
   EXPECT_FLOAT_EQ(theta[1], phi[1]);
   EXPECT_FLOAT_EQ(theta[2], phi[2]);
@@ -774,6 +818,29 @@ TEST(deserializer_matrix, read) {
 
   double a = deserializer.read<double>();
   EXPECT_FLOAT_EQ(13.0, a);
+}
+
+TEST(deserializer_matrix, complex_read) {
+  std::vector<int> theta_i;
+  std::vector<double> theta;
+  for (size_t i = 0; i < 100.0; ++i)
+    theta.push_back(static_cast<double>(i));
+  stan::io::deserializer<double> deserializer(theta, theta_i);
+  for (int i = 0; i < 7; ++i) {
+    double x = deserializer.read<double>();
+    EXPECT_FLOAT_EQ(static_cast<double>(i), x);
+  }
+  using eig_mat = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic>;
+  eig_mat y = deserializer.read<eig_mat>(3, 2);
+  EXPECT_EQ(3, y.rows());
+  EXPECT_EQ(2, y.cols());
+  double sentinal = 7;
+  for (int i = 0; i < y.size(); ++i) {
+    EXPECT_FLOAT_EQ(sentinal, y(i).real());
+    sentinal++;
+    EXPECT_FLOAT_EQ(sentinal, y(i).imag());
+    sentinal++;
+  }
 }
 
 TEST(deserializer_matrix, matrix_lb) {
