@@ -70,6 +70,40 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
   }
 }
 
+template <class Model, class RNG>
+void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
+                          int start, int finish, int num_thin, int refresh,
+                          bool save, bool warmup,
+                          util::mcmc_writer& mcmc_writer,
+                          stan::mcmc::sample& init_s, Model& model,
+                          RNG& base_rng, callbacks::interrupt& callback,
+                          callbacks::logger& logger, size_t n_chain) {
+  for (int m = 0; m < num_iterations; ++m) {
+    callback();
+
+    if (refresh > 0
+        && (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
+      int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
+      std::stringstream message;
+      message << "Chain [" << (n_chain + 1) << "] " << "Iteration: ";
+      message << std::setw(it_print_width) << m + 1 + start << " / " << finish;
+      message << " [" << std::setw(3)
+              << static_cast<int>((100.0 * (start + m + 1)) / finish) << "%] ";
+      message << (warmup ? " (Warmup)" : " (Sampling)");
+
+      logger.info(message);
+    }
+
+    init_s = sampler.transition(init_s, logger);
+
+    if (save && ((m % num_thin) == 0)) {
+      mcmc_writer.write_sample_params(base_rng, init_s, sampler, model);
+      mcmc_writer.write_diagnostic_params(init_s, sampler);
+    }
+  }
+}
+
+
 }  // namespace util
 }  // namespace services
 }  // namespace stan
