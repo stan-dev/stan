@@ -56,6 +56,8 @@ pipeline {
                 + "e.g. PR-640.")
         string(defaultValue: 'downstream_tests', name: 'cmdstan_pr',
           description: 'PR to test CmdStan upstream against e.g. PR-630')
+        string(defaultValue: 'nightly', name: 'stanc3_bin_url',
+          description: 'Custom stanc3 binary url')
     }
     options {
         skipDefaultCheckout()
