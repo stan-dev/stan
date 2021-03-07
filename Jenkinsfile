@@ -135,6 +135,9 @@ pipeline {
                        git clean -xffd
                     """
                     utils.checkout_pr("math", "lib/stan_math", params.math_pr)
+                    if (params.stanc3_bin_url != 'nightly') {
+                        sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                    }
                     stash 'StanSetup'
                     setupCXX(true, env.GCC)
                     parallel(
