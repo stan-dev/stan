@@ -204,7 +204,7 @@ pipeline {
                             setupCXX()
                             script {
                                if (params.stanc3_bin_url != 'nightly') {
-                                  bat "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                                  bat "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
                                }
                             }
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
@@ -221,7 +221,7 @@ pipeline {
                         setupCXX(true, env.GCC)
                         script{ 
                             if (params.stanc3_bin_url != 'nightly') {
-                                sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                                sh "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
                             }
                         }
                         sh "g++ --version"
@@ -236,7 +236,7 @@ pipeline {
                         setupCXX(false)
                         script{
                             if (params.stanc3_bin_url != 'nightly') {
-                                sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                                sh "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
                             }
                         }
                         runTests("src/test/unit")
@@ -254,7 +254,7 @@ pipeline {
                         setupCXX(true, env.GCC)
                         script {
                             if (params.stanc3_bin_url != 'nightly') {
-                               sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                               sh "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
                             }
                         }
                         runTests("src/test/integration", separateMakeStep=false)
@@ -303,7 +303,7 @@ pipeline {
                         setupCXX()
                         script {
                             if (params.stanc3_bin_url != 'nightly') {
-                                sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                                sh "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
                             }
                         }
                         script {
