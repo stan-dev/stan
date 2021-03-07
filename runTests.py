@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import time
+import glob
 
 winsfx = ".exe"
 testsfx = "_test.cpp"
@@ -115,19 +116,25 @@ def runTest(name):
     command = '%s --gtest_output="xml:%s.xml"' % (executable, xml)
     doCommand(command)
 
+def files_in_folder(folder):
+    """Returns a list of files in the folder and all
+    its subfolders recursively. The folder can be
+    written with wildcards as with the Unix find command.
+    """
+    files = []
+    for f in glob.glob(folder):
+        if os.path.isdir(f):
+            files.extend(files_in_folder(f + os.sep + "**"))
+        else:
+            files.append(f)
+    return files
 
 def findTests(base_path):
-    folders = filter(os.path.isdir, base_path)
-    nonfolders = list(set(base_path) - set(folders))
-    tests = nonfolders + [
-        os.path.join(root, n)
-        for f in folders
-        for root, _, names in os.walk(f)
-        for n in names
-        if n.endswith(testsfx)
-    ]
+    files = []
+    for test_path in base_path:
+        files.extend(files_in_folder(test_path))
+    tests = [f for f in files if f.endswith(testsfx)]
     return list(map(mungeName, tests))
-
 
 def batched(tests):
     return [tests[i : i + batchSize] for i in range(0, len(tests), batchSize)]
