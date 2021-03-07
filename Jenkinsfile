@@ -202,8 +202,10 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             setupCXX()
-                            if (params.stanc3_bin_url != 'nightly') {
-                                sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                            script {
+                               if (params.stanc3_bin_url != 'nightly') {
+                                  bat "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                               }
                             }
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             bat "mingw32-make -j${env.PARALLEL} test-headers"
@@ -217,8 +219,10 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, env.GCC)
-                        if (params.stanc3_bin_url != 'nightly') {
-                            sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                        script{ 
+                            if (params.stanc3_bin_url != 'nightly') {
+                                sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                            }
                         }
                         sh "g++ --version"
                         runTests("src/test/unit")
@@ -230,8 +234,10 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX(false)
-                        if (params.stanc3_bin_url != 'nightly') {
-                            sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                        script{
+                            if (params.stanc3_bin_url != 'nightly') {
+                                sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                            }
                         }
                         runTests("src/test/unit")
                     }
@@ -246,8 +252,10 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, env.GCC)
-                        if (params.stanc3_bin_url != 'nightly') {
-                           sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                        script {
+                            if (params.stanc3_bin_url != 'nightly') {
+                               sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                            }
                         }
                         runTests("src/test/integration", separateMakeStep=false)
                     }
@@ -293,8 +301,10 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX()
-                        if (params.stanc3_bin_url != 'nightly') {
-                            sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                        script {
+                            if (params.stanc3_bin_url != 'nightly') {
+                                sh "echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
+                            }
                         }
                         script {
                             dir("lib/stan_math/") {
