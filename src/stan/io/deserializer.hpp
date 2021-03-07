@@ -232,8 +232,7 @@ class deserializer {
    * @param rows The size of the rows of the matrix.
    * @param cols The size of the cols of the matrix.
    */
-  template <typename Ret,
-            require_eigen_matrix_dynamic_t<Ret>* = nullptr,
+  template <typename Ret, require_eigen_matrix_dynamic_t<Ret>* = nullptr,
             require_not_vt_complex<Ret>* = nullptr>
   inline auto read(Eigen::Index rows, Eigen::Index cols) {
     if (rows == 0 || cols == 0) {
@@ -249,8 +248,7 @@ class deserializer {
    * @param rows The size of the rows of the matrix.
    * @param cols The size of the cols of the matrix.
    */
-  template <typename Ret,
-            require_eigen_matrix_dynamic_t<Ret>* = nullptr,
+  template <typename Ret, require_eigen_matrix_dynamic_t<Ret>* = nullptr,
             require_vt_complex<Ret>* = nullptr>
   inline auto read(Eigen::Index rows, Eigen::Index cols) {
     if (rows == 0 || cols == 0) {
