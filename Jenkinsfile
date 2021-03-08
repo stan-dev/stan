@@ -252,7 +252,7 @@ pipeline {
                     }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX()
+                        setupCXX(false, env.CXX, stanc3_bin_url())
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
@@ -269,7 +269,7 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCXX()
+                            setupCXX(false, env.CXX, stanc3_bin_url())
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             setupCXX(false)
                             runTestsWin("src/test/integration", separateMakeStep=false)
