@@ -205,7 +205,7 @@ pipeline {
                             unstash 'StanSetup'
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             bat "mingw32-make -j${env.PARALLEL} test-headers"
-                            setupCXX(false, stanc3_bin_url = stanc3_bin_url())
+                            setupCXX(false, env.GCC, stanc3_bin_url = stanc3_bin_url())
                             runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
@@ -216,7 +216,6 @@ pipeline {
                         unstash 'StanSetup'
                         sh "echo '${stanc3_bin_url()}'"
                         setupCXX(true, env.GCC, stanc3_bin_url = stanc3_bin_url())
-                        sh "g++ --version"
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -226,7 +225,6 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX(false, env.GCC, stanc3_bin_url = stanc3_bin_url())
-                        sh "cat make/local"
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -240,6 +238,7 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, env.GCC, stanc3_bin_url = stanc3_bin_url())
+                        sh "cat make/local"
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
