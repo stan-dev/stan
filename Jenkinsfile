@@ -214,7 +214,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        debugurl = stanc3_bin_url()
+                        def debugurl = stanc3_bin_url()
                         sh "echo '${debugurl}'"
                         setupCXX(true, env.GCC, stanc3_bin_url = stanc3_bin_url())
                         sh "g++ --version"
