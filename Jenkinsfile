@@ -316,7 +316,7 @@ pipeline {
                 build(job: "CmdStan/${cmdstan_pr()}",
                       parameters: [string(name: 'stan_pr', value: stan_pr()),
                                    string(name: 'math_pr', value: params.math_pr),
-                                   string(name: 'stanc3_bin_url', value: params.stanc3_bin_url])
+                                   string(name: 'stanc3_bin_url', value: params.stanc3_bin_url)])
             }
         }
         stage('Performance') {
