@@ -4,8 +4,9 @@ import org.stan.Utils
 def utils = new org.stan.Utils()
 def skipRemainingStages = false
 
-def setupCXX(failOnError = true, CXX = env.CXX, stanc3_bin_url = "nightly") {
+def setupCXX(failOnError = true, CXX = env.CXX, String stanc3_bin_url = "nightly") {
     errorStr = failOnError ? "-Werror " : ""
+    sh "echo '${stanc3_bin_url}'"
     stanc3_bin_url_str = stanc3_bin_url != "nightly" ? "\nSTANC3_TEST_BIN_URL=${stanc3_bin_url}\n" : ""
     writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}${stanc3_bin_url_str}")
 }
@@ -56,7 +57,7 @@ pipeline {
         string(defaultValue: '', name: 'math_pr', description: "Leave blank "
                 + "unless testing against a specific math repo pull request, "
                 + "e.g. PR-640.")
-        string(defaultValue: 'downstream_tests', name: 'cmdstan_pr',
+        string(defaultValue: 'downstream_tests', name: '3',
           description: 'PR to test CmdStan upstream against e.g. PR-630')
         string(defaultValue: 'nightly', name: 'stanc3_bin_url',
           description: 'Custom stanc3 binary url')
