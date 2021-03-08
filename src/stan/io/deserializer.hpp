@@ -437,65 +437,6 @@ class deserializer {
   }
 
   /**
-   * Return the next object transformed to be a (partial)
-   * correlation between -1 and 1, incrementing the specified
-   * reference with the log of the absolute Jacobian determinant.
-   *
-   * <p>See <code>stan::math::corr_constrain(T,T&)</code>.
-   *
-   * @tparam Ret The type to return.
-   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
-   * determinant of the transform.
-   * @tparam LP Type of log probability.
-   * @param k Dimensions of matrix return type.
-   * @param lp The reference to the variable holding the log
-   * probability to increment.
-   */
-  template <typename Ret, bool Jacobian, typename LP,
-            require_not_std_vector_t<Ret>* = nullptr,
-            require_matrix_t<Ret>* = nullptr>
-  inline auto read_corr(LP& lp, Eigen::Index k) {
-    using stan::math::corr_matrix_constrain;
-    if (Jacobian) {
-      return corr_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2),
-          k, lp);
-    } else {
-      return corr_matrix_constrain(
-          this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2),
-          k);
-    }
-  }
-
-  /**
-   * Specialization of `read_corr` for `std::vector` return types.
-   *
-   * <p>See <code>stan::math::corr_constrain(T,T&)</code>.
-   *
-   * @tparam Ret The type to return.
-   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
-   * determinant of the transform.
-   * @tparam LP Type of log probability.
-   * @tparam Sizes A parameter pack of integral types.
-   * @param lp The reference to the variable holding the log
-   * @param vecsize The size of the return vector.
-   * @param sizes Pack of integrals to use to construct the return's type.
-   * probability to increment.
-   * @return The next scalar transformed to a correlation.
-   */
-  template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
-            require_std_vector_t<Ret>* = nullptr>
-  inline auto read_corr(LP& lp, const size_t vecsize, Sizes... sizes) {
-    std::decay_t<Ret> ret;
-    ret.reserve(vecsize);
-    for (size_t i = 0; i < vecsize; ++i) {
-      ret.emplace_back(
-          this->read_corr<value_type_t<Ret>, Jacobian>(lp, sizes...));
-    }
-    return ret;
-  }
-
-  /**
    * Return the next unit_vector of the specified size (using one fewer
    * unconstrained scalars), incrementing the specified reference with the
    * log absolute Jacobian determinant.
@@ -518,9 +459,9 @@ class deserializer {
   inline auto read_unit_vector(LP& lp, Sizes... sizes) {
     using stan::math::unit_vector_constrain;
     if (Jacobian) {
-      return unit_vector_constrain(this->read<Ret>(sizes...), lp);
+      return math::eval(unit_vector_constrain(this->read<Ret>(sizes...), lp));
     } else {
-      return unit_vector_constrain(this->read<Ret>(sizes...));
+      return math::eval(unit_vector_constrain(this->read<Ret>(sizes...)));
     }
   }
 
@@ -923,6 +864,65 @@ class deserializer {
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
           this->read_cov_matrix<value_type_t<Ret>, Jacobian>(lp, sizes...));
+    }
+    return ret;
+  }
+
+  /**
+   * Return the next object transformed to be a (partial)
+   * correlation between -1 and 1, incrementing the specified
+   * reference with the log of the absolute Jacobian determinant.
+   *
+   * <p>See <code>stan::math::corr_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @param k Dimensions of matrix return type.
+   * @param lp The reference to the variable holding the log
+   * probability to increment.
+   */
+  template <typename Ret, bool Jacobian, typename LP,
+            require_not_std_vector_t<Ret>* = nullptr,
+            require_matrix_t<Ret>* = nullptr>
+  inline auto read_corr_matrix(LP& lp, Eigen::Index k) {
+    using stan::math::corr_matrix_constrain;
+    if (Jacobian) {
+      return corr_matrix_constrain(
+          this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2),
+          k, lp);
+    } else {
+      return corr_matrix_constrain(
+          this->read<conditional_var_val_t<Ret, vector_t>>((k * (k - 1)) / 2),
+          k);
+    }
+  }
+
+  /**
+   * Specialization of `read_corr` for `std::vector` return types.
+   *
+   * <p>See <code>stan::math::corr_constrain(T,T&)</code>.
+   *
+   * @tparam Ret The type to return.
+   * @tparam Jacobian Whether to increment the log of the absolute Jacobian
+   * determinant of the transform.
+   * @tparam LP Type of log probability.
+   * @tparam Sizes A parameter pack of integral types.
+   * @param lp The reference to the variable holding the log
+   * @param vecsize The size of the return vector.
+   * @param sizes Pack of integrals to use to construct the return's type.
+   * probability to increment.
+   * @return The next scalar transformed to a correlation.
+   */
+  template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
+  inline auto read_corr_matrix(LP& lp, const size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(
+          this->read_corr_matrix<value_type_t<Ret>, Jacobian>(lp, sizes...));
     }
     return ret;
   }
