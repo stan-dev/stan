@@ -237,7 +237,6 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, env.CXX, stanc3_bin_url())
-                        sh "cat make/local"
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
@@ -316,7 +315,8 @@ pipeline {
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
                       parameters: [string(name: 'stan_pr', value: stan_pr()),
-                                   string(name: 'math_pr', value: params.math_pr)])
+                                   string(name: 'math_pr', value: params.math_pr),
+                                   string(name: 'stanc3_bin_url', value: params.stanc3_bin_url])
             }
         }
         stage('Performance') {
