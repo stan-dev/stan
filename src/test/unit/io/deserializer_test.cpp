@@ -299,7 +299,7 @@ TEST(deserializer, zeroSizeVecs) {
 
 // out of memory
 
-/*TEST(deserializer, eos_exception) {
+TEST(deserializer, eos_exception) {
   std::vector<double> theta;
   theta.push_back(1.0);
   theta.push_back(2.0);
@@ -333,7 +333,7 @@ TEST(deserializer, zeroSizeVecs) {
   EXPECT_THROW(deserializer.read<Eigen::MatrixXd>(2, 2), std::runtime_error);
   EXPECT_THROW((deserializer.read<Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic>>(2, 2)), std::runtime_error);
   EXPECT_THROW(deserializer.read<std::vector<Eigen::MatrixXd>>(2, 3, 2), std::runtime_error);
-  }*/
+}
 
 // lb
 
