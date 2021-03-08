@@ -549,7 +549,7 @@ inline plain_type_t<EigMat> rvalue(EigMat&& x, const char* name,
  */
 template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(Mat&& x, const char* name, const Idx& row_idx,
-                   index_omni col_idx) {
+                   index_omni /*col_idx*/) {
   return rvalue(std::forward<Mat>(x), name, row_idx);
 }
 
@@ -651,15 +651,15 @@ inline auto rvalue(Mat&& x, const char* name, const Idx& row_idx,
  * @param[in] idx single index.
  * @return Result of indexing array.
  */
-template <typename StdVec, typename... Idxes,
+template <typename StdVec, typename... Idxs,
           require_std_vector_t<StdVec>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, index_uni idx1,
-                   const Idxes&... idxes) {
+                   const Idxs&... idxs) {
   math::check_range("array[uni, ...] index", name, v.size(), idx1.n_);
   if (std::is_rvalue_reference<StdVec>::value) {
-    return rvalue(std::move(v[idx1.n_ - 1]), name, idxes...);
+    return rvalue(std::move(v[idx1.n_ - 1]), name, idxs...);
   } else {
-    return rvalue(v[idx1.n_ - 1], name, idxes...);
+    return rvalue(v[idx1.n_ - 1], name, idxs...);
   }
 }
 
@@ -673,7 +673,7 @@ inline auto rvalue(StdVec&& v, const char* name, index_uni idx1,
  * @param[in] c Container of list elements.
  * @param[in] name String form of expression being evaluated.
  * @param[in] idx1 single index
- * @param[in] idxes remaining indices
+ * @param[in] idxs remaining indices
  * @return Result of indexing array.
  */
 template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
@@ -696,16 +696,16 @@ inline auto rvalue(StdVec&& v, const char* name, index_uni idx) {
  * @param[in] v Container of list elements.
  * @param[in] name String form of expression being evaluated.
  * @param[in] idx1 first index
- * @param[in] idxes remaining indices
+ * @param[in] idxs remaining indices
  * @return Result of indexing array.
  */
-template <typename StdVec, typename Idx1, typename... Idxes,
+template <typename StdVec, typename Idx1, typename... Idxs,
           require_std_vector_t<StdVec>* = nullptr,
           require_not_same_t<Idx1, index_uni>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, Idx1 idx1,
-                   const Idxes&... idxes) {
+                   const Idxs&... idxs) {
   using inner_type = plain_type_t<decltype(
-      rvalue(v[rvalue_at(0, idx1) - 1], name, idxes...))>;
+      rvalue(v[rvalue_at(0, idx1) - 1], name, idxs...))>;
   std::vector<inner_type> result;
   const int index_size = rvalue_index_size(idx1, v.size());
   if (index_size > 0) {
@@ -715,9 +715,9 @@ inline auto rvalue(StdVec&& v, const char* name, Idx1 idx1,
     const int n = rvalue_at(i, idx1);
     math::check_range("array[..., ...] index", name, v.size(), n);
     if (std::is_rvalue_reference<StdVec>::value) {
-      result.emplace_back(rvalue(std::move(v[n - 1]), name, idxes...));
+      result.emplace_back(rvalue(std::move(v[n - 1]), name, idxs...));
     } else {
-      result.emplace_back(rvalue(v[n - 1], name, idxes...));
+      result.emplace_back(rvalue(v[n - 1], name, idxs...));
     }
   }
   return result;

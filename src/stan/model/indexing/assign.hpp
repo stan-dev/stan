@@ -209,7 +209,7 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name, index_max idx) {
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x, Vec2&& y, const char* name, index_omni) {
+inline void assign(Vec1&& x, Vec2&& y, const char* name, index_omni /* idx */) {
   stan::math::check_size_match("vector[omni] assign", "left hand side",
                                x.size(), name, y.size());
   x = std::forward<Vec2>(y);
@@ -288,7 +288,7 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
  */
 template <typename Mat1, typename Mat2,
           require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(Mat1&& x, Mat2&& y, const char* name, index_omni) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, index_omni /* idx */) {
   stan::math::check_size_match("matrix[omni] assign", "left hand side rows",
                                x.rows(), name, y.rows());
   stan::math::check_size_match("matrix[omni] assign", "left hand side columns",
@@ -655,7 +655,7 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(Mat1&& x, Mat2&& y, const char* name, const Idx& row_idx,
-                   index_omni) {
+                   index_omni /* idx */) {
   assign(x, std::forward<Mat2>(y), name, row_idx);
 }
 
@@ -800,17 +800,17 @@ inline void assign(T&& x, U&& y, const char* name) {
  * @param[in] y Value.
  * @param[in] name Name of variable
  * @param[in] idx1 uni index
- * @param[in] idxes Remaining indices
+ * @param[in] idxs Remaining indices
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions do not match in the
  * tail assignment.
  */
-template <typename StdVec, typename U, typename... Idxes,
+template <typename StdVec, typename U, typename... Idxs,
           require_std_vector_t<StdVec>* = nullptr>
 inline void assign(StdVec&& x, U&& y, const char* name, index_uni idx1,
-                   const Idxes&... idxes) {
+                   const Idxs&... idxs) {
   stan::math::check_range("vector[uni,...] assign", name, x.size(), idx1.n_);
-  assign(x[idx1.n_ - 1], std::forward<U>(y), name, idxes...);
+  assign(x[idx1.n_ - 1], std::forward<U>(y), name, idxs...);
 }
 
 /**
@@ -850,17 +850,17 @@ inline void assign(StdVec&& x, U&& y, const char* name, index_uni idx) {
  * @param[in] y Value.
  * @param[in] name Name of variable
  * @param[in] idx1 first index
- * @param[in] idxes Remaining indices
+ * @param[in] idxs Remaining indices
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the size of the multiple indexing
  * and size of first dimension of value do not match, or any of
  * the recursive tail assignment dimensions do not match.
  */
-template <typename T, typename Idx1, typename... Idxes, typename U,
+template <typename T, typename Idx1, typename... Idxs, typename U,
           require_all_std_vector_t<T, U>* = nullptr,
           require_not_same_t<Idx1, index_uni>* = nullptr>
 inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
-                   const Idxes&... idxes) {
+                   const Idxs&... idxs) {
   int x_idx_size = rvalue_index_size(idx1, x.size());
   stan::math::check_size_match("vector[multi,...] assign", "left hand side",
                                x_idx_size, name, y.size());
@@ -868,9 +868,9 @@ inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
     int i = rvalue_at(n, idx1);
     stan::math::check_range("vector[multi,...] assign", name, x.size(), i);
     if (std::is_rvalue_reference<U>::value) {
-      assign(x[i - 1], std::move(y[n]), name, idxes...);
+      assign(x[i - 1], std::move(y[n]), name, idxs...);
     } else {
-      assign(x[i - 1], y[n], name, idxes...);
+      assign(x[i - 1], y[n], name, idxs...);
     }
   }
 }
