@@ -4,9 +4,9 @@ import org.stan.Utils
 def utils = new org.stan.Utils()
 def skipRemainingStages = false
 
-def setupCXX(failOnError = true, CXX = env.CXX, stanc3_bin_url = 'nightly') {
+def setupCXX(failOnError = true, CXX = env.CXX, stanc3_bin_url = "nightly") {
     errorStr = failOnError ? "-Werror " : ""
-    stanc3_bin_url_str = stanc3_bin_url != 'nightly' ? "\nSTANC3_TEST_BIN_URL=${stanc3_bin_url}\n" : ""
+    stanc3_bin_url_str = stanc3_bin_url != "nightly" ? "\nSTANC3_TEST_BIN_URL=${stanc3_bin_url}\n" : ""
     writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}${stanc3_bin_url_str}")
 }
 
@@ -214,6 +214,8 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
+                        debugurl = stanc3_bin_url()
+                        sh "echo '${debugurl}'"
                         setupCXX(true, env.GCC, stanc3_bin_url = stanc3_bin_url())
                         sh "g++ --version"
                         runTests("src/test/unit")
