@@ -214,8 +214,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.CXX, stanc3_bin_url())
-                        sh "cat make/local"
+                        setupCXX(true, env.GCC, stanc3_bin_url())
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
