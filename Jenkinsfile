@@ -6,7 +6,7 @@ def skipRemainingStages = false
 
 def setupCXX(failOnError = true, CXX = env.CXX, stanc3_bin_url = 'nightly') {
     errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}\n")
+    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
     if (stanc3_bin_url != 'nightly') {
         writeFile(file: "make/local", text: "STANC3_TEST_BIN_URL=${stanc3_bin_url}\n")
     }    
