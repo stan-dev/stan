@@ -56,7 +56,7 @@ pipeline {
         string(defaultValue: '', name: 'math_pr', description: "Leave blank "
                 + "unless testing against a specific math repo pull request, "
                 + "e.g. PR-640.")
-        string(defaultValue: 'downstream_tests', name: '3',
+        string(defaultValue: 'downstream_tests', name: 'cmdstan_pr',
           description: 'PR to test CmdStan upstream against e.g. PR-630')
         string(defaultValue: 'nightly', name: 'stanc3_bin_url',
           description: 'Custom stanc3 binary url')
@@ -214,7 +214,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.GCC, stanc3_bin_url())
+                        setupCXX(true, env.GCC, ${stanc3_bin_url()})
                         sh "cat make/local"
                         runTests("src/test/unit")
                     }
