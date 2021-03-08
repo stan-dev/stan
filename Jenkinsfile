@@ -223,7 +223,7 @@ pipeline {
                     agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false, stanc3_bin_url = params.stanc3_bin_url)
+                        setupCXX(false, env.GCC, stanc3_bin_url = params.stanc3_bin_url)
                         sh "cat make/local"
                         runTests("src/test/unit")
                     }
