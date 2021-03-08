@@ -138,7 +138,8 @@ TEST(deserializer_row_vector, complex_read) {
     double x = deserializer.read<double>();
     EXPECT_FLOAT_EQ(static_cast<double>(i), x);
   }
-  using complex_row_vec = Eigen::Matrix<std::complex<double>, 1, Eigen::Dynamic>;
+  using complex_row_vec
+      = Eigen::Matrix<std::complex<double>, 1, Eigen::Dynamic>;
   complex_row_vec y = deserializer.read<complex_row_vec>(4);
   EXPECT_EQ(1, y.rows());
   EXPECT_EQ(4, y.cols());
@@ -218,8 +219,7 @@ TEST(deserializer_array, read) {
     double x = deserializer.read<double>();
     EXPECT_FLOAT_EQ(static_cast<double>(i), x);
   }
-  std::vector<double> y
-    = deserializer.read<std::vector<double>>(4);
+  std::vector<double> y = deserializer.read<std::vector<double>>(4);
   EXPECT_EQ(4, y.size());
   EXPECT_FLOAT_EQ(7.0, y[0]);
   EXPECT_FLOAT_EQ(8.0, y[1]);
@@ -262,7 +262,7 @@ TEST(deserializer_array, read_vector) {
     theta.push_back(static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   std::vector<Eigen::VectorXd> y
-    = deserializer.read<std::vector<Eigen::VectorXd>>(4, 2);
+      = deserializer.read<std::vector<Eigen::VectorXd>>(4, 2);
   EXPECT_EQ(4, y.size());
   EXPECT_FLOAT_EQ(0.0, y[0](0));
   EXPECT_FLOAT_EQ(1.0, y[0](1));
@@ -522,9 +522,11 @@ TEST(deserializer_vector, unit_vector_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  Eigen::VectorXd reference = stan::math::unit_vector_constrain(stan::math::to_vector(theta));
-  Eigen::VectorXd phi(deserializer.read_unit_vector<Eigen::VectorXd, false>(lp, 4));
-  for(size_t i = 0; i < phi.size(); ++i) {
+  Eigen::VectorXd reference
+      = stan::math::unit_vector_constrain(stan::math::to_vector(theta));
+  Eigen::VectorXd phi(
+      deserializer.read_unit_vector<Eigen::VectorXd, false>(lp, 4));
+  for (size_t i = 0; i < phi.size(); ++i) {
     EXPECT_FLOAT_EQ(reference(i), phi[i]);
   }
 }
@@ -539,9 +541,11 @@ TEST(deserializer_vector, unit_vector_jacobian) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0.0;
   double lp_ref = 0.0;
-  Eigen::VectorXd reference = stan::math::unit_vector_constrain(stan::math::to_vector(theta), lp_ref);
-  Eigen::VectorXd phi(deserializer.read_unit_vector<Eigen::VectorXd, true>(lp, 4));
-  for(size_t i = 0; i < phi.size(); ++i) {
+  Eigen::VectorXd reference
+      = stan::math::unit_vector_constrain(stan::math::to_vector(theta), lp_ref);
+  Eigen::VectorXd phi(
+      deserializer.read_unit_vector<Eigen::VectorXd, true>(lp, 4));
+  for (size_t i = 0; i < phi.size(); ++i) {
     EXPECT_FLOAT_EQ(reference(i), phi[i]);
   }
   EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -558,9 +562,10 @@ TEST(deserializer_vector, simplex_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  Eigen::VectorXd reference = stan::math::simplex_constrain(stan::math::to_vector(theta));
+  Eigen::VectorXd reference
+      = stan::math::simplex_constrain(stan::math::to_vector(theta));
   Eigen::VectorXd phi(deserializer.read_simplex<Eigen::VectorXd, false>(lp, 4));
-  for(size_t i = 0; i < phi.size(); ++i) {
+  for (size_t i = 0; i < phi.size(); ++i) {
     EXPECT_FLOAT_EQ(reference(i), phi[i]);
   }
 }
@@ -575,9 +580,10 @@ TEST(deserializer_vector, simplex_jacobian) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0.0;
   double lp_ref = 0.0;
-  Eigen::VectorXd reference = stan::math::simplex_constrain(stan::math::to_vector(theta), lp_ref);
+  Eigen::VectorXd reference
+      = stan::math::simplex_constrain(stan::math::to_vector(theta), lp_ref);
   Eigen::VectorXd phi(deserializer.read_simplex<Eigen::VectorXd, true>(lp, 4));
-  for(size_t i = 0; i < phi.size(); ++i) {
+  for (size_t i = 0; i < phi.size(); ++i) {
     EXPECT_FLOAT_EQ(reference(i), phi[i]);
   }
   EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -684,9 +690,11 @@ TEST(deserializer_matrix, cholesky_factor_cov_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  Eigen::MatrixXd reference =
-    stan::math::cholesky_factor_constrain(stan::math::to_vector(theta).segment(0, 6), 3, 3);
-  Eigen::MatrixXd L(deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, false>(lp, 3U, 3U));
+  Eigen::MatrixXd reference = stan::math::cholesky_factor_constrain(
+      stan::math::to_vector(theta).segment(0, 6), 3, 3);
+  Eigen::MatrixXd L(
+      deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, false>(lp, 3U,
+                                                                    3U));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
   EXPECT_EQ(9, L.size());
@@ -702,9 +710,10 @@ TEST(deserializer_matrix, cholesky_factor_cov_jacobian) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp_ref = 0.0;
   double lp = 0.0;
-  Eigen::MatrixXd reference =
-    stan::math::cholesky_factor_constrain(stan::math::to_vector(theta).segment(0, 6), 3, 3, lp_ref);
-  Eigen::MatrixXd L(deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, true>(lp, 3U, 3U));
+  Eigen::MatrixXd reference = stan::math::cholesky_factor_constrain(
+      stan::math::to_vector(theta).segment(0, 6), 3, 3, lp_ref);
+  Eigen::MatrixXd L(
+      deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, true>(lp, 3U, 3U));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
   EXPECT_EQ(9, L.size());
@@ -720,9 +729,11 @@ TEST(deserializer_matrix, cholesky_factor_cov_constrain_non_square) {
     theta.push_back(-static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  Eigen::MatrixXd reference =
-    stan::math::cholesky_factor_constrain(stan::math::to_vector(theta).segment(0, 5), 3, 2);
-  Eigen::MatrixXd L(deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, false>(lp, 3U, 2U));
+  Eigen::MatrixXd reference = stan::math::cholesky_factor_constrain(
+      stan::math::to_vector(theta).segment(0, 5), 3, 2);
+  Eigen::MatrixXd L(
+      deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, false>(lp, 3U,
+                                                                    2U));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(2, L.cols());
   EXPECT_EQ(6, L.size());
@@ -738,9 +749,10 @@ TEST(deserializer_matrix, cholesky_factor_cov_jacobian_non_square) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp_ref = 0.0;
   double lp = 0.0;
-  Eigen::MatrixXd reference =
-    stan::math::cholesky_factor_constrain(stan::math::to_vector(theta).segment(0, 5), 3, 2, lp_ref);
-  Eigen::MatrixXd L(deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, true>(lp, 3U, 2U));
+  Eigen::MatrixXd reference = stan::math::cholesky_factor_constrain(
+      stan::math::to_vector(theta).segment(0, 5), 3, 2, lp_ref);
+  Eigen::MatrixXd L(
+      deserializer.read_cholesky_factor_cov<Eigen::MatrixXd, true>(lp, 3U, 2U));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(2, L.cols());
   EXPECT_EQ(6, L.size());
@@ -758,8 +770,10 @@ TEST(deserializer_matrix, cholesky_factor_corr_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  Eigen::MatrixXd reference = stan::math::cholesky_corr_constrain(stan::math::to_vector(theta).segment(0, 3), 3);
-  Eigen::MatrixXd L(deserializer.read_cholesky_factor_corr<Eigen::MatrixXd, false>(lp, 3U));
+  Eigen::MatrixXd reference = stan::math::cholesky_corr_constrain(
+      stan::math::to_vector(theta).segment(0, 3), 3);
+  Eigen::MatrixXd L(
+      deserializer.read_cholesky_factor_corr<Eigen::MatrixXd, false>(lp, 3U));
   EXPECT_NO_THROW(stan::math::check_cholesky_factor_corr(
       "test_cholesky_factor_corr_constrain", "L", L));
   EXPECT_EQ(3, L.rows());
@@ -777,8 +791,10 @@ TEST(deserializer_matrix, cholesky_factor_corr_jacobian) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp_ref = 0.0;
   double lp = 0.0;
-  Eigen::MatrixXd reference = stan::math::cholesky_corr_constrain(stan::math::to_vector(theta).segment(0, 3), 3, lp_ref);
-  Eigen::MatrixXd L(deserializer.read_cholesky_factor_corr<Eigen::MatrixXd, true>(lp, 3U));
+  Eigen::MatrixXd reference = stan::math::cholesky_corr_constrain(
+      stan::math::to_vector(theta).segment(0, 3), 3, lp_ref);
+  Eigen::MatrixXd L(
+      deserializer.read_cholesky_factor_corr<Eigen::MatrixXd, true>(lp, 3U));
   EXPECT_NO_THROW(stan::math::check_cholesky_factor_corr(
       "test_cholesky_factor_corr_constrain", "L", L));
   EXPECT_EQ(3, L.rows());
@@ -798,8 +814,10 @@ TEST(deserializer_matrix, cov_matrix_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  Eigen::MatrixXd reference = stan::math::cov_matrix_constrain(stan::math::to_vector(theta).segment(0, 6), 3);
-  Eigen::MatrixXd L(deserializer.read_cov_matrix<Eigen::MatrixXd, false>(lp, 3U));
+  Eigen::MatrixXd reference = stan::math::cov_matrix_constrain(
+      stan::math::to_vector(theta).segment(0, 6), 3);
+  Eigen::MatrixXd L(
+      deserializer.read_cov_matrix<Eigen::MatrixXd, false>(lp, 3U));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
   EXPECT_EQ(9, L.size());
@@ -815,8 +833,10 @@ TEST(deserializer_matrix, cov_matrix_jacobian) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp_ref = 0.0;
   double lp = 0.0;
-  Eigen::MatrixXd reference = stan::math::cov_matrix_constrain(stan::math::to_vector(theta).segment(0, 6), 3, lp_ref);
-  Eigen::MatrixXd L(deserializer.read_cov_matrix<Eigen::MatrixXd, true>(lp, 3U));
+  Eigen::MatrixXd reference = stan::math::cov_matrix_constrain(
+      stan::math::to_vector(theta).segment(0, 6), 3, lp_ref);
+  Eigen::MatrixXd L(
+      deserializer.read_cov_matrix<Eigen::MatrixXd, true>(lp, 3U));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
   EXPECT_EQ(9, L.size());
@@ -834,8 +854,10 @@ TEST(deserializer_matrix, corr_matrix_constrain) {
     theta.push_back(-static_cast<double>(i));
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp = 0;
-  Eigen::MatrixXd reference = stan::math::corr_matrix_constrain(stan::math::to_vector(theta).segment(0, 3), 3);
-  Eigen::MatrixXd L(deserializer.read_corr_matrix<Eigen::MatrixXd, false>(lp, 3U));
+  Eigen::MatrixXd reference = stan::math::corr_matrix_constrain(
+      stan::math::to_vector(theta).segment(0, 3), 3);
+  Eigen::MatrixXd L(
+      deserializer.read_corr_matrix<Eigen::MatrixXd, false>(lp, 3U));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
   EXPECT_EQ(9, L.size());
@@ -851,8 +873,10 @@ TEST(deserializer_matrix, corr_matrix_jacobian) {
   stan::io::deserializer<double> deserializer(theta, theta_i);
   double lp_ref = 0.0;
   double lp = 0.0;
-  Eigen::MatrixXd reference = stan::math::corr_matrix_constrain(stan::math::to_vector(theta).segment(0, 3), 3, lp_ref);
-  Eigen::MatrixXd L(deserializer.read_corr_matrix<Eigen::MatrixXd, true>(lp, 3U));
+  Eigen::MatrixXd reference = stan::math::corr_matrix_constrain(
+      stan::math::to_vector(theta).segment(0, 3), 3, lp_ref);
+  Eigen::MatrixXd L(
+      deserializer.read_corr_matrix<Eigen::MatrixXd, true>(lp, 3U));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
   EXPECT_EQ(9, L.size());
