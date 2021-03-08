@@ -33,6 +33,7 @@ def deleteDirWin() {
     deleteDir()
 }
 
+String stanc3_bin_url() { params.stanc3_bin_url ?: "nightly" }
 String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
 String stan_pr() {
     if (env.BRANCH_NAME == 'downstream_tests') {
@@ -204,7 +205,7 @@ pipeline {
                             unstash 'StanSetup'
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             bat "mingw32-make -j${env.PARALLEL} test-headers"
-                            setupCXX(false, stanc3_bin_url = params.stanc3_bin_url)
+                            setupCXX(false, stanc3_bin_url = stanc3_bin_url())
                             runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
@@ -213,7 +214,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.GCC, stanc3_bin_url = params.stanc3_bin_url)
+                        setupCXX(true, env.GCC, stanc3_bin_url = stanc3_bin_url())
                         sh "g++ --version"
                         runTests("src/test/unit")
                     }
@@ -223,7 +224,7 @@ pipeline {
                     agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false, env.GCC, stanc3_bin_url = params.stanc3_bin_url)
+                        setupCXX(false, env.GCC, stanc3_bin_url = stanc3_bin_url())
                         sh "cat make/local"
                         runTests("src/test/unit")
                     }
@@ -237,7 +238,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.GCC, stanc3_bin_url = params.stanc3_bin_url)
+                        setupCXX(true, env.GCC, stanc3_bin_url = stanc3_bin_url())
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
@@ -281,7 +282,7 @@ pipeline {
                     agent any
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(stanc3_bin_url = params.stanc3_bin_url)
+                        setupCXX(stanc3_bin_url = stanc3_bin_url())
                         script {
                             dir("lib/stan_math/") {
                                 sh "echo O=0 > make/local"
@@ -328,7 +329,7 @@ pipeline {
             agent { label 'oldimac' }
             steps {
                 unstash 'StanSetup'
-                setupCXX(stanc3_bin_url = params.stanc3_bin_url)
+                setupCXX(stanc3_bin_url = stanc3_bin_url())
                 sh """
                     ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance
