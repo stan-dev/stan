@@ -214,7 +214,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.GCC, ${stanc3_bin_url()})
+                        setupCXX(true, env.GCC, "${stanc3_bin_url()}")
                         sh "cat make/local"
                         runTests("src/test/unit")
                     }
