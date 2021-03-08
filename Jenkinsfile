@@ -223,8 +223,8 @@ pipeline {
                     agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
-                        sh "cat make/local"
                         setupCXX(false, stanc3_bin_url = params.stanc3_bin_url)
+                        sh "cat make/local"
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
