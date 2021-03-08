@@ -4,9 +4,12 @@ import org.stan.Utils
 def utils = new org.stan.Utils()
 def skipRemainingStages = false
 
-def setupCXX(failOnError = true, CXX = env.CXX) {
+def setupCXX(failOnError = true, CXX = env.CXX, stanc3_bin_url = 'nightly') {
     errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
+    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}\n")
+    if (stanc3_bin_url != 'nightly') {
+        writeFile(file: "make/local", text: "STANC3_TEST_BIN_URL=${stanc3_bin_url}\n")
+    }    
 }
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
@@ -201,15 +204,9 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCXX()
-                            script {
-                               if (params.stanc3_bin_url != 'nightly') {
-                                  bat "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
-                               }
-                            }
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             bat "mingw32-make -j${env.PARALLEL} test-headers"
-                            setupCXX(false)
+                            setupCXX(false, stanc3_bin_url = params.stanc3_bin_url)
                             runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
@@ -218,12 +215,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
-                        script{ 
-                            if (params.stanc3_bin_url != 'nightly') {
-                                sh "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
-                            }
-                        }
+                        setupCXX(true, env.GCC, stanc3_bin_url = params.stanc3_bin_url)
                         sh "g++ --version"
                         runTests("src/test/unit")
                     }
@@ -233,12 +225,7 @@ pipeline {
                     agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false)
-                        script{
-                            if (params.stanc3_bin_url != 'nightly') {
-                                sh "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
-                            }
-                        }
+                        setupCXX(false, stanc3_bin_url = params.stanc3_bin_url)
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -251,12 +238,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
-                        script {
-                            if (params.stanc3_bin_url != 'nightly') {
-                               sh "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
-                            }
-                        }
+                        setupCXX(true, env.GCC, stanc3_bin_url = params.stanc3_bin_url)
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
@@ -300,12 +282,7 @@ pipeline {
                     agent any
                     steps {
                         unstash 'StanSetup'
-                        setupCXX()
-                        script {
-                            if (params.stanc3_bin_url != 'nightly') {
-                                sh "echo '\nSTANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local"
-                            }
-                        }
+                        setupCXX(stanc3_bin_url = params.stanc3_bin_url)
                         script {
                             dir("lib/stan_math/") {
                                 sh "echo O=0 > make/local"
@@ -352,7 +329,7 @@ pipeline {
             agent { label 'oldimac' }
             steps {
                 unstash 'StanSetup'
-                setupCXX()
+                setupCXX(stanc3_bin_url = params.stanc3_bin_url)
                 sh """
                     ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance
