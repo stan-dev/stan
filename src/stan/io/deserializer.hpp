@@ -39,7 +39,7 @@ class deserializer {
   size_t pos_i_{0};  // current position in map of integers.
 
   /**
-   * Return pointer to current scalar and incriment the internal counter.
+   * Return reference to current scalar and increment the internal counter.
    * @param m amount to move `pos_r_` up.
    */
   inline T& scalar_ptr_increment(size_t m) {
@@ -150,8 +150,9 @@ class deserializer {
   template <typename Ret, require_complex_t<Ret>* = nullptr>
   inline auto read() {
     check_r_capacity(2);
-    return std::complex<T>{map_r_.coeffRef(pos_r_++),
-                           map_r_.coeffRef(pos_r_++)};
+    auto real = scalar_ptr_increment(1);
+    auto imag = scalar_ptr_increment(1);
+    return std::complex<T>{real, imag};
   }
 
   /**
@@ -195,8 +196,9 @@ class deserializer {
       check_r_capacity(2 * m);
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
-        ret.coeffRef(i) = std::complex<T>{map_r_.coeffRef(pos_r_++),
-                                          map_r_.coeffRef(pos_r_++)};
+	auto real = scalar_ptr_increment(1);
+	auto imag = scalar_ptr_increment(1);
+        ret.coeffRef(i) = std::complex<T>{real, imag};
       }
       return ret;
     }
@@ -232,8 +234,9 @@ class deserializer {
       check_r_capacity(2 * m);
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
-        ret.coeffRef(i) = std::complex<T>{map_r_.coeffRef(pos_r_++),
-                                          map_r_.coeffRef(pos_r_++)};
+	auto real = scalar_ptr_increment(1);
+	auto imag = scalar_ptr_increment(1);
+        ret.coeffRef(i) = std::complex<T>{real, imag};
       }
       return ret;
     }
@@ -271,8 +274,9 @@ class deserializer {
       check_r_capacity(2 * rows * cols);
       Ret ret(rows, cols);
       for (Eigen::Index i = 0; i < rows * cols; ++i) {
-        ret.coeffRef(i) = std::complex<T>{map_r_.coeffRef(pos_r_++),
-                                          map_r_.coeffRef(pos_r_++)};
+	auto real = scalar_ptr_increment(1);
+	auto imag = scalar_ptr_increment(1);
+        ret.coeffRef(i) = std::complex<T>{real, imag};
       }
       return ret;
     }
@@ -642,7 +646,6 @@ class deserializer {
    * @tparam Sizes A parameter pack of integral types.
    * @tparam LP Type of log probability.
    * @param lp The reference to the variable holding the log
-   * @param vecsize The size of the return vector.
    * @param sizes Pack of integrals to use to construct the return's type.
    * probability to increment.
    * @return Next positive_ordered vector of the specified size.
