@@ -48,10 +48,12 @@ class deserializer {
   }
 
   /**
-   * Check if there is anything left to read for scalars.
+   * Check there are at least m reals left to read
+   * @param m Number of reals to read
+   * @throws std::runtime_error if there aren't at least m reals left
    */
-  void check_r_capacity() const {
-    if (pos_r_ >= r_size_) {
+  void check_r_capacity(size_t m) const {
+    if (pos_r_ + m > r_size_) {
       []() STAN_COLD_PATH {
         throw std::runtime_error("no more scalars to read");
       }();
@@ -59,10 +61,12 @@ class deserializer {
   }
 
   /**
-   * Check if there is anything left to read for integers.
+   * Check there are at least m integers left to read
+   * @param m Number of integers to read
+   * @throws std::runtime_error if there aren't at least m integers left
    */
-  void check_i_capacity() const {
-    if (pos_i_ >= i_size_) {
+  void check_i_capacity(size_t m) const {
+    if (pos_i_ + m > i_size_) {
       []() STAN_COLD_PATH {
         throw std::runtime_error("no more integers to read");
       }();
@@ -134,13 +138,18 @@ class deserializer {
    */
   template <typename Ret, require_t<is_fp_or_ad<Ret>>* = nullptr>
   inline auto read() {
-    check_r_capacity();
+    check_r_capacity(1);
     return map_r_.coeffRef(pos_r_++);
   }
 
+  /**
+   * Construct a complex variable from the next two reals in the sequence
+   *
+   * @return Next complex value
+   */
   template <typename Ret, require_complex_t<Ret>* = nullptr>
   inline auto read() {
-    check_r_capacity();
+    check_r_capacity(2);
     return std::complex<T>{map_r_.coeffRef(pos_r_++),
                            map_r_.coeffRef(pos_r_++)};
   }
@@ -152,7 +161,7 @@ class deserializer {
    */
   template <typename Ret, require_integral_t<Ret>* = nullptr>
   inline auto read() {
-    check_i_capacity();
+    check_i_capacity(1);
     return map_i_.coeffRef(pos_i_++);
   }
 
@@ -167,6 +176,7 @@ class deserializer {
     if (unlikely(m == 0)) {
       return map_vector_t(nullptr, m);
     } else {
+      check_r_capacity(m);
       return map_vector_t(&scalar_ptr_increment(m), m);
     }
   }
@@ -182,6 +192,7 @@ class deserializer {
     if (unlikely(m == 0)) {
       return Ret(map_vector_t(nullptr, m));
     } else {
+      check_r_capacity(2 * m);
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
         ret.coeffRef(i) = std::complex<T>{map_r_.coeffRef(pos_r_++),
@@ -202,6 +213,7 @@ class deserializer {
     if (unlikely(m == 0)) {
       return map_row_vector_t(nullptr, m);
     } else {
+      check_r_capacity(m);
       return map_row_vector_t(&scalar_ptr_increment(m), m);
     }
   }
@@ -217,6 +229,7 @@ class deserializer {
     if (unlikely(m == 0)) {
       return Ret(map_row_vector_t(nullptr, m));
     } else {
+      check_r_capacity(2 * m);
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
         ret.coeffRef(i) = std::complex<T>{map_r_.coeffRef(pos_r_++),
@@ -238,6 +251,7 @@ class deserializer {
     if (rows == 0 || cols == 0) {
       return map_matrix_t(nullptr, rows, cols);
     } else {
+      check_r_capacity(rows * cols);
       return map_matrix_t(&scalar_ptr_increment(rows * cols), rows, cols);
     }
   }
@@ -254,6 +268,7 @@ class deserializer {
     if (rows == 0 || cols == 0) {
       return Ret(map_matrix_t(nullptr, rows, cols));
     } else {
+      check_r_capacity(2 * rows * cols);
       Ret ret(rows, cols);
       for (Eigen::Index i = 0; i < rows * cols; ++i) {
         ret.coeffRef(i) = std::complex<T>{map_r_.coeffRef(pos_r_++),
