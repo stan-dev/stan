@@ -1,6 +1,6 @@
 transformed data {
   real u;
-  matrix[3,3] m;
+  matrix[3, 3] m;
   row_vector[3] v;
   u = 2.1 / 3;
   u = 2 / 3.1;
@@ -14,7 +14,7 @@ parameters {
 transformed parameters {
   real xt;
   real ut;
-  matrix[3,3] mt;
+  matrix[3, 3] mt;
   row_vector[3] vt;
   xt = 2 / 3;
   ut = 2.1 / 3;
@@ -24,5 +24,6 @@ transformed parameters {
   vt = vt / mt;
 }
 model {
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
+

@@ -1,6 +1,9 @@
 functions {
   void foo_lp() {
-    print("lp__ = ", get_lp());
+    print("lp__ = ", target());
   }
 }
-model {}
+model {
+
+}
+

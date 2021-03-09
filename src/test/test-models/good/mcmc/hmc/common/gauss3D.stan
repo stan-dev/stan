@@ -1,7 +1,7 @@
 parameters {
-  real x[3];
+  array[3] real x;
 }
-
 model {
   x ~ normal(0, 1);
 }
+

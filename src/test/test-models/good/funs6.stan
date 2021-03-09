@@ -7,5 +7,6 @@ parameters {
   real y;
 }
 model {
-  foo(y) ~ normal(0,2);
+  foo(y) ~ normal(0, 2);
 }
+

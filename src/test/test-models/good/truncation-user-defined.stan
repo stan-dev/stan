@@ -1,7 +1,13 @@
 functions {
-  real foo_log(real y, real theta) { return 1; }
-  real foo_cdf_log(real y, real theta) { return 1; }
-  real foo_ccdf_log(real y, real theta) { return 1; }
+  real foo_lpdf(real y, real theta) {
+    return 1;
+  }
+  real foo_lcdf(real y, real theta) {
+    return 1;
+  }
+  real foo_lccdf(real y, real theta) {
+    return 1;
+  }
 }
 data {
   real y;
@@ -16,3 +22,4 @@ model {
   y ~ foo(theta) T[ , U];
   y ~ foo(theta) T[L, U];
 }
+

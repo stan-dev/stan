@@ -6,4 +6,6 @@ parameters {
   real mu2;
 }
 model {
+
 }
+

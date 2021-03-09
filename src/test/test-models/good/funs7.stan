@@ -8,9 +8,10 @@ functions {
 parameters {
   real y;
 }
-transformed parameters{
+transformed parameters {
   real z = foo(y);
 }
 model {
   y ~ normal(0, 1);
 }
+

@@ -9,3 +9,4 @@ parameters {
 model {
   y ~ bar_baz(3.2);
 }
+

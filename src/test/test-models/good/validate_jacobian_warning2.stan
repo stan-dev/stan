@@ -2,5 +2,6 @@ parameters {
   real y;
 }
 model {
-  (y * y) ~ normal(0,1);
+  y * y ~ normal(0, 1);
 }
+

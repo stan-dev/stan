@@ -1,0 +1,38 @@
+name: Testing
+
+env:
+  clangppVersion: '6.0'
+
+on:
+  pull_request:
+    branches: [ develop, master ]
+  push:
+    branches: [ develop, master ]
+    paths-ignore:
+      - 'licenses/**'
+      - 'LICENSE.md'
+      - 'README.md'
+      - 'RELEASE-NOTES.txt'
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    name: run stan tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.8]
+      fail-fast: false
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v2
+        with:
+          submodules:  true
+      - name: Install clang++
+        run: sudo apt-get install clang-${{ env.clangppVersion }}++
+      - name: Run tests
+        run: |
+          echo "CXX=clang++-${{ env.clangppVersion }}" >> make/local
+          echo "O=0" >> make/local
+          python runTests.py -j 2 src/test/unit

@@ -2,5 +2,6 @@ parameters {
   real rejection;
 }
 model {
-  rejection ~ normal(0,1);
+  rejection ~ normal(0, 1);
 }
+

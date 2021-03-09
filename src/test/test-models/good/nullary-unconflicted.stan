@@ -12,7 +12,10 @@ parameters {
 transformed parameters {
   real mu;
   mu = e() + pi() + log2() + log10() + sqrt2() + not_a_number()
-    + positive_infinity() + negative_infinity() + machine_precision();
+       + positive_infinity() + negative_infinity() + machine_precision(
+       );
 }
 model {
+
 }
+

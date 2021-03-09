@@ -4,9 +4,10 @@ import org.stan.Utils
 def utils = new org.stan.Utils()
 def skipRemainingStages = false
 
-def setupCXX(failOnError = true, CXX = env.CXX) {
+def setupCXX(failOnError = true, CXX = env.CXX, String stanc3_bin_url = "nightly") {
     errorStr = failOnError ? "-Werror " : ""
-    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}")
+    stanc3_bin_url_str = stanc3_bin_url != "nightly" ? "\nSTANC3_TEST_BIN_URL=${stanc3_bin_url}\n" : ""
+    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}${stanc3_bin_url_str}")
 }
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
@@ -32,6 +33,7 @@ def deleteDirWin() {
     deleteDir()
 }
 
+String stanc3_bin_url() { params.stanc3_bin_url ?: "nightly" }
 String cmdstan_pr() { params.cmdstan_pr ?: "downstream_tests" }
 String stan_pr() {
     if (env.BRANCH_NAME == 'downstream_tests') {
@@ -56,6 +58,8 @@ pipeline {
                 + "e.g. PR-640.")
         string(defaultValue: 'downstream_tests', name: 'cmdstan_pr',
           description: 'PR to test CmdStan upstream against e.g. PR-630')
+        string(defaultValue: 'nightly', name: 'stanc3_bin_url',
+          description: 'Custom stanc3 binary url')
     }
     options {
         skipDefaultCheckout()
@@ -165,7 +169,7 @@ pipeline {
         stage('Verify changes') {
             agent { label 'linux' }
             steps {
-                script {         
+                script {
 
                     retry(3) { checkout scm }
                     sh 'git clean -xffd'
@@ -173,8 +177,8 @@ pipeline {
                     // These paths will be passed to git diff
                     // If there are changes to them, CI/CD will continue else skip
                     def paths = ['make', 'src/stan', 'src/test', 'Jenkinsfile', 'makefile', 'runTests.py',
-                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test', 
-                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile', 
+                        'lib/stan_math/stan', 'lib/stan_math/make', 'lib/stan_math/lib', 'lib/stan_math/test',
+                        'lib/stan_math/runTests.py', 'lib/stan_math/runChecks.py', 'lib/stan_math/makefile',
                         'lib/stan_math/Jenkinsfile', 'lib/stan_math/.clang-format'
                     ].join(" ")
 
@@ -199,10 +203,9 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCXX()
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             bat "mingw32-make -j${env.PARALLEL} test-headers"
-                            setupCXX(false)
+                            setupCXX(false, env.CXX, stanc3_bin_url())
                             runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
@@ -211,8 +214,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
-                        sh "g++ --version"
+                        setupCXX(true, env.GCC, stanc3_bin_url())
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -221,7 +223,7 @@ pipeline {
                     agent { label 'osx' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false)
+                        setupCXX(false, env.CXX, stanc3_bin_url())
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -234,14 +236,14 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.GCC)
+                        setupCXX(true, env.GCC, stanc3_bin_url())
                         runTests("src/test/integration", separateMakeStep=false)
                     }
                     post { always { deleteDir() } }
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
-                    when { 
+                    when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
                             env.BRANCH_NAME == "master" ) &&
@@ -256,12 +258,12 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Integration Windows') {
-                    agent { label 'windows' }
-                    when { 
-                        expression { 
+                    agent { label 'windows-ec2' }
+                    when {
+                        expression {
                             ( env.BRANCH_NAME == "develop" ||
                             env.BRANCH_NAME == "master" ) &&
-                            !skipRemainingStages 
+                            !skipRemainingStages
                         }
                     }
                     steps {
@@ -278,15 +280,15 @@ pipeline {
                     agent any
                     steps {
                         unstash 'StanSetup'
-                        setupCXX()
+                        setupCXX(true, env.CXX, stanc3_bin_url())
                         script {
                             dir("lib/stan_math/") {
                                 sh "echo O=0 > make/local"
-                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                withEnv(['PATH+TBB=./lib/tbb']) {
                                     try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
                                     finally { junit 'test/**/*.xml' }
                                 }
-                                withEnv(['PATH+TBB=./lib/tbb']) {           
+                                withEnv(['PATH+TBB=./lib/tbb']) {
                                     sh "python ./test/expressions/test_expression_testing_framework.py"
                                 }
                             }
@@ -302,13 +304,13 @@ pipeline {
             }
         }
         stage('Upstream CmdStan tests') {
-            when { 
-                    expression { 
+            when {
+                    expression {
                         ( env.BRANCH_NAME ==~ /PR-\d+/ ||
                         env.BRANCH_NAME == "downstream_tests" ||
                         env.BRANCH_NAME == "downstream_hotfix" ) &&
-                        !skipRemainingStages 
-                    } 
+                        !skipRemainingStages
+                    }
                 }
             steps {
                 build(job: "CmdStan/${cmdstan_pr()}",
@@ -325,7 +327,7 @@ pipeline {
             agent { label 'oldimac' }
             steps {
                 unstash 'StanSetup'
-                setupCXX()
+                setupCXX(true, env.CXX, stanc3_bin_url())
                 sh """
                     ./runTests.py -j${env.PARALLEL} src/test/performance
                     cd test/performance

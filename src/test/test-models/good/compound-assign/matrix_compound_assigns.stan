@@ -7,36 +7,29 @@ generated quantities {
   print("ident ", ident);
   z *= x;
   print("z *= x ", z);
-
   z = [[1, 2], [4, 5]];
   z += x;
   print("z += x ", z);
-
   z = [[1, 2], [4, 5]];
   z -= x;
   print("z -= x ", z);
-
   z = [[1, 2], [4, 5]];
   z /= x;
   print("z /= x ", z);
-
   z = [[1, 2], [4, 5]];
   z *= ident;
   print("z *= ident ", z);
-
   z = [[1, 2], [4, 5]];
   z .*= ident;
   print("z .*= ident ", z);
-
   z = [[1, 2], [4, 5]];
   z += ident;
   print("z += ident ", z);
-
   z = [[1, 2], [4, 5]];
   z -= ident;
   print("z -= ident ", z);
-
   z = [[1, 2], [4, 5]];
   z ./= ident;
   print("z ./= ident ", z);
 }
+

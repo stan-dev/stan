@@ -1,12 +1,13 @@
 functions {
   void foo(real x) {
-    print("x=",x);
-  } 
+    print("x=", x);
+  }
 }
 parameters {
   real y;
 }
 model {
   foo(y);
-  y ~ normal(0,1);
+  y ~ normal(0, 1);
 }
+

@@ -1,11 +1,12 @@
 functions {
-  real unit_normal_log(real y) {
-    return normal_log(y,0,1); 
-  } 
+  real unit_normal_lpdf(real y) {
+    return normal_lpdf(y| 0, 1);
+  }
 }
 parameters {
   real y;
 }
 model {
-  increment_log_prob(unit_normal_log(y));
+  target += unit_normal_lpdf(y| );
 }
+

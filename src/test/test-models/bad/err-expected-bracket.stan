@@ -1,3 +1,0 @@
-model {
-}
-generated quantities 
