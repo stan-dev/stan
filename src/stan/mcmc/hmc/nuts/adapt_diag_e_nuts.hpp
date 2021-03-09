@@ -35,7 +35,7 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
           = this->var_adaptation_.learn_variance(inv_metric, this->z_.q);
 
       if (update) {
-        this->z_.set_inv_metric(inv_metric);
+        this->z_.set_inv_metric(std::move(inv_metric));
 
         this->init_stepsize(logger);
 

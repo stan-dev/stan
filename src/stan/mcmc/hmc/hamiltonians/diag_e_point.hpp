@@ -34,12 +34,8 @@ class diag_e_point : public ps_point {
    *
    * @param inv_e_metric initial mass matrix
    */
-  void set_inv_metric(const Eigen::VectorXd& inv_e_metric) {
-    math::check_size_match(
-        "set_inv_metric", "Number of rows in old inverse metric",
-        inv_e_metric_.size(), "number of rows in new inverse metric",
-        inv_e_metric.size());
-    inv_e_metric_ = inv_e_metric;
+  void set_inv_metric(Eigen::VectorXd&& inv_e_metric) {
+    inv_e_metric_ = std::forward<Eigen::VectorXd>(inv_e_metric);
   }
 
   /**

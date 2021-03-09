@@ -37,7 +37,7 @@ class adapt_dense_e_static_uniform
           = this->covar_adaptation_.learn_covariance(inv_metric, this->z_.q);
 
       if (update) {
-        this->z_.set_inv_metric(inv_metric);
+        this->z_.set_inv_metric(std::move(inv_metric));
 
         this->init_stepsize(logger);
 
