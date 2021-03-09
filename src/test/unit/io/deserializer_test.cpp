@@ -338,69 +338,68 @@ TEST(deserializer, eos_exception) {
 
   {
     std::vector<double> theta(1);
-    stan::io::deserializer<double> deserializer(theta, theta_i);    
+    stan::io::deserializer<double> deserializer(theta, theta_i);
     EXPECT_THROW(deserializer.read<Eigen::VectorXd>(2), std::runtime_error);
   }
 
   {
     std::vector<double> theta(3);
-    stan::io::deserializer<double> deserializer(theta, theta_i);    
+    stan::io::deserializer<double> deserializer(theta, theta_i);
     EXPECT_THROW(
-      (deserializer
-           .read<Eigen::Matrix<std::complex<double>, Eigen::Dynamic, 1>>(2)),
-      std::runtime_error);
+        (deserializer
+             .read<Eigen::Matrix<std::complex<double>, Eigen::Dynamic, 1>>(2)),
+        std::runtime_error);
   }
 
   {
     std::vector<double> theta(5);
-    stan::io::deserializer<double> deserializer(theta, theta_i);    
+    stan::io::deserializer<double> deserializer(theta, theta_i);
     EXPECT_THROW(deserializer.read<std::vector<Eigen::VectorXd>>(3, 2),
-		 std::runtime_error);
+                 std::runtime_error);
   }
 
   {
     std::vector<double> theta(1);
-    stan::io::deserializer<double> deserializer(theta, theta_i);    
+    stan::io::deserializer<double> deserializer(theta, theta_i);
     EXPECT_THROW(deserializer.read<Eigen::RowVectorXd>(2), std::runtime_error);
   }
 
   {
     std::vector<double> theta(3);
-    stan::io::deserializer<double> deserializer(theta, theta_i);    
+    stan::io::deserializer<double> deserializer(theta, theta_i);
     EXPECT_THROW(
-		 (deserializer
-		  .read<Eigen::Matrix<std::complex<double>, 1, Eigen::Dynamic>>(2)),
-		 std::runtime_error);
+        (deserializer
+             .read<Eigen::Matrix<std::complex<double>, 1, Eigen::Dynamic>>(2)),
+        std::runtime_error);
   }
 
   {
     std::vector<double> theta(5);
-    stan::io::deserializer<double> deserializer(theta, theta_i);    
+    stan::io::deserializer<double> deserializer(theta, theta_i);
     EXPECT_THROW(deserializer.read<std::vector<Eigen::RowVectorXd>>(3, 2),
-		 std::runtime_error);
+                 std::runtime_error);
   }
 
   {
     std::vector<double> theta(3);
-    stan::io::deserializer<double> deserializer(theta, theta_i);    
+    stan::io::deserializer<double> deserializer(theta, theta_i);
     EXPECT_THROW(deserializer.read<Eigen::MatrixXd>(2, 2), std::runtime_error);
   }
 
   {
     std::vector<double> theta(7);
-    stan::io::deserializer<double> deserializer(theta, theta_i);    
+    stan::io::deserializer<double> deserializer(theta, theta_i);
     EXPECT_THROW(
-		 (deserializer.read<
-		  Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic>>(
-										       2, 2)),
-		 std::runtime_error);
+        (deserializer.read<Eigen::Matrix<std::complex<double>, Eigen::Dynamic,
+                                         Eigen::Dynamic>>(2, 2)),
+        std::runtime_error);
   }
 
   {
     std::vector<double> theta(11);
-    stan::io::deserializer<double> deserializer(theta, theta_i);    
+    stan::io::deserializer<double> deserializer(theta, theta_i);
     EXPECT_THROW(deserializer.read<std::vector<Eigen::MatrixXd>>(2, 3, 2),
-		 std::runtime_error);
+                 std::runtime_error);
   }
 }
 
