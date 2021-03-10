@@ -196,8 +196,8 @@ class deserializer {
       check_r_capacity(2 * m);
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
-	auto real = scalar_ptr_increment(1);
-	auto imag = scalar_ptr_increment(1);
+        auto real = scalar_ptr_increment(1);
+        auto imag = scalar_ptr_increment(1);
         ret.coeffRef(i) = std::complex<T>{real, imag};
       }
       return ret;
@@ -234,8 +234,8 @@ class deserializer {
       check_r_capacity(2 * m);
       Ret ret(m);
       for (Eigen::Index i = 0; i < m; ++i) {
-	auto real = scalar_ptr_increment(1);
-	auto imag = scalar_ptr_increment(1);
+        auto real = scalar_ptr_increment(1);
+        auto imag = scalar_ptr_increment(1);
         ret.coeffRef(i) = std::complex<T>{real, imag};
       }
       return ret;
@@ -274,8 +274,8 @@ class deserializer {
       check_r_capacity(2 * rows * cols);
       Ret ret(rows, cols);
       for (Eigen::Index i = 0; i < rows * cols; ++i) {
-	auto real = scalar_ptr_increment(1);
-	auto imag = scalar_ptr_increment(1);
+        auto real = scalar_ptr_increment(1);
+        auto imag = scalar_ptr_increment(1);
         ret.coeffRef(i) = std::complex<T>{real, imag};
       }
       return ret;
