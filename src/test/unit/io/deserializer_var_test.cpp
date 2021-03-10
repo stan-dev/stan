@@ -24,8 +24,7 @@ TEST(deserializer_scalar, complex_read) {
   theta.push_back(3.0);
   theta.push_back(4.0);
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
-  std::complex<stan::math::var> x
-      = deserializer.read<std::complex<stan::math::var>>();
+  std::complex<stan::math::var> x = deserializer.read<std::complex<stan::math::var>>();
   EXPECT_FLOAT_EQ(1.0, x.real().val());
   EXPECT_FLOAT_EQ(2.0, x.imag().val());
   std::complex<stan::math::var> y
