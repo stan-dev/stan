@@ -946,10 +946,70 @@ class deserializer {
   }
 
   /**
+   * Unconstrain lower bounded variable
+   *
+   * @tparam S Type of lower bounded input
+   * @tparam L Type of lower bound
+   * @param y Lower bounded input
+   * @param lb Lower bound
+   * @return Unconstrained variable
+   */
+  template <typename S, typename L>
+  inline auto free_lb(const S& y, const L& lb) {
+    return stan::math::lb_free(y, lb);
+  }
+
+  /**
+   * Unconstrain upper bounded variable
+   *
+   * @tparam S Type of upper bounded input
+   * @tparam U Type of upper bound
+   * @param y Upper bounded input
+   * @param ub Upper bound
+   * @return Unconstrained variable
+   */
+  template <typename S, typename U>
+  inline auto free_ub(const S& y, const U& ub) {
+    return stan::math::ub_free(y, ub);
+  }
+
+  /**
+   * Unconstrain bounded variable
+   *
+   * @tparam S Type of bounded input
+   * @tparam L Type of lower bound
+   * @tparam U Type of upper bound
+   * @param y Upper bounded input
+   * @param lb Lower bound
+   * @param ub Upper bound
+   * @return Unconstrained variable
+   */
+  template <typename S, typename L, typename U>
+  inline auto free_lub(const S& y, const L& lb, const U& ub) {
+    return stan::math::lub_free(y, lb, ub);
+  }
+
+  /**
+   * Do inverse of offset-multiplier transform
+   *
+   * @tparam S Type of transformed input
+   * @tparam O Type of offset
+   * @tparam M Type of multiplier
+   * @param y Offset-multiplied input
+   * @param offset Offset
+   * @param multiplier Multiplier
+   * @return un-offset-multiplied variable
+   */
+  template <typename S, typename O, typename M>
+  inline auto free_offset_multiplier(const S& y, const O& offset, const M& multiplier) {
+    return stan::math::offset_multiplier_free(y, offset, multiplier);
+  }
+
+  /**
    * Unconstrain the unit vector y
    *
    * @tparam Vec Type of vector to free
-   * @return Freed unit vector
+   * @return Unconstrained vector
    * @throw std::domain_error if y is not unit vector
    */
   template <typename Vec,
@@ -962,16 +1022,233 @@ class deserializer {
    * Unconstrain all the unit vectors in the `std::vector` y
    *
    * @tparam T Type of input
-   * @return Freed unit vectors
+   * @return Unconstrained vectors
    * @throw std::domain_error if any vectors are not unit vectors
    */
-  template <typename T,
-            require_std_vector_t<T>* = nullptr>
-  inline auto free_unit_vector(const T& y) {
-    T ret;
+  template <typename S,
+            require_std_vector_t<S>* = nullptr>
+  inline auto free_unit_vector(const S& y) {
+    S ret;
     ret.reserve(y.size());
-    for (size_t i = 0; i < vecsize; ++i) {
+    for (size_t i = 0; i < y.size(); ++i) {
       ret.emplace_back(free_unit_vector(y[i]));
+    }
+    return ret;
+  }
+
+  /**
+   * Unconstrain the simplex vector y
+   *
+   * @tparam Vec Type of vector to free
+   * @return Unconstrained vector
+   * @throw std::domain_error if y is not a simplex
+   */
+  template <typename Vec,
+	    require_not_std_vector_t<Vec>* = nullptr>
+  inline auto free_simplex(const Vec& y) {
+    return stan::math::simplex_free(y);
+  }
+
+  /**
+   * Unconstrain all the simplices in the `std::vector` y
+   *
+   * @tparam T Type of input
+   * @return Unconstrained vectors
+   * @throw std::domain_error if any vectors are not simplices
+   */
+  template <typename S,
+            require_std_vector_t<S>* = nullptr>
+  inline auto free_simplex(const S& y) {
+    S ret;
+    ret.reserve(y.size());
+    for (size_t i = 0; i < y.size(); ++i) {
+      ret.emplace_back(free_simplex(y[i]));
+    }
+    return ret;
+  }
+
+  /**
+   * Unconstrain the ordered vector y
+   *
+   * @tparam Vec Type of vector to free
+   * @return Unconstrained vector
+   * @throw std::domain_error if y is not ordered
+   */
+  template <typename Vec,
+	    require_not_std_vector_t<Vec>* = nullptr>
+  inline auto free_ordered(const Vec& y) {
+    return stan::math::ordered_free(y);
+  }
+
+  /**
+   * Unconstrain all the ordered vectors in the `std::vector` y
+   *
+   * @tparam T Type of input
+   * @return Unconstrained vectors
+   * @throw std::domain_error if any vectors are not ordered
+   */
+  template <typename S,
+            require_std_vector_t<S>* = nullptr>
+  inline auto free_ordered(const S& y) {
+    S ret;
+    ret.reserve(y.size());
+    for (size_t i = 0; i < y.size(); ++i) {
+      ret.emplace_back(free_ordered(y[i]));
+    }
+    return ret;
+  }
+
+  /**
+   * Unconstrain the positive ordered vector y
+   *
+   * @tparam Vec Type of vector to free
+   * @return Unconstrained vector
+   * @throw std::domain_error if any vector in y is not a positive and ordered
+   */
+  template <typename Vec,
+	    require_not_std_vector_t<Vec>* = nullptr>
+  inline auto free_positive_ordered(const Vec& y) {
+    return stan::math::positive_ordered_free(y);
+  }
+
+  /**
+   * Unconstrain all the positive ordered vectors in the `std::vector` y
+   *
+   * @tparam T Type of input
+   * @return Unconstrained vectors
+   * @throw std::domain_error if any vectors are not postive and ordered
+   */
+  template <typename S,
+            require_std_vector_t<S>* = nullptr>
+  inline auto free_positive_ordered(const S& y) {
+    S ret;
+    ret.reserve(y.size());
+    for (size_t i = 0; i < y.size(); ++i) {
+      ret.emplace_back(free_positive_ordered(y[i]));
+    }
+    return ret;
+  }
+
+  /**
+   * Unconstrain the covariance cholesky factor y
+   *
+   * @tparam Mat Type of matrix to free
+   * @return Unconstrained vector
+   * @throw std::domain_error if y is not a valid cholesky factor
+   */
+  template <typename Mat,
+	    require_not_std_vector_t<Mat>* = nullptr>
+  inline auto free_cholesky_factor_cov(const Mat& y) {
+    return stan::math::cholesky_factor_free(y);
+  }
+
+  /**
+   * Unconstrain all the covariance cholesky factors in the `std::vector` y
+   *
+   * @tparam T Type of input
+   * @return Unconstrained vectors
+   * @throw std::domain_error if any vectors are not valid cholesky factors
+   */
+  template <typename S,
+            require_std_vector_t<S>* = nullptr>
+  inline auto free_cholesky_factor_cov(const S& y) {
+    std::vector<plain_type_t<decltype(free_cholesky_factor_cov(y[0]))>> ret;
+    ret.reserve(y.size());
+    for (size_t i = 0; i < y.size(); ++i) {
+      ret.emplace_back(free_cholesky_factor_cov(y[i]));
+    }
+    return ret;
+  }
+
+  /**
+   * Unconstrain the correlation matrix cholesky factor y
+   *
+   * @tparam Mat Type of matrix to free
+   * @return Unconstrained vector
+   * @throw std::domain_error if y is not a valid cholesky factor
+   */
+  template <typename Mat,
+	    require_not_std_vector_t<Mat>* = nullptr>
+  inline auto free_cholesky_factor_corr(const Mat& y) {
+    return stan::math::cholesky_corr_free(y);
+  }
+
+  /**
+   * Unconstrain all the correlation matrix cholesky factors in the `std::vector` y
+   *
+   * @tparam T Type of input
+   * @return Unconstrained vectors
+   * @throw std::domain_error if any matrices in y are not valid cholesky factors
+   */
+  template <typename S,
+            require_std_vector_t<S>* = nullptr>
+  inline auto free_cholesky_factor_corr(const S& y) {
+    std::vector<plain_type_t<decltype(free_cholesky_factor_corr(y[0]))>> ret;
+    ret.reserve(y.size());
+    for (size_t i = 0; i < y.size(); ++i) {
+      ret.emplace_back(free_cholesky_factor_corr(y[i]));
+    }
+    return ret;
+  }
+
+  /**
+   * Unconstrain the covariance matrix y
+   *
+   * @tparam Mat Type of matrix to free
+   * @return Unconstrained vector
+   * @throw std::invalid_argument if y is not square
+   */
+  template <typename Mat,
+	    require_not_std_vector_t<Mat>* = nullptr>
+  inline auto free_cov_matrix(const Mat& y) {
+    return stan::math::cov_matrix_free(y);
+  }
+
+  /**
+   * Unconstrain all the covariance matrices in the `std::vector` y
+   *
+   * @tparam T Type of input
+   * @return Unconstrained vectors
+   * @throw std::invalid_argument if any matrices are not square
+   */
+  template <typename S,
+            require_std_vector_t<S>* = nullptr>
+  inline auto free_cov_matrix(const S& y) {
+    std::vector<plain_type_t<decltype(free_cov_matrix(y[0]))>> ret;
+    ret.reserve(y.size());
+    for (size_t i = 0; i < y.size(); ++i) {
+      ret.emplace_back(free_cov_matrix(y[i]));
+    }
+    return ret;
+  }
+
+  /**
+   * Unconstrain the correlation matrix y
+   *
+   * @tparam Mat Type of matrix to free
+   * @return Unconstrained vector
+   * @throw std::invalid_argument if y is not square
+   */
+  template <typename Mat,
+	    require_not_std_vector_t<Mat>* = nullptr>
+  inline auto free_corr_matrix(const Mat& y) {
+    return stan::math::corr_matrix_free(y);
+  }
+
+  /**
+   * Unconstrain all the correlation matrices in the `std::vector` y
+   *
+   * @tparam T Type of input
+   * @return Unconstrained vectors
+   * @throw std::invalid_argument if any vectors are not square
+   */
+  template <typename S,
+            require_std_vector_t<S>* = nullptr>
+  inline auto free_corr_matrix(const S& y) {
+    std::vector<plain_type_t<decltype(free_corr_matrix(y[0]))>> ret;
+    ret.reserve(y.size());
+    for (size_t i = 0; i < y.size(); ++i) {
+      ret.emplace_back(free_corr_matrix(y[i]));
     }
     return ret;
   }
