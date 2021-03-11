@@ -331,6 +331,19 @@ class model_base : public prob_grad {
                                Eigen::VectorXd& params_r,
                                std::ostream* msgs) const = 0;
 
+   /**
+    * Read constrained parameter values from the specified context,
+    * unconstrain them, then concatenate the unconstrained sequences
+    * into the specified parameter sequence.  Output messages go to the
+    * specified stream.
+    *
+    * @param[in] context definitions of variable values
+    * @param[in,out] params_r unconstrained parameter values produced
+    * @param[in,out] msgs stream to which messages are written
+    */
+   virtual void transform_inits(Eigen::VectorXd& params_r,
+                                std::ostream* msgs) const = 0;
+
   /**
    * Convert the specified sequence of unconstrained parameters to a
    * sequence of constrained parameters, optionally including
