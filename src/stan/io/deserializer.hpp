@@ -944,6 +944,37 @@ class deserializer {
     }
     return ret;
   }
+
+  /**
+   * Unconstrain the unit vector y
+   *
+   * @tparam Vec Type of vector to free
+   * @return Freed unit vector
+   * @throw std::domain_error if y is not unit vector
+   */
+  template <typename Vec,
+	    require_not_std_vector_t<Vec>* = nullptr>
+  inline auto free_unit_vector(const Vec& y) {
+    return stan::math::unit_vector_free(y);
+  }
+
+  /**
+   * Unconstrain all the unit vectors in the `std::vector` y
+   *
+   * @tparam T Type of input
+   * @return Freed unit vectors
+   * @throw std::domain_error if any vectors are not unit vectors
+   */
+  template <typename T,
+            require_std_vector_t<T>* = nullptr>
+  inline auto free_unit_vector(const T& y) {
+    T ret;
+    ret.reserve(y.size());
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(free_unit_vector(y[i]));
+    }
+    return ret;
+  }
 };
 
 }  // namespace io
