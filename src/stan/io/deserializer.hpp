@@ -952,8 +952,7 @@ class deserializer {
    * @return Freed unit vector
    * @throw std::domain_error if y is not unit vector
    */
-  template <typename Vec,
-	    require_not_std_vector_t<Vec>* = nullptr>
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
   inline auto free_unit_vector(const Vec& y) {
     return stan::math::unit_vector_free(y);
   }
@@ -965,8 +964,7 @@ class deserializer {
    * @return Freed unit vectors
    * @throw std::domain_error if any vectors are not unit vectors
    */
-  template <typename T,
-            require_std_vector_t<T>* = nullptr>
+  template <typename T, require_std_vector_t<T>* = nullptr>
   inline auto free_unit_vector(const T& y) {
     T ret;
     ret.reserve(y.size());
