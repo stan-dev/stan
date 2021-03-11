@@ -18,19 +18,14 @@ TEST(deserializer_vector, lb_free) {
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::VectorXd> std_vec = { vec1, vec2 },
-    std_vec_bad = { vec1, vec_bad };
+  std::vector<Eigen::VectorXd> std_vec = {vec1, vec2},
+                               std_vec_bad = {vec1, vec_bad};
 
-  stan::test::expect_near_rel("deserializer free",
-			      uvec1,
-			      deserializer.free_lb(vec1, lb));
+  stan::test::expect_near_rel("deserializer free", uvec1,
+                              deserializer.free_lb(vec1, lb));
   std::vector<Eigen::VectorXd> std_uvec = deserializer.free_lb(std_vec, lb);
-  stan::test::expect_near_rel("deserializer free",
-			      uvec1,
-			      std_uvec[0]);
-  stan::test::expect_near_rel("deserializer free",
-			      uvec2,
-			      std_uvec[1]);
+  stan::test::expect_near_rel("deserializer free", uvec1, std_uvec[0]);
+  stan::test::expect_near_rel("deserializer free", uvec2, std_uvec[1]);
 
   EXPECT_THROW(deserializer.free_lb(vec_bad, lb), std::domain_error);
   EXPECT_THROW(deserializer.free_lb(std_vec_bad, lb), std::domain_error);
@@ -51,19 +46,14 @@ TEST(deserializer_vector, ub_free) {
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::VectorXd> std_vec = { vec1, vec2 },
-    std_vec_bad = { vec1, vec_bad };
+  std::vector<Eigen::VectorXd> std_vec = {vec1, vec2},
+                               std_vec_bad = {vec1, vec_bad};
 
-  stan::test::expect_near_rel("deserializer free",
-			      uvec1,
-			      deserializer.free_ub(vec1, ub));
+  stan::test::expect_near_rel("deserializer free", uvec1,
+                              deserializer.free_ub(vec1, ub));
   std::vector<Eigen::VectorXd> std_uvec = deserializer.free_ub(std_vec, ub);
-  stan::test::expect_near_rel("deserializer free",
-			      uvec1,
-			      std_uvec[0]);
-  stan::test::expect_near_rel("deserializer free",
-			      uvec2,
-			      std_uvec[1]);
+  stan::test::expect_near_rel("deserializer free", uvec1, std_uvec[0]);
+  stan::test::expect_near_rel("deserializer free", uvec2, std_uvec[1]);
 
   EXPECT_THROW(deserializer.free_ub(vec_bad, ub), std::domain_error);
   EXPECT_THROW(deserializer.free_ub(std_vec_bad, ub), std::domain_error);
@@ -85,19 +75,15 @@ TEST(deserializer_vector, lub_free) {
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::VectorXd> std_vec = { vec1, vec2 },
-    std_vec_bad = { vec1, vec_bad };
+  std::vector<Eigen::VectorXd> std_vec = {vec1, vec2},
+                               std_vec_bad = {vec1, vec_bad};
 
-  stan::test::expect_near_rel("deserializer free",
-			      uvec1,
-			      deserializer.free_lub(vec1, lb, ub));
-  std::vector<Eigen::VectorXd> std_uvec = deserializer.free_lub(std_vec, lb, ub);
-  stan::test::expect_near_rel("deserializer free",
-			      uvec1,
-			      std_uvec[0]);
-  stan::test::expect_near_rel("deserializer free",
-			      uvec2,
-			      std_uvec[1]);
+  stan::test::expect_near_rel("deserializer free", uvec1,
+                              deserializer.free_lub(vec1, lb, ub));
+  std::vector<Eigen::VectorXd> std_uvec
+      = deserializer.free_lub(std_vec, lb, ub);
+  stan::test::expect_near_rel("deserializer free", uvec1, std_uvec[0]);
+  stan::test::expect_near_rel("deserializer free", uvec2, std_uvec[1]);
 
   EXPECT_THROW(deserializer.free_lub(vec_bad, lb, ub), std::domain_error);
   EXPECT_THROW(deserializer.free_lub(std_vec_bad, lb, ub), std::domain_error);
@@ -111,27 +97,26 @@ TEST(deserializer_vector, offset_multiplier_free) {
   Eigen::VectorXd uvec1 = Eigen::VectorXd::Random(3);
   Eigen::VectorXd uvec2 = Eigen::VectorXd::Random(3);
   Eigen::VectorXd vec_bad(2);
-  Eigen::VectorXd vec1 = stan::math::offset_multiplier_constrain(uvec1, offset, multiplier);
-  Eigen::VectorXd vec2 = stan::math::offset_multiplier_constrain(uvec2, offset, multiplier);
+  Eigen::VectorXd vec1
+      = stan::math::offset_multiplier_constrain(uvec1, offset, multiplier);
+  Eigen::VectorXd vec2
+      = stan::math::offset_multiplier_constrain(uvec2, offset, multiplier);
   vec_bad << -0.5, 1.0;
 
   std::vector<int> theta_i;
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::VectorXd> std_vec = { vec1, vec2 },
-    std_vec_bad = { vec1, vec_bad };
+  std::vector<Eigen::VectorXd> std_vec = {vec1, vec2},
+                               std_vec_bad = {vec1, vec_bad};
 
-  stan::test::expect_near_rel("deserializer free",
-			      uvec1,
-			      deserializer.free_offset_multiplier(vec1, offset, multiplier));
-  std::vector<Eigen::VectorXd> std_uvec = deserializer.free_offset_multiplier(std_vec, offset, multiplier);
-  stan::test::expect_near_rel("deserializer free",
-			      uvec1,
-			      std_uvec[0]);
-  stan::test::expect_near_rel("deserializer free",
-			      uvec2,
-			      std_uvec[1]);
+  stan::test::expect_near_rel(
+      "deserializer free", uvec1,
+      deserializer.free_offset_multiplier(vec1, offset, multiplier));
+  std::vector<Eigen::VectorXd> std_uvec
+      = deserializer.free_offset_multiplier(std_vec, offset, multiplier);
+  stan::test::expect_near_rel("deserializer free", uvec1, std_uvec[0]);
+  stan::test::expect_near_rel("deserializer free", uvec2, std_uvec[1]);
 }
 
 // unit vector
@@ -146,11 +131,12 @@ TEST(deserializer_vector, unit_vector_free) {
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::VectorXd> std_vec = { vec1, vec2 },
-    std_vec_bad = { vec1, vec_bad };
+  std::vector<Eigen::VectorXd> std_vec = {vec1, vec2},
+                               std_vec_bad = {vec1, vec_bad};
 
   Eigen::VectorXd uvec = deserializer.free_unit_vector(vec1);
-  std::vector<Eigen::VectorXd> std_uvec = deserializer.free_unit_vector(std_vec);
+  std::vector<Eigen::VectorXd> std_uvec
+      = deserializer.free_unit_vector(std_vec);
 
   EXPECT_THROW(deserializer.free_unit_vector(vec_bad), std::domain_error);
   EXPECT_THROW(deserializer.free_unit_vector(std_vec_bad), std::domain_error);
@@ -168,8 +154,8 @@ TEST(deserializer_vector, simplex_free) {
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::VectorXd> std_vec = { vec1, vec2 },
-    std_vec_bad = { vec1, vec_bad };
+  std::vector<Eigen::VectorXd> std_vec = {vec1, vec2},
+                               std_vec_bad = {vec1, vec_bad};
 
   Eigen::VectorXd uvec = deserializer.free_simplex(vec1);
   std::vector<Eigen::VectorXd> std_uvec = deserializer.free_simplex(std_vec);
@@ -190,8 +176,8 @@ TEST(deserializer_vector, ordered_free) {
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::VectorXd> std_vec = { vec1, vec2 },
-    std_vec_bad = { vec1, vec_bad };
+  std::vector<Eigen::VectorXd> std_vec = {vec1, vec2},
+                               std_vec_bad = {vec1, vec_bad};
 
   Eigen::VectorXd uvec = deserializer.free_ordered(vec1);
   std::vector<Eigen::VectorXd> std_uvec = deserializer.free_ordered(std_vec);
@@ -212,14 +198,16 @@ TEST(deserializer_vector, positive_ordered_free) {
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::VectorXd> std_vec = { vec1, vec2 },
-    std_vec_bad = { vec1, vec_bad };
+  std::vector<Eigen::VectorXd> std_vec = {vec1, vec2},
+                               std_vec_bad = {vec1, vec_bad};
 
   Eigen::VectorXd uvec = deserializer.free_positive_ordered(vec1);
-  std::vector<Eigen::VectorXd> std_uvec = deserializer.free_positive_ordered(std_vec);
+  std::vector<Eigen::VectorXd> std_uvec
+      = deserializer.free_positive_ordered(std_vec);
 
   EXPECT_THROW(deserializer.free_positive_ordered(vec_bad), std::domain_error);
-  EXPECT_THROW(deserializer.free_positive_ordered(std_vec_bad), std::domain_error);
+  EXPECT_THROW(deserializer.free_positive_ordered(std_vec_bad),
+               std::domain_error);
 }
 
 // cholesky_factor_cov
@@ -235,28 +223,24 @@ TEST(deserializer_vector, cholesky_factor_free) {
   Eigen::MatrixXd L1 = stan::math::cholesky_factor_constrain(vec1, M, N);
   Eigen::MatrixXd L2 = stan::math::cholesky_factor_constrain(vec2, M, M);
   Eigen::MatrixXd L_bad = stan::math::add_diag(L1, -10.0);
-  
+
   std::vector<int> theta_i;
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::MatrixXd> std_vec = { L1, L2 },
-    std_vec_bad = { L1, L_bad };
+  std::vector<Eigen::MatrixXd> std_vec = {L1, L2}, std_vec_bad = {L1, L_bad};
 
-  stan::test::expect_near_rel("deserializer_free",
-				    vec1,
-				    deserializer.free_cholesky_factor_cov(L1));
-  std::vector<Eigen::VectorXd> std_uvec = deserializer.free_cholesky_factor_cov(std_vec);
+  stan::test::expect_near_rel("deserializer_free", vec1,
+                              deserializer.free_cholesky_factor_cov(L1));
+  std::vector<Eigen::VectorXd> std_uvec
+      = deserializer.free_cholesky_factor_cov(std_vec);
 
-  stan::test::expect_near_rel("deserializer_free",
-				    vec1,
-				    std_uvec[0]);
-  stan::test::expect_near_rel("deserializer_free",
-				    vec2,
-				    std_uvec[1]);
+  stan::test::expect_near_rel("deserializer_free", vec1, std_uvec[0]);
+  stan::test::expect_near_rel("deserializer_free", vec2, std_uvec[1]);
 
   EXPECT_THROW(deserializer.free_cholesky_factor_cov(L_bad), std::domain_error);
-  EXPECT_THROW(deserializer.free_cholesky_factor_cov(std_vec_bad), std::domain_error);
+  EXPECT_THROW(deserializer.free_cholesky_factor_cov(std_vec_bad),
+               std::domain_error);
 }
 
 // cholesky_factor_corr
@@ -270,28 +254,25 @@ TEST(deserializer_vector, cholesky_corr_free) {
   Eigen::MatrixXd L1 = stan::math::cholesky_corr_constrain(vec1, M);
   Eigen::MatrixXd L2 = stan::math::cholesky_corr_constrain(vec2, M);
   Eigen::MatrixXd L_bad(2, 3);
-  
+
   std::vector<int> theta_i;
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::MatrixXd> std_vec = { L1, L2 },
-    std_vec_bad = { L1, L_bad };
+  std::vector<Eigen::MatrixXd> std_vec = {L1, L2}, std_vec_bad = {L1, L_bad};
 
-  stan::test::expect_near_rel("deserializer_free",
-				    vec1,
-				    deserializer.free_cholesky_factor_corr(L1));
-  std::vector<Eigen::VectorXd> std_uvec = deserializer.free_cholesky_factor_corr(std_vec);
+  stan::test::expect_near_rel("deserializer_free", vec1,
+                              deserializer.free_cholesky_factor_corr(L1));
+  std::vector<Eigen::VectorXd> std_uvec
+      = deserializer.free_cholesky_factor_corr(std_vec);
 
-  stan::test::expect_near_rel("deserializer_free",
-				    vec1,
-				    std_uvec[0]);
-  stan::test::expect_near_rel("deserializer_free",
-				    vec2,
-				    std_uvec[1]);
+  stan::test::expect_near_rel("deserializer_free", vec1, std_uvec[0]);
+  stan::test::expect_near_rel("deserializer_free", vec2, std_uvec[1]);
 
-  EXPECT_THROW(deserializer.free_cholesky_factor_corr(L_bad), std::invalid_argument);
-  EXPECT_THROW(deserializer.free_cholesky_factor_corr(std_vec_bad), std::invalid_argument);
+  EXPECT_THROW(deserializer.free_cholesky_factor_corr(L_bad),
+               std::invalid_argument);
+  EXPECT_THROW(deserializer.free_cholesky_factor_corr(std_vec_bad),
+               std::invalid_argument);
 }
 
 // cov_matrix
@@ -305,28 +286,23 @@ TEST(deserializer_vector, cov_matrix_free) {
   Eigen::MatrixXd L1 = stan::math::cov_matrix_constrain(vec1, M);
   Eigen::MatrixXd L2 = stan::math::cov_matrix_constrain(vec2, M);
   Eigen::MatrixXd L_bad(2, 3);
-  
+
   std::vector<int> theta_i;
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::MatrixXd> std_vec = { L1, L2 },
-    std_vec_bad = { L1, L_bad };
+  std::vector<Eigen::MatrixXd> std_vec = {L1, L2}, std_vec_bad = {L1, L_bad};
 
-  stan::test::expect_near_rel("deserializer_free",
-				    vec1,
-				    deserializer.free_cov_matrix(L1));
+  stan::test::expect_near_rel("deserializer_free", vec1,
+                              deserializer.free_cov_matrix(L1));
   std::vector<Eigen::VectorXd> std_uvec = deserializer.free_cov_matrix(std_vec);
 
-  stan::test::expect_near_rel("deserializer_free",
-				    vec1,
-				    std_uvec[0]);
-  stan::test::expect_near_rel("deserializer_free",
-				    vec2,
-				    std_uvec[1]);
+  stan::test::expect_near_rel("deserializer_free", vec1, std_uvec[0]);
+  stan::test::expect_near_rel("deserializer_free", vec2, std_uvec[1]);
 
   EXPECT_THROW(deserializer.free_cov_matrix(L_bad), std::invalid_argument);
-  EXPECT_THROW(deserializer.free_cov_matrix(std_vec_bad), std::invalid_argument);
+  EXPECT_THROW(deserializer.free_cov_matrix(std_vec_bad),
+               std::invalid_argument);
 }
 
 // corr_matrix
@@ -340,26 +316,22 @@ TEST(deserializer_vector, corr_matrix_free) {
   Eigen::MatrixXd L1 = stan::math::corr_matrix_constrain(vec1, M);
   Eigen::MatrixXd L2 = stan::math::corr_matrix_constrain(vec2, M);
   Eigen::MatrixXd L_bad(2, 3);
-  
+
   std::vector<int> theta_i;
   std::vector<double> theta;
   stan::io::deserializer<double> deserializer(theta, theta_i);
 
-  std::vector<Eigen::MatrixXd> std_vec = { L1, L2 },
-    std_vec_bad = { L1, L_bad };
+  std::vector<Eigen::MatrixXd> std_vec = {L1, L2}, std_vec_bad = {L1, L_bad};
 
-  stan::test::expect_near_rel("deserializer_free",
-				    vec1,
-				    deserializer.free_corr_matrix(L1));
-  std::vector<Eigen::VectorXd> std_uvec = deserializer.free_corr_matrix(std_vec);
+  stan::test::expect_near_rel("deserializer_free", vec1,
+                              deserializer.free_corr_matrix(L1));
+  std::vector<Eigen::VectorXd> std_uvec
+      = deserializer.free_corr_matrix(std_vec);
 
-  stan::test::expect_near_rel("deserializer_free",
-				    vec1,
-				    std_uvec[0]);
-  stan::test::expect_near_rel("deserializer_free",
-				    vec2,
-				    std_uvec[1]);
+  stan::test::expect_near_rel("deserializer_free", vec1, std_uvec[0]);
+  stan::test::expect_near_rel("deserializer_free", vec2, std_uvec[1]);
 
   EXPECT_THROW(deserializer.free_corr_matrix(L_bad), std::invalid_argument);
-  EXPECT_THROW(deserializer.free_corr_matrix(std_vec_bad), std::invalid_argument);
+  EXPECT_THROW(deserializer.free_corr_matrix(std_vec_bad),
+               std::invalid_argument);
 }

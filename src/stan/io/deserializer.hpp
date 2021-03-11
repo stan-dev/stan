@@ -1001,7 +1001,8 @@ class deserializer {
    * @return un-offset-multiplied variable
    */
   template <typename S, typename O, typename M>
-  inline auto free_offset_multiplier(const S& y, const O& offset, const M& multiplier) {
+  inline auto free_offset_multiplier(const S& y, const O& offset,
+                                     const M& multiplier) {
     return stan::math::offset_multiplier_free(y, offset, multiplier);
   }
 
@@ -1024,8 +1025,7 @@ class deserializer {
    * @return Unconstrained vectors
    * @throw std::domain_error if any vectors are not unit vectors
    */
-  template <typename S,
-            require_std_vector_t<S>* = nullptr>
+  template <typename S, require_std_vector_t<S>* = nullptr>
   inline auto free_unit_vector(const S& y) {
     S ret;
     ret.reserve(y.size());
@@ -1042,8 +1042,7 @@ class deserializer {
    * @return Unconstrained vector
    * @throw std::domain_error if y is not a simplex
    */
-  template <typename Vec,
-	    require_not_std_vector_t<Vec>* = nullptr>
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
   inline auto free_simplex(const Vec& y) {
     return stan::math::simplex_free(y);
   }
@@ -1055,8 +1054,7 @@ class deserializer {
    * @return Unconstrained vectors
    * @throw std::domain_error if any vectors are not simplices
    */
-  template <typename S,
-            require_std_vector_t<S>* = nullptr>
+  template <typename S, require_std_vector_t<S>* = nullptr>
   inline auto free_simplex(const S& y) {
     S ret;
     ret.reserve(y.size());
@@ -1073,8 +1071,7 @@ class deserializer {
    * @return Unconstrained vector
    * @throw std::domain_error if y is not ordered
    */
-  template <typename Vec,
-	    require_not_std_vector_t<Vec>* = nullptr>
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
   inline auto free_ordered(const Vec& y) {
     return stan::math::ordered_free(y);
   }
@@ -1086,8 +1083,7 @@ class deserializer {
    * @return Unconstrained vectors
    * @throw std::domain_error if any vectors are not ordered
    */
-  template <typename S,
-            require_std_vector_t<S>* = nullptr>
+  template <typename S, require_std_vector_t<S>* = nullptr>
   inline auto free_ordered(const S& y) {
     S ret;
     ret.reserve(y.size());
@@ -1104,8 +1100,7 @@ class deserializer {
    * @return Unconstrained vector
    * @throw std::domain_error if any vector in y is not a positive and ordered
    */
-  template <typename Vec,
-	    require_not_std_vector_t<Vec>* = nullptr>
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
   inline auto free_positive_ordered(const Vec& y) {
     return stan::math::positive_ordered_free(y);
   }
@@ -1117,8 +1112,7 @@ class deserializer {
    * @return Unconstrained vectors
    * @throw std::domain_error if any vectors are not postive and ordered
    */
-  template <typename S,
-            require_std_vector_t<S>* = nullptr>
+  template <typename S, require_std_vector_t<S>* = nullptr>
   inline auto free_positive_ordered(const S& y) {
     S ret;
     ret.reserve(y.size());
@@ -1135,8 +1129,7 @@ class deserializer {
    * @return Unconstrained vector
    * @throw std::domain_error if y is not a valid cholesky factor
    */
-  template <typename Mat,
-	    require_not_std_vector_t<Mat>* = nullptr>
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
   inline auto free_cholesky_factor_cov(const Mat& y) {
     return stan::math::cholesky_factor_free(y);
   }
@@ -1148,8 +1141,7 @@ class deserializer {
    * @return Unconstrained vectors
    * @throw std::domain_error if any vectors are not valid cholesky factors
    */
-  template <typename S,
-            require_std_vector_t<S>* = nullptr>
+  template <typename S, require_std_vector_t<S>* = nullptr>
   inline auto free_cholesky_factor_cov(const S& y) {
     std::vector<plain_type_t<decltype(free_cholesky_factor_cov(y[0]))>> ret;
     ret.reserve(y.size());
@@ -1166,21 +1158,21 @@ class deserializer {
    * @return Unconstrained vector
    * @throw std::domain_error if y is not a valid cholesky factor
    */
-  template <typename Mat,
-	    require_not_std_vector_t<Mat>* = nullptr>
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
   inline auto free_cholesky_factor_corr(const Mat& y) {
     return stan::math::cholesky_corr_free(y);
   }
 
   /**
-   * Unconstrain all the correlation matrix cholesky factors in the `std::vector` y
+   * Unconstrain all the correlation matrix cholesky factors in the
+   * `std::vector` y
    *
    * @tparam T Type of input
    * @return Unconstrained vectors
-   * @throw std::domain_error if any matrices in y are not valid cholesky factors
+   * @throw std::domain_error if any matrices in y are not valid cholesky
+   * factors
    */
-  template <typename S,
-            require_std_vector_t<S>* = nullptr>
+  template <typename S, require_std_vector_t<S>* = nullptr>
   inline auto free_cholesky_factor_corr(const S& y) {
     std::vector<plain_type_t<decltype(free_cholesky_factor_corr(y[0]))>> ret;
     ret.reserve(y.size());
@@ -1197,8 +1189,7 @@ class deserializer {
    * @return Unconstrained vector
    * @throw std::invalid_argument if y is not square
    */
-  template <typename Mat,
-	    require_not_std_vector_t<Mat>* = nullptr>
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
   inline auto free_cov_matrix(const Mat& y) {
     return stan::math::cov_matrix_free(y);
   }
@@ -1210,8 +1201,7 @@ class deserializer {
    * @return Unconstrained vectors
    * @throw std::invalid_argument if any matrices are not square
    */
-  template <typename S,
-            require_std_vector_t<S>* = nullptr>
+  template <typename S, require_std_vector_t<S>* = nullptr>
   inline auto free_cov_matrix(const S& y) {
     std::vector<plain_type_t<decltype(free_cov_matrix(y[0]))>> ret;
     ret.reserve(y.size());
@@ -1228,8 +1218,7 @@ class deserializer {
    * @return Unconstrained vector
    * @throw std::invalid_argument if y is not square
    */
-  template <typename Mat,
-	    require_not_std_vector_t<Mat>* = nullptr>
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
   inline auto free_corr_matrix(const Mat& y) {
     return stan::math::corr_matrix_free(y);
   }
@@ -1241,8 +1230,7 @@ class deserializer {
    * @return Unconstrained vectors
    * @throw std::invalid_argument if any vectors are not square
    */
-  template <typename S,
-            require_std_vector_t<S>* = nullptr>
+  template <typename S, require_std_vector_t<S>* = nullptr>
   inline auto free_corr_matrix(const S& y) {
     std::vector<plain_type_t<decltype(free_corr_matrix(y[0]))>> ret;
     ret.reserve(y.size());
