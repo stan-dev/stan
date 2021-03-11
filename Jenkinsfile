@@ -294,7 +294,8 @@ pipeline {
                                 sh "make clean-all"
                                 sh "echo STAN_THREADS=true >> make/local"
                                 withEnv(['PATH+TBB=./lib/tbb']) {
-                                    sh "./runTests.py -j${env.PARALLEL} test/expressions"
+                                    try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
+                                    finally { junit 'test/**/*.xml' }
                                 }
                             }
                         }
