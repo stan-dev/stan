@@ -235,25 +235,87 @@ pipeline {
                 stage('Integration Linux') {
                     agent { label 'linux' }
                     steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.GCC, stanc3_bin_url())
-                        runTests("src/test/integration", separateMakeStep=false)
+                        sh """
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                        """
+                        script {
+                            if (params.cmdstan_pr != 'downstream_tests') {
+                                sh """
+                                    cd performance-tests-cmdstan/cmdstan
+                                    git checkout ${params.cmdstan_pr}
+                                """
+                            }
+                            if (params.stanc3_bin_url != 'nightly') {
+                                sh """
+                                    cd performance-tests-cmdstan/cmdstan
+                                    echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
+                                """
+                            }
+                        }
+                        dir('performance-tests-cmdstan/cmdstan/stan'){
+                            unstash 'StanSetup'
+                        }        
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan
+                            echo 'O=0' >> make/local
+                            echo 'CXX=${env.GCC}' >> make/local
+                            make -j${env.PARALLEL} build
+                            cd ..
+                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                        """
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan/stan
+                            ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                        """
                     }
                     post { always { deleteDir() } }
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ) &&
-                            !skipRemainingStages
-                        }
-                    }
+                    // when {
+                    //     expression {
+                    //         ( env.BRANCH_NAME == "develop" ||
+                    //         env.BRANCH_NAME == "master" ) &&
+                    //         !skipRemainingStages
+                    //     }
+                    // }
                     steps {
-                        unstash 'StanSetup'
-                        setupCXX()
-                        runTests("src/test/integration", separateMakeStep=false)
+                        sh """
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                        """
+                        script {
+                            if (params.cmdstan_pr != 'downstream_tests') {
+                                sh """
+                                    cd performance-tests-cmdstan/cmdstan
+                                    git checkout ${params.cmdstan_pr}
+                                """
+                            }
+                            if (params.stanc3_bin_url != 'nightly') {
+                                sh """
+                                    cd performance-tests-cmdstan/cmdstan
+                                    echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
+                                """
+                            }
+                        }
+                        dir('performance-tests-cmdstan/cmdstan/stan'){
+                            unstash 'StanSetup'
+                        }        
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan
+                            echo 'O=0' >> make/local
+                            echo 'CXX=${env.CXX}' >> make/local
+                            make -j${env.PARALLEL} build
+                            cd ..
+                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                        """
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan/stan
+                            ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                        """
                     }
                     post { always { deleteDir() } }
                 }
