@@ -989,8 +989,7 @@ class deserializer {
    * @return Unconstrained variable
    */
   template <typename Ret, typename L, typename U, typename... Sizes>
-  inline auto read_free_lub(const L& lb, const U& ub,
-			    Sizes... sizes) {
+  inline auto read_free_lub(const L& lb, const U& ub, Sizes... sizes) {
     return stan::math::lub_free(this->read<Ret>(sizes...), lb, ub);
   }
 
@@ -1007,11 +1006,10 @@ class deserializer {
    * @return Unconstrained variable
    */
   template <typename Ret, typename O, typename M, typename... Sizes>
-  inline auto read_free_offset_multiplier(const O& offset,
-					  const M& multiplier,
-					  Sizes... sizes) {
-    return stan::math::offset_multiplier_free(this->read<Ret>(sizes...),
-					      offset, multiplier);
+  inline auto read_free_offset_multiplier(const O& offset, const M& multiplier,
+                                          Sizes... sizes) {
+    return stan::math::offset_multiplier_free(this->read<Ret>(sizes...), offset,
+                                              multiplier);
   }
 
   /**
@@ -1020,8 +1018,7 @@ class deserializer {
    * @tparam Ret Type of output
    * @return Unconstrained vector
    */
-  template <typename Ret,
-	    require_not_std_vector_t<Ret>* = nullptr>
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
   inline auto read_free_unit_vector(size_t size) {
     return stan::math::unit_vector_free(this->read<Ret>(size));
   }
@@ -1036,7 +1033,7 @@ class deserializer {
    * @return Unconstrained vectors
    */
   template <typename Ret, typename... Sizes,
-	    require_std_vector_t<Ret>* = nullptr>
+            require_std_vector_t<Ret>* = nullptr>
   inline auto read_free_unit_vector(size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
@@ -1067,7 +1064,7 @@ class deserializer {
    * @return Unconstrained vectors
    */
   template <typename Ret, typename... Sizes,
-	    require_std_vector_t<Ret>* = nullptr>
+            require_std_vector_t<Ret>* = nullptr>
   inline auto read_free_simplex(size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
@@ -1098,7 +1095,7 @@ class deserializer {
    * @return Unconstrained vectors
    */
   template <typename Ret, typename... Sizes,
-	    require_std_vector_t<Ret>* = nullptr>
+            require_std_vector_t<Ret>* = nullptr>
   inline auto read_free_ordered(size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
@@ -1128,7 +1125,8 @@ class deserializer {
    * @param sizes dimensions
    * @return Unconstrained vectors
    */
-  template <typename Ret, typename... Sizes, require_std_vector_t<Ret>* = nullptr>
+  template <typename Ret, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
   inline auto read_free_positive_ordered(size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
@@ -1161,12 +1159,13 @@ class deserializer {
    * @return Unconstrained matrices
    */
   template <typename Ret, typename... Sizes,
-	    require_std_vector_t<Ret>* = nullptr>
+            require_std_vector_t<Ret>* = nullptr>
   inline auto read_free_cholesky_factor_cov(size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
-      ret.emplace_back(read_free_cholesky_factor_cov<value_type_t<Ret>>(sizes...));
+      ret.emplace_back(
+          read_free_cholesky_factor_cov<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
@@ -1193,12 +1192,13 @@ class deserializer {
    * @return Unconstrained matrices
    */
   template <typename Ret, typename... Sizes,
-	    require_std_vector_t<Ret>* = nullptr>
+            require_std_vector_t<Ret>* = nullptr>
   inline auto read_free_cholesky_factor_corr(size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
-      ret.emplace_back(read_free_cholesky_factor_corr<value_type_t<Ret>>(sizes...));
+      ret.emplace_back(
+          read_free_cholesky_factor_corr<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
@@ -1225,7 +1225,7 @@ class deserializer {
    * @return Unconstrained matrices
    */
   template <typename Ret, typename... Sizes,
-	    require_std_vector_t<Ret>* = nullptr>
+            require_std_vector_t<Ret>* = nullptr>
   inline auto read_free_cov_matrix(size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
@@ -1256,7 +1256,8 @@ class deserializer {
    * @param sizes dimensions
    * @return Unconstrained matrices
    */
-  template <typename Ret, typename... Sizes, require_std_vector_t<Ret>* = nullptr>
+  template <typename Ret, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr>
   inline auto read_free_corr_matrix(size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
