@@ -75,7 +75,7 @@ class serializer {
    * @param data_r A reference to a Sequence of scalar values to be written to.
    */
   template <typename RVec, require_vector_like_t<RVec>* = nullptr>
-  serializer(RVec& data_r)
+  explicit serializer(RVec& data_r)
       : map_r_(data_r.data(), data_r.size()), r_size_(data_r.size()) {}
 
   /**
