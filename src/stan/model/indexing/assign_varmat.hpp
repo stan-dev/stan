@@ -1,5 +1,5 @@
-#ifndef STAN_MODEL_INDEXING_LVALUE_VARMAT_HPP
-#define STAN_MODEL_INDEXING_LVALUE_VARMAT_HPP
+#ifndef STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
+#define STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
 
 #include <stan/math/rev.hpp>
 #include <stan/model/indexing/index.hpp>

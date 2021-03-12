@@ -1,5 +1,5 @@
-#ifndef STAN_MODEL_INDEXING_LVALUE_HPP
-#define STAN_MODEL_INDEXING_LVALUE_HPP
+#ifndef STAN_MODEL_INDEXING_ASSIGN_HPP
+#define STAN_MODEL_INDEXING_ASSIGN_HPP
 
 #include <stan/math/prim.hpp>
 #include <stan/model/indexing/access_helpers.hpp>
