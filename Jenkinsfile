@@ -216,7 +216,7 @@ pipeline {
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" || ||
+                            env.BRANCH_NAME == "master" ||
                             params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
