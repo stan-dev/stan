@@ -3,7 +3,6 @@
 #include <test/unit/math/expect_near_rel.hpp>
 #include <gtest/gtest.h>
 
-
 // vector
 
 TEST(serializer_varvector, read) {
@@ -85,7 +84,6 @@ TEST(serializer_stdvector_varmat, read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-
 // size zero
 
 TEST(serializer, zeroSizeVecs) {
@@ -96,7 +94,8 @@ TEST(serializer, zeroSizeVecs) {
 
   EXPECT_NO_THROW(serializer.write(1.5));  // finish available
 
-  EXPECT_NO_THROW(serializer.write(stan::math::var_value<Eigen::VectorXd>(Eigen::VectorXd(0))));
+  EXPECT_NO_THROW(serializer.write(
+      stan::math::var_value<Eigen::VectorXd>(Eigen::VectorXd(0))));
 }
 
 // out of memory
@@ -119,7 +118,8 @@ TEST(serializer, eos_exception) {
   {
     std::vector<stan::math::var> theta(1);
     stan::io::serializer<stan::math::var> serializer(theta);
-    EXPECT_THROW(serializer.write(stan::math::var_value<Eigen::VectorXd>(Eigen::VectorXd(2))), std::runtime_error);
+    EXPECT_THROW(serializer.write(stan::math::var_value<Eigen::VectorXd>(
+                     Eigen::VectorXd(2))),
+                 std::runtime_error);
   }
-
 }

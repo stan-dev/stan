@@ -3,7 +3,6 @@
 #include <test/unit/math/expect_near_rel.hpp>
 #include <gtest/gtest.h>
 
-
 // vector
 
 TEST(serializer_stdvec_vector, read) {
@@ -29,7 +28,6 @@ TEST(serializer_stdvec_vector, read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-
 TEST(serializer_stdvec_vector, complex_read) {
   std::vector<double> theta;
   using complex_vec = Eigen::Matrix<std::complex<double>, -1, 1>;
@@ -40,7 +38,8 @@ TEST(serializer_stdvec_vector, complex_read) {
   for (size_t i = 0; i < 2U; ++i) {
     complex_vec x(10);
     for (size_t j = 0; j < 10U; ++j) {
-      x.coeffRef(j) = std::complex<double>(-static_cast<double>(j), -static_cast<double>(j + 1));
+      x.coeffRef(j) = std::complex<double>(-static_cast<double>(j),
+                                           -static_cast<double>(j + 1));
     }
     x_stdvec.push_back(x);
   }
@@ -50,9 +49,9 @@ TEST(serializer_stdvec_vector, complex_read) {
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 10U; ++j) {
       EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i][j].real())
-       << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
+          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
       EXPECT_FLOAT_EQ(theta[sentinal + 1], x_stdvec[i][j].imag())
-       << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
+          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
       sentinal += 2;
     }
   }
@@ -83,7 +82,6 @@ TEST(serializer_stdvec_rowvector, read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-
 TEST(serializer_stdvec_rowvector, complex_read) {
   std::vector<double> theta;
   using complex_vec = Eigen::Matrix<std::complex<double>, 1, -1>;
@@ -94,7 +92,8 @@ TEST(serializer_stdvec_rowvector, complex_read) {
   for (size_t i = 0; i < 2U; ++i) {
     complex_vec x(10);
     for (size_t j = 0; j < 10U; ++j) {
-      x.coeffRef(j) = std::complex<double>(-static_cast<double>(j), -static_cast<double>(j + 1));
+      x.coeffRef(j) = std::complex<double>(-static_cast<double>(j),
+                                           -static_cast<double>(j + 1));
     }
     x_stdvec.push_back(x);
   }
@@ -104,9 +103,9 @@ TEST(serializer_stdvec_rowvector, complex_read) {
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 10U; ++j) {
       EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i][j].real())
-       << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
+          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
       EXPECT_FLOAT_EQ(theta[sentinal + 1], x_stdvec[i][j].imag())
-       << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
+          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
       sentinal += 2;
     }
   }
@@ -114,7 +113,6 @@ TEST(serializer_stdvec_rowvector, complex_read) {
 }
 
 // matrix
-
 
 TEST(serializer_stdvec_matrix, read) {
   std::vector<double> theta;
@@ -139,7 +137,6 @@ TEST(serializer_stdvec_matrix, read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-
 TEST(serializer_stdvec_matrix, complex_read) {
   std::vector<double> theta;
   using complex_mat = Eigen::Matrix<std::complex<double>, -1, -1>;
@@ -150,7 +147,8 @@ TEST(serializer_stdvec_matrix, complex_read) {
   for (size_t i = 0; i < 2U; ++i) {
     complex_mat x(4, 4);
     for (size_t j = 0; j < 16U; ++j) {
-      x.coeffRef(j) = std::complex<double>(-static_cast<double>(j), -static_cast<double>(j + 1));
+      x.coeffRef(j) = std::complex<double>(-static_cast<double>(j),
+                                           -static_cast<double>(j + 1));
     }
     x_stdvec.push_back(x);
   }
@@ -160,15 +158,14 @@ TEST(serializer_stdvec_matrix, complex_read) {
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 16U; ++j) {
       EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i](j).real())
-       << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
+          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
       EXPECT_FLOAT_EQ(theta[sentinal + 1], x_stdvec[i](j).imag())
-       << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
+          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
       sentinal += 2;
     }
   }
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
-
 
 TEST(serializer_stdvec_stdvector, read) {
   std::vector<double> theta;
@@ -193,7 +190,6 @@ TEST(serializer_stdvec_stdvector, read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-
 TEST(serializer_stdvec_stdvector, complex_read) {
   std::vector<double> theta;
   using complex_vec = std::vector<std::complex<double>>;
@@ -204,7 +200,8 @@ TEST(serializer_stdvec_stdvector, complex_read) {
   for (size_t i = 0; i < 2U; ++i) {
     complex_vec x;
     for (size_t j = 0; j < 10U; ++j) {
-      x.push_back(std::complex<double>(-static_cast<double>(j), -static_cast<double>(j + 1)));
+      x.push_back(std::complex<double>(-static_cast<double>(j),
+                                       -static_cast<double>(j + 1)));
     }
     x_stdvec.push_back(x);
   }
@@ -214,9 +211,9 @@ TEST(serializer_stdvec_stdvector, complex_read) {
   for (size_t i = 0; i < 2U; ++i) {
     for (size_t j = 0; j < 10U; ++j) {
       EXPECT_FLOAT_EQ(theta[sentinal], x_stdvec[i][j].real())
-       << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
+          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
       EXPECT_FLOAT_EQ(theta[sentinal + 1], x_stdvec[i][j].imag())
-       << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
+          << "For idx: " << sentinal << " i: " << i << "j: " << j << "\n";
       sentinal += 2;
     }
   }

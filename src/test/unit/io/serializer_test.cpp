@@ -38,7 +38,6 @@ TEST(serializer_scalar, complex_read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-
 // vector
 
 TEST(serializer_vector, read) {
@@ -64,7 +63,8 @@ TEST(serializer_vector, complex_read) {
     theta.push_back(static_cast<double>(i + 1));
   }
   for (size_t i = 0; i < 10U; ++i) {
-    x.coeffRef(i) = std::complex<double>(-static_cast<double>(i), -static_cast<double>(i + 1));
+    x.coeffRef(i) = std::complex<double>(-static_cast<double>(i),
+                                         -static_cast<double>(i + 1));
   }
 
   stan::io::serializer<double> serializer(theta);
@@ -103,7 +103,8 @@ TEST(serializer_rowvector, complex_read) {
     theta.push_back(static_cast<double>(i + 1));
   }
   for (size_t i = 0; i < 10U; ++i) {
-    x.coeffRef(i) = std::complex<double>(-static_cast<double>(i), -static_cast<double>(i + 1));
+    x.coeffRef(i) = std::complex<double>(-static_cast<double>(i),
+                                         -static_cast<double>(i + 1));
   }
 
   stan::io::serializer<double> serializer(theta);
@@ -116,7 +117,6 @@ TEST(serializer_rowvector, complex_read) {
   }
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
-
 
 // matrix
 
@@ -143,7 +143,8 @@ TEST(serializer_matrix, complex_read) {
     theta.push_back(static_cast<double>(i + 1));
   }
   for (size_t i = 0; i < 16U; ++i) {
-    x.coeffRef(i) = std::complex<double>(-static_cast<double>(i), -static_cast<double>(i + 1));
+    x.coeffRef(i) = std::complex<double>(-static_cast<double>(i),
+                                         -static_cast<double>(i + 1));
   }
 
   stan::io::serializer<double> serializer(theta);
@@ -182,7 +183,8 @@ TEST(serializer_stdvector, complex_read) {
     theta.push_back(static_cast<double>(i + 1));
   }
   for (size_t i = 0; i < 10U; ++i) {
-    x.push_back(std::complex<double>(-static_cast<double>(i), -static_cast<double>(i + 1)));
+    x.push_back(std::complex<double>(-static_cast<double>(i),
+                                     -static_cast<double>(i + 1)));
   }
 
   stan::io::serializer<double> serializer(theta);
@@ -211,7 +213,8 @@ TEST(serializer, zeroSizeVecs) {
   EXPECT_NO_THROW(serializer.write(Eigen::RowVectorXd(0)));
   EXPECT_NO_THROW(serializer.write(Eigen::MatrixXd(0, 3)));
   EXPECT_NO_THROW(serializer.write(Eigen::MatrixXd(3, 0)));
-  EXPECT_NO_THROW(serializer.write(std::vector<std::vector<Eigen::MatrixXd>>(0)));
+  EXPECT_NO_THROW(
+      serializer.write(std::vector<std::vector<Eigen::MatrixXd>>(0)));
 }
 
 // out of memory
@@ -236,7 +239,8 @@ TEST(serializer, eos_exception) {
   {
     std::vector<double> theta(1);
     stan::io::serializer<double> serializer(theta);
-    EXPECT_THROW(serializer.write(std::complex<double>{-1, 1}), std::runtime_error);
+    EXPECT_THROW(serializer.write(std::complex<double>{-1, 1}),
+                 std::runtime_error);
   }
 
   {
@@ -254,15 +258,17 @@ TEST(serializer, eos_exception) {
   {
     std::vector<double> theta(3);
     stan::io::serializer<double> serializer(theta);
-    using complex_colvec = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, 1>;
+    using complex_colvec
+        = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, 1>;
     EXPECT_THROW((serializer.write(complex_colvec(4))), std::runtime_error);
   }
 
   {
     std::vector<double> theta(5);
     stan::io::serializer<double> serializer(theta);
-    EXPECT_THROW(serializer.write(std::vector<Eigen::VectorXd>(3, Eigen::VectorXd(2))),
-                 std::runtime_error);
+    EXPECT_THROW(
+        serializer.write(std::vector<Eigen::VectorXd>(3, Eigen::VectorXd(2))),
+        std::runtime_error);
   }
 
   {
@@ -274,7 +280,8 @@ TEST(serializer, eos_exception) {
   {
     std::vector<double> theta(3);
     stan::io::serializer<double> serializer(theta);
-    using complex_rowvec = Eigen::Matrix<std::complex<double>, 1, Eigen::Dynamic>;
+    using complex_rowvec
+        = Eigen::Matrix<std::complex<double>, 1, Eigen::Dynamic>;
     EXPECT_THROW((serializer.write(complex_rowvec(4))), std::runtime_error);
   }
 
@@ -295,14 +302,16 @@ TEST(serializer, eos_exception) {
   {
     std::vector<double> theta(7);
     stan::io::serializer<double> serializer(theta);
-    using eig_complex_mat = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic>;
+    using eig_complex_mat
+        = Eigen::Matrix<std::complex<double>, Eigen::Dynamic, Eigen::Dynamic>;
     EXPECT_THROW((serializer.write(eig_complex_mat(2, 2))), std::runtime_error);
   }
 
   {
     std::vector<double> theta(11);
     stan::io::serializer<double> serializer(theta);
-    EXPECT_THROW(serializer.write(std::vector<Eigen::MatrixXd>(2, Eigen::MatrixXd(3, 2))),
+    EXPECT_THROW(serializer.write(
+                     std::vector<Eigen::MatrixXd>(2, Eigen::MatrixXd(3, 2))),
                  std::runtime_error);
   }
 }
