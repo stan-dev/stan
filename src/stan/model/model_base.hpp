@@ -337,11 +337,12 @@ class model_base : public prob_grad {
     * into the specified parameter sequence.  Output messages go to the
     * specified stream.
     *
-    * @param[in] context definitions of variable values
+    * @param[in] input_r The initial values of parameters.
     * @param[in,out] params_r unconstrained parameter values produced
     * @param[in,out] msgs stream to which messages are written
     */
-   virtual void transform_inits(Eigen::VectorXd& params_r,
+   virtual void transform_inits(Eigen::VectorXd& input_r,
+                                Eigen::VectorXd& params_r,
                                 std::ostream* msgs) const = 0;
 
   /**
