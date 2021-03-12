@@ -201,11 +201,13 @@ pipeline {
             parallel {
                 stage('Windows Headers & Unit') {
                     agent { label 'windows' }
-                    expression {
-                        ( env.BRANCH_NAME == "develop" ||
-                        env.BRANCH_NAME == "master" ||
-                        params.run_tests_all_os ) &&
-                        !skipRemainingStages
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
                     }
                     steps {
                         deleteDirWin()
