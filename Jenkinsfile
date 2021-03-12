@@ -201,6 +201,12 @@ pipeline {
             parallel {
                 stage('Windows Headers & Unit') {
                     agent { label 'windows' }
+                    expression {
+                        ( env.BRANCH_NAME == "develop" ||
+                        env.BRANCH_NAME == "master" ||
+                        params.run_tests_all_os ) &&
+                        !skipRemainingStages
+                    }
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
@@ -213,17 +219,10 @@ pipeline {
                 }
                 stage('Linux Unit') {
                     agent { label 'linux' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
-                            !skipRemainingStages
-                        }
-                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, env.GCC, stanc3_bin_url())
+                        sh "make -j${env.PARALLEL} test-headers"
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
