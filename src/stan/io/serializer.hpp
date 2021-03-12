@@ -8,8 +8,8 @@ namespace stan {
 namespace io {
 
 /**
- * A stream-based reader for integer, scalar, vector, matrix
- * and array data types, with Jacobian calculations.
+ * A stream-based writer for integer, scalar, vector, matrix
+ * and array data types.
  *
  * The template parameter <code>T</code> represents the type of
  * scalars and the values in vectors and matrices.  The only
@@ -21,11 +21,6 @@ namespace io {
  * This includes <code>double</code> itself and the reverse-mode
  * algorithmic differentiation class <code>stan::math::var</code>.
  *
- * <p>For transformed values, the scalar type parameter <code>T</code>
- * must support the transforming operations, such as <code>exp(x)</code>
- * for positive-bounded variables.  It must also support equality and
- * inequality tests with <code>double</code> values.
- *
  * @tparam T Basic scalar type.
  */
 template <typename T>
@@ -36,15 +31,6 @@ class serializer {
   size_t pos_r_{0};  // current position in map of reals.
 
   /**
-   * Return reference to current scalar and increment the internal counter.
-   * @param m amount to move `pos_r_` up.
-   */
-  inline T& scalar_ptr_increment(size_t m) {
-    pos_r_ += m;
-    return map_r_.coeffRef(pos_r_ - m);
-  }
-
-  /**
    * Check there are at least m reals left to read
    * @param m Number of reals to read
    * @throws std::runtime_error if there aren't at least m reals left
@@ -52,7 +38,7 @@ class serializer {
   void check_r_capacity(size_t m) const {
     if (pos_r_ + m > r_size_) {
       []() STAN_COLD_PATH {
-        throw std::runtime_error("no more scalars to read");
+        throw std::runtime_error("no more scalars available to write");
       }();
     }
   }
@@ -85,7 +71,8 @@ class serializer {
    * Attempting to write beyond the end of the data or integer
    * value sequences raises a runtime exception.
    *
-   * @param data_r Sequence of scalar values.
+   * @param RVec Vector like class.
+   * @param data_r A reference to a Sequence of scalar values to be written to.
    */
   template <typename RVec,
             require_vector_like_t<RVec>* = nullptr>
@@ -95,15 +82,16 @@ class serializer {
 
   /**
    * Return the number of scalars available to be written to.
-   *
    */
   inline size_t available() const noexcept { return r_size_ - pos_r_; }
 
     /**
      * Write the next object in the sequence.
-     * @tparam Scalar A Stan scalar
+     * @tparam Scalar A Stan scalar class
+     * @param x A scalar
      */
-    template <typename Scalar, require_t<is_arithmetic_or_ad<Scalar>>* = nullptr>
+    template <typename Scalar, require_t<is_arithmetic_or_ad<Scalar>>* = nullptr,
+     require_not_var_matrix_t<Scalar>* = nullptr>
     inline void write(Scalar x) {
       check_r_capacity(1);
       map_r_.coeffRef(pos_r_) = x;
@@ -112,7 +100,7 @@ class serializer {
 
     /**
      * Write a complex variable from the next two reals in the sequence
-     * @tparam Complex A complex type.
+     * @tparam Complex An `std::complex` type.
      * @param x The complex scalar
      */
     template <typename Complex, require_complex_t<Complex>* = nullptr>
