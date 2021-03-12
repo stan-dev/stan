@@ -533,14 +533,15 @@ class deserializer {
    * @return The next simplex of the specified size.
    * @throws std::invalid_argument if number of dimensions (`k`) is zero
    */
-  template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
+  template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_simplex(LP& lp, Sizes... sizes) {
+  inline auto read_simplex(LP& lp, size_t size) {
     using stan::math::simplex_constrain;
+    stan::math::check_positive("read_simplex", "size", size);
     if (Jacobian) {
-      return simplex_constrain(this->read<Ret>(sizes...), lp);
+      return simplex_constrain(this->read<Ret>(size - 1), lp);
     } else {
-      return simplex_constrain(this->read<Ret>(sizes...));
+      return simplex_constrain(this->read<Ret>(size - 1));
     }
   }
 
@@ -946,296 +947,321 @@ class deserializer {
   }
 
   /**
-   * Unconstrain lower bounded variable
+   * Read a serialized lower bounded variable and unconstrain it
    *
-   * @tparam S Type of lower bounded input
+   * @tparam Ret Type of output
    * @tparam L Type of lower bound
-   * @param y Lower bounded input
+   * @tparam Sizes Types of dimensions of output
    * @param lb Lower bound
+   * @param sizes dimensions
    * @return Unconstrained variable
    */
-  template <typename S, typename L>
-  inline auto free_lb(const S& y, const L& lb) {
-    return stan::math::lb_free(y, lb);
+  template <typename Ret, typename L, typename... Sizes>
+  inline auto read_free_lb(const L& lb, Sizes... sizes) {
+    return stan::math::lb_free(this->read<Ret>(sizes...), lb);
   }
 
   /**
-   * Unconstrain upper bounded variable
+   * Read a serialized lower bounded variable and unconstrain it
    *
-   * @tparam S Type of upper bounded input
+   * @tparam Ret Type of output
    * @tparam U Type of upper bound
-   * @param y Upper bounded input
+   * @tparam Sizes Types of dimensions of output
    * @param ub Upper bound
+   * @param sizes dimensions
    * @return Unconstrained variable
    */
-  template <typename S, typename U>
-  inline auto free_ub(const S& y, const U& ub) {
-    return stan::math::ub_free(y, ub);
+  template <typename Ret, typename U, typename... Sizes>
+  inline auto read_free_ub(const U& ub, Sizes... sizes) {
+    return stan::math::ub_free(this->read<Ret>(sizes...), ub);
   }
 
   /**
-   * Unconstrain bounded variable
+   * Read a serialized bounded variable and unconstrain it
    *
-   * @tparam S Type of bounded input
+   * @tparam Ret Type of output
    * @tparam L Type of lower bound
    * @tparam U Type of upper bound
-   * @param y Upper bounded input
+   * @tparam Sizes Types of dimensions of output
    * @param lb Lower bound
    * @param ub Upper bound
+   * @param sizes dimensions
    * @return Unconstrained variable
    */
-  template <typename S, typename L, typename U>
-  inline auto free_lub(const S& y, const L& lb, const U& ub) {
-    return stan::math::lub_free(y, lb, ub);
+  template <typename Ret, typename L, typename U, typename... Sizes>
+  inline auto read_free_lub(const L& lb, const U& ub,
+			    Sizes... sizes) {
+    return stan::math::lub_free(this->read<Ret>(sizes...), lb, ub);
   }
 
   /**
-   * Do inverse of offset-multiplier transform
+   * Read a serialized offset-multiplied variable and unconstrain it
    *
-   * @tparam S Type of transformed input
+   * @tparam Ret Type of output
    * @tparam O Type of offset
    * @tparam M Type of multiplier
-   * @param y Offset-multiplied input
+   * @tparam Sizes Types of dimensions of output
    * @param offset Offset
    * @param multiplier Multiplier
-   * @return un-offset-multiplied variable
+   * @param sizes dimensions
+   * @return Unconstrained variable
    */
-  template <typename S, typename O, typename M>
-  inline auto free_offset_multiplier(const S& y, const O& offset,
-                                     const M& multiplier) {
-    return stan::math::offset_multiplier_free(y, offset, multiplier);
+  template <typename Ret, typename O, typename M, typename... Sizes>
+  inline auto read_free_offset_multiplier(const O& offset,
+					  const M& multiplier,
+					  Sizes... sizes) {
+    return stan::math::offset_multiplier_free(this->read<Ret>(sizes...),
+					      offset, multiplier);
   }
 
   /**
-   * Unconstrain the unit vector y
+   * Read a serialized unit vector and unconstrain it
    *
-   * @tparam Vec Type of vector to free
+   * @tparam Ret Type of output
    * @return Unconstrained vector
-   * @throw std::domain_error if y is not unit vector
    */
-  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
-  inline auto free_unit_vector(const Vec& y) {
-    return stan::math::unit_vector_free(y);
+  template <typename Ret,
+	    require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_unit_vector(size_t size) {
+    return stan::math::unit_vector_free(this->read<Ret>(size));
   }
 
   /**
-   * Unconstrain all the unit vectors in the `std::vector` y
+   * Read serialized unit vectors and unconstrain them
    *
-   * @tparam T Type of input
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
    * @return Unconstrained vectors
-   * @throw std::domain_error if any vectors are not unit vectors
    */
-  template <typename S, require_std_vector_t<S>* = nullptr>
-  inline auto free_unit_vector(const S& y) {
-    S ret;
-    ret.reserve(y.size());
-    for (size_t i = 0; i < y.size(); ++i) {
-      ret.emplace_back(free_unit_vector(y[i]));
+  template <typename Ret, typename... Sizes,
+	    require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_unit_vector(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_unit_vector<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
 
   /**
-   * Unconstrain the simplex vector y
+   * Read a serialized simplex and unconstrain it
    *
-   * @tparam Vec Type of vector to free
+   * @tparam Ret Type of output
    * @return Unconstrained vector
-   * @throw std::domain_error if y is not a simplex
    */
-  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
-  inline auto free_simplex(const Vec& y) {
-    return stan::math::simplex_free(y);
+  template <typename Ret>
+  inline auto read_free_simplex(size_t size) {
+    return stan::math::simplex_free(this->read<Ret>(size));
   }
 
   /**
-   * Unconstrain all the simplices in the `std::vector` y
+   * Read serialized simplices and unconstrain them
    *
-   * @tparam T Type of input
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
    * @return Unconstrained vectors
-   * @throw std::domain_error if any vectors are not simplices
    */
-  template <typename S, require_std_vector_t<S>* = nullptr>
-  inline auto free_simplex(const S& y) {
-    S ret;
-    ret.reserve(y.size());
-    for (size_t i = 0; i < y.size(); ++i) {
-      ret.emplace_back(free_simplex(y[i]));
+  template <typename Ret, typename... Sizes,
+	    require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_simplex(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_simplex<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
 
   /**
-   * Unconstrain the ordered vector y
+   * Read a serialized ordered and unconstrain it
    *
-   * @tparam Vec Type of vector to free
+   * @tparam Ret Type of output
    * @return Unconstrained vector
-   * @throw std::domain_error if y is not ordered
    */
-  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
-  inline auto free_ordered(const Vec& y) {
-    return stan::math::ordered_free(y);
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_ordered(size_t size) {
+    return stan::math::ordered_free(this->read<Ret>(size));
   }
 
   /**
-   * Unconstrain all the ordered vectors in the `std::vector` y
+   * Read serialized ordered vectors and unconstrain them
    *
-   * @tparam T Type of input
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
    * @return Unconstrained vectors
-   * @throw std::domain_error if any vectors are not ordered
    */
-  template <typename S, require_std_vector_t<S>* = nullptr>
-  inline auto free_ordered(const S& y) {
-    S ret;
-    ret.reserve(y.size());
-    for (size_t i = 0; i < y.size(); ++i) {
-      ret.emplace_back(free_ordered(y[i]));
+  template <typename Ret, typename... Sizes,
+	    require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_ordered(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_ordered<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
 
   /**
-   * Unconstrain the positive ordered vector y
+   * Read a serialized positive ordered vector and unconstrain it
    *
-   * @tparam Vec Type of vector to free
+   * @tparam Ret Type of output
    * @return Unconstrained vector
-   * @throw std::domain_error if any vector in y is not a positive and ordered
    */
-  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
-  inline auto free_positive_ordered(const Vec& y) {
-    return stan::math::positive_ordered_free(y);
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_positive_ordered(size_t size) {
+    return stan::math::positive_ordered_free(this->read<Ret>(size));
   }
 
   /**
-   * Unconstrain all the positive ordered vectors in the `std::vector` y
+   * Read serialized positive ordered vectors and unconstrain them
    *
-   * @tparam T Type of input
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
    * @return Unconstrained vectors
-   * @throw std::domain_error if any vectors are not postive and ordered
    */
-  template <typename S, require_std_vector_t<S>* = nullptr>
-  inline auto free_positive_ordered(const S& y) {
-    S ret;
-    ret.reserve(y.size());
-    for (size_t i = 0; i < y.size(); ++i) {
-      ret.emplace_back(free_positive_ordered(y[i]));
+  template <typename Ret, typename... Sizes, require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_positive_ordered(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_positive_ordered<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
 
   /**
-   * Unconstrain the covariance cholesky factor y
+   * Read a serialized covariance matrix cholesky factor and unconstrain it
    *
-   * @tparam Mat Type of matrix to free
-   * @return Unconstrained vector
-   * @throw std::domain_error if y is not a valid cholesky factor
+   * @tparam Ret Type of output
+   * @param M Rows of matrix
+   * @param N Cols of matrix
+   * @return Unconstrained matrix
    */
-  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
-  inline auto free_cholesky_factor_cov(const Mat& y) {
-    return stan::math::cholesky_factor_free(y);
+  template <typename Ret>
+  inline auto read_free_cholesky_factor_cov(Eigen::Index M, Eigen::Index N) {
+    return stan::math::cholesky_factor_free(this->read<Ret>(M, N));
   }
 
   /**
-   * Unconstrain all the covariance cholesky factors in the `std::vector` y
+   * Read serialized covariance matrix cholesky factors and unconstrain them
    *
-   * @tparam T Type of input
-   * @return Unconstrained vectors
-   * @throw std::domain_error if any vectors are not valid cholesky factors
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
+   * @return Unconstrained matrices
    */
-  template <typename S, require_std_vector_t<S>* = nullptr>
-  inline auto free_cholesky_factor_cov(const S& y) {
-    std::vector<plain_type_t<decltype(free_cholesky_factor_cov(y[0]))>> ret;
-    ret.reserve(y.size());
-    for (size_t i = 0; i < y.size(); ++i) {
-      ret.emplace_back(free_cholesky_factor_cov(y[i]));
+  template <typename Ret, typename... Sizes,
+	    require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_cholesky_factor_cov(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_cholesky_factor_cov<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
 
   /**
-   * Unconstrain the correlation matrix cholesky factor y
+   * Read a serialized covariance matrix cholesky factor and unconstrain it
    *
-   * @tparam Mat Type of matrix to free
-   * @return Unconstrained vector
-   * @throw std::domain_error if y is not a valid cholesky factor
+   * @tparam Ret Type of output
+   * @param M Rows/Cols of matrix
+   * @return Unconstrained matrix
    */
-  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
-  inline auto free_cholesky_factor_corr(const Mat& y) {
-    return stan::math::cholesky_corr_free(y);
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_cholesky_factor_corr(size_t M) {
+    return stan::math::cholesky_corr_free(this->read<Ret>(M, M));
   }
 
   /**
-   * Unconstrain all the correlation matrix cholesky factors in the
-   * `std::vector` y
+   * Read serialized correlation matrix cholesky factors and unconstrain them
    *
-   * @tparam T Type of input
-   * @return Unconstrained vectors
-   * @throw std::domain_error if any matrices in y are not valid cholesky
-   * factors
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
+   * @return Unconstrained matrices
    */
-  template <typename S, require_std_vector_t<S>* = nullptr>
-  inline auto free_cholesky_factor_corr(const S& y) {
-    std::vector<plain_type_t<decltype(free_cholesky_factor_corr(y[0]))>> ret;
-    ret.reserve(y.size());
-    for (size_t i = 0; i < y.size(); ++i) {
-      ret.emplace_back(free_cholesky_factor_corr(y[i]));
+  template <typename Ret, typename... Sizes,
+	    require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_cholesky_factor_corr(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_cholesky_factor_corr<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
 
   /**
-   * Unconstrain the covariance matrix y
+   * Read a serialized covariance matrix cholesky factor and unconstrain it
    *
-   * @tparam Mat Type of matrix to free
-   * @return Unconstrained vector
-   * @throw std::invalid_argument if y is not square
+   * @tparam Ret Type of output
+   * @param M Rows/Cols of matrix
+   * @return Unconstrained matrix
    */
-  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
-  inline auto free_cov_matrix(const Mat& y) {
-    return stan::math::cov_matrix_free(y);
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_cov_matrix(size_t M) {
+    return stan::math::cov_matrix_free(this->read<Ret>(M, M));
   }
 
   /**
-   * Unconstrain all the covariance matrices in the `std::vector` y
+   * Read serialized covariance matrices and unconstrain them
    *
-   * @tparam T Type of input
-   * @return Unconstrained vectors
-   * @throw std::invalid_argument if any matrices are not square
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
+   * @return Unconstrained matrices
    */
-  template <typename S, require_std_vector_t<S>* = nullptr>
-  inline auto free_cov_matrix(const S& y) {
-    std::vector<plain_type_t<decltype(free_cov_matrix(y[0]))>> ret;
-    ret.reserve(y.size());
-    for (size_t i = 0; i < y.size(); ++i) {
-      ret.emplace_back(free_cov_matrix(y[i]));
+  template <typename Ret, typename... Sizes,
+	    require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_cov_matrix(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_cov_matrix<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
 
   /**
-   * Unconstrain the correlation matrix y
+   * Read a serialized covariance matrix cholesky factor and unconstrain it
    *
-   * @tparam Mat Type of matrix to free
-   * @return Unconstrained vector
-   * @throw std::invalid_argument if y is not square
+   * @tparam Ret Type of output
+   * @param M Rows/Cols of matrix
+   * @return Unconstrained matrix
    */
-  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
-  inline auto free_corr_matrix(const Mat& y) {
-    return stan::math::corr_matrix_free(y);
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_corr_matrix(size_t M) {
+    return stan::math::corr_matrix_free(this->read<Ret>(M, M));
   }
 
   /**
-   * Unconstrain all the correlation matrices in the `std::vector` y
+   * Read serialized correlation matrices and unconstrain them
    *
-   * @tparam T Type of input
-   * @return Unconstrained vectors
-   * @throw std::invalid_argument if any vectors are not square
+   * @tparam Ret Type of output
+   * @tparam Sizes Types of dimensions of output
+   * @param vecsize Vector size
+   * @param sizes dimensions
+   * @return Unconstrained matrices
    */
-  template <typename S, require_std_vector_t<S>* = nullptr>
-  inline auto free_corr_matrix(const S& y) {
-    std::vector<plain_type_t<decltype(free_corr_matrix(y[0]))>> ret;
-    ret.reserve(y.size());
-    for (size_t i = 0; i < y.size(); ++i) {
-      ret.emplace_back(free_corr_matrix(y[i]));
+  template <typename Ret, typename... Sizes, require_std_vector_t<Ret>* = nullptr>
+  inline auto read_free_corr_matrix(size_t vecsize, Sizes... sizes) {
+    std::decay_t<Ret> ret;
+    ret.reserve(vecsize);
+    for (size_t i = 0; i < vecsize; ++i) {
+      ret.emplace_back(read_free_corr_matrix<value_type_t<Ret>>(sizes...));
     }
     return ret;
   }
