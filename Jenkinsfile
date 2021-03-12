@@ -60,6 +60,7 @@ pipeline {
           description: 'PR to test CmdStan upstream against e.g. PR-630')
         string(defaultValue: 'nightly', name: 'stanc3_bin_url',
           description: 'Custom stanc3 binary url')
+        booleanParam(defaultValue: false, name: 'run_tests_all_os', description: 'Run unit and integration tests on all OS.')
     }
     options {
         skipDefaultCheckout()
@@ -212,6 +213,14 @@ pipeline {
                 }
                 stage('Linux Unit') {
                     agent { label 'linux' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" || ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, env.GCC, stanc3_bin_url())
@@ -221,6 +230,14 @@ pipeline {
                 }
                 stage('Mac Unit') {
                     agent { label 'osx' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(false, env.CXX, stanc3_bin_url())
@@ -274,13 +291,14 @@ pipeline {
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
-                    // when {
-                    //     expression {
-                    //         ( env.BRANCH_NAME == "develop" ||
-                    //         env.BRANCH_NAME == "master" ) &&
-                    //         !skipRemainingStages
-                    //     }
-                    // }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         sh """
                             git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
@@ -324,7 +342,8 @@ pipeline {
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ) &&
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
                     }
