@@ -26,8 +26,8 @@ namespace io {
 template <typename T>
 class serializer {
  private:
-  Eigen::Map<Eigen::Matrix<T, -1, 1>> map_r_;    // map of reals.
-  size_t r_size_{0};                             // size of reals available.
+  Eigen::Map<Eigen::Matrix<T, -1, 1>> map_r_;  // map of reals.
+  size_t r_size_{0};                           // size of reals available.
   size_t pos_r_{0};  // current position in map of reals.
 
   /**
@@ -44,8 +44,8 @@ class serializer {
   }
 
   template <typename S>
-  using is_arithmetic_or_ad = bool_constant<std::is_arithmetic<S>::value
-                                    || is_autodiff<S>::value>;
+  using is_arithmetic_or_ad
+      = bool_constant<std::is_arithmetic<S>::value || is_autodiff<S>::value>;
 
  public:
   using matrix_t = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
@@ -74,178 +74,176 @@ class serializer {
    * @param RVec Vector like class.
    * @param data_r A reference to a Sequence of scalar values to be written to.
    */
-  template <typename RVec,
-            require_vector_like_t<RVec>* = nullptr>
+  template <typename RVec, require_vector_like_t<RVec>* = nullptr>
   serializer(RVec& data_r)
-      : map_r_(data_r.data(), data_r.size()),
-        r_size_(data_r.size()) {}
+      : map_r_(data_r.data(), data_r.size()), r_size_(data_r.size()) {}
 
   /**
    * Return the number of scalars available to be written to.
    */
   inline size_t available() const noexcept { return r_size_ - pos_r_; }
 
-    /**
-     * Write the next object in the sequence.
-     * @tparam Scalar A Stan scalar class
-     * @param x A scalar
-     */
-    template <typename Scalar, require_t<is_arithmetic_or_ad<Scalar>>* = nullptr,
-     require_not_var_matrix_t<Scalar>* = nullptr>
-    inline void write(Scalar x) {
-      check_r_capacity(1);
-      map_r_.coeffRef(pos_r_) = x;
-      pos_r_++;
-    }
+  /**
+   * Write the next object in the sequence.
+   * @tparam Scalar A Stan scalar class
+   * @param x A scalar
+   */
+  template <typename Scalar, require_t<is_arithmetic_or_ad<Scalar>>* = nullptr,
+            require_not_var_matrix_t<Scalar>* = nullptr>
+  inline void write(Scalar x) {
+    check_r_capacity(1);
+    map_r_.coeffRef(pos_r_) = x;
+    pos_r_++;
+  }
 
-    /**
-     * Write a complex variable from the next two reals in the sequence
-     * @tparam Complex An `std::complex` type.
-     * @param x The complex scalar
-     */
-    template <typename Complex, require_complex_t<Complex>* = nullptr>
-    inline void write(Complex&& x) {
-      check_r_capacity(2);
-      map_r_.coeffRef(pos_r_) = x.real();
-      map_r_.coeffRef(pos_r_ + 1) = x.imag();
+  /**
+   * Write a complex variable from the next two reals in the sequence
+   * @tparam Complex An `std::complex` type.
+   * @param x The complex scalar
+   */
+  template <typename Complex, require_complex_t<Complex>* = nullptr>
+  inline void write(Complex&& x) {
+    check_r_capacity(2);
+    map_r_.coeffRef(pos_r_) = x.real();
+    map_r_.coeffRef(pos_r_ + 1) = x.imag();
+    pos_r_ += 2;
+  }
+
+  /**
+   * Write an Eigen column vector
+   * @tparam Vec An Eigen type with compile time columns equal to 1.
+   * @param vec The Eigen column vector
+   */
+  template <typename Vec, require_eigen_col_vector_t<Vec>* = nullptr,
+            require_not_vt_complex<Vec>* = nullptr>
+  inline void write(Vec&& vec) {
+    check_r_capacity(vec.size());
+    map_vector_t(&map_r_.coeffRef(pos_r_), vec.size()) = vec;
+    pos_r_ += vec.size();
+  }
+
+  /**
+   * Write a Eigen column vector with inner complex type.
+   * @tparam Vec An Eigen type with compile time columns equal to 1.
+   * @param vec The Eigen column vector
+   */
+  template <typename Vec, require_eigen_col_vector_t<Vec>* = nullptr,
+            require_vt_complex<Vec>* = nullptr>
+  inline void write(Vec&& vec) {
+    check_r_capacity(2 * vec.size());
+    using stan::math::to_ref;
+    auto&& vec_ref = to_ref(std::forward<Vec>(vec));
+    for (Eigen::Index i = 0; i < vec_ref.size(); ++i) {
+      map_r_.coeffRef(pos_r_) = vec_ref.coeff(i).real();
+      map_r_.coeffRef(pos_r_ + 1) = vec_ref.coeff(i).imag();
       pos_r_ += 2;
     }
+  }
 
-    /**
-     * Write an Eigen column vector
-     * @tparam Vec An Eigen type with compile time columns equal to 1.
-     * @param vec The Eigen column vector
-     */
-    template <typename Vec, require_eigen_col_vector_t<Vec>* = nullptr,
-              require_not_vt_complex<Vec>* = nullptr>
-    inline void write(Vec&& vec) {
-        check_r_capacity(vec.size());
-        map_vector_t(&map_r_.coeffRef(pos_r_), vec.size()) = vec;
-        pos_r_ += vec.size();
-    }
+  /**
+   * Write an Eigen row vector.
+   * @tparam Vec An Eigen type with compile time rows equal to 1.
+   * @param vec The Eigen row vector
+   */
+  template <typename Vec, require_eigen_row_vector_t<Vec>* = nullptr,
+            require_not_vt_complex<Vec>* = nullptr>
+  inline void write(Vec&& vec) {
+    check_r_capacity(vec.size());
+    map_row_vector_t(&map_r_.coeffRef(pos_r_), vec.size()) = vec;
+    pos_r_ += vec.size();
+  }
 
-    /**
-     * Write a Eigen column vector with inner complex type.
-     * @tparam Vec An Eigen type with compile time columns equal to 1.
-     * @param vec The Eigen column vector
-     */
-    template <typename Vec, require_eigen_col_vector_t<Vec>* = nullptr,
-              require_vt_complex<Vec>* = nullptr>
-    inline void write(Vec&& vec) {
-        check_r_capacity(2 * vec.size());
-        using stan::math::to_ref;
-        auto&& vec_ref = to_ref(std::forward<Vec>(vec));
-        for (Eigen::Index i = 0; i < vec_ref.size(); ++i) {
-          map_r_.coeffRef(pos_r_) = vec_ref.coeff(i).real();
-          map_r_.coeffRef(pos_r_ + 1) = vec_ref.coeff(i).imag();
-          pos_r_ += 2;
-        }
+  /**
+   * Write an Eigen row vector with inner complex type.
+   * @tparam Vec An Eigen type with compile time rows equal to 1.
+   * @param vec The Eigen row vector
+   */
+  template <typename Vec, require_eigen_row_vector_t<Vec>* = nullptr,
+            require_vt_complex<Vec>* = nullptr>
+  inline void write(Vec&& vec) {
+    using stan::math::to_ref;
+    check_r_capacity(2 * vec.size());
+    auto&& vec_ref = to_ref(std::forward<Vec>(vec));
+    for (Eigen::Index i = 0; i < vec_ref.size(); ++i) {
+      map_r_.coeffRef(pos_r_) = vec_ref.coeff(i).real();
+      map_r_.coeffRef(pos_r_ + 1) = vec_ref.coeff(i).imag();
+      pos_r_ += 2;
     }
+  }
 
-    /**
-     * Write an Eigen row vector.
-     * @tparam Vec An Eigen type with compile time rows equal to 1.
-     * @param vec The Eigen row vector
-     */
-    template <typename Vec, require_eigen_row_vector_t<Vec>* = nullptr,
-              require_not_vt_complex<Vec>* = nullptr>
-    inline void write(Vec&& vec) {
-        check_r_capacity(vec.size());
-        map_row_vector_t(&map_r_.coeffRef(pos_r_), vec.size()) = vec;
-        pos_r_ += vec.size();
-    }
+  /**
+   * Write a Eigen matrix of size `(rows, cols)`.
+   * @tparam Mat An Eigen class with dynamic rows and columns
+   * @param mat An Eigen object
+   */
+  template <typename Mat, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
+            require_not_vt_complex<Mat>* = nullptr>
+  inline void write(Mat&& mat) {
+    check_r_capacity(mat.size());
+    map_matrix_t(&map_r_.coeffRef(pos_r_), mat.rows(), mat.cols()) = mat;
+    pos_r_ += mat.size();
+  }
 
-    /**
-     * Write an Eigen row vector with inner complex type.
-     * @tparam Vec An Eigen type with compile time rows equal to 1.
-     * @param vec The Eigen row vector
-     */
-    template <typename Vec, require_eigen_row_vector_t<Vec>* = nullptr,
-              require_vt_complex<Vec>* = nullptr>
-    inline void write(Vec&& vec) {
-        using stan::math::to_ref;
-        check_r_capacity(2 * vec.size());
-        auto&& vec_ref = to_ref(std::forward<Vec>(vec));
-        for (Eigen::Index i = 0; i < vec_ref.size(); ++i) {
-          map_r_.coeffRef(pos_r_) = vec_ref.coeff(i).real();
-          map_r_.coeffRef(pos_r_ + 1) = vec_ref.coeff(i).imag();
-          pos_r_ += 2;
-        }
+  /**
+   * Write a Eigen matrix of size `(rows, cols)` with complex inner type.
+   * @tparam Mat The type to write
+   * @param rows The size of the rows of the matrix.
+   * @param cols The size of the cols of the matrix.
+   */
+  template <typename Mat, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
+            require_vt_complex<Mat>* = nullptr>
+  inline void write(Mat&& x) {
+    check_r_capacity(2 * x.size());
+    using stan::math::to_ref;
+    auto&& x_ref = to_ref(x);
+    for (Eigen::Index i = 0; i < x.size(); ++i) {
+      map_r_.coeffRef(pos_r_) = x_ref.coeff(i).real();
+      map_r_.coeffRef(pos_r_ + 1) = x_ref.coeff(i).imag();
+      pos_r_ += 2;
     }
+  }
 
-    /**
-     * Write a Eigen matrix of size `(rows, cols)`.
-     * @tparam Mat An Eigen class with dynamic rows and columns
-     * @param mat An Eigen object
-     */
-    template <typename Mat, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
-              require_not_vt_complex<Mat>* = nullptr>
-    inline void write(Mat&& mat) {
-      check_r_capacity(mat.size());
-      map_matrix_t(&map_r_.coeffRef(pos_r_), mat.rows(), mat.cols()) = mat;
-      pos_r_ += mat.size();
-    }
+  /**
+   * Write a `var_value` with inner Eigen type.
+   * @tparam Ret The type to write
+   * @tparam T_ Should never be set by user, set to default value of `T` for
+   *  performing deduction on the class's inner type.
+   *  dimensions of the `var_value` matrix or vector.
+   */
+  template <typename VarMat, typename T_ = T, require_var_t<T_>* = nullptr,
+            require_var_matrix_t<VarMat>* = nullptr>
+  inline void write(VarMat&& x) {
+    check_r_capacity(x.size());
+    map_matrix_t(&map_r_.coeffRef(pos_r_), x.rows(), x.cols())
+        = stan::math::from_var_value(x);
+    pos_r_ += x.size();
+  }
 
-    /**
-     * Write a Eigen matrix of size `(rows, cols)` with complex inner type.
-     * @tparam Mat The type to write
-     * @param rows The size of the rows of the matrix.
-     * @param cols The size of the cols of the matrix.
-     */
-    template <typename Mat, require_eigen_matrix_dynamic_t<Mat>* = nullptr,
-              require_vt_complex<Mat>* = nullptr>
-    inline void write(Mat&& x) {
-        check_r_capacity(2 * x.size());
-        using stan::math::to_ref;
-        auto&& x_ref = to_ref(x);
-        for (Eigen::Index i = 0; i < x.size(); ++i) {
-          map_r_.coeffRef(pos_r_) = x_ref.coeff(i).real();
-          map_r_.coeffRef(pos_r_ + 1) = x_ref.coeff(i).imag();
-          pos_r_ += 2;
-        }
-    }
+  /**
+   * Write an Eigen type when the serializers inner class is not var.
+   * @tparam VarMat The type to write
+   * @tparam T_ Should never be set by user, set to default value of `T` for
+   *  performing deduction on the class's inner type.
+   *  dimensions of the `var_value` matrix or vector.
+   */
+  template <typename VarMat, typename T_ = T, require_not_var_t<T_>* = nullptr,
+            require_var_matrix_t<VarMat>* = nullptr>
+  inline void write(VarMat&& x) {
+    this->write(stan::math::value_of(x));
+  }
 
-    /**
-     * Write a `var_value` with inner Eigen type.
-     * @tparam Ret The type to write
-     * @tparam T_ Should never be set by user, set to default value of `T` for
-     *  performing deduction on the class's inner type.
-     *  dimensions of the `var_value` matrix or vector.
-     */
-    template <typename VarMat, typename T_ = T,
-              require_var_t<T_>* = nullptr, require_var_matrix_t<VarMat>* = nullptr>
-    inline void write(VarMat&& x) {
-      check_r_capacity(x.size());
-      map_matrix_t(&map_r_.coeffRef(pos_r_), x.rows(), x.cols()) = stan::math::from_var_value(x);
-      pos_r_ += x.size();
+  /**
+   * Write an `std::vector`
+   * @tparam StdVec The type to write
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write(StdVec&& x) {
+    for (size_t i = 0; i < x.size(); ++i) {
+      this->write(x[i]);
     }
-
-    /**
-     * Write an Eigen type when the serializers inner class is not var.
-     * @tparam VarMat The type to write
-     * @tparam T_ Should never be set by user, set to default value of `T` for
-     *  performing deduction on the class's inner type.
-     *  dimensions of the `var_value` matrix or vector.
-     */
-    template <typename VarMat, typename T_ = T,
-              require_not_var_t<T_>* = nullptr,
-              require_var_matrix_t<VarMat>* = nullptr>
-    inline void write(VarMat&& x) {
-      this->write(stan::math::value_of(x));
-    }
-
-    /**
-     * Write an `std::vector`
-     * @tparam StdVec The type to write
-     */
-    template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-    inline void write(StdVec&& x) {
-      for (size_t i = 0; i < x.size(); ++i) {
-        this->write(x[i]);
-      }
-    }
+  }
 };
-}
-}
+}  // namespace io
+}  // namespace stan
 
 #endif

@@ -206,9 +206,9 @@ class model_base_crtp : public stan::model::model_base {
     return static_cast<const M*>(this)->template transform_inits(context, params_r, msgs);
   }
 
-  void transform_inits(Eigen::VectorXd& params_r,
-                                std::ostream* msgs) const {
-    return static_cast<const M*>(this)->template transform_inits(params_r, msgs);
+  void transform_inits(Eigen::VectorXd& params_r, std::ostream* msgs) const {
+    return static_cast<const M*>(this)->template transform_inits(params_r,
+                                                                 msgs);
   }
 };
 
