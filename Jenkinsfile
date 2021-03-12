@@ -258,7 +258,7 @@ pipeline {
                         sh """
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
-                            echo 'CXX=${env.GXX}' >> make/local
+                            echo 'CXX=${env.CXX}' >> make/local
                             make -j${env.PARALLEL} build
                             cd ..
                             ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
