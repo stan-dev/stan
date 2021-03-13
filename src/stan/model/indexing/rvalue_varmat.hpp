@@ -46,7 +46,7 @@ namespace model {
  *
  * @tparam Vec `var_value` with inner Eigen type with either dynamic rows or
  * columns, but not both.
- * @param[in] v `var_value` with inner Eigen vector type.
+ * @param[in] x `var_value` with inner Eigen vector type.
  * @param[in] idxs Sequence of integers.
  * @param[in] name Name of variable (default "ANON").
  * @param[in] depth Indexing depth (default 0).

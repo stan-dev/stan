@@ -753,7 +753,7 @@ inline auto rvalue(StdVec&& v, const cons_index_list<index_uni, Idx>& idxs,
  * Types:  std::vector<T>[uni] : T
  *
  * @tparam StdVec a standard vector
- * @param[in] c Container of list elements.
+ * @param[in] v Container of list elements.
  * @param[in] idxs Index list beginning with single index.
  * @param[in] name String form of expression being evaluated.
  * @param[in] depth Depth of indexing dimension.

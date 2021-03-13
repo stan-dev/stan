@@ -86,7 +86,7 @@ class empty_var_context : public var_context {
    * @param stage stan program processing stage
    * @param name variable name
    * @param base_type declared stan variable type
-   * @param dims variable dimensions
+   * @param dims_declared variable dimensions
    * @throw std::runtime_error if mismatch between declared
    *        dimensions and dimensions found in context.
    */
