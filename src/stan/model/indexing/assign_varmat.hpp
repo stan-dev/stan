@@ -245,7 +245,7 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
  * @param[in] x Matrix variable to be assigned.
  * @param[in] y Value matrix.
  * @param[in] name Name of variable
- * @param[in] idxs Multiple index
+ * @param[in] idx Multiple index
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.

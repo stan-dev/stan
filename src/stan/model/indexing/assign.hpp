@@ -647,7 +647,6 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
  * @param[in] y Value matrix.
  * @param[in] name Name of variable
  * @param[in] row_idx index for selecting rows
- * @param[in] col_idx multi index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.

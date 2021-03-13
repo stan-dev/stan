@@ -45,7 +45,7 @@ namespace model {
  *
  * @tparam Vec `var_value` with inner Eigen type with either dynamic rows or
  * columns, but not both.
- * @param[in] v `var_value` with inner Eigen vector type.
+ * @param[in] x `var_value` with inner Eigen vector type.
  * @param[in] name Name of variable
  * @param[in] idx Sequence of integers.
  * @throw std::out_of_range If any of the indices are out of bounds.

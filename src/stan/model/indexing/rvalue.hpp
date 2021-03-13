@@ -63,7 +63,6 @@ inline T rvalue(T&& x, const char* /*name*/) {
  *
  * @tparam T A type that is a plain object.
  * @param[in] x an object.
- * @param[in] name String form of expression being evaluated.
  * @return Result of indexing matrix.
  */
 template <typename T>
@@ -78,7 +77,6 @@ inline T rvalue(T&& x, const char* /*name*/, index_omni /*idx*/) {
  *
  * @tparam T Any type.
  * @param[in] x an object.
- * @param[in] idx Index consisting of two omni-indices.
  * @param[in] name String form of expression being evaluated.
  * @return Result of indexing matrix.
  */
@@ -544,7 +542,6 @@ inline plain_type_t<EigMat> rvalue(EigMat&& x, const char* name,
  * @param[in] x type
  * @param[in] name Name of variable
  * @param[in] row_idx index for selecting rows.
- * @param[in] col_idx omni index for selecting cols.
  * @throw std::out_of_range If any of the indices are out of bounds.
  */
 template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
@@ -648,7 +645,8 @@ inline auto rvalue(Mat&& x, const char* name, const Idx& row_idx,
  * @tparam Idx Index list type for indexes after first index.
  * @param[in] v Container of list elements.
  * @param[in] name String form of expression being evaluated.
- * @param[in] idx single index.
+ * @param[in] idx1 first index.
+ * @param[in] idxs remaining indices.
  * @return Result of indexing array.
  */
 template <typename StdVec, typename... Idxs,
@@ -670,10 +668,9 @@ inline auto rvalue(StdVec&& v, const char* name, index_uni idx1,
  * Types:  std::vector<T>[uni] : T
  *
  * @tparam StdVec a standard vector
- * @param[in] c Container of list elements.
+ * @param[in] v Container of list elements.
  * @param[in] name String form of expression being evaluated.
- * @param[in] idx1 single index
- * @param[in] idxs remaining indices
+ * @param[in] idx single index
  * @return Result of indexing array.
  */
 template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
