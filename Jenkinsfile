@@ -281,6 +281,13 @@ pipeline {
                         }
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
+                            script {
+                                if (params.stanc3_bin_url != 'nightly') {
+                                    sh """
+                                        echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
+                                    """
+                                }
+                            }
                         }        
                         sh """
                             cd performance-tests-cmdstan/cmdstan
