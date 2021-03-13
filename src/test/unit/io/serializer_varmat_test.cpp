@@ -7,10 +7,9 @@
 
 TEST(serializer_varvector, read) {
   using stan::math::var_value;
-  std::vector<stan::math::var> theta;
+  std::vector<stan::math::var> theta(10, 0.0);
   Eigen::VectorXd x_val(10);
   for (size_t i = 0; i < 10U; ++i) {
-    theta.push_back(static_cast<double>(i));
     x_val.coeffRef(i) = -static_cast<double>(i);
   }
   var_value<Eigen::VectorXd> x(x_val);
@@ -26,10 +25,9 @@ TEST(serializer_varvector, read) {
 
 TEST(serializer_varrowvector, read) {
   using stan::math::var_value;
-  std::vector<stan::math::var> theta;
+  std::vector<stan::math::var> theta(10.0, 0.0);
   Eigen::RowVectorXd x_val(10);
   for (size_t i = 0; i < 10U; ++i) {
-    theta.push_back(static_cast<double>(i));
     x_val.coeffRef(i) = -static_cast<double>(i);
   }
   var_value<Eigen::RowVectorXd> x(x_val);
@@ -45,10 +43,9 @@ TEST(serializer_varrowvector, read) {
 
 TEST(serializer_varmatrix, read) {
   using stan::math::var_value;
-  std::vector<stan::math::var> theta;
+  std::vector<stan::math::var> theta(16, 0.0);
   Eigen::MatrixXd x_val(4, 4);
   for (size_t i = 0; i < 16U; ++i) {
-    theta.push_back(static_cast<double>(i));
     x_val.coeffRef(i) = -static_cast<double>(i);
   }
   var_value<Eigen::MatrixXd> x(x_val);
@@ -64,12 +61,9 @@ TEST(serializer_varmatrix, read) {
 
 TEST(serializer_stdvector_varmat, read) {
   using stan::math::var_value;
-  std::vector<stan::math::var> theta;
+  std::vector<stan::math::var> theta(18, 0.0);
   std::vector<var_value<Eigen::MatrixXd>> x;
   for (size_t i = 0; i < 2U; ++i) {
-    for (int j = 0; j < 9U; ++j) {
-      theta.push_back(static_cast<double>(i));
-    }
     x.push_back(Eigen::MatrixXd::Random(3, 3));
   }
   stan::io::serializer<stan::math::var> serializer(theta);

@@ -4,22 +4,13 @@
 #include <stan/math/rev.hpp>
 
 namespace stan {
-
 namespace io {
 
 /**
- * A stream-based writer for integer, scalar, vector, matrix
- * and array data types.
+ * A stream-based writer for scalar, vector, matrix, and array data types.
  *
- * The template parameter <code>T</code> represents the type of
- * scalars and the values in vectors and matrices.  The only
- * requirement on the template type <code>T</code> is that a
- * double can be copied into it, as in
- *
- * <code>T t = 0.0;</code>
- *
- * This includes <code>double</code> itself and the reverse-mode
- * algorithmic differentiation class <code>stan::math::var</code>.
+ *`T` is the storage scalar type. Variables written by the serializer must
+ * have a scalar type convertible to type `T`.
  *
  * @tparam T Basic scalar type.
  */
@@ -31,14 +22,15 @@ class serializer {
   size_t pos_r_{0};  // current position in map of reals.
 
   /**
-   * Check there are at least m reals left to read
+   * Check there is room for at least m more reals to store
+   *
    * @param m Number of reals to read
-   * @throws std::runtime_error if there aren't at least m reals left
+   * @throws std::runtime_error if there isn't room for m reals
    */
   void check_r_capacity(size_t m) const {
     if (pos_r_ + m > r_size_) {
       []() STAN_COLD_PATH {
-        throw std::runtime_error("no more scalars available to write");
+        throw std::runtime_error("no more storage available to write");
       }();
     }
   }
@@ -64,15 +56,12 @@ class serializer {
       = stan::math::var_value<Eigen::Matrix<double, 1, Eigen::Dynamic>>;
 
   /**
-   * Construct a variable serializer using the specified vectors
-   * as the source of scalar and integer values for data to be read into.
-   *  This class holds a reference to the specified data vectors.
+   * Construct a variable serializer using data_r for storage.
    *
-   * Attempting to write beyond the end of the data or integer
-   * value sequences raises a runtime exception.
+   * Attempting to write beyond the end of data_r will raise a runtime exception.
    *
    * @param RVec Vector like class.
-   * @param data_r A reference to a Sequence of scalar values to be written to.
+   * @param data_r Storage vector
    */
   template <typename RVec, require_vector_like_t<RVec>* = nullptr>
   explicit serializer(RVec& data_r)
@@ -84,7 +73,7 @@ class serializer {
   inline size_t available() const noexcept { return r_size_ - pos_r_; }
 
   /**
-   * Write the next object in the sequence.
+   * Write a scalar to storage
    * @tparam Scalar A Stan scalar class
    * @param x A scalar
    */
@@ -97,7 +86,7 @@ class serializer {
   }
 
   /**
-   * Write a complex variable from the next two reals in the sequence
+   * Write a complex variable to storage
    * @tparam Complex An `std::complex` type.
    * @param x The complex scalar
    */
@@ -110,7 +99,7 @@ class serializer {
   }
 
   /**
-   * Write an Eigen column vector
+   * Write an Eigen column vector to storage
    * @tparam Vec An Eigen type with compile time columns equal to 1.
    * @param vec The Eigen column vector
    */
@@ -123,7 +112,7 @@ class serializer {
   }
 
   /**
-   * Write a Eigen column vector with inner complex type.
+   * Write a Eigen column vector with inner complex type to storage
    * @tparam Vec An Eigen type with compile time columns equal to 1.
    * @param vec The Eigen column vector
    */
@@ -141,7 +130,7 @@ class serializer {
   }
 
   /**
-   * Write an Eigen row vector.
+   * Write an Eigen row vector to storage
    * @tparam Vec An Eigen type with compile time rows equal to 1.
    * @param vec The Eigen row vector
    */
@@ -154,7 +143,7 @@ class serializer {
   }
 
   /**
-   * Write an Eigen row vector with inner complex type.
+   * Write an Eigen row vector with inner complex type to storage
    * @tparam Vec An Eigen type with compile time rows equal to 1.
    * @param vec The Eigen row vector
    */
@@ -172,7 +161,7 @@ class serializer {
   }
 
   /**
-   * Write a Eigen matrix of size `(rows, cols)`.
+   * Write a Eigen matrix of size `(rows, cols)` to storage
    * @tparam Mat An Eigen class with dynamic rows and columns
    * @param mat An Eigen object
    */
@@ -185,7 +174,7 @@ class serializer {
   }
 
   /**
-   * Write a Eigen matrix of size `(rows, cols)` with complex inner type.
+   * Write a Eigen matrix of size `(rows, cols)` with complex inner type to storage
    * @tparam Mat The type to write
    * @param rows The size of the rows of the matrix.
    * @param cols The size of the cols of the matrix.
@@ -204,7 +193,7 @@ class serializer {
   }
 
   /**
-   * Write a `var_value` with inner Eigen type.
+   * Write a `var_value` with inner Eigen type to storage
    * @tparam Ret The type to write
    * @tparam T_ Should never be set by user, set to default value of `T` for
    *  performing deduction on the class's inner type.
@@ -233,7 +222,7 @@ class serializer {
   }
 
   /**
-   * Write an `std::vector`
+   * Write a `std::vector` to storage
    * @tparam StdVec The type to write
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
@@ -243,6 +232,7 @@ class serializer {
     }
   }
 };
+
 }  // namespace io
 }  // namespace stan
 
