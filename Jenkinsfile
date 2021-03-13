@@ -258,10 +258,19 @@ pipeline {
                         """
                         script {
                             if (params.cmdstan_pr != 'downstream_tests') {
-                                sh """
-                                    cd performance-tests-cmdstan/cmdstan
-                                    git checkout ${params.cmdstan_pr}
-                                """
+                                if(params.cmdstan_pr.contains("PR-")){
+                                    pr_number = params.cmdstan_pr.split("-")[1]
+                                    sh """
+                                        cd performance-tests-cmdstan/cmdstan
+                                        git fetch origin pull/${pr_number}/head:pr/${pr_number}
+                                        git checkout pr/${pr_number}
+                                    """
+                                }else{
+                                    sh """
+                                        cd performance-tests-cmdstan/cmdstan
+                                        git checkout develop && git pull && git checkout ${params.cmdstan_pr}
+                                    """
+                                }
                             }
                             if (params.stanc3_bin_url != 'nightly') {
                                 sh """
@@ -272,6 +281,13 @@ pipeline {
                         }
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
+                            script {
+                                if (params.stanc3_bin_url != 'nightly') {
+                                    sh """
+                                        echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
+                                    """
+                                }
+                            }
                         }        
                         sh """
                             cd performance-tests-cmdstan/cmdstan
@@ -304,20 +320,6 @@ pipeline {
                         sh """
                             git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
                         """
-                        script {
-                            if (params.cmdstan_pr != 'downstream_tests') {
-                                sh """
-                                    cd performance-tests-cmdstan/cmdstan
-                                    git checkout ${params.cmdstan_pr}
-                                """
-                            }
-                            if (params.stanc3_bin_url != 'nightly') {
-                                sh """
-                                    cd performance-tests-cmdstan/cmdstan
-                                    echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
-                                """
-                            }
-                        }
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
                         }        
@@ -351,7 +353,7 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCXX()
+                            setupCXX(false, env.CXX, stanc3_bin_url())
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             setupCXX(false)
                             runTestsWin("src/test/integration", separateMakeStep=false)
