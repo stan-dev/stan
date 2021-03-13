@@ -33,8 +33,9 @@ TEST(serializer_stdvec_vector, complex_write) {
   for (size_t i = 0; i < 2U; ++i) {
     complex_vec x(10);
     for (size_t j = 0; j < 10U; ++j) {
-      x.coeffRef(j) = std::complex<double>(-static_cast<double>(i * 20 + j),
-                                           -static_cast<double>(i * 20 + j + 1));
+      x.coeffRef(j)
+          = std::complex<double>(-static_cast<double>(i * 20 + j),
+                                 -static_cast<double>(i * 20 + j + 1));
     }
     x_stdvec.push_back(x);
   }
@@ -81,8 +82,9 @@ TEST(serializer_stdvec_rowvector, complex_write) {
   for (size_t i = 0; i < 2U; ++i) {
     complex_vec x(10);
     for (size_t j = 0; j < 10U; ++j) {
-      x.coeffRef(j) = std::complex<double>(-static_cast<double>(i * 20 + j),
-                                           -static_cast<double>(i * 20 + j + 1));
+      x.coeffRef(j)
+          = std::complex<double>(-static_cast<double>(i * 20 + j),
+                                 -static_cast<double>(i * 20 + j + 1));
     }
     x_stdvec.push_back(x);
   }
@@ -130,8 +132,9 @@ TEST(serializer_stdvec_matrix, complex_write) {
   for (size_t i = 0; i < 2U; ++i) {
     complex_mat x(4, 4);
     for (size_t j = 0; j < 16U; ++j) {
-      x.coeffRef(j) = std::complex<double>(-static_cast<double>(i * 32 + j),
-                                           -static_cast<double>(i * 32 + j + 1));
+      x.coeffRef(j)
+          = std::complex<double>(-static_cast<double>(i * 32 + j),
+                                 -static_cast<double>(i * 32 + j + 1));
     }
     x_stdvec.push_back(x);
   }

@@ -58,7 +58,8 @@ class serializer {
   /**
    * Construct a variable serializer using data_r for storage.
    *
-   * Attempting to write beyond the end of data_r will raise a runtime exception.
+   * Attempting to write beyond the end of data_r will raise a runtime
+   * exception.
    *
    * @param RVec Vector like class.
    * @param data_r Storage vector
@@ -174,7 +175,8 @@ class serializer {
   }
 
   /**
-   * Write a Eigen matrix of size `(rows, cols)` with complex inner type to storage
+   * Write a Eigen matrix of size `(rows, cols)` with complex inner type to
+   * storage
    * @tparam Mat The type to write
    * @param rows The size of the rows of the matrix.
    * @param cols The size of the cols of the matrix.
