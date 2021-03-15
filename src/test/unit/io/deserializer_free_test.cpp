@@ -112,7 +112,8 @@ void read_free_lub_test(Sizes... sizes) {
   // Read an constrained variable
   stan::io::deserializer<double> deserializer1(theta1, theta_i);
   double lp = 0.0;
-  Ret vec_ref = deserializer1.read_constrain_lub<Ret, false>(lb, ub, lp, sizes...);
+  Ret vec_ref
+      = deserializer1.read_constrain_lub<Ret, false>(lb, ub, lp, sizes...);
 
   // Serialize a constrained variable
   stan::io::serializer<double> serializer(theta2);
@@ -209,7 +210,8 @@ void read_free_unit_vector_test(Sizes... sizes) {
   // Read an constrained variable
   stan::io::deserializer<double> deserializer1(theta1, theta_i);
   double lp = 0.0;
-  Ret vec_ref = deserializer1.read_constrain_unit_vector<Ret, false>(lp, sizes...);
+  Ret vec_ref
+      = deserializer1.read_constrain_unit_vector<Ret, false>(lp, sizes...);
 
   // Serialize a constrained variable
   stan::io::serializer<double> serializer(theta2);
@@ -348,7 +350,8 @@ void read_free_positive_ordered_test(Sizes... sizes) {
   // Read an constrained variable
   stan::io::deserializer<double> deserializer1(theta1, theta_i);
   double lp = 0.0;
-  Ret vec_ref = deserializer1.read_constrain_positive_ordered<Ret, false>(lp, sizes...);
+  Ret vec_ref
+      = deserializer1.read_constrain_positive_ordered<Ret, false>(lp, sizes...);
 
   // Serialize a constrained variable
   stan::io::serializer<double> serializer(theta2);
@@ -394,8 +397,8 @@ void read_free_cholesky_factor_cov_test(Sizes... sizes) {
   // Read an constrained variable
   stan::io::deserializer<double> deserializer1(theta1, theta_i);
   double lp = 0.0;
-  Ret vec_ref
-      = deserializer1.read_constrain_cholesky_factor_cov<Ret, false>(lp, sizes...);
+  Ret vec_ref = deserializer1.read_constrain_cholesky_factor_cov<Ret, false>(
+      lp, sizes...);
 
   // Serialize a constrained variable
   stan::io::serializer<double> serializer(theta2);
@@ -446,8 +449,8 @@ void read_free_cholesky_factor_corr_test(Sizes... sizes) {
   // Read an constrained variable
   stan::io::deserializer<double> deserializer1(theta1, theta_i);
   double lp = 0.0;
-  Ret vec_ref
-      = deserializer1.read_constrain_cholesky_factor_corr<Ret, false>(lp, sizes...);
+  Ret vec_ref = deserializer1.read_constrain_cholesky_factor_corr<Ret, false>(
+      lp, sizes...);
 
   // Serialize a constrained variable
   stan::io::serializer<double> serializer(theta2);
@@ -493,7 +496,8 @@ void read_free_cov_matrix_test(Sizes... sizes) {
   // Read an constrained variable
   stan::io::deserializer<double> deserializer1(theta1, theta_i);
   double lp = 0.0;
-  Ret vec_ref = deserializer1.read_constrain_cov_matrix<Ret, false>(lp, sizes...);
+  Ret vec_ref
+      = deserializer1.read_constrain_cov_matrix<Ret, false>(lp, sizes...);
 
   // Serialize a constrained variable
   stan::io::serializer<double> serializer(theta2);
@@ -538,7 +542,8 @@ void read_free_corr_matrix_test(Sizes... sizes) {
   // Read an constrained variable
   stan::io::deserializer<double> deserializer1(theta1, theta_i);
   double lp = 0.0;
-  Ret vec_ref = deserializer1.read_constrain_corr_matrix<Ret, false>(lp, sizes...);
+  Ret vec_ref
+      = deserializer1.read_constrain_corr_matrix<Ret, false>(lp, sizes...);
 
   // Serialize a constrained variable
   stan::io::serializer<double> serializer(theta2);

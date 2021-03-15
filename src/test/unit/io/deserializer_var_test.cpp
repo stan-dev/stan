@@ -317,10 +317,12 @@ TEST(deserializer_scalar, read_constrain_lb_constrain_jacobian) {
   theta.push_back(0.0);
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
   stan::math::var lp = -1.5;
-  EXPECT_FLOAT_EQ(1.0 + exp(-2.0),
-                  (deserializer.read_constrain_lb<stan::math::var, true>(1.0, lp)).val());
-  EXPECT_FLOAT_EQ(5.0 + exp(3.0),
-                  (deserializer.read_constrain_lb<stan::math::var, true>(5.0, lp)).val());
+  EXPECT_FLOAT_EQ(
+      1.0 + exp(-2.0),
+      (deserializer.read_constrain_lb<stan::math::var, true>(1.0, lp)).val());
+  EXPECT_FLOAT_EQ(
+      5.0 + exp(3.0),
+      (deserializer.read_constrain_lb<stan::math::var, true>(5.0, lp)).val());
   EXPECT_FLOAT_EQ(
       -2.0 + exp(-1.0),
       (deserializer.read_constrain_lb<stan::math::var, true>(-2.0, lp)).val());
@@ -363,10 +365,12 @@ TEST(deserializer_scalar, read_constrain_ub_constrain_jacobian) {
   theta.push_back(0.0);
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
   stan::math::var lp = -12.9;
-  EXPECT_FLOAT_EQ(1.0 - exp(-2.0),
-                  (deserializer.read_constrain_ub<stan::math::var, true>(1.0, lp)).val());
-  EXPECT_FLOAT_EQ(5.0 - exp(3.0),
-                  (deserializer.read_constrain_ub<stan::math::var, true>(5.0, lp)).val());
+  EXPECT_FLOAT_EQ(
+      1.0 - exp(-2.0),
+      (deserializer.read_constrain_ub<stan::math::var, true>(1.0, lp)).val());
+  EXPECT_FLOAT_EQ(
+      5.0 - exp(3.0),
+      (deserializer.read_constrain_ub<stan::math::var, true>(5.0, lp)).val());
   EXPECT_FLOAT_EQ(
       -2.0 - exp(-1.0),
       (deserializer.read_constrain_ub<stan::math::var, true>(-2.0, lp)).val());
@@ -394,16 +398,20 @@ TEST(deserializer_scalar, read_constrain_lub_constrain) {
   stan::math::var lp = 0;
   EXPECT_FLOAT_EQ(
       inv_logit_m2,
-      (deserializer.read_constrain_lub<stan::math::var, false>(0.0, 1.0, lp)).val());
+      (deserializer.read_constrain_lub<stan::math::var, false>(0.0, 1.0, lp))
+          .val());
   EXPECT_FLOAT_EQ(
       3.0 + 2.0 * inv_logit_3,
-      (deserializer.read_constrain_lub<stan::math::var, false>(3.0, 5.0, lp)).val());
+      (deserializer.read_constrain_lub<stan::math::var, false>(3.0, 5.0, lp))
+          .val());
   EXPECT_FLOAT_EQ(
       -3.0 + 5.0 * inv_logit_m1,
-      (deserializer.read_constrain_lub<stan::math::var, false>(-3.0, 2.0, lp)).val());
+      (deserializer.read_constrain_lub<stan::math::var, false>(-3.0, 2.0, lp))
+          .val());
   EXPECT_FLOAT_EQ(
       -15.0 + 30.0 * inv_logit_0,
-      (deserializer.read_constrain_lub<stan::math::var, false>(-15.0, 15.0, lp)).val());
+      (deserializer.read_constrain_lub<stan::math::var, false>(-15.0, 15.0, lp))
+          .val());
 }
 TEST(deserializer_scalar, read_constrain_lub_constrain_jacobian) {
   std::vector<int> theta_i;
@@ -416,16 +424,20 @@ TEST(deserializer_scalar, read_constrain_lub_constrain_jacobian) {
   stan::math::var lp = -7.2;
   EXPECT_FLOAT_EQ(
       0.0 + 1.0 * inv_logit_m2,
-      (deserializer.read_constrain_lub<stan::math::var, true>(0.0, 1.0, lp)).val());
+      (deserializer.read_constrain_lub<stan::math::var, true>(0.0, 1.0, lp))
+          .val());
   EXPECT_FLOAT_EQ(
       3.0 + 2.0 * inv_logit_3,
-      (deserializer.read_constrain_lub<stan::math::var, true>(3.0, 5.0, lp)).val());
+      (deserializer.read_constrain_lub<stan::math::var, true>(3.0, 5.0, lp))
+          .val());
   EXPECT_FLOAT_EQ(
       -3.0 + 5.0 * inv_logit_m1,
-      (deserializer.read_constrain_lub<stan::math::var, true>(-3.0, 2.0, lp)).val());
+      (deserializer.read_constrain_lub<stan::math::var, true>(-3.0, 2.0, lp))
+          .val());
   EXPECT_FLOAT_EQ(
       -15.0 + 30.0 * inv_logit_0,
-      (deserializer.read_constrain_lub<stan::math::var, true>(-15.0, 15.0, lp)).val());
+      (deserializer.read_constrain_lub<stan::math::var, true>(-15.0, 15.0, lp))
+          .val());
   double expected_lp = -7.2
                        + log((1.0 - 0.0) * inv_logit_m2 * (1 - inv_logit_m2))
                        + log((5.0 - 3.0) * inv_logit_3 * (1 - inv_logit_3))
@@ -444,22 +456,26 @@ TEST(deserializer_scalar, offset_multiplier_constrain) {
   theta.push_back(0.0);
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
   stan::math::var lp = 0;
-  EXPECT_FLOAT_EQ(-2.0,
-                  (deserializer.read_constrain_offset_multiplier<stan::math::var, false>(
-                       0.0, 1.0, lp))
-                      .val());
-  EXPECT_FLOAT_EQ(3.0 + 5.0 * 3.0,
-                  (deserializer.read_constrain_offset_multiplier<stan::math::var, false>(
-                       3.0, 5.0, lp))
-                      .val());
-  EXPECT_FLOAT_EQ(-3.0 + 2.0 * -1.0,
-                  (deserializer.read_constrain_offset_multiplier<stan::math::var, false>(
-                       -3.0, 2.0, lp))
-                      .val());
-  EXPECT_FLOAT_EQ(-15.0,
-                  (deserializer.read_constrain_offset_multiplier<stan::math::var, false>(
-                       -15.0, 15.0, lp))
-                      .val());
+  EXPECT_FLOAT_EQ(
+      -2.0,
+      (deserializer.read_constrain_offset_multiplier<stan::math::var, false>(
+           0.0, 1.0, lp))
+          .val());
+  EXPECT_FLOAT_EQ(
+      3.0 + 5.0 * 3.0,
+      (deserializer.read_constrain_offset_multiplier<stan::math::var, false>(
+           3.0, 5.0, lp))
+          .val());
+  EXPECT_FLOAT_EQ(
+      -3.0 + 2.0 * -1.0,
+      (deserializer.read_constrain_offset_multiplier<stan::math::var, false>(
+           -3.0, 2.0, lp))
+          .val());
+  EXPECT_FLOAT_EQ(
+      -15.0,
+      (deserializer.read_constrain_offset_multiplier<stan::math::var, false>(
+           -15.0, 15.0, lp))
+          .val());
 }
 
 TEST(deserializer_scalar, offset_multiplier_constrain_jacobian) {
@@ -473,20 +489,24 @@ TEST(deserializer_scalar, offset_multiplier_constrain_jacobian) {
   stan::math::var lp = -7.2;
   EXPECT_FLOAT_EQ(
       -2.0,
-      (deserializer.read_constrain_offset_multiplier<stan::math::var, true>(0.0, 1.0, lp))
+      (deserializer.read_constrain_offset_multiplier<stan::math::var, true>(
+           0.0, 1.0, lp))
           .val());
   EXPECT_FLOAT_EQ(
       3.0 + 5.0 * 3.0,
-      (deserializer.read_constrain_offset_multiplier<stan::math::var, true>(3.0, 5.0, lp))
+      (deserializer.read_constrain_offset_multiplier<stan::math::var, true>(
+           3.0, 5.0, lp))
           .val());
-  EXPECT_FLOAT_EQ(-3.0 + 2.0 * -1.0,
-                  (deserializer.read_constrain_offset_multiplier<stan::math::var, true>(
-                       -3.0, 2.0, lp))
-                      .val());
-  EXPECT_FLOAT_EQ(-15.0,
-                  (deserializer.read_constrain_offset_multiplier<stan::math::var, true>(
-                       -15.0, 15.0, lp))
-                      .val());
+  EXPECT_FLOAT_EQ(
+      -3.0 + 2.0 * -1.0,
+      (deserializer.read_constrain_offset_multiplier<stan::math::var, true>(
+           -3.0, 2.0, lp))
+          .val());
+  EXPECT_FLOAT_EQ(
+      -15.0,
+      (deserializer.read_constrain_offset_multiplier<stan::math::var, true>(
+           -15.0, 15.0, lp))
+          .val());
   double expected_lp = -7.2 + log(1.0) + log(5.0) + log(2.0) + log(15.0);
   EXPECT_FLOAT_EQ(expected_lp, lp.val());
 }
