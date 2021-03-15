@@ -5,14 +5,13 @@
 
 // vector
 
-TEST(serializer_stdvec_vector, read) {
-  std::vector<double> theta;
+TEST(serializer_stdvec_vector, write) {
+  std::vector<double> theta(100);
   std::vector<Eigen::VectorXd> x_stdvec;
   for (size_t i = 0; i < 2U; ++i) {
     Eigen::VectorXd x_vec(10);
-    for (size_t i = 0; i < 10U; ++i) {
-      theta.push_back(static_cast<double>(i));
-      x_vec.coeffRef(i) = -static_cast<double>(i);
+    for (size_t j = 0; j < 10U; ++j) {
+      x_vec.coeffRef(j) = -static_cast<double>(i * 10 + j);
     }
     x_stdvec.push_back(x_vec);
   }
@@ -25,21 +24,18 @@ TEST(serializer_stdvec_vector, read) {
       ++sentinal;
     }
   }
-  EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_stdvec_vector, complex_read) {
-  std::vector<double> theta;
+TEST(serializer_stdvec_vector, complex_write) {
+  std::vector<double> theta(100);
   using complex_vec = Eigen::Matrix<std::complex<double>, -1, 1>;
   std::vector<complex_vec> x_stdvec;
-  for (size_t i = 0; i < 40U; ++i) {
-    theta.push_back(static_cast<double>(i));
-  }
   for (size_t i = 0; i < 2U; ++i) {
     complex_vec x(10);
     for (size_t j = 0; j < 10U; ++j) {
-      x.coeffRef(j) = std::complex<double>(-static_cast<double>(j),
-                                           -static_cast<double>(j + 1));
+      x.coeffRef(j)
+          = std::complex<double>(-static_cast<double>(i * 20 + j),
+                                 -static_cast<double>(i * 20 + j + 1));
     }
     x_stdvec.push_back(x);
   }
@@ -55,18 +51,16 @@ TEST(serializer_stdvec_vector, complex_read) {
       sentinal += 2;
     }
   }
-  EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 // row vector
 
-TEST(serializer_stdvec_rowvector, read) {
-  std::vector<double> theta;
+TEST(serializer_stdvec_rowvector, write) {
+  std::vector<double> theta(100);
   std::vector<Eigen::RowVectorXd> x_stdvec;
   for (size_t i = 0; i < 2U; ++i) {
     Eigen::RowVectorXd x_vec(10);
-    for (size_t i = 0; i < 10U; ++i) {
-      theta.push_back(static_cast<double>(i));
-      x_vec.coeffRef(i) = -static_cast<double>(i);
+    for (size_t j = 0; j < 10U; ++j) {
+      x_vec.coeffRef(j) = -static_cast<double>(i * 10 + j);
     }
     x_stdvec.push_back(x_vec);
   }
@@ -79,21 +73,18 @@ TEST(serializer_stdvec_rowvector, read) {
       ++sentinal;
     }
   }
-  EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_stdvec_rowvector, complex_read) {
-  std::vector<double> theta;
+TEST(serializer_stdvec_rowvector, complex_write) {
+  std::vector<double> theta(100);
   using complex_vec = Eigen::Matrix<std::complex<double>, 1, -1>;
   std::vector<complex_vec> x_stdvec;
-  for (size_t i = 0; i < 40U; ++i) {
-    theta.push_back(static_cast<double>(i));
-  }
   for (size_t i = 0; i < 2U; ++i) {
     complex_vec x(10);
     for (size_t j = 0; j < 10U; ++j) {
-      x.coeffRef(j) = std::complex<double>(-static_cast<double>(j),
-                                           -static_cast<double>(j + 1));
+      x.coeffRef(j)
+          = std::complex<double>(-static_cast<double>(i * 20 + j),
+                                 -static_cast<double>(i * 20 + j + 1));
     }
     x_stdvec.push_back(x);
   }
@@ -109,19 +100,17 @@ TEST(serializer_stdvec_rowvector, complex_read) {
       sentinal += 2;
     }
   }
-  EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
 // matrix
 
-TEST(serializer_stdvec_matrix, read) {
-  std::vector<double> theta;
+TEST(serializer_stdvec_matrix, write) {
+  std::vector<double> theta(100);
   std::vector<Eigen::MatrixXd> x_stdvec;
   for (size_t i = 0; i < 2U; ++i) {
     Eigen::MatrixXd x_vec(4, 4);
-    for (size_t i = 0; i < 16U; ++i) {
-      theta.push_back(static_cast<double>(i));
-      x_vec.coeffRef(i) = -static_cast<double>(i);
+    for (size_t j = 0; j < 16U; ++j) {
+      x_vec.coeffRef(j) = -static_cast<double>(i * 16 + j);
     }
     x_stdvec.push_back(x_vec);
   }
@@ -134,21 +123,18 @@ TEST(serializer_stdvec_matrix, read) {
       ++sentinal;
     }
   }
-  EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_stdvec_matrix, complex_read) {
-  std::vector<double> theta;
+TEST(serializer_stdvec_matrix, complex_write) {
+  std::vector<double> theta(100);
   using complex_mat = Eigen::Matrix<std::complex<double>, -1, -1>;
   std::vector<complex_mat> x_stdvec;
-  for (size_t i = 0; i < 64U; ++i) {
-    theta.push_back(static_cast<double>(i));
-  }
   for (size_t i = 0; i < 2U; ++i) {
     complex_mat x(4, 4);
     for (size_t j = 0; j < 16U; ++j) {
-      x.coeffRef(j) = std::complex<double>(-static_cast<double>(j),
-                                           -static_cast<double>(j + 1));
+      x.coeffRef(j)
+          = std::complex<double>(-static_cast<double>(i * 32 + j),
+                                 -static_cast<double>(i * 32 + j + 1));
     }
     x_stdvec.push_back(x);
   }
@@ -164,17 +150,15 @@ TEST(serializer_stdvec_matrix, complex_read) {
       sentinal += 2;
     }
   }
-  EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_stdvec_stdvector, read) {
-  std::vector<double> theta;
+TEST(serializer_stdvec_stdvector, write) {
+  std::vector<double> theta(100);
   std::vector<std::vector<double>> x_stdvec;
   for (size_t i = 0; i < 2U; ++i) {
     std::vector<double> x_vec;
-    for (size_t i = 0; i < 10U; ++i) {
-      theta.push_back(static_cast<double>(i));
-      x_vec.push_back(-static_cast<double>(i));
+    for (size_t j = 0; j < 10U; ++j) {
+      x_vec.push_back(-static_cast<double>(i * 10 + j));
     }
     x_stdvec.push_back(x_vec);
   }
@@ -187,21 +171,17 @@ TEST(serializer_stdvec_stdvector, read) {
       ++sentinal;
     }
   }
-  EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_stdvec_stdvector, complex_read) {
-  std::vector<double> theta;
+TEST(serializer_stdvec_stdvector, complex_write) {
+  std::vector<double> theta(100);
   using complex_vec = std::vector<std::complex<double>>;
   std::vector<complex_vec> x_stdvec;
-  for (size_t i = 0; i < 40U; ++i) {
-    theta.push_back(static_cast<double>(i));
-  }
   for (size_t i = 0; i < 2U; ++i) {
     complex_vec x;
     for (size_t j = 0; j < 10U; ++j) {
-      x.push_back(std::complex<double>(-static_cast<double>(j),
-                                       -static_cast<double>(j + 1)));
+      x.push_back(std::complex<double>(-static_cast<double>(i * 20 + j),
+                                       -static_cast<double>(i * 20 + j + 1)));
     }
     x_stdvec.push_back(x);
   }
@@ -217,5 +197,4 @@ TEST(serializer_stdvec_stdvector, complex_read) {
       sentinal += 2;
     }
   }
-  EXPECT_THROW(serializer.write(4), std::runtime_error);
 }

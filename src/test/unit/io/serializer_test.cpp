@@ -3,48 +3,41 @@
 #include <test/unit/math/expect_near_rel.hpp>
 #include <gtest/gtest.h>
 
-TEST(serializer_scalar, read) {
-  std::vector<double> theta;
-  theta.push_back(1.0);
-  theta.push_back(2.0);
+TEST(serializer_scalar, write) {
+  std::vector<double> theta(2, 0.0);
   double x = 4.0;
   double y = 6.0;
   stan::io::serializer<double> serializer(theta);
   serializer.write(x);
-  EXPECT_FLOAT_EQ(4.0, theta[0]);
+  EXPECT_FLOAT_EQ(x, theta[0]);
   serializer.write(y);
-  EXPECT_FLOAT_EQ(6.0, y);
+  EXPECT_FLOAT_EQ(y, theta[1]);
   EXPECT_EQ(0U, serializer.available());
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_scalar, complex_read) {
-  std::vector<double> theta;
-  theta.push_back(1.0);
-  theta.push_back(2.0);
-  theta.push_back(3.0);
-  theta.push_back(4.0);
+TEST(serializer_scalar, complex_write) {
+  std::vector<double> theta(4, 0.0);
   stan::io::serializer<double> serializer(theta);
   std::complex<double> x = std::complex<double>(5.0, 6.0);
   std::complex<double> y = std::complex<double>(7.0, 8.0);
 
   serializer.write(x);
-  EXPECT_FLOAT_EQ(5.0, theta[0]);
-  EXPECT_FLOAT_EQ(6.0, theta[1]);
+  EXPECT_FLOAT_EQ(x.real(), theta[0]);
+  EXPECT_FLOAT_EQ(x.imag(), theta[1]);
   serializer.write(y);
-  EXPECT_FLOAT_EQ(7.0, theta[2]);
-  EXPECT_FLOAT_EQ(8.0, theta[3]);
+  EXPECT_FLOAT_EQ(y.real(), theta[2]);
+  EXPECT_FLOAT_EQ(y.imag(), theta[3]);
   EXPECT_EQ(0U, serializer.available());
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
 // vector
 
-TEST(serializer_vector, read) {
-  std::vector<double> theta;
+TEST(serializer_vector, write) {
+  std::vector<double> theta(10, 0.0);
   Eigen::VectorXd x(10);
   for (size_t i = 0; i < 10U; ++i) {
-    theta.push_back(static_cast<double>(i));
     x.coeffRef(i) = -static_cast<double>(i);
   }
   stan::io::serializer<double> serializer(theta);
@@ -55,13 +48,9 @@ TEST(serializer_vector, read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_vector, complex_read) {
-  std::vector<double> theta;
+TEST(serializer_vector, complex_write) {
+  std::vector<double> theta(20, 0.0);
   Eigen::Matrix<std::complex<double>, -1, 1> x(10);
-  for (size_t i = 0; i < 20U; i += 2) {
-    theta.push_back(static_cast<double>(i));
-    theta.push_back(static_cast<double>(i + 1));
-  }
   for (size_t i = 0; i < 10U; ++i) {
     x.coeffRef(i) = std::complex<double>(-static_cast<double>(i),
                                          -static_cast<double>(i + 1));
@@ -80,11 +69,10 @@ TEST(serializer_vector, complex_read) {
 
 // row vector
 
-TEST(serializer_rowvector, read) {
-  std::vector<double> theta;
+TEST(serializer_rowvector, write) {
+  std::vector<double> theta(10, 0.0);
   Eigen::RowVectorXd x(10);
   for (size_t i = 0; i < 10U; ++i) {
-    theta.push_back(static_cast<double>(i));
     x.coeffRef(i) = -static_cast<double>(i);
   }
   stan::io::serializer<double> serializer(theta);
@@ -95,13 +83,9 @@ TEST(serializer_rowvector, read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_rowvector, complex_read) {
-  std::vector<double> theta;
+TEST(serializer_rowvector, complex_write) {
+  std::vector<double> theta(20, 0.0);
   Eigen::Matrix<std::complex<double>, 1, -1> x(10);
-  for (size_t i = 0; i < 20U; i += 2) {
-    theta.push_back(static_cast<double>(i));
-    theta.push_back(static_cast<double>(i + 1));
-  }
   for (size_t i = 0; i < 10U; ++i) {
     x.coeffRef(i) = std::complex<double>(-static_cast<double>(i),
                                          -static_cast<double>(i + 1));
@@ -120,11 +104,10 @@ TEST(serializer_rowvector, complex_read) {
 
 // matrix
 
-TEST(serializer_matrix, read) {
-  std::vector<double> theta;
+TEST(serializer_matrix, write) {
+  std::vector<double> theta(16, 0.0);
   Eigen::MatrixXd x(4, 4);
   for (size_t i = 0; i < 16U; ++i) {
-    theta.push_back(static_cast<double>(i));
     x.coeffRef(i) = -static_cast<double>(i);
   }
   stan::io::serializer<double> serializer(theta);
@@ -135,13 +118,9 @@ TEST(serializer_matrix, read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_matrix, complex_read) {
-  std::vector<double> theta;
+TEST(serializer_matrix, complex_write) {
+  std::vector<double> theta(32, 0.0);
   Eigen::Matrix<std::complex<double>, -1, -1> x(4, 4);
-  for (size_t i = 0; i < 32U; i += 2) {
-    theta.push_back(static_cast<double>(i));
-    theta.push_back(static_cast<double>(i + 1));
-  }
   for (size_t i = 0; i < 16U; ++i) {
     x.coeffRef(i) = std::complex<double>(-static_cast<double>(i),
                                          -static_cast<double>(i + 1));
@@ -160,11 +139,10 @@ TEST(serializer_matrix, complex_read) {
 
 // array
 
-TEST(serializer_stdvector, read) {
-  std::vector<double> theta;
+TEST(serializer_stdvector, write) {
+  std::vector<double> theta(10, 0.0);
   std::vector<double> x;
   for (size_t i = 0; i < 10U; ++i) {
-    theta.push_back(static_cast<double>(i));
     x.push_back(-static_cast<double>(i));
   }
   stan::io::serializer<double> serializer(theta);
@@ -175,13 +153,9 @@ TEST(serializer_stdvector, read) {
   EXPECT_THROW(serializer.write(4), std::runtime_error);
 }
 
-TEST(serializer_stdvector, complex_read) {
-  std::vector<double> theta;
+TEST(serializer_stdvector, complex_write) {
+  std::vector<double> theta(20, 0.0);
   std::vector<std::complex<double>> x;
-  for (size_t i = 0; i < 20U; i += 2) {
-    theta.push_back(static_cast<double>(i));
-    theta.push_back(static_cast<double>(i + 1));
-  }
   for (size_t i = 0; i < 10U; ++i) {
     x.push_back(std::complex<double>(-static_cast<double>(i),
                                      -static_cast<double>(i + 1)));
