@@ -111,7 +111,7 @@ inline double compute_potential_scale_reduction(
  * same length as draws.
  *
  * @param draws stores pointers to arrays of chains
- * @param sizes stores sizes of chains
+ * @param size stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_potential_scale_reduction(
@@ -167,7 +167,7 @@ inline double compute_split_potential_scale_reduction(
  * same length as draws.
  *
  * @param draws stores pointers to arrays of chains
- * @param sizes stores sizes of chains
+ * @param size stores sizes of chains
  * @return potential scale reduction for the specified parameter
  */
 inline double compute_split_potential_scale_reduction(
