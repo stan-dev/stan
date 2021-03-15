@@ -60,6 +60,7 @@ pipeline {
           description: 'PR to test CmdStan upstream against e.g. PR-630')
         string(defaultValue: 'nightly', name: 'stanc3_bin_url',
           description: 'Custom stanc3 binary url')
+        booleanParam(defaultValue: false, name: 'run_tests_all_os', description: 'Run unit and integration tests on all OS.')
     }
     options {
         skipDefaultCheckout()
@@ -200,6 +201,14 @@ pipeline {
             parallel {
                 stage('Windows Headers & Unit') {
                     agent { label 'windows' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
@@ -215,12 +224,21 @@ pipeline {
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, env.GCC, stanc3_bin_url())
+                        sh "make -j${env.PARALLEL} test-headers"
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
                 }
                 stage('Mac Unit') {
                     agent { label 'osx' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(false, env.CXX, stanc3_bin_url())
@@ -235,9 +253,56 @@ pipeline {
                 stage('Integration Linux') {
                     agent { label 'linux' }
                     steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.GCC, stanc3_bin_url())
-                        runTests("src/test/integration", separateMakeStep=false)
+                        sh """
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                        """
+                        script {
+                            if (params.cmdstan_pr != 'downstream_tests') {
+                                if(params.cmdstan_pr.contains("PR-")){
+                                    pr_number = params.cmdstan_pr.split("-")[1]
+                                    sh """
+                                        cd performance-tests-cmdstan/cmdstan
+                                        git fetch origin pull/${pr_number}/head:pr/${pr_number}
+                                        git checkout pr/${pr_number}
+                                    """
+                                }else{
+                                    sh """
+                                        cd performance-tests-cmdstan/cmdstan
+                                        git checkout develop && git pull && git checkout ${params.cmdstan_pr}
+                                    """
+                                }
+                            }
+                            if (params.stanc3_bin_url != 'nightly') {
+                                sh """
+                                    cd performance-tests-cmdstan/cmdstan
+                                    echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
+                                """
+                            }
+                        }
+                        dir('performance-tests-cmdstan/cmdstan/stan'){
+                            unstash 'StanSetup'
+                            script {
+                                if (params.stanc3_bin_url != 'nightly') {
+                                    sh """
+                                        echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
+                                    """
+                                }
+                            }
+                        }        
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan
+                            echo 'O=0' >> make/local
+                            echo 'CXX=${env.CXX}' >> make/local
+                            make -j${env.PARALLEL} build
+                            cd ..
+                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                        """
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan/stan
+                            ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                        """
                     }
                     post { always { deleteDir() } }
                 }
@@ -246,14 +311,32 @@ pipeline {
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ) &&
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
                     }
                     steps {
-                        unstash 'StanSetup'
-                        setupCXX()
-                        runTests("src/test/integration", separateMakeStep=false)
+                        sh """
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                        """
+                        dir('performance-tests-cmdstan/cmdstan/stan'){
+                            unstash 'StanSetup'
+                        }        
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan
+                            echo 'O=0' >> make/local
+                            echo 'CXX=${env.CXX}' >> make/local
+                            make -j${env.PARALLEL} build
+                            cd ..
+                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                        """
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan/stan
+                            ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                        """
                     }
                     post { always { deleteDir() } }
                 }
@@ -262,14 +345,15 @@ pipeline {
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ) &&
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
                     }
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            setupCXX()
+                            setupCXX(false, env.CXX, stanc3_bin_url())
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
                             setupCXX(false)
                             runTestsWin("src/test/integration", separateMakeStep=false)
@@ -290,6 +374,12 @@ pipeline {
                                 }
                                 withEnv(['PATH+TBB=./lib/tbb']) {
                                     sh "python ./test/expressions/test_expression_testing_framework.py"
+                                }
+                                sh "make clean-all"
+                                sh "echo STAN_THREADS=true >> make/local"
+                                withEnv(['PATH+TBB=./lib/tbb']) {
+                                    try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
+                                    finally { junit 'test/**/*.xml' }
                                 }
                             }
                         }
