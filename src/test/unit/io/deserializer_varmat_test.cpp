@@ -102,7 +102,7 @@ TEST(deserializer_var_matrix, read) {
 
 // lb
 
-TEST(deserializer, read_lb_constrain) {
+TEST(deserializer, read_constrain_lb_constrain) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -112,12 +112,12 @@ TEST(deserializer, read_lb_constrain) {
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
   stan::math::var lp = 0.0;
   auto reference = stan::math::lb_constrain(stan::math::to_vector(theta), 1.5);
-  auto y = deserializer.read_lb<var_vector_t, false>(1.5, lp, theta.size());
+  auto y = deserializer.read_constrain_lb<var_vector_t, false>(1.5, lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
 }
 
-TEST(deserializer, read_lb_constrain_jacobian) {
+TEST(deserializer, read_constrain_lb_constrain_jacobian) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -129,7 +129,7 @@ TEST(deserializer, read_lb_constrain_jacobian) {
   stan::math::var lp = 0.0;
   auto reference
       = stan::math::lb_constrain(stan::math::to_vector(theta), 1.5, lp_ref);
-  auto y = deserializer.read_lb<var_vector_t, true>(1.5, lp, theta.size());
+  auto y = deserializer.read_constrain_lb<var_vector_t, true>(1.5, lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
   EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
@@ -137,7 +137,7 @@ TEST(deserializer, read_lb_constrain_jacobian) {
 
 // ub
 
-TEST(deserializer, read_ub_constrain) {
+TEST(deserializer, read_constrain_ub_constrain) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -147,12 +147,12 @@ TEST(deserializer, read_ub_constrain) {
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
   stan::math::var lp = 0.0;
   auto reference = stan::math::ub_constrain(stan::math::to_vector(theta), 1.5);
-  auto y = deserializer.read_ub<var_vector_t, false>(1.5, lp, theta.size());
+  auto y = deserializer.read_constrain_ub<var_vector_t, false>(1.5, lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
 }
 
-TEST(deserializer, read_ub_constrain_jacobian) {
+TEST(deserializer, read_constrain_ub_constrain_jacobian) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -164,7 +164,7 @@ TEST(deserializer, read_ub_constrain_jacobian) {
   stan::math::var lp = 0.0;
   auto reference
       = stan::math::ub_constrain(stan::math::to_vector(theta), 1.5, lp_ref);
-  auto y = deserializer.read_ub<var_vector_t, true>(1.5, lp, theta.size());
+  auto y = deserializer.read_constrain_ub<var_vector_t, true>(1.5, lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
   EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
@@ -172,7 +172,7 @@ TEST(deserializer, read_ub_constrain_jacobian) {
 
 // lub
 
-TEST(deserializer, read_lub_constrain) {
+TEST(deserializer, read_constrain_lub_constrain) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -184,12 +184,12 @@ TEST(deserializer, read_lub_constrain) {
   auto reference
       = stan::math::lub_constrain(stan::math::to_vector(theta), 1.0, 2.0);
   auto y
-      = deserializer.read_lub<var_vector_t, false>(1.0, 2.0, lp, theta.size());
+      = deserializer.read_constrain_lub<var_vector_t, false>(1.0, 2.0, lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
 }
 
-TEST(deserializer, read_lub_constrain_jacobian) {
+TEST(deserializer, read_constrain_lub_constrain_jacobian) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -202,7 +202,7 @@ TEST(deserializer, read_lub_constrain_jacobian) {
   auto reference = stan::math::lub_constrain(stan::math::to_vector(theta), 1.0,
                                              2.0, lp_ref);
   auto y
-      = deserializer.read_lub<var_vector_t, true>(1.0, 2.0, lp, theta.size());
+      = deserializer.read_constrain_lub<var_vector_t, true>(1.0, 2.0, lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
   EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
@@ -210,7 +210,7 @@ TEST(deserializer, read_lub_constrain_jacobian) {
 
 // offset multiplier
 
-TEST(deserializer, read_offset_multiplier_constrain) {
+TEST(deserializer, read_constrain_offset_multiplier_constrain) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -221,13 +221,13 @@ TEST(deserializer, read_offset_multiplier_constrain) {
   stan::math::var lp = 0.0;
   auto reference = stan::math::offset_multiplier_constrain(
       stan::math::to_vector(theta), 1.0, 2.0);
-  auto y = deserializer.read_offset_multiplier<var_vector_t, false>(
+  auto y = deserializer.read_constrain_offset_multiplier<var_vector_t, false>(
       1.0, 2.0, lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
 }
 
-TEST(deserializer, read_offset_multiplier_jacobian) {
+TEST(deserializer, read_constrain_offset_multiplier_jacobian) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -239,7 +239,7 @@ TEST(deserializer, read_offset_multiplier_jacobian) {
   stan::math::var lp = 0.0;
   auto reference = stan::math::offset_multiplier_constrain(
       stan::math::to_vector(theta), 1.0, 2.0, lp_ref);
-  auto y = deserializer.read_offset_multiplier<var_vector_t, true>(
+  auto y = deserializer.read_constrain_offset_multiplier<var_vector_t, true>(
       1.0, 2.0, lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
@@ -248,7 +248,7 @@ TEST(deserializer, read_offset_multiplier_jacobian) {
 
 // unit vector
 
-TEST(deserializer, read_unit_vector_constrain) {
+TEST(deserializer, read_constrain_unit_vector_constrain) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -259,12 +259,12 @@ TEST(deserializer, read_unit_vector_constrain) {
   stan::math::var lp = 0.0;
   auto reference
       = stan::math::unit_vector_constrain(stan::math::to_vector(theta));
-  auto y = deserializer.read_unit_vector<var_vector_t, false>(lp, theta.size());
+  auto y = deserializer.read_constrain_unit_vector<var_vector_t, false>(lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
 }
 
-TEST(deserializer, read_unit_vector_jacobian) {
+TEST(deserializer, read_constrain_unit_vector_jacobian) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -276,7 +276,7 @@ TEST(deserializer, read_unit_vector_jacobian) {
   stan::math::var lp = 0.0;
   auto reference
       = stan::math::unit_vector_constrain(stan::math::to_vector(theta), lp_ref);
-  auto y = deserializer.read_unit_vector<var_vector_t, true>(lp, theta.size());
+  auto y = deserializer.read_constrain_unit_vector<var_vector_t, true>(lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
   EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
@@ -284,7 +284,7 @@ TEST(deserializer, read_unit_vector_jacobian) {
 
 // simplex
 
-TEST(deserializer, read_simplex_constrain) {
+TEST(deserializer, read_constrain_simplex_constrain) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -294,12 +294,12 @@ TEST(deserializer, read_simplex_constrain) {
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
   stan::math::var lp = 0.0;
   auto reference = stan::math::simplex_constrain(stan::math::to_vector(theta));
-  auto y = deserializer.read_simplex<var_vector_t, false>(lp, theta.size());
+  auto y = deserializer.read_constrain_simplex<var_vector_t, false>(lp, theta.size() + 1);
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
 }
 
-TEST(deserializer, read_simplex_jacobian) {
+TEST(deserializer, read_constrain_simplex_jacobian) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -311,7 +311,7 @@ TEST(deserializer, read_simplex_jacobian) {
   stan::math::var lp = 0.0;
   auto reference
       = stan::math::simplex_constrain(stan::math::to_vector(theta), lp_ref);
-  auto y = deserializer.read_simplex<var_vector_t, true>(lp, theta.size());
+  auto y = deserializer.read_constrain_simplex<var_vector_t, true>(lp, theta.size() + 1);
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
   EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
@@ -319,7 +319,7 @@ TEST(deserializer, read_simplex_jacobian) {
 
 // ordered
 
-TEST(deserializer, read_ordered_constrain) {
+TEST(deserializer, read_constrain_ordered_constrain) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -329,12 +329,12 @@ TEST(deserializer, read_ordered_constrain) {
   stan::io::deserializer<stan::math::var> deserializer(theta, theta_i);
   stan::math::var lp = 0.0;
   auto reference = stan::math::ordered_constrain(stan::math::to_vector(theta));
-  auto y = deserializer.read_ordered<var_vector_t, false>(lp, theta.size());
+  auto y = deserializer.read_constrain_ordered<var_vector_t, false>(lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
 }
 
-TEST(deserializer, read_ordered_jacobian) {
+TEST(deserializer, read_constrain_ordered_jacobian) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -346,7 +346,7 @@ TEST(deserializer, read_ordered_jacobian) {
   stan::math::var lp = 0.0;
   auto reference
       = stan::math::ordered_constrain(stan::math::to_vector(theta), lp_ref);
-  auto y = deserializer.read_ordered<var_vector_t, true>(lp, theta.size());
+  auto y = deserializer.read_constrain_ordered<var_vector_t, true>(lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
   EXPECT_FLOAT_EQ(lp_ref.val(), lp.val());
@@ -354,7 +354,7 @@ TEST(deserializer, read_ordered_jacobian) {
 
 // positive ordered
 
-TEST(deserializer, read_positive_ordered_constrain) {
+TEST(deserializer, read_constrain_positive_ordered_constrain) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -365,13 +365,13 @@ TEST(deserializer, read_positive_ordered_constrain) {
   stan::math::var lp = 0.0;
   auto reference
       = stan::math::positive_ordered_constrain(stan::math::to_vector(theta));
-  auto y = deserializer.read_positive_ordered<var_vector_t, false>(
+  auto y = deserializer.read_constrain_positive_ordered<var_vector_t, false>(
       lp, theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
 }
 
-TEST(deserializer, read_positive_ordered_jacobian) {
+TEST(deserializer, read_constrain_positive_ordered_jacobian) {
   std::vector<int> theta_i;
   std::vector<stan::math::var> theta;
   theta.push_back(-2.0);
@@ -383,7 +383,7 @@ TEST(deserializer, read_positive_ordered_jacobian) {
   stan::math::var lp = 0.0;
   auto reference = stan::math::positive_ordered_constrain(
       stan::math::to_vector(theta), lp_ref);
-  auto y = deserializer.read_positive_ordered<var_vector_t, true>(lp,
+  auto y = deserializer.read_constrain_positive_ordered<var_vector_t, true>(lp,
                                                                   theta.size());
   EXPECT_TRUE((std::is_same<var_vector_t, decltype(y)>::value));
   stan::test::expect_near_rel("deserializer tests", reference.val(), y.val());
@@ -402,7 +402,7 @@ TEST(deserializer_var_matrix, cholesky_factor_cov_constrain) {
   auto reference = stan::math::cholesky_factor_constrain(
       stan::math::to_vector(theta).segment(0, 6), 3, 3);
   auto L
-      = deserializer.read_cholesky_factor_cov<var_matrix_t, false>(lp, 3U, 3U);
+      = deserializer.read_constrain_cholesky_factor_cov<var_matrix_t, false>(lp, 3U, 3U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
@@ -422,7 +422,7 @@ TEST(deserializer_var_matrix, cholesky_factor_cov_jacobian) {
   auto reference = stan::math::cholesky_factor_constrain(
       stan::math::to_vector(theta).segment(0, 6), 3, 3, lp_ref);
   auto L
-      = deserializer.read_cholesky_factor_cov<var_matrix_t, true>(lp, 3U, 3U);
+      = deserializer.read_constrain_cholesky_factor_cov<var_matrix_t, true>(lp, 3U, 3U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
@@ -442,7 +442,7 @@ TEST(deserializer_var_matrix, cholesky_factor_cov_constrain_non_square) {
   auto reference = stan::math::cholesky_factor_constrain(
       stan::math::to_vector(theta).segment(0, 5), 3, 2);
   auto L
-      = deserializer.read_cholesky_factor_cov<var_matrix_t, false>(lp, 3U, 2U);
+      = deserializer.read_constrain_cholesky_factor_cov<var_matrix_t, false>(lp, 3U, 2U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(2, L.cols());
@@ -462,7 +462,7 @@ TEST(deserializer_var_matrix, cholesky_factor_cov_jacobian_non_square) {
   auto reference = stan::math::cholesky_factor_constrain(
       stan::math::to_vector(theta).segment(0, 5), 3, 2, lp_ref);
   auto L
-      = deserializer.read_cholesky_factor_cov<var_matrix_t, true>(lp, 3U, 2U);
+      = deserializer.read_constrain_cholesky_factor_cov<var_matrix_t, true>(lp, 3U, 2U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(2, L.cols());
@@ -483,7 +483,7 @@ TEST(deserializer_var_matrix, cholesky_factor_corr_constrain) {
   stan::math::var lp = 0;
   auto reference = stan::math::cholesky_corr_constrain(
       stan::math::to_vector(theta).segment(0, 3), 3);
-  auto L = deserializer.read_cholesky_factor_corr<var_matrix_t, false>(lp, 3U);
+  auto L = deserializer.read_constrain_cholesky_factor_corr<var_matrix_t, false>(lp, 3U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
@@ -502,7 +502,7 @@ TEST(deserializer_var_matrix, cholesky_factor_corr_jacobian) {
   stan::math::var lp = 0.0;
   auto reference = stan::math::cholesky_corr_constrain(
       stan::math::to_vector(theta).segment(0, 3), 3, lp_ref);
-  auto L = deserializer.read_cholesky_factor_corr<var_matrix_t, true>(lp, 3U);
+  auto L = deserializer.read_constrain_cholesky_factor_corr<var_matrix_t, true>(lp, 3U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
@@ -523,7 +523,7 @@ TEST(deserializer_var_matrix, cov_matrix_constrain) {
   stan::math::var lp = 0;
   auto reference = stan::math::cov_matrix_constrain(
       stan::math::to_vector(theta).segment(0, 6), 3);
-  auto L = deserializer.read_cov_matrix<var_matrix_t, false>(lp, 3U);
+  auto L = deserializer.read_constrain_cov_matrix<var_matrix_t, false>(lp, 3U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
@@ -542,7 +542,7 @@ TEST(deserializer_var_matrix, cov_matrix_jacobian) {
   stan::math::var lp = 0.0;
   auto reference = stan::math::cov_matrix_constrain(
       stan::math::to_vector(theta).segment(0, 6), 3, lp_ref);
-  auto L = deserializer.read_cov_matrix<var_matrix_t, true>(lp, 3U);
+  auto L = deserializer.read_constrain_cov_matrix<var_matrix_t, true>(lp, 3U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
@@ -563,7 +563,7 @@ TEST(deserializer_var_matrix, corr_matrix_constrain) {
   stan::math::var lp = 0;
   auto reference = stan::math::corr_matrix_constrain(
       stan::math::to_vector(theta).segment(0, 3), 3);
-  auto L = deserializer.read_corr_matrix<var_matrix_t, false>(lp, 3U);
+  auto L = deserializer.read_constrain_corr_matrix<var_matrix_t, false>(lp, 3U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());
@@ -582,7 +582,7 @@ TEST(deserializer_var_matrix, corr_matrix_jacobian) {
   stan::math::var lp = 0.0;
   auto reference = stan::math::corr_matrix_constrain(
       stan::math::to_vector(theta).segment(0, 3), 3, lp_ref);
-  auto L = deserializer.read_corr_matrix<var_matrix_t, true>(lp, 3U);
+  auto L = deserializer.read_constrain_corr_matrix<var_matrix_t, true>(lp, 3U);
   EXPECT_TRUE((std::is_same<var_matrix_t, decltype(L)>::value));
   EXPECT_EQ(3, L.rows());
   EXPECT_EQ(3, L.cols());

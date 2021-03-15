@@ -357,7 +357,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LB, typename LP,
             typename... Sizes>
-  inline auto read_lb(const LB& lb, LP& lp, Sizes... sizes) {
+  inline auto read_constrain_lb(const LB& lb, LP& lp, Sizes... sizes) {
     if (Jacobian) {
       return stan::math::lb_constrain(this->read<Ret>(sizes...), lb, lp);
     } else {
@@ -383,7 +383,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename UB, typename LP,
             typename... Sizes>
-  inline auto read_ub(const UB& ub, LP& lp, Sizes... sizes) {
+  inline auto read_constrain_ub(const UB& ub, LP& lp, Sizes... sizes) {
     if (Jacobian) {
       return stan::math::ub_constrain(this->read<Ret>(sizes...), ub, lp);
     } else {
@@ -411,7 +411,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LB, typename UB, typename LP,
             typename... Sizes>
-  inline auto read_lub(const LB& lb, const UB& ub, LP& lp, Sizes... sizes) {
+  inline auto read_constrain_lub(const LB& lb, const UB& ub, LP& lp, Sizes... sizes) {
     if (Jacobian) {
       return stan::math::lub_constrain(this->read<Ret>(sizes...), lb, ub, lp);
     } else {
@@ -442,7 +442,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename Offset, typename Mult,
             typename LP, typename... Sizes>
-  inline auto read_offset_multiplier(const Offset& offset,
+  inline auto read_constrain_offset_multiplier(const Offset& offset,
                                      const Mult& multiplier, LP& lp,
                                      Sizes... sizes) {
     using stan::math::offset_multiplier_constrain;
@@ -475,7 +475,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_unit_vector(LP& lp, Sizes... sizes) {
+  inline auto read_constrain_unit_vector(LP& lp, Sizes... sizes) {
     using stan::math::unit_vector_constrain;
     if (Jacobian) {
       return math::eval(unit_vector_constrain(this->read<Ret>(sizes...), lp));
@@ -505,12 +505,12 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_unit_vector(LP& lp, const size_t vecsize, Sizes... sizes) {
+  inline auto read_constrain_unit_vector(LP& lp, const size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
-          this->read_unit_vector<value_type_t<Ret>, Jacobian>(lp, sizes...));
+          this->read_constrain_unit_vector<value_type_t<Ret>, Jacobian>(lp, sizes...));
     }
     return ret;
   }
@@ -535,7 +535,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_simplex(LP& lp, size_t size) {
+  inline auto read_constrain_simplex(LP& lp, size_t size) {
     using stan::math::simplex_constrain;
     stan::math::check_positive("read_simplex", "size", size);
     if (Jacobian) {
@@ -566,12 +566,12 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_simplex(LP& lp, const size_t vecsize, Sizes... sizes) {
+  inline auto read_constrain_simplex(LP& lp, const size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
-          this->read_simplex<value_type_t<Ret>, Jacobian>(lp, sizes...));
+          this->read_constrain_simplex<value_type_t<Ret>, Jacobian>(lp, sizes...));
     }
     return ret;
   }
@@ -595,7 +595,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_ordered(LP& lp, Sizes... sizes) {
+  inline auto read_constrain_ordered(LP& lp, Sizes... sizes) {
     using stan::math::ordered_constrain;
     if (Jacobian) {
       return ordered_constrain(this->read<Ret>(sizes...), lp);
@@ -624,12 +624,12 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_ordered(LP& lp, const size_t vecsize, Sizes... sizes) {
+  inline auto read_constrain_ordered(LP& lp, const size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
-          this->read_ordered<value_type_t<Ret>, Jacobian>(lp, sizes...));
+          this->read_constrain_ordered<value_type_t<Ret>, Jacobian>(lp, sizes...));
     }
     return ret;
   }
@@ -653,7 +653,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_not_std_vector_t<Ret>* = nullptr>
-  inline auto read_positive_ordered(LP& lp, Sizes... sizes) {
+  inline auto read_constrain_positive_ordered(LP& lp, Sizes... sizes) {
     using stan::math::positive_ordered_constrain;
     if (Jacobian) {
       return positive_ordered_constrain(this->read<Ret>(sizes...), lp);
@@ -682,12 +682,12 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_positive_ordered(LP& lp, const size_t vecsize,
+  inline auto read_constrain_positive_ordered(LP& lp, const size_t vecsize,
                                     Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
-      ret.emplace_back(this->read_positive_ordered<value_type_t<Ret>, Jacobian>(
+      ret.emplace_back(this->read_constrain_positive_ordered<value_type_t<Ret>, Jacobian>(
           lp, sizes...));
     }
     return ret;
@@ -712,7 +712,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
-  inline auto read_cholesky_factor_cov(LP& lp, Eigen::Index M, Eigen::Index N) {
+  inline auto read_constrain_cholesky_factor_cov(LP& lp, Eigen::Index M, Eigen::Index N) {
     if (Jacobian) {
       return stan::math::cholesky_factor_constrain(
           this->read<conditional_var_val_t<Ret, vector_t>>((N * (N + 1)) / 2
@@ -747,13 +747,13 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_cholesky_factor_cov(LP& lp, const size_t vecsize,
+  inline auto read_constrain_cholesky_factor_cov(LP& lp, const size_t vecsize,
                                        Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
-          this->read_cholesky_factor_cov<value_type_t<Ret>, Jacobian>(
+          this->read_constrain_cholesky_factor_cov<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
     }
     return ret;
@@ -778,7 +778,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
-  inline auto read_cholesky_factor_corr(LP& lp, Eigen::Index K) {
+  inline auto read_constrain_cholesky_factor_corr(LP& lp, Eigen::Index K) {
     using stan::math::cholesky_corr_constrain;
     if (Jacobian) {
       return cholesky_corr_constrain(
@@ -813,13 +813,13 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_cholesky_factor_corr(LP& lp, const size_t vecsize,
+  inline auto read_constrain_cholesky_factor_corr(LP& lp, const size_t vecsize,
                                         Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
-          this->read_cholesky_factor_corr<value_type_t<Ret>, Jacobian>(
+          this->read_constrain_cholesky_factor_corr<value_type_t<Ret>, Jacobian>(
               lp, sizes...));
     }
     return ret;
@@ -842,7 +842,7 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_matrix_t<Ret>* = nullptr>
-  inline auto read_cov_matrix(LP& lp, Eigen::Index k) {
+  inline auto read_constrain_cov_matrix(LP& lp, Eigen::Index k) {
     using stan::math::cov_matrix_constrain;
     if (Jacobian) {
       return cov_matrix_constrain(
@@ -877,12 +877,12 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  auto read_cov_matrix(LP& lp, const size_t vecsize, Sizes... sizes) {
+  auto read_constrain_cov_matrix(LP& lp, const size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
-          this->read_cov_matrix<value_type_t<Ret>, Jacobian>(lp, sizes...));
+          this->read_constrain_cov_matrix<value_type_t<Ret>, Jacobian>(lp, sizes...));
     }
     return ret;
   }
@@ -905,7 +905,7 @@ class deserializer {
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr,
             require_matrix_t<Ret>* = nullptr>
-  inline auto read_corr_matrix(LP& lp, Eigen::Index k) {
+  inline auto read_constrain_corr_matrix(LP& lp, Eigen::Index k) {
     using stan::math::corr_matrix_constrain;
     if (Jacobian) {
       return corr_matrix_constrain(
@@ -936,12 +936,12 @@ class deserializer {
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr>
-  inline auto read_corr_matrix(LP& lp, const size_t vecsize, Sizes... sizes) {
+  inline auto read_constrain_corr_matrix(LP& lp, const size_t vecsize, Sizes... sizes) {
     std::decay_t<Ret> ret;
     ret.reserve(vecsize);
     for (size_t i = 0; i < vecsize; ++i) {
       ret.emplace_back(
-          this->read_corr_matrix<value_type_t<Ret>, Jacobian>(lp, sizes...));
+          this->read_constrain_corr_matrix<value_type_t<Ret>, Jacobian>(lp, sizes...));
     }
     return ret;
   }

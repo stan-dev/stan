@@ -55,12 +55,12 @@ TEST(deserializer_array, unit_vector) {
     double lp_ref = 0.0;
     double lp = 0.0;
     auto y
-        = deserializer1.read_unit_vector<std::vector<Eigen::VectorXd>, false>(
+        = deserializer1.read_constrain_unit_vector<std::vector<Eigen::VectorXd>, false>(
             lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_unit_vector<Eigen::VectorXd, false>(lp_ref, 3));
+          deserializer2.read_constrain_unit_vector<Eigen::VectorXd, false>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
@@ -69,12 +69,12 @@ TEST(deserializer_array, unit_vector) {
   {
     double lp_ref = 0.0;
     double lp = 0.0;
-    auto y = deserializer1.read_unit_vector<std::vector<Eigen::VectorXd>, true>(
+    auto y = deserializer1.read_constrain_unit_vector<std::vector<Eigen::VectorXd>, true>(
         lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_unit_vector<Eigen::VectorXd, true>(lp_ref, 3));
+          deserializer2.read_constrain_unit_vector<Eigen::VectorXd, true>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
@@ -95,12 +95,12 @@ TEST(deserializer_array, simplex) {
   {
     double lp_ref = 0.0;
     double lp = 0.0;
-    auto y = deserializer1.read_simplex<std::vector<Eigen::VectorXd>, false>(
+    auto y = deserializer1.read_constrain_simplex<std::vector<Eigen::VectorXd>, false>(
         lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_simplex<Eigen::VectorXd, false>(lp_ref, 3));
+          deserializer2.read_constrain_simplex<Eigen::VectorXd, false>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
@@ -109,12 +109,12 @@ TEST(deserializer_array, simplex) {
   {
     double lp_ref = 0.0;
     double lp = 0.0;
-    auto y = deserializer1.read_simplex<std::vector<Eigen::VectorXd>, true>(
+    auto y = deserializer1.read_constrain_simplex<std::vector<Eigen::VectorXd>, true>(
         lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_simplex<Eigen::VectorXd, true>(lp_ref, 3));
+          deserializer2.read_constrain_simplex<Eigen::VectorXd, true>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
@@ -135,12 +135,12 @@ TEST(deserializer_array, ordered) {
   {
     double lp_ref = 0.0;
     double lp = 0.0;
-    auto y = deserializer1.read_ordered<std::vector<Eigen::VectorXd>, false>(
+    auto y = deserializer1.read_constrain_ordered<std::vector<Eigen::VectorXd>, false>(
         lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_ordered<Eigen::VectorXd, false>(lp_ref, 3));
+          deserializer2.read_constrain_ordered<Eigen::VectorXd, false>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
@@ -149,12 +149,12 @@ TEST(deserializer_array, ordered) {
   {
     double lp_ref = 0.0;
     double lp = 0.0;
-    auto y = deserializer1.read_ordered<std::vector<Eigen::VectorXd>, true>(
+    auto y = deserializer1.read_constrain_ordered<std::vector<Eigen::VectorXd>, true>(
         lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_ordered<Eigen::VectorXd, true>(lp_ref, 3));
+          deserializer2.read_constrain_ordered<Eigen::VectorXd, true>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
@@ -176,12 +176,12 @@ TEST(deserializer_array, positive_ordered) {
     double lp_ref = 0.0;
     double lp = 0.0;
     auto y = deserializer1
-                 .read_positive_ordered<std::vector<Eigen::VectorXd>, false>(
+                 .read_constrain_positive_ordered<std::vector<Eigen::VectorXd>, false>(
                      lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_positive_ordered<Eigen::VectorXd, false>(lp_ref,
+          deserializer2.read_constrain_positive_ordered<Eigen::VectorXd, false>(lp_ref,
                                                                       3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -192,12 +192,12 @@ TEST(deserializer_array, positive_ordered) {
     double lp_ref = 0.0;
     double lp = 0.0;
     auto y = deserializer1
-                 .read_positive_ordered<std::vector<Eigen::VectorXd>, true>(
+                 .read_constrain_positive_ordered<std::vector<Eigen::VectorXd>, true>(
                      lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_positive_ordered<Eigen::VectorXd, true>(lp_ref,
+          deserializer2.read_constrain_positive_ordered<Eigen::VectorXd, true>(lp_ref,
                                                                      3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -220,12 +220,12 @@ TEST(deserializer_array, chol_cov) {
     double lp_ref = 0.0;
     double lp = 0.0;
     auto y = deserializer1
-                 .read_cholesky_factor_cov<std::vector<Eigen::MatrixXd>, false>(
+                 .read_constrain_cholesky_factor_cov<std::vector<Eigen::MatrixXd>, false>(
                      lp, 4, 3, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_cholesky_factor_cov<Eigen::MatrixXd, false>(lp_ref,
+          deserializer2.read_constrain_cholesky_factor_cov<Eigen::MatrixXd, false>(lp_ref,
                                                                          3, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -236,12 +236,12 @@ TEST(deserializer_array, chol_cov) {
     double lp_ref = 0.0;
     double lp = 0.0;
     auto y = deserializer1
-                 .read_cholesky_factor_cov<std::vector<Eigen::MatrixXd>, true>(
+                 .read_constrain_cholesky_factor_cov<std::vector<Eigen::MatrixXd>, true>(
                      lp, 4, 3, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_cholesky_factor_cov<Eigen::MatrixXd, true>(lp_ref,
+          deserializer2.read_constrain_cholesky_factor_cov<Eigen::MatrixXd, true>(lp_ref,
                                                                         3, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -252,12 +252,12 @@ TEST(deserializer_array, chol_cov) {
     double lp_ref = 0.0;
     double lp = 0.0;
     auto y = deserializer1
-                 .read_cholesky_factor_cov<std::vector<Eigen::MatrixXd>, false>(
+                 .read_constrain_cholesky_factor_cov<std::vector<Eigen::MatrixXd>, false>(
                      lp, 4, 3, 2);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_cholesky_factor_cov<Eigen::MatrixXd, false>(lp_ref,
+          deserializer2.read_constrain_cholesky_factor_cov<Eigen::MatrixXd, false>(lp_ref,
                                                                          3, 2));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -268,12 +268,12 @@ TEST(deserializer_array, chol_cov) {
     double lp_ref = 0.0;
     double lp = 0.0;
     auto y = deserializer1
-                 .read_cholesky_factor_cov<std::vector<Eigen::MatrixXd>, true>(
+                 .read_constrain_cholesky_factor_cov<std::vector<Eigen::MatrixXd>, true>(
                      lp, 4, 3, 2);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_cholesky_factor_cov<Eigen::MatrixXd, true>(lp_ref,
+          deserializer2.read_constrain_cholesky_factor_cov<Eigen::MatrixXd, true>(lp_ref,
                                                                         3, 2));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -297,12 +297,12 @@ TEST(deserializer_array, chol_corr) {
     double lp = 0.0;
     auto y
         = deserializer1
-              .read_cholesky_factor_corr<std::vector<Eigen::MatrixXd>, false>(
+              .read_constrain_cholesky_factor_corr<std::vector<Eigen::MatrixXd>, false>(
                   lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_cholesky_factor_corr<Eigen::MatrixXd, false>(
+          deserializer2.read_constrain_cholesky_factor_corr<Eigen::MatrixXd, false>(
               lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -313,12 +313,12 @@ TEST(deserializer_array, chol_corr) {
     double lp_ref = 0.0;
     double lp = 0.0;
     auto y = deserializer1
-                 .read_cholesky_factor_corr<std::vector<Eigen::MatrixXd>, true>(
+                 .read_constrain_cholesky_factor_corr<std::vector<Eigen::MatrixXd>, true>(
                      lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_cholesky_factor_corr<Eigen::MatrixXd, true>(lp_ref,
+          deserializer2.read_constrain_cholesky_factor_corr<Eigen::MatrixXd, true>(lp_ref,
                                                                          3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
@@ -340,12 +340,12 @@ TEST(deserializer_array, cov_matrix) {
   {
     double lp_ref = 0.0;
     double lp = 0.0;
-    auto y = deserializer1.read_cov_matrix<std::vector<Eigen::MatrixXd>, false>(
+    auto y = deserializer1.read_constrain_cov_matrix<std::vector<Eigen::MatrixXd>, false>(
         lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_cov_matrix<Eigen::MatrixXd, false>(lp_ref, 3));
+          deserializer2.read_constrain_cov_matrix<Eigen::MatrixXd, false>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
@@ -354,12 +354,12 @@ TEST(deserializer_array, cov_matrix) {
   {
     double lp_ref = 0.0;
     double lp = 0.0;
-    auto y = deserializer1.read_cov_matrix<std::vector<Eigen::MatrixXd>, true>(
+    auto y = deserializer1.read_constrain_cov_matrix<std::vector<Eigen::MatrixXd>, true>(
         lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_cov_matrix<Eigen::MatrixXd, true>(lp_ref, 3));
+          deserializer2.read_constrain_cov_matrix<Eigen::MatrixXd, true>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
@@ -381,12 +381,12 @@ TEST(deserializer_array, corr_matrix) {
     double lp_ref = 0.0;
     double lp = 0.0;
     auto y
-        = deserializer1.read_corr_matrix<std::vector<Eigen::MatrixXd>, false>(
+        = deserializer1.read_constrain_corr_matrix<std::vector<Eigen::MatrixXd>, false>(
             lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_corr_matrix<Eigen::MatrixXd, false>(lp_ref, 3));
+          deserializer2.read_constrain_corr_matrix<Eigen::MatrixXd, false>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
@@ -395,12 +395,12 @@ TEST(deserializer_array, corr_matrix) {
   {
     double lp_ref = 0.0;
     double lp = 0.0;
-    auto y = deserializer1.read_corr_matrix<std::vector<Eigen::MatrixXd>, true>(
+    auto y = deserializer1.read_constrain_corr_matrix<std::vector<Eigen::MatrixXd>, true>(
         lp, 4, 3);
     for (size_t i = 0; i < 4; ++i) {
       stan::test::expect_near_rel(
           "test_std_vector_deserializer", y[i],
-          deserializer2.read_corr_matrix<Eigen::MatrixXd, true>(lp_ref, 3));
+          deserializer2.read_constrain_corr_matrix<Eigen::MatrixXd, true>(lp_ref, 3));
     }
     EXPECT_FLOAT_EQ(lp_ref, lp);
   }
