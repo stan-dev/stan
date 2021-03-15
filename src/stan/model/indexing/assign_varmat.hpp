@@ -1,10 +1,9 @@
-#ifndef STAN_MODEL_INDEXING_LVALUE_VARMAT_HPP
-#define STAN_MODEL_INDEXING_LVALUE_VARMAT_HPP
+#ifndef STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
+#define STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
 
 #include <stan/math/rev.hpp>
 #include <stan/model/indexing/index.hpp>
-#include <stan/model/indexing/index_list.hpp>
-#include <stan/model/indexing/lvalue.hpp>
+#include <stan/model/indexing/assign.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
 #include <type_traits>
@@ -50,21 +49,17 @@ namespace model {
  * columns, but not both.
  * @tparam U Type of value (must be assignable to T).
  * @param[in] x Vector variable to be assigned.
- * @param[in] idxs index holding which cell to assign to.
  * @param[in] y Value to assign.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx index holding which cell to assign to.
  * @throw std::out_of_range If the index is out of bounds.
  */
 template <typename VarVec, typename U, require_var_vector_t<VarVec>* = nullptr,
           require_var_t<U>* = nullptr,
           require_floating_point_t<value_type_t<U>>* = nullptr>
-inline void assign(VarVec&& x,
-                   const cons_index_list<index_uni, nil_index_list>& idxs,
-                   const U& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("var_vector[uni] assign", name, x.size(),
-                          idxs.head_.n_);
-  const auto coeff_idx = idxs.head_.n_ - 1;
+inline void assign(VarVec&& x, const U& y, const char* name, index_uni idx) {
+  stan::math::check_range("var_vector[uni] assign", name, x.size(), idx.n_);
+  const auto coeff_idx = idx.n_ - 1;
   double prev_val = x.val().coeffRef(coeff_idx);
   x.vi_->val_.coeffRef(coeff_idx) = y.val();
   stan::math::reverse_pass_callback([x, y, coeff_idx, prev_val]() mutable {
@@ -84,23 +79,21 @@ inline void assign(VarVec&& x,
  * @tparam Vec2 `var_value` with inner Eigen type with either dynamic rows or
  * columns, but not both.
  * @param[in] x Vector to be assigned.
- * @param[in] idxs Index holding an `std::vector` of cells to assign to.
  * @param[in] y Value vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx Index holding an `std::vector` of cells to assign to.
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
  */
 template <typename Vec1, typename Vec2,
           require_all_var_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const cons_index_list<index_multi, nil_index_list>& idxs,
-                   const Vec2& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Vec1&& x, const Vec2& y, const char* name,
+                   const index_multi& idx) {
   stan::math::check_size_match("vector[multi] assign", "left hand side",
-                               idxs.head_.ns_.size(), name, y.size());
+                               idx.ns_.size(), name, y.size());
   const auto x_size = x.size();
-  const auto assign_size = idxs.head_.ns_.size();
+  const auto assign_size = idx.ns_.size();
   arena_t<std::vector<int>> x_idx(assign_size);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_vals(assign_size);
   Eigen::Matrix<double, -1, 1> y_vals(assign_size);
@@ -108,10 +101,9 @@ inline void assign(Vec1&& x,
   x_set.reserve(assign_size);
   // We have to use two loops to avoid aliasing issues.
   for (int i = assign_size - 1; i >= 0; --i) {
-    if (likely(x_set.insert(idxs.head_.ns_[i]).second)) {
-      stan::math::check_range("vector[multi] assign", name, x_size,
-                              idxs.head_.ns_[i]);
-      x_idx[i] = idxs.head_.ns_[i] - 1;
+    if (likely(x_set.insert(idx.ns_[i]).second)) {
+      stan::math::check_range("vector[multi] assign", name, x_size, idx.ns_[i]);
+      x_idx[i] = idx.ns_[i] - 1;
       prev_vals.coeffRef(i) = x.vi_->val_.coeffRef(x_idx[i]);
       y_vals.coeffRef(i) = y.vi_->val_.coeff(i);
     } else {
@@ -148,33 +140,28 @@ inline void assign(Vec1&& x,
  * @tparam Mat `var_value` with inner Eigen type with dynamic rows and columns.
  * @tparam U Scalar type.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Sequence of two single indexes (from 1).
  * @param[in] y Value scalar.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx uni index for selecting rows
+ * @param[in] col_idx uni index for selecting columns
  * @throw std::out_of_range If either of the indices are out of bounds.
  */
 template <typename Mat, typename U, require_var_dense_dynamic_t<Mat>* = nullptr,
           require_var_t<U>* = nullptr,
           require_floating_point_t<value_type_t<U>>* = nullptr>
-inline void assign(
-    Mat&& x,
-    const cons_index_list<index_uni,
-                          cons_index_list<index_uni, nil_index_list>>& idxs,
-    const U& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("matrix[uni,uni] assign", name, x.rows(),
-                          idxs.head_.n_);
-  stan::math::check_range("matrix[uni,uni] assign", name, x.cols(),
-                          idxs.tail_.head_.n_);
-  const int row_idx = idxs.head_.n_ - 1;
-  const int col_idx = idxs.tail_.head_.n_ - 1;
-  double prev_val = x.val().coeffRef(row_idx, col_idx);
-  x.vi_->val_.coeffRef(row_idx, col_idx) = y.val();
+inline void assign(Mat&& x, const U& y, const char* name, index_uni row_idx,
+                   index_uni col_idx) {
+  stan::math::check_range("matrix[uni,uni] assign", name, x.rows(), row_idx.n_);
+  stan::math::check_range("matrix[uni,uni] assign", name, x.cols(), col_idx.n_);
+  const int row_idx_val = row_idx.n_ - 1;
+  const int col_idx_val = col_idx.n_ - 1;
+  double prev_val = x.val().coeffRef(row_idx_val, col_idx_val);
+  x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = y.val();
   stan::math::reverse_pass_callback(
-      [x, y, row_idx, col_idx, prev_val]() mutable {
-        x.vi_->val_.coeffRef(row_idx, col_idx) = prev_val;
-        y.adj() += x.adj().coeffRef(row_idx, col_idx);
-        x.adj().coeffRef(row_idx, col_idx) = 0.0;
+      [x, y, row_idx_val, col_idx_val, prev_val]() mutable {
+        x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = prev_val;
+        y.adj() += x.adj().coeffRef(row_idx_val, col_idx_val);
+        x.adj().coeffRef(row_idx_val, col_idx_val) = 0.0;
       });
 }
 
@@ -188,10 +175,10 @@ inline void assign(
  * @tparam Vec `var_value` with inner Eigen type with dynamic columns and
  * compile time rows of 1.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs A list with a uni index for rows and multi index for columns.
  * @param[in] y Row vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx uni index for selecting rows
+ * @param[in] col_idx multi index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
@@ -200,17 +187,14 @@ template <typename Mat1, typename Vec,
           require_var_dense_dynamic_t<Mat1>* = nullptr,
           require_eigen_dense_dynamic_t<value_type_t<Mat1>>* = nullptr,
           require_var_row_vector_t<Vec>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<index_uni,
-                          cons_index_list<index_multi, nil_index_list>>& idxs,
-    const Vec& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
+                   const index_multi& col_idx) {
   stan::math::check_range("matrix[uni, multi] assign", name, x.rows(),
-                          idxs.head_.n_);
-  const auto assign_cols = idxs.tail_.head_.ns_.size();
+                          row_idx.n_);
+  const auto assign_cols = col_idx.ns_.size();
   stan::math::check_size_match("matrix[uni, multi] assign", "left hand side",
                                assign_cols, name, y.size());
-  const int row_idx = idxs.head_.n_ - 1;
+  const int row_idx_val = row_idx.n_ - 1;
   arena_t<std::vector<int>> x_idx(assign_cols);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_val(assign_cols);
   Eigen::Matrix<double, -1, 1> y_vals(assign_cols);
@@ -218,11 +202,11 @@ inline void assign(
   x_set.reserve(assign_cols);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int i = assign_cols - 1; i >= 0; --i) {
-    if (likely(x_set.insert(idxs.tail_.head_.ns_[i]).second)) {
+    if (likely(x_set.insert(col_idx.ns_[i]).second)) {
       stan::math::check_range("matrix[uni, multi] assign", name, x.cols(),
-                              idxs.tail_.head_.ns_[i]);
-      x_idx[i] = idxs.tail_.head_.ns_[i] - 1;
-      prev_val.coeffRef(i) = x.val().coeffRef(row_idx, x_idx[i]);
+                              col_idx.ns_[i]);
+      x_idx[i] = col_idx.ns_[i] - 1;
+      prev_val.coeffRef(i) = x.val().coeffRef(row_idx_val, x_idx[i]);
       y_vals.coeffRef(i) = y.val().coeff(i);
     } else {
       x_idx[i] = -1;
@@ -230,23 +214,24 @@ inline void assign(
   }
   for (int i = assign_cols - 1; i >= 0; --i) {
     if (likely(x_idx[i] != -1)) {
-      x.vi_->val_.coeffRef(row_idx, x_idx[i]) = y_vals.coeff(i);
+      x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = y_vals.coeff(i);
     }
   }
-  stan::math::reverse_pass_callback([x, y, row_idx, x_idx, prev_val]() mutable {
-    for (size_t i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        x.vi_->val_.coeffRef(row_idx, x_idx[i]) = prev_val.coeff(i);
-        prev_val.coeffRef(i) = x.adj().coeffRef(row_idx, x_idx[i]);
-        x.adj().coeffRef(row_idx, x_idx[i]) = 0.0;
-      }
-    }
-    for (size_t i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        y.adj().coeffRef(i) += prev_val.coeffRef(i);
-      }
-    }
-  });
+  stan::math::reverse_pass_callback(
+      [x, y, row_idx_val, x_idx, prev_val]() mutable {
+        for (size_t i = 0; i < x_idx.size(); ++i) {
+          if (likely(x_idx[i] != -1)) {
+            x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = prev_val.coeff(i);
+            prev_val.coeffRef(i) = x.adj().coeffRef(row_idx_val, x_idx[i]);
+            x.adj().coeffRef(row_idx_val, x_idx[i]) = 0.0;
+          }
+        }
+        for (size_t i = 0; i < x_idx.size(); ++i) {
+          if (likely(x_idx[i] != -1)) {
+            y.adj().coeffRef(i) += prev_val.coeffRef(i);
+          }
+        }
+      });
 }
 
 /**
@@ -258,20 +243,18 @@ inline void assign(
  * @tparam Mat1 `var_value` with inner Eigen type with dynamic rows and columns.
  * @tparam Mat2 `var_value` with inner Eigen type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Pair of multiple indexes (from 1).
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx Multiple index
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2,
           require_all_var_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   const cons_index_list<index_multi, nil_index_list>& idxs,
-                   const Mat2& y, const char* name = "ANON", int depth = 0) {
-  const auto assign_rows = idxs.head_.ns_.size();
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const index_multi& idx) {
+  const auto assign_rows = idx.ns_.size();
   stan::math::check_size_match("matrix[multi] assign", "left hand side rows",
                                assign_rows, name, y.rows());
   stan::math::check_size_match("matrix[multi] assign", "left hand side columns",
@@ -283,10 +266,10 @@ inline void assign(Mat1&& x,
   x_set.reserve(assign_rows);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int i = assign_rows - 1; i >= 0; --i) {
-    if (likely(x_set.insert(idxs.head_.ns_[i]).second)) {
+    if (likely(x_set.insert(idx.ns_[i]).second)) {
       stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(),
-                              idxs.head_.ns_[i]);
-      x_idx[i] = idxs.head_.ns_[i] - 1;
+                              idx.ns_[i]);
+      x_idx[i] = idx.ns_[i] - 1;
       prev_vals.row(i) = x.vi_->val_.row(x_idx[i]);
       y_vals.row(i) = y.vi_->val_.row(i);
     } else {
@@ -324,23 +307,20 @@ inline void assign(Mat1&& x,
  * @tparam Mat1 `var_value` with inner Eigen type with dynamic rows and columns.
  * @tparam Mat2 `var_value` with inner Eigen type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Pair of multiple indexes (from 1).
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx multi index for selecting rows
+ * @param[in] col_idx multi index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2,
           require_all_var_matrix_t<Mat1, Mat2>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<index_multi,
-                          cons_index_list<index_multi, nil_index_list>>& idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
-  const auto assign_rows = idxs.head_.ns_.size();
-  const auto assign_cols = idxs.tail_.head_.ns_.size();
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const index_multi& row_idx, const index_multi& col_idx) {
+  const auto assign_rows = row_idx.ns_.size();
+  const auto assign_cols = col_idx.ns_.size();
   stan::math::check_size_match("matrix[multi,multi] assign", "left hand side",
                                assign_rows, name, y.rows());
   stan::math::check_size_match("matrix[multi,multi] assign", "left hand side",
@@ -357,19 +337,19 @@ inline void assign(
   Eigen::Matrix<double, -1, -1> y_vals(assign_rows, assign_cols);
   // Need to remove duplicates for cases like {{2, 3, 2, 2}, {1, 2, 2}}
   for (int i = assign_rows - 1; i >= 0; --i) {
-    if (likely(x_row_set.insert(idxs.head_.ns_[i]).second)) {
+    if (likely(x_row_set.insert(row_idx.ns_[i]).second)) {
       stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(),
-                              idxs.head_.ns_[i]);
-      x_row_idx[i] = idxs.head_.ns_[i] - 1;
+                              row_idx.ns_[i]);
+      x_row_idx[i] = row_idx.ns_[i] - 1;
     } else {
       x_row_idx[i] = -1;
     }
   }
   for (int j = assign_cols - 1; j >= 0; --j) {
-    if (likely(x_set.insert(idxs.tail_.head_.ns_[j]).second)) {
+    if (likely(x_set.insert(col_idx.ns_[j]).second)) {
       stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
-                              idxs.tail_.head_.ns_[j]);
-      x_col_idx[j] = idxs.tail_.head_.ns_[j] - 1;
+                              col_idx.ns_[j]);
+      x_col_idx[j] = col_idx.ns_[j] - 1;
       for (int i = assign_rows - 1; i >= 0; --i) {
         if (likely(x_row_idx[i] != -1)) {
           prev_vals.coeffRef(i, j) = x.vi_->val_(x_row_idx[i], x_col_idx[j]);
@@ -423,22 +403,19 @@ inline void assign(
  * @tparam Mat2 `var_value` with inner Eigen type
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Pair of multiple indexes (from 1).
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx index for selecting rows
+ * @param[in] col_idx multi index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_all_var_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<Idx, cons_index_list<index_multi, nil_index_list>>&
-        idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
-  const auto assign_cols = idxs.tail_.head_.ns_.size();
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const Idx& row_idx, const index_multi& col_idx) {
+  const auto assign_cols = col_idx.ns_.size();
   stan::math::check_size_match("matrix[..., multi] assign", "left hand side",
                                assign_cols, name, y.cols());
   std::unordered_set<int> x_set;
@@ -446,11 +423,10 @@ inline void assign(
   x_set.reserve(assign_cols);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int j = assign_cols - 1; j >= 0; --j) {
-    if (likely(x_set.insert(idxs.tail_.head_.ns_[j]).second)) {
+    if (likely(x_set.insert(col_idx.ns_[j]).second)) {
       stan::math::check_range("matrix[..., multi] assign col", name, x.cols(),
-                              idxs.tail_.head_.ns_[j]);
-      assign(x.col(idxs.tail_.head_.ns_[j] - 1), index_list(idxs.head_),
-             y_eval.col(j), name, depth + 1);
+                              col_idx.ns_[j]);
+      assign(x.col(col_idx.ns_[j] - 1), y_eval.col(j), name, row_idx);
     }
   }
 }

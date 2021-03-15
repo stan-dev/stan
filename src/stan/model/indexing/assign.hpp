@@ -1,10 +1,9 @@
-#ifndef STAN_MODEL_INDEXING_LVALUE_HPP
-#define STAN_MODEL_INDEXING_LVALUE_HPP
+#ifndef STAN_MODEL_INDEXING_ASSIGN_HPP
+#define STAN_MODEL_INDEXING_ASSIGN_HPP
 
 #include <stan/math/prim.hpp>
 #include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
-#include <stan/model/indexing/index_list.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
 #include <stan/model/indexing/rvalue_index_size.hpp>
 #include <type_traits>
@@ -47,14 +46,12 @@ namespace model {
  * @tparam U rvalue variable type, which must be assignable to `T`
  * @param[in,out] x lvalue
  * @param[in] y rvalue
- * @param[in] name Name of lvalue variable (default "ANON"); ignored
- * @param[in] depth Indexing depth (default 0; ignored
+ * @param[in] name Name of lvalue variable
  */
 template <
     typename T, typename U,
     require_t<std::is_assignable<std::decay_t<T>&, std::decay_t<U>>>* = nullptr>
-inline void assign(T&& x, const nil_index_list& /* idxs */, U&& y,
-                   const char* name = "ANON", int depth = 0) {
+inline void assign(T&& x, U&& y, const char* name) {
   x = std::forward<U>(y);
 }
 
@@ -66,19 +63,16 @@ inline void assign(T&& x, const nil_index_list& /* idxs */, U&& y,
  * @tparam Vec Eigen type with either dynamic rows or columns, but not both.
  * @tparam U Type of value (must be assignable to T).
  * @param[in] x Vector variable to be assigned.
- * @param[in] idxs index holding which cell to assign to.
  * @param[in] y Value to assign.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx index to assign to.
  * @throw std::out_of_range If the index is out of bounds.
  */
 template <typename Vec, typename U, require_eigen_vector_t<Vec>* = nullptr,
           require_stan_scalar_t<U>* = nullptr>
-inline void assign(Vec&& x,
-                   const cons_index_list<index_uni, nil_index_list>& idxs,
-                   const U& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("vector[uni] assign", name, x.size(), idxs.head_.n_);
-  x.coeffRef(idxs.head_.n_ - 1) = y;
+inline void assign(Vec&& x, const U& y, const char* name, index_uni idx) {
+  stan::math::check_range("vector[uni] assign", name, x.size(), idx.n_);
+  x.coeffRef(idx.n_ - 1) = y;
 }
 
 /**
@@ -89,27 +83,24 @@ inline void assign(Vec&& x,
  * @tparam Vec1 Eigen type with either dynamic rows or columns, but not both.
  * @tparam Vec2 Eigen type with either dynamic rows or columns, but not both.
  * @param[in] x Vector to be assigned.
- * @param[in] idxs Index holding an `std::vector` of cells to assign to.
  * @param[in] y Value vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx Index holding an `std::vector` of cells to assign to.
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
  */
 template <typename Vec1, typename Vec2,
           require_all_eigen_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const cons_index_list<index_multi, nil_index_list>& idxs,
-                   const Vec2& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Vec1&& x, const Vec2& y, const char* name,
+                   const index_multi& idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_size_match("vector[multi] assign", "left hand side",
-                               idxs.head_.ns_.size(), name, y_ref.size());
+                               idx.ns_.size(), name, y_ref.size());
   const auto x_size = x.size();
   for (int n = 0; n < y_ref.size(); ++n) {
-    stan::math::check_range("vector[multi] assign", name, x_size,
-                            idxs.head_.ns_[n]);
-    x.coeffRef(idxs.head_.ns_[n] - 1) = y_ref.coeff(n);
+    stan::math::check_range("vector[multi] assign", name, x_size, idx.ns_[n]);
+    x.coeffRef(idx.ns_[n] - 1) = y_ref.coeff(n);
   }
 }
 
@@ -121,10 +112,9 @@ inline void assign(Vec1&& x,
  * @tparam Vec1 A type with either dynamic rows or columns, but not both.
  * @tparam Vec2 A type with either dynamic rows or columns, but not both.
  * @param[in] x vector variable to be assigned.
- * @param[in] idxs List holding a single `index_min_max`.
  * @param[in] y Value vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx `index_min_max`.
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
@@ -132,27 +122,24 @@ inline void assign(Vec1&& x,
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const cons_index_list<index_min_max, nil_index_list>& idxs,
-                   const Vec2& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Vec1&& x, const Vec2& y, const char* name,
+                   index_min_max idx) {
   stan::math::check_range("vector[min_max] min assign", name, x.size(),
-                          idxs.head_.min_);
+                          idx.min_);
   stan::math::check_range("vector[min_max] max assign", name, x.size(),
-                          idxs.head_.max_);
-  if (idxs.head_.is_ascending()) {
-    const auto slice_start = idxs.head_.min_ - 1;
-    const auto slice_size = idxs.head_.max_ - slice_start;
+                          idx.max_);
+  if (idx.is_ascending()) {
+    const auto slice_start = idx.min_ - 1;
+    const auto slice_size = idx.max_ - slice_start;
     stan::math::check_size_match("vector[min_max] assign", "left hand side",
                                  slice_size, name, y.size());
     x.segment(slice_start, slice_size) = y;
-    return;
   } else {
-    const auto slice_start = idxs.head_.max_ - 1;
-    const auto slice_size = idxs.head_.min_ - slice_start;
+    const auto slice_start = idx.max_ - 1;
+    const auto slice_size = idx.min_ - slice_start;
     stan::math::check_size_match("vector[reverse_min_max] assign",
                                  "left hand side", slice_size, name, y.size());
     x.segment(slice_start, slice_size) = y.reverse();
-    return;
   }
 }
 
@@ -164,10 +151,9 @@ inline void assign(Vec1&& x,
  * @tparam Vec1 A type with either dynamic rows or columns, but not both.
  * @tparam Vec2 A type with either dynamic rows or columns, but not both.
  * @param[in] x vector to be assigned to.
- * @param[in] idxs An index.
  * @param[in] y Value vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx An index.
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
@@ -175,14 +161,11 @@ inline void assign(Vec1&& x,
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const cons_index_list<index_min, nil_index_list>& idxs,
-                   const Vec2& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("vector[min] assign", name, x.size(),
-                          idxs.head_.min_);
+inline void assign(Vec1&& x, const Vec2& y, const char* name, index_min idx) {
+  stan::math::check_range("vector[min] assign", name, x.size(), idx.min_);
   stan::math::check_size_match("vector[min] assign", "left hand side",
-                               x.size() - idxs.head_.min_ + 1, name, y.size());
-  x.tail(x.size() - idxs.head_.min_ + 1) = y;
+                               x.size() - idx.min_ + 1, name, y.size());
+  x.tail(x.size() - idx.min_ + 1) = y;
 }
 
 /**
@@ -193,10 +176,9 @@ inline void assign(Vec1&& x,
  * @tparam Vec1 A type with either dynamic rows or columns, but not both.
  * @tparam Vec2 A type with either dynamic rows or columns, but not both.
  * @param[in] x vector to be assigned to.
- * @param[in] idxs An index.
  * @param[in] y Value vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx An index.
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
@@ -204,14 +186,11 @@ inline void assign(Vec1&& x,
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const cons_index_list<index_max, nil_index_list>& idxs,
-                   const Vec2& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("vector[max] assign", name, x.size(),
-                          idxs.head_.max_);
-  stan::math::check_size_match("vector[max] assign", "left hand side",
-                               idxs.head_.max_, name, y.size());
-  x.head(idxs.head_.max_) = y;
+inline void assign(Vec1&& x, const Vec2& y, const char* name, index_max idx) {
+  stan::math::check_range("vector[max] assign", name, x.size(), idx.max_);
+  stan::math::check_size_match("vector[max] assign", "left hand side", idx.max_,
+                               name, y.size());
+  x.head(idx.max_) = y;
 }
 
 /**
@@ -222,19 +201,15 @@ inline void assign(Vec1&& x,
  * @tparam Vec1 A type with either dynamic rows or columns, but not both.
  * @tparam Vec2 A type with either dynamic rows or columns, but not both.
  * @param[in] x vector to be assigned to.
- * @param[in] idxs An index.
  * @param[in] y Value vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
  */
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
-inline void assign(Vec1&& x,
-                   const cons_index_list<index_omni, nil_index_list>& idxs,
-                   Vec2&& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Vec1&& x, Vec2&& y, const char* name, index_omni /* idx */) {
   stan::math::check_size_match("vector[omni] assign", "left hand side",
                                x.size(), name, y.size());
   x = std::forward<Vec2>(y);
@@ -249,10 +224,9 @@ inline void assign(Vec1&& x,
  * @tparam RowVec A type with dynamic columns and a compile time rows equal
  * to 1.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs An index holding the row to be assigned to.
  * @param[in] y Value row vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx An index holding the row to be assigned to.
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the number of columns in the row
  * vector and matrix do not match.
@@ -260,14 +234,11 @@ inline void assign(Vec1&& x,
 template <typename Mat, typename RowVec,
           require_dense_dynamic_t<Mat>* = nullptr,
           require_row_vector_t<RowVec>* = nullptr>
-inline void assign(Mat&& x,
-                   const cons_index_list<index_uni, nil_index_list>& idxs,
-                   const RowVec& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat&& x, const RowVec& y, const char* name, index_uni idx) {
   stan::math::check_size_match("matrix[uni] assign", "left hand side columns",
                                x.cols(), name, y.size());
-  stan::math::check_range("matrix[uni] assign row", name, x.rows(),
-                          idxs.head_.n_);
-  x.row(idxs.head_.n_ - 1) = y;
+  stan::math::check_range("matrix[uni] assign row", name, x.rows(), idx.n_);
+  x.row(idx.n_ - 1) = y;
 }
 
 /**
@@ -278,26 +249,24 @@ inline void assign(Mat&& x,
  * @tparam Mat An Eigen type with dynamic rows and columns.
  * @tparam Mat2 An Eigen type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs List holding a multi index.
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx multi index
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2,
           require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   const cons_index_list<index_multi, nil_index_list>& idxs,
-                   const Mat2& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const index_multi& idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_size_match("matrix[multi] assign", "left hand side rows",
-                               idxs.head_.ns_.size(), name, y.rows());
+                               idx.ns_.size(), name, y.rows());
   stan::math::check_size_match("matrix[multi] assign", "left hand side columns",
                                x.cols(), name, y.cols());
-  for (int i = 0; i < idxs.head_.ns_.size(); ++i) {
-    const int n = idxs.head_.ns_[i];
+  for (int i = 0; i < idx.ns_.size(); ++i) {
+    const int n = idx.ns_[i];
     stan::math::check_range("matrix[multi] assign row", name, x.rows(), n);
     x.row(n - 1) = y_ref.row(i);
   }
@@ -311,19 +280,15 @@ inline void assign(Mat1&& x,
  * @tparam Mat1 A type with dynamic rows and columns.
  * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs List holding an omni index.
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2,
           require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   const cons_index_list<index_omni, nil_index_list>& idxs,
-                   Mat2&& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, index_omni /* idx */) {
   stan::math::check_size_match("matrix[omni] assign", "left hand side rows",
                                x.rows(), name, y.rows());
   stan::math::check_size_match("matrix[omni] assign", "left hand side columns",
@@ -339,11 +304,9 @@ inline void assign(Mat1&& x,
  * @tparam Mat1 A type with dynamic rows and columns.
  * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs An indexing from a minimum index (inclusive) to
- * the end of a container.
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx min index
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
@@ -351,12 +314,9 @@ inline void assign(Mat1&& x,
 template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr,
           require_matrix_t<Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   const cons_index_list<index_min, nil_index_list>& idxs,
-                   const Mat2& y, const char* name = "ANON", int depth = 0) {
-  const auto row_size = x.rows() - (idxs.head_.min_ - 1);
-  stan::math::check_range("matrix[min] assign row", name, x.rows(),
-                          idxs.head_.min_);
+inline void assign(Mat1&& x, const Mat2& y, const char* name, index_min idx) {
+  const auto row_size = x.rows() - (idx.min_ - 1);
+  stan::math::check_range("matrix[min] assign row", name, x.rows(), idx.min_);
   stan::math::check_size_match("matrix[min] assign", "left hand side rows",
                                row_size, name, y.rows());
   stan::math::check_size_match("matrix[min] assign", "left hand side columns",
@@ -372,11 +332,9 @@ inline void assign(Mat1&& x,
  * @tparam Mat1 A type with dynamic rows and columns.
  * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs An indexing from the start of the container up to
- * the specified maximum index (inclusive).
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx max index
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
@@ -384,16 +342,13 @@ inline void assign(Mat1&& x,
 template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr,
           require_matrix_t<Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   const cons_index_list<index_max, nil_index_list>& idxs,
-                   const Mat2& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("matrix[max] assign row", name, x.rows(),
-                          idxs.head_.max_);
+inline void assign(Mat1&& x, const Mat2& y, const char* name, index_max idx) {
+  stan::math::check_range("matrix[max] assign row", name, x.rows(), idx.max_);
   stan::math::check_size_match("matrix[max] assign", "left hand side rows",
-                               idxs.head_.max_, name, y.rows());
+                               idx.max_, name, y.rows());
   stan::math::check_size_match("matrix[max] assign", "left hand side columns",
                                x.cols(), name, y.cols());
-  x.topRows(idxs.head_.max_) = y;
+  x.topRows(idx.max_) = y;
 }
 
 /**
@@ -404,10 +359,9 @@ inline void assign(Mat1&& x,
  * @tparam Mat1 A type with dynamic rows and columns.
  * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs An index for a min_max range of rows
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx An index for a min_max range of rows
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
@@ -415,29 +369,27 @@ inline void assign(Mat1&& x,
 template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr,
           require_matrix_t<Mat2>* = nullptr>
-inline void assign(Mat1&& x,
-                   const cons_index_list<index_min_max, nil_index_list>& idxs,
-                   Mat2&& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max idx) {
   stan::math::check_range("matrix[min_max] max row indexing", name, x.rows(),
-                          idxs.head_.max_);
+                          idx.max_);
   stan::math::check_range("matrix[min_max] min row indexing", name, x.rows(),
-                          idxs.head_.min_);
+                          idx.min_);
   stan::math::check_size_match("matrix[min_max] assign",
                                "left hand side columns", x.cols(), name,
                                y.cols());
-  if (idxs.head_.is_ascending()) {
-    const auto row_size = idxs.head_.max_ - idxs.head_.min_ + 1;
+  if (idx.is_ascending()) {
+    const auto row_size = idx.max_ - idx.min_ + 1;
     stan::math::check_size_match("matrix[min_max] assign",
                                  "left hand side rows", row_size, name,
                                  y.rows());
-    x.middleRows(idxs.head_.min_ - 1, row_size) = y;
+    x.middleRows(idx.min_ - 1, row_size) = y;
     return;
   } else {
-    const auto row_size = idxs.head_.min_ - idxs.head_.max_ + 1;
+    const auto row_size = idx.min_ - idx.max_ + 1;
     stan::math::check_size_match("matrix[reverse_min_max] assign",
                                  "left hand side rows", row_size, name,
                                  y.rows());
-    x.middleRows(idxs.head_.max_ - 1, row_size) = internal::colwise_reverse(y);
+    x.middleRows(idx.max_ - 1, row_size) = internal::colwise_reverse(y);
     return;
   }
 }
@@ -450,82 +402,74 @@ inline void assign(Mat1&& x,
  * @tparam Mat1 A type with dynamic rows and columns.
  * @tparam Mat2 A type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs An index list containing two min_max indices
  * @param[in] y Matrix variable to assign from.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx min_max index for selecting rows
+ * @param[in] col_idx min_max index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<index_min_max,
-                          cons_index_list<index_min_max, nil_index_list>>& idxs,
-    Mat2&& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
+                   index_min_max col_idx) {
   stan::math::check_range("matrix[min_max, min_max] assign max row", name,
-                          x.rows(), idxs.head_.max_);
+                          x.rows(), row_idx.max_);
   stan::math::check_range("matrix[min_max, min_max] assign min row", name,
-                          x.rows(), idxs.head_.min_);
+                          x.rows(), row_idx.min_);
   stan::math::check_range("matrix[min_max, min_max] assign max column", name,
-                          x.cols(), idxs.tail_.head_.max_);
+                          x.cols(), col_idx.max_);
   stan::math::check_range("matrix[min_max, min_max] assign min column", name,
-                          x.cols(), idxs.tail_.head_.min_);
-  if (idxs.head_.is_ascending()) {
-    if (idxs.tail_.head_.is_ascending()) {
-      auto row_size = idxs.head_.max_ - (idxs.head_.min_ - 1);
-      auto col_size = idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1);
+                          x.cols(), col_idx.min_);
+  if (row_idx.is_ascending()) {
+    if (col_idx.is_ascending()) {
+      auto row_size = row_idx.max_ - (row_idx.min_ - 1);
+      auto col_size = col_idx.max_ - (col_idx.min_ - 1);
       stan::math::check_size_match("matrix[min_max, min_max] assign",
                                    "left hand side rows", row_size, name,
                                    y.rows());
       stan::math::check_size_match("matrix[min_max, min_max] assign",
                                    "left hand side columns", col_size, name,
                                    y.cols());
-      x.block(idxs.head_.min_ - 1, idxs.tail_.head_.min_ - 1, row_size,
-              col_size)
-          = y;
+      x.block(row_idx.min_ - 1, col_idx.min_ - 1, row_size, col_size) = y;
       return;
     } else {
-      auto row_size = idxs.head_.max_ - (idxs.head_.min_ - 1);
-      auto col_size = idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1);
+      auto row_size = row_idx.max_ - (row_idx.min_ - 1);
+      auto col_size = col_idx.min_ - (col_idx.max_ - 1);
       stan::math::check_size_match("matrix[min_max, reverse_min_max] assign",
                                    "left hand side rows", row_size, name,
                                    y.rows());
       stan::math::check_size_match("matrix[min_max, reverse_min_max] assign",
                                    "left hand side columns", col_size, name,
                                    y.cols());
-      x.block(idxs.head_.min_ - 1, idxs.tail_.head_.max_ - 1, row_size,
-              col_size)
+      x.block(row_idx.min_ - 1, col_idx.max_ - 1, row_size, col_size)
           = internal::rowwise_reverse(y);
       return;
     }
   } else {
-    if (idxs.tail_.head_.is_ascending()) {
-      auto row_size = idxs.head_.min_ - (idxs.head_.max_ - 1);
-      auto col_size = idxs.tail_.head_.max_ - (idxs.tail_.head_.min_ - 1);
+    if (col_idx.is_ascending()) {
+      auto row_size = row_idx.min_ - (row_idx.max_ - 1);
+      auto col_size = col_idx.max_ - (col_idx.min_ - 1);
       stan::math::check_size_match("matrix[reverse_min_max, min_max] assign",
                                    "left hand side rows", row_size, name,
                                    y.rows());
       stan::math::check_size_match("matrix[reverse_min_max, min_max] assign",
                                    "left hand side columns", col_size, name,
                                    y.cols());
-      x.block(idxs.head_.max_ - 1, idxs.tail_.head_.min_ - 1, row_size,
-              col_size)
+      x.block(row_idx.max_ - 1, col_idx.min_ - 1, row_size, col_size)
           = internal::colwise_reverse(y);
       return;
     } else {
-      auto row_size = idxs.head_.min_ - (idxs.head_.max_ - 1);
-      auto col_size = idxs.tail_.head_.min_ - (idxs.tail_.head_.max_ - 1);
+      auto row_size = row_idx.min_ - (row_idx.max_ - 1);
+      auto col_size = col_idx.min_ - (col_idx.max_ - 1);
       stan::math::check_size_match(
           "matrix[reverse_min_max, reverse_min_max] assign",
           "left hand side rows", row_size, name, y.rows());
       stan::math::check_size_match(
           "matrix[reverse_min_max, reverse_min_max] assign",
           "left hand side columns", col_size, name, y.cols());
-      x.block(idxs.head_.max_ - 1, idxs.tail_.head_.max_ - 1, row_size,
-              col_size)
+      x.block(row_idx.max_ - 1, col_idx.max_ - 1, row_size, col_size)
           = y.reverse();
       return;
     }
@@ -540,24 +484,21 @@ inline void assign(
  * @tparam Mat Eigen type with dynamic rows and columns.
  * @tparam U Scalar type.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Sequence of two single indexes (from 1).
  * @param[in] y Value scalar.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx uni index for selecting rows
+ * @param[in] col_idx uni index for selecting columns
  * @throw std::out_of_range If either of the indices are out of bounds.
  */
 template <typename Mat, typename U,
           require_eigen_dense_dynamic_t<Mat>* = nullptr>
-inline void assign(
-    Mat&& x,
-    const cons_index_list<index_uni,
-                          cons_index_list<index_uni, nil_index_list>>& idxs,
-    const U& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat&& x, const U& y, const char* name, index_uni row_idx,
+                   index_uni col_idx) {
   stan::math::check_range("matrix[uni,uni] assign row", name, x.rows(),
-                          idxs.head_.n_);
+                          row_idx.n_);
   stan::math::check_range("matrix[uni,uni] assign column", name, x.cols(),
-                          idxs.tail_.head_.n_);
-  x.coeffRef(idxs.head_.n_ - 1, idxs.tail_.head_.n_ - 1) = y;
+                          col_idx.n_);
+  x.coeffRef(row_idx.n_ - 1, col_idx.n_ - 1) = y;
 }
 
 /**
@@ -569,10 +510,10 @@ inline void assign(
  * @tparam Mat1 Eigen type with dynamic rows and columns.
  * @tparam Vec Eigen type with dynamic columns and compile time rows of 1.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs A list with a uni index for rows and multi index for columns.
  * @param[in] y Row vector.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx uni index for selecting rows
+ * @param[in] col_idx multi index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
@@ -580,20 +521,17 @@ inline void assign(
 template <typename Mat1, typename Vec,
           require_eigen_dense_dynamic_t<Mat1>* = nullptr,
           require_eigen_row_vector_t<Vec>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<index_uni,
-                          cons_index_list<index_multi, nil_index_list>>& idxs,
-    const Vec& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
+                   const index_multi& col_idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_range("matrix[uni, multi] assign row", name, x.rows(),
-                          idxs.head_.n_);
+                          row_idx.n_);
   stan::math::check_size_match("matrix[uni, multi] assign", "left hand side",
-                               idxs.tail_.head_.ns_.size(), name, y_ref.size());
-  for (int i = 0; i < idxs.tail_.head_.ns_.size(); ++i) {
+                               col_idx.ns_.size(), name, y_ref.size());
+  for (int i = 0; i < col_idx.ns_.size(); ++i) {
     stan::math::check_range("matrix[uni, multi] assign column", name, x.cols(),
-                            idxs.tail_.head_.ns_[i]);
-    x.coeffRef(idxs.head_.n_ - 1, idxs.tail_.head_.ns_[i] - 1) = y_ref.coeff(i);
+                            col_idx.ns_[i]);
+    x.coeffRef(row_idx.n_ - 1, col_idx.ns_[i] - 1) = y_ref.coeff(i);
   }
 }
 
@@ -606,34 +544,31 @@ inline void assign(
  * @tparam Mat1 Eigen type with dynamic rows and columns.
  * @tparam Mat2 Eigen type with dynamic rows and columns.
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Pair of multiple indexes (from 1).
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx multi index for selecting rows
+ * @param[in] col_idx multi index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2,
           require_all_eigen_dense_dynamic_t<Mat1, Mat2>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<index_multi,
-                          cons_index_list<index_multi, nil_index_list>>& idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const index_multi& row_idx, const index_multi& col_idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_size_match("matrix[multi,multi] assign row sizes",
-                               "left hand side", idxs.head_.ns_.size(), name,
+                               "left hand side", row_idx.ns_.size(), name,
                                y_ref.rows());
   stan::math::check_size_match("matrix[multi,multi] assign column sizes",
-                               "left hand side", idxs.tail_.head_.ns_.size(),
-                               name, y_ref.cols());
+                               "left hand side", col_idx.ns_.size(), name,
+                               y_ref.cols());
   for (int j = 0; j < y_ref.cols(); ++j) {
-    const int n = idxs.tail_.head_.ns_[j];
+    const int n = col_idx.ns_[j];
     stan::math::check_range("matrix[multi,multi] assign column", name, x.cols(),
                             n);
     for (int i = 0; i < y_ref.rows(); ++i) {
-      const int m = idxs.head_.ns_[i];
+      const int m = row_idx.ns_[i];
       stan::math::check_range("matrix[multi,multi] assign row", name, x.rows(),
                               m);
       x.coeffRef(m - 1, n - 1) = y_ref.coeff(i, j);
@@ -650,26 +585,21 @@ inline void assign(
  * @tparam Mat2 A type that's assignable to the indexed matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Container holding row index and a min_max index.
  * @param[in] y Matrix variable to assign from.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx index for selecting rows
+ * @param[in] col_idx uni index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
-        idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const Idx& row_idx, index_uni col_idx) {
   stan::math::check_range("matrix[..., uni] assign column", name, x.cols(),
-                          idxs.tail_.head_.n_);
-  assign(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), y, name,
-         depth + 1);
-  return;
+                          col_idx.n_);
+  assign(x.col(col_idx.n_ - 1), y, name, row_idx);
 }
 
 /**
@@ -681,30 +611,27 @@ inline void assign(
  * @tparam Mat2 Eigen type
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Pair of multiple indexes (from 1).
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx index for selecting rows
+ * @param[in] col_idx multi index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_eigen_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<Idx, cons_index_list<index_multi, nil_index_list>>&
-        idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const Idx& row_idx, const index_multi& col_idx) {
   const auto& y_ref = stan::math::to_ref(y);
   stan::math::check_size_match("matrix[..., multi] assign column sizes",
-                               "left hand side", idxs.tail_.head_.ns_.size(),
-                               name, y_ref.cols());
-  for (int j = 0; j < idxs.tail_.head_.ns_.size(); ++j) {
-    const int n = idxs.tail_.head_.ns_[j];
+                               "left hand side", col_idx.ns_.size(), name,
+                               y_ref.cols());
+  for (int j = 0; j < col_idx.ns_.size(); ++j) {
+    const int n = col_idx.ns_[j];
     stan::math::check_range("matrix[..., multi] assign column", name, x.cols(),
                             n);
-    assign(x.col(n - 1), index_list(idxs.head_), y_ref.col(j), name, depth + 1);
+    assign(x.col(n - 1), y_ref.col(j), name, row_idx);
   }
 }
 
@@ -717,22 +644,18 @@ inline void assign(
  * @tparam Mat2 A type assignable to the slice of the matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Pair of multiple indexes (from 1).
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx index for selecting rows
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<Idx, cons_index_list<index_omni, nil_index_list>>&
-        idxs,
-    Mat2&& y, const char* name = "ANON", int depth = 0) {
-  assign(x, index_list(idxs.head_), std::forward<Mat2>(y), name, depth + 1);
+inline void assign(Mat1&& x, Mat2&& y, const char* name, const Idx& row_idx,
+                   index_omni /* idx */) {
+  assign(x, std::forward<Mat2>(y), name, row_idx);
 }
 
 /**
@@ -744,29 +667,26 @@ inline void assign(
  * @tparam Mat2 A type assignable to the slice of the matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Container holding a row index and an index from a minimum
  * index (inclusive) to the end of a container.
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx index for selecting rows
+ * @param[in] col_idx min index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<Idx, cons_index_list<index_min, nil_index_list>>&
-        idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
-  const auto start_col = idxs.tail_.head_.min_ - 1;
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const Idx& row_idx, index_min col_idx) {
+  const auto start_col = col_idx.min_ - 1;
   const auto col_size = x.cols() - start_col;
   stan::math::check_range("matrix[..., min] assign column", name, x.cols(),
-                          idxs.tail_.head_.min_);
+                          col_idx.min_);
   stan::math::check_size_match("matrix[..., min] assign column sizes",
                                "left hand side", col_size, name, y.cols());
-  assign(x.rightCols(col_size), index_list(idxs.head_), y, name, depth + 1);
+  assign(x.rightCols(col_size), y, name, row_idx);
 }
 
 /**
@@ -778,29 +698,24 @@ inline void assign(
  * @tparam Mat2 A type assignable to the slice of the matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Index holding a row index and an index from the start of the
  * container up to the specified maximum index (inclusive).
  * @param[in] y Value matrix.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx index for selecting rows
+ * @param[in] col_idx max index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<Idx, cons_index_list<index_max, nil_index_list>>&
-        idxs,
-    const Mat2& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, const Mat2& y, const char* name,
+                   const Idx& row_idx, index_max col_idx) {
   stan::math::check_range("matrix[..., max] assign", name, x.cols(),
-                          idxs.tail_.head_.max_);
+                          col_idx.max_);
   stan::math::check_size_match("matrix[..., max] assign column size",
-                               "left hand side", idxs.tail_.head_.max_, name,
-                               y.cols());
-  assign(x.leftCols(idxs.tail_.head_.max_), index_list(idxs.head_), y, name,
-         depth + 1);
+                               "left hand side", col_idx.max_, name, y.cols());
+  assign(x.leftCols(col_idx.max_), y, name, row_idx);
 }
 
 /**
@@ -812,41 +727,35 @@ inline void assign(
  * @tparam Mat2 A type assignable to the slice of the matrix.
  * @tparam Idx The row index type
  * @param[in] x Matrix variable to be assigned.
- * @param[in] idxs Container holding row index and a min_max index.
  * @param[in] y Matrix variable to assign from.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] row_idx index for selecting rows
+ * @param[in] col_idx max index for selecting columns
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
-inline void assign(
-    Mat1&& x,
-    const cons_index_list<Idx, cons_index_list<index_min_max, nil_index_list>>&
-        idxs,
-    Mat2&& y, const char* name = "ANON", int depth = 0) {
+inline void assign(Mat1&& x, Mat2&& y, const char* name, const Idx& row_idx,
+                   index_min_max col_idx) {
   stan::math::check_range("matrix[..., min_max] assign min column", name,
-                          x.cols(), idxs.tail_.head_.min_);
+                          x.cols(), col_idx.min_);
   stan::math::check_range("matrix[..., min_max] assign max column", name,
-                          x.cols(), idxs.tail_.head_.max_);
-  if (idxs.tail_.head_.is_ascending()) {
-    const auto col_start = idxs.tail_.head_.min_ - 1;
-    const auto col_size = idxs.tail_.head_.max_ - col_start;
+                          x.cols(), col_idx.max_);
+  if (col_idx.is_ascending()) {
+    const auto col_start = col_idx.min_ - 1;
+    const auto col_size = col_idx.max_ - col_start;
     stan::math::check_size_match("matrix[..., min_max] assign column size",
                                  "left hand side", col_size, name, y.cols());
-    assign(x.middleCols(col_start, col_size), index_list(idxs.head_), y, name,
-           depth + 1);
-    return;
+    assign(x.middleCols(col_start, col_size), y, name, row_idx);
   } else {
-    const auto col_start = idxs.tail_.head_.max_ - 1;
-    const auto col_size = idxs.tail_.head_.min_ - col_start;
+    const auto col_start = col_idx.max_ - 1;
+    const auto col_size = col_idx.min_ - col_start;
     stan::math::check_size_match("matrix[..., min_max] assign column size",
                                  "left hand side", col_size, name, y.cols());
-    assign(x.middleCols(col_start, col_size), index_list(idxs.head_),
-           internal::rowwise_reverse(y), name, depth + 1);
-    return;
+    assign(x.middleCols(col_start, col_size), internal::rowwise_reverse(y),
+           name, row_idx);
   }
 }
 
@@ -859,22 +768,20 @@ inline void assign(
  * @tparam U Type of Std vector to be assigned from.
  * @param[in] x lvalue variable
  * @param[in] y rvalue variable
- * @param[in] name name of lvalue variable (default "ANON").
- * @param[in] depth indexing depth (default 0).
+ * @param[in] name name of lvalue variable
  */
 template <typename T, typename U, require_all_std_vector_t<T, U>* = nullptr,
           require_not_t<
               std::is_assignable<std::decay_t<T>&, std::decay_t<U>>>* = nullptr>
-inline void assign(T&& x, const nil_index_list& /* idxs */, U&& y,
-                   const char* name = "ANON", int depth = 0) {
+inline void assign(T&& x, U&& y, const char* name) {
   x.resize(y.size());
   if (std::is_rvalue_reference<U>::value) {
     for (size_t i = 0; i < y.size(); ++i) {
-      assign(x[i], nil_index_list(), std::move(y[i]), name, depth + 1);
+      assign(x[i], std::move(y[i]), name);
     }
   } else {
     for (size_t i = 0; i < y.size(); ++i) {
-      assign(x[i], nil_index_list(), y[i], name, depth + 1);
+      assign(x[i], y[i], name);
     }
   }
 }
@@ -889,22 +796,20 @@ inline void assign(T&& x, const nil_index_list& /* idxs */, U&& y,
  * @tparam Idx Type of tail of index list.
  * @tparam U A type assignable to the value type of `StdVec`
  * @param[in] x Array variable to be assigned.
- * @param[in] idxs List of indexes beginning with single index
- * (from 1).
  * @param[in] y Value.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx1 uni index
+ * @param[in] idxs Remaining indices
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions do not match in the
  * tail assignment.
  */
-template <typename StdVec, typename Idx, typename U,
+template <typename StdVec, typename U, typename... Idxs,
           require_std_vector_t<StdVec>* = nullptr>
-inline void assign(StdVec&& x, const cons_index_list<index_uni, Idx>& idxs,
-                   U&& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("vector[uni,...] assign", name, x.size(),
-                          idxs.head_.n_);
-  assign(x[idxs.head_.n_ - 1], idxs.tail_, std::forward<U>(y), name, depth + 1);
+inline void assign(StdVec&& x, U&& y, const char* name, index_uni idx1,
+                   const Idxs&... idxs) {
+  stan::math::check_range("vector[uni,...] assign", name, x.size(), idx1.n_);
+  assign(x[idx1.n_ - 1], std::forward<U>(y), name, idxs...);
 }
 
 /**
@@ -916,22 +821,18 @@ inline void assign(StdVec&& x, const cons_index_list<index_uni, Idx>& idxs,
  * @tparam Idx Type of tail of index list.
  * @tparam U A type assignable to the value type of `StdVec`
  * @param[in] x Array variable to be assigned.
- * @param[in] idxs A list of indices holding a single uni index.
  * @param[in] y Value.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx uni index
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the dimensions do not match in the
  * tail assignment.
  */
 template <typename StdVec, typename U, require_std_vector_t<StdVec>* = nullptr,
           require_t<std::is_assignable<value_type_t<StdVec>&, U>>* = nullptr>
-inline void assign(StdVec&& x,
-                   const cons_index_list<index_uni, nil_index_list>& idxs,
-                   U&& y, const char* name = "ANON", int depth = 0) {
-  stan::math::check_range("vector[uni,...] assign", name, x.size(),
-                          idxs.head_.n_);
-  x[idxs.head_.n_ - 1] = std::forward<U>(y);
+inline void assign(StdVec&& x, U&& y, const char* name, index_uni idx) {
+  stan::math::check_range("vector[uni,...] assign", name, x.size(), idx.n_);
+  x[idx.n_ - 1] = std::forward<U>(y);
 }
 
 /**
@@ -945,29 +846,30 @@ inline void assign(StdVec&& x,
  * @tparam Idx2 Type of tail of index list.
  * @tparam U A standard vector
  * @param[in] x Array variable to be assigned.
- * @param[in] idxs List of indexes
  * @param[in] y Value.
- * @param[in] name Name of variable (default "ANON").
- * @param[in] depth Indexing depth (default 0).
+ * @param[in] name Name of variable
+ * @param[in] idx1 first index
+ * @param[in] idxs Remaining indices
  * @throw std::out_of_range If any of the indices are out of bounds.
  * @throw std::invalid_argument If the size of the multiple indexing
  * and size of first dimension of value do not match, or any of
  * the recursive tail assignment dimensions do not match.
  */
-template <typename T, typename Idx1, typename Idx2, typename U,
-          require_all_std_vector_t<T, U>* = nullptr>
-inline void assign(T&& x, const cons_index_list<Idx1, Idx2>& idxs, U&& y,
-                   const char* name = "ANON", int depth = 0) {
-  int x_idx_size = rvalue_index_size(idxs.head_, x.size());
+template <typename T, typename Idx1, typename... Idxs, typename U,
+          require_all_std_vector_t<T, U>* = nullptr,
+          require_not_same_t<Idx1, index_uni>* = nullptr>
+inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
+                   const Idxs&... idxs) {
+  int x_idx_size = rvalue_index_size(idx1, x.size());
   stan::math::check_size_match("vector[multi,...] assign", "left hand side",
                                x_idx_size, name, y.size());
   for (size_t n = 0; n < y.size(); ++n) {
-    int i = rvalue_at(n, idxs.head_);
+    int i = rvalue_at(n, idx1);
     stan::math::check_range("vector[multi,...] assign", name, x.size(), i);
     if (std::is_rvalue_reference<U>::value) {
-      assign(x[i - 1], idxs.tail_, std::move(y[n]), name, depth + 1);
+      assign(x[i - 1], std::move(y[n]), name, idxs...);
     } else {
-      assign(x[i - 1], idxs.tail_, y[n], name, depth + 1);
+      assign(x[i - 1], y[n], name, idxs...);
     }
   }
 }
