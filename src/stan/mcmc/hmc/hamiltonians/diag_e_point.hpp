@@ -34,8 +34,7 @@ class diag_e_point : public ps_point {
    *
    * @param inv_e_metric initial mass matrix
    */
-  template <typename EigVec,
-	    require_eigen_vector_t<EigVec>* = nullptr>
+  template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
   void set_inv_metric(EigVec&& inv_e_metric) {
     inv_e_metric_ = std::forward<EigVec>(inv_e_metric);
   }
