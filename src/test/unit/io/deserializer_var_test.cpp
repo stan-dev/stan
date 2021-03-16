@@ -568,7 +568,7 @@ TEST(deserializer_vector, simplex_constrain) {
       = stan::math::simplex_constrain(stan::math::to_vector(theta));
   Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> phi(
       deserializer.read_constrain_simplex<
-          Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>, false>(lp, 4));
+      Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>, false>(lp, theta.size() + 1));
   for (size_t i = 0; i < phi.size(); ++i) {
     EXPECT_FLOAT_EQ(reference(i).val(), phi[i].val());
   }
@@ -588,7 +588,7 @@ TEST(deserializer_vector, simplex_jacobian) {
       = stan::math::simplex_constrain(stan::math::to_vector(theta), lp_ref);
   Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1> phi(
       deserializer.read_constrain_simplex<
-          Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>, true>(lp, 4));
+      Eigen::Matrix<stan::math::var, Eigen::Dynamic, 1>, true>(lp, theta.size() + 1));
   for (size_t i = 0; i < phi.size(); ++i) {
     EXPECT_FLOAT_EQ(reference(i).val(), phi[i].val());
   }
