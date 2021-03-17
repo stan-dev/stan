@@ -50,12 +50,11 @@ class normal_lowrank : public base_family {
    * @throw std::domain_error If the mean vector contains NaN values or does
    * not match this distribution's dimensionality.
    */
-  void validate_mean(const char* function,
-                     const Eigen::VectorXd& mu) {
+  void validate_mean(const char* function, const Eigen::VectorXd& mu) {
     stan::math::check_not_nan(function, "Mean vector", mu);
-    stan::math::check_size_match(function,
-                               "Dimension of input vector", mu.size(),
-                               "Dimension of current vector", dimension());
+    stan::math::check_size_match(function, "Dimension of input vector",
+                                 mu.size(), "Dimension of current vector",
+                                 dimension());
   }
 
   /**
@@ -67,8 +66,7 @@ class normal_lowrank : public base_family {
    * @throw std::domain_error If the matrix is not of the correct dimension or
    * rank, or if it contains not-a-number values.
    */
-  void validate_factor(const char* function,
-                       const Eigen::MatrixXd& B) {
+  void validate_factor(const char* function, const Eigen::MatrixXd& B) {
     stan::math::check_not_nan(function, "Low rank factor", B);
     stan::math::check_lower_triangular(function, "Low rank factor", B);
     stan::math::check_size_match(function,
@@ -87,12 +85,11 @@ class normal_lowrank : public base_family {
    * @throw std::domain_error If the matrix is not of the correct dimension or
    * rank, or if it contains not-a-number values.
    */
-  void validate_noise(const char *function,
-                      const Eigen::VectorXd& log_d) {
+  void validate_noise(const char* function, const Eigen::VectorXd& log_d) {
     stan::math::check_not_nan(function, "log std vector", log_d);
-    stan::math::check_size_match(function,
-                                 "Dimension of mean vector", dimension(),
-                                 "Dimension of log std vector", log_d.size());
+    stan::math::check_size_match(function, "Dimension of mean vector",
+                                 dimension(), "Dimension of log std vector",
+                                 log_d.size());
   }
 
  public:
@@ -105,12 +102,11 @@ class normal_lowrank : public base_family {
    * @param[in] rank The rank of the low-rank factor.
    */
   explicit normal_lowrank(size_t dimension, size_t rank)
-  : mu_(Eigen::VectorXd::Zero(dimension)),
-    B_(Eigen::MatrixXd::Zero(dimension, rank)),
-    log_d_(Eigen::VectorXd::Zero(dimension)),
-    dimension_(dimension),
-    rank_(rank) {
-  }
+      : mu_(Eigen::VectorXd::Zero(dimension)),
+        B_(Eigen::MatrixXd::Zero(dimension, rank)),
+        log_d_(Eigen::VectorXd::Zero(dimension)),
+        dimension_(dimension),
+        rank_(rank) {}
 
   /**
    * Construct a variational distribution with specified mean vector, and
@@ -138,10 +134,9 @@ class normal_lowrank : public base_family {
    * lower-triangular, if the parameters have inconsistent dimensionality,
    * or if any NaNs are present.
    */
-  explicit normal_lowrank(const Eigen::VectorXd& mu,
-                          const Eigen::MatrixXd& B,
+  explicit normal_lowrank(const Eigen::VectorXd& mu, const Eigen::MatrixXd& B,
                           const Eigen::VectorXd& log_d)
-  : mu_(mu), B_(B), log_d_(log_d), dimension_(mu.size()), rank_(B.cols()) {
+      : mu_(mu), B_(B), log_d_(log_d), dimension_(mu.size()), rank_(B.cols()) {
     static const char* function = "stan::variational::normal_lowrank";
     validate_mean(function, mu);
     validate_factor(function, B);
@@ -264,8 +259,8 @@ class normal_lowrank : public base_family {
         = "stan::variational::normal_lowrank::operator=";
     stan::math::check_size_match(function, "Dimension of lhs", dimension(),
                                  "Dimension of rhs", rhs.dimension());
-    stan::math::check_size_match(function, "Rank of lhs", rank(),
-                                 "Rank of rhs", rhs.rank());
+    stan::math::check_size_match(function, "Rank of lhs", rank(), "Rank of rhs",
+                                 rhs.rank());
     mu_ = rhs.mu();
     B_ = rhs.B();
     log_d_ = rhs.log_d();
@@ -287,8 +282,8 @@ class normal_lowrank : public base_family {
         = "stan::variational::normal_lowrank::operator+=";
     stan::math::check_size_match(function, "Dimension of lhs", dimension(),
                                  "Dimension of rhs", rhs.dimension());
-    stan::math::check_size_match(function, "Rank of lhs", rank(),
-                                 "Rank of rhs", rhs.rank());
+    stan::math::check_size_match(function, "Rank of lhs", rank(), "Rank of rhs",
+                                 rhs.rank());
     mu_ += rhs.mu();
     B_ += rhs.B();
     log_d_ += rhs.log_d();
@@ -311,8 +306,8 @@ class normal_lowrank : public base_family {
 
     stan::math::check_size_match(function, "Dimension of lhs", dimension(),
                                  "Dimension of rhs", rhs.dimension());
-    stan::math::check_size_match(function, "Rank of lhs", rank(),
-                                 "Rank of rhs", rhs.rank());
+    stan::math::check_size_match(function, "Rank of lhs", rank(), "Rank of rhs",
+                                 rhs.rank());
     mu_.array() /= rhs.mu().array();
     B_.array() /= rhs.B().array();
     log_d_.array() /= rhs.log_d().array();
@@ -394,11 +389,11 @@ class normal_lowrank : public base_family {
    * eps = tail(eta, dimension).
    */
   Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
-    static const char* function =
-      "stan::variational::normal_lowrank::transform";
-    stan::math::check_size_match(function,
-                         "Dimension of input vector", eta.size(),
-                         "Sum of dimension and rank", dimension() + rank());
+    static const char* function
+        = "stan::variational::normal_lowrank::transform";
+    stan::math::check_size_match(function, "Dimension of input vector",
+                                 eta.size(), "Sum of dimension and rank",
+                                 dimension() + rank());
     stan::math::check_not_nan(function, "Input vector", eta);
     Eigen::VectorXd z = eta.head(rank());
     Eigen::VectorXd eps = eta.tail(dimension());
@@ -462,14 +457,11 @@ class normal_lowrank : public base_family {
    * specified bounds.
    */
   template <class M, class BaseRNG>
-  void calc_grad(normal_lowrank& elbo_grad,
-                 M& m,
-                 Eigen::VectorXd& cont_params,
-                 int n_monte_carlo_grad,
-                 BaseRNG& rng,
+  void calc_grad(normal_lowrank& elbo_grad, M& m, Eigen::VectorXd& cont_params,
+                 int n_monte_carlo_grad, BaseRNG& rng,
                  callbacks::logger& logger) const {
-    static const char* function =
-      "stan::variational::normal_lowrank::calc_grad";
+    static const char* function
+        = "stan::variational::normal_lowrank::calc_grad";
 
     stan::math::check_size_match(function, "Dimension of elbo_grad",
                                  elbo_grad.dimension(),
@@ -479,8 +471,8 @@ class normal_lowrank : public base_family {
                                  cont_params.size());
 
     stan::math::check_size_match(function, "Rank of elbo_grad",
-                                 elbo_grad.rank(),
-                                 "Rank of variational q", rank());
+                                 elbo_grad.rank(), "Rank of variational q",
+                                 rank());
 
     Eigen::VectorXd mu_grad = Eigen::VectorXd::Zero(dimension());
     Eigen::MatrixXd B_grad = Eigen::MatrixXd::Zero(dimension(), rank());
@@ -503,7 +495,7 @@ class normal_lowrank : public base_family {
 
     // Naive Monte Carlo integration
     static const int n_retries = 10;
-    for (int i = 0, n_monte_carlo_drop = 0; i < n_monte_carlo_grad; ) {
+    for (int i = 0, n_monte_carlo_drop = 0; i < n_monte_carlo_grad;) {
       // Draw from standard normal and transform to real-coordinate space
       for (int d = 0; d < dimension() + rank(); ++d) {
         eta(d) = stan::math::normal_rng(0, 1, rng);
@@ -537,8 +529,9 @@ class normal_lowrank : public base_family {
           const char* name = "The number of dropped evaluations";
           const char* msg1 = "has reached its maximum amount (";
           int y = n_retries * n_monte_carlo_grad;
-          const char* msg2 = "). Your model may be either severely "
-            "ill-conditioned or misspecified.";
+          const char* msg2
+              = "). Your model may be either severely "
+                "ill-conditioned or misspecified.";
           stan::math::domain_error(function, name, y, msg1, msg2);
         }
       }
@@ -576,8 +569,7 @@ class normal_lowrank : public base_family {
  * @return Elementwise addition of the specified approximations.
  * @throw std::domain_error If the dimensionalities do not match.
  */
-inline normal_lowrank operator+(normal_lowrank lhs,
-                                 const normal_lowrank& rhs) {
+inline normal_lowrank operator+(normal_lowrank lhs, const normal_lowrank& rhs) {
   return lhs += rhs;
 }
 
@@ -590,8 +582,7 @@ inline normal_lowrank operator+(normal_lowrank lhs,
  * @return Elementwise division of the specified approximations.
  * @throw std::domain_error If the dimensionalities do not match.
  */
-inline normal_lowrank operator/(normal_lowrank lhs,
-                                 const normal_lowrank& rhs) {
+inline normal_lowrank operator/(normal_lowrank lhs, const normal_lowrank& rhs) {
   return lhs /= rhs;
 }
 

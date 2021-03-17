@@ -263,16 +263,16 @@ TEST(advi_test, multivar_no_constraint_lowrank) {
 
   // ADVI
   size_t rank = 1;
-  stan::variational::advi_lowrank<Model, rng_t>
-      test_advi(my_model, cont_params, base_rng, rank, n_monte_carlo_grad,
-                1e4,  // absurdly high!
-                100, 1);
+  stan::variational::advi_lowrank<Model, rng_t> test_advi(
+      my_model, cont_params, base_rng, rank, n_monte_carlo_grad,
+      1e4,  // absurdly high!
+      100, 1);
 
   // Create some arbitrary variational q() family to calculate the ELBO over
   Eigen::VectorXd mu = Eigen::VectorXd::Constant(my_model.num_params_r(), 2.5);
-  Eigen::VectorXd fac = Eigen::MatrixXd::Constant(my_model.num_params_r(),
-                                                  rank, 0.0); // no covariance
-                                                              // in posterior
+  Eigen::VectorXd fac = Eigen::MatrixXd::Constant(my_model.num_params_r(), rank,
+                                                  0.0);  // no covariance
+                                                         // in posterior
   Eigen::VectorXd log_d
       = Eigen::VectorXd::Constant(my_model.num_params_r(),
                                   0.0);  // initializing log_d = 0
@@ -306,8 +306,9 @@ TEST(advi_test, multivar_no_constraint_lowrank) {
       = "stan::variational::normal_lowrank: "
         "Dimension of mean vector (3) and "
         "Dimension of log std vector (2) must match in size";
-  EXPECT_THROW_MSG(stan::variational::normal_lowrank(mu_grad, B_grad, log_d_grad),
-                   std::invalid_argument, error);
+  EXPECT_THROW_MSG(
+      stan::variational::normal_lowrank(mu_grad, B_grad, log_d_grad),
+      std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(0);
 
@@ -315,8 +316,9 @@ TEST(advi_test, multivar_no_constraint_lowrank) {
       = "stan::variational::normal_lowrank: "
         "Dimension of mean vector (0) and "
         "Dimension of low-rank factor (3) must match in size";
-  EXPECT_THROW_MSG(stan::variational::normal_lowrank(mu_grad, B_grad, log_d_grad),
-                   std::invalid_argument, error);
+  EXPECT_THROW_MSG(
+      stan::variational::normal_lowrank(mu_grad, B_grad, log_d_grad),
+      std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
   B_grad = Eigen::MatrixXd::Zero(my_model.num_params_r(), 1);
@@ -326,8 +328,9 @@ TEST(advi_test, multivar_no_constraint_lowrank) {
       = "stan::variational::normal_lowrank: "
         "Dimension of mean vector (2) and "
         "Dimension of log std vector (3) must match in size";
-  EXPECT_THROW_MSG(stan::variational::normal_lowrank(mu_grad, B_grad, log_d_grad),
-                   std::invalid_argument, error);
+  EXPECT_THROW_MSG(
+      stan::variational::normal_lowrank(mu_grad, B_grad, log_d_grad),
+      std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(my_model.num_params_r());
   log_d_grad = Eigen::VectorXd::Zero(0);
@@ -336,8 +339,9 @@ TEST(advi_test, multivar_no_constraint_lowrank) {
       = "stan::variational::normal_lowrank: "
         "Dimension of mean vector (2) and "
         "Dimension of log std vector (0) must match in size";
-  EXPECT_THROW_MSG(stan::variational::normal_lowrank(mu_grad, B_grad, log_d_grad),
-                   std::invalid_argument, error);
+  EXPECT_THROW_MSG(
+      stan::variational::normal_lowrank(mu_grad, B_grad, log_d_grad),
+      std::invalid_argument, error);
 
   mu_grad = Eigen::VectorXd::Zero(3);
   B_grad = Eigen::VectorXd::Zero(3, rank);

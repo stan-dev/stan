@@ -30,8 +30,7 @@ class base_family {
   double calc_log_g(Eigen::VectorXd& eta) const;
 
   template <class BaseRNG>
-  Eigen::VectorXd sample_log_g(BaseRNG& rng,
-                               Eigen::VectorXd& eta,
+  Eigen::VectorXd sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta,
                                double& log_g) const;
 
   template <class M, class BaseRNG>
