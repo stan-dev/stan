@@ -76,7 +76,7 @@ class advi_base {
     math::check_positive(function, "Number of posterior samples for output",
                          n_posterior_samples_);
   }
-  
+
   /**
    * Calculates the Evidence Lower BOund (ELBO) by sampling from
    * the variational distribution and then evaluating the log joint,
@@ -590,7 +590,8 @@ class advi : public advi_base<Model, Q, BaseRNG> {
 };
 
 template<class Model, class BaseRNG>
-class advi_lowrank : public advi_base<Model, stan::variational::normal_lowrank, BaseRNG> {
+class advi_lowrank : public advi_base
+  <Model, stan::variational::normal_lowrank, BaseRNG> {
  public:
   /**
     * Constructor
@@ -625,8 +626,7 @@ class advi_lowrank : public advi_base<Model, stan::variational::normal_lowrank, 
 
  private:
   stan::variational::normal_lowrank init_variational(
-    Eigen::VectorXd& cont_params
-  ) const {
+    Eigen::VectorXd& cont_params) const {
     return stan::variational::normal_lowrank(cont_params, rank_);
   }
 

@@ -271,10 +271,10 @@ class normal_lowrank : public base_family {
     Eigen::MatrixXd d_inv2
         = log_d_.array().exp().square().matrix().asDiagonal().inverse();
     Eigen::MatrixXd Bt = B_.transpose();
-    Eigen::MatrixXd id = Eigen::MatrixXd::Identity(rank(), rank());
+    Eigen::MatrixXd I = Eigen::MatrixXd::Identity(rank(), rank());
     Eigen::MatrixXd woodbury
-        = d_inv2 - d_inv2 * B_ * (id + Bt * d_inv2 * B_).inverse() * Bt * d_inv2;
-    
+        = d_inv2 - d_inv2 * B_ * (I + Bt * d_inv2 * B_).inverse() * Bt * d_inv2;
+
     Eigen::VectorXd tmp_mu_grad = Eigen::VectorXd::Zero(dimension());
 
     // Naive Monte Carlo integration
@@ -381,7 +381,7 @@ inline normal_lowrank operator+(double scalar, normal_lowrank rhs) {
 inline normal_lowrank operator*(double scalar, normal_lowrank rhs) {
   return rhs *= scalar;
 }
-} // namespace variational
-} // namespace stan
+}  // namespace variational
+}  // namespace stan
 
 #endif
