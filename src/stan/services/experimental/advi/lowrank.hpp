@@ -34,6 +34,7 @@ namespace advi {
  * @param[in] max_iterations maximum number of iterations
  * @param[in] tol_rel_obj convergence tolerance on the relative norm
  *   of the objective
+ * @param[in] rank the rank of the approximation
  * @param[in] eta stepsize scaling parameter for variational inference
  * @param[in] adapt_engaged adaptation engaged?
  * @param[in] adapt_iterations number of iterations for eta adaptation

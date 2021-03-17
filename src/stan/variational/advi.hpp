@@ -31,7 +31,8 @@ namespace variational {
  *
  * Implements "black box" variational inference using stochastic gradient
  * ascent to maximize the Evidence Lower Bound for a given model
- * and variational family.
+ * and variational family. This base class encapsulates the mean-field,
+ * low-rank, and full-rank variational posterior classes.
  *
  * @tparam Model class of model
  * @tparam Q class of variational distribution
@@ -569,6 +570,13 @@ class advi_base {
   virtual Q init_variational(size_t dimension) const = 0;
 };
 
+/**
+ * The ADVI implementation used for meanfield and full-rank approximations.
+ *
+ * @tparam Model Class of model
+ * @tparam Q Class of variational distribution, either mean-field or low-rank.
+ * @tparam BaseRNG Class of random number generator
+ */
 template<class Model, class Q, class BaseRNG>
 class advi : public advi_base<Model, Q, BaseRNG> {
  public:
@@ -589,6 +597,12 @@ class advi : public advi_base<Model, Q, BaseRNG> {
   }
 };
 
+/**
+ * The ADVI implementation used only for low-rank approximations.
+ *
+ * @tparam Model Class of model.
+ * @tparam BaseRNG Class of random number generator.
+ */
 template<class Model, class BaseRNG>
 class advi_lowrank : public advi_base
   <Model, stan::variational::normal_lowrank, BaseRNG> {

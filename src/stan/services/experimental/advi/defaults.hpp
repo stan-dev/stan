@@ -17,7 +17,7 @@ struct rank {
     return "Rank of the covariance approximation when using low-rank ADVI.";
   }
 
-  static int default_value() { return 0; }
+  static int default_value() { return 1; }
 };
 
 /**
