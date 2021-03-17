@@ -69,11 +69,10 @@ class normal_lowrank : public base_family {
   void validate_factor(const char* function, const Eigen::MatrixXd& B) {
     stan::math::check_not_nan(function, "Low rank factor", B);
     stan::math::check_lower_triangular(function, "Low rank factor", B);
-    stan::math::check_size_match(function,
-                                 "Dimension of mean vector", dimension(),
-                                 "Dimension of low-rank factor", B.rows());
-    stan::math::check_size_match(function,
-                                 "Rank of factor", B.cols(),
+    stan::math::check_size_match(function, "Dimension of mean vector",
+                                 dimension(), "Dimension of low-rank factor",
+                                 B.rows());
+    stan::math::check_size_match(function, "Rank of factor", B.cols(),
                                  "Rank of approximation", rank());
   }
 
@@ -116,12 +115,11 @@ class normal_lowrank : public base_family {
    * @params[in] rank Rank of the approximation.
    */
   explicit normal_lowrank(const Eigen::VectorXd& mu, size_t rank)
-  : mu_(mu),
-    B_(Eigen::MatrixXd::Zero(mu.size(), rank)),
-    log_d_(Eigen::VectorXd::Zero(mu.size())),
-    dimension_(mu.size()),
-    rank_(rank) {
-  }
+      : mu_(mu),
+        B_(Eigen::MatrixXd::Zero(mu.size(), rank)),
+        log_d_(Eigen::VectorXd::Zero(mu.size())),
+        dimension_(mu.size()),
+        rank_(rank) {}
 
   /**
    * Construct a variational distribution with specified mean and covariance
@@ -367,12 +365,17 @@ class normal_lowrank : public base_family {
     static int r = rank();
     static double mult = 0.5 * (1.0 + stan::math::LOG_TWO_PI);
     double result = mult * dimension();
-    result
-        += 0.5 * log(
-             (Eigen::MatrixXd::Identity(r, r) +
-              B_.transpose() *
-              log_d_.array().exp().square().matrix().asDiagonal().inverse() *
-              B_).determinant());
+    result += 0.5
+              * log((Eigen::MatrixXd::Identity(r, r)
+                     + B_.transpose()
+                           * log_d_.array()
+                                 .exp()
+                                 .square()
+                                 .matrix()
+                                 .asDiagonal()
+                                 .inverse()
+                           * B_)
+                        .determinant());
     for (int d = 0; d < dimension(); ++d) {
       result += log_d_(d);
     }
