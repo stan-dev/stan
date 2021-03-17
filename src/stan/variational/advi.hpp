@@ -569,53 +569,50 @@ class advi_base {
   virtual Q init_variational(size_t dimension) const = 0;
 };
 
-template<class Model, class Q, class BaseRNG>
+template <class Model, class Q, class BaseRNG>
 class advi : public advi_base<Model, Q, BaseRNG> {
  public:
   advi(Model& m, Eigen::VectorXd& cont_params, BaseRNG& rng,
-            int n_monte_carlo_grad, int n_monte_carlo_elbo, int eval_elbo,
-            int n_posterior_samples)
-    : advi_base<Model, Q, BaseRNG>(m, cont_params, rng, n_monte_carlo_grad,
-                                   n_monte_carlo_elbo, eval_elbo,
-                                   n_posterior_samples) {}
+       int n_monte_carlo_grad, int n_monte_carlo_elbo, int eval_elbo,
+       int n_posterior_samples)
+      : advi_base<Model, Q, BaseRNG>(m, cont_params, rng, n_monte_carlo_grad,
+                                     n_monte_carlo_elbo, eval_elbo,
+                                     n_posterior_samples) {}
 
  private:
   Q init_variational(Eigen::VectorXd& cont_params) const {
     return Q(cont_params);
   }
 
-  Q init_variational(size_t dimension) const {
-    return Q(dimension);
-  }
+  Q init_variational(size_t dimension) const { return Q(dimension); }
 };
 
-template<class Model, class BaseRNG>
-class advi_lowrank : public advi_base
-  <Model, stan::variational::normal_lowrank, BaseRNG> {
+template <class Model, class BaseRNG>
+class advi_lowrank
+    : public advi_base<Model, stan::variational::normal_lowrank, BaseRNG> {
  public:
   /**
-    * Constructor
-    *
-    * @param[in] m stan model
-    * @param[in] cont_params initialization of continuous parameters
-    * @param[in,out] rng random number generator
-    * @param[in] rank rank of approximation
-    * @param[in] n_monte_carlo_grad number of samples for gradient computation
-    * @param[in] n_monte_carlo_elbo number of samples for ELBO computation
-    * @param[in] eval_elbo evaluate ELBO at every "eval_elbo" iters
-    * @param[in] n_posterior_samples number of samples to draw from posterior
-    * @throw std::runtime_error if n_monte_carlo_grad is not positive
-    * @throw std::runtime_error if n_monte_carlo_elbo is not positive
-    * @throw std::runtime_error if eval_elbo is not positive
-    * @throw std::runtime_error if n_posterior_samples is not positive
-    */
+   * Constructor
+   *
+   * @param[in] m stan model
+   * @param[in] cont_params initialization of continuous parameters
+   * @param[in,out] rng random number generator
+   * @param[in] rank rank of approximation
+   * @param[in] n_monte_carlo_grad number of samples for gradient computation
+   * @param[in] n_monte_carlo_elbo number of samples for ELBO computation
+   * @param[in] eval_elbo evaluate ELBO at every "eval_elbo" iters
+   * @param[in] n_posterior_samples number of samples to draw from posterior
+   * @throw std::runtime_error if n_monte_carlo_grad is not positive
+   * @throw std::runtime_error if n_monte_carlo_elbo is not positive
+   * @throw std::runtime_error if eval_elbo is not positive
+   * @throw std::runtime_error if n_posterior_samples is not positive
+   */
   advi_lowrank(Model& m, Eigen::VectorXd& cont_params, BaseRNG& rng,
                size_t rank, int n_monte_carlo_grad, int n_monte_carlo_elbo,
                int eval_elbo, int n_posterior_samples)
-      : advi_base<Model, stan::variational::normal_lowrank, BaseRNG>(m,
-          cont_params,
-          rng, n_monte_carlo_grad, n_monte_carlo_elbo,
-          eval_elbo, n_posterior_samples),
+      : advi_base<Model, stan::variational::normal_lowrank, BaseRNG>(
+            m, cont_params, rng, n_monte_carlo_grad, n_monte_carlo_elbo,
+            eval_elbo, n_posterior_samples),
         rank_(rank) {
     static const char* function = "stan::variational::advi_lowrank";
     math::check_positive(function, "Approximation rank", rank_);
@@ -626,7 +623,7 @@ class advi_lowrank : public advi_base
 
  private:
   stan::variational::normal_lowrank init_variational(
-    Eigen::VectorXd& cont_params) const {
+      Eigen::VectorXd& cont_params) const {
     return stan::variational::normal_lowrank(cont_params, rank_);
   }
 

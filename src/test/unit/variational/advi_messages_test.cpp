@@ -116,8 +116,8 @@ TEST_F(advi_test, prev_elbo_larger_fullrank) {
 }
 
 TEST_F(advi_test, prev_elbo_larger_lowrank) {
-  EXPECT_EQ(0, advi_lowrank_->run(10, 0, 50, 0.2, 100, logger,
-                                  parameter_writer, diagnostic_writer));
+  EXPECT_EQ(0, advi_lowrank_->run(10, 0, 50, 0.2, 100, logger, parameter_writer,
+                                  diagnostic_writer));
   EXPECT_TRUE(log_stream_.str().find(err_msg2) != std::string::npos)
       << "The message should have err_msg2 inside it.";
 }

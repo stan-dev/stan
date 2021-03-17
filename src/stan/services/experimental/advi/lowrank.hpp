@@ -54,8 +54,7 @@ int lowrank(Model& model, const stan::io::var_context& init,
             double tol_rel_obj, int rank, double eta, bool adapt_engaged,
             int adapt_iterations, int eval_elbo, int output_samples,
             callbacks::interrupt& interrupt, callbacks::logger& logger,
-            callbacks::writer& init_writer,
-            callbacks::writer& parameter_writer,
+            callbacks::writer& init_writer, callbacks::writer& parameter_writer,
             callbacks::writer& diagnostic_writer) {
   util::experimental_message(logger);
 
@@ -75,9 +74,9 @@ int lowrank(Model& model, const stan::io::var_context& init,
   Eigen::VectorXd cont_params
       = Eigen::Map<Eigen::VectorXd>(&cont_vector[0], cont_vector.size(), 1);
 
-  stan::variational::advi_lowrank<Model, boost::ecuyer1988>
-      cmd_advi(model, cont_params, rng, rank, grad_samples, elbo_samples,
-               eval_elbo, output_samples);
+  stan::variational::advi_lowrank<Model, boost::ecuyer1988> cmd_advi(
+      model, cont_params, rng, rank, grad_samples, elbo_samples, eval_elbo,
+      output_samples);
   cmd_advi.run(eta, adapt_engaged, adapt_iterations, tol_rel_obj,
                max_iterations, logger, parameter_writer, diagnostic_writer);
 
