@@ -367,7 +367,8 @@ class normal_fullrank : public base_family {
   }
 
   /**
-   * Sample from the variational distribution along with the log-density.
+   * Sample from the variational distribution and return its log normal
+   * density.
    *
    * @tparam BaseRNG Random number generator class.
    * @param[in] rng Random number generator.

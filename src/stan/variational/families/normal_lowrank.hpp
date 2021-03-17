@@ -11,15 +11,45 @@
 
 namespace stan {
 namespace variational {
+/**
+ * Variational family approximation with low-rank multivariate normal
+ * distribution.
+ */
 class normal_lowrank : public base_family {
  private:
+  /**
+   * Mean vector.
+   */
   Eigen::VectorXd mu_;
+
+  /**
+   * Low-rank covariance factor.
+   */
   Eigen::MatrixXd B_;
+
+  /**
+   * Additive white noise for covariance positive definite-ness.
+   */
   Eigen::VectorXd log_d_;
 
+  /**
+   * Dimensionality of the distribution.
+   */
   const int dimension_;
+
+  /**
+   * Rank of the low-rank covariance factor.
+   */
   const int rank_;
 
+  /**
+   * Raise a domain exception if the specified vector contains not-a-number
+   * values or is not of the correct dimension.
+   *
+   * @param[in] mu Mean vector.
+   * @throw std::domain_error If the mean vector contains NaN values or does
+   * not match this distribution's dimensionality.
+   */
   void validate_mean(const char* function,
                      const Eigen::VectorXd& mu) {
     stan::math::check_not_nan(function, "Mean vector", mu);
@@ -28,9 +58,19 @@ class normal_lowrank : public base_family {
                                "Dimension of current vector", dimension());
   }
 
+  /**
+   * Raise a domain exception if the specified matrix is not of the correct
+   * dimension or rank, is not lower triangular, or contains not-a-number
+   * values.
+   *
+   * @param[in] B Low-rank factor.
+   * @throw std::domain_error If the matrix is not of the correct dimension or
+   * rank, or if it contains not-a-number values.
+   */
   void validate_factor(const char* function,
                        const Eigen::MatrixXd& B) {
     stan::math::check_not_nan(function, "Low rank factor", B);
+    stan::math::check_lower_triangular(function, "Low rank factor", B);
     stan::math::check_size_match(function,
                                  "Dimension of mean vector", dimension(),
                                  "Dimension of low-rank factor", B.rows());
@@ -39,6 +79,14 @@ class normal_lowrank : public base_family {
                                  "Rank of approximation", rank());
   }
 
+  /**
+   * Raise a domain exception if the specified matrix is not of the correct
+   * dimension, or contains not-a-number-values.
+   *
+   * @param[in] log_d Log std vector.
+   * @throw std::domain_error If the matrix is not of the correct dimension or
+   * rank, or if it contains not-a-number values.
+   */
   void validate_noise(const char *function,
                       const Eigen::VectorXd& log_d) {
     stan::math::check_not_nan(function, "log std vector", log_d);
@@ -48,14 +96,14 @@ class normal_lowrank : public base_family {
   }
 
  public:
-  explicit normal_lowrank(const Eigen::VectorXd& mu, size_t rank)
-  : mu_(mu),
-    B_(Eigen::MatrixXd::Zero(mu.size(), rank)),
-    log_d_(Eigen::VectorXd::Zero(mu.size())),
-    dimension_(mu.size()),
-    rank_(rank) {
-  }
-
+  /**
+   * Construct a variational distribution of the specified dimensionality with
+   * a zero mean, zero low-rank factor matrix, and a zero log-std vector,
+   * corresponding to an identity covariance.
+   *
+   * @param[in] dimension The dimensionality of the distribution.
+   * @param[in] rank The rank of the low-rank factor.
+   */
   explicit normal_lowrank(size_t dimension, size_t rank)
   : mu_(Eigen::VectorXd::Zero(dimension)),
     B_(Eigen::MatrixXd::Zero(dimension, rank)),
@@ -64,6 +112,32 @@ class normal_lowrank : public base_family {
     rank_(rank) {
   }
 
+  /**
+   * Construct a variational distribution with specified mean vector, and
+   * identity covariance.
+   *
+   * @params[in] mu Mean vector.
+   * @params[in] rank Rank of the approximation.
+   */
+  explicit normal_lowrank(const Eigen::VectorXd& mu, size_t rank)
+  : mu_(mu),
+    B_(Eigen::MatrixXd::Zero(mu.size(), rank)),
+    log_d_(Eigen::VectorXd::Zero(mu.size())),
+    dimension_(mu.size()),
+    rank_(rank) {
+  }
+
+  /**
+   * Construct a variational distribution with specified mean and covariance
+   * parameters.
+   *
+   * @param[in] mu Mean vector.
+   * @param[in] B Low-rank covariance factor.
+   * @param[in] log_d Additive log std vector.
+   * @throws std::domain_error If the low-rank covariance factor is not not
+   * lower-triangular, if the parameters have inconsistent dimensionality,
+   * or if any NaNs are present.
+   */
   explicit normal_lowrank(const Eigen::VectorXd& mu,
                           const Eigen::MatrixXd& B,
                           const Eigen::VectorXd& log_d)
@@ -74,50 +148,117 @@ class normal_lowrank : public base_family {
     validate_noise(function, log_d);
   }
 
+  /**
+   * Return the dimensionality of the approximation.
+   */
   int dimension() const { return dimension_; }
+
+  /**
+   * Return the rank of the approximation.
+   */
   int rank() const { return rank_; }
 
+  /**
+   * Return the mean vector.
+   */
   const Eigen::VectorXd& mean() const { return mu(); }
+
+  /**
+   * Return the mean vector.
+   */
   const Eigen::VectorXd& mu() const { return mu_; }
+
+  /**
+   * Return the low-rank covariance factor.
+   */
   const Eigen::MatrixXd& B() const { return B_; }
+
+  /**
+   * Return the additive log-std.
+   */
   const Eigen::VectorXd& log_d() const { return log_d_; }
 
+  /**
+   * Set the mean vector.
+   *
+   * @param[in] mu Mean vector.
+   * @throw std::domain_error If the size of the specified mean vector does not
+   * match the stored dimension of this approximation.
+   */
   void set_mu(const Eigen::VectorXd& mu) {
     static const char* function = "stan::variational::set_mu";
     validate_mean(function, mu);
     mu_ = mu;
   }
 
+  /**
+   * Set the low-rank factor to the specified value.
+   *
+   * @param[in] B The low-rank factor of the covariance matrix.
+   * @throw std::domain_error If the specified matrix does not have the correct
+   * dimension or rank, is not lower triangular, or contains NaNs.
+   */
   void set_B(const Eigen::MatrixXd& B) {
     static const char* function = "stan::variational::set_B";
     validate_factor(function, B);
     B_ = B;
   }
 
+  /**
+   * Set the additive log-std component of the covariance.
+   *
+   * @param[in] log_d The log-std vector.
+   * @throw std::domain_error If the size of the log-std vector does not match
+   * the dimension of the approximation, or contains NaNs.
+   */
   void set_log_d(const Eigen::VectorXd& log_d) {
     static const char* function = "stan::variational::set_log_d";
     validate_noise(function, log_d);
     log_d_ = log_d;
   }
 
+  /**
+   * Set the mean, low-rank factor, and log-std of the approximation to zero.
+   */
   void set_to_zero() {
     mu_ = Eigen::VectorXd::Zero(dimension());
     B_ = Eigen::MatrixXd::Zero(dimension(), rank());
     log_d_ = Eigen::VectorXd::Zero(dimension());
   }
 
+  /**
+   * Return a new low-rank approximation resulting from squaring the entries in
+   * the mean, low-rank factor, and log-std vector for the covariance matrix.
+   * The new approximation does not hold any references to this approximation.
+   */
   normal_lowrank square() const {
     return normal_lowrank(Eigen::VectorXd(mu_.array().square()),
                           Eigen::MatrixXd(B_.array().square()),
                           Eigen::VectorXd(log_d_.array().square()));
   }
 
+  /**
+   * Return a new low-rank approximation resulting from taking the square root
+   * of the entries in the mean, low-rank factor, and log-std vector for the
+   * covariance matrix. The new approximation does not hold any references to
+   * this approximation.
+   */
   normal_lowrank sqrt() const {
     return normal_lowrank(Eigen::VectorXd(mu_.array().sqrt()),
                           Eigen::MatrixXd(B_.array().sqrt()),
                           Eigen::VectorXd(log_d_.array().sqrt()));
   }
 
+  /**
+   * Return this approximation after setting its mean vector, low-rank factor,
+   * and log-std vector to the values given by the specified approximation.
+   *
+   * @param[in] rhf Approximation from which to gather the mean and covariance
+   * parameters.
+   * @return This approximation after assignment.
+   * @throw std::domain_error If the dimensionality or rank of the specified
+   * approximation does not match this approximation's dimensionality or rank.
+   */
   normal_lowrank& operator=(const normal_lowrank& rhs) {
     static const char* function
         = "stan::variational::normal_lowrank::operator=";
@@ -131,6 +272,16 @@ class normal_lowrank : public base_family {
     return *this;
   }
 
+  /**
+   * Add the mean, low-rank covariance factor, and log-std of the specified
+   * approximation to this approximation.
+   *
+   * @param[in] rhs Approximation from which to gather the mean and covariance
+   * parameters.
+   * @return This approximation after adding the specified approximation.
+   * @throw std::domain_error If the dimensionality or rank of the specified
+   * approximation does not match this approximation's dimensionality.
+   */
   normal_lowrank& operator+=(const normal_lowrank& rhs) {
     static const char* function
         = "stan::variational::normal_lowrank::operator+=";
@@ -144,6 +295,16 @@ class normal_lowrank : public base_family {
     return *this;
   }
 
+  /**
+   * Return this approximation after elementwise division by the specified
+   * approximation's mean, low-rank factor, and log-std vector.
+   *
+   * @param[in] rhs Approximation from which to gather the mean and covariance
+   * parameters.
+   * @return This approximation after dividing by the specified approximation.
+   * @throw std::domain_error If the dimensionality or rank of the specified
+   * approximation does not match this approximation's dimensionality.
+   */
   inline normal_lowrank& operator/=(const normal_lowrank& rhs) {
     static const char* function
         = "stan::variational::normal_lowrank::operator/=";
@@ -158,6 +319,17 @@ class normal_lowrank : public base_family {
     return *this;
   }
 
+  /**
+   * Return this approximation after adding the specified scalar to each entry
+   * in the mean, low-rank covariance factor, and log-std vector.
+   *
+   * <b>Warning:</b> No finiteness check is made on the scalar, so it may
+   * introduce NaNs.
+   *
+   * @param[in] scalar Scalar to add.
+   * @return This approximation after elementwise addition of the specified
+   * scalar.
+   */
   normal_lowrank& operator+=(double scalar) {
     mu_.array() += scalar;
     B_.array() += scalar;
@@ -165,6 +337,17 @@ class normal_lowrank : public base_family {
     return *this;
   }
 
+  /**
+   * Return this approximation after multiplying the mean, low-rank factor, and
+   * log-std vector by the specified scalar.
+   *
+   * <b>Warning:</b> No finiteness check is made on the scalar, so it may
+   * introduce NaNs.
+   *
+   * @param[in] scalar Scalar to multiply by.
+   * @return This approximation after elementwise multiplication of the
+   * specified scalar.
+   */
   normal_lowrank& operator*=(double scalar) {
     mu_ *= scalar;
     B_ *= scalar;
@@ -172,13 +355,23 @@ class normal_lowrank : public base_family {
     return *this;
   }
 
+  /**
+   * Return the entropy of this approximation.
+   *
+   * <p>The entropy is defined using the matrix determinant lemma as
+   *   0.5 * dim * (1 + log2pi) + 0.5 * log det (B^T B + D^2)
+   * where
+   *   log det (B^T B + D^2) = log det(I + B^T D^2 B) + 2 * log det(D)
+   *                         = log det(I + B^T D^2 B) + 2 * sum(log_d)
+   * where the last equality holds because the representation of D stored is
+   * its diag vector.
+   *
+   * @return Entropy of this approximation.
+   */
   double entropy() const {
     static int r = rank();
     static double mult = 0.5 * (1.0 + stan::math::LOG_TWO_PI);
     double result = mult * dimension();
-    // Determinant by the matrix determinant lemma
-    //   det(D^2 + B.B^T) = det(I + B^T.D^-2.B) * det(D^2)
-    // where D^2 is diagonal and so can be computed accordingly
     result
         += 0.5 * log(
              (Eigen::MatrixXd::Identity(r, r) +
@@ -191,6 +384,15 @@ class normal_lowrank : public base_family {
     return result;
   }
 
+  /**
+   * Return the transform of the specified vector using the mean and covariance
+   * parameters.
+   *
+   * The transform is defined by
+   * S^{-1}(eta) = B * z + D * eps + mu
+   * where D = diag(exp(log_d)), z = head(eta, rank) and
+   * eps = tail(eta, dimension).
+   */
   Eigen::VectorXd transform(const Eigen::VectorXd& eta) const {
     static const char* function =
       "stan::variational::normal_lowrank::transform";
@@ -203,18 +405,25 @@ class normal_lowrank : public base_family {
     return (log_d_.array().exp() * eps.array()).matrix() + (B_ * z) + mu_;
   }
 
+  /**
+   * Sample from the variational distribution.
+   *
+   * @tparam BaseRNG Random number generator class.
+   * @param[in] rng Random number generator.
+   * @param[out] zeta Output variational standard normals.
+   */
   template <class BaseRNG>
-  void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
+  void sample(BaseRNG& rng, Eigen::VectorXd& zeta) const {
     // Draw from standard normal and transform to real-coordinate space
-    Eigen::VectorXd zeta = Eigen::VectorXd::Zero(dimension() + rank());
+    Eigen::VectorXd eta = Eigen::VectorXd::Zero(dimension() + rank());
     for (int d = 0; d < dimension() + rank(); ++d)
-      zeta(d) = stan::math::normal_rng(0, 1, rng);
-    eta = transform(zeta);
+      eta(d) = stan::math::normal_rng(0, 1, rng);
+    zeta = transform(eta);
   }
 
   /**
-   * Draw a posterior sample from the normal distribution,
-   * and return its log normal density. The constants are dropped.
+   * Sample from the variational distribution and return its log normal
+   * density.
    *
    * @param[in] rng Base random number generator.
    * @param[out] eta Vector to which the draw is assigned; dimension has to be
@@ -237,6 +446,21 @@ class normal_lowrank : public base_family {
     eta = transform(zeta);
   }
 
+  /**
+   * Calculates the gradient with respect to the mean and covariance parameters
+   * in parallel.
+   *
+   * @tparam M Model class.
+   * @tparam BaseRNG Class of base random number generator.
+   * @param[in] elbo_grad Approximation to store gradient.
+   * @param[in] m Model.
+   * @param[in] cont_params Continuous parameters.
+   * @param[in] n_monte_carlo_grad Sample size for gradient computation.
+   * @param[in,out] rng Random number generator.
+   * @param[in,out] logger Logger for messages.
+   * @throw std::domain_error If the number of divergent iterations exceeds its
+   * specified bounds.
+   */
   template <class M, class BaseRNG>
   void calc_grad(normal_lowrank& elbo_grad,
                  M& m,
@@ -328,6 +552,12 @@ class normal_lowrank : public base_family {
     elbo_grad.set_log_d(log_d_grad);
   }
 
+  /**
+   * Calculate the log-density of a vector of independent std normals.
+   *
+   * @param[in] eta The random sample.
+   * @return The log-probability of the random sample.
+   */
   double calc_log_g(const Eigen::VectorXd& eta) const {
     double log_g = 0;
     for (int d = 0; d < rank() + dimension(); ++d) {
@@ -337,6 +567,15 @@ class normal_lowrank : public base_family {
   }
 };
 
+/**
+ * Return a new approximation resulting from elementwise addition of
+ * of the first specified approximation to the second.
+ *
+ * @param[in] lhs First approximation.
+ * @param[in] rhs Second approximation.
+ * @return Elementwise addition of the specified approximations.
+ * @throw std::domain_error If the dimensionalities do not match.
+ */
 inline normal_lowrank operator+(normal_lowrank lhs,
                                  const normal_lowrank& rhs) {
   return lhs += rhs;
@@ -358,8 +597,8 @@ inline normal_lowrank operator/(normal_lowrank lhs,
 
 /**
  * Return a new approximation resulting from elementwise addition
- * of the specified scalar to the mean and Cholesky factor of
- * covariance entries for the specified approximation.
+ * of the specified scalar to the mean, low-rank factor, and log-std
+ * vector entries for the specified approximation.
  *
  * @param[in] scalar Scalar value
  * @param[in] rhs Approximation.
@@ -371,8 +610,8 @@ inline normal_lowrank operator+(double scalar, normal_lowrank rhs) {
 
 /**
  * Return a new approximation resulting from elementwise
- * multiplication of the specified scalar to the mean and Cholesky
- * factor of covariance entries for the specified approximation.
+ * multiplication of the specified scalar to the mean low-rank factor,
+ * and log-std for the specified approximation.
  *
  * @param[in] scalar Scalar value
  * @param[in] rhs Approximation.
