@@ -21,14 +21,19 @@ class base_family {
   // Distribution-based operations
   virtual const Eigen::VectorXd& mean() const = 0;
   virtual double entropy() const = 0;
+
   Eigen::VectorXd transform(const Eigen::VectorXd& eta) const;
+
   template <class BaseRNG>
   Eigen::VectorXd sample(BaseRNG& rng, Eigen::VectorXd& eta) const;
+
+  double calc_log_g(Eigen::VectorXd& eta) const;
+
   template <class BaseRNG>
   Eigen::VectorXd sample_log_g(BaseRNG& rng,
                                Eigen::VectorXd& eta,
                                double& log_g) const;
-  double calc_log_g(Eigen::VectorXd& eta) const;
+
   template <class M, class BaseRNG>
   void calc_grad(base_family& elbo_grad, M& m, Eigen::VectorXd& cont_params,
                  int n_monte_carlo_grad, BaseRNG& rng,
