@@ -1061,7 +1061,7 @@ class deserializer {
    * @tparam Ret Type of output
    * @return Unconstrained vector
    */
-  template <typename Ret>
+  template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
   inline auto read_free_simplex(size_t size) {
     return stan::math::simplex_free(this->read<Ret>(size));
   }
