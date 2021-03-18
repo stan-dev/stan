@@ -5,6 +5,8 @@
 
 #include <stan/io/cmd_line.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/deserializer.hpp>
+#include <stan/io/serializer.hpp>
 #include <stan/io/reader.hpp>
 #include <stan/io/writer.hpp>
 
