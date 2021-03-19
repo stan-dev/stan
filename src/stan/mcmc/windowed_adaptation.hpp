@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/base_adaptation.hpp>
-#include <ostream>
+#include <iostream>
 #include <string>
 
 namespace stan {
@@ -107,6 +107,25 @@ class windowed_adaptation : public base_adaptation {
     if (next_window_boundary >= num_warmup_ - adapt_term_buffer_) {
       adapt_next_window_ = num_warmup_ - adapt_term_buffer_ - 1;
     }
+  }
+
+  /**
+   * Check if there is any more warmup left to do
+   */
+  bool finished() {
+    if(adapt_window_counter_ + 1 >= num_warmup_) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Increment the window counter and return the new value
+   */
+  unsigned int increment_window_counter() {
+    adapt_window_counter_ += 1;
+    return adapt_window_counter_;
   }
 
  protected:
