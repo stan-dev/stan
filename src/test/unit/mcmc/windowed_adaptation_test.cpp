@@ -54,7 +54,7 @@ TEST(McmcWindowedAdaptation, finished) {
 
   adapter.set_window_params(1000, 75, 50, 25, logger);
 
-  for(size_t i = 0; i < 999; i++) {
+  for (size_t i = 0; i < 999; i++) {
     EXPECT_FALSE(adapter.finished());
     adapter.increment_window_counter();
   }

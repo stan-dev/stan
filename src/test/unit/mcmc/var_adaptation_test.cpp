@@ -26,8 +26,9 @@ TEST(McmcVarAdaptation, learn_variance) {
   for (int i = 0; i < n; ++i)
     EXPECT_EQ(target_var(i), var(i));
 
-  // Make sure learn_variance doesn't return true after second window (adaptation finished)
-  for (int i = 0; i < 2 * n_learn ; ++i) {
+  // Make sure learn_variance doesn't return true after second window
+  // (adaptation finished)
+  for (int i = 0; i < 2 * n_learn; ++i) {
     EXPECT_FALSE(adapter.learn_variance(var, q));
   }
   EXPECT_TRUE(adapter.finished());
