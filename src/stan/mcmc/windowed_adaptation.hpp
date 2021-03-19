@@ -3,7 +3,7 @@
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/mcmc/base_adaptation.hpp>
-#include <iostream>
+#include <ostream>
 #include <string>
 
 namespace stan {
