@@ -108,9 +108,7 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
     dummy_params_i.clear();
     unconstrained_params_r.clear();
     try {
-      stan::io::array_var_context context(param_names, draws.row(i),
-                                          param_dimss);
-      model.transform_inits(context, dummy_params_i, unconstrained_params_r,
+      model.transform_inits(draws.row(i), dummy_params_i, unconstrained_params_r,
                             &msg);
     } catch (const std::exception &e) {
       if (msg.str().length() > 0)

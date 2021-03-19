@@ -112,6 +112,12 @@ class var_context {
   virtual void names_i(std::vector<std::string>& names) const = 0;
 
   /**
+   * Return the total number of parameters in a model wrt dimensions
+   */
+  virtual size_t total_vals_r_size() const {
+    return STAN::MATH::NOT_A_NUMBER;
+  };
+  /**
    * Check variable dimensions against variable declaration.
    *
    * @param stage stan program processing stage

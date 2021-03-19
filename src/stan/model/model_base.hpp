@@ -566,6 +566,23 @@ class model_base : public prob_grad {
                                std::vector<double>& params_r,
                                std::ostream* msgs) const = 0;
 
+
+ /**
+  * Read constrained parameter values from a serialized vector,
+  * unconstrain them, then concatenate the unconstrained sequences
+  * into the specified parameter sequence.  Output messages go to the
+  * specified stream.
+  *
+  *
+  * @param[in] input_r A vector with size equal to the dimensions of all
+  *  of the parameters.
+  * @param[in,out] params_r unconstrained parameter values produced
+  * @param[in,out] msgs stream to which messages are written
+  */
+  virtual void void transform_inits(Eigen::VectorXd& input_r,
+                                Eigen::VectorXd& params_r,
+                                std::ostream* msgs) const = 0;
+
   /**
    * Convert the specified sequence of unconstrained parameters to a
    * sequence of constrained parameters, optionally including

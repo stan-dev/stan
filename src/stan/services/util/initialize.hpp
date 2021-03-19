@@ -92,13 +92,23 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
     try {
       stan::io::random_var_context random_context(model, rng, init_radius,
                                                   is_initialized_with_zero);
-
       if (!any_initialized) {
         unconstrained = random_context.get_unconstrained();
       } else {
         stan::io::chained_var_context context(init, random_context);
-
-        model.transform_inits(context, disc_vector, unconstrained, &msg);
+        // get the constrained param names and serialize all of them.
+        std::vector<std::string> constrain_param_names;
+        random_context.names_r(constrained_param_names);
+        std::vector<double> serialized_val_r;
+        serialized_val_r.reserve(random_context.total_vals_r_size());
+        // Assumes names are in same order as defined in model.
+        for (size_t i = 0; i < constrained_param_names.size(); ++i) {
+          std::vector<double> init_val = context.vals_r(constrained_param_names[i]);
+          for (size_t j = 0; j < init_val.size(); ++j) {
+            serialized_val_r.push_back(init_val[i]);
+          }
+        }
+        model.transform_inits(serialized_val_r, unconstrained, &msg);
       }
     } catch (std::domain_error& e) {
       if (msg.str().length() > 0)

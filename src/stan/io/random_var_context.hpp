@@ -17,6 +17,25 @@ namespace io {
  * the unconstrained values randomly. This is used for initialization.
  */
 class random_var_context : public var_context {
+  /**
+   * Parameter names in the model
+   */
+  std::vector<std::string> names_;
+  /**
+   * Dimensions of parameters in the model
+   */
+  std::vector<std::vector<size_t> > dims_;
+  /**
+   * Random parameter values of the model in the
+   * unconstrained space
+   */
+  std::vector<double> unconstrained_params_;
+  /**
+   * Random parameter values of the model in the
+   * constrained space
+   */
+  std::vector<std::vector<double> > vals_r_;
+
  public:
   /**
    * Constructs a random var_context.
@@ -205,26 +224,15 @@ class random_var_context : public var_context {
     return unconstrained_params_;
   }
 
- private:
-  /**
-   * Parameter names in the model
-   */
-  std::vector<std::string> names_;
-  /**
-   * Dimensions of parameters in the model
-   */
-  std::vector<std::vector<size_t> > dims_;
-  /**
-   * Random parameter values of the model in the
-   * unconstrained space
-   */
-  std::vector<double> unconstrained_params_;
-  /**
-   * Random parameter values of the model in the
-   * constrained space
-   */
-  std::vector<std::vector<double> > vals_r_;
+  size_t total_vals_r_size() const final {
+    size_t total_size = 0;
+    for (size_t i = 0; i < vals_r_.size(); ++i) {
+      total_size += vals_r_[i].size();
+    }
+    return total_size;
+  }
 
+ private:
   /**
    * Computes the size of a variable based on the dim provided.
    *
