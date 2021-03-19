@@ -203,8 +203,8 @@ class model_base_crtp : public stan::model::model_base {
   void transform_inits(const io::var_context& context,
                        Eigen::VectorXd& params_r,
                        std::ostream* msgs) const override {
-    return static_cast<const M*>(this)->template transform_inits(
-        context, params_r, msgs);
+    return static_cast<const M*>(this)->transform_inits(context, params_r,
+                                                        msgs);
   }
 };
 
