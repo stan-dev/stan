@@ -1,5 +1,5 @@
-#ifndef STAN_CALLBACKS_STREAM_WRITER_HPP
-#define STAN_CALLBACKS_STREAM_WRITER_HPP
+#ifndef STAN_CALLBACKS_FILE_STREAM_WRITER_HPP
+#define STAN_CALLBACKS_FILE_STREAM_WRITER_HPP
 
 #include <stan/callbacks/writer.hpp>
 #include <ostream>
@@ -10,27 +10,32 @@ namespace stan {
 namespace callbacks {
 
 /**
- * <code>stream_writer</code> is an implementation
- * of <code>writer</code> that writes to a stream.
+ * <code>file_stream_writer</code> is an implementation
+ * of <code>writer</code> that writes to a file.
  */
-class stream_writer final : public writer {
+class file_stream_writer final : public writer {
  public:
   /**
-   * Constructs a stream writer with an output stream
+   * Constructs a file stream writer with an output stream
    * and an optional prefix for comments.
    *
-   * @param[in, out] output stream to write
-   * @param[in] comment_prefix string to stream before
-   *   each comment line. Default is "".
+   * @param[in, out] A unique pointer to a type inheriting from `std::ostream`
+   * @param[in] comment_prefix string to stream before each comment line.
+   *  Default is "".
    */
-  explicit stream_writer(std::ostream& output,
+   explicit file_stream_writer(std::unique_ptr<std::ostream>&& output,
                          const std::string& comment_prefix = "")
-      : output_(output), comment_prefix_(comment_prefix) {}
+      : output_(std::move(output)), comment_prefix_(comment_prefix) {}
 
+
+  file_stream_writer();
+  file_stream_writer(file_stream_writer& other) = delete;
+  file_stream_writer(file_stream_writer&& other) :
+   output_(std::move(other.output_)), comment_prefix_(std::move(other.comment_prefix_)) {}
   /**
    * Virtual destructor
    */
-  virtual ~stream_writer() {}
+  virtual ~file_stream_writer() {}
 
   /**
    * Writes a set of names on a single line in csv format followed
@@ -42,6 +47,12 @@ class stream_writer final : public writer {
    */
   void operator()(const std::vector<std::string>& names) {
     write_vector(names);
+  }
+  /**
+   * Get the underlying stream
+   */
+  auto& get_stream() {
+    return *output_;
   }
 
   /**
@@ -57,7 +68,7 @@ class stream_writer final : public writer {
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
-  void operator()() { output_ << comment_prefix_ << std::endl; }
+  void operator()() { *output_ << comment_prefix_ << std::endl; }
 
   /**
    * Writes the comment_prefix then the message followed by a newline.
@@ -65,14 +76,14 @@ class stream_writer final : public writer {
    * @param[in] message A string
    */
   void operator()(const std::string& message) {
-    output_ << comment_prefix_ << message << std::endl;
+    *output_ << comment_prefix_ << message << std::endl;
   }
 
  private:
   /**
    * Output stream
    */
-  std::ostream& output_;
+  std::unique_ptr<std::ostream> output_;
 
   /**
    * Comment prefix to use when printing comments: strings and blank lines
@@ -97,11 +108,12 @@ class stream_writer final : public writer {
 
     for (typename std::vector<T>::const_iterator it = v.begin(); it != last;
          ++it)
-      output_ << *it << ",";
-    output_ << v.back() << std::endl;
+      *output_ << *it << ",";
+    *output_ << v.back() << std::endl;
   }
 };
 
-}  // namespace callbacks
-}  // namespace stan
+}
+}
+
 #endif
