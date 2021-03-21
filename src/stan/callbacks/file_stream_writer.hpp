@@ -23,15 +23,15 @@ class file_stream_writer final : public writer {
    * @param[in] comment_prefix string to stream before each comment line.
    *  Default is "".
    */
-   explicit file_stream_writer(std::unique_ptr<std::ostream>&& output,
-                         const std::string& comment_prefix = "")
+  explicit file_stream_writer(std::unique_ptr<std::ostream>&& output,
+                              const std::string& comment_prefix = "")
       : output_(std::move(output)), comment_prefix_(comment_prefix) {}
-
 
   file_stream_writer();
   file_stream_writer(file_stream_writer& other) = delete;
-  file_stream_writer(file_stream_writer&& other) :
-   output_(std::move(other.output_)), comment_prefix_(std::move(other.comment_prefix_)) {}
+  file_stream_writer(file_stream_writer&& other)
+      : output_(std::move(other.output_)),
+        comment_prefix_(std::move(other.comment_prefix_)) {}
   /**
    * Virtual destructor
    */
@@ -51,9 +51,7 @@ class file_stream_writer final : public writer {
   /**
    * Get the underlying stream
    */
-  auto& get_stream() {
-    return *output_;
-  }
+  auto& get_stream() { return *output_; }
 
   /**
    * Writes a set of values in csv format followed by a newline.
@@ -113,7 +111,7 @@ class file_stream_writer final : public writer {
   }
 };
 
-}
-}
+}  // namespace callbacks
+}  // namespace stan
 
 #endif

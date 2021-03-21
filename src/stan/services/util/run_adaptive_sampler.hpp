@@ -89,15 +89,17 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   writer.write_timing(warm_delta_t, sample_delta_t);
 }
 
-template <class Sampler, class Model, class RNG, typename SampT, typename DiagnoseT>
+template <class Sampler, class Model, class RNG, typename SampT,
+          typename DiagnoseT>
 void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
-                          std::vector<std::vector<double>>& cont_vectors, int num_warmup,
-                          int num_samples, int num_thin, int refresh,
-                          bool save_warmup, std::vector<RNG>& rngs,
+                          std::vector<std::vector<double>>& cont_vectors,
+                          int num_warmup, int num_samples, int num_thin,
+                          int refresh, bool save_warmup, std::vector<RNG>& rngs,
                           callbacks::interrupt& interrupt,
                           callbacks::logger& logger,
                           std::vector<SampT>& sample_writers,
-                           std::vector<DiagnoseT>& diagnostic_writers, size_t n_chain) {
+                          std::vector<DiagnoseT>& diagnostic_writers,
+                          size_t n_chain) {
   std::vector<services::util::mcmc_writer> writers;
   writers.reserve(n_chain);
   std::vector<stan::mcmc::sample> samples;

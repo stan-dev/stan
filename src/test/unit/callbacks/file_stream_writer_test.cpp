@@ -23,7 +23,8 @@ TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {
     x.push_back(n);
 
   EXPECT_NO_THROW(writer(x));
-  EXPECT_EQ("0,1,2,3,4\n", static_cast<std::stringstream&>(writer.get_stream()).str());
+  EXPECT_EQ("0,1,2,3,4\n",
+            static_cast<std::stringstream&>(writer.get_stream()).str());
 }
 
 TEST_F(StanInterfaceCallbacksStreamWriter, string_vector) {
@@ -33,7 +34,8 @@ TEST_F(StanInterfaceCallbacksStreamWriter, string_vector) {
     x.push_back(boost::lexical_cast<std::string>(n));
 
   EXPECT_NO_THROW(writer(x));
-  EXPECT_EQ("0,1,2,3,4\n", static_cast<std::stringstream&>(writer.get_stream()).str());
+  EXPECT_EQ("0,1,2,3,4\n",
+            static_cast<std::stringstream&>(writer.get_stream()).str());
 }
 
 TEST_F(StanInterfaceCallbacksStreamWriter, null) {
@@ -43,5 +45,6 @@ TEST_F(StanInterfaceCallbacksStreamWriter, null) {
 
 TEST_F(StanInterfaceCallbacksStreamWriter, string) {
   EXPECT_NO_THROW(writer("message"));
-  EXPECT_EQ("message\n", static_cast<std::stringstream&>(writer.get_stream()).str());
+  EXPECT_EQ("message\n",
+            static_cast<std::stringstream&>(writer.get_stream()).str());
 }
