@@ -13,7 +13,7 @@ namespace callbacks {
  * <code>stream_writer</code> is an implementation
  * of <code>writer</code> that writes to a stream.
  */
-class stream_writer final : public writer {
+class stream_writer : public writer {
  public:
   /**
    * Constructs a stream writer with an output stream
