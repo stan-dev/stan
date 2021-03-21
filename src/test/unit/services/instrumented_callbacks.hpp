@@ -9,7 +9,7 @@
 #include <string>
 #include <iostream>
 #include <exception>
-
+#include <atomic>
 namespace stan {
 namespace test {
 namespace unit {
@@ -27,7 +27,7 @@ class instrumented_interrupt : public stan::callbacks::interrupt {
   unsigned int call_count() { return counter_; }
 
  private:
-  unsigned int counter_;
+  std::atomic<unsigned int> counter_;
 };
 
 /**
@@ -96,9 +96,8 @@ class instrumented_writer : public stan::callbacks::writer {
 
   unsigned int call_count() {
     unsigned int n = 0;
-    for (std::map<std::string, int>::iterator it = counter_.begin();
-         it != counter_.end(); ++it)
-      n += it->second;
+    for (auto& it : counter_)
+      n += it.second;
     return n;
   }
 
@@ -137,7 +136,7 @@ class instrumented_writer : public stan::callbacks::writer {
   std::vector<std::string> string_values() { return string; };
 
  private:
-  std::map<std::string, int> counter_;
+  std::map<std::string, std::atomic<int>> counter_;
   std::vector<std::pair<std::string, double> > string_double;
   std::vector<std::pair<std::string, int> > string_int;
   std::vector<std::pair<std::string, std::string> > string_string;
@@ -156,35 +155,53 @@ class instrumented_writer : public stan::callbacks::writer {
  */
 class instrumented_logger : public stan::callbacks::logger {
  public:
+  std::mutex logger_guard;
   instrumented_logger() {}
 
-  void debug(const std::string& message) { debug_.push_back(message); }
+  void debug(const std::string& message) {
+    std::lock_guard<std::mutex> guard(logger_guard);
+    debug_.push_back(message);
+  }
 
   void debug(const std::stringstream& message) {
+    std::lock_guard<std::mutex> guard(logger_guard);
     debug_.push_back(message.str());
   }
 
-  void info(const std::string& message) { info_.push_back(message); }
+  void info(const std::string& message) {
+    std::lock_guard<std::mutex> guard(logger_guard);
+    info_.push_back(message);
+  }
 
   void info(const std::stringstream& message) {
+    std::lock_guard<std::mutex> guard(logger_guard);
     info_.push_back(message.str());
   }
 
-  void warn(const std::string& message) { warn_.push_back(message); }
+  void warn(const std::string& message) {
+    std::lock_guard<std::mutex> guard(logger_guard);
+    warn_.push_back(message);
+  }
 
   void warn(const std::stringstream& message) {
+    std::lock_guard<std::mutex> guard(logger_guard);
     warn_.push_back(message.str());
   }
 
-  void error(const std::string& message) { error_.push_back(message); }
+  void error(const std::string& message) {
+    std::lock_guard<std::mutex> guard(logger_guard);
+    error_.push_back(message);
+  }
 
   void error(const std::stringstream& message) {
+    std::lock_guard<std::mutex> guard(logger_guard);
     error_.push_back(message.str());
   }
 
   void fatal(const std::string& message) { fatal_.push_back(message); }
 
   void fatal(const std::stringstream& message) {
+    std::lock_guard<std::mutex> guard(logger_guard);
     fatal_.push_back(message.str());
   }
 

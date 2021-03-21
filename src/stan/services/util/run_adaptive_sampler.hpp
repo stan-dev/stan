@@ -124,10 +124,11 @@ void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
     samples.emplace_back(cont_params, 0, 0);
   }
   std::vector<double> warm_delta_v(n_chain, 0);
+  std::vector<double> sample_delta_v(n_chain, 0);
   tbb::parallel_for(
       tbb::blocked_range<size_t>(0, n_chain, 1),
       [num_warmup, num_samples, num_thin, refresh, save_warmup, &samples,
-       &warm_delta_v, &writers, &samplers, &model, &cont_vectors, &rngs,
+       &warm_delta_v, &sample_delta_v, &writers, &samplers, &model, &cont_vectors, &rngs,
        &interrupt, &logger, &sample_writers,
        &diagnostic_writers](const tbb::blocked_range<size_t>& r) {
         for (size_t i = r.begin(); i != r.end(); ++i) {
@@ -161,15 +162,18 @@ void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
                                      refresh, true, false, writer, samp, model,
                                      rngs[i], interrupt, logger, i);
           auto end_sample = std::chrono::steady_clock::now();
-          double sample_delta_t
+          sample_delta_v[i]
               = std::chrono::duration_cast<std::chrono::milliseconds>(
                     end_sample - start_sample)
                     .count()
                 / 1000.0;
-          writer.write_timing(warm_delta_v[i], sample_delta_t);
         }
       },
       tbb::simple_partitioner());
+    for (int i = 0; i < n_chain; ++i) {
+      writers[i].write_timing(warm_delta_v[i], sample_delta_v[i]);
+    }
+
 }
 
 }  // namespace util
