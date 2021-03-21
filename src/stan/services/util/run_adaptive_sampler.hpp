@@ -5,6 +5,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/services/util/generate_transitions.hpp>
 #include <stan/services/util/mcmc_writer.hpp>
+#include <tbb/parallel_for.h>
 #include <chrono>
 #include <vector>
 
@@ -88,17 +89,15 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   writer.write_timing(warm_delta_t, sample_delta_t);
 }
 
-template <typename Sampler, typename Model, typename RNG, typename SampleWriter,
-          typename DiagnosticWriter>
-void run_adaptive_sampler(Sampler& sampler, Model& model,
-                          std::vector<std::vector<double>>& cont_vector,
-                          int num_warmup, int num_samples, int num_thin,
-                          int refresh, bool save_warmup, RNG& rng,
+template <class Sampler, class Model, class RNG, typename SampT, typename DiagnoseT>
+void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
+                          std::vector<std::vector<double>>& cont_vectors, int num_warmup,
+                          int num_samples, int num_thin, int refresh,
+                          bool save_warmup, std::vector<RNG>& rngs,
                           callbacks::interrupt& interrupt,
                           callbacks::logger& logger,
-                          std::vector<SampleWriter>& sample_writer,
-                          std::vector<DiagnosticWriter>& diagnostic_writer,
-                          size_t n_chains = 0) {
+                          std::vector<SampT>& sample_writers,
+                           std::vector<DiagnoseT>& diagnostic_writers, size_t n_chain) {
   std::vector<services::util::mcmc_writer> writers;
   writers.reserve(n_chain);
   std::vector<stan::mcmc::sample> samples;
@@ -151,7 +150,6 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                 / 1000.0;
           sampler.disengage_adaptation();
           auto&& sample_writer = sample_writers[i];
-          auto&& sampler = samplers[i];
           writer.write_adapt_finish(sampler);
           sampler.write_sampler_state(sample_writer);
 
