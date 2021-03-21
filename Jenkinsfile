@@ -360,32 +360,6 @@ pipeline {
                     }
                     post { always { deleteDirWin() } }
                 }
-                stage('Math functions expressions test') {
-                    agent any
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.CXX, stanc3_bin_url())
-                        script {
-                            dir("lib/stan_math/") {
-                                sh "echo O=0 > make/local"
-                                withEnv(['PATH+TBB=./lib/tbb']) {
-                                    try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
-                                    finally { junit 'test/**/*.xml' }
-                                }
-                                withEnv(['PATH+TBB=./lib/tbb']) {
-                                    sh "python ./test/expressions/test_expression_testing_framework.py"
-                                }
-                                sh "make clean-all"
-                                sh "echo STAN_THREADS=true >> make/local"
-                                withEnv(['PATH+TBB=./lib/tbb']) {
-                                    try { sh "./runTests.py -j${env.PARALLEL} test/expressions" }
-                                    finally { junit 'test/**/*.xml' }
-                                }
-                            }
-                        }
-                    }
-                    post { always { deleteDir() } }
-                }
             }
             when {
                 expression {
