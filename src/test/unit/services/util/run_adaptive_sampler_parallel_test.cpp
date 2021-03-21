@@ -9,6 +9,7 @@
 
 class ServicesUtil : public testing::Test {
   using model_t = stan::mcmc::adapt_unit_e_nuts<stan_model, boost::ecuyer1988>;
+
  public:
   ServicesUtil()
       : model(context, 0, &model_log),
@@ -21,13 +22,13 @@ class ServicesUtil : public testing::Test {
         refresh(0),
         n_chain(3),
         save_warmup(false) {
-          rng.clear();
-          for (int i = 0; i < 3; ++i) {
-            rng[i] = std::move(stan::services::util::create_rng(0, 1));
-            sampler.push_back(model_t(model, rng[i]));
-            sample_writer.push_back(stan::test::unit::instrumented_writer{});
-            diagnostic_writer.push_back(stan::test::unit::instrumented_writer{});
-          }
+    rng.clear();
+    for (int i = 0; i < 3; ++i) {
+      rng[i] = std::move(stan::services::util::create_rng(0, 1));
+      sampler.push_back(model_t(model, rng[i]));
+      sample_writer.push_back(stan::test::unit::instrumented_writer{});
+      diagnostic_writer.push_back(stan::test::unit::instrumented_writer{});
+    }
   }
 
   std::stringstream model_log;
@@ -36,7 +37,8 @@ class ServicesUtil : public testing::Test {
   std::vector<std::vector<double>> cont_vector;
   std::vector<boost::ecuyer1988> rng;
   stan::test::unit::instrumented_interrupt interrupt;
-  std::vector<stan::test::unit::instrumented_writer> sample_writer, diagnostic_writer;
+  std::vector<stan::test::unit::instrumented_writer> sample_writer,
+      diagnostic_writer;
   stan::test::unit::instrumented_logger logger;
   std::vector<model_t> sampler;
   int num_warmup, num_samples, num_thin, refresh, n_chain;
@@ -60,10 +62,10 @@ TEST_F(ServicesUtil, all_zero) {
   EXPECT_EQ(2, sample_writer[0].call_count("empty")) << "blank lines";
 
   EXPECT_EQ(6, diagnostic_writer[0].call_count());
-  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string")) << "header line";
+  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string"))
+      << "header line";
   EXPECT_EQ(3, diagnostic_writer[0].call_count("string")) << "elapsed time";
   EXPECT_EQ(2, diagnostic_writer[0].call_count("empty")) << "blank lines";
-
 }
 
 TEST_F(ServicesUtil, num_warmup_no_save) {
@@ -84,7 +86,8 @@ TEST_F(ServicesUtil, num_warmup_no_save) {
   EXPECT_EQ(2, sample_writer[0].call_count("empty")) << "blank lines";
 
   EXPECT_EQ(6, diagnostic_writer[0].call_count());
-  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string")) << "header line";
+  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string"))
+      << "header line";
   EXPECT_EQ(3, diagnostic_writer[0].call_count("string")) << "elapsed time";
   EXPECT_EQ(2, diagnostic_writer[0].call_count("empty")) << "blank lines";
 }
@@ -95,7 +98,7 @@ TEST_F(ServicesUtil, num_warmup_save) {
   stan::services::util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
       save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, 3);
-  EXPECT_EQ((num_warmup) * 3, interrupt.call_count());
+  EXPECT_EQ((num_warmup)*3, interrupt.call_count());
 
   EXPECT_EQ((3 + 2) * 3, logger.call_count()) << "Writes the elapsed time";
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
@@ -110,7 +113,8 @@ TEST_F(ServicesUtil, num_warmup_save) {
       << "warmup draws";
 
   EXPECT_EQ(num_warmup + 6, diagnostic_writer[0].call_count());
-  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string")) << "header line";
+  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string"))
+      << "header line";
   EXPECT_EQ(3, diagnostic_writer[0].call_count("string")) << "elapsed time";
   EXPECT_EQ(2, diagnostic_writer[0].call_count("empty")) << "blank lines";
   EXPECT_EQ(num_warmup, diagnostic_writer[0].call_count("vector_double"))
@@ -137,7 +141,8 @@ TEST_F(ServicesUtil, num_samples) {
       << "num_samples draws";
 
   EXPECT_EQ(num_samples + 6, diagnostic_writer[0].call_count());
-  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string")) << "header line";
+  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string"))
+      << "header line";
   EXPECT_EQ(3, diagnostic_writer[0].call_count("string")) << "elapsed time";
   EXPECT_EQ(2, diagnostic_writer[0].call_count("empty")) << "blank lines";
   EXPECT_EQ(num_samples, sample_writer[0].call_count("vector_double"))
@@ -169,7 +174,8 @@ TEST_F(ServicesUtil, num_warmup_save_num_samples_num_thin) {
 
   EXPECT_EQ((num_warmup + num_samples) / num_thin + 6,
             diagnostic_writer[0].call_count());
-  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string")) << "header line";
+  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string"))
+      << "header line";
   EXPECT_EQ(3, diagnostic_writer[0].call_count("string")) << "elapsed time";
   EXPECT_EQ(2, diagnostic_writer[0].call_count("empty")) << "blank lines";
   EXPECT_EQ((num_warmup + num_samples) / num_thin,
@@ -197,10 +203,12 @@ TEST_F(ServicesUtil, num_warmup_num_samples_refresh) {
   EXPECT_EQ(1, sample_writer[0].call_count("vector_string")) << "header line";
   EXPECT_EQ(2 + 3, sample_writer[0].call_count("string")) << "elapsed time";
   EXPECT_EQ(2, sample_writer[0].call_count("empty")) << "blank lines";
-  EXPECT_EQ(num_samples, sample_writer[0].call_count("vector_double")) << "draws";
+  EXPECT_EQ(num_samples, sample_writer[0].call_count("vector_double"))
+      << "draws";
 
   EXPECT_EQ(num_samples + 6, diagnostic_writer[0].call_count());
-  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string")) << "header line";
+  EXPECT_EQ(1, diagnostic_writer[0].call_count("vector_string"))
+      << "header line";
   EXPECT_EQ(3, diagnostic_writer[0].call_count("string")) << "elapsed time";
   EXPECT_EQ(2, diagnostic_writer[0].call_count("empty")) << "blank lines";
   EXPECT_EQ(num_samples, diagnostic_writer[0].call_count("vector_double"))

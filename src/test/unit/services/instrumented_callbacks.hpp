@@ -103,33 +103,33 @@ class instrumented_writer : public stan::callbacks::writer {
 
   unsigned int call_count(std::string s) { return counter_[s]; }
 
-  std::vector<std::pair<std::string, double> > string_double_values() {
+  std::vector<std::pair<std::string, double>> string_double_values() {
     return string_double;
   };
 
-  std::vector<std::pair<std::string, int> > string_int_values() {
+  std::vector<std::pair<std::string, int>> string_int_values() {
     return string_int;
   };
 
-  std::vector<std::pair<std::string, std::string> > string_string_values() {
+  std::vector<std::pair<std::string, std::string>> string_string_values() {
     return string_string;
   };
 
-  std::vector<std::pair<std::string, std::vector<double> > >
+  std::vector<std::pair<std::string, std::vector<double>>>
   string_pdouble_int_values() {
     return string_pdouble_int;
   };
 
-  std::vector<std::pair<std::string, Eigen::MatrixXd> >
+  std::vector<std::pair<std::string, Eigen::MatrixXd>>
   string_pdouble_int_int_values() {
     return string_pdouble_int_int;
   };
 
-  std::vector<std::vector<std::string> > vector_string_values() {
+  std::vector<std::vector<std::string>> vector_string_values() {
     return vector_string;
   };
 
-  std::vector<std::vector<double> > vector_double_values() {
+  std::vector<std::vector<double>> vector_double_values() {
     return vector_double;
   };
 
@@ -137,13 +137,13 @@ class instrumented_writer : public stan::callbacks::writer {
 
  private:
   std::map<std::string, std::atomic<int>> counter_;
-  std::vector<std::pair<std::string, double> > string_double;
-  std::vector<std::pair<std::string, int> > string_int;
-  std::vector<std::pair<std::string, std::string> > string_string;
-  std::vector<std::pair<std::string, std::vector<double> > > string_pdouble_int;
-  std::vector<std::pair<std::string, Eigen::MatrixXd> > string_pdouble_int_int;
-  std::vector<std::vector<std::string> > vector_string;
-  std::vector<std::vector<double> > vector_double;
+  std::vector<std::pair<std::string, double>> string_double;
+  std::vector<std::pair<std::string, int>> string_int;
+  std::vector<std::pair<std::string, std::string>> string_string;
+  std::vector<std::pair<std::string, std::vector<double>>> string_pdouble_int;
+  std::vector<std::pair<std::string, Eigen::MatrixXd>> string_pdouble_int_int;
+  std::vector<std::vector<std::string>> vector_string;
+  std::vector<std::vector<double>> vector_double;
   std::vector<std::string> string;
 };
 

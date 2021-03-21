@@ -128,8 +128,8 @@ void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
   tbb::parallel_for(
       tbb::blocked_range<size_t>(0, n_chain, 1),
       [num_warmup, num_samples, num_thin, refresh, save_warmup, &samples,
-       &warm_delta_v, &sample_delta_v, &writers, &samplers, &model, &cont_vectors, &rngs,
-       &interrupt, &logger, &sample_writers,
+       &warm_delta_v, &sample_delta_v, &writers, &samplers, &model,
+       &cont_vectors, &rngs, &interrupt, &logger, &sample_writers,
        &diagnostic_writers](const tbb::blocked_range<size_t>& r) {
         for (size_t i = r.begin(); i != r.end(); ++i) {
           auto&& writer = writers[i];
@@ -170,10 +170,9 @@ void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
         }
       },
       tbb::simple_partitioner());
-    for (int i = 0; i < n_chain; ++i) {
-      writers[i].write_timing(warm_delta_v[i], sample_delta_v[i]);
-    }
-
+  for (int i = 0; i < n_chain; ++i) {
+    writers[i].write_timing(warm_delta_v[i], sample_delta_v[i]);
+  }
 }
 
 }  // namespace util
