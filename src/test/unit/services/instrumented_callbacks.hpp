@@ -10,6 +10,7 @@
 #include <iostream>
 #include <exception>
 #include <atomic>
+#include <mutex>
 namespace stan {
 namespace test {
 namespace unit {
