@@ -7,6 +7,8 @@
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_unit_e_nuts.hpp>
 
+auto&& blah = stan::math::init_threadpool_tbb();
+
 class ServicesUtil : public testing::Test {
   using model_t = stan::mcmc::adapt_unit_e_nuts<stan_model, boost::ecuyer1988>;
 
