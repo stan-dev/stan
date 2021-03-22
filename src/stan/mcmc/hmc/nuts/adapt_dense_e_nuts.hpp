@@ -33,6 +33,7 @@ class adapt_dense_e_nuts : public dense_e_nuts<Model, BaseRNG>,
           this->z_.inv_e_metric_, this->z_.q);
 
       if (update) {
+        this->metric_check(this->z_.inv_e_metric_.allFinite());
         this->init_stepsize(logger);
 
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));

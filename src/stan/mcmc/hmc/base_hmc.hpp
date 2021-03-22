@@ -127,7 +127,7 @@ class base_hmc : public base_mcmc {
         this->nom_epsilon_ = direction == 1 ? 2.0 * this->nom_epsilon_
                                             : 0.5 * this->nom_epsilon_;
 
-      if (this->nom_epsilon_ > 1e7)
+      if (!(this->nom_epsilon_ < 1e7))
         throw std::runtime_error(
             "Posterior is improper. "
             "Please check your model.");
@@ -139,6 +139,13 @@ class base_hmc : public base_mcmc {
     }
 
     this->z_.ps_point::operator=(z_init);
+  }
+
+  void metric_check(bool ok) {
+    if (!ok)
+      throw std::runtime_error(
+          "Posterior is improper. "
+          "Please check your model.");
   }
 
   /**
