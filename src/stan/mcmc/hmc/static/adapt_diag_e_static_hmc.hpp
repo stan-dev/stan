@@ -36,7 +36,6 @@ class adapt_diag_e_static_hmc : public diag_e_static_hmc<Model, BaseRNG>,
                                                          this->z_.q);
 
       if (update) {
-        this->hamiltonian_.check_finite_metric(this->z_);
         this->init_stepsize(logger);
         this->update_L_();
 

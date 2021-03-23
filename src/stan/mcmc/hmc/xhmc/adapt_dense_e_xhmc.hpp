@@ -33,7 +33,6 @@ class adapt_dense_e_xhmc : public dense_e_xhmc<Model, BaseRNG>,
           this->z_.inv_e_metric_, this->z_.q);
 
       if (update) {
-        this->hamiltonian_.check_finite_metric(this->z_);
         this->init_stepsize(logger);
 
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));

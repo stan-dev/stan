@@ -33,7 +33,6 @@ class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG>,
                                                          this->z_.q);
 
       if (update) {
-        this->hamiltonian_.check_finite_metric(this->z_);
         this->init_stepsize(logger);
 
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));

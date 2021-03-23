@@ -28,6 +28,13 @@ class covar_adaptation : public windowed_adaptation {
               + 1e-3 * (5.0 / (n + 5.0))
                     * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
 
+      if (!covar.allFinite())
+        throw std::runtime_error(
+            "Numerical overflow in metric adaptation. "
+            "Posterior is too wide for Stan to estimate it. "
+            "This problem may indicate that the posterior is improper. "
+            "Please check your model.");
+
       estimator_.restart();
 
       ++adapt_window_counter_;

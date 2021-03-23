@@ -52,10 +52,6 @@ class dense_e_metric : public base_hamiltonian<Model, dense_e_point, BaseRNG> {
 
     z.p = z.inv_e_metric_.llt().matrixU().solve(u);
   }
-
-  bool has_finite_metric(dense_e_point& z) {
-    return z.inv_e_metric_.allFinite();
-  }
 };
 
 }  // namespace mcmc

@@ -27,6 +27,13 @@ class var_adaptation : public windowed_adaptation {
       var = (n / (n + 5.0)) * var
             + 1e-3 * (5.0 / (n + 5.0)) * Eigen::VectorXd::Ones(var.size());
 
+      if (!var.allFinite())
+        throw std::runtime_error(
+            "Numerical overflow in metric adaptation. "
+            "Posterior is too wide for Stan to estimate it. "
+            "This problem may indicate that the posterior is improper. "
+            "Please check your model.");
+
       estimator_.restart();
 
       ++adapt_window_counter_;
