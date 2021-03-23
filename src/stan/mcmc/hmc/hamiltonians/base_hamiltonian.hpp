@@ -77,6 +77,17 @@ class base_hamiltonian {
     update_potential_gradient(z, logger);
   }
 
+  virtual bool has_finite_metric(Point& z) { return true; }
+
+  void check_finite_metric(Point& z) {
+    if (!has_finite_metric(z))
+      throw std::runtime_error(
+          "Numerical overflow in metric adaptation. "
+          "Posterior is too wide for Stan to estimate it. "
+          "This problem may indicate that the posterior is improper. "
+          "Please check your model.");
+  }
+
  protected:
   const Model& model_;
 

@@ -48,6 +48,10 @@ class diag_e_metric : public base_hamiltonian<Model, diag_e_point, BaseRNG> {
     for (int i = 0; i < z.p.size(); ++i)
       z.p(i) = rand_diag_gaus() / sqrt(z.inv_e_metric_(i));
   }
+
+  bool has_finite_metric(diag_e_point& z) {
+    return z.inv_e_metric_.allFinite();
+  }
 };
 
 }  // namespace mcmc
