@@ -65,8 +65,8 @@ namespace util {
  *   std::domain_error)
  * @return valid unconstrained parameters for the model
  */
-template <bool Jacobian = true, class Model, class RNG>
-std::vector<double> initialize(Model& model, const stan::io::var_context& init,
+template <bool Jacobian = true, typename Model, typename InitContext, typename RNG>
+std::vector<double> initialize(Model& model, const InitContext& init,
                                RNG& rng, double init_radius, bool print_timing,
                                stan::callbacks::logger& logger,
                                stan::callbacks::writer& init_writer) {

@@ -66,7 +66,6 @@ int hmc_nuts_diag_e_adapt(
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
-  std::vector<int> disc_vector;
   std::vector<double> cont_vector = util::initialize(
       model, init, rng, init_radius, true, logger, init_writer);
 
@@ -153,6 +152,80 @@ int hmc_nuts_diag_e_adapt(
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer);
 }
+
+template <class Model, typename InitContext, typename InitInvContext, typename SampWriter, typename DiagnoseWriter>
+int hmc_nuts_diag_e_adapt(
+    Model& model, const std::vector<InitContext>& init,
+    const std::vector<InitInvContext>& init_inv_metric, unsigned int random_seed,
+    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    int num_thin, bool save_warmup, int refresh, double stepsize,
+    double stepsize_jitter, int max_depth, double delta, double gamma,
+    double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
+    unsigned int window, callbacks::interrupt& interrupt,
+    callbacks::logger& logger, callbacks::writer& init_writer,
+    std::vector<SampWriter>& sample_writer, std::vector<DiagnoseWriter>& diagnostic_writer, size_t n_chain) {
+  using sample_t = stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>;
+  std::vector<boost::ecuyer1988> rngs;
+  rngs.reserve(n_chain);
+  std::vector<std::vector<double>> cont_vectors;
+  cont_vectors.reserve(n_chain);
+  std::vector<sample_t> samplers;
+  samplers.reserve(n_chain);
+  try {
+    for (int i = 0; i < n_chain; ++i) {
+      rngs.emplace_back(util::create_rng(random_seed, chain + i));
+      cont_vectors.emplace_back(util::initialize(
+          model, init[i], rngs[i], init_radius, true, logger, init_writer));
+      samplers.emplace_back(model, rngs[i]);
+      Eigen::VectorXd inv_metric = util::read_diag_inv_metric(init_inv_metric[i],
+                                              model.num_params_r(), logger);
+      util::validate_diag_inv_metric(inv_metric, logger);
+
+      samplers[i].set_metric(inv_metric);
+      samplers[i].set_nominal_stepsize(stepsize);
+      samplers[i].set_stepsize_jitter(stepsize_jitter);
+      samplers[i].set_max_depth(max_depth);
+
+      samplers[i].get_stepsize_adaptation().set_mu(log(10 * stepsize));
+      samplers[i].get_stepsize_adaptation().set_delta(delta);
+      samplers[i].get_stepsize_adaptation().set_gamma(gamma);
+      samplers[i].get_stepsize_adaptation().set_kappa(kappa);
+      samplers[i].get_stepsize_adaptation().set_t0(t0);
+      samplers[i].set_window_params(num_warmup, init_buffer, term_buffer, window,
+                                logger);
+
+    }
+  } catch (const std::domain_error& e) {
+    return error_codes::CONFIG;
+  }
+  util::run_adaptive_sampler(
+      samplers, model, cont_vectors, num_warmup, num_samples, num_thin, refresh,
+      save_warmup, rngs, interrupt, logger, sample_writer, diagnostic_writer, n_chain);
+
+  return error_codes::OK;
+}
+
+template <class Model, typename InitContext, typename SampWriter, typename DiagnoseWriter>
+int hmc_nuts_diag_e_adapt(
+    Model& model, const std::vector<InitContext>& init, unsigned int random_seed,
+    unsigned int chain, double init_radius, int num_warmup, int num_samples,
+    int num_thin, bool save_warmup, int refresh, double stepsize,
+    double stepsize_jitter, int max_depth, double delta, double gamma,
+    double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
+    unsigned int window, callbacks::interrupt& interrupt,
+    callbacks::logger& logger, callbacks::writer& init_writer,
+    std::vector<SampWriter>& sample_writer, std::vector<DiagnoseWriter>& diagnostic_writer, size_t n_chain) {
+  stan::io::dump dmp
+      = util::create_unit_e_diag_inv_metric(model.num_params_r());
+  std::vector<stan::io::dump> unit_e_metrics(n_chain, dmp);
+  return hmc_nuts_diag_e_adapt(
+      model, init, unit_e_metrics, random_seed, chain, init_radius, num_warmup,
+      num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
+      max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
+      interrupt, logger, init_writer, sample_writer, diagnostic_writer, n_chain);
+}
+
+
 
 }  // namespace sample
 }  // namespace services

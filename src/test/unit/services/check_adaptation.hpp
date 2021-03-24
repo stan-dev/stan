@@ -14,9 +14,7 @@ namespace test {
 namespace unit {
 
 double stod(const std::string& val) {
-  char tmp[val.length()];
-  strcpy(tmp, val.c_str());
-  return atof(tmp);
+  return atof(val.c_str());
 }
 
 void check_adaptation(const size_t& num_params,
