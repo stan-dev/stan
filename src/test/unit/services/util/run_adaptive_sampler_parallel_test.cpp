@@ -9,23 +9,25 @@
 
 auto&& blah = stan::math::init_threadpool_tbb();
 
+static constexpr size_t num_chains = 5;
+
 class ServicesUtil : public testing::Test {
   using model_t = stan::mcmc::adapt_unit_e_nuts<stan_model, boost::ecuyer1988>;
 
  public:
   ServicesUtil()
       : model(context, 0, &model_log),
-        rng(3),
-        cont_vector(3, std::vector<double>{0, 0}),
+        rng(num_chains),
+        cont_vector(num_chains, std::vector<double>{0, 0}),
         sampler(),
         num_warmup(0),
         num_samples(0),
         num_thin(1),
         refresh(0),
-        n_chain(3),
+        n_chain(num_chains),
         save_warmup(false) {
     rng.clear();
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < num_chains; ++i) {
       rng[i] = std::move(stan::services::util::create_rng(0, 1));
       sampler.push_back(model_t(model, rng[i]));
       sample_writer.push_back(stan::test::unit::instrumented_writer{});
@@ -50,10 +52,10 @@ class ServicesUtil : public testing::Test {
 TEST_F(ServicesUtil, all_zero) {
   stan::services::util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, 3);
+      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, num_chains);
   EXPECT_EQ(0, interrupt.call_count());
 
-  EXPECT_EQ((3 + 2) * 3, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ((3 + 2) * num_chains, logger.call_count()) << "Writes the elapsed time";
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
       << "No other calls to logger";
 
@@ -74,10 +76,10 @@ TEST_F(ServicesUtil, num_warmup_no_save) {
   num_warmup = 1000;
   stan::services::util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, 3);
-  EXPECT_EQ(num_warmup * 3, interrupt.call_count());
+      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, num_chains);
+  EXPECT_EQ(num_warmup * num_chains, interrupt.call_count());
 
-  EXPECT_EQ((3 + 2) * 3, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ((3 + 2) * num_chains, logger.call_count()) << "Writes the elapsed time";
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
       << "No other calls to logger";
 
@@ -99,10 +101,10 @@ TEST_F(ServicesUtil, num_warmup_save) {
   save_warmup = true;
   stan::services::util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, 3);
-  EXPECT_EQ((num_warmup)*3, interrupt.call_count());
+      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, num_chains);
+  EXPECT_EQ((num_warmup) * num_chains, interrupt.call_count());
 
-  EXPECT_EQ((3 + 2) * 3, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ((3 + 2) * num_chains, logger.call_count()) << "Writes the elapsed time";
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
       << "No other calls to logger";
 
@@ -127,10 +129,10 @@ TEST_F(ServicesUtil, num_samples) {
   num_samples = 1000;
   stan::services::util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, 3);
-  EXPECT_EQ(num_samples * 3, interrupt.call_count());
+      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, num_chains);
+  EXPECT_EQ(num_samples * num_chains, interrupt.call_count());
 
-  EXPECT_EQ((3 + 2) * 3, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ((3 + 2) * num_chains, logger.call_count()) << "Writes the elapsed time";
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
       << "No other calls to logger";
 
@@ -158,10 +160,10 @@ TEST_F(ServicesUtil, num_warmup_save_num_samples_num_thin) {
   num_thin = 10;
   stan::services::util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, 3);
-  EXPECT_EQ((num_warmup + num_samples) * 3, interrupt.call_count());
+      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, num_chains);
+  EXPECT_EQ((num_warmup + num_samples) * num_chains, interrupt.call_count());
 
-  EXPECT_EQ((3 + 2) * 3, logger.call_count()) << "Writes the elapsed time";
+  EXPECT_EQ((3 + 2) * num_chains, logger.call_count()) << "Writes the elapsed time";
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
       << "No other calls to logger";
 
@@ -191,10 +193,10 @@ TEST_F(ServicesUtil, num_warmup_num_samples_refresh) {
   refresh = 10;
   stan::services::util::run_adaptive_sampler(
       sampler, model, cont_vector, num_warmup, num_samples, num_thin, refresh,
-      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, 3);
-  EXPECT_EQ((num_warmup + num_samples) * 3, interrupt.call_count());
+      save_warmup, rng, interrupt, logger, sample_writer, diagnostic_writer, num_chains);
+  EXPECT_EQ((num_warmup + num_samples) * num_chains, interrupt.call_count());
 
-  EXPECT_EQ((num_warmup * 3 + num_samples * 3) / refresh + (2 + 3 + 2) * 3,
+  EXPECT_EQ((num_warmup * num_chains + num_samples * num_chains) / refresh + (2 + 3 + 2) * num_chains,
             logger.call_count())
       << "Writes 1 to start warmup, 1 to start post-warmup, and "
       << "(num_warmup + num_samples) / refresh, then the elapsed time";

@@ -106,34 +106,28 @@ void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
                          interrupt, logger, sample_writers[0],
                          diagnostic_writers[0]);
   }
-  std::vector<stan::mcmc::sample> samples;
-  samples.reserve(n_chain);
-  for (int i = 0; i < n_chain; ++i) {
-    auto&& sampler = samplers[i];
-    sampler.engage_adaptation();
-    Eigen::Map<Eigen::VectorXd> cont_params(cont_vectors[i].data(),
-                                            cont_vectors[i].size());
-    try {
-      sampler.z().q = cont_params;
-      sampler.init_stepsize(logger);
-    } catch (const std::exception& e) {
-      logger.info("Exception initializing step size.");
-      logger.info(e.what());
-      return;
-    }
-    samples.emplace_back(cont_params, 0, 0);
-  }
   tbb::parallel_for(
       tbb::blocked_range<size_t>(0, n_chain, 1),
-      [num_warmup, num_samples, num_thin, refresh, save_warmup, &samples,
-       &samplers, &model, &rngs, &interrupt, &logger, &sample_writers,
+      [num_warmup, num_samples, num_thin, refresh, save_warmup,
+       &samplers, &model, &rngs, &interrupt, &logger, &sample_writers, &cont_vectors,
        &diagnostic_writers](const tbb::blocked_range<size_t>& r) {
         for (size_t i = r.begin(); i != r.end(); ++i) {
+          auto&& sampler = samplers[i];
+          sampler.engage_adaptation();
+          Eigen::Map<Eigen::VectorXd> cont_params(cont_vectors[i].data(),
+                                                  cont_vectors[i].size());
+          try {
+            sampler.z().q = cont_params;
+            sampler.init_stepsize(logger);
+          } catch (const std::exception& e) {
+            logger.info("Exception initializing step size.");
+            logger.info(e.what());
+            return;
+          }
+          stan::mcmc::sample samp(cont_params, 0, 0);
           auto&& sample_writer = sample_writers[i];
           auto writer = services::util::mcmc_writer(
               sample_writer, diagnostic_writers[i], logger);
-          auto&& sampler = samplers[i];
-          auto&& samp = samples[i];
 
           // Headers
           writer.write_sample_names(samp, sampler, model);
