@@ -51,8 +51,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
     if (refresh > 0
         && (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
       int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
-      std::string mes;
-      std::stringstream message(mes, std::ios_base::in);
+      std::stringstream message;
       if (n_chain > 0) {
         message << "Chain [" << (n_chain + 1) << "]";
       }

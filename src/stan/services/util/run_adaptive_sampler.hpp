@@ -100,18 +100,18 @@ void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
                           std::vector<SampT>& sample_writers,
                           std::vector<DiagnoseT>& diagnostic_writers,
                           size_t n_chain) {
-  std::vector<services::util::mcmc_writer> writers;
-  writers.reserve(n_chain);
+  if (n_chain == 0) {
+    run_adaptive_sampler(samplers[0], model, cont_vectors[0], num_warmup, num_samples,
+     num_thin, refresh, save_warmup, rngs[0], interrupt, logger, sample_writers[0],
+     diagnostic_writers[0]);
+  }
   std::vector<stan::mcmc::sample> samples;
   samples.reserve(n_chain);
-
   for (int i = 0; i < n_chain; ++i) {
-    auto&& sample_writer = sample_writers[i];
-    auto&& diagnostic_writer = diagnostic_writers[i];
     auto&& sampler = samplers[i];
-    Eigen::Map<Eigen::VectorXd> cont_params(cont_vectors[i].data(),
-                                            cont_vectors[i].size());
     sampler.engage_adaptation();
+    Eigen::Map<Eigen::VectorXd> cont_params(cont_vectors[i].data(),
+                                           cont_vectors[i].size());
     try {
       sampler.z().q = cont_params;
       sampler.init_stepsize(logger);
@@ -120,19 +120,17 @@ void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
       logger.info(e.what());
       return;
     }
-    writers.emplace_back(sample_writer, diagnostic_writer, logger);
     samples.emplace_back(cont_params, 0, 0);
   }
-  std::vector<double> warm_delta_v(n_chain, 0);
-  std::vector<double> sample_delta_v(n_chain, 0);
   tbb::parallel_for(
       tbb::blocked_range<size_t>(0, n_chain, 1),
       [num_warmup, num_samples, num_thin, refresh, save_warmup, &samples,
-       &warm_delta_v, &sample_delta_v, &writers, &samplers, &model,
-       &cont_vectors, &rngs, &interrupt, &logger, &sample_writers,
+       &samplers, &model,
+       &rngs, &interrupt, &logger, &sample_writers,
        &diagnostic_writers](const tbb::blocked_range<size_t>& r) {
         for (size_t i = r.begin(); i != r.end(); ++i) {
-          auto&& writer = writers[i];
+          auto&& sample_writer = sample_writers[i];
+          auto writer = services::util::mcmc_writer(sample_writer, diagnostic_writers[i], logger);
           auto&& sampler = samplers[i];
           auto&& samp = samples[i];
 
@@ -140,39 +138,36 @@ void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
           writer.write_sample_names(samp, sampler, model);
           writer.write_diagnostic_names(samp, sampler, model);
 
-          auto start_warm = std::chrono::steady_clock::now();
+          const auto start_warm = std::chrono::steady_clock::now();
           util::generate_transitions(sampler, num_warmup, 0,
                                      num_warmup + num_samples, num_thin,
                                      refresh, save_warmup, true, writer, samp,
                                      model, rngs[i], interrupt, logger, i);
-          auto end_warm = std::chrono::steady_clock::now();
-          warm_delta_v[i]
+          const auto end_warm = std::chrono::steady_clock::now();
+          auto warm_delta
               = std::chrono::duration_cast<std::chrono::milliseconds>(
                     end_warm - start_warm)
                     .count()
                 / 1000.0;
           sampler.disengage_adaptation();
-          auto&& sample_writer = sample_writers[i];
           writer.write_adapt_finish(sampler);
           sampler.write_sampler_state(sample_writer);
 
-          auto start_sample = std::chrono::steady_clock::now();
+          const auto start_sample = std::chrono::steady_clock::now();
           util::generate_transitions(sampler, num_samples, num_warmup,
                                      num_warmup + num_samples, num_thin,
                                      refresh, true, false, writer, samp, model,
                                      rngs[i], interrupt, logger, i);
-          auto end_sample = std::chrono::steady_clock::now();
-          sample_delta_v[i]
+          const auto end_sample = std::chrono::steady_clock::now();
+          auto sample_delta
               = std::chrono::duration_cast<std::chrono::milliseconds>(
                     end_sample - start_sample)
                     .count()
                 / 1000.0;
+          writer.write_timing(warm_delta, sample_delta);
         }
       },
       tbb::simple_partitioner());
-  for (int i = 0; i < n_chain; ++i) {
-    writers[i].write_timing(warm_delta_v[i], sample_delta_v[i]);
-  }
 }
 
 }  // namespace util
