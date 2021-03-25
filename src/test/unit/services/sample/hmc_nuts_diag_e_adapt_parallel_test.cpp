@@ -14,7 +14,7 @@ class ServicesSampleHmcNutsDiagEAdaptPar : public testing::Test {
     for (int i = 0; i < num_chains; ++i) {
       parameter.push_back(stan::test::unit::instrumented_writer{});
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
-      context.push_back(stan::io::empty_var_context{});
+      context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
   }
   stan::io::empty_var_context data_context;
@@ -22,7 +22,7 @@ class ServicesSampleHmcNutsDiagEAdaptPar : public testing::Test {
   stan::test::unit::instrumented_logger logger;
   stan::test::unit::instrumented_writer init;
   std::vector<stan::test::unit::instrumented_writer> parameter, diagnostic;
-  std::vector<stan::io::empty_var_context> context;
+  std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   stan_model model;
 };
 
@@ -127,9 +127,8 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptPar, parameter_checks) {
     EXPECT_EQ("lp__", diagnostic_names[0][0]);
     EXPECT_EQ("accept_stat__", diagnostic_names[0][1]);
   }
-    EXPECT_EQ(return_code, 0);
+  EXPECT_EQ(return_code, 0);
 }
-
 
 TEST_F(ServicesSampleHmcNutsDiagEAdaptPar, output_regression) {
   unsigned int random_seed = 0;
