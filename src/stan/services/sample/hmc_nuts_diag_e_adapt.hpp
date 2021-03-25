@@ -203,9 +203,18 @@ int hmc_nuts_diag_e_adapt(
     } catch (const std::domain_error& e) {
       return error_codes::CONFIG;
     }
-    util::run_adaptive_sampler(
-        samplers, model, cont_vectors, num_warmup, num_samples, num_thin, refresh,
-        save_warmup, rngs, interrupt, logger, sample_writer, diagnostic_writer, n_chain);
+    tbb::parallel_for(
+        tbb::blocked_range<size_t>(0, n_chain, 1),
+        [num_warmup, num_samples, num_thin, refresh, save_warmup,
+         &samplers, &model, &rngs, &interrupt, &logger, &sample_writer, &cont_vectors,
+         &diagnostic_writer](const tbb::blocked_range<size_t>& r) {
+        for (size_t i = r.begin(); i != r.end(); ++i) {
+      util::run_adaptive_sampler(
+          samplers[i], model, cont_vectors[i], num_warmup, num_samples, num_thin, refresh,
+          save_warmup, rngs[i], interrupt, logger, sample_writer[i], diagnostic_writer[i]);
+        }
+      },
+      tbb::simple_partitioner());
 
     return error_codes::OK;
   }
