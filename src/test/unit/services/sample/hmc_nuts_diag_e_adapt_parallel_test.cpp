@@ -127,9 +127,8 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptPar, parameter_checks) {
     EXPECT_EQ("lp__", diagnostic_names[0][0]);
     EXPECT_EQ("accept_stat__", diagnostic_names[0][1]);
   }
-    EXPECT_EQ(return_code, 0);
+  EXPECT_EQ(return_code, 0);
 }
-
 
 TEST_F(ServicesSampleHmcNutsDiagEAdaptPar, output_regression) {
   unsigned int random_seed = 0;

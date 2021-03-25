@@ -17,9 +17,8 @@ namespace util {
  */
 inline stan::io::dump create_unit_e_diag_inv_metric(size_t num_params) {
   std::string dims("),.Dim=c(" + std::to_string(num_params) + "))");
-  Eigen::IOFormat
-  RFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ",", "", "",
-  "inv_metric <- structure(c(", dims);
+  Eigen::IOFormat RFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ",",
+                       "", "", "inv_metric <- structure(c(", dims);
   std::stringstream txt;
   txt << Eigen::VectorXd::Ones(num_params).format(RFmt);
   return stan::io::dump(txt);
