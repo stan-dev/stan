@@ -108,8 +108,8 @@ void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
   }
   tbb::parallel_for(
       tbb::blocked_range<size_t>(0, n_chain, 1),
-      [num_warmup, num_samples, num_thin, refresh, save_warmup,
-       &samplers, &model, &rngs, &interrupt, &logger, &sample_writers, &cont_vectors,
+      [num_warmup, num_samples, num_thin, refresh, save_warmup, &samplers,
+       &model, &rngs, &interrupt, &logger, &sample_writers, &cont_vectors,
        &diagnostic_writers](const tbb::blocked_range<size_t>& r) {
         for (size_t i = r.begin(); i != r.end(); ++i) {
           auto&& sampler = samplers[i];
