@@ -43,7 +43,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                           callbacks::interrupt& interrupt,
                           callbacks::logger& logger,
                           callbacks::writer& sample_writer,
-                          callbacks::writer& diagnostic_writer) {
+                          callbacks::writer& diagnostic_writer, size_t chain_id = 0) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
 
@@ -67,7 +67,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true, writer, s,
-                             model, rng, interrupt, logger);
+                             model, rng, interrupt, logger, chain_id);
   auto end_warm = std::chrono::steady_clock::now();
   double warm_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                             end_warm - start_warm)
@@ -80,7 +80,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   auto start_sample = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_samples, num_warmup,
                              num_warmup + num_samples, num_thin, refresh, true,
-                             false, writer, s, model, rng, interrupt, logger);
+                             false, writer, s, model, rng, interrupt, logger, chain_id);
   auto end_sample = std::chrono::steady_clock::now();
   double sample_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                               end_sample - start_sample)
@@ -89,81 +89,6 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   writer.write_timing(warm_delta_t, sample_delta_t);
 }
 
-template <class Sampler, class Model, class RNG, typename SampT,
-          typename DiagnoseT>
-void run_adaptive_sampler(std::vector<Sampler>& samplers, Model& model,
-                          std::vector<std::vector<double>>& cont_vectors,
-                          int num_warmup, int num_samples, int num_thin,
-                          int refresh, bool save_warmup, std::vector<RNG>& rngs,
-                          callbacks::interrupt& interrupt,
-                          callbacks::logger& logger,
-                          std::vector<SampT>& sample_writers,
-                          std::vector<DiagnoseT>& diagnostic_writers,
-                          size_t n_chain) {
-  if (n_chain == 0) {
-    run_adaptive_sampler(samplers[0], model, cont_vectors[0], num_warmup,
-                         num_samples, num_thin, refresh, save_warmup, rngs[0],
-                         interrupt, logger, sample_writers[0],
-                         diagnostic_writers[0]);
-  }
-  tbb::parallel_for(
-      tbb::blocked_range<size_t>(0, n_chain, 1),
-      [num_warmup, num_samples, num_thin, refresh, save_warmup,
-       &samplers, &model, &rngs, &interrupt, &logger, &sample_writers, &cont_vectors,
-       &diagnostic_writers](const tbb::blocked_range<size_t>& r) {
-        for (size_t i = r.begin(); i != r.end(); ++i) {
-          auto&& sampler = samplers[i];
-          sampler.engage_adaptation();
-          Eigen::Map<Eigen::VectorXd> cont_params(cont_vectors[i].data(),
-                                                  cont_vectors[i].size());
-          try {
-            sampler.z().q = cont_params;
-            sampler.init_stepsize(logger);
-          } catch (const std::exception& e) {
-            logger.info("Exception initializing step size.");
-            logger.info(e.what());
-            return;
-          }
-          stan::mcmc::sample samp(cont_params, 0, 0);
-          auto&& sample_writer = sample_writers[i];
-          auto writer = services::util::mcmc_writer(
-              sample_writer, diagnostic_writers[i], logger);
-
-          // Headers
-          writer.write_sample_names(samp, sampler, model);
-          writer.write_diagnostic_names(samp, sampler, model);
-
-          const auto start_warm = std::chrono::steady_clock::now();
-          util::generate_transitions(sampler, num_warmup, 0,
-                                     num_warmup + num_samples, num_thin,
-                                     refresh, save_warmup, true, writer, samp,
-                                     model, rngs[i], interrupt, logger, i);
-          const auto end_warm = std::chrono::steady_clock::now();
-          auto warm_delta
-              = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    end_warm - start_warm)
-                    .count()
-                / 1000.0;
-          sampler.disengage_adaptation();
-          writer.write_adapt_finish(sampler);
-          sampler.write_sampler_state(sample_writer);
-
-          const auto start_sample = std::chrono::steady_clock::now();
-          util::generate_transitions(sampler, num_samples, num_warmup,
-                                     num_warmup + num_samples, num_thin,
-                                     refresh, true, false, writer, samp, model,
-                                     rngs[i], interrupt, logger, i);
-          const auto end_sample = std::chrono::steady_clock::now();
-          auto sample_delta
-              = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    end_sample - start_sample)
-                    .count()
-                / 1000.0;
-          writer.write_timing(warm_delta, sample_delta);
-        }
-      },
-      tbb::simple_partitioner());
-}
 
 }  // namespace util
 }  // namespace services

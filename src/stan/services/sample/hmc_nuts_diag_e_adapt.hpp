@@ -151,6 +151,22 @@ int hmc_nuts_diag_e_adapt(
       interrupt, logger, init_writer, sample_writer, diagnostic_writer);
 }
 
+namespace internal {
+
+  template <typename Context>
+  inline const auto& get_context(const std::shared_ptr<Context>& x) {
+    return *x;
+  }
+
+  /**
+   * Specialization
+   */
+  template <typename Context>
+  inline auto get_context(Context&& x) {
+    return std::forward<Context>(x);
+  }
+
+}
 template <class Model, typename InitContext, typename InitInvContext, typename SampleWriter, typename DiagnosticWriter>
 int hmc_nuts_diag_e_adapt(
     Model& model, const std::vector<InitContext>& init,
@@ -162,9 +178,10 @@ int hmc_nuts_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     std::vector<SampleWriter>& sample_writer, std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
+  using internal::get_context;
   if (n_chain == 0) {
     return hmc_nuts_diag_e_adapt(
-        model, init[0], init_inv_metric[0], random_seed, chain, init_radius, num_warmup,
+        model, get_context(init[0]), init_inv_metric[0], random_seed, chain, init_radius, num_warmup,
         num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
         max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
         interrupt, logger, init_writer, sample_writer[0], diagnostic_writer[0]);
@@ -211,7 +228,7 @@ int hmc_nuts_diag_e_adapt(
         for (size_t i = r.begin(); i != r.end(); ++i) {
       util::run_adaptive_sampler(
           samplers[i], model, cont_vectors[i], num_warmup, num_samples, num_thin, refresh,
-          save_warmup, rngs[i], interrupt, logger, sample_writer[i], diagnostic_writer[i]);
+          save_warmup, rngs[i], interrupt, logger, sample_writer[i], diagnostic_writer[i], i + 1);
         }
       },
       tbb::simple_partitioner());
@@ -230,9 +247,10 @@ int hmc_nuts_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     std::vector<SampleWriter>& sample_writer, std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
+      using internal::get_context;
     if (n_chain == 0) {
       return hmc_nuts_diag_e_adapt(
-          model, init[0], random_seed, chain, init_radius, num_warmup,
+          model, get_context(init[0]), random_seed, chain, init_radius, num_warmup,
           num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
           max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
           interrupt, logger, init_writer, sample_writer[0], diagnostic_writer[0]);
