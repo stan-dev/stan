@@ -33,7 +33,7 @@ inline const auto& get_context(const std::shared_ptr<Context>& x) {
  * Specialization to return back the input context
  */
 template <typename Context>
-inline auto get_context(Context&& x) {
+inline decltype(auto) get_context(Context&& x) {
   return std::forward<Context>(x);
 }
 
