@@ -69,7 +69,7 @@ class file_stream_writer final : public writer {
   void operator()() {
     std::stringstream streamer;
     streamer << comment_prefix_ << std::endl;
-    *output_ << streamer;
+    *output_ << streamer.str();
   }
 
   /**
@@ -80,7 +80,7 @@ class file_stream_writer final : public writer {
   void operator()(const std::string& message) {
     std::stringstream streamer;
     streamer << comment_prefix_ << message << std::endl;
-    *output_ << streamer;
+    *output_ << streamer.str();
   }
 
  private:
@@ -114,7 +114,7 @@ class file_stream_writer final : public writer {
            streamer << *it << ",";
     }
     streamer << v.back() << std::endl;
-    *output_ << streamer;
+    *output_ << streamer.str();
   }
 };
 

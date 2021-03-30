@@ -25,7 +25,7 @@ namespace internal {
  *  shared_ptr.
  */
 template <typename T>
-inline const auto& get_underlying(const std::shared_ptr<T>& x) {
+inline auto&& get_underlying(const std::shared_ptr<T>& x) {
   return *x;
 }
 
@@ -34,7 +34,7 @@ inline const auto& get_underlying(const std::shared_ptr<T>& x) {
  *  unique_ptr.
  */
 template <typename T>
-inline const auto& get_underlying(const std::unique_ptr<T>& x) {
+inline auto&& get_underlying(const std::unique_ptr<T>& x) {
   return *x;
 }
 
@@ -42,7 +42,7 @@ inline const auto& get_underlying(const std::unique_ptr<T>& x) {
  * Specialization to return back the input
  */
 template <typename T>
-inline const auto& get_underlying(T&& x) {
+inline auto&& get_underlying(T&& x) {
   return std::forward<T>(x);
 }
 
@@ -243,7 +243,7 @@ int hmc_nuts_diag_e_adapt(
   using internal::get_underlying;
   if (n_chain == 0) {
     return hmc_nuts_diag_e_adapt(
-        model, get_underlying(init[0]), init_inv_metric[0], random_seed, chain,
+        model, get_underlying(init[0]), get_underlying(init_inv_metric[0]), random_seed, chain,
         init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
         stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
         init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
@@ -264,7 +264,7 @@ int hmc_nuts_diag_e_adapt(
                                                    logger, init_writer[i]));
         samplers.emplace_back(model, rngs[i]);
         Eigen::VectorXd inv_metric = util::read_diag_inv_metric(
-            init_inv_metric[i], model.num_params_r(), logger);
+            get_underlying(init_inv_metric[i]), model.num_params_r(), logger);
         util::validate_diag_inv_metric(inv_metric, logger);
 
         samplers[i].set_metric(inv_metric);
