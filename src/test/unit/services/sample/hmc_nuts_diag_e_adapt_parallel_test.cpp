@@ -12,6 +12,7 @@ class ServicesSampleHmcNutsDiagEAdaptPar : public testing::Test {
  public:
   ServicesSampleHmcNutsDiagEAdaptPar() : model(data_context, 0, &model_log) {
     for (int i = 0; i < num_chains; ++i) {
+      init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
       context.push_back(std::make_shared<stan::io::empty_var_context>());
@@ -20,8 +21,9 @@ class ServicesSampleHmcNutsDiagEAdaptPar : public testing::Test {
   stan::io::empty_var_context data_context;
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
-  stan::test::unit::instrumented_writer init;
-  std::vector<stan::test::unit::instrumented_writer> parameter, diagnostic;
+  std::vector<stan::test::unit::instrumented_writer> init;
+  std::vector<stan::test::unit::instrumented_writer> parameter;
+  std::vector<stan::test::unit::instrumented_writer> diagnostic;
   std::vector<std::shared_ptr<stan::io::empty_var_context>> context;
   stan_model model;
 };
@@ -158,10 +160,12 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptPar, output_regression) {
       delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
       logger, init, parameter, diagnostic, num_chains);
 
-  std::vector<std::string> init_values;
-  init_values = init.string_values();
+  for (auto&& init_it : init) {
+    std::vector<std::string> init_values;
+    init_values = init_it.string_values();
 
-  EXPECT_EQ(0, init_values.size());
+    EXPECT_EQ(0, init_values.size());
+  }
 
   EXPECT_EQ(num_chains, logger.find_info("Elapsed Time:"));
   EXPECT_EQ(num_chains, logger.find_info("seconds (Warm-up)"));

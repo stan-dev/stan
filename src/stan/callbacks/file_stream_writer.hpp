@@ -66,7 +66,11 @@ class file_stream_writer final : public writer {
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
-  void operator()() { *output_ << comment_prefix_ << std::endl; }
+  void operator()() {
+    std::stringstream streamer;
+    streamer << comment_prefix_ << std::endl;
+    *output_ << streamer;
+  }
 
   /**
    * Writes the comment_prefix then the message followed by a newline.
@@ -74,7 +78,9 @@ class file_stream_writer final : public writer {
    * @param[in] message A string
    */
   void operator()(const std::string& message) {
-    *output_ << comment_prefix_ << message << std::endl;
+    std::stringstream streamer;
+    streamer << comment_prefix_ << message << std::endl;
+    *output_ << streamer;
   }
 
  private:
@@ -100,14 +106,15 @@ class file_stream_writer final : public writer {
   void write_vector(const std::vector<T>& v) {
     if (v.empty())
       return;
-
-    typename std::vector<T>::const_iterator last = v.end();
+    using const_iter = typename std::vector<T>::const_iterator;
+    const_iter last = v.end();
     --last;
-
-    for (typename std::vector<T>::const_iterator it = v.begin(); it != last;
-         ++it)
-      *output_ << *it << ",";
-    *output_ << v.back() << std::endl;
+    std::stringstream streamer;
+    for (const_iter it = v.begin(); it != last; ++it) {
+           streamer << *it << ",";
+    }
+    streamer << v.back() << std::endl;
+    *output_ << streamer;
   }
 };
 

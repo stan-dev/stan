@@ -24,17 +24,26 @@ namespace internal {
  * Specializtion to get a const reference to the underlying value in a
  *  shared_ptr.
  */
-template <typename Context>
-inline const auto& get_context(const std::shared_ptr<Context>& x) {
+template <typename T>
+inline const auto& get_underlying(const std::shared_ptr<T>& x) {
   return *x;
 }
 
 /**
- * Specialization to return back the input context
+ * Specializtion to get a const reference to the underlying value in a
+ *  unique_ptr.
  */
-template <typename Context>
-inline decltype(auto) get_context(Context&& x) {
-  return std::forward<Context>(x);
+template <typename T>
+inline const auto& get_underlying(const std::unique_ptr<T>& x) {
+  return *x;
+}
+
+/**
+ * Specialization to return back the input
+ */
+template <typename T>
+inline const auto& get_underlying(T&& x) {
+  return std::forward<T>(x);
 }
 
 }  // namespace internal
@@ -44,6 +53,11 @@ inline decltype(auto) get_context(Context&& x) {
  * with a pre-specified Euclidean metric.
  *
  * @tparam Model Model class
+ * @tparam InitContext A type derived from `stan::io::var_context`
+ * @tparam InitMetricContext A type derived from `stan::io::var_context`
+ * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
+ * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
+ * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model to test (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] init_inv_metric var context exposing an initial diagonal
@@ -74,7 +88,7 @@ inline decltype(auto) get_context(Context&& x) {
  * @return error_codes::OK if successful
  */
 template <typename Model, typename InitContext, typename InitMetricContext,
-          typename SampleWriter, typename DiagnosticWriter>
+          typename InitWriter, typename SampleWriter, typename DiagnosticWriter>
 int hmc_nuts_diag_e_adapt(
     Model& model, const InitContext& init,
     const InitMetricContext& init_inv_metric, unsigned int random_seed,
@@ -83,13 +97,13 @@ int hmc_nuts_diag_e_adapt(
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
     unsigned int window, callbacks::interrupt& interrupt,
-    callbacks::logger& logger, callbacks::writer& init_writer,
+    callbacks::logger& logger, InitWriter& init_writer,
     SampleWriter& sample_writer, DiagnosticWriter& diagnostic_writer) {
-  using internal::get_context;
+  using internal::get_underlying;
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<double> cont_vector = util::initialize(
-      model, get_context(init), rng, init_radius, true, logger, init_writer);
+      model, get_underlying(init), rng, init_radius, true, logger, init_writer);
 
   Eigen::VectorXd inv_metric;
   try {
@@ -155,7 +169,7 @@ int hmc_nuts_diag_e_adapt(
  * @return error_codes::OK if successful
  */
 template <typename Model, typename InitContext, typename SampleWriter,
-          typename DiagnosticWriter>
+          typename DiagnosticWriter, typename InitWriter>
 int hmc_nuts_diag_e_adapt(
     Model& model, const InitContext& init, unsigned int random_seed,
     unsigned int chain, double init_radius, int num_warmup, int num_samples,
@@ -163,19 +177,58 @@ int hmc_nuts_diag_e_adapt(
     double stepsize_jitter, int max_depth, double delta, double gamma,
     double kappa, double t0, unsigned int init_buffer, unsigned int term_buffer,
     unsigned int window, callbacks::interrupt& interrupt,
-    callbacks::logger& logger, callbacks::writer& init_writer,
+    callbacks::logger& logger, InitWriter& init_writer,
     SampleWriter& sample_writer, DiagnosticWriter& diagnostic_writer) {
-  stan::io::dump dmp
+  stan::io::dump unit_e_metric
       = util::create_unit_e_diag_inv_metric(model.num_params_r());
   return hmc_nuts_diag_e_adapt(
-      model, init, dmp, random_seed, chain, init_radius, num_warmup,
+      model, init, unit_e_metric, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
       interrupt, logger, init_writer, sample_writer, diagnostic_writer);
 }
 
+/**
+ * Runs multiple chains of HMC with NUTS with adaptation using diagonal Euclidean metric with a pre-specified Euclidean metric.
+ *
+ * @tparam Model Model class
+ * @tparam InitContext A type derived from `stan::io::var_context`
+ * @tparam InitMetricContext A type derived from `stan::io::var_context`
+ * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
+ * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
+ * @tparam InitWriter A type derived from `stan::callbacks::writer`
+ * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] init An std vector of init var contexts for initialization of each chain.
+ * @param[in] init_inv_metric An std vector of var contexts exposing an initial diagonal
+              inverse Euclidean metric for each chain (must be positive definite)
+ * @param[in] random_seed random seed for the random number generator
+ * @param[in] chain chain id to advance the pseudo random number generator
+ * @param[in] init_radius radius to initialize
+ * @param[in] num_warmup Number of warmup samples
+ * @param[in] num_samples Number of samples
+ * @param[in] num_thin Number to thin the samples
+ * @param[in] save_warmup Indicates whether to save the warmup iterations
+ * @param[in] refresh Controls the output
+ * @param[in] stepsize initial stepsize for discrete evolution
+ * @param[in] stepsize_jitter uniform random jitter of stepsize
+ * @param[in] max_depth Maximum tree depth
+ * @param[in] delta adaptation target acceptance statistic
+ * @param[in] gamma adaptation regularization scale
+ * @param[in] kappa adaptation relaxation exponent
+ * @param[in] t0 adaptation iteration offset
+ * @param[in] init_buffer width of initial fast adaptation interval
+ * @param[in] term_buffer width of final fast adaptation interval
+ * @param[in] window initial width of slow adaptation interval
+ * @param[in,out] interrupt Callback for interrupts
+ * @param[in,out] logger Logger for messages
+ * @param[in,out] init_writer std vector of Writer callbacks for unconstrained inits of each chain.
+ * @param[in,out] sample_writer std vector of Writers for draws of each chain.
+ * @param[in,out] diagnostic_writer std vector of Writers for diagnostic information of each chain.
+ * @param[in] n_chain The number of chains to run in parallel. `init`, `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same length as this value.
+ * @return error_codes::OK if successful
+ */
 template <class Model, typename InitContext, typename InitInvContext,
-          typename SampleWriter, typename DiagnosticWriter>
+          typename InitWriter, typename SampleWriter, typename DiagnosticWriter>
 int hmc_nuts_diag_e_adapt(
     Model& model, const std::vector<InitContext>& init,
     const std::vector<InitInvContext>& init_inv_metric,
@@ -185,15 +238,15 @@ int hmc_nuts_diag_e_adapt(
     double delta, double gamma, double kappa, double t0,
     unsigned int init_buffer, unsigned int term_buffer, unsigned int window,
     callbacks::interrupt& interrupt, callbacks::logger& logger,
-    callbacks::writer& init_writer, std::vector<SampleWriter>& sample_writer,
+    std::vector<InitWriter>& init_writer, std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
-  using internal::get_context;
+  using internal::get_underlying;
   if (n_chain == 0) {
     return hmc_nuts_diag_e_adapt(
-        model, get_context(init[0]), init_inv_metric[0], random_seed, chain,
+        model, get_underlying(init[0]), init_inv_metric[0], random_seed, chain,
         init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
         stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-        init_buffer, term_buffer, window, interrupt, logger, init_writer,
+        init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
         sample_writer[0], diagnostic_writer[0]);
   } else {
     using sample_t = stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>;
@@ -206,9 +259,9 @@ int hmc_nuts_diag_e_adapt(
     try {
       for (int i = 0; i < n_chain; ++i) {
         rngs.emplace_back(util::create_rng(random_seed, chain + i));
-        cont_vectors.emplace_back(util::initialize(model, get_context(init[i]),
+        cont_vectors.emplace_back(util::initialize(model, get_underlying(init[i]),
                                                    rngs[i], init_radius, true,
-                                                   logger, init_writer));
+                                                   logger, init_writer[i]));
         samplers.emplace_back(model, rngs[i]);
         Eigen::VectorXd inv_metric = util::read_diag_inv_metric(
             init_inv_metric[i], model.num_params_r(), logger);
@@ -248,7 +301,39 @@ int hmc_nuts_diag_e_adapt(
   }
 }
 
-template <class Model, typename InitContext, typename SampleWriter,
+/**
+ * Runs multiple chains of HMC with NUTS with adaptation using diagonal Euclidean metric.
+ *
+ * @tparam Model Model class
+ * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] init An std vector of init var contexts for initialization of each chain.
+ * @param[in] random_seed random seed for the random number generator
+ * @param[in] chain chain id to advance the pseudo random number generator
+ * @param[in] init_radius radius to initialize
+ * @param[in] num_warmup Number of warmup samples
+ * @param[in] num_samples Number of samples
+ * @param[in] num_thin Number to thin the samples
+ * @param[in] save_warmup Indicates whether to save the warmup iterations
+ * @param[in] refresh Controls the output
+ * @param[in] stepsize initial stepsize for discrete evolution
+ * @param[in] stepsize_jitter uniform random jitter of stepsize
+ * @param[in] max_depth Maximum tree depth
+ * @param[in] delta adaptation target acceptance statistic
+ * @param[in] gamma adaptation regularization scale
+ * @param[in] kappa adaptation relaxation exponent
+ * @param[in] t0 adaptation iteration offset
+ * @param[in] init_buffer width of initial fast adaptation interval
+ * @param[in] term_buffer width of final fast adaptation interval
+ * @param[in] window initial width of slow adaptation interval
+ * @param[in,out] interrupt Callback for interrupts
+ * @param[in,out] logger Logger for messages
+ * @param[in,out] init_writer std vector of Writer callbacks for unconstrained inits of each chain.
+ * @param[in,out] sample_writer std vector of Writers for draws of each chain.
+ * @param[in,out] diagnostic_writer std vector of Writers for diagnostic information of each chain.
+ * @param[in] n_chain The number of chains to run in parallel. `init`, `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same length as this value.
+ * @return error_codes::OK if successful
+ */
+template <class Model, typename InitContext, typename InitWriter, typename SampleWriter,
           typename DiagnosticWriter>
 int hmc_nuts_diag_e_adapt(
     Model& model, const std::vector<InitContext>& init,
@@ -258,20 +343,20 @@ int hmc_nuts_diag_e_adapt(
     double delta, double gamma, double kappa, double t0,
     unsigned int init_buffer, unsigned int term_buffer, unsigned int window,
     callbacks::interrupt& interrupt, callbacks::logger& logger,
-    callbacks::writer& init_writer, std::vector<SampleWriter>& sample_writer,
+    std::vector<InitWriter>& init_writer, std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
-  using internal::get_context;
+  using internal::get_underlying;
   if (n_chain == 0) {
     return hmc_nuts_diag_e_adapt(
-        model, get_context(init[0]), random_seed, chain, init_radius,
+        model, get_underlying(init[0]), random_seed, chain, init_radius,
         num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
         stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
-        term_buffer, window, interrupt, logger, init_writer, sample_writer[0],
+        term_buffer, window, interrupt, logger, init_writer[0], sample_writer[0],
         diagnostic_writer[0]);
   } else {
-    stan::io::dump dmp
+    stan::io::dump unit_e_metric
         = util::create_unit_e_diag_inv_metric(model.num_params_r());
-    std::vector<stan::io::dump> unit_e_metrics(n_chain, dmp);
+    std::vector<stan::io::dump> unit_e_metrics(n_chain, unit_e_metric);
     return hmc_nuts_diag_e_adapt(
         model, init, unit_e_metrics, random_seed, chain, init_radius,
         num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
