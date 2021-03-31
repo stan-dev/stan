@@ -165,7 +165,8 @@ std::vector<double> initialize(Model& model, const stan::io::var_context& init,
     } catch (const std::exception& e) {
       if (log_prob_msg.str().length() > 0)
         logger.info(log_prob_msg);
-      logger.info("  Failed to evaluate log_prob with gradients for performance test");
+      logger.info(
+          "  Failed to evaluate log_prob with gradients for performance test");
       logger.info(e.what());
       throw;
     }
