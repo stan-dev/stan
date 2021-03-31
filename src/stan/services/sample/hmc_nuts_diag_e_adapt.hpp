@@ -13,40 +13,12 @@
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/inv_metric.hpp>
+#include <stan/services/util/get_underlying.hpp>
 #include <vector>
 
 namespace stan {
 namespace services {
 namespace sample {
-
-namespace internal {
-/**
- * Specializtion to get a const reference to the underlying value in a
- *  shared_ptr.
- */
-template <typename T>
-inline auto&& get_underlying(const std::shared_ptr<T>& x) {
-  return *x;
-}
-
-/**
- * Specializtion to get a const reference to the underlying value in a
- *  unique_ptr.
- */
-template <typename T>
-inline auto&& get_underlying(const std::unique_ptr<T>& x) {
-  return *x;
-}
-
-/**
- * Specialization to return back the input
- */
-template <typename T>
-inline auto&& get_underlying(T&& x) {
-  return std::forward<T>(x);
-}
-
-}  // namespace internal
 
 /**
  * Runs HMC with NUTS with adaptation using diagonal Euclidean metric
@@ -99,7 +71,7 @@ int hmc_nuts_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, InitWriter& init_writer,
     SampleWriter& sample_writer, DiagnosticWriter& diagnostic_writer) {
-  using internal::get_underlying;
+  using util::get_underlying;
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<double> cont_vector = util::initialize(
@@ -240,8 +212,8 @@ int hmc_nuts_diag_e_adapt(
     callbacks::interrupt& interrupt, callbacks::logger& logger,
     std::vector<InitWriter>& init_writer, std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
-  using internal::get_underlying;
-  if (n_chain == 0) {
+  using util::get_underlying;
+  if (n_chain == 1) {
     return hmc_nuts_diag_e_adapt(
         model, get_underlying(init[0]), get_underlying(init_inv_metric[0]), random_seed, chain,
         init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
@@ -285,14 +257,14 @@ int hmc_nuts_diag_e_adapt(
     }
     tbb::parallel_for(
         tbb::blocked_range<size_t>(0, n_chain, 1),
-        [num_warmup, num_samples, num_thin, refresh, save_warmup, &samplers,
+        [num_warmup, num_samples, num_thin, refresh, save_warmup, n_chain, &samplers,
          &model, &rngs, &interrupt, &logger, &sample_writer, &cont_vectors,
          &diagnostic_writer](const tbb::blocked_range<size_t>& r) {
           for (size_t i = r.begin(); i != r.end(); ++i) {
             util::run_adaptive_sampler(
                 samplers[i], model, cont_vectors[i], num_warmup, num_samples,
                 num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
-                sample_writer[i], diagnostic_writer[i], i + 1);
+                sample_writer[i], diagnostic_writer[i], i + 1, n_chain);
           }
         },
         tbb::simple_partitioner());
@@ -345,8 +317,8 @@ int hmc_nuts_diag_e_adapt(
     callbacks::interrupt& interrupt, callbacks::logger& logger,
     std::vector<InitWriter>& init_writer, std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
-  using internal::get_underlying;
-  if (n_chain == 0) {
+  using util::get_underlying;
+  if (n_chain == 1) {
     return hmc_nuts_diag_e_adapt(
         model, get_underlying(init[0]), random_seed, chain, init_radius,
         num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
@@ -354,9 +326,11 @@ int hmc_nuts_diag_e_adapt(
         term_buffer, window, interrupt, logger, init_writer[0], sample_writer[0],
         diagnostic_writer[0]);
   } else {
-    stan::io::dump unit_e_metric
-        = util::create_unit_e_diag_inv_metric(model.num_params_r());
-    std::vector<stan::io::dump> unit_e_metrics(n_chain, unit_e_metric);
+    std::vector<stan::io::dump> unit_e_metrics;
+    unit_e_metrics.reserve(n_chain);
+    for (size_t i = 0; i < n_chain; ++i) {
+      unit_e_metrics.emplace_back(util::create_unit_e_diag_inv_metric(model.num_params_r()));
+    }
     return hmc_nuts_diag_e_adapt(
         model, init, unit_e_metrics, random_seed, chain, init_radius,
         num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
