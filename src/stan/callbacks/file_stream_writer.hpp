@@ -111,7 +111,7 @@ class file_stream_writer final : public writer {
     --last;
     std::stringstream streamer;
     for (const_iter it = v.begin(); it != last; ++it) {
-           streamer << *it << ",";
+      streamer << *it << ",";
     }
     streamer << v.back() << std::endl;
     *output_ << streamer.str();

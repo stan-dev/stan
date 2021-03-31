@@ -161,7 +161,8 @@ int hmc_nuts_diag_e_adapt(
 }
 
 /**
- * Runs multiple chains of HMC with NUTS with adaptation using diagonal Euclidean metric with a pre-specified Euclidean metric.
+ * Runs multiple chains of HMC with NUTS with adaptation using diagonal
+ Euclidean metric with a pre-specified Euclidean metric.
  *
  * @tparam Model Model class
  * @tparam InitContext A type derived from `stan::io::var_context`
@@ -170,9 +171,10 @@ int hmc_nuts_diag_e_adapt(
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model to test (with data already instantiated)
- * @param[in] init An std vector of init var contexts for initialization of each chain.
- * @param[in] init_inv_metric An std vector of var contexts exposing an initial diagonal
-              inverse Euclidean metric for each chain (must be positive definite)
+ * @param[in] init An std vector of init var contexts for initialization of each
+ chain.
+ * @param[in] init_inv_metric An std vector of var contexts exposing an initial
+ diagonal inverse Euclidean metric for each chain (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
  * @param[in] init_radius radius to initialize
@@ -193,10 +195,14 @@ int hmc_nuts_diag_e_adapt(
  * @param[in] window initial width of slow adaptation interval
  * @param[in,out] interrupt Callback for interrupts
  * @param[in,out] logger Logger for messages
- * @param[in,out] init_writer std vector of Writer callbacks for unconstrained inits of each chain.
+ * @param[in,out] init_writer std vector of Writer callbacks for unconstrained
+ inits of each chain.
  * @param[in,out] sample_writer std vector of Writers for draws of each chain.
- * @param[in,out] diagnostic_writer std vector of Writers for diagnostic information of each chain.
- * @param[in] n_chain The number of chains to run in parallel. `init`, `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same length as this value.
+ * @param[in,out] diagnostic_writer std vector of Writers for diagnostic
+ information of each chain.
+ * @param[in] n_chain The number of chains to run in parallel. `init`,
+ `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer` must
+ be the same length as this value.
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContext, typename InitInvContext,
@@ -210,16 +216,17 @@ int hmc_nuts_diag_e_adapt(
     double delta, double gamma, double kappa, double t0,
     unsigned int init_buffer, unsigned int term_buffer, unsigned int window,
     callbacks::interrupt& interrupt, callbacks::logger& logger,
-    std::vector<InitWriter>& init_writer, std::vector<SampleWriter>& sample_writer,
+    std::vector<InitWriter>& init_writer,
+    std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
   using util::get_underlying;
   if (n_chain == 1) {
     return hmc_nuts_diag_e_adapt(
-        model, get_underlying(init[0]), get_underlying(init_inv_metric[0]), random_seed, chain,
-        init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
-        stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-        init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
-        sample_writer[0], diagnostic_writer[0]);
+        model, get_underlying(init[0]), get_underlying(init_inv_metric[0]),
+        random_seed, chain, init_radius, num_warmup, num_samples, num_thin,
+        save_warmup, refresh, stepsize, stepsize_jitter, max_depth, delta,
+        gamma, kappa, t0, init_buffer, term_buffer, window, interrupt, logger,
+        init_writer[0], sample_writer[0], diagnostic_writer[0]);
   } else {
     using sample_t = stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>;
     std::vector<boost::ecuyer1988> rngs;
@@ -231,9 +238,9 @@ int hmc_nuts_diag_e_adapt(
     try {
       for (int i = 0; i < n_chain; ++i) {
         rngs.emplace_back(util::create_rng(random_seed, chain + i));
-        cont_vectors.emplace_back(util::initialize(model, get_underlying(init[i]),
-                                                   rngs[i], init_radius, true,
-                                                   logger, init_writer[i]));
+        cont_vectors.emplace_back(
+            util::initialize(model, get_underlying(init[i]), rngs[i],
+                             init_radius, true, logger, init_writer[i]));
         samplers.emplace_back(model, rngs[i]);
         Eigen::VectorXd inv_metric = util::read_diag_inv_metric(
             get_underlying(init_inv_metric[i]), model.num_params_r(), logger);
@@ -274,11 +281,13 @@ int hmc_nuts_diag_e_adapt(
 }
 
 /**
- * Runs multiple chains of HMC with NUTS with adaptation using diagonal Euclidean metric.
+ * Runs multiple chains of HMC with NUTS with adaptation using diagonal
+ * Euclidean metric.
  *
  * @tparam Model Model class
  * @param[in] model Input model to test (with data already instantiated)
- * @param[in] init An std vector of init var contexts for initialization of each chain.
+ * @param[in] init An std vector of init var contexts for initialization of each
+ * chain.
  * @param[in] random_seed random seed for the random number generator
  * @param[in] chain chain id to advance the pseudo random number generator
  * @param[in] init_radius radius to initialize
@@ -299,14 +308,18 @@ int hmc_nuts_diag_e_adapt(
  * @param[in] window initial width of slow adaptation interval
  * @param[in,out] interrupt Callback for interrupts
  * @param[in,out] logger Logger for messages
- * @param[in,out] init_writer std vector of Writer callbacks for unconstrained inits of each chain.
+ * @param[in,out] init_writer std vector of Writer callbacks for unconstrained
+ * inits of each chain.
  * @param[in,out] sample_writer std vector of Writers for draws of each chain.
- * @param[in,out] diagnostic_writer std vector of Writers for diagnostic information of each chain.
- * @param[in] n_chain The number of chains to run in parallel. `init`, `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same length as this value.
+ * @param[in,out] diagnostic_writer std vector of Writers for diagnostic
+ * information of each chain.
+ * @param[in] n_chain The number of chains to run in parallel. `init`,
+ * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
+ * length as this value.
  * @return error_codes::OK if successful
  */
-template <class Model, typename InitContext, typename InitWriter, typename SampleWriter,
-          typename DiagnosticWriter>
+template <class Model, typename InitContext, typename InitWriter,
+          typename SampleWriter, typename DiagnosticWriter>
 int hmc_nuts_diag_e_adapt(
     Model& model, const std::vector<InitContext>& init,
     unsigned int random_seed, unsigned int chain, double init_radius,
@@ -315,7 +328,8 @@ int hmc_nuts_diag_e_adapt(
     double delta, double gamma, double kappa, double t0,
     unsigned int init_buffer, unsigned int term_buffer, unsigned int window,
     callbacks::interrupt& interrupt, callbacks::logger& logger,
-    std::vector<InitWriter>& init_writer, std::vector<SampleWriter>& sample_writer,
+    std::vector<InitWriter>& init_writer,
+    std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
   using util::get_underlying;
   if (n_chain == 1) {
@@ -323,8 +337,8 @@ int hmc_nuts_diag_e_adapt(
         model, get_underlying(init[0]), random_seed, chain, init_radius,
         num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
         stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
-        term_buffer, window, interrupt, logger, init_writer[0], sample_writer[0],
-        diagnostic_writer[0]);
+        term_buffer, window, interrupt, logger, init_writer[0],
+        sample_writer[0], diagnostic_writer[0]);
   } else {
     std::vector<stan::io::dump> unit_e_metrics;
     unit_e_metrics.reserve(n_chain);
