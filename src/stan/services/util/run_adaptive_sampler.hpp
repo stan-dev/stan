@@ -36,12 +36,15 @@ namespace util {
  * @param[in,out] diagnostic_writer writer for diagnostic information
  */
 template <typename Sampler, typename Model, typename RNG>
-void run_adaptive_sampler(
-    Sampler& sampler, Model& model, std::vector<double>& cont_vector,
-    int num_warmup, int num_samples, int num_thin, int refresh,
-    bool save_warmup, RNG& rng, callbacks::interrupt& interrupt,
-    callbacks::logger& logger, callbacks::writer& sample_writer,
-    callbacks::writer& diagnostic_writer, size_t chain_id = 0, size_t n_chain = 1) {
+void run_adaptive_sampler(Sampler& sampler, Model& model,
+                          std::vector<double>& cont_vector, int num_warmup,
+                          int num_samples, int num_thin, int refresh,
+                          bool save_warmup, RNG& rng,
+                          callbacks::interrupt& interrupt,
+                          callbacks::logger& logger,
+                          callbacks::writer& sample_writer,
+                          callbacks::writer& diagnostic_writer,
+                          size_t chain_id = 0, size_t n_chain = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
 
@@ -76,9 +79,10 @@ void run_adaptive_sampler(
   sampler.write_sampler_state(sample_writer);
 
   auto start_sample = std::chrono::steady_clock::now();
-  util::generate_transitions(
-      sampler, num_samples, num_warmup, num_warmup + num_samples, num_thin,
-      refresh, true, false, writer, s, model, rng, interrupt, logger, chain_id, n_chain);
+  util::generate_transitions(sampler, num_samples, num_warmup,
+                             num_warmup + num_samples, num_thin, refresh, true,
+                             false, writer, s, model, rng, interrupt, logger,
+                             chain_id, n_chain);
   auto end_sample = std::chrono::steady_clock::now();
   double sample_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                               end_sample - start_sample)

@@ -33,6 +33,8 @@ inline auto&& get_underlying(T&& x) {
   return std::forward<T>(x);
 }
 
-}}}
+}  // namespace util
+}  // namespace services
+}  // namespace stan
 
 #endif

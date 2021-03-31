@@ -264,8 +264,9 @@ int hmc_nuts_diag_e_adapt(
     }
     tbb::parallel_for(
         tbb::blocked_range<size_t>(0, n_chain, 1),
-        [num_warmup, num_samples, num_thin, refresh, save_warmup, n_chain, &samplers,
-         &model, &rngs, &interrupt, &logger, &sample_writer, &cont_vectors,
+        [num_warmup, num_samples, num_thin, refresh, save_warmup, n_chain,
+         &samplers, &model, &rngs, &interrupt, &logger, &sample_writer,
+         &cont_vectors,
          &diagnostic_writer](const tbb::blocked_range<size_t>& r) {
           for (size_t i = r.begin(); i != r.end(); ++i) {
             util::run_adaptive_sampler(
@@ -343,7 +344,8 @@ int hmc_nuts_diag_e_adapt(
     std::vector<stan::io::dump> unit_e_metrics;
     unit_e_metrics.reserve(n_chain);
     for (size_t i = 0; i < n_chain; ++i) {
-      unit_e_metrics.emplace_back(util::create_unit_e_diag_inv_metric(model.num_params_r()));
+      unit_e_metrics.emplace_back(
+          util::create_unit_e_diag_inv_metric(model.num_params_r()));
     }
     return hmc_nuts_diag_e_adapt(
         model, init, unit_e_metrics, random_seed, chain, init_radius,
