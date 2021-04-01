@@ -301,7 +301,7 @@ int hmc_nuts_dense_e_adapt(
     unit_e_metrics.reserve(n_chain);
     for (size_t i = 0; i < n_chain; ++i) {
       unit_e_metrics.emplace_back(
-          std::make_shared<stan::io::dump>(util::create_unit_e_dense_inv_metric(model.num_params_r()));
+          std::make_shared<stan::io::dump>(util::create_unit_e_dense_inv_metric(model.num_params_r())));
     }
     return hmc_nuts_dense_e_adapt(
         model, init, unit_e_metrics, random_seed, chain, init_radius,
