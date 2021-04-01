@@ -13,7 +13,6 @@
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/inv_metric.hpp>
-#include <stan/services/util/get_underlying.hpp>
 #include <vector>
 
 namespace stan {
@@ -71,11 +70,10 @@ int hmc_nuts_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, InitWriter& init_writer,
     SampleWriter& sample_writer, DiagnosticWriter& diagnostic_writer) {
-  using util::get_underlying;
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<double> cont_vector = util::initialize(
-      model, get_underlying(init), rng, init_radius, true, logger, init_writer);
+      model, init, rng, init_radius, true, logger, init_writer);
 
   Eigen::VectorXd inv_metric;
   try {
@@ -219,10 +217,9 @@ int hmc_nuts_diag_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
-  using util::get_underlying;
   if (n_chain == 1) {
     return hmc_nuts_diag_e_adapt(
-        model, get_underlying(init[0]), get_underlying(init_inv_metric[0]),
+        model, *init[0], *init_inv_metric[0],
         random_seed, chain, init_radius, num_warmup, num_samples, num_thin,
         save_warmup, refresh, stepsize, stepsize_jitter, max_depth, delta,
         gamma, kappa, t0, init_buffer, term_buffer, window, interrupt, logger,
@@ -239,11 +236,11 @@ int hmc_nuts_diag_e_adapt(
       for (int i = 0; i < n_chain; ++i) {
         rngs.emplace_back(util::create_rng(random_seed, chain + i));
         cont_vectors.emplace_back(
-            util::initialize(model, get_underlying(init[i]), rngs[i],
+            util::initialize(model, *init[i], rngs[i],
                              init_radius, true, logger, init_writer[i]));
         samplers.emplace_back(model, rngs[i]);
         Eigen::VectorXd inv_metric = util::read_diag_inv_metric(
-            get_underlying(init_inv_metric[i]), model.num_params_r(), logger);
+            *init_inv_metric[i], model.num_params_r(), logger);
         util::validate_diag_inv_metric(inv_metric, logger);
 
         samplers[i].set_metric(inv_metric);
@@ -332,20 +329,19 @@ int hmc_nuts_diag_e_adapt(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer, size_t n_chain) {
-  using util::get_underlying;
   if (n_chain == 1) {
     return hmc_nuts_diag_e_adapt(
-        model, get_underlying(init[0]), random_seed, chain, init_radius,
+        model, *init[0], random_seed, chain, init_radius,
         num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
         stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
         term_buffer, window, interrupt, logger, init_writer[0],
         sample_writer[0], diagnostic_writer[0]);
   } else {
-    std::vector<stan::io::dump> unit_e_metrics;
+    std::vector<std::shared_ptr<stan::io::dump>> unit_e_metrics;
     unit_e_metrics.reserve(n_chain);
     for (size_t i = 0; i < n_chain; ++i) {
       unit_e_metrics.emplace_back(
-          util::create_unit_e_diag_inv_metric(model.num_params_r()));
+          std::make_shared<stan::io::dump>(util::create_unit_e_diag_inv_metric(model.num_params_r())));
     }
     return hmc_nuts_diag_e_adapt(
         model, init, unit_e_metrics, random_seed, chain, init_radius,
