@@ -17,7 +17,7 @@ class dense_e_point : public ps_point {
    * Inverse mass matrix.
    */
   Eigen::MatrixXd inv_e_metric_;
-  Eigen::MatrixXd inv_e_metric_llt_matrixU_;
+  Eigen::MatrixXd inv_e_metric_llt_matrixL_;
 
  public:
   /**
@@ -27,9 +27,9 @@ class dense_e_point : public ps_point {
    * @param n number of dimensions
    */
   explicit dense_e_point(int n)
-      : ps_point(n), inv_e_metric_(n, n), inv_e_metric_llt_matrixU_(n, n) {
+      : ps_point(n), inv_e_metric_(n, n), inv_e_metric_llt_matrixL_(n, n) {
     inv_e_metric_.setIdentity();
-    inv_e_metric_llt_matrixU_.setIdentity();
+    inv_e_metric_llt_matrixL_.setIdentity();
   }
 
   /**
@@ -40,7 +40,7 @@ class dense_e_point : public ps_point {
   template <typename EigMat, require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
   void set_inv_metric(EigMat&& inv_e_metric) {
     inv_e_metric_ = std::forward<EigMat>(inv_e_metric);
-    inv_e_metric_llt_matrixU_ = inv_e_metric_.llt().matrixU();
+    inv_e_metric_llt_matrixL_ = inv_e_metric_.llt().matrixL();
   }
 
   /**
@@ -56,8 +56,8 @@ class dense_e_point : public ps_point {
    *
    * @return reference to transpose of Cholesky factor
    */
-  const Eigen::MatrixXd& get_transpose_llt_inv_metric() const {
-    return inv_e_metric_llt_matrixU_;
+  const Eigen::MatrixXd& get_llt_inv_metric() const {
+    return inv_e_metric_llt_matrixL_;
   }
 
   /**
