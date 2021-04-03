@@ -215,9 +215,10 @@ TEST_F(ServicesSampleHmcNutsDenseEAdapt, no_timestep_reset) {
 
   std::vector<std::string> string_values = parameter.string_values();
   bool found_step_size = false;
-  for(size_t i = 0; i < string_values.size(); i++) {
-    // Make sure the sampler wrote a Step size and that it is not reset to exactly 1
-    if(string_values[i].compare("Step size")) {
+  for (size_t i = 0; i < string_values.size(); i++) {
+    // Make sure the sampler wrote a Step size and that it is not reset to
+    // exactly 1
+    if (string_values[i].compare("Step size")) {
       found_step_size = true;
       EXPECT_NE(string_values[i].compare("Step size = 1"), 0);
     }

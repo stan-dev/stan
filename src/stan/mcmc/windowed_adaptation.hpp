@@ -112,9 +112,7 @@ class windowed_adaptation : public base_adaptation {
   /**
    * Check if there is any more warmup left to do
    */
-  bool finished() {
-    return adapt_window_counter_ + 1 >= num_warmup_;
-  }
+  bool finished() { return adapt_window_counter_ + 1 >= num_warmup_; }
 
   /**
    * Increment the window counter and return the new value
