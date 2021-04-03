@@ -20,7 +20,7 @@ TEST(McmcCovarAdaptation, learn_covariance) {
   for (int i = 0; i < n_learn - 1; ++i) {
     EXPECT_FALSE(adapter.learn_covariance(covar, q));
   }
-  // Learn variance should return true at end of first window
+  // Learn covariance should return true at end of first window
   EXPECT_TRUE(adapter.learn_covariance(covar, q));
 
   for (int i = 0; i < n; ++i) {
@@ -29,7 +29,7 @@ TEST(McmcCovarAdaptation, learn_covariance) {
     }
   }
 
-  // Make sure learn_variance doesn't return true after second window
+  // Make sure learn_covariance doesn't return true after second window
   // (adaptation finished)
   for (int i = 0; i < 2 * n_learn; ++i) {
     EXPECT_FALSE(adapter.learn_covariance(covar, q));
