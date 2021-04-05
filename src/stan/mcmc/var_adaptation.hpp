@@ -30,9 +30,10 @@ class var_adaptation : public windowed_adaptation {
       if (!var.allFinite())
         throw std::runtime_error(
             "Numerical overflow in metric adaptation. "
-            "Posterior is too wide for Stan to estimate it. "
-            "This problem may indicate that the posterior is improper. "
-            "Please check your model.");
+            "This occurs when the sampler encounters extreme values on the "
+            "unconstrained space; this may happen when the posterior density "
+            "function is too wide or improper. "
+            "There may be problems with your model specification.");
 
       estimator_.restart();
 
