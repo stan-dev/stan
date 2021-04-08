@@ -291,7 +291,6 @@ TEST(serializer, eos_exception) {
   }
 }
 
-
 template <typename Ret, typename... Sizes>
 void write_free_lb_test(Sizes... sizes) {
   double lb = 0.5;
@@ -364,7 +363,6 @@ TEST(serializer_vectorized, write_free_ub) {
   write_free_ub_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2, 4);
 }
 
-
 template <typename Ret, typename... Sizes>
 void write_free_lub_test(Sizes... sizes) {
   double ub = 0.5;
@@ -376,7 +374,8 @@ void write_free_lub_test(Sizes... sizes) {
   // Read an constrained variable
   stan::io::deserializer<double> deserializer(theta1, theta_i);
   double lp = 0.0;
-  Ret vec_ref = deserializer.read_constrain_lub<Ret, false>(lb, ub, lp, sizes...);
+  Ret vec_ref
+      = deserializer.read_constrain_lub<Ret, false>(lb, ub, lp, sizes...);
 
   // Serialize a constrained variable
   Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta_size);
@@ -401,7 +400,6 @@ TEST(serializer_vectorized, write_free_lub) {
   write_free_lub_test<std::vector<Eigen::VectorXd>>(2, 4);
   write_free_lub_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2, 4);
 }
-
 
 template <typename Ret, typename... Sizes>
 void write_free_offset_multiplier_test(Sizes... sizes) {
@@ -438,7 +436,8 @@ TEST(serializer_vectorized, write_free_offset_multiplier) {
   write_free_offset_multiplier_test<double>();
   write_free_offset_multiplier_test<Eigen::VectorXd>(4);
   write_free_offset_multiplier_test<std::vector<Eigen::VectorXd>>(2, 4);
-  write_free_offset_multiplier_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2, 4);
+  write_free_offset_multiplier_test<std::vector<std::vector<Eigen::VectorXd>>>(
+      3, 2, 4);
 }
 template <typename Ret, typename... Sizes>
 void write_free_unit_vector_test(Sizes... sizes) {
@@ -475,7 +474,7 @@ TEST(serializer_vectorized, write_free_unit_vector) {
   write_free_unit_vector_test<Eigen::VectorXd>(4);
   write_free_unit_vector_test<std::vector<Eigen::VectorXd>>(2, 4);
   write_free_unit_vector_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2,
-                                                                        4);
+                                                                         4);
 }
 
 template <typename Ret, typename... Sizes>
@@ -511,7 +510,6 @@ TEST(serializer_vectorized, write_free_simplex) {
   write_free_simplex_test<std::vector<Eigen::VectorXd>>(2, 4);
   write_free_simplex_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2, 4);
 }
-
 
 // ordered
 
@@ -617,20 +615,19 @@ void write_free_cholesky_factor_cov_test(Sizes... sizes) {
 TEST(serializer_vectorized, write_free_cholesky_factor_cov) {
   write_free_cholesky_factor_cov_test<Eigen::MatrixXd>(4, 3);
   write_free_cholesky_factor_cov_test<std::vector<Eigen::MatrixXd>>(2, 4, 3);
-  write_free_cholesky_factor_cov_test<std::vector<std::vector<Eigen::MatrixXd>>>(
-      3, 2, 4, 3);
+  write_free_cholesky_factor_cov_test<
+      std::vector<std::vector<Eigen::MatrixXd>>>(3, 2, 4, 3);
 
   write_free_cholesky_factor_cov_test<Eigen::MatrixXd>(2, 2);
   write_free_cholesky_factor_cov_test<std::vector<Eigen::MatrixXd>>(2, 2, 2);
-  write_free_cholesky_factor_cov_test<std::vector<std::vector<Eigen::MatrixXd>>>(
-      3, 2, 2, 2);
+  write_free_cholesky_factor_cov_test<
+      std::vector<std::vector<Eigen::MatrixXd>>>(3, 2, 2, 2);
 }
 
 // cholesky_factor_corr
 
 template <typename Ret, typename... Sizes>
 void write_free_cholesky_factor_corr_test(Sizes... sizes) {
-
   // Read an constrained variable
   Eigen::VectorXd theta1 = Eigen::VectorXd::Random(100);
   std::vector<int> theta_i;
@@ -696,7 +693,8 @@ void write_free_cov_matrix_test(Sizes... sizes) {
 TEST(serializer_vectorized, write_free_cov_matrix) {
   write_free_cov_matrix_test<Eigen::MatrixXd>(2);
   write_free_cov_matrix_test<std::vector<Eigen::MatrixXd>>(2, 2);
-  write_free_cov_matrix_test<std::vector<std::vector<Eigen::MatrixXd>>>(3, 2, 2);
+  write_free_cov_matrix_test<std::vector<std::vector<Eigen::MatrixXd>>>(3, 2,
+                                                                        2);
 }
 
 // corr_matrix
@@ -733,5 +731,5 @@ TEST(serializer_vectorized, write_free_corr_matrix) {
   write_free_corr_matrix_test<Eigen::MatrixXd>(2);
   write_free_corr_matrix_test<std::vector<Eigen::MatrixXd>>(2, 2);
   write_free_corr_matrix_test<std::vector<std::vector<Eigen::MatrixXd>>>(3, 2,
-                                                                        2);
+                                                                         2);
 }

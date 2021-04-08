@@ -232,257 +232,258 @@ class serializer {
     }
   }
 
+  /**
+   * Write a serialized lower bounded variable and unconstrain it
+   *
+   * @tparam S A scalar, Eigen type, or `std::vector`
+   * @tparam L Type of lower bound
+   * @param lb Lower bound
+   * @param x An object of the types listed above.
+   */
+  template <typename S, typename L>
+  inline void write_free_lb(const L& lb, const S& x) {
+    this->write(stan::math::lb_free(x, lb));
+  }
 
-    /**
-     * Write a serialized lower bounded variable and unconstrain it
-     *
-     * @tparam S A scalar, Eigen type, or `std::vector`
-     * @tparam L Type of lower bound
-     * @param lb Lower bound
-     * @param x An object of the types listed above.
-     */
-    template <typename S, typename L>
-    inline void write_free_lb(const L& lb, const S& x) {
-      this->write(stan::math::lb_free(x, lb));
+  /**
+   * Write a serialized lower bounded variable and unconstrain it
+   *
+   * @tparam S A scalar, Eigen type, or `std::vector`
+   * @tparam U Type of upper bound
+   * @param ub Upper bound
+   * @param x An object of the types listed above.
+   */
+  template <typename S, typename U>
+  inline void write_free_ub(const U& ub, const S& x) {
+    this->write(stan::math::ub_free(x, ub));
+  }
+
+  /**
+   * Write a serialized bounded variable and unconstrain it
+   *
+   * @tparam S A scalar, Eigen type, or `std::vector`
+   * @tparam L Type of lower bound
+   * @tparam U Type of upper bound
+   * @param lb Lower bound
+   * @param ub Upper bound
+   * @param x An object of the types listed above.
+   */
+  template <typename S, typename L, typename U>
+  inline void write_free_lub(const L& lb, const U& ub, const S& x) {
+    this->write(stan::math::lub_free(x, lb, ub));
+  }
+
+  /**
+   * Write a serialized offset-multiplied variable and unconstrain it
+   *
+   * @tparam S A scalar, Eigen type, or `std::vector`
+   * @tparam O Type of offset
+   * @tparam M Type of multiplier
+   * @param offset Offset
+   * @param multiplier Multiplier
+   * @param x An object of the types listed above.
+   */
+  template <typename S, typename O, typename M>
+  inline void write_free_offset_multiplier(const O& offset, const M& multiplier,
+                                           const S& x) {
+    this->write(stan::math::offset_multiplier_free(x, offset, multiplier));
+  }
+
+  /**
+   * Write a serialized unit vector and unconstrain it
+   *
+   * @tparam Vec An Eigen type with either fixed rows or columns at compile
+   * time.
+   * @param x The vector to read from.
+   */
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
+  inline void write_free_unit_vector(const Vec& x) {
+    this->write(stan::math::unit_vector_free(x));
+  }
+
+  /**
+   * Write serialized unit vectors and unconstrain them
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_unit_vector(const StdVec& x) {
+    for (auto&& ret_i : x) {
+      this->write_free_unit_vector(ret_i);
     }
+  }
 
-    /**
-     * Write a serialized lower bounded variable and unconstrain it
-     *
-     * @tparam S A scalar, Eigen type, or `std::vector`
-     * @tparam U Type of upper bound
-     * @param ub Upper bound
-     * @param x An object of the types listed above.
-     */
-    template <typename S, typename U>
-    inline void write_free_ub(const U& ub, const S& x) {
-      this->write(stan::math::ub_free(x, ub));
+  /**
+   * Write a serialized simplex and unconstrain it
+   *
+   * @tparam Vec An Eigen type with either fixed rows or columns at compile
+   * time.
+   * @param x The vector to read from.
+   */
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
+  inline void write_free_simplex(const Vec& x) {
+    this->write(stan::math::simplex_free(x));
+  }
+
+  /**
+   * Write serialized simplices and unconstrain them
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_simplex(const StdVec& x) {
+    for (auto&& ret_i : x) {
+      this->write_free_simplex(ret_i);
     }
+  }
 
-    /**
-     * Write a serialized bounded variable and unconstrain it
-     *
-     * @tparam S A scalar, Eigen type, or `std::vector`
-     * @tparam L Type of lower bound
-     * @tparam U Type of upper bound
-     * @param lb Lower bound
-     * @param ub Upper bound
-     * @param x An object of the types listed above.
-     */
-    template <typename S, typename L, typename U>
-    inline void write_free_lub(const L& lb, const U& ub, const S& x) {
-      this->write(stan::math::lub_free(x, lb, ub));
+  /**
+   * Write a serialized ordered and unconstrain it
+   *
+   * @tparam Vec An Eigen type with either fixed rows or columns at compile
+   * time.
+   * @param x The vector to read from.
+   */
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
+  inline void write_free_ordered(const Vec& x) {
+    this->write(stan::math::ordered_free(x));
+  }
+
+  /**
+   * Write serialized ordered vectors and unconstrain them
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_ordered(const StdVec& x) {
+    for (auto&& ret_i : x) {
+      this->write_free_ordered(ret_i);
     }
+  }
 
-    /**
-     * Write a serialized offset-multiplied variable and unconstrain it
-     *
-     * @tparam S A scalar, Eigen type, or `std::vector`
-     * @tparam O Type of offset
-     * @tparam M Type of multiplier
-     * @param offset Offset
-     * @param multiplier Multiplier
-     * @param x An object of the types listed above.
-     */
-    template <typename S, typename O, typename M>
-    inline void write_free_offset_multiplier(const O& offset, const M& multiplier,
-                                            const S& x) {
-      this->write(stan::math::offset_multiplier_free(x, offset, multiplier));
+  /**
+   * Write a serialized positive ordered vector and unconstrain it
+   *
+   * @tparam Vec An Eigen type with either fixed rows or columns at compile
+   * time.
+   * @param x The vector to read from.
+   */
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
+  inline void write_free_positive_ordered(const Vec& x) {
+    this->write(stan::math::positive_ordered_free(x));
+  }
+
+  /**
+   * Write serialized positive ordered vectors and unconstrain them
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_positive_ordered(const StdVec& x) {
+    for (auto&& ret_i : x) {
+      this->write_free_positive_ordered(ret_i);
     }
+  }
 
-    /**
-     * Write a serialized unit vector and unconstrain it
-     *
-     * @tparam Vec An Eigen type with either fixed rows or columns at compile time.
-     * @param x The vector to read from.
-     */
-    template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
-    inline void write_free_unit_vector(const Vec& x) {
-      this->write(stan::math::unit_vector_free(x));
+  /**
+   * Write a serialized covariance matrix cholesky factor and unconstrain it
+   *
+   * @tparam Mat An Eigen type with dynamic rows and columns at compile time.
+   * @param x An Eigen matrix to write to the serialized vector.
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_free_cholesky_factor_cov(const Mat& x) {
+    this->write(stan::math::cholesky_factor_free(x));
+  }
+
+  /**
+   * Write serialized covariance matrix cholesky factors and unconstrain them
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_cholesky_factor_cov(const StdVec& x) {
+    for (auto&& ret_i : x) {
+      this->write_free_cholesky_factor_cov(ret_i);
     }
+  }
 
-    /**
-     * Write serialized unit vectors and unconstrain them
-     *
-     * @tparam StdVec A `std:vector`
-     * @param x An std vector.
-     */
-    template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-    inline void write_free_unit_vector(const StdVec& x) {
-      for (auto&& ret_i : x) {
-        this->write_free_unit_vector(ret_i);
-      }
+  /**
+   * Write a serialized covariance matrix cholesky factor and unconstrain it
+   *
+   * @tparam Mat Type of input
+   * @param x An Eigen matrix to write to the serialized vector.
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_free_cholesky_factor_corr(const Mat& x) {
+    this->write(stan::math::cholesky_corr_free(x));
+  }
+
+  /**
+   * Write serialized correlation matrix cholesky factors and unconstrain them
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_cholesky_factor_corr(const StdVec& x) {
+    for (auto&& ret_i : x) {
+      this->write_free_cholesky_factor_corr(ret_i);
     }
+  }
 
-    /**
-     * Write a serialized simplex and unconstrain it
-     *
-     * @tparam Vec An Eigen type with either fixed rows or columns at compile time.
-     * @param x The vector to read from.
-     */
-    template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
-    inline void write_free_simplex(const Vec& x) {
-      this->write(stan::math::simplex_free(x));
+  /**
+   * Write a serialized covariance matrix cholesky factor and unconstrain it
+   *
+   * @tparam Mat An Eigen type with dynamic rows and columns at compile time
+   * @param x An Eigen matrix to write to the serialized vector.
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_free_cov_matrix(const Mat& x) {
+    this->write(stan::math::cov_matrix_free(x));
+  }
+
+  /**
+   * Write serialized covariance matrices and unconstrain them
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x a standard vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_cov_matrix(const StdVec& x) {
+    for (auto&& ret_i : x) {
+      this->write_free_cov_matrix(ret_i);
     }
+  }
 
-    /**
-     * Write serialized simplices and unconstrain them
-     *
-     * @tparam StdVec A `std:vector`
-     * @param x An std vector.
-     */
-    template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-    inline void write_free_simplex(const StdVec& x) {
-      for (auto&& ret_i : x) {
-        this->write_free_simplex(ret_i);
-      }
+  /**
+   * Write a serialized covariance matrix cholesky factor and unconstrain it
+   *
+   * @tparam Mat An Eigen type with dynamic rows and columns at compile time.
+   * @param x An Eigen matrix to write to the serialized vector.
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_free_corr_matrix(const Mat& x) {
+    this->write(stan::math::corr_matrix_free(x));
+  }
+
+  /**
+   * Write serialized correlation matrices and unconstrain them
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_free_corr_matrix(const StdVec& x) {
+    for (auto&& ret_i : x) {
+      this->write_free_corr_matrix(ret_i);
     }
-
-    /**
-     * Write a serialized ordered and unconstrain it
-     *
-     * @tparam Vec An Eigen type with either fixed rows or columns at compile time.
-     * @param x The vector to read from.
-     */
-    template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
-    inline void write_free_ordered(const Vec& x) {
-      this->write(stan::math::ordered_free(x));
-    }
-
-    /**
-     * Write serialized ordered vectors and unconstrain them
-     *
-     * @tparam StdVec A `std:vector`
-     * @param x An std vector.
-     */
-    template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-    inline void write_free_ordered(const StdVec& x) {
-      for (auto&& ret_i : x) {
-        this->write_free_ordered(ret_i);
-      }
-    }
-
-    /**
-     * Write a serialized positive ordered vector and unconstrain it
-     *
-     * @tparam Vec An Eigen type with either fixed rows or columns at compile time.
-     * @param x The vector to read from.
-     */
-    template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
-    inline void write_free_positive_ordered(const Vec& x) {
-      this->write(stan::math::positive_ordered_free(x));
-    }
-
-    /**
-     * Write serialized positive ordered vectors and unconstrain them
-     *
-     * @tparam StdVec A `std:vector`
-     * @param x An std vector.
-     */
-    template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-    inline void write_free_positive_ordered(const StdVec& x) {
-      for (auto&& ret_i : x) {
-        this->write_free_positive_ordered(ret_i);
-      }
-    }
-
-    /**
-     * Write a serialized covariance matrix cholesky factor and unconstrain it
-     *
-     * @tparam Mat An Eigen type with dynamic rows and columns at compile time.
-     * @param x An Eigen matrix to write to the serialized vector.
-     */
-    template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
-    inline void write_free_cholesky_factor_cov(const Mat& x) {
-      this->write(stan::math::cholesky_factor_free(x));
-    }
-
-    /**
-     * Write serialized covariance matrix cholesky factors and unconstrain them
-     *
-     * @tparam StdVec A `std:vector`
-     * @param x An std vector.
-     */
-    template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-    inline void write_free_cholesky_factor_cov(const StdVec& x) {
-      for (auto&& ret_i : x) {
-        this->write_free_cholesky_factor_cov(ret_i);
-      }
-    }
-
-    /**
-     * Write a serialized covariance matrix cholesky factor and unconstrain it
-     *
-     * @tparam Mat Type of input
-     * @param x An Eigen matrix to write to the serialized vector.
-     */
-    template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
-    inline void write_free_cholesky_factor_corr(const Mat& x) {
-      this->write(stan::math::cholesky_corr_free(x));
-    }
-
-    /**
-     * Write serialized correlation matrix cholesky factors and unconstrain them
-     *
-     * @tparam StdVec A `std:vector`
-     * @param x An std vector.
-     */
-    template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-    inline void write_free_cholesky_factor_corr(const StdVec& x) {
-      for (auto&& ret_i : x) {
-        this->write_free_cholesky_factor_corr(ret_i);
-      }
-    }
-
-    /**
-     * Write a serialized covariance matrix cholesky factor and unconstrain it
-     *
-     * @tparam Mat An Eigen type with dynamic rows and columns at compile time
-     * @param x An Eigen matrix to write to the serialized vector.
-     */
-    template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
-    inline void write_free_cov_matrix(const Mat& x) {
-      this->write(stan::math::cov_matrix_free(x));
-    }
-
-    /**
-     * Write serialized covariance matrices and unconstrain them
-     *
-     * @tparam StdVec A `std:vector`
-     * @param x a standard vector.
-     */
-    template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-    inline void write_free_cov_matrix(const StdVec& x) {
-      for (auto&& ret_i : x) {
-        this->write_free_cov_matrix(ret_i);
-      }
-    }
-
-    /**
-     * Write a serialized covariance matrix cholesky factor and unconstrain it
-     *
-     * @tparam Mat An Eigen type with dynamic rows and columns at compile time.
-     * @param x An Eigen matrix to write to the serialized vector.
-     */
-    template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
-    inline void write_free_corr_matrix(const Mat& x) {
-      this->write(stan::math::corr_matrix_free(x));
-    }
-
-    /**
-     * Write serialized correlation matrices and unconstrain them
-     *
-     * @tparam StdVec A `std:vector`
-     * @param x An std vector.
-     */
-    template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-    inline void write_free_corr_matrix(const StdVec& x) {
-      for (auto&& ret_i : x) {
-        this->write_free_corr_matrix(ret_i);
-      }
-    }
-
-
+  }
 };
 
 }  // namespace io
