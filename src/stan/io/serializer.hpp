@@ -24,7 +24,7 @@ class serializer {
   /**
    * Check there is room for at least m more reals to store
    *
-   * @param m Number of reals to read
+   * @param m Number of reals to Write
    * @throws std::runtime_error if there isn't room for m reals
    */
   void check_r_capacity(size_t m) const {
@@ -229,10 +229,279 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write(StdVec&& x) {
-    for (size_t i = 0; i < x.size(); ++i) {
-      this->write(x[i]);
+    for (auto&& x_i : x) {
+      this->write(x_i);
     }
   }
+
+
+    /**
+     * Write a serialized lower bounded variable and unconstrain it
+     *
+     * @tparam Ret Type of output
+     * @tparam L Type of lower bound
+     * @tparam Sizes Types of dimensions of output
+     * @param lb Lower bound
+     * @param sizes dimensions
+     */
+    template <typename Ret, typename L>
+    inline void write_free_lb(const L& lb, const Ret& ret) {
+      this->write(stan::math::lb_free(ret, lb));
+    }
+
+    /**
+     * Write a serialized lower bounded variable and unconstrain it
+     *
+     * @tparam Ret Type of output
+     * @tparam U Type of upper bound
+     * @tparam Sizes Types of dimensions of output
+     * @param ub Upper bound
+     * @param sizes dimensions
+     */
+    template <typename Ret, typename U>
+    inline void write_free_ub(const U& ub, const Ret& ret) {
+      this->write(stan::math::ub_free(ret, ub));
+    }
+
+    /**
+     * Write a serialized bounded variable and unconstrain it
+     *
+     * @tparam Ret Type of output
+     * @tparam L Type of lower bound
+     * @tparam U Type of upper bound
+     * @tparam Sizes Types of dimensions of output
+     * @param lb Lower bound
+     * @param ub Upper bound
+     * @param sizes dimensions
+     */
+    template <typename Ret, typename L, typename U>
+    inline void write_free_lub(const L& lb, const U& ub, const Ret& ret) {
+      this->write(stan::math::lub_free(ret, lb, ub));
+    }
+
+    /**
+     * Write a serialized offset-multiplied variable and unconstrain it
+     *
+     * @tparam Ret Type of output
+     * @tparam O Type of offset
+     * @tparam M Type of multiplier
+     * @tparam Sizes Types of dimensions of output
+     * @param offset Offset
+     * @param multiplier Multiplier
+     * @param sizes dimensions
+     */
+    template <typename Ret, typename O, typename M>
+    inline void write_free_offset_multiplier(const O& offset, const M& multiplier,
+                                            const Ret& ret) {
+      this->write(stan::math::offset_multiplier_free(ret, offset, multiplier));
+    }
+
+    /**
+     * Write a serialized unit vector and unconstrain it
+     *
+     * @tparam Ret Type of output
+     */
+    template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+    inline void write_free_unit_vector(const Ret& ret) {
+      this->write(stan::math::unit_vector_free(ret));
+    }
+
+    /**
+     * Write serialized unit vectors and unconstrain them
+     *
+     * @tparam Ret Type of output
+     * @tparam Sizes Types of dimensions of output
+     * @param vecsize Vector size
+     * @param sizes dimensions
+     */
+    template <typename Ret, require_std_vector_t<Ret>* = nullptr>
+    inline void write_free_unit_vector(const Ret& ret) {
+      for (auto&& ret_i : ret) {
+        this->write_free_unit_vector(ret_i);
+      }
+    }
+
+    /**
+     * Write a serialized simplex and unconstrain it
+     *
+     * @tparam Ret Type of output
+     */
+    template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+    inline void write_free_simplex(const Ret& ret) {
+      this->write(stan::math::simplex_free(ret));
+    }
+
+    /**
+     * Write serialized simplices and unconstrain them
+     *
+     * @tparam Ret Type of output
+     * @tparam Sizes Types of dimensions of output
+     * @param vecsize Vector size
+     * @param sizes dimensions
+     */
+    template <typename Ret, require_std_vector_t<Ret>* = nullptr>
+    inline void write_free_simplex(const Ret& ret) {
+      for (auto&& ret_i : ret) {
+        this->write_free_simplex(ret_i);
+      }
+    }
+
+    /**
+     * Write a serialized ordered and unconstrain it
+     *
+     * @tparam Ret Type of output
+     */
+    template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+    inline void write_free_ordered(const Ret& ret) {
+      this->write(stan::math::ordered_free(ret));
+    }
+
+    /**
+     * Write serialized ordered vectors and unconstrain them
+     *
+     * @tparam Ret Type of output
+     * @tparam Sizes Types of dimensions of output
+     * @param vecsize Vector size
+     * @param sizes dimensions
+     */
+    template <typename Ret, require_std_vector_t<Ret>* = nullptr>
+    inline void write_free_ordered(const Ret& ret) {
+      for (auto&& ret_i : ret) {
+        this->write_free_ordered(ret_i);
+      }
+    }
+
+    /**
+     * Write a serialized positive ordered vector and unconstrain it
+     *
+     * @tparam Ret Type of output
+     */
+    template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+    inline void write_free_positive_ordered(const Ret& ret) {
+      this->write(stan::math::positive_ordered_free(ret));
+    }
+
+    /**
+     * Write serialized positive ordered vectors and unconstrain them
+     *
+     * @tparam Ret Type of output
+     * @tparam Sizes Types of dimensions of output
+     * @param vecsize Vector size
+     * @param sizes dimensions
+     */
+    template <typename Ret, require_std_vector_t<Ret>* = nullptr>
+    inline void write_free_positive_ordered(const Ret& ret) {
+      for (auto&& ret_i : ret) {
+        this->write_free_positive_ordered(ret_i);
+      }
+    }
+
+    /**
+     * Write a serialized covariance matrix cholesky factor and unconstrain it
+     *
+     * @tparam Ret Type of output
+     * @param M Rows of matrix
+     * @param N Cols of matrix
+     */
+    template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+    inline void write_free_cholesky_factor_cov(const Ret& ret) {
+      this->write(stan::math::cholesky_factor_free(ret));
+    }
+
+    /**
+     * Write serialized covariance matrix cholesky factors and unconstrain them
+     *
+     * @tparam Ret Type of output
+     * @tparam Sizes Types of dimensions of output
+     * @param vecsize Vector size
+     * @param sizes dimensions
+     */
+    template <typename Ret, require_std_vector_t<Ret>* = nullptr>
+    inline void write_free_cholesky_factor_cov(const Ret& ret) {
+      for (auto&& ret_i : ret) {
+        this->write_free_cholesky_factor_cov(ret_i);
+      }
+    }
+
+    /**
+     * Write a serialized covariance matrix cholesky factor and unconstrain it
+     *
+     * @tparam Ret Type of output
+     * @param M Rows/Cols of matrix
+     */
+    template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+    inline void write_free_cholesky_factor_corr(const Ret& ret) {
+      this->write(stan::math::cholesky_corr_free(ret));
+    }
+
+    /**
+     * Write serialized correlation matrix cholesky factors and unconstrain them
+     *
+     * @tparam Ret Type of output
+     * @tparam Sizes Types of dimensions of output
+     * @param vecsize Vector size
+     * @param sizes dimensions
+     */
+    template <typename Ret, require_std_vector_t<Ret>* = nullptr>
+    inline void write_free_cholesky_factor_corr(const Ret& ret) {
+      for (auto&& ret_i : ret) {
+        this->write_free_cholesky_factor_corr(ret_i);
+      }
+    }
+
+    /**
+     * Write a serialized covariance matrix cholesky factor and unconstrain it
+     *
+     * @tparam Ret Type of output
+     * @param M Rows/Cols of matrix
+     */
+    template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+    inline void write_free_cov_matrix(const Ret& ret) {
+      this->write(stan::math::cov_matrix_free(ret));
+    }
+
+    /**
+     * Write serialized covariance matrices and unconstrain them
+     *
+     * @tparam Ret Type of output
+     * @tparam Sizes Types of dimensions of output
+     * @param vecsize Vector size
+     * @param sizes dimensions
+     */
+    template <typename Ret, require_std_vector_t<Ret>* = nullptr>
+    inline void write_free_cov_matrix(const Ret& ret) {
+      for (auto&& ret_i : ret) {
+        this->write_free_cov_matrix(ret_i);
+      }
+    }
+
+    /**
+     * Write a serialized covariance matrix cholesky factor and unconstrain it
+     *
+     * @tparam Ret Type of output
+     * @param M Rows/Cols of matrix
+     */
+    template <typename Ret, require_not_std_vector_t<Ret>* = nullptr>
+    inline void write_free_corr_matrix(const Ret& ret) {
+      this->write(stan::math::corr_matrix_free(ret));
+    }
+
+    /**
+     * Write serialized correlation matrices and unconstrain them
+     *
+     * @tparam Ret Type of output
+     * @tparam Sizes Types of dimensions of output
+     * @param vecsize Vector size
+     * @param sizes dimensions
+     */
+    template <typename Ret, require_std_vector_t<Ret>* = nullptr>
+    inline void write_free_corr_matrix(const Ret& ret) {
+      for (auto&& ret_i : ret) {
+        this->write_free_corr_matrix(ret_i);
+      }
+    }
+
+
 };
 
 }  // namespace io
