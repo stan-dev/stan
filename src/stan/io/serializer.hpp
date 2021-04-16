@@ -227,7 +227,7 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write(StdVec&& x) {
-    for (auto&& x_i : x) {
+    for (const auto& x_i : x) {
       this->write(x_i);
     }
   }
@@ -309,7 +309,7 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write_free_unit_vector(const StdVec& x) {
-    for (auto&& ret_i : x) {
+    for (const auto& ret_i : x) {
       this->write_free_unit_vector(ret_i);
     }
   }
@@ -334,7 +334,7 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write_free_simplex(const StdVec& x) {
-    for (auto&& ret_i : x) {
+    for (const auto& ret_i : x) {
       this->write_free_simplex(ret_i);
     }
   }
@@ -359,7 +359,7 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write_free_ordered(const StdVec& x) {
-    for (auto&& ret_i : x) {
+    for (const auto& ret_i : x) {
       this->write_free_ordered(ret_i);
     }
   }
@@ -384,7 +384,7 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write_free_positive_ordered(const StdVec& x) {
-    for (auto&& ret_i : x) {
+    for (const auto& ret_i : x) {
       this->write_free_positive_ordered(ret_i);
     }
   }
@@ -408,7 +408,7 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write_free_cholesky_factor_cov(const StdVec& x) {
-    for (auto&& ret_i : x) {
+    for (const auto& ret_i : x) {
       this->write_free_cholesky_factor_cov(ret_i);
     }
   }
@@ -432,7 +432,7 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write_free_cholesky_factor_corr(const StdVec& x) {
-    for (auto&& ret_i : x) {
+    for (const auto& ret_i : x) {
       this->write_free_cholesky_factor_corr(ret_i);
     }
   }
@@ -456,7 +456,7 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write_free_cov_matrix(const StdVec& x) {
-    for (auto&& ret_i : x) {
+    for (const auto& ret_i : x) {
       this->write_free_cov_matrix(ret_i);
     }
   }
@@ -480,7 +480,7 @@ class serializer {
    */
   template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
   inline void write_free_corr_matrix(const StdVec& x) {
-    for (auto&& ret_i : x) {
+    for (const auto& ret_i : x) {
       this->write_free_corr_matrix(ret_i);
     }
   }
