@@ -1,3 +1,4 @@
+#include <stan/io/deserializer.hpp>
 #include <stan/io/serializer.hpp>
 // expect_near_rel comes from lib/stan_math
 #include <test/unit/math/expect_near_rel.hpp>
@@ -288,4 +289,447 @@ TEST(serializer, eos_exception) {
                      std::vector<Eigen::MatrixXd>(2, Eigen::MatrixXd(3, 2))),
                  std::runtime_error);
   }
+}
+
+template <typename Ret, typename... Sizes>
+void write_free_lb_test(Sizes... sizes) {
+  double lb = 0.5;
+  constexpr size_t theta_size = 100;
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(theta_size);
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref = deserializer.read_constrain_lb<Ret, false>(lb, lp, sizes...);
+
+  // Serialize a constrained variable
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta_size);
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_lb(lb, vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_lb) {
+  write_free_lb_test<double>();
+  write_free_lb_test<Eigen::VectorXd>(4);
+  write_free_lb_test<std::vector<Eigen::VectorXd>>(2, 4);
+  write_free_lb_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2, 4);
+}
+
+template <typename Ret, typename... Sizes>
+void write_free_ub_test(Sizes... sizes) {
+  double ub = 0.5;
+  constexpr size_t theta_size = 100;
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(theta_size);
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref = deserializer.read_constrain_ub<Ret, false>(ub, lp, sizes...);
+
+  // Serialize a constrained variable
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta_size);
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_ub(ub, vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_ub) {
+  write_free_ub_test<double>();
+  write_free_ub_test<Eigen::VectorXd>(4);
+  write_free_ub_test<std::vector<Eigen::VectorXd>>(2, 4);
+  write_free_ub_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2, 4);
+}
+
+template <typename Ret, typename... Sizes>
+void write_free_lub_test(Sizes... sizes) {
+  double ub = 0.5;
+  double lb = 0.1;
+  constexpr size_t theta_size = 100;
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(theta_size);
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref
+      = deserializer.read_constrain_lub<Ret, false>(lb, ub, lp, sizes...);
+
+  // Serialize a constrained variable
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta_size);
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_lub(lb, ub, vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_lub) {
+  write_free_lub_test<double>();
+  write_free_lub_test<Eigen::VectorXd>(4);
+  write_free_lub_test<std::vector<Eigen::VectorXd>>(2, 4);
+  write_free_lub_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2, 4);
+}
+
+template <typename Ret, typename... Sizes>
+void write_free_offset_multiplier_test(Sizes... sizes) {
+  double offset = 0.5;
+  double multiplier = 0.35;
+  constexpr size_t theta_size = 100;
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(theta_size);
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref = deserializer.read_constrain_offset_multiplier<Ret, false>(
+      offset, multiplier, lp, sizes...);
+
+  // Serialize a constrained variable
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta_size);
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_offset_multiplier(offset, multiplier, vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_offset_multiplier) {
+  write_free_offset_multiplier_test<double>();
+  write_free_offset_multiplier_test<Eigen::VectorXd>(4);
+  write_free_offset_multiplier_test<std::vector<Eigen::VectorXd>>(2, 4);
+  write_free_offset_multiplier_test<std::vector<std::vector<Eigen::VectorXd>>>(
+      3, 2, 4);
+}
+template <typename Ret, typename... Sizes>
+void write_free_unit_vector_test(Sizes... sizes) {
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(100);
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref
+      = deserializer.read_constrain_unit_vector<Ret, false>(lp, sizes...);
+
+  // Serialize a constrained variable
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta1.size());
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_unit_vector(vec_ref);
+
+  // For unit vector, it's not actually doing a change of variables so we check
+  // theta2 equals theta2 (freeing doesn't actually get the unconstrained
+  // variable back).
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta1.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta2.segment(0, used1),
+                              theta2.segment(0, used2));
+}
+
+TEST(serializer_vectorized, write_free_unit_vector) {
+  write_free_unit_vector_test<Eigen::VectorXd>(4);
+  write_free_unit_vector_test<std::vector<Eigen::VectorXd>>(2, 4);
+  write_free_unit_vector_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2,
+                                                                         4);
+}
+
+template <typename Ret, typename... Sizes>
+void write_free_simplex_test(Sizes... sizes) {
+  constexpr size_t theta_size = 100;
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(theta_size);
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref = deserializer.read_constrain_simplex<Ret, false>(lp, sizes...);
+
+  // Serialize a constrained variable
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta_size);
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_simplex(vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_simplex) {
+  write_free_simplex_test<Eigen::VectorXd>(4);
+  write_free_simplex_test<std::vector<Eigen::VectorXd>>(2, 4);
+  write_free_simplex_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2, 4);
+}
+
+// ordered
+
+template <typename Ret, typename... Sizes>
+void write_free_ordered_test(Sizes... sizes) {
+  // Read an constrained variable
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(100);
+  std::vector<int> theta_i;
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref = deserializer.read_constrain_ordered<Ret, false>(lp, sizes...);
+
+  // Serialize a constrained variable
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta1.size());
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_ordered(vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_ordered) {
+  write_free_ordered_test<Eigen::VectorXd>(4);
+  write_free_ordered_test<std::vector<Eigen::VectorXd>>(2, 4);
+  write_free_ordered_test<std::vector<std::vector<Eigen::VectorXd>>>(3, 2, 4);
+}
+
+// positive_ordered
+
+template <typename Ret, typename... Sizes>
+void write_free_positive_ordered_test(Sizes... sizes) {
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(100);
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta1.size());
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref
+      = deserializer.read_constrain_positive_ordered<Ret, false>(lp, sizes...);
+
+  // Serialize a constrained variable
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_positive_ordered(vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_positive_ordered) {
+  write_free_positive_ordered_test<Eigen::VectorXd>(4);
+  write_free_positive_ordered_test<std::vector<Eigen::VectorXd>>(2, 4);
+  write_free_positive_ordered_test<std::vector<std::vector<Eigen::VectorXd>>>(
+      3, 2, 4);
+}
+
+// cholesky_factor_cov
+
+template <typename Ret, typename... Sizes>
+void write_free_cholesky_factor_cov_test(Sizes... sizes) {
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(100);
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta1.size());
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref = deserializer.read_constrain_cholesky_factor_cov<Ret, false>(
+      lp, sizes...);
+
+  // Serialize a constrained variable
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_cholesky_factor_cov(vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_cholesky_factor_cov) {
+  write_free_cholesky_factor_cov_test<Eigen::MatrixXd>(4, 3);
+  write_free_cholesky_factor_cov_test<std::vector<Eigen::MatrixXd>>(2, 4, 3);
+  write_free_cholesky_factor_cov_test<
+      std::vector<std::vector<Eigen::MatrixXd>>>(3, 2, 4, 3);
+
+  write_free_cholesky_factor_cov_test<Eigen::MatrixXd>(2, 2);
+  write_free_cholesky_factor_cov_test<std::vector<Eigen::MatrixXd>>(2, 2, 2);
+  write_free_cholesky_factor_cov_test<
+      std::vector<std::vector<Eigen::MatrixXd>>>(3, 2, 2, 2);
+}
+
+// cholesky_factor_corr
+
+template <typename Ret, typename... Sizes>
+void write_free_cholesky_factor_corr_test(Sizes... sizes) {
+  // Read an constrained variable
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(100);
+  std::vector<int> theta_i;
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref = deserializer.read_constrain_cholesky_factor_corr<Ret, false>(
+      lp, sizes...);
+
+  // Serialize a constrained variable
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta1.size());
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_cholesky_factor_corr(vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_cholesky_factor_corr) {
+  write_free_cholesky_factor_corr_test<Eigen::MatrixXd>(2);
+  write_free_cholesky_factor_corr_test<std::vector<Eigen::MatrixXd>>(2, 2);
+  write_free_cholesky_factor_corr_test<
+      std::vector<std::vector<Eigen::MatrixXd>>>(3, 2, 2);
+}
+
+// cov_matrix
+
+template <typename Ret, typename... Sizes>
+void write_free_cov_matrix_test(Sizes... sizes) {
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(100);
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta1.size());
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref
+      = deserializer.read_constrain_cov_matrix<Ret, false>(lp, sizes...);
+
+  // Serialize a constrained variable
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_cov_matrix(vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_cov_matrix) {
+  write_free_cov_matrix_test<Eigen::MatrixXd>(2);
+  write_free_cov_matrix_test<std::vector<Eigen::MatrixXd>>(2, 2);
+  write_free_cov_matrix_test<std::vector<std::vector<Eigen::MatrixXd>>>(3, 2,
+                                                                        2);
+}
+
+// corr_matrix
+
+template <typename Ret, typename... Sizes>
+void write_free_corr_matrix_test(Sizes... sizes) {
+  Eigen::VectorXd theta1 = Eigen::VectorXd::Random(100);
+  Eigen::VectorXd theta2 = Eigen::VectorXd::Random(theta1.size());
+  std::vector<int> theta_i;
+
+  // Read an constrained variable
+  stan::io::deserializer<double> deserializer(theta1, theta_i);
+  double lp = 0.0;
+  Ret vec_ref
+      = deserializer.read_constrain_corr_matrix<Ret, false>(lp, sizes...);
+
+  // Serialize a constrained variable
+  stan::io::serializer<double> serializer(theta2);
+  serializer.write_free_corr_matrix(vec_ref);
+
+  size_t used1 = theta1.size() - deserializer.available();
+  size_t used2 = theta2.size() - serializer.available();
+
+  // Number of variables read should equal number of variables written
+  EXPECT_EQ(used1, used2);
+
+  // Make sure the variables written back are the same
+  stan::test::expect_near_rel("deserializer read free",
+                              theta1.segment(0, used1),
+                              theta2.segment(0, used1));
+}
+
+TEST(serializer_vectorized, write_free_corr_matrix) {
+  write_free_corr_matrix_test<Eigen::MatrixXd>(2);
+  write_free_corr_matrix_test<std::vector<Eigen::MatrixXd>>(2, 2);
+  write_free_corr_matrix_test<std::vector<std::vector<Eigen::MatrixXd>>>(3, 2,
+                                                                         2);
 }
