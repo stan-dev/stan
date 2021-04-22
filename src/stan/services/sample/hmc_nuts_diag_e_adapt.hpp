@@ -176,7 +176,9 @@ int hmc_nuts_diag_e_adapt(
  * @param[in] init_inv_metric An std vector of var contexts exposing an initial
  diagonal inverse Euclidean metric for each chain (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
- * @param[in] init_chain_id first chain id. The pseudo random number generator will advance by for each chain by an integer sequence from `init_chain_id` to `num_chains`
+ * @param[in] init_chain_id first chain id. The pseudo random number generator
+ will advance by for each chain by an integer sequence from `init_chain_id` to
+ `num_chains`
  * @param[in] init_radius radius to initialize
  * @param[in] num_warmup Number of warmup samples
  * @param[in] num_samples Number of samples
@@ -223,10 +225,10 @@ int hmc_nuts_diag_e_adapt(
   if (num_chains == 1) {
     return hmc_nuts_diag_e_adapt(
         model, get_underlying(init[0]), get_underlying(init_inv_metric[0]),
-        random_seed, init_chain_id, init_radius, num_warmup, num_samples, num_thin,
-        save_warmup, refresh, stepsize, stepsize_jitter, max_depth, delta,
-        gamma, kappa, t0, init_buffer, term_buffer, window, interrupt, logger,
-        init_writer[0], sample_writer[0], diagnostic_writer[0]);
+        random_seed, init_chain_id, init_radius, num_warmup, num_samples,
+        num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
+        delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
+        logger, init_writer[0], sample_writer[0], diagnostic_writer[0]);
   } else {
     using sample_t = stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>;
     std::vector<boost::ecuyer1988> rngs;
@@ -290,7 +292,9 @@ int hmc_nuts_diag_e_adapt(
  * @param[in] init An std vector of init var contexts for initialization of each
  * chain.
  * @param[in] random_seed random seed for the random number generator
- * @param[in] init_chain_id first chain id. The pseudo random number generator will advance by for each chain by an integer sequence from `init_chain_id` to `num_chains`
+ * @param[in] init_chain_id first chain id. The pseudo random number generator
+ * will advance by for each chain by an integer sequence from `init_chain_id` to
+ * `num_chains`
  * @param[in] init_radius radius to initialize
  * @param[in] num_warmup Number of warmup samples
  * @param[in] num_samples Number of samples
