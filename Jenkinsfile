@@ -357,15 +357,17 @@ pipeline {
                         """
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
-                        }        
-                        bat """
-                            cd performance-tests-cmdstan/cmdstan
-                            echo 'O=0' >> make/local
-                            echo 'CXX=${env.CXX}' >> make/local
-                            make -j${env.PARALLEL} build
-                            cd ..
-                            python ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
-                        """
+                        }
+                        withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {  
+                            bat """
+                                cd performance-tests-cmdstan/cmdstan
+                                echo 'O=0' >> make/local
+                                echo 'CXX=${env.CXX}' >> make/local
+                                make -j${env.PARALLEL} build
+                                cd ..
+                                python ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                            """
+                        }
                         bat """
                             cd performance-tests-cmdstan/cmdstan/stan
                             python ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
