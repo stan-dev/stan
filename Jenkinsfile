@@ -192,62 +192,62 @@ pipeline {
                 }
             }
         }
-        stage('Unit tests') {
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
-            parallel {
-                stage('Windows Headers & Unit') {
-                    agent { label 'windows' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
-                            !skipRemainingStages
-                        }
-                    }
-                    steps {
-                        deleteDirWin()
-                            unstash 'StanSetup'
-                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                            bat "mingw32-make -j${env.PARALLEL} test-headers"
-                            setupCXX(false, env.CXX, stanc3_bin_url())
-                            runTestsWin("src/test/unit")
-                    }
-                    post { always { deleteDirWin() } }
-                }
-                stage('Linux Unit') {
-                    agent { label 'linux' }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, env.GCC, stanc3_bin_url())
-                        sh "make -j${env.PARALLEL} test-headers"
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
-                stage('Mac Unit') {
-                    agent { label 'osx' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
-                            !skipRemainingStages
-                        }
-                    }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(false, env.CXX, stanc3_bin_url())
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
-            }
-        }
+        // stage('Unit tests') {
+        //     when {
+        //         expression {
+        //             !skipRemainingStages
+        //         }
+        //     }
+        //     parallel {
+        //         stage('Windows Headers & Unit') {
+        //             agent { label 'windows' }
+        //             when {
+        //                 expression {
+        //                     ( env.BRANCH_NAME == "develop" ||
+        //                     env.BRANCH_NAME == "master" ||
+        //                     params.run_tests_all_os ) &&
+        //                     !skipRemainingStages
+        //                 }
+        //             }
+        //             steps {
+        //                 deleteDirWin()
+        //                     unstash 'StanSetup'
+        //                     bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+        //                     bat "mingw32-make -j${env.PARALLEL} test-headers"
+        //                     setupCXX(false, env.CXX, stanc3_bin_url())
+        //                     runTestsWin("src/test/unit")
+        //             }
+        //             post { always { deleteDirWin() } }
+        //         }
+        //         stage('Linux Unit') {
+        //             agent { label 'linux' }
+        //             steps {
+        //                 unstash 'StanSetup'
+        //                 setupCXX(true, env.GCC, stanc3_bin_url())
+        //                 sh "make -j${env.PARALLEL} test-headers"
+        //                 runTests("src/test/unit")
+        //             }
+        //             post { always { deleteDir() } }
+        //         }
+        //         stage('Mac Unit') {
+        //             agent { label 'osx' }
+        //             when {
+        //                 expression {
+        //                     ( env.BRANCH_NAME == "develop" ||
+        //                     env.BRANCH_NAME == "master" ||
+        //                     params.run_tests_all_os ) &&
+        //                     !skipRemainingStages
+        //                 }
+        //             }
+        //             steps {
+        //                 unstash 'StanSetup'
+        //                 setupCXX(false, env.CXX, stanc3_bin_url())
+        //                 runTests("src/test/unit")
+        //             }
+        //             post { always { deleteDir() } }
+        //         }
+        //     }
+        // }
         stage('Integration') {
             parallel {
                 stage('Integration Linux') {
@@ -308,14 +308,14 @@ pipeline {
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
-                    // when {
-                    //     expression {
-                    //         ( env.BRANCH_NAME == "develop" ||
-                    //         env.BRANCH_NAME == "master" ||
-                    //         params.run_tests_all_os ) &&
-                    //         !skipRemainingStages
-                    //     }
-                    // }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         sh """
                             git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan --branch remove_big_models_from_testing
@@ -340,26 +340,41 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
-                // stage('Integration Windows') {
-                //     agent { label 'windows-ec2' }
-                //     when {
-                //         expression {
-                //             ( env.BRANCH_NAME == "develop" ||
-                //             env.BRANCH_NAME == "master" ||
-                //             params.run_tests_all_os ) &&
-                //             !skipRemainingStages
-                //         }
-                //     }
-                //     steps {
-                //         deleteDirWin()
-                //             unstash 'StanSetup'
-                //             setupCXX(false, env.CXX, stanc3_bin_url())
-                //             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                //             setupCXX(false)
-                //             runTestsWin("src/test/integration", separateMakeStep=false)
-                //     }
-                //     post { always { deleteDirWin() } }
-                // }
+                stage('Integration Windows') {
+                    agent { label 'windows-ec2' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
+                    steps {
+                        deleteDirWin()
+                        bat """
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan --branch remove_big_models_from_testing
+                        """
+                        dir('performance-tests-cmdstan/cmdstan/stan'){
+                            unstash 'StanSetup'
+                        }        
+                        bat """
+                            cd performance-tests-cmdstan/cmdstan
+                            echo 'O=0' >> make/local
+                            echo 'CXX=${env.CXX}' >> make/local
+                            make -j${env.PARALLEL} build
+                            cd ..
+                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                        """
+                        bat """
+                            cd performance-tests-cmdstan/cmdstan/stan
+                            python ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            python ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            python ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                        """
+                    }
+                    post { always { deleteDirWin() } }
+                }
             }
             when {
                 expression {
