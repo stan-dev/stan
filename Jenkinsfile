@@ -254,7 +254,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         sh """
-                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan --branch remove_big_models_from_testing
                         """
                         script {
                             if (params.cmdstan_pr != 'downstream_tests') {
@@ -308,17 +308,17 @@ pipeline {
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
-                            !skipRemainingStages
-                        }
-                    }
+                    // when {
+                    //     expression {
+                    //         ( env.BRANCH_NAME == "develop" ||
+                    //         env.BRANCH_NAME == "master" ||
+                    //         params.run_tests_all_os ) &&
+                    //         !skipRemainingStages
+                    //     }
+                    // }
                     steps {
                         sh """
-                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan --branch remove_big_models_from_testing
                         """
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
@@ -340,26 +340,26 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
-                stage('Integration Windows') {
-                    agent { label 'windows-ec2' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
-                            !skipRemainingStages
-                        }
-                    }
-                    steps {
-                        deleteDirWin()
-                            unstash 'StanSetup'
-                            setupCXX(false, env.CXX, stanc3_bin_url())
-                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                            setupCXX(false)
-                            runTestsWin("src/test/integration", separateMakeStep=false)
-                    }
-                    post { always { deleteDirWin() } }
-                }
+                // stage('Integration Windows') {
+                //     agent { label 'windows-ec2' }
+                //     when {
+                //         expression {
+                //             ( env.BRANCH_NAME == "develop" ||
+                //             env.BRANCH_NAME == "master" ||
+                //             params.run_tests_all_os ) &&
+                //             !skipRemainingStages
+                //         }
+                //     }
+                //     steps {
+                //         deleteDirWin()
+                //             unstash 'StanSetup'
+                //             setupCXX(false, env.CXX, stanc3_bin_url())
+                //             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+                //             setupCXX(false)
+                //             runTestsWin("src/test/integration", separateMakeStep=false)
+                //     }
+                //     post { always { deleteDirWin() } }
+                // }
             }
             when {
                 expression {
