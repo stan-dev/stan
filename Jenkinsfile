@@ -364,7 +364,7 @@ pipeline {
                             echo 'CXX=${env.CXX}' >> make/local
                             make -j${env.PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                            python ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
                         """
                         bat """
                             cd performance-tests-cmdstan/cmdstan/stan
