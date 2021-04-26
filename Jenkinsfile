@@ -358,12 +358,11 @@ pipeline {
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
                         }
+                        writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${CXX}\nO=0\nPRECOMPILED_HEADERS=true")
                         withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {  
+                            
                             bat """
                                 cd performance-tests-cmdstan/cmdstan
-                                'O=0' | Out-File -FilePath make/local
-                                'CXX=${env.CXX}' | Out-File -FilePath make/local
-                                'PRECOMPILED_HEADERS=tru' | Out-File -FilePath make/local
                                 mingw32-make -j${env.PARALLEL} build
                                 cd ..
                                 python ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
