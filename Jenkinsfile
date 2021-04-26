@@ -358,7 +358,7 @@ pipeline {
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
                         }
-                        writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${CXX}\nO=0\nPRECOMPILED_HEADERS=true")
+                        writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${CXX}\nO=1\nPRECOMPILED_HEADERS=true")
                         withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {  
                             
                             bat """
