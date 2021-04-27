@@ -192,62 +192,62 @@ pipeline {
                 }
             }
         }
-        // stage('Unit tests') {
-        //     when {
-        //         expression {
-        //             !skipRemainingStages
-        //         }
-        //     }
-        //     parallel {
-        //         stage('Windows Headers & Unit') {
-        //             agent { label 'windows' }
-        //             when {
-        //                 expression {
-        //                     ( env.BRANCH_NAME == "develop" ||
-        //                     env.BRANCH_NAME == "master" ||
-        //                     params.run_tests_all_os ) &&
-        //                     !skipRemainingStages
-        //                 }
-        //             }
-        //             steps {
-        //                 deleteDirWin()
-        //                     unstash 'StanSetup'
-        //                     bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-        //                     bat "mingw32-make -j${env.PARALLEL} test-headers"
-        //                     setupCXX(false, env.CXX, stanc3_bin_url())
-        //                     runTestsWin("src/test/unit")
-        //             }
-        //             post { always { deleteDirWin() } }
-        //         }
-        //         stage('Linux Unit') {
-        //             agent { label 'linux' }
-        //             steps {
-        //                 unstash 'StanSetup'
-        //                 setupCXX(true, env.GCC, stanc3_bin_url())
-        //                 sh "make -j${env.PARALLEL} test-headers"
-        //                 runTests("src/test/unit")
-        //             }
-        //             post { always { deleteDir() } }
-        //         }
-        //         stage('Mac Unit') {
-        //             agent { label 'osx' }
-        //             when {
-        //                 expression {
-        //                     ( env.BRANCH_NAME == "develop" ||
-        //                     env.BRANCH_NAME == "master" ||
-        //                     params.run_tests_all_os ) &&
-        //                     !skipRemainingStages
-        //                 }
-        //             }
-        //             steps {
-        //                 unstash 'StanSetup'
-        //                 setupCXX(false, env.CXX, stanc3_bin_url())
-        //                 runTests("src/test/unit")
-        //             }
-        //             post { always { deleteDir() } }
-        //         }
-        //     }
-        // }
+        stage('Unit tests') {
+            when {
+                expression {
+                    !skipRemainingStages
+                }
+            }
+            parallel {
+                stage('Windows Headers & Unit') {
+                    agent { label 'windows' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
+                    steps {
+                        deleteDirWin()
+                            unstash 'StanSetup'
+                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
+                            bat "mingw32-make -j${env.PARALLEL} test-headers"
+                            setupCXX(false, env.CXX, stanc3_bin_url())
+                            runTestsWin("src/test/unit")
+                    }
+                    post { always { deleteDirWin() } }
+                }
+                stage('Linux Unit') {
+                    agent { label 'linux' }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(true, env.GCC, stanc3_bin_url())
+                        sh "make -j${env.PARALLEL} test-headers"
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
+                stage('Mac Unit') {
+                    agent { label 'osx' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(false, env.CXX, stanc3_bin_url())
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
+            }
+        }
         stage('Integration') {
             parallel {
                 stage('Integration Linux') {
