@@ -50,6 +50,7 @@ String integration_tests_flags() {
     } else {
         ''
     }
+}
 
 def isBranch(String b) { env.BRANCH_NAME == b }
 Boolean isPR() { env.CHANGE_URL != null }
