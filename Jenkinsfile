@@ -44,6 +44,12 @@ String stan_pr() {
         env.BRANCH_NAME
     }
 }
+String integration_tests_flags() { 
+    if (params.compile_all_model) {
+        '--no-ignore-models '
+    } else {
+        ''
+    }
 
 def isBranch(String b) { env.BRANCH_NAME == b }
 Boolean isPR() { env.CHANGE_URL != null }
@@ -61,6 +67,7 @@ pipeline {
         string(defaultValue: 'nightly', name: 'stanc3_bin_url',
           description: 'Custom stanc3 binary url')
         booleanParam(defaultValue: false, name: 'run_tests_all_os', description: 'Run unit and integration tests on all OS.')
+        booleanParam(defaultValue: false, name: 'compile_all_models', description: 'Run integration tests on the full test model suite.')
     }
     options {
         skipDefaultCheckout()
@@ -295,7 +302,7 @@ pipeline {
                             echo 'CXX=${env.CXX}' >> make/local
                             make -j${env.PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 cmdstan/stan/src/test/test-models/good
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
@@ -329,7 +336,7 @@ pipeline {
                             echo 'CXX=${env.CXX}' >> make/local
                             make -j${env.PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 cmdstan/stan/src/test/test-models/good
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
@@ -365,7 +372,7 @@ pipeline {
                                 cd performance-tests-cmdstan/cmdstan
                                 mingw32-make -j${env.PARALLEL} build
                                 cd ..
-                                python ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                                python ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 cmdstan/stan/src/test/test-models/good
                             """
                         }
                         bat """
