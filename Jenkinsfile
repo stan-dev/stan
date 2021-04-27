@@ -254,7 +254,7 @@ pipeline {
                     agent { label 'linux' }
                     steps {
                         sh """
-                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan --branch remove_big_models_from_testing
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
                         """
                         script {
                             if (params.cmdstan_pr != 'downstream_tests') {
@@ -318,7 +318,7 @@ pipeline {
                     }
                     steps {
                         sh """
-                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan --branch remove_big_models_from_testing
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
                         """
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
@@ -342,23 +342,23 @@ pipeline {
                 }
                 stage('Integration Windows') {
                     agent { label 'windows-ec2' }
-                    // when {
-                    //     expression {
-                    //         ( env.BRANCH_NAME == "develop" ||
-                    //         env.BRANCH_NAME == "master" ||
-                    //         params.run_tests_all_os ) &&
-                    //         !skipRemainingStages
-                    //     }
-                    // }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         deleteDirWin()
                         bat """
-                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan --branch remove_big_models_from_testing
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
                         """
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
                         }
-                        writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${CXX}\nO=2\nPRECOMPILED_HEADERS=true")
+                        writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${CXX}\nPRECOMPILED_HEADERS=true")
                         withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {  
                             
                             bat """
