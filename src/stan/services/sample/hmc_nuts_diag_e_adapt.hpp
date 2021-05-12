@@ -161,8 +161,8 @@ int hmc_nuts_diag_e_adapt(
  * Euclidean metric with a pre-specified Euclidean metric.
  *
  * @tparam Model Model class
- * @tparam InitContextPtr A type derived from `stan::io::var_context`
- * @tparam InitMetricContext A type derived from `stan::io::var_context`
+ * @tparam InitContextPtr A pointer with underlying type derived from `stan::io::var_context`
+ * @tparam InitInvContextPtr A pointer with underlying type derived from `stan::io::var_context`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
@@ -283,6 +283,10 @@ int hmc_nuts_diag_e_adapt(
  * Euclidean metric.
  *
  * @tparam Model Model class
+ * @tparam InitContextPtr A pointer with underlying type derived from `stan::io::var_context`
+ * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
+ * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
+ * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model to test (with data already instantiated)
  * @param[in] init An std vector of init var contexts for initialization of each
  * chain.
