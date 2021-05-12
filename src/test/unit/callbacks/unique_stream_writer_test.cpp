@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <boost/lexical_cast.hpp>
-#include <stan/callbacks/file_stream_writer.hpp>
+#include <stan/callbacks/unique_stream_writer.hpp>
 
 class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
  public:
@@ -13,7 +13,7 @@ class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
   }
   void TearDown() {}
 
-  stan::callbacks::file_stream_writer writer;
+  stan::callbacks::unique_stream_writer writer;
 };
 
 TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {

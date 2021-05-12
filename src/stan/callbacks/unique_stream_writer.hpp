@@ -1,5 +1,5 @@
-#ifndef STAN_CALLBACKS_FILE_STREAM_WRITER_HPP
-#define STAN_CALLBACKS_FILE_STREAM_WRITER_HPP
+#ifndef STAN_CALLBACKS_UNIQUE_STREAM_WRITER_HPP
+#define STAN_CALLBACKS_UNIQUE_STREAM_WRITER_HPP
 
 #include <stan/callbacks/writer.hpp>
 #include <ostream>
@@ -10,32 +10,33 @@ namespace stan {
 namespace callbacks {
 
 /**
- * <code>file_stream_writer</code> is an implementation
- * of <code>writer</code> that writes to a file.
+ * <code>unique_stream_writer</code> is an implementation
+ * of <code>writer</code> that holds a unique pointer to the stream it is
+ * writing to.
  */
-class file_stream_writer final : public writer {
+class unique_stream_writer final : public writer {
  public:
   /**
-   * Constructs a file stream writer with an output stream
+   * Constructs a unique stream writer with an output stream
    * and an optional prefix for comments.
    *
    * @param[in, out] A unique pointer to a type inheriting from `std::ostream`
    * @param[in] comment_prefix string to stream before each comment line.
    *  Default is "".
    */
-  explicit file_stream_writer(std::unique_ptr<std::ostream>&& output,
+  explicit unique_stream_writer(std::unique_ptr<std::ostream>&& output,
                               const std::string& comment_prefix = "")
       : output_(std::move(output)), comment_prefix_(comment_prefix) {}
 
-  file_stream_writer();
-  file_stream_writer(file_stream_writer& other) = delete;
-  file_stream_writer(file_stream_writer&& other)
+  unique_stream_writer();
+  unique_stream_writer(unique_stream_writer& other) = delete;
+  unique_stream_writer(unique_stream_writer&& other)
       : output_(std::move(other.output_)),
         comment_prefix_(std::move(other.comment_prefix_)) {}
   /**
    * Virtual destructor
    */
-  virtual ~file_stream_writer() {}
+  virtual ~unique_stream_writer() {}
 
   /**
    * Writes a set of names on a single line in csv format followed

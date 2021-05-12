@@ -13,7 +13,6 @@
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/inv_metric.hpp>
-#include <stan/services/util/get_underlying.hpp>
 #include <vector>
 
 namespace stan {
@@ -161,7 +160,7 @@ int hmc_nuts_dense_e_adapt(
  * with a pre-specified Euclidean metric.
  *
  * @tparam Model Model class
- * @tparam InitContext A type derived from `stan::io::var_context`
+ * @tparam InitContextPtr A type derived from `stan::io::var_context`
  * @tparam InitMetricContext A type derived from `stan::io::var_context`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
@@ -203,11 +202,11 @@ int hmc_nuts_dense_e_adapt(
  be the same length as this value.
  * @return error_codes::OK if successful
  */
-template <class Model, typename InitContext, typename InitInvContext,
+template <class Model, typename InitContextPtr, typename InitInvContextPtr,
           typename InitWriter, typename SampleWriter, typename DiagnosticWriter>
 int hmc_nuts_dense_e_adapt(
-    Model& model, const std::vector<InitContext>& init,
-    const std::vector<InitInvContext>& init_inv_metric,
+    Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
+    const std::vector<InitInvContextPtr>& init_inv_metric,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
     int num_warmup, int num_samples, int num_thin, bool save_warmup,
     int refresh, double stepsize, double stepsize_jitter, int max_depth,
@@ -216,11 +215,10 @@ int hmc_nuts_dense_e_adapt(
     callbacks::interrupt& interrupt, callbacks::logger& logger,
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
-    std::vector<DiagnosticWriter>& diagnostic_writer, size_t num_chains) {
-  using util::get_underlying;
+    std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(
-        model, get_underlying(init[0]), get_underlying(init_inv_metric[0]),
+        model, *init[0], *init_inv_metric[0],
         random_seed, init_chain_id, init_radius, num_warmup, num_samples,
         num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
         delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
@@ -237,10 +235,10 @@ int hmc_nuts_dense_e_adapt(
       for (int i = 0; i < num_chains; ++i) {
         rngs.emplace_back(util::create_rng(random_seed, init_chain_id + i));
         cont_vectors.emplace_back(
-            util::initialize(model, get_underlying(init[i]), rngs[i],
+            util::initialize(model, *init[i], rngs[i],
                              init_radius, true, logger, init_writer[i]));
         Eigen::MatrixXd inv_metric = util::read_dense_inv_metric(
-            get_underlying(init_inv_metric[i]), model.num_params_r(), logger);
+            *init_inv_metric[i], model.num_params_r(), logger);
         util::validate_dense_inv_metric(inv_metric, logger);
 
         samplers.emplace_back(model, rngs[i]);
@@ -319,10 +317,10 @@ int hmc_nuts_dense_e_adapt(
  * length as this value.
  * @return error_codes::OK if successful
  */
-template <class Model, typename InitContext, typename InitWriter,
+template <class Model, typename InitContextPtr, typename InitWriter,
           typename SampleWriter, typename DiagnosticWriter>
 int hmc_nuts_dense_e_adapt(
-    Model& model, const std::vector<InitContext>& init,
+    Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
     unsigned int random_seed, unsigned int init_chain_id, double init_radius,
     int num_warmup, int num_samples, int num_thin, bool save_warmup,
     int refresh, double stepsize, double stepsize_jitter, int max_depth,
@@ -331,28 +329,27 @@ int hmc_nuts_dense_e_adapt(
     callbacks::interrupt& interrupt, callbacks::logger& logger,
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
-    std::vector<DiagnosticWriter>& diagnostic_writer, size_t num_chains = 1) {
-  using util::get_underlying;
+    std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(
-        model, get_underlying(init[0]), random_seed, init_chain_id, init_radius,
+        model, *init[0], random_seed, init_chain_id, init_radius,
         num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
         stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
         term_buffer, window, interrupt, logger, init_writer[0],
         sample_writer[0], diagnostic_writer[0]);
   } else {
-    std::vector<stan::io::dump> unit_e_metrics;
+    std::vector<std::unique_ptr<stan::io::dump>> unit_e_metrics;
     unit_e_metrics.reserve(num_chains);
     for (size_t i = 0; i < num_chains; ++i) {
       unit_e_metrics.emplace_back(
-          util::create_unit_e_dense_inv_metric(model.num_params_r()));
+          std::make_unique<stan::io::dump>(util::create_unit_e_dense_inv_metric(model.num_params_r())));
     }
     return hmc_nuts_dense_e_adapt(
-        model, init, unit_e_metrics, random_seed, init_chain_id, init_radius,
+        model, num_chains, init, unit_e_metrics, random_seed, init_chain_id, init_radius,
         num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
         stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
         term_buffer, window, interrupt, logger, init_writer, sample_writer,
-        diagnostic_writer, num_chains);
+        diagnostic_writer);
   }
 }
 
