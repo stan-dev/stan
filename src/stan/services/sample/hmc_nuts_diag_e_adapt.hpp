@@ -219,11 +219,11 @@ int hmc_nuts_diag_e_adapt(
     std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
     return hmc_nuts_diag_e_adapt(
-        model, *init[0], *init_inv_metric[0],
-        random_seed, init_chain_id, init_radius, num_warmup, num_samples,
-        num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
-        delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
-        logger, init_writer[0], sample_writer[0], diagnostic_writer[0]);
+        model, *init[0], *init_inv_metric[0], random_seed, init_chain_id,
+        init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+        stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+        init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
+        sample_writer[0], diagnostic_writer[0]);
   } else {
     using sample_t = stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>;
     std::vector<boost::ecuyer1988> rngs;
@@ -235,9 +235,9 @@ int hmc_nuts_diag_e_adapt(
     try {
       for (int i = 0; i < num_chains; ++i) {
         rngs.emplace_back(util::create_rng(random_seed, init_chain_id + i));
-        cont_vectors.emplace_back(
-            util::initialize(model, *init[i], rngs[i],
-                             init_radius, true, logger, init_writer[i]));
+        cont_vectors.emplace_back(util::initialize(model, *init[i], rngs[i],
+                                                   init_radius, true, logger,
+                                                   init_writer[i]));
         samplers.emplace_back(model, rngs[i]);
         Eigen::VectorXd inv_metric = util::read_diag_inv_metric(
             *init_inv_metric[i], model.num_params_r(), logger);
@@ -337,24 +337,24 @@ int hmc_nuts_diag_e_adapt(
     std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
     return hmc_nuts_diag_e_adapt(
-        model, *init[0], random_seed, init_chain_id, init_radius,
-        num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
-        stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
-        term_buffer, window, interrupt, logger, init_writer[0],
-        sample_writer[0], diagnostic_writer[0]);
+        model, *init[0], random_seed, init_chain_id, init_radius, num_warmup,
+        num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
+        max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
+        interrupt, logger, init_writer[0], sample_writer[0],
+        diagnostic_writer[0]);
   } else {
     std::vector<std::unique_ptr<stan::io::dump>> unit_e_metrics;
     unit_e_metrics.reserve(num_chains);
     for (size_t i = 0; i < num_chains; ++i) {
-      unit_e_metrics.emplace_back(
-          std::make_unique<stan::io::dump>(util::create_unit_e_diag_inv_metric(model.num_params_r())));
+      unit_e_metrics.emplace_back(std::make_unique<stan::io::dump>(
+          util::create_unit_e_diag_inv_metric(model.num_params_r())));
     }
     return hmc_nuts_diag_e_adapt(
-        model, num_chains, init, unit_e_metrics, random_seed, init_chain_id, init_radius,
-        num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
-        stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
-        term_buffer, window, interrupt, logger, init_writer, sample_writer,
-        diagnostic_writer);
+        model, num_chains, init, unit_e_metrics, random_seed, init_chain_id,
+        init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
+        stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
+        init_buffer, term_buffer, window, interrupt, logger, init_writer,
+        sample_writer, diagnostic_writer);
   }
 }
 

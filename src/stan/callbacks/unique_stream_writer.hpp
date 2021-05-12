@@ -25,7 +25,7 @@ class unique_stream_writer final : public writer {
    *  Default is "".
    */
   explicit unique_stream_writer(std::unique_ptr<std::ostream>&& output,
-                              const std::string& comment_prefix = "")
+                                const std::string& comment_prefix = "")
       : output_(std::move(output)), comment_prefix_(comment_prefix) {}
 
   unique_stream_writer();
