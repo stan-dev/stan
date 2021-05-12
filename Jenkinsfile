@@ -44,6 +44,13 @@ String stan_pr() {
         env.BRANCH_NAME
     }
 }
+String integration_tests_flags() { 
+    if (params.compile_all_model) {
+        '--no-ignore-models '
+    } else {
+        ''
+    }
+}
 
 def isBranch(String b) { env.BRANCH_NAME == b }
 Boolean isPR() { env.CHANGE_URL != null }
@@ -61,6 +68,7 @@ pipeline {
         string(defaultValue: 'nightly', name: 'stanc3_bin_url',
           description: 'Custom stanc3 binary url')
         booleanParam(defaultValue: false, name: 'run_tests_all_os', description: 'Run unit and integration tests on all OS.')
+        booleanParam(defaultValue: false, name: 'compile_all_models', description: 'Run integration tests on the full test model suite.')
     }
     options {
         skipDefaultCheckout()
@@ -295,7 +303,7 @@ pipeline {
                             echo 'CXX=${env.CXX}' >> make/local
                             make -j${env.PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 cmdstan/stan/src/test/test-models/good
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
@@ -329,7 +337,7 @@ pipeline {
                             echo 'CXX=${env.CXX}' >> make/local
                             make -j${env.PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${env.PARALLEL} --runs=0 cmdstan/stan/src/test/test-models/good
+                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 cmdstan/stan/src/test/test-models/good
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
@@ -352,11 +360,28 @@ pipeline {
                     }
                     steps {
                         deleteDirWin()
+                        bat """
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                        """
+                        dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
-                            setupCXX(false, env.CXX, stanc3_bin_url())
-                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                            setupCXX(false)
-                            runTestsWin("src/test/integration", separateMakeStep=false)
+                        }
+                        writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${CXX}\nPRECOMPILED_HEADERS=true")
+                        withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {  
+                            
+                            bat """
+                                cd performance-tests-cmdstan/cmdstan
+                                mingw32-make -j${env.PARALLEL} build
+                                cd ..
+                                python ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 cmdstan/stan/src/test/test-models/good
+                            """
+                        }
+                        bat """
+                            cd performance-tests-cmdstan/cmdstan/stan
+                            python ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            python ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            python ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                        """
                     }
                     post { always { deleteDirWin() } }
                 }
