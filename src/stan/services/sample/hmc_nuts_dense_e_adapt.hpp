@@ -160,8 +160,10 @@ int hmc_nuts_dense_e_adapt(
  * with a pre-specified Euclidean metric.
  *
  * @tparam Model Model class
- * @tparam InitContextPtr A pointer with underlying type derived from `stan::io::var_context`
- * @tparam InitInvContextPtr A pointer with underlying type derived from `stan::io::var_context`
+ * @tparam InitContextPtr A pointer with underlying type derived from
+ `stan::io::var_context`
+ * @tparam InitInvContextPtr A pointer with underlying type derived from
+ `stan::io::var_context`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
@@ -282,7 +284,8 @@ int hmc_nuts_dense_e_adapt(
  * with identity matrix as initial inv_metric.
  *
  * @tparam Model Model class
- * @tparam InitContextPtr A pointer with underlying type derived from `stan::io::var_context`
+ * @tparam InitContextPtr A pointer with underlying type derived from
+ * `stan::io::var_context`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
