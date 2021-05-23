@@ -82,7 +82,8 @@ class base_hmc : public base_mcmc {
     ps_point z_init(this->z_);
 
     // Skip initialization for extreme step sizes
-    if (this->nom_epsilon_ == 0 || this->nom_epsilon_ > 1e7)
+    if (this->nom_epsilon_ == 0 || this->nom_epsilon_ > 1e7
+        || std::isnan(this->nom_epsilon_))
       return;
 
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);
