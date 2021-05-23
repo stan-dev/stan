@@ -351,28 +351,49 @@ class normal_fullrank : public base_family {
     return (L_chol_ * eta) + mu_;
   }
 
+  /**
+   * Sample from the variational distribution.
+   *
+   * @tparam BaseRNG Random number generator class.
+   * @param[in] rng Random number generator.
+   * @param[in,out] zeta Input standard normals, output variational sample.
+   */
   template <class BaseRNG>
-  void sample(BaseRNG& rng, Eigen::VectorXd& eta) const {
+  void sample(BaseRNG& rng, Eigen::VectorXd& zeta) const {
     // Draw from standard normal and transform to real-coordinate space
     for (int d = 0; d < dimension(); ++d)
-      eta(d) = stan::math::normal_rng(0, 1, rng);
-    eta = transform(eta);
+      zeta(d) = stan::math::normal_rng(0, 1, rng);
+    zeta = transform(zeta);
   }
 
+  /**
+   * Sample from the variational distribution and return its log normal
+   * density.
+   *
+   * @tparam BaseRNG Random number generator class.
+   * @param[in] rng Random number generator.
+   * @param[in,out] zeta Input standard normals, output variational sample.
+   * @param[in] log_g The log-probability of the sample.
+   */
   template <class BaseRNG>
-  void sample_log_g(BaseRNG& rng, Eigen::VectorXd& eta, double& log_g) const {
+  void sample_log_g(BaseRNG& rng, Eigen::VectorXd& zeta, double& log_g) const {
     // Draw from the approximation
     for (int d = 0; d < dimension(); ++d) {
-      eta(d) = stan::math::normal_rng(0, 1, rng);
+      zeta(d) = stan::math::normal_rng(0, 1, rng);
     }
     // Compute the log density before transformation
-    log_g = calc_log_g(eta);
+    log_g = calc_log_g(zeta);
     // Transform to real-coordinate space
-    eta = transform(eta);
+    zeta = transform(zeta);
   }
 
+  /**
+   * Calculate the log-density of a vector of independent std normals.
+   *
+   * @param[in] eta The random sample.
+   * @return The log-probability of the random sample.
+   */
   double calc_log_g(const Eigen::VectorXd& eta) const {
-    // Compute the log density wrt normal distribution dropping constants
     double log_g = 0;
     for (int d = 0; d < dimension(); ++d) {
       log_g += -stan::math::square(eta(d)) * 0.5;

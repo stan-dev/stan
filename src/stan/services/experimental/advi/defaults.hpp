@@ -10,6 +10,17 @@ namespace experimental {
 namespace advi {
 
 /**
+ * Rank of the approximation when using low-rank ADVI.
+ */
+struct rank {
+  static std::string description() {
+    return "Rank of the covariance approximation when using low-rank ADVI.";
+  }
+
+  static int default_value() { return 1; }
+};
+
+/**
  * Number of samples for Monte Carlo estimate of gradients.
  */
 struct gradient_samples {
