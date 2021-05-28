@@ -55,6 +55,11 @@ inline T rvalue(T&& x, const char* /*name*/) {
   return std::forward<T>(x);
 }
 
+template <typename T>
+inline T& rvalue(T& x, const char* /*name*/) {
+  return x;
+}
+
 /**
  * Return the result of indexing a type without taking a subset. Mostly used as
  * an intermediary rvalue function when doing multiple subsets.
@@ -68,6 +73,11 @@ inline T rvalue(T&& x, const char* /*name*/) {
 template <typename T>
 inline T rvalue(T&& x, const char* /*name*/, index_omni /*idx*/) {
   return std::forward<T>(x);
+}
+
+template <typename T>
+inline T& rvalue(T& x, const char* /*name*/, index_omni /*idx*/) {
+  return x;
 }
 
 /**
@@ -84,6 +94,12 @@ template <typename T>
 inline T rvalue(T&& x, const char* name, index_omni /*idx1*/,
                 index_omni /*idx2*/) {
   return std::forward<T>(x);
+}
+
+template <typename T>
+inline T& rvalue(T& x, const char* name, index_omni /*idx1*/,
+                index_omni /*idx2*/) {
+  return x;
 }
 
 /**
@@ -675,6 +691,16 @@ inline auto rvalue(StdVec&& v, const char* name, index_uni idx1,
  */
 template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, index_uni idx) {
+  math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
+  if (std::is_rvalue_reference<StdVec>::value) {
+    return std::move(v[idx.n_ - 1]);
+  } else {
+    return v[idx.n_ - 1];
+  }
+}
+
+template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+inline auto& rvalue(StdVec& v, const char* name, index_uni idx) {
   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
   return v[idx.n_ - 1];
 }
