@@ -60,6 +60,11 @@ inline T& rvalue(T& x, const char* /*name*/) {
   return x;
 }
 
+template <typename T>
+inline const T& rvalue(const T& x, const char* /*name*/) {
+  return x;
+}
+
 /**
  * Return the result of indexing a type without taking a subset. Mostly used as
  * an intermediary rvalue function when doing multiple subsets.
@@ -77,6 +82,11 @@ inline T rvalue(T&& x, const char* /*name*/, index_omni /*idx*/) {
 
 template <typename T>
 inline T& rvalue(T& x, const char* /*name*/, index_omni /*idx*/) {
+  return x;
+}
+
+template <typename T>
+inline const T& rvalue(const T& x, const char* /*name*/, index_omni /*idx*/) {
   return x;
 }
 
@@ -98,6 +108,12 @@ inline T rvalue(T&& x, const char* name, index_omni /*idx1*/,
 
 template <typename T>
 inline T& rvalue(T& x, const char* name, index_omni /*idx1*/,
+                index_omni /*idx2*/) {
+  return x;
+}
+
+template <typename T>
+inline const T& rvalue(const T& x, const char* name, index_omni /*idx1*/,
                 index_omni /*idx2*/) {
   return x;
 }
@@ -138,7 +154,7 @@ template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
 inline plain_type_t<EigVec> rvalue(EigVec&& v, const char* name,
                                    const index_multi& idx) {
   const auto v_size = v.size();
-  const auto& v_ref = stan::math::to_ref(v);
+  auto&& v_ref = stan::math::to_ref(std::forward<EigVec>(v));
   plain_type_t<EigVec> ret_v(idx.ns_.size());
   for (int i = 0; i < idx.ns_.size(); ++i) {
     math::check_range("vector[multi] indexing", name, v_ref.size(), idx.ns_[i]);
@@ -245,7 +261,7 @@ inline auto rvalue(Mat&& x, const char* name, index_uni idx) {
 template <typename EigMat, require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline plain_type_t<EigMat> rvalue(EigMat&& x, const char* name,
                                    const index_multi& idx) {
-  const auto& x_ref = stan::math::to_ref(x);
+  auto&& x_ref = stan::math::to_ref(std::forward<EigMat>(x));
   plain_type_t<EigMat> x_ret(idx.ns_.size(), x.cols());
   for (int i = 0; i < idx.ns_.size(); ++i) {
     const int n = idx.ns_[i];
@@ -449,7 +465,7 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
     index_uni col_idx) {
   math::check_range("matrix[multi, uni] column indexing", name, x.cols(),
                     col_idx.n_);
-  const auto& x_ref = stan::math::to_ref(x);
+  auto&& x_ref = stan::math::to_ref(std::forward<EigMat>(x));
   Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> x_ret(
       row_idx.ns_.size());
   for (int i = 0; i < row_idx.ns_.size(); ++i) {
@@ -477,7 +493,7 @@ template <typename EigMat, require_eigen_dense_dynamic_t<EigMat>* = nullptr>
 inline plain_type_t<EigMat> rvalue(EigMat&& x, const char* name,
                                    const index_multi& row_idx,
                                    const index_multi& col_idx) {
-  const auto& x_ref = stan::math::to_ref(x);
+  auto&& x_ref = stan::math::to_ref(std::forward<EigMat>(x));
   const int rows = row_idx.ns_.size();
   const int cols = col_idx.ns_.size();
   plain_type_t<EigMat> x_ret(rows, cols);
@@ -535,7 +551,7 @@ template <typename EigMat, typename Idx,
 inline plain_type_t<EigMat> rvalue(EigMat&& x, const char* name,
                                    const Idx& row_idx,
                                    const index_multi& col_idx) {
-  const auto& x_ref = stan::math::to_ref(x);
+  auto&& x_ref = stan::math::to_ref(std::forward<EigMat>(x));
   const int rows = rvalue_index_size(row_idx, x_ref.rows());
   const int cols = rvalue_index_size(col_idx, x_ref.cols());
   plain_type_t<EigMat> x_ret(rows, col_idx.ns_.size());
@@ -701,6 +717,12 @@ inline auto rvalue(StdVec&& v, const char* name, index_uni idx) {
 
 template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
 inline auto& rvalue(StdVec& v, const char* name, index_uni idx) {
+  math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
+  return v[idx.n_ - 1];
+}
+
+template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+inline const auto& rvalue(const StdVec& v, const char* name, index_uni idx) {
   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
   return v[idx.n_ - 1];
 }
