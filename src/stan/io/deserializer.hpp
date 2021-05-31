@@ -330,7 +330,7 @@ class deserializer {
             require_not_same_t<value_type_t<Ret>, T>* = nullptr>
   inline auto read(Eigen::Index m, Sizes... dims) {
     if (unlikely(m == 0)) {
-      return Ret();
+      return std::decay_t<Ret>();
     } else {
       std::decay_t<Ret> ret_vec;
       ret_vec.reserve(m);
@@ -342,19 +342,17 @@ class deserializer {
   }
 
   /**
-   * Return an `std::vector`
+   * Return an `std::vector` of scalars
    * @tparam Ret The type to return.
    * @tparam Sizes integral types.
    * @param m The size of the vector.
-   * @param dims a possible set of inner container sizes passed to subsequent
-   * `read` functions.
    */
   template <typename Ret, typename... Sizes,
             require_std_vector_t<Ret>* = nullptr,
             require_same_t<value_type_t<Ret>, T>* = nullptr>
   inline auto read(Eigen::Index m) {
     if (unlikely(m == 0)) {
-      return Ret();
+      return std::decay_t<Ret>();
     } else {
       check_r_capacity(m);
       const auto *start_pos = &this->map_r_.coeffRef(this->pos_r_);
