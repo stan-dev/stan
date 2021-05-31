@@ -53,6 +53,7 @@ class deserializer {
    * @throws std::runtime_error if there aren't at least m reals left
    */
   void check_r_capacity(size_t m) const {
+    STAN_NO_RANGE_CHECKS_RETURN;
     if (pos_r_ + m > r_size_) {
       []() STAN_COLD_PATH {
         throw std::runtime_error("no more scalars to read");
@@ -66,6 +67,7 @@ class deserializer {
    * @throws std::runtime_error if there aren't at least m integers left
    */
   void check_i_capacity(size_t m) const {
+    STAN_NO_RANGE_CHECKS_RETURN;
     if (pos_i_ + m > i_size_) {
       []() STAN_COLD_PATH {
         throw std::runtime_error("no more integers to read");
@@ -324,10 +326,11 @@ class deserializer {
    * `read` functions.
    */
   template <typename Ret, typename... Sizes,
-            require_std_vector_t<Ret>* = nullptr>
+            require_std_vector_t<Ret>* = nullptr,
+            require_not_same_t<value_type_t<Ret>, T>* = nullptr>
   inline auto read(Eigen::Index m, Sizes... dims) {
     if (unlikely(m == 0)) {
-      return Ret();
+      return std::decay_t<Ret>();
     } else {
       std::decay_t<Ret> ret_vec;
       ret_vec.reserve(m);
@@ -335,6 +338,27 @@ class deserializer {
         ret_vec.emplace_back(this->read<value_type_t<Ret>>(dims...));
       }
       return ret_vec;
+    }
+  }
+
+  /**
+   * Return an `std::vector` of scalars
+   * @tparam Ret The type to return.
+   * @tparam Sizes integral types.
+   * @param m The size of the vector.
+   */
+  template <typename Ret, typename... Sizes,
+            require_std_vector_t<Ret>* = nullptr,
+            require_same_t<value_type_t<Ret>, T>* = nullptr>
+  inline auto read(Eigen::Index m) {
+    if (unlikely(m == 0)) {
+      return std::decay_t<Ret>();
+    } else {
+      check_r_capacity(m);
+      const auto* start_pos = &this->map_r_.coeffRef(this->pos_r_);
+      const auto* end_pos = &this->map_r_.coeffRef(this->pos_r_ + m);
+      this->pos_r_ += m;
+      return std::decay_t<Ret>(start_pos, end_pos);
     }
   }
 
