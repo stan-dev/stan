@@ -355,8 +355,8 @@ class deserializer {
       return std::decay_t<Ret>();
     } else {
       check_r_capacity(m);
-      const auto *start_pos = &this->map_r_.coeffRef(this->pos_r_);
-      const auto *end_pos = &this->map_r_.coeffRef(this->pos_r_ + m);
+      const auto* start_pos = &this->map_r_.coeffRef(this->pos_r_);
+      const auto* end_pos = &this->map_r_.coeffRef(this->pos_r_ + m);
       this->pos_r_ += m;
       return std::decay_t<Ret>(start_pos, end_pos);
     }

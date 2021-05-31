@@ -108,13 +108,13 @@ inline T rvalue(T&& x, const char* name, index_omni /*idx1*/,
 
 template <typename T>
 inline T& rvalue(T& x, const char* name, index_omni /*idx1*/,
-                index_omni /*idx2*/) {
+                 index_omni /*idx2*/) {
   return x;
 }
 
 template <typename T>
 inline const T& rvalue(const T& x, const char* name, index_omni /*idx1*/,
-                index_omni /*idx2*/) {
+                       index_omni /*idx2*/) {
   return x;
 }
 
