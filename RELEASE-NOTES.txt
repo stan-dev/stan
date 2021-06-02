@@ -13,7 +13,7 @@ v2.27.0 (2 June 2021)
 - Removed unuse template keyword to fix for clang 12+. (#3026)
 - Added more robust detection of improper posteriors by checking that metric does not overflow during adaptation. (#3030)
 
-v2.26.1 (15 February 2021)
+v2.26.1 (17 February 2021)
 ======================================================================
 
 - Updated Math to v4.0.1
