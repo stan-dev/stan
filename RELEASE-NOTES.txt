@@ -5,7 +5,15 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
-v2.26.1 (15 February 2021)
+v2.27.0 (2 June 2021)
+======================================================================
+
+- Refactored indexing functions (renaming, replaces indexing structure in favor of variadic arguments). (#3011)
+- Added the serializer and deserializer classes for reading/writing constraints in the generated C++ easier. (#3013, #3018, #3019, #3024, #3036)
+- Removed unuse template keyword to fix for clang 12+. (#3026)
+- Added more robust detection of improper posteriors by checking that metric does not overflow during adaptation. (#3030)
+
+v2.26.1 (17 February 2021)
 ======================================================================
 
 - Updated Math to v4.0.1
