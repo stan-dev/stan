@@ -153,10 +153,9 @@ inline auto rvalue(Vec&& v, const char* name, index_uni idx) {
 template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
 inline auto rvalue(EigVec&& v, const char* name,
                                    const index_multi& idx) {
-  const auto& v_ref = stan::math::to_ref(v);
   return plain_type_t<EigVec>::NullaryExpr(
       idx.ns_.size(),
-      [name, &idx, &v_ref](Eigen::Index i) {
+      [name, &idx, v_ref = stan::math::to_ref(v)](Eigen::Index i) {
         math::check_range("vector[multi] indexing", name, v_ref.size(),
                           idx.ns_[i]);
         return v_ref.coeff(idx.ns_[i] - 1);
