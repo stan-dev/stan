@@ -28,6 +28,14 @@ class covar_adaptation : public windowed_adaptation {
               + 1e-3 * (5.0 / (n + 5.0))
                     * Eigen::MatrixXd::Identity(covar.rows(), covar.cols());
 
+      if (!covar.allFinite())
+        throw std::runtime_error(
+            "Numerical overflow in metric adaptation. "
+            "This occurs when the sampler encounters extreme values on the "
+            "unconstrained space; this may happen when the posterior density "
+            "function is too wide or improper. "
+            "There may be problems with your model specification.");
+
       estimator_.restart();
 
       ++adapt_window_counter_;
