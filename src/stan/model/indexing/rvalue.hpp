@@ -746,8 +746,8 @@ template <typename StdVec, typename Idx1, typename... Idxs,
           require_not_same_t<Idx1, index_uni>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, Idx1 idx1,
                    const Idxs&... idxs) {
-  using inner_type = plain_type_t<decltype(rvalue(v[rvalue_at(0, idx1) - 1],
-                                                  name, idxs...))>;
+  using inner_type = plain_type_t<decltype(
+      rvalue(v[rvalue_at(0, idx1) - 1], name, idxs...))>;
   std::vector<inner_type> result;
   const int index_size = rvalue_index_size(idx1, v.size());
   if (index_size > 0) {
