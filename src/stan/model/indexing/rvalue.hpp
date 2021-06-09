@@ -151,8 +151,7 @@ inline auto rvalue(Vec&& v, const char* name, index_uni idx) {
  * the indexed size.
  */
 template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
-inline auto rvalue(EigVec&& v, const char* name,
-                                   const index_multi& idx) {
+inline auto rvalue(EigVec&& v, const char* name, const index_multi& idx) {
   return plain_type_t<EigVec>::NullaryExpr(
       idx.ns_.size(),
       [name, &idx, v_ref = stan::math::to_ref(v)](Eigen::Index i) {
@@ -439,8 +438,8 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
   return Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic>::NullaryExpr(
       col_idx.ns_.size(), [name, row_i = row_idx.n_ - 1, &col_idx,
                            &x_ref = stan::math::to_ref(x)](Eigen::Index i) {
-        math::check_range("matrix[uni, multi] column indexing", name, x_ref.cols(),
-                          col_idx.ns_[i]);
+        math::check_range("matrix[uni, multi] column indexing", name,
+                          x_ref.cols(), col_idx.ns_[i]);
         return x_ref.coeff(row_i, col_idx.ns_[i] - 1);
       });
 }
@@ -747,8 +746,8 @@ template <typename StdVec, typename Idx1, typename... Idxs,
           require_not_same_t<Idx1, index_uni>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, Idx1 idx1,
                    const Idxs&... idxs) {
-  using inner_type = plain_type_t<decltype(
-      rvalue(v[rvalue_at(0, idx1) - 1], name, idxs...))>;
+  using inner_type = plain_type_t<decltype(rvalue(v[rvalue_at(0, idx1) - 1],
+                                                  name, idxs...))>;
   std::vector<inner_type> result;
   const int index_size = rvalue_index_size(idx1, v.size());
   if (index_size > 0) {
