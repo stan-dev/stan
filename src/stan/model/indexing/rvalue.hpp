@@ -152,13 +152,16 @@ inline auto rvalue(Vec&& v, const char* name, index_uni idx) {
  */
 template <typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
 inline auto rvalue(EigVec&& v, const char* name, const index_multi& idx) {
-  return plain_type_t<EigVec>::NullaryExpr(
-      idx.ns_.size(),
-      [name, &idx, v_ref = stan::math::to_ref(v)](Eigen::Index i) {
-        math::check_range("vector[multi] indexing", name, v_ref.size(),
-                          idx.ns_[i]);
-        return v_ref.coeff(idx.ns_[i] - 1);
-      });
+  return stan::math::make_holder(
+      [name, &idx](auto& v_ref) {
+        return plain_type_t<EigVec>::NullaryExpr(
+            idx.ns_.size(), [name, &idx, &v_ref](Eigen::Index i) {
+              math::check_range("vector[multi] indexing", name, v_ref.size(),
+                                idx.ns_[i]);
+              return v_ref.coeff(idx.ns_[i] - 1);
+            });
+      },
+      stan::math::to_ref(v));
 }
 
 /**
@@ -262,12 +265,15 @@ inline plain_type_t<EigMat> rvalue(EigMat&& x, const char* name,
   for (int i = 0; i < idx.ns_.size(); ++i) {
     math::check_range("matrix[multi] row indexing", name, x.rows(), idx.ns_[i]);
   }
-  return plain_type_t<EigMat>::NullaryExpr(
-      idx.ns_.size(), x.cols(),
-      [name, &idx, &x_ref = stan::math::to_ref(x)](Eigen::Index i,
-                                                   Eigen::Index j) {
-        return x_ref.coeff(idx.ns_[i] - 1, j);
-      });
+  return stan::math::make_holder(
+      [name, &idx](auto& x_ref) {
+        return plain_type_t<EigMat>::NullaryExpr(
+            idx.ns_.size(), x_ref.cols(),
+            [name, &idx, &x_ref](Eigen::Index i, Eigen::Index j) {
+              return x_ref.coeff(idx.ns_[i] - 1, j);
+            });
+      },
+      stan::math::to_ref(x));
 }
 
 /**
@@ -435,13 +441,18 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
   math::check_range("matrix[uni, multi] row indexing", name, x.rows(),
                     row_idx.n_);
 
-  return Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic>::NullaryExpr(
-      col_idx.ns_.size(), [name, row_i = row_idx.n_ - 1, &col_idx,
-                           &x_ref = stan::math::to_ref(x)](Eigen::Index i) {
-        math::check_range("matrix[uni, multi] column indexing", name,
-                          x_ref.cols(), col_idx.ns_[i]);
-        return x_ref.coeff(row_i, col_idx.ns_[i] - 1);
-      });
+
+  return stan::math::make_holder(
+      [name, row_idx, &col_idx](auto& x_ref) {
+      return Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic>::NullaryExpr(
+          col_idx.ns_.size(), [name, row_i = row_idx.n_ - 1, &col_idx,
+                               &x_ref](Eigen::Index i) {
+            math::check_range("matrix[uni, multi] column indexing", name,
+                              x_ref.cols(), col_idx.ns_[i]);
+            return x_ref.coeff(row_i, col_idx.ns_[i] - 1);
+          });
+      },
+      stan::math::to_ref(x));
 }
 
 /**
@@ -464,13 +475,17 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
   math::check_range("matrix[multi, uni] column indexing", name, x.cols(),
                     col_idx.n_);
 
-  return Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1>::NullaryExpr(
-      row_idx.ns_.size(), [name, &row_idx, col_i = col_idx.n_ - 1,
-                           &x_ref = stan::math::to_ref(x)](Eigen::Index i) {
-        math::check_range("matrix[multi, uni] row indexing", name, x_ref.rows(),
-                          row_idx.ns_[i]);
-        return x_ref.coeff(row_idx.ns_[i] - 1, col_i);
-      });
+  return stan::math::make_holder(
+      [name, &row_idx, col_idx](auto& x_ref) {
+      return Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1>::NullaryExpr(
+          row_idx.ns_.size(), [name, &row_idx, col_i = col_idx.n_ - 1,
+                               &x_ref](Eigen::Index i) {
+            math::check_range("matrix[multi, uni] row indexing", name, x_ref.rows(),
+                              row_idx.ns_[i]);
+            return x_ref.coeff(row_idx.ns_[i] - 1, col_i);
+          });
+      },
+      stan::math::to_ref(x));
 }
 
 /**
