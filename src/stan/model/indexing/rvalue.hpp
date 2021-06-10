@@ -441,16 +441,15 @@ inline Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic> rvalue(
   math::check_range("matrix[uni, multi] row indexing", name, x.rows(),
                     row_idx.n_);
 
-
   return stan::math::make_holder(
       [name, row_idx, &col_idx](auto& x_ref) {
-      return Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic>::NullaryExpr(
-          col_idx.ns_.size(), [name, row_i = row_idx.n_ - 1, &col_idx,
-                               &x_ref](Eigen::Index i) {
-            math::check_range("matrix[uni, multi] column indexing", name,
-                              x_ref.cols(), col_idx.ns_[i]);
-            return x_ref.coeff(row_i, col_idx.ns_[i] - 1);
-          });
+        return Eigen::Matrix<value_type_t<EigMat>, 1, Eigen::Dynamic>::
+            NullaryExpr(col_idx.ns_.size(), [name, row_i = row_idx.n_ - 1,
+                                             &col_idx, &x_ref](Eigen::Index i) {
+              math::check_range("matrix[uni, multi] column indexing", name,
+                                x_ref.cols(), col_idx.ns_[i]);
+              return x_ref.coeff(row_i, col_idx.ns_[i] - 1);
+            });
       },
       stan::math::to_ref(x));
 }
@@ -477,13 +476,14 @@ inline Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1> rvalue(
 
   return stan::math::make_holder(
       [name, &row_idx, col_idx](auto& x_ref) {
-      return Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1>::NullaryExpr(
-          row_idx.ns_.size(), [name, &row_idx, col_i = col_idx.n_ - 1,
-                               &x_ref](Eigen::Index i) {
-            math::check_range("matrix[multi, uni] row indexing", name, x_ref.rows(),
-                              row_idx.ns_[i]);
-            return x_ref.coeff(row_idx.ns_[i] - 1, col_i);
-          });
+        return Eigen::Matrix<value_type_t<EigMat>, Eigen::Dynamic, 1>::
+            NullaryExpr(row_idx.ns_.size(),
+                        [name, &row_idx, col_i = col_idx.n_ - 1,
+                         &x_ref](Eigen::Index i) {
+                          math::check_range("matrix[multi, uni] row indexing",
+                                            name, x_ref.rows(), row_idx.ns_[i]);
+                          return x_ref.coeff(row_idx.ns_[i] - 1, col_i);
+                        });
       },
       stan::math::to_ref(x));
 }
@@ -694,15 +694,19 @@ inline auto rvalue(Mat&& x, const char* name, const Idx& row_idx,
  * @return Result of indexing array.
  */
 template <typename StdVec, typename... Idxs,
-          require_std_vector_t<StdVec>* = nullptr>
+          require_std_vector_t<StdVec>* = nullptr,
+          require_not_t<std::is_reference<StdVec>>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, index_uni idx1,
                    const Idxs&... idxs) {
   math::check_range("array[uni, ...] index", name, v.size(), idx1.n_);
-  if (std::is_rvalue_reference<StdVec>::value) {
-    return rvalue(std::move(v[idx1.n_ - 1]), name, idxs...);
-  } else {
-    return rvalue(v[idx1.n_ - 1], name, idxs...);
-  }
+  return rvalue(std::move(v[idx1.n_ - 1]), name, idxs...);
+}
+template <typename StdVec, typename... Idxs,
+          require_std_vector_t<StdVec>* = nullptr>
+inline auto rvalue(StdVec& v, const char* name, index_uni idx1,
+                   const Idxs&... idxs) {
+  math::check_range("array[uni, ...] index", name, v.size(), idx1.n_);
+  return rvalue(v[idx1.n_ - 1], name, idxs...);
 }
 
 /**
@@ -717,24 +721,14 @@ inline auto rvalue(StdVec&& v, const char* name, index_uni idx1,
  * @param[in] idx single index
  * @return Result of indexing array.
  */
-template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+template <typename StdVec, require_std_vector_t<StdVec>* = nullptr,
+          require_not_t<std::is_reference<StdVec>>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, index_uni idx) {
-  math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
-  if (std::is_rvalue_reference<StdVec>::value) {
-    return std::move(v[idx.n_ - 1]);
-  } else {
-    return v[idx.n_ - 1];
-  }
-}
-
-template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-inline auto& rvalue(StdVec& v, const char* name, index_uni idx) {
   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
   return v[idx.n_ - 1];
 }
-
 template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-inline const auto& rvalue(const StdVec& v, const char* name, index_uni idx) {
+inline auto& rvalue(StdVec& v, const char* name, index_uni idx) {
   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
   return v[idx.n_ - 1];
 }
@@ -761,8 +755,8 @@ template <typename StdVec, typename Idx1, typename... Idxs,
           require_not_same_t<Idx1, index_uni>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, Idx1 idx1,
                    const Idxs&... idxs) {
-  using inner_type = plain_type_t<decltype(
-      rvalue(v[rvalue_at(0, idx1) - 1], name, idxs...))>;
+  using inner_type = plain_type_t<decltype(rvalue(v[rvalue_at(0, idx1) - 1],
+                                                  name, idxs...))>;
   std::vector<inner_type> result;
   const int index_size = rvalue_index_size(idx1, v.size());
   if (index_size > 0) {
