@@ -266,10 +266,10 @@ inline plain_type_t<EigMat> rvalue(EigMat&& x, const char* name,
     math::check_range("matrix[multi] row indexing", name, x.rows(), idx.ns_[i]);
   }
   return stan::math::make_holder(
-      [name, &idx](auto& x_ref) {
+      [&idx](auto& x_ref) {
         return plain_type_t<EigMat>::NullaryExpr(
             idx.ns_.size(), x_ref.cols(),
-            [name, &idx, &x_ref](Eigen::Index i, Eigen::Index j) {
+            [&idx, &x_ref](Eigen::Index i, Eigen::Index j) {
               return x_ref.coeff(idx.ns_[i] - 1, j);
             });
       },
@@ -695,7 +695,7 @@ inline auto rvalue(Mat&& x, const char* name, const Idx& row_idx,
  */
 template <typename StdVec, typename... Idxs,
           require_std_vector_t<StdVec>* = nullptr,
-          require_not_t<std::is_reference<StdVec>>* = nullptr>
+          require_not_t<std::is_lvalue_reference<StdVec&&>>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, index_uni idx1,
                    const Idxs&... idxs) {
   math::check_range("array[uni, ...] index", name, v.size(), idx1.n_);
@@ -722,7 +722,7 @@ inline auto rvalue(StdVec& v, const char* name, index_uni idx1,
  * @return Result of indexing array.
  */
 template <typename StdVec, require_std_vector_t<StdVec>* = nullptr,
-          require_not_t<std::is_reference<StdVec>>* = nullptr>
+          require_not_t<std::is_lvalue_reference<StdVec&&>>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, index_uni idx) {
   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
   return v[idx.n_ - 1];
