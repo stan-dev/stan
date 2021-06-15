@@ -260,6 +260,7 @@ int hmc_nuts_dense_e_adapt(
     } catch (const std::domain_error& e) {
       return error_codes::CONFIG;
     }
+#ifdef STAN_THREADS
     tbb::parallel_for(
         tbb::blocked_range<size_t>(0, num_chains, 1),
         [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
@@ -273,8 +274,15 @@ int hmc_nuts_dense_e_adapt(
                 sample_writer[i], diagnostic_writer[i], i + 1, num_chains);
           }
         },
-        tbb::simple_partitioner());
-
+        tbb::affinity_partitioner());
+#else
+  for (size_t i = 0; i != num_chains; ++i) {
+    util::run_adaptive_sampler(
+        samplers[i], model, cont_vectors[i], num_warmup, num_samples,
+        num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
+        sample_writer[i], diagnostic_writer[i], i + 1, num_chains);
+  }
+#endif
     return error_codes::OK;
   }
 }
