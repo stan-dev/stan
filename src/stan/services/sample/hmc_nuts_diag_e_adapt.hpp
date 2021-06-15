@@ -275,7 +275,7 @@ int hmc_nuts_diag_e_adapt(
                 sample_writer[i], diagnostic_writer[i], i + 1, num_chains);
           }
         },
-        tbb::affinity_partitioner());
+        tbb::simple_partitioner());
 #else
     for (size_t i = 0; i != num_chains; ++i) {
       util::run_adaptive_sampler(
