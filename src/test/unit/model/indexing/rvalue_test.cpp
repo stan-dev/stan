@@ -16,7 +16,8 @@ using stan::model::index_uni;
 
 template <typename C, typename... I>
 void test_out_of_range(C&& c, I&&... idxs) {
-  EXPECT_THROW(stan::model::rvalue(c, "", idxs...), std::out_of_range);
+  EXPECT_THROW(stan::math::eval(stan::model::rvalue(c, "", idxs...)),
+               std::out_of_range);
 }
 
 TEST(ModelIndexing, rvalue_vector_nil) {
