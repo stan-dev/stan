@@ -96,7 +96,7 @@ inline auto index_check(const math::matrix_cl<int>& i, const char* name,
  */
 template <typename Expr, typename RowIndex,
           require_all_kernel_expressions_and_none_scalar_t<Expr>* = nullptr>
-inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index) {
+inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index) {
   auto checks = internal::index_check(row_index, name, expr.rows());
   try {
     math::index_apply<std::tuple_size<decltype(checks)>::value>(
@@ -107,7 +107,8 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index) {
   } catch (const std::domain_error& e) {
     throw std::out_of_range(e.what());
   }
-  return math::indexing(expr, internal::cl_row_index(row_index, expr.rows(), name),
+  return math::indexing(expr,
+                        internal::cl_row_index(row_index, expr.rows(), name),
                         math::col_index(-1, expr.cols()));
 }
 
@@ -145,7 +146,8 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index,
     throw std::out_of_range(e.what());
   }
 
-  return math::indexing(expr, internal::cl_row_index(row_index, expr.rows(), name),
+  return math::indexing(expr,
+                        internal::cl_row_index(row_index, expr.rows(), name),
                         internal::cl_col_index(col_index, expr.cols(), name));
 }
 
@@ -197,7 +199,7 @@ inline auto rvalue(Expr&& expr, const char* name, const index_uni row_index,
 template <typename Expr, typename RowIndex,
           require_rev_kernel_expression_t<Expr>* = nullptr,
           require_not_same_t<RowIndex, math::matrix_cl<int>>* = nullptr>
-inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index) {
+inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index) {
   int rows = expr.rows();
   auto checks1 = internal::index_check(row_index, name, rows);
   try {
@@ -209,16 +211,11 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index) {
   } catch (const std::domain_error& e) {
     throw std::out_of_range(e.what());
   }
-  math::matrix_cl<double> res
-      = math::indexing(expr.val(), internal::cl_row_index(row_index, expr.rows(), name),
-                       math::col_index(-1, expr.cols()));
-  return make_callback_var(
-      res, [expr, row_index,
-            name](math::vari_value<math::matrix_cl<double>>& res_vari) mutable {
-        math::indexing(expr.adj(), internal::cl_row_index(row_index, expr.rows(), name),
-                       math::col_index(-1, expr.cols()))
-            += res_vari.adj();
-      });
+  auto res_vari
+      = expr.vi_->index(internal::cl_row_index(row_index, expr.rows(), name),
+                        math::col_index(-1, expr.cols()));
+  return math::var_value<value_type_t<decltype(res_vari)>>(
+      new decltype(res_vari)(res_vari));
 }
 
 /**
@@ -258,24 +255,12 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index,
   } catch (const std::domain_error& e) {
     throw std::out_of_range(e.what());
   }
-  math::matrix_cl<double> res;
-  auto res_expr
-      = math::indexing(expr.val(), internal::cl_row_index(row_index, rows, name),
-                       internal::cl_col_index(col_index, expr.cols(), name));
-  auto checks = std::tuple_cat(internal::index_check(row_index, name, rows),
-                               internal::index_check(col_index, name, rows));
-  math::index_apply<std::tuple_size<decltype(checks)>::value>(
-      [&res, &res_expr, &checks](auto... Is) {
-        math::results(res, std::get<Is>(checks).first...)
-            = math::expressions(res_expr, std::get<Is>(checks).second...);
-      });
-  return make_callback_var(
-      res, [expr, row_index, col_index,
-            name](math::vari_value<math::matrix_cl<double>>& res_vari) mutable {
-        math::indexing(expr.adj(), internal::cl_row_index(row_index, expr.rows(), name),
-                       internal::cl_col_index(col_index, expr.cols(), name))
-            += res_vari.adj();
-      });
+
+  auto res_vari
+      = expr.vi_->index(internal::cl_row_index(row_index, rows, name),
+                        internal::cl_col_index(col_index, expr.cols(), name));
+  return math::var_value<value_type_t<decltype(res_vari)>>(
+      new decltype(res_vari)(res_vari));
 }
 
 /**
@@ -352,9 +337,9 @@ inline auto rvalue(Expr&& expr, const char* name,
       });
 }
 
-
 /**
- * Index a rev kernel generator expression with two indices, at least one of which is multi-index.
+ * Index a rev kernel generator expression with two indices, at least one of
+ * which is multi-index.
  *
  * @tparam Expr type of the exoression
  * @tparam RowIndex type of row index
