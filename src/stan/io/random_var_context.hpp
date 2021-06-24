@@ -115,13 +115,13 @@ class random_var_context : public var_context {
     return vals_r_[loc - names_.begin()];
   }
 
-  std::vector<std::complex<double>> vals_r(const std::string& name) const {
+  std::vector<std::complex<double>> vals_c(const std::string& name) const {
     std::vector<std::string>::const_iterator loc
         = std::find(names_.begin(), names_.end(), name);
     if (loc == names_.end()) {
       return std::vector<std::complex<double>>();
     } else {
-      const auto& val_r = vals_r_[loc - names_.begin()]
+      const auto& val_r = vals_r_[loc - names_.begin()];
       std::vector<std::complex<double>> ret_c(val_r.size() / 2);
       int comp_iter;
       int real_iter;
