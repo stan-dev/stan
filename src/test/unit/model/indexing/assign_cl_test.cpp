@@ -1,0 +1,413 @@
+#ifdef STAN_OPENCL
+#include <iostream>
+#include <stdexcept>
+#include <vector>
+#include <stan/model/indexing/assign.hpp>
+#include <stan/model/indexing/assign_cl.hpp>
+#include <stan/model/indexing/rvalue.hpp>
+#include <stan/model/indexing/rvalue_cl.hpp>
+#include <stan/math.hpp>
+#include <gtest/gtest.h>
+#include <test/unit/util.hpp>
+#include <test/unit/pretty_print_types.hpp>
+#include <tuple>
+
+using stan::model::assign;
+using stan::model::rvalue;
+
+using stan::model::index_max;
+using stan::model::index_min;
+using stan::model::index_min_max;
+using stan::model::index_multi;
+using stan::model::index_omni;
+using stan::model::index_uni;
+
+template <typename T>
+T opencl_index(T i) {
+  return i;
+}
+stan::math::matrix_cl<int> opencl_index(const index_multi& i) {
+  return stan::math::to_matrix_cl(i.ns_);
+}
+
+template <typename T, stan::require_not_rev_kernel_expression_t<T>* = nullptr>
+void set_adjoints1(T& v) {
+  for (int i = 0; i < v.rows(); i++) {
+    for (int j = 0; j < v.cols(); j++) {
+      v(i, j).adj() += i + 10 * j + 100;
+    }
+  }
+}
+template <typename T, stan::require_rev_kernel_expression_t<T>* = nullptr>
+void set_adjoints1(T& v) {
+  Eigen::MatrixXd adj(v.rows(), v.cols());
+
+  for (int i = 0; i < v.rows(); i++) {
+    for (int j = 0; j < v.cols(); j++) {
+      adj(i, j) = i + 10 * j + 100;
+    }
+  }
+  stan::math::matrix_cl<double> adj_cl(adj);
+  v.adj() += adj_cl;
+}
+template <typename T, stan::require_not_rev_kernel_expression_t<T>* = nullptr>
+void set_adjoints2(T& v) {
+  for (int i = 0; i < v.rows(); i++) {
+    for (int j = 0; j < v.cols(); j++) {
+      v(i, j).adj() += i + 10 * j + 10000;
+    }
+  }
+}
+template <typename T, stan::require_rev_kernel_expression_t<T>* = nullptr>
+void set_adjoints2(T& v) {
+  Eigen::MatrixXd adj(v.rows(), v.cols());
+
+  for (int i = 0; i < v.rows(); i++) {
+    for (int j = 0; j < v.cols(); j++) {
+      adj(i, j) = i + 10 * j + 10000;
+    }
+  }
+  stan::math::matrix_cl<double> adj_cl(adj);
+  v.adj() += adj_cl;
+}
+
+TEST(ModelIndexing, rvalue_opencl_vector_1d) {
+  Eigen::VectorXd m1(4);
+  m1 << 1, 2, 3, 4;
+  Eigen::VectorXd m2(4);
+  m2 << 4, 5, 6, 7;
+  stan::math::matrix_cl<double> m1_cl(m1);
+  stan::math::matrix_cl<double> m2_cl(m2);
+  Eigen::VectorXi m1_i(4);
+  m1_i << 1, 3, 5, 7;
+  Eigen::VectorXi m2_i(4);
+  m2_i << 2, 4, 6, 8;
+  stan::math::matrix_cl<int> m1_i_cl(m1_i);
+  stan::math::matrix_cl<int> m2_i_cl(m2_i);
+  stan::math::matrix_cl<double> m_err(5, 5);
+  stan::math::matrix_cl<int> m_i_err(5, 5);
+  auto indices = std::make_tuple(
+      index_omni(), index_multi(std::vector<int>{1, 3, 2}), index_min(2),
+      index_max(3), index_min_max(2, 3), index_min_max(3, 1));
+  constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
+  stan::math::index_apply<N_ind>([&](auto... Is1) {
+    std::initializer_list<int>{(
+        [&](const auto& ind1) {
+          // prim
+
+          Eigen::VectorXd m_test = m1;
+          stan::math::matrix_cl<double> m_test_cl = m1_cl;
+          Eigen::VectorXi m_i_test = m1_i;
+          stan::math::matrix_cl<int> m_i_test_cl = m1_i_cl;
+
+          auto ind1_cl = opencl_index(ind1);
+
+          assign(m_test, rvalue(m2, "", ind1), "", ind1);
+          assign(m_test_cl, rvalue(m2_cl, "", ind1_cl), "", ind1_cl);
+          assign(m_i_test, rvalue(m2_i, "", ind1), "", ind1);
+          assign(m_i_test_cl, rvalue(m2_i_cl, "", ind1_cl), "", ind1_cl);
+
+          EXPECT_MATRIX_EQ(m_test, stan::math::from_matrix_cl(m_test_cl));
+          EXPECT_MATRIX_EQ(m_i_test, stan::math::from_matrix_cl(m_i_test_cl));
+
+          EXPECT_THROW(assign(m_test_cl, m_err, "", ind1_cl),
+                       std::invalid_argument);
+          EXPECT_THROW(assign(m_i_test_cl, m_i_err, "", ind1_cl),
+                       std::invalid_argument);
+
+          // rev = prim
+
+          stan::math::vector_v m1_v1 = m1;
+          stan::math::vector_v m1_v2 = m1;
+          stan::math::var_value<stan::math::matrix_cl<double>> m1_v_cl
+              = stan::math::to_matrix_cl(m1_v2);
+          stan::math::vector_v m1_v11
+              = m1_v1;  // workaround index_omni changing m1_v11
+          assign(m1_v11, rvalue(m2, "", ind1), "", ind1);
+          assign(m1_v_cl, rvalue(m2_cl, "", ind1_cl), "", ind1_cl);
+          EXPECT_MATRIX_EQ(m1_v11.val(),
+                           stan::math::from_matrix_cl(m1_v_cl.val()));
+
+          set_adjoints1(m1_v11);
+          set_adjoints1(m1_v_cl);
+
+          stan::math::grad();
+
+          EXPECT_MATRIX_EQ(m1_v1.adj(),
+                           stan::math::from_matrix_cl(m1_v_cl.adj()));
+          EXPECT_MATRIX_EQ(m1_v1.val(),
+                           stan::math::from_matrix_cl(m1_v_cl.val()));
+
+          EXPECT_THROW(assign(m1_v_cl, m_err, "", ind1_cl),
+                       std::invalid_argument);
+
+          stan::math::recover_memory();
+
+          // rev = rev
+
+          m1_v1 = m1;
+          m1_v2 = m1;
+          stan::math::vector_v m2_v1 = m2;
+          stan::math::vector_v m2_v2 = m2;
+          m1_v_cl = stan::math::to_matrix_cl(m1_v2);
+          stan::math::var_value<stan::math::matrix_cl<double>> m2_v_cl
+              = stan::math::to_matrix_cl(m2_v2);
+          m1_v11 = m1_v1;  // workaround index_omni changing m1_v11
+          assign(m1_v11, rvalue(m2_v1, "", ind1), "", ind1);
+          assign(m1_v_cl, rvalue(m2_v_cl, "", ind1_cl), "", ind1_cl);
+          EXPECT_MATRIX_EQ(m1_v11.val(),
+                           stan::math::from_matrix_cl(m1_v_cl.val()));
+
+          set_adjoints1(m1_v11);
+          set_adjoints2(m2_v1);
+          set_adjoints1(m1_v_cl);
+          set_adjoints2(m2_v_cl);
+
+          stan::math::grad();
+
+          EXPECT_MATRIX_EQ(m1_v1.adj(),
+                           stan::math::from_matrix_cl(m1_v_cl.adj()));
+          EXPECT_MATRIX_EQ(m2_v1.adj(),
+                           stan::math::from_matrix_cl(m2_v_cl.adj()));
+          EXPECT_MATRIX_EQ(m1_v1.val(),
+                           stan::math::from_matrix_cl(m1_v_cl.val()));
+          EXPECT_MATRIX_EQ(m2_v1.val(),
+                           stan::math::from_matrix_cl(m2_v_cl.val()));
+
+          stan::math::var_value<stan::math::matrix_cl<double>> m_v_err = m_err;
+          EXPECT_THROW(assign(m1_v_cl, m_v_err, "", ind1_cl),
+                       std::invalid_argument);
+
+          stan::math::recover_memory();
+        }(std::get<Is1>(indices)),
+        0)...};
+  });
+}
+
+TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
+  Eigen::MatrixXd m1(4, 4);
+  m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7;
+  Eigen::MatrixXd m2(4, 4);
+  m2 << 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 8, 7, 6, 5, 4, 3;
+  stan::math::matrix_cl<double> m1_cl(m1);
+  stan::math::matrix_cl<double> m2_cl(m2);
+  Eigen::MatrixXi m1_i(4, 4);
+  m1_i << 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7;
+  Eigen::MatrixXi m2_i(4, 4);
+  m2_i << 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 8, 7, 6, 5, 4, 3;
+  stan::math::matrix_cl<int> m1_i_cl(m1_i);
+  stan::math::matrix_cl<int> m2_i_cl(m2_i);
+  stan::math::matrix_cl<double> m_err(5, 5);
+  stan::math::matrix_cl<int> m_i_err(5, 5);
+  auto indices = std::make_tuple(
+      index_uni(1), index_omni(), index_multi(std::vector<int>{1, 3, 2}),
+      index_min(2), index_max(3), index_min_max(2, 3), index_min_max(3, 1));
+  constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
+  stan::math::index_apply<N_ind>([&](auto... Is1) {
+    std::initializer_list<int>{(
+        [&](const auto& ind1) {
+          // prim
+
+          Eigen::MatrixXd m_test = m1;
+          stan::math::matrix_cl<double> m_test_cl = m1_cl;
+          Eigen::MatrixXi m_i_test = m1_i;
+          stan::math::matrix_cl<int> m_i_test_cl = m1_i_cl;
+
+          auto ind1_cl = opencl_index(ind1);
+
+          assign(m_test, rvalue(m2, "", ind1), "", ind1);
+          assign(m_test_cl, rvalue(m2_cl, "", ind1_cl), "", ind1_cl);
+          assign(m_i_test, rvalue(m2_i, "", ind1), "", ind1);
+          assign(m_i_test_cl, rvalue(m2_i_cl, "", ind1_cl), "", ind1_cl);
+
+          EXPECT_MATRIX_EQ(m_test, stan::math::from_matrix_cl(m_test_cl));
+          EXPECT_MATRIX_EQ(m_i_test, stan::math::from_matrix_cl(m_i_test_cl));
+
+          EXPECT_THROW(assign(m_test_cl, m_err, "", ind1_cl),
+                       std::invalid_argument);
+          EXPECT_THROW(assign(m_i_test_cl, m_i_err, "", ind1_cl),
+                       std::invalid_argument);
+
+          // rev = prim
+
+          stan::math::matrix_v m1_v1 = m1;
+          stan::math::matrix_v m1_v2 = m1;
+          stan::math::var_value<stan::math::matrix_cl<double>> m1_v_cl
+              = stan::math::to_matrix_cl(m1_v2);
+          stan::math::matrix_v m1_v11
+              = m1_v1;  // workaround index_omni changing m1_v11
+          assign(m1_v11, rvalue(m2, "", ind1), "", ind1);
+          assign(m1_v_cl, rvalue(m2_cl, "", ind1_cl), "", ind1_cl);
+          EXPECT_MATRIX_EQ(m1_v11.val(),
+                           stan::math::from_matrix_cl(m1_v_cl.val()));
+
+          set_adjoints1(m1_v11);
+          set_adjoints1(m1_v_cl);
+
+          stan::math::grad();
+
+          EXPECT_MATRIX_EQ(m1_v1.adj(),
+                           stan::math::from_matrix_cl(m1_v_cl.adj()));
+          EXPECT_MATRIX_EQ(m1_v1.val(),
+                           stan::math::from_matrix_cl(m1_v_cl.val()));
+
+          EXPECT_THROW(assign(m1_v_cl, m_err, "", ind1_cl),
+                       std::invalid_argument);
+
+          stan::math::recover_memory();
+
+          // rev = rev
+
+          m1_v1 = m1;
+          m1_v2 = m1;
+          stan::math::matrix_v m2_v1 = m2;
+          stan::math::matrix_v m2_v2 = m2;
+          m1_v_cl = stan::math::to_matrix_cl(m1_v2);
+          stan::math::var_value<stan::math::matrix_cl<double>> m2_v_cl
+              = stan::math::to_matrix_cl(m2_v2);
+          m1_v11 = m1_v1;  // workaround index_omni changing m1_v11
+          assign(m1_v11, rvalue(m2_v1, "", ind1), "", ind1);
+          assign(m1_v_cl, rvalue(m2_v_cl, "", ind1_cl), "", ind1_cl);
+          EXPECT_MATRIX_EQ(m1_v11.val(),
+                           stan::math::from_matrix_cl(m1_v_cl.val()));
+
+          set_adjoints1(m1_v11);
+          set_adjoints2(m2_v1);
+          set_adjoints1(m1_v_cl);
+          set_adjoints2(m2_v_cl);
+
+          stan::math::grad();
+
+          EXPECT_MATRIX_EQ(m1_v1.adj(),
+                           stan::math::from_matrix_cl(m1_v_cl.adj()));
+          EXPECT_MATRIX_EQ(m2_v1.adj(),
+                           stan::math::from_matrix_cl(m2_v_cl.adj()));
+          EXPECT_MATRIX_EQ(m1_v1.val(),
+                           stan::math::from_matrix_cl(m1_v_cl.val()));
+          EXPECT_MATRIX_EQ(m2_v1.val(),
+                           stan::math::from_matrix_cl(m2_v_cl.val()));
+
+          stan::math::var_value<stan::math::matrix_cl<double>> m_v_err = m_err;
+          EXPECT_THROW(assign(m1_v_cl, m_v_err, "", ind1_cl),
+                       std::invalid_argument);
+
+          stan::math::recover_memory();
+        }(std::get<Is1>(indices)),
+        0)...};
+  });
+}
+
+TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
+  Eigen::MatrixXd m1(4, 4);
+  m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7;
+  Eigen::MatrixXd m2(4, 4);
+  m2 << 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 8, 7, 6, 5, 4, 3;
+  stan::math::matrix_cl<double> m1_cl(m1);
+  stan::math::matrix_cl<double> m2_cl(m2);
+  Eigen::MatrixXi m1_i(4, 4);
+  m1_i << 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7;
+  Eigen::MatrixXi m2_i(4, 4);
+  m2_i << 9, 8, 7, 6, 5, 4, 3, 2, 1, 9, 8, 7, 6, 5, 4, 3;
+  stan::math::matrix_cl<int> m1_i_cl(m1_i);
+  stan::math::matrix_cl<int> m2_i_cl(m2_i);
+  auto indices = std::make_tuple(
+      index_uni(1), index_omni(), index_multi(std::vector<int>{1, 3, 2}),
+      index_min(2), index_max(3), index_min_max(2, 3), index_min_max(3, 1));
+  constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
+  stan::math::index_apply<N_ind>([&](auto... Is1) {
+    std::initializer_list<int>{(
+        [&](const auto& ind1) {
+          stan::math::index_apply<N_ind>([&](auto... Is2) {
+            std::initializer_list<int>{(
+                [&](const auto& ind2) {
+                  // prim
+
+                  Eigen::MatrixXd m_test = m1;
+                  stan::math::matrix_cl<double> m_test_cl = m1_cl;
+                  Eigen::MatrixXi m_i_test = m1_i;
+                  stan::math::matrix_cl<int> m_i_test_cl = m1_i_cl;
+
+                  auto ind1_cl = opencl_index(ind1);
+                  auto ind2_cl = opencl_index(ind2);
+
+                  assign(m_test, rvalue(m2, "", ind1, ind2), "", ind1, ind2);
+                  assign(m_test_cl, rvalue(m2_cl, "", ind1_cl, ind2_cl), "",
+                         ind1_cl, ind2_cl);
+                  assign(m_i_test, rvalue(m2_i, "", ind1, ind2), "", ind1,
+                         ind2);
+                  assign(m_i_test_cl, rvalue(m2_i_cl, "", ind1_cl, ind2_cl), "",
+                         ind1_cl, ind2_cl);
+
+                  EXPECT_MATRIX_EQ(m_test,
+                                   stan::math::from_matrix_cl(m_test_cl));
+                  EXPECT_MATRIX_EQ(m_i_test,
+                                   stan::math::from_matrix_cl(m_i_test_cl));
+
+                  // rev = prim
+
+                  stan::math::matrix_v m1_v1 = m1;
+                  stan::math::matrix_v m1_v2 = m1;
+                  stan::math::var_value<stan::math::matrix_cl<double>> m1_v_cl
+                      = stan::math::to_matrix_cl(m1_v2);
+                  stan::math::matrix_v m1_v11
+                      = m1_v1;  // workaround index_omni changing m1_v11
+                  assign(m1_v11, rvalue(m2, "", ind1, ind2), "", ind1, ind2);
+                  assign(m1_v_cl, rvalue(m2_cl, "", ind1_cl, ind2_cl), "",
+                         ind1_cl, ind2_cl);
+                  EXPECT_MATRIX_EQ(m1_v11.val(),
+                                   stan::math::from_matrix_cl(m1_v_cl.val()));
+
+                  set_adjoints1(m1_v11);
+                  set_adjoints1(m1_v_cl);
+
+                  stan::math::grad();
+
+                  EXPECT_MATRIX_EQ(m1_v1.adj(),
+                                   stan::math::from_matrix_cl(m1_v_cl.adj()));
+                  EXPECT_MATRIX_EQ(m1_v1.val(),
+                                   stan::math::from_matrix_cl(m1_v_cl.val()));
+
+                  stan::math::recover_memory();
+
+                  // rev = rev
+
+                  m1_v1 = m1;
+                  m1_v2 = m1;
+                  stan::math::matrix_v m2_v1 = m2;
+                  stan::math::matrix_v m2_v2 = m2;
+                  m1_v_cl = stan::math::to_matrix_cl(m1_v2);
+                  stan::math::var_value<stan::math::matrix_cl<double>> m2_v_cl
+                      = stan::math::to_matrix_cl(m2_v2);
+                  m1_v11 = m1_v1;  // workaround index_omni changing m1_v11
+                  assign(m1_v11, rvalue(m2_v1, "", ind1, ind2), "", ind1, ind2);
+                  assign(m1_v_cl, rvalue(m2_v_cl, "", ind1_cl, ind2_cl), "",
+                         ind1_cl, ind2_cl);
+                  EXPECT_MATRIX_EQ(m1_v11.val(),
+                                   stan::math::from_matrix_cl(m1_v_cl.val()));
+
+                  set_adjoints1(m1_v11);
+                  set_adjoints2(m2_v1);
+                  set_adjoints1(m1_v_cl);
+                  set_adjoints2(m2_v_cl);
+
+                  stan::math::grad();
+
+                  EXPECT_MATRIX_EQ(m1_v1.adj(),
+                                   stan::math::from_matrix_cl(m1_v_cl.adj()));
+                  EXPECT_MATRIX_EQ(m2_v1.adj(),
+                                   stan::math::from_matrix_cl(m2_v_cl.adj()));
+                  EXPECT_MATRIX_EQ(m1_v1.val(),
+                                   stan::math::from_matrix_cl(m1_v_cl.val()));
+                  EXPECT_MATRIX_EQ(m2_v1.val(),
+                                   stan::math::from_matrix_cl(m2_v_cl.val()));
+
+                  stan::math::recover_memory();
+                }(std::get<Is2>(indices)),
+                0)...};
+          });
+        }(std::get<Is1>(indices)),
+        0)...};
+  });
+}
+
+#endif

@@ -20,7 +20,7 @@ inline auto cl_row_index(const math::matrix_cl<int>& i, int rows,
                          const char* name) {
   return math::rowwise_broadcast(i - 1);
 }
-inline auto cl_row_index(index_omni i, int rows, const char* name) {
+inline auto cl_row_index(index_omni /*i*/, int rows, const char* name) {
   return math::row_index(rows, -1);
 }
 inline auto cl_row_index(index_min i, int rows, const char* name) {
@@ -215,7 +215,7 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index) {
       = expr.vi_->index(internal::cl_row_index(row_index, expr.rows(), name),
                         math::col_index(-1, expr.cols()));
   return math::var_value<value_type_t<decltype(res_vari)>>(
-      new decltype(res_vari)(res_vari));
+      new decltype(res_vari)(std::move(res_vari)));
 }
 
 /**
@@ -260,7 +260,7 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index,
       = expr.vi_->index(internal::cl_row_index(row_index, rows, name),
                         internal::cl_col_index(col_index, expr.cols(), name));
   return math::var_value<value_type_t<decltype(res_vari)>>(
-      new decltype(res_vari)(res_vari));
+      new decltype(res_vari)(std::move(res_vari)));
 }
 
 /**
@@ -314,7 +314,7 @@ inline auto rvalue(Expr&& expr, const char* name,
                    const math::matrix_cl<int>& row_index) {
   auto row_idx_expr = math::rowwise_broadcast(row_index - 1);
   auto col_idx_expr = math::col_index(-1, expr.cols());
-  auto res_expr = math::indexing(expr.val(), row_idx_expr, col_idx_expr);
+  auto res_expr = math::indexing(expr.val_op(), row_idx_expr, col_idx_expr);
   auto lin_idx_expr
       = row_idx_expr + col_idx_expr * static_cast<int>(expr.rows());
 
@@ -377,7 +377,7 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index,
   }
   auto row_idx_expr = internal::cl_row_index(row_index, rows, name);
   auto col_idx_expr = internal::cl_col_index(col_index, cols, name);
-  auto res_expr = math::indexing(expr.val(), row_idx_expr, col_idx_expr);
+  auto res_expr = math::indexing(expr.val_op(), row_idx_expr, col_idx_expr);
   auto lin_idx_expr = row_idx_expr + col_idx_expr * rows;
   math::matrix_cl<double> res;
   math::arena_matrix_cl<int> lin_idx;
