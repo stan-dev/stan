@@ -13,7 +13,23 @@ namespace stan {
 namespace model {
 
 // prim
-
+/**
+ * Assign one primitive kernel generator expression to another, using given
+ * index.
+ *
+ * @tparam ExprLhs type of the expression on the left hand side of the
+ * assignment
+ * @tparam ExprRhs type of the expression on the right hand side of the
+ * assignment
+ * @tparam RowIndex type of index
+ * @param[in,out] expr_lhs expression on the left hand side of the assignment
+ * @param expr_rhs expression on the right hand side of the assignment
+ * @param name Name of lvalue variable
+ * @param row_index index used for indexing `expr_lhs`
+ * @throw std::out_of_range If the index is out of bounds.
+ * @throw std::invalid_argument If the right hand side size isn't the same as
+ * the indexed left hand side size.
+ */
 template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_kernel_expression_lhs_t<ExprLhs>* = nullptr,
           require_all_kernel_expressions_and_none_scalar_t<ExprRhs>* = nullptr>
@@ -28,6 +44,25 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   rvalue(expr_lhs, name, row_index) = expr_rhs;
 }
 
+/**
+ * Assign one primitive kernel generator expression to another, using given
+ * indices.
+ *
+ * @tparam ExprLhs type of the expression on the left hand side of the
+ * assignment
+ * @tparam ExprRhs type of the expression on the right hand side of the
+ * assignment
+ * @tparam RowIndex type of row index
+ * @tparam ColIndex type of columnindex
+ * @param[in,out] expr_lhs expression on the left hand side of the assignment
+ * @param expr_rhs expression on the right hand side of the assignment
+ * @param name Name of lvalue variable
+ * @param row_index index used for indexing rows of `expr_lhs`
+ * @param col_index index used for indexing columns of `expr_lhs`
+ * @throw std::out_of_range If the index is out of bounds.
+ * @throw std::invalid_argument If the right hand side size isn't the same as
+ * the indexed left hand side size.
+ */
 template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           typename ColIndex,
           require_kernel_expression_lhs_t<ExprLhs>* = nullptr,
@@ -46,6 +81,20 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   rvalue(expr_lhs, name, row_index, col_index) = expr_rhs;
 }
 
+/**
+ * Assign a scalar to a primitive kernel generator expression, using given uni
+ * indices.
+ *
+ * @tparam ExprLhs type of the expression on the left hand side of the
+ * assignment
+ * @tparam ScalRhs type of the scalar on the right hand side of the assignment
+ * @param[in,out] expr_lhs expression on the left hand side of the assignment
+ * @param scal_rhs scalar on the right hand side of the assignment
+ * @param name Name of lvalue variable
+ * @param row_index index used for indexing rows of `expr_lhs`
+ * @param col_index index used for indexing columns of `expr_lhs`
+ * @throw std::out_of_range If the index is out of bounds.
+ */
 template <typename ExprLhs, typename ScalRhs,
           require_kernel_expression_lhs_t<ExprLhs>* = nullptr,
           require_stan_scalar_t<ScalRhs>* = nullptr>
@@ -57,7 +106,23 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
 }
 
 // assign(rev, prim, ...)
-
+/**
+ * Assign one primitive kernel generator expression to a reverse mode kernel
+ * generator expression, using given index.
+ *
+ * @tparam ExprLhs type of the expression on the left hand side of the
+ * assignment
+ * @tparam ExprRhs type of the expression on the right hand side of the
+ * assignment
+ * @tparam RowIndex type of index
+ * @param[in,out] expr_lhs expression on the left hand side of the assignment
+ * @param expr_rhs expression on the right hand side of the assignment
+ * @param name Name of lvalue variable
+ * @param row_index index used for indexing `expr_lhs`
+ * @throw std::out_of_range If the index is out of bounds.
+ * @throw std::invalid_argument If the right hand side size isn't the same as
+ * the indexed left hand side size.
+ */
 template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_rev_kernel_expression_t<ExprLhs>* = nullptr,
           require_all_kernel_expressions_and_none_scalar_t<ExprRhs>* = nullptr>
@@ -81,6 +146,25 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   });
 }
 
+/**
+ * Assign one primitive kernel generator expression to a reverse mode kernel
+ * generator expression, using given indices.
+ *
+ * @tparam ExprLhs type of the expression on the left hand side of the
+ * assignment
+ * @tparam ExprRhs type of the expression on the right hand side of the
+ * assignment
+ * @tparam RowIndex type of row index
+ * @tparam ColIndex type of columnindex
+ * @param[in,out] expr_lhs expression on the left hand side of the assignment
+ * @param expr_rhs expression on the right hand side of the assignment
+ * @param name Name of lvalue variable
+ * @param row_index index used for indexing rows of `expr_lhs`
+ * @param col_index index used for indexing columns of `expr_lhs`
+ * @throw std::out_of_range If the index is out of bounds.
+ * @throw std::invalid_argument If the right hand side size isn't the same as
+ * the indexed left hand side size.
+ */
 template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           typename ColIndex,
           require_rev_kernel_expression_t<ExprLhs>* = nullptr,
@@ -111,6 +195,20 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
       });
 }
 
+/**
+ * Assign a primitive scalar to a reverse mode kernel generator expression,
+ * using given uni indices.
+ *
+ * @tparam ExprLhs type of the expression on the left hand side of the
+ * assignment
+ * @tparam ScalRhs type of the scalar on the right hand side of the assignment
+ * @param[in,out] expr_lhs expression on the left hand side of the assignment
+ * @param scal_rhs scalar on the right hand side of the assignment
+ * @param name Name of lvalue variable
+ * @param row_index index used for indexing rows of `expr_lhs`
+ * @param col_index index used for indexing columns of `expr_lhs`
+ * @throw std::out_of_range If the index is out of bounds.
+ */
 template <typename ExprLhs, typename ScalRhs,
           require_rev_kernel_expression_t<ExprLhs>* = nullptr,
           require_arithmetic_t<ScalRhs>* = nullptr>
@@ -134,7 +232,23 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
 }
 
 // assign(rev, rev, ...)
-
+/**
+ * Assign one reverse mode kernel generator expression to another, using given
+ * index.
+ *
+ * @tparam ExprLhs type of the expression on the left hand side of the
+ * assignment
+ * @tparam ExprRhs type of the expression on the right hand side of the
+ * assignment
+ * @tparam RowIndex type of index
+ * @param[in,out] expr_lhs expression on the left hand side of the assignment
+ * @param expr_rhs expression on the right hand side of the assignment
+ * @param name Name of lvalue variable
+ * @param row_index index used for indexing `expr_lhs`
+ * @throw std::out_of_range If the index is out of bounds.
+ * @throw std::invalid_argument If the right hand side size isn't the same as
+ * the indexed left hand side size.
+ */
 template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_all_rev_kernel_expression_t<ExprLhs, ExprRhs>* = nullptr>
 inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
@@ -161,6 +275,25 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
       });
 }
 
+/**
+ * Assign one reverse mode kernel generator expression to another, using given
+ * indices.
+ *
+ * @tparam ExprLhs type of the expression on the left hand side of the
+ * assignment
+ * @tparam ExprRhs type of the expression on the right hand side of the
+ * assignment
+ * @tparam RowIndex type of row index
+ * @tparam ColIndex type of columnindex
+ * @param[in,out] expr_lhs expression on the left hand side of the assignment
+ * @param expr_rhs expression on the right hand side of the assignment
+ * @param name Name of lvalue variable
+ * @param row_index index used for indexing rows of `expr_lhs`
+ * @param col_index index used for indexing columns of `expr_lhs`
+ * @throw std::out_of_range If the index is out of bounds.
+ * @throw std::invalid_argument If the right hand side size isn't the same as
+ * the indexed left hand side size.
+ */
 template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           typename ColIndex,
           require_all_rev_kernel_expression_t<ExprLhs, ExprRhs>* = nullptr,
@@ -192,6 +325,20 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   });
 }
 
+/**
+ * Assign a reverse mode scalar to a reverse mode kernel generator expression,
+ * using given uni indices.
+ *
+ * @tparam ExprLhs type of the expression on the left hand side of the
+ * assignment
+ * @tparam ScalRhs type of the scalar on the right hand side of the assignment
+ * @param[in,out] expr_lhs expression on the left hand side of the assignment
+ * @param scal_rhs scalar on the right hand side of the assignment
+ * @param name Name of lvalue variable
+ * @param row_index index used for indexing rows of `expr_lhs`
+ * @param col_index index used for indexing columns of `expr_lhs`
+ * @throw std::out_of_range If the index is out of bounds.
+ */
 template <typename ExprLhs, typename ScalRhs,
           require_rev_kernel_expression_t<ExprLhs>* = nullptr,
           require_var_t<ScalRhs>* = nullptr>
