@@ -133,51 +133,6 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
 }
 
 /**
- * Assign a matrix to another matrix
- *
- * Types:  mat[omni] = mat
- *
- * @tparam Mat1 `var_value` with inner Eigen type
- * @tparam Mat2 `var_value` with inner Eigen type
- * @param[in] x Matrix variable to be assigned.
- * @param[in] y Value matrix.
- * @param[in] name Name of variable
- * @throw std::out_of_range If any of the indices are out of bounds.
- * @throw std::invalid_argument If the dimensions of the indexed
- * matrix and right-hand side matrix do not match.
- */
-template <typename Mat1, typename Mat2,
-          require_all_var_matrix_t<Mat1, Mat2>* = nullptr>
-inline void assign(Mat1&& x, Mat2&& y, const char* name, index_omni /* idx */) {
-  stan::math::check_size_match("matrix[omni] assign", "left hand side rows",
-                               x.rows(), name, y.rows());
-  stan::math::check_size_match("matrix[omni] assign", "left hand side columns",
-                               x.cols(), name, y.cols());
-  using PrimType
-      = Eigen::Matrix<double, Mat1::RowsAtCompileTime, Mat1::ColsAtCompileTime>;
-  arena_t<PrimType> prev_vals = x.val();
-  x = y; //TODO forward?
-
-  stan::math::reverse_pass_callback([x, y, prev_vals]() mutable {
-    x.val_op() = std::move(prev_vals);
-    y.adj() += x.adj();
-    x.adj() = PrimType::Constant(0, x.adj().rows(), x.adj().cols());
-    for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        x.vi_->val_.coeffRef(x_idx[i]) = prev_vals.coeffRef(i);
-        prev_vals.coeffRef(i) = x.adj().coeffRef(x_idx[i]);
-        x.adj().coeffRef(x_idx[i]) = 0.0;
-      }
-    }
-    for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        y.adj().coeffRef(i) += prev_vals.coeffRef(i);
-      }
-    }
-  });
-}
-
-/**
  * Assign to a cell of an Eigen Matrix.
  *
  * Types:  mat[single, single] = scalar

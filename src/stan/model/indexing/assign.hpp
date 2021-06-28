@@ -208,8 +208,7 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name, index_max idx) {
  */
 template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
-          require_all_not_std_vector_t<Vec1, Vec2>* = nullptr,
-          require_all_not_var_t<Vec1, Vec2>* = nullptr>
+          require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x, Vec2&& y, const char* name, index_omni /* idx */) {
   stan::math::check_size_match("vector[omni] assign", "left hand side",
                                x.size(), name, y.size());
@@ -288,8 +287,7 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
  * matrix and right-hand side matrix do not match.
  */
 template <typename Mat1, typename Mat2,
-          require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr,
-          require_all_not_var_t<Mat1, Mat2>* = nullptr>
+          require_all_dense_dynamic_t<Mat1, Mat2>* = nullptr>
 inline void assign(Mat1&& x, Mat2&& y, const char* name, index_omni /* idx */) {
   stan::math::check_size_match("matrix[omni] assign", "left hand side rows",
                                x.rows(), name, y.rows());
