@@ -61,7 +61,8 @@ inline int rvalue_index_size(const index_max& idx, int size) {
  * @return Size of result.
  */
 inline int rvalue_index_size(const index_min_max& idx, int size) {
-  return (idx.max_ < idx.min_) ? (idx.min_ - idx.max_ + 1) : (idx.max_ - idx.min_ + 1);
+  return (idx.max_ < idx.min_) ? (idx.min_ - idx.max_ + 1)
+                               : (idx.max_ - idx.min_ + 1);
 }
 
 }  // namespace model

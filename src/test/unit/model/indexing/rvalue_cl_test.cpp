@@ -52,7 +52,6 @@ void expect_eq(const T_eig& a, const T_cl& b) {
 void expect_eq(const double a, const double b) { EXPECT_EQ(a, b); }
 void expect_eq(const int a, const int b) { EXPECT_EQ(a, b); }
 
-
 TEST(ModelIndexing, rvalue_opencl_vector_1d) {
   Eigen::VectorXd m(4);
   m << 1, 2, 3, 4;
@@ -91,7 +90,6 @@ TEST(ModelIndexing, rvalue_opencl_vector_1d) {
         0)...};
   });
 }
-
 
 TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
   Eigen::MatrixXd m(4, 4);
