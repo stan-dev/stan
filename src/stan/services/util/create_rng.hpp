@@ -23,7 +23,9 @@ namespace util {
  * @param[in] chain_num For multi-chain, the ch
  * @return a boost::ecuyer1988 instance
  */
-inline boost::ecuyer1988 create_rng(unsigned int seed, unsigned int init_chain_id, unsigned int chain_num = 0) {
+inline boost::ecuyer1988 create_rng(unsigned int seed,
+                                    unsigned int init_chain_id,
+                                    unsigned int chain_num = 0) {
   using boost::uintmax_t;
   constexpr static uintmax_t DISCARD_STRIDE = static_cast<uintmax_t>(1) << 50;
   boost::ecuyer1988 rng(seed);
