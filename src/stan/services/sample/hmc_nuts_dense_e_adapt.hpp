@@ -235,7 +235,7 @@ int hmc_nuts_dense_e_adapt(
     samplers.reserve(num_chains);
     try {
       for (int i = 0; i < num_chains; ++i) {
-        rngs.emplace_back(util::create_rng(random_seed, init_chain_id + i));
+        rngs.emplace_back(util::create_rng(random_seed, init_chain_id, i));
         cont_vectors.emplace_back(util::initialize(model, *init[i], rngs[i],
                                                    init_radius, true, logger,
                                                    init_writer[i]));
