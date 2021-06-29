@@ -13,7 +13,9 @@ namespace callbacks {
  * <code>unique_stream_writer</code> is an implementation
  * of <code>writer</code> that holds a unique pointer to the stream it is
  * writing to.
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
  */
+template <typename Stream>
 class unique_stream_writer final : public writer {
  public:
   /**
@@ -24,7 +26,7 @@ class unique_stream_writer final : public writer {
    * @param[in] comment_prefix string to stream before each comment line.
    *  Default is "".
    */
-  explicit unique_stream_writer(std::unique_ptr<std::ostream>&& output,
+  explicit unique_stream_writer(std::unique_ptr<Stream>&& output,
                                 const std::string& comment_prefix = "")
       : output_(std::move(output)), comment_prefix_(comment_prefix) {}
 
@@ -88,7 +90,7 @@ class unique_stream_writer final : public writer {
   /**
    * Output stream
    */
-  std::unique_ptr<std::ostream> output_;
+  std::unique_ptr<Stream> output_;
 
   /**
    * Comment prefix to use when printing comments: strings and blank lines

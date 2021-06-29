@@ -13,7 +13,7 @@ class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
   }
   void TearDown() {}
 
-  stan::callbacks::unique_stream_writer writer;
+  stan::callbacks::unique_stream_writer<std::ostream> writer;
 };
 
 TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {
