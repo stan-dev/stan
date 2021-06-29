@@ -17,7 +17,8 @@ namespace test {
  * @param rows Number of rows
  * @param cols Number of columns.
  */
-Eigen::MatrixXd read_stan_sample_csv(std::istringstream& in, int rows, int cols) {
+Eigen::MatrixXd read_stan_sample_csv(std::istringstream& in, int rows,
+                                     int cols) {
   std::string line;
   int row = 0;
   int col = 0;
@@ -50,7 +51,7 @@ class ServicesSampleHmcNutsDiagEAdaptParMatch : public testing::Test {
  public:
   ServicesSampleHmcNutsDiagEAdaptParMatch()
       : model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
-          data_context, 0, &model_log)) {
+            data_context, 0, &model_log)) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
       par_parameters.emplace_back(std::make_unique<std::stringstream>(), "#");
@@ -117,7 +118,8 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
     auto par_str = par_parameters[i].get_stream().str();
     auto sub_par_str = par_str.substr(par_str.find("Diagonal") - 1);
     std::istringstream sub_par_stream(sub_par_str);
-    Eigen::MatrixXd par_mat = stan::test::read_stan_sample_csv(sub_par_stream, 80, 9);
+    Eigen::MatrixXd par_mat
+        = stan::test::read_stan_sample_csv(sub_par_stream, 80, 9);
     par_res.push_back(par_mat);
   }
   std::vector<Eigen::MatrixXd> seq_res;
@@ -125,7 +127,8 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
     auto seq_str = seq_parameters[i].get_stream().str();
     auto sub_seq_str = seq_str.substr(seq_str.find("Diagonal") - 1);
     std::istringstream sub_seq_stream(sub_seq_str);
-    Eigen::MatrixXd seq_mat = stan::test::read_stan_sample_csv(sub_seq_stream, 80, 9);
+    Eigen::MatrixXd seq_mat
+        = stan::test::read_stan_sample_csv(sub_seq_stream, 80, 9);
     seq_res.push_back(seq_mat);
   }
   for (int i = 0; i < num_chains; ++i) {
