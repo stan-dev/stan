@@ -1,4 +1,4 @@
-#include <stan/services/sample/hmc_nuts_diag_e_adapt.hpp>
+#include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/callbacks/unique_stream_writer.hpp>
 #include <test/unit/util.hpp>
@@ -10,10 +10,11 @@
 
 auto&& blah = stan::math::init_threadpool_tbb();
 
+
 static constexpr size_t num_chains = 4;
-class ServicesSampleHmcNutsDiagEAdaptParMatch : public testing::Test {
+class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
  public:
-  ServicesSampleHmcNutsDiagEAdaptParMatch()
+  ServicesSampleHmcNutsDenseEAdaptParMatch()
       : model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
             data_context, 0, &model_log)) {
     for (int i = 0; i < num_chains; ++i) {
@@ -41,7 +42,7 @@ class ServicesSampleHmcNutsDiagEAdaptParMatch : public testing::Test {
  * with the same initial id is the same as running multiple calls
  * with incrementing chain ids.
  */
-TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
+TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   constexpr unsigned int random_seed = 0;
   constexpr unsigned int chain = 0;
   constexpr double init_radius = 0;
@@ -62,7 +63,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
   constexpr unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
-  int return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
+  int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
       *model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
       max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
@@ -75,7 +76,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
   for (int i = 0; i < num_chains; ++i) {
     stan::test::unit::instrumented_writer seq_init;
     stan::test::unit::instrumented_writer seq_diagnostic;
-    return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
+    return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
         *model, *(context[i]), random_seed, i, init_radius, num_warmup,
         num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
         max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
@@ -85,7 +86,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
   std::vector<Eigen::MatrixXd> par_res;
   for (int i = 0; i < num_chains; ++i) {
     auto par_str = par_parameters[i].get_stream().str();
-    auto sub_par_str = par_str.substr(par_str.find("Diagonal") - 1);
+    auto sub_par_str = par_str.substr(par_str.find("Elements") - 1);
     std::istringstream sub_par_stream(sub_par_str);
     Eigen::MatrixXd par_mat
         = stan::test::read_stan_sample_csv(sub_par_stream, 80, 9);
@@ -94,7 +95,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
   std::vector<Eigen::MatrixXd> seq_res;
   for (int i = 0; i < num_chains; ++i) {
     auto seq_str = seq_parameters[i].get_stream().str();
-    auto sub_seq_str = seq_str.substr(seq_str.find("Diagonal") - 1);
+    auto sub_seq_str = seq_str.substr(seq_str.find("Elements") - 1);
     std::istringstream sub_seq_stream(sub_seq_str);
     Eigen::MatrixXd seq_mat
         = stan::test::read_stan_sample_csv(sub_seq_stream, 80, 9);

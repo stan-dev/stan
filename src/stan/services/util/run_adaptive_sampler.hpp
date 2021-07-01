@@ -34,6 +34,9 @@ namespace util {
  * @param[in,out] logger logger for messages
  * @param[in,out] sample_writer writer for draws
  * @param[in,out] diagnostic_writer writer for diagnostic information
+ * @param[in] chain_id The id for a given chain.
+ * @param[in] n_chain The number of chains used in the program. This
+ *  is used in generate transitions to print out the chain number.
  */
 template <typename Sampler, typename Model, typename RNG>
 void run_adaptive_sampler(Sampler& sampler, Model& model,
