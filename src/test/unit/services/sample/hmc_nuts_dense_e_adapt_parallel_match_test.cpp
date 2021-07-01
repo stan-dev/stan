@@ -10,7 +10,6 @@
 
 auto&& blah = stan::math::init_threadpool_tbb();
 
-
 static constexpr size_t num_chains = 4;
 class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
  public:
