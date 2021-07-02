@@ -71,15 +71,16 @@ inline auto cl_col_index(index_min_max i, int cols, const char* name) {
 }
 
 template <typename Index>
-inline std::tuple<> index_check(Index i, const char* name, int dim) {
-  return std::make_tuple();
-}
-inline auto index_check(const math::matrix_cl<int>& i, const char* name,
+inline void index_check(Index i, const char* name, int dim) {}
+inline void index_check(const math::matrix_cl<int>& i, const char* name,
                         int dim) {
-  return std::make_tuple(std::make_pair(
-      math::check_cl("multi-indexing", name, i, "within range"),
-      static_cast<int>(stan::error_index::value) <= i
-          && i < dim + static_cast<int>(stan::error_index::value)));
+  try {
+    math::check_cl("multi-indexing", name, i, "within range")
+        = static_cast<int>(stan::error_index::value) <= i
+          && i < dim + static_cast<int>(stan::error_index::value);
+  } catch (const std::domain_error& e) {
+    throw std::out_of_range(e.what());
+  }
 }
 }  // namespace internal
 
@@ -87,26 +88,17 @@ inline auto index_check(const math::matrix_cl<int>& i, const char* name,
 /**
  * Index a prim kernel generator expression with one index.
  *
- * @tparam Expr type of the exoression
+ * @tparam Expr type of the expression
  * @tparam RowIndex type of index
  * @param expr a prim kernel generator expression to index
- * @param name string form of expression being evaluated
+ * @param name name of value being indexed (if named, otherwise an empty string)
  * @param row_index index
  * @return result of indexing
  */
 template <typename Expr, typename RowIndex,
           require_all_kernel_expressions_and_none_scalar_t<Expr>* = nullptr>
 inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index) {
-  auto checks = internal::index_check(row_index, name, expr.rows());
-  try {
-    math::index_apply<std::tuple_size<decltype(checks)>::value>(
-        [&checks](auto... Is) {
-          math::results(std::get<Is>(checks).first...)
-              = math::expressions(std::get<Is>(checks).second...);
-        });
-  } catch (const std::domain_error& e) {
-    throw std::out_of_range(e.what());
-  }
+  internal::index_check(row_index, name, expr.rows());
   return math::indexing(expr,
                         internal::cl_row_index(row_index, expr.rows(), name),
                         math::col_index(-1, expr.cols()));
@@ -115,11 +107,11 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index) {
 /**
  * Index a prim kernel generator expression with two indices.
  *
- * @tparam Expr type of the exoression
+ * @tparam Expr type of the expression
  * @tparam RowIndex type of row index
  * @tparam ColIndex type of column index
  * @param expr a prim kernel generator expression to index
- * @param name string form of expression being evaluated
+ * @param name name of value being indexed (if named, otherwise an empty string)
  * @param row_index row index
  * @param col_index column index
  * @return result of indexing
@@ -129,22 +121,8 @@ template <typename Expr, typename RowIndex, typename ColIndex,
           require_any_not_same_t<RowIndex, ColIndex, index_uni>* = nullptr>
 inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index,
                    const ColIndex& col_index) {
-  auto checks1 = internal::index_check(row_index, name, expr.rows());
-  auto checks2 = internal::index_check(col_index, name, expr.cols());
-  try {
-    math::index_apply<std::tuple_size<decltype(checks1)>::value>(
-        [&checks1](auto... Is) {
-          math::results(std::get<Is>(checks1).first...)
-              = math::expressions(std::get<Is>(checks1).second...);
-        });
-    math::index_apply<std::tuple_size<decltype(checks2)>::value>(
-        [&checks2](auto... Is) {
-          math::results(std::get<Is>(checks2).first...)
-              = math::expressions(std::get<Is>(checks2).second...);
-        });
-  } catch (const std::domain_error& e) {
-    throw std::out_of_range(e.what());
-  }
+  internal::index_check(row_index, name, expr.rows());
+  internal::index_check(col_index, name, expr.cols());
 
   return math::indexing(expr,
                         internal::cl_row_index(row_index, expr.rows(), name),
@@ -154,9 +132,9 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index,
 /**
  * Index a prim kernel generator expression with two single indices.
  *
- * @tparam Expr type of the exoression
+ * @tparam Expr type of the expression
  * @param expr a prim kernel generator expression to index
- * @param name string form of expression being evaluated
+ * @param name name of value being indexed (if named, otherwise an empty string)
  * @param row_index row index
  * @param col_index column index
  * @return result of indexing (scalar)
@@ -189,10 +167,10 @@ inline auto rvalue(Expr&& expr, const char* name, const index_uni row_index,
 /**
  * Index a rev kernel generator expression with one (non multi-) index.
  *
- * @tparam Expr type of the exoression
+ * @tparam Expr type of the expression
  * @tparam RowIndex type of index
  * @param expr a prim kernel generator expression to index
- * @param name string form of expression being evaluated
+ * @param name name of value being indexed (if named, otherwise an empty string)
  * @param row_index index
  * @return result of indexing
  */
@@ -201,16 +179,7 @@ template <typename Expr, typename RowIndex,
           require_not_same_t<RowIndex, math::matrix_cl<int>>* = nullptr>
 inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index) {
   int rows = expr.rows();
-  auto checks1 = internal::index_check(row_index, name, rows);
-  try {
-    math::index_apply<std::tuple_size<decltype(checks1)>::value>(
-        [&checks1](auto... Is) {
-          math::results(std::get<Is>(checks1).first...)
-              = math::expressions(std::get<Is>(checks1).second...);
-        });
-  } catch (const std::domain_error& e) {
-    throw std::out_of_range(e.what());
-  }
+  internal::index_check(row_index, name, rows);
   auto res_vari
       = expr.vi_->index(internal::cl_row_index(row_index, expr.rows(), name),
                         math::col_index(-1, expr.cols()));
@@ -221,11 +190,11 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index) {
 /**
  * Index a rev kernel generator expression with two (non-multi) indices.
  *
- * @tparam Expr type of the exoression
+ * @tparam Expr type of the expression
  * @tparam RowIndex type of row index
  * @tparam ColIndex type of column index
  * @param expr a prim kernel generator expression to index
- * @param name string form of expression being evaluated
+ * @param name name of value being indexed (if named, otherwise an empty string)
  * @param row_index row index
  * @param col_index column index
  * @return result of indexing
@@ -239,22 +208,8 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index,
                    const ColIndex col_index) {
   int rows = expr.rows();
   int cols = expr.cols();
-  auto checks1 = internal::index_check(row_index, name, rows);
-  auto checks2 = internal::index_check(col_index, name, cols);
-  try {
-    math::index_apply<std::tuple_size<decltype(checks1)>::value>(
-        [&checks1](auto... Is) {
-          math::results(std::get<Is>(checks1).first...)
-              = math::expressions(std::get<Is>(checks1).second...);
-        });
-    math::index_apply<std::tuple_size<decltype(checks2)>::value>(
-        [&checks2](auto... Is) {
-          math::results(std::get<Is>(checks2).first...)
-              = math::expressions(std::get<Is>(checks2).second...);
-        });
-  } catch (const std::domain_error& e) {
-    throw std::out_of_range(e.what());
-  }
+  internal::index_check(row_index, name, rows);
+  internal::index_check(col_index, name, cols);
 
   auto res_vari
       = expr.vi_->index(internal::cl_row_index(row_index, rows, name),
@@ -266,9 +221,9 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index,
 /**
  * Index a rev kernel generator expression with two uni indices.
  *
- * @tparam Expr type of the exoression
+ * @tparam Expr type of the expression
  * @param expr a prim kernel generator expression to index
- * @param name string form of expression being evaluated
+ * @param name name of value being indexed (if named, otherwise an empty string)
  * @param row_index row index
  * @param col_index column index
  * @return result of indexing
@@ -302,30 +257,23 @@ inline math::var rvalue(Expr&& expr, const char* name,
 /**
  * Index a rev kernel generator expression with one multi-index.
  *
- * @tparam Expr type of the exoression
+ * @tparam Expr type of the expression
  * @tparam RowIndex type of index
  * @param expr a prim kernel generator expression to index
- * @param name string form of expression being evaluated
+ * @param name name of value being indexed (if named, otherwise an empty string)
  * @param row_index index
  * @return result of indexing
  */
 template <typename Expr, require_rev_kernel_expression_t<Expr>* = nullptr>
 inline auto rvalue(Expr&& expr, const char* name,
                    const math::matrix_cl<int>& row_index) {
+  internal::index_check(row_index, name, expr.rows());
+
   auto row_idx_expr = math::rowwise_broadcast(row_index - 1);
   auto col_idx_expr = math::col_index(-1, expr.cols());
   auto res_expr = math::indexing(expr.val_op(), row_idx_expr, col_idx_expr);
   auto lin_idx_expr
       = row_idx_expr + col_idx_expr * static_cast<int>(expr.rows());
-
-  try {
-    math::check_cl("multi-indexing", name, row_index, "within range")
-        = static_cast<int>(stan::error_index::value) <= row_index
-          && row_index
-                 < static_cast<int>(expr.rows() + stan::error_index::value);
-  } catch (const std::domain_error& e) {
-    throw std::out_of_range(e.what());
-  }
 
   math::matrix_cl<double> res;
   math::arena_matrix_cl<int> lin_idx;
@@ -341,11 +289,11 @@ inline auto rvalue(Expr&& expr, const char* name,
  * Index a rev kernel generator expression with two indices, at least one of
  * which is multi-index.
  *
- * @tparam Expr type of the exoression
+ * @tparam Expr type of the expression
  * @tparam RowIndex type of row index
  * @tparam ColIndex type of column index
  * @param expr a prim kernel generator expression to index
- * @param name string form of expression being evaluated
+ * @param name name of value being indexed (if named, otherwise an empty string)
  * @param row_index row index
  * @param col_index column index
  * @return result of indexing
@@ -359,22 +307,8 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index,
                    const ColIndex& col_index) {
   int rows = expr.rows();
   int cols = expr.cols();
-  auto checks1 = internal::index_check(row_index, name, rows);
-  auto checks2 = internal::index_check(col_index, name, cols);
-  try {
-    math::index_apply<std::tuple_size<decltype(checks1)>::value>(
-        [&checks1](auto... Is) {
-          math::results(std::get<Is>(checks1).first...)
-              = math::expressions(std::get<Is>(checks1).second...);
-        });
-    math::index_apply<std::tuple_size<decltype(checks2)>::value>(
-        [&checks2](auto... Is) {
-          math::results(std::get<Is>(checks2).first...)
-              = math::expressions(std::get<Is>(checks2).second...);
-        });
-  } catch (const std::domain_error& e) {
-    throw std::out_of_range(e.what());
-  }
+  internal::index_check(row_index, name, rows);
+  internal::index_check(col_index, name, cols);
   auto row_idx_expr = internal::cl_row_index(row_index, rows, name);
   auto col_idx_expr = internal::cl_col_index(col_index, cols, name);
   auto res_expr = math::indexing(expr.val_op(), row_idx_expr, col_idx_expr);
