@@ -33,15 +33,15 @@ namespace model {
 template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_kernel_expression_lhs_t<ExprLhs>* = nullptr,
           require_all_kernel_expressions_and_none_scalar_t<ExprRhs>* = nullptr>
-inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
-                   const char* name, const RowIndex& row_index) {
+inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
+                   const RowIndex& row_index) {
   if (std::is_same<RowIndex, index_omni>::value) {
     stan::math::check_size_match("omni assign", "left hand side rows",
                                  expr_lhs.rows(), name, expr_rhs.rows());
     stan::math::check_size_match("omni assign", "left hand side columns",
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
-  rvalue(expr_lhs, name, row_index) = expr_rhs;
+  rvalue(expr_lhs, name, row_index) = std::forward<ExprRhs>(expr_rhs);
 }
 
 /**
@@ -68,9 +68,8 @@ template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_kernel_expression_lhs_t<ExprLhs>* = nullptr,
           require_all_kernel_expressions_and_none_scalar_t<ExprRhs>* = nullptr,
           require_any_not_same_t<RowIndex, ColIndex, index_uni>* = nullptr>
-inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
-                   const char* name, const RowIndex& row_index,
-                   const ColIndex& col_index) {
+inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
+                   const RowIndex& row_index, const ColIndex& col_index) {
   if (std::is_same<RowIndex, index_omni>::value
       && std::is_same<ColIndex, index_omni>::value) {
     stan::math::check_size_match("omni assign", "left hand side rows",
@@ -78,7 +77,8 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
     stan::math::check_size_match("omni assign", "left hand side columns",
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
-  rvalue(expr_lhs, name, row_index, col_index) = expr_rhs;
+  rvalue(expr_lhs, name, row_index, col_index)
+      = std::forward<ExprRhs>(expr_rhs);
 }
 
 /**
@@ -126,18 +126,22 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
 template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_rev_kernel_expression_t<ExprLhs>* = nullptr,
           require_all_kernel_expressions_and_none_scalar_t<ExprRhs>* = nullptr>
-inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
-                   const char* name, const RowIndex& row_index) {
+inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
+                   const RowIndex& row_index) {
   if (std::is_same<RowIndex, index_omni>::value) {
     stan::math::check_size_match("omni assign", "left hand side rows",
                                  expr_lhs.rows(), name, expr_rhs.rows());
     stan::math::check_size_match("omni assign", "left hand side columns",
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
-  auto&& lhs_holder = rvalue(expr_lhs.val_op(), name, row_index);
-  auto& lhs = lhs_holder;
-  math::arena_matrix_cl<double> prev_vals = lhs;
-  lhs = expr_rhs;
+  decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index);
+  math::arena_matrix_cl<double> prev_vals;
+  if (std::is_rvalue_reference<ExprRhs&&>::value) {
+    prev_vals = std::move(lhs);
+  } else {
+    prev_vals = lhs;
+  }
+  lhs = std::forward<ExprRhs>(expr_rhs);
   math::reverse_pass_callback([expr_lhs, row_index, prev_vals, name]() mutable {
     auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
     auto&& lhs_adj = rvalue(expr_lhs.adj(), name, row_index);
@@ -170,9 +174,8 @@ template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_rev_kernel_expression_t<ExprLhs>* = nullptr,
           require_all_kernel_expressions_and_none_scalar_t<ExprRhs>* = nullptr,
           require_any_not_same_t<RowIndex, ColIndex, index_uni>* = nullptr>
-inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
-                   const char* name, const RowIndex& row_index,
-                   const ColIndex& col_index) {
+inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
+                   const RowIndex& row_index, const ColIndex& col_index) {
   if (std::is_same<RowIndex, index_omni>::value
       && std::is_same<ColIndex, index_omni>::value) {
     stan::math::check_size_match("omni assign", "left hand side rows",
@@ -180,10 +183,14 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
     stan::math::check_size_match("omni assign", "left hand side columns",
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
-  auto&& lhs_holder = rvalue(expr_lhs.val_op(), name, row_index, col_index);
-  auto& lhs = lhs_holder;
-  math::arena_matrix_cl<double> prev_vals = lhs;
-  lhs = expr_rhs;
+  decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index, col_index);
+  math::arena_matrix_cl<double> prev_vals;
+  if (std::is_rvalue_reference<ExprRhs&&>::value) {
+    prev_vals = std::move(lhs);
+  } else {
+    prev_vals = lhs;
+  }
+  lhs = std::forward<ExprRhs>(expr_rhs);
   math::reverse_pass_callback(
       [expr_lhs, row_index, col_index, prev_vals, name]() mutable {
         auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index, col_index);
@@ -215,9 +222,8 @@ template <typename ExprLhs, typename ScalRhs,
 inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
                    const char* name, const index_uni row_index,
                    const index_uni col_index) {
-  auto&& lhs_holder = math::block_zero_based(
+  decltype(auto) lhs = math::block_zero_based(
       expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
-  auto& lhs = lhs_holder;
   math::arena_matrix_cl<double> prev_val = lhs;
   lhs = math::constant(scal_rhs, 1, 1);
   math::reverse_pass_callback(
@@ -259,8 +265,7 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
     stan::math::check_size_match("omni assign", "left hand side columns",
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
-  auto&& lhs_holder = rvalue(expr_lhs.val_op(), name, row_index);
-  auto& lhs = lhs_holder;
+  decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index);
   math::arena_matrix_cl<double> prev_vals = lhs;
   lhs = expr_rhs.val();
   math::reverse_pass_callback(
@@ -273,6 +278,12 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
             prev_vals, expr_rhs.adj() + lhs_adj,
             math::constant(0.0, lhs_adj.rows(), lhs_adj.cols()));
       });
+}
+// the "forwarding" overload
+inline void assign(math::var_value<math::matrix_cl<double>>& expr_lhs,
+                   math::var_value<math::matrix_cl<double>>&& expr_rhs,
+                   const char* /*name*/, index_omni /*row_index*/) {
+  expr_lhs.vi_ = expr_rhs.vi_;
 }
 
 /**
@@ -308,8 +319,7 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
     stan::math::check_size_match("omni assign", "left hand side columns",
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
-  auto&& lhs_holder = rvalue(expr_lhs.val_op(), name, row_index, col_index);
-  auto& lhs = lhs_holder;
+  decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index, col_index);
   math::arena_matrix_cl<double> prev_vals = lhs;
   lhs = expr_rhs.val();
   math::reverse_pass_callback([expr_lhs, expr_rhs, row_index, col_index, name,
@@ -323,6 +333,13 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
         prev_vals, expr_rhs.adj() + lhs_adj,
         math::constant(0.0, lhs_adj.rows(), lhs_adj.cols()));
   });
+}
+// the "forwarding" overload
+inline void assign(math::var_value<math::matrix_cl<double>>& expr_lhs,
+                   math::var_value<math::matrix_cl<double>>&& expr_rhs,
+                   const char* /*name*/, index_omni /*row_index*/,
+                   index_omni /*col_index*/) {
+  expr_lhs.vi_ = expr_rhs.vi_;
 }
 
 /**
@@ -345,9 +362,8 @@ template <typename ExprLhs, typename ScalRhs,
 inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
                    const char* name, const index_uni row_index,
                    const index_uni col_index) {
-  auto&& lhs_holder = math::block_zero_based(
+  decltype(auto) lhs = math::block_zero_based(
       expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
-  auto& lhs = lhs_holder;
   math::arena_matrix_cl<double> prev_val = lhs;
   lhs = math::constant(scal_rhs.val(), 1, 1);
   math::reverse_pass_callback(

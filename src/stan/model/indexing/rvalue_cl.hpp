@@ -158,7 +158,9 @@ inline auto rvalue(Expr&& expr, const char* name, const index_uni row_index,
         sizeof(Val), &res, &expr_eval.write_events(), &copy_event);
     copy_event.wait();
   } catch (const cl::Error& e) {
-    stan::math::check_opencl_error("uni uni indexing", e);
+    std::ostringstream m;
+    m << "uni uni indexing of " << name;
+    stan::math::check_opencl_error(m.str().c_str(), e);
   }
   return res;
 }
@@ -244,7 +246,9 @@ inline math::var rvalue(Expr&& expr, const char* name,
         sizeof(Val), &res, &expr.val().write_events(), &copy_event);
     copy_event.wait();
   } catch (const cl::Error& e) {
-    stan::math::check_opencl_error("uni uni indexing", e);
+    std::ostringstream m;
+    m << "uni uni indexing of " << name;
+    stan::math::check_opencl_error(m.str().c_str(), e);
   }
   return math::make_callback_var(
       res, [expr, row_index, col_index](math::vari res_vari) mutable {
