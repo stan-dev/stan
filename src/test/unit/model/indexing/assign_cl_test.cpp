@@ -9,7 +9,7 @@
 #include <stan/math.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
-#include <test/unit/pretty_print_types.hpp>
+#include <test/unit/model/indexing/util_cl.hpp>
 #include <tuple>
 
 using stan::model::assign;
@@ -21,55 +21,6 @@ using stan::model::index_min_max;
 using stan::model::index_multi;
 using stan::model::index_omni;
 using stan::model::index_uni;
-
-template <typename T>
-T opencl_index(T i) {
-  return i;
-}
-stan::math::matrix_cl<int> opencl_index(const index_multi& i) {
-  return stan::math::to_matrix_cl(i.ns_);
-}
-
-template <typename T, stan::require_not_rev_kernel_expression_t<T>* = nullptr>
-void set_adjoints1(T& v) {
-  for (int i = 0; i < v.rows(); i++) {
-    for (int j = 0; j < v.cols(); j++) {
-      v(i, j).adj() += i + 10 * j + 100;
-    }
-  }
-}
-template <typename T, stan::require_rev_kernel_expression_t<T>* = nullptr>
-void set_adjoints1(T& v) {
-  Eigen::MatrixXd adj(v.rows(), v.cols());
-
-  for (int i = 0; i < v.rows(); i++) {
-    for (int j = 0; j < v.cols(); j++) {
-      adj(i, j) = i + 10 * j + 100;
-    }
-  }
-  stan::math::matrix_cl<double> adj_cl(adj);
-  v.adj() += adj_cl;
-}
-template <typename T, stan::require_not_rev_kernel_expression_t<T>* = nullptr>
-void set_adjoints2(T& v) {
-  for (int i = 0; i < v.rows(); i++) {
-    for (int j = 0; j < v.cols(); j++) {
-      v(i, j).adj() += i + 10 * j + 10000;
-    }
-  }
-}
-template <typename T, stan::require_rev_kernel_expression_t<T>* = nullptr>
-void set_adjoints2(T& v) {
-  Eigen::MatrixXd adj(v.rows(), v.cols());
-
-  for (int i = 0; i < v.rows(); i++) {
-    for (int j = 0; j < v.cols(); j++) {
-      adj(i, j) = i + 10 * j + 10000;
-    }
-  }
-  stan::math::matrix_cl<double> adj_cl(adj);
-  v.adj() += adj_cl;
-}
 
 TEST(ModelIndexing, rvalue_opencl_vector_1d) {
   Eigen::VectorXd m1(4);
@@ -92,9 +43,6 @@ TEST(ModelIndexing, rvalue_opencl_vector_1d) {
   constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
   stan::math::for_each(
       [&](auto index) {
-        //  stan::math::index_apply<N_ind>([&](auto... Is1) {
-        //    std::initializer_list<int>{(
-        //        [&](const auto& ind1) {
         // prim
 
         Eigen::VectorXd m_test = m1;
@@ -186,8 +134,6 @@ TEST(ModelIndexing, rvalue_opencl_vector_1d) {
                      std::invalid_argument);
 
         stan::math::recover_memory();
-        //        }(std::get<Is1>(indices)),
-        //        0)...};
       },
       indices);
 }
@@ -214,9 +160,6 @@ TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
 
   stan::math::for_each(
       [&](auto index) {
-//  stan::math::index_apply<N_ind>([&](auto... Is1) {
-//    std::initializer_list<int>{(
-//        [&](const auto& ind1) {
           // prim
 
           Eigen::MatrixXd m_test = m1;
@@ -310,8 +253,6 @@ TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
                        std::invalid_argument);
 
           stan::math::recover_memory();
-//        }(std::get<Is1>(indices)),
-//        0)...};
   }, indices);
 }
 
@@ -335,15 +276,8 @@ TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
 
   stan::math::for_each(
       [&](auto index1) {
-//  stan::math::index_apply<N_ind>([&](auto... Is1) {
-//    std::initializer_list<int>{(
-//        [&](const auto& ind1) {
-
       stan::math::for_each(
           [&](auto index2) {
-//          stan::math::index_apply<N_ind>([&](auto... Is2) {
-//            std::initializer_list<int>{(
-//                [&](const auto& ind2) {
                   // prim
 
                   Eigen::MatrixXd m_test = m1;
@@ -433,11 +367,7 @@ TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
                                    stan::math::from_matrix_cl(m2_v_cl.val()));
 
                   stan::math::recover_memory();
-//                }(std::get<Is2>(indices)),
-//                0)...};
           }, indices);
-//        }(std::get<Is1>(indices)),
-//        0)...};
   }, indices);
 }
 

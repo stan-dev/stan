@@ -7,7 +7,7 @@
 #include <stan/math.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
-#include <test/unit/pretty_print_types.hpp>
+#include <test/unit/model/indexing/util_cl.hpp>
 #include <tuple>
 
 using stan::model::rvalue;
@@ -19,31 +19,6 @@ using stan::model::index_multi;
 using stan::model::index_omni;
 using stan::model::index_uni;
 
-template <typename T>
-T opencl_index(T i) {
-  return i;
-}
-stan::math::matrix_cl<int> opencl_index(const index_multi& i) {
-  return stan::math::to_matrix_cl(i.ns_);
-}
-
-template <typename T>
-auto from_matrix_cl_nonscalar(const T& a) {
-  return stan::math::from_matrix_cl(a);
-}
-auto from_matrix_cl_nonscalar(const stan::math::var a) { return a; }
-auto from_matrix_cl_nonscalar(const double a) { return a; }
-auto from_matrix_cl_nonscalar(const int a) { return a; }
-
-template <typename T>
-void set_adjoints(T& v) {
-  for (int i = 0; i < v.rows(); i++) {
-    for (int j = 0; j < v.cols(); j++) {
-      v(i, j).adj() += i + 3;
-    }
-  }
-}
-void set_adjoints(stan::math::var v) { v.adj() = 3; }
 
 template <typename T_eig, typename T_cl>
 void expect_eq(const T_eig& a, const T_cl& b) {
@@ -81,8 +56,8 @@ TEST(ModelIndexing, rvalue_opencl_vector_1d) {
           auto res = from_matrix_cl_nonscalar(
               rvalue(m_v_cl, "", opencl_index(ind1)));
           expect_eq(correct.val(), res.val());
-          set_adjoints(correct);
-          set_adjoints(res);
+          set_adjoints1(correct);
+          set_adjoints1(res);
           stan::math::grad();
           expect_eq(m_v1.adj(), m_v2.adj());
           stan::math::recover_memory();
@@ -120,8 +95,8 @@ TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
           auto res = from_matrix_cl_nonscalar(
               rvalue(m_v_cl, "", opencl_index(ind1)));
           expect_eq(correct.val(), res.val());
-          set_adjoints(correct);
-          set_adjoints(res);
+          set_adjoints1(correct);
+          set_adjoints1(res);
           stan::math::grad();
           expect_eq(m_v1.adj(), m_v2.adj());
           stan::math::recover_memory();
@@ -164,8 +139,8 @@ TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
                   auto res = from_matrix_cl_nonscalar(rvalue(
                       m_v_cl, "", opencl_index(ind1), opencl_index(ind2)));
                   expect_eq(correct.val(), res.val());
-                  set_adjoints(correct);
-                  set_adjoints(res);
+                  set_adjoints1(correct);
+                  set_adjoints1(res);
                   stan::math::grad();
                   expect_eq(m_v1.adj(), m_v2.adj());
                   stan::math::recover_memory();
