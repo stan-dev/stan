@@ -141,7 +141,7 @@ inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
   } else {
     prev_vals = lhs;
   }
-  lhs = std::forward<ExprRhs>(expr_rhs); //assign the values
+  lhs = std::forward<ExprRhs>(expr_rhs);  // assign the values
   math::reverse_pass_callback([expr_lhs, row_index, prev_vals, name]() mutable {
     auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
     auto&& lhs_adj = rvalue(expr_lhs.adj(), name, row_index);
@@ -190,7 +190,7 @@ inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
   } else {
     prev_vals = lhs;
   }
-  lhs = std::forward<ExprRhs>(expr_rhs); //assign the values
+  lhs = std::forward<ExprRhs>(expr_rhs);  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, row_index, col_index, prev_vals, name]() mutable {
         auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index, col_index);
@@ -225,7 +225,7 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
   decltype(auto) lhs = math::block_zero_based(
       expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
   math::arena_matrix_cl<double> prev_val = lhs;
-  lhs = math::constant(scal_rhs, 1, 1); //assign the values
+  lhs = math::constant(scal_rhs, 1, 1);  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, row_index, col_index, prev_val]() mutable {
         auto&& lhs_val = math::block_zero_based(
@@ -267,7 +267,7 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   }
   decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index);
   math::arena_matrix_cl<double> prev_vals = lhs;
-  lhs = expr_rhs.val(); //assign the values
+  lhs = expr_rhs.val();  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, expr_rhs, row_index, name, prev_vals]() mutable {
         auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
@@ -321,7 +321,7 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   }
   decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index, col_index);
   math::arena_matrix_cl<double> prev_vals = lhs;
-  lhs = expr_rhs.val(); //assign the values
+  lhs = expr_rhs.val();  // assign the values
   math::reverse_pass_callback([expr_lhs, expr_rhs, row_index, col_index, name,
                                prev_vals]() mutable {
     auto&& lhs_val_holder
@@ -365,7 +365,7 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
   decltype(auto) lhs = math::block_zero_based(
       expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
   math::arena_matrix_cl<double> prev_val = lhs;
-  lhs = math::constant(scal_rhs.val(), 1, 1); //assign the values
+  lhs = math::constant(scal_rhs.val(), 1, 1);  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, scal_rhs, row_index, col_index, prev_val]() mutable {
         auto&& lhs_val = math::block_zero_based(

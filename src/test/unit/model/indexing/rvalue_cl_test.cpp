@@ -19,7 +19,6 @@ using stan::model::index_multi;
 using stan::model::index_omni;
 using stan::model::index_uni;
 
-
 template <typename T_eig, typename T_cl>
 void expect_eq(const T_eig& a, const T_cl& b) {
   EXPECT_MATRIX_EQ(a, b);

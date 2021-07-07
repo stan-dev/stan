@@ -163,7 +163,7 @@ TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
 
   stan::math::for_each(
       [&](auto index) {
-          // prim
+        // prim
 
         Eigen::MatrixXd m_test = m1;
         stan::math::matrix_cl<double> m_test_cl = m1_cl;
@@ -255,8 +255,9 @@ TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
         EXPECT_THROW(assign(m1_v_cl, m_v_err, "var err2", index_cl),
                      std::invalid_argument);
 
-          stan::math::recover_memory();
-  }, indices);
+        stan::math::recover_memory();
+      },
+      indices);
 }
 
 TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
@@ -279,9 +280,9 @@ TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
 
   stan::math::for_each(
       [&](auto index1) {
-      stan::math::for_each(
-          [&](auto index2) {
-                  // prim
+        stan::math::for_each(
+            [&](auto index2) {
+              // prim
 
               Eigen::MatrixXd m_test = m1;
               stan::math::matrix_cl<double> m_test_cl = m1_cl;
@@ -368,9 +369,11 @@ TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
               EXPECT_MATRIX_EQ(m2_v1.val(),
                                stan::math::from_matrix_cl(m2_v_cl.val()));
 
-                  stan::math::recover_memory();
-          }, indices);
-  }, indices);
+              stan::math::recover_memory();
+            },
+            indices);
+      },
+      indices);
 }
 
 #endif
