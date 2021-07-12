@@ -144,7 +144,7 @@ template <typename Expr,
 inline auto rvalue(Expr&& expr, const char* name, const index_uni row_index,
                    const index_uni col_index) {
   using Val = stan::value_type_t<Expr>;
-  math::matrix_cl<Val> expr_eval = expr;
+  decltype(auto) expr_eval = expr.eval();
   math::check_range("uni indexing", name, expr_eval.rows(), row_index.n_);
   math::check_range("uni indexing", name, expr_eval.cols(), col_index.n_);
   cl::CommandQueue queue = stan::math::opencl_context.queue();
