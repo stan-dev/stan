@@ -16,8 +16,9 @@ inline auto cl_row_index(index_uni i, int rows, const char* name) {
   math::check_range("uni indexing", name, rows, i.n_);
   return math::constant(i.n_ - 1, 1, -1);
 }
-inline auto cl_row_index(const math::matrix_cl<int>& i, int rows,
-                         const char* name) {
+template <typename T, require_matrix_cl_t<T>* = nullptr,
+          require_all_vt_same<T, int>* = nullptr>
+inline auto cl_row_index(const T& i, int rows, const char* name) {
   return math::rowwise_broadcast(i - 1);
 }
 inline auto cl_row_index(index_omni /*i*/, int rows, const char* name) {
@@ -45,8 +46,9 @@ inline auto cl_col_index(index_uni i, int cols, const char* name) {
   math::check_range("uni indexing", name, cols, i.n_);
   return math::constant(i.n_ - 1, -1, 1);
 }
-inline auto cl_col_index(const math::matrix_cl<int>& i, int cols,
-                         const char* name) {
+template <typename T, require_matrix_cl_t<T>* = nullptr,
+          require_all_vt_same<T, int>* = nullptr>
+inline auto cl_col_index(const T& i, int cols, const char* name) {
   return math::colwise_broadcast(math::transpose(i - 1));
 }
 inline auto cl_col_index(index_omni i, int cols, const char* name) {

@@ -149,12 +149,10 @@ inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
   lhs = std::forward<ExprRhs>(expr_rhs);  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, prev_vals, name,
-       row_index_tup
-       = std::tuple<RowIndex>(std::forward<RowIndex>(row_index))]() mutable {
-        auto&& lhs_val
-            = rvalue(expr_lhs.val_op(), name, std::get<0>(row_index_tup));
-        auto&& lhs_adj
-            = rvalue(expr_lhs.adj(), name, std::get<0>(row_index_tup));
+       row_index
+       = math::to_arena(std::forward<RowIndex>(row_index))]() mutable {
+        auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
+        auto&& lhs_adj = rvalue(expr_lhs.adj(), name, row_index);
         math::results(lhs_val, lhs_adj) = math::expressions(
             prev_vals, math::constant(0.0, lhs_adj.rows(), lhs_adj.cols()));
       });
@@ -205,15 +203,11 @@ inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
   lhs = std::forward<ExprRhs>(expr_rhs);  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, prev_vals, name,
-       row_index_tup = std::tuple<RowIndex>(std::forward<RowIndex>(row_index)),
-       col_index_tup
-       = std::tuple<ColIndex>(std::forward<ColIndex>(col_index))]() mutable {
-        auto&& lhs_val
-            = rvalue(expr_lhs.val_op(), name, std::get<0>(row_index_tup),
-                     std::get<0>(col_index_tup));
-        auto&& lhs_adj
-            = rvalue(expr_lhs.adj(), name, std::get<0>(row_index_tup),
-                     std::get<0>(col_index_tup));
+       row_index = math::to_arena(std::forward<RowIndex>(row_index)),
+       col_index
+       = math::to_arena(std::forward<ColIndex>(col_index))]() mutable {
+        auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index, col_index);
+        auto&& lhs_adj = rvalue(expr_lhs.adj(), name, row_index, col_index);
         lhs_adj = math::constant(0.0, lhs_adj.rows(), lhs_adj.cols());
         lhs_val = prev_vals;
         math::results(lhs_val, lhs_adj) = math::expressions(
@@ -291,12 +285,12 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   lhs = expr_rhs.val();  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, expr_rhs, name, prev_vals,
-       row_index_tup
-       = std::tuple<RowIndex>(std::forward<RowIndex>(row_index))]() mutable {
+       row_index
+       = math::to_arena(std::forward<RowIndex>(row_index))]() mutable {
         auto&& lhs_val
-            = rvalue(expr_lhs.val_op(), name, std::get<0>(row_index_tup));
+            = rvalue(expr_lhs.val_op(), name, row_index);
         decltype(auto) lhs_adj
-            = rvalue(expr_lhs.adj(), name, std::get<0>(row_index_tup));
+            = rvalue(expr_lhs.adj(), name, row_index);
 
         math::results(lhs_val, expr_rhs.adj(), lhs_adj) = math::expressions(
             prev_vals, expr_rhs.adj() + lhs_adj,
