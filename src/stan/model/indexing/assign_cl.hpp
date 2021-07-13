@@ -287,10 +287,8 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
       [expr_lhs, expr_rhs, name, prev_vals,
        row_index
        = math::to_arena(std::forward<RowIndex>(row_index))]() mutable {
-        auto&& lhs_val
-            = rvalue(expr_lhs.val_op(), name, row_index);
-        decltype(auto) lhs_adj
-            = rvalue(expr_lhs.adj(), name, row_index);
+        auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
+        decltype(auto) lhs_adj = rvalue(expr_lhs.adj(), name, row_index);
 
         math::results(lhs_val, expr_rhs.adj(), lhs_adj) = math::expressions(
             prev_vals, expr_rhs.adj() + lhs_adj,
