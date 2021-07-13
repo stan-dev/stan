@@ -22,7 +22,7 @@ using stan::model::index_multi;
 using stan::model::index_omni;
 using stan::model::index_uni;
 
-TEST(ModelIndexing, rvalue_opencl_vector_1d) {
+TEST(ModelIndexing, assign_opencl_vector_1d) {
   Eigen::VectorXd m1(4);
   m1 << 1, 2, 3, 4;
   Eigen::VectorXd m2(4);
@@ -141,7 +141,7 @@ TEST(ModelIndexing, rvalue_opencl_vector_1d) {
       indices);
 }
 
-TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
+TEST(ModelIndexing, assign_opencl_matrix_1d) {
   Eigen::MatrixXd m1(4, 4);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7;
   Eigen::MatrixXd m2(4, 4);
@@ -260,7 +260,7 @@ TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
       indices);
 }
 
-TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
+TEST(ModelIndexing, assign_opencl_matrix_2d) {
   Eigen::MatrixXd m1(4, 4);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7;
   Eigen::MatrixXd m2(4, 4);

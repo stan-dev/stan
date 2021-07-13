@@ -36,33 +36,28 @@ TEST(ModelIndexing, rvalue_opencl_vector_1d) {
   auto indices = std::make_tuple(
       index_omni(), index_multi(std::vector<int>{1, 2, 1, 3, 1}), index_min(2),
       index_max(3), index_min_max(2, 3), index_min_max(3, 1));
-  constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
-  stan::math::index_apply<N_ind>([&indices, &m, &m_cl, &m_i,
-                                  &m_i_cl](auto... Is1) {
-    std::initializer_list<int>{(
-        [&indices, &m, &m_cl, &m_i, &m_i_cl](const auto& ind1) {
-          expect_eq(rvalue(m, "", ind1), from_matrix_cl_nonscalar(rvalue(
-                                             m_cl, "", opencl_index(ind1))));
-          expect_eq(
-              rvalue(m_i, "", ind1),
-              from_matrix_cl_nonscalar(rvalue(m_i_cl, "", opencl_index(ind1))));
+  stan::math::for_each(
+      [&indices, &m, &m_cl, &m_i, &m_i_cl](const auto& ind1) {
+        expect_eq(rvalue(m, "", ind1), from_matrix_cl_nonscalar(rvalue(
+                                           m_cl, "", opencl_index(ind1))));
+        expect_eq(rvalue(m_i, "", ind1), from_matrix_cl_nonscalar(rvalue(
+                                             m_i_cl, "", opencl_index(ind1))));
 
-          stan::math::vector_v m_v1 = m;
-          stan::math::vector_v m_v2 = m;
-          stan::math::var_value<stan::math::matrix_cl<double>> m_v_cl
-              = stan::math::to_matrix_cl(m_v2);
-          auto correct = stan::math::eval(rvalue(m_v1, "", ind1));
-          auto res = from_matrix_cl_nonscalar(
-              rvalue(m_v_cl, "", opencl_index(ind1)));
-          expect_eq(correct.val(), res.val());
-          set_adjoints1(correct);
-          set_adjoints1(res);
-          stan::math::grad();
-          expect_eq(m_v1.adj(), m_v2.adj());
-          stan::math::recover_memory();
-        }(std::get<Is1>(indices)),
-        0)...};
-  });
+        stan::math::vector_v m_v1 = m;
+        stan::math::vector_v m_v2 = m;
+        stan::math::var_value<stan::math::matrix_cl<double>> m_v_cl
+            = stan::math::to_matrix_cl(m_v2);
+        auto correct = stan::math::eval(rvalue(m_v1, "", ind1));
+        auto res
+            = from_matrix_cl_nonscalar(rvalue(m_v_cl, "", opencl_index(ind1)));
+        expect_eq(correct.val(), res.val());
+        set_adjoints1(correct);
+        set_adjoints1(res);
+        stan::math::grad();
+        expect_eq(m_v1.adj(), m_v2.adj());
+        stan::math::recover_memory();
+      },
+      indices);
 }
 
 TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
@@ -75,33 +70,28 @@ TEST(ModelIndexing, rvalue_opencl_matrix_1d) {
   auto indices = std::make_tuple(
       index_uni(3), index_omni(), index_multi(std::vector<int>{1, 2, 1, 3, 1}),
       index_min(2), index_max(3), index_min_max(2, 3), index_min_max(3, 1));
-  constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
-  stan::math::index_apply<N_ind>([&indices, &m, &m_cl, &m_i,
-                                  &m_i_cl](auto... Is1) {
-    std::initializer_list<int>{(
-        [&indices, &m, &m_cl, &m_i, &m_i_cl](const auto& ind1) {
-          expect_eq(rvalue(m, "", ind1), from_matrix_cl_nonscalar(rvalue(
-                                             m_cl, "", opencl_index(ind1))));
-          expect_eq(
-              rvalue(m_i, "", ind1),
-              from_matrix_cl_nonscalar(rvalue(m_i_cl, "", opencl_index(ind1))));
+  stan::math::for_each(
+      [&indices, &m, &m_cl, &m_i, &m_i_cl](const auto& ind1) {
+        expect_eq(rvalue(m, "", ind1), from_matrix_cl_nonscalar(rvalue(
+                                           m_cl, "", opencl_index(ind1))));
+        expect_eq(rvalue(m_i, "", ind1), from_matrix_cl_nonscalar(rvalue(
+                                             m_i_cl, "", opencl_index(ind1))));
 
-          stan::math::matrix_v m_v1 = m;
-          stan::math::matrix_v m_v2 = m;
-          stan::math::var_value<stan::math::matrix_cl<double>> m_v_cl
-              = stan::math::to_matrix_cl(m_v2);
-          auto correct = rvalue(m_v1, "", ind1);
-          auto res = from_matrix_cl_nonscalar(
-              rvalue(m_v_cl, "", opencl_index(ind1)));
-          expect_eq(correct.val(), res.val());
-          set_adjoints1(correct);
-          set_adjoints1(res);
-          stan::math::grad();
-          expect_eq(m_v1.adj(), m_v2.adj());
-          stan::math::recover_memory();
-        }(std::get<Is1>(indices)),
-        0)...};
-  });
+        stan::math::matrix_v m_v1 = m;
+        stan::math::matrix_v m_v2 = m;
+        stan::math::var_value<stan::math::matrix_cl<double>> m_v_cl
+            = stan::math::to_matrix_cl(m_v2);
+        auto correct = rvalue(m_v1, "", ind1);
+        auto res
+            = from_matrix_cl_nonscalar(rvalue(m_v_cl, "", opencl_index(ind1)));
+        expect_eq(correct.val(), res.val());
+        set_adjoints1(correct);
+        set_adjoints1(res);
+        stan::math::grad();
+        expect_eq(m_v1.adj(), m_v2.adj());
+        stan::math::recover_memory();
+      },
+      indices);
 }
 
 TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
@@ -114,41 +104,35 @@ TEST(ModelIndexing, rvalue_opencl_matrix_2d) {
   auto indices = std::make_tuple(
       index_uni(3), index_omni(), index_multi(std::vector<int>{1, 2, 1, 3, 1}),
       index_min(2), index_max(3), index_min_max(2, 3), index_min_max(3, 1));
-  constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
-  stan::math::index_apply<N_ind>([&](auto... Is1) {
-    std::initializer_list<int>{(
-        [&](const auto& ind1) {
-          stan::math::index_apply<N_ind>([&](auto... Is2) {
-            std::initializer_list<int>{(
-                [&](const auto& ind2) {
-                  expect_eq(
-                      rvalue(m, "", ind1, ind2),
-                      from_matrix_cl_nonscalar(rvalue(
-                          m_cl, "", opencl_index(ind1), opencl_index(ind2))));
-                  expect_eq(
-                      rvalue(m_i, "", ind1, ind2),
-                      from_matrix_cl_nonscalar(rvalue(
-                          m_i_cl, "", opencl_index(ind1), opencl_index(ind2))));
+  stan::math::for_each(
+      [&](const auto& ind1) {
+        stan::math::for_each(
+            [&](const auto& ind2) {
+              expect_eq(rvalue(m, "", ind1, ind2),
+                        from_matrix_cl_nonscalar(rvalue(
+                            m_cl, "", opencl_index(ind1), opencl_index(ind2))));
+              expect_eq(
+                  rvalue(m_i, "", ind1, ind2),
+                  from_matrix_cl_nonscalar(rvalue(
+                      m_i_cl, "", opencl_index(ind1), opencl_index(ind2))));
 
-                  stan::math::matrix_v m_v1 = m;
-                  stan::math::matrix_v m_v2 = m;
-                  stan::math::var_value<stan::math::matrix_cl<double>> m_v_cl
-                      = stan::math::to_matrix_cl(m_v2);
-                  auto correct = rvalue(m_v1, "", ind1, ind2);
-                  auto res = from_matrix_cl_nonscalar(rvalue(
-                      m_v_cl, "", opencl_index(ind1), opencl_index(ind2)));
-                  expect_eq(correct.val(), res.val());
-                  set_adjoints1(correct);
-                  set_adjoints1(res);
-                  stan::math::grad();
-                  expect_eq(m_v1.adj(), m_v2.adj());
-                  stan::math::recover_memory();
-                }(std::get<Is2>(indices)),
-                0)...};
-          });
-        }(std::get<Is1>(indices)),
-        0)...};
-  });
+              stan::math::matrix_v m_v1 = m;
+              stan::math::matrix_v m_v2 = m;
+              stan::math::var_value<stan::math::matrix_cl<double>> m_v_cl
+                  = stan::math::to_matrix_cl(m_v2);
+              auto correct = rvalue(m_v1, "", ind1, ind2);
+              auto res = from_matrix_cl_nonscalar(
+                  rvalue(m_v_cl, "", opencl_index(ind1), opencl_index(ind2)));
+              expect_eq(correct.val(), res.val());
+              set_adjoints1(correct);
+              set_adjoints1(res);
+              stan::math::grad();
+              expect_eq(m_v1.adj(), m_v2.adj());
+              stan::math::recover_memory();
+            },
+            indices);
+      },
+      indices);
 }
 
 TEST(ModelIndexing, rvalue_opencl_matrix_2d_errors) {
@@ -166,34 +150,26 @@ TEST(ModelIndexing, rvalue_opencl_matrix_2d_errors) {
   auto indices = std::make_tuple(
       index_uni(3), index_omni(), index_multi(std::vector<int>{1, 2, 1, 3, 1}),
       index_min(2), index_max(3), index_min_max(2, 3), index_min_max(3, 1));
-  constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
-  constexpr int N_ind_err = std::tuple_size<decltype(indices_err)>::value;
-  stan::math::index_apply<N_ind>(
-      [&indices_err, &indices, &m, &m_cl, &m_v_cl](auto... Is1) {
-        std::initializer_list<int>{(
-            [&indices_err, &indices, &m, &m_cl, &m_v_cl](const auto& ind) {
-              stan::math::index_apply<N_ind_err>(
-                  [&indices_err, &m, &m_cl, &m_v_cl, &ind](auto... Is2) {
-                    std::initializer_list<int>{(
-                        [&m, &m_cl, &m_v_cl, &ind](const auto& ind_err) {
-                          EXPECT_THROW(rvalue(m_cl, "", opencl_index(ind),
-                                              opencl_index(ind_err)),
-                                       std::out_of_range);
-                          EXPECT_THROW(rvalue(m_cl, "", opencl_index(ind_err),
-                                              opencl_index(ind)),
-                                       std::out_of_range);
-                          EXPECT_THROW(rvalue(m_v_cl, "", opencl_index(ind),
-                                              opencl_index(ind_err)),
-                                       std::out_of_range);
-                          EXPECT_THROW(rvalue(m_v_cl, "", opencl_index(ind_err),
-                                              opencl_index(ind)),
-                                       std::out_of_range);
-                        }(std::get<Is2>(indices_err)),
-                        0)...};
-                  });
-            }(std::get<Is1>(indices)),
-            0)...};
-      });
+  stan::math::for_each(
+      [&indices_err, &indices, &m, &m_cl, &m_v_cl](const auto& ind) {
+        stan::math::for_each(
+            [&m, &m_cl, &m_v_cl, &ind](const auto& ind_err) {
+              EXPECT_THROW(
+                  rvalue(m_cl, "", opencl_index(ind), opencl_index(ind_err)),
+                  std::out_of_range);
+              EXPECT_THROW(
+                  rvalue(m_cl, "", opencl_index(ind_err), opencl_index(ind)),
+                  std::out_of_range);
+              EXPECT_THROW(
+                  rvalue(m_v_cl, "", opencl_index(ind), opencl_index(ind_err)),
+                  std::out_of_range);
+              EXPECT_THROW(
+                  rvalue(m_v_cl, "", opencl_index(ind_err), opencl_index(ind)),
+                  std::out_of_range);
+            },
+            indices_err);
+      },
+      indices);
 }
 
 TEST(ModelIndexing, rvalue_opencl_matrix_1d_errors) {
@@ -208,16 +184,12 @@ TEST(ModelIndexing, rvalue_opencl_matrix_1d_errors) {
       index_multi(std::vector<int>{5, 2}), index_min(5), index_max(0),
       index_min_max(-1, 3), index_min_max(2, 5), index_min_max(5, 1),
       index_min_max(3, -1));
-  constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
-  stan::math::index_apply<N_ind>([&indices, &m, &m_cl, &m_v_cl](auto... Is1) {
-    std::initializer_list<int>{(
-        [&indices, &m, &m_cl, &m_v_cl](const auto& ind1) {
-          EXPECT_THROW(rvalue(m_cl, "", opencl_index(ind1)), std::out_of_range);
-          EXPECT_THROW(rvalue(m_v_cl, "", opencl_index(ind1)),
-                       std::out_of_range);
-        }(std::get<Is1>(indices)),
-        0)...};
-  });
+  stan::math::for_each(
+      [&indices, &m, &m_cl, &m_v_cl](const auto& ind1) {
+        EXPECT_THROW(rvalue(m_cl, "", opencl_index(ind1)), std::out_of_range);
+        EXPECT_THROW(rvalue(m_v_cl, "", opencl_index(ind1)), std::out_of_range);
+      },
+      indices);
 }
 
 TEST(ModelIndexing, rvalue_opencl_vector_1d_errors) {
@@ -232,16 +204,12 @@ TEST(ModelIndexing, rvalue_opencl_vector_1d_errors) {
       index_multi(std::vector<int>{5, 2}), index_min(5), index_max(0),
       index_min_max(-1, 3), index_min_max(2, 5), index_min_max(5, 1),
       index_min_max(3, -1));
-  constexpr int N_ind = std::tuple_size<decltype(indices)>::value;
-  stan::math::index_apply<N_ind>([&indices, &m, &m_cl, &m_v_cl](auto... Is1) {
-    std::initializer_list<int>{(
-        [&indices, &m, &m_cl, &m_v_cl](const auto& ind1) {
-          EXPECT_THROW(rvalue(m_cl, "", opencl_index(ind1)), std::out_of_range);
-          EXPECT_THROW(rvalue(m_v_cl, "", opencl_index(ind1)),
-                       std::out_of_range);
-        }(std::get<Is1>(indices)),
-        0)...};
-  });
+  stan::math::for_each(
+      [&indices, &m, &m_cl, &m_v_cl](const auto& ind1) {
+        EXPECT_THROW(rvalue(m_cl, "", opencl_index(ind1)), std::out_of_range);
+        EXPECT_THROW(rvalue(m_v_cl, "", opencl_index(ind1)), std::out_of_range);
+      },
+      indices);
 }
 
 #endif
