@@ -434,7 +434,7 @@ TEST_F(RvalueRev, uni_mat) {
 }
 
 TEST_F(RvalueRev, uni_uni_mat) {
-  using stan::model::test::check_matrix_adjs;
+  using stan::model::test::check_adjs;
   Eigen::MatrixXd x_val(3, 4);
   x_val << 0.0, 0.1, 0.2, 0.3, 1.0, 1.1, 1.2, 1.3, 2.0, 2.1, 2.2, 2.3;
   for (int m = 0; m < 3; ++m) {
@@ -445,7 +445,7 @@ TEST_F(RvalueRev, uni_uni_mat) {
       x_sub.grad();
       auto check_i = [m](int i) { return m == i; };
       auto check_j = [n](int j) { return n == j; };
-      check_matrix_adjs(check_i, check_j, x);
+      check_adjs(check_i, check_j, x);
       stan::math::recover_memory();
     }
   }
@@ -481,7 +481,7 @@ TEST_F(RvalueRev, omni_uni_mat) {
 TEST_F(RvalueRev, multi_uni_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
-  using stan::model::test::check_matrix_adjs;
+  using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
