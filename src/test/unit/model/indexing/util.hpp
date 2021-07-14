@@ -19,9 +19,10 @@ namespace test {
  * @param x A vector holding underlying containers
  * @param name A helper name to print out on failure.
  */
-template <typename Check1, typename Check2, typename StdVecVar, require_std_vector_t<StdVecVar>* = nullptr>
+template <typename Check1, typename Check2, typename StdVecVar,
+          require_std_vector_t<StdVecVar>* = nullptr>
 void check_adjs(Check1&& i_check, Check2&& j_check, const StdVecVar& x,
-                        const char* name) {
+                const char* name) {
   for (Eigen::Index i = 0; i < x.size(); ++i) {
     for (Eigen::Index j = 0; j < x[i].size(); ++j) {
       if (i_check(i)) {
@@ -57,9 +58,10 @@ void check_adjs(Check1&& i_check, Check2&& j_check, const StdVecVar& x,
  *  0, any cell satisfying `i_check` and `j_check` are assumed to be 0, and
  *  all cells that fail are equal to 1.
  */
-template <typename Check1, typename Check2, typename VarMat, require_var_matrix_t<VarMat>* = nullptr>
+template <typename Check1, typename Check2, typename VarMat,
+          require_var_matrix_t<VarMat>* = nullptr>
 void check_adjs(Check1&& i_check, Check2&& j_check, const VarMat& x,
-                       const char* name = "", int check_val = 1) {
+                const char* name = "", int check_val = 1) {
   for (Eigen::Index j = 0; j < x.cols(); ++j) {
     for (Eigen::Index i = 0; i < x.rows(); ++i) {
       if (i_check(i)) {
@@ -95,18 +97,16 @@ void check_adjs(Check1&& i_check, Check2&& j_check, const VarMat& x,
  *  0, any cell satisfying `i_check` and `j_check` are assumed to be 0, and
  *  all cells that fail are equal to 1.
  */
-template <typename Check1, typename Check2, typename VarMat, require_eigen_vt<std::is_arithmetic, VarMat>* = nullptr>
+template <typename Check1, typename Check2, typename VarMat,
+          require_eigen_vt<std::is_arithmetic, VarMat>* = nullptr>
 void check_adjs(Check1&& i_check, Check2&& j_check, const VarMat& x,
-                       const char* name = "", int check_val = 1) {
-}
+                const char* name = "", int check_val = 1) {}
 
 void check_adjs(stan::math::var x, const char* name = "", int check_val = 1) {
-  EXPECT_FLOAT_EQ(x.adj(), check_val)
-         << "Failed on " << name;
+  EXPECT_FLOAT_EQ(x.adj(), check_val) << "Failed on " << name;
 }
 
-void check_adjs(double x, const char* name = "", int check_val = 1) {
-}
+void check_adjs(double x, const char* name = "", int check_val = 1) {}
 
 /**
  * Check an Eigen vector's adjoints
@@ -122,7 +122,7 @@ void check_adjs(double x, const char* name = "", int check_val = 1) {
  */
 template <typename Check1, typename VarMat, require_st_var<VarMat>* = nullptr>
 void check_adjs(Check1&& i_check, const VarMat& x, const char* name = "",
-                       int check_val = 1) {
+                int check_val = 1) {
   for (Eigen::Index i = 0; i < x.size(); ++i) {
     if (i_check(i)) {
       EXPECT_FLOAT_EQ(x.adj()(i), check_val)
@@ -133,15 +133,10 @@ void check_adjs(Check1&& i_check, const VarMat& x, const char* name = "",
     }
   }
 }
-template <typename Check1, typename VarMat, require_st_arithmetic<VarMat>* = nullptr>
+template <typename Check1, typename VarMat,
+          require_st_arithmetic<VarMat>* = nullptr>
 void check_adjs(Check1&& i_check, const VarMat& x, const char* name = "",
-                       int check_val = 1) {
-
-                       }
-
-
-
-
+                int check_val = 1) {}
 
 /**
  * Generate a matrix holding a linear sequence.
@@ -167,7 +162,10 @@ auto generate_linear_matrix(Eigen::Index n, Eigen::Index m, double start = 0) {
 template <typename RhsScalar = stan::math::var>
 auto generate_linear_var_matrix(Eigen::Index n, Eigen::Index m,
                                 double start = 0) {
-  using ret_t = std::conditional_t<is_var<RhsScalar>::value, stan::math::var_value<Eigen::Matrix<double, -1, -1>>, Eigen::Matrix<double, -1, -1>>;
+  using ret_t
+      = std::conditional_t<is_var<RhsScalar>::value,
+                           stan::math::var_value<Eigen::Matrix<double, -1, -1>>,
+                           Eigen::Matrix<double, -1, -1>>;
   return ret_t(generate_linear_matrix(n, m, start));
 }
 
@@ -193,9 +191,11 @@ auto generate_linear_vector(Eigen::Index n, double start = 0) {
  * @param n Number of cells.
  * @param start Where the linear sequence should start from.
  */
-template <typename Vec = Eigen::Matrix<double, -1, 1>, typename RhsScalar = stan::math::var>
+template <typename Vec = Eigen::Matrix<double, -1, 1>,
+          typename RhsScalar = stan::math::var>
 auto generate_linear_var_vector(Eigen::Index n, double start = 0) {
-  using ret_t = std::conditional_t<is_var<RhsScalar>::value, stan::math::var_value<Vec>, Vec>;
+  using ret_t = std::conditional_t<is_var<RhsScalar>::value,
+                                   stan::math::var_value<Vec>, Vec>;
   return ret_t(generate_linear_vector<Vec>(n, start));
 }
 

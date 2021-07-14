@@ -67,8 +67,8 @@ void test_throw_invalid_arg(T1& lhs, const T2& rhs, const I&... idxs) {
 
 template <typename Vec, typename RhsScalar>
 void test_nil_vec() {
-  using stan::math::var_value;
   using stan::math::var;
+  using stan::math::var_value;
   using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec, var>(5);
@@ -113,14 +113,14 @@ void test_uni_vec() {
 }
 
 TEST_F(VarAssign, uni_vec) {
-   test_uni_vec<Eigen::VectorXd, stan::math::var>();
-   test_uni_vec<Eigen::VectorXd, double>();
- }
+  test_uni_vec<Eigen::VectorXd, stan::math::var>();
+  test_uni_vec<Eigen::VectorXd, double>();
+}
 
 TEST_F(VarAssign, uni_rowvec) {
-   test_uni_vec<Eigen::RowVectorXd, stan::math::var>();
-   test_uni_vec<Eigen::RowVectorXd, double>();
- }
+  test_uni_vec<Eigen::RowVectorXd, stan::math::var>();
+  test_uni_vec<Eigen::RowVectorXd, double>();
+}
 
 template <typename Vec, typename RhsScalar>
 void test_multi_vec() {
@@ -163,8 +163,8 @@ TEST_F(VarAssign, multi_vec) {
 }
 
 TEST_F(VarAssign, multi_rowvec) {
-   test_multi_vec<Eigen::RowVectorXd, stan::math::var>();
-   test_multi_vec<Eigen::RowVectorXd, double>();
+  test_multi_vec<Eigen::RowVectorXd, stan::math::var>();
+  test_multi_vec<Eigen::RowVectorXd, double>();
 }
 
 template <typename Vec>
@@ -219,19 +219,21 @@ void test_omni_vec() {
     check_adjs(check_i, x, "lhs", 0.0);
   }
   check_adjs(check_i, y, "rhs", 1.0);
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec, RhsScalar>(4), index_omni());
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec, RhsScalar>(6), index_omni());
+  test_throw_invalid_arg(x, generate_linear_var_vector<Vec, RhsScalar>(4),
+                         index_omni());
+  test_throw_invalid_arg(x, generate_linear_var_vector<Vec, RhsScalar>(6),
+                         index_omni());
 }
 
 TEST_F(VarAssign, omni_vec) {
-   test_omni_vec<Eigen::VectorXd, stan::math::var>();
-   test_omni_vec<Eigen::VectorXd, double>();
- }
+  test_omni_vec<Eigen::VectorXd, stan::math::var>();
+  test_omni_vec<Eigen::VectorXd, double>();
+}
 
 TEST_F(VarAssign, omni_rowvec) {
-   test_omni_vec<Eigen::RowVectorXd, stan::math::var>();
-   test_omni_vec<Eigen::RowVectorXd, double>();
- }
+  test_omni_vec<Eigen::RowVectorXd, stan::math::var>();
+  test_omni_vec<Eigen::RowVectorXd, double>();
+}
 
 template <typename Vec, typename RhsScalar>
 void test_min_vec() {
@@ -251,21 +253,21 @@ void test_min_vec() {
   EXPECT_MATRIX_EQ(x.val(), x_val);
   auto check_i = [](int i) { return i < 2; };
   check_adjs(check_i, x, "lhs");
-  check_adjs([](int /* i */) { return true;}, y, "rhs");
+  check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_min(0));
   test_throw_out_of_range(x, y, index_min(6));
   test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(4), index_min(3));
   test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(2), index_min(3));
 }
 TEST_F(VarAssign, min_vec) {
-   test_min_vec<Eigen::VectorXd, stan::math::var>();
-   test_min_vec<Eigen::VectorXd, double>();
- }
+  test_min_vec<Eigen::VectorXd, stan::math::var>();
+  test_min_vec<Eigen::VectorXd, double>();
+}
 
 TEST_F(VarAssign, min_rowvec) {
-   test_min_vec<Eigen::RowVectorXd, stan::math::var>();
-   test_min_vec<Eigen::RowVectorXd, double>();
- }
+  test_min_vec<Eigen::RowVectorXd, stan::math::var>();
+  test_min_vec<Eigen::RowVectorXd, double>();
+}
 
 template <typename Vec, typename RhsScalar>
 void test_max_vec() {
@@ -284,7 +286,7 @@ void test_max_vec() {
   EXPECT_MATRIX_EQ(x.val(), x_val);
   auto check_i = [](int i) { return i > 1; };
   check_adjs(check_i, x, "lhs");
-  check_adjs([](int /* i */) { return true;}, y, "rhs");
+  check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_max(0));
   test_throw_out_of_range(x, y, index_max(6));
   test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(3), index_max(2));
@@ -292,14 +294,14 @@ void test_max_vec() {
 }
 
 TEST_F(VarAssign, max_vec) {
-   test_max_vec<Eigen::VectorXd, stan::math::var>();
-   test_max_vec<Eigen::VectorXd, double>();
- }
+  test_max_vec<Eigen::VectorXd, stan::math::var>();
+  test_max_vec<Eigen::VectorXd, double>();
+}
 
 TEST_F(VarAssign, max_rowvec) {
-   test_max_vec<Eigen::RowVectorXd, stan::math::var>();
-   test_max_vec<Eigen::RowVectorXd, double>();
- }
+  test_max_vec<Eigen::RowVectorXd, stan::math::var>();
+  test_max_vec<Eigen::RowVectorXd, double>();
+}
 
 template <typename Vec, typename RhsScalar>
 void test_positive_minmax_varvector() {
@@ -321,7 +323,7 @@ void test_positive_minmax_varvector() {
   EXPECT_MATRIX_EQ(x.val(), x_val);
   auto check_i = [](int i) { return (i > 3); };
   check_adjs(check_i, x, "lhs");
-  check_adjs([](int /* i */) { return true;}, y, "rhs");
+  check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_min_max(0, 3));
   test_throw_out_of_range(x, y, index_min_max(1, 6));
   test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(5),
@@ -360,7 +362,7 @@ void test_negative_minmax_varvector() {
   EXPECT_MATRIX_EQ(x.val(), x_val);
   auto check_i = [](int i) { return (i > 3); };
   check_adjs(check_i, x, "lhs");
-  check_adjs([](int /* i */) { return true;}, y, "rhs");
+  check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_min_max(3, 0));
   test_throw_out_of_range(x, y, index_min_max(6, 1));
   test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(5),
@@ -452,7 +454,6 @@ auto uni_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
@@ -509,7 +510,6 @@ template <typename RhsScalar>
 auto multi_uni_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
-  using stan::model::test::check_adjs;
   using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
@@ -598,7 +598,7 @@ auto minmax_uni_mat_test() {
   auto check_i = [](int i) { return (i == 1 || i == 2); };
   auto check_j = [](int j) { return j == 3; };
   check_adjs(check_i, check_j, x, "lhs", 0);
-  check_adjs([](int /* */) { return true;}, y, "rhs");
+  check_adjs([](int /* */) { return true; }, y, "rhs");
 
   test_throw_out_of_range(x, y, index_min_max(2, 3), index_uni(0));
   test_throw_out_of_range(x, y, index_min_max(2, 3), index_uni(5));
@@ -698,7 +698,6 @@ auto uni_multi_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
@@ -743,7 +742,6 @@ TEST_F(VarAssign, uni_multi_matrix) {
 TEST_F(VarAssign, uni_multi_alias_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
-  using stan::model::test::check_adjs;
   using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
@@ -876,7 +874,6 @@ auto minmax_multi_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
@@ -927,7 +924,6 @@ TEST_F(VarAssign, minmax_multi_alias_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
@@ -952,11 +948,11 @@ TEST_F(VarAssign, minmax_multi_alias_matrix) {
 // omni
 template <typename RhsScalar>
 void omni_matrix_test() {
+  using stan::math::value_of;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
-  using stan::math::value_of;
   auto x = generate_linear_var_matrix(5, 5);
   var_value<Eigen::MatrixXd> x_copy(x.vi_);
   Eigen::MatrixXd x_val = x.val();
@@ -969,7 +965,7 @@ void omni_matrix_test() {
     EXPECT_MATRIX_EQ(value_of(y), x_copy.val());
   }
   sum(x).grad();
-  auto check_all = [](int /* i */) { return true;};
+  auto check_all = [](int /* i */) { return true; };
   if (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(x.val(), value_of(y));
     check_adjs(check_all, check_all, x, "lhs");
@@ -992,11 +988,11 @@ TEST_F(VarAssign, omni_matrix) {
 
 template <typename RhsScalar>
 void omni_omni_matrix_test() {
+  using stan::math::value_of;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
-  using stan::math::value_of;
   auto x = generate_linear_var_matrix(5, 5);
   var_value<Eigen::MatrixXd> x_copy(x.vi_);
   Eigen::MatrixXd x_val = x.val();
@@ -1011,7 +1007,7 @@ void omni_omni_matrix_test() {
     EXPECT_MATRIX_EQ(value_of(y), x_copy.val());
   }
   sum(x).grad();
-  auto check_all = [](int /* i */) { return true;};
+  auto check_all = [](int /* i */) { return true; };
   if (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(x.val(), value_of(y));
     check_adjs(check_all, check_all, x, "lhs");
@@ -1034,15 +1030,12 @@ void omni_omni_matrix_test() {
 TEST_F(VarAssign, omni_omni_matrix_var) {
   omni_omni_matrix_test<stan::math::var>();
 }
-TEST_F(VarAssign, omni_omni_matrix_dbl) {
-  omni_omni_matrix_test<double>();
-}
+TEST_F(VarAssign, omni_omni_matrix_dbl) { omni_omni_matrix_test<double>(); }
 
 template <typename RhsScalar>
 void uni_omni_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
-  using stan::model::test::check_adjs;
   using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
@@ -1059,12 +1052,12 @@ void uni_omni_matrix_test() {
   check_adjs(check_i, check_all, x, "lhs");
   check_adjs(check_all, y, "rhs");
 
-  test_throw_invalid_arg(x,
-                         generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(4, 10),
-                         index_uni(1), index_omni());
-  test_throw_invalid_arg(x,
-                         generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(6, 10),
-                         index_uni(1), index_omni());
+  test_throw_invalid_arg(
+      x, generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(4, 10),
+      index_uni(1), index_omni());
+  test_throw_invalid_arg(
+      x, generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(6, 10),
+      index_uni(1), index_omni());
   test_throw_out_of_range(x, y, index_uni(0), index_omni());
   test_throw_out_of_range(x, y, index_uni(6), index_omni());
 }
@@ -1123,7 +1116,7 @@ void minmax_min_matrix_test() {
   auto check_i = [](int i) { return (i == 1 || i == 2); };
   auto check_j = [](int j) { return j > 0; };
   check_adjs(check_i, check_j, x, "lhs", 0);
-  auto check_all = [](int /* */) { return true;};
+  auto check_all = [](int /* */) { return true; };
   check_adjs(check_all, check_all, y, "rhs");
   test_throw_out_of_range(x, y, index_min_max(0, 3), index_min(2));
   test_throw_out_of_range(x, y, index_min_max(2, 4), index_min(2));
@@ -1167,8 +1160,8 @@ void max_matrix_test() {
   test_throw_invalid_arg(x, z, index_max(2));
 }
 TEST_F(VarAssign, max_matrix) {
-max_matrix_test<stan::math::var>();
-max_matrix_test<double>();
+  max_matrix_test<stan::math::var>();
+  max_matrix_test<double>();
 }
 
 template <typename RhsScalar>
@@ -1190,7 +1183,7 @@ void min_max_matrix_test() {
   auto check_i_x = [](int i) { return i > 0; };
   auto check_j_x = [](int j) { return j < 2; };
   check_adjs(check_i_x, check_j_x, x, "lhs", 0);
-  auto check_all = [](int /* i*/) { return true;};
+  auto check_all = [](int /* i*/) { return true; };
   check_adjs(check_all, check_all, y, "rhs");
   test_throw_out_of_range(x, y, index_min(0), index_max(2));
   test_throw_out_of_range(x, y, index_min(5), index_max(2));
@@ -1222,7 +1215,9 @@ void positive_minmax_matrix_test() {
 
   for (int i = 0; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
-    std::conditional_t<stan::is_var<RhsScalar>::value, var_value<Eigen::MatrixXd>, Eigen::MatrixXd> x_rev(x_rev_val);
+    std::conditional_t<stan::is_var<RhsScalar>::value,
+                       var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
+        x_rev(x_rev_val);
     const int ii = i + 1;
     assign(x, x_rev.block(0, 0, ii, 5), "", index_min_max(1, ii));
     auto x_val_check = x.val().block(0, 0, ii, 5);
@@ -1261,11 +1256,14 @@ void negative_minmax_matrix_test() {
 
   for (int i = 0; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
-    std::conditional_t<stan::is_var<RhsScalar>::value, var_value<Eigen::MatrixXd>, Eigen::MatrixXd> x_rev(x_rev_val);
+    std::conditional_t<stan::is_var<RhsScalar>::value,
+                       var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
+        x_rev(x_rev_val);
     const int ii = i + 1;
     assign(x, x_rev.block(0, 0, ii, 5), "", index_min_max(ii, 1));
     auto x_val_check = x.val().block(0, 0, ii, 5);
-    auto x_rev_val_check = stan::math::value_of(x_rev).block(0, 0, ii, 5).colwise().reverse();
+    auto x_rev_val_check
+        = stan::math::value_of(x_rev).block(0, 0, ii, 5).colwise().reverse();
     EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
     sum(x).grad();
     auto check_i = [i](int kk) { return kk <= i; };
@@ -1300,7 +1298,9 @@ void positive_minmax_positive_minmax_matrix_test() {
 
   for (int i = 0; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
-    std::conditional_t<stan::is_var<RhsScalar>::value, var_value<Eigen::MatrixXd>, Eigen::MatrixXd> x_rev(x_rev_val);
+    std::conditional_t<stan::is_var<RhsScalar>::value,
+                       var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
+        x_rev(x_rev_val);
     const int ii = i + 1;
     assign(x, x_rev.block(0, 0, ii, ii), "", index_min_max(1, ii),
            index_min_max(1, ii));
@@ -1355,12 +1355,15 @@ void positive_minmax_negative_minmax_matrix_test() {
 
   for (int i = 0; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
-    std::conditional_t<stan::is_var<RhsScalar>::value, var_value<Eigen::MatrixXd>, Eigen::MatrixXd> x_rev(x_rev_val);
+    std::conditional_t<stan::is_var<RhsScalar>::value,
+                       var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
+        x_rev(x_rev_val);
     const int ii = i + 1;
     assign(x, x_rev.block(0, 0, ii, ii), "", index_min_max(1, ii),
            index_min_max(ii, 1));
     auto x_val_check = x.val().block(0, 0, ii, ii);
-    auto x_rev_val_check = stan::math::value_of(x_rev).block(0, 0, ii, ii).rowwise().reverse();
+    auto x_rev_val_check
+        = stan::math::value_of(x_rev).block(0, 0, ii, ii).rowwise().reverse();
     EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
     sum(x).grad();
     auto check_i = [i](int kk) { return kk <= i; };
@@ -1410,12 +1413,15 @@ void negative_minmax_positive_minmax_matrix_test() {
 
   for (int i = 0; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
-    std::conditional_t<stan::is_var<RhsScalar>::value, var_value<Eigen::MatrixXd>, Eigen::MatrixXd> x_rev(x_rev_val);
+    std::conditional_t<stan::is_var<RhsScalar>::value,
+                       var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
+        x_rev(x_rev_val);
     const int ii = i + 1;
     assign(x, x_rev.block(0, 0, ii, ii), "", index_min_max(ii, 1),
            index_min_max(1, ii));
     auto x_val_check = x.val().block(0, 0, ii, ii);
-    auto x_rev_val_check = stan::math::value_of(x_rev).block(0, 0, ii, ii).colwise().reverse();
+    auto x_rev_val_check
+        = stan::math::value_of(x_rev).block(0, 0, ii, ii).colwise().reverse();
     EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
     sum(x).grad();
     auto check_i = [i](int kk) { return kk <= i; };
@@ -1446,8 +1452,8 @@ void negative_minmax_positive_minmax_matrix_test() {
 }
 
 TEST_F(VarAssign, negative_minmax_positive_minmax_matrix) {
-negative_minmax_positive_minmax_matrix_test<stan::math::var>();
-negative_minmax_positive_minmax_matrix_test<double>();
+  negative_minmax_positive_minmax_matrix_test<stan::math::var>();
+  negative_minmax_positive_minmax_matrix_test<double>();
 }
 
 template <typename RhsScalar>
@@ -1465,12 +1471,15 @@ void negative_minmax_negative_minmax_matrix_test() {
 
   for (int i = 0; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
-    std::conditional_t<stan::is_var<RhsScalar>::value, var_value<Eigen::MatrixXd>, Eigen::MatrixXd> x_rev(x_rev_val);
+    std::conditional_t<stan::is_var<RhsScalar>::value,
+                       var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
+        x_rev(x_rev_val);
     const int ii = i + 1;
     assign(x, x_rev.block(0, 0, ii, ii), "", index_min_max(ii, 1),
            index_min_max(ii, 1));
     auto x_val_check = x.val().block(0, 0, ii, ii);
-    auto x_rev_val_check = stan::math::value_of(x_rev).block(0, 0, ii, ii).reverse();
+    auto x_rev_val_check
+        = stan::math::value_of(x_rev).block(0, 0, ii, ii).reverse();
     EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
     sum(x).grad();
     auto check_i = [i](int kk) { return kk <= i; };
@@ -1510,7 +1519,6 @@ void uni_minmax_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
@@ -1518,13 +1526,14 @@ void uni_minmax_matrix_test() {
   Eigen::MatrixXd x_val = x.val();
   auto y = generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(3, 10);
   assign(x, y, "", index_uni(2), index_min_max(2, 4));
-  EXPECT_MATRIX_EQ(stan::math::value_of(y).segment(0, 3), x.val().row(1).segment(1, 3));
+  EXPECT_MATRIX_EQ(stan::math::value_of(y).segment(0, 3),
+                   x.val().row(1).segment(1, 3));
   sum(x).grad();
   EXPECT_MATRIX_EQ(x.val(), x_val);
   auto check_i = [](int i) { return i == 1; };
   auto check_j = [](int j) { return (j > 0 && j < 4); };
   check_adjs(check_i, check_j, x, "lhs", 0);
-  check_adjs([](int /* */) { return true;}, y, "rhs");
+  check_adjs([](int /* */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_uni(0), index_min_max(2, 4));
   test_throw_out_of_range(x, y, index_uni(6), index_min_max(2, 4));
   test_throw_out_of_range(x, y, index_uni(2), index_min_max(0, 2));
@@ -1538,8 +1547,8 @@ void uni_minmax_matrix_test() {
 }
 
 TEST_F(VarAssign, uni_minmax_matrix) {
-uni_minmax_matrix_test<stan::math::var>();
-uni_minmax_matrix_test<double>();
+  uni_minmax_matrix_test<stan::math::var>();
+  uni_minmax_matrix_test<double>();
 }
 
 template <typename RhsScalar>
@@ -1556,7 +1565,7 @@ void nil_matrix() {
   assign(x, y, "");
   EXPECT_MATRIX_EQ(stan::math::value_of(y), x.val());
   sum(x).grad();
-  auto check_all = [](int /* i */) { return true;};
+  auto check_all = [](int /* i */) { return true; };
   if (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(x.val(), stan::math::value_of(y));
     check_adjs(check_all, check_all, x, "lhs");
