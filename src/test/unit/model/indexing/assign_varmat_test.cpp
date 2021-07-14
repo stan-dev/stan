@@ -72,15 +72,20 @@ void test_nil_vec() {
   using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_vector;
   auto x = generate_linear_var_vector<Vec, var>(5);
+  Eigen::VectorXd x_val = x.val();
   auto y = generate_linear_var_vector<Vec, RhsScalar>(5, 1.0);
   assign(x, y, "");
-  for (Eigen::Index i = 0; i < x.size(); ++i) {
-    EXPECT_FLOAT_EQ(x.val().coeffRef(i), i + 1);
-  }
+  EXPECT_MATRIX_EQ(x.val(), stan::math::value_of(y));
   stan::math::sum(x).grad();
-  auto check_i = [](int i) { return true; };
-  check_adjs(check_i, x, "lhs", 1);
-  check_adjs(check_i, y, "rhs", 1);
+  auto check_all = [](int i) { return true; };
+  if (stan::is_var<RhsScalar>::value) {
+    EXPECT_MATRIX_EQ(x.val(), stan::math::value_of(y));
+    check_adjs(check_all, x, "lhs", 1);
+    check_adjs(check_all, y, "rhs", 1);
+  } else {
+    EXPECT_MATRIX_EQ(x.val(), x_val);
+    check_adjs(check_all, x, "lhs", 0.0);
+  }
 }
 TEST_F(VarAssign, nil) {
   test_nil_vec<Eigen::VectorXd, stan::math::var>();
@@ -225,7 +230,7 @@ TEST_F(VarAssign, omni_vec) {
 
 TEST_F(VarAssign, omni_rowvec) {
    test_omni_vec<Eigen::RowVectorXd, stan::math::var>();
-   //test_omni_vec<Eigen::RowVectorXd, double>();
+   test_omni_vec<Eigen::RowVectorXd, double>();
  }
 
 template <typename Vec, typename RhsScalar>
@@ -996,6 +1001,8 @@ void omni_omni_matrix_test() {
   var_value<Eigen::MatrixXd> x_copy(x.vi_);
   Eigen::MatrixXd x_val = x.val();
   auto y = generate_linear_var_matrix<RhsScalar>(5, 5, 10);
+  stan::math::var lp = sum(x_copy);
+  lp.adj() = 1;
   assign(x, y, "", index_omni(), index_omni());
   if (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(value_of(y), x.val());
@@ -1010,9 +1017,9 @@ void omni_omni_matrix_test() {
     check_adjs(check_all, check_all, x, "lhs");
     check_adjs(check_all, check_all, y, "rhs");
   } else {
-    // Need to double check this.
-    check_adjs(check_all, check_all, x, "lhs", 0.0);
-    check_adjs(check_all, check_all, x_copy, "lhs", 0.0);
+    // Both are one in this case
+    check_adjs(check_all, check_all, x, "lhs", 1.0);
+    check_adjs(check_all, check_all, x_copy, "lhs", 1.0);
   }
   test_throw_invalid_arg(x, generate_linear_var_matrix(5, 6, 10), index_omni(),
                          index_omni());
@@ -1024,8 +1031,10 @@ void omni_omni_matrix_test() {
                          index_omni());
 }
 
-TEST_F(VarAssign, omni_omni_matrix) {
+TEST_F(VarAssign, omni_omni_matrix_var) {
   omni_omni_matrix_test<stan::math::var>();
+}
+TEST_F(VarAssign, omni_omni_matrix_dbl) {
   omni_omni_matrix_test<double>();
 }
 
@@ -1533,36 +1542,48 @@ uni_minmax_matrix_test<stan::math::var>();
 uni_minmax_matrix_test<double>();
 }
 
-// nil only shows up as a single index
-TEST_F(VarAssign, nil_matrix) {
+template <typename RhsScalar>
+void nil_matrix() {
   using stan::math::var_value;
   using stan::model::test::check_adjs;
   using stan::model::test::generate_linear_var_matrix;
   using stan::model::test::generate_linear_var_vector;
 
   auto x = generate_linear_var_matrix(5, 5);
+  var_value<Eigen::MatrixXd> x_copy(x.vi_);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix(5, 5, 10);
+  auto y = generate_linear_var_matrix<RhsScalar>(5, 5, 10);
   assign(x, y, "");
-  EXPECT_MATRIX_EQ(y.val(), x.val());
+  EXPECT_MATRIX_EQ(stan::math::value_of(y), x.val());
   sum(x).grad();
-  EXPECT_MATRIX_EQ(x.val(), y.val());
-  EXPECT_MATRIX_EQ(x.adj(), Eigen::MatrixXd::Ones(5, 5));
-  EXPECT_MATRIX_EQ(y.adj(), Eigen::MatrixXd::Ones(5, 5));
+  auto check_all = [](int /* i */) { return true;};
+  if (stan::is_var<RhsScalar>::value) {
+    EXPECT_MATRIX_EQ(x.val(), stan::math::value_of(y));
+    check_adjs(check_all, check_all, x, "lhs");
+    check_adjs(check_all, check_all, y, "rhs");
+  } else {
+    check_adjs(check_all, check_all, x, "lhs", 0.0);
+    EXPECT_MATRIX_EQ(x.val(), x_val);
+  }
+}
+// nil only shows up as a single index
+TEST_F(VarAssign, nil_matrix) {
+  nil_matrix<stan::math::var>();
+  nil_matrix<double>();
 }
 
 namespace stan {
 namespace model {
 namespace test {
 
-template <typename RhsScalar, typename T1, typename I1, typename I2>
+template <typename T1, typename I1, typename I2>
 inline void assign_tester(T1&& x, const I1& idx1, const I2& idx2) {
   using stan::math::var_value;
   using stan::model::test::generate_linear_matrix;
   auto multi1 = convert_to_multi(idx1, x, false);
   auto multi2 = convert_to_multi(idx2, x, true);
   var_value<std::decay_t<T1>> x1(x);
-  std::conditional_t<is_var<RhsScalar>::value, var_value<std::decay_t<T1>>, std::decay_t<T1>> x2(x);
+  var_value<std::decay_t<T1>> x2(x);
   Eigen::MatrixXd y_val
       = generate_linear_matrix(multi1.ns_.size(), multi2.ns_.size(), 10);
   var_value<Eigen::MatrixXd> y(y_val);

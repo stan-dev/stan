@@ -53,7 +53,7 @@ template <
     typename T, typename U,
     require_t<std::is_assignable<std::decay_t<T>&, std::decay_t<U>>>* = nullptr>
 inline void assign(T&& x, U&& y, const char* name) {
-  x = std::forward<U>(y);
+  internal::assign_impl(x, std::forward<U>(y));
 }
 
 /**
@@ -390,7 +390,8 @@ inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max idx) {
     stan::math::check_size_match("matrix[reverse_min_max] assign",
                                  "left hand side rows", row_size, name,
                                  y.rows());
-    internal::assign_impl(x.middleRows(idx.max_ - 1, row_size), internal::colwise_reverse(y));
+    internal::assign_impl(x.middleRows(idx.max_ - 1, row_size),
+                          internal::colwise_reverse(y));
     return;
   }
 }
@@ -433,7 +434,8 @@ inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
       stan::math::check_size_match("matrix[min_max, min_max] assign",
                                    "left hand side columns", col_size, name,
                                    y.cols());
-      internal::assign_impl(x.block(row_idx.min_ - 1, col_idx.min_ - 1, row_size, col_size), y);
+      internal::assign_impl(
+          x.block(row_idx.min_ - 1, col_idx.min_ - 1, row_size, col_size), y);
       return;
     } else {
       auto row_size = row_idx.max_ - (row_idx.min_ - 1);
@@ -444,7 +446,9 @@ inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
       stan::math::check_size_match("matrix[min_max, reverse_min_max] assign",
                                    "left hand side columns", col_size, name,
                                    y.cols());
-      internal::assign_impl(x.block(row_idx.min_ - 1, col_idx.max_ - 1, row_size, col_size), internal::rowwise_reverse(y));
+      internal::assign_impl(
+          x.block(row_idx.min_ - 1, col_idx.max_ - 1, row_size, col_size),
+          internal::rowwise_reverse(y));
       return;
     }
   } else {
@@ -457,7 +461,9 @@ inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
       stan::math::check_size_match("matrix[reverse_min_max, min_max] assign",
                                    "left hand side columns", col_size, name,
                                    y.cols());
-      internal::assign_impl(x.block(row_idx.max_ - 1, col_idx.min_ - 1, row_size, col_size), internal::colwise_reverse(y));
+      internal::assign_impl(
+          x.block(row_idx.max_ - 1, col_idx.min_ - 1, row_size, col_size),
+          internal::colwise_reverse(y));
       return;
     } else {
       auto row_size = row_idx.min_ - (row_idx.max_ - 1);
@@ -468,7 +474,9 @@ inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
       stan::math::check_size_match(
           "matrix[reverse_min_max, reverse_min_max] assign",
           "left hand side columns", col_size, name, y.cols());
-      internal::assign_impl(x.block(row_idx.max_ - 1, col_idx.max_ - 1, row_size, col_size), y.reverse());
+      internal::assign_impl(
+          x.block(row_idx.max_ - 1, col_idx.max_ - 1, row_size, col_size),
+          y.reverse());
       return;
     }
   }

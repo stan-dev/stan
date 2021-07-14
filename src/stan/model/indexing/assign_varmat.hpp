@@ -15,18 +15,81 @@ namespace stan {
 namespace model {
 
 namespace internal {
-  template <typename T>
-  using require_var_matrix_or_arithmetic_eigen = require_any_t<is_var_matrix<T>,
-   stan::math::disjunction<std::is_arithmetic<scalar_type_t<T>>, is_eigen_matrix_dynamic<T>>>;
+template <typename T>
+using require_var_matrix_or_arithmetic_eigen
+    = require_any_t<is_var_matrix<T>, stan::math::disjunction<
+                                          std::is_arithmetic<scalar_type_t<T>>,
+                                          is_eigen_matrix_dynamic<T>>>;
 
-   template <typename T>
-   using require_var_vector_or_arithmetic_eigen = require_any_t<is_var_vector<T>,
-    stan::math::disjunction<std::is_arithmetic<scalar_type_t<T>>, is_eigen_vector<T>>>;
+template <typename T>
+using require_var_vector_or_arithmetic_eigen
+    = require_any_t<is_var_vector<T>, stan::math::disjunction<
+                                          std::is_arithmetic<scalar_type_t<T>>,
+                                          is_eigen_vector<T>>>;
 
-    template <typename T>
-    using require_var_row_vector_or_arithmetic_eigen = require_any_t<is_var_row_vector<T>,
-     stan::math::disjunction<std::is_arithmetic<scalar_type_t<T>>, is_eigen_row_vector<T>>>;
+template <typename T>
+using require_var_row_vector_or_arithmetic_eigen = require_any_t<
+    is_var_row_vector<T>,
+    stan::math::disjunction<std::is_arithmetic<scalar_type_t<T>>,
+                            is_eigen_row_vector<T>>>;
+
+/**
+ * Require both types to be either `var<Matrix>` or `Eigen::Matrix`
+ */
+template <typename Mat1, typename Mat2>
+using require_all_var_matrix_or_all_var_eigen = require_any_t<
+    stan::math::conjunction<is_eigen<Mat1>, is_eigen<Mat2>>,
+    stan::math::conjunction<is_var_matrix<Mat1>, is_var_matrix<Mat2>>>;
+
+/**
+ * Base case of assignment
+ * @tparam T1 Any type that's not a var matrix.
+ * @tparam T2 Any type that's not a var matrix.
+ * @param x The value to assign to
+ * @param y The value to assign from.
+ */
+template <typename T1, typename T2, require_not_var_matrix_t<T1>* = nullptr>
+void assign_impl(T1&& x, T2&& y) {
+  x = std::forward<T2>(y);
 }
+
+/**
+ * For assigning one var matrix to another
+ * @tparam Mat1 A `var_value` with inner type derived from `EigenBase`
+ * @tparam Mat1 A `var_value` with inner type derived from `EigenBase`
+ * @param x The var matrix to assign to
+ * @param x The var matrix to assign from
+ */
+template <typename Mat1, typename Mat2,
+          require_all_var_matrix_t<Mat1, Mat2>* = nullptr>
+void assign_impl(Mat1&& x, Mat2&& y) {
+  x = std::forward<Mat2>(y);
+}
+
+/**
+ * Assigning an `Eigen::Matrix<double>` to a `var<Matrix>`
+ * In this case we need to
+ * 1. Store the previous values from `x`
+ * 2. Assign the values from `y` to the values of `x`
+ * 3. Setup a reverse pass callback that sets the `x` values to it's previous
+ *  values and then zero's out the adjoints.
+ *
+ * @tparam Mat1 A `var_value` with inner type derived from `EigenBase`
+ * @tparam Mat2 A type derived from `EigenBase` with an arithmetic scalar.
+ * @param x The var matrix to assign to
+ * @param y The eigen matrix to assign from.
+ */
+template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
+          require_eigen_st<std::is_arithmetic, Mat2>* = nullptr>
+void assign_impl(Mat1&& x, Mat2&& y) {
+  auto prev_vals = stan::math::to_arena(x.val());
+  x.vi_->val_ = std::forward<Mat2>(y);
+  stan::math::reverse_pass_callback([x, prev_vals]() mutable {
+    x.vi_->val_ = prev_vals;
+    x.vi_->adj_.setZero();
+  });
+}
+}  // namespace internal
 /**
  * Indexing Notes:
  * The different index types:
@@ -85,27 +148,6 @@ inline void assign(VarVec&& x, const U& y, const char* name, index_uni idx) {
   });
 }
 
-namespace internal {
-  template <typename Mat1, typename Mat2>
-  using require_all_var_matrix_or_all_var_eigen = require_any_t<
-  stan::math::conjunction<is_eigen<Mat1>, is_eigen<Mat2>>,
-  stan::math::conjunction<is_var_matrix<Mat1>, is_var_matrix<Mat2>>>;
-  template <typename Mat1, typename Mat2, require_all_var_matrix_or_all_var_eigen<Mat1, Mat2>* = nullptr>
-  void assign_impl(Mat1&& x, Mat2&& y) {
-    x = std::forward<Mat2>(y);
-  }
-  template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
-   require_eigen_st<std::is_arithmetic, Mat2>* = nullptr>
-  void assign_impl(Mat1&& x, Mat2&& y) {
-    auto prev_vals = stan::math::to_arena(x.val());
-    x.vi_->val_ = std::forward<Mat2>(y);
-    stan::math::reverse_pass_callback([x, prev_vals]() mutable {
-      x.vi_->val_ = prev_vals;
-      x.vi_->adj_.setZero();
-    });
-  }
-}
-
 /**
  * Assign to a non-contiguous subset of elements in a vector.
  *
@@ -123,8 +165,7 @@ namespace internal {
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
  */
-template <typename Vec1, typename Vec2,
-          require_var_vector_t<Vec1>* = nullptr,
+template <typename Vec1, typename Vec2, require_var_vector_t<Vec1>* = nullptr,
           internal::require_var_vector_or_arithmetic_eigen<Vec2>* = nullptr>
 inline void assign(Vec1&& x, const Vec2& y, const char* name,
                    const index_multi& idx) {
@@ -170,7 +211,8 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
       if (!is_constant<Vec2>::value) {
         for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
           if (likely(x_idx[i] != -1)) {
-            forward_as<promote_scalar_t<var, Vec2>>(y).adj().coeffRef(i) += prev_vals.coeffRef(i);
+            forward_as<promote_scalar_t<var, Vec2>>(y).adj().coeffRef(i)
+                += prev_vals.coeffRef(i);
           }
         }
       }
@@ -212,16 +254,16 @@ inline void assign(Mat&& x, const U& y, const char* name, index_uni row_idx,
   const int col_idx_val = col_idx.n_ - 1;
   double prev_val = x.val().coeffRef(row_idx_val, col_idx_val);
   x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = stan::math::value_of(y);
-  stan::math::reverse_pass_callback(
-      [x, y, row_idx_val, col_idx_val, prev_val]() mutable {
-        x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = prev_val;
-        using stan::math::forward_as;
-        using stan::math::var;
-        if (!is_constant<U>::value) {
-          forward_as<var>(y).adj() += x.adj().coeffRef(row_idx_val, col_idx_val);
-        }
-        x.adj().coeffRef(row_idx_val, col_idx_val) = 0.0;
-      });
+  stan::math::reverse_pass_callback([x, y, row_idx_val, col_idx_val,
+                                     prev_val]() mutable {
+    x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = prev_val;
+    using stan::math::forward_as;
+    using stan::math::var;
+    if (!is_constant<U>::value) {
+      forward_as<var>(y).adj() += x.adj().coeffRef(row_idx_val, col_idx_val);
+    }
+    x.adj().coeffRef(row_idx_val, col_idx_val) = 0.0;
+  });
 }
 
 /**
@@ -291,7 +333,8 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
           using stan::math::promote_scalar_t;
           for (size_t i = 0; i < x_idx.size(); ++i) {
             if (likely(x_idx[i] != -1)) {
-              forward_as<promote_scalar_t<var, Vec>>(y).adj().coeffRef(i) += prev_val.coeffRef(i);
+              forward_as<promote_scalar_t<var, Vec>>(y).adj().coeffRef(i)
+                  += prev_val.coeffRef(i);
             }
           }
         });
@@ -371,11 +414,12 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
       using stan::math::forward_as;
       using stan::math::var;
       using stan::math::promote_scalar_t;
-        for (size_t i = 0; i < x_idx.size(); ++i) {
-          if (likely(x_idx[i] != -1)) {
-            forward_as<promote_scalar_t<var, Mat2>>(y).adj().row(i) += prev_vals.row(i);
-          }
+      for (size_t i = 0; i < x_idx.size(); ++i) {
+        if (likely(x_idx[i] != -1)) {
+          forward_as<promote_scalar_t<var, Mat2>>(y).adj().row(i)
+              += prev_vals.row(i);
         }
+      }
     });
   } else {
     stan::math::reverse_pass_callback([x, prev_vals, x_idx]() mutable {
@@ -407,8 +451,7 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
-template <typename Mat1, typename Mat2,
-          require_var_matrix_t<Mat1>* = nullptr,
+template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
           internal::require_var_matrix_or_arithmetic_eigen<Mat2>* = nullptr>
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const index_multi& row_idx, const index_multi& col_idx) {
@@ -470,7 +513,8 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
         if (likely(x_col_idx[j] != -1)) {
           for (int i = 0; i < x_row_idx.size(); ++i) {
             if (likely(x_row_idx[i] != -1)) {
-              x.vi_->val_(x_row_idx[i], x_col_idx[j]) = prev_vals.coeffRef(i, j);
+              x.vi_->val_(x_row_idx[i], x_col_idx[j])
+                  = prev_vals.coeffRef(i, j);
               prev_vals.coeffRef(i, j) = x.adj()(x_row_idx[i], x_col_idx[j]);
               x.adj()(x_row_idx[i], x_col_idx[j]) = 0;
             }
@@ -484,7 +528,8 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
         if (likely(x_col_idx[j] != -1)) {
           for (int i = 0; i < x_row_idx.size(); ++i) {
             if (likely(x_row_idx[i] != -1)) {
-              forward_as<promote_scalar_t<var, Mat2>>(y).adj()(i, j) += prev_vals.coeffRef(i, j);
+              forward_as<promote_scalar_t<var, Mat2>>(y).adj()(i, j)
+                  += prev_vals.coeffRef(i, j);
             }
           }
         }
@@ -497,7 +542,8 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
         if (likely(x_col_idx[j] != -1)) {
           for (int i = 0; i < x_row_idx.size(); ++i) {
             if (likely(x_row_idx[i] != -1)) {
-              x.vi_->val_(x_row_idx[i], x_col_idx[j]) = prev_vals.coeffRef(i, j);
+              x.vi_->val_(x_row_idx[i], x_col_idx[j])
+                  = prev_vals.coeffRef(i, j);
               prev_vals.coeffRef(i, j) = x.adj()(x_row_idx[i], x_col_idx[j]);
               x.adj()(x_row_idx[i], x_col_idx[j]) = 0;
             }
@@ -527,7 +573,7 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
  */
 template <typename Mat1, typename Mat2, typename Idx,
           require_var_dense_dynamic_t<Mat1>* = nullptr,
-         internal::require_var_matrix_or_arithmetic_eigen<Mat2>* = nullptr>
+          internal::require_var_matrix_or_arithmetic_eigen<Mat2>* = nullptr>
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const Idx& row_idx, const index_multi& col_idx) {
   const auto assign_cols = col_idx.ns_.size();
