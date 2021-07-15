@@ -258,6 +258,31 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
+                stage('OpenCL GPU tests') {
+                    agent { label "gelman-group-win2 || linux-gpu" }
+                    steps {
+                        script {
+                            if (isUnix()) {
+                                deleteDir()
+                                unstash 'StanSetup'
+                                sh "echo CXX=${env.CXX} -Werror > make/local"
+                                sh "echo STAN_OPENCL=true>> make/local"
+                                sh "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_GPU} >> make/local"
+                                sh "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_GPU} >> make/local"
+                                runTests("src/test/unit")
+                            } else {
+                                deleteDirWin()
+                                unstash 'StanSetup'
+                                bat "echo CXX=${env.CXX} -Werror > make/local"
+                                bat "echo STAN_OPENCL=true >> make/local"
+                                bat "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_GPU} >> make/local"
+                                bat "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_GPU} >> make/local"
+                                bat 'echo LDFLAGS_OPENCL= -L"C:\\Program Files (x86)\\IntelSWTools\\system_studio_2020\\OpenCL\\sdk\\lib\\x64" -lOpenCL >> make/local'
+                                runTestsWin("src/test/unit")
+                            }
+                        }
+                    }
+                }
             }
         }
         stage('Integration') {
@@ -393,67 +418,6 @@ pipeline {
             when {
                 expression {
                     !skipRemainingStages
-                }
-            }
-        }
-        stage('OpenCL tests'){
-            parallel {
-                stage('OpenCL CPU tests') {
-                    when {
-                        expression {
-                            !skipOpenCL
-                        }
-                    }
-                    agent { label "gelman-group-win2 || linux-gpu" }
-                    steps {
-                        script {
-                            if (isUnix()) {
-                                deleteDir()
-                                unstash 'StanSetup'
-                                sh "echo CXX=${env.CXX} -Werror > make/local"
-                                sh "echo STAN_OPENCL=true>> make/local"
-                                sh "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_CPU}>> make/local"
-                                sh "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_CPU}>> make/local"
-                                runTests("lib/stan_math/test/unit/math/opencl", false)
-                                runTests("src/test/unit")
-                            } else {
-                                deleteDirWin()
-                                unstash 'StanSetup'
-                                bat "echo CXX=${env.CXX} -Werror > make/local"
-                                bat "echo STAN_OPENCL=true >> make/local"
-                                bat "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_CPU} >> make/local"
-                                bat "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_CPU} >> make/local"
-                                bat 'echo LDFLAGS_OPENCL= -L"C:\\Program Files (x86)\\IntelSWTools\\system_studio_2020\\OpenCL\\sdk\\lib\\x64" -lOpenCL >> make/local'
-                                runTestsWin("src/test/unit")
-                            }
-                        }
-                    }
-                }
-
-                stage('OpenCL GPU tests') {
-                    agent { label "gelman-group-win2 || linux-gpu" }
-                    steps {
-                        script {
-                            if (isUnix()) {
-                                deleteDir()
-                                unstash 'StanSetup'
-                                sh "echo CXX=${env.CXX} -Werror > make/local"
-                                sh "echo STAN_OPENCL=true>> make/local"
-                                sh "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_GPU} >> make/local"
-                                sh "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_GPU} >> make/local"
-                                runTests("src/test/unit")
-                            } else {
-                                deleteDirWin()
-                                unstash 'StanSetup'
-                                bat "echo CXX=${env.CXX} -Werror > make/local"
-                                bat "echo STAN_OPENCL=true >> make/local"
-                                bat "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_GPU} >> make/local"
-                                bat "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_GPU} >> make/local"
-                                bat 'echo LDFLAGS_OPENCL= -L"C:\\Program Files (x86)\\IntelSWTools\\system_studio_2020\\OpenCL\\sdk\\lib\\x64" -lOpenCL >> make/local'
-                                runTestsWin("src/test/unit")
-                            }
-                        }
-                    }
                 }
             }
         }
