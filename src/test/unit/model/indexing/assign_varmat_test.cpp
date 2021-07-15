@@ -219,10 +219,12 @@ void test_omni_vec() {
     check_adjs(check_i, x, "lhs", 0.0);
   }
   check_adjs(check_i, y, "rhs", 1.0);
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec, RhsScalar>(4),
-                         index_omni());
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec, RhsScalar>(6),
-                         index_omni());
+  test_throw_invalid_arg(
+      x, conditionally_generate_linear_var_vector<Vec, RhsScalar>(4),
+      index_omni());
+  test_throw_invalid_arg(
+      x, conditionally_generate_linear_var_vector<Vec, RhsScalar>(6),
+      index_omni());
 }
 
 TEST_F(VarAssign, omni_vec) {
@@ -256,8 +258,10 @@ void test_min_vec() {
   check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_min(0));
   test_throw_out_of_range(x, y, index_min(6));
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(4), index_min(3));
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(2), index_min(3));
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(4),
+                         index_min(3));
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(2),
+                         index_min(3));
 }
 TEST_F(VarAssign, min_vec) {
   test_min_vec<Eigen::VectorXd, stan::math::var>();
@@ -289,8 +293,10 @@ void test_max_vec() {
   check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_max(0));
   test_throw_out_of_range(x, y, index_max(6));
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(3), index_max(2));
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(1), index_max(2));
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(3),
+                         index_max(2));
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(1),
+                         index_max(2));
 }
 
 TEST_F(VarAssign, max_vec) {
@@ -459,7 +465,9 @@ auto uni_mat_test() {
 
   auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(5, 10);
+  auto y
+      = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(
+          5, 10);
   assign(x, y, "", index_uni(1));
   EXPECT_MATRIX_EQ(y.val().row(0), x.val().row(0));
   sum(x).grad();
@@ -516,7 +524,9 @@ auto multi_uni_mat_test() {
 
   auto x = conditionally_generate_linear_var_matrix(3, 4);
   Eigen::MatrixXd x_val = x.val();
-  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(3, 10);
+  auto y
+      = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(
+          3, 10);
 
   std::vector<int> ns;
   ns.push_back(3);
@@ -556,7 +566,8 @@ auto omni_uni_mat_test() {
 
   auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = conditionally_generate_linear_var_vector<Eigen::VectorXd, RhsScalar>(5, 10);
+  auto y = conditionally_generate_linear_var_vector<Eigen::VectorXd, RhsScalar>(
+      5, 10);
   assign(x, y, "", index_omni(), index_uni(1));
   auto y_val = stan::math::value_of(y);
   EXPECT_MATRIX_EQ(y_val, x.val().col(0));
@@ -568,10 +579,12 @@ auto omni_uni_mat_test() {
   check_adjs(check_all, y, "rhs");
   test_throw_out_of_range(x, y, index_omni(), index_uni(0));
   test_throw_out_of_range(x, y, index_omni(), index_uni(6));
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Eigen::VectorXd>(6),
-                         index_omni(), index_uni(1));
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Eigen::VectorXd>(4),
-                         index_omni(), index_uni(1));
+  test_throw_invalid_arg(
+      x, conditionally_generate_linear_var_vector<Eigen::VectorXd>(6),
+      index_omni(), index_uni(1));
+  test_throw_invalid_arg(
+      x, conditionally_generate_linear_var_vector<Eigen::VectorXd>(4),
+      index_omni(), index_uni(1));
 }
 
 TEST_F(VarAssign, omni_uni_matrix) {
@@ -589,7 +602,8 @@ auto minmax_uni_mat_test() {
 
   auto x = conditionally_generate_linear_var_matrix(3, 4);
   Eigen::MatrixXd x_val = x.val();
-  auto y = conditionally_generate_linear_var_vector<Eigen::VectorXd, RhsScalar>(2, 10);
+  auto y = conditionally_generate_linear_var_vector<Eigen::VectorXd, RhsScalar>(
+      2, 10);
 
   assign(x, y, "", index_min_max(2, 3), index_uni(4));
   EXPECT_MATRIX_EQ(stan::math::value_of(y), x.val().col(3).segment(1, 2));
@@ -703,7 +717,9 @@ auto uni_multi_mat_test() {
 
   auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(4, 10);
+  auto y
+      = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(
+          4, 10);
 
   vector<int> ns{4, 1, 3, 3};
   assign(x, y, "", index_uni(3), index_multi(ns));
@@ -718,12 +734,12 @@ auto uni_multi_mat_test() {
   check_adjs(check_i_x, check_j_x, x, "lhs", 0);
   auto check_i_y = [](int i) { return i != 2; };
   check_adjs(check_i_y, y, "rhs", 1);
-  test_throw_invalid_arg(x,
-                         conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(5, 10),
-                         index_uni(3), index_multi(ns));
-  test_throw_invalid_arg(x,
-                         conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(3, 10),
-                         index_uni(3), index_multi(ns));
+  test_throw_invalid_arg(
+      x, conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(5, 10),
+      index_uni(3), index_multi(ns));
+  test_throw_invalid_arg(
+      x, conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(3, 10),
+      index_uni(3), index_multi(ns));
   test_throw_out_of_range(x, y, index_uni(0), index_multi(ns));
   test_throw_out_of_range(x, y, index_uni(6), index_multi(ns));
   ns[ns.size() - 1] = 0;
@@ -975,10 +991,14 @@ void omni_matrix_test() {
     check_adjs(check_all, check_all, x, "lhs", 0.0);
     check_adjs(check_all, check_all, x_copy, "lhs", 0.0);
   }
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 6, 10), index_omni());
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 4, 10), index_omni());
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(6, 5, 10), index_omni());
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(4, 5, 10), index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 6, 10),
+                         index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 4, 10),
+                         index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(6, 5, 10),
+                         index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(4, 5, 10),
+                         index_omni());
 }
 
 TEST_F(VarAssign, omni_matrix) {
@@ -1018,14 +1038,14 @@ void omni_omni_matrix_test() {
     check_adjs(check_all, check_all, x, "lhs", 1.0);
     check_adjs(check_all, check_all, x_copy, "lhs", 1.0);
   }
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 6, 10), index_omni(),
-                         index_omni());
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 4, 10), index_omni(),
-                         index_omni());
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(6, 5, 10), index_omni(),
-                         index_omni());
-  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(4, 5, 10), index_omni(),
-                         index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 6, 10),
+                         index_omni(), index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 4, 10),
+                         index_omni(), index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(6, 5, 10),
+                         index_omni(), index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(4, 5, 10),
+                         index_omni(), index_omni());
 }
 
 TEST_F(VarAssign, omni_omni_matrix_var) {
@@ -1043,7 +1063,9 @@ void uni_omni_matrix_test() {
 
   auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(5, 10);
+  auto y
+      = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(
+          5, 10);
   assign(x, y, "", index_uni(1), index_omni());
   EXPECT_MATRIX_EQ(stan::math::value_of(y).row(0), x.val().row(0));
   sum(x).grad();
@@ -1054,10 +1076,14 @@ void uni_omni_matrix_test() {
   check_adjs(check_all, y, "rhs");
 
   test_throw_invalid_arg(
-      x, conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(4, 10),
+      x,
+      conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(
+          4, 10),
       index_uni(1), index_omni());
   test_throw_invalid_arg(
-      x, conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(6, 10),
+      x,
+      conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(
+          6, 10),
       index_uni(1), index_omni());
   test_throw_out_of_range(x, y, index_uni(0), index_omni());
   test_throw_out_of_range(x, y, index_uni(6), index_omni());
@@ -1525,7 +1551,9 @@ void uni_minmax_matrix_test() {
 
   auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(3, 10);
+  auto y
+      = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(
+          3, 10);
   assign(x, y, "", index_uni(2), index_min_max(2, 4));
   EXPECT_MATRIX_EQ(stan::math::value_of(y).segment(0, 3),
                    x.val().row(1).segment(1, 3));
@@ -1539,12 +1567,12 @@ void uni_minmax_matrix_test() {
   test_throw_out_of_range(x, y, index_uni(6), index_min_max(2, 4));
   test_throw_out_of_range(x, y, index_uni(2), index_min_max(0, 2));
   test_throw_out_of_range(x, y, index_uni(2), index_min_max(1, 6));
-  test_throw_invalid_arg(x,
-                         conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(2, 10),
-                         index_uni(2), index_min_max(2, 4));
-  test_throw_invalid_arg(x,
-                         conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(4, 10),
-                         index_uni(2), index_min_max(2, 4));
+  test_throw_invalid_arg(
+      x, conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(2, 10),
+      index_uni(2), index_min_max(2, 4));
+  test_throw_invalid_arg(
+      x, conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(4, 10),
+      index_uni(2), index_min_max(2, 4));
 }
 
 TEST_F(VarAssign, uni_minmax_matrix) {
