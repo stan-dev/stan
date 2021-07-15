@@ -424,7 +424,6 @@ pipeline {
                                 bat "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_CPU} >> make/local"
                                 bat "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_CPU} >> make/local"
                                 bat 'echo LDFLAGS_OPENCL= -L"C:\\Program Files (x86)\\IntelSWTools\\system_studio_2020\\OpenCL\\sdk\\lib\\x64" -lOpenCL >> make/local'
-                                bat "mingw32-make.exe -f make/standalone math-libs"
                                 runTestsWin("src/test/unit")
                             }
                         }
@@ -451,7 +450,6 @@ pipeline {
                                 bat "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_GPU} >> make/local"
                                 bat "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_GPU} >> make/local"
                                 bat 'echo LDFLAGS_OPENCL= -L"C:\\Program Files (x86)\\IntelSWTools\\system_studio_2020\\OpenCL\\sdk\\lib\\x64" -lOpenCL >> make/local'
-                                bat "mingw32-make.exe -f make/standalone math-libs"
                                 runTestsWin("src/test/unit")
                             }
                         }
