@@ -194,7 +194,7 @@ pipeline {
 
                     skipRemainingStages = utils.verifyChanges(paths)
 
-                    def openCLPaths = ['lib/stan_math/stan/math/opencl', 'lib/stan_math/test/unit/math/opencl'].join(" ")
+                    def openCLPaths = ['src/stan/model/indexing'].join(" ")
                     skipOpenCL = utils.verifyChanges(openCLPaths)
                 }
             }
@@ -397,11 +397,6 @@ pipeline {
             }
         }
         stage('OpenCL tests'){
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
             parallel {
                 stage('OpenCL CPU tests') {
                     when {
@@ -419,12 +414,8 @@ pipeline {
                                 sh "echo STAN_OPENCL=true>> make/local"
                                 sh "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_CPU}>> make/local"
                                 sh "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_CPU}>> make/local"
-                                // skips tests that require specific support in OpenCL
-                                sh 'echo "ifdef NO_CPU_OPENCL_INT64_BASE_ATOMIC" >> make/local'
-                                sh 'echo "CXXFLAGS += -DSTAN_TEST_SKIP_REQUIRING_OPENCL_INT64_BASE_ATOMIC" >> make/local'
-                                sh 'echo "endif" >> make/local'
                                 runTests("lib/stan_math/test/unit/math/opencl", false)
-                                runTests("lib/stan_math/test/unit/multiple_translation_units_test.cpp")
+                                runTests("src/test/unit")
                             } else {
                                 deleteDirWin()
                                 unstash 'StanSetup'
@@ -434,13 +425,12 @@ pipeline {
                                 bat "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_CPU} >> make/local"
                                 bat 'echo LDFLAGS_OPENCL= -L"C:\\Program Files (x86)\\IntelSWTools\\system_studio_2020\\OpenCL\\sdk\\lib\\x64" -lOpenCL >> make/local'
                                 bat "mingw32-make.exe -f make/standalone math-libs"
-                                runTestsWin("lib/stan_math/test/unit/math/opencl", false, false)
-                                runTestsWin("lib/stan_math/test/unit/multiple_translation_units_test.cpp", false, false)
+                                runTestsWin("src/test/unit")
                             }
                         }
                     }
                 }
-            
+
                 stage('OpenCL GPU tests') {
                     agent { label "gelman-group-win2 || linux-gpu" }
                     steps {
