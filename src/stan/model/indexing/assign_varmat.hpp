@@ -42,28 +42,20 @@ using require_all_var_matrix_or_all_var_eigen = require_any_t<
     stan::math::conjunction<is_var_matrix<Mat1>, is_var_matrix<Mat2>>>;
 
 /**
+ * Does an xor
+ */
+template <typename T1, typename T2>
+using require_nand_var_matrix_or_eigen = require_not_t<stan::math::conjunction<is_var_matrix<T1>, is_eigen<T2>>>;
+/**
  * Base case of assignment
  * @tparam T1 Any type that's not a var matrix.
  * @tparam T2 Any type that's not a var matrix.
  * @param x The value to assign to
  * @param y The value to assign from.
  */
-template <typename T1, typename T2, require_not_var_matrix_t<T1>* = nullptr>
+template <typename T1, typename T2, require_nand_var_matrix_or_eigen<T1, T2>* = nullptr>
 void assign_impl(T1&& x, T2&& y) {
   x = std::forward<T2>(y);
-}
-
-/**
- * For assigning one var matrix to another
- * @tparam Mat1 A `var_value` with inner type derived from `EigenBase`
- * @tparam Mat1 A `var_value` with inner type derived from `EigenBase`
- * @param x The var matrix to assign to
- * @param x The var matrix to assign from
- */
-template <typename Mat1, typename Mat2,
-          require_all_var_matrix_t<Mat1, Mat2>* = nullptr>
-void assign_impl(Mat1&& x, Mat2&& y) {
-  x = std::forward<Mat2>(y);
 }
 
 /**
