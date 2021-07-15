@@ -109,157 +109,15 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
       = math::constant(scal_rhs, 1, 1);
 }
 
-// assign(rev, prim, ...)
+// rev
 /**
- * Assign one primitive kernel generator expression to a reverse mode kernel
- * generator expression, using given index.
+ * Assign one primitive or reverse mode kernel generator expression to a reverse
+ * mode one, using given index.
  *
  * @tparam ExprLhs type of the assignable rev expression on the left hand side
  * of the assignment
- * @tparam ExprRhs type of the prim expression on the right hand side of the
- * assignment
- * @tparam RowIndex type of index (a Stan index type or `matrix_cl<int>` instad
- * of `index_multi`)
- * @param[in,out] expr_lhs expression on the left hand side of the assignment
- * @param expr_rhs expression on the right hand side of the assignment
- * @param name Name of lvalue variable
- * @param row_index index used for indexing `expr_lhs`
- * @throw std::out_of_range If the index is out of bounds.
- * @throw std::invalid_argument If the right hand side size isn't the same as
- * the indexed left hand side size.
- */
-template <typename ExprLhs, typename ExprRhs, typename RowIndex,
-          require_rev_kernel_expression_t<ExprLhs>* = nullptr,
-          require_all_kernel_expressions_and_none_scalar_t<ExprRhs>* = nullptr>
-inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
-                   RowIndex&& row_index) {
-  if (std::is_same<std::decay_t<RowIndex>, index_omni>::value) {
-    stan::math::check_size_match("omni assign", "left hand side rows",
-                                 expr_lhs.rows(), name, expr_rhs.rows());
-    stan::math::check_size_match("omni assign", "left hand side columns",
-                                 expr_lhs.cols(), name, expr_rhs.cols());
-  }
-  decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index);
-  math::arena_matrix_cl<double> prev_vals;
-  if (std::is_rvalue_reference<ExprRhs&&>::value) {
-    prev_vals = std::move(lhs);
-  } else {
-    prev_vals = lhs;
-  }
-  lhs = std::forward<ExprRhs>(expr_rhs);  // assign the values
-  math::reverse_pass_callback(
-      [expr_lhs, prev_vals, name,
-       row_index
-       = math::to_arena(std::forward<RowIndex>(row_index))]() mutable {
-        auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
-        auto&& lhs_adj = rvalue(expr_lhs.adj(), name, row_index);
-        math::results(lhs_val, lhs_adj) = math::expressions(
-            prev_vals, math::constant(0.0, lhs_adj.rows(), lhs_adj.cols()));
-      });
-}
-
-/**
- * Assign one primitive kernel generator expression to a reverse mode kernel
- * generator expression, using given indices.
- *
- * @tparam ExprLhs type of the assignable rev expression on the left hand side
- * of the assignment
- * @tparam ExprRhs type of the prim expression on the right hand side of the
- * assignment
- * @tparam RowIndex type of row index (a Stan index type or `matrix_cl<int>`
- * instad of `index_multi`)
- * @tparam ColIndex type of column index (a Stan index type or `matrix_cl<int>`
- * instad of `index_multi`)
- * @param[in,out] expr_lhs expression on the left hand side of the assignment
- * @param expr_rhs expression on the right hand side of the assignment
- * @param name Name of lvalue variable
- * @param row_index index used for indexing rows of `expr_lhs`
- * @param col_index index used for indexing columns of `expr_lhs`
- * @throw std::out_of_range If the index is out of bounds.
- * @throw std::invalid_argument If the right hand side size isn't the same as
- * the indexed left hand side size.
- */
-template <typename ExprLhs, typename ExprRhs, typename RowIndex,
-          typename ColIndex,
-          require_rev_kernel_expression_t<ExprLhs>* = nullptr,
-          require_all_kernel_expressions_and_none_scalar_t<ExprRhs>* = nullptr,
-          require_any_not_same_t<RowIndex, ColIndex, index_uni>* = nullptr>
-inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
-                   RowIndex&& row_index, ColIndex&& col_index) {
-  if (std::is_same<std::decay_t<RowIndex>, index_omni>::value
-      && std::is_same<std::decay_t<ColIndex>, index_omni>::value) {
-    stan::math::check_size_match("omni assign", "left hand side rows",
-                                 expr_lhs.rows(), name, expr_rhs.rows());
-    stan::math::check_size_match("omni assign", "left hand side columns",
-                                 expr_lhs.cols(), name, expr_rhs.cols());
-  }
-  decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index, col_index);
-  math::arena_matrix_cl<double> prev_vals;
-  if (std::is_rvalue_reference<ExprRhs&&>::value) {
-    prev_vals = std::move(lhs);
-  } else {
-    prev_vals = lhs;
-  }
-  lhs = std::forward<ExprRhs>(expr_rhs);  // assign the values
-  math::reverse_pass_callback(
-      [expr_lhs, prev_vals, name,
-       row_index = math::to_arena(std::forward<RowIndex>(row_index)),
-       col_index
-       = math::to_arena(std::forward<ColIndex>(col_index))]() mutable {
-        auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index, col_index);
-        auto&& lhs_adj = rvalue(expr_lhs.adj(), name, row_index, col_index);
-        lhs_adj = math::constant(0.0, lhs_adj.rows(), lhs_adj.cols());
-        lhs_val = prev_vals;
-        math::results(lhs_val, lhs_adj) = math::expressions(
-            prev_vals, math::constant(0.0, lhs_adj.rows(), lhs_adj.cols()));
-      });
-}
-
-/**
- * Assign a primitive scalar to a reverse mode kernel generator expression,
- * using given uni indices.
- *
- * @tparam ExprLhs type of the assignable revexpression on the left hand side of
+ * @tparam ExprRhs type of the prim or rev expression on the right hand side of
  * the assignment
- * @tparam ScalRhs type of the prim scalar on the right hand side of the
- * assignment
- * @param[in,out] expr_lhs expression on the left hand side of the assignment
- * @param scal_rhs scalar on the right hand side of the assignment
- * @param name Name of lvalue variable
- * @param row_index index used for indexing rows of `expr_lhs`
- * @param col_index index used for indexing columns of `expr_lhs`
- * @throw std::out_of_range If the index is out of bounds.
- */
-template <typename ExprLhs, typename ScalRhs,
-          require_rev_kernel_expression_t<ExprLhs>* = nullptr,
-          require_arithmetic_t<ScalRhs>* = nullptr>
-inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
-                   const char* name, const index_uni row_index,
-                   const index_uni col_index) {
-  decltype(auto) lhs = math::block_zero_based(
-      expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
-  math::arena_matrix_cl<double> prev_val = lhs;
-  lhs = math::constant(scal_rhs, 1, 1);  // assign the values
-  math::reverse_pass_callback(
-      [expr_lhs, row_index, col_index, prev_val]() mutable {
-        auto&& lhs_val = math::block_zero_based(
-            expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
-        auto&& lhs_adj = math::block_zero_based(
-            expr_lhs.adj(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
-        math::results(lhs_adj, lhs_val)
-            = math::expressions(math::constant(0.0, 1, 1), prev_val);
-      });
-}
-
-// assign(rev, rev, ...)
-/**
- * Assign one reverse mode kernel generator expression to another, using given
- * index.
- *
- * @tparam ExprLhs type of the assignable rev expression on the left hand side
- * of the assignment
- * @tparam ExprRhs type of the rev expression on the right hand side of the
- * assignment
  * @tparam RowIndex type of index
  * @param[in,out] expr_lhs expression on the left hand side of the assignment
  * @param expr_rhs expression on the right hand side of the assignment
@@ -271,7 +129,8 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
  * the indexed left hand side size.
  */
 template <typename ExprLhs, typename ExprRhs, typename RowIndex,
-          require_all_rev_kernel_expression_t<ExprLhs, ExprRhs>* = nullptr>
+          require_rev_kernel_expression_t<ExprLhs>* = nullptr,
+          require_nonscalar_prim_or_rev_kernel_expression_t<ExprRhs>* = nullptr>
 inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
                    const char* name, RowIndex&& row_index) {
   if (std::is_same<std::decay_t<RowIndex>, index_omni>::value) {
@@ -282,7 +141,7 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   }
   decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index);
   math::arena_matrix_cl<double> prev_vals = lhs;
-  lhs = expr_rhs.val();  // assign the values
+  lhs = math::value_of(expr_rhs);  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, expr_rhs, name, prev_vals,
        row_index
@@ -290,9 +149,12 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
         auto&& lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
         decltype(auto) lhs_adj = rvalue(expr_lhs.adj(), name, row_index);
 
-        math::results(lhs_val, expr_rhs.adj(), lhs_adj) = math::expressions(
-            prev_vals, expr_rhs.adj() + lhs_adj,
-            math::constant(0.0, lhs_adj.rows(), lhs_adj.cols()));
+        math::results(lhs_val, math::adjoint_of(expr_rhs), lhs_adj)
+            = math::expressions(
+                prev_vals,
+                math::calc_if<!is_constant<ExprRhs>::value>(
+                    math::adjoint_of(expr_rhs) + lhs_adj),
+                math::constant(0.0, lhs_adj.rows(), lhs_adj.cols()));
       });
 }
 // the "forwarding" overload
@@ -303,13 +165,13 @@ inline void assign(math::var_value<math::matrix_cl<double>>& expr_lhs,
 }
 
 /**
- * Assign one reverse mode kernel generator expression to another, using given
- * indices.
+ * Assign one primitive or reverse mode kernel generator expression to a reverse
+ * mode one, using given indices.
  *
  * @tparam ExprLhs type of the assignable rev expression on the left hand side
  * of the assignment
- * @tparam ExprRhs type of the rev expression on the right hand side of the
- * assignment
+ * @tparam ExprRhs type of the prim or rev expression on the right hand side of
+ * the assignment
  * @tparam RowIndex type of row index (a Stan index type or `matrix_cl<int>`
  * instad of `index_multi`)
  * @tparam ColIndex type of column index (a Stan index type or `matrix_cl<int>`
@@ -323,10 +185,11 @@ inline void assign(math::var_value<math::matrix_cl<double>>& expr_lhs,
  * @throw std::invalid_argument If the right hand side size isn't the same as
  * the indexed left hand side size.
  */
-template <typename ExprLhs, typename ExprRhs, typename RowIndex,
-          typename ColIndex,
-          require_all_rev_kernel_expression_t<ExprLhs, ExprRhs>* = nullptr,
-          require_any_not_same_t<RowIndex, ColIndex, index_uni>* = nullptr>
+template <
+    typename ExprLhs, typename ExprRhs, typename RowIndex, typename ColIndex,
+    require_rev_kernel_expression_t<ExprLhs>* = nullptr,
+    require_all_nonscalar_prim_or_rev_kernel_expression_t<ExprRhs>* = nullptr,
+    require_any_not_same_t<RowIndex, ColIndex, index_uni>* = nullptr>
 inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
                    const char* name, RowIndex&& row_index,
                    ColIndex&& col_index) {
@@ -339,7 +202,7 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   }
   decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index, col_index);
   math::arena_matrix_cl<double> prev_vals = lhs;
-  lhs = expr_rhs.val();  // assign the values
+  lhs = math::value_of(expr_rhs);  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, expr_rhs, name, prev_vals,
        row_index_tup = std::tuple<RowIndex>(std::forward<RowIndex>(row_index)),
@@ -351,9 +214,12 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
         decltype(auto) lhs_adj
             = rvalue(expr_lhs.adj(), name, std::get<0>(row_index_tup),
                      std::get<0>(col_index_tup));
-        math::results(lhs_val, expr_rhs.adj(), lhs_adj) = math::expressions(
-            prev_vals, expr_rhs.adj() + lhs_adj,
-            math::constant(0.0, lhs_adj.rows(), lhs_adj.cols()));
+        math::results(lhs_val, math::adjoint_of(expr_rhs), lhs_adj)
+            = math::expressions(
+                prev_vals,
+                math::calc_if<!is_constant<ExprRhs>::value>(
+                    math::adjoint_of(expr_rhs) + lhs_adj),
+                math::constant(0.0, lhs_adj.rows(), lhs_adj.cols()));
       });
 }
 // the "forwarding" overload
@@ -365,12 +231,12 @@ inline void assign(math::var_value<math::matrix_cl<double>>& expr_lhs,
 }
 
 /**
- * Assign a reverse mode scalar to a reverse mode kernel generator expression,
- * using given uni indices.
+ * Assign a primitive or reverse mode scalar to a reverse mode kernel generator
+ * expression, using given uni indices.
  *
  * @tparam ExprLhs type of the assignable rev expression on the left hand side
  * of the assignment
- * @tparam ScalRhs type of the rev scalar on the right hand side of the
+ * @tparam ScalRhs type of the prim or rev scalar on the right hand side of the
  * assignment
  * @param[in,out] expr_lhs expression on the left hand side of the assignment
  * @param scal_rhs scalar on the right hand side of the assignment
@@ -381,21 +247,23 @@ inline void assign(math::var_value<math::matrix_cl<double>>& expr_lhs,
  */
 template <typename ExprLhs, typename ScalRhs,
           require_rev_kernel_expression_t<ExprLhs>* = nullptr,
-          require_var_t<ScalRhs>* = nullptr>
+          require_stan_scalar_t<ScalRhs>* = nullptr>
 inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
                    const char* name, const index_uni row_index,
                    const index_uni col_index) {
   decltype(auto) lhs = math::block_zero_based(
       expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
   math::arena_matrix_cl<double> prev_val = lhs;
-  lhs = math::constant(scal_rhs.val(), 1, 1);  // assign the values
+  lhs = math::constant(math::value_of(scal_rhs), 1, 1);  // assign the value
   math::reverse_pass_callback(
       [expr_lhs, scal_rhs, row_index, col_index, prev_val]() mutable {
         auto&& lhs_val = math::block_zero_based(
             expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
         auto&& lhs_adj = math::block_zero_based(
             expr_lhs.adj(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
-        scal_rhs.adj() += math::from_matrix_cl<double>(lhs_adj);
+        if (!is_constant<ScalRhs>::value) {
+          math::adjoint_of(scal_rhs) += math::from_matrix_cl<double>(lhs_adj);
+        }
         math::results(lhs_adj, lhs_val)
             = math::expressions(math::constant(0.0, 1, 1), prev_val);
       });
