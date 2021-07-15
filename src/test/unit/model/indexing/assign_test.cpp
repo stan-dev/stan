@@ -681,14 +681,15 @@ TEST(ModelIndexing, resultSizeNegIndexing) {
   using stan::model::index_min_max;
   using std::vector;
 
-  vector<double> rhs;
-  rhs.push_back(2);
-  rhs.push_back(5);
-  rhs.push_back(-125);
+  vector<double> lhs{1, 2, 3, 4, 5};
+  vector<double> rhs{6, 7, 8, 9};
 
-  vector<double> lhs;
-  assign(rhs, lhs, "", index_min_max(1, 0));
-  EXPECT_EQ(0, lhs.size());
+  assign(lhs, rhs, "", index_min_max(4, 1));
+  EXPECT_FLOAT_EQ(lhs[0], 9);
+  EXPECT_FLOAT_EQ(lhs[1], 8);
+  EXPECT_FLOAT_EQ(lhs[2], 7);
+  EXPECT_FLOAT_EQ(lhs[3], 6);
+  EXPECT_FLOAT_EQ(lhs[4], 5);
 }
 
 TEST(ModelIndexing, resultSizeIndexingEigen) {
