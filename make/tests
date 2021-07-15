@@ -173,6 +173,9 @@ test/integration/libmtu_%.so : test/integration/mtu/%_1.o test/integration/mtu/%
 
 test/integration/multiple_translation_units_test$(EXE) : test/integration/libmtu_model.so test/integration/libmtu_mcmc.so
 
+ifdef STAN_OPENCL
+STANCFLAGS+= --use-opencl
+endif
 
 ############################################################
 ##
@@ -181,7 +184,7 @@ test/integration/multiple_translation_units_test$(EXE) : test/integration/libmtu
 TEST_MODELS = $(call findfiles,src/test/test-models,*.stan)
 $(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/test-models/%.stan bin/stanc$(EXE)
 	@mkdir -p $(dir $@)
-	$(WINE) bin/stanc$(EXE) $< --o=$@
+	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) $< --o=$@
 
 ##
 # Generate C++ from Stan standalone functions
@@ -189,7 +192,7 @@ $(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/
 TEST_FUNCTIONS = $(call findfiles,src/test/test-models,*.stanfuncs)
 $(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs bin/stanc$(EXE)
 	@mkdir -p $(dir $@)
-	$(WINE) bin/stanc$(EXE) --standalone-functions $< --o=$@
+	$(WINE) bin/stanc$(EXE) $(STANCFLAGS) --standalone-functions $< --o=$@
 
 ##
 # Compile models depends on every model within
