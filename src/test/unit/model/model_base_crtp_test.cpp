@@ -13,24 +13,24 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
 
   virtual ~mock_model() {}
 
-  std::string model_name() const  { return "mock_model"; }
+  std::string model_name() const override { return "mock_model"; }
 
-  std::vector<std::string> model_compile_info() const  {
+  std::vector<std::string> model_compile_info() const {
     std::vector<std::string> stanc_info;
     stanc_info.push_back("stanc_version = stanc3");
     return stanc_info;
   }
 
-  void get_param_names(std::vector<std::string>& names) const  {}
-  void get_dims(std::vector<std::vector<size_t> >& dimss) const  {}
+  void get_param_names(std::vector<std::string>& names) const override {}
+  void get_dims(std::vector<std::vector<size_t> >& dimss) const override {}
 
   void constrained_param_names(std::vector<std::string>& param_names,
                                bool include_tparams,
-                               bool include_gqs) const  {}
+                               bool include_gqs) const override {}
 
   void unconstrained_param_names(std::vector<std::string>& param_names,
                                  bool include_tparams,
-                                 bool include_gqs) const  {}
+                                 bool include_gqs) const override {}
 
   template <bool propto, bool jacobian, typename T>
   T log_prob(Eigen::Matrix<T, -1, 1>& params_r, std::ostream* msgs) const {
@@ -57,7 +57,7 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
 
   void transform_inits(const stan::io::var_context& context,
                        Eigen::VectorXd& params_r,
-                       std::ostream* msgs) const  {}
+                       std::ostream* msgs) const override {}
 
   template <typename RNG>
   void write_array(RNG& base_rng, Eigen::VectorXd& params_r,
@@ -91,7 +91,7 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
   void transform_inits(const stan::io::var_context& context,
                        std::vector<int>& params_i,
                        std::vector<double>& params_r,
-                       std::ostream* msgs) const  {}
+                       std::ostream* msgs) const override {}
 
   template <typename RNG>
   void write_array(RNG& base_rng, std::vector<double>& params_r,
