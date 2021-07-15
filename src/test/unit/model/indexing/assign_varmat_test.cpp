@@ -70,10 +70,10 @@ void test_nil_vec() {
   using stan::math::var;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_vector<Vec, var>(5);
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_vector<Vec, var>(5);
   Eigen::VectorXd x_val = x.val();
-  auto y = generate_linear_var_vector<Vec, RhsScalar>(5, 1.0);
+  auto y = conditionally_generate_linear_var_vector<Vec, RhsScalar>(5, 1.0);
   assign(x, y, "");
   EXPECT_MATRIX_EQ(x.val(), stan::math::value_of(y));
   stan::math::sum(x).grad();
@@ -97,8 +97,8 @@ void test_uni_vec() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_vector<Vec>(5);
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_vector<Vec>(5);
   Vec x_val = x.val();
   RhsScalar y(18);
   assign(x, y, "", index_uni(2));
@@ -127,10 +127,10 @@ void test_multi_vec() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_vector<Vec>(5);
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_vector<Vec>(5);
   Vec x_val = x.val();
-  auto y = generate_linear_var_vector<Vec, RhsScalar>(3, 10);
+  auto y = conditionally_generate_linear_var_vector<Vec, RhsScalar>(3, 10);
   vector<int> ns;
   ns.push_back(2);
   ns.push_back(4);
@@ -151,9 +151,9 @@ void test_multi_vec() {
   ns.push_back(2);
   test_throw_invalid_arg(x, y, index_multi(ns));
   ns.pop_back();
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(4),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(4),
                          index_multi(ns));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(2),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(2),
                          index_multi(ns));
 }
 
@@ -172,8 +172,8 @@ void test_multi_alias_vec() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_vector<Eigen::VectorXd>(5, 1);
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_vector<Eigen::VectorXd>(5, 1);
   Eigen::VectorXd x_val = x.val();
   vector<int> ns{1, 1, 2, 3};
   assign(x, x.segment(1, 4), "", index_multi(ns));
@@ -193,10 +193,10 @@ void test_omni_vec() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_vector<Vec>(5);
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_vector<Vec>(5);
   Vec x_val = stan::math::value_of(x);
-  auto y = generate_linear_var_vector<Vec, RhsScalar>(5, 10);
+  auto y = conditionally_generate_linear_var_vector<Vec, RhsScalar>(5, 10);
   Vec y_val = stan::math::value_of(y);
   auto x_copy = var_value<Vec>(x.vi_);
   assign(x, y, "", index_omni());
@@ -219,9 +219,9 @@ void test_omni_vec() {
     check_adjs(check_i, x, "lhs", 0.0);
   }
   check_adjs(check_i, y, "rhs", 1.0);
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec, RhsScalar>(4),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec, RhsScalar>(4),
                          index_omni());
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec, RhsScalar>(6),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec, RhsScalar>(6),
                          index_omni());
 }
 
@@ -240,9 +240,9 @@ void test_min_vec() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_vector<Vec>(5);
-  auto y = generate_linear_var_vector<Vec, RhsScalar>(3, 10);
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_vector<Vec>(5);
+  auto y = conditionally_generate_linear_var_vector<Vec, RhsScalar>(3, 10);
   Vec x_val(x.val());
   auto y_val = stan::math::value_of(y).eval();
   assign(x, y, "", index_min(3));
@@ -256,8 +256,8 @@ void test_min_vec() {
   check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_min(0));
   test_throw_out_of_range(x, y, index_min(6));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(4), index_min(3));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(2), index_min(3));
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(4), index_min(3));
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(2), index_min(3));
 }
 TEST_F(VarAssign, min_vec) {
   test_min_vec<Eigen::VectorXd, stan::math::var>();
@@ -274,10 +274,10 @@ void test_max_vec() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_vector<Vec>(5);
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_vector<Vec>(5);
   Vec x_val = x.val();
-  auto y = generate_linear_var_vector<Vec, RhsScalar>(2, 10);
+  auto y = conditionally_generate_linear_var_vector<Vec, RhsScalar>(2, 10);
   auto y_val = stan::math::value_of(y);
   assign(x, y, "", index_max(2));
   EXPECT_FLOAT_EQ(y_val[0], x.val()[0]);
@@ -289,8 +289,8 @@ void test_max_vec() {
   check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_max(0));
   test_throw_out_of_range(x, y, index_max(6));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(3), index_max(2));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(1), index_max(2));
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(3), index_max(2));
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(1), index_max(2));
 }
 
 TEST_F(VarAssign, max_vec) {
@@ -308,10 +308,10 @@ void test_positive_minmax_varvector() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_vector<Vec>(5);
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_vector<Vec>(5);
   Vec x_val = x.val();
-  auto y = generate_linear_var_vector<Vec, RhsScalar>(4, 10);
+  auto y = conditionally_generate_linear_var_vector<Vec, RhsScalar>(4, 10);
 
   assign(x, y, "", index_min_max(1, 4));
   EXPECT_FLOAT_EQ(x.val()(0), 10);
@@ -326,9 +326,9 @@ void test_positive_minmax_varvector() {
   check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_min_max(0, 3));
   test_throw_out_of_range(x, y, index_min_max(1, 6));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(5),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(5),
                          index_min_max(1, 4));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(3),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(3),
                          index_min_max(1, 4));
 }
 
@@ -347,10 +347,10 @@ void test_negative_minmax_varvector() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_vector<Vec>(5);
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_vector<Vec>(5);
   Vec x_val = x.val();
-  auto y = generate_linear_var_vector<Vec, RhsScalar>(4, 10);
+  auto y = conditionally_generate_linear_var_vector<Vec, RhsScalar>(4, 10);
 
   assign(x, y, "", index_min_max(4, 1));
   EXPECT_FLOAT_EQ(x.val()(0), 13);
@@ -365,9 +365,9 @@ void test_negative_minmax_varvector() {
   check_adjs([](int /* i */) { return true; }, y, "rhs");
   test_throw_out_of_range(x, y, index_min_max(3, 0));
   test_throw_out_of_range(x, y, index_min_max(6, 1));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(5),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(5),
                          index_min_max(4, 1));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Vec>(3),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(3),
                          index_min_max(4, 1));
 }
 
@@ -454,12 +454,12 @@ auto uni_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(5, 10);
+  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(5, 10);
   assign(x, y, "", index_uni(1));
   EXPECT_MATRIX_EQ(y.val().row(0), x.val().row(0));
   sum(x).grad();
@@ -482,8 +482,8 @@ auto uni_uni_mat_test() {
   using stan::math::var;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  auto x = generate_linear_var_matrix(5, 5);
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
   RhsScalar y = 10.12;
   assign(x, y, "", index_uni(2), index_uni(3));
@@ -511,12 +511,12 @@ auto multi_uni_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(3, 4);
+  auto x = conditionally_generate_linear_var_matrix(3, 4);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(3, 10);
+  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(3, 10);
 
   std::vector<int> ns;
   ns.push_back(3);
@@ -551,12 +551,12 @@ template <typename RhsScalar>
 auto omni_uni_mat_test() {
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_vector<Eigen::VectorXd, RhsScalar>(5, 10);
+  auto y = conditionally_generate_linear_var_vector<Eigen::VectorXd, RhsScalar>(5, 10);
   assign(x, y, "", index_omni(), index_uni(1));
   auto y_val = stan::math::value_of(y);
   EXPECT_MATRIX_EQ(y_val, x.val().col(0));
@@ -568,9 +568,9 @@ auto omni_uni_mat_test() {
   check_adjs(check_all, y, "rhs");
   test_throw_out_of_range(x, y, index_omni(), index_uni(0));
   test_throw_out_of_range(x, y, index_omni(), index_uni(6));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Eigen::VectorXd>(6),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Eigen::VectorXd>(6),
                          index_omni(), index_uni(1));
-  test_throw_invalid_arg(x, generate_linear_var_vector<Eigen::VectorXd>(4),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Eigen::VectorXd>(4),
                          index_omni(), index_uni(1));
 }
 
@@ -584,12 +584,12 @@ auto minmax_uni_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(3, 4);
+  auto x = conditionally_generate_linear_var_matrix(3, 4);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_vector<Eigen::VectorXd, RhsScalar>(2, 10);
+  auto y = conditionally_generate_linear_var_vector<Eigen::VectorXd, RhsScalar>(2, 10);
 
   assign(x, y, "", index_min_max(2, 3), index_uni(4));
   EXPECT_MATRIX_EQ(stan::math::value_of(y), x.val().col(3).segment(1, 2));
@@ -604,9 +604,9 @@ auto minmax_uni_mat_test() {
   test_throw_out_of_range(x, y, index_min_max(2, 3), index_uni(5));
   test_throw_out_of_range(x, y, index_min_max(0, 1), index_uni(4));
   test_throw_out_of_range(x, y, index_min_max(2, 4), index_uni(4));
-  test_throw_invalid_arg(x, generate_linear_var_vector(1, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector(1, 10),
                          index_min_max(2, 3), index_uni(4));
-  test_throw_invalid_arg(x, generate_linear_var_vector(3, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_vector(3, 10),
                          index_min_max(2, 3), index_uni(4));
 }
 
@@ -620,11 +620,11 @@ auto multi_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix<RhsScalar>(7, 5, 10);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(7, 5, 10);
   std::vector<int> row_idx{3, 4, 1, 4, 1, 4, 5};
   stan::arena_t<std::vector<int>> x_idx;
   stan::arena_t<std::vector<int>> y_idx;
@@ -650,13 +650,13 @@ auto multi_mat_test() {
   auto check_i_y = [](int i) { return (i == 0 || i > 3); };
   auto check_j_y = [](int j) { return true; };
   check_adjs(check_i_y, check_j_y, y, "rhs", 1);
-  test_throw_invalid_arg(x, generate_linear_var_matrix(8, 5, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(8, 5, 10),
                          index_multi(row_idx));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(6, 5, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(6, 5, 10),
                          index_multi(row_idx));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(7, 4, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(7, 4, 10),
                          index_multi(row_idx));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(7, 6, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(7, 6, 10),
                          index_multi(row_idx));
   row_idx[3] = 20;
   test_throw_out_of_range(x, y, index_multi(row_idx));
@@ -675,9 +675,9 @@ TEST_F(VarAssign, multi_alias_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
   std::vector<int> row_idx{2, 3, 1, 3};
   assign(x, x.block(0, 0, 4, 5), "", index_multi(row_idx));
@@ -698,12 +698,12 @@ auto uni_multi_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(4, 10);
+  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(4, 10);
 
   vector<int> ns{4, 1, 3, 3};
   assign(x, y, "", index_uni(3), index_multi(ns));
@@ -719,10 +719,10 @@ auto uni_multi_mat_test() {
   auto check_i_y = [](int i) { return i != 2; };
   check_adjs(check_i_y, y, "rhs", 1);
   test_throw_invalid_arg(x,
-                         generate_linear_var_vector<Eigen::RowVectorXd>(5, 10),
+                         conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(5, 10),
                          index_uni(3), index_multi(ns));
   test_throw_invalid_arg(x,
-                         generate_linear_var_vector<Eigen::RowVectorXd>(3, 10),
+                         conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(3, 10),
                          index_uni(3), index_multi(ns));
   test_throw_out_of_range(x, y, index_uni(0), index_multi(ns));
   test_throw_out_of_range(x, y, index_uni(6), index_multi(ns));
@@ -743,10 +743,10 @@ TEST_F(VarAssign, uni_multi_alias_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
   vector<int> ns{1, 1, 2, 3};
   assign(x, x.row(2).segment(0, 4), "", index_uni(3), index_multi(ns));
@@ -768,11 +768,11 @@ auto multi_multi_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix<RhsScalar>(7, 7, 10);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(7, 7, 10);
   std::vector<int> row_idx{3, 4, 1, 4, 1, 4, 5};
   std::vector<int> col_idx{1, 4, 4, 3, 2, 1, 5};
 
@@ -808,13 +808,13 @@ auto multi_multi_mat_test() {
   auto check_j_y = [](int j) { return (j > 1); };
   check_adjs(check_i_y, check_j_y, y, "rhs", 1);
 
-  test_throw_invalid_arg(x, generate_linear_var_matrix(6, 7, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(6, 7, 10),
                          index_multi(row_idx), index_multi(col_idx));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(8, 7, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(8, 7, 10),
                          index_multi(row_idx), index_multi(col_idx));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(7, 6, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(7, 6, 10),
                          index_multi(row_idx), index_multi(col_idx));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(7, 8, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(7, 8, 10),
                          index_multi(row_idx), index_multi(col_idx));
   col_idx.pop_back();
   test_throw_invalid_arg(x, y, index_multi(row_idx), index_multi(col_idx));
@@ -838,9 +838,9 @@ TEST_F(VarAssign, multi_multi_alias_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
   std::vector<int> row_idx{1, 2, 2, 4};
   std::vector<int> col_idx{1, 2, 2, 3};
@@ -874,12 +874,12 @@ auto minmax_multi_mat_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix(3, 4, 25);
+  auto y = conditionally_generate_linear_var_matrix(3, 4, 25);
 
   vector<int> ns{4, 1, 3, 3};
   assign(x, y, "", index_min_max(1, 3), index_multi(ns));
@@ -896,13 +896,13 @@ auto minmax_multi_mat_test() {
   auto check_i_y = [](int i) { return true; };
   auto check_j_y = [](int j) { return j != 2; };
   check_adjs(check_i_y, check_j_y, y, "lhs", 1);
-  test_throw_invalid_arg(x, generate_linear_var_matrix(3, 5, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(3, 5, 10),
                          index_min_max(1, 3), index_multi(ns));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(3, 3, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(3, 3, 10),
                          index_min_max(1, 3), index_multi(ns));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(4, 4, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(4, 4, 10),
                          index_min_max(1, 3), index_multi(ns));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(2, 4, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(2, 4, 10),
                          index_min_max(1, 3), index_multi(ns));
 
   test_throw_out_of_range(x, y, index_min_max(0, 3), index_multi(ns));
@@ -924,10 +924,10 @@ TEST_F(VarAssign, minmax_multi_alias_matrix) {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
 
   vector<int> ns{4, 1, 3, 3};
@@ -951,12 +951,12 @@ void omni_matrix_test() {
   using stan::math::value_of;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_matrix(5, 5);
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   var_value<Eigen::MatrixXd> x_copy(x.vi_);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix<RhsScalar>(5, 5, 10);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(5, 5, 10);
   assign(x, y, "", index_omni());
   if (stan::is_var<RhsScalar>::value) {
     EXPECT_MATRIX_EQ(value_of(y), x.val());
@@ -975,10 +975,10 @@ void omni_matrix_test() {
     check_adjs(check_all, check_all, x, "lhs", 0.0);
     check_adjs(check_all, check_all, x_copy, "lhs", 0.0);
   }
-  test_throw_invalid_arg(x, generate_linear_var_matrix(5, 6, 10), index_omni());
-  test_throw_invalid_arg(x, generate_linear_var_matrix(5, 4, 10), index_omni());
-  test_throw_invalid_arg(x, generate_linear_var_matrix(6, 5, 10), index_omni());
-  test_throw_invalid_arg(x, generate_linear_var_matrix(4, 5, 10), index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 6, 10), index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 4, 10), index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(6, 5, 10), index_omni());
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(4, 5, 10), index_omni());
 }
 
 TEST_F(VarAssign, omni_matrix) {
@@ -991,12 +991,12 @@ void omni_omni_matrix_test() {
   using stan::math::value_of;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
-  auto x = generate_linear_var_matrix(5, 5);
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   var_value<Eigen::MatrixXd> x_copy(x.vi_);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix<RhsScalar>(5, 5, 10);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(5, 5, 10);
   stan::math::var lp = sum(x_copy);
   lp.adj() = 1;
   assign(x, y, "", index_omni(), index_omni());
@@ -1013,17 +1013,18 @@ void omni_omni_matrix_test() {
     check_adjs(check_all, check_all, x, "lhs");
     check_adjs(check_all, check_all, y, "rhs");
   } else {
+    EXPECT_MATRIX_EQ(x.val(), x_val);
     // Both are one in this case
     check_adjs(check_all, check_all, x, "lhs", 1.0);
     check_adjs(check_all, check_all, x_copy, "lhs", 1.0);
   }
-  test_throw_invalid_arg(x, generate_linear_var_matrix(5, 6, 10), index_omni(),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 6, 10), index_omni(),
                          index_omni());
-  test_throw_invalid_arg(x, generate_linear_var_matrix(5, 4, 10), index_omni(),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(5, 4, 10), index_omni(),
                          index_omni());
-  test_throw_invalid_arg(x, generate_linear_var_matrix(6, 5, 10), index_omni(),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(6, 5, 10), index_omni(),
                          index_omni());
-  test_throw_invalid_arg(x, generate_linear_var_matrix(4, 5, 10), index_omni(),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(4, 5, 10), index_omni(),
                          index_omni());
 }
 
@@ -1037,12 +1038,12 @@ void uni_omni_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(5, 10);
+  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(5, 10);
   assign(x, y, "", index_uni(1), index_omni());
   EXPECT_MATRIX_EQ(stan::math::value_of(y).row(0), x.val().row(0));
   sum(x).grad();
@@ -1053,10 +1054,10 @@ void uni_omni_matrix_test() {
   check_adjs(check_all, y, "rhs");
 
   test_throw_invalid_arg(
-      x, generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(4, 10),
+      x, conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(4, 10),
       index_uni(1), index_omni());
   test_throw_invalid_arg(
-      x, generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(6, 10),
+      x, conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(6, 10),
       index_uni(1), index_omni());
   test_throw_out_of_range(x, y, index_uni(0), index_omni());
   test_throw_out_of_range(x, y, index_uni(6), index_omni());
@@ -1073,11 +1074,11 @@ void min_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
 
-  auto x = generate_linear_var_matrix(3, 4);
+  auto x = conditionally_generate_linear_var_matrix(3, 4);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix<RhsScalar>(2, 4, 10);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(2, 4, 10);
 
   assign(x, y, "", index_min(2));
   EXPECT_MATRIX_EQ(x.val().bottomRows(2), stan::math::value_of(y));
@@ -1104,11 +1105,11 @@ void minmax_min_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
 
-  auto x = generate_linear_var_matrix(3, 4);
+  auto x = conditionally_generate_linear_var_matrix(3, 4);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix<RhsScalar>(2, 3, 10);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(2, 3, 10);
   assign(x, y, "", index_min_max(2, 3), index_min(2));
   EXPECT_MATRIX_EQ(stan::math::value_of(y), x.val().block(1, 1, 2, 3));
   sum(x).grad();
@@ -1122,9 +1123,9 @@ void minmax_min_matrix_test() {
   test_throw_out_of_range(x, y, index_min_max(2, 4), index_min(2));
   test_throw_out_of_range(x, y, index_min_max(2, 3), index_min(0));
   test_throw_out_of_range(x, y, index_min_max(2, 3), index_min(5));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(1, 3, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(1, 3, 10),
                          index_min_max(2, 3), index_min(2));
-  test_throw_invalid_arg(x, generate_linear_var_matrix(2, 5, 10),
+  test_throw_invalid_arg(x, conditionally_generate_linear_var_matrix(2, 5, 10),
                          index_min_max(2, 3), index_min(2));
 }
 
@@ -1139,11 +1140,11 @@ void max_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
 
-  auto x = generate_linear_var_matrix(3, 4);
+  auto x = conditionally_generate_linear_var_matrix(3, 4);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix<RhsScalar>(2, 4, 10);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(2, 4, 10);
 
   assign(x, y, "", index_max(2));
   EXPECT_MATRIX_EQ(x.val().topRows(2), stan::math::value_of(y));
@@ -1169,11 +1170,11 @@ void min_max_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
 
-  auto x = generate_linear_var_matrix(3, 4);
+  auto x = conditionally_generate_linear_var_matrix(3, 4);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix<RhsScalar>(2, 2, 10);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(2, 2, 10);
 
   assign(x, y, "", index_min(2), index_max(2));
   EXPECT_MATRIX_EQ(x.val().block(1, 0, 2, 2), stan::math::value_of(y));
@@ -1205,7 +1206,7 @@ void positive_minmax_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
   Eigen::Matrix<double, -1, -1> x_val(5, 5);
   Eigen::Matrix<double, -1, -1> x_rev_val(5, 5);
   for (int i = 0; i < x_val.size(); ++i) {
@@ -1288,7 +1289,7 @@ void positive_minmax_positive_minmax_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
   Eigen::Matrix<double, -1, -1> x_val(5, 5);
   Eigen::Matrix<double, -1, -1> x_rev_val(5, 5);
   for (int i = 0; i < x_val.size(); ++i) {
@@ -1519,12 +1520,12 @@ void uni_minmax_matrix_test() {
   using stan::math::sum;
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(3, 10);
+  auto y = conditionally_generate_linear_var_vector<Eigen::RowVectorXd, RhsScalar>(3, 10);
   assign(x, y, "", index_uni(2), index_min_max(2, 4));
   EXPECT_MATRIX_EQ(stan::math::value_of(y).segment(0, 3),
                    x.val().row(1).segment(1, 3));
@@ -1539,10 +1540,10 @@ void uni_minmax_matrix_test() {
   test_throw_out_of_range(x, y, index_uni(2), index_min_max(0, 2));
   test_throw_out_of_range(x, y, index_uni(2), index_min_max(1, 6));
   test_throw_invalid_arg(x,
-                         generate_linear_var_vector<Eigen::RowVectorXd>(2, 10),
+                         conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(2, 10),
                          index_uni(2), index_min_max(2, 4));
   test_throw_invalid_arg(x,
-                         generate_linear_var_vector<Eigen::RowVectorXd>(4, 10),
+                         conditionally_generate_linear_var_vector<Eigen::RowVectorXd>(4, 10),
                          index_uni(2), index_min_max(2, 4));
 }
 
@@ -1555,13 +1556,13 @@ template <typename RhsScalar>
 void nil_matrix() {
   using stan::math::var_value;
   using stan::model::test::check_adjs;
-  using stan::model::test::generate_linear_var_matrix;
-  using stan::model::test::generate_linear_var_vector;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
 
-  auto x = generate_linear_var_matrix(5, 5);
+  auto x = conditionally_generate_linear_var_matrix(5, 5);
   var_value<Eigen::MatrixXd> x_copy(x.vi_);
   Eigen::MatrixXd x_val = x.val();
-  auto y = generate_linear_var_matrix<RhsScalar>(5, 5, 10);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(5, 5, 10);
   assign(x, y, "");
   EXPECT_MATRIX_EQ(stan::math::value_of(y), x.val());
   sum(x).grad();

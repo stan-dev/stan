@@ -160,7 +160,7 @@ auto generate_linear_matrix(Eigen::Index n, Eigen::Index m, double start = 0) {
  * @param start Where the linear sequence should start from.
  */
 template <typename RhsScalar = stan::math::var>
-auto generate_linear_var_matrix(Eigen::Index n, Eigen::Index m,
+auto conditionally_generate_linear_var_matrix(Eigen::Index n, Eigen::Index m,
                                 double start = 0) {
   using ret_t
       = std::conditional_t<is_var<RhsScalar>::value,
@@ -193,7 +193,7 @@ auto generate_linear_vector(Eigen::Index n, double start = 0) {
  */
 template <typename Vec = Eigen::Matrix<double, -1, 1>,
           typename RhsScalar = stan::math::var>
-auto generate_linear_var_vector(Eigen::Index n, double start = 0) {
+auto conditionally_generate_linear_var_vector(Eigen::Index n, double start = 0) {
   using ret_t = std::conditional_t<is_var<RhsScalar>::value,
                                    stan::math::var_value<Vec>, Vec>;
   return ret_t(generate_linear_vector<Vec>(n, start));
