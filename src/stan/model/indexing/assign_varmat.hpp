@@ -172,7 +172,9 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
       }
       for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
         if (likely(x_idx[i] != -1)) {
-          math::forward_as<math::promote_scalar_t<math::var, Vec2>>(y).adj().coeffRef(i)
+          math::forward_as<math::promote_scalar_t<math::var, Vec2>>(y)
+              .adj()
+              .coeffRef(i)
               += prev_vals.coeff(i);
         }
       }
@@ -214,14 +216,14 @@ inline void assign(Mat&& x, const U& y, const char* name, index_uni row_idx,
   const int col_idx_val = col_idx.n_ - 1;
   double prev_val = x.val().coeffRef(row_idx_val, col_idx_val);
   x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = stan::math::value_of(y);
-  stan::math::reverse_pass_callback([x, y, row_idx_val, col_idx_val,
-                                     prev_val]() mutable {
-    x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = prev_val;
-    if (!is_constant<U>::value) {
-      math::adjoint_of(y) += x.adj().coeff(row_idx_val, col_idx_val);
-    }
-    x.adj().coeffRef(row_idx_val, col_idx_val) = 0.0;
-  });
+  stan::math::reverse_pass_callback(
+      [x, y, row_idx_val, col_idx_val, prev_val]() mutable {
+        x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = prev_val;
+        if (!is_constant<U>::value) {
+          math::adjoint_of(y) += x.adj().coeff(row_idx_val, col_idx_val);
+        }
+        x.adj().coeffRef(row_idx_val, col_idx_val) = 0.0;
+      });
 }
 
 /**
@@ -288,7 +290,9 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
           }
           for (size_t i = 0; i < x_idx.size(); ++i) {
             if (likely(x_idx[i] != -1)) {
-              math::forward_as<math::promote_scalar_t<math::var, Vec>>(y).adj().coeffRef(i)
+              math::forward_as<math::promote_scalar_t<math::var, Vec>>(y)
+                  .adj()
+                  .coeffRef(i)
                   += prev_val.coeff(i);
             }
           }
@@ -368,7 +372,9 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
       }
       for (size_t i = 0; i < x_idx.size(); ++i) {
         if (likely(x_idx[i] != -1)) {
-          math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y).adj().row(i)
+          math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y)
+              .adj()
+              .row(i)
               += prev_vals.row(i);
         }
       }
@@ -441,7 +447,8 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
       x_col_idx[j] = col_idx.ns_[j] - 1;
       for (int i = assign_rows - 1; i >= 0; --i) {
         if (likely(x_row_idx[i] != -1)) {
-          prev_vals.coeffRef(i, j) = x.vi_->val_.coeff(x_row_idx[i], x_col_idx[j]);
+          prev_vals.coeffRef(i, j)
+              = x.vi_->val_.coeff(x_row_idx[i], x_col_idx[j]);
           y_vals.coeffRef(i, j) = y_val.coeff(i, j);
         }
       }
@@ -459,47 +466,51 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
     }
   }
   if (!is_constant<Mat2>::value) {
-    stan::math::reverse_pass_callback([x, y, prev_vals, x_col_idx,
-                                       x_row_idx]() mutable {
-      for (int j = 0; j < x_col_idx.size(); ++j) {
-        if (likely(x_col_idx[j] != -1)) {
-          for (int i = 0; i < x_row_idx.size(); ++i) {
-            if (likely(x_row_idx[i] != -1)) {
-              x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j])
-                  = prev_vals.coeff(i, j);
-              prev_vals.coeffRef(i, j) = x.adj().coeff(x_row_idx[i], x_col_idx[j]);
-              x.adj().coeffRef(x_row_idx[i], x_col_idx[j]) = 0;
+    stan::math::reverse_pass_callback(
+        [x, y, prev_vals, x_col_idx, x_row_idx]() mutable {
+          for (int j = 0; j < x_col_idx.size(); ++j) {
+            if (likely(x_col_idx[j] != -1)) {
+              for (int i = 0; i < x_row_idx.size(); ++i) {
+                if (likely(x_row_idx[i] != -1)) {
+                  x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j])
+                      = prev_vals.coeff(i, j);
+                  prev_vals.coeffRef(i, j)
+                      = x.adj().coeff(x_row_idx[i], x_col_idx[j]);
+                  x.adj().coeffRef(x_row_idx[i], x_col_idx[j]) = 0;
+                }
+              }
             }
           }
-        }
-      }
-      for (int j = 0; j < x_col_idx.size(); ++j) {
-        if (likely(x_col_idx[j] != -1)) {
-          for (int i = 0; i < x_row_idx.size(); ++i) {
-            if (likely(x_row_idx[i] != -1)) {
-              math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y).adj().coeffRef(i, j)
-                  += prev_vals.coeff(i, j);
+          for (int j = 0; j < x_col_idx.size(); ++j) {
+            if (likely(x_col_idx[j] != -1)) {
+              for (int i = 0; i < x_row_idx.size(); ++i) {
+                if (likely(x_row_idx[i] != -1)) {
+                  math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y)
+                      .adj()
+                      .coeffRef(i, j)
+                      += prev_vals.coeff(i, j);
+                }
+              }
             }
           }
-        }
-      }
-    });
+        });
   } else {
-    stan::math::reverse_pass_callback([x, prev_vals, x_col_idx,
-                                       x_row_idx]() mutable {
-      for (int j = 0; j < x_col_idx.size(); ++j) {
-        if (likely(x_col_idx[j] != -1)) {
-          for (int i = 0; i < x_row_idx.size(); ++i) {
-            if (likely(x_row_idx[i] != -1)) {
-              x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j])
-                  = prev_vals.coeff(i, j);
-              prev_vals.coeffRef(i, j) = x.adj().coeff(x_row_idx[i], x_col_idx[j]);
-              x.adj().coeffRef(x_row_idx[i], x_col_idx[j]) = 0;
+    stan::math::reverse_pass_callback(
+        [x, prev_vals, x_col_idx, x_row_idx]() mutable {
+          for (int j = 0; j < x_col_idx.size(); ++j) {
+            if (likely(x_col_idx[j] != -1)) {
+              for (int i = 0; i < x_row_idx.size(); ++i) {
+                if (likely(x_row_idx[i] != -1)) {
+                  x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j])
+                      = prev_vals.coeff(i, j);
+                  prev_vals.coeffRef(i, j)
+                      = x.adj().coeff(x_row_idx[i], x_col_idx[j]);
+                  x.adj().coeffRef(x_row_idx[i], x_col_idx[j]) = 0;
+                }
+              }
             }
           }
-        }
-      }
-    });
+        });
   }
 }
 
