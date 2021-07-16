@@ -1,3 +1,4 @@
+#ifndef STAN_OPENCL
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/xhmc/softabs_xhmc.hpp>
 #include <boost/random/additive_combine.hpp>
@@ -124,3 +125,4 @@ TEST(McmcUnitEXHMC, transition) {
   EXPECT_EQ("", error.str());
   EXPECT_EQ("", fatal.str());
 }
+#endif

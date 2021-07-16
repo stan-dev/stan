@@ -1,3 +1,4 @@
+#ifndef STAN_OPENCL
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
@@ -358,3 +359,4 @@ TEST(McmcSoftAbsNuts, transition_test) {
   EXPECT_EQ("", error.str());
   EXPECT_EQ("", fatal.str());
 }
+#endif
