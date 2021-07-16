@@ -34,15 +34,6 @@ using require_var_row_vector_or_arithmetic_eigen = require_any_t<
                             is_eigen_row_vector<T>>>;
 
 /**
- * Require both types to be either `var<Matrix>` or `Eigen::Matrix`
- */
-template <typename Mat1, typename Mat2>
-using require_all_var_matrix_or_all_var_eigen = require_any_t<
-    stan::math::conjunction<is_eigen<Mat1>, is_eigen<Mat2>>,
-    stan::math::conjunction<is_var_matrix<Mat1>, is_var_matrix<Mat2>>>;
-
-
-/**
  * Assigning an `Eigen::Matrix<double>` to a `var<Matrix>`
  * In this case we need to
  * 1. Store the previous values from `x`
