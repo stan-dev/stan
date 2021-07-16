@@ -265,7 +265,7 @@ pipeline {
                             if (isUnix()) {
                                 deleteDir()
                                 unstash 'StanSetup'
-                                sh "echo CXX=${env.CXX} -Werror -Wno-inconsistent-missing-override > make/local"
+                                setupCXX(true, env.GCC, stanc3_bin_url())
                                 sh "echo STAN_OPENCL=true>> make/local"
                                 sh "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_GPU} >> make/local"
                                 sh "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_GPU} >> make/local"
@@ -273,7 +273,7 @@ pipeline {
                             } else {
                                 deleteDirWin()
                                 unstash 'StanSetup'
-                                bat "echo CXX=${env.CXX} -Werror > make/local"
+                                setupCXX(false, env.CXX, stanc3_bin_url())
                                 bat "echo STAN_OPENCL=true >> make/local"
                                 bat "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_GPU} >> make/local"
                                 bat "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_GPU} >> make/local"
