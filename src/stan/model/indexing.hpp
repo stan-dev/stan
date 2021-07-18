@@ -8,4 +8,9 @@
 #include <stan/model/indexing/rvalue.hpp>
 #include <stan/model/indexing/rvalue_varmat.hpp>
 
+#ifdef STAN_OPENCL
+#include <stan/model/indexing/assign_cl.hpp>
+#include <stan/model/indexing/rvalue_cl.hpp>
+#endif
+
 #endif
