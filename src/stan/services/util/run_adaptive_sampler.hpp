@@ -35,7 +35,7 @@ namespace util {
  * @param[in,out] sample_writer writer for draws
  * @param[in,out] diagnostic_writer writer for diagnostic information
  * @param[in] chain_id The id for a given chain.
- * @param[in] n_chain The number of chains used in the program. This
+ * @param[in] num_chains The number of chains used in the program. This
  *  is used in generate transitions to print out the chain number.
  */
 template <typename Sampler, typename Model, typename RNG>
@@ -47,7 +47,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
                           callbacks::logger& logger,
                           callbacks::writer& sample_writer,
                           callbacks::writer& diagnostic_writer,
-                          size_t chain_id = 1, size_t n_chain = 1) {
+                          size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
 
@@ -71,7 +71,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true, writer, s,
-                             model, rng, interrupt, logger, chain_id, n_chain);
+                             model, rng, interrupt, logger, chain_id, num_chains);
   auto end_warm = std::chrono::steady_clock::now();
   double warm_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                             end_warm - start_warm)
@@ -85,7 +85,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   util::generate_transitions(sampler, num_samples, num_warmup,
                              num_warmup + num_samples, num_thin, refresh, true,
                              false, writer, s, model, rng, interrupt, logger,
-                             chain_id, n_chain);
+                             chain_id, num_chains);
   auto end_sample = std::chrono::steady_clock::now();
   double sample_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                               end_sample - start_sample)

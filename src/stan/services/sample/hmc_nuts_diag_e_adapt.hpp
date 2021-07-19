@@ -169,14 +169,17 @@ int hmc_nuts_diag_e_adapt(
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] num_chains The number of chains to run in parallel. `init`,
+ * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer` must
+ * be the same length as this value.
  * @param[in] init An std vector of init var contexts for initialization of each
- chain.
+ * chain.
  * @param[in] init_inv_metric An std vector of var contexts exposing an initial
  diagonal inverse Euclidean metric for each chain (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
- will advance by for each chain by an integer sequence from `init_chain_id` to
- `num_chains`
+ * will advance for each chain by an integer sequence from `init_chain_id` to
+ * `init_chain_id + num_chains - 1`
  * @param[in] init_radius radius to initialize
  * @param[in] num_warmup Number of warmup samples
  * @param[in] num_samples Number of samples
@@ -196,13 +199,10 @@ int hmc_nuts_diag_e_adapt(
  * @param[in,out] interrupt Callback for interrupts
  * @param[in,out] logger Logger for messages
  * @param[in,out] init_writer std vector of Writer callbacks for unconstrained
- inits of each chain.
+ * inits of each chain.
  * @param[in,out] sample_writer std vector of Writers for draws of each chain.
  * @param[in,out] diagnostic_writer std vector of Writers for diagnostic
- information of each chain.
- * @param[in] num_chains The number of chains to run in parallel. `init`,
- `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer` must
- be the same length as this value.
+ * information of each chain.
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitInvContextPtr,
@@ -226,7 +226,7 @@ int hmc_nuts_diag_e_adapt(
         stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
         init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
         sample_writer[0], diagnostic_writer[0]);
-  } else {
+  }
     using sample_t = stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>;
     std::vector<boost::ecuyer1988> rngs;
     rngs.reserve(num_chains);
@@ -236,7 +236,7 @@ int hmc_nuts_diag_e_adapt(
     samplers.reserve(num_chains);
     try {
       for (int i = 0; i < num_chains; ++i) {
-        rngs.emplace_back(util::create_rng(random_seed, init_chain_id, i));
+        rngs.emplace_back(util::create_rng(random_seed, init_chain_id + i));
         cont_vectors.emplace_back(util::initialize(model, *init[i], rngs[i],
                                                    init_radius, true, logger,
                                                    init_writer[i]));
@@ -277,7 +277,7 @@ int hmc_nuts_diag_e_adapt(
         },
         tbb::simple_partitioner());
     return error_codes::OK;
-  }
+
 }
 
 /**
@@ -291,12 +291,15 @@ int hmc_nuts_diag_e_adapt(
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] num_chains The number of chains to run in parallel. `init`,
+ * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
+ * length as this value.
  * @param[in] init An std vector of init var contexts for initialization of each
  * chain.
  * @param[in] random_seed random seed for the random number generator
  * @param[in] init_chain_id first chain id. The pseudo random number generator
  * will advance by for each chain by an integer sequence from `init_chain_id` to
- * `num_chains`
+ * `init_chain_id+num_chains-1`
  * @param[in] init_radius radius to initialize
  * @param[in] num_warmup Number of warmup samples
  * @param[in] num_samples Number of samples
@@ -320,9 +323,6 @@ int hmc_nuts_diag_e_adapt(
  * @param[in,out] sample_writer std vector of Writers for draws of each chain.
  * @param[in,out] diagnostic_writer std vector of Writers for diagnostic
  * information of each chain.
- * @param[in] num_chains The number of chains to run in parallel. `init`,
- * `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same
- * length as this value.
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
@@ -345,7 +345,7 @@ int hmc_nuts_diag_e_adapt(
         max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
         interrupt, logger, init_writer[0], sample_writer[0],
         diagnostic_writer[0]);
-  } else {
+  }
     std::vector<std::unique_ptr<stan::io::dump>> unit_e_metrics;
     unit_e_metrics.reserve(num_chains);
     for (size_t i = 0; i < num_chains; ++i) {
@@ -358,7 +358,6 @@ int hmc_nuts_diag_e_adapt(
         stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
         init_buffer, term_buffer, window, interrupt, logger, init_writer,
         sample_writer, diagnostic_writer);
-  }
 }
 
 }  // namespace sample

@@ -36,6 +36,8 @@ namespace util {
  * @param[in,out] base_rng random number generator
  * @param[in,out] callback interrupt callback called once an iteration
  * @param[in,out] logger logger for messages
+ * @param[in] num_chains The number of chains used in the program. This
+ *  is used in generate transitions to print out the chain number.
  */
 template <class Model, class RNG>
 void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
@@ -45,7 +47,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
                           stan::mcmc::sample& init_s, Model& model,
                           RNG& base_rng, callbacks::interrupt& callback,
                           callbacks::logger& logger, size_t chain_id = 1,
-                          size_t n_chain = 1) {
+                          size_t num_chains = 1) {
   for (int m = 0; m < num_iterations; ++m) {
     callback();
 
@@ -53,7 +55,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
         && (start + m + 1 == finish || m == 0 || (m + 1) % refresh == 0)) {
       int it_print_width = std::ceil(std::log10(static_cast<double>(finish)));
       std::stringstream message;
-      if (n_chain != 1) {
+      if (num_chains != 1) {
         message << "Chain [" << chain_id << "] ";
       }
       message << "Iteration: ";
