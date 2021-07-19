@@ -160,7 +160,7 @@ TEST(ModelIndexing, assign_opencl_vector_1d) {
       indices);
 }
 
- TEST(ModelIndexing, assign_opencl_matrix_1d) {
+TEST(ModelIndexing, assign_opencl_matrix_1d) {
   Eigen::MatrixXd m1(4, 4);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7;
   Eigen::MatrixXd m2(4, 4);
@@ -263,8 +263,8 @@ TEST(ModelIndexing, assign_opencl_vector_1d) {
         stan::math::var_value<stan::math::matrix_cl<double>> m2_v_cl
             = stan::math::to_matrix_cl(m2_v2);
         m1_v11 = m1_v1;  // workaround index_omni changing m1_v11
-        assign(m1_v11, rvalue(m2_v1, "rvalue var", index), "assign var",
-        index); assign(m1_v_cl, rvalue(m2_v_cl, "rvalue var cl", index_cl),
+        assign(m1_v11, rvalue(m2_v1, "rvalue var", index), "assign var", index);
+        assign(m1_v_cl, rvalue(m2_v_cl, "rvalue var cl", index_cl),
                "assign var cl", index_cl);
         EXPECT_MATRIX_EQ(m1_v11.val(),
                          stan::math::from_matrix_cl(m1_v_cl.val()));
@@ -297,7 +297,7 @@ TEST(ModelIndexing, assign_opencl_vector_1d) {
       indices);
 }
 
- TEST(ModelIndexing, assign_opencl_matrix_2d) {
+TEST(ModelIndexing, assign_opencl_matrix_2d) {
   Eigen::MatrixXd m1(4, 4);
   m1 << 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7;
   Eigen::MatrixXd m2(4, 4);
