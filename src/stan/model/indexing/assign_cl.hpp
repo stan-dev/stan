@@ -256,7 +256,7 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
       [expr_lhs, scal_rhs, row_index, col_index, prev_val]() mutable {
         auto&& lhs_val = math::block_zero_based(
             expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
-        auto&& lhs_adj = math::block_zero_based(
+        decltype(auto) lhs_adj = math::block_zero_based(
             expr_lhs.adj(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
         if (!is_constant<ScalRhs>::value) {
           math::adjoint_of(scal_rhs) += math::from_matrix_cl<double>(lhs_adj);
