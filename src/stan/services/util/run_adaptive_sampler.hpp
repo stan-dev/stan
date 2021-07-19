@@ -71,7 +71,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true, writer, s,
-                             model, rng, interrupt, logger, chain_id, num_chains);
+                             model, rng, interrupt, logger, chain_id,
+                             num_chains);
   auto end_warm = std::chrono::steady_clock::now();
   double warm_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                             end_warm - start_warm)
