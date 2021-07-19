@@ -6,7 +6,6 @@
 #include <stan/math/opencl/indexing_rev.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/rvalue_cl.hpp>
-#include <tuple>
 #include <utility>
 
 namespace stan {
@@ -139,9 +138,9 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
     stan::math::check_size_match("omni assign", "left hand side columns",
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
-  decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index);
-  math::arena_matrix_cl<double> prev_vals = lhs;
-  lhs = math::value_of(expr_rhs);  // assign the values
+  decltype(auto) lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
+  math::arena_matrix_cl<double> prev_vals = lhs_val;
+  lhs_val = math::value_of(expr_rhs);  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, expr_rhs, name, prev_vals,
        row_index
@@ -205,15 +204,13 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   lhs = math::value_of(expr_rhs);  // assign the values
   math::reverse_pass_callback(
       [expr_lhs, expr_rhs, name, prev_vals,
-       row_index_tup = std::tuple<RowIndex>(std::forward<RowIndex>(row_index)),
-       col_index_tup
-       = std::tuple<ColIndex>(std::forward<ColIndex>(col_index))]() mutable {
+       row_index = math::to_arena(std::forward<RowIndex>(row_index)),
+       col_index
+       = math::to_arena(std::forward<ColIndex>(col_index))]() mutable {
         decltype(auto) lhs_val
-            = rvalue(expr_lhs.val_op(), name, std::get<0>(row_index_tup),
-                     std::get<0>(col_index_tup));
+            = rvalue(expr_lhs.val_op(), name, row_index, col_index);
         decltype(auto) lhs_adj
-            = rvalue(expr_lhs.adj(), name, std::get<0>(row_index_tup),
-                     std::get<0>(col_index_tup));
+            = rvalue(expr_lhs.adj(), name, row_index, col_index);
         math::results(lhs_val, math::adjoint_of(expr_rhs), lhs_adj)
             = math::expressions(
                 prev_vals,
@@ -251,10 +248,10 @@ template <typename ExprLhs, typename ScalRhs,
 inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
                    const char* name, const index_uni row_index,
                    const index_uni col_index) {
-  decltype(auto) lhs = math::block_zero_based(
+  decltype(auto) lhs_val = math::block_zero_based(
       expr_lhs.val_op(), row_index.n_ - 1, col_index.n_ - 1, 1, 1);
-  math::arena_matrix_cl<double> prev_val = lhs;
-  lhs = math::constant(math::value_of(scal_rhs), 1, 1);  // assign the value
+  math::arena_matrix_cl<double> prev_val = lhs_val;
+  lhs_val = math::constant(math::value_of(scal_rhs), 1, 1);  // assign the value
   math::reverse_pass_callback(
       [expr_lhs, scal_rhs, row_index, col_index, prev_val]() mutable {
         auto&& lhs_val = math::block_zero_based(

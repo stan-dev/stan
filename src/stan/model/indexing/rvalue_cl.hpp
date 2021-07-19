@@ -5,7 +5,6 @@
 #include <stan/math/opencl/rev.hpp>
 #include <stan/math/opencl/indexing_rev.hpp>
 #include <stan/model/indexing/index.hpp>
-#include <tuple>
 #include <utility>
 
 namespace stan {
