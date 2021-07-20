@@ -59,6 +59,8 @@ TEST(McmcSoftAbs, sample_p) {
   EXPECT_EQ("", fatal.str());
 }
 
+#ifndef STAN_OPENCL
+
 TEST(McmcSoftAbs, gradients) {
   rng_t base_rng(0);
 
@@ -151,6 +153,8 @@ TEST(McmcSoftAbs, gradients) {
   EXPECT_EQ("", error.str());
   EXPECT_EQ("", fatal.str());
 }
+
+#endif
 
 TEST(McmcSoftAbs, streams) {
   stan::test::capture_std_streams();
