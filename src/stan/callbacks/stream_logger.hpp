@@ -14,7 +14,7 @@ namespace callbacks {
  * <code>logger</code> that writes messages to separate
  * std::stringstream outputs.
  */
-class stream_logger : public logger {
+class stream_logger final : public logger {
  private:
   std::ostream& debug_;
   std::ostream& info_;

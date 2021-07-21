@@ -16,7 +16,7 @@ namespace callbacks {
  * For any call to this writer, it will tee the call to both writers
  * provided in the constructor.
  */
-class tee_writer : public writer {
+class tee_writer final : public writer {
  public:
   /**
    * Constructor accepting two writers.

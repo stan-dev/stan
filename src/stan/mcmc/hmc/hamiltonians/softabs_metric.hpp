@@ -174,26 +174,26 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
 
   // Threshold below which a power series
   // approximation of the softabs function is used
-  static double lower_softabs_thresh;
+  static constexpr double lower_softabs_thresh = 1e-4;
 
   // Threshold above which an asymptotic
   // approximation of the softabs function is used
-  static double upper_softabs_thresh;
+  static constexpr double upper_softabs_thresh = 18;
 
   // Threshold below which an exact derivative is
   // used in the Jacobian calculation instead of
   // finite differencing
-  static double jacobian_thresh;
+  static constexpr double jacobian_thresh = 1e-10;
 };
 
 template <class Model, class BaseRNG>
-double softabs_metric<Model, BaseRNG>::lower_softabs_thresh = 1e-4;
+constexpr double softabs_metric<Model, BaseRNG>::lower_softabs_thresh;
 
 template <class Model, class BaseRNG>
-double softabs_metric<Model, BaseRNG>::upper_softabs_thresh = 18;
+constexpr double softabs_metric<Model, BaseRNG>::upper_softabs_thresh;
 
 template <class Model, class BaseRNG>
-double softabs_metric<Model, BaseRNG>::jacobian_thresh = 1e-10;
+constexpr double softabs_metric<Model, BaseRNG>::jacobian_thresh;
 }  // namespace mcmc
 }  // namespace stan
 #endif
