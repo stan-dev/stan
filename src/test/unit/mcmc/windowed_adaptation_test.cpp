@@ -46,3 +46,17 @@ TEST(McmcWindowedAdaptation, set_window_params3) {
   ASSERT_EQ(0, logger.call_count());
   ASSERT_EQ(0, logger.call_count_info());
 }
+
+TEST(McmcWindowedAdaptation, finished) {
+  stan::test::unit::instrumented_logger logger;
+
+  stan::mcmc::windowed_adaptation adapter("test");
+
+  adapter.set_window_params(1000, 75, 50, 25, logger);
+
+  for (size_t i = 0; i < 999; i++) {
+    EXPECT_FALSE(adapter.finished());
+    adapter.increment_window_counter();
+  }
+  EXPECT_TRUE(adapter.finished());
+}
