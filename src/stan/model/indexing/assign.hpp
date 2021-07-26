@@ -15,27 +15,6 @@ namespace stan {
 
 namespace model {
 
-namespace internal {
-/**
- * Base case of assignment
- * @tparam T1 Any type that's not a var matrix.
- * @tparam T2 Any type that's not a var matrix.
- * @param x The value to assign to
- * @param y The value to assign from.
- */
-template <typename T1, typename T2,
-          require_any_not_t<is_var_matrix<T1>, is_eigen<T2>>* = nullptr>
-void assign_impl(T1&& x, T2&& y) {
-  x = std::forward<T2>(y);
-}
-
-// Fwd decl here and define later.
-template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
-          require_eigen_st<std::is_arithmetic, Mat2>* = nullptr>
-void assign_impl(Mat1&& x, Mat2&& y);
-
-}  // namespace internal
-
 /**
  * Indexing Notes:
  * The different index types:
