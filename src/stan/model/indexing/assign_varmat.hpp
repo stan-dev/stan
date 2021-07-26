@@ -46,8 +46,8 @@ using require_var_row_vector_or_arithmetic_eigen = require_any_t<
  * @param x The var matrix to assign to
  * @param y The eigen matrix to assign from.
  */
-template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
-          require_eigen_st<std::is_arithmetic, Mat2>* = nullptr>
+template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>,
+          require_eigen_st<std::is_arithmetic, Mat2>>
 void assign_impl(Mat1&& x, Mat2&& y) {
   auto prev_vals = stan::math::to_arena(x.val());
   x.vi_->val_ = std::forward<Mat2>(y);
