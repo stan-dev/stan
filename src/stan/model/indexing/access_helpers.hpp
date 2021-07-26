@@ -66,7 +66,6 @@ void assign_impl(Mat1&& x, Mat2&& y) {
   });
 }
 
-
 }  // namespace internal
 }  // namespace model
 }  // namespace stan
