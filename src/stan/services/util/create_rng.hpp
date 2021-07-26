@@ -24,7 +24,7 @@ namespace util {
  */
 inline boost::ecuyer1988 create_rng(unsigned int seed, unsigned int chain) {
   using boost::uintmax_t;
-  static uintmax_t DISCARD_STRIDE = static_cast<uintmax_t>(1) << 50;
+  static constexpr uintmax_t DISCARD_STRIDE = static_cast<uintmax_t>(1) << 50;
   boost::ecuyer1988 rng(seed);
   rng.discard(DISCARD_STRIDE * chain);
   return rng;
