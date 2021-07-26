@@ -1,12 +1,11 @@
-#include <iostream>
-#include <stdexcept>
-#include <vector>
-#include <stan/model/indexing/rvalue.hpp>
-#include <stan/model/indexing/rvalue_varmat.hpp>
+#include <src/stan/model/indexing.hpp>
 #include <test/unit/util.hpp>
 #include <test/unit/model/indexing/util.hpp>
 #include <stan/math.hpp>
 #include <gtest/gtest.h>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
 
 using stan::model::index_max;
 using stan::model::index_min;

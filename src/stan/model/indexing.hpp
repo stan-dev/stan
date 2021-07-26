@@ -1,6 +1,7 @@
 #ifndef STAN_MODEL_INDEXING_HPP
 #define STAN_MODEL_INDEXING_HPP
 
+#include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/assign.hpp>
 #ifdef STAN_OPENCL
 #include <stan/model/indexing/assign_cl.hpp>
