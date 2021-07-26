@@ -1,7 +1,6 @@
 #ifndef STAN_MODEL_INDEXING_ACCESS_HELPERS_HPP
 #define STAN_MODEL_INDEXING_ACCESS_HELPERS_HPP
 
-#include <stan/math/prim.hpp>
 #include <stan/math/rev/meta.hpp>
 
 namespace stan {

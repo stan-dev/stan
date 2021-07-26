@@ -1,8 +1,9 @@
 #ifndef STAN_MODEL_INDEXING_INDEX_HPP
 #define STAN_MODEL_INDEXING_INDEX_HPP
 
-#include <vector>
 #include <stan/math/prim/meta.hpp>
+#include <vector>
+
 namespace stan {
 
 namespace model {

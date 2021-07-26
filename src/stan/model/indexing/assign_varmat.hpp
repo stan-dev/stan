@@ -1,11 +1,11 @@
 #ifndef STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
 #define STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
 
-#include <stan/math/rev.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/meta.hpp>
+#include <stan/math/rev/fun/adjoint_of.hpp>
 #include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
-#include <stan/model/indexing/rvalue_at.hpp>
-#include <stan/model/indexing/rvalue_index_size.hpp>
 #include <type_traits>
 #include <vector>
 #include <unordered_set>

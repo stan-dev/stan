@@ -1,7 +1,9 @@
 #ifndef STAN_MODEL_INDEXING_ASSIGN_HPP
 #define STAN_MODEL_INDEXING_ASSIGN_HPP
 
-#include <stan/math/prim.hpp>
+#include <stan/math/prim/meta.hpp>
+#include <stan/math/prim/err.hpp>
+#include <stan/math/prim/fun/to_ref.hpp>
 #include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
@@ -26,6 +28,11 @@ template <typename T1, typename T2,
 void assign_impl(T1&& x, T2&& y) {
   x = std::forward<T2>(y);
 }
+
+// Fwd decl here and define later.
+template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
+          require_eigen_st<std::is_arithmetic, Mat2>* = nullptr>
+void assign_impl(Mat1&& x, Mat2&& y);
 
 }  // namespace internal
 
