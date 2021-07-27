@@ -1,9 +1,9 @@
+#include <stan/model/indexing.hpp>
+#include <stan/math/prim/fun/eval.hpp>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-#include <stan/model/indexing/rvalue.hpp>
-#include <stan/math.hpp>
-#include <gtest/gtest.h>
 
 using stan::model::rvalue;
 
