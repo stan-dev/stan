@@ -1,4 +1,5 @@
 #include <stan/model/indexing.hpp>
+#include <stan/math/rev/fun/sum.hpp>
 #include <test/unit/util.hpp>
 #include <test/unit/model/indexing/util.hpp>
 #include <gtest/gtest.h>
