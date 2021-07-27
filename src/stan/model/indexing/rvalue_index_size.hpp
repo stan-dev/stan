@@ -54,15 +54,15 @@ inline int rvalue_index_size(const index_max& idx, int size) {
 }
 
 /**
- * Return size of specified min - max index.  If the maximum value
- * index is less than the minimum index, the size will be zero.
+ * Return size of specified min - max index.
  *
  * @param[in] idx Input index (from 1).
  * @param[in] size Size of container (ignored).
  * @return Size of result.
  */
 inline int rvalue_index_size(const index_min_max& idx, int size) {
-  return (idx.max_ < idx.min_) ? 0 : (idx.max_ - idx.min_ + 1);
+  return (idx.max_ < idx.min_) ? (idx.min_ - idx.max_ + 1)
+                               : (idx.max_ - idx.min_ + 1);
 }
 
 }  // namespace model

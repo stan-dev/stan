@@ -68,7 +68,7 @@ inline int rvalue_at(int n, const index_min_max& idx) {
   if (idx.min_ < idx.max_) {
     return idx.min_ + n;
   } else {
-    return idx.max_ + n;
+    return idx.min_ - n;
   }
 }
 
