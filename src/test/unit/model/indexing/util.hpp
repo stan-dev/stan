@@ -1,7 +1,7 @@
 #ifndef STAN_TEST_UNIT_MODEL_INDEXING_UTIL_HPP
 #define STAN_TEST_UNIT_MODEL_INDEXING_UTIL_HPP
 
-#include <stan/math/prim.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <gtest/gtest.h>
 
 namespace stan {
