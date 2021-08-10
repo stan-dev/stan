@@ -71,6 +71,7 @@ class unique_stream_writer final : public writer {
    */
   void operator()() {
     std::stringstream streamer;
+    streamer.precision(output_.get()->precision());
     streamer << comment_prefix_ << std::endl;
     *output_ << streamer.str();
   }
@@ -82,6 +83,7 @@ class unique_stream_writer final : public writer {
    */
   void operator()(const std::string& message) {
     std::stringstream streamer;
+    streamer.precision(output_.get()->precision());
     streamer << comment_prefix_ << message << std::endl;
     *output_ << streamer.str();
   }
@@ -113,6 +115,7 @@ class unique_stream_writer final : public writer {
     const_iter last = v.end();
     --last;
     std::stringstream streamer;
+    streamer.precision(output_.get()->precision());
     for (const_iter it = v.begin(); it != last; ++it) {
       streamer << *it << ",";
     }
