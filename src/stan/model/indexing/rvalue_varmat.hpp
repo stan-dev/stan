@@ -1,8 +1,8 @@
 #ifndef STAN_MODEL_INDEXING_RVALUE_VARMAT_HPP
 #define STAN_MODEL_INDEXING_RVALUE_VARMAT_HPP
 
-#include <stan/math/prim.hpp>
-#include <stan/math/rev.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/meta.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/rvalue.hpp>
 #include <type_traits>

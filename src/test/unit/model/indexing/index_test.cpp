@@ -1,7 +1,7 @@
-#include <vector>
-#include <boost/type_traits/is_same.hpp>
-#include <stan/model/indexing/index.hpp>
+#include <stan/model/indexing.hpp>
 #include <gtest/gtest.h>
+#include <boost/type_traits/is_same.hpp>
+#include <vector>
 
 using stan::model::index_max;
 using stan::model::index_min;

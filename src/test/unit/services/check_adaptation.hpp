@@ -13,11 +13,7 @@ namespace stan {
 namespace test {
 namespace unit {
 
-double stod(const std::string& val) {
-  char tmp[val.length()];
-  strcpy(tmp, val.c_str());
-  return atof(tmp);
-}
+double stod(const std::string& val) { return atof(val.c_str()); }
 
 void check_adaptation(const size_t& num_params,
                       const std::vector<double>& param_vals,

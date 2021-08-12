@@ -1,4 +1,4 @@
-#include <stan/model/indexing/rvalue_index_size.hpp>
+#include <stan/model/indexing.hpp>
 #include <gtest/gtest.h>
 #include <vector>
 

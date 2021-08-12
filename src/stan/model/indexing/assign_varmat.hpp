@@ -1,11 +1,11 @@
 #ifndef STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
 #define STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
 
-#include <stan/math/rev.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/meta.hpp>
+#include <stan/math/rev/fun/adjoint_of.hpp>
+#include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
-#include <stan/model/indexing/assign.hpp>
-#include <stan/model/indexing/rvalue_at.hpp>
-#include <stan/model/indexing/rvalue_index_size.hpp>
 #include <type_traits>
 #include <vector>
 #include <unordered_set>
@@ -14,6 +14,26 @@ namespace stan {
 
 namespace model {
 
+namespace internal {
+template <typename T>
+using require_var_matrix_or_arithmetic_eigen
+    = require_any_t<is_var_matrix<T>, stan::math::disjunction<
+                                          std::is_arithmetic<scalar_type_t<T>>,
+                                          is_eigen_matrix_dynamic<T>>>;
+
+template <typename T>
+using require_var_vector_or_arithmetic_eigen
+    = require_any_t<is_var_vector<T>, stan::math::disjunction<
+                                          std::is_arithmetic<scalar_type_t<T>>,
+                                          is_eigen_vector<T>>>;
+
+template <typename T>
+using require_var_row_vector_or_arithmetic_eigen = require_any_t<
+    is_var_row_vector<T>,
+    stan::math::disjunction<std::is_arithmetic<scalar_type_t<T>>,
+                            is_eigen_row_vector<T>>>;
+
+}  // namespace internal
 /**
  * Indexing Notes:
  * The different index types:
@@ -55,16 +75,17 @@ namespace model {
  * @throw std::out_of_range If the index is out of bounds.
  */
 template <typename VarVec, typename U, require_var_vector_t<VarVec>* = nullptr,
-          require_var_t<U>* = nullptr,
-          require_floating_point_t<value_type_t<U>>* = nullptr>
+          require_stan_scalar_t<U>* = nullptr>
 inline void assign(VarVec&& x, const U& y, const char* name, index_uni idx) {
   stan::math::check_range("var_vector[uni] assign", name, x.size(), idx.n_);
   const auto coeff_idx = idx.n_ - 1;
   double prev_val = x.val().coeffRef(coeff_idx);
-  x.vi_->val_.coeffRef(coeff_idx) = y.val();
+  x.vi_->val_.coeffRef(coeff_idx) = stan::math::value_of(y);
   stan::math::reverse_pass_callback([x, y, coeff_idx, prev_val]() mutable {
     x.vi_->val_.coeffRef(coeff_idx) = prev_val;
-    y.adj() += x.adj().coeffRef(coeff_idx);
+    if (!is_constant<U>::value) {
+      math::adjoint_of(y) += x.adj().coeffRef(coeff_idx);
+    }
     x.adj().coeffRef(coeff_idx) = 0.0;
   });
 }
@@ -86,8 +107,8 @@ inline void assign(VarVec&& x, const U& y, const char* name, index_uni idx) {
  * @throw std::invalid_argument If the value size isn't the same as
  * the indexed size.
  */
-template <typename Vec1, typename Vec2,
-          require_all_var_vector_t<Vec1, Vec2>* = nullptr>
+template <typename Vec1, typename Vec2, require_var_vector_t<Vec1>* = nullptr,
+          internal::require_var_vector_or_arithmetic_eigen<Vec2>* = nullptr>
 inline void assign(Vec1&& x, const Vec2& y, const char* name,
                    const index_multi& idx) {
   stan::math::check_size_match("vector[multi] assign", "left hand side",
@@ -96,40 +117,56 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
   const auto assign_size = idx.ns_.size();
   arena_t<std::vector<int>> x_idx(assign_size);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_vals(assign_size);
-  Eigen::Matrix<double, -1, 1> y_vals(assign_size);
+  Eigen::Matrix<double, -1, 1> y_idx_vals(assign_size);
   std::unordered_set<int> x_set;
   x_set.reserve(assign_size);
+  const auto& y_val = stan::math::value_of(y);
   // We have to use two loops to avoid aliasing issues.
   for (int i = assign_size - 1; i >= 0; --i) {
     if (likely(x_set.insert(idx.ns_[i]).second)) {
       stan::math::check_range("vector[multi] assign", name, x_size, idx.ns_[i]);
       x_idx[i] = idx.ns_[i] - 1;
       prev_vals.coeffRef(i) = x.vi_->val_.coeffRef(x_idx[i]);
-      y_vals.coeffRef(i) = y.vi_->val_.coeff(i);
+      y_idx_vals.coeffRef(i) = y_val.coeff(i);
     } else {
       x_idx[i] = -1;
     }
   }
   for (int i = assign_size - 1; i >= 0; --i) {
     if (likely(x_idx[i] != -1)) {
-      x.vi_->val_.coeffRef(x_idx[i]) = y_vals.coeff(i);
+      x.vi_->val_.coeffRef(x_idx[i]) = y_idx_vals.coeff(i);
     }
   }
 
-  stan::math::reverse_pass_callback([x, y, x_idx, prev_vals]() mutable {
-    for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        x.vi_->val_.coeffRef(x_idx[i]) = prev_vals.coeffRef(i);
-        prev_vals.coeffRef(i) = x.adj().coeffRef(x_idx[i]);
-        x.adj().coeffRef(x_idx[i]) = 0.0;
+  if (!is_constant<Vec2>::value) {
+    stan::math::reverse_pass_callback([x, y, x_idx, prev_vals]() mutable {
+      for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
+        if (likely(x_idx[i] != -1)) {
+          x.vi_->val_.coeffRef(x_idx[i]) = prev_vals.coeffRef(i);
+          prev_vals.coeffRef(i) = x.adj().coeffRef(x_idx[i]);
+          x.adj().coeffRef(x_idx[i]) = 0.0;
+        }
       }
-    }
-    for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        y.adj().coeffRef(i) += prev_vals.coeffRef(i);
+      for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
+        if (likely(x_idx[i] != -1)) {
+          math::forward_as<math::promote_scalar_t<math::var, Vec2>>(y)
+              .adj()
+              .coeffRef(i)
+              += prev_vals.coeff(i);
+        }
       }
-    }
-  });
+    });
+  } else {
+    stan::math::reverse_pass_callback([x, x_idx, prev_vals]() mutable {
+      for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
+        if (likely(x_idx[i] != -1)) {
+          x.vi_->val_.coeffRef(x_idx[i]) = prev_vals.coeff(i);
+          prev_vals.coeffRef(i) = x.adj().coeff(x_idx[i]);
+          x.adj().coeffRef(x_idx[i]) = 0.0;
+        }
+      }
+    });
+  }
 }
 
 /**
@@ -147,8 +184,7 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
  * @throw std::out_of_range If either of the indices are out of bounds.
  */
 template <typename Mat, typename U, require_var_dense_dynamic_t<Mat>* = nullptr,
-          require_var_t<U>* = nullptr,
-          require_floating_point_t<value_type_t<U>>* = nullptr>
+          require_stan_scalar_t<U>* = nullptr>
 inline void assign(Mat&& x, const U& y, const char* name, index_uni row_idx,
                    index_uni col_idx) {
   stan::math::check_range("matrix[uni,uni] assign", name, x.rows(), row_idx.n_);
@@ -156,11 +192,13 @@ inline void assign(Mat&& x, const U& y, const char* name, index_uni row_idx,
   const int row_idx_val = row_idx.n_ - 1;
   const int col_idx_val = col_idx.n_ - 1;
   double prev_val = x.val().coeffRef(row_idx_val, col_idx_val);
-  x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = y.val();
+  x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = stan::math::value_of(y);
   stan::math::reverse_pass_callback(
       [x, y, row_idx_val, col_idx_val, prev_val]() mutable {
         x.vi_->val_.coeffRef(row_idx_val, col_idx_val) = prev_val;
-        y.adj() += x.adj().coeffRef(row_idx_val, col_idx_val);
+        if (!is_constant<U>::value) {
+          math::adjoint_of(y) += x.adj().coeff(row_idx_val, col_idx_val);
+        }
         x.adj().coeffRef(row_idx_val, col_idx_val) = 0.0;
       });
 }
@@ -185,8 +223,7 @@ inline void assign(Mat&& x, const U& y, const char* name, index_uni row_idx,
  */
 template <typename Mat1, typename Vec,
           require_var_dense_dynamic_t<Mat1>* = nullptr,
-          require_eigen_dense_dynamic_t<value_type_t<Mat1>>* = nullptr,
-          require_var_row_vector_t<Vec>* = nullptr>
+          internal::require_var_row_vector_or_arithmetic_eigen<Vec>* = nullptr>
 inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
                    const index_multi& col_idx) {
   stan::math::check_range("matrix[uni, multi] assign", name, x.rows(),
@@ -197,41 +234,58 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
   const int row_idx_val = row_idx.n_ - 1;
   arena_t<std::vector<int>> x_idx(assign_cols);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_val(assign_cols);
-  Eigen::Matrix<double, -1, 1> y_vals(assign_cols);
+  Eigen::Matrix<double, -1, 1> y_val_idx(assign_cols);
   std::unordered_set<int> x_set;
   x_set.reserve(assign_cols);
+  const auto& y_val = stan::math::value_of(y);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int i = assign_cols - 1; i >= 0; --i) {
     if (likely(x_set.insert(col_idx.ns_[i]).second)) {
       stan::math::check_range("matrix[uni, multi] assign", name, x.cols(),
                               col_idx.ns_[i]);
       x_idx[i] = col_idx.ns_[i] - 1;
-      prev_val.coeffRef(i) = x.val().coeffRef(row_idx_val, x_idx[i]);
-      y_vals.coeffRef(i) = y.val().coeff(i);
+      prev_val.coeffRef(i) = x.val().coeff(row_idx_val, x_idx[i]);
+      y_val_idx.coeffRef(i) = y_val.coeff(i);
     } else {
       x_idx[i] = -1;
     }
   }
   for (int i = assign_cols - 1; i >= 0; --i) {
     if (likely(x_idx[i] != -1)) {
-      x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = y_vals.coeff(i);
+      x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = y_val_idx.coeff(i);
     }
   }
-  stan::math::reverse_pass_callback(
-      [x, y, row_idx_val, x_idx, prev_val]() mutable {
-        for (size_t i = 0; i < x_idx.size(); ++i) {
-          if (likely(x_idx[i] != -1)) {
-            x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = prev_val.coeff(i);
-            prev_val.coeffRef(i) = x.adj().coeffRef(row_idx_val, x_idx[i]);
-            x.adj().coeffRef(row_idx_val, x_idx[i]) = 0.0;
+  if (!is_constant<Vec>::value) {
+    stan::math::reverse_pass_callback(
+        [x, y, row_idx_val, x_idx, prev_val]() mutable {
+          for (size_t i = 0; i < x_idx.size(); ++i) {
+            if (likely(x_idx[i] != -1)) {
+              x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = prev_val.coeff(i);
+              prev_val.coeffRef(i) = x.adj().coeff(row_idx_val, x_idx[i]);
+              x.adj().coeffRef(row_idx_val, x_idx[i]) = 0.0;
+            }
           }
-        }
-        for (size_t i = 0; i < x_idx.size(); ++i) {
-          if (likely(x_idx[i] != -1)) {
-            y.adj().coeffRef(i) += prev_val.coeffRef(i);
+          for (size_t i = 0; i < x_idx.size(); ++i) {
+            if (likely(x_idx[i] != -1)) {
+              math::forward_as<math::promote_scalar_t<math::var, Vec>>(y)
+                  .adj()
+                  .coeffRef(i)
+                  += prev_val.coeff(i);
+            }
           }
-        }
-      });
+        });
+  } else {
+    stan::math::reverse_pass_callback(
+        [x, row_idx_val, x_idx, prev_val]() mutable {
+          for (size_t i = 0; i < x_idx.size(); ++i) {
+            if (likely(x_idx[i] != -1)) {
+              x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = prev_val.coeff(i);
+              prev_val.coeffRef(i) = x.adj().coeffRef(row_idx_val, x_idx[i]);
+              x.adj().coeffRef(row_idx_val, x_idx[i]) = 0.0;
+            }
+          }
+        });
+  }
 }
 
 /**
@@ -251,7 +305,8 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2,
-          require_all_var_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+          require_var_dense_dynamic_t<Mat1>* = nullptr,
+          internal::require_var_matrix_or_arithmetic_eigen<Mat2>* = nullptr>
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const index_multi& idx) {
   const auto assign_rows = idx.ns_.size();
@@ -261,9 +316,10 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
                                x.cols(), name, y.cols());
   arena_t<std::vector<int>> x_idx(assign_rows);
   arena_t<Eigen::Matrix<double, -1, -1>> prev_vals(assign_rows, x.cols());
-  Eigen::Matrix<double, -1, -1> y_vals(assign_rows, x.cols());
+  Eigen::Matrix<double, -1, -1> y_val_idx(assign_rows, x.cols());
   std::unordered_set<int> x_set;
   x_set.reserve(assign_rows);
+  const auto& y_val = stan::math::value_of(y);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int i = assign_rows - 1; i >= 0; --i) {
     if (likely(x_set.insert(idx.ns_[i]).second)) {
@@ -271,31 +327,46 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
                               idx.ns_[i]);
       x_idx[i] = idx.ns_[i] - 1;
       prev_vals.row(i) = x.vi_->val_.row(x_idx[i]);
-      y_vals.row(i) = y.vi_->val_.row(i);
+      y_val_idx.row(i) = y_val.row(i);
     } else {
       x_idx[i] = -1;
     }
   }
   for (int i = assign_rows - 1; i >= 0; --i) {
     if (likely(x_idx[i] != -1)) {
-      x.vi_->val_.row(x_idx[i]) = y_vals.row(i);
+      x.vi_->val_.row(x_idx[i]) = y_val_idx.row(i);
     }
   }
 
-  stan::math::reverse_pass_callback([x, y, prev_vals, x_idx]() mutable {
-    for (size_t i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        x.vi_->val_.row(x_idx[i]) = prev_vals.row(i);
-        prev_vals.row(i) = x.adj().row(x_idx[i]);
-        x.adj().row(x_idx[i]).fill(0);
+  if (!is_constant<Mat2>::value) {
+    stan::math::reverse_pass_callback([x, y, prev_vals, x_idx]() mutable {
+      for (size_t i = 0; i < x_idx.size(); ++i) {
+        if (likely(x_idx[i] != -1)) {
+          x.vi_->val_.row(x_idx[i]) = prev_vals.row(i);
+          prev_vals.row(i) = x.adj().row(x_idx[i]);
+          x.adj().row(x_idx[i]).fill(0);
+        }
       }
-    }
-    for (size_t i = 0; i < x_idx.size(); ++i) {
-      if (likely(x_idx[i] != -1)) {
-        y.adj().row(i) += prev_vals.row(i);
+      for (size_t i = 0; i < x_idx.size(); ++i) {
+        if (likely(x_idx[i] != -1)) {
+          math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y)
+              .adj()
+              .row(i)
+              += prev_vals.row(i);
+        }
       }
-    }
-  });
+    });
+  } else {
+    stan::math::reverse_pass_callback([x, prev_vals, x_idx]() mutable {
+      for (size_t i = 0; i < x_idx.size(); ++i) {
+        if (likely(x_idx[i] != -1)) {
+          x.vi_->val_.row(x_idx[i]) = prev_vals.row(i);
+          prev_vals.row(i) = x.adj().row(x_idx[i]);
+          x.adj().row(x_idx[i]).setZero();
+        }
+      }
+    });
+  }
 }
 
 /**
@@ -315,8 +386,8 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
  * @throw std::invalid_argument If the dimensions of the indexed
  * matrix and value matrix do not match.
  */
-template <typename Mat1, typename Mat2,
-          require_all_var_matrix_t<Mat1, Mat2>* = nullptr>
+template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
+          internal::require_var_matrix_or_arithmetic_eigen<Mat2>* = nullptr>
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const index_multi& row_idx, const index_multi& col_idx) {
   const auto assign_rows = row_idx.ns_.size();
@@ -345,6 +416,7 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
       x_row_idx[i] = -1;
     }
   }
+  const auto& y_val = stan::math::value_of(y);
   for (int j = assign_cols - 1; j >= 0; --j) {
     if (likely(x_set.insert(col_idx.ns_[j]).second)) {
       stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
@@ -352,8 +424,9 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
       x_col_idx[j] = col_idx.ns_[j] - 1;
       for (int i = assign_rows - 1; i >= 0; --i) {
         if (likely(x_row_idx[i] != -1)) {
-          prev_vals.coeffRef(i, j) = x.vi_->val_(x_row_idx[i], x_col_idx[j]);
-          y_vals(i, j) = y.vi_->val_(i, j);
+          prev_vals.coeffRef(i, j)
+              = x.vi_->val_.coeff(x_row_idx[i], x_col_idx[j]);
+          y_vals.coeffRef(i, j) = y_val.coeff(i, j);
         }
       }
     } else {
@@ -364,34 +437,58 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
     if (likely(x_col_idx[j] != -1)) {
       for (int i = assign_rows - 1; i >= 0; --i) {
         if (likely(x_row_idx[i] != -1)) {
-          x.vi_->val_(x_row_idx[i], x_col_idx[j]) = y_vals(i, j);
+          x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j]) = y_vals.coeff(i, j);
         }
       }
     }
   }
-  stan::math::reverse_pass_callback([x, y, prev_vals, x_col_idx,
-                                     x_row_idx]() mutable {
-    for (int j = 0; j < x_col_idx.size(); ++j) {
-      if (likely(x_col_idx[j] != -1)) {
-        for (int i = 0; i < x_row_idx.size(); ++i) {
-          if (likely(x_row_idx[i] != -1)) {
-            x.vi_->val_(x_row_idx[i], x_col_idx[j]) = prev_vals.coeffRef(i, j);
-            prev_vals.coeffRef(i, j) = x.adj()(x_row_idx[i], x_col_idx[j]);
-            x.adj()(x_row_idx[i], x_col_idx[j]) = 0;
+  if (!is_constant<Mat2>::value) {
+    stan::math::reverse_pass_callback(
+        [x, y, prev_vals, x_col_idx, x_row_idx]() mutable {
+          for (int j = 0; j < x_col_idx.size(); ++j) {
+            if (likely(x_col_idx[j] != -1)) {
+              for (int i = 0; i < x_row_idx.size(); ++i) {
+                if (likely(x_row_idx[i] != -1)) {
+                  x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j])
+                      = prev_vals.coeff(i, j);
+                  prev_vals.coeffRef(i, j)
+                      = x.adj().coeff(x_row_idx[i], x_col_idx[j]);
+                  x.adj().coeffRef(x_row_idx[i], x_col_idx[j]) = 0;
+                }
+              }
+            }
           }
-        }
-      }
-    }
-    for (int j = 0; j < x_col_idx.size(); ++j) {
-      if (likely(x_col_idx[j] != -1)) {
-        for (int i = 0; i < x_row_idx.size(); ++i) {
-          if (likely(x_row_idx[i] != -1)) {
-            y.adj()(i, j) += prev_vals.coeffRef(i, j);
+          for (int j = 0; j < x_col_idx.size(); ++j) {
+            if (likely(x_col_idx[j] != -1)) {
+              for (int i = 0; i < x_row_idx.size(); ++i) {
+                if (likely(x_row_idx[i] != -1)) {
+                  math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y)
+                      .adj()
+                      .coeffRef(i, j)
+                      += prev_vals.coeff(i, j);
+                }
+              }
+            }
           }
-        }
-      }
-    }
-  });
+        });
+  } else {
+    stan::math::reverse_pass_callback(
+        [x, prev_vals, x_col_idx, x_row_idx]() mutable {
+          for (int j = 0; j < x_col_idx.size(); ++j) {
+            if (likely(x_col_idx[j] != -1)) {
+              for (int i = 0; i < x_row_idx.size(); ++i) {
+                if (likely(x_row_idx[i] != -1)) {
+                  x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j])
+                      = prev_vals.coeff(i, j);
+                  prev_vals.coeffRef(i, j)
+                      = x.adj().coeff(x_row_idx[i], x_col_idx[j]);
+                  x.adj().coeffRef(x_row_idx[i], x_col_idx[j]) = 0;
+                }
+              }
+            }
+          }
+        });
+  }
 }
 
 /**
@@ -412,14 +509,15 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
  * matrix and value matrix do not match.
  */
 template <typename Mat1, typename Mat2, typename Idx,
-          require_all_var_dense_dynamic_t<Mat1, Mat2>* = nullptr>
+          require_var_dense_dynamic_t<Mat1>* = nullptr,
+          internal::require_var_matrix_or_arithmetic_eigen<Mat2>* = nullptr>
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const Idx& row_idx, const index_multi& col_idx) {
   const auto assign_cols = col_idx.ns_.size();
   stan::math::check_size_match("matrix[..., multi] assign", "left hand side",
                                assign_cols, name, y.cols());
   std::unordered_set<int> x_set;
-  auto y_eval = y.eval();
+  const auto& y_eval = y.eval();
   x_set.reserve(assign_cols);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (int j = assign_cols - 1; j >= 0; --j) {

@@ -1,9 +1,9 @@
+#include <stan/model/indexing.hpp>
+#include <stan/math/prim/fun/eval.hpp>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-#include <stan/model/indexing/rvalue.hpp>
-#include <stan/math.hpp>
-#include <gtest/gtest.h>
 
 using stan::model::rvalue;
 
@@ -16,7 +16,8 @@ using stan::model::index_uni;
 
 template <typename C, typename... I>
 void test_out_of_range(C&& c, I&&... idxs) {
-  EXPECT_THROW(stan::model::rvalue(c, "", idxs...), std::out_of_range);
+  EXPECT_THROW(stan::math::eval(stan::model::rvalue(c, "", idxs...)),
+               std::out_of_range);
 }
 
 TEST(ModelIndexing, rvalue_vector_nil) {
