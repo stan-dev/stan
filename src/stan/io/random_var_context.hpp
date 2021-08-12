@@ -125,8 +125,10 @@ class random_var_context : public var_context {
       std::vector<std::complex<double>> ret_c(val_r.size() / 2);
       int comp_iter;
       int real_iter;
-      for (comp_iter = 0, real_iter = 0; real_iter < val_r.size(); comp_iter += 1, real_iter += 2) {
-        ret_c[comp_iter] = std::complex<double>{val_r[real_iter], val_r[real_iter + 1]};
+      for (comp_iter = 0, real_iter = 0; real_iter < val_r.size();
+           comp_iter += 1, real_iter += 2) {
+        ret_c[comp_iter]
+            = std::complex<double>{val_r[real_iter], val_r[real_iter + 1]};
       }
       return ret_c;
     }
@@ -230,7 +232,7 @@ class random_var_context : public var_context {
   /**
    * Dimensions of parameters in the model
    */
-  std::vector<std::vector<size_t> > dims_;
+  std::vector<std::vector<size_t>> dims_;
   /**
    * Random parameter values of the model in the
    * unconstrained space
@@ -240,7 +242,7 @@ class random_var_context : public var_context {
    * Random parameter values of the model in the
    * constrained space
    */
-  std::vector<std::vector<double> > vals_r_;
+  std::vector<std::vector<double>> vals_r_;
 
   /**
    * Computes the size of a variable based on the dim provided.
@@ -264,10 +266,10 @@ class random_var_context : public var_context {
    * @return constrained values reshaped to be returned in the vals_r
    *   function
    */
-  std::vector<std::vector<double> > constrained_to_vals_r(
+  std::vector<std::vector<double>> constrained_to_vals_r(
       const std::vector<double>& constrained,
-      const std::vector<std::vector<size_t> >& dims) {
-    std::vector<std::vector<double> > vals_r(dims.size());
+      const std::vector<std::vector<size_t>>& dims) {
+    std::vector<std::vector<double>> vals_r(dims.size());
 
     std::vector<double>::const_iterator start = constrained.begin();
     for (size_t i = 0; i < dims.size(); ++i) {

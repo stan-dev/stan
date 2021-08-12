@@ -68,7 +68,8 @@ class var_context {
    * @param name Name of variable.
    * @return Sequence of values for the named variable.
    */
-  virtual std::vector<std::complex<double>> vals_c(const std::string& name) const = 0;
+  virtual std::vector<std::complex<double>> vals_c(
+      const std::string& name) const = 0;
 
   /**
    * Return the dimensions for the specified floating point variable.
