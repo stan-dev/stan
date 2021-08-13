@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <complex>
 
 namespace stan {
 
@@ -54,6 +55,21 @@ class var_context {
    * @return Sequence of values for the named variable.
    */
   virtual std::vector<double> vals_r(const std::string& name) const = 0;
+
+  /**
+   * Return the complex floating point values for the variable of the
+   * specified variable name in last-index-major order.  This
+   * method should cast integers to floating point values if the
+   * values of the named variable are all integers.
+   *
+   * <p>If there is no variable of the specified name, the empty
+   * vector is returned.
+   *
+   * @param name Name of variable.
+   * @return Sequence of values for the named variable.
+   */
+  virtual std::vector<std::complex<double>> vals_c(
+      const std::string& name) const = 0;
 
   /**
    * Return the dimensions for the specified floating point variable.

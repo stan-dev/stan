@@ -11,7 +11,7 @@ TEST(array_var_context, ctor_int) {
   for (size_t i = 0; i < 16; i++) {
     v.push_back(i);
   }
-  std::vector<std::vector<size_t> > dims;
+  std::vector<std::vector<size_t>> dims;
   std::vector<size_t> scalar_dim;
   std::vector<size_t> vec_dim;
   std::vector<size_t> zerolen_dim;
@@ -67,7 +67,7 @@ TEST(array_var_context, ctor_real) {
   for (size_t i = 0; i < 16; i++) {
     v.push_back(1.0 * i);
   }
-  std::vector<std::vector<size_t> > dims;
+  std::vector<std::vector<size_t>> dims;
   std::vector<size_t> scalar_dim;
   std::vector<size_t> vec_dim;
   std::vector<size_t> zerolen_dim;
@@ -127,7 +127,7 @@ TEST(array_var_context, ctor_RowVectorXd) {
   for (size_t i = 0; i < 16; i++) {
     v(i) = 1.0 * i;
   }
-  std::vector<std::vector<size_t> > dims;
+  std::vector<std::vector<size_t>> dims;
   std::vector<size_t> scalar_dim;
   std::vector<size_t> vec_dim;
   vec_dim.push_back(3);
@@ -178,7 +178,7 @@ TEST(array_var_context, invalid_input) {
     std::vector<size_t> array_dim;
     array_dim.push_back(3);
     array_dim.push_back(4);
-    std::vector<std::vector<size_t> > dims;
+    std::vector<std::vector<size_t>> dims;
     dims.push_back(array_dim);
     std::vector<std::string> names;
     names.push_back("alpha");
@@ -196,7 +196,7 @@ TEST(array_var_context, invalid_input2) {
     std::vector<size_t> array_dim;
     array_dim.push_back(3);
     array_dim.push_back(4);
-    std::vector<std::vector<size_t> > dims;
+    std::vector<std::vector<size_t>> dims;
     dims.push_back(array_dim);
     std::vector<std::string> names;
     names.push_back("alpha");
@@ -210,7 +210,7 @@ TEST(array_var_context, invalid_input2) {
 
 TEST(array_var_context, invalid_context_validate) {
   std::vector<int> a;
-  std::vector<std::vector<size_t> > dims;
+  std::vector<std::vector<size_t>> dims;
   std::vector<std::string> names;
   stan::io::array_var_context avc(names, a, dims);
   // invalid - empty
@@ -240,4 +240,70 @@ TEST(array_var_context, invalid_context_validate) {
   stan::io::array_var_context avc3(names, a, dims);
   EXPECT_NO_THROW(
       bernoulli_model_namespace::bernoulli_model(avc3, 0, &std::cout));
+}
+
+TEST(array_var_context, ctor_complex) {
+  std::vector<double> v;
+  for (size_t i = 0; i < 32; i++) {
+    v.push_back(1.0 * i);
+  }
+  std::vector<std::vector<size_t>> dims;
+  std::vector<size_t> alpha_scalar_dim{2};
+
+  std::vector<size_t> beta_vec_dim;
+  beta_vec_dim.push_back(3);
+  beta_vec_dim.push_back(2);
+
+  std::vector<size_t> zerolen_dim;
+  zerolen_dim.push_back(3);
+  zerolen_dim.push_back(0);
+
+  std::vector<size_t> array_dim;
+  array_dim.push_back(3);
+  array_dim.push_back(4);
+  array_dim.push_back(2);
+
+  dims.push_back(alpha_scalar_dim);
+  dims.push_back(beta_vec_dim);
+  dims.push_back(array_dim);
+  dims.push_back(zerolen_dim);
+  std::vector<std::string> names;
+  names.push_back("alpha");
+  names.push_back("beta");
+  names.push_back("gamma");
+  names.push_back("eta");
+  stan::io::array_var_context avc(names, v, dims);
+
+  EXPECT_TRUE(avc.contains_r("alpha"));
+  EXPECT_TRUE(avc.contains_r("beta"));
+  EXPECT_TRUE(avc.contains_r("gamma"));
+  EXPECT_TRUE(avc.contains_r("eta"));
+
+  EXPECT_FALSE(avc.contains_i("alpha"));
+  EXPECT_FALSE(avc.contains_i("beta"));
+  EXPECT_FALSE(avc.contains_i("gamma"));
+  EXPECT_FALSE(avc.contains_i("eta"));
+  std::vector<std::complex<double>> alpha;
+  alpha.push_back(std::complex<double>(0.0, 1.0));
+  EXPECT_EQ(alpha, avc.vals_c("alpha"));
+  EXPECT_EQ(alpha_scalar_dim, avc.dims_r("alpha"));
+
+  std::vector<std::complex<double>> beta;
+  for (size_t i = 2; i <= 6; i += 2) {
+    beta.push_back(std::complex<double>{static_cast<double>(i),
+                                        static_cast<double>(i + 1)});
+  }
+  EXPECT_EQ(beta, avc.vals_c("beta"));
+  EXPECT_EQ(beta_vec_dim, avc.dims_r("beta"));
+
+  std::vector<std::complex<double>> gamma;
+  for (size_t i = 8; i < 32; i += 2) {
+    gamma.push_back(std::complex<double>(static_cast<double>(i),
+                                         static_cast<double>(i + 1)));
+  }
+  EXPECT_EQ(gamma, avc.vals_c("gamma"));
+  EXPECT_EQ(array_dim, avc.dims_r("gamma"));
+
+  std::vector<std::complex<double>> eta;
+  EXPECT_EQ(eta, avc.vals_c("eta"));
 }

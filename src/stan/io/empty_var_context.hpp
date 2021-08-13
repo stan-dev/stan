@@ -39,6 +39,10 @@ class empty_var_context : public var_context {
     return std::vector<double>();
   }
 
+  std::vector<std::complex<double>> vals_c(const std::string& name) const {
+    return std::vector<std::complex<double>>();
+  }
+
   /**
    * Always returns an empty vector.
    *
