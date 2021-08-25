@@ -1,11 +1,11 @@
 #ifndef STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
 #define STAN_MODEL_INDEXING_ASSIGN_VARMAT_HPP
 
-#include <stan/math/rev.hpp>
+#include <stan/math/rev/core.hpp>
+#include <stan/math/rev/meta.hpp>
+#include <stan/math/rev/fun/adjoint_of.hpp>
 #include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
-#include <stan/model/indexing/rvalue_at.hpp>
-#include <stan/model/indexing/rvalue_index_size.hpp>
 #include <type_traits>
 #include <vector>
 #include <unordered_set>
@@ -33,29 +33,6 @@ using require_var_row_vector_or_arithmetic_eigen = require_any_t<
     stan::math::disjunction<std::is_arithmetic<scalar_type_t<T>>,
                             is_eigen_row_vector<T>>>;
 
-/**
- * Assigning an `Eigen::Matrix<double>` to a `var<Matrix>`
- * In this case we need to
- * 1. Store the previous values from `x`
- * 2. Assign the values from `y` to the values of `x`
- * 3. Setup a reverse pass callback that sets the `x` values to it's previous
- *  values and then zero's out the adjoints.
- *
- * @tparam Mat1 A `var_value` with inner type derived from `EigenBase`
- * @tparam Mat2 A type derived from `EigenBase` with an arithmetic scalar.
- * @param x The var matrix to assign to
- * @param y The eigen matrix to assign from.
- */
-template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
-          require_eigen_st<std::is_arithmetic, Mat2>* = nullptr>
-void assign_impl(Mat1&& x, Mat2&& y) {
-  auto prev_vals = stan::math::to_arena(x.val());
-  x.vi_->val_ = std::forward<Mat2>(y);
-  stan::math::reverse_pass_callback([x, prev_vals]() mutable {
-    x.vi_->val_ = prev_vals;
-    x.vi_->adj_.setZero();
-  });
-}
 }  // namespace internal
 /**
  * Indexing Notes:

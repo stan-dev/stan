@@ -27,6 +27,24 @@ TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {
             static_cast<std::stringstream&>(writer.get_stream()).str());
 }
 
+TEST_F(StanInterfaceCallbacksStreamWriter, double_vector_precision2) {
+  const int N = 5;
+  std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
+  writer.get_stream().precision(2);
+  EXPECT_NO_THROW(writer(x));
+  EXPECT_EQ("1.2,2.3,3.5,4.6\n",
+            static_cast<std::stringstream&>(writer.get_stream()).str());
+}
+
+TEST_F(StanInterfaceCallbacksStreamWriter, double_vector_precision3) {
+  const int N = 5;
+  std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
+  writer.get_stream().precision(3);
+  EXPECT_NO_THROW(writer(x));
+  EXPECT_EQ("1.23,2.35,3.46,4.57\n",
+            static_cast<std::stringstream&>(writer.get_stream()).str());
+}
+
 TEST_F(StanInterfaceCallbacksStreamWriter, string_vector) {
   const int N = 5;
   std::vector<std::string> x;

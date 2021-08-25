@@ -1,13 +1,11 @@
-#include <iostream>
-#include <stdexcept>
-#include <vector>
-#include <stan/model/indexing/assign_varmat.hpp>
-#include <stan/model/indexing/assign.hpp>
-#include <stan/model/indexing/rvalue.hpp>
-#include <stan/math/rev.hpp>
+#include <stan/model/indexing.hpp>
+#include <stan/math/rev/fun/sum.hpp>
 #include <test/unit/util.hpp>
 #include <test/unit/model/indexing/util.hpp>
 #include <gtest/gtest.h>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
 
 using Eigen::Dynamic;
 using Eigen::Matrix;

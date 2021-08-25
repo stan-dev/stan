@@ -1,7 +1,9 @@
 #ifndef STAN_MODEL_INDEXING_ASSIGN_HPP
 #define STAN_MODEL_INDEXING_ASSIGN_HPP
 
-#include <stan/math/prim.hpp>
+#include <stan/math/prim/meta.hpp>
+#include <stan/math/prim/err.hpp>
+#include <stan/math/prim/fun/to_ref.hpp>
 #include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
 #include <stan/model/indexing/rvalue_at.hpp>
@@ -12,22 +14,6 @@
 namespace stan {
 
 namespace model {
-
-namespace internal {
-/**
- * Base case of assignment
- * @tparam T1 Any type that's not a var matrix.
- * @tparam T2 Any type that's not a var matrix.
- * @param x The value to assign to
- * @param y The value to assign from.
- */
-template <typename T1, typename T2,
-          require_any_not_t<is_var_matrix<T1>, is_eigen<T2>>* = nullptr>
-void assign_impl(T1&& x, T2&& y) {
-  x = std::forward<T2>(y);
-}
-
-}  // namespace internal
 
 /**
  * Indexing Notes:
