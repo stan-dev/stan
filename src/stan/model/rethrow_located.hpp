@@ -81,7 +81,8 @@ struct located_exception : public E {
  * @param[in] e original exception
  * @param[in] location string representing the source file location
  */
-inline void rethrow_located(const std::exception& e, std::string location) {
+[[noreturn]] inline void rethrow_located(const std::exception& e,
+                                         std::string location) {
   using std::bad_alloc;      // -> exception
   using std::bad_cast;       // -> exception
   using std::bad_exception;  // -> exception
@@ -143,9 +144,9 @@ inline void rethrow_located(const std::exception& e, std::string location) {
  *   exception originated
  * @param[in] reader trace of how program was included from files
  */
-inline void rethrow_located(const std::exception& e, int line,
-                            const io::program_reader& reader
-                            = stan::io::program_reader()) {
+[[noreturn]] inline void rethrow_located(const std::exception& e, int line,
+                                         const io::program_reader& reader
+                                         = stan::io::program_reader()) {
   std::stringstream o;
   if (line < 1) {
     o << "  Found before start of program.";
