@@ -195,17 +195,15 @@ inline auto rvalue(Vec&& v,
  */
 template <typename Vec, require_vector_t<Vec>* = nullptr,
           require_not_std_vector_t<Vec>* = nullptr>
-inline
-#ifdef USE_STANC3
-  auto
-#else
-  plain_type_t<Vec>
-#endif  
-  rvalue(Vec&& x, const cons_index_list<index_min, nil_index_list>& idxs,
-         const char* name = "ANON", int depth = 0) {
+inline auto rvalue(Vec&& x, const cons_index_list<index_min, nil_index_list>& idxs,
+                   const char* name = "ANON", int depth = 0) {
   stan::math::check_range("vector[min] indexing", name, x.size(),
                           idxs.head_.min_);
+#ifdef USE_STANC3
   return x.tail(x.size() - idxs.head_.min_ + 1);
+#else
+  return x.tail(x.size() - idxs.head_.min_ + 1).eval();
+#endif
 }
 
 /**
@@ -250,7 +248,11 @@ inline auto rvalue(Mat&& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[uni] indexing", name, x.rows(), idxs.head_.n_);
+#ifdef USE_STANC3
   return x.row(idxs.head_.n_ - 1);
+#else
+  return x.row(idxs.head_.n_ - 1).eval();
+#endif
 }
 
 /**
@@ -560,13 +562,7 @@ inline plain_type_t<EigMat> rvalue(
  * @param[in] depth Depth of indexing dimension.
  */
 template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
-inline
-#ifdef USE_STANC3
-  auto
-#else
-  Eigen::Matrix<value_type_t<Mat>, -1, 1>
-#endif  
-  rvalue(
+inline auto rvalue(
     Mat&& x,
     const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
         idxs,
