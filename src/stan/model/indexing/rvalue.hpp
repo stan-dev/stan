@@ -226,7 +226,11 @@ inline auto rvalue(Vec&& x,
                    const char* name = "ANON", int depth = 0) {
   stan::math::check_range("vector[max] indexing", name, x.size(),
                           idxs.head_.max_);
+#ifdef USE_STANC3
   return x.head(idxs.head_.max_);
+#else
+  return x.head(idxs.head_.max_).eval();
+#endif
 }
 
 /**
