@@ -195,7 +195,8 @@ inline auto rvalue(Vec&& v,
  */
 template <typename Vec, require_vector_t<Vec>* = nullptr,
           require_not_std_vector_t<Vec>* = nullptr>
-inline auto rvalue(Vec&& x, const cons_index_list<index_min, nil_index_list>& idxs,
+inline auto rvalue(Vec&& x,
+                   const cons_index_list<index_min, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
   stan::math::check_range("vector[min] indexing", name, x.size(),
                           idxs.head_.min_);

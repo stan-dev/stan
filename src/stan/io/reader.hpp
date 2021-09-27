@@ -1189,7 +1189,6 @@ class reader {
     return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K);
   }
 
-
   /**
    * Return the next Cholesky factor for a correlation matrix with
    * the specified dimensionality, reading from an unconstrained
