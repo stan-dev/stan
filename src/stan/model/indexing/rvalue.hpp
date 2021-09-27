@@ -200,7 +200,11 @@ inline auto rvalue(Vec&& x,
                    const char* name = "ANON", int depth = 0) {
   stan::math::check_range("vector[min] indexing", name, x.size(),
                           idxs.head_.min_);
+#ifdef USE_STANC3
   return x.tail(x.size() - idxs.head_.min_ + 1);
+#else
+  return x.tail(x.size() - idxs.head_.min_ + 1).eval();
+#endif
 }
 
 /**
@@ -223,7 +227,11 @@ inline auto rvalue(Vec&& x,
                    const char* name = "ANON", int depth = 0) {
   stan::math::check_range("vector[max] indexing", name, x.size(),
                           idxs.head_.max_);
+#ifdef USE_STANC3
   return x.head(idxs.head_.max_);
+#else
+  return x.head(idxs.head_.max_).eval();
+#endif
 }
 
 /**
@@ -245,7 +253,11 @@ inline auto rvalue(Mat&& x,
                    const cons_index_list<index_uni, nil_index_list>& idxs,
                    const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[uni] indexing", name, x.rows(), idxs.head_.n_);
+#ifdef USE_STANC3
   return x.row(idxs.head_.n_ - 1);
+#else
+  return x.row(idxs.head_.n_ - 1).eval();
+#endif
 }
 
 /**

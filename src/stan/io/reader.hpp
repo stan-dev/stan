@@ -1189,7 +1189,6 @@ class reader {
     return stan::math::cholesky_corr_constrain(vector((K * (K - 1)) / 2), K);
   }
 
-
   /**
    * Return the next Cholesky factor for a correlation matrix with
    * the specified dimensionality, reading from an unconstrained
@@ -1638,16 +1637,30 @@ class reader {
   inline auto vector_offset_multiplier_constrain(const TL offset,
                                                  const TS multiplier,
                                                  size_t m) {
+#ifdef USE_STANC3
     return stan::math::offset_multiplier_constrain(vector(m), offset,
                                                    multiplier);
+#else
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_offset_multiplier_constrain(offset, multiplier);
+    return v;
+#endif
   }
 
   template <typename TL, typename TS>
   inline auto vector_offset_multiplier_constrain(const TL offset,
                                                  const TS multiplier, size_t m,
                                                  T &lp) {
+#ifdef USE_STANC3
     return stan::math::offset_multiplier_constrain(vector(m), offset,
                                                    multiplier, lp);
+#else
+    vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
+    return v;
+#endif
   }
 
   template <typename TL, typename TS>
@@ -1661,16 +1674,30 @@ class reader {
   inline auto row_vector_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m) {
+#ifdef USE_STANC3
     return stan::math::offset_multiplier_constrain(row_vector(m), offset,
                                                    multiplier);
+#else
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_offset_multiplier_constrain(offset, multiplier);
+    return v;
+#endif
   }
 
   template <typename TL, typename TS>
   inline auto row_vector_offset_multiplier_constrain(const TL offset,
                                                      const TS multiplier,
                                                      size_t m, T &lp) {
+#ifdef USE_STANC3
     return stan::math::offset_multiplier_constrain(row_vector(m), offset,
                                                    multiplier, lp);
+#else
+    row_vector_t v(m);
+    for (size_t i = 0; i < m; ++i)
+      v(i) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
+    return v;
+#endif
   }
 
   template <typename TL, typename TS>
@@ -1684,16 +1711,32 @@ class reader {
   inline auto matrix_offset_multiplier_constrain(const TL offset,
                                                  const TS multiplier, size_t m,
                                                  size_t n) {
+#ifdef USE_STANC3
     return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
                                                    multiplier);
+#else
+    matrix_t v(m, n);
+    for (size_t j = 0; j < n; ++j)
+      for (size_t i = 0; i < m; ++i)
+        v(i, j) = scalar_offset_multiplier_constrain(offset, multiplier);
+    return v;
+#endif
   }
 
   template <typename TL, typename TS>
   inline auto matrix_offset_multiplier_constrain(const TL offset,
                                                  const TS multiplier, size_t m,
                                                  size_t n, T &lp) {
+#ifdef USE_STANC3
     return stan::math::offset_multiplier_constrain(matrix(m, n), offset,
                                                    multiplier, lp);
+#else
+    matrix_t v(m, n);
+    for (size_t j = 0; j < n; ++j)
+      for (size_t i = 0; i < m; ++i)
+        v(i, j) = scalar_offset_multiplier_constrain(offset, multiplier, lp);
+    return v;
+#endif
   }
 };
 
