@@ -569,15 +569,15 @@ inline plain_type_t<EigMat> rvalue(
 template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline
 #ifdef USE_STANC3
-  auto 
+    auto
 #else
-  Eigen::Matrix<value_type_t<Mat>, -1, 1>
+    Eigen::Matrix<value_type_t<Mat>, -1, 1>
 #endif
-  rvalue(
-    Mat&& x,
-    const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
-        idxs,
-    const char* name = "ANON", int depth = 0) {
+    rvalue(
+        Mat&& x,
+        const cons_index_list<Idx, cons_index_list<index_uni, nil_index_list>>&
+            idxs,
+        const char* name = "ANON", int depth = 0) {
   math::check_range("matrix[..., uni] column indexing", name, x.cols(),
                     idxs.tail_.head_.n_);
   return rvalue(x.col(idxs.tail_.head_.n_ - 1), index_list(idxs.head_), name,
