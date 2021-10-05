@@ -9,6 +9,6 @@ TEST(Stan, macro) {
 
 TEST(Stan, version) {
   EXPECT_EQ("2", stan::MAJOR_VERSION);
-  EXPECT_EQ("27", stan::MINOR_VERSION);
+  EXPECT_EQ("28", stan::MINOR_VERSION);
   EXPECT_EQ("0", stan::PATCH_VERSION);
 }

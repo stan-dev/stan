@@ -5,6 +5,14 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.28.0 (5 October 2021)
+======================================================================
+
+ - Now using Eigen nullaryExpression for indexing with multi_index so these indexing functions propagate expressions, potentially reducing the number of times memory needs to be accessed. (#3046)
+ - Fixes `àssign()` for `var<Matrix>`. (#3049)
+ - Allowed intake of complex numbers. (#3056)
+ - Marged rethrow_located as [[noreturn]]. (#3059)
+
 v2.27.0 (2 June 2021)
 ======================================================================
 
