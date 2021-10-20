@@ -44,7 +44,8 @@ class diag_e_point : public ps_point {
   inline void write_metric(stan::callbacks::writer& writer) {
     writer("Diagonal elements of inverse mass matrix:");
     std::stringstream inv_e_metric_ss;
-    inv_e_metric_ss << inv_e_metric_(0);
+    if (inv_e_metric_.size() > 0)
+      inv_e_metric_ss << inv_e_metric_(0);
     for (int i = 1; i < inv_e_metric_.size(); ++i)
       inv_e_metric_ss << ", " << inv_e_metric_(i);
     writer(inv_e_metric_ss.str());
