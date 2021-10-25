@@ -1,7 +1,0 @@
-data {
-  int N;
-}
-model {
-
-}
-

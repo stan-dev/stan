@@ -1,2 +1,0 @@
-real y;
-real z;
