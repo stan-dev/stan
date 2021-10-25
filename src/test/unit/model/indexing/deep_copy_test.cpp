@@ -1,7 +1,7 @@
-#include <Eigen/Dense>
-#include <stan/model/indexing/deep_copy.hpp>
-#include <vector>
+#include <stan/math/prim/fun/Eigen.hpp>
+#include <stan/model/indexing.hpp>
 #include <gtest/gtest.h>
+#include <vector>
 
 TEST(modelIndexingDeepCopy, scalar) {
   using stan::model::deep_copy;

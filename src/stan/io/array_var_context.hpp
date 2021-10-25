@@ -288,6 +288,45 @@ class array_var_context : public var_context {
   }
 
   /**
+   * Return the double values for the variable with the specified
+   * name or null.
+   *
+   * @param name Name of variable.
+   * @return Values of variable.
+   *
+   */
+  std::vector<std::complex<double>> vals_c(const std::string& name) const {
+    const auto val_r = vars_r_.find(name);
+    if (val_r != vars_r_.end()) {
+      std::vector<std::complex<double>> ret_c(val_r->second.first.size() / 2);
+      int comp_iter;
+      int real_iter;
+      for (comp_iter = 0, real_iter = 0; real_iter < val_r->second.first.size();
+           comp_iter += 1, real_iter += 2) {
+        ret_c[comp_iter] = std::complex<double>{
+            val_r->second.first[real_iter], val_r->second.first[real_iter + 1]};
+      }
+      return ret_c;
+    } else {
+      const auto val_i = vars_i_.find(name);
+      if (val_i != vars_i_.end()) {
+        std::vector<std::complex<double>> ret_c(val_i->second.first.size() / 2);
+        int comp_iter;
+        int real_iter;
+        for (comp_iter = 0, real_iter = 0;
+             real_iter < val_i->second.first.size();
+             comp_iter += 1, real_iter += 2) {
+          ret_c[comp_iter] = std::complex<double>{
+              static_cast<double>(val_i->second.first[real_iter]),
+              static_cast<double>(val_i->second.first[real_iter + 1])};
+        }
+        return ret_c;
+      }
+    }
+    return std::vector<std::complex<double>>{};
+  }
+
+  /**
    * Return the dimensions for the double variable with the specified
    * name.
    *
