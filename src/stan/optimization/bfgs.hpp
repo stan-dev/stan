@@ -30,43 +30,24 @@ typedef enum {
 template <typename Scalar = double>
 class ConvergenceOptions {
  public:
-  ConvergenceOptions() {
-    maxIts = 10000;
-    fScale = 1.0;
-
-    tolAbsX = 1e-8;
-    tolAbsF = 1e-12;
-    tolAbsGrad = 1e-8;
-
-    tolRelF = 1e+4;
-    tolRelGrad = 1e+3;
-  }
-  size_t maxIts;
-  Scalar tolAbsX;
-  Scalar tolAbsF;
-  Scalar tolRelF;
-  Scalar fScale;
-  Scalar tolAbsGrad;
-  Scalar tolRelGrad;
+  size_t maxIts{10000};
+  Scalar tolAbsX{1e-8};
+  Scalar tolAbsF{1e-12};
+  Scalar tolRelF{1e+4};
+  Scalar fScale{1.0};
+  Scalar tolAbsGrad{1e-8};
+  Scalar tolRelGrad{1e+3};
 };
 
 template <typename Scalar = double>
 class LSOptions {
  public:
-  LSOptions() {
-    c1 = 1e-4;
-    c2 = 0.9;
-    alpha0 = 1e-3;
-    minAlpha = 1e-12;
-    maxLSIts = 20;
-    maxLSRestarts = 10;
-  }
-  Scalar c1;
-  Scalar c2;
-  Scalar alpha0;
-  Scalar minAlpha;
-  Scalar maxLSIts;
-  Scalar maxLSRestarts;
+  Scalar c1{1e-4};
+  Scalar c2{0.9};
+  Scalar alpha0{1e-3};
+  Scalar minAlpha{1e-12};
+  Scalar maxLSIts{20};
+  Scalar maxLSRestarts{10};
 };
 template <typename FunctorType, typename QNUpdateType, typename Scalar = double,
           int DimAtCompile = Eigen::Dynamic>
@@ -155,6 +136,12 @@ class BFGSMinimizer {
   }
 
   explicit BFGSMinimizer(FunctorType &f) : _func(f) {}
+  explicit BFGSMinimizer(FunctorType &f, const std::vector<double>& params_r,
+    const LSOptions<double>& ls_opt, const ConvergenceOptions<double>& conv_opt,
+    const QNUpdateType& updater) :
+     _func(f), _qn(updater), _ls_opts(ls_opt), _conv_opts(conv_opt) {
+       initialize(params_r);
+     }
 
   void initialize(const VectorT &x0) {
     int ret;
@@ -390,10 +377,16 @@ class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>, QNUpdateType,
   ModelAdaptor<M> _adaptor;
 
  public:
-  typedef BFGSMinimizer<ModelAdaptor<M>, QNUpdateType, Scalar, DimAtCompile>
-      BFGSBase;
-  typedef typename BFGSBase::VectorT vector_t;
-  typedef typename stan::math::index_type<vector_t>::type idx_t;
+  using BFGSBase = BFGSMinimizer<ModelAdaptor<M>, QNUpdateType, Scalar, DimAtCompile>;
+  using vector_t = typename BFGSBase::VectorT;
+  using idx_t = typename stan::math::index_type<vector_t>::type;
+
+  BFGSLineSearch(M& model, const std::vector<double>& params_r,
+    const std::vector<int> &params_i, const LSOptions<double>& ls_opt,
+    const ConvergenceOptions<double>& conv_opt, const QNUpdateType& updater,
+    std::ostream *msgs = 0) :
+    BFGSBase(_adaptor, params_r, ls_opt, conv_opt, updater),
+     _adaptor(model, params_i, msgs) {}
 
   BFGSLineSearch(M &model, const std::vector<double> &params_r,
                  const std::vector<int> &params_i, std::ostream *msgs = 0)
@@ -402,8 +395,7 @@ class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>, QNUpdateType,
   }
 
   void initialize(const std::vector<double> &params_r) {
-    Eigen::Matrix<double, Eigen::Dynamic, 1> x;
-    x.resize(params_r.size());
+    Eigen::Matrix<double, Eigen::Dynamic, 1> x(params_r.size());
     for (size_t i = 0; i < params_r.size(); i++)
       x[i] = params_r[i];
     BFGSBase::initialize(x);

@@ -20,6 +20,71 @@ namespace stan {
 namespace services {
 namespace optimize {
 
+using lbfgs_ret_t = std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd, Eigen::VectorXd>;
+template <typename LBFGS>
+inline std::vector<lbfgs_ret> lbfgs_with_covar_ret(LBFGS& lbfgs, size_t max_iter) {
+  std::vector<lbfgs_ret_t> ret_vec;
+  ret_vec.reserve(max_iter);
+  int ret = 0;
+
+  while (ret == 0) {
+    interrupt();
+    if (refresh > 0
+        && (lbfgs.iter_num() == 0 || ((lbfgs.iter_num() + 1) % refresh == 0)))
+      logger.info(
+          "    Iter"
+          "      log prob"
+          "        ||dx||"
+          "      ||grad||"
+          "       alpha"
+          "      alpha0"
+          "  # evals"
+          "  Notes ");
+
+    ret = lbfgs.step();
+    lp = lbfgs.logp();
+    lbfgs.params_r(cont_vector);
+
+    if (refresh > 0
+        && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
+            || ((lbfgs.iter_num() + 1) % refresh == 0))) {
+      std::stringstream msg;
+      msg << " " << std::setw(7) << lbfgs.iter_num() << " ";
+      msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+      msg << " " << std::setw(12) << std::setprecision(6)
+          << lbfgs.prev_step_size() << " ";
+      msg << " " << std::setw(12) << std::setprecision(6)
+          << lbfgs.curr_g().norm() << " ";
+      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha()
+          << " ";
+      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
+          << " ";
+      msg << " " << std::setw(7) << lbfgs.grad_evals() << " ";
+      msg << " " << lbfgs.note() << " ";
+      logger.info(msg);
+    }
+
+    if (lbfgs_ss.str().length() > 0) {
+      logger.info(lbfgs_ss);
+      lbfgs_ss.str("");
+    }
+
+    if (save_iterations) {
+      std::vector<double> values;
+      std::stringstream msg;
+      model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                        &msg);
+      if (msg.str().length() > 0)
+        logger.info(msg);
+
+      values.insert(values.begin(), lp);
+      parameter_writer(values);
+    }
+  }
+  return ret_vec;
+}
+
+
 /**
  * Runs the L-BFGS algorithm for a model.
  *
@@ -63,7 +128,7 @@ namespace optimize {
  *
  */
 template <class Model>
-int pathfinder_lbfgs_single(Model& model, const stan::io::var_context& init,
+inline int pathfinder_lbfgs_single(Model& model, const stan::io::var_context& init,
           unsigned int random_seed, unsigned int path, double init_radius,
           int history_size, double init_alpha, double tol_obj,
           double tol_rel_obj, double tol_grad, double tol_rel_grad,
@@ -80,9 +145,7 @@ int pathfinder_lbfgs_single(Model& model, const stan::io::var_context& init,
   std::vector<double> cont_vector = util::initialize<false>(
       model, init, rng, init_radius, false, logger, init_writer);
   std::stringstream lbfgs_ss;
-  typedef stan::optimization::BFGSLineSearch<Model,
-                                             stan::optimization::LBFGSUpdate<> >
-      Optimizer;
+  using lbfgs_update_t = LBFGSUpdate<double, Eigen::Dynamic> ;
   LSOptions<double> ls_opts;
   ls_opts.alpha0 = init_alpha;
   ConvergenceOptions<double> conv_opts;
@@ -92,13 +155,12 @@ int pathfinder_lbfgs_single(Model& model, const stan::io::var_context& init,
   conv_opts.tolRelGrad = tol_rel_grad;
   conv_opts.tolAbsX = tol_param;
   conv_opts.maxIts = num_iterations;
-  LBFGSUpdate<double, Eigen::Dynamic> lbfgs_update(history_size);
+  lbfgs_update_t lbfgs_update(history_size);
+  using Optimizer = stan::optimization::BFGSLineSearch<Model, lbfgs_update_t>;
   Optimizer lbfgs(model, cont_vector, disc_vector, ls_opts, conv_opts, lbfgs_update, &lbfgs_ss);
 
-  double lp = lbfgs.logp();
-
   std::stringstream initial_msg;
-  initial_msg << "Initial log joint probability = " << lp;
+  initial_msg << "Initial log joint probability = " << lbfgs.logp();
   logger.info(initial_msg);
 
   std::vector<std::string> names;
@@ -107,7 +169,7 @@ int pathfinder_lbfgs_single(Model& model, const stan::io::var_context& init,
   parameter_writer(names);
   // (2)
   using lbfgs_ret_t = std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::MatrixXd, Eigen::MatrixXd, Eigen::VectorXd>;
-  std::vector<lbfgs_ret> lbfgs_ret = lbfgs_with_covar_ret(model, conv_vector, lbfgs, history_size, );
+  std::vector<lbfgs_ret> lbfgs_ret = lbfgs_with_covar_ret(lbfgs, history_size);
   // (3)
   Eigen::VectorXd lambda(num_iterations);
   for (size_t l = 0; l < num_iterations; l++) {
