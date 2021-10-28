@@ -19,71 +19,76 @@ namespace stan {
 namespace services {
 namespace optimize {
 
-using lbfgs_ret_t
-    = std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::MatrixXd,
-                 Eigen::MatrixXd, Eigen::VectorXd>;
-template <typename LBFGS>
-inline std::vector<lbfgs_ret> lbfgs_with_covar_ret(LBFGS& lbfgs,
-                                                   size_t max_iter) {
-  std::vector<lbfgs_ret_t> ret_vec;
-  ret_vec.reserve(max_iter);
-  int ret = 0;
+/**
+ *
+ */
+struct pathfinder_lbfgs_iter_t {
+  // The parameters for an iteration of LBFGS
+  Eigen::VectorXd params_;
+  // Gradients of parameters from an iteration of LBFGS
+  Eigen::VectorXd grads_;
+  // Vector of diagonal elements of $alpha$
+  Eigen::VectorXd alpha_;
+  // KxN matrix ($beta$)
+  Eigen::MatrixXd beta_;
+  // K sized vector $gamma$
+  Eigen::VectorXd gamma_;
+};
 
-  while (ret == 0) {
-    interrupt();
-    if (refresh > 0
-        && (lbfgs.iter_num() == 0 || ((lbfgs.iter_num() + 1) % refresh == 0)))
-      logger.info(
-          "    Iter"
-          "      log prob"
-          "        ||dx||"
-          "      ||grad||"
-          "       alpha"
-          "      alpha0"
-          "  # evals"
-          "  Notes ");
-
-    ret = lbfgs.step();
-    lp = lbfgs.logp();
-    lbfgs.params_r(cont_vector);
-
-    if (refresh > 0
-        && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
-            || ((lbfgs.iter_num() + 1) % refresh == 0))) {
-      std::stringstream msg;
-      msg << " " << std::setw(7) << lbfgs.iter_num() << " ";
-      msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
-      msg << " " << std::setw(12) << std::setprecision(6)
-          << lbfgs.prev_step_size() << " ";
-      msg << " " << std::setw(12) << std::setprecision(6)
-          << lbfgs.curr_g().norm() << " ";
-      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha()
-          << " ";
-      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
-          << " ";
-      msg << " " << std::setw(7) << lbfgs.grad_evals() << " ";
-      msg << " " << lbfgs.note() << " ";
-      logger.info(msg);
+template <typename BaseRNG>
+inline auto bfgs_sample(const pathfinder_lbfgs_iter_t& lbfgs_iter, BaseRNG& rng,
+                        size_t num_elbo_draws) {
+  auto&& params = lbfgs_iter.params_;
+  auto&& grads = lbfgs_iter.grads_;
+  auto&& alpha = lbfgs_iter.alpha_;
+  auto&& beta = lbfgs_iter.beta_;
+  auto&& gamma = lbfgs_iter.gamma_;
+  const auto N = alpha.size();
+  // determinant of a diagonal matrix is the product of elements of its diagonal
+  auto alpha_det = alpha[0];
+  for (Eigen::Index i = 1; i < N; ++i) {
+    alpha_det *= alpha[i];
+  }
+  Eigen::HouseholderQR<matrix_t> qr(m.rows(), m.cols());
+  qr.compute(m);
+  const auto min_size = std::min(m.rows(), m.cols());
+  Eigen::MatrixXd R = qr.matrixQR().topLeftCorner(min_size, m.cols());
+  for (int i = 0; i < min_size; i++) {
+    for (int j = 0; j < i; j++) {
+      R.coeffRef(i, j) = 0.0;
     }
-
-    if (lbfgs_ss.str().length() > 0) {
-      logger.info(lbfgs_ss);
-      lbfgs_ss.str("");
-    }
-
-    if (save_iterations) {
-      std::vector<double> values;
-      std::stringstream msg;
-      model.write_array(rng, cont_vector, disc_vector, values, true, true,
-                        &msg);
-      if (msg.str().length() > 0)
-        logger.info(msg);
-
-      values.insert(values.begin(), lp);
-      parameter_writer(values);
+    if (R(i, i) < 0) {
+      R.row(i) *= -1.0;
     }
   }
-  return ret_vec;
+  Eigen::MatrixXd Q
+      = qr.householderQ() * matrix_t::Identity(m.rows(), min_size);
+  for (int i = 0; i < min_size; i++) {
+    if (qr.matrixQR().coeff(i, i) < 0) {
+      Q.col(i) *= -1.0;
+    }
+  }
+
+  auto L = (Eigen::MatrixXd::Identity(N, N) + R * gamma * R.transpose())
+               .llt()
+               .matrixL();
+  auto log_det_sigma = std::log(alpha_det) + 2 * L.logAbsDeterminant() auto mu
+      = params + alpha.asDiagonal() * grads + beta * gamma * beta * grads;
+  boost::variate_generator<BaseRNG&, boost::normal_distribution<> >
+      rand_unit_gaus(rng, boost::normal_distribution<>());
+  Eigen::VectorXd u = Eigen::VectorXd::NullaryExpr(
+      N, [&rand_unit_gaus]() { return rand_unit_gaus(); });
+  Eigen::MatrixXd approx_draws(N, num_elbo_draws);
+  Eigen::MatrixXd log_density_draws(num_elbo_draws);
+  for (int m = 0; m < num_elbo_draws; ++m) {
+      approx_draws.col(i) = mu + alpha.array().sqrt().asDiagonal() * (Q * L * Q.transpose() * u.col(m) + u.col(m)) - Q * Q.transpose() * u.col(m));
+      log_density_draws.coeffRef(i) = -.5 * log_det_sigma
+                                      + u.col(m).transpose() * u.col(m)
+                                      + N * log(2 * stan::math::pi());
+      u = Eigen::VectorXd::NullaryExpr(
+          N, [&rand_unit_gaus]() { return rand_unit_gaus(); });
+  }
+  return std::make_tuple(approx_draws, log_density_draws);
 }
 
 /**
@@ -126,11 +131,12 @@ inline std::vector<lbfgs_ret> lbfgs_with_covar_ret(LBFGS& lbfgs,
  * objective function, and factorization of covariance estimation
  * 3. For each L-BFGS iteration `num_iterations`
  *  3a. Run BFGS-Sample to get `num_elbo_draws` draws from normal approximation
- * and log density of draws in the approximate normal distribution 3b. Calculate
- * a vector of size `num_elbo_draws` joint log probability given normal
- * approximation 3c. Calculate ELBO given 3a and 3b
+ * and log density of draws in the approximate normal distribution
+ *  3b. Calculate a vector of size `num_elbo_draws` joint log probability given
+ * normal approximation
+ *  3c. Calculate ELBO given 3a and 3b
  * 4. Find $l \in L$ that maximizes ELBO $l^* = arg max_l ELBO^(l)$.
- * 5. Run BFGSD-Sample to return `num_draws` draws from ELBO-maximizing normal
+ * 5. Run bfgs-Sample to return `num_draws` draws from ELBO-maximizing normal
  * approx and log density of draws in ELBO-maximizing normal approximation.
  *
  */
@@ -147,9 +153,10 @@ inline int pathfinder_lbfgs_single(
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
-  // (1)
+  // 1. Sample initial parameters
   std::vector<double> cont_vector = util::initialize<false>(
       model, init, rng, init_radius, false, logger, init_writer);
+  // Setup LBFGS
   std::stringstream lbfgs_ss;
   using lbfgs_update_t = LBFGSUpdate<double, Eigen::Dynamic>;
   LSOptions<double> ls_opts;
@@ -174,28 +181,97 @@ inline int pathfinder_lbfgs_single(
   names.push_back("lp__");
   model.constrained_param_names(names, true, true);
   parameter_writer(names);
-  // (2)
-  using lbfgs_ret_t
-      = std::tuple<Eigen::VectorXd, Eigen::VectorXd, Eigen::MatrixXd,
-                   Eigen::MatrixXd, Eigen::VectorXd>;
-  std::vector<lbfgs_ret> lbfgs_ret = lbfgs_with_covar_ret(lbfgs, history_size);
-  // (3)
+  /*
+   * 2. Run L-BFGS to return optimization path for parameters, gradients of
+   * objective function, and factorization of covariance estimation
+   */
+  std::vector<pathfinder_lbfgs_iter_t> lbfgs_iters;
+  lbfgs_iters.reserve(max_iter);
+  int ret = 0;
+
+  while (ret == 0) {
+    interrupt();
+    if (refresh > 0
+        && (lbfgs.iter_num() == 0 || ((lbfgs.iter_num() + 1) % refresh == 0)))
+      logger.info(
+          "    Iter"
+          "      log prob"
+          "        ||dx||"
+          "      ||grad||"
+          "       alpha"
+          "      alpha0"
+          "  # evals"
+          "  Notes ");
+    // TODO: Need to get out pathfinder_lbfgs_iter_t every step
+    ret = lbfgs.step();
+    lp = lbfgs.logp();
+    lbfgs.params_r(cont_vector);
+
+    if (refresh > 0
+        && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
+            || ((lbfgs.iter_num() + 1) % refresh == 0))) {
+      std::stringstream msg;
+      msg << " " << std::setw(7) << lbfgs.iter_num() << " ";
+      msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+      msg << " " << std::setw(12) << std::setprecision(6)
+          << lbfgs.prev_step_size() << " ";
+      msg << " " << std::setw(12) << std::setprecision(6)
+          << lbfgs.curr_g().norm() << " ";
+      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha()
+          << " ";
+      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
+          << " ";
+      msg << " " << std::setw(7) << lbfgs.grad_evals() << " ";
+      msg << " " << lbfgs.note() << " ";
+      logger.info(msg);
+    }
+
+    if (lbfgs_ss.str().length() > 0) {
+      logger.info(lbfgs_ss);
+      lbfgs_ss.str("");
+    }
+
+    if (save_iterations) {
+      std::vector<double> values;
+      std::stringstream msg;
+      model.write_array(rng, cont_vector, disc_vector, values, true, true,
+                        &msg);
+      if (msg.str().length() > 0)
+        logger.info(msg);
+
+      values.insert(values.begin(), lp);
+      parameter_writer(values);
+    }
+  }
+
+  // 3. For each L-BFGS iteration `num_iterations`
   Eigen::VectorXd lambda(num_iterations);
   for (size_t l = 0; l < num_iterations; l++) {
+    /**
+     * 3a. Run BFGS-Sample to get `num_elbo_draws` draws from normal
+     * approximation and log density of draws in the approximate normal
+     * distribution
+     */
     auto&& lfbgs_ret_l = lfbgs_ret[l];
-    std::tuple<Eigen::MatrixXd, Eigen::VectorXd> phi_and_lq = bfgs_sample(
-        std::get<0>(lfbgs_ret_l), std::get<2>(lfbgs_ret_l),
-        std::get<3>(lfbgs_ret_l), std::get<4>(lfbgs_ret_l), num_elbo_draws);
+    std::tuple<Eigen::MatrixXd, Eigen::VectorXd> phi_and_lq
+        = bfgs_sample(lfbgs_ret_l, num_elbo_draws);
+    /**
+     * 3b. Calculate a vector of size `num_elbo_draws` joint log probability
+     * given normal approximation
+     */
     Eigen::VectorXd lp_calcs = lp_per_k_calc(std::get<0>(phi_and_lq));
-    lambda[l] = elbo_calc(lp_calcs, std::get<1>(phi_and_lq));
+    // 3c. Calculate ELBO given 3a and 3b
+    lambda[l] = (lp_calcs - std::get<1>(phi_and_lq)).sum();
   }
-  // (4)
+  //  4. Find $l \in L$ that maximizes ELBO $l^* = arg max_l ELBO^(l)$.
   Eigen::Index max_l = get_max_idx(lambda);
-  // (5)
-  auto&& lfbgs_ret_l = lfbgs_ret[max_l];
-  std::tuple<Eigen::MatrixXd, Eigen::VectorXd> bfgs_sample(
-      std::get<0>(lfbgs_ret_l), std::get<2>(lfbgs_ret_l),
-      std::get<3>(lfbgs_ret_l), std::get<4>(lfbgs_ret_l), num_draws);
+  auto&& lbfgs_ret_l = lfbgs_ret[max_l];
+  /**
+   * 5. Run bfgs-Sample to return `num_draws` draws from ELBO-maximizing normal
+   * approx and log density of draws in ELBO-maximizing normal approximation.
+   */
+  std::tuple<Eigen::MatrixXd, Eigen::VectorXd> bfgs_sample(lbfgs_ret_l,
+                                                           num_draws);
   return return_code;
 }
 
