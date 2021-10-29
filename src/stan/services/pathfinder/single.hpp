@@ -50,26 +50,23 @@ inline auto form_init_diag(const Eigen::Array<double, -1, 1>& E0,
 }
 
 struct sample_pkg_t {
-  std::string label;
   Eigen::VectorXd x_center;
-  Eigen::MatrixXd cholHk;
-  Eigen::MatrixXd Qk;
-  Eigen::VectorXd theta_D;
-  Eigen::MatrixXd Rktilde;
   double logdetcholHk;
+  Eigen::MatrixXd L_approx;
+  Eigen::MatrixXd Qk;
 };
 
 template <typename Generator>
-inline auto calc_u_u2(Generator& rnorm, const sample_full_pkg& sample_pkg,
-                      const Eigen::VectorXd& alpha, size_t m) {
+inline auto calc_u_u2(Generator& rnorm, const sample_full_pkg& sample_pkg, const Eigen::VectorXd& alpha,
+                      size_t m) {
   u = rnorm(m);
   u2 = crossprod(sample_pkg.L_approx, u) + sample_pkg.x_center;
   return std::forward_as_tuple(std::move(u), std::move(u2))
 }
 
 template <typename Generator>
-inline auto calc_u_u2(Generator& rnorm, const sample_sparse_pkg& sample_pkg,
-                      const Eigen::VectorXd& alpha, size_t m) {
+inline auto calc_u_u2(Generator& rnorm, const sample_sparse_pkg& sample_pkg, const Eigen::VectorXd& alpha,
+                      size_t m) {
   u = rnorm(m);
   Eigen::VectorXd u1 = crossprod(sample_pkg.Qk, u);
   u2 = alpha.array().inverse().sqrt().matrix().asDiagonal()
@@ -80,9 +77,8 @@ inline auto calc_u_u2(Generator& rnorm, const sample_sparse_pkg& sample_pkg,
 }
 
 template <typename SamplePkg, typename F, typename BaseRNG>
-auto est_DIV(const SamplePkg& sample_pkg, size_t N_sam,
-             const Eigen::VectorXd& alpha, F&& fn, std::string label,
-             BaseRNG& rng) {
+auto est_DIV(const SamplePkg& sample_pkg, size_t N_sam, const Eigen::VectorXd& alpha, F&& fn,
+             std::string label, BaseRNG& rng) {
   const auto D = sample_pkg.x_center.size();
   // Should fill with Inf!
   Eigen::VectorXd fn_draws = Eigen::VectorXd::Zero(N_sam);
@@ -514,13 +510,13 @@ inline int pathfinder_lbfgs_single(
      * approximation and log density of draws in the approximate normal
      * distribution
      */
-
+    sample_pkg_t taylor_appx_tuple;
     if (2 * m >= param_size) {
-      full_ret_t tayler_appx_tuple form_n_apx_taylor_full(
+      taylor_appx_tuple = form_n_apx_taylor_full(
           Ykt_mat, alpha, Dk, ninvRST, std::get<0>(lbfgs_iters[i]),
           std::get<1>(lbfgs_iters[i]));
     } else {
-      sparse_ret_t tayler_appx_tuple form_n_apx_taylor_sparse(
+      taylor_appx_tuple = form_n_apx_taylor_sparse(
           Ykt_mat, alpha, Dk, ninvRST, std::get<1>(lbfgs_iters[i]),
           std::get<1>(lbfgs_iters[i]));
     }
