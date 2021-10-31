@@ -263,6 +263,7 @@ pipeline {
                     steps {
                         sh """
                             git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                            git clone https://github.com/stan-dev/stanc3/ performance-tests-cmdstan/stanc3
                         """
                         script {
                             if (params.cmdstan_pr != 'downstream_tests') {
@@ -303,7 +304,8 @@ pipeline {
                             echo 'CXX=${env.CXX}' >> make/local
                             make -j${env.PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 cmdstan/stan/src/test/test-models/good
+                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
@@ -337,7 +339,8 @@ pipeline {
                             echo 'CXX=${env.CXX}' >> make/local
                             make -j${env.PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 cmdstan/stan/src/test/test-models/good
+                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
@@ -373,7 +376,8 @@ pipeline {
                                 cd performance-tests-cmdstan/cmdstan
                                 mingw32-make -j${env.PARALLEL} build
                                 cd ..
-                                python ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 cmdstan/stan/src/test/test-models/good
+                                python ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                                python ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                             """
                         }
                         bat """
