@@ -1,0 +1,3 @@
+parameters {
+  real y;
+}
