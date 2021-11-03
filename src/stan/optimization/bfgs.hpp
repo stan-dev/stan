@@ -136,16 +136,22 @@ class BFGSMinimizer {
   }
 
   explicit BFGSMinimizer(FunctorType &f) : _func(f) {}
-  explicit BFGSMinimizer(FunctorType &f, const std::vector<double>& params_r,
+  template <typename Vec, require_vector_t<Vec>* = nullptr>
+  explicit BFGSMinimizer(FunctorType &f, const Vec& params_r,
     const LSOptions<double>& ls_opt, const ConvergenceOptions<double>& conv_opt,
     const QNUpdateType& updater) :
      _func(f), _qn(updater), _ls_opts(ls_opt), _conv_opts(conv_opt) {
        initialize(params_r);
      }
 
-  void initialize(const VectorT &x0) {
+  template <typename Vec, require_vector_t<Vec>* = nullptr>
+  void initialize(const Vec &x0) {
     int ret;
-    _xk = x0;
+    _xk.resize(x0.size());
+    _gk.resize(x0.size());
+    for (Eigen::Index i = 0; i < x0.size(); ++i) {
+      _xk[i] = x0[i];
+    }
     ret = _func(_xk, _fk, _gk);
     if (ret) {
       throw std::runtime_error("Error evaluating initial BFGS point.");
@@ -380,21 +386,24 @@ class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>, QNUpdateType,
   using BFGSBase = BFGSMinimizer<ModelAdaptor<M>, QNUpdateType, Scalar, DimAtCompile>;
   using vector_t = typename BFGSBase::VectorT;
   using idx_t = typename stan::math::index_type<vector_t>::type;
-
-  BFGSLineSearch(M& model, const std::vector<double>& params_r,
+  template <typename Vec, require_vector_t<Vec>* = nullptr>
+  BFGSLineSearch(M& model, const Vec& params_r,
     const std::vector<int> &params_i, const LSOptions<double>& ls_opt,
     const ConvergenceOptions<double>& conv_opt, const QNUpdateType& updater,
     std::ostream *msgs = 0) :
     BFGSBase(_adaptor, params_r, ls_opt, conv_opt, updater),
-     _adaptor(model, params_i, msgs) {}
+     _adaptor(model, params_i, msgs) {
+       initialize(params_r);
+     }
 
-  BFGSLineSearch(M &model, const std::vector<double> &params_r,
+  template <typename Vec, require_vector_t<Vec>* = nullptr>
+  BFGSLineSearch(M &model, const Vec& params_r,
                  const std::vector<int> &params_i, std::ostream *msgs = 0)
       : BFGSBase(_adaptor), _adaptor(model, params_i, msgs) {
     initialize(params_r);
   }
-
-  void initialize(const std::vector<double> &params_r) {
+  template <typename Vec, require_vector_t<Vec>* = nullptr>
+  void initialize(const Vec &params_r) {
     Eigen::Matrix<double, Eigen::Dynamic, 1> x(params_r.size());
     for (size_t i = 0; i < params_r.size(); i++)
       x[i] = params_r[i];

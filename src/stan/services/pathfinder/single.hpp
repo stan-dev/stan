@@ -6,6 +6,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/optimization/bfgs.hpp>
+#include <stan/optimization/lbfgs_update.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
@@ -54,143 +55,88 @@ struct sample_pkg_t {
   double logdetcholHk;
   Eigen::MatrixXd L_approx;
   Eigen::MatrixXd Qk;
+  bool use_full;
+};
+
+struct div_est_t {
+  double DIV;
+  int fn_calls_DIV;
+  Eigen::MatrixXd repeat_draws;
+  Eigen::VectorXd fn_draws;
+  Eigen::VectorXd lp_approx_draws;
 };
 
 template <typename Generator>
-inline auto calc_u_u2(Generator& rnorm, const sample_full_pkg& sample_pkg, const Eigen::VectorXd& alpha,
-                      size_t m) {
-  u = rnorm(m);
-  u2 = crossprod(sample_pkg.L_approx, u) + sample_pkg.x_center;
-  return std::forward_as_tuple(std::move(u), std::move(u2))
-}
-
-template <typename Generator>
-inline auto calc_u_u2(Generator& rnorm, const sample_sparse_pkg& sample_pkg, const Eigen::VectorXd& alpha,
-                      size_t m) {
-  u = rnorm(m);
-  Eigen::VectorXd u1 = crossprod(sample_pkg.Qk, u);
-  u2 = alpha.array().inverse().sqrt().matrix().asDiagonal()
-           * (sample_pkg.Qk * crossprod(sample_pkg.Rktilde, u1)
-              + (u - sample_pkg.Qk * u1))
-       + sample_pkg.x_center;
-  return std::forward_as_tuple(std::move(u), std::move(u2))
+inline auto calc_u_u2(Generator& rnorm, const sample_pkg_t& sample_pkg,
+                      const Eigen::VectorXd& alpha) {
+  if (sample_pkg.use_full) {
+    auto u = rnorm().eval();
+    auto u2 = (crossprod(sample_pkg.L_approx, u) + sample_pkg.x_center).eval();
+    return std::make_tuple(std::move(u), std::move(u2));
+  } else {
+    auto u = rnorm().eval();
+    auto u1 = crossprod(sample_pkg.Qk, u).eval();
+    auto u2 = (alpha.array().inverse().sqrt().matrix().asDiagonal()
+             * (sample_pkg.Qk * crossprod(sample_pkg.L_approx, u1)
+                + (u - sample_pkg.Qk * u1))
+         + sample_pkg.x_center).eval();
+    return std::make_tuple(std::move(u), std::move(u2));
+  }
 }
 
 template <typename SamplePkg, typename F, typename BaseRNG>
-auto est_DIV(const SamplePkg& sample_pkg, size_t N_sam, const Eigen::VectorXd& alpha, F&& fn,
-             std::string label, BaseRNG& rng) {
+auto est_DIV(const SamplePkg& sample_pkg, size_t N_sam,
+             const Eigen::VectorXd& alpha, F&& fn, const char* label,
+             BaseRNG& rng) {
   const auto D = sample_pkg.x_center.size();
-  // Should fill with Inf!
-  Eigen::VectorXd fn_draws = Eigen::VectorXd::Zero(N_sam);
-  Eigen::VectorXd lp_approx_draws = Eigen::VectorXd::Zero(N_sam);
-  Eigen::MatrixXd repeat_draws = Eigen::MatrixXd::Zero(D, N_sam);
   int draw_ind = 1;
   int fn_calls_DIV = 0;
-  int f_test_DIV = -std::numeric_limits<int>::infinity();
   boost::variate_generator<BaseRNG&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
-  std::tuple<Eigen::VectorXd, Eigen::VectorXd> tuple_u;
-  auto rnorm = [&rand_unit_gaus](auto D) {
-    return Eigen::VectorXd::NullaryExpr(
-        D, [&rand_unit_gaus]() { return rand_unit_gaus(); });
+  auto rnorm = [&rand_unit_gaus, D, N_sam]() {
+    return Eigen::MatrixXd::NullaryExpr(
+        D, N_sam, [&rand_unit_gaus]() { return rand_unit_gaus(); });
   };
-  for (int l = 0; l < (2 * N_sam); ++l) {
-    auto tuple_u = calc_u_u2(rnorm, sample_pkg, alpha, D);
-    auto&& u = std::get<0>(tuple_u);
-    auto&& u2 = std::get<1>(tuple_u);
-    // skip bad samples
-    bool skip_flag = false;
-    double f_test_DIV;
-    try {
-      f_test_DIV = fn(u2);
-    } catch (...) {
-      // TODO: Actually catch errors
-      skip_flag = true;
+  auto tuple_u = calc_u_u2(rnorm, sample_pkg, alpha);
+  auto&& u = std::get<0>(tuple_u);
+  auto&& u2 = std::get<1>(tuple_u);
+  // skip bad samples
+  Eigen::VectorXd f_test_DIV;
+  try {
+    for (Eigen::Index i = 0; i < f_test_DIV.cols(); ++i) {
+      f_test_DIV.col(i) = u2.col(i).unaryExpr([&fn](auto&& x) { return fn(x);});
     }
-    if (f_test_DIV == std::numeric_limits<double>::quiet_NaN()) {
-      skip_flag = true;
-    }
-    if (skip_flag) {
-      continue;
-    } else {
-      fn_draws[draw_ind] = f_test_DIV;
-      lp_approx_draws[draw_ind]
-          = -sample_pkg.logdetcholHk - 0.5 * u.array().square().sum()
-            - 0.5 * D * log(2 * 3.14);  // NOTE THIS NEEDS TO BE pi()
-      repeat_draws(0, draw_ind) = u2;
-      draw_ind = draw_ind + 1;
-    }
-    fn_calls_DIV = fn_calls_DIV + 1;
-    if (draw_ind == N_sam + 1) {
-      break;
-    }
+  } catch (...) {
+    // TODO: Actually catch errors
   }
+  Eigen::VectorXd fn_draws = f_test_DIV;
+  Eigen::VectorXd lp_approx_draws
+      = -sample_pkg.logdetcholHk - 0.5 * u.array().square().colwise().sum()
+        - 0.5 * D * log(2 * 3.14);  // NOTE THIS NEEDS TO BE pi()
+  Eigen::MatrixXd repeat_draws = u2;
 
   //### Divergence estimation ###
   double ELBO = -fn_draws.mean() - lp_approx_draws.mean();
-  ;
   if (is_nan(ELBO)) {
     ELBO = -std::numeric_limits<double>::infinity();
   }
-  double DIV;
-  if (label == "ELBO") {
-    DIV = ELBO;
-  } else if (label == "lIKL") {
-    // log Inclusive-KL E[p(x_i)/q(x_k)]
-    DIV = ELBO
-          + log((-fn_draws.array() - lp_approx_draws.array() - ELBO)
-                    .exp()
-                    .mean());
-  } else if (label == "lADIV") {
-    // log alpha-divergence E[(p(x_i)/q(x_k))^alpha], e.g. with 1/2
-    DIV = 0.5 * ELBO
-          + log(((0.5 * (-fn_draws.array() - lp_approx_draws.array() - ELBO))
-                     .exp()
-                     .mean()));
-  } else if (label == "lCDIV") {
-    // log Chi^2-divergence is alpha-divergence with alpha=2
-    DIV = 2.0 * ELBO
-          + log(((2.0
-                  * (-fn_draws.array() - lp_approx_draws.array() - ELBO)
-                        .exp()
-                        .mean())));
-  } else {
-    throw std::domain_error("The divergence is misspecified");
-  }
-
-  if (is_nan(DIV)) {
-    DIV = -std::numeric_limits<double>::infinity();
-  }
-  if (is_infinite(DIV)) {
-    DIV = -std::numeric_limits<double>::infinity();
-  }
-
-  if ((fn_draws.array() == std::numeric_limits<double>::infinity()).any()) {
-    fn_draws[0] = std::numeric_limits<double>::infinity();
-  }
-  /*
-  return(list(DIV = DIV,
-              repeat_draws = repeat_draws, fn_draws = fn_draws,
-              lp_approx_draws = lp_approx_draws, fn_calls_DIV = fn_calls_DIV))
-    */
+  return div_est_t{ELBO, fn_calls_DIV, std::move(repeat_draws), std::move(fn_draws),
+                         std::move(lp_approx_draws)};
 }
 
 template <typename SamplePkg, typename BaseRNG>
-inline auto Sam_N_apx(const SamplePkg& sample_pkg, size_t N_sam,
+inline auto Sam_N_apx(const SamplePkg& sample_pkg, size_t N_sam, const Eigen::VectorXd& alpha,
                       BaseRNG&& rng) {
   const Eigen::Index D = sample_pkg.x_center.size();
-  Eigen::VectorXd lp_approx_draws = Eigen::VectorXd::Zero(N_sam);
-  Eigen::MatrixXd repeat_draws = Eigen::VectorXd::Zero(D, N_sam);
-
   boost::variate_generator<BaseRNG&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
-  auto rnorm = [&rand_unit_gaus](auto D) {
-    return Eigen::VectorXd::NullaryExpr(
-        D, [&rand_unit_gaus]() { return rand_unit_gaus(); });
+  auto rnorm = [&rand_unit_gaus, D, N_sam]() {
+    return Eigen::MatrixXd::NullaryExpr(
+        D, N_sam, [&rand_unit_gaus]() { return rand_unit_gaus(); });
   };
-  auto tuple_u = calc_u_u2(rnorm, sample_pkg, D * N_sam);
-  using map_t = Eigen::Map<Eigen::MatrixXd> Eigen::VectorXd lp_apx_draws
-      = -sample_pkg.logdetcholHk
+  auto tuple_u = calc_u_u2(rnorm, sample_pkg, alpha);
+  using map_t = Eigen::Map<Eigen::MatrixXd>;
+  Eigen::VectorXd lp_approx_draws = -sample_pkg.logdetcholHk
         - 0.5
               * map_t(std::get<0>(tuple_u).data(), D, N_sam)
                     .array()
@@ -198,7 +144,7 @@ inline auto Sam_N_apx(const SamplePkg& sample_pkg, size_t N_sam,
                     .colwise()
                     .sum()
         - 0.5 * D* log(2 * 3.14);  // TODO: PUT BACK pi()
-  return std::make_tuple(std::get<1>(tuple_u), lp_apx_draws);
+  return std::make_tuple(std::get<1>(tuple_u), lp_approx_draws);
 }
 
 inline auto form_n_apx_taylor_full(const Eigen::MatrixXd& Ykt_mat,
@@ -221,7 +167,8 @@ inline auto form_n_apx_taylor_full(const Eigen::MatrixXd& Ykt_mat,
   auto logdetcholHk = 2.0 * std::log(cholHk.determinant());
 
   Eigen::VectorXd x_center = point_est - Hk * grad_est;
-  return 1;
+  return sample_pkg_t{std::move(x_center), logdetcholHk, std::move(cholHk),
+                      Eigen::MatrixXd(0, 0), true};
 }
 
 inline auto form_n_apx_taylor_sparse(const Eigen::MatrixXd& Ykt_mat,
@@ -268,12 +215,12 @@ inline auto form_n_apx_taylor_sparse(const Eigen::MatrixXd& Ykt_mat,
       Qk.col(i) *= -1.0;
     }
   }
-  Eigen::MatrixXd Rktilde
+  Eigen::MatrixXd L_approx
       = (Rkbar * Mkbar * Rkbar.transpose()
          + Eigen::MatrixXd::Identity(Rkbar.rows(), Rkbar.rows()))
             .llt()
             .matrixL();
-  double logdetcholHk = Rktilde.diagonal().array().log().sum()
+  double logdetcholHk = L_approx.diagonal().array().log().sum()
                         + 0.5 * alpha.array().log().sum();
   Eigen::VectorXd ninvRSTg = ninvRST * grad_est;
   Eigen::VectorXd x_center_tmp
@@ -284,7 +231,25 @@ inline auto form_n_apx_taylor_sparse(const Eigen::MatrixXd& Ykt_mat,
         + ninvRSTg.transpose() * ykt_mat_cprod * ninvRSTg.transpose();
   Eigen::VectorXd x_center = point_est - x_center_tmp;
 
-  return std::make_tuple();
+  return sample_pkg_t{std::move(x_center), logdetcholHk, std::move(L_approx),
+                      std::move(Qk), false};
+}
+
+inline auto form_n_apx_taylor(const Eigen::MatrixXd& Ykt_mat,
+                                     const Eigen::VectorXd& alpha,
+                                     const Eigen::VectorXd& Dk,
+                                     const Eigen::MatrixXd& ninvRST,
+                                     const Eigen::VectorXd& point_est,
+                                     const Eigen::VectorXd& grad_est) {
+  // If twice the current history size is larger than the number of params
+  // use a sparse approximation
+  if (2 * Ykt_mat.size() > Ykt_mat.rows()) {
+    return form_n_apx_taylor_full(Ykt_mat, alpha, Dk, ninvRST, point_est,
+                                  grad_est);
+  } else {
+    return form_n_apx_taylor_sparse(Ykt_mat, alpha, Dk, ninvRST, point_est,
+                                    grad_est);
+  }
 }
 
 inline bool check_cond(const Eigen::VectorXd& Yk, const Eigen::VectorXd& Sk) {
@@ -353,15 +318,30 @@ inline bool check_cond(const Eigen::VectorXd& Yk, const Eigen::VectorXd& Sk) {
  */
 template <class Model>
 inline int pathfinder_lbfgs_single(
-    Model& model, const stan::io::var_context& init, unsigned int random_seed,
-    unsigned int path, double init_radius, int history_size, double init_alpha,
-    double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
-    double tol_param, int num_iterations, bool save_iterations, int refresh,
-    callbacks::interrupt& interrupt, size_t num_elbo_draws, size_t num_draws,
-    size_t num_threads, callbacks::logger& logger,
-    callbacks::writer& init_writer, callbacks::writer& parameter_writer,
-    callbacks::writer& diagnostic_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+    Model& model,
+    const stan::io::var_context& init,
+    unsigned int random_seed,
+    unsigned int path,
+    double init_radius,
+    int history_size,
+    double init_alpha,
+    double tol_obj,
+    double tol_rel_obj,
+    double tol_grad,
+    double tol_rel_grad,
+    double tol_param,
+    int num_iterations,
+    bool save_iterations,
+    int refresh,
+    callbacks::interrupt& interrupt,
+    size_t num_elbo_draws,
+    size_t num_draws,
+    size_t num_threads,
+    callbacks::logger& logger,
+    callbacks::writer& init_writer,
+    callbacks::writer& parameter_writer) {
+    //callbacks::writer& diagnostic_writer) {
+  boost::ecuyer1988 rng = util::create_rng(random_seed, path);
 
   std::vector<int> disc_vector;
   // 1. Sample initial parameters
@@ -369,16 +349,16 @@ inline int pathfinder_lbfgs_single(
       model, init, rng, init_radius, false, logger, init_writer);
   // Setup LBFGS
   std::stringstream lbfgs_ss;
-  using lbfgs_update_t = LBFGSUpdate<double, Eigen::Dynamic>;
-  LSOptions<double> ls_opts;
+  stan::optimization::LSOptions<double> ls_opts;
   ls_opts.alpha0 = init_alpha;
-  ConvergenceOptions<double> conv_opts;
+  stan::optimization::ConvergenceOptions<double> conv_opts;
   conv_opts.tolAbsF = tol_obj;
   conv_opts.tolRelF = tol_rel_obj;
   conv_opts.tolAbsGrad = tol_grad;
   conv_opts.tolRelGrad = tol_rel_grad;
   conv_opts.tolAbsX = tol_param;
   conv_opts.maxIts = num_iterations;
+  using lbfgs_update_t = stan::optimization::LBFGSUpdate<double, Eigen::Dynamic>;
   lbfgs_update_t lbfgs_update(history_size);
   using Optimizer = stan::optimization::BFGSLineSearch<Model, lbfgs_update_t>;
   Optimizer lbfgs(model, cont_vector, disc_vector, ls_opts, conv_opts,
@@ -397,7 +377,7 @@ inline int pathfinder_lbfgs_single(
    * objective function, and factorization of covariance estimation
    */
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> lbfgs_iters;
-  lbfgs_iters.reserve(max_iter);
+  lbfgs_iters.reserve(num_iterations);
   int ret = 0;
 
   while (ret == 0) {
@@ -415,7 +395,7 @@ inline int pathfinder_lbfgs_single(
           "  Notes ");
     // TODO: Need to get out pathfinder_lbfgs_iter_t every step
     ret = lbfgs.step();
-    lp = lbfgs.logp();
+    double lp = lbfgs.logp();
     lbfgs.params_r(cont_vector);
 
     if (refresh > 0
@@ -447,8 +427,8 @@ inline int pathfinder_lbfgs_single(
     if (msg.str().length() > 0) {
       logger.info(msg);
     }
-
-    lbfgs_iters.emplace_back(values, lbfgs.curr_g());
+    Eigen::VectorXd value_vec = Eigen::Map<Eigen::VectorXd>(values.data(), values.size());
+    lbfgs_iters.emplace_back(value_vec, lbfgs.curr_g());
 
     if (save_iterations) {
       values.insert(values.begin(), lp);
@@ -458,15 +438,17 @@ inline int pathfinder_lbfgs_single(
 
   // 3. For each L-BFGS iteration `num_iterations`
   Eigen::VectorXd lambda(lbfgs_iters.size());
-  Eigen::VectorXd E = Eigen::VectorXd::Ones();
+  Eigen::VectorXd E = Eigen::VectorXd::Ones(cont_vector.size());
   boost::circular_buffer<Eigen::VectorXd> Ykt_h(history_size);
   boost::circular_buffer<Eigen::VectorXd> Skt_h(history_size);
   double div_max = std::numeric_limits<double>::min();
-  for (size_t iter = 0; iter < lbfgs_iters; iter++) {
+  div_est_t DIV_fit_best;
+  sample_pkg_t sample_pkg_best;
+  for (size_t iter = 0; iter < lbfgs_iters.size(); iter++) {
     Eigen::VectorXd Ykt
-        = std::get<1>(lbfgs_iters[i]) - std::get<1>(lbfgs_iters[i + 1]);
+        = std::get<1>(lbfgs_iters[iter]) - std::get<1>(lbfgs_iters[iter + 1]);
     Eigen::VectorXd Skt
-        = std::get<0>(lbfgs_iters[i]) - std::get<0>(lbfgs_iters[i + 1]);
+        = std::get<0>(lbfgs_iters[iter]) - std::get<0>(lbfgs_iters[iter + 1]);
     if (check_cond(Ykt, Skt)) {
       // initial estimate of diagonal inverse Hessian
       E = form_init_diag(E.array(), Ykt.array(), Skt.array());
@@ -510,39 +492,49 @@ inline int pathfinder_lbfgs_single(
      * approximation and log density of draws in the approximate normal
      * distribution
      */
-    sample_pkg_t taylor_appx_tuple;
-    if (2 * m >= param_size) {
-      taylor_appx_tuple = form_n_apx_taylor_full(
-          Ykt_mat, alpha, Dk, ninvRST, std::get<0>(lbfgs_iters[i]),
-          std::get<1>(lbfgs_iters[i]));
-    } else {
-      taylor_appx_tuple = form_n_apx_taylor_sparse(
-          Ykt_mat, alpha, Dk, ninvRST, std::get<1>(lbfgs_iters[i]),
-          std::get<1>(lbfgs_iters[i]));
-    }
-    if (ill_distr) {
+    sample_pkg_t taylor_appx_tuple = form_n_apx_taylor_full(
+        Ykt_mat, E, Dk, ninvRST, std::get<0>(lbfgs_iters[iter]),
+        std::get<1>(lbfgs_iters[iter]));
+    bool ill_distr = false;
+    if (ill_distr) {// Ignore this for now || stan::math::is_nan(std::get<0>(sample_pkg[1]))) {
       continue;
     }
-    if (is_na(sample_pkg[1])) {
-      continue;
-    }
-    DIV_fit = est_DIV(sample_pkg, N_sam_DIV, fn,
-                      label = "ELBO")  //#lCDIV #lADIV  #lIKL #ELBO
+    auto fn = [&model](auto u) {
+      return 1.0;
+    };
+    //#lCDIV #lADIV  #lIKL #ELBO
+    auto DIV_fit = est_DIV(taylor_appx_tuple, num_elbo_draws, E, fn, "ELBO", rng);
         // TODO: Calculate total function calls
         // fn_call = fn_call + DIV_fit$fn_calls_DIV
         // DIV_ls = c(DIV_ls, DIV_fit$DIV)
         //  4. Find $l \in L$ that maximizes ELBO $l^* = arg max_l ELBO^(l)$.
-        if (DIV_fit.DIV_ > DIV_max) {
-      DIV_max = DIV_fit$DIV DIV_fit_pick = DIV_fit sample_pkg_pick = sample_pkg
+    if (DIV_fit.DIV > div_max) {
+      div_max = DIV_fit.DIV;
+      DIV_fit_best = DIV_fit;
+      sample_pkg_best = taylor_appx_tuple;
     }
   }
-  /**
-   * 5. Run bfgs-Sample to return `num_draws` draws from ELBO-maximizing normal
-   * approx and log density of draws in ELBO-maximizing normal approximation.
-   */
-  std::tuple<Eigen::MatrixXd, Eigen::VectorXd> final_samples
-      = Sam_N_apx(sample_pkg_pick, num_draws, rng);
-  return return_code;
+  // Generate upto N_sam samples from the best approximating Normal ##
+  if (num_draws > DIV_fit_best.fn_draws.size()) {
+    auto draws_N_apx = Sam_N_apx(sample_pkg_best,
+                             num_draws - DIV_fit_best.fn_draws.size(), E, rng);
+
+    // update the samples in DIV_save ##
+    /* Stuff to print
+    DIV_save$repeat_draws <- cbind(DIV_save$repeat_draws, draws_N_apx$samples)
+    DIV_save$lp_approx_draws <- c(DIV_save$lp_approx_draws,
+                                  draws_N_apx$lp_apx_draws)
+    */
+  }
+  /* Stuff to print
+return(list(sample_pkg_save = sample_pkg_save,
+            DIV_save = DIV_save,
+            y = y,
+            fn_call = fn_call,
+            gr_call = gr_call,
+            status = "samples"))
+            */
+  return 1;
 }
 
 }  // namespace optimize
