@@ -97,12 +97,6 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
    known_theta_tilde_sd << 1.0034803, 0.9962264, 0.9927524, 0.9934484, 1.0353772, 1.0122802, 0.9880471, 1.1189115;
 
  Eigen::MatrixXd param_vals = parameter.values_.transpose();
- std::cout << "Values: \n"
-           << param_vals.format(CommaInitFmt) << "\n";
-  Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
-  std::cout << "Mean Values: \n"
-            << mean_vals.format(CommaInitFmt) << "\n";
-  std::cout << "SD Values: \n" << ((param_vals.rowwise() - mean_vals).array().square().matrix().colwise().sum().array() / (param_vals.rows() - 1)).sqrt() << "\n";
 
   std::cout << "\n --- Optim Path ---" << std::endl;
   for (Eigen::Index i = 0; i < diagnostics.optim_path_.size(); ++i) {
@@ -111,6 +105,14 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
     tmp.row(1) = std::get<1>(diagnostics.optim_path_[i]);
     std::cout << "Iter: " << i << "\n" << tmp << "\n";
   }
+  std::cout << "---- Results  -------" << std::endl;
+  std::cout << "Values: \n"
+            << param_vals.format(CommaInitFmt) << "\n";
+   Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
+   std::cout << "Mean Values: \n"
+             << mean_vals.format(CommaInitFmt) << "\n";
+   std::cout << "SD Values: \n" << ((param_vals.rowwise() - mean_vals).array().square().matrix().colwise().sum().array() / (param_vals.rows() - 1)).sqrt() << "\n";
+
 //            (().array()).square().sum()/(param_vals.rows() - 1)).sqrt();
   /*
     EXPECT_EQ(logger.call_count(), logger.call_count_info())
