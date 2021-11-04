@@ -60,7 +60,7 @@ inline auto form_init_diag(const Eigen::Array<double, -1, 1>& E0,
             - a * (Sk / E0).square() / (Sk.square() / E0).sum());
 }
 
-struct sample_pkg_t {
+struct taylor_approx_t {
   Eigen::VectorXd x_center;
   double logdetcholHk;
   Eigen::MatrixXd L_approx;
@@ -77,33 +77,34 @@ struct div_est_t {
 };
 
 template <typename Generator>
-inline auto calc_u_u2(Generator& rnorm, const sample_pkg_t& sample_pkg,
+inline auto calc_u_u2(Generator& rnorm, const taylor_approx_t& taylor_approx,
                       const Eigen::VectorXd& alpha) {
-  if (sample_pkg.use_full) {
+  if (taylor_approx.use_full) {
     Eigen::MatrixXd u = rnorm().eval();
-    Eigen::MatrixXd u2
-        = (crossprod(sample_pkg.L_approx, u).colwise() + sample_pkg.x_center)
-              .eval();
+    Eigen::MatrixXd u2 = (crossprod(taylor_approx.L_approx, u).colwise()
+                          + taylor_approx.x_center)
+                             .eval();
     return std::make_tuple(std::move(u), std::move(u2));
   } else {
     Eigen::MatrixXd u = rnorm().eval();
-    Eigen::MatrixXd u1 = crossprod(sample_pkg.Qk, u).eval();
-    Eigen::MatrixXd u22 = (sample_pkg.Qk * crossprod(sample_pkg.L_approx, u1)
-                           + (u - sample_pkg.Qk * u1));
+    Eigen::MatrixXd u1 = crossprod(taylor_approx.Qk, u).eval();
+    Eigen::MatrixXd u22
+        = (taylor_approx.Qk * crossprod(taylor_approx.L_approx, u1)
+           + (u - taylor_approx.Qk * u1));
     Eigen::MatrixXd u2
         = ((alpha.array().inverse().sqrt().matrix().asDiagonal() * u22)
                .colwise()
-           + sample_pkg.x_center)
+           + taylor_approx.x_center)
               .eval();
     return std::make_tuple(std::move(u), std::move(u2));
   }
 }
 
 template <typename SamplePkg, typename F, typename BaseRNG>
-auto est_DIV(const SamplePkg& sample_pkg, size_t num_samples,
+auto est_DIV(const SamplePkg& taylor_approx, size_t num_samples,
              const Eigen::VectorXd& alpha, F&& fn, const char* label,
              BaseRNG& rng) {
-  const auto D = sample_pkg.x_center.size();
+  const auto D = taylor_approx.x_center.size();
   int draw_ind = 1;
   int fn_calls_DIV = 0;
   boost::variate_generator<BaseRNG&, boost::normal_distribution<>>
@@ -112,7 +113,7 @@ auto est_DIV(const SamplePkg& sample_pkg, size_t num_samples,
     return Eigen::MatrixXd::NullaryExpr(
         D, num_samples, [&rand_unit_gaus]() { return rand_unit_gaus(); });
   };
-  auto tuple_u = calc_u_u2(rnorm, sample_pkg, alpha);
+  auto tuple_u = calc_u_u2(rnorm, taylor_approx, alpha);
   auto&& u = std::get<0>(tuple_u);
   auto&& u2 = std::get<1>(tuple_u);
   // skip bad samples
@@ -126,7 +127,7 @@ auto est_DIV(const SamplePkg& sample_pkg, size_t num_samples,
   }
   Eigen::VectorXd fn_draws = f_test_DIV;
   Eigen::VectorXd lp_approx_draws
-      = -sample_pkg.logdetcholHk - 0.5 * u.array().square().colwise().sum()
+      = -taylor_approx.logdetcholHk - 0.5 * u.array().square().colwise().sum()
         - 0.5 * D * log(2 * 3.14);  // NOTE THIS NEEDS TO BE pi()
   Eigen::MatrixXd repeat_draws = u2;
   //### Divergence estimation ###
@@ -139,10 +140,10 @@ auto est_DIV(const SamplePkg& sample_pkg, size_t num_samples,
 }
 
 template <typename SamplePkg, typename BaseRNG>
-inline auto approximation_samples(const SamplePkg& sample_pkg,
+inline auto approximation_samples(const SamplePkg& taylor_approx,
                                   size_t num_samples,
                                   const Eigen::VectorXd& alpha, BaseRNG&& rng) {
-  const Eigen::Index num_params = sample_pkg.x_center.size();
+  const Eigen::Index num_params = taylor_approx.x_center.size();
   boost::variate_generator<BaseRNG&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
   auto rnorm = [&rand_unit_gaus, num_params, num_samples]() {
@@ -150,10 +151,10 @@ inline auto approximation_samples(const SamplePkg& sample_pkg,
         num_params, num_samples,
         [&rand_unit_gaus]() { return rand_unit_gaus(); });
   };
-  auto tuple_u = calc_u_u2(rnorm, sample_pkg, alpha);
+  auto tuple_u = calc_u_u2(rnorm, taylor_approx, alpha);
   using map_t = Eigen::Map<Eigen::MatrixXd>;
   Eigen::VectorXd lp_approx_draws
-      = -sample_pkg.logdetcholHk
+      = -taylor_approx.logdetcholHk
         - 0.5
               * map_t(std::get<0>(tuple_u).data(), num_params, num_samples)
                     .array()
@@ -167,12 +168,10 @@ inline auto approximation_samples(const SamplePkg& sample_pkg,
   return final_params;
 }
 
-inline auto form_n_apx_taylor_full(const Eigen::MatrixXd& Ykt_matt,
-                                   const Eigen::VectorXd& alpha,
-                                   const Eigen::VectorXd& Dk,
-                                   const Eigen::MatrixXd& ninvRST,
-                                   const Eigen::VectorXd& point_est,
-                                   const Eigen::VectorXd& grad_est) {
+inline auto construct_taylor_approximation_full(
+    const Eigen::MatrixXd& Ykt_matt, const Eigen::VectorXd& alpha,
+    const Eigen::VectorXd& Dk, const Eigen::MatrixXd& ninvRST,
+    const Eigen::VectorXd& point_est, const Eigen::VectorXd& grad_est) {
   auto& Ykt_mat = Ykt_matt.transpose();
   /*
   Eigen::MatrixXd ykt_mat_cprod
@@ -196,16 +195,14 @@ inline auto form_n_apx_taylor_full(const Eigen::MatrixXd& Ykt_matt,
   auto logdetcholHk = 2.0 * std::log(cholHk.determinant());
 
   Eigen::VectorXd x_center = point_est - Hk * grad_est;
-  return sample_pkg_t{std::move(x_center), logdetcholHk, std::move(cholHk),
-                      Eigen::MatrixXd(0, 0), true};
+  return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(cholHk),
+                         Eigen::MatrixXd(0, 0), true};
 }
 
-inline auto form_n_apx_taylor_sparse(const Eigen::MatrixXd& Ykt_matt,
-                                     const Eigen::VectorXd& alpha,
-                                     const Eigen::VectorXd& Dk,
-                                     const Eigen::MatrixXd& ninvRST,
-                                     const Eigen::VectorXd& point_est,
-                                     const Eigen::VectorXd& grad_est) {
+inline auto construct_taylor_approximation_sparse(
+    const Eigen::MatrixXd& Ykt_matt, const Eigen::VectorXd& alpha,
+    const Eigen::VectorXd& Dk, const Eigen::MatrixXd& ninvRST,
+    const Eigen::VectorXd& point_est, const Eigen::VectorXd& grad_est) {
   auto Ykt_mat = Ykt_matt.transpose().eval();
   const Eigen::Index m = Ykt_mat.rows();
   Eigen::MatrixXd Wkbart(Ykt_mat.rows() + ninvRST.rows(), Ykt_mat.cols());
@@ -259,24 +256,24 @@ inline auto form_n_apx_taylor_sparse(const Eigen::MatrixXd& Ykt_matt,
         + ninvRSTg.transpose() * blah * ninvRSTg.transpose();
   Eigen::VectorXd x_center = point_est - x_center_tmp;
 
-  return sample_pkg_t{std::move(x_center), logdetcholHk, std::move(L_approx),
-                      std::move(Qk), false};
+  return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(L_approx),
+                         std::move(Qk), false};
 }
 
-inline auto form_n_apx_taylor(const Eigen::MatrixXd& Ykt_mat,
-                              const Eigen::VectorXd& alpha,
-                              const Eigen::VectorXd& Dk,
-                              const Eigen::MatrixXd& ninvRST,
-                              const Eigen::VectorXd& point_est,
-                              const Eigen::VectorXd& grad_est) {
+inline auto construct_taylor_approximation(const Eigen::MatrixXd& Ykt_mat,
+                                           const Eigen::VectorXd& alpha,
+                                           const Eigen::VectorXd& Dk,
+                                           const Eigen::MatrixXd& ninvRST,
+                                           const Eigen::VectorXd& point_est,
+                                           const Eigen::VectorXd& grad_est) {
   // If twice the current history size is larger than the number of params
   // use a sparse approximation
   if (2 * Ykt_mat.size() > Ykt_mat.rows()) {
-    return form_n_apx_taylor_full(Ykt_mat, alpha, Dk, ninvRST, point_est,
-                                  grad_est);
+    return construct_taylor_approximation_full(Ykt_mat, alpha, Dk, ninvRST,
+                                               point_est, grad_est);
   } else {
-    return form_n_apx_taylor_sparse(Ykt_mat, alpha, Dk, ninvRST, point_est,
-                                    grad_est);
+    return construct_taylor_approximation_sparse(Ykt_mat, alpha, Dk, ninvRST,
+                                                 point_est, grad_est);
   }
 }
 
@@ -467,7 +464,7 @@ inline int pathfinder_lbfgs_single(
   boost::circular_buffer<Eigen::VectorXd> Skt_h(history_size);
   double div_max = std::numeric_limits<double>::min();
   div_est_t DIV_fit_best;
-  sample_pkg_t sample_pkg_best;
+  taylor_approx_t taylor_approx_best;
   for (size_t iter = 0; iter < lbfgs_iters.size() - 1; iter++) {
     Eigen::VectorXd Ykt
         = std::get<1>(lbfgs_iters[iter]) - std::get<1>(lbfgs_iters[iter + 1]);
@@ -517,12 +514,12 @@ inline int pathfinder_lbfgs_single(
      * approximation and log density of draws in the approximate normal
      * distribution
      */
-    sample_pkg_t taylor_appx_tuple = form_n_apx_taylor(
+    taylor_approx_t taylor_appx_tuple = construct_taylor_approximation(
         Ykt_mat, E, Dk, ninvRST, std::get<0>(lbfgs_iters[iter]),
         std::get<1>(lbfgs_iters[iter]));
     bool ill_distr = false;
     if (ill_distr) {  // Ignore this for now ||
-                      // stan::math::is_nan(std::get<0>(sample_pkg[1]))) {
+                      // stan::math::is_nan(std::get<0>(taylor_approx[1]))) {
       continue;
     }
     auto fn = [&model, &disc_vector](auto&& u) {
@@ -539,12 +536,13 @@ inline int pathfinder_lbfgs_single(
     if (DIV_fit.DIV > div_max) {
       div_max = DIV_fit.DIV;
       DIV_fit_best = DIV_fit;
-      sample_pkg_best = taylor_appx_tuple;
+      taylor_approx_best = taylor_appx_tuple;
     }
   }
 
   // Generate upto num_samples samples from the best approximating Normal ##
-  auto draws_N_apx = approximation_samples(sample_pkg_best, num_draws, E, rng);
+  auto draws_N_apx
+      = approximation_samples(taylor_approx_best, num_draws, E, rng);
   parameter_writer(draws_N_apx);
   // update the samples in DIV_save ##
   /* Stuff to print
@@ -554,7 +552,7 @@ inline int pathfinder_lbfgs_single(
   */
 
   /* Stuff to print
-return(list(sample_pkg_save = sample_pkg_save,
+return(list(taylor_approx_save = taylor_approx_save,
             DIV_save = DIV_save,
             y = y,
             fn_call = fn_call,
