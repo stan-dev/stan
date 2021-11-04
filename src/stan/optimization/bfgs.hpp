@@ -141,7 +141,6 @@ class BFGSMinimizer {
     const LSOptions<double>& ls_opt, const ConvergenceOptions<double>& conv_opt,
     const QNUpdateType& updater) :
      _func(f), _qn(updater), _ls_opts(ls_opt), _conv_opts(conv_opt) {
-       initialize(params_r);
      }
 
   template <typename Vec, require_vector_t<Vec>* = nullptr>

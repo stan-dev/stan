@@ -1,6 +1,7 @@
 #ifndef STAN_CALLBACKS_WRITER_HPP
 #define STAN_CALLBACKS_WRITER_HPP
 
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <boost/lexical_cast.hpp>
 #include <string>
 #include <vector>
@@ -45,6 +46,8 @@ class writer {
    * @param[in] message A string
    */
   virtual void operator()(const std::string& message) {}
+
+  virtual void operator()(const Eigen::MatrixXd& values) {}
 };
 
 }  // namespace callbacks

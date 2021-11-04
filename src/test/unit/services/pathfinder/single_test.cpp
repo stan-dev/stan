@@ -16,7 +16,7 @@ class values : public stan::callbacks::stream_writer {
  public:
   std::vector<std::string> names_;
   std::vector<std::vector<double> > states_;
-
+  Eigen::MatrixXd values_;
   values(std::ostream& stream) : stan::callbacks::stream_writer(stream) {}
 
   /**
@@ -34,17 +34,22 @@ class values : public stan::callbacks::stream_writer {
   void operator()(const std::vector<double>& state) {
     states_.push_back(state);
   }
+  void operator()(const Eigen::MatrixXd& vals) { values_ = vals; }
 };
 
 class ServicesPathfinderSingle : public testing::Test {
  public:
   ServicesPathfinderSingle()
-      : init(init_ss), parameter(parameter_ss), model(context, 0, &model_ss) {}
+      : init(init_ss),
+        parameter(parameter_ss),
+        diagnostics(diagnostic_ss),
+        model(context, 0, &model_ss) {}
 
-  std::stringstream init_ss, parameter_ss, model_ss;
+  std::stringstream init_ss, parameter_ss, diagnostic_ss, model_ss;
   stan::callbacks::stream_writer init;
   stan::test::unit::instrumented_logger logger;
   values parameter;
+  values diagnostics;
   stan::io::empty_var_context context;
   stan_model model;
 };
@@ -59,53 +64,39 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   mock_callback callback;
 
   int return_code = stan::services::optimize::pathfinder_lbfgs_single(
-      model,
-      context,
-      seed,
-      chain,
-      init_radius,
-      5,
-      0.001,
-      1e-12,
-      10000,
-      1e-8,
-      10000000,
-      1e-8,
-      2000,
-      save_iterations,
-      refresh,
-      callback,
-      500,
-      500,
-      1,
-      logger,
-      init,
-      parameter);
-/*
-  EXPECT_EQ(logger.call_count(), logger.call_count_info())
-      << "all output to info";
-  EXPECT_EQ(1, logger.find("Initial log joint probability = -1"));
-  EXPECT_EQ(1, logger.find("Optimization terminated normally: "));
-  EXPECT_EQ(1, logger.find("  Convergence detected: relative gradient "
-                           "magnitude is below tolerance"));
+      model, context, seed, chain, init_radius, 5, 0.001, 1e-12, 10000, 1e-8,
+      10000000, 1e-8, 2000, save_iterations, refresh, callback, 500, 500, 1,
+      logger, init, parameter, diagnostics);
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
+                               "", "");
 
-  EXPECT_EQ("0,0\n", init_ss.str());
+  std::cout << "Values: \n"
+            << parameter.values_.transpose().format(CommaInitFmt) << "\n";
+  /*
+    EXPECT_EQ(logger.call_count(), logger.call_count_info())
+        << "all output to info";
+    EXPECT_EQ(1, logger.find("Initial log joint probability = -1"));
+    EXPECT_EQ(1, logger.find("Optimization terminated normally: "));
+    EXPECT_EQ(1, logger.find("  Convergence detected: relative gradient "
+                             "magnitude is below tolerance"));
 
-  ASSERT_EQ(3, parameter.names_.size());
-  EXPECT_EQ("lp__", parameter.names_[0]);
-  EXPECT_EQ("x", parameter.names_[1]);
-  EXPECT_EQ("y", parameter.names_[2]);
+    EXPECT_EQ("0,0\n", init_ss.str());
 
-  EXPECT_EQ(23, parameter.states_.size());
-  EXPECT_FLOAT_EQ(0, parameter.states_.front()[1])
-      << "initial value should be (0, 0)";
-  EXPECT_FLOAT_EQ(0, parameter.states_.front()[2])
-      << "initial value should be (0, 0)";
-  EXPECT_FLOAT_EQ(0.99998301, parameter.states_.back()[1])
-      << "optimal value should be (1, 1)";
-  EXPECT_FLOAT_EQ(0.99996597, parameter.states_.back()[2])
-      << "optimal value should be (1, 1)";
-  EXPECT_FLOAT_EQ(return_code, 0);
-  EXPECT_EQ(22, callback.n);
-*/
+    ASSERT_EQ(3, parameter.names_.size());
+    EXPECT_EQ("lp__", parameter.names_[0]);
+    EXPECT_EQ("x", parameter.names_[1]);
+    EXPECT_EQ("y", parameter.names_[2]);
+
+    EXPECT_EQ(23, parameter.states_.size());
+    EXPECT_FLOAT_EQ(0, parameter.states_.front()[1])
+        << "initial value should be (0, 0)";
+    EXPECT_FLOAT_EQ(0, parameter.states_.front()[2])
+        << "initial value should be (0, 0)";
+    EXPECT_FLOAT_EQ(0.99998301, parameter.states_.back()[1])
+        << "optimal value should be (1, 1)";
+    EXPECT_FLOAT_EQ(0.99996597, parameter.states_.back()[2])
+        << "optimal value should be (1, 1)";
+    EXPECT_FLOAT_EQ(return_code, 0);
+    EXPECT_EQ(22, callback.n);
+  */
 }
