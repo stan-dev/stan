@@ -27,7 +27,10 @@ inline Eigen::MatrixXd crossprod(T1&& x, T2&& y) {
 
 template <typename T1>
 inline Eigen::MatrixXd crossprod(T1&& x) {
-  return Eigen::MatrixXd(x.cols(), x.cols()).setZero().selfadjointView<Eigen::Lower>().rankUpdate(x.adjoint());
+  return Eigen::MatrixXd(x.cols(), x.cols())
+      .setZero()
+      .selfadjointView<Eigen::Lower>()
+      .rankUpdate(x.adjoint());
 }
 
 template <typename T1, typename T2>
@@ -37,7 +40,10 @@ inline Eigen::MatrixXd tcrossprod(T1&& x, T2&& y) {
 
 template <typename T1>
 inline Eigen::MatrixXd tcrossprod(T1&& x) {
-  return Eigen::MatrixXd(x.rows(), x.rows()).setZero().selfadjointView<Eigen::Lower>().rankUpdate(x);
+  return Eigen::MatrixXd(x.rows(), x.rows())
+      .setZero()
+      .selfadjointView<Eigen::Lower>()
+      .rankUpdate(x);
 }
 /*
 
@@ -59,7 +65,10 @@ inline auto form_init_diag(const Eigen::Array<double, -1, 1>& E0,
   double thetak = yk_sq.sum() / Dk;
   double a = ((E0 * yk_sq).sum() / Dk);
   return (a / E0 + yk_sq / Dk
-            - a * (Sk / E0).square() / (Sk.square() / E0).sum()).inverse().matrix().eval();
+          - a * (Sk / E0).square() / (Sk.square() / E0).sum())
+      .inverse()
+      .matrix()
+      .eval();
 }
 
 struct taylor_approx_t {
@@ -68,6 +77,12 @@ struct taylor_approx_t {
   Eigen::MatrixXd L_approx;
   Eigen::MatrixXd Qk;
   bool use_full;
+  Eigen::MatrixXd wkbart;
+  Eigen::MatrixXd mkbart;
+  Eigen::VectorXd point_est;
+  Eigen::VectorXd grad_est;
+  Eigen::MatrixXd ninvRST;
+  Eigen::MatrixXd Rkbar;
 };
 
 struct div_est_t {
@@ -79,39 +94,34 @@ struct div_est_t {
 };
 
 template <typename Generator>
-inline auto calc_u_u2(Generator& rnorm, const taylor_approx_t& taylor_approx,
-                      const Eigen::VectorXd& alpha) {
+inline auto calc_u_u2(Generator& rnorm, const taylor_approx_t& taylor_approx, const Eigen::VectorXd& alpha) {
+  Eigen::MatrixXd u = rnorm().eval();
   if (taylor_approx.use_full) {
-    Eigen::MatrixXd u = rnorm().eval();
-    Eigen::MatrixXd u2 = crossprod(taylor_approx.L_approx.template triangularView<Eigen::Lower>(), u).colwise()
-                          + taylor_approx.x_center;
+    Eigen::MatrixXd u2
+        = crossprod(
+              taylor_approx.L_approx, u)
+              .colwise()
+          + taylor_approx.x_center;
     return std::make_tuple(std::move(u), std::move(u2));
   } else {
-    Eigen::MatrixXd u = rnorm().eval();
-    Eigen::MatrixXd u1 = crossprod(taylor_approx.Qk, u).eval();
+    Eigen::MatrixXd u1 = crossprod(taylor_approx.Qk, u);
     Eigen::MatrixXd u2
-        = (alpha.array().inverse().sqrt().matrix().asDiagonal() * (taylor_approx.Qk * crossprod(taylor_approx.L_approx.template triangularView<Eigen::Lower>(), u1)
-           + (u - taylor_approx.Qk * u1)))
-               .colwise()
-           + taylor_approx.x_center
-              .eval();
+        = (alpha.array().sqrt().matrix().asDiagonal()
+           * (taylor_approx.Qk
+                  * crossprod(taylor_approx.L_approx,
+                              u1)
+              + (u - taylor_approx.Qk * u1)))
+              .colwise()
+          + taylor_approx.x_center;
     return std::make_tuple(std::move(u), std::move(u2));
   }
 }
 
 template <typename SamplePkg, typename F, typename BaseRNG>
-auto est_DIV(const SamplePkg& taylor_approx, size_t num_samples,
-             const Eigen::VectorXd& alpha, F&& fn,
-             BaseRNG& rng) {
+auto est_DIV(const SamplePkg& taylor_approx, size_t num_samples, const Eigen::VectorXd& alpha, F&& fn, BaseRNG&& rnorm) {
   const auto D = taylor_approx.x_center.size();
   int draw_ind = 1;
   int fn_calls_DIV = 0;
-  boost::variate_generator<BaseRNG&, boost::normal_distribution<>>
-      rand_unit_gaus(rng, boost::normal_distribution<>());
-  auto rnorm = [&rand_unit_gaus, D, num_samples]() {
-    return Eigen::MatrixXd::NullaryExpr(
-        D, num_samples, [&rand_unit_gaus]() { return rand_unit_gaus(); });
-  };
   auto tuple_u = calc_u_u2(rnorm, taylor_approx, alpha);
   auto&& u = std::get<0>(tuple_u);
   auto&& u2 = std::get<1>(tuple_u);
@@ -136,27 +146,9 @@ auto est_DIV(const SamplePkg& taylor_approx, size_t num_samples,
 }
 
 template <typename SamplePkg, typename BaseRNG>
-inline auto approximation_samples(const SamplePkg& taylor_approx,
-                                  size_t num_samples,
-                                  const Eigen::VectorXd& alpha, BaseRNG&& rng) {
+inline auto approximation_samples(const SamplePkg& taylor_approx, size_t num_samples, const Eigen::VectorXd& alpha, BaseRNG&& rnorm) {
   const Eigen::Index num_params = taylor_approx.x_center.size();
-  boost::variate_generator<BaseRNG&, boost::normal_distribution<>>
-      rand_unit_gaus(rng, boost::normal_distribution<>());
-  auto rnorm = [&rand_unit_gaus, num_params, num_samples]() {
-    return Eigen::MatrixXd::NullaryExpr(
-        num_params, num_samples,
-        [&rand_unit_gaus]() { return rand_unit_gaus(); });
-  };
   auto tuple_u = calc_u_u2(rnorm, taylor_approx, alpha);
-  /*
-  std::cout << "Taylor: \n";
-  std::cout << "x_center: \n" << taylor_approx_best.x_center << "\n";
-  std::cout << "logdetcholHk: \n" << taylor_approx_best.logdetcholHk << "\n";
-  std::cout << "L_approx: \n" << taylor_approx_best.L_approx << "\n";
-  std::cout << "Qk: \n" << taylor_approx_best.Qk << "\n";
-  */
-//  std::cout << "u: \n" << std::get<0>(tuple_u) << "\n";
-//std::cout << "u2: \n" << std::get<1>(tuple_u) << "\n";
 
   using map_t = Eigen::Map<Eigen::MatrixXd>;
   Eigen::VectorXd lp_approx_draws
@@ -183,18 +175,18 @@ inline auto construct_taylor_approximation_full(
       Ykt_mat
       * alpha.head(Ykt_mat.cols()).array().sqrt().matrix().asDiagonal());
   y_tcrossprod_alpha += Dk.asDiagonal();
-  Eigen::MatrixXd y_mul_alpha = Ykt_mat * alpha.head(Ykt_mat.cols()).asDiagonal();
-  Eigen::MatrixXd Hk
-      = crossprod(y_mul_alpha, ninvRST)
-        + crossprod(ninvRST, y_mul_alpha)
-        + crossprod(ninvRST, y_tcrossprod_alpha * ninvRST);
+  Eigen::MatrixXd y_mul_alpha
+      = Ykt_mat * alpha.head(Ykt_mat.cols()).asDiagonal();
+  Eigen::MatrixXd Hk = crossprod(y_mul_alpha, ninvRST)
+                       + crossprod(ninvRST, y_mul_alpha)
+                       + crossprod(ninvRST, y_tcrossprod_alpha * ninvRST);
   Hk += alpha.asDiagonal();
   Eigen::MatrixXd cholHk = Hk.llt().matrixL();
   auto logdetcholHk = 2.0 * cholHk.diagonal().array().log().sum();
 
   Eigen::VectorXd x_center = point_est - Hk * grad_est;
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(cholHk),
-                         Eigen::MatrixXd(0, 0), true};
+                         Eigen::MatrixXd(0, 0), true, Eigen::MatrixXd(0, 0), Eigen::MatrixXd(0, 0), point_est, grad_est, ninvRST};
 }
 
 inline auto construct_taylor_approximation_sparse(
@@ -204,17 +196,17 @@ inline auto construct_taylor_approximation_sparse(
   auto Ykt_mat = Ykt_matt.transpose().eval();
   const Eigen::Index m = Ykt_mat.rows();
   Eigen::MatrixXd Wkbart(Ykt_mat.rows() + ninvRST.rows(), Ykt_mat.cols());
-  Eigen::MatrixXd y_mul_sqrt_alpha = Ykt_mat
-  * alpha.head(Ykt_mat.cols()).array().sqrt().matrix().asDiagonal();
-  Wkbart.topRows(Ykt_mat.rows())
-      = y_mul_sqrt_alpha;
+  Eigen::MatrixXd y_mul_sqrt_alpha
+      = Ykt_mat
+        * alpha.head(Ykt_mat.cols()).array().sqrt().matrix().asDiagonal();
+  Wkbart.topRows(Ykt_mat.rows()) = y_mul_sqrt_alpha;
   Wkbart.bottomRows(ninvRST.rows())
       = ninvRST * alpha.array().inverse().sqrt().matrix().asDiagonal();
 
   Eigen::MatrixXd Mkbar(2 * m, 2 * m);
   Mkbar.topLeftCorner(m, m).setZero();
-  Mkbar.topRightCorner(m, m) = Eigen::DiagonalMatrix<double, -1, -1>(m);
-  Mkbar.bottomLeftCorner(m, m) = Eigen::DiagonalMatrix<double, -1, -1>(m);
+  Mkbar.topRightCorner(m, m) = Eigen::MatrixXd::Identity(m, m);
+  Mkbar.bottomLeftCorner(m, m) = Eigen::MatrixXd::Identity(m, m);
   Eigen::MatrixXd y_tcrossprod_alpha = tcrossprod(y_mul_sqrt_alpha);
   y_tcrossprod_alpha += Dk.asDiagonal();
   Mkbar.bottomRightCorner(m, m) = y_tcrossprod_alpha;
@@ -223,7 +215,9 @@ inline auto construct_taylor_approximation_sparse(
   qr.compute(Wkbart.transpose());
   const auto min_size = std::min(Wkbart.rows(), Wkbart.cols());
   Eigen::MatrixXd Rkbar = qr.matrixQR().topLeftCorner(min_size, Wkbart.rows());
+  /*
   for (int i = 0; i < min_size; i++) {
+
     for (int j = 0; j < i; j++) {
       Rkbar.coeffRef(i, j) = 0.0;
     }
@@ -231,30 +225,35 @@ inline auto construct_taylor_approximation_sparse(
       Rkbar.row(i) *= -1.0;
     }
   }
+  */
+  Rkbar.triangularView<Eigen::StrictlyLower>().setZero();
   Eigen::MatrixXd Qk
       = qr.householderQ() * Eigen::MatrixXd::Identity(Wkbart.cols(), min_size);
+  /*
   for (int i = 0; i < min_size; i++) {
     if (qr.matrixQR().coeff(i, i) < 0) {
       Qk.col(i) *= -1.0;
     }
   }
+  */
   Eigen::MatrixXd L_approx
       = (Rkbar * Mkbar * Rkbar.transpose()
          + Eigen::MatrixXd::Identity(Rkbar.rows(), Rkbar.rows()))
             .llt()
-            .matrixL();
+            .matrixL().transpose();
   double logdetcholHk = L_approx.diagonal().array().log().sum()
                         + 0.5 * alpha.array().log().sum();
   Eigen::VectorXd ninvRSTg = ninvRST * grad_est;
   Eigen::VectorXd alpha_mul_grad = (alpha.array() * grad_est.array()).matrix();
-  Eigen::VectorXd x_center_tmp =
-    alpha_mul_grad + (alpha.array() * crossprod(Ykt_mat, ninvRSTg).array()).matrix() +
-    crossprod(ninvRST, Ykt_mat * alpha_mul_grad)  +
-    crossprod(ninvRST, y_tcrossprod_alpha * ninvRSTg);
+  Eigen::VectorXd x_center_tmp
+      = alpha_mul_grad
+        + (alpha.array() * crossprod(Ykt_mat, ninvRSTg).array()).matrix()
+        + crossprod(ninvRST, Ykt_mat * alpha_mul_grad)
+        + crossprod(ninvRST, y_tcrossprod_alpha * ninvRSTg);
   Eigen::VectorXd x_center = point_est - x_center_tmp;
 
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(L_approx),
-                         std::move(Qk), false};
+                         std::move(Qk), false, Wkbart, Mkbar, point_est, grad_est, ninvRST, Rkbar};
 }
 
 inline auto construct_taylor_approximation(const Eigen::MatrixXd& Ykt_mat,
@@ -440,7 +439,8 @@ inline int pathfinder_lbfgs_single(
     }
     std::vector<double> values;
     std::stringstream msg;
-    model.write_array(rng, cont_vector, disc_vector, values, false, false, &msg);
+    model.write_array(rng, cont_vector, disc_vector, values, false, false,
+                      &msg);
     Eigen::VectorXd value_vec
         = Eigen::Map<Eigen::VectorXd>(values.data(), values.size());
     lbfgs_iters.emplace_back(lbfgs.curr_x(), lbfgs.curr_g());
@@ -451,7 +451,7 @@ inline int pathfinder_lbfgs_single(
 
     if (save_iterations) {
       values.insert(values.begin(), lp);
-//      diagnostic_writer(values);
+      //      diagnostic_writer(values);
     }
   }
   diagnostic_writer(lbfgs_iters);
@@ -525,9 +525,16 @@ inline int pathfinder_lbfgs_single(
       return model.template log_prob<false, false>(
           const_cast<std::decay_t<decltype(u)>&>(u), 0);
     };
+    boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
+        rand_unit_gaus(rng, boost::normal_distribution<>());
+    auto rnorm = [&rand_unit_gaus, num_params = E.size(), num_samples = num_draws]() {
+      return Eigen::MatrixXd::NullaryExpr(
+          num_params, num_samples,
+          [&rand_unit_gaus]() { return rand_unit_gaus(); });
+    };
+
     //#lCDIV #lADIV  #lIKL #ELBO
-    auto DIV_fit
-        = est_DIV(taylor_appx_tuple, num_elbo_draws, E, fn, rng);
+    auto DIV_fit = est_DIV(taylor_appx_tuple, num_elbo_draws, E, fn, rnorm);
     // TODO: Calculate total function calls
     // fn_call = fn_call + DIV_fit$fn_calls_DIV
     // DIV_ls = c(DIV_ls, DIV_fit$DIV)
@@ -547,8 +554,16 @@ inline int pathfinder_lbfgs_single(
   std::cout << "L_approx: \n" << taylor_approx_best.L_approx << "\n";
   std::cout << "Qk: \n" << taylor_approx_best.Qk << "\n";
   */
+  boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
+      rand_unit_gaus(rng, boost::normal_distribution<>());
+  auto rnorm = [&rand_unit_gaus, num_params = E.size(), num_samples = num_draws]() {
+    return Eigen::MatrixXd::NullaryExpr(
+        num_params, num_samples,
+        [&rand_unit_gaus]() { return rand_unit_gaus(); });
+  };
+
   auto draws_N_apx
-      = approximation_samples(taylor_approx_best, num_draws, E, rng);
+      = approximation_samples(taylor_approx_best, num_draws, E, rnorm);
 
   parameter_writer(draws_N_apx);
   // update the samples in DIV_save ##
