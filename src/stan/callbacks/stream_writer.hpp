@@ -70,7 +70,10 @@ class stream_writer : public writer {
     }
   }
 
-  inline bool is_empty() const {
+  /**
+   * Check if the writer is writing to an empty stream
+   */
+  inline bool is_empty() const noexcept final {
     return empty_;
   }
 
@@ -86,7 +89,10 @@ class stream_writer : public writer {
    */
   std::string comment_prefix_;
 
-  bool empty_;
+  /**
+   * Used as check for whether output stream needs to be written to.
+   */
+  bool empty_{false};
   /**
    * Writes a set of values in csv format followed by a newline.
    *

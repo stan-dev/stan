@@ -54,7 +54,7 @@ class unique_stream_writer final : public writer {
   /**
    * Get the underlying stream
    */
-  auto& get_stream() { return *output_; }
+  inline auto& get_stream() noexcept { return *output_; }
 
   /**
    * Writes a set of values in csv format followed by a newline.
@@ -92,7 +92,10 @@ class unique_stream_writer final : public writer {
     }
   }
 
-  inline bool is_empty() const {
+  /**
+   * Check if the writer is writing to an empty stream
+   */
+  inline bool is_empty() const noexcept {
     return empty_;
   }
 
@@ -107,6 +110,9 @@ class unique_stream_writer final : public writer {
    */
   std::string comment_prefix_;
 
+  /**
+   * Used as check for whether output stream needs to be written to.
+   */
   bool empty_{false};
   /**
    * Writes a set of values in csv format followed by a newline.

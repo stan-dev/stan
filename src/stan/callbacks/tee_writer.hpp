@@ -49,7 +49,10 @@ class tee_writer final : public writer {
     writer2_(message);
   }
 
-  inline bool is_empty() const {
+  /**
+   * Check if both writers are writing to an empty stream
+   */
+  inline bool is_empty() const noexcept {
     return writer1_.is_empty() && writer2_.is_empty();
   }
 
