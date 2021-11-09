@@ -34,7 +34,9 @@ class mock_writer : public stan::callbacks::writer {
     }
   }
 
-  inline bool is_empty() const noexcept { return false; }
+  inline bool is_empty() const noexcept {
+    return false;
+  }
 };
 }  // namespace test
 
