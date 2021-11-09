@@ -65,7 +65,6 @@ class tee_writer final : public writer {
    * The second writer
    */
   writer& writer2_;
-
 };
 
 }  // namespace callbacks

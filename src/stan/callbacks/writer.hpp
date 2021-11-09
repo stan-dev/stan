@@ -49,9 +49,7 @@ class writer {
   /**
    * Check if the writer is writing to an empty stream
    */
-   virtual bool is_empty() const noexcept {
-     return true;
-   }
+  virtual bool is_empty() const noexcept { return true; }
 };
 
 }  // namespace callbacks

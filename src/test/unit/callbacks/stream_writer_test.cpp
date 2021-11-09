@@ -5,7 +5,10 @@
 class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksStreamWriter()
-      : ss(), writer(ss), writer_prefix(ss, "# "), empty_writer(ss, "# ", true) {}
+      : ss(),
+        writer(ss),
+        writer_prefix(ss, "# "),
+        empty_writer(ss, "# ", true) {}
 
   void SetUp() {
     ss.str(std::string());

@@ -172,15 +172,15 @@ class mcmc_writer {
    */
   void write_diagnostic_params(stan::mcmc::sample& sample,
                                stan::mcmc::base_mcmc& sampler) {
-   if (!diagnostic_writer_.is_empty()) {
-    std::vector<double> values;
+    if (!diagnostic_writer_.is_empty()) {
+      std::vector<double> values;
 
-    sample.get_sample_params(values);
-    sampler.get_sampler_params(values);
-    sampler.get_sampler_diagnostics(values);
+      sample.get_sample_params(values);
+      sampler.get_sampler_params(values);
+      sampler.get_sampler_diagnostics(values);
 
-    diagnostic_writer_(values);
-   }
+      diagnostic_writer_(values);
+    }
   }
 
   /**
