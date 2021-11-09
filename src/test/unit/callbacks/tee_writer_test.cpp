@@ -20,7 +20,7 @@ class mock_writer : public stan::callbacks::writer {
      if (!empty_) {++N;}
   }
 
-  inline bool is_empty() {
+  inline bool is_empty() const noexcept {
     return false;
   }
 };
