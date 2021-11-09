@@ -41,6 +41,10 @@ class instrumented_writer : public stan::callbacks::writer {
  public:
   instrumented_writer() {}
 
+  inline bool is_empty() const noexcept {
+    return false;
+  }
+
   void operator()(const std::string& key, double value) {
     counter_["string_double"]++;
     string_double.push_back(std::make_pair(key, value));

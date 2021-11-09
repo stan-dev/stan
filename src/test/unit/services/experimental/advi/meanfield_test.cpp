@@ -1,8 +1,8 @@
 #include <stan/services/experimental/advi/meanfield.hpp>
-#include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/services/test_lp.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <gtest/gtest.h>
 
 class ServicesExperimentalAdvi : public testing::Test {
  public:
