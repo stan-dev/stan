@@ -5,15 +5,19 @@
 class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksStreamWriter()
-      : writer(std::make_unique<std::stringstream>(std::stringstream{})) {}
+      : writer(std::make_unique<std::stringstream>(std::stringstream{})),
+      empty_writer(std::make_unique<std::stringstream>(std::stringstream{}), "#", true) {}
 
   void SetUp() {
     static_cast<std::stringstream&>(writer.get_stream()).str(std::string());
     static_cast<std::stringstream&>(writer.get_stream()).clear();
+    static_cast<std::stringstream&>(empty_writer.get_stream()).str(std::string());
+    static_cast<std::stringstream&>(empty_writer.get_stream()).clear();
   }
   void TearDown() {}
 
   stan::callbacks::unique_stream_writer<std::ostream> writer;
+  stan::callbacks::unique_stream_writer<std::ostream> empty_writer;
 };
 
 TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {
@@ -25,6 +29,17 @@ TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {
   EXPECT_NO_THROW(writer(x));
   EXPECT_EQ("0,1,2,3,4\n",
             static_cast<std::stringstream&>(writer.get_stream()).str());
+}
+
+TEST_F(StanInterfaceCallbacksStreamWriter, empty_test) {
+  const int N = 5;
+  std::vector<double> x;
+  for (int n = 0; n < N; ++n)
+    x.push_back(n);
+
+  EXPECT_NO_THROW(empty_writer(x));
+  EXPECT_EQ("",
+            static_cast<std::stringstream&>(empty_writer.get_stream()).str());
 }
 
 TEST_F(StanInterfaceCallbacksStreamWriter, double_vector_precision2) {

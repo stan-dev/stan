@@ -49,6 +49,10 @@ class tee_writer final : public writer {
     writer2_(message);
   }
 
+  inline bool is_empty() const {
+    return writer1_.is_empty() && writer2_.is_empty();
+  }
+
  private:
   /**
    * The first writer
@@ -58,6 +62,7 @@ class tee_writer final : public writer {
    * The second writer
    */
   writer& writer2_;
+
 };
 
 }  // namespace callbacks
