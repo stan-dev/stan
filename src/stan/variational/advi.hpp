@@ -462,8 +462,8 @@ class advi {
           callbacks::writer& parameter_writer,
           callbacks::writer& diagnostic_writer) const {
     if (!diagnostic_writer.is_empty()) {
-    diagnostic_writer("iter,time_in_seconds,ELBO");
-  }
+      diagnostic_writer("iter,time_in_seconds,ELBO");
+    }
     // Initialize variational approximation
     Q variational = Q(cont_params_);
 

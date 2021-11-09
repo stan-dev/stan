@@ -24,7 +24,8 @@ class stream_writer : public writer {
    *   each comment line. Default is "".
    */
   explicit stream_writer(std::ostream& output,
-                         const std::string& comment_prefix = "", bool is_empty = false)
+                         const std::string& comment_prefix = "",
+                         bool is_empty = false)
       : output_(output), comment_prefix_(comment_prefix), empty_(is_empty) {}
 
   /**
@@ -57,7 +58,11 @@ class stream_writer : public writer {
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
-  void operator()() { if (!empty_) {output_ << comment_prefix_ << std::endl;} }
+  void operator()() {
+    if (!empty_) {
+      output_ << comment_prefix_ << std::endl;
+    }
+  }
 
   /**
    * Writes the comment_prefix then the message followed by a newline.
@@ -73,10 +78,7 @@ class stream_writer : public writer {
   /**
    * Check if the writer is writing to an empty stream
    */
-  inline bool is_empty() const noexcept final {
-    return empty_;
-  }
-
+  inline bool is_empty() const noexcept final { return empty_; }
 
  private:
   /**

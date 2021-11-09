@@ -10,27 +10,43 @@ class mock_writer : public stan::callbacks::writer {
   mock_writer() : N(0) {}
   mock_writer(bool is_empty) : N(0), empty_(is_empty) {}
 
-  void operator()(const std::vector<std::string>& names) { if (!empty_) {++N;} }
+  void operator()(const std::vector<std::string>& names) {
+    if (!empty_) {
+      ++N;
+    }
+  }
 
-  void operator()(const std::vector<double>& state) { if (!empty_) {++N;} }
+  void operator()(const std::vector<double>& state) {
+    if (!empty_) {
+      ++N;
+    }
+  }
 
-  void operator()() { if (!empty_) {++N;} }
+  void operator()() {
+    if (!empty_) {
+      ++N;
+    }
+  }
 
   void operator()(const std::string& message) {
-     if (!empty_) {++N;}
+    if (!empty_) {
+      ++N;
+    }
   }
 
-  inline bool is_empty() const noexcept {
-    return false;
-  }
+  inline bool is_empty() const noexcept { return false; }
 };
 }  // namespace test
 
 class StanCallbacksTeeWriter : public ::testing::Test {
  public:
   StanCallbacksTeeWriter()
-      : writer1(), writer2(), tee_writer(writer1, writer2),
-      empty_writer1(true), empty_writer2(true), empty_tee_writer(empty_writer1, empty_writer2) {}
+      : writer1(),
+        writer2(),
+        tee_writer(writer1, writer2),
+        empty_writer1(true),
+        empty_writer2(true),
+        empty_tee_writer(empty_writer1, empty_writer2) {}
 
   test::mock_writer writer1, writer2;
   stan::callbacks::tee_writer tee_writer;

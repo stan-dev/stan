@@ -6,12 +6,14 @@ class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksStreamWriter()
       : writer(std::make_unique<std::stringstream>(std::stringstream{})),
-      empty_writer(std::make_unique<std::stringstream>(std::stringstream{}), "#", true) {}
+        empty_writer(std::make_unique<std::stringstream>(std::stringstream{}),
+                     "#", true) {}
 
   void SetUp() {
     static_cast<std::stringstream&>(writer.get_stream()).str(std::string());
     static_cast<std::stringstream&>(writer.get_stream()).clear();
-    static_cast<std::stringstream&>(empty_writer.get_stream()).str(std::string());
+    static_cast<std::stringstream&>(empty_writer.get_stream())
+        .str(std::string());
     static_cast<std::stringstream&>(empty_writer.get_stream()).clear();
   }
   void TearDown() {}

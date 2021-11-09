@@ -27,14 +27,18 @@ class unique_stream_writer final : public writer {
    *  Default is "".
    */
   explicit unique_stream_writer(std::unique_ptr<Stream>&& output,
-                                const std::string& comment_prefix = "", bool is_empty = false)
-      : output_(std::move(output)), comment_prefix_(comment_prefix), empty_(is_empty) {}
+                                const std::string& comment_prefix = "",
+                                bool is_empty = false)
+      : output_(std::move(output)),
+        comment_prefix_(comment_prefix),
+        empty_(is_empty) {}
 
   unique_stream_writer();
   unique_stream_writer(unique_stream_writer& other) = delete;
   unique_stream_writer(unique_stream_writer&& other)
       : output_(std::move(other.output_)),
-        comment_prefix_(std::move(other.comment_prefix_)), empty_(other.empty_) {}
+        comment_prefix_(std::move(other.comment_prefix_)),
+        empty_(other.empty_) {}
   /**
    * Virtual destructor
    */
@@ -75,7 +79,7 @@ class unique_stream_writer final : public writer {
       streamer.precision(output_.get()->precision());
       streamer << comment_prefix_ << std::endl;
       *output_ << streamer.str();
-   }
+    }
   }
 
   /**
@@ -95,9 +99,7 @@ class unique_stream_writer final : public writer {
   /**
    * Check if the writer is writing to an empty stream
    */
-  inline bool is_empty() const noexcept {
-    return empty_;
-  }
+  inline bool is_empty() const noexcept { return empty_; }
 
  private:
   /**
