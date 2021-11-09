@@ -149,17 +149,19 @@ class mcmc_writer {
   template <class Model>
   void write_diagnostic_names(stan::mcmc::sample sample,
                               stan::mcmc::base_mcmc& sampler, Model& model) {
-    std::vector<std::string> names;
+    if (!diagnostic_writer_.is_empty()) {
+      std::vector<std::string> names;
 
-    sample.get_sample_param_names(names);
-    sampler.get_sampler_param_names(names);
+      sample.get_sample_param_names(names);
+      sampler.get_sampler_param_names(names);
 
-    std::vector<std::string> model_names;
-    model.unconstrained_param_names(model_names, false, false);
+      std::vector<std::string> model_names;
+      model.unconstrained_param_names(model_names, false, false);
 
-    sampler.get_sampler_diagnostic_names(model_names, names);
+      sampler.get_sampler_diagnostic_names(model_names, names);
 
-    diagnostic_writer_(names);
+      diagnostic_writer_(names);
+    }
   }
 
   /**
@@ -170,6 +172,7 @@ class mcmc_writer {
    */
   void write_diagnostic_params(stan::mcmc::sample& sample,
                                stan::mcmc::base_mcmc& sampler) {
+   if (!diagnostic_writer_.is_empty()) {
     std::vector<double> values;
 
     sample.get_sample_params(values);
@@ -177,6 +180,7 @@ class mcmc_writer {
     sampler.get_sampler_diagnostics(values);
 
     diagnostic_writer_(values);
+   }
   }
 
   /**
@@ -247,7 +251,9 @@ class mcmc_writer {
    */
   void write_timing(double warmDeltaT, double sampleDeltaT) {
     write_timing(warmDeltaT, sampleDeltaT, sample_writer_);
-    write_timing(warmDeltaT, sampleDeltaT, diagnostic_writer_);
+    if (!diagnostic_writer_.is_empty()) {
+      write_timing(warmDeltaT, sampleDeltaT, diagnostic_writer_);
+    }
     log_timing(warmDeltaT, sampleDeltaT);
   }
 };

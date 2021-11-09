@@ -5,7 +5,7 @@
 class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksStreamWriter()
-      : ss(), writer(ss), writer_prefix(ss, "# ") {}
+      : ss(), writer(ss), writer_prefix(ss, "# "), empty_writer(ss, "# ", true) {}
 
   void SetUp() {
     ss.str(std::string());
@@ -16,6 +16,7 @@ class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
   std::stringstream ss;
   stan::callbacks::stream_writer writer;
   stan::callbacks::stream_writer writer_prefix;
+  stan::callbacks::stream_writer empty_writer;
 };
 
 TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {
@@ -26,6 +27,16 @@ TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {
 
   EXPECT_NO_THROW(writer(x));
   EXPECT_EQ("0,1,2,3,4\n", ss.str());
+}
+
+TEST_F(StanInterfaceCallbacksStreamWriter, empty_vector) {
+  const int N = 5;
+  std::vector<double> x;
+  for (int n = 0; n < N; ++n)
+    x.push_back(n);
+
+  EXPECT_NO_THROW(empty_writer(x));
+  EXPECT_EQ("", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksStreamWriter, string_vector) {

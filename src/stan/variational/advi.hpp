@@ -392,12 +392,14 @@ class advi {
             = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
                   .count()
               / 1000.0;
-        std::vector<double> print_vector;
-        print_vector.clear();
-        print_vector.push_back(iter_counter);
-        print_vector.push_back(delta_t);
-        print_vector.push_back(elbo);
-        diagnostic_writer(print_vector);
+        if (!diagnostic_writer.is_empty()) {
+          std::vector<double> print_vector;
+          print_vector.clear();
+          print_vector.push_back(iter_counter);
+          print_vector.push_back(delta_t);
+          print_vector.push_back(elbo);
+          diagnostic_writer(print_vector);
+        }
 
         if (delta_elbo_ave < tol_rel_obj) {
           ss << "   MEAN ELBO CONVERGED";
@@ -459,8 +461,9 @@ class advi {
           double tol_rel_obj, int max_iterations, callbacks::logger& logger,
           callbacks::writer& parameter_writer,
           callbacks::writer& diagnostic_writer) const {
+    if (!diagnostic_writer.is_empty()) {
     diagnostic_writer("iter,time_in_seconds,ELBO");
-
+  }
     // Initialize variational approximation
     Q variational = Q(cont_params_);
 

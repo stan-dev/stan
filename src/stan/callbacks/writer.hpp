@@ -45,6 +45,13 @@ class writer {
    * @param[in] message A string
    */
   virtual void operator()(const std::string& message) {}
+
+  /**
+   * Check if the writer is writing to an empty stream
+   */
+   virtual bool is_empty() const {
+     return true;
+   }
 };
 
 }  // namespace callbacks

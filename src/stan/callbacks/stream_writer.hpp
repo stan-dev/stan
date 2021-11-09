@@ -24,8 +24,8 @@ class stream_writer : public writer {
    *   each comment line. Default is "".
    */
   explicit stream_writer(std::ostream& output,
-                         const std::string& comment_prefix = "")
-      : output_(output), comment_prefix_(comment_prefix) {}
+                         const std::string& comment_prefix = "", bool is_empty = false)
+      : output_(output), comment_prefix_(comment_prefix), empty_(is_empty) {}
 
   /**
    * Virtual destructor
@@ -57,7 +57,7 @@ class stream_writer : public writer {
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
-  void operator()() { output_ << comment_prefix_ << std::endl; }
+  void operator()() { if (!empty_) {output_ << comment_prefix_ << std::endl;} }
 
   /**
    * Writes the comment_prefix then the message followed by a newline.
@@ -65,8 +65,15 @@ class stream_writer : public writer {
    * @param[in] message A string
    */
   void operator()(const std::string& message) {
-    output_ << comment_prefix_ << message << std::endl;
+    if (!empty_) {
+      output_ << comment_prefix_ << message << std::endl;
+    }
   }
+
+  inline bool is_empty() const {
+    return empty_;
+  }
+
 
  private:
   /**
@@ -79,6 +86,7 @@ class stream_writer : public writer {
    */
   std::string comment_prefix_;
 
+  bool empty_;
   /**
    * Writes a set of values in csv format followed by a newline.
    *
@@ -89,16 +97,18 @@ class stream_writer : public writer {
    */
   template <class T>
   void write_vector(const std::vector<T>& v) {
-    if (v.empty())
-      return;
+    if (!empty_) {
+      if (v.empty())
+        return;
 
-    typename std::vector<T>::const_iterator last = v.end();
-    --last;
+      typename std::vector<T>::const_iterator last = v.end();
+      --last;
 
-    for (typename std::vector<T>::const_iterator it = v.begin(); it != last;
-         ++it)
-      output_ << *it << ",";
-    output_ << v.back() << std::endl;
+      for (typename std::vector<T>::const_iterator it = v.begin(); it != last;
+           ++it)
+        output_ << *it << ",";
+      output_ << v.back() << std::endl;
+    }
   }
 };
 
