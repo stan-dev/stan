@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 
-
 typedef boost::ecuyer1988 rng_t;
 typedef univariate_no_constraint_model_namespace::univariate_no_constraint_model
     Model;
@@ -66,7 +65,8 @@ TEST(advi_test, univar_no_constraint_fullrank) {
 
   elbo_true += log(S_j);
   elbo_true += log(1.0 / (sqrt(sigma_j_sq * 2.0 * stan::math::pi())));
-  elbo_true += -0.5 * (std::pow(mu_j - 1.88, 2) / sigma_j_sq + 1.0 / sigma_j_sq);
+  elbo_true
+      += -0.5 * (std::pow(mu_j - 1.88, 2) / sigma_j_sq + 1.0 / sigma_j_sq);
   elbo_true += 0.5 * (1 + log(2.0 * stan::math::pi()));
 
   double const EPSILON = 0.1;
@@ -191,7 +191,8 @@ TEST(advi_test, univar_no_constraint_meanfield) {
 
   elbo_true += log(S_j);
   elbo_true += log(1.0 / (sqrt(sigma_j_sq * 2.0 * stan::math::pi())));
-  elbo_true += -0.5 * (std::pow(mu_j - 1.88, 2) / sigma_j_sq + 1.0 / sigma_j_sq);
+  elbo_true
+      += -0.5 * (std::pow(mu_j - 1.88, 2) / sigma_j_sq + 1.0 / sigma_j_sq);
   elbo_true += 0.5 * (1 + log(2.0 * stan::math::pi()));
 
   double const EPSILON = 0.1;

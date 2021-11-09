@@ -8,8 +8,6 @@
 #include <string>
 #include <vector>
 
-
-
 typedef boost::ecuyer1988 rng_t;
 typedef univariate_with_constraint_model_namespace::
     univariate_with_constraint_model Model;
