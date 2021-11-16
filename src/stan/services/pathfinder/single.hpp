@@ -75,13 +75,6 @@ struct taylor_approx_t {
   Eigen::MatrixXd L_approx;
   Eigen::MatrixXd Qk;
   bool use_full;
-  Eigen::MatrixXd wkbart;
-  Eigen::MatrixXd mkbart;
-  Eigen::VectorXd point_est;
-  Eigen::VectorXd grad_est;
-  Eigen::MatrixXd ninvRST;
-  Eigen::MatrixXd Rkbar;
-  Eigen::VectorXd alpha;
 };
 
 struct div_est_t {
@@ -159,7 +152,7 @@ auto est_DIV(const SamplePkg& taylor_approx, size_t num_samples, const Eigen::Ve
 template <typename SamplePkg, typename BaseRNG>
 inline auto approximation_samples(const SamplePkg& taylor_approx, size_t num_samples, const Eigen::VectorXd& alpha, BaseRNG&& rnorm) {
   const Eigen::Index num_params = taylor_approx.x_center.size();
-  auto tuple_u = calc_u_u2(rnorm, taylor_approx, taylor_approx.alpha);
+  auto tuple_u = calc_u_u2(rnorm, taylor_approx, alpha);
 
 
   auto&& u = std::get<0>(tuple_u);
@@ -197,7 +190,7 @@ inline auto construct_taylor_approximation_full(
 
   Eigen::VectorXd x_center = point_est - Hk * grad_est;
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(cholHk),
-                         Eigen::MatrixXd(0, 0), true, Eigen::MatrixXd(0, 0), Eigen::MatrixXd(0, 0), point_est, grad_est, ninvRST, alpha};
+                         Eigen::MatrixXd(0, 0), true};
 }
 
 template <typename EigVec>
@@ -260,7 +253,7 @@ inline auto construct_taylor_approximation_sparse(
   std::cout << "Rkbar: " << Rkbar.format(CommaInitFmt) << "\n";
 */
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(L_approx),
-                         std::move(Qk), false, Wkbart, Mkbar, point_est, grad_est, ninvRST, Rkbar, alpha};
+                         std::move(Qk)};
 }
 
 template <typename EigVec>
@@ -307,8 +300,8 @@ template <typename T, stan::require_matrix_t<T>* = nullptr>
 inline Eigen::Array<bool, -1, 1> check_cond2(const T& Yk, const T& Sk) {
   auto Dk = (Yk.array() * Sk.array()).colwise().sum().eval();
   auto thetak = (Yk.array().square().colwise().sum() / Dk).abs();
-  std::cout << "\nDk: \n" << Dk << "\n";
-  std::cout << "\nthetak: \n" << thetak << "\n";
+  //std::cout << "\nDk: \n" << Dk << "\n";
+  //std::cout << "\nthetak: \n" << thetak << "\n";
   return (Dk > 0 && thetak <= 1e12).eval();
 }
 
@@ -361,9 +354,9 @@ inline Eigen::Array<bool, -1, 1> check_cond2(const T& Yk, const T& Sk) {
  * approx and log density of draws in ELBO-maximizing normal approximation.
  *
  */
-template <typename InputIters, class Model, typename DiagnosticWriter, typename ParamWriter>
+template <class Model, typename DiagnosticWriter, typename ParamWriter>
 inline int pathfinder_lbfgs_single(
-    Model& model, InputIters&& input_iters, const stan::io::var_context& init, unsigned int random_seed,
+    Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
@@ -479,7 +472,7 @@ inline int pathfinder_lbfgs_single(
       logger.info(msg);
     }
   }
-  diagnostic_writer(lbfgs_iters);
+  //diagnostic_writer(lbfgs_iters);
   actual_num_iters++;
   /*
   std::cout << "1: \n" << std::get<0>(lbfgs_iters[0]) << "\n";
