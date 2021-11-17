@@ -485,7 +485,7 @@ inline int pathfinder_lbfgs_single(
   boost::circular_buffer<decltype(Ykt_diff.col(0))> Ykt_h(history_size);
   boost::circular_buffer<decltype(Skt_diff.col(0))> Skt_h(history_size);
   Eigen::Index best_E;// = Eigen::VectorXd::Ones(param_size);
-  double div_max = std::numeric_limits<double>::min();
+  double div_max = std::numeric_limits<double>::lowest();
   div_est_t DIV_fit_best;
   taylor_approx_t taylor_approx_best;
   size_t winner = 0;
