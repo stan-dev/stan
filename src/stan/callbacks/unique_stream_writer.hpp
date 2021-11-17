@@ -67,7 +67,7 @@ class unique_stream_writer final : public writer {
   void operator()(const std::vector<double>& state) { write_vector(state); }
 
   void operator()(const Eigen::MatrixXd& states) {
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "\n", "", "", "");
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "", "", "\n", "", "");
     *output_ << states.transpose().format(CommaInitFmt);
   }
 
