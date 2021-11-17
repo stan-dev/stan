@@ -17,6 +17,7 @@ class values : public stan::callbacks::stream_writer {
  public:
   std::vector<std::string> names_;
   std::vector<std::vector<double> > states_;
+  std::vector<Eigen::VectorXd> eigen_states_;
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> optim_path_;
   Eigen::MatrixXd values_;
   values(std::ostream& stream) : stan::callbacks::stream_writer(stream) {}
@@ -39,6 +40,7 @@ class values : public stan::callbacks::stream_writer {
   void operator()(const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& xx) {
     optim_path_ = xx;
   }
+  void operator()(const Eigen::VectorXd& vals) { eigen_states_.push_back(vals); }
   void operator()(const Eigen::MatrixXd& vals) { values_ = vals; }
 };
 
@@ -140,7 +142,11 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
 
 
 
-       Eigen::MatrixXd param_vals = parameter.values_.transpose();
+       //Eigen::MatrixXd param_vals = parameter.values_.transpose();
+       Eigen::MatrixXd param_vals(parameter.eigen_states_.size(), parameter.eigen_states_[0].size());
+       for (size_t i = 0; i < parameter.eigen_states_.size(); ++i) {
+         param_vals.row(i) = parameter.eigen_states_[i];
+       }
 
         std::cout << "\n --- Optim Path ---" << std::endl;
         for (Eigen::Index i = 0; i < diagnostics.optim_path_.size(); ++i) {
