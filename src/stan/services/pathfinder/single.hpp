@@ -162,7 +162,8 @@ inline auto approximation_samples(const SamplePkg& taylor_approx,
   Eigen::VectorXd lp_approx_draws
       = -taylor_approx.logdetcholHk - 0.5 * u.array().square().colwise().sum()
         - 0.5 * num_params * log(2 * stan::math::pi());
-  return std::make_tuple(std::move(std::get<1>(std::move(tuple_u))), std::move(lp_approx_draws));
+  return std::make_tuple(std::move(std::get<1>(std::move(tuple_u))),
+                         std::move(lp_approx_draws));
 }
 
 template <typename EigVec>
