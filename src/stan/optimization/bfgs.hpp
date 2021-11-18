@@ -69,19 +69,19 @@ class BFGSMinimizer {
   LSOptions<Scalar> _ls_opts;
   ConvergenceOptions<Scalar> _conv_opts;
 
-  QNUpdateType &get_qnupdate() { return _qn; }
-  const QNUpdateType &get_qnupdate() const { return _qn; }
+  inline QNUpdateType &get_qnupdate() noexcept { return _qn; }
+  inline const QNUpdateType &get_qnupdate() const noexcept { return _qn; }
 
-  const Scalar &curr_f() const { return _fk; }
-  const VectorT &curr_x() const { return _xk; }
-  const VectorT &curr_g() const { return _gk; }
-  const VectorT &curr_p() const { return _pk; }
+  inline const Scalar &curr_f() const noexcept { return _fk; }
+  inline const VectorT &curr_x() const noexcept { return _xk; }
+  inline const VectorT &curr_g() const noexcept { return _gk; }
+  inline const VectorT &curr_p() const noexcept { return _pk; }
 
-  const Scalar &prev_f() const { return _fk_1; }
-  const VectorT &prev_x() const { return _xk_1; }
-  const VectorT &prev_g() const { return _gk_1; }
-  const VectorT &prev_p() const { return _pk_1; }
-  Scalar prev_step_size() const { return _pk_1.norm() * _alphak_1; }
+  inline const Scalar &prev_f() const noexcept { return _fk_1; }
+  inline const VectorT &prev_x() const noexcept { return _xk_1; }
+  inline const VectorT &prev_g() const noexcept { return _gk_1; }
+  inline const VectorT &prev_p() const noexcept { return _pk_1; }
+  inline Scalar prev_step_size() const { return _pk_1.norm() * _alphak_1; }
 
   inline Scalar rel_grad_norm() const {
     return -_pk.dot(_gk) / std::max(std::fabs(_fk), _conv_opts.fScale);
@@ -92,11 +92,11 @@ class BFGSMinimizer {
                       std::max(std::fabs(_fk), _conv_opts.fScale));
   }
 
-  const Scalar &alpha0() const { return _alpha0; }
-  const Scalar &alpha() const { return _alpha; }
-  const size_t iter_num() const { return _itNum; }
+  inline const Scalar &alpha0() const noexcept { return _alpha0; }
+  inline const Scalar &alpha() const noexcept { return _alpha; }
+  inline const size_t iter_num() const noexcept { return _itNum; }
 
-  const std::string &note() const { return _note; }
+  inline const std::string &note() const noexcept { return _note; }
 
   std::string get_code_string(int retCode) {
     switch (retCode) {
@@ -136,11 +136,11 @@ class BFGSMinimizer {
   }
 
   explicit BFGSMinimizer(FunctorType &f) : _func(f) {}
-  template <typename Vec, require_vector_t<Vec>* = nullptr>
+  template <typename Vec, require_vector_t<Vec>* = nullptr, typename LSOpt, typename ConvergeOpt, typename QnUpdater>
   explicit BFGSMinimizer(FunctorType &f, const Vec& params_r,
-    const LSOptions<double>& ls_opt, const ConvergenceOptions<double>& conv_opt,
-    const QNUpdateType& updater) :
-     _func(f), _qn(updater), _ls_opts(ls_opt), _conv_opts(conv_opt) {
+    LSOpt&& ls_opt, ConvergeOpt&& conv_opt,
+    QnUpdater&& updater) :
+     _func(f), _qn(std::forward<QnUpdater>(updater)), _ls_opts(std::forward<LSOpt>(ls_opt)), _conv_opts(std::forward<ConvergeOpt>(conv_opt)) {
      }
 
   template <typename Vec, require_vector_t<Vec>* = nullptr>
