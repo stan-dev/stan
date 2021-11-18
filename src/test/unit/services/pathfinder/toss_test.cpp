@@ -6,6 +6,8 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
 
+auto&& blah = stan::math::init_threadpool_tbb(4);
+
 struct mock_callback : public stan::callbacks::interrupt {
   int n;
   mock_callback() : n(0) {}
@@ -159,8 +161,10 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
                                      "", "");
 
         std::cout << "---- Results  -------" << std::endl;
+        /*
         std::cout << "Values: \n"
                   << param_vals.format(CommaInitFmt) << "\n";
+        */
          Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
          std::cout << "Mean Values: \n"
                    << mean_vals.format(CommaInitFmt) << "\n";

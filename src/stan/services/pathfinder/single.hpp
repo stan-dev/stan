@@ -10,12 +10,19 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
+#include <tbb/parallel_for.h>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <mutex>
 
+#define STAN_DEBUG_PATH_POST_LBFGS false
+#define STAN_DEBUG_PATH_TAYLOR_APPX false
+#define STAN_DEBUG_PATH_ELBO_DRAWS false
+#define STAN_DEBUG_PATH_CURVE_CHECK false
+#define STAN_DEBUG_PATH_BEST_ELBO false
 namespace stan {
 namespace services {
 namespace optimize {
@@ -48,8 +55,7 @@ inline Eigen::MatrixXd tcrossprod(T1&& x) {
 
 template <typename EigVec>
 Eigen::MatrixXd circular_buffer_times_diagonal(
-    const boost::circular_buffer<EigVec>& y_buff,
-    const Eigen::VectorXd& alpha) {
+    const std::vector<EigVec>& y_buff, const Eigen::VectorXd& alpha) {
   Eigen::MatrixXd ret(y_buff.size(), alpha.size());
   for (Eigen::Index i = 0; i < y_buff.size(); ++i) {
     ret.row(i) = y_buff[i].array() * alpha.array();
@@ -59,7 +65,7 @@ Eigen::MatrixXd circular_buffer_times_diagonal(
 
 template <typename EigVec>
 Eigen::VectorXd circular_buffer_crossprod_vector(
-    const boost::circular_buffer<EigVec>& y_buff, const Eigen::VectorXd& x) {
+    const std::vector<EigVec>& y_buff, const Eigen::VectorXd& x) {
   Eigen::VectorXd ret(y_buff[0].size());
   ret.setZero();
   for (Eigen::Index i = 0; i < y_buff.size(); ++i) {
@@ -69,9 +75,8 @@ Eigen::VectorXd circular_buffer_crossprod_vector(
 }
 
 template <typename EigVec>
-Eigen::MatrixXd circular_buffer_mul_vector(
-    const boost::circular_buffer<EigVec>& y_buff,
-    const Eigen::VectorXd& alpha) {
+Eigen::MatrixXd circular_buffer_mul_vector(const std::vector<EigVec>& y_buff,
+                                           const Eigen::VectorXd& alpha) {
   Eigen::VectorXd ret(y_buff.size());
   for (Eigen::Index i = 0; i < y_buff.size(); ++i) {
     ret(i) = y_buff[i].dot(alpha);
@@ -87,17 +92,56 @@ inline bool is_infinite(double x) {
   return x == std::numeric_limits<double>::infinity();
 }
 
-template <typename EigArray>
-inline auto form_init_diag(const EigArray& E0, const EigArray& Yk,
-                           const EigArray& Sk) {
-  double Dk = (Yk * Sk).sum();
+template <typename EigMat, stan::require_matrix_t<EigMat>* = nullptr>
+inline Eigen::Array<bool, -1, 1> check_curvatures(const EigMat& Yk,
+                                                  const EigMat& Sk) {
+  auto Dk = (Yk.array() * Sk.array()).colwise().sum().eval();
+  auto thetak = (Yk.array().square().colwise().sum() / Dk).abs().eval();
+  if (STAN_DEBUG_PATH_CURVE_CHECK) {
+    std::cout << "\n Check Dk: \n" << Dk.transpose() << "\n";
+    std::cout << "\n Check thetak: \n" << thetak.transpose() << "\n";
+  }
+  return (Dk > 0 && thetak <= 1e12);
+}
+/*
+template <typename EigArray1, typename EigArray2>
+inline auto form_diag(const EigArray1& E0, const EigArray2& Yk,
+                      const EigArray2& Sk) {
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
+                               "", " ");
+  std::cout << "\n Yk: \n" << Yk.format(CommaInitFmt) << "\n";
+  std::cout << "\n Sk: \n" << Sk.format(CommaInitFmt) << "\n";
+  std::cout << "\n E0: \n" << E0.format(CommaInitFmt) << "\n";
+  double Dk = Yk.matrix().dot(Sk.matrix());
+  std::cout << "\n Dk: " << Dk << "\n";
   auto yk_sq = Yk.square().eval();
+  std::cout << "\n yk_sq: \n" << yk_sq.format(CommaInitFmt) << "\n";
   double a = ((E0 * yk_sq).sum() / Dk);
-  return (a / E0 + yk_sq / Dk
-          - a * (Sk / E0).square() / (Sk.square() / E0).sum())
-      .inverse()
-      .matrix()
-      .eval();
+  std::cout << "\n a: " << a << "\n";
+  auto denom = (a / E0 + yk_sq / Dk
+                - a * (Sk / E0).square() / (Sk.square() / E0).sum())
+                   .eval();
+  std::cout << "\n denom: \n" << denom.format(CommaInitFmt) << "\n";
+  auto res = denom.inverse().matrix().eval();
+  std::cout << "\n res: \n" << res.format(CommaInitFmt) << "\n";
+
+  return res;
+}
+*/
+/**
+ * eq 4.9
+ * Gilbert, J.C., Lemaréchal, C. Some numerical experiments with variable-storage quasi-Newton algorithms.
+ * Mathematical Programming 45, 407–435 (1989). https://doi.org/10.1007/BF01589113
+ */
+template <typename EigVec1, typename EigVec2, typename EigVec3>
+inline auto form_diag(const EigVec1& alpha_init, const EigVec2& Yk,
+                      const EigVec3& Sk) {
+  double y_alpha_y = (Yk.dot(alpha_init.asDiagonal() * Yk));
+  double y_s = Yk.dot(Sk);
+  double s_inv_alpha_s = Sk.dot(alpha_init.array().inverse().matrix().asDiagonal() * Sk);
+  return y_s
+         / (y_alpha_y / alpha_init.array() + Yk.array().square()
+            - (y_alpha_y / s_inv_alpha_s) * (Sk.array() / alpha_init.array()).square());
 }
 
 struct taylor_approx_t {
@@ -117,8 +161,9 @@ struct div_est_t {
 };
 
 template <typename Generator>
-inline auto calc_u_u2(Generator& rnorm, const taylor_approx_t& taylor_approx,
-                      const Eigen::VectorXd& alpha) {
+inline auto get_rnorm_and_draws(Generator& rnorm,
+                                const taylor_approx_t& taylor_approx,
+                                const Eigen::VectorXd& alpha) {
   Eigen::MatrixXd u = rnorm().eval();
   if (taylor_approx.use_full) {
     Eigen::MatrixXd u2 = crossprod(taylor_approx.L_approx, u).colwise()
@@ -137,46 +182,50 @@ inline auto calc_u_u2(Generator& rnorm, const taylor_approx_t& taylor_approx,
 }
 
 template <typename SamplePkg, typename F, typename BaseRNG>
-auto est_DIV(const SamplePkg& taylor_approx, size_t num_samples,
-             const Eigen::VectorXd& alpha, F&& fn, BaseRNG&& rnorm) {
-  const auto D = taylor_approx.x_center.size();
+auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
+                    const Eigen::VectorXd& alpha, F&& fn, BaseRNG&& rnorm) {
+  const auto param_size = taylor_approx.x_center.size();
   int draw_ind = 1;
   int fn_calls_DIV = 0;
-  auto tuple_u = calc_u_u2(rnorm, taylor_approx, alpha);
+  auto tuple_u = get_rnorm_and_draws(rnorm, taylor_approx, alpha);
   auto&& u = std::get<0>(tuple_u);
   auto&& u2 = std::get<1>(tuple_u);
   // skip bad samples
-  Eigen::VectorXd f_test_DIV(u2.cols());
+  Eigen::VectorXd f_test_elbo_draws(u2.cols());
   try {
-    for (Eigen::Index i = 0; i < f_test_DIV.size(); ++i) {
+    for (Eigen::Index i = 0; i < f_test_elbo_draws.size(); ++i) {
       Eigen::VectorXd blahh = u2.col(i).eval();
-      f_test_DIV(i) = fn(blahh);
+      f_test_elbo_draws(i) = fn(blahh);
       ++fn_calls_DIV;
     }
   } catch (...) {
     // TODO: Actually catch errors
   }
-  std::cout << "\nf_test_DIV: \n" << f_test_DIV << "\n";
+  //  std::cout << "\nf_test_elbo_draws: \n" << f_test_elbo_draws << "\n";
   Eigen::VectorXd lp_approx_draws
       = -taylor_approx.logdetcholHk - 0.5 * u.array().square().colwise().sum()
-        - 0.5 * D * log(2 * stan::math::pi());  // NOTE THIS NEEDS TO BE pi()
+        - 0.5 * param_size
+              * log(2 * stan::math::pi());  // NOTE THIS NEEDS TO BE pi()
   Eigen::MatrixXd repeat_draws = u2;
   //### Divergence estimation ###
-  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, " ", ", ", "\n", "",
-                               "", " ");
 
-  double ELBO = -f_test_DIV.mean() - lp_approx_draws.mean();
-  /*
-  std::cout << "logdetcholHk: " << taylor_approx.logdetcholHk << "\n";
-  std::cout << "ELBO: " << ELBO << "\n";
-  std::cout << "repeat_draws: \n" <<
-  repeat_draws.transpose().eval().format(CommaInitFmt) << "\n"; std::cout <<
-  "random_stuff: \n" << u.transpose().eval().format(CommaInitFmt) << "\n";
-  std::cout << "lp_approx_draws: \n" << lp_approx_draws.format(CommaInitFmt) <<
-  "\n"; std::cout << "fn_call: \n" << f_test_DIV.format(CommaInitFmt) << "\n";
-  */
-  return div_est_t{ELBO, fn_calls_DIV, std::move(repeat_draws),
-                   std::move(f_test_DIV), std::move(lp_approx_draws)};
+  double ELBO = -f_test_elbo_draws.mean() - lp_approx_draws.mean();
+  if (STAN_DEBUG_PATH_ELBO_DRAWS) {
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, " ", ", ", "\n", "",
+                                 "", " ");
+    std::cout << "logdetcholHk: " << taylor_approx.logdetcholHk << "\n";
+    std::cout << "ELBO: " << ELBO << "\n";
+    std::cout << "repeat_draws: \n"
+              << repeat_draws.transpose().eval().format(CommaInitFmt) << "\n";
+    std::cout << "random_stuff: \n"
+              << u.transpose().eval().format(CommaInitFmt) << "\n";
+    std::cout << "lp_approx_draws: \n"
+              << lp_approx_draws.format(CommaInitFmt) << "\n";
+    std::cout << "fn_call: \n"
+              << f_test_elbo_draws.format(CommaInitFmt) << "\n";
+  }
+  return div_est_t{ELBO, std::move(fn_calls_DIV), std::move(repeat_draws),
+                   std::move(f_test_elbo_draws), std::move(lp_approx_draws)};
 }
 
 template <typename SamplePkg, typename BaseRNG>
@@ -185,7 +234,7 @@ inline auto approximation_samples(const SamplePkg& taylor_approx,
                                   const Eigen::VectorXd& alpha,
                                   BaseRNG&& rnorm) {
   const Eigen::Index num_params = taylor_approx.x_center.size();
-  auto tuple_u = calc_u_u2(rnorm, taylor_approx, alpha);
+  auto tuple_u = get_rnorm_and_draws(rnorm, taylor_approx, alpha);
 
   auto&& u = std::get<0>(tuple_u);
   auto&& u2 = std::get<1>(tuple_u);
@@ -204,18 +253,35 @@ inline auto construct_taylor_approximation_full(const Buff& Ykt_mat,
                                                 const Eigen::MatrixXd& ninvRST,
                                                 const EigVec& point_est,
                                                 const EigVec& grad_est) {
-  Eigen::MatrixXd y_tcrossprod_alpha = tcrossprod(
-      circular_buffer_times_diagonal(Ykt_mat, alpha.array().sqrt().matrix()));
+  Eigen::MatrixXd y_tcrossprod_alpha
+      = tcrossprod(circular_buffer_times_diagonal(
+            Ykt_mat, alpha.array().sqrt().matrix().eval()))
+        * ninvRST;
   y_tcrossprod_alpha += Dk.asDiagonal();
   Eigen::MatrixXd y_mul_alpha = circular_buffer_times_diagonal(Ykt_mat, alpha);
   Eigen::MatrixXd Hk = crossprod(y_mul_alpha, ninvRST)
                        + crossprod(ninvRST, y_mul_alpha)
-                       + crossprod(ninvRST, y_tcrossprod_alpha * ninvRST);
+                       + crossprod(ninvRST, y_tcrossprod_alpha);
   Hk += alpha.asDiagonal();
   Eigen::MatrixXd cholHk = Hk.llt().matrixL();
-  auto logdetcholHk = 2.0 * cholHk.diagonal().array().abs().log().sum();
+  auto logdetcholHk = 2.0 * cholHk.diagonal().array().log().sum();
 
   Eigen::VectorXd x_center = point_est - Hk * grad_est;
+  if (STAN_DEBUG_PATH_TAYLOR_APPX) {
+    std::cout << "---Full---\n";
+
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
+                                 "", "", " ");
+    std::cout << "Alpha: \n" << alpha.format(CommaInitFmt) << "\n";
+    std::cout << "ninvRST: \n" << ninvRST.format(CommaInitFmt) << "\n";
+    std::cout << "Dk: \n" << Dk.format(CommaInitFmt) << "\n";
+    std::cout << "Point: \n" << point_est.format(CommaInitFmt) << "\n";
+    std::cout << "grad: \n" << grad_est.format(CommaInitFmt) << "\n";
+    std::cout << "Hk: " << Hk.format(CommaInitFmt) << "\n";
+    std::cout << "L_approx: \n" << cholHk.format(CommaInitFmt) << "\n";
+    std::cout << "logdetcholHk: \n" << logdetcholHk << "\n";
+    std::cout << "x_center: \n" << x_center.format(CommaInitFmt) << "\n";
+  }
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(cholHk),
                          Eigen::MatrixXd(0, 0), true};
 }
@@ -226,8 +292,6 @@ inline auto construct_taylor_approximation_sparse(
     const Eigen::VectorXd& Dk, const Eigen::MatrixXd& ninvRST,
     const EigVec& point_est, const EigVec& grad_est) {
   const Eigen::Index current_history_size = Ykt_mat.size();
-  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
-                               "", " ");
   Eigen::MatrixXd y_mul_sqrt_alpha = circular_buffer_times_diagonal(
       Ykt_mat, alpha.array().sqrt().matrix().eval());
   Eigen::MatrixXd Wkbart(Ykt_mat.size() + ninvRST.rows(), alpha.size());
@@ -256,9 +320,8 @@ inline auto construct_taylor_approximation_sparse(
       = (Rkbar * Mkbar * Rkbar.transpose()
          + Eigen::MatrixXd::Identity(Rkbar.rows(), Rkbar.rows()))
             .llt()
-            .matrixL()
-            .transpose();
-  double logdetcholHk = L_approx.diagonal().array().abs().log().sum()
+            .matrixL();
+  double logdetcholHk = L_approx.diagonal().array().log().sum()
                         + 0.5 * alpha.array().log().sum();
   Eigen::VectorXd ninvRSTg = ninvRST * grad_est;
   Eigen::VectorXd alpha_mul_grad = (alpha.array() * grad_est.array()).matrix();
@@ -272,7 +335,11 @@ inline auto construct_taylor_approximation_sparse(
         + crossprod(ninvRST, y_tcrossprod_alpha * ninvRSTg);
 
   Eigen::VectorXd x_center = point_est - x_center_tmp;
-  /*
+
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
+                               "", " ");
+  if (STAN_DEBUG_PATH_TAYLOR_APPX) {
+    std::cout << "---Sparse---\n";
     std::cout << "Full QR: " << qr.matrixQR().format(CommaInitFmt) << "\n";
     std::cout << "Qk: \n" << Qk.format(CommaInitFmt) << "\n";
     std::cout << "L_approx: \n" << L_approx.format(CommaInitFmt) << "\n";
@@ -281,11 +348,10 @@ inline auto construct_taylor_approximation_sparse(
     std::cout << "Wkbar: \n" << Wkbart.format(CommaInitFmt) << "\n";
     std::cout << "x_center: \n" << x_center.format(CommaInitFmt) << "\n";
     std::cout << "NinvRST: " << ninvRST.format(CommaInitFmt) << "\n";
-    std::cout << "Ykt_mat: " << Ykt_mat.format(CommaInitFmt) << "\n";
     std::cout << "Rkbar: " << Rkbar.format(CommaInitFmt) << "\n";
-  */
+  }
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(L_approx),
-                         std::move(Qk)};
+                         std::move(Qk), false};
 }
 
 template <typename EigVec, typename Buff>
@@ -322,12 +388,6 @@ inline bool check_curvatures(const T& Yk, const T& Sk) {
   }
 }
 */
-template <typename EigMat, stan::require_matrix_t<EigMat>* = nullptr>
-inline Eigen::Array<bool, -1, 1> check_curvatures(const EigMat& Yk, const EigMat& Sk) {
-  auto Dk = (Yk.array() * Sk.array()).colwise().sum().eval();
-  auto thetak = (Yk.array().square().colwise().sum() / Dk).abs();
-  return (Dk > 0 && thetak <= 1e12);
-}
 
 /**
  * Runs the L-BFGS algorithm for a model.
@@ -388,8 +448,12 @@ inline int pathfinder_lbfgs_single(
     size_t num_threads, callbacks::logger& logger,
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
     DiagnosticWriter& diagnostic_writer) {
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
+                               "", " ");
+
   // callbacks::writer& diagnostic_writer) {
-  boost::ecuyer1988 rng = util::create_rng<boost::ecuyer1988>(random_seed, path);
+  boost::ecuyer1988 rng
+      = util::create_rng<boost::ecuyer1988>(random_seed, path);
 
   std::vector<int> disc_vector;
   // 1. Sample initial parameters
@@ -412,8 +476,8 @@ inline int pathfinder_lbfgs_single(
       = stan::optimization::LBFGSUpdate<double, Eigen::Dynamic>;
   lbfgs_update_t lbfgs_update(history_size);
   using Optimizer = stan::optimization::BFGSLineSearch<Model, lbfgs_update_t>;
-  Optimizer lbfgs(model, cont_vector, disc_vector, std::move(ls_opts), std::move(conv_opts),
-                  std::move(lbfgs_update), &lbfgs_ss);
+  Optimizer lbfgs(model, cont_vector, disc_vector, std::move(ls_opts),
+                  std::move(conv_opts), std::move(lbfgs_update), &lbfgs_ss);
 
   std::stringstream initial_msg;
   initial_msg << "Initial log joint probability = " << lbfgs.logp();
@@ -499,7 +563,7 @@ inline int pathfinder_lbfgs_single(
     }
   }
   // diagnostic_writer(lbfgs_iters);
-  actual_num_iters++;
+  actual_num_iters;
   /*
   std::cout << "1: \n" << std::get<0>(lbfgs_iters[0]) << "\n";
   std::cout << "2: \n" << std::get<1>(lbfgs_iters[0]) << "\n";
@@ -510,26 +574,55 @@ inline int pathfinder_lbfgs_single(
                              - grad_mat.leftCols(actual_num_iters);
   Eigen::MatrixXd Skt_diff = param_mat.middleCols(1, actual_num_iters)
                              - param_mat.leftCols(actual_num_iters);
-  boost::circular_buffer<decltype(Ykt_diff.col(0))> Ykt_h(history_size);
-  boost::circular_buffer<decltype(Skt_diff.col(0))> Skt_h(history_size);
+  //  boost::circular_buffer<decltype(Ykt_diff.col(0))> Ykt_h(history_size);
+  //  boost::circular_buffer<decltype(Skt_diff.col(0))> Skt_h(history_size);
   Eigen::Index best_E;  // = Eigen::VectorXd::Ones(param_size);
   double div_max = std::numeric_limits<double>::lowest();
   div_est_t DIV_fit_best;
   taylor_approx_t taylor_approx_best;
   size_t winner = 0;
+  size_t num_curves_correct = 0;
   Eigen::MatrixXd alpha_mat(param_size, actual_num_iters);
-  alpha_mat.col(0).setOnes();
-  Eigen::Matrix<bool, -1, 1> check_curvatures_vec = check_curvatures(Ykt_diff, Skt_diff);
-  for (Eigen::Index iter = 0; iter < actual_num_iters - 1; iter++) {
+  Eigen::Matrix<bool, -1, 1> check_curvatures_vec
+      = check_curvatures(Ykt_diff, Skt_diff);
+  if (check_curvatures_vec[0]) {
+    alpha_mat.col(0) = form_diag(Eigen::Matrix<double, -1, 1>::Ones(param_size),
+                                 Ykt_diff.col(0), Skt_diff.col(0));
+
+  } else {
+    alpha_mat.col(0).setOnes();
+  }
+  for (Eigen::Index iter = 1; iter < actual_num_iters; iter++) {
+    if (STAN_DEBUG_PATH_CURVE_CHECK) {
+      std::cout << "\n---Curve " << iter << "----\n";
+    }
     if (check_curvatures_vec[iter]) {
-      alpha_mat.col(iter + 1) = form_init_diag(alpha_mat.col(iter).array(),
-                                               Ykt_diff.col(iter).array(),
-                                               Skt_diff.col(iter).array());
+      alpha_mat.col(iter) = form_diag(alpha_mat.col(iter - 1),
+                                      Ykt_diff.col(iter), Skt_diff.col(iter));
     } else {
-      alpha_mat.col(iter + 1) = alpha_mat.col(iter);
+      alpha_mat.col(iter) = alpha_mat.col(iter - 1);
     }
   }
-
+  if (STAN_DEBUG_PATH_POST_LBFGS) {
+    std::cout << "\n Alpha mat: "
+              << alpha_mat.transpose().eval().format(CommaInitFmt) << "\n";
+    std::cout << "\n Ykt_diff mat: "
+              << Ykt_diff.transpose().eval().format(CommaInitFmt) << "\n";
+    std::cout << "\n grad mat: "
+              << grad_mat.leftCols(actual_num_iters + 5)
+                     .transpose()
+                     .eval()
+                     .format(CommaInitFmt)
+              << "\n";
+    std::cout << "\n Skt_diff mat: "
+              << Skt_diff.transpose().eval().format(CommaInitFmt) << "\n";
+    std::cout << "\n param mat: "
+              << param_mat.leftCols(actual_num_iters + 5)
+                     .transpose()
+                     .eval()
+                     .format(CommaInitFmt)
+              << "\n";
+  }
   boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
   auto rnorm
@@ -540,83 +633,137 @@ inline int pathfinder_lbfgs_single(
         };
 
   auto fn = [&model](auto&& u) {
-    return -model.template log_prob<false, false>(u,  0);
+    return -model.template log_prob<false, true>(u, 0);
   };
 
   // NOTE: We always push the first one no matter what
   check_curvatures_vec[0] = true;
-  for (Eigen::Index iter = 0; iter < actual_num_iters - 1; iter++) {
-    // std::cout << "\n------------ Iter: " << iter << "------------\n" <<
-    // std::endl;
-    auto Ykt = Ykt_diff.col(iter);
-    auto Skt = Skt_diff.col(iter);
-    auto alpha = alpha_mat.col(iter);
-    if (check_curvatures_vec[iter]) {
-      // update Y and S matrix
-      Ykt_h.push_back(Ykt);
-      Skt_h.push_back(Skt);
-    }
-    /*
-    if (Eigen::isnan(alpha.array()).any()) {
-      std::cout << "Iter: " << iter << "\n";
-      std::cout << "alpha: \n" << alpha << "\n";
-      std::cout << "Ykt: \n" << Ykt << "\n";
-      std::cout << "Skt: \n" << Skt << "\n";
-    } else {
-//      std::cout << "alpha: \n" << alpha << "\n" << std::endl;
-    }
-    */
-    const auto current_history_size = Ykt_h.size();
-    Eigen::VectorXd Dk(current_history_size);
-    for (Eigen::Index i = 0; i < current_history_size; i++) {
-      Dk[i] = Ykt_h[i].dot(Skt_h[i]);
-    }
-    Eigen::MatrixXd Rk
-        = Eigen::MatrixXd::Zero(current_history_size, current_history_size);
-    for (Eigen::Index s = 0; s < current_history_size; s++) {
-      for (Eigen::Index i = 0; i <= s; i++) {
-        Rk(i, s) = Skt_h[i].dot(Ykt_h[s]);
-      }
-    }
-    Eigen::MatrixXd ninvRST;
-    {
-      Eigen::MatrixXd Skt_mat(param_size, current_history_size);
-      for (Eigen::Index i = 0; i < current_history_size; ++i) {
-        Skt_mat.col(i) = Skt_h[i];
-      }
-      Skt_mat.transposeInPlace();
-      Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat);
-      ninvRST = -std::move(Skt_mat);
-    }
-    /*
-    Eigen::MatrixXd Ykt_mat(param_size, current_history_size);
-    for (Eigen::Index i = 0; i < current_history_size; ++i) {
-      Ykt_mat.col(i) = Ykt_h[i];
-    }
-    */
-    /**
-     * 3a. Run BFGS-Sample to get `num_elbo_draws` draws from normal
-     * approximation and log density of draws in the approximate normal
-     * distribution
-     */
-    taylor_approx_t taylor_appx_tuple = construct_taylor_approximation(
-        Ykt_h, alpha, Dk, ninvRST, param_mat.col(iter), grad_mat.col(iter));
+  std::mutex update_best_mutex;
+  //  for (Eigen::Index iter = 0; iter < actual_num_iters - 1; iter++) {
+  tbb::parallel_for(
+      tbb::blocked_range<int>(0, actual_num_iters - 1),
+      [&](tbb::blocked_range<int> r) {
+        for (int iter = r.begin(); iter < r.end(); ++iter) {
+          // std::cout << "\n------------ Iter: " << iter << "------------\n";
+          // std::endl;
+          auto Ykt = Ykt_diff.col(iter);
+          auto Skt = Skt_diff.col(iter);
+          auto alpha = alpha_mat.col(iter);
+          std::vector<size_t> ys_cols;
+          const size_t curr_hist_size3
+              = iter < history_size ? iter + 1 : history_size;
+          {
+            for (Eigen::Index end_iter = iter; end_iter >= 0; --end_iter) {
+              // std::cout << "End iter: " << end_iter << "\n";
+              if (check_curvatures_vec[end_iter]) {
+                ys_cols.push_back(end_iter);
+              }
+              if (ys_cols.size() == history_size) {
+                break;
+              }
+            }
+            /*
+            std::cout << "hist_size: " << history_size << "\n";
+            std::cout << "current_hist_size2: " << current_hist_size2 << "\n";
+            std::cout << "curr_hist_size3: " << curr_hist_size3 << "\n";
+            std::cout << "Ykt_h size: " << Ykt_h.size() << "\n";
+            */
+          }
+          std::vector<decltype(Ykt_diff.col(0))> Ykt_h;
+          std::vector<decltype(Skt_diff.col(0))> Skt_h;
+          std::for_each(
+              ys_cols.rbegin(), ys_cols.rend(),
+              [&Ykt_h, &Skt_h, &Ykt_diff, &Skt_diff](const size_t idx) {
+                Ykt_h.push_back(Ykt_diff.col(idx));
+                Skt_h.push_back(Skt_diff.col(idx));
+              });
+          // std::reverse(Ykt_h.begin(), Ykt_h.end());
+          // std::reverse(Skt_h.begin(), Skt_h.end());
+          Eigen::MatrixXd Ykt_acc(Ykt_h[0].size(), Ykt_h.size());
+          for (Eigen::Index i = 0; i < Ykt_h.size(); ++i) {
+            Ykt_acc.col(i) = Ykt_h[i];
+          }
+          // std::cout << "Ykt_mat: " << Ykt_acc.format(CommaInitFmt) << "\n";
 
-    //#lCDIV #lADIV  #lIKL #ELBO
-    auto DIV_fit = est_DIV(taylor_appx_tuple, num_elbo_draws, alpha, fn, rnorm);
-    // TODO: Calculate total function calls
-    // fn_call = fn_call + DIV_fit$fn_calls_DIV
-    // DIV_ls = c(DIV_ls, DIV_fit$DIV)
-    //  4. Find $l \in L$ that maximizes ELBO $l^* = arg max_l ELBO^(l)$.
-    if (DIV_fit.DIV > div_max) {
-      div_max = DIV_fit.DIV;
-      DIV_fit_best = DIV_fit;
-      taylor_approx_best = taylor_appx_tuple;
-      winner = iter;
-      best_E = iter;
-    }
-  }
-  std::cout << "Winner: " << winner << "\n";
+          /*
+          if (check_curvatures_vec[iter]) {
+            // update Y and S matrix
+            Ykt_h.push_back(Ykt);
+            Skt_h.push_back(Skt);
+          }
+          */
+          /*
+          if (Eigen::isnan(alpha.array()).any()) {
+            std::cout << "Iter: " << iter << "\n";
+            std::cout << "alpha: \n" << alpha << "\n";
+            std::cout << "Ykt: \n" << Ykt << "\n";
+            std::cout << "Skt: \n" << Skt << "\n";
+          } else {
+      //      std::cout << "alpha: \n" << alpha << "\n" << std::endl;
+          }
+          */
+          const auto current_history_size = Ykt_h.size();
+          Eigen::VectorXd Dk(current_history_size);
+          for (Eigen::Index i = 0; i < current_history_size; i++) {
+            Dk[i] = Ykt_h[i].dot(Skt_h[i]);
+          }
+          Eigen::MatrixXd Rk = Eigen::MatrixXd::Zero(current_history_size,
+                                                     current_history_size);
+          for (Eigen::Index s = 0; s < current_history_size; s++) {
+            for (Eigen::Index i = 0; i <= s; i++) {
+              Rk(i, s) = Skt_h[i].dot(Ykt_h[s]);
+            }
+          }
+          Eigen::MatrixXd ninvRST;
+          {
+            Eigen::MatrixXd Skt_mat(param_size, current_history_size);
+            for (Eigen::Index i = 0; i < current_history_size; ++i) {
+              Skt_mat.col(i) = Skt_h[i];
+            }
+            Skt_mat.transposeInPlace();
+            Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat);
+            ninvRST = -std::move(Skt_mat);
+          }
+          /*
+          Eigen::MatrixXd Ykt_mat(param_size, current_history_size);
+          for (Eigen::Index i = 0; i < current_history_size; ++i) {
+            Ykt_mat.col(i) = Ykt_h[i];
+          }
+          */
+          /**
+           * 3a. Run BFGS-Sample to get `num_elbo_draws` draws from normal
+           * approximation and log density of draws in the approximate normal
+           * distribution
+           */
+          taylor_approx_t taylor_appx_tuple = construct_taylor_approximation(
+              Ykt_h, alpha, Dk, ninvRST, param_mat.col(iter),
+              grad_mat.col(iter));
+
+          //#lCDIV #lADIV  #lIKL #ELBO
+          auto DIV_fit = est_elbo_draws(taylor_appx_tuple, num_elbo_draws,
+                                        alpha, fn, rnorm);
+          // TODO: Calculate total function calls
+          // fn_call = fn_call + DIV_fit$fn_calls_DIV
+          // DIV_ls = c(DIV_ls, DIV_fit$DIV)
+          //  4. Find $l \in L$ that maximizes ELBO $l^* = arg max_l ELBO^(l)$.
+          {
+            std::lock_guard<std::mutex> guard(update_best_mutex);
+            if (STAN_DEBUG_PATH_BEST_ELBO) {
+              std::cout << "DIV curr: " << DIV_fit.DIV << "\n";
+              std::cout << "DIV best: " << div_max << "\n";
+            }
+            if (DIV_fit.DIV > div_max) {
+              div_max = DIV_fit.DIV;
+              DIV_fit_best = std::move(DIV_fit);
+              taylor_approx_best = std::move(taylor_appx_tuple);
+              winner = iter;
+              best_E = iter;
+            }
+          }
+        }
+      },
+      tbb::simple_partitioner());
+  // std::cout << "Winner: " << winner << "\n";
   // Generate upto num_samples samples from the best approximating Normal ##
   /*
   std::cout << "Taylor: \n";
