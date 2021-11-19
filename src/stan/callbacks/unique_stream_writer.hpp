@@ -127,7 +127,7 @@ class unique_stream_writer final : public writer {
       auto last = v.end();
       --last;
       for (auto it = v.begin(); it != last; ++it) {
-             *output_ << *it << ",";
+        *output_ << *it << ",";
       }
       *output_ << v.back() << std::endl;
     }
