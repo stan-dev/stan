@@ -41,7 +41,6 @@ class stream_writer : public writer {
    * @param[in] names Names in a std::vector
    */
   void operator()(const std::vector<std::string>& names) {
-    if (output_ == nullptr) return;
     write_vector(names);
   }
 
@@ -53,10 +52,7 @@ class stream_writer : public writer {
    *
    * @param[in] state Values in a std::vector
    */
-  void operator()(const std::vector<double>& state) {
-    if (output_ == nullptr) return;
-    write_vector(state);
-  }
+  void operator()(const std::vector<double>& state) { write_vector(state); }
 
   /**
    * Writes the comment_prefix to the stream followed by a newline.
@@ -93,7 +89,6 @@ class stream_writer : public writer {
    */
   template <class T>
   void write_vector(const std::vector<T>& v) {
-    if (output_ == nullptr) return;
     if (v.empty())
       return;
 
