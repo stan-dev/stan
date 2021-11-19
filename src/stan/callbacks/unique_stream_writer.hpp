@@ -75,10 +75,7 @@ class unique_stream_writer final : public writer {
    */
   void operator()() {
     if (!empty_) {
-      std::stringstream streamer;
-      streamer.precision(output_.get()->precision());
-      streamer << comment_prefix_ << std::endl;
-      *output_ << streamer.str();
+      *output_ << comment_prefix_ << std::endl;
     }
   }
 
@@ -89,10 +86,7 @@ class unique_stream_writer final : public writer {
    */
   void operator()(const std::string& message) {
     if (!empty_) {
-      std::stringstream streamer;
-      streamer.precision(output_.get()->precision());
-      streamer << comment_prefix_ << message << std::endl;
-      *output_ << streamer.str();
+      *output_ << comment_prefix_ << message << std::endl;
     }
   }
 
@@ -127,18 +121,15 @@ class unique_stream_writer final : public writer {
   template <class T>
   void write_vector(const std::vector<T>& v) {
     if (!empty_) {
-      if (v.empty())
+      if (v.empty()) {
         return;
-      using const_iter = typename std::vector<T>::const_iterator;
-      const_iter last = v.end();
-      --last;
-      std::stringstream streamer;
-      streamer.precision(output_.get()->precision());
-      for (const_iter it = v.begin(); it != last; ++it) {
-        streamer << *it << ",";
       }
-      streamer << v.back() << std::endl;
-      *output_ << streamer.str();
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+             *output_ << *it << ",";
+      }
+      *output_ << v.back() << std::endl;
     }
   }
 };
