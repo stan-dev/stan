@@ -48,76 +48,80 @@ class unique_stream_writer final : public writer {
    *
    * @param[in] names Names in a std::vector
    */
-   void operator()(const std::vector<std::string>& names) {
-     if (output_ == nullptr) return;
-     write_vector(names);
-   }
-   /**
-    * Get the underlying stream
-    */
-   inline auto& get_stream() noexcept { return *output_; }
+  void operator()(const std::vector<std::string>& names) {
+    if (output_ == nullptr)
+      return;
+    write_vector(names);
+  }
+  /**
+   * Get the underlying stream
+   */
+  inline auto& get_stream() noexcept { return *output_; }
 
-   /**
-    * Writes a set of values in csv format followed by a newline.
-    *
-    * Note: the precision of the output is determined by the settings
-    *  of the stream on construction.
-    *
-    * @param[in] state Values in a std::vector
-    */
-   void operator()(const std::vector<double>& state) { write_vector(state); }
+  /**
+   * Writes a set of values in csv format followed by a newline.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] state Values in a std::vector
+   */
+  void operator()(const std::vector<double>& state) { write_vector(state); }
 
-   /**
-    * Writes the comment_prefix to the stream followed by a newline.
-    */
-   void operator()() {
-     if (output_ == nullptr) return;
-       *output_ << comment_prefix_ << std::endl;
-   }
+  /**
+   * Writes the comment_prefix to the stream followed by a newline.
+   */
+  void operator()() {
+    if (output_ == nullptr)
+      return;
+    *output_ << comment_prefix_ << std::endl;
+  }
 
-   /**
-    * Writes the comment_prefix then the message followed by a newline.
-    *
-    * @param[in] message A string
-    */
-   void operator()(const std::string& message) {
-     if (output_ == nullptr) return;
-       *output_ << comment_prefix_ << message << std::endl;
-   }
+  /**
+   * Writes the comment_prefix then the message followed by a newline.
+   *
+   * @param[in] message A string
+   */
+  void operator()(const std::string& message) {
+    if (output_ == nullptr)
+      return;
+    *output_ << comment_prefix_ << message << std::endl;
+  }
 
-  private:
-   /**
-    * Output stream
-    */
-   std::unique_ptr<Stream> output_;
+ private:
+  /**
+   * Output stream
+   */
+  std::unique_ptr<Stream> output_;
 
-   /**
-    * Comment prefix to use when printing comments: strings and blank lines
-    */
-   std::string comment_prefix_;
+  /**
+   * Comment prefix to use when printing comments: strings and blank lines
+   */
+  std::string comment_prefix_;
 
-   /**
-    * Writes a set of values in csv format followed by a newline.
-    *
-    * Note: the precision of the output is determined by the settings
-    *  of the stream on construction.
-    *
-    * @param[in] v Values in a std::vector
-    */
-   template <class T>
-   void write_vector(const std::vector<T>& v) {
-       if (output_ == nullptr) return;
-       if (v.empty()) {
-         return;
-       }
-       auto last = v.end();
-       --last;
-       for (auto it = v.begin(); it != last; ++it) {
-              *output_ << *it << ",";
-       }
-       *output_ << v.back() << std::endl;
-     }
- };
+  /**
+   * Writes a set of values in csv format followed by a newline.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] v Values in a std::vector
+   */
+  template <class T>
+  void write_vector(const std::vector<T>& v) {
+    if (output_ == nullptr)
+      return;
+    if (v.empty()) {
+      return;
+    }
+    auto last = v.end();
+    --last;
+    for (auto it = v.begin(); it != last; ++it) {
+      *output_ << *it << ",";
+    }
+    *output_ << v.back() << std::endl;
+  }
+};
 
 }  // namespace callbacks
 }  // namespace stan
