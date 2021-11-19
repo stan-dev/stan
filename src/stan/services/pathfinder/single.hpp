@@ -18,11 +18,12 @@
 #include <vector>
 #include <mutex>
 
-#define STAN_DEBUG_PATH_POST_LBFGS false
-#define STAN_DEBUG_PATH_TAYLOR_APPX false
-#define STAN_DEBUG_PATH_ELBO_DRAWS false
-#define STAN_DEBUG_PATH_CURVE_CHECK false
-#define STAN_DEBUG_PATH_BEST_ELBO false
+#define STAN_DEBUG_PATH_ALL false
+#define STAN_DEBUG_PATH_POST_LBFGS false || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_TAYLOR_APPX false || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_ELBO_DRAWS false || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_CURVE_CHECK false || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_BEST_ELBO false || STAN_DEBUG_PATH_ALL
 namespace stan {
 namespace services {
 namespace optimize {
@@ -253,30 +254,42 @@ inline auto construct_taylor_approximation_full(const Buff& Ykt_mat,
                                                 const Eigen::MatrixXd& ninvRST,
                                                 const EigVec& point_est,
                                                 const EigVec& grad_est) {
+Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
+                             "", "", " ");
+
+if (STAN_DEBUG_PATH_TAYLOR_APPX) {
+  std::cout << "---Full---\n";
+
+  std::cout << "Alpha: \n" << alpha.format(CommaInitFmt) << "\n";
+  std::cout << "ninvRST: \n" << ninvRST.format(CommaInitFmt) << "\n";
+  std::cout << "Dk: \n" << Dk.format(CommaInitFmt) << "\n";
+  std::cout << "Point: \n" << point_est.format(CommaInitFmt) << "\n";
+  std::cout << "grad: \n" << grad_est.format(CommaInitFmt) << "\n";
+  }
   Eigen::MatrixXd y_tcrossprod_alpha
       = tcrossprod(circular_buffer_times_diagonal(
             Ykt_mat, alpha.array().sqrt().matrix().eval()))
         * ninvRST;
-  y_tcrossprod_alpha += Dk.asDiagonal();
+  //std::cout << "y_tcrossprod_alpha: \n" << y_tcrossprod_alpha << "\n";
+  const auto dk_min_size = std::min(y_tcrossprod_alpha.rows(), y_tcrossprod_alpha.cols());
+  y_tcrossprod_alpha += Dk.head(dk_min_size).asDiagonal();
+  //std::cout << "y_tcrossprod_alpha2: \n" << y_tcrossprod_alpha << "\n";
+
   Eigen::MatrixXd y_mul_alpha = circular_buffer_times_diagonal(Ykt_mat, alpha);
   Eigen::MatrixXd Hk = crossprod(y_mul_alpha, ninvRST)
                        + crossprod(ninvRST, y_mul_alpha)
                        + crossprod(ninvRST, y_tcrossprod_alpha);
+  //std::cout << "Hk: " << Hk.format(CommaInitFmt) << "\n";
   Hk += alpha.asDiagonal();
+  //std::cout << "Hk2: " << Hk.format(CommaInitFmt) << "\n";
   Eigen::MatrixXd cholHk = Hk.llt().matrixL();
+  //std::cout << "L_approx: \n" << cholHk.format(CommaInitFmt) << "\n";
   auto logdetcholHk = 2.0 * cholHk.diagonal().array().log().sum();
 
   Eigen::VectorXd x_center = point_est - Hk * grad_est;
   if (STAN_DEBUG_PATH_TAYLOR_APPX) {
     std::cout << "---Full---\n";
 
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
-                                 "", "", " ");
-    std::cout << "Alpha: \n" << alpha.format(CommaInitFmt) << "\n";
-    std::cout << "ninvRST: \n" << ninvRST.format(CommaInitFmt) << "\n";
-    std::cout << "Dk: \n" << Dk.format(CommaInitFmt) << "\n";
-    std::cout << "Point: \n" << point_est.format(CommaInitFmt) << "\n";
-    std::cout << "grad: \n" << grad_est.format(CommaInitFmt) << "\n";
     std::cout << "Hk: " << Hk.format(CommaInitFmt) << "\n";
     std::cout << "L_approx: \n" << cholHk.format(CommaInitFmt) << "\n";
     std::cout << "logdetcholHk: \n" << logdetcholHk << "\n";
@@ -639,12 +652,14 @@ inline int pathfinder_lbfgs_single(
   // NOTE: We always push the first one no matter what
   check_curvatures_vec[0] = true;
   std::mutex update_best_mutex;
-  //  for (Eigen::Index iter = 0; iter < actual_num_iters - 1; iter++) {
+    for (Eigen::Index iter = 0; iter < actual_num_iters - 1; iter++) {
+      /*
   tbb::parallel_for(
       tbb::blocked_range<int>(0, actual_num_iters - 1),
       [&](tbb::blocked_range<int> r) {
-        for (int iter = r.begin(); iter < r.end(); ++iter) {
-          // std::cout << "\n------------ Iter: " << iter << "------------\n";
+      */
+      //  for (int iter = r.begin(); iter < r.end(); ++iter) {
+          //std::cout << "\n------------ Iter: " << iter << "------------\n";
           // std::endl;
           auto Ykt = Ykt_diff.col(iter);
           auto Skt = Skt_diff.col(iter);
@@ -679,12 +694,13 @@ inline int pathfinder_lbfgs_single(
               });
           // std::reverse(Ykt_h.begin(), Ykt_h.end());
           // std::reverse(Skt_h.begin(), Skt_h.end());
+          /*
           Eigen::MatrixXd Ykt_acc(Ykt_h[0].size(), Ykt_h.size());
           for (Eigen::Index i = 0; i < Ykt_h.size(); ++i) {
             Ykt_acc.col(i) = Ykt_h[i];
           }
-          // std::cout << "Ykt_mat: " << Ykt_acc.format(CommaInitFmt) << "\n";
-
+          std::cout << "Ykt_mat: " << Ykt_acc.format(CommaInitFmt) << "\n";
+          */
           /*
           if (check_curvatures_vec[iter]) {
             // update Y and S matrix
@@ -761,8 +777,8 @@ inline int pathfinder_lbfgs_single(
             }
           }
         }
-      },
-      tbb::simple_partitioner());
+      /*},
+      tbb::simple_partitioner());*/
   // std::cout << "Winner: " << winner << "\n";
   // Generate upto num_samples samples from the best approximating Normal ##
   /*
