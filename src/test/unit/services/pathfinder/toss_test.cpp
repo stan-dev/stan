@@ -6,7 +6,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
 
-auto&& blah = stan::math::init_threadpool_tbb(1);
+auto&& blah = stan::math::init_threadpool_tbb(8);
 
 struct mock_callback : public stan::callbacks::interrupt {
   int n;
