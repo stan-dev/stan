@@ -162,6 +162,24 @@ inline auto get_rnorm_and_draws(Generator& rnorm,
   }
 }
 
+template <typename F>
+inline auto calc_lp_fun(F&& fn, const Eigen::MatrixXd& samples) {
+  int draw_ind = 1;
+  int fn_calls_DIV = 0;
+  Eigen::VectorXd f_test_elbo_draws(samples.cols());
+  Eigen::VectorXd u2_col;
+  try {
+    for (Eigen::Index i = 0; i < samples.cols(); ++i) {
+      u2_col = samples.col(i);
+      f_test_elbo_draws(i) = fn(u2_col);
+      ++fn_calls_DIV;
+    }
+  } catch (...) {
+    // TODO: Actually catch errors
+  }
+  return f_test_elbo_draws;
+}
+
 template <typename SamplePkg, typename F, typename BaseRNG>
 inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
                            const Eigen::VectorXd& alpha, F&& fn,
@@ -362,6 +380,21 @@ inline auto construct_taylor_approximation(const Buff& Ykt_mat,
   }
 }
 
+template <bool ReturnLpSamples, typename EigMat, typename EigVec,
+          std::enable_if_t<ReturnLpSamples>* = nullptr>
+inline auto ret_pathfinder(int return_code, EigMat&& samples,
+                           EigVec&& lp_ratio) {
+  return std::make_tuple(return_code, std::forward<EigMat>(samples),
+                         std::forward<EigVec>(lp_ratio));
+}
+
+template <bool ReturnLpSamples, typename EigMat, typename EigVec,
+          std::enable_if_t<!ReturnLpSamples>* = nullptr>
+inline auto ret_pathfinder(int return_code, EigMat&& samples,
+                           EigVec&& lp_ratio) {
+  return return_code;
+}
+
 /**
  * Runs the L-BFGS algorithm for a model.
  *
@@ -411,7 +444,8 @@ inline auto construct_taylor_approximation(const Buff& Ykt_mat,
  * approx and log density of draws in ELBO-maximizing normal approximation.
  *
  */
-template <class Model, typename DiagnosticWriter, typename ParamWriter>
+template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
+          typename ParamWriter>
 inline int pathfinder_lbfgs_single(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
@@ -711,7 +745,8 @@ inline int pathfinder_lbfgs_single(
     constrained_draws2(constrained_draws2.size() - 1) = lp_vec(i);
     parameter_writer(constrained_draws2);
   }
-  return 1;
+  Eigen::VectorXd lp_ratio = calc_lp_fun(fn, draws_mat) - lp_vec;
+  return ret_pathfinder<ReturnLpSamples>(1, draws_mat, lp_ratio);
 }
 
 }  // namespace optimize
