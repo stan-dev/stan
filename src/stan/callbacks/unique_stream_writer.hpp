@@ -49,12 +49,14 @@ class unique_stream_writer final : public writer {
    * @param[in] names Names in a std::vector
    */
   void operator()(const std::vector<std::string>& names) {
+    if (output_ == nullptr)
+      return;
     write_vector(names);
   }
   /**
    * Get the underlying stream
    */
-  auto& get_stream() { return *output_; }
+  inline auto& get_stream() noexcept { return *output_; }
 
   /**
    * Writes a set of values in csv format followed by a newline.
@@ -70,10 +72,9 @@ class unique_stream_writer final : public writer {
    * Writes the comment_prefix to the stream followed by a newline.
    */
   void operator()() {
-    std::stringstream streamer;
-    streamer.precision(output_.get()->precision());
-    streamer << comment_prefix_ << std::endl;
-    *output_ << streamer.str();
+    if (output_ == nullptr)
+      return;
+    *output_ << comment_prefix_ << std::endl;
   }
 
   /**
@@ -82,10 +83,9 @@ class unique_stream_writer final : public writer {
    * @param[in] message A string
    */
   void operator()(const std::string& message) {
-    std::stringstream streamer;
-    streamer.precision(output_.get()->precision());
-    streamer << comment_prefix_ << message << std::endl;
-    *output_ << streamer.str();
+    if (output_ == nullptr)
+      return;
+    *output_ << comment_prefix_ << message << std::endl;
   }
 
  private:
@@ -109,18 +109,17 @@ class unique_stream_writer final : public writer {
    */
   template <class T>
   void write_vector(const std::vector<T>& v) {
-    if (v.empty())
+    if (output_ == nullptr)
       return;
-    using const_iter = typename std::vector<T>::const_iterator;
-    const_iter last = v.end();
-    --last;
-    std::stringstream streamer;
-    streamer.precision(output_.get()->precision());
-    for (const_iter it = v.begin(); it != last; ++it) {
-      streamer << *it << ",";
+    if (v.empty()) {
+      return;
     }
-    streamer << v.back() << std::endl;
-    *output_ << streamer.str();
+    auto last = v.end();
+    --last;
+    for (auto it = v.begin(); it != last; ++it) {
+      *output_ << *it << ",";
+    }
+    *output_ << v.back() << std::endl;
   }
 };
 
