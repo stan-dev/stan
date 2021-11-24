@@ -302,6 +302,7 @@ pipeline {
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
                             echo 'CXX=${env.CXX}' >> make/local
+                            make clean-all
                             make -j${env.PARALLEL} build
                             cd ..
                             ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
@@ -337,6 +338,7 @@ pipeline {
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
                             echo 'CXX=${env.CXX}' >> make/local
+                            make clean-all
                             make -j${env.PARALLEL} build
                             cd ..
                             ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
