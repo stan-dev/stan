@@ -21,9 +21,10 @@
 #define STAN_DEBUG_PATH_ALL false
 #define STAN_DEBUG_PATH_POST_LBFGS false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_TAYLOR_APPX false || STAN_DEBUG_PATH_ALL
-#define STAN_DEBUG_PATH_ELBO_DRAWS false || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_ELBO_DRAWS true || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_CURVE_CHECK false || STAN_DEBUG_PATH_ALL
-#define STAN_DEBUG_PATH_BEST_ELBO false || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_BEST_ELBO true || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_ITERS STAN_DEBUG_PATH_ALL || STAN_DEBUG_PATH_POST_LBFGS || STAN_DEBUG_PATH_TAYLOR_APPX || STAN_DEBUG_PATH_ELBO_DRAWS || STAN_DEBUG_PATH_CURVE_CHECK || STAN_DEBUG_PATH_BEST_ELBO
 
 namespace stan {
 namespace services {
@@ -634,7 +635,9 @@ inline auto pathfinder_lbfgs_single(
       tbb::blocked_range<int>(0, actual_num_iters - 1),
       [&](tbb::blocked_range<int> r) {
         for (int iter = r.begin(); iter < r.end(); ++iter) {
-          // std::cout << "\n------------ Iter: " << iter << "------------\n";
+          if (STAN_DEBUG_PATH_ITERS) {
+            std::cout << "\n------------ Iter: " << iter << "------------\n";
+          }
           boost::variate_generator<boost::ecuyer1988&,
                                    boost::normal_distribution<>>
               rand_unit_gaus(rng_vec[iter], boost::normal_distribution<>());
