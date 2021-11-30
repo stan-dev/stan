@@ -37,7 +37,10 @@ inline int pathfinder_lbfgs_multi(
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
   Eigen::Array<double, -1, 1> lp_ratios(num_draws * num_paths);
   std::vector<std::string> param_names;
-  model.constrained_param_names(param_names, true);
+  model.constrained_param_names(param_names, true, true);
+  param_names.push_back("lp__");
+  parameter_writer(param_names);
+  diagnostic_writer(param_names);
   size_t num_params = param_names.size();
   Eigen::Array<double, -1, -1> samples(num_params, num_paths * num_draws);
   tbb::parallel_for(tbb::blocked_range<int>(0, num_paths),

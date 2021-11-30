@@ -21,9 +21,9 @@
 #define STAN_DEBUG_PATH_ALL false
 #define STAN_DEBUG_PATH_POST_LBFGS false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_TAYLOR_APPX false || STAN_DEBUG_PATH_ALL
-#define STAN_DEBUG_PATH_ELBO_DRAWS true || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_ELBO_DRAWS false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_CURVE_CHECK false || STAN_DEBUG_PATH_ALL
-#define STAN_DEBUG_PATH_BEST_ELBO true || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_BEST_ELBO false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_ITERS STAN_DEBUG_PATH_ALL || STAN_DEBUG_PATH_POST_LBFGS || STAN_DEBUG_PATH_TAYLOR_APPX || STAN_DEBUG_PATH_ELBO_DRAWS || STAN_DEBUG_PATH_CURVE_CHECK || STAN_DEBUG_PATH_BEST_ELBO
 
 namespace stan {
@@ -164,7 +164,7 @@ inline auto get_rnorm_and_draws(Generator& rnorm,
 }
 
 template <typename F>
-inline auto calc_lp_fun(F&& fn, const Eigen::MatrixXd& samples) {
+inline auto calc_lp_fun(F&& mod_log_prob, const Eigen::MatrixXd& samples) {
   int draw_ind = 1;
   int fn_calls_DIV = 0;
   Eigen::VectorXd f_test_elbo_draws(samples.cols());
@@ -172,7 +172,7 @@ inline auto calc_lp_fun(F&& fn, const Eigen::MatrixXd& samples) {
   try {
     for (Eigen::Index i = 0; i < samples.cols(); ++i) {
       u2_col = samples.col(i);
-      f_test_elbo_draws(i) = fn(u2_col);
+      f_test_elbo_draws(i) = mod_log_prob(u2_col);
       ++fn_calls_DIV;
     }
   } catch (...) {
@@ -183,7 +183,7 @@ inline auto calc_lp_fun(F&& fn, const Eigen::MatrixXd& samples) {
 
 template <typename SamplePkg, typename F, typename BaseRNG>
 inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
-                           const Eigen::VectorXd& alpha, F&& fn,
+                           const Eigen::VectorXd& alpha, F&& mod_log_prob,
                            BaseRNG&& rnorm) {
   const auto param_size = taylor_approx.x_center.size();
   int draw_ind = 1;
@@ -194,7 +194,7 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
   try {
     for (Eigen::Index i = 0; i < num_samples; ++i) {
       u2_col = std::get<1>(tuple_u).col(i);
-      f_test_elbo_draws(i) = fn(u2_col);
+      f_test_elbo_draws(i) = mod_log_prob(u2_col);
       ++fn_calls_DIV;
     }
   } catch (...) {
@@ -215,13 +215,13 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
     std::cout << "repeat_draws: \n"
               << std::get<1>(tuple_u).transpose().eval().format(CommaInitFmt)
               << "\n";
-    std::cout << "random_stuff: \n"
+    /*std::cout << "random_stuff: \n"
               << std::get<0>(tuple_u).transpose().eval().format(CommaInitFmt)
-              << "\n";
+              << "\n";*/
     std::cout << "lp_approx_draws: \n"
-              << lp_approx_draws.format(CommaInitFmt) << "\n";
+              << lp_approx_draws.transpose().eval().format(CommaInitFmt) << "\n";
     std::cout << "fn_call: \n"
-              << f_test_elbo_draws.format(CommaInitFmt) << "\n";
+              << f_test_elbo_draws.transpose().eval().format(CommaInitFmt) << "\n";
   }
   return ELBO;
 }
@@ -281,7 +281,7 @@ inline auto construct_taylor_approximation_full(const Buff& Ykt_mat,
   // std::cout << "Hk2: " << Hk.format(CommaInitFmt) << "\n";
   Eigen::MatrixXd L_hk = Hk.llt().matrixL();
   // std::cout << "L_approx: \n" << cholHk.format(CommaInitFmt) << "\n";
-  auto logdetcholHk = 2.0 * L_hk.diagonal().array().log().sum();
+  double logdetcholHk = 2.0 * L_hk.diagonal().array().abs().log().sum();
 
   Eigen::VectorXd x_center = point_est - Hk * grad_est;
   if (STAN_DEBUG_PATH_TAYLOR_APPX) {
@@ -331,7 +331,7 @@ inline auto construct_taylor_approximation_sparse(
          + Eigen::MatrixXd::Identity(Rkbar.rows(), Rkbar.rows()))
             .llt()
             .matrixL();
-  double logdetcholHk = L_approx.diagonal().array().log().sum()
+  double logdetcholHk = L_approx.diagonal().array().abs().log().sum()
                         + 0.5 * alpha.array().log().sum();
   Eigen::VectorXd ninvRSTg = ninvRST * grad_est;
   Eigen::VectorXd alpha_mul_grad = (alpha.array() * grad_est.array()).matrix();
@@ -602,7 +602,7 @@ inline auto pathfinder_lbfgs_single(
     std::cout << "\n Ykt_diff mat: "
               << Ykt_diff.transpose().eval().format(CommaInitFmt) << "\n";
     std::cout << "\n grad mat: "
-              << grad_mat.leftCols(actual_num_iters + 5)
+              << grad_mat.leftCols(actual_num_iters)
                      .transpose()
                      .eval()
                      .format(CommaInitFmt)
@@ -610,7 +610,7 @@ inline auto pathfinder_lbfgs_single(
     std::cout << "\n Skt_diff mat: "
               << Skt_diff.transpose().eval().format(CommaInitFmt) << "\n";
     std::cout << "\n param mat: "
-              << param_mat.leftCols(actual_num_iters + 5)
+              << param_mat.leftCols(actual_num_iters)
                      .transpose()
                      .eval()
                      .format(CommaInitFmt)
@@ -622,7 +622,7 @@ inline auto pathfinder_lbfgs_single(
         util::create_rng<boost::ecuyer1988>(random_seed, path + iter));
   }
 
-  auto fn = [&model](auto&& u) {
+  auto mod_log_prob = [&model](auto&& u) {
     return -model.template log_prob<false, true>(u, 0);
   };
 
@@ -679,7 +679,7 @@ inline auto pathfinder_lbfgs_single(
           Eigen::MatrixXd Rk = Eigen::MatrixXd::Zero(current_history_size,
                                                      current_history_size);
           for (Eigen::Index s = 0; s < current_history_size; s++) {
-            for (Eigen::Index i = 0; i <= s; i++) {
+            for (Eigen::Index i = s; i < current_history_size; i++) {
               Rk(i, s) = Skt_h[i].dot(Ykt_h[s]);
             }
           }
@@ -690,7 +690,14 @@ inline auto pathfinder_lbfgs_single(
               Skt_mat.col(i) = Skt_h[i];
             }
             Skt_mat.transposeInPlace();
-            Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat);
+            if (STAN_DEBUG_PATH_ITERS) {
+              std::cout << "\nRk: \n" << Rk << "\n";
+              std::cout << "\nSkt: \n" << Skt_mat << "\n";
+            }
+            Rk.triangularView<Eigen::Lower>().solveInPlace(Skt_mat);
+            if (STAN_DEBUG_PATH_ITERS) {
+              std::cout << "\nninvRST: \n" << Skt_mat << "\n";
+            }
             ninvRST = -std::move(Skt_mat);
           }
           /**
@@ -703,7 +710,7 @@ inline auto pathfinder_lbfgs_single(
               grad_mat.col(iter));
 
           auto elbo = est_elbo_draws(taylor_appx_tuple, num_elbo_draws, alpha,
-                                     fn, rnorm);
+                                     mod_log_prob, rnorm);
           // TODO: Calculate total function calls
           // fn_call = fn_call + DIV_fit$fn_calls_DIV
           // DIV_ls = c(DIV_ls, DIV_fit$elbo)
@@ -733,21 +740,23 @@ inline auto pathfinder_lbfgs_single(
         };
   auto draws_tuple = approximation_samples(taylor_approx_best, num_draws,
                                            alpha_mat.col(best_E), rnorm);
-  auto&& draws_mat = std::get<0>(draws_tuple);
-  auto&& lp_vec = std::get<1>(draws_tuple);
+  auto&& draws_mat = std::get<0>(std::move(draws_tuple));
+  auto&& approx_lp_vec = std::get<1>(std::move(draws_tuple));
   Eigen::VectorXd unconstrained_draws;
-  Eigen::VectorXd constrained_draws1;
-  Eigen::VectorXd constrained_draws2(names.size());
-  Eigen::MatrixXd constrainted_draws_mat(names.size() - 1, draws_mat.cols());
+  Eigen::VectorXd constrained_draws_vec;
+  Eigen::MatrixXd constrainted_draws_mat(names.size(), draws_mat.cols());
   for (Eigen::Index i = 0; i < draws_mat.cols(); ++i) {
     unconstrained_draws = draws_mat.col(i);
-    model.write_array(rng, unconstrained_draws, constrained_draws1);
-    constrainted_draws_mat.col(i) = constrained_draws1;
-    constrained_draws2.head(names.size() - 1) = constrained_draws1;
-    constrained_draws2(constrained_draws2.size() - 1) = lp_vec(i);
-    parameter_writer(constrained_draws2);
+    model.write_array(rng, unconstrained_draws, constrained_draws_vec);
+    constrainted_draws_mat.col(i).segment(0, names.size() - 1) = constrained_draws_vec;
+    try {
+      constrainted_draws_mat.col(i)(names.size() - 1) = mod_log_prob(unconstrained_draws);
+    } catch (...) {
+      // TODO: Actually catch errors
+    }
   }
-  Eigen::Array<double, -1, 1> lp_ratio = calc_lp_fun(fn, draws_mat) - lp_vec;
+  parameter_writer(constrainted_draws_mat);
+  Eigen::Array<double, -1, 1> lp_ratio = constrainted_draws_mat.row(names.size() - 1).transpose() - approx_lp_vec;
   return ret_pathfinder<ReturnLpSamples>(1, std::move(lp_ratio), std::move(constrainted_draws_mat));
 }
 
