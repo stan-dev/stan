@@ -75,6 +75,11 @@ pipeline {
         preserveStashes(buildCount: 7)
         parallelsAlwaysFailFast()
     }
+    environment {
+        CXX = 'clang++-6.0'
+        GCC = 'g++'
+        PARALLEL = 8
+    }
     stages {
         stage('Kill previous builds') {
             when {
@@ -89,10 +94,13 @@ pipeline {
             }
         }
         stage("Clang-format") {
-            agent any
+            agent {
+                docker {
+                    image 'stanorg/ci:alpine'
+                    label 'linux'
+                }
+            }
             steps {
-                sh "printenv"
-                deleteDir()
                 retry(3) { checkout scm }
                 withCredentials([usernamePassword(credentialsId: 'a630aebc-6861-4e69-b497-fd7f496ec46b',
                     usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
@@ -137,10 +145,14 @@ pipeline {
             }
         }
         stage('Linting & Doc checks') {
-            agent any
+            agent {
+                docker {
+                    image 'stanorg/ci:alpine'
+                    label 'linux'
+                }
+            }
             steps {
                 script {
-                    sh "printenv"
                     retry(3) { checkout scm }
                     sh """
                        make math-revert
@@ -176,7 +188,12 @@ pipeline {
             }
         }
         stage('Verify changes') {
-            agent { label 'linux' }
+            agent {
+                docker {
+                    image 'stanorg/ci:alpine'
+                    label 'linux'
+                }
+            }
             steps {
                 script {
 
@@ -228,7 +245,12 @@ pipeline {
                     post { always { deleteDirWin() } }
                 }
                 stage('Linux Unit') {
-                    agent { label 'linux' }
+                    agent {
+                        docker {
+                            image 'stanorg/ci:alpine'
+                            label 'linux'
+                        }
+                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, env.GCC, stanc3_bin_url())
@@ -238,7 +260,12 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Mac Unit') {
-                    agent { label 'osx' }
+                    agent {
+                        docker {
+                            image 'stanorg/ci:alpine'
+                            label 'osx'
+                        }
+                    }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
@@ -259,7 +286,12 @@ pipeline {
         stage('Integration') {
             parallel {
                 stage('Integration Linux') {
-                    agent { label 'linux' }
+                    agent {
+                        docker {
+                            image 'stanorg/ci:alpine'
+                            label 'linux'
+                        }
+                    }
                     steps {
                         sh """
                             git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
@@ -318,7 +350,12 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Integration Mac') {
-                    agent { label 'osx' }
+                    agent {
+                        docker {
+                            image 'stanorg/ci:alpine'
+                            label 'osx'
+                        }
+                    }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
@@ -354,7 +391,7 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Integration Windows') {
-                    agent { label 'windows-ec2' }
+                    agent { label 'windows' }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
@@ -419,7 +456,12 @@ pipeline {
                     !skipRemainingStages
                 }
             }
-            agent { label 'oldimac' }
+            agent {
+                docker {
+                    image 'stanorg/ci:alpine'
+                    label 'osx' // oldimac
+                }
+            }
             steps {
                 unstash 'StanSetup'
                 setupCXX(true, env.CXX, stanc3_bin_url())
@@ -441,9 +483,10 @@ pipeline {
             }
         }
     }
+    // Below lines are commented to avoid spamming emails during migration/debug
     post {
         always {
-            node("osx || linux") {
+            node("linux") {
                 recordIssues id: "pipeline",
                 name: "Entire pipeline results",
                 enabledForFailure: true,
@@ -461,10 +504,10 @@ pipeline {
         success {
             script {
                 utils.updateUpstream(env,'cmdstan')
-                utils.mailBuildResults("SUCCESSFUL")
+                //utils.mailBuildResults("SUCCESSFUL")
             }
         }
-        unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
-        failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
+        //unstable { script { utils.mailBuildResults("UNSTABLE", "stan-buildbot@googlegroups.com") } }
+        //failure { script { utils.mailBuildResults("FAILURE", "stan-buildbot@googlegroups.com") } }
     }
 }
