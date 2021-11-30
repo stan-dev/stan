@@ -6,7 +6,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
 
-auto&& blah = stan::math::init_threadpool_tbb(8);
+auto&& blah = stan::math::init_threadpool_tbb(1);
 
 struct mock_callback : public stan::callbacks::interrupt {
   int n;
@@ -101,6 +101,8 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 2;
+  double num_elbo_draws = 500;
+  double num_draws = 1000;
 
   bool save_iterations = true;
   int refresh = 0;
@@ -139,7 +141,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
 
   int return_code = stan::services::optimize::pathfinder_lbfgs_single(
       model, empty_context, seed, chain, init_radius, 15, 0.001, 1e-12, 10000, 1e-8,
-      10000000, 1e-8, 2000, save_iterations, refresh, callback, 100, 100, 1,
+      10000000, 1e-8, 2000, save_iterations, refresh, callback, num_elbo_draws, num_draws, 1,
       logger, init, parameter, diagnostics);
 
 
