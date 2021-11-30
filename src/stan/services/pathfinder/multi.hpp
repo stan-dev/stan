@@ -33,27 +33,39 @@ inline int pathfinder_lbfgs_multi(
     callbacks::interrupt& interrupt, size_t num_elbo_draws, size_t num_draws,
     size_t num_multi_draws, size_t num_threads, size_t num_paths,
     callbacks::logger& logger, callbacks::writer& init_writer,
+    std::vector<ParamWriter>& single_path_parameter_writer, std::vector<DiagnosticWriter>& single_path_diagnostic_writer,
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
   Eigen::Array<double, -1, 1> lp_ratios(num_draws * num_paths);
-  size_t num_params = 0;
-  Eigen::Array<double, -1, -1> samples(num_paths * num_draws, num_params);
+  std::vector<std::string> param_names;
+  model.constrained_param_names(param_names, true);
+  size_t num_params = param_names.size();
+  Eigen::Array<double, -1, -1> samples(num_params, num_paths * num_draws);
   tbb::parallel_for(tbb::blocked_range<int>(0, num_paths),
     [&](tbb::blocked_range<int> r) {
       for (int iter = r.begin(); iter < r.end(); ++iter) {
         auto pathfinder_ret
             = stan::services::optimize::pathfinder_lbfgs_single<true>(
-                model, init, random_seed, path + iter, init_radius,
-                history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad,
-                tol_param, num_iterations, save_iterations, refresh,
-                interrupt, num_elbo_draws, num_draws, num_threads,
-                logger, init_writer, parameter_writer, diagnostic_writer);
-        Eigen::Array<double, -1, 1> lp_ratio = std::get<0>(pathfinder_ret);
+              model, init, random_seed,
+              path + iter, init_radius, history_size, init_alpha,
+              tol_obj, tol_rel_obj, tol_grad, tol_rel_grad,
+              tol_param, num_iterations, save_iterations, refresh,
+               interrupt, num_elbo_draws, num_draws,
+              num_threads, logger,
+              init_writer, single_path_parameter_writer[iter],
+              single_path_diagnostic_writer[iter]);
+        Eigen::Array<double, -1, 1> lp_ratio = std::get<1>(pathfinder_ret);
         // logic for writing to lp_ratios and draws
         lp_ratios.segment(iter * num_draws, num_draws) = -lp_ratio;
-        samples.middleRows(iter * num_draws, num_draws) = std::get<1>(pathfinder_ret);
+        /*
+        Eigen::MatrixXd blah1 = samples.middleCols(iter * num_draws, num_draws);
+        std::cout << "\n blah rows:" << blah1.rows() << " cols:" << blah1.cols() << "\n";
+        Eigen::MatrixXd blah2 = std::get<2>(pathfinder_ret);
+        std::cout << "\n samples rows:" << blah2.rows() << " cols:" << blah2.cols() << "\n";
+        */
+        samples.middleCols(iter * num_draws, num_draws) = std::get<2>(pathfinder_ret);
       }
     });
-  const auto tail_len = std::min(0.2 * samples.rows(), 3 * std::sqrt(samples.rows()));
+  const auto tail_len = std::min(0.2 * samples.cols(), 3 * std::sqrt(samples.cols()));
   Eigen::Array<double, -1, 1> weight_vals = stan::services::psis::get_psis_weights(lp_ratios, tail_len);
   // Figure out if I can use something in boost and not a std::vector
   std::vector<double> lp_weights(num_paths * num_draws);
@@ -68,7 +80,7 @@ inline int pathfinder_lbfgs_multi(
       rand_psis_idx(
           rng, boost::random::discrete_distribution<Eigen::Index, double>(lp_weights));
   for (size_t i = 0; i < num_multi_draws; ++i) {
-    parameter_writer(samples.row(rand_psis_idx()));
+    parameter_writer(samples.col(rand_psis_idx()));
   }
   return 1;
 }

@@ -1,3 +1,4 @@
+#include <stan/math.hpp>
 #include <stan/services/pathfinder/multi.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
@@ -42,8 +43,10 @@ class values : public stan::callbacks::stream_writer {
   void operator()(const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& xx) {
     optim_path_ = xx;
   }
-  void operator()(const Eigen::VectorXd& vals) { eigen_states_.push_back(vals); }
-  void operator()(const Eigen::MatrixXd& vals) { values_ = vals; }
+  template <typename EigVec, stan::require_eigen_vector_t<EigVec>* = nullptr>
+  void operator()(const EigVec& vals) { eigen_states_.push_back(vals); }
+  template <typename EigMat, stan::require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
+  void operator()(const EigMat& vals) { values_ = vals; }
 };
 
 stan::io::array_var_context init_context() {
@@ -101,7 +104,19 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 2;
-
+  size_t num_elbo_draws = 1000;
+  size_t num_draws = 100;
+  size_t num_multi_draws = 100;
+  size_t num_threads = 1;
+  size_t num_paths = 10;
+  std::vector<std::stringstream> single_path_parameter_ss(num_paths);
+  std::vector<std::stringstream> single_path_diagnostic_ss(num_paths);
+  std::vector<values> single_path_parameter_writer;
+  std::vector<values> single_path_diagnostic_writer;
+  for (int i = 0; i < num_paths; ++i) {
+    single_path_parameter_writer.emplace_back(single_path_parameter_ss[i]);
+    single_path_diagnostic_writer.emplace_back(single_path_diagnostic_ss[i]);
+  }
   bool save_iterations = true;
   int refresh = 0;
   mock_callback callback;
@@ -136,16 +151,11 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   for (Eigen::Index i = 0; i < X_vals.cols(); ++i) {
       input_iters.emplace_back(X_vals.col(i), G_vals.col(i));
   }
-  size_t num_elbo_draws = 100;
-  size_t num_draws = 100;
-  size_t num_multi_draws = 100;
-  size_t num_threads = 1;
-  size_t num_paths = 10;
-  int return_code = stan::services::optimize::pathfinder_lbfgs_single(
+  int return_code = stan::services::optimize::pathfinder_lbfgs_multi(
       model, empty_context, seed, chain, init_radius, 15, 0.001, 1e-12, 10000, 1e-8,
       10000000, 1e-8, 2000, save_iterations, refresh, callback, num_elbo_draws,
       num_draws, num_multi_draws, num_threads, num_paths,
-      logger, init, parameter, diagnostics);
+      logger, init, single_path_parameter_writer, single_path_diagnostic_writer, parameter, diagnostics);
 
 
 
@@ -169,7 +179,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
         /*
         std::cout << "Values: \n"
                   << param_vals.format(CommaInitFmt) << "\n";
-        */
+                  */
          Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
          std::cout << "Mean Values: \n"
                    << mean_vals.format(CommaInitFmt) << "\n";

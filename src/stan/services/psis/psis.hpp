@@ -99,17 +99,17 @@ inline auto psis_smooth_tail(const Eigen::Array<double, -1, 1>& x,
     auto fit = gpdfit(x.array().exp() - exp_cutoff);
     double k = std::get<0>(fit);
     double sigma = std::get<1>(fit);
-    std::cout << "\n k: " << k << "\n";
-    std::cout << "\n sigma: " << sigma << "\n";
+//    std::cout << "\n k: " << k << "\n";
+//    std::cout << "\n sigma: " << sigma << "\n";
     if (is_finite(k)) {
         auto p =
             (Eigen::Array<double, -1, 1>::LinSpaced(x_size, 1, x_size) - 0.5) /
             x_size;
         Eigen::Array<double, -1, 1> blah = qgpd(p, k, sigma);
-        std::cout << "\nblah: \n" << blah << "\n";
+//        std::cout << "\nblah: \n" << blah << "\n";
         auto qq = blah + exp_cutoff;
-        std::cout << "\n p: \n" << p << "\n";
-        std::cout << "\n qq: \n" << qq << "\n";
+//        std::cout << "\n p: \n" << p << "\n";
+//        std::cout << "\n qq: \n" << qq << "\n";
         return std::make_tuple(qq.log().eval(), k);
     } else {
         return std::make_tuple(x, k);
@@ -172,7 +172,9 @@ inline auto get_psis_weights(const Eigen::Array<double, -1, 1>& log_ratios_i,
     // shift log ratios for safer exponentation
     const double max_log_ratio = log_ratios_i.maxCoeff();
     Eigen::Array<double, -1, 1> lw_i = log_ratios_i - max_log_ratio;
+    /*
     std::cout << "\nlw_i: \n" << lw_i << "\n";
+    */
     double khat = 0;
 
     if (tail_len_i >= 5) {
@@ -185,8 +187,10 @@ inline auto get_psis_weights(const Eigen::Array<double, -1, 1>& log_ratios_i,
         auto max_n = max_n_elements(lw_i, tail_len_i + 1);
         Eigen::Array<double, -1, 1> lw_tail = std::get<0>(max_n).tail(tail_len_i);
         double cutoff = std::get<0>(max_n)(0);
+        /*
         std::cout << "\ncutoff: " << cutoff << "\n";
         std::cout << "\ntop_n: \n" << lw_tail << "\n";
+        */
         if (lw_tail.maxCoeff() - lw_tail.minCoeff() <=
             std::numeric_limits<double>::min() * 10) {
             /*
@@ -200,14 +204,15 @@ inline auto get_psis_weights(const Eigen::Array<double, -1, 1>& log_ratios_i,
             // cutoff = ord$x[min(tail_ids) - 1] // largest value smaller than
             // tail values
             auto smoothed = psis_smooth_tail(lw_tail, cutoff);
-            std::cout << "\n smoothed: \n" << std::get<0>(smoothed) << "\n";
             auto khat = std::get<1>(smoothed);
-            std::cout << "\nkhat: " << khat << "\n";
-            //         lw_i[ord$ix[tail_ids]] = smoothed$tail
-            std::cout << "\nidx_n: \n" << std::get<1>(max_n).tail(tail_len_i) << "\n";
             insert_smooth_to_tail(lw_i, std::get<1>(max_n).tail(tail_len_i),
                                   std::get<0>(smoothed));
+/*
+            std::cout << "\n smoothed: \n" << std::get<0>(smoothed) << "\n";
+            std::cout << "\nkhat: " << khat << "\n";
+            std::cout << "\nidx_n: \n" << std::get<1>(max_n).tail(tail_len_i) << "\n";
             std::cout << "\nnew lw_i: \n" << lw_i << "\n";
+            */
         }
     }
 
@@ -220,7 +225,7 @@ inline auto get_psis_weights(const Eigen::Array<double, -1, 1>& log_ratios_i,
         // unchanged lw_i = lw_i + max(log_ratios_i)
     }
     auto max_adj = (lw_i + max_log_ratio).eval();
-    std::cout << "\nmax_adj: \n" << max_adj << "\n";
+//    std::cout << "\nmax_adj: \n" << max_adj << "\n";
     return (max_adj - log_sum_exp(max_adj)).exp().eval();
 }
 

@@ -382,16 +382,13 @@ inline auto construct_taylor_approximation(const Buff& Ykt_mat,
 
 template <bool ReturnLpSamples, typename EigMat, typename EigVec,
           std::enable_if_t<ReturnLpSamples>* = nullptr>
-inline auto ret_pathfinder(int return_code, EigMat&& samples,
-                           EigVec&& lp_ratio) {
-  return std::make_tuple(return_code, std::forward<EigMat>(samples),
-                         std::forward<EigVec>(lp_ratio));
+inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples) {
+  return std::make_tuple(return_code, std::forward<EigVec>(lp_ratio), std::forward<EigMat>(samples));
 }
 
 template <bool ReturnLpSamples, typename EigMat, typename EigVec,
           std::enable_if_t<!ReturnLpSamples>* = nullptr>
-inline auto ret_pathfinder(int return_code, EigMat&& samples,
-                           EigVec&& lp_ratio) {
+inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples) {
   return return_code;
 }
 
@@ -446,7 +443,7 @@ inline auto ret_pathfinder(int return_code, EigMat&& samples,
  */
 template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
           typename ParamWriter>
-inline int pathfinder_lbfgs_single(
+inline auto pathfinder_lbfgs_single(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
@@ -642,7 +639,7 @@ inline int pathfinder_lbfgs_single(
                                    boost::normal_distribution<>>
               rand_unit_gaus(rng_vec[iter], boost::normal_distribution<>());
           auto rnorm = [&rand_unit_gaus, num_params = param_size,
-                        num_samples = num_draws]() {
+                        num_samples = num_elbo_draws]() {
             return Eigen::MatrixXd::NullaryExpr(
                 num_params, num_samples,
                 [&rand_unit_gaus]() { return rand_unit_gaus(); });
@@ -738,15 +735,17 @@ inline int pathfinder_lbfgs_single(
   Eigen::VectorXd unconstrained_draws;
   Eigen::VectorXd constrained_draws1;
   Eigen::VectorXd constrained_draws2(names.size());
+  Eigen::MatrixXd constrainted_draws_mat(names.size() - 1, draws_mat.cols());
   for (Eigen::Index i = 0; i < draws_mat.cols(); ++i) {
     unconstrained_draws = draws_mat.col(i);
     model.write_array(rng, unconstrained_draws, constrained_draws1);
+    constrainted_draws_mat.col(i) = constrained_draws1;
     constrained_draws2.head(names.size() - 1) = constrained_draws1;
     constrained_draws2(constrained_draws2.size() - 1) = lp_vec(i);
     parameter_writer(constrained_draws2);
   }
-  Eigen::VectorXd lp_ratio = calc_lp_fun(fn, draws_mat) - lp_vec;
-  return ret_pathfinder<ReturnLpSamples>(1, draws_mat, lp_ratio);
+  Eigen::Array<double, -1, 1> lp_ratio = calc_lp_fun(fn, draws_mat) - lp_vec;
+  return ret_pathfinder<ReturnLpSamples>(1, std::move(lp_ratio), std::move(constrainted_draws_mat));
 }
 
 }  // namespace optimize
