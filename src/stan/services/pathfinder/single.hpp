@@ -18,8 +18,8 @@
 #include <vector>
 #include <mutex>
 
-#define STAN_DEBUG_PATH_ALL false
-#define STAN_DEBUG_PATH_POST_LBFGS false || STAN_DEBUG_PATH_ALL
+#define STAN_DEBUG_PATH_ALL true
+#define STAN_DEBUG_PATH_POST_LBFGS true || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_TAYLOR_APPX false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_ELBO_DRAWS false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_CURVE_CHECK false || STAN_DEBUG_PATH_ALL
@@ -206,7 +206,7 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
         - 0.5 * std::get<0>(tuple_u).array().square().colwise().sum()
         - 0.5 * param_size * log(2 * stan::math::pi());
   //### Divergence estimation ###
-  double ELBO = -f_test_elbo_draws.mean() - lp_approx_draws.mean();
+  double ELBO = -(f_test_elbo_draws - lp_approx_draws).mean();
   if (STAN_DEBUG_PATH_ELBO_DRAWS) {
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, " ", ", ", "\n", "",
                                  "", " ");
@@ -480,7 +480,7 @@ inline auto pathfinder_lbfgs_single(
   using lbfgs_update_t
       = stan::optimization::LBFGSUpdate<double, Eigen::Dynamic>;
   lbfgs_update_t lbfgs_update(history_size);
-  using Optimizer = stan::optimization::BFGSLineSearch<Model, lbfgs_update_t>;
+  using Optimizer = stan::optimization::BFGSLineSearch<Model, lbfgs_update_t, true>;
   Optimizer lbfgs(model, cont_vector, disc_vector, std::move(ls_opts),
                   std::move(conv_opts), std::move(lbfgs_update), &lbfgs_ss);
 
@@ -512,7 +512,7 @@ inline auto pathfinder_lbfgs_single(
 
     param_mat.col(0)
         = Eigen::Map<Eigen::VectorXd>(cont_vector.data(), param_size);
-    grad_mat.col(0) = Eigen::Map<Eigen::VectorXd>(g1.data(), param_size);
+    grad_mat.col(0) = -Eigen::Map<Eigen::VectorXd>(g1.data(), param_size);
   }
   int actual_num_iters = 0;
   while (ret == 0) {
@@ -559,7 +559,7 @@ inline auto pathfinder_lbfgs_single(
     lbfgs_iters.emplace_back(lbfgs.curr_x(), lbfgs.curr_g());
     ++actual_num_iters;
     param_mat.col(actual_num_iters) = lbfgs.curr_x();
-    grad_mat.col(actual_num_iters) = lbfgs.curr_g();
+    grad_mat.col(actual_num_iters) = -lbfgs.curr_g();
     if (msg.str().length() > 0) {
       logger.info(msg);
     }
@@ -679,7 +679,7 @@ inline auto pathfinder_lbfgs_single(
           Eigen::MatrixXd Rk = Eigen::MatrixXd::Zero(current_history_size,
                                                      current_history_size);
           for (Eigen::Index s = 0; s < current_history_size; s++) {
-            for (Eigen::Index i = s; i < current_history_size; i++) {
+            for (Eigen::Index i = 0; i <= s; i++) {
               Rk(i, s) = Skt_h[i].dot(Ykt_h[s]);
             }
           }
@@ -694,7 +694,7 @@ inline auto pathfinder_lbfgs_single(
               std::cout << "\nRk: \n" << Rk << "\n";
               std::cout << "\nSkt: \n" << Skt_mat << "\n";
             }
-            Rk.triangularView<Eigen::Lower>().solveInPlace(Skt_mat);
+            Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat);
             if (STAN_DEBUG_PATH_ITERS) {
               std::cout << "\nninvRST: \n" << Skt_mat << "\n";
             }

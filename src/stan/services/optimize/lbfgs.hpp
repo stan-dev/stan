@@ -65,9 +65,7 @@ int lbfgs(Model& model, const stan::io::var_context& init,
       model, init, rng, init_radius, false, logger, init_writer);
 
   std::stringstream lbfgs_ss;
-  typedef stan::optimization::BFGSLineSearch<Model,
-                                             stan::optimization::LBFGSUpdate<> >
-      Optimizer;
+  using Optimizer = stan::optimization::BFGSLineSearch<Model, stan::optimization::LBFGSUpdate<>>;
   Optimizer lbfgs(model, cont_vector, disc_vector, &lbfgs_ss);
   lbfgs.get_qnupdate().set_history_size(history_size);
   lbfgs._ls_opts.alpha0 = init_alpha;
