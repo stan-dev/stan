@@ -24,15 +24,15 @@
 namespace stan {
 namespace services {
 namespace optimize {
-template <class Model, typename DiagnosticWriter, typename ParamWriter>
+template <class Model, typename InitContext, typename InitWriter, typename DiagnosticWriter, typename ParamWriter>
 inline int pathfinder_lbfgs_multi(
-    Model& model, const stan::io::var_context& init, unsigned int random_seed,
+    Model& model, InitContext&& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
     callbacks::interrupt& interrupt, size_t num_elbo_draws, size_t num_draws,
     size_t num_multi_draws, size_t num_threads, size_t num_paths,
-    callbacks::logger& logger, callbacks::writer& init_writer,
+    callbacks::logger& logger, InitWriter&& init_writers,
     std::vector<ParamWriter>& single_path_parameter_writer, std::vector<DiagnosticWriter>& single_path_diagnostic_writer,
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
   Eigen::Array<double, -1, 1> lp_ratios(num_draws * num_paths);
@@ -48,13 +48,13 @@ inline int pathfinder_lbfgs_multi(
       for (int iter = r.begin(); iter < r.end(); ++iter) {
         auto pathfinder_ret
             = stan::services::optimize::pathfinder_lbfgs_single<true>(
-              model, init, random_seed,
+              model, *(init[iter]), random_seed,
               path + iter, init_radius, history_size, init_alpha,
               tol_obj, tol_rel_obj, tol_grad, tol_rel_grad,
               tol_param, num_iterations, save_iterations, refresh,
                interrupt, num_elbo_draws, num_draws,
               num_threads, logger,
-              init_writer, single_path_parameter_writer[iter],
+              init_writers[iter], single_path_parameter_writer[iter],
               single_path_diagnostic_writer[iter]);
         Eigen::Array<double, -1, 1> lp_ratio = std::get<1>(pathfinder_ret);
         // logic for writing to lp_ratios and draws

@@ -35,6 +35,11 @@ class unique_stream_writer final : public writer {
   unique_stream_writer(unique_stream_writer&& other)
       : output_(std::move(other.output_)),
         comment_prefix_(std::move(other.comment_prefix_)) {}
+  inline unique_stream_writer& operator=(unique_stream_writer<Stream>&& other) {
+    this->output_ = std::move(other.output_);
+    this->comment_prefix_ = other.comment_prefix_;
+    return *this;
+  }
   /**
    * Virtual destructor
    */
