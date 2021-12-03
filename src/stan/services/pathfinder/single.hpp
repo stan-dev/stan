@@ -18,7 +18,7 @@
 #include <vector>
 #include <mutex>
 
-#define STAN_DEBUG_PATH_ALL false
+#define STAN_DEBUG_PATH_ALL true
 #define STAN_DEBUG_PATH_POST_LBFGS false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_TAYLOR_APPX false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_ELBO_DRAWS false || STAN_DEBUG_PATH_ALL
@@ -490,6 +490,7 @@ inline auto pathfinder_lbfgs_single(
 
   std::vector<std::string> names;
   model.constrained_param_names(names, true, true);
+  names.push_back("lp_approx__");
   names.push_back("lp__");
   parameter_writer(names);
   diagnostic_writer(names);
@@ -741,20 +742,21 @@ inline auto pathfinder_lbfgs_single(
   auto draws_tuple = approximation_samples(taylor_approx_best, num_draws,
                                            alpha_mat.col(best_E), rnorm);
   auto&& draws_mat = std::get<0>(draws_tuple);
-  auto&& lp_vec = std::get<1>(draws_tuple);
+  auto&& lp_approx_vec = std::get<1>(draws_tuple);
   Eigen::VectorXd unconstrained_draws;
   Eigen::VectorXd constrained_draws1;
   Eigen::VectorXd constrained_draws2(names.size());
-  Eigen::MatrixXd constrainted_draws_mat(names.size() - 1, draws_mat.cols());
+  Eigen::MatrixXd constrainted_draws_mat(names.size() - 2, draws_mat.cols());
   for (Eigen::Index i = 0; i < draws_mat.cols(); ++i) {
     unconstrained_draws = draws_mat.col(i);
     model.write_array(rng, unconstrained_draws, constrained_draws1);
     constrainted_draws_mat.col(i) = constrained_draws1;
-    constrained_draws2.head(names.size() - 1) = constrained_draws1;
-    constrained_draws2(constrained_draws2.size() - 1) = lp_vec(i);
+    constrained_draws2.head(names.size() - 2) = constrained_draws1;
+    constrained_draws2(names.size() - 2) = lp_approx_vec(i);
+    constrained_draws2(names.size() - 1) = fn(unconstrained_draws);
     parameter_writer(constrained_draws2);
   }
-  Eigen::Array<double, -1, 1> lp_ratio = calc_lp_fun(fn, draws_mat) - lp_vec;
+  Eigen::Array<double, -1, 1> lp_ratio;// = calc_lp_fun(fn, draws_mat) - lp_vec;
   return ret_pathfinder<ReturnLpSamples>(0, std::move(lp_ratio), std::move(constrainted_draws_mat));
 }
 
