@@ -755,7 +755,7 @@ inline auto pathfinder_lbfgs_single(
     parameter_writer(constrained_draws2);
   }
   Eigen::Array<double, -1, 1> lp_ratio = calc_lp_fun(fn, draws_mat) - lp_vec;
-  return ret_pathfinder<ReturnLpSamples>(1, std::move(lp_ratio), std::move(constrainted_draws_mat));
+  return ret_pathfinder<ReturnLpSamples>(0, std::move(lp_ratio), std::move(constrainted_draws_mat));
 }
 
 }  // namespace optimize
