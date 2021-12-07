@@ -229,9 +229,9 @@ pipeline {
                     agent { label 'windows' }
                     when {
                         expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
+//                             ( env.BRANCH_NAME == "develop" ||
+//                             env.BRANCH_NAME == "master" ||
+//                             params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
                     }
@@ -245,22 +245,22 @@ pipeline {
                     }
                     post { always { deleteDirWin() } }
                 }
-                stage('Linux Unit') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:ubuntu'
-                            label 'linux'
-                            args '--pull always'
-                        }
-                    }
-                    steps {
-                        unstash 'StanSetup'
-                        setupCXX(true, GCC, stanc3_bin_url())
-                        sh "make -j${PARALLEL} test-headers"
-                        runTests("src/test/unit")
-                    }
-                    post { always { deleteDir() } }
-                }
+//                 stage('Linux Unit') {
+//                     agent {
+//                         docker {
+//                             image 'stanorg/ci:ubuntu'
+//                             label 'linux'
+//                             args '--pull always'
+//                         }
+//                     }
+//                     steps {
+//                         unstash 'StanSetup'
+//                         setupCXX(true, GCC, stanc3_bin_url())
+//                         sh "make -j${PARALLEL} test-headers"
+//                         runTests("src/test/unit")
+//                     }
+//                     post { always { deleteDir() } }
+//                 }
                 stage('Mac Unit') {
                 agent { label 'osx' }
 //                     agent {
@@ -271,9 +271,9 @@ pipeline {
 //                     }
                     when {
                         expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
+//                             ( env.BRANCH_NAME == "develop" ||
+//                             env.BRANCH_NAME == "master" ||
+//                             params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
                     }
@@ -353,17 +353,18 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Integration Mac') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:ubuntu'
-                            label 'osx'
-                        }
-                    }
+//                     agent {
+//                         docker {
+//                             image 'stanorg/ci:ubuntu'
+//                             label 'osx'
+//                         }
+//                     }
+                    agent { label 'osx' }
                     when {
                         expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
+//                             ( env.BRANCH_NAME == "develop" ||
+//                             env.BRANCH_NAME == "master" ||
+//                             params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
                     }
@@ -397,9 +398,9 @@ pipeline {
                     agent { label 'windows' }
                     when {
                         expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
+//                             ( env.BRANCH_NAME == "develop" ||
+//                             env.BRANCH_NAME == "master" ||
+//                             params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
                     }
