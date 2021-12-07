@@ -76,7 +76,7 @@ pipeline {
         parallelsAlwaysFailFast()
     }
     environment {
-        CXX = 'clang++-6.0'
+        CXX = 'clang++-11.0'
         GCC = 'g++'
         PARALLEL = 8
     }
