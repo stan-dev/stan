@@ -250,7 +250,7 @@ pipeline {
                         docker {
                             image 'stanorg/ci:ubuntu'
                             label 'linux'
-                            args "--pull"
+                            args '--pull always'
                         }
                     }
                     steps {
