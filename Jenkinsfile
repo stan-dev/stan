@@ -239,8 +239,8 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             withEnv(["MINGW_EXECUTABLE=${env.MINGW}\\bin\\mingw32-make.exe"]) {
-                                bat "$MINGW_EXECUTABLE -f lib/stan_math/make/standalone math-libs"
-                                bat "$MINGW_EXECUTABLE -j${PARALLEL} test-headers"
+                                bat "\"$MINGW_EXECUTABLE\" -f lib/stan_math/make/standalone math-libs"
+                                bat "\"$MINGW_EXECUTABLE\" -j${PARALLEL} test-headers"
                             }
                             setupCXX(false, env.CXX, stanc3_bin_url())
                             runTestsWin("src/test/unit")
@@ -419,7 +419,7 @@ pipeline {
                             
                             bat """
                                 cd performance-tests-cmdstan/cmdstan
-                                $MINGW_EXECUTABLE -j${PARALLEL} build
+                                \"$MINGW_EXECUTABLE\" -j${PARALLEL} build
                                 cd ..
                                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
                                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
