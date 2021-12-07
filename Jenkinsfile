@@ -239,7 +239,8 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             withEnv(["MINGW_EXECUTABLE=${env.MINGW}\\bin\\mingw32-make.exe", "RTOOLS40_HOME=C:\\PROGRA~1\\R\\R-4.1.2"]) {
-                                bat "SET \"PATH=${RTOOLS40_HOME}\\usr\\bin;%PATH%\"
+                                bat """
+                                    SET \"PATH=${RTOOLS40_HOME}\\usr\\bin;%PATH%\"
                                     \"$MINGW_EXECUTABLE\" -f lib/stan_math/make/standalone math-libs
                                     \"$MINGW_EXECUTABLE\" -j${PARALLEL} test-headers
                                 """
