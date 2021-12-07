@@ -152,6 +152,8 @@ inline auto get_rnorm_and_draws(Generator& rnorm,
                          + taylor_approx.x_center;
     return std::make_tuple(std::move(u), std::move(u2));
   } else {
+    std::cout << "\n Qk: \n" << taylor_approx.Qk << "\n";
+        std::cout << "\n u: \n" << u << "\n";
     Eigen::MatrixXd u1 = crossprod(taylor_approx.Qk, u);
     Eigen::MatrixXd u2
         = (alpha.array().sqrt().matrix().asDiagonal()
@@ -633,7 +635,7 @@ inline auto pathfinder_lbfgs_single(
   //    for (Eigen::Index iter = 0; iter < actual_num_iters - 1; iter++) {
 
   tbb::parallel_for(
-      tbb::blocked_range<int>(0, actual_num_iters - 1),
+      tbb::blocked_range<int>(0, (actual_num_iters - 1) == 0 ? 1 : (actual_num_iters - 1) ),
       [&](tbb::blocked_range<int> r) {
         for (int iter = r.begin(); iter < r.end(); ++iter) {
           if (STAN_DEBUG_PATH_ITERS) {
