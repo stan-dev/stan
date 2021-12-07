@@ -81,18 +81,19 @@ pipeline {
         PARALLEL = 8
     }
     stages {
-        stage('Kill previous builds') {
-            when {
-                not { branch 'develop' }
-                not { branch 'master' }
-                not { branch 'downstream_tests' }
-            }
-            steps {
-                script {
-                    utils.killOldBuilds()
-                }
-            }
-        }
+    // Scripts not permitted to use method hudson.model.ItemGroup getItem java.lang.String
+//         stage('Kill previous builds') {
+//             when {
+//                 not { branch 'develop' }
+//                 not { branch 'master' }
+//                 not { branch 'downstream_tests' }
+//             }
+//             steps {
+//                 script {
+//                     utils.killOldBuilds()
+//                 }
+//             }
+//         }
         stage("Clang-format") {
             agent {
                 docker {
