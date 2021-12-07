@@ -261,12 +261,13 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Mac Unit') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:ubuntu'
-                            label 'osx'
-                        }
-                    }
+                agent { label 'osx' }
+//                     agent {
+//                         docker {
+//                             image 'stanorg/ci:ubuntu'
+//                             label 'osx'
+//                         }
+//                     }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
