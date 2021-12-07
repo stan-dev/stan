@@ -415,7 +415,7 @@ pipeline {
                             unstash 'StanSetup'
                         }
                         writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${CXX}\nPRECOMPILED_HEADERS=true")
-                        withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb", "MINGW_EXECUTABLE=${env.MINGW}\\bin\\mingw32-make.exe]") {
+                        withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb", "MINGW_EXECUTABLE=${env.MINGW}\\bin\\mingw32-make.exe"]) {
                             
                             bat """
                                 cd performance-tests-cmdstan/cmdstan
