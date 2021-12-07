@@ -4,7 +4,7 @@ import org.stan.Utils
 def utils = new org.stan.Utils()
 def skipRemainingStages = false
 
-def setupCXX(failOnError = true, CXX = env.CXX, String stanc3_bin_url = "nightly") {
+def setupCXX(failOnError = true, CXX = CXX, String stanc3_bin_url = "nightly") {
     errorStr = failOnError ? "-Werror " : ""
     stanc3_bin_url_str = stanc3_bin_url != "nightly" ? "\nSTANC3_TEST_BIN_URL=${stanc3_bin_url}\n" : ""
     writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}${stanc3_bin_url_str}")
@@ -12,18 +12,18 @@ def setupCXX(failOnError = true, CXX = env.CXX, String stanc3_bin_url = "nightly
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
     if (separateMakeStep) {
-        sh "./runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+        sh "./runTests.py -j${PARALLEL} ${testPath} --make-only"
     }
-    try { sh "./runTests.py -j${env.PARALLEL} ${testPath}" }
+    try { sh "./runTests.py -j${PARALLEL} ${testPath}" }
     finally { junit 'test/**/*.xml' }
 }
 
 def runTestsWin(String testPath, Boolean separateMakeStep=true) {
     withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
        if (separateMakeStep) {
-           bat "runTests.py -j${env.PARALLEL} ${testPath} --make-only"
+           bat "runTests.py -j${PARALLEL} ${testPath} --make-only"
        }
-       try { bat "runTests.py -j${env.PARALLEL} ${testPath}" }
+       try { bat "runTests.py -j${PARALLEL} ${testPath}" }
        finally { junit 'test/**/*.xml' }
     }
 }
@@ -96,7 +96,7 @@ pipeline {
         stage("Clang-format") {
             agent {
                 docker {
-                    image 'stanorg/ci:alpine'
+                    image 'stanorg/ci:ubuntu'
                     label 'linux'
                 }
             }
@@ -108,7 +108,7 @@ pipeline {
                         set -x
                         git checkout -b ${branchName()}
                         clang-format --version
-                        find src -name '*.hpp' -o -name '*.cpp' | xargs -n20 -P${env.PARALLEL} clang-format -i
+                        find src -name '*.hpp' -o -name '*.cpp' | xargs -n20 -P${PARALLEL} clang-format -i
                         if [[ `git diff` != "" ]]; then
                             git config --global user.email "mc.stanislaw@gmail.com"
                             git config --global user.name "Stan Jenkins"
@@ -147,7 +147,7 @@ pipeline {
         stage('Linting & Doc checks') {
             agent {
                 docker {
-                    image 'stanorg/ci:alpine'
+                    image 'stanorg/ci:ubuntu'
                     label 'linux'
                 }
             }
@@ -161,7 +161,7 @@ pipeline {
                     """
                     utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
-                    setupCXX(true, env.GCC)
+                    setupCXX(true, GCC)
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
@@ -190,7 +190,7 @@ pipeline {
         stage('Verify changes') {
             agent {
                 docker {
-                    image 'stanorg/ci:alpine'
+                    image 'stanorg/ci:ubuntu'
                     label 'linux'
                 }
             }
@@ -238,7 +238,7 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                            bat "mingw32-make -j${env.PARALLEL} test-headers"
+                            bat "mingw32-make -j${PARALLEL} test-headers"
                             setupCXX(false, env.CXX, stanc3_bin_url())
                             runTestsWin("src/test/unit")
                     }
@@ -247,14 +247,14 @@ pipeline {
                 stage('Linux Unit') {
                     agent {
                         docker {
-                            image 'stanorg/ci:alpine'
+                            image 'stanorg/ci:ubuntu'
                             label 'linux'
                         }
                     }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, env.GCC, stanc3_bin_url())
-                        sh "make -j${env.PARALLEL} test-headers"
+                        setupCXX(true, GCC, stanc3_bin_url())
+                        sh "make -j${PARALLEL} test-headers"
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -262,7 +262,7 @@ pipeline {
                 stage('Mac Unit') {
                     agent {
                         docker {
-                            image 'stanorg/ci:alpine'
+                            image 'stanorg/ci:ubuntu'
                             label 'osx'
                         }
                     }
@@ -276,7 +276,7 @@ pipeline {
                     }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false, env.CXX, stanc3_bin_url())
+                        setupCXX(false, CXX, stanc3_bin_url())
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -288,7 +288,7 @@ pipeline {
                 stage('Integration Linux') {
                     agent {
                         docker {
-                            image 'stanorg/ci:alpine'
+                            image 'stanorg/ci:ubuntu'
                             label 'linux'
                         }
                     }
@@ -333,12 +333,12 @@ pipeline {
                         sh """
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
-                            echo 'CXX=${env.CXX}' >> make/local
+                            echo 'CXX=${CXX}' >> make/local
                             make clean-all
-                            make -j${env.PARALLEL} build
+                            make -j${PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
-                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 example-models
+                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
@@ -352,7 +352,7 @@ pipeline {
                 stage('Integration Mac') {
                     agent {
                         docker {
-                            image 'stanorg/ci:alpine'
+                            image 'stanorg/ci:ubuntu'
                             label 'osx'
                         }
                     }
@@ -374,12 +374,12 @@ pipeline {
                         sh """
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
-                            echo 'CXX=${env.CXX}' >> make/local
+                            echo 'CXX=${CXX}' >> make/local
                             make clean-all
-                            make -j${env.PARALLEL} build
+                            make -j${PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
-                            ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 example-models
+                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
@@ -413,10 +413,10 @@ pipeline {
                             
                             bat """
                                 cd performance-tests-cmdstan/cmdstan
-                                mingw32-make -j${env.PARALLEL} build
+                                mingw32-make -j${PARALLEL} build
                                 cd ..
-                                python ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
-                                python ./runPerformanceTests.py -j${env.PARALLEL} ${integration_tests_flags()}--runs=0 example-models
+                                python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                                python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                             """
                         }
                         bat """
@@ -458,15 +458,15 @@ pipeline {
             }
             agent {
                 docker {
-                    image 'stanorg/ci:alpine'
+                    image 'stanorg/ci:ubuntu'
                     label 'osx' // oldimac
                 }
             }
             steps {
                 unstash 'StanSetup'
-                setupCXX(true, env.CXX, stanc3_bin_url())
+                setupCXX(true, CXX, stanc3_bin_url())
                 sh """
-                    ./runTests.py -j${env.PARALLEL} src/test/performance
+                    ./runTests.py -j${PARALLEL} src/test/performance
                     cd test/performance
                     RScript ../../src/test/performance/plot_performance.R
                 """
