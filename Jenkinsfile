@@ -76,7 +76,7 @@ pipeline {
         parallelsAlwaysFailFast()
     }
     environment {
-        CXX = 'clang++-11.0'
+        CXX = 'clang++'
         GCC = 'g++'
         PARALLEL = 8
     }
@@ -238,8 +238,10 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            bat "mingw32-make -f lib/stan_math/make/standalone math-libs"
-                            bat "mingw32-make -j${PARALLEL} test-headers"
+                            withEnv(["MINGW_EXECUTABLE=${env.MINGW}\\bin\\mingw32-make.exe"]) {
+                                bat "$MINGW_EXECUTABLE -f lib/stan_math/make/standalone math-libs"
+                                bat "$MINGW_EXECUTABLE -j${PARALLEL} test-headers"
+                            }
                             setupCXX(false, env.CXX, stanc3_bin_url())
                             runTestsWin("src/test/unit")
                     }
@@ -413,11 +415,11 @@ pipeline {
                             unstash 'StanSetup'
                         }
                         writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${CXX}\nPRECOMPILED_HEADERS=true")
-                        withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {  
+                        withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb", "MINGW_EXECUTABLE=${env.MINGW}\\bin\\mingw32-make.exe]") {
                             
                             bat """
                                 cd performance-tests-cmdstan/cmdstan
-                                mingw32-make -j${PARALLEL} build
+                                $MINGW_EXECUTABLE -j${PARALLEL} build
                                 cd ..
                                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
                                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
