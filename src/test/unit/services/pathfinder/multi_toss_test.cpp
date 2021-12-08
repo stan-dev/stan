@@ -16,6 +16,99 @@ struct mock_callback : public stan::callbacks::interrupt {
   void operator()() { n++; }
 };
 
+class loggy : public stan::callbacks::logger {
+  /**
+   * Logs a message with debug log level
+   *
+   * @param[in] message message
+   */
+  virtual void debug(const std::string& message) {
+    std::cout << message << "\n";
+  }
+
+  /**
+   * Logs a message with debug log level.
+   *
+   * @param[in] message message
+   */
+  virtual void debug(const std::stringstream& message) {
+    std::cout << message.str() << "\n";
+  }
+
+  /**
+   * Logs a message with info log level.
+   *
+   * @param[in] message message
+   */
+  virtual void info(const std::string& message) {
+    std::cout << message << "\n";
+  }
+
+  /**
+   * Logs a message with info log level.
+   *
+   * @param[in] message message
+   */
+  virtual void info(const std::stringstream& message) {
+    std::cout << message.str() << "\n";
+  }
+
+  /**
+   * Logs a message with warn log level.
+   *
+   * @param[in] message message
+   */
+  virtual void warn(const std::string& message) {
+    std::cout << message << "\n";
+  }
+
+  /**
+   * Logs a message with warn log level.
+   *
+   * @param[in] message message
+   */
+  virtual void warn(const std::stringstream& message) {
+    std::cout << message.str() << "\n";
+  }
+
+  /**
+   * Logs an error with error log level.
+   *
+   * @param[in] message message
+   */
+  virtual void error(const std::string& message) {
+    std::cout << message << "\n";
+  }
+
+  /**
+   * Logs an error with error log level.
+   *
+   * @param[in] message message
+   */
+  virtual void error(const std::stringstream& message) {
+    std::cout << message.str() << "\n";
+  }
+
+  /**
+   * Logs an error with fatal log level.
+   *
+   * @param[in] message message
+   */
+  virtual void fatal(const std::string& message) {
+    std::cout << message << "\n";
+  }
+
+  /**
+   * Logs an error with fatal log level.
+   *
+   * @param[in] message message
+   */
+  virtual void fatal(const std::stringstream& message) {
+    std::cout << message.str() << "\n";
+  }
+};
+
+
 class values : public stan::callbacks::stream_writer {
  public:
   std::vector<std::string> names_;
@@ -72,14 +165,15 @@ class ServicesPathfinderSingle : public testing::Test {
 
   std::stringstream init_ss, parameter_ss, diagnostic_ss, model_ss;
   stan::callbacks::stream_writer init;
-  stan::test::unit::instrumented_logger logger;
+  loggy logger;
   values parameter;
   values diagnostics;
   stan::io::array_var_context context;
   stan_model model;
 };
 
-stan::io::array_var_context init_init_context() {
+auto init_init_context() {
+  /*
   std::vector<std::string> names_r{"mu", "tau", "theta_tilde"};
   std::vector<double> values_r{0.3808,
   1.58,
@@ -98,35 +192,50 @@ stan::io::array_var_context init_init_context() {
   using size_vec = std::vector<size_t>;
   std::vector<size_vec> dims_i{size_vec{}};
   return stan::io::array_var_context(names_r, values_r, dims_r);
+  */
+  return stan::io::empty_var_context();
 }
 
 TEST_F(ServicesPathfinderSingle, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 2;
-  size_t num_elbo_draws = 2000;
-  size_t num_draws = 1000;
-  size_t num_multi_draws = 1000;
+  size_t num_multi_draws = 20000;
   size_t num_threads = 1;
-  size_t num_paths = 12;
+  size_t num_paths = 24;
+  double num_elbo_draws = 1000;
+  double num_draws = 10000;
+  int history_size = 15;
+  double init_alpha = 0.00001;
+  double tol_obj = 0;
+  double tol_rel_obj = 0;
+  double tol_grad = 0;
+  double tol_rel_grad = 0;
+  double tol_param = 0;
+  int num_iterations = 60;
+  //bool save_iterations = true;
+  int refresh = 5;
   std::vector<std::stringstream> single_path_parameter_ss(num_paths);
   std::vector<std::stringstream> single_path_diagnostic_ss(num_paths);
   std::vector<values> single_path_parameter_writer;
   std::vector<values> single_path_diagnostic_writer;
+  std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
     single_path_parameter_writer.emplace_back(single_path_parameter_ss[i]);
     single_path_diagnostic_writer.emplace_back(single_path_diagnostic_ss[i]);
+    single_path_inits.emplace_back(std::make_unique<decltype(init_init_context())>(init_init_context()));
   }
-  bool save_iterations = true;
-  int refresh = 0;
+  bool save_iterations = false;
+  //int refresh = 0;
   mock_callback callback;
-  stan::io::array_var_context empty_context = init_init_context();
 
   int return_code = stan::services::optimize::pathfinder_lbfgs_multi(
-      model, empty_context, seed, chain, init_radius, 15, 0.001, 1e-12, 10000, 1e-8,
-      10000000, 1e-8, 2000, save_iterations, refresh, callback, num_elbo_draws,
+      model, single_path_inits, seed, chain, init_radius, history_size, init_alpha,
+      tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
+       save_iterations, refresh, callback, num_elbo_draws,
       num_draws, num_multi_draws, num_threads, num_paths,
-      logger, init, single_path_parameter_writer, single_path_diagnostic_writer, parameter, diagnostics);
+      logger, std::vector<stan::callbacks::stream_writer>(num_paths, init),
+       single_path_parameter_writer, single_path_diagnostic_writer, parameter, diagnostics);
 
 
 
@@ -148,8 +257,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
 
         std::cout << "---- Results  -------" << std::endl;
 
-        std::cout << "Values: \n"
-                  << param_vals.format(CommaInitFmt) << "\n";
+        //std::cout << "Values: \n" << param_vals.format(CommaInitFmt) << "\n";
 
          Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
          std::cout << "Mean Values: \n"

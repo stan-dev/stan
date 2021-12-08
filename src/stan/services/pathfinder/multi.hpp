@@ -21,6 +21,8 @@
 #include <vector>
 #include <mutex>
 
+#define STAN_DEBUG_MULTI_PATH_ALL false
+
 namespace stan {
 namespace services {
 namespace optimize {
@@ -35,9 +37,13 @@ inline int pathfinder_lbfgs_multi(
     callbacks::logger& logger, InitWriter&& init_writers,
     std::vector<ParamWriter>& single_path_parameter_writer, std::vector<DiagnosticWriter>& single_path_diagnostic_writer,
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
+                               "", "");
+
   Eigen::Array<double, -1, 1> lp_ratios(num_draws * num_paths);
   std::vector<std::string> param_names;
   model.constrained_param_names(param_names, true, true);
+  param_names.push_back("lp_approx__");
   param_names.push_back("lp__");
   parameter_writer(param_names);
   diagnostic_writer(param_names);
@@ -58,7 +64,7 @@ inline int pathfinder_lbfgs_multi(
               single_path_diagnostic_writer[iter]);
         Eigen::Array<double, -1, 1> lp_ratio = std::get<1>(pathfinder_ret);
         // logic for writing to lp_ratios and draws
-        lp_ratios.segment(iter * num_draws, num_draws) = -lp_ratio;
+        lp_ratios.segment(iter * num_draws, num_draws) = lp_ratio;
         /*
         Eigen::MatrixXd blah1 = samples.middleCols(iter * num_draws, num_draws);
         std::cout << "\n blah rows:" << blah1.rows() << " cols:" << blah1.cols() << "\n";
@@ -69,11 +75,16 @@ inline int pathfinder_lbfgs_multi(
       }
     });
   const auto tail_len = std::min(0.2 * samples.cols(), 3 * std::sqrt(samples.cols()));
-  Eigen::Array<double, -1, 1> weight_vals = stan::services::psis::get_psis_weights(lp_ratios, tail_len);
+  Eigen::Array<double, -1, 1> weight_vals = stan::services::psis::get_psis_weights(-lp_ratios, tail_len);
   // Figure out if I can use something in boost and not a std::vector
   std::vector<double> lp_weights(num_paths * num_draws);
   for (size_t i = 0; i < weight_vals.size(); ++i) {
     lp_weights[i] = weight_vals[i];
+  }
+  if (STAN_DEBUG_MULTI_PATH_ALL) {
+    std::cout << "\n tail_len: " << tail_len << "\n";
+    std::cout << "\n lp ratios: \n" << lp_ratios.transpose().eval().format(CommaInitFmt);
+    std::cout << "\n weight_vals: \n" << weight_vals.transpose().eval().format(CommaInitFmt);
   }
   boost::ecuyer1988 rng
       = util::create_rng<boost::ecuyer1988>(random_seed, path);
