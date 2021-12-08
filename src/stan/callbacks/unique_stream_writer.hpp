@@ -30,7 +30,7 @@ class unique_stream_writer final : public writer {
                                 const std::string& comment_prefix = "")
       : output_(std::move(output)), comment_prefix_(comment_prefix) {}
 
-  unique_stream_writer();
+  unique_stream_writer() = default;
   unique_stream_writer(unique_stream_writer& other) = delete;
   unique_stream_writer(unique_stream_writer&& other)
       : output_(std::move(other.output_)),
@@ -74,6 +74,8 @@ class unique_stream_writer final : public writer {
   void operator()(const std::vector<double>& state) { write_vector(state); }
 
   void operator()(const Eigen::MatrixXd& states) {
+    if (output_ == nullptr)
+      return;
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "", "", "\n", "", "");
     *output_ << states.transpose().format(CommaInitFmt);
   }
@@ -102,12 +104,12 @@ class unique_stream_writer final : public writer {
   /**
    * Output stream
    */
-  std::unique_ptr<Stream> output_;
+  std::unique_ptr<Stream> output_{nullptr};
 
   /**
    * Comment prefix to use when printing comments: strings and blank lines
    */
-  std::string comment_prefix_;
+  std::string comment_prefix_{"# "};
 
   /**
    * Writes a set of values in csv format followed by a newline.
