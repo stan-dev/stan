@@ -93,7 +93,7 @@ inline int pathfinder_lbfgs_multi(
                            boost::random::discrete_distribution<Eigen::Index, double>>
       rand_psis_idx(
           rng, boost::random::discrete_distribution<Eigen::Index, double>(lp_weights));
-  for (size_t i = 0; i < num_multi_draws; ++i) {
+  for (size_t i = 0; i <= num_multi_draws; ++i) {
     parameter_writer(samples.col(rand_psis_idx()));
   }
   return 0;
