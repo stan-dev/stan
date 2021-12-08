@@ -96,7 +96,7 @@ inline int pathfinder_lbfgs_multi(
   for (size_t i = 0; i < num_multi_draws; ++i) {
     parameter_writer(samples.col(rand_psis_idx()));
   }
-  return 1;
+  return 0;
 }
 }  // namespace optimize
 }  // namespace services
