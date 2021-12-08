@@ -26,7 +26,7 @@
 namespace stan {
 namespace services {
 namespace optimize {
-template <class Model, typename InitContext, typename InitWriter, typename DiagnosticWriter, typename ParamWriter>
+template <class Model, typename InitContext, typename InitWriter, typename DiagnosticWriter, typename ParamWriter, typename SingleParamWriter, typename SingleDiagnosticWriter>
 inline int pathfinder_lbfgs_multi(
     Model& model, InitContext&& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
@@ -35,7 +35,7 @@ inline int pathfinder_lbfgs_multi(
     callbacks::interrupt& interrupt, size_t num_elbo_draws, size_t num_draws,
     size_t num_multi_draws, size_t num_threads, size_t num_paths,
     callbacks::logger& logger, InitWriter&& init_writers,
-    std::vector<ParamWriter>& single_path_parameter_writer, std::vector<DiagnosticWriter>& single_path_diagnostic_writer,
+    std::vector<SingleParamWriter>& single_path_parameter_writer, std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");

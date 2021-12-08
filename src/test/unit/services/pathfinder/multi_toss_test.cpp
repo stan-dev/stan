@@ -215,14 +215,12 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   int num_iterations = 60;
   //bool save_iterations = true;
   int refresh = 5;
-  std::vector<std::stringstream> single_path_parameter_ss(num_paths);
-  std::vector<std::stringstream> single_path_diagnostic_ss(num_paths);
-  std::vector<values> single_path_parameter_writer;
-  std::vector<values> single_path_diagnostic_writer;
+  std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
+  std::vector<stan::callbacks::writer> single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
-    single_path_parameter_writer.emplace_back(single_path_parameter_ss[i]);
-    single_path_diagnostic_writer.emplace_back(single_path_diagnostic_ss[i]);
+//    single_path_parameter_writer.emplace_back(single_path_parameter_ss[i]);
+//    single_path_diagnostic_writer.emplace_back(single_path_diagnostic_ss[i]);
     single_path_inits.emplace_back(std::make_unique<decltype(init_init_context())>(init_init_context()));
   }
   bool save_iterations = false;

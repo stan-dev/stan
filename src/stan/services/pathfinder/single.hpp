@@ -521,17 +521,6 @@ inline auto pathfinder_lbfgs_single(
   while (ret == 0) {
     std::stringstream msg;
     interrupt();
-    if (refresh > 0
-        && (lbfgs.iter_num() == 0 || ((lbfgs.iter_num() + 1) % refresh == 0)))
-      logger.info(path_num +
-          "    Iter"
-          "      log prob"
-          "        ||dx||"
-          "      ||grad||"
-          "       alpha"
-          "      alpha0"
-          "  # evals"
-          "  Notes ");
     ret = lbfgs.step();
     double lp = lbfgs.logp();
     //lbfgs.params_r(cont_vector);
@@ -540,6 +529,15 @@ inline auto pathfinder_lbfgs_single(
         && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
             || ((lbfgs.iter_num() + 1) % refresh == 0))) {
       std::stringstream msg;
+      msg << path_num +
+          "    Iter"
+          "      log prob"
+          "        ||dx||"
+          "      ||grad||"
+          "       alpha"
+          "      alpha0"
+          "  # evals"
+          "  Notes \n";
       msg << path_num << " " << std::setw(7) << lbfgs.iter_num() << " ";
       msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
       msg << " " << std::setw(12) << std::setprecision(6)
