@@ -6,6 +6,6 @@ parameters {
   real theta;
 }
 model {
-  theta ~ normal(0, .5);
+  theta ~ normal(3, 2);
   y ~ normal(theta, 1);
 }
