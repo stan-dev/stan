@@ -238,11 +238,12 @@ pipeline {
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
-                            withEnv(["MINGW_EXECUTABLE=${env.MINGW}\\bin\\mingw32-make.exe", "RTOOLS40_HOME=C:\\PROGRA~1\\R\\R-4.1.2"]) {
+                            withEnv(["MINGW_BIN_PATH=${env.MINGW}\\bin", "RTOOLS40_HOME=C:\\PROGRA~1\\R\\R-4.1.2"]) {
                                 bat """
-                                    SET \"PATH=${RTOOLS40_HOME}\\usr\\bin;%PATH%\"
-                                    \"$MINGW_EXECUTABLE\" -f lib/stan_math/make/standalone math-libs
-                                    \"$MINGW_EXECUTABLE\" -j${PARALLEL} test-headers
+                                    SET \"PATH=${RTOOLS40_HOME}\\bin;%PATH%\"
+                                    SET \"PATH=${MINGW_BIN_PATH}\\bin;%PATH%\"
+                                    mingw32-make -f lib/stan_math/make/standalone math-libs
+                                    mingw32-make -j${PARALLEL} test-headers
                                 """
                             }
                             setupCXX(false, env.CXX, stanc3_bin_url())
