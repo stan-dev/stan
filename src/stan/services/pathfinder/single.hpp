@@ -524,8 +524,8 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples)
  *
  */
 template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
-          typename ParamWriter, typename XX, typename YY>
-inline auto pathfinder_lbfgs_single(XX&& given_X, YY&& given_grad,
+          typename ParamWriter>
+inline auto pathfinder_lbfgs_single(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
@@ -581,10 +581,11 @@ inline auto pathfinder_lbfgs_single(XX&& given_X, YY&& given_grad,
    */
   //std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> lbfgs_iters;
   int ret = 0;
+  /*
   Eigen::MatrixXd param_mat = given_X;
   Eigen::MatrixXd grad_mat = given_grad;
   int actual_num_iters = given_X.cols() - 1;
-  /*
+  */
   Eigen::MatrixXd param_mat(param_size, num_iterations);
   Eigen::MatrixXd grad_mat(param_size, num_iterations);
   {
@@ -640,11 +641,11 @@ inline auto pathfinder_lbfgs_single(XX&& given_X, YY&& given_grad,
       logger.info(lbfgs_ss);
       lbfgs_ss.str("");
     }
-//
+/*
     * If the retcode is -1 then linesearch failed even with a hessian reset
     * so the current vals and grads are the same as the previous iter
     * and we are exiting
-//
+*/
     if (likely(ret != -1)) {
       //lbfgs_iters.emplace_back(lbfgs.curr_x(), lbfgs.curr_g());
       ++actual_num_iters;
@@ -657,7 +658,7 @@ inline auto pathfinder_lbfgs_single(XX&& given_X, YY&& given_grad,
     //std::cout << "\nRet: " << ret << "\n";
   }
   // 3. For each L-BFGS iteration `num_iterations`
-  */
+
   Eigen::MatrixXd Ykt_diff = grad_mat.middleCols(1, actual_num_iters)
                              - grad_mat.leftCols(actual_num_iters);
   Eigen::MatrixXd Skt_diff = param_mat.middleCols(1, actual_num_iters)
