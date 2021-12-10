@@ -21,8 +21,8 @@
 #include <vector>
 #include <mutex>
 
-#define STAN_DEBUG_MULTI_PATH_PSIS true
-#define STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER true
+#define STAN_DEBUG_MULTI_PATH_PSIS false
+#define STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER false
 
 namespace stan {
 namespace services {
