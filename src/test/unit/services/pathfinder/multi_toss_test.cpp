@@ -202,7 +202,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   double init_radius = 2;
   size_t num_multi_draws = 20000;
   size_t num_threads = 1;
-  size_t num_paths = 24;
+  size_t num_paths = 4;
   double num_elbo_draws = 1000;
   double num_draws = 10000;
   int history_size = 15;
