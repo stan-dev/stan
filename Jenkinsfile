@@ -239,11 +239,8 @@ pipeline {
                         deleteDirWin()
                             unstash 'StanSetup'
                             bat """
-				SET \"PATH=${MINGW}\\bin;%PATH%\"
-                                SET \"PATH=${RTOOLS40_HOME}\\usr\\bin;%PATH%\"
+                                SET \"PATH=${RTOOLS40_HOME}\\usr\\bin;${LLVM}\\bin;%PATH%\"
                                 echo %PATH%
-                                mingw32-make -f lib/stan_math/make/standalone math-libs
-                                mingw32-make -j${PARALLEL} test-headers
                                 make -f lib/stan_math/make/standalone math-libs
                                 make -j${PARALLEL} test-headers
                             """
