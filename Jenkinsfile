@@ -285,7 +285,7 @@ pipeline {
 //                     }
 //                     post { always { deleteDir() } }
 //                 }
-//             }
+            }
         }
         stage('Integration') {
             when {
