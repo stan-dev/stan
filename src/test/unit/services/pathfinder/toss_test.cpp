@@ -1,12 +1,12 @@
 #include <stan/services/pathfinder/single.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <test/test-models/good/stat_comp_benchmarks_models/eight_schools.hpp>
+#include <test/test-models/good/eight_schools.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
 
-auto&& blah = stan::math::init_threadpool_tbb(1);
+auto&& blah = stan::math::init_threadpool_tbb(12);
 
 struct mock_callback : public stan::callbacks::interrupt {
   int n;
@@ -193,8 +193,8 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 2;
-  double num_elbo_draws = 100;
-  double num_draws = 100;
+  double num_elbo_draws = 1000;
+  double num_draws = 1000;
   int history_size = 15;
   double init_alpha = 0.001;
   double tol_obj = 0;

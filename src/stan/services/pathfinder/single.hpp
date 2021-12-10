@@ -735,18 +735,17 @@ inline auto pathfinder_lbfgs_single(
     rng_vec.emplace_back(
         util::create_rng<boost::ecuyer1988>(random_seed, path + iter));
   }
-  for (Eigen::Index iter = 0; iter < actual_num_iters - 1; iter++) {
-  /*
+  //for (Eigen::Index iter = 0; iter < actual_num_iters; iter++) {
+
   tbb::parallel_for(
       tbb::blocked_range<int>(0, actual_num_iters),
       [&](tbb::blocked_range<int> r) {
         for (int iter = r.begin(); iter < r.end(); ++iter) {
-          */
+
           std::string iter_msg(path_num + "Iter: [" + std::to_string(iter) + "] ");
           if (STAN_DEBUG_PATH_ITERS) {
             std::cout << "\n------------ Iter: " << iter << "------------\n";
           }
-          /*
           boost::variate_generator<boost::ecuyer1988&,
                                    boost::normal_distribution<>>
               rand_unit_gaus(rng_vec[iter], boost::normal_distribution<>());
@@ -755,7 +754,8 @@ inline auto pathfinder_lbfgs_single(
             return Eigen::MatrixXd::NullaryExpr(
                 num_params, num_samples,
                 [&rand_unit_gaus]() { return rand_unit_gaus(); });
-          };*/
+          };
+          /*
           auto rnorm = [num_params = param_size,
                         num_samples = num_elbo_draws]() {
             Eigen::MatrixXd blah(num_samples, num_params);
@@ -763,7 +763,7 @@ inline auto pathfinder_lbfgs_single(
             blah.transposeInPlace();
             return blah;
           };
-
+*/
           auto Ykt = Ykt_diff.col(iter);
           auto Skt = Skt_diff.col(iter);
           auto alpha = alpha_mat.col(iter);
@@ -849,7 +849,7 @@ inline auto pathfinder_lbfgs_single(
             }
           }
         }
-//      });
+      });
   // std::cout << "Winner: " << best_E << "\n";
   boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
