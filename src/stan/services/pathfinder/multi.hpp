@@ -21,7 +21,7 @@
 #include <vector>
 #include <mutex>
 
-#define STAN_DEBUG_MULTI_PATH_PSIS false
+#define STAN_DEBUG_MULTI_PATH_PSIS true
 #define STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER false
 
 namespace stan {
@@ -95,6 +95,8 @@ inline int pathfinder_lbfgs_multi(
   }
   if (STAN_DEBUG_MULTI_PATH_PSIS) {
     std::cout << "\n tail_len: " << tail_len << "\n";
+    std::cout << "\nSamples rows: " << samples.rows() << " cols: " << samples.cols() << "\n";
+    std::cout << "\n raw lps: \n" << samples.bottomRows(2).transpose().eval().format(CommaInitFmt) << "\n";
     std::cout << "\n lp ratios: \n" << lp_ratios.transpose().eval().format(CommaInitFmt);
     std::cout << "\n weight_vals: \n" << weight_vals.transpose().eval().format(CommaInitFmt);
   }

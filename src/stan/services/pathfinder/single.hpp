@@ -862,7 +862,7 @@ inline auto pathfinder_lbfgs_single(
   auto draws_tuple = approximation_samples(taylor_approx_best, num_draws,
                                            alpha_mat.col(best_E), rnorm);
   auto&& draws_mat = std::get<0>(draws_tuple);
-  auto&& lp_approx_vec = std::get<1>(draws_tuple);
+  auto lp_approx_vec = std::get<1>(draws_tuple).array().exp().eval();
   Eigen::MatrixXd constrainted_draws_mat(names.size(), draws_mat.cols());
   Eigen::VectorXd lp_ratio(draws_mat.cols());
   tbb::parallel_for(
@@ -878,7 +878,7 @@ inline auto pathfinder_lbfgs_single(
           constrained_draws2.head(names.size() - 2) = constrained_draws1;
           constrained_draws2(names.size() - 2) = lp_approx_vec(i);
           constrained_draws2(names.size() - 1) = -fn(unconstrained_draws);
-          lp_ratio(i) = - constrained_draws2(names.size() - 1) - constrained_draws2(names.size() - 2);
+          lp_ratio(i) = (-constrained_draws2(names.size() - 1)) - constrained_draws2(names.size() - 2);
           constrainted_draws_mat.col(i) = constrained_draws2;
         }
       });
