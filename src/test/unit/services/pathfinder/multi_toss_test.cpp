@@ -2,7 +2,7 @@
 #include <stan/services/pathfinder/multi.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
-#include <test/test-models/good/stat_comp_benchmarks_models/eight_schools.hpp>
+#include <test/test-models/good/eight_schools.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
@@ -200,11 +200,11 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 2;
-  size_t num_multi_draws = 20000;
+  size_t num_multi_draws = 100;
   size_t num_threads = 1;
-  size_t num_paths = 4;
+  size_t num_paths = 2;
   double num_elbo_draws = 1000;
-  double num_draws = 10000;
+  double num_draws = 100;
   int history_size = 15;
   double init_alpha = 0.00001;
   double tol_obj = 0;

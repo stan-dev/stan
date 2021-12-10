@@ -203,7 +203,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   double tol_rel_grad = 0;
   double tol_param = 0;
   int num_iterations = 60;
-  bool save_iterations = true;
+  bool save_iterations = false;
   int refresh = 1;
   mock_callback callback;
   stan::io::array_var_context empty_context = init_init_context();

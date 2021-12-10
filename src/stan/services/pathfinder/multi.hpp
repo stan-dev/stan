@@ -21,7 +21,8 @@
 #include <vector>
 #include <mutex>
 
-#define STAN_DEBUG_MULTI_PATH_ALL false
+#define STAN_DEBUG_MULTI_PATH_PSIS true
+#define STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER true
 
 namespace stan {
 namespace services {
@@ -52,6 +53,7 @@ inline int pathfinder_lbfgs_multi(
   tbb::parallel_for(tbb::blocked_range<int>(0, num_paths),
     [&](tbb::blocked_range<int> r) {
       for (int iter = r.begin(); iter < r.end(); ++iter) {
+        // TODO: Make fake writer that receives the samples
         auto pathfinder_ret
             = stan::services::optimize::pathfinder_lbfgs_single<true>(
               model, *(init[iter]), random_seed,
@@ -72,16 +74,26 @@ inline int pathfinder_lbfgs_multi(
         std::cout << "\n samples rows:" << blah2.rows() << " cols:" << blah2.cols() << "\n";
         */
         samples.middleCols(iter * num_draws, num_draws) = std::get<2>(pathfinder_ret);
+        if (STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER) {
+          auto param_vals = std::get<2>(pathfinder_ret).transpose();
+          Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
+          std::cout << "Mean Values: \n"
+                    << mean_vals.format(CommaInitFmt) << "\n";
+          std::cout << "SD Values: \n" << ((param_vals.rowwise() - mean_vals).array().square().matrix().colwise().sum().array() / (param_vals.rows() - 1)).sqrt() << "\n";
+
+        }
+
       }
+
     });
   const auto tail_len = std::min(0.2 * samples.cols(), 3 * std::sqrt(samples.cols()));
-  Eigen::Array<double, -1, 1> weight_vals = stan::services::psis::get_psis_weights(-lp_ratios, tail_len);
+  Eigen::Array<double, -1, 1> weight_vals = stan::services::psis::get_psis_weights(lp_ratios, tail_len);
   // Figure out if I can use something in boost and not a std::vector
   std::vector<double> lp_weights(num_paths * num_draws);
   for (size_t i = 0; i < weight_vals.size(); ++i) {
     lp_weights[i] = weight_vals[i];
   }
-  if (STAN_DEBUG_MULTI_PATH_ALL) {
+  if (STAN_DEBUG_MULTI_PATH_PSIS) {
     std::cout << "\n tail_len: " << tail_len << "\n";
     std::cout << "\n lp ratios: \n" << lp_ratios.transpose().eval().format(CommaInitFmt);
     std::cout << "\n weight_vals: \n" << weight_vals.transpose().eval().format(CommaInitFmt);
