@@ -143,10 +143,10 @@ struct elbo_est_t {
   Eigen::VectorXd lp_approx_draws;
 };
 
-template <typename Generator>
+template <typename Generator, typename EigVec>
 inline auto get_rnorm_and_draws(Generator& rnorm,
                                 const taylor_approx_t& taylor_approx,
-                                const Eigen::VectorXd& alpha) {
+                                const EigVec& alpha) {
   Eigen::MatrixXd u = rnorm().eval();
   if (taylor_approx.use_full) {
     Eigen::MatrixXd u2 = crossprod(taylor_approx.L_approx, u).colwise()
@@ -191,9 +191,9 @@ inline auto calc_lp_fun(F&& fn, const Eigen::MatrixXd& samples) {
   return f_test_elbo_draws;
 }
 
-template <typename SamplePkg, typename F, typename BaseRNG, typename Model>
+template <typename SamplePkg, typename F, typename BaseRNG, typename Model, typename EigVec>
 inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
-                           const Eigen::VectorXd& alpha, F&& fn,
+                           const EigVec& alpha, F&& fn,
                            BaseRNG&& rnorm, Model& model, Eigen::Index iter = 0) {
   const auto num_params = taylor_approx.x_center.size();
   int draw_ind = 1;
@@ -240,7 +240,7 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
 
   //std::cout << "\nf_alt: \n" << f_alt << "\n";
   //### Divergence estimation ###
-  double ELBO = ((-f_test_elbo_draws) - lp_approx_draws).mean();
+  double ELBO = ((f_test_elbo_draws) - lp_approx_draws).mean();
   if (STAN_DEBUG_PATH_ELBO_DRAWS) {
     Eigen::MatrixXd f_alt(num_samples, 7);
     auto fn1 = [&model](auto&& u) {
@@ -256,13 +256,7 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
       return -model.log_prob_propto_jacobian(u, 0);
     };
     auto fn5 = [&model](auto&& u) {
-      std::vector<double> uu(u.size());
-      for (int i = 0; i < u.size(); ++i) {
-        uu[i] = u[i];
-      }
-      std::vector<int> blah;
-      std::vector<double> grad1;
-      return -stan::model::log_prob_grad<true, true>(model, uu, blah, grad1, 0);
+      return -stan::model::log_prob_propto<true>(model, u, 0);
     };
     try {
       for (Eigen::Index i = 0; i < num_samples; ++i) {
@@ -316,10 +310,10 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
   return ELBO;
 }
 
-template <typename SamplePkg, typename BaseRNG>
+template <typename SamplePkg, typename BaseRNG, typename EigVec>
 inline auto approximation_samples(const SamplePkg& taylor_approx,
                                   size_t num_samples,
-                                  const Eigen::VectorXd& alpha,
+                                  const EigVec& alpha,
                                   BaseRNG&& rnorm) {
   const Eigen::Index num_params = taylor_approx.x_center.size();
   auto tuple_u = get_rnorm_and_draws(rnorm, taylor_approx, alpha);
@@ -340,11 +334,11 @@ inline auto approximation_samples(const SamplePkg& taylor_approx,
                          std::move(lp_approx_draws));
 }
 
-template <typename EigVec, typename Buff>
+template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec, typename InvMat>
 inline auto construct_taylor_approximation_full(const Buff& Ykt_mat,
-                                                const Eigen::VectorXd& alpha,
-                                                const Eigen::VectorXd& Dk,
-                                                const Eigen::MatrixXd& ninvRST,
+                                                const AlphaVec& alpha,
+                                                const DkVec& Dk,
+                                                const InvMat& ninvRST,
                                                 const EigVec& point_est,
                                                 const EigVec& grad_est) {
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
@@ -399,10 +393,10 @@ inline auto construct_taylor_approximation_full(const Buff& Ykt_mat,
                          Eigen::MatrixXd(0, 0), true};
 }
 
-template <typename EigVec, typename Buff>
+template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec, typename InvMat>
 inline auto construct_taylor_approximation_sparse(
-    const Buff& Ykt_mat, const Eigen::VectorXd& alpha,
-    const Eigen::VectorXd& Dk, const Eigen::MatrixXd& ninvRST,
+    const Buff& Ykt_mat, const AlphaVec& alpha,
+    const DkVec& Dk, const InvMat& ninvRST,
     const EigVec& point_est, const EigVec& grad_est) {
   const Eigen::Index current_history_size = Ykt_mat.size();
   Eigen::MatrixXd y_mul_sqrt_alpha = std_vec_matrix_times_diagonal(
@@ -471,11 +465,11 @@ inline auto construct_taylor_approximation_sparse(
                          std::move(Qk), false};
 }
 
-template <typename EigVec, typename Buff>
+template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec, typename InvMat>
 inline auto construct_taylor_approximation(const Buff& Ykt_mat,
-                                           const EigVec& alpha,
-                                           const Eigen::VectorXd& Dk,
-                                           const Eigen::MatrixXd& ninvRST,
+                                           const AlphaVec& alpha,
+                                           const DkVec& Dk,
+                                           const InvMat& ninvRST,
                                            const EigVec& point_est,
                                            const EigVec& grad_est) {
   // If twice the current history size is larger than the number of params
@@ -693,12 +687,18 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
   Eigen::MatrixXd alpha_mat(param_size, actual_num_iters);
   Eigen::Matrix<bool, -1, 1> check_curvatures_vec
       = check_curvatures(Ykt_diff, Skt_diff);
-  alpha_mat.col(0).setOnes();
+  if (check_curvatures_vec[0]) {
+    alpha_mat.col(0) = form_diag(Eigen::VectorXd::Ones(param_size),
+                                    Ykt_diff.col(0), Skt_diff.col(0));
+  } else {
+    alpha_mat.col(0).setOnes();
+  }
+
   for (Eigen::Index iter = 1; iter < actual_num_iters; iter++) {
     if (STAN_DEBUG_PATH_CURVE_CHECK) {
       std::cout << "\n---Curve " << iter << "----\n";
     }
-    if (check_curvatures_vec[iter - 1]) {
+    if (check_curvatures_vec[iter]) {
       alpha_mat.col(iter) = form_diag(alpha_mat.col(iter - 1),
                                       Ykt_diff.col(iter), Skt_diff.col(iter));
     } else {
@@ -731,7 +731,7 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
               << "\n";
   }
   auto fn = [&model](auto&& u) {
-    return -model.template log_prob<false, true>(u, nullptr);
+    return -model.template log_prob<true, true>(u, nullptr);
   };
   // NOTE: We always push the first one no matter what
   check_curvatures_vec[0] = true;
@@ -832,8 +832,8 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
            * distribution
            */
           taylor_approx_t taylor_appx_tuple = construct_taylor_approximation(
-              Ykt_h, alpha, Dk, ninvRST, param_mat.col(iter + 1),
-              grad_mat.col(iter + 1));
+              Ykt_h, alpha, Dk, ninvRST, param_mat.col(iter),
+              grad_mat.col(iter));
 
           auto elbo = est_elbo_draws(taylor_appx_tuple, num_elbo_draws, alpha,
                                      fn, rnorm, model, iter);
@@ -897,7 +897,7 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
           constrained_draws2.head(names.size() - 2) = constrained_draws1;
           constrained_draws2(names.size() - 2) = lp_approx_vec(i);
           constrained_draws2(names.size() - 1) = fn(unconstrained_draws);
-          lp_ratio(i) = -constrained_draws2(names.size() - 1) - constrained_draws2(names.size() - 2);
+          lp_ratio(i) = (constrained_draws2(names.size() - 1) - constrained_draws2(names.size() - 2));
           constrainted_draws_mat.col(i) = constrained_draws2;
 //        }
       }

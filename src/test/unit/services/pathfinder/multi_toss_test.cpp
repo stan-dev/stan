@@ -199,7 +199,7 @@ auto init_init_context() {
 TEST_F(ServicesPathfinderSingle, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
-  double init_radius = 2;
+  double init_radius = .6;
   size_t num_multi_draws = 10000;
   size_t num_threads = 1;
   size_t num_paths = 16;
