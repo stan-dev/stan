@@ -228,7 +228,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
       input_iters.emplace_back(X_vals.col(i), G_vals.col(i));
   }
 
-  int return_code = stan::services::optimize::pathfinder_lbfgs_single(X_vals, G_vals,
+  int return_code = stan::services::optimize::pathfinder_lbfgs_single(//X_vals, G_vals,
       model, empty_context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations, save_iterations, refresh, callback, num_elbo_draws, num_draws, 1,
       logger, init, parameter, diagnostics);
