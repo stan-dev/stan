@@ -18,7 +18,7 @@
 #include <vector>
 #include <mutex>
 
-#define STAN_DEBUG_PATH_ALL false
+#define STAN_DEBUG_PATH_ALL true
 #define STAN_DEBUG_PATH_POST_LBFGS false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_TAYLOR_APPX false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_ELBO_DRAWS false || STAN_DEBUG_PATH_ALL
@@ -104,12 +104,12 @@ template <typename EigMat, stan::require_matrix_t<EigMat>* = nullptr>
 inline Eigen::Array<bool, -1, 1> check_curvatures(const EigMat& Yk,
                                                   const EigMat& Sk) {
   auto Dk = ((Yk.array()) * Sk.array()).colwise().sum().eval();
-  auto thetak = (Yk.array().square().colwise().sum()).abs().eval();
+  auto thetak = (Yk.array().square().colwise().sum() / Dk).abs().eval();
   if (STAN_DEBUG_PATH_CURVE_CHECK) {
     std::cout << "\n Check Dk: \n" << Dk.transpose() << "\n";
     std::cout << "\n Check thetak: \n" << thetak.transpose() << "\n";
   }
-  return (Dk > (thetak * 1e-12));
+  return ((Dk > 0) && (thetak <= 1e12));
 }
 
 /**
@@ -181,7 +181,6 @@ inline auto get_rnorm_and_draws(Generator& rnorm,
 
 template <typename F>
 inline auto calc_lp_fun(F&& fn, const Eigen::MatrixXd& samples) {
-  int draw_ind = 1;
   int fn_calls_DIV = 0;
   Eigen::VectorXd f_test_elbo_draws(samples.cols());
   Eigen::VectorXd u2_col;
@@ -203,7 +202,6 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
                            const EigVec& alpha, F&& fn, BaseRNG&& rnorm,
                            Model& model, Eigen::Index iter = 0) {
   const auto num_params = taylor_approx.x_center.size();
-  int draw_ind = 1;
   int fn_calls_DIV = 0;
   auto tuple_u = get_rnorm_and_draws(rnorm, taylor_approx, alpha);
   if (STAN_DEBUG_PATH_RNORM_DRAWS) {
@@ -703,8 +701,7 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
   // 3. For each L-BFGS iteration `num_iterations`
 
   // std::cout << "\nactual_num_iters: " << actual_num_iters << "\n";
-  Eigen::MatrixXd Ykt_diff = grad_mat.leftCols(actual_num_iters)
-                             - grad_mat.middleCols(1, actual_num_iters);
+  Eigen::MatrixXd Ykt_diff = grad_mat.middleCols(1, actual_num_iters) - grad_mat.leftCols(actual_num_iters);
   Eigen::MatrixXd Skt_diff = param_mat.middleCols(1, actual_num_iters)
                              - param_mat.leftCols(actual_num_iters);
   size_t num_curves_correct = 0;
@@ -906,8 +903,7 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
   Eigen::MatrixXd constrainted_draws_mat(names.size(), draws_mat.cols());
   Eigen::VectorXd lp_ratio(draws_mat.cols());
 
-  tbb::parallel_for(
-      tbb::blocked_range<Eigen::Index>(0, draws_mat.cols()),
+  tbb::parallel_for(tbb::blocked_range<Eigen::Index>(0, draws_mat.cols()),
       [&](tbb::blocked_range<Eigen::Index> r) {
         Eigen::VectorXd unconstrained_draws;
         Eigen::VectorXd constrained_draws1;

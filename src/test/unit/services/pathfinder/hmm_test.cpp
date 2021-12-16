@@ -139,14 +139,14 @@ class values : public stan::callbacks::stream_writer {
 };
 
 stan::io::array_var_context init_context() {
-  std::vector<std::string> names_r{"y", "sigma"};
-  std::vector<double> values_r{};
+  std::vector<std::string> names_r{"y"};
+  std::vector<double> values_r{3.80243860781729, 8.23171251257037, 9.38968606678926, 7.15007526996264, 8.05259295310005, 8.35299725934312, 9.93528194725218, 8.83709568584264, 10.8034417596194, 7.96539420436862, 3.96202858463837, 3.98768015273356, 3.12193526066983, 8.92767684051081, 8.86176959483729, 7.94336794135265, 7.74041515529173, 9.53023201591449, 8.4996253770068, 8.55247318957826, 1.34936312600009, 3.60275518002102, 4.41494380951644, 1.65355067400174, 2.24910935304437, 2.19403774925662, 8.17425778045396, 9.04580247944741, 10.8475354844926, 8.5610080047624, 2.65666514361278, 2.92716300625152, 4.43683136163691, 7.25195489353772, 9.41689161641245, 7.8789131853013, 8.51788238504067, 10.3103824332802, 8.78568252383045, 7.84549078920844, 8.62998509947047, 9.56864052641054, 3.44511705134115, 9.61546596572572, 8.97748012802273, 8.969175021172, 9.17095288382957, 9.1290668101165, 8.03721626068803, 8.65881783585576, 9.56357150231007, 8.88794881206943, 7.35243245946842, 9.06003093656358, 8.96672501942626, 8.75640471108888, 6.56274235350523, 8.84587374667829, 7.69647355530988, 9.1093219724588, 2.29157525311394, 2.8870025282086, 3.0926032762415, 2.3561255138748, 3.03901538491436, 9.92335232119353, 9.5235007367306, 9.01375508740495, 7.73934374541708, 9.69311182173609, 7.17721944021149, 9.15991474459831, 9.3880247689926, 10.1410297116603, 8.32544429594712, 7.80609039888422, 9.60341189493316, 8.91135517043675, 8.46517335366137, 8.74402069650252, 7.95504120330691, 10.4302739662341, 10.6962719698706, 10.0251659677153, 9.12834482963362, 8.65506843072042, 8.26288704192228, 8.76653312709294, 9.25500206410883, 8.61730744278892, 10.2755982692551, 8.05684930053199, 9.27038599132892, 10.1874134838294, 7.4331562275345, 9.72345731108348, 7.24183082277811, 7.33979487360853, 9.9455615571267, 7.89390236647281};
   using size_vec = std::vector<size_t>;
-  std::vector<size_vec> dims_r{size_vec{8}, size_vec{8}};
-  std::vector<std::string> names_i{"J"};
-  std::vector<int> values_i{8};
+  std::vector<size_vec> dims_r{size_vec{100}};
+  std::vector<std::string> names_i{"N", "K"};
+  std::vector<int> values_i{100, 2};
   using size_vec = std::vector<size_t>;
-  std::vector<size_vec> dims_i{size_vec{}};
+  std::vector<size_vec> dims_i{size_vec{}, size_vec{}};
   return stan::io::array_var_context(names_r, values_r, dims_r, names_i, values_i, dims_i);
 }
 
@@ -168,7 +168,8 @@ class ServicesPathfinderSingle : public testing::Test {
   stan_model model;
 };
 
-stan::io::array_var_context init_init_context() {
+auto init_init_context() {
+  /*
   std::vector<std::string> names_r{"mu", "tau", "theta_tilde"};
   std::vector<double> values_r{0.516456,
   0.1732794, //-1.75285,
@@ -187,6 +188,8 @@ stan::io::array_var_context init_init_context() {
   using size_vec = std::vector<size_t>;
   std::vector<size_vec> dims_i{size_vec{}};
   return stan::io::array_var_context(names_r, values_r, dims_r);
+  */
+  return stan::io::empty_var_context();
 }
 
 TEST_F(ServicesPathfinderSingle, rosenbrock) {
@@ -206,7 +209,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   bool save_iterations = false;
   int refresh = 1;
   mock_callback callback;
-  stan::io::array_var_context empty_context = init_init_context();
+  auto init_context = init_init_context();
 
 
   Eigen::MatrixXd X_vals(21, 10);
@@ -228,8 +231,8 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
       input_iters.emplace_back(X_vals.col(i), G_vals.col(i));
   }
 
-  int return_code = stan::services::optimize::pathfinder_lbfgs_single(X_vals, G_vals,
-      model, empty_context, seed, chain, init_radius, history_size, init_alpha,
+  int return_code = stan::services::optimize::pathfinder_lbfgs_single(//X_vals, G_vals,
+      model, init_context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations, save_iterations, refresh, callback, num_elbo_draws, num_draws, 1,
       logger, init, parameter, diagnostics);
 
