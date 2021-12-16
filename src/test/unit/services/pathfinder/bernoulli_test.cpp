@@ -15,7 +15,6 @@ struct mock_callback : public stan::callbacks::interrupt {
   void operator()() { n++; }
 };
 
-
 class loggy : public stan::callbacks::logger {
   /**
    * Logs a message with debug log level
@@ -141,7 +140,9 @@ class values : public stan::callbacks::stream_writer {
     eigen_states_.push_back(vals);
   }
   template <typename T, stan::require_eigen_dense_dynamic_t<T>* = nullptr>
-  void operator()(const T& vals) { values_ = vals; }
+  void operator()(const T& vals) {
+    values_ = vals;
+  }
 };
 
 constexpr size_t y_size = 10000;
@@ -241,16 +242,19 @@ TEST_F(ServicesPathfinderSingle, normal3_1) {
             << param_vals.format(CommaInitFmt) << "\n";
   */
   auto mean_vals = param_vals.rowwise().mean().eval();
-  std::cout << "Mean Values: \n" << mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
+  std::cout << "Mean Values: \n"
+            << mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
   std::cout << "SD Values: \n"
             << (((param_vals.colwise() - mean_vals)
-                    .array()
-                    .square()
-                    .matrix()
-                    .rowwise()
-                    .sum()
-                    .array()
-                / (param_vals.cols() - 1))
-                   .sqrt()).transpose().eval()
+                     .array()
+                     .square()
+                     .matrix()
+                     .rowwise()
+                     .sum()
+                     .array()
+                 / (param_vals.cols() - 1))
+                    .sqrt())
+                   .transpose()
+                   .eval()
             << "\n";
 }

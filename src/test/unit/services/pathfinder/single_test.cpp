@@ -15,7 +15,7 @@ struct mock_callback : public stan::callbacks::interrupt {
 class values : public stan::callbacks::stream_writer {
  public:
   std::vector<std::string> names_;
-  std::vector<std::vector<double> > states_;
+  std::vector<std::vector<double>> states_;
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> optim_path_;
   Eigen::MatrixXd values_;
   values(std::ostream& stream) : stan::callbacks::stream_writer(stream) {}
@@ -35,7 +35,8 @@ class values : public stan::callbacks::stream_writer {
   void operator()(const std::vector<double>& state) {
     states_.push_back(state);
   }
-  void operator()(const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& xx) {
+  void operator()(
+      const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& xx) {
     optim_path_ = xx;
   }
   void operator()(const Eigen::MatrixXd& vals) { values_ = vals; }
@@ -43,14 +44,16 @@ class values : public stan::callbacks::stream_writer {
 
 stan::io::array_var_context init_context() {
   std::vector<std::string> names_r{"y", "sigma"};
-  std::vector<double> values_r{28, 8, -3, 7, -1, 1, 18, 12, 15, 10, 16, 11,  9, 11, 10, 18};
+  std::vector<double> values_r{28, 8,  -3, 7,  -1, 1,  18, 12,
+                               15, 10, 16, 11, 9,  11, 10, 18};
   using size_vec = std::vector<size_t>;
   std::vector<size_vec> dims_r{size_vec{8}, size_vec{8}};
   std::vector<std::string> names_i{"J"};
   std::vector<int> values_i{8};
   using size_vec = std::vector<size_t>;
   std::vector<size_vec> dims_i{size_vec{}};
-  return stan::io::array_var_context(names_r, values_r, dims_r, names_i, values_i, dims_i);
+  return stan::io::array_var_context(names_r, values_r, dims_r, names_i,
+                                     values_i, dims_i);
 }
 
 class ServicesPathfinderSingle : public testing::Test {
@@ -87,16 +90,17 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
   double known_mu_mean{4.38};
-  double known_tau_mean{0.12367541 };
+  double known_tau_mean{0.12367541};
   Eigen::VectorXd known_theta_tilde_mean(8);
-  known_theta_tilde_mean << -0.03963756, -0.12260122, 0.06966011, -0.15862005, -0.12785432, -0.07130486,
-    1.36489658, 0.62058815;
+  known_theta_tilde_mean << -0.03963756, -0.12260122, 0.06966011, -0.15862005,
+      -0.12785432, -0.07130486, 1.36489658, 0.62058815;
   double known_mu_sd{0.9958823};
   double known_tau_sd{0.9749844};
   Eigen::VectorXd known_theta_tilde_sd(8);
-   known_theta_tilde_sd << 1.0034803, 0.9962264, 0.9927524, 0.9934484, 1.0353772, 1.0122802, 0.9880471, 1.1189115;
+  known_theta_tilde_sd << 1.0034803, 0.9962264, 0.9927524, 0.9934484, 1.0353772,
+      1.0122802, 0.9880471, 1.1189115;
 
- Eigen::MatrixXd param_vals = parameter.values_.transpose();
+  Eigen::MatrixXd param_vals = parameter.values_.transpose();
 
   std::cout << "\n --- Optim Path ---" << std::endl;
   for (Eigen::Index i = 0; i < diagnostics.optim_path_.size(); ++i) {
@@ -106,14 +110,22 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
     std::cout << "Iter: " << i << "\n" << tmp << "\n";
   }
   std::cout << "---- Results  -------" << std::endl;
-  std::cout << "Values: \n"
-            << param_vals.format(CommaInitFmt) << "\n";
-   Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
-   std::cout << "Mean Values: \n"
-             << mean_vals.format(CommaInitFmt) << "\n";
-   std::cout << "SD Values: \n" << ((param_vals.rowwise() - mean_vals).array().square().matrix().colwise().sum().array() / (param_vals.rows() - 1)).sqrt() << "\n";
+  std::cout << "Values: \n" << param_vals.format(CommaInitFmt) << "\n";
+  Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
+  std::cout << "Mean Values: \n" << mean_vals.format(CommaInitFmt) << "\n";
+  std::cout << "SD Values: \n"
+            << ((param_vals.rowwise() - mean_vals)
+                    .array()
+                    .square()
+                    .matrix()
+                    .colwise()
+                    .sum()
+                    .array()
+                / (param_vals.rows() - 1))
+                   .sqrt()
+            << "\n";
 
-//            (().array()).square().sum()/(param_vals.rows() - 1)).sqrt();
+  //            (().array()).square().sum()/(param_vals.rows() - 1)).sqrt();
   /*
     EXPECT_EQ(logger.call_count(), logger.call_count_info())
         << "all output to info";

@@ -334,21 +334,12 @@ inline auto approximation_samples(const SamplePkg& taylor_approx,
                                   BaseRNG&& rnorm) {
   const Eigen::Index num_params = taylor_approx.x_center.size();
   auto tuple_u = get_rnorm_and_draws(rnorm, taylor_approx, alpha);
-  auto&& u2 = std::get<1>(tuple_u);
   // TODO: Inline this on the bottom row
   Eigen::VectorXd lp_approx_draws
       = -0.5
         * (taylor_approx.logdetcholHk
            + std::get<0>(std::move(tuple_u)).array().square().colwise().sum()
            + num_params * log(2 * stan::math::pi()));
-
-  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, " ", ", ", "\n", "",
-                               "", " ");
-  /*        std::cout << "\n final_draws: \n"
-                    <<
-     std::get<1>(tuple_u).transpose().eval().format(CommaInitFmt)
-                    << "\n";
-  */
   return std::make_tuple(std::move(std::get<1>(std::move(tuple_u))),
                          std::move(lp_approx_draws));
 }
@@ -380,15 +371,7 @@ inline auto construct_taylor_approximation_full(
   // std::cout << "y_tcrossprod_alpha2: \n" << y_tcrossprod_alpha << "\n";
 
   Eigen::MatrixXd y_mul_alpha = std_vec_matrix_times_diagonal(Ykt_mat, alpha);
-  Eigen::MatrixXd step1 = crossprod(y_mul_alpha, ninvRST);
-  Eigen::MatrixXd step2 = crossprod(ninvRST, y_mul_alpha);
-  Eigen::MatrixXd step3 = crossprod(ninvRST, y_tcrossprod_alpha * ninvRST);
-  /*
-  std::cout << "\nstep1: \n" << step1 << "\n";
-  std::cout << "\nstep2: \n" << step2 << "\n";
-  std::cout << "\nstep3: \n" << step3 << "\n";
-  */
-  Eigen::MatrixXd Hk = step1 + step2 + step3;
+  Eigen::MatrixXd Hk = crossprod(y_mul_alpha, ninvRST) + crossprod(ninvRST, y_mul_alpha) + crossprod(ninvRST, y_tcrossprod_alpha * ninvRST);
   // std::cout << "Hk: " << Hk.format(CommaInitFmt) << "\n";
   Hk += alpha.asDiagonal();
   // std::cout << "Hk2: " << Hk.format(CommaInitFmt) << "\n";
@@ -455,15 +438,13 @@ inline auto construct_taylor_approximation_sparse(
                         + 0.5 * alpha.array().log().sum();
   Eigen::VectorXd ninvRSTg = ninvRST * grad_est;
   Eigen::VectorXd alpha_mul_grad = (alpha.array() * grad_est.array()).matrix();
-  Eigen::VectorXd x_center_tmp
-      = alpha_mul_grad
-        + (alpha.array()
-           * std_vec_matrix_crossprod_vector(Ykt_mat, ninvRSTg).array())
-              .matrix()
-        + crossprod(ninvRST, std_vec_matrix_mul_vector(Ykt_mat, alpha_mul_grad))
-        + crossprod(ninvRST, y_tcrossprod_alpha * ninvRSTg);
 
-  Eigen::VectorXd x_center = point_est - x_center_tmp;
+  Eigen::VectorXd x_center = point_est - (alpha_mul_grad
+    + (alpha.array()
+       * std_vec_matrix_crossprod_vector(Ykt_mat, ninvRSTg).array())
+          .matrix()
+    + crossprod(ninvRST, std_vec_matrix_mul_vector(Ykt_mat, alpha_mul_grad))
+    + crossprod(ninvRST, y_tcrossprod_alpha * ninvRSTg));
 
   if (STAN_DEBUG_PATH_TAYLOR_APPX) {
     std::cout << "Full QR: \n" << qr.matrixQR().format(CommaInitFmt) << "\n";
@@ -573,6 +554,7 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
     size_t num_threads, callbacks::logger& logger,
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
     DiagnosticWriter& diagnostic_writer) {
+  const auto start_optim_time = std::chrono::steady_clock::now();
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", " ");
 
@@ -699,8 +681,12 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
     }
   }
   // 3. For each L-BFGS iteration `num_iterations`
-
-  // std::cout << "\nparam_cols_filled: " << param_cols_filled << "\n";
+  const auto end_optim_time = std::chrono::steady_clock::now();
+  const double optim_delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            end_optim_time - start_optim_time)
+                            .count()
+                        / 1000.0;
+  const auto start_pathfinder_time = std::chrono::steady_clock::now();
   Eigen::MatrixXd Ykt_diff = grad_mat.middleCols(1, param_cols_filled - 1) - grad_mat.leftCols(param_cols_filled - 1);
   Eigen::MatrixXd Skt_diff = param_mat.middleCols(1, param_cols_filled - 1)
                              - param_mat.leftCols(param_cols_filled - 1);
@@ -924,6 +910,26 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
               << "\n";
   }
   parameter_writer(constrainted_draws_mat);
+  auto end_pathfinder_time = std::chrono::steady_clock::now();
+  double pathfinder_delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                              end_pathfinder_time - start_pathfinder_time)
+                              .count()
+                          / 1000.0;
+  parameter_writer();
+  const auto time_header = std::string("Elapsed Time: ");
+  std::string optim_time_str =  time_header + std::to_string(optim_delta_time) + " seconds (lbfgs)";
+  parameter_writer(optim_time_str);
+
+  std::string pathfinder_time_str = std::string(time_header.size(), ' ') + std::to_string(pathfinder_delta_time)
+      + " seconds (Pathfinder)";
+  parameter_writer(pathfinder_time_str);
+
+  std::string total_time_str = std::string(time_header.size(), ' ') + std::to_string(optim_delta_time + pathfinder_delta_time)
+      + " seconds (Total)";
+  parameter_writer(total_time_str);
+
+  parameter_writer();
+
   return ret_pathfinder<ReturnLpSamples>(0, std::move(lp_ratio),
                                          std::move(constrainted_draws_mat));
 }
