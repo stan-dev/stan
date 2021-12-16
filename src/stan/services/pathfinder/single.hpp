@@ -240,7 +240,7 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
 
   //std::cout << "\nf_alt: \n" << f_alt << "\n";
   //### Divergence estimation ###
-  double ELBO = ((f_test_elbo_draws) - lp_approx_draws).mean();
+  double ELBO = -(f_test_elbo_draws).mean() - (lp_approx_draws).mean();
   if (STAN_DEBUG_PATH_ELBO_DRAWS) {
     Eigen::MatrixXd f_alt(num_samples, 7);
     auto fn1 = [&model](auto&& u) {
@@ -681,7 +681,7 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
   // 3. For each L-BFGS iteration `num_iterations`
 
   //std::cout << "\nactual_num_iters: " << actual_num_iters << "\n";
-  Eigen::MatrixXd Ykt_diff = grad_mat.middleCols(1, actual_num_iters) - grad_mat.leftCols(actual_num_iters);
+  Eigen::MatrixXd Ykt_diff = grad_mat.leftCols(actual_num_iters) - grad_mat.middleCols(1, actual_num_iters);
   Eigen::MatrixXd Skt_diff = param_mat.middleCols(1, actual_num_iters) - param_mat.leftCols(actual_num_iters);
   size_t num_curves_correct = 0;
   Eigen::MatrixXd alpha_mat(param_size, actual_num_iters);
@@ -731,7 +731,7 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
               << "\n";
   }
   auto fn = [&model](auto&& u) {
-    return -model.template log_prob<true, true>(u, nullptr);
+    return -stan::model::log_prob_propto<true>(model, u, 0);
   };
   // NOTE: We always push the first one no matter what
   check_curvatures_vec[0] = true;
@@ -897,7 +897,7 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
           constrained_draws2.head(names.size() - 2) = constrained_draws1;
           constrained_draws2(names.size() - 2) = lp_approx_vec(i);
           constrained_draws2(names.size() - 1) = fn(unconstrained_draws);
-          lp_ratio(i) = (constrained_draws2(names.size() - 1) - constrained_draws2(names.size() - 2));
+          lp_ratio(i) = -constrained_draws2(names.size() - 1) - constrained_draws2(names.size() - 2);
           constrainted_draws_mat.col(i) = constrained_draws2;
 //        }
       }

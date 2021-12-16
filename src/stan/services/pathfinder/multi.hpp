@@ -22,7 +22,7 @@
 #include <mutex>
 
 #define STAN_DEBUG_MULTI_PATH_PSIS false
-#define STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER false
+#define STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER true
 
 namespace stan {
 namespace services {
