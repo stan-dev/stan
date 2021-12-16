@@ -18,7 +18,7 @@
 #include <vector>
 #include <mutex>
 
-#define STAN_DEBUG_PATH_ALL true
+#define STAN_DEBUG_PATH_ALL false
 #define STAN_DEBUG_PATH_POST_LBFGS false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_TAYLOR_APPX false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_ELBO_DRAWS false || STAN_DEBUG_PATH_ALL
@@ -101,7 +101,7 @@ inline bool is_infinite(double x) {
 }
 
 template <typename EigMat, stan::require_matrix_t<EigMat>* = nullptr>
-inline Eigen::Array<bool, -1, 1> check_curvatures(const EigMat& Yk,
+inline Eigen::Array<bool, -1, 1> check_curve(const EigMat& Yk,
                                                   const EigMat& Sk) {
   auto Dk = ((Yk.array()) * Sk.array()).colwise().sum().eval();
   auto thetak = (Yk.array().square().colwise().sum() / Dk).abs().eval();
@@ -249,7 +249,7 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
 
   // std::cout << "\nf_alt: \n" << f_alt << "\n";
   //### Divergence estimation ###
-  double ELBO = -(f_test_elbo_draws).mean() - (lp_approx_draws).mean();
+  double ELBO =  -(f_test_elbo_draws).mean() - (lp_approx_draws).mean();
   if (STAN_DEBUG_PATH_ELBO_DRAWS) {
     Eigen::MatrixXd f_alt(num_samples, 7);
     auto fn1 = [&model](auto&& u) {
@@ -625,7 +625,7 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
   /*
   Eigen::MatrixXd param_mat = given_X;
   Eigen::MatrixXd grad_mat = given_grad;
-  int actual_num_iters = given_X.cols() - 1;
+  int param_cols_filled = given_X.cols() - 1;
   */
   Eigen::MatrixXd param_mat(param_size, num_iterations + 1);
   Eigen::MatrixXd grad_mat(param_size, num_iterations + 1);
@@ -642,7 +642,7 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
         = Eigen::Map<Eigen::VectorXd>(cont_vector.data(), param_size);
     grad_mat.col(0) = Eigen::Map<Eigen::VectorXd>(g1.data(), param_size);
   }
-  int actual_num_iters = 0;
+  int param_cols_filled = 1;
   while (ret == 0) {
     std::stringstream msg;
     interrupt();
@@ -687,12 +687,12 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
      * so the current vals and grads are the same as the previous iter
      * and we are exiting
      */
-    // std::cout << "\niter: " << actual_num_iters << " Ret: " << ret << "\n";
+    // std::cout << "\niter: " << param_cols_filled << " Ret: " << ret << "\n";
     if (likely(ret != -1)) {
       // lbfgs_i9999ters.emplace_back(lbfgs.curr_x(), lbfgs.curr_g());
-      ++actual_num_iters;
-      param_mat.col(actual_num_iters) = lbfgs.curr_x();
-      grad_mat.col(actual_num_iters) = lbfgs.curr_g();
+      param_mat.col(param_cols_filled) = lbfgs.curr_x();
+      grad_mat.col(param_cols_filled) = lbfgs.curr_g();
+      ++param_cols_filled;
     }
     if (msg.str().length() > 0) {
       logger.info(msg);
@@ -700,26 +700,20 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
   }
   // 3. For each L-BFGS iteration `num_iterations`
 
-  // std::cout << "\nactual_num_iters: " << actual_num_iters << "\n";
-  Eigen::MatrixXd Ykt_diff = grad_mat.middleCols(1, actual_num_iters) - grad_mat.leftCols(actual_num_iters);
-  Eigen::MatrixXd Skt_diff = param_mat.middleCols(1, actual_num_iters)
-                             - param_mat.leftCols(actual_num_iters);
+  // std::cout << "\nparam_cols_filled: " << param_cols_filled << "\n";
+  Eigen::MatrixXd Ykt_diff = grad_mat.middleCols(1, param_cols_filled - 1) - grad_mat.leftCols(param_cols_filled - 1);
+  Eigen::MatrixXd Skt_diff = param_mat.middleCols(1, param_cols_filled - 1)
+                             - param_mat.leftCols(param_cols_filled - 1);
   size_t num_curves_correct = 0;
-  Eigen::MatrixXd alpha_mat(param_size, actual_num_iters);
-  Eigen::Matrix<bool, -1, 1> check_curvatures_vec
-      = check_curvatures(Ykt_diff, Skt_diff);
-  if (check_curvatures_vec[0]) {
-    alpha_mat.col(0) = form_diag(Eigen::VectorXd::Ones(param_size),
-                                 Ykt_diff.col(0), Skt_diff.col(0));
-  } else {
-    alpha_mat.col(0).setOnes();
-  }
-
-  for (Eigen::Index iter = 1; iter < actual_num_iters; iter++) {
+  const auto diff_size = Ykt_diff.cols();
+  Eigen::MatrixXd alpha_mat(param_size, diff_size);
+  Eigen::Matrix<bool, -1, 1> check_curve_vec = check_curve(Ykt_diff, Skt_diff);
+  alpha_mat.col(0).setOnes();
+  for (Eigen::Index iter = 1; iter < diff_size; iter++) {
     if (STAN_DEBUG_PATH_CURVE_CHECK) {
-      std::cout << "\n---Curve " << iter << "----\n";
+  //    std::cout << "\n---Curve " << iter << "----\n";
     }
-    if (check_curvatures_vec[iter]) {
+    if (check_curve_vec[iter]) {
       alpha_mat.col(iter) = form_diag(alpha_mat.col(iter - 1),
                                       Ykt_diff.col(iter), Skt_diff.col(iter));
     } else {
@@ -731,13 +725,13 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
     std::lock_guard<std::mutex> guard(update_best_mutex);
     std::cout << "\n num_params: " << param_size << "\n";
     std::cout << "\n num_elbo_params: " << num_elbo_draws << "\n";
-    std::cout << "\n actual_num_iters: " << actual_num_iters << "\n";
+    std::cout << "\n param_cols_filled: " << param_cols_filled << "\n";
     std::cout << "\n Alpha mat: "
               << alpha_mat.transpose().eval().format(CommaInitFmt) << "\n";
     std::cout << "\n Ykt_diff mat: "
               << Ykt_diff.transpose().eval().format(CommaInitFmt) << "\n";
     std::cout << "\n grad mat: "
-              << grad_mat.leftCols(actual_num_iters + 1)
+              << grad_mat.leftCols(param_cols_filled)
                      .transpose()
                      .eval()
                      .format(CommaInitFmt)
@@ -745,26 +739,26 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
     std::cout << "\n Skt_diff mat: "
               << Skt_diff.transpose().eval().format(CommaInitFmt) << "\n";
     std::cout << "\n param mat: "
-              << param_mat.leftCols(actual_num_iters + 1)
+              << param_mat.leftCols(param_cols_filled)
                      .transpose()
                      .eval()
                      .format(CommaInitFmt)
               << "\n";
   }
   auto fn = [&model](auto&& u) {
-    return -stan::model::log_prob_propto<true>(model, u, 0);
+    return -model.template log_prob<false, true>(u, 0);
   };
   // NOTE: We always push the first one no matter what
-  check_curvatures_vec[0] = true;
-  // actual_num_iters = actual_num_iters > 1 ? actual_num_iters - 1 :
-  // actual_num_iters;
+  check_curve_vec[0] = true;
+  // param_cols_filled = param_cols_filled > 1 ? param_cols_filled - 1 :
+  // param_cols_filled;
   std::vector<boost::ecuyer1988> rng_vec;
-  for (Eigen::Index i = 0; i < actual_num_iters; i++) {
+  for (Eigen::Index i = 0; i < diff_size; i++) {
     rng_vec.emplace_back(
         util::create_rng<boost::ecuyer1988>(random_seed, path + i));
   }
-  // for (Eigen::Index iter = 0; iter < actual_num_iters; iter++) {
-  Eigen::MatrixXd elbo_mat(actual_num_iters, 2);
+  // for (Eigen::Index iter = 0; iter < param_cols_filled; iter++) {
+  Eigen::MatrixXd elbo_mat(diff_size, 2);
   for (int i = 0; i < elbo_mat.rows(); ++i) {
     elbo_mat(i, 0) = i;
   }
@@ -774,7 +768,7 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
   taylor_approx_t taylor_approx_best;
   size_t winner = 0;
   tbb::parallel_for(
-      tbb::blocked_range<int>(0, actual_num_iters),
+      tbb::blocked_range<int>(0, diff_size),
       [&](tbb::blocked_range<int> r) {
         for (int iter = r.begin(); iter < r.end(); ++iter) {
           std::string iter_msg(path_num + "Iter: [" + std::to_string(iter)
@@ -801,7 +795,7 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
               = iter < history_size ? iter + 1 : history_size;
           {
             for (Eigen::Index end_iter = iter; end_iter >= 0; --end_iter) {
-              if (check_curvatures_vec[end_iter]) {
+              if (check_curve_vec[end_iter]) {
                 ys_cols.push_back(end_iter);
               }
               if (ys_cols.size() == history_size) {
@@ -852,8 +846,8 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
            * distribution
            */
           taylor_approx_t taylor_appx_tuple = construct_taylor_approximation(
-              Ykt_h, alpha, Dk, ninvRST, param_mat.col(iter),
-              grad_mat.col(iter));
+              Ykt_h, alpha, Dk, ninvRST, param_mat.col(iter + 1),
+              grad_mat.col(iter + 1));
 
           auto elbo = est_elbo_draws(taylor_appx_tuple, num_elbo_draws, alpha,
                                      fn, rnorm, model, iter);
