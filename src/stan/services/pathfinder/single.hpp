@@ -25,7 +25,6 @@
 #define STAN_DEBUG_PATH_CURVE_CHECK false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_BEST_ELBO false || STAN_DEBUG_PATH_ALL
 #define STAN_DEBUG_PATH_RNORM_DRAWS false || STAN_DEBUG_PATH_ALL
-#define STAN_DEBUG_MULTI_PATH_SINGLE_PATH_TOP_LEVEL false
 #define STAN_DEBUG_PATH_ITERS STAN_DEBUG_PATH_ALL || STAN_DEBUG_PATH_POST_LBFGS || STAN_DEBUG_PATH_TAYLOR_APPX || STAN_DEBUG_PATH_ELBO_DRAWS || STAN_DEBUG_PATH_CURVE_CHECK || STAN_DEBUG_PATH_BEST_ELBO || STAN_DEBUG_PATH_RNORM_DRAWS
 
 namespace stan {
@@ -102,7 +101,7 @@ inline Eigen::Array<bool, -1, 1> check_curvatures(const EigMat& Yk,
                                                   const EigMat& Sk) {
   auto Dk = ((Yk.array()) * Sk.array()).colwise().sum().eval();
   auto thetak = (Yk.array().square().colwise().sum()).abs().eval();
-  if (STAN_DEBUG_PATH_CURVE_CHECK || STAN_DEBUG_MULTI_PATH_SINGLE_PATH_TOP_LEVEL) {
+  if (STAN_DEBUG_PATH_CURVE_CHECK) {
     std::cout << "\n Check Dk: \n" << Dk.transpose() << "\n";
     std::cout << "\n Check thetak: \n" << thetak.transpose() << "\n";
   }
@@ -226,8 +225,8 @@ inline auto est_elbo_draws(const SamplePkg& taylor_approx, size_t num_samples,
   // Should the constant be dropped here??
   Eigen::VectorXd lp_approx_draws
     = -0.5 * (taylor_approx.logdetcholHk
-      + std::get<0>(tuple_u).array().square().colwise().sum());
-      //+ num_params * log(2 * stan::math::pi()));
+      + std::get<0>(tuple_u).array().square().colwise().sum()
+      + num_params * log(2 * stan::math::pi()));
   try {
     for (Eigen::Index i = 0; i < num_samples; ++i) {
       u2_col = std::get<1>(tuple_u).col(i);
@@ -328,8 +327,8 @@ inline auto approximation_samples(const SamplePkg& taylor_approx,
   // TODO: Inline this on the bottom row
   Eigen::VectorXd lp_approx_draws
       = -0.5 * (taylor_approx.logdetcholHk
-        + std::get<0>(std::move(tuple_u)).array().square().colwise().sum());
-        //+ num_params * log(2 * stan::math::pi()));
+        + std::get<0>(std::move(tuple_u)).array().square().colwise().sum()
+        + num_params * log(2 * stan::math::pi()));
 
         Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, " ", ", ", "\n", "",
                                      "", " ");
@@ -707,7 +706,7 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
     }
   }
   std::mutex update_best_mutex;
-  if (STAN_DEBUG_PATH_POST_LBFGS || STAN_DEBUG_MULTI_PATH_SINGLE_PATH_TOP_LEVEL) {
+  if (STAN_DEBUG_PATH_POST_LBFGS) {
     std::lock_guard<std::mutex> guard(update_best_mutex);
     std::cout << "\n num_params: " << param_size << "\n";
     std::cout << "\n num_elbo_params: " << num_elbo_draws << "\n";
@@ -732,7 +731,7 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
               << "\n";
   }
   auto fn = [&model](auto&& u) {
-    return model.template log_prob<true, true>(u, nullptr);
+    return -model.template log_prob<false, true>(u, nullptr);
   };
   // NOTE: We always push the first one no matter what
   check_curvatures_vec[0] = true;
@@ -861,10 +860,10 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
           }
         }
       });
-  if (STAN_DEBUG_PATH_BEST_ELBO || STAN_DEBUG_MULTI_PATH_SINGLE_PATH_TOP_LEVEL) {
+  if (STAN_DEBUG_PATH_BEST_ELBO) {
     std::cout << "ELBOs: \n" << elbo_mat.format(CommaInitFmt) << "\n";
     std::cout << "Winner: " << best_E << "\n";
-    std::cout << "optim vals: \n" << param_mat.col(best_E) << "\n";
+    std::cout << "optim vals: \n" << param_mat.col(best_E + 1) << "\n";
   }
   boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
       rand_unit_gaus(rng_vec[best_E], boost::normal_distribution<>());
@@ -897,8 +896,8 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
           //constrainted_draws_mat.col(i) = constrained_draws1;
           constrained_draws2.head(names.size() - 2) = constrained_draws1;
           constrained_draws2(names.size() - 2) = lp_approx_vec(i);
-          constrained_draws2(names.size() - 1) = fn(unconstrained_draws);
-          lp_ratio(i) = -constrained_draws2(names.size() - 1) - constrained_draws2(names.size() - 2);
+          constrained_draws2(names.size() - 1) = -fn(unconstrained_draws);
+          lp_ratio(i) = (constrained_draws2(names.size() - 1) - constrained_draws2(names.size() - 2));
           constrainted_draws_mat.col(i) = constrained_draws2;
 //        }
       }
