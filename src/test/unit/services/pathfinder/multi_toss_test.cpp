@@ -7,7 +7,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <gtest/gtest.h>
 
-auto&& blah = stan::math::init_threadpool_tbb(16);
+auto&& blah = stan::math::init_threadpool_tbb(1);
 
 struct mock_callback : public stan::callbacks::interrupt {
   int n;
@@ -199,7 +199,7 @@ auto init_init_context() {
 TEST_F(ServicesPathfinderSingle, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
-  double init_radius = .6;
+  double init_radius = 2;
   size_t num_multi_draws = 10000;
   size_t num_threads = 1;
   size_t num_paths = 16;
@@ -214,7 +214,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   double tol_param = 0;
   int num_iterations = 60;
   //bool save_iterations = true;
-  int refresh = 5;
+  int refresh = 1;
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
   std::vector<stan::callbacks::writer> single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;

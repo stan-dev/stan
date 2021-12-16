@@ -896,8 +896,8 @@ inline auto pathfinder_lbfgs_single(//XVals&& given_X, GVals&& given_grad,
           //constrainted_draws_mat.col(i) = constrained_draws1;
           constrained_draws2.head(names.size() - 2) = constrained_draws1;
           constrained_draws2(names.size() - 2) = lp_approx_vec(i);
-          constrained_draws2(names.size() - 1) = -fn(unconstrained_draws);
-          lp_ratio(i) = (constrained_draws2(names.size() - 1) - constrained_draws2(names.size() - 2));
+          constrained_draws2(names.size() - 1) = fn(unconstrained_draws);
+          lp_ratio(i) = -constrained_draws2(names.size() - 1) - constrained_draws2(names.size() - 2);
           constrainted_draws_mat.col(i) = constrained_draws2;
 //        }
       }
