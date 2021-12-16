@@ -550,7 +550,7 @@ inline auto pathfinder_lbfgs_single(  // XVals&& given_X, GVals&& given_grad,
     unsigned int path, double init_radius, int history_size, double init_alpha,
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
-    callbacks::interrupt& interrupt, size_t num_elbo_draws, size_t num_draws,
+    callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
     size_t num_threads, callbacks::logger& logger,
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
     DiagnosticWriter& diagnostic_writer) {

@@ -33,8 +33,8 @@ inline int pathfinder_lbfgs_multi(
     unsigned int path, double init_radius, int history_size, double init_alpha,
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
-    callbacks::interrupt& interrupt, size_t num_elbo_draws, size_t num_draws,
-    size_t num_multi_draws, size_t num_threads, size_t num_paths,
+    callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
+    int num_multi_draws, size_t num_threads, int num_paths,
     callbacks::logger& logger, InitWriter&& init_writers,
     std::vector<SingleParamWriter>& single_path_parameter_writer, std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
