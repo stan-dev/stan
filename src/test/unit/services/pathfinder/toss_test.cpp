@@ -59,8 +59,8 @@ stan::io::array_var_context init_init_context() {
 TEST_F(ServicesPathfinderSingle, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
-  double init_radius = .5;
-  double num_elbo_draws = 100;
+  double init_radius = .7;
+  double num_elbo_draws = 80;
   double num_draws = 100;
   int history_size = 15;
   double init_alpha = 0.001;
