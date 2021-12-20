@@ -302,6 +302,7 @@ pipeline {
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
                             echo 'CXX=${env.CXX}' >> make/local
+                            echo 'PRECOMPILED_HEADERS=false' >> make/local
                             make clean-all
                             make -j${env.PARALLEL} build
                             cd ..
