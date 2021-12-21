@@ -112,13 +112,13 @@ inline Eigen::Index quick_sort_partition(EigDblArr&& arr, EigIdxArr&& idx, const
         // If current element is smaller than or
         // equal to pivot
         if (arr[j] <= pivot) {
-            i++;  // increment index of smaller element
-            std::swap(arr[i], arr[j]);
-            std::swap(idx[i], idx[j]);
+            ++i;  // increment index of smaller element
+            std::swap(arr.coeffRef(i), arr.coeffRef(j));
+            std::swap(idx.coeffRef(i), idx.coeffRef(j));
         }
     }
-    std::swap(arr[i + 1], arr[high]);
-    std::swap(idx[i + 1], idx[high]);
+    std::swap(arr.coeffRef(i + 1), arr.coeffRef(high));
+    std::swap(idx.coeffRef(i + 1), idx.coeffRef(high));
     return (i + 1);
 }
 
@@ -157,7 +157,7 @@ inline auto max_n_insertion_start(T&& top_n, const double value) {
   Eigen::Index high_idx = top_size;
   while (high_idx - low_idx > 1l) {
       const Eigen::Index probe_idx = (low_idx + high_idx) / 2l;
-      const double curr_val = top_n[probe_idx];
+      const double curr_val = top_n.coeff(probe_idx);
       if (curr_val > value) {
         high_idx = probe_idx;
       } else {
@@ -177,38 +177,39 @@ inline auto max_n_elements(const EigArray& lw_i, const size_t tail_len_i) {
     Eigen::Array<Eigen::Index, -1, 1> top_n_idx =
         Eigen::Array<Eigen::Index, -1, 1>::LinSpaced(tail_len_i, 0, tail_len_i);
     quick_sort(top_n, top_n_idx);
-    for (Eigen::Index i = tail_len_i; i < lw_i.size(); ++i) {
-      if (lw_i[i] >= top_n[0]) {
-        Eigen::Index starting_pos = max_n_insertion_start(top_n, lw_i[i]);
+    for (Eigen::Index i = tail_len_i; i < tail_len_i; ++i) {
+      if (lw_i.coeff(i) >= top_n.coeffRef(0)) {
+        const Eigen::Index starting_pos = max_n_insertion_start(top_n, lw_i.coeff(i));
         for (Eigen::Index k = 1; k <= starting_pos; ++k) {
-            top_n[k - 1] = top_n[k];
+            top_n.coeffRef(k - 1) = top_n.coeff(k);
         }
-        top_n[starting_pos] = lw_i[i];
+        top_n.coeffRef(starting_pos) = lw_i.coeff(i);
         for (Eigen::Index k = 1; k <= starting_pos; ++k) {
-            top_n_idx[k - 1] = top_n_idx[k];
+            top_n_idx.coeffRef(k - 1) = top_n_idx.coeff(k);
         }
-        top_n_idx[starting_pos] = i;
+        top_n_idx.coeffRef(starting_pos) = i;
       }
     }
     return std::make_tuple(std::move(top_n), std::move(top_n_idx));
 }
 
-inline void insert_smooth_to_tail(Eigen::Array<double, -1, 1>& lw_i,
-                                  const Eigen::Array<Eigen::Index, -1, 1>& idx,
-                                  const Eigen::Array<double, -1, 1>& smoothed) {
-    for (Eigen::Index i = 0; i < idx.size(); ++i) {
-        lw_i[idx[i]] = smoothed[i];
+template <typename EigDblArray1, typename EigIndexArray, typename EigDblArray2>
+inline void insert_smooth_to_tail(EigDblArray1&& lw_i,
+                                  EigIndexArray&& idx,
+                                  EigDblArray2&& smoothed) {
+    const Eigen::Index idx_size = idx.size();
+    for (Eigen::Index i = 0; i < idx_size; ++i) {
+        lw_i.coeffRef(idx.coeff(i)) = smoothed.coeff(i);
     }
 }
 
-inline auto get_psis_weights(const Eigen::Array<double, -1, 1>& log_ratios_i,
+template <typename EigArray>
+inline auto get_psis_weights(const EigArray& log_ratios_i,
                              size_t tail_len_i) {
     const auto S = log_ratios_i.size();
     // shift log ratios for safer exponentation
     const double max_log_ratio = log_ratios_i.maxCoeff();
     Eigen::Array<double, -1, 1> lw_i = log_ratios_i - max_log_ratio;
-    double khat = 0;
-
     if (tail_len_i >= 5) {
         // Get back tail + smallest but not on tail in ascending order
         auto max_n = max_n_elements(lw_i, tail_len_i + 1);

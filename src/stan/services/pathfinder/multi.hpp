@@ -14,6 +14,7 @@
 #include <stan/services/util/create_rng.hpp>
 #include <tbb/parallel_for.h>
 #include <boost/random/discrete_distribution.hpp>
+#include <boost/iterator.hpp>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -109,11 +110,6 @@ inline int pathfinder_lbfgs_multi(
       = std::min(0.2 * samples.cols(), 3 * std::sqrt(samples.cols()));
   Eigen::Array<double, -1, 1> weight_vals
       = stan::services::psis::get_psis_weights(lp_ratios, tail_len);
-  // Figure out if I can use something in boost and not a std::vector
-  std::vector<double> lp_weights(num_paths * num_draws);
-  for (size_t i = 0; i < weight_vals.size(); ++i) {
-    lp_weights[i] = weight_vals[i];
-  }
   if (STAN_DEBUG_MULTI_PATH_PSIS) {
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
                                  "", "", "");
@@ -136,7 +132,9 @@ inline int pathfinder_lbfgs_multi(
       boost::random::discrete_distribution<Eigen::Index, double>>
       rand_psis_idx(rng,
                     boost::random::discrete_distribution<Eigen::Index, double>(
-                        lp_weights));
+                        boost::iterator_range<double*>(
+                            weight_vals.data(),
+                            weight_vals.data() + weight_vals.size())));
   for (size_t i = 0; i <= num_multi_draws; ++i) {
     parameter_writer(samples.col(rand_psis_idx()));
   }
