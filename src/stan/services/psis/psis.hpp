@@ -12,6 +12,7 @@
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <tbb/parallel_for.h>
+#include <tbb/parallel_invoke.h>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
@@ -25,31 +26,33 @@ namespace services {
 namespace psis {
 
 template <typename T>
-inline bool is_finite(T x) {
+inline bool is_finite(T x) noexcept {
     return x != std::numeric_limits<T>::infinity();
 }
 
 template <typename T>
 inline auto log_sum_exp(const T& v) {
-    if (v.size() == 0) {
+    if (unlikely(v.size() == 0)) {
         return -std::numeric_limits<double>::infinity();
+    } else {
+      const auto& v_ref = stan::math::to_ref(v);
+      const double max = v_ref.maxCoeff();
+      if (!std::isfinite(max)) {
+          return max;
+      }
+      return max + std::log((v_ref.array() - max).exp().sum());
     }
-    const auto& v_ref = v;
-    const double max = v_ref.maxCoeff();
-    if (!std::isfinite(max)) {
-        return max;
-    }
-    return max + std::log((v_ref.array() - max).exp().sum());
 }
 
-inline Eigen::Array<double, -1, 1> lx(const Eigen::Array<double, -1, 1>& a,
-                                      const Eigen::Array<double, -1, 1>& x) {
+template <typename EigArray1, typename EigArray2>
+inline Eigen::Array<double, -1, 1> lx(const EigArray1& a, const EigArray2& x) {
     Eigen::Array<double, -1, 1> k = ((-a).matrix() * x.matrix().transpose()).array().log1p().matrix().rowwise().mean().array();
     return (-a / k).log() - k - 1;
 }
 
-inline auto gpdfit(const Eigen::Array<double, -1, 1>& x, bool wip = true,
-            size_t min_grid_pts = 30) {
+
+template <typename EigArray>
+inline auto gpdfit(const EigArray& x, bool wip = true, size_t min_grid_pts = 30) {
     // See section 4 of Zhang and Stephens (2009)
     const auto N = x.size();
     constexpr auto prior = 3.0;
@@ -57,41 +60,26 @@ inline auto gpdfit(const Eigen::Array<double, -1, 1>& x, bool wip = true,
     Eigen::Array<double, -1, 1> jj =
         Eigen::Array<double, -1, 1>::LinSpaced(M, 1, static_cast<double>(M));
     double xstar = x[std::floor(N / 4 + 0.5) - 1];  // first quartile of sample
-//    std::cout << "\nx: \n" << x;
-//    std::cout << "\njj: \n" << jj;
-
     auto theta = (1.0 / x[N - 1] + (1.0 - (M / (jj - 0.5)).sqrt()) / prior / xstar).eval();
     auto l_theta = (static_cast<double>(N) * lx(theta, x)).eval();   // profile log-lik
-//    std::cout << "\nx[N - 1]: " << x[N - 1] << "\n";
-//    std::cout << "\nx_star: " << xstar << "\n";
-//    std::cout << "\nl_theta: \n" << l_theta;
-    auto w_theta = (l_theta - log_sum_exp(l_theta)).exp().eval();  // normalize
-//    std::cout << "\ntheta: \n" << theta;
-//    std::cout << "\nw_theta: \n" << w_theta << "\n";
+    auto w_theta = (l_theta - log_sum_exp(l_theta)).exp();  // normalize
     auto theta_hat = (theta * w_theta).sum();
-    auto k = (-theta_hat * x).log1p().mean();
+    double k = (-theta_hat * x).log1p().mean();
     auto sigma = -k / theta_hat;
-    // auto k = adjust_k_wip(k, n = N);
     constexpr double a = 10;
     const double n_plus_a = N + a;
     k = k * N / n_plus_a + a * 0.5 / n_plus_a;
-//    std::cout << "\nk: " << k;
-//    std::cout << "\nsigma: " << sigma;
     return std::make_tuple(k, sigma);
 }
 
-inline auto qgpd(const Eigen::Array<double, -1, 1>& p, double k, double sigma) {
-    /*
-      if (is.nan(sigma) || sigma <= 0) {
-        return(rep(NaN, length(p)))
-      }
-    */
-    // TODO: Replace with expm1()
+template <typename EigArray>
+inline auto qgpd(const EigArray& p, double k, double sigma) {
     return (sigma * stan::math::expm1(-k * (-p).log1p()) / k).eval();
 }
 
-inline auto psis_smooth_tail(const Eigen::Array<double, -1, 1>& x,
-                             double cutoff) {
+
+template <typename EigArray>
+inline auto psis_smooth_tail(const EigArray& x, double cutoff) {
     const auto x_size = x.size();
     const auto exp_cutoff = std::exp(cutoff);
 
@@ -99,61 +87,108 @@ inline auto psis_smooth_tail(const Eigen::Array<double, -1, 1>& x,
     auto fit = gpdfit(x.array().exp() - exp_cutoff);
     double k = std::get<0>(fit);
     double sigma = std::get<1>(fit);
-//    std::cout << "\n k: " << k << "\n";
-//    std::cout << "\n sigma: " << sigma << "\n";
     if (is_finite(k)) {
         auto p =
             (Eigen::Array<double, -1, 1>::LinSpaced(x_size, 1, x_size) - 0.5) /
             x_size;
         Eigen::Array<double, -1, 1> blah = qgpd(p, k, sigma);
-//        std::cout << "\nblah: \n" << blah << "\n";
-        auto qq = blah + exp_cutoff;
-//        std::cout << "\n p: \n" << p << "\n";
-//        std::cout << "\n qq: \n" << qq << "\n";
-        return std::make_tuple(qq.log().eval(), k);
+        return std::make_tuple((blah + exp_cutoff).log().eval(), k);
     } else {
         return std::make_tuple(x, k);
     }
 }
 
-void bubble_sort(Eigen::Array<double, -1, 1>& arr,
-                 Eigen::Array<Eigen::Index, -1, 1>& arr_idx) {
-    const auto n = arr.size();
-    Eigen::Index i, j;
-    for (i = 0; i < arr.size(); i++) {
-        // Last i elements are already in place
-        for (j = 0; j < n - i - 1; j++) {
-            if (arr[j] > arr[j + 1]) {
-                std::swap(arr[j], arr[j + 1]);
-                std::swap(arr_idx[j], arr_idx[j + 1]);
-            }
+/* This function takes last element as pivot, places
+   the pivot element at its correct position in sorted
+    array, and places all smaller (smaller than pivot)
+   to left of pivot and all greater elements to right
+   of pivot */
+template <typename EigDblArr, typename EigIdxArr>
+inline Eigen::Index quick_sort_partition(EigDblArr&& arr, EigIdxArr&& idx, const Eigen::Index low, const Eigen::Index high) {
+    const auto pivot = arr[high];      // pivot
+    Eigen::Index i = (low - 1);  // Index of smaller element
+
+    for (Eigen::Index j = low; j <= high - 1; ++j) {
+        // If current element is smaller than or
+        // equal to pivot
+        if (arr[j] <= pivot) {
+            i++;  // increment index of smaller element
+            std::swap(arr[i], arr[j]);
+            std::swap(idx[i], idx[j]);
+        }
+    }
+    std::swap(arr[i + 1], arr[high]);
+    std::swap(idx[i + 1], idx[high]);
+    return (i + 1);
+}
+
+/* The main function that implements quick_sort
+ arr[] --> Array to be sorted,
+  low  --> Starting index,
+  high  --> Ending index */
+template <typename EigDblArr, typename EigIdxArr>
+inline void quick_sort(EigDblArr&& arr, EigIdxArr&& idx, const Eigen::Index low, const Eigen::Index high) {
+    if (low < high) {
+        /* pi is partitioning index, arr[p] is now
+           at right place */
+        const Eigen::Index pi = quick_sort_partition(arr, idx, low, high);
+
+        // Separately sort elements before
+        // partition and after partition
+        if (high - low >= 400) {
+          tbb::parallel_invoke( [&]{quick_sort(arr, idx, low, pi - 1);},
+                               [&]{quick_sort(arr, idx, pi + 1, high);} );
+        } else {
+          quick_sort(arr, idx, low, pi - 1);
+          quick_sort(arr, idx, pi + 1, high);
         }
     }
 }
 
-inline auto max_n_elements(const Eigen::Array<double, -1, 1>& lw_i,
-                           size_t tail_len_i) {
+template <typename EigDblArr, typename EigIdxArr>
+inline void quick_sort(EigDblArr&& arr, EigIdxArr&& idx) {
+    quick_sort(arr, idx, 0, arr.size() - 1);
+}
+
+template <typename T>
+inline auto max_n_insertion_start(T&& top_n, const double value) {
+  const Eigen::Index top_size = top_n.size();
+  Eigen::Index low_idx = -1l;
+  Eigen::Index high_idx = top_size;
+  while (high_idx - low_idx > 1l) {
+      const Eigen::Index probe_idx = (low_idx + high_idx) / 2l;
+      const double curr_val = top_n[probe_idx];
+      if (curr_val > value) {
+        high_idx = probe_idx;
+      } else {
+        low_idx = probe_idx;
+      }
+  }
+  if (high_idx == top_size) {
+    return top_size - 1;
+  } else {
+    return high_idx - 1;
+  }
+}
+
+template <typename EigArray>
+inline auto max_n_elements(const EigArray& lw_i, const size_t tail_len_i) {
     Eigen::Array<double, -1, 1> top_n = lw_i.head(tail_len_i);
     Eigen::Array<Eigen::Index, -1, 1> top_n_idx =
         Eigen::Array<Eigen::Index, -1, 1>::LinSpaced(tail_len_i, 0, tail_len_i);
-    bubble_sort(top_n, top_n_idx);
+    quick_sort(top_n, top_n_idx);
     for (Eigen::Index i = tail_len_i; i < lw_i.size(); ++i) {
-        for (Eigen::Index j = top_n.size() - 1; j >= 0; --j) {
-            if (top_n[j] <= lw_i[i]) {
-                //              std::cout << "j: " << j;
-                for (Eigen::Index k = 1; k <= j; ++k) {
-                    //                  std::cout << " k: " << k;
-                    top_n[k - 1] = top_n[k];
-                    top_n_idx[k - 1] = top_n_idx[k];
-                    //                std::cout << " top_n: " <<
-                    //                top_n.transpose();
-                }
-                top_n[j] = lw_i[i];
-                top_n_idx[j] = i;
-                //              std::cout << "\n";
-                break;
-            }
+      if (lw_i[i] >= top_n[0]) {
+        Eigen::Index starting_pos = max_n_insertion_start(top_n, lw_i[i]);
+        for (Eigen::Index k = 1; k <= starting_pos; ++k) {
+            top_n[k - 1] = top_n[k];
         }
+        top_n[starting_pos] = lw_i[i];
+        for (Eigen::Index k = 1; k <= starting_pos; ++k) {
+            top_n_idx[k - 1] = top_n_idx[k];
+        }
+        top_n_idx[starting_pos] = i;
+      }
     }
     return std::make_tuple(std::move(top_n), std::move(top_n_idx));
 }
@@ -172,60 +207,31 @@ inline auto get_psis_weights(const Eigen::Array<double, -1, 1>& log_ratios_i,
     // shift log ratios for safer exponentation
     const double max_log_ratio = log_ratios_i.maxCoeff();
     Eigen::Array<double, -1, 1> lw_i = log_ratios_i - max_log_ratio;
-    /*
-    std::cout << "\nlw_i: \n" << lw_i << "\n";
-    */
     double khat = 0;
 
     if (tail_len_i >= 5) {
-        /*
-        ord = sort.int(lw_i, index.return = TRUE)
-        tail_ids = seq(S - tail_len_i + 1, S)
-        lw_tail = ord$x[tail_ids]
-        */
         // Get back tail + smallest but not on tail in ascending order
         auto max_n = max_n_elements(lw_i, tail_len_i + 1);
         Eigen::Array<double, -1, 1> lw_tail = std::get<0>(max_n).tail(tail_len_i);
         double cutoff = std::get<0>(max_n)(0);
-        /*
-        std::cout << "\ncutoff: " << cutoff << "\n";
-        std::cout << "\ntop_n: \n" << lw_tail << "\n";
-        */
         if (lw_tail.maxCoeff() - lw_tail.minCoeff() <=
             std::numeric_limits<double>::min() * 10) {
-            /*
-            warning(
-              "Can't fit generalized Pareto distribution ",
-              "because all tail values are the same.",
-              call. = FALSE
-            )
-            */
+             // I need to throw a warning here
         } else {
-            // cutoff = ord$x[min(tail_ids) - 1] // largest value smaller than
-            // tail values
             auto smoothed = psis_smooth_tail(lw_tail, cutoff);
             auto khat = std::get<1>(smoothed);
             insert_smooth_to_tail(lw_i, std::get<1>(max_n).tail(tail_len_i),
                                   std::get<0>(smoothed));
-/*
-            std::cout << "\n smoothed: \n" << std::get<0>(smoothed) << "\n";
-            std::cout << "\nkhat: " << khat << "\n";
-            std::cout << "\nidx_n: \n" << std::get<1>(max_n).tail(tail_len_i) << "\n";
-            std::cout << "\nnew lw_i: \n" << lw_i << "\n";
-            */
         }
     }
 
     // truncate at max of raw wts (i.e., 0 since max has been subtracted)
     for (Eigen::Index i = 0; i < lw_i.size(); ++i) {
-        if (lw_i(i) > 0) {
-            lw_i(i) = 0.0;
+        if (lw_i.coeff(i) > 0) {
+            lw_i.coeffRef(i) = 0.0;
         }
-        // shift log weights back so that the smallest log weights remain
-        // unchanged lw_i = lw_i + max(log_ratios_i)
     }
     auto max_adj = (lw_i + max_log_ratio).eval();
-//    std::cout << "\nmax_adj: \n" << max_adj << "\n";
     return (max_adj - log_sum_exp(max_adj)).exp().eval();
 }
 

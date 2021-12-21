@@ -440,6 +440,7 @@ inline auto construct_taylor_approximation(
   }
 }
 
+
 template <bool ReturnLpSamples, typename EigMat, typename EigVec,
           std::enable_if_t<ReturnLpSamples>* = nullptr>
 inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio,
