@@ -560,25 +560,29 @@ inline auto pathfinder_lbfgs_single(
    * objective function, and factorization of covariance estimation
    */
   int ret = 0;
+  /*
   Eigen::MatrixXd param_mat(param_size, num_iterations + 1);
   Eigen::MatrixXd grad_mat(param_size, num_iterations + 1);
+  */
+  std::vector<Eigen::VectorXd> param_vecs;
+  param_vecs.reserve(num_iterations);
+  std::vector<Eigen::VectorXd> grad_vecs;
+  grad_vecs.reserve(num_iterations);
   {
     std::vector<double> g1;
     double blah = stan::model::log_prob_grad<true, true>(model, cont_vector,
                                                          disc_vector, g1);
-    param_mat.col(0)
-        = Eigen::Map<Eigen::VectorXd>(cont_vector.data(), param_size);
-    grad_mat.col(0) = Eigen::Map<Eigen::VectorXd>(g1.data(), param_size);
+    param_vecs.emplace_back(
+        Eigen::Map<Eigen::VectorXd>(cont_vector.data(), param_size));
+    grad_vecs.emplace_back(Eigen::Map<Eigen::VectorXd>(g1.data(), param_size));
   }
-  int param_cols_filled = 1;
+  int param_cols_filled = 0;
   while (ret == 0) {
     std::stringstream msg;
     interrupt();
     ret = lbfgs.step();
     double lp = lbfgs.logp();
-    if (refresh > 0
-        && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
-            || ((lbfgs.iter_num() + 1) % refresh == 0))) {
+    if (refresh > 0 && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0 || ((lbfgs.iter_num() + 1) % refresh == 0))) {
       std::stringstream msg;
       msg << path_num +
           "    Iter"
@@ -614,8 +618,8 @@ inline auto pathfinder_lbfgs_single(
      * and we are exiting
      */
     if (likely(ret != -1)) {
-      param_mat.col(param_cols_filled) = lbfgs.curr_x();
-      grad_mat.col(param_cols_filled) = lbfgs.curr_g();
+      param_vecs.emplace_back(lbfgs.curr_x());
+      grad_vecs.emplace_back(lbfgs.curr_g());
       ++param_cols_filled;
     }
     if (msg.str().length() > 0) {
@@ -630,10 +634,18 @@ inline auto pathfinder_lbfgs_single(
         / 1000.0;
   const auto start_pathfinder_time = std::chrono::steady_clock::now();
   // 3. Setup param and grad differences and updates of diagonal hessian (alpha)
+  /*
   Eigen::MatrixXd Ykt_diff = grad_mat.middleCols(1, param_cols_filled - 1)
                              - grad_mat.leftCols(param_cols_filled - 1);
   Eigen::MatrixXd Skt_diff = param_mat.middleCols(1, param_cols_filled - 1)
                              - param_mat.leftCols(param_cols_filled - 1);
+  */
+  Eigen::MatrixXd Ykt_diff(param_size, param_cols_filled);
+  Eigen::MatrixXd Skt_diff(param_size, param_cols_filled);
+  for (Eigen::Index i = 0; i < param_cols_filled; ++i) {
+    Ykt_diff.col(i) = param_vecs[i + 1] - param_vecs[i];
+    Skt_diff.col(i) = grad_vecs[i + 1] - grad_vecs[i];
+  }
   const auto diff_size = Ykt_diff.cols();
   Eigen::MatrixXd alpha_mat(param_size, diff_size);
   Eigen::Matrix<bool, -1, 1> check_curve_vec = check_curve(Ykt_diff, Skt_diff);
@@ -658,20 +670,24 @@ inline auto pathfinder_lbfgs_single(
               << alpha_mat.transpose().eval().format(CommaInitFmt) << "\n";
     std::cout << "\n Ykt_diff mat: "
               << Ykt_diff.transpose().eval().format(CommaInitFmt) << "\n";
+              /*
     std::cout << "\n grad mat: "
               << grad_mat.leftCols(param_cols_filled)
                      .transpose()
                      .eval()
                      .format(CommaInitFmt)
               << "\n";
+              */
     std::cout << "\n Skt_diff mat: "
               << Skt_diff.transpose().eval().format(CommaInitFmt) << "\n";
+              /*
     std::cout << "\n param mat: "
               << param_mat.leftCols(param_cols_filled)
                      .transpose()
                      .eval()
                      .format(CommaInitFmt)
               << "\n";
+              */
   }
   auto fn = [&model](auto&& u) {
     return -model.template log_prob<false, true>(u, 0);
@@ -753,8 +769,8 @@ inline auto pathfinder_lbfgs_single(
            * 3a(1). Run BFGS-Sample to get pieces need for sampling.
            */
           taylor_approx_t taylor_appx_tuple = construct_taylor_approximation(
-              Ykt_h, alpha, Dk, ninvRST, param_mat.col(iter + 1),
-              grad_mat.col(iter + 1));
+              Ykt_h, alpha, Dk, ninvRST, param_vecs[iter + 1],
+              grad_vecs[iter + 1]);
 
           /**
            * 3a(1). Get `num_elbo_draws` draws from normal
@@ -801,7 +817,7 @@ inline auto pathfinder_lbfgs_single(
                                  "", "", " ");
     std::cout << "ELBOs: \n" << elbo_mat.format(CommaInitFmt) << "\n";
     std::cout << "Winner: " << best_E << "\n";
-    std::cout << "optim vals: \n" << param_mat.col(best_E + 1) << "\n";
+    std::cout << "optim vals: \n" << param_vecs[best_E + 1] << "\n";
   }
 
   Eigen::MatrixXd constrainted_draws_mat(names.size(), num_draws);
