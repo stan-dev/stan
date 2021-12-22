@@ -209,8 +209,8 @@ inline elbo_est_t est_elbo_draws(F&& fn, RNorm&& rnorm,
   }
   //### Divergence estimation ###
   lp_mat.col(1)
-      = -0.5
-        * (taylor_approx.logdetcholHk + u.array().square().colwise().sum()
+      =
+        (-taylor_approx.logdetcholHk) + -0.5 * (u.array().square().colwise().sum()
            + num_params * log(2 * stan::math::pi()));
   double ELBO = ((-lp_mat.col(0)) - lp_mat.col(1)).mean();
   if (STAN_DEBUG_PATH_ELBO_DRAWS) {
@@ -299,8 +299,8 @@ inline auto approximation_samples(BaseRNG&& rnorm,
   auto approx_draws = get_rnorm_and_draws(u, taylor_approx, alpha);
   // TODO: Inline this on the bottom row
   Eigen::VectorXd lp_approx
-      = -0.5
-        * (taylor_approx.logdetcholHk + u.array().square().colwise().sum()
+      = (-taylor_approx.logdetcholHk) + -0.5
+        * (u.array().square().colwise().sum()
            + num_params * log(2 * stan::math::pi()));
   return std::make_tuple(std::move(approx_draws), std::move(lp_approx));
 }
