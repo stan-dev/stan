@@ -365,7 +365,6 @@ pipeline {
                             label 'osx'
                         }
                     }
-                    agent { label 'osx' }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
