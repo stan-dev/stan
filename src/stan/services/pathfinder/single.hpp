@@ -141,20 +141,20 @@ struct taylor_approx_t {
 
 struct elbo_est_t {
   double elbo{std::numeric_limits<double>::lowest()};
-  int fn_calls_elbo{0};
+  size_t fn_calls_elbo{0};
   Eigen::MatrixXd repeat_draws;
   Eigen::MatrixXd lp_mat;
 };
 
 template <typename EigMat, typename EigVec>
-inline auto get_rnorm_and_draws(EigMat& u, const taylor_approx_t& taylor_approx,
+inline auto get_rnorm_and_draws(EigMat&& u, const taylor_approx_t& taylor_approx,
                                 const EigVec& alpha) {
   if (taylor_approx.use_full) {
     return (crossprod(taylor_approx.L_approx, u).colwise()
             + taylor_approx.x_center)
         .eval();
   } else {
-    Eigen::MatrixXd u1 = taylor_approx.Qk.transpose() * u;
+    auto u1 = (taylor_approx.Qk.transpose() * u).eval();
     return ((alpha.array().sqrt().matrix().asDiagonal()
              * (taylor_approx.Qk * crossprod(taylor_approx.L_approx, u1)
                 + (u - taylor_approx.Qk * u1)))
@@ -164,16 +164,14 @@ inline auto get_rnorm_and_draws(EigMat& u, const taylor_approx_t& taylor_approx,
   }
 }
 
-template <typename SamplePkg, typename F, typename RNorm, typename Model,
-          typename EigVec>
-inline elbo_est_t est_elbo_draws(F&& fn, RNorm&& rnorm,
+template <bool ReturnElbo = true, typename F, typename RNorm, typename EigVec, typename SamplePkg>
+inline elbo_est_t est_approx_draws(F&& fn, RNorm&& rnorm,
                                  const SamplePkg& taylor_approx,
-                                 size_t num_samples, const EigVec& alpha,
-                                 Model& model, Eigen::Index iter = 0) {
+                                 size_t num_samples, const EigVec& alpha) {
   const auto num_params = taylor_approx.x_center.size();
-  int fn_calls_elbo = 0;
-  Eigen::MatrixXd u = rnorm(num_params, num_samples);
-  auto approx_samples = get_rnorm_and_draws(u, taylor_approx, alpha);
+  size_t fn_calls_elbo = 0;
+  Eigen::MatrixXd uniform_samps = rnorm(num_params, num_samples);
+  auto approx_samples = get_rnorm_and_draws(uniform_samps, taylor_approx, alpha);
   if (STAN_DEBUG_PATH_RNORM_DRAWS) {
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
                                  ", ", ", ", "\n", "", "", " ");
@@ -197,112 +195,72 @@ inline elbo_est_t est_elbo_draws(F&& fn, RNorm&& rnorm,
   }
   Eigen::MatrixXd lp_mat(num_samples, 2);
   Eigen::VectorXd approx_samples_col;
-  try {
-    for (Eigen::Index i = 0; i < num_samples; ++i) {
-      approx_samples_col = approx_samples.col(i);
-      lp_mat(i, 0) = fn(approx_samples_col);
-      ++fn_calls_elbo;
+  size_t fail_trys = 0;
+  for (Eigen::Index i = 0; i < num_samples; ++i) {
+    approx_samples_col = approx_samples.col(i);
+    try {
+      lp_mat(i, 1) = fn(approx_samples_col);
+    } catch (const std::exception& e) {
+      ++fail_trys;
+      if (fail_trys > 101) {
+        std::domain_error fn_exception(std::string("Approximate estimation failed after 100 attempts with final error: ") + e.what());
+        throw fn_exception;
+      }
+      uniform_samps.col(i) = rnorm(num_params, 1);
+      approx_samples.col(i) = get_rnorm_and_draws(uniform_samps.col(i), taylor_approx, alpha);
+      --i;
     }
-  } catch (...) {
-    std::cout << "\n\n\n YIKES!!!! \n\n\n";
-    // TODO: Actually catch errors
+      ++fn_calls_elbo;
   }
   //### Divergence estimation ###
-  lp_mat.col(1)
+  lp_mat.col(0)
       =
-        (-taylor_approx.logdetcholHk) + -0.5 * (u.array().square().colwise().sum()
-           + num_params * log(2 * stan::math::pi()));
-  double ELBO = ((-lp_mat.col(0)) - lp_mat.col(1)).mean();
-  if (STAN_DEBUG_PATH_ELBO_DRAWS) {
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", ", ", "\n", "", "", " ");
-    Eigen::MatrixXd f_alt(num_samples, 7);
-    auto fn1 = [&model](auto&& u) {
-      return -model.template log_prob<false, false>(u, 0);
-    };
-    auto fn2 = [&model](auto&& u) {
-      return -model.template log_prob<false, true>(u, 0);
-    };
-    auto fn3 = [&model](auto&& u) {
-      return -model.template log_prob<true, false>(u, 0);
-    };
-    auto fn4
-        = [&model](auto&& u) { return -model.log_prob_propto_jacobian(u, 0); };
-    auto fn5 = [&model](auto&& u) {
-      return -stan::model::log_prob_propto<true>(model, u, 0);
-    };
-    try {
-      for (Eigen::Index i = 0; i < num_samples; ++i) {
-        approx_samples_col = approx_samples.col(i);
-        f_alt.col(2)(i) = fn1(approx_samples_col);
-        f_alt.col(3)(i) = fn2(approx_samples_col);
-        f_alt.col(4)(i) = fn3(approx_samples_col);
-        f_alt.col(5)(i) = fn4(approx_samples_col);
-        f_alt.col(6)(i) = fn5(approx_samples_col);
-        ++fn_calls_elbo;
-      }
-    } catch (...) {
-      std::cout << "\n\n\n YIKES!!!! \n\n\n";
-      // TODO: Actually catch errors
+        (-taylor_approx.logdetcholHk) + -0.5 * (uniform_samps.array().square().colwise().sum()
+           + num_params * stan::math::LOG_TWO_PI);
+  if (ReturnElbo) {
+    double ELBO = ((-lp_mat.col(1)) - lp_mat.col(0)).mean();
+    if (STAN_DEBUG_PATH_ELBO_DRAWS) {
+      Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                   ", ", ", ", "\n", "", "", " ");
+      std::cout << "\n Rando Sums: \n"
+                << approx_samples.array().square().colwise().sum().eval().format(
+                       CommaInitFmt)
+                << "\n";
+      std::cout << "logdetcholHk: " << taylor_approx.logdetcholHk << "\n";
+      std::cout << "ELBO: " << ELBO << "\n";
+      std::cout << "repeat_draws: \n"
+                << approx_samples.transpose().eval().format(CommaInitFmt) << "\n";
+      /*std::cout << "random_stuff: \n"
+                << std::get<0>(tuple_u).transpose().eval().format(CommaInitFmt)
+                << "\n";*/
+      std::cout << "lp_approx: \n"
+                << lp_mat.col(1).transpose().eval().format(CommaInitFmt) << "\n";
+      std::cout << "fn_call: \n"
+                << lp_mat.col(0).transpose().eval().format(CommaInitFmt) << "\n";
+      Eigen::MatrixXd param_vals = approx_samples;
+      auto mean_vals = param_vals.rowwise().mean().eval();
+      std::cout << "Mean Values: \n"
+                << mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
+      std::cout << "SD Values: \n"
+                << (((param_vals.colwise() - mean_vals)
+                         .array()
+                         .square()
+                         .matrix()
+                         .rowwise()
+                         .sum()
+                         .array()
+                     / (param_vals.cols() - 1))
+                        .sqrt())
+                       .transpose()
+                       .eval()
+                << "\n";
     }
-    f_alt.col(0) = lp_mat.col(1);
-    f_alt.col(1) = lp_mat.col(0);
-
-    std::cout << "\n Rando Sums: \n"
-              << approx_samples.array().square().colwise().sum().eval().format(
-                     CommaInitFmt)
-              << "\n";
-    std::cout << "logdetcholHk: " << taylor_approx.logdetcholHk << "\n";
-    std::cout << "\n means: \n" << f_alt.colwise().mean().eval() << "\n";
-    std::cout << "\n ELBOs: \n"
-              << ((-f_alt).colwise() - lp_mat.col(1)).colwise().mean().eval()
-              << "\n";
-    std::cout << "ELBO: " << ELBO << "\n";
-    std::cout << "repeat_draws: \n"
-              << approx_samples.transpose().eval().format(CommaInitFmt) << "\n";
-    /*std::cout << "random_stuff: \n"
-              << std::get<0>(tuple_u).transpose().eval().format(CommaInitFmt)
-              << "\n";*/
-    std::cout << "lp_approx: \n"
-              << lp_mat.col(1).transpose().eval().format(CommaInitFmt) << "\n";
-    std::cout << "fn_call: \n"
-              << lp_mat.col(0).transpose().eval().format(CommaInitFmt) << "\n";
-    std::cout << "diff_lps: \n" << f_alt.format(CommaInitFmt) << "\n";
-    Eigen::MatrixXd param_vals = approx_samples;
-    auto mean_vals = param_vals.rowwise().mean().eval();
-    std::cout << "Mean Values: \n"
-              << mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
-    std::cout << "SD Values: \n"
-              << (((param_vals.colwise() - mean_vals)
-                       .array()
-                       .square()
-                       .matrix()
-                       .rowwise()
-                       .sum()
-                       .array()
-                   / (param_vals.cols() - 1))
-                      .sqrt())
-                     .transpose()
-                     .eval()
-              << "\n";
+    return elbo_est_t{ELBO, fn_calls_elbo, std::move(approx_samples),
+                      std::move(lp_mat)};
+  } else {
+    return elbo_est_t{std::numeric_limits<double>::lowest(), fn_calls_elbo, std::move(approx_samples),
+                      std::move(lp_mat)};
   }
-  return elbo_est_t{ELBO, fn_calls_elbo, std::move(approx_samples),
-                    std::move(lp_mat)};
-}
-
-template <typename SamplePkg, typename BaseRNG, typename EigVec>
-inline auto approximation_samples(BaseRNG&& rnorm,
-                                  const SamplePkg& taylor_approx,
-                                  int num_samples, const EigVec& alpha) {
-  const Eigen::Index num_params = taylor_approx.x_center.size();
-  Eigen::MatrixXd u = rnorm(num_params, num_samples);
-  auto approx_draws = get_rnorm_and_draws(u, taylor_approx, alpha);
-  // TODO: Inline this on the bottom row
-  Eigen::VectorXd lp_approx
-      = (-taylor_approx.logdetcholHk) + -0.5
-        * (u.array().square().colwise().sum()
-           + num_params * log(2 * stan::math::pi()));
-  return std::make_tuple(std::move(approx_draws), std::move(lp_approx));
 }
 
 template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
@@ -788,8 +746,14 @@ inline auto pathfinder_lbfgs_single(
                 num_params, num_samples,
                 [&rand_unit_gaus]() { return rand_unit_gaus(); });
           };
-          auto elbo_est = est_elbo_draws(fn, rnorm, taylor_appx_tuple,
-                                         num_elbo_draws, alpha, model, iter);
+
+          elbo_est_t elbo_est;
+          try {
+            elbo_est = est_approx_draws<true>(fn, rnorm, taylor_appx_tuple,
+                                           num_elbo_draws, alpha);
+          } catch (const std::exception& e) {
+            logger.info(std::string("ELBO estimation failed for LBFGS iteration " + std::to_string(iter) + " with error: ") + e.what());
+          }
           if (refresh > 0
               && (lbfgs.iter_num() == 0
                   || ((lbfgs.iter_num() + 1) % refresh == 0))) {
@@ -823,23 +787,18 @@ inline auto pathfinder_lbfgs_single(
   Eigen::MatrixXd constrainted_draws_mat(names.size(), num_draws);
   Eigen::VectorXd lp_ratio(num_draws);
   {
-    auto elbo_lps = std::move(elbo_fit_best.lp_mat);
-    lp_ratio.head(num_elbo_draws) = -elbo_lps.col(0) - elbo_lps.col(1);
-    auto elbo_draws = std::move(elbo_fit_best.repeat_draws);
+    lp_ratio.head(num_elbo_draws) = -elbo_fit_best.lp_mat.col(1) - elbo_fit_best.lp_mat.col(0);
+    constrainted_draws_mat.block(names.size() - 2, 0, 2, num_elbo_draws) = elbo_fit_best.lp_mat.transpose();
     tbb::parallel_for(
         tbb::blocked_range<Eigen::Index>(0, num_elbo_draws, 512),
         [&](tbb::blocked_range<Eigen::Index> r) {
           Eigen::VectorXd unconstrained_draws;
-          Eigen::VectorXd constrained_draws1;
-          Eigen::VectorXd constrained_draws2(names.size());
+          Eigen::VectorXd constrained_draws;
           for (Eigen::Index i = r.begin(); i < r.end(); ++i) {
             //    for (Eigen::Index i = 0; i < num_elbo_draws; ++i) {
-            unconstrained_draws = elbo_draws.col(i);
-            model.write_array(rng, unconstrained_draws, constrained_draws1);
-            constrained_draws2.head(names.size() - 2) = constrained_draws1;
-            constrained_draws2(names.size() - 1) = elbo_lps(i, 0);
-            constrained_draws2(names.size() - 2) = elbo_lps(i, 1);
-            constrainted_draws_mat.col(i) = constrained_draws2;
+            unconstrained_draws = elbo_fit_best.repeat_draws.col(i);
+            model.write_array(rng, unconstrained_draws, constrained_draws);
+            constrainted_draws_mat.col(i).head(names.size() - 2) = constrained_draws;
           }
         });
   }
@@ -858,22 +817,21 @@ inline auto pathfinder_lbfgs_single(
         tbb::blocked_range<Eigen::Index>(num_elbo_draws, num_draws, 256),
         [&](tbb::blocked_range<Eigen::Index> r) {
           Eigen::VectorXd unconstrained_draws;
-          Eigen::VectorXd constrained_draws1;
-          Eigen::VectorXd constrained_draws2(names.size());
-          auto draws_tuple = approximation_samples(
-              rnorm, taylor_approx_best, r.size(), alpha_mat.col(best_E));
-          auto draws_mat = std::move(std::get<0>(std::move(draws_tuple)));
-          auto lp_approx_vec = std::get<1>(std::move(draws_tuple)).array();
+          Eigen::VectorXd constrained_draws;
+          elbo_est_t draws_tuple;
+          try {
+            draws_tuple = est_approx_draws<false>(fn,
+                rnorm, taylor_approx_best, r.size(), alpha_mat.col(best_E));
+          } catch (const std::exception& e) {
+            logger.info(std::string("Final sampling approximation failed with error: ") + e.what());
+          }
+          lp_ratio.segment(static_cast<Eigen::Index>(r.begin()), r.size()) = -draws_tuple.lp_mat.col(1) - draws_tuple.lp_mat.col(0);
+          constrainted_draws_mat.block(names.size() - 2,
+           static_cast<Eigen::Index>(r.begin()), 2, r.size()) = draws_tuple.lp_mat.transpose();
           for (Eigen::Index i = r.begin(), idx = 0; i < r.end(); ++i, ++idx) {
-            unconstrained_draws = draws_mat.col(idx);
-            model.write_array(rng, unconstrained_draws, constrained_draws1);
-            constrained_draws2.head(names.size() - 2) = constrained_draws1;
-            constrained_draws2(names.size() - 2) = lp_approx_vec(idx);
-            constrained_draws2(names.size() - 1) = fn(unconstrained_draws);
-            lp_ratio(i) = -constrained_draws2(names.size() - 1)
-                          - constrained_draws2(names.size() - 2);
-            constrainted_draws_mat.col(i) = constrained_draws2;
-            //        }
+            unconstrained_draws = draws_tuple.repeat_draws.col(idx);
+            model.write_array(rng, unconstrained_draws, constrained_draws);
+            constrainted_draws_mat.col(i).head(names.size() - 2) = constrained_draws;
           }
         });
   }
