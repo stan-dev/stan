@@ -5,6 +5,11 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.28.2 (22 November 2021)
+======================================================================
+
+ - Fixed a performance regression caused by using the diagnostic writer even when diagnostics were not requested.
+
 v2.28.1 (21 October 2021)
 ======================================================================
 
