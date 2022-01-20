@@ -628,9 +628,13 @@ inline auto rvalue(Mat&& x, const char* name, const Idx& row_idx,
 template <typename Mat, typename Idx, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(Mat&& x, const char* name, const Idx& row_idx,
                    index_max col_idx) {
-  math::check_range("matrix[..., max] column indexing", name, x.cols(),
-                    col_idx.max_);
-  return rvalue(x.leftCols(col_idx.max_), name, row_idx);
+  if (col_idx.max_ > 0) {
+    math::check_range("matrix[..., max] column indexing", name, x.cols(),
+                      col_idx.max_);
+    return rvalue(x.leftCols(col_idx.max_), name, row_idx);
+  } else {
+    return rvalue(x.leftCols(0), name, row_idx);
+  }
 }
 
 /**
@@ -707,17 +711,26 @@ inline auto rvalue(StdVec& v, const char* name, index_uni idx1,
  * @param[in] idx single index
  * @return Result of indexing array.
  */
+ template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+ inline const auto& rvalue(const StdVec& v, const char* name, index_uni idx) {
+   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
+   return v[idx.n_ - 1];
+ }
+
+ template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+ inline auto& rvalue(StdVec& v, const char* name, index_uni idx) {
+   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
+   return v[idx.n_ - 1];
+ }
+
 template <typename StdVec, require_std_vector_t<StdVec>* = nullptr,
           require_not_t<std::is_lvalue_reference<StdVec&&>>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, index_uni idx) {
   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
-  return v[idx.n_ - 1];
+  return std::move(v[idx.n_ - 1]);
 }
-template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
-inline auto& rvalue(StdVec& v, const char* name, index_uni idx) {
-  math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
-  return v[idx.n_ - 1];
-}
+
+
 
 /**
  * Return the result of indexing the specified array with
@@ -739,22 +752,23 @@ inline auto& rvalue(StdVec& v, const char* name, index_uni idx) {
 template <typename StdVec, typename Idx1, typename... Idxs,
           require_std_vector_t<StdVec>* = nullptr,
           require_not_same_t<Idx1, index_uni>* = nullptr>
-inline auto rvalue(StdVec&& v, const char* name, Idx1 idx1,
+inline auto rvalue(StdVec&& v, const char* name, const Idx1& idx1,
                    const Idxs&... idxs) {
   using inner_type = plain_type_t<decltype(
       rvalue(v[rvalue_at(0, idx1) - 1], name, idxs...))>;
-  std::vector<inner_type> result;
-  const int index_size = rvalue_index_size(idx1, v.size());
-  if (index_size > 0) {
-    result.reserve(index_size);
+  const auto index_size = rvalue_index_size(idx1, v.size());
+  stan::math::check_greater_or_equal("array[..., ...] indexing", "size", index_size, 0);
+  std::vector<inner_type> result(index_size);
+  if ((std::is_same<std::decay_t<Idx1>, index_min_max>::value || std::is_same<std::decay_t<Idx1>, index_max>::value) && index_size == 0) {
+    return result;
   }
   for (int i = 0; i < index_size; ++i) {
     const int n = rvalue_at(i, idx1);
     math::check_range("array[..., ...] index", name, v.size(), n);
-    if (std::is_rvalue_reference<StdVec>::value) {
-      result.emplace_back(rvalue(std::move(v[n - 1]), name, idxs...));
+    if ((!std::is_same<std::decay_t<Idx1>, index_multi>::value) && std::is_rvalue_reference<StdVec>::value) {
+      result[i] = rvalue(std::move(v[n - 1]), name, idxs...);
     } else {
-      result.emplace_back(rvalue(v[n - 1], name, idxs...));
+      result[i] = rvalue(v[n - 1], name, idxs...);
     }
   }
   return result;
