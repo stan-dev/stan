@@ -1370,7 +1370,7 @@ void positive_minmax_negative_minmax_matrix_test() {
         x_rev(x_rev_val);
     const int ii = i + 1;
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii), index_min_max(1, ii),
-           index_min_max(ii, 1));
+                           index_min_max(ii, 1));
   }
 }
 
@@ -1399,7 +1399,7 @@ void negative_minmax_positive_minmax_matrix_test() {
         x_rev(x_rev_val);
     const int ii = i + 1;
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 1),
-           index_min_max(1, ii));
+                           index_min_max(1, ii));
     stan::math::recover_memory();
   }
 }
@@ -1429,7 +1429,7 @@ void negative_minmax_negative_minmax_matrix_test() {
         x_rev(x_rev_val);
     const int ii = i + 1;
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 1),
-           index_min_max(ii, 1));
+                           index_min_max(ii, 1));
     stan::math::recover_memory();
   }
 }

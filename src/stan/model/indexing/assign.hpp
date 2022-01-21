@@ -137,9 +137,8 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
                                  slice_size, name, y.size());
     internal::assign_impl(x.segment(slice_start, slice_size), y, name);
   } else {
-    stan::math::check_size_match("vector[min_max] assign", "left hand side",
-                                 0, name, y.size());
-
+    stan::math::check_size_match("vector[min_max] assign", "left hand side", 0,
+                                 name, y.size());
   }
 }
 
@@ -189,8 +188,8 @@ template <typename Vec1, typename Vec2,
 inline void assign(Vec1&& x, const Vec2& y, const char* name, index_max idx) {
   if (idx.max_ > 0) {
     stan::math::check_range("vector[max] assign", name, x.size(), idx.max_);
-    stan::math::check_size_match("vector[max] assign", "left hand side", idx.max_,
-                                 name, y.size());
+    stan::math::check_size_match("vector[max] assign", "left hand side",
+                                 idx.max_, name, y.size());
     internal::assign_impl(x.head(idx.max_), y, name);
   } else {
     stan::math::check_size_match("vector[max] assign", "left hand side", 0,
@@ -356,8 +355,8 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name, index_max idx) {
                                  idx.max_, name, y.rows());
     internal::assign_impl(x.topRows(idx.max_), y, name);
   } else {
-    stan::math::check_size_match("matrix[max] assign", "left hand side rows",
-                                 0, name, y.rows());
+    stan::math::check_size_match("matrix[max] assign", "left hand side rows", 0,
+                                 name, y.rows());
     internal::assign_impl(x.topRows(0), y, name);
   }
 }
@@ -396,8 +395,7 @@ inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max idx) {
     internal::assign_impl(x.middleRows(idx.min_ - 1, row_size), y, name);
   } else {
     stan::math::check_size_match("matrix[min_max] assign",
-                                 "left hand side rows", 0, name,
-                                 y.rows());
+                                 "left hand side rows", 0, name, y.rows());
   }
 }
 
@@ -421,44 +419,42 @@ template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
                    index_min_max col_idx) {
- stan::math::check_range("matrix[min_max, min_max] assign min row", name,
-                         x.rows(), row_idx.min_);
+  stan::math::check_range("matrix[min_max, min_max] assign min row", name,
+                          x.rows(), row_idx.min_);
 
- stan::math::check_range("matrix[min_max, min_max] assign min column", name,
-                         x.cols(), col_idx.min_);
+  stan::math::check_range("matrix[min_max, min_max] assign min column", name,
+                          x.cols(), col_idx.min_);
 
   if ((row_idx.max_ >= row_idx.min_) && (col_idx.max_ >= col_idx.min_)) {
-      auto row_size = row_idx.max_ - (row_idx.min_ - 1);
-      auto col_size = col_idx.max_ - (col_idx.min_ - 1);
-      stan::math::check_range("matrix[min_max, min_max] assign max row", name,
-                              x.rows(), row_idx.max_);
-      stan::math::check_range("matrix[min_max, min_max] assign max column", name,
-                              x.cols(), col_idx.max_);
+    auto row_size = row_idx.max_ - (row_idx.min_ - 1);
+    auto col_size = col_idx.max_ - (col_idx.min_ - 1);
+    stan::math::check_range("matrix[min_max, min_max] assign max row", name,
+                            x.rows(), row_idx.max_);
+    stan::math::check_range("matrix[min_max, min_max] assign max column", name,
+                            x.cols(), col_idx.max_);
 
-      stan::math::check_size_match("matrix[min_max, min_max] assign",
-                                   "left hand side rows", row_size, name,
-                                   y.rows());
-      stan::math::check_size_match("matrix[min_max, min_max] assign",
-                                   "left hand side columns", col_size, name,
-                                   y.cols());
-      internal::assign_impl(
-          x.block(row_idx.min_ - 1, col_idx.min_ - 1, row_size, col_size), y, name);
+    stan::math::check_size_match("matrix[min_max, min_max] assign",
+                                 "left hand side rows", row_size, name,
+                                 y.rows());
+    stan::math::check_size_match("matrix[min_max, min_max] assign",
+                                 "left hand side columns", col_size, name,
+                                 y.cols());
+    internal::assign_impl(
+        x.block(row_idx.min_ - 1, col_idx.min_ - 1, row_size, col_size), y,
+        name);
   } else {
     // Check the indexing is valid but don't actually do assignment
     if (row_idx.max_ >= row_idx.min_) {
       stan::math::check_range("matrix[min_max, min_max] assign max row", name,
                               x.rows(), row_idx.max_);
       stan::math::check_size_match("matrix[min_max, min_max] assign",
-                                   "left hand side columns", 0, name,
-                                   y.cols());
+                                   "left hand side columns", 0, name, y.cols());
 
     } else {
-      stan::math::check_range("matrix[min_max, min_max] assign max column", name,
-                              x.cols(), col_idx.max_);
+      stan::math::check_range("matrix[min_max, min_max] assign max column",
+                              name, x.cols(), col_idx.max_);
       stan::math::check_size_match("matrix[min_max, min_max] assign",
-                                   "left hand side rows", 0, name,
-                                   y.rows());
-
+                                   "left hand side rows", 0, name, y.rows());
     }
   }
 }
@@ -702,7 +698,8 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
     stan::math::check_range("matrix[..., max] assign", name, x.cols(),
                             col_idx.max_);
     stan::math::check_size_match("matrix[..., max] assign column size",
-                                 "left hand side", col_idx.max_, name, y.cols());
+                                 "left hand side", col_idx.max_, name,
+                                 y.cols());
     assign(x.leftCols(col_idx.max_), y, name, row_idx);
   } else {
     stan::math::check_size_match("matrix[..., max] assign column size",
@@ -825,7 +822,6 @@ inline void assign(StdVec&& x, U&& y, const char* name, index_uni idx) {
   x[idx.n_ - 1] = std::forward<U>(y);
 }
 
-
 /**
  * Assign to the elements of an std vector with additional subsetting on each
  * element.
@@ -853,7 +849,8 @@ inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
                    const Idxs&... idxs) {
   int x_idx_size = rvalue_index_size(idx1, x.size());
   // If there is a reverse min_max index or negative max index
-  if (std::is_same<std::decay_t<Idx1>, index_min_max>::value || std::is_same<std::decay_t<Idx1>, index_max>::value) {
+  if (std::is_same<std::decay_t<Idx1>, index_min_max>::value
+      || std::is_same<std::decay_t<Idx1>, index_max>::value) {
     if (x_idx_size == 0) {
       stan::math::check_size_match("array[multi, ...] assign", "left hand side",
                                    0, name, y.size());
