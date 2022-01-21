@@ -358,7 +358,7 @@ void test_negative_minmax_varvector() {
 
   test_throw_invalid_arg(x, y, index_min_max(4, 1));
   test_throw_invalid_arg(x, y, index_min_max(3, 0));
-  test_throw_invalid_arg(x, y, index_min_max(6, 1));
+  test_throw_out_of_range(x, y, index_min_max(6, 1));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(5),
                          index_min_max(4, 1));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(3),

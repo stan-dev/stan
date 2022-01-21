@@ -126,9 +126,9 @@ template <typename Vec1, typename Vec2,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x, const Vec2& y, const char* name,
                    index_min_max idx) {
+   stan::math::check_range("vector[min_max] min assign", name, x.size(),
+                           idx.min_);
   if (idx.max_ >= idx.min_) {
-    stan::math::check_range("vector[min_max] min assign", name, x.size(),
-                            idx.min_);
     stan::math::check_range("vector[min_max] max assign", name, x.size(),
                             idx.max_);
     const auto slice_start = idx.min_ - 1;
@@ -381,22 +381,20 @@ template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr,
           require_matrix_t<Mat2>* = nullptr>
 inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max idx) {
+  stan::math::check_range("matrix[min_max] min row indexing", name, x.rows(),
+                          idx.min_);
   stan::math::check_size_match("matrix[min_max] assign",
                                "left hand side columns", x.cols(), name,
                                y.cols());
   if (idx.max_ >= idx.min_) {
     stan::math::check_range("matrix[min_max] max row indexing", name, x.rows(),
                             idx.max_);
-    stan::math::check_range("matrix[min_max] min row indexing", name, x.rows(),
-                            idx.min_);
     const auto row_size = idx.max_ - idx.min_ + 1;
     stan::math::check_size_match("matrix[min_max] assign",
                                  "left hand side rows", row_size, name,
                                  y.rows());
     internal::assign_impl(x.middleRows(idx.min_ - 1, row_size), y, name);
   } else {
-    stan::math::check_range("matrix[min_max] min row indexing", name, x.rows(),
-                            idx.min_);
     stan::math::check_size_match("matrix[min_max] assign",
                                  "left hand side rows", 0, name,
                                  y.rows());
