@@ -103,7 +103,7 @@ inline const T& rvalue(const T& x, const char* /*name*/, index_omni /*idx*/) {
  */
 template <typename T>
 inline std::decay_t<T> rvalue(T&& x, const char* name, index_omni /*idx1*/,
-                index_omni /*idx2*/) {
+                              index_omni /*idx2*/) {
   return std::forward<T>(x);
 }
 
@@ -364,30 +364,28 @@ inline auto rvalue(Mat&& x, const char* name, index_min_max idx) {
 template <typename Mat, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(Mat&& x, const char* name, index_min_max row_idx,
                    index_min_max col_idx) {
-   math::check_range("matrix[min_max, min_max] min row indexing", name, x.rows(),
-                     row_idx.min_);
-   math::check_range("matrix[min_max, min_max] min column indexing", name,
-                     x.cols(), col_idx.min_);
+  math::check_range("matrix[min_max, min_max] min row indexing", name, x.rows(),
+                    row_idx.min_);
+  math::check_range("matrix[min_max, min_max] min column indexing", name,
+                    x.cols(), col_idx.min_);
   if (row_idx.max_ >= row_idx.min_ && col_idx.max_ >= col_idx.min_) {
-      math::check_range("matrix[min_max, min_max] max row indexing", name, x.rows(),
-                        row_idx.max_);
-      math::check_range("matrix[min_max, min_max] max column indexing", name,
-                        x.cols(), col_idx.max_);
-      return x.block(row_idx.min_ - 1, col_idx.min_ - 1,
-                 row_idx.max_ - (row_idx.min_ - 1),
-                 col_idx.max_ - (col_idx.min_ - 1));
-  } else if (row_idx.max_ >= row_idx.min_) {
-    math::check_range("matrix[min_max, min_max] max row indexing", name, x.rows(),
-                      row_idx.max_);
-    return x.block(row_idx.min_ - 1, col_idx.min_ - 1,
-               row_idx.max_ - (row_idx.min_ - 1),
-               0);
-  } else if (col_idx.max_ >= col_idx.min_) {
+    math::check_range("matrix[min_max, min_max] max row indexing", name,
+                      x.rows(), row_idx.max_);
     math::check_range("matrix[min_max, min_max] max column indexing", name,
                       x.cols(), col_idx.max_);
     return x.block(row_idx.min_ - 1, col_idx.min_ - 1,
-               0,
-               col_idx.max_ - (col_idx.min_ - 1));
+                   row_idx.max_ - (row_idx.min_ - 1),
+                   col_idx.max_ - (col_idx.min_ - 1));
+  } else if (row_idx.max_ >= row_idx.min_) {
+    math::check_range("matrix[min_max, min_max] max row indexing", name,
+                      x.rows(), row_idx.max_);
+    return x.block(row_idx.min_ - 1, col_idx.min_ - 1,
+                   row_idx.max_ - (row_idx.min_ - 1), 0);
+  } else if (col_idx.max_ >= col_idx.min_) {
+    math::check_range("matrix[min_max, min_max] max column indexing", name,
+                      x.cols(), col_idx.max_);
+    return x.block(row_idx.min_ - 1, col_idx.min_ - 1, 0,
+                   col_idx.max_ - (col_idx.min_ - 1));
   } else {
     return x.block(row_idx.min_ - 1, col_idx.min_ - 1, 0, 0);
   }
@@ -659,9 +657,10 @@ inline auto rvalue(Mat&& x, const char* name, const Idx& row_idx,
                     col_idx.min_);
   const Eigen::Index col_start = col_idx.min_ - 1;
   if (col_idx.max_ >= col_idx.min_) {
-    math::check_range("matrix[..., min_max] max column indexing", name, x.cols(),
-                      col_idx.max_);
-    return rvalue(x.middleCols(col_start, col_idx.max_ - col_start), name, row_idx);
+    math::check_range("matrix[..., min_max] max column indexing", name,
+                      x.cols(), col_idx.max_);
+    return rvalue(x.middleCols(col_start, col_idx.max_ - col_start), name,
+                  row_idx);
   } else {
     return rvalue(x.middleCols(col_start, 0), name, row_idx);
   }
@@ -711,17 +710,17 @@ inline auto rvalue(StdVec& v, const char* name, index_uni idx1,
  * @param[in] idx single index
  * @return Result of indexing array.
  */
- template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
- inline const auto& rvalue(const StdVec& v, const char* name, index_uni idx) {
-   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
-   return v[idx.n_ - 1];
- }
+template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+inline const auto& rvalue(const StdVec& v, const char* name, index_uni idx) {
+  math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
+  return v[idx.n_ - 1];
+}
 
- template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
- inline auto& rvalue(StdVec& v, const char* name, index_uni idx) {
-   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
-   return v[idx.n_ - 1];
- }
+template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+inline auto& rvalue(StdVec& v, const char* name, index_uni idx) {
+  math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
+  return v[idx.n_ - 1];
+}
 
 template <typename StdVec, require_std_vector_t<StdVec>* = nullptr,
           require_not_t<std::is_lvalue_reference<StdVec&&>>* = nullptr>
@@ -729,8 +728,6 @@ inline auto rvalue(StdVec&& v, const char* name, index_uni idx) {
   math::check_range("array[uni, ...] index", name, v.size(), idx.n_);
   return std::move(v[idx.n_ - 1]);
 }
-
-
 
 /**
  * Return the result of indexing the specified array with
@@ -757,15 +754,19 @@ inline auto rvalue(StdVec&& v, const char* name, const Idx1& idx1,
   using inner_type = plain_type_t<decltype(
       rvalue(v[rvalue_at(0, idx1) - 1], name, idxs...))>;
   const auto index_size = rvalue_index_size(idx1, v.size());
-  stan::math::check_greater_or_equal("array[..., ...] indexing", "size", index_size, 0);
+  stan::math::check_greater_or_equal("array[..., ...] indexing", "size",
+                                     index_size, 0);
   std::vector<inner_type> result(index_size);
-  if ((std::is_same<std::decay_t<Idx1>, index_min_max>::value || std::is_same<std::decay_t<Idx1>, index_max>::value) && index_size == 0) {
+  if ((std::is_same<std::decay_t<Idx1>, index_min_max>::value
+       || std::is_same<std::decay_t<Idx1>, index_max>::value)
+      && index_size == 0) {
     return result;
   }
   for (int i = 0; i < index_size; ++i) {
     const int n = rvalue_at(i, idx1);
     math::check_range("array[..., ...] index", name, v.size(), n);
-    if ((!std::is_same<std::decay_t<Idx1>, index_multi>::value) && std::is_rvalue_reference<StdVec>::value) {
+    if ((!std::is_same<std::decay_t<Idx1>, index_multi>::value)
+        && std::is_rvalue_reference<StdVec>::value) {
       result[i] = rvalue(std::move(v[n - 1]), name, idxs...);
     } else {
       result[i] = rvalue(v[n - 1], name, idxs...);

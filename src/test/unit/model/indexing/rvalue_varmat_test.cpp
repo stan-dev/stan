@@ -1033,7 +1033,6 @@ TEST_F(RvalueRev, negative_minmax_negative_minmax_matrix) {
       EXPECT_EQ(0, y.rows());
       EXPECT_EQ(0, y.cols());
     }
-
   }
 }
 

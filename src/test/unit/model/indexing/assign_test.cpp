@@ -107,7 +107,7 @@ TEST(ModelIndexing, lvalueUniUni) {
   xs1.push_back(1.1);
   xs1.push_back(1.2);
 
-  vector<vector<double> > xs;
+  vector<vector<double>> xs;
   xs.push_back(xs0);
   xs.push_back(xs1);
 
@@ -218,13 +218,14 @@ TEST(ModelIndexing, lvalueMultiEigen) {
   test_throw_ia(x, y, index_multi(ns));
 
   std::vector<double> z_std_empty(0);
-  EXPECT_NO_THROW(assign(z_std_empty, std::vector<double>{}, "", index_max(-5)));
-  EXPECT_NO_THROW(assign(z_std_empty, std::vector<double>{}, "", index_min_max(1, -1)));
-
+  EXPECT_NO_THROW(
+      assign(z_std_empty, std::vector<double>{}, "", index_max(-5)));
+  EXPECT_NO_THROW(
+      assign(z_std_empty, std::vector<double>{}, "", index_min_max(1, -1)));
 }
 
 TEST(ModelIndexing, lvalueMultiMulti) {
-  vector<vector<double> > xs;
+  vector<vector<double>> xs;
   for (int i = 0; i < 10; ++i) {
     vector<double> xsi;
     for (int j = 0; j < 20; ++j)
@@ -232,7 +233,7 @@ TEST(ModelIndexing, lvalueMultiMulti) {
     xs.push_back(xsi);
   }
 
-  vector<vector<double> > ys;
+  vector<vector<double>> ys;
   for (int i = 0; i < 2; ++i) {
     vector<double> ysi;
     for (int j = 0; j < 3; ++j)
@@ -250,8 +251,10 @@ TEST(ModelIndexing, lvalueMultiMulti) {
   test_throw_ia(xs, ys, index_min(9), index_max(2));
   std::vector<std::vector<double>> lhs_empty(11, std::vector<double>{});
   std::vector<std::vector<double>> rhs_empty(3, std::vector<double>{});
-  EXPECT_NO_THROW(assign(lhs_empty, rhs_empty, "", index_min(9), index_max(-4)));
-  EXPECT_NO_THROW(assign(lhs_empty, rhs_empty, "", index_min(9), index_min_max(3, -4)));
+  EXPECT_NO_THROW(
+      assign(lhs_empty, rhs_empty, "", index_min(9), index_max(-4)));
+  EXPECT_NO_THROW(
+      assign(lhs_empty, rhs_empty, "", index_min(9), index_min_max(3, -4)));
 }
 
 TEST(ModelIndexing, lvalueMultiMultiEigen) {
@@ -283,16 +286,19 @@ TEST(ModelIndexing, lvalueMultiMultiEigen) {
   test_throw_ia(xs, ys, index_min(9), index_max(2));
   std::vector<Eigen::VectorXd> lhs_empty(11, Eigen::VectorXd(0));
   std::vector<Eigen::VectorXd> rhs_inner_empty(3, Eigen::VectorXd(0));
-  EXPECT_NO_THROW(assign(lhs_empty, rhs_inner_empty, "", index_min(9), index_max(-4)));
-  EXPECT_NO_THROW(assign(lhs_empty, rhs_inner_empty, "", index_min(9), index_min_max(3, -4)));
+  EXPECT_NO_THROW(
+      assign(lhs_empty, rhs_inner_empty, "", index_min(9), index_max(-4)));
+  EXPECT_NO_THROW(assign(lhs_empty, rhs_inner_empty, "", index_min(9),
+                         index_min_max(3, -4)));
   std::vector<Eigen::VectorXd> rhs_empty(0);
-  EXPECT_NO_THROW(assign(lhs_empty, rhs_empty, "", index_max(-4), index_min(9)));
-  EXPECT_NO_THROW(assign(lhs_empty, rhs_empty, "", index_min_max(3, -4), index_min(9)));
-
+  EXPECT_NO_THROW(
+      assign(lhs_empty, rhs_empty, "", index_max(-4), index_min(9)));
+  EXPECT_NO_THROW(
+      assign(lhs_empty, rhs_empty, "", index_min_max(3, -4), index_min(9)));
 }
 
 TEST(ModelIndexing, lvalueUniMulti) {
-  vector<vector<double> > xs;
+  vector<vector<double>> xs;
   for (int i = 0; i < 10; ++i) {
     vector<double> xsi;
     for (int j = 0; j < 20; ++j)
@@ -315,7 +321,7 @@ TEST(ModelIndexing, lvalueUniMulti) {
 }
 
 TEST(ModelIndexing, lvalueMultiUni) {
-  vector<vector<double> > xs;
+  vector<vector<double>> xs;
   for (int i = 0; i < 10; ++i) {
     vector<double> xsi;
     for (int j = 0; j < 20; ++j)
@@ -481,7 +487,8 @@ TEST(ModelIndexing, lvalueMatrixMax) {
   test_throw_ia(x, z, index_max(1));
   test_throw_ia(x, z, index_max(2));
   Eigen::MatrixXd z_empty(0, 4);
-  EXPECT_NO_THROW(assign(z_empty, Eigen::MatrixXd(0, 4), "empty", index_max(-8)));
+  EXPECT_NO_THROW(
+      assign(z_empty, Eigen::MatrixXd(0, 4), "empty", index_max(-8)));
   test_throw(z_empty, Eigen::MatrixXd(0, 2), index_min(-8));
 }
 
@@ -655,11 +662,11 @@ TEST(ModelIndexing, doubleToVar) {
   xs.push_back(1);
   xs.push_back(2);
   xs.push_back(3);
-  vector<vector<double> > xss;
+  vector<vector<double>> xss;
   xss.push_back(xs);
 
   vector<var> ys(3);
-  vector<vector<var> > yss;
+  vector<vector<var>> yss;
   yss.push_back(ys);
 
   assign(yss, xss, "foo", index_omni());
@@ -781,7 +788,7 @@ TEST(ModelIndexing, resultSizePosMinMaxNegMinMaxEigenMatrix) {
 
   for (int i = 1; i < x.rows(); ++i) {
     test_throw_ia(x, x_rev.block(0, 0, i + 1, i + 1), index_min_max(1, i + 1),
-           index_min_max(i + 1, 1));
+                  index_min_max(i + 1, 1));
     /*
     Eigen::MatrixXd x_rowwise_reverse
         = x_rev.block(0, 0, i + 1, i + 1).rowwise().reverse();
@@ -812,7 +819,7 @@ TEST(ModelIndexing, resultSizeNigMinMaxPosMinMaxEigenMatrix) {
 
   for (int i = 1; i < x.rows(); ++i) {
     test_throw_ia(x, x_rev.block(0, 0, i + 1, i + 1), index_min_max(i + 1, 1),
-           index_min_max(1, i + 1));
+                  index_min_max(1, i + 1));
     /*
     Eigen::MatrixXd x_colwise_reverse
         = x_rev.block(0, 0, i + 1, i + 1).colwise().reverse();
@@ -843,7 +850,7 @@ TEST(ModelIndexing, resultSizeNegMinMaxNegMinMaxEigenMatrix) {
 
   for (int i = 1; i < x.rows(); ++i) {
     test_throw_ia(x, x_rev.block(0, 0, i + 1, i + 1), index_min_max(i + 1, 1),
-           index_min_max(i + 1, 1));
+                  index_min_max(i + 1, 1));
     /*
     Eigen::MatrixXd x_reverse = x_rev.block(0, 0, i + 1, i + 1).reverse();
     assign(x, x_rev.block(0, 0, i + 1, i + 1), "", index_min_max(i + 1, 1),

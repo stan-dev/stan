@@ -102,7 +102,7 @@ TEST(ModelIndexing, rvalue_vector_min_nil) {
 
   EXPECT_THROW(rvalue(x, "", index_min(7)), std::domain_error);
 
-  //test_out_of_range(x, index_min(0));
+  // test_out_of_range(x, index_min(0));
 }
 
 TEST(ModelIndexing, rvalue_eigen_vector_min_nil) {
@@ -832,7 +832,8 @@ TEST(ModelIndexing, rvalueMatrixMulti) {
   test_out_of_range(m.array(), index_min_max(0, 3));
   test_out_of_range(m.array(), index_min_max(2, 15));
 
-  auto a_no_rows_slice = rvalue(m.block(0, 0, 4, 3).array() + 2, "", index_min_max(3, 2));
+  auto a_no_rows_slice
+      = rvalue(m.block(0, 0, 4, 3).array() + 2, "", index_min_max(3, 2));
   EXPECT_EQ(0, a_no_rows_slice.rows());
   EXPECT_EQ(3, a_no_rows_slice.cols());
   test_out_of_range(m.array(), index_min_max(0, 3));
