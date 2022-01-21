@@ -289,7 +289,7 @@ void test_max_vec() {
   auto check_i = [](int i) { return i > 1; };
   check_adjs(check_i, x, "lhs");
   check_adjs([](int /* i */) { return true; }, y, "rhs");
-  test_throw_out_of_range(x, y, index_max(0));
+  test_throw_invalid_arg(x, y, index_max(0));
   test_throw_out_of_range(x, y, index_max(6));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(3),
                          index_max(2));
@@ -356,19 +356,9 @@ void test_negative_minmax_varvector() {
   Vec x_val = x.val();
   auto y = conditionally_generate_linear_var_vector<Vec, RhsScalar>(4, 10);
 
-  assign(x, y, "", index_min_max(4, 1));
-  EXPECT_FLOAT_EQ(x.val()(0), 13);
-  EXPECT_FLOAT_EQ(x.val()(1), 12);
-  EXPECT_FLOAT_EQ(x.val()(2), 11);
-  EXPECT_FLOAT_EQ(x.val()(3), 10);
-  EXPECT_FLOAT_EQ(x.val()(4), 4);
-  sum(x).grad();
-  EXPECT_MATRIX_EQ(x.val(), x_val);
-  auto check_i = [](int i) { return (i > 3); };
-  check_adjs(check_i, x, "lhs");
-  check_adjs([](int /* i */) { return true; }, y, "rhs");
-  test_throw_out_of_range(x, y, index_min_max(3, 0));
-  test_throw_out_of_range(x, y, index_min_max(6, 1));
+  test_throw_invalid_arg(x, y, index_min_max(4, 1));
+  test_throw_invalid_arg(x, y, index_min_max(3, 0));
+  test_throw_invalid_arg(x, y, index_min_max(6, 1));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(5),
                          index_min_max(4, 1));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(3),
@@ -1178,7 +1168,7 @@ void max_matrix_test() {
   auto check_all = [](int j) { return true; };
   check_adjs(check_i_x, check_all, x, "lhs", 0);
   check_adjs(check_all, y, "rhs");
-  test_throw_out_of_range(x, y, index_max(0));
+  test_throw_invalid_arg(x, y, index_max(0));
   test_throw_out_of_range(x, y, index_max(4));
   test_throw_invalid_arg(x, y, index_max(1));
   var_value<MatrixXd> z(MatrixXd::Ones(1, 2));
@@ -1212,7 +1202,7 @@ void min_max_matrix_test() {
   check_adjs(check_all, check_all, y, "rhs");
   test_throw_out_of_range(x, y, index_min(0), index_max(2));
   test_throw_out_of_range(x, y, index_min(5), index_max(2));
-  test_throw_out_of_range(x, y, index_min(2), index_max(0));
+  test_throw_invalid_arg(x, y, index_min(2), index_max(0));
   test_throw_out_of_range(x, y, index_min(2), index_max(5));
   test_throw_invalid_arg(x, y, index_min(2), index_max(1));
   var_value<MatrixXd> z(MatrixXd::Ones(1, 4));
@@ -1279,23 +1269,14 @@ void negative_minmax_matrix_test() {
     x_rev_val(i) = x_val.size() - i - 1;
   }
 
-  for (int i = 0; i < x_val.rows(); ++i) {
+  for (int i = 0; i < x_val.rows() - 1; ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
     std::conditional_t<stan::is_var<RhsScalar>::value,
                        var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
         x_rev(x_rev_val);
-    const int ii = i + 1;
-    assign(x, x_rev.block(0, 0, ii, 5), "", index_min_max(ii, 1));
-    auto x_val_check = x.val().block(0, 0, ii, 5);
-    auto x_rev_val_check
-        = stan::math::value_of(x_rev).block(0, 0, ii, 5).colwise().reverse();
-    EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
-    sum(x).grad();
-    auto check_i = [i](int kk) { return kk <= i; };
-    auto check_all = [i](int jj) { return true; };
-    check_adjs(check_i, check_all, x, "lhs", 0);
-    check_adjs(check_i, check_all, x_rev, "rhs", 1);
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, 5), index_min_max(ii, 0));
+    const int ii = i + 2;
+    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5), index_min_max(ii, 1));
+    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5), index_min_max(ii, 0));
     test_throw_out_of_range(x, x_rev.block(0, 0, ii, 5),
                             index_min_max(ii + x.rows(), 1));
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5), index_min_max(ii, 2));
@@ -1337,6 +1318,7 @@ void positive_minmax_positive_minmax_matrix_test() {
     auto check_j = [i](int jj) { return jj <= i; };
     check_adjs(check_i, check_j, x, "lhs", 0);
     check_adjs(check_i, check_j, x_rev, "rhs", 1);
+
     test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(0, ii),
                             index_min_max(1, ii));
     test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(1, ii),
@@ -1344,8 +1326,10 @@ void positive_minmax_positive_minmax_matrix_test() {
     test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii),
                             index_min_max(1, x.rows() + 1),
                             index_min_max(1, ii));
+
     test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(1, ii),
                             index_min_max(1, x.rows() + 1));
+
     // We don't want to go out of bounds when making the eigen block.
     auto ii_range_high = ii == 5 ? 4 : ii + 1;
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii - 1, ii),
@@ -1356,6 +1340,7 @@ void positive_minmax_positive_minmax_matrix_test() {
                            index_min_max(1, ii), index_min_max(1, ii));
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii_range_high),
                            index_min_max(1, ii), index_min_max(1, ii));
+
     stan::math::recover_memory();
   }
 }
@@ -1378,43 +1363,14 @@ void positive_minmax_negative_minmax_matrix_test() {
     x_rev_val(i) = x_val.size() - i - 1;
   }
 
-  for (int i = 0; i < x_val.rows(); ++i) {
+  for (int i = 1; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
     std::conditional_t<stan::is_var<RhsScalar>::value,
                        var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
         x_rev(x_rev_val);
     const int ii = i + 1;
-    assign(x, x_rev.block(0, 0, ii, ii), "", index_min_max(1, ii),
+    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii), index_min_max(1, ii),
            index_min_max(ii, 1));
-    auto x_val_check = x.val().block(0, 0, ii, ii);
-    auto x_rev_val_check
-        = stan::math::value_of(x_rev).block(0, 0, ii, ii).rowwise().reverse();
-    EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
-    sum(x).grad();
-    auto check_i = [i](int kk) { return kk <= i; };
-    auto check_j = [i](int jj) { return jj <= i; };
-    check_adjs(check_i, check_j, x, "lhs", 0);
-    check_adjs(check_i, check_j, x_rev, "rhs", 1);
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(0, ii),
-                            index_min_max(ii, 1));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(1, ii),
-                            index_min_max(ii, 0));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii),
-                            index_min_max(1, x.rows() + 1),
-                            index_min_max(1, ii));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(1, ii),
-                            index_min_max(1, x.rows() + 1));
-    // We don't want to go out of bounds when making the eigen block.
-    auto ii_range_high = ii == 5 ? 4 : ii + 1;
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii - 1, ii),
-                           index_min_max(1, ii), index_min_max(ii, 1));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii_range_high, ii),
-                           index_min_max(1, ii), index_min_max(ii, 1));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii - 1),
-                           index_min_max(1, ii), index_min_max(ii, 1));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii_range_high),
-                           index_min_max(1, ii), index_min_max(ii, 1));
-    stan::math::recover_memory();
   }
 }
 
@@ -1436,42 +1392,14 @@ void negative_minmax_positive_minmax_matrix_test() {
     x_rev_val(i) = x_val.size() - i - 1;
   }
 
-  for (int i = 0; i < x_val.rows(); ++i) {
+  for (int i = 1; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
     std::conditional_t<stan::is_var<RhsScalar>::value,
                        var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
         x_rev(x_rev_val);
     const int ii = i + 1;
-    assign(x, x_rev.block(0, 0, ii, ii), "", index_min_max(ii, 1),
+    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 1),
            index_min_max(1, ii));
-    auto x_val_check = x.val().block(0, 0, ii, ii);
-    auto x_rev_val_check
-        = stan::math::value_of(x_rev).block(0, 0, ii, ii).colwise().reverse();
-    EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
-    sum(x).grad();
-    auto check_i = [i](int kk) { return kk <= i; };
-    auto check_j = [i](int jj) { return jj <= i; };
-    check_adjs(check_i, check_j, x, "lhs", 0);
-    check_adjs(check_i, check_j, x_rev, "rhs", 1);
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 0),
-                            index_min_max(1, ii));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 1),
-                            index_min_max(0, ii));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii),
-                            index_min_max(x.rows() + 1, 1),
-                            index_min_max(1, ii));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 1),
-                            index_min_max(1, x.rows() + 1));
-    // We don't want to go out of bounds when making the eigen block.
-    auto ii_range_high = ii == 5 ? 4 : ii + 1;
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii - 1, ii),
-                           index_min_max(ii, 1), index_min_max(1, ii));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii_range_high, ii),
-                           index_min_max(ii, 1), index_min_max(1, ii));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii - 1),
-                           index_min_max(ii, 1), index_min_max(1, ii));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii_range_high),
-                           index_min_max(ii, 1), index_min_max(1, ii));
     stan::math::recover_memory();
   }
 }
@@ -1494,42 +1422,14 @@ void negative_minmax_negative_minmax_matrix_test() {
     x_rev_val(i) = x_val.size() - i - 1;
   }
 
-  for (int i = 0; i < x_val.rows(); ++i) {
+  for (int i = 1; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
     std::conditional_t<stan::is_var<RhsScalar>::value,
                        var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
         x_rev(x_rev_val);
     const int ii = i + 1;
-    assign(x, x_rev.block(0, 0, ii, ii), "", index_min_max(ii, 1),
+    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 1),
            index_min_max(ii, 1));
-    auto x_val_check = x.val().block(0, 0, ii, ii);
-    auto x_rev_val_check
-        = stan::math::value_of(x_rev).block(0, 0, ii, ii).reverse();
-    EXPECT_MATRIX_EQ(x_val_check, x_rev_val_check);
-    sum(x).grad();
-    auto check_i = [i](int kk) { return kk <= i; };
-    auto check_j = [i](int jj) { return jj <= i; };
-    check_adjs(check_i, check_j, x, "lhs", 0);
-    check_adjs(check_i, check_j, x_rev, "rhs", 1);
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 0),
-                            index_min_max(ii, 1));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 1),
-                            index_min_max(ii, 0));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii),
-                            index_min_max(x.rows() + 1, 1),
-                            index_min_max(ii, 1));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, ii), index_min_max(ii, 1),
-                            index_min_max(x.rows() + 1, 1));
-    // We don't want to go out of bounds when making the eigen block.
-    auto ii_range_high = ii == 5 ? 4 : ii + 1;
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii - 1, ii),
-                           index_min_max(ii, 1), index_min_max(ii, 1));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii_range_high, ii),
-                           index_min_max(ii, 1), index_min_max(ii, 1));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii - 1),
-                           index_min_max(ii, 1), index_min_max(ii, 1));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, ii_range_high),
-                           index_min_max(ii, 1), index_min_max(ii, 1));
     stan::math::recover_memory();
   }
 }
