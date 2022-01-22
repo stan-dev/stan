@@ -30,7 +30,7 @@ class serializer {
   void check_r_capacity(size_t m) const {
     if (pos_r_ + m > r_size_) {
       []() STAN_COLD_PATH {
-        throw std::runtime_error(std::string("In serializer: Storage capacity [" + std::to_string(r_size_) + "] exceeded while writing value of size [" + std::to_string(m) + "] from position [" + std::to_string(pos_r_) + "]. This is an internal error, if you see it please report it as an issue on the Stan github repository.");
+        throw std::runtime_error(std::string("In serializer: Storage capacity [") + std::to_string(r_size_) + "] exceeded while writing value of size [" + std::to_string(m) + "] from position [" + std::to_string(pos_r_) + "]. This is an internal error, if you see it please report it as an issue on the Stan github repository.");
       }();
     }
   }
