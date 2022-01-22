@@ -286,9 +286,10 @@ TEST(ModelIndexing, lvalueMultiMultiEigen) {
   test_throw_ia(xs, ys, index_min(9), index_max(2));
   std::vector<Eigen::VectorXd> lhs_inner_empty(11, Eigen::VectorXd(0));
   std::vector<Eigen::VectorXd> rhs_inner_empty(3, Eigen::VectorXd(0));
-  EXPECT_NO_THROW(assign(lhs_inner_empty, rhs_inner_empty, "", index_min(9), index_min_max(1, -4)));
-  EXPECT_NO_THROW(
-      assign(lhs_inner_empty, rhs_inner_empty, "", index_min(9), index_max(-4)));
+  EXPECT_NO_THROW(assign(lhs_inner_empty, rhs_inner_empty, "", index_min(9),
+                         index_min_max(1, -4)));
+  EXPECT_NO_THROW(assign(lhs_inner_empty, rhs_inner_empty, "", index_min(9),
+                         index_max(-4)));
   std::vector<Eigen::VectorXd> lhs_empty(0, Eigen::VectorXd(0));
   std::vector<Eigen::VectorXd> rhs_empty(0);
   EXPECT_NO_THROW(

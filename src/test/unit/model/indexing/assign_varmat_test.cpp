@@ -54,7 +54,8 @@ inline bool check_multi_duplicate(const stan::arena_t<std::vector<int>>& x_idx,
 
 template <typename T1, typename T2, typename... I>
 void test_throw_out_of_range(T1& lhs, const T2& rhs, const I&... idxs) {
-  EXPECT_THROW(stan::model::assign(lhs, rhs, "rhs", idxs...), std::out_of_range);
+  EXPECT_THROW(stan::model::assign(lhs, rhs, "rhs", idxs...),
+               std::out_of_range);
 }
 
 template <typename T1, typename T2, typename... I>
@@ -295,7 +296,6 @@ void test_max_vec() {
                          index_max(2));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(1),
                          index_max(2));
-
 }
 
 TEST_F(VarAssign, max_vec) {
@@ -1276,11 +1276,12 @@ void negative_minmax_matrix_test() {
                        var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
         x_rev(x_rev_val);
     const int ii = i + 1;
-    EXPECT_NO_THROW(assign(x, x_rev.block(0, 0, 0, 5), "", index_min_max(ii, 1)));
+    EXPECT_NO_THROW(
+        assign(x, x_rev.block(0, 0, 0, 5), "", index_min_max(ii, 1)));
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5), index_min_max(ii, 1));
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5), index_min_max(ii, 0));
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5),
-                            index_min_max(ii + x.rows(), 1));
+                           index_min_max(ii + x.rows(), 1));
     stan::math::recover_memory();
   }
 }
