@@ -284,12 +284,12 @@ TEST(ModelIndexing, lvalueMultiMultiEigen) {
 
   test_throw_ia(xs, ys, index_min(7), index_max(3));
   test_throw_ia(xs, ys, index_min(9), index_max(2));
-  std::vector<Eigen::VectorXd> lhs_empty(11, Eigen::VectorXd(0));
+  std::vector<Eigen::VectorXd> lhs_inner_empty(11, Eigen::VectorXd(0));
   std::vector<Eigen::VectorXd> rhs_inner_empty(3, Eigen::VectorXd(0));
+  EXPECT_NO_THROW(assign(lhs_inner_empty, rhs_inner_empty, "", index_min(9), index_min_max(1, -4)));
   EXPECT_NO_THROW(
-      assign(lhs_empty, rhs_inner_empty, "", index_min(9), index_max(-4)));
-  EXPECT_NO_THROW(assign(lhs_empty, rhs_inner_empty, "", index_min(9),
-                         index_min_max(3, -4)));
+      assign(lhs_inner_empty, rhs_inner_empty, "", index_min(9), index_max(-4)));
+  std::vector<Eigen::VectorXd> lhs_empty(0, Eigen::VectorXd(0));
   std::vector<Eigen::VectorXd> rhs_empty(0);
   EXPECT_NO_THROW(
       assign(lhs_empty, rhs_empty, "", index_max(-4), index_min(9)));
@@ -710,7 +710,7 @@ TEST(ModelIndexing, resultSizeNegIndexing) {
   rhs.push_back(-125);
 
   vector<double> lhs;
-  assign(rhs, lhs, "", index_min_max(1, 0));
+  test_throw_ia(rhs, lhs, index_min_max(1, 0));
   EXPECT_EQ(0, lhs.size());
 }
 

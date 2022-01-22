@@ -54,12 +54,12 @@ inline bool check_multi_duplicate(const stan::arena_t<std::vector<int>>& x_idx,
 
 template <typename T1, typename T2, typename... I>
 void test_throw_out_of_range(T1& lhs, const T2& rhs, const I&... idxs) {
-  EXPECT_THROW(stan::model::assign(lhs, rhs, "", idxs...), std::out_of_range);
+  EXPECT_THROW(stan::model::assign(lhs, rhs, "rhs", idxs...), std::out_of_range);
 }
 
 template <typename T1, typename T2, typename... I>
 void test_throw_invalid_arg(T1& lhs, const T2& rhs, const I&... idxs) {
-  EXPECT_THROW(stan::model::assign(lhs, rhs, "", idxs...),
+  EXPECT_THROW(stan::model::assign(lhs, rhs, "rhs", idxs...),
                std::invalid_argument);
 }
 
@@ -295,6 +295,7 @@ void test_max_vec() {
                          index_max(2));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(1),
                          index_max(2));
+
 }
 
 TEST_F(VarAssign, max_vec) {
@@ -358,7 +359,7 @@ void test_negative_minmax_varvector() {
 
   test_throw_invalid_arg(x, y, index_min_max(4, 1));
   test_throw_invalid_arg(x, y, index_min_max(3, 0));
-  test_throw_out_of_range(x, y, index_min_max(6, 1));
+  test_throw_invalid_arg(x, y, index_min_max(6, 1));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(5),
                          index_min_max(4, 1));
   test_throw_invalid_arg(x, conditionally_generate_linear_var_vector<Vec>(3),
@@ -1269,18 +1270,17 @@ void negative_minmax_matrix_test() {
     x_rev_val(i) = x_val.size() - i - 1;
   }
 
-  for (int i = 0; i < x_val.rows() - 1; ++i) {
+  for (int i = 1; i < x_val.rows(); ++i) {
     var_value<Eigen::MatrixXd> x(x_val);
     std::conditional_t<stan::is_var<RhsScalar>::value,
                        var_value<Eigen::MatrixXd>, Eigen::MatrixXd>
         x_rev(x_rev_val);
-    const int ii = i + 2;
+    const int ii = i + 1;
+    EXPECT_NO_THROW(assign(x, x_rev.block(0, 0, 0, 5), "", index_min_max(ii, 1)));
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5), index_min_max(ii, 1));
     test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5), index_min_max(ii, 0));
-    test_throw_out_of_range(x, x_rev.block(0, 0, ii, 5),
+    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5),
                             index_min_max(ii + x.rows(), 1));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 5), index_min_max(ii, 2));
-    test_throw_invalid_arg(x, x_rev.block(0, 0, ii, 4), index_min_max(1, ii));
     stan::math::recover_memory();
   }
 }
@@ -1506,6 +1506,26 @@ void nil_matrix() {
 TEST_F(VarAssign, nil_matrix) {
   nil_matrix<stan::math::var>();
   nil_matrix<double>();
+}
+
+template <typename RhsScalar>
+void size_zero_matrix() {
+  using stan::math::var_value;
+  using stan::model::test::check_adjs;
+  using stan::model::test::conditionally_generate_linear_var_matrix;
+  using stan::model::test::conditionally_generate_linear_var_vector;
+
+  auto x = conditionally_generate_linear_var_matrix(0, 0);
+  auto y = conditionally_generate_linear_var_matrix<RhsScalar>(0, 0);
+  assign(x, y, "");
+  assign(x, y, "", index_max(-1));
+  assign(x, y, "", index_min_max(1, -1));
+  assign(x, y, "", index_min(1), index_min_max(1, -1));
+}
+
+TEST_F(VarAssign, size_zero_matrix) {
+  size_zero_matrix<stan::math::var>();
+  size_zero_matrix<double>();
 }
 
 namespace stan {
