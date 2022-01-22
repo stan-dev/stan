@@ -137,8 +137,6 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
                                  "right hand side", y.size());
     internal::assign_impl(x.segment(slice_start, slice_size), y, name);
   } else {
-    stan::math::check_size_match("vector[negative_min_max] assign", name,
-                                 x.size(), "right hand side", 0);
     stan::math::check_size_match("vector[negative_min_max] assign", name, 0,
                                  "right hand side", y.size());
   }
@@ -195,8 +193,6 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name, index_max idx) {
                                  "right hand side", y.size());
     internal::assign_impl(x.head(idx.max_), y, name);
   } else {
-    stan::math::check_size_match("vector[max < 1] assign", name, x.size(),
-                                 "right hand side", 0);
     stan::math::check_size_match("vector[max < 1] assign", name, 0,
                                  "right hand side", y.size());
   }
@@ -361,8 +357,6 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name, index_max idx) {
                                  "right hand side rows", y.rows());
     internal::assign_impl(x.topRows(idx.max_), y, name);
   } else {
-    stan::math::check_size_match("matrix[max < 1] assign rows", name, x.rows(),
-                                 "right hand side rows", 0);
     stan::math::check_size_match("matrix[max < 1] assign rows", name, 0,
                                  "right hand side rows", y.rows());
   }
@@ -465,19 +459,11 @@ inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
           "matrix[negative_min_max, min_max] assign max column", name, x.cols(),
           col_idx.max_);
       stan::math::check_size_match("matrix[min_max, min_max] assign rows", name,
-                                   x.rows(), "right hand side", 0);
-      stan::math::check_size_match("matrix[min_max, min_max] assign rows", name,
                                    0, "right hand side", y.rows());
     } else {
       stan::math::check_size_match(
-          "matrix[negative_min_max, negative_min_max] assign rows", name,
-          x.rows(), "right hand side", 0);
-      stan::math::check_size_match(
           "matrix[negative_min_max, negative_min_max] assign rows", name, 0,
           "right hand side", y.rows());
-      stan::math::check_size_match(
-          "matrix[negative_min_max, negative_min_max] assign cols", name,
-          x.cols(), "right hand side", 0);
       stan::math::check_size_match(
           "matrix[negative_min_max, negative_min_max] assign cols", name, 0,
           "right hand side", y.cols());
@@ -729,8 +715,6 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
                                  y.cols());
     assign(x.leftCols(col_idx.max_), y, name, row_idx);
   } else {
-    stan::math::check_size_match("matrix[..., max] assign columns", name,
-                                 x.cols(), "right hand side columns", 0);
     stan::math::check_size_match("matrix[..., max] assign columns", name, 0,
                                  "right hand side columns", y.cols());
   }
@@ -768,8 +752,6 @@ inline void assign(Mat1&& x, Mat2&& y, const char* name, const Idx& row_idx,
                                  name, col_size, "right hand side", y.cols());
     assign(x.middleCols(col_start, col_size), y, name, row_idx);
   } else {
-    stan::math::check_size_match("matrix[..., negative_min_max] assign columns",
-                                 name, x.cols(), "right hand side columns", 0);
     stan::math::check_size_match("matrix[..., negative_min_max] assign columns",
                                  name, 0, "right hand side columns", y.cols());
   }
@@ -887,8 +869,6 @@ inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
         stan::math::check_size_match("array[negative_min_max, ...] assign",
                                      name, 0, "right hand side", y.size());
       } else {
-        stan::math::check_size_match("array[max < 1, ...] assign", name,
-                                     x.size(), "right hand side", 0);
         stan::math::check_size_match("array[max < 1, ...] assign", name, 0,
                                      "right hand side", y.size());
       }
