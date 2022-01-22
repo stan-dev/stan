@@ -59,7 +59,7 @@ void assign_impl(T1&& x, T2&& y, const char* name) {
   // We are allowed to assign to fully uninitialized matrix
   if (x.rows() != 0 && x.cols() != 0) {
     static constexpr const char* obj_type
-        = is_vector<Mat1>::value ? "vector" : "matrix";
+        = is_vector<T1>::value ? "vector" : "matrix";
     stan::math::check_size_match(
         (std::string(obj_type) + " assign columns").c_str(), name, x.cols(),
         "right hand side columns", y.cols());
