@@ -59,13 +59,13 @@ void assign_impl(T1&& x, T2&& y, const char* name) {
   // We are allowed to assign to fully uninitialized matrix
   if (x.rows() != 0 && x.cols() != 0) {
     static constexpr const char* obj_type
-        = is_vector<T1>::value ? "vector" : "matrix";
+        = is_vector<Mat1>::value ? "vector" : "matrix";
     stan::math::check_size_match(
         (std::string(obj_type) + " assign columns").c_str(),
-        "left hand side columns", x.cols(), name, y.cols());
+        name, x.cols(), "right hand side columns", y.cols());
     stan::math::check_size_match(
-        (std::string(obj_type) + " assign rows").c_str(), "left hand side rows",
-        x.rows(), name, y.rows());
+        (std::string(obj_type) + " assign rows").c_str(), name,
+        x.rows(), "right hand side rows", y.rows());
   }
   x = std::forward<T2>(y);
 }
@@ -91,10 +91,10 @@ void assign_impl(Mat1&& x, Mat2&& y, const char* name) {
         = is_vector<Mat1>::value ? "vector" : "matrix";
     stan::math::check_size_match(
         (std::string(obj_type) + " assign columns").c_str(),
-        "left hand side columns", x.cols(), name, y.cols());
+        name, x.cols(), "right hand side columns", y.cols());
     stan::math::check_size_match(
-        (std::string(obj_type) + " assign rows").c_str(), "left hand side rows",
-        x.rows(), name, y.rows());
+        (std::string(obj_type) + " assign rows").c_str(), name,
+        x.rows(), "right hand side rows", y.rows());
   }
   auto prev_vals = stan::math::to_arena(x.val());
   x.vi_->val_ = std::forward<Mat2>(y);
