@@ -126,7 +126,7 @@ template <typename Vec1, typename Vec2,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x, const Vec2& y, const char* name,
                    index_min_max idx) {
-  if (idx.max_ >= idx.min_) {
+  if (likely(idx.max_ >= idx.min_)) {
     stan::math::check_range("vector[min_max] min assign", name, x.size(),
                             idx.min_);
     stan::math::check_range("vector[min_max] max assign", name, x.size(),
@@ -187,7 +187,7 @@ template <typename Vec1, typename Vec2,
           require_all_vector_t<Vec1, Vec2>* = nullptr,
           require_all_not_std_vector_t<Vec1, Vec2>* = nullptr>
 inline void assign(Vec1&& x, const Vec2& y, const char* name, index_max idx) {
-  if (idx.max_ > 0) {
+  if (likely(idx.max_ > 0)) {
     stan::math::check_range("vector[max] assign", name, x.size(), idx.max_);
     stan::math::check_size_match("vector[max] assign", name, idx.max_,
                                  "right hand side", y.size());
@@ -351,7 +351,7 @@ template <typename Mat1, typename Mat2,
 inline void assign(Mat1&& x, const Mat2& y, const char* name, index_max idx) {
   stan::math::check_size_match("matrix[max] assign columns", name, x.cols(),
                                "right hand side columns", y.cols());
-  if (idx.max_ > 0) {
+  if (likely(idx.max_ > 0)) {
     stan::math::check_range("matrix[max] assign row", name, x.rows(), idx.max_);
     stan::math::check_size_match("matrix[max] assign rows", name, idx.max_,
                                  "right hand side rows", y.rows());
@@ -383,7 +383,7 @@ template <typename Mat1, typename Mat2,
 inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max idx) {
   stan::math::check_size_match("matrix[min_max] assign columns", name, x.cols(),
                                "right hand side columns", y.cols());
-  if (idx.max_ >= idx.min_) {
+  if (likely(idx.max_ >= idx.min_)) {
     stan::math::check_range("matrix[min_max] min row indexing", name, x.rows(),
                             idx.min_);
     stan::math::check_range("matrix[min_max] max row indexing", name, x.rows(),
@@ -418,7 +418,7 @@ template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
                    index_min_max col_idx) {
-  if ((row_idx.max_ >= row_idx.min_) && (col_idx.max_ >= col_idx.min_)) {
+  if (likely((row_idx.max_ >= row_idx.min_) && (col_idx.max_ >= col_idx.min_))) {
     stan::math::check_range("matrix[min_max, min_max] assign min row", name,
                             x.rows(), row_idx.min_);
 
@@ -707,7 +707,7 @@ template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const Idx& row_idx, index_max col_idx) {
-  if (col_idx.max_ > 0) {
+  if (likely(col_idx.max_ > 0)) {
     stan::math::check_range("matrix[..., max] assign", name, x.cols(),
                             col_idx.max_);
     stan::math::check_size_match("matrix[..., max] assign columns", name,
@@ -741,7 +741,7 @@ template <typename Mat1, typename Mat2, typename Idx,
           require_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(Mat1&& x, Mat2&& y, const char* name, const Idx& row_idx,
                    index_min_max col_idx) {
-  if (col_idx.max_ >= col_idx.min_) {
+  if (likely(col_idx.max_ >= col_idx.min_)) {
     stan::math::check_range("matrix[..., min_max] assign min column", name,
                             x.cols(), col_idx.min_);
     stan::math::check_range("matrix[..., min_max] assign max column", name,
@@ -772,7 +772,10 @@ template <typename T, typename U, require_all_std_vector_t<T, U>* = nullptr,
           require_not_t<
               std::is_assignable<std::decay_t<T>&, std::decay_t<U>>>* = nullptr>
 inline void assign(T&& x, U&& y, const char* name) {
-  x.resize(y.size());
+  if (unlikely(x.size() != 0)) {
+    stan::math::check_size_match("assign array size", name, x.size(),
+        "right hand side", y.size());
+  }
   if (std::is_rvalue_reference<U&&>::value) {
     for (size_t i = 0; i < y.size(); ++i) {
       assign(x[i], std::move(y[i]), name);
