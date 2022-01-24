@@ -884,7 +884,7 @@ inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
   for (size_t n = 0; n < y.size(); ++n) {
     size_t i = rvalue_at(n, idx1);
     stan::math::check_range("array[multi, ...] assign", name, x.size(), i);
-    if (std::is_rvalue_reference<U>::value) {
+    if (std::is_rvalue_reference<U&&>::value) {
       assign(x[i - 1], std::move(y[n]), name, idxs...);
     } else {
       assign(x[i - 1], y[n], name, idxs...);
