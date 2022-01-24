@@ -70,7 +70,6 @@ void assign_impl(T1&& x, T2&& y, const char* name) {
   x = std::forward<T2>(y);
 }
 
-
 /**
  * Base case of assignment
  * @tparam T1 Any type that's not a var matrix.
@@ -84,7 +83,7 @@ void assign_impl(T1&& x, T2&& y, const char* name) {
   // We are allowed to assign to fully uninitialized matrix
   if (unlikely(x.size() != 0)) {
     stan::math::check_size_match("assign array size", name, x.size(),
-        "right hand side", y.size());
+                                 "right hand side", y.size());
   }
   x = std::forward<T2>(y);
 }

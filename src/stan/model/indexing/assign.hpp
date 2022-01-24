@@ -418,7 +418,8 @@ template <typename Mat1, typename Mat2,
           require_dense_dynamic_t<Mat1>* = nullptr>
 inline void assign(Mat1&& x, Mat2&& y, const char* name, index_min_max row_idx,
                    index_min_max col_idx) {
-  if (likely((row_idx.max_ >= row_idx.min_) && (col_idx.max_ >= col_idx.min_))) {
+  if (likely((row_idx.max_ >= row_idx.min_)
+             && (col_idx.max_ >= col_idx.min_))) {
     stan::math::check_range("matrix[min_max, min_max] assign min row", name,
                             x.rows(), row_idx.min_);
 
@@ -774,7 +775,7 @@ template <typename T, typename U, require_all_std_vector_t<T, U>* = nullptr,
 inline void assign(T&& x, U&& y, const char* name) {
   if (unlikely(x.size() != 0)) {
     stan::math::check_size_match("assign array size", name, x.size(),
-        "right hand side", y.size());
+                                 "right hand side", y.size());
   }
   if (std::is_rvalue_reference<U&&>::value) {
     for (size_t i = 0; i < y.size(); ++i) {
