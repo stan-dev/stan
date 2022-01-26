@@ -821,6 +821,7 @@ std::cout << "\n param mat: "
                 std::string("ELBO estimation failed for LBFGS iteration "
                             + std::to_string(iter) + " with error: ")
                 + e.what());
+                continue;
           }
           if (refresh > 0
               && (lbfgs.iter_num() == 0
