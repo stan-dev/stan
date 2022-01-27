@@ -869,8 +869,6 @@ inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
     if (x_idx_size == 0) {
       if (std::is_same<std::decay_t<Idx1>, index_min_max>::value) {
         stan::math::check_size_match("array[negative_min_max, ...] assign",
-                                     name, x.size(), "right hand side", 0);
-        stan::math::check_size_match("array[negative_min_max, ...] assign",
                                      name, 0, "right hand side", y.size());
       } else {
         stan::math::check_size_match("array[max < 1, ...] assign", name, 0,

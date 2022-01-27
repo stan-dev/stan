@@ -711,7 +711,7 @@ TEST(ModelIndexing, resultSizeNegIndexing) {
   rhs.push_back(-125);
 
   vector<double> lhs;
-  test_throw_ia(rhs, lhs, index_min_max(1, 0));
+  test_throw_ia(lhs, rhs, index_min_max(1, 0));
   EXPECT_EQ(0, lhs.size());
 }
 
