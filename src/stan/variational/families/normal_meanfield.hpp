@@ -363,8 +363,7 @@ class normal_meanfield : public base_family {
       try {
         std::stringstream ss;
         stan::model::gradient(m, zeta, tmp_lp, tmp_mu_grad, &ss);
-        if (ss.str().length() > 0)
-          logger.info(ss);
+        logger.info(ss);
         stan::math::check_finite(function, "Gradient of mu", tmp_mu_grad);
         mu_grad += tmp_mu_grad;
         omega_grad.array() += tmp_mu_grad.array().cwiseProduct(eta.array());

@@ -30,8 +30,7 @@ void gradient(const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
       logger.info(ss);
     throw;
   }
-  if (ss.str().length() > 0)
-    logger.info(ss);
+  logger.info(ss);
 }
 
 }  // namespace model

@@ -93,8 +93,7 @@ int lbfgs(Model& model, const stan::io::var_context& init,
     std::vector<double> values;
     std::stringstream msg;
     model.write_array(rng, cont_vector, disc_vector, values, true, true, &msg);
-    if (msg.str().length() > 0)
-      logger.info(msg);
+    logger.info(msg);
 
     values.insert(values.begin(), lp);
     parameter_writer(values);
@@ -160,8 +159,7 @@ int lbfgs(Model& model, const stan::io::var_context& init,
     std::vector<double> values;
     std::stringstream msg;
     model.write_array(rng, cont_vector, disc_vector, values, true, true, &msg);
-    if (msg.str().length() > 0)
-      logger.info(msg);
+    logger.info(msg);
 
     values.insert(values.begin(), lp);
     parameter_writer(values);

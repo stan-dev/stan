@@ -103,8 +103,7 @@ class advi {
       try {
         std::stringstream ss;
         double log_prob = model_.template log_prob<false, true>(zeta, &ss);
-        if (ss.str().length() > 0)
-          logger.info(ss);
+        logger.info(ss);
         stan::math::check_finite(function, "log_prob", log_prob);
         elbo += log_prob;
         ++i;
