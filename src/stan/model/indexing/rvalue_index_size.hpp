@@ -50,7 +50,11 @@ inline int rvalue_index_size(const index_min& idx, int size) {
  * @return Size of result.
  */
 inline int rvalue_index_size(const index_max& idx, int size) {
-  return idx.max_;
+  if (idx.max_ > 0) {
+    return idx.max_;
+  } else {
+    return 0;
+  }
 }
 
 /**

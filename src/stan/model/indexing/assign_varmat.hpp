@@ -111,8 +111,8 @@ template <typename Vec1, typename Vec2, require_var_vector_t<Vec1>* = nullptr,
           internal::require_var_vector_or_arithmetic_eigen<Vec2>* = nullptr>
 inline void assign(Vec1&& x, const Vec2& y, const char* name,
                    const index_multi& idx) {
-  stan::math::check_size_match("vector[multi] assign", "left hand side",
-                               idx.ns_.size(), name, y.size());
+  stan::math::check_size_match("vector[multi] assign", name, idx.ns_.size(),
+                               "right hand side", y.size());
   const auto x_size = x.size();
   const auto assign_size = idx.ns_.size();
   arena_t<std::vector<int>> x_idx(assign_size);
@@ -229,8 +229,8 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
   stan::math::check_range("matrix[uni, multi] assign", name, x.rows(),
                           row_idx.n_);
   const auto assign_cols = col_idx.ns_.size();
-  stan::math::check_size_match("matrix[uni, multi] assign", "left hand side",
-                               assign_cols, name, y.size());
+  stan::math::check_size_match("matrix[uni, multi] assign columns", name,
+                               assign_cols, "right hand side", y.size());
   const int row_idx_val = row_idx.n_ - 1;
   arena_t<std::vector<int>> x_idx(assign_cols);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_val(assign_cols);
@@ -310,10 +310,10 @@ template <typename Mat1, typename Mat2,
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const index_multi& idx) {
   const auto assign_rows = idx.ns_.size();
-  stan::math::check_size_match("matrix[multi] assign", "left hand side rows",
-                               assign_rows, name, y.rows());
-  stan::math::check_size_match("matrix[multi] assign", "left hand side columns",
-                               x.cols(), name, y.cols());
+  stan::math::check_size_match("matrix[multi] assign rows", name, assign_rows,
+                               "right hand side rows", y.rows());
+  stan::math::check_size_match("matrix[multi] assign columns", name, x.cols(),
+                               "right hand side rows", y.cols());
   arena_t<std::vector<int>> x_idx(assign_rows);
   arena_t<Eigen::Matrix<double, -1, -1>> prev_vals(assign_rows, x.cols());
   Eigen::Matrix<double, -1, -1> y_val_idx(assign_rows, x.cols());
@@ -392,10 +392,11 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const index_multi& row_idx, const index_multi& col_idx) {
   const auto assign_rows = row_idx.ns_.size();
   const auto assign_cols = col_idx.ns_.size();
-  stan::math::check_size_match("matrix[multi,multi] assign", "left hand side",
-                               assign_rows, name, y.rows());
-  stan::math::check_size_match("matrix[multi,multi] assign", "left hand side",
-                               assign_cols, name, y.cols());
+  stan::math::check_size_match("matrix[multi,multi] assign rows", name,
+                               assign_rows, "right hand side rows", y.rows());
+  stan::math::check_size_match("matrix[multi,multi] assign columns", name,
+                               assign_cols, "right hand side columns",
+                               y.cols());
   using arena_vec = std::vector<int, stan::math::arena_allocator<int>>;
   using pair_type = std::pair<int, arena_vec>;
   arena_vec x_col_idx(assign_cols);
@@ -514,8 +515,9 @@ template <typename Mat1, typename Mat2, typename Idx,
 inline void assign(Mat1&& x, const Mat2& y, const char* name,
                    const Idx& row_idx, const index_multi& col_idx) {
   const auto assign_cols = col_idx.ns_.size();
-  stan::math::check_size_match("matrix[..., multi] assign", "left hand side",
-                               assign_cols, name, y.cols());
+  stan::math::check_size_match("matrix[..., multi] assign columns", name,
+                               assign_cols, "right hand side columns",
+                               y.cols());
   std::unordered_set<int> x_set;
   const auto& y_eval = y.eval();
   x_set.reserve(assign_cols);
