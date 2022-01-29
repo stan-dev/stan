@@ -26,12 +26,10 @@ void gradient(const M& model, const Eigen::Matrix<double, Eigen::Dynamic, 1>& x,
   try {
     stan::math::gradient(model_functional<M>(model, &ss), x, f, grad_f);
   } catch (std::exception& e) {
-    if (ss.str().length() > 0)
-      logger.info(ss);
+    logger.info(ss);
     throw;
   }
-  if (ss.str().length() > 0)
-    logger.info(ss);
+  logger.info(ss);
 }
 
 }  // namespace model

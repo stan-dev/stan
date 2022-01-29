@@ -111,13 +111,11 @@ class mcmc_writer {
       model.write_array(rng, cont_params, params_i, model_values, true, true,
                         &ss);
     } catch (const std::exception& e) {
-      if (ss.str().length() > 0)
-        logger_.info(ss);
+      logger_.info(ss);
       ss.str("");
       logger_.info(e.what());
     }
-    if (ss.str().length() > 0)
-      logger_.info(ss);
+    logger_.info(ss);
 
     if (model_values.size() > 0)
       values.insert(values.end(), model_values.begin(), model_values.end());

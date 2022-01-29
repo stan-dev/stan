@@ -46,7 +46,8 @@ class stream_logger final : public logger {
   void info(const std::string& message) { info_ << message << std::endl; }
 
   void info(const std::stringstream& message) {
-    info_ << message.str() << std::endl;
+    if(message.str().length() > 0)
+      info_ << message.str() << std::endl;
   }
 
   void warn(const std::string& message) { warn_ << message << std::endl; }

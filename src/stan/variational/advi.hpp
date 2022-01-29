@@ -103,8 +103,7 @@ class advi {
       try {
         std::stringstream ss;
         double log_prob = model_.template log_prob<false, true>(zeta, &ss);
-        if (ss.str().length() > 0)
-          logger.info(ss);
+        logger.info(ss);
         stan::math::check_finite(function, "log_prob", log_prob);
         elbo += log_prob;
         ++i;
@@ -486,8 +485,7 @@ class advi {
     std::stringstream msg;
     model_.write_array(rng_, cont_vector, disc_vector, values, true, true,
                        &msg);
-    if (msg.str().length() > 0)
-      logger.info(msg);
+    logger.info(msg);
 
     // The first row of lp_, log_p, and log_g.
     values.insert(values.begin(), {0, 0, 0});
@@ -512,8 +510,7 @@ class advi {
                          &msg2);
       //  log_p: Log probability in the unconstrained space
       log_p = model_.template log_prob<false, true>(cont_params_, &msg2);
-      if (msg2.str().length() > 0)
-        logger.info(msg2);
+      logger.info(msg2);
       // Write lp__, log_p, and log_g.
       values.insert(values.begin(), {0, log_p, log_g});
       parameter_writer(values);

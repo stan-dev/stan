@@ -78,13 +78,11 @@ class gq_writer {
       model.write_array(rng, const_cast<std::vector<double>&>(draw), params_i,
                         values, false, true, &ss);
     } catch (const std::exception& e) {
-      if (ss.str().length() > 0)
-        logger_.info(ss);
+      logger_.info(ss);
       logger_.info(e.what());
       return;
     }
-    if (ss.str().length() > 0)
-      logger_.info(ss);
+    logger_.info(ss);
 
     std::vector<double> gq_values(values.begin() + num_constrained_params_,
                                   values.end());
