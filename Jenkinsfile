@@ -11,23 +11,44 @@ def skipRemainingStages = false
 def setupCXX(failOnError = true, CXX = CXX, String stanc3_bin_url = "nightly") {
     errorStr = failOnError ? "-Werror " : ""
     stanc3_bin_url_str = stanc3_bin_url != "nightly" ? "\nSTANC3_TEST_BIN_URL=${stanc3_bin_url}\n" : ""
-    writeFile(file: "make/local", text: "CXX=${CXX} ${errorStr}${stanc3_bin_url_str}")
+    writeFile(file: "make/local", text: "CXX=${CXX} -Wno-inconsistent-missing-override ${errorStr}${stanc3_bin_url_str}")
+    // echo "CXXFLAGS += -Wno-inconsistent-missing-override" >> make/local
 }
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
     if (separateMakeStep) {
-        sh "./runTests.py -j${PARALLEL} ${testPath} --make-only"
+        sh "python3 runTests.py -j${PARALLEL} ${testPath} --make-only"
     }
-    try { sh "./runTests.py -j${PARALLEL} ${testPath}" }
+    try { sh "python3 runTests.py -j${PARALLEL} ${testPath}" }
     finally { junit 'test/**/*.xml' }
 }
 
 def runTestsWin(String testPath, Boolean separateMakeStep=true) {
     withEnv(['PATH+TBB=./lib/stan_math/lib/tbb']) {
        if (separateMakeStep) {
-           bat "runTests.py -j${PARALLEL} ${testPath} --make-only"
+           bat """
+            SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
+            SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
+            SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
+            SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
+            SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
+            SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
+            SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
+            python runTests.py -j${PARALLEL} ${testPath} --make-only
+           """
        }
-       try { bat "runTests.py -j${PARALLEL} ${testPath}" }
+       try {
+            bat """
+                SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
+                SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
+                SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
+                SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
+                SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
+                SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
+                SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
+                python runTests.py -j${PARALLEL} ${testPath}
+            """
+       }
        finally { junit 'test/**/*.xml' }
     }
 }
@@ -80,11 +101,14 @@ pipeline {
         parallelsAlwaysFailFast()
     }
     environment {
-        CXX = 'clang++'
         GCC = 'g++'
         PARALLEL = 8
+        MAC_CXX = 'clang++'
+        LINUX_CXX = 'clang++-6.0'
+        WIN_CXX = 'g++'
     }
     stages {
+
         stage('Kill previous builds') {
             when {
                 not { branch 'develop' }
@@ -165,7 +189,7 @@ pipeline {
                     """
                     utils.checkout_pr("math", "lib/stan_math", params.math_pr)
                     stash 'StanSetup'
-                    setupCXX(true, GCC)
+                    setupCXX(true, LINUX_CXX)
                     parallel(
                         CppLint: { sh "make cpplint" },
                         API_docs: { sh 'make doxygen' },
@@ -230,24 +254,28 @@ pipeline {
             parallel {
                 stage('Windows Headers & Unit') {
                     agent { label 'windows' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
-                            !skipRemainingStages
-                        }
-                    }
+//                     when {
+//                         expression {
+//                             ( env.BRANCH_NAME == "develop" ||
+//                             env.BRANCH_NAME == "master" ||
+//                             params.run_tests_all_os ) &&
+//                             !skipRemainingStages
+//                         }
+//                     }
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
                             bat """
-                                SET \"PATH=${RTOOLS40_HOME}\\usr\\bin;${LLVM}\\bin;%PATH%\"
-                                echo %PATH%
-                                make -f lib/stan_math/make/standalone math-libs
-                                make -j${PARALLEL} test-headers
+                                SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
+                                SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
+                                SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
+                                SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
+                                SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
+                                SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
+                                mingw32-make.exe -f lib/stan_math/make/standalone math-libs
+                                mingw32-make.exe -j${PARALLEL} test-headers
                             """
-                            setupCXX(false, env.CXX, stanc3_bin_url())
+                            setupCXX(false, WIN_CXX, stanc3_bin_url())
                             runTestsWin("src/test/unit")
                     }
                     post { always { deleteDirWin() } }
@@ -262,7 +290,7 @@ pipeline {
                     }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(true, GCC, stanc3_bin_url())
+                        setupCXX(true, LINUX_CXX, stanc3_bin_url())
                         sh "make -j${PARALLEL} test-headers"
                         runTests("src/test/unit")
                     }
@@ -270,17 +298,17 @@ pipeline {
                 }
                 stage('Mac Unit') {
                 agent { label 'osx' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
-                            !skipRemainingStages
-                        }
-                    }
+//                     when {
+//                         expression {
+//                             ( env.BRANCH_NAME == "develop" ||
+//                             env.BRANCH_NAME == "master" ||
+//                             params.run_tests_all_os ) &&
+//                             !skipRemainingStages
+//                         }
+//                     }
                     steps {
                         unstash 'StanSetup'
-                        setupCXX(false, CXX, stanc3_bin_url())
+                        setupCXX(false, MAC_CXX, stanc3_bin_url())
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -342,7 +370,7 @@ pipeline {
                         sh """
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
-                            echo 'CXX=${CXX}' >> make/local
+                            echo 'CXX=${LINUX_CXX}' >> make/local
                             echo 'PRECOMPILED_HEADERS=false' >> make/local
                             make clean-all
                             make -j${PARALLEL} build
@@ -360,20 +388,15 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Integration Mac') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:gpu'
-                            label 'osx'
-                        }
-                    }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
-                            !skipRemainingStages
-                        }
-                    }
+                    agent { label 'osx' }
+//                     when {
+//                         expression {
+//                             ( env.BRANCH_NAME == "develop" ||
+//                             env.BRANCH_NAME == "master" ||
+//                             params.run_tests_all_os ) &&
+//                             !skipRemainingStages
+//                         }
+//                     }
                     steps {
                         sh """
                             git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
@@ -384,7 +407,7 @@ pipeline {
                         sh """
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
-                            echo 'CXX=${CXX}' >> make/local
+                            echo 'CXX=${MAC_CXX}' >> make/local
                             make clean-all
                             make -j${PARALLEL} build
                             cd ..
@@ -402,14 +425,14 @@ pipeline {
                 }
                 stage('Integration Windows') {
                     agent { label 'windows' }
-                    when {
-                        expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
-                            !skipRemainingStages
-                        }
-                    }
+//                     when {
+//                         expression {
+//                             ( env.BRANCH_NAME == "develop" ||
+//                             env.BRANCH_NAME == "master" ||
+//                             params.run_tests_all_os ) &&
+//                             !skipRemainingStages
+//                         }
+//                     }
                     steps {
                         deleteDirWin()
                         bat """
@@ -418,18 +441,32 @@ pipeline {
                         dir('performance-tests-cmdstan/cmdstan/stan'){
                             unstash 'StanSetup'
                         }
-                        writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${CXX}\nPRECOMPILED_HEADERS=true")
-                        withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb", "MINGW_EXECUTABLE=${env.MINGW}\\bin\\mingw32-make.exe"]) {
-                            
+                        writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true")
+                        withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
+
                             bat """
+                                SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
+                                SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
+                                SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
+                                SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
+                                SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
+                                SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
+                                SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
                                 cd performance-tests-cmdstan/cmdstan
-                                \"$MINGW_EXECUTABLE\" -j${PARALLEL} build
+                                mingw32-make.exe -j${PARALLEL} build
                                 cd ..
                                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
                                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                             """
                         }
                         bat """
+                            SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
+                            SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
+                            SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
+                            SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
+                            SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
+                            SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
+                            SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
                             cd performance-tests-cmdstan/cmdstan/stan
                             python ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
                             python ./runTests.py src/test/integration/standalone_functions_test.cpp
@@ -455,6 +492,7 @@ pipeline {
                                    string(name: 'math_pr', value: params.math_pr)])
             }
         }
+
         stage('Performance') {
             when {
                 expression {
@@ -469,7 +507,7 @@ pipeline {
             }
             steps {
                 unstash 'StanSetup'
-                setupCXX(true, CXX, stanc3_bin_url())
+                setupCXX(true, MAC_CXX, stanc3_bin_url())
                 sh """
                     ./runTests.py -j${PARALLEL} src/test/performance
                     cd test/performance
@@ -487,6 +525,7 @@ pipeline {
                 }
             }
         }
+
     }
     // Below lines are commented to avoid spamming emails during migration/debug
     post {
