@@ -5,6 +5,13 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.29.0
+======================================================================
+
+ - Fixed assign and lvalue to return empty array with negative indexing and prevent assigning containers not matching in size. (#3095)
+ - Refactored the integration tests to use the Stan model from the stanc3 repository.
+ - Upgraded Stan Math to 4.3.0.
+
 v2.28.2 (22 November 2021)
 ======================================================================
 
