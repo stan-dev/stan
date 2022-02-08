@@ -40,8 +40,51 @@ inline auto colwise_reverse(const T& x) {
  * @param y The value to assign from.
  */
 template <typename T1, typename T2,
-          require_any_not_t<is_var_matrix<T1>, is_eigen<T2>>* = nullptr>
-void assign_impl(T1&& x, T2&& y) {
+          require_all_t<is_stan_scalar<T1>, is_stan_scalar<T2>>* = nullptr>
+void assign_impl(T1&& x, T2&& y, const char* name) {
+  x = std::forward<T2>(y);
+}
+
+/**
+ * Base case of assignment
+ * @tparam T1 Any type that's not a var matrix.
+ * @tparam T2 Any type that's not a var matrix.
+ * @param x The value to assign to
+ * @param y The value to assign from.
+ */
+template <typename T1, typename T2,
+          require_any_not_t<is_var_matrix<T1>, is_eigen<T2>>* = nullptr,
+          require_all_t<is_matrix<T1>, is_matrix<T2>>* = nullptr>
+void assign_impl(T1&& x, T2&& y, const char* name) {
+  // We are allowed to assign to fully uninitialized matrix
+  if (x.size() != 0) {
+    static constexpr const char* obj_type
+        = is_vector<T1>::value ? "vector" : "matrix";
+    stan::math::check_size_match(
+        (std::string(obj_type) + " assign columns").c_str(), name, x.cols(),
+        "right hand side columns", y.cols());
+    stan::math::check_size_match(
+        (std::string(obj_type) + " assign rows").c_str(), name, x.rows(),
+        "right hand side rows", y.rows());
+  }
+  x = std::forward<T2>(y);
+}
+
+/**
+ * Base case of assignment
+ * @tparam T1 Any type that's not a var matrix.
+ * @tparam T2 Any type that's not a var matrix.
+ * @param x The value to assign to
+ * @param y The value to assign from.
+ */
+template <typename T1, typename T2,
+          require_all_t<is_std_vector<T1>, is_std_vector<T2>>* = nullptr>
+void assign_impl(T1&& x, T2&& y, const char* name) {
+  // We are allowed to assign to fully uninitialized matrix
+  if (unlikely(x.size() != 0)) {
+    stan::math::check_size_match("assign array size", name, x.size(),
+                                 "right hand side", y.size());
+  }
   x = std::forward<T2>(y);
 }
 
@@ -60,7 +103,17 @@ void assign_impl(T1&& x, T2&& y) {
  */
 template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
           require_eigen_st<std::is_arithmetic, Mat2>* = nullptr>
-void assign_impl(Mat1&& x, Mat2&& y) {
+void assign_impl(Mat1&& x, Mat2&& y, const char* name) {
+  if (x.size() != 0) {
+    static constexpr const char* obj_type
+        = is_vector<Mat1>::value ? "vector" : "matrix";
+    stan::math::check_size_match(
+        (std::string(obj_type) + " assign columns").c_str(), name, x.cols(),
+        "right hand side columns", y.cols());
+    stan::math::check_size_match(
+        (std::string(obj_type) + " assign rows").c_str(), name, x.rows(),
+        "right hand side rows", y.rows());
+  }
   auto prev_vals = stan::math::to_arena(x.val());
   x.vi_->val_ = std::forward<Mat2>(y);
   stan::math::reverse_pass_callback([x, prev_vals]() mutable {
