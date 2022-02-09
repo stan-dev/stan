@@ -520,14 +520,15 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio,
  *
  */
 template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
-          typename ParamWriter>
-inline auto pathfinder_lbfgs_single(
-    Model& model, const stan::io::var_context& init, unsigned int random_seed,
-    unsigned int path, double init_radius, int history_size, double init_alpha,
-    double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
-    double tol_param, int num_iterations, bool save_iterations, int refresh,
-    callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
-    int num_eval_attempts, size_t num_threads, callbacks::logger& logger,
+          typename ParamWriter>//, typename XVal, typename GVal>
+inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
+   Model& model, const stan::io::var_context& init,
+    unsigned int random_seed, unsigned int path, double init_radius,
+    int history_size, double init_alpha, double tol_obj, double tol_rel_obj,
+    double tol_grad, double tol_rel_grad, double tol_param, int num_iterations,
+    bool save_iterations, int refresh, callbacks::interrupt& interrupt,
+    int num_elbo_draws, int num_draws, int num_eval_attempts,
+    size_t num_threads, callbacks::logger& logger,
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
     DiagnosticWriter& diagnostic_writer) {
   const auto start_optim_time = std::chrono::steady_clock::now();
@@ -583,6 +584,12 @@ inline auto pathfinder_lbfgs_single(
   param_vecs.reserve(num_iterations);
   std::vector<Eigen::VectorXd> grad_vecs;
   grad_vecs.reserve(num_iterations);
+  /*
+  for (Eigen::Index i = 0; i < x_val.cols(); ++i) {
+    param_vecs.push_back(x_val.col(i));
+    grad_vecs.push_back(g_val.col(i));
+  }
+  */
   {
     std::vector<double> g1;
     double blah = stan::model::log_prob_grad<true, true>(model, cont_vector,
@@ -673,13 +680,18 @@ inline auto pathfinder_lbfgs_single(
   Eigen::MatrixXd Ykt_diff(param_size, param_cols_filled);
   Eigen::MatrixXd Skt_diff(param_size, param_cols_filled);
   for (Eigen::Index i = 0; i < param_cols_filled; ++i) {
-    Ykt_diff.col(i) = param_vecs[i + 1] - param_vecs[i];
-    Skt_diff.col(i) = grad_vecs[i + 1] - grad_vecs[i];
+    Ykt_diff.col(i) = grad_vecs[i + 1] - grad_vecs[i];
+    Skt_diff.col(i) = param_vecs[i + 1] - param_vecs[i];
   }
   const auto diff_size = Ykt_diff.cols();
   Eigen::MatrixXd alpha_mat(param_size, diff_size);
   Eigen::Matrix<bool, -1, 1> check_curve_vec = check_curve(Ykt_diff, Skt_diff);
-  alpha_mat.col(0).setOnes();
+  if (check_curve_vec[0]) {
+    alpha_mat.col(0) = form_diag(Eigen::VectorXd::Ones(param_size),
+                                    Ykt_diff.col(0), Skt_diff.col(0));
+  } else {
+    alpha_mat.col(0).setOnes();
+  }
   for (Eigen::Index iter = 1; iter < diff_size; iter++) {
     if (check_curve_vec[iter]) {
       alpha_mat.col(iter) = form_diag(alpha_mat.col(iter - 1),
@@ -695,7 +707,7 @@ inline auto pathfinder_lbfgs_single(
                                  "", "", " ");
     std::cout << "\n num_params: " << param_size << "\n";
     std::cout << "\n num_elbo_params: " << num_elbo_draws << "\n";
-    std::cout << "\n param_cols_filled: " << param_cols_filled << "\n";
+    //std::cout << "\n param_cols_filled: " << param_cols_filled << "\n";
     std::cout << "\n Alpha mat: "
               << alpha_mat.transpose().eval().format(CommaInitFmt) << "\n";
     std::cout << "\n Ykt_diff mat: "
@@ -821,7 +833,7 @@ std::cout << "\n param mat: "
                 std::string("ELBO estimation failed for LBFGS iteration "
                             + std::to_string(iter) + " with error: ")
                 + e.what());
-                continue;
+            continue;
           }
           if (refresh > 0
               && (lbfgs.iter_num() == 0
