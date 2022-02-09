@@ -656,12 +656,12 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
     return_code = error_codes::OK;
   } else {
     logger.info("Optimization terminated with error: ");
+    logger.info("  " + lbfgs.get_code_string(ret));
     logger.info(
         "Stan will still attempt pathfinder but may fail or produce incorrect "
         "results.");
-    return_code = error_codes::SOFTWARE;
+    return_code = error_codes::OK;
   }
-  logger.info("  " + lbfgs.get_code_string(ret));
 
   const auto end_optim_time = std::chrono::steady_clock::now();
   const double optim_delta_time
@@ -737,8 +737,9 @@ std::cout << "\n param mat: "
   // NOTE: We always push the first one no matter what
   check_curve_vec[0] = true;
   std::vector<boost::ecuyer1988> rng_vec;
-  rng_vec.reserve(diff_size);
-  for (Eigen::Index i = 0; i < diff_size; i++) {
+  const int tbb_threads = stan::math::internal::get_num_threads();
+  rng_vec.reserve(tbb_threads);
+  for (Eigen::Index i = 0; i < tbb_threads + 1; i++) {
     rng_vec.emplace_back(
         util::create_rng<boost::ecuyer1988>(random_seed, path + i));
   }
@@ -756,6 +757,9 @@ std::cout << "\n param mat: "
   tbb::parallel_for(
       tbb::blocked_range<Eigen::Index>(0, diff_size),
       [&](tbb::blocked_range<Eigen::Index> r) {
+        boost::variate_generator<boost::ecuyer1988&,
+                                 boost::normal_distribution<>>
+            rand_unit_gaus(rng_vec[tbb::this_task_arena::current_thread_index()], boost::normal_distribution<>());
         for (int iter = r.begin(); iter < r.end(); ++iter) {
           std::string iter_msg(path_num + "Iter: [" + std::to_string(iter)
                                + "] ");
@@ -820,9 +824,6 @@ std::cout << "\n param mat: "
            * distribution
            */
           //  4. Find $l \in L$ that maximizes ELBO $l^* = arg max_l ELBO^(l)$.
-          boost::variate_generator<boost::ecuyer1988&,
-                                   boost::normal_distribution<>>
-              rand_unit_gaus(rng_vec[iter], boost::normal_distribution<>());
           elbo_est_t elbo_est;
           try {
             elbo_est = est_approx_draws<true>(fn, rand_unit_gaus,
@@ -868,7 +869,7 @@ std::cout << "\n param mat: "
     logger.info(
         "Pathfinder Failure: None of the LBFGS iterations completed "
         "successfully");
-    return ret_pathfinder<ReturnLpSamples>(-1, Eigen::VectorXd(0),
+    return ret_pathfinder<ReturnLpSamples>(error_codes::SOFTWARE, Eigen::VectorXd(0),
                                            Eigen::MatrixXd(0, 0));
   }
   Eigen::MatrixXd constrainted_draws_mat(names.size(), num_draws);
@@ -893,15 +894,14 @@ std::cout << "\n param mat: "
         });
   }
   if ((num_draws - num_elbo_draws) > 0) {
-    boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
-        rand_unit_gaus(rng_vec[best_E], boost::normal_distribution<>());
-
     tbb::parallel_for(
         tbb::blocked_range<Eigen::Index>(num_elbo_draws, num_draws, 256),
         [&](tbb::blocked_range<Eigen::Index> r) {
           Eigen::VectorXd unconstrained_draws;
           Eigen::VectorXd constrained_draws;
           elbo_est_t draws_tuple;
+          boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
+              rand_unit_gaus(rng_vec[tbb::this_task_arena::current_thread_index()], boost::normal_distribution<>());
           try {
             draws_tuple = est_approx_draws<false>(
                 fn, rand_unit_gaus, taylor_approx_best, r.size(),
@@ -951,7 +951,7 @@ std::cout << "\n param mat: "
 
   parameter_writer();
 
-  return ret_pathfinder<ReturnLpSamples>(0, std::move(lp_ratio),
+  return ret_pathfinder<ReturnLpSamples>(error_codes::OK, std::move(lp_ratio),
                                          std::move(constrainted_draws_mat));
 }
 

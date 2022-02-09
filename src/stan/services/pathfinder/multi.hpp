@@ -65,6 +65,11 @@ inline int pathfinder_lbfgs_multi(
                   num_eval_attempts, num_threads, logger, init_writers[iter],
                   single_path_parameter_writer[iter],
                   single_path_diagnostic_writer[iter]);
+          if (std::get<0>(pathfinder_ret) == error_codes::SOFTWARE) {
+            // TODO: We should try to keep going.
+            throw std::domain_error(std::string("Pathfinder iteration: ") +
+             std::to_string(iter) + " failed. Insert reason why here with good error message" );
+          }
           Eigen::Array<double, -1, 1> lp_ratio = std::get<1>(pathfinder_ret);
           // logic for writing to lp_ratios and draws
           lp_ratios.segment(iter * num_draws, num_draws) = lp_ratio;
