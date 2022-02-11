@@ -6,22 +6,26 @@
 
 namespace stan {
 
-  namespace mcmc {
+namespace mcmc {
 
-    class stepsize_adapter: public base_adapter {
-    public:
-      stepsize_adapter() { }
+class stepsize_adapter : public base_adapter {
+ public:
+  stepsize_adapter() {}
 
-      stepsize_adaptation& get_stepsize_adaptation() {
-        return stepsize_adaptation_;
-      }
+  stepsize_adaptation& get_stepsize_adaptation() {
+    return stepsize_adaptation_;
+  }
 
-    protected:
-      stepsize_adaptation stepsize_adaptation_;
-    };
+  const stepsize_adaptation& get_stepsize_adaptation() const noexcept {
+    return stepsize_adaptation_;
+  }
 
-  }  // mcmc
+ protected:
+  stepsize_adaptation stepsize_adaptation_;
+};
 
-}  // stan
+}  // namespace mcmc
+
+}  // namespace stan
 
 #endif

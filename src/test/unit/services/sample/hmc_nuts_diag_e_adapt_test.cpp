@@ -6,9 +6,8 @@
 #include <iostream>
 
 class ServicesSampleHmcNutsDiagEAdapt : public testing::Test {
-public:
-  ServicesSampleHmcNutsDiagEAdapt()
-    : model(context, &model_log) {}
+ public:
+  ServicesSampleHmcNutsDiagEAdapt() : model(context, 0, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
@@ -40,17 +39,15 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, call_count) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   int return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-      model, context, random_seed, chain, init_radius,
-      num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-      init_buffer, term_buffer, window,
-      interrupt, logger, init,
-      parameter, diagnostic);
+      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
+      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
+      delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
+      logger, init, parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
 
-  int num_output_lines = (num_warmup+num_samples)/num_thin;
-  EXPECT_EQ(num_warmup+num_samples, interrupt.call_count());
+  int num_output_lines = (num_warmup + num_samples) / num_thin;
+  EXPECT_EQ(num_warmup + num_samples, interrupt.call_count());
   EXPECT_EQ(1, parameter.call_count("vector_string"));
   EXPECT_EQ(num_output_lines, parameter.call_count("vector_double"));
   EXPECT_EQ(1, diagnostic.call_count("vector_string"));
@@ -80,12 +77,10 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, parameter_checks) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   stan::services::sample::hmc_nuts_diag_e_adapt(
-      model, context, random_seed, chain, init_radius,
-      num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-      init_buffer, term_buffer, window,
-      interrupt, logger, init,
-      parameter, diagnostic);
+      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
+      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
+      delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
+      logger, init, parameter, diagnostic);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
@@ -112,7 +107,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, parameter_checks) {
   EXPECT_EQ(parameter_names[0].size(), parameter_values[0].size());
   EXPECT_EQ(diagnostic_names[0].size(), diagnostic_values[0].size());
 
-  EXPECT_EQ((num_warmup+num_samples)/num_thin, parameter_values.size());
+  EXPECT_EQ((num_warmup + num_samples) / num_thin, parameter_values.size());
 
   // Expect one call to set parameter names, and one set of output per
   // iteration.
@@ -143,12 +138,10 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_sizes) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   int return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
-      model, context, random_seed, chain, init_radius,
-      num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-      init_buffer, term_buffer, window,
-      interrupt, logger, init,
-      parameter, diagnostic);
+      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
+      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
+      delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
+      logger, init, parameter, diagnostic);
 
   std::vector<std::vector<std::string> > parameter_names;
   parameter_names = parameter.vector_string_values();
@@ -160,7 +153,6 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_sizes) {
   diagnostic_values = diagnostic.vector_double_values();
 
   EXPECT_EQ(return_code, 0);
-
 }
 
 TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_regression) {
@@ -185,14 +177,11 @@ TEST_F(ServicesSampleHmcNutsDiagEAdapt, output_regression) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-
   stan::services::sample::hmc_nuts_diag_e_adapt(
-      model, context, random_seed, chain, init_radius,
-      num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
-      init_buffer, term_buffer, window,
-      interrupt, logger, init,
-      parameter, diagnostic);
+      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
+      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
+      delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
+      logger, init, parameter, diagnostic);
 
   std::vector<std::string> init_values;
   init_values = init.string_values();

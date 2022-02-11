@@ -15,7 +15,7 @@ TEST(ModelUtil, gradient) {
   data_stream.close();
 
   std::stringstream output;
-  valid_model_namespace::valid_model valid_model(data_var_context, &output);
+  valid_model_namespace::valid_model valid_model(data_var_context, 0, &output);
   EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g));
 
   EXPECT_FLOAT_EQ(dim, x.size());
@@ -24,10 +24,10 @@ TEST(ModelUtil, gradient) {
   EXPECT_EQ("", output.str());
 
   // Incorporate once operands and partials has been generalized
-  //output.str("");
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
-  //EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g), std::domain_error);
-  //EXPECT_EQ("", output.str());
+  // output.str("");
+  // domain_fail_namespace::domain_fail domain_fail_model(data_var_context,
+  // &output); EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g),
+  // std::domain_error); EXPECT_EQ("", output.str());
 }
 
 TEST(ModelUtil, gradient_writer) {
@@ -43,7 +43,7 @@ TEST(ModelUtil, gradient_writer) {
 
   std::stringstream output;
   stan::test::unit::instrumented_logger logger;
-  valid_model_namespace::valid_model valid_model(data_var_context, &output);
+  valid_model_namespace::valid_model valid_model(data_var_context, 0, &output);
   EXPECT_NO_THROW(stan::model::gradient(valid_model, x, f, g, logger));
 
   EXPECT_FLOAT_EQ(dim, x.size());
@@ -52,8 +52,8 @@ TEST(ModelUtil, gradient_writer) {
   EXPECT_EQ(0, logger.call_count());
 
   // Incorporate once operands and partials has been generalized
-  //output.str("");
-  //domain_fail_namespace::domain_fail domain_fail_model(data_var_context, &output);
-  //EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g), std::domain_error);
-  //EXPECT_EQ("", output.str());
+  // output.str("");
+  // domain_fail_namespace::domain_fail domain_fail_model(data_var_context,
+  // &output); EXPECT_THROW(stan::model::gradient(domain_fail_model, x, f, g),
+  // std::domain_error); EXPECT_EQ("", output.str());
 }

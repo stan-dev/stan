@@ -11,7 +11,6 @@
 typedef boost::ecuyer1988 rng_t;
 
 TEST(McmcDiagEMetric, sample_p) {
-
   rng_t base_rng(0);
 
   Eigen::VectorXd q(2);
@@ -38,7 +37,7 @@ TEST(McmcDiagEMetric, sample_p) {
   double var = m2 / (n_samples + 1.0);
 
   // Mean within 5sigma of expected value (d / 2)
-  EXPECT_TRUE(std::fabs(m   - 0.5 * q.size()) < 5.0 * sqrt(var));
+  EXPECT_TRUE(std::fabs(m - 0.5 * q.size()) < 5.0 * sqrt(var));
 
   // Variance within 10% of expected value (d / 2)
   EXPECT_TRUE(std::fabs(var - 0.5 * q.size()) < 0.1 * q.size());
@@ -58,13 +57,14 @@ TEST(McmcDiagEMetric, gradients) {
   data_stream.close();
 
   std::stringstream model_output;
-  funnel_model_namespace::funnel_model model(data_var_context, &model_output);
-
+  funnel_model_namespace::funnel_model model(data_var_context, 0,
+                                             &model_output);
 
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  stan::mcmc::diag_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
+  stan::mcmc::diag_e_metric<funnel_model_namespace::funnel_model, rng_t> metric(
+      model);
 
   double epsilon = 1e-6;
 
@@ -72,7 +72,6 @@ TEST(McmcDiagEMetric, gradients) {
   Eigen::VectorXd g1 = metric.dtau_dq(z, logger);
 
   for (int i = 0; i < z.q.size(); ++i) {
-
     double delta = 0;
 
     z.q(i) += epsilon;
@@ -89,13 +88,11 @@ TEST(McmcDiagEMetric, gradients) {
     delta /= 2 * epsilon;
 
     EXPECT_NEAR(delta, g1(i), epsilon);
-
   }
 
   Eigen::VectorXd g2 = metric.dtau_dp(z);
 
   for (int i = 0; i < z.q.size(); ++i) {
-
     double delta = 0;
 
     z.p(i) += epsilon;
@@ -109,13 +106,11 @@ TEST(McmcDiagEMetric, gradients) {
     delta /= 2 * epsilon;
 
     EXPECT_NEAR(delta, g2(i), epsilon);
-
   }
 
   Eigen::VectorXd g3 = metric.dphi_dq(z, logger);
 
   for (int i = 0; i < z.q.size(); ++i) {
-
     double delta = 0;
 
     z.q(i) += epsilon;
@@ -132,7 +127,6 @@ TEST(McmcDiagEMetric, gradients) {
     delta /= 2 * epsilon;
 
     EXPECT_NEAR(delta, g3(i), epsilon);
-
   }
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", debug.str());
@@ -150,7 +144,6 @@ TEST(McmcDiagEMetric, streams) {
   Eigen::VectorXd q(2);
   q(0) = 5;
   q(1) = 1;
-
 
   stan::mcmc::mock_model model(q.size());
 

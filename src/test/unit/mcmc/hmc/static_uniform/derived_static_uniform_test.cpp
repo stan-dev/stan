@@ -31,7 +31,7 @@ TEST(McmcStaticUniform, unit_e_transition) {
   gauss_model_namespace::gauss_model model(data_var_context);
 
   stan::mcmc::unit_e_static_uniform<gauss_model_namespace::gauss_model, rng_t>
-    sampler(model, base_rng);
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -68,7 +68,7 @@ TEST(McmcStaticUniform, diag_e_transition) {
   gauss_model_namespace::gauss_model model(data_var_context);
 
   stan::mcmc::diag_e_static_uniform<gauss_model_namespace::gauss_model, rng_t>
-    sampler(model, base_rng);
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -105,7 +105,7 @@ TEST(McmcStaticUniform, dense_e_transition) {
   gauss_model_namespace::gauss_model model(data_var_context);
 
   stan::mcmc::dense_e_static_uniform<gauss_model_namespace::gauss_model, rng_t>
-    sampler(model, base_rng);
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -142,7 +142,7 @@ TEST(McmcStaticUniform, softabs_transition) {
   gauss_model_namespace::gauss_model model(data_var_context);
 
   stan::mcmc::softabs_static_uniform<gauss_model_namespace::gauss_model, rng_t>
-    sampler(model, base_rng);
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -178,8 +178,9 @@ TEST(McmcStaticUniform, adapt_unit_e_transition) {
   stan::io::dump data_var_context(empty_stream);
   gauss_model_namespace::gauss_model model(data_var_context);
 
-  stan::mcmc::adapt_unit_e_static_uniform<gauss_model_namespace::gauss_model, rng_t>
-    sampler(model, base_rng);
+  stan::mcmc::adapt_unit_e_static_uniform<gauss_model_namespace::gauss_model,
+                                          rng_t>
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -215,8 +216,9 @@ TEST(McmcStaticUniform, adapt_diag_e_transition) {
   stan::io::dump data_var_context(empty_stream);
   gauss_model_namespace::gauss_model model(data_var_context);
 
-  stan::mcmc::adapt_diag_e_static_uniform<gauss_model_namespace::gauss_model, rng_t>
-    sampler(model, base_rng);
+  stan::mcmc::adapt_diag_e_static_uniform<gauss_model_namespace::gauss_model,
+                                          rng_t>
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -252,8 +254,9 @@ TEST(McmcStaticUniform, adapt_dense_e_transition) {
   stan::io::dump data_var_context(empty_stream);
   gauss_model_namespace::gauss_model model(data_var_context);
 
-  stan::mcmc::adapt_dense_e_static_uniform<gauss_model_namespace::gauss_model, rng_t>
-    sampler(model, base_rng);
+  stan::mcmc::adapt_dense_e_static_uniform<gauss_model_namespace::gauss_model,
+                                           rng_t>
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -289,8 +292,9 @@ TEST(McmcStaticUniform, adapt_softabs_e_transition) {
   stan::io::dump data_var_context(empty_stream);
   gauss_model_namespace::gauss_model model(data_var_context);
 
-  stan::mcmc::adapt_softabs_static_uniform<gauss_model_namespace::gauss_model, rng_t>
-    sampler(model, base_rng);
+  stan::mcmc::adapt_softabs_static_uniform<gauss_model_namespace::gauss_model,
+                                           rng_t>
+      sampler(model, base_rng);
 
   sampler.z() = z_init;
   sampler.init_hamiltonian(logger);
@@ -310,5 +314,4 @@ TEST(McmcStaticUniform, adapt_softabs_e_transition) {
   EXPECT_EQ("", warn.str());
   EXPECT_EQ("", error.str());
   EXPECT_EQ("", fatal.str());
-
 }

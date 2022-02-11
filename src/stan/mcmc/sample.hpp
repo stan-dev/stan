@@ -1,65 +1,62 @@
 #ifndef STAN_MCMC_SAMPLE_HPP
 #define STAN_MCMC_SAMPLE_HPP
 
-#include <Eigen/Dense>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <vector>
 #include <string>
 
 namespace stan {
 
-  namespace mcmc {
+namespace mcmc {
 
-    class sample {
-    public:
-      sample(const Eigen::VectorXd& q, double log_prob, double stat)
-        : cont_params_(q), log_prob_(log_prob), accept_stat_(stat) {
-      }
+class sample {
+ public:
+  sample(const Eigen::VectorXd& q, double log_prob, double stat)
+      : cont_params_(q), log_prob_(log_prob), accept_stat_(stat) {}
 
-      virtual ~sample() {}  // No-op
+  sample(Eigen::VectorXd&& q, double log_prob, double stat)  // NOLINT
+      : cont_params_(std::move(q)), log_prob_(log_prob), accept_stat_(stat) {}
 
-      int size_cont() const {
-        return cont_params_.size();
-      }
+  sample(const sample&) = default;
 
-      double cont_params(int k) const {
-        return cont_params_(k);
-      }
+  sample(sample&&) = default;
 
-      void cont_params(Eigen::VectorXd& x) const {
-        x = cont_params_;
-      }
+  sample& operator=(const sample&) = default;
 
-      const Eigen::VectorXd& cont_params() const {
-        return cont_params_;
-      }
+  sample& operator=(sample&&) = default;
 
-      inline double log_prob() const {
-        return log_prob_;
-      }
+  virtual ~sample() = default;
 
-      inline double accept_stat() const {
-        return accept_stat_;
-      }
+  int size_cont() const { return cont_params_.size(); }
 
-      static void get_sample_param_names(std::vector<std::string>& names) {
-        names.push_back("lp__");
-        names.push_back("accept_stat__");
-      }
+  double cont_params(int k) const { return cont_params_(k); }
 
-      void get_sample_params(std::vector<double>& values) {
-        values.push_back(log_prob_);
-        values.push_back(accept_stat_);
-      }
+  void cont_params(Eigen::VectorXd& x) const { x = cont_params_; }
 
-    private:
-      Eigen::VectorXd cont_params_;  // Continuous coordinates of sample
-      double log_prob_;              // Log probability of sample
-      double accept_stat_;           // Acceptance statistic of transition
-    };
+  const Eigen::VectorXd& cont_params() const { return cont_params_; }
 
-  }  // mcmc
+  inline double log_prob() const { return log_prob_; }
 
-}  // stan
+  inline double accept_stat() const { return accept_stat_; }
+
+  static void get_sample_param_names(std::vector<std::string>& names) {
+    names.push_back("lp__");
+    names.push_back("accept_stat__");
+  }
+
+  void get_sample_params(std::vector<double>& values) {
+    values.push_back(log_prob_);
+    values.push_back(accept_stat_);
+  }
+
+ private:
+  Eigen::VectorXd cont_params_;  // Continuous coordinates of sample
+  double log_prob_;              // Log probability of sample
+  double accept_stat_;           // Acceptance statistic of transition
+};
+
+}  // namespace mcmc
+
+}  // namespace stan
 
 #endif
-

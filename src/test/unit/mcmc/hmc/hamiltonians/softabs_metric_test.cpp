@@ -32,7 +32,6 @@ TEST(McmcSoftAbs, sample_p) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-
   metric.update_metric(z, logger);
 
   for (int i = 0; i < n_samples; ++i) {
@@ -47,7 +46,7 @@ TEST(McmcSoftAbs, sample_p) {
   double var = m2 / (n_samples + 1.0);
 
   // Mean within 5sigma of expected value (d / 2)
-  EXPECT_TRUE(std::fabs(m   - 0.5 * q.size()) < 5.0 * sqrt(var));
+  EXPECT_TRUE(std::fabs(m - 0.5 * q.size()) < 5.0 * sqrt(var));
 
   // Variance within 10% of expected value (d / 2)
   EXPECT_TRUE(std::fabs(var - 0.5 * q.size()) < 0.1 * q.size());
@@ -61,7 +60,6 @@ TEST(McmcSoftAbs, sample_p) {
 }
 
 TEST(McmcSoftAbs, gradients) {
-
   rng_t base_rng(0);
 
   Eigen::VectorXd q = Eigen::VectorXd::Ones(11);
@@ -78,9 +76,11 @@ TEST(McmcSoftAbs, gradients) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  funnel_model_namespace::funnel_model model(data_var_context, &model_output);
+  funnel_model_namespace::funnel_model model(data_var_context, 0,
+                                             &model_output);
 
-  stan::mcmc::softabs_metric<funnel_model_namespace::funnel_model, rng_t> metric(model);
+  stan::mcmc::softabs_metric<funnel_model_namespace::funnel_model, rng_t>
+      metric(model);
 
   double epsilon = 1e-6;
 
@@ -88,7 +88,6 @@ TEST(McmcSoftAbs, gradients) {
   Eigen::VectorXd g1 = metric.dtau_dq(z, logger);
 
   for (int i = 0; i < z.q.size(); ++i) {
-
     double delta = 0;
 
     z.q(i) += epsilon;
@@ -110,7 +109,6 @@ TEST(McmcSoftAbs, gradients) {
   Eigen::VectorXd g2 = metric.dtau_dp(z);
 
   for (int i = 0; i < z.q.size(); ++i) {
-
     double delta = 0;
 
     z.p(i) += epsilon;

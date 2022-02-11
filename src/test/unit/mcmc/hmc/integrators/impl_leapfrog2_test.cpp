@@ -25,13 +25,14 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::impl_leapfrog<
-    stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
-    integrator;
+      stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
+      integrator;
 
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(
+      model);
 
   stan::mcmc::unit_e_point z(1);
   z.q(0) = 1;
@@ -75,13 +76,14 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::impl_leapfrog<
-    stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
-    integrator;
+      stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> >
+      integrator;
 
-  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
+  stan::mcmc::unit_e_metric<gauss_model_namespace::gauss_model, rng_t> metric(
+      model);
 
   // Create a circle of points
   const int n_points = 1000;
@@ -98,7 +100,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
 
     double theta = 2 * pi * (double)i / (double)n_points;
     z.back().q(0) = r * cos(theta) + q0;
-    z.back().p(0)    = r * sin(theta) + p0;
+    z.back().p(0) = r * sin(theta) + p0;
   }
 
   // Evolve circle
@@ -116,7 +118,6 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
   double area = 0;
 
   for (int i = 0; i < n_points; ++i) {
-
     double x1 = z[i].q(0);
     double y1 = z[i].p(0);
     double x2 = z[(i + 1) % n_points].q(0);
@@ -128,24 +129,22 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
     double x_delta = x2 - x1;
     double y_delta = y2 - y1;
 
-    double a = sqrt( x_delta * x_delta + y_delta * y_delta);
+    double a = sqrt(x_delta * x_delta + y_delta * y_delta);
 
     double x_norm = 1;
-    double y_norm = - x_delta / y_delta;
-    double norm = sqrt( x_norm * x_norm + y_norm * y_norm );
+    double y_norm = -x_delta / y_delta;
+    double norm = sqrt(x_norm * x_norm + y_norm * y_norm);
 
     a *= (x_bary * x_norm + y_bary * y_norm) / norm;
     a = a < 0 ? -a : a;
 
     area += a;
-
   }
 
   area *= 0.5;
 
   // Symplectic integrators preserve volume (area in 2D)
   EXPECT_NEAR(area, pi * r * r, 1e-2);
-
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", debug.str());
@@ -166,13 +165,14 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::impl_leapfrog<
-    stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> >
-    integrator;
+      stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> >
+      integrator;
 
-  stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
+  stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> metric(
+      model);
 
   stan::mcmc::softabs_point z(1);
   z.q(0) = 1;
@@ -216,13 +216,14 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  gauss_model_namespace::gauss_model model(data_var_context, &model_output);
+  gauss_model_namespace::gauss_model model(data_var_context, 0, &model_output);
 
   stan::mcmc::impl_leapfrog<
-    stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> >
-    integrator;
+      stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> >
+      integrator;
 
-  stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> metric(model);
+  stan::mcmc::softabs_metric<gauss_model_namespace::gauss_model, rng_t> metric(
+      model);
 
   // Create a circle of points
   const int n_points = 1000;
@@ -239,7 +240,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
 
     double theta = 2 * pi * (double)i / (double)n_points;
     z.back().q(0) = r * cos(theta) + q0;
-    z.back().p(0)    = r * sin(theta) + p0;
+    z.back().p(0) = r * sin(theta) + p0;
   }
 
   // Evolve circle
@@ -257,7 +258,6 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
   double area = 0;
 
   for (int i = 0; i < n_points; ++i) {
-
     double x1 = z[i].q(0);
     double y1 = z[i].p(0);
     double x2 = z[(i + 1) % n_points].q(0);
@@ -269,24 +269,22 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
     double x_delta = x2 - x1;
     double y_delta = y2 - y1;
 
-    double a = sqrt( x_delta * x_delta + y_delta * y_delta);
+    double a = sqrt(x_delta * x_delta + y_delta * y_delta);
 
     double x_norm = 1;
-    double y_norm = - x_delta / y_delta;
-    double norm = sqrt( x_norm * x_norm + y_norm * y_norm );
+    double y_norm = -x_delta / y_delta;
+    double norm = sqrt(x_norm * x_norm + y_norm * y_norm);
 
     a *= (x_bary * x_norm + y_bary * y_norm) / norm;
     a = a < 0 ? -a : a;
 
     area += a;
-
   }
 
   area *= 0.5;
 
   // Symplectic integrators preserve volume (area in 2D)
   EXPECT_NEAR(area, pi * r * r, 1e-2);
-
 
   EXPECT_EQ("", model_output.str());
   EXPECT_EQ("", debug.str());

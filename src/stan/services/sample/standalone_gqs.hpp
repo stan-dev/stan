@@ -4,89 +4,133 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
+#include <stan/io/array_var_context.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/gq_writer.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
+#include <boost/algorithm/string.hpp>
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace stan {
-  namespace services {
+namespace services {
 
-    /**
-     * Return the number of constrained parameters for the specified
-     * model.
-     *
-     * @tparam Model type of model
-     * @param[in] model model to query
-     * @return number of constrained parameters for the model
-     */
-    template <class Model>
-    int num_constrained_params(const Model& model) {
-        std::vector<std::string> param_names;
-        static const bool include_tparams = false;
-        static const bool include_gqs = false;
-        model.constrained_param_names(param_names, include_tparams,
-                                      include_gqs);
-        return param_names.size();
+/**
+ * Find the names, dimensions of the model parameters.
+ * Assembles vectors of name, dimensions for the variables
+ * declared in the parameters block.
+ *
+ * @tparam Model type of model
+ * @param[in] model model to query
+ * @param[in, out] param_names sequence of parameter names
+ * @param[in, out] param_dimss sequence of variable dimensionalities
+ */
+template <class Model>
+void get_model_parameters(const Model &model,
+                          std::vector<std::string> &param_names,
+                          std::vector<std::vector<size_t>> &param_dimss) {
+  std::vector<std::string> param_cols;
+  model.constrained_param_names(param_cols, false, false);
+  std::string cur_name("");
+  std::vector<std::string> splits;
+  for (size_t i = 0; i < param_cols.size(); ++i) {
+    boost::algorithm::split(splits, param_cols[i], boost::is_any_of("."));
+    if (splits.size() == 1 || splits[0] != cur_name) {
+      cur_name = splits[0];
+      param_names.emplace_back(cur_name);
     }
-
-    /**
-     * Given a set of draws from a fitted model, generate corresponding
-     * quantities of interest.  Data written to callback writer.
-     * Return code indicates success or type of error.
-     *
-     * @tparam Model model class
-     * @param[in] model instantiated model
-     * @param[in] draws sequence of draws of unconstrained parameters
-     * @param[in] seed seed to use for randomization
-     * @param[in, out] interrupt called every iteration
-     * @param[in, out] logger logger to which to write warning and error messages
-     * @param[in, out] sample_writer writer to which draws are written
-     * @return error code
-     */
-    template <class Model>
-    int standalone_generate(const Model& model,
-                            const std::vector<std::vector<double> >& draws,
-                            unsigned int seed,
-                            callbacks::interrupt& interrupt,
-                            callbacks::logger& logger,
-                            callbacks::writer& sample_writer) {
-      if (draws.empty()) {
-        logger.error("Empty set of draws from fitted model.");
-        return error_codes::DATAERR;
+  }
+  std::vector<std::string> all_param_names;
+  model.get_param_names(all_param_names);
+  size_t num_params = param_names.size();
+  std::vector<std::vector<size_t>> dimss;
+  model.get_dims(dimss);
+  for (size_t i = 0; i < param_names.size(); i++) {
+    for (size_t j = i; j < all_param_names.size(); ++j) {
+      if (param_names[i].compare(all_param_names[j]) == 0) {
+        param_dimss.emplace_back(dimss[j]);
+        break;
       }
-
-      int num_params = num_constrained_params(model);
-      std::vector<std::string> gq_names;
-      static const bool include_tparams = false;
-      static const bool include_gqs = true;
-      model.constrained_param_names(gq_names, include_tparams, include_gqs);
-      if (!(static_cast<size_t>(num_params) < gq_names.size())) {
-        logger.error("Model doesn't generate any quantities of interest.");
-        return error_codes::CONFIG;
-      }
-
-      util::gq_writer writer(sample_writer, logger, num_params);
-      boost::ecuyer1988 rng = util::create_rng(seed, 1);
-      writer.write_gq_names(model);
-
-      std::stringstream msg;
-      for (const std::vector<double>& draw : draws) {
-        if (static_cast<size_t>(num_params) != draw.size()) {
-          msg << "Wrong number of params in draws from fitted model.  ";
-          msg << "Expecting " << num_params << " columns, ";
-          msg << "found " << draws[0].size() << " columns.";
-          std::string msgstr = msg.str();
-          logger.error(msgstr);
-          return error_codes::DATAERR;
-        }
-        interrupt();  // call out to interrupt and fail
-        writer.write_gq_values(model, rng, draw);
-      }
-      return error_codes::OK;
     }
-
   }
 }
+
+/**
+ * Given a set of draws from a fitted model, generate corresponding
+ * quantities of interest which are written to callback writer.
+ * Matrix of draws consists of one row per draw, one column per parameter.
+ * Draws are processed one row at a time.
+ * Return code indicates success or type of error.
+ *
+ * @tparam Model model class
+ * @param[in] model instantiated model
+ * @param[in] draws sequence of draws of constrained parameters
+ * @param[in] seed seed to use for randomization
+ * @param[in, out] interrupt called every iteration
+ * @param[in, out] logger logger to which to write warning and error messages
+ * @param[in, out] sample_writer writer to which draws are written
+ * @return error code
+ */
+template <class Model>
+int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
+                        unsigned int seed, callbacks::interrupt &interrupt,
+                        callbacks::logger &logger,
+                        callbacks::writer &sample_writer) {
+  if (draws.size() == 0) {
+    logger.error("Empty set of draws from fitted model.");
+    return error_codes::DATAERR;
+  }
+
+  std::vector<std::string> p_names;
+  model.constrained_param_names(p_names, false, false);
+  std::vector<std::string> gq_names;
+  model.constrained_param_names(gq_names, false, true);
+  if (!(p_names.size() < gq_names.size())) {
+    logger.error("Model doesn't generate any quantities of interest.");
+    return error_codes::CONFIG;
+  }
+
+  std::stringstream msg;
+  if (p_names.size() != draws.cols()) {
+    msg << "Wrong number of parameter values in draws from fitted model.  ";
+    msg << "Expecting " << p_names.size() << " columns, ";
+    msg << "found " << draws.cols() << " columns.";
+    std::string msgstr = msg.str();
+    logger.error(msgstr);
+    return error_codes::DATAERR;
+  }
+  util::gq_writer writer(sample_writer, logger, p_names.size());
+  writer.write_gq_names(model);
+
+  boost::ecuyer1988 rng = util::create_rng(seed, 1);
+  std::vector<std::string> param_names;
+  std::vector<std::vector<size_t>> param_dimss;
+  get_model_parameters(model, param_names, param_dimss);
+
+  std::vector<int> dummy_params_i;
+  std::vector<double> unconstrained_params_r;
+  for (size_t i = 0; i < draws.rows(); ++i) {
+    dummy_params_i.clear();
+    unconstrained_params_r.clear();
+    try {
+      stan::io::array_var_context context(param_names, draws.row(i),
+                                          param_dimss);
+      model.transform_inits(context, dummy_params_i, unconstrained_params_r,
+                            &msg);
+    } catch (const std::exception &e) {
+      if (msg.str().length() > 0)
+        logger.error(msg);
+      logger.error(e.what());
+      return error_codes::DATAERR;
+    }
+    interrupt();  // call out to interrupt and fail
+    writer.write_gq_values(model, rng, unconstrained_params_r);
+  }
+  return error_codes::OK;
+}
+
+}  // namespace services
+}  // namespace stan
 #endif

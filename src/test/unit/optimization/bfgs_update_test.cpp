@@ -4,7 +4,7 @@
 TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
   const int nDim = 10;
 
-  typedef stan::optimization::BFGSUpdate_HInv<double,nDim> QNUpdateT;
+  typedef stan::optimization::BFGSUpdate_HInv<double, nDim> QNUpdateT;
   typedef QNUpdateT::VectorT VectorT;
 
   QNUpdateT bfgsUp;
@@ -18,19 +18,19 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
     sk[i] = 1;
     yk[i] = 1;
 
-    bfgsUp.update(yk,sk,i==0);
+    bfgsUp.update(yk, sk, i == 0);
 
     // Because the constructed update vectors are all orthogonal the secant
-    // equation should be exactlty satisfied for all nDim updates.
+    // equation should be exactly satisfied for all nDim updates.
     for (int j = 0; j <= i; j++) {
       sk.setZero(nDim);
       yk.setZero(nDim);
       sk[i - j] = 1;
       yk[i - j] = 1;
 
-      bfgsUp.search_direction(sdir,yk);
-      
-      EXPECT_NEAR((sdir + sk).norm(),0.0,1e-10);
+      bfgsUp.search_direction(sdir, yk);
+
+      EXPECT_NEAR((sdir + sk).norm(), 0.0, 1e-10);
     }
   }
 }
@@ -38,7 +38,7 @@ TEST(OptimizationBfgsUpdate, bfgs_update_secant) {
 TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
   const int nDim = 10;
 
-  typedef stan::optimization::BFGSUpdate_HInv<double,nDim> QNUpdateT;
+  typedef stan::optimization::BFGSUpdate_HInv<double, nDim> QNUpdateT;
   typedef QNUpdateT::VectorT VectorT;
 
   QNUpdateT bfgsUp;
@@ -50,13 +50,13 @@ TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_update) {
     sk[i] = 1;
     yk[i] = 1;
 
-    bfgsUp.update(yk,sk,i==0);
+    bfgsUp.update(yk, sk, i == 0);
   }
 }
 
 TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_search_direction) {
   const int nDim = 10;
-  typedef stan::optimization::BFGSUpdate_HInv<double,nDim> QNUpdateT;
+  typedef stan::optimization::BFGSUpdate_HInv<double, nDim> QNUpdateT;
   typedef QNUpdateT::VectorT VectorT;
 
   QNUpdateT bfgsUp;
@@ -65,15 +65,14 @@ TEST(OptimizationBfgsUpdate, BFGSUpdate_HInv_search_direction) {
   yk.setZero(nDim);
   sk[0] = 1;
   yk[0] = 1;
-  bfgsUp.update(yk,sk,true);
+  bfgsUp.update(yk, sk, true);
 
   for (int i = 0; i < nDim; i++) {
-
     for (int j = 0; j <= i; j++) {
       yk.setZero(nDim);
       yk[i - j] = 1;
-      
-      bfgsUp.search_direction(sdir,yk);
+
+      bfgsUp.search_direction(sdir, yk);
     }
   }
 }

@@ -1,13 +1,5 @@
-PYTHON2 ?= python
-# Check version because new distros have python to default to Python3
-PYTHON_VERSION := $(shell $(PYTHON2) -c "print(__import__('sys').version.split(' ' )[0].split('.')[0])")
-ifeq ($(PYTHON_VERSION),)
-  $(warning Python2 required by cpplint, but PYTHON2=$(PYTHON2) not found. See 'make help')
-endif
-ifeq ($(PYTHON_VERSION),3)
-  $(warning Python2 required by cpplint, but PYTHON2=$(PYTHON2) is Python3. See 'make help')
-endif
+PYTHON ?= python
 
 .PHONY: cpplint
 cpplint:
-	@$(PYTHON2) $(CPPLINT)/cpplint.py --output=vs7 --counting=detailed --root=src --extension=hpp,cpp --filter=-runtime/indentation_namespace,-readability/namespace,-legal/copyright,-whitespace/indent,-runtime/reference $(shell find src/stan -name '*.hpp' -o -name '*.cpp')
+	@$(PYTHON) $(CPPLINT)/cpplint.py --output=vs7 --counting=detailed --root=src --extension=hpp,cpp --filter=-runtime/indentation_namespace,-build/c++11,-readability/namespace,-legal/copyright,-whitespace/indent,-runtime/reference,-build/header_guard,-build/include_order,-build/include_what_you_use,-runtime/string,-build/namespaces $(call findfiles,src/stan,*.hpp) $(call findfiles,src/stan,*.cpp)

@@ -15,9 +15,8 @@
  */
 
 class ServicesSampleHmcNutsDiagEMassMatrix : public testing::Test {
-public:
-  ServicesSampleHmcNutsDiagEMassMatrix()
-    : model(context, &model_log) {}
+ public:
+  ServicesSampleHmcNutsDiagEMassMatrix() : model(context, 0, &model_log) {}
 
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
@@ -41,32 +40,15 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, unit_e_no_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  int return_code =
-    stan::services::sample::hmc_nuts_diag_e(model,
-                                            context,
-                                            random_seed,
-                                            chain,
-                                            init_radius,
-                                            num_warmup,
-                                            num_samples,
-                                            num_thin,
-                                            save_warmup,
-                                            refresh,
-                                            stepsize,
-                                            stepsize_jitter,
-                                            max_depth,
-                                            interrupt,
-                                            logger,
-                                            init,
-                                            parameter,
-                                            diagnostic);
+  int return_code = stan::services::sample::hmc_nuts_diag_e(
+      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
+      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
+      interrupt, logger, init, parameter, diagnostic);
   EXPECT_EQ(0, return_code);
 
-  stan::io::dump dmp =
-    stan::services::util::create_unit_e_diag_inv_metric(3);
+  stan::io::dump dmp = stan::services::util::create_unit_e_diag_inv_metric(3);
   stan::io::var_context& inv_metric = dmp;
-  std::vector<double> diag_vals
-    = inv_metric.vals_r("inv_metric");
+  std::vector<double> diag_vals = inv_metric.vals_r("inv_metric");
   stan::test::unit::check_adaptation(3, diag_vals, parameter, 0.2);
 }
 
@@ -93,32 +75,11 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, unit_e_adapt_250) {
   EXPECT_EQ(interrupt.call_count(), 0);
 
   // run sampler with unit_e Euclidean metric, 250 warmups
-  int return_code =
-    stan::services::sample::hmc_nuts_diag_e_adapt(model,
-                                                  context,
-                                                  random_seed,
-                                                  chain,
-                                                  init_radius,
-                                                  num_warmup,
-                                                  num_samples,
-                                                  num_thin,
-                                                  save_warmup,
-                                                  refresh,
-                                                  stepsize,
-                                                  stepsize_jitter,
-                                                  max_depth,
-                                                  delta,
-                                                  gamma,
-                                                  kappa,
-                                                  t0,
-                                                  init_buffer,
-                                                  term_buffer,
-                                                  window,
-                                                  interrupt,
-                                                  logger,
-                                                  init,
-                                                  parameter,
-                                                  diagnostic);
+  int return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
+      model, context, random_seed, chain, init_radius, num_warmup, num_samples,
+      num_thin, save_warmup, refresh, stepsize, stepsize_jitter, max_depth,
+      delta, gamma, kappa, t0, init_buffer, term_buffer, window, interrupt,
+      logger, init, parameter, diagnostic);
   EXPECT_EQ(0, return_code);
 }
 
@@ -137,32 +98,16 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_metric_no_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  std::string txt =
-    "inv_metric <- structure(c(0.787405, 0.884987, 1.19869),.Dim=c(3))";
+  std::string txt
+      = "inv_metric <- structure(c(0.787405, 0.884987, 1.19869),.Dim=c(3))";
   std::stringstream in(txt);
   stan::io::dump dump(in);
   stan::io::var_context& inv_metric = dump;
 
-  int return_code =
-    stan::services::sample::hmc_nuts_diag_e(model,
-                                            context,
-                                            inv_metric,
-                                            random_seed,
-                                            chain,
-                                            init_radius,
-                                            num_warmup,
-                                            num_samples,
-                                            num_thin,
-                                            save_warmup,
-                                            refresh,
-                                            stepsize,
-                                            stepsize_jitter,
-                                            max_depth,
-                                            interrupt,
-                                            logger,
-                                            init,
-                                            parameter,
-                                            diagnostic);
+  int return_code = stan::services::sample::hmc_nuts_diag_e(
+      model, context, inv_metric, random_seed, chain, init_radius, num_warmup,
+      num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
+      max_depth, interrupt, logger, init, parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
 
@@ -195,39 +140,17 @@ TEST_F(ServicesSampleHmcNutsDiagEMassMatrix, use_metric_skip_adapt) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  std::string txt =
-    "inv_metric <- structure(c(0.787405, 0.884987, 1.19869),.Dim=c(3))";
+  std::string txt
+      = "inv_metric <- structure(c(0.787405, 0.884987, 1.19869),.Dim=c(3))";
   std::stringstream in(txt);
   stan::io::dump dump(in);
   stan::io::var_context& inv_metric = dump;
 
-  int return_code =
-    stan::services::sample::hmc_nuts_diag_e_adapt(model,
-                                                  context,
-                                                  inv_metric,
-                                                  random_seed,
-                                                  chain,
-                                                  init_radius,
-                                                  num_warmup,
-                                                  num_samples,
-                                                  num_thin,
-                                                  save_warmup,
-                                                  refresh,
-                                                  stepsize,
-                                                  stepsize_jitter,
-                                                  max_depth,
-                                                  delta,
-                                                  gamma,
-                                                  kappa,
-                                                  t0,
-                                                  init_buffer,
-                                                  term_buffer,
-                                                  window,
-                                                  interrupt,
-                                                  logger,
-                                                  init,
-                                                  parameter,
-                                                  diagnostic);
+  int return_code = stan::services::sample::hmc_nuts_diag_e_adapt(
+      model, context, inv_metric, random_seed, chain, init_radius, num_warmup,
+      num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
+      max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
+      interrupt, logger, init, parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
 
