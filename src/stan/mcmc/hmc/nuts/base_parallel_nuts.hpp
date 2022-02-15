@@ -259,12 +259,16 @@ class base_parallel_nuts
 
     // now wire up the fwd and bck build of the trees which
     // depends on single-core or multi-core run
+    // TODO (Steve) We should only use this class if get_num_threads > 1
+    // Else just use the non-parallel nuts.
     const bool run_serial = stan::math::internal::get_num_threads() == 1;
 
     std::size_t fwd_idx = 0;
     std::size_t bck_idx = 0;
     // TODO: the extenders should also check for a global flag if
     // we want to keep running
+    // TODO: We should also just run depth = 0 outside the loop to avoid the
+    // if statement here
     for (std::size_t depth = 0; depth != this->max_depth_; ++depth) {
       if (fwd_direction[depth]) {
         builder_iter_t fwd_iter
@@ -330,7 +334,7 @@ class base_parallel_nuts
       // joins.push_back(joiner_t(g));
       // std::cout << "creating check at depth " << depth << std::endl;
       checks.emplace_back(g, [&, depth](continue_msg) {
-        bool is_fwd = fwd_direction[depth];
+        const bool is_fwd = fwd_direction[depth];
 
         extend_tree_t& subtree_result = ends[depth];
 
@@ -344,10 +348,10 @@ class base_parallel_nuts
           sum_metro_prob += std::get<6>(subtree_result);
         }
 
-        bool valid_subtree = is_fwd ? valid_subtree_fwd[all_builder_idx[depth]]
+        const bool valid_subtree = is_fwd ? valid_subtree_fwd[all_builder_idx[depth]]
                                     : valid_subtree_bck[all_builder_idx[depth]];
 
-        bool is_valid = valid_subtree & this->valid_trees_;
+        const bool is_valid = valid_subtree & this->valid_trees_;
 
         // std::cout << "CHECK at depth " << depth;
 
