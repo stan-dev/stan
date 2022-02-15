@@ -1,9 +1,10 @@
-#ifndef STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
-#define STAN_MCMC_HMC_NUTS_BASE_NUTS_HPP
+#ifndef STAN_MCMC_HMC_NUTS_BASE_PARALLEL_NUTS_HPP
+#define STAN_MCMC_HMC_NUTS_BASE_PARALLEL_NUTS_HPP
 
 #include <stan/callbacks/logger.hpp>
 #include <stan/math/prim.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
+#include <stan/mcmc/hmc/base_parallel_nuts.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <algorithm>
 #include <cmath>
@@ -21,6 +22,19 @@
 
 using namespace tbb::flow;
 
+template <typename BaseRNG>
+inline auto make_uniform_vec(std::vector<BaseRNG>& thread_rngs) {
+  /*
+  std::vector<boost::uniform_01<BaseRNG&>> rand_uniform_vec;
+  const size_t num_thread_rngs = thread_rngs.size();
+  rand_uniform_vec.reserve(num_thread_rngs);
+  for (size_t i = 0; i < rand_uniform_vec.size(); ++i) {
+    rand_uniform_vec.emplace_back(thread_rngs[i]);
+  }
+  */
+  return std::vector<boost::uniform_01<BaseRNG&>>(thread_rngs.begin(), thread_rngs.end());
+}
+
 // Prototype of speculative NUTS.
 // Uses the Intel Flow Graph concept to turn NUTS into a parallel
 // algorithm in that the forward and backward sweep run at the same
@@ -28,64 +42,66 @@ using namespace tbb::flow;
 
 namespace stan {
   namespace mcmc {
+
     /**
      * The No-U-Turn sampler (NUTS) with multinomial sampling
      */
     template <class Model, template<class, class> class Hamiltonian,
               template<class> class Integrator, class BaseRNG>
-    class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
+    class base_parallel_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     public:
-      typedef typename Hamiltonian<Model, BaseRNG>::PointType state_t;
+      using state_t = typename Hamiltonian<Model, BaseRNG>::PointType;
 
-      base_nuts(const Model& model, BaseRNG& rng)
+      base_parallel_nuts(const Model& model, std::vector<BaseRNG>& thread_rngs)
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, thread_rngs[tbb::this_task_arena::current_thread_index()]),
+        rand_uniform_vec_(make_uniform_vec(thread_rngs)) {
+      }
+
+      base_parallel_nuts(const Model& model, BaseRNG& rng, std::vector<BaseRNG>& thread_rngs)
         : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng),
-          depth_(0), max_depth_(5), max_deltaH_(1000), valid_trees_(true),
-          n_leapfrog_(0), divergent_(false), energy_(0) {
+        rand_uniform_vec_(make_uniform_vec(thread_rngs)) {
       }
 
       /**
        * specialized constructor for specified diag mass matrix
        */
-      base_nuts(const Model& model, BaseRNG& rng,
-                Eigen::VectorXd& inv_e_metric)
-        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                            inv_e_metric),
-          depth_(0), max_depth_(5), max_deltaH_(1000), valid_trees_(true),
-          n_leapfrog_(0), divergent_(false), energy_(0) {
+      base_parallel_nuts(const Model& model, BaseRNG& rng,
+                Eigen::VectorXd& inv_e_metric, std::vector<BaseRNG>& thread_rngs)
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng, inv_e_metric),
+        rand_uniform_vec_(make_uniform_vec(thread_rngs)) {
       }
 
       /**
        * specialized constructor for specified dense mass matrix
        */
-      base_nuts(const Model& model, BaseRNG& rng,
-                Eigen::MatrixXd& inv_e_metric)
-        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng,
-                                                            inv_e_metric),
-        depth_(0), max_depth_(5), max_deltaH_(1000), valid_trees_(true),
-        n_leapfrog_(0), divergent_(false), energy_(0) {
+      base_parallel_nuts(const Model& model, BaseRNG& rng,
+                Eigen::MatrixXd& inv_e_metric, std::vector<BaseRNG>& thread_rngs)
+        : base_hmc<Model, Hamiltonian, Integrator, BaseRNG>(model, rng, inv_e_metric),
+        rand_uniform_vec_(make_uniform_vec(thread_rngs)) {
       }
 
-      ~base_nuts() {}
+      ~base_parallel_nuts() {}
 
-      void set_metric(const Eigen::MatrixXd& inv_e_metric) {
+      inline void set_metric(const Eigen::MatrixXd& inv_e_metric) {
         this->z_.set_metric(inv_e_metric);
       }
 
-      void set_metric(const Eigen::VectorXd& inv_e_metric) {
+      inline void set_metric(const Eigen::VectorXd& inv_e_metric) {
         this->z_.set_metric(inv_e_metric);
       }
 
-      void set_max_depth(int d) {
-        if (d > 0)
+      inline void set_max_depth(int d) noexcept {
+        if (d > 0) {
           max_depth_ = d;
+        }
       }
 
-      void set_max_delta(double d) {
+      inline void set_max_delta(double d) noexcept {
         max_deltaH_ = d;
       }
 
-      int get_max_depth() { return this->max_depth_; }
-      double get_max_delta() { return this->max_deltaH_; }
+      inline int get_max_depth() noexcept { return this->max_depth_; }
+      inline double get_max_delta() noexcept { return this->max_deltaH_; }
 
      // stores from left/right subtree entire information
       struct subtree {
@@ -104,19 +120,18 @@ namespace stan {
         ps_point z_end_;
         ps_point z_propose_;
         Eigen::VectorXd p_sharp_end_;
-        const double H0_;
-        const double sign_;
-        int n_leapfrog_;
-        double sum_metro_prob_;
+        double H0_;
+        double sign_;
+        int n_leapfrog_{0};
+        double sum_metro_prob_{0};
       };
 
 
       // extends the tree into the direction of the sign of the
       // subtree
-      typedef std::tuple<bool, double, Eigen::VectorXd, Eigen::VectorXd, ps_point, int, double> extend_tree_t;
+      using extend_tree_t = std::tuple<bool, double, Eigen::VectorXd, Eigen::VectorXd, ps_point, int, double>;
 
-      extend_tree_t
-      extend_tree(int depth, subtree& tree, state_t& z,
+      inline extend_tree_t extend_tree(int depth, subtree& tree, state_t& z,
                   callbacks::logger& logger) {
         // save the current ends needed for later criterion computations
         //Eigen::VectorXd p_end = tree.p_end_;
@@ -147,8 +162,7 @@ namespace stan {
       }
 
 
-      sample
-      transition(sample& init_sample, callbacks::logger& logger) {
+      inline sample transition(sample& init_sample, callbacks::logger& logger) {
         return transition_parallel(init_sample, logger);
       }
 
@@ -753,21 +767,24 @@ namespace stan {
       }
 
       inline double get_rand_uniform() {
-        static std::mutex rng_mutex;
-        std::lock_guard<std::mutex> lock(rng_mutex);
-        return this->rand_uniform_();
+        return this->rand_uniform_vec_[tbb::this_task_arena::current_thread_index()]();
       }
 
-      int depth_;
-      int max_depth_;
-      double max_deltaH_;
-      bool valid_trees_;
-
-      int n_leapfrog_;
-      bool divergent_;
-      double energy_;
+      int depth_{0};
+      int max_depth_{5};
+      double max_deltaH_{1000};
+      int n_leapfrog_{0};
+      double energy_{0};
+      bool valid_trees_{true};
+      bool divergent_{false};
+      // Uniform(0, 1) RNG
+      std::vector<boost::uniform_01<BaseRNG&>> rand_uniform_vec_;
     };
-
+    template <bool ParallelBase, class Model, template<class, class> class Hamiltonian,
+              template<class> class Integrator, class BaseRNG>
+    using base_parallel_nuts_ct = std::conditional_t<ParallelBase,
+     base_parallel_nuts<Model, Hamiltonian, Integrator, BaseRNG>,
+     base_parallel_nuts<Model, Hamiltonian, Integrator, BaseRNG>>;
   }  // mcmc
 }  // stan
 #endif
