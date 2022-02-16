@@ -267,20 +267,20 @@ class base_parallel_nuts
     // if statement here
     for (std::size_t depth = 0; depth != this->max_depth_; ++depth) {
       if (fwd_direction[depth]) {
-        builder_iter_t fwd_iter
-            = fwd_builder.emplace_back(g, [&, depth, fwd_idx](tbb::flow::continue_msg) {
-                // std::cout << "fwd turn at depth " << depth;
-                bool valid_parent
-                    = fwd_idx == 0 ? true : valid_subtree_fwd[fwd_idx - 1];
-                if (valid_parent) {
-                  // std::cout << " yes, here we go!" << std::endl;
-                  ends[depth] = extend_tree(depth, tree_fwd, z_fwd, logger_fwd);
-                  valid_subtree_fwd[fwd_idx] = std::get<0>(ends[depth]);
-                } else {
-                  valid_subtree_fwd[fwd_idx] = false;
-                }
-                // std::cout << " nothing to do." << std::endl;
-              });
+        builder_iter_t fwd_iter = fwd_builder.emplace_back(
+            g, [&, depth, fwd_idx](tbb::flow::continue_msg) {
+              // std::cout << "fwd turn at depth " << depth;
+              bool valid_parent
+                  = fwd_idx == 0 ? true : valid_subtree_fwd[fwd_idx - 1];
+              if (valid_parent) {
+                // std::cout << " yes, here we go!" << std::endl;
+                ends[depth] = extend_tree(depth, tree_fwd, z_fwd, logger_fwd);
+                valid_subtree_fwd[fwd_idx] = std::get<0>(ends[depth]);
+              } else {
+                valid_subtree_fwd[fwd_idx] = false;
+              }
+              // std::cout << " nothing to do." << std::endl;
+            });
         if (!run_serial && fwd_idx != 0) {
           // in this case this is not the starting node, we
           // connect this with its predecessor
@@ -289,20 +289,20 @@ class base_parallel_nuts
         all_builder_idx[depth] = fwd_idx;
         ++fwd_idx;
       } else {
-        builder_iter_t bck_iter
-            = bck_builder.emplace_back(g, [&, depth, bck_idx](tbb::flow::continue_msg) {
-                // std::cout << "bck turn at depth " << depth;
-                bool valid_parent
-                    = bck_idx == 0 ? true : valid_subtree_bck[bck_idx - 1];
-                if (valid_parent) {
-                  // std::cout << " yes, here we go!" << std::endl;
-                  ends[depth] = extend_tree(depth, tree_bck, z_bck, logger_bck);
-                  valid_subtree_bck[bck_idx] = std::get<0>(ends[depth]);
-                } else {
-                  valid_subtree_bck[bck_idx] = false;
-                }
-                // std::cout << " nothing to do." << std::endl;
-              });
+        builder_iter_t bck_iter = bck_builder.emplace_back(
+            g, [&, depth, bck_idx](tbb::flow::continue_msg) {
+              // std::cout << "bck turn at depth " << depth;
+              bool valid_parent
+                  = bck_idx == 0 ? true : valid_subtree_bck[bck_idx - 1];
+              if (valid_parent) {
+                // std::cout << " yes, here we go!" << std::endl;
+                ends[depth] = extend_tree(depth, tree_bck, z_bck, logger_bck);
+                valid_subtree_bck[bck_idx] = std::get<0>(ends[depth]);
+              } else {
+                valid_subtree_bck[bck_idx] = false;
+              }
+              // std::cout << " nothing to do." << std::endl;
+            });
         if (!run_serial && bck_idx != 0) {
           // in case this is not the starting node, we connect
           // this with his predecessor
@@ -344,8 +344,9 @@ class base_parallel_nuts
           sum_metro_prob += std::get<6>(subtree_result);
         }
 
-        const bool valid_subtree = is_fwd ? valid_subtree_fwd[all_builder_idx[depth]]
-                                    : valid_subtree_bck[all_builder_idx[depth]];
+        const bool valid_subtree
+            = is_fwd ? valid_subtree_fwd[all_builder_idx[depth]]
+                     : valid_subtree_bck[all_builder_idx[depth]];
 
         const bool is_valid = valid_subtree & this->valid_trees_;
 
@@ -403,11 +404,13 @@ class base_parallel_nuts
       if (fwd_direction[depth]) {
         // std::cout << "depth " << depth << ": joining fwd node " <<
         // all_builder_idx[depth] << " into join node." << std::endl;
-        tbb::flow::make_edge(fwd_builder[all_builder_idx[depth]], checks.back());
+        tbb::flow::make_edge(fwd_builder[all_builder_idx[depth]],
+                             checks.back());
       } else {
         // std::cout << "depth " << depth << ": joining bck node " <<
         // all_builder_idx[depth] << " into join node." << std::endl;
-        tbb::flow::make_edge(bck_builder[all_builder_idx[depth]], checks.back());
+        tbb::flow::make_edge(bck_builder[all_builder_idx[depth]],
+                             checks.back());
       }
       if (!run_serial && depth != 0) {
         tbb::flow::make_edge(checks[depth - 1], checks.back());
@@ -416,9 +419,9 @@ class base_parallel_nuts
 
     if (run_serial) {
       for (std::size_t i = 1; i < this->max_depth_; ++i) {
-        tbb::flow::make_edge(checks[i - 1], fwd_direction[i]
-                                     ? fwd_builder[all_builder_idx[i]]
-                                     : bck_builder[all_builder_idx[i]]);
+        tbb::flow::make_edge(
+            checks[i - 1], fwd_direction[i] ? fwd_builder[all_builder_idx[i]]
+                                            : bck_builder[all_builder_idx[i]]);
       }
     }
 

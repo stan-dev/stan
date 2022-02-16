@@ -107,8 +107,9 @@ int hmc_nuts_diag_e_adapt_parallel(
       tbb::blocked_range<size_t>(0, num_chains, 1),
       [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
        init_chain_id, &ret_code, &model, &rngs, &interrupt, &logger,
-       &sample_writer, &init, &init_writer, &init_inv_metric, init_radius, delta, stepsize, max_depth,
-       stepsize_jitter, gamma, kappa, t0, init_buffer, term_buffer, window,
+       &sample_writer, &init, &init_writer, &init_inv_metric, init_radius,
+       delta, stepsize, max_depth, stepsize_jitter, gamma, kappa, t0,
+       init_buffer, term_buffer, window,
        &diagnostic_writer](const tbb::blocked_range<size_t>& r) {
         boost::ecuyer1988& thread_rng
             = rngs[tbb::this_task_arena::current_thread_index()];
@@ -213,10 +214,10 @@ int hmc_nuts_diag_e_adapt_parallel(
     std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (stan::math::internal::get_num_threads() == 1) {
     return hmc_nuts_diag_e_adapt(
-        model, num_chains, init, random_seed, init_chain_id, init_radius, num_warmup,
-        num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-        max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-        interrupt, logger, init_writer, sample_writer,
+        model, num_chains, init, random_seed, init_chain_id, init_radius,
+        num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
+        stepsize_jitter, max_depth, delta, gamma, kappa, t0, init_buffer,
+        term_buffer, window, interrupt, logger, init_writer, sample_writer,
         diagnostic_writer);
   }
   std::vector<std::unique_ptr<stan::io::dump>> unit_e_metrics;
