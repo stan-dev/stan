@@ -1667,3 +1667,11 @@ TEST_F(VarAssign, all_types) {
   Eigen::MatrixXd x_long = generate_linear_matrix(7, 4);
   all_assign_tests(x_long);
 }
+
+TEST(ModelIndexing, size_zero_assign) {
+  stan::math::var_value<Eigen::MatrixXd> A;
+  stan::math::var_value<Eigen::MatrixXd> B = Eigen::MatrixXd::Random(3, 3);
+  stan::model::assign(A, B, "varmat to varmat");
+  stan::math::var_value<Eigen::MatrixXd> C;
+  stan::model::assign(C, Eigen::MatrixXd::Random(3, 3), "rvalue_double");
+}
