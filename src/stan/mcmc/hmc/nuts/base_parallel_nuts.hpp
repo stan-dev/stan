@@ -4,7 +4,6 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/math/prim.hpp>
 #include <stan/mcmc/hmc/base_hmc.hpp>
-#include <stan/mcmc/hmc/base_parallel_nuts.hpp>
 #include <stan/mcmc/hmc/hamiltonians/ps_point.hpp>
 #include <algorithm>
 #include <cmath>
@@ -16,11 +15,16 @@
 
 #include <stan/math/prim/core/init_threadpool_tbb.hpp>
 
-#include "tbb/task_scheduler_init.h"
-#include "tbb/flow_graph.h"
-#include "tbb/concurrent_vector.h"
+#include <tbb/flow_graph.h>
+#include <tbb/concurrent_vector.h>
 
-using namespace tbb::flow;
+// Prototype of speculative NUTS.
+// Uses the Intel Flow Graph concept to turn NUTS into a parallel
+// algorithm in that the forward and backward sweep run at the same
+// time in parallel.
+
+namespace stan {
+namespace mcmc {
 
 template <typename BaseRNG>
 inline auto make_uniform_vec(std::vector<BaseRNG>& thread_rngs) {
@@ -35,14 +39,6 @@ inline auto make_uniform_vec(std::vector<BaseRNG>& thread_rngs) {
   return std::vector<boost::uniform_01<BaseRNG&>>(thread_rngs.begin(),
                                                   thread_rngs.end());
 }
-
-// Prototype of speculative NUTS.
-// Uses the Intel Flow Graph concept to turn NUTS into a parallel
-// algorithm in that the forward and backward sweep run at the same
-// time in parallel.
-
-namespace stan {
-namespace mcmc {
 
 /**
  * The No-U-Turn sampler (NUTS) with multinomial sampling
@@ -247,15 +243,15 @@ class base_parallel_nuts
     callbacks::logger logger_bck;
 
     // build TBB flow graph
-    graph g;
+    tbb::flow::graph g;
 
     // add nodes which advance the left/right tree
-    typedef continue_node<continue_msg> tree_builder_t;
+    using tree_builder_t = tbb::flow::continue_node<tbb::flow::continue_msg>;
 
     tbb::concurrent_vector<std::size_t> all_builder_idx(this->max_depth_);
     tbb::concurrent_vector<tree_builder_t> fwd_builder;
     tbb::concurrent_vector<tree_builder_t> bck_builder;
-    typedef tbb::concurrent_vector<tree_builder_t>::iterator builder_iter_t;
+    using builder_iter_t = tbb::concurrent_vector<tree_builder_t>::iterator;
 
     // now wire up the fwd and bck build of the trees which
     // depends on single-core or multi-core run
@@ -272,7 +268,7 @@ class base_parallel_nuts
     for (std::size_t depth = 0; depth != this->max_depth_; ++depth) {
       if (fwd_direction[depth]) {
         builder_iter_t fwd_iter
-            = fwd_builder.emplace_back(g, [&, depth, fwd_idx](continue_msg) {
+            = fwd_builder.emplace_back(g, [&, depth, fwd_idx](tbb::flow::continue_msg) {
                 // std::cout << "fwd turn at depth " << depth;
                 bool valid_parent
                     = fwd_idx == 0 ? true : valid_subtree_fwd[fwd_idx - 1];
@@ -288,13 +284,13 @@ class base_parallel_nuts
         if (!run_serial && fwd_idx != 0) {
           // in this case this is not the starting node, we
           // connect this with its predecessor
-          make_edge(*(fwd_iter - 1), *fwd_iter);
+          tbb::flow::make_edge(*(fwd_iter - 1), *fwd_iter);
         }
         all_builder_idx[depth] = fwd_idx;
         ++fwd_idx;
       } else {
         builder_iter_t bck_iter
-            = bck_builder.emplace_back(g, [&, depth, bck_idx](continue_msg) {
+            = bck_builder.emplace_back(g, [&, depth, bck_idx](tbb::flow::continue_msg) {
                 // std::cout << "bck turn at depth " << depth;
                 bool valid_parent
                     = bck_idx == 0 ? true : valid_subtree_bck[bck_idx - 1];
@@ -310,8 +306,8 @@ class base_parallel_nuts
         if (!run_serial && bck_idx != 0) {
           // in case this is not the starting node, we connect
           // this with his predecessor
-          // make_edge(bck_builder[bck_idx-1], bck_builder[bck_idx]);
-          make_edge(*(bck_iter - 1), *bck_iter);
+          // tbb::flow::make_edge(bck_builder[bck_idx-1], bck_builder[bck_idx]);
+          tbb::flow::make_edge(*(bck_iter - 1), *bck_iter);
         }
         all_builder_idx[depth] = bck_idx;
         ++bck_idx;
@@ -322,7 +318,7 @@ class base_parallel_nuts
     // proposed states from the subtrees
     // typedef function_node< tbb::flow::tuple<bool, bool>, bool> checker_t;
     // typedef join_node< tbb::flow::tuple<bool,bool> > joiner_t;
-    typedef continue_node<continue_msg> checker_t;
+    using checker_t = tbb::flow::continue_node<tbb::flow::continue_msg>;
 
     tbb::concurrent_vector<checker_t> checks;
     // std::vector<joiner_t> joins;
@@ -333,7 +329,7 @@ class base_parallel_nuts
     for (std::size_t depth = 0; depth != this->max_depth_; ++depth) {
       // joins.push_back(joiner_t(g));
       // std::cout << "creating check at depth " << depth << std::endl;
-      checks.emplace_back(g, [&, depth](continue_msg) {
+      checks.emplace_back(g, [&, depth](tbb::flow::continue_msg) {
         const bool is_fwd = fwd_direction[depth];
 
         extend_tree_t& subtree_result = ends[depth];
@@ -407,20 +403,20 @@ class base_parallel_nuts
       if (fwd_direction[depth]) {
         // std::cout << "depth " << depth << ": joining fwd node " <<
         // all_builder_idx[depth] << " into join node." << std::endl;
-        make_edge(fwd_builder[all_builder_idx[depth]], checks.back());
+        tbb::flow::make_edge(fwd_builder[all_builder_idx[depth]], checks.back());
       } else {
         // std::cout << "depth " << depth << ": joining bck node " <<
         // all_builder_idx[depth] << " into join node." << std::endl;
-        make_edge(bck_builder[all_builder_idx[depth]], checks.back());
+        tbb::flow::make_edge(bck_builder[all_builder_idx[depth]], checks.back());
       }
       if (!run_serial && depth != 0) {
-        make_edge(checks[depth - 1], checks.back());
+        tbb::flow::make_edge(checks[depth - 1], checks.back());
       }
     }
 
     if (run_serial) {
       for (std::size_t i = 1; i < this->max_depth_; ++i) {
-        make_edge(checks[i - 1], fwd_direction[i]
+        tbb::flow::make_edge(checks[i - 1], fwd_direction[i]
                                      ? fwd_builder[all_builder_idx[i]]
                                      : bck_builder[all_builder_idx[i]]);
       }
@@ -428,14 +424,14 @@ class base_parallel_nuts
 
     // kick off work
     if (fwd_direction[0]) {
-      fwd_builder[0].try_put(continue_msg());
+      fwd_builder[0].try_put(tbb::flow::continue_msg());
       // the first turn is fwd, so kick off the bck walker if needed
       if (!run_serial && num_bck != 0)
-        bck_builder[0].try_put(continue_msg());
+        bck_builder[0].try_put(tbb::flow::continue_msg());
     } else {
-      bck_builder[0].try_put(continue_msg());
+      bck_builder[0].try_put(tbb::flow::continue_msg());
       if (!run_serial && num_fwd != 0)
-        fwd_builder[0].try_put(continue_msg());
+        fwd_builder[0].try_put(tbb::flow::continue_msg());
     }
 
     g.wait_for_all();
@@ -775,12 +771,14 @@ class base_parallel_nuts
   // Uniform(0, 1) RNG
   std::vector<boost::uniform_01<BaseRNG&>> rand_uniform_vec_;
 };
+
 template <bool ParallelBase, class Model,
           template <class, class> class Hamiltonian,
           template <class> class Integrator, class BaseRNG>
-using base_parallel_nuts_ct = std::conditional_t<
+using base_nuts_ct = std::conditional_t<
     ParallelBase, base_parallel_nuts<Model, Hamiltonian, Integrator, BaseRNG>,
-    base_parallel_nuts<Model, Hamiltonian, Integrator, BaseRNG>>;
+    base_nuts<Model, Hamiltonian, Integrator, BaseRNG>>;
+
 }  // namespace mcmc
 }  // namespace stan
 #endif
