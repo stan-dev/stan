@@ -1,7 +1,3 @@
-// TODO
-// Ensure proper cleanup
-// https://github.com/stan-dev/stan/pull/3093
-
 @Library('StanUtils')
 import org.stan.Utils
 
@@ -12,7 +8,6 @@ def setupCXX(failOnError = true, CXX = CXX, String stanc3_bin_url = "nightly") {
     errorStr = failOnError ? "-Werror " : ""
     stanc3_bin_url_str = stanc3_bin_url != "nightly" ? "\nSTANC3_TEST_BIN_URL=${stanc3_bin_url}\n" : ""
     writeFile(file: "make/local", text: "CXX=${CXX} -Wno-inconsistent-missing-override ${errorStr}${stanc3_bin_url_str}")
-    // echo "CXXFLAGS += -Wno-inconsistent-missing-override" >> make/local
 }
 
 def runTests(String testPath, Boolean separateMakeStep=true) {
@@ -254,14 +249,14 @@ pipeline {
             parallel {
                 stage('Windows Headers & Unit') {
                     agent { label 'windows' }
-//                     when {
-//                         expression {
-//                             ( env.BRANCH_NAME == "develop" ||
-//                             env.BRANCH_NAME == "master" ||
-//                             params.run_tests_all_os ) &&
-//                             !skipRemainingStages
-//                         }
-//                     }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         deleteDirWin()
                             unstash 'StanSetup'
@@ -298,14 +293,14 @@ pipeline {
                 }
                 stage('Mac Unit') {
                 agent { label 'osx' }
-//                     when {
-//                         expression {
-//                             ( env.BRANCH_NAME == "develop" ||
-//                             env.BRANCH_NAME == "master" ||
-//                             params.run_tests_all_os ) &&
-//                             !skipRemainingStages
-//                         }
-//                     }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(false, MAC_CXX, stanc3_bin_url())
@@ -389,14 +384,14 @@ pipeline {
                 }
                 stage('Integration Mac') {
                     agent { label 'osx' }
-//                     when {
-//                         expression {
-//                             ( env.BRANCH_NAME == "develop" ||
-//                             env.BRANCH_NAME == "master" ||
-//                             params.run_tests_all_os ) &&
-//                             !skipRemainingStages
-//                         }
-//                     }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         sh """
                             git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
@@ -425,14 +420,14 @@ pipeline {
                 }
                 stage('Integration Windows') {
                     agent { label 'windows' }
-//                     when {
-//                         expression {
-//                             ( env.BRANCH_NAME == "develop" ||
-//                             env.BRANCH_NAME == "master" ||
-//                             params.run_tests_all_os ) &&
-//                             !skipRemainingStages
-//                         }
-//                     }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
                     steps {
                         deleteDirWin()
                         bat """
