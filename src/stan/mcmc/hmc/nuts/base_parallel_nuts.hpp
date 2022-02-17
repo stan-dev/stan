@@ -263,7 +263,8 @@ class base_parallel_nuts
     // we want to keep running
     // TODO: We should also just run depth = 0 outside the loop to avoid the
     // if statement here
-    for (std::size_t depth = 0, fwd_idx = 0, bck_idx = 0; depth != this->max_depth_; ++depth) {
+    for (std::size_t depth = 0, fwd_idx = 0, bck_idx = 0;
+         depth != this->max_depth_; ++depth) {
       if (fwd_direction[depth]) {
         builder_iter_t fwd_iter = fwd_builder.emplace_back(
             g, [&, depth, fwd_idx](tbb::flow::continue_msg) {

@@ -16,18 +16,21 @@ template <class Model, class BaseRNG, bool ParallelBase = false>
 class adapt_diag_e_nuts : public diag_e_nuts<Model, BaseRNG, ParallelBase>,
                           public stepsize_var_adapter {
  public:
-  template <bool ParallelBase_ = ParallelBase, std::enable_if_t<!ParallelBase_>* = nullptr>
+  template <bool ParallelBase_ = ParallelBase,
+            std::enable_if_t<!ParallelBase_>* = nullptr>
   adapt_diag_e_nuts(const Model& model, BaseRNG& rng)
       : diag_e_nuts<Model, BaseRNG, ParallelBase>(model, rng),
         stepsize_var_adapter(model.num_params_r()) {}
 
-  template <bool ParallelBase_ = ParallelBase, std::enable_if_t<ParallelBase_>* = nullptr>
+  template <bool ParallelBase_ = ParallelBase,
+            std::enable_if_t<ParallelBase_>* = nullptr>
   adapt_diag_e_nuts(const Model& model, std::vector<BaseRNG>& thread_rngs)
-  : diag_e_nuts<Model, BaseRNG, ParallelBase>(model, thread_rngs),
-    stepsize_var_adapter(model.num_params_r()) {}
+      : diag_e_nuts<Model, BaseRNG, ParallelBase>(model, thread_rngs),
+        stepsize_var_adapter(model.num_params_r()) {}
 
   inline sample transition(sample& init_sample, callbacks::logger& logger) {
-    sample s = diag_e_nuts<Model, BaseRNG, ParallelBase>::transition(init_sample, logger);
+    sample s = diag_e_nuts<Model, BaseRNG, ParallelBase>::transition(
+        init_sample, logger);
 
     if (this->adapt_flag_) {
       this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,
