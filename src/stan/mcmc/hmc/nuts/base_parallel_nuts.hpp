@@ -239,9 +239,10 @@ class base_parallel_nuts
     tbb::concurrent_vector<bool> valid_subtree_bck(num_bck, true);
 
     // HACK!!!
+    /*
     callbacks::logger logger_fwd;
     callbacks::logger logger_bck;
-
+    */
     // build TBB flow graph
     tbb::flow::graph g;
 
@@ -250,22 +251,19 @@ class base_parallel_nuts
 
     tbb::concurrent_vector<std::size_t> all_builder_idx(this->max_depth_);
     tbb::concurrent_vector<tree_builder_t> fwd_builder;
+    fwd_builder.reserve(this->max_depth_);
     tbb::concurrent_vector<tree_builder_t> bck_builder;
+    bck_builder.reserve(this->max_depth_);
     using builder_iter_t = tbb::concurrent_vector<tree_builder_t>::iterator;
 
     // now wire up the fwd and bck build of the trees which
     // depends on single-core or multi-core run
-    // TODO (Steve) We should only use this class if get_num_threads > 1
-    // Else just use the non-parallel nuts.
-    const bool run_serial = stan::math::internal::get_num_threads() == 1;
 
-    std::size_t fwd_idx = 0;
-    std::size_t bck_idx = 0;
     // TODO: the extenders should also check for a global flag if
     // we want to keep running
     // TODO: We should also just run depth = 0 outside the loop to avoid the
     // if statement here
-    for (std::size_t depth = 0; depth != this->max_depth_; ++depth) {
+    for (std::size_t depth = 0, fwd_idx = 0, bck_idx = 0; depth != this->max_depth_; ++depth) {
       if (fwd_direction[depth]) {
         builder_iter_t fwd_iter = fwd_builder.emplace_back(
             g, [&, depth, fwd_idx](tbb::flow::continue_msg) {
@@ -274,14 +272,14 @@ class base_parallel_nuts
                   = fwd_idx == 0 ? true : valid_subtree_fwd[fwd_idx - 1];
               if (valid_parent) {
                 // std::cout << " yes, here we go!" << std::endl;
-                ends[depth] = extend_tree(depth, tree_fwd, z_fwd, logger_fwd);
+                ends[depth] = extend_tree(depth, tree_fwd, z_fwd, logger);
                 valid_subtree_fwd[fwd_idx] = std::get<0>(ends[depth]);
               } else {
                 valid_subtree_fwd[fwd_idx] = false;
               }
               // std::cout << " nothing to do." << std::endl;
             });
-        if (!run_serial && fwd_idx != 0) {
+        if (fwd_idx != 0) {
           // in this case this is not the starting node, we
           // connect this with its predecessor
           tbb::flow::make_edge(*(fwd_iter - 1), *fwd_iter);
@@ -296,14 +294,14 @@ class base_parallel_nuts
                   = bck_idx == 0 ? true : valid_subtree_bck[bck_idx - 1];
               if (valid_parent) {
                 // std::cout << " yes, here we go!" << std::endl;
-                ends[depth] = extend_tree(depth, tree_bck, z_bck, logger_bck);
+                ends[depth] = extend_tree(depth, tree_bck, z_bck, logger);
                 valid_subtree_bck[bck_idx] = std::get<0>(ends[depth]);
               } else {
                 valid_subtree_bck[bck_idx] = false;
               }
               // std::cout << " nothing to do." << std::endl;
             });
-        if (!run_serial && bck_idx != 0) {
+        if (bck_idx != 0) {
           // in case this is not the starting node, we connect
           // this with his predecessor
           // tbb::flow::make_edge(bck_builder[bck_idx-1], bck_builder[bck_idx]);
@@ -348,7 +346,7 @@ class base_parallel_nuts
             = is_fwd ? valid_subtree_fwd[all_builder_idx[depth]]
                      : valid_subtree_bck[all_builder_idx[depth]];
 
-        const bool is_valid = valid_subtree & this->valid_trees_;
+        const bool is_valid = valid_subtree && this->valid_trees_;
 
         // std::cout << "CHECK at depth " << depth;
 
@@ -412,16 +410,8 @@ class base_parallel_nuts
         tbb::flow::make_edge(bck_builder[all_builder_idx[depth]],
                              checks.back());
       }
-      if (!run_serial && depth != 0) {
+      if (depth != 0) {
         tbb::flow::make_edge(checks[depth - 1], checks.back());
-      }
-    }
-
-    if (run_serial) {
-      for (std::size_t i = 1; i < this->max_depth_; ++i) {
-        tbb::flow::make_edge(
-            checks[i - 1], fwd_direction[i] ? fwd_builder[all_builder_idx[i]]
-                                            : bck_builder[all_builder_idx[i]]);
       }
     }
 
@@ -429,12 +419,14 @@ class base_parallel_nuts
     if (fwd_direction[0]) {
       fwd_builder[0].try_put(tbb::flow::continue_msg());
       // the first turn is fwd, so kick off the bck walker if needed
-      if (!run_serial && num_bck != 0)
+      if (num_bck != 0) {
         bck_builder[0].try_put(tbb::flow::continue_msg());
+      }
     } else {
       bck_builder[0].try_put(tbb::flow::continue_msg());
-      if (!run_serial && num_fwd != 0)
+      if (num_fwd != 0) {
         fwd_builder[0].try_put(tbb::flow::continue_msg());
+      }
     }
 
     g.wait_for_all();

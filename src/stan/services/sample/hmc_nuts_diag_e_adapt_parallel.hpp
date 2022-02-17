@@ -84,7 +84,8 @@ int hmc_nuts_diag_e_adapt_parallel(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  if (stan::math::internal::get_num_threads() == 1) {
+  if (tbb::this_task_arena::max_concurrency() == 1) {
+    std::cout << "Running serial" << std::endl;
     return hmc_nuts_diag_e_adapt(
         model, num_chains, init, init_inv_metric, random_seed, init_chain_id,
         init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
@@ -92,7 +93,7 @@ int hmc_nuts_diag_e_adapt_parallel(
         init_buffer, term_buffer, window, interrupt, logger, init_writer,
         sample_writer, diagnostic_writer);
   }
-  const int num_threads = stan::math::internal::get_num_threads();
+  const int num_threads = tbb::this_task_arena::max_concurrency();
   std::vector<boost::ecuyer1988> rngs;
   rngs.reserve(num_threads);
   try {
@@ -212,7 +213,8 @@ int hmc_nuts_diag_e_adapt_parallel(
     std::vector<InitWriter>& init_writer,
     std::vector<SampleWriter>& sample_writer,
     std::vector<DiagnosticWriter>& diagnostic_writer) {
-  if (stan::math::internal::get_num_threads() == 1) {
+  if (tbb::this_task_arena::max_concurrency() == 1) {
+    std::cout << "Running serial" << std::endl;
     return hmc_nuts_diag_e_adapt(
         model, num_chains, init, random_seed, init_chain_id, init_radius,
         num_warmup, num_samples, num_thin, save_warmup, refresh, stepsize,
