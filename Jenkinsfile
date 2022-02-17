@@ -494,15 +494,10 @@ pipeline {
                     !skipRemainingStages
                 }
             }
-            agent {
-                docker {
-                    image 'stanorg/ci:gpu'
-                    label 'osx' // oldimac
-                }
-            }
+            agent { label 'oldimac' }
             steps {
                 unstash 'StanSetup'
-                setupCXX(true, MAC_CXX, stanc3_bin_url())
+                setupCXX(true, "/usr/local/opt/llvm@6/bin/clang++", stanc3_bin_url())
                 sh """
                     ./runTests.py -j${PARALLEL} src/test/performance
                     cd test/performance
