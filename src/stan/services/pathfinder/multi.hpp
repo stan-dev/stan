@@ -153,7 +153,7 @@ inline int pathfinder_lbfgs_multi(
                         boost::iterator_range<double*>(
                             weight_vals.data(),
                             weight_vals.data() + weight_vals.size())));
-  for (size_t i = 0; i <= num_multi_draws; ++i) {
+  for (size_t i = 0; i <= num_multi_draws - 1; ++i) {
     parameter_writer(samples.col(rand_psis_idx()));
   }
   const auto end_psis_time = std::chrono::steady_clock::now();

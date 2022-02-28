@@ -239,7 +239,7 @@ template <bool ReturnElbo = true, typename LPF, typename ConstrainF, typename RN
 inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG&& rng,
                                    const SamplePkg& taylor_approx,
                                    size_t num_samples, const EigVec& alpha,
-                                   Logger&& logger, int num_eval_attempts) {
+                                   Logger&& logger, int num_eval_attempts, const std::string& iter_msg) {
  boost::variate_generator<boost::ecuyer1988&,
                           boost::normal_distribution<>>
      rand_unit_gaus(rng, boost::normal_distribution<>());
@@ -286,7 +286,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
           if (fail_trys == num_eval_attempts) {
             at_least_one_failed = true;
             lp_mat_tmp(i, 1) = -std::numeric_limits<double>::infinity();
-            logger.info(std::string("Approximate estimation failed after ") + std::to_string(num_eval_attempts) + " attempts because the approximated samples returned back log(0) from log_prob");
+            logger.info(iter_msg + "Approximate estimation failed after " + std::to_string(num_eval_attempts) + " attempts because the approximated samples returned back log(0) from log_prob");
           }
           uniform_samps_tmp.col(i) = gen_eigen_matrix<-1, 1>(rand_unit_gaus, num_params, 1);
           approx_samples_tmp.col(i).segment(0, num_params) = gen_draws(uniform_samps_tmp.col(i), taylor_approx, alpha);
@@ -297,10 +297,10 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
         if (fail_trys == num_eval_attempts) {
           at_least_one_failed = true;
           lp_mat_tmp(i, 1) = -std::numeric_limits<double>::infinity();
-          logger.info(
-              std::string("Approximate estimation failed after ")
+          logger.info(iter_msg +
+              "Approximate estimation failed after "
               + std::to_string(num_eval_attempts)
-              + " attempts with final error: \n" + e.what());
+              + " attempts with final error: \n\t" + e.what());
         }
         uniform_samps_tmp.col(i) = gen_eigen_matrix<-1, 1>(rand_unit_gaus, num_params, 1);
         approx_samples_tmp.col(i).segment(0, num_params) = gen_draws(uniform_samps_tmp.col(i), taylor_approx, alpha);
@@ -875,19 +875,16 @@ std::cout << "\n param mat: "
           try {
             elbo_est = est_approx_draws<true>(lp_fun, constrain_fun, thread_rng,
                                               taylor_appx_tuple, num_elbo_draws,
-                                              alpha, logger, num_eval_attempts);
+                                              alpha, logger, num_eval_attempts, iter_msg);
           } catch (const std::exception& e) {
-            logger.info(
-                std::string("ELBO estimation failed for LBFGS iteration "
-                            + std::to_string(iter) + " with error: ")
+            logger.info(iter_msg + "ELBO estimation failed " + " with error: " +
                 + e.what());
             continue;
           }
           if (refresh > 0
               && (lbfgs.iter_num() == 0
                   || ((lbfgs.iter_num() + 1) % refresh == 0))) {
-            logger.info(iter_msg + ": ELBO (" + std::to_string(elbo_est.elbo)
-                        + ")");
+            logger.info(iter_msg + ": ELBO (" + std::to_string(elbo_est.elbo) + ")");
           }
           if (STAN_DEBUG_PATH_BEST_ELBO) {
             elbo_mat(iter, 1) = elbo_est.elbo;
@@ -913,8 +910,8 @@ std::cout << "\n param mat: "
     std::cout << "optim vals: \n" << param_vecs[best_E + 1] << "\n";
   }
   if (best_E == -1) {
-    logger.info(
-        "Pathfinder Failure: None of the LBFGS iterations completed "
+    logger.info(path_num +
+        "Failure: None of the LBFGS iterations completed "
         "successfully");
     return ret_pathfinder<ReturnLpSamples>(error_codes::SOFTWARE, Eigen::VectorXd(0),
                                            Eigen::MatrixXd(0, 0));
@@ -928,7 +925,7 @@ std::cout << "\n param mat: "
     try {
       auto&& thread_rng = rng_vec[tbb::this_task_arena::current_thread_index()];
       elbo_est_t draws_tuple = est_approx_draws<false>(lp_fun, constrain_fun, thread_rng, taylor_approx_best, remaining_draws,
-          alpha_mat.col(best_E), logger, num_eval_attempts);
+          alpha_mat.col(best_E), logger, num_eval_attempts, path_num);
       auto&& draws_lp = draws_tuple.lp_mat;
       auto&& new_draws = draws_tuple.repeat_draws;
       lp_ratio = Eigen::VectorXd(draws_lp.size() + elbo_lp.size());
@@ -950,13 +947,13 @@ std::cout << "\n param mat: "
       /*constrained_draws_mat.leftCols(elbo_draws.cols()) = elbo_draws;
       constrained_draws_mat.rightCols(new_draws.cols()) = new_draws;*/
     } catch (const std::exception& e) {
-      logger.info(
-          std::string("Final sampling approximation failed with error: ")
+      logger.info( path_num +
+          "Final sampling approximation failed with error: "
           + e.what());
-      logger.info(
-          std::string("Returning the approximate samples used for ELBO calculation: ")
+      logger.info(path_num +
+          "Returning the approximate samples used for ELBO calculation: "
           + e.what());
-      constrained_draws_mat = Eigen::MatrixXd(names.size() - 2, elbo_draws.cols());
+      constrained_draws_mat = Eigen::MatrixXd(names.size(), elbo_draws.cols());
       Eigen::VectorXd approx_samples_tmp_col, approx_samples_constrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
         approx_samples_tmp_col = elbo_draws.col(i).head(elbo_draws.rows() - 2);
@@ -967,7 +964,7 @@ std::cout << "\n param mat: "
       lp_ratio = std::move(elbo_lp);
     }
   } else {
-    constrained_draws_mat = Eigen::MatrixXd(names.size() - 2, elbo_draws.cols());
+    constrained_draws_mat = Eigen::MatrixXd(names.size(), elbo_draws.cols());
     Eigen::VectorXd approx_samples_tmp_col, approx_samples_constrained_col;
     for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
       approx_samples_tmp_col =

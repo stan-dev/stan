@@ -488,34 +488,6 @@ pipeline {
             }
         }
 
-        stage('Performance') {
-            when {
-                expression {
-                    !skipRemainingStages
-                }
-            }
-            agent { label 'oldimac' }
-            steps {
-                unstash 'StanSetup'
-                setupCXX(true, "/usr/local/opt/llvm@6/bin/clang++", stanc3_bin_url())
-                sh """
-                    ./runTests.py -j${PARALLEL} src/test/performance
-                    cd test/performance
-                    RScript ../../src/test/performance/plot_performance.R
-                """
-            }
-            post {
-                always {
-                    retry(2) {
-                        junit 'test/**/*.xml'
-                        archiveArtifacts 'test/performance/performance.csv,test/performance/performance.png'
-                        perfReport compareBuildPrevious: true, errorFailedThreshold: 0, errorUnstableThreshold: 0, failBuildIfNoResultFile: false, modePerformancePerTestCase: true, sourceDataFiles: 'test/performance/**.xml'
-                    }
-                    deleteDir()
-                }
-            }
-        }
-
     }
     // Below lines are commented to avoid spamming emails during migration/debug
     post {
