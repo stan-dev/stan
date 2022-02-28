@@ -354,7 +354,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
   //std::cout << "\nrows: " << blah.rows() << "\n cols: " << blah.cols();
   blah = lp_mat.transpose();
   if (ReturnElbo) {
-    Eigen::VectorXd lp_ratio = (-lp_mat.col(1)) - lp_mat.col(0);
+    Eigen::VectorXd lp_ratio = (lp_mat.col(1)) - lp_mat.col(0);
     double ELBO = lp_ratio.mean();
     debug_check_elbo_draws(taylor_approx, approx_samples, lp_mat, ELBO);
     return elbo_est_t{ELBO, lp_fun_calls_elbo, std::move(approx_samples),
@@ -777,7 +777,7 @@ std::cout << "\n param mat: "
     */
   }
   auto lp_fun = [&model](auto&& u, auto&& streamer) {
-    return -model.template log_prob<false, true>(u, &streamer);
+    return model.template log_prob<false, true>(u, &streamer);
   };
   auto constrain_fun = [&model](auto&& rng, auto&& unconstrained_draws, auto&& constrained_draws) {
     model.write_array(rng, unconstrained_draws, constrained_draws);
