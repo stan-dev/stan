@@ -937,7 +937,7 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
       auto&& new_lp_ratio = est_draws.lp_ratio;
       auto&& lp_draws = est_draws.lp_mat;
       auto&& new_draws = est_draws.repeat_draws;
-      lp_ratio = Eigen::Array<double, -1, 1>(lp_ratio.size() + elbo_lp_ratio.size());
+      lp_ratio = Eigen::Array<double, -1, 1>(new_lp_ratio.size() + elbo_lp_ratio.size());
       lp_ratio.head(elbo_lp_ratio.size()) = elbo_lp_ratio.array();
       lp_ratio.tail(new_lp_ratio.size()) = new_lp_ratio.array();
       const auto total_size = elbo_draws.cols() + new_draws.cols();
