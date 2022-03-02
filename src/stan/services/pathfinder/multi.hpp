@@ -64,7 +64,7 @@ if (STAN_DEBUG_MULTI_PATH_PSIS) {
 */
 namespace stan {
 namespace services {
-namespace optimize {
+namespace pathfinder {
 template <class Model, typename InitContext, typename InitWriter,
           typename DiagnosticWriter, typename ParamWriter,
           typename SingleParamWriter, typename SingleDiagnosticWriter>
@@ -96,7 +96,7 @@ inline int pathfinder_lbfgs_multi(
         for (int iter = r.begin(); iter < r.end(); ++iter) {
           // TODO: Make fake writer that receives the samples
           auto pathfinder_ret
-              = stan::services::optimize::pathfinder_lbfgs_single<true>(
+              = stan::services::pathfinder::pathfinder_lbfgs_single<true>(
                   model, *(init[iter]), random_seed, path + iter, init_radius,
                   history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
                   tol_rel_grad, tol_param, num_iterations, save_iterations,

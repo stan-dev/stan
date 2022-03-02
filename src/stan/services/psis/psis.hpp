@@ -183,12 +183,12 @@ inline auto max_n_insertion_start(T&& top_n, const double value) {
 }
 
 template <typename EigArray>
-inline auto max_n_elements(const EigArray& lw_i, const size_t tail_len_i) {
+inline auto max_n_elements(const EigArray& lw_i, const Eigen::Index tail_len_i) {
   Eigen::Array<double, -1, 1> top_n = lw_i.head(tail_len_i);
   Eigen::Array<Eigen::Index, -1, 1> top_n_idx
       = Eigen::Array<Eigen::Index, -1, 1>::LinSpaced(tail_len_i, 0, tail_len_i);
   quick_sort(top_n, top_n_idx);
-  for (Eigen::Index i = tail_len_i; i < tail_len_i; ++i) {
+  for (Eigen::Index i = tail_len_i; i < lw_i.size(); ++i) {
     if (lw_i.coeff(i) >= top_n.coeff(0)) {
       const Eigen::Index starting_pos
           = max_n_insertion_start(top_n, lw_i.coeff(i));

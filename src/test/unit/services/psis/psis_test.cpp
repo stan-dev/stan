@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 auto&& blah = stan::math::init_threadpool_tbb(1);
-/*
+
 TEST(ServicesPSIS, xl) {
   Eigen::Array<double, -1, 1> test_x(20);
   test_x << 0.00231135747917145, 0.00433831801177895, 0.0108541508266367,
@@ -82,7 +82,7 @@ TEST(ServicesPSIS, psis_smooth_tail) {
 }
 
 TEST(ServicesPSIS, get_psis_weights) {
-  Eigen::VectorXd lrms(100);
+  Eigen::Array<double, -1, 1> lrms(100);
   lrms << 6.34466061445847, 5.4846884595318, 4.88197964898707, 7.81547476520815,
       7.21312186227255, 5.89526945311154, -18.6868826136285, 5.69901858745526,
       6.35360681626944, 5.77318645987978, 8.50016049059785, 5.92318779250444,
@@ -108,7 +108,7 @@ TEST(ServicesPSIS, get_psis_weights) {
       6.02289466654851, 6.78340253571924, 6.06495986706907, -7.02111971231673,
       4.91652175788515, 5.59472544249795, 7.16126247369561, 6.15854810500356,
       6.62555174418028, 9.103992907802, 6.7399306070758, 6.04794961458687;
-  Eigen::VectorXd answer(100);
+  Eigen::Array<double, -1, 1> answer(100);
   answer << 0.00614128190501742, 0.00259883000263199, 0.00142240988349195,
       0.0274531755800624, 0.0157476498780024, 0.00391823907901988,
       8.26414513956511e-14, 0.00322003256443345, 0.00619646954412031,
@@ -149,7 +149,7 @@ TEST(ServicesPSIS, get_psis_weights) {
     EXPECT_FLOAT_EQ(blah(i), answer(i));
   }
 }
-*/
+
 
 
 TEST(ServicesPSIS, max_n_elements) {
@@ -162,8 +162,8 @@ TEST(ServicesPSIS, max_n_elements) {
                                "", "", " ");
   auto sorted_result = std::get<0>(sorted_tuple);
   auto sorted_result_pos = std::get<1>(sorted_tuple);
-  std::cout << "nums:\n" << sorted_result.format(CommaInitFmt) << "\n";
-  std::cout << "position: \n" << sorted_result_pos.format(CommaInitFmt) << "\n";
+  //std::cout << "nums:\n" << sorted_result.format(CommaInitFmt) << "\n";
+  //std::cout << "position: \n" << sorted_result_pos.format(CommaInitFmt) << "\n";
 
   Eigen::Array<double, -1, 1> sorted_ans(5);
   sorted_ans << 16, 17, 18, 19, 20;
