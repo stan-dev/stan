@@ -83,6 +83,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   double tol_rel_grad = 0;
   double tol_param = 0;
   int num_iterations = 60;
+  int num_eval_attempts = 20;
   // bool save_iterations = true;
   int refresh = 1;
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
@@ -98,11 +99,11 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   // int refresh = 0;
   mock_callback callback;
 
-  int return_code = stan::services::optimize::pathfinder_lbfgs_multi(
+  int return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
       model, single_path_inits, seed, chain, init_radius, history_size,
       init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
       num_iterations, save_iterations, refresh, callback, num_elbo_draws,
-      num_draws, num_multi_draws, num_threads, num_paths, logger,
+      num_draws, num_multi_draws, num_eval_attempts, num_threads, num_paths, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
       diagnostics);

@@ -234,8 +234,8 @@ struct elbo_est_t {
   double elbo{-std::numeric_limits<double>::infinity()};
   size_t fn_calls_elbo{0};
   Eigen::MatrixXd repeat_draws;
-  Eigen::MatrixXd lp_mat;
-  Eigen::VectorXd lp_ratio;
+  Eigen::Array<double, -1, -1> lp_mat;
+  Eigen::Array<double, -1, 1> lp_ratio;
 };
 
 template <typename EigMat, typename EigVec,
@@ -301,7 +301,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
   Eigen::MatrixXd approx_samples_tmp(num_params, num_samples);
   approx_samples_tmp = gen_draws(uniform_samps_tmp, taylor_approx, alpha);
   stan_debug_path_rnorm_draws(approx_samples_tmp);
-  Eigen::MatrixXd lp_mat_tmp(num_samples, 2);
+  Eigen::Array<double, -1, -1> lp_mat_tmp(num_samples, 2);
   Eigen::VectorXd approx_samples_tmp_col;
   Eigen::VectorXd approx_samples_constrained_col;
   std::stringstream pathfinder_ss;
@@ -343,7 +343,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
     }
   }
   // Cleanup for -inf values
-  Eigen::MatrixXd lp_mat;
+  Eigen::Array<double, -1, -1> lp_mat;
   Eigen::MatrixXd approx_samples;
   Eigen::MatrixXd uniform_samps;
   if (at_least_one_failed) {
@@ -366,7 +366,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
         throw std::domain_error(iter_msg + "Approximate samples failed to create any samples with final error message: " + e.what());
       }
     } else {
-      lp_mat = Eigen::MatrixXd(success_rows.size(), 2);
+      lp_mat = Eigen::Array<double, -1, -1>(success_rows.size(), 2);
       approx_samples = Eigen::MatrixXd(num_params, success_rows.size());
       uniform_samps = Eigen::MatrixXd(num_params, success_rows.size());
       for (Eigen::Index i = 0; i < success_rows.size(); ++i) {
@@ -380,12 +380,12 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
     approx_samples = std::move(approx_samples_tmp);
     uniform_samps = std::move(uniform_samps_tmp);
   }
-  //### Divergence estimation ###
+
   lp_mat.col(0) = (-taylor_approx.logdetcholHk)
                   + -0.5
                         * (uniform_samps.array().square().colwise().sum()
                            + num_params * stan::math::LOG_TWO_PI);
-  Eigen::VectorXd lp_ratio = (lp_mat.col(1)) - lp_mat.col(0);
+  Eigen::Array<double, -1, 1> lp_ratio = (lp_mat.col(1)) - lp_mat.col(0);
   if (ReturnElbo) {
     double ELBO = lp_ratio.mean();
     debug_check_elbo_draws(taylor_approx, approx_samples, lp_mat, ELBO);
@@ -673,20 +673,10 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
    * objective function, and factorization of covariance estimation
    */
   int ret = 0;
-  /*
-  Eigen::MatrixXd param_mat(param_size, num_iterations + 1);
-  Eigen::MatrixXd grad_mat(param_size, num_iterations + 1);
-  */
   std::vector<Eigen::VectorXd> param_vecs;
   param_vecs.reserve(num_iterations);
   std::vector<Eigen::VectorXd> grad_vecs;
   grad_vecs.reserve(num_iterations);
-  /*
-  for (Eigen::Index i = 0; i < x_val.cols(); ++i) {
-    param_vecs.push_back(x_val.col(i));
-    grad_vecs.push_back(g_val.col(i));
-  }
-  */
   {
     std::vector<double> g1;
     double blah = stan::model::log_prob_grad<true, true>(model, cont_vector,
@@ -929,13 +919,13 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
     logger.info(path_num +
         "Failure: None of the LBFGS iterations completed "
         "successfully");
-    return stan::services::pathfinder::internal::ret_pathfinder<ReturnLpSamples>(error_codes::SOFTWARE, Eigen::VectorXd(0),
-                                           Eigen::MatrixXd(0, 0));
+    return stan::services::pathfinder::internal::ret_pathfinder<ReturnLpSamples>(error_codes::SOFTWARE, Eigen::Array<double, -1, 1>(0),
+                                           Eigen::Array<double, -1, -1>(0, 0));
   } else {
     logger.info(path_num + "Best Iter: [" + std::to_string(best_E) + "] ELBO (" + std::to_string(elbo_best.elbo) + ")");
   }
-  Eigen::Matrix<double, -1, -1> constrained_draws_mat;
-  Eigen::VectorXd lp_ratio;
+  Eigen::Array<double, -1, -1> constrained_draws_mat;
+  Eigen::Array<double, -1, 1> lp_ratio;
   auto&& elbo_draws = elbo_best.repeat_draws;
   auto&& elbo_lp_ratio = elbo_best.lp_ratio;
   auto&& elbo_lp_mat = elbo_best.lp_mat;
@@ -944,14 +934,14 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
     try {
       auto&& thread_rng = rng_vec[tbb::this_task_arena::current_thread_index()];
       stan::services::pathfinder::internal::elbo_est_t est_draws = stan::services::pathfinder::internal::est_approx_draws<false>(lp_fun, constrain_fun, thread_rng, taylor_approx_best, remaining_draws, alpha_mat.col(best_E), logger, num_eval_attempts, path_num);
-      auto&& lp_ratio = est_draws.lp_ratio;
+      auto&& new_lp_ratio = est_draws.lp_ratio;
       auto&& lp_draws = est_draws.lp_mat;
       auto&& new_draws = est_draws.repeat_draws;
-      lp_ratio = Eigen::VectorXd(lp_ratio.size() + elbo_lp_ratio.size());
-      lp_ratio.head(elbo_lp_ratio.size()) = elbo_lp_ratio;
-      lp_ratio.tail(lp_ratio.size()) = lp_ratio;
+      lp_ratio = Eigen::Array<double, -1, 1>(lp_ratio.size() + elbo_lp_ratio.size());
+      lp_ratio.head(elbo_lp_ratio.size()) = elbo_lp_ratio.array();
+      lp_ratio.tail(new_lp_ratio.size()) = new_lp_ratio.array();
       const auto total_size = elbo_draws.cols() + new_draws.cols();
-      constrained_draws_mat = Eigen::MatrixXd(names.size(), total_size);
+      constrained_draws_mat = Eigen::Array<double, -1, -1>(names.size(), total_size);
       Eigen::VectorXd unconstrained_col;
       Eigen::VectorXd approx_samples_constrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
@@ -971,7 +961,7 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
       logger.info(path_num +
           "Returning the approximate samples used for ELBO calculation: "
           + e.what());
-      constrained_draws_mat = Eigen::MatrixXd(names.size(), elbo_draws.cols());
+      constrained_draws_mat = Eigen::Array<double, -1, -1>(names.size(), elbo_draws.cols());
       Eigen::VectorXd approx_samples_constrained_col;
       Eigen::VectorXd unconstrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
@@ -982,7 +972,7 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
       lp_ratio = std::move(elbo_best.lp_ratio);
     }
   } else {
-    constrained_draws_mat = Eigen::MatrixXd(names.size(), elbo_draws.cols());
+    constrained_draws_mat = Eigen::Array<double, -1, -1>(names.size(), elbo_draws.cols());
     Eigen::VectorXd approx_samples_constrained_col;
     Eigen::VectorXd unconstrained_col;
   for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
@@ -992,7 +982,7 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
     }
     lp_ratio = std::move(elbo_best.lp_ratio);
   }
-  parameter_writer(constrained_draws_mat);
+  parameter_writer(constrained_draws_mat.matrix());
   auto end_pathfinder_time = std::chrono::steady_clock::now();
   double pathfinder_delta_time
       = std::chrono::duration_cast<std::chrono::milliseconds>(
