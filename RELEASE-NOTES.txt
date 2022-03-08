@@ -5,6 +5,19 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.29.1 (2 March 2022)
+======================================================================
+
+- Updated Stan Math to 4.3.1.
+- Fixed a bug with assigning var matrix types, only surfaces when using stanc3 optimization (`--O1` or up).
+
+v2.29.0 (14 February 2022)
+======================================================================
+
+ - Fixed assign and lvalue to return empty array with negative indexing and prevent assigning containers not matching in size. (#3095)
+ - Refactored the integration tests to use the Stan model from the stanc3 repository.
+ - Upgraded Stan Math to 4.3.0.
+
 v2.28.2 (22 November 2021)
 ======================================================================
 
