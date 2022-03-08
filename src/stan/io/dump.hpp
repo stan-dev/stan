@@ -2,6 +2,9 @@
 #define STAN_IO_DUMP_HPP
 
 #include <stan/io/validate_zero_buf.hpp>
+#ifdef USE_STANC3
+#include <stan/io/validate_dims.hpp>
+#endif
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim.hpp>
 #include <boost/lexical_cast.hpp>
