@@ -133,10 +133,10 @@ pipeline {
                         clang-format --version
                         find src -name '*.hpp' -o -name '*.cpp' | xargs -n20 -P${PARALLEL} clang-format -i
                         if [[ `git diff` != "" ]]; then
-                            git config --global user.email "mc.stanislaw@gmail.com"
-                            git config --global user.name "Stan Jenkins"
+                            git config user.email "mc.stanislaw@gmail.com"
+                            git config user.name "Stan Jenkins"
                             git add src
-                            git commit -m "[Jenkins] auto-formatting by `clang-format --version`"
+                            git commit --author="Stan BuildBot <mc.stanislaw@gmail.com>" -m "[Jenkins] auto-formatting by `clang-format --version`"
                             git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/stan.git ${branchName()}
                             echo "Exiting build because clang-format found changes."
                             echo "Those changes are now found on stan-dev/stan under branch ${branchName()}"
