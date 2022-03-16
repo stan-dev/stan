@@ -8,7 +8,7 @@
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 
-auto&& blah = stan::math::init_threadpool_tbb(16);
+auto&& blah = stan::math::init_threadpool_tbb(1);
 
 stan::io::array_var_context init_context() {
   std::vector<std::string> names_r{"y", "sigma"};
@@ -133,16 +133,31 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   // std::cout << "Values: \n" << param_vals.format(CommaInitFmt) << "\n";
 
   Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
+  Eigen::RowVectorXd sd_vals = ((param_vals.rowwise() - mean_vals)
+          .array()
+          .square()
+          .matrix()
+          .colwise()
+          .sum()
+          .array()
+      / (param_vals.rows() - 1))
+         .sqrt();
+         /*
   std::cout << "Mean Values: \n" << mean_vals.format(CommaInitFmt) << "\n";
   std::cout << "SD Values: \n"
-            << ((param_vals.rowwise() - mean_vals)
-                    .array()
-                    .square()
-                    .matrix()
-                    .colwise()
-                    .sum()
-                    .array()
-                / (param_vals.rows() - 1))
-                   .sqrt()
+            << sd_vals.format(CommaInitFmt)
             << "\n";
+*/
+  Eigen::RowVectorXd prev_mean_vals(20);
+  prev_mean_vals << 1.89104, 3.66449, 0.22256,  0.119645, -0.146812, 0.23633, -0.244868, -0.227134,  0.504507, 0.0476979, 3.66491, 2.57979, 1.21644, 2.81399, 1.53776, 1.39865, 3.99508, 2.41488, -17.9537, -47.016;
+  Eigen::RowVectorXd prev_sd_vals(20);
+  prev_sd_vals << 1.93964, 4.77042, 0.95799, 0.842812, 0.963455, 0.948548, 1.03149, 0.989, 0.920778, 0.888529, 4.6405, 3.63071, 4.25895, 4.45198, 3.90755, 4.23075, 4.56257, 4.22915, 4.37932, 2.28608;
+  Eigen::VectorXd diff_vals(20);
+  diff_vals = ((prev_mean_vals.array() + (2.0 * prev_sd_vals.array())).abs() - mean_vals.array().abs()).matrix().transpose();
+  for (Eigen::Index i = 0; i < 18; i++) {
+    EXPECT_GE(diff_vals(i), 0.0);
+  }
+  /*
+  std::cout << "Diffs\n" << diff_vals.format(CommaInitFmt) << "\n";
+  */
 }

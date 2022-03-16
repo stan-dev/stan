@@ -131,6 +131,10 @@ class values : public stan::callbacks::stream_writer {
       const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& xx) {
     optim_path_ = xx;
   }
+  void operator()(
+      const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& xx) {
+    optim_path_.push_back(xx);
+  }
   template <typename EigVec, stan::require_eigen_vector_t<EigVec>* = nullptr>
   void operator()(const EigVec& vals) {
     eigen_states_.push_back(vals);

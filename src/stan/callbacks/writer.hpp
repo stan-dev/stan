@@ -40,6 +40,11 @@ class writer {
    */
   virtual void operator()() {}
 
+  virtual void operator()(
+      const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& xx) {}
+  virtual void operator()(
+      const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& xx) {}
+
   /**
    * Writes a string.
    *

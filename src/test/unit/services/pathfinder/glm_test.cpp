@@ -65,54 +65,35 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   mock_callback callback;
   stan::io::empty_var_context empty_context;// = init_init_context();
 
-  Eigen::MatrixXd X_vals(7, 12);
-  X_vals << -0.9379653474316, -0.906446, -0.682177, -0.516077, 0.656601, 1.06249, 1.07171, 1.00748, 1.02424, 1.00262, 0.998965, 0.998807, -0.511504401452839, -0.49175, -0.351237, -0.247312, 0.486332, 0.738993, 0.725828, 0.648645, 0.677527, 0.67996, 0.679536, 0.679433, 0.291413453407586, 0.294501, 0.316563, 0.333201, 0.450803, 0.494126, 0.533998, 0.602209, 0.565176, 0.529828, 0.526583, 0.526686, 1.6328311599791, 1.61069, 1.45323, 1.33681, 0.514938, 0.232202, 0.251525, 0.346413, 0.309305, 0.302608, 0.30297, 0.303124, -1.19327227585018, -1.17169, -1.01816, -0.904524, -0.102272, 0.17477, 0.171626, 0.109297, 0.129993, 0.123168, 0.121544, 0.121431, 1.59355873987079, 1.60035, 1.64863, 1.68432, 1.93627, 2.0229, 2.0163, 1.98586, 1.99788, 2.0005, 2.00047, 2.00043, 1.77870107442141, 1.37282, 0.886139, 0.896325, 0.62072, 0.479404, 0.438835, 0.352543, 0.355224, 0.348206, 0.346179, 0.346386;
-  //X_vals.transposeInPlace();
-  //std::cout << "X: \n" << X_vals << "\n";
-  Eigen::MatrixXd G_vals(7, 12);
-  G_vals << -538.795258957539, -1193.54, -2787.09, -2460.93, -963.116, 240.828, 295.796, 35.3482, 118.845, 18.1959, 0.707573, -0.0732505, -337.686441619218, -747.813, -1741.9, -1534.7, -555.248, 226.509, 191.577, -150.733, -9.21149, 2.36078, 0.236548, -0.275565, -52.7756240774553, -117.388, -283.128, -256.908, -194.133, -131.901, 22.2857, 373.053, 186.283, 14.9878, -0.779346, -0.243255, 378.444156818226, 838.015, 1950.94, 1718.05, 610.5, -272.085, -214.05, 215.538, 31.3514, -2.37823, -0.648677, 0.124479, -368.904255729204, -817.083, -1905.83, -1681.12, -635.263, 202.618, 205.27, -62.8332, 39.5327, 8.25498, 0.406626, -0.154521, -116.09861240689, -256.969, -597.95, -526.455, -185.436, 86.1095, 65.9468, -72.0084, -12.5622, 0.3128, 0.173923, -0.0556924, 6938.06445770271, 3285.01, -4563.34, -2196, 3488.28, 2271.27, 1635.71, 78.8554, 165.178, 36.9415, -3.38412, 0.741704;
-  //G_vals.transposeInPlace();
-  //std::cout << "G: \n" << G_vals << "\n";
-  Eigen::MatrixXd Ykt_diff = G_vals.middleCols(1, 11) - G_vals.leftCols(11);
-  Eigen::MatrixXd Skt_diff = X_vals.middleCols(1, 11) - X_vals.leftCols(11);
-  auto Dk = ((Ykt_diff.array()) * Skt_diff.array()).colwise().sum().eval();
-  auto thetak = (Ykt_diff.array().square().colwise().sum()).abs().eval();
-  if (STAN_DEBUG_PATH_CURVE_CHECK) {
-    std::cout << "\n Check Dk: \n" << Dk.transpose() << "\n";
-    std::cout << "\n Check thetak: \n" << thetak.transpose() << "\n";
-  }
-
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> input_iters;
-  for (Eigen::Index i = 0; i < X_vals.cols(); ++i) {
-    input_iters.emplace_back(X_vals.col(i), G_vals.col(i));
-  }
-
 
   int return_code
-      = stan::services::pathfinder::pathfinder_lbfgs_single(//X_vals, G_vals,
+      = stan::services::pathfinder::pathfinder_lbfgs_single(
           model, empty_context, seed, chain, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           num_iterations, save_iterations, refresh, callback, num_elbo_draws,
           num_draws, num_eval_attempts, num_threads, logger, init, parameter, diagnostics);
+  /*
   for (auto&& times : parameter.times_) {
     std::cout << times;
   }
-
+  */
   // Eigen::MatrixXd param_vals = parameter.values_.transpose();
   // Eigen::MatrixXd param_vals = parameter.values_.transpose();
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
-
+  /*
   std::cout << "\n --- Optim Path ---" << std::endl;
   for (Eigen::Index i = 0; i < diagnostics.optim_path_.size(); ++i) {
-    Eigen::MatrixXd tmp(2, param_vals.cols() - 1);
+    Eigen::MatrixXd tmp(2, std::get<0>(diagnostics.optim_path_[i]).size());
     tmp.row(0) = std::get<0>(diagnostics.optim_path_[i]);
     tmp.row(1) = std::get<1>(diagnostics.optim_path_[i]);
-    std::cout << "Iter: " << i << "\n" << tmp << "\n";
+    //std::cout << "Iter: " << i << "\n" << tmp << "\n";
   }
+  */
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
 
-  std::cout << "---- Results  -------" << std::endl;
+  //std::cout << "---- Results  -------" << std::endl;
   Eigen::VectorXd mean_vals = param_vals.rowwise().mean().eval();
   //       std::cout << "Mean Values: \n" <<
   //       mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
@@ -183,10 +164,12 @@ Eigen::VectorXd prev_sd_vals = (((prev_param_vals.colwise() - prev_mean_vals)
     EXPECT_NEAR(0, all_mean_vals(2, i), 1);
   }
   //EXPECT_NEAR(0, all_mean_vals(2, 9), 0.05);
+  /*
   std::cout << "\nMean vals:\n" << all_mean_vals.format(CommaInitFmt) << "\n";
   std::cout << "\nSD vals:\n" << all_sd_vals.format(CommaInitFmt) << "\n";
   std::cout << "\nMean vals:\n" << mean_vals.format(CommaInitFmt) << "\n";
   std::cout << "\nSD vals:\n" << sd_vals.format(CommaInitFmt) << "\n";
+  */
 }
 
 TEST_F(ServicesPathfinderSingle, glm_multi) {
@@ -238,17 +221,17 @@ TEST_F(ServicesPathfinderSingle, glm_multi) {
     param_vals.row(i) = parameter.eigen_states_[i];
   }
   param_vals.transposeInPlace();
-  std::cout << "\n --- Optim Path ---" << std::endl;
+  //std::cout << "\n --- Optim Path ---" << std::endl;
   for (Eigen::Index i = 0; i < diagnostics.optim_path_.size(); ++i) {
     Eigen::MatrixXd tmp(2, param_vals.cols() - 1);
     tmp.row(0) = std::get<0>(diagnostics.optim_path_[i]);
     tmp.row(1) = std::get<1>(diagnostics.optim_path_[i]);
-    std::cout << "Iter: " << i << "\n" << tmp << "\n";
+    //std::cout << "Iter: " << i << "\n" << tmp << "\n";
   }
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
 
-  std::cout << "---- Results  -------" << std::endl;
+  //std::cout << "---- Results  -------" << std::endl;
   Eigen::VectorXd mean_vals = param_vals.rowwise().mean().eval();
   //       std::cout << "Mean Values: \n" <<
   //       mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
@@ -320,9 +303,11 @@ Eigen::VectorXd prev_sd_vals = (((prev_param_vals.colwise() - prev_mean_vals)
     EXPECT_NEAR(0, all_mean_vals(2, i), 1);
   }
   //EXPECT_NEAR(0, all_mean_vals(2, 9), 10);
+  /*
   std::cout << "\nMean vals:\n" << all_mean_vals.format(CommaInitFmt) << "\n";
   std::cout << "\nSD vals:\n" << all_sd_vals.format(CommaInitFmt) << "\n";
 
   std::cout << "\nMean vals:\n" << mean_vals.format(CommaInitFmt) << "\n";
   std::cout << "\nSD vals:\n" << sd_vals.format(CommaInitFmt) << "\n";
+  */
 }

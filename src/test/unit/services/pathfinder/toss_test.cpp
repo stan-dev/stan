@@ -57,21 +57,24 @@ stan::io::array_var_context init_init_context() {
 }
 
 TEST_F(ServicesPathfinderSingle, rosenbrock) {
-  unsigned int seed = 0;
-  unsigned int chain = 1;
-  double init_radius = .7;
-  double num_elbo_draws = 80;
-  double num_draws = 100;
-  int history_size = 15;
-  double init_alpha = 0.001;
-  double tol_obj = 0;
-  double tol_rel_obj = 0;
-  double tol_grad = 0;
-  double tol_rel_grad = 0;
-  double tol_param = 0;
-  int num_iterations = 60;
-  bool save_iterations = false;
-  int refresh = 1;
+  constexpr unsigned int seed = 0;
+  constexpr unsigned int chain = 1;
+  constexpr double init_radius = .7;
+  constexpr double num_elbo_draws = 80;
+  constexpr double num_draws = 100;
+  constexpr int history_size = 15;
+  constexpr double init_alpha = 0.001;
+  constexpr double tol_obj = 0;
+  constexpr double tol_rel_obj = 0;
+  constexpr double tol_grad = 0;
+  constexpr double tol_rel_grad = 0;
+  constexpr double tol_param = 0;
+  constexpr int num_iterations = 60;
+  constexpr bool save_iterations = true;
+  constexpr int refresh = 1;
+  constexpr int num_eval_attempts = 100;
+  constexpr int num_threads = 1;
+
   mock_callback callback;
   stan::io::array_var_context empty_context = init_init_context();
 
@@ -109,7 +112,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
       3.36647, 0.723114, 0.202517, -0.117238, 0.167945, -0.0765771, -0.0130584,
       0.510919, 0.263161, 1.43295, 3.3664;
   X_vals.transposeInPlace();
-  std::cout << "X: \n" << X_vals << "\n";
+  //std::cout << "X: \n" << X_vals << "\n";
   /*
   std::cout << "X: \n" << X_vals << "\n";
   */
@@ -152,6 +155,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
       8.99411e-05, 4.38511e-05, 1.53115e-05, -8.10758e-05, 5.07464e-05,
       -4.18918e-07, -6.97718e-05;
   G_vals.transposeInPlace();
+  /*
   std::cout << "G: \n" << G_vals << "\n";
   Eigen::MatrixXd Ykt_diff = G_vals.middleCols(1, 20) - G_vals.leftCols(20);
   Eigen::MatrixXd Skt_diff = X_vals.middleCols(1, 20) - X_vals.leftCols(20);
@@ -161,18 +165,18 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
     std::cout << "\n Check Dk: \n" << Dk.transpose() << "\n";
     std::cout << "\n Check thetak: \n" << thetak.transpose() << "\n";
   }
-
+  */
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> input_iters;
   for (Eigen::Index i = 0; i < X_vals.cols(); ++i) {
     input_iters.emplace_back(X_vals.col(i), G_vals.col(i));
   }
 
   int return_code
-      = stan::services::optimize::pathfinder_lbfgs_single(  // X_vals, G_vals,
+      = stan::services::pathfinder::pathfinder_lbfgs_single(  // X_vals, G_vals,
           model, empty_context, seed, chain, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           num_iterations, save_iterations, refresh, callback, num_elbo_draws,
-          num_draws, 1, logger, init, parameter, diagnostics);
+          num_draws, num_eval_attempts, num_threads, logger, init, parameter, diagnostics);
 
   for (auto&& times : parameter.times_) {
     std::cout << times;
@@ -181,18 +185,19 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   // Eigen::MatrixXd param_vals = parameter.values_.transpose();
   // Eigen::MatrixXd param_vals = parameter.values_.transpose();
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
-
+  /*
   std::cout << "\n --- Optim Path ---" << std::endl;
   for (Eigen::Index i = 0; i < diagnostics.optim_path_.size(); ++i) {
-    Eigen::MatrixXd tmp(2, param_vals.cols() - 1);
-    tmp.row(0) = std::get<0>(diagnostics.optim_path_[i]);
-    tmp.row(1) = std::get<1>(diagnostics.optim_path_[i]);
+    Eigen::MatrixXd tmp(2, std::get<0>(diagnostics.optim_path_[i]).size());
+    tmp.row(0) = std::get<0>(diagnostics.optim_path_[i]).transpose();
+    tmp.row(1) = std::get<1>(diagnostics.optim_path_[i]).transpose();
     std::cout << "Iter: " << i << "\n" << tmp << "\n";
   }
+  */
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
 
-  std::cout << "---- Results  -------" << std::endl;
+  //std::cout << "---- Results  -------" << std::endl;
   /*
   std::cout << "Values: \n"
             << param_vals.format(CommaInitFmt) << "\n";
@@ -597,6 +602,12 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
              .sqrt())
             .transpose()
             .eval();
+  Eigen::VectorXd diff_vals(20);
+  diff_vals = ((mean_r_vals.array() + (2.0 * sd_r_vals.array())).abs() - mean_vals.array().abs()).matrix();
+  for (Eigen::Index i = 0; i < 18; i++) {
+    EXPECT_GE(diff_vals(i), 0.0);
+  }
+
   Eigen::MatrixXd ans_diff = param_vals - r_constrainted_draws_mat;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
   //      std::cout << "diff Mean Values: \n" <<
@@ -622,7 +633,8 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = sd_r_vals;
   all_sd_vals.row(2) = sd_diff_vals;
-
+/*
   std::cout << "\nMean vals:\n" << all_mean_vals.format(CommaInitFmt) << "\n";
   std::cout << "\nSD vals:\n" << all_sd_vals.format(CommaInitFmt) << "\n";
+*/
 }

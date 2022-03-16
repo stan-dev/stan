@@ -35,99 +35,110 @@ namespace stan {
 namespace services {
 namespace pathfinder {
 namespace internal {
-template <typename T1, typename T2, typename T3>
-inline void debug_check_elbo_draws(T1&& taylor_approx, T2&& approx_samples, T3&& lp_mat, double ELBO) {
-    if (STAN_DEBUG_PATH_ELBO_DRAWS) {
-      Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                   ", ", ", ", "\n", "", "", " ");
-      std::cout
-          << "\n Rando Sums: \n"
-          << approx_samples.array().square().colwise().sum().eval().format(
-                 CommaInitFmt)
-          << "\n";
-      std::cout << "logdetcholHk: " << taylor_approx.logdetcholHk << "\n";
-      std::cout << "ELBO: " << ELBO << "\n";
-      std::cout << "repeat_draws: \n"
-                << approx_samples.transpose().eval().format(CommaInitFmt)
-                << "\n";
-      /*std::cout << "random_stuff: \n"
-                << std::get<0>(tuple_u).transpose().eval().format(CommaInitFmt)
-                << "\n";*/
-      std::cout << "lp_approx: \n"
-                << lp_mat.col(1).transpose().eval().format(CommaInitFmt)
-                << "\n";
-      std::cout << "fn_call: \n"
-                << lp_mat.col(0).transpose().eval().format(CommaInitFmt)
-                << "\n";
-      Eigen::MatrixXd param_vals = approx_samples;
-      auto mean_vals = param_vals.rowwise().mean().eval();
-      std::cout << "Mean Values: \n"
-                << mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
-      std::cout << "SD Values: \n"
-                << (((param_vals.colwise() - mean_vals)
-                         .array()
-                         .square()
-                         .matrix()
-                         .rowwise()
-                         .sum()
-                         .array()
-                     / (param_vals.cols() - 1))
-                        .sqrt())
-                       .transpose()
-                       .eval()
-                << "\n";
-    }
+template <typename T0, typename T1, typename T2, typename T3>
+inline void stan_debug_path_elbo_draws(T0&& logger, T1&& taylor_approx,
+                                       T2&& approx_samples, T3&& lp_mat,
+                                       double ELBO) {
+  if (STAN_DEBUG_PATH_ELBO_DRAWS) {
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                 ", ", ", ", "\n", "", "", " ");
+    std::stringstream debug_stream;
+    debug_stream
+        << "\n Rando Sums: \n"
+        << approx_samples.array().square().colwise().sum().eval().format(
+               CommaInitFmt)
+        << "\n";
+    debug_stream << "logdetcholHk: " << taylor_approx.logdetcholHk << "\n";
+    debug_stream << "ELBO: " << ELBO << "\n";
+    debug_stream << "repeat_draws: \n"
+                 << approx_samples.transpose().eval().format(CommaInitFmt)
+                 << "\n";
+    debug_stream << "lp_approx: \n"
+                 << lp_mat.col(1).transpose().eval().format(CommaInitFmt)
+                 << "\n";
+    debug_stream << "fn_call: \n"
+                 << lp_mat.col(0).transpose().eval().format(CommaInitFmt)
+                 << "\n";
+    Eigen::MatrixXd param_vals = approx_samples;
+    auto mean_vals = param_vals.rowwise().mean().eval();
+    debug_stream << "Mean Values: \n"
+                 << mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
+    debug_stream << "SD Values: \n"
+                 << (((param_vals.colwise() - mean_vals)
+                          .array()
+                          .square()
+                          .matrix()
+                          .rowwise()
+                          .sum()
+                          .array()
+                      / (param_vals.cols() - 1))
+                         .sqrt())
+                        .transpose()
+                        .eval()
+                 << "\n";
+    logger.info(debug_stream);
+  }
 }
 
-template <typename T>
-inline void stan_debug_path_rnorm_draws(T&& approx_samples_tmp) {
+template <typename T0, typename T>
+inline void stan_debug_path_rnorm_draws(T0&& logger, T&& approx_samples_tmp) {
   if (STAN_DEBUG_PATH_RNORM_DRAWS) {
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
                                  ", ", ", ", "\n", "", "", " ");
     Eigen::MatrixXd param_vals = approx_samples_tmp;
     auto mean_vals = param_vals.rowwise().mean().eval();
-    std::cout << "Mean Values: \n"
-              << mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
-    std::cout << "SD Values: \n"
-              << (((param_vals.colwise() - mean_vals)
-                       .array()
-                       .square()
-                       .matrix()
-                       .rowwise()
-                       .sum()
-                       .array()
-                   / (param_vals.cols() - 1))
-                      .sqrt())
-                     .transpose()
-                     .eval()
-              << "\n";
+    std::stringstream debug_stream;
+    debug_stream << "Mean Values: \n"
+                 << mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
+    debug_stream << "SD Values: \n"
+                 << (((param_vals.colwise() - mean_vals)
+                          .array()
+                          .square()
+                          .matrix()
+                          .rowwise()
+                          .sum()
+                          .array()
+                      / (param_vals.cols() - 1))
+                         .sqrt())
+                        .transpose()
+                        .eval()
+                 << "\n";
+    logger.info(debug_stream);
   }
 }
 
-template <typename T1, typename T2>
-inline void stan_debug_path_curve_check(T1&& Dk, T2&& thetak) {
+template <typename T0, typename T1, typename T2>
+inline void stan_debug_path_curve_check(T0&& logger, T1&& Dk, T2&& thetak) {
   if (STAN_DEBUG_PATH_CURVE_CHECK) {
-    std::cout << "\n Check Dk: \n" << Dk.transpose() << "\n";
-    std::cout << "\n Check thetak: \n" << thetak.transpose() << "\n";
+    std::stringstream debug_stream;
+    debug_stream << "\n Check Dk: \n" << Dk.transpose() << "\n";
+    debug_stream << "\n Check thetak: \n" << thetak.transpose() << "\n";
+    logger.info(debug_stream);
   }
 }
 
-template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
-inline void stan_debug_post_lbfgs(T1&& update_best_mutex, T2&& param_size, T3&& num_elbo_draws, T4&& alpha_mat,  T5&& Ykt_diff, T6&& Skt_diff) {
-if (STAN_DEBUG_PATH_POST_LBFGS) {
-  std::lock_guard<std::mutex> guard(update_best_mutex);
-  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
-                               "", "", " ");
-  std::cout << "\n num_params: " << param_size << "\n";
-  std::cout << "\n num_elbo_params: " << num_elbo_draws << "\n";
-  //std::cout << "\n param_cols_filled: " << param_cols_filled << "\n";
-  std::cout << "\n Alpha mat: "
-            << alpha_mat.transpose().eval().format(CommaInitFmt) << "\n";
-  std::cout << "\n Ykt_diff mat: "
-            << Ykt_diff.transpose().eval().format(CommaInitFmt) << "\n";
-  std::cout << "\n Skt_diff mat: "
-            << Skt_diff.transpose().eval().format(CommaInitFmt) << "\n";
-}
+template <typename T0, typename T1, typename T2, typename T3, typename T4,
+          typename T5, typename T6>
+inline void stan_debug_post_lbfgs(T0&& logger, T1&& update_best_mutex,
+                                  T2&& param_size, T3&& num_elbo_draws,
+                                  T4&& alpha_mat, T5&& Ykt_diff,
+                                  T6&& Skt_diff) {
+  if (STAN_DEBUG_PATH_POST_LBFGS) {
+    std::lock_guard<std::mutex> guard(update_best_mutex);
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
+                                 "", "", " ");
+    std::stringstream debug_stream;
+    debug_stream << "\n num_params: " << param_size << "\n";
+    debug_stream << "\n num_elbo_params: " << num_elbo_draws << "\n";
+    // std::cout << "\n param_cols_filled: " << param_cols_filled << "\n";
+    debug_stream << "\n Alpha mat: "
+                 << alpha_mat.transpose().eval().format(CommaInitFmt) << "\n";
+    debug_stream << "\n Ykt_diff mat: "
+                 << Ykt_diff.transpose().eval().format(CommaInitFmt) << "\n";
+    debug_stream << "\n Skt_diff mat: "
+                 << Skt_diff.transpose().eval().format(CommaInitFmt) << "\n";
+    logger.info(debug_stream);
+  }
 }
 template <typename T1, typename T2>
 inline auto crossprod(T1&& x, T2&& y) {
@@ -155,6 +166,19 @@ inline Eigen::MatrixXd tcrossprod(T1&& x) {
       .rankUpdate(x);
 }
 
+/**
+ * Perform a `Matrix * vector.asDiagonal()`` multiplication with the matrix
+ * represented as an `std::vector` of rows.
+ * @tparam EigVec1 A type inheriting from `Eigen::DenseBase` with compile time
+ *  rows or columns equal to 1
+ * @tparam EigVec2 A type inheriting from `Eigen::DenseBase` with compile time
+ *  rows or columns equal to 1
+ * @param y_buff A standard vector with elements representing the rows of
+ *  a matrix.
+ * @param alpha An eigen vector representing the diagonals of a matrix.
+ * @return Returns the same result as if we called `Matrix *
+ * vector.asDiagonal()`
+ */
 template <typename EigVec1, typename EigVec2>
 inline Eigen::MatrixXd std_vec_matrix_times_diagonal(
     const std::vector<EigVec1>& y_buff, const EigVec2& alpha) {
@@ -176,6 +200,17 @@ inline Eigen::VectorXd std_vec_matrix_crossprod_vector(
   return ret;
 }
 
+/**
+ * Perform a Matrix * vector multiply with the matrix represented as an
+ * `std::vector` of rows.
+ * @tparam EigVec1 A type inheriting from `Eigen::DenseBase` with compile time
+ *  rows or columns equal to 1
+ * @tparam EigVec2 A type inheriting from `Eigen::DenseBase` with compile time
+ *  rows or columns equal to 1
+ * @param y_buff A standard vector with elements representing the rows of
+ *  a matrix.
+ * @param alpha An eigen vector.
+ */
 template <typename EigVec1, typename EigVec2>
 inline Eigen::MatrixXd std_vec_matrix_mul_vector(
     const std::vector<EigVec1>& y_buff, const EigVec2& alpha) {
@@ -194,12 +229,16 @@ inline bool is_infinite(double x) noexcept {
   return x == std::numeric_limits<double>::infinity();
 }
 
-template <typename EigMat, stan::require_matrix_t<EigMat>* = nullptr>
-inline Eigen::Array<bool, -1, 1> check_curve(const EigMat& Yk,
-                                             const EigMat& Sk) {
+/**
+ * Check the curvature of the LBFGS optimization path is convex.
+ */
+template <typename EigMat, stan::require_matrix_t<EigMat>* = nullptr,
+          typename Logger>
+inline Eigen::Array<bool, -1, 1> check_curve(const EigMat& Yk, const EigMat& Sk,
+                                             Logger&& logger) {
   auto Dk = ((Yk.array()) * Sk.array()).colwise().sum().eval();
   auto thetak = (Yk.array().square().colwise().sum() / Dk).abs().eval();
-  stan_debug_path_curve_check(Dk, thetak);
+  stan_debug_path_curve_check(logger, Dk, thetak);
   return ((Dk > 0) && (thetak <= 1e12));
 }
 
@@ -238,6 +277,20 @@ struct elbo_est_t {
   Eigen::Array<double, -1, 1> lp_ratio;
 };
 
+/**
+ * Generate approximate draws using either the full or sparse taylor
+ * approximation.
+ * @tparam EigMat A type inheriting from `Eigen::DenseBase` with dynamic rows
+ * and columns.
+ * @tparam EigVec A type inheriting from `Eigen::DenseBase` with the compile
+ * time number of columns equal to 1.
+ * @param u A matrix of gaussian IID samples with rows equal to the size of the
+ * number of samples to be made and columns equal to the number of parameters.
+ * @param taylor_approx Approximation from `construct_taylor_approximation`.
+ * @param alpha TODO: Define this
+ * @return A matrix with rows equal to the number of samples and columns equal
+ * to the number of parameters.
+ */
 template <typename EigMat, typename EigVec,
           require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
 inline auto gen_draws(EigMat&& u, const taylor_approx_t& taylor_approx,
@@ -257,6 +310,20 @@ inline auto gen_draws(EigMat&& u, const taylor_approx_t& taylor_approx,
   }
 }
 
+/**
+ * Generate approximate draws using either the full or sparse taylor
+ * approximation.
+ * @tparam EigVec1 A type inheriting from `Eigen::DenseBase` with the compile
+ * time number of columns equal to 1.
+ * @tparam EigVec2 A type inheriting from `Eigen::DenseBase` with the compile
+ * time number of columns equal to 1.
+ * @param u A matrix of gaussian IID samples with columns equal to the size of
+ * the number of samples to be made and rows equal to the number of parameters.
+ * @param taylor_approx Approximation from `construct_taylor_approximation`.
+ * @param alpha TODO: Define this
+ * @return A matrix with columns equal to the number of samples and rows equal
+ * to the number of parameters.
+ */
 template <typename EigVec1, typename EigVec2,
           require_eigen_vector_t<EigVec1>* = nullptr>
 inline auto gen_draws(EigVec1&& u, const taylor_approx_t& taylor_approx,
@@ -274,6 +341,19 @@ inline auto gen_draws(EigVec1&& u, const taylor_approx_t& taylor_approx,
   }
 }
 
+/**
+ * Generate an Eigen matrix of from an rng generator.
+ * @tparam RowsAtCompileTime The number of compile time rows for the result
+ * matrix.
+ * @tparam ColsAtCompileTime The number of compile time cols for the result
+ * matrix.
+ * @tparam Generator A functor with a valid `operator()` used to generate the
+ * samples.
+ * @param variate_generator An rng generator
+ * @param num_params The runtime number of parameters
+ * @param num_samples The runtime number of samples.
+ *
+ */
 template <Eigen::Index RowsAtCompileTime = -1,
           Eigen::Index ColsAtCompileTime = -1, typename Generator>
 inline auto gen_eigen_matrix(Generator&& variate_generator,
@@ -284,15 +364,18 @@ inline auto gen_eigen_matrix(Generator&& variate_generator,
                   [&variate_generator]() { return variate_generator(); });
 }
 
-template <bool ReturnElbo = true, typename LPF, typename ConstrainF, typename RNG,
-          typename EigVec, typename SamplePkg, typename Logger>
-inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG&& rng,
-                                   const SamplePkg& taylor_approx,
+/**
+ *
+ */
+template <bool ReturnElbo = true, typename LPF, typename ConstrainF,
+          typename RNG, typename EigVec, typename SamplePkg, typename Logger>
+inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
+                                   RNG&& rng, const SamplePkg& taylor_approx,
                                    size_t num_samples, const EigVec& alpha,
-                                   Logger&& logger, int num_eval_attempts, const std::string& iter_msg) {
- boost::variate_generator<boost::ecuyer1988&,
-                          boost::normal_distribution<>>
-     rand_unit_gaus(rng, boost::normal_distribution<>());
+                                   Logger&& logger, int num_eval_attempts,
+                                   const std::string& iter_msg) {
+  boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
+      rand_unit_gaus(rng, boost::normal_distribution<>());
 
   const auto num_params = taylor_approx.x_center.size();
   size_t lp_fun_calls_elbo = 0;
@@ -300,7 +383,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
       = gen_eigen_matrix(rand_unit_gaus, num_params, num_samples);
   Eigen::MatrixXd approx_samples_tmp(num_params, num_samples);
   approx_samples_tmp = gen_draws(uniform_samps_tmp, taylor_approx, alpha);
-  stan_debug_path_rnorm_draws(approx_samples_tmp);
+  stan_debug_path_rnorm_draws(logger, approx_samples_tmp);
   Eigen::Array<double, -1, -1> lp_mat_tmp(num_samples, 2);
   Eigen::VectorXd approx_samples_tmp_col;
   Eigen::VectorXd approx_samples_constrained_col;
@@ -316,19 +399,23 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
     for (size_t fail_trys = 0; fail_trys <= num_eval_attempts; ++fail_trys) {
       try {
         approx_samples_tmp_col = approx_samples_tmp.col(i);
-        lp_mat_tmp.coeffRef(i, 1) = lp_fun(approx_samples_tmp_col, pathfinder_ss);
+        lp_mat_tmp.coeffRef(i, 1)
+            = lp_fun(approx_samples_tmp_col, pathfinder_ss);
         if (std::isfinite(lp_mat_tmp.coeff(i, 1))) {
           log_stream(logger, pathfinder_ss);
           ++lp_fun_calls_elbo;
           break;
         } else {
           if (fail_trys == num_eval_attempts) {
-            lp_mat_tmp.coeffRef(i, 1) = -std::numeric_limits<double>::infinity();
+            lp_mat_tmp.coeffRef(i, 1)
+                = -std::numeric_limits<double>::infinity();
             at_least_one_failed = true;
             log_stream(logger, pathfinder_ss);
           }
-          uniform_samps_tmp.col(i) = gen_eigen_matrix<-1, 1>(rand_unit_gaus, num_params, 1);
-          approx_samples_tmp.col(i) = gen_draws(uniform_samps_tmp.col(i), taylor_approx, alpha);
+          uniform_samps_tmp.col(i)
+              = gen_eigen_matrix<-1, 1>(rand_unit_gaus, num_params, 1);
+          approx_samples_tmp.col(i)
+              = gen_draws(uniform_samps_tmp.col(i), taylor_approx, alpha);
         }
       } catch (const std::exception& e) {
         if (fail_trys == num_eval_attempts) {
@@ -336,8 +423,10 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
           at_least_one_failed = true;
           log_stream(logger, pathfinder_ss);
         }
-        uniform_samps_tmp.col(i) = gen_eigen_matrix<-1, 1>(rand_unit_gaus, num_params, 1);
-        approx_samples_tmp.col(i) = gen_draws(uniform_samps_tmp.col(i), taylor_approx, alpha);
+        uniform_samps_tmp.col(i)
+            = gen_eigen_matrix<-1, 1>(rand_unit_gaus, num_params, 1);
+        approx_samples_tmp.col(i)
+            = gen_draws(uniform_samps_tmp.col(i), taylor_approx, alpha);
       }
       ++lp_fun_calls_elbo;
     }
@@ -388,50 +477,63 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun, RNG
   Eigen::Array<double, -1, 1> lp_ratio = (lp_mat.col(1)) - lp_mat.col(0);
   if (ReturnElbo) {
     double ELBO = lp_ratio.mean();
-    debug_check_elbo_draws(taylor_approx, approx_samples, lp_mat, ELBO);
-    return elbo_est_t{ELBO, lp_fun_calls_elbo, std::move(approx_samples), std::move(lp_mat),
-                      std::move(lp_ratio)};
+    stan_debug_path_elbo_draws(logger, taylor_approx, approx_samples, lp_mat,
+                               ELBO);
+    return elbo_est_t{ELBO, lp_fun_calls_elbo, std::move(approx_samples),
+                      std::move(lp_mat), std::move(lp_ratio)};
   } else {
-    return elbo_est_t{-std::numeric_limits<double>::infinity(), lp_fun_calls_elbo,
-                      std::move(approx_samples), std::move(lp_mat),
-                      std::move(lp_ratio)};
+    return elbo_est_t{-std::numeric_limits<double>::infinity(),
+                      lp_fun_calls_elbo, std::move(approx_samples),
+                      std::move(lp_mat), std::move(lp_ratio)};
   }
 }
 
-template <typename T1, typename T2, typename T3, typename T4, typename T5>
-inline void stan_debug_path_taylor_appx_full1(T1&& alpha, T2&& ninvRST, T3&& Dk, T4&& point_est, T5&& grad_est) {
+template <typename T0, typename T1, typename T2, typename T3, typename T4,
+          typename T5>
+inline void stan_debug_path_taylor_appx_full1(T0&& logger, T1&& alpha,
+                                              T2&& ninvRST, T3&& Dk,
+                                              T4&& point_est, T5&& grad_est) {
   if (STAN_DEBUG_PATH_TAYLOR_APPX) {
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
                                  "", "", " ");
-    std::cout << "---Full---\n";
+    std::stringstream debug_stream;
+    debug_stream << "---Full---\n";
 
-    std::cout << "Alpha: \n" << alpha.format(CommaInitFmt) << "\n";
-    std::cout << "ninvRST: \n" << ninvRST.format(CommaInitFmt) << "\n";
-    std::cout << "Dk: \n" << Dk.format(CommaInitFmt) << "\n";
-    std::cout << "Point: \n" << point_est.format(CommaInitFmt) << "\n";
-    std::cout << "grad: \n" << grad_est.format(CommaInitFmt) << "\n";
+    debug_stream << "Alpha: \n" << alpha.format(CommaInitFmt) << "\n";
+    debug_stream << "ninvRST: \n" << ninvRST.format(CommaInitFmt) << "\n";
+    debug_stream << "Dk: \n" << Dk.format(CommaInitFmt) << "\n";
+    debug_stream << "Point: \n" << point_est.format(CommaInitFmt) << "\n";
+    debug_stream << "grad: \n" << grad_est.format(CommaInitFmt) << "\n";
+    logger.info(debug_stream);
   }
 }
 
-template <typename T1, typename T2, typename T3, typename T4>
-inline void stan_debug_path_taylor_appx_full2(T1&& Hk, T2&& L_hk, T3&& logdetcholHk, T4&& x_center) {
+template <typename T0, typename T1, typename T2, typename T3, typename T4>
+inline void stan_debug_path_taylor_appx_full2(T0&& logger, T1&& Hk, T2&& L_hk,
+                                              T3&& logdetcholHk,
+                                              T4&& x_center) {
   if (STAN_DEBUG_PATH_TAYLOR_APPX) {
     std::cout << "---Full---\n";
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
                                  "", "", " ");
-    std::cout << "Hk: " << Hk.format(CommaInitFmt) << "\n";
-    std::cout << "L_approx: \n" << L_hk.format(CommaInitFmt) << "\n";
-    std::cout << "logdetcholHk: \n" << logdetcholHk << "\n";
-    std::cout << "x_center: \n" << x_center.format(CommaInitFmt) << "\n";
+
+    std::stringstream debug_stream;
+    debug_stream << "Hk: " << Hk.format(CommaInitFmt) << "\n";
+    debug_stream << "L_approx: \n" << L_hk.format(CommaInitFmt) << "\n";
+    debug_stream << "logdetcholHk: \n" << logdetcholHk << "\n";
+    debug_stream << "x_center: \n" << x_center.format(CommaInitFmt) << "\n";
+    logger.info(debug_stream);
   }
 }
 
 template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
-          typename InvMat>
+          typename InvMat, typename Logger>
 inline auto construct_taylor_approximation_full(
     const Buff& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
-    const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est) {
-  stan_debug_path_taylor_appx_full1(alpha, ninvRST, Dk, point_est, grad_est);
+    const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
+    Logger&& logger) {
+  stan_debug_path_taylor_appx_full1(logger, alpha, ninvRST, Dk, point_est,
+                                    grad_est);
   Eigen::MatrixXd y_tcrossprod_alpha = tcrossprod(std_vec_matrix_times_diagonal(
       Ykt_mat, alpha.array().sqrt().matrix().eval()));
   y_tcrossprod_alpha += Dk.asDiagonal();
@@ -446,46 +548,55 @@ inline auto construct_taylor_approximation_full(
   double logdetcholHk = L_hk.diagonal().array().abs().log().sum();
 
   Eigen::VectorXd x_center = point_est - Hk * grad_est;
-  stan_debug_path_taylor_appx_full2(Hk, L_hk, logdetcholHk, x_center);
+  stan_debug_path_taylor_appx_full2(logger, Hk, L_hk, logdetcholHk, x_center);
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(L_hk),
                          Eigen::MatrixXd(0, 0), true};
 }
 
-template <typename T1>
-inline void stan_debug_path_taylor_appx_sparse1(T1&& Wkbart) {
+template <typename T0, typename T1>
+inline void stan_debug_path_taylor_appx_sparse1(T0&& logger, T1&& Wkbart) {
   if (STAN_DEBUG_PATH_TAYLOR_APPX) {
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
                                  "", "", " ");
-    std::cout << "---Sparse---\n";
-    std::cout << "Wkbar: \n" << Wkbart.format(CommaInitFmt) << "\n";
+    std::stringstream debug_stream;
+    debug_stream << "---Sparse---\n";
+    debug_stream << "Wkbar: \n" << Wkbart.format(CommaInitFmt) << "\n";
+    logger.info(debug_stream);
   }
 }
 
-template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10, typename T11>
-inline void stan_debug_path_taylor_appx_sparse2(T1&& qr, T2&& alpha, T3&& Qk, T4&& L_approx, T5&& logdetcholHk, T6&& Mkbar, T7&& Wkbart, T8&& x_center, T9&& ninvRST, T10&& ninvRSTg, T11&& Rkbar) {
+template <typename T0, typename T1, typename T2, typename T3, typename T4,
+          typename T5, typename T6, typename T7, typename T8, typename T9,
+          typename T10, typename T11>
+inline void stan_debug_path_taylor_appx_sparse2(
+    T0&& logger, T1&& qr, T2&& alpha, T3&& Qk, T4&& L_approx, T5&& logdetcholHk,
+    T6&& Mkbar, T7&& Wkbart, T8&& x_center, T9&& ninvRST, T10&& ninvRSTg,
+    T11&& Rkbar) {
   if (STAN_DEBUG_PATH_TAYLOR_APPX) {
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
                                  "", "", " ");
-    std::cout << "Full QR: \n" << qr.matrixQR().format(CommaInitFmt) << "\n";
-    std::cout << "Alpha: \n" << alpha.format(CommaInitFmt) << "\n";
-    std::cout << "Qk: \n" << Qk.format(CommaInitFmt) << "\n";
-    std::cout << "L_approx: \n" << L_approx.format(CommaInitFmt) << "\n";
-    std::cout << "logdetcholHk: \n" << logdetcholHk << "\n";
-    std::cout << "Mkbar: \n" << Mkbar.format(CommaInitFmt) << "\n";
-    std::cout << "Decomp Wkbar: \n" << Wkbart.format(CommaInitFmt) << "\n";
-    std::cout << "x_center: \n" << x_center.format(CommaInitFmt) << "\n";
-    std::cout << "NinvRST: " << ninvRST.format(CommaInitFmt) << "\n";
-    std::cout << "ninvRSTg: \n" << ninvRSTg.format(CommaInitFmt) << "\n";
-    std::cout << "Rkbar: " << Rkbar.format(CommaInitFmt) << "\n";
+    std::stringstream debug_stream;
+    debug_stream << "Full QR: \n" << qr.matrixQR().format(CommaInitFmt) << "\n";
+    debug_stream << "Alpha: \n" << alpha.format(CommaInitFmt) << "\n";
+    debug_stream << "Qk: \n" << Qk.format(CommaInitFmt) << "\n";
+    debug_stream << "L_approx: \n" << L_approx.format(CommaInitFmt) << "\n";
+    debug_stream << "logdetcholHk: \n" << logdetcholHk << "\n";
+    debug_stream << "Mkbar: \n" << Mkbar.format(CommaInitFmt) << "\n";
+    debug_stream << "Decomp Wkbar: \n" << Wkbart.format(CommaInitFmt) << "\n";
+    debug_stream << "x_center: \n" << x_center.format(CommaInitFmt) << "\n";
+    debug_stream << "NinvRST: " << ninvRST.format(CommaInitFmt) << "\n";
+    debug_stream << "ninvRSTg: \n" << ninvRSTg.format(CommaInitFmt) << "\n";
+    debug_stream << "Rkbar: " << Rkbar.format(CommaInitFmt) << "\n";
+    logger.info(debug_stream);
   }
-
 }
 
 template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
-          typename InvMat>
+          typename InvMat, typename Logger>
 inline auto construct_taylor_approximation_sparse(
     const Buff& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
-    const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est) {
+    const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
+    Logger&& logger) {
   const Eigen::Index current_history_size = Ykt_mat.size();
   Eigen::MatrixXd y_mul_sqrt_alpha = std_vec_matrix_times_diagonal(
       Ykt_mat, alpha.array().sqrt().matrix().eval());
@@ -493,7 +604,7 @@ inline auto construct_taylor_approximation_sparse(
   Wkbart.topRows(Ykt_mat.size()) = y_mul_sqrt_alpha;
   Wkbart.bottomRows(ninvRST.rows())
       = ninvRST * alpha.array().inverse().sqrt().matrix().asDiagonal();
-  stan_debug_path_taylor_appx_sparse1(Wkbart);
+  stan_debug_path_taylor_appx_sparse1(logger, Wkbart);
   Eigen::MatrixXd Mkbar(2 * current_history_size, 2 * current_history_size);
   Mkbar.topLeftCorner(current_history_size, current_history_size).setZero();
   Mkbar.topRightCorner(current_history_size, current_history_size)
@@ -531,24 +642,27 @@ inline auto construct_taylor_approximation_sparse(
            + crossprod(ninvRST,
                        std_vec_matrix_mul_vector(Ykt_mat, alpha_mul_grad))
            + crossprod(ninvRST, y_tcrossprod_alpha * ninvRSTg));
-  stan_debug_path_taylor_appx_sparse2(qr, alpha, Qk, L_approx, logdetcholHk, Mkbar, Wkbart, x_center, ninvRST, ninvRSTg, Rkbar);
+  stan_debug_path_taylor_appx_sparse2(logger, qr, alpha, Qk, L_approx,
+                                      logdetcholHk, Mkbar, Wkbart, x_center,
+                                      ninvRST, ninvRSTg, Rkbar);
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(L_approx),
                          std::move(Qk), false};
 }
 
 template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
-          typename InvMat>
+          typename InvMat, typename Logger>
 inline auto construct_taylor_approximation(
     const Buff& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
-    const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est) {
+    const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
+    Logger&& logger) {
   // If twice the current history size is larger than the number of params
   // use a sparse approximation
   if (2 * Ykt_mat.size() >= Ykt_mat[0].size()) {
     return construct_taylor_approximation_full(Ykt_mat, alpha, Dk, ninvRST,
-                                               point_est, grad_est);
+                                               point_est, grad_est, logger);
   } else {
     return construct_taylor_approximation_sparse(Ykt_mat, alpha, Dk, ninvRST,
-                                                 point_est, grad_est);
+                                                 point_est, grad_est, logger);
   }
 }
 
@@ -566,7 +680,7 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio,
                            EigMat&& samples) noexcept {
   return return_code;
 }
-}
+}  // namespace internal
 /**
  * Runs the L-BFGS algorithm for a model.
  *
@@ -617,15 +731,14 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio,
  *
  */
 template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
-          typename ParamWriter>//, typename XVal, typename GVal>
-inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
-   Model& model, const stan::io::var_context& init,
-    unsigned int random_seed, unsigned int path, double init_radius,
-    int history_size, double init_alpha, double tol_obj, double tol_rel_obj,
-    double tol_grad, double tol_rel_grad, double tol_param, int num_iterations,
-    bool save_iterations, int refresh, callbacks::interrupt& interrupt,
-    int num_elbo_draws, int num_draws, int num_eval_attempts,
-    size_t num_threads, callbacks::logger& logger,
+          typename ParamWriter>       //, typename XVal, typename GVal>
+inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
+    Model& model, const stan::io::var_context& init, unsigned int random_seed,
+    unsigned int path, double init_radius, int history_size, double init_alpha,
+    double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
+    double tol_param, int num_iterations, bool save_iterations, int refresh,
+    callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
+    int num_eval_attempts, size_t num_threads, callbacks::logger& logger,
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
     DiagnosticWriter& diagnostic_writer) {
   const auto start_optim_time = std::chrono::steady_clock::now();
@@ -667,7 +780,6 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
   names.push_back("lp_approx__");
   names.push_back("lp__");
   parameter_writer(names);
-  diagnostic_writer(names);
   /*
    * 2. Run L-BFGS to return optimization path for parameters, gradients of
    * objective function, and factorization of covariance estimation
@@ -679,12 +791,20 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
   grad_vecs.reserve(num_iterations);
   {
     std::vector<double> g1;
-    double blah = stan::model::log_prob_grad<true, true>(model, cont_vector,
+    double lp = stan::model::log_prob_grad<true, true>(model, cont_vector,
                                                          disc_vector, g1);
     param_vecs.emplace_back(
         Eigen::Map<Eigen::VectorXd>(cont_vector.data(), param_size));
     grad_vecs.emplace_back(Eigen::Map<Eigen::VectorXd>(g1.data(), param_size));
+    if (save_iterations) {
+      diagnostic_writer(std::make_tuple(Eigen::Map<Eigen::VectorXd>(cont_vector.data(), param_size).eval(), Eigen::Map<Eigen::VectorXd>(g1.data(), param_size).eval()));
+    }
   }
+  auto constrain_fun = [&model](auto&& rng, auto&& unconstrained_draws,
+                                auto&& constrained_draws) {
+    model.write_array(rng, unconstrained_draws, constrained_draws);
+    return constrained_draws;
+  };
   int param_cols_filled = 0;
   while (ret == 0) {
     std::stringstream msg;
@@ -736,6 +856,9 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
     if (msg.str().length() > 0) {
       logger.info(msg);
     }
+    if (save_iterations) {
+      diagnostic_writer(std::make_tuple(lbfgs.curr_x(), lbfgs.curr_g()));
+    }
   }
   int return_code;
   if (ret >= 0) {
@@ -765,46 +888,40 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
   }
   const auto diff_size = Ykt_diff.cols();
   Eigen::MatrixXd alpha_mat(param_size, diff_size);
-  Eigen::Matrix<bool, -1, 1> check_curve_vec = stan::services::pathfinder::internal::check_curve(Ykt_diff, Skt_diff);
+  Eigen::Matrix<bool, -1, 1> check_curve_vec
+      = stan::services::pathfinder::internal::check_curve(Ykt_diff, Skt_diff,
+                                                          logger);
   if (check_curve_vec[0]) {
-    alpha_mat.col(0) = stan::services::pathfinder::internal::form_diag(Eigen::VectorXd::Ones(param_size),
-                                    Ykt_diff.col(0), Skt_diff.col(0));
+    alpha_mat.col(0) = stan::services::pathfinder::internal::form_diag(
+        Eigen::VectorXd::Ones(param_size), Ykt_diff.col(0), Skt_diff.col(0));
   } else {
     alpha_mat.col(0).setOnes();
   }
   for (Eigen::Index iter = 1; iter < diff_size; iter++) {
     if (check_curve_vec[iter]) {
-      alpha_mat.col(iter) = stan::services::pathfinder::internal::form_diag(alpha_mat.col(iter - 1),
-                                      Ykt_diff.col(iter), Skt_diff.col(iter));
+      alpha_mat.col(iter) = stan::services::pathfinder::internal::form_diag(
+          alpha_mat.col(iter - 1), Ykt_diff.col(iter), Skt_diff.col(iter));
     } else {
       alpha_mat.col(iter) = alpha_mat.col(iter - 1);
     }
   }
   std::mutex update_best_mutex;
-  stan::services::pathfinder::internal::stan_debug_post_lbfgs(update_best_mutex, param_size, num_elbo_draws, alpha_mat, Ykt_diff, Skt_diff);
+  stan::services::pathfinder::internal::stan_debug_post_lbfgs(
+      logger, update_best_mutex, param_size, num_elbo_draws, alpha_mat,
+      Ykt_diff, Skt_diff);
   auto lp_fun = [&model](auto&& u, auto&& streamer) {
     return model.template log_prob<false, true>(u, &streamer);
-  };
-  auto constrain_fun = [&model](auto&& rng, auto&& unconstrained_draws, auto&& constrained_draws) {
-    model.write_array(rng, unconstrained_draws, constrained_draws);
-    return constrained_draws;
   };
   // NOTE: We always push the first one no matter what
   check_curve_vec[0] = true;
   std::vector<boost::ecuyer1988> rng_vec;
-  const int tbb_threads = stan::math::internal::get_num_threads();
+  const int tbb_threads = tbb::this_task_arena::max_concurrency();
   rng_vec.reserve(tbb_threads);
   for (Eigen::Index i = 0; i < tbb_threads + 1; i++) {
     rng_vec.emplace_back(
         util::create_rng<boost::ecuyer1988>(random_seed, path + i));
   }
-  Eigen::MatrixXd elbo_mat;
-  if (STAN_DEBUG_PATH_BEST_ELBO) {
-    elbo_mat = Eigen::MatrixXd(diff_size, 2);
-    for (int i = 0; i < elbo_mat.rows(); ++i) {
-      elbo_mat(i, 0) = i;
-    }
-  }
+
   Eigen::Index best_E = -1;
   stan::services::pathfinder::internal::elbo_est_t elbo_best;
   stan::services::pathfinder::internal::taylor_approx_t taylor_approx_best;
@@ -812,12 +929,14 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
   tbb::parallel_for(
       tbb::blocked_range<Eigen::Index>(0, diff_size),
       [&](tbb::blocked_range<Eigen::Index> r) {
-        auto&& thread_rng = rng_vec[tbb::this_task_arena::current_thread_index()];
+        auto&& thread_rng
+            = rng_vec[tbb::this_task_arena::current_thread_index()];
         for (int iter = r.begin(); iter < r.end(); ++iter) {
           std::string iter_msg(path_num + "Iter: [" + std::to_string(iter)
                                + "] ");
           if (STAN_DEBUG_PATH_ITERS) {
-            std::cout << "\n------------ Iter: " << iter << "------------\n";
+            logger.info(iter_msg + "\n------------ Iter: "
+                        + std::to_string(iter) + "------------\n");
           }
           auto alpha = alpha_mat.col(iter);
           std::vector<Eigen::Index> ys_cols;
@@ -855,21 +974,28 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
           {
             Skt_mat.transposeInPlace();
             if (STAN_DEBUG_PATH_ITERS) {
-              std::cout << "\nRk: \n" << Rk << "\n";
-              std::cout << "\nSkt: \n" << Skt_mat << "\n";
+              std::stringstream debug_info;
+              debug_info << iter_msg;
+              debug_info << "\nRk: \n" << Rk << "\n";
+              debug_info << "\nSkt: \n" << Skt_mat << "\n";
+              logger.info(debug_info);
             }
             Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat);
             ninvRST = std::move(-Skt_mat);
             if (STAN_DEBUG_PATH_ITERS) {
-              std::cout << "\nninvRST: \n" << ninvRST << "\n";
+              std::stringstream debug_info;
+              debug_info << iter_msg;
+              debug_info << "\nninvRST: \n" << ninvRST << "\n";
+              logger.info(debug_info);
             }
           }
           /**
            * 3a(1). Run BFGS-Sample to get pieces need for sampling.
            */
-          auto taylor_appx_tuple = stan::services::pathfinder::internal::construct_taylor_approximation(
-              Ykt_h, alpha, Dk, ninvRST, param_vecs[iter + 1],
-              grad_vecs[iter + 1]);
+          auto taylor_appx_tuple = stan::services::pathfinder::internal::
+              construct_taylor_approximation(Ykt_h, alpha, Dk, ninvRST,
+                                             param_vecs[iter + 1],
+                                             grad_vecs[iter + 1], logger);
 
           /**
            * 3a(1). Get `num_elbo_draws` draws from normal
@@ -879,26 +1005,22 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
           //  4. Find $l \in L$ that maximizes ELBO $l^* = arg max_l ELBO^(l)$.
           stan::services::pathfinder::internal::elbo_est_t elbo_est;
           try {
-            elbo_est = stan::services::pathfinder::internal::est_approx_draws<true>(lp_fun, constrain_fun, thread_rng,
-                                              taylor_appx_tuple, num_elbo_draws,
-                                              alpha, logger, num_eval_attempts, iter_msg);
+            elbo_est
+                = stan::services::pathfinder::internal::est_approx_draws<true>(
+                    lp_fun, constrain_fun, thread_rng, taylor_appx_tuple,
+                    num_elbo_draws, alpha, logger, num_eval_attempts, iter_msg);
           } catch (const std::exception& e) {
-            logger.info(iter_msg + "ELBO estimation failed " + " with error: " +
-                + e.what());
+            logger.info(iter_msg + "ELBO estimation failed "
+                        + " with error: " + +e.what());
             continue;
           }
           if (refresh > 0
               && (lbfgs.iter_num() == 0
                   || ((lbfgs.iter_num() + 1) % refresh == 0))) {
-            logger.info(iter_msg + ": ELBO (" + std::to_string(elbo_est.elbo) + ")");
-          }
-          if (STAN_DEBUG_PATH_BEST_ELBO) {
-            elbo_mat(iter, 1) = elbo_est.elbo;
+            logger.info(iter_msg + ": ELBO (" + std::to_string(elbo_est.elbo)
+                        + ")");
           }
           {
-            if (STAN_DEBUG_PATH_BEST_ELBO) {
-              std::cout << "elbo best: " << elbo_best.elbo << "\n";
-            }
             std::lock_guard<std::mutex> guard(update_best_mutex);
             if (elbo_est.elbo > elbo_best.elbo) {
               elbo_best = std::move(elbo_est);
@@ -908,21 +1030,16 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
           }
         }
       });
-  if (STAN_DEBUG_PATH_BEST_ELBO) {
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
-                                 "", "", " ");
-    std::cout << "ELBOs: \n" << elbo_mat.format(CommaInitFmt) << "\n";
-    std::cout << "Winner: " << best_E << "\n";
-    std::cout << "optim vals: \n" << param_vecs[best_E + 1] << "\n";
-  }
   if (best_E == -1) {
     logger.info(path_num +
         "Failure: None of the LBFGS iterations completed "
         "successfully");
-    return stan::services::pathfinder::internal::ret_pathfinder<ReturnLpSamples>(error_codes::SOFTWARE, Eigen::Array<double, -1, 1>(0),
-                                           Eigen::Array<double, -1, -1>(0, 0));
+    return stan::services::pathfinder::internal::ret_pathfinder<
+        ReturnLpSamples>(error_codes::SOFTWARE, Eigen::Array<double, -1, 1>(0),
+                         Eigen::Array<double, -1, -1>(0, 0));
   } else {
-    logger.info(path_num + "Best Iter: [" + std::to_string(best_E) + "] ELBO (" + std::to_string(elbo_best.elbo) + ")");
+    logger.info(path_num + "Best Iter: [" + std::to_string(best_E) + "] ELBO ("
+                + std::to_string(elbo_best.elbo) + ")");
   }
   Eigen::Array<double, -1, -1> constrained_draws_mat;
   Eigen::Array<double, -1, 1> lp_ratio;
@@ -933,51 +1050,64 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
   if (remaining_draws > 0) {
     try {
       auto&& thread_rng = rng_vec[tbb::this_task_arena::current_thread_index()];
-      stan::services::pathfinder::internal::elbo_est_t est_draws = stan::services::pathfinder::internal::est_approx_draws<false>(lp_fun, constrain_fun, thread_rng, taylor_approx_best, remaining_draws, alpha_mat.col(best_E), logger, num_eval_attempts, path_num);
+      stan::services::pathfinder::internal::elbo_est_t est_draws
+          = stan::services::pathfinder::internal::est_approx_draws<false>(
+              lp_fun, constrain_fun, thread_rng, taylor_approx_best,
+              remaining_draws, alpha_mat.col(best_E), logger, num_eval_attempts,
+              path_num);
       auto&& new_lp_ratio = est_draws.lp_ratio;
       auto&& lp_draws = est_draws.lp_mat;
       auto&& new_draws = est_draws.repeat_draws;
-      lp_ratio = Eigen::Array<double, -1, 1>(new_lp_ratio.size() + elbo_lp_ratio.size());
+      lp_ratio = Eigen::Array<double, -1, 1>(new_lp_ratio.size()
+                                             + elbo_lp_ratio.size());
       lp_ratio.head(elbo_lp_ratio.size()) = elbo_lp_ratio.array();
       lp_ratio.tail(new_lp_ratio.size()) = new_lp_ratio.array();
       const auto total_size = elbo_draws.cols() + new_draws.cols();
-      constrained_draws_mat = Eigen::Array<double, -1, -1>(names.size(), total_size);
+      constrained_draws_mat
+          = Eigen::Array<double, -1, -1>(names.size(), total_size);
       Eigen::VectorXd unconstrained_col;
       Eigen::VectorXd approx_samples_constrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
         unconstrained_col = elbo_draws.col(i);
-        constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(rng, unconstrained_col, approx_samples_constrained_col);
+        constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(
+            rng, unconstrained_col, approx_samples_constrained_col);
         constrained_draws_mat.col(i).tail(2) = elbo_lp_mat.row(i);
       }
-      for (Eigen::Index i = elbo_draws.cols(), j = 0; i < total_size; ++i, ++j) {
+      for (Eigen::Index i = elbo_draws.cols(), j = 0; i < total_size;
+           ++i, ++j) {
         unconstrained_col = new_draws.col(j);
-        constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(rng, unconstrained_col, approx_samples_constrained_col);
+        constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(
+            rng, unconstrained_col, approx_samples_constrained_col);
         constrained_draws_mat.col(i).tail(2) = lp_draws.row(j);
       }
     } catch (const std::exception& e) {
-      logger.info( path_num +
-          "Final sampling approximation failed with error: "
+      logger.info(path_num + "Final sampling approximation failed with error: "
+                  + e.what());
+      logger.info(
+          path_num
+          + "Returning the approximate samples used for ELBO calculation: "
           + e.what());
-      logger.info(path_num +
-          "Returning the approximate samples used for ELBO calculation: "
-          + e.what());
-      constrained_draws_mat = Eigen::Array<double, -1, -1>(names.size(), elbo_draws.cols());
+      constrained_draws_mat
+          = Eigen::Array<double, -1, -1>(names.size(), elbo_draws.cols());
       Eigen::VectorXd approx_samples_constrained_col;
       Eigen::VectorXd unconstrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
         unconstrained_col = elbo_draws.col(i);
-        constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(rng, unconstrained_col, approx_samples_constrained_col);
+        constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(
+            rng, unconstrained_col, approx_samples_constrained_col);
         constrained_draws_mat.col(i).tail(2) = elbo_lp_mat.row(i);
       }
       lp_ratio = std::move(elbo_best.lp_ratio);
     }
   } else {
-    constrained_draws_mat = Eigen::Array<double, -1, -1>(names.size(), elbo_draws.cols());
+    constrained_draws_mat
+        = Eigen::Array<double, -1, -1>(names.size(), elbo_draws.cols());
     Eigen::VectorXd approx_samples_constrained_col;
     Eigen::VectorXd unconstrained_col;
-  for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
+    for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
       unconstrained_col = elbo_draws.col(i);
-      constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(rng, unconstrained_col, approx_samples_constrained_col);
+      constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(
+          rng, unconstrained_col, approx_samples_constrained_col);
       constrained_draws_mat.col(i).tail(2) = elbo_lp_mat.row(i);
     }
     lp_ratio = std::move(elbo_best.lp_ratio);
@@ -1004,11 +1134,11 @@ inline auto pathfinder_lbfgs_single(//XVal&& x_val, GVal&& g_val,
         + " seconds (Total)";
   parameter_writer(total_time_str);
   parameter_writer();
-  return stan::services::pathfinder::internal::ret_pathfinder<ReturnLpSamples>(error_codes::OK, std::move(lp_ratio),
-                                         std::move(constrained_draws_mat));
+  return stan::services::pathfinder::internal::ret_pathfinder<ReturnLpSamples>(
+      error_codes::OK, std::move(lp_ratio), std::move(constrained_draws_mat));
 }
 
-}  // namespace optimize
+}  // namespace pathfinder
 }  // namespace services
 }  // namespace stan
 #endif

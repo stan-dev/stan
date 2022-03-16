@@ -26,42 +26,6 @@
 #define STAN_DEBUG_MULTI_PATH_PSIS false
 #define STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER false
 
-/*
-if (STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER) {
-  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ",
-                               "\n", "", "", "");
-  auto param_vals = std::get<2>(pathfinder_ret).transpose();
-  Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
-  std::cout << "Mean Values: \n"
-            << mean_vals.format(CommaInitFmt) << "\n";
-  std::cout << "SD Values: \n"
-            << ((param_vals.rowwise() - mean_vals)
-                    .array()
-                    .square()
-                    .matrix()
-                    .colwise()
-                    .sum()
-                    .array()
-                / (param_vals.rows() - 1))
-                   .sqrt()
-            << "\n";
-}
-if (STAN_DEBUG_MULTI_PATH_PSIS) {
-  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
-                               "", "", "");
-  std::cout << "\n tail_len: " << tail_len << "\n";
-  std::cout << "\nSamples rows: " << samples.rows()
-            << " cols: " << samples.cols() << "\n";
-  std::cout << "\n raw lps: \n"
-            << samples.bottomRows(2).transpose().eval().format(CommaInitFmt)
-            << "\n";
-  std::cout << "\n lp ratios: \n"
-            << lp_ratios.transpose().eval().format(CommaInitFmt);
-  std::cout << "\n weight_vals: \n"
-            << weight_vals.transpose().eval().format(CommaInitFmt);
-}
-
-*/
 namespace stan {
 namespace services {
 namespace pathfinder {
