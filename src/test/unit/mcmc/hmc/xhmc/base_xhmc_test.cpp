@@ -58,7 +58,7 @@ class divergent_xhmc : public base_xhmc<mock_model, divergent_hamiltonian,
  public:
   divergent_xhmc(const mock_model& m, rng_t& rng)
       : base_xhmc<mock_model, divergent_hamiltonian, expl_leapfrog, rng_t>(
-            m, rng) {}
+          m, rng) {}
 };
 
 }  // namespace mcmc

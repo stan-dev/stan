@@ -66,7 +66,7 @@ class softabs_metric : public base_hamiltonian<Model, softabs_point, BaseRNG> {
   Eigen::VectorXd dtau_dp(softabs_point& z) {
     return z.eigen_deco.eigenvectors()
            * z.softabs_lambda_inv.cwiseProduct(
-                 z.eigen_deco.eigenvectors().transpose() * z.p);
+               z.eigen_deco.eigenvectors().transpose() * z.p);
   }
 
   Eigen::VectorXd dphi_dq(softabs_point& z, callbacks::logger& logger) {
