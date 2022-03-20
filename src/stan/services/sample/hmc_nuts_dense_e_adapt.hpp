@@ -1,11 +1,11 @@
 #ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_ADAPT_HPP
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_ADAPT_HPP
 
-#include <stan/math/prim.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/run_adaptive_sampler.hpp>

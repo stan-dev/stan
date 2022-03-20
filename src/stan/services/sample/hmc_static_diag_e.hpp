@@ -12,7 +12,6 @@
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/inv_metric.hpp>
-
 #include <vector>
 
 namespace stan {
