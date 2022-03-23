@@ -863,13 +863,18 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
   int return_code;
   if (ret >= 0) {
     logger.info("Optimization terminated normally: ");
-    return_code = error_codes::OK;
   } else {
     logger.info("Optimization terminated with error: ");
     logger.info("  " + lbfgs.get_code_string(ret));
-    logger.info(
-        "Stan will still attempt pathfinder but may fail or produce incorrect "
-        "results.");
+    if (param_vecs.size() == 1) {
+      logger.info("Optimization failed to start, pathfinder cannot be run.");
+      return stan::services::pathfinder::internal::ret_pathfinder<ReturnLpSamples>(error_codes::SOFTWARE, Eigen::Array<double, -1, 1>(0),
+                                             Eigen::Array<double, -1, -1>(0, 0));
+    } else {
+      logger.info(
+          "Stan will still attempt pathfinder but may fail or produce incorrect "
+          "results.");
+    }
     return_code = error_codes::OK;
   }
 
