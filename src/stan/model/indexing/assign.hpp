@@ -10,6 +10,7 @@
 #include <stan/model/indexing/rvalue_index_size.hpp>
 #include <type_traits>
 #include <vector>
+#include <tuple>
 
 namespace stan {
 
@@ -888,6 +889,25 @@ inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
       assign(x[i - 1], y[n], name, idxs...);
     }
   }
+}
+
+namespace internal {
+  template <typename... Types>
+  struct is_tuple_impl : std::false_type {};
+  template <typename... Types>
+  struct is_tuple_impl<std::tuple<Types...>> : std::true_type {};
+
+  template <typename T>
+  struct is_tuple : is_tuple_imple<std::decay_t<T>> {};
+
+}
+
+template <typename Tuple1, typename Tuple2,
+ require_all_t<internal::is_tuple<Tuple1>, internal::is_tuple<Tuple2>>* = nullptr>
+inline void assign(Tuple1&& x, Tuple2&& y, const char* name) {
+  stan::math::for_each([name](auto&& x_sub, auto&& y_sub) mutable {
+    assign(std::forward<decltype(x_sub)>(x_sub), std::forward<decltype(y_sub)>(y_sub), name);
+  }, std::forward<Tuple1>(x), std::forward<Tuple2>(y));
 }
 
 }  // namespace model
