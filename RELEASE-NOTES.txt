@@ -5,6 +5,12 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.29.2 (25 March 2022)
+======================================================================
+
+- Fixed bug with selecting matrix rows with `matrix[x:x, ]`.
+- Updated Math submodule to 4.3.2
+
 v2.29.1 (2 March 2022)
 ======================================================================
 
