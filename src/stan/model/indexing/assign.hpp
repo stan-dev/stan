@@ -3,6 +3,7 @@
 
 #include <stan/math/prim/meta.hpp>
 #include <stan/math/prim/err.hpp>
+#include <stan/math/prim/functor.hpp>
 #include <stan/math/prim/fun/to_ref.hpp>
 #include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
@@ -891,19 +892,11 @@ inline void assign(T&& x, U&& y, const char* name, const Idx1& idx1,
   }
 }
 
-namespace internal {
-  template <typename... Types>
-  struct is_tuple_impl : std::false_type {};
-  template <typename... Types>
-  struct is_tuple_impl<std::tuple<Types...>> : std::true_type {};
-
-  template <typename T>
-  struct is_tuple : is_tuple_imple<std::decay_t<T>> {};
-
-}
 
 template <typename Tuple1, typename Tuple2,
- require_all_t<internal::is_tuple<Tuple1>, internal::is_tuple<Tuple2>>* = nullptr>
+ require_all_t<internal::is_tuple<Tuple1>, internal::is_tuple<Tuple2>>* = nullptr,
+ require_not_t<
+     std::is_assignable<std::decay_t<Tuple1>&, std::decay_t<Tuple2>>>* = nullptr>
 inline void assign(Tuple1&& x, Tuple2&& y, const char* name) {
   stan::math::for_each([name](auto&& x_sub, auto&& y_sub) mutable {
     assign(std::forward<decltype(x_sub)>(x_sub), std::forward<decltype(y_sub)>(y_sub), name);
