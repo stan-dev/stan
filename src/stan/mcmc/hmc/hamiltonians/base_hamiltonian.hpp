@@ -51,7 +51,7 @@ class base_hamiltonian {
 
   void update_potential(Point& z, callbacks::logger& logger) {
     try {
-      z.V = -stan::model::log_prob_propto<true>(model_, z.q);
+      z.V = -stan::model::log_prob_propto<true, true>(model_, z.q);
     } catch (const std::exception& e) {
       this->write_error_msg_(e, logger);
       z.V = std::numeric_limits<double>::infinity();

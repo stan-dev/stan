@@ -87,7 +87,7 @@ class model_base_crtp : public stan::model::model_base {
 
   inline double log_prob(Eigen::VectorXd& theta,
                          std::ostream* msgs) const override {
-    return static_cast<const M*>(this)->template log_prob<false, false, double>(
+    return static_cast<const M*>(this)->template log_prob<false, false>(
         theta, msgs);
   }
   inline math::var log_prob(Eigen::Matrix<math::var, -1, 1>& theta,

@@ -34,21 +34,8 @@ double log_prob_propto(const M& model, std::vector<double>& params_r,
                        std::vector<int>& params_i, std::ostream* msgs = 0) {
   using stan::math::var;
   using std::vector;
-  try {
-    vector<var> ad_params_r;
-    ad_params_r.reserve(model.num_params_r());
-    for (size_t i = 0; i < model.num_params_r(); ++i)
-      ad_params_r.push_back(params_r[i]);
-    double lp = model
-                    .template log_prob<true, jacobian_adjust_transform>(
-                        ad_params_r, params_i, msgs)
-                    .val();
-    stan::math::recover_memory();
-    return lp;
-  } catch (std::exception& ex) {
-    stan::math::recover_memory();
-    throw;
-  }
+  return model.template log_prob<true, jacobian_adjust_transform>(
+                        params_r, params_i, msgs);
 }
 
 /**
@@ -74,24 +61,8 @@ double log_prob_propto(const M& model, std::vector<double>& params_r,
 template <bool jacobian_adjust_transform, class M>
 double log_prob_propto(const M& model, Eigen::VectorXd& params_r,
                        std::ostream* msgs = 0) {
-  using stan::math::var;
-  using std::vector;
-  vector<int> params_i(0);
-  try {
-    vector<var> ad_params_r;
-    ad_params_r.reserve(model.num_params_r());
-    for (size_t i = 0; i < model.num_params_r(); ++i)
-      ad_params_r.push_back(params_r(i));
-    double lp = model
-                    .template log_prob<true, jacobian_adjust_transform>(
-                        ad_params_r, params_i, msgs)
-                    .val();
-    stan::math::recover_memory();
-    return lp;
-  } catch (std::exception& ex) {
-    stan::math::recover_memory();
-    throw;
-  }
+  return model.template log_prob<true, jacobian_adjust_transform>(
+                        params_r,  msgs);
 }
 
 }  // namespace model
