@@ -6,6 +6,7 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/array_var_context.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/variational/print_progress.hpp>
 #include <stan/variational/families/normal_fullrank.hpp>
@@ -397,7 +398,7 @@ class advi {
         print_vector.push_back(iter_counter);
         print_vector.push_back(delta_t);
         print_vector.push_back(elbo);
-        diagnostic_writer(print_vector);
+        // diagnostic_writer(print_vector);
 
         if (delta_elbo_ave < tol_rel_obj) {
           ss << "   MEAN ELBO CONVERGED";
@@ -459,7 +460,7 @@ class advi {
           double tol_rel_obj, int max_iterations, callbacks::logger& logger,
           callbacks::writer& parameter_writer,
           callbacks::writer& diagnostic_writer) const {
-    diagnostic_writer("iter,time_in_seconds,ELBO");
+    //diagnostic_writer("iter,time_in_seconds,ELBO");
 
     // Initialize variational approximation
     Q variational = Q(cont_params_);
@@ -488,6 +489,17 @@ class advi {
                        &msg);
     if (msg.str().length() > 0)
       logger.info(msg);
+    
+    std::vector<std::string> constrain_param_names;
+    std::vector<std::string> param_names;
+    model_.get_param_names(param_names);
+    std::vector<std::vector<size_t>> param_dims;
+    model_.get_dims(param_dims);
+    stan::io::array_var_context context(param_names, values, param_dims);
+    std::vector<double> unconstrained;
+    model_.transform_inits(context, disc_vector, unconstrained, &msg);
+    model_.constrained_param_names(constrain_param_names, false, false);
+    diagnostic_writer(constrain_param_names);
 
     // The first row of lp_, log_p, and log_g.
     values.insert(values.begin(), {0, 0, 0});
@@ -510,6 +522,9 @@ class advi {
       std::stringstream msg2;
       model_.write_array(rng_, cont_vector, disc_vector, values, true, true,
                          &msg2);
+      stan::io::array_var_context context(param_names, values, param_dims);
+      model_.transform_inits(context, disc_vector, unconstrained, &msg);
+      diagnostic_writer(unconstrained);
       //  log_p: Log probability in the unconstrained space
       log_p = model_.template log_prob<false, true>(cont_params_, &msg2);
       if (msg2.str().length() > 0)
