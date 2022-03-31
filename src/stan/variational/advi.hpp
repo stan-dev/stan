@@ -495,9 +495,7 @@ class advi {
     model_.get_param_names(param_names);
     std::vector<std::vector<size_t>> param_dims;
     model_.get_dims(param_dims);
-    stan::io::array_var_context context(param_names, values, param_dims);
     std::vector<double> unconstrained;
-    model_.transform_inits(context, disc_vector, unconstrained, &msg);
     model_.constrained_param_names(constrain_param_names, false, false);
     diagnostic_writer(constrain_param_names);
 
