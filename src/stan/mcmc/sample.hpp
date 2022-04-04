@@ -48,9 +48,9 @@ class sample {
     values.push_back(log_prob_);
     values.push_back(accept_stat_);
   }
+  Eigen::VectorXd cont_params_;  // Continuous coordinates of sample
 
  private:
-  Eigen::VectorXd cont_params_;  // Continuous coordinates of sample
   double log_prob_;              // Log probability of sample
   double accept_stat_;           // Acceptance statistic of transition
 };

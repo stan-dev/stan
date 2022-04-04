@@ -101,16 +101,21 @@ class mcmc_writer {
     sample.get_sample_params(values);
     sampler.get_sampler_params(values);
 
-    std::vector<double> model_values;
+    Eigen::VectorXd model_values;
     std::vector<int> params_i;
     std::stringstream ss;
     try {
+      model.write_array(rng, sample.cont_params_, model_values, true, true,
+                        &ss);
+      /*
       std::vector<double> cont_params(
           sample.cont_params().data(),
           sample.cont_params().data() + sample.cont_params().size());
       model.write_array(rng, cont_params, params_i, model_values, true, true,
                         &ss);
+                        */
     } catch (const std::exception& e) {
+      model_values = Eigen::VectorXd::Constant(num_model_params_, std::numeric_limits<double>::quiet_NaN());
       if (ss.str().length() > 0)
         logger_.info(ss);
       ss.str("");
@@ -119,12 +124,13 @@ class mcmc_writer {
     if (ss.str().length() > 0)
       logger_.info(ss);
 
-    if (model_values.size() > 0)
-      values.insert(values.end(), model_values.begin(), model_values.end());
-    if (model_values.size() < num_model_params_)
+    if (model_values.size() > 0) {
+      values.insert(values.end(), model_values.data(), model_values.data() + model_values.size());
+    }
+    if (model_values.size() < num_model_params_) {
       values.insert(values.end(), num_model_params_ - model_values.size(),
                     std::numeric_limits<double>::quiet_NaN());
-
+    }
     sample_writer_(values);
   }
 
