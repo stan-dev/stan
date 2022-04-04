@@ -2,7 +2,6 @@
 #include <stan/io/var_context.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/callbacks/stream_logger.hpp>
-#include <stan/model/prob_grad.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
@@ -12,10 +11,10 @@
 typedef boost::ecuyer1988 rng_t;
 
 // Mock Model
-class mock_model : public stan::model::prob_grad {
+class mock_model : public stan::model::model_base {
  public:
   mock_model(size_t num_params_r)
-      : stan::model::prob_grad(num_params_r),
+      : stan::model::model_base(num_params_r),
         templated_log_prob_calls(0),
         transform_inits_calls(0),
         write_array_calls(0),
@@ -92,10 +91,10 @@ class mock_model : public stan::model::prob_grad {
 };
 
 // Mock Throwing Model throws exception
-class mock_throwing_model : public stan::model::prob_grad {
+class mock_throwing_model : public stan::model::model_base {
  public:
   mock_throwing_model(size_t num_params_r)
-      : stan::model::prob_grad(num_params_r),
+      : stan::model::model_base(num_params_r),
         templated_log_prob_calls(0),
         transform_inits_calls(0),
         write_array_calls(0),

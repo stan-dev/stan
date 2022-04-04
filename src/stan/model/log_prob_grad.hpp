@@ -71,11 +71,7 @@ double log_prob_grad(const M& model, Eigen::VectorXd& params_r,
   using stan::math::var;
   using std::vector;
   try {
-    Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r(params_r.size());
-    for (size_t i = 0; i < model.num_params_r(); ++i) {
-      stan::math::var var_i(params_r[i]);
-      ad_params_r[i] = var_i;
-    }
+    Eigen::Matrix<var, Eigen::Dynamic, 1> ad_params_r = params_r.head(model.num_params_r());
     var adLogProb = model.template log_prob<propto, jacobian_adjust_transform>(
         ad_params_r, msgs);
     double val = adLogProb.val();

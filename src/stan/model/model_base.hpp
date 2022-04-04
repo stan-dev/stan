@@ -3,7 +3,6 @@
 
 #include <stan/io/var_context.hpp>
 #include <stan/math/rev/core.hpp>
-#include <stan/model/prob_grad.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <ostream>
 #include <string>
@@ -21,16 +20,16 @@ namespace model {
  *
  * <p><i>Implementation Details:</i> The reason there are so many
  * overloads of the `log_prob` and `write_array` methods is that
- * template methods cannot be declared virtual.  This class extends
- * `stan::model::prob_grad` in order to define sizing for the number
- * of unconstrained parameters;  thus it is not a pure virtual base
- * class.
+ * template methods cannot be declared virtual.
  *
  *<p>The approach to defining models used by the Stan language code
  * generator is use the curiously recursive template base class defined
  * in the extension `stan::model::model_base_crtp`.
  */
-class model_base : public prob_grad {
+class model_base {
+ protected:
+   size_t num_params_r__;
+
  public:
   /**
    * Construct a model with the specified number of real valued
@@ -39,12 +38,20 @@ class model_base : public prob_grad {
    * @param[in] num_params_r number of real-valued, unconstrained
    * parameters
    */
-  explicit model_base(size_t num_params_r) : prob_grad(num_params_r) {}
+  explicit model_base(size_t num_params_r) : num_params_r__(num_params_r) {}
 
   /**
    * Destructor.  This class has a no-op destructor.
    */
   virtual ~model_base() {}
+
+  /**
+   * Return number of unconstrained real parameters.
+   *
+   * @return number of unconstrained real parameters
+   */
+  inline size_t num_params_r() const { return num_params_r__; }
+
 
   /**
    * Return the name of the model.

@@ -167,10 +167,10 @@ TEST_F(ServicesUtilInitialize, full_init__print_true) {
 
 namespace test {
 // Mock Throwing Model throws exception
-class mock_throwing_model : public stan::model::prob_grad {
+class mock_throwing_model : public stan::model::model_base {
  public:
   mock_throwing_model()
-      : stan::model::prob_grad(1),
+      : stan::model::model_base(1),
         templated_log_prob_calls(0),
         transform_inits_calls(0),
         write_array_calls(0),
@@ -302,10 +302,10 @@ TEST_F(ServicesUtilInitialize, model_throws__full_init) {
 
 namespace test {
 // Mock Throwing Model throws exception
-class mock_error_model : public stan::model::prob_grad {
+class mock_error_model : public stan::model::model_base {
  public:
   mock_error_model()
-      : stan::model::prob_grad(1),
+      : stan::model::model_base(1),
         templated_log_prob_calls(0),
         transform_inits_calls(0),
         write_array_calls(0),
@@ -438,10 +438,10 @@ TEST_F(ServicesUtilInitialize, model_errors__full_init) {
 namespace test {
 // mock_throwing_model_in_write_array throws exception in the write_array()
 // method
-class mock_throwing_model_in_write_array : public stan::model::prob_grad {
+class mock_throwing_model_in_write_array : public stan::model::model_base {
  public:
   mock_throwing_model_in_write_array()
-      : stan::model::prob_grad(1),
+      : stan::model::model_base(1),
         templated_log_prob_calls(0),
         transform_inits_calls(0),
         write_array_calls(0),

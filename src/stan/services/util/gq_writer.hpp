@@ -5,7 +5,6 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
-#include <stan/model/prob_grad.hpp>
 #include <sstream>
 #include <iomanip>
 #include <string>

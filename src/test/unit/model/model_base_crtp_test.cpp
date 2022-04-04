@@ -105,8 +105,6 @@ TEST(model, modelBaseInheritance) {
   // check that base_model and prob_grad inheritance works
   mock_model m(17);
   EXPECT_EQ(17u, m.num_params_r());
-  EXPECT_EQ(0u, m.num_params_i());
-  EXPECT_THROW(m.param_range_i(0), std::out_of_range);
 }
 
 TEST(model, modelTemplateLogProb) {

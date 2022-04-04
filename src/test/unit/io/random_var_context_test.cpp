@@ -9,10 +9,10 @@
 namespace test {
 // mock_throwing_model_in_write_array throws exception in the write_array()
 // method
-class mock_throwing_model_in_write_array : public stan::model::prob_grad {
+class mock_throwing_model_in_write_array : public stan::model::model_base {
  public:
   mock_throwing_model_in_write_array()
-      : stan::model::prob_grad(1),
+      : stan::model::model_base(1),
         templated_log_prob_calls(0),
         transform_inits_calls(0),
         write_array_calls(0),
