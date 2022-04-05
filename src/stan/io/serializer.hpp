@@ -492,6 +492,302 @@ class serializer {
       this->write_free_corr_matrix(ret_i);
     }
   }
+
+  /**
+   * Write a lower bounded variable to storage
+   *
+   * @tparam S A scalar, Eigen type, or `std::vector`
+   * @tparam L Type of lower bound
+   * @param lb Lower bound
+   * @param x An object of the types listed above.
+   */
+  template <typename S, typename L, require_stan_scalar_t<S>* = nullptr,
+            require_stan_scalar_t<L>* = nullptr>
+  inline void write_checked_lb(const L& lb, const S& x) {
+    if (stan::math::is_less_or_equal(lb, x)) {
+      this->write(x);
+    } else {
+      this->write(std::numeric_limits<double>::quiet_NaN());
+    }
+  }
+
+  /**
+   * Write a lower bounded variable to storage
+   *
+   * @tparam S A scalar, Eigen type, or `std::vector`
+   * @tparam U Type of upper bound
+   * @param ub Upper bound
+   * @param x An object of the types listed above.
+   */
+  template <typename S, typename U, require_stan_scalar_t<S>* = nullptr,
+            require_stan_scalar_t<U>* = nullptr>
+  inline void write_checked_ub(const U& ub, const S& x) {
+    if (stan::math::is_less_or_equal(x, ub)) {
+      this->write(x);
+    } else {
+      this->write(std::numeric_limits<double>::quiet_NaN());
+    }
+  }
+
+  /**
+   * Write a bounded variable to storage
+   *
+   * @tparam S A scalar, Eigen type, or `std::vector`
+   * @tparam L Type of lower bound
+   * @tparam U Type of upper bound
+   * @param lb Lower bound
+   * @param ub Upper bound
+   * @param x An object of the types listed above.
+   */
+  template <
+      typename S, typename L, typename U, require_stan_scalar_t<S>* = nullptr,
+      require_stan_scalar_t<L>* = nullptr, require_stan_scalar_t<U>* = nullptr>
+  inline void write_checked_lub(const L& lb, const U& ub, const S& x) {
+    if (stan::math::is_less_or_equal(lb, x)
+        && stan::math::is_less_or_equal(x, ub)) {
+      this->write(x);
+    } else {
+      this->write(std::numeric_limits<double>::quiet_NaN());
+    }
+  }
+
+  /**
+   * Write a unit vector to storage
+   *
+   * @tparam Vec An Eigen type with either fixed rows or columns at compile
+   * time.
+   * @param x The vector to read from.
+   */
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
+  inline void write_checked_unit_vector(const Vec& x) {
+    if (stan::math::is_unit_vector(x)) {
+      this->write(x);
+    } else {
+      this->write(Eigen::VectorXd::Constant(
+          x.size(), std::numeric_limits<double>::quiet_NaN()));
+    }
+  }
+
+  /**
+   * Write unit vectors to storage
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_checked_unit_vector(const StdVec& x) {
+    for (const auto& ret_i : x) {
+      this->write_checked_unit_vector(ret_i);
+    }
+  }
+
+  /**
+   * Write a simplex to storage
+   *
+   * @tparam Vec An Eigen type with either fixed rows or columns at compile
+   * time.
+   * @param x The vector to read from.
+   */
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
+  inline void write_checked_simplex(const Vec& x) {
+    // stan::math::is_simplex does not exist, improvise
+    if (stan::math::is_unit_vector(stan::math::sqrt(x))) {
+      this->write(x);
+    } else {
+      this->write(Eigen::VectorXd::Constant(
+          x.size(), std::numeric_limits<double>::quiet_NaN()));
+    }
+  }
+
+  /**
+   * Write simplices to storage
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_checked_simplex(const StdVec& x) {
+    for (const auto& ret_i : x) {
+      this->write_checked_simplex(ret_i);
+    }
+  }
+
+  /**
+   * Write an ordered to storage
+   *
+   * @tparam Vec An Eigen type with either fixed rows or columns at compile
+   * time.
+   * @param x The vector to read from.
+   */
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
+  inline void write_checked_ordered(const Vec& x) {
+    if (stan::math::is_ordered(stan::math::to_array_1d(x))) {
+      this->write(x);
+    } else {
+      this->write(Eigen::VectorXd::Constant(
+          x.size(), std::numeric_limits<double>::quiet_NaN()));
+    }
+  }
+
+  /**
+   * Write ordered vectors to storage
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_checked_ordered(const StdVec& x) {
+    for (const auto& ret_i : x) {
+      this->write_checked_ordered(ret_i);
+    }
+  }
+
+  /**
+   * Write a positive ordered vector to storage
+   *
+   * @tparam Vec An Eigen type with either fixed rows or columns at compile
+   * time.
+   * @param x The vector to read from.
+   */
+  template <typename Vec, require_not_std_vector_t<Vec>* = nullptr>
+  inline void write_checked_positive_ordered(const Vec& x) {
+    if (stan::math::is_positive(x)
+        && stan::math::is_ordered(stan::math::to_array_1d(x))) {
+      this->write(x);
+    } else {
+      this->write(Eigen::VectorXd::Constant(
+          x.size(), std::numeric_limits<double>::quiet_NaN()));
+    }
+  }
+
+  /**
+   * Write positive ordered vectors to storage
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_checked_positive_ordered(const StdVec& x) {
+    for (const auto& ret_i : x) {
+      this->write_checked_positive_ordered(ret_i);
+    }
+  }
+
+  /**
+   * Write a covariance matrix cholesky factor to storage
+   *
+   * @tparam Mat An Eigen type with dynamic rows and columns at compile time.
+   * @param x An Eigen matrix to write to the serialized vector.
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_checked_cholesky_factor_cov(const Mat& x) {
+    if (stan::math::is_cholesky_factor(x)) {
+      this->write(x);
+    } else {
+      this->write(Eigen::VectorXd::Constant(
+          x.size(), std::numeric_limits<double>::quiet_NaN()));
+    }
+  }
+
+  /**
+   * Write covariance matrix cholesky factors to storage
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_checked_cholesky_factor_cov(const StdVec& x) {
+    for (const auto& ret_i : x) {
+      this->write_checked_cholesky_factor_cov(ret_i);
+    }
+  }
+
+  /**
+   * Write a covariance matrix cholesky factor to storage
+   *
+   * @tparam Mat Type of input
+   * @param x An Eigen matrix to write to the serialized vector.
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_checked_cholesky_factor_corr(const Mat& x) {
+    if (stan::math::is_cholesky_factor_corr(x)) {
+      this->write(x);
+    } else {
+      this->write(Eigen::VectorXd::Constant(
+          x.size(), std::numeric_limits<double>::quiet_NaN()));
+    }
+  }
+
+  /**
+   * Write correlation matrix cholesky factors to storage
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_checked_cholesky_factor_corr(const StdVec& x) {
+    for (const auto& ret_i : x) {
+      this->write_checked_cholesky_factor_corr(ret_i);
+    }
+  }
+
+  /**
+   * Write a covariance matrix cholesky factor to storage
+   *
+   * @tparam Mat An Eigen type with dynamic rows and columns at compile time
+   * @param x An Eigen matrix to write to the serialized vector.
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_checked_cov_matrix(const Mat& x) {
+    if (stan::math::is_pos_definite(x)) {
+      this->write(x);
+    } else {
+      this->write(Eigen::VectorXd::Constant(
+          x.size(), std::numeric_limits<double>::quiet_NaN()));
+    }
+  }
+
+  /**
+   * Write covariance matrices to storage
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x a standard vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_checked_cov_matrix(const StdVec& x) {
+    for (const auto& ret_i : x) {
+      this->write_checked_cov_matrix(ret_i);
+    }
+  }
+
+  /**
+   * Write a covariance matrix cholesky factor to storage
+   *
+   * @tparam Mat An Eigen type with dynamic rows and columns at compile time.
+   * @param x An Eigen matrix to write to the serialized vector.
+   */
+  template <typename Mat, require_not_std_vector_t<Mat>* = nullptr>
+  inline void write_checked_corr_matrix(const Mat& x) {
+    if (stan::math::is_corr_matrix(x)) {
+      this->write(x);
+    } else {
+      this->write(Eigen::VectorXd::Constant(
+          x.size(), std::numeric_limits<double>::quiet_NaN()));
+    }
+  }
+
+  /**
+   * Write correlation matrices to storage
+   *
+   * @tparam StdVec A `std:vector`
+   * @param x An std vector.
+   */
+  template <typename StdVec, require_std_vector_t<StdVec>* = nullptr>
+  inline void write_checked_corr_matrix(const StdVec& x) {
+    for (const auto& ret_i : x) {
+      this->write_checked_corr_matrix(ret_i);
+    }
+  }
 };
 
 }  // namespace io

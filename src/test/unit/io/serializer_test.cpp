@@ -733,3 +733,171 @@ TEST(serializer_vectorized, write_free_corr_matrix) {
   write_free_corr_matrix_test<std::vector<std::vector<Eigen::MatrixXd>>>(3, 2,
                                                                          2);
 }
+
+TEST(serializer, write_checked_lub) {
+  std::vector<double> theta(6);
+  stan::io::serializer<double> serializer(theta);
+  serializer.write_checked_lb(1.0, 2.0);
+  serializer.write_checked_lb(2.0, 1.0);
+  serializer.write_checked_ub(1.0, 2.0);
+  serializer.write_checked_ub(2.0, 1.0);
+  serializer.write_checked_lub(1.0, 2.0, 1.5);
+  serializer.write_checked_lub(1.0, 2.0, 2.5);
+  EXPECT_EQ(theta[0], 2.0);
+  EXPECT_TRUE(std::isnan(theta[1]));
+  EXPECT_TRUE(std::isnan(theta[2]));
+  EXPECT_EQ(theta[3], 1.0);
+  EXPECT_EQ(theta[4], 1.5);
+  EXPECT_TRUE(std::isnan(theta[5]));
+}
+
+TEST(serializer_vectorized, write_checked_unit_vector) {
+  std::vector<Eigen::VectorXd> vec;
+  vec.push_back(Eigen::Vector4d{0.5, -0.5, 0.5, -0.5});
+  vec.push_back(Eigen::Vector4d{1.0, -0.5, 0.25, 0.0});
+  vec.push_back(Eigen::Vector4d{0.0, -1.0, 0.0, 0.0});
+  std::vector<double> theta(12);
+  stan::io::serializer<double> serializer(theta);
+  serializer.write_checked_unit_vector(vec);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[i], vec[0](i));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(std::isnan(theta[4 + i]));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[8 + i], vec[2](i));
+  }
+}
+
+TEST(serializer_vectorized, write_checked_simplex) {
+  std::vector<Eigen::VectorXd> vec;
+  vec.push_back(Eigen::Vector4d{0.25, 0.25, 0.25, 0.25});
+  vec.push_back(Eigen::Vector4d{0.0, -0.5, 0.25, 0.0});
+  vec.push_back(Eigen::Vector4d{0.0, 1.0, 0.0, 0.0});
+  std::vector<double> theta(12);
+  stan::io::serializer<double> serializer(theta);
+  serializer.write_checked_simplex(vec);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[i], vec[0](i));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(std::isnan(theta[4 + i]));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[8 + i], vec[2](i));
+  }
+}
+
+TEST(serializer_vectorized, write_checked_ordered) {
+  std::vector<Eigen::VectorXd> vec;
+  vec.push_back(Eigen::Vector4d{1.0, 2.0, 3.0, 4.0});
+  vec.push_back(Eigen::Vector4d{1.0, 3.0, 2.0, 4.0});
+  vec.push_back(Eigen::Vector4d{-5.0, -1.0, 0.0, 8.0});
+  std::vector<double> theta(12);
+  stan::io::serializer<double> serializer(theta);
+  serializer.write_checked_ordered(vec);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[i], vec[0][i]);
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(std::isnan(theta[4 + i]));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[8 + i], vec[2][i]);
+  }
+}
+
+TEST(serializer_vectorized, write_checked_positive_ordered) {
+  std::vector<Eigen::VectorXd> vec;
+  vec.push_back(Eigen::Vector4d{1.0, 2.0, 3.0, 4.0});
+  vec.push_back(Eigen::Vector4d{1.0, 3.0, 2.0, 4.0});
+  vec.push_back(Eigen::Vector4d{-5.0, -1.0, 0.0, 8.0});
+  std::vector<double> theta(12);
+  stan::io::serializer<double> serializer(theta);
+  serializer.write_checked_positive_ordered(vec);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[i], vec[0](i));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(std::isnan(theta[4 + i]));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(std::isnan(theta[8 + i]));
+  }
+}
+
+TEST(serializer_vectorized, write_checked_cholesky_factor_cov) {
+  std::vector<Eigen::MatrixXd> vec;
+  vec.push_back((Eigen::Matrix2d() << 1.0, 0.0, 0.0, 1.0).finished());
+  vec.push_back((Eigen::Matrix2d() << 1.0, 0.5, 0.5, 0.5).finished());
+  vec.push_back((Eigen::Matrix2d() << 1.0, 0.0, -0.5, 0.5).finished());
+  std::vector<double> theta(12);
+  stan::io::serializer<double> serializer(theta);
+  serializer.write_checked_cholesky_factor_cov(vec);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[i], vec[0](i));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(std::isnan(theta[4 + i]));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[8 + i], vec[2](i));
+  }
+}
+TEST(serializer_vectorized, write_checked_cholesky_factor_corr) {
+  std::vector<Eigen::MatrixXd> vec;
+  vec.push_back((Eigen::Matrix2d() << 1.0, 0.0, 0.0, 1.0).finished());
+  vec.push_back((Eigen::Matrix2d() << 1.0, 0.0, 0.5, 0.5).finished());
+  vec.push_back((Eigen::Matrix2d() << 1.0, 0.0, -0.6, 0.8).finished());
+  std::vector<double> theta(12);
+  stan::io::serializer<double> serializer(theta);
+  serializer.write_checked_cholesky_factor_corr(vec);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[i], vec[0](i));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(std::isnan(theta[4 + i]));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[8 + i], vec[2](i));
+  }
+}
+
+TEST(serializer_vectorized, write_checked_cov_matrix) {
+  std::vector<Eigen::MatrixXd> vec;
+  vec.push_back((Eigen::Matrix2d() << 1.0, 0.0, 0.0, 1.0).finished());
+  vec.push_back((Eigen::Matrix2d() << 1.0, 2.5, 0.5, 1.0).finished());
+  vec.push_back((Eigen::Matrix2d() << 2.0, -0.5, -0.5, 1.0).finished());
+  std::vector<double> theta(12);
+  stan::io::serializer<double> serializer(theta);
+  serializer.write_checked_cov_matrix(vec);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[i], vec[0](i));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(std::isnan(theta[4 + i]));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[8 + i], vec[2](i));
+  }
+}
+
+TEST(serializer_vectorized, write_checked_corr_matrix) {
+  std::vector<Eigen::MatrixXd> vec;
+  vec.push_back((Eigen::Matrix2d() << 1.0, 0.0, 0.0, 1.0).finished());
+  vec.push_back((Eigen::Matrix2d() << 2.0, 0.5, 0.5, 1.0).finished());
+  vec.push_back((Eigen::Matrix2d() << 1.0, -0.5, -0.5, 1.0).finished());
+  std::vector<double> theta(12);
+  stan::io::serializer<double> serializer(theta);
+  serializer.write_checked_corr_matrix(vec);
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[i], vec[0](i));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_TRUE(std::isnan(theta[4 + i]));
+  }
+  for (int i = 0; i < 4; ++i) {
+    EXPECT_EQ(theta[8 + i], vec[2](i));
+  }
+}
