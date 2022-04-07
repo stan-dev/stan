@@ -65,11 +65,11 @@ int fixed_param(Model& model, const stan::io::var_context& init,
   // Headers
   writer.write_sample_names(s, sampler, model);
   writer.write_diagnostic_names(s, sampler, model);
-
+  stan::math::stack_alloc mem;
   auto start = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_samples, 0, num_samples, num_thin,
                              refresh, true, false, writer, s, model, rng,
-                             interrupt, logger);
+                             interrupt, logger, mem);
   auto end = std::chrono::steady_clock::now();
   double sample_delta_t
       = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
