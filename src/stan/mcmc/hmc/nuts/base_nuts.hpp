@@ -74,7 +74,13 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
   int get_max_depth() { return this->max_depth_; }
   double get_max_delta() { return this->max_deltaH_; }
-
+  inline auto make_vec(int size, stan::math::stack_alloc* mem) {
+    return stack_matrix<Eigen::VectorXd>(size, mem);
+  }
+  template <typename T>
+  inline auto make_vec(T&& x, stan::math::stack_alloc* mem) {
+    return stack_matrix<Eigen::VectorXd>(x, mem);
+  }
   sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
     // Initialize the algorithm
     this->sample_stepsize();
@@ -84,14 +90,14 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);
     this->hamiltonian_.init(this->z_, logger);
 
-    ps_point z_fwd(this->z_);  // State at forward end of trajectory
-    ps_point z_bck(z_fwd);     // State at backward end of trajectory
+    ps_point_map z_fwd(memory, this->z_);  // State at forward end of trajectory
+    ps_point_map z_bck(memory, this->z_);     // State at backward end of trajectory
 
-    ps_point z_sample(z_fwd);
-    ps_point z_propose(z_fwd);
+    ps_point_map z_sample(memory, this->z_);
+    ps_point_map z_propose(memory, this->z_);
 
     // Momentum and sharp momentum at forward end of forward subtree
-    Eigen::VectorXd p_fwd_fwd = this->z_.p;
+    auto p_fwd_fwd = this->z_.p;
     Eigen::VectorXd p_sharp_fwd_fwd = this->hamiltonian_.dtau_dp(this->z_);
 
     // Momentum and sharp momentum at backward end of forward subtree
@@ -140,7 +146,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
             this->depth_, z_propose, p_sharp_fwd_bck, p_sharp_fwd_fwd, rho_fwd,
             p_fwd_bck, p_fwd_fwd, H0, 1, n_leapfrog, log_sum_weight_subtree,
             sum_metro_prob, logger, memory);
-        z_fwd.ps_point::operator=(this->z_);
+        z_fwd = this->z_;
       } else {
         // Extend the current trajectory backwards
         this->z_.ps_point::operator=(z_bck);
@@ -152,7 +158,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
             this->depth_, z_propose, p_sharp_bck_fwd, p_sharp_bck_bck, rho_bck,
             p_bck_fwd, p_bck_bck, H0, -1, n_leapfrog, log_sum_weight_subtree,
             sum_metro_prob, logger, memory);
-        z_bck.ps_point::operator=(this->z_);
+        z_bck = this->z_;
       }
 
       if (!valid_subtree)
@@ -204,6 +210,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     return sample(this->z_.q, -this->z_.V, accept_prob);
   }
 
+
   void get_sampler_param_names(std::vector<std::string>& names) {
     names.push_back("stepsize__");
     names.push_back("treedepth__");
@@ -251,9 +258,6 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
                   PBegVec& p_beg, PEndVec& p_end, double H0,
                   double sign, int& n_leapfrog, double& log_sum_weight,
                   double& sum_metro_prob, callbacks::logger& logger, stan::math::stack_alloc& memory) {
-    auto make_vec = [](auto& mem, auto size) mutable {
-      return Eigen::Map<Eigen::VectorXd>(mem.template alloc_array<double>(size), size);
-    };
     // Base case
     if (depth == 0) {
       this->integrator_.evolve(this->z_, this->hamiltonian_,
@@ -291,10 +295,10 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
     double log_sum_weight_init = -std::numeric_limits<double>::infinity();
 
     // Momentum and sharp momentum at end of the initial subtree
-    auto p_init_end = make_vec(memory, this->z_.p.size()); //(this->z_.p.size());
-    auto p_sharp_init_end = make_vec(memory, this->z_.p.size());//(this->z_.p.size());
+    auto p_init_end = make_vec(this->z_.p.size(), &memory); //(this->z_.p.size());
+    auto p_sharp_init_end = make_vec(this->z_.p.size(), &memory);//(this->z_.p.size());
 
-    auto rho_init = make_vec(memory, rho.size()); //Eigen::VectorXd::Zero(rho.size());
+    auto rho_init = make_vec(rho.size(), &memory); //Eigen::VectorXd::Zero(rho.size());
     rho_init.setZero();
     bool valid_init
         = build_tree(depth - 1, z_propose, p_sharp_beg, p_sharp_init_end,
@@ -316,10 +320,10 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
     Eigen::VectorXd rho_final = Eigen::VectorXd::Zero(rho.size());
     */
-    auto p_final_beg = make_vec(memory, this->z_.p.size());
-    auto p_sharp_final_beg = make_vec(memory, this->z_.p.size());
+    auto p_final_beg = make_vec(this->z_.p.size(), &memory);
+    auto p_sharp_final_beg = make_vec(this->z_.p.size(), &memory);
 
-    auto rho_final = make_vec(memory, rho.size());//Eigen::VectorXd::Zero(rho.size());
+    auto rho_final = make_vec(rho.size(), &memory);//Eigen::VectorXd::Zero(rho.size());
     rho_final.setZero();
     bool valid_final
         = build_tree(depth - 1, z_propose_final, p_sharp_final_beg, p_sharp_end,
