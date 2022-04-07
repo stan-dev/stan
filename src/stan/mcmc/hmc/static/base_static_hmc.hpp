@@ -37,7 +37,7 @@ class base_static_hmc
     this->z_.set_metric(inv_e_metric);
   }
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
     this->sample_stepsize();
 
     this->seed(init_sample.cont_params());

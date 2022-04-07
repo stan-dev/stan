@@ -21,9 +21,9 @@ class adapt_unit_e_nuts_classic : public unit_e_nuts_classic<Model, BaseRNG>,
 
   ~adapt_unit_e_nuts_classic() {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
     sample s
-        = unit_e_nuts_classic<Model, BaseRNG>::transition(init_sample, logger);
+        = unit_e_nuts_classic<Model, BaseRNG>::transition(init_sample, logger, memory);
 
     if (this->adapt_flag_)
       this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

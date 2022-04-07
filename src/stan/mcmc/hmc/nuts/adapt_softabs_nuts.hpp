@@ -21,8 +21,8 @@ class adapt_softabs_nuts : public softabs_nuts<Model, BaseRNG>,
 
   ~adapt_softabs_nuts() {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
-    sample s = softabs_nuts<Model, BaseRNG>::transition(init_sample, logger);
+  sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
+    sample s = softabs_nuts<Model, BaseRNG>::transition(init_sample, logger, memory);
 
     if (this->adapt_flag_)
       this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

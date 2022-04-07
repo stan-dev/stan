@@ -23,7 +23,7 @@ class adapt_softabs_static_uniform
 
   ~adapt_softabs_static_uniform() {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
     sample s = softabs_static_uniform<Model, BaseRNG>::transition(init_sample,
                                                                   logger);
     if (this->adapt_flag_) {

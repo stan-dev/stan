@@ -22,8 +22,8 @@ class adapt_dense_e_xhmc : public dense_e_xhmc<Model, BaseRNG>,
 
   ~adapt_dense_e_xhmc() {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
-    sample s = dense_e_xhmc<Model, BaseRNG>::transition(init_sample, logger);
+  sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
+    sample s = dense_e_xhmc<Model, BaseRNG>::transition(init_sample, logger, memory);
 
     if (this->adapt_flag_) {
       this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

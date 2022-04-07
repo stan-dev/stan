@@ -50,7 +50,7 @@ class base_xhmc : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
   double get_max_deltaH() { return this->max_deltaH_; }
   double get_x_delta() { return this->x_delta_; }
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
     // Initialize the algorithm
     this->sample_stepsize();
 

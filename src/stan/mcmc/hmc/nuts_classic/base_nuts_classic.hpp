@@ -56,7 +56,7 @@ class base_nuts_classic
   int get_max_depth() { return this->max_depth_; }
   double get_max_delta() { return this->max_delta_; }
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
     // Initialize the algorithm
     this->sample_stepsize();
 

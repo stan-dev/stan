@@ -31,7 +31,7 @@ class base_static_uniform
 
   ~base_static_uniform() {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
     this->sample_stepsize();
 
     this->seed(init_sample.cont_params());

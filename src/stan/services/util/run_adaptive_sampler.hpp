@@ -67,11 +67,11 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   // Headers
   writer.write_sample_names(s, sampler, model);
   writer.write_diagnostic_names(s, sampler, model);
-
+  stan::math::stack_alloc mem;
   auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true, writer, s,
-                             model, rng, interrupt, logger, chain_id,
+                             model, rng, interrupt, logger, mem, chain_id,
                              num_chains);
   auto end_warm = std::chrono::steady_clock::now();
   double warm_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -85,7 +85,7 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
   auto start_sample = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_samples, num_warmup,
                              num_warmup + num_samples, num_thin, refresh, true,
-                             false, writer, s, model, rng, interrupt, logger,
+                             false, writer, s, model, rng, interrupt, logger, mem,
                              chain_id, num_chains);
   auto end_sample = std::chrono::steady_clock::now();
   double sample_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(

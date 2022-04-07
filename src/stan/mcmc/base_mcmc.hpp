@@ -1,6 +1,7 @@
 #ifndef STAN_MCMC_BASE_MCMC_HPP
 #define STAN_MCMC_BASE_MCMC_HPP
 
+#include <stan/math/memory/stack_alloc.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/mcmc/sample.hpp>
@@ -17,7 +18,7 @@ class base_mcmc {
 
   virtual ~base_mcmc() {}
 
-  virtual sample transition(sample& init_sample, callbacks::logger& logger) = 0;
+  virtual sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) = 0;
 
   virtual void get_sampler_param_names(std::vector<std::string>& names) {}
 

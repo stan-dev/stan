@@ -23,9 +23,9 @@ class adapt_diag_e_static_hmc : public diag_e_static_hmc<Model, BaseRNG>,
 
   ~adapt_diag_e_static_hmc() {}
 
-  sample transition(sample& init_sample, callbacks::logger& logger) {
+  sample transition(sample& init_sample, callbacks::logger& logger, stan::math::stack_alloc& memory) {
     sample s
-        = diag_e_static_hmc<Model, BaseRNG>::transition(init_sample, logger);
+        = diag_e_static_hmc<Model, BaseRNG>::transition(init_sample, logger, memory);
 
     if (this->adapt_flag_) {
       this->stepsize_adaptation_.learn_stepsize(this->nom_epsilon_,

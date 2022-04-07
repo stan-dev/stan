@@ -46,7 +46,7 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
                           util::mcmc_writer& mcmc_writer,
                           stan::mcmc::sample& init_s, Model& model,
                           RNG& base_rng, callbacks::interrupt& callback,
-                          callbacks::logger& logger, size_t chain_id = 1,
+                          callbacks::logger& logger, stan::math::stack_alloc& mem, size_t chain_id = 1,
                           size_t num_chains = 1) {
   for (int m = 0; m < num_iterations; ++m) {
     callback();
@@ -66,9 +66,13 @@ void generate_transitions(stan::mcmc::base_mcmc& sampler, int num_iterations,
 
       logger.info(message);
     }
-
-    init_s = sampler.transition(init_s, logger);
-
+    try {
+      init_s = sampler.transition(init_s, logger, mem);
+    } catch (const std::exception& e) {
+      mem.recover_all();
+      throw;
+    }
+    mem.recover_all();
     if (save && ((m % num_thin) == 0)) {
       mcmc_writer.write_sample_params(base_rng, init_s, sampler, model);
       mcmc_writer.write_diagnostic_params(init_s, sampler);
