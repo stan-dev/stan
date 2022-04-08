@@ -95,6 +95,12 @@ class model_base_crtp : public stan::model::model_base {
     return static_cast<const M*>(this)->template log_prob<false, false>(theta,
                                                                         msgs);
   }
+  inline math::var log_prob(
+      stan::math::var_value<Eigen::Matrix<double, -1, 1>>& theta,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<false, false>(theta,
+                                                                      msgs);
+  }
 
   inline double log_prob_jacobian(Eigen::VectorXd& theta,
                                   std::ostream* msgs) const override {
@@ -106,6 +112,12 @@ class model_base_crtp : public stan::model::model_base {
     return static_cast<const M*>(this)->template log_prob<false, true>(theta,
                                                                        msgs);
   }
+  inline math::var log_prob_jacobian(
+      stan::math::var_value<Eigen::Matrix<double, -1, 1>>& theta,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<false, true>(theta,
+                                                                      msgs);
+  }
 
   inline double log_prob_propto(Eigen::VectorXd& theta,
                                 std::ostream* msgs) const override {
@@ -116,6 +128,12 @@ class model_base_crtp : public stan::model::model_base {
                                    std::ostream* msgs) const override {
     return static_cast<const M*>(this)->template log_prob<true, false>(theta,
                                                                        msgs);
+  }
+  inline math::var log_prob_propto(
+      stan::math::var_value<Eigen::Matrix<double, -1, 1>>& theta,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<true, false>(theta,
+                                                                      msgs);
   }
 
   inline double log_prob_propto_jacobian(Eigen::VectorXd& theta,
@@ -129,7 +147,12 @@ class model_base_crtp : public stan::model::model_base {
     return static_cast<const M*>(this)->template log_prob<true, true>(theta,
                                                                       msgs);
   }
-
+  inline math::var log_prob_propto_jacobian(
+      stan::math::var_value<Eigen::Matrix<double, -1, 1>>& theta,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<true, true>(theta,
+                                                                      msgs);
+  }
   void write_array(boost::ecuyer1988& rng, Eigen::VectorXd& theta,
                    Eigen::VectorXd& vars, bool include_tparams = true,
                    bool include_gqs = true,

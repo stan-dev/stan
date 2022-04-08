@@ -185,6 +185,8 @@ class model_base : public prob_grad {
   virtual math::var log_prob(Eigen::Matrix<math::var, -1, 1>& params_r,
                              std::ostream* msgs) const = 0;
 
+ virtual math::var log_prob(stan::math::var_value<Eigen::Matrix<double, -1, 1>>& params_r,
+                            std::ostream* msgs) const = 0;
   /**
    * Return the log density for the specified unconstrained
    * parameters, with Jacobian correction for constraints and with
@@ -217,6 +219,9 @@ class model_base : public prob_grad {
   virtual math::var log_prob_jacobian(Eigen::Matrix<math::var, -1, 1>& params_r,
                                       std::ostream* msgs) const = 0;
 
+  virtual math::var log_prob_jacobian(stan::math::var_value<Eigen::Matrix<double, -1, 1>>& params_r,
+                             std::ostream* msgs) const = 0;
+
   /**
    * Return the log density for the specified unconstrained
    * parameters, without Jacobian correction for constraints and
@@ -245,6 +250,9 @@ class model_base : public prob_grad {
    */
   virtual math::var log_prob_propto(Eigen::Matrix<math::var, -1, 1>& params_r,
                                     std::ostream* msgs) const = 0;
+
+  virtual math::var log_prob_propto(stan::math::var_value<Eigen::Matrix<double, -1, 1>>& params_r,
+                             std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -283,6 +291,9 @@ class model_base : public prob_grad {
   virtual math::var log_prob_propto_jacobian(
       Eigen::Matrix<math::var, -1, 1>& params_r, std::ostream* msgs) const = 0;
 
+  virtual math::var log_prob_propto_jacobian(stan::math::var_value<Eigen::Matrix<double, -1, 1>>& params_r,
+                             std::ostream* msgs) const = 0;
+
   /**
    * Convenience template function returning the log density for the
    * specified unconstrained parameters, with Jacobian and normalizing
@@ -306,6 +317,18 @@ class model_base : public prob_grad {
    */
   template <bool propto, bool jacobian, typename T>
   inline T log_prob(Eigen::Matrix<T, -1, 1>& params_r,
+                    std::ostream* msgs) const {
+    if (propto && jacobian)
+      return log_prob_propto_jacobian(params_r, msgs);
+    else if (propto && !jacobian)
+      return log_prob_propto(params_r, msgs);
+    else if (!propto && jacobian)
+      return log_prob_jacobian(params_r, msgs);
+    else  // if (!propto && !jacobian)
+      return log_prob(params_r, msgs);
+  }
+  template <bool propto, bool jacobian>
+  inline stan::math::var log_prob(stan::math::var_value<Eigen::Matrix<double, -1, 1>>& params_r,
                     std::ostream* msgs) const {
     if (propto && jacobian)
       return log_prob_propto_jacobian(params_r, msgs);
