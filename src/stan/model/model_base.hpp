@@ -28,7 +28,7 @@ namespace model {
  */
 class model_base {
  protected:
-   size_t num_params_r__;
+  size_t num_params_r__;
 
  public:
   /**
@@ -51,7 +51,6 @@ class model_base {
    * @return number of unconstrained real parameters
    */
   inline size_t num_params_r() const { return num_params_r__; }
-
 
   /**
    * Return the name of the model.
