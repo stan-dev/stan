@@ -392,6 +392,14 @@ TEST(ModelIndexing, rvalue_doubless_minmax_minmax_eigen) {
   auto normal_y = rvalue(x, "", index_min_max(1, 2), index_min_max(1, 2));
   EXPECT_EQ(2, normal_y.rows());
   EXPECT_EQ(2, normal_y.cols());
+  auto row_select
+      = rvalue(x, "", index_min_max(1, 1), stan::model::index_omni());
+  EXPECT_EQ(1, row_select.rows());
+  EXPECT_EQ(3, row_select.cols());
+  auto col_select
+      = rvalue(x, "", stan::model::index_omni(), index_min_max(2, 2));
+  EXPECT_EQ(3, col_select.rows());
+  EXPECT_EQ(1, col_select.cols());
   auto empty_row_y = rvalue(x, "", index_min_max(2, 1), index_min_max(1, 2));
   EXPECT_EQ(0, empty_row_y.rows());
   EXPECT_EQ(2, empty_row_y.cols());
