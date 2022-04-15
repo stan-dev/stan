@@ -2,7 +2,7 @@
 #include <gtest/gtest.h>
 
 auto&& blah = stan::math::init_threadpool_tbb(1);
-/*
+
 TEST(ServicesPSIS, xl) {
   Eigen::Array<double, -1, 1> test_x(20);
   test_x << 0.00231135747917145, 0.00433831801177895, 0.0108541508266367,
@@ -25,7 +25,7 @@ TEST(ServicesPSIS, xl) {
       -1.14714626375751, -0.760774912681297, -0.394219954206013,
       -0.045843397405553, 0.285809256288784, 0.602034622751884,
       0.903992807508582;
-  auto xx = stan::services::psis::lx(theta, test_x);
+  auto xx = stan::services::psis::internal::lx(theta, test_x);
   // std::cout << "\nxx: \n" << xx << "\n";
   Eigen::Array<double, -1, 1> good_vals(34);
   good_vals << 1.06041260401414, 1.15443356538553, 1.19147065735959,
@@ -51,7 +51,7 @@ TEST(ServicesPSIS, gpdfit) {
       0.0659810585631264, 0.0796802961280512, 0.146305816395337,
       0.184840740340265, 0.20479110080993, 0.257155687804798, 0.414031661251632,
       0.95242504763768;
-  auto xx = stan::services::psis::gpdfit(test_vals);
+  auto xx = stan::services::psis::internal::gpdfit(test_vals);
   EXPECT_FLOAT_EQ(std::get<0>(xx), 0.6692217);
   EXPECT_FLOAT_EQ(std::get<1>(xx), 0.049593218);
 }
@@ -65,7 +65,7 @@ TEST(ServicesPSIS, psis_smooth_tail) {
       -2.06156037889818, -1.64051190289183, -1.45922773174626,
       -1.37687465350847, -1.18832703957184, -0.773042236304335, 0;
   double cutoff = -3.04544886711793;
-  auto xx = stan::services::psis::psis_smooth_tail(lw_tail, cutoff);
+  auto xx = stan::services::psis::internal::psis_smooth_tail(lw_tail, cutoff);
   EXPECT_FLOAT_EQ(std::get<1>(xx), 0.6692217);
   Eigen::Array<double, -1, 1> good_vals(20);
   good_vals << -3.01918021688078, -2.96532035254991, -2.90951591025097,
@@ -144,12 +144,12 @@ TEST(ServicesPSIS, get_psis_weights) {
       0.00813295746634018, 0.082538932616576, 0.00911848336266506,
       0.00456456171607177;
 
-  auto blah = stan::services::psis::get_psis_weights(lrms, 20);
+  auto blah = stan::services::psis::psis_weights(lrms, 20);
   for (Eigen::Index i = 0; i < answer.size(); ++i) {
     EXPECT_FLOAT_EQ(blah(i), answer(i));
   }
 }
-*/
+
 
 
 TEST(ServicesPSIS, max_n_elements) {
@@ -157,7 +157,7 @@ TEST(ServicesPSIS, max_n_elements) {
   for (Eigen::Index i = 0; i < 21; ++i) {
     unsorted(i) = i;
   }
-  auto sorted_tuple = stan::services::psis::max_n_elements(unsorted, 5);
+  auto sorted_tuple = stan::services::psis::internal::max_n_elements(unsorted, 5);
   Eigen::IOFormat CommaInitFmt(Eigen::FullPrecision, 0, ", ", ", ", "\n",
                                "", "", " ");
   auto sorted_result = std::get<0>(sorted_tuple);
