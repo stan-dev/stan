@@ -29,7 +29,6 @@ void test_throw_ia(T1& lhs, const T2& rhs, const I&... idxs) {
                std::invalid_argument);
 }
 
-
 TEST(ModelIndexing, lvalueNil) {
   double x = 3;
   double y = 5;
@@ -1146,33 +1145,37 @@ TEST(model_indexing, assign_densemat_densemat_multi_index_multi_index) {
   test_throw(x, y, index_multi(ms), index_multi(ns));
 }
 
-
 TEST(model_indexing, tuples) {
   std::tuple<Eigen::VectorXd, Eigen::VectorXd, std::vector<double>> A;
-  std::tuple<Eigen::VectorXd, Eigen::VectorXd, std::vector<double>> B =
-   std::make_tuple(Eigen::VectorXd::Random(2), Eigen::VectorXd::Random(2), std::vector<double>{2, 2, 2});
+  std::tuple<Eigen::VectorXd, Eigen::VectorXd, std::vector<double>> B
+      = std::make_tuple(Eigen::VectorXd::Random(2), Eigen::VectorXd::Random(2),
+                        std::vector<double>{2, 2, 2});
   assign(A, B, "tuple_basic");
-  stan::math::for_each([](auto&& a, auto&& b) {
-    for (int i = 0; i < a.size(); i++) {
-      EXPECT_FLOAT_EQ(a[i], b[i]);
-    }
-  }, A, B);
+  stan::math::for_each(
+      [](auto&& a, auto&& b) {
+        for (int i = 0; i < a.size(); i++) {
+          EXPECT_FLOAT_EQ(a[i], b[i]);
+        }
+      },
+      A, B);
 }
-
 
 TEST(model_indexing, tuples_non_trivially_assignable) {
   std::tuple<Eigen::Matrix<stan::math::var, -1, 1>,
-   Eigen::Matrix<stan::math::var, -1, 1>,
-   std::vector<stan::math::var>> A
-    = std::make_tuple(Eigen::Matrix<stan::math::var, -1, 1>::Random(2),
-        Eigen::Matrix<stan::math::var, -1, 1>::Random(2),
-        std::vector<stan::math::var>{3, 3, 3});
-  std::tuple<Eigen::VectorXd, Eigen::VectorXd, std::vector<double>> B =
-   std::make_tuple(Eigen::VectorXd::Random(2), Eigen::VectorXd::Random(2), std::vector<double>{2, 2, 2});
+             Eigen::Matrix<stan::math::var, -1, 1>,
+             std::vector<stan::math::var>>
+      A = std::make_tuple(Eigen::Matrix<stan::math::var, -1, 1>::Random(2),
+                          Eigen::Matrix<stan::math::var, -1, 1>::Random(2),
+                          std::vector<stan::math::var>{3, 3, 3});
+  std::tuple<Eigen::VectorXd, Eigen::VectorXd, std::vector<double>> B
+      = std::make_tuple(Eigen::VectorXd::Random(2), Eigen::VectorXd::Random(2),
+                        std::vector<double>{2, 2, 2});
   assign(A, B, "tuple_basic");
-  stan::math::for_each([](auto&& a, auto&& b) {
-    for (int i = 0; i < a.size(); i++) {
-      EXPECT_FLOAT_EQ(a[i].val(), b[i]);
-    }
-  }, A, B);
+  stan::math::for_each(
+      [](auto&& a, auto&& b) {
+        for (int i = 0; i < a.size(); i++) {
+          EXPECT_FLOAT_EQ(a[i].val(), b[i]);
+        }
+      },
+      A, B);
 }
