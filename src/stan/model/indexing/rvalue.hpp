@@ -338,7 +338,7 @@ template <typename Mat, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(Mat&& x, const char* name, index_min_max idx) {
   math::check_range("matrix[min_max] min row indexing", name, x.rows(),
                     idx.min_);
-  if (idx.max_ > idx.min_) {
+  if (idx.max_ >= idx.min_) {
     math::check_range("matrix[min_max] max row indexing", name, x.rows(),
                       idx.max_);
     return x.middleRows(idx.min_ - 1, idx.max_ - idx.min_ + 1);
