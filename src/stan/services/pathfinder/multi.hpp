@@ -142,7 +142,7 @@ inline int pathfinder_lbfgs_multi(
   const auto tail_len
       = std::min(0.2 * num_returned_samples, 3 * std::sqrt(num_returned_samples));
   Eigen::Array<double, -1, 1> weight_vals
-      = stan::services::psis::psis_weights(lp_ratios, tail_len);
+      = stan::services::psis::psis_weights(lp_ratios, tail_len, logger);
   boost::ecuyer1988 rng
       = util::create_rng<boost::ecuyer1988>(random_seed, path);
   boost::variate_generator<

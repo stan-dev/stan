@@ -1,6 +1,8 @@
 #ifndef TEST_UNIT_SERVICES_PATHFINDER_UTIL_HPP
 #define TEST_UNIT_SERVICES_PATHFINDER_UTIL_HPP
 
+#include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 struct mock_callback : public stan::callbacks::interrupt {
   int n;
   mock_callback() : n(0) {}
@@ -9,6 +11,7 @@ struct mock_callback : public stan::callbacks::interrupt {
 };
 
 class loggy : public stan::callbacks::logger {
+public:
   /**
    * Logs a message with debug log level
    *

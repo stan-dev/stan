@@ -1,4 +1,5 @@
 #include <stan/services/psis/psis.hpp>
+#include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 
 auto&& blah = stan::math::init_threadpool_tbb(1);
@@ -25,7 +26,7 @@ TEST(ServicesPSIS, xl) {
       -1.14714626375751, -0.760774912681297, -0.394219954206013,
       -0.045843397405553, 0.285809256288784, 0.602034622751884,
       0.903992807508582;
-  auto xx = stan::services::psis::internal::lx(theta, test_x);
+  auto xx = stan::services::psis::internal::profile_loglikelihood(theta, test_x);
   // std::cout << "\nxx: \n" << xx << "\n";
   Eigen::Array<double, -1, 1> good_vals(34);
   good_vals << 1.06041260401414, 1.15443356538553, 1.19147065735959,
@@ -38,7 +39,7 @@ TEST(ServicesPSIS, xl) {
       1.1331873300179, 1.11259974380022, 1.08721662622115, 1.05458546311518,
       1.00973177805282, 0.939927373529039, 0.789031648847585;
   for (Eigen::Index i = 0; i < good_vals.size(); ++i) {
-    EXPECT_FLOAT_EQ(xx(i), good_vals(i));
+    EXPECT_FLOAT_EQ(xx(i), good_vals(i)) << "Failed for xx(" << std::to_string(i) << ")";
   }
 }
 
@@ -52,8 +53,8 @@ TEST(ServicesPSIS, gpdfit) {
       0.184840740340265, 0.20479110080993, 0.257155687804798, 0.414031661251632,
       0.95242504763768;
   auto xx = stan::services::psis::internal::gpdfit(test_vals);
-  EXPECT_FLOAT_EQ(std::get<0>(xx), 0.6692217);
-  EXPECT_FLOAT_EQ(std::get<1>(xx), 0.049593218);
+  EXPECT_FLOAT_EQ(std::get<0>(xx), 0.049593218);
+  EXPECT_FLOAT_EQ(std::get<1>(xx), 0.6692217);
 }
 
 TEST(ServicesPSIS, psis_smooth_tail) {
@@ -82,7 +83,7 @@ TEST(ServicesPSIS, psis_smooth_tail) {
 }
 
 TEST(ServicesPSIS, get_psis_weights) {
-  Eigen::VectorXd lrms(100);
+  Eigen::Array<double, -1, 1> lrms(100);
   lrms << 6.34466061445847, 5.4846884595318, 4.88197964898707, 7.81547476520815,
       7.21312186227255, 5.89526945311154, -18.6868826136285, 5.69901858745526,
       6.35360681626944, 5.77318645987978, 8.50016049059785, 5.92318779250444,
@@ -108,7 +109,7 @@ TEST(ServicesPSIS, get_psis_weights) {
       6.02289466654851, 6.78340253571924, 6.06495986706907, -7.02111971231673,
       4.91652175788515, 5.59472544249795, 7.16126247369561, 6.15854810500356,
       6.62555174418028, 9.103992907802, 6.7399306070758, 6.04794961458687;
-  Eigen::VectorXd answer(100);
+  Eigen::Array<double, -1, 1> answer(100);
   answer << 0.00614128190501742, 0.00259883000263199, 0.00142240988349195,
       0.0274531755800624, 0.0157476498780024, 0.00391823907901988,
       8.26414513956511e-14, 0.00322003256443345, 0.00619646954412031,
@@ -143,8 +144,8 @@ TEST(ServicesPSIS, get_psis_weights) {
       0.00290112423098392, 0.0146773422920254, 0.00509837055791414,
       0.00813295746634018, 0.082538932616576, 0.00911848336266506,
       0.00456456171607177;
-
-  auto blah = stan::services::psis::psis_weights(lrms, 20);
+  loggy warner;
+  auto blah = stan::services::psis::psis_weights(lrms, 20, warner);
   for (Eigen::Index i = 0; i < answer.size(); ++i) {
     EXPECT_FLOAT_EQ(blah(i), answer(i));
   }
@@ -157,7 +158,7 @@ TEST(ServicesPSIS, max_n_elements) {
   for (Eigen::Index i = 0; i < 21; ++i) {
     unsorted(i) = i;
   }
-  auto sorted_tuple = stan::services::psis::internal::max_n_elements(unsorted, 5);
+  auto sorted_tuple = stan::services::psis::internal::largest_n_elements(unsorted, 5);
   Eigen::IOFormat CommaInitFmt(Eigen::FullPrecision, 0, ", ", ", ", "\n",
                                "", "", " ");
   auto sorted_result = std::get<0>(sorted_tuple);
