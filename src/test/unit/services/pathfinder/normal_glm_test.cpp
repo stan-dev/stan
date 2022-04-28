@@ -11,7 +11,7 @@ auto&& threadpool_init = stan::math::init_threadpool_tbb(8);
 
 auto init_context() {
   std::fstream stream(
-      "/home/steve/stan/origin/stan/src/test/unit/services/pathfinder/"
+      "./src/test/unit/services/pathfinder/"
       "glm_test.data.R",
       std::fstream::in);
   return stan::io::dump(stream);
