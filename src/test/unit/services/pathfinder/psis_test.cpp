@@ -1,4 +1,4 @@
-#include <stan/services/psis/psis.hpp>
+#include <stan/services/pathfinder/psis.hpp>
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 
@@ -144,7 +144,7 @@ TEST(ServicesPSIS, get_psis_weights) {
       0.00290112423098392, 0.0146773422920254, 0.00509837055791414,
       0.00813295746634018, 0.082538932616576, 0.00911848336266506,
       0.00456456171607177;
-  loggy warner;
+  stan::test::loggy warner;
   auto blah = stan::services::psis::psis_weights(lrms, 20, warner);
   for (Eigen::Index i = 0; i < answer.size(); ++i) {
     EXPECT_FLOAT_EQ(blah(i), answer(i));

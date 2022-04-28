@@ -8,7 +8,7 @@
 #include <stan/optimization/bfgs.hpp>
 #include <stan/optimization/lbfgs_update.hpp>
 #include <stan/services/pathfinder/single.hpp>
-#include <stan/services/psis/psis.hpp>
+#include <stan/services/pathfinder/psis.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
@@ -16,12 +16,8 @@
 #include <tbb/concurrent_vector.h>
 #include <boost/random/discrete_distribution.hpp>
 #include <boost/iterator.hpp>
-#include <fstream>
-#include <iostream>
-#include <iomanip>
 #include <string>
 #include <vector>
-#include <mutex>
 
 #define STAN_DEBUG_MULTI_PATH_PSIS false
 #define STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER false
@@ -29,6 +25,53 @@
 namespace stan {
 namespace services {
 namespace pathfinder {
+
+/**
+ * Runs multiple pathfinders with final approximate samples drawn using PSIS.
+ * @tparam Model A model implementation
+ * @tparam InitContext Type inheriting from `stan::io::var_context`
+ * @tparam InitWriter Type inheriting from `stan::io::var_context`
+ * @tparam DiagnosticWriter Type inheriting from stan::callbacks::writer
+ * @tparam ParamWriter Type inheriting from stan::callbacks::writer
+ * @tparam SingleDiagnosticWriter Type inheriting from stan::callbacks::writer
+ * @tparam SingleParamWriter Type inheriting from stan::callbacks::writer
+ * @param[in] model ($log p$ in paper) Input model to test (with data already
+ * instantiated)
+ * @param[in] init ($\pi_0$ in paper) var context for initialization
+ * @param[in] random_seed random seed for the random number generator
+ * @param[in] path path id to advance the pseudo random number generator
+ * @param[in] init_radius radius to initialize
+ * @param[in] history_size  (J in paper) amount of history to keep for L-BFGS
+ * @param[in] init_alpha line search step size for first iteration
+ * @param[in] tol_obj convergence tolerance on absolute changes in
+ *   objective function value
+ * @param[in] tol_rel_obj ($\tau^{rel}$ in paper) convergence tolerance on
+ * relative changes in objective function value
+ * @param[in] tol_grad convergence tolerance on the norm of the gradient
+ * @param[in] tol_rel_grad convergence tolerance on the relative norm of
+ *   the gradient
+ * @param[in] tol_param convergence tolerance on changes in parameter
+ *   value
+ * @param[in] num_iterations (L in paper) maximum number of LBFGS iterations
+ * @param[in] save_iterations indicates whether all the iterations should
+ *   be saved to the parameter_writer
+ * @param[in] refresh how often to write output to logger
+ * @param[in,out] interrupt callback to be called every iteration
+ * @param[in] num_elbo_draws (K in paper) number of MC draws to evaluate ELBO
+ * @param[in] num_draws (M in paper) number of approximate posterior draws to
+ * return
+ * @param[in] num_multi_draws The number of draws to return from PSIS sampling
+ * @param[in] num_paths The number of single pathfinders to run.
+ * @param[in] num_eval_attempts Number of times to attempt to calculate
+ * the log probability of an MC sample while calculating the ELBO.
+ * @param[in,out] logger Logger for messages
+ * @param[in,out] init_writer Writer callback for unconstrained inits
+ * @param[in,out] single_path_parameter_writer output for parameter values
+ * @param[in,out] single_path_diagnostic_writer output for diagnostics values
+ * @param[in,out] parameter_writer output for parameter values
+ * @param[in,out] diagnostic_writer output for diagnostics values
+ * @return error_codes::OK if successful
+ */
 template <class Model, typename InitContext, typename InitWriter,
           typename DiagnosticWriter, typename ParamWriter,
           typename SingleParamWriter, typename SingleDiagnosticWriter>
@@ -38,7 +81,7 @@ inline int pathfinder_lbfgs_multi(
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
     callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
-    int num_multi_draws, int num_eval_attempts, size_t num_threads,
+    int num_multi_draws, int num_eval_attempts,
     int num_paths, callbacks::logger& logger, InitWriter&& init_writers,
     std::vector<SingleParamWriter>& single_path_parameter_writer,
     std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
@@ -55,6 +98,7 @@ inline int pathfinder_lbfgs_multi(
   individual_lp_ratios.reserve(num_paths);
   tbb::concurrent_vector<Eigen::Array<double, -1, -1>> individual_samples;
   individual_samples.reserve(num_paths);
+  std::atomic<size_t> lp_calls{0};
   tbb::parallel_for(
       tbb::blocked_range<int>(0, num_paths), [&](tbb::blocked_range<int> r) {
         for (int iter = r.begin(); iter < r.end(); ++iter) {
@@ -65,7 +109,7 @@ inline int pathfinder_lbfgs_multi(
                   history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
                   tol_rel_grad, tol_param, num_iterations, save_iterations,
                   refresh, interrupt, num_elbo_draws, num_draws,
-                  num_eval_attempts, num_threads, logger, init_writers[iter],
+                  num_eval_attempts, logger, init_writers[iter],
                   single_path_parameter_writer[iter],
                   single_path_diagnostic_writer[iter]);
           if (std::get<0>(pathfinder_ret) == error_codes::SOFTWARE) {
@@ -75,6 +119,7 @@ inline int pathfinder_lbfgs_multi(
           }
           individual_lp_ratios.emplace_back(std::move(std::get<1>(std::move(pathfinder_ret))));
           individual_samples.emplace_back(std::move(std::get<2>(std::move(pathfinder_ret))));
+          lp_calls += std::get<3>(pathfinder_ret);
         }
       });
   const auto end_pathfinders_time = std::chrono::steady_clock::now();
@@ -90,6 +135,9 @@ inline int pathfinder_lbfgs_multi(
   if (successful_pathfinders == 0) {
     logger.info("No pathfinders ran successfully");
     return error_codes::SOFTWARE;
+  }
+  if (refresh != 0) {
+    logger.info("Total Evaluations: (" + std::to_string(lp_calls) + ")");    
   }
   for (size_t i = 0; i < successful_pathfinders; i++) {
       num_returned_samples += individual_lp_ratios[i].size();

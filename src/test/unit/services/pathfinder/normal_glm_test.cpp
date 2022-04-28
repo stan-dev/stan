@@ -7,16 +7,16 @@
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 
-auto&& blah = stan::math::init_threadpool_tbb(1);
+auto&& threadpool_init = stan::math::init_threadpool_tbb(8);
 
 auto init_context() {
   std::fstream stream("/home/steve/stan/origin/stan/src/test/unit/services/pathfinder/glm_test.data.R", std::fstream::in);
   return stan::io::dump(stream);
 }
 
-class ServicesPathfinderSingle : public testing::Test {
+class ServicesPathfinderGLM : public testing::Test {
  public:
-  ServicesPathfinderSingle()
+  ServicesPathfinderGLM()
       : init(init_ss),
         parameter(parameter_ss),
         diagnostics(diagnostic_ss),
@@ -25,9 +25,8 @@ class ServicesPathfinderSingle : public testing::Test {
 
   std::stringstream init_ss, parameter_ss, diagnostic_ss, model_ss;
   stan::callbacks::stream_writer init;
-  loggy logger;
-  values parameter;
-  values diagnostics;
+  stan::test::values parameter;
+  stan::test::values diagnostics;
   stan::io::dump context;
   stan_model model;
 };
@@ -44,7 +43,7 @@ stan::io::array_var_context init_init_context() {
   return stan::io::array_var_context(names_r, values_r, dims_r);
 }
 
-TEST_F(ServicesPathfinderSingle, rosenbrock) {
+TEST_F(ServicesPathfinderGLM, single) {
   constexpr unsigned int seed = 0;
   constexpr unsigned int chain = 1;
   constexpr double init_radius = .7;
@@ -60,10 +59,11 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
   constexpr int num_iterations = 60;
   constexpr bool save_iterations = false;
   constexpr int num_eval_attempts = 100;
-  constexpr int num_threads = 1;
-  constexpr int refresh = 1;
-  mock_callback callback;
+  constexpr int refresh = 0;
+  stan::test::mock_callback callback;
   stan::io::empty_var_context empty_context;// = init_init_context();
+  std::ostream empty_ostream(nullptr);
+  stan::test::loggy logger(empty_ostream);
 
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> input_iters;
 
@@ -72,7 +72,7 @@ TEST_F(ServicesPathfinderSingle, rosenbrock) {
           model, empty_context, seed, chain, init_radius, history_size,
           init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
           num_iterations, save_iterations, refresh, callback, num_elbo_draws,
-          num_draws, num_eval_attempts, num_threads, logger, init, parameter, diagnostics);
+          num_draws, num_eval_attempts, logger, init, parameter, diagnostics);
   /*
   for (auto&& times : parameter.times_) {
     std::cout << times;
@@ -172,15 +172,14 @@ Eigen::VectorXd prev_sd_vals = (((prev_param_vals.colwise() - prev_mean_vals)
   */
 }
 
-TEST_F(ServicesPathfinderSingle, glm_multi) {
+TEST_F(ServicesPathfinderGLM, multi) {
   constexpr unsigned int seed = 0;
   constexpr unsigned int chain = 1;
-  constexpr double init_radius = .7;
+  constexpr double init_radius = 1;
   constexpr double num_multi_draws = 100;
-  constexpr int num_threads = 1;
   constexpr int num_paths = 4;
   constexpr double num_elbo_draws = 1000;
-  constexpr double num_draws = 1000;
+  constexpr double num_draws = 2000;
   constexpr int history_size = 15;
   constexpr double init_alpha = 1;
   constexpr double tol_obj = 0;
@@ -188,11 +187,13 @@ TEST_F(ServicesPathfinderSingle, glm_multi) {
   constexpr double tol_grad = 0;
   constexpr double tol_rel_grad = 0;
   constexpr double tol_param = 0;
-  constexpr int num_iterations = 60;
+  constexpr int num_iterations = 220;
   constexpr bool save_iterations = false;
-  constexpr int refresh = 1;
+  constexpr int refresh = 0;
   constexpr int num_eval_attempts = 10;
 
+  std::ostream empty_ostream(nullptr);
+  stan::test::loggy logger(empty_ostream);
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
   std::vector<stan::callbacks::writer> single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
@@ -203,12 +204,12 @@ TEST_F(ServicesPathfinderSingle, glm_multi) {
         std::make_unique<decltype(init_init_context())>(init_init_context()));
   }
   // int refresh = 0;
-  mock_callback callback;
+  stan::test::mock_callback callback;
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
       model, single_path_inits, seed, chain, init_radius, history_size,
       init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
       num_iterations, save_iterations, refresh, callback, num_elbo_draws,
-      num_draws, num_multi_draws, num_eval_attempts, num_threads, num_paths, logger,
+      num_draws, num_multi_draws, num_eval_attempts, num_paths, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
       diagnostics);

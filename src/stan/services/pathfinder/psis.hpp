@@ -2,24 +2,9 @@
 #define STAN_SERVICES_PSIS_HPP
 
 #include <stan/math.hpp>
-#include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
-#include <stan/callbacks/writer.hpp>
-#include <stan/io/var_context.hpp>
-#include <stan/optimization/bfgs.hpp>
-#include <stan/optimization/lbfgs_update.hpp>
 #include <stan/services/error_codes.hpp>
-#include <stan/services/util/initialize.hpp>
-#include <stan/services/util/create_rng.hpp>
-#include <tbb/parallel_for.h>
 #include <tbb/parallel_invoke.h>
-#include <fstream>
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <vector>
-#include <mutex>
-#include <queue>
 
 namespace stan {
 namespace services {
@@ -32,8 +17,8 @@ namespace internal {
  * compile time rows and 1 compile time column.
  * @tparam EigArray2 An Eigen type inheriting from `ArrayBase` with unknown
  * compile time rows and 1 compile time column.
- * @param theta Estimates from gpd estimation
- * @param x The sample that the parameters were estimated from.
+ * @param[in] theta Estimates from gpd estimation
+ * @param[in] x The sample that the parameters were estimated from.
  */
 template <typename EigArray1, typename EigArray2>
 inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
@@ -60,8 +45,8 @@ inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
  *
  * @tparam EigArray An Eigen type inheriting from `ArrayBase` with unknown
  * compile time rows and 1 compile time column.
- * @param x A numeric vector. The sample from which to estimate the parameters.
- * @param min_grid_pts The minimum number of grid points used in the fitting
+ * @param[in] x A numeric vector. The sample from which to estimate the parameters.
+ * @param[in] min_grid_pts The minimum number of grid points used in the fitting
  *   algorithm.
  * @return A pair of doubles with the first element `sigma` and the second
  * element `k`.
@@ -84,7 +69,7 @@ inline auto gpdfit(const EigArray& x, const Eigen::Index min_grid_pts = 30) {
   auto linspaced_arr = array_vec_t::LinSpaced(M, 1, static_cast<double>(M));
   // first quartile of sample
   const double x_1st_qt
-      = x_ref.coeff(std::floor(static_cast<double>(N) / 4 + 0.5) - 1);
+      = x_ref.coeff(static_cast<Eigen::Index>(std::floor(static_cast<double>(N) / 4.0 + 0.5)) - 1l);
   array_vec_t theta
       = (1.0 / x_ref.coeff(N - 1)
          + (1.0 - (M / (linspaced_arr - 0.5)).sqrt()) / (prior * x_1st_qt));
@@ -214,10 +199,6 @@ inline void quick_sort(Eigen::Array<double, -1, 1>& arr,
 
 /**
  * Runs quick_sort optionally in parallel
- * @tparam EigDblArr An Eigen type inheriting from `ArrayBase` with unknown
- * compile time rows and 1 compile time column.
- * @tparam EigEdxArr An Eigen type inheriting from `ArrayBase` with unknown
- * compile time rows and 1 compile time column.
  * @param[in, out] arr The Array of doubles to be sorted
  * @param[in, out] idx The index of the original positions of the elements of
  * `arr`. This is also sorted to keep track of the original positions of the
