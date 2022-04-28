@@ -1094,6 +1094,7 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
   auto&& elbo_lp_ratio = elbo_best.lp_ratio;
   auto&& elbo_lp_mat = elbo_best.lp_mat;
   const int remaining_draws = num_draws - elbo_lp_ratio.rows();
+  const Eigen::Index num_unconstrained_params = names.size() - 2;
   if (remaining_draws > 0) {
     try {
       auto&& thread_rng = rng_vec[tbb::this_task_arena::current_thread_index()];
@@ -1117,14 +1118,14 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
       Eigen::VectorXd approx_samples_constrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
         unconstrained_col = elbo_draws.col(i);
-        constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(
+        constrained_draws_mat.col(i).head(num_unconstrained_params) = constrain_fun(
             rng, unconstrained_col, approx_samples_constrained_col);
         constrained_draws_mat.col(i).tail(2) = elbo_lp_mat.row(i);
       }
       for (Eigen::Index i = elbo_draws.cols(), j = 0; i < total_size;
            ++i, ++j) {
         unconstrained_col = new_draws.col(j);
-        constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(
+        constrained_draws_mat.col(i).head(num_unconstrained_params) = constrain_fun(
             rng, unconstrained_col, approx_samples_constrained_col);
         constrained_draws_mat.col(i).tail(2) = lp_draws.row(j);
       }
@@ -1141,7 +1142,7 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
       Eigen::VectorXd unconstrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
         unconstrained_col = elbo_draws.col(i);
-        constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(
+        constrained_draws_mat.col(i).head(num_unconstrained_params) = constrain_fun(
             rng, unconstrained_col, approx_samples_constrained_col);
         constrained_draws_mat.col(i).tail(2) = elbo_lp_mat.row(i);
       }
@@ -1154,7 +1155,7 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
     Eigen::VectorXd unconstrained_col;
     for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
       unconstrained_col = elbo_draws.col(i);
-      constrained_draws_mat.col(i).head(names.size() - 2) = constrain_fun(
+      constrained_draws_mat.col(i).head(num_unconstrained_params) = constrain_fun(
           rng, unconstrained_col, approx_samples_constrained_col);
       constrained_draws_mat.col(i).tail(2) = elbo_lp_mat.row(i);
     }
