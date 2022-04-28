@@ -185,11 +185,8 @@ TEST_F(ServicesPathfinderEightSchools, single) {
                                 .transpose()
                                 .eval();
 
-  Eigen::MatrixXd r_answer(10, 100);
-  auto r_answer_vec = stan::test::eight_schools_answer_vec();
-  for (Eigen::Index i = 0; i < 1000; ++i) {
-    r_answer(i) = r_answer_vec(i);
-  }
+  Eigen::MatrixXd r_answer = stan::test::eight_schools_r_answer();
+
   Eigen::MatrixXd r_constrainted_draws_mat(20, 100);
   {
     auto rng = stan::services::util::create_rng<boost::ecuyer1988>(0123, 0);
