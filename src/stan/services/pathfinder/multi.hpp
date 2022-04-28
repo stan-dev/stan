@@ -99,7 +99,6 @@ inline int pathfinder_lbfgs_multi(
   tbb::parallel_for(
       tbb::blocked_range<int>(0, num_paths), [&](tbb::blocked_range<int> r) {
         for (int iter = r.begin(); iter < r.end(); ++iter) {
-          // TODO: Make fake writer that receives the samples
           auto pathfinder_ret
               = stan::services::pathfinder::pathfinder_lbfgs_single<true>(
                   model, *(init[iter]), random_seed, path + iter, init_radius,

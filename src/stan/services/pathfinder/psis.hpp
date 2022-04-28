@@ -288,7 +288,8 @@ inline Eigen::Array<double, -1, 1> psis_weights(const EigArray& log_ratios,
                  <= std::numeric_limits<double>::min() * 10)) {
       double eps_diff = lw_tail.maxCoeff() - lw_tail.minCoeff();
       logger.warn(
-       std::string("In PSIS Weight Calculation: Difference between the tails is ") +
+       std::string("In PSIS Weight Calculation: Difference "
+       "between the tails is ") +
         std::to_string(eps_diff) +
         "which is too small for estimating the generalized pareto values."
         " Returning non-pareto smoothed weights.");
