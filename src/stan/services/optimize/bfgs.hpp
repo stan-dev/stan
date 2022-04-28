@@ -63,7 +63,8 @@ int bfgs(Model& model, const stan::io::var_context& init,
       model, init, rng, init_radius, false, logger, init_writer);
 
   std::stringstream bfgs_ss;
-  using Optimizer = stan::optimization::BFGSLineSearch<Model, stan::optimization::BFGSUpdate_HInv<>>;
+  using Optimizer = stan::optimization::BFGSLineSearch<
+      Model, stan::optimization::BFGSUpdate_HInv<>>;
   Optimizer bfgs(model, cont_vector, disc_vector, &bfgs_ss);
   bfgs._ls_opts.alpha0 = init_alpha;
   bfgs._conv_opts.tolAbsF = tol_obj;
