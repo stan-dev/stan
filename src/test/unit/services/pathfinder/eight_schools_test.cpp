@@ -41,9 +41,7 @@ class ServicesPathfinderEightSchools : public testing::Test {
   stan_model model;
 };
 
-auto init_init_context() {
-  return stan::io::empty_var_context();
-}
+auto init_init_context() { return stan::io::empty_var_context(); }
 
 TEST_F(ServicesPathfinderEightSchools, multi) {
   constexpr unsigned int seed = 0;
@@ -101,26 +99,33 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
 
   Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
   Eigen::RowVectorXd sd_vals = ((param_vals.rowwise() - mean_vals)
-          .array()
-          .square()
-          .matrix()
-          .colwise()
-          .sum()
-          .array()
-      / (param_vals.rows() - 1))
-         .sqrt();
-         /*
-  std::cout << "Mean Values: \n" << mean_vals.format(CommaInitFmt) << "\n";
-  std::cout << "SD Values: \n"
-            << sd_vals.format(CommaInitFmt)
-            << "\n";
+                                    .array()
+                                    .square()
+                                    .matrix()
+                                    .colwise()
+                                    .sum()
+                                    .array()
+                                / (param_vals.rows() - 1))
+                                   .sqrt();
+  /*
+std::cout << "Mean Values: \n" << mean_vals.format(CommaInitFmt) << "\n";
+std::cout << "SD Values: \n"
+     << sd_vals.format(CommaInitFmt)
+     << "\n";
 */
   Eigen::RowVectorXd prev_mean_vals(20);
-  prev_mean_vals << 1.89104, 3.66449, 0.22256,  0.119645, -0.146812, 0.23633, -0.244868, -0.227134,  0.504507, 0.0476979, 3.66491, 2.57979, 1.21644, 2.81399, 1.53776, 1.39865, 3.99508, 2.41488, -17.9537, -47.016;
+  prev_mean_vals << 1.89104, 3.66449, 0.22256, 0.119645, -0.146812, 0.23633,
+      -0.244868, -0.227134, 0.504507, 0.0476979, 3.66491, 2.57979, 1.21644,
+      2.81399, 1.53776, 1.39865, 3.99508, 2.41488, -17.9537, -47.016;
   Eigen::RowVectorXd prev_sd_vals(20);
-  prev_sd_vals << 1.93964, 4.77042, 0.95799, 0.842812, 0.963455, 0.948548, 1.03149, 0.989, 0.920778, 0.888529, 4.6405, 3.63071, 4.25895, 4.45198, 3.90755, 4.23075, 4.56257, 4.22915, 4.37932, 2.28608;
+  prev_sd_vals << 1.93964, 4.77042, 0.95799, 0.842812, 0.963455, 0.948548,
+      1.03149, 0.989, 0.920778, 0.888529, 4.6405, 3.63071, 4.25895, 4.45198,
+      3.90755, 4.23075, 4.56257, 4.22915, 4.37932, 2.28608;
   Eigen::VectorXd diff_vals(20);
-  diff_vals = ((prev_mean_vals.array() + (2.0 * prev_sd_vals.array())).abs() - mean_vals.array().abs()).matrix().transpose();
+  diff_vals = ((prev_mean_vals.array() + (2.0 * prev_sd_vals.array())).abs()
+               - mean_vals.array().abs())
+                  .matrix()
+                  .transpose();
   for (Eigen::Index i = 0; i < 18; i++) {
     EXPECT_GE(diff_vals(i), 0.0);
   }
@@ -150,18 +155,17 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   stan::test::loggy logger(empty_ostream);
   stan::test::mock_callback callback;
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
-          model, context, seed, chain, init_radius, history_size,
-          init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-          num_iterations, save_iterations, refresh, callback, num_elbo_draws,
-          num_draws, num_eval_attempts, logger, init, parameter, diagnostics);
+      model, context, seed, chain, init_radius, history_size, init_alpha,
+      tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
+      save_iterations, refresh, callback, num_elbo_draws, num_draws,
+      num_eval_attempts, logger, init, parameter, diagnostics);
 
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
 
-
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
 
-  //std::cout << "---- Results  -------" << std::endl;
+  // std::cout << "---- Results  -------" << std::endl;
   /*
   std::cout << "Values: \n"
             << param_vals.format(CommaInitFmt) << "\n";
@@ -180,7 +184,6 @@ TEST_F(ServicesPathfinderEightSchools, single) {
                                  .sqrt())
                                 .transpose()
                                 .eval();
-
 
   Eigen::MatrixXd r_answer(10, 100);
   auto r_answer_vec = stan::test::eight_schools_answer_vec();
@@ -256,7 +259,9 @@ TEST_F(ServicesPathfinderEightSchools, single) {
             .transpose()
             .eval();
   Eigen::VectorXd diff_vals(20);
-  diff_vals = ((mean_r_vals.array() + (2.0 * sd_r_vals.array())).abs() - mean_vals.array().abs()).matrix();
+  diff_vals = ((mean_r_vals.array() + (2.0 * sd_r_vals.array())).abs()
+               - mean_vals.array().abs())
+                  .matrix();
   for (Eigen::Index i = 0; i < 18; i++) {
     EXPECT_GE(diff_vals(i), 0.0);
   }

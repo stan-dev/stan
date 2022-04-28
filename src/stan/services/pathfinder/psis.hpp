@@ -45,7 +45,8 @@ inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
  *
  * @tparam EigArray An Eigen type inheriting from `ArrayBase` with unknown
  * compile time rows and 1 compile time column.
- * @param[in] x A numeric vector. The sample from which to estimate the parameters.
+ * @param[in] x A numeric vector. The sample from which to estimate the
+ * parameters.
  * @param[in] min_grid_pts The minimum number of grid points used in the fitting
  *   algorithm.
  * @return A pair of doubles with the first element `sigma` and the second
@@ -68,8 +69,9 @@ inline auto gpdfit(const EigArray& x, const Eigen::Index min_grid_pts = 30) {
   const Eigen::Index M = min_grid_pts + std::floor(std::sqrt(N));
   auto linspaced_arr = array_vec_t::LinSpaced(M, 1, static_cast<double>(M));
   // first quartile of sample
-  const double x_1st_qt
-      = x_ref.coeff(static_cast<Eigen::Index>(std::floor(static_cast<double>(N) / 4.0 + 0.5)) - 1l);
+  const double x_1st_qt = x_ref.coeff(
+      static_cast<Eigen::Index>(std::floor(static_cast<double>(N) / 4.0 + 0.5))
+      - 1l);
   array_vec_t theta
       = (1.0 / x_ref.coeff(N - 1)
          + (1.0 - (M / (linspaced_arr - 0.5)).sqrt()) / (prior * x_1st_qt));

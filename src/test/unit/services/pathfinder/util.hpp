@@ -17,7 +17,8 @@ struct mock_callback : public stan::callbacks::interrupt {
 
 class loggy : public stan::callbacks::logger {
   std::ostream& log_;
-public:
+
+ public:
   loggy(std::ostream& x) : log_(x) {}
   loggy() : log_(std::cout) {}
   /**
@@ -25,9 +26,7 @@ public:
    *
    * @param[in] message message
    */
-  virtual void debug(const std::string& message) {
-    log_ << message << "\n";
-  }
+  virtual void debug(const std::string& message) { log_ << message << "\n"; }
 
   /**
    * Logs a message with debug log level.
@@ -43,9 +42,7 @@ public:
    *
    * @param[in] message message
    */
-  virtual void info(const std::string& message) {
-    log_ << message << "\n";
-  }
+  virtual void info(const std::string& message) { log_ << message << "\n"; }
 
   /**
    * Logs a message with info log level.
@@ -61,9 +58,7 @@ public:
    *
    * @param[in] message message
    */
-  virtual void warn(const std::string& message) {
-    log_ << message << "\n";
-  }
+  virtual void warn(const std::string& message) { log_ << message << "\n"; }
 
   /**
    * Logs a message with warn log level.
@@ -79,9 +74,7 @@ public:
    *
    * @param[in] message message
    */
-  virtual void error(const std::string& message) {
-    log_ << message << "\n";
-  }
+  virtual void error(const std::string& message) { log_ << message << "\n"; }
 
   /**
    * Logs an error with error log level.
@@ -97,9 +90,7 @@ public:
    *
    * @param[in] message message
    */
-  virtual void fatal(const std::string& message) {
-    log_ << message << "\n";
-  }
+  virtual void fatal(const std::string& message) { log_ << message << "\n"; }
 
   /**
    * Logs an error with fatal log level.
@@ -142,8 +133,7 @@ class values : public stan::callbacks::stream_writer {
       const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& xx) {
     optim_path_ = xx;
   }
-  void operator()(
-      const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& xx) {
+  void operator()(const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& xx) {
     optim_path_.push_back(xx);
   }
   template <typename EigVec, stan::require_eigen_vector_t<EigVec>* = nullptr>
@@ -463,9 +453,9 @@ Eigen::Matrix<double, 1000, 1> eight_schools_answer_vec() {
       0.883659297466583, 0.237348359431015, -0.477046037210403,
       -0.983966078658822, -0.471162152607535, -0.142998279988775,
       -0.170498289396448;
-      return r_answer_vec;
+  return r_answer_vec;
 }
-}
-}
+}  // namespace test
+}  // namespace stan
 
 #endif

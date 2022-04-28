@@ -26,7 +26,8 @@ TEST(ServicesPSIS, xl) {
       -1.14714626375751, -0.760774912681297, -0.394219954206013,
       -0.045843397405553, 0.285809256288784, 0.602034622751884,
       0.903992807508582;
-  auto xx = stan::services::psis::internal::profile_loglikelihood(theta, test_x);
+  auto xx
+      = stan::services::psis::internal::profile_loglikelihood(theta, test_x);
   // std::cout << "\nxx: \n" << xx << "\n";
   Eigen::Array<double, -1, 1> good_vals(34);
   good_vals << 1.06041260401414, 1.15443356538553, 1.19147065735959,
@@ -39,7 +40,8 @@ TEST(ServicesPSIS, xl) {
       1.1331873300179, 1.11259974380022, 1.08721662622115, 1.05458546311518,
       1.00973177805282, 0.939927373529039, 0.789031648847585;
   for (Eigen::Index i = 0; i < good_vals.size(); ++i) {
-    EXPECT_FLOAT_EQ(xx(i), good_vals(i)) << "Failed for xx(" << std::to_string(i) << ")";
+    EXPECT_FLOAT_EQ(xx(i), good_vals(i))
+        << "Failed for xx(" << std::to_string(i) << ")";
   }
 }
 
@@ -151,20 +153,20 @@ TEST(ServicesPSIS, get_psis_weights) {
   }
 }
 
-
-
 TEST(ServicesPSIS, max_n_elements) {
   Eigen::Array<double, -1, 1> unsorted(21);
   for (Eigen::Index i = 0; i < 21; ++i) {
     unsorted(i) = i;
   }
-  auto sorted_tuple = stan::services::psis::internal::largest_n_elements(unsorted, 5);
-  Eigen::IOFormat CommaInitFmt(Eigen::FullPrecision, 0, ", ", ", ", "\n",
-                               "", "", " ");
+  auto sorted_tuple
+      = stan::services::psis::internal::largest_n_elements(unsorted, 5);
+  Eigen::IOFormat CommaInitFmt(Eigen::FullPrecision, 0, ", ", ", ", "\n", "",
+                               "", " ");
   auto sorted_result = std::get<0>(sorted_tuple);
   auto sorted_result_pos = std::get<1>(sorted_tuple);
-  //std::cout << "nums:\n" << sorted_result.format(CommaInitFmt) << "\n";
-  //std::cout << "position: \n" << sorted_result_pos.format(CommaInitFmt) << "\n";
+  // std::cout << "nums:\n" << sorted_result.format(CommaInitFmt) << "\n";
+  // std::cout << "position: \n" << sorted_result_pos.format(CommaInitFmt) <<
+  // "\n";
 
   Eigen::Array<double, -1, 1> sorted_ans(5);
   sorted_ans << 16, 17, 18, 19, 20;

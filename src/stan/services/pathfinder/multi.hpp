@@ -81,8 +81,8 @@ inline int pathfinder_lbfgs_multi(
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
     callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
-    int num_multi_draws, int num_eval_attempts,
-    int num_paths, callbacks::logger& logger, InitWriter&& init_writers,
+    int num_multi_draws, int num_eval_attempts, int num_paths,
+    callbacks::logger& logger, InitWriter&& init_writers,
     std::vector<SingleParamWriter>& single_path_parameter_writer,
     std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
@@ -113,12 +113,15 @@ inline int pathfinder_lbfgs_multi(
                   single_path_parameter_writer[iter],
                   single_path_diagnostic_writer[iter]);
           if (std::get<0>(pathfinder_ret) == error_codes::SOFTWARE) {
-            logger.info(std::string("Pathfinder iteration: ") +
-             std::to_string(iter) + " failed. [Return better error codes for nice message here]" );
-             return;
+            logger.info(
+                std::string("Pathfinder iteration: ") + std::to_string(iter)
+                + " failed. [Return better error codes for nice message here]");
+            return;
           }
-          individual_lp_ratios.emplace_back(std::move(std::get<1>(std::move(pathfinder_ret))));
-          individual_samples.emplace_back(std::move(std::get<2>(std::move(pathfinder_ret))));
+          individual_lp_ratios.emplace_back(
+              std::move(std::get<1>(std::move(pathfinder_ret))));
+          individual_samples.emplace_back(
+              std::move(std::get<2>(std::move(pathfinder_ret))));
           lp_calls += std::get<3>(pathfinder_ret);
         }
       });
@@ -137,22 +140,25 @@ inline int pathfinder_lbfgs_multi(
     return error_codes::SOFTWARE;
   }
   if (refresh != 0) {
-    logger.info("Total Evaluations: (" + std::to_string(lp_calls) + ")");    
+    logger.info("Total Evaluations: (" + std::to_string(lp_calls) + ")");
   }
   for (size_t i = 0; i < successful_pathfinders; i++) {
-      num_returned_samples += individual_lp_ratios[i].size();
+    num_returned_samples += individual_lp_ratios[i].size();
   }
   Eigen::Array<double, -1, 1> lp_ratios(num_returned_samples);
-  Eigen::Array<double, -1, -1> samples(individual_samples[0].rows(), num_returned_samples);
+  Eigen::Array<double, -1, -1> samples(individual_samples[0].rows(),
+                                       num_returned_samples);
   Eigen::Index filling_start_row = 0;
   for (size_t iter = 0; iter < successful_pathfinders; ++iter) {
     const Eigen::Index individ_num_samples = individual_lp_ratios[iter].size();
-    lp_ratios.segment(filling_start_row, individ_num_samples) = individual_lp_ratios[iter];
-    samples.middleCols(filling_start_row, individ_num_samples) = individual_samples[iter];
+    lp_ratios.segment(filling_start_row, individ_num_samples)
+        = individual_lp_ratios[iter];
+    samples.middleCols(filling_start_row, individ_num_samples)
+        = individual_samples[iter];
     filling_start_row += individ_num_samples;
   }
-  const auto tail_len
-      = std::min(0.2 * num_returned_samples, 3 * std::sqrt(num_returned_samples));
+  const auto tail_len = std::min(0.2 * num_returned_samples,
+                                 3 * std::sqrt(num_returned_samples));
   Eigen::Array<double, -1, 1> weight_vals
       = stan::services::psis::psis_weights(lp_ratios, tail_len, logger);
   boost::ecuyer1988 rng
@@ -196,7 +202,7 @@ inline int pathfinder_lbfgs_multi(
 
   return 0;
 }
-}  // namespace optimize
+}  // namespace pathfinder
 }  // namespace services
 }  // namespace stan
 #endif
