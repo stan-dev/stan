@@ -19,9 +19,6 @@
 #include <string>
 #include <vector>
 
-#define STAN_DEBUG_MULTI_PATH_PSIS false
-#define STAN_DEBUG_MULTI_PATH_SINGLE_PATHFINDER false
-
 namespace stan {
 namespace services {
 namespace pathfinder {
