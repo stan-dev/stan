@@ -136,14 +136,16 @@ class BFGSMinimizer {
   }
 
   explicit BFGSMinimizer(FunctorType &f) : _func(f) {}
-  template <typename Vec, require_vector_t<Vec>* = nullptr, typename LSOpt, typename ConvergeOpt, typename QnUpdater>
-  explicit BFGSMinimizer(FunctorType &f, const Vec& params_r,
-    LSOpt&& ls_opt, ConvergeOpt&& conv_opt,
-    QnUpdater&& updater) :
-     _func(f), _qn(std::forward<QnUpdater>(updater)), _ls_opts(std::forward<LSOpt>(ls_opt)), _conv_opts(std::forward<ConvergeOpt>(conv_opt)) {
-     }
+  template <typename Vec, require_vector_t<Vec> * = nullptr, typename LSOpt,
+            typename ConvergeOpt, typename QnUpdater>
+  explicit BFGSMinimizer(FunctorType &f, const Vec &params_r, LSOpt &&ls_opt,
+                         ConvergeOpt &&conv_opt, QnUpdater &&updater)
+      : _func(f),
+        _qn(std::forward<QnUpdater>(updater)),
+        _ls_opts(std::forward<LSOpt>(ls_opt)),
+        _conv_opts(std::forward<ConvergeOpt>(conv_opt)) {}
 
-  template <typename Vec, require_vector_t<Vec>* = nullptr>
+  template <typename Vec, require_vector_t<Vec> * = nullptr>
   void initialize(const Vec &x0) {
     int ret;
     _xk.resize(x0.size());
@@ -339,7 +341,8 @@ class ModelAdaptor {
     _fevals++;
 
     try {
-      f = -log_prob_grad<true, JacobianTransform>(_model, _x, _params_i, _g, _msgs);
+      f = -log_prob_grad<true, JacobianTransform>(_model, _x, _params_i, _g,
+                                                  _msgs);
     } catch (const std::exception &e) {
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
@@ -374,10 +377,11 @@ class ModelAdaptor {
   }
 };
 
-template <typename M, typename QNUpdateType, bool JacobianTransform = false, typename Scalar = double,
-          int DimAtCompile = Eigen::Dynamic>
-class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M, JacobianTransform>, QNUpdateType,
-                                            Scalar, DimAtCompile> {
+template <typename M, typename QNUpdateType, bool JacobianTransform = false,
+          typename Scalar = double, int DimAtCompile = Eigen::Dynamic>
+class BFGSLineSearch
+    : public BFGSMinimizer<ModelAdaptor<M, JacobianTransform>, QNUpdateType,
+                           Scalar, DimAtCompile> {
  private:
   using model_t = ModelAdaptor<M, JacobianTransform>;
   model_t _adaptor;
@@ -386,23 +390,24 @@ class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M, JacobianTransform>, 
   using BFGSBase = BFGSMinimizer<model_t, QNUpdateType, Scalar, DimAtCompile>;
   using vector_t = typename BFGSBase::VectorT;
   using idx_t = typename stan::math::index_type<vector_t>::type;
-  template <typename Vec, require_vector_t<Vec>* = nullptr>
-  BFGSLineSearch(M& model, const Vec& params_r,
-    const std::vector<int> &params_i, const LSOptions<double>& ls_opt,
-    const ConvergenceOptions<double>& conv_opt, const QNUpdateType& updater,
-    std::ostream *msgs = 0) :
-    BFGSBase(_adaptor, params_r, ls_opt, conv_opt, updater),
-     _adaptor(model, params_i, msgs) {
-       initialize(params_r);
-     }
+  template <typename Vec, require_vector_t<Vec> * = nullptr>
+  BFGSLineSearch(M &model, const Vec &params_r,
+                 const std::vector<int> &params_i,
+                 const LSOptions<double> &ls_opt,
+                 const ConvergenceOptions<double> &conv_opt,
+                 const QNUpdateType &updater, std::ostream *msgs = 0)
+      : BFGSBase(_adaptor, params_r, ls_opt, conv_opt, updater),
+        _adaptor(model, params_i, msgs) {
+    initialize(params_r);
+  }
 
-  template <typename Vec, require_vector_t<Vec>* = nullptr>
-  BFGSLineSearch(M &model, const Vec& params_r,
+  template <typename Vec, require_vector_t<Vec> * = nullptr>
+  BFGSLineSearch(M &model, const Vec &params_r,
                  const std::vector<int> &params_i, std::ostream *msgs = 0)
       : BFGSBase(_adaptor), _adaptor(model, params_i, msgs) {
     initialize(params_r);
   }
-  template <typename Vec, require_vector_t<Vec>* = nullptr>
+  template <typename Vec, require_vector_t<Vec> * = nullptr>
   void initialize(const Vec &params_r) {
     Eigen::Matrix<double, Eigen::Dynamic, 1> x(params_r.size());
     for (size_t i = 0; i < params_r.size(); i++)
