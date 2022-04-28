@@ -186,20 +186,16 @@ inline int pathfinder_lbfgs_multi(
                                + std::to_string(pathfinders_delta_time)
                                + " seconds (Pathfinders)";
   parameter_writer(optim_time_str);
-
   std::string psis_time_str = std::string(time_header.size(), ' ')
                               + std::to_string(psis_delta_time)
                               + " seconds (PSIS)";
   parameter_writer(psis_time_str);
-
   std::string total_time_str
       = std::string(time_header.size(), ' ')
         + std::to_string(pathfinders_delta_time + psis_delta_time)
         + " seconds (Total)";
   parameter_writer(total_time_str);
-
   parameter_writer();
-
   return 0;
 }
 }  // namespace pathfinder

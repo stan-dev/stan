@@ -619,7 +619,6 @@ inline taylor_approx_t construct_taylor_approximation_full(
   Hk += alpha.asDiagonal();
   Eigen::MatrixXd L_hk = Hk.llt().matrixL().transpose();
   double logdetcholHk = L_hk.diagonal().array().abs().log().sum();
-
   Eigen::VectorXd x_center = point_est - Hk * grad_est;
   debug::taylor_appx_full2(logger, Hk, L_hk, logdetcholHk, x_center);
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(L_hk),
@@ -691,7 +690,6 @@ inline auto construct_taylor_approximation_sparse(
                         + 0.5 * alpha.array().log().sum();
   Eigen::VectorXd ninvRSTg = ninvRST * grad_est;
   Eigen::VectorXd alpha_mul_grad = (alpha.array() * grad_est.array()).matrix();
-
   Eigen::VectorXd x_center
       = point_est
         - (alpha_mul_grad
@@ -823,12 +821,10 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
   const auto start_optim_time = std::chrono::steady_clock::now();
   boost::ecuyer1988 rng
       = util::create_rng<boost::ecuyer1988>(random_seed, path);
-
   std::vector<int> disc_vector;
   std::vector<double> cont_vector = util::initialize<false>(
       model, init, rng, init_radius, false, logger, init_writer);
   const auto param_size = cont_vector.size();
-
   // Setup LBFGS
   std::stringstream lbfgs_ss;
   stan::optimization::LSOptions<double> ls_opts;
@@ -847,13 +843,11 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
       = stan::optimization::BFGSLineSearch<Model, lbfgs_update_t, true>;
   Optimizer lbfgs(model, cont_vector, disc_vector, std::move(ls_opts),
                   std::move(conv_opts), std::move(lbfgs_update), &lbfgs_ss);
-
   const std::string path_num("Path: [" + std::to_string(path) + "] ");
   if (refresh != 0) {
     logger.info(path_num + "Initial log joint probability = "
                 + std::to_string(lbfgs.logp()));
   }
-
   std::vector<std::string> names;
   model.constrained_param_names(names, true, true);
   names.push_back("lp_approx__");
@@ -956,7 +950,6 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
     }
     return_code = error_codes::OK;
   }
-
   const auto end_optim_time = std::chrono::steady_clock::now();
   const double optim_delta_time
       = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -1003,7 +996,6 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
     rng_vec.emplace_back(
         util::create_rng<boost::ecuyer1988>(random_seed, path + i));
   }
-
   Eigen::Index best_E = -1;
   internal::elbo_est_t elbo_best;
   internal::taylor_approx_t taylor_approx_best;
