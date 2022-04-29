@@ -999,7 +999,7 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
   Eigen::Index best_E = -1;
   internal::elbo_est_t elbo_best;
   internal::taylor_approx_t taylor_approx_best;
-  std::atomic<size_t> num_evals{0};
+  std::atomic<size_t> num_evals{lbfgs.grad_evals()};
   tbb::parallel_for(
       tbb::blocked_range<Eigen::Index>(0, diff_size),
       [&](tbb::blocked_range<Eigen::Index> r) {
