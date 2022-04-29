@@ -73,6 +73,11 @@ class unique_stream_writer final : public writer {
    */
   void operator()(const std::vector<double>& state) { write_vector(state); }
 
+  void operator()(const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
+     write_vector(std::get<0>(state));
+     write_vector(std::get<1>(state));
+  }
+
   void operator()(const Eigen::MatrixXd& states) {
     if (output_ == nullptr)
       return;
