@@ -74,8 +74,12 @@ class unique_stream_writer final : public writer {
   void operator()(const std::vector<double>& state) { write_vector(state); }
 
   void operator()(const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
-     write_vector(std::get<0>(state));
-     write_vector(std::get<1>(state));
+    if (output_ == nullptr)
+      return;
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                 ", ", "", "", "\n", "", "");
+    *output_ << std::get<0>(state).transpose().eval();
+    *output_ << std::get<1>(state).transpose().eval();
   }
 
   void operator()(const Eigen::MatrixXd& states) {
