@@ -5,14 +5,14 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/array_var_context.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/gq_writer.hpp>
-#include <stan/math/prim/fun/Eigen.hpp>
 #include <boost/algorithm/string.hpp>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 namespace stan {
 namespace services {

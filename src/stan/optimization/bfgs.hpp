@@ -30,43 +30,24 @@ typedef enum {
 template <typename Scalar = double>
 class ConvergenceOptions {
  public:
-  ConvergenceOptions() {
-    maxIts = 10000;
-    fScale = 1.0;
-
-    tolAbsX = 1e-8;
-    tolAbsF = 1e-12;
-    tolAbsGrad = 1e-8;
-
-    tolRelF = 1e+4;
-    tolRelGrad = 1e+3;
-  }
-  size_t maxIts;
-  Scalar tolAbsX;
-  Scalar tolAbsF;
-  Scalar tolRelF;
-  Scalar fScale;
-  Scalar tolAbsGrad;
-  Scalar tolRelGrad;
+  size_t maxIts{10000};
+  Scalar tolAbsX{1e-8};
+  Scalar tolAbsF{1e-12};
+  Scalar tolRelF{1e+4};
+  Scalar fScale{1.0};
+  Scalar tolAbsGrad{1e-8};
+  Scalar tolRelGrad{1e+3};
 };
 
 template <typename Scalar = double>
 class LSOptions {
  public:
-  LSOptions() {
-    c1 = 1e-4;
-    c2 = 0.9;
-    alpha0 = 1e-3;
-    minAlpha = 1e-12;
-    maxLSIts = 20;
-    maxLSRestarts = 10;
-  }
-  Scalar c1;
-  Scalar c2;
-  Scalar alpha0;
-  Scalar minAlpha;
-  Scalar maxLSIts;
-  Scalar maxLSRestarts;
+  Scalar c1{1e-4};
+  Scalar c2{0.9};
+  Scalar alpha0{1e-3};
+  Scalar minAlpha{1e-12};
+  Scalar maxLSIts{20};
+  Scalar maxLSRestarts{10};
 };
 template <typename FunctorType, typename QNUpdateType, typename Scalar = double,
           int DimAtCompile = Eigen::Dynamic>
@@ -88,19 +69,19 @@ class BFGSMinimizer {
   LSOptions<Scalar> _ls_opts;
   ConvergenceOptions<Scalar> _conv_opts;
 
-  QNUpdateType &get_qnupdate() { return _qn; }
-  const QNUpdateType &get_qnupdate() const { return _qn; }
+  inline QNUpdateType &get_qnupdate() noexcept { return _qn; }
+  inline const QNUpdateType &get_qnupdate() const noexcept { return _qn; }
 
-  const Scalar &curr_f() const { return _fk; }
-  const VectorT &curr_x() const { return _xk; }
-  const VectorT &curr_g() const { return _gk; }
-  const VectorT &curr_p() const { return _pk; }
+  inline const Scalar &curr_f() const noexcept { return _fk; }
+  inline const VectorT &curr_x() const noexcept { return _xk; }
+  inline const VectorT &curr_g() const noexcept { return _gk; }
+  inline const VectorT &curr_p() const noexcept { return _pk; }
 
-  const Scalar &prev_f() const { return _fk_1; }
-  const VectorT &prev_x() const { return _xk_1; }
-  const VectorT &prev_g() const { return _gk_1; }
-  const VectorT &prev_p() const { return _pk_1; }
-  Scalar prev_step_size() const { return _pk_1.norm() * _alphak_1; }
+  inline const Scalar &prev_f() const noexcept { return _fk_1; }
+  inline const VectorT &prev_x() const noexcept { return _xk_1; }
+  inline const VectorT &prev_g() const noexcept { return _gk_1; }
+  inline const VectorT &prev_p() const noexcept { return _pk_1; }
+  inline Scalar prev_step_size() const { return _pk_1.norm() * _alphak_1; }
 
   inline Scalar rel_grad_norm() const {
     return -_pk.dot(_gk) / std::max(std::fabs(_fk), _conv_opts.fScale);
@@ -111,11 +92,11 @@ class BFGSMinimizer {
                       std::max(std::fabs(_fk), _conv_opts.fScale));
   }
 
-  const Scalar &alpha0() const { return _alpha0; }
-  const Scalar &alpha() const { return _alpha; }
-  const size_t iter_num() const { return _itNum; }
+  inline const Scalar &alpha0() const noexcept { return _alpha0; }
+  inline const Scalar &alpha() const noexcept { return _alpha; }
+  inline const size_t iter_num() const noexcept { return _itNum; }
 
-  const std::string &note() const { return _note; }
+  inline const std::string &note() const noexcept { return _note; }
 
   std::string get_code_string(int retCode) {
     switch (retCode) {
@@ -155,10 +136,23 @@ class BFGSMinimizer {
   }
 
   explicit BFGSMinimizer(FunctorType &f) : _func(f) {}
+  template <typename Vec, require_vector_t<Vec> * = nullptr, typename LSOpt,
+            typename ConvergeOpt, typename QnUpdater>
+  explicit BFGSMinimizer(FunctorType &f, const Vec &params_r, LSOpt &&ls_opt,
+                         ConvergeOpt &&conv_opt, QnUpdater &&updater)
+      : _func(f),
+        _qn(std::forward<QnUpdater>(updater)),
+        _ls_opts(std::forward<LSOpt>(ls_opt)),
+        _conv_opts(std::forward<ConvergeOpt>(conv_opt)) {}
 
-  void initialize(const VectorT &x0) {
+  template <typename Vec, require_vector_t<Vec> * = nullptr>
+  void initialize(const Vec &x0) {
     int ret;
-    _xk = x0;
+    _xk.resize(x0.size());
+    _gk.resize(x0.size());
+    for (Eigen::Index i = 0; i < x0.size(); ++i) {
+      _xk[i] = x0[i];
+    }
     ret = _func(_xk, _fk, _gk);
     if (ret) {
       throw std::runtime_error("Error evaluating initial BFGS point.");
@@ -289,7 +283,7 @@ class BFGSMinimizer {
   }
 };
 
-template <class M>
+template <class M, bool JacobianTransform = false>
 class ModelAdaptor {
  private:
   M &_model;
@@ -315,7 +309,7 @@ class ModelAdaptor {
       _x[i] = x[i];
 
     try {
-      f = -log_prob_propto<false>(_model, _x, _params_i, _msgs);
+      f = -log_prob_propto<JacobianTransform>(_model, _x, _params_i, _msgs);
     } catch (const std::exception &e) {
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
@@ -347,7 +341,8 @@ class ModelAdaptor {
     _fevals++;
 
     try {
-      f = -log_prob_grad<true, false>(_model, _x, _params_i, _g, _msgs);
+      f = -log_prob_grad<true, JacobianTransform>(_model, _x, _params_i, _g,
+                                                  _msgs);
     } catch (const std::exception &e) {
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
@@ -382,28 +377,39 @@ class ModelAdaptor {
   }
 };
 
-template <typename M, typename QNUpdateType, typename Scalar = double,
-          int DimAtCompile = Eigen::Dynamic>
-class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>, QNUpdateType,
-                                            Scalar, DimAtCompile> {
+template <typename M, typename QNUpdateType, bool JacobianTransform = false,
+          typename Scalar = double, int DimAtCompile = Eigen::Dynamic>
+class BFGSLineSearch
+    : public BFGSMinimizer<ModelAdaptor<M, JacobianTransform>, QNUpdateType,
+                           Scalar, DimAtCompile> {
  private:
-  ModelAdaptor<M> _adaptor;
+  using model_t = ModelAdaptor<M, JacobianTransform>;
+  model_t _adaptor;
 
  public:
-  typedef BFGSMinimizer<ModelAdaptor<M>, QNUpdateType, Scalar, DimAtCompile>
-      BFGSBase;
-  typedef typename BFGSBase::VectorT vector_t;
-  typedef typename stan::math::index_type<vector_t>::type idx_t;
+  using BFGSBase = BFGSMinimizer<model_t, QNUpdateType, Scalar, DimAtCompile>;
+  using vector_t = typename BFGSBase::VectorT;
+  using idx_t = typename stan::math::index_type<vector_t>::type;
+  template <typename Vec, require_vector_t<Vec> * = nullptr>
+  BFGSLineSearch(M &model, const Vec &params_r,
+                 const std::vector<int> &params_i,
+                 const LSOptions<double> &ls_opt,
+                 const ConvergenceOptions<double> &conv_opt,
+                 const QNUpdateType &updater, std::ostream *msgs = 0)
+      : BFGSBase(_adaptor, params_r, ls_opt, conv_opt, updater),
+        _adaptor(model, params_i, msgs) {
+    initialize(params_r);
+  }
 
-  BFGSLineSearch(M &model, const std::vector<double> &params_r,
+  template <typename Vec, require_vector_t<Vec> * = nullptr>
+  BFGSLineSearch(M &model, const Vec &params_r,
                  const std::vector<int> &params_i, std::ostream *msgs = 0)
       : BFGSBase(_adaptor), _adaptor(model, params_i, msgs) {
     initialize(params_r);
   }
-
-  void initialize(const std::vector<double> &params_r) {
-    Eigen::Matrix<double, Eigen::Dynamic, 1> x;
-    x.resize(params_r.size());
+  template <typename Vec, require_vector_t<Vec> * = nullptr>
+  void initialize(const Vec &params_r) {
+    Eigen::Matrix<double, Eigen::Dynamic, 1> x(params_r.size());
     for (size_t i = 0; i < params_r.size(); i++)
       x[i] = params_r[i];
     BFGSBase::initialize(x);

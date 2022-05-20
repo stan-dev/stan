@@ -15,7 +15,7 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
  public:
   ServicesSampleHmcNutsDenseEAdaptParMatch()
       : model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
-            data_context, 0, &model_log)) {
+          data_context, 0, &model_log)) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
       par_parameters.emplace_back(std::make_unique<std::stringstream>(), "#");

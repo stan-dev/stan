@@ -30,11 +30,16 @@ class unique_stream_writer final : public writer {
                                 const std::string& comment_prefix = "")
       : output_(std::move(output)), comment_prefix_(comment_prefix) {}
 
-  unique_stream_writer();
+  unique_stream_writer() = default;
   unique_stream_writer(unique_stream_writer& other) = delete;
   unique_stream_writer(unique_stream_writer&& other)
       : output_(std::move(other.output_)),
         comment_prefix_(std::move(other.comment_prefix_)) {}
+  inline unique_stream_writer& operator=(unique_stream_writer<Stream>&& other) {
+    this->output_ = std::move(other.output_);
+    this->comment_prefix_ = other.comment_prefix_;
+    return *this;
+  }
   /**
    * Virtual destructor
    */
@@ -68,6 +73,23 @@ class unique_stream_writer final : public writer {
    */
   void operator()(const std::vector<double>& state) { write_vector(state); }
 
+  void operator()(const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
+    if (output_ == nullptr)
+      return;
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                 ", ", "", "", "\n", "", "");
+    *output_ << std::get<0>(state).transpose().eval();
+    *output_ << std::get<1>(state).transpose().eval();  
+  }
+
+  void operator()(const Eigen::MatrixXd& states) {
+    if (output_ == nullptr)
+      return;
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                 ", ", "", "", "\n", "", "");
+    *output_ << states.transpose().format(CommaInitFmt);
+  }
+
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
@@ -92,12 +114,12 @@ class unique_stream_writer final : public writer {
   /**
    * Output stream
    */
-  std::unique_ptr<Stream> output_;
+  std::unique_ptr<Stream> output_{nullptr};
 
   /**
    * Comment prefix to use when printing comments: strings and blank lines
    */
-  std::string comment_prefix_;
+  std::string comment_prefix_{"# "};
 
   /**
    * Writes a set of values in csv format followed by a newline.

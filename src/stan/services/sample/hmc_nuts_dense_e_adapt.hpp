@@ -1,14 +1,13 @@
 #ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_ADAPT_HPP
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_DENSE_E_ADAPT_HPP
 
-#include <stan/math/prim.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/mcmc/fixed_param_sampler.hpp>
-#include <stan/services/error_codes.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/services/util/run_adaptive_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
@@ -260,21 +259,21 @@ int hmc_nuts_dense_e_adapt(
   } catch (const std::domain_error& e) {
     return error_codes::CONFIG;
   }
-  tbb::parallel_for(tbb::blocked_range<size_t>(0, num_chains, 1),
-                    [num_warmup, num_samples, num_thin, refresh, save_warmup,
-                     num_chains, init_chain_id, &samplers, &model, &rngs,
-                     &interrupt, &logger, &sample_writer, &cont_vectors,
-                     &diagnostic_writer](const tbb::blocked_range<size_t>& r) {
-                      for (size_t i = r.begin(); i != r.end(); ++i) {
-                        util::run_adaptive_sampler(
-                            samplers[i], model, cont_vectors[i], num_warmup,
-                            num_samples, num_thin, refresh, save_warmup,
-                            rngs[i], interrupt, logger, sample_writer[i],
-                            diagnostic_writer[i], init_chain_id + i,
-                            num_chains);
-                      }
-                    },
-                    tbb::simple_partitioner());
+  tbb::parallel_for(
+      tbb::blocked_range<size_t>(0, num_chains, 1),
+      [num_warmup, num_samples, num_thin, refresh, save_warmup, num_chains,
+       init_chain_id, &samplers, &model, &rngs, &interrupt, &logger,
+       &sample_writer, &cont_vectors,
+       &diagnostic_writer](const tbb::blocked_range<size_t>& r) {
+        for (size_t i = r.begin(); i != r.end(); ++i) {
+          util::run_adaptive_sampler(samplers[i], model, cont_vectors[i],
+                                     num_warmup, num_samples, num_thin, refresh,
+                                     save_warmup, rngs[i], interrupt, logger,
+                                     sample_writer[i], diagnostic_writer[i],
+                                     init_chain_id + i, num_chains);
+        }
+      },
+      tbb::simple_partitioner());
   return error_codes::OK;
 }
 
