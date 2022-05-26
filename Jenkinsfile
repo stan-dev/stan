@@ -406,8 +406,8 @@ pipeline {
                             make clean-all
                             make -j${PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
-                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
+                            python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                            python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
