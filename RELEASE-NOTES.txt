@@ -5,6 +5,12 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.30.0 (1 July 2022)
+======================================================================
+- Added `const noexcept` modifiers to the three accessors related to step-size (nominal, current, and jitter). (3124)
+- Removed unused variable `num_params`. (#3126)
+- Code cleanup - consistent set of includes for the set of services in stan/services/sample. (#3111)
+
 v2.29.2 (25 March 2022)
 ======================================================================
 
