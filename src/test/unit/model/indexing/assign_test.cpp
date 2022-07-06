@@ -739,14 +739,6 @@ TEST(ModelIndexing, resultSizeNegIndexingEigen) {
   lhs << 1, 2, 3, 4, 5;
   Eigen::VectorXd rhs(4);
   rhs << 1, 2, 3, 4;
-  /*
-  assign(lhs, rhs, "", index_min_max(4, 1));
-  EXPECT_FLOAT_EQ(lhs(0), 4);
-  EXPECT_FLOAT_EQ(lhs(1), 3);
-  EXPECT_FLOAT_EQ(lhs(2), 2);
-  EXPECT_FLOAT_EQ(lhs(3), 1);
-  EXPECT_FLOAT_EQ(lhs(4), 5);
-  */
   test_throw_ia(lhs, rhs, index_min_max(4, 1));
 }
 
@@ -790,20 +782,6 @@ TEST(ModelIndexing, resultSizePosMinMaxNegMinMaxEigenMatrix) {
   for (int i = 1; i < x.rows(); ++i) {
     test_throw_ia(x, x_rev.block(0, 0, i + 1, i + 1), index_min_max(1, i + 1),
                   index_min_max(i + 1, 1));
-    /*
-    Eigen::MatrixXd x_rowwise_reverse
-        = x_rev.block(0, 0, i + 1, i + 1).rowwise().reverse();
-    assign(x, x_rev.block(0, 0, i + 1, i + 1), "", index_min_max(1, i + 1),
-           index_min_max(i + 1, 1));
-    for (int kk = 0; kk < i; ++kk) {
-      for (int jj = 0; jj < i; ++jj) {
-        EXPECT_FLOAT_EQ(x(kk, jj), x_rowwise_reverse(kk, jj));
-      }
-    }
-    for (int j = 0; j < x.size(); ++j) {
-      x(j) = j;
-    }
-    */
   }
 }
 
@@ -821,20 +799,6 @@ TEST(ModelIndexing, resultSizeNigMinMaxPosMinMaxEigenMatrix) {
   for (int i = 1; i < x.rows(); ++i) {
     test_throw_ia(x, x_rev.block(0, 0, i + 1, i + 1), index_min_max(i + 1, 1),
                   index_min_max(1, i + 1));
-    /*
-    Eigen::MatrixXd x_colwise_reverse
-        = x_rev.block(0, 0, i + 1, i + 1).colwise().reverse();
-    assign(x, x_rev.block(0, 0, i + 1, i + 1), "", index_min_max(i + 1, 1),
-           index_min_max(1, i + 1));
-    for (int kk = 0; kk < i; ++kk) {
-      for (int jj = 0; jj < i; ++jj) {
-        EXPECT_FLOAT_EQ(x(kk, jj), x_colwise_reverse(kk, jj));
-      }
-    }
-    for (int j = 0; j < x.size(); ++j) {
-      x(j) = j;
-    }
-    */
   }
 }
 
@@ -852,19 +816,6 @@ TEST(ModelIndexing, resultSizeNegMinMaxNegMinMaxEigenMatrix) {
   for (int i = 1; i < x.rows(); ++i) {
     test_throw_ia(x, x_rev.block(0, 0, i + 1, i + 1), index_min_max(i + 1, 1),
                   index_min_max(i + 1, 1));
-    /*
-    Eigen::MatrixXd x_reverse = x_rev.block(0, 0, i + 1, i + 1).reverse();
-    assign(x, x_rev.block(0, 0, i + 1, i + 1), "", index_min_max(i + 1, 1),
-           index_min_max(i + 1, 1));
-    for (int kk = 0; kk < i; ++kk) {
-      for (int jj = 0; jj < i; ++jj) {
-        EXPECT_FLOAT_EQ(x(kk, jj), x_reverse(kk, jj));
-      }
-    }
-    for (int j = 0; j < x.size(); ++j) {
-      x(j) = j;
-    }
-    */
   }
 }
 
@@ -1192,4 +1143,39 @@ TEST(model_indexing, assign_densemat_densemat_multi_index_multi_index) {
 
   ns[ns.size() - 1] = 10;
   test_throw(x, y, index_multi(ms), index_multi(ns));
+}
+
+TEST(model_indexing, tuples) {
+  std::tuple<Eigen::VectorXd, Eigen::VectorXd, std::vector<double>> A;
+  std::tuple<Eigen::VectorXd, Eigen::VectorXd, std::vector<double>> B
+      = std::make_tuple(Eigen::VectorXd::Random(2), Eigen::VectorXd::Random(2),
+                        std::vector<double>{2, 2, 2});
+  assign(A, B, "tuple_basic");
+  stan::math::for_each(
+      [](auto&& a, auto&& b) {
+        for (int i = 0; i < a.size(); i++) {
+          EXPECT_FLOAT_EQ(a[i], b[i]);
+        }
+      },
+      A, B);
+}
+
+TEST(model_indexing, tuples_non_trivially_assignable) {
+  std::tuple<Eigen::Matrix<stan::math::var, -1, 1>,
+             Eigen::Matrix<stan::math::var, -1, 1>,
+             std::vector<stan::math::var>>
+      A = std::make_tuple(Eigen::Matrix<stan::math::var, -1, 1>::Random(2),
+                          Eigen::Matrix<stan::math::var, -1, 1>::Random(2),
+                          std::vector<stan::math::var>{3, 3, 3});
+  std::tuple<Eigen::VectorXd, Eigen::VectorXd, std::vector<double>> B
+      = std::make_tuple(Eigen::VectorXd::Random(2), Eigen::VectorXd::Random(2),
+                        std::vector<double>{2, 2, 2});
+  assign(A, B, "tuple_basic");
+  stan::math::for_each(
+      [](auto&& a, auto&& b) {
+        for (int i = 0; i < a.size(); i++) {
+          EXPECT_FLOAT_EQ(a[i].val(), b[i]);
+        }
+      },
+      A, B);
 }

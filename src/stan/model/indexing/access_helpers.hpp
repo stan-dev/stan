@@ -143,6 +143,22 @@ void assign_impl(Mat1&& x, Mat2&& y, const char* name) {
     x = stan::math::var_value<plain_type_t<Mat2>>(std::forward<Mat2>(y));
   }
 }
+
+template <typename... Types>
+struct is_tuple_impl : std::false_type {};
+template <typename... Types>
+struct is_tuple_impl<std::tuple<Types...>> : std::true_type {};
+
+template <typename T>
+struct is_tuple : is_tuple_impl<std::decay_t<T>> {};
+
+template <typename Tuple1, typename Tuple2,
+          require_all_t<internal::is_tuple<Tuple1>,
+                        internal::is_tuple<Tuple2>>* = nullptr>
+inline void assign_impl(Tuple1&& x, Tuple2&& y, const char* name) {
+  x = std::forward<Tuple2>(y);
+}
+
 }  // namespace internal
 }  // namespace model
 }  // namespace stan
