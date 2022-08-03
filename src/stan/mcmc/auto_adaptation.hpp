@@ -224,11 +224,10 @@ class auto_adaptation : public windowed_adaptation {
               = (Ytest.cols() > 0) ? internal::covariance(Ytest.transpose())
                                    : Eigen::MatrixXd::Zero(M, M);
 
-          Eigen::MatrixXd dense
-              = (N / (N + 5.0)) * cov_train
-                + 1e-3 * (5.0 / (N + 5.0))
-                      * Eigen::MatrixXd::Identity(cov_train.rows(),
-                                                  cov_train.cols());
+          Eigen::MatrixXd dense = (N / (N + 5.0)) * cov_train
+                                  + 1e-3 * (5.0 / (N + 5.0))
+                                        * Eigen::MatrixXd::Identity(
+                                            cov_train.rows(), cov_train.cols());
 
           Eigen::MatrixXd diag = dense.diagonal().asDiagonal();
 
