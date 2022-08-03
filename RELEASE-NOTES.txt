@@ -5,6 +5,81 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.30.0 (1 July 2022)
+======================================================================
+- Added `const noexcept` modifiers to the three accessors related to step-size (nominal, current, and jitter). (3124)
+- Removed unused variable `num_params`. (#3126)
+- Code cleanup - consistent set of includes for the set of services in stan/services/sample. (#3111)
+
+v2.29.2 (25 March 2022)
+======================================================================
+
+- Fixed bug with selecting matrix rows with `matrix[x:x, ]`.
+- Updated Math submodule to 4.3.2
+
+v2.29.1 (2 March 2022)
+======================================================================
+
+- Updated Stan Math to 4.3.1.
+- Fixed a bug with assigning var matrix types, only surfaces when using stanc3 optimization (`--O1` or up).
+
+v2.29.0 (14 February 2022)
+======================================================================
+
+ - Fixed assign and lvalue to return empty array with negative indexing and prevent assigning containers not matching in size. (#3095)
+ - Refactored the integration tests to use the Stan model from the stanc3 repository.
+ - Upgraded Stan Math to 4.3.0.
+
+v2.28.2 (22 November 2021)
+======================================================================
+
+ - Fixed a performance regression caused by using the diagnostic writer even when diagnostics were not requested.
+
+v2.28.1 (21 October 2021)
+======================================================================
+
+ - Updated to Stan Math 4.2.1
+
+v2.28.0 (5 October 2021)
+======================================================================
+
+ - Now using Eigen nullaryExpression for indexing with multi_index so these indexing functions propagate expressions, potentially reducing the number of times memory needs to be accessed. (#3046)
+ - Fixes `àssign()` for `var<Matrix>`. (#3049)
+ - Allowed intake of complex numbers. (#3056)
+ - Marged rethrow_located as [[noreturn]]. (#3059)
+
+v2.27.0 (2 June 2021)
+======================================================================
+
+- Refactored indexing functions (renaming, replaces indexing structure in favor of variadic arguments). (#3011)
+- Added the serializer and deserializer classes for reading/writing constraints in the generated C++ easier. (#3013, #3018, #3019, #3024, #3036)
+- Removed unuse template keyword to fix for clang 12+. (#3026)
+- Added more robust detection of improper posteriors by checking that metric does not overflow during adaptation. (#3030)
+
+v2.26.1 (17 February 2021)
+======================================================================
+
+- Updated Math to v4.0.1
+
+v.2.26.0 (26 January 2021)
+======================================================================
+
+- Improved performance for assigning to slices of matrices and vectors and vector-style indexing (#2962, #2964, #2965, #2973).
+- Improved error messages on range checks. (#2978)
+- Allowed Stan CSV files to have first column be any Stan variable name, not just "lp__".
+- Removed .eval() in rvalue() where applicable. (#2974)
+- Allowed reader to accept Eigen vector and use Eigen Map to access inputs. (#2955)
+- Allowed functions in reader to output a `var_value<Eigen::Matrix<T, R, C>>`.
+- Added assignment to `var_value<Eigen::Matrix<T, R, C>>`.
+- Added rvalue overloads for `var_value<Eigen::Matrix<T, R, C>>`.
+
+v.2.25.0 (26 October 2020)
+======================================================================
+
+- added a const accessor to _z in base_hmc.hpp
+- bugfixed validate_dims in array_var_context
+- cleaned up includes of Eigen
+
 v.2.24.0 (28 July 2020)
 ======================================================================
 

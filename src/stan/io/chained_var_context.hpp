@@ -34,6 +34,10 @@ class chained_var_context : public var_context {
     return vc1_.contains_r(name) ? vc1_.vals_r(name) : vc2_.vals_r(name);
   }
 
+  std::vector<std::complex<double>> vals_c(const std::string& name) const {
+    return vc1_.contains_r(name) ? vc1_.vals_c(name) : vc2_.vals_c(name);
+  }
+
   std::vector<int> vals_i(const std::string& name) const {
     return vc1_.contains_i(name) ? vc1_.vals_i(name) : vc2_.vals_i(name);
   }
@@ -67,7 +71,7 @@ class chained_var_context : public var_context {
    * @param stage stan program processing stage
    * @param name variable name
    * @param base_type declared stan variable type
-   * @param dims variable dimensions
+   * @param dims_declared variable dimensions
    * @throw std::runtime_error if mismatch between declared
    *        dimensions and dimensions found in context.
    */

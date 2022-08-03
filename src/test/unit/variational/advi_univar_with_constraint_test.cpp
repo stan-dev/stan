@@ -1,11 +1,12 @@
 #include <test/test-models/good/variational/univariate_with_constraint.hpp>
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/stream_logger.hpp>
-#include <gtest/gtest.h>
 #include <test/unit/util.hpp>
-#include <vector>
-#include <string>
 #include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <gtest/gtest.h>
+#include <cmath>
+#include <string>
+#include <vector>
 
 typedef boost::ecuyer1988 rng_t;
 typedef univariate_with_constraint_model_namespace::
@@ -58,8 +59,8 @@ TEST(advi_test, univar_with_constraint_fullrank) {
 
   double S_j = 1.0 / (2.0 * stan::math::pi()) * sqrt(sigma_j_sq / (1.0))
                * exp(-0.5
-                     * (pow(1.5, 2) + pow(1.4, 2) + pow(1.6, 2)
-                        - pow(mu_j, 2) / sigma_j_sq));
+                     * (std::pow(1.5, 2) + std::pow(1.4, 2) + std::pow(1.6, 2)
+                        - std::pow(mu_j, 2) / sigma_j_sq));
 
   double elbo_true = 0.0;
 
@@ -69,7 +70,7 @@ TEST(advi_test, univar_with_constraint_fullrank) {
       += -0.5 * one_over_sigma_j_sq * (exp(2.0 * log(1.88)) * exp(2.0 * 1.0));
   elbo_true += -0.5 * one_over_sigma_j_sq
                * (-2.0 * mu_j * exp(log(1.88)) * exp(0.5 * 1.0));
-  elbo_true += -0.5 * one_over_sigma_j_sq * (pow(mu_j, 2.0));
+  elbo_true += -0.5 * one_over_sigma_j_sq * (std::pow(mu_j, 2.0));
   elbo_true += log(1.88);
   elbo_true += 0.5 * (1 + log(2.0 * stan::math::pi()));
 
@@ -189,8 +190,8 @@ TEST(advi_test, univar_with_constraint_meanfield) {
 
   double S_j = 1.0 / (2.0 * stan::math::pi()) * sqrt(sigma_j_sq / (1.0))
                * exp(-0.5
-                     * (pow(1.5, 2) + pow(1.4, 2) + pow(1.6, 2)
-                        - pow(mu_j, 2) / sigma_j_sq));
+                     * (std::pow(1.5, 2) + std::pow(1.4, 2) + std::pow(1.6, 2)
+                        - std::pow(mu_j, 2) / sigma_j_sq));
 
   double elbo_true = 0.0;
 
@@ -200,7 +201,7 @@ TEST(advi_test, univar_with_constraint_meanfield) {
       += -0.5 * one_over_sigma_j_sq * (exp(2.0 * log(1.88)) * exp(2.0 * 1.0));
   elbo_true += -0.5 * one_over_sigma_j_sq
                * (-2.0 * mu_j * exp(log(1.88)) * exp(0.5 * 1.0));
-  elbo_true += -0.5 * one_over_sigma_j_sq * (pow(mu_j, 2.0));
+  elbo_true += -0.5 * one_over_sigma_j_sq * (std::pow(mu_j, 2.0));
   elbo_true += log(1.88);
   elbo_true += 0.5 * (1 + log(2.0 * stan::math::pi()));
 

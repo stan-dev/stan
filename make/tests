@@ -1,9 +1,3 @@
-ifdef STANC2
-TEST_STANC=test/test-models/stanc2$(EXE)
-else
-TEST_STANC=bin/stanc$(EXE)
-endif
-
 ##
 # Build/download stanc3
 ##
@@ -78,41 +72,9 @@ src/test/%.d : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(ST
 src/test/%.d : INC += $(INC_GTEST)
 src/test/%.d : DEPTARGETS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@
 
-## this is for the $(STANC_TEMPLATE_INSTANTIATION) files
-src/stan/%.d : DEPTARGETS = -MT test/test-models/stanc2$(EXE) -MT $(patsubst src/%.d,test/%.o,$@) -MT $@
-
 ifneq ($(filter test/%$(EXE),$(MAKECMDGOALS)),)
 -include $(patsubst test/%$(EXE),src/test/%.d,$(filter test/%,$(MAKECMDGOALS)))
 endif
-
-ifneq ($(filter test/unit/lang/%$(EXE),$(MAKECMDGOALS)),)
--include src/test/test-models/stanc2.d
--include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
-endif
-
-ifneq ($(filter test/test-models/stanc2$(EXE) test/test-models/stanc2.o,$(MAKECMDGOALS)),)
--include src/test/test-models/stanc2.d
--include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
-endif
-
-ifneq ($(filter test/test-models/good/%.hpp test/test-models/good/%.hpp-test,$(MAKECMDGOALS)),)
--include src/test/test-models/stanc2.d
--include $(patsubst %.cpp,%.d,$(STANC_TEMPLATE_INSTANTIATION_CPP))
-endif
-
-
-##
-# static rule to link in libstanc.
-# needed by subset of unit tests that test stan compiler
-# all these tests are under stan/test/unit/lang
-##
-STANC_TESTS_HEADERS := $(call findfiles,src/test/unit/lang,*_test.cpp)
-STANC_TESTS_O := $(patsubst src/%.cpp,%.o,$(STANC_TESTS_HEADERS))
-STANC_TESTS := $(patsubst src/%.cpp,%$(EXE),$(STANC_TESTS_HEADERS))
-
-# add additional dependency to libstanc.a
-$(STANC_TESTS_O) : test/libstanc.a
-$(STANC_TESTS) : LDLIBS += $(LDLIBS_STANC)
 
 ############################################################
 ##
@@ -216,47 +178,18 @@ test/integration/multiple_translation_units_test$(EXE) : test/integration/libmtu
 ##
 # Use the stanc compiler to generate C++ from Stan programs
 ##
-test/test-models/stanc2$(EXE) : O = $(O_STANC)
-test/test-models/stanc2$(EXE) : test/libstanc.a
-test/test-models/stanc2$(EXE) : LDLIBS += $(LDLIBS_STANC)
-test/test-models/stanc2$(EXE) : %$(EXE) : %.o
-	@mkdir -p $(dir $@)
-	$(LINK.cpp) $< $(LDLIBS) $(OUTPUT_OPTION)
-
 TEST_MODELS = $(call findfiles,src/test/test-models,*.stan)
-$(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/test-models/%.stan $(TEST_STANC)
+$(patsubst src/%.stan,%.hpp,$(TEST_MODELS)) : test/test-models/%.hpp : src/test/test-models/%.stan bin/stanc$(EXE)
 	@mkdir -p $(dir $@)
-	$(WINE) $(TEST_STANC) $< --o=$@
+	$(WINE) bin/stanc$(EXE) $< --o=$@
 
 ##
 # Generate C++ from Stan standalone functions
 ##
 TEST_FUNCTIONS = $(call findfiles,src/test/test-models,*.stanfuncs)
-$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs $(TEST_STANC)
+$(patsubst src/%.stanfuncs,%.hpp,$(TEST_FUNCTIONS)) : test/test-models/%.hpp : src/test/test-models/%.stanfuncs bin/stanc$(EXE)
 	@mkdir -p $(dir $@)
-	$(WINE) $(TEST_STANC) --standalone-functions $< --o=$@
-
-##
-# src/test/unit/lang/stanc_helper_test.cpp requires files to be read-only.
-##
-.PHONY: change-file-permissions
-change-file-permissions:
-ifeq ($(OS),Windows_NT)
-	attrib +r src\\test\\test-models\\good\\stanc_helper.stan
-	attrib +r src\\test\\test-models\\bad\\stanc_helper.stan
-	attrib +r src\\test\\test-models\\bad\\read_only
-else
-	chmod 444 src/test/test-models/*/stanc_helper.stan
-	chmod 555 src/test/test-models/bad/read_only
-endif
-
-test/unit/lang/stanc_helper_test.o: change-file-permissions
-
-##
-# Add additional dependencies for tests that should translate Stan to hpp, but
-# isn't included in the source using `#include`.
-##
-test/unit/lang/parser_generator_test$(EXE): $(patsubst src/%.stan,%.hpp,$(call findfiles,src/test/test-models/good/parser-generator,*.stan))
+	$(WINE) bin/stanc$(EXE) --standalone-functions $< --o=$@
 
 ##
 # Compile models depends on every model within

@@ -5,14 +5,14 @@
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/array_var_context.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/gq_writer.hpp>
-#include <stan/math/prim/fun/Eigen.hpp>
 #include <boost/algorithm/string.hpp>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
 
 namespace stan {
 namespace services {
@@ -42,11 +42,17 @@ void get_model_parameters(const Model &model,
       param_names.emplace_back(cur_name);
     }
   }
-  size_t num_params = param_names.size();
+  std::vector<std::string> all_param_names;
+  model.get_param_names(all_param_names);
   std::vector<std::vector<size_t>> dimss;
   model.get_dims(dimss);
-  for (size_t i = 0; i < num_params; ++i) {
-    param_dimss.emplace_back(dimss[i]);
+  for (size_t i = 0; i < param_names.size(); i++) {
+    for (size_t j = i; j < all_param_names.size(); ++j) {
+      if (param_names[i].compare(all_param_names[j]) == 0) {
+        param_dimss.emplace_back(dimss[j]);
+        break;
+      }
+    }
   }
 }
 

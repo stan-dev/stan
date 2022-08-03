@@ -5,22 +5,6 @@
 
 namespace stan {
 
-namespace internal {
-
-template <typename T>
-using is_eigen_dense_dynamic = stan::internal::is_eigen_matrix_dynamic_impl<
-    std::decay_t<T>,
-    stan::is_eigen_dense_base<T>::value && stan::is_eigen<T>::value>;
-
-template <typename T>
-using require_eigen_dense_dynamic_t = require_t<is_eigen_dense_dynamic<T>>;
-
-template <typename... Types>
-using require_all_eigen_dense_dynamic_t
-    = require_all_t<is_eigen_dense_dynamic<Types>...>;
-
-}  // namespace internal
-
 namespace model {
 
 // relative indexing from 0; multi-indexing and return from 1
@@ -44,7 +28,7 @@ inline int rvalue_at(int n, const index_multi& idx) { return idx.ns_[n]; }
  * @param[in] idx Index (from 1).
  * @return Underlying index position (from 1).
  */
-inline constexpr int rvalue_at(int n, const index_omni& idx) { return n + 1; }
+inline int rvalue_at(int n, const index_omni& idx) { return n + 1; }
 
 /**
  * Return the index in the underlying array corresponding to the
@@ -56,9 +40,7 @@ inline constexpr int rvalue_at(int n, const index_omni& idx) { return n + 1; }
  * @param[in] idx Index (from 1)
  * @return Underlying index position (from 1).
  */
-inline constexpr int rvalue_at(int n, const index_min& idx) {
-  return idx.min_ + n;
-}
+inline int rvalue_at(int n, const index_min& idx) { return idx.min_ + n; }
 
 /**
  * Return the index in the underlying array corresponding to the
@@ -70,7 +52,7 @@ inline constexpr int rvalue_at(int n, const index_min& idx) {
  * @param[in] idx Index (from 1).
  * @return Underlying index position (from 1).
  */
-inline constexpr int rvalue_at(int n, const index_max& idx) { return n + 1; }
+inline int rvalue_at(int n, const index_max& idx) { return n + 1; }
 
 /**
  * Return the index in the underlying array corresponding to the
@@ -82,8 +64,12 @@ inline constexpr int rvalue_at(int n, const index_max& idx) { return n + 1; }
  * @param[in] idx Index (from 1).
  * @return Underlying index position (from 1).
  */
-inline constexpr int rvalue_at(int n, const index_min_max& idx) {
-  return idx.min_ + n;
+inline int rvalue_at(int n, const index_min_max& idx) {
+  if (idx.min_ < idx.max_) {
+    return idx.min_ + n;
+  } else {
+    return idx.max_ + n;
+  }
 }
 
 }  // namespace model

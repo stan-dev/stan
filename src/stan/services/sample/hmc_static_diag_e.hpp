@@ -6,14 +6,12 @@
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
 #include <stan/math/prim.hpp>
-#include <stan/mcmc/fixed_param_sampler.hpp>
 #include <stan/mcmc/hmc/static/diag_e_static_hmc.hpp>
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/run_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/inv_metric.hpp>
-
 #include <vector>
 
 namespace stan {

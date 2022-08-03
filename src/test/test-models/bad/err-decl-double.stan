@@ -1,5 +1,0 @@
-data {
-  double y;
-}
-model {
-}

@@ -1,5 +1,0 @@
-parameters {
-  int theta;
-}
-model {
-}

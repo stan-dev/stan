@@ -1,8 +1,9 @@
 #ifndef STAN_MODEL_INDEXING_INDEX_HPP
 #define STAN_MODEL_INDEXING_INDEX_HPP
 
-#include <vector>
 #include <stan/math/prim/meta.hpp>
+#include <vector>
+
 namespace stan {
 
 namespace model {
@@ -22,7 +23,7 @@ struct index_uni {
    *
    * @param n single index.
    */
-  explicit constexpr index_uni(int n) noexcept : n_(n) {}
+  explicit index_uni(int n) noexcept : n_(n) {}
 };
 
 // MULTIPLE INDEXING (does not reduce dimensionality)
@@ -40,7 +41,7 @@ struct index_multi {
    * @param ns multiple indexes.
    */
   template <typename T, require_std_vector_vt<std::is_integral, T>* = nullptr>
-  explicit constexpr index_multi(T&& ns) noexcept : ns_(std::forward<T>(ns)) {}
+  explicit index_multi(T&& ns) noexcept : ns_(std::forward<T>(ns)) {}
 };
 
 /**
@@ -61,7 +62,7 @@ struct index_min {
    *
    * @param min minimum index (inclusive).
    */
-  explicit constexpr index_min(int min) noexcept : min_(min) {}
+  explicit index_min(int min) noexcept : min_(min) {}
 };
 
 /**
@@ -77,7 +78,7 @@ struct index_max {
    *
    * @param max maximum index (inclusive).
    */
-  explicit constexpr index_max(int max) noexcept : max_(max) {}
+  explicit index_max(int max) noexcept : max_(max) {}
 };
 
 /**
@@ -90,7 +91,7 @@ struct index_min_max {
   /**
    * Return whether the index is positive or negative
    */
-  bool is_ascending() const { return min_ <= max_; }
+  inline bool is_ascending() const noexcept { return min_ <= max_; }
   /**
    * Construct an indexing from the specified minimum index
    * (inclusive) and maximum index (inclusive).
@@ -98,7 +99,7 @@ struct index_min_max {
    * @param min minimum index (inclusive).
    * @param max maximum index (inclusive).
    */
-  constexpr index_min_max(int min, int max) noexcept : min_(min), max_(max) {}
+  index_min_max(int min, int max) noexcept : min_(min), max_(max) {}
 };
 
 }  // namespace model

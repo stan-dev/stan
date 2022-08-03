@@ -82,7 +82,8 @@ class base_hmc : public base_mcmc {
     ps_point z_init(this->z_);
 
     // Skip initialization for extreme step sizes
-    if (this->nom_epsilon_ == 0 || this->nom_epsilon_ > 1e7)
+    if (this->nom_epsilon_ == 0 || this->nom_epsilon_ > 1e7
+        || std::isnan(this->nom_epsilon_))
       return;
 
     this->hamiltonian_.sample_p(this->z_, this->rand_int_);
@@ -162,16 +163,16 @@ class base_hmc : public base_mcmc {
       nom_epsilon_ = e;
   }
 
-  double get_nominal_stepsize() { return this->nom_epsilon_; }
+  double get_nominal_stepsize() const noexcept { return this->nom_epsilon_; }
 
-  double get_current_stepsize() { return this->epsilon_; }
+  double get_current_stepsize() const noexcept { return this->epsilon_; }
 
   virtual void set_stepsize_jitter(double j) {
     if (j > 0 && j < 1)
       epsilon_jitter_ = j;
   }
 
-  double get_stepsize_jitter() { return this->epsilon_jitter_; }
+  double get_stepsize_jitter() const noexcept { return this->epsilon_jitter_; }
 
   void sample_stepsize() {
     this->epsilon_ = this->nom_epsilon_;
