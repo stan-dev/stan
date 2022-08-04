@@ -5,6 +5,24 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.30.0 (1 July 2022)
+======================================================================
+- Added `const noexcept` modifiers to the three accessors related to step-size (nominal, current, and jitter). (3124)
+- Removed unused variable `num_params`. (#3126)
+- Code cleanup - consistent set of includes for the set of services in stan/services/sample. (#3111)
+
+v2.29.2 (25 March 2022)
+======================================================================
+
+- Fixed bug with selecting matrix rows with `matrix[x:x, ]`.
+- Updated Math submodule to 4.3.2
+
+v2.29.1 (2 March 2022)
+======================================================================
+
+- Updated Stan Math to 4.3.1.
+- Fixed a bug with assigning var matrix types, only surfaces when using stanc3 optimization (`--O1` or up).
+
 v2.29.0 (14 February 2022)
 ======================================================================
 
