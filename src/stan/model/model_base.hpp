@@ -72,6 +72,22 @@ class model_base : public prob_grad {
   virtual void get_param_names(std::vector<std::string>& names) const = 0;
 
   /**
+   * Set the specified argument to sequence of parameters, transformed
+   * parameters, and generated quantities in the order in which they
+   * were declared.  The input sequence is cleared and resized.
+   *
+   * @param[in,out] names sequence of names parameters, transformed
+   * parameters, and generated quantities
+   * @param[in] emit_transformed_parameters whether to add transformed
+   *  parameters names to the `names` vector
+   * @param[in] emit_generated_quantities whether to add generated quantities
+   *  names to the `names` vector.
+   */
+  virtual void get_param_names(std::vector<std::string>& names,
+   const bool emit_transformed_parameters = true,
+   const bool emit_generated_quantities = true) const = 0;
+
+  /**
    * Set the dimensionalities of constrained parameters, transformed
    * parameters, and generated quantities.  The input sequence is
    * cleared and resized.  The dimensions of each parameter

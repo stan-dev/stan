@@ -220,7 +220,7 @@ int hmc_nuts_dense_e_adapt(
     std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(
-        model, *init[0], *init_inv_metric[0], random_seed, init_chain_id,
+        model, *(init[0]), *(init_inv_metric[0]), random_seed, init_chain_id,
         init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
         stepsize, stepsize_jitter, max_depth, delta, gamma, kappa, t0,
         init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
@@ -337,7 +337,7 @@ int hmc_nuts_dense_e_adapt(
     std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
     return hmc_nuts_dense_e_adapt(
-        model, *init[0], random_seed, init_chain_id, init_radius, num_warmup,
+        model, *(init[0]), random_seed, init_chain_id, init_radius, num_warmup,
         num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
         max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
         interrupt, logger, init_writer[0], sample_writer[0],
