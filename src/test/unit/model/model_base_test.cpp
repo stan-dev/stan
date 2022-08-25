@@ -19,8 +19,10 @@ struct mock_model : public stan::model::model_base {
     return stanc_info;
   }
 
-  void get_param_names(std::vector<std::string>& names) const override {}
-  void get_dims(std::vector<std::vector<size_t> >& dimss) const override {}
+  void get_param_names(std::vector<std::string>& names, bool include_tparams,
+                       bool include_gqs) const override {}
+  void get_dims(std::vector<std::vector<size_t> >& dimss, bool include_tparams,
+                bool include_gqs) const override {}
 
   void constrained_param_names(std::vector<std::string>& param_names,
                                bool include_tparams,
