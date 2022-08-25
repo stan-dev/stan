@@ -9,7 +9,6 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/gq_writer.hpp>
-#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
