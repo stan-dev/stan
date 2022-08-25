@@ -31,14 +31,13 @@ template <class Model>
 void get_model_parameters(const Model &model,
                           std::vector<std::string> &param_names,
                           std::vector<std::vector<size_t>> &param_dimss) {
-
   std::vector<std::string> all_param_names;
   model.get_param_names(all_param_names, false, false);
   std::vector<std::vector<size_t>> dimss;
   model.get_dims(dimss, false, false);
   // remove zero-size
   for (size_t i = 0; i < all_param_names.size(); i++) {
-    auto& v = dimss[i];
+    auto &v = dimss[i];
     if (std::find(v.begin(), v.end(), 0) == v.end()) {
       param_names.emplace_back(all_param_names[i]);
       param_dimss.emplace_back(dimss[i]);
