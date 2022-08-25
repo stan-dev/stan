@@ -84,8 +84,9 @@ class model_base : public prob_grad {
    *  names to the `names` vector.
    */
   virtual void get_param_names(std::vector<std::string>& names,
-   const bool emit_transformed_parameters = true,
-   const bool emit_generated_quantities = true) const = 0;
+                               const bool emit_transformed_parameters = true,
+                               const bool emit_generated_quantities
+                               = true) const = 0;
 
   /**
    * Set the dimensionalities of constrained parameters, transformed
