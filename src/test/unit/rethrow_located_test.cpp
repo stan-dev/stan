@@ -7,7 +7,8 @@ void test_rethrow_located_2() {
     try {
       throw E("foo");
     } catch (const std::exception& e) {
-      stan::lang::rethrow_located(e, "(at line 5, file /Users/carp/temp2/bar.stan)");
+      stan::lang::rethrow_located(
+          e, "(at line 5, file /Users/carp/temp2/bar.stan)");
     }
   } catch (const E2& e) {
     EXPECT_TRUE(std::string(e.what()).find_first_of("5") != std::string::npos);
@@ -31,7 +32,8 @@ void test_rethrow_located_nullary(const std::string& original_type) {
     try {
       throw E();
     } catch (const std::exception& e) {
-      stan::lang::rethrow_located(e, "(at line 5, file /Users/carp/temp2/bar.stan)");
+      stan::lang::rethrow_located(
+          e, "(at line 5, file /Users/carp/temp2/bar.stan)");
     }
   } catch (const E& e) {
     EXPECT_TRUE(std::string(e.what()).find_first_of("5") != std::string::npos);
