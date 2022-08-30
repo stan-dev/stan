@@ -483,8 +483,11 @@ pipeline {
                 }
             steps {
                 build(job: "Stan/CmdStan/${cmdstan_pr()}",
-                      parameters: [string(name: 'stan_pr', value: stan_pr()),
-                                   string(name: 'math_pr', value: params.math_pr)])
+                      parameters: [
+                        string(name: 'stan_pr', value: stan_pr()),
+                        string(name: 'math_pr', value: params.math_pr),
+                        string(name: 'stanc3_bin_url', value: stanc3_bin_url())
+                      ])
             }
         }
 
