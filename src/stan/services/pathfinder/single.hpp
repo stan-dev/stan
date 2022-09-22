@@ -136,7 +136,6 @@ inline void post_lbfgs(T0&& logger, T1&& update_best_mutex, T2&& param_size,
     std::stringstream debug_stream;
     debug_stream << "\n num_params: " << param_size << "\n";
     debug_stream << "\n num_elbo_params: " << num_elbo_draws << "\n";
-    // std::cout << "\n param_cols_filled: " << param_cols_filled << "\n";
     debug_stream << "\n Alpha mat: "
                  << alpha_mat.transpose().eval().format(CommaInitFmt) << "\n";
     debug_stream << "\n Ykt_diff mat: "
@@ -223,7 +222,7 @@ inline void taylor_appx_sparse2(T0&& logger, T1&& qr, T2&& alpha, T3&& Qk,
 }  // namespace debug
 template <typename T1, typename T2>
 inline auto crossprod(T1&& x, T2&& y) {
-  return x.transpose() * y;
+  return std::forward<T1>(x).transpose() * std::forward<T2>(y);
 }
 
 template <typename T1>
@@ -231,12 +230,12 @@ inline Eigen::MatrixXd crossprod(T1&& x) {
   return Eigen::MatrixXd(x.cols(), x.cols())
       .setZero()
       .selfadjointView<Eigen::Lower>()
-      .rankUpdate(x.adjoint());
+      .rankUpdate(std::forward<T1>(x).adjoint());
 }
 
 template <typename T1, typename T2>
 inline auto tcrossprod(T1&& x, T2&& y) {
-  return x * y.transpose();
+  return std::forward<T1>(x) * std::forward<T2>(y).transpose();
 }
 
 template <typename T1>
@@ -244,7 +243,7 @@ inline Eigen::MatrixXd tcrossprod(T1&& x) {
   return Eigen::MatrixXd(x.rows(), x.rows())
       .setZero()
       .selfadjointView<Eigen::Lower>()
-      .rankUpdate(x);
+      .rankUpdate(std::forward<T1>(x));
 }
 
 /**
@@ -332,6 +331,12 @@ inline Eigen::Array<bool, -1, 1> check_curve(const EigMat& Yk, const EigMat& Sk,
  * Gilbert, J.C., Lemaréchal, C. Some numerical experiments with
  * variable-storage quasi-Newton algorithms. Mathematical Programming 45,
  * 407–435 (1989). https://doi.org/10.1007/BF01589113
+ * @tparam EigVec1 Type derived from `Eigen::DenseBase` with one column at compile time
+ * @tparam EigVec2 Type derived from `Eigen::DenseBase` with one column at compile time
+ * @tparam EigVec3 Type derived from `Eigen::DenseBase` with one column at compile time
+ * @param alpha_init Vector of initial values to update
+ * @param Yk Vector of gradients
+ * @param Sk Vector of values
  */
 template <typename EigVec1, typename EigVec2, typename EigVec3>
 inline auto form_diag(const EigVec1& alpha_init, const EigVec2& Yk,
@@ -347,7 +352,7 @@ inline auto form_diag(const EigVec1& alpha_init, const EigVec2& Yk,
 }
 
 /**
- * The information from running the taylor approximation
+ * Information from running the taylor approximation
  */
 struct taylor_approx_t {
   Eigen::VectorXd x_center;
@@ -357,9 +362,12 @@ struct taylor_approx_t {
   bool use_full;       // boolean indicationg if full or sparse approx was used.
 };
 
+/**
+ * Information from calling ELBO estimation
+ */
 struct elbo_est_t {
   double elbo{-std::numeric_limits<double>::infinity()};
-  size_t fn_calls{0};
+  size_t fn_calls{0}; // Number of times the log_prob function is called.
   Eigen::MatrixXd repeat_draws;
   Eigen::Array<double, -1, -1> lp_mat;
   Eigen::Array<double, -1, 1> lp_ratio;
@@ -451,7 +459,23 @@ gen_eigen_matrix(Generator&& variate_generator, const Eigen::Index num_params,
 }
 
 /**
- *
+ * Estimate the approximate draws given the taylor approximation.
+ * @tparam ReturnElbo If true, calculate ELBO and return it in `elbo_est_t`. If `false` ELBO is set in the return as `-Infinity`
+ * @tparam LPF Type of log probability functor
+ * @tparam ConstrainF Type of functor for constraining parameters
+ * @tparam RNG Type of random number generator
+ * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 column at compile time.
+ * @tparam Logger Type of logger callback
+ * @param lp_fun Functor to calculate the log density
+ * @param constrain_fun A functor to transform parameters to the constrained space
+ * @param rng A generator to produce standard gaussian random variables
+ * @param taylor_approx The taylor approximation at this iteration of LBFGS
+ * @param num_samples Number of approximate samples to generate
+ * @param alpha The approximation of the diagonal hessian
+ * @param logger A callback writer for messages
+ * @param num_eval_attempts Number of evaluation attempts to make for each
+ *  column of the taylor approximation. For each column if this number is exceeded that value is discarded.
+ * @param iter_msg The beginning of messages that includes the iteration number
  */
 template <bool ReturnElbo = true, typename LPF, typename ConstrainF,
           typename RNG, typename EigVec, typename Logger>
@@ -581,12 +605,12 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
 /**
  * Construct the full taylor approximation
  * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column.
+ * column
  * @tparam Buff An std::vector holding column views of an Eigen Matrix
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column.
+ * column
  * @tparam DkVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column.
+ * column
  * @tparam InvMat Type inheriting from `Eigen::DenseBase` with dynamic compile
  * time rows and columns
  * @tparam Logger Type inheriting from `stan::io::logger`
@@ -598,7 +622,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
  * @param ninvRST
  * @param point_est The parameters for the given iteration of LBFGS
  * @param grad_est The gradients for the given iteration of LBFGS
- * @param logger used for printing out debug values.
+ * @param logger used for printing out debug values
  */
 template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
           typename InvMat, typename Logger>
@@ -628,12 +652,12 @@ inline taylor_approx_t construct_taylor_approximation_full(
 /**
  * Construct the sparse taylor approximation
  * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column.
+ * column
  * @tparam Buff An std::vector holding column views of an Eigen Matrix
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column.
+ * column
  * @tparam DkVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column.
+ * column
  * @tparam InvMat Type inheriting from `Eigen::DenseBase` with dynamic compile
  * time rows and columns
  * @tparam Logger Type inheriting from `stan::io::logger`
@@ -645,7 +669,7 @@ inline taylor_approx_t construct_taylor_approximation_full(
  * @param ninvRST
  * @param point_est The parameters for the given iteration of LBFGS
  * @param grad_est The gradients for the given iteration of LBFGS
- * @param logger used for printing out debug values.
+ * @param logger used for printing out debug values
  */
 template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
           typename InvMat, typename Logger>
@@ -708,12 +732,12 @@ inline auto construct_taylor_approximation_sparse(
 /**
  * Construct the taylor approximation.
  * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column.
+ * column
  * @tparam Buff An std::vector holding column views of an Eigen Matrix
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column.
+ * column
  * @tparam DkVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column.
+ * column
  * @tparam InvMat Type inheriting from `Eigen::DenseBase` with dynamic compile
  * time rows and columns
  * @tparam Logger Type inheriting from `stan::io::logger`
@@ -725,7 +749,7 @@ inline auto construct_taylor_approximation_sparse(
  * @param ninvRST
  * @param point_est The parameters for the given iteration of LBFGS
  * @param grad_est The gradients for the given iteration of LBFGS
- * @param logger used for printing out debug values.
+ * @param logger used for printing out debug values
  */
 template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
           typename InvMat, typename Logger>
@@ -746,11 +770,12 @@ inline taylor_approx_t construct_taylor_approximation(
 
 /**
  * Construct the return for directly calling single pathfinder or
- *  calling single pathfinder from multi pathfinder.
+ *  calling single pathfinder from multi pathfinder
  * @tparam ReturnLpSamples if `true` then this function returns the lp_ratio
  *  and samples. If false then only the return code is returned
- * @tparam EigMat An Eigen matrix
- * @tparam EigVec An Eigen Vector
+ * @tparam EigMat A type inheriting from `Eigen::DenseBase`
+ * @tparam EigVec A type inheriting from `Eigen::DenseBase` with one column defined at compile time
+ * @return A tuple with an error code, a vector holding the log prob ratios, matrix of samples, and an unsigned integer for number of times the log prob functions was called.
  */
 template <bool ReturnLpSamples, typename EigMat, typename EigVec,
           std::enable_if_t<ReturnLpSamples>* = nullptr>
@@ -768,48 +793,47 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
 }
 }  // namespace internal
 /**
- * Runs a single pathfinder
+ * Run single path pathfinder with specified initializations and write results to the specified callbacks and it returns a return code.
  * @tparam ReturnLpSamples if `true` single pathfinder returns the lp_ratio
- * vector and approximate samples. If `false` only gives gives a return code.
- * @tparam Model A model implementation
- * @tparam DiagnosticWriter Type inheriting from stan::callbacks::writer
- * @tparam ParamWriter Type inheriting from stan::callbacks::writer
- * @param[in] model ($log p$ in paper) Input model to test (with data already
- * instantiated)
- * @param[in] init ($\pi_0$ in paper) var context for initialization
- * @param[in] random_seed random seed for the random number generator
+ * vector and approximate samples. If `false` only gives a return code.
+ * @tparam Model type of model
+ * @tparam DiagnosticWriter Type inheriting from @ref stan::callbacks::writer
+ * @tparam ParamWriter Type inheriting from @ref stan::callbacks::writer
+ * @param[in] model defining target log density and transforms (log $p$ in paper)
+ * @param[in] init ($\pi_0$ in paper) var context for initialization. Random initial values will be generated for parameters user has not supplied.
+ * @param[in] random_seed seed for the random number generator
  * @param[in] path path id to advance the pseudo random number generator
- * @param[in] init_radius radius to initialize
- * @param[in] history_size  (J in paper) amount of history to keep for L-BFGS
- * @param[in] init_alpha line search step size for first iteration
- * @param[in] tol_obj convergence tolerance on absolute changes in
+ * @param[in] init_radius A non-negative value to initialize variables uniformly in (-init_radius, init_radius) if not defined in the initialization var context
+ * @param[in] history_size  Non-negative value for (J in paper) amount of history to keep for L-BFGS
+ * @param[in] init_alpha Non-negative value for line search step size for first iteration
+ * @param[in] tol_obj Non-negative value for convergence tolerance on absolute changes in
  *   objective function value
- * @param[in] tol_rel_obj ($\tau^{rel}$ in paper) convergence tolerance on
+ * @param[in] tol_rel_obj ($\tau^{rel}$ in paper) Non-negative value for convergence tolerance on
  * relative changes in objective function value
- * @param[in] tol_grad convergence tolerance on the norm of the gradient
- * @param[in] tol_rel_grad convergence tolerance on the relative norm of
+ * @param[in] tol_grad Non-negative value for convergence tolerance on the norm of the gradient
+ * @param[in] tol_rel_grad Non-negative value for convergence tolerance on the relative norm of
  *   the gradient
- * @param[in] tol_param convergence tolerance on changes in parameter
- *   value
- * @param[in] num_iterations (L in paper) maximum number of LBFGS iterations
+ * @param[in] tol_param Non-negative value for convergence tolerance changes in the L1 norm of parameter
+ *   values
+ * @param[in] num_iterations (L in paper) Non-negative value for maximum number of LBFGS iterations
  * @param[in] save_iterations indicates whether all the iterations should
  *   be saved to the parameter_writer
- * @param[in] refresh how often to write output to logger
+ * @param[in] refresh Output is written to the logger for each iteration modulo the refresh value
  * @param[in,out] interrupt callback to be called every iteration
  * @param[in] num_elbo_draws (K in paper) number of MC draws to evaluate ELBO
  * @param[in] num_draws (M in paper) number of approximate posterior draws to
  * return
  * @param[in] num_eval_attempts Number of times to attempt to calculate
- * the log probability of an MC sample while calculating the ELBO.
+ * the log density of an MC draw from the approximate distribution while calculating the ELBO. If this value is exceeded the MC draw for that approximation will be discarded.
  * @param[in,out] logger Logger for messages
  * @param[in,out] init_writer Writer callback for unconstrained inits
- * @param[in,out] parameter_writer output for parameter values
+ * @param[in,out] parameter_writer Writer callback for parameter values
  * @param[in,out] diagnostic_writer output for diagnostics values
- * @return error_codes::OK if successful
+ * @return `error_codes::OK` if successful, `error_codes::SOFTWARE` for failures
  */
 template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
-          typename ParamWriter>       //, typename XVal, typename GVal>
-inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
+          typename ParamWriter>
+inline auto pathfinder_lbfgs_single(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
@@ -845,7 +869,7 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
                   std::move(conv_opts), std::move(lbfgs_update), &lbfgs_ss);
   const std::string path_num("Path: [" + std::to_string(path) + "] ");
   if (refresh != 0) {
-    logger.info(path_num + "Initial log joint probability = "
+    logger.info(path_num + "Initial log joint density = "
                 + std::to_string(lbfgs.logp()));
   }
   std::vector<std::string> names;
@@ -931,7 +955,7 @@ inline auto pathfinder_lbfgs_single(  // XVal&& x_val, GVal&& g_val,
       diagnostic_writer(std::make_tuple(lbfgs.curr_x(), lbfgs.curr_g()));
     }
   }
-  int return_code;
+  int return_code = error_codes::OK;
   if (ret >= 0) {
     logger.info("Optimization terminated normally: ");
   } else {
