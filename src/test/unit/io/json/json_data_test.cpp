@@ -27,8 +27,8 @@ void test_int_var(stan::json::json_data &jdata, const std::string &text,
     EXPECT_EQ(expected_vals[i], vals[i]);
 }
 
-void test_empty_int_arr(stan::json::json_data &jdata,
-                        const std::string &text, const std::string &name,
+void test_empty_int_arr(stan::json::json_data &jdata, const std::string &text,
+                        const std::string &name,
                         const std::vector<int> &expected_vals) {
   EXPECT_EQ(true, jdata.contains_i(name));
   std::vector<size_t> dims = jdata.dims_i(name);
