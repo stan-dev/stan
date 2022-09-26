@@ -225,7 +225,7 @@ class json_data_handler : public stan::json::json_handler {
     if (n > (unsigned)std::numeric_limits<int>::max())
       promote_to_double();
     if (is_int_) {
-      values_i_.push_back((int)n);
+      values_i_.push_back(static_cast<int>(n));
     } else {
       values_r_.push_back(n);
     }
