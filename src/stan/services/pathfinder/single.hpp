@@ -339,9 +339,12 @@ inline Eigen::Array<bool, -1, 1> check_curve(const EigMat& Yk, const EigMat& Sk,
  * Gilbert, J.C., Lemaréchal, C. Some numerical experiments with
  * variable-storage quasi-Newton algorithms. Mathematical Programming 45,
  * 407–435 (1989). https://doi.org/10.1007/BF01589113
- * @tparam EigVec1 Type derived from `Eigen::DenseBase` with one column at compile time
- * @tparam EigVec2 Type derived from `Eigen::DenseBase` with one column at compile time
- * @tparam EigVec3 Type derived from `Eigen::DenseBase` with one column at compile time
+ * @tparam EigVec1 Type derived from `Eigen::DenseBase` with one column at
+ * compile time
+ * @tparam EigVec2 Type derived from `Eigen::DenseBase` with one column at
+ * compile time
+ * @tparam EigVec3 Type derived from `Eigen::DenseBase` with one column at
+ * compile time
  * @param alpha_init Vector of initial values to update
  * @param Yk Vector of gradients
  * @param Sk Vector of values
@@ -375,7 +378,7 @@ struct taylor_approx_t {
  */
 struct elbo_est_t {
   double elbo{-std::numeric_limits<double>::infinity()};
-  size_t fn_calls{0}; // Number of times the log_prob function is called.
+  size_t fn_calls{0};  // Number of times the log_prob function is called.
   Eigen::MatrixXd repeat_draws;
   Eigen::Array<double, -1, -1> lp_mat;
   Eigen::Array<double, -1, 1> lp_ratio;
@@ -468,21 +471,25 @@ gen_eigen_matrix(Generator&& variate_generator, const Eigen::Index num_params,
 
 /**
  * Estimate the approximate draws given the taylor approximation.
- * @tparam ReturnElbo If true, calculate ELBO and return it in `elbo_est_t`. If `false` ELBO is set in the return as `-Infinity`
+ * @tparam ReturnElbo If true, calculate ELBO and return it in `elbo_est_t`. If
+ * `false` ELBO is set in the return as `-Infinity`
  * @tparam LPF Type of log probability functor
  * @tparam ConstrainF Type of functor for constraining parameters
  * @tparam RNG Type of random number generator
- * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 column at compile time.
+ * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 column at
+ * compile time.
  * @tparam Logger Type of logger callback
  * @param lp_fun Functor to calculate the log density
- * @param constrain_fun A functor to transform parameters to the constrained space
+ * @param constrain_fun A functor to transform parameters to the constrained
+ * space
  * @param rng A generator to produce standard gaussian random variables
  * @param taylor_approx The taylor approximation at this iteration of LBFGS
  * @param num_samples Number of approximate samples to generate
  * @param alpha The approximation of the diagonal hessian
  * @param logger A callback writer for messages
  * @param num_eval_attempts Number of evaluation attempts to make for each
- *  column of the taylor approximation. For each column if this number is exceeded that value is discarded.
+ *  column of the taylor approximation. For each column if this number is
+ * exceeded that value is discarded.
  * @param iter_msg The beginning of messages that includes the iteration number
  */
 template <bool ReturnElbo = true, typename LPF, typename ConstrainF,
@@ -782,8 +789,11 @@ inline taylor_approx_t construct_taylor_approximation(
  * @tparam ReturnLpSamples if `true` then this function returns the lp_ratio
  *  and samples. If false then only the return code is returned
  * @tparam EigMat A type inheriting from `Eigen::DenseBase`
- * @tparam EigVec A type inheriting from `Eigen::DenseBase` with one column defined at compile time
- * @return A tuple with an error code, a vector holding the log prob ratios, matrix of samples, and an unsigned integer for number of times the log prob functions was called.
+ * @tparam EigVec A type inheriting from `Eigen::DenseBase` with one column
+ * defined at compile time
+ * @return A tuple with an error code, a vector holding the log prob ratios,
+ * matrix of samples, and an unsigned integer for number of times the log prob
+ * functions was called.
  */
 template <bool ReturnLpSamples, typename EigMat, typename EigVec,
           std::enable_if_t<ReturnLpSamples>* = nullptr>
@@ -801,37 +811,49 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
 }
 }  // namespace internal
 /**
- * Run single path pathfinder with specified initializations and write results to the specified callbacks and it returns a return code.
+ * Run single path pathfinder with specified initializations and write results
+ * to the specified callbacks and it returns a return code.
  * @tparam ReturnLpSamples if `true` single pathfinder returns the lp_ratio
  * vector and approximate samples. If `false` only gives a return code.
  * @tparam Model type of model
  * @tparam DiagnosticWriter Type inheriting from @ref stan::callbacks::writer
  * @tparam ParamWriter Type inheriting from @ref stan::callbacks::writer
- * @param[in] model defining target log density and transforms (log $p$ in paper)
- * @param[in] init ($\pi_0$ in paper) var context for initialization. Random initial values will be generated for parameters user has not supplied.
+ * @param[in] model defining target log density and transforms (log $p$ in
+ * paper)
+ * @param[in] init ($\pi_0$ in paper) var context for initialization. Random
+ * initial values will be generated for parameters user has not supplied.
  * @param[in] random_seed seed for the random number generator
  * @param[in] path path id to advance the pseudo random number generator
- * @param[in] init_radius A non-negative value to initialize variables uniformly in (-init_radius, init_radius) if not defined in the initialization var context
- * @param[in] history_size  Non-negative value for (J in paper) amount of history to keep for L-BFGS
- * @param[in] init_alpha Non-negative value for line search step size for first iteration
- * @param[in] tol_obj Non-negative value for convergence tolerance on absolute changes in
- *   objective function value
- * @param[in] tol_rel_obj ($\tau^{rel}$ in paper) Non-negative value for convergence tolerance on
- * relative changes in objective function value
- * @param[in] tol_grad Non-negative value for convergence tolerance on the norm of the gradient
- * @param[in] tol_rel_grad Non-negative value for convergence tolerance on the relative norm of
- *   the gradient
- * @param[in] tol_param Non-negative value for convergence tolerance changes in the L1 norm of parameter
- *   values
- * @param[in] num_iterations (L in paper) Non-negative value for maximum number of LBFGS iterations
+ * @param[in] init_radius A non-negative value to initialize variables uniformly
+ * in (-init_radius, init_radius) if not defined in the initialization var
+ * context
+ * @param[in] history_size  Non-negative value for (J in paper) amount of
+ * history to keep for L-BFGS
+ * @param[in] init_alpha Non-negative value for line search step size for first
+ * iteration
+ * @param[in] tol_obj Non-negative value for convergence tolerance on absolute
+ * changes in objective function value
+ * @param[in] tol_rel_obj ($\tau^{rel}$ in paper) Non-negative value for
+ * convergence tolerance on relative changes in objective function value
+ * @param[in] tol_grad Non-negative value for convergence tolerance on the norm
+ * of the gradient
+ * @param[in] tol_rel_grad Non-negative value for convergence tolerance on the
+ * relative norm of the gradient
+ * @param[in] tol_param Non-negative value for convergence tolerance changes in
+ * the L1 norm of parameter values
+ * @param[in] num_iterations (L in paper) Non-negative value for maximum number
+ * of LBFGS iterations
  * @param[in] save_iterations indicates whether all the iterations should
  *   be saved to the parameter_writer
- * @param[in] refresh Output is written to the logger for each iteration modulo the refresh value
+ * @param[in] refresh Output is written to the logger for each iteration modulo
+ * the refresh value
  * @param[in,out] interrupt callback to be called every iteration
  * @param[in] num_elbo_draws (K in paper) number of MC draws to evaluate ELBO
  * @param[in] num_draws (M in paper) number of approximate posterior draws to return
  * @param[in] num_eval_attempts Number of times to attempt to calculate
- * the log density of an MC draw from the approximate distribution while calculating the ELBO. If this value is exceeded the MC draw for that approximation will be discarded.
+ * the log density of an MC draw from the approximate distribution while
+ * calculating the ELBO. If this value is exceeded the MC draw for that
+ * approximation will be discarded.
  * @param[in,out] logger Logger for messages
  * @param[in,out] init_writer Writer callback for unconstrained inits
  * @param[in,out] parameter_writer Writer callback for parameter values
