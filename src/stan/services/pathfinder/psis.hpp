@@ -12,16 +12,17 @@ namespace psis {
 namespace internal {
 
 /**
- * Compute log joint likelihood parameter estimates from generalized pareto distribution and the samples
- *  the parameters were estimated from.
+ * Compute log joint likelihood parameter estimates from generalized pareto
+ * distribution and the samples the parameters were estimated from.
  * @tparam EigArray1 An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
  * @tparam EigArray2 An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
  * @param[in] theta Estimates from generalized pareto distribution estimation
  * @param[in] x The sample that the parameters were estimated from.
- * @return Array of the joint log likelihood of parameter estimates from generalized pareto distribution and the samples
- *  the parameters were estimated from.
+ * @return Array of the joint log likelihood of parameter estimates from
+ * generalized pareto distribution and the samples the parameters were estimated
+ * from.
  */
 template <typename EigArray1, typename EigArray2>
 inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,

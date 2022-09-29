@@ -257,7 +257,8 @@ inline Eigen::MatrixXd tcrossprod(T1&& x) {
  * @param y_buff A standard vector with elements representing the rows of
  *  a matrix.
  * @param alpha An eigen vector representing the diagonals of a matrix.
- * @return Returns the same result as if we called `y_buff * alpha.asDiagonal()` where `y_buff` is an Eigen matrix.
+ * @return Returns the same result as if we called `y_buff * alpha.asDiagonal()`
+ * where `y_buff` is an Eigen matrix.
  */
 template <typename EigVec1, typename EigVec2>
 inline Eigen::MatrixXd std_vec_matrix_times_diagonal(
@@ -317,11 +318,15 @@ inline Eigen::MatrixXd std_vec_matrix_mul_vector(
  * Check the curvature of the LBFGS optimization path is convex.
  * For each pair of parameters and gradients we check:
  *  1. If the direction of each iteration is check to be greater than zero
- *  2. If the absolute value of the squared gradient over direction is checked to be greater than 1e-12.
- * @tparam EigMat A type derived from `Eigen::MatrixBase` with dynamic compile time rows and columns
+ *  2. If the absolute value of the squared gradient over direction is checked
+ * to be greater than 1e-12.
+ * @tparam EigMat A type derived from `Eigen::MatrixBase` with dynamic compile
+ * time rows and columns
  * @tparam Logger A type with a `log` method for writing
- * @param Yk Matrix containing difference in gradient calculation per LBFGS iterations
- * @param Sk Matrix containing difference in parameter calculation per LBFGS iterations
+ * @param Yk Matrix containing difference in gradient calculation per LBFGS
+ * iterations
+ * @param Sk Matrix containing difference in parameter calculation per LBFGS
+ * iterations
  * @param logger logger used to send messages to error for user.
  */
 template <typename EigMat, stan::require_matrix_t<EigMat>* = nullptr,
@@ -849,7 +854,8 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * the refresh value
  * @param[in,out] interrupt callback to be called every iteration
  * @param[in] num_elbo_draws (K in paper) number of MC draws to evaluate ELBO
- * @param[in] num_draws (M in paper) number of approximate posterior draws to return
+ * @param[in] num_draws (M in paper) number of approximate posterior draws to
+ * return
  * @param[in] num_eval_attempts Number of times to attempt to calculate
  * the log density of an MC draw from the approximate distribution while
  * calculating the ELBO. If this value is exceeded the MC draw for that
@@ -858,7 +864,10 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * @param[in,out] init_writer Writer callback for unconstrained inits
  * @param[in,out] parameter_writer Writer callback for parameter values
  * @param[in,out] diagnostic_writer output for diagnostics values
- * @return If `ReturnLpSamples` is `true`, returns a tuple of the error code, approximate draws, and a vector of the lp ratio. If `false`, only returns an error code `error_codes::OK` if successful, `error_codes::SOFTWARE` for failures
+ * @return If `ReturnLpSamples` is `true`, returns a tuple of the error code,
+ * approximate draws, and a vector of the lp ratio. If `false`, only returns an
+ * error code `error_codes::OK` if successful, `error_codes::SOFTWARE` for
+ * failures
  */
 template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
           typename ParamWriter>
@@ -917,10 +926,12 @@ inline auto pathfinder_lbfgs_single(
                                                        disc_vector, g1);
     param_vecs.emplace_back(
         Eigen::Map<Eigen::VectorXd>(cont_vector.data(), num_parameters));
-    grad_vecs.emplace_back(Eigen::Map<Eigen::VectorXd>(g1.data(), num_parameters));
+    grad_vecs.emplace_back(
+        Eigen::Map<Eigen::VectorXd>(g1.data(), num_parameters));
     if (save_iterations) {
       diagnostic_writer(std::make_tuple(
-          Eigen::Map<Eigen::VectorXd>(cont_vector.data(), num_parameters).eval(),
+          Eigen::Map<Eigen::VectorXd>(cont_vector.data(), num_parameters)
+              .eval(),
           Eigen::Map<Eigen::VectorXd>(g1.data(), num_parameters).eval()));
     }
   }
@@ -1020,8 +1031,9 @@ inline auto pathfinder_lbfgs_single(
   Eigen::Matrix<bool, -1, 1> check_curve_vec
       = internal::check_curve(Ykt_diff, Skt_diff, logger);
   if (check_curve_vec[0]) {
-    alpha_mat.col(0) = internal::form_diag(Eigen::VectorXd::Ones(num_parameters),
-                                           Ykt_diff.col(0), Skt_diff.col(0));
+    alpha_mat.col(0)
+        = internal::form_diag(Eigen::VectorXd::Ones(num_parameters),
+                              Ykt_diff.col(0), Skt_diff.col(0));
   } else {
     alpha_mat.col(0).setOnes();
   }
@@ -1100,14 +1112,15 @@ inline auto pathfinder_lbfgs_single(
             Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat);
             ninvRST = std::move(-Skt_mat);
           }
-          internal::taylor_approx_t taylor_appx = internal::construct_taylor_approximation(
-              Ykt_h, alpha, Dk, ninvRST, param_vecs[iter + 1],
-              grad_vecs[iter + 1], logger);
+          internal::taylor_approx_t taylor_appx
+              = internal::construct_taylor_approximation(
+                  Ykt_h, alpha, Dk, ninvRST, param_vecs[iter + 1],
+                  grad_vecs[iter + 1], logger);
           internal::elbo_est_t elbo_est;
           try {
             elbo_est = internal::est_approx_draws<true>(
-                lp_fun, constrain_fun, thread_rng, taylor_appx,
-                num_elbo_draws, alpha, logger, num_eval_attempts, iter_msg);
+                lp_fun, constrain_fun, thread_rng, taylor_appx, num_elbo_draws,
+                alpha, logger, num_eval_attempts, iter_msg);
             num_evals += elbo_est.fn_calls;
           } catch (const std::exception& e) {
             logger.info(iter_msg + "ELBO estimation failed "
