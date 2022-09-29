@@ -115,7 +115,7 @@ inline void rnorm_draws(T0&& logger, T&& approx_samples_tmp) {
 }
 
 template <typename T0, typename T1, typename T2>
-inline void curve_check(T0&& logger, T1&& Dk, T2&& thetak) {
+inline void print_curve(T0&& logger, T1&& Dk, T2&& thetak) {
   if (STAN_DEBUG_PATH_CURVE_CHECK) {
     std::stringstream debug_stream;
     debug_stream << "\n Check Dk: \n" << Dk.transpose() << "\n";
@@ -126,7 +126,7 @@ inline void curve_check(T0&& logger, T1&& Dk, T2&& thetak) {
 
 template <typename T0, typename T1, typename T2, typename T3, typename T4,
           typename T5, typename T6>
-inline void post_lbfgs(T0&& logger, T1&& update_best_mutex, T2&& param_size,
+inline void post_lbfgs(T0&& logger, T1&& update_best_mutex, T2&& num_parameters,
                        T3&& num_elbo_draws, T4&& alpha_mat, T5&& Ykt_diff,
                        T6&& Skt_diff) {
   if (STAN_DEBUG_PATH_POST_LBFGS) {
@@ -134,7 +134,7 @@ inline void post_lbfgs(T0&& logger, T1&& update_best_mutex, T2&& param_size,
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n",
                                  "", "", " ");
     std::stringstream debug_stream;
-    debug_stream << "\n num_params: " << param_size << "\n";
+    debug_stream << "\n num_params: " << num_parameters << "\n";
     debug_stream << "\n num_elbo_params: " << num_elbo_draws << "\n";
     debug_stream << "\n Alpha mat: "
                  << alpha_mat.transpose().eval().format(CommaInitFmt) << "\n";
@@ -220,6 +220,7 @@ inline void taylor_appx_sparse2(T0&& logger, T1&& qr, T2&& alpha, T3&& Qk,
   }
 }
 }  // namespace debug
+
 template <typename T1, typename T2>
 inline auto crossprod(T1&& x, T2&& y) {
   return std::forward<T1>(x).transpose() * std::forward<T2>(y);
@@ -256,8 +257,7 @@ inline Eigen::MatrixXd tcrossprod(T1&& x) {
  * @param y_buff A standard vector with elements representing the rows of
  *  a matrix.
  * @param alpha An eigen vector representing the diagonals of a matrix.
- * @return Returns the same result as if we called `Matrix *
- * vector.asDiagonal()`
+ * @return Returns the same result as if we called `y_buff * alpha.asDiagonal()` where `y_buff` is an Eigen matrix.
  */
 template <typename EigVec1, typename EigVec2>
 inline Eigen::MatrixXd std_vec_matrix_times_diagonal(
@@ -278,7 +278,7 @@ inline Eigen::MatrixXd std_vec_matrix_times_diagonal(
  *  rows or columns equal to 1
  * @param y_buff A standard vector with elements representing the rows of
  *  a matrix.
- * @param alpha An eigen vector.
+ * @param x An eigen vector.
  * @return Returns the same result as if we called `Matrix.transpose() * vector`
  */
 template <typename EigVec1, typename EigVec2>
@@ -315,15 +315,23 @@ inline Eigen::MatrixXd std_vec_matrix_mul_vector(
 
 /**
  * Check the curvature of the LBFGS optimization path is convex.
+ * For each pair of parameters and gradients we check:
+ *  1. If the direction of each iteration is check to be greater than zero
+ *  2. If the absolute value of the squared gradient over direction is checked to be greater than 1e-12.
+ * @tparam EigMat A type derived from `Eigen::MatrixBase` with dynamic compile time rows and columns
+ * @tparam Logger A type with a `log` method for writing
+ * @param Yk Matrix containing difference in gradient calculation per LBFGS iterations
+ * @param Sk Matrix containing difference in parameter calculation per LBFGS iterations
+ * @param logger logger used to send messages to error for user.
  */
 template <typename EigMat, stan::require_matrix_t<EigMat>* = nullptr,
           typename Logger>
 inline Eigen::Array<bool, -1, 1> check_curve(const EigMat& Yk, const EigMat& Sk,
                                              Logger&& logger) {
-  auto Dk = ((Yk.array()) * Sk.array()).colwise().sum();
+  auto Dk = (Yk.array() * Sk.array()).colwise().sum();
   auto thetak = (Yk.array().square().colwise().sum() / Dk).abs();
-  debug::curve_check(logger, Dk, thetak);
-  return ((Dk > 0) && (thetak <= 1e12));
+  debug::print_curve(logger, Dk, thetak);
+  return Dk > 0 && thetak <= 1e12;
 }
 
 /**
@@ -821,15 +829,14 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * @param[in] refresh Output is written to the logger for each iteration modulo the refresh value
  * @param[in,out] interrupt callback to be called every iteration
  * @param[in] num_elbo_draws (K in paper) number of MC draws to evaluate ELBO
- * @param[in] num_draws (M in paper) number of approximate posterior draws to
- * return
+ * @param[in] num_draws (M in paper) number of approximate posterior draws to return
  * @param[in] num_eval_attempts Number of times to attempt to calculate
  * the log density of an MC draw from the approximate distribution while calculating the ELBO. If this value is exceeded the MC draw for that approximation will be discarded.
  * @param[in,out] logger Logger for messages
  * @param[in,out] init_writer Writer callback for unconstrained inits
  * @param[in,out] parameter_writer Writer callback for parameter values
  * @param[in,out] diagnostic_writer output for diagnostics values
- * @return `error_codes::OK` if successful, `error_codes::SOFTWARE` for failures
+ * @return If `ReturnLpSamples` is `true`, returns a tuple of the error code, approximate draws, and a vector of the lp ratio. If `false`, only returns an error code `error_codes::OK` if successful, `error_codes::SOFTWARE` for failures
  */
 template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
           typename ParamWriter>
@@ -848,7 +855,7 @@ inline auto pathfinder_lbfgs_single(
   std::vector<int> disc_vector;
   std::vector<double> cont_vector = util::initialize<false>(
       model, init, rng, init_radius, false, logger, init_writer);
-  const auto param_size = cont_vector.size();
+  const auto num_parameters = cont_vector.size();
   // Setup LBFGS
   std::stringstream lbfgs_ss;
   stan::optimization::LSOptions<double> ls_opts;
@@ -887,12 +894,12 @@ inline auto pathfinder_lbfgs_single(
     double lp = stan::model::log_prob_grad<true, true>(model, cont_vector,
                                                        disc_vector, g1);
     param_vecs.emplace_back(
-        Eigen::Map<Eigen::VectorXd>(cont_vector.data(), param_size));
-    grad_vecs.emplace_back(Eigen::Map<Eigen::VectorXd>(g1.data(), param_size));
+        Eigen::Map<Eigen::VectorXd>(cont_vector.data(), num_parameters));
+    grad_vecs.emplace_back(Eigen::Map<Eigen::VectorXd>(g1.data(), num_parameters));
     if (save_iterations) {
       diagnostic_writer(std::make_tuple(
-          Eigen::Map<Eigen::VectorXd>(cont_vector.data(), param_size).eval(),
-          Eigen::Map<Eigen::VectorXd>(g1.data(), param_size).eval()));
+          Eigen::Map<Eigen::VectorXd>(cont_vector.data(), num_parameters).eval(),
+          Eigen::Map<Eigen::VectorXd>(g1.data(), num_parameters).eval()));
     }
   }
   auto constrain_fun = [&model](auto&& rng, auto&& unconstrained_draws,
@@ -981,23 +988,22 @@ inline auto pathfinder_lbfgs_single(
             .count()
         / 1000.0;
   const auto start_pathfinder_time = std::chrono::steady_clock::now();
-  Eigen::MatrixXd Ykt_diff(param_size, param_cols_filled);
-  Eigen::MatrixXd Skt_diff(param_size, param_cols_filled);
+  Eigen::MatrixXd Ykt_diff(num_parameters, param_cols_filled);
+  Eigen::MatrixXd Skt_diff(num_parameters, param_cols_filled);
   for (Eigen::Index i = 0; i < param_cols_filled; ++i) {
     Ykt_diff.col(i) = grad_vecs[i + 1] - grad_vecs[i];
     Skt_diff.col(i) = param_vecs[i + 1] - param_vecs[i];
   }
-  const auto diff_size = Ykt_diff.cols();
-  Eigen::MatrixXd alpha_mat(param_size, diff_size);
+  Eigen::MatrixXd alpha_mat(num_parameters, param_cols_filled);
   Eigen::Matrix<bool, -1, 1> check_curve_vec
       = internal::check_curve(Ykt_diff, Skt_diff, logger);
   if (check_curve_vec[0]) {
-    alpha_mat.col(0) = internal::form_diag(Eigen::VectorXd::Ones(param_size),
+    alpha_mat.col(0) = internal::form_diag(Eigen::VectorXd::Ones(num_parameters),
                                            Ykt_diff.col(0), Skt_diff.col(0));
   } else {
     alpha_mat.col(0).setOnes();
   }
-  for (Eigen::Index iter = 1; iter < diff_size; iter++) {
+  for (Eigen::Index iter = 1; iter < param_cols_filled; iter++) {
     if (check_curve_vec[iter]) {
       alpha_mat.col(iter) = internal::form_diag(
           alpha_mat.col(iter - 1), Ykt_diff.col(iter), Skt_diff.col(iter));
@@ -1006,7 +1012,7 @@ inline auto pathfinder_lbfgs_single(
     }
   }
   std::mutex update_best_mutex;
-  internal::debug::post_lbfgs(logger, update_best_mutex, param_size,
+  internal::debug::post_lbfgs(logger, update_best_mutex, num_parameters,
                               num_elbo_draws, alpha_mat, Ykt_diff, Skt_diff);
   auto lp_fun = [&model](auto&& u, auto&& streamer) {
     return model.template log_prob<false, true>(u, &streamer);
@@ -1025,7 +1031,7 @@ inline auto pathfinder_lbfgs_single(
   internal::taylor_approx_t taylor_approx_best;
   std::atomic<size_t> num_evals{lbfgs.grad_evals()};
   tbb::parallel_for(
-      tbb::blocked_range<Eigen::Index>(0, diff_size),
+      tbb::blocked_range<Eigen::Index>(0, param_cols_filled),
       [&](tbb::blocked_range<Eigen::Index> r) {
         auto&& thread_rng
             = rng_vec[tbb::this_task_arena::current_thread_index()];
@@ -1057,10 +1063,6 @@ inline auto pathfinder_lbfgs_single(
             Ykt_h.push_back(Ykt_diff.col(ys_cols[i]));
             Skt_mat.col(i) = Skt_diff.col(ys_cols[i]);
           }
-          Eigen::VectorXd Dk(current_history_size);
-          for (Eigen::Index i = 0; i < current_history_size; i++) {
-            Dk.coeffRef(i) = Ykt_h[i].dot(Skt_mat.col(i));
-          }
           Eigen::MatrixXd Rk = Eigen::MatrixXd::Zero(current_history_size,
                                                      current_history_size);
           for (Eigen::Index s = 0; s < current_history_size; s++) {
@@ -1068,19 +1070,21 @@ inline auto pathfinder_lbfgs_single(
               Rk.coeffRef(i, s) = Skt_mat.col(i).dot(Ykt_h[s]);
             }
           }
+          Eigen::VectorXd Dk = Rk.diagonal();
+          // Unfolded algorithm in paper for inverse RST
           Eigen::MatrixXd ninvRST;
           {
             Skt_mat.transposeInPlace();
             Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat);
             ninvRST = std::move(-Skt_mat);
           }
-          auto taylor_appx_tuple = internal::construct_taylor_approximation(
+          internal::taylor_approx_t taylor_appx = internal::construct_taylor_approximation(
               Ykt_h, alpha, Dk, ninvRST, param_vecs[iter + 1],
               grad_vecs[iter + 1], logger);
           internal::elbo_est_t elbo_est;
           try {
             elbo_est = internal::est_approx_draws<true>(
-                lp_fun, constrain_fun, thread_rng, taylor_appx_tuple,
+                lp_fun, constrain_fun, thread_rng, taylor_appx,
                 num_elbo_draws, alpha, logger, num_eval_attempts, iter_msg);
             num_evals += elbo_est.fn_calls;
           } catch (const std::exception& e) {
@@ -1096,7 +1100,7 @@ inline auto pathfinder_lbfgs_single(
             std::lock_guard<std::mutex> guard(update_best_mutex);
             if (elbo_est.elbo > elbo_best.elbo) {
               elbo_best = std::move(elbo_est);
-              taylor_approx_best = std::move(taylor_appx_tuple);
+              taylor_approx_best = std::move(taylor_appx);
               best_E = iter;
             }
           }
@@ -1159,12 +1163,13 @@ inline auto pathfinder_lbfgs_single(
         constrained_draws_mat.col(i).tail(2) = lp_draws.row(j);
       }
     } catch (const std::exception& e) {
+      std::string err_msg = e.what();
       logger.info(path_num + "Final sampling approximation failed with error: "
-                  + e.what());
+                  + err_msg);
       logger.info(
           path_num
           + "Returning the approximate samples used for ELBO calculation: "
-          + e.what());
+          + err_msg);
       constrained_draws_mat
           = Eigen::Array<double, -1, -1>(names.size(), elbo_draws.cols());
       Eigen::VectorXd approx_samples_constrained_col;
@@ -1193,13 +1198,13 @@ inline auto pathfinder_lbfgs_single(
     lp_ratio = std::move(elbo_best.lp_ratio);
   }
   parameter_writer(constrained_draws_mat.matrix());
+  parameter_writer();
   auto end_pathfinder_time = std::chrono::steady_clock::now();
   double pathfinder_delta_time
       = std::chrono::duration_cast<std::chrono::milliseconds>(
             end_pathfinder_time - start_pathfinder_time)
             .count()
         / 1000.0;
-  parameter_writer();
   const auto time_header = std::string("Elapsed Time: ");
   std::string optim_time_str
       = time_header + std::to_string(optim_delta_time) + " seconds (lbfgs)";

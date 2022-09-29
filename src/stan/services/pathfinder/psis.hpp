@@ -12,13 +12,16 @@ namespace psis {
 namespace internal {
 
 /**
- * Compute log joint likelihood
- * @tparam EigArray1 An Eigen type inheriting from `ArrayBase` with unknown
+ * Compute log joint likelihood parameter estimates from generalized pareto distribution and the samples
+ *  the parameters were estimated from.
+ * @tparam EigArray1 An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
- * @tparam EigArray2 An Eigen type inheriting from `ArrayBase` with unknown
+ * @tparam EigArray2 An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
- * @param[in] theta Estimates from gpd estimation
+ * @param[in] theta Estimates from generalized pareto distribution estimation
  * @param[in] x The sample that the parameters were estimated from.
+ * @return Array of the joint log likelihood of parameter estimates from generalized pareto distribution and the samples
+ *  the parameters were estimated from.
  */
 template <typename EigArray1, typename EigArray2>
 inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
@@ -37,13 +40,13 @@ inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
  * Estimate parameters of the Generalized Pareto distribution
  *
  * Given a sample `x`, Estimate the parameters `k` and $\sigma$ of
- * the generalized Pareto distribution (GPD), assuming the location parameter is
+ * the Generalized Pareto Distribution (GPD), assuming the location parameter is
  * 0. By default the fit uses a prior for `k`, which will stabilize
  * estimates for very small sample sizes (and low effective sample sizes in the
  * case of MCMC samples). The weakly informative prior is a Gaussian prior
  * centered at 0.5.
  *
- * @tparam EigArray An Eigen type inheriting from `ArrayBase` with unknown
+ * @tparam EigArray An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
  * @param[in] x A numeric vector. The sample from which to estimate the
  * parameters.
@@ -92,7 +95,7 @@ inline auto gpdfit(const EigArray& x, const Eigen::Index min_grid_pts = 30) {
  * Inverse CDF of generalized pareto distribution
  * (assuming location parameter is 0)
  *
- * @tparam EigArray An Eigen type inheriting from `ArrayBase` with unknown
+ * @tparam EigArray An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
  * @param[in] p Vector of probabilities.
  * @param[in] k Scalar shape parameter.
@@ -107,7 +110,7 @@ inline auto qgpd(const EigArray& p, const double k, const double sigma) {
 /**
  * PSIS tail smoothing for a single vector
  *
- * @tparam EigArray An Eigen type inheriting from `ArrayBase` with unknown
+ * @tparam EigArray An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
  * @param[in] x Array of tail elements already sorted in ascending order.
  * @param[in] cutoff
@@ -265,7 +268,7 @@ largest_n_elements(const Eigen::Array<double, -1, 1>& arr,
 /*
  * Compute Pareto smoothed importance sampling (PSIS) log weights.
  *
- * @tparam EigArray An Eigen type inheriting from `ArrayBase` with unknown
+ * @tparam EigArray An Eigen type inheriting from `ArrayBase` with dynamic
  * compile time rows and 1 compile time column.
  * @param[in] log_ratios Array of logarithms of importance ratios
  * @param[in] tail_len Size of the tail

@@ -409,7 +409,7 @@ class BFGSLineSearch
   }
   template <typename Vec, require_vector_t<Vec> * = nullptr>
   void initialize(const Vec &params_r) {
-    Eigen::Matrix<double, Eigen::Dynamic, 1> x(params_r.size());
+    Eigen::VectorXd x(params_r.size());
     for (size_t i = 0; i < params_r.size(); i++)
       x[i] = params_r[i];
     BFGSBase::initialize(x);
