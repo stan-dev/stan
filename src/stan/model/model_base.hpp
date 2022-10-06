@@ -3,7 +3,7 @@
 
 #include <stan/io/var_context.hpp>
 #include <stan/math/rev/core.hpp>
-#ifdef STAN_MODEL_AD_HESSIAN
+#ifdef STAN_MODEL_FVAR_VAR
 #include <stan/math/mix.hpp>
 #endif
 #include <stan/model/prob_grad.hpp>
@@ -595,7 +595,7 @@ class model_base : public prob_grad {
                            bool include_tparams = true, bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
 
-#ifdef STAN_MODEL_AD_HESSIAN
+#ifdef STAN_MODEL_FVAR_VAR
 
   /**
    * Return the log density for the specified unconstrained

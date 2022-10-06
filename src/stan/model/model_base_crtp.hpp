@@ -2,7 +2,7 @@
 #define STAN_MODEL_MODEL_BASE_CRTP_HPP
 
 #include <stan/model/model_base.hpp>
-#ifdef STAN_MODEL_AD_HESSIAN
+#ifdef STAN_MODEL_FVAR_VAR
 #include <stan/math/mix.hpp>
 #endif
 #include <iostream>
@@ -210,7 +210,7 @@ class model_base_crtp : public stan::model::model_base {
                                                         msgs);
   }
 
-#ifdef STAN_MODEL_AD_HESSIAN
+#ifdef STAN_MODEL_FVAR_VAR
 
   /**
    * Return the log density for the specified unconstrained
