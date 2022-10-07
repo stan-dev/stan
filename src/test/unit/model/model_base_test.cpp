@@ -143,25 +143,25 @@ struct mock_model : public stan::model::model_base {
 
   stan::math::fvar<stan::math::var> log_prob(
       Eigen::Matrix<stan::math::fvar<stan::math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const {
+      std::ostream* msgs) const override {
     return 18;
   }
 
   stan::math::fvar<stan::math::var> log_prob_jacobian(
       Eigen::Matrix<stan::math::fvar<stan::math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const {
+      std::ostream* msgs) const override {
     return 19;
   }
 
   stan::math::fvar<stan::math::var> log_prob_propto(
       Eigen::Matrix<stan::math::fvar<stan::math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const {
+      std::ostream* msgs) const override {
     return 20;
   }
 
   stan::math::fvar<stan::math::var> log_prob_propto_jacobian(
       Eigen::Matrix<stan::math::fvar<stan::math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const {
+      std::ostream* msgs) const override {
     return 21;
   }
 #endif

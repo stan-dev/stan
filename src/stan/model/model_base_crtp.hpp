@@ -223,7 +223,7 @@ class model_base_crtp : public stan::model::model_base {
    */
   inline math::fvar<math::var> log_prob(
       Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const {
+      std::ostream* msgs) const override {
     return static_cast<const M*>(this)->template log_prob<false, false>(
         params_r, msgs);
   }
@@ -243,7 +243,7 @@ class model_base_crtp : public stan::model::model_base {
    */
   inline math::fvar<math::var> log_prob_jacobian(
       Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const {
+      std::ostream* msgs) const override {
     return static_cast<const M*>(this)->template log_prob<false, true>(params_r,
                                                                        msgs);
   }
@@ -259,7 +259,7 @@ class model_base_crtp : public stan::model::model_base {
    */
   inline math::fvar<math::var> log_prob_propto(
       Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const {
+      std::ostream* msgs) const override {
     return static_cast<const M*>(this)->template log_prob<true, false>(params_r,
                                                                        msgs);
   }
@@ -279,7 +279,7 @@ class model_base_crtp : public stan::model::model_base {
    */
   inline math::fvar<math::var> log_prob_propto_jacobian(
       Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const {
+      std::ostream* msgs) const override {
     return static_cast<const M*>(this)->template log_prob<true, true>(params_r,
                                                                       msgs);
   }
