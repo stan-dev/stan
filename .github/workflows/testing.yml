@@ -37,7 +37,7 @@ jobs:
           echo "O=0" >> make/local
           python runTests.py -j 2 src/test/unit
 
-run-fvar-var-tests:
+  run-fvar-var-tests:
     name: run stan fvar-var model tests
     runs-on: ${{ matrix.os }}
     strategy:
