@@ -218,7 +218,8 @@ TEST(model, modelTemplateLogProb) {
   EXPECT_FLOAT_EQ(18, bm.log_prob(params_r_fv, msgs).val().val());
   EXPECT_FLOAT_EQ(19, bm.log_prob_jacobian(params_r_fv, msgs).val().val());
   EXPECT_FLOAT_EQ(20, bm.log_prob_propto(params_r_fv, msgs).val().val());
-  EXPECT_FLOAT_EQ(21, bm.log_prob_propto_jacobian(params_r_fv, msgs).val().val());
+  EXPECT_FLOAT_EQ(21,
+                  bm.log_prob_propto_jacobian(params_r_fv, msgs).val().val());
 
   double v9 = bm.template log_prob<false, false>(params_r_fv, msgs).val().val();
   EXPECT_FLOAT_EQ(18, v9);
