@@ -19,11 +19,27 @@ namespace services {
  * sample writer and writing messages to the logger, returning a
  * return code of 0 if successful.
  *
+ * Interrupts are called 
+ *
  * @tparam Model a Stan model
  * @tparam jacobian `true` to include Jacobian adjustment for
  * constrained parameters
- * @parma[in] m model from which to sample from the Laplace approximation
- * @parma[in] theta_hat mode at which to center the Laplace approximate
+ * @parma[in] m model from which to sample
+ * @parma[in] theta_hat mode at which to center the Laplace
+ * approximation  
+ * @param[in] draws number of draws to generate
+ * @param[in] random_seed seed for generating random numbers in the
+ * Stan program and in sampling  
+ * @param[in] refresh period between iterations at which updates are
+ * given 
+ * @param[in] interrupt callback for interrupting sampling
+ * @param[in,out] logger callback for writing console messages from
+ * sampler and from Stan programs
+ * @param[in,out] sample_writer callback for writing parameter names
+ * and then draws
+ * @return a return code, with 0 indicating success and
+ * `stan::error_codes::DATAERROR` idicating misconfiguration
+ * @throw any exception raised in executing the Stan program
  */
 template <class Model, bool jacobian>
 int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
@@ -57,6 +73,10 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
     return error_codes::DATAERR;
   }
 
+  std::vector<std::string> param_tp_gq_names;
+  model.constrained_param_names(param_tp_gq_names, true, true);
+  size_t draw_size = param_tp_gq_names.size();
+
   // write names of params, tps, and gqs to sample writer
   std::vector<std::string> names;
   static const bool include_tp = true;
@@ -64,8 +84,7 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   model.constrained_param_names(names, include_tp, include_gq);
   sample_writer(names);
 
-  // TODO: figure out how to get msgs out of logger and write
-  // construct model functor for autodiff based on jacobian
+  // create log density functor
   std::stringstream log_density_msgs;
   auto log_density_fun = [&](const Eigen::Matrix<var, -1, 1>& theta) {
     return model.template log_prob<true, jacobian, var>(
@@ -73,27 +92,28 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
       log_density_msgs);
   };
 
-  logger.info("Calculating Cholesky factor of inverse negative Hessian");
+  // calculate inverse negative Hessian's Cholesky factor
+  logger.info("Calculating Cholesky factor of inverse negative Hessian\n");
   double log_p;  // dummy
   Eigen::VectorXd grad;  // dummy
   Eigen::MatrixXd hessian;
-  logger.info("    Calculating Hessian");
+  logger.info("    Calculating Hessian\n");
   math::internal::finite_diff_hessian_auto(log_density_fun, theta_hat, log_p,
 					   grad, hessian);
   std::string log_density_msgs_str = log_density_msgs.str();
-  if (log_density_msgs_str.size() > 0) {
-    logger.info(log_density_msgs_str);
-  }
-  logger.info("    Calculating inverse of Cholesky factor of negative Hessian");
+  logger.info(log_density_msgs_str);
+  logger.info("    Calculating inverse of Cholesky factor of negative Hessian\n");
   Eigen::MatrixXd L_neg_hessian = (-hessian).llt().matrixL();
   Eigen::MatrixXd inv_sqrt_neg_hessian = L_neg_hessian.inverse();
 
+  // generate draws
   boost::ecuyer1988 rng = util::create_rng(random_seed, 0);
+  Eigen::VectorXd draw_vec;  // declare draw_vec, msgs here to avoid re-alloc
   for (int m = 0; m < draws; ++m) {
     interrupt();  // allow interpution each iteration
     if (refresh > 0 && m % refresh == 0) {
       std::stringstream log_msg;
-      log_msg << "iteration " << m;
+      log_msg << "iteration " << m << std::endl;
       logger.info(log_msg);
     }
     Eigen::VectorXd z(num_unc_params);
@@ -101,11 +121,11 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
       z(n) = math::std_normal_rng(rng);
     }
     auto unc_draw = theta_hat + z * inv_sqrt_neg_hessian;
-    Eigen::VectorXd draw;
     std::stringstream msgs;
-    model.write_array(rng, unc_draw, draw, include_tp, include_gq, msgs);
-    std::string msgs_str = msgs.str();
-    if (msgs_str.size() > 0) logger.info(msgs_str);
+    model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq, msgs);
+    logger.info(msgs);
+    std::vector<double> draw(&draw_vec(0), &draw_vec(0) + draw_size);
+    sample_writer(draw);
   }
   return error_codes::OK;
 }
