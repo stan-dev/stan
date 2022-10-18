@@ -20,17 +20,27 @@ class ServicesLaplaceSample: public ::testing::Test {
 
   void SetUp() {
     stan::io::empty_var_context var_context;
-    model = new stan_model(var_context);
+    model = new stan_model(var_context);  // typedef from multi_normal.hpp
   }
 
   void TearDown() { delete model; }
 
-  stan::test::unit::instrumented_interrupt interrupt;
+  stan_model* model;
   std::stringstream msgs;
   stan::callbacks::stream_logger logger;
-  stan_model* model;
+  stan::test::unit::instrumented_interrupt interrupt;
 };
 
 TEST_F(ServicesLaplaceSample, bar) {
-  EXPECT_EQ(1, 1);
+  EXPECT_EQ(1,1);
+
+
+  Eigen::VectorXd theta_hat(2);
+  theta_hat << 2, 3;
+  int draws = 10;
+  unsigned int seed = 1234;
+  int refresh = 1;
+  std::stringstream sample_ss;
+  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+  stan::services::laplace_sample<true>(*model, theta_hat, draws, seed, refresh, interrupt, logger, sample_writer);
 }
