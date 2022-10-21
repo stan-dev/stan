@@ -124,7 +124,6 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   }
 }
 }  // namespace internal
-
   
 /**
  * Take the specified number of draws from the Laplace approximation
