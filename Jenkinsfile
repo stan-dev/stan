@@ -64,7 +64,7 @@ String stan_pr() {
         env.BRANCH_NAME
     }
 }
-String integration_tests_flags() { 
+String integration_tests_flags() {
     if (params.compile_all_model) {
         '--no-ignore-models '
     } else {
@@ -97,7 +97,7 @@ pipeline {
     }
     environment {
         GCC = 'g++'
-        PARALLEL = 8
+        PARALLEL = 4
         MAC_CXX = 'clang++'
         LINUX_CXX = 'clang++-6.0'
         WIN_CXX = 'g++'
@@ -366,18 +366,17 @@ pipeline {
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
                             echo 'CXX=${LINUX_CXX}' >> make/local
-                            echo 'PRECOMPILED_HEADERS=false' >> make/local
                             make clean-all
                             make -j${PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
-                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
+                            python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                            python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
-                            ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
-                            ./runTests.py src/test/integration/standalone_functions_test.cpp
-                            ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                            python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp
                         """
                     }
                     post { always { deleteDir() } }
@@ -406,8 +405,8 @@ pipeline {
                             make clean-all
                             make -j${PARALLEL} build
                             cd ..
-                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
-                            ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
+                            python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                            python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
@@ -483,8 +482,11 @@ pipeline {
                 }
             steps {
                 build(job: "Stan/CmdStan/${cmdstan_pr()}",
-                      parameters: [string(name: 'stan_pr', value: stan_pr()),
-                                   string(name: 'math_pr', value: params.math_pr)])
+                      parameters: [
+                        string(name: 'stan_pr', value: stan_pr()),
+                        string(name: 'math_pr', value: params.math_pr),
+                        string(name: 'stanc3_bin_url', value: stanc3_bin_url())
+                      ])
             }
         }
 

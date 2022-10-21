@@ -398,7 +398,6 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
                                assign_cols, "right hand side columns",
                                y.cols());
   using arena_vec = std::vector<int, stan::math::arena_allocator<int>>;
-  using pair_type = std::pair<int, arena_vec>;
   arena_vec x_col_idx(assign_cols);
   arena_vec x_row_idx(assign_rows);
   std::unordered_set<int> x_set;

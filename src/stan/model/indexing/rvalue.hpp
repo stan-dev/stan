@@ -338,7 +338,7 @@ template <typename Mat, require_dense_dynamic_t<Mat>* = nullptr>
 inline auto rvalue(Mat&& x, const char* name, index_min_max idx) {
   math::check_range("matrix[min_max] min row indexing", name, x.rows(),
                     idx.min_);
-  if (idx.max_ > idx.min_) {
+  if (idx.max_ >= idx.min_) {
     math::check_range("matrix[min_max] max row indexing", name, x.rows(),
                       idx.max_);
     return x.middleRows(idx.min_ - 1, idx.max_ - idx.min_ + 1);
@@ -555,7 +555,6 @@ inline plain_type_t<EigMat> rvalue(EigMat&& x, const char* name,
                                    const index_multi& col_idx) {
   const auto& x_ref = stan::math::to_ref(x);
   const int rows = rvalue_index_size(row_idx, x_ref.rows());
-  const int cols = rvalue_index_size(col_idx, x_ref.cols());
   plain_type_t<EigMat> x_ret(rows, col_idx.ns_.size());
   for (int j = 0; j < col_idx.ns_.size(); ++j) {
     const Eigen::Index n = col_idx.ns_[j];

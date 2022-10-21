@@ -2,6 +2,9 @@
 #define STAN_MODEL_MODEL_BASE_CRTP_HPP
 
 #include <stan/model/model_base.hpp>
+#ifdef STAN_MODEL_FVAR_VAR
+#include <stan/math/mix.hpp>
+#endif
 #include <iostream>
 #include <utility>
 #include <vector>
@@ -206,6 +209,81 @@ class model_base_crtp : public stan::model::model_base {
     return static_cast<const M*>(this)->transform_inits(context, params_r,
                                                         msgs);
   }
+
+#ifdef STAN_MODEL_FVAR_VAR
+
+  /**
+   * Return the log density for the specified unconstrained
+   * parameters, without Jacobian and with normalizing constants for
+   * probability functions.
+   *
+   * @param[in] params_r unconstrained parameters
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  inline math::fvar<math::var> log_prob(
+      Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<false, false>(
+        params_r, msgs);
+  }
+
+  /**
+   * Return the log density for the specified unconstrained
+   * parameters, with Jacobian correction for constraints and with
+   * normalizing constants for probability functions.
+   *
+   * <p>The Jacobian is of the inverse transform from unconstrained
+   * parameters to constrained parameters; full details for Stan
+   * language types can be found in the language reference manual.
+   *
+   * @param[in] params_r unconstrained parameters
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  inline math::fvar<math::var> log_prob_jacobian(
+      Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<false, true>(params_r,
+                                                                       msgs);
+  }
+
+  /**
+   * Return the log density for the specified unconstrained
+   * parameters, without Jacobian correction for constraints and
+   * dropping normalizing constants.
+   *
+   * @param[in] params_r unconstrained parameters
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  inline math::fvar<math::var> log_prob_propto(
+      Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<true, false>(params_r,
+                                                                       msgs);
+  }
+
+  /**
+   * Return the log density for the specified unconstrained
+   * parameters, with Jacobian correction for constraints and dropping
+   * normalizing constants.
+   *
+   * <p>The Jacobian is of the inverse transform from unconstrained
+   * parameters to constrained parameters; full details for Stan
+   * language types can be found in the language reference manual.
+   *
+   * @param[in] params_r unconstrained parameters
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  inline math::fvar<math::var> log_prob_propto_jacobian(
+      Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const override {
+    return static_cast<const M*>(this)->template log_prob<true, true>(params_r,
+                                                                      msgs);
+  }
+#endif
 };
 
 }  // namespace model

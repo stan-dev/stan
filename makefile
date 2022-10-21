@@ -15,6 +15,7 @@ help:
 -include make/local                       # user-defined variables
 
 MATH ?= lib/stan_math/
+RAPIDJSON ?= lib/rapidjson_1.1.0/
 
 -include $(MATH)make/compiler_flags
 -include $(MATH)make/dependencies
@@ -24,7 +25,7 @@ include make/cpplint                      # cpplint
 include make/tests                        # tests
 include make/clang-tidy
 
-INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I ./src/
+INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I ./src/ -I $(RAPIDJSON)
 
 .PHONY: help
 help:

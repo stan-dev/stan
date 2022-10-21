@@ -219,7 +219,6 @@ inline auto rvalue(VarMat&& x, const char* name, const index_multi& row_idx,
   const auto ret_rows = row_idx.ns_.size();
   const auto ret_cols = col_idx.ns_.size();
   const Eigen::Index x_rows = x.rows();
-  const Eigen::Index x_cols = x.cols();
   arena_t<plain_type_t<value_type_t<VarMat>>> x_ret_val(ret_rows, ret_cols);
   arena_std_vec row_idx_vals(ret_rows);
   arena_std_vec col_idx_vals(ret_cols);
