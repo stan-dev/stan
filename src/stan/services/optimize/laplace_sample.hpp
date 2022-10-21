@@ -17,25 +17,24 @@ namespace internal {
 
 template <bool jacobian, typename Model>
 void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
-		    int draws, unsigned int random_seed,
-		    int refresh, callbacks::interrupt& interrupt,
-		    callbacks::logger& logger,
-		    callbacks::writer& sample_writer) {
+                    int draws, unsigned int random_seed, int refresh,
+                    callbacks::interrupt& interrupt, callbacks::logger& logger,
+                    callbacks::writer& sample_writer) {
   if (draws <= 0) {
     throw std::domain_error("Number of draws must be > 0; found draws = "
-			    + std::to_string(draws));
+                            + std::to_string(draws));
   }
-  
+
   std::vector<std::string> unc_param_names;
   model.unconstrained_param_names(unc_param_names, false, false);
   int num_unc_params = unc_param_names.size();
 
   if (theta_hat.size() != num_unc_params) {
-    throw::std::domain_error("Specified mode is wrong size; expected "
-			     + std::to_string(num_unc_params)
-			     + " unconstrained parameters, but specified mode has size = "
-			     + std::to_string(theta_hat.size()));
-			     
+    throw ::std::domain_error(
+        "Specified mode is wrong size; expected "
+        + std::to_string(num_unc_params)
+        + " unconstrained parameters, but specified mode has size = "
+        + std::to_string(theta_hat.size()));
   }
 
   std::vector<std::string> param_tp_gq_names;
@@ -54,22 +53,22 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   // create log density functor for vars and vals
   std::stringstream log_density_msgs;
   auto log_density_fun
-    = [&](const Eigen::Matrix<stan::math::var, -1, 1>& theta) {
-    return model.template log_prob<true, jacobian, stan::math::var>(
-      const_cast<Eigen::Matrix<stan::math::var, -1, 1>&>(theta),
-      &log_density_msgs);
-  };
+      = [&](const Eigen::Matrix<stan::math::var, -1, 1>& theta) {
+          return model.template log_prob<true, jacobian, stan::math::var>(
+              const_cast<Eigen::Matrix<stan::math::var, -1, 1>&>(theta),
+              &log_density_msgs);
+        };
 
   // calculate inverse negative Hessian's Cholesky factor
   if (refresh > 0) {
     logger.info("Calculating Hessian\n");
   }
-  double log_p;  // dummy
+  double log_p;          // dummy
   Eigen::VectorXd grad;  // dummy
   Eigen::MatrixXd hessian;
   interrupt();
   math::internal::finite_diff_hessian_auto(log_density_fun, theta_hat, log_p,
-					   grad, hessian);
+                                           grad, hessian);
   if (refresh > 0) {
     logger.info(log_density_msgs);
     logger.info("\n");
@@ -86,7 +85,7 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   Eigen::MatrixXd inv_sqrt_neg_hessian = L_neg_hessian.inverse().transpose();
   interrupt();
   Eigen::MatrixXd half_hessian = 0.5 * hessian;
-   
+
   // generate draws and output to sample writer
   if (refresh > 0) {
     logger.info("Generating draws");
@@ -109,8 +108,8 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
     Eigen::VectorXd unc_draw = theta_hat + inv_sqrt_neg_hessian * z;
     double log_p = log_density_fun(unc_draw).val();
     Eigen::VectorXd diff = unc_draw - theta_hat;
-    double log_q = diff.transpose() * half_hessian * diff; 
-    
+    double log_q = diff.transpose() * half_hessian * diff;
+
     std::stringstream msgs;
     model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq, &msgs);
     if (refresh > 0) {
@@ -124,7 +123,7 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   }
 }
 }  // namespace internal
-  
+
 /**
  * Take the specified number of draws from the Laplace approximation
  * for the model at the specified unconstrained mode, writing the
@@ -143,10 +142,10 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
  * @tparam Model a Stan model
  * @parma[in] m model from which to sample
  * @parma[in] theta_hat unconstrained mode at which to center the
- * Laplace approximation  
+ * Laplace approximation
  * @param[in] draws number of draws to generate
  * @param[in] random_seed seed for generating random numbers in the
- * Stan program and in sampling  
+ * Stan program and in sampling
  * @param[in] refresh period between iterations at which updates are
  * given, with a value of 0 turning off all messages
  * @param[in] interrupt callback for interrupting sampling
@@ -158,14 +157,13 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
  */
 template <bool jacobian, typename Model>
 int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
-		   int draws, unsigned int random_seed,
-		   int refresh, callbacks::interrupt& interrupt,
-		   callbacks::logger& logger,
-		   callbacks::writer& sample_writer) {
+                   int draws, unsigned int random_seed, int refresh,
+                   callbacks::interrupt& interrupt, callbacks::logger& logger,
+                   callbacks::writer& sample_writer) {
   try {
     internal::laplace_sample<jacobian>(model, theta_hat, draws, random_seed,
-				       refresh, interrupt, logger,
-				       sample_writer);
+                                       refresh, interrupt, logger,
+                                       sample_writer);
     return error_codes::OK;
   } catch (const std::exception& e) {
     if (refresh >= 0) {
@@ -181,5 +179,5 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
 }
 }  // namespace services
 }  // namespace stan
-  
+
 #endif
