@@ -5,13 +5,6 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 
-struct mock_callback : public stan::callbacks::interrupt {
-  int n;
-  mock_callback() : n(0) {}
-
-  void operator()() { n++; }
-};
-
 class values : public stan::callbacks::stream_writer {
  public:
   std::vector<std::string> names_;
@@ -56,11 +49,11 @@ TEST_F(ServicesOptimizeNewton, rosenbrock) {
 
   int num_iterations = 1000;
   bool save_iterations = true;
-  mock_callback callback;
+  stan::test::unit::instrumented_interrupt interrupt;
 
   int return_code = stan::services::optimize::newton(
       model, context, seed, chain, init_radius, num_iterations, save_iterations,
-      callback, logger, init, parameter);
+      interrupt, logger, init, parameter);
 
   EXPECT_EQ(0, return_code);
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
@@ -83,7 +76,7 @@ TEST_F(ServicesOptimizeNewton, rosenbrock) {
   EXPECT_NEAR(1, parameter.states_.back()[2], 1e-3)
       << "optimal value should be (1, 1)";
   EXPECT_FLOAT_EQ(return_code, 0);
-  EXPECT_GT(callback.n, 0);
+  EXPECT_LT(0, interrupt.call_count());
 }
 
 TEST_F(ServicesOptimizeNewton, rosenbrock_no_save_iterations) {
@@ -93,11 +86,11 @@ TEST_F(ServicesOptimizeNewton, rosenbrock_no_save_iterations) {
 
   int num_iterations = 1000;
   bool save_iterations = false;
-  mock_callback callback;
+  stan::test::unit::instrumented_interrupt interrupt;
 
   int return_code = stan::services::optimize::newton(
       model, context, seed, chain, init_radius, num_iterations, save_iterations,
-      callback, logger, init, parameter);
+      interrupt, logger, init, parameter);
 
   EXPECT_EQ(0, return_code);
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
@@ -118,5 +111,5 @@ TEST_F(ServicesOptimizeNewton, rosenbrock_no_save_iterations) {
   EXPECT_NEAR(1, parameter.states_.back()[2], 1e-3)
       << "optimal value should be (1, 1)";
   EXPECT_FLOAT_EQ(return_code, 0);
-  EXPECT_GT(callback.n, 0);
+  EXPECT_LT(0, interrupt.call_count());
 }

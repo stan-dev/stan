@@ -5,13 +5,6 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 
-struct mock_callback : public stan::callbacks::interrupt {
-  int n;
-  mock_callback() : n(0) {}
-
-  void operator()() { n++; }
-};
-
 class values : public stan::callbacks::stream_writer {
  public:
   std::vector<std::string> names_;
@@ -56,11 +49,11 @@ TEST_F(ServicesOptimizeBfgs, rosenbrock) {
 
   bool save_iterations = true;
   int refresh = 0;
-  mock_callback callback;
+  stan::test::unit::instrumented_interrupt interrupt;
 
   int return_code = stan::services::optimize::bfgs(
       model, context, seed, chain, init_radius, 0.001, 1e-12, 10000, 1e-8,
-      10000000, 1e-8, 2000, save_iterations, refresh, callback, logger, init,
+      10000000, 1e-8, 2000, save_iterations, refresh, interrupt, logger, init,
       parameter);
 
   EXPECT_EQ(logger.call_count(), logger.call_count_info())
@@ -87,5 +80,5 @@ TEST_F(ServicesOptimizeBfgs, rosenbrock) {
   EXPECT_FLOAT_EQ(1, parameter.states_.back()[2])
       << "optimal value should be (1, 1)";
   EXPECT_FLOAT_EQ(return_code, 0);
-  EXPECT_EQ(19, callback.n);
+  EXPECT_EQ(19, interrupt.call_count());
 }
