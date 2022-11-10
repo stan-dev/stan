@@ -5,44 +5,7 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 
-class values : public stan::callbacks::stream_writer {
- public:
-  std::vector<std::string> names_;
-  std::vector<std::vector<double> > states_;
-
-  values(std::ostream& stream) : stan::callbacks::stream_writer(stream) {}
-
-  /**
-   * Writes a set of names.
-   *
-   * @param[in] names Names in a std::vector
-   */
-  void operator()(const std::vector<std::string>& names) { names_ = names; }
-
-  /**
-   * Writes a set of values.
-   *
-   * @param[in] state Values in a std::vector
-   */
-  void operator()(const std::vector<double>& state) {
-    states_.push_back(state);
-  }
-};
-
-class ServicesOptimizeLbfgs : public testing::Test {
- public:
-  ServicesOptimizeLbfgs()
-      : init(init_ss), parameter(parameter_ss), model(context, 0, &model_ss) {}
-
-  std::stringstream init_ss, parameter_ss, model_ss;
-  stan::callbacks::stream_writer init;
-  stan::test::unit::instrumented_logger logger;
-  values parameter;
-  stan::io::empty_var_context context;
-  stan_model model;
-};
-
-TEST_F(ServicesOptimizeLbfgs, rosenbrock) {
+TEST_F(ServicesOptimize, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;

@@ -1,12 +1,11 @@
-#include <stan/services/optimize/lbfgs.hpp>
+#include <stan/services/optimize/bfgs.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/simple_jacobian.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <cmath>
 
-TEST_F(ServicesOptimize, with_jacobian) {
+TEST_F(ServicesOptimize, withJacobian) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -15,8 +14,8 @@ TEST_F(ServicesOptimize, with_jacobian) {
   int refresh = 0;
   stan::test::unit::instrumented_interrupt interrupt;
 
-  int return_code = stan::services::optimize::lbfgs<stan_model, true>(
-      model, context, seed, chain, init_radius, 5, 0.001, 1e-12, 10000, 1e-8,
+  int return_code = stan::services::optimize::bfgs<stan_model, true>(
+      model, context, seed, chain, init_radius, 0.001, 1e-12, 10000, 1e-8,
       10000000, 1e-8, 2000, save_iterations, refresh, interrupt, logger, init,
       parameter);
 
@@ -27,9 +26,10 @@ TEST_F(ServicesOptimize, with_jacobian) {
   EXPECT_EQ("lp__", parameter.names_[0]);
   EXPECT_EQ("sigma", parameter.names_[1]);
   EXPECT_NEAR((3 + std::sqrt(13)) / 2, parameter.states_.back()[1], 0.0001);
+  EXPECT_GT(interrupt.call_count(), 0);
 }
 
-TEST_F(ServicesOptimize, without_jacobian) {
+TEST_F(ServicesOptimize, withoutJacobian) {
   unsigned int seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -38,8 +38,8 @@ TEST_F(ServicesOptimize, without_jacobian) {
   int refresh = 0;
   stan::test::unit::instrumented_interrupt interrupt;
 
-  int return_code = stan::services::optimize::lbfgs<stan_model, false>(
-      model, context, seed, chain, init_radius, 5, 0.001, 1e-12, 10000, 1e-8,
+  int return_code = stan::services::optimize::bfgs<stan_model, false>(
+      model, context, seed, chain, init_radius, 0.001, 1e-12, 10000, 1e-8,
       10000000, 1e-8, 2000, save_iterations, refresh, interrupt, logger, init,
       parameter);
 
@@ -50,4 +50,5 @@ TEST_F(ServicesOptimize, without_jacobian) {
   EXPECT_EQ("lp__", parameter.names_[0]);
   EXPECT_EQ("sigma", parameter.names_[1]);
   EXPECT_NEAR(3, parameter.states_.back()[1], 0.0001);
+  EXPECT_GT(interrupt.call_count(), 1);
 }

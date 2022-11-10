@@ -11,10 +11,41 @@
 #include <exception>
 #include <atomic>
 #include <mutex>
+
+
 namespace stan {
 namespace test {
 namespace unit {
 
+/**
+ * Mock writer that records names and states written.
+ */
+class values_writer : public stan::callbacks::stream_writer {
+ public:
+  std::vector<std::string> names_;
+  std::vector<std::vector<double> > states_;
+
+  values_writer(std::ostream& stream)
+    : stan::callbacks::stream_writer(stream) {}
+
+  /**
+   * Writes a set of names.
+   *
+   * @param[in] names Names in a std::vector
+   */
+  void operator()(const std::vector<std::string>& names) { names_ = names; }
+
+  /**
+   * Writes a set of values.
+   *
+   * @param[in] state Values in a std::vector
+   */
+  void operator()(const std::vector<double>& state) {
+    states_.push_back(state);
+  }
+};
+
+  
 /**
  * instrumented_interrupt counts the number of times it is
  * called and makes the count accessible via a method.
@@ -261,5 +292,23 @@ class instrumented_logger : public stan::callbacks::logger {
 }  // namespace unit
 }  // namespace test
 }  // namespace stan
+
+/**
+ * Container class for holding model, callbacks, and streams on which
+ * callbacks are based.
+ */
+struct ServicesOptimize : public testing::Test {
+  ServicesOptimize()
+      : init(init_ss), parameter(parameter_ss), model(context, 0, &model_ss) {}
+
+  std::stringstream init_ss, parameter_ss, model_ss;
+  stan::test::unit::instrumented_logger logger;
+  stan::callbacks::stream_writer init;
+  stan::test::unit::values_writer parameter;
+  stan::io::empty_var_context context;
+  stan_model model;
+};
+
+
 
 #endif
