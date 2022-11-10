@@ -5,6 +5,18 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 
+struct ServicesOptimize : public testing::Test {
+  ServicesOptimize()
+      : init(init_ss), parameter(parameter_ss), model(context, 0, &model_ss) {}
+
+  std::stringstream init_ss, parameter_ss, model_ss;
+  stan::test::unit::instrumented_logger logger;
+  stan::callbacks::stream_writer init;
+  stan::test::unit::values_writer parameter;
+  stan::io::empty_var_context context;
+  stan_model model;
+};
+
 TEST_F(ServicesOptimize, withJacobian) {
   unsigned int seed = 0;
   unsigned int chain = 1;

@@ -1,16 +1,18 @@
 #ifndef TEST__UNIT__INSTRUMENTED_CALLBACKS_HPP
 #define TEST__UNIT__INSTRUMENTED_CALLBACKS_HPP
 
+#include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/callbacks/interrupt.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
-#include <map>
-#include <string>
-#include <iostream>
-#include <exception>
 #include <atomic>
+#include <exception>
+#include <iostream>
+#include <map>
 #include <mutex>
+#include <string>
 
 
 namespace stan {
@@ -288,26 +290,9 @@ class instrumented_logger : public stan::callbacks::logger {
   std::vector<std::string> error_;
   std::vector<std::string> fatal_;
 };
-
 }  // namespace unit
 }  // namespace test
 }  // namespace stan
-
-/**
- * Container class for holding model, callbacks, and streams on which
- * callbacks are based.
- */
-struct ServicesOptimize : public testing::Test {
-  ServicesOptimize()
-      : init(init_ss), parameter(parameter_ss), model(context, 0, &model_ss) {}
-
-  std::stringstream init_ss, parameter_ss, model_ss;
-  stan::test::unit::instrumented_logger logger;
-  stan::callbacks::stream_writer init;
-  stan::test::unit::values_writer parameter;
-  stan::io::empty_var_context context;
-  stan_model model;
-};
 
 
 
