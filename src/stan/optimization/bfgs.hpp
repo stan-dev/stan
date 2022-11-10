@@ -289,7 +289,7 @@ class BFGSMinimizer {
   }
 };
 
-template <class M, bool jacobian=false>
+template <class M, bool jacobian = false>
 class ModelAdaptor {
  private:
   M &_model;
@@ -384,16 +384,18 @@ class ModelAdaptor {
 
 /**
  * @tparam jacobian `true` to include Jacobian adjustment (default `false`)
- */  
+ */
 template <typename M, typename QNUpdateType, typename Scalar = double,
           int DimAtCompile = Eigen::Dynamic, bool jacobian = false>
-class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType,
-                                            Scalar, DimAtCompile> {
+class BFGSLineSearch
+    : public BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
+                           DimAtCompile> {
  private:
   ModelAdaptor<M, jacobian> _adaptor;
 
  public:
-  typedef BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar, DimAtCompile>
+  typedef BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
+                        DimAtCompile>
       BFGSBase;
   typedef typename BFGSBase::VectorT vector_t;
   typedef typename stan::math::index_type<vector_t>::type idx_t;

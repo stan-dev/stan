@@ -5,7 +5,6 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 
-
 TEST_F(ServicesOptimize, rosenbrock) {
   unsigned int seed = 0;
   unsigned int chain = 1;

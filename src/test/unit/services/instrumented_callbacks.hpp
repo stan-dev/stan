@@ -12,7 +12,6 @@
 #include <atomic>
 #include <mutex>
 
-
 namespace stan {
 namespace test {
 namespace unit {
@@ -23,10 +22,10 @@ namespace unit {
 class values_writer : public stan::callbacks::stream_writer {
  public:
   std::vector<std::string> names_;
-  std::vector<std::vector<double> > states_;
+  std::vector<std::vector<double>> states_;
 
   values_writer(std::ostream& stream)
-    : stan::callbacks::stream_writer(stream) {}
+      : stan::callbacks::stream_writer(stream) {}
 
   /**
    * Writes a set of names.
@@ -45,7 +44,6 @@ class values_writer : public stan::callbacks::stream_writer {
   }
 };
 
-  
 /**
  * instrumented_interrupt counts the number of times it is
  * called and makes the count accessible via a method.
@@ -308,7 +306,5 @@ struct ServicesOptimize : public testing::Test {
   stan::io::empty_var_context context;
   stan_model model;
 };
-
-
 
 #endif
