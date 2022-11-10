@@ -49,7 +49,7 @@ namespace optimize {
  * @param[in,out] parameter_writer output for parameter values
  * @return error_codes::OK if successful
  */
-template <class Model, bool jacobian=false>
+template <class Model, bool jacobian = false>
 int bfgs(Model& model, const stan::io::var_context& init,
          unsigned int random_seed, unsigned int chain, double init_radius,
          double init_alpha, double tol_obj, double tol_rel_obj, double tol_grad,
@@ -65,7 +65,8 @@ int bfgs(Model& model, const stan::io::var_context& init,
 
   std::stringstream bfgs_ss;
   typedef stan::optimization::BFGSLineSearch<
-    Model, stan::optimization::BFGSUpdate_HInv<>, double, Eigen::Dynamic, jacobian>
+      Model, stan::optimization::BFGSUpdate_HInv<>, double, Eigen::Dynamic,
+      jacobian>
       Optimizer;
   Optimizer bfgs(model, cont_vector, disc_vector, &bfgs_ss);
   bfgs._ls_opts.alpha0 = init_alpha;

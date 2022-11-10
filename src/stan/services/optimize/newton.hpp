@@ -54,7 +54,7 @@ int newton(Model& model, const stan::io::var_context& init,
   try {
     std::stringstream message;
     lp = model.template log_prob<false, jacobian>(cont_vector, disc_vector,
-						  &message);
+                                                  &message);
     logger.info(message);
   } catch (const std::exception& e) {
     logger.info("");
@@ -97,7 +97,7 @@ int newton(Model& model, const stan::io::var_context& init,
     interrupt();
     lastlp = lp;
     lp = stan::optimization::newton_step<Model, jacobian>(model, cont_vector,
-							  disc_vector);
+                                                          disc_vector);
 
     std::stringstream msg2;
     msg2 << "Iteration " << std::setw(2) << (m + 1) << "."

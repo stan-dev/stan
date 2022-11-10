@@ -59,7 +59,7 @@ double newton_step(M& model, std::vector<double>& params_r,
       new_params_r[i] = params_r[i] - step_size * g[i];
     try {
       f1 = stan::model::log_prob_grad<true, jacobian>(model, new_params_r,
-						      params_i, gradient);
+                                                      params_i, gradient);
     } catch (std::exception& e) {
       // FIXME:  this is not a good way to handle a general exception
       f1 = -1e100;
