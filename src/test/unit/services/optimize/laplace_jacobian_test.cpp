@@ -31,7 +31,6 @@ class ServicesLaplaceJacobian : public ::testing::Test {
   stan::test::unit::instrumented_interrupt interrupt;
 };
 
-
 TEST_F(ServicesLaplaceJacobian, laplace_jacobian_adjust) {
   Eigen::VectorXd theta_hat(1);
   theta_hat << 1.09;  // test for mode sigma at 3.1, take log
@@ -50,9 +49,9 @@ TEST_F(ServicesLaplaceJacobian, laplace_jacobian_adjust) {
 
   std::stringstream sample2_ss;
   stan::callbacks::stream_writer sample_writer2(sample2_ss, "");
-  return_code = stan::services::laplace_sample<false>(
-      *model, theta_hat, draws, seed, refresh, interrupt, logger,
-      sample_writer2);
+  return_code = stan::services::laplace_sample<false>(*model, theta_hat, draws,
+                                                      seed, refresh, interrupt,
+                                                      logger, sample_writer2);
   EXPECT_EQ(stan::services::error_codes::OK, return_code);
   stan::io::stan_csv draws2
       = stan::io::stan_csv_reader::parse(sample2_ss, &out);
@@ -70,7 +69,7 @@ TEST_F(ServicesLaplaceJacobian, laplace_jacobian_adjust) {
   Eigen::MatrixXd sample1 = draws1.samples;
   Eigen::MatrixXd sample2 = draws2.samples;
 
-  EXPECT_EQ(sample1.coeff(0,0), sample2.coeff(0,0));
-  EXPECT_NE(sample1.coeff(0,1), sample2.coeff(0,1));
-  EXPECT_EQ(sample1.coeff(0,2), sample2.coeff(0,2));
+  EXPECT_EQ(sample1.coeff(0, 0), sample2.coeff(0, 0));
+  EXPECT_NE(sample1.coeff(0, 1), sample2.coeff(0, 1));
+  EXPECT_EQ(sample1.coeff(0, 2), sample2.coeff(0, 2));
 }
