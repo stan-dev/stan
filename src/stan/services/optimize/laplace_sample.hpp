@@ -105,7 +105,8 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
     }
     Eigen::VectorXd unc_draw = theta_hat + inv_sqrt_neg_hessian * z;
     std::stringstream write_array_msgs;
-    model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq, &write_array_msgs);
+    model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq,
+                      &write_array_msgs);
     if (refresh > 0) {
       if (write_array_msgs.peek() != std::char_traits<char>::eof())
         logger.info(write_array_msgs);
