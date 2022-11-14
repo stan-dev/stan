@@ -85,10 +85,10 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   interrupt();
   Eigen::MatrixXd half_hessian = 0.5 * hessian;
 
-  // generate draws and output to sample writer
   if (refresh > 0) {
     logger.info("Generating draws");
   }
+  // generate draws
   std::stringstream refresh_msg;
   boost::ecuyer1988 rng = util::create_rng(random_seed, 0);
   Eigen::VectorXd draw_vec;  // declare draw_vec, msgs here to avoid re-alloc
@@ -103,20 +103,19 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
     for (int n = 0; n < num_unc_params; ++n) {
       z(n) = math::std_normal_rng(rng);
     }
-
     Eigen::VectorXd unc_draw = theta_hat + inv_sqrt_neg_hessian * z;
-    double log_p = log_density_fun(unc_draw).val();
-    Eigen::VectorXd diff = unc_draw - theta_hat;
-    double log_q = diff.transpose() * half_hessian * diff;
-
     std::stringstream write_array_msgs;
     model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq, &write_array_msgs);
     if (refresh > 0) {
       if (write_array_msgs.peek() != std::char_traits<char>::eof())
         logger.info(write_array_msgs);
     }
+    // output draw, log_p, log_q
     std::vector<double> draw(&draw_vec(0), &draw_vec(0) + draw_size);
+    double log_p = log_density_fun(unc_draw).val();
     draw.push_back(log_p);
+    Eigen::VectorXd diff = unc_draw - theta_hat;
+    double log_q = diff.transpose() * half_hessian * diff;
     draw.push_back(log_q);
     sample_writer(draw);
   }
