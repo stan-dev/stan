@@ -107,10 +107,8 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
     std::stringstream write_array_msgs;
     model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq,
                       &write_array_msgs);
-    if (refresh > 0) {
-      if (write_array_msgs.peek() != std::char_traits<char>::eof())
+    if (refresh > 0 && write_array_msgs.peek() != std::char_traits<char>::eof())
         logger.info(write_array_msgs);
-    }
     // output draw, log_p, log_q
     std::vector<double> draw(&draw_vec(0), &draw_vec(0) + draw_size);
     double log_p = log_density_fun(unc_draw).val();
