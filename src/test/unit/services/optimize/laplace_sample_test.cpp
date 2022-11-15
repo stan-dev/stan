@@ -136,16 +136,17 @@ TEST_F(ServicesLaplaceSample, consoleOutput) {
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   std::stringstream logger_ss;
-  stan::callbacks::stream_logger sample_logger(logger_ss,logger_ss,logger_ss,logger_ss,logger_ss);
+  stan::callbacks::stream_logger sample_logger(logger_ss, logger_ss, logger_ss,
+                                               logger_ss, logger_ss);
   int return_code = stan::services::laplace_sample<true>(
-      *model, theta_hat, draws, seed, refresh, interrupt,
-      sample_logger, sample_writer);
+      *model, theta_hat, draws, seed, refresh, interrupt, sample_logger,
+      sample_writer);
   EXPECT_EQ(stan::services::error_codes::OK, return_code);
   std::string console_str = logger_ss.str();
-  EXPECT_EQ(1, count_matches(
-      "Calculating Hessian\nCalculating inverse of Cholesky factor\n",
-      console_str));
-  EXPECT_EQ(1, count_matches(
-      "Generating draws\niteration: 0\niteration: 1",
-      console_str));
+  EXPECT_EQ(1,
+            count_matches(
+                "Calculating Hessian\nCalculating inverse of Cholesky factor\n",
+                console_str));
+  EXPECT_EQ(1, count_matches("Generating draws\niteration: 0\niteration: 1",
+                             console_str));
 }
