@@ -22,6 +22,7 @@ namespace optimize {
  * Runs the Newton algorithm for a model.
  *
  * @tparam Model A model implementation
+ * @tparam jacobian `true` to include Jacobian adjustment (default `false`)
  * @param[in] model the Stan model instantiated with data
  * @param[in] init var context for initialization
  * @param[in] random_seed random seed for the random number generator
@@ -36,7 +37,7 @@ namespace optimize {
  * @param[in,out] parameter_writer output for parameter values
  * @return error_codes::OK if successful
  */
-template <class Model>
+template <class Model, bool jacobian = false>
 int newton(Model& model, const stan::io::var_context& init,
            unsigned int random_seed, unsigned int chain, double init_radius,
            int num_iterations, bool save_iterations,
@@ -52,13 +53,13 @@ int newton(Model& model, const stan::io::var_context& init,
   double lp(0);
   try {
     std::stringstream message;
-    lp = model.template log_prob<false, false>(cont_vector, disc_vector,
-                                               &message);
+    lp = model.template log_prob<false, jacobian>(cont_vector, disc_vector,
+                                                  &message);
     logger.info(message);
   } catch (const std::exception& e) {
     logger.info("");
     logger.info(
-        "Informational Message: The current Metropolis"
+        "Informational Message: The current"
         " proposal is about to be rejected because of"
         " the following issue:");
     logger.info(e.what());
@@ -95,7 +96,8 @@ int newton(Model& model, const stan::io::var_context& init,
     }
     interrupt();
     lastlp = lp;
-    lp = stan::optimization::newton_step(model, cont_vector, disc_vector);
+    lp = stan::optimization::newton_step<Model, jacobian>(model, cont_vector,
+                                                          disc_vector);
 
     std::stringstream msg2;
     msg2 << "Iteration " << std::setw(2) << (m + 1) << "."
