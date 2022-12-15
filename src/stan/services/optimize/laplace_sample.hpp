@@ -69,9 +69,8 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   interrupt();
   math::internal::finite_diff_hessian_auto(log_density_fun, theta_hat, log_p,
                                            grad, hessian);
-  if (refresh > 0) {
-    if (log_density_msgs.peek() != std::char_traits<char>::eof())
-      logger.info(log_density_msgs);
+  if (refresh > 0 && log_density_msgs.peek() != std::char_traits<char>::eof())
+    logger.info(log_density_msgs);
   }
 
   // calculate Cholesky factor and inverse
