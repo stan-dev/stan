@@ -71,7 +71,6 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
                                            grad, hessian);
   if (refresh > 0 && log_density_msgs.peek() != std::char_traits<char>::eof())
     logger.info(log_density_msgs);
-  }
 
   // calculate Cholesky factor and inverse
   interrupt();
