@@ -107,8 +107,8 @@ TEST_F(ServicesLaplaceSample, wrongSizeModeError) {
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   int RC = stan::services::laplace_sample<true>(*model, theta_hat, draws, seed,
-  refresh, interrupt, logger,
-          sample_writer);
+                                                refresh, interrupt, logger,
+                                                sample_writer);
   EXPECT_EQ(stan::services::error_codes::DATAERR, RC);
 }
 
