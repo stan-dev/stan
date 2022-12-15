@@ -71,54 +71,54 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
                                            grad, hessian);
   if (refresh > 0 && log_density_msgs.peek() != std::char_traits<char>::eof())
     logger.info(log_density_msgs);
-  }
+}
 
-  // calculate Cholesky factor and inverse
-  interrupt();
-  if (refresh > 0) {
-    logger.info("Calculating inverse of Cholesky factor");
-  }
-  Eigen::MatrixXd L_neg_hessian = (-hessian).llt().matrixL();
-  interrupt();
-  Eigen::MatrixXd inv_sqrt_neg_hessian = L_neg_hessian.inverse().transpose();
-  interrupt();
-  Eigen::MatrixXd half_hessian = 0.5 * hessian;
+// calculate Cholesky factor and inverse
+interrupt();
+if (refresh > 0) {
+  logger.info("Calculating inverse of Cholesky factor");
+}
+Eigen::MatrixXd L_neg_hessian = (-hessian).llt().matrixL();
+interrupt();
+Eigen::MatrixXd inv_sqrt_neg_hessian = L_neg_hessian.inverse().transpose();
+interrupt();
+Eigen::MatrixXd half_hessian = 0.5 * hessian;
 
-  if (refresh > 0) {
-    logger.info("Generating draws");
+if (refresh > 0) {
+  logger.info("Generating draws");
+}
+// generate draws
+std::stringstream refresh_msg;
+boost::ecuyer1988 rng = util::create_rng(random_seed, 0);
+Eigen::VectorXd draw_vec;  // declare draw_vec, msgs here to avoid re-alloc
+for (int m = 0; m < draws; ++m) {
+  interrupt();  // allow interpution each iteration
+  if (refresh > 0 && m % refresh == 0) {
+    refresh_msg << "iteration: " << std::to_string(m);
+    logger.info(refresh_msg);
+    refresh_msg.str(std::string());
   }
-  // generate draws
-  std::stringstream refresh_msg;
-  boost::ecuyer1988 rng = util::create_rng(random_seed, 0);
-  Eigen::VectorXd draw_vec;  // declare draw_vec, msgs here to avoid re-alloc
-  for (int m = 0; m < draws; ++m) {
-    interrupt();  // allow interpution each iteration
-    if (refresh > 0 && m % refresh == 0) {
-      refresh_msg << "iteration: " << std::to_string(m);
-      logger.info(refresh_msg);
-      refresh_msg.str(std::string());
-    }
-    Eigen::VectorXd z(num_unc_params);
-    for (int n = 0; n < num_unc_params; ++n) {
-      z(n) = math::std_normal_rng(rng);
-    }
-    Eigen::VectorXd unc_draw = theta_hat + inv_sqrt_neg_hessian * z;
-    std::stringstream write_array_msgs;
-    model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq,
-                      &write_array_msgs);
-    if (refresh > 0 && write_array_msgs.peek() != std::char_traits<char>::eof())
-      logger.info(write_array_msgs);
-    // output draw, log_p, log_q
-    std::vector<double> draw(&draw_vec(0), &draw_vec(0) + draw_size);
-    double log_p = log_density_fun(unc_draw).val();
-    draw.push_back(log_p);
-    Eigen::VectorXd diff = unc_draw - theta_hat;
-    double log_q = diff.transpose() * half_hessian * diff;
-    draw.push_back(log_q);
-    sample_writer(draw);
+  Eigen::VectorXd z(num_unc_params);
+  for (int n = 0; n < num_unc_params; ++n) {
+    z(n) = math::std_normal_rng(rng);
   }
+  Eigen::VectorXd unc_draw = theta_hat + inv_sqrt_neg_hessian * z;
+  std::stringstream write_array_msgs;
+  model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq,
+                    &write_array_msgs);
+  if (refresh > 0 && write_array_msgs.peek() != std::char_traits<char>::eof())
+    logger.info(write_array_msgs);
+  // output draw, log_p, log_q
+  std::vector<double> draw(&draw_vec(0), &draw_vec(0) + draw_size);
+  double log_p = log_density_fun(unc_draw).val();
+  draw.push_back(log_p);
+  Eigen::VectorXd diff = unc_draw - theta_hat;
+  double log_q = diff.transpose() * half_hessian * diff;
+  draw.push_back(log_q);
+  sample_writer(draw);
 }
 }  // namespace internal
+}  // namespace services
 
 /**
  * Take the specified number of draws from the Laplace approximation
@@ -172,7 +172,7 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   }
   return error_codes::DATAERR;
 }
-}  // namespace services
+}  // namespace stan
 }  // namespace stan
 
 #endif
