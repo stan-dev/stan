@@ -39,7 +39,9 @@ TEST_F(ServicesLaplaceSample, values) {
   int refresh = 1;
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
-  int return_code = stan::services::laplace_sample<true>(*model, theta_hat, draws, seed, refresh, interrupt, logger,sample_writer);
+  int return_code = stan::services::laplace_sample<true>(
+      *model, theta_hat, draws, seed, refresh, interrupt, logger,
+      sample_writer);
   EXPECT_EQ(stan::services::error_codes::OK, return_code);
   std::string samples_str = sample_ss.str();
   EXPECT_EQ(2, count_matches("y", samples_str));
@@ -49,7 +51,8 @@ TEST_F(ServicesLaplaceSample, values) {
   EXPECT_EQ(1, count_matches("log_q", samples_str));
 
   std::stringstream out;
-  stan::io::stan_csv draws_csv = stan::io::stan_csv_reader::parse(sample_ss, &out);
+  stan::io::stan_csv draws_csv
+      = stan::io::stan_csv_reader::parse(sample_ss, &out);
 
   EXPECT_EQ(4, draws_csv.header.size());
   EXPECT_EQ("y[1]", draws_csv.header[0]);
@@ -104,8 +107,8 @@ TEST_F(ServicesLaplaceSample, wrongSizeModeError) {
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   int RC = stan::services::laplace_sample<true>(*model, theta_hat, draws, seed,
-refresh, interrupt, logger,
-     sample_writer);
+                                                refresh, interrupt, logger,
+                                                sample_writer);
   EXPECT_EQ(stan::services::error_codes::DATAERR, RC);
 }
 
