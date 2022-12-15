@@ -118,7 +118,7 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
     draw.push_back(log_q);
     sample_writer(draw);
   }
-}
+}  // namespace internal
 }  // namespace internal
 
 /**
