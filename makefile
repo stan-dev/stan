@@ -14,8 +14,17 @@ help:
 -include $(HOME)/.config/stan/make.local  # user-defined variables
 -include make/local                       # user-defined variables
 
-MATH ?= lib/stan_math/
-RAPIDJSON ?= lib/rapidjson_1.1.0/
+ifdef MATH_INC
+  MATH ?= $(MATH_INC)
+else
+  MATH ?= lib/stan_math/
+endif
+
+ifdef RAPIDJSON_INC
+  RAPIDJSON ?= $(RAPIDJSON_INC)
+else
+  RAPIDJSON ?= lib/rapidjson_1.1.0/
+endif
 
 -include $(MATH)make/compiler_flags
 -include $(MATH)make/dependencies
