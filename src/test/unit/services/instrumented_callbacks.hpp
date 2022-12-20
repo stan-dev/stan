@@ -1,19 +1,50 @@
 #ifndef TEST__UNIT__INSTRUMENTED_CALLBACKS_HPP
 #define TEST__UNIT__INSTRUMENTED_CALLBACKS_HPP
 
+#include <stan/callbacks/interrupt.hpp>
+#include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/writer.hpp>
-#include <stan/callbacks/interrupt.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
-#include <map>
-#include <string>
-#include <iostream>
-#include <exception>
 #include <atomic>
+#include <exception>
+#include <iostream>
+#include <map>
 #include <mutex>
+#include <string>
+
 namespace stan {
 namespace test {
 namespace unit {
+
+/**
+ * Mock writer that records names and states written.
+ */
+class values_writer : public stan::callbacks::stream_writer {
+ public:
+  std::vector<std::string> names_;
+  std::vector<std::vector<double>> states_;
+
+  values_writer(std::ostream& stream)
+      : stan::callbacks::stream_writer(stream) {}
+
+  /**
+   * Writes a set of names.
+   *
+   * @param[in] names Names in a std::vector
+   */
+  void operator()(const std::vector<std::string>& names) { names_ = names; }
+
+  /**
+   * Writes a set of values.
+   *
+   * @param[in] state Values in a std::vector
+   */
+  void operator()(const std::vector<double>& state) {
+    states_.push_back(state);
+  }
+};
 
 /**
  * instrumented_interrupt counts the number of times it is
@@ -257,7 +288,6 @@ class instrumented_logger : public stan::callbacks::logger {
   std::vector<std::string> error_;
   std::vector<std::string> fatal_;
 };
-
 }  // namespace unit
 }  // namespace test
 }  // namespace stan

@@ -23,6 +23,7 @@ namespace optimize {
  * Runs the BFGS algorithm for a model.
  *
  * @tparam Model A model implementation
+ * @tparam jacobian `true` to include Jacobian adjust (default `false`)
  * @param[in] model Input model to test (with data already instantiated)
  * @param[in] init var context for initialization
  * @param[in] random_seed random seed for the random number generator
@@ -48,7 +49,7 @@ namespace optimize {
  * @param[in,out] parameter_writer output for parameter values
  * @return error_codes::OK if successful
  */
-template <class Model>
+template <class Model, bool jacobian = false>
 int bfgs(Model& model, const stan::io::var_context& init,
          unsigned int random_seed, unsigned int chain, double init_radius,
          double init_alpha, double tol_obj, double tol_rel_obj, double tol_grad,
@@ -64,7 +65,8 @@ int bfgs(Model& model, const stan::io::var_context& init,
 
   std::stringstream bfgs_ss;
   typedef stan::optimization::BFGSLineSearch<
-      Model, stan::optimization::BFGSUpdate_HInv<> >
+      Model, stan::optimization::BFGSUpdate_HInv<>, double, Eigen::Dynamic,
+      jacobian>
       Optimizer;
   Optimizer bfgs(model, cont_vector, disc_vector, &bfgs_ss);
   bfgs._ls_opts.alpha0 = init_alpha;
