@@ -61,7 +61,7 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
 
   // calculate inverse negative Hessian's Cholesky factor
   if (refresh > 0) {
-    logger.info("Calculating Hessian\n");
+    logger.info("Calculating Hessian");
   }
   double log_p;          // dummy
   Eigen::VectorXd grad;  // dummy
@@ -69,16 +69,13 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   interrupt();
   math::internal::finite_diff_hessian_auto(log_density_fun, theta_hat, log_p,
                                            grad, hessian);
-  if (refresh > 0) {
+  if (refresh > 0 && log_density_msgs.peek() != std::char_traits<char>::eof())
     logger.info(log_density_msgs);
-    logger.info("\n");
-  }
 
   // calculate Cholesky factor and inverse
   interrupt();
   if (refresh > 0) {
     logger.info("Calculating inverse of Cholesky factor");
-    logger.info("\n");
   }
   Eigen::MatrixXd L_neg_hessian = (-hessian).llt().matrixL();
   interrupt();
@@ -86,42 +83,40 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   interrupt();
   Eigen::MatrixXd half_hessian = 0.5 * hessian;
 
-  // generate draws and output to sample writer
   if (refresh > 0) {
     logger.info("Generating draws");
-    logger.info("\n");
   }
+  // generate draws
+  std::stringstream refresh_msg;
   boost::ecuyer1988 rng = util::create_rng(random_seed, 0);
   Eigen::VectorXd draw_vec;  // declare draw_vec, msgs here to avoid re-alloc
   for (int m = 0; m < draws; ++m) {
     interrupt();  // allow interpution each iteration
     if (refresh > 0 && m % refresh == 0) {
-      logger.info("iteration: ");
-      logger.info(std::to_string(m));
-      logger.info("\n");
+      refresh_msg << "iteration: " << std::to_string(m);
+      logger.info(refresh_msg);
+      refresh_msg.str(std::string());
     }
     Eigen::VectorXd z(num_unc_params);
     for (int n = 0; n < num_unc_params; ++n) {
       z(n) = math::std_normal_rng(rng);
     }
-
     Eigen::VectorXd unc_draw = theta_hat + inv_sqrt_neg_hessian * z;
+    std::stringstream write_array_msgs;
+    model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq,
+                      &write_array_msgs);
+    if (refresh > 0 && write_array_msgs.peek() != std::char_traits<char>::eof())
+      logger.info(write_array_msgs);
+    // output draw, log_p, log_q
+    std::vector<double> draw(&draw_vec(0), &draw_vec(0) + draw_size);
     double log_p = log_density_fun(unc_draw).val();
+    draw.push_back(log_p);
     Eigen::VectorXd diff = unc_draw - theta_hat;
     double log_q = diff.transpose() * half_hessian * diff;
-
-    std::stringstream msgs;
-    model.write_array(rng, unc_draw, draw_vec, include_tp, include_gq, &msgs);
-    if (refresh > 0) {
-      logger.info(msgs);
-      logger.info("\n");
-    }
-    std::vector<double> draw(&draw_vec(0), &draw_vec(0) + draw_size);
-    draw.push_back(log_p);
     draw.push_back(log_q);
     sample_writer(draw);
   }
-}
+}  // namespace internal
 }  // namespace internal
 
 /**
@@ -168,11 +163,10 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
   } catch (const std::exception& e) {
     if (refresh >= 0) {
       logger.error(e.what());
-      logger.error("\n");
     }
   } catch (...) {
     if (refresh >= 0) {
-      logger.error("unknown exception during execution\n");
+      logger.error("unknown exception during execution");
     }
   }
   return error_codes::DATAERR;
