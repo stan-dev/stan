@@ -101,6 +101,10 @@ pipeline {
         MAC_CXX = 'clang++'
         LINUX_CXX = 'clang++-6.0'
         WIN_CXX = 'g++'
+        GIT_AUTHOR_NAME = 'Stan Jenkins'
+        GIT_AUTHOR_EMAIL = 'mc.stanislaw@gmail.com'
+        GIT_COMMITTER_NAME = 'Stan Jenkins'
+        GIT_COMMITTER_EMAIL = 'mc.stanislaw@gmail.com'
     }
     stages {
 
@@ -136,7 +140,7 @@ pipeline {
                             git config user.email "mc.stanislaw@gmail.com"
                             git config user.name "Stan Jenkins"
                             git add src
-                            git commit --author="Stan BuildBot <mc.stanislaw@gmail.com>" -m "[Jenkins] auto-formatting by `clang-format --version`"
+                            git commit -m "[Jenkins] auto-formatting by `clang-format --version`"
                             git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/stan.git ${branchName()}
                             echo "Exiting build because clang-format found changes."
                             echo "Those changes are now found on stan-dev/stan under branch ${branchName()}"
