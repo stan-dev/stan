@@ -30,13 +30,16 @@ typedef std::map<std::string, std::pair<std::vector<int>, std::vector<size_t>>>
  * <code>json_handler</code> that restricts the allowed JSON text
  * to a set of Stan variable declarations in JSON format.
  * Each Stan variable consists of a JSON key : value pair.
- * The key is a string and the value is either a single numeric
- * scalar value or a JSON array of numeric values.
+ * The key is a string (the Stan variable name) and the value
+ * is either a scalar variables, array, or a tuple.
+ * The latter two kinds of variables allow for deeply nested
+ * structures, e.g., a tuple one of whose slots in an array
+ * or another tuple, or an array whose elements are tuples,
+ * or any combination thereof.
  *
  * <p>The <code>json_data_handler</code> checks that the top-level
- * JSON object contains a set of name-value pairs
- * where the values can be either numeric scalar objects or
- * or numeric arrays of any dimensionality. Arrays must be rectangular.
+ * JSON object contains a set of name-value pairs whose values can
+ * be scalar or structured objects containing only numeric values.
  * The strings \"Inf\" and \"Infinity\" are mapped to positive infinity,
  * the strings \"-Inf\" and \"-Infinity\" are mapped to negative infinity,
  * and the string \"NaN\" is mapped to not-a-number.
