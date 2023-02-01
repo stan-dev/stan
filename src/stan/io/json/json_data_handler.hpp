@@ -57,6 +57,8 @@ class json_data_handler : public stan::json::json_handler {
   size_t dim_idx_;
   size_t dim_last_;
   bool is_int_;
+  bool tuple_start_;
+  bool tuple_end_;
 
   void reset() {
     key_stack_.clear();
@@ -68,6 +70,8 @@ class json_data_handler : public stan::json::json_handler {
     dim_idx_ = 0;
     dim_last_ = 0;
     is_int_ = true;
+    tuple_start_ = false;
+    tuple_end_ = false;
   }
 
   bool is_init() {
@@ -78,6 +82,7 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   std::string key_str() {
+    if (key_stack_.size() == 0) return "";
     return std::accumulate(std::next(key_stack_.begin()), key_stack_.end(),
                            key_stack_[0], // start with first element
                            [](std::string a, const std::string b) {
@@ -151,12 +156,17 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   void start_object() {
-    // always OK?
+    std::cout << "start object " << key_str() << std::endl << std::flush;
+    if (key_stack_.size() > 0)
+      tuple_start_ = true;
   }
 
   void end_object() {
-    save_current_key_value_pair();
-    reset();
+    if (key_stack_.size() > 0 && !tuple_end_) {
+      std::cout << "end object, stack is:  " << key_str() << std::endl << std::flush;
+      save_current_key_value_pair();
+    }
+    tuple_end_ = true;
   }
 
   void promote_to_double() {
@@ -203,8 +213,12 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   void key(const std::string &key) {
-    save_current_key_value_pair();
-    reset();
+    std::cout << "key: " << key << std::endl << std::flush;
+    tuple_end_ = false;
+    if (tuple_start_)
+      tuple_start_ = false;
+    else
+      save_current_key_value_pair();
     key_stack_.push_back(key);
   }
 
@@ -250,6 +264,7 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   void save_current_key_value_pair() {
+    std::cout << " save key " << key_str() << std::endl << std::flush;
     if (0 == key_stack_.size())
       return;
 
@@ -284,6 +299,7 @@ class json_data_handler : public stan::json::json_handler {
       }
       vars_r_[key_str()] = pair;
     }
+    key_stack_.pop_back();
   }
 
   void incr_dim_size() {
