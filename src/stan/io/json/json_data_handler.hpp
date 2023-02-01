@@ -9,6 +9,7 @@
 #include <iostream>
 #include <limits>
 #include <map>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -33,13 +34,11 @@ typedef std::map<std::string, std::pair<std::vector<int>, std::vector<size_t>>>
  * The key is a string (the Stan variable name) and the value
  * is either a scalar variables, array, or a tuple.
  * The latter two kinds of variables allow for deeply nested
- * structures, e.g., a tuple one of whose slots in an array
- * or another tuple, or an array whose elements are tuples,
- * or any combination thereof.
+ * structures, e.g., arrays of tuples, tuples composed of arrays,
+ * tuples composed of arrays of tuples, etc.
  *
  * <p>The <code>json_data_handler</code> checks that the top-level
- * JSON object contains a set of name-value pairs whose values can
- * be scalar or structured objects containing only numeric values.
+ * JSON object contains a set of key-value pairs.
  * The strings \"Inf\" and \"Infinity\" are mapped to positive infinity,
  * the strings \"-Inf\" and \"-Infinity\" are mapped to negative infinity,
  * and the string \"NaN\" is mapped to not-a-number.
@@ -49,7 +48,7 @@ class json_data_handler : public stan::json::json_handler {
  private:
   vars_map_r &vars_r_;
   vars_map_i &vars_i_;
-  std::string key_;
+  std::vector<std::string> key_stack_;
   std::vector<double> values_r_;
   std::vector<int> values_i_;
   std::vector<size_t> dims_;
@@ -60,7 +59,7 @@ class json_data_handler : public stan::json::json_handler {
   bool is_int_;
 
   void reset() {
-    key_.clear();
+    key_stack_.clear();
     values_r_.clear();
     values_i_.clear();
     dims_.clear();
@@ -72,10 +71,18 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   bool is_init() {
-    return (key_.size() == 0 && values_r_.size() == 0 && values_i_.size() == 0
+    return (key_stack_.size() == 0 && values_r_.size() == 0 && values_i_.size() == 0
             && dims_.size() == 0 && dims_verify_.size() == 0
             && dims_unknown_.size() == 0 && dim_idx_ == 0 && dim_last_ == 0
             && is_int_);
+  }
+
+  std::string key_str() {
+    return std::accumulate(std::next(key_stack_.begin()), key_stack_.end(),
+                           key_stack_[0], // start with first element
+                           [](std::string a, const std::string b) {
+                             return std::move(a) + '.' + b;
+                           });
   }
 
  public:
@@ -91,7 +98,7 @@ class json_data_handler : public stan::json::json_handler {
       : json_handler(),
         vars_r_(vars_r),
         vars_i_(vars_i),
-        key_(),
+        key_stack_(),
         values_r_(),
         values_i_(),
         dims_(),
@@ -102,20 +109,20 @@ class json_data_handler : public stan::json::json_handler {
         is_int_(true) {}
 
   void start_text() {
-    vars_i_.clear();
-    vars_r_.clear();
+    //    vars_i_.clear();  why is this needed?
+    //    vars_r_.clear();
     reset();
   }
 
   void end_text() { reset(); }
 
   void start_array() {
-    if (0 == key_.size()) {
+    if (0 == key_stack_.size()) {
       throw json_error("expecting JSON object, found array");
     }
     if (dim_idx_ > 0 && dim_last_ == dim_idx_) {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_ << ", error: non-scalar array value";
+      errorMsg << "variable: " << key_str() << ", error: non-scalar array value";
       throw json_error(errorMsg.str());
     }
     incr_dim_size();
@@ -134,7 +141,7 @@ class json_data_handler : public stan::json::json_handler {
       dims_unknown_[dim_idx_ - 1] = false;
     } else if (dims_verify_[dim_idx_ - 1] != dims_[dim_idx_ - 1]) {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_ << ", error: non-rectangular array";
+      errorMsg << "variable: " << key_str() << ", error: non-rectangular array";
       throw json_error(errorMsg.str());
     }
     if (0 == dim_last_
@@ -144,11 +151,7 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   void start_object() {
-    if (!is_init()) {
-      std::stringstream errorMsg;
-      errorMsg << "variable: " << key_ << ", error: nested objects not allowed";
-      throw json_error(errorMsg.str());
-    }
+    // always OK?
   }
 
   void end_object() {
@@ -167,13 +170,13 @@ class json_data_handler : public stan::json::json_handler {
 
   void null() {
     std::stringstream errorMsg;
-    errorMsg << "variable: " << key_ << ", error: null values not allowed";
+    errorMsg << "variable: " << key_str() << ", error: null values not allowed";
     throw json_error(errorMsg.str());
   }
 
   void boolean(bool p) {
     std::stringstream errorMsg;
-    errorMsg << "variable: " << key_ << ", error: boolean values not allowed";
+    errorMsg << "variable: " << key_str() << ", error: boolean values not allowed";
     throw json_error(errorMsg.str());
   }
 
@@ -191,7 +194,7 @@ class json_data_handler : public stan::json::json_handler {
       tmp = std::numeric_limits<double>::quiet_NaN();
     } else {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_ << ", error: string values not allowed";
+      errorMsg << "variable: " << key_str() << ", error: string values not allowed";
       throw json_error(errorMsg.str());
     }
     promote_to_double();
@@ -202,7 +205,7 @@ class json_data_handler : public stan::json::json_handler {
   void key(const std::string &key) {
     save_current_key_value_pair();
     reset();
-    key_ = key;
+    key_stack_.push_back(key);
   }
 
   void number_double(double x) {
@@ -247,14 +250,14 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   void save_current_key_value_pair() {
-    if (0 == key_.size())
+    if (0 == key_stack_.size())
       return;
 
     // redefinition or variables not allowed
-    if (vars_r_.find(key_) != vars_r_.end()
-        || vars_i_.find(key_) != vars_i_.end()) {
+    if (vars_r_.find(key_str()) != vars_r_.end()
+        || vars_i_.find(key_str()) != vars_i_.end()) {
       std::stringstream errorMsg;
-      errorMsg << "attempt to redefine variable: " << key_;
+      errorMsg << "attempt to redefine variable: " << key_str();
       throw json_error(errorMsg.str());
     }
 
@@ -269,7 +272,7 @@ class json_data_handler : public stan::json::json_handler {
       } else {
         pair = make_pair(values_i_, dims_);
       }
-      vars_i_[key_] = pair;
+      vars_i_[key_str()] = pair;
     } else {
       std::pair<std::vector<double>, std::vector<size_t>> pair;
       if (dims_.size() > 1) {
@@ -279,7 +282,7 @@ class json_data_handler : public stan::json::json_handler {
       } else {
         pair = make_pair(values_r_, dims_);
       }
-      vars_r_[key_] = pair;
+      vars_r_[key_str()] = pair;
     }
   }
 
@@ -304,7 +307,7 @@ class json_data_handler : public stan::json::json_handler {
   void set_last_dim() {
     if (dim_last_ > 0 && dim_idx_ < dim_last_) {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_ << ", error: non-rectangular array";
+      errorMsg << "variable: " << key_str() << ", error: non-rectangular array";
       throw json_error(errorMsg.str());
     }
     dim_last_ = dim_idx_;
@@ -320,7 +323,7 @@ class json_data_handler : public stan::json::json_handler {
     // array index should be valid, but check just in case
     if (rtl_offset >= rtl_dsize * dims[0]) {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_ << ", unexpected error";
+      errorMsg << "variable: " << key_str() << ", unexpected error";
       throw json_error(errorMsg.str());
     }
 
