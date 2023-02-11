@@ -4,82 +4,14 @@
 #include <stan/io/json/json_handler.hpp>
 #include <stan/io/json/rapidjson_parser.hpp>
 
+#include <test/unit/io/json/util.hpp>
+
 #include <boost/limits.hpp>
 #include <boost/math/concepts/real_concept.hpp>
 #include <boost/math/special_functions/fpclassify.hpp>
 #include <gtest/gtest.h>
 
 #include <complex>
-
-void test_int_var(stan::json::json_data &jdata, const std::string &text,
-                  const std::string &name,
-                  const std::vector<int> &expected_vals,
-                  const std::vector<size_t> &expected_dims) {
-  EXPECT_EQ(true, jdata.contains_i(name));
-  std::vector<size_t> dims = jdata.dims_i(name);
-  EXPECT_EQ(expected_dims.size(), dims.size());
-  for (size_t i = 0; i < dims.size(); i++)
-    EXPECT_EQ(expected_dims[i], dims[i]);
-  std::vector<int> vals = jdata.vals_i(name);
-  EXPECT_EQ(expected_vals.size(), vals.size());
-  for (size_t i = 0; i < vals.size(); i++)
-    EXPECT_EQ(expected_vals[i], vals[i]);
-}
-
-void test_empty_int_arr(stan::json::json_data &jdata, const std::string &text,
-                        const std::string &name,
-                        const std::vector<int> &expected_vals) {
-  EXPECT_EQ(true, jdata.contains_i(name));
-  std::vector<size_t> dims = jdata.dims_i(name);
-  EXPECT_EQ(1, dims.size());
-  std::vector<int> vals = jdata.vals_i(name);
-  EXPECT_EQ(expected_vals.size(), vals.size());
-  for (size_t i = 0; i < vals.size(); i++)
-    EXPECT_EQ(expected_vals[i], vals[i]);
-}
-
-void test_real_var(stan::json::json_data &jdata, const std::string &text,
-                   const std::string &name,
-                   const std::vector<double> &expected_vals,
-                   const std::vector<size_t> &expected_dims) {
-  EXPECT_EQ(true, jdata.contains_r(name));
-  std::vector<size_t> dims = jdata.dims_r(name);
-  EXPECT_EQ(expected_dims.size(), dims.size());
-  for (size_t i = 0; i < dims.size(); i++)
-    EXPECT_EQ(expected_dims[i], dims[i]);
-  std::vector<double> vals = jdata.vals_r(name);
-  EXPECT_EQ(expected_vals.size(), vals.size());
-  for (size_t i = 0; i < vals.size(); i++)
-    EXPECT_EQ(expected_vals[i], vals[i]);
-}
-
-void test_complex_var(stan::json::json_data &jdata, const std::string &text,
-                      const std::string &name,
-                      const std::vector<std::complex<double>> &expected_vals,
-                      const std::vector<size_t> &expected_dims) {
-  EXPECT_EQ(true, (jdata.contains_r(name) || jdata.contains_i(name)));
-  std::vector<size_t> dims = jdata.dims_r(name);
-  dims.pop_back();
-  EXPECT_EQ(expected_dims.size(), dims.size());
-  for (size_t i = 0; i < dims.size(); i++)
-    EXPECT_EQ(expected_dims[i], dims[i]);
-  std::vector<std::complex<double>> vals = jdata.vals_c(name);
-  EXPECT_EQ(expected_vals.size(), vals.size());
-  for (size_t i = 0; i < vals.size(); i++)
-    EXPECT_EQ(expected_vals[i], vals[i]);
-}
-
-void test_exception(const std::string &input,
-                    const std::string &exception_text) {
-  try {
-    std::stringstream s(input);
-    stan::json::json_data jdata(s);
-  } catch (const std::exception &e) {
-    EXPECT_EQ(e.what(), exception_text);
-    return;
-  }
-  FAIL();  // didn't throw an exception as expected.
-}
 
 TEST(ioJson, jsonData_scalar_int) {
   std::string txt = "{ \"foo\" : 1 }";
@@ -88,7 +20,7 @@ TEST(ioJson, jsonData_scalar_int) {
   std::vector<int> expected_vals;
   expected_vals.push_back(1);
   std::vector<size_t> expected_dims;
-  test_int_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_int_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_scalar_real) {
@@ -98,7 +30,7 @@ TEST(ioJson, jsonData_scalar_real) {
   std::vector<double> expected_vals;
   expected_vals.push_back(1.1);
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_real_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_scalar_complex) {
@@ -108,7 +40,7 @@ TEST(ioJson, jsonData_scalar_complex) {
   std::vector<std::complex<double>> expected_vals;
   expected_vals.push_back(std::complex<double>(1.1, 2.2));
   std::vector<size_t> expected_dims;
-  test_complex_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_complex_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_mult_vars) {
@@ -118,10 +50,10 @@ TEST(ioJson, jsonData_mult_vars) {
   std::vector<int> expected_vals_i;
   expected_vals_i.push_back(1);
   std::vector<size_t> expected_dims;
-  test_int_var(jdata, txt, "foo", expected_vals_i, expected_dims);
+  test_int_var(jdata, "foo", expected_vals_i, expected_dims);
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(0.1);
-  test_real_var(jdata, txt, "bar", expected_vals_r, expected_dims);
+  test_real_var(jdata, "bar", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_mult_vars2) {
@@ -131,10 +63,10 @@ TEST(ioJson, jsonData_mult_vars2) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
   expected_vals_r.clear();
   expected_vals_r.push_back(0.1);
-  test_real_var(jdata, txt, "bar", expected_vals_r, expected_dims);
+  test_real_var(jdata, "bar", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_mult_vars3) {
@@ -147,16 +79,16 @@ TEST(ioJson, jsonData_mult_vars3) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
   expected_vals_r.clear();
   expected_vals_r.push_back(0.1);
-  test_real_var(jdata, txt, "bar", expected_vals_r, expected_dims);
+  test_real_var(jdata, "bar", expected_vals_r, expected_dims);
   expected_vals_r.clear();
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   expected_vals_r.push_back(0.1);
   expected_vals_r.push_back(1);
   expected_dims.push_back(3);
-  test_real_var(jdata, txt, "baz", expected_vals_r, expected_dims);
+  test_real_var(jdata, "baz", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_real_array_1D) {
@@ -168,7 +100,7 @@ TEST(ioJson, jsonData_real_array_1D) {
   expected_vals.push_back(2.2);
   std::vector<size_t> expected_dims;
   expected_dims.push_back(2);
-  test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_real_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_complex_array_1D) {
@@ -180,7 +112,7 @@ TEST(ioJson, jsonData_complex_array_1D) {
   expected_vals.push_back(std::complex<double>(3, 4));
   std::vector<size_t> expected_dims;
   expected_dims.push_back(2);
-  test_complex_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_complex_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_array_1D_inf) {
@@ -192,7 +124,7 @@ TEST(ioJson, jsonData_array_1D_inf) {
   expected_vals.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
   expected_dims.push_back(2);
-  test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_real_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_array_1D_inf2) {
@@ -204,7 +136,7 @@ TEST(ioJson, jsonData_array_1D_inf2) {
   expected_vals.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
   expected_dims.push_back(2);
-  test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_real_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_array_1D_neg_inf) {
@@ -216,7 +148,7 @@ TEST(ioJson, jsonData_array_1D_neg_inf) {
   expected_vals.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
   expected_dims.push_back(2);
-  test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_real_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_real_array_2D) {
@@ -234,7 +166,7 @@ TEST(ioJson, jsonData_real_array_2D) {
   std::vector<size_t> expected_dims;
   expected_dims.push_back(3);
   expected_dims.push_back(2);
-  test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_real_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_complex_array_2D) {
@@ -249,7 +181,7 @@ TEST(ioJson, jsonData_complex_array_2D) {
   std::vector<size_t> expected_dims;
   expected_dims.push_back(2);
   expected_dims.push_back(2);
-  test_complex_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_complex_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_real_array_3D) {
@@ -291,7 +223,7 @@ TEST(ioJson, jsonData_real_array_3D) {
   expected_dims.push_back(2);  // two rows
   expected_dims.push_back(3);  // three cols
   expected_dims.push_back(4);  // four shelves
-  test_real_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_real_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_complex_array_3D) {
@@ -320,7 +252,7 @@ TEST(ioJson, jsonData_complex_array_3D) {
   expected_dims.push_back(2);
   expected_dims.push_back(3);
   expected_dims.push_back(2);
-  test_complex_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_complex_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_int_array_3D) {
@@ -360,7 +292,7 @@ TEST(ioJson, jsonData_int_array_3D) {
   expected_dims.push_back(2);  // two rows
   expected_dims.push_back(3);  // three cols
   expected_dims.push_back(4);  // four shelves
-  test_int_var(jdata, txt, "foo", expected_vals, expected_dims);
+  test_int_var(jdata, "foo", expected_vals, expected_dims);
 }
 
 TEST(ioJson, jsonData_empty_1D_array) {
@@ -370,7 +302,7 @@ TEST(ioJson, jsonData_empty_1D_array) {
   std::vector<int> expected_vals_i;
   std::vector<size_t> expected_dims;
   expected_dims.push_back(0);
-  test_int_var(jdata, txt, "foo", expected_vals_i, expected_dims);
+  test_int_var(jdata, "foo", expected_vals_i, expected_dims);
 }
 
 TEST(ioJson, jsonData_empty_2D_array_0_0) {
@@ -381,7 +313,7 @@ TEST(ioJson, jsonData_empty_2D_array_0_0) {
   std::vector<size_t> expected_dims;
   expected_dims.push_back(0);
   expected_dims.push_back(0);
-  test_empty_int_arr(jdata, txt, "foo", expected_vals_i);
+  test_empty_int_arr(jdata, "foo", expected_vals_i);
   try {
     jdata.validate_dims("test", "foo", "int", expected_dims);
   } catch (const std::exception &e) {
@@ -397,7 +329,7 @@ TEST(ioJson, jsonData_empty_2D_array_1_0) {
   std::vector<size_t> expected_dims;
   expected_dims.push_back(1);
   expected_dims.push_back(0);
-  test_empty_int_arr(jdata, txt, "foo", expected_vals_i);
+  test_empty_int_arr(jdata, "foo", expected_vals_i);
   try {
     jdata.validate_dims("test", "foo", "int", expected_dims);
   } catch (const std::exception &e) {
@@ -414,7 +346,7 @@ TEST(ioJson, jsonData_empty_3D_array_0_0_0) {
   expected_dims.push_back(0);
   expected_dims.push_back(0);
   expected_dims.push_back(0);
-  test_empty_int_arr(jdata, txt, "foo", expected_vals_i);
+  test_empty_int_arr(jdata, "foo", expected_vals_i);
   try {
     jdata.validate_dims("test", "foo", "int", expected_dims);
   } catch (const std::exception &e) {
@@ -431,7 +363,7 @@ TEST(ioJson, jsonData_empty_3D_array_2_1_0) {
   expected_dims.push_back(2);
   expected_dims.push_back(1);
   expected_dims.push_back(0);
-  test_empty_int_arr(jdata, txt, "foo", expected_vals_i);
+  test_empty_int_arr(jdata, "foo", expected_vals_i);
   try {
     jdata.validate_dims("test", "foo", "int", expected_dims);
   } catch (const std::exception &e) {
@@ -583,7 +515,7 @@ TEST(ioJson, jsonData_unsigned_Inf_str) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_signed_neg_Inf_str) {
@@ -593,7 +525,7 @@ TEST(ioJson, jsonData_signed_neg_Inf_str) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
 }
 
 // python/js:  Infinity, -Infinity, NaN
@@ -613,7 +545,7 @@ TEST(ioJson, jsonData_unsigned_Infinity_bare) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_pos_Infinity_bare) {
@@ -623,7 +555,7 @@ TEST(ioJson, jsonData_pos_Infinity_bare) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_signed_neg_Infinity_bare) {
@@ -633,7 +565,7 @@ TEST(ioJson, jsonData_signed_neg_Infinity_bare) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_unsigned_Infinity_str) {
@@ -643,7 +575,7 @@ TEST(ioJson, jsonData_unsigned_Infinity_str) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_pos_Infinity_str) {
@@ -653,7 +585,7 @@ TEST(ioJson, jsonData_pos_Infinity_str) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_signed_neg_Infinity_str) {
@@ -663,7 +595,7 @@ TEST(ioJson, jsonData_signed_neg_Infinity_str) {
   std::vector<double> expected_vals_r;
   expected_vals_r.push_back(-std::numeric_limits<double>::infinity());
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", expected_vals_r, expected_dims);
+  test_real_var(jdata, "foo", expected_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_max_int) {
@@ -675,7 +607,7 @@ TEST(ioJson, jsonData_max_int) {
   expected_vals_i.push_back(2147483647);
   std::vector<size_t> expected_dims;
   expected_dims.push_back(2);
-  test_int_var(jdata, txt, "foo", expected_vals_i, expected_dims);
+  test_int_var(jdata, "foo", expected_vals_i, expected_dims);
 }
 
 TEST(ioJson, jsonData_promote_large_int_to_double) {
@@ -687,8 +619,8 @@ TEST(ioJson, jsonData_promote_large_int_to_double) {
   std::vector<double> bar_vals_r;
   bar_vals_r.push_back(2147483648.0);
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", foo_vals_r, expected_dims);
-  test_real_var(jdata, txt, "bar", bar_vals_r, expected_dims);
+  test_real_var(jdata, "foo", foo_vals_r, expected_dims);
+  test_real_var(jdata, "bar", bar_vals_r, expected_dims);
 }
 
 TEST(ioJson, jsonData_promote_extra_large_int_to_double) {
@@ -700,6 +632,6 @@ TEST(ioJson, jsonData_promote_extra_large_int_to_double) {
   std::vector<double> bar_vals_r;
   bar_vals_r.push_back(9223372036854775807.0);
   std::vector<size_t> expected_dims;
-  test_real_var(jdata, txt, "foo", foo_vals_r, expected_dims);
-  test_real_var(jdata, txt, "bar", bar_vals_r, expected_dims);
+  test_real_var(jdata, "foo", foo_vals_r, expected_dims);
+  test_real_var(jdata, "bar", bar_vals_r, expected_dims);
 }

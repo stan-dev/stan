@@ -14,17 +14,29 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace stan {
 
 namespace json {
 
-typedef std::map<std::string,
-                 std::pair<std::vector<double>, std::vector<size_t>>>
-    vars_map_r;
+typedef std::pair<std::vector<double>, std::vector<size_t>> var_r;
+typedef std::pair<std::vector<int>, std::vector<size_t>> var_i;
 
-typedef std::map<std::string, std::pair<std::vector<int>, std::vector<size_t>>>
-    vars_map_i;
+typedef std::map<std::string, var_r> vars_map_r;
+typedef std::map<std::string, var_i> vars_map_i;
+
+struct meta_type {
+  // the general set of structures that the handler needs to manage
+  // as determined by the initial sequence of start elements
+  // following the Stan variable name,
+  enum {
+    SCALAR = 0,  // no start elements
+    ARRAY = 1,   // one or more "["
+    TUPLE = 2,   // one or more "{"
+    ARRAY_OF_TUPLES = 3,  // one or more "[" followed by "{"
+  };
+};
 
 /**
  * A <code>json_data_handler</code> is an implementation of a
@@ -46,45 +58,68 @@ typedef std::map<std::string, std::pair<std::vector<int>, std::vector<size_t>>>
  */
 class json_data_handler : public stan::json::json_handler {
  private:
-  vars_map_r &vars_r_;
-  vars_map_i &vars_i_;
-  std::vector<std::string> key_stack_;
-  std::vector<double> values_r_;
-  std::vector<int> values_i_;
-  std::vector<size_t> dims_;
-  std::vector<size_t> dims_verify_;
-  std::vector<bool> dims_unknown_;
-  size_t dim_idx_;
-  size_t dim_last_;
-  bool is_int_;
-  bool tuple_start_;
-  bool tuple_end_;
+  vars_map_r &vars_r;
+  vars_map_i &vars_i;
+  std::vector<std::string> key_stack;
+  std::map<std::string, int> var_types_map;
+  std::map<std::string, int> key_types_map;
+  std::vector<double> values_r;
+  std::vector<int> values_i;
+  std::vector<size_t> dims;
+  std::vector<size_t> dims_found; // element per dim so far
+  std::vector<bool> dims_known; // false until seen first row
+  int var_type;
+  int dim_idx;  // current dimension
+  size_t array_start_i;  // ptr into values_i
+  size_t array_start_r;  // ptr into values_r
+  bool is_int;
 
-  void reset() {
-    key_stack_.clear();
-    values_r_.clear();
-    values_i_.clear();
-    dims_.clear();
-    dims_verify_.clear();
-    dims_unknown_.clear();
-    dim_idx_ = 0;
-    dim_last_ = 0;
-    is_int_ = true;
-    tuple_start_ = false;
-    tuple_end_ = false;
+  bool debug = true;
+
+  void dump_state(std::string where) {
+    if (debug) {
+      std::string slot_type("unknown");
+      if (key_types_map.count(key_str()) == 1)
+        slot_type = std::to_string(key_types_map[key_str()]);
+      std::cout << where << std::endl
+                << "key " << key_str() << " var_type " << var_type
+                << " slot_type " << slot_type << " is_int " << is_int 
+                << " dims " << dims.size() << " dim_idx " << dim_idx
+                << " values_i " << values_i.size() << " values_r " << values_r.size()
+                << std::endl;
+    }
+  }
+
+  void reset_values() {
+    values_r.clear();
+    values_i.clear();
+    array_start_i = 0;
+    array_start_r = 0;
+  }
+
+  void reset_var() {
+    reset_values();
+    dims.clear();
+    dims_found.clear();
+    dims_known.clear();
+    dim_idx = -1;
+    var_type = meta_type::SCALAR;
+    is_int = true;
   }
 
   bool is_init() {
-    return (key_stack_.size() == 0 && values_r_.size() == 0 && values_i_.size() == 0
-            && dims_.size() == 0 && dims_verify_.size() == 0
-            && dims_unknown_.size() == 0 && dim_idx_ == 0 && dim_last_ == 0
-            && is_int_);
+    return (key_stack.size() == 0 && var_types_map.size() == 0
+            && key_types_map.size() == 0 && values_r.size() == 0
+            && values_i.size() == 0 && dims.size() == 0
+            && dims_found.size() == 0 && dims_known.size() == 0
+            && dim_idx == -1 && array_start_i == 0 && array_start_r == 0
+            && is_int);
   }
 
   std::string key_str() {
-    if (key_stack_.size() == 0) return "";
-    return std::accumulate(std::next(key_stack_.begin()), key_stack_.end(),
-                           key_stack_[0], // start with first element
+    if (key_stack.size() == 0) return "";
+    return std::accumulate(std::next(key_stack.begin()), key_stack.end(),
+                           key_stack[0], // start with first element
                            [](std::string a, const std::string b) {
                              return std::move(a) + '.' + b;
                            });
@@ -96,86 +131,120 @@ class json_data_handler : public stan::json::json_handler {
    *
    * <b>Warning:</b> This method does not close the input stream.
    *
-   * @param vars_r name-value map for real-valued variables
-   * @param vars_i name-value map for int-valued variables
+   * @param a_vars_r name-value map for real-valued variables
+   * @param a_vars_i name-value map for int-valued variables
    */
-  json_data_handler(vars_map_r &vars_r, vars_map_i &vars_i)
+  json_data_handler(vars_map_r &a_vars_r, vars_map_i &a_vars_i)
       : json_handler(),
-        vars_r_(vars_r),
-        vars_i_(vars_i),
-        key_stack_(),
-        values_r_(),
-        values_i_(),
-        dims_(),
-        dims_verify_(),
-        dims_unknown_(),
-        dim_idx_(0),
-        dim_last_(0),
-        is_int_(true) {}
-
+        vars_r(a_vars_r),
+        vars_i(a_vars_i),
+        key_stack(),
+        var_types_map(),
+        key_types_map(),
+        values_r(),
+        values_i(),
+        dims(),
+        dim_idx(-1),
+        array_start_i(0),
+        array_start_r(0),
+        var_type(meta_type::SCALAR),
+        is_int(true) {}
+  
+  // *** start handler events ***
   void start_text() {
-    //    vars_i_.clear();  why is this needed?
-    //    vars_r_.clear();
-    reset();
+    vars_i.clear();  // can't accumulate var defs across calls to parser
+    vars_r.clear();
+    var_types_map.clear();
+    key_types_map.clear();
+    reset_var();
   }
 
-  void end_text() { reset(); }
+  void end_text() {
+    save_key_value_pair();
+    convert_arrays();
+    //    reset_var();
+  }
+
+  void key(const std::string &key) {
+    save_key_value_pair();
+    if (key_stack.size() == 0) {
+      reset_var();
+    } else {
+      reset_values();
+    }
+    key_stack.push_back(key);
+    if (key_types_map.count(key_str()) == 0) {
+      key_types_map[key_str()] = meta_type::SCALAR;
+      is_int = true;
+    }
+    dump_state("handled key");
+  }
+
+  void start_object() {
+    if (is_init())
+      return;
+    key_types_map[key_str()] = meta_type::TUPLE;
+    if (var_type == meta_type::SCALAR)
+      var_type = meta_type::TUPLE;
+    else if (var_type == meta_type::ARRAY)
+      var_type = meta_type::ARRAY_OF_TUPLES;
+    dump_state("handled {");
+  }
+
+  void end_object() {
+    save_key_value_pair();
+    dump_state("handled }");
+    if (key_stack.size() > 0 && dim_idx < 0)
+      key_stack.pop_back();
+  }
 
   void start_array() {
-    if (0 == key_stack_.size()) {
+    dump_state("start [");
+    if (0 == key_stack.size()) {
       throw json_error("expecting JSON object, found array");
     }
-    if (dim_idx_ > 0 && dim_last_ == dim_idx_) {
+    if (var_type == meta_type::SCALAR
+        && (values_r.size() > 0 || values_i.size() > 0)) {
       std::stringstream errorMsg;
       errorMsg << "variable: " << key_str() << ", error: non-scalar array value";
       throw json_error(errorMsg.str());
     }
-    incr_dim_size();
-    dim_idx_++;
-    if (dims_.size() < dim_idx_) {
-      dims_.push_back(0);
-      dims_unknown_.push_back(true);
-      dims_verify_.push_back(0);
-    } else {
-      dims_verify_[dim_idx_ - 1] = 0;
+    if (var_type == meta_type::SCALAR)
+      var_type = meta_type::ARRAY;
+    key_types_map[key_str()] = meta_type::ARRAY;
+    dim_idx++;
+    if (dims.size() < dim_idx + 1) {
+      dims.push_back(0);
+      dims_found.push_back(0);
+      dims_known.push_back(false);
     }
+    array_start_i = values_i.size();
+    array_start_r = values_r.size();
+    dump_state("handled [");
   }
 
   void end_array() {
-    if (dims_unknown_[dim_idx_ - 1] == true) {
-      dims_unknown_[dim_idx_ - 1] = false;
-    } else if (dims_verify_[dim_idx_ - 1] != dims_[dim_idx_ - 1]) {
-      std::stringstream errorMsg;
-      errorMsg << "variable: " << key_str() << ", error: non-rectangular array";
-      throw json_error(errorMsg.str());
+    if (dims_known[dim_idx]) {
+      if ((is_int && dims[dim_idx] != values_i.size() - array_start_i)
+          || (!is_int && dims[dim_idx] != values_r.size() - array_start_r)) {
+          std::stringstream errorMsg;
+          errorMsg << "variable: " << key_str() << ", error: non-rectangular array";
+          throw json_error(errorMsg.str());
+        }
+    } else {
+      if (is_int)
+        dims[dim_idx] = values_i.size() - array_start_i;
+      else
+        dims[dim_idx] = values_r.size() - array_start_r;
+      dims_known[dim_idx] = true;
     }
-    if (0 == dim_last_
-        && ((is_int_ && values_i_.size() > 0) || (values_r_.size() > 0)))
-      dim_last_ = dim_idx_;
-    dim_idx_--;
-  }
-
-  void start_object() {
-    std::cout << "start object " << key_str() << std::endl << std::flush;
-    if (key_stack_.size() > 0)
-      tuple_start_ = true;
-  }
-
-  void end_object() {
-    if (key_stack_.size() > 0 && !tuple_end_) {
-      std::cout << "end object, stack is:  " << key_str() << std::endl << std::flush;
-      save_current_key_value_pair();
+    dim_idx--;
+    if (dim_idx < 0) {
+      save_key_value_pair();
+      if (key_stack.size() > 0)
+        key_stack.pop_back();
     }
-    tuple_end_ = true;
-  }
-
-  void promote_to_double() {
-    if (is_int_) {
-      for (std::vector<int>::iterator it = values_i_.begin();
-           it != values_i_.end(); ++it)
-        values_r_.push_back(*it);
-      is_int_ = false;
-    }
+    dump_state("handled ]");
   }
 
   void null() {
@@ -208,109 +277,123 @@ class json_data_handler : public stan::json::json_handler {
       throw json_error(errorMsg.str());
     }
     promote_to_double();
-    values_r_.push_back(tmp);
-    incr_dim_size();
-  }
-
-  void key(const std::string &key) {
-    std::cout << "key: " << key << std::endl << std::flush;
-    tuple_end_ = false;
-    if (tuple_start_)
-      tuple_start_ = false;
-    else
-      save_current_key_value_pair();
-    key_stack_.push_back(key);
+    values_r.push_back(tmp);
   }
 
   void number_double(double x) {
-    set_last_dim();
     promote_to_double();
-    values_r_.push_back(x);
-    incr_dim_size();
+    values_r.push_back(x);
   }
 
   void number_int(int n) {
-    set_last_dim();
-    if (is_int_) {
-      values_i_.push_back(n);
+    if (is_int) {
+      values_i.push_back(n);
     } else {
-      values_r_.push_back(n);
+      values_r.push_back(n);
     }
-    incr_dim_size();
+    dump_state("int " + std::to_string(n));
   }
 
   void number_unsigned_int(unsigned n) {
-    set_last_dim();
     // if integer overflow, promote numeric data to double
     if (n > (unsigned)std::numeric_limits<int>::max())
       promote_to_double();
-    if (is_int_) {
-      values_i_.push_back(static_cast<int>(n));
+    if (is_int) {
+      values_i.push_back(static_cast<int>(n));
     } else {
-      values_r_.push_back(n);
+      values_r.push_back(n);
     }
-    incr_dim_size();
+    dump_state("int " + std::to_string(n));
   }
 
   void number_int64(int64_t n) {
     // the number doesn't fit in int (otherwise number_int() would be called)
     number_double(n);
+    dump_state("int " + std::to_string(n));
   }
 
   void number_unsigned_int64(uint64_t n) {
     // the number doesn't fit in int (otherwise number_unsigned_int() would be
     // called)
     number_double(n);
+    dump_state("int " + std::to_string(n));
   }
 
-  void save_current_key_value_pair() {
-    std::cout << " save key " << key_str() << std::endl << std::flush;
-    if (0 == key_stack_.size())
-      return;
+  // *** end handler events ***
 
-    // redefinition or variables not allowed
-    if (vars_r_.find(key_str()) != vars_r_.end()
-        || vars_i_.find(key_str()) != vars_i_.end()) {
+  void promote_to_double() {
+    if (is_int) {
+      for (std::vector<int>::iterator it = values_i.begin();
+           it != values_i.end(); ++it)
+        values_r.push_back(*it);
+      array_start_r = array_start_i;
+    }
+    is_int = false;
+  }
+
+
+  void save_key_value_pair() {
+    dump_state("save key");
+    if (0 == key_stack.size())
+      return;
+    if (key_types_map.count(key_str()) < 1) {
+      // this shouldn't happen!!!
       std::stringstream errorMsg;
-      errorMsg << "attempt to redefine variable: " << key_str();
+      errorMsg << "json_data_handler unexpected parsing error " << key_str();
       throw json_error(errorMsg.str());
     }
-
-    // transpose order of array values to column-major
-    if (is_int_) {
-      std::pair<std::vector<int>, std::vector<size_t>> pair;
-      if (dims_.size() > 1) {
-        std::vector<int> cm_values_i(values_i_.size());
-        to_column_major(cm_values_i, values_i_, dims_);
-        pair = make_pair(cm_values_i, dims_);
-
+    if (key_types_map[key_str()] == meta_type::TUPLE) {
+      std::cout << " tuple var " << key_str() << " nothing to record " << std::endl;
+      return;
+    }
+    bool do_append = (var_type == meta_type::ARRAY_OF_TUPLES);
+    std::cout << "value type " << key_types_map[key_str()] << std::endl;
+    var_types_map[key_str()] = key_types_map[key_str()];
+    if (!do_append) {
+      if (is_int) {
+        std::pair<std::vector<int>, std::vector<size_t>> pair;
+        pair = make_pair(values_i, dims);
+        vars_i[key_str()] = pair;
       } else {
-        pair = make_pair(values_i_, dims_);
+        std::pair<std::vector<double>, std::vector<size_t>> pair;
+        pair = make_pair(values_r, dims);
+        vars_r[key_str()] = pair;
       }
-      vars_i_[key_str()] = pair;
     } else {
-      std::pair<std::vector<double>, std::vector<size_t>> pair;
-      if (dims_.size() > 1) {
-        std::vector<double> cm_values_r(values_r_.size());
-        to_column_major(cm_values_r, values_r_, dims_);
-        pair = make_pair(cm_values_r, dims_);
+        // promote to double now!!!!
+      if (is_int) {
+        if (vars_i.count(key_str()) == 0) {
+          std::pair<std::vector<int>, std::vector<size_t>> pair;
+          pair = make_pair(values_i, dims);
+          vars_i[key_str()] = pair;
+        } else {
+          for (std::vector<int>::iterator it = values_i.begin();
+               it != values_i.end(); ++it)
+            vars_i[key_str()].first.push_back(*it);
+          vars_i[key_str()].second = dims;
+        }
       } else {
-        pair = make_pair(values_r_, dims_);
+        if (vars_r.count(key_str()) == 0) {
+          std::pair<std::vector<double>, std::vector<size_t>> pair;
+          pair = make_pair(values_r, dims);
+          vars_r[key_str()] = pair;
+        } else {
+          for (std::vector<double>::iterator it = values_r.begin();
+               it != values_r.end(); ++it)
+            vars_r[key_str()].first.push_back(*it);
+          vars_r[key_str()].second = dims;
+        }
       }
-      vars_r_[key_str()] = pair;
     }
-    key_stack_.pop_back();
+    key_stack.pop_back();
   }
 
-  void incr_dim_size() {
-    if (dim_idx_ > 0) {
-      if (dims_unknown_[dim_idx_ - 1])
-        dims_[dim_idx_ - 1]++;
-      else
-        dims_verify_[dim_idx_ - 1]++;
-    }
+  void convert_arrays() {
+    for (auto const &var : var_types_map)
+      std::cout << var.first << " " << var.second << " ";
+    std::cout << std::endl;
   }
-
+  
   template <typename T>
   void to_column_major(std::vector<T> &cm_vals, const std::vector<T> &rm_vals,
                        const std::vector<size_t> &dims) {
@@ -318,15 +401,6 @@ class json_data_handler : public stan::json::json_handler {
       size_t idx = convert_offset_rtl_2_ltr(i, dims);
       cm_vals[idx] = rm_vals[i];
     }
-  }
-
-  void set_last_dim() {
-    if (dim_last_ > 0 && dim_idx_ < dim_last_) {
-      std::stringstream errorMsg;
-      errorMsg << "variable: " << key_str() << ", error: non-rectangular array";
-      throw json_error(errorMsg.str());
-    }
-    dim_last_ = dim_idx_;
   }
 
   // convert row-major offset to column-major offset
@@ -367,3 +441,41 @@ class json_data_handler : public stan::json::json_handler {
 }  // namespace stan
 
 #endif
+
+
+    // edge case:  adding to array_of_tuples slot, promote to double
+    // // transpose order of array values to column-major
+    // if (is_int) {
+    //   
+    //   if (dims.size() > 1) {
+    //     std::vector<int> cm_values_i(values_i.size());
+    //     to_column_major(cm_values_i, values_i_, dims);
+    //     pair = make_pair(cm_values_i, dims);
+
+    //   } else {
+    //     
+    //   }
+    //   if (do_append && (vars_i.find(key_str()) != vars_i.end()))
+    //     // check dims!
+    //     for (size_t i = 0; i < vars_i.size(); i++)
+    //       vars_i[key_str()].first.push_back(values_i[i]);
+    //   else
+    //     vars_i[key_str()] = pair;
+    //   std::cout << " save int " << key_str() << std::endl;
+    // } else {
+    //   std::pair<std::vector<double>, std::vector<size_t>> pair;
+    //   if (dims.size() > 1) {
+    //     std::vector<double> cm_values_r(values_r.size());
+    //     to_column_major(cm_values_r, values_r_, dims);
+    //     pair = make_pair(cm_values_r, dims);
+    //   } else {
+    //     pair = make_pair(values_r_, dims);
+    //   }
+    //   if (do_append && (vars_r.find(key_str()) != vars_r.end()))
+    //     // check dims! - dims must match existing dims
+    //     for (size_t i = 0; i < vars_r.size(); i++)
+    //       vars_r[key_str()].first.push_back(values_r[i]);
+    //   else
+    //     vars_r[key_str()] = pair;
+    //   std::cout << " save real " << key_str() << std::endl;
+    // }
