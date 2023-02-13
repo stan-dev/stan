@@ -60,7 +60,7 @@ TEST(ioJson, jsonData_array_tuple_array) {
   std::cout << tmp << std::endl << std::flush;
 
   std::cout << filename << std::endl << std::flush;
-  //  show_parse(filename);
+  show_file(filename);
   std::ifstream in(filename);
   stan::json::json_data jdata1(in);
   EXPECT_EQ(true, jdata1.contains_r("y"));
@@ -79,7 +79,7 @@ TEST(ioJson, jsonData_no_tuples) {
   std::vector<std::string> json_path;
   json_path = {"src", "test", "test-data", "arrays.json"};
   std::string filename = paths_to_fname(json_path);
-  //  show_file(filename);
+  show_file(filename);
   //  show_parse(filename);
   std::ifstream in(filename);
   stan::json::json_data jdata(in);
