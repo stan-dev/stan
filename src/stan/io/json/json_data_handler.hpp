@@ -7,6 +7,7 @@
 #include <stan/io/var_context.hpp>
 #include <cctype>
 #include <iostream>
+#include <ostream>
 #include <limits>
 #include <map>
 #include <numeric>
@@ -14,7 +15,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace stan {
 
@@ -36,6 +37,48 @@ struct meta_type {
     TUPLE = 2,   // one or more "{"
     ARRAY_OF_TUPLES = 3,  // one or more "[" followed by "{"
   };
+};
+
+struct meta_event {
+  // info needed to manage key stack
+  enum {
+    OBJ_OPEN= 0,  // {
+    OBJ_CLOSE = 1,  // }
+    KEY = 2, 
+  };
+};
+
+class array_dims {
+  // accumulates array dimensions
+ public:
+  std::vector<size_t> dims;
+  std::vector<size_t> dims_acc;
+  int cur_dim;
+  array_dims() : dims(), dims_acc(), cur_dim(0) {
+  }
+
+  std::string print() {
+    std::stringstream ss;
+    ss << " num dims: " << dims.size() << "\tdims: ";
+    for (size_t i=0; i < dims.size(); ++i)
+      ss << " " << dims[i];
+    ss << "\tdims_acc: ";
+    for (size_t i=0; i < dims_acc.size(); ++i)
+      ss << " " << dims_acc[i];
+    ss << std::endl;
+    return ss.str();
+  }
+
+  bool operator==(const array_dims& other) {
+    return dims == other.dims && dims_acc == other.dims_acc
+        && cur_dim == other.cur_dim;
+  }
+
+  bool operator!=(const array_dims& other) {
+    return dims != other.dims || dims_acc != other.dims_acc
+        || cur_dim != other.cur_dim;
+  }
+
 };
 
 /**
@@ -63,37 +106,34 @@ class json_data_handler : public stan::json::json_handler {
   std::vector<std::string> key_stack;
   std::map<std::string, int> var_types_map;
   std::map<std::string, int> key_types_map;
+  std::map<std::string, array_dims> key_dims_map;
   std::vector<double> values_r;
   std::vector<int> values_i;
-  std::vector<size_t> dims;
-  std::vector<size_t> dim_elts;  // accumulates elements per row
-  int dim_at;
-  int var_type;
   size_t array_start_i;  // index into values_i
   size_t array_start_r;  // index into values_r
+  int var_type;
   bool is_int;
-
-  bool debug = true;
-
+  int event;
+  
   void dump_state(std::string where) {
-    if (debug) {
-      std::string slot_type("unknown");
-      if (key_types_map.count(key_str()) == 1)
-        slot_type = std::to_string(key_types_map[key_str()]);
-      std::cout << where << std::endl
-                << "key " << key_str() << " var_type " << var_type
-                << " slot_type " << slot_type << " is_int " << is_int 
-                << " dims " << dims.size() << " dim_at " << dim_at
-                << " values_i " << values_i.size() << " values_r " << values_r.size()
-                << std::endl;
-      std::cout << "\tdims: ";
-      for (size_t i = 0; i < dims.size(); i++)
-        std::cout << " " << dims[i];
-      std::cout << "\tdim_elts: ";
-      for (size_t i = 0; i < dim_elts.size(); i++)
-        std::cout << " " << dim_elts[i];
+    std::string slot_type("unknown");
+    if (key_types_map.count(key_str()) == 1)
+      slot_type = std::to_string(key_types_map[key_str()]);
+    std::cout << where 
+              << " key " << key_str() << " var_type " << var_type
+              << " slot_type " << slot_type << " is_int " << is_int 
+              << "\n\tvalues_i " << values_i.size();
+    for (auto& x: values_i)
+      std::cout << " " << x;
+    std::cout << std::endl;
+    std::cout<< "\n\tvalues_r " << values_r.size();
+    for (auto& x: values_r)
+      std::cout << " " << x;
+    std::cout << std::endl;
+    if (key_dims_map.count(key_str()) == 1)
+      std::cout << key_dims_map[key_str()].print();
+    else
       std::cout << std::endl;
-    }
   }
 
   void reset_values() {
@@ -105,18 +145,14 @@ class json_data_handler : public stan::json::json_handler {
 
   void reset_var() {
     reset_values();
-    dims.clear();
-    dim_elts.clear();
-    dim_at = 0;
     var_type = meta_type::SCALAR;
     is_int = true;
   }
 
   bool is_init() {
     return (key_stack.empty() && var_types_map.empty()  && key_types_map.empty()
-            && values_r.empty() && values_i.empty() && dims.empty()
-            && dim_elts.empty() && dim_at == 0 && array_start_i == 0
-            && array_start_r == 0 && is_int);
+            && values_r.empty() && values_i.empty() && key_dims_map.empty()
+            && array_start_i == 0 && array_start_r == 0 && is_int);
   }
 
   std::string key_str() {
@@ -144,11 +180,9 @@ class json_data_handler : public stan::json::json_handler {
         key_stack(),
         var_types_map(),
         key_types_map(),
+        key_dims_map(),
         values_r(),
         values_i(),
-        dims(),
-        dim_elts(),
-        dim_at(0),
         array_start_i(0),
         array_start_r(0),
         var_type(meta_type::SCALAR),
@@ -165,12 +199,29 @@ class json_data_handler : public stan::json::json_handler {
 
   void end_text() {
     save_key_value_pair();
+    for (auto& x : key_types_map)
+      std::cout << "key " << x.first << " type " << x.second << std::endl;
+    for (auto& x : var_types_map)
+      std::cout << " variable " << x.first << " type " << x.second << std::endl;
+    for (auto& x : key_dims_map) {
+      std::cout << " variable " << x.first;
+      std::cout << x.second.print();
+    }
+    std::cout << std::endl;
     convert_arrays();
-    reset_var();
+    for (auto& var : vars_i)
+      std::cout << var.first << std::endl;
+    for (auto& var : vars_r)
+      std::cout << var.first << std::endl;
+
+    //    reset_var();
   }
 
   void key(const std::string &key) {
-    save_key_value_pair();
+    if (event != meta_event::OBJ_OPEN) {
+      save_key_value_pair();
+    }
+    event = meta_event::KEY;
     if (key_stack.empty()) {
       reset_var();
     } else {
@@ -184,27 +235,34 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   void start_object() {
+    event = meta_event::OBJ_OPEN;
     if (is_init())
       return;
-    key_types_map[key_str()] = meta_type::TUPLE;
     if (var_type == meta_type::SCALAR)
       var_type = meta_type::TUPLE;
     else if (var_type == meta_type::ARRAY)
       var_type = meta_type::ARRAY_OF_TUPLES;
+    key_types_map[key_str()] = var_type;
   }
 
   void end_object() {
+    event = meta_event::OBJ_CLOSE;
+    if (var_type == meta_type::ARRAY_OF_TUPLES) {
+      array_dims outer = get_outer_dims(key_stack);
+      if (!outer.dims.empty()) {
+        outer.dims_acc[outer.dims.size()-1]++;
+        set_outer_dims(outer);
+      }
+    }
     save_key_value_pair();
-    if (key_stack.size() > 0 && var_type != meta_type::ARRAY_OF_TUPLES)
-      key_stack.pop_back();
   }
 
   void start_array() {
-    if (0 == key_stack.size()) {
+    if (key_stack.empty()) {
       throw json_error("expecting JSON object, found array");
     }
     if (var_type == meta_type::SCALAR
-        && (values_r.size() > 0 || values_i.size() > 0)) {
+        && !(values_r.empty() && values_r.empty())) {
       std::stringstream errorMsg;
       errorMsg << "variable: " << key_str() << ", error: non-scalar array value";
       throw json_error(errorMsg.str());
@@ -212,34 +270,47 @@ class json_data_handler : public stan::json::json_handler {
     if (var_type == meta_type::SCALAR)
       var_type = meta_type::ARRAY;
     key_types_map[key_str()] = meta_type::ARRAY;
-    dim_at++;
-    if (dims.empty() || dims.size() < dim_at) {
-      dims.push_back(0);
-      dim_elts.push_back(0);
+    array_dims dims;
+    if (key_dims_map.count(key_str()) == 1)
+      dims = key_dims_map[key_str()];
+    dims.cur_dim++;
+    if (dims.dims.empty() || dims.dims.size() < dims.cur_dim) {
+      dims.dims.push_back(0);
+      dims.dims_acc.push_back(0);
     }
-    if (dim_at > 1)
-      dim_elts[dim_at-2]++;
+    if (dims.cur_dim > 1)
+      dims.dims_acc[dims.cur_dim-2]++;
+    key_dims_map[key_str()] = dims;
     array_start_i = values_i.size();
     array_start_r = values_r.size();
   }
 
   void end_array() {
-    if (dim_at == dims.size() && 0 == dims[dim_at-1]) {
-      // first inner array row 
+    if (key_dims_map.count(key_str()) == 0)
+      unexpected_error(key_str());
+    array_dims dims = key_dims_map[key_str()];
+    bool is_aot = false;
+    if (var_type == meta_type::ARRAY_OF_TUPLES) {
+      array_dims outer = get_outer_dims(key_stack);
+      if (outer == dims)
+        is_aot = true;
+    }
+    bool is_last = !is_aot && dims.cur_dim == dims.dims.size();
+    int idx = dims.cur_dim - 1;
+    if (is_last && 0 == dims.dims[idx]) {  // innermost row of scalar elts
       if (is_int)
-        dims[dim_at-1] = values_i.size() - array_start_i;
+        dims.dims[idx] = values_i.size() - array_start_i;
       else
-        dims[dim_at-1] = values_r.size() - array_start_r;
-    } else if (dim_at < dims.size() && 0 == dims[dim_at-1]) {
-      // first outer array row
-      dims[dim_at-1] = dim_elts[dim_at-1];
-    } else if (dims[dim_at-1] > 0) {
+        dims.dims[idx] = values_r.size() - array_start_r;
+    } else if (0 == dims.dims[idx]) {  // row of array or tuple elts
+      dims.dims[idx] = dims.dims_acc[idx];
+    } else {
       bool is_rect = false;
-      if (dim_at == dims.size()) {
-        if ((is_int && dims[dim_at-1] == values_i.size() - array_start_i)
-            || (!is_int && dims[dim_at-1] == values_r.size() - array_start_r))
+      if (is_last) {
+        if ((is_int && dims.dims[idx] == values_i.size() - array_start_i)
+            || (!is_int && dims.dims[idx] == values_r.size() - array_start_r))
           is_rect = true;
-      } else if (dims[dim_at-1] == dim_elts[dim_at-1]) {
+      } else if (dims.dims[idx] == dims.dims_acc[idx]) {
         is_rect = true;
       }
       if (!is_rect) {
@@ -248,13 +319,9 @@ class json_data_handler : public stan::json::json_handler {
         throw json_error(errorMsg.str());
       }
     }
-    dim_elts[dim_at-1] = 0;
-    dim_at--;
-    if (dim_at == 0) {
-      save_key_value_pair();
-      if (key_stack.size() > 0)
-        key_stack.pop_back();
-    }
+    dims.dims_acc[idx] = 0;
+    dims.cur_dim--;
+    key_dims_map[key_str()] = dims;
   }
 
   void null() {
@@ -337,24 +404,58 @@ class json_data_handler : public stan::json::json_handler {
     is_int = false;
   }
 
-
   void save_key_value_pair() {
     if (0 == key_stack.size())
       return;
     if (key_types_map.count(key_str()) < 1)
       unexpected_error(key_str());
-    if (key_types_map[key_str()] == meta_type::TUPLE)
-      return;
-
-    if (var_type == meta_type::ARRAY_OF_TUPLES) {
-      var_types_map[key_str()] = meta_type::ARRAY;
-      // update sizes - 1-d array, incr last dim, 2-d array, incr last 2 dims
-      if (is_int) {
-        if (vars_r.count(key_str()) == 0 && vars_i.count(key_str()) == 0) {
+    if (key_types_map[key_str()] == meta_type::TUPLE
+        || key_types_map[key_str()] == meta_type::ARRAY_OF_TUPLES) {
+      ;
+    } else {
+      dump_state("save scalar or array (row)");
+      std::vector<size_t> dims;
+      if (key_dims_map.count(key_str()) == 1)
+        dims = key_dims_map[key_str()].dims;
+      bool is_new = vars_r.count(key_str()) == 0 && vars_i.count(key_str()) == 0;
+      bool is_real = vars_r.count(key_str()) == 1;
+      bool was_int = vars_i.count(key_str()) == 1;
+      std::cout << "is_new? " << is_new << " is_real? " << is_real << " was_int? " << was_int << std::endl;
+      if (is_new) {
+        var_types_map[key_str()] = key_types_map[key_str()];
+        if (is_int) {
           std::pair<std::vector<int>, std::vector<size_t>> pair;
           pair = make_pair(values_i, dims);
           vars_i[key_str()] = pair;
-        } else if (vars_r.count(key_str()) == 0) {
+        } else {
+          std::pair<std::vector<double>, std::vector<size_t>> pair;
+          pair = make_pair(values_r, dims);
+          vars_r[key_str()] = pair;
+        }
+      } else {
+        if (var_type != meta_type::ARRAY_OF_TUPLES) {
+          std::stringstream errorMsg;
+          errorMsg << "attempt to redefine variable " << key_str();
+          throw json_error(errorMsg.str());
+        }
+        std::cout << "one row of array of tuples" << std::endl;
+        var_types_map[key_str()] = meta_type::ARRAY;
+        std::vector<size_t> dims = key_dims_map[key_str()].dims;
+        if ((!is_int && was_int) || (is_int && is_real)) {  // promote to double
+          std::vector<double> values_tmp;
+          std::cout << "save existing vars_i values ";
+          for (auto& x : vars_i[key_str()].first) {
+            values_tmp.push_back(x);
+            std::cout << " " << x;
+          }
+          std::cout << std::endl;
+          for (auto&x : values_r)
+            values_tmp.push_back(x);
+          std::pair<std::vector<double>, std::vector<size_t>> pair;
+          pair = make_pair(values_tmp, dims);
+          vars_r[key_str()] = pair;
+          vars_i.erase(key_str());
+        } else if (is_int) {
           for (std::vector<int>::iterator it = values_i.begin();
                it != values_i.end(); ++it)
             vars_i[key_str()].first.push_back(*it);
@@ -364,82 +465,69 @@ class json_data_handler : public stan::json::json_handler {
                it != values_r.end(); ++it)
             vars_r[key_str()].first.push_back(*it);
           vars_r[key_str()].second = dims;
-        }          
-      } else {
-        if (vars_i.count(key_str()) == 1) {
-          std::vector<double> tmp(vars_i[key_str()].first.begin(), vars_i[key_str()].first.end());
-          for (std::vector<double>::iterator it = values_r.begin();
-               it != values_r.end(); ++it)
-            tmp.push_back(*it);
-          std::pair<std::vector<double>, std::vector<size_t>> pair;
-          pair = make_pair(tmp, dims);
-          vars_r[key_str()] = pair;
-          vars_i.erase(key_str());
-        } else if (vars_r.count(key_str()) == 0) {
-          std::pair<std::vector<double>, std::vector<size_t>> pair;
-          pair = make_pair(values_r, dims);
-          vars_r[key_str()] = pair;
-        } else {
-          for (std::vector<double>::iterator it = values_r.begin();
-               it != values_r.end(); ++it)
-            vars_r[key_str()].first.push_back(*it);
-          vars_r[key_str()].second = dims;
         }
-      }
-    } else {
-      var_types_map[key_str()] = key_types_map[key_str()];
-      if (is_int) {
-        std::pair<std::vector<int>, std::vector<size_t>> pair;
-        pair = make_pair(values_i, dims);
-        vars_i[key_str()] = pair;
-      } else {
-        std::pair<std::vector<double>, std::vector<size_t>> pair;
-        pair = make_pair(values_r, dims);
-        vars_r[key_str()] = pair;
       }
     }
     key_stack.pop_back();
   }
 
   void convert_arrays() {
-    for (auto const &var : var_types_map)
-      std::cout << var.first << " " << var.second << " ";
-    std::cout << std::endl;
-    // for (auto const &var : var_types_map) {
-    //   if (var.second == meta_type::ARRAY) {
-    //     std::cout << "converting " << var.first << std::endl;
-    //     if (vars_i.count(var.first) == 1) {
-    //       std::pair<std::vector<int>, std::vector<size_t>> pair;
-    //       std::vector<int> cm_values_i(vars_i[var.first].first.size());
-    //       to_column_major(cm_values_i,
-    //                       vars_i[var.first].first,
-    //                       vars_i[var.first].second);
-    //       pair = make_pair(cm_values_i, vars_i[var.first].second);
-    //       vars_i[var.first] = pair;
-    //     } else if (vars_r.count(var.first) == 1) {
-    //       std::pair<std::vector<double>, std::vector<size_t>> pair;
-    //       std::vector<double> cm_values_r(vars_r[var.first].first.size());
-    //       to_column_major(cm_values_r,
-    //                       vars_r[var.first].first,
-    //                       vars_r[var.first].second);
-    //       pair = make_pair(cm_values_r, vars_r[var.first].second);
-    //       vars_r[var.first] = pair;
-
-    //     } else {
-    //       unexpected_error(var.first);
-    //     }
-    //   }
-    // }
+    for (auto const &var : var_types_map) {
+      if (var.second != meta_type::ARRAY) {
+        std::cout << "nothing to be done for " << var.first << std::endl;
+        return;
+      }
+      std::cout << "converting " << var.first << " type " << var.second << std::endl;
+      std::vector<size_t> all_dims;
+      array_dims inner = key_dims_map[var.first];
+      // check is need to combine dims
+      std::vector<std::string> keys;
+      split(keys, var.first, boost::is_any_of("."), boost::token_compress_on);
+      array_dims outer = get_outer_dims(keys);
+      if (inner != outer)
+        for (auto& x : outer.dims)
+          all_dims.push_back(x);
+      for (auto& x : inner.dims)
+        all_dims.push_back(x);
+      if (vars_i.count(var.first) == 1) {
+        std::vector<int> cm_values_i(vars_i[var.first].first.size());
+        std::pair<std::vector<int>, std::vector<size_t>> pair;
+        if (all_dims.empty()) {
+          to_column_major(cm_values_i,
+                          vars_i[var.first].first,
+                          vars_i[var.first].second);
+          pair = make_pair(cm_values_i, vars_i[var.first].second);
+        } else {
+          to_column_major(cm_values_i,
+                          vars_i[var.first].first,
+                          all_dims);
+          pair = make_pair(cm_values_i, all_dims);
+        }            
+        vars_i[var.first] = pair;
+      } else if (vars_r.count(var.first) == 1) {
+        std::vector<double> cm_values_r(vars_r[var.first].first.size());
+        std::pair<std::vector<double>, std::vector<size_t>> pair;
+        if (all_dims.empty()) {
+          to_column_major(cm_values_r,
+                          vars_r[var.first].first,
+                          vars_r[var.first].second);
+          pair = make_pair(cm_values_r, vars_r[var.first].second);
+        } else {
+          to_column_major(cm_values_r,
+                          vars_r[var.first].first,
+                          all_dims);
+          pair = make_pair(cm_values_r, all_dims);
+        }            
+        vars_r[var.first] = pair;
+      } else {
+        unexpected_error("cannot convert " + var.first);
+      }
+    }
   }
-  
+ 
   template <typename T>
   void to_column_major(std::vector<T> &cm_vals, const std::vector<T> &rm_vals,
                        const std::vector<size_t> &dims) {
-    std::cout << "to_column_major, num_dims: " << dims.size() << ", sizes: ";
-    for (size_t i = 0; i < dims.size(); i++)
-      std::cout << " " << dims[i];
-    std::cout << " num elts " << rm_vals.size() << std::endl;
-
     for (size_t i = 0; i < rm_vals.size(); i++) {
       size_t idx = convert_offset_rtl_2_ltr(i, dims);
       cm_vals[idx] = rm_vals[i];
@@ -484,6 +572,35 @@ class json_data_handler : public stan::json::json_handler {
     throw json_error(errorMsg.str());
   }    
 
+  // assumes at more 2 dims - inner / outer
+  array_dims get_outer_dims(std::vector<std::string> keys) {
+    std::string prefix;
+    for (size_t i=0; i < keys.size(); ++i) {
+      prefix.append(keys[i]);
+      if (key_dims_map.count(prefix) == 1)
+        return key_dims_map[prefix];
+      else
+        prefix.append(".");
+    }
+    array_dims empty;
+    return empty;
+  }
+
+  void set_outer_dims(array_dims update) {
+    std::string prefix;
+    for (size_t i=0; i < key_stack.size(); ++i) {
+      prefix.append(key_stack[i]);
+      if (key_dims_map.count(prefix) == 1)
+        break;
+      else
+        prefix.append(".");
+    }
+    if (prefix.back() != '.')
+      key_dims_map[prefix] = update;
+    else
+      unexpected_error(key_str());
+  }
+
 };
 
 }  // namespace json
@@ -491,41 +608,3 @@ class json_data_handler : public stan::json::json_handler {
 }  // namespace stan
 
 #endif
-
-
-    // edge case:  adding to array_of_tuples slot, promote to double
-    // // transpose order of array values to column-major
-    // if (is_int) {
-    //   
-    //   if (dims.size() > 1) {
-    //     std::vector<int> cm_values_i(values_i.size());
-    //     to_column_major(cm_values_i, values_i_, dims);
-    //     pair = make_pair(cm_values_i, dims);
-
-    //   } else {
-    //     
-    //   }
-    //   if (do_append && (vars_i.find(key_str()) != vars_i.end()))
-    //     // check dims!
-    //     for (size_t i = 0; i < vars_i.size(); i++)
-    //       vars_i[key_str()].first.push_back(values_i[i]);
-    //   else
-    //     vars_i[key_str()] = pair;
-    //   std::cout << " save int " << key_str() << std::endl;
-    // } else {
-    //   std::pair<std::vector<double>, std::vector<size_t>> pair;
-    //   if (dims.size() > 1) {
-    //     std::vector<double> cm_values_r(values_r.size());
-    //     to_column_major(cm_values_r, values_r_, dims);
-    //     pair = make_pair(cm_values_r, dims);
-    //   } else {
-    //     pair = make_pair(values_r_, dims);
-    //   }
-    //   if (do_append && (vars_r.find(key_str()) != vars_r.end()))
-    //     // check dims! - dims must match existing dims
-    //     for (size_t i = 0; i < vars_r.size(); i++)
-    //       vars_r[key_str()].first.push_back(values_r[i]);
-    //   else
-    //     vars_r[key_str()] = pair;
-    //   std::cout << " save real " << key_str() << std::endl;
-    // }
