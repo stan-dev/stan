@@ -59,12 +59,12 @@ class array_dims {
 
   std::string print() {
     std::stringstream ss;
-    ss << " num dims: " << dims.size() << "\tdims: ";
-    for (size_t i=0; i < dims.size(); ++i)
-      ss << " " << dims[i];
-    ss << "\tdims_acc: ";
-    for (size_t i=0; i < dims_acc.size(); ++i)
-      ss << " " << dims_acc[i];
+    ss << " num dims: " << dims.size() << "\tdim szs: ";
+    for (auto& x : dims)
+      ss << " " << x;
+    ss << "\tdims_acc cts: ";
+    for (auto& x : dims_acc)
+      ss << " " << x;
     ss << std::endl;
     return ss.str();
   }
@@ -75,8 +75,7 @@ class array_dims {
   }
 
   bool operator!=(const array_dims& other) {
-    return dims != other.dims || dims_acc != other.dims_acc
-        || cur_dim != other.cur_dim;
+    return !operator==(other);
   }
 
 };
@@ -104,36 +103,45 @@ class json_data_handler : public stan::json::json_handler {
   vars_map_r &vars_r;
   vars_map_i &vars_i;
   std::vector<std::string> key_stack;
-  std::map<std::string, int> var_types_map;
-  std::map<std::string, int> key_types_map;
-  std::map<std::string, array_dims> key_dims_map;
+  std::map<std::string, int> var_types_map;  // vars_r and vars_i entries
+  std::map<std::string, int> slot_types_map;  // all slots all vars parsed
+  std::map<std::string, array_dims> slot_dims_map;
+  std::map<std::string, bool> int_slots_map;
   std::vector<double> values_r;
   std::vector<int> values_i;
   size_t array_start_i;  // index into values_i
   size_t array_start_r;  // index into values_r
-  int var_type;
-  bool is_int;
   int event;
   
   void dump_state(std::string where) {
     std::string slot_type("unknown");
-    if (key_types_map.count(key_str()) == 1)
-      slot_type = std::to_string(key_types_map[key_str()]);
+    if (slot_types_map.count(key_str()) == 1)
+      slot_type = std::to_string(slot_types_map[key_str()]);
+    bool is_int = true;
+    if (int_slots_map.count(key_str()) == 1)
+      is_int = int_slots_map[key_str()];
     std::cout << where 
-              << " key " << key_str() << " var_type " << var_type
-              << " slot_type " << slot_type << " is_int " << is_int 
-              << "\n\tvalues_i " << values_i.size();
+              << " key " << key_str()
+              << " slot_type " << slot_type
+              << " is_int " << is_int 
+              << "\n\tvalues_i (" << values_i.size() << ") ";
     for (auto& x: values_i)
       std::cout << " " << x;
-    std::cout << std::endl;
-    std::cout<< "\n\tvalues_r " << values_r.size();
+    std::cout<< "\n\tvalues_r (" << values_r.size() << ") ";
     for (auto& x: values_r)
       std::cout << " " << x;
     std::cout << std::endl;
-    if (key_dims_map.count(key_str()) == 1)
-      std::cout << key_dims_map[key_str()].print();
+    if (slot_dims_map.count(key_str()) == 1)
+      std::cout << slot_dims_map[key_str()].print();
     else
       std::cout << std::endl;
+    std::cout << "\tknown int vars (" << vars_i.size() << ") ";
+    for (auto&x : vars_i)
+      std::cout << " " << x.first;
+    std::cout << "\tknown real vars (" << vars_r.size() << ") ";
+    for (auto&x : vars_r)
+      std::cout << " " << x.first;
+    std::cout << std::endl;
   }
 
   void reset_values() {
@@ -143,25 +151,25 @@ class json_data_handler : public stan::json::json_handler {
     array_start_r = 0;
   }
 
-  void reset_var() {
-    reset_values();
-    var_type = meta_type::SCALAR;
-    is_int = true;
-  }
-
   bool is_init() {
-    return (key_stack.empty() && var_types_map.empty()  && key_types_map.empty()
-            && values_r.empty() && values_i.empty() && key_dims_map.empty()
-            && array_start_i == 0 && array_start_r == 0 && is_int);
+    return (key_stack.empty() && var_types_map.empty()  && slot_types_map.empty()
+            && values_r.empty() && values_i.empty() && slot_dims_map.empty()
+            && array_start_i == 0 && array_start_r == 0 && int_slots_map.empty());
   }
 
   std::string key_str() {
-    if (key_stack.empty()) return "";
-    return std::accumulate(std::next(key_stack.begin()), key_stack.end(),
-                           key_stack[0], // start with first element
-                           [](std::string a, const std::string b) {
-                             return std::move(a) + '.' + b;
-                           });
+    return boost::algorithm::join(key_stack, ".");
+  }
+
+  std::string outer_key_str() {
+    std::string result;
+    if (key_stack.size() > 1) {
+      std::string slot = key_stack.back();
+      key_stack.pop_back();
+      result = key_str();
+      key_stack.push_back(slot);
+    }
+    return result;
   }
 
  public:
@@ -179,42 +187,46 @@ class json_data_handler : public stan::json::json_handler {
         vars_i(a_vars_i),
         key_stack(),
         var_types_map(),
-        key_types_map(),
-        key_dims_map(),
+        slot_types_map(),
+        slot_dims_map(),
+        int_slots_map(),
         values_r(),
         values_i(),
         array_start_i(0),
-        array_start_r(0),
-        var_type(meta_type::SCALAR),
-        is_int(true) {}
+        array_start_r(0) {}
   
   // *** start handler events ***
   void start_text() {
     vars_i.clear();  // can't accumulate var defs across calls to parser
     vars_r.clear();
     var_types_map.clear();
-    key_types_map.clear();
-    reset_var();
+    slot_types_map.clear();
+    reset_values();
   }
 
   void end_text() {
     save_key_value_pair();
-    for (auto& x : key_types_map)
+
+    for (auto& x : slot_types_map)
       std::cout << "key " << x.first << " type " << x.second << std::endl;
+    for (auto& x : int_slots_map)
+      std::cout << "key " << x.first << " is_int? " << x.second << std::endl;
     for (auto& x : var_types_map)
       std::cout << " variable " << x.first << " type " << x.second << std::endl;
-    for (auto& x : key_dims_map) {
+    for (auto& x : slot_dims_map) {
       std::cout << " variable " << x.first;
       std::cout << x.second.print();
     }
     std::cout << std::endl;
+
     convert_arrays();
+
     for (auto& var : vars_i)
       std::cout << var.first << std::endl;
     for (auto& var : vars_r)
       std::cout << var.first << std::endl;
 
-    //    reset_var();
+    reset_values();
   }
 
   void key(const std::string &key) {
@@ -222,15 +234,11 @@ class json_data_handler : public stan::json::json_handler {
       save_key_value_pair();
     }
     event = meta_event::KEY;
-    if (key_stack.empty()) {
-      reset_var();
-    } else {
-      reset_values();
-    }
+    reset_values();
     key_stack.push_back(key);
-    if (key_types_map.count(key_str()) == 0) {
-      key_types_map[key_str()] = meta_type::SCALAR;
-      is_int = true;
+    if (slot_types_map.count(key_str()) == 0) {
+      slot_types_map[key_str()] = meta_type::SCALAR;
+      int_slots_map[key_str()] = true;
     }
   }
 
@@ -238,16 +246,19 @@ class json_data_handler : public stan::json::json_handler {
     event = meta_event::OBJ_OPEN;
     if (is_init())
       return;
-    if (var_type == meta_type::SCALAR)
-      var_type = meta_type::TUPLE;
-    else if (var_type == meta_type::ARRAY)
-      var_type = meta_type::ARRAY_OF_TUPLES;
-    key_types_map[key_str()] = var_type;
+    if (slot_types_map[key_str()] == meta_type::ARRAY) {
+      slot_types_map[key_str()] = meta_type::ARRAY_OF_TUPLES;
+    }
+    else if (slot_types_map[key_str()] == meta_type::SCALAR) {
+      slot_types_map[key_str()] = meta_type::TUPLE;
+    }
+    // don't reset tuples or array of tuples
   }
 
   void end_object() {
     event = meta_event::OBJ_CLOSE;
-    if (var_type == meta_type::ARRAY_OF_TUPLES) {
+    if (key_stack.size() > 1
+        && slot_types_map[outer_key_str()] == meta_type::ARRAY_OF_TUPLES) {
       array_dims outer = get_outer_dims(key_stack);
       if (!outer.dims.empty()) {
         outer.dims_acc[outer.dims.size()-1]++;
@@ -261,18 +272,19 @@ class json_data_handler : public stan::json::json_handler {
     if (key_stack.empty()) {
       throw json_error("expecting JSON object, found array");
     }
-    if (var_type == meta_type::SCALAR
+    if (slot_types_map[key_str()] == meta_type::SCALAR
         && !(values_r.empty() && values_r.empty())) {
       std::stringstream errorMsg;
       errorMsg << "variable: " << key_str() << ", error: non-scalar array value";
       throw json_error(errorMsg.str());
     }
-    if (var_type == meta_type::SCALAR)
-      var_type = meta_type::ARRAY;
-    key_types_map[key_str()] = meta_type::ARRAY;
+    if (slot_types_map[key_str()] == meta_type::SCALAR)
+        slot_types_map[key_str()] = meta_type::ARRAY;
+    else if (slot_types_map[key_str()] == meta_type::TUPLE)
+      unexpected_error(key_str());
     array_dims dims;
-    if (key_dims_map.count(key_str()) == 1)
-      dims = key_dims_map[key_str()];
+    if (slot_dims_map.count(key_str()) == 1)
+      dims = slot_dims_map[key_str()];
     dims.cur_dim++;
     if (dims.dims.empty() || dims.dims.size() < dims.cur_dim) {
       dims.dims.push_back(0);
@@ -280,23 +292,19 @@ class json_data_handler : public stan::json::json_handler {
     }
     if (dims.cur_dim > 1)
       dims.dims_acc[dims.cur_dim-2]++;
-    key_dims_map[key_str()] = dims;
+    slot_dims_map[key_str()] = dims;
     array_start_i = values_i.size();
     array_start_r = values_r.size();
   }
 
   void end_array() {
-    if (key_dims_map.count(key_str()) == 0)
+    if (slot_dims_map.count(key_str()) == 0)
       unexpected_error(key_str());
-    array_dims dims = key_dims_map[key_str()];
-    bool is_aot = false;
-    if (var_type == meta_type::ARRAY_OF_TUPLES) {
-      array_dims outer = get_outer_dims(key_stack);
-      if (outer == dims)
-        is_aot = true;
-    }
-    bool is_last = !is_aot && dims.cur_dim == dims.dims.size();
+    array_dims dims = slot_dims_map[key_str()];
     int idx = dims.cur_dim - 1;
+    bool is_int = int_slots_map[key_str()];
+    bool is_last = (slot_types_map[key_str()] != meta_type::ARRAY_OF_TUPLES
+                    && dims.cur_dim == dims.dims.size());
     if (is_last && 0 == dims.dims[idx]) {  // innermost row of scalar elts
       if (is_int)
         dims.dims[idx] = values_i.size() - array_start_i;
@@ -321,7 +329,7 @@ class json_data_handler : public stan::json::json_handler {
     }
     dims.dims_acc[idx] = 0;
     dims.cur_dim--;
-    key_dims_map[key_str()] = dims;
+    slot_dims_map[key_str()] = dims;
   }
 
   void null() {
@@ -363,7 +371,7 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   void number_int(int n) {
-    if (is_int) {
+    if (int_slots_map[key_str()]) {
       values_i.push_back(n);
     } else {
       values_r.push_back(n);
@@ -374,7 +382,7 @@ class json_data_handler : public stan::json::json_handler {
     // if integer overflow, promote numeric data to double
     if (n > (unsigned)std::numeric_limits<int>::max())
       promote_to_double();
-    if (is_int) {
+    if (int_slots_map[key_str()]) {
       values_i.push_back(static_cast<int>(n));
     } else {
       values_r.push_back(n);
@@ -395,34 +403,33 @@ class json_data_handler : public stan::json::json_handler {
   // *** end handler events ***
 
   void promote_to_double() {
-    if (is_int) {
+    if (int_slots_map[key_str()]) {
       for (std::vector<int>::iterator it = values_i.begin();
            it != values_i.end(); ++it)
         values_r.push_back(*it);
       array_start_r = array_start_i;
     }
-    is_int = false;
+    int_slots_map[key_str()] = false;
   }
 
   void save_key_value_pair() {
     if (0 == key_stack.size())
       return;
-    if (key_types_map.count(key_str()) < 1)
+    if (slot_types_map.count(key_str()) < 1)
       unexpected_error(key_str());
-    if (key_types_map[key_str()] == meta_type::TUPLE
-        || key_types_map[key_str()] == meta_type::ARRAY_OF_TUPLES) {
+    if (slot_types_map[key_str()] == meta_type::TUPLE
+        || slot_types_map[key_str()] == meta_type::ARRAY_OF_TUPLES) {
       ;
     } else {
-      dump_state("save scalar or array (row)");
-      std::vector<size_t> dims;
-      if (key_dims_map.count(key_str()) == 1)
-        dims = key_dims_map[key_str()].dims;
-      bool is_new = vars_r.count(key_str()) == 0 && vars_i.count(key_str()) == 0;
+      bool is_int = int_slots_map[key_str()];
+      bool is_new = (vars_r.count(key_str()) == 0 && vars_i.count(key_str()) == 0);
       bool is_real = vars_r.count(key_str()) == 1;
       bool was_int = vars_i.count(key_str()) == 1;
-      std::cout << "is_new? " << is_new << " is_real? " << is_real << " was_int? " << was_int << std::endl;
+      std::vector<size_t> dims;
+      if (slot_dims_map.count(key_str()) == 1)
+        dims = slot_dims_map[key_str()].dims;
       if (is_new) {
-        var_types_map[key_str()] = key_types_map[key_str()];
+        var_types_map[key_str()] = slot_types_map[key_str()];
         if (is_int) {
           std::pair<std::vector<int>, std::vector<size_t>> pair;
           pair = make_pair(values_i, dims);
@@ -433,22 +440,18 @@ class json_data_handler : public stan::json::json_handler {
           vars_r[key_str()] = pair;
         }
       } else {
-        if (var_type != meta_type::ARRAY_OF_TUPLES) {
+        if (!is_array_tuples(key_stack)) {
           std::stringstream errorMsg;
           errorMsg << "attempt to redefine variable " << key_str();
           throw json_error(errorMsg.str());
         }
-        std::cout << "one row of array of tuples" << std::endl;
         var_types_map[key_str()] = meta_type::ARRAY;
-        std::vector<size_t> dims = key_dims_map[key_str()].dims;
+        std::vector<size_t> dims = slot_dims_map[key_str()].dims;
         if ((!is_int && was_int) || (is_int && is_real)) {  // promote to double
           std::vector<double> values_tmp;
-          std::cout << "save existing vars_i values ";
           for (auto& x : vars_i[key_str()].first) {
             values_tmp.push_back(x);
-            std::cout << " " << x;
           }
-          std::cout << std::endl;
           for (auto&x : values_r)
             values_tmp.push_back(x);
           std::pair<std::vector<double>, std::vector<size_t>> pair;
@@ -456,14 +459,12 @@ class json_data_handler : public stan::json::json_handler {
           vars_r[key_str()] = pair;
           vars_i.erase(key_str());
         } else if (is_int) {
-          for (std::vector<int>::iterator it = values_i.begin();
-               it != values_i.end(); ++it)
-            vars_i[key_str()].first.push_back(*it);
+          for (auto& x: values_i)
+            vars_i[key_str()].first.push_back(x);
           vars_i[key_str()].second = dims;
         } else {
-          for (std::vector<double>::iterator it = values_r.begin();
-               it != values_r.end(); ++it)
-            vars_r[key_str()].first.push_back(*it);
+          for (auto& x: values_r)
+            vars_r[key_str()].first.push_back(x);
           vars_r[key_str()].second = dims;
         }
       }
@@ -474,12 +475,11 @@ class json_data_handler : public stan::json::json_handler {
   void convert_arrays() {
     for (auto const &var : var_types_map) {
       if (var.second != meta_type::ARRAY) {
-        std::cout << "nothing to be done for " << var.first << std::endl;
         return;
       }
       std::cout << "converting " << var.first << " type " << var.second << std::endl;
       std::vector<size_t> all_dims;
-      array_dims inner = key_dims_map[var.first];
+      array_dims inner = slot_dims_map[var.first];
       // check is need to combine dims
       std::vector<std::string> keys;
       split(keys, var.first, boost::is_any_of("."), boost::token_compress_on);
@@ -572,33 +572,50 @@ class json_data_handler : public stan::json::json_handler {
     throw json_error(errorMsg.str());
   }    
 
-  // assumes at more 2 dims - inner / outer
-  array_dims get_outer_dims(std::vector<std::string> keys) {
-    std::string prefix;
-    for (size_t i=0; i < keys.size(); ++i) {
-      prefix.append(keys[i]);
-      if (key_dims_map.count(prefix) == 1)
-        return key_dims_map[prefix];
-      else
-        prefix.append(".");
+  array_dims get_outer_dims(const std::vector<std::string>& keys) {
+    std::vector<std::string> stack = keys;
+    std::string key;
+    stack.pop_back();
+    while (!stack.empty()) {
+      key = boost::algorithm::join(stack, ".");
+      if (slot_dims_map.count(key) == 1)
+        return slot_dims_map[key];
+      stack.pop_back();
     }
-    array_dims empty;
-    return empty;
+    key = boost::algorithm::join(keys, ".");
+    if (slot_dims_map.count(key) != 1)
+      unexpected_error(key);
+    return slot_dims_map[key];
+  }
+
+  bool is_array_tuples(const std::vector<std::string>& keys) {
+    std::vector<std::string> stack = keys;
+    std::string key;
+    stack.pop_back();
+    while (!stack.empty()) {
+      key = boost::algorithm::join(stack, ".");
+      if (slot_types_map[key] == meta_type::ARRAY_OF_TUPLES)
+        return true;
+      stack.pop_back();
+    }
+    return false;
   }
 
   void set_outer_dims(array_dims update) {
-    std::string prefix;
-    for (size_t i=0; i < key_stack.size(); ++i) {
-      prefix.append(key_stack[i]);
-      if (key_dims_map.count(prefix) == 1)
+    std::vector<std::string> stack = key_stack;
+    std::string key;
+    stack.pop_back();
+    while (!stack.empty()) {
+      key = boost::algorithm::join(stack, ".");
+      if (slot_dims_map.count(key) == 1)
         break;
-      else
-        prefix.append(".");
+      stack.pop_back();
     }
-    if (prefix.back() != '.')
-      key_dims_map[prefix] = update;
-    else
-      unexpected_error(key_str());
+    if (stack.empty()) {
+      key = boost::algorithm::join(key_stack, ".");
+      unexpected_error(key);
+    }
+    slot_dims_map[key] = update;
   }
 
 };
