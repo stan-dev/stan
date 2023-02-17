@@ -296,7 +296,7 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Mac Unit') {
-                agent { label 'osx' }
+                agent { label 'osx && !m1' }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
@@ -386,7 +386,7 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Integration Mac') {
-                    agent { label 'osx' }
+                    agent { label 'osx && !m1' }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
