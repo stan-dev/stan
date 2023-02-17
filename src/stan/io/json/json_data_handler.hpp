@@ -27,10 +27,11 @@ typedef std::pair<std::vector<int>, std::vector<size_t>> var_i;
 typedef std::map<std::string, var_r> vars_map_r;
 typedef std::map<std::string, var_i> vars_map_i;
 
+/** Enum of the kinds of structures the handler needs to manage.
+ *  Determined by the initial sequence of start elements following
+ *  the top-level set of keys in the JSON object.
+ */
 struct meta_type {
-  // the general set of structures that the handler needs to manage
-  // as determined by the initial sequence of start elements
-  // following the Stan variable name,
   enum {
     SCALAR = 0,  // no start elements
     ARRAY = 1,   // one or more "["
@@ -39,8 +40,8 @@ struct meta_type {
   };
 };
 
+/** Enum for salient handler events */
 struct meta_event {
-  // info needed to manage key stack
   enum {
     OBJ_OPEN= 0,  // {
     OBJ_CLOSE = 1,  // }
@@ -48,25 +49,17 @@ struct meta_event {
   };
 };
 
+/** Tracks array dimensions.
+ *  Vector 'dims_acc' records number of elements seen since open_array.
+ *  Vector 'dims' records size of first row seen.
+ *  Int 'cur_dim' tracks nested array rows.
+ */
 class array_dims {
-  // accumulates array dimensions
  public:
   std::vector<size_t> dims;
   std::vector<size_t> dims_acc;
   int cur_dim;
   array_dims() : dims(), dims_acc(), cur_dim(0) {
-  }
-
-  std::string print() {
-    std::stringstream ss;
-    ss << " num dims: " << dims.size() << "\tdim szs: ";
-    for (auto& x : dims)
-      ss << " " << x;
-    ss << "\tdims_acc cts: ";
-    for (auto& x : dims_acc)
-      ss << " " << x;
-    ss << std::endl;
-    return ss.str();
   }
 
   bool operator==(const array_dims& other) {
@@ -78,6 +71,18 @@ class array_dims {
     return !operator==(other);
   }
 
+  std::string print() {
+    // only used for debugging
+    std::stringstream ss;
+    ss << " num dims: " << dims.size() << "\tdim szs: ";
+    for (auto& x : dims)
+      ss << " " << x;
+    ss << "\tdims_acc cts: ";
+    for (auto& x : dims_acc)
+      ss << " " << x;
+    ss << std::endl;
+    return ss.str();
+  }
 };
 
 /**
@@ -112,37 +117,6 @@ class json_data_handler : public stan::json::json_handler {
   size_t array_start_i;  // index into values_i
   size_t array_start_r;  // index into values_r
   int event;
-  
-  void dump_state(std::string where) {
-    std::string slot_type("unknown");
-    if (slot_types_map.count(key_str()) == 1)
-      slot_type = std::to_string(slot_types_map[key_str()]);
-    bool is_int = true;
-    if (int_slots_map.count(key_str()) == 1)
-      is_int = int_slots_map[key_str()];
-    std::cout << where 
-              << " key " << key_str()
-              << " slot_type " << slot_type
-              << " is_int " << is_int 
-              << "\n\tvalues_i (" << values_i.size() << ") ";
-    for (auto& x: values_i)
-      std::cout << " " << x;
-    std::cout<< "\n\tvalues_r (" << values_r.size() << ") ";
-    for (auto& x: values_r)
-      std::cout << " " << x;
-    std::cout << std::endl;
-    if (slot_dims_map.count(key_str()) == 1)
-      std::cout << slot_dims_map[key_str()].print();
-    else
-      std::cout << std::endl;
-    std::cout << "\tknown int vars (" << vars_i.size() << ") ";
-    for (auto&x : vars_i)
-      std::cout << " " << x.first;
-    std::cout << "\tknown real vars (" << vars_r.size() << ") ";
-    for (auto&x : vars_r)
-      std::cout << " " << x.first;
-    std::cout << std::endl;
-  }
 
   void reset_values() {
     values_r.clear();
@@ -206,26 +180,7 @@ class json_data_handler : public stan::json::json_handler {
 
   void end_text() {
     save_key_value_pair();
-
-    for (auto& x : slot_types_map)
-      std::cout << "key " << x.first << " type " << x.second << std::endl;
-    for (auto& x : int_slots_map)
-      std::cout << "key " << x.first << " is_int? " << x.second << std::endl;
-    for (auto& x : var_types_map)
-      std::cout << " variable " << x.first << " type " << x.second << std::endl;
-    for (auto& x : slot_dims_map) {
-      std::cout << " variable " << x.first;
-      std::cout << x.second.print();
-    }
-    std::cout << std::endl;
-
     convert_arrays();
-
-    for (auto& var : vars_i)
-      std::cout << var.first << std::endl;
-    for (auto& var : vars_r)
-      std::cout << var.first << std::endl;
-
     reset_values();
   }
 
@@ -412,6 +367,10 @@ class json_data_handler : public stan::json::json_handler {
     int_slots_map[key_str()] = false;
   }
 
+  /* Save non-tuple vars and innermost tuple slots to vars_i and vars_r.
+   * For arrays of tuples we need to check that new elements are consistent
+   * with previous tuple elements.
+   */
   void save_key_value_pair() {
     if (0 == key_stack.size())
       return;
@@ -472,15 +431,20 @@ class json_data_handler : public stan::json::json_handler {
     key_stack.pop_back();
   }
 
+  /* Process array variables
+   *  a. for array of tuples, concatenate dimensions
+   *  b. convert vector of values in row-major order
+   *     to vector of values in column-major order.
+   * Update vars_i and vars_r accordingly.
+   */
   void convert_arrays() {
     for (auto const &var : var_types_map) {
       if (var.second != meta_type::ARRAY) {
         return;
       }
-      std::cout << "converting " << var.first << " type " << var.second << std::endl;
       std::vector<size_t> all_dims;
       array_dims inner = slot_dims_map[var.first];
-      // check is need to combine dims
+      // do we need to generalize to more deeply nested structures?
       std::vector<std::string> keys;
       split(keys, var.first, boost::is_any_of("."), boost::token_compress_on);
       array_dims outer = get_outer_dims(keys);
@@ -616,6 +580,38 @@ class json_data_handler : public stan::json::json_handler {
       unexpected_error(key);
     }
     slot_dims_map[key] = update;
+  }
+
+  // for debugging only
+  void dump_state(std::string where) {
+    std::string slot_type("unknown");
+    if (slot_types_map.count(key_str()) == 1)
+      slot_type = std::to_string(slot_types_map[key_str()]);
+    bool is_int = true;
+    if (int_slots_map.count(key_str()) == 1)
+      is_int = int_slots_map[key_str()];
+    std::cout << where 
+              << " key " << key_str()
+              << " slot_type " << slot_type
+              << " is_int " << is_int 
+              << "\n\tvalues_i (" << values_i.size() << ") ";
+    for (auto& x: values_i)
+      std::cout << " " << x;
+    std::cout<< "\n\tvalues_r (" << values_r.size() << ") ";
+    for (auto& x: values_r)
+      std::cout << " " << x;
+    std::cout << std::endl;
+    if (slot_dims_map.count(key_str()) == 1)
+      std::cout << slot_dims_map[key_str()].print();
+    else
+      std::cout << std::endl;
+    std::cout << "\tknown int vars (" << vars_i.size() << ") ";
+    for (auto&x : vars_i)
+      std::cout << " " << x.first;
+    std::cout << "\tknown real vars (" << vars_r.size() << ") ";
+    for (auto&x : vars_r)
+      std::cout << " " << x.first;
+    std::cout << std::endl;
   }
 
 };
