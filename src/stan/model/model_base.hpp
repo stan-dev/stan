@@ -133,8 +133,7 @@ class model_base : public prob_grad {
    */
   virtual void constrained_param_names(std::vector<std::string>& param_names,
                                        bool include_tparams = true,
-                                       bool include_gqs = true) const
-      = 0;
+                                       bool include_gqs = true) const = 0;
 
   /**
    * Set the specified sequence of parameter names to the
@@ -163,8 +162,7 @@ class model_base : public prob_grad {
    */
   virtual void unconstrained_param_names(std::vector<std::string>& param_names,
                                          bool include_tparams = true,
-                                         bool include_gqs = true) const
-      = 0;
+                                         bool include_gqs = true) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -175,8 +173,8 @@ class model_base : public prob_grad {
    * @param[in,out] msgs message stream
    * @return log density for specified parameters
    */
-  virtual double log_prob(Eigen::VectorXd& params_r, std::ostream* msgs) const
-      = 0;
+  virtual double log_prob(Eigen::VectorXd& params_r,
+                          std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -188,8 +186,7 @@ class model_base : public prob_grad {
    * @return log density for specified parameters
    */
   virtual math::var log_prob(Eigen::Matrix<math::var, -1, 1>& params_r,
-                             std::ostream* msgs) const
-      = 0;
+                             std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -205,8 +202,7 @@ class model_base : public prob_grad {
    * @return log density for specified parameters
    */
   virtual double log_prob_jacobian(Eigen::VectorXd& params_r,
-                                   std::ostream* msgs) const
-      = 0;
+                                   std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -222,8 +218,7 @@ class model_base : public prob_grad {
    * @return log density for specified parameters
    */
   virtual math::var log_prob_jacobian(Eigen::Matrix<math::var, -1, 1>& params_r,
-                                      std::ostream* msgs) const
-      = 0;
+                                      std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -240,8 +235,7 @@ class model_base : public prob_grad {
    * @return log density for specified parameters
    */
   virtual double log_prob_propto(Eigen::VectorXd& params_r,
-                                 std::ostream* msgs) const
-      = 0;
+                                 std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -253,8 +247,7 @@ class model_base : public prob_grad {
    * @return log density for specified parameters
    */
   virtual math::var log_prob_propto(Eigen::Matrix<math::var, -1, 1>& params_r,
-                                    std::ostream* msgs) const
-      = 0;
+                                    std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -275,8 +268,7 @@ class model_base : public prob_grad {
    * @return log density for specified parameters
    */
   virtual double log_prob_propto_jacobian(Eigen::VectorXd& params_r,
-                                          std::ostream* msgs) const
-      = 0;
+                                          std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -292,8 +284,7 @@ class model_base : public prob_grad {
    * @return log density for specified parameters
    */
   virtual math::var log_prob_propto_jacobian(
-      Eigen::Matrix<math::var, -1, 1>& params_r, std::ostream* msgs) const
-      = 0;
+      Eigen::Matrix<math::var, -1, 1>& params_r, std::ostream* msgs) const = 0;
 
   /**
    * Convenience template function returning the log density for the
@@ -341,8 +332,7 @@ class model_base : public prob_grad {
    */
   virtual void transform_inits(const io::var_context& context,
                                Eigen::VectorXd& params_r,
-                               std::ostream* msgs) const
-      = 0;
+                               std::ostream* msgs) const = 0;
 
   /**
    * Convert the specified sequence of unconstrained parameters to a
@@ -366,8 +356,7 @@ class model_base : public prob_grad {
                            Eigen::VectorXd& params_r,
                            Eigen::VectorXd& params_constrained_r,
                            bool include_tparams = true, bool include_gqs = true,
-                           std::ostream* msgs = 0) const
-      = 0;
+                           std::ostream* msgs = 0) const = 0;
 
   // TODO(carpenter): cut redundant std::vector versions from here ===
 
@@ -384,8 +373,8 @@ class model_base : public prob_grad {
    * @return log density for specified parameters
    */
   virtual double log_prob(std::vector<double>& params_r,
-                          std::vector<int>& params_i, std::ostream* msgs) const
-      = 0;
+                          std::vector<int>& params_i,
+                          std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -401,8 +390,7 @@ class model_base : public prob_grad {
    */
   virtual math::var log_prob(std::vector<math::var>& params_r,
                              std::vector<int>& params_i,
-                             std::ostream* msgs) const
-      = 0;
+                             std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -422,8 +410,7 @@ class model_base : public prob_grad {
    */
   virtual double log_prob_jacobian(std::vector<double>& params_r,
                                    std::vector<int>& params_i,
-                                   std::ostream* msgs) const
-      = 0;
+                                   std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -443,8 +430,7 @@ class model_base : public prob_grad {
    */
   virtual math::var log_prob_jacobian(std::vector<math::var>& params_r,
                                       std::vector<int>& params_i,
-                                      std::ostream* msgs) const
-      = 0;
+                                      std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -465,8 +451,7 @@ class model_base : public prob_grad {
    */
   virtual double log_prob_propto(std::vector<double>& params_r,
                                  std::vector<int>& params_i,
-                                 std::ostream* msgs) const
-      = 0;
+                                 std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -482,8 +467,7 @@ class model_base : public prob_grad {
    */
   virtual math::var log_prob_propto(std::vector<math::var>& params_r,
                                     std::vector<int>& params_i,
-                                    std::ostream* msgs) const
-      = 0;
+                                    std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -508,8 +492,7 @@ class model_base : public prob_grad {
    */
   virtual double log_prob_propto_jacobian(std::vector<double>& params_r,
                                           std::vector<int>& params_i,
-                                          std::ostream* msgs) const
-      = 0;
+                                          std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -529,8 +512,7 @@ class model_base : public prob_grad {
    */
   virtual math::var log_prob_propto_jacobian(std::vector<math::var>& params_r,
                                              std::vector<int>& params_i,
-                                             std::ostream* msgs) const
-      = 0;
+                                             std::ostream* msgs) const = 0;
 
   /**
    * Convenience template function returning the log density for the
@@ -585,8 +567,7 @@ class model_base : public prob_grad {
   virtual void transform_inits(const io::var_context& context,
                                std::vector<int>& params_i,
                                std::vector<double>& params_r,
-                               std::ostream* msgs) const
-      = 0;
+                               std::ostream* msgs) const = 0;
 
   /**
    * Convert the specified sequence of unconstrained parameters to a
@@ -612,8 +593,7 @@ class model_base : public prob_grad {
                            std::vector<int>& params_i,
                            std::vector<double>& params_r_constrained,
                            bool include_tparams = true, bool include_gqs = true,
-                           std::ostream* msgs = 0) const
-      = 0;
+                           std::ostream* msgs = 0) const = 0;
 
 #ifdef STAN_MODEL_FVAR_VAR
 
@@ -628,8 +608,7 @@ class model_base : public prob_grad {
    */
   virtual math::fvar<math::var> log_prob(
       Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const
-      = 0;
+      std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -646,8 +625,7 @@ class model_base : public prob_grad {
    */
   virtual math::fvar<math::var> log_prob_jacobian(
       Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const
-      = 0;
+      std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -660,8 +638,7 @@ class model_base : public prob_grad {
    */
   virtual math::fvar<math::var> log_prob_propto(
       Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const
-      = 0;
+      std::ostream* msgs) const = 0;
 
   /**
    * Return the log density for the specified unconstrained
@@ -678,8 +655,7 @@ class model_base : public prob_grad {
    */
   virtual math::fvar<math::var> log_prob_propto_jacobian(
       Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
-      std::ostream* msgs) const
-      = 0;
+      std::ostream* msgs) const = 0;
 #endif
 };
 

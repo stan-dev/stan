@@ -750,8 +750,8 @@ template <typename StdVec, typename Idx1, typename... Idxs,
           require_not_same_t<Idx1, index_uni>* = nullptr>
 inline auto rvalue(StdVec&& v, const char* name, const Idx1& idx1,
                    const Idxs&... idxs) {
-  using inner_type = plain_type_t<decltype(rvalue(v[rvalue_at(0, idx1) - 1],
-                                                  name, idxs...))>;
+  using inner_type = plain_type_t<decltype(
+      rvalue(v[rvalue_at(0, idx1) - 1], name, idxs...))>;
   const auto index_size = rvalue_index_size(idx1, v.size());
   stan::math::check_greater_or_equal("array[..., ...] indexing", "size",
                                      index_size, 0);
