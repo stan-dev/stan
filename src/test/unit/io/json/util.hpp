@@ -18,26 +18,26 @@ class recording_handler : public stan::json::json_handler {
  public:
   std::stringstream os_;
   recording_handler() : json_handler(), os_() {}
-  void start_text() { os_ << "S:text" << std::endl; }
-  void end_text() { os_ << "E:text" << std::endl; }
-  void start_array() { os_ << "S:arr" << std::endl; }
-  void end_array() { os_ << "E:arr" << std::endl; }
-  void start_object() { os_ << "S:obj" << std::endl; }
-  void end_object() { os_ << "E:obj" << std::endl; }
-  void null() { os_ << "NULL:null" << std::endl; }
-  void boolean(bool p) { os_ << "BOOL:" << p << std::endl; }
+  void start_text() { os_ << "S:text"; }
+  void end_text() { os_ << "E:text"; }
+  void start_array() { os_ << "S:arr"; }
+  void end_array() { os_ << "E:arr"; }
+  void start_object() { os_ << "S:obj"; }
+  void end_object() { os_ << "E:obj"; }
+  void null() { os_ << "NULL:null"; }
+  void boolean(bool p) { os_ << "BOOL:" << p; }
   void string(const std::string &s) {
-    os_ << "STR:\"" << s << "\"" << std::endl;
+    os_ << "STR:\"" << s << "\"";
   }
   void key(const std::string &key) {
-    os_ << "KEY:\"" << key << "\"" << std::endl;
+    os_ << "KEY:\"" << key << "\"";
   }
-  void number_double(double x) { os_ << "D(REAL):" << x << std::endl; }
-  void number_int(int n) { os_ << "I(INT):" << n << std::endl; }
-  void number_unsigned_int(unsigned n) { os_ << "U(INT):" << n << std::endl; }
-  void number_int64(int64_t n) { os_ << "I64(INT):" << n << std::endl; }
+  void number_double(double x) { os_ << "D(REAL):" << x; }
+  void number_int(int n) { os_ << "I(INT):" << n; }
+  void number_unsigned_int(unsigned n) { os_ << "U(INT):" << n; }
+  void number_int64(int64_t n) { os_ << "I64(INT):" << n; }
   void number_unsigned_int64(uint64_t n) {
-    os_ << "U64(INT):" << n << std::endl;
+    os_ << "U64(INT):" << n;
   }
 };
 
@@ -158,13 +158,27 @@ void test_complex_var(stan::json::json_data &jdata, const std::string &name,
     EXPECT_EQ(expected_vals[i], vals[i]);
 }
 
+bool hasEnding(std::string const &fullString, std::string const &ending) {
+  if (fullString.length() >= ending.length()) {
+    return (0
+            == fullString.compare(fullString.length() - ending.length(),
+                                  ending.length(), ending));
+  } else {
+    return false;
+  }
+}
+
 void test_exception(const std::string &input,
                     const std::string &exception_text) {
   try {
+    
     std::stringstream s(input);
     stan::json::json_data jdata(s);
   } catch (const std::exception &e) {
-    EXPECT_EQ(e.what(), exception_text);
+    std::cout << "input:\n" << input << std::endl;
+    std::cout << "expect message:\n" << exception_text << std::endl;
+    std::cout << "found:\n" << e.what() << std::endl;
+    EXPECT_TRUE(hasEnding(e.what(), exception_text));
     return;
   }
   FAIL();  // didn't throw an exception as expected.

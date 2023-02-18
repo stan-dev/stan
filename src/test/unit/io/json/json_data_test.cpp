@@ -391,49 +391,44 @@ TEST(ioJson, jsonData_array_err2) {
 
 TEST(ioJson, jsonData_array_err3) {
   std::string txt = "{ \"foo\" : [1, 2, 3, 4, [5], 6, 7] }";
-  test_exception(txt, "variable: foo, error: non-scalar array value");
+  test_exception(txt, "variable: foo, error: ill-formed array");
 }
 
 TEST(ioJson, jsonData_array_err4) {
   std::string txt = "{ \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
-  test_exception(txt, "variable: foo, error: non-rectangular array");
+  test_exception(txt, "variable: foo, error: ill-formed array");
 }
 
 TEST(ioJson, jsonData_array_err5) {
   std::string txt = "{  \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
-  test_exception(txt, "variable: foo, error: non-scalar array value");
+  test_exception(txt, "variable: foo, error: ill-formed array");
 }
 
 TEST(ioJson, jsonData_array_err6) {
   std::string txt
       = "{ \"baz\" : [[1.0,2.0,3.0],[4.0,5.0,6]],  \"foo\" : [1, "
         "2, 3, 4, [5], 6, 7] }";
-  test_exception(txt, "variable: foo, error: non-scalar array value");
+  test_exception(txt, "variable: foo, error: ill-formed array");
 }
 
 TEST(ioJson, jsonData_array_err7) {
   std::string txt
       = "{ \"baz\":[[1,2],[3,4.0]],  \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
-  test_exception(txt, "variable: foo, error: non-rectangular array");
+  test_exception(txt, "variable: foo, error: ill-formed array");
 }
 
 TEST(ioJson, jsonData_array_err8) {
   std::string txt
       = "{  \"baz\":[1,2,\"-Inf\"], \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
-  test_exception(txt, "variable: foo, error: non-scalar array value");
+  test_exception(txt, "variable: foo, error: ill-formed array");
 }
 
 TEST(ioJson, jsonData_array_err9) {
   std::string txt
       = "{\"a\":1,  \"baz\":[1,2,\"-Inf\"], \"b\":2.0, "
         "\"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
-  test_exception(txt, "variable: foo, error: non-scalar array value");
+  test_exception(txt, "variable: foo, error: ill-formed array");
 }
-
-// TEST(ioJson, jsonData_obj_err1) {
-//   std::string txt = "{ \"foo\" : { \"bar\" : 1 } }";
-//   test_exception(txt, "variable: foo, error: nested objects not allowed");
-// }
 
 TEST(ioJson, jsonData_mult_vars_err1) {
   std::string txt = "{ \"foo\" : 1, \"foo\" : 0.1 }";

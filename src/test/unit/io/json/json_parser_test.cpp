@@ -7,16 +7,6 @@
 #include <test/unit/io/json/util.hpp>
 #include <gtest/gtest.h>
 
-bool hasEnding(std::string const &fullString, std::string const &ending) {
-  if (fullString.length() >= ending.length()) {
-    return (0
-            == fullString.compare(fullString.length() - ending.length(),
-                                  ending.length(), ending));
-  } else {
-    return false;
-  }
-}
-
 void test_parser(const std::string &input, const std::string &expected_output) {
   recording_handler handler;
   std::stringstream s(input);
@@ -497,10 +487,14 @@ TEST(ioJson, jsonParserStr17) {
 
 TEST(ioJson, jsonParserErr01) {
   test_exception(" \n \n   5    ",
-                 "expecting start of object ({) or array ([)\n");
+                 "\nexpecting start of object ({) or array ([)\n");
 }
 
-TEST(ioJson, jsonParserErr02) { test_exception("[ .5 ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr02) {
+  test_exception("[ .5 ]",
+                 "expecting JSON object, found array");
+}
+
 
 TEST(ioJson, jsonParserErr02a) {
   test_exception("[ 0",

@@ -440,11 +440,11 @@ class json_data_handler : public stan::json::json_handler {
   void convert_arrays() {
     for (auto const& var : var_types_map) {
       if (var.second != meta_type::ARRAY) {
-        return;
+        continue;
       }
       std::vector<size_t> all_dims;
       array_dims inner = slot_dims_map[var.first];
-      // do we need to generalize to more deeply nested structures?
+      // MM TODO: do we need to generalize to more deeply nested structures?
       std::vector<std::string> keys;
       split(keys, var.first, boost::is_any_of("."), boost::token_compress_on);
       array_dims outer = get_outer_dims(keys);
@@ -457,11 +457,12 @@ class json_data_handler : public stan::json::json_handler {
         std::vector<int> cm_values_i(vars_i[var.first].first.size());
         std::pair<std::vector<int>, std::vector<size_t>> pair;
         if (all_dims.empty()) {
-          to_column_major(cm_values_i, vars_i[var.first].first,
-                          vars_i[var.first].second);
+          to_column_major(var.first, cm_values_i,
+                          vars_i[var.first].first, vars_i[var.first].second);
           pair = make_pair(cm_values_i, vars_i[var.first].second);
         } else {
-          to_column_major(cm_values_i, vars_i[var.first].first, all_dims);
+          to_column_major(var.first, cm_values_i,
+                          vars_i[var.first].first, all_dims);
           pair = make_pair(cm_values_i, all_dims);
         }
         vars_i[var.first] = pair;
@@ -469,40 +470,55 @@ class json_data_handler : public stan::json::json_handler {
         std::vector<double> cm_values_r(vars_r[var.first].first.size());
         std::pair<std::vector<double>, std::vector<size_t>> pair;
         if (all_dims.empty()) {
-          to_column_major(cm_values_r, vars_r[var.first].first,
-                          vars_r[var.first].second);
+          to_column_major(var.first, cm_values_r,
+                          vars_r[var.first].first, vars_r[var.first].second);
           pair = make_pair(cm_values_r, vars_r[var.first].second);
         } else {
-          to_column_major(cm_values_r, vars_r[var.first].first, all_dims);
+          to_column_major(var.first, cm_values_r,
+                          vars_r[var.first].first, all_dims);
           pair = make_pair(cm_values_r, all_dims);
         }
         vars_r[var.first] = pair;
       } else {
-        unexpected_error("cannot convert " + var.first);
+          std::stringstream errorMsg;
+          errorMsg << "variable: " << var.first << ", ill-formed json";
+          throw json_error(errorMsg.str());
       }
     }
   }
 
   template <typename T>
-  void to_column_major(std::vector<T>& cm_vals, const std::vector<T>& rm_vals,
+  void to_column_major(std::string vname,
+                       std::vector<T>& cm_vals,
+                       const std::vector<T>& rm_vals,
                        const std::vector<size_t>& dims) {
+    size_t expected_size = 1;
+    for (auto&x : dims)
+      expected_size *= x;
+    if (expected_size != rm_vals.size()) {
+      std::stringstream errorMsg;
+      errorMsg << "variable: " << vname << ", error: ill-formed array";
+      throw json_error(errorMsg.str());
+    }
+
     for (size_t i = 0; i < rm_vals.size(); i++) {
-      size_t idx = convert_offset_rtl_2_ltr(i, dims);
+      size_t idx = convert_offset_rtl_2_ltr(vname, i, dims);
       cm_vals[idx] = rm_vals[i];
     }
   }
 
   // convert row-major offset to column-major offset
-  size_t convert_offset_rtl_2_ltr(size_t rtl_offset,
+  size_t convert_offset_rtl_2_ltr(std::string vname,
+                                  size_t rtl_offset,
                                   const std::vector<size_t>& dims) {
     size_t rtl_dsize = 1;
     for (size_t i = 1; i < dims.size(); i++)
       rtl_dsize *= dims[i];
 
-    // array index should be valid, but check just in case
+    // double-check array indexing
     if (rtl_offset >= rtl_dsize * dims[0]) {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_str() << ", unexpected error";
+      errorMsg << "variable: " << vname << ", unexpected error";
       throw json_error(errorMsg.str());
     }
 
@@ -526,7 +542,7 @@ class json_data_handler : public stan::json::json_handler {
 
   void unexpected_error(std::string where) {
     std::stringstream errorMsg;
-    errorMsg << "json_data_handler unexpected parsing error, at key " << where;
+    errorMsg << "unexpected parsing error, at key " << where;
     throw json_error(errorMsg.str());
   }
 
