@@ -296,7 +296,7 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Mac Unit') {
-                agent { label 'osx' }
+                agent { label 'osx && !m1' }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
@@ -386,7 +386,7 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Integration Mac') {
-                    agent { label 'osx' }
+                    agent { label 'osx && !m1' }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
@@ -414,9 +414,9 @@ pipeline {
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
-                            ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
-                            ./runTests.py src/test/integration/standalone_functions_test.cpp
-                            ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                            python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp
                         """
                     }
                     post { always { deleteDir() } }
