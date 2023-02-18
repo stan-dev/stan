@@ -7,27 +7,6 @@
 #include <test/unit/io/json/util.hpp>
 #include <gtest/gtest.h>
 
-class recording_handler : public stan::json::json_handler {
- public:
-  std::stringstream os_;
-  recording_handler() : json_handler(), os_() {}
-  void start_text() { os_ << "S:text"; }
-  void end_text() { os_ << "E:text"; }
-  void start_array() { os_ << "S:arr"; }
-  void end_array() { os_ << "E:arr"; }
-  void start_object() { os_ << "S:obj"; }
-  void end_object() { os_ << "E:obj"; }
-  void null() { os_ << "NULL:null"; }
-  void boolean(bool p) { os_ << "BOOL:" << p; }
-  void string(const std::string &s) { os_ << "STR:\"" << s << "\""; }
-  void key(const std::string &key) { os_ << "KEY:\"" << key << "\""; }
-  void number_double(double x) { os_ << "D(REAL):" << x; }
-  void number_int(int n) { os_ << "I(INT):" << n; }
-  void number_unsigned_int(unsigned n) { os_ << "U(INT):" << n; }
-  void number_int64(int64_t n) { os_ << "I64(INT):" << n; }
-  void number_unsigned_int64(uint64_t n) { os_ << "U64(INT):" << n; }
-};
-
 bool hasEnding(std::string const &fullString, std::string const &ending) {
   if (fullString.length() >= ending.length()) {
     return (0
@@ -43,19 +22,6 @@ void test_parser(const std::string &input, const std::string &expected_output) {
   std::stringstream s(input);
   stan::json::rapidjson_parse(s, handler);
   EXPECT_EQ(expected_output, handler.os_.str());
-}
-
-void test_exception(const std::string &input,
-                    const std::string &exception_text) {
-  try {
-    recording_handler handler;
-    std::stringstream s(input);
-    stan::json::rapidjson_parse(s, handler);
-  } catch (const std::exception &e) {
-    EXPECT_TRUE(hasEnding(e.what(), exception_text));
-    return;
-  }
-  FAIL();  // didn't throw an exception as expected.
 }
 
 TEST(ioJson, jsonParserA0) {

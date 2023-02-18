@@ -401,7 +401,7 @@ class json_data_handler : public stan::json::json_handler {
       } else {
         if (!is_array_tuples(key_stack)) {
           std::stringstream errorMsg;
-          errorMsg << "attempt to redefine variable " << key_str();
+          errorMsg << "attempt to redefine variable: " << key_str();
           throw json_error(errorMsg.str());
         }
         var_types_map[key_str()] = meta_type::ARRAY;
