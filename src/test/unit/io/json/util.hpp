@@ -26,19 +26,13 @@ class recording_handler : public stan::json::json_handler {
   void end_object() { os_ << "E:obj"; }
   void null() { os_ << "NULL:null"; }
   void boolean(bool p) { os_ << "BOOL:" << p; }
-  void string(const std::string &s) {
-    os_ << "STR:\"" << s << "\"";
-  }
-  void key(const std::string &key) {
-    os_ << "KEY:\"" << key << "\"";
-  }
+  void string(const std::string &s) { os_ << "STR:\"" << s << "\""; }
+  void key(const std::string &key) { os_ << "KEY:\"" << key << "\""; }
   void number_double(double x) { os_ << "D(REAL):" << x; }
   void number_int(int n) { os_ << "I(INT):" << n; }
   void number_unsigned_int(unsigned n) { os_ << "U(INT):" << n; }
   void number_int64(int64_t n) { os_ << "I64(INT):" << n; }
-  void number_unsigned_int64(uint64_t n) {
-    os_ << "U64(INT):" << n;
-  }
+  void number_unsigned_int64(uint64_t n) { os_ << "U64(INT):" << n; }
 };
 
 /**
@@ -171,13 +165,9 @@ bool hasEnding(std::string const &fullString, std::string const &ending) {
 void test_exception(const std::string &input,
                     const std::string &exception_text) {
   try {
-    
     std::stringstream s(input);
     stan::json::json_data jdata(s);
   } catch (const std::exception &e) {
-    std::cout << "input:\n" << input << std::endl;
-    std::cout << "expect message:\n" << exception_text << std::endl;
-    std::cout << "found:\n" << e.what() << std::endl;
     EXPECT_TRUE(hasEnding(e.what(), exception_text));
     return;
   }

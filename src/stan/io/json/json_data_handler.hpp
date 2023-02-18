@@ -220,13 +220,13 @@ class json_data_handler : public stan::json::json_handler {
 
   void start_array() {
     if (key_stack.empty()) {
-      throw json_error("expecting JSON object, found array");
+      throw json_error("Expecting JSON object, found array.");
     }
     if (slot_types_map[key_str()] == meta_type::SCALAR
         && !(values_r.empty() && values_r.empty())) {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_str()
-               << ", error: non-scalar array value";
+      errorMsg << "Variable: " << key_str()
+               << ", error: non-scalar array value.";
       throw json_error(errorMsg.str());
     }
     if (slot_types_map[key_str()] == meta_type::SCALAR)
@@ -274,8 +274,8 @@ class json_data_handler : public stan::json::json_handler {
       }
       if (!is_rect) {
         std::stringstream errorMsg;
-        errorMsg << "variable: " << key_str()
-                 << ", error: non-rectangular array";
+        errorMsg << "Variable: " << key_str()
+                 << ", error: non-rectangular array.";
         throw json_error(errorMsg.str());
       }
     }
@@ -286,14 +286,15 @@ class json_data_handler : public stan::json::json_handler {
 
   void null() {
     std::stringstream errorMsg;
-    errorMsg << "variable: " << key_str() << ", error: null values not allowed";
+    errorMsg << "Variable: " << key_str()
+             << ", error: null values not allowed.";
     throw json_error(errorMsg.str());
   }
 
   void boolean(bool p) {
     std::stringstream errorMsg;
-    errorMsg << "variable: " << key_str()
-             << ", error: boolean values not allowed";
+    errorMsg << "Variable: " << key_str()
+             << ", error: boolean values not allowed.";
     throw json_error(errorMsg.str());
   }
 
@@ -311,8 +312,8 @@ class json_data_handler : public stan::json::json_handler {
       tmp = std::numeric_limits<double>::quiet_NaN();
     } else {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_str()
-               << ", error: string values not allowed";
+      errorMsg << "Variable: " << key_str()
+               << ", error: string values not allowed.";
       throw json_error(errorMsg.str());
     }
     promote_to_double();
@@ -401,7 +402,7 @@ class json_data_handler : public stan::json::json_handler {
       } else {
         if (!is_array_tuples(key_stack)) {
           std::stringstream errorMsg;
-          errorMsg << "attempt to redefine variable: " << key_str();
+          errorMsg << "Attempt to redefine variable: " << key_str() << ".";
           throw json_error(errorMsg.str());
         }
         var_types_map[key_str()] = meta_type::ARRAY;
@@ -457,12 +458,12 @@ class json_data_handler : public stan::json::json_handler {
         std::vector<int> cm_values_i(vars_i[var.first].first.size());
         std::pair<std::vector<int>, std::vector<size_t>> pair;
         if (all_dims.empty()) {
-          to_column_major(var.first, cm_values_i,
-                          vars_i[var.first].first, vars_i[var.first].second);
+          to_column_major(var.first, cm_values_i, vars_i[var.first].first,
+                          vars_i[var.first].second);
           pair = make_pair(cm_values_i, vars_i[var.first].second);
         } else {
-          to_column_major(var.first, cm_values_i,
-                          vars_i[var.first].first, all_dims);
+          to_column_major(var.first, cm_values_i, vars_i[var.first].first,
+                          all_dims);
           pair = make_pair(cm_values_i, all_dims);
         }
         vars_i[var.first] = pair;
@@ -470,34 +471,33 @@ class json_data_handler : public stan::json::json_handler {
         std::vector<double> cm_values_r(vars_r[var.first].first.size());
         std::pair<std::vector<double>, std::vector<size_t>> pair;
         if (all_dims.empty()) {
-          to_column_major(var.first, cm_values_r,
-                          vars_r[var.first].first, vars_r[var.first].second);
+          to_column_major(var.first, cm_values_r, vars_r[var.first].first,
+                          vars_r[var.first].second);
           pair = make_pair(cm_values_r, vars_r[var.first].second);
         } else {
-          to_column_major(var.first, cm_values_r,
-                          vars_r[var.first].first, all_dims);
+          to_column_major(var.first, cm_values_r, vars_r[var.first].first,
+                          all_dims);
           pair = make_pair(cm_values_r, all_dims);
         }
         vars_r[var.first] = pair;
       } else {
-          std::stringstream errorMsg;
-          errorMsg << "variable: " << var.first << ", ill-formed json";
-          throw json_error(errorMsg.str());
+        std::stringstream errorMsg;
+        errorMsg << "Variable: " << var.first << ", ill-formed JSON.";
+        throw json_error(errorMsg.str());
       }
     }
   }
 
   template <typename T>
-  void to_column_major(std::string vname,
-                       std::vector<T>& cm_vals,
+  void to_column_major(std::string vname, std::vector<T>& cm_vals,
                        const std::vector<T>& rm_vals,
                        const std::vector<size_t>& dims) {
     size_t expected_size = 1;
-    for (auto&x : dims)
+    for (auto& x : dims)
       expected_size *= x;
     if (expected_size != rm_vals.size()) {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << vname << ", error: ill-formed array";
+      errorMsg << "Variable: " << vname << ", error: ill-formed array.";
       throw json_error(errorMsg.str());
     }
 
@@ -508,8 +508,7 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   // convert row-major offset to column-major offset
-  size_t convert_offset_rtl_2_ltr(std::string vname,
-                                  size_t rtl_offset,
+  size_t convert_offset_rtl_2_ltr(std::string vname, size_t rtl_offset,
                                   const std::vector<size_t>& dims) {
     size_t rtl_dsize = 1;
     for (size_t i = 1; i < dims.size(); i++)
@@ -518,7 +517,7 @@ class json_data_handler : public stan::json::json_handler {
     // double-check array indexing
     if (rtl_offset >= rtl_dsize * dims[0]) {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << vname << ", unexpected error";
+      errorMsg << "Variable: " << vname << ", ill-formed data.";
       throw json_error(errorMsg.str());
     }
 
@@ -542,7 +541,7 @@ class json_data_handler : public stan::json::json_handler {
 
   void unexpected_error(std::string where) {
     std::stringstream errorMsg;
-    errorMsg << "unexpected parsing error, at key " << where;
+    errorMsg << "Variable " << where << " ill-formed data.";
     throw json_error(errorMsg.str());
   }
 

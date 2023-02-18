@@ -63,19 +63,19 @@ TEST(ioJson, rtl_2_ltr_2) {
 TEST(ioJson, rtl_2_ltr_err_1) {
   std::vector<size_t> dims(1);
   dims[0] = 7;
-  test_exception(7, "variable: foo, unexpected error", dims);
+  test_exception(7, "Variable: foo, ill-formed data.", dims);
 }
 
 TEST(ioJson, rtl_2_ltr_err_2) {
   std::vector<size_t> dims(2);
   dims[0] = 2;
   dims[1] = 4;
-  test_exception(8, "variable: foo, unexpected error", dims);
+  test_exception(8, "Variable: foo, ill-formed data.", dims);
 }
 
 TEST(ioJson, rtl_2_ltr_err_3n) {
   std::vector<size_t> dims(2);
   dims[0] = 2;
   dims[1] = 4;
-  test_exception(11, "variable: foo, unexpected error", dims);
+  test_exception(11, "Variable: foo, ill-formed data.", dims);
 }

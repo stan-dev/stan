@@ -78,12 +78,12 @@ TEST(ioJson, jsonParserA6) {
 }
 
 TEST(ioJson, jsonParserA7) {
-  test_parser("[ -1, -2, \"-inf\"]",
+  test_parser("[ -1, -2, \"-Inf\"]",
               "S:text"
               "S:arr"
               "I(INT):-1"
               "I(INT):-2"
-              "STR:\"-inf\""
+              "STR:\"-Inf\""
               "E:arr"
               "E:text");
 }
@@ -491,91 +491,101 @@ TEST(ioJson, jsonParserErr01) {
 }
 
 TEST(ioJson, jsonParserErr02) {
-  test_exception("[ .5 ]",
-                 "expecting JSON object, found array");
+  test_exception("[ .5 ]", "Expecting JSON object, found array.");
 }
 
-
 TEST(ioJson, jsonParserErr02a) {
-  test_exception("[ 0",
+  test_exception("{ \"x\" : [ 0",
                  "Missing a comma or ']' after an array element or "
                  "found a zero padded number.\n");
 }
 
 TEST(ioJson, jsonParserErr02b) {
-  test_exception("[ 0.", "Missing fraction part in number.\n");
+  test_exception("{ \"x\" : [ 0.", "Missing fraction part in number.\n");
 }
 
 TEST(ioJson, jsonParserErr02c) {
-  test_exception("[ 99.9",
+  test_exception("{ \"x\": [ 99.9",
                  "Missing a comma or ']' after an array element or "
                  "found a zero padded number.\n");
 }
 
 TEST(ioJson, jsonParserErr03) {
-  test_exception("[ 000.005 ]",
+  test_exception("{ \"x\": [ 000.005 ]",
                  "Missing a comma or ']' after an array element "
                  "or found a zero padded number.\n");
 }
 
 TEST(ioJson, jsonParserErr04) {
-  test_exception("[ 1. ]", "Missing fraction part in number.\n");
+  test_exception("{ \"x\": [ 1. ]", "Missing fraction part in number.\n");
 }
 
 TEST(ioJson, jsonParserErr05) {
-  test_exception("[ 1.009e ]", "Missing exponent in number.\n");
+  test_exception("{ \"x\": [ 1.009e ]", "Missing exponent in number.\n");
 }
 
 TEST(ioJson, jsonParserErr06b) {
-  test_exception("[ \"\\uD834abc\" ]",
+  test_exception("{ \"x\": [ \"\\uD834abc\" ]",
                  "The surrogate pair in string is invalid.\n");
 }
 
 TEST(ioJson, jsonParserErr06e) {
-  test_exception("[ \"\\uD834", "The surrogate pair in string is invalid.\n");
+  test_exception("{ \"x\": [ \"\\uD834",
+                 "The surrogate pair in string is invalid.\n");
 }
 
 TEST(ioJson, jsonParserErr06f) {
-  test_exception("[ \"\\uD8",
+  test_exception("{ \"x\": [ \"\\uD8",
                  "Incorrect hex digit after \\u escape in string.\n");
 }
 
 TEST(ioJson, jsonParserErr06g) {
-  test_exception("[ \"\\uE000\\uD",
+  test_exception("{ \"x\": [ \"\\uE000\\uD",
                  "Incorrect hex digit after \\u escape in string.\n");
 }
 
 TEST(ioJson, jsonParserErr07) {
-  test_exception("[ \"\\aFFFF\" ]", "Invalid escape character in string.\n");
+  test_exception("{ \"x\": [ \"\\aFFFF\" ]",
+                 "Invalid escape character in string.\n");
 }
 
 TEST(ioJson, jsonParserErr08) {
   std::stringstream ss;
   char c = 11;
-  ss << "[ \"" << c << "\" ]";
+  ss << "{ \"x\": [ \"" << c << "\" ]";
   test_exception(ss.str(), "Invalid encoding in string.\n");
 }
 
-TEST(ioJson, jsonParserErr09) { test_exception("[ t ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr09) {
+  test_exception("{ \"x\": [ t ]", "Invalid value.\n");
+}
 
-TEST(ioJson, jsonParserErr10) { test_exception("[ f ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr10) {
+  test_exception("{ \"x\": [ f ]", "Invalid value.\n");
+}
 
-TEST(ioJson, jsonParserErr11) { test_exception("[ n ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr11) {
+  test_exception("{ \"x\": [ n ]", "Invalid value.\n");
+}
 
 TEST(ioJson, jsonParserErr12) {
-  test_exception("[5}",
+  test_exception("{ \"x\": [5}",
                  "Missing a comma or ']' after an array element or "
                  "found a zero padded number.\n");
 }
 
-TEST(ioJson, jsonParserErr12a) { test_exception("[ a ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr12a) {
+  test_exception("{ \"x\": [ a ]", "Invalid value.\n");
+}
 
 TEST(ioJson, jsonParserErr12b) {
-  test_exception("[ \"a\", a ]", "Invalid value.\n");
+  test_exception("{ \"x\": [ \"a\", a ]",
+                 "Variable: x, error: string values not allowed.");
 }
 
 TEST(ioJson, jsonParserErr12c) {
-  test_exception("[ \"a\", ", "Invalid value.\n");
+  test_exception("{ \"x\": [ \"a\",",
+                 "Variable: x, error: string values not allowed.");
 }
 
 TEST(ioJson, jsonParserErr12d) {
@@ -609,8 +619,7 @@ TEST(ioJson, jsonParserErr14b) {
 
 TEST(ioJson, jsonParserErr14c) {
   test_exception("{ \"bar\" : [ \"foo\": -1.0100e09 , }",
-                 "Missing a comma or ']' after an array element or found a "
-                 "zero padded number.\n");
+                 "Variable: bar, error: string values not allowed.");
 }
 
 TEST(ioJson, jsonParseErr14d) {
@@ -648,12 +657,12 @@ TEST(ioJson, jsonParserErr17) {
 }
 
 TEST(ioJson, jsonParserErr18) {
-  test_exception("[ -1, -2, \"-inf\", ]", "Invalid value.\n");
+  test_exception("{ \"x\": [ -1, -2, \"-Inf\", ]", "Invalid value.\n");
 }
 
 TEST(ioJson, jsonParserErr19a) {
   test_exception(
-      "[ "
+      "{ \"x\": [ "
       "111111111111111111111111111111111111111111111111111111111111111111111111"
       "111111111111111111111111111111111111111111111111111111111111111111111111"
       "111111111111111111111111111111111111111111111111111111111111111111111111"
@@ -664,7 +673,7 @@ TEST(ioJson, jsonParserErr19a) {
 
 TEST(ioJson, jsonParserErr19b) {
   test_exception(
-      "[ "
+      "{ \"x\": [ "
       "-11111111111111111111111111111111111111111111111111111111111111111111111"
       "111111111111111111111111111111111111111111111111111111111111111111111111"
       "111111111111111111111111111111111111111111111111111111111111111111111111"
@@ -674,6 +683,6 @@ TEST(ioJson, jsonParserErr19b) {
 }
 
 TEST(ioJson, jsonParserErr19d) {
-  test_exception("[ 9.19191919191919e1000000000000 ]",
+  test_exception("{ \"x\": [ 9.19191919191919e1000000000000 ]",
                  "Number too big to be stored in double.\n");
 }

@@ -377,7 +377,7 @@ TEST(ioJson, jsonData_array_err1) {
         "12.3, 12.4 ], [ 13.1, 13.2, 13.3, 13.4] ],"
         "                            [ [ 21.1, 21.2, 21.3, 21.4 ], "
         "[ 666, 22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
-  test_exception(txt, "variable: foo, error: non-rectangular array");
+  test_exception(txt, "Variable: foo, error: non-rectangular array.");
 }
 
 TEST(ioJson, jsonData_array_err2) {
@@ -386,94 +386,94 @@ TEST(ioJson, jsonData_array_err2) {
         "12.3, 12.4 ] ],"
         "                            [ [ 21.1, 21.2, 21.3, 21.4 ], "
         "[ 666, 22.3, 22.4 ], [ 23.1, 23.2, 23.3, 23.4] ] ] }";
-  test_exception(txt, "variable: foo, error: non-rectangular array");
+  test_exception(txt, "Variable: foo, error: non-rectangular array.");
 }
 
 TEST(ioJson, jsonData_array_err3) {
   std::string txt = "{ \"foo\" : [1, 2, 3, 4, [5], 6, 7] }";
-  test_exception(txt, "variable: foo, error: ill-formed array");
+  test_exception(txt, "Variable: foo, error: ill-formed array.");
 }
 
 TEST(ioJson, jsonData_array_err4) {
   std::string txt = "{ \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
-  test_exception(txt, "variable: foo, error: ill-formed array");
+  test_exception(txt, "Variable: foo, error: ill-formed array.");
 }
 
 TEST(ioJson, jsonData_array_err5) {
   std::string txt = "{  \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
-  test_exception(txt, "variable: foo, error: ill-formed array");
+  test_exception(txt, "Variable: foo, error: ill-formed array.");
 }
 
 TEST(ioJson, jsonData_array_err6) {
   std::string txt
       = "{ \"baz\" : [[1.0,2.0,3.0],[4.0,5.0,6]],  \"foo\" : [1, "
         "2, 3, 4, [5], 6, 7] }";
-  test_exception(txt, "variable: foo, error: ill-formed array");
+  test_exception(txt, "Variable: foo, error: ill-formed array.");
 }
 
 TEST(ioJson, jsonData_array_err7) {
   std::string txt
       = "{ \"baz\":[[1,2],[3,4.0]],  \"foo\" : [[1], 2, 3, 4, 5, 6, 7] }";
-  test_exception(txt, "variable: foo, error: ill-formed array");
+  test_exception(txt, "Variable: foo, error: ill-formed array.");
 }
 
 TEST(ioJson, jsonData_array_err8) {
   std::string txt
       = "{  \"baz\":[1,2,\"-Inf\"], \"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
-  test_exception(txt, "variable: foo, error: ill-formed array");
+  test_exception(txt, "Variable: foo, error: ill-formed array.");
 }
 
 TEST(ioJson, jsonData_array_err9) {
   std::string txt
       = "{\"a\":1,  \"baz\":[1,2,\"-Inf\"], \"b\":2.0, "
         "\"foo\" : [1, 2, 3, 4, 5, 6, [7]] }";
-  test_exception(txt, "variable: foo, error: ill-formed array");
+  test_exception(txt, "Variable: foo, error: ill-formed array.");
 }
 
 TEST(ioJson, jsonData_mult_vars_err1) {
   std::string txt = "{ \"foo\" : 1, \"foo\" : 0.1 }";
-  test_exception(txt, "attempt to redefine variable: foo");
+  test_exception(txt, "Attempt to redefine variable: foo.");
 }
 
-TEST(ioJson, jsonData_mult_vars_er2) {
+TEST(ioJson, jsonData_mult_vars_err2) {
   std::string txt = "{ \"foo\" : 1.1, \"foo\" : 0.1 }";
-  test_exception(txt, "attempt to redefine variable: foo");
+  test_exception(txt, "Attempt to redefine variable: foo.");
 }
 
-TEST(ioJson, jsonData_mult_vars_er3) {
+TEST(ioJson, jsonData_mult_vars_err3) {
   std::string txt = "{ \"foo\" : [ 1.1, 1 ], \"foo\" : 0.1 }";
-  test_exception(txt, "attempt to redefine variable: foo");
+  test_exception(txt, "Attempt to redefine variable: foo.");
 }
 
 TEST(ioJson, jsonData_null_value_err) {
   std::string txt = "{ \"foo\" : [ 1.1, 1, null ] }";
-  test_exception(txt, "variable: foo, error: null values not allowed");
+  test_exception(txt, "Variable: foo, error: null values not allowed.");
 }
 
 TEST(ioJson, jsonData_bool_value_err1) {
   std::string txt = "{ \"foo\" : [ 1.1, 1, true ] }";
-  test_exception(txt, "variable: foo, error: boolean values not allowed");
+  test_exception(txt, "Variable: foo, error: boolean values not allowed.");
 }
 
 TEST(ioJson, jsonData_bool_value_err2) {
   std::string txt = "{ \"foo\" : [ 1.1, 1, false ] }";
-  test_exception(txt, "variable: foo, error: boolean values not allowed");
+  test_exception(txt, "Variable: foo, error: boolean values not allowed.");
 }
 
 TEST(ioJson, jsonData_string_value_err) {
   std::string txt = "{ \"foo\" : [ 1.1, 1, \"abc\" ] }";
-  test_exception(txt, "variable: foo, error: string values not allowed");
+  test_exception(txt, "Variable: foo, error: string values not allowed.");
 }
 
 TEST(ioJson, jsonData_not_an_obj) {
   std::string txt = "[ 1 ]";
-  test_exception(txt, "expecting JSON object, found array");
+  test_exception(txt, "Expecting JSON object, found array.");
 }
 
 // don't allow array of objects
 TEST(ioJson, jsonData_err_array_of_obj) {
   std::string txt = "[ { \"foo\": 1}, { \"bar\": 1 } ]";
-  test_exception(txt, "expecting JSON object, found array");
+  test_exception(txt, "Expecting JSON object, found array.");
 }
 
 TEST(ioJson, jsonData_parse_mult_objects_err) {
