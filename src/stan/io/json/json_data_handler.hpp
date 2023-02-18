@@ -33,9 +33,9 @@ typedef std::map<std::string, var_i> vars_map_i;
  */
 struct meta_type {
   enum {
-    SCALAR = 0,  // no start elements
-    ARRAY = 1,   // one or more "["
-    TUPLE = 2,   // one or more "{"
+    SCALAR = 0,           // no start elements
+    ARRAY = 1,            // one or more "["
+    TUPLE = 2,            // one or more "{"
     ARRAY_OF_TUPLES = 3,  // one or more "[" followed by "{"
   };
 };
@@ -43,9 +43,9 @@ struct meta_type {
 /** Enum for salient handler events */
 struct meta_event {
   enum {
-    OBJ_OPEN= 0,  // {
+    OBJ_OPEN = 0,   // {
     OBJ_CLOSE = 1,  // }
-    KEY = 2, 
+    KEY = 2,
   };
 };
 
@@ -59,17 +59,14 @@ class array_dims {
   std::vector<size_t> dims;
   std::vector<size_t> dims_acc;
   int cur_dim;
-  array_dims() : dims(), dims_acc(), cur_dim(0) {
-  }
+  array_dims() : dims(), dims_acc(), cur_dim(0) {}
 
   bool operator==(const array_dims& other) {
     return dims == other.dims && dims_acc == other.dims_acc
-        && cur_dim == other.cur_dim;
+           && cur_dim == other.cur_dim;
   }
 
-  bool operator!=(const array_dims& other) {
-    return !operator==(other);
-  }
+  bool operator!=(const array_dims& other) { return !operator==(other); }
 
   std::string print() {
     // only used for debugging
@@ -105,10 +102,10 @@ class array_dims {
  */
 class json_data_handler : public stan::json::json_handler {
  private:
-  vars_map_r &vars_r;
-  vars_map_i &vars_i;
+  vars_map_r& vars_r;
+  vars_map_i& vars_i;
   std::vector<std::string> key_stack;
-  std::map<std::string, int> var_types_map;  // vars_r and vars_i entries
+  std::map<std::string, int> var_types_map;   // vars_r and vars_i entries
   std::map<std::string, int> slot_types_map;  // all slots all vars parsed
   std::map<std::string, array_dims> slot_dims_map;
   std::map<std::string, bool> int_slots_map;
@@ -126,14 +123,13 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   bool is_init() {
-    return (key_stack.empty() && var_types_map.empty()  && slot_types_map.empty()
+    return (key_stack.empty() && var_types_map.empty() && slot_types_map.empty()
             && values_r.empty() && values_i.empty() && slot_dims_map.empty()
-            && array_start_i == 0 && array_start_r == 0 && int_slots_map.empty());
+            && array_start_i == 0 && array_start_r == 0
+            && int_slots_map.empty());
   }
 
-  std::string key_str() {
-    return boost::algorithm::join(key_stack, ".");
-  }
+  std::string key_str() { return boost::algorithm::join(key_stack, "."); }
 
   std::string outer_key_str() {
     std::string result;
@@ -155,7 +151,7 @@ class json_data_handler : public stan::json::json_handler {
    * @param a_vars_r name-value map for real-valued variables
    * @param a_vars_i name-value map for int-valued variables
    */
-  json_data_handler(vars_map_r &a_vars_r, vars_map_i &a_vars_i)
+  json_data_handler(vars_map_r& a_vars_r, vars_map_i& a_vars_i)
       : json_handler(),
         vars_r(a_vars_r),
         vars_i(a_vars_i),
@@ -168,7 +164,7 @@ class json_data_handler : public stan::json::json_handler {
         values_i(),
         array_start_i(0),
         array_start_r(0) {}
-  
+
   // *** start handler events ***
   void start_text() {
     vars_i.clear();  // can't accumulate var defs across calls to parser
@@ -184,7 +180,7 @@ class json_data_handler : public stan::json::json_handler {
     reset_values();
   }
 
-  void key(const std::string &key) {
+  void key(const std::string& key) {
     if (event != meta_event::OBJ_OPEN) {
       save_key_value_pair();
     }
@@ -203,8 +199,7 @@ class json_data_handler : public stan::json::json_handler {
       return;
     if (slot_types_map[key_str()] == meta_type::ARRAY) {
       slot_types_map[key_str()] = meta_type::ARRAY_OF_TUPLES;
-    }
-    else if (slot_types_map[key_str()] == meta_type::SCALAR) {
+    } else if (slot_types_map[key_str()] == meta_type::SCALAR) {
       slot_types_map[key_str()] = meta_type::TUPLE;
     }
     // don't reset tuples or array of tuples
@@ -216,7 +211,7 @@ class json_data_handler : public stan::json::json_handler {
         && slot_types_map[outer_key_str()] == meta_type::ARRAY_OF_TUPLES) {
       array_dims outer = get_outer_dims(key_stack);
       if (!outer.dims.empty()) {
-        outer.dims_acc[outer.dims.size()-1]++;
+        outer.dims_acc[outer.dims.size() - 1]++;
         set_outer_dims(outer);
       }
     }
@@ -230,11 +225,12 @@ class json_data_handler : public stan::json::json_handler {
     if (slot_types_map[key_str()] == meta_type::SCALAR
         && !(values_r.empty() && values_r.empty())) {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_str() << ", error: non-scalar array value";
+      errorMsg << "variable: " << key_str()
+               << ", error: non-scalar array value";
       throw json_error(errorMsg.str());
     }
     if (slot_types_map[key_str()] == meta_type::SCALAR)
-        slot_types_map[key_str()] = meta_type::ARRAY;
+      slot_types_map[key_str()] = meta_type::ARRAY;
     else if (slot_types_map[key_str()] == meta_type::TUPLE)
       unexpected_error(key_str());
     array_dims dims;
@@ -246,7 +242,7 @@ class json_data_handler : public stan::json::json_handler {
       dims.dims_acc.push_back(0);
     }
     if (dims.cur_dim > 1)
-      dims.dims_acc[dims.cur_dim-2]++;
+      dims.dims_acc[dims.cur_dim - 2]++;
     slot_dims_map[key_str()] = dims;
     array_start_i = values_i.size();
     array_start_r = values_r.size();
@@ -278,7 +274,8 @@ class json_data_handler : public stan::json::json_handler {
       }
       if (!is_rect) {
         std::stringstream errorMsg;
-        errorMsg << "variable: " << key_str() << ", error: non-rectangular array";
+        errorMsg << "variable: " << key_str()
+                 << ", error: non-rectangular array";
         throw json_error(errorMsg.str());
       }
     }
@@ -295,11 +292,12 @@ class json_data_handler : public stan::json::json_handler {
 
   void boolean(bool p) {
     std::stringstream errorMsg;
-    errorMsg << "variable: " << key_str() << ", error: boolean values not allowed";
+    errorMsg << "variable: " << key_str()
+             << ", error: boolean values not allowed";
     throw json_error(errorMsg.str());
   }
 
-  void string(const std::string &s) {
+  void string(const std::string& s) {
     double tmp;
     if (0 == s.compare("-Inf")) {
       tmp = -std::numeric_limits<double>::infinity();
@@ -313,7 +311,8 @@ class json_data_handler : public stan::json::json_handler {
       tmp = std::numeric_limits<double>::quiet_NaN();
     } else {
       std::stringstream errorMsg;
-      errorMsg << "variable: " << key_str() << ", error: string values not allowed";
+      errorMsg << "variable: " << key_str()
+               << ", error: string values not allowed";
       throw json_error(errorMsg.str());
     }
     promote_to_double();
@@ -378,10 +377,11 @@ class json_data_handler : public stan::json::json_handler {
       unexpected_error(key_str());
     if (slot_types_map[key_str()] == meta_type::TUPLE
         || slot_types_map[key_str()] == meta_type::ARRAY_OF_TUPLES) {
-      ;
+      {}
     } else {
       bool is_int = int_slots_map[key_str()];
-      bool is_new = (vars_r.count(key_str()) == 0 && vars_i.count(key_str()) == 0);
+      bool is_new
+          = (vars_r.count(key_str()) == 0 && vars_i.count(key_str()) == 0);
       bool is_real = vars_r.count(key_str()) == 1;
       bool was_int = vars_i.count(key_str()) == 1;
       std::vector<size_t> dims;
@@ -411,18 +411,18 @@ class json_data_handler : public stan::json::json_handler {
           for (auto& x : vars_i[key_str()].first) {
             values_tmp.push_back(x);
           }
-          for (auto&x : values_r)
+          for (auto& x : values_r)
             values_tmp.push_back(x);
           std::pair<std::vector<double>, std::vector<size_t>> pair;
           pair = make_pair(values_tmp, dims);
           vars_r[key_str()] = pair;
           vars_i.erase(key_str());
         } else if (is_int) {
-          for (auto& x: values_i)
+          for (auto& x : values_i)
             vars_i[key_str()].first.push_back(x);
           vars_i[key_str()].second = dims;
         } else {
-          for (auto& x: values_r)
+          for (auto& x : values_r)
             vars_r[key_str()].first.push_back(x);
           vars_r[key_str()].second = dims;
         }
@@ -438,7 +438,7 @@ class json_data_handler : public stan::json::json_handler {
    * Update vars_i and vars_r accordingly.
    */
   void convert_arrays() {
-    for (auto const &var : var_types_map) {
+    for (auto const& var : var_types_map) {
       if (var.second != meta_type::ARRAY) {
         return;
       }
@@ -457,41 +457,35 @@ class json_data_handler : public stan::json::json_handler {
         std::vector<int> cm_values_i(vars_i[var.first].first.size());
         std::pair<std::vector<int>, std::vector<size_t>> pair;
         if (all_dims.empty()) {
-          to_column_major(cm_values_i,
-                          vars_i[var.first].first,
+          to_column_major(cm_values_i, vars_i[var.first].first,
                           vars_i[var.first].second);
           pair = make_pair(cm_values_i, vars_i[var.first].second);
         } else {
-          to_column_major(cm_values_i,
-                          vars_i[var.first].first,
-                          all_dims);
+          to_column_major(cm_values_i, vars_i[var.first].first, all_dims);
           pair = make_pair(cm_values_i, all_dims);
-        }            
+        }
         vars_i[var.first] = pair;
       } else if (vars_r.count(var.first) == 1) {
         std::vector<double> cm_values_r(vars_r[var.first].first.size());
         std::pair<std::vector<double>, std::vector<size_t>> pair;
         if (all_dims.empty()) {
-          to_column_major(cm_values_r,
-                          vars_r[var.first].first,
+          to_column_major(cm_values_r, vars_r[var.first].first,
                           vars_r[var.first].second);
           pair = make_pair(cm_values_r, vars_r[var.first].second);
         } else {
-          to_column_major(cm_values_r,
-                          vars_r[var.first].first,
-                          all_dims);
+          to_column_major(cm_values_r, vars_r[var.first].first, all_dims);
           pair = make_pair(cm_values_r, all_dims);
-        }            
+        }
         vars_r[var.first] = pair;
       } else {
         unexpected_error("cannot convert " + var.first);
       }
     }
   }
- 
+
   template <typename T>
-  void to_column_major(std::vector<T> &cm_vals, const std::vector<T> &rm_vals,
-                       const std::vector<size_t> &dims) {
+  void to_column_major(std::vector<T>& cm_vals, const std::vector<T>& rm_vals,
+                       const std::vector<size_t>& dims) {
     for (size_t i = 0; i < rm_vals.size(); i++) {
       size_t idx = convert_offset_rtl_2_ltr(i, dims);
       cm_vals[idx] = rm_vals[i];
@@ -500,7 +494,7 @@ class json_data_handler : public stan::json::json_handler {
 
   // convert row-major offset to column-major offset
   size_t convert_offset_rtl_2_ltr(size_t rtl_offset,
-                                  const std::vector<size_t> &dims) {
+                                  const std::vector<size_t>& dims) {
     size_t rtl_dsize = 1;
     for (size_t i = 1; i < dims.size(); i++)
       rtl_dsize *= dims[i];
@@ -534,7 +528,7 @@ class json_data_handler : public stan::json::json_handler {
     std::stringstream errorMsg;
     errorMsg << "json_data_handler unexpected parsing error, at key " << where;
     throw json_error(errorMsg.str());
-  }    
+  }
 
   array_dims get_outer_dims(const std::vector<std::string>& keys) {
     std::vector<std::string> stack = keys;
@@ -590,15 +584,13 @@ class json_data_handler : public stan::json::json_handler {
     bool is_int = true;
     if (int_slots_map.count(key_str()) == 1)
       is_int = int_slots_map[key_str()];
-    std::cout << where 
-              << " key " << key_str()
-              << " slot_type " << slot_type
-              << " is_int " << is_int 
-              << "\n\tvalues_i (" << values_i.size() << ") ";
-    for (auto& x: values_i)
+    std::cout << where << " key " << key_str() << " slot_type " << slot_type
+              << " is_int " << is_int << "\n\tvalues_i (" << values_i.size()
+              << ") ";
+    for (auto& x : values_i)
       std::cout << " " << x;
-    std::cout<< "\n\tvalues_r (" << values_r.size() << ") ";
-    for (auto& x: values_r)
+    std::cout << "\n\tvalues_r (" << values_r.size() << ") ";
+    for (auto& x : values_r)
       std::cout << " " << x;
     std::cout << std::endl;
     if (slot_dims_map.count(key_str()) == 1)
@@ -606,14 +598,13 @@ class json_data_handler : public stan::json::json_handler {
     else
       std::cout << std::endl;
     std::cout << "\tknown int vars (" << vars_i.size() << ") ";
-    for (auto&x : vars_i)
+    for (auto& x : vars_i)
       std::cout << " " << x.first;
     std::cout << "\tknown real vars (" << vars_r.size() << ") ";
-    for (auto&x : vars_r)
+    for (auto& x : vars_r)
       std::cout << " " << x.first;
     std::cout << std::endl;
   }
-
 };
 
 }  // namespace json

@@ -110,7 +110,7 @@ char get_slash() {
  * @param file_path vector of strings representing path to the file
  * @return the string representation of the path
  */
-std::string paths_to_fname(const std::vector<std::string> &path) {
+std::string paths_to_fname(const std::vector<std::string>& path) {
   std::string pathstr;
   if (path.size() > 0) {
     pathstr.append(path[0]);
@@ -121,8 +121,6 @@ std::string paths_to_fname(const std::vector<std::string> &path) {
   }
   return pathstr;
 }
-
-
 
 namespace stan {
 namespace test {
@@ -149,7 +147,6 @@ void reset_std_streams() {
   cout_buf = 0;
   cerr_buf = 0;
 }
-
 
 }  // namespace test
 }  // namespace stan
