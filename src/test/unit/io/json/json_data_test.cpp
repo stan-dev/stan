@@ -392,8 +392,6 @@ TEST(ioJson, jsonData_x_3d_y_2d_z_0d) {
   test_real_var(jdata, "z", expected_vals_z, expected_dims_z);
 }
 
-
-
 TEST(ioJson, jsonData_array_err1) {
   std::string txt
       = "{ \"foo\" : [ [ [ 11.1, 11.2, 11.3, 11.4 ], [ 12.1, 12.2, "

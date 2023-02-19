@@ -377,7 +377,8 @@ class json_data_handler : public stan::json::json_handler {
       unexpected_error(key_str());
     if (slot_types_map[key_str()] == meta_type::TUPLE
         || slot_types_map[key_str()] == meta_type::ARRAY_OF_TUPLES) {
-      {}
+      {
+      }
     } else {
       bool is_int = int_slots_map[key_str()];
       bool is_new

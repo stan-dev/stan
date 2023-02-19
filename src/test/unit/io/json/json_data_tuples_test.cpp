@@ -152,7 +152,8 @@ TEST(ioJson, jsonData_array_tuple_multi) {
   std::vector<size_t> expected_dims_x11 = {2, 3};
   test_int_var(jdata, "x.1.1", expected_vals_x11, expected_dims_x11);
 
-  std::vector<double> expected_vals_x12 = {1, 91.1, 3, 93.3, 5, 95.5, 2, 92.2, 4, 94.4, 6, 96.6};
+  std::vector<double> expected_vals_x12
+      = {1, 91.1, 3, 93.3, 5, 95.5, 2, 92.2, 4, 94.4, 6, 96.6};
   std::vector<size_t> expected_dims_x12 = {2, 3, 2};
   test_real_var(jdata, "x.1.2", expected_vals_x12, expected_dims_x12);
 
@@ -160,4 +161,3 @@ TEST(ioJson, jsonData_array_tuple_multi) {
   std::vector<size_t> expected_dims_x2 = {2};
   test_int_var(jdata, "x.2", expected_vals_x2, expected_dims_x2);
 }
-
