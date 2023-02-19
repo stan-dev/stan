@@ -443,41 +443,31 @@ class json_data_handler : public stan::json::json_handler {
         continue;
       }
       std::vector<size_t> all_dims;
-      array_dims inner = slot_dims_map[var.first];
-      // MM TODO: do we need to generalize to more deeply nested structures?
-      std::vector<std::string> keys;
-      split(keys, var.first, boost::is_any_of("."), boost::token_compress_on);
-      array_dims outer = get_outer_dims(keys);
-      if (inner != outer)
-        for (auto& x : outer.dims)
-          all_dims.push_back(x);
-      for (auto& x : inner.dims)
-        all_dims.push_back(x);
+      std::vector<std::string> slots;
+      split(slots, var.first, boost::is_any_of("."), boost::token_compress_on);
+      std::string slot;
+      for (size_t i=0; i < slots.size(); ++i) {
+        slot.append(slots[i]);
+        if (slot_dims_map.count(slot) == 1
+            && !slot_dims_map[slot].dims.empty()) {
+          for (auto& x : slot_dims_map[slot].dims)
+            all_dims.push_back(x);
+        }
+        slot.append(".");
+      }
       if (vars_i.count(var.first) == 1) {
         std::vector<int> cm_values_i(vars_i[var.first].first.size());
         std::pair<std::vector<int>, std::vector<size_t>> pair;
-        if (all_dims.empty()) {
-          to_column_major(var.first, cm_values_i, vars_i[var.first].first,
-                          vars_i[var.first].second);
-          pair = make_pair(cm_values_i, vars_i[var.first].second);
-        } else {
-          to_column_major(var.first, cm_values_i, vars_i[var.first].first,
-                          all_dims);
-          pair = make_pair(cm_values_i, all_dims);
-        }
+        to_column_major(var.first, cm_values_i, vars_i[var.first].first,
+                        all_dims);
+        pair = make_pair(cm_values_i, all_dims);
         vars_i[var.first] = pair;
       } else if (vars_r.count(var.first) == 1) {
         std::vector<double> cm_values_r(vars_r[var.first].first.size());
         std::pair<std::vector<double>, std::vector<size_t>> pair;
-        if (all_dims.empty()) {
-          to_column_major(var.first, cm_values_r, vars_r[var.first].first,
-                          vars_r[var.first].second);
-          pair = make_pair(cm_values_r, vars_r[var.first].second);
-        } else {
-          to_column_major(var.first, cm_values_r, vars_r[var.first].first,
-                          all_dims);
-          pair = make_pair(cm_values_r, all_dims);
-        }
+        to_column_major(var.first, cm_values_r, vars_r[var.first].first,
+                        all_dims);
+        pair = make_pair(cm_values_r, all_dims);
         vars_r[var.first] = pair;
       } else {
         std::stringstream errorMsg;
