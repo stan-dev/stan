@@ -77,7 +77,6 @@ class array_dims {
     ss << "\tdims_acc cts: ";
     for (auto& x : dims_acc)
       ss << " " << x;
-    ss << std::endl;
     return ss.str();
   }
 };
@@ -378,8 +377,7 @@ class json_data_handler : public stan::json::json_handler {
       unexpected_error(key_str());
     if (slot_types_map[key_str()] == meta_type::TUPLE
         || slot_types_map[key_str()] == meta_type::ARRAY_OF_TUPLES) {
-      {
-      }
+      {}
     } else {
       bool is_int = int_slots_map[key_str()];
       bool is_new
@@ -611,8 +609,7 @@ class json_data_handler : public stan::json::json_handler {
     std::cout << std::endl;
     if (slot_dims_map.count(key_str()) == 1)
       std::cout << slot_dims_map[key_str()].print();
-    else
-      std::cout << std::endl;
+    std::cout << std::endl;
     std::cout << "\tknown int vars (" << vars_i.size() << ") ";
     for (auto& x : vars_i)
       std::cout << " " << x.first;

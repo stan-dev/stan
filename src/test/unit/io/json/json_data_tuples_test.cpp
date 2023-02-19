@@ -56,7 +56,7 @@ TEST(ioJson, jsonData_tuple_nested) {
 }
 
 // array[2] (array[3] real, real) x;
-TEST(ioJson, jsonData_array_tuple_simple) {
+TEST(ioJson, jsonData_array_tuple_arrays) {
   std::vector<std::string> json_path;
   json_path = {"src", "test", "test-data", "d1_array_tuple_1d_real.json"};
   std::string filename = paths_to_fname(json_path);
@@ -67,13 +67,21 @@ TEST(ioJson, jsonData_array_tuple_simple) {
   std::vector<size_t> expected_dims_x1 = {2, 3};
   test_real_var(jdata, "x.1", expected_vals_x1, expected_dims_x1);
 
-  std::vector<double> expected_vals_x2 = {1, 2.2};
-  std::vector<size_t> expected_dims_x2 = {2};
+  std::vector<double> expected_vals_x2 = {5, 5.5, 7, 7.7, 6, 6.6, 8, 8.8};
+  std::vector<size_t> expected_dims_x2 = {2, 2, 2};
   test_real_var(jdata, "x.2", expected_vals_x2, expected_dims_x2);
+
+  std::vector<double> expected_vals_x3 = {1, 2.2};
+  std::vector<size_t> expected_dims_x3 = {2};
+  test_real_var(jdata, "x.3", expected_vals_x3, expected_dims_x3);
 
   std::vector<double> expected_vals_y = {3.214};
   std::vector<size_t> expected_dims_y;
   test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
+
+  std::vector<double> expected_vals_z4 = {0.1, 0.4, 0.2, 0.5, 0.3, 0.6};
+  std::vector<size_t> expected_dims_z4 = {2, 3};
+  test_real_var(jdata, "z.4", expected_vals_z4, expected_dims_z4);
 }
 
 // array[3] (array[2] int, (array[2] real, real)) x;
@@ -132,24 +140,24 @@ TEST(ioJson, jsonData_array_tuple_array) {
   test_real_var(jdata2, "y", expected_vals_y, expected_dims_y);
 }
 
-// sanity check - non-tuple vars OK
-TEST(ioJson, jsonData_no_tuples) {
+// array[2] (array[3] (int, array[2] real), int ) x;
+TEST(ioJson, jsonData_array_tuple_multi) {
   std::vector<std::string> json_path;
-  json_path = {"src", "test", "test-data", "arrays.json"};
+  json_path = {"src", "test", "test-data", "array_tuple_multi.json"};
   std::string filename = paths_to_fname(json_path);
   std::ifstream in(filename);
   stan::json::json_data jdata(in);
 
-  std::vector<double> expected_vals_x
-      = {11.1, 31, 21, 41, 12, 32, 22.2, 42, 13, 33.3, 23, 43};
-  std::vector<size_t> expected_dims_x = {2, 2, 3};
-  test_real_var(jdata, "x", expected_vals_x, expected_dims_x);
+  std::vector<int> expected_vals_x11 = {111, 444, 222, 555, 333, 666};
+  std::vector<size_t> expected_dims_x11 = {2, 3};
+  test_int_var(jdata, "x.1.1", expected_vals_x11, expected_dims_x11);
 
-  std::vector<double> expected_vals_y = {1, 3.3, 2.2, 4};
-  std::vector<size_t> expected_dims_y = {2, 2};
-  test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
+  std::vector<double> expected_vals_x12 = {1, 91.1, 3, 93.3, 5, 95.5, 2, 92.2, 4, 94.4, 6, 96.6};
+  std::vector<size_t> expected_dims_x12 = {2, 3, 2};
+  test_real_var(jdata, "x.1.2", expected_vals_x12, expected_dims_x12);
 
-  std::vector<double> expected_vals_z = {3.214};
-  std::vector<size_t> expected_dims_z;
-  test_real_var(jdata, "z", expected_vals_z, expected_dims_z);
+  std::vector<int> expected_vals_x2 = {37, 47};
+  std::vector<size_t> expected_dims_x2 = {2};
+  test_int_var(jdata, "x.2", expected_vals_x2, expected_dims_x2);
 }
+
