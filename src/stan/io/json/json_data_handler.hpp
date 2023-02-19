@@ -447,7 +447,7 @@ class json_data_handler : public stan::json::json_handler {
       std::vector<std::string> slots;
       split(slots, var.first, boost::is_any_of("."), boost::token_compress_on);
       std::string slot;
-      for (size_t i=0; i < slots.size(); ++i) {
+      for (size_t i = 0; i < slots.size(); ++i) {
         slot.append(slots[i]);
         if (slot_dims_map.count(slot) == 1
             && !slot_dims_map[slot].dims.empty()) {
