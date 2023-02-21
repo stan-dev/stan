@@ -503,6 +503,10 @@ pipeline {
                 name: "Entire pipeline results",
                 enabledForFailure: true,
                 aggregatingResults : false,
+                filters: [
+                    excludeCategory('deprecated-declarations'),
+                    excludeCategory('-Wdeprecated-declarations')
+                ],
                 tools: [
                     gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
                     clang(id: "pipeline_clang", name: "LLVM/Clang")
