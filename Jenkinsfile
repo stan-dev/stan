@@ -251,50 +251,50 @@ pipeline {
                 }
             }
             parallel {
-                // stage('Windows Headers & Unit') {
-                //     agent { label 'windows' }
-                //     when {
-                //         expression {
-                //             ( env.BRANCH_NAME == "develop" ||
-                //             env.BRANCH_NAME == "master" ||
-                //             params.run_tests_all_os ) &&
-                //             !skipRemainingStages
-                //         }
-                //     }
-                //     steps {
-                //         deleteDirWin()
-                //             unstash 'StanSetup'
-                //             bat """
-                //                 SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
-                //                 SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
-                //                 SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
-                //                 SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
-                //                 SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
-                //                 SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
-                //                 mingw32-make.exe -f lib/stan_math/make/standalone math-libs
-                //                 mingw32-make.exe -j${PARALLEL} test-headers
-                //             """
-                //             setupCXX(false, WIN_CXX, stanc3_bin_url())
-                //             runTestsWin("src/test/unit")
-                //     }
-                //     post { always { deleteDirWin() } }
-                // }
-                // stage('Linux Unit') {
-                //     agent {
-                //         docker {
-                //             image 'stanorg/ci:gpu'
-                //             label 'linux'
-                //             args '--pull always'
-                //         }
-                //     }
-                //     steps {
-                //         unstash 'StanSetup'
-                //         setupCXX(true, LINUX_CXX, stanc3_bin_url())
-                //         sh "make -j${PARALLEL} test-headers"
-                //         runTests("src/test/unit")
-                //     }
-                //     post { always { deleteDir() } }
-                // }
+                stage('Windows Headers & Unit') {
+                    agent { label 'windows' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
+                    steps {
+                        deleteDirWin()
+                            unstash 'StanSetup'
+                            bat """
+                                SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
+                                SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
+                                SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
+                                SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
+                                SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
+                                SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
+                                mingw32-make.exe -f lib/stan_math/make/standalone math-libs
+                                mingw32-make.exe -j${PARALLEL} test-headers
+                            """
+                            setupCXX(false, WIN_CXX, stanc3_bin_url())
+                            runTestsWin("src/test/unit")
+                    }
+                    post { always { deleteDirWin() } }
+                }
+                stage('Linux Unit') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:gpu'
+                            label 'linux'
+                            args '--pull always'
+                        }
+                    }
+                    steps {
+                        unstash 'StanSetup'
+                        setupCXX(true, LINUX_CXX, stanc3_bin_url())
+                        sh "make -j${PARALLEL} test-headers"
+                        runTests("src/test/unit")
+                    }
+                    post { always { deleteDir() } }
+                }
                 stage('Mac Unit') {
                 agent { label 'm1' }
                     when {
@@ -321,70 +321,70 @@ pipeline {
                 }
             }
             parallel {
-                // stage('Integration Linux') {
-                //     agent {
-                //         docker {
-                //             image 'stanorg/ci:gpu'
-                //             label 'linux'
-                //         }
-                //     }
-                //     steps {
-                //         sh """
-                //             git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
-                //             git clone https://github.com/stan-dev/stanc3/ performance-tests-cmdstan/stanc3
-                //         """
-                //         script {
-                //             if (params.cmdstan_pr != 'downstream_tests') {
-                //                 if(params.cmdstan_pr.contains("PR-")){
-                //                     pr_number = params.cmdstan_pr.split("-")[1]
-                //                     sh """
-                //                         cd performance-tests-cmdstan/cmdstan
-                //                         git fetch origin pull/${pr_number}/head:pr/${pr_number}
-                //                         git checkout pr/${pr_number}
-                //                     """
-                //                 }else{
-                //                     sh """
-                //                         cd performance-tests-cmdstan/cmdstan
-                //                         git checkout develop && git pull && git checkout ${params.cmdstan_pr}
-                //                     """
-                //                 }
-                //             }
-                //             if (params.stanc3_bin_url != 'nightly') {
-                //                 sh """
-                //                     cd performance-tests-cmdstan/cmdstan
-                //                     echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
-                //                 """
-                //             }
-                //         }
-                //         dir('performance-tests-cmdstan/cmdstan/stan'){
-                //             unstash 'StanSetup'
-                //             script {
-                //                 if (params.stanc3_bin_url != 'nightly') {
-                //                     sh """
-                //                         echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
-                //                     """
-                //                 }
-                //             }
-                //         }
-                //         sh """
-                //             cd performance-tests-cmdstan/cmdstan
-                //             echo 'O=0' >> make/local
-                //             echo 'CXX=${LINUX_CXX}' >> make/local
-                //             make clean-all
-                //             make -j${PARALLEL} build
-                //             cd ..
-                //             python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
-                //             python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
-                //         """
-                //         sh """
-                //             cd performance-tests-cmdstan/cmdstan/stan
-                //             python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
-                //             python3 ./runTests.py src/test/integration/standalone_functions_test.cpp
-                //             python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp
-                //         """
-                //     }
-                //     post { always { deleteDir() } }
-                // }
+                stage('Integration Linux') {
+                    agent {
+                        docker {
+                            image 'stanorg/ci:gpu'
+                            label 'linux'
+                        }
+                    }
+                    steps {
+                        sh """
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                            git clone https://github.com/stan-dev/stanc3/ performance-tests-cmdstan/stanc3
+                        """
+                        script {
+                            if (params.cmdstan_pr != 'downstream_tests') {
+                                if(params.cmdstan_pr.contains("PR-")){
+                                    pr_number = params.cmdstan_pr.split("-")[1]
+                                    sh """
+                                        cd performance-tests-cmdstan/cmdstan
+                                        git fetch origin pull/${pr_number}/head:pr/${pr_number}
+                                        git checkout pr/${pr_number}
+                                    """
+                                }else{
+                                    sh """
+                                        cd performance-tests-cmdstan/cmdstan
+                                        git checkout develop && git pull && git checkout ${params.cmdstan_pr}
+                                    """
+                                }
+                            }
+                            if (params.stanc3_bin_url != 'nightly') {
+                                sh """
+                                    cd performance-tests-cmdstan/cmdstan
+                                    echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
+                                """
+                            }
+                        }
+                        dir('performance-tests-cmdstan/cmdstan/stan'){
+                            unstash 'StanSetup'
+                            script {
+                                if (params.stanc3_bin_url != 'nightly') {
+                                    sh """
+                                        echo 'STANC3_TEST_BIN_URL=${params.stanc3_bin_url}' >> make/local
+                                    """
+                                }
+                            }
+                        }
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan
+                            echo 'O=0' >> make/local
+                            echo 'CXX=${LINUX_CXX}' >> make/local
+                            make clean-all
+                            make -j${PARALLEL} build
+                            cd ..
+                            python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                            python3 ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
+                        """
+                        sh """
+                            cd performance-tests-cmdstan/cmdstan/stan
+                            python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                        """
+                    }
+                    post { always { deleteDir() } }
+                }
                 stage('Integration Mac') {
                     agent { label 'm1' }
                     when {
@@ -421,78 +421,78 @@ pipeline {
                     }
                     post { always { deleteDir() } }
                 }
-                // stage('Integration Windows') {
-                //     agent { label 'windows' }
-                //     when {
-                //         expression {
-                //             ( env.BRANCH_NAME == "develop" ||
-                //             env.BRANCH_NAME == "master" ||
-                //             params.run_tests_all_os ) &&
-                //             !skipRemainingStages
-                //         }
-                //     }
-                //     steps {
-                //         deleteDirWin()
-                //         bat """
-                //             git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
-                //         """
-                //         dir('performance-tests-cmdstan/cmdstan/stan'){
-                //             unstash 'StanSetup'
-                //         }
-                //         writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true")
-                //         withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
+                stage('Integration Windows') {
+                    agent { label 'windows' }
+                    when {
+                        expression {
+                            ( env.BRANCH_NAME == "develop" ||
+                            env.BRANCH_NAME == "master" ||
+                            params.run_tests_all_os ) &&
+                            !skipRemainingStages
+                        }
+                    }
+                    steps {
+                        deleteDirWin()
+                        bat """
+                            git clone --recursive https://github.com/stan-dev/performance-tests-cmdstan
+                        """
+                        dir('performance-tests-cmdstan/cmdstan/stan'){
+                            unstash 'StanSetup'
+                        }
+                        writeFile(file: "performance-tests-cmdstan/cmdstan/make/local", text: "CXX=${WIN_CXX}\nPRECOMPILED_HEADERS=true")
+                        withEnv(["PATH+TBB=${WORKSPACE}\\performance-tests-cmdstan\\cmdstan\\stan\\lib\\stan_math\\lib\\tbb"]) {
 
-                //             bat """
-                //                 SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
-                //                 SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
-                //                 SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
-                //                 SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
-                //                 SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
-                //                 SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
-                //                 SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
-                //                 cd performance-tests-cmdstan/cmdstan
-                //                 mingw32-make.exe -j${PARALLEL} build
-                //                 cd ..
-                //                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
-                //                 python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
-                //             """
-                //         }
-                //         bat """
-                //             SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
-                //             SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
-                //             SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
-                //             SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
-                //             SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
-                //             SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
-                //             SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
-                //             cd performance-tests-cmdstan/cmdstan/stan
-                //             python ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
-                //             python ./runTests.py src/test/integration/standalone_functions_test.cpp
-                //             python ./runTests.py src/test/integration/multiple_translation_units_test.cpp
-                //         """
-                //     }
-                //     post { always { deleteDirWin() } }
-                // }
+                            bat """
+                                SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
+                                SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
+                                SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
+                                SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
+                                SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
+                                SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
+                                SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
+                                cd performance-tests-cmdstan/cmdstan
+                                mingw32-make.exe -j${PARALLEL} build
+                                cd ..
+                                python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 stanc3/test/integration/good
+                                python ./runPerformanceTests.py -j${PARALLEL} ${integration_tests_flags()}--runs=0 example-models
+                            """
+                        }
+                        bat """
+                            SET \"PATH=C:\\Users\\jenkins\\Anaconda3;%PATH%\"
+                            SET \"PATH=${env.RTOOLS40_HOME};%PATH%\"
+                            SET \"PATH=${env.RTOOLS40_HOME}\\usr\\bin;${LLVM7}\\bin;%PATH%\" //
+                            SET \"PATH=${env.RTOOLS40_HOME}\\mingw64\\bin;%PATH%\"
+                            SET \"PATH=C:\\PROGRA~1\\R\\R-4.1.2\\bin;%PATH%\"
+                            SET \"PATH=C:\\PROGRA~1\\Microsoft^ MPI\\Bin;%PATH%\"
+                            SET \"MPI_HOME=C:\\PROGRA~1\\Microsoft^ MPI\\Bin\"
+                            cd performance-tests-cmdstan/cmdstan/stan
+                            python ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            python ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            python ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                        """
+                    }
+                    post { always { deleteDirWin() } }
+                }
             }
         }
-        // stage('Upstream CmdStan tests') {
-        //     when {
-        //             expression {
-        //                 ( env.BRANCH_NAME ==~ /PR-\d+/ ||
-        //                 env.BRANCH_NAME == "downstream_tests" ||
-        //                 env.BRANCH_NAME == "downstream_hotfix" ) &&
-        //                 !skipRemainingStages
-        //             }
-        //         }
-        //     steps {
-        //         build(job: "Stan/CmdStan/${cmdstan_pr()}",
-        //               parameters: [
-        //                 string(name: 'stan_pr', value: stan_pr()),
-        //                 string(name: 'math_pr', value: params.math_pr),
-        //                 string(name: 'stanc3_bin_url', value: stanc3_bin_url())
-        //               ])
-        //     }
-        // }
+        stage('Upstream CmdStan tests') {
+            when {
+                    expression {
+                        ( env.BRANCH_NAME ==~ /PR-\d+/ ||
+                        env.BRANCH_NAME == "downstream_tests" ||
+                        env.BRANCH_NAME == "downstream_hotfix" ) &&
+                        !skipRemainingStages
+                    }
+                }
+            steps {
+                build(job: "Stan/CmdStan/${cmdstan_pr()}",
+                      parameters: [
+                        string(name: 'stan_pr', value: stan_pr()),
+                        string(name: 'math_pr', value: params.math_pr),
+                        string(name: 'stanc3_bin_url', value: stanc3_bin_url())
+                      ])
+            }
+        }
 
     }
     // Below lines are commented to avoid spamming emails during migration/debug
