@@ -504,8 +504,7 @@ pipeline {
                 enabledForFailure: true,
                 aggregatingResults : false,
                 filters: [
-                    excludeCategory('deprecated-declarations'),
-                    excludeCategory('-Wdeprecated-declarations')
+                    excludeFile('/lib/.*')
                 ],
                 tools: [
                     gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
