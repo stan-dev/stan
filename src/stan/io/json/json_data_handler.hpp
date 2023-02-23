@@ -260,7 +260,6 @@ class json_data_handler : public stan::json::json_handler {
     key_stack.pop_back();
   }
 
-
   /* Process array variables
    *  a. for array of tuples, concatenate dimensions
    *  b. convert vector of values in row-major order
