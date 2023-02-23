@@ -40,7 +40,9 @@ struct meta_type {
   };
 };
 
-/** Enum for salient handler events */
+/** Enum which tracks handler events.
+    Used to identify first and last slot of a tuple.
+*/
 struct meta_event {
   enum {
     OBJ_OPEN = 0,   // {
@@ -73,10 +75,13 @@ class array_dims {
  * A <code>json_data_handler</code> is an implementation of a
  * <code>json_handler</code> that restricts the allowed JSON text
  * to a single JSON object which define Stan variables.
- * Each Stan variable consists of a JSON key : value pair.
+ * The handler is responsible for populating the data structures
+ * `vars_r` and `vars_i` which map variable names to the values and
+ * dimensions found in the JSON.
+ *
+ * In the JSON, each Stan variable is a JSON key : value pair.
  * The key is a string (the Stan variable name) and the value
  * is either a scalar variables, array, or a tuple.
- *
  * Stan program variables can only be of type int or real (double).
  * The strings \"Inf\" and \"Infinity\" are mapped to positive infinity,
  * the strings \"-Inf\" and \"-Infinity\" are mapped to negative infinity,
@@ -88,11 +93,15 @@ class array_dims {
  * or other tuples and array elements can be tuples, which allows
  * for any level of nested arrays within tuples, or tuples within arrays.
  *
- * In the C++ code, only the innermost tuple slots correspond to Stan
- * program variables.   The handler tracks all intermediate slots via
- * a series of maps.  These are used to check the consistency of array
- * dimensions for arrays of tuples, and to determine whether or not the
- * variable should be stored in the vars_i or vars_r objects.
+ * For a Stan model variable which has nested tuples, only the innermost
+ * tuple slot will correspond to a variable in the generated C++ code,
+ * likewise, in the JSON object, only the innermost elements will be
+ * int or real values. For arrays of tuples, the handler needs to track
+ * both the array dimension and whether or not the values found so far
+ * are of type real or int.  To do this, the handler uses a series of
+ * maps between tuple slots seen so far and the C++ storage type (int or real),
+ * the variable meta-type (array, tuple, or array of tuples), and if an array
+ * variable, the dimensions of the array.
  */
 class json_data_handler : public stan::json::json_handler {
  private:
@@ -264,8 +273,8 @@ class json_data_handler : public stan::json::json_handler {
 
   /* Process array variables
    *  a. for array of tuples, concatenate dimensions
-   *  b. convert vector of values in row-major order
-   *     to vector of values in column-major order.
+   *  b. if multi-dim array, convert vector of values
+   *      from row-major order to column-major order.
    * Update vars_i and vars_r accordingly.
    */
   void convert_arrays() {
@@ -287,18 +296,26 @@ class json_data_handler : public stan::json::json_handler {
         slot.append(".");
       }
       if (vars_i.count(var.first) == 1) {
-        std::vector<int> cm_values_i(vars_i[var.first].first.size());
         std::pair<std::vector<int>, std::vector<size_t>> pair;
-        to_column_major(var.first, cm_values_i, vars_i[var.first].first,
-                        all_dims);
-        pair = make_pair(cm_values_i, all_dims);
+        if (all_dims.size() > 1) {
+          std::vector<int> cm_values_i(vars_i[var.first].first.size());
+          to_column_major(var.first, cm_values_i, vars_i[var.first].first,
+                          all_dims);
+          pair = make_pair(cm_values_i, all_dims);
+        } else {
+          pair = make_pair(vars_i[var.first].first, all_dims);
+        }
         vars_i[var.first] = pair;
       } else if (vars_r.count(var.first) == 1) {
-        std::vector<double> cm_values_r(vars_r[var.first].first.size());
         std::pair<std::vector<double>, std::vector<size_t>> pair;
-        to_column_major(var.first, cm_values_r, vars_r[var.first].first,
-                        all_dims);
-        pair = make_pair(cm_values_r, all_dims);
+        if (all_dims.size() > 1) {
+          std::vector<double> cm_values_r(vars_r[var.first].first.size());
+          to_column_major(var.first, cm_values_r, vars_r[var.first].first,
+                          all_dims);
+          pair = make_pair(cm_values_r, all_dims);
+        } else {
+          pair = make_pair(vars_r[var.first].first, all_dims);
+        }
         vars_r[var.first] = pair;
       } else {
         std::stringstream errorMsg;
@@ -320,7 +337,6 @@ class json_data_handler : public stan::json::json_handler {
       errorMsg << "Variable: " << vname << ", error: ill-formed array.";
       throw json_error(errorMsg.str());
     }
-
     for (size_t i = 0; i < rm_vals.size(); i++) {
       size_t idx = convert_offset_rtl_2_ltr(vname, i, dims);
       cm_vals[idx] = rm_vals[i];
@@ -354,20 +370,31 @@ class json_data_handler : public stan::json::json_handler {
         array_start_i(0),
         array_start_r(0) {}
 
+  /** Clear all maps before parsing next JSON object.
+   *  This means that we don't accumulate variable definitions
+   *  across calls to the parser.
+   */
   void start_text() {
-    vars_i.clear();  // can't accumulate var defs across calls to parser
+    vars_i.clear();
     vars_r.clear();
     var_types_map.clear();
     slot_types_map.clear();
+    slot_dims_map.clear();
+    int_slots_map.clear();
     reset_values();
   }
 
+  /** Once all variable definitions have been processed,
+   *  convert arrays from row-major to column-major.
+   */
   void end_text() {
-    save_key_value_pair();
     convert_arrays();
-    reset_values();
   }
 
+  /** A key is either a top-level Stan variable name or a tuple slot id.
+   *  Logic handles edge case where key is the first slot of a tuple;
+   *  the name of the enclosing object is not used in the generated C++.
+   */
   void key(const std::string& key) {
     if (event != meta_event::OBJ_OPEN) {
       save_key_value_pair();
@@ -381,6 +408,8 @@ class json_data_handler : public stan::json::json_handler {
     }
   }
 
+  /** A start object ("{") event changes the meta-type of the current key.
+   */
   void start_object() {
     event = meta_event::OBJ_OPEN;
     if (is_init())
@@ -390,9 +419,12 @@ class json_data_handler : public stan::json::json_handler {
     } else if (slot_types_map[key_str()] == meta_type::SCALAR) {
       slot_types_map[key_str()] = meta_type::TUPLE;
     }
-    // don't reset tuples or array of tuples
   }
 
+  /** An end object ("}") event closes either the top-level object or a tuple.
+   *  If the latter, when the enclosing object is an array of tuples, we must
+   *  record of check the array size for the current array dimension.
+   */
   void end_object() {
     event = meta_event::OBJ_CLOSE;
     if (key_stack.size() > 1
@@ -406,6 +438,11 @@ class json_data_handler : public stan::json::json_handler {
     save_key_value_pair();
   }
 
+  /** For a start array ("[") event we first check that we're not currently
+   *  processing the values in an array.  We need to do this because JSON
+   *  doesn't distinguish lists of heterogenous elements and arrays.
+   *  Then we add or update the dimensions of the array variable.
+   */
   void start_array() {
     if (key_stack.empty()) {
       throw json_error("Expecting JSON object, found array.");
@@ -436,6 +473,12 @@ class json_data_handler : public stan::json::json_handler {
     array_start_r = values_r.size();
   }
 
+  /** An array event ("]") closes the current array dimension.
+   *  The innermost array dimension are the scalar elements which
+   *  are found in the accumulator vectors `values_i` and `values_r`.
+   *  If processing the first row of an array, record the size of this row,
+   *  else check that the size of this row matches recorded row size.
+   */
   void end_array() {
     if (slot_dims_map.count(key_str()) == 0)
       unexpected_error(key_str());
@@ -543,7 +586,9 @@ class json_data_handler : public stan::json::json_handler {
     number_double(n);
   }
 
-  // convert row-major offset to column-major offset
+  /** This function provides the column-major offset of an array element
+   *  given its row-major offset and the array dimensions.
+   */ 
   size_t convert_offset_rtl_2_ltr(std::string vname, size_t rtl_offset,
                                   const std::vector<size_t>& dims) {
     size_t rtl_dsize = 1;
