@@ -118,7 +118,7 @@ class json_data_handler : public stan::json::json_handler {
     array_start_r = 0;
   }
 
-  std::string key_str() { return boost::algorithm::join(key_stack, "."); }
+  inline std::string key_str() { return boost::algorithm::join(key_stack, "."); }
 
   std::string outer_key_str() {
     std::string result;
@@ -438,10 +438,11 @@ class json_data_handler : public stan::json::json_handler {
   void end_array() {
     if (slot_dims_map.count(key_str()) == 0)
       unexpected_error(key_str());
-    array_dims dims = slot_dims_map[key_str()];
+    std::string key(key_str());
+    array_dims dims = slot_dims_map[key];
     int idx = dims.cur_dim - 1;
-    bool is_int = int_slots_map[key_str()];
-    bool is_last = (slot_types_map[key_str()] != meta_type::ARRAY_OF_TUPLES
+    bool is_int = int_slots_map[key];
+    bool is_last = (slot_types_map[key] != meta_type::ARRAY_OF_TUPLES
                     && dims.cur_dim == dims.dims.size());
     if (is_last && 0 == dims.dims[idx]) {  // innermost row of scalar elts
       if (is_int)
@@ -461,14 +462,14 @@ class json_data_handler : public stan::json::json_handler {
       }
       if (!is_rect) {
         std::stringstream errorMsg;
-        errorMsg << "Variable: " << key_str()
+        errorMsg << "Variable: " << key
                  << ", error: non-rectangular array.";
         throw json_error(errorMsg.str());
       }
     }
     dims.dims_acc[idx] = 0;
     dims.cur_dim--;
-    slot_dims_map[key_str()] = dims;
+    slot_dims_map[key] = dims;
   }
 
   void null() {
