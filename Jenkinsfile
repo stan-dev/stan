@@ -296,7 +296,7 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Mac Unit') {
-                agent { label 'osx && !m1' }
+                agent { label 'osx' }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
@@ -386,7 +386,7 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('Integration Mac') {
-                    agent { label 'osx && !m1' }
+                    agent { label 'osx' }
                     when {
                         expression {
                             ( env.BRANCH_NAME == "develop" ||
@@ -503,6 +503,9 @@ pipeline {
                 name: "Entire pipeline results",
                 enabledForFailure: true,
                 aggregatingResults : false,
+                filters: [
+                    excludeFile('/lib/.*')
+                ],
                 tools: [
                     gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
                     clang(id: "pipeline_clang", name: "LLVM/Clang")

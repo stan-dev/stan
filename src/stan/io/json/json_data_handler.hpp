@@ -87,7 +87,7 @@ class array_dims {
  * to the slot number, counting from 1.  Tuple elements can be arrays
  * or other tuples and array elements can be tuples, which allows
  * for any level of nested arrays within tuples, or tuples within arrays.
- * 
+ *
  * In the C++ code, only the innermost tuple slots correspond to Stan
  * program variables.   The handler tracks all intermediate slots via
  * a series of maps.  These are used to check the consistency of array
@@ -105,8 +105,8 @@ class json_data_handler : public stan::json::json_handler {
   std::map<std::string, bool> int_slots_map;
   std::vector<double> values_r;  // accumulates real var values
   std::vector<int> values_i;     // accumulates int var values
-  size_t array_start_i;  // index into values_i
-  size_t array_start_r;  // index into values_r
+  size_t array_start_i;          // index into values_i
+  size_t array_start_r;          // index into values_r
   int event;
 
   void reset_values() {
@@ -412,8 +412,7 @@ class json_data_handler : public stan::json::json_handler {
     if (slot_types_map[key] == meta_type::SCALAR
         && !(values_r.empty() && values_r.empty())) {
       std::stringstream errorMsg;
-      errorMsg << "Variable: " << key
-               << ", error: non-scalar array value.";
+      errorMsg << "Variable: " << key << ", error: non-scalar array value.";
       throw json_error(errorMsg.str());
     }
     if (slot_types_map[key] == meta_type::SCALAR)
