@@ -35,69 +35,6 @@ class recording_handler : public stan::json::json_handler {
   void number_unsigned_int64(uint64_t n) { os_ << "U64(INT):" << n; }
 };
 
-/**
- * Gets the path separator for the OS.
- *
- * @return '\' for Windows, '/' otherwise.
- */
-char get_slash() {
-#if defined(WIN32) || defined(_WIN32) \
-    || defined(__WIN32) && !defined(__CYGWIN__)
-  static char path_separator = '\\';
-#else
-  static char path_separator = '/';
-#endif
-  return path_separator;
-}
-
-/**
- * Returns the path as a string with the appropriate path separator.
- *
- * @param file_path vector of strings representing path to the file
- * @return the string representation of the path
- */
-std::string paths_to_fname(const std::vector<std::string> &path) {
-  std::string pathstr;
-  if (path.size() > 0) {
-    pathstr.append(path[0]);
-    for (size_t i = 1; i < path.size(); i++) {
-      pathstr.append(1, get_slash());
-      pathstr.append(path[i]);
-    }
-  }
-  return pathstr;
-}
-
-/**
- * Echo contents of filename to stdout
- *
- * @param filename path to the file
- */
-void show_file(const std::string &fileName) {
-  std::ifstream ifs(fileName.c_str(),
-                    std::ios::in | std::ios::binary | std::ios::ate);
-  std::ifstream::pos_type fileSize = ifs.tellg();
-  ifs.seekg(0, std::ios::beg);
-  std::vector<char> bytes(fileSize);
-  ifs.read(bytes.data(), fileSize);
-  std::string tmp(bytes.data(), fileSize);
-  std::cout << tmp << std::endl << std::flush;
-}
-
-/**
- * Echo parse of filename to stdout
- *
- * @param filename path to the file
- */
-void show_parse(const std::string &fileName) {
-  recording_handler handler;
-  std::ifstream ifs(fileName.c_str(),
-                    std::ios::in | std::ios::binary | std::ios::ate);
-  ifs.seekg(0, std::ios::beg);
-  stan::json::rapidjson_parse(ifs, handler);
-  std::cout << handler.os_.str() << std::endl << std::flush;
-}
-
 void test_int_var(stan::json::json_data &jdata, const std::string &name,
                   const std::vector<int> &expected_vals,
                   const std::vector<size_t> &expected_dims) {

@@ -4,6 +4,7 @@
 #include <stan/io/json/json_handler.hpp>
 #include <stan/io/json/rapidjson_parser.hpp>
 
+#include <test/unit/util.hpp>
 #include <test/unit/io/json/util.hpp>
 
 #include <boost/limits.hpp>
@@ -373,7 +374,7 @@ TEST(ioJson, jsonData_empty_3D_array_2_1_0) {
 
 TEST(ioJson, jsonData_x_3d_y_2d_z_0d) {
   std::vector<std::string> json_path;
-  json_path = {"src", "test", "test-data", "arrays.json"};
+  json_path = {"src", "test", "unit", "io", "test_json_files", "arrays.json"};
   std::string filename = paths_to_fname(json_path);
   std::ifstream in(filename);
   stan::json::json_data jdata(in);

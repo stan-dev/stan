@@ -67,37 +67,32 @@ class array_dims {
   }
 
   bool operator!=(const array_dims& other) { return !operator==(other); }
-
-  std::string print() {
-    // only used for debugging
-    std::stringstream ss;
-    ss << " num dims: " << dims.size() << "\tdim szs: ";
-    for (auto& x : dims)
-      ss << " " << x;
-    ss << "\tdims_acc cts: ";
-    for (auto& x : dims_acc)
-      ss << " " << x;
-    return ss.str();
-  }
 };
 
 /**
  * A <code>json_data_handler</code> is an implementation of a
  * <code>json_handler</code> that restricts the allowed JSON text
- * to a set of Stan variable declarations in JSON format.
+ * to a single JSON object which define Stan variables.
  * Each Stan variable consists of a JSON key : value pair.
  * The key is a string (the Stan variable name) and the value
  * is either a scalar variables, array, or a tuple.
- * The latter two kinds of variables allow for deeply nested
- * structures, e.g., arrays of tuples, tuples composed of arrays,
- * tuples composed of arrays of tuples, etc.
  *
- * <p>The <code>json_data_handler</code> checks that the top-level
- * JSON object contains a set of key-value pairs.
+ * Stan program variables can only be of type int or real (double).
  * The strings \"Inf\" and \"Infinity\" are mapped to positive infinity,
  * the strings \"-Inf\" and \"-Infinity\" are mapped to negative infinity,
  * and the string \"NaN\" is mapped to not-a-number.
  * Bare versions of Infinity, -Infinity, and NaN are also allowed.
+ *
+ * Tuple variables consist of a JSON object, whose keys correspond
+ * to the slot number, counting from 1.  Tuple elements can be arrays
+ * or other tuples and array elements can be tuples, which allows
+ * for any level of nested arrays within tuples, or tuples within arrays.
+ * 
+ * In the C++ code, only the innermost tuple slots correspond to Stan
+ * program variables.   The handler tracks all intermediate slots via
+ * a series of maps.  These are used to check the consistency of array
+ * dimensions for arrays of tuples, and to determine whether or not the
+ * variable should be stored in the vars_i or vars_r objects.
  */
 class json_data_handler : public stan::json::json_handler {
  private:
@@ -108,13 +103,15 @@ class json_data_handler : public stan::json::json_handler {
   std::map<std::string, int> slot_types_map;  // all slots all vars parsed
   std::map<std::string, array_dims> slot_dims_map;
   std::map<std::string, bool> int_slots_map;
-  std::vector<double> values_r;
-  std::vector<int> values_i;
+  std::vector<double> values_r;  // accumulates real var values
+  std::vector<int> values_i;     // accumulates int var values
   size_t array_start_i;  // index into values_i
   size_t array_start_r;  // index into values_r
   int event;
 
   void reset_values() {
+    // Once var values have been copied into var_context maps,
+    // clear the accumulator vectors.
     values_r.clear();
     values_i.clear();
     array_start_i = 0;
@@ -335,40 +332,9 @@ class json_data_handler : public stan::json::json_handler {
     throw json_error(errorMsg.str());
   }
 
-  // for debugging only
-  void dump_state(std::string where) {
-    std::string slot_type("unknown");
-    if (slot_types_map.count(key_str()) == 1)
-      slot_type = std::to_string(slot_types_map[key_str()]);
-    bool is_int = true;
-    if (int_slots_map.count(key_str()) == 1)
-      is_int = int_slots_map[key_str()];
-    std::cout << where << " key " << key_str() << " slot_type " << slot_type
-              << " is_int " << is_int << "\n\tvalues_i (" << values_i.size()
-              << ") ";
-    for (auto& x : values_i)
-      std::cout << " " << x;
-    std::cout << "\n\tvalues_r (" << values_r.size() << ") ";
-    for (auto& x : values_r)
-      std::cout << " " << x;
-    std::cout << std::endl;
-    if (slot_dims_map.count(key_str()) == 1)
-      std::cout << slot_dims_map[key_str()].print();
-    std::cout << std::endl;
-    std::cout << "\tknown int vars (" << vars_i.size() << ") ";
-    for (auto& x : vars_i)
-      std::cout << " " << x.first;
-    std::cout << "\tknown real vars (" << vars_r.size() << ") ";
-    for (auto& x : vars_r)
-      std::cout << " " << x.first;
-    std::cout << std::endl;
-  }
-
  public:
   /**
    * Construct a json_data_handler object.
-   *
-   * <b>Warning:</b> This method does not close the input stream.
    *
    * @param a_vars_r name-value map for real-valued variables
    * @param a_vars_i name-value map for int-valued variables
@@ -443,20 +409,21 @@ class json_data_handler : public stan::json::json_handler {
     if (key_stack.empty()) {
       throw json_error("Expecting JSON object, found array.");
     }
-    if (slot_types_map[key_str()] == meta_type::SCALAR
+    std::string key(key_str());
+    if (slot_types_map[key] == meta_type::SCALAR
         && !(values_r.empty() && values_r.empty())) {
       std::stringstream errorMsg;
-      errorMsg << "Variable: " << key_str()
+      errorMsg << "Variable: " << key
                << ", error: non-scalar array value.";
       throw json_error(errorMsg.str());
     }
-    if (slot_types_map[key_str()] == meta_type::SCALAR)
-      slot_types_map[key_str()] = meta_type::ARRAY;
-    else if (slot_types_map[key_str()] == meta_type::TUPLE)
-      unexpected_error(key_str());
+    if (slot_types_map[key] == meta_type::SCALAR)
+      slot_types_map[key] = meta_type::ARRAY;
+    else if (slot_types_map[key] == meta_type::TUPLE)
+      unexpected_error(key);
     array_dims dims;
-    if (slot_dims_map.count(key_str()) == 1)
-      dims = slot_dims_map[key_str()];
+    if (slot_dims_map.count(key) == 1)
+      dims = slot_dims_map[key];
     dims.cur_dim++;
     if (dims.dims.empty() || dims.dims.size() < dims.cur_dim) {
       dims.dims.push_back(0);
@@ -464,7 +431,7 @@ class json_data_handler : public stan::json::json_handler {
     }
     if (dims.cur_dim > 1)
       dims.dims_acc[dims.cur_dim - 2]++;
-    slot_dims_map[key_str()] = dims;
+    slot_dims_map[key] = dims;
     array_start_i = values_i.size();
     array_start_r = values_r.size();
   }
