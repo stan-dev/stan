@@ -387,9 +387,7 @@ class json_data_handler : public stan::json::json_handler {
   /** Once all variable definitions have been processed,
    *  convert arrays from row-major to column-major.
    */
-  void end_text() {
-    convert_arrays();
-  }
+  void end_text() { convert_arrays(); }
 
   /** A key is either a top-level Stan variable name or a tuple slot id.
    *  Logic handles edge case where key is the first slot of a tuple;
@@ -588,7 +586,7 @@ class json_data_handler : public stan::json::json_handler {
 
   /** This function provides the column-major offset of an array element
    *  given its row-major offset and the array dimensions.
-   */ 
+   */
   size_t convert_offset_rtl_2_ltr(std::string vname, size_t rtl_offset,
                                   const std::vector<size_t>& dims) {
     size_t rtl_dsize = 1;
