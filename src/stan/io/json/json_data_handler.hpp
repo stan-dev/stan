@@ -118,7 +118,9 @@ class json_data_handler : public stan::json::json_handler {
     array_start_r = 0;
   }
 
-  inline std::string key_str() { return boost::algorithm::join(key_stack, "."); }
+  inline std::string key_str() {
+    return boost::algorithm::join(key_stack, ".");
+  }
 
   std::string outer_key_str() {
     std::string result;
@@ -461,8 +463,7 @@ class json_data_handler : public stan::json::json_handler {
       }
       if (!is_rect) {
         std::stringstream errorMsg;
-        errorMsg << "Variable: " << key
-                 << ", error: non-rectangular array.";
+        errorMsg << "Variable: " << key << ", error: non-rectangular array.";
         throw json_error(errorMsg.str());
       }
     }
