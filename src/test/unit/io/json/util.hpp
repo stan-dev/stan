@@ -111,4 +111,16 @@ void test_exception(const std::string &input,
   FAIL();  // didn't throw an exception as expected.
 }
 
+
+std::string file2str(const std::string &fileName) {
+  std::ifstream ifs(fileName.c_str(),
+                    std::ios::in | std::ios::binary | std::ios::ate);
+  std::ifstream::pos_type fileSize = ifs.tellg();
+  ifs.seekg(0, std::ios::beg);
+  std::vector<char> bytes(fileSize);
+  ifs.read(bytes.data(), fileSize);
+  std::string txt(bytes.data(), fileSize);
+  return txt;
+}
+
 #endif
