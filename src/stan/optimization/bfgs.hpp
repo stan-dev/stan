@@ -283,7 +283,7 @@ class BFGSMinimizer {
   }
 };
 
-template <class M, bool JacobianTransform = false>
+template <class M, bool jacobian = false>
 class ModelAdaptor {
  private:
   M &_model;
@@ -309,7 +309,7 @@ class ModelAdaptor {
       _x[i] = x[i];
 
     try {
-      f = -log_prob_propto<JacobianTransform>(_model, _x, _params_i, _msgs);
+      f = -log_prob_propto<jacobian>(_model, _x, _params_i, _msgs);
     } catch (const std::exception &e) {
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
@@ -341,8 +341,7 @@ class ModelAdaptor {
     _fevals++;
 
     try {
-      f = -log_prob_grad<true, JacobianTransform>(_model, _x, _params_i, _g,
-                                                  _msgs);
+      f = -log_prob_grad<true, jacobian>(_model, _x, _params_i, _g, _msgs);
     } catch (const std::exception &e) {
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
@@ -377,29 +376,23 @@ class ModelAdaptor {
   }
 };
 
-template <typename M, typename QNUpdateType, bool JacobianTransform = false,
-          typename Scalar = double, int DimAtCompile = Eigen::Dynamic>
+/**
+ * @tparam jacobian `true` to include Jacobian adjustment (default `false`)
+ */
+template <typename M, typename QNUpdateType, typename Scalar = double,
+          int DimAtCompile = Eigen::Dynamic, bool jacobian = false>
 class BFGSLineSearch
-    : public BFGSMinimizer<ModelAdaptor<M, JacobianTransform>, QNUpdateType,
-                           Scalar, DimAtCompile> {
+    : public BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
+                           DimAtCompile> {
  private:
-  using model_t = ModelAdaptor<M, JacobianTransform>;
-  model_t _adaptor;
+  ModelAdaptor<M, jacobian> _adaptor;
 
  public:
-  using BFGSBase = BFGSMinimizer<model_t, QNUpdateType, Scalar, DimAtCompile>;
-  using vector_t = typename BFGSBase::VectorT;
-  using idx_t = typename stan::math::index_type<vector_t>::type;
-  template <typename Vec, require_vector_t<Vec> * = nullptr>
-  BFGSLineSearch(M &model, const Vec &params_r,
-                 const std::vector<int> &params_i,
-                 const LSOptions<double> &ls_opt,
-                 const ConvergenceOptions<double> &conv_opt,
-                 const QNUpdateType &updater, std::ostream *msgs = 0)
-      : BFGSBase(_adaptor, params_r, ls_opt, conv_opt, updater),
-        _adaptor(model, params_i, msgs) {
-    initialize(params_r);
-  }
+  typedef BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
+                        DimAtCompile>
+      BFGSBase;
+  typedef typename BFGSBase::VectorT vector_t;
+  typedef typename stan::math::index_type<vector_t>::type idx_t;
 
   template <typename Vec, require_vector_t<Vec> * = nullptr>
   BFGSLineSearch(M &model, const Vec &params_r,

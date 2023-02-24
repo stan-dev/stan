@@ -64,7 +64,7 @@ String stan_pr() {
         env.BRANCH_NAME
     }
 }
-String integration_tests_flags() { 
+String integration_tests_flags() {
     if (params.compile_all_model) {
         '--no-ignore-models '
     } else {
@@ -97,10 +97,14 @@ pipeline {
     }
     environment {
         GCC = 'g++'
-        PARALLEL = 8
+        PARALLEL = 4
         MAC_CXX = 'clang++'
         LINUX_CXX = 'clang++-6.0'
         WIN_CXX = 'g++'
+        GIT_AUTHOR_NAME = 'Stan Jenkins'
+        GIT_AUTHOR_EMAIL = 'mc.stanislaw@gmail.com'
+        GIT_COMMITTER_NAME = 'Stan Jenkins'
+        GIT_COMMITTER_EMAIL = 'mc.stanislaw@gmail.com'
     }
     stages {
 
@@ -136,7 +140,7 @@ pipeline {
                             git config user.email "mc.stanislaw@gmail.com"
                             git config user.name "Stan Jenkins"
                             git add src
-                            git commit --author="Stan BuildBot <mc.stanislaw@gmail.com>" -m "[Jenkins] auto-formatting by `clang-format --version`"
+                            git commit -m "[Jenkins] auto-formatting by `clang-format --version`"
                             git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${fork()}/stan.git ${branchName()}
                             echo "Exiting build because clang-format found changes."
                             echo "Those changes are now found on stan-dev/stan under branch ${branchName()}"
@@ -366,7 +370,6 @@ pipeline {
                             cd performance-tests-cmdstan/cmdstan
                             echo 'O=0' >> make/local
                             echo 'CXX=${LINUX_CXX}' >> make/local
-                            echo 'PRECOMPILED_HEADERS=false' >> make/local
                             make clean-all
                             make -j${PARALLEL} build
                             cd ..
@@ -411,9 +414,9 @@ pipeline {
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
-                            ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
-                            ./runTests.py src/test/integration/standalone_functions_test.cpp
-                            ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                            python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp
                         """
                     }
                     post { always { deleteDir() } }
@@ -500,6 +503,9 @@ pipeline {
                 name: "Entire pipeline results",
                 enabledForFailure: true,
                 aggregatingResults : false,
+                filters: [
+                    excludeFile('/lib/.*')
+                ],
                 tools: [
                     gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
                     clang(id: "pipeline_clang", name: "LLVM/Clang")
