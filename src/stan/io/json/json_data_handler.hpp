@@ -237,11 +237,8 @@ class json_data_handler : public stan::json::json_handler {
           vars_r[key] = pair;
         }
       } else {
-        // if (!is_array_tuples(key_stack)) {
-        //   std::stringstream errorMsg;
-        //   errorMsg << "Attempt to redefine variable: " << key << ".";
-        //   throw json_error(errorMsg.str());
-        // }
+        if (slot_types_map[key_stack[0]] != meta_type::ARRAY_OF_TUPLES)
+          unexpected_error(key);
         var_types_map[key] = meta_type::ARRAY;
         std::vector<size_t> dims = slot_dims_map[key].dims;
         if ((!is_int && was_int) || (is_int && is_real)) {  // promote to double
