@@ -172,8 +172,8 @@ TEST(errJson, jsonData_empty_3D_array_2_1_0) {
 
 TEST(errJson, jsonData_redefine_var_1) {
   std::vector<std::string> json_path;
-  json_path
-      = {"src", "test", "unit", "io", "test_json_files", "redefine_vars_1.json"};
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "redefine_vars_1.json"};
   std::string filename = paths_to_fname(json_path);
   std::string txt = file2str(filename);
   test_exception(txt, "Attempt to redefine variable: x.");
@@ -181,8 +181,8 @@ TEST(errJson, jsonData_redefine_var_1) {
 
 TEST(errJson, jsonData_redefine_var_2) {
   std::vector<std::string> json_path;
-  json_path
-      = {"src", "test", "unit", "io", "test_json_files", "redefine_vars_2.json"};
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "redefine_vars_2.json"};
   std::string filename = paths_to_fname(json_path);
   std::string txt = file2str(filename);
   test_exception(txt, "Attempt to redefine variable: x.");
@@ -190,18 +190,17 @@ TEST(errJson, jsonData_redefine_var_2) {
 
 TEST(errJson, jsonData_redefine_var_3) {
   std::vector<std::string> json_path;
-  json_path
-      = {"src", "test", "unit", "io", "test_json_files", "redefine_vars_3.json"};
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "redefine_vars_3.json"};
   std::string filename = paths_to_fname(json_path);
   std::string txt = file2str(filename);
   test_exception(txt, "Attempt to redefine variable: x.");
 }
 
-
 TEST(errJson, jsonData_redefine_var_4) {
   std::vector<std::string> json_path;
-  json_path
-      = {"src", "test", "unit", "io", "test_json_files", "redefine_vars_4.json"};
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "redefine_vars_4.json"};
   std::string filename = paths_to_fname(json_path);
   std::string txt = file2str(filename);
   test_exception(txt, "Attempt to redefine variable: x.");

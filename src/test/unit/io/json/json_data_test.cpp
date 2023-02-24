@@ -343,7 +343,6 @@ TEST(ioJson, jsonData_x_3d_y_2d_z_0d) {
   test_real_var(jdata, "z", expected_vals_z, expected_dims_z);
 }
 
-
 TEST(ioJson, jsonData_parse_empty_obj) {
   std::string txt = "{}";
   std::stringstream in(txt);
