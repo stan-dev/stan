@@ -218,9 +218,9 @@ class json_data_handler : public stan::json::json_handler {
       unexpected_error(key);
     if (slot_types_map[key] == meta_type::SCALAR
         || slot_types_map[key] == meta_type::ARRAY) {
-      bool is_int = int_slots_map[key];
       bool is_new
           = (vars_r.count(key) == 0 && vars_i.count(key) == 0);
+      bool is_int = int_slots_map[key];
       bool is_real = vars_r.count(key) == 1;
       bool was_int = vars_i.count(key) == 1;
       std::vector<size_t> dims;
@@ -238,11 +238,11 @@ class json_data_handler : public stan::json::json_handler {
           vars_r[key] = pair;
         }
       } else {
-        if (!is_array_tuples(key_stack)) {
-          std::stringstream errorMsg;
-          errorMsg << "Attempt to redefine variable: " << key << ".";
-          throw json_error(errorMsg.str());
-        }
+        // if (!is_array_tuples(key_stack)) {
+        //   std::stringstream errorMsg;
+        //   errorMsg << "Attempt to redefine variable: " << key << ".";
+        //   throw json_error(errorMsg.str());
+        // }
         var_types_map[key] = meta_type::ARRAY;
         std::vector<size_t> dims = slot_dims_map[key].dims;
         if ((!is_int && was_int) || (is_int && is_real)) {  // promote to double
@@ -399,6 +399,11 @@ class json_data_handler : public stan::json::json_handler {
     event = meta_event::KEY;
     reset_values();
     key_stack.push_back(key);
+    if (key_stack.size() == 1 && slot_types_map.count(key_str()) == 1) {
+      std::stringstream errorMsg;
+      errorMsg << "Attempt to redefine variable: " << key << ".";
+      throw json_error(errorMsg.str());
+    }
     if (slot_types_map.count(key_str()) == 0) {
       slot_types_map[key_str()] = meta_type::SCALAR;
       int_slots_map[key_str()] = true;
