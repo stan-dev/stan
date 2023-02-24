@@ -210,61 +210,59 @@ class json_data_handler : public stan::json::json_handler {
    * with previous tuple elements.
    */
   void save_key_value_pair() {
-    if (0 == key_stack.size())
+    if (key_stack.empty())
       return;
-    if (slot_types_map.count(key_str()) < 1)
-      unexpected_error(key_str());
-    if (slot_types_map[key_str()] == meta_type::TUPLE
-        || slot_types_map[key_str()] == meta_type::ARRAY_OF_TUPLES) {
-      {
-      }
-    } else {
-      bool is_int = int_slots_map[key_str()];
+    std::string key = key_str();
+    if (slot_types_map.count(key) < 1)
+      unexpected_error(key);
+    if (slot_types_map[key] == meta_type::SCALAR
+        || slot_types_map[key] == meta_type::ARRAY) {
+      bool is_int = int_slots_map[key];
       bool is_new
-          = (vars_r.count(key_str()) == 0 && vars_i.count(key_str()) == 0);
-      bool is_real = vars_r.count(key_str()) == 1;
-      bool was_int = vars_i.count(key_str()) == 1;
+          = (vars_r.count(key) == 0 && vars_i.count(key) == 0);
+      bool is_real = vars_r.count(key) == 1;
+      bool was_int = vars_i.count(key) == 1;
       std::vector<size_t> dims;
-      if (slot_dims_map.count(key_str()) == 1)
-        dims = slot_dims_map[key_str()].dims;
+      if (slot_dims_map.count(key) == 1)
+        dims = slot_dims_map[key].dims;
       if (is_new) {
-        var_types_map[key_str()] = slot_types_map[key_str()];
+        var_types_map[key] = slot_types_map[key];
         if (is_int) {
           std::pair<std::vector<int>, std::vector<size_t>> pair;
           pair = make_pair(values_i, dims);
-          vars_i[key_str()] = pair;
+          vars_i[key] = pair;
         } else {
           std::pair<std::vector<double>, std::vector<size_t>> pair;
           pair = make_pair(values_r, dims);
-          vars_r[key_str()] = pair;
+          vars_r[key] = pair;
         }
       } else {
         if (!is_array_tuples(key_stack)) {
           std::stringstream errorMsg;
-          errorMsg << "Attempt to redefine variable: " << key_str() << ".";
+          errorMsg << "Attempt to redefine variable: " << key << ".";
           throw json_error(errorMsg.str());
         }
-        var_types_map[key_str()] = meta_type::ARRAY;
-        std::vector<size_t> dims = slot_dims_map[key_str()].dims;
+        var_types_map[key] = meta_type::ARRAY;
+        std::vector<size_t> dims = slot_dims_map[key].dims;
         if ((!is_int && was_int) || (is_int && is_real)) {  // promote to double
           std::vector<double> values_tmp;
-          for (auto& x : vars_i[key_str()].first) {
+          for (auto& x : vars_i[key].first) {
             values_tmp.push_back(x);
           }
           for (auto& x : values_r)
             values_tmp.push_back(x);
           std::pair<std::vector<double>, std::vector<size_t>> pair;
           pair = make_pair(values_tmp, dims);
-          vars_r[key_str()] = pair;
-          vars_i.erase(key_str());
+          vars_r[key] = pair;
+          vars_i.erase(key);
         } else if (is_int) {
           for (auto& x : values_i)
-            vars_i[key_str()].first.push_back(x);
-          vars_i[key_str()].second = dims;
+            vars_i[key].first.push_back(x);
+          vars_i[key].second = dims;
         } else {
           for (auto& x : values_r)
-            vars_r[key_str()].first.push_back(x);
-          vars_r[key_str()].second = dims;
+            vars_r[key].first.push_back(x);
+          vars_r[key].second = dims;
         }
       }
     }
