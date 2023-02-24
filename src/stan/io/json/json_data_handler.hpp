@@ -218,8 +218,7 @@ class json_data_handler : public stan::json::json_handler {
       unexpected_error(key);
     if (slot_types_map[key] == meta_type::SCALAR
         || slot_types_map[key] == meta_type::ARRAY) {
-      bool is_new
-          = (vars_r.count(key) == 0 && vars_i.count(key) == 0);
+      bool is_new = (vars_r.count(key) == 0 && vars_i.count(key) == 0);
       bool is_int = int_slots_map[key];
       bool is_real = vars_r.count(key) == 1;
       bool was_int = vars_i.count(key) == 1;
