@@ -197,12 +197,13 @@ class json_data_handler : public stan::json::json_handler {
 
   void promote_to_double() {
     if (int_slots_map[key_str()]) {
-      for (std::vector<int>::iterator it = values_i.begin();
-           it != values_i.end(); ++it)
-        values_r.push_back(*it);
+      int_slots_map[key_str()] = false;
+      values_r.reserve(values_i.size());
+      values_r.insert(values_r.end(), values_i.begin(), values_i.end());
       array_start_r = array_start_i;
+      values_i.clear();
+      array_start_i = 0;
     }
-    int_slots_map[key_str()] = false;
   }
 
   /* Save non-tuple vars and innermost tuple slots to vars_i and vars_r.
