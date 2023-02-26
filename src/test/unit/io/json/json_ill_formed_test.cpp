@@ -131,7 +131,6 @@ TEST(errJson, jsonData_empty_2D_array_1_0) {
   try {
     jdata.validate_dims("test", "foo", "int", expected_dims);
   } catch (const std::exception &e) {
-    std::cout << e.what() << std::endl;
     FAIL();
   }
 }
