@@ -1,13 +1,13 @@
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
-#include <boost/random/mixmax.hpp>
+#include <boost/random/additive_combine.hpp>
 #include <stan/io/dump.hpp>
 #include <fstream>
 
 #include <gtest/gtest.h>
 
-typedef boost::random::mixmax rng_t;
+typedef boost::ecuyer1988 rng_t;
 
 TEST(McmcSoftAbsNuts, build_tree_test) {
   rng_t base_rng(4839294);

@@ -3,10 +3,10 @@
 #include <stan/mcmc/hmc/nuts/base_nuts.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
 #include <vector>
-#include <boost/random/mixmax.hpp>
+#include <boost/random/additive_combine.hpp>
 #include <gtest/gtest.h>
 
-typedef boost::random::mixmax rng_t;
+typedef boost::ecuyer1988 rng_t;
 
 namespace stan {
 namespace mcmc {

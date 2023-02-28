@@ -10,11 +10,11 @@
 
 #include <test/test-models/good/mcmc/hmc/common/gauss.hpp>
 
-#include <boost/random/mixmax.hpp>
+#include <boost/random/additive_combine.hpp>
 
 #include <gtest/gtest.h>
 
-typedef boost::random::mixmax rng_t;
+typedef boost::ecuyer1988 rng_t;
 
 TEST(McmcStaticUniform, unit_e_transition) {
   rng_t base_rng(4839294);
