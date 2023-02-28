@@ -847,11 +847,12 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 column at
  * compile time
  * @tparam GradBuffer Boost circular buffer with inner Eigen vector type
- * @tparam CurrentParams Type inheriting from `Eigen::DenseBase` with 1 column at
- * compile time
+ * @tparam CurrentParams Type inheriting from `Eigen::DenseBase` with 1 column
+ * at compile time
  * @tparam CurentGrads Type inheriting from `Eigen::DenseBase` with 1 column at
  * compile time
- * @tparam ParamMat Type inheriting from `Eigen::DenseBase` with dynamic rows and columns at compile time.
+ * @tparam ParamMat Type inheriting from `Eigen::DenseBase` with dynamic rows
+ * and columns at compile time.
  * @tparam Logger Type of logger callback
  * @param num_evals[in/out] Number of calls to the log probability function.
  * @param rng A generator to produce standard gaussian random variables
@@ -861,7 +862,8 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * space
  * @param current_params Parameters from iteration of LBFGS
  * @param current_grads Gradients from iteration of LBFGS
- * @param grad_buffer Circular buffer of the last `history_size` changes in the gradient. 
+ * @param grad_buffer Circular buffer of the last `history_size` changes in the
+ * gradient.
  * @param Skt_mat Matrix of the last `history_size` changes in the gradient.
  * @param num_elbo_draws Number of draws for the ELBO estimation
  * @param iter_msg The beginning of messages that includes the iteration number
