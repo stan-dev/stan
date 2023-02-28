@@ -517,9 +517,6 @@ gen_eigen_matrix(Generator&& variate_generator, const Eigen::Index num_params,
  * @param num_samples Number of approximate samples to generate
  * @param alpha The approximation of the diagonal hessian
  * @param logger A callback writer for messages
- * @param num_eval_attempts Number of evaluation attempts to make for each
- *  column of the taylor approximation. For each column if this number is
- * exceeded that value is discarded.
  * @param iter_msg The beginning of messages that includes the iteration number
  */
 template <bool ReturnElbo = true, typename LPF, typename ConstrainF,
@@ -841,6 +838,35 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
   return return_code;
 }
 
+/**
+ * Estimate the approximate draws given the taylor approximation.
+ * @tparam RNG Type of random number generator
+ * @tparam LPFun Type of log probability functor
+ * @tparam ConstrainFun Type of functor for constraining parameters
+ * @tparam Logger Type inheriting from `stan::callbacks::logger`
+ * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 column at
+ * compile time
+ * @tparam GradBuffer Boost circular buffer with inner Eigen vector type
+ * @tparam CurrentParams Type inheriting from `Eigen::DenseBase` with 1 column at
+ * compile time
+ * @tparam CurentGrads Type inheriting from `Eigen::DenseBase` with 1 column at
+ * compile time
+ * @tparam ParamMat Type inheriting from `Eigen::DenseBase` with dynamic rows and columns at compile time.
+ * @tparam Logger Type of logger callback
+ * @param num_evals[in/out] Number of calls to the log probability function.
+ * @param rng A generator to produce standard gaussian random variables
+ * @param alpha The approximation of the diagonal hessian
+ * @param lp_fun Functor to calculate the log density
+ * @param constrain_fun A functor to transform parameters to the constrained
+ * space
+ * @param current_params Parameters from iteration of LBFGS
+ * @param current_grads Gradients from iteration of LBFGS
+ * @param grad_buffer Circular buffer of the last `history_size` changes in the gradient. 
+ * @param Skt_mat Matrix of the last `history_size` changes in the gradient.
+ * @param num_elbo_draws Number of draws for the ELBO estimation
+ * @param iter_msg The beginning of messages that includes the iteration number
+ * @param logger A callback writer for messages
+ */
 template <typename RNG, typename LPFun, typename ConstrainFun, typename Logger,
           typename AlphaVec, typename GradBuffer, typename CurrentParams,
           typename CurrentGrads, typename ParamMat>
@@ -877,7 +903,6 @@ auto pathfinder_impl(std::size_t& num_evals, RNG&& rng, AlphaVec&& alpha,
                                          taylor_appx, num_elbo_draws, alpha,
                                          logger, iter_msg, num_evals),
         taylor_appx);
-    // TODO: Put num_evals in est_approx_draws
   } catch (const std::exception& e) {
     logger.info(iter_msg + "ELBO estimation failed "
                 + " with error: " + e.what());
