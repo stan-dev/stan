@@ -66,8 +66,10 @@ class BFGSMinimizer {
   QNUpdateType _qn;
 
  public:
-  LSOptions<Scalar> _ls_opts;
-  ConvergenceOptions<Scalar> _conv_opts;
+  using ls_options_t = LSOptions<Scalar>;
+  ls_options_t _ls_opts;
+  using convergence_options_t = ConvergenceOptions<Scalar>;
+  convergence_options_t _conv_opts;
 
   inline QNUpdateType &get_qnupdate() noexcept { return _qn; }
   inline const QNUpdateType &get_qnupdate() const noexcept { return _qn; }
@@ -98,7 +100,7 @@ class BFGSMinimizer {
 
   inline const std::string &note() const noexcept { return _note; }
 
-  std::string get_code_string(int retCode) {
+  inline std::string get_code_string(int retCode) const noexcept {
     switch (retCode) {
       case TERM_SUCCESS:
         return std::string("Successful step completed");
@@ -400,6 +402,16 @@ class BFGSLineSearch
       : BFGSBase(_adaptor), _adaptor(model, params_i, msgs) {
     initialize(params_r);
   }
+
+  template <typename Vec, typename LSOpt,
+            typename ConvergeOpt, typename QnUpdater, require_vector_t<Vec> * = nullptr>
+  BFGSLineSearch(M &model, const Vec &params_r,
+                 const std::vector<int> &params_i, LSOpt&& ls_options, 
+                 ConvergeOpt&& convergence_options, QnUpdater&& qn_update, std::ostream *msgs = 0)
+      : _adaptor(model, params_i, msgs), BFGSBase(_adaptor, params_r, ls_options, convergence_options, qn_update) {
+    initialize(params_r);
+  }
+
   template <typename Vec, require_vector_t<Vec> * = nullptr>
   void initialize(const Vec &params_r) {
     Eigen::VectorXd x(params_r.size());

@@ -8,7 +8,12 @@
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 
+// Locally tests can use threads but for jenkins we should just use 1 thread
+#ifdef LOCAL_THREADS_TEST
+auto&& threadpool_init = stan::math::init_threadpool_tbb(LOCAL_THREADS_TEST);
+#else 
 auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
+#endif
 
 stan::io::array_var_context init_context() {
   std::vector<std::string> names_r{"y", "sigma"};
@@ -58,7 +63,7 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   constexpr double tol_grad = 0;
   constexpr double tol_rel_grad = 0;
   constexpr double tol_param = 0;
-  constexpr int num_iterations = 60;
+  constexpr int num_iterations = 500;
   constexpr int num_eval_attempts = 20;
   // bool save_iterations = true;
   constexpr int refresh = 0;
@@ -83,7 +88,7 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
       num_draws, num_multi_draws, num_eval_attempts, num_paths, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
-      diagnostics);
+      diagnostics, threadpool_init);
 
   // Eigen::MatrixXd param_vals = parameter.values_.transpose();
   Eigen::MatrixXd param_vals(parameter.eigen_states_.size(),
@@ -107,12 +112,10 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
                                     .array()
                                 / (param_vals.rows() - 1))
                                    .sqrt();
-  /*
-std::cout << "Mean Values: \n" << mean_vals.format(CommaInitFmt) << "\n";
-std::cout << "SD Values: \n"
-     << sd_vals.format(CommaInitFmt)
-     << "\n";
-*/
+ 
+//std::cout << "Mean Values: \n" << mean_vals.format(CommaInitFmt) << "\n";
+// std::cout << "SD Values: \n" << sd_vals.format(CommaInitFmt) << "\n";
+
   Eigen::RowVectorXd prev_mean_vals(20);
   prev_mean_vals << 1.89104, 3.66449, 0.22256, 0.119645, -0.146812, 0.23633,
       -0.244868, -0.227134, 0.504507, 0.0476979, 3.66491, 2.57979, 1.21644,
@@ -129,9 +132,9 @@ std::cout << "SD Values: \n"
   for (Eigen::Index i = 0; i < 18; i++) {
     EXPECT_GE(diff_vals(i), 0.0);
   }
-  /*
-  std::cout << "Diffs\n" << diff_vals.format(CommaInitFmt) << "\n";
-  */
+  
+  // std::cout << "Diffs\n" << diff_vals.format(CommaInitFmt) << "\n";
+  
 }
 
 TEST_F(ServicesPathfinderEightSchools, single) {
@@ -158,7 +161,7 @@ TEST_F(ServicesPathfinderEightSchools, single) {
       model, context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
       save_iterations, refresh, callback, num_elbo_draws, num_draws,
-      num_eval_attempts, logger, init, parameter, diagnostics);
+      num_eval_attempts, logger, init, parameter, diagnostics, threadpool_init);
 
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");

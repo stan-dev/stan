@@ -7,7 +7,12 @@
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 
-auto&& threadpool_init = stan::math::init_threadpool_tbb(8);
+// Locally tests can use threads but for jenkins we should just use 1 thread
+#ifdef LOCAL_THREADS_TEST
+auto&& threadpool_init = stan::math::init_threadpool_tbb(LOCAL_THREADS_TEST);
+#else 
+auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
+#endif
 
 auto init_context() {
   std::fstream stream(
@@ -62,10 +67,10 @@ TEST_F(ServicesPathfinderGLM, single) {
   constexpr int num_iterations = 60;
   constexpr bool save_iterations = false;
   constexpr int num_eval_attempts = 100;
-  constexpr int refresh = 0;
+  constexpr int refresh = 1;
   stan::test::mock_callback callback;
   stan::io::empty_var_context empty_context;  // = init_init_context();
-  std::ostream empty_ostream(nullptr);
+  std::ofstream empty_ostream(nullptr);
   stan::test::loggy logger(empty_ostream);
 
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> input_iters;
@@ -74,7 +79,7 @@ TEST_F(ServicesPathfinderGLM, single) {
       model, empty_context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
       save_iterations, refresh, callback, num_elbo_draws, num_draws,
-      num_eval_attempts, logger, init, parameter, diagnostics);
+      num_eval_attempts, logger, init, parameter, diagnostics, threadpool_init);
   /*
   for (auto&& times : parameter.times_) {
     std::cout << times;
@@ -129,8 +134,8 @@ TEST_F(ServicesPathfinderGLM, single) {
                                      .eval();
   Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
-  //      std::cout << "diff Mean Values: \n" <<
-  //      mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
+//        std::cout << "diff Mean Values: \n" <<
+//        mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
                                        .array()
                                        .square()
@@ -152,16 +157,17 @@ TEST_F(ServicesPathfinderGLM, single) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = prev_sd_vals;
   all_sd_vals.row(2) = sd_diff_vals;
-  for (int i = 0; i < all_mean_vals.cols() - 1; ++i) {
-    EXPECT_NEAR(0, all_mean_vals(2, i), 1);
+  for (int i = 0; i < all_mean_vals.cols() - 2; ++i) {
+    EXPECT_NEAR(0, all_mean_vals(2, i), .01);
+  }
+  for (int i = 0; i < all_mean_vals.cols() - 2; ++i) {
+    EXPECT_NEAR(0, all_sd_vals(2, i), .1);
   }
   // EXPECT_NEAR(0, all_mean_vals(2, 9), 0.05);
-  /*
-  std::cout << "\nMean vals:\n" << all_mean_vals.format(CommaInitFmt) << "\n";
-  std::cout << "\nSD vals:\n" << all_sd_vals.format(CommaInitFmt) << "\n";
-  std::cout << "\nMean vals:\n" << mean_vals.format(CommaInitFmt) << "\n";
-  std::cout << "\nSD vals:\n" << sd_vals.format(CommaInitFmt) << "\n";
-  */
+//  std::cout << "\nAll Mean vals:\n" << all_mean_vals.format(CommaInitFmt) << "\n";
+//  std::cout << "\nAll SD vals:\n" << all_sd_vals.format(CommaInitFmt) << "\n";
+//  std::cout << "\nMean vals:\n" << mean_vals.format(CommaInitFmt) << "\n";
+ // std::cout << "\nSD vals:\n" << sd_vals.format(CommaInitFmt) << "\n";
 }
 
 TEST_F(ServicesPathfinderGLM, multi) {
@@ -204,7 +210,7 @@ TEST_F(ServicesPathfinderGLM, multi) {
       num_draws, num_multi_draws, num_eval_attempts, num_paths, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
-      diagnostics);
+      diagnostics, threadpool_init);
 
   // Eigen::MatrixXd param_vals = parameter.values_.transpose();
   // Eigen::MatrixXd param_vals = parameter.values_.transpose();
@@ -260,8 +266,8 @@ TEST_F(ServicesPathfinderGLM, multi) {
                                      .eval();
   Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
-  //      std::cout << "diff Mean Values: \n" <<
-  //      mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
+//        std::cout << "diff Mean Values: \n" <<
+//        mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
                                        .array()
                                        .square()
@@ -278,13 +284,16 @@ TEST_F(ServicesPathfinderGLM, multi) {
   all_mean_vals.row(0) = mean_vals;
   all_mean_vals.row(1) = prev_mean_vals;
   all_mean_vals.row(2) = mean_diff_vals;
+  for (int i = 0; i < all_mean_vals.cols() - 2; ++i) {
+    EXPECT_NEAR(0, all_mean_vals(2, i), .01);
+  }
 
   Eigen::MatrixXd all_sd_vals(3, 10);
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = prev_sd_vals;
   all_sd_vals.row(2) = sd_diff_vals;
-  for (int i = 0; i < all_mean_vals.cols() - 2; ++i) {
-    EXPECT_NEAR(0, all_mean_vals(2, i), 1);
+  for (int i = 0; i < all_sd_vals.cols() - 2; ++i) {
+    EXPECT_NEAR(0, all_sd_vals(2, i), 0.1);
   }
   // EXPECT_NEAR(0, all_mean_vals(2, 9), 10);
   /*
