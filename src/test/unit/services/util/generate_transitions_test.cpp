@@ -30,7 +30,7 @@ TEST_F(ServicesSamplesGenerateTransitions, call_counting) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  boost::ecuyer1988 rng = stan::services::util::create_rng(seed, chain);
+  stan::rng_t rng = stan::services::util::create_rng(seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector = stan::services::util::initialize(
@@ -86,7 +86,7 @@ TEST_F(ServicesSamplesGenerateTransitions, output_sizes) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  boost::ecuyer1988 rng = stan::services::util::create_rng(seed, chain);
+  stan::rng_t rng = stan::services::util::create_rng(seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector = stan::services::util::initialize(

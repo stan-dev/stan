@@ -7,9 +7,9 @@
 #include <stan/mcmc/hmc/nuts_classic/diag_e_nuts_classic.hpp>
 #include <stan/mcmc/hmc/nuts_classic/dense_e_nuts_classic.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <boost/random/mixmax.hpp>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 TEST(McmcDerivedNutsClassic, compute_criterion_unit_e) {
   rng_t base_rng(0);

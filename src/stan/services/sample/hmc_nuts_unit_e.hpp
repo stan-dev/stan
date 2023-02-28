@@ -52,13 +52,13 @@ int hmc_nuts_unit_e(Model& model, const stan::io::var_context& init,
                     callbacks::writer& init_writer,
                     callbacks::writer& sample_writer,
                     callbacks::writer& diagnostic_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector = util::initialize(
       model, init, rng, init_radius, true, logger, init_writer);
 
-  stan::mcmc::unit_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  stan::mcmc::unit_e_nuts<Model, stan::rng_t> sampler(model, rng);
   sampler.set_nominal_stepsize(stepsize);
   sampler.set_stepsize_jitter(stepsize_jitter);
   sampler.set_max_depth(max_depth);

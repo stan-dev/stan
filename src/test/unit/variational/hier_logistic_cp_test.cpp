@@ -7,9 +7,9 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/mixmax.hpp>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 typedef hier_logistic_cp_model_namespace::hier_logistic_cp_model Model_cp;
 
 TEST(advi_test, hier_logistic_cp_constraint_meanfield) {

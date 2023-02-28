@@ -8,9 +8,9 @@
 #include <gtest/gtest.h>
 #include <test/unit/util.hpp>
 #include <stan/variational/advi.hpp>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/mixmax.hpp>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 // Mock Model
 class mock_model : public stan::model::prob_grad {

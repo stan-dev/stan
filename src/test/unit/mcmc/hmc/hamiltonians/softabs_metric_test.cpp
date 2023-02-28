@@ -5,13 +5,13 @@
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 #include <test/unit/util.hpp>
 
-#include <boost/random/additive_combine.hpp>
+#include <boost/random/mixmax.hpp>
 
 #include <gtest/gtest.h>
 
 #include <string>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 TEST(McmcSoftAbs, sample_p) {
   rng_t base_rng(0);

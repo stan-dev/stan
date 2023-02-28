@@ -2,11 +2,11 @@
 #include <test/test-models/good/mcmc/hmc/hamiltonians/funnel.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <boost/random/mixmax.hpp>
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 TEST(BaseHamiltonian, update_potential_gradient) {
   std::fstream data_stream(std::string("").c_str(), std::fstream::in);

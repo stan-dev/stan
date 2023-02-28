@@ -7,9 +7,9 @@
 #include <stan/io/dump.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/mixmax.hpp>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   rng_t base_rng(0);

@@ -2,10 +2,10 @@
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/nuts_classic/base_nuts_classic.hpp>
 #include <stan/mcmc/hmc/integrators/expl_leapfrog.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <boost/random/mixmax.hpp>
 #include <gtest/gtest.h>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 namespace stan {
 namespace mcmc {

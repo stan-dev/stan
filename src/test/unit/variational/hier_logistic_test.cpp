@@ -5,10 +5,10 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/mixmax.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 class advi_test : public ::testing::Test {
  public:

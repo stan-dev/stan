@@ -6,9 +6,9 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/mixmax.hpp>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 class eta_adapt_big_test : public ::testing::Test {
  public:

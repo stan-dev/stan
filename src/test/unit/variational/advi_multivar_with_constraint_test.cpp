@@ -5,9 +5,9 @@
 #include <test/unit/util.hpp>
 #include <vector>
 #include <string>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/mixmax.hpp>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 typedef multivariate_with_constraint_model_namespace::
     multivariate_with_constraint_model Model;
 

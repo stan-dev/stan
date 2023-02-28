@@ -1,9 +1,12 @@
 #ifndef STAN_SERVICES_UTIL_CREATE_RNG_HPP
 #define STAN_SERVICES_UTIL_CREATE_RNG_HPP
 
-#include <boost/random/additive_combine.hpp>
+#include <boost/random/mixmax.hpp>
 
 namespace stan {
+
+typedef boost::random::mixmax rng_t;
+
 namespace services {
 namespace util {
 
@@ -20,15 +23,10 @@ namespace util {
  *
  * @param[in] seed the random seed
  * @param[in] chain the chain id
- * @return a boost::ecuyer1988 instance
+ * @return a stan::rng_t instance
  */
-inline boost::ecuyer1988 create_rng(unsigned int seed, unsigned int chain) {
-  using boost::uintmax_t;
-  static constexpr uintmax_t DISCARD_STRIDE = static_cast<uintmax_t>(1) << 50;
-  boost::ecuyer1988 rng(seed);
-  // always discard at least 1 to avoid issue with small seeds for certain RNG
-  // distributions. See stan#3167 and boostorg/random#92
-  rng.discard(std::max(static_cast<uintmax_t>(1), DISCARD_STRIDE * chain));
+inline rng_t create_rng(unsigned int seed, unsigned int chain) {
+  rng_t rng(seed + chain);
   return rng;
 }
 

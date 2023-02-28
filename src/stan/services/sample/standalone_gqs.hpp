@@ -103,7 +103,7 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
   util::gq_writer writer(sample_writer, logger, p_names.size());
   writer.write_gq_names(model);
 
-  boost::ecuyer1988 rng = util::create_rng(seed, 1);
+  stan::rng_t rng = util::create_rng(seed, 1);
   std::vector<std::string> param_names;
   std::vector<std::vector<size_t>> param_dimss;
   get_model_parameters(model, param_names, param_dimss);

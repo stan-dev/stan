@@ -1,5 +1,5 @@
 #include <string>
-#include <boost/random/additive_combine.hpp>
+#include <boost/random/mixmax.hpp>
 #include <stan/io/dump.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/dense_e_metric.hpp>
@@ -8,7 +8,7 @@
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 TEST(McmcDenseEMetric, sample_p) {
   rng_t base_rng(0);

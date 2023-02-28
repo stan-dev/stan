@@ -73,7 +73,7 @@ class ServicesUtil : public testing::Test {
   stan::io::empty_var_context context;
   stan_model model;
   std::vector<double> cont_vector;
-  boost::ecuyer1988 rng;
+  boost::random::mixmax rng;
   stan::test::unit::instrumented_interrupt interrupt;
   stan::test::unit::instrumented_writer sample_writer, diagnostic_writer;
   stan::test::unit::instrumented_logger logger;

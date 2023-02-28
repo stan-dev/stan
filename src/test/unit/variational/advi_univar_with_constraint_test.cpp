@@ -2,13 +2,13 @@
 #include <stan/variational/advi.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <test/unit/util.hpp>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/mixmax.hpp>
 #include <gtest/gtest.h>
 #include <cmath>
 #include <string>
 #include <vector>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 typedef univariate_with_constraint_model_namespace::
     univariate_with_constraint_model Model;
 

@@ -77,7 +77,7 @@ struct mock_model : public stan::model::model_base {
                        Eigen::VectorXd& params_r,
                        std::ostream* msgs) const override {}
 
-  void write_array(boost::ecuyer1988& base_rng, Eigen::VectorXd& params_r,
+  void write_array(boost::random::mixmax& base_rng, Eigen::VectorXd& params_r,
                    Eigen::VectorXd& params_constrained_r, bool include_tparams,
                    bool include_gqs, std::ostream* msgs) const override {}
 
@@ -133,8 +133,8 @@ struct mock_model : public stan::model::model_base {
                        std::vector<double>& params_r,
                        std::ostream* msgs) const override {}
 
-  void write_array(boost::ecuyer1988& base_rng, std::vector<double>& params_r,
-                   std::vector<int>& params_i,
+  void write_array(boost::random::mixmax& base_rng,
+                   std::vector<double>& params_r, std::vector<int>& params_i,
                    std::vector<double>& params_r_constrained,
                    bool include_tparams, bool include_gqs,
                    std::ostream* msgs) const override {}

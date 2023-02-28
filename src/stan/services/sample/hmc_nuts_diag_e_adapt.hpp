@@ -68,7 +68,7 @@ int hmc_nuts_diag_e_adapt(
     unsigned int window, callbacks::interrupt& interrupt,
     callbacks::logger& logger, callbacks::writer& init_writer,
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<double> cont_vector = util::initialize(
       model, init, rng, init_radius, true, logger, init_writer);
@@ -82,7 +82,7 @@ int hmc_nuts_diag_e_adapt(
     return error_codes::CONFIG;
   }
 
-  stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  stan::mcmc::adapt_diag_e_nuts<Model, stan::rng_t> sampler(model, rng);
 
   sampler.set_metric(inv_metric);
   sampler.set_nominal_stepsize(stepsize);
@@ -227,8 +227,8 @@ int hmc_nuts_diag_e_adapt(
         init_buffer, term_buffer, window, interrupt, logger, init_writer[0],
         sample_writer[0], diagnostic_writer[0]);
   }
-  using sample_t = stan::mcmc::adapt_diag_e_nuts<Model, boost::ecuyer1988>;
-  std::vector<boost::ecuyer1988> rngs;
+  using sample_t = stan::mcmc::adapt_diag_e_nuts<Model, stan::rng_t>;
+  std::vector<stan::rng_t> rngs;
   rngs.reserve(num_chains);
   std::vector<std::vector<double>> cont_vectors;
   cont_vectors.reserve(num_chains);

@@ -6,13 +6,13 @@
 #include <stan/mcmc/hmc/nuts_classic/adapt_unit_e_nuts_classic.hpp>
 #include <stan/mcmc/hmc/nuts_classic/adapt_diag_e_nuts_classic.hpp>
 #include <stan/mcmc/hmc/nuts_classic/adapt_dense_e_nuts_classic.hpp>
-#include <boost/random/additive_combine.hpp>
+#include <boost/random/mixmax.hpp>
 #include <stan/io/dump.hpp>
 #include <fstream>
 
 #include <gtest/gtest.h>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 TEST(McmcNutsClassic, instantiaton_test) {
   rng_t base_rng(4839294);

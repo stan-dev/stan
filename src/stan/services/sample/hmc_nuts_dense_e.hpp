@@ -56,7 +56,7 @@ int hmc_nuts_dense_e(Model& model, const stan::io::var_context& init,
                      callbacks::writer& init_writer,
                      callbacks::writer& sample_writer,
                      callbacks::writer& diagnostic_writer) {
-  boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
+  stan::rng_t rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
   std::vector<double> cont_vector = util::initialize(
@@ -71,7 +71,7 @@ int hmc_nuts_dense_e(Model& model, const stan::io::var_context& init,
     return error_codes::CONFIG;
   }
 
-  stan::mcmc::dense_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
+  stan::mcmc::dense_e_nuts<Model, stan::rng_t> sampler(model, rng);
 
   sampler.set_metric(inv_metric);
 

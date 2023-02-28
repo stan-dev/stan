@@ -6,13 +6,13 @@
 
 #include <test/test-models/good/mcmc/hmc/integrators/gauss.hpp>
 
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/mixmax.hpp>
 
 #include <gtest/gtest.h>
 
 #include <sstream>
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   rng_t base_rng(0);

@@ -9,13 +9,13 @@
 
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
-#include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
+#include <boost/random/mixmax.hpp>
 #include <test/unit/util.hpp>
 
 // namespace
 //************************************************************
 
-typedef boost::ecuyer1988 rng_t;
+typedef boost::random::mixmax rng_t;
 
 class McmcHmcIntegratorsExplLeapfrogF : public testing::Test {
  public:
