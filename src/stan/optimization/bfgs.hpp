@@ -403,12 +403,15 @@ class BFGSLineSearch
     initialize(params_r);
   }
 
-  template <typename Vec, typename LSOpt,
-            typename ConvergeOpt, typename QnUpdater, require_vector_t<Vec> * = nullptr>
+  template <typename Vec, typename LSOpt, typename ConvergeOpt,
+            typename QnUpdater, require_vector_t<Vec> * = nullptr>
   BFGSLineSearch(M &model, const Vec &params_r,
-                 const std::vector<int> &params_i, LSOpt&& ls_options, 
-                 ConvergeOpt&& convergence_options, QnUpdater&& qn_update, std::ostream *msgs = 0)
-      : _adaptor(model, params_i, msgs), BFGSBase(_adaptor, params_r, ls_options, convergence_options, qn_update) {
+                 const std::vector<int> &params_i, LSOpt &&ls_options,
+                 ConvergeOpt &&convergence_options, QnUpdater &&qn_update,
+                 std::ostream *msgs = 0)
+      : _adaptor(model, params_i, msgs),
+        BFGSBase(_adaptor, params_r, ls_options, convergence_options,
+                 qn_update) {
     initialize(params_r);
   }
 

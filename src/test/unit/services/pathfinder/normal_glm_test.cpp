@@ -10,7 +10,7 @@
 // Locally tests can use threads but for jenkins we should just use 1 thread
 #ifdef LOCAL_THREADS_TEST
 auto&& threadpool_init = stan::math::init_threadpool_tbb(LOCAL_THREADS_TEST);
-#else 
+#else
 auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
 #endif
 
@@ -134,8 +134,8 @@ TEST_F(ServicesPathfinderGLM, single) {
                                      .eval();
   Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
-//        std::cout << "diff Mean Values: \n" <<
-//        mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
+  //        std::cout << "diff Mean Values: \n" <<
+  //        mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
                                        .array()
                                        .square()
@@ -164,10 +164,11 @@ TEST_F(ServicesPathfinderGLM, single) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
   }
   // EXPECT_NEAR(0, all_mean_vals(2, 9), 0.05);
-//  std::cout << "\nAll Mean vals:\n" << all_mean_vals.format(CommaInitFmt) << "\n";
-//  std::cout << "\nAll SD vals:\n" << all_sd_vals.format(CommaInitFmt) << "\n";
-//  std::cout << "\nMean vals:\n" << mean_vals.format(CommaInitFmt) << "\n";
- // std::cout << "\nSD vals:\n" << sd_vals.format(CommaInitFmt) << "\n";
+  //  std::cout << "\nAll Mean vals:\n" << all_mean_vals.format(CommaInitFmt) <<
+  //  "\n"; std::cout << "\nAll SD vals:\n" << all_sd_vals.format(CommaInitFmt)
+  //  << "\n"; std::cout << "\nMean vals:\n" << mean_vals.format(CommaInitFmt)
+  //  << "\n";
+  // std::cout << "\nSD vals:\n" << sd_vals.format(CommaInitFmt) << "\n";
 }
 
 TEST_F(ServicesPathfinderGLM, multi) {
@@ -266,8 +267,8 @@ TEST_F(ServicesPathfinderGLM, multi) {
                                      .eval();
   Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
-//        std::cout << "diff Mean Values: \n" <<
-//        mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
+  //        std::cout << "diff Mean Values: \n" <<
+  //        mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
                                        .array()
                                        .square()

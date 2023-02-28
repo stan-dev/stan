@@ -11,7 +11,7 @@
 // Locally tests can use threads but for jenkins we should just use 1 thread
 #ifdef LOCAL_THREADS_TEST
 auto&& threadpool_init = stan::math::init_threadpool_tbb(LOCAL_THREADS_TEST);
-#else 
+#else
 auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
 #endif
 
@@ -112,9 +112,9 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
                                     .array()
                                 / (param_vals.rows() - 1))
                                    .sqrt();
- 
-//std::cout << "Mean Values: \n" << mean_vals.format(CommaInitFmt) << "\n";
-// std::cout << "SD Values: \n" << sd_vals.format(CommaInitFmt) << "\n";
+
+  // std::cout << "Mean Values: \n" << mean_vals.format(CommaInitFmt) << "\n";
+  // std::cout << "SD Values: \n" << sd_vals.format(CommaInitFmt) << "\n";
 
   Eigen::RowVectorXd prev_mean_vals(20);
   prev_mean_vals << 1.89104, 3.66449, 0.22256, 0.119645, -0.146812, 0.23633,
@@ -132,9 +132,8 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   for (Eigen::Index i = 0; i < 18; i++) {
     EXPECT_GE(diff_vals(i), 0.0);
   }
-  
+
   // std::cout << "Diffs\n" << diff_vals.format(CommaInitFmt) << "\n";
-  
 }
 
 TEST_F(ServicesPathfinderEightSchools, single) {

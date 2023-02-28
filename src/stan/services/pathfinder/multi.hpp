@@ -85,7 +85,8 @@ namespace pathfinder {
  */
 template <class Model, typename InitContext, typename InitWriter,
           typename DiagnosticWriter, typename ParamWriter,
-          typename SingleParamWriter, typename SingleDiagnosticWriter, typename TaskArena>
+          typename SingleParamWriter, typename SingleDiagnosticWriter,
+          typename TaskArena>
 inline int pathfinder_lbfgs_multi(
     Model& model, InitContext&& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
@@ -96,7 +97,8 @@ inline int pathfinder_lbfgs_multi(
     callbacks::logger& logger, InitWriter&& init_writers,
     std::vector<SingleParamWriter>& single_path_parameter_writer,
     std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
-    ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer, TaskArena&& task_arena) {
+    ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer,
+    TaskArena&& task_arena) {
   const auto start_pathfinders_time = std::chrono::steady_clock::now();
   std::vector<std::string> param_names;
   model.constrained_param_names(param_names, true, true);
