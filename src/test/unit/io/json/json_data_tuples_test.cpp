@@ -168,7 +168,6 @@ TEST(ioJson, jsonData_tuple_array_3d_array_2d) {
   test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
 }
 
-
 TEST(ioJson, jsonData_array_tuple_multi) {
   std::vector<std::string> json_path;
   json_path = {
