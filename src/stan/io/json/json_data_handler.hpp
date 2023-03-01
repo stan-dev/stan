@@ -207,6 +207,7 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   /* Save non-tuple vars and innermost tuple slots to vars_i and vars_r.
+   * Converts multi-dim arrays from row-major to column major.
    * For arrays of tuples we need to check that new elements are consistent
    * with previous tuple elements.
    */
@@ -225,6 +226,17 @@ class json_data_handler : public stan::json::json_handler {
       std::vector<size_t> dims;
       if (slot_dims_map.count(key) == 1)
         dims = slot_dims_map[key].dims;
+      if (dims.size() > 1) {
+        if (is_int) {
+          std::vector<int> cm_values_i(values_i.size());
+          to_column_major(key, cm_values_i, values_i, dims);
+          values_i.assign(cm_values_i.begin(), cm_values_i.end());
+        } else {
+          std::vector<double> cm_values_r(values_r.size());
+          to_column_major(key, cm_values_r, values_r, dims);
+          values_r.assign(cm_values_r.begin(), cm_values_r.end());
+        }
+      }
       if (is_new) {
         var_types_map[key] = slot_types_map[key];
         if (is_int) {
@@ -241,6 +253,7 @@ class json_data_handler : public stan::json::json_handler {
           unexpected_error(key);
         var_types_map[key] = meta_type::ARRAY;
         std::vector<size_t> dims = slot_dims_map[key].dims;
+
         if ((!is_int && was_int) || (is_int && is_real)) {  // promote to double
           std::vector<double> values_tmp;
           for (auto& x : vars_i[key].first) {
@@ -266,13 +279,10 @@ class json_data_handler : public stan::json::json_handler {
     key_stack.pop_back();
   }
 
-  /* Process array variables
-   *  a. for array of tuples, concatenate dimensions
-   *  b. if multi-dim array, convert vector of values
-   *      from row-major order to column-major order.
-   * Update vars_i and vars_r accordingly.
+  /* For array of tuples, concatenate dimensions
+   * Update vars_i and vars_r dimensions accordingly.
    */
-  void convert_arrays() {
+  void update_array_dims() {
     for (auto const& var : var_types_map) {
       if (var.second != meta_type::ARRAY) {
         continue;
@@ -291,27 +301,15 @@ class json_data_handler : public stan::json::json_handler {
         slot.append(".");
       }
       if (vars_i.count(var.first) == 1) {
-        std::pair<std::vector<int>, std::vector<size_t>> pair;
-        if (all_dims.size() > 1) {
-          std::vector<int> cm_values_i(vars_i[var.first].first.size());
-          to_column_major(var.first, cm_values_i, vars_i[var.first].first,
-                          all_dims);
-          pair = make_pair(cm_values_i, all_dims);
-        } else {
-          pair = make_pair(vars_i[var.first].first, all_dims);
-        }
-        vars_i[var.first] = pair;
+        if (all_dims.size() == vars_i[var.first].second.size())
+          continue;
+        else
+          vars_i[var.first].second.assign(all_dims.begin(), all_dims.end());
       } else if (vars_r.count(var.first) == 1) {
-        std::pair<std::vector<double>, std::vector<size_t>> pair;
-        if (all_dims.size() > 1) {
-          std::vector<double> cm_values_r(vars_r[var.first].first.size());
-          to_column_major(var.first, cm_values_r, vars_r[var.first].first,
-                          all_dims);
-          pair = make_pair(cm_values_r, all_dims);
-        } else {
-          pair = make_pair(vars_r[var.first].first, all_dims);
-        }
-        vars_r[var.first] = pair;
+        if (all_dims.size() == vars_r[var.first].second.size())
+          continue;
+        else
+          vars_r[var.first].second.assign(all_dims.begin(), all_dims.end());
       } else {
         std::stringstream errorMsg;
         errorMsg << "Variable: " << var.first << ", ill-formed JSON.";
@@ -380,9 +378,9 @@ class json_data_handler : public stan::json::json_handler {
   }
 
   /** Once all variable definitions have been processed,
-   *  convert arrays from row-major to column-major.
+   *  update dimensions for array of tuple variables.
    */
-  void end_text() { convert_arrays(); }
+  void end_text() { update_array_dims(); }
 
   /** A key is either a top-level Stan variable name or a tuple slot id.
    *  Logic handles edge case where key is the first slot of a tuple;

@@ -64,11 +64,11 @@ TEST(ioJson, jsonData_array_tuple_arrays) {
   std::ifstream in(filename);
   stan::json::json_data jdata(in);
 
-  std::vector<double> expected_vals_x1 = {11, 21, 12, 22.2, 13, 23};
+  std::vector<double> expected_vals_x1 = {11, 12, 13, 21, 22.2, 23};
   std::vector<size_t> expected_dims_x1 = {2, 3};
   test_real_var(jdata, "x.1", expected_vals_x1, expected_dims_x1);
 
-  std::vector<double> expected_vals_x2 = {5, 5.5, 7, 7.7, 6, 6.6, 8, 8.8};
+  std::vector<double> expected_vals_x2 = {5, 7, 6, 8, 5.5, 7.7, 6.6, 8.8};
   std::vector<size_t> expected_dims_x2 = {2, 2, 2};
   test_real_var(jdata, "x.2", expected_vals_x2, expected_dims_x2);
 
@@ -80,7 +80,11 @@ TEST(ioJson, jsonData_array_tuple_arrays) {
   std::vector<size_t> expected_dims_y;
   test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
 
-  std::vector<double> expected_vals_z4 = {0.1, 0.4, 0.2, 0.5, 0.3, 0.6};
+  std::vector<double> expected_vals_z1 = {11, 12, 13, 21, 22.2, 23};
+  std::vector<size_t> expected_dims_z1 = {2, 3};
+  test_real_var(jdata, "z.1", expected_vals_z1, expected_dims_z1);
+
+  std::vector<double> expected_vals_z4 = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6};
   std::vector<size_t> expected_dims_z4 = {2, 3};
   test_real_var(jdata, "z.4", expected_vals_z4, expected_dims_z4);
 }
@@ -97,11 +101,11 @@ TEST(ioJson, jsonData_array_tuple_1d_tuple_1d_real) {
   std::ifstream in(filename);
   stan::json::json_data jdata(in);
 
-  std::vector<int> expected_vals_x1 = {11, 21, 31, 12, 22, 32};
+  std::vector<int> expected_vals_x1 = {11, 12, 21, 22, 31, 32};
   std::vector<size_t> expected_dims_x1 = {3, 2};
   test_int_var(jdata, "x.1", expected_vals_x1, expected_dims_x1);
 
-  std::vector<double> expected_vals_x2_1 = {1.1, 3.3, 5.5, 2.2, 4.4, 6.6};
+  std::vector<double> expected_vals_x2_1 = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6};
   std::vector<size_t> expected_dims_x2_1 = {3, 2};
   test_real_var(jdata, "x.2.1", expected_vals_x2_1, expected_dims_x2_1);
 
@@ -114,10 +118,8 @@ TEST(ioJson, jsonData_array_tuple_1d_tuple_1d_real) {
   test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
 }
 
-// different var decl and different JSON, but equivalent vars:
 // array[2, 2] (array[3] real, real) x;
-// (array[2, 2, 3] real, array[2, 2] real) x;
-TEST(ioJson, jsonData_array_tuple_array) {
+TEST(ioJson, jsonData_d2_array_tuple_1d_real) {
   std::vector<std::string> json_path;
   json_path = {"src",
                "test",
@@ -125,31 +127,47 @@ TEST(ioJson, jsonData_array_tuple_array) {
                "io",
                "test_json_files",
                "d2_array_tuple_1d_real.json"};
-  std::string filename1 = paths_to_fname(json_path);
-  std::ifstream in1(filename1);
-  stan::json::json_data jdata1(in1);
+  std::string filename = paths_to_fname(json_path);
+  std::ifstream in(filename);
+  stan::json::json_data jdata(in);
+
+  std::vector<double> expected_vals_x1
+      = {11.1, 12, 13, 21, 22.2, 23, 31, 32, 33.3, 41, 42, 43};
+  std::vector<size_t> expected_dims_x1 = {2, 2, 3};
+  test_real_var(jdata, "x.1", expected_vals_x1, expected_dims_x1);
+
+  std::vector<double> expected_vals_x2 = {1, 2.2, 3.3, 4};
+  std::vector<size_t> expected_dims_x2 = {2, 2};
+  test_real_var(jdata, "x.2", expected_vals_x2, expected_dims_x2);
+
+  std::vector<double> expected_vals_y = {3.214};
+  std::vector<size_t> expected_dims_y;
+  test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
+}
+
+// // (array[2, 2, 3] real, array[2, 2] real) x;
+TEST(ioJson, jsonData_tuple_array_3d_array_2d) {
+  std::vector<std::string> json_path;
   json_path = {
       "src", "test", "unit", "io", "test_json_files", "tuple_array_3d_2d.json"};
-  std::string filename2 = paths_to_fname(json_path);
-  std::ifstream in2(filename2);
-  stan::json::json_data jdata2(in2);
+  std::string filename = paths_to_fname(json_path);
+  std::ifstream in(filename);
+  stan::json::json_data jdata(in);
 
   std::vector<double> expected_vals_x1
       = {11.1, 31, 21, 41, 12, 32, 22.2, 42, 13, 33.3, 23, 43};
   std::vector<size_t> expected_dims_x1 = {2, 2, 3};
-  test_real_var(jdata1, "x.1", expected_vals_x1, expected_dims_x1);
-  test_real_var(jdata2, "x.1", expected_vals_x1, expected_dims_x1);
+  test_real_var(jdata, "x.1", expected_vals_x1, expected_dims_x1);
 
   std::vector<double> expected_vals_x2 = {1, 3.3, 2.2, 4};
   std::vector<size_t> expected_dims_x2 = {2, 2};
-  test_real_var(jdata1, "x.2", expected_vals_x2, expected_dims_x2);
-  test_real_var(jdata2, "x.2", expected_vals_x2, expected_dims_x2);
+  test_real_var(jdata, "x.2", expected_vals_x2, expected_dims_x2);
 
   std::vector<double> expected_vals_y = {3.214};
   std::vector<size_t> expected_dims_y;
-  test_real_var(jdata1, "y", expected_vals_y, expected_dims_y);
-  test_real_var(jdata2, "y", expected_vals_y, expected_dims_y);
+  test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
 }
+
 
 TEST(ioJson, jsonData_array_tuple_multi) {
   std::vector<std::string> json_path;
@@ -159,12 +177,12 @@ TEST(ioJson, jsonData_array_tuple_multi) {
   std::ifstream in(filename);
   stan::json::json_data jdata(in);
 
-  std::vector<int> expected_vals_x11 = {111, 444, 222, 555, 333, 666};
+  std::vector<int> expected_vals_x11 = {111, 222, 333, 444, 555, 666};
   std::vector<size_t> expected_dims_x11 = {2, 3};
   test_int_var(jdata, "x.1.1", expected_vals_x11, expected_dims_x11);
 
   std::vector<double> expected_vals_x12
-      = {1, 91.1, 3, 93.3, 5, 95.5, 2, 92.2, 4, 94.4, 6, 96.6};
+      = {1, 2, 3, 4, 5, 6, 91.1, 92.2, 93.3, 94.4, 95.5, 96.6};
   std::vector<size_t> expected_dims_x12 = {2, 3, 2};
   test_real_var(jdata, "x.1.2", expected_vals_x12, expected_dims_x12);
 
