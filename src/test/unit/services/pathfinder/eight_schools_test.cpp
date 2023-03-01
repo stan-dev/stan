@@ -124,7 +124,6 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   for (Eigen::Index i = 0; i < 18; i++) {
     EXPECT_GE(diff_vals(i), 0.0);
   }
-
 }
 
 TEST_F(ServicesPathfinderEightSchools, single) {
@@ -241,9 +240,9 @@ TEST_F(ServicesPathfinderEightSchools, single) {
             .transpose()
             .eval();
   Eigen::VectorXd diff_vals(20);
-  diff_vals = ((mean_r_vals.array() + (2.0 * sd_r_vals.array()))
-               - mean_vals.array())
-                  .matrix();
+  diff_vals
+      = ((mean_r_vals.array() + (2.0 * sd_r_vals.array())) - mean_vals.array())
+            .matrix();
   for (Eigen::Index i = 0; i < 18; i++) {
     EXPECT_GE(diff_vals(i), 0.0);
   }

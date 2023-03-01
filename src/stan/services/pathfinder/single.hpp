@@ -767,7 +767,7 @@ inline auto construct_taylor_approximation_sparse(
            + (ninvRST.transpose()
               * ((Ykt_mat.transpose() * alpha_mul_grad)
                  + y_tcrossprod_alpha * ninvRSTg)));
-                 
+
   debug::taylor_appx_sparse2(logger, qr, alpha, Qk, L_approx, logdetcholHk,
                              Mkbar, Wkbart, x_center, ninvRST, ninvRSTg, Rkbar);
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(L_approx),
