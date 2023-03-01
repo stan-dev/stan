@@ -1,3 +1,11 @@
+#include <stdexcept>
+/*
+#ifdef eigen_assert
+#undef eigen_assert
+#endif
+#define eigen_assert(x) \
+  if (!(x)) { throw (std::runtime_error("Nooo")); }
+*/
 #include <stan/services/pathfinder/multi.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
@@ -9,7 +17,7 @@
 
 // Locally tests can use threads but for jenkins we should just use 1 thread
 #ifdef LOCAL_THREADS_TEST
-auto&& threadpool_init = stan::math::init_threadpool_tbb(LOCAL_THREADS_TEST);
+auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
 #else
 auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
 #endif
@@ -80,30 +88,11 @@ TEST_F(ServicesPathfinderGLM, single) {
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
       save_iterations, refresh, callback, num_elbo_draws, num_draws,
       num_eval_attempts, logger, init, parameter, diagnostics, threadpool_init);
-  /*
-  for (auto&& times : parameter.times_) {
-    std::cout << times;
-  }
-  */
-  // Eigen::MatrixXd param_vals = parameter.values_.transpose();
-  // Eigen::MatrixXd param_vals = parameter.values_.transpose();
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
-  /*
-  std::cout << "\n --- Optim Path ---" << std::endl;
-  for (Eigen::Index i = 0; i < diagnostics.optim_path_.size(); ++i) {
-    Eigen::MatrixXd tmp(2, std::get<0>(diagnostics.optim_path_[i]).size());
-    tmp.row(0) = std::get<0>(diagnostics.optim_path_[i]);
-    tmp.row(1) = std::get<1>(diagnostics.optim_path_[i]);
-    //std::cout << "Iter: " << i << "\n" << tmp << "\n";
-  }
-  */
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
 
-  // std::cout << "---- Results  -------" << std::endl;
   Eigen::VectorXd mean_vals = param_vals.rowwise().mean().eval();
-  //       std::cout << "Mean Values: \n" <<
-  //       mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_vals = (((param_vals.colwise() - mean_vals)
                                   .array()
                                   .square()
@@ -115,12 +104,8 @@ TEST_F(ServicesPathfinderGLM, single) {
                                  .sqrt())
                                 .transpose()
                                 .eval();
-  // std::cout << "\n\n" << param_vals.format(CommaInitFmt) << "\n\n";
   Eigen::MatrixXd prev_param_vals = stan::test::normal_glm_param_vals();
-  // std::cout << "\n\n" << prev_param_vals.format(CommaInitFmt) << "\n\n";
   Eigen::VectorXd prev_mean_vals = prev_param_vals.rowwise().mean().eval();
-  //       std::cout << "Mean Values: \n" <<
-  //       mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd prev_sd_vals = (((prev_param_vals.colwise() - prev_mean_vals)
                                        .array()
                                        .square()
@@ -134,8 +119,6 @@ TEST_F(ServicesPathfinderGLM, single) {
                                      .eval();
   Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
-  //        std::cout << "diff Mean Values: \n" <<
-  //        mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
                                        .array()
                                        .square()
@@ -152,7 +135,6 @@ TEST_F(ServicesPathfinderGLM, single) {
   all_mean_vals.row(0) = mean_vals;
   all_mean_vals.row(1) = prev_mean_vals;
   all_mean_vals.row(2) = mean_diff_vals;
-
   Eigen::MatrixXd all_sd_vals(3, 10);
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = prev_sd_vals;
@@ -163,12 +145,6 @@ TEST_F(ServicesPathfinderGLM, single) {
   for (int i = 0; i < all_mean_vals.cols() - 2; ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
   }
-  // EXPECT_NEAR(0, all_mean_vals(2, 9), 0.05);
-  //  std::cout << "\nAll Mean vals:\n" << all_mean_vals.format(CommaInitFmt) <<
-  //  "\n"; std::cout << "\nAll SD vals:\n" << all_sd_vals.format(CommaInitFmt)
-  //  << "\n"; std::cout << "\nMean vals:\n" << mean_vals.format(CommaInitFmt)
-  //  << "\n";
-  // std::cout << "\nSD vals:\n" << sd_vals.format(CommaInitFmt) << "\n";
 }
 
 TEST_F(ServicesPathfinderGLM, multi) {
@@ -197,12 +173,9 @@ TEST_F(ServicesPathfinderGLM, multi) {
   std::vector<stan::callbacks::writer> single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
-    //    single_path_parameter_writer.emplace_back(single_path_parameter_ss[i]);
-    //    single_path_diagnostic_writer.emplace_back(single_path_diagnostic_ss[i]);
     single_path_inits.emplace_back(
         std::make_unique<decltype(init_init_context())>(init_init_context()));
   }
-  // int refresh = 0;
   stan::test::mock_callback callback;
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
       model, single_path_inits, seed, chain, init_radius, history_size,
@@ -213,28 +186,21 @@ TEST_F(ServicesPathfinderGLM, multi) {
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
       diagnostics, threadpool_init);
 
-  // Eigen::MatrixXd param_vals = parameter.values_.transpose();
-  // Eigen::MatrixXd param_vals = parameter.values_.transpose();
   Eigen::MatrixXd param_vals(parameter.eigen_states_.size(),
                              parameter.eigen_states_[0].size());
   for (size_t i = 0; i < parameter.eigen_states_.size(); ++i) {
     param_vals.row(i) = parameter.eigen_states_[i];
   }
   param_vals.transposeInPlace();
-  // std::cout << "\n --- Optim Path ---" << std::endl;
   for (Eigen::Index i = 0; i < diagnostics.optim_path_.size(); ++i) {
     Eigen::MatrixXd tmp(2, param_vals.cols() - 1);
     tmp.row(0) = std::get<0>(diagnostics.optim_path_[i]);
     tmp.row(1) = std::get<1>(diagnostics.optim_path_[i]);
-    // std::cout << "Iter: " << i << "\n" << tmp << "\n";
   }
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
 
-  // std::cout << "---- Results  -------" << std::endl;
   Eigen::VectorXd mean_vals = param_vals.rowwise().mean().eval();
-  //       std::cout << "Mean Values: \n" <<
-  //       mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_vals = (((param_vals.colwise() - mean_vals)
                                   .array()
                                   .square()
@@ -246,14 +212,8 @@ TEST_F(ServicesPathfinderGLM, multi) {
                                  .sqrt())
                                 .transpose()
                                 .eval();
-  // std::cout << "\n\n" << param_vals.format(CommaInitFmt) << "\n\n";
-  // std::cout << "rows: " << param_vals.rows() << " cols: " <<
-  // param_vals.cols() << "\n";
   Eigen::MatrixXd prev_param_vals = stan::test::normal_glm_param_vals();
-  // std::cout << "\n\n" << prev_param_vals.format(CommaInitFmt) << "\n\n";
   Eigen::VectorXd prev_mean_vals = prev_param_vals.rowwise().mean().eval();
-  //       std::cout << "Mean Values: \n" <<
-  //       mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd prev_sd_vals = (((prev_param_vals.colwise() - prev_mean_vals)
                                        .array()
                                        .square()
@@ -267,8 +227,6 @@ TEST_F(ServicesPathfinderGLM, multi) {
                                      .eval();
   Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
-  //        std::cout << "diff Mean Values: \n" <<
-  //        mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
                                        .array()
                                        .square()
@@ -296,12 +254,4 @@ TEST_F(ServicesPathfinderGLM, multi) {
   for (int i = 0; i < all_sd_vals.cols() - 2; ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), 0.1);
   }
-  // EXPECT_NEAR(0, all_mean_vals(2, 9), 10);
-  /*
-  std::cout << "\nMean vals:\n" << all_mean_vals.format(CommaInitFmt) << "\n";
-  std::cout << "\nSD vals:\n" << all_sd_vals.format(CommaInitFmt) << "\n";
-
-  std::cout << "\nMean vals:\n" << mean_vals.format(CommaInitFmt) << "\n";
-  std::cout << "\nSD vals:\n" << sd_vals.format(CommaInitFmt) << "\n";
-  */
 }

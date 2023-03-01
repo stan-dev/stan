@@ -667,19 +667,22 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
  * @param grad_est The gradients for the given iteration of LBFGS
  * @param logger used for printing out debug values
  */
-template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
-          typename InvMat, typename Logger>
+template <typename EigVec, typename AlphaVec, typename DkVec, typename InvMat,
+          typename Logger, typename GradMat>
 inline taylor_approx_t construct_taylor_approximation_full(
-    const Buff& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
+    GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
     Logger&& logger) {
   debug::taylor_appx_full1(logger, alpha, ninvRST, Dk, point_est, grad_est);
-  Eigen::MatrixXd y_tcrossprod_alpha = tcrossprod(std_vec_matrix_times_diagonal(
-      Ykt_mat, alpha.array().sqrt().matrix().eval()));
+  //  Eigen::MatrixXd y_tcrossprod_alpha =
+  //  tcrossprod(std_vec_matrix_times_diagonal(
+  //      Ykt_mat, alpha.array().sqrt().matrix().eval()));
+  Eigen::MatrixXd y_tcrossprod_alpha = tcrossprod(
+      Ykt_mat.transpose() * alpha.array().sqrt().matrix().asDiagonal());
   y_tcrossprod_alpha += Dk.asDiagonal();
   const auto dk_min_size
       = std::min(y_tcrossprod_alpha.rows(), y_tcrossprod_alpha.cols());
-  Eigen::MatrixXd y_mul_alpha = std_vec_matrix_times_diagonal(Ykt_mat, alpha);
+  Eigen::MatrixXd y_mul_alpha = Ykt_mat.transpose() * alpha.asDiagonal();
   Eigen::MatrixXd Hk = crossprod(y_mul_alpha, ninvRST)
                        + crossprod(ninvRST, y_mul_alpha)
                        + crossprod(ninvRST, y_tcrossprod_alpha * ninvRST);
@@ -714,17 +717,17 @@ inline taylor_approx_t construct_taylor_approximation_full(
  * @param grad_est The gradients for the given iteration of LBFGS
  * @param logger used for printing out debug values
  */
-template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
-          typename InvMat, typename Logger>
+template <typename EigVec, typename AlphaVec, typename DkVec, typename InvMat,
+          typename Logger, typename GradMat>
 inline auto construct_taylor_approximation_sparse(
-    const Buff& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
+    GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
     Logger&& logger) {
-  const Eigen::Index history_size = Ykt_mat.size();
+  const Eigen::Index history_size = Ykt_mat.cols();
   const Eigen::Index history_size_times_2 = history_size * 2;
   const Eigen::Index num_params = alpha.size();
-  Eigen::MatrixXd y_mul_sqrt_alpha = std_vec_matrix_times_diagonal(
-      Ykt_mat, alpha.array().sqrt().matrix().eval());
+  Eigen::MatrixXd y_mul_sqrt_alpha
+      = Ykt_mat.transpose() * alpha.array().sqrt().matrix().asDiagonal();
   Eigen::MatrixXd Wkbart(history_size_times_2, num_params);
   Wkbart.topRows(history_size) = y_mul_sqrt_alpha;
   Wkbart.bottomRows(history_size)
@@ -760,12 +763,11 @@ inline auto construct_taylor_approximation_sparse(
   Eigen::VectorXd x_center
       = point_est
         - (alpha_mul_grad
-           + (alpha.array()
-              * std_vec_matrix_crossprod_vector(Ykt_mat, ninvRSTg).array())
-                 .matrix()
-           + crossprod(ninvRST,
-                       std_vec_matrix_mul_vector(Ykt_mat, alpha_mul_grad))
-           + crossprod(ninvRST, y_tcrossprod_alpha * ninvRSTg));
+           + (alpha.array() * (Ykt_mat * ninvRSTg).array()).matrix()
+           + (ninvRST.transpose()
+              * ((Ykt_mat.transpose() * alpha_mul_grad)
+                 + y_tcrossprod_alpha * ninvRSTg)));
+                 
   debug::taylor_appx_sparse2(logger, qr, alpha, Qk, L_approx, logdetcholHk,
                              Mkbar, Wkbart, x_center, ninvRST, ninvRSTg, Rkbar);
   return taylor_approx_t{std::move(x_center), logdetcholHk, std::move(L_approx),
@@ -794,15 +796,15 @@ inline auto construct_taylor_approximation_sparse(
  * @param grad_est The gradients for the given iteration of LBFGS
  * @param logger used for printing out debug values
  */
-template <typename EigVec, typename Buff, typename AlphaVec, typename DkVec,
-          typename InvMat, typename Logger>
+template <typename EigVec, typename AlphaVec, typename DkVec, typename InvMat,
+          typename Logger, typename GradMat>
 inline taylor_approx_t construct_taylor_approximation(
-    const Buff& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
+    GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
     Logger&& logger) {
   // If twice the current history size is larger than the number of params
   // use a sparse approximation
-  if (2 * Ykt_mat.size() >= Ykt_mat[0].size()) {
+  if (2 * Ykt_mat.cols() >= Ykt_mat.rows()) {
     return construct_taylor_approximation_full(Ykt_mat, alpha, Dk, ninvRST,
                                                point_est, grad_est, logger);
   } else {
@@ -870,35 +872,38 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * @param logger A callback writer for messages
  */
 template <typename RNG, typename LPFun, typename ConstrainFun, typename Logger,
-          typename AlphaVec, typename GradBuffer, typename CurrentParams,
-          typename CurrentGrads, typename ParamMat>
+          typename AlphaVec, typename CurrentParams, typename CurrentGrads,
+          typename ParamMat, typename GradMat>
 auto pathfinder_impl(std::size_t& num_evals, RNG&& rng, AlphaVec&& alpha,
                      LPFun&& lp_fun, ConstrainFun&& constrain_fun,
                      CurrentParams&& current_params,
-                     CurrentGrads&& current_grads, GradBuffer&& grad_buffer,
+                     CurrentGrads&& current_grads, GradMat&& Ykt_mat,
                      ParamMat&& Skt_mat, std::size_t num_elbo_draws,
                      const std::string& iter_msg, Logger&& logger) {
-  const auto current_history_size = grad_buffer.size();
+  const auto current_history_size = Ykt_mat.cols();
   //    Ykt_h.reserve(current_history_size);
   Eigen::MatrixXd Rk
       = Eigen::MatrixXd::Zero(current_history_size, current_history_size);
-  for (Eigen::Index s = 0; s < current_history_size; s++) {
-    for (Eigen::Index i = 0; i <= s; i++) {
-      Rk.coeffRef(i, s) = Skt_mat.col(i).dot(grad_buffer[s]);
-    }
-  }
+  Rk.template triangularView<Eigen::Upper>() = Skt_mat.transpose() * Ykt_mat;
+  /*
+for (Eigen::Index s = 0; s < current_history_size; s++) {
+for (Eigen::Index i = 0; i <= s; i++) {
+  Rk.coeffRef(i, s) = Skt_mat.col(i).dot(Ykt_mat.col(s));
+}
+}
+*/
   Eigen::VectorXd Dk = Rk.diagonal();
   // Unfolded algorithm in paper for inverse RST
-  Eigen::MatrixXd ninvRST;
   {
-    Skt_mat.transposeInPlace();
-    Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat);
-    ninvRST = std::move(-Skt_mat);
+    //    Skt_mat.transposeInPlace();
+    Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat.transpose());
+    // Skt_mat is now ninvRST
+    Skt_mat = -Skt_mat;
   }
   internal::taylor_approx_t taylor_appx
-      = internal::construct_taylor_approximation(grad_buffer, alpha, Dk,
-                                                 ninvRST, current_params,
-                                                 current_grads, logger);
+      = internal::construct_taylor_approximation(
+          Ykt_mat, alpha, Dk, Skt_mat.transpose(), current_params,
+          current_grads, logger);
   try {
     return std::make_pair(
         internal::est_approx_draws<true>(lp_fun, constrain_fun, rng,
@@ -1018,8 +1023,6 @@ inline auto pathfinder_lbfgs_single(
   param_vecs.reserve(num_iterations);
   std::vector<Eigen::VectorXd> grad_vecs;
   grad_vecs.reserve(num_iterations);
-  Eigen::VectorXd curr_params;
-  Eigen::VectorXd curr_grads;
   Eigen::VectorXd prev_params
       = Eigen::Map<Eigen::VectorXd>(cont_vector.data(), cont_vector.size());
   Eigen::VectorXd prev_grads;
@@ -1051,6 +1054,8 @@ inline auto pathfinder_lbfgs_single(
   internal::elbo_est_t elbo_best;
   internal::taylor_approx_t taylor_approx_best;
   std::size_t num_evals{lbfgs.grad_evals()};
+  Eigen::MatrixXd Ykt_mat(num_parameters, history_size);
+  Eigen::MatrixXd Skt_mat(num_parameters, history_size);
   while (ret == 0) {
     std::stringstream msg;
     interrupt();
@@ -1094,20 +1099,24 @@ inline auto pathfinder_lbfgs_single(
      * and we are exiting
      */
     if (likely(ret != -1)) {
-      Eigen::VectorXd curr_params = lbfgs.curr_x();
-      Eigen::VectorXd curr_grads = lbfgs.curr_g();
-      param_buff.push_back(curr_params - prev_params);
-      grad_buff.push_back(curr_grads - prev_grads);
-      prev_params = curr_params;
-      prev_grads = curr_grads;
+      param_buff.push_back(lbfgs.curr_x() - prev_params);
+      grad_buff.push_back(lbfgs.curr_g() - prev_grads);
+      prev_params = lbfgs.curr_x();
+      prev_grads = lbfgs.curr_g();
       current_history_size = std::min(current_history_size + 1,
                                       static_cast<std::size_t>(history_size));
       if (internal::check_curve(param_buff.back(), grad_buff.back(), logger)) {
         alpha = internal::form_diag(alpha, grad_buff.back(), param_buff.back());
       }
-      Eigen::MatrixXd Skt_mat(num_parameters, current_history_size);
+      Eigen::Map<Eigen::MatrixXd> Ykt_map(Ykt_mat.data(), num_parameters,
+                                          current_history_size);
       for (Eigen::Index i = 0; i < current_history_size; ++i) {
-        Skt_mat.col(i) = param_buff[i];
+        Ykt_map.col(i) = grad_buff[i];
+      }
+      Eigen::Map<Eigen::MatrixXd> Skt_map(Skt_mat.data(), num_parameters,
+                                          current_history_size);
+      for (Eigen::Index i = 0; i < current_history_size; ++i) {
+        Skt_map.col(i) = param_buff[i];
       }
       std::string iter_msg(path_num + "Iter: ["
                            + std::to_string(lbfgs.iter_num()) + "] ");
@@ -1117,8 +1126,8 @@ inline auto pathfinder_lbfgs_single(
       }
 
       auto pathfinder_res = internal::pathfinder_impl(
-          num_evals, rng, alpha, lp_fun, constrain_fun, curr_params, curr_grads,
-          grad_buff, Skt_mat, num_elbo_draws, iter_msg, logger);
+          num_evals, rng, alpha, lp_fun, constrain_fun, lbfgs.curr_x(),
+          lbfgs.curr_g(), Ykt_map, Skt_map, num_elbo_draws, iter_msg, logger);
       if (pathfinder_res.first.elbo > elbo_best.elbo) {
         elbo_best = std::move(pathfinder_res.first);
         taylor_approx_best = std::move(pathfinder_res.second);

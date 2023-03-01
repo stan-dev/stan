@@ -74,8 +74,6 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   std::vector<stan::callbacks::writer> single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
-    //    single_path_parameter_writer.emplace_back(single_path_parameter_ss[i]);
-    //    single_path_diagnostic_writer.emplace_back(single_path_diagnostic_ss[i]);
     single_path_inits.emplace_back(
         std::make_unique<decltype(init_init_context())>(init_init_context()));
   }
@@ -90,7 +88,6 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
       diagnostics, threadpool_init);
 
-  // Eigen::MatrixXd param_vals = parameter.values_.transpose();
   Eigen::MatrixXd param_vals(parameter.eigen_states_.size(),
                              parameter.eigen_states_[0].size());
   for (size_t i = 0; i < parameter.eigen_states_.size(); ++i) {
@@ -99,8 +96,6 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
 
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
-
-  // std::cout << "Values: \n" << param_vals.format(CommaInitFmt) << "\n";
 
   Eigen::RowVectorXd mean_vals = param_vals.colwise().mean();
   Eigen::RowVectorXd sd_vals = ((param_vals.rowwise() - mean_vals)
@@ -112,9 +107,6 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
                                     .array()
                                 / (param_vals.rows() - 1))
                                    .sqrt();
-
-  // std::cout << "Mean Values: \n" << mean_vals.format(CommaInitFmt) << "\n";
-  // std::cout << "SD Values: \n" << sd_vals.format(CommaInitFmt) << "\n";
 
   Eigen::RowVectorXd prev_mean_vals(20);
   prev_mean_vals << 1.89104, 3.66449, 0.22256, 0.119645, -0.146812, 0.23633,
@@ -133,7 +125,6 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
     EXPECT_GE(diff_vals(i), 0.0);
   }
 
-  // std::cout << "Diffs\n" << diff_vals.format(CommaInitFmt) << "\n";
 }
 
 TEST_F(ServicesPathfinderEightSchools, single) {
@@ -167,14 +158,7 @@ TEST_F(ServicesPathfinderEightSchools, single) {
 
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
 
-  // std::cout << "---- Results  -------" << std::endl;
-  /*
-  std::cout << "Values: \n"
-            << param_vals.format(CommaInitFmt) << "\n";
-  */
   Eigen::VectorXd mean_vals = param_vals.rowwise().mean().eval();
-  //       std::cout << "Mean Values: \n" <<
-  //       mean_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_vals = (((param_vals.colwise() - mean_vals)
                                   .array()
                                   .square()
@@ -199,6 +183,7 @@ TEST_F(ServicesPathfinderEightSchools, single) {
     Eigen::VectorXd constrained_draws1;
     Eigen::VectorXd constrained_draws2(20);
     Eigen::VectorXd lp_approx_vec(100);
+    // Results are from Lu's R code
     lp_approx_vec << -12.0415891980758, -14.6692843779338, -13.4109656242788,
         -12.227160804752, -10.8994669454787, -13.9464452858378,
         -17.7039786093493, -11.3031695577237, -12.1849838459723,
@@ -243,8 +228,6 @@ TEST_F(ServicesPathfinderEightSchools, single) {
     }
   }
   Eigen::VectorXd mean_r_vals = r_constrainted_draws_mat.rowwise().mean();
-  //        std::cout << "R Mean Values: \n" <<
-  //        mean_r_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_r_vals
       = (((r_constrainted_draws_mat.colwise() - mean_r_vals)
               .array()
@@ -258,8 +241,8 @@ TEST_F(ServicesPathfinderEightSchools, single) {
             .transpose()
             .eval();
   Eigen::VectorXd diff_vals(20);
-  diff_vals = ((mean_r_vals.array() + (2.0 * sd_r_vals.array())).abs()
-               - mean_vals.array().abs())
+  diff_vals = ((mean_r_vals.array() + (2.0 * sd_r_vals.array()))
+               - mean_vals.array())
                   .matrix();
   for (Eigen::Index i = 0; i < 18; i++) {
     EXPECT_GE(diff_vals(i), 0.0);
@@ -267,8 +250,6 @@ TEST_F(ServicesPathfinderEightSchools, single) {
 
   Eigen::MatrixXd ans_diff = param_vals - r_constrainted_draws_mat;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
-  //      std::cout << "diff Mean Values: \n" <<
-  //      mean_diff_vals.transpose().eval().format(CommaInitFmt) << "\n";
   Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
                                        .array()
                                        .square()

@@ -28,7 +28,10 @@ TEST(ServicesPSIS, xl) {
       0.903992807508582;
   auto xx
       = stan::services::psis::internal::profile_loglikelihood(theta, test_x);
-  // std::cout << "\nxx: \n" << xx << "\n";
+  /*
+   * All test values come from running the equivalent R function with the same 
+   * inputs in the package loo
+   */ 
   Eigen::Array<double, -1, 1> good_vals(34);
   good_vals << 1.06041260401414, 1.15443356538553, 1.19147065735959,
       1.21250394179907, 1.22599729792255, 1.23511270696396, 1.24135988808796,
