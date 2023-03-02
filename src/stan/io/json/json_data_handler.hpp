@@ -16,6 +16,7 @@
 #include <utility>
 #include <vector>
 #include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
 
 namespace stan {
 
@@ -166,6 +167,11 @@ class json_data_handler : public stan::json::json_handler {
             && int_slots_map.empty());
   }
 
+  bool validate_key(const std::string& name)   {
+    static const boost::regex re("[a-zA-Z][a-zA-Z0-9_]*");
+    return regex_match(name, re);
+  }
+
   bool is_array_tuples(const std::vector<std::string>& keys) {
     std::vector<std::string> stack(keys);
     std::string key;
@@ -229,7 +235,7 @@ class json_data_handler : public stan::json::json_handler {
    * with previous tuple elements.
    */
   void save_key_value_pair() {
-    if (key_stack.empty())
+    if (key_stack.empty() || !is_stan_var )
       return;
     std::string key = key_str();
     if (slot_types_map.count(key) < 1)
@@ -450,6 +456,10 @@ class json_data_handler : public stan::json::json_handler {
     reset_values();
     std::string outer = key_str();
     key_stack.push_back(key);
+    if (key_stack.size() == 1) {
+      is_stan_var = validate_key(key);
+      std::cout << key << " is valid? " << (is_stan_var ? "true" : "false") << std::endl;
+    }
     if (key_stack.size() == 1 && slot_types_map.count(key) == 1) {
       std::stringstream errorMsg;
       errorMsg << "Attempt to redefine variable: " << key << ".";
