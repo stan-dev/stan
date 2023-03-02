@@ -388,8 +388,7 @@ class json_data_handler : public stan::json::json_handler {
     }
   }
 
-  void unexpected_error(const std::string& where,
-                        const std::string& what) {
+  void unexpected_error(const std::string& where, const std::string& what) {
     std::stringstream errorMsg;
     errorMsg << "Variable " << where << ", " << what << ".";
     throw json_error(errorMsg.str());
