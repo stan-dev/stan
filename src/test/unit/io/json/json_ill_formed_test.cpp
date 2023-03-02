@@ -204,3 +204,39 @@ TEST(errJson, jsonData_redefine_var_4) {
   std::string txt = file2str(filename);
   test_exception(txt, "Attempt to redefine variable: x.");
 }
+
+TEST(errJson, jsonData_redefine_var_5) {
+  std::vector<std::string> json_path;
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "redefine_vars_5.json"};
+  std::string filename = paths_to_fname(json_path);
+  std::string txt = file2str(filename);
+  test_exception(txt, "Attempt to redefine variable: x.");
+}
+
+TEST(errJson, jsonData_redefine_var_6) {
+  std::vector<std::string> json_path;
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "redefine_vars_6.json"};
+  std::string filename = paths_to_fname(json_path);
+  std::string txt = file2str(filename);
+  test_exception(txt, "Attempt to redefine variable: x.");
+}
+
+TEST(errJson, jsonData_inconsistent_array_tuples_1) {
+  std::vector<std::string> json_path;
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "inconsistent_array_tuples_1.json"};
+  std::string filename = paths_to_fname(json_path);
+  std::string txt = file2str(filename);
+  test_exception(txt, "Variable x.1: size mismatch between tuple elements.");
+}
+
+TEST(errJson, jsonData_inconsistent_array_tuples_2) {
+  std::vector<std::string> json_path;
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "inconsistent_array_tuples_2.json"};
+  std::string filename = paths_to_fname(json_path);
+  std::string txt = file2str(filename);
+  test_exception(txt, "Variable x.1: size mismatch between tuple elements.");
+}

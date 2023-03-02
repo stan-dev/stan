@@ -108,7 +108,7 @@ void test_exception(const std::string &input,
     EXPECT_TRUE(hasEnding(e.what(), exception_text));
     return;
   }
-  FAIL();  // didn't throw an exception as expected.
+  FAIL() << "didn't throw exception" ;
 }
 
 std::string file2str(const std::string &fileName) {

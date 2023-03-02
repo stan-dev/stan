@@ -71,6 +71,16 @@ class array_dims {
   bool operator!=(const array_dims& other) { return !operator==(other); }
 };
 
+/** Tracks num slots in a tuple for array of tuple consistency.
+ */
+class tuple_slots {
+ public:
+  size_t slots;
+  size_t slots_acc;
+  bool is_first;
+  tuple_slots() : slots(0), slots_acc(0), is_first(true) {}
+};
+
 /**
  * A <code>json_data_handler</code> is an implementation of a
  * <code>json_handler</code> that restricts the allowed JSON text
@@ -222,7 +232,7 @@ class json_data_handler : public stan::json::json_handler {
       bool is_new = (vars_r.count(key) == 0 && vars_i.count(key) == 0);
       bool is_int = int_slots_map[key];
       bool is_real = vars_r.count(key) == 1;
-      bool was_int = vars_i.count(key) == 1;
+      bool was_int = !is_int && vars_i.count(key) == 1;
       std::vector<size_t> dims;
       if (slot_dims_map.count(key) == 1)
         dims = slot_dims_map[key].dims;
@@ -251,9 +261,33 @@ class json_data_handler : public stan::json::json_handler {
       } else {
         if (slot_types_map[key_stack[0]] != meta_type::ARRAY_OF_TUPLES)
           unexpected_error(key);
+        bool consistent = true;
+        if (is_int || was_int) {
+          auto expect_dims = vars_i[key].second;
+          size_t expect_vals_len = 1;
+          for (auto& x : expect_dims)
+            expect_vals_len *= x;
+          if (is_int) {
+            if (expect_vals_len != values_i.size())
+              consistent = false;
+          } else {
+            if (expect_vals_len != values_r.size())
+              consistent = false;
+          }
+        } else {
+          auto expect_dims = vars_r[key].second;
+          size_t expect_vals_len = 1;
+          for (auto& x : expect_dims)
+            expect_vals_len *= x;
+          if (expect_vals_len != values_r.size())
+            consistent = false;
+        }
+        if (!consistent) {
+          std::stringstream errorMsg;
+          errorMsg << "Variable " << key << ": size mismatch between tuple elements.";
+          throw json_error(errorMsg.str());
+        }
         var_types_map[key] = meta_type::ARRAY;
-        std::vector<size_t> dims = slot_dims_map[key].dims;
-
         if ((!is_int && was_int) || (is_int && is_real)) {  // promote to double
           std::vector<double> values_tmp;
           for (auto& x : vars_i[key].first) {
@@ -384,7 +418,8 @@ class json_data_handler : public stan::json::json_handler {
 
   /** A key is either a top-level Stan variable name or a tuple slot id.
    *  Logic handles edge case where key is the first slot of a tuple;
-   *  the name of the enclosing object is not used in the generated C++.
+   *  the name of the enclosing object is not used in the generated C++,
+   *  but we still need to track the number of tuple slots.
    */
   void key(const std::string& key) {
     if (event != meta_event::OBJ_OPEN) {
@@ -392,44 +427,79 @@ class json_data_handler : public stan::json::json_handler {
     }
     event = meta_event::KEY;
     reset_values();
+    std::string outer = key_str();
     key_stack.push_back(key);
-    if (key_stack.size() == 1 && slot_types_map.count(key_str()) == 1) {
+    if (key_stack.size() == 1 && slot_types_map.count(key) == 1) {
       std::stringstream errorMsg;
       errorMsg << "Attempt to redefine variable: " << key << ".";
       throw json_error(errorMsg.str());
     }
-    if (slot_types_map.count(key_str()) == 0) {
-      slot_types_map[key_str()] = meta_type::SCALAR;
-      int_slots_map[key_str()] = true;
+    std::string vname = key_str();
+    if (slot_types_map.count(vname) == 0) {
+      slot_types_map[vname] = meta_type::SCALAR;
+      int_slots_map[vname] = true;
     }
+    // if (key_stack.size() > 1
+    //     && slot_types_map[outer] == meta_type::TUPLE) {
+    //   if (tuple_slots_map.count(outer) == 0)
+    //     unexpected_error(vname);
+    //   if (tuple_slots_map[outer].is_first)
+    //     tuple_slots_map[outer].slots++;
+    //   else
+    //     tuple_slots_map[outer].slots_acc++;
+    // }
   }
 
-  /** A start object ("{") event changes the meta-type of the current key.
+  /**
+   * A start object ("{") event changes the meta-type of the current key.
+   * Initialize or update tuple slots.
    */
   void start_object() {
     event = meta_event::OBJ_OPEN;
     if (is_init())
       return;
-    if (slot_types_map[key_str()] == meta_type::ARRAY) {
-      slot_types_map[key_str()] = meta_type::ARRAY_OF_TUPLES;
+    std::string key = key_str();
+    if (slot_types_map[key] == meta_type::ARRAY) {
+      slot_types_map[key] = meta_type::ARRAY_OF_TUPLES;
     } else if (slot_types_map[key_str()] == meta_type::SCALAR) {
       slot_types_map[key_str()] = meta_type::TUPLE;
     }
+    // if (tuple_slots_map.count(key) == 0) {
+    //   tuple_slots slots;
+    //   tuple_slots_map[key] = slots;
+    // } else {
+    //   tuple_slots_map[key].is_first = false;
+    // }
   }
 
   /** An end object ("}") event closes either the top-level object or a tuple.
-   *  If the latter, when the enclosing object is an array of tuples, we must
-   *  record of check the array size for the current array dimension.
+   *  If the latter, we record or check the number of tuple slots.
+   *  If this is an array of tuples, we record or check the size of the
+   *  current array dim as well.
    */
   void end_object() {
     event = meta_event::OBJ_CLOSE;
-    if (key_stack.size() > 1
-        && slot_types_map[outer_key_str()] == meta_type::ARRAY_OF_TUPLES) {
-      array_dims outer = get_outer_dims(key_stack);
-      if (!outer.dims.empty()) {
-        outer.dims_acc[outer.dims.size() - 1]++;
-        set_outer_dims(outer);
+    if (key_stack.size() > 1) {
+      std::string tuple = outer_key_str();
+      if (slot_types_map[tuple] == meta_type::ARRAY_OF_TUPLES) {
+        array_dims outer = get_outer_dims(key_stack);
+        if (!outer.dims.empty()) {
+          outer.dims_acc[outer.dims.size() - 1]++;
+          set_outer_dims(outer);
+        }
       }
+      // if (tuple_slots_map.count(tuple) == 0)
+      //   unexpected_error(tuple);
+      // if (tuple_slots_map[tuple].is_first) {
+      //   tuple_slots_map[tuple].is_first = false;
+      // } else {
+      //   if (tuple_slots_map[tuple].slots_acc != tuple_slots_map[tuple].slots) {
+      //     std::stringstream errorMsg;
+      //     errorMsg << "Variable " << tuple << ": size mismatch between tuple elements.";
+      //     throw json_error(errorMsg.str());
+      //   }
+      //   tuple_slots_map[tuple].slots_acc = 0;
+      // }
     }
     save_key_value_pair();
   }
