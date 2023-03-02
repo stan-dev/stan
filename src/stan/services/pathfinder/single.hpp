@@ -235,24 +235,7 @@ inline void taylor_appx_sparse2(T0&& logger, T1&& qr, T2&& alpha, T3&& Qk,
 }
 }  // namespace debug
 
-template <typename T1, typename T2>
-inline auto crossprod(T1&& x, T2&& y) {
-  return std::forward<T1>(x).transpose() * std::forward<T2>(y);
-}
-
-template <typename T1>
-inline Eigen::MatrixXd crossprod(T1&& x) {
-  return Eigen::MatrixXd(x.cols(), x.cols())
-      .setZero()
-      .selfadjointView<Eigen::Lower>()
-      .rankUpdate(std::forward<T1>(x).adjoint());
-}
-
-template <typename T1, typename T2>
-inline auto tcrossprod(T1&& x, T2&& y) {
-  return std::forward<T1>(x) * std::forward<T2>(y).transpose();
-}
-
+// t(x) * x
 template <typename T1>
 inline Eigen::MatrixXd tcrossprod(T1&& x) {
   return Eigen::MatrixXd(x.rows(), x.rows())
@@ -261,103 +244,11 @@ inline Eigen::MatrixXd tcrossprod(T1&& x) {
       .rankUpdate(std::forward<T1>(x));
 }
 
-/**
- * Perform a `Matrix * vector.asDiagonal()` multiplication with the matrix
- * represented as an `std::vector` of rows.
- * @tparam EigVec1 A type inheriting from `Eigen::DenseBase` with compile time
- *  rows or columns equal to 1
- * @tparam EigVec2 A type inheriting from `Eigen::DenseBase` with compile time
- *  rows or columns equal to 1
- * @param y_buff A standard vector with elements representing the rows of
- *  a matrix.
- * @param alpha An eigen vector representing the diagonals of a matrix.
- * @return Returns the same result as if we called `y_buff * alpha.asDiagonal()`
- * where `y_buff` is an Eigen matrix.
- */
-template <typename EigVec1, typename EigVec2>
-inline Eigen::MatrixXd std_vec_matrix_times_diagonal(const EigVec1& y_buff,
-                                                     const EigVec2& alpha) {
-  Eigen::MatrixXd ret(y_buff.size(), alpha.size());
-  for (Eigen::Index i = 0; i < y_buff.size(); ++i) {
-    ret.row(i) = y_buff[i].array() * alpha.array();
-  }
-  return ret;
-}
-
-/**
- * Perform a `Matrix.transpose() * vector` multiplication with the matrix
- * represented as an `std::vector` of rows.
- * @tparam EigVec1 A type inheriting from `Eigen::DenseBase` with compile time
- *  rows or columns equal to 1
- * @tparam EigVec2 A type inheriting from `Eigen::DenseBase` with compile time
- *  rows or columns equal to 1
- * @param y_buff A standard vector with elements representing the rows of
- *  a matrix.
- * @param x An eigen vector.
- * @return Returns the same result as if we called `Matrix.transpose() * vector`
- */
-template <typename EigVec1, typename EigVec2>
-inline Eigen::VectorXd std_vec_matrix_crossprod_vector(const EigVec1& y_buff,
-                                                       const EigVec2& x) {
-  Eigen::VectorXd ret(y_buff[0].size());
-  ret.setZero();
-  for (Eigen::Index i = 0; i < y_buff.size(); ++i) {
-    ret.noalias() += y_buff[i] * x.coeff(i);
-  }
-  return ret;
-}
-
-/**
- * Perform a Matrix * vector multiply with the matrix represented as an
- * `std::vector` of rows.
- * @tparam EigVec1 A type inheriting from `Eigen::DenseBase` with compile time
- *  rows or columns equal to 1
- * @tparam EigVec2 A type inheriting from `Eigen::DenseBase` with compile time
- *  rows or columns equal to 1
- * @param y_buff A standard vector with elements representing the rows of
- *  a matrix.
- * @param alpha An eigen vector.
- */
-template <typename EigVec1, typename EigVec2>
-inline Eigen::MatrixXd std_vec_matrix_mul_vector(const EigVec1& y_buff,
-                                                 const EigVec2& alpha) {
-  Eigen::VectorXd ret(y_buff.size());
-  for (Eigen::Index i = 0; i < y_buff.size(); ++i) {
-    ret(i) = y_buff[i].dot(alpha);
-  }
-  return ret;
-}
-
-/**
- * Check the curvature of the LBFGS optimization path is convex.
- * For each pair of parameters and gradients we check:
- *  1. If the direction of each iteration is check to be greater than zero
- *  2. If the absolute value of the squared gradient over direction is checked
- * to be greater than 1e-12.
- * @tparam EigMat A type derived from `Eigen::MatrixBase` with dynamic compile
- * time rows and columns
- * @tparam Logger A type with a `log` method for writing
- * @param Yk Matrix containing difference in gradient calculation per LBFGS
- * iterations
- * @param Sk Matrix containing difference in parameter calculation per LBFGS
- * iterations
- * @param logger logger used to send messages to error for user.
- */
-template <typename EigMat,
-          stan::require_eigen_matrix_dynamic_t<EigMat>* = nullptr,
-          typename Logger>
-inline Eigen::Array<bool, -1, 1> check_curve(const EigMat& Yk, const EigMat& Sk,
-                                             Logger&& logger) {
-  auto Dk = (Yk.array() * Sk.array()).colwise().sum();
-  auto thetak = (Yk.array().square().colwise().sum() / Dk).abs();
-  debug::print_curve(logger, Dk, thetak);
-  return Dk > 0 && thetak <= 1e12;
-}
 
 template <typename EigVec, stan::require_eigen_vector_t<EigVec>* = nullptr,
           typename Logger>
 inline bool check_curve(const EigVec& Yk, const EigVec& Sk, Logger&& logger) {
-  auto Dk = (Yk.array() * Sk.array()).sum();
+  auto Dk = Yk.dot(Sk);
   auto thetak = std::abs(Yk.array().square().sum() / Dk);
   debug::print_curve(logger, Dk, thetak);
   return Dk > 0 && thetak <= 1e12;
@@ -381,7 +272,7 @@ inline bool check_curve(const EigVec& Yk, const EigVec& Sk, Logger&& logger) {
 template <typename EigVec1, typename EigVec2, typename EigVec3>
 inline auto form_diag(const EigVec1& alpha_init, const EigVec2& Yk,
                       const EigVec3& Sk) {
-  double y_alpha_y = (Yk.dot(alpha_init.asDiagonal() * Yk));
+  double y_alpha_y = Yk.dot(alpha_init.asDiagonal() * Yk);
   double y_s = Yk.dot(Sk);
   double s_inv_alpha_s
       = Sk.dot(alpha_init.array().inverse().matrix().asDiagonal() * Sk);
@@ -434,15 +325,13 @@ inline Eigen::MatrixXd gen_draws(EigMat&& u,
                                  const taylor_approx_t& taylor_approx,
                                  const EigVec& alpha) {
   if (taylor_approx.use_full) {
-    return crossprod(taylor_approx.L_approx, u).colwise()
+    return (taylor_approx.L_approx.transpose() * u).colwise()
            + taylor_approx.x_center;
   } else {
-    Eigen::MatrixXd u1 = (taylor_approx.Qk.transpose() * u);
-    return (alpha.array().sqrt().matrix().asDiagonal()
-            * (taylor_approx.Qk * crossprod(taylor_approx.L_approx, u1)
-               + (u - taylor_approx.Qk * u1)))
-               .colwise()
-           + taylor_approx.x_center;
+    return (alpha.array().sqrt().matrix().asDiagonal() * 
+     (taylor_approx.Qk * (taylor_approx.L_approx - 
+      Eigen::MatrixXd::Identity(taylor_approx.L_approx.rows(), taylor_approx.L_approx.cols())) *
+      (taylor_approx.Qk.transpose() * u) + u)).colwise() + taylor_approx.x_center;
   }
 }
 
@@ -458,7 +347,7 @@ inline Eigen::MatrixXd gen_draws(EigMat&& u,
  * @param taylor_approx Approximation from `construct_taylor_approximation`.
  * @param alpha TODO: Define this
  * @return A matrix with columns equal to the number of samples and rows equal
- * to the number of parameters.
+ * to the number of parameters. Each column represents an approximate draw for the set of parameters.
  */
 template <typename EigVec1, typename EigVec2,
           require_eigen_vector_t<EigVec1>* = nullptr>
@@ -466,13 +355,12 @@ inline Eigen::VectorXd gen_draws(EigVec1&& u,
                                  const taylor_approx_t& taylor_approx,
                                  const EigVec2& alpha) {
   if (taylor_approx.use_full) {
-    return crossprod(taylor_approx.L_approx, u) + taylor_approx.x_center;
+    return (taylor_approx.L_approx.transpose() * u) + taylor_approx.x_center;
   } else {
-    Eigen::VectorXd u1 = (taylor_approx.Qk.transpose() * u);
-    return (alpha.array().sqrt().matrix().asDiagonal()
-            * (taylor_approx.Qk * crossprod(taylor_approx.L_approx, u1)
-               + (u - taylor_approx.Qk * u1)))
-           + taylor_approx.x_center;
+    return (alpha.array().sqrt().matrix().asDiagonal() * 
+     (taylor_approx.Qk * (taylor_approx.L_approx - 
+      Eigen::MatrixXd::Identity(taylor_approx.L_approx.rows(), taylor_approx.L_approx.cols())) *
+      (taylor_approx.Qk.transpose() * u) + u)) + taylor_approx.x_center;
   }
 }
 
@@ -501,6 +389,7 @@ gen_eigen_matrix(Generator&& variate_generator, const Eigen::Index num_params,
 
 /**
  * Estimate the approximate draws given the taylor approximation.
+ * 
  * @tparam ReturnElbo If true, calculate ELBO and return it in `elbo_est_t`. If
  * `false` ELBO is set in the return as `-Infinity`
  * @tparam LPF Type of log probability functor
@@ -516,8 +405,9 @@ gen_eigen_matrix(Generator&& variate_generator, const Eigen::Index num_params,
  * @param taylor_approx The taylor approximation at this iteration of LBFGS
  * @param num_samples Number of approximate samples to generate
  * @param alpha The approximation of the diagonal hessian
- * @param logger A callback writer for messages
  * @param iter_msg The beginning of messages that includes the iteration number
+ * @param[in,out] num_evals Numbe of evaluations of log prob function.
+ * @param logger A callback writer for messages
  */
 template <bool ReturnElbo = true, typename LPF, typename ConstrainF,
           typename RNG, typename EigVec, typename Logger>
@@ -525,108 +415,38 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
                                    RNG&& rng,
                                    const taylor_approx_t& taylor_approx,
                                    size_t num_samples, const EigVec& alpha,
-                                   Logger&& logger, const std::string& iter_msg,
-                                   std::size_t& num_evals) {
+                                   const std::string& iter_msg,
+                                   std::size_t& num_evals, Logger&& logger) {
   boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
-  int num_eval_attempts = 100;
   const auto num_params = taylor_approx.x_center.size();
   size_t lp_fun_calls = 0;
-  Eigen::MatrixXd uniform_samps_tmp
+  Eigen::MatrixXd uniform_samps
       = gen_eigen_matrix(rand_unit_gaus, num_params, num_samples);
-  Eigen::MatrixXd approx_samples_tmp(num_params, num_samples);
-  approx_samples_tmp = gen_draws(uniform_samps_tmp, taylor_approx, alpha);
-  debug::rnorm_draws(logger, approx_samples_tmp);
-  Eigen::Array<double, -1, -1> lp_mat_tmp(num_samples, 2);
-  Eigen::VectorXd approx_samples_tmp_col;
+  Eigen::MatrixXd approx_samples(num_params, num_samples);
+  approx_samples = gen_draws(uniform_samps, taylor_approx, alpha);
+  debug::rnorm_draws(logger, approx_samples);
+  Eigen::Array<double, -1, -1> lp_mat(num_samples, 2);
+  Eigen::VectorXd approx_samples_col;
   Eigen::VectorXd approx_samples_constrained_col;
   std::stringstream pathfinder_ss;
-  auto log_stream = [](auto& logger, auto& pathfinder_ss) mutable {
+  const auto log_stream = [](auto& logger, auto& pathfinder_ss) {
     if (pathfinder_ss.str().length() > 0) {
       logger.info(pathfinder_ss);
       pathfinder_ss.str(std::string());
     }
   };
-  bool at_least_one_failed = false;
   for (Eigen::Index i = 0; i < num_samples; ++i) {
-    for (size_t fail_trys = 0; fail_trys <= num_eval_attempts; ++fail_trys) {
-      try {
-        approx_samples_tmp_col = approx_samples_tmp.col(i);
-        ++lp_fun_calls;
-        lp_mat_tmp.coeffRef(i, 1)
-            = lp_fun(approx_samples_tmp_col, pathfinder_ss);
-        if (std::isfinite(lp_mat_tmp.coeff(i, 1))) {
-          log_stream(logger, pathfinder_ss);
-          break;
-        } else {
-          if (fail_trys == num_eval_attempts) {
-            lp_mat_tmp.coeffRef(i, 1)
-                = -std::numeric_limits<double>::infinity();
-            at_least_one_failed = true;
-            log_stream(logger, pathfinder_ss);
-          }
-          uniform_samps_tmp.col(i)
-              = gen_eigen_matrix<-1, 1>(rand_unit_gaus, num_params, 1);
-          approx_samples_tmp.col(i)
-              = gen_draws(uniform_samps_tmp.col(i), taylor_approx, alpha);
-        }
-      } catch (const std::exception& e) {
-        if (fail_trys == num_eval_attempts) {
-          lp_mat_tmp.coeffRef(i, 1) = -std::numeric_limits<double>::infinity();
-          at_least_one_failed = true;
-          log_stream(logger, pathfinder_ss);
-        }
-        uniform_samps_tmp.col(i)
-            = gen_eigen_matrix<-1, 1>(rand_unit_gaus, num_params, 1);
-        approx_samples_tmp.col(i)
-            = gen_draws(uniform_samps_tmp.col(i), taylor_approx, alpha);
-      }
+    try {
+      approx_samples_col = approx_samples.col(i);
+      ++lp_fun_calls;
+      lp_mat.coeffRef(i, 1) = lp_fun(approx_samples_col, pathfinder_ss);
+      log_stream(logger, pathfinder_ss);
+    } catch (const std::exception& e) {
+        lp_mat.coeffRef(i, 1) = -std::numeric_limits<double>::infinity();
+        log_stream(logger, pathfinder_ss);
     }
   }
-  // Cleanup for -inf values
-  Eigen::Array<double, -1, -1> lp_mat;
-  Eigen::MatrixXd approx_samples;
-  Eigen::MatrixXd uniform_samps;
-  if (at_least_one_failed) {
-    std::vector<Eigen::Index> success_rows;
-    success_rows.reserve(lp_mat_tmp.rows());
-    for (Eigen::Index i = 0; i < lp_mat_tmp.rows(); ++i) {
-      if (std::isfinite(lp_mat_tmp(i, 1))) {
-        success_rows.push_back(i);
-      }
-    }
-    if (success_rows.size() == 0) {
-      approx_samples_tmp_col = approx_samples_tmp.col(0);
-      try {
-        double test_val = lp_fun(approx_samples_tmp_col, pathfinder_ss);
-        if (!std::isfinite(test_val)) {
-          throw std::domain_error(iter_msg +
-             "Approximate estimation failed after " +
-             std::to_string(num_eval_attempts) +
-            " attempts because the approximated samples returned back log(0)"
-            " from calling lp calculation.");
-        }
-      } catch (const std::exception& e) {
-        throw std::domain_error(iter_msg +
-          "Approximate samples failed to create any samples with final error"
-          " message: " + e.what());
-      }
-    } else {
-      lp_mat = Eigen::Array<double, -1, -1>(success_rows.size(), 2);
-      approx_samples = Eigen::MatrixXd(num_params, success_rows.size());
-      uniform_samps = Eigen::MatrixXd(num_params, success_rows.size());
-      for (Eigen::Index i = 0; i < success_rows.size(); ++i) {
-        lp_mat(i, 1) = lp_mat_tmp(success_rows[i], 1);
-        approx_samples.col(i) = approx_samples_tmp.col(success_rows[i]);
-        uniform_samps.col(i) = uniform_samps_tmp.col(success_rows[i]);
-      }
-    }
-  } else {
-    lp_mat = std::move(lp_mat_tmp);
-    approx_samples = std::move(approx_samples_tmp);
-    uniform_samps = std::move(uniform_samps_tmp);
-  }
-
   lp_mat.col(0) = (-taylor_approx.logdetcholHk)
                   + -0.5
                         * (uniform_samps.array().square().colwise().sum()
@@ -647,45 +467,44 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
 
 /**
  * Construct the full taylor approximation
- * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column
- * @tparam Buff An std::vector holding column views of an Eigen Matrix
+ * @tparam GradMat Type inheriting from `Eigen::DenseBase` with compile time dynamic rows and columns
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam DkVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam InvMat Type inheriting from `Eigen::DenseBase` with dynamic compile
  * time rows and columns
+ * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
+ * column
  * @tparam Logger Type inheriting from `stan::io::logger`
- * @param Ykt_mat std vector of length equal to history size containing the
- * gradients from the iterations of LBFGS
+ * @param Ykt_mat Matrix of the changes to the gradient with column length of history size.
  * @param alpha The diagonal of the approximate hessian
  * @param Dk vector of Columnwise products of parameter and gradients with size
  * equal to history size
- * @param ninvRST
+ * @param ninvRST Inverse of the Rk matrix
  * @param point_est The parameters for the given iteration of LBFGS
  * @param grad_est The gradients for the given iteration of LBFGS
  * @param logger used for printing out debug values
  */
-template <typename EigVec, typename AlphaVec, typename DkVec, typename InvMat,
-          typename Logger, typename GradMat>
+template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat, typename EigVec,
+          typename Logger>
 inline taylor_approx_t construct_taylor_approximation_full(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
     Logger&& logger) {
   debug::taylor_appx_full1(logger, alpha, ninvRST, Dk, point_est, grad_est);
-  //  Eigen::MatrixXd y_tcrossprod_alpha =
-  //  tcrossprod(std_vec_matrix_times_diagonal(
-  //      Ykt_mat, alpha.array().sqrt().matrix().eval()));
   Eigen::MatrixXd y_tcrossprod_alpha = tcrossprod(
       Ykt_mat.transpose() * alpha.array().sqrt().matrix().asDiagonal());
+  /*
+   * + DK.asDiagonal() cannot be done one same line 
+   * See https://forum.kde.org/viewtopic.php?f=74&t=136617
+   */
   y_tcrossprod_alpha += Dk.asDiagonal();
   const auto dk_min_size
       = std::min(y_tcrossprod_alpha.rows(), y_tcrossprod_alpha.cols());
   Eigen::MatrixXd y_mul_alpha = Ykt_mat.transpose() * alpha.asDiagonal();
-  Eigen::MatrixXd Hk = crossprod(y_mul_alpha, ninvRST)
-                       + crossprod(ninvRST, y_mul_alpha)
-                       + crossprod(ninvRST, y_tcrossprod_alpha * ninvRST);
+  Eigen::MatrixXd Hk = y_mul_alpha.transpose() * ninvRST
+                       + ninvRST.transpose() * (y_mul_alpha + y_tcrossprod_alpha * ninvRST);
   Hk += alpha.asDiagonal();
   Eigen::MatrixXd L_hk = Hk.llt().matrixL().transpose();
   double logdetcholHk = L_hk.diagonal().array().abs().log().sum();
@@ -697,18 +516,17 @@ inline taylor_approx_t construct_taylor_approximation_full(
 
 /**
  * Construct the sparse taylor approximation
- * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column
- * @tparam Buff An std::vector holding column views of an Eigen Matrix
+ * @tparam GradMat Type inheriting from `Eigen::DenseBase` with compile time dynamic rows and columns
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam DkVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam InvMat Type inheriting from `Eigen::DenseBase` with dynamic compile
  * time rows and columns
+ * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
+ * column
  * @tparam Logger Type inheriting from `stan::io::logger`
- * @param Ykt_mat std vector of length equal to history size containing the
- * gradients from the iterations of LBFGS
+ * @param Ykt_mat Matrix of the changes to the gradient with column length of history size.
  * @param alpha The diagonal of the approximate hessian
  * @param Dk vector of Columnwise products of parameter and gradients with size
  * equal to history size
@@ -717,8 +535,8 @@ inline taylor_approx_t construct_taylor_approximation_full(
  * @param grad_est The gradients for the given iteration of LBFGS
  * @param logger used for printing out debug values
  */
-template <typename EigVec, typename AlphaVec, typename DkVec, typename InvMat,
-          typename Logger, typename GradMat>
+template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
+ typename EigVec, typename Logger>
 inline auto construct_taylor_approximation_sparse(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
@@ -776,18 +594,17 @@ inline auto construct_taylor_approximation_sparse(
 
 /**
  * Construct the taylor approximation.
- * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
- * column
- * @tparam Buff An std::vector holding column views of an Eigen Matrix
+ * @tparam GradMat Type inheriting from `Eigen::DenseBase` with compile time dynamic rows and columns
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam DkVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam InvMat Type inheriting from `Eigen::DenseBase` with dynamic compile
  * time rows and columns
+ * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
+ * column
  * @tparam Logger Type inheriting from `stan::io::logger`
- * @param Ykt_mat std vector of length equal to history size containing the
- * gradients from the iterations of LBFGS
+ * @param Ykt_mat Matrix of the changes to the gradient with column length of history size.
  * @param alpha The diagonal of the approximate hessian
  * @param Dk vector of Columnwise products of parameter and gradients with size
  * equal to history size
@@ -796,8 +613,8 @@ inline auto construct_taylor_approximation_sparse(
  * @param grad_est The gradients for the given iteration of LBFGS
  * @param logger used for printing out debug values
  */
-template <typename EigVec, typename AlphaVec, typename DkVec, typename InvMat,
-          typename Logger, typename GradMat>
+template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat, typename EigVec,
+          typename Logger>
 inline taylor_approx_t construct_taylor_approximation(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
@@ -856,26 +673,26 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * @tparam ParamMat Type inheriting from `Eigen::DenseBase` with dynamic rows
  * and columns at compile time.
  * @tparam Logger Type of logger callback
- * @param num_evals[in/out] Number of calls to the log probability function.
- * @param rng A generator to produce standard gaussian random variables
+ * @param[in,out] num_evals Number of calls to the log probability function.
+ * @param[in,out] rng A generator to produce standard gaussian random variables
  * @param alpha The approximation of the diagonal hessian
  * @param lp_fun Functor to calculate the log density
  * @param constrain_fun A functor to transform parameters to the constrained
  * space
  * @param current_params Parameters from iteration of LBFGS
  * @param current_grads Gradients from iteration of LBFGS
- * @param grad_buffer Circular buffer of the last `history_size` changes in the
- * gradient.
- * @param Skt_mat Matrix of the last `history_size` changes in the gradient.
+ * @param Ykt_mat Matrix of the last `history_size` changes in the gradient.
+ * @param[in,out] Skt_mat Matrix of the last `history_size` changes in the parameters.
+ *  `Skt_mat` is transformed in this function and will hold inverse solution of RS^T
  * @param num_elbo_draws Number of draws for the ELBO estimation
  * @param iter_msg The beginning of messages that includes the iteration number
  * @param logger A callback writer for messages
  */
-template <typename RNG, typename LPFun, typename ConstrainFun, typename Logger,
+template <typename RNG, typename LPFun, typename ConstrainFun,
           typename AlphaVec, typename CurrentParams, typename CurrentGrads,
-          typename ParamMat, typename GradMat>
-auto pathfinder_impl(std::size_t& num_evals, RNG&& rng, AlphaVec&& alpha,
-                     LPFun&& lp_fun, ConstrainFun&& constrain_fun,
+          typename GradMat, typename ParamMat, typename Logger>
+auto pathfinder_impl(std::size_t& num_evals, RNG&& rng, 
+                     LPFun&& lp_fun, ConstrainFun&& constrain_fun, AlphaVec&& alpha,
                      CurrentParams&& current_params,
                      CurrentGrads&& current_grads, GradMat&& Ykt_mat,
                      ParamMat&& Skt_mat, std::size_t num_elbo_draws,
@@ -908,7 +725,7 @@ for (Eigen::Index i = 0; i <= s; i++) {
     return std::make_pair(
         internal::est_approx_draws<true>(lp_fun, constrain_fun, rng,
                                          taylor_appx, num_elbo_draws, alpha,
-                                         logger, iter_msg, num_evals),
+                                         iter_msg, num_evals, logger),
         taylor_appx);
   } catch (const std::exception& e) {
     logger.info(iter_msg + "ELBO estimation failed "
@@ -927,7 +744,7 @@ for (Eigen::Index i = 0; i <= s; i++) {
  * @tparam ParamWriter Type inheriting from @ref stan::callbacks::writer
  * @param[in] model defining target log density and transforms (log $p$ in
  * paper)
- * @param[in] init ($\pi_0$ in paper) var context for initialization. Random
+ * @param[in] init ($pi_0$ in paper) var context for initialization. Random
  * initial values will be generated for parameters user has not supplied.
  * @param[in] random_seed seed for the random number generator
  * @param[in] path path id to advance the pseudo random number generator
@@ -940,7 +757,7 @@ for (Eigen::Index i = 0; i <= s; i++) {
  * iteration
  * @param[in] tol_obj Non-negative value for convergence tolerance on absolute
  * changes in objective function value
- * @param[in] tol_rel_obj ($\tau^{rel}$ in paper) Non-negative value for
+ * @param[in] tol_rel_obj ($tau^{rel}$ in paper) Non-negative value for
  * convergence tolerance on relative changes in objective function value
  * @param[in] tol_grad Non-negative value for convergence tolerance on the norm
  * of the gradient
@@ -958,10 +775,6 @@ for (Eigen::Index i = 0; i <= s; i++) {
  * @param[in] num_elbo_draws (K in paper) number of MC draws to evaluate ELBO
  * @param[in] num_draws (M in paper) number of approximate posterior draws to
  * return
- * @param[in] num_eval_attempts Number of times to attempt to calculate
- * the log density of an MC draw from the approximate distribution while
- * calculating the ELBO. If this value is exceeded the MC draw for that
- * approximation will be discarded.
  * @param[in,out] logger Logger for messages
  * @param[in,out] init_writer Writer callback for unconstrained inits
  * @param[in,out] parameter_writer Writer callback for parameter values
@@ -972,16 +785,16 @@ for (Eigen::Index i = 0; i <= s; i++) {
  * failures
  */
 template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
-          typename ParamWriter, typename TbbTask>
+          typename ParamWriter>
 inline auto pathfinder_lbfgs_single(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
     callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
-    int num_eval_attempts, callbacks::logger& logger,
+    callbacks::logger& logger,
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
-    DiagnosticWriter& diagnostic_writer, TbbTask&& task_arena) {
+    DiagnosticWriter& diagnostic_writer) {
   const auto start_optim_time = std::chrono::steady_clock::now();
   boost::ecuyer1988 rng
       = util::create_rng<boost::ecuyer1988>(random_seed, path);
@@ -1046,10 +859,10 @@ inline auto pathfinder_lbfgs_single(
     model.write_array(rng, unconstrained_draws, constrained_draws);
     return constrained_draws;
   };
-  Eigen::VectorXd alpha = Eigen::VectorXd::Ones(num_parameters);
   auto lp_fun = [&model](auto&& u, auto&& streamer) {
     return model.template log_prob<false, true>(u, &streamer);
   };
+  Eigen::VectorXd alpha = Eigen::VectorXd::Ones(num_parameters);
   Eigen::Index best_E = -1;
   internal::elbo_est_t elbo_best;
   internal::taylor_approx_t taylor_approx_best;
@@ -1126,7 +939,7 @@ inline auto pathfinder_lbfgs_single(
       }
 
       auto pathfinder_res = internal::pathfinder_impl(
-          num_evals, rng, alpha, lp_fun, constrain_fun, lbfgs.curr_x(),
+          num_evals, rng, lp_fun, constrain_fun, alpha, lbfgs.curr_x(),
           lbfgs.curr_g(), Ykt_map, Skt_map, num_elbo_draws, iter_msg, logger);
       if (pathfinder_res.first.elbo > elbo_best.elbo) {
         elbo_best = std::move(pathfinder_res.first);
@@ -1200,7 +1013,7 @@ inline auto pathfinder_lbfgs_single(
     try {
       internal::elbo_est_t est_draws = internal::est_approx_draws<false>(
           lp_fun, constrain_fun, rng, taylor_approx_best, remaining_draws,
-          taylor_approx_best.alpha, logger, path_num, num_evals);
+          taylor_approx_best.alpha, path_num, num_evals, logger);
       num_evals += est_draws.fn_calls;
       auto&& new_lp_ratio = est_draws.lp_ratio;
       auto&& lp_draws = est_draws.lp_mat;

@@ -35,7 +35,7 @@ namespace pathfinder {
  * @tparam SingleParamWriter Type inheriting from stan::callbacks::writer
  * @param[in] model defining target log density and transforms (log $p$ in
  * paper)
- * @param[in] init ($\pi_0$ in paper) var context for initialization. Random
+ * @param[in] init ($pi_0$ in paper) var context for initialization. Random
  * initial values will be generated for parameters user has not supplied.
  * @param[in] random_seed seed for the random number generator
  * @param[in] path path id to advance the pseudo random number generator
@@ -48,7 +48,7 @@ namespace pathfinder {
  * iteration
  * @param[in] tol_obj Non-negative value for convergence tolerance on absolute
  * changes in objective function value
- * @param[in] tol_rel_obj ($\tau^{rel}$ in paper) Non-negative value for
+ * @param[in] tol_rel_obj ($tau^{rel}$ in paper) Non-negative value for
  * convergence tolerance on relative changes in objective function value
  * @param[in] tol_grad Non-negative value for convergence tolerance on the norm
  * of the gradient
@@ -68,12 +68,8 @@ namespace pathfinder {
  * return
  * @param[in] num_multi_draws The number of draws to return from PSIS sampling
  * @param[in] num_paths The number of single pathfinders to run.
- * @param[in] num_eval_attempts Number of times to attempt to calculate
- * the log density of an MC draw from the approximate distribution while
- * calculating the ELBO. If this value is exceeded the MC draw for that
- * approximation will be discarded.
  * @param[in,out] logger Logger for messages
- * @param[in,out] init_writer Writer callback for unconstrained inits
+ * @param[in,out] init_writers Writer callback for unconstrained inits
  * @param[in,out] single_path_parameter_writer output for parameter values of
  * the individual pathfinder runs.
  * @param[in,out] single_path_diagnostic_writer output for diagnostics values of
@@ -85,20 +81,18 @@ namespace pathfinder {
  */
 template <class Model, typename InitContext, typename InitWriter,
           typename DiagnosticWriter, typename ParamWriter,
-          typename SingleParamWriter, typename SingleDiagnosticWriter,
-          typename TaskArena>
+          typename SingleParamWriter, typename SingleDiagnosticWriter>
 inline int pathfinder_lbfgs_multi(
     Model& model, InitContext&& init, unsigned int random_seed,
     unsigned int path, double init_radius, int history_size, double init_alpha,
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
     callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
-    int num_multi_draws, int num_eval_attempts, int num_paths,
+    int num_multi_draws, int num_paths,
     callbacks::logger& logger, InitWriter&& init_writers,
     std::vector<SingleParamWriter>& single_path_parameter_writer,
     std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
-    ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer,
-    TaskArena&& task_arena) {
+    ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
   const auto start_pathfinders_time = std::chrono::steady_clock::now();
   std::vector<std::string> param_names;
   model.constrained_param_names(param_names, true, true);
@@ -121,9 +115,9 @@ inline int pathfinder_lbfgs_multi(
                   history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
                   tol_rel_grad, tol_param, num_iterations, save_iterations,
                   refresh, interrupt, num_elbo_draws, num_draws,
-                  num_eval_attempts, logger, init_writers[iter],
+                  logger, init_writers[iter],
                   single_path_parameter_writer[iter],
-                  single_path_diagnostic_writer[iter], task_arena);
+                  single_path_diagnostic_writer[iter]);
           if (std::get<0>(pathfinder_ret) == error_codes::SOFTWARE) {
             logger.info(std::string("Pathfinder iteration: ")
                         + std::to_string(iter) + " failed.");

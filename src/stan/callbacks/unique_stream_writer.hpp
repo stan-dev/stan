@@ -22,7 +22,7 @@ class unique_stream_writer final : public writer {
    * Constructs a unique stream writer with an output stream
    * and an optional prefix for comments.
    *
-   * @param[in, out] A unique pointer to a type inheriting from `std::ostream`
+   * @param[in, out] output unique pointer to a type inheriting from `std::ostream`
    * @param[in] comment_prefix string to stream before each comment line.
    *  Default is "".
    */

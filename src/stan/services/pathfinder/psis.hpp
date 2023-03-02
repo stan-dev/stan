@@ -40,7 +40,7 @@ inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
 /**
  * Estimate parameters of the Generalized Pareto distribution
  *
- * Given a sample `x`, Estimate the parameters `k` and $\sigma$ of
+ * Given a sample `x`, Estimate the parameters `k` and $sigma$ of
  * the Generalized Pareto Distribution (GPD), assuming the location parameter is
  * 0. By default the fit uses a prior for `k`, which will stabilize
  * estimates for very small sample sizes (and low effective sample sizes in the
@@ -58,8 +58,8 @@ inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
  *
  * @details Here the parameter `k is the negative of `k` in Zhang & Stephens
  * (2009).
- *
- * @references
+ * 
+ * references:
  * Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
  * for the generalized Pareto distribution. *Technometrics* **51**, 316-325.
  */

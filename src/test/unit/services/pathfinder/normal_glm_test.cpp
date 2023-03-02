@@ -17,7 +17,7 @@
 
 // Locally tests can use threads but for jenkins we should just use 1 thread
 #ifdef LOCAL_THREADS_TEST
-auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
+auto&& threadpool_init = stan::math::init_threadpool_tbb(LOCAL_THREADS_TEST);
 #else
 auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
 #endif
@@ -74,7 +74,6 @@ TEST_F(ServicesPathfinderGLM, single) {
   constexpr double tol_param = 0;
   constexpr int num_iterations = 60;
   constexpr bool save_iterations = false;
-  constexpr int num_eval_attempts = 100;
   constexpr int refresh = 1;
   stan::test::mock_callback callback;
   stan::io::empty_var_context empty_context;  // = init_init_context();
@@ -87,7 +86,7 @@ TEST_F(ServicesPathfinderGLM, single) {
       model, empty_context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
       save_iterations, refresh, callback, num_elbo_draws, num_draws,
-      num_eval_attempts, logger, init, parameter, diagnostics, threadpool_init);
+      logger, init, parameter, diagnostics);
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
@@ -165,7 +164,6 @@ TEST_F(ServicesPathfinderGLM, multi) {
   constexpr int num_iterations = 220;
   constexpr bool save_iterations = false;
   constexpr int refresh = 0;
-  constexpr int num_eval_attempts = 10;
 
   std::ostream empty_ostream(nullptr);
   stan::test::loggy logger(empty_ostream);
@@ -181,10 +179,10 @@ TEST_F(ServicesPathfinderGLM, multi) {
       model, single_path_inits, seed, chain, init_radius, history_size,
       init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
       num_iterations, save_iterations, refresh, callback, num_elbo_draws,
-      num_draws, num_multi_draws, num_eval_attempts, num_paths, logger,
+      num_draws, num_multi_draws, num_paths, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
-      diagnostics, threadpool_init);
+      diagnostics);
 
   Eigen::MatrixXd param_vals(parameter.eigen_states_.size(),
                              parameter.eigen_states_[0].size());
@@ -192,11 +190,6 @@ TEST_F(ServicesPathfinderGLM, multi) {
     param_vals.row(i) = parameter.eigen_states_[i];
   }
   param_vals.transposeInPlace();
-  for (Eigen::Index i = 0; i < diagnostics.optim_path_.size(); ++i) {
-    Eigen::MatrixXd tmp(2, param_vals.cols() - 1);
-    tmp.row(0) = std::get<0>(diagnostics.optim_path_[i]);
-    tmp.row(1) = std::get<1>(diagnostics.optim_path_[i]);
-  }
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
 
