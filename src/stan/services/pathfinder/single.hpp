@@ -289,7 +289,7 @@ struct taylor_approx_t {
   double logdetcholHk;       // Log deteriminant of the cholesky
   Eigen::MatrixXd L_approx;  // Approximate choleskly
   Eigen::MatrixXd Qk;  // Q of the QR decompositon. Only used for sparse approx
-  Eigen::VectorXd alpha;
+  Eigen::VectorXd alpha; // diagonal of the initial inv hessian
   bool use_full;  // boolean indicationg if full or sparse approx was used.
 };
 
@@ -313,27 +313,26 @@ struct elbo_est_t {
  * time number of columns equal to 1.
  * @param u A matrix of gaussian IID samples with rows equal to the size of the
  * number of samples to be made and columns equal to the number of parameters.
- * @param taylor_approx Approximation from `construct_taylor_approximation`.
+ * @param taylor_approx Approximation from `taylor_approximation`.
  * @param alpha TODO: Define this
  * @return A matrix with rows equal to the number of samples and columns equal
  * to the number of parameters.
  */
-template <typename EigMat, typename EigVec,
+template <typename EigMat, 
           require_eigen_matrix_dynamic_t<EigMat>* = nullptr>
-inline Eigen::MatrixXd gen_draws(EigMat&& u,
-                                 const taylor_approx_t& taylor_approx,
-                                 const EigVec& alpha) {
+inline Eigen::MatrixXd approximate_samples(EigMat&& u,
+                                 const taylor_approx_t& taylor_approx) {
   if (taylor_approx.use_full) {
-    return (taylor_approx.L_approx.transpose() * u).colwise()
+    return (taylor_approx.L_approx.transpose() * std::forward<EigMat>(u)).colwise()
            + taylor_approx.x_center;
   } else {
-    return (alpha.array().sqrt().matrix().asDiagonal()
+    return (taylor_approx.alpha.array().sqrt().matrix().asDiagonal()
             * (taylor_approx.Qk
                    * (taylor_approx.L_approx
                       - Eigen::MatrixXd::Identity(
                           taylor_approx.L_approx.rows(),
                           taylor_approx.L_approx.cols()))
-                   * (taylor_approx.Qk.transpose() * u)
+                   * (taylor_approx.Qk.transpose() * u) 
                + u))
                .colwise()
            + taylor_approx.x_center;
@@ -349,21 +348,19 @@ inline Eigen::MatrixXd gen_draws(EigMat&& u,
  * time number of columns equal to 1.
  * @param u A matrix of gaussian IID samples with columns equal to the size of
  * the number of samples to be made and rows equal to the number of parameters.
- * @param taylor_approx Approximation from `construct_taylor_approximation`.
- * @param alpha TODO: Define this
+ * @param taylor_approx Approximation from `taylor_approximation`.
  * @return A matrix with columns equal to the number of samples and rows equal
  * to the number of parameters. Each column represents an approximate draw for
  * the set of parameters.
  */
 template <typename EigVec1, typename EigVec2,
           require_eigen_vector_t<EigVec1>* = nullptr>
-inline Eigen::VectorXd gen_draws(EigVec1&& u,
-                                 const taylor_approx_t& taylor_approx,
-                                 const EigVec2& alpha) {
+inline Eigen::VectorXd approximate_samples(EigVec1&& u,
+                                 const taylor_approx_t& taylor_approx) {
   if (taylor_approx.use_full) {
-    return (taylor_approx.L_approx.transpose() * u) + taylor_approx.x_center;
+    return (taylor_approx.L_approx.transpose() * std::forward<EigVec1>(u)) + taylor_approx.x_center;
   } else {
-    return (alpha.array().sqrt().matrix().asDiagonal()
+    return (taylor_approx.alpha.array().sqrt().matrix().asDiagonal()
             * (taylor_approx.Qk
                    * (taylor_approx.L_approx
                       - Eigen::MatrixXd::Identity(
@@ -383,7 +380,7 @@ inline Eigen::VectorXd gen_draws(EigVec1&& u,
  * matrix.
  * @tparam Generator A functor with a valid `operator()` used to generate the
  * samples.
- * @param variate_generator An rng generator
+ * @param[in,out] variate_generator An rng generator
  * @param num_params The runtime number of parameters
  * @param num_samples The runtime number of samples.
  *
@@ -391,7 +388,7 @@ inline Eigen::VectorXd gen_draws(EigVec1&& u,
 template <Eigen::Index RowsAtCompileTime = -1,
           Eigen::Index ColsAtCompileTime = -1, typename Generator>
 inline Eigen::Matrix<double, RowsAtCompileTime, ColsAtCompileTime>
-gen_eigen_matrix(Generator&& variate_generator, const Eigen::Index num_params,
+generate_matrix(Generator&& variate_generator, const Eigen::Index num_params,
                  const Eigen::Index num_samples) {
   return Eigen::Matrix<double, RowsAtCompileTime, ColsAtCompileTime>::
       NullaryExpr(num_params, num_samples,
@@ -412,12 +409,11 @@ gen_eigen_matrix(Generator&& variate_generator, const Eigen::Index num_params,
  * @param lp_fun Functor to calculate the log density
  * @param constrain_fun A functor to transform parameters to the constrained
  * space
- * @param rng A generator to produce standard gaussian random variables
+ * @param[in,out] rng A generator to produce standard gaussian random variables
  * @param taylor_approx The taylor approximation at this iteration of LBFGS
  * @param num_samples Number of approximate samples to generate
  * @param alpha The approximation of the diagonal hessian
  * @param iter_msg The beginning of messages that includes the iteration number
- * @param[in,out] num_evals Numbe of evaluations of log prob function.
  * @param logger A callback writer for messages
  */
 template <bool ReturnElbo = true, typename LPF, typename ConstrainF,
@@ -426,20 +422,20 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
                                    RNG&& rng,
                                    const taylor_approx_t& taylor_approx,
                                    size_t num_samples, const EigVec& alpha,
-                                   const std::string& iter_msg,
-                                   std::size_t& num_evals, Logger&& logger) {
+                                   const std::string& iter_msg, Logger&& logger) {
   boost::variate_generator<boost::ecuyer1988&, boost::normal_distribution<>>
       rand_unit_gaus(rng, boost::normal_distribution<>());
   const auto num_params = taylor_approx.x_center.size();
   size_t lp_fun_calls = 0;
-  Eigen::MatrixXd uniform_samps
-      = gen_eigen_matrix(rand_unit_gaus, num_params, num_samples);
-  Eigen::MatrixXd approx_samples(num_params, num_samples);
-  approx_samples = gen_draws(uniform_samps, taylor_approx, alpha);
-  debug::rnorm_draws(logger, approx_samples);
+  Eigen::MatrixXd unit_samps = generate_matrix(rand_unit_gaus, num_params, num_samples);
   Eigen::Array<double, -1, -1> lp_mat(num_samples, 2);
+  lp_mat.col(0) = (-taylor_approx.logdetcholHk)
+                  + -0.5
+                        * (unit_samps.array().square().colwise().sum()
+                           + num_params * stan::math::LOG_TWO_PI);
+  Eigen::MatrixXd approx_samples = approximate_samples(std::move(unit_samps), taylor_approx);
+  debug::rnorm_draws(logger, approx_samples);
   Eigen::VectorXd approx_samples_col;
-  Eigen::VectorXd approx_samples_constrained_col;
   std::stringstream pathfinder_ss;
   const auto log_stream = [](auto& logger, auto& pathfinder_ss) {
     if (pathfinder_ss.str().length() > 0) {
@@ -458,12 +454,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
       log_stream(logger, pathfinder_ss);
     }
   }
-  lp_mat.col(0) = (-taylor_approx.logdetcholHk)
-                  + -0.5
-                        * (uniform_samps.array().square().colwise().sum()
-                           + num_params * stan::math::LOG_TWO_PI);
   Eigen::Array<double, -1, 1> lp_ratio = (lp_mat.col(1)) - lp_mat.col(0);
-  num_evals += lp_fun_calls;
   if (ReturnElbo) {
     double ELBO = lp_ratio.mean();
     debug::elbo_draws(logger, taylor_approx, approx_samples, lp_mat, ELBO);
@@ -501,7 +492,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
  */
 template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
           typename EigVec, typename Logger>
-inline taylor_approx_t construct_taylor_approximation_full(
+inline taylor_approx_t taylor_approximation_full(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
     Logger&& logger) {
@@ -553,7 +544,7 @@ inline taylor_approx_t construct_taylor_approximation_full(
  */
 template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
           typename EigVec, typename Logger>
-inline auto construct_taylor_approximation_sparse(
+inline auto taylor_approximation_sparse(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
     Logger&& logger) {
@@ -633,17 +624,17 @@ inline auto construct_taylor_approximation_sparse(
  */
 template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
           typename EigVec, typename Logger>
-inline taylor_approx_t construct_taylor_approximation(
+inline taylor_approx_t taylor_approximation(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
     Logger&& logger) {
   // If twice the current history size is larger than the number of params
   // use a sparse approximation
   if (2 * Ykt_mat.cols() >= Ykt_mat.rows()) {
-    return construct_taylor_approximation_full(Ykt_mat, alpha, Dk, ninvRST,
+    return taylor_approximation_full(Ykt_mat, alpha, Dk, ninvRST,
                                                point_est, grad_est, logger);
   } else {
-    return construct_taylor_approximation_sparse(Ykt_mat, alpha, Dk, ninvRST,
+    return taylor_approximation_sparse(Ykt_mat, alpha, Dk, ninvRST,
                                                  point_est, grad_est, logger);
   }
 }
@@ -691,7 +682,6 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * @tparam ParamMat Type inheriting from `Eigen::DenseBase` with dynamic rows
  * and columns at compile time.
  * @tparam Logger Type of logger callback
- * @param[in,out] num_evals Number of calls to the log probability function.
  * @param[in,out] rng A generator to produce standard gaussian random variables
  * @param alpha The approximation of the diagonal hessian
  * @param lp_fun Functor to calculate the log density
@@ -710,7 +700,7 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
 template <typename RNG, typename LPFun, typename ConstrainFun,
           typename AlphaVec, typename CurrentParams, typename CurrentGrads,
           typename GradMat, typename ParamMat, typename Logger>
-auto pathfinder_impl(std::size_t& num_evals, RNG&& rng, LPFun&& lp_fun,
+auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun,
                      ConstrainFun&& constrain_fun, AlphaVec&& alpha,
                      CurrentParams&& current_params,
                      CurrentGrads&& current_grads, GradMat&& Ykt_mat,
@@ -737,14 +727,14 @@ for (Eigen::Index i = 0; i <= s; i++) {
     Skt_mat = -Skt_mat;
   }
   internal::taylor_approx_t taylor_appx
-      = internal::construct_taylor_approximation(
+      = internal::taylor_approximation(
           Ykt_mat, alpha, Dk, Skt_mat.transpose(), current_params,
           current_grads, logger);
   try {
     return std::make_pair(
         internal::est_approx_draws<true>(lp_fun, constrain_fun, rng,
                                          taylor_appx, num_elbo_draws, alpha,
-                                         iter_msg, num_evals, logger),
+                                         iter_msg, logger),
         taylor_appx);
   } catch (const std::exception& e) {
     logger.info(iter_msg + "ELBO estimation failed "
@@ -957,8 +947,9 @@ inline auto pathfinder_lbfgs_single(
       }
 
       auto pathfinder_res = internal::pathfinder_impl(
-          num_evals, rng, lp_fun, constrain_fun, alpha, lbfgs.curr_x(),
+          rng, lp_fun, constrain_fun, alpha, lbfgs.curr_x(),
           lbfgs.curr_g(), Ykt_map, Skt_map, num_elbo_draws, iter_msg, logger);
+      num_evals += pathfinder_res.first.fn_calls;
       if (pathfinder_res.first.elbo > elbo_best.elbo) {
         elbo_best = std::move(pathfinder_res.first);
         taylor_approx_best = std::move(pathfinder_res.second);
@@ -997,14 +988,6 @@ inline auto pathfinder_lbfgs_single(
     }
     return_code = error_codes::OK;
   }
-  const auto end_optim_time = std::chrono::steady_clock::now();
-  const double optim_delta_time
-      = std::chrono::duration_cast<std::chrono::milliseconds>(
-            end_optim_time - start_optim_time)
-            .count()
-        / 1000.0;
-  const auto start_pathfinder_time = std::chrono::steady_clock::now();
-  // NOTE: We always push the first one no matter what
   num_evals += lbfgs.grad_evals();
   if (best_E == -1) {
     logger.info(path_num +
@@ -1031,7 +1014,7 @@ inline auto pathfinder_lbfgs_single(
     try {
       internal::elbo_est_t est_draws = internal::est_approx_draws<false>(
           lp_fun, constrain_fun, rng, taylor_approx_best, remaining_draws,
-          taylor_approx_best.alpha, path_num, num_evals, logger);
+          taylor_approx_best.alpha, path_num, logger);
       num_evals += est_draws.fn_calls;
       auto&& new_lp_ratio = est_draws.lp_ratio;
       auto&& lp_draws = est_draws.lp_mat;
@@ -1097,25 +1080,15 @@ inline auto pathfinder_lbfgs_single(
   }
   parameter_writer(constrained_draws_mat.matrix());
   parameter_writer();
-  auto end_pathfinder_time = std::chrono::steady_clock::now();
-  double pathfinder_delta_time
+  const auto end_optim_time = std::chrono::steady_clock::now();
+  const double optim_delta_time
       = std::chrono::duration_cast<std::chrono::milliseconds>(
-            end_pathfinder_time - start_pathfinder_time)
+            end_optim_time - start_optim_time)
             .count()
         / 1000.0;
   const auto time_header = std::string("Elapsed Time: ");
   std::string optim_time_str
-      = time_header + std::to_string(optim_delta_time) + " seconds (lbfgs)";
-  parameter_writer(optim_time_str);
-  std::string pathfinder_time_str = std::string(time_header.size(), ' ')
-                                    + std::to_string(pathfinder_delta_time)
-                                    + " seconds (Pathfinder)";
-  parameter_writer(pathfinder_time_str);
-  std::string total_time_str
-      = std::string(time_header.size(), ' ')
-        + std::to_string(optim_delta_time + pathfinder_delta_time)
-        + " seconds (Total)";
-  parameter_writer(total_time_str);
+      = time_header + std::to_string(optim_delta_time) + " seconds (Pathfinder)";
   parameter_writer();
   return internal::ret_pathfinder<ReturnLpSamples>(
       error_codes::OK, std::move(lp_ratio), std::move(constrained_draws_mat),

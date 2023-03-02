@@ -164,7 +164,6 @@ inline int pathfinder_lbfgs_multi(
         = individual_samples[iter];
     filling_start_row += individ_num_samples;
   }
-
   const auto tail_len = std::min(0.2 * num_returned_samples,
                                  3 * std::sqrt(num_returned_samples));
   Eigen::Array<double, -1, 1> weight_vals

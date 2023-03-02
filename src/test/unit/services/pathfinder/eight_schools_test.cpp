@@ -119,8 +119,10 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   all_mean_vals.row(0) = mean_vals;
   all_mean_vals.row(1) = r_mean_vals;
   all_mean_vals.row(2) = mean_vals - r_mean_vals;
+#ifdef LOCAL_THREADS_TEST
   std::cout << "all means: \n"
             << all_mean_vals.format(CommaInitFmt) << std::endl;
+#endif
   // This samples badly, but is a known issue with initialization.
   for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
     EXPECT_NEAR(0, all_mean_vals(2, i), 1);
@@ -129,7 +131,9 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = r_sd_vals;
   all_sd_vals.row(2) = sd_vals - r_sd_vals;
+#ifdef LOCAL_THREADS_TEST
   std::cout << "all sd: \n" << all_sd_vals.format(CommaInitFmt) << std::endl;
+#endif
   for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
     EXPECT_NEAR(0, all_sd_vals(2, i), 2);
   }
@@ -252,8 +256,10 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   all_mean_vals.row(0) = mean_vals;
   all_mean_vals.row(1) = mean_r_vals;
   all_mean_vals.row(2) = mean_vals - mean_r_vals;
+#ifdef LOCAL_THREADS_TEST
   std::cout << "all means: \n"
             << all_mean_vals.format(CommaInitFmt) << std::endl;
+#endif
   // Single pathfinder can do very badly for eight schools
   for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
     EXPECT_NEAR(0, all_mean_vals(2, i), 100);
@@ -263,7 +269,9 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = sd_r_vals;
   all_sd_vals.row(2) = sd_vals - sd_r_vals;
+#ifdef LOCAL_THREADS_TEST
   std::cout << "all sds: \n" << all_sd_vals.format(CommaInitFmt) << std::endl;
+#endif
   for (Eigen::Index i = 0; i < all_sd_vals.cols(); i++) {
     EXPECT_NEAR(0, all_sd_vals(2, i), 100);
   }
