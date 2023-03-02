@@ -123,17 +123,17 @@ class json_data_handler : public stan::json::json_handler {
   vars_map_r& vars_r;
   vars_map_i& vars_i;
   std::vector<std::string> key_stack;
-  std::map<std::string, int> var_types_map;  // vars_r and vars_i entries
+  std::map<std::string, int> var_types_map;   // vars_r and vars_i entries
   std::map<std::string, int> slot_types_map;  // all slots all vars parsed
   std::map<std::string, array_dims> slot_dims_map;
   std::map<std::string, tuple_slots> tuple_slots_map;
   std::map<std::string, bool> int_slots_map;
   std::vector<double> values_r;  // accumulates real var values
-  std::vector<int> values_i;  // accumulates int var values
-  size_t array_start_i;  // index into values_i
-  size_t array_start_r;  // index into values_r
-  int event;  // tracks most recent meta_event
-  bool is_stan_var;  // allow non-Stan entries in JSON object
+  std::vector<int> values_i;     // accumulates int var values
+  size_t array_start_i;          // index into values_i
+  size_t array_start_r;          // index into values_r
+  int event;                     // tracks most recent meta_event
+  bool is_stan_var;              // allow non-Stan entries in JSON object
 
   void reset_values() {
     // Once var values have been copied into var_context maps,
@@ -508,18 +508,19 @@ class json_data_handler : public stan::json::json_handler {
           outer.dims_acc[outer.dims.size() - 1]++;
           set_outer_dims(outer);
         }
-      if (tuple_slots_map.count(tuple) == 0)
-        unexpected_error(tuple, "found close object, not a tuple var");
-      if (tuple_slots_map[tuple].is_first) {
-        tuple_slots_map[tuple].is_first = false;
-      } else {
-        if (tuple_slots_map[tuple].slots_acc != tuple_slots_map[tuple].slots) {
-          std::stringstream errorMsg;
-          errorMsg << "Variable " << tuple
-                   << ": size mismatch between tuple elements.";
-          throw json_error(errorMsg.str());
+        if (tuple_slots_map.count(tuple) == 0)
+          unexpected_error(tuple, "found close object, not a tuple var");
+        if (tuple_slots_map[tuple].is_first) {
+          tuple_slots_map[tuple].is_first = false;
+        } else {
+          if (tuple_slots_map[tuple].slots_acc
+              != tuple_slots_map[tuple].slots) {
+            std::stringstream errorMsg;
+            errorMsg << "Variable " << tuple
+                     << ": size mismatch between tuple elements.";
+            throw json_error(errorMsg.str());
+          }
         }
-      }
       }
     }
     save_key_value_pair();
