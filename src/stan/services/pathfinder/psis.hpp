@@ -58,7 +58,7 @@ inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
  *
  * @details Here the parameter `k is the negative of `k` in Zhang & Stephens
  * (2009).
- * 
+ *
  * references:
  * Zhang, J., and Stephens, M. A. (2009). A new and efficient estimation method
  * for the generalized Pareto distribution. *Technometrics* **51**, 316-325.

@@ -244,7 +244,6 @@ inline Eigen::MatrixXd tcrossprod(T1&& x) {
       .rankUpdate(std::forward<T1>(x));
 }
 
-
 template <typename EigVec, stan::require_eigen_vector_t<EigVec>* = nullptr,
           typename Logger>
 inline bool check_curve(const EigVec& Yk, const EigVec& Sk, Logger&& logger) {
@@ -328,10 +327,16 @@ inline Eigen::MatrixXd gen_draws(EigMat&& u,
     return (taylor_approx.L_approx.transpose() * u).colwise()
            + taylor_approx.x_center;
   } else {
-    return (alpha.array().sqrt().matrix().asDiagonal() * 
-     (taylor_approx.Qk * (taylor_approx.L_approx - 
-      Eigen::MatrixXd::Identity(taylor_approx.L_approx.rows(), taylor_approx.L_approx.cols())) *
-      (taylor_approx.Qk.transpose() * u) + u)).colwise() + taylor_approx.x_center;
+    return (alpha.array().sqrt().matrix().asDiagonal()
+            * (taylor_approx.Qk
+                   * (taylor_approx.L_approx
+                      - Eigen::MatrixXd::Identity(
+                          taylor_approx.L_approx.rows(),
+                          taylor_approx.L_approx.cols()))
+                   * (taylor_approx.Qk.transpose() * u)
+               + u))
+               .colwise()
+           + taylor_approx.x_center;
   }
 }
 
@@ -347,7 +352,8 @@ inline Eigen::MatrixXd gen_draws(EigMat&& u,
  * @param taylor_approx Approximation from `construct_taylor_approximation`.
  * @param alpha TODO: Define this
  * @return A matrix with columns equal to the number of samples and rows equal
- * to the number of parameters. Each column represents an approximate draw for the set of parameters.
+ * to the number of parameters. Each column represents an approximate draw for
+ * the set of parameters.
  */
 template <typename EigVec1, typename EigVec2,
           require_eigen_vector_t<EigVec1>* = nullptr>
@@ -357,10 +363,15 @@ inline Eigen::VectorXd gen_draws(EigVec1&& u,
   if (taylor_approx.use_full) {
     return (taylor_approx.L_approx.transpose() * u) + taylor_approx.x_center;
   } else {
-    return (alpha.array().sqrt().matrix().asDiagonal() * 
-     (taylor_approx.Qk * (taylor_approx.L_approx - 
-      Eigen::MatrixXd::Identity(taylor_approx.L_approx.rows(), taylor_approx.L_approx.cols())) *
-      (taylor_approx.Qk.transpose() * u) + u)) + taylor_approx.x_center;
+    return (alpha.array().sqrt().matrix().asDiagonal()
+            * (taylor_approx.Qk
+                   * (taylor_approx.L_approx
+                      - Eigen::MatrixXd::Identity(
+                          taylor_approx.L_approx.rows(),
+                          taylor_approx.L_approx.cols()))
+                   * (taylor_approx.Qk.transpose() * u)
+               + u))
+           + taylor_approx.x_center;
   }
 }
 
@@ -389,7 +400,7 @@ gen_eigen_matrix(Generator&& variate_generator, const Eigen::Index num_params,
 
 /**
  * Estimate the approximate draws given the taylor approximation.
- * 
+ *
  * @tparam ReturnElbo If true, calculate ELBO and return it in `elbo_est_t`. If
  * `false` ELBO is set in the return as `-Infinity`
  * @tparam LPF Type of log probability functor
@@ -443,8 +454,8 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
       lp_mat.coeffRef(i, 1) = lp_fun(approx_samples_col, pathfinder_ss);
       log_stream(logger, pathfinder_ss);
     } catch (const std::exception& e) {
-        lp_mat.coeffRef(i, 1) = -std::numeric_limits<double>::infinity();
-        log_stream(logger, pathfinder_ss);
+      lp_mat.coeffRef(i, 1) = -std::numeric_limits<double>::infinity();
+      log_stream(logger, pathfinder_ss);
     }
   }
   lp_mat.col(0) = (-taylor_approx.logdetcholHk)
@@ -467,7 +478,8 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
 
 /**
  * Construct the full taylor approximation
- * @tparam GradMat Type inheriting from `Eigen::DenseBase` with compile time dynamic rows and columns
+ * @tparam GradMat Type inheriting from `Eigen::DenseBase` with compile time
+ * dynamic rows and columns
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam DkVec Type inheriting from `Eigen::DenseBase` with 1 compile time
@@ -477,7 +489,8 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
  * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam Logger Type inheriting from `stan::io::logger`
- * @param Ykt_mat Matrix of the changes to the gradient with column length of history size.
+ * @param Ykt_mat Matrix of the changes to the gradient with column length of
+ * history size.
  * @param alpha The diagonal of the approximate hessian
  * @param Dk vector of Columnwise products of parameter and gradients with size
  * equal to history size
@@ -486,8 +499,8 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
  * @param grad_est The gradients for the given iteration of LBFGS
  * @param logger used for printing out debug values
  */
-template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat, typename EigVec,
-          typename Logger>
+template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
+          typename EigVec, typename Logger>
 inline taylor_approx_t construct_taylor_approximation_full(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
@@ -496,15 +509,16 @@ inline taylor_approx_t construct_taylor_approximation_full(
   Eigen::MatrixXd y_tcrossprod_alpha = tcrossprod(
       Ykt_mat.transpose() * alpha.array().sqrt().matrix().asDiagonal());
   /*
-   * + DK.asDiagonal() cannot be done one same line 
+   * + DK.asDiagonal() cannot be done one same line
    * See https://forum.kde.org/viewtopic.php?f=74&t=136617
    */
   y_tcrossprod_alpha += Dk.asDiagonal();
   const auto dk_min_size
       = std::min(y_tcrossprod_alpha.rows(), y_tcrossprod_alpha.cols());
   Eigen::MatrixXd y_mul_alpha = Ykt_mat.transpose() * alpha.asDiagonal();
-  Eigen::MatrixXd Hk = y_mul_alpha.transpose() * ninvRST
-                       + ninvRST.transpose() * (y_mul_alpha + y_tcrossprod_alpha * ninvRST);
+  Eigen::MatrixXd Hk
+      = y_mul_alpha.transpose() * ninvRST
+        + ninvRST.transpose() * (y_mul_alpha + y_tcrossprod_alpha * ninvRST);
   Hk += alpha.asDiagonal();
   Eigen::MatrixXd L_hk = Hk.llt().matrixL().transpose();
   double logdetcholHk = L_hk.diagonal().array().abs().log().sum();
@@ -516,7 +530,8 @@ inline taylor_approx_t construct_taylor_approximation_full(
 
 /**
  * Construct the sparse taylor approximation
- * @tparam GradMat Type inheriting from `Eigen::DenseBase` with compile time dynamic rows and columns
+ * @tparam GradMat Type inheriting from `Eigen::DenseBase` with compile time
+ * dynamic rows and columns
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam DkVec Type inheriting from `Eigen::DenseBase` with 1 compile time
@@ -526,7 +541,8 @@ inline taylor_approx_t construct_taylor_approximation_full(
  * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam Logger Type inheriting from `stan::io::logger`
- * @param Ykt_mat Matrix of the changes to the gradient with column length of history size.
+ * @param Ykt_mat Matrix of the changes to the gradient with column length of
+ * history size.
  * @param alpha The diagonal of the approximate hessian
  * @param Dk vector of Columnwise products of parameter and gradients with size
  * equal to history size
@@ -536,7 +552,7 @@ inline taylor_approx_t construct_taylor_approximation_full(
  * @param logger used for printing out debug values
  */
 template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
- typename EigVec, typename Logger>
+          typename EigVec, typename Logger>
 inline auto construct_taylor_approximation_sparse(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
@@ -594,7 +610,8 @@ inline auto construct_taylor_approximation_sparse(
 
 /**
  * Construct the taylor approximation.
- * @tparam GradMat Type inheriting from `Eigen::DenseBase` with compile time dynamic rows and columns
+ * @tparam GradMat Type inheriting from `Eigen::DenseBase` with compile time
+ * dynamic rows and columns
  * @tparam AlphaVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam DkVec Type inheriting from `Eigen::DenseBase` with 1 compile time
@@ -604,7 +621,8 @@ inline auto construct_taylor_approximation_sparse(
  * @tparam EigVec Type inheriting from `Eigen::DenseBase` with 1 compile time
  * column
  * @tparam Logger Type inheriting from `stan::io::logger`
- * @param Ykt_mat Matrix of the changes to the gradient with column length of history size.
+ * @param Ykt_mat Matrix of the changes to the gradient with column length of
+ * history size.
  * @param alpha The diagonal of the approximate hessian
  * @param Dk vector of Columnwise products of parameter and gradients with size
  * equal to history size
@@ -613,8 +631,8 @@ inline auto construct_taylor_approximation_sparse(
  * @param grad_est The gradients for the given iteration of LBFGS
  * @param logger used for printing out debug values
  */
-template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat, typename EigVec,
-          typename Logger>
+template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
+          typename EigVec, typename Logger>
 inline taylor_approx_t construct_taylor_approximation(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est,
@@ -682,8 +700,9 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * @param current_params Parameters from iteration of LBFGS
  * @param current_grads Gradients from iteration of LBFGS
  * @param Ykt_mat Matrix of the last `history_size` changes in the gradient.
- * @param[in,out] Skt_mat Matrix of the last `history_size` changes in the parameters.
- *  `Skt_mat` is transformed in this function and will hold inverse solution of RS^T
+ * @param[in,out] Skt_mat Matrix of the last `history_size` changes in the
+ * parameters. `Skt_mat` is transformed in this function and will hold inverse
+ * solution of RS^T
  * @param num_elbo_draws Number of draws for the ELBO estimation
  * @param iter_msg The beginning of messages that includes the iteration number
  * @param logger A callback writer for messages
@@ -691,8 +710,8 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
 template <typename RNG, typename LPFun, typename ConstrainFun,
           typename AlphaVec, typename CurrentParams, typename CurrentGrads,
           typename GradMat, typename ParamMat, typename Logger>
-auto pathfinder_impl(std::size_t& num_evals, RNG&& rng, 
-                     LPFun&& lp_fun, ConstrainFun&& constrain_fun, AlphaVec&& alpha,
+auto pathfinder_impl(std::size_t& num_evals, RNG&& rng, LPFun&& lp_fun,
+                     ConstrainFun&& constrain_fun, AlphaVec&& alpha,
                      CurrentParams&& current_params,
                      CurrentGrads&& current_grads, GradMat&& Ykt_mat,
                      ParamMat&& Skt_mat, std::size_t num_elbo_draws,
@@ -792,9 +811,8 @@ inline auto pathfinder_lbfgs_single(
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
     callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
-    callbacks::logger& logger,
-    callbacks::writer& init_writer, ParamWriter& parameter_writer,
-    DiagnosticWriter& diagnostic_writer) {
+    callbacks::logger& logger, callbacks::writer& init_writer,
+    ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
   const auto start_optim_time = std::chrono::steady_clock::now();
   boost::ecuyer1988 rng
       = util::create_rng<boost::ecuyer1988>(random_seed, path);

@@ -112,14 +112,15 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
       -0.244868, -0.227134, 0.504507, 0.0476979, 3.66491, 2.57979, 1.21644,
       2.81399, 1.53776, 1.39865, 3.99508, 2.41488, -17.9537, -47.016;
   Eigen::RowVectorXd r_sd_vals(20);
-  r_sd_vals << 1.93964, 4.77042, 0.95799, 0.842812, 0.963455, 0.948548,
-      1.03149, 0.989, 0.920778, 0.888529, 4.6405, 3.63071, 4.25895, 4.45198,
-      3.90755, 4.23075, 4.56257, 4.22915, 4.37932, 2.28608;
+  r_sd_vals << 1.93964, 4.77042, 0.95799, 0.842812, 0.963455, 0.948548, 1.03149,
+      0.989, 0.920778, 0.888529, 4.6405, 3.63071, 4.25895, 4.45198, 3.90755,
+      4.23075, 4.56257, 4.22915, 4.37932, 2.28608;
   Eigen::MatrixXd all_mean_vals(3, 20);
   all_mean_vals.row(0) = mean_vals;
   all_mean_vals.row(1) = r_mean_vals;
   all_mean_vals.row(2) = mean_vals - r_mean_vals;
-  std::cout << "all means: \n" << all_mean_vals.format(CommaInitFmt) << std::endl; 
+  std::cout << "all means: \n"
+            << all_mean_vals.format(CommaInitFmt) << std::endl;
   // This samples badly, but is a known issue with initialization.
   for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
     EXPECT_NEAR(0, all_mean_vals(2, i), 1);
@@ -128,7 +129,7 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = r_sd_vals;
   all_sd_vals.row(2) = sd_vals - r_sd_vals;
-  std::cout << "all sd: \n" << all_sd_vals.format(CommaInitFmt) << std::endl; 
+  std::cout << "all sd: \n" << all_sd_vals.format(CommaInitFmt) << std::endl;
   for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
     EXPECT_NEAR(0, all_sd_vals(2, i), 2);
   }
@@ -156,8 +157,8 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
       model, context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
-      save_iterations, refresh, callback, num_elbo_draws, num_draws,
-      logger, init, parameter, diagnostics);
+      save_iterations, refresh, callback, num_elbo_draws, num_draws, logger,
+      init, parameter, diagnostics);
 
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
@@ -251,7 +252,8 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   all_mean_vals.row(0) = mean_vals;
   all_mean_vals.row(1) = mean_r_vals;
   all_mean_vals.row(2) = mean_vals - mean_r_vals;
-  std::cout << "all means: \n" << all_mean_vals.format(CommaInitFmt) << std::endl; 
+  std::cout << "all means: \n"
+            << all_mean_vals.format(CommaInitFmt) << std::endl;
   // Single pathfinder can do very badly for eight schools
   for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
     EXPECT_NEAR(0, all_mean_vals(2, i), 100);
@@ -261,9 +263,8 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = sd_r_vals;
   all_sd_vals.row(2) = sd_vals - sd_r_vals;
-  std::cout << "all sds: \n" << all_sd_vals.format(CommaInitFmt) << std::endl; 
+  std::cout << "all sds: \n" << all_sd_vals.format(CommaInitFmt) << std::endl;
   for (Eigen::Index i = 0; i < all_sd_vals.cols(); i++) {
     EXPECT_NEAR(0, all_sd_vals(2, i), 100);
   }
-
 }

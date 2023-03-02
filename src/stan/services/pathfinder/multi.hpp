@@ -88,8 +88,8 @@ inline int pathfinder_lbfgs_multi(
     double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
     double tol_param, int num_iterations, bool save_iterations, int refresh,
     callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
-    int num_multi_draws, int num_paths,
-    callbacks::logger& logger, InitWriter&& init_writers,
+    int num_multi_draws, int num_paths, callbacks::logger& logger,
+    InitWriter&& init_writers,
     std::vector<SingleParamWriter>& single_path_parameter_writer,
     std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
@@ -114,9 +114,8 @@ inline int pathfinder_lbfgs_multi(
                   model, *(init[iter]), random_seed, path + iter, init_radius,
                   history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
                   tol_rel_grad, tol_param, num_iterations, save_iterations,
-                  refresh, interrupt, num_elbo_draws, num_draws,
-                  logger, init_writers[iter],
-                  single_path_parameter_writer[iter],
+                  refresh, interrupt, num_elbo_draws, num_draws, logger,
+                  init_writers[iter], single_path_parameter_writer[iter],
                   single_path_diagnostic_writer[iter]);
           if (std::get<0>(pathfinder_ret) == error_codes::SOFTWARE) {
             logger.info(std::string("Pathfinder iteration: ")

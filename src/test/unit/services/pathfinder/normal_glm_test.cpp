@@ -85,8 +85,8 @@ TEST_F(ServicesPathfinderGLM, single) {
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
       model, empty_context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
-      save_iterations, refresh, callback, num_elbo_draws, num_draws,
-      logger, init, parameter, diagnostics);
+      save_iterations, refresh, callback, num_elbo_draws, num_draws, logger,
+      init, parameter, diagnostics);
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
                                "", "");
