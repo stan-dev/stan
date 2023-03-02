@@ -184,7 +184,7 @@ class json_data_handler : public stan::json::json_handler {
     }
     key = boost::algorithm::join(keys, ".");
     if (slot_dims_map.count(key) != 1)
-      unexpected_error(key);
+      unexpected_error(key, "not an array");
     return slot_dims_map[key];
   }
 
@@ -200,7 +200,7 @@ class json_data_handler : public stan::json::json_handler {
     }
     if (stack.empty()) {
       key = boost::algorithm::join(key_stack, ".");
-      unexpected_error(key);
+      unexpected_error(key, "ill-formed array");
     }
     slot_dims_map[key] = update;
   }
@@ -226,7 +226,7 @@ class json_data_handler : public stan::json::json_handler {
       return;
     std::string key = key_str();
     if (slot_types_map.count(key) < 1)
-      unexpected_error(key);
+      unexpected_error(key, "unknown variable");
     if (slot_types_map[key] == meta_type::SCALAR
         || slot_types_map[key] == meta_type::ARRAY) {
       bool is_new = (vars_r.count(key) == 0 && vars_i.count(key) == 0);
@@ -259,8 +259,18 @@ class json_data_handler : public stan::json::json_handler {
           vars_r[key] = pair;
         }
       } else {
-        if (slot_types_map[key_stack[0]] != meta_type::ARRAY_OF_TUPLES)
-          unexpected_error(key);
+        bool is_aot = false;
+        std::string vname;
+        for (auto& key : key_stack) {
+          vname.append(key);
+          if (slot_types_map[vname] == meta_type::ARRAY_OF_TUPLES) {
+            is_aot = true;
+            break;
+          }
+          vname.append(".");
+        }
+        if (!is_aot)
+          unexpected_error(key, "not array of tuples");
         bool consistent = true;
         if (is_int || was_int) {
           auto expect_dims = vars_i[key].second;
@@ -370,9 +380,10 @@ class json_data_handler : public stan::json::json_handler {
     }
   }
 
-  void unexpected_error(std::string where) {
+  void unexpected_error(const std::string& where,
+                        const std::string& what) {
     std::stringstream errorMsg;
-    errorMsg << "Variable " << where << " ill-formed data.";
+    errorMsg << "Variable " << where << ", " << what << ".";
     throw json_error(errorMsg.str());
   }
 
@@ -523,7 +534,7 @@ class json_data_handler : public stan::json::json_handler {
     if (slot_types_map[key] == meta_type::SCALAR)
       slot_types_map[key] = meta_type::ARRAY;
     else if (slot_types_map[key] == meta_type::TUPLE)
-      unexpected_error(key);
+      unexpected_error(key, "ill-formed tuple");
     array_dims dims;
     if (slot_dims_map.count(key) == 1)
       dims = slot_dims_map[key];
@@ -547,7 +558,7 @@ class json_data_handler : public stan::json::json_handler {
    */
   void end_array() {
     if (slot_dims_map.count(key_str()) == 0)
-      unexpected_error(key_str());
+      unexpected_error(key_str(), "ill-formed array");
     std::string key(key_str());
     array_dims dims = slot_dims_map[key];
     int idx = dims.cur_dim - 1;

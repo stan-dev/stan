@@ -189,3 +189,15 @@ TEST(ioJson, jsonData_array_tuple_multi) {
   std::vector<size_t> expected_dims_x2 = {2};
   test_int_var(jdata, "x.2", expected_vals_x2, expected_dims_x2);
 }
+
+TEST(ioJson, jsonData_tuple_arr_tuple) {
+  std::vector<std::string> json_path;
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "tuple_arr_tuple.json"};
+  std::string filename = paths_to_fname(json_path);
+  std::ifstream in(filename);
+  stan::json::json_data jdata(in);
+  std::vector<int> expected_vals_t2 = {3};
+  std::vector<size_t> expected_dims_t2;
+  test_int_var(jdata, "tuple_arr_tuple.2", expected_vals_t2, expected_dims_t2);
+}
