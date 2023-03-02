@@ -284,7 +284,8 @@ class json_data_handler : public stan::json::json_handler {
         }
         if (!consistent) {
           std::stringstream errorMsg;
-          errorMsg << "Variable " << key << ": size mismatch between tuple elements.";
+          errorMsg << "Variable " << key
+                   << ": size mismatch between tuple elements.";
           throw json_error(errorMsg.str());
         }
         var_types_map[key] = meta_type::ARRAY;
@@ -493,10 +494,11 @@ class json_data_handler : public stan::json::json_handler {
       // if (tuple_slots_map[tuple].is_first) {
       //   tuple_slots_map[tuple].is_first = false;
       // } else {
-      //   if (tuple_slots_map[tuple].slots_acc != tuple_slots_map[tuple].slots) {
+      //   if (tuple_slots_map[tuple].slots_acc != tuple_slots_map[tuple].slots)
+      //   {
       //     std::stringstream errorMsg;
-      //     errorMsg << "Variable " << tuple << ": size mismatch between tuple elements.";
-      //     throw json_error(errorMsg.str());
+      //     errorMsg << "Variable " << tuple << ": size mismatch between tuple
+      //     elements."; throw json_error(errorMsg.str());
       //   }
       //   tuple_slots_map[tuple].slots_acc = 0;
       // }
