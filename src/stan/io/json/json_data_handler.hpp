@@ -116,8 +116,9 @@ class tuple_slots {
  * are of the same shape.  To do this we track the number of slots in the tuple
  * as well as the dimensions of any array slots in the tuple.
  *
- * The JSON object can have non-Stan variable entries.  The handler will
- * ignore these entries.
+ * If the top-level object entry key is not a legal Stan variable name
+ * the handler will not check the corresponding value, other than maintining
+ * the event state and key_stack.
  */
 class json_data_handler : public stan::json::json_handler {
  private:
@@ -134,7 +135,7 @@ class json_data_handler : public stan::json::json_handler {
   size_t array_start_i;  // index into values_i
   size_t array_start_r;  // index into values_r
   int event;  // tracks most recent meta_event
-  bool not_stan_var;  // allow non-Stan entries in JSON object
+  bool not_stan_var;  // accept non-Stan entries
 
   void reset_values() {
     // Once var values have been copied into var_context maps,
@@ -167,9 +168,12 @@ class json_data_handler : public stan::json::json_handler {
             && int_slots_map.empty());
   }
 
-  bool invalid_varname(const std::string& name)   {
+  /** Stan variable names must start with a letter
+   *  and contain only letters, numbers, or an underscore.
+   */
+  bool valid_varname(const std::string& name)   {
     static const boost::regex re("[a-zA-Z][a-zA-Z0-9_]*");
-    return !regex_match(name, re);
+    return regex_match(name, re);
   }
 
   bool is_array_tuples(const std::vector<std::string>& keys) {
@@ -461,7 +465,7 @@ class json_data_handler : public stan::json::json_handler {
     std::string outer = key_str();
     key_stack.push_back(key);
     if (key_stack.size() == 1) {
-      not_stan_var = invalid_varname(key);
+      not_stan_var = !valid_varname(key);
     }
     if (not_stan_var)
       return;
