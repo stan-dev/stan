@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 
 // tuple(int, real) x - also real y;
-TEST(ioJson, jsonData_tuple_int_real) {
+TEST(ioJsonTuples, jsonData_tuple_int_real) {
   std::vector<std::string> json_path;
   json_path
       = {"src", "test", "unit", "io", "test_json_files", "tuple_int_real.json"};
@@ -30,7 +30,7 @@ TEST(ioJson, jsonData_tuple_int_real) {
 }
 
 // tuple(real, (int, real)) x;
-TEST(ioJson, jsonData_tuple_nested) {
+TEST(ioJsonTuples, jsonData_tuple_nested) {
   std::vector<std::string> json_path;
   json_path
       = {"src", "test", "unit", "io", "test_json_files", "tuple_nested.json"};
@@ -52,7 +52,7 @@ TEST(ioJson, jsonData_tuple_nested) {
   test_real_var(jdata, "y", expected_vals_r, expected_dims);
 }
 
-TEST(ioJson, jsonData_array_tuple_arrays) {
+TEST(ioJsonTuples, jsonData_array_tuple_arrays) {
   std::vector<std::string> json_path;
   json_path = {"src",
                "test",
@@ -89,7 +89,7 @@ TEST(ioJson, jsonData_array_tuple_arrays) {
   test_real_var(jdata, "z.4", expected_vals_z4, expected_dims_z4);
 }
 
-TEST(ioJson, jsonData_array_tuple_1d_tuple_1d_real) {
+TEST(ioJsonTuples, jsonData_array_tuple_1d_tuple_1d_real) {
   std::vector<std::string> json_path;
   json_path = {"src",
                "test",
@@ -119,7 +119,7 @@ TEST(ioJson, jsonData_array_tuple_1d_tuple_1d_real) {
 }
 
 // array[2, 2] (array[3] real, real) x;
-TEST(ioJson, jsonData_d2_array_tuple_1d_real) {
+TEST(ioJsonTuples, jsonData_d2_array_tuple_1d_real) {
   std::vector<std::string> json_path;
   json_path = {"src",
                "test",
@@ -146,7 +146,7 @@ TEST(ioJson, jsonData_d2_array_tuple_1d_real) {
 }
 
 // // (array[2, 2, 3] real, array[2, 2] real) x;
-TEST(ioJson, jsonData_tuple_array_3d_array_2d) {
+TEST(ioJsonTuples, jsonData_tuple_array_3d_array_2d) {
   std::vector<std::string> json_path;
   json_path = {
       "src", "test", "unit", "io", "test_json_files", "tuple_array_3d_2d.json"};
@@ -168,7 +168,7 @@ TEST(ioJson, jsonData_tuple_array_3d_array_2d) {
   test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
 }
 
-TEST(ioJson, jsonData_array_tuple_multi) {
+TEST(ioJsonTuples, jsonData_array_tuple_multi) {
   std::vector<std::string> json_path;
   json_path = {
       "src", "test", "unit", "io", "test_json_files", "array_tuple_multi.json"};
@@ -190,7 +190,7 @@ TEST(ioJson, jsonData_array_tuple_multi) {
   test_int_var(jdata, "x.2", expected_vals_x2, expected_dims_x2);
 }
 
-TEST(ioJson, jsonData_tuple_arr_tuple) {
+TEST(ioJsonTuples, jsonData_tuple_arr_tuple) {
   std::vector<std::string> json_path;
   json_path = {
       "src", "test", "unit", "io", "test_json_files", "tuple_arr_tuple.json"};
@@ -200,4 +200,37 @@ TEST(ioJson, jsonData_tuple_arr_tuple) {
   std::vector<int> expected_vals_t2 = {3};
   std::vector<size_t> expected_dims_t2;
   test_int_var(jdata, "tuple_arr_tuple.2", expected_vals_t2, expected_dims_t2);
+}
+
+// json file with non-stan entries
+TEST(ioJsonTuples, jsonData_plus_comments_1) {
+  std::vector<std::string> json_path;
+  json_path = {"src",
+               "test",
+               "unit",
+               "io",
+               "test_json_files",
+               "not_stan_varname.json"};
+  std::string filename = paths_to_fname(json_path);
+  std::ifstream in(filename);
+  stan::json::json_data jdata(in);
+  std::vector<int> expected_vals_x1 = {1};
+  std::vector<size_t> expected_dims_x1;
+  test_int_var(jdata, "x.1", expected_vals_x1, expected_dims_x1);
+}
+
+TEST(ioJsonTuples, jsonData_plus_comments_2) {
+  std::vector<std::string> json_path;
+  json_path = {"src",
+               "test",
+               "unit",
+               "io",
+               "test_json_files",
+               "vars_plus_comments.json"};
+  std::string filename = paths_to_fname(json_path);
+  std::ifstream in(filename);
+  stan::json::json_data jdata(in);
+  std::vector<double> expected_vals_y = {3.214};
+  std::vector<size_t> expected_dims_y;
+  test_real_var(jdata, "y", expected_vals_y, expected_dims_y);
 }
