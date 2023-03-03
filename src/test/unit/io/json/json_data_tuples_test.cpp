@@ -205,12 +205,8 @@ TEST(ioJsonTuples, jsonData_tuple_arr_tuple) {
 // json file with non-stan entries
 TEST(ioJsonTuples, jsonData_plus_comments_1) {
   std::vector<std::string> json_path;
-  json_path = {"src",
-               "test",
-               "unit",
-               "io",
-               "test_json_files",
-               "not_stan_varname.json"};
+  json_path = {
+      "src", "test", "unit", "io", "test_json_files", "not_stan_varname.json"};
   std::string filename = paths_to_fname(json_path);
   std::ifstream in(filename);
   stan::json::json_data jdata(in);
