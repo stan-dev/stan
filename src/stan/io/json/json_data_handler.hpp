@@ -130,11 +130,11 @@ class json_data_handler : public stan::json::json_handler {
   std::map<std::string, tuple_slots> tuple_slots_map;
   std::map<std::string, bool> int_slots_map;
   std::vector<double> values_r;  // accumulates real var values
-  std::vector<int> values_i;  // accumulates int var values
-  size_t array_start_i;  // index into values_i
-  size_t array_start_r;  // index into values_r
-  int event;  // tracks most recent meta_event
-  bool not_stan_var;  // allow non-Stan entries in JSON object
+  std::vector<int> values_i;     // accumulates int var values
+  size_t array_start_i;          // index into values_i
+  size_t array_start_r;          // index into values_r
+  int event;                     // tracks most recent meta_event
+  bool not_stan_var;             // allow non-Stan entries in JSON object
 
   void reset_values() {
     // Once var values have been copied into var_context maps,
@@ -167,7 +167,7 @@ class json_data_handler : public stan::json::json_handler {
             && int_slots_map.empty());
   }
 
-  bool invalid_varname(const std::string& name)   {
+  bool invalid_varname(const std::string& name) {
     static const boost::regex re("[a-zA-Z][a-zA-Z0-9_]*");
     return !regex_match(name, re);
   }
