@@ -316,8 +316,8 @@ TEST(ioJson, jsonData_empty_2D_array_0_0) {
   expected_dims.push_back(0);
   test_empty_int_arr(jdata, "foo", expected_vals_i);
   EXPECT_NO_THROW(jdata.validate_dims("test", "foo", "int", expected_dims));
-  EXPECT_NO_THROW(jdata.validate_dims("test", "foo.2", "double", expected_dims));
-
+  EXPECT_NO_THROW(
+      jdata.validate_dims("test", "foo.2", "double", expected_dims));
 }
 
 TEST(ioJson, jsonData_x_3d_y_2d_z_0d) {
