@@ -19,7 +19,7 @@ class unit_e_static_uniform
  public:
   unit_e_static_uniform(const Model& model, BaseRNG& rng)
       : base_static_uniform<Model, unit_e_metric, expl_leapfrog, BaseRNG>(
-            model, rng) {}
+          model, rng) {}
 };
 }  // namespace mcmc
 }  // namespace stan

@@ -138,6 +138,33 @@ struct mock_model : public stan::model::model_base {
                    std::vector<double>& params_r_constrained,
                    bool include_tparams, bool include_gqs,
                    std::ostream* msgs) const override {}
+
+#ifdef STAN_MODEL_FVAR_VAR
+
+  stan::math::fvar<stan::math::var> log_prob(
+      Eigen::Matrix<stan::math::fvar<stan::math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const override {
+    return 18;
+  }
+
+  stan::math::fvar<stan::math::var> log_prob_jacobian(
+      Eigen::Matrix<stan::math::fvar<stan::math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const override {
+    return 19;
+  }
+
+  stan::math::fvar<stan::math::var> log_prob_propto(
+      Eigen::Matrix<stan::math::fvar<stan::math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const override {
+    return 20;
+  }
+
+  stan::math::fvar<stan::math::var> log_prob_propto_jacobian(
+      Eigen::Matrix<stan::math::fvar<stan::math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const override {
+    return 21;
+  }
+#endif
 };
 
 TEST(model, modelBaseInheritance) {
@@ -185,4 +212,25 @@ TEST(model, modelTemplateLogProb) {
   EXPECT_FLOAT_EQ(7, v7);
   double v8 = bm.template log_prob<true, true>(params_r_v, msgs).val();
   EXPECT_FLOAT_EQ(8, v8);
+
+#ifdef STAN_MODEL_FVAR_VAR
+  Eigen::Matrix<stan::math::fvar<stan::math::var>, -1, 1> params_r_fv(3);
+  EXPECT_FLOAT_EQ(18, bm.log_prob(params_r_fv, msgs).val().val());
+  EXPECT_FLOAT_EQ(19, bm.log_prob_jacobian(params_r_fv, msgs).val().val());
+  EXPECT_FLOAT_EQ(20, bm.log_prob_propto(params_r_fv, msgs).val().val());
+  EXPECT_FLOAT_EQ(21,
+                  bm.log_prob_propto_jacobian(params_r_fv, msgs).val().val());
+
+  double v9 = bm.template log_prob<false, false>(params_r_fv, msgs).val().val();
+  EXPECT_FLOAT_EQ(18, v9);
+
+  double v10 = bm.template log_prob<false, true>(params_r_fv, msgs).val().val();
+  EXPECT_FLOAT_EQ(19, v10);
+
+  double v11 = bm.template log_prob<true, false>(params_r_fv, msgs).val().val();
+  EXPECT_FLOAT_EQ(20, v11);
+
+  double v12 = bm.template log_prob<true, true>(params_r_fv, msgs).val().val();
+  EXPECT_FLOAT_EQ(21, v12);
+#endif
 }

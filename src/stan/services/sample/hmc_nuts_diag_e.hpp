@@ -1,14 +1,13 @@
 #ifndef STAN_SERVICES_SAMPLE_HMC_NUTS_DIAG_E_HPP
 #define STAN_SERVICES_SAMPLE_HMC_NUTS_DIAG_E_HPP
 
-#include <stan/math/prim.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/logger.hpp>
 #include <stan/callbacks/writer.hpp>
 #include <stan/io/var_context.hpp>
-#include <stan/mcmc/fixed_param_sampler.hpp>
-#include <stan/services/error_codes.hpp>
+#include <stan/math/prim.hpp>
 #include <stan/mcmc/hmc/nuts/diag_e_nuts.hpp>
+#include <stan/services/error_codes.hpp>
 #include <stan/services/util/run_sampler.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/initialize.hpp>

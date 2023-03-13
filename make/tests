@@ -54,7 +54,7 @@ endif
 
 test/%$(EXE) : CXXFLAGS += $(CXXFLAGS_GTEST)
 test/%$(EXE) : CPPFLAGS += $(CPPFLAGS_GTEST)
-test/%$(EXE) : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(STAN),.)
+test/%$(EXE) : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(STAN),.) -I $(RAPIDJSON)
 test/%$(EXE) : INC += $(INC_GTEST)
 test/%$(EXE) : test/%.o $(GTEST)/src/gtest_main.cc $(GTEST)/src/gtest-all.o $(LIBSUNDIALS) $(MPI_TARGETS) $(TBB_TARGETS)
 	$(LINK.cpp) $(filter-out test/%.hpp %.hpp-test,$^) $(LDLIBS) $(OUTPUT_OPTION)
@@ -68,7 +68,7 @@ test/%.o : src/test/%.cpp
 ##
 src/test/%.d : CXXFLAGS += $(CXXFLAGS_GTEST)
 src/test/%.d : CPPFLAGS += $(CPPFLAGS_GTEST)
-src/test/%.d : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(STAN),.)
+src/test/%.d : INC_FIRST = -I $(if $(STAN),$(STAN)/src,src) -I $(if $(STAN),$(STAN),.) -I $(RAPIDJSON)
 src/test/%.d : INC += $(INC_GTEST)
 src/test/%.d : DEPTARGETS = -MT $(patsubst src/test/%.d,test/%.o,$@) -MT $@
 
