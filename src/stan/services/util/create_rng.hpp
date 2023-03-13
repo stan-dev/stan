@@ -26,7 +26,9 @@ inline boost::ecuyer1988 create_rng(unsigned int seed, unsigned int chain) {
   using boost::uintmax_t;
   static constexpr uintmax_t DISCARD_STRIDE = static_cast<uintmax_t>(1) << 50;
   boost::ecuyer1988 rng(seed);
-  rng.discard(DISCARD_STRIDE * chain);
+  // always discard at least 1 to avoid issue with small seeds for certain RNG
+  // distributions. See stan#3167 and boostorg/random#92
+  rng.discard(std::max(static_cast<uintmax_t>(1), DISCARD_STRIDE * chain));
   return rng;
 }
 
