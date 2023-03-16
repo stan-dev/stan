@@ -25,7 +25,9 @@ namespace pathfinder {
 
 template <typename T>
 double duration_seconds(const T& start, const T& end) {
-  return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.0;
+  return std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+             .count()
+         / 1000.0;
 }
 
 /**
@@ -127,14 +129,17 @@ inline int pathfinder_lbfgs_multi(
                         + std::to_string(iter) + " failed.");
             return;
           }
-          individual_lp_ratios.emplace_back(std::move(std::get<1>(pathfinder_ret)));
-          individual_samples.emplace_back(std::move(std::get<2>(pathfinder_ret)));
+          individual_lp_ratios.emplace_back(
+              std::move(std::get<1>(pathfinder_ret)));
+          individual_samples.emplace_back(
+              std::move(std::get<2>(pathfinder_ret)));
           lp_calls += std::get<3>(pathfinder_ret);
         }
       });
   const auto end_pathfinders_time = std::chrono::steady_clock::now();
 
-  const double pathfinders_delta_time = duration_seconds(start_pathfinders_time, end_pathfinders_time);
+  const double pathfinders_delta_time
+      = duration_seconds(start_pathfinders_time, end_pathfinders_time);
   const auto start_psis_time = std::chrono::steady_clock::now();
   // Because of failure in lp calcs we can have multiple returned sizes
   size_t num_returned_samples = 0;
@@ -144,8 +149,8 @@ inline int pathfinder_lbfgs_multi(
     return error_codes::SOFTWARE;
   }
   if (refresh != 0) {
-    logger.info(
-        "Total log probability function evaluations:" + std::to_string(lp_calls));
+    logger.info("Total log probability function evaluations:"
+                + std::to_string(lp_calls));
   }
   for (auto&& ilpr : individual_lp_ratios) {
     num_returned_samples += ilpr.size();
@@ -156,8 +161,10 @@ inline int pathfinder_lbfgs_multi(
   Eigen::Index filling_start_row = 0;
   for (size_t i = 0; i < successful_pathfinders; ++i) {
     const Eigen::Index individ_num_samples = individual_lp_ratios[i].size();
-    lp_ratios.segment(filling_start_row, individ_num_samples) = individual_lp_ratios[i];
-    samples.middleCols(filling_start_row, individ_num_samples) = individual_samples[i];
+    lp_ratios.segment(filling_start_row, individ_num_samples)
+        = individual_lp_ratios[i];
+    samples.middleCols(filling_start_row, individ_num_samples)
+        = individual_samples[i];
     filling_start_row += individ_num_samples;
   }
   const auto tail_len = std::min(0.2 * num_returned_samples,

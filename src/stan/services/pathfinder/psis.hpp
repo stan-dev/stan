@@ -64,7 +64,8 @@ inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
  * for the generalized Pareto distribution. *Technometrics* **51**, 316-325.
  */
 template <typename EigArray>
-inline std::pair<double, double> gpdfit(const EigArray& x, const Eigen::Index min_grid_pts = 30) {
+inline std::pair<double, double> gpdfit(const EigArray& x,
+                                        const Eigen::Index min_grid_pts = 30) {
   using array_vec_t = Eigen::Array<double, -1, 1>;
   constexpr auto prior = 3.0;
   const auto& x_ref = stan::math::to_ref(x);
@@ -76,10 +77,12 @@ inline std::pair<double, double> gpdfit(const EigArray& x, const Eigen::Index mi
   const double x_1st_qt = x_ref.coeff(
       static_cast<Eigen::Index>(std::floor(static_cast<double>(N) / 4.0 + 0.5))
       - 1l);
-  array_vec_t theta  = 1.0 / x_ref.coeff(N - 1)
-         + (1.0 - (M / (linspaced_arr - 0.5)).sqrt()) / (prior * x_1st_qt);
+  array_vec_t theta
+      = 1.0 / x_ref.coeff(N - 1)
+        + (1.0 - (M / (linspaced_arr - 0.5)).sqrt()) / (prior * x_1st_qt);
   // profile log-lik
-  array_vec_t l_theta = static_cast<double>(N) * profile_loglikelihood(theta, x_ref);
+  array_vec_t l_theta
+      = static_cast<double>(N) * profile_loglikelihood(theta, x_ref);
   auto normalized_theta = (l_theta - stan::math::log_sum_exp(l_theta)).exp();
   const double theta_hat = (theta * normalized_theta).sum();
   double k = (-theta_hat * x_ref).log1p().mean();
@@ -150,11 +153,11 @@ inline Eigen::Index quick_sort_partition(Eigen::Array<double, -1, 1>& arr,
                                          Eigen::Array<Eigen::Index, -1, 1>& idx,
                                          const Eigen::Index low,
                                          const Eigen::Index high) {
-  const double pivot = arr.coeff(high); 
+  const double pivot = arr.coeff(high);
   Eigen::Index i = (low - 1);
   for (Eigen::Index j = low; j <= high - 1; ++j) {
     if (arr.coeff(j) <= pivot) {
-      ++i; 
+      ++i;
       std::swap(arr.coeffRef(i), arr.coeffRef(j));
       std::swap(idx.coeffRef(i), idx.coeffRef(j));
     }

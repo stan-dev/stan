@@ -18,7 +18,6 @@
 #include <vector>
 #include <atomic>
 
-
 namespace stan {
 namespace services {
 namespace pathfinder {
@@ -229,7 +228,8 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
   Eigen::VectorXd approx_samples_col;
   std::stringstream pathfinder_ss;
   const auto log_stream = [](auto& logger, auto& pathfinder_ss) {
-    if (pathfinder_ss.str().length() == 0) return;
+    if (pathfinder_ss.str().length() == 0)
+      return;
     logger.info(pathfinder_ss);
     pathfinder_ss.str(std::string());
   };
@@ -325,11 +325,9 @@ inline taylor_approx_t taylor_approximation_dense(
  */
 template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
           typename EigVec>
-inline taylor_approx_t taylor_approximation_sparse(GradMat&& Ykt_mat,
-                                        const AlphaVec& alpha, const DkVec& Dk,
-                                        const InvMat& ninvRST,
-                                        const EigVec& point_est,
-                                        const EigVec& grad_est) {
+inline taylor_approx_t taylor_approximation_sparse(
+    GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
+    const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est) {
   const Eigen::Index history_size = Ykt_mat.cols();
   const Eigen::Index history_size_times_2 = history_size * 2;
   const Eigen::Index num_params = alpha.size();
@@ -410,10 +408,10 @@ inline taylor_approx_t taylor_approximation(
   const auto num_params = Ykt_mat.rows();
   if (2 * history_size >= num_params) {
     return taylor_approximation_sparse(Ykt_mat, alpha, Dk, ninvRST, point_est,
-                                     grad_est);
+                                       grad_est);
   } else {
     return taylor_approximation_dense(Ykt_mat, alpha, Dk, ninvRST, point_est,
-                                       grad_est);
+                                      grad_est);
   }
 }
 
@@ -484,17 +482,15 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
                      ParamMat&& Skt_mat, std::size_t num_elbo_draws,
                      const std::string& iter_msg, Logger&& logger) {
   const auto history_size = Ykt_mat.cols();
-  Eigen::MatrixXd Rk
-      = Eigen::MatrixXd::Zero(history_size, history_size);
+  Eigen::MatrixXd Rk = Eigen::MatrixXd::Zero(history_size, history_size);
   Rk.template triangularView<Eigen::Upper>() = Skt_mat.transpose() * Ykt_mat;
   Eigen::VectorXd Dk = Rk.diagonal();
   // Unfolded algorithm in paper for inverse RST
   Rk.triangularView<Eigen::Upper>().solveInPlace(Skt_mat.transpose());
   // Skt_mat is now ninvRST
   Skt_mat = -Skt_mat;
-  internal::taylor_approx_t taylor_appx
-      = internal::taylor_approximation(Ykt_mat, alpha, Dk, Skt_mat.transpose(),
-                                       current_params, current_grads);
+  internal::taylor_approx_t taylor_appx = internal::taylor_approximation(
+      Ykt_mat, alpha, Dk, Skt_mat.transpose(), current_params, current_grads);
   try {
     return std::make_pair(internal::est_approx_draws<true>(
                               lp_fun, constrain_fun, rng, taylor_appx,
@@ -562,12 +558,13 @@ template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
           typename ParamWriter>
 inline auto pathfinder_lbfgs_single(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
-    unsigned int path, double init_radius, int max_history_size, double init_alpha,
-    double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
-    double tol_param, int num_iterations, bool save_iterations, int refresh,
-    callbacks::interrupt& interrupt, int num_elbo_draws, int num_draws,
-    callbacks::logger& logger, callbacks::writer& init_writer,
-    ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
+    unsigned int path, double init_radius, int max_history_size,
+    double init_alpha, double tol_obj, double tol_rel_obj, double tol_grad,
+    double tol_rel_grad, double tol_param, int num_iterations,
+    bool save_iterations, int refresh, callbacks::interrupt& interrupt,
+    int num_elbo_draws, int num_draws, callbacks::logger& logger,
+    callbacks::writer& init_writer, ParamWriter& parameter_writer,
+    DiagnosticWriter& diagnostic_writer) {
   const auto start_optim_time = std::chrono::steady_clock::now();
   boost::ecuyer1988 rng
       = util::create_rng<boost::ecuyer1988>(random_seed, path);
@@ -693,13 +690,13 @@ inline auto pathfinder_lbfgs_single(
      */
     if (unlikely(ret == -1)) {
       continue;
-    } 
+    }
     param_buff.push_back(lbfgs.curr_x() - prev_params);
     grad_buff.push_back(lbfgs.curr_g() - prev_grads);
     prev_params = lbfgs.curr_x();
     prev_grads = lbfgs.curr_g();
     history_size = std::min(history_size + 1,
-                                    static_cast<std::size_t>(max_history_size));
+                            static_cast<std::size_t>(max_history_size));
     if (internal::check_curve(param_buff.back(), grad_buff.back(), logger)) {
       alpha = internal::form_diag(alpha, grad_buff.back(), param_buff.back());
     }
@@ -713,8 +710,8 @@ inline auto pathfinder_lbfgs_single(
     for (Eigen::Index i = 0; i < history_size; ++i) {
       Skt_map.col(i) = param_buff[i];
     }
-    std::string iter_msg(path_num + "Iter: ["
-                          + std::to_string(lbfgs.iter_num()) + "] ");
+    std::string iter_msg(path_num + "Iter: [" + std::to_string(lbfgs.iter_num())
+                         + "] ");
 
     auto pathfinder_res = internal::pathfinder_impl(
         rng, lp_fun, constrain_fun, alpha, lbfgs.curr_x(), lbfgs.curr_g(),
@@ -730,14 +727,15 @@ inline auto pathfinder_lbfgs_single(
       logger.info(iter_msg + ": ELBO ("
                   + std::to_string(pathfinder_res.first.elbo) + ")");
     }
-    
   }
   if (ret >= 0) {
     logger.info("Optimization terminated normally: ");
   } else {
-    std::string prefix_err_msg = "Optimization terminated with error: " + lbfgs.get_code_string(ret);
+    std::string prefix_err_msg
+        = "Optimization terminated with error: " + lbfgs.get_code_string(ret);
     if (param_vecs.size() == 1) {
-      logger.info(prefix_err_msg + " Optimization failed to start, pathfinder cannot be run.");
+      logger.info(prefix_err_msg
+                  + " Optimization failed to start, pathfinder cannot be run.");
       return internal::ret_pathfinder<ReturnLpSamples>(
           error_codes::SOFTWARE, Eigen::Array<double, -1, 1>(0),
           Eigen::Array<double, -1, -1>(0, 0),
