@@ -1,60 +1,17 @@
-
 #include <stan/io/json/json_data.hpp>
 #include <stan/io/json/json_data_handler.hpp>
 #include <stan/io/json/json_error.hpp>
 #include <stan/io/json/json_handler.hpp>
 #include <stan/io/json/rapidjson_parser.hpp>
+
+#include <test/unit/io/json/util.hpp>
 #include <gtest/gtest.h>
-
-class recording_handler : public stan::json::json_handler {
- public:
-  std::stringstream os_;
-  recording_handler() : json_handler(), os_() {}
-  void start_text() { os_ << "S:text"; }
-  void end_text() { os_ << "E:text"; }
-  void start_array() { os_ << "S:arr"; }
-  void end_array() { os_ << "E:arr"; }
-  void start_object() { os_ << "S:obj"; }
-  void end_object() { os_ << "E:obj"; }
-  void null() { os_ << "NULL:null"; }
-  void boolean(bool p) { os_ << "BOOL:" << p; }
-  void string(const std::string &s) { os_ << "STR:\"" << s << "\""; }
-  void key(const std::string &key) { os_ << "KEY:\"" << key << "\""; }
-  void number_double(double x) { os_ << "D(REAL):" << x; }
-  void number_int(int n) { os_ << "I(INT):" << n; }
-  void number_unsigned_int(unsigned n) { os_ << "U(INT):" << n; }
-  void number_int64(int64_t n) { os_ << "I64(INT):" << n; }
-  void number_unsigned_int64(uint64_t n) { os_ << "U64(INT):" << n; }
-};
-
-bool hasEnding(std::string const &fullString, std::string const &ending) {
-  if (fullString.length() >= ending.length()) {
-    return (0
-            == fullString.compare(fullString.length() - ending.length(),
-                                  ending.length(), ending));
-  } else {
-    return false;
-  }
-}
 
 void test_parser(const std::string &input, const std::string &expected_output) {
   recording_handler handler;
   std::stringstream s(input);
   stan::json::rapidjson_parse(s, handler);
   EXPECT_EQ(expected_output, handler.os_.str());
-}
-
-void test_exception(const std::string &input,
-                    const std::string &exception_text) {
-  try {
-    recording_handler handler;
-    std::stringstream s(input);
-    stan::json::rapidjson_parse(s, handler);
-  } catch (const std::exception &e) {
-    EXPECT_TRUE(hasEnding(e.what(), exception_text));
-    return;
-  }
-  FAIL();  // didn't throw an exception as expected.
 }
 
 TEST(ioJson, jsonParserA0) {
@@ -121,12 +78,12 @@ TEST(ioJson, jsonParserA6) {
 }
 
 TEST(ioJson, jsonParserA7) {
-  test_parser("[ -1, -2, \"-inf\"]",
+  test_parser("[ -1, -2, \"-Inf\"]",
               "S:text"
               "S:arr"
               "I(INT):-1"
               "I(INT):-2"
-              "STR:\"-inf\""
+              "STR:\"-Inf\""
               "E:arr"
               "E:text");
 }
@@ -530,91 +487,105 @@ TEST(ioJson, jsonParserStr17) {
 
 TEST(ioJson, jsonParserErr01) {
   test_exception(" \n \n   5    ",
-                 "expecting start of object ({) or array ([)\n");
+                 "\nexpecting start of object ({) or array ([)\n");
 }
 
-TEST(ioJson, jsonParserErr02) { test_exception("[ .5 ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr02) {
+  test_exception("[ .5 ]", "Expecting JSON object, found array.");
+}
 
 TEST(ioJson, jsonParserErr02a) {
-  test_exception("[ 0",
+  test_exception("{ \"x\" : [ 0",
                  "Missing a comma or ']' after an array element or "
                  "found a zero padded number.\n");
 }
 
 TEST(ioJson, jsonParserErr02b) {
-  test_exception("[ 0.", "Missing fraction part in number.\n");
+  test_exception("{ \"x\" : [ 0.", "Missing fraction part in number.\n");
 }
 
 TEST(ioJson, jsonParserErr02c) {
-  test_exception("[ 99.9",
+  test_exception("{ \"x\": [ 99.9",
                  "Missing a comma or ']' after an array element or "
                  "found a zero padded number.\n");
 }
 
 TEST(ioJson, jsonParserErr03) {
-  test_exception("[ 000.005 ]",
+  test_exception("{ \"x\": [ 000.005 ]",
                  "Missing a comma or ']' after an array element "
                  "or found a zero padded number.\n");
 }
 
 TEST(ioJson, jsonParserErr04) {
-  test_exception("[ 1. ]", "Missing fraction part in number.\n");
+  test_exception("{ \"x\": [ 1. ]", "Missing fraction part in number.\n");
 }
 
 TEST(ioJson, jsonParserErr05) {
-  test_exception("[ 1.009e ]", "Missing exponent in number.\n");
+  test_exception("{ \"x\": [ 1.009e ]", "Missing exponent in number.\n");
 }
 
 TEST(ioJson, jsonParserErr06b) {
-  test_exception("[ \"\\uD834abc\" ]",
+  test_exception("{ \"x\": [ \"\\uD834abc\" ]",
                  "The surrogate pair in string is invalid.\n");
 }
 
 TEST(ioJson, jsonParserErr06e) {
-  test_exception("[ \"\\uD834", "The surrogate pair in string is invalid.\n");
+  test_exception("{ \"x\": [ \"\\uD834",
+                 "The surrogate pair in string is invalid.\n");
 }
 
 TEST(ioJson, jsonParserErr06f) {
-  test_exception("[ \"\\uD8",
+  test_exception("{ \"x\": [ \"\\uD8",
                  "Incorrect hex digit after \\u escape in string.\n");
 }
 
 TEST(ioJson, jsonParserErr06g) {
-  test_exception("[ \"\\uE000\\uD",
+  test_exception("{ \"x\": [ \"\\uE000\\uD",
                  "Incorrect hex digit after \\u escape in string.\n");
 }
 
 TEST(ioJson, jsonParserErr07) {
-  test_exception("[ \"\\aFFFF\" ]", "Invalid escape character in string.\n");
+  test_exception("{ \"x\": [ \"\\aFFFF\" ]",
+                 "Invalid escape character in string.\n");
 }
 
 TEST(ioJson, jsonParserErr08) {
   std::stringstream ss;
   char c = 11;
-  ss << "[ \"" << c << "\" ]";
+  ss << "{ \"x\": [ \"" << c << "\" ]";
   test_exception(ss.str(), "Invalid encoding in string.\n");
 }
 
-TEST(ioJson, jsonParserErr09) { test_exception("[ t ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr09) {
+  test_exception("{ \"x\": [ t ]", "Invalid value.\n");
+}
 
-TEST(ioJson, jsonParserErr10) { test_exception("[ f ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr10) {
+  test_exception("{ \"x\": [ f ]", "Invalid value.\n");
+}
 
-TEST(ioJson, jsonParserErr11) { test_exception("[ n ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr11) {
+  test_exception("{ \"x\": [ n ]", "Invalid value.\n");
+}
 
 TEST(ioJson, jsonParserErr12) {
-  test_exception("[5}",
+  test_exception("{ \"x\": [5}",
                  "Missing a comma or ']' after an array element or "
                  "found a zero padded number.\n");
 }
 
-TEST(ioJson, jsonParserErr12a) { test_exception("[ a ]", "Invalid value.\n"); }
+TEST(ioJson, jsonParserErr12a) {
+  test_exception("{ \"x\": [ a ]", "Invalid value.\n");
+}
 
 TEST(ioJson, jsonParserErr12b) {
-  test_exception("[ \"a\", a ]", "Invalid value.\n");
+  test_exception("{ \"x\": [ \"a\", a ]",
+                 "Variable: x, error: string values not allowed.");
 }
 
 TEST(ioJson, jsonParserErr12c) {
-  test_exception("[ \"a\", ", "Invalid value.\n");
+  test_exception("{ \"x\": [ \"a\",",
+                 "Variable: x, error: string values not allowed.");
 }
 
 TEST(ioJson, jsonParserErr12d) {
@@ -648,8 +619,7 @@ TEST(ioJson, jsonParserErr14b) {
 
 TEST(ioJson, jsonParserErr14c) {
   test_exception("{ \"bar\" : [ \"foo\": -1.0100e09 , }",
-                 "Missing a comma or ']' after an array element or found a "
-                 "zero padded number.\n");
+                 "Variable: bar, error: string values not allowed.");
 }
 
 TEST(ioJson, jsonParseErr14d) {
@@ -687,12 +657,12 @@ TEST(ioJson, jsonParserErr17) {
 }
 
 TEST(ioJson, jsonParserErr18) {
-  test_exception("[ -1, -2, \"-inf\", ]", "Invalid value.\n");
+  test_exception("{ \"x\": [ -1, -2, \"-Inf\", ]", "Invalid value.\n");
 }
 
 TEST(ioJson, jsonParserErr19a) {
   test_exception(
-      "[ "
+      "{ \"x\": [ "
       "111111111111111111111111111111111111111111111111111111111111111111111111"
       "111111111111111111111111111111111111111111111111111111111111111111111111"
       "111111111111111111111111111111111111111111111111111111111111111111111111"
@@ -703,7 +673,7 @@ TEST(ioJson, jsonParserErr19a) {
 
 TEST(ioJson, jsonParserErr19b) {
   test_exception(
-      "[ "
+      "{ \"x\": [ "
       "-11111111111111111111111111111111111111111111111111111111111111111111111"
       "111111111111111111111111111111111111111111111111111111111111111111111111"
       "111111111111111111111111111111111111111111111111111111111111111111111111"
@@ -713,6 +683,6 @@ TEST(ioJson, jsonParserErr19b) {
 }
 
 TEST(ioJson, jsonParserErr19d) {
-  test_exception("[ 9.19191919191919e1000000000000 ]",
+  test_exception("{ \"x\": [ 9.19191919191919e1000000000000 ]",
                  "Number too big to be stored in double.\n");
 }

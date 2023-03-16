@@ -89,6 +89,39 @@ void match_csv_columns(const Eigen::MatrixXd& samples,
   }
 #endif
 
+/**
+ * Gets the path separator for the OS.
+ *
+ * @return '\' for Windows, '/' otherwise.
+ */
+char get_slash() {
+#if defined(WIN32) || defined(_WIN32) \
+    || defined(__WIN32) && !defined(__CYGWIN__)
+  static char path_separator = '\\';
+#else
+  static char path_separator = '/';
+#endif
+  return path_separator;
+}
+
+/**
+ * Returns the path as a string with the appropriate path separator.
+ *
+ * @param file_path vector of strings representing path to the file
+ * @return the string representation of the path
+ */
+std::string paths_to_fname(const std::vector<std::string>& path) {
+  std::string pathstr;
+  if (path.size() > 0) {
+    pathstr.append(path[0]);
+    for (size_t i = 1; i < path.size(); i++) {
+      pathstr.append(1, get_slash());
+      pathstr.append(path[i]);
+    }
+  }
+  return pathstr;
+}
+
 namespace stan {
 namespace test {
 std::streambuf* cout_buf = 0;
@@ -114,6 +147,7 @@ void reset_std_streams() {
   cout_buf = 0;
   cerr_buf = 0;
 }
+
 }  // namespace test
 }  // namespace stan
 

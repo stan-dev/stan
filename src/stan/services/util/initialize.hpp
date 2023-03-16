@@ -77,7 +77,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
   bool is_fully_initialized = true;
   bool any_initialized = false;
   std::vector<std::string> param_names;
-  model.get_param_names(param_names);
+  model.get_param_names(param_names, false, false);
   for (size_t n = 0; n < param_names.size(); n++) {
     is_fully_initialized &= init.contains_r(param_names[n]);
     any_initialized |= init.contains_r(param_names[n]);
