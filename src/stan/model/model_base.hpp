@@ -71,9 +71,14 @@ class model_base : public prob_grad {
    *
    * @param[in,out] names sequence of names parameters, transformed
    * parameters, and generated quantities
+   * @param[in] include_tparams true if transformed parameters should
+   * be included
+   * @param[in] include_gqs true if generated quantities should be
+   * included
    */
-  virtual void get_param_names(std::vector<std::string>& names) const = 0;
-
+  virtual void get_param_names(std::vector<std::string>& names,
+                               bool include_tparams = true,
+                               bool include_gqs = true) const = 0;
   /**
    * Set the dimensionalities of constrained parameters, transformed
    * parameters, and generated quantities.  The input sequence is
@@ -90,9 +95,14 @@ class model_base : public prob_grad {
    * dimensionality `std::vector<size_t>{2, 3, 4}`.
    *
    * @param[in,out] dimss sequence of dimensions specifications to set
+   * @param[in] include_tparams true if transformed parameters should
+   * be included
+   * @param[in] include_gqs true if generated quantities should be
+   * included
    */
-  virtual void get_dims(std::vector<std::vector<size_t> >& dimss) const = 0;
-
+  virtual void get_dims(std::vector<std::vector<size_t> >& dimss,
+                        bool include_tparams = true,
+                        bool include_gqs = true) const = 0;
   /**
    *  Set the specified sequence to the indexed, scalar, constrained
    *  parameter names.  Each variable is output with a
