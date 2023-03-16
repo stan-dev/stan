@@ -140,7 +140,7 @@ class BFGSMinimizer {
   explicit BFGSMinimizer(FunctorType &f) : _func(f) {}
   template <typename Vec, require_vector_t<Vec> * = nullptr, typename LSOpt,
             typename ConvergeOpt, typename QnUpdater>
-  explicit BFGSMinimizer(FunctorType &f, const Vec &params_r, LSOpt &&ls_opt,
+  explicit BFGSMinimizer(FunctorType &f, Vec&& params_r, LSOpt &&ls_opt,
                          ConvergeOpt &&conv_opt, QnUpdater &&updater)
       : _func(f),
         _qn(std::forward<QnUpdater>(updater)),
@@ -148,13 +148,10 @@ class BFGSMinimizer {
         _conv_opts(std::forward<ConvergeOpt>(conv_opt)) {}
 
   template <typename Vec, require_vector_t<Vec> * = nullptr>
-  void initialize(const Vec &x0) {
+  void initialize(Vec&& x0) {
     int ret;
-    _xk.resize(x0.size());
     _gk.resize(x0.size());
-    for (Eigen::Index i = 0; i < x0.size(); ++i) {
-      _xk[i] = x0[i];
-    }
+    _xk = Eigen::Map<Eigen::VectorXd>(x0.data(), x0.size());
     ret = _func(_xk, _fk, _gk);
     if (ret) {
       throw std::runtime_error("Error evaluating initial BFGS point.");
@@ -397,30 +394,27 @@ class BFGSLineSearch
   typedef typename stan::math::index_type<vector_t>::type idx_t;
 
   template <typename Vec, require_vector_t<Vec> * = nullptr>
-  BFGSLineSearch(M &model, const Vec &params_r,
+  BFGSLineSearch(M &model, Vec&& params_r,
                  const std::vector<int> &params_i, std::ostream *msgs = 0)
       : BFGSBase(_adaptor), _adaptor(model, params_i, msgs) {
-    initialize(params_r);
+    BFGSBase::initialize(params_r);
   }
 
   template <typename Vec, typename LSOpt, typename ConvergeOpt,
             typename QnUpdater, require_vector_t<Vec> * = nullptr>
-  BFGSLineSearch(M &model, const Vec &params_r,
+  BFGSLineSearch(M &model, Vec&& params_r,
                  const std::vector<int> &params_i, LSOpt &&ls_options,
                  ConvergeOpt &&convergence_options, QnUpdater &&qn_update,
                  std::ostream *msgs = 0)
       : _adaptor(model, params_i, msgs),
         BFGSBase(_adaptor, params_r, ls_options, convergence_options,
                  qn_update) {
-    initialize(params_r);
+    BFGSBase::initialize(params_r);
   }
 
   template <typename Vec, require_vector_t<Vec> * = nullptr>
-  void initialize(const Vec &params_r) {
-    Eigen::VectorXd x(params_r.size());
-    for (size_t i = 0; i < params_r.size(); i++)
-      x[i] = params_r[i];
-    BFGSBase::initialize(x);
+  void initialize(Vec&& params_r) {
+    BFGSBase::initialize(params_r);
   }
 
   size_t grad_evals() { return _adaptor.fevals(); }

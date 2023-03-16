@@ -64,7 +64,7 @@ inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
  * for the generalized Pareto distribution. *Technometrics* **51**, 316-325.
  */
 template <typename EigArray>
-inline auto gpdfit(const EigArray& x, const Eigen::Index min_grid_pts = 30) {
+inline std::pair<double, double> gpdfit(const EigArray& x, const Eigen::Index min_grid_pts = 30) {
   using array_vec_t = Eigen::Array<double, -1, 1>;
   constexpr auto prior = 3.0;
   const auto& x_ref = stan::math::to_ref(x);
@@ -76,20 +76,18 @@ inline auto gpdfit(const EigArray& x, const Eigen::Index min_grid_pts = 30) {
   const double x_1st_qt = x_ref.coeff(
       static_cast<Eigen::Index>(std::floor(static_cast<double>(N) / 4.0 + 0.5))
       - 1l);
-  array_vec_t theta
-      = (1.0 / x_ref.coeff(N - 1)
-         + (1.0 - (M / (linspaced_arr - 0.5)).sqrt()) / (prior * x_1st_qt));
+  array_vec_t theta  = 1.0 / x_ref.coeff(N - 1)
+         + (1.0 - (M / (linspaced_arr - 0.5)).sqrt()) / (prior * x_1st_qt);
   // profile log-lik
-  array_vec_t l_theta
-      = (static_cast<double>(N) * profile_loglikelihood(theta, x_ref));
+  array_vec_t l_theta = static_cast<double>(N) * profile_loglikelihood(theta, x_ref);
   auto normalized_theta = (l_theta - stan::math::log_sum_exp(l_theta)).exp();
   const double theta_hat = (theta * normalized_theta).sum();
   double k = (-theta_hat * x_ref).log1p().mean();
   const double sigma = -k / theta_hat;
   constexpr double a = 10;
   const double n_plus_a = N + a;
-  k = k * N / n_plus_a + a * 0.5 / n_plus_a;
-  return std::make_pair(sigma, k);
+  auto kk = k * N / n_plus_a + a * 0.5 / n_plus_a;
+  return {sigma, kk};
 }
 
 /**
@@ -105,7 +103,7 @@ inline auto gpdfit(const EigArray& x, const Eigen::Index min_grid_pts = 30) {
  */
 template <typename EigArray>
 inline auto qgpd(const EigArray& p, const double k, const double sigma) {
-  return (sigma * stan::math::expm1(-k * (-p).log1p()) / k);
+  return sigma * stan::math::expm1(-k * (-p).log1p()) / k;
 }
 
 /**
@@ -152,25 +150,23 @@ inline Eigen::Index quick_sort_partition(Eigen::Array<double, -1, 1>& arr,
                                          Eigen::Array<Eigen::Index, -1, 1>& idx,
                                          const Eigen::Index low,
                                          const Eigen::Index high) {
-  const double pivot = arr.coeff(high);  // pivot
-  Eigen::Index i = (low - 1l);           // Index of smaller element
+  const double pivot = arr.coeff(high); 
+  Eigen::Index i = (low - 1);
   for (Eigen::Index j = low; j <= high - 1; ++j) {
-    // If current element is smaller than or
-    // equal to pivot
     if (arr.coeff(j) <= pivot) {
-      ++i;  // increment index of smaller element
+      ++i; 
       std::swap(arr.coeffRef(i), arr.coeffRef(j));
       std::swap(idx.coeffRef(i), idx.coeffRef(j));
     }
   }
-  std::swap(arr.coeffRef(i + 1l), arr.coeffRef(high));
-  std::swap(idx.coeffRef(i + 1l), idx.coeffRef(high));
-  return (i + 1l);
+  std::swap(arr.coeffRef(++i), arr.coeffRef(high));
+  std::swap(idx.coeffRef(i), idx.coeffRef(high));
+  return (i);
 }
 
 /**
  * Runs quick_sort optionally in parallel
- * @tparam Parallel Whether to allow the algorithm to attempt to run in
+ * @tparam Concurrent Whether to allow the algorithm to attempt to run in
  * parallel.
  * @param[in, out] arr The Array of doubles to be sorted
  * @param[in, out] idx The index of the original positions of the elements of
@@ -179,16 +175,14 @@ inline Eigen::Index quick_sort_partition(Eigen::Array<double, -1, 1>& arr,
  * @param[in] low Starting index of the sort
  * @param[in] high Ending index of the sort
  */
-template <bool DoParallel = true>
+template <bool Concurrent = true>
 inline void quick_sort(Eigen::Array<double, -1, 1>& arr,
                        Eigen::Array<Eigen::Index, -1, 1>& idx,
                        const Eigen::Index low, const Eigen::Index high) {
   if (low < high) {
-    // pi is partitioning index, arr[p] is now at right place
     const Eigen::Index partition_idx
         = quick_sort_partition(arr, idx, low, high);
-    // Separately sort elements before partition and after partition
-    if (DoParallel && (high - low >= 400l)) {
+    if (Concurrent && (high - low >= 400l)) {
       tbb::parallel_invoke(
           [&arr, &idx, low, partition_idx]() {
             quick_sort(arr, idx, low, partition_idx - 1);
@@ -262,7 +256,7 @@ largest_n_elements(const Eigen::Array<double, -1, 1>& arr,
       top_n_idx.coeffRef(starting_pos) = i;
     }
   }
-  return std::make_pair(std::move(top_n), std::move(top_n_idx));
+  return {std::move(top_n), std::move(top_n_idx)};
 }
 }  // namespace internal
 
@@ -305,10 +299,7 @@ inline Eigen::Array<double, -1, 1> psis_weights(const EigArray& log_ratios,
         llr_weights.coeffRef(idx.coeff(i)) = smoothed.first.coeff(i);
       }
       if (smoothed.second > 0.7) {
-        logger.warn(std::string("Pareto k value (") +
-         std::to_string(smoothed.second) +
-         ") is greater than 0.7 which often indicates model"
-         " misspecification.");
+        logger.warn(std::string("Pareto k value (") + std::to_string(smoothed.second) + ") is greater than 0.7 which often indicates model" " misspecification.");
       }
     }
   }
@@ -320,7 +311,8 @@ inline Eigen::Array<double, -1, 1> psis_weights(const EigArray& log_ratios,
     }
   }
   auto max_adj = (llr_weights + max_log_ratio).eval();
-  return (max_adj - stan::math::log_sum_exp(max_adj)).exp();
+  auto max_adj_exp = max_adj.exp();
+  return max_adj_exp / max_adj_exp.sum();
 }
 
 }  // namespace psis
