@@ -315,11 +315,9 @@ TEST(ioJson, jsonData_empty_2D_array_0_0) {
   expected_dims.push_back(0);
   expected_dims.push_back(0);
   test_empty_int_arr(jdata, "foo", expected_vals_i);
-  try {
-    jdata.validate_dims("test", "foo", "int", expected_dims);
-  } catch (const std::exception &e) {
-    FAIL();
-  }
+  EXPECT_NO_THROW(jdata.validate_dims("test", "foo", "int", expected_dims));
+  EXPECT_NO_THROW(
+      jdata.validate_dims("test", "foo.2", "double", expected_dims));
 }
 
 TEST(ioJson, jsonData_x_3d_y_2d_z_0d) {
@@ -352,6 +350,12 @@ TEST(ioJson, jsonData_parse_empty_obj) {
   EXPECT_EQ(0U, var_names.size());
   jdata.names_i(var_names);
   EXPECT_EQ(0U, var_names.size());
+
+  EXPECT_THROW(
+      jdata.validate_dims("testing", "should_not_exist", "double", {3, 2}),
+      std::runtime_error);
+  EXPECT_NO_THROW(
+      jdata.validate_dims("testing", "zero_dims", "double", {3, 0, 2}));
 }
 
 // R: strings "NaN", "Inf", "-Inf"
