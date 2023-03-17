@@ -9,7 +9,6 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/create_rng.hpp>
 #include <stan/services/util/gq_writer.hpp>
-#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -31,27 +30,16 @@ template <class Model>
 void get_model_parameters(const Model &model,
                           std::vector<std::string> &param_names,
                           std::vector<std::vector<size_t>> &param_dimss) {
-  std::vector<std::string> param_cols;
-  model.constrained_param_names(param_cols, false, false);
-  std::string cur_name("");
-  std::vector<std::string> splits;
-  for (size_t i = 0; i < param_cols.size(); ++i) {
-    boost::algorithm::split(splits, param_cols[i], boost::is_any_of("."));
-    if (splits.size() == 1 || splits[0] != cur_name) {
-      cur_name = splits[0];
-      param_names.emplace_back(cur_name);
-    }
-  }
   std::vector<std::string> all_param_names;
-  model.get_param_names(all_param_names);
+  model.get_param_names(all_param_names, false, false);
   std::vector<std::vector<size_t>> dimss;
-  model.get_dims(dimss);
-  for (size_t i = 0; i < param_names.size(); i++) {
-    for (size_t j = i; j < all_param_names.size(); ++j) {
-      if (param_names[i].compare(all_param_names[j]) == 0) {
-        param_dimss.emplace_back(dimss[j]);
-        break;
-      }
+  model.get_dims(dimss, false, false);
+  // remove zero-size
+  for (size_t i = 0; i < all_param_names.size(); i++) {
+    auto &v = dimss[i];
+    if (std::find(v.begin(), v.end(), 0) == v.end()) {
+      param_names.emplace_back(all_param_names[i]);
+      param_dimss.emplace_back(dimss[i]);
     }
   }
 }
