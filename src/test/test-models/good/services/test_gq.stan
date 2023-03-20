@@ -16,5 +16,9 @@ generated quantities {
   vector[2] y_rep;
   y_rep[1] = normal_rng(y[1], 1);
   y_rep[2] = normal_rng(y[2], 1);
+  // trigger exception/nan behavior
+  if (y[2]>5)
+    reject("exception in GQ");
+  real x2gq = 0.3;
 }
 
