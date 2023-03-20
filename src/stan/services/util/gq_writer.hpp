@@ -81,7 +81,6 @@ class gq_writer {
       if (ss.str().length() > 0)
         logger_.info(ss);
       logger_.info(e.what());
-      return;
     }
     if (ss.str().length() > 0)
       logger_.info(ss);
