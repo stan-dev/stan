@@ -11,7 +11,7 @@ void test_rtl_2_ltr(size_t idx_rtl, size_t idx_ltr,
   stan::json::vars_map_i vars_i;
   stan::json::json_data_handler handler(vars_r, vars_i);
 
-  size_t idx = handler.convert_offset_rtl_2_ltr(idx_rtl, dims);
+  size_t idx = handler.convert_offset_rtl_2_ltr("foo", idx_rtl, dims);
   EXPECT_EQ(idx, idx_ltr);
 }
 
@@ -21,7 +21,7 @@ void test_exception(size_t idx_rtl, const std::string &exception_text,
   stan::json::vars_map_i vars_i;
   stan::json::json_data_handler handler(vars_r, vars_i);
   try {
-    handler.convert_offset_rtl_2_ltr(idx_rtl, dims);
+    handler.convert_offset_rtl_2_ltr("foo", idx_rtl, dims);
   } catch (const std::exception &e) {
     EXPECT_EQ(e.what(), exception_text);
     return;
@@ -63,19 +63,19 @@ TEST(ioJson, rtl_2_ltr_2) {
 TEST(ioJson, rtl_2_ltr_err_1) {
   std::vector<size_t> dims(1);
   dims[0] = 7;
-  test_exception(7, "variable: , unexpected error", dims);
+  test_exception(7, "Variable: foo, ill-formed data.", dims);
 }
 
 TEST(ioJson, rtl_2_ltr_err_2) {
   std::vector<size_t> dims(2);
   dims[0] = 2;
   dims[1] = 4;
-  test_exception(8, "variable: , unexpected error", dims);
+  test_exception(8, "Variable: foo, ill-formed data.", dims);
 }
 
 TEST(ioJson, rtl_2_ltr_err_3n) {
   std::vector<size_t> dims(2);
   dims[0] = 2;
   dims[1] = 4;
-  test_exception(11, "variable: , unexpected error", dims);
+  test_exception(11, "Variable: foo, ill-formed data.", dims);
 }

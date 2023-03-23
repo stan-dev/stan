@@ -414,9 +414,9 @@ pipeline {
                         """
                         sh """
                             cd performance-tests-cmdstan/cmdstan/stan
-                            ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
-                            ./runTests.py src/test/integration/standalone_functions_test.cpp
-                            ./runTests.py src/test/integration/multiple_translation_units_test.cpp
+                            python3 ./runTests.py src/test/integration/compile_standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/standalone_functions_test.cpp
+                            python3 ./runTests.py src/test/integration/multiple_translation_units_test.cpp
                         """
                     }
                     post { always { deleteDir() } }
@@ -503,6 +503,9 @@ pipeline {
                 name: "Entire pipeline results",
                 enabledForFailure: true,
                 aggregatingResults : false,
+                filters: [
+                    excludeFile('/lib/.*')
+                ],
                 tools: [
                     gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
                     clang(id: "pipeline_clang", name: "LLVM/Clang")

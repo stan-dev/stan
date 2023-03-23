@@ -7,12 +7,12 @@ namespace stan {
 namespace io {
 
 /**
- * Return true if the specified string starts with the specified
- * prefix.
+ * Return true if the specified string ends with the specified
+ * suffix.
  *
- * @param p prefix
+ * @param p suffix
  * @param s string to test
- * @return true if s has p as a prefix
+ * @return true if s has p as a suffix
  */
 inline bool ends_with(const std::string& p, const std::string& s) {
   return s.size() >= p.size() && s.substr(s.size() - p.size()) == p;

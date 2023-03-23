@@ -43,25 +43,8 @@ class random_var_context : public var_context {
   random_var_context(Model& model, RNG& rng, double init_radius, bool init_zero)
       : unconstrained_params_(model.num_params_r()) {
     size_t num_unconstrained_ = model.num_params_r();
-    model.get_param_names(names_);
-    model.get_dims(dims_);
-
-    // cutting names_ and dims_ down to just the constrained parameters
-    std::vector<std::string> constrained_params_names;
-    model.constrained_param_names(constrained_params_names, false, false);
-    size_t keep = constrained_params_names.size();
-    size_t i = 0;
-    size_t num = 0;
-    for (i = 0; i < dims_.size(); ++i) {
-      size_t size = 1;
-      for (size_t n = 0; n < dims_[i].size(); ++n)
-        size *= dims_[i][n];
-      num += size;
-      if (num > keep)
-        break;
-    }
-    dims_.erase(dims_.begin() + i, dims_.end());
-    names_.erase(names_.begin() + i, names_.end());
+    model.get_param_names(names_, false, false);
+    model.get_dims(dims_, false, false);
 
     if (init_zero) {
       for (size_t n = 0; n < num_unconstrained_; ++n)
