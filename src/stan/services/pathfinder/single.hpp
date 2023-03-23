@@ -407,11 +407,11 @@ inline taylor_approx_t taylor_approximation(
   const auto history_size = Ykt_mat.cols();
   const auto num_params = Ykt_mat.rows();
   if (2 * history_size >= num_params) {
-    return taylor_approximation_sparse(Ykt_mat, alpha, Dk, ninvRST, point_est,
-                                       grad_est);
-  } else {
     return taylor_approximation_dense(Ykt_mat, alpha, Dk, ninvRST, point_est,
                                       grad_est);
+  } else {
+    return taylor_approximation_sparse(Ykt_mat, alpha, Dk, ninvRST, point_est,
+                                       grad_est);
   }
 }
 
