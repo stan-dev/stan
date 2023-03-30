@@ -245,7 +245,7 @@ inline Eigen::Array<double, -1, 1> psis_weights(const EigArray& log_ratios,
         llr_weights.coeffRef(idx.coeff(i)) = smoothed.first.coeff(i);
       }
       if (smoothed.second > 0.7) {
-        logger.warn(std::string("Pareto k value (") + 
+        logger.warn(std::string("Pareto k value (") +
          std::to_string(smoothed.second) + ") is greater than 0.7 which often"
          " indicates model" " misspecification.");
       }
