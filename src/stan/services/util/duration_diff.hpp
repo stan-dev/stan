@@ -10,19 +10,22 @@ namespace util {
 
 /**
  * Convert time points into a count in seconds.
- * @tparam T A type that whose output from a `operator-` is accepted by duration cast. 
- *  This is normally a `std::chrono::time_point<std::chrono::high_resolution_clock>` from 
+ * @tparam T A type that whose output from a `operator-` is accepted by duration
+ * cast. This is normally a
+ * `std::chrono::time_point<std::chrono::high_resolution_clock>` from
  *  `std::chrono::high_resolution_clock::now()`.
  * @param start Starting time point
  * @param end Ending time point
- * @return A duration in units of seconds with millisecond precision 
+ * @return A duration in units of seconds with millisecond precision
  */
 template <std::size_t Scale = 1000, typename T>
 inline double duration_diff(const T& start, const T& end) {
-  return std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / static_cast<double>(Scale);
+  return std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+             .count()
+         / static_cast<double>(Scale);
 }
-}
-}
-}
+}  // namespace util
+}  // namespace services
+}  // namespace stan
 
 #endif

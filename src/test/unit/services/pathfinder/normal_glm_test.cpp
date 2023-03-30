@@ -178,8 +178,8 @@ TEST_F(ServicesPathfinderGLM, multi) {
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
       model, single_path_inits, seed, chain, init_radius, history_size,
       init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-      num_iterations, num_elbo_draws, num_draws, num_multi_draws, 
-      num_paths, save_iterations, refresh, callback, logger,
+      num_iterations, num_elbo_draws, num_draws, num_multi_draws, num_paths,
+      save_iterations, refresh, callback, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
       diagnostics);

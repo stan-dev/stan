@@ -24,7 +24,6 @@ namespace stan {
 namespace services {
 namespace pathfinder {
 
-
 /**
  * Runs multiple pathfinders with final approximate samples drawn using PSIS.
  *
@@ -86,12 +85,13 @@ template <class Model, typename InitContext, typename InitWriter,
           typename SingleParamWriter, typename SingleDiagnosticWriter>
 inline int pathfinder_lbfgs_multi(
     Model& model, InitContext&& init, unsigned int random_seed,
-    unsigned int stride_id, double init_radius, int history_size, double init_alpha,
-    double tol_obj, double tol_rel_obj, double tol_grad, double tol_rel_grad,
-    double tol_param, int num_iterations, int num_elbo_draws, int num_draws, 
-    int num_multi_draws, int num_paths, bool save_iterations, int refresh, 
-    callbacks::interrupt& interrupt, callbacks::logger& logger,
-    InitWriter&& init_writers, std::vector<SingleParamWriter>& single_path_parameter_writer,
+    unsigned int stride_id, double init_radius, int history_size,
+    double init_alpha, double tol_obj, double tol_rel_obj, double tol_grad,
+    double tol_rel_grad, double tol_param, int num_iterations,
+    int num_elbo_draws, int num_draws, int num_multi_draws, int num_paths,
+    bool save_iterations, int refresh, callbacks::interrupt& interrupt,
+    callbacks::logger& logger, InitWriter&& init_writers,
+    std::vector<SingleParamWriter>& single_path_parameter_writer,
     std::vector<SingleDiagnosticWriter>& single_path_diagnostic_writer,
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
   const auto start_pathfinders_time = std::chrono::steady_clock::now();
@@ -112,11 +112,12 @@ inline int pathfinder_lbfgs_multi(
         for (int iter = r.begin(); iter < r.end(); ++iter) {
           auto pathfinder_ret
               = stan::services::pathfinder::pathfinder_lbfgs_single<true>(
-                  model, *(init[iter]), random_seed, stride_id + iter, init_radius,
-                  history_size, init_alpha, tol_obj, tol_rel_obj, tol_grad,
-                  tol_rel_grad, tol_param, num_iterations, num_elbo_draws, num_draws, 
-                  save_iterations, refresh, interrupt, logger,
-                  init_writers[iter], single_path_parameter_writer[iter],
+                  model, *(init[iter]), random_seed, stride_id + iter,
+                  init_radius, history_size, init_alpha, tol_obj, tol_rel_obj,
+                  tol_grad, tol_rel_grad, tol_param, num_iterations,
+                  num_elbo_draws, num_draws, save_iterations, refresh,
+                  interrupt, logger, init_writers[iter],
+                  single_path_parameter_writer[iter],
                   single_path_diagnostic_writer[iter]);
           if (std::get<0>(pathfinder_ret) == error_codes::SOFTWARE) {
             logger.info(std::string("Pathfinder iteration: ")
@@ -132,8 +133,8 @@ inline int pathfinder_lbfgs_multi(
       });
   const auto end_pathfinders_time = std::chrono::steady_clock::now();
 
-  const double pathfinders_delta_time
-      = stan::services::util::duration_diff(start_pathfinders_time, end_pathfinders_time);
+  const double pathfinders_delta_time = stan::services::util::duration_diff(
+      start_pathfinders_time, end_pathfinders_time);
   const auto start_psis_time = std::chrono::steady_clock::now();
   const size_t successful_pathfinders = individual_samples.size();
   if (successful_pathfinders == 0) {
@@ -179,7 +180,8 @@ inline int pathfinder_lbfgs_multi(
     parameter_writer(samples.col(rand_psis_idx()));
   }
   const auto end_psis_time = std::chrono::steady_clock::now();
-  double psis_delta_time = stan::services::util::duration_diff(start_psis_time, end_psis_time);
+  double psis_delta_time
+      = stan::services::util::duration_diff(start_psis_time, end_psis_time);
   parameter_writer();
   const auto time_header = std::string("Elapsed Time: ");
   std::string optim_time_str = time_header

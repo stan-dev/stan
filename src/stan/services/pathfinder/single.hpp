@@ -141,7 +141,8 @@ inline Eigen::MatrixXd approximate_samples(
  * @return A matrix with columns equal to the number of samples and rows equal
  * to the number of parameters. Each column represents an approximate draw for
  * the set of parameters.
- * @return A vector of an approximated sample derived from the taylor approximation.
+ * @return A vector of an approximated sample derived from the taylor
+ * approximation.
  */
 template <typename EigVec1, typename EigVec2,
           require_eigen_vector_t<EigVec1>* = nullptr>
@@ -206,7 +207,8 @@ generate_matrix(Generator&& variate_generator, const Eigen::Index num_params,
  * @param alpha The approximation of the diagonal hessian
  * @param iter_msg The beginning of messages that includes the iteration number
  * @param logger A callback writer for messages
- * @return A struct with the ELBO estimate along with the samples and log probability ratios.
+ * @return A struct with the ELBO estimate along with the samples and log
+ * probability ratios.
  */
 template <bool ReturnElbo = true, typename LPF, typename ConstrainF,
           typename RNG, typename EigVec, typename Logger>
@@ -479,7 +481,8 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * @param num_elbo_draws Number of draws for the ELBO estimation
  * @param iter_msg The beginning of messages that includes the iteration number
  * @param logger A callback writer for messages
- * @return A pair holding the elbo estimate information and the taylor approximation information.
+ * @return A pair holding the elbo estimate information and the taylor
+ * approximation information.
  */
 template <typename RNG, typename LPFun, typename ConstrainFun,
           typename AlphaVec, typename CurrentParams, typename CurrentGrads,
@@ -568,11 +571,11 @@ inline auto pathfinder_lbfgs_single(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
     unsigned int stride_id, double init_radius, int max_history_size,
     double init_alpha, double tol_obj, double tol_rel_obj, double tol_grad,
-    double tol_rel_grad, double tol_param, int num_iterations, 
-    int num_elbo_draws, int num_draws, 
-    bool save_iterations, int refresh, callbacks::interrupt& interrupt,
-    callbacks::logger& logger, callbacks::writer& init_writer, 
-    ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
+    double tol_rel_grad, double tol_param, int num_iterations,
+    int num_elbo_draws, int num_draws, bool save_iterations, int refresh,
+    callbacks::interrupt& interrupt, callbacks::logger& logger,
+    callbacks::writer& init_writer, ParamWriter& parameter_writer,
+    DiagnosticWriter& diagnostic_writer) {
   const auto start_pathfinder_time = std::chrono::steady_clock::now();
   boost::ecuyer1988 rng
       = util::create_rng<boost::ecuyer1988>(random_seed, stride_id);
@@ -843,10 +846,12 @@ inline auto pathfinder_lbfgs_single(
   parameter_writer(constrained_draws_mat.matrix());
   parameter_writer();
   const auto end_pathfinder_time = std::chrono::steady_clock::now();
-  const double pathfinder_delta_time = stan::services::util::duration_diff(start_pathfinder_time, end_pathfinder_time);
+  const double pathfinder_delta_time = stan::services::util::duration_diff(
+      start_pathfinder_time, end_pathfinder_time);
   const auto time_header = std::string("Elapsed Time: ");
-  std::string pathfinder_time_str = time_header + std::to_string(pathfinder_delta_time)
-                               + " seconds (Pathfinder)";
+  std::string pathfinder_time_str = time_header
+                                    + std::to_string(pathfinder_delta_time)
+                                    + " seconds (Pathfinder)";
   parameter_writer(pathfinder_time_str);
   parameter_writer();
   return internal::ret_pathfinder<ReturnLpSamples>(

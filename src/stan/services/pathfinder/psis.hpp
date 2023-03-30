@@ -137,7 +137,6 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
   }
 }
 
-
 /**
  * Runs quick_sort optionally in parallel
  * @param[in, out] arr The Array of doubles to be sorted
@@ -146,15 +145,14 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
  * elements in `arr`.
  */
 inline void dual_sort(Eigen::Array<double, -1, 1>& arr,
-                       Eigen::Array<Eigen::Index, -1, 1>& idx) {
+                      Eigen::Array<Eigen::Index, -1, 1>& idx) {
   std::vector<std::pair<double, int>> pair_vec;
   pair_vec.reserve(arr.size());
   for (std::size_t i = 0; i < arr.size(); ++i) {
     pair_vec.emplace_back(arr[i], idx[i]);
   }
-  std::sort(pair_vec.begin(), pair_vec.end(), [](auto&& a, auto&& b) {
-    return a.first < b.first;
-  });
+  std::sort(pair_vec.begin(), pair_vec.end(),
+            [](auto&& a, auto&& b) { return a.first < b.first; });
   for (std::size_t i = 0; i < arr.size(); ++i) {
     arr[i] = pair_vec[i].first;
     idx[i] = pair_vec[i].second;
