@@ -50,7 +50,7 @@ auto init_init_context() { return stan::io::empty_var_context(); }
 
 TEST_F(ServicesPathfinderEightSchools, multi) {
   constexpr unsigned int seed = 0;
-  constexpr unsigned int chain = 1;
+  constexpr unsigned int stride_id = 1;
   constexpr double init_radius = 1;
   constexpr size_t num_multi_draws = 10000;
   constexpr size_t num_paths = 16;
@@ -79,10 +79,10 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   stan::test::mock_callback callback;
 
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
-      model, single_path_inits, seed, chain, init_radius, history_size,
+      model, single_path_inits, seed, stride_id, init_radius, history_size,
       init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-      num_iterations, save_iterations, refresh, callback, num_elbo_draws,
-      num_draws, num_multi_draws, num_paths, logger,
+      num_iterations, num_elbo_draws, num_draws, num_multi_draws, num_paths,
+      save_iterations, refresh, callback, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
       diagnostics);
@@ -108,21 +108,17 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
                                    .sqrt();
 
   Eigen::RowVectorXd r_mean_vals(20);
-  r_mean_vals << 1.89104, 3.66449, 0.22256, 0.119645, -0.146812, 0.23633,
+  r_mean_vals << -17.9537, -47.016, 1.89104, 3.66449, 0.22256, 0.119645, -0.146812, 0.23633,
       -0.244868, -0.227134, 0.504507, 0.0476979, 3.66491, 2.57979, 1.21644,
-      2.81399, 1.53776, 1.39865, 3.99508, 2.41488, -17.9537, -47.016;
+      2.81399, 1.53776, 1.39865, 3.99508, 2.41488;
   Eigen::RowVectorXd r_sd_vals(20);
-  r_sd_vals << 1.93964, 4.77042, 0.95799, 0.842812, 0.963455, 0.948548, 1.03149,
+  r_sd_vals <<  4.37932, 2.28608, 1.93964, 4.77042, 0.95799, 0.842812, 0.963455, 0.948548, 1.03149,
       0.989, 0.920778, 0.888529, 4.6405, 3.63071, 4.25895, 4.45198, 3.90755,
-      4.23075, 4.56257, 4.22915, 4.37932, 2.28608;
+      4.23075, 4.56257, 4.22915;
   Eigen::MatrixXd all_mean_vals(3, 20);
   all_mean_vals.row(0) = mean_vals;
   all_mean_vals.row(1) = r_mean_vals;
   all_mean_vals.row(2) = mean_vals - r_mean_vals;
-#ifdef LOCAL_THREADS_TEST
-  std::cout << "all means: \n"
-            << all_mean_vals.format(CommaInitFmt) << std::endl;
-#endif
   // This samples badly, but is a known issue with initialization.
   for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
     EXPECT_NEAR(0, all_mean_vals(2, i), 1);
@@ -131,9 +127,6 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = r_sd_vals;
   all_sd_vals.row(2) = sd_vals - r_sd_vals;
-#ifdef LOCAL_THREADS_TEST
-  std::cout << "all sd: \n" << all_sd_vals.format(CommaInitFmt) << std::endl;
-#endif
   for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
     EXPECT_NEAR(0, all_sd_vals(2, i), 2);
   }
@@ -141,7 +134,7 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
 
 TEST_F(ServicesPathfinderEightSchools, single) {
   constexpr unsigned int seed = 0;
-  constexpr unsigned int chain = 1;
+  constexpr unsigned int stride_id = 1;
   constexpr double init_radius = 1;
   constexpr double num_elbo_draws = 80;
   constexpr double num_draws = 1000;
@@ -159,9 +152,9 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   stan::test::loggy logger(empty_ostream);
   stan::test::mock_callback callback;
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
-      model, context, seed, chain, init_radius, history_size, init_alpha,
+      model, context, seed, stride_id, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
-      save_iterations, refresh, callback, num_elbo_draws, num_draws, logger,
+      num_elbo_draws, num_draws, save_iterations, refresh, callback, logger,
       init, parameter, diagnostics);
 
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
@@ -232,9 +225,9 @@ TEST_F(ServicesPathfinderEightSchools, single) {
     for (Eigen::Index i = 0; i < r_answer.cols(); ++i) {
       unconstrained_draws = r_answer.col(i);
       model.write_array(rng, unconstrained_draws, constrained_draws1);
-      constrained_draws2.head(18) = constrained_draws1;
-      constrained_draws2(18) = lp_approx_vec(i);
-      constrained_draws2(19) = -fn(unconstrained_draws);
+      constrained_draws2.tail(18) = constrained_draws1;
+      constrained_draws2(0) = lp_approx_vec(i);
+      constrained_draws2(1) = -fn(unconstrained_draws);
       r_constrainted_draws_mat.col(i) = constrained_draws2;
     }
   }
@@ -256,22 +249,17 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   all_mean_vals.row(0) = mean_vals;
   all_mean_vals.row(1) = mean_r_vals;
   all_mean_vals.row(2) = mean_vals - mean_r_vals;
-#ifdef LOCAL_THREADS_TEST
-  std::cout << "all means: \n"
-            << all_mean_vals.format(CommaInitFmt) << std::endl;
-#endif
-  // Single pathfinder can do very badly for eight schools
-  for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
-    EXPECT_NEAR(0, all_mean_vals(2, i), 100);
-  }
 
   Eigen::MatrixXd all_sd_vals(3, 20);
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = sd_r_vals;
   all_sd_vals.row(2) = sd_vals - sd_r_vals;
-#ifdef LOCAL_THREADS_TEST
-  std::cout << "all sds: \n" << all_sd_vals.format(CommaInitFmt) << std::endl;
-#endif
+
+  // Single pathfinder can do very badly for eight schools
+  for (Eigen::Index i = 0; i < all_mean_vals.cols(); i++) {
+    EXPECT_NEAR(0, all_mean_vals(2, i), 100);
+  }
+
   for (Eigen::Index i = 0; i < all_sd_vals.cols(); i++) {
     EXPECT_NEAR(0, all_sd_vals(2, i), 100);
   }

@@ -85,7 +85,7 @@ TEST_F(ServicesPathfinderGLM, single) {
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
       model, empty_context, seed, chain, init_radius, history_size, init_alpha,
       tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param, num_iterations,
-      save_iterations, refresh, callback, num_elbo_draws, num_draws, logger,
+      num_elbo_draws, num_draws, save_iterations, refresh, callback, logger,
       init, parameter, diagnostics);
   Eigen::MatrixXd param_vals = std::move(parameter.values_);
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, 0, ", ", ", ", "\n", "",
@@ -138,10 +138,10 @@ TEST_F(ServicesPathfinderGLM, single) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = prev_sd_vals;
   all_sd_vals.row(2) = sd_diff_vals;
-  for (int i = 0; i < all_mean_vals.cols() - 2; ++i) {
+  for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_mean_vals(2, i), .01);
   }
-  for (int i = 0; i < all_mean_vals.cols() - 2; ++i) {
+  for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
   }
 }
@@ -178,8 +178,8 @@ TEST_F(ServicesPathfinderGLM, multi) {
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_multi(
       model, single_path_inits, seed, chain, init_radius, history_size,
       init_alpha, tol_obj, tol_rel_obj, tol_grad, tol_rel_grad, tol_param,
-      num_iterations, save_iterations, refresh, callback, num_elbo_draws,
-      num_draws, num_multi_draws, num_paths, logger,
+      num_iterations, num_elbo_draws, num_draws, num_multi_draws, 
+      num_paths, save_iterations, refresh, callback, logger,
       std::vector<stan::callbacks::stream_writer>(num_paths, init),
       single_path_parameter_writer, single_path_diagnostic_writer, parameter,
       diagnostics);
@@ -236,7 +236,8 @@ TEST_F(ServicesPathfinderGLM, multi) {
   all_mean_vals.row(0) = mean_vals;
   all_mean_vals.row(1) = prev_mean_vals;
   all_mean_vals.row(2) = mean_diff_vals;
-  for (int i = 0; i < all_mean_vals.cols() - 2; ++i) {
+
+  for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_mean_vals(2, i), .01);
   }
 
@@ -244,7 +245,7 @@ TEST_F(ServicesPathfinderGLM, multi) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = prev_sd_vals;
   all_sd_vals.row(2) = sd_diff_vals;
-  for (int i = 0; i < all_sd_vals.cols() - 2; ++i) {
+  for (int i = 2; i < all_sd_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), 0.1);
   }
 }
