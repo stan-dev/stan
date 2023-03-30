@@ -138,88 +138,31 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
 }
 
 /**
- * This function takes the last element as pivot, places the pivot element at
- * its correct position in the sorted array, and places all values smaller than
- * the pivot to the left of the pivot and all greater elements to the right of
- * the pivot
- * @param[in, out] arr The Array of doubles to be sorted
- * @param[in, out] idx The index of the original positions of the elements of
- * `arr`. This is also sorted to keep track of the original positions of the
- * elements in `arr`.
- * @param[in] low Starting index of the sort
- * @param[in] high Ending index of the sort
- */
-inline Eigen::Index quick_sort_partition(Eigen::Array<double, -1, 1>& arr,
-                                         Eigen::Array<Eigen::Index, -1, 1>& idx,
-                                         const Eigen::Index low,
-                                         const Eigen::Index high) {
-  const double pivot = arr.coeff(high);
-  Eigen::Index i = (low - 1);
-  for (Eigen::Index j = low; j <= high - 1; ++j) {
-    if (arr.coeff(j) <= pivot) {
-      ++i;
-      std::swap(arr.coeffRef(i), arr.coeffRef(j));
-      std::swap(idx.coeffRef(i), idx.coeffRef(j));
-    }
-  }
-  std::swap(arr.coeffRef(++i), arr.coeffRef(high));
-  std::swap(idx.coeffRef(i), idx.coeffRef(high));
-  return (i);
-}
-
-/**
- * Runs quick_sort optionally in parallel
- * @tparam Concurrent Whether to allow the algorithm to attempt to run in
- * parallel.
- * @param[in, out] arr The Array of doubles to be sorted
- * @param[in, out] idx The index of the original positions of the elements of
- * `arr`. This is also sorted to keep track of the original positions of the
- * elements in `arr`.
- * @param[in] low Starting index of the sort
- * @param[in] high Ending index of the sort
- */
-template <bool Concurrent = true>
-inline void quick_sort(Eigen::Array<double, -1, 1>& arr,
-                       Eigen::Array<Eigen::Index, -1, 1>& idx,
-                       const Eigen::Index low, const Eigen::Index high) {
-  if (low < high) {
-    const Eigen::Index partition_idx
-        = quick_sort_partition(arr, idx, low, high);
-    if (Concurrent && (high - low >= 400l)) {
-      tbb::parallel_invoke(
-          [&arr, &idx, low, partition_idx]() {
-            quick_sort(arr, idx, low, partition_idx - 1);
-          },
-          [&arr, &idx, high, partition_idx]() {
-            quick_sort(arr, idx, partition_idx + 1, high);
-          });
-    } else {
-      quick_sort<false>(arr, idx, low, partition_idx - 1);
-      quick_sort<false>(arr, idx, partition_idx + 1, high);
-    }
-  }
-}
-
-/**
  * Runs quick_sort optionally in parallel
  * @param[in, out] arr The Array of doubles to be sorted
  * @param[in, out] idx The index of the original positions of the elements of
  * `arr`. This is also sorted to keep track of the original positions of the
  * elements in `arr`.
  */
-inline void quick_sort(Eigen::Array<double, -1, 1>& arr,
-                       Eigen::Array<Eigen::Index, -1, 1>& idx) {
-  if (arr.size() >= 400l) {
-    quick_sort(arr, idx, 0l, arr.size() - 1l);
-  } else {
-    quick_sort<false>(arr, idx, 0l, arr.size() - 1l);
+inline void dual_sort(Eigen::Array<double, -1, 1>& arr,
+                      Eigen::Array<Eigen::Index, -1, 1>& idx) {
+  std::vector<std::pair<double, int>> pair_vec;
+  pair_vec.reserve(arr.size());
+  for (std::size_t i = 0; i < arr.size(); ++i) {
+    pair_vec.emplace_back(arr[i], idx[i]);
   }
+  std::sort(pair_vec.begin(), pair_vec.end(),
+            [](auto&& a, auto&& b) { return a.first < b.first; });
+  for (std::size_t i = 0; i < arr.size(); ++i) {
+    arr[i] = pair_vec[i].first;
+    idx[i] = pair_vec[i].second;
+  }
+  return;
 }
 
 inline auto largest_insertion(const Eigen::Array<double, -1, 1>& top_n,
                               const double value) {
   const Eigen::Index top_size = top_n.size();
-  Eigen::Index low_idx = -1l;
   Eigen::Index high_idx = top_size;
   for (Eigen::Index low_idx = -1, probe_idx = (-1l + top_size) / 2l;
        high_idx - low_idx > 1l; probe_idx = (low_idx + high_idx) / 2l) {
@@ -229,7 +172,7 @@ inline auto largest_insertion(const Eigen::Array<double, -1, 1>& top_n,
       low_idx = probe_idx;
     }
   }
-  return high_idx - 1l;
+  return high_idx - 1;
 }
 
 /**
@@ -245,7 +188,7 @@ largest_n_elements(const Eigen::Array<double, -1, 1>& arr,
   Eigen::Array<double, -1, 1> top_n = arr.head(top_size);
   Eigen::Array<Eigen::Index, -1, 1> top_n_idx
       = Eigen::Array<Eigen::Index, -1, 1>::LinSpaced(top_size, 0, top_size);
-  quick_sort(top_n, top_n_idx);
+  dual_sort(top_n, top_n_idx);
   for (Eigen::Index i = top_size; i < arr.size(); ++i) {
     if (arr.coeff(i) >= top_n.coeff(0)) {
       const Eigen::Index starting_pos = largest_insertion(top_n, arr.coeff(i));

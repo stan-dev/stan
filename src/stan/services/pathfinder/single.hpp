@@ -10,6 +10,7 @@
 #include <stan/services/error_codes.hpp>
 #include <stan/services/util/initialize.hpp>
 #include <stan/services/util/create_rng.hpp>
+#include <stan/services/util/duration_diff.hpp>
 #include <boost/circular_buffer.hpp>
 #include <tbb/parallel_for.h>
 #include <tbb/concurrent_queue.h>
@@ -54,6 +55,7 @@ inline bool check_curve(const EigVec& Yk, const EigVec& Sk, Logger&& logger) {
  * @param alpha_init Vector of initial values to update
  * @param Yk Vector of gradients
  * @param Sk Vector of values
+ * @return A vector of the next updated diagonal of the hessian.
  */
 template <typename EigVec1, typename EigVec2, typename EigVec3>
 inline auto form_diag(const EigVec1& alpha_init, const EigVec2& Yk,
@@ -139,6 +141,8 @@ inline Eigen::MatrixXd approximate_samples(
  * @return A matrix with columns equal to the number of samples and rows equal
  * to the number of parameters. Each column represents an approximate draw for
  * the set of parameters.
+ * @return A vector of an approximated sample derived from the taylor
+ * approximation.
  */
 template <typename EigVec1, typename EigVec2,
           require_eigen_vector_t<EigVec1>* = nullptr>
@@ -171,7 +175,7 @@ inline Eigen::VectorXd approximate_samples(
  * @param[in,out] variate_generator An rng generator
  * @param num_params The runtime number of parameters
  * @param num_samples The runtime number of samples.
- *
+ * @return A matrix of values generated from the `variate_generator`
  */
 template <Eigen::Index RowsAtCompileTime = -1,
           Eigen::Index ColsAtCompileTime = -1, typename Generator>
@@ -203,6 +207,8 @@ generate_matrix(Generator&& variate_generator, const Eigen::Index num_params,
  * @param alpha The approximation of the diagonal hessian
  * @param iter_msg The beginning of messages that includes the iteration number
  * @param logger A callback writer for messages
+ * @return A struct with the ELBO estimate along with the samples and log
+ * probability ratios.
  */
 template <bool ReturnElbo = true, typename LPF, typename ConstrainF,
           typename RNG, typename EigVec, typename Logger>
@@ -275,6 +281,7 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
  * @param ninvRST Inverse of the Rk matrix
  * @param point_est The parameters for the given iteration of LBFGS
  * @param grad_est The gradients for the given iteration of LBFGS
+ * @return The components of the dense taylor approximation
  */
 template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
           typename EigVec>
@@ -322,6 +329,7 @@ inline taylor_approx_t taylor_approximation_dense(
  * @param ninvRST
  * @param point_est The parameters for the given iteration of LBFGS
  * @param grad_est The gradients for the given iteration of LBFGS
+ * @return The components of the sparse taylor approximation
  */
 template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
           typename EigVec>
@@ -396,6 +404,7 @@ inline taylor_approx_t taylor_approximation_sparse(
  * @param ninvRST
  * @param point_est The parameters for the given iteration of LBFGS
  * @param grad_est The gradients for the given iteration of LBFGS
+ * @return The components of either the sparse or dense taylor approximation
  */
 template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
           typename EigVec>
@@ -407,11 +416,11 @@ inline taylor_approx_t taylor_approximation(
   const auto history_size = Ykt_mat.cols();
   const auto num_params = Ykt_mat.rows();
   if (2 * history_size >= num_params) {
-    return taylor_approximation_sparse(Ykt_mat, alpha, Dk, ninvRST, point_est,
-                                       grad_est);
-  } else {
     return taylor_approximation_dense(Ykt_mat, alpha, Dk, ninvRST, point_est,
                                       grad_est);
+  } else {
+    return taylor_approximation_sparse(Ykt_mat, alpha, Dk, ninvRST, point_est,
+                                       grad_est);
   }
 }
 
@@ -472,6 +481,8 @@ inline auto ret_pathfinder(int return_code, EigVec&& lp_ratio, EigMat&& samples,
  * @param num_elbo_draws Number of draws for the ELBO estimation
  * @param iter_msg The beginning of messages that includes the iteration number
  * @param logger A callback writer for messages
+ * @return A pair holding the elbo estimate information and the taylor
+ * approximation information.
  */
 template <typename RNG, typename LPFun, typename ConstrainFun,
           typename AlphaVec, typename CurrentParams, typename CurrentGrads,
@@ -517,7 +528,7 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
  * @param[in] init ($pi_0$ in paper) var context for initialization. Random
  * initial values will be generated for parameters user has not supplied.
  * @param[in] random_seed seed for the random number generator
- * @param[in] path path id to advance the pseudo random number generator
+ * @param[in] stride_id id to advance the pseudo random number generator
  * @param[in] init_radius A non-negative value to initialize variables uniformly
  * in (-init_radius, init_radius) if not defined in the initialization var
  * context
@@ -558,16 +569,16 @@ template <bool ReturnLpSamples = false, class Model, typename DiagnosticWriter,
           typename ParamWriter>
 inline auto pathfinder_lbfgs_single(
     Model& model, const stan::io::var_context& init, unsigned int random_seed,
-    unsigned int path, double init_radius, int max_history_size,
+    unsigned int stride_id, double init_radius, int max_history_size,
     double init_alpha, double tol_obj, double tol_rel_obj, double tol_grad,
     double tol_rel_grad, double tol_param, int num_iterations,
-    bool save_iterations, int refresh, callbacks::interrupt& interrupt,
-    int num_elbo_draws, int num_draws, callbacks::logger& logger,
+    int num_elbo_draws, int num_draws, bool save_iterations, int refresh,
+    callbacks::interrupt& interrupt, callbacks::logger& logger,
     callbacks::writer& init_writer, ParamWriter& parameter_writer,
     DiagnosticWriter& diagnostic_writer) {
-  const auto start_optim_time = std::chrono::steady_clock::now();
+  const auto start_pathfinder_time = std::chrono::steady_clock::now();
   boost::ecuyer1988 rng
-      = util::create_rng<boost::ecuyer1988>(random_seed, path);
+      = util::create_rng<boost::ecuyer1988>(random_seed, stride_id);
   std::vector<int> disc_vector;
   std::vector<double> cont_vector = util::initialize<false>(
       model, init, rng, init_radius, false, logger, init_writer);
@@ -591,27 +602,24 @@ inline auto pathfinder_lbfgs_single(
                                            Eigen::Dynamic, true>;
   Optimizer lbfgs(model, cont_vector, disc_vector, std::move(ls_opts),
                   std::move(conv_opts), std::move(lbfgs_update), &lbfgs_ss);
-  const std::string path_num("Path: [" + std::to_string(path) + "] ");
+  const std::string path_num("Path: [" + std::to_string(stride_id) + "] ");
   if (refresh != 0) {
     logger.info(path_num + "Initial log joint density = "
                 + std::to_string(lbfgs.logp()));
   }
   std::vector<std::string> names;
-  model.constrained_param_names(names, true, true);
   names.push_back("lp_approx__");
   names.push_back("lp__");
+  model.constrained_param_names(names, true, true);
   parameter_writer(names);
   int ret = 0;
-  std::vector<Eigen::VectorXd> param_vecs;
-  param_vecs.reserve(num_iterations);
-  std::vector<Eigen::VectorXd> grad_vecs;
-  grad_vecs.reserve(num_iterations);
+  boost::circular_buffer<Eigen::VectorXd> param_buff(max_history_size);
+  boost::circular_buffer<Eigen::VectorXd> grad_buff(max_history_size);
   Eigen::VectorXd prev_params
       = Eigen::Map<Eigen::VectorXd>(cont_vector.data(), cont_vector.size());
   Eigen::VectorXd prev_grads;
-  boost::circular_buffer<Eigen::VectorXd> param_buff(max_history_size);
-  boost::circular_buffer<Eigen::VectorXd> grad_buff(max_history_size);
   std::size_t history_size = 0;
+  // Initial gradients
   {
     std::vector<double> g1;
     double lp = stan::model::log_prob_grad<true, true>(model, cont_vector,
@@ -728,12 +736,13 @@ inline auto pathfinder_lbfgs_single(
                   + std::to_string(pathfinder_res.first.elbo) + ")");
     }
   }
+  num_evals += lbfgs.grad_evals();
   if (ret >= 0) {
     logger.info("Optimization terminated normally: ");
   } else {
     std::string prefix_err_msg
         = "Optimization terminated with error: " + lbfgs.get_code_string(ret);
-    if (param_vecs.size() == 1) {
+    if (lbfgs.iter_num() < 2) {
       logger.info(prefix_err_msg
                   + " Optimization failed to start, pathfinder cannot be run.");
       return internal::ret_pathfinder<ReturnLpSamples>(
@@ -745,7 +754,6 @@ inline auto pathfinder_lbfgs_single(
           " Stan will still attempt pathfinder but may fail or produce incorrect results.");
     }
   }
-  num_evals += lbfgs.grad_evals();
   if (best_E == -1) {
     logger.info(path_num +
         "Failure: None of the LBFGS iterations completed "
@@ -786,19 +794,19 @@ inline auto pathfinder_lbfgs_single(
       Eigen::VectorXd unconstrained_col;
       Eigen::VectorXd approx_samples_constrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
+        constrained_draws_mat.col(i).head(2) = elbo_lp_mat.row(i);
         unconstrained_col = elbo_draws.col(i);
-        constrained_draws_mat.col(i).head(num_unconstrained_params)
+        constrained_draws_mat.col(i).tail(num_unconstrained_params)
             = constrain_fun(rng, unconstrained_col,
                             approx_samples_constrained_col);
-        constrained_draws_mat.col(i).tail(2) = elbo_lp_mat.row(i);
       }
       for (Eigen::Index i = elbo_draws.cols(), j = 0; i < total_size;
            ++i, ++j) {
+        constrained_draws_mat.col(i).head(2) = lp_draws.row(j);
         unconstrained_col = new_draws.col(j);
-        constrained_draws_mat.col(i).head(num_unconstrained_params)
+        constrained_draws_mat.col(i).tail(num_unconstrained_params)
             = constrain_fun(rng, unconstrained_col,
                             approx_samples_constrained_col);
-        constrained_draws_mat.col(i).tail(2) = lp_draws.row(j);
       }
     } catch (const std::exception& e) {
       std::string err_msg = e.what();
@@ -813,11 +821,11 @@ inline auto pathfinder_lbfgs_single(
       Eigen::VectorXd approx_samples_constrained_col;
       Eigen::VectorXd unconstrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
+        constrained_draws_mat.col(i).head(2) = elbo_lp_mat.row(i);
         unconstrained_col = elbo_draws.col(i);
-        constrained_draws_mat.col(i).head(num_unconstrained_params)
+        constrained_draws_mat.col(i).tail(num_unconstrained_params)
             = constrain_fun(rng, unconstrained_col,
                             approx_samples_constrained_col);
-        constrained_draws_mat.col(i).tail(2) = elbo_lp_mat.row(i);
       }
       lp_ratio = std::move(elbo_best.lp_ratio);
     }
@@ -827,25 +835,24 @@ inline auto pathfinder_lbfgs_single(
     Eigen::VectorXd approx_samples_constrained_col;
     Eigen::VectorXd unconstrained_col;
     for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
+      constrained_draws_mat.col(i).head(2) = elbo_lp_mat.row(i);
       unconstrained_col = elbo_draws.col(i);
-      constrained_draws_mat.col(i).head(num_unconstrained_params)
+      constrained_draws_mat.col(i).tail(num_unconstrained_params)
           = constrain_fun(rng, unconstrained_col,
                           approx_samples_constrained_col);
-      constrained_draws_mat.col(i).tail(2) = elbo_lp_mat.row(i);
     }
     lp_ratio = std::move(elbo_best.lp_ratio);
   }
   parameter_writer(constrained_draws_mat.matrix());
   parameter_writer();
-  const auto end_optim_time = std::chrono::steady_clock::now();
-  const double optim_delta_time
-      = std::chrono::duration_cast<std::chrono::milliseconds>(
-            end_optim_time - start_optim_time)
-            .count()
-        / 1000.0;
+  const auto end_pathfinder_time = std::chrono::steady_clock::now();
+  const double pathfinder_delta_time = stan::services::util::duration_diff(
+      start_pathfinder_time, end_pathfinder_time);
   const auto time_header = std::string("Elapsed Time: ");
-  std::string optim_time_str = time_header + std::to_string(optim_delta_time)
-                               + " seconds (Pathfinder)";
+  std::string pathfinder_time_str = time_header
+                                    + std::to_string(pathfinder_delta_time)
+                                    + " seconds (Pathfinder)";
+  parameter_writer(pathfinder_time_str);
   parameter_writer();
   return internal::ret_pathfinder<ReturnLpSamples>(
       error_codes::OK, std::move(lp_ratio), std::move(constrained_draws_mat),
