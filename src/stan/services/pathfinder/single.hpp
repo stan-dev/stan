@@ -751,7 +751,8 @@ inline auto pathfinder_lbfgs_single(
           std::atomic<size_t>{num_evals + lbfgs.grad_evals()});
     } else {
       logger.info(prefix_err_msg +
-          " Stan will still attempt pathfinder but may fail or produce incorrect results.");
+          " Stan will still attempt pathfinder but may fail or produce "
+          "incorrect results.");
     }
   }
   if (best_E == -1) {
