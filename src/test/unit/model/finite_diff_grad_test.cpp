@@ -1,4 +1,5 @@
 #include <stan/model/finite_diff_grad.hpp>
+#include <stan/io/dump.hpp>
 #include <test/unit/model/test_model.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <test/unit/util.hpp>
