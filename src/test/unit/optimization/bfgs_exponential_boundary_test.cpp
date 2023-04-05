@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/optimization/bfgs.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/exponential_boundary.hpp>
 
 typedef exponential_boundary_model_namespace::exponential_boundary_model Model;
@@ -13,9 +14,7 @@ TEST(OptimizationBfgs, exponential_boundary_nonconvergence) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
 
   Model eb_model(dummy_context);
   std::stringstream out;

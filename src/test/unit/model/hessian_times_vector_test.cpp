@@ -1,4 +1,5 @@
 #include <stan/model/hessian_times_vector.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <gtest/gtest.h>
 
@@ -10,9 +11,7 @@ TEST(ModelUtil, hessian_times_vector) {
   double f;
   Eigen::VectorXd hess_f_dot_v(dim);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream output;
   valid_model_namespace::valid_model valid_model(data_var_context, 0, &output);
