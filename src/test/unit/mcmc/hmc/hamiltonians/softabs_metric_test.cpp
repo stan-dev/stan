@@ -1,4 +1,4 @@
-#include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
@@ -68,9 +68,7 @@ TEST(McmcSoftAbs, gradients) {
   z.q = q;
   z.p.setOnes();
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;

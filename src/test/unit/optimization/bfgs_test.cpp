@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <stan/optimization/bfgs.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
 
 typedef rosenbrock_model_namespace::rosenbrock_model Model;
@@ -14,9 +15,7 @@ TEST(OptimizationBfgs, rosenbrock_bfgs_convergence) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
 
   Model rb_model(dummy_context);
   std::stringstream out;
@@ -48,9 +47,7 @@ TEST(OptimizationBfgs, rosenbrock_bfgs_termconds) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
 
   Model rb_model(dummy_context);
 
@@ -117,9 +114,7 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_convergence) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
 
   Model rb_model(dummy_context);
   std::stringstream out;
@@ -151,9 +146,7 @@ TEST(OptimizationBfgs, rosenbrock_lbfgs_termconds) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
 
   Model rb_model(dummy_context);
   std::stringstream out;
@@ -239,9 +232,7 @@ TEST(OptimizationBfgs, ModelAdaptor) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
@@ -260,9 +251,7 @@ TEST(OptimizationBfgs, ModelAdaptor_fevals) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
@@ -277,9 +266,7 @@ TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
@@ -299,9 +286,7 @@ TEST(OptimizationBfgs, ModelAdaptor_operator_parens__matrix_double_matrix) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
@@ -321,9 +306,7 @@ TEST(OptimizationBfgs, ModelAdaptor_df) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   stan::optimization::ModelAdaptor<Model> mod(rb_model, disc_vector, &out);
@@ -342,9 +325,7 @@ TEST(OptimizationBfgs, BFGSLineSearch) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
@@ -361,9 +342,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_initialize) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
@@ -385,9 +364,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_grad_evals) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
@@ -402,9 +379,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_logp) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
@@ -419,9 +394,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_grad_norm) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
@@ -439,9 +412,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_grad) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);
@@ -460,9 +431,7 @@ TEST(OptimizationBfgs, BFGSLineSearch_params_r) {
   cont_vector[1] = 1;
   std::vector<int> disc_vector;
 
-  static const std::string DATA("");
-  std::stringstream data_stream(DATA);
-  stan::io::dump dummy_context(data_stream);
+  stan::io::empty_var_context dummy_context;
   Model rb_model(dummy_context);
   std::stringstream out;
   Optimizer bfgs(rb_model, cont_vector, disc_vector, &out);

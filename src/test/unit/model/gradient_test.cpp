@@ -1,4 +1,5 @@
 #include <stan/model/gradient.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <gtest/gtest.h>
@@ -10,9 +11,7 @@ TEST(ModelUtil, gradient) {
   double f;
   Eigen::VectorXd g(dim);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream output;
   valid_model_namespace::valid_model valid_model(data_var_context, 0, &output);
@@ -37,9 +36,7 @@ TEST(ModelUtil, gradient_writer) {
   double f;
   Eigen::VectorXd g(dim);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream output;
   stan::test::unit::instrumented_logger logger;

@@ -1,6 +1,7 @@
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/model/test_gradients.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <test/unit/util.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
@@ -9,9 +10,7 @@
 TEST(ModelUtil, streams) {
   stan::test::capture_std_streams();
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   stan_model model(data_var_context, 0, static_cast<std::stringstream*>(0));
   std::vector<double> params_r(1);
