@@ -17,7 +17,7 @@ typedef boost::ecuyer1988 rng_t;
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   rng_t base_rng(0);
 
-stan::io::empty_var_context data_var_context;
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;
@@ -66,7 +66,7 @@ stan::io::empty_var_context data_var_context;
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
   rng_t base_rng(0);
 
-stan::io::empty_var_context data_var_context;
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;
@@ -153,7 +153,7 @@ stan::io::empty_var_context data_var_context;
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   rng_t base_rng(0);
 
-stan::io::empty_var_context data_var_context;
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;
@@ -202,7 +202,7 @@ stan::io::empty_var_context data_var_context;
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
   rng_t base_rng(0);
 
-stan::io::empty_var_context data_var_context;
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;
