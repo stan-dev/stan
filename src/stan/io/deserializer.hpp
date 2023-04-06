@@ -31,18 +31,18 @@ namespace io {
 template <typename T>
 class deserializer {
  private:
-  Eigen::Map<Eigen::Matrix<T, -1, 1>> map_r_;    // map of reals.
-  Eigen::Map<Eigen::Matrix<int, -1, 1>> map_i_;  // map of integers.
-  size_t r_size_{0};                             // size of reals available.
-  size_t i_size_{0};                             // size of integers available.
-  size_t pos_r_{0};  // current position in map of reals.
-  size_t pos_i_{0};  // current position in map of integers.
+  Eigen::Map<const Eigen::Matrix<T, -1, 1>> map_r_;    // map of reals.
+  Eigen::Map<const Eigen::Matrix<int, -1, 1>> map_i_;  // map of integers.
+  size_t r_size_{0};  // size of reals available.
+  size_t i_size_{0};  // size of integers available.
+  size_t pos_r_{0};   // current position in map of reals.
+  size_t pos_i_{0};   // current position in map of integers.
 
   /**
    * Return reference to current scalar and increment the internal counter.
    * @param m amount to move `pos_r_` up.
    */
-  inline T& scalar_ptr_increment(size_t m) {
+  inline const T& scalar_ptr_increment(size_t m) {
     pos_r_ += m;
     return map_r_.coeffRef(pos_r_ - m);
   }
@@ -89,9 +89,9 @@ class deserializer {
   using vector_t = Eigen::Matrix<T, Eigen::Dynamic, 1>;
   using row_vector_t = Eigen::Matrix<T, 1, Eigen::Dynamic>;
 
-  using map_matrix_t = Eigen::Map<matrix_t>;
-  using map_vector_t = Eigen::Map<vector_t>;
-  using map_row_vector_t = Eigen::Map<row_vector_t>;
+  using map_matrix_t = Eigen::Map<const matrix_t>;
+  using map_vector_t = Eigen::Map<const vector_t>;
+  using map_row_vector_t = Eigen::Map<const row_vector_t>;
 
   using var_matrix_t = stan::math::var_value<
       Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>>;
@@ -113,7 +113,7 @@ class deserializer {
    */
   template <typename RVec, typename IntVec,
             require_all_vector_like_t<RVec, IntVec>* = nullptr>
-  deserializer(RVec& data_r, IntVec& data_i)
+  deserializer(const RVec& data_r, const IntVec& data_i)
       : map_r_(data_r.data(), data_r.size()),
         map_i_(data_i.data(), data_i.size()),
         r_size_(data_r.size()),
