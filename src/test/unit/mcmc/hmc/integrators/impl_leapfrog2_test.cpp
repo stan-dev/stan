@@ -1,4 +1,4 @@
-#include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <stan/mcmc/hmc/hamiltonians/softabs_metric.hpp>
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
@@ -17,9 +17,7 @@ typedef boost::ecuyer1988 rng_t;
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
   rng_t base_rng(0);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;
@@ -68,9 +66,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_energy_conservation) {
 TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
   rng_t base_rng(0);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;
@@ -157,9 +153,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, unit_e_symplecticness) {
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
   rng_t base_rng(0);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;
@@ -208,9 +202,7 @@ TEST(McmcHmcIntegratorsImplLeapfrog, softabs_energy_conservation) {
 TEST(McmcHmcIntegratorsImplLeapfrog, softabs_symplecticness) {
   rng_t base_rng(0);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;

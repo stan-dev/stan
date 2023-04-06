@@ -1,6 +1,6 @@
 #include <string>
 #include <boost/random/additive_combine.hpp>
-#include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/unit/mcmc/hmc/mock_hmc.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 #include <stan/callbacks/stream_logger.hpp>
@@ -52,9 +52,7 @@ TEST(McmcDiagEMetric, gradients) {
   z.q = q;
   z.p.setOnes();
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   funnel_model_namespace::funnel_model model(data_var_context, 0,
