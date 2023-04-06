@@ -9,6 +9,7 @@
 #include <stan/services/pathfinder/multi.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
+#include <stan/io/dump.hpp>
 #include <test/test-models/good/normal_glm.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
