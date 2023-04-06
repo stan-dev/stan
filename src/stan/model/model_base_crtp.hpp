@@ -203,13 +203,6 @@ class model_base_crtp : public stan::model::model_base {
         rng, theta, theta_i, vars, include_tparams, include_gqs, msgs);
   }
 
-  void transform_inits(const io::var_context& context,
-                       Eigen::VectorXd& params_r,
-                       std::ostream* msgs) const override {
-    return static_cast<const M*>(this)->transform_inits(context, params_r,
-                                                        msgs);
-  }
-
 #ifdef STAN_MODEL_FVAR_VAR
 
   /**

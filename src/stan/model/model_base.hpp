@@ -368,6 +368,22 @@ class model_base : public prob_grad {
                            bool include_tparams = true, bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
 
+
+  /**
+   * Convert the specified sequence of constrained parameters to a
+   * sequence of unconstrained parameters.
+   *
+   * This is the inverse of write_array. The output will be resized
+   * if necessary to match the number of unconstrained parameters.
+   *
+   * @param[in] params_r_constrained constrained parameters input
+   * @param[in,out] params_r unconstrained parameters produced
+   * @param[in,out] msgs msgs stream to which messages are written
+   */
+  virtual void unconstrain_array(const Eigen::VectorXd& params_constrained_r,
+                                 Eigen::VectorXd& params_r,
+                                 std::ostream* msgs = nullptr) const = 0;
+
   // TODO(carpenter): cut redundant std::vector versions from here ===
 
   /**
@@ -604,6 +620,21 @@ class model_base : public prob_grad {
                            std::vector<double>& params_r_constrained,
                            bool include_tparams = true, bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
+
+  /**
+   * Convert the specified sequence of constrained parameters to a
+   * sequence of unconstrained parameters.
+   *
+   * This is the inverse of write_array. The output will be resized
+   * if necessary to match the number of unconstrained parameters.
+   *
+   * @param[in] params_r_constrained constrained parameters input
+   * @param[in,out] params_r unconstrained parameters produced
+   * @param[in,out] msgs msgs stream to which messages are written
+   */
+  virtual void unconstrain_array(const std::vector<double>& params_constrained_r,
+                                 std::vector<double>& params_r,
+                                 std::ostream* msgs = nullptr) const = 0;
 
 #ifdef STAN_MODEL_FVAR_VAR
 
