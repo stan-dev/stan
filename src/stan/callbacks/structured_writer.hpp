@@ -20,16 +20,8 @@ class structured_writer {
    */
   virtual ~structured_writer() {}
 
-  /**
-   * Write start symbol
-   */
-  virtual void start_token() {}
-
-  /**
-   * Write end symbol
-   *
-   */
-  virtual void end_token() {}
+  virtual void begin() {}
+  virtual void end() {}
 
   virtual void keyed_begin(const std::string& key) {}
   virtual void keyed_null() {}
