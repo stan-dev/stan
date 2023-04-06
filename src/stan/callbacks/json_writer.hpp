@@ -85,6 +85,16 @@ class json_writer final : public structured_writer {
     *output_ << value;
   }
 
+  void keyed_value(const std::string& key,
+                    const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
+    write_sep();
+    write_key(key);
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+                                 ", ", "", "", "\n", "", "");
+    *output_ << std::get<0>(state).transpose().eval();
+    *output_ << std::get<1>(state).transpose().eval();
+  }
+
   // complex numbers are objects?
   //  void keyed_scalar(const std::string& key, double value) {
   //  write_sep();
@@ -98,28 +108,10 @@ class json_writer final : public structured_writer {
     write_vector(values);
   }
 
-  void keyed_values(const std::string& key,
-                    const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
-    write_sep();
-    write_key(key);
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
-    *output_ << std::get<0>(state).transpose().eval();
-    *output_ << std::get<1>(state).transpose().eval();
-  }
-
   void keyed_values(const std::string& key, const Eigen::MatrixXd& states) {
     write_sep();
     write_key(key);
     *output_ << "\"" << key << "\" : \"";
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
-    *output_ << states.transpose().format(CommaInitFmt);
-  }
-
-  void operator()(const std::string& key, const Eigen::MatrixXd& states) {
-    write_sep();
-    write_key(key);
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
                                  ", ", "", "", "\n", "", "");
     *output_ << states.transpose().format(CommaInitFmt);
