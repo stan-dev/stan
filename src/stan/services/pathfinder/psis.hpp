@@ -89,8 +89,8 @@ inline std::pair<double, double> gpdfit(const EigArray& x,
   const double sigma = -k / theta_hat;
   constexpr double a = 10;
   const double n_plus_a = N + a;
-  auto kk = k * N / n_plus_a + a * 0.5 / n_plus_a;
-  return {sigma, kk};
+  auto k_weighted = k * N / n_plus_a + a * 0.5 / n_plus_a;
+  return {sigma, k_weighted};
 }
 
 /**
@@ -138,7 +138,7 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
 }
 
 /**
- * Runs quick_sort optionally in parallel
+ * Sort the input arr and store the original indices for the sorted array in `idx`
  * @param[in, out] arr The Array of doubles to be sorted
  * @param[in, out] idx The index of the original positions of the elements of
  * `arr`. This is also sorted to keep track of the original positions of the
@@ -160,19 +160,22 @@ inline void dual_sort(Eigen::Array<double, -1, 1>& arr,
   return;
 }
 
-inline auto largest_insertion(const Eigen::Array<double, -1, 1>& top_n,
-                              const double value) {
-  const Eigen::Index top_size = top_n.size();
-  Eigen::Index high_idx = top_size;
-  for (Eigen::Index low_idx = -1, probe_idx = (-1l + top_size) / 2l;
-       high_idx - low_idx > 1l; probe_idx = (low_idx + high_idx) / 2l) {
-    if (top_n.coeff(probe_idx) > value) {
-      high_idx = probe_idx;
-    } else {
-      low_idx = probe_idx;
-    }
+/**
+ * Returns the index to the first element in the range [first, last) that does not satisfy element < value or last if no such element is found. 
+ * @param arr The index (range) to search
+ * @param value The value to search for
+ * @return The index to the first element in the range [first, last) that does not satisfy element < value or last if no such element is found
+ */
+inline auto lower_bound_idx(const Eigen::Array<double, -1, 1>& arr, const double value) {
+  Eigen::Index base = 0;
+  Eigen::Index search_len = arr.size();
+  while (search_len > 1) {
+      Eigen::Index half = search_len / 2;
+      // some compilers will replace this with  with a cmov
+      base += (arr.coeff(base + half) < value) * half; 
+      search_len -= half;
   }
-  return high_idx - 1;
+  return base;
 }
 
 /**
@@ -191,7 +194,7 @@ largest_n_elements(const Eigen::Array<double, -1, 1>& arr,
   dual_sort(top_n, top_n_idx);
   for (Eigen::Index i = top_size; i < arr.size(); ++i) {
     if (arr.coeff(i) >= top_n.coeff(0)) {
-      const Eigen::Index starting_pos = largest_insertion(top_n, arr.coeff(i));
+      const Eigen::Index starting_pos = lower_bound_idx(top_n, arr.coeff(i));
       for (Eigen::Index k = 1; k <= starting_pos; ++k) {
         top_n.coeffRef(k - 1) = top_n.coeff(k);
       }
@@ -206,13 +209,16 @@ largest_n_elements(const Eigen::Array<double, -1, 1>& arr,
 }
 }  // namespace internal
 
-/*
+/**
  * Compute Pareto smoothed importance sampling (PSIS) log weights.
  *
  * @tparam EigArray An Eigen type inheriting from `ArrayBase` with dynamic
+ * @tparam Logger A type derived from `stan::callbacks::logger`
  * compile time rows and 1 compile time column.
  * @param[in] log_ratios Array of logarithms of importance ratios
  * @param[in] tail_len Size of the tail
+ * @param[in,out] logger Stream for writing possible warnings 
+ * @return An array with the weights for each observation for PSIS
  */
 template <typename EigArray, typename Logger>
 inline Eigen::Array<double, -1, 1> psis_weights(const EigArray& log_ratios,

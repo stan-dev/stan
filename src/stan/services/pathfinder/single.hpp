@@ -33,9 +33,16 @@ inline Eigen::MatrixXd tcrossprod(T1&& x) {
       .rankUpdate(std::forward<T1>(x));
 }
 
-template <typename EigVec, stan::require_eigen_vector_t<EigVec>* = nullptr,
-          typename Logger>
-inline bool check_curve(const EigVec& Yk, const EigVec& Sk, Logger&& logger) {
+/**
+ * Check the optimization direction is strictly positive and curvature is 'tame'
+ * @tparam EigVec1 Type derived from `Eigen::DenseBase` with one column at
+ * compile time
+ * @param Yk Vector of gradients
+ * @param Sk Vector of values
+ * @return boolean with true if both the optimization direction `Dk` is greater than zero and the curvature `thetak` is less than 1e12.
+ */
+template <typename EigVec, stan::require_eigen_vector_t<EigVec>* = nullptr>
+inline bool check_curve(const EigVec& Yk, const EigVec& Sk) {
   auto Dk = Yk.dot(Sk);
   auto thetak = std::abs(Yk.array().square().sum() / Dk);
   return Dk > 0 && thetak <= 1e12;
@@ -74,7 +81,7 @@ inline auto form_diag(const EigVec1& alpha_init, const EigVec2& Yk,
  * Information from running the taylor approximation
  */
 struct taylor_approx_t {
-  Eigen::VectorXd x_center;
+  Eigen::VectorXd x_center; // Mean estimate
   double logdetcholHk;       // Log deteriminant of the cholesky
   Eigen::MatrixXd L_approx;  // Approximate choleskly
   Eigen::MatrixXd Qk;  // Q of the QR decompositon. Only used for sparse approx
@@ -86,10 +93,13 @@ struct taylor_approx_t {
  * Information from calling ELBO estimation
  */
 struct elbo_est_t {
+   // Evidence Lower Bound
   double elbo{-std::numeric_limits<double>::infinity()};
   size_t fn_calls{0};  // Number of times the log_prob function is called.
-  Eigen::MatrixXd repeat_draws;
-  Eigen::Array<double, -1, -1> lp_mat;
+  Eigen::MatrixXd repeat_draws; // Samples
+  // Two column matrix. First column is approximate lp and second is true lp
+  Eigen::Array<double, -1, -1> lp_mat; 
+  // Ratio of approximate lp to true lp.
   Eigen::Array<double, -1, 1> lp_ratio;
 };
 
@@ -326,7 +336,7 @@ inline taylor_approx_t taylor_approximation_dense(
  * @param alpha The diagonal of the approximate hessian
  * @param Dk vector of Columnwise products of parameter and gradients with size
  * equal to history size
- * @param ninvRST
+ * @param ninvRST The solution of X = R^-1 * S
  * @param point_est The parameters for the given iteration of LBFGS
  * @param grad_est The gradients for the given iteration of LBFGS
  * @return The components of the sparse taylor approximation
@@ -705,7 +715,7 @@ inline auto pathfinder_lbfgs_single(
     prev_grads = lbfgs.curr_g();
     history_size = std::min(history_size + 1,
                             static_cast<std::size_t>(max_history_size));
-    if (internal::check_curve(param_buff.back(), grad_buff.back(), logger)) {
+    if (internal::check_curve(param_buff.back(), grad_buff.back())) {
       alpha = internal::form_diag(alpha, grad_buff.back(), param_buff.back());
     }
     Eigen::Map<Eigen::MatrixXd> Ykt_map(Ykt_mat.data(), num_parameters,
