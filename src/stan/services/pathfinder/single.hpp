@@ -39,7 +39,8 @@ inline Eigen::MatrixXd tcrossprod(T1&& x) {
  * compile time
  * @param Yk Vector of gradients
  * @param Sk Vector of values
- * @return boolean with true if both the optimization direction `Dk` is greater than zero and the curvature `thetak` is less than 1e12.
+ * @return boolean with true if both the optimization direction `Dk` is greater
+ * than zero and the curvature `thetak` is less than 1e12.
  */
 template <typename EigVec, stan::require_eigen_vector_t<EigVec>* = nullptr>
 inline bool check_curve(const EigVec& Yk, const EigVec& Sk) {
@@ -81,7 +82,7 @@ inline auto form_diag(const EigVec1& alpha_init, const EigVec2& Yk,
  * Information from running the taylor approximation
  */
 struct taylor_approx_t {
-  Eigen::VectorXd x_center; // Mean estimate
+  Eigen::VectorXd x_center;  // Mean estimate
   double logdetcholHk;       // Log deteriminant of the cholesky
   Eigen::MatrixXd L_approx;  // Approximate choleskly
   Eigen::MatrixXd Qk;  // Q of the QR decompositon. Only used for sparse approx
@@ -93,12 +94,12 @@ struct taylor_approx_t {
  * Information from calling ELBO estimation
  */
 struct elbo_est_t {
-   // Evidence Lower Bound
+  // Evidence Lower Bound
   double elbo{-std::numeric_limits<double>::infinity()};
   size_t fn_calls{0};  // Number of times the log_prob function is called.
-  Eigen::MatrixXd repeat_draws; // Samples
+  Eigen::MatrixXd repeat_draws;  // Samples
   // Two column matrix. First column is approximate lp and second is true lp
-  Eigen::Array<double, -1, -1> lp_mat; 
+  Eigen::Array<double, -1, -1> lp_mat;
   // Ratio of approximate lp to true lp.
   Eigen::Array<double, -1, 1> lp_ratio;
 };

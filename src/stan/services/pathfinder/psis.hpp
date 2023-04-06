@@ -138,7 +138,8 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
 }
 
 /**
- * Sort the input arr and store the original indices for the sorted array in `idx`
+ * Sort the input arr and store the original indices for the sorted array in
+ * `idx`
  * @param[in, out] arr The Array of doubles to be sorted
  * @param[in, out] idx The index of the original positions of the elements of
  * `arr`. This is also sorted to keep track of the original positions of the
@@ -161,19 +162,22 @@ inline void dual_sort(Eigen::Array<double, -1, 1>& arr,
 }
 
 /**
- * Returns the index to the first element in the range [first, last) that does not satisfy element < value or last if no such element is found. 
+ * Returns the index to the first element in the range [first, last) that does
+ * not satisfy element < value or last if no such element is found.
  * @param arr The index (range) to search
  * @param value The value to search for
- * @return The index to the first element in the range [first, last) that does not satisfy element < value or last if no such element is found
+ * @return The index to the first element in the range [first, last) that does
+ * not satisfy element < value or last if no such element is found
  */
-inline auto lower_bound_idx(const Eigen::Array<double, -1, 1>& arr, const double value) {
+inline auto lower_bound_idx(const Eigen::Array<double, -1, 1>& arr,
+                            const double value) {
   Eigen::Index base = 0;
   Eigen::Index search_len = arr.size();
   while (search_len > 1) {
-      Eigen::Index half = search_len / 2;
-      // some compilers will replace this with  with a cmov
-      base += (arr.coeff(base + half) < value) * half; 
-      search_len -= half;
+    Eigen::Index half = search_len / 2;
+    // some compilers will replace this with  with a cmov
+    base += (arr.coeff(base + half) < value) * half;
+    search_len -= half;
   }
   return base;
 }
@@ -217,7 +221,7 @@ largest_n_elements(const Eigen::Array<double, -1, 1>& arr,
  * compile time rows and 1 compile time column.
  * @param[in] log_ratios Array of logarithms of importance ratios
  * @param[in] tail_len Size of the tail
- * @param[in,out] logger Stream for writing possible warnings 
+ * @param[in,out] logger Stream for writing possible warnings
  * @return An array with the weights for each observation for PSIS
  */
 template <typename EigArray, typename Logger>
