@@ -79,7 +79,7 @@ TEST_F(ServicesPathfinderGLM, single) {
   stan::test::mock_callback callback;
   stan::io::empty_var_context empty_context;  // = init_init_context();
   std::ofstream empty_ostream(nullptr);
-  stan::test::loggy logger(empty_ostream);
+  stan::test::loggy logger(std::cout);
 
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> input_iters;
 
