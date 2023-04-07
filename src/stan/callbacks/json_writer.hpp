@@ -3,8 +3,9 @@
 
 #include <stan/callbacks/structured_writer.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
-#include <vector>
+#include <ostream>
 #include <string>
+#include <vector>
 
 namespace stan {
 namespace callbacks {
@@ -12,8 +13,9 @@ namespace callbacks {
 /**
  * <code>json_writer</code> is an implementation of
  * <code>structured_writer</code> that writes JSON format data to a stream.
+ * @tparam Stream A type with with a valid `operator<<(std::string)`
  */
-template <typename Stream>
+template <typename Stream, typename Deleter = std::default_delete<Stream>>
 class json_writer final : public structured_writer {
  public:
   /**
@@ -21,12 +23,16 @@ class json_writer final : public structured_writer {
    *
    * @param[in, out] A unique pointer to a type inheriting from `std::ostream`
    */
-  explicit json_writer(std::unique_ptr<Stream>&& output)
-      : output_(std::move(output)) {}
+  explicit json_writer(std::unique_ptr<Stream, Deleter>&& output)
+      : output_(std::move(output)) {
+    if (output_ == nullptr)
+      throw std::invalid_argument("writer cannot be null");
+  }
 
   json_writer();
   json_writer(json_writer& other) = delete;
-  json_writer(json_writer&& other) : output_(std::move(other.output_)) {}
+  json_writer(json_writer&& other)
+      : output_(std::move(other.output_)) {}
 
   /**
    * Virtual destructor.
@@ -45,7 +51,7 @@ class json_writer final : public structured_writer {
    * Writes object member key followed by ": {"
    *
    */
-  void keyed_begin(const std::string& key) {
+  void write_begin(const std::string& key) {
     write_key(key);
     begin();
   }
@@ -55,37 +61,37 @@ class json_writer final : public structured_writer {
    */
   void end() { *output_ << "}"; }
 
-  void keyed_string(const std::string& key, const std::string& value) {
+  void write_string(const std::string& key, const std::string& value) {
     write_sep();
     write_key(key);
     *output_ << "\"" << value << "\"";
   }
 
-  void keyed_null(const std::string& key) {
+  void write_null(const std::string& key) {
     write_sep();
     write_key(key);
     *output_ << "\"null\" ";
   }
 
-  void keyed_bool(const std::string& key, bool value) {
+  void write_bool(const std::string& key, bool value) {
     write_sep();
     write_key(key);
     *output_ << "\"" << (value ? "true" : "false") << "\" :" << value;
   }
 
-  void keyed_value(const std::string& key, int value) {
+  void write_value(const std::string& key, int value) {
     write_sep();
     write_key(key);
     *output_ << value;
   }
 
-  void keyed_value(const std::string& key, double value) {
+  void write_value(const std::string& key, double value) {
     write_sep();
     write_key(key);
     *output_ << value;
   }
 
-  void keyed_value(const std::string& key,
+  void write_value(const std::string& key,
                     const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
     write_sep();
     write_key(key);
@@ -96,19 +102,19 @@ class json_writer final : public structured_writer {
   }
 
   // complex numbers are objects?
-  //  void keyed_scalar(const std::string& key, double value) {
+  //  void write_scalar(const std::string& key, double value) {
   //  write_sep();
   //  write_key(key);
   //    *output_ << "\"" << key << "\" :" << value;
   //  }
 
-  void keyed_values(const std::string& key, const std::vector<double>& values) {
+  void write_values(const std::string& key, const std::vector<double>& values) {
     write_sep();
     write_key(key);
     write_vector(values);
   }
 
-  void keyed_values(const std::string& key, const Eigen::MatrixXd& states) {
+  void write_values(const std::string& key, const Eigen::MatrixXd& states) {
     write_sep();
     write_key(key);
     *output_ << "\"" << key << "\" : \"";
@@ -118,28 +124,17 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Writes newline.
-   */
-  void newline() { *output_ << std::endl; }
-
-  /**
-   * Reset state.
+   * Reset state
    */
   void reset() {
-    get_stream().clear();
     is_rest_ = false;
   }
-
-  /**
-   * Get the underlying stream
-   */
-  inline auto& get_stream() noexcept { return *output_; }
 
  private:
   /**
    * Output stream
    */
-  std::unique_ptr<Stream> output_;
+  std::unique_ptr<Stream, Deleter> output_;
 
   /**
    * State - first member or rest of object?

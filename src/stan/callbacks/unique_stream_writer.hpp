@@ -29,7 +29,10 @@ class unique_stream_writer final : public writer {
    */
   explicit unique_stream_writer(std::unique_ptr<Stream, Deleter>&& output,
                                 const std::string& comment_prefix = "")
-      : output_(std::move(output)), comment_prefix_(comment_prefix) {}
+      : output_(std::move(output)), comment_prefix_(comment_prefix) {
+    if (output_ == nullptr)
+      throw std::invalid_argument("output writer cannot be null");
+  }
 
   unique_stream_writer();
   unique_stream_writer(unique_stream_writer& other) = delete;
@@ -56,10 +59,6 @@ class unique_stream_writer final : public writer {
   }
 
   /**
-   * Get the underlying stream
-   */
-  inline auto& get_stream() noexcept { return *output_; }
-  /**
    * Writes a set of values in csv format followed by a newline.
    *
    * Note: the precision of the output is determined by the settings
@@ -73,8 +72,6 @@ class unique_stream_writer final : public writer {
    * Writes the comment_prefix to the stream followed by a newline.
    */
   void operator()() {
-    if (output_ == nullptr)
-      return;
     *output_ << comment_prefix_ << std::endl;
   }
 
@@ -84,8 +81,6 @@ class unique_stream_writer final : public writer {
    * @param[in] message A string
    */
   void operator()(const std::string& message) {
-    if (output_ == nullptr)
-      return;
     *output_ << comment_prefix_ << message << std::endl;
   }
 

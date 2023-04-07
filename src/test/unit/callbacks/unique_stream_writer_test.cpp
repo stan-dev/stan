@@ -9,8 +9,10 @@ struct deleter_noop {
 class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksStreamWriter()
-      : ss(), writer(std::unique_ptr<std::stringstream, deleter_noop>(&ss)), writer_prefix(std::unique_ptr<std::stringstream, deleter_noop>(&ss), "# ") {}
+      : ss(),
+        writer(std::unique_ptr<std::stringstream, deleter_noop>(&ss)) {}
 
+  
   void SetUp() {
     ss.str(std::string());
     ss.clear();
@@ -18,9 +20,7 @@ class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
   void TearDown() {}
 
   std::stringstream ss;
-  std::stringstream ss_prefix;
   stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop> writer;
-  stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop> writer_prefix;
 };
 
 TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {
@@ -34,17 +34,17 @@ TEST_F(StanInterfaceCallbacksStreamWriter, double_vector) {
 }
 
 TEST_F(StanInterfaceCallbacksStreamWriter, double_vector_precision2) {
+  ss << std::setprecision(2);
   const int N = 5;
   std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
-  writer.get_stream().precision(2);
   EXPECT_NO_THROW(writer(x));
   EXPECT_EQ("1.2,2.3,3.5,4.6\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksStreamWriter, double_vector_precision3) {
+  ss << std::setprecision(3);
   const int N = 5;
   std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
-  writer.get_stream().precision(3);
   EXPECT_NO_THROW(writer(x));
   EXPECT_EQ("1.23,2.35,3.46,4.57\n", ss.str());
 }
