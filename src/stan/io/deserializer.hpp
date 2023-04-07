@@ -555,7 +555,7 @@ class deserializer {
    * @tparam LP Type of log probability.
    * @tparam Sizes A parameter pack of integral types.
    * @param lp The reference to the variable holding the log
-   * @param sizes Pack of integrals to use to construct the return's type.
+   * @param size Number of cells in simplex to generate.
    * probability to increment.
    * @return The next simplex of the specified size.
    * @throws std::invalid_argument if number of dimensions (`k`) is zero

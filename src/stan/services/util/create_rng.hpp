@@ -18,14 +18,16 @@ namespace util {
  * that the draws used to initialized transformed data are not
  * duplicated.
  *
+ * @tparam RngType type of RNG to return, default is `boost::ecuyer1988`
  * @param[in] seed the random seed
  * @param[in] chain the chain id
- * @return a boost::ecuyer1988 instance
+ * @return an RNG instance
  */
-inline boost::ecuyer1988 create_rng(unsigned int seed, unsigned int chain) {
+template <typename RngType = boost::ecuyer1988>
+inline RngType create_rng(unsigned int seed, unsigned int chain) {
   using boost::uintmax_t;
   static constexpr uintmax_t DISCARD_STRIDE = static_cast<uintmax_t>(1) << 50;
-  boost::ecuyer1988 rng(seed);
+  RngType rng(seed);
   // always discard at least 1 to avoid issue with small seeds for certain RNG
   // distributions. See stan#3167 and boostorg/random#92
   rng.discard(std::max(static_cast<uintmax_t>(1), DISCARD_STRIDE * chain));
