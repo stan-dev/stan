@@ -20,29 +20,21 @@ class structured_writer {
    */
   virtual ~structured_writer() {}
 
-  /**
-   * Write start symbol
-   */
-  virtual void start_token() {}
+  virtual void begin() {}
+  virtual void end() {}
 
-  /**
-   * Write end symbol
-   *
-   */
-  virtual void end_token() {}
+  virtual void write_begin(const std::string& key) {}
+  virtual void write_null() {}
+  virtual void write_bool(const std::string& key, bool value) {}
 
-  virtual void keyed_begin(const std::string& key) {}
-  virtual void keyed_null() {}
-  virtual void keyed_bool(const std::string& key, bool value) {}
-
-  virtual void keyed_value(const std::string& key, int value) {}
-  virtual void keyed_value(const std::string& key, double value) {}
-  virtual void keyed_value(const std::string& key,
+  virtual void write_value(const std::string& key, int value) {}
+  virtual void write_value(const std::string& key, double value) {}
+  virtual void write_value(const std::string& key,
     const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& value) {}
 
-  virtual void keyed_values(const std::string& key,
+  virtual void write_values(const std::string& key,
                             const std::vector<double> value) {}
-  virtual void keyed_values(const std::string& key,
+  virtual void write_values(const std::string& key,
     const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& values) {}
 
   virtual void reset() {}
