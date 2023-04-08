@@ -2,10 +2,11 @@
 #define STAN_CALLBACKS_UNIQUE_STREAM_WRITER_HPP
 
 #include <stan/callbacks/writer.hpp>
-#include <ostream>
-#include <vector>
-#include <string>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <memory>
+#include <ostream>
+#include <string>
+#include <vector>
 
 namespace stan {
 namespace callbacks {
