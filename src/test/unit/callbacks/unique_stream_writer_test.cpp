@@ -3,16 +3,14 @@
 #include <stan/callbacks/unique_stream_writer.hpp>
 
 struct deleter_noop {
-    template <typename T>
-    constexpr void operator()(T* arg) const {}
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
 };
 class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksStreamWriter()
-      : ss(),
-        writer(std::unique_ptr<std::stringstream, deleter_noop>(&ss)) {}
+      : ss(), writer(std::unique_ptr<std::stringstream, deleter_noop>(&ss)) {}
 
-  
   void SetUp() {
     ss.str(std::string());
     ss.clear();
@@ -66,6 +64,5 @@ TEST_F(StanInterfaceCallbacksStreamWriter, null) {
 
 TEST_F(StanInterfaceCallbacksStreamWriter, string) {
   EXPECT_NO_THROW(writer("message"));
-  EXPECT_EQ("message\n",
-            ss.str());
+  EXPECT_EQ("message\n", ss.str());
 }

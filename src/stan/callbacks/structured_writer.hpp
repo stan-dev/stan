@@ -29,16 +29,18 @@ class structured_writer {
 
   virtual void write_value(const std::string& key, int value) {}
   virtual void write_value(const std::string& key, double value) {}
-  virtual void write_value(const std::string& key,
-    const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& value) {}
+  virtual void write_value(
+      const std::string& key,
+      const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& value) {}
 
   virtual void write_values(const std::string& key,
                             const std::vector<double> value) {}
-  virtual void write_values(const std::string& key,
-    const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& values) {}
+  virtual void write_values(
+      const std::string& key,
+      const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& values) {
+  }
 
   virtual void reset() {}
-
 };
 
 }  // namespace callbacks

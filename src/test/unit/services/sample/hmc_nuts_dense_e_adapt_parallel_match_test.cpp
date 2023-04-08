@@ -13,8 +13,8 @@ auto&& blah = stan::math::init_threadpool_tbb();
 static constexpr size_t num_chains = 4;
 
 struct deleter_noop {
-    template <typename T>
-    constexpr void operator()(T* arg) const {}
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
 };
 class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
  public:
@@ -25,10 +25,10 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
       ss_par.emplace_back(std::stringstream());
       ss_seq.emplace_back(std::stringstream());
       init.push_back(stan::test::unit::instrumented_writer{});
-      par_parameters.emplace_back(
-          str_writer(std::unique_ptr<std::stringstream, deleter_noop>(&ss_par[i]), "#"));
-      seq_parameters.emplace_back(
-          str_writer(std::unique_ptr<std::stringstream, deleter_noop>(&ss_seq[i]), "#"));
+      par_parameters.emplace_back(str_writer(
+          std::unique_ptr<std::stringstream, deleter_noop>(&ss_par[i]), "#"));
+      seq_parameters.emplace_back(str_writer(
+          std::unique_ptr<std::stringstream, deleter_noop>(&ss_seq[i]), "#"));
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
@@ -39,7 +39,8 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
   std::vector<stan::test::unit::instrumented_writer> init;
   std::vector<std::stringstream> ss_par;
   std::vector<std::stringstream> ss_seq;
-  using str_writer = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
+  using str_writer
+      = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
   std::vector<str_writer> par_parameters;
   std::vector<str_writer> seq_parameters;
   std::vector<stan::test::unit::instrumented_writer> diagnostic;

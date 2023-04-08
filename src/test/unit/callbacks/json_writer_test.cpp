@@ -3,8 +3,8 @@
 #include <stan/callbacks/json_writer.hpp>
 
 struct deleter_noop {
-    template <typename T>
-    constexpr void operator()(T* arg) const {}
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
 };
 class StanInterfaceCallbacksJsonWriter : public ::testing::Test {
  public:
@@ -16,9 +16,7 @@ class StanInterfaceCallbacksJsonWriter : public ::testing::Test {
     ss.clear();
   }
 
-  void TearDown() {
-    writer.reset();
-  }
+  void TearDown() { writer.reset(); }
 
   std::stringstream ss;
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer;
@@ -38,19 +36,20 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
     x.push_back(n);
 
   EXPECT_NO_THROW(writer.write_values(key, x));
-  EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]",
-            ss.str());
+  EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]", ss.str());
 
   EXPECT_NO_THROW(writer.write_values(key, x));
-  EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]"
-            ", \"key\" : [ 0, 1, 2, 3, 4 ]",
-            ss.str());
+  EXPECT_EQ(
+      "\"key\" : [ 0, 1, 2, 3, 4 ]"
+      ", \"key\" : [ 0, 1, 2, 3, 4 ]",
+      ss.str());
 
   EXPECT_NO_THROW(writer.write_values(key, x));
-  EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]"
-            ", \"key\" : [ 0, 1, 2, 3, 4 ]"
-            ", \"key\" : [ 0, 1, 2, 3, 4 ]",
-            ss.str());
+  EXPECT_EQ(
+      "\"key\" : [ 0, 1, 2, 3, 4 ]"
+      ", \"key\" : [ 0, 1, 2, 3, 4 ]"
+      ", \"key\" : [ 0, 1, 2, 3, 4 ]",
+      ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, single_member) {
@@ -59,8 +58,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, single_member) {
   EXPECT_NO_THROW(writer.begin());
   EXPECT_NO_THROW(writer.write_string(key, value));
   EXPECT_NO_THROW(writer.end());
-  EXPECT_EQ("{\n\"key\" : \"value\"}",
-            ss.str());
+  EXPECT_EQ("{\n\"key\" : \"value\"}", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
@@ -70,16 +68,18 @@ TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
   EXPECT_NO_THROW(writer.write_string(key, value));
   EXPECT_NO_THROW(writer.write_string(key, value));
 
-  EXPECT_EQ("{\n\"key\" : \"value\""
-            ", \"key\" : \"value\"",
-            ss.str());
+  EXPECT_EQ(
+      "{\n\"key\" : \"value\""
+      ", \"key\" : \"value\"",
+      ss.str());
 
   EXPECT_NO_THROW(writer.write_string(key, value));
   EXPECT_NO_THROW(writer.end());
-  EXPECT_EQ("{\n\"key\" : \"value\""
-            ", \"key\" : \"value\""
-            ", \"key\" : \"value\"}",
-            ss.str());
+  EXPECT_EQ(
+      "{\n\"key\" : \"value\""
+      ", \"key\" : \"value\""
+      ", \"key\" : \"value\"}",
+      ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision2) {

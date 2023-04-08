@@ -93,9 +93,7 @@ class unique_stream_writer final : public writer {
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
-  void operator()() {
-    *output_ << comment_prefix_ << std::endl;
-  }
+  void operator()() { *output_ << comment_prefix_ << std::endl; }
 
   /**
    * Writes the comment_prefix then the message followed by a newline.

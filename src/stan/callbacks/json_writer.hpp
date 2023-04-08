@@ -31,8 +31,7 @@ class json_writer final : public structured_writer {
 
   json_writer();
   json_writer(json_writer& other) = delete;
-  json_writer(json_writer&& other)
-      : output_(std::move(other.output_)) {}
+  json_writer(json_writer&& other) : output_(std::move(other.output_)) {}
 
   /**
    * Virtual destructor.
@@ -92,7 +91,7 @@ class json_writer final : public structured_writer {
   }
 
   void write_value(const std::string& key,
-                    const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
+                   const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
     write_sep();
     write_key(key);
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
@@ -126,9 +125,7 @@ class json_writer final : public structured_writer {
   /**
    * Reset state
    */
-  void reset() {
-    is_rest_ = false;
-  }
+  void reset() { is_rest_ = false; }
 
  private:
   /**
