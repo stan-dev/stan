@@ -17,7 +17,7 @@ namespace callbacks {
  * writing to.
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  */
-template <typename Stream, typename Deleter = std::default_delete<Stream>>
+template <typename Stream>
 class unique_stream_writer final : public writer {
  public:
   /**
@@ -28,7 +28,7 @@ class unique_stream_writer final : public writer {
    * @param[in] comment_prefix string to stream before each comment line.
    *  Default is "".
    */
-  explicit unique_stream_writer(std::unique_ptr<Stream, Deleter>&& output,
+  explicit unique_stream_writer(std::unique_ptr<Stream>&& output,
                                 const std::string& comment_prefix = "")
       : output_(std::move(output)), comment_prefix_(comment_prefix) {
     if (output_ == nullptr)
@@ -108,11 +108,16 @@ class unique_stream_writer final : public writer {
     *output_ << comment_prefix_ << message << std::endl;
   }
 
+  /**
+   * Get the underlying stream
+   */
+  inline auto& get_stream() noexcept { return *output_; }
+
  private:
   /**
    * Output stream
    */
-  std::unique_ptr<Stream, Deleter> output_;
+  std::unique_ptr<Stream> output_;
 
   /**
    * Comment prefix to use when printing comments: strings and blank lines
