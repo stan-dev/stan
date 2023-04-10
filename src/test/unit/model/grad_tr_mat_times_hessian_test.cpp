@@ -1,4 +1,5 @@
 #include <stan/model/grad_tr_mat_times_hessian.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/model/valid.hpp>
 #include <gtest/gtest.h>
 
@@ -9,9 +10,7 @@ TEST(ModelUtil, grad_tr_mat_times_hessian) {
   Eigen::MatrixXd X = Eigen::MatrixXd::Identity(dim, dim);
   Eigen::VectorXd grad_tr_X_hess_f(dim);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream output;
 

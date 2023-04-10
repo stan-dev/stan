@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stan/callbacks/stream_logger.hpp>
 #include <test/test-models/good/mcmc/hmc/integrators/gauss.hpp>
-#include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <stan/mcmc/hmc/hamiltonians/unit_e_metric.hpp>
 #include <stan/mcmc/hmc/hamiltonians/diag_e_metric.hpp>
 #include <boost/random/additive_combine.hpp>  // L'Ecuyer RNG
@@ -14,9 +14,7 @@ typedef boost::ecuyer1988 rng_t;
 TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
   rng_t base_rng(0);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;
@@ -65,9 +63,7 @@ TEST(McmcHmcIntegratorsExplLeapfrog, energy_conservation) {
 TEST(McmcHmcIntegratorsExplLeapfrog, symplecticness) {
   rng_t base_rng(0);
 
-  std::fstream data_stream(std::string("").c_str(), std::fstream::in);
-  stan::io::dump data_var_context(data_stream);
-  data_stream.close();
+  stan::io::empty_var_context data_var_context;
 
   std::stringstream model_output;
   std::stringstream debug, info, warn, error, fatal;

@@ -42,7 +42,8 @@ class mock_throwing_model_in_write_array : public stan::model::prob_grad {
     }
   }
 
-  void get_dims(std::vector<std::vector<size_t> >& dimss__) const {
+  void get_dims(std::vector<std::vector<size_t> >& dimss__,
+                bool include_tparams = true, bool include_gqs = true) const {
     dimss__.resize(0);
     std::vector<size_t> scalar_dim;
     dimss__.push_back(scalar_dim);
@@ -54,7 +55,9 @@ class mock_throwing_model_in_write_array : public stan::model::prob_grad {
     param_names__.push_back("theta");
   }
 
-  void get_param_names(std::vector<std::string>& names) const {
+  void get_param_names(std::vector<std::string>& names,
+                       bool include_tparams = true,
+                       bool include_gqs = true) const {
     constrained_param_names(names);
   }
 
@@ -104,6 +107,8 @@ class random_var_context : public testing::Test {
 TEST_F(random_var_context, contains_r) {
   stan::io::random_var_context context(model, rng, 2, false);
   EXPECT_FALSE(context.contains_r(""));
+  EXPECT_FALSE(context.contains_r("z"));    // transformed parameter
+  EXPECT_FALSE(context.contains_r("xgq"));  // generated quantity
   EXPECT_TRUE(context.contains_r("y"));
 }
 
