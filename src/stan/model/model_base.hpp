@@ -368,7 +368,6 @@ class model_base : public prob_grad {
                            bool include_tparams = true, bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
 
-
   /**
    * Convert the specified sequence of constrained parameters to a
    * sequence of unconstrained parameters.
@@ -632,9 +631,9 @@ class model_base : public prob_grad {
    * @param[in,out] params_r unconstrained parameters produced
    * @param[in,out] msgs msgs stream to which messages are written
    */
-  virtual void unconstrain_array(const std::vector<double>& params_constrained_r,
-                                 std::vector<double>& params_r,
-                                 std::ostream* msgs = nullptr) const = 0;
+  virtual void unconstrain_array(
+      const std::vector<double>& params_constrained_r,
+      std::vector<double>& params_r, std::ostream* msgs = nullptr) const = 0;
 
 #ifdef STAN_MODEL_FVAR_VAR
 
