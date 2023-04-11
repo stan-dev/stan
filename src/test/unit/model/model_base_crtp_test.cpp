@@ -101,6 +101,13 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
                    std::vector<double>& params_r_constrained,
                    bool include_tparams, bool include_gqs,
                    std::ostream* msgs) const {}
+
+  void unconstrain_array(const Eigen::VectorXd& params_constrained_r,
+                         Eigen::VectorXd& params_r,
+                         std::ostream* msgs = nullptr) const override {}
+  void unconstrain_array(const std::vector<double>& params_constrained_r,
+                         std::vector<double>& params_r,
+                         std::ostream* msgs = nullptr) const override {}
 };
 
 TEST(model, modelBaseInheritance) {

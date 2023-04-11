@@ -83,6 +83,10 @@ struct mock_model : public stan::model::model_base {
                    Eigen::VectorXd& params_constrained_r, bool include_tparams,
                    bool include_gqs, std::ostream* msgs) const override {}
 
+  void unconstrain_array(const Eigen::VectorXd& params_constrained_r,
+                         Eigen::VectorXd& params_r,
+                         std::ostream* msgs = nullptr) const override {}
+
   double log_prob(std::vector<double>& params_r, std::vector<int>& params_i,
                   std::ostream* msgs) const override {
     return 11;
@@ -140,6 +144,10 @@ struct mock_model : public stan::model::model_base {
                    std::vector<double>& params_r_constrained,
                    bool include_tparams, bool include_gqs,
                    std::ostream* msgs) const override {}
+
+  void unconstrain_array(const std::vector<double>& params_constrained_r,
+                         std::vector<double>& params_r,
+                         std::ostream* msgs = nullptr) const override {}
 
 #ifdef STAN_MODEL_FVAR_VAR
 
