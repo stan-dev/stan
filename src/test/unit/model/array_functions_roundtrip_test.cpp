@@ -5,46 +5,61 @@
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
-TEST(ModelUtil, write_array_unconstrain_array_roundtrip) {
-  stan::io::empty_var_context data_var_context;
-  stan_model model(data_var_context, 0, static_cast<std::stringstream*>(0));
+class ModelArrayFunctionsRoundtripTest : public testing::Test {
+ public:
+  ModelArrayFunctionsRoundtripTest()
+      : model(context, 0, nullptr), rng(12324232), inits(nullptr) {
+    out.str("");
 
-  std::vector<std::string> json_path;
-  json_path = {"src",  "test",  "test-models",
-               "good", "model", "parameters.inits.json"};
-  std::string filename = paths_to_fname(json_path);
-  std::ifstream in(filename);
-  stan::json::json_data inits(in);
+    std::vector<std::string> json_path = {
+        "src", "test", "test-models", "good", "model", "parameters.inits.json"};
+    std::string filename = paths_to_fname(json_path);
+    std::ifstream in(filename);
+    inits = new stan::json::json_data(in);
+  }
 
+  ~ModelArrayFunctionsRoundtripTest() { delete inits; }
+
+  stan::io::empty_var_context context;
+  stan::io::var_context* inits;
+  stan_model model;
   std::stringstream out;
-  out.str("");
+  boost::ecuyer1988 rng;
 
-  // unused in this model but needed for write_array
-  auto rng = stan::services::util::create_rng(12324232, 1);
-
-  try {
+  /**
+   * Test that the unconstrain_array function is the inverse of the
+   * write_array function. This tests the Eigen overloads.
+   *
+   * This calls transform_inits, write_array, and then unconstrain_array
+   * and asserts that the output of unconstrain_array is the same as the
+   * output of transform_inits.
+   */
+  void eigen_round_trip(bool include_gq, bool include_tp) {
     Eigen::VectorXd init_vector;
-    model.transform_inits(inits, init_vector, &out);
+    model.transform_inits(*inits, init_vector, &out);
 
     Eigen::VectorXd written_vector;
-    model.write_array(rng, init_vector, written_vector, &out);
+    model.write_array(rng, init_vector, written_vector, include_gq, include_tp,
+                      &out);
 
     Eigen::VectorXd recovered_vector;
     model.unconstrain_array(written_vector, recovered_vector, &out);
 
     EXPECT_MATRIX_NEAR(init_vector, recovered_vector, 1e-10);
     EXPECT_EQ("", out.str());
-  } catch (...) {
-    FAIL() << "write_array_unconstrain_array_roundtrip Eigen::VectorXd";
   }
 
-  try {
+  /**
+   * Same as eigen_round_trip but for the std::vector overloads
+   */
+  void std_vec_round_trip(bool include_gq, bool include_tp) {
     std::vector<int> unused;
     std::vector<double> init_vector;
-    model.transform_inits(inits, unused, init_vector, &out);
+    model.transform_inits(*inits, unused, init_vector, &out);
 
     std::vector<double> written_vector;
-    model.write_array(rng, init_vector, unused, written_vector, &out);
+    model.write_array(rng, init_vector, unused, written_vector, include_gq,
+                      include_tp, &out);
 
     std::vector<double> recovered_vector;
     model.unconstrain_array(written_vector, recovered_vector, &out);
@@ -54,7 +69,23 @@ TEST(ModelUtil, write_array_unconstrain_array_roundtrip) {
     }
 
     EXPECT_EQ("", out.str());
-  } catch (...) {
-    FAIL() << "write_array_unconstrain_array_roundtrip std::vector<double>";
   }
+};
+
+// test all combinations of include_gq and include_tp.
+// unconstrain_array should ignore them as they appear at the end
+// of the written vectors
+
+TEST_F(ModelArrayFunctionsRoundtripTest, eigen_overloads) {
+  eigen_round_trip(false, false);
+  eigen_round_trip(false, true);
+  eigen_round_trip(true, false);
+  eigen_round_trip(true, true);
+}
+
+TEST_F(ModelArrayFunctionsRoundtripTest, std_vector_overloads) {
+  std_vec_round_trip(false, false);
+  std_vec_round_trip(false, true);
+  std_vec_round_trip(true, false);
+  std_vec_round_trip(true, true);
 }
