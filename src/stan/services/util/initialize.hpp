@@ -122,12 +122,10 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
 
     msg.str("");
     double log_prob(0);
+    std::vector<double> gradient;
     try {
-      // we evaluate the log_prob function with propto=false
-      // because we're evaluating with `double` as the type of
-      // the parameters.
-      log_prob = model.template log_prob<false, Jacobian>(unconstrained,
-                                                          disc_vector, &msg);
+      log_prob = stan::model::log_prob_grad<true, Jacobian>(
+          model, unconstrained, disc_vector, gradient, &msg);
       if (msg.str().length() > 0)
         logger.info(msg);
     } catch (std::domain_error& e) {
@@ -135,7 +133,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
         logger.info(msg);
       logger.info("Rejecting initial value:");
       logger.info(
-          "  Error evaluating the log probability"
+          "  Error evaluating the log probability with gradients"
           " at the initial value.");
       logger.info(e.what());
       continue;
@@ -143,7 +141,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       if (msg.str().length() > 0)
         logger.info(msg);
       logger.info(
-          "Unrecoverable error evaluating the log probability"
+          "Unrecoverable error evaluating the log probability with gradients"
           " at the initial value.");
       logger.info(e.what());
       throw;
@@ -159,7 +157,6 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
       continue;
     }
     std::stringstream log_prob_msg;
-    std::vector<double> gradient;
     auto start = std::chrono::steady_clock::now();
     try {
       // we evaluate this with propto=true since we're
@@ -169,6 +166,8 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     } catch (const std::exception& e) {
       if (log_prob_msg.str().length() > 0)
         logger.info(log_prob_msg);
+      logger.info(
+          "  Failed to evaluate log_prob with gradients for performance test");
       logger.info(e.what());
       throw;
     }
