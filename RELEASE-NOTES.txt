@@ -5,6 +5,22 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.32.0 (20 April 2023)
+======================================================================
+
+- Extended `get_dims` and `get_param_names` in model_base with flags for whether to include transformed parameters and generated quantities. (#3139)
+- Fixed an issue where initialization would still retry many times even if a fixed initialization was provided. (#3139)
+- Cleaned up newlines in Laplace service logging. (#3153)
+- make: use SUNDIALS_TARGETS instead of LIBSUNDIALS. (#3162)
+- Updated JSON var context to handle nested structures (tuples). (#3165)
+- Always discard at least 1 entry in new RNGs. (#3168)
+- Relaxed requirements for 0-sized data objects in JSON. (#3170)
+- Deleted unused io/cmd_line.hpp. (#3172)
+- Standalone GQ: Output NaNs when exception is caught. (#3173)
+- Cleaned up dimension and name logic in random_var_context. (#3174)
+- Removed old/unused IO code. (#3177)
+- Made deserializer's map members const. (#3178)
+
 v2.31.0 (21 November 2022)
 ======================================================================
 - RapidJSON library is now a part of Stan (previously part of CmdStan) (#3143)
