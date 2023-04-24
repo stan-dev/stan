@@ -17,7 +17,19 @@ namespace callbacks {
  */
 template <typename Stream, typename Deleter = std::default_delete<Stream>>
 class json_writer final : public structured_writer {
+   private:
+  /**
+   * Output stream
+   */
+  std::unique_ptr<Stream, Deleter> output_{nullptr};
+
+  /**
+   * State - first member or rest of object?
+   */
+  bool is_rest_;
+
  public:
+ json_writer() : output_(nullptr) {}
   /**
    * Constructs a json writer with an output stream.
    *
@@ -29,7 +41,6 @@ class json_writer final : public structured_writer {
       throw std::invalid_argument("writer cannot be null");
   }
 
-  json_writer();
   json_writer(json_writer& other) = delete;
   json_writer(json_writer&& other) : output_(std::move(other.output_)) {}
 
@@ -45,6 +56,25 @@ class json_writer final : public structured_writer {
     *output_ << "{" << std::endl;
     is_rest_ = false;
   }
+  /**
+   * Writes "}", final token of a JSON object.
+   */
+  void end() { 
+    *output_ << "}";
+    write_sep();
+    *output_ << "\n";
+  }
+
+  void begin_list() {
+    *output_ << "[";
+    is_rest_ = false;
+  }
+  void end_list() {
+    *output_ << "]";
+    write_sep();
+    *output_ << "\n";
+  }
+
 
   /**
    * Writes object member key followed by ": {"
@@ -52,74 +82,84 @@ class json_writer final : public structured_writer {
    */
   void write_begin(const std::string& key) {
     write_key(key);
-    begin();
-  }
+    this->begin();
+  }  
 
-  /**
-   * Writes "}", final token of a JSON object.
-   */
-  void end() { *output_ << "}"; }
-
-  void write_string(const std::string& key, const std::string& value) {
-    write_sep();
-    write_key(key);
-    *output_ << "\"" << value << "\"";
-  }
-
-  void write_null(const std::string& key) {
+  void write(const std::string& key) {
     write_sep();
     write_key(key);
     *output_ << "\"null\" ";
   }
 
-  void write_bool(const std::string& key, bool value) {
+
+  void write(const std::string& key, const std::string& value) {
     write_sep();
     write_key(key);
-    *output_ << "\"" << (value ? "true" : "false") << "\" :" << value;
+    *output_ << "\"" << value << "\"";
   }
 
-  void write_value(const std::string& key, int value) {
+  void write(const std::string& key, bool value) {
+    write_sep();
+    write_key(key);
+    *output_ << "\"" << (value ? "true" : "false");
+  }
+
+  void write(const std::string& key, int value) {
+    write_sep();
+    write_key(key);
+    *output_ << value;
+  }
+  // TODO: WRITE THE VIRTUAL FUNCTION FOR THIS
+  void write(const std::string& key, std::size_t value) {
     write_sep();
     write_key(key);
     *output_ << value;
   }
 
-  void write_value(const std::string& key, double value) {
+  void write(const std::string& key, double value) {
     write_sep();
     write_key(key);
     *output_ << value;
   }
 
-  void write_value(const std::string& key,
-                   const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
+  
+  void write(const std::string& key, const std::complex<double>& value) {
     write_sep();
     write_key(key);
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
-    *output_ << std::get<0>(state).transpose().eval();
-    *output_ << std::get<1>(state).transpose().eval();
-  }
+      *output_ << "\"" << key << "\" : [" << value.real() << ", " << value.imag() << "]";
+    }
 
-  // complex numbers are objects?
-  //  void write_scalar(const std::string& key, double value) {
-  //  write_sep();
-  //  write_key(key);
-  //    *output_ << "\"" << key << "\" :" << value;
-  //  }
-
-  void write_values(const std::string& key, const std::vector<double>& values) {
+  void write(const std::string& key, const std::vector<double>& values) {
     write_sep();
     write_key(key);
     write_vector(values);
   }
 
-  void write_values(const std::string& key, const Eigen::MatrixXd& states) {
+  void write(const std::string& key, const std::vector<std::string>& values) {
     write_sep();
     write_key(key);
-    *output_ << "\"" << key << "\" : \"";
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
-    *output_ << states.transpose().format(CommaInitFmt);
+    write_vector(values);
+  }
+
+  void write(const std::string& key, const Eigen::MatrixXd& mat) {
+    write_sep();
+    write_key(key);
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "", "[", "], ", "[", "]");
+    *output_ << mat.transpose().format(CommaInitFmt);
+  }
+
+  void write(const std::string& key, const Eigen::VectorXd& vec) {
+    write_sep();
+    write_key(key);
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "", "", "", "[", "]");
+    *output_ << vec.transpose().format(CommaInitFmt);
+  }
+
+  void write(const std::string& key, const Eigen::RowVectorXd& vec) {
+    write_sep();
+    write_key(key);
+    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "", "", "", "[", "]");
+    *output_ << vec.format(CommaInitFmt);
   }
 
   /**
@@ -127,25 +167,16 @@ class json_writer final : public structured_writer {
    */
   void reset() { is_rest_ = false; }
 
- private:
-  /**
-   * Output stream
-   */
-  std::unique_ptr<Stream, Deleter> output_;
-
-  /**
-   * State - first member or rest of object?
-   */
-  bool is_rest_;
-
+private:
   /**
    * Determines whether or not output requires comma separator
    */
   void write_sep() {
-    if (is_rest_)
+    if (is_rest_) {
       *output_ << ", ";
-    else
+    } else {
       is_rest_ = true;
+    }
   }
 
   /**

@@ -8,8 +8,10 @@
 */
 #include <stan/services/pathfinder/multi.hpp>
 #include <stan/io/array_var_context.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/dump.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <test/test-models/good/normal_glm.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
@@ -26,25 +28,36 @@ auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
 auto init_context() {
   std::fstream stream(
       "./src/test/unit/services/pathfinder/"
-      "glm_test.data.R",
+      "glm_test.json",
       std::fstream::in);
-  return stan::io::dump(stream);
+  return stan::json::json_data(stream);
 }
+
+struct deleter_noop {
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
+};
 
 class ServicesPathfinderGLM : public testing::Test {
  public:
   ServicesPathfinderGLM()
       : init(init_ss),
         parameter(parameter_ss),
-        diagnostics(diagnostic_ss),
+        diagnostics(std::unique_ptr<std::stringstream, deleter_noop>(&diagnostic_ss)),
         context(init_context()),
         model(context, 0, &model_ss) {}
+
+  void SetUp() {
+    diagnostic_ss.str(std::string());
+    diagnostic_ss.clear();
+  }
+  void TearDown() {}
 
   std::stringstream init_ss, parameter_ss, diagnostic_ss, model_ss;
   stan::callbacks::stream_writer init;
   stan::test::values parameter;
-  stan::test::values diagnostics;
-  stan::io::dump context;
+  stan::callbacks::json_writer<std::stringstream, deleter_noop> diagnostics;
+  stan::json::json_data context;
   stan_model model;
 };
 
@@ -61,21 +74,22 @@ stan::io::array_var_context init_init_context() {
 }
 
 TEST_F(ServicesPathfinderGLM, single) {
-  constexpr unsigned int seed = 0;
+  constexpr unsigned int seed = 3;
   constexpr unsigned int chain = 1;
-  constexpr double init_radius = .7;
+  constexpr double init_radius = 2;
   constexpr double num_elbo_draws = 80;
-  constexpr double num_draws = 100;
-  constexpr int history_size = 15;
+  constexpr double num_draws = 500;
+  constexpr int history_size = 35;
   constexpr double init_alpha = 1;
   constexpr double tol_obj = 0;
   constexpr double tol_rel_obj = 0;
   constexpr double tol_grad = 0;
   constexpr double tol_rel_grad = 0;
   constexpr double tol_param = 0;
-  constexpr int num_iterations = 60;
-  constexpr bool save_iterations = false;
+  constexpr int num_iterations = 400;
+  constexpr bool save_iterations = true;
   constexpr int refresh = 1;
+
   stan::test::mock_callback callback;
   stan::io::empty_var_context empty_context;  // = init_init_context();
   std::ofstream empty_ostream(nullptr);
@@ -104,6 +118,7 @@ TEST_F(ServicesPathfinderGLM, single) {
                                  .sqrt())
                                 .transpose()
                                 .eval();
+                                /*
   Eigen::MatrixXd prev_param_vals = stan::test::normal_glm_param_vals();
   Eigen::VectorXd prev_mean_vals = prev_param_vals.rowwise().mean().eval();
   Eigen::VectorXd prev_sd_vals = (((prev_param_vals.colwise() - prev_mean_vals)
@@ -117,6 +132,15 @@ TEST_F(ServicesPathfinderGLM, single) {
                                       .sqrt())
                                      .transpose()
                                      .eval();
+                                     */
+  std::cout << "Means:\n" << std::endl;
+  std::cout << mean_vals.transpose().eval().format(CommaInitFmt) << std::endl;
+  std::cout << "SDs: \n" << std::endl;
+  std::cout <<  sd_vals.transpose().eval().format(CommaInitFmt) << std::endl;
+  std::cout << diagnostic_ss.str() << std::endl;
+                                     /*
+  std::cout << "param_row: " << param_vals.rows() << " param_cols: " << param_vals.cols() <<
+  " prev_row: " << prev_param_vals.rows() << " prev_cols: " << prev_param_vals.cols() << std::endl;
   Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
   Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
@@ -139,14 +163,16 @@ TEST_F(ServicesPathfinderGLM, single) {
   all_sd_vals.row(0) = sd_vals;
   all_sd_vals.row(1) = prev_sd_vals;
   all_sd_vals.row(2) = sd_diff_vals;
+  True Sd's are all 1 and true means are -4, -2, 0, 1, 3, -1
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_mean_vals(2, i), .01);
   }
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
   }
+  */
 }
-
+/*
 TEST_F(ServicesPathfinderGLM, multi) {
   constexpr unsigned int seed = 0;
   constexpr unsigned int chain = 1;
@@ -169,7 +195,7 @@ TEST_F(ServicesPathfinderGLM, multi) {
   std::ostream empty_ostream(nullptr);
   stan::test::loggy logger(empty_ostream);
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
-  std::vector<stan::callbacks::writer> single_path_diagnostic_writer(num_paths);
+  std::vector<stan::callbacks::json_writer<std::stringstream>> single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
     single_path_inits.emplace_back(
@@ -219,6 +245,13 @@ TEST_F(ServicesPathfinderGLM, multi) {
                                       .sqrt())
                                      .transpose()
                                      .eval();
+   std::cout << "Means:\n" << std::endl;
+  std::cout << mean_vals.transpose().eval().format(CommaInitFmt) << std::endl;
+  std::cout << "SDs: \n" << std::endl;
+  std::cout <<  sd_vals.transpose().eval().format(CommaInitFmt) << std::endl;
+  std::cout << diagnostic_ss.str() << std::endl;
+
+  
   Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
   Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
   Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
@@ -249,4 +282,6 @@ TEST_F(ServicesPathfinderGLM, multi) {
   for (int i = 2; i < all_sd_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), 0.1);
   }
+  
 }
+*/

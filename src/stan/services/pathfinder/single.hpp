@@ -632,7 +632,12 @@ inline auto pathfinder_lbfgs_single(
   Eigen::VectorXd prev_grads(num_parameters);
   stan::model::log_prob_grad<true, true>(model, prev_params, prev_grads);
   if (save_iterations) {
-    diagnostic_writer(std::make_tuple(prev_params, prev_grads));
+    diagnostic_writer.begin();
+    diagnostic_writer.begin();
+    diagnostic_writer.write("iter", int(0));
+    diagnostic_writer.write("unconstrained_parameters", prev_params);
+    diagnostic_writer.write("grads", prev_grads);
+    diagnostic_writer.end();
   }
   auto constrain_fun = [&model](auto&& rng, auto&& unconstrained_draws,
                                 auto&& constrained_draws) {
@@ -649,30 +654,25 @@ inline auto pathfinder_lbfgs_single(
   std::size_t num_evals{lbfgs.grad_evals()};
   Eigen::MatrixXd Ykt_mat(num_parameters, max_history_size);
   Eigen::MatrixXd Skt_mat(num_parameters, max_history_size);
-  std::string log_header = path_num + "\n" +
-    "    Iter"
-    "      log prob"
-    "        ||dx||"
-    "      ||grad||"
-    "       alpha"
-    "      alpha0"
-    "  # evals"
-    "  ELBO"
-    "  Best ELBO"
-    "  Notes \n";
-  auto print_log_remainder = [](auto&& write_log_cond, auto&& msg, auto ret, auto num_evals, auto&& lbfgs, auto best_elbo, auto elbo, auto&& lbfgs_ss, auto&& logger) mutable {
+  std::string log_header = path_num + " Iter      log prob        ||dx||      ||grad||     alpha      alpha0      # evals       ELBO    Best ELBO        Notes \n";
+  auto print_log_remainder = [](auto&& write_log_cond, auto&& msg, auto ret, auto num_evals, auto&& lbfgs, 
+   auto best_elbo, auto elbo, auto&& lbfgs_ss, auto&& logger) mutable {
     if (write_log_cond) {
-      msg << " " << std::setw(7) << num_evals << " ";
-      msg << " " <<  std::setprecision(4) << elbo;
-      msg << " " <<  std::setprecision(4) << best_elbo;
-      msg << " " << lbfgs.note() << " ";
+      msg << std::setw(10) << num_evals;
+      if (elbo < 1e+7) {
+        msg  << std::setw(11) << std::scientific << std::setprecision(3) << elbo;
+      } else {
+        msg  << std::setw(11) << std::scientific << std::setprecision(3) << elbo;
+      }
+      if (best_elbo < 1e+7) {
+        msg  << std::setw(11) << std::scientific << std::setprecision(3) << best_elbo;
+      } else {
+        msg  << std::setw(11) << std::scientific << std::setprecision(3) << best_elbo;
+      }
+      msg << std::setw(18) << lbfgs.note();
       logger.info(msg.str());
       msg.clear();
       msg.str("");
-    }
-    if (lbfgs_ss.str().length() > 0) {
-      logger.info(lbfgs_ss);
-      lbfgs_ss.str("");
     }
   };
 
@@ -685,7 +685,13 @@ inline auto pathfinder_lbfgs_single(
         && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
             || ((lbfgs.iter_num() + 1) % refresh == 0));
     if (write_log_cond) {
-      msg << log_header << " " << std::setw(7) << lbfgs.iter_num() << " ";
+      msg << std::setw(5) << log_header <<  std::setw(15) << lbfgs.iter_num() << std::setw(16) << std::scientific << std::setprecision(3) << lp
+              << std::setw(15) << std::scientific << std::setprecision(3) << lbfgs.prev_step_size()
+              << std::setw(12) << std::scientific << std::setprecision(3) << lbfgs.curr_g().norm()
+              << std::setw(13) << std::scientific << std::setprecision(3) << lbfgs.alpha()
+              << std::setw(11) << std::scientific << std::setprecision(3) << lbfgs.alpha0();
+              /*
+      msg << log_header << "        " << std::setw(7) << lbfgs.iter_num() << " ";
       msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
       msg << " " << std::setw(12) << std::setprecision(6)
           << lbfgs.prev_step_size() << " ";
@@ -695,49 +701,102 @@ inline auto pathfinder_lbfgs_single(
           << " ";
       msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
           << " ";
-//      logger.info(msg.str());
+          */
     }
+    history_size = std::min(history_size + 1,
+                            static_cast<std::size_t>(max_history_size));
 
     if (save_iterations) {
-      diagnostic_writer(std::make_tuple(lbfgs.curr_x(), lbfgs.curr_g()));
+      diagnostic_writer.begin();
+      diagnostic_writer.write("iter", lbfgs.iter_num());
+      diagnostic_writer.write("unconstrained_parameters", prev_params);
+      diagnostic_writer.write("grads", prev_grads);
+      diagnostic_writer.write("history_size", history_size);
+      //diagnostic_writer(std::make_tuple(lbfgs.curr_x(), lbfgs.curr_g()));
     }
     // if retcode is -1, line search failed w/o updating vals/grads, so exit
     if (unlikely(ret == -1)) {
-      print_log_remainder(write_log_cond, msg, ret, num_evals, lbfgs, elbo, lbfgs_ss, logger);
+      print_log_remainder(write_log_cond, msg, ret, num_evals, lbfgs, elbo_best.elbo, std::numeric_limits<double>::quiet_NaN(),lbfgs_ss, logger);
+      if (save_iterations) {
+        diagnostic_writer.write("lbfgs_success", false);
+        diagnostic_writer.write("pathfinder_success", false);
+        diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
+        diagnostic_writer.end();
+      }
+      if (lbfgs_ss.str().length() > 0) {
+        logger.info(lbfgs_ss);
+        lbfgs_ss.str("");
+      }
+
       continue;
     }
-    param_buff.push_back(lbfgs.curr_x() - prev_params);
-    grad_buff.push_back(lbfgs.curr_g() - prev_grads);
-    prev_params = lbfgs.curr_x();
-    prev_grads = lbfgs.curr_g();
-    history_size = std::min(history_size + 1,
-                            static_cast<std::size_t>(max_history_size));
-    if (internal::check_curve(param_buff.back(), grad_buff.back())) {
-      alpha = internal::form_diag(alpha, grad_buff.back(), param_buff.back());
-    }
-    Eigen::Map<Eigen::MatrixXd> Ykt_map(Ykt_mat.data(), num_parameters,
-                                        history_size);
-    for (Eigen::Index i = 0; i < history_size; ++i) {
-      Ykt_map.col(i) = grad_buff[i];
-    }
-    Eigen::Map<Eigen::MatrixXd> Skt_map(Skt_mat.data(), num_parameters,
-                                        history_size);
-    for (Eigen::Index i = 0; i < history_size; ++i) {
-      Skt_map.col(i) = param_buff[i];
-    }
-    std::string iter_msg(path_num + "Iter: [" + std::to_string(lbfgs.iter_num())
-                         + "] ");
+    try {
+      param_buff.push_back(lbfgs.curr_x() - prev_params);
+      grad_buff.push_back(lbfgs.curr_g() - prev_grads);
+      prev_params = lbfgs.curr_x();
+      prev_grads = lbfgs.curr_g();
+      if (internal::check_curve(param_buff.back(), grad_buff.back())) {
+        alpha = internal::form_diag(alpha, grad_buff.back(), param_buff.back());
+      }
+      Eigen::Map<Eigen::MatrixXd> Ykt_map(Ykt_mat.data(), num_parameters,
+                                          history_size);
+      for (Eigen::Index i = 0; i < history_size; ++i) {
+        Ykt_map.col(i) = grad_buff[i];
+      }
+      Eigen::Map<Eigen::MatrixXd> Skt_map(Skt_mat.data(), num_parameters,
+                                          history_size);
+      for (Eigen::Index i = 0; i < history_size; ++i) {
+        Skt_map.col(i) = param_buff[i];
+      }
+      std::string iter_msg(path_num + "Iter: [" + std::to_string(lbfgs.iter_num())
+                          + "] ");
 
-    auto pathfinder_res = internal::pathfinder_impl(
-        rng, lp_fun, constrain_fun, alpha, lbfgs.curr_x(), lbfgs.curr_g(),
-        Ykt_map, Skt_map, num_elbo_draws, iter_msg, logger);
-    num_evals += pathfinder_res.first.fn_calls;
-    print_log_remainder(write_log_cond, msg, ret, num_evals, lbfgs, elbo, lbfgs_ss, logger);
-    if (pathfinder_res.first.elbo > elbo_best.elbo) {
-      elbo_best = std::move(pathfinder_res.first);
-      taylor_approx_best = std::move(pathfinder_res.second);
-      best_iteration = lbfgs.iter_num();
+      auto pathfinder_res = internal::pathfinder_impl(
+          rng, lp_fun, constrain_fun, alpha, lbfgs.curr_x(), lbfgs.curr_g(),
+          Ykt_map, Skt_map, num_elbo_draws, iter_msg, logger);
+      num_evals += pathfinder_res.first.fn_calls;
+      print_log_remainder(write_log_cond, msg, ret, num_evals, lbfgs, pathfinder_res.first.elbo, pathfinder_res.first.elbo, lbfgs_ss, logger);
+      if (save_iterations) {
+        diagnostic_writer.write("lbfgs_success", true);
+        diagnostic_writer.write("pathfinder_success", true);
+        diagnostic_writer.write("x_center", pathfinder_res.second.x_center);
+        diagnostic_writer.write("logDetCholHk", pathfinder_res.second.logdetcholHk);
+        diagnostic_writer.write("L_approx", pathfinder_res.second.L_approx);
+        diagnostic_writer.write("Qk", pathfinder_res.second.Qk);
+        diagnostic_writer.write("alpha", pathfinder_res.second.alpha);
+        diagnostic_writer.write("full", pathfinder_res.second.use_full);
+        diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
+        diagnostic_writer.end();
+      }
+      if (lbfgs_ss.str().length() > 0) {
+        logger.info(lbfgs_ss);
+        lbfgs_ss.str("");
+      }
+
+      if (pathfinder_res.first.elbo > elbo_best.elbo) {
+        elbo_best = std::move(pathfinder_res.first);
+        taylor_approx_best = std::move(pathfinder_res.second);
+        best_iteration = lbfgs.iter_num();
+      }
+    } catch (const std::exception& e) {
+      if (save_iterations) {
+        diagnostic_writer.write("lbfgs_success", true);
+        diagnostic_writer.write("pathfinder_success", false);
+        diagnostic_writer.write("history_size", history_size);
+        diagnostic_writer.write("history_size", history_size);
+        diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
+        diagnostic_writer.write("pathfinder_error", std::string(e.what()));
+        diagnostic_writer.end();
+      }
+      if (lbfgs_ss.str().length() > 0) {
+        logger.info(lbfgs_ss);
+        lbfgs_ss.str("");
+      }
+      throw e;
     }
+  }
+  if (save_iterations) {
+    diagnostic_writer.end();
   }
   if (ret <= 0) {
     std::string prefix_err_msg

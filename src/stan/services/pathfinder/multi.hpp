@@ -100,7 +100,6 @@ inline int pathfinder_lbfgs_multi(
   param_names.push_back("lp_approx__");
   param_names.push_back("lp__");
   parameter_writer(param_names);
-  diagnostic_writer(param_names);
   const size_t num_params = param_names.size();
   tbb::concurrent_vector<Eigen::Array<double, -1, 1>> individual_lp_ratios;
   individual_lp_ratios.reserve(num_paths);
