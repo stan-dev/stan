@@ -634,7 +634,7 @@ inline auto pathfinder_lbfgs_single(
   if (save_iterations) {
     diagnostic_writer.begin_record();
     diagnostic_writer.begin_record("0");
-    diagnostic_writer.write("iter", int(0));
+    diagnostic_writer.write("iter", static_cast<int>(0));
     diagnostic_writer.write("unconstrained_parameters", prev_params);
     diagnostic_writer.write("grads", prev_grads);
     diagnostic_writer.end_record();
@@ -654,7 +654,9 @@ inline auto pathfinder_lbfgs_single(
   std::size_t num_evals{lbfgs.grad_evals()};
   Eigen::MatrixXd Ykt_mat(num_parameters, max_history_size);
   Eigen::MatrixXd Skt_mat(num_parameters, max_history_size);
-  std::string log_header = path_num + " Iter      log prob        ||dx||      ||grad||     alpha      alpha0      # evals       ELBO    Best ELBO        Notes \n";
+  std::string log_header = path_num + " Iter      log prob        ||dx||      "
+  "||grad||     alpha      alpha0      # evals       ELBO    Best ELBO        "
+  "Notes \n";
   auto print_log_remainder = [](auto&& write_log_cond, auto&& msg, auto ret,
                                 auto num_evals, auto&& lbfgs, auto best_elbo,
                                 auto elbo, auto&& lbfgs_ss,
