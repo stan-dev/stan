@@ -1,10 +1,13 @@
 #include <stan/math.hpp>
 #include <stan/services/pathfinder/multi.hpp>
+#include <stan/callbacks/json_writer.hpp>
+#include <stan/callbacks/stream_writer.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
+#include <stan/io/json/json_data.hpp>
 #include <test/test-models/good/eight_schools.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
-#include <stan/callbacks/stream_writer.hpp>
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 
@@ -34,14 +37,19 @@ class ServicesPathfinderEightSchools : public testing::Test {
   ServicesPathfinderEightSchools()
       : init(init_ss),
         parameter(parameter_ss),
-        diagnostics(diagnostic_ss),
+        diagnostics(std::unique_ptr<std::stringstream, stan::test::deleter_noop>(&diagnostic_ss)),
         context(init_context()),
         model(context, 0, &model_ss) {}
+
+  void SetUp() {
+    diagnostic_ss.str(std::string());
+    diagnostic_ss.clear();
+  }
 
   std::stringstream init_ss, parameter_ss, diagnostic_ss, model_ss;
   stan::callbacks::stream_writer init;
   stan::test::values parameter;
-  stan::test::values diagnostics;
+  stan::callbacks::json_writer<std::stringstream, stan::test::deleter_noop> diagnostics;
   stan::io::array_var_context context;
   stan_model model;
 };
@@ -70,7 +78,7 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   std::ofstream empty_ostream("../test.log");
   stan::test::loggy logger(empty_ostream);
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
-  std::vector<stan::callbacks::writer> single_path_diagnostic_writer(num_paths);
+  std::vector<stan::callbacks::structured_writer> single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
     single_path_inits.emplace_back(

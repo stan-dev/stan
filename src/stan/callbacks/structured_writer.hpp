@@ -20,8 +20,9 @@ class structured_writer {
    */
   virtual ~structured_writer() {}
 
-  virtual void begin() {}
-  virtual void end() {}
+  virtual void begin_record() {}
+  virtual void begin_record(const std::string&) {}
+  virtual void end_record() {}
   virtual void begin_list() {}
   virtual void end_list() {}
 

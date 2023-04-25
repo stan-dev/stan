@@ -33,17 +33,12 @@ auto init_context() {
   return stan::json::json_data(stream);
 }
 
-struct deleter_noop {
-  template <typename T>
-  constexpr void operator()(T* arg) const {}
-};
-
 class ServicesPathfinderGLM : public testing::Test {
  public:
   ServicesPathfinderGLM()
       : init(init_ss),
         parameter(parameter_ss),
-        diagnostics(std::unique_ptr<std::stringstream, deleter_noop>(&diagnostic_ss)),
+        diagnostics(std::unique_ptr<std::stringstream, stan::test::deleter_noop>(&diagnostic_ss)),
         context(init_context()),
         model(context, 0, &model_ss) {}
 
@@ -56,7 +51,7 @@ class ServicesPathfinderGLM : public testing::Test {
   std::stringstream init_ss, parameter_ss, diagnostic_ss, model_ss;
   stan::callbacks::stream_writer init;
   stan::test::values parameter;
-  stan::callbacks::json_writer<std::stringstream, deleter_noop> diagnostics;
+  stan::callbacks::json_writer<std::stringstream, stan::test::deleter_noop> diagnostics;
   stan::json::json_data context;
   stan_model model;
 };
@@ -93,7 +88,7 @@ TEST_F(ServicesPathfinderGLM, single) {
   stan::test::mock_callback callback;
   stan::io::empty_var_context empty_context;  // = init_init_context();
   std::ofstream empty_ostream(nullptr);
-  stan::test::loggy logger(std::cout);
+  stan::test::loggy logger(empty_ostream);
 
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> input_iters;
 
@@ -118,61 +113,29 @@ TEST_F(ServicesPathfinderGLM, single) {
                                  .sqrt())
                                 .transpose()
                                 .eval();
-                                /*
-  Eigen::MatrixXd prev_param_vals = stan::test::normal_glm_param_vals();
-  Eigen::VectorXd prev_mean_vals = prev_param_vals.rowwise().mean().eval();
-  Eigen::VectorXd prev_sd_vals = (((prev_param_vals.colwise() - prev_mean_vals)
-                                       .array()
-                                       .square()
-                                       .matrix()
-                                       .rowwise()
-                                       .sum()
-                                       .array()
-                                   / (prev_param_vals.cols() - 1))
-                                      .sqrt())
-                                     .transpose()
-                                     .eval();
-                                     */
-  std::cout << "Means:\n" << std::endl;
-  std::cout << mean_vals.transpose().eval().format(CommaInitFmt) << std::endl;
-  std::cout << "SDs: \n" << std::endl;
-  std::cout <<  sd_vals.transpose().eval().format(CommaInitFmt) << std::endl;
-  std::cout << diagnostic_ss.str() << std::endl;
-                                     /*
-  std::cout << "param_row: " << param_vals.rows() << " param_cols: " << param_vals.cols() <<
-  " prev_row: " << prev_param_vals.rows() << " prev_cols: " << prev_param_vals.cols() << std::endl;
-  Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
-  Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
-  Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
-                                       .array()
-                                       .square()
-                                       .matrix()
-                                       .rowwise()
-                                       .sum()
-                                       .array()
-                                   / (ans_diff.cols() - 1))
-                                      .sqrt())
-                                     .transpose()
-                                     .eval();
-
+                                
+  auto prev_param_summary = stan::test::normal_glm_param_summary();
+  Eigen::VectorXd prev_mean_vals = prev_param_summary.first;
+  Eigen::VectorXd prev_sd_vals = prev_param_summary.second;
+  Eigen::MatrixXd ans_mean_diff = mean_vals - prev_mean_vals;
+  Eigen::MatrixXd ans_sd_diff = sd_vals - prev_sd_vals;
   Eigen::MatrixXd all_mean_vals(3, 10);
-  all_mean_vals.row(0) = mean_vals;
-  all_mean_vals.row(1) = prev_mean_vals;
-  all_mean_vals.row(2) = mean_diff_vals;
+  all_mean_vals.row(0) = mean_vals.transpose();
+  all_mean_vals.row(1) = prev_mean_vals.transpose();
+  all_mean_vals.row(2) = ans_mean_diff.transpose();
   Eigen::MatrixXd all_sd_vals(3, 10);
-  all_sd_vals.row(0) = sd_vals;
-  all_sd_vals.row(1) = prev_sd_vals;
-  all_sd_vals.row(2) = sd_diff_vals;
-  True Sd's are all 1 and true means are -4, -2, 0, 1, 3, -1
+  all_sd_vals.row(0) = sd_vals.transpose();
+  all_sd_vals.row(1) = prev_sd_vals.transpose();
+  all_sd_vals.row(2) = ans_sd_diff.transpose();
+  //True Sd's are all 1 and true means are -4, -2, 0, 1, 3, -1
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_mean_vals(2, i), .01);
   }
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
   }
-  */
 }
-/*
+
 TEST_F(ServicesPathfinderGLM, multi) {
   constexpr unsigned int seed = 0;
   constexpr unsigned int chain = 1;
@@ -232,56 +195,24 @@ TEST_F(ServicesPathfinderGLM, multi) {
                                  .sqrt())
                                 .transpose()
                                 .eval();
-  Eigen::MatrixXd prev_param_vals = stan::test::normal_glm_param_vals();
-  Eigen::VectorXd prev_mean_vals = prev_param_vals.rowwise().mean().eval();
-  Eigen::VectorXd prev_sd_vals = (((prev_param_vals.colwise() - prev_mean_vals)
-                                       .array()
-                                       .square()
-                                       .matrix()
-                                       .rowwise()
-                                       .sum()
-                                       .array()
-                                   / (prev_param_vals.cols() - 1))
-                                      .sqrt())
-                                     .transpose()
-                                     .eval();
-   std::cout << "Means:\n" << std::endl;
-  std::cout << mean_vals.transpose().eval().format(CommaInitFmt) << std::endl;
-  std::cout << "SDs: \n" << std::endl;
-  std::cout <<  sd_vals.transpose().eval().format(CommaInitFmt) << std::endl;
-  std::cout << diagnostic_ss.str() << std::endl;
-
-  
-  Eigen::MatrixXd ans_diff = param_vals - prev_param_vals;
-  Eigen::VectorXd mean_diff_vals = ans_diff.rowwise().mean();
-  Eigen::VectorXd sd_diff_vals = (((ans_diff.colwise() - mean_diff_vals)
-                                       .array()
-                                       .square()
-                                       .matrix()
-                                       .rowwise()
-                                       .sum()
-                                       .array()
-                                   / (ans_diff.cols() - 1))
-                                      .sqrt())
-                                     .transpose()
-                                     .eval();
-
+  auto prev_param_summary = stan::test::normal_glm_param_summary();
+  Eigen::VectorXd prev_mean_vals = prev_param_summary.first;
+  Eigen::VectorXd prev_sd_vals = prev_param_summary.second;
+  Eigen::MatrixXd ans_mean_diff = mean_vals - prev_mean_vals;
+  Eigen::MatrixXd ans_sd_diff = sd_vals - prev_sd_vals;
   Eigen::MatrixXd all_mean_vals(3, 10);
-  all_mean_vals.row(0) = mean_vals;
-  all_mean_vals.row(1) = prev_mean_vals;
-  all_mean_vals.row(2) = mean_diff_vals;
-
+  all_mean_vals.row(0) = mean_vals.transpose();
+  all_mean_vals.row(1) = prev_mean_vals.transpose();
+  all_mean_vals.row(2) = ans_mean_diff.transpose();
+  Eigen::MatrixXd all_sd_vals(3, 10);
+  all_sd_vals.row(0) = sd_vals.transpose();
+  all_sd_vals.row(1) = prev_sd_vals.transpose();
+  all_sd_vals.row(2) = ans_sd_diff.transpose();
+  //True Sd's are all 1 and true means are -4, -2, 0, 1, 3, -1
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_mean_vals(2, i), .01);
   }
-
-  Eigen::MatrixXd all_sd_vals(3, 10);
-  all_sd_vals.row(0) = sd_vals;
-  all_sd_vals.row(1) = prev_sd_vals;
-  all_sd_vals.row(2) = sd_diff_vals;
-  for (int i = 2; i < all_sd_vals.cols(); ++i) {
-    EXPECT_NEAR(0, all_sd_vals(2, i), 0.1);
-  }
-  
+  for (int i = 2; i < all_mean_vals.cols(); ++i) {
+    EXPECT_NEAR(0, all_sd_vals(2, i), .1);
+  }  
 }
-*/
