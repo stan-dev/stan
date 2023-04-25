@@ -38,7 +38,9 @@ class ServicesPathfinderGLM : public testing::Test {
   ServicesPathfinderGLM()
       : init(init_ss),
         parameter(parameter_ss),
-        diagnostics(std::unique_ptr<std::stringstream, stan::test::deleter_noop>(&diagnostic_ss)),
+        diagnostics(
+            std::unique_ptr<std::stringstream, stan::test::deleter_noop>(
+                &diagnostic_ss)),
         context(init_context()),
         model(context, 0, &model_ss) {}
 
@@ -51,7 +53,8 @@ class ServicesPathfinderGLM : public testing::Test {
   std::stringstream init_ss, parameter_ss, diagnostic_ss, model_ss;
   stan::callbacks::stream_writer init;
   stan::test::values parameter;
-  stan::callbacks::json_writer<std::stringstream, stan::test::deleter_noop> diagnostics;
+  stan::callbacks::json_writer<std::stringstream, stan::test::deleter_noop>
+      diagnostics;
   stan::json::json_data context;
   stan_model model;
 };
@@ -113,7 +116,7 @@ TEST_F(ServicesPathfinderGLM, single) {
                                  .sqrt())
                                 .transpose()
                                 .eval();
-                                
+
   auto prev_param_summary = stan::test::normal_glm_param_summary();
   Eigen::VectorXd prev_mean_vals = prev_param_summary.first;
   Eigen::VectorXd prev_sd_vals = prev_param_summary.second;
@@ -127,7 +130,7 @@ TEST_F(ServicesPathfinderGLM, single) {
   all_sd_vals.row(0) = sd_vals.transpose();
   all_sd_vals.row(1) = prev_sd_vals.transpose();
   all_sd_vals.row(2) = ans_sd_diff.transpose();
-  //True Sd's are all 1 and true means are -4, -2, 0, 1, 3, -1
+  // True Sd's are all 1 and true means are -4, -2, 0, 1, 3, -1
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_mean_vals(2, i), .01);
   }
@@ -158,7 +161,8 @@ TEST_F(ServicesPathfinderGLM, multi) {
   std::ostream empty_ostream(nullptr);
   stan::test::loggy logger(empty_ostream);
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
-  std::vector<stan::callbacks::json_writer<std::stringstream>> single_path_diagnostic_writer(num_paths);
+  std::vector<stan::callbacks::json_writer<std::stringstream>>
+      single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
     single_path_inits.emplace_back(
@@ -208,11 +212,11 @@ TEST_F(ServicesPathfinderGLM, multi) {
   all_sd_vals.row(0) = sd_vals.transpose();
   all_sd_vals.row(1) = prev_sd_vals.transpose();
   all_sd_vals.row(2) = ans_sd_diff.transpose();
-  //True Sd's are all 1 and true means are -4, -2, 0, 1, 3, -1
+  // True Sd's are all 1 and true means are -4, -2, 0, 1, 3, -1
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_mean_vals(2, i), .01);
   }
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
-  }  
+  }
 }

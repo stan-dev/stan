@@ -655,19 +655,23 @@ inline auto pathfinder_lbfgs_single(
   Eigen::MatrixXd Ykt_mat(num_parameters, max_history_size);
   Eigen::MatrixXd Skt_mat(num_parameters, max_history_size);
   std::string log_header = path_num + " Iter      log prob        ||dx||      ||grad||     alpha      alpha0      # evals       ELBO    Best ELBO        Notes \n";
-  auto print_log_remainder = [](auto&& write_log_cond, auto&& msg, auto ret, auto num_evals, auto&& lbfgs, 
-   auto best_elbo, auto elbo, auto&& lbfgs_ss, auto&& logger) mutable {
+  auto print_log_remainder = [](auto&& write_log_cond, auto&& msg, auto ret,
+                                auto num_evals, auto&& lbfgs, auto best_elbo,
+                                auto elbo, auto&& lbfgs_ss,
+                                auto&& logger) mutable {
     if (write_log_cond) {
       msg << std::setw(10) << num_evals;
       if (elbo < 1e+7) {
-        msg  << std::setw(11) << std::scientific << std::setprecision(3) << elbo;
+        msg << std::setw(11) << std::scientific << std::setprecision(3) << elbo;
       } else {
-        msg  << std::setw(11) << std::scientific << std::setprecision(3) << elbo;
+        msg << std::setw(11) << std::scientific << std::setprecision(3) << elbo;
       }
       if (best_elbo < 1e+7) {
-        msg  << std::setw(11) << std::scientific << std::setprecision(3) << best_elbo;
+        msg << std::setw(11) << std::scientific << std::setprecision(3)
+            << best_elbo;
       } else {
-        msg  << std::setw(11) << std::scientific << std::setprecision(3) << best_elbo;
+        msg << std::setw(11) << std::scientific << std::setprecision(3)
+            << best_elbo;
       }
       msg << std::setw(18) << lbfgs.note();
       logger.info(msg.str());
@@ -681,27 +685,31 @@ inline auto pathfinder_lbfgs_single(
     interrupt();
     ret = lbfgs.step();
     double lp = lbfgs.logp();
-    bool write_log_cond = refresh > 0
-        && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
-            || ((lbfgs.iter_num() + 1) % refresh == 0));
+    bool write_log_cond
+        = refresh > 0
+          && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
+              || ((lbfgs.iter_num() + 1) % refresh == 0));
     if (write_log_cond) {
-      msg << std::setw(5) << log_header <<  std::setw(15) << lbfgs.iter_num() << std::setw(16) << std::scientific << std::setprecision(3) << lp
-              << std::setw(15) << std::scientific << std::setprecision(3) << lbfgs.prev_step_size()
-              << std::setw(12) << std::scientific << std::setprecision(3) << lbfgs.curr_g().norm()
-              << std::setw(13) << std::scientific << std::setprecision(3) << lbfgs.alpha()
-              << std::setw(11) << std::scientific << std::setprecision(3) << lbfgs.alpha0();
-              /*
-      msg << log_header << "        " << std::setw(7) << lbfgs.iter_num() << " ";
-      msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
-      msg << " " << std::setw(12) << std::setprecision(6)
-          << lbfgs.prev_step_size() << " ";
-      msg << " " << std::setw(12) << std::setprecision(6)
-          << lbfgs.curr_g().norm() << " ";
-      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha()
-          << " ";
-      msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
-          << " ";
-          */
+      msg << std::setw(5) << log_header << std::setw(15) << lbfgs.iter_num()
+          << std::setw(16) << std::scientific << std::setprecision(3) << lp
+          << std::setw(15) << std::scientific << std::setprecision(3)
+          << lbfgs.prev_step_size() << std::setw(12) << std::scientific
+          << std::setprecision(3) << lbfgs.curr_g().norm() << std::setw(13)
+          << std::scientific << std::setprecision(3) << lbfgs.alpha()
+          << std::setw(11) << std::scientific << std::setprecision(3)
+          << lbfgs.alpha0();
+      /*
+msg << log_header << "        " << std::setw(7) << lbfgs.iter_num() << " ";
+msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
+msg << " " << std::setw(12) << std::setprecision(6)
+  << lbfgs.prev_step_size() << " ";
+msg << " " << std::setw(12) << std::setprecision(6)
+  << lbfgs.curr_g().norm() << " ";
+msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha()
+  << " ";
+msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
+  << " ";
+  */
     }
     history_size = std::min(history_size + 1,
                             static_cast<std::size_t>(max_history_size));
@@ -712,11 +720,13 @@ inline auto pathfinder_lbfgs_single(
       diagnostic_writer.write("unconstrained_parameters", prev_params);
       diagnostic_writer.write("grads", prev_grads);
       diagnostic_writer.write("history_size", history_size);
-      //diagnostic_writer(std::make_tuple(lbfgs.curr_x(), lbfgs.curr_g()));
+      // diagnostic_writer(std::make_tuple(lbfgs.curr_x(), lbfgs.curr_g()));
     }
     // if retcode is -1, line search failed w/o updating vals/grads, so exit
     if (unlikely(ret == -1)) {
-      print_log_remainder(write_log_cond, msg, ret, num_evals, lbfgs, elbo_best.elbo, std::numeric_limits<double>::quiet_NaN(),lbfgs_ss, logger);
+      print_log_remainder(
+          write_log_cond, msg, ret, num_evals, lbfgs, elbo_best.elbo,
+          std::numeric_limits<double>::quiet_NaN(), lbfgs_ss, logger);
       if (save_iterations) {
         diagnostic_writer.write("lbfgs_success", false);
         diagnostic_writer.write("pathfinder_success", false);
@@ -748,19 +758,22 @@ inline auto pathfinder_lbfgs_single(
       for (Eigen::Index i = 0; i < history_size; ++i) {
         Skt_map.col(i) = param_buff[i];
       }
-      std::string iter_msg(path_num + "Iter: [" + std::to_string(lbfgs.iter_num())
-                          + "] ");
+      std::string iter_msg(path_num + "Iter: ["
+                           + std::to_string(lbfgs.iter_num()) + "] ");
 
       auto pathfinder_res = internal::pathfinder_impl(
           rng, lp_fun, constrain_fun, alpha, lbfgs.curr_x(), lbfgs.curr_g(),
           Ykt_map, Skt_map, num_elbo_draws, iter_msg, logger);
       num_evals += pathfinder_res.first.fn_calls;
-      print_log_remainder(write_log_cond, msg, ret, num_evals, lbfgs, pathfinder_res.first.elbo, pathfinder_res.first.elbo, lbfgs_ss, logger);
+      print_log_remainder(write_log_cond, msg, ret, num_evals, lbfgs,
+                          pathfinder_res.first.elbo, pathfinder_res.first.elbo,
+                          lbfgs_ss, logger);
       if (save_iterations) {
         diagnostic_writer.write("lbfgs_success", true);
         diagnostic_writer.write("pathfinder_success", true);
         diagnostic_writer.write("x_center", pathfinder_res.second.x_center);
-        diagnostic_writer.write("logDetCholHk", pathfinder_res.second.logdetcholHk);
+        diagnostic_writer.write("logDetCholHk",
+                                pathfinder_res.second.logdetcholHk);
         diagnostic_writer.write("L_approx", pathfinder_res.second.L_approx);
         diagnostic_writer.write("Qk", pathfinder_res.second.Qk);
         diagnostic_writer.write("alpha", pathfinder_res.second.alpha);
@@ -909,8 +922,8 @@ inline auto pathfinder_lbfgs_single(
   const double pathfinder_delta_time = stan::services::util::duration_diff(
       start_pathfinder_time, end_pathfinder_time);
   std::string pathfinder_time_str = "Elapsed Time: ";
-  pathfinder_time_str +=  std::to_string(pathfinder_delta_time) +
-   std::string(" seconds (Pathfinder)");
+  pathfinder_time_str += std::to_string(pathfinder_delta_time)
+                         + std::string(" seconds (Pathfinder)");
   parameter_writer(pathfinder_time_str);
   parameter_writer();
   return internal::ret_pathfinder<ReturnLpSamples>(

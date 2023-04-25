@@ -460,11 +460,14 @@ Eigen::Matrix<double, 10, 100> eight_schools_r_answer() {
   return r_answer;
 }
 
-std::pair<Eigen::Matrix<double, 10, 1>, Eigen::Matrix<double, 10, 1>> normal_glm_param_summary() {
+std::pair<Eigen::Matrix<double, 10, 1>, Eigen::Matrix<double, 10, 1>>
+normal_glm_param_summary() {
   Eigen::Matrix<double, 10, 1> mean_param_vals;
-  mean_param_vals << 20.1766,   -7191.17,   -3.99891,   -2.00917, 0.00428024,   0.990037,    2.98999,   -1.02273,    1.01613,  -0.994856;
+  mean_param_vals << 20.1766, -7191.17, -3.99891, -2.00917, 0.00428024,
+      0.990037, 2.98999, -1.02273, 1.01613, -0.994856;
   Eigen::Matrix<double, 10, 1> sd_param_vals;
-  sd_param_vals << 1.83697,   1.85228, 0.0145116, 0.0145324, 0.0136457, 0.0137487, 0.0144594, 0.0145803, 0.0102204, 0.0146323;  
+  sd_param_vals << 1.83697, 1.85228, 0.0145116, 0.0145324, 0.0136457, 0.0137487,
+      0.0144594, 0.0145803, 0.0102204, 0.0146323;
   return {mean_param_vals, sd_param_vals};
 }
 }  // namespace test

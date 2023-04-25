@@ -35,9 +35,9 @@ class structured_writer {
   virtual void write(const std::string& key, int value) {}
   virtual void write(const std::string& key, std::size_t value) {}
   virtual void write(const std::string& key, double value) {}
-  virtual void write(const std::string& key, const std::complex<double>& value) {}
   virtual void write(const std::string& key,
-                            const std::vector<double> value) {}
+                     const std::complex<double>& value) {}
+  virtual void write(const std::string& key, const std::vector<double> value) {}
   void write(const std::string& key, const std::vector<std::string>& values) {}
   void write(const std::string& key, const Eigen::MatrixXd& mat) {}
   void write(const std::string& key, const Eigen::VectorXd& vec) {}

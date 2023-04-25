@@ -37,7 +37,9 @@ class ServicesPathfinderEightSchools : public testing::Test {
   ServicesPathfinderEightSchools()
       : init(init_ss),
         parameter(parameter_ss),
-        diagnostics(std::unique_ptr<std::stringstream, stan::test::deleter_noop>(&diagnostic_ss)),
+        diagnostics(
+            std::unique_ptr<std::stringstream, stan::test::deleter_noop>(
+                &diagnostic_ss)),
         context(init_context()),
         model(context, 0, &model_ss) {}
 
@@ -49,7 +51,8 @@ class ServicesPathfinderEightSchools : public testing::Test {
   std::stringstream init_ss, parameter_ss, diagnostic_ss, model_ss;
   stan::callbacks::stream_writer init;
   stan::test::values parameter;
-  stan::callbacks::json_writer<std::stringstream, stan::test::deleter_noop> diagnostics;
+  stan::callbacks::json_writer<std::stringstream, stan::test::deleter_noop>
+      diagnostics;
   stan::io::array_var_context context;
   stan_model model;
 };
@@ -78,7 +81,8 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   std::ofstream empty_ostream("../test.log");
   stan::test::loggy logger(empty_ostream);
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
-  std::vector<stan::callbacks::structured_writer> single_path_diagnostic_writer(num_paths);
+  std::vector<stan::callbacks::structured_writer> single_path_diagnostic_writer(
+      num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
     single_path_inits.emplace_back(
