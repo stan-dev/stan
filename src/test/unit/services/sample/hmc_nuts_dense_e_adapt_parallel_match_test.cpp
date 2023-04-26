@@ -20,11 +20,15 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
  public:
   ServicesSampleHmcNutsDenseEAdaptParMatch()
       : model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
-          data_context, 0, &model_log)), ss_par(num_chains), ss_seq(num_chains) {
+          data_context, 0, &model_log)),
+        ss_par(num_chains),
+        ss_seq(num_chains) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
-      par_parameters.emplace_back(std::unique_ptr<std::stringstream, deleter_noop>(&ss_par[i]), "#");
-      seq_parameters.emplace_back(std::unique_ptr<std::stringstream, deleter_noop>(&ss_seq[i]), "#");
+      par_parameters.emplace_back(
+          std::unique_ptr<std::stringstream, deleter_noop>(&ss_par[i]), "#");
+      seq_parameters.emplace_back(
+          std::unique_ptr<std::stringstream, deleter_noop>(&ss_seq[i]), "#");
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
@@ -90,7 +94,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
         interrupt, logger, seq_init, seq_parameters[i], seq_diagnostic);
     EXPECT_EQ(0, return_code);
   }
-  
+
   std::vector<Eigen::MatrixXd> par_res;
   for (int i = 0; i < num_chains; ++i) {
     auto par_str = ss_par[i].str();
@@ -114,5 +118,4 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
         = (par_res[i].array() - seq_res[i].array()).matrix();
     EXPECT_MATRIX_EQ(diff_res, Eigen::MatrixXd::Zero(80, 9));
   }
-  
 }
