@@ -6,6 +6,7 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace stan {
 namespace callbacks {
