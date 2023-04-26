@@ -20,7 +20,6 @@ namespace callbacks {
 template <typename Stream, typename Deleter = std::default_delete<Stream>>
 class unique_stream_writer final : public writer {
  public:
- 
   /**
    * Constructs a unique stream writer with an output stream
    * and an optional prefix for comments.
@@ -94,9 +93,10 @@ class unique_stream_writer final : public writer {
   /**
    * Writes the comment_prefix to the stream followed by a newline.
    */
-  void operator()() { 
-    if (output_ == nullptr) return;
-    *output_ << comment_prefix_ << std::endl; 
+  void operator()() {
+    if (output_ == nullptr)
+      return;
+    *output_ << comment_prefix_ << std::endl;
   }
 
   /**
@@ -105,7 +105,8 @@ class unique_stream_writer final : public writer {
    * @param[in] message A string
    */
   void operator()(const std::string& message) {
-    if (output_ == nullptr) return;
+    if (output_ == nullptr)
+      return;
     *output_ << comment_prefix_ << message << std::endl;
   }
 
