@@ -61,6 +61,11 @@ class unique_stream_writer final : public writer {
   }
 
   /**
+   * Get the underlying stream
+   */
+  inline auto& get_stream() noexcept { return *output_; }
+
+  /**
    * Writes a set of values in csv format followed by a newline.
    *
    * Note: the precision of the output is determined by the settings
