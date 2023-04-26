@@ -19,15 +19,11 @@ class ServicesSampleHmcNutsDiagEAdaptParMatch : public testing::Test {
  public:
   ServicesSampleHmcNutsDiagEAdaptParMatch()
       : model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
-          data_context, 0, &model_log)) {
+          data_context, 0, &model_log)), ss_par(num_chains), ss_seq(num_chains) {
     for (int i = 0; i < num_chains; ++i) {
-      ss_par.emplace_back(std::stringstream());
-      ss_seq.emplace_back(std::stringstream());
       init.push_back(stan::test::unit::instrumented_writer{});
-      par_parameters.emplace_back(str_writer(
-          std::unique_ptr<std::stringstream, deleter_noop>(&ss_par[i]), "#"));
-      seq_parameters.emplace_back(str_writer(
-          std::unique_ptr<std::stringstream, deleter_noop>(&ss_seq[i]), "#"));
+      par_parameters.emplace_back(std::unique_ptr<std::stringstream, deleter_noop>(&ss_par[i]), "#");
+      seq_parameters.emplace_back(std::unique_ptr<std::stringstream, deleter_noop>(&ss_seq[i]), "#");
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
