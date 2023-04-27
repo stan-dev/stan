@@ -75,9 +75,7 @@ class json_writer final : public structured_writer {
       for (int i = prev_pos; i < pos; ++i) {
         new_value[i + count] = value[i];
       }
-      const auto iter_pos = std::find(chars_to_escape.begin(),
-                                      chars_to_escape.end(), value[pos]);
-      const int idx = std::distance(chars_to_escape.begin(), iter_pos);
+      int idx = strchr(chars_to_escape.data(), value[pos]) - chars_to_escape.data();
       new_value[pos + count] = chars_to_replace[idx][0];
       new_value[pos + count + 1] = chars_to_replace[idx][1];
       pos += 1;
