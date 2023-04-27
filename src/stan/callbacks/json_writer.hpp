@@ -60,18 +60,22 @@ class json_writer final : public structured_writer {
    * @return The processed string.
    */
   std::string process_string(const std::string& value) {
-    std::string new_value = value;
-    static constexpr std::array<char, 11> chars_to_escape
-        = {'\\', '"', '/', '\b', '\f', '\n', '\r', '\t', '\v', '\a', '\0'};
-    static constexpr std::array<const char*, 11> chars_to_replace
+    static constexpr std::array<char, 10> chars_to_escape
+        = {'\\', '"', '/', '\b', '\f', '\n', '\r', '\t', '\v', '\a'};
+    static constexpr std::array<const char*, 10> chars_to_replace
         = {"\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n",
-           "\\r",  "\\t",  "\\v", "\\a", "\\0"};
-    for (int i = 0; i < 11; ++i) {
-      std::size_t pos = 0;
-      while ((pos = new_value.find(chars_to_escape[i], pos))
-             != std::string::npos) {
-        new_value.replace(pos, 1, chars_to_replace[i]);
-        pos += 2;
+            "\\r",  "\\t",  "\\v", "\\a"};
+    static constexpr const char* chars_escape = "\\\"/\b\f\n\r\t\v\a";
+    std::string new_value = value;
+    std::size_t pos = 0;
+    std::size_t count = 0;
+    while ((pos = value.find_first_of(chars_escape, pos, 10)) != std::string::npos) {
+      for (int i = 0; i < 11; ++i) {
+        if (value[pos] == chars_to_escape[i]) {
+          new_value.replace(pos + count, 1, chars_to_replace[i], 2);
+          pos += 1;
+          count++;
+        }
       }
     }
     return new_value;

@@ -91,6 +91,13 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision2) {
   EXPECT_EQ("\"key\" : [ 1.2, 2.3, 3.5, 4.6 ]", ss.str());
 }
 
+TEST_F(StanInterfaceCallbacksJsonWriter, write_string_special_characters) {
+  ss << std::setprecision(2);
+  std::string key("key");
+  std::string x("the\\quick\"brown/\bfox\fjumped\nover\rthe\tlazy\vdog\atwotimes");
+  EXPECT_NO_THROW(writer.write(key, x));
+  EXPECT_EQ("\"key\" : \"the\\\\quick\\\"brown\\/\\bfox\\fjumped\\nover\\rthe\\tlazy\\vdog\\atwotimes\"", ss.str());
+}
 // TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision3) {
 //   const int N = 5;
 //   std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
