@@ -3,12 +3,8 @@
 
 #include <stan/math.hpp>
 
-#include <stan/io/cmd_line.hpp>
-#include <stan/io/dump.hpp>
 #include <stan/io/deserializer.hpp>
 #include <stan/io/serializer.hpp>
-#include <stan/io/reader.hpp>
-#include <stan/io/writer.hpp>
 
 #include <stan/model/rethrow_located.hpp>
 #include <stan/model/model_base.hpp>

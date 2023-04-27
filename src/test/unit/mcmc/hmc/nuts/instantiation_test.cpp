@@ -7,7 +7,7 @@
 #include <stan/mcmc/hmc/nuts/adapt_diag_e_nuts.hpp>
 #include <stan/mcmc/hmc/nuts/adapt_dense_e_nuts.hpp>
 #include <boost/random/additive_combine.hpp>
-#include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <fstream>
 
 #include <gtest/gtest.h>
@@ -22,8 +22,7 @@ TEST(McmcNuts, instantiaton_test) {
   std::stringstream error_stream;
   stan::callbacks::stream_writer error_writer(error_stream);
 
-  std::fstream empty_stream("", std::fstream::in);
-  stan::io::dump data_var_context(empty_stream);
+  stan::io::empty_var_context data_var_context;
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::unit_e_nuts<gauss3D_model_namespace::gauss3D_model, rng_t>

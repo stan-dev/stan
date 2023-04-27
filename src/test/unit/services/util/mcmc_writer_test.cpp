@@ -57,14 +57,18 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
 
   }  // transform_inits()
 
-  inline void get_param_names(std::vector<std::string>& names__) const {
+  inline void get_param_names(std::vector<std::string>& names__,
+                              bool include_tparams = true,
+                              bool include_gqs = true) const {
     names__.clear();
     names__.emplace_back("y");
     names__.emplace_back("z");
     names__.emplace_back("xgq");
   }  // get_param_names()
 
-  inline void get_dims(std::vector<std::vector<size_t>>& dimss__) const final {
+  inline void get_dims(std::vector<std::vector<size_t>>& dimss__,
+                       bool include_tparams = true,
+                       bool include_gqs = true) const final {
     dimss__.clear();
     dimss__.emplace_back(std::vector<size_t>{static_cast<size_t>(2)});
 

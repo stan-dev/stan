@@ -3,7 +3,7 @@
 #include <stan/callbacks/stream_logger.hpp>
 #include <stan/mcmc/hmc/nuts/softabs_nuts.hpp>
 #include <boost/random/additive_combine.hpp>
-#include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <fstream>
 
 #include <gtest/gtest.h>
@@ -24,8 +24,7 @@ TEST(McmcSoftAbsNuts, build_tree_test) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  std::fstream empty_stream("", std::fstream::in);
-  stan::io::dump data_var_context(empty_stream);
+  stan::io::empty_var_context data_var_context;
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::softabs_nuts<gauss3D_model_namespace::gauss3D_model, rng_t>
@@ -112,8 +111,7 @@ TEST(McmcSoftAbsNuts, tree_boundary_test) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  std::fstream empty_stream("", std::fstream::in);
-  stan::io::dump data_var_context(empty_stream);
+  stan::io::empty_var_context data_var_context;
 
   typedef gauss3D_model_namespace::gauss3D_model model_t;
   model_t model(data_var_context);
@@ -327,8 +325,7 @@ TEST(McmcSoftAbsNuts, transition_test) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  std::fstream empty_stream("", std::fstream::in);
-  stan::io::dump data_var_context(empty_stream);
+  stan::io::empty_var_context data_var_context;
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::softabs_nuts<gauss3D_model_namespace::gauss3D_model, rng_t>

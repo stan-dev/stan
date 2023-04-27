@@ -289,7 +289,7 @@ class BFGSMinimizer {
   }
 };
 
-template <class M>
+template <class M, bool jacobian = false>
 class ModelAdaptor {
  private:
   M &_model;
@@ -315,7 +315,7 @@ class ModelAdaptor {
       _x[i] = x[i];
 
     try {
-      f = -log_prob_propto<false>(_model, _x, _params_i, _msgs);
+      f = -log_prob_propto<jacobian>(_model, _x, _params_i, _msgs);
     } catch (const std::exception &e) {
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
@@ -347,7 +347,7 @@ class ModelAdaptor {
     _fevals++;
 
     try {
-      f = -log_prob_grad<true, false>(_model, _x, _params_i, _g, _msgs);
+      f = -log_prob_grad<true, jacobian>(_model, _x, _params_i, _g, _msgs);
     } catch (const std::exception &e) {
       if (_msgs)
         (*_msgs) << e.what() << std::endl;
@@ -382,15 +382,20 @@ class ModelAdaptor {
   }
 };
 
+/**
+ * @tparam jacobian `true` to include Jacobian adjustment (default `false`)
+ */
 template <typename M, typename QNUpdateType, typename Scalar = double,
-          int DimAtCompile = Eigen::Dynamic>
-class BFGSLineSearch : public BFGSMinimizer<ModelAdaptor<M>, QNUpdateType,
-                                            Scalar, DimAtCompile> {
+          int DimAtCompile = Eigen::Dynamic, bool jacobian = false>
+class BFGSLineSearch
+    : public BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
+                           DimAtCompile> {
  private:
-  ModelAdaptor<M> _adaptor;
+  ModelAdaptor<M, jacobian> _adaptor;
 
  public:
-  typedef BFGSMinimizer<ModelAdaptor<M>, QNUpdateType, Scalar, DimAtCompile>
+  typedef BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
+                        DimAtCompile>
       BFGSBase;
   typedef typename BFGSBase::VectorT vector_t;
   typedef typename stan::math::index_type<vector_t>::type idx_t;

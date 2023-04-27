@@ -3,6 +3,9 @@
 
 #include <stan/io/var_context.hpp>
 #include <stan/math/rev/core.hpp>
+#ifdef STAN_MODEL_FVAR_VAR
+#include <stan/math/mix.hpp>
+#endif
 #include <stan/model/prob_grad.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <ostream>
@@ -68,9 +71,14 @@ class model_base : public prob_grad {
    *
    * @param[in,out] names sequence of names parameters, transformed
    * parameters, and generated quantities
+   * @param[in] include_tparams true if transformed parameters should
+   * be included
+   * @param[in] include_gqs true if generated quantities should be
+   * included
    */
-  virtual void get_param_names(std::vector<std::string>& names) const = 0;
-
+  virtual void get_param_names(std::vector<std::string>& names,
+                               bool include_tparams = true,
+                               bool include_gqs = true) const = 0;
   /**
    * Set the dimensionalities of constrained parameters, transformed
    * parameters, and generated quantities.  The input sequence is
@@ -87,9 +95,14 @@ class model_base : public prob_grad {
    * dimensionality `std::vector<size_t>{2, 3, 4}`.
    *
    * @param[in,out] dimss sequence of dimensions specifications to set
+   * @param[in] include_tparams true if transformed parameters should
+   * be included
+   * @param[in] include_gqs true if generated quantities should be
+   * included
    */
-  virtual void get_dims(std::vector<std::vector<size_t> >& dimss) const = 0;
-
+  virtual void get_dims(std::vector<std::vector<size_t> >& dimss,
+                        bool include_tparams = true,
+                        bool include_gqs = true) const = 0;
   /**
    *  Set the specified sequence to the indexed, scalar, constrained
    *  parameter names.  Each variable is output with a
@@ -591,6 +604,69 @@ class model_base : public prob_grad {
                            std::vector<double>& params_r_constrained,
                            bool include_tparams = true, bool include_gqs = true,
                            std::ostream* msgs = 0) const = 0;
+
+#ifdef STAN_MODEL_FVAR_VAR
+
+  /**
+   * Return the log density for the specified unconstrained
+   * parameters, without Jacobian and with normalizing constants for
+   * probability functions.
+   *
+   * @param[in] params_r unconstrained parameters
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  virtual math::fvar<math::var> log_prob(
+      Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const = 0;
+
+  /**
+   * Return the log density for the specified unconstrained
+   * parameters, with Jacobian correction for constraints and with
+   * normalizing constants for probability functions.
+   *
+   * <p>The Jacobian is of the inverse transform from unconstrained
+   * parameters to constrained parameters; full details for Stan
+   * language types can be found in the language reference manual.
+   *
+   * @param[in] params_r unconstrained parameters
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  virtual math::fvar<math::var> log_prob_jacobian(
+      Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const = 0;
+
+  /**
+   * Return the log density for the specified unconstrained
+   * parameters, without Jacobian correction for constraints and
+   * dropping normalizing constants.
+   *
+   * @param[in] params_r unconstrained parameters
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  virtual math::fvar<math::var> log_prob_propto(
+      Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const = 0;
+
+  /**
+   * Return the log density for the specified unconstrained
+   * parameters, with Jacobian correction for constraints and dropping
+   * normalizing constants.
+   *
+   * <p>The Jacobian is of the inverse transform from unconstrained
+   * parameters to constrained parameters; full details for Stan
+   * language types can be found in the language reference manual.
+   *
+   * @param[in] params_r unconstrained parameters
+   * @param[in,out] msgs message stream
+   * @return log density for specified parameters
+   */
+  virtual math::fvar<math::var> log_prob_propto_jacobian(
+      Eigen::Matrix<math::fvar<math::var>, -1, 1>& params_r,
+      std::ostream* msgs) const = 0;
+#endif
 };
 
 }  // namespace model

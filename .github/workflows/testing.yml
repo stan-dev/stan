@@ -21,12 +21,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-20.04]
         python-version: [3.8]
       fail-fast: false
     steps:
       - name: Check out source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules:  true
       - name: Install clang++
@@ -36,3 +36,25 @@ jobs:
           echo "CXX=clang++-${{ env.clangppVersion }}" >> make/local
           echo "O=0" >> make/local
           python runTests.py -j 2 src/test/unit
+
+  run-fvar-var-tests:
+    name: run stan fvar-var model tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        python-version: [3.8]
+      fail-fast: false
+    steps:
+      - name: Check out source code
+        uses: actions/checkout@v3
+        with:
+          submodules:  true
+      - name: Install clang++
+        run: sudo apt-get install clang-${{ env.clangppVersion }}++
+      - name: Run tests
+        run: |
+          echo "CXX=clang++-${{ env.clangppVersion }}" >> make/local
+          echo "CXXFLAGS+=-DSTAN_MODEL_FVAR_VAR" >> make/local
+          echo "O=0" >> make/local
+          python runTests.py -j 2 src/test/unit/model/

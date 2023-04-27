@@ -3,7 +3,7 @@
 #include <stan/mcmc/hmc/xhmc/softabs_xhmc.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <test/test-models/good/mcmc/hmc/common/gauss3D.hpp>
-#include <stan/io/dump.hpp>
+#include <stan/io/empty_var_context.hpp>
 #include <fstream>
 
 #include <gtest/gtest.h>
@@ -24,8 +24,7 @@ TEST(McmcUnitEXHMC, build_tree) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  std::fstream empty_stream("", std::fstream::in);
-  stan::io::dump data_var_context(empty_stream);
+  stan::io::empty_var_context data_var_context;
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::softabs_xhmc<gauss3D_model_namespace::gauss3D_model, rng_t>
@@ -96,8 +95,7 @@ TEST(McmcUnitEXHMC, transition) {
   std::stringstream debug, info, warn, error, fatal;
   stan::callbacks::stream_logger logger(debug, info, warn, error, fatal);
 
-  std::fstream empty_stream("", std::fstream::in);
-  stan::io::dump data_var_context(empty_stream);
+  stan::io::empty_var_context data_var_context;
   gauss3D_model_namespace::gauss3D_model model(data_var_context);
 
   stan::mcmc::softabs_xhmc<gauss3D_model_namespace::gauss3D_model, rng_t>

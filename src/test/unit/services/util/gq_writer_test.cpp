@@ -27,6 +27,7 @@ TEST_F(ServicesUtilGQWriter, t1) {
   // model test_gq.stan gen quantities block has 3 params:  xqg, y_rep.1,
   // y_rep.2
   EXPECT_EQ(count_matches("xgq", sample_ss.str()), 1);
+  EXPECT_EQ(count_matches("x2gq", sample_ss.str()), 1);
   EXPECT_EQ(count_matches("y_rep", sample_ss.str()), 2);
 }
 
@@ -40,6 +41,23 @@ TEST_F(ServicesUtilGQWriter, t2) {
   draw.push_back(-6.789);
   stan::services::util::gq_writer writer(sample_writer, logger, 2);
   writer.write_gq_values(model, rng1, draw);
-  // model test_gq.stan generates 3 values, 2 commas
-  EXPECT_EQ(count_matches(",", sample_ss.str()), 2);
+  // model test_gq.stan generates 4 values, 3 commas
+  EXPECT_EQ(count_matches(",", sample_ss.str()), 3);
+  EXPECT_EQ(count_matches("nan", sample_ss.str()), 0);
+}
+
+TEST_F(ServicesUtilGQWriter, TestExceptions) {
+  stan::callbacks::stream_writer sample_writer(sample_ss, "");
+  stan::callbacks::stream_logger logger(logger_ss, logger_ss, logger_ss,
+                                        logger_ss, logger_ss);
+  boost::ecuyer1988 rng1 = stan::services::util::create_rng(0, 1);
+  std::vector<double> draw;
+  draw.push_back(2.345);
+  draw.push_back(6.789);
+  stan::services::util::gq_writer writer(sample_writer, logger, 2);
+  writer.write_gq_values(model, rng1, draw);
+  // model test_gq.stan generates 4 values, 3 commas
+  EXPECT_EQ(count_matches(",", sample_ss.str()), 3);
+
+  EXPECT_EQ(count_matches("nan", sample_ss.str()), 4);
 }
