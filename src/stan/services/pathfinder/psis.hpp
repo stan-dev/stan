@@ -245,7 +245,7 @@ inline Eigen::Array<double, -1, 1> psis_weights(const EigArray& log_ratios,
        std::string("In PSIS Weight Calculation: Difference "
        "between the tails is ") +
         std::to_string(eps_diff) +
-        "which is too small for estimating the generalized pareto values."
+        " which is too small for estimating the generalized pareto values."
         " Returning non-pareto smoothed weights.");
     } else {
       auto smoothed = internal::psis_smooth_tail(lw_tail, cutoff);

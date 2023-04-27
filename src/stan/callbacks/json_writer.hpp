@@ -13,8 +13,8 @@ namespace stan {
 namespace callbacks {
 
 /**
- * <code>json_writer</code> is an implementation of
- * <code>structured_writer</code> that writes JSON format data to a stream.
+ * `json_writer` is an implementation of
+ * `structured_writer` that writes JSON format data to a stream.
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
  * output stream
@@ -42,7 +42,7 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Determines whether or a record's internal object requires a comma separator
+   * Determines whether a record's internal object requires a comma separator
    */
   void write_sep() {
     if (record_internal_needs_comma_) {
@@ -63,8 +63,8 @@ class json_writer final : public structured_writer {
   std::string process_string(const std::string& value) {
     static constexpr std::array<char, 11> chars_to_escape
         = {'\\', '"', '/', '\b', '\f', '\n', '\r', '\t', '\v', '\a', '\0'};
-    static constexpr std::array<const char*, 10> chars_to_replace = {
-        "\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t", "\\v", "\\a"};
+    static constexpr std::array<const char*, 11> chars_to_replace = {
+        "\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t", "\\v", "\\a", "\\0"};
     // Replacing every value leads to 2x the size
     std::string new_value(value.size() * 2, 'x');
     std::size_t pos = 0;
@@ -98,7 +98,8 @@ class json_writer final : public structured_writer {
    */
   void write_key(const std::string& key) { *output_ << "\"" << key << "\" : "; }
   /**
-   * Writes a set of comma separated values.
+   * Writes a set of comma separated strings. 
+   * Strings are cleaned to escape special characters.
    *
    * @param[in] v Values in a std::vector
    */
@@ -161,6 +162,11 @@ class json_writer final : public structured_writer {
     record_needs_comma_ = false;
     record_depth_++;
   }
+
+  /**
+   * Writes "\"key\" : {", initial token of a named JSON record.
+   * @param[in] key The name of the record.
+   */
   void begin_record(const std::string& key) {
     write_record_comma_if_needed();
     *output_ << "\"" << key << "\": {";
@@ -203,7 +209,7 @@ class json_writer final : public structured_writer {
   /**
    * Write a key-value pair to the output stream with a value of null as the
    * value.
-   * @param key The key to write
+   * @param key Name of the value pair
    */
   void write(const std::string& key) {
     write_sep();
@@ -213,6 +219,7 @@ class json_writer final : public structured_writer {
 
   /**
    * Write a key-value pair where the value is a string.
+   * @param key Name of the value pair
    * @param value string to write.
    */
   void write(const std::string& key, const std::string& value) {
@@ -223,8 +230,21 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Write a key-value pair where the value is a string.
-   * @param value string to write.
+   * Write a key-value pair where the value is a const char*.
+   * @param key Name of the value pair
+   * @param value pointer to chars to write.
+   */
+  void write(const std::string& key, const char* value) {
+    std::string processsed_string = process_string(value);
+    write_sep();
+    write_key(key);
+    *output_ << "\"" << processsed_string << "\"";
+  }
+
+  /**
+   * Write a key-value pair where the value is a bool.
+   * @param key Name of the value pair
+   * @param value bool to write.
    */
   void write(const std::string& key, bool value) {
     write_sep();
@@ -233,8 +253,9 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Write a key-value pair where the value is a string.
-   * @param value string to write.
+   * Write a key-value pair where the value is an int.
+   * @param key Name of the value pair
+   * @param value int to write.
    */
   void write(const std::string& key, int value) {
     write_sep();
@@ -243,8 +264,9 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Write a key-value pair where the value is a string.
-   * @param value string to write.
+   * Write a key-value pair where the value is an `std::size_t`.
+   * @param key Name of the value pair
+   * @param value `std::size_t` to write.
    */
   void write(const std::string& key, std::size_t value) {
     write_sep();
@@ -253,8 +275,9 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Write a key-value pair where the value is a string.
-   * @param value string to write.
+   * Write a key-value pair where the value is a double.
+   * @param key Name of the value pair
+   * @param value double to write.
    */
   void write(const std::string& key, double value) {
     write_sep();
@@ -263,8 +286,9 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Write a key-value pair where the value is a string.
-   * @param value string to write.
+   * Write a key-value pair where the value is a complex value.
+   * @param key Name of the value pair
+   * @param value complex value to write.
    */
   void write(const std::string& key, const std::complex<double>& value) {
     write_sep();
@@ -274,8 +298,9 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Write a key-value pair where the value is a string.
-   * @param value string to write.
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param value vector to write.
    */
   void write(const std::string& key, const std::vector<double>& values) {
     write_sep();
@@ -284,7 +309,8 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Write a key-value pair where the value is a vector of strings.
+   * Write a key-value pair where the value is a vector of strings to be made a list.
+   * @param key Name of the value pair
    * @param value vector of strings to write.
    */
   void write(const std::string& key, const std::vector<std::string>& values) {
@@ -294,7 +320,8 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Write a key-value pair where the value is a Eigen Matrix.
+   * Write a key-value pair where the value is an Eigen Matrix.
+   * @param key Name of the value pair
    * @param value Eigen Matrix to write.
    */
   void write(const std::string& key, const Eigen::MatrixXd& mat) {
@@ -307,6 +334,7 @@ class json_writer final : public structured_writer {
 
   /**
    * Write a key-value pair where the value is an Eigen Vector.
+   * @param key Name of the value pair
    * @param value Eigen Vector to write.
    */
   void write(const std::string& key, const Eigen::VectorXd& vec) {
@@ -319,14 +347,15 @@ class json_writer final : public structured_writer {
 
   /**
    * Write a key-value pair where the value is a Eigen RowVector.
+   * @param key Name of the value pair
    * @param value Eigen RowVector to write.
    */
   void write(const std::string& key, const Eigen::RowVectorXd& vec) {
     write_sep();
     write_key(key);
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
+    Eigen::IOFormat json_format(Eigen::StreamPrecision, Eigen::DontAlignCols,
                                  ", ", "", "", "", "[", "]");
-    *output_ << vec.format(CommaInitFmt);
+    *output_ << vec.format(json_format);
   }
 
   /**

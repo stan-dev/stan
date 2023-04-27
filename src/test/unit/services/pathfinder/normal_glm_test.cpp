@@ -12,7 +12,7 @@
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/json/json_data.hpp>
-#include <test/test-models/good/normal_glm.hpp>
+#include <test/test-models/good/services/normal_glm.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <test/unit/services/pathfinder/util.hpp>
@@ -28,7 +28,7 @@ auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
 auto init_context() {
   std::fstream stream(
       "./src/test/unit/services/pathfinder/"
-      "glm_test.json",
+      "normal_glm_test.json",
       std::fstream::in);
   return stan::json::json_data(stream);
 }

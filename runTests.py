@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/mnt/sw/nix/store/b4q5asj8flwlgmaijgj1r6wbmnls5x8k-python-3.9.15-view/bin/python
 
 from __future__ import print_function
 from argparse import ArgumentParser, RawTextHelpFormatter

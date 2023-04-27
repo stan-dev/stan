@@ -114,7 +114,7 @@ struct elbo_est_t {
  * @param u A matrix of gaussian IID samples with rows equal to the size of the
  * number of samples to be made and columns equal to the number of parameters.
  * @param taylor_approx Approximation from `taylor_approximation`.
- * @param alpha TODO: Define this
+ * @param alpha The vector of values on the diagonal of the diagonal matrix representing the initial inverse Hessian.
  * @return A matrix with rows equal to the number of samples and columns equal
  * to the number of parameters.
  */
@@ -631,7 +631,7 @@ inline auto pathfinder_lbfgs_single(
   std::size_t history_size = 0;
   Eigen::VectorXd prev_grads(num_parameters);
   stan::model::log_prob_grad<true, true>(model, prev_params, prev_grads);
-  if (save_iterations) {
+  if (unlikely(save_iterations)) {
     diagnostic_writer.begin_record();
     diagnostic_writer.begin_record("0");
     diagnostic_writer.write("iter", static_cast<int>(0));
@@ -662,20 +662,11 @@ inline auto pathfinder_lbfgs_single(
                                 auto elbo, auto&& lbfgs_ss,
                                 auto&& logger) mutable {
     if (write_log_cond) {
-      msg << std::setw(10) << num_evals;
-      if (elbo < 1e+7) {
-        msg << std::setw(11) << std::scientific << std::setprecision(3) << elbo;
-      } else {
-        msg << std::setw(11) << std::scientific << std::setprecision(3) << elbo;
-      }
-      if (best_elbo < 1e+7) {
-        msg << std::setw(11) << std::scientific << std::setprecision(3)
-            << best_elbo;
-      } else {
-        msg << std::setw(11) << std::scientific << std::setprecision(3)
-            << best_elbo;
-      }
-      msg << std::setw(18) << lbfgs.note();
+      msg << 
+      std::setw(10) << num_evals <<
+      std::setw(11) << std::scientific << std::setprecision(3) << elbo <<
+      std::setw(11) << std::scientific << std::setprecision(3) << best_elbo <<
+      std::setw(18) << lbfgs.note();
       logger.info(msg.str());
       msg.clear();
       msg.str("");
@@ -692,39 +683,25 @@ inline auto pathfinder_lbfgs_single(
           && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
               || ((lbfgs.iter_num() + 1) % refresh == 0));
     if (write_log_cond) {
-      msg << std::setw(5) << log_header << std::setw(15) << lbfgs.iter_num()
-          << std::setw(16) << std::scientific << std::setprecision(3) << lp
-          << std::setw(15) << std::scientific << std::setprecision(3)
-          << lbfgs.prev_step_size() << std::setw(12) << std::scientific
-          << std::setprecision(3) << lbfgs.curr_g().norm() << std::setw(13)
-          << std::scientific << std::setprecision(3) << lbfgs.alpha()
-          << std::setw(11) << std::scientific << std::setprecision(3)
-          << lbfgs.alpha0();
-      /*
-msg << log_header << "        " << std::setw(7) << lbfgs.iter_num() << " ";
-msg << " " << std::setw(12) << std::setprecision(6) << lp << " ";
-msg << " " << std::setw(12) << std::setprecision(6)
-  << lbfgs.prev_step_size() << " ";
-msg << " " << std::setw(12) << std::setprecision(6)
-  << lbfgs.curr_g().norm() << " ";
-msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha()
-  << " ";
-msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
-  << " ";
-  */
+      msg << std::setw(5) << log_header << 
+          std::setw(15) << lbfgs.iter_num() << 
+          std::setw(16) << std::scientific << std::setprecision(3) << lp << 
+          std::setw(15) << std::scientific << std::setprecision(3) << lbfgs.prev_step_size() << 
+          std::setw(12) << std::scientific << std::setprecision(3) << lbfgs.curr_g().norm() << 
+          std::setw(13) << std::scientific << std::setprecision(3) << lbfgs.alpha() << 
+          std::setw(11) << std::scientific << std::setprecision(3) << lbfgs.alpha0();
     }
     history_size = std::min(history_size + 1,
                             static_cast<std::size_t>(max_history_size));
 
-    if (save_iterations) {
+    if (unlikely(save_iterations)) {
       diagnostic_writer.begin_record(std::to_string(lbfgs.iter_num()));
       diagnostic_writer.write("iter", lbfgs.iter_num());
       diagnostic_writer.write("unconstrained_parameters", prev_params);
       diagnostic_writer.write("grads", prev_grads);
       diagnostic_writer.write("history_size", history_size);
-      // diagnostic_writer(std::make_tuple(lbfgs.curr_x(), lbfgs.curr_g()));
     }
-    // if retcode is -1, line search failed w/o updating vals/grads, so exit
+    // if retcode is -1, line search failed w/o updating vals/grads, so exit loop
     if (unlikely(ret == -1)) {
       print_log_remainder(
           write_log_cond, msg, ret, num_evals, lbfgs, elbo_best.elbo,
@@ -739,8 +716,7 @@ msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
         logger.info(lbfgs_ss);
         lbfgs_ss.str("");
       }
-
-      continue;
+      break;
     }
     try {
       param_buff.push_back(lbfgs.curr_x() - prev_params);
@@ -770,7 +746,7 @@ msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
       print_log_remainder(write_log_cond, msg, ret, num_evals, lbfgs,
                           pathfinder_res.first.elbo, pathfinder_res.first.elbo,
                           lbfgs_ss, logger);
-      if (save_iterations) {
+      if (unlikely(save_iterations)) {
         diagnostic_writer.write("lbfgs_success", true);
         diagnostic_writer.write("pathfinder_success", true);
         diagnostic_writer.write("x_center", pathfinder_res.second.x_center);
@@ -794,7 +770,7 @@ msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
         best_iteration = lbfgs.iter_num();
       }
     } catch (const std::exception& e) {
-      if (save_iterations) {
+      if (unlikely(save_iterations)) {
         diagnostic_writer.write("lbfgs_success", true);
         diagnostic_writer.write("pathfinder_success", false);
         diagnostic_writer.write("history_size", history_size);
@@ -810,10 +786,10 @@ msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
       throw e;
     }
   }
-  if (save_iterations) {
+  if (unlikely(save_iterations)) {
     diagnostic_writer.end_record();
   }
-  if (ret <= 0) {
+  if (unlikely(ret <= 0)) {
     std::string prefix_err_msg
         = "Optimization terminated with error: " + lbfgs.get_code_string(ret);
     if (lbfgs.iter_num() < 2) {
@@ -829,7 +805,7 @@ msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
           "incorrect results.");
     }
   }
-  if (best_iteration == -1) {
+  if (unlikely(best_iteration == -1)) {
     logger.info(path_num +
         "Failure: None of the LBFGS iterations completed "
         "successfully");
@@ -850,7 +826,7 @@ msg << " " << std::setw(10) << std::setprecision(4) << lbfgs.alpha0()
   auto&& elbo_lp_mat = elbo_best.lp_mat;
   const int remaining_draws = num_draws - elbo_lp_ratio.rows();
   const Eigen::Index num_unconstrained_params = names.size() - 2;
-  if (remaining_draws > 0) {
+  if (likely(remaining_draws > 0)) {
     try {
       internal::elbo_est_t est_draws = internal::est_approx_draws<false>(
           lp_fun, constrain_fun, rng, taylor_approx_best, remaining_draws,

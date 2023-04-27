@@ -12,10 +12,12 @@ namespace stan {
 namespace callbacks {
 
 /**
- * <code>unique_stream_writer</code> is an implementation
- * of <code>writer</code> that holds a unique pointer to the stream it is
+ * `unique_stream_writer` is an implementation
+ * of `writer` that holds a unique pointer to the stream it is
  * writing to.
  * @tparam Stream A type with with a valid `operator<<(std::string)`
+ * @tparam Deleter A class with a valid `operator()` method for deleting the
+ * output stream
  */
 template <typename Stream, typename Deleter = std::default_delete<Stream>>
 class unique_stream_writer final : public writer {
@@ -75,15 +77,14 @@ class unique_stream_writer final : public writer {
     write_vector(state);
   }
 
-  void operator()(const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& state) {
-    if (output_ == nullptr)
-      return;
-    Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "\n", "", "");
-    *output_ << std::get<0>(state).transpose().eval();
-    *output_ << std::get<1>(state).transpose().eval();
-  }
-
+  /**
+   * Writes multiple rows and columns of values in csv format.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] state A matrix of values. The input is expected to have parameters in the rows and samples in the columns. The matrix is then transposed for the output.
+   */
   void operator()(const Eigen::MatrixXd& states) {
     if (output_ == nullptr)
       return;

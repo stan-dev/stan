@@ -40,11 +40,6 @@ class writer {
    */
   virtual void operator()() {}
 
-  virtual void operator()(
-      const std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>>& xx) {}
-  virtual void operator()(
-      const std::tuple<Eigen::VectorXd, Eigen::VectorXd>& xx) {}
-
   /**
    * Writes a string.
    *
@@ -52,6 +47,14 @@ class writer {
    */
   virtual void operator()(const std::string& message) {}
 
+  /**
+   * Writes multiple rows and columns of values in csv format.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] state A matrix of values. The input is expected to have parameters in the rows and samples in the columns. The matrix is then transposed for the output.
+   */
   virtual void operator()(const Eigen::MatrixXd& values) {}
 };
 

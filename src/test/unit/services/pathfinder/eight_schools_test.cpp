@@ -6,7 +6,7 @@
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/json/json_data.hpp>
-#include <test/test-models/good/eight_schools.hpp>
+#include <test/test-models/good/services/eight_schools.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
@@ -78,7 +78,7 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   // bool save_iterations = true;
   constexpr int refresh = 1;
   constexpr bool save_iterations = false;
-  std::ofstream empty_ostream("../test.log");
+  std::ofstream empty_ostream(nullptr);
   stan::test::loggy logger(empty_ostream);
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
   std::vector<stan::callbacks::structured_writer> single_path_diagnostic_writer(
