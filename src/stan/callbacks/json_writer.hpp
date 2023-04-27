@@ -65,7 +65,7 @@ class json_writer final : public structured_writer {
         = {'\\', '"', '/', '\b', '\f', '\n', '\r', '\t', '\v', '\a', '\0'};
     static constexpr std::array<const char*, 10> chars_to_replace = {
         "\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t", "\\v", "\\a"};
-    // Replacing every value leads to 2x the size 
+    // Replacing every value leads to 2x the size
     std::string new_value(value.size() * 2, 'x');
     std::size_t pos = 0;
     std::size_t count = 0;
@@ -75,7 +75,8 @@ class json_writer final : public structured_writer {
       for (int i = prev_pos; i < pos; ++i) {
         new_value[i + count] = value[i];
       }
-      const auto iter_pos = std::find(chars_to_escape.begin(), chars_to_escape.end(), value[pos]);
+      const auto iter_pos = std::find(chars_to_escape.begin(),
+                                      chars_to_escape.end(), value[pos]);
       const int idx = std::distance(chars_to_escape.begin(), iter_pos);
       new_value[pos + count] = chars_to_replace[idx][0];
       new_value[pos + count + 1] = chars_to_replace[idx][1];
@@ -90,7 +91,6 @@ class json_writer final : public structured_writer {
     new_value.resize(value.size() + count);
     return new_value;
   }
-
 
   /**
    * Writes key plus colon for key-value pair.
