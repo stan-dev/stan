@@ -62,14 +62,14 @@ class json_writer final : public structured_writer {
   std::string process_string(const std::string& value) {
     static constexpr std::array<char, 10> chars_to_escape
         = {'\\', '"', '/', '\b', '\f', '\n', '\r', '\t', '\v', '\a'};
-    static constexpr std::array<const char*, 10> chars_to_replace
-        = {"\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n",
-            "\\r",  "\\t",  "\\v", "\\a"};
+    static constexpr std::array<const char*, 10> chars_to_replace = {
+        "\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t", "\\v", "\\a"};
     static constexpr const char* chars_escape = "\\\"/\b\f\n\r\t\v\a";
     std::string new_value = value;
     std::size_t pos = 0;
     std::size_t count = 0;
-    while ((pos = value.find_first_of(chars_escape, pos, 10)) != std::string::npos) {
+    while ((pos = value.find_first_of(chars_escape, pos, 10))
+           != std::string::npos) {
       for (int i = 0; i < 11; ++i) {
         if (value[pos] == chars_to_escape[i]) {
           new_value.replace(pos + count, 1, chars_to_replace[i], 2);
