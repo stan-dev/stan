@@ -219,7 +219,8 @@ TEST(ModelIndexing, lvalueMultiEigen) {
 
   std::vector<double> z_std_empty(0);
   // FIX ODD BEHAVIOR
-  EXPECT_NO_THROW(assign(z_std_empty, std::vector<double>{}, "", index_max(-5)));
+  EXPECT_NO_THROW(
+      assign(z_std_empty, std::vector<double>{}, "", index_max(-5)));
   test_throw_ia(z_std_empty, std::vector<double>{}, index_min_max(1, -1));
 }
 
