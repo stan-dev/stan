@@ -30,10 +30,7 @@ class unique_stream_writer final : public writer {
    */
   explicit unique_stream_writer(std::unique_ptr<Stream, Deleter>&& output,
                                 const std::string& comment_prefix = "")
-      : output_(std::move(output)), comment_prefix_(comment_prefix) {
-    if (output_ == nullptr)
-      throw std::invalid_argument("output writer cannot be null");
-  }
+      : output_(std::move(output)), comment_prefix_(comment_prefix) {}
 
   unique_stream_writer();
   unique_stream_writer(unique_stream_writer& other) = delete;
