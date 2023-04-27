@@ -86,8 +86,8 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision2) {
   ss << std::setprecision(2);
   std::string key("key");
   const int N = 5;
-std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
-EXPECT_NO_THROW(writer.write(key, x));
+  std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
+  EXPECT_NO_THROW(writer.write(key, x));
   EXPECT_EQ("\"key\" : [ 1.2, 2.3, 3.5, 4.6 ]", ss.str());
 }
 
@@ -108,29 +108,25 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision3) {
   std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
   ss.precision(3);
   EXPECT_NO_THROW(writer.write("key", x));
-  EXPECT_EQ("\"key\" : [ 1.23, 2.35, 3.46, 4.57 ]",
-            ss.str());
+  EXPECT_EQ("\"key\" : [ 1.23, 2.35, 3.46, 4.57 ]", ss.str());
 }
 
- TEST_F(StanInterfaceCallbacksJsonWriter, write_string_vector) {
-   const int N = 5;
-   std::vector<std::string> x;
-   for (int n = 0; n < N; ++n)
-     x.push_back(boost::lexical_cast<std::string>(n));
+TEST_F(StanInterfaceCallbacksJsonWriter, write_string_vector) {
+  const int N = 5;
+  std::vector<std::string> x;
+  for (int n = 0; n < N; ++n)
+    x.push_back(boost::lexical_cast<std::string>(n));
 
-   EXPECT_NO_THROW(writer.write("key", x));
-   EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]",
-             ss.str());
- }
+  EXPECT_NO_THROW(writer.write("key", x));
+  EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]", ss.str());
+}
 
- TEST_F(StanInterfaceCallbacksJsonWriter, write_null) {
-   EXPECT_NO_THROW(writer.write("message"));
-   EXPECT_EQ("\"message\" : \"null\" ",
-             ss.str());
- }
+TEST_F(StanInterfaceCallbacksJsonWriter, write_null) {
+  EXPECT_NO_THROW(writer.write("message"));
+  EXPECT_EQ("\"message\" : \"null\" ", ss.str());
+}
 
- TEST_F(StanInterfaceCallbacksJsonWriter, write_string) {
-   EXPECT_NO_THROW(writer.write("key", "value"));
-   EXPECT_EQ("\"key\" : \"value\"",
-             ss.str());
- }
+TEST_F(StanInterfaceCallbacksJsonWriter, write_string) {
+  EXPECT_NO_THROW(writer.write("key", "value"));
+  EXPECT_EQ("\"key\" : \"value\"", ss.str());
+}

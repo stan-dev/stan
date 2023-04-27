@@ -114,7 +114,8 @@ struct elbo_est_t {
  * @param u A matrix of gaussian IID samples with rows equal to the size of the
  * number of samples to be made and columns equal to the number of parameters.
  * @param taylor_approx Approximation from `taylor_approximation`.
- * @param alpha The vector of values on the diagonal of the diagonal matrix representing the initial inverse Hessian.
+ * @param alpha The vector of values on the diagonal of the diagonal matrix
+ * representing the initial inverse Hessian.
  * @return A matrix with rows equal to the number of samples and columns equal
  * to the number of parameters.
  */
@@ -662,11 +663,9 @@ inline auto pathfinder_lbfgs_single(
                                 auto elbo, auto&& lbfgs_ss,
                                 auto&& logger) mutable {
     if (write_log_cond) {
-      msg << 
-      std::setw(10) << num_evals <<
-      std::setw(11) << std::scientific << std::setprecision(3) << elbo <<
-      std::setw(11) << std::scientific << std::setprecision(3) << best_elbo <<
-      std::setw(18) << lbfgs.note();
+      msg << std::setw(10) << num_evals << std::setw(11) << std::scientific
+          << std::setprecision(3) << elbo << std::setw(11) << std::scientific
+          << std::setprecision(3) << best_elbo << std::setw(18) << lbfgs.note();
       logger.info(msg.str());
       msg.clear();
       msg.str("");
@@ -683,13 +682,14 @@ inline auto pathfinder_lbfgs_single(
           && (ret != 0 || !lbfgs.note().empty() || lbfgs.iter_num() == 0
               || ((lbfgs.iter_num() + 1) % refresh == 0));
     if (write_log_cond) {
-      msg << std::setw(5) << log_header << 
-          std::setw(15) << lbfgs.iter_num() << 
-          std::setw(16) << std::scientific << std::setprecision(3) << lp << 
-          std::setw(15) << std::scientific << std::setprecision(3) << lbfgs.prev_step_size() << 
-          std::setw(12) << std::scientific << std::setprecision(3) << lbfgs.curr_g().norm() << 
-          std::setw(13) << std::scientific << std::setprecision(3) << lbfgs.alpha() << 
-          std::setw(11) << std::scientific << std::setprecision(3) << lbfgs.alpha0();
+      msg << std::setw(5) << log_header << std::setw(15) << lbfgs.iter_num()
+          << std::setw(16) << std::scientific << std::setprecision(3) << lp
+          << std::setw(15) << std::scientific << std::setprecision(3)
+          << lbfgs.prev_step_size() << std::setw(12) << std::scientific
+          << std::setprecision(3) << lbfgs.curr_g().norm() << std::setw(13)
+          << std::scientific << std::setprecision(3) << lbfgs.alpha()
+          << std::setw(11) << std::scientific << std::setprecision(3)
+          << lbfgs.alpha0();
     }
     history_size = std::min(history_size + 1,
                             static_cast<std::size_t>(max_history_size));
@@ -701,7 +701,8 @@ inline auto pathfinder_lbfgs_single(
       diagnostic_writer.write("grads", prev_grads);
       diagnostic_writer.write("history_size", history_size);
     }
-    // if retcode is -1, line search failed w/o updating vals/grads, so exit loop
+    // if retcode is -1, line search failed w/o updating vals/grads, so exit
+    // loop
     if (unlikely(ret == -1)) {
       print_log_remainder(
           write_log_cond, msg, ret, num_evals, lbfgs, elbo_best.elbo,

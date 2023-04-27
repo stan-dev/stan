@@ -63,8 +63,9 @@ class json_writer final : public structured_writer {
   std::string process_string(const std::string& value) {
     static constexpr std::array<char, 11> chars_to_escape
         = {'\\', '"', '/', '\b', '\f', '\n', '\r', '\t', '\v', '\a', '\0'};
-    static constexpr std::array<const char*, 11> chars_to_replace = {
-        "\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n", "\\r", "\\t", "\\v", "\\a", "\\0"};
+    static constexpr std::array<const char*, 11> chars_to_replace
+        = {"\\\\", "\\\"", "\\/", "\\b", "\\f", "\\n",
+           "\\r",  "\\t",  "\\v", "\\a", "\\0"};
     // Replacing every value leads to 2x the size
     std::string new_value(value.size() * 2, 'x');
     std::size_t pos = 0;
@@ -98,7 +99,7 @@ class json_writer final : public structured_writer {
    */
   void write_key(const std::string& key) { *output_ << "\"" << key << "\" : "; }
   /**
-   * Writes a set of comma separated strings. 
+   * Writes a set of comma separated strings.
    * Strings are cleaned to escape special characters.
    *
    * @param[in] v Values in a std::vector
@@ -309,7 +310,8 @@ class json_writer final : public structured_writer {
   }
 
   /**
-   * Write a key-value pair where the value is a vector of strings to be made a list.
+   * Write a key-value pair where the value is a vector of strings to be made a
+   * list.
    * @param key Name of the value pair
    * @param value vector of strings to write.
    */
@@ -354,7 +356,7 @@ class json_writer final : public structured_writer {
     write_sep();
     write_key(key);
     Eigen::IOFormat json_format(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                 ", ", "", "", "", "[", "]");
+                                ", ", "", "", "", "[", "]");
     *output_ << vec.format(json_format);
   }
 

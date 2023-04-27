@@ -97,7 +97,8 @@ class structured_writer {
    */
   virtual void write(const std::string& key, const std::vector<double> value) {}
   /**
-   * Write a key-value pair where the value is a vector of strings to be made a list.
+   * Write a key-value pair where the value is a vector of strings to be made a
+   * list.
    * @param key Name of the value pair
    * @param value vector of strings to write.
    */

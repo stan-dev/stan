@@ -83,7 +83,9 @@ class unique_stream_writer final : public writer {
    * Note: the precision of the output is determined by the settings
    *  of the stream on construction.
    *
-   * @param[in] state A matrix of values. The input is expected to have parameters in the rows and samples in the columns. The matrix is then transposed for the output.
+   * @param[in] state A matrix of values. The input is expected to have
+   * parameters in the rows and samples in the columns. The matrix is then
+   * transposed for the output.
    */
   void operator()(const Eigen::MatrixXd& states) {
     if (output_ == nullptr)
