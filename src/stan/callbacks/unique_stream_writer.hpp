@@ -70,12 +70,12 @@ class unique_stream_writer final : public writer {
    * Note: the precision of the output is determined by the settings
    *  of the stream on construction.
    *
-   * @param[in] state Values in a std::vector
+   * @param[in] values Values in a std::vector
    */
-  void operator()(const std::vector<double>& state) {
+  void operator()(const std::vector<double>& values) {
     if (output_ == nullptr)
       return;
-    write_vector(state);
+    write_vector(values);
   }
 
   /**
@@ -93,7 +93,7 @@ class unique_stream_writer final : public writer {
       return;
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,
                                  ", ", "", "", "\n", "", "");
-    *output_ << states.transpose().format(CommaInitFmt);
+    *output_ << values.transpose().format(CommaInitFmt);
   }
 
   /**
