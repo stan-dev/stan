@@ -317,16 +317,28 @@ pipeline {
                     post { always { deleteDir() } }
                 }
                 stage('OpenCL GPU tests') {
-                    agent { label "gelman-group-win2 || linux-gpu" }
+                    agent {
+                        docker {
+                            image 'stanorg/ci:gpu-cpp17'
+                            label 'v100'
+                            args '--gpus 1'
+                        }
+                    }
                     steps {
                         script {
                             if (isUnix()) {
                                 deleteDir()
                                 unstash 'StanSetup'
                                 setupCXX(true, env.GCC, stanc3_bin_url())
-                                sh "echo STAN_OPENCL=true >> make/local"
-                                sh "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_GPU} >> make/local"
-                                sh "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_GPU} >> make/local"
+                                sh """
+                                    echo CXX=${CLANG_CXX} -Werror > make/local
+                                    echo STAN_OPENCL=true >> make/local
+                                    echo OPENCL_PLATFORM_ID=${OPENCL_PLATFORM_ID_GPU} >> make/local
+                                    echo OPENCL_DEVICE_ID=${OPENCL_DEVICE_ID_GPU} >> make/local
+                                """
+                                if (!(params.optimizeUnitTests || isBranch('develop') || isBranch('master'))) {
+                                    sh "echo O=1 >> make/local"
+                                }
                                 runTests("src/test/unit")
                             } else {
                                 deleteDirWin()
