@@ -184,10 +184,10 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
  * where x is the input point, f and g are the function value and
  * gradient at x and ret is non-zero if function evaluation fails.
  *
- * @tparam Scalar A scalar type 
- * 
- * @tparam XType A scalar type 
- * 
+ * @tparam Scalar A scalar type
+ *
+ * @tparam XType A scalar type
+ *
  * @param func Function which is being minimized.
  *
  * @param alpha First value of \f$ \alpha \f$ to try.  Upon return this

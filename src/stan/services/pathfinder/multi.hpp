@@ -101,9 +101,11 @@ inline int pathfinder_lbfgs_multi(
   param_names.push_back("lp__");
   parameter_writer(param_names);
   const size_t num_params = param_names.size();
-  tbb::concurrent_vector<Eigen::Array<double, Eigen::Dynamic, 1>> individual_lp_ratios;
+  tbb::concurrent_vector<Eigen::Array<double, Eigen::Dynamic, 1>>
+      individual_lp_ratios;
   individual_lp_ratios.reserve(num_paths);
-  tbb::concurrent_vector<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>> individual_samples;
+  tbb::concurrent_vector<Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>>
+      individual_samples;
   individual_samples.reserve(num_paths);
   std::atomic<size_t> lp_calls{0};
   tbb::parallel_for(
@@ -150,8 +152,8 @@ inline int pathfinder_lbfgs_multi(
     num_returned_samples += ilpr.size();
   }
   Eigen::Array<double, Eigen::Dynamic, 1> lp_ratios(num_returned_samples);
-  Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic> samples(individual_samples[0].rows(),
-                                       num_returned_samples);
+  Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic> samples(
+      individual_samples[0].rows(), num_returned_samples);
   Eigen::Index filling_start_row = 0;
   for (size_t i = 0; i < successful_pathfinders; ++i) {
     const Eigen::Index individ_num_samples = individual_lp_ratios[i].size();

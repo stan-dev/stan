@@ -141,7 +141,8 @@ class json_writer final : public structured_writer {
   /**
    * Constructs a json writer with an output stream.
    *
-   * @param[in, out] output unique pointer to a type inheriting from `std::ostream`
+   * @param[in, out] output unique pointer to a type inheriting from
+   * `std::ostream`
    */
   explicit json_writer(std::unique_ptr<Stream, Deleter>&& output)
       : output_(std::move(output)) {

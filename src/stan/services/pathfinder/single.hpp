@@ -259,7 +259,8 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
     }
     log_stream(logger, pathfinder_ss);
   }
-  Eigen::Array<double, Eigen::Dynamic, 1> lp_ratio = lp_mat.col(1) - lp_mat.col(0);
+  Eigen::Array<double, Eigen::Dynamic, 1> lp_ratio
+      = lp_mat.col(1) - lp_mat.col(0);
   if (ReturnElbo) {
     double elbo = lp_ratio.mean();
     return elbo_est_t{elbo, lp_fun_calls, std::move(approx_samples),
@@ -834,13 +835,14 @@ inline auto pathfinder_lbfgs_single(
       auto&& new_lp_ratio = est_draws.lp_ratio;
       auto&& lp_draws = est_draws.lp_mat;
       auto&& new_draws = est_draws.repeat_draws;
-      lp_ratio = Eigen::Array<double, Eigen::Dynamic, 1>(new_lp_ratio.size()
-                                             + elbo_lp_ratio.size());
+      lp_ratio = Eigen::Array<double, Eigen::Dynamic, 1>(
+          new_lp_ratio.size() + elbo_lp_ratio.size());
       lp_ratio.head(elbo_lp_ratio.size()) = elbo_lp_ratio.array();
       lp_ratio.tail(new_lp_ratio.size()) = new_lp_ratio.array();
       const auto total_size = elbo_draws.cols() + new_draws.cols();
       constrained_draws_mat
-          = Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>(names.size(), total_size);
+          = Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>(names.size(),
+                                                                 total_size);
       Eigen::VectorXd unconstrained_col;
       Eigen::VectorXd approx_samples_constrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
@@ -867,7 +869,8 @@ inline auto pathfinder_lbfgs_single(
           + "Returning the approximate samples used for ELBO calculation: "
           + err_msg);
       constrained_draws_mat
-          = Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>(names.size(), elbo_draws.cols());
+          = Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>(
+              names.size(), elbo_draws.cols());
       Eigen::VectorXd approx_samples_constrained_col;
       Eigen::VectorXd unconstrained_col;
       for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {
@@ -881,7 +884,8 @@ inline auto pathfinder_lbfgs_single(
     }
   } else {
     constrained_draws_mat
-        = Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>(names.size(), elbo_draws.cols());
+        = Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>(
+            names.size(), elbo_draws.cols());
     Eigen::VectorXd approx_samples_constrained_col;
     Eigen::VectorXd unconstrained_col;
     for (Eigen::Index i = 0; i < elbo_draws.cols(); ++i) {

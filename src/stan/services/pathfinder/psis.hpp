@@ -25,15 +25,16 @@ namespace internal {
  * from.
  */
 template <typename EigArray1, typename EigArray2>
-inline Eigen::Array<double, Eigen::Dynamic, 1> profile_loglikelihood(const EigArray1& theta,
-                                                         const EigArray2& x) {
-  Eigen::Array<double, Eigen::Dynamic, 1> k = ((-theta).matrix() * x.matrix().transpose())
-                                      .array()
-                                      .log1p()
-                                      .matrix()
-                                      .rowwise()
-                                      .mean()
-                                      .array();
+inline Eigen::Array<double, Eigen::Dynamic, 1> profile_loglikelihood(
+    const EigArray1& theta, const EigArray2& x) {
+  Eigen::Array<double, Eigen::Dynamic, 1> k
+      = ((-theta).matrix() * x.matrix().transpose())
+            .array()
+            .log1p()
+            .matrix()
+            .rowwise()
+            .mean()
+            .array();
   return (-theta / k).log() - k - 1;
 }
 
@@ -129,8 +130,10 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
   if (!std::isinf(k)) {
     const Eigen::Index x_size = x.size();
     const double sigma = fit.first;
-    auto p = (Eigen::Array<double, Eigen::Dynamic, 1>::LinSpaced(x_size, 1, x_size) - 0.5)
-             / x_size;
+    auto p
+        = (Eigen::Array<double, Eigen::Dynamic, 1>::LinSpaced(x_size, 1, x_size)
+           - 0.5)
+          / x_size;
     return std::make_pair((qgpd(p, k, sigma) + exp_cutoff).log().eval(), k);
   } else {
     return std::make_pair(x.eval(), k);
@@ -189,12 +192,14 @@ inline auto lower_bound_idx(const Eigen::Array<double, Eigen::Dynamic, 1>& arr,
  * @return A pair with the largest N elements in `first` and the original index
  * of the largest N elements in `second`
  */
-inline std::pair<Eigen::Array<double, Eigen::Dynamic, 1>, Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>>
+inline std::pair<Eigen::Array<double, Eigen::Dynamic, 1>,
+                 Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>>
 largest_n_elements(const Eigen::Array<double, Eigen::Dynamic, 1>& arr,
                    const Eigen::Index top_size) {
   Eigen::Array<double, Eigen::Dynamic, 1> top_n = arr.head(top_size);
   Eigen::Array<Eigen::Index, Eigen::Dynamic, 1> top_n_idx
-      = Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>::LinSpaced(top_size, 0, top_size);
+      = Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>::LinSpaced(top_size, 0,
+                                                                 top_size);
   dual_sort(top_n, top_n_idx);
   for (Eigen::Index i = top_size; i < arr.size(); ++i) {
     if (arr.coeff(i) >= top_n.coeff(0)) {
@@ -225,16 +230,17 @@ largest_n_elements(const Eigen::Array<double, Eigen::Dynamic, 1>& arr,
  * @return An array with the weights for each observation for PSIS
  */
 template <typename EigArray, typename Logger>
-inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(const EigArray& log_ratios,
-                                                Eigen::Index tail_len,
-                                                Logger& logger) {
+inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
+    const EigArray& log_ratios, Eigen::Index tail_len, Logger& logger) {
   const auto S = log_ratios.size();
   // shift log ratios for safer exponentation
   const double max_log_ratio = log_ratios.maxCoeff();
-  Eigen::Array<double, Eigen::Dynamic, 1> llr_weights = log_ratios.array() - max_log_ratio;
+  Eigen::Array<double, Eigen::Dynamic, 1> llr_weights
+      = log_ratios.array() - max_log_ratio;
   if (tail_len >= 5) {
     // Get back tail + smallest but not on tail in ascending order
-    std::pair<Eigen::Array<double, Eigen::Dynamic, 1>, Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>>
+    std::pair<Eigen::Array<double, Eigen::Dynamic, 1>,
+              Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>>
         max_n = internal::largest_n_elements(llr_weights, tail_len + 1);
     auto lw_tail = max_n.first.tail(tail_len);
     double cutoff = max_n.first(0);
