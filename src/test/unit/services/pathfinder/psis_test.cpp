@@ -3,7 +3,6 @@
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 
-
 // Locally tests can use threads but for jenkins we should just use 1 thread
 #ifdef LOCAL_THREADS_TEST
 auto&& threadpool_init = stan::math::init_threadpool_tbb(LOCAL_THREADS_TEST);
