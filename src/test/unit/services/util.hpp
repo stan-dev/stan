@@ -17,7 +17,6 @@ struct deleter_noop {
   constexpr void operator()(T* arg) const {}
 };
 
-
 /**
  * Read a CSV into an Eigen matrix.
  * @param in An input string stream holding the CSV
