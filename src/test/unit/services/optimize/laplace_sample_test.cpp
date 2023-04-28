@@ -60,7 +60,6 @@ TEST_F(ServicesLaplaceSample, values) {
   EXPECT_EQ("y[1]", draws_csv.header[2]);
   EXPECT_EQ("y[2]", draws_csv.header[3]);
 
-
   Eigen::MatrixXd sample = draws_csv.samples;
   EXPECT_EQ(4, sample.cols());
   EXPECT_EQ(draws, sample.rows());
@@ -69,7 +68,7 @@ TEST_F(ServicesLaplaceSample, values) {
   Eigen::VectorXd log_q = sample.col(1);
   Eigen::VectorXd y1 = sample.col(2);
   Eigen::VectorXd y2 = sample.col(3);
-  
+
   // because target is normal, laplace approx is exact
   for (int m = 0; m < draws; ++m) {
     EXPECT_FLOAT_EQ(0, log_p(m) - log_q(m));
