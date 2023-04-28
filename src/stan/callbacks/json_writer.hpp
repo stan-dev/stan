@@ -141,7 +141,7 @@ class json_writer final : public structured_writer {
   /**
    * Constructs a json writer with an output stream.
    *
-   * @param[in, out] A unique pointer to a type inheriting from `std::ostream`
+   * @param[in, out] output unique pointer to a type inheriting from `std::ostream`
    */
   explicit json_writer(std::unique_ptr<Stream, Deleter>&& output)
       : output_(std::move(output)) {
@@ -301,7 +301,7 @@ class json_writer final : public structured_writer {
   /**
    * Write a key-value pair where the value is a vector to be made a list.
    * @param key Name of the value pair
-   * @param value vector to write.
+   * @param values vector to write.
    */
   void write(const std::string& key, const std::vector<double>& values) {
     write_sep();
@@ -313,7 +313,7 @@ class json_writer final : public structured_writer {
    * Write a key-value pair where the value is a vector of strings to be made a
    * list.
    * @param key Name of the value pair
-   * @param value vector of strings to write.
+   * @param values vector of strings to write.
    */
   void write(const std::string& key, const std::vector<std::string>& values) {
     write_sep();
@@ -324,7 +324,7 @@ class json_writer final : public structured_writer {
   /**
    * Write a key-value pair where the value is an Eigen Matrix.
    * @param key Name of the value pair
-   * @param value Eigen Matrix to write.
+   * @param mat Eigen Matrix to write.
    */
   void write(const std::string& key, const Eigen::MatrixXd& mat) {
     write_sep();
@@ -337,7 +337,7 @@ class json_writer final : public structured_writer {
   /**
    * Write a key-value pair where the value is an Eigen Vector.
    * @param key Name of the value pair
-   * @param value Eigen Vector to write.
+   * @param vec Eigen Vector to write.
    */
   void write(const std::string& key, const Eigen::VectorXd& vec) {
     write_sep();
@@ -350,7 +350,7 @@ class json_writer final : public structured_writer {
   /**
    * Write a key-value pair where the value is a Eigen RowVector.
    * @param key Name of the value pair
-   * @param value Eigen RowVector to write.
+   * @param vec Eigen RowVector to write.
    */
   void write(const std::string& key, const Eigen::RowVectorXd& vec) {
     write_sep();

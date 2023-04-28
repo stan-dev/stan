@@ -26,7 +26,7 @@ class unique_stream_writer final : public writer {
    * Constructs a unique stream writer with an output stream
    * and an optional prefix for comments.
    *
-   * @param[in, out] A unique pointer to a type inheriting from `std::ostream`
+   * @param[in, out] output A unique pointer to a type inheriting from `std::ostream`
    * @param[in] comment_prefix string to stream before each comment line.
    *  Default is "".
    */
@@ -83,11 +83,11 @@ class unique_stream_writer final : public writer {
    * Note: the precision of the output is determined by the settings
    *  of the stream on construction.
    *
-   * @param[in] state A matrix of values. The input is expected to have
+   * @param[in] values A matrix of values. The input is expected to have
    * parameters in the rows and samples in the columns. The matrix is then
    * transposed for the output.
    */
-  void operator()(const Eigen::MatrixXd& states) {
+  void operator()(const Eigen::MatrixXd& values) {
     if (output_ == nullptr)
       return;
     Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols,

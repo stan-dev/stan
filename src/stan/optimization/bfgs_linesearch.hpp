@@ -23,6 +23,7 @@ namespace optimization {
  *
  * This function implements the full parameter version of CubicInterp().
  *
+ * @tparam Scalar A scalar type used by all the function arguments
  * @param df0 First derivative value, f'(x0)
  * @param x1 Second point
  * @param f1 Second function value, f(x1)
@@ -88,6 +89,7 @@ Scalar CubicInterp(const Scalar &df0, const Scalar &x1, const Scalar &f1,
  * finds the minimal value of g(x) on the interval [loX,hiX] including
  * the end points.
  *
+ * @tparam Scalar A scalar type used by all the function arguments
  * @param x0 First point
  * @param f0 First function value, f(x0)
  * @param df0 First derivative value, f'(x0)
@@ -182,6 +184,10 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
  * where x is the input point, f and g are the function value and
  * gradient at x and ret is non-zero if function evaluation fails.
  *
+ * @tparam Scalar A scalar type 
+ * 
+ * @tparam XType A scalar type 
+ * 
  * @param func Function which is being minimized.
  *
  * @param alpha First value of \f$ \alpha \f$ to try.  Upon return this

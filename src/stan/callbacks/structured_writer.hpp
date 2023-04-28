@@ -41,7 +41,6 @@ class structured_writer {
    */
   virtual void end_list() {}
 
-  virtual void write_begin(const std::string& key) {}
   /**
    * Write a key-value pair to the output stream with a value of null as the
    * value.
@@ -93,32 +92,32 @@ class structured_writer {
   /**
    * Write a key-value pair where the value is a vector to be made a list.
    * @param key Name of the value pair
-   * @param value vector to write.
+   * @param values vector to write.
    */
-  virtual void write(const std::string& key, const std::vector<double> value) {}
+  virtual void write(const std::string& key, const std::vector<double> values) {}
   /**
    * Write a key-value pair where the value is a vector of strings to be made a
    * list.
    * @param key Name of the value pair
-   * @param value vector of strings to write.
+   * @param values vector of strings to write.
    */
   void write(const std::string& key, const std::vector<std::string>& values) {}
   /**
    * Write a key-value pair where the value is an Eigen Matrix.
    * @param key Name of the value pair
-   * @param value Eigen Matrix to write.
+   * @param mat Eigen Matrix to write.
    */
   void write(const std::string& key, const Eigen::MatrixXd& mat) {}
   /**
    * Write a key-value pair where the value is an Eigen Vector.
    * @param key Name of the value pair
-   * @param value Eigen Vector to write.
+   * @param vec Eigen Vector to write.
    */
   void write(const std::string& key, const Eigen::VectorXd& vec) {}
   /**
    * Write a key-value pair where the value is a Eigen RowVector.
    * @param key Name of the value pair
-   * @param value Eigen RowVector to write.
+   * @param vec Eigen RowVector to write.
    */
   void write(const std::string& key, const Eigen::RowVectorXd& vec) {}
 

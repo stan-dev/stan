@@ -25,9 +25,9 @@ namespace internal {
  * from.
  */
 template <typename EigArray1, typename EigArray2>
-inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
+inline Eigen::Array<double, Eigen::Dynamic, 1> profile_loglikelihood(const EigArray1& theta,
                                                          const EigArray2& x) {
-  Eigen::Array<double, -1, 1> k = ((-theta).matrix() * x.matrix().transpose())
+  Eigen::Array<double, Eigen::Dynamic, 1> k = ((-theta).matrix() * x.matrix().transpose())
                                       .array()
                                       .log1p()
                                       .matrix()
@@ -66,7 +66,7 @@ inline Eigen::Array<double, -1, 1> profile_loglikelihood(const EigArray1& theta,
 template <typename EigArray>
 inline std::pair<double, double> gpdfit(const EigArray& x,
                                         const Eigen::Index min_grid_pts = 30) {
-  using array_vec_t = Eigen::Array<double, -1, 1>;
+  using array_vec_t = Eigen::Array<double, Eigen::Dynamic, 1>;
   constexpr auto prior = 3.0;
   const auto& x_ref = stan::math::to_ref(x);
   const Eigen::Index N = x_ref.size();
@@ -129,7 +129,7 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
   if (!std::isinf(k)) {
     const Eigen::Index x_size = x.size();
     const double sigma = fit.first;
-    auto p = (Eigen::Array<double, -1, 1>::LinSpaced(x_size, 1, x_size) - 0.5)
+    auto p = (Eigen::Array<double, Eigen::Dynamic, 1>::LinSpaced(x_size, 1, x_size) - 0.5)
              / x_size;
     return std::make_pair((qgpd(p, k, sigma) + exp_cutoff).log().eval(), k);
   } else {
@@ -145,8 +145,8 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
  * `arr`. This is also sorted to keep track of the original positions of the
  * elements in `arr`.
  */
-inline void dual_sort(Eigen::Array<double, -1, 1>& arr,
-                      Eigen::Array<Eigen::Index, -1, 1>& idx) {
+inline void dual_sort(Eigen::Array<double, Eigen::Dynamic, 1>& arr,
+                      Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>& idx) {
   std::vector<std::pair<double, int>> pair_vec;
   pair_vec.reserve(arr.size());
   for (std::size_t i = 0; i < arr.size(); ++i) {
@@ -169,7 +169,7 @@ inline void dual_sort(Eigen::Array<double, -1, 1>& arr,
  * @return The index to the first element in the range [first, last) that does
  * not satisfy element < value or last if no such element is found
  */
-inline auto lower_bound_idx(const Eigen::Array<double, -1, 1>& arr,
+inline auto lower_bound_idx(const Eigen::Array<double, Eigen::Dynamic, 1>& arr,
                             const double value) {
   Eigen::Index base = 0;
   Eigen::Index search_len = arr.size();
@@ -189,12 +189,12 @@ inline auto lower_bound_idx(const Eigen::Array<double, -1, 1>& arr,
  * @return A pair with the largest N elements in `first` and the original index
  * of the largest N elements in `second`
  */
-inline std::pair<Eigen::Array<double, -1, 1>, Eigen::Array<Eigen::Index, -1, 1>>
-largest_n_elements(const Eigen::Array<double, -1, 1>& arr,
+inline std::pair<Eigen::Array<double, Eigen::Dynamic, 1>, Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>>
+largest_n_elements(const Eigen::Array<double, Eigen::Dynamic, 1>& arr,
                    const Eigen::Index top_size) {
-  Eigen::Array<double, -1, 1> top_n = arr.head(top_size);
-  Eigen::Array<Eigen::Index, -1, 1> top_n_idx
-      = Eigen::Array<Eigen::Index, -1, 1>::LinSpaced(top_size, 0, top_size);
+  Eigen::Array<double, Eigen::Dynamic, 1> top_n = arr.head(top_size);
+  Eigen::Array<Eigen::Index, Eigen::Dynamic, 1> top_n_idx
+      = Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>::LinSpaced(top_size, 0, top_size);
   dual_sort(top_n, top_n_idx);
   for (Eigen::Index i = top_size; i < arr.size(); ++i) {
     if (arr.coeff(i) >= top_n.coeff(0)) {
@@ -225,16 +225,16 @@ largest_n_elements(const Eigen::Array<double, -1, 1>& arr,
  * @return An array with the weights for each observation for PSIS
  */
 template <typename EigArray, typename Logger>
-inline Eigen::Array<double, -1, 1> psis_weights(const EigArray& log_ratios,
+inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(const EigArray& log_ratios,
                                                 Eigen::Index tail_len,
                                                 Logger& logger) {
   const auto S = log_ratios.size();
   // shift log ratios for safer exponentation
   const double max_log_ratio = log_ratios.maxCoeff();
-  Eigen::Array<double, -1, 1> llr_weights = log_ratios.array() - max_log_ratio;
+  Eigen::Array<double, Eigen::Dynamic, 1> llr_weights = log_ratios.array() - max_log_ratio;
   if (tail_len >= 5) {
     // Get back tail + smallest but not on tail in ascending order
-    std::pair<Eigen::Array<double, -1, 1>, Eigen::Array<Eigen::Index, -1, 1>>
+    std::pair<Eigen::Array<double, Eigen::Dynamic, 1>, Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>>
         max_n = internal::largest_n_elements(llr_weights, tail_len + 1);
     auto lw_tail = max_n.first.tail(tail_len);
     double cutoff = max_n.first(0);
