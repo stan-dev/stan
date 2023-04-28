@@ -331,7 +331,6 @@ pipeline {
                                 unstash 'StanSetup'
                                 setupCXX(true, env.GCC, stanc3_bin_url())
                                 sh """
-                                    echo CXX=${CLANG_CXX} -Werror > make/local
                                     echo STAN_OPENCL=true >> make/local
                                     echo OPENCL_PLATFORM_ID=${OPENCL_PLATFORM_ID_GPU} >> make/local
                                     echo OPENCL_DEVICE_ID=${OPENCL_DEVICE_ID_GPU} >> make/local
