@@ -6,16 +6,17 @@
 #define eigen_assert(x) \
   if (!(x)) { throw (std::runtime_error("Nooo")); }
 */
-#include <stan/services/pathfinder/multi.hpp>
-#include <stan/io/array_var_context.hpp>
 #include <stan/callbacks/json_writer.hpp>
+#include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/dump.hpp>
 #include <stan/io/json/json_data.hpp>
+#include <stan/services/pathfinder/multi.hpp>
+#include <stan/callbacks/stream_writer.hpp>
 #include <test/test-models/good/services/normal_glm.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
-#include <stan/callbacks/stream_writer.hpp>
 #include <test/unit/services/pathfinder/util.hpp>
+#include <test/unit/services/util.hpp>
 #include <gtest/gtest.h>
 
 // Locally tests can use threads but for jenkins we should just use 1 thread

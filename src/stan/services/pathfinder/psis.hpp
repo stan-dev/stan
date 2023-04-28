@@ -147,6 +147,7 @@ inline auto psis_smooth_tail(const EigArray& x, const double cutoff) {
  * @param[in, out] idx The index of the original positions of the elements of
  * `arr`. This is also sorted to keep track of the original positions of the
  * elements in `arr`.
+ * @return None. arr and idx are modified in place.
  */
 inline void dual_sort(Eigen::Array<double, Eigen::Dynamic, 1>& arr,
                       Eigen::Array<Eigen::Index, Eigen::Dynamic, 1>& idx) {

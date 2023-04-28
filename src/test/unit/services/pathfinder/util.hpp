@@ -7,10 +7,6 @@
 
 namespace stan {
 namespace test {
-struct deleter_noop {
-  template <typename T>
-  constexpr void operator()(T* arg) const {}
-};
 
 struct mock_callback : public stan::callbacks::interrupt {
   int n;

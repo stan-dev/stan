@@ -1,13 +1,14 @@
-#include <stan/math.hpp>
-#include <stan/services/pathfinder/multi.hpp>
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <stan/callbacks/structured_writer.hpp>
+#include <stan/math.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
 #include <stan/io/json/json_data.hpp>
+#include <stan/services/pathfinder/multi.hpp>
 #include <test/test-models/good/services/eight_schools.hpp>
 #include <test/unit/services/instrumented_callbacks.hpp>
+#include <test/unit/services/util.hpp>
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 

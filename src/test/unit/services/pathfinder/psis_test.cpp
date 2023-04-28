@@ -3,7 +3,13 @@
 #include <test/unit/services/pathfinder/util.hpp>
 #include <gtest/gtest.h>
 
-auto&& blah = stan::math::init_threadpool_tbb(1);
+
+// Locally tests can use threads but for jenkins we should just use 1 thread
+#ifdef LOCAL_THREADS_TEST
+auto&& threadpool_init = stan::math::init_threadpool_tbb(LOCAL_THREADS_TEST);
+#else
+auto&& threadpool_init = stan::math::init_threadpool_tbb(1);
+#endif
 
 TEST(ServicesPSIS, xl) {
   Eigen::Array<double, -1, 1> test_x(20);
@@ -168,9 +174,6 @@ TEST(ServicesPSIS, max_n_elements) {
                                "", " ");
   auto sorted_result = std::get<0>(sorted_tuple);
   auto sorted_result_pos = std::get<1>(sorted_tuple);
-  // std::cout << "nums:\n" << sorted_result.format(CommaInitFmt) << "\n";
-  // std::cout << "position: \n" << sorted_result_pos.format(CommaInitFmt) <<
-  // "\n";
 
   Eigen::Array<double, -1, 1> sorted_ans(5);
   sorted_ans << 16, 17, 18, 19, 20;
