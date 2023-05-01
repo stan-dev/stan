@@ -293,13 +293,18 @@ pipeline {
                         docker {
                             image 'stanorg/ci:gpu'
                             label 'linux'
-                            args '--pull always'
+                            args '--pull always --gpus 1'
                         }
                     }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, LINUX_CXX, stanc3_bin_url())
-                        sh "make -j${PARALLEL} test-headers"
+                        sh """
+                            echo STAN_OPENCL=true >> make/local
+                            echo OPENCL_PLATFORM_ID=${OPENCL_PLATFORM_ID_GPU} >> make/local
+                            echo OPENCL_DEVICE_ID=${OPENCL_DEVICE_ID_GPU} >> make/local
+                            make -j${PARALLEL} test-headers
+                        """
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
@@ -320,42 +325,6 @@ pipeline {
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }
-                }
-                stage('OpenCL GPU tests') {
-                    agent {
-                        docker {
-                            image 'stanorg/ci:gpu-cpp17'
-                            label 'v100'
-                            args '--gpus 1'
-                        }
-                    }
-                    steps {
-                        script {
-                            if (isUnix()) {
-                                deleteDir()
-                                unstash 'StanSetup'
-                                setupCXX(true, env.GCC, stanc3_bin_url())
-                                sh """
-                                    echo STAN_OPENCL=true >> make/local
-                                    echo OPENCL_PLATFORM_ID=${OPENCL_PLATFORM_ID_GPU} >> make/local
-                                    echo OPENCL_DEVICE_ID=${OPENCL_DEVICE_ID_GPU} >> make/local
-                                """
-                                if (!(params.optimizeUnitTests || isBranch('develop') || isBranch('master'))) {
-                                    sh "echo O=1 >> make/local"
-                                }
-                                runTests("src/test/unit")
-                            } else {
-                                deleteDirWin()
-                                unstash 'StanSetup'
-                                setupCXX(false, env.CXX, stanc3_bin_url())
-                                bat "echo STAN_OPENCL=true >> make/local"
-                                bat "echo OPENCL_PLATFORM_ID=${env.OPENCL_PLATFORM_ID_GPU} >> make/local"
-                                bat "echo OPENCL_DEVICE_ID=${env.OPENCL_DEVICE_ID_GPU} >> make/local"
-                                bat 'echo LDFLAGS_OPENCL= -L"C:\\Program Files (x86)\\IntelSWTools\\system_studio_2020\\OpenCL\\sdk\\lib\\x64" -lOpenCL >> make/local'
-                                runTestsWin("src/test/unit")
-                            }
-                        }
-                    }
                 }
             }
         }
