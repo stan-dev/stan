@@ -303,6 +303,8 @@ pipeline {
                             echo STAN_OPENCL=true >> make/local
                             echo OPENCL_PLATFORM_ID=${OPENCL_PLATFORM_ID_GPU} >> make/local
                             echo OPENCL_DEVICE_ID=${OPENCL_DEVICE_ID_GPU} >> make/local
+                        """
+                        sh """
                             make -j${PARALLEL} test-headers
                         """
                         runTests("src/test/unit")
