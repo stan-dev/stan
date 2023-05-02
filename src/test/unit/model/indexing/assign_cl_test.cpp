@@ -22,9 +22,6 @@ using stan::model::index_multi;
 using stan::model::index_omni;
 using stan::model::index_uni;
 
-
-
-
 TEST(ModelIndexing, assign_opencl_vector_1d) {
   Eigen::VectorXd m1(4);
   m1 << 1, 2, 3, 4;

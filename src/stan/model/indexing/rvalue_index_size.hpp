@@ -24,7 +24,8 @@ inline int rvalue_index_size(const index_multi& idx, int size) noexcept {
   return idx.ns_.size();
 }
 
-inline constexpr int rvalue_index_size(const index_uni& idx, int size) noexcept {
+inline constexpr int rvalue_index_size(const index_uni& idx,
+                                       int size) noexcept {
   return 1;
 }
 
@@ -36,7 +37,9 @@ inline constexpr int rvalue_index_size(const index_uni& idx, int size) noexcept 
  * @param[in] size Size of container.
  * @return Size of result.
  */
-inline int rvalue_index_size(const index_omni& idx, int size) noexcept { return size; }
+inline int rvalue_index_size(const index_omni& idx, int size) noexcept {
+  return size;
+}
 
 /**
  * Return size of specified min index for specified size of
@@ -73,12 +76,12 @@ inline int rvalue_index_size(const index_max& idx, int size) noexcept {
  * @return Size of result.
  */
 inline int rvalue_index_size(const index_min_max& idx, int size) noexcept {
-  return (idx.max_ < idx.min_) ? 0
-                               : (idx.max_ - idx.min_ + 1);
+  return (idx.max_ < idx.min_) ? 0 : (idx.max_ - idx.min_ + 1);
 }
 
 #ifdef STAN_OPENCL
-inline int rvalue_index_size(const stan::math::matrix_cl<int>& idx, int size) noexcept {
+inline int rvalue_index_size(const stan::math::matrix_cl<int>& idx,
+                             int size) noexcept {
   return idx.size();
 }
 #endif

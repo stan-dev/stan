@@ -12,12 +12,12 @@
 
 using stan::model::rvalue;
 
-using stan::model::index_uni;
-using stan::model::index_multi;
-using stan::model::index_min;
 using stan::model::index_max;
+using stan::model::index_min;
 using stan::model::index_min_max;
+using stan::model::index_multi;
 using stan::model::index_omni;
+using stan::model::index_uni;
 
 template <typename T_eig, typename T_cl>
 void expect_eq(const T_eig& a, const T_cl& b) {
@@ -26,29 +26,19 @@ void expect_eq(const T_eig& a, const T_cl& b) {
 void expect_eq(const double a, const double b) { EXPECT_EQ(a, b); }
 void expect_eq(const int a, const int b) { EXPECT_EQ(a, b); }
 
-const char* print_index_type(stan::model::index_uni) {
-  return "index_uni";
-}
+const char* print_index_type(stan::model::index_uni) { return "index_uni"; }
 
-const char* print_index_type(stan::model::index_multi) {
-  return "index_multi";
-}
+const char* print_index_type(stan::model::index_multi) { return "index_multi"; }
 
-const char* print_index_type(stan::model::index_min) {
-  return "index_min";
-}
+const char* print_index_type(stan::model::index_min) { return "index_min"; }
 
-const char* print_index_type(stan::model::index_max) {
-  return "index_max";
-}
+const char* print_index_type(stan::model::index_max) { return "index_max"; }
 
 const char* print_index_type(stan::model::index_min_max) {
   return "index_min_max";
 }
 
-const char* print_index_type(stan::model::index_omni) {
-  return "index_omni";
-}
+const char* print_index_type(stan::model::index_omni) { return "index_omni"; }
 
 TEST(ModelIndexing, rvalue_opencl_vector_1d) {
   Eigen::VectorXd m(4);

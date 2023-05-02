@@ -219,7 +219,8 @@ TEST(ModelIndexing, lvalueMultiEigen) {
   std::vector<double> z_std_empty(0);
   EXPECT_NO_THROW(
       assign(z_std_empty, std::vector<double>{}, "", index_max(-5)));
-  EXPECT_NO_THROW(assign(z_std_empty, std::vector<double>{}, "", index_min_max(1, -1)));
+  EXPECT_NO_THROW(
+      assign(z_std_empty, std::vector<double>{}, "", index_min_max(1, -1)));
 }
 
 TEST(ModelIndexing, lvalueMultiMulti) {
@@ -290,7 +291,8 @@ TEST(ModelIndexing, lvalueMultiMultiEigen) {
   std::vector<Eigen::VectorXd> rhs_empty(0);
   EXPECT_NO_THROW(
       assign(lhs_empty, rhs_empty, "", index_max(-4), index_min(9)));
-  EXPECT_NO_THROW(assign(lhs_empty, rhs_empty, "", index_min_max(3, -4), index_min(9)));
+  EXPECT_NO_THROW(
+      assign(lhs_empty, rhs_empty, "", index_min_max(3, -4), index_min(9)));
 }
 
 TEST(ModelIndexing, lvalueUniMulti) {
