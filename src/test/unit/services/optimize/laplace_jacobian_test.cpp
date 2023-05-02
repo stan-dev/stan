@@ -57,19 +57,19 @@ TEST_F(ServicesLaplaceJacobian, laplace_jacobian_adjust) {
       = stan::io::stan_csv_reader::parse(sample2_ss, &out);
 
   EXPECT_EQ(3, draws1.header.size());
-  EXPECT_EQ("sigma", draws1.header[0]);
-  EXPECT_EQ("log_p", draws1.header[1]);
-  EXPECT_EQ("log_q", draws1.header[2]);
+  EXPECT_EQ("log_p__", draws1.header[0]);
+  EXPECT_EQ("log_q__", draws1.header[1]);
+  EXPECT_EQ("sigma", draws1.header[2]);
 
   EXPECT_EQ(3, draws2.header.size());
-  EXPECT_EQ("sigma", draws2.header[0]);
-  EXPECT_EQ("log_p", draws2.header[1]);
-  EXPECT_EQ("log_q", draws2.header[2]);
+  EXPECT_EQ("log_p__", draws2.header[0]);
+  EXPECT_EQ("log_q__", draws2.header[1]);
+  EXPECT_EQ("sigma", draws2.header[2]);
 
   Eigen::MatrixXd sample1 = draws1.samples;
   Eigen::MatrixXd sample2 = draws2.samples;
 
-  EXPECT_EQ(sample1.coeff(0, 0), sample2.coeff(0, 0));
-  EXPECT_NE(sample1.coeff(0, 1), sample2.coeff(0, 1));
+  EXPECT_NE(sample1.coeff(0, 0), sample2.coeff(0, 0));
+  EXPECT_EQ(sample1.coeff(0, 1), sample2.coeff(0, 1));
   EXPECT_EQ(sample1.coeff(0, 2), sample2.coeff(0, 2));
 }
