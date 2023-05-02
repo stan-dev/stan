@@ -22,6 +22,9 @@ using stan::model::index_multi;
 using stan::model::index_omni;
 using stan::model::index_uni;
 
+
+
+
 TEST(ModelIndexing, assign_opencl_vector_1d) {
   Eigen::VectorXd m1(4);
   m1 << 1, 2, 3, 4;
@@ -46,7 +49,6 @@ TEST(ModelIndexing, assign_opencl_vector_1d) {
   stan::math::for_each(
       [&](auto index) {
         // prim
-
         Eigen::VectorXd m_test = m1;
         stan::math::matrix_cl<double> m_test_cl = m1_cl;
         Eigen::VectorXi m_i_test = m1_i;
@@ -58,13 +60,14 @@ TEST(ModelIndexing, assign_opencl_vector_1d) {
                index);
         assign(m_test_cl, rvalue(m2_cl, "rvalue double cl", index_cl),
                "assign double cl", index_cl);
+        Eigen::VectorXd test1 = stan::math::from_matrix_cl(m_test_cl);
         assign(m_i_test, rvalue(m2_i, "rvalue int", index), "assign int",
                index);
         assign(m_i_test_cl, rvalue(m2_i_cl, "rvalue int cl", index_cl),
                "assign int cl", index_cl);
-
-        EXPECT_MATRIX_EQ(m_test, stan::math::from_matrix_cl(m_test_cl));
-        EXPECT_MATRIX_EQ(m_i_test, stan::math::from_matrix_cl(m_i_test_cl));
+        EXPECT_MATRIX_EQ(m_test, test1);
+        Eigen::VectorXi test2 = stan::math::from_matrix_cl(m_i_test_cl);
+        EXPECT_MATRIX_EQ(m_i_test, test2);
 
         EXPECT_THROW(assign(m_test_cl, m_err, "double cl assign err", index_cl),
                      std::invalid_argument);

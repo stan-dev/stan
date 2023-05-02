@@ -11,6 +11,38 @@
 namespace stan {
 namespace model {
 
+namespace internal {
+inline constexpr const char* print_index_type(stan::model::index_uni) {
+  return "uni index";
+}
+
+inline const char* print_index_type(stan::model::index_multi) {
+  return "multi index";
+}
+
+inline constexpr const char* print_index_type(stan::model::index_min) {
+  return "min index";
+}
+
+inline constexpr const char* print_index_type(stan::model::index_max) {
+  return "max index";
+}
+
+inline constexpr const char* print_index_type(stan::model::index_min_max) {
+  return "min max index";
+}
+
+inline constexpr const char* print_index_type(stan::model::index_omni) {
+  return "omni index";
+}
+
+#ifdef STAN_OPENCL
+inline const char* print_index_type(const stan::math::matrix_cl<int>&) {
+  return "multi index";
+}
+#endif
+}
+
 // prim
 /**
  * Assign one primitive kernel generator expression to another, using given
@@ -41,8 +73,12 @@ inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
     stan::math::check_size_match("omni assign", "left hand side columns",
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
-  rvalue(expr_lhs, name, row_index) = std::forward<ExprRhs>(expr_rhs);
+  decltype(auto) lhs = rvalue(expr_lhs, name, row_index);
+  stan::math::check_size_match(internal::print_index_type(row_index),
+    "left hand side rows", lhs.rows(), name, expr_rhs.rows());
+  lhs = std::forward<ExprRhs>(expr_rhs);
 }
+
 
 /**
  * Assign one primitive kernel generator expression to another, using given
@@ -79,8 +115,13 @@ inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
     stan::math::check_size_match("omni assign", "left hand side columns",
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
-  rvalue(expr_lhs, name, row_index, col_index)
-      = std::forward<ExprRhs>(expr_rhs);
+  decltype(auto) lhs = rvalue(expr_lhs, name, row_index, col_index);
+  stan::math::check_size_match(internal::print_index_type(row_index),
+    "left hand side rows", lhs.rows(), name, expr_rhs.rows());
+  stan::math::check_size_match(internal::print_index_type(col_index),
+    "left hand side cols", lhs.cols(), name, expr_rhs.cols());
+
+  lhs = std::forward<ExprRhs>(expr_rhs);
 }
 
 /**
@@ -133,12 +174,12 @@ template <typename ExprLhs, typename ExprRhs, typename RowIndex,
 inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
                    const char* name, RowIndex&& row_index) {
   if (std::is_same<std::decay_t<RowIndex>, index_omni>::value) {
-    stan::math::check_size_match("omni assign", "left hand side rows",
-                                 expr_lhs.rows(), name, expr_rhs.rows());
-    stan::math::check_size_match("omni assign", "left hand side columns",
-                                 expr_lhs.cols(), name, expr_rhs.cols());
+    stan::math::check_size_match("omni assign", "left hand side rows", expr_lhs.rows(), name, expr_rhs.rows());
+    stan::math::check_size_match("omni assign", "left hand side columns", expr_lhs.cols(), name, expr_rhs.cols());
   }
   decltype(auto) lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
+  stan::math::check_size_match(internal::print_index_type(row_index),
+    "left hand side rows", lhs_val.rows(), name, expr_rhs.rows());
   math::arena_matrix_cl<double> prev_vals = lhs_val;
   lhs_val = math::value_of(expr_rhs);  // assign the values
   math::reverse_pass_callback(
@@ -160,6 +201,8 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
 inline void assign(math::var_value<math::matrix_cl<double>>& expr_lhs,
                    math::var_value<math::matrix_cl<double>>&& expr_rhs,
                    const char* /*name*/, index_omni /*row_index*/) {
+                      
+
   expr_lhs.vi_ = expr_rhs.vi_;
 }
 
@@ -200,6 +243,11 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
                                  expr_lhs.cols(), name, expr_rhs.cols());
   }
   decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index, col_index);
+  stan::math::check_size_match(internal::print_index_type(row_index),
+    "left hand side rows", lhs.rows(), name, expr_rhs.rows());
+  stan::math::check_size_match(internal::print_index_type(col_index),
+    "left hand side cols", lhs.cols(), name, expr_rhs.cols());
+
   math::arena_matrix_cl<double> prev_vals = lhs;
   lhs = math::value_of(expr_rhs);  // assign the values
   math::reverse_pass_callback(

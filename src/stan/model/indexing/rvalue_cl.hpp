@@ -37,7 +37,7 @@ inline auto cl_row_index(index_min_max i, int rows, const char* name) {
   if (i.min_ <= i.max_) {
     return 1 * math::row_index(i.max_ - (i.min_ - 1), -1) + (i.min_ - 1);
   } else {
-    return -1 * math::row_index(i.min_ - (i.max_ - 1), -1) + (i.min_ - 1);
+    return 1 * math::row_index(0, -1) + (i.min_ - 1);
   }
 }
 
@@ -67,12 +67,28 @@ inline auto cl_col_index(index_min_max i, int cols, const char* name) {
   if (i.min_ <= i.max_) {
     return 1 * math::col_index(-1, i.max_ - (i.min_ - 1)) + (i.min_ - 1);
   } else {
-    return -1 * math::col_index(-1, i.min_ - (i.max_ - 1)) + (i.min_ - 1);
+    return 1 * math::col_index(-1, 0) + (i.min_ - 1);
   }
 }
 
 template <typename Index>
 inline void index_check(Index i, const char* name, int dim) {}
+
+inline void index_check(const index_min_max& i, const char* name, int dim) {
+  math::check_range("min_max indexing min", name, dim, i.min_);
+  math::check_range("min_max indexing max", name, dim, i.max_);
+}
+
+inline void index_check(const index_max& i, const char* name, int dim) {
+  math::check_range("min_max indexing min", name, dim, i.max_);
+}
+inline void index_check(const index_min& i, const char* name, int dim) {
+  math::check_range("min_max indexing", name, dim, i.min_);
+}
+inline void index_check(const index_uni& i, const char* name, int dim) {
+  math::check_range("uni indexing", name, dim, i.n_);
+}
+
 inline void index_check(const math::matrix_cl<int>& i, const char* name,
                         int dim) {
   try {
@@ -98,7 +114,7 @@ inline void index_check(const math::matrix_cl<int>& i, const char* name,
  */
 template <typename Expr, typename RowIndex,
           require_all_kernel_expressions_and_none_scalar_t<Expr>* = nullptr>
-inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index) {
+inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index) {  
   internal::index_check(row_index, name, expr.rows());
   return math::indexing(expr,
                         internal::cl_row_index(row_index, expr.rows(), name),
@@ -121,14 +137,14 @@ template <typename Expr, typename RowIndex, typename ColIndex,
           require_all_kernel_expressions_and_none_scalar_t<Expr>* = nullptr,
           require_any_not_same_t<RowIndex, ColIndex, index_uni>* = nullptr>
 inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index,
-                   const ColIndex& col_index) {
+                   const ColIndex& col_index) {        
   internal::index_check(row_index, name, expr.rows());
   internal::index_check(col_index, name, expr.cols());
-
   return math::indexing(expr,
                         internal::cl_row_index(row_index, expr.rows(), name),
                         internal::cl_col_index(col_index, expr.cols(), name));
 }
+
 
 /**
  * Index a prim kernel generator expression with two single indices.
@@ -190,6 +206,7 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index) {
       new decltype(res_vari)(std::move(res_vari)));
 }
 
+
 /**
  * Index a rev kernel generator expression with two (non-multi) indices.
  *
@@ -213,13 +230,14 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex row_index,
   int cols = expr.cols();
   internal::index_check(row_index, name, rows);
   internal::index_check(col_index, name, cols);
-
   auto res_vari
       = expr.vi_->index(internal::cl_row_index(row_index, rows, name),
                         internal::cl_col_index(col_index, expr.cols(), name));
   return math::var_value<value_type_t<decltype(res_vari)>>(
       new decltype(res_vari)(std::move(res_vari)));
 }
+
+
 
 /**
  * Index a rev kernel generator expression with two uni indices.
@@ -272,8 +290,8 @@ inline math::var rvalue(Expr&& expr, const char* name,
 template <typename Expr, require_rev_kernel_expression_t<Expr>* = nullptr>
 inline auto rvalue(Expr&& expr, const char* name,
                    const math::matrix_cl<int>& row_index) {
+  
   internal::index_check(row_index, name, expr.rows());
-
   auto row_idx_expr = math::rowwise_broadcast(row_index - 1);
   auto col_idx_expr = math::col_index(-1, expr.cols());
   auto res_expr = math::indexing(expr.val_op(), row_idx_expr, col_idx_expr);
@@ -327,6 +345,8 @@ inline auto rvalue(Expr&& expr, const char* name, const RowIndex& row_index,
         math::indexing_rev(expr.adj(), lin_idx, res_vari.adj());
       });
 }
+
+
 
 }  // namespace model
 }  // namespace stan

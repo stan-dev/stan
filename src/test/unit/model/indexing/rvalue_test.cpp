@@ -292,8 +292,7 @@ TEST(ModelIndexing, rvalue_doubless_uni_multi) {
   EXPECT_FLOAT_EQ(1.1, y[0]);
 
   empty_y = rvalue(x, "", index_uni(1), index_min_max(3, 1));
-  // CHECK THIS
-  EXPECT_EQ(3U, empty_y.size());
+  EXPECT_EQ(0, empty_y.size());
 
   y = rvalue(x, "", index_uni(3), index_omni());
   EXPECT_EQ(3, y.size());
@@ -469,7 +468,7 @@ TEST(ModelIndexing, rvalue_doubless_multi_uni) {
   test_out_of_range(x, index_min_max(2, 2), index_uni(15));
 
   empty_y = rvalue(x, "", index_min_max(2, 1), index_uni(2));
-  EXPECT_EQ(2, empty_y.size());
+  EXPECT_EQ(0, empty_y.size());
 
   y = rvalue(x, "", index_omni(), index_uni(3));
   EXPECT_EQ(3, y.size());

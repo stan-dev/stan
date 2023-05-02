@@ -210,7 +210,6 @@ TEST(ModelIndexing, lvalueMultiEigen) {
 
   ns[0] = 0;
   test_throw(x, y, index_multi(ns));
-
   ns[0] = 11;
   test_throw(x, y, index_multi(ns));
 
@@ -218,10 +217,9 @@ TEST(ModelIndexing, lvalueMultiEigen) {
   test_throw_ia(x, y, index_multi(ns));
 
   std::vector<double> z_std_empty(0);
-  // FIX ODD BEHAVIOR
   EXPECT_NO_THROW(
       assign(z_std_empty, std::vector<double>{}, "", index_max(-5)));
-  test_throw_ia(z_std_empty, std::vector<double>{}, index_min_max(1, -1));
+  EXPECT_NO_THROW(assign(z_std_empty, std::vector<double>{}, "", index_min_max(1, -1)));
 }
 
 TEST(ModelIndexing, lvalueMultiMulti) {
@@ -253,7 +251,6 @@ TEST(ModelIndexing, lvalueMultiMulti) {
   std::vector<std::vector<double>> rhs_empty(3, std::vector<double>{});
   EXPECT_NO_THROW(
       assign(lhs_empty, rhs_empty, "", index_min(9), index_max(-4)));
-  test_throw_ia(lhs_empty, rhs_empty, index_min(9), index_min_max(3, -4));
 }
 
 TEST(ModelIndexing, lvalueMultiMultiEigen) {
@@ -293,7 +290,7 @@ TEST(ModelIndexing, lvalueMultiMultiEigen) {
   std::vector<Eigen::VectorXd> rhs_empty(0);
   EXPECT_NO_THROW(
       assign(lhs_empty, rhs_empty, "", index_max(-4), index_min(9)));
-  test_throw_ia(lhs_empty, rhs_empty, index_min_max(3, -4), index_min(9));
+  EXPECT_NO_THROW(assign(lhs_empty, rhs_empty, "", index_min_max(3, -4), index_min(9)));
 }
 
 TEST(ModelIndexing, lvalueUniMulti) {
@@ -706,11 +703,11 @@ TEST(ModelIndexing, resultSizeNegIndexing) {
   vector<double> lhs{1, 2, 3, 4, 5};
   vector<double> rhs{6, 7, 8, 9};
 
-  assign(lhs, rhs, "", index_min_max(4, 1));
-  EXPECT_FLOAT_EQ(lhs[0], 9);
-  EXPECT_FLOAT_EQ(lhs[1], 8);
-  EXPECT_FLOAT_EQ(lhs[2], 7);
-  EXPECT_FLOAT_EQ(lhs[3], 6);
+  test_throw_ia(lhs, rhs, index_min_max(4, 1));
+  EXPECT_FLOAT_EQ(lhs[0], 1);
+  EXPECT_FLOAT_EQ(lhs[1], 2);
+  EXPECT_FLOAT_EQ(lhs[2], 3);
+  EXPECT_FLOAT_EQ(lhs[3], 4);
   EXPECT_FLOAT_EQ(lhs[4], 5);
   lhs = {};
   test_throw_ia(lhs, rhs, index_min_max(1, 0));
