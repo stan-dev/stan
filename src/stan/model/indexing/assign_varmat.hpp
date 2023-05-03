@@ -6,6 +6,7 @@
 #include <stan/math/rev/fun/adjoint_of.hpp>
 #include <stan/model/indexing/access_helpers.hpp>
 #include <stan/model/indexing/index.hpp>
+#include <boost/unordered/unordered_map.hpp>
 #include <type_traits>
 #include <vector>
 #include <unordered_set>
@@ -115,55 +116,46 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
                                "right hand side", y.size());
   const auto x_size = x.size();
   const auto assign_size = idx.ns_.size();
-  arena_t<std::vector<int>> x_idx(assign_size);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_vals(assign_size);
   Eigen::Matrix<double, -1, 1> y_idx_vals(assign_size);
-  std::unordered_set<int> x_set;
-  x_set.reserve(assign_size);
+  // Use boost unordered flat map when boost 1.82 goes into math
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> x_map;
+  x_map.reserve(assign_size);
+  // Keep track of the last place we assigned to.
+  for (int i = 0; i < assign_size; ++i) {
+    x_map[idx.ns_[i] - 1] = i;
+  }
   const auto& y_val = stan::math::value_of(y);
   // We have to use two loops to avoid aliasing issues.
-  for (int i = assign_size - 1; i >= 0; --i) {
-    if (likely(x_set.insert(idx.ns_[i]).second)) {
-      stan::math::check_range("vector[multi] assign", name, x_size, idx.ns_[i]);
-      x_idx[i] = idx.ns_[i] - 1;
-      prev_vals.coeffRef(i) = x.vi_->val_.coeffRef(x_idx[i]);
-      y_idx_vals.coeffRef(i) = y_val.coeff(i);
-    } else {
-      x_idx[i] = -1;
-    }
+  for (auto&& x_idx : x_map) {
+      stan::math::check_range("vector[multi] assign", name, x_size, x_idx.first + 1);
+      prev_vals.coeffRef(x_idx.second) = x.vi_->val_.coeffRef(x_idx.first);
+      y_idx_vals.coeffRef(x_idx.second) = y_val.coeff(x_idx.second);
   }
-  for (int i = assign_size - 1; i >= 0; --i) {
-    if (likely(x_idx[i] != -1)) {
-      x.vi_->val_.coeffRef(x_idx[i]) = y_idx_vals.coeff(i);
-    }
+  for (auto&& x_idx : x_map) {
+      x.vi_->val_.coeffRef(x_idx.first) = y_idx_vals.coeff(x_idx.second);
   }
 
   if (!is_constant<Vec2>::value) {
-    stan::math::reverse_pass_callback([x, y, x_idx, prev_vals]() mutable {
-      for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
-        if (likely(x_idx[i] != -1)) {
-          x.vi_->val_.coeffRef(x_idx[i]) = prev_vals.coeffRef(i);
-          prev_vals.coeffRef(i) = x.adj().coeffRef(x_idx[i]);
-          x.adj().coeffRef(x_idx[i]) = 0.0;
-        }
+    stan::math::reverse_pass_callback([x, y, x_map, prev_vals]() mutable {
+      for (auto&& x_idx : x_map) {
+          x.vi_->val_.coeffRef(x_idx.first) = prev_vals.coeffRef(x_idx.second);
+          prev_vals.coeffRef(x_idx.second) = x.adj().coeffRef(x_idx.first);
+          x.adj().coeffRef(x_idx.first) = 0.0;
       }
-      for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
-        if (likely(x_idx[i] != -1)) {
+      for (auto&& x_idx : x_map) {
           math::forward_as<math::promote_scalar_t<math::var, Vec2>>(y)
               .adj()
-              .coeffRef(i)
-              += prev_vals.coeff(i);
-        }
+              .coeffRef(x_idx.second)
+              += prev_vals.coeff(x_idx.second);
       }
     });
   } else {
-    stan::math::reverse_pass_callback([x, x_idx, prev_vals]() mutable {
-      for (Eigen::Index i = 0; i < x_idx.size(); ++i) {
-        if (likely(x_idx[i] != -1)) {
-          x.vi_->val_.coeffRef(x_idx[i]) = prev_vals.coeff(i);
-          prev_vals.coeffRef(i) = x.adj().coeff(x_idx[i]);
-          x.adj().coeffRef(x_idx[i]) = 0.0;
-        }
+    stan::math::reverse_pass_callback([x, x_map, prev_vals]() mutable {
+      for (auto&& x_idx : x_map) {
+        x.vi_->val_.coeffRef(x_idx.first) = prev_vals.coeff(x_idx.second);
+        prev_vals.coeffRef(x_idx.second) = x.adj().coeff(x_idx.first);
+        x.adj().coeffRef(x_idx.first) = 0.0;
       }
     });
   }
@@ -235,54 +227,45 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
   arena_t<std::vector<int>> x_idx(assign_cols);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_val(assign_cols);
   Eigen::Matrix<double, -1, 1> y_val_idx(assign_cols);
-  std::unordered_set<int> x_set;
-  x_set.reserve(assign_cols);
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> col_map;
+  col_map.reserve(assign_cols);
+  // Keep track of the last place we assigned to.
+  for (int i = 0; i < assign_cols; ++i) {
+    col_map[col_idx.ns_[i] - 1] = i;
+  }
   const auto& y_val = stan::math::value_of(y);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
-  for (int i = assign_cols - 1; i >= 0; --i) {
-    if (likely(x_set.insert(col_idx.ns_[i]).second)) {
-      stan::math::check_range("matrix[uni, multi] assign", name, x.cols(),
-                              col_idx.ns_[i]);
-      x_idx[i] = col_idx.ns_[i] - 1;
-      prev_val.coeffRef(i) = x.val().coeff(row_idx_val, x_idx[i]);
-      y_val_idx.coeffRef(i) = y_val.coeff(i);
-    } else {
-      x_idx[i] = -1;
-    }
+  for (auto&& col_map_idx : col_map) {
+    stan::math::check_range("matrix[uni, multi] assign", name, x.cols(),
+                            col_map_idx.first + 1);
+    prev_val.coeffRef(col_map_idx.second) = x.val().coeff(row_idx_val, col_map_idx.first);
+    y_val_idx.coeffRef(col_map_idx.second) = y_val.coeff(col_map_idx.second);
   }
-  for (int i = assign_cols - 1; i >= 0; --i) {
-    if (likely(x_idx[i] != -1)) {
-      x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = y_val_idx.coeff(i);
-    }
+  for (auto&& col_map_idx : col_map) {
+      x.vi_->val_.coeffRef(row_idx_val, col_map_idx.first) = y_val_idx.coeff(col_map_idx.second);
   }
   if (!is_constant<Vec>::value) {
     stan::math::reverse_pass_callback(
-        [x, y, row_idx_val, x_idx, prev_val]() mutable {
-          for (size_t i = 0; i < x_idx.size(); ++i) {
-            if (likely(x_idx[i] != -1)) {
-              x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = prev_val.coeff(i);
-              prev_val.coeffRef(i) = x.adj().coeff(row_idx_val, x_idx[i]);
-              x.adj().coeffRef(row_idx_val, x_idx[i]) = 0.0;
-            }
+        [x, y, row_idx_val, col_map, prev_val]() mutable {
+          for (auto&& col_map_idx : col_map) {
+            x.vi_->val_.coeffRef(row_idx_val, col_map_idx.first) = prev_val.coeff(col_map_idx.second);
+            prev_val.coeffRef(col_map_idx.second) = x.adj().coeff(row_idx_val, col_map_idx.first);
+            x.adj().coeffRef(row_idx_val, col_map_idx.first) = 0.0;
           }
-          for (size_t i = 0; i < x_idx.size(); ++i) {
-            if (likely(x_idx[i] != -1)) {
-              math::forward_as<math::promote_scalar_t<math::var, Vec>>(y)
-                  .adj()
-                  .coeffRef(i)
-                  += prev_val.coeff(i);
-            }
+          for (auto&& col_map_idx : col_map) {
+            math::forward_as<math::promote_scalar_t<math::var, Vec>>(y)
+                .adj()
+                .coeffRef(col_map_idx.second)
+                += prev_val.coeff(col_map_idx.second);
           }
         });
   } else {
     stan::math::reverse_pass_callback(
-        [x, row_idx_val, x_idx, prev_val]() mutable {
-          for (size_t i = 0; i < x_idx.size(); ++i) {
-            if (likely(x_idx[i] != -1)) {
-              x.vi_->val_.coeffRef(row_idx_val, x_idx[i]) = prev_val.coeff(i);
-              prev_val.coeffRef(i) = x.adj().coeffRef(row_idx_val, x_idx[i]);
-              x.adj().coeffRef(row_idx_val, x_idx[i]) = 0.0;
-            }
+        [x, row_idx_val, col_map, prev_val]() mutable {
+          for (auto&& col_map_idx : col_map) {
+            x.vi_->val_.coeffRef(row_idx_val, col_map_idx.first) = prev_val.coeff(col_map_idx.second);
+            prev_val.coeffRef(col_map_idx.second) = x.adj().coeffRef(row_idx_val, col_map_idx.first);
+            x.adj().coeffRef(row_idx_val, col_map_idx.first) = 0.0;
           }
         });
   }
@@ -314,56 +297,45 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
                                "right hand side rows", y.rows());
   stan::math::check_size_match("matrix[multi] assign columns", name, x.cols(),
                                "right hand side rows", y.cols());
-  arena_t<std::vector<int>> x_idx(assign_rows);
   arena_t<Eigen::Matrix<double, -1, -1>> prev_vals(assign_rows, x.cols());
   Eigen::Matrix<double, -1, -1> y_val_idx(assign_rows, x.cols());
-  std::unordered_set<int> x_set;
-  x_set.reserve(assign_rows);
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> row_map;
+  row_map.reserve(assign_rows);
+  for (int i = 0; i < assign_rows; ++i) {
+    row_map[idx.ns_[i] - 1] = i;
+  }
+
   const auto& y_val = stan::math::value_of(y);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
-  for (int i = assign_rows - 1; i >= 0; --i) {
-    if (likely(x_set.insert(idx.ns_[i]).second)) {
-      stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(),
-                              idx.ns_[i]);
-      x_idx[i] = idx.ns_[i] - 1;
-      prev_vals.row(i) = x.vi_->val_.row(x_idx[i]);
-      y_val_idx.row(i) = y_val.row(i);
-    } else {
-      x_idx[i] = -1;
-    }
+  for (auto&& row_idx : row_map) {
+      stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(), row_idx.first + 1);
+      prev_vals.row(row_idx.second) = x.vi_->val_.row(row_idx.first);
+      y_val_idx.row(row_idx.second) = y_val.row(row_idx.second);
   }
-  for (int i = assign_rows - 1; i >= 0; --i) {
-    if (likely(x_idx[i] != -1)) {
-      x.vi_->val_.row(x_idx[i]) = y_val_idx.row(i);
-    }
+  for (auto&& row_idx : row_map) {
+    x.vi_->val_.row(row_idx.first) = y_val_idx.row(row_idx.second);
   }
 
   if (!is_constant<Mat2>::value) {
-    stan::math::reverse_pass_callback([x, y, prev_vals, x_idx]() mutable {
-      for (size_t i = 0; i < x_idx.size(); ++i) {
-        if (likely(x_idx[i] != -1)) {
-          x.vi_->val_.row(x_idx[i]) = prev_vals.row(i);
-          prev_vals.row(i) = x.adj().row(x_idx[i]);
-          x.adj().row(x_idx[i]).fill(0);
-        }
+    stan::math::reverse_pass_callback([x, y, prev_vals, row_map]() mutable {
+      for (auto&& row_idx : row_map) {
+          x.vi_->val_.row(row_idx.first) = prev_vals.row(row_idx.second);
+          prev_vals.row(row_idx.second) = x.adj().row(row_idx.first);
+          x.adj().row(row_idx.first).fill(0);
       }
-      for (size_t i = 0; i < x_idx.size(); ++i) {
-        if (likely(x_idx[i] != -1)) {
+      for (auto&& row_idx : row_map) {
           math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y)
               .adj()
-              .row(i)
-              += prev_vals.row(i);
-        }
+              .row(row_idx.second)
+              += prev_vals.row(row_idx.second);
       }
     });
   } else {
-    stan::math::reverse_pass_callback([x, prev_vals, x_idx]() mutable {
-      for (size_t i = 0; i < x_idx.size(); ++i) {
-        if (likely(x_idx[i] != -1)) {
-          x.vi_->val_.row(x_idx[i]) = prev_vals.row(i);
-          prev_vals.row(i) = x.adj().row(x_idx[i]);
-          x.adj().row(x_idx[i]).setZero();
-        }
+    stan::math::reverse_pass_callback([x, prev_vals, row_map]() mutable {
+      for (auto&& row_idx : row_map) {
+          x.vi_->val_.row(row_idx.first) = prev_vals.row(row_idx.second);
+          prev_vals.row(row_idx.second) = x.adj().row(row_idx.first);
+          x.adj().row(row_idx.first).setZero();
       }
     });
   }
@@ -398,94 +370,70 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
                                assign_cols, "right hand side columns",
                                y.cols());
   using arena_vec = std::vector<int, stan::math::arena_allocator<int>>;
-  arena_vec x_col_idx(assign_cols);
-  arena_vec x_row_idx(assign_rows);
-  std::unordered_set<int> x_set;
-  x_set.reserve(assign_cols);
-  std::unordered_set<int> x_row_set;
-  x_row_set.reserve(assign_rows);
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> row_map;
+  row_map.reserve(assign_rows);
+  for (int i = 0; i < assign_rows; ++i) {
+    stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(),
+                            row_idx.ns_[i]);
+    row_map[row_idx.ns_[i] - 1] = i;
+  }
+
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> col_map;
+  col_map.reserve(assign_cols);
+  for (int i = 0; i < assign_cols; ++i) {
+    stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
+                            col_idx.ns_[i]);
+    col_map[col_idx.ns_[i] - 1] = i;
+  }
+
   arena_t<Eigen::Matrix<double, -1, -1>> prev_vals(assign_rows, assign_cols);
-  Eigen::Matrix<double, -1, -1> y_vals(assign_rows, assign_cols);
+  Eigen::Matrix<double, -1, -1> dedupe_y_vals(assign_rows, assign_cols);
   // Need to remove duplicates for cases like {{2, 3, 2, 2}, {1, 2, 2}}
-  for (int i = assign_rows - 1; i >= 0; --i) {
-    if (likely(x_row_set.insert(row_idx.ns_[i]).second)) {
-      stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(),
-                              row_idx.ns_[i]);
-      x_row_idx[i] = row_idx.ns_[i] - 1;
-    } else {
-      x_row_idx[i] = -1;
-    }
-  }
   const auto& y_val = stan::math::value_of(y);
-  for (int j = assign_cols - 1; j >= 0; --j) {
-    if (likely(x_set.insert(col_idx.ns_[j]).second)) {
-      stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
-                              col_idx.ns_[j]);
-      x_col_idx[j] = col_idx.ns_[j] - 1;
-      for (int i = assign_rows - 1; i >= 0; --i) {
-        if (likely(x_row_idx[i] != -1)) {
-          prev_vals.coeffRef(i, j)
-              = x.vi_->val_.coeff(x_row_idx[i], x_col_idx[j]);
-          y_vals.coeffRef(i, j) = y_val.coeff(i, j);
-        }
+  for (auto&& col_idx : col_map) {
+      for (auto&& row_idx : row_map) {
+          prev_vals.coeffRef(row_idx.second, col_idx.second)
+              = x.vi_->val_.coeff(row_idx.first, col_idx.first);
+          dedupe_y_vals.coeffRef(row_idx.second, col_idx.second) = y_val.coeff(row_idx.second, col_idx.second);
       }
-    } else {
-      x_col_idx[j] = -1;
-    }
   }
-  for (int j = assign_cols - 1; j >= 0; --j) {
-    if (likely(x_col_idx[j] != -1)) {
-      for (int i = assign_rows - 1; i >= 0; --i) {
-        if (likely(x_row_idx[i] != -1)) {
-          x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j]) = y_vals.coeff(i, j);
-        }
-      }
+  for (auto&& col_idx : col_map) {
+    for (auto&& row_idx : row_map) {
+      x.vi_->val_.coeffRef(row_idx.first, col_idx.first) = dedupe_y_vals.coeff(row_idx.second, col_idx.second);
     }
   }
   if (!is_constant<Mat2>::value) {
     stan::math::reverse_pass_callback(
-        [x, y, prev_vals, x_col_idx, x_row_idx]() mutable {
-          for (int j = 0; j < x_col_idx.size(); ++j) {
-            if (likely(x_col_idx[j] != -1)) {
-              for (int i = 0; i < x_row_idx.size(); ++i) {
-                if (likely(x_row_idx[i] != -1)) {
-                  x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j])
-                      = prev_vals.coeff(i, j);
-                  prev_vals.coeffRef(i, j)
-                      = x.adj().coeff(x_row_idx[i], x_col_idx[j]);
-                  x.adj().coeffRef(x_row_idx[i], x_col_idx[j]) = 0;
-                }
+        [x, y, prev_vals, row_map, col_map]() mutable {
+          for (auto&& col_idx : col_map) {
+            for (auto&& row_idx : row_map) {
+                  x.vi_->val_.coeffRef(row_idx.first, col_idx.first)
+                      = prev_vals.coeff(row_idx.second, col_idx.second);
+                  prev_vals.coeffRef(row_idx.second, col_idx.second)
+                      = x.adj().coeff(row_idx.first, col_idx.first);
+                  x.adj().coeffRef(row_idx.first, col_idx.first) = 0;
               }
-            }
           }
-          for (int j = 0; j < x_col_idx.size(); ++j) {
-            if (likely(x_col_idx[j] != -1)) {
-              for (int i = 0; i < x_row_idx.size(); ++i) {
-                if (likely(x_row_idx[i] != -1)) {
-                  math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y)
-                      .adj()
-                      .coeffRef(i, j)
-                      += prev_vals.coeff(i, j);
-                }
-              }
+          for (auto&& col_idx : col_map) {
+            for (auto&& row_idx : row_map) {
+              math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y)
+                  .adj()
+                  .coeffRef(row_idx.second, col_idx.second)
+                   += prev_vals.coeff(row_idx.second, col_idx.second);
             }
           }
         });
   } else {
     stan::math::reverse_pass_callback(
-        [x, prev_vals, x_col_idx, x_row_idx]() mutable {
-          for (int j = 0; j < x_col_idx.size(); ++j) {
-            if (likely(x_col_idx[j] != -1)) {
-              for (int i = 0; i < x_row_idx.size(); ++i) {
-                if (likely(x_row_idx[i] != -1)) {
-                  x.vi_->val_.coeffRef(x_row_idx[i], x_col_idx[j])
-                      = prev_vals.coeff(i, j);
-                  prev_vals.coeffRef(i, j)
-                      = x.adj().coeff(x_row_idx[i], x_col_idx[j]);
-                  x.adj().coeffRef(x_row_idx[i], x_col_idx[j]) = 0;
-                }
+        [x, prev_vals, row_map, col_map]() mutable {
+          for (auto&& col_idx : col_map) {
+            for (auto&& row_idx : row_map) {
+                x.vi_->val_.coeffRef(row_idx.first, col_idx.first)
+                    = prev_vals.coeff(row_idx.second, col_idx.second);
+                prev_vals.coeffRef(row_idx.second, col_idx.second)
+                    = x.adj().coeff(row_idx.first, col_idx.first);
+                x.adj().coeffRef(row_idx.first, col_idx.first) = 0;
               }
-            }
           }
         });
   }
@@ -517,16 +465,17 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
   stan::math::check_size_match("matrix[..., multi] assign columns", name,
                                assign_cols, "right hand side columns",
                                y.cols());
-  std::unordered_set<int> x_set;
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> col_map;
+  col_map.reserve(assign_cols);
+  for (int i = 0; i < assign_cols; ++i) {
+    stan::math::check_range("matrix[multi, multi] assign col", name, x.rows(),
+                            col_idx.ns_[i]);
+    col_map[col_idx.ns_[i] - 1] = i;
+  }
   const auto& y_eval = y.eval();
-  x_set.reserve(assign_cols);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
-  for (int j = assign_cols - 1; j >= 0; --j) {
-    if (likely(x_set.insert(col_idx.ns_[j]).second)) {
-      stan::math::check_range("matrix[..., multi] assign col", name, x.cols(),
-                              col_idx.ns_[j]);
-      assign(x.col(col_idx.ns_[j] - 1), y_eval.col(j), name, row_idx);
-    }
+  for (auto&& col_idx : col_map) {
+      assign(x.col(col_idx.first), y_eval.col(col_idx.second), name, row_idx);
   }
 }
 
