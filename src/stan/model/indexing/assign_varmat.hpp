@@ -119,7 +119,9 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
   arena_t<Eigen::Matrix<double, -1, 1>> prev_vals(assign_size);
   Eigen::Matrix<double, -1, 1> y_idx_vals(assign_size);
   // Use boost unordered flat map when boost 1.82 goes into math
-  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> x_map;
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>,
+                       stan::math::arena_allocator<std::pair<const int, int>>>
+      x_map;
   x_map.reserve(assign_size);
   // Keep track of the last place we assigned to.
   for (int i = 0; i < assign_size; ++i) {
@@ -128,26 +130,27 @@ inline void assign(Vec1&& x, const Vec2& y, const char* name,
   const auto& y_val = stan::math::value_of(y);
   // We have to use two loops to avoid aliasing issues.
   for (auto&& x_idx : x_map) {
-      stan::math::check_range("vector[multi] assign", name, x_size, x_idx.first + 1);
-      prev_vals.coeffRef(x_idx.second) = x.vi_->val_.coeffRef(x_idx.first);
-      y_idx_vals.coeffRef(x_idx.second) = y_val.coeff(x_idx.second);
+    stan::math::check_range("vector[multi] assign", name, x_size,
+                            x_idx.first + 1);
+    prev_vals.coeffRef(x_idx.second) = x.vi_->val_.coeffRef(x_idx.first);
+    y_idx_vals.coeffRef(x_idx.second) = y_val.coeff(x_idx.second);
   }
   for (auto&& x_idx : x_map) {
-      x.vi_->val_.coeffRef(x_idx.first) = y_idx_vals.coeff(x_idx.second);
+    x.vi_->val_.coeffRef(x_idx.first) = y_idx_vals.coeff(x_idx.second);
   }
 
   if (!is_constant<Vec2>::value) {
     stan::math::reverse_pass_callback([x, y, x_map, prev_vals]() mutable {
       for (auto&& x_idx : x_map) {
-          x.vi_->val_.coeffRef(x_idx.first) = prev_vals.coeffRef(x_idx.second);
-          prev_vals.coeffRef(x_idx.second) = x.adj().coeffRef(x_idx.first);
-          x.adj().coeffRef(x_idx.first) = 0.0;
+        x.vi_->val_.coeffRef(x_idx.first) = prev_vals.coeffRef(x_idx.second);
+        prev_vals.coeffRef(x_idx.second) = x.adj().coeffRef(x_idx.first);
+        x.adj().coeffRef(x_idx.first) = 0.0;
       }
       for (auto&& x_idx : x_map) {
-          math::forward_as<math::promote_scalar_t<math::var, Vec2>>(y)
-              .adj()
-              .coeffRef(x_idx.second)
-              += prev_vals.coeff(x_idx.second);
+        math::forward_as<math::promote_scalar_t<math::var, Vec2>>(y)
+            .adj()
+            .coeffRef(x_idx.second)
+            += prev_vals.coeff(x_idx.second);
       }
     });
   } else {
@@ -227,7 +230,9 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
   arena_t<std::vector<int>> x_idx(assign_cols);
   arena_t<Eigen::Matrix<double, -1, 1>> prev_val(assign_cols);
   Eigen::Matrix<double, -1, 1> y_val_idx(assign_cols);
-  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> col_map;
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>,
+                       stan::math::arena_allocator<std::pair<const int, int>>>
+      col_map;
   col_map.reserve(assign_cols);
   // Keep track of the last place we assigned to.
   for (int i = 0; i < assign_cols; ++i) {
@@ -238,18 +243,22 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
   for (auto&& col_map_idx : col_map) {
     stan::math::check_range("matrix[uni, multi] assign", name, x.cols(),
                             col_map_idx.first + 1);
-    prev_val.coeffRef(col_map_idx.second) = x.val().coeff(row_idx_val, col_map_idx.first);
+    prev_val.coeffRef(col_map_idx.second)
+        = x.val().coeff(row_idx_val, col_map_idx.first);
     y_val_idx.coeffRef(col_map_idx.second) = y_val.coeff(col_map_idx.second);
   }
   for (auto&& col_map_idx : col_map) {
-      x.vi_->val_.coeffRef(row_idx_val, col_map_idx.first) = y_val_idx.coeff(col_map_idx.second);
+    x.vi_->val_.coeffRef(row_idx_val, col_map_idx.first)
+        = y_val_idx.coeff(col_map_idx.second);
   }
   if (!is_constant<Vec>::value) {
     stan::math::reverse_pass_callback(
         [x, y, row_idx_val, col_map, prev_val]() mutable {
           for (auto&& col_map_idx : col_map) {
-            x.vi_->val_.coeffRef(row_idx_val, col_map_idx.first) = prev_val.coeff(col_map_idx.second);
-            prev_val.coeffRef(col_map_idx.second) = x.adj().coeff(row_idx_val, col_map_idx.first);
+            x.vi_->val_.coeffRef(row_idx_val, col_map_idx.first)
+                = prev_val.coeff(col_map_idx.second);
+            prev_val.coeffRef(col_map_idx.second)
+                = x.adj().coeff(row_idx_val, col_map_idx.first);
             x.adj().coeffRef(row_idx_val, col_map_idx.first) = 0.0;
           }
           for (auto&& col_map_idx : col_map) {
@@ -263,8 +272,10 @@ inline void assign(Mat1&& x, const Vec& y, const char* name, index_uni row_idx,
     stan::math::reverse_pass_callback(
         [x, row_idx_val, col_map, prev_val]() mutable {
           for (auto&& col_map_idx : col_map) {
-            x.vi_->val_.coeffRef(row_idx_val, col_map_idx.first) = prev_val.coeff(col_map_idx.second);
-            prev_val.coeffRef(col_map_idx.second) = x.adj().coeffRef(row_idx_val, col_map_idx.first);
+            x.vi_->val_.coeffRef(row_idx_val, col_map_idx.first)
+                = prev_val.coeff(col_map_idx.second);
+            prev_val.coeffRef(col_map_idx.second)
+                = x.adj().coeffRef(row_idx_val, col_map_idx.first);
             x.adj().coeffRef(row_idx_val, col_map_idx.first) = 0.0;
           }
         });
@@ -299,7 +310,9 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
                                "right hand side rows", y.cols());
   arena_t<Eigen::Matrix<double, -1, -1>> prev_vals(assign_rows, x.cols());
   Eigen::Matrix<double, -1, -1> y_val_idx(assign_rows, x.cols());
-  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> row_map;
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>,
+                       stan::math::arena_allocator<std::pair<const int, int>>>
+      row_map;
   row_map.reserve(assign_rows);
   for (int i = 0; i < assign_rows; ++i) {
     row_map[idx.ns_[i] - 1] = i;
@@ -308,9 +321,10 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
   const auto& y_val = stan::math::value_of(y);
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (auto&& row_idx : row_map) {
-      stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(), row_idx.first + 1);
-      prev_vals.row(row_idx.second) = x.vi_->val_.row(row_idx.first);
-      y_val_idx.row(row_idx.second) = y_val.row(row_idx.second);
+    stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(),
+                            row_idx.first + 1);
+    prev_vals.row(row_idx.second) = x.vi_->val_.row(row_idx.first);
+    y_val_idx.row(row_idx.second) = y_val.row(row_idx.second);
   }
   for (auto&& row_idx : row_map) {
     x.vi_->val_.row(row_idx.first) = y_val_idx.row(row_idx.second);
@@ -319,23 +333,22 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
   if (!is_constant<Mat2>::value) {
     stan::math::reverse_pass_callback([x, y, prev_vals, row_map]() mutable {
       for (auto&& row_idx : row_map) {
-          x.vi_->val_.row(row_idx.first) = prev_vals.row(row_idx.second);
-          prev_vals.row(row_idx.second) = x.adj().row(row_idx.first);
-          x.adj().row(row_idx.first).fill(0);
+        x.vi_->val_.row(row_idx.first) = prev_vals.row(row_idx.second);
+        prev_vals.row(row_idx.second) = x.adj().row(row_idx.first);
+        x.adj().row(row_idx.first).fill(0);
       }
       for (auto&& row_idx : row_map) {
-          math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y)
-              .adj()
-              .row(row_idx.second)
-              += prev_vals.row(row_idx.second);
+        math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y).adj().row(
+            row_idx.second)
+            += prev_vals.row(row_idx.second);
       }
     });
   } else {
     stan::math::reverse_pass_callback([x, prev_vals, row_map]() mutable {
       for (auto&& row_idx : row_map) {
-          x.vi_->val_.row(row_idx.first) = prev_vals.row(row_idx.second);
-          prev_vals.row(row_idx.second) = x.adj().row(row_idx.first);
-          x.adj().row(row_idx.first).setZero();
+        x.vi_->val_.row(row_idx.first) = prev_vals.row(row_idx.second);
+        prev_vals.row(row_idx.second) = x.adj().row(row_idx.first);
+        x.adj().row(row_idx.first).setZero();
       }
     });
   }
@@ -370,7 +383,9 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
                                assign_cols, "right hand side columns",
                                y.cols());
   using arena_vec = std::vector<int, stan::math::arena_allocator<int>>;
-  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> row_map;
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>,
+                       stan::math::arena_allocator<std::pair<const int, int>>>
+      row_map;
   row_map.reserve(assign_rows);
   for (int i = 0; i < assign_rows; ++i) {
     stan::math::check_range("matrix[multi, multi] assign row", name, x.rows(),
@@ -378,7 +393,9 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
     row_map[row_idx.ns_[i] - 1] = i;
   }
 
-  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> col_map;
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>,
+                       stan::math::arena_allocator<std::pair<const int, int>>>
+      col_map;
   col_map.reserve(assign_cols);
   for (int i = 0; i < assign_cols; ++i) {
     stan::math::check_range("matrix[multi, multi] assign col", name, x.cols(),
@@ -391,15 +408,17 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
   // Need to remove duplicates for cases like {{2, 3, 2, 2}, {1, 2, 2}}
   const auto& y_val = stan::math::value_of(y);
   for (auto&& col_idx : col_map) {
-      for (auto&& row_idx : row_map) {
-          prev_vals.coeffRef(row_idx.second, col_idx.second)
-              = x.vi_->val_.coeff(row_idx.first, col_idx.first);
-          dedupe_y_vals.coeffRef(row_idx.second, col_idx.second) = y_val.coeff(row_idx.second, col_idx.second);
-      }
+    for (auto&& row_idx : row_map) {
+      prev_vals.coeffRef(row_idx.second, col_idx.second)
+          = x.vi_->val_.coeff(row_idx.first, col_idx.first);
+      dedupe_y_vals.coeffRef(row_idx.second, col_idx.second)
+          = y_val.coeff(row_idx.second, col_idx.second);
+    }
   }
   for (auto&& col_idx : col_map) {
     for (auto&& row_idx : row_map) {
-      x.vi_->val_.coeffRef(row_idx.first, col_idx.first) = dedupe_y_vals.coeff(row_idx.second, col_idx.second);
+      x.vi_->val_.coeffRef(row_idx.first, col_idx.first)
+          = dedupe_y_vals.coeff(row_idx.second, col_idx.second);
     }
   }
   if (!is_constant<Mat2>::value) {
@@ -407,19 +426,19 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
         [x, y, prev_vals, row_map, col_map]() mutable {
           for (auto&& col_idx : col_map) {
             for (auto&& row_idx : row_map) {
-                  x.vi_->val_.coeffRef(row_idx.first, col_idx.first)
-                      = prev_vals.coeff(row_idx.second, col_idx.second);
-                  prev_vals.coeffRef(row_idx.second, col_idx.second)
-                      = x.adj().coeff(row_idx.first, col_idx.first);
-                  x.adj().coeffRef(row_idx.first, col_idx.first) = 0;
-              }
+              x.vi_->val_.coeffRef(row_idx.first, col_idx.first)
+                  = prev_vals.coeff(row_idx.second, col_idx.second);
+              prev_vals.coeffRef(row_idx.second, col_idx.second)
+                  = x.adj().coeff(row_idx.first, col_idx.first);
+              x.adj().coeffRef(row_idx.first, col_idx.first) = 0;
+            }
           }
           for (auto&& col_idx : col_map) {
             for (auto&& row_idx : row_map) {
               math::forward_as<math::promote_scalar_t<math::var, Mat2>>(y)
                   .adj()
                   .coeffRef(row_idx.second, col_idx.second)
-                   += prev_vals.coeff(row_idx.second, col_idx.second);
+                  += prev_vals.coeff(row_idx.second, col_idx.second);
             }
           }
         });
@@ -428,12 +447,12 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
         [x, prev_vals, row_map, col_map]() mutable {
           for (auto&& col_idx : col_map) {
             for (auto&& row_idx : row_map) {
-                x.vi_->val_.coeffRef(row_idx.first, col_idx.first)
-                    = prev_vals.coeff(row_idx.second, col_idx.second);
-                prev_vals.coeffRef(row_idx.second, col_idx.second)
-                    = x.adj().coeff(row_idx.first, col_idx.first);
-                x.adj().coeffRef(row_idx.first, col_idx.first) = 0;
-              }
+              x.vi_->val_.coeffRef(row_idx.first, col_idx.first)
+                  = prev_vals.coeff(row_idx.second, col_idx.second);
+              prev_vals.coeffRef(row_idx.second, col_idx.second)
+                  = x.adj().coeff(row_idx.first, col_idx.first);
+              x.adj().coeffRef(row_idx.first, col_idx.first) = 0;
+            }
           }
         });
   }
@@ -465,7 +484,9 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
   stan::math::check_size_match("matrix[..., multi] assign columns", name,
                                assign_cols, "right hand side columns",
                                y.cols());
-  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>, stan::math::arena_allocator<std::pair<const int, int>>> col_map;
+  boost::unordered_map<int, int, boost::hash<int>, std::equal_to<>,
+                       stan::math::arena_allocator<std::pair<const int, int>>>
+      col_map;
   col_map.reserve(assign_cols);
   for (int i = 0; i < assign_cols; ++i) {
     stan::math::check_range("matrix[multi, multi] assign col", name, x.rows(),
@@ -475,7 +496,7 @@ inline void assign(Mat1&& x, const Mat2& y, const char* name,
   const auto& y_eval = y.eval();
   // Need to remove duplicates for cases like {2, 3, 2, 2}
   for (auto&& col_idx : col_map) {
-      assign(x.col(col_idx.first), y_eval.col(col_idx.second), name, row_idx);
+    assign(x.col(col_idx.first), y_eval.col(col_idx.second), name, row_idx);
   }
 }
 
