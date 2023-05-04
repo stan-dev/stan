@@ -92,7 +92,7 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
   writer.write_gq_names(model);
 
   boost::ecuyer1988 rng = util::create_rng(seed, 1);
-  
+
   std::vector<double> unconstrained_params_r;
   std::vector<double> row(draws.cols());
 
