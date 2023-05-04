@@ -210,7 +210,7 @@ class model_base_crtp : public stan::model::model_base {
         rng, theta, theta_i, vars, include_tparams, include_gqs, msgs);
   }
 
-  void void unconstrain_array(const std::vector<double>& params_constrained_r,
+  void unconstrain_array(const std::vector<double>& params_constrained_r,
                               std::vector<double>& params_r,
                               std::ostream* msgs = nullptr) const override {
     return static_cast<const M*>(this)->unconstrain_array(params_constrained_r,
