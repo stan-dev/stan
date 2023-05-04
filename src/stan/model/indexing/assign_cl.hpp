@@ -169,8 +169,9 @@ inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
   stan::math::check_size_match(internal::print_index_type(row_index),
                                "left hand side rows", lhs_val.rows(), name,
                                expr_rhs.rows());
-  stan::math::check_size_match(internal::print_index_type(row_index), "left hand side columns",
-                                lhs_val.cols(), name, expr_rhs.cols());
+  stan::math::check_size_match(internal::print_index_type(row_index),
+                               "left hand side columns", lhs_val.cols(), name,
+                               expr_rhs.cols());
   math::arena_matrix_cl<double> prev_vals = lhs_val;
   lhs_val = math::value_of(expr_rhs);  // assign the values
   math::reverse_pass_callback(
