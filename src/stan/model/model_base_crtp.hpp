@@ -141,10 +141,10 @@ class model_base_crtp : public stan::model::model_base {
         rng, theta, vars, include_tparams, include_gqs, msgs);
   }
 
-  void unconstrain_array(const Eigen::VectorXd& params_constrained_r,
+  void unconstrain_array(const Eigen::VectorXd& params_r_constrained,
                          Eigen::VectorXd& params_r,
                          std::ostream* msgs = nullptr) const override {
-    return static_cast<const M*>(this)->unconstrain_array(params_constrained_r,
+    return static_cast<const M*>(this)->unconstrain_array(params_r_constrained,
                                                           params_r, msgs);
   }
 
@@ -210,10 +210,10 @@ class model_base_crtp : public stan::model::model_base {
         rng, theta, theta_i, vars, include_tparams, include_gqs, msgs);
   }
 
-  void unconstrain_array(const std::vector<double>& params_constrained_r,
+  void unconstrain_array(const std::vector<double>& params_r_constrained,
                          std::vector<double>& params_r,
                          std::ostream* msgs = nullptr) const override {
-    return static_cast<const M*>(this)->unconstrain_array(params_constrained_r,
+    return static_cast<const M*>(this)->unconstrain_array(params_r_constrained,
                                                           params_r, msgs);
   }
 
