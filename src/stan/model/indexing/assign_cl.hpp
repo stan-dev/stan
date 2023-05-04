@@ -67,16 +67,13 @@ template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_all_kernel_expressions_and_none_scalar_t<ExprRhs>* = nullptr>
 inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
                    const RowIndex& row_index) {
-  if (std::is_same<RowIndex, index_omni>::value) {
-    stan::math::check_size_match("omni assign", "left hand side rows",
-                                 expr_lhs.rows(), name, expr_rhs.rows());
-    stan::math::check_size_match("omni assign", "left hand side columns",
-                                 expr_lhs.cols(), name, expr_rhs.cols());
-  }
   decltype(auto) lhs = rvalue(expr_lhs, name, row_index);
   stan::math::check_size_match(internal::print_index_type(row_index),
                                "left hand side rows", lhs.rows(), name,
                                expr_rhs.rows());
+  stan::math::check_size_match(internal::print_index_type(row_index),
+                               "left hand side cols", lhs.cols(), name,
+                               expr_rhs.cols());
   lhs = std::forward<ExprRhs>(expr_rhs);
 }
 
@@ -108,13 +105,6 @@ template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_any_not_same_t<RowIndex, ColIndex, index_uni>* = nullptr>
 inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
                    const RowIndex& row_index, const ColIndex& col_index) {
-  if (std::is_same<RowIndex, index_omni>::value
-      && std::is_same<ColIndex, index_omni>::value) {
-    stan::math::check_size_match("omni assign", "left hand side rows",
-                                 expr_lhs.rows(), name, expr_rhs.rows());
-    stan::math::check_size_match("omni assign", "left hand side columns",
-                                 expr_lhs.cols(), name, expr_rhs.cols());
-  }
   decltype(auto) lhs = rvalue(expr_lhs, name, row_index, col_index);
   stan::math::check_size_match(internal::print_index_type(row_index),
                                "left hand side rows", lhs.rows(), name,
@@ -175,16 +165,12 @@ template <typename ExprLhs, typename ExprRhs, typename RowIndex,
           require_nonscalar_prim_or_rev_kernel_expression_t<ExprRhs>* = nullptr>
 inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
                    const char* name, RowIndex&& row_index) {
-  if (std::is_same<std::decay_t<RowIndex>, index_omni>::value) {
-    stan::math::check_size_match("omni assign", "left hand side rows",
-                                 expr_lhs.rows(), name, expr_rhs.rows());
-    stan::math::check_size_match("omni assign", "left hand side columns",
-                                 expr_lhs.cols(), name, expr_rhs.cols());
-  }
   decltype(auto) lhs_val = rvalue(expr_lhs.val_op(), name, row_index);
   stan::math::check_size_match(internal::print_index_type(row_index),
                                "left hand side rows", lhs_val.rows(), name,
                                expr_rhs.rows());
+  stan::math::check_size_match(internal::print_index_type(row_index), "left hand side columns",
+                                lhs_val.cols(), name, expr_rhs.cols());
   math::arena_matrix_cl<double> prev_vals = lhs_val;
   lhs_val = math::value_of(expr_rhs);  // assign the values
   math::reverse_pass_callback(
@@ -238,13 +224,6 @@ template <
 inline void assign(ExprLhs&& expr_lhs, const ExprRhs& expr_rhs,
                    const char* name, RowIndex&& row_index,
                    ColIndex&& col_index) {
-  if (std::is_same<std::decay_t<RowIndex>, index_omni>::value
-      && std::is_same<std::decay_t<ColIndex>, index_omni>::value) {
-    stan::math::check_size_match("omni assign", "left hand side rows",
-                                 expr_lhs.rows(), name, expr_rhs.rows());
-    stan::math::check_size_match("omni assign", "left hand side columns",
-                                 expr_lhs.cols(), name, expr_rhs.cols());
-  }
   decltype(auto) lhs = rvalue(expr_lhs.val_op(), name, row_index, col_index);
   stan::math::check_size_match(internal::print_index_type(row_index),
                                "left hand side rows", lhs.rows(), name,
