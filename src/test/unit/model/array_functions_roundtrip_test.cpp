@@ -5,23 +5,21 @@
 #include <test/unit/util.hpp>
 #include <gtest/gtest.h>
 
+auto get_init_json() {
+  std::vector<std::string> json_path = {
+      "src", "test", "test-models", "good", "model", "parameters.inits.json"};
+  std::string filename = paths_to_fname(json_path);
+  std::ifstream in(filename);
+  return std::unique_ptr<stan::io::var_context>(new stan::json::json_data(in));
+}
+
 class ModelArrayFunctionsRoundtripTest : public testing::Test {
  public:
   ModelArrayFunctionsRoundtripTest()
-      : model(context, 0, nullptr), rng(12324232), inits(nullptr) {
-    out.str("");
-
-    std::vector<std::string> json_path = {
-        "src", "test", "test-models", "good", "model", "parameters.inits.json"};
-    std::string filename = paths_to_fname(json_path);
-    std::ifstream in(filename);
-    inits = new stan::json::json_data(in);
-  }
-
-  ~ModelArrayFunctionsRoundtripTest() { delete inits; }
+      : model(context, 0, nullptr), rng(12324232), inits(get_init_json()) {}
 
   stan::io::empty_var_context context;
-  stan::io::var_context* inits;
+  std::unique_ptr<stan::io::var_context> inits;
   stan_model model;
   std::stringstream out;
   boost::ecuyer1988 rng;
