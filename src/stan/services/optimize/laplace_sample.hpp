@@ -135,8 +135,8 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
  * @tparam jacobian `true` to include Jacobian adjustment for
  * constrained parameters
  * @tparam Model a Stan model
- * @parma[in] m model from which to sample
- * @parma[in] theta_hat unconstrained mode at which to center the
+ * @param[in] m model from which to sample
+ * @param[in] theta_hat unconstrained mode at which to center the
  * Laplace approximation
  * @param[in] draws number of draws to generate
  * @param[in] random_seed seed for generating random numbers in the

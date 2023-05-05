@@ -493,8 +493,8 @@ class deserializer {
    * @tparam LP Type of log probability.
    * @tparam Sizes A parameter pack of integral types.
    * @param lp The reference to the variable holding the log
-   * @param sizes Pack of integrals to use to construct the return's type.
    * probability to increment.
+   * @param sizes Pack of integrals to use to construct the return's type.
    * @return The next unit_vector of the specified size.
    * @throw std::invalid_argument if k is zero
    */
@@ -522,9 +522,9 @@ class deserializer {
    * @tparam LP Type of log probability.
    * @tparam Sizes A parameter pack of integral types.
    * @param lp The reference to the variable holding the log
+   * probability to increment.
    * @param vecsize The size of the return vector.
    * @param sizes Pack of integrals to use to construct the return's type.
-   * probability to increment.
    * @return The next unit_vector of the specified size.
    * @throw std::invalid_argument if k is zero
    */
@@ -555,8 +555,8 @@ class deserializer {
    * @tparam LP Type of log probability.
    * @tparam Sizes A parameter pack of integral types.
    * @param lp The reference to the variable holding the log
-   * @param sizes Pack of integrals to use to construct the return's type.
    * probability to increment.
+   * @param size Size of the returned simplex.
    * @return The next simplex of the specified size.
    * @throws std::invalid_argument if number of dimensions (`k`) is zero
    */
@@ -585,9 +585,9 @@ class deserializer {
    * @tparam LP Type of log probability.
    * @tparam Sizes A parameter pack of integral types.
    * @param lp The reference to the variable holding the log
+   * probability to increment.
    * @param vecsize The size of the return vector.
    * @param sizes Pack of integrals to use to construct the return's type.
-   * probability to increment.
    * @return The next simplex of the specified size.
    * @throws std::invalid_argument if number of dimensions (`k`) is zero
    */
@@ -618,8 +618,8 @@ class deserializer {
    * @tparam LP Type of log probability.
    * @tparam Sizes A parameter pack of integral types.
    * @param lp The reference to the variable holding the log
-   * @param sizes Pack of integrals to use to construct the return's type.
    * probability to increment.
+   * @param sizes Pack of integrals to use to construct the return's type.
    * @return Next ordered vector of the specified size.
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
@@ -646,9 +646,9 @@ class deserializer {
    * @tparam Sizes A parameter pack of integral types.
    * @tparam LP Type of log probability.
    * @param lp The reference to the variable holding the log
+   * probability to increment.
    * @param vecsize The size of the return vector.
    * @param sizes Pack of integrals to use to construct the return's type.
-   * probability to increment.
    * @return Next ordered vector of the specified size.
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
@@ -678,8 +678,8 @@ class deserializer {
    * @tparam Sizes A parameter pack of integral types.
    * @tparam LP Type of log probability.
    * @param lp The reference to the variable holding the log
-   * @param sizes Pack of integrals to use to construct the return's type.
    * probability to increment.
+   * @param sizes Pack of integrals to use to construct the return's type.
    * @return Next positive_ordered vector of the specified size.
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
@@ -706,9 +706,9 @@ class deserializer {
    * @tparam Sizes A parameter pack of integral types.
    * @tparam LP Type of log probability.
    * @param lp The reference to the variable holding the log
+   * probability to increment.
    * @param vecsize The size of the return vector.
    * @param sizes Pack of integrals to use to construct the return's type.
-   * probability to increment.
    * @return Next positive_ordered vector of the specified size.
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
@@ -771,9 +771,9 @@ class deserializer {
    * @tparam Sizes A parameter pack of integral types.
    * @tparam LP Type of log probability.
    * @param lp The reference to the variable holding the log
+   * probability to increment.
    * @param vecsize The size of the return vector.
    * @param sizes Pack of integrals to use to construct the return's type.
-   * probability to increment.
    * @return Next Cholesky factor.
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor.
@@ -837,9 +837,9 @@ class deserializer {
    * @tparam LP Type of log probability.
    * @tparam Sizes A parameter pack of integral types.
    * @param lp The reference to the variable holding the log
+   * probability to increment.
    * @param vecsize The size of the return vector.
    * @param sizes Pack of integrals to use to construct the return's type.
-   * probability to increment.
    * @return Next Cholesky factor for a correlation matrix.
    * @throw std::domain_error if the matrix is not a valid
    *    Cholesky factor for a correlation matrix.
@@ -903,9 +903,9 @@ class deserializer {
    * @tparam LP Type of log probability.
    * @tparam Sizes A parameter pack of integral types.
    * @param lp The reference to the variable holding the log
+   * probability to increment.
    * @param vecsize The size of the return vector.
    * @param sizes Pack of integrals to use to construct the return's type.
-   * probability to increment.
    * @return The next covariance matrix of the specified dimensionality.
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,
@@ -932,9 +932,9 @@ class deserializer {
    * @tparam Jacobian Whether to increment the log of the absolute Jacobian
    * determinant of the transform.
    * @tparam LP Type of log probability.
-   * @param k Dimensions of matrix return type.
    * @param lp The reference to the variable holding the log
    * probability to increment.
+   * @param k Dimensions of matrix return type.
    */
   template <typename Ret, bool Jacobian, typename LP,
             require_not_std_vector_t<Ret>* = nullptr,
@@ -963,9 +963,9 @@ class deserializer {
    * @tparam LP Type of log probability.
    * @tparam Sizes A parameter pack of integral types.
    * @param lp The reference to the variable holding the log
+   * probability to increment.
    * @param vecsize The size of the return vector.
    * @param sizes Pack of integrals to use to construct the return's type.
-   * probability to increment.
    * @return The next scalar transformed to a correlation.
    */
   template <typename Ret, bool Jacobian, typename LP, typename... Sizes,

@@ -379,7 +379,7 @@ class model_base : public prob_grad {
    * @param[in,out] params_r unconstrained parameters produced
    * @param[in,out] msgs msgs stream to which messages are written
    */
-  virtual void unconstrain_array(const Eigen::VectorXd& params_constrained_r,
+  virtual void unconstrain_array(const Eigen::VectorXd& params_r_constrained,
                                  Eigen::VectorXd& params_r,
                                  std::ostream* msgs = nullptr) const = 0;
 
@@ -632,7 +632,7 @@ class model_base : public prob_grad {
    * @param[in,out] msgs msgs stream to which messages are written
    */
   virtual void unconstrain_array(
-      const std::vector<double>& params_constrained_r,
+      const std::vector<double>& params_r_constrained,
       std::vector<double>& params_r, std::ostream* msgs = nullptr) const = 0;
 
 #ifdef STAN_MODEL_FVAR_VAR

@@ -19,10 +19,10 @@ class ModelArrayFunctionsRoundtripTest : public testing::Test {
       : model(context, 0, nullptr), rng(12324232), inits(get_init_json()) {}
 
   stan::io::empty_var_context context;
-  std::unique_ptr<stan::io::var_context> inits;
   stan_model model;
-  std::stringstream out;
   boost::ecuyer1988 rng;
+  std::unique_ptr<stan::io::var_context> inits;
+  std::stringstream out;
 
   /**
    * Test that the unconstrain_array function is the inverse of the
