@@ -19,9 +19,9 @@ class ModelArrayFunctionsRoundtripTest : public testing::Test {
       : model(context, 0, nullptr), rng(12324232), inits(get_init_json()) {}
 
   stan::io::empty_var_context context;
+  stan_model model;
   boost::ecuyer1988 rng;
   std::unique_ptr<stan::io::var_context> inits;
-  stan_model model;
   std::stringstream out;
 
   /**
