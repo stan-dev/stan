@@ -84,8 +84,6 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
   return error_codes::OK;
 }
 
-
-
 /**
  * DEPRECATED: This function assumes dimensions are rectangular,
  * a restriction which the Stan language may soon relax.
