@@ -20,7 +20,7 @@ void prettify_stan_csv_name(std::string& variable) {
     for (auto& part : parts) {
       int pos = part.find('.');
       if (pos > 0) {
-        part.replace(pos, 1, "[");
+        part[pos] = '[';
         std::replace(part.begin(), part.end(), '.', ',');
         part += "]";
       }
