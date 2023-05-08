@@ -13,7 +13,7 @@
 namespace stan {
 namespace io {
 
-void prettify_stan_csv_name(std::string& variable) {
+inline void prettify_stan_csv_name(std::string& variable) {
   if (variable.find_first_of(":.") != std::string::npos) {
     std::vector<std::string> parts;
     boost::split(parts, variable, boost::is_any_of(":"));
