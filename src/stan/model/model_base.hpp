@@ -80,6 +80,11 @@ class model_base : public prob_grad {
                                bool include_tparams = true,
                                bool include_gqs = true) const = 0;
   /**
+   * WARNING: This function bakes in the assumption that the
+   * parameter values are rectangular. This is already not true
+   * for Tuple types, and will be fundamentally broken for ragged
+   * arrays or sparse matrices.
+   *
    * Set the dimensionalities of constrained parameters, transformed
    * parameters, and generated quantities.  The input sequence is
    * cleared and resized.  The dimensions of each parameter

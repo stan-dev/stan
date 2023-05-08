@@ -30,20 +30,3 @@ class ServicesStandaloneGQ2 : public ::testing::Test {
   stan::callbacks::stream_logger logger;
   stan_model *model;
 };
-
-TEST_F(ServicesStandaloneGQ2, zero_sized_params_get_model_parameters) {
-  std::vector<std::string> param_names;
-  std::vector<std::vector<size_t>> param_dimss;
-  stan::services::get_model_parameters(*model, param_names, param_dimss);
-
-  EXPECT_EQ(param_names.size(), 4);
-  EXPECT_EQ(param_dimss.size(), 4);
-  EXPECT_EQ(param_dimss[0].size(), 0);
-  EXPECT_EQ(param_dimss[1].size(), 1);
-  EXPECT_EQ(param_dimss[1][0], 5);
-  EXPECT_EQ(param_dimss[2].size(), 1);
-  EXPECT_EQ(param_dimss[2][0], 6);
-  EXPECT_EQ(param_dimss[3].size(), 2);
-  EXPECT_EQ(param_dimss[3][0], 2);
-  EXPECT_EQ(param_dimss[3][1], 3);
-}

@@ -17,34 +17,6 @@ namespace stan {
 namespace services {
 
 /**
- * Find the names, dimensions of the model parameters.
- * Assembles vectors of name, dimensions for the variables
- * declared in the parameters block.
- *
- * @tparam Model type of model
- * @param[in] model model to query
- * @param[in, out] param_names sequence of parameter names
- * @param[in, out] param_dimss sequence of variable dimensionalities
- */
-template <class Model>
-void get_model_parameters(const Model &model,
-                          std::vector<std::string> &param_names,
-                          std::vector<std::vector<size_t>> &param_dimss) {
-  std::vector<std::string> all_param_names;
-  model.get_param_names(all_param_names, false, false);
-  std::vector<std::vector<size_t>> dimss;
-  model.get_dims(dimss, false, false);
-  // remove zero-size
-  for (size_t i = 0; i < all_param_names.size(); i++) {
-    auto &v = dimss[i];
-    if (std::find(v.begin(), v.end(), 0) == v.end()) {
-      param_names.emplace_back(all_param_names[i]);
-      param_dimss.emplace_back(dimss[i]);
-    }
-  }
-}
-
-/**
  * Given a set of draws from a fitted model, generate corresponding
  * quantities of interest which are written to callback writer.
  * Matrix of draws consists of one row per draw, one column per parameter.
@@ -110,6 +82,42 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
     writer.write_gq_values(model, rng, unconstrained_params_r);
   }
   return error_codes::OK;
+}
+
+/**
+ * DEPRECATED: This function assumes dimensions are rectangular,
+ * a restriction which the Stan language may soon relax.
+ *
+ * Find the names, dimensions of the model parameters.
+ * Assembles vectors of name, dimensions for the variables
+ * declared in the parameters block.
+ *
+ * @tparam Model type of model
+ * @param[in] model model to query
+ * @param[in, out] param_names sequence of parameter names
+ * @param[in, out] param_dimss sequence of variable dimensionalities
+ */
+template <class Model>
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((deprecated))
+#elif defined(_MSC_VER)
+__declspec(deprecated)
+#endif
+void get_model_parameters(const Model &model,
+                          std::vector<std::string> &param_names,
+                          std::vector<std::vector<size_t>> &param_dimss) {
+  std::vector<std::string> all_param_names;
+  model.get_param_names(all_param_names, false, false);
+  std::vector<std::vector<size_t>> dimss;
+  model.get_dims(dimss, false, false);
+  // remove zero-size
+  for (size_t i = 0; i < all_param_names.size(); i++) {
+    auto &v = dimss[i];
+    if (std::find(v.begin(), v.end(), 0) == v.end()) {
+      param_names.emplace_back(all_param_names[i]);
+      param_dimss.emplace_back(dimss[i]);
+    }
+  }
 }
 
 }  // namespace services

@@ -12,6 +12,7 @@ class StanIoStanCsvReader : public testing::Test {
     metadata3_stream.open("src/test/unit/io/test_csv_files/metadata3.csv");
     header1_stream.open("src/test/unit/io/test_csv_files/header1.csv");
     header2_stream.open("src/test/unit/io/test_csv_files/header2.csv");
+    header3_stream.open("src/test/unit/io/test_csv_files/header3.csv");
     adaptation1_stream.open("src/test/unit/io/test_csv_files/adaptation1.csv");
     samples1_stream.open("src/test/unit/io/test_csv_files/samples1.csv");
 
@@ -29,6 +30,7 @@ class StanIoStanCsvReader : public testing::Test {
     metadata3_stream.close();
     header1_stream.close();
     header2_stream.close();
+    header3_stream.close();
     adaptation1_stream.close();
     samples1_stream.close();
 
@@ -43,6 +45,7 @@ class StanIoStanCsvReader : public testing::Test {
       samples1_stream;
   std::ifstream metadata3_stream, header2_stream;
   std::ifstream eight_schools_stream;
+  std::ifstream header3_stream;
 };
 
 TEST_F(StanIoStanCsvReader, read_metadata1) {
@@ -139,6 +142,40 @@ TEST_F(StanIoStanCsvReader, read_header2) {
     std::stringstream ss;
     ss << "mu[" << i << "]";
     EXPECT_EQ(ss.str(), header[1 + i]);
+  }
+}
+
+TEST_F(StanIoStanCsvReader, read_header_tuples) {
+  std::vector<std::string> header;
+  EXPECT_TRUE(
+      stan::io::stan_csv_reader::read_header(header3_stream, header, 0));
+
+  ASSERT_EQ(46, header.size());
+
+  // skip lp__ etc
+  int headeridx = 7;
+
+  for (int outer = 1; outer <= 3; ++outer) {
+    std::stringstream scalar;
+    scalar << "complicated[" << outer << "]"
+           << "." << 1;
+    EXPECT_EQ(scalar.str(), header[headeridx++]);
+
+    for (int inner = 1; inner <= 4; ++inner) {
+      std::stringstream inner_scalar;
+      inner_scalar << "complicated[" << outer << "]"
+                   << "." << 2 << "[" << inner << "]"
+                   << "." << 1;
+      EXPECT_EQ(inner_scalar.str(), header[headeridx++]);
+
+      for (int matrix_columns = 1; matrix_columns <= 2; ++matrix_columns) {
+        std::stringstream matrix;
+        matrix << "complicated[" << outer << "]"
+               << "." << 2 << "[" << inner << "]"
+               << "." << 2 << "[" << 1 << "," << matrix_columns << "]";
+        EXPECT_EQ(matrix.str(), header[headeridx++]);
+      }
+    }
   }
 }
 
