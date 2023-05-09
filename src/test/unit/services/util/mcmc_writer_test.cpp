@@ -66,6 +66,14 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
     names__.emplace_back("xgq");
   }  // get_param_names()
 
+  inline std::vector<size_t> get_param_sizes() const {
+    std::vector<size_t> param_sizes;
+    param_sizes.push_back(2);
+    param_sizes.push_back(2);
+    param_sizes.push_back(1);
+    return param_sizes;
+  }  // get_param_sizes()
+
   inline void get_dims(std::vector<std::vector<size_t>>& dimss__,
                        bool include_tparams = true,
                        bool include_gqs = true) const final {

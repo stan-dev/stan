@@ -41,9 +41,11 @@ class random_var_context : public var_context {
    */
   template <class Model, class RNG>
   random_var_context(Model& model, RNG& rng, double init_radius, bool init_zero)
-      : unconstrained_params_(model.num_params_r()) {
+      : unconstrained_params_(model.num_params_r()),
+        sizes_(model.get_param_sizes(false, false)) {
     size_t num_unconstrained_ = model.num_params_r();
     model.get_param_names(names_, false, false);
+    // NB: this is only used in dims_r, which we never call ourselves.
     model.get_dims(dims_, false, false);
 
     if (init_zero) {
@@ -61,7 +63,7 @@ class random_var_context : public var_context {
     model.write_array(rng, unconstrained_params_, int_params,
                       constrained_params, false, false, 0);
 
-    vals_r_ = constrained_to_vals_r(constrained_params, dims_);
+    vals_r_ = constrained_to_vals_r(constrained_params);
   }
 
   /**
@@ -183,7 +185,9 @@ class random_var_context : public var_context {
 
   /**
    * Check variable dimensions against variable declaration.
-   * Only used for data read in from file.
+   * Note: Because we are creating this directly from the specification
+   * of the model, this should always succeed. We provide a rough
+   * sanity check to make sure the number of elements requested matches.
    *
    * @param stage stan program processing stage
    * @param name variable name
@@ -195,7 +199,23 @@ class random_var_context : public var_context {
   void validate_dims(const std::string& stage, const std::string& name,
                      const std::string& base_type,
                      const std::vector<size_t>& dims_declared) const {
-    stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
+    if (!contains_r(name)) {
+      std::stringstream msg;
+      msg << "variable does not exist"
+          << "; processing stage=" << stage << "; variable name=" << name
+          << "; base type=" << base_type;
+      throw std::runtime_error(msg.str());
+    }
+    size_t size_requested = dim_size(dims_declared);
+    size_t size_contained = stored_dim_size(name);
+    if (size_requested != size_contained) {
+      std::stringstream msg;
+      msg << "mismatch in size of parameter declared and found in context"
+          << "; processing stage=" << stage << "; variable name=" << name
+          << "; size declared=" << size_requested
+          << "; size found=" << size_contained;
+      throw std::runtime_error(msg.str());
+    }
   }
 
   /**
@@ -217,6 +237,10 @@ class random_var_context : public var_context {
    */
   std::vector<std::vector<size_t>> dims_;
   /**
+   * Sizes of parameters in model
+   */
+  std::vector<size_t> sizes_;
+  /**
    * Random parameter values of the model in the
    * unconstrained space
    */
@@ -233,11 +257,19 @@ class random_var_context : public var_context {
    * @param dim dimension of the variable
    * @return total size of the variable
    */
-  size_t dim_size(const std::vector<size_t>& dim) {
+  size_t dim_size(const std::vector<size_t>& dim) const {
     size_t size = 1;
     for (size_t j = 0; j < dim.size(); ++j)
       size *= dim[j];
     return size;
+  }
+
+  size_t stored_dim_size(const std::string& name) const {
+    std::vector<std::string>::const_iterator loc
+        = std::find(names_.begin(), names_.end(), name);
+    if (loc == names_.end())
+      return 0;
+    return sizes_[loc - names_.begin()];
   }
 
   /**
@@ -250,13 +282,12 @@ class random_var_context : public var_context {
    *   function
    */
   std::vector<std::vector<double>> constrained_to_vals_r(
-      const std::vector<double>& constrained,
-      const std::vector<std::vector<size_t>>& dims) {
-    std::vector<std::vector<double>> vals_r(dims.size());
+      const std::vector<double>& constrained) {
+    std::vector<std::vector<double>> vals_r(sizes_.size());
 
     std::vector<double>::const_iterator start = constrained.begin();
-    for (size_t i = 0; i < dims.size(); ++i) {
-      size_t size = dim_size(dims[i]);
+    for (size_t i = 0; i < sizes_.size(); ++i) {
+      size_t size = sizes_[i];
       vals_r[i] = std::vector<double>(start, start + size);
       start += size;
     }

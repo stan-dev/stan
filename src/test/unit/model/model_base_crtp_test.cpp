@@ -26,6 +26,11 @@ struct mock_model : public stan::model::model_base_crtp<mock_model> {
   void get_dims(std::vector<std::vector<size_t> >& dimss, bool include_tparams,
                 bool include_gqs) const override {}
 
+  std::vector<size_t> get_param_sizes(bool include_tparams,
+                                      bool include_gqs) const override {
+    return std::vector<size_t>();
+  }
+
   void constrained_param_names(std::vector<std::string>& param_names,
                                bool include_tparams,
                                bool include_gqs) const override {}

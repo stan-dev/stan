@@ -49,6 +49,11 @@ class mock_throwing_model_in_write_array : public stan::model::prob_grad {
     dimss__.push_back(scalar_dim);
   }
 
+  std::vector<size_t> get_param_sizes(bool include_tparams = true,
+                                      bool include_gqs = true) const {
+    return std::vector<size_t>{1};
+  }
+
   void constrained_param_names(std::vector<std::string>& param_names__,
                                bool include_tparams__ = true,
                                bool include_gqs__ = true) const {
