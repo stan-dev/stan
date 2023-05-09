@@ -173,10 +173,6 @@ test/integration/libmtu_%.so : test/integration/mtu/%_1.o test/integration/mtu/%
 
 test/integration/multiple_translation_units_test$(EXE) : test/integration/libmtu_model.so test/integration/libmtu_mcmc.so
 
-ifdef STAN_OPENCL
-STANCFLAGS+= --use-opencl
-endif
-
 ############################################################
 ##
 # Use the stanc compiler to generate C++ from Stan programs
