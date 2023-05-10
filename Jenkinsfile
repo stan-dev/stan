@@ -3,6 +3,7 @@ import org.stan.Utils
 
 def utils = new org.stan.Utils()
 def skipRemainingStages = false
+def skipOpenCL = false
 
 def setupCXX(failOnError = true, CXX = CXX, String stanc3_bin_url = "nightly") {
     errorStr = failOnError ? "-Werror " : ""
@@ -105,6 +106,11 @@ pipeline {
         GIT_AUTHOR_EMAIL = 'mc.stanislaw@gmail.com'
         GIT_COMMITTER_NAME = 'Stan Jenkins'
         GIT_COMMITTER_EMAIL = 'mc.stanislaw@gmail.com'
+        OPENCL_DEVICE_ID_CPU = 0
+        OPENCL_DEVICE_ID_GPU = 0
+        OPENCL_PLATFORM_ID = 1
+        OPENCL_PLATFORM_ID_CPU = 0
+        OPENCL_PLATFORM_ID_GPU = 0
     }
     stages {
 
@@ -236,6 +242,9 @@ pipeline {
                     ].join(" ")
 
                     skipRemainingStages = utils.verifyChanges(paths)
+
+                    def openCLPaths = ['src/stan/model/indexing'].join(" ")
+                    skipOpenCL = utils.verifyChanges(openCLPaths)
                 }
             }
             post {
@@ -284,13 +293,20 @@ pipeline {
                         docker {
                             image 'stanorg/ci:gpu'
                             label 'linux'
-                            args '--pull always'
+                            args '--pull always --gpus 1'
                         }
                     }
                     steps {
                         unstash 'StanSetup'
                         setupCXX(true, LINUX_CXX, stanc3_bin_url())
-                        sh "make -j${PARALLEL} test-headers"
+                        sh """
+                            echo STAN_OPENCL=true > make/local
+                            echo OPENCL_PLATFORM_ID=${OPENCL_PLATFORM_ID_GPU} >> make/local
+                            echo OPENCL_DEVICE_ID=${OPENCL_DEVICE_ID_GPU} >> make/local
+                        """
+                        sh """
+                            make -j${PARALLEL} test-headers
+                        """
                         runTests("src/test/unit")
                     }
                     post { always { deleteDir() } }

@@ -20,7 +20,7 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
 
   std::string model_name() const final { return "throwing_model"; }
 
-  std::vector<std::string> model_compile_info() const {
+  std::vector<std::string> model_compile_info() const override {
     std::vector<std::string> stanc_info;
     stanc_info.push_back("stanc_version = stanc3 e010e06c");
     stanc_info.push_back("stancflags = ");
