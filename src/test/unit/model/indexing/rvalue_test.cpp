@@ -292,7 +292,7 @@ TEST(ModelIndexing, rvalue_doubless_uni_multi) {
   EXPECT_FLOAT_EQ(1.1, y[0]);
 
   empty_y = rvalue(x, "", index_uni(1), index_min_max(3, 1));
-  EXPECT_EQ(0U, empty_y.size());
+  EXPECT_EQ(0, empty_y.size());
 
   y = rvalue(x, "", index_uni(3), index_omni());
   EXPECT_EQ(3, y.size());

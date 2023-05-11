@@ -23,7 +23,7 @@ struct index_uni {
    *
    * @param n single index.
    */
-  explicit index_uni(int n) noexcept : n_(n) {}
+  constexpr explicit index_uni(int n) noexcept : n_(n) {}
 };
 
 // MULTIPLE INDEXING (does not reduce dimensionality)
@@ -62,7 +62,7 @@ struct index_min {
    *
    * @param min minimum index (inclusive).
    */
-  explicit index_min(int min) noexcept : min_(min) {}
+  constexpr explicit index_min(int min) noexcept : min_(min) {}
 };
 
 /**
@@ -78,7 +78,7 @@ struct index_max {
    *
    * @param max maximum index (inclusive).
    */
-  explicit index_max(int max) noexcept : max_(max) {}
+  constexpr explicit index_max(int max) noexcept : max_(max) {}
 };
 
 /**
@@ -99,7 +99,7 @@ struct index_min_max {
    * @param min minimum index (inclusive).
    * @param max maximum index (inclusive).
    */
-  index_min_max(int min, int max) noexcept : min_(min), max_(max) {}
+  constexpr index_min_max(int min, int max) noexcept : min_(min), max_(max) {}
 };
 
 }  // namespace model
