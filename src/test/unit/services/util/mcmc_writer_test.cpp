@@ -20,7 +20,7 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
 
   std::string model_name() const final { return "throwing_model"; }
 
-  std::vector<std::string> model_compile_info() const {
+  std::vector<std::string> model_compile_info() const override {
     std::vector<std::string> stanc_info;
     stanc_info.push_back("stanc_version = stanc3 e010e06c");
     stanc_info.push_back("stancflags = ");
@@ -149,6 +149,13 @@ class throwing_model : public stan::model::model_base_crtp<throwing_model> {
       const stan::io::var_context& context,
       Eigen::Matrix<double, Eigen::Dynamic, 1>& params_r,
       std::ostream* pstream__ = nullptr) const {}
+
+  void unconstrain_array(const Eigen::VectorXd& params_constrained_r,
+                         Eigen::VectorXd& params_r,
+                         std::ostream* msgs = nullptr) const override {}
+  void unconstrain_array(const std::vector<double>& params_constrained_r,
+                         std::vector<double>& params_r,
+                         std::ostream* msgs = nullptr) const override {}
 };
 }  // namespace test
 
