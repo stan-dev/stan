@@ -44,29 +44,30 @@ TEST_F(ServicesLaplaceSample, values) {
       sample_writer);
   EXPECT_EQ(stan::services::error_codes::OK, return_code);
   std::string samples_str = sample_ss.str();
+  EXPECT_EQ(1, count_matches("log_p__", samples_str));
+  EXPECT_EQ(1, count_matches("log_q__", samples_str));
   EXPECT_EQ(2, count_matches("y", samples_str));
   EXPECT_EQ(1, count_matches("y.1", samples_str));
   EXPECT_EQ(1, count_matches("y.2", samples_str));
-  EXPECT_EQ(1, count_matches("log_p", samples_str));
-  EXPECT_EQ(1, count_matches("log_q", samples_str));
 
   std::stringstream out;
   stan::io::stan_csv draws_csv
       = stan::io::stan_csv_reader::parse(sample_ss, &out);
 
   EXPECT_EQ(4, draws_csv.header.size());
-  EXPECT_EQ("y[1]", draws_csv.header[0]);
-  EXPECT_EQ("y[2]", draws_csv.header[1]);
-  EXPECT_EQ("log_p", draws_csv.header[2]);
-  EXPECT_EQ("log_q", draws_csv.header[3]);
+  EXPECT_EQ("log_p__", draws_csv.header[0]);
+  EXPECT_EQ("log_q__", draws_csv.header[1]);
+  EXPECT_EQ("y[1]", draws_csv.header[2]);
+  EXPECT_EQ("y[2]", draws_csv.header[3]);
 
   Eigen::MatrixXd sample = draws_csv.samples;
   EXPECT_EQ(4, sample.cols());
   EXPECT_EQ(draws, sample.rows());
-  Eigen::VectorXd y1 = sample.col(0);
-  Eigen::VectorXd y2 = sample.col(1);
-  Eigen::VectorXd log_p = sample.col(2);
-  Eigen::VectorXd log_q = sample.col(2);
+
+  Eigen::VectorXd log_p = sample.col(0);
+  Eigen::VectorXd log_q = sample.col(1);
+  Eigen::VectorXd y1 = sample.col(2);
+  Eigen::VectorXd y2 = sample.col(3);
 
   // because target is normal, laplace approx is exact
   for (int m = 0; m < draws; ++m) {

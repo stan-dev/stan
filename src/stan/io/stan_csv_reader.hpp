@@ -13,6 +13,22 @@
 namespace stan {
 namespace io {
 
+inline void prettify_stan_csv_name(std::string& variable) {
+  if (variable.find_first_of(":.") != std::string::npos) {
+    std::vector<std::string> parts;
+    boost::split(parts, variable, boost::is_any_of(":"));
+    for (auto& part : parts) {
+      int pos = part.find('.');
+      if (pos > 0) {
+        part[pos] = '[';
+        std::replace(part.begin(), part.end(), '.', ',');
+        part += "]";
+      }
+    }
+    variable = boost::algorithm::join(parts, ".");
+  }
+}
+
 // FIXME: should consolidate with the options from
 // the command line in stan::lang
 struct stan_csv_metadata {
@@ -192,11 +208,8 @@ class stan_csv_reader {
       std::getline(ss, token, ',');
       boost::trim(token);
 
-      int pos = token.find('.');
-      if (pos > 0 && prettify_name) {
-        token.replace(pos, 1, "[");
-        std::replace(token.begin(), token.end(), '.', ',');
-        token += "]";
+      if (prettify_name) {
+        prettify_stan_csv_name(token);
       }
       header[idx++] = token;
     }
