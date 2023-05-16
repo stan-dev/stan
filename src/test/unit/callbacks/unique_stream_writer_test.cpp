@@ -5,9 +5,8 @@
 class StanInterfaceCallbacksStreamWriter : public ::testing::Test {
  public:
   StanInterfaceCallbacksStreamWriter()
-      : ss(),
-        writer(std::unique_ptr<std::stringstream>(&ss)) {}
-  
+      : ss(), writer(std::unique_ptr<std::stringstream>(&ss)) {}
+
   void SetUp() {
     ss.str(std::string());
     ss.clear();
@@ -61,6 +60,5 @@ TEST_F(StanInterfaceCallbacksStreamWriter, null) {
 
 TEST_F(StanInterfaceCallbacksStreamWriter, string) {
   EXPECT_NO_THROW(writer("message"));
-  EXPECT_EQ("message\n",
-            writer.get_stream().str());
+  EXPECT_EQ("message\n", writer.get_stream().str());
 }
