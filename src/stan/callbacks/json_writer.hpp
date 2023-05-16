@@ -215,7 +215,7 @@ class json_writer {
   void write(const std::string& key) {
     write_sep();
     write_key(key);
-    *output_ << "\"null\" ";
+    *output_ << "null";
   }
 
   /**
