@@ -54,5 +54,5 @@ TEST(modelIndexingRvalueIndexSize, minMax) {
   EXPECT_EQ(0, rvalue_index_size(mm3, 10));
 
   index_min_max mm4(1, 0);
-  EXPECT_EQ(0, rvalue_index_size(mm3, 10));
+  EXPECT_EQ(0, rvalue_index_size(mm4, 10));
 }
