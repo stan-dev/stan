@@ -23,8 +23,8 @@ class StanInterfaceCallbacksJsonWriter : public ::testing::Test {
 };
 
 TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_end) {
-  EXPECT_NO_THROW(writer.begin_record());
-  EXPECT_NO_THROW(writer.end_record());
+  writer.begin_record();
+  writer.end_record();
   EXPECT_EQ("{}", ss.str());
 }
 
@@ -35,16 +35,16 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
   for (int n = 0; n < N; ++n)
     x.push_back(n);
 
-  EXPECT_NO_THROW(writer.write(key, x));
+  writer.write(key, x);
   EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]", ss.str());
 
-  EXPECT_NO_THROW(writer.write(key, x));
+  writer.write(key, x);
   EXPECT_EQ(
       "\"key\" : [ 0, 1, 2, 3, 4 ]"
       ", \"key\" : [ 0, 1, 2, 3, 4 ]",
       ss.str());
 
-  EXPECT_NO_THROW(writer.write(key, x));
+  writer.write(key, x);
   EXPECT_EQ(
       "\"key\" : [ 0, 1, 2, 3, 4 ]"
       ", \"key\" : [ 0, 1, 2, 3, 4 ]"
@@ -55,26 +55,26 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
 TEST_F(StanInterfaceCallbacksJsonWriter, single_member) {
   std::string key("key");
   std::string value("value");
-  EXPECT_NO_THROW(writer.begin_record());
-  EXPECT_NO_THROW(writer.write(key, value));
-  EXPECT_NO_THROW(writer.end_record());
+  writer.begin_record();
+  writer.write(key, value);
+  writer.end_record();
   EXPECT_EQ("{\"key\" : \"value\"}", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
   std::string key("key");
   std::string value("value");
-  EXPECT_NO_THROW(writer.begin_record());
-  EXPECT_NO_THROW(writer.write(key, value));
-  EXPECT_NO_THROW(writer.write(key, value));
+  writer.begin_record();
+  writer.write(key, value);
+  writer.write(key, value);
 
   EXPECT_EQ(
       "{\"key\" : \"value\""
       ", \"key\" : \"value\"",
       ss.str());
 
-  EXPECT_NO_THROW(writer.write(key, value));
-  EXPECT_NO_THROW(writer.end_record());
+  writer.write(key, value);
+  writer.end_record();
   EXPECT_EQ(
       "{\"key\" : \"value\""
       ", \"key\" : \"value\""
@@ -87,8 +87,18 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision2) {
   std::string key("key");
   const int N = 5;
   std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
-  EXPECT_NO_THROW(writer.write(key, x));
+  writer.write(key, x);
   EXPECT_EQ("\"key\" : [ 1.2, 2.3, 3.5, 4.6 ]", ss.str());
+}
+
+TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_nan_inf) {
+  std::string key("key");
+  std::vector<double> x;
+  x.push_back(std::numeric_limits<double>::quiet_NaN());
+  x.push_back(std::numeric_limits<double>::infinity());
+  x.push_back(-std::numeric_limits<double>::infinity());
+  writer.write(key, x);
+  EXPECT_EQ("\"key\" : [ nan, inf, -inf ]", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_string_special_characters) {
@@ -96,7 +106,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_string_special_characters) {
   std::string key("key");
   std::string x(
       "the\\quick\"brown/\bfox\fjumped\nover\rthe\tlazy\vdog\atwotimes");
-  EXPECT_NO_THROW(writer.write(key, x));
+  writer.write(key, x);
   EXPECT_EQ(
       "\"key\" : "
       "\"the\\\\quick\\\"brown\\/"
@@ -107,7 +117,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision3) {
   const int N = 5;
   std::vector<double> x{1.23456789, 2.3456789, 3.45678910, 4.567890123};
   ss.precision(3);
-  EXPECT_NO_THROW(writer.write("key", x));
+  writer.write("key", x);
   EXPECT_EQ("\"key\" : [ 1.23, 2.35, 3.46, 4.57 ]", ss.str());
 }
 
@@ -117,16 +127,16 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_string_vector) {
   for (int n = 0; n < N; ++n)
     x.push_back(boost::lexical_cast<std::string>(n));
 
-  EXPECT_NO_THROW(writer.write("key", x));
+  writer.write("key", x);
   EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_null) {
-  EXPECT_NO_THROW(writer.write("message"));
+  writer.write("message");
   EXPECT_EQ("\"message\" : null", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_string) {
-  EXPECT_NO_THROW(writer.write("key", "value"));
+  writer.write("key", "value");
   EXPECT_EQ("\"key\" : \"value\"", ss.str());
 }
