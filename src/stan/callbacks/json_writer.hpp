@@ -12,8 +12,18 @@ namespace stan {
 namespace callbacks {
 
 /**
- * `json_writer` methods output JSON data to a stream piecewise,
- * allowing for streaming outputs of structured data.
+ * The `json_writer` callback is used output a single JSON object.
+ * A JSON object is a mapping from element names to values which can be
+ * either a scalar or array element, or a nested JSON object.
+ * Each object element is output piecewise.  Aside from the top-level object
+ * begin and object end events, all callback methods output the element
+ * name followed by the element value.
+ * 
+ * Because JSON format requires a comma between elements, the writer maintains
+ * internal state to determine whether or not to output the comma separator.
+ * However, the writer doesn't try to validate the object's internal structure
+ * or object completeness.
+ *
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
  * output stream
@@ -24,7 +34,7 @@ class json_writer {
   // Output stream
   std::unique_ptr<Stream, Deleter> output_{nullptr};
   // Whether or not the record's current object needs a comma separator
-  bool record_internal_needs_comma_ = false;
+  bool record_element_needs_comma_ = false;
   // Depth of records (used to determine whether or not to print comma
   // separator)
   int record_depth_ = 0;
@@ -44,10 +54,10 @@ class json_writer {
    * Determines whether a record's internal object requires a comma separator
    */
   void write_sep() {
-    if (record_internal_needs_comma_) {
+    if (record_element_needs_comma_) {
       *output_ << ", ";
     } else {
-      record_internal_needs_comma_ = true;
+      record_element_needs_comma_ = true;
     }
   }
 
@@ -178,33 +188,12 @@ class json_writer {
    * Writes "}", final token of a JSON record.
    */
   void end_record() {
+    *output_ << "}";
+    record_depth_--;
     if (record_depth_ > 0) {
-      *output_ << "}";
-      record_depth_--;
-      if (record_depth_ > 0) {
-        record_needs_comma_ = true;
-      }
-      record_internal_needs_comma_ = false;
-    } else {
-      throw std::runtime_error(
-          "Attempted to end record, but there is no open record.");
+      record_needs_comma_ = true;
     }
-  }
-
-  /**
-   * Writes "[", initial token of a JSON list.
-   */
-  void begin_list() {
-    *output_ << "[";
-    record_internal_needs_comma_ = false;
-  }
-  /**
-   * Writes "]", final token of a JSON list.
-   */
-  void end_list() {
-    *output_ << "]";
-    write_sep();
-    *output_ << "\n";
+    record_element_needs_comma_ = false;
   }
 
   /**
@@ -364,7 +353,7 @@ class json_writer {
    * Reset state
    */
   void reset() {
-    record_internal_needs_comma_ = false;
+    record_element_needs_comma_ = false;
     record_needs_comma_ = false;
     record_depth_ = 0;
   }

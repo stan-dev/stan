@@ -123,7 +123,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_string_vector) {
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_null) {
   EXPECT_NO_THROW(writer.write("message"));
-  EXPECT_EQ("\"message\" : \"null\" ", ss.str());
+  EXPECT_EQ("\"message\" : null", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_string) {
