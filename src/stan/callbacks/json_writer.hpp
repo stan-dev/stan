@@ -18,7 +18,7 @@ namespace callbacks {
  * Each object element is output piecewise.  Aside from the top-level object
  * begin and object end events, all callback methods output the element
  * name followed by the element value.
- * 
+ *
  * Because JSON format requires a comma between elements, the writer maintains
  * internal state to determine whether or not to output the comma separator.
  * However, the writer doesn't try to validate the object's internal structure
