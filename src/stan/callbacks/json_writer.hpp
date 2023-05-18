@@ -162,7 +162,7 @@ class json_writer {
     }
     *output_ << v.back() << " ]";
   }
-  
+
   /**
    * Writes a single value.  Corrects capitalization for inf and nans.
    *
@@ -181,10 +181,6 @@ class json_writer {
       *output_ << v;
     }
   }
-
-
-
-
 
  public:
   json_writer() : output_(nullptr) {}
