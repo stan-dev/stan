@@ -5,6 +5,11 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.32.2 (15 May 2023)
+======================================================================
+
+- Fixed handling of zero-sized parameters in standalone generated quantities.
+
 v2.32.1 (2 May 2023)
 ======================================================================
 
