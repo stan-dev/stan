@@ -2,6 +2,7 @@
 #define STAN_CALLBACKS_JSON_WRITER_HPP
 
 #include <stan/math/prim/fun/Eigen.hpp>
+#include <stan/math/rev.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -104,7 +105,42 @@ class json_writer {
    *
    * @param[in] key member name.
    */
-  void write_key(const std::string& key) { *output_ << "\"" << key << "\" : "; }
+  void write_key(const std::string& key) {
+    *output_ << "\"" << process_string(key) << "\" : ";
+  }
+
+  /**
+   * Writes a single value.  Corrects capitalization for inf and nans.
+   *
+   * @param[in] v value
+   */
+  void write_value(double v) {
+    if (unlikely(std::isinf(v))) {
+      if (v > 0) {
+        *output_ << "Inf";
+      } else {
+        *output_ << "-Inf";
+      }
+    } else if (unlikely(std::isnan(v))) {
+      *output_ << "NaN";
+    } else {
+      *output_ << v;
+    }
+  }
+
+  /**
+   * Writes a single complex value.
+   *
+   * @param[in] v value
+   */
+  void write_complex_value(std::complex<double> v) {
+    *output_ << "[";
+    write_value(v.real());
+    *output_ << ", ";
+    write_value(v.imag());
+    *output_ << "]";
+  }
+
   /**
    * Writes a set of comma separated strings.
    * Strings are cleaned to escape special characters.
@@ -112,14 +148,13 @@ class json_writer {
    * @param[in] v Values in a std::vector
    */
   void write_vector(const std::vector<std::string>& v) {
-    if (v.empty()) {
-      return;
-    }
     *output_ << "[ ";
-    auto last = v.end();
-    --last;
-    for (auto it = v.begin(); it != last; ++it) {
-      *output_ << process_string(*it) << ", ";
+    if (v.size() > 0) {
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+        *output_ << process_string(*it) << ", ";
+      }
     }
     *output_ << v.back() << " ]";
   }
@@ -130,56 +165,73 @@ class json_writer {
    * @param[in] v Values in a std::vector
    */
   void write_vector(const std::vector<double>& v) {
-    if (v.empty()) {
-      return;
-    }
     *output_ << "[ ";
-    auto last = v.end();
-    --last;
-    for (auto it = v.begin(); it != last; ++it) {
-      write_element(*it);
-      *output_ << ", ";
+    if (v.size() > 0) {
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+        write_value(*it);
+        *output_ << ", ";
+      }
+      write_value(v.back());
     }
-    write_element(v.back());
     *output_ << " ]";
   }
 
   /**
-   * Writes a set of comma separated values.
+   * Writes a set of comma separated integer values.
    *
    * @param[in] v Values in a std::vector
    */
-  template <class T>
-  void write_vector(const std::vector<T>& v) {
-    if (v.empty()) {
-      return;
-    }
+  void write_vector(const std::vector<int>& v) {
     *output_ << "[ ";
-    auto last = v.end();
-    --last;
-    for (auto it = v.begin(); it != last; ++it) {
-      *output_ << *it << ", ";
+    if (v.size() > 0) {
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+        *output_ << *it << ", ";
+      }
     }
     *output_ << v.back() << " ]";
   }
 
+
   /**
-   * Writes a single value.  Corrects capitalization for inf and nans.
+   * Writes a set of comma separated complex values.
    *
-   * @param[in] v value
+   * @param[in] v Values in a std::vector
    */
-  void write_element(double v) {
-    if (std::isinf(v)) {
-      if (v > 0) {
-        *output_ << "Inf";
-      } else {
-        *output_ << "-Inf";
+  void write_vector(const std::vector<std::complex<double>>& v) {
+    *output_ << "[ ";
+    if (v.size() > 0) {
+      size_t last = v.size() - 1;
+      for (size_t i = 0; i < last; ++i) {
+        write_complex_value(v[i]);
+        *output_ << ", ";
       }
-    } else if (std::isnan(v)) {
-      *output_ << "NaN";
-    } else {
-      *output_ << v;
+      write_complex_value(v[last]);
     }
+    *output_ <<  " ]";
+  }
+
+
+  /**
+   * Writes the set of comma separated values in an Eigen (row) vector.
+   *
+   * @param[in] v Values in a std::vector
+   */
+  template <typename Derived>
+  void write_eigen_vector(const Eigen::DenseBase<Derived>& v) {
+    *output_ << "[ ";
+    if (v.size() > 0) {
+      size_t last = v.size() - 1;
+      for (Eigen::Index i = 0; i < last; ++i) {
+        write_value(v[i]);
+        *output_ << ", ";
+      }
+      write_value(v[last]);
+    }
+    *output_ << " ]";
   }
 
  public:
@@ -309,7 +361,7 @@ class json_writer {
   void write(const std::string& key, double value) {
     write_sep();
     write_key(key);
-    *output_ << value;
+    write_value(value);
   }
 
   /**
@@ -320,8 +372,7 @@ class json_writer {
   void write(const std::string& key, const std::complex<double>& value) {
     write_sep();
     write_key(key);
-    *output_ << "\"" << key << "\" : [" << value.real() << ", " << value.imag()
-             << "]";
+    write_complex_value(value);
   }
 
   /**
@@ -329,35 +380,11 @@ class json_writer {
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  void write(const std::string& key, const std::vector<double>& values) {
+  template <typename T>
+  void write(const std::string& key, const std::vector<T>& values) {
     write_sep();
     write_key(key);
     write_vector(values);
-  }
-
-  /**
-   * Write a key-value pair where the value is a vector of strings to be made a
-   * list.
-   * @param key Name of the value pair
-   * @param values vector of strings to write.
-   */
-  void write(const std::string& key, const std::vector<std::string>& values) {
-    write_sep();
-    write_key(key);
-    write_vector(values);
-  }
-
-  /**
-   * Write a key-value pair where the value is an Eigen Matrix.
-   * @param key Name of the value pair
-   * @param mat Eigen Matrix to write.
-   */
-  void write(const std::string& key, const Eigen::MatrixXd& mat) {
-    write_sep();
-    write_key(key);
-    Eigen::IOFormat json_format(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                ", ", ", ", "[", "]", "[", "]");
-    *output_ << mat.format(json_format);
   }
 
   /**
@@ -368,31 +395,24 @@ class json_writer {
   void write(const std::string& key, const Eigen::VectorXd& vec) {
     write_sep();
     write_key(key);
-    Eigen::IOFormat json_format(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                ", ", "", "", "", "[", "]");
-    *output_ << vec.transpose().format(json_format);
+    write_eigen_vector(vec);
   }
 
   /**
-   * Write a key-value pair where the value is a Eigen RowVector.
+   * Write a key-value pair where the value is an Eigen Matrix.
    * @param key Name of the value pair
-   * @param vec Eigen RowVector to write.
+   * @param mat Eigen Matrix to write.
    */
-  void write(const std::string& key, const Eigen::RowVectorXd& vec) {
+  void write(const std::string& key, const Eigen::MatrixXd& mat) {
     write_sep();
     write_key(key);
-    Eigen::IOFormat json_format(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                ", ", "", "", "", "[", "]");
-    *output_ << vec.format(json_format);
-  }
-
-  /**
-   * Reset state
-   */
-  void reset() {
-    record_element_needs_comma_ = false;
-    record_needs_comma_ = false;
-    record_depth_ = 0;
+    *output_ << "[ ";
+    for(int i = 0; i < mat.rows()-1; ++i) {
+      write_eigen_vector(mat.row(i));
+      *output_ << ", ";
+    }
+    *output_ << write_eigen_vector(mat.row(mat.rows()-1));
+    *output_ << " ]";
   }
 };
 
