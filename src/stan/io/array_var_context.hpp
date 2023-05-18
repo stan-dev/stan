@@ -390,6 +390,13 @@ class array_var_context : public var_context {
   void validate_dims(const std::string& stage, const std::string& name,
                      const std::string& base_type,
                      const std::vector<size_t>& dims_declared) const {
+    size_t num_elts = 1;
+    for (auto& d : dims_declared) {
+      num_elts *= d;
+    }
+    if (num_elts == 0) {
+      return;
+    }
     stan::io::validate_dims(*this, stage, name, base_type, dims_declared);
   }
 
