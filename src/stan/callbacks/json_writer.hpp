@@ -15,14 +15,12 @@ namespace callbacks {
  * The `json_writer` callback is used output a single JSON object.
  * A JSON object is a mapping from element names to values which can be
  * either a scalar or array element, or a nested JSON object.
- * Each object element is output piecewise.  Aside from the top-level object
- * begin and object end events, all callback methods output the element
- * name followed by the element value.
- *
- * Because JSON format requires a comma between elements, the writer maintains
+ * Objects are output elementwise via `write` callbacks which send
+ * key, value pairs to the output stream.  Because JSON format
+ * requires a comma between elements, the writer maintains
  * internal state to determine whether or not to output the comma separator.
- * However, the writer doesn't try to validate the object's internal structure
- * or object completeness.
+ * The writer doesn't try to validate the object's internal structure
+ * or object completeness, only syntactic correctness.
  *
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
