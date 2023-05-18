@@ -98,7 +98,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_nan_inf) {
   x.push_back(std::numeric_limits<double>::infinity());
   x.push_back(-std::numeric_limits<double>::infinity());
   writer.write(key, x);
-  EXPECT_EQ("\"key\" : [ nan, inf, -inf ]", ss.str());
+  EXPECT_EQ("\"key\" : [ NaN, Inf, -Inf ]", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_string_special_characters) {

@@ -125,6 +125,26 @@ class json_writer {
   }
 
   /**
+   * Writes a set of comma separated double values.
+   *
+   * @param[in] v Values in a std::vector
+   */
+  void write_vector(const std::vector<double>& v) {
+    if (v.empty()) {
+      return;
+    }
+    *output_ << "[ ";
+    auto last = v.end();
+    --last;
+    for (auto it = v.begin(); it != last; ++it) {
+      write_element(*it);
+      *output_ << ", ";
+    }
+    write_element(v.back());
+    *output_ << " ]";
+  }
+
+  /**
    * Writes a set of comma separated values.
    *
    * @param[in] v Values in a std::vector
@@ -142,6 +162,29 @@ class json_writer {
     }
     *output_ << v.back() << " ]";
   }
+  
+  /**
+   * Writes a single value.  Corrects capitalization for inf and nans.
+   *
+   * @param[in] v value
+   */
+  void write_element(double v) {
+    if (std::isinf(v)) {
+      if (v > 0) {
+        *output_ << "Inf";
+      } else {
+        *output_ << "-Inf";
+      }
+    } else if (std::isnan(v)) {
+      *output_ << "NaN";
+    } else {
+      *output_ << v;
+    }
+  }
+
+
+
+
 
  public:
   json_writer() : output_(nullptr) {}
