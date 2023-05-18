@@ -195,7 +195,6 @@ class json_writer {
     *output_ << v.back() << " ]";
   }
 
-
   /**
    * Writes a set of comma separated complex values.
    *
@@ -211,9 +210,8 @@ class json_writer {
       }
       write_complex_value(v[last]);
     }
-    *output_ <<  " ]";
+    *output_ << " ]";
   }
-
 
   /**
    * Writes the set of comma separated values in an Eigen (row) vector.
@@ -407,11 +405,11 @@ class json_writer {
     write_sep();
     write_key(key);
     *output_ << "[ ";
-    for(int i = 0; i < mat.rows()-1; ++i) {
+    for (int i = 0; i < mat.rows() - 1; ++i) {
       write_eigen_vector(mat.row(i));
       *output_ << ", ";
     }
-    *output_ << write_eigen_vector(mat.row(mat.rows()-1));
+    *output_ << write_eigen_vector(mat.row(mat.rows() - 1));
     *output_ << " ]";
   }
 };

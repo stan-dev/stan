@@ -16,7 +16,7 @@ class StanInterfaceCallbacksJsonWriter : public ::testing::Test {
     ss.clear();
   }
 
-  void TearDown() { }
+  void TearDown() {}
 
   std::stringstream ss;
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer;
@@ -184,5 +184,3 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_complex_vector) {
   writer.write(key, x);
   EXPECT_EQ("\"key\" : [ [1.11, 2.11], [1.11, 2.11], [1.11, 2.11] ]", ss.str());
 }
-
-
