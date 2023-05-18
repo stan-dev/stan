@@ -184,3 +184,39 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_complex_vector) {
   writer.write(key, x);
   EXPECT_EQ("\"key\" : [ [1.11, 2.11], [1.11, 2.11], [1.11, 2.11] ]", ss.str());
 }
+
+TEST_F(StanInterfaceCallbacksJsonWriter, write_eigen_vector) {
+  std::string key("key");
+  Eigen::VectorXd x {{1.0, 2.0, 3.0, 4.0}};  
+  writer.write(key, x);
+  EXPECT_EQ("\"key\" : [ 1, 2, 3, 4 ]", ss.str());
+}
+
+TEST_F(StanInterfaceCallbacksJsonWriter, write_empty_eigen_vector) {
+  std::string key("key");
+  Eigen::VectorXd x;
+  writer.write(key, x);
+  EXPECT_EQ("\"key\" : [  ]", ss.str());
+}
+
+TEST_F(StanInterfaceCallbacksJsonWriter, write_eigen_rowvector) {
+  std::string key("key");
+  Eigen::RowVectorXd x {{1.0, 2.0, 3.0, 4.0}};  
+  writer.write(key, x);
+  EXPECT_EQ("\"key\" : [ 1, 2, 3, 4 ]", ss.str());
+}
+
+TEST_F(StanInterfaceCallbacksJsonWriter, write_eigen_matrix) {
+  std::string key("key");
+  Eigen::MatrixXd x {{1.0, 2.0}, {3.0, 4.0}};  
+  writer.write(key, x);
+  EXPECT_EQ("\"key\" : [ [ 1, 2 ], [ 3, 4 ] ]", ss.str());
+}
+
+TEST_F(StanInterfaceCallbacksJsonWriter, write_empty_eigen_matrix) {
+  std::string key("key");
+  Eigen::MatrixXd x;
+  writer.write(key, x);
+  EXPECT_EQ("\"key\" : [  ]", ss.str());
+}
+

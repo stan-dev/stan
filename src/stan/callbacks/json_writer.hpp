@@ -397,6 +397,17 @@ class json_writer {
   }
 
   /**
+   * Write a key-value pair where the value is an Eigen Vector.
+   * @param key Name of the value pair
+   * @param vec Eigen Vector to write.
+   */
+  void write(const std::string& key, const Eigen::RowVectorXd& vec) {
+    write_sep();
+    write_key(key);
+    write_eigen_vector(vec);
+  }
+
+  /**
    * Write a key-value pair where the value is an Eigen Matrix.
    * @param key Name of the value pair
    * @param mat Eigen Matrix to write.
@@ -405,11 +416,14 @@ class json_writer {
     write_sep();
     write_key(key);
     *output_ << "[ ";
-    for (int i = 0; i < mat.rows() - 1; ++i) {
-      write_eigen_vector(mat.row(i));
-      *output_ << ", ";
+    if (mat.rows() > 0) {
+      Eigen::Index last = mat.rows() - 1;
+      for (Eigen::Index i = 0; i < last; ++i) {
+        write_eigen_vector(mat.row(i));
+        *output_ << ", ";
+      }
+      write_eigen_vector(mat.row(last));
     }
-    *output_ << write_eigen_vector(mat.row(mat.rows() - 1));
     *output_ << " ]";
   }
 };
