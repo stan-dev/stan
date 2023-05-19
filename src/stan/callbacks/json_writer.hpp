@@ -2,7 +2,7 @@
 #define STAN_CALLBACKS_JSON_WRITER_HPP
 
 #include <stan/math/prim/fun/Eigen.hpp>
-#include <stan/math/rev.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -233,7 +233,12 @@ class json_writer {
   }
 
  public:
+  /**
+   * Constructs a no-op json writer.
+   *
+   */
   json_writer() : output_(nullptr) {}
+
   /**
    * Constructs a json writer with an output stream.
    *
@@ -241,13 +246,9 @@ class json_writer {
    * `std::ostream`
    */
   explicit json_writer(std::unique_ptr<Stream, Deleter>&& output)
-      : output_(std::move(output)) {
-    if (output_ == nullptr)
-      throw std::invalid_argument("writer cannot be null");
-  }
+      : output_(std::move(output)) {}
 
   json_writer(json_writer& other) = delete;
-  json_writer(json_writer&& other) : output_(std::move(other.output_)) {}
 
   ~json_writer() {}
 
