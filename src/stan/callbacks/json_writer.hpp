@@ -256,6 +256,8 @@ class json_writer {
    * Writes "{", initial token of a JSON record.
    */
   void begin_record() {
+    if (output_ == nullptr)
+      return;
     write_record_comma_if_needed();
     *output_ << "{";
     record_needs_comma_ = false;
@@ -267,6 +269,8 @@ class json_writer {
    * @param[in] key The name of the record.
    */
   void begin_record(const std::string& key) {
+    if (output_ == nullptr)
+      return;
     write_record_comma_if_needed();
     *output_ << "\"" << key << "\": {";
     record_needs_comma_ = false;
@@ -276,6 +280,8 @@ class json_writer {
    * Writes "}", final token of a JSON record.
    */
   void end_record() {
+    if (output_ == nullptr)
+      return;
     *output_ << "}";
     record_depth_--;
     if (record_depth_ > 0) {
@@ -290,6 +296,8 @@ class json_writer {
    * @param key Name of the value pair
    */
   void write(const std::string& key) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     *output_ << "null";
@@ -301,6 +309,8 @@ class json_writer {
    * @param value string to write.
    */
   void write(const std::string& key, const std::string& value) {
+    if (output_ == nullptr)
+      return;
     std::string processsed_string = process_string(value);
     write_sep();
     write_key(key);
@@ -313,6 +323,8 @@ class json_writer {
    * @param value pointer to chars to write.
    */
   void write(const std::string& key, const char* value) {
+    if (output_ == nullptr)
+      return;
     std::string processsed_string = process_string(value);
     write_sep();
     write_key(key);
@@ -325,6 +337,8 @@ class json_writer {
    * @param value bool to write.
    */
   void write(const std::string& key, bool value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     *output_ << (value ? "true" : "false");
@@ -336,6 +350,8 @@ class json_writer {
    * @param value int to write.
    */
   void write(const std::string& key, int value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     *output_ << value;
@@ -347,6 +363,8 @@ class json_writer {
    * @param value `std::size_t` to write.
    */
   void write(const std::string& key, std::size_t value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     *output_ << value;
@@ -358,6 +376,8 @@ class json_writer {
    * @param value double to write.
    */
   void write(const std::string& key, double value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     write_value(value);
@@ -369,6 +389,8 @@ class json_writer {
    * @param value complex value to write.
    */
   void write(const std::string& key, const std::complex<double>& value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     write_complex_value(value);
@@ -381,6 +403,8 @@ class json_writer {
    */
   template <typename T>
   void write(const std::string& key, const std::vector<T>& values) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     write_vector(values);
@@ -392,6 +416,8 @@ class json_writer {
    * @param vec Eigen Vector to write.
    */
   void write(const std::string& key, const Eigen::VectorXd& vec) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     write_eigen_vector(vec);
@@ -403,6 +429,8 @@ class json_writer {
    * @param vec Eigen Vector to write.
    */
   void write(const std::string& key, const Eigen::RowVectorXd& vec) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     write_eigen_vector(vec);
@@ -414,6 +442,8 @@ class json_writer {
    * @param mat Eigen Matrix to write.
    */
   void write(const std::string& key, const Eigen::MatrixXd& mat) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     *output_ << "[ ";
