@@ -219,3 +219,10 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_empty_eigen_matrix) {
   writer.write(key, x);
   EXPECT_EQ("\"key\" : [  ]", ss.str());
 }
+
+TEST_F(StanInterfaceCallbacksJsonWriter, no_op_writer) {
+  std::string key("key");
+  std::string value("value");
+  stan::callbacks::json_writer<std::stringstream, deleter_noop> writer;
+  EXPECT_NO_THROW(writer.write(key,value));
+}
