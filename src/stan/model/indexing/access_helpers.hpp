@@ -38,6 +38,7 @@ inline auto colwise_reverse(const T& x) {
  * @tparam T2 A scalar
  * @param x The value to assign to
  * @param y The value to assign from.
+ * @param name The name of the variable being assigned to (unused)
  */
 template <typename T1, typename T2,
           require_all_t<is_stan_scalar<T1>, is_stan_scalar<T2>>* = nullptr>
@@ -120,6 +121,7 @@ void assign_impl(T1&& x, T2&& y, const char* name) {
  * @tparam Mat2 A type derived from `EigenBase` with an arithmetic scalar.
  * @param x The var matrix to assign to
  * @param y The eigen matrix to assign from.
+ * @param name The name of the variable being assigned to
  */
 template <typename Mat1, typename Mat2, require_var_matrix_t<Mat1>* = nullptr,
           require_eigen_st<std::is_arithmetic, Mat2>* = nullptr>

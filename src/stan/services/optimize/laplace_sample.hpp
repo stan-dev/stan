@@ -43,11 +43,11 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
 
   // write names of params, tps, and gqs to sample writer
   std::vector<std::string> names;
+  names.push_back("log_p__");
+  names.push_back("log_q__");
   static const bool include_tp = true;
   static const bool include_gq = true;
   model.constrained_param_names(names, include_tp, include_gq);
-  names.push_back("log_p");
-  names.push_back("log_q");
   sample_writer(names);
 
   // create log density functor for vars and vals
@@ -110,10 +110,10 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
     // output draw, log_p, log_q
     std::vector<double> draw(&draw_vec(0), &draw_vec(0) + draw_size);
     double log_p = log_density_fun(unc_draw).val();
-    draw.push_back(log_p);
+    draw.insert(draw.begin(), log_p);
     Eigen::VectorXd diff = unc_draw - theta_hat;
     double log_q = diff.transpose() * half_hessian * diff;
-    draw.push_back(log_q);
+    draw.insert(draw.begin() + 1, log_q);
     sample_writer(draw);
   }
 }  // namespace internal

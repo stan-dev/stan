@@ -47,14 +47,6 @@ TEST_F(ServicesStandaloneGQ, genDraws_bernoulli) {
   ASSERT_EQ(1000, bern_csv.samples.rows());
   ASSERT_EQ(19, bern_csv.samples.cols());
 
-  // model bernoulli.stan has 1 param
-  std::vector<std::string> param_names;
-  std::vector<std::vector<size_t>> param_dimss;
-  stan::services::get_model_parameters(*model, param_names, param_dimss);
-
-  EXPECT_EQ(param_names.size(), 1);
-  EXPECT_EQ(param_dimss.size(), 1);
-
   std::stringstream sample_ss;
   stan::callbacks::stream_writer sample_writer(sample_ss, "");
   int return_code = stan::services::standalone_generate(
