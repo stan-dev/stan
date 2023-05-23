@@ -231,5 +231,5 @@ TEST_F(StanInterfaceCallbacksJsonWriter, no_op_writer2) {
   std::string key("key");
   std::string value("value");
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer(nullptr);
-  EXPECT_NO_THROW(writer.write(key,value));
+  EXPECT_NO_THROW(writer.write(key, value));
 }
