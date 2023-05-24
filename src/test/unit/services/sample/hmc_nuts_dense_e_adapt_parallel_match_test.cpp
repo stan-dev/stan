@@ -11,6 +11,7 @@
 auto&& blah = stan::math::init_threadpool_tbb();
 
 static constexpr size_t num_chains = 4;
+
 class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
  public:
   ServicesSampleHmcNutsDenseEAdaptParMatch()
@@ -24,6 +25,7 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
   }
+
   stan::io::empty_var_context data_context;
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
