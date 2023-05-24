@@ -1,8 +1,8 @@
 #ifndef STAN_CALLBACKS_JSON_WRITER_HPP
 #define STAN_CALLBACKS_JSON_WRITER_HPP
 
-#include <stan/callbacks/structured_writer.hpp>
 #include <stan/math/prim/fun/Eigen.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -13,19 +13,27 @@ namespace stan {
 namespace callbacks {
 
 /**
- * `json_writer` is an implementation of
- * `structured_writer` that writes JSON format data to a stream.
+ * The `json_writer` callback is used output a single JSON object.
+ * A JSON object is a mapping from element names to values which can be
+ * either a scalar or array element, or a nested JSON object.
+ * Objects are output elementwise via `write` callbacks which send
+ * key, value pairs to the output stream.  Because JSON format
+ * requires a comma between elements, the writer maintains
+ * internal state to determine whether or not to output the comma separator.
+ * The writer doesn't try to validate the object's internal structure
+ * or object completeness, only syntactic correctness.
+ *
  * @tparam Stream A type with with a valid `operator<<(std::string)`
  * @tparam Deleter A class with a valid `operator()` method for deleting the
  * output stream
  */
 template <typename Stream, typename Deleter = std::default_delete<Stream>>
-class json_writer final : public structured_writer {
+class json_writer {
  private:
   // Output stream
   std::unique_ptr<Stream, Deleter> output_{nullptr};
   // Whether or not the record's current object needs a comma separator
-  bool record_internal_needs_comma_ = false;
+  bool record_element_needs_comma_ = false;
   // Depth of records (used to determine whether or not to print comma
   // separator)
   int record_depth_ = 0;
@@ -45,10 +53,10 @@ class json_writer final : public structured_writer {
    * Determines whether a record's internal object requires a comma separator
    */
   void write_sep() {
-    if (record_internal_needs_comma_) {
+    if (record_element_needs_comma_) {
       *output_ << ", ";
     } else {
-      record_internal_needs_comma_ = true;
+      record_element_needs_comma_ = true;
     }
   }
 
@@ -97,7 +105,42 @@ class json_writer final : public structured_writer {
    *
    * @param[in] key member name.
    */
-  void write_key(const std::string& key) { *output_ << "\"" << key << "\" : "; }
+  void write_key(const std::string& key) {
+    *output_ << "\"" << process_string(key) << "\" : ";
+  }
+
+  /**
+   * Writes a single value.  Corrects capitalization for inf and nans.
+   *
+   * @param[in] v value
+   */
+  void write_value(double v) {
+    if (unlikely(std::isinf(v))) {
+      if (v > 0) {
+        *output_ << "Inf";
+      } else {
+        *output_ << "-Inf";
+      }
+    } else if (unlikely(std::isnan(v))) {
+      *output_ << "NaN";
+    } else {
+      *output_ << v;
+    }
+  }
+
+  /**
+   * Writes a single complex value.
+   *
+   * @param[in] v value
+   */
+  void write_complex_value(std::complex<double> v) {
+    *output_ << "[";
+    write_value(v.real());
+    *output_ << ", ";
+    write_value(v.imag());
+    *output_ << "]";
+  }
+
   /**
    * Writes a set of comma separated strings.
    * Strings are cleaned to escape special characters.
@@ -105,39 +148,97 @@ class json_writer final : public structured_writer {
    * @param[in] v Values in a std::vector
    */
   void write_vector(const std::vector<std::string>& v) {
-    if (v.empty()) {
-      return;
-    }
     *output_ << "[ ";
-    auto last = v.end();
-    --last;
-    for (auto it = v.begin(); it != last; ++it) {
-      *output_ << process_string(*it) << ", ";
+    if (v.size() > 0) {
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+        *output_ << process_string(*it) << ", ";
+      }
     }
     *output_ << v.back() << " ]";
   }
 
   /**
-   * Writes a set of comma separated values.
+   * Writes a set of comma separated double values.
    *
    * @param[in] v Values in a std::vector
    */
-  template <class T>
-  void write_vector(const std::vector<T>& v) {
-    if (v.empty()) {
-      return;
-    }
+  void write_vector(const std::vector<double>& v) {
     *output_ << "[ ";
-    auto last = v.end();
-    --last;
-    for (auto it = v.begin(); it != last; ++it) {
-      *output_ << *it << ", ";
+    if (v.size() > 0) {
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+        write_value(*it);
+        *output_ << ", ";
+      }
+      write_value(v.back());
+    }
+    *output_ << " ]";
+  }
+
+  /**
+   * Writes a set of comma separated integer values.
+   *
+   * @param[in] v Values in a std::vector
+   */
+  void write_vector(const std::vector<int>& v) {
+    *output_ << "[ ";
+    if (v.size() > 0) {
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+        *output_ << *it << ", ";
+      }
     }
     *output_ << v.back() << " ]";
   }
 
+  /**
+   * Writes a set of comma separated complex values.
+   *
+   * @param[in] v Values in a std::vector
+   */
+  void write_vector(const std::vector<std::complex<double>>& v) {
+    *output_ << "[ ";
+    if (v.size() > 0) {
+      size_t last = v.size() - 1;
+      for (size_t i = 0; i < last; ++i) {
+        write_complex_value(v[i]);
+        *output_ << ", ";
+      }
+      write_complex_value(v[last]);
+    }
+    *output_ << " ]";
+  }
+
+  /**
+   * Writes the set of comma separated values in an Eigen (row) vector.
+   *
+   * @param[in] v Values in a std::vector
+   */
+  template <typename Derived>
+  void write_eigen_vector(const Eigen::DenseBase<Derived>& v) {
+    *output_ << "[ ";
+    if (v.size() > 0) {
+      size_t last = v.size() - 1;
+      for (Eigen::Index i = 0; i < last; ++i) {
+        write_value(v[i]);
+        *output_ << ", ";
+      }
+      write_value(v[last]);
+    }
+    *output_ << " ]";
+  }
+
  public:
+  /**
+   * Constructs a no-op json writer.
+   *
+   */
   json_writer() : output_(nullptr) {}
+
   /**
    * Constructs a json writer with an output stream.
    *
@@ -145,20 +246,18 @@ class json_writer final : public structured_writer {
    * `std::ostream`
    */
   explicit json_writer(std::unique_ptr<Stream, Deleter>&& output)
-      : output_(std::move(output)) {
-    if (output_ == nullptr)
-      throw std::invalid_argument("writer cannot be null");
-  }
+      : output_(std::move(output)) {}
 
   json_writer(json_writer& other) = delete;
-  json_writer(json_writer&& other) : output_(std::move(other.output_)) {}
 
-  virtual ~json_writer() {}
+  ~json_writer() {}
 
   /**
    * Writes "{", initial token of a JSON record.
    */
   void begin_record() {
+    if (output_ == nullptr)
+      return;
     write_record_comma_if_needed();
     *output_ << "{";
     record_needs_comma_ = false;
@@ -170,6 +269,8 @@ class json_writer final : public structured_writer {
    * @param[in] key The name of the record.
    */
   void begin_record(const std::string& key) {
+    if (output_ == nullptr)
+      return;
     write_record_comma_if_needed();
     *output_ << "\"" << key << "\": {";
     record_needs_comma_ = false;
@@ -179,33 +280,14 @@ class json_writer final : public structured_writer {
    * Writes "}", final token of a JSON record.
    */
   void end_record() {
+    if (output_ == nullptr)
+      return;
+    *output_ << "}";
+    record_depth_--;
     if (record_depth_ > 0) {
-      *output_ << "}";
-      record_depth_--;
-      if (record_depth_ > 0) {
-        record_needs_comma_ = true;
-      }
-      record_internal_needs_comma_ = false;
-    } else {
-      throw std::runtime_error(
-          "Attempted to end record, but there is no open record.");
+      record_needs_comma_ = true;
     }
-  }
-
-  /**
-   * Writes "[", initial token of a JSON list.
-   */
-  void begin_list() {
-    *output_ << "[";
-    record_internal_needs_comma_ = false;
-  }
-  /**
-   * Writes "]", final token of a JSON list.
-   */
-  void end_list() {
-    *output_ << "]";
-    write_sep();
-    *output_ << "\n";
+    record_element_needs_comma_ = false;
   }
 
   /**
@@ -214,9 +296,11 @@ class json_writer final : public structured_writer {
    * @param key Name of the value pair
    */
   void write(const std::string& key) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
-    *output_ << "\"null\" ";
+    *output_ << "null";
   }
 
   /**
@@ -225,6 +309,8 @@ class json_writer final : public structured_writer {
    * @param value string to write.
    */
   void write(const std::string& key, const std::string& value) {
+    if (output_ == nullptr)
+      return;
     std::string processsed_string = process_string(value);
     write_sep();
     write_key(key);
@@ -237,6 +323,8 @@ class json_writer final : public structured_writer {
    * @param value pointer to chars to write.
    */
   void write(const std::string& key, const char* value) {
+    if (output_ == nullptr)
+      return;
     std::string processsed_string = process_string(value);
     write_sep();
     write_key(key);
@@ -249,6 +337,8 @@ class json_writer final : public structured_writer {
    * @param value bool to write.
    */
   void write(const std::string& key, bool value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     *output_ << (value ? "true" : "false");
@@ -260,6 +350,8 @@ class json_writer final : public structured_writer {
    * @param value int to write.
    */
   void write(const std::string& key, int value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     *output_ << value;
@@ -271,6 +363,8 @@ class json_writer final : public structured_writer {
    * @param value `std::size_t` to write.
    */
   void write(const std::string& key, std::size_t value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     *output_ << value;
@@ -282,9 +376,11 @@ class json_writer final : public structured_writer {
    * @param value double to write.
    */
   void write(const std::string& key, double value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
-    *output_ << value;
+    write_value(value);
   }
 
   /**
@@ -293,10 +389,11 @@ class json_writer final : public structured_writer {
    * @param value complex value to write.
    */
   void write(const std::string& key, const std::complex<double>& value) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
-    *output_ << "\"" << key << "\" : [" << value.real() << ", " << value.imag()
-             << "]";
+    write_complex_value(value);
   }
 
   /**
@@ -304,35 +401,13 @@ class json_writer final : public structured_writer {
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  void write(const std::string& key, const std::vector<double>& values) {
+  template <typename T>
+  void write(const std::string& key, const std::vector<T>& values) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
     write_vector(values);
-  }
-
-  /**
-   * Write a key-value pair where the value is a vector of strings to be made a
-   * list.
-   * @param key Name of the value pair
-   * @param values vector of strings to write.
-   */
-  void write(const std::string& key, const std::vector<std::string>& values) {
-    write_sep();
-    write_key(key);
-    write_vector(values);
-  }
-
-  /**
-   * Write a key-value pair where the value is an Eigen Matrix.
-   * @param key Name of the value pair
-   * @param mat Eigen Matrix to write.
-   */
-  void write(const std::string& key, const Eigen::MatrixXd& mat) {
-    write_sep();
-    write_key(key);
-    Eigen::IOFormat json_format(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                ", ", ", ", "[", "]", "[", "]");
-    *output_ << mat.format(json_format);
   }
 
   /**
@@ -341,33 +416,46 @@ class json_writer final : public structured_writer {
    * @param vec Eigen Vector to write.
    */
   void write(const std::string& key, const Eigen::VectorXd& vec) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
-    Eigen::IOFormat json_format(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                ", ", "", "", "", "[", "]");
-    *output_ << vec.transpose().format(json_format);
+    write_eigen_vector(vec);
   }
 
   /**
-   * Write a key-value pair where the value is a Eigen RowVector.
+   * Write a key-value pair where the value is an Eigen Vector.
    * @param key Name of the value pair
-   * @param vec Eigen RowVector to write.
+   * @param vec Eigen Vector to write.
    */
   void write(const std::string& key, const Eigen::RowVectorXd& vec) {
+    if (output_ == nullptr)
+      return;
     write_sep();
     write_key(key);
-    Eigen::IOFormat json_format(Eigen::StreamPrecision, Eigen::DontAlignCols,
-                                ", ", "", "", "", "[", "]");
-    *output_ << vec.format(json_format);
+    write_eigen_vector(vec);
   }
 
   /**
-   * Reset state
+   * Write a key-value pair where the value is an Eigen Matrix.
+   * @param key Name of the value pair
+   * @param mat Eigen Matrix to write.
    */
-  void reset() {
-    record_internal_needs_comma_ = false;
-    record_needs_comma_ = false;
-    record_depth_ = 0;
+  void write(const std::string& key, const Eigen::MatrixXd& mat) {
+    if (output_ == nullptr)
+      return;
+    write_sep();
+    write_key(key);
+    *output_ << "[ ";
+    if (mat.rows() > 0) {
+      Eigen::Index last = mat.rows() - 1;
+      for (Eigen::Index i = 0; i < last; ++i) {
+        write_eigen_vector(mat.row(i));
+        *output_ << ", ";
+      }
+      write_eigen_vector(mat.row(last));
+    }
+    *output_ << " ]";
   }
 };
 

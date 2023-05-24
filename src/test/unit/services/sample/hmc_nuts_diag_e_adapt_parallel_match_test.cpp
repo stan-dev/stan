@@ -95,7 +95,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
   }
   std::vector<Eigen::MatrixXd> par_res;
   for (int i = 0; i < num_chains; ++i) {
-    auto par_str = ss_par[i].str();
+    auto par_str = par_parameters[i].get_stream().str();
     auto sub_par_str = par_str.substr(par_str.find("Diagonal") - 1);
     std::istringstream sub_par_stream(sub_par_str);
     Eigen::MatrixXd par_mat
@@ -104,7 +104,7 @@ TEST_F(ServicesSampleHmcNutsDiagEAdaptParMatch, single_multi_match) {
   }
   std::vector<Eigen::MatrixXd> seq_res;
   for (int i = 0; i < num_chains; ++i) {
-    auto seq_str = ss_seq[i].str();
+    auto seq_str = seq_parameters[i].get_stream().str();
     auto sub_seq_str = seq_str.substr(seq_str.find("Diagonal") - 1);
     std::istringstream sub_seq_stream(sub_seq_str);
     Eigen::MatrixXd seq_mat
