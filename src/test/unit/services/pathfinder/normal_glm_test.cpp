@@ -1,11 +1,4 @@
 #include <stdexcept>
-/*
-#ifdef eigen_assert
-#undef eigen_assert
-#endif
-#define eigen_assert(x) \
-  if (!(x)) { throw (std::runtime_error("Nooo")); }
-*/
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>

@@ -30,10 +30,10 @@ namespace pathfinder {
  * @tparam Model A model implementation
  * @tparam InitContext Type inheriting from `stan::io::var_context`
  * @tparam InitWriter Type inheriting from `stan::io::writer`
- * @tparam DiagnosticWriter Type inheriting from stan::callbacks::writer
- * @tparam ParamWriter Type inheriting from stan::callbacks::writer
- * @tparam SingleDiagnosticWriter Type inheriting from stan::callbacks::writer
- * @tparam SingleParamWriter Type inheriting from stan::callbacks::writer
+ * @tparam DiagnosticWriter Type inheriting from `stan::callbacks::writer`
+ * @tparam ParamWriter Type inheriting from `stan::callbacks::writer`
+ * @tparam SingleDiagnosticWriter Type inheriting from `stan::callbacks::writer`
+ * @tparam SingleParamWriter Type inheriting from `stan::callbacks::writer`
  * @param[in] model defining target log density and transforms (log $p$ in
  * paper)
  * @param[in] init ($pi_0$ in paper) var context for initialization. Random
@@ -120,7 +120,7 @@ inline int pathfinder_lbfgs_multi(
                   interrupt, logger, init_writers[iter],
                   single_path_parameter_writer[iter],
                   single_path_diagnostic_writer[iter]);
-          if (std::get<0>(pathfinder_ret) == error_codes::SOFTWARE) {
+          if (unlikely(std::get<0>(pathfinder_ret) == error_codes::SOFTWARE)) {
             logger.info(std::string("Pathfinder iteration: ")
                         + std::to_string(iter) + " failed.");
             return;
