@@ -33,6 +33,7 @@ class ServicesSampleHmcNutsDenseEAdaptParMatch : public testing::Test {
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
   }
+
   stan::io::empty_var_context data_context;
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
@@ -97,7 +98,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
 
   std::vector<Eigen::MatrixXd> par_res;
   for (int i = 0; i < num_chains; ++i) {
-    auto par_str = ss_par[i].str();
+    auto par_str = par_parameters[i].get_stream().str();
     auto sub_par_str = par_str.substr(par_str.find("Elements") - 1);
     std::istringstream sub_par_stream(sub_par_str);
     Eigen::MatrixXd par_mat
@@ -106,7 +107,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptParMatch, single_multi_match) {
   }
   std::vector<Eigen::MatrixXd> seq_res;
   for (int i = 0; i < num_chains; ++i) {
-    auto seq_str = ss_seq[i].str();
+    auto seq_str = seq_parameters[i].get_stream().str();
     auto sub_seq_str = seq_str.substr(seq_str.find("Elements") - 1);
     std::istringstream sub_seq_stream(sub_seq_str);
     Eigen::MatrixXd seq_mat
