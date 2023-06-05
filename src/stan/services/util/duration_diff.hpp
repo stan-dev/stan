@@ -10,6 +10,8 @@ namespace util {
 
 /**
  * Convert time points into a count in seconds.
+ * @tparam Scale The scale of the output. For example, if Scale is 1000, the
+ * output will be in units of seconds with millisecond precision.
  * @tparam T A type that whose output from a `operator-` is accepted by duration
  * cast. This is normally a
  * `std::chrono::time_point<std::chrono::high_resolution_clock>` from

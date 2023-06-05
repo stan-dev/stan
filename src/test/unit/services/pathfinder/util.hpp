@@ -15,12 +15,12 @@ struct mock_callback : public stan::callbacks::interrupt {
   void operator()() { n++; }
 };
 
-class loggy : public stan::callbacks::logger {
+class test_logger : public stan::callbacks::logger {
   std::ostream& log_;
 
  public:
-  loggy(std::ostream& x) : log_(x) {}
-  loggy() : log_(std::cout) {}
+  test_logger(std::ostream& x) : log_(x) {}
+  test_logger() : log_(std::cout) {}
   /**
    * Logs a message with debug log level
    *
@@ -102,7 +102,10 @@ class loggy : public stan::callbacks::logger {
   }
 };
 
-class values : public stan::callbacks::stream_writer {
+/**
+ * Writer that stores results in memory. 
+ */
+class in_memory_writer : public stan::callbacks::stream_writer {
  public:
   std::vector<std::string> names_;
   std::vector<std::string> times_;
@@ -110,7 +113,7 @@ class values : public stan::callbacks::stream_writer {
   std::vector<Eigen::VectorXd> eigen_states_;
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> optim_path_;
   Eigen::MatrixXd values_;
-  values(std::ostream& stream) : stan::callbacks::stream_writer(stream) {}
+  in_memory_writer(std::ostream& stream) : stan::callbacks::stream_writer(stream) {}
 
   /**
    * Writes a set of names.

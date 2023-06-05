@@ -51,7 +51,7 @@ class ServicesPathfinderEightSchools : public testing::Test {
 
   std::stringstream init_ss, parameter_ss, diagnostic_ss, model_ss;
   stan::callbacks::stream_writer init;
-  stan::test::values parameter;
+  stan::test::in_memory_writer parameter;
   stan::callbacks::json_writer<std::stringstream, stan::test::deleter_noop>
       diagnostics;
   stan::io::array_var_context context;
@@ -80,7 +80,7 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   constexpr int refresh = 1;
   constexpr bool save_iterations = false;
   std::ofstream empty_ostream(nullptr);
-  stan::test::loggy logger(empty_ostream);
+  stan::test::test_logger logger(empty_ostream);
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
   std::vector<stan::callbacks::structured_writer> single_path_diagnostic_writer(
       num_paths);
@@ -162,7 +162,7 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   constexpr bool save_iterations = false;
   constexpr int refresh = 0;
   std::ofstream empty_ostream("../test.log");
-  stan::test::loggy logger(empty_ostream);
+  stan::test::test_logger logger(empty_ostream);
   stan::test::mock_callback callback;
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
       model, context, seed, stride_id, init_radius, history_size, init_alpha,
