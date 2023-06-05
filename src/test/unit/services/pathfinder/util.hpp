@@ -103,7 +103,7 @@ class test_logger : public stan::callbacks::logger {
 };
 
 /**
- * Writer that stores results in memory. 
+ * Writer that stores results in memory.
  */
 class in_memory_writer : public stan::callbacks::stream_writer {
  public:
@@ -113,7 +113,8 @@ class in_memory_writer : public stan::callbacks::stream_writer {
   std::vector<Eigen::VectorXd> eigen_states_;
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> optim_path_;
   Eigen::MatrixXd values_;
-  in_memory_writer(std::ostream& stream) : stan::callbacks::stream_writer(stream) {}
+  in_memory_writer(std::ostream& stream)
+      : stan::callbacks::stream_writer(stream) {}
 
   /**
    * Writes a set of names.
