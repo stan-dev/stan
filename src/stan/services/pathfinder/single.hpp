@@ -24,7 +24,6 @@ namespace services {
 namespace pathfinder {
 namespace internal {
 
-
 /**
  * Check the optimization direction is strictly positive and curvature is 'tame'
  * @tparam EigVec1 Type derived from `Eigen::DenseBase` with one column at
@@ -233,12 +232,13 @@ inline elbo_est_t est_approx_draws(LPF&& lp_fun, ConstrainF&& constrain_fun,
                            + num_params * stan::math::LOG_TWO_PI);
   Eigen::MatrixXd approx_samples
       = approximate_samples(std::move(unit_samps), taylor_approx);
-  const auto log_stream = [](auto& logger, auto& pathfinder_ss, const auto& iter_msg) {
-    if (pathfinder_ss.str().length() == 0)
-      return;
-    logger.info(iter_msg + pathfinder_ss.str());
-    pathfinder_ss.str(std::string());
-  };
+  const auto log_stream
+      = [](auto& logger, auto& pathfinder_ss, const auto& iter_msg) {
+          if (pathfinder_ss.str().length() == 0)
+            return;
+          logger.info(iter_msg + pathfinder_ss.str());
+          pathfinder_ss.str(std::string());
+        };
   Eigen::VectorXd approx_samples_col;
   std::stringstream pathfinder_ss;
   for (Eigen::Index i = 0; i < num_samples; ++i) {
@@ -291,11 +291,14 @@ template <typename GradMat, typename AlphaVec, typename DkVec, typename InvMat,
 inline taylor_approx_t taylor_approximation_dense(
     GradMat&& Ykt_mat, const AlphaVec& alpha, const DkVec& Dk,
     const InvMat& ninvRST, const EigVec& point_est, const EigVec& grad_est) {
-  auto y_tcrossprod_alpha_expr = Ykt_mat.transpose() * alpha.array().sqrt().matrix().asDiagonal();
-  Eigen::MatrixXd y_tcrossprod_alpha = 
-    Eigen::MatrixXd(y_tcrossprod_alpha_expr.rows(), 
-      y_tcrossprod_alpha_expr.rows()).setZero().selfadjointView<Eigen::Lower>()
-       .rankUpdate(std::move(y_tcrossprod_alpha_expr));
+  auto y_tcrossprod_alpha_expr
+      = Ykt_mat.transpose() * alpha.array().sqrt().matrix().asDiagonal();
+  Eigen::MatrixXd y_tcrossprod_alpha
+      = Eigen::MatrixXd(y_tcrossprod_alpha_expr.rows(),
+                        y_tcrossprod_alpha_expr.rows())
+            .setZero()
+            .selfadjointView<Eigen::Lower>()
+            .rankUpdate(std::move(y_tcrossprod_alpha_expr));
   /*
    * + DK.asDiagonal() cannot be done on same line
    * See https://forum.kde.org/viewtopic.php?f=74&t=136617
@@ -357,10 +360,11 @@ inline taylor_approx_t taylor_approximation_sparse(
       = Eigen::MatrixXd::Identity(history_size, history_size);
   Mkbar.bottomLeftCorner(history_size, history_size)
       = Eigen::MatrixXd::Identity(history_size, history_size);
-  Eigen::MatrixXd y_tcrossprod_alpha = Eigen::MatrixXd(y_mul_sqrt_alpha.rows(), y_mul_sqrt_alpha.rows())
-    .setZero()
-    .selfadjointView<Eigen::Lower>()
-    .rankUpdate(std::move(y_mul_sqrt_alpha));
+  Eigen::MatrixXd y_tcrossprod_alpha
+      = Eigen::MatrixXd(y_mul_sqrt_alpha.rows(), y_mul_sqrt_alpha.rows())
+            .setZero()
+            .selfadjointView<Eigen::Lower>()
+            .rankUpdate(std::move(y_mul_sqrt_alpha));
   y_tcrossprod_alpha += Dk.asDiagonal();
   Mkbar.bottomRightCorner(history_size, history_size) = y_tcrossprod_alpha;
   Wkbart.transposeInPlace();
@@ -372,11 +376,13 @@ inline taylor_approx_t taylor_approximation_sparse(
   Rkbar.triangularView<Eigen::StrictlyLower>().setZero();
   Eigen::MatrixXd Qk
       = qr.householderQ() * Eigen::MatrixXd::Identity(num_params, min_size);
-  Eigen::MatrixXd L_approx = (Rkbar.triangularView<Eigen::Upper>() * Mkbar * Rkbar.transpose().triangularView<Eigen::Lower>()
-                              + Eigen::MatrixXd::Identity(min_size, min_size))
-                                 .llt()
-                                 .matrixL()
-                                 .transpose();
+  Eigen::MatrixXd L_approx
+      = (Rkbar.triangularView<Eigen::Upper>() * Mkbar
+             * Rkbar.transpose().triangularView<Eigen::Lower>()
+         + Eigen::MatrixXd::Identity(min_size, min_size))
+            .llt()
+            .matrixL()
+            .transpose();
   double logdetcholHk = L_approx.diagonal().array().abs().log().sum()
                         + 0.5 * alpha.array().log().sum();
   Eigen::VectorXd ninvRSTg = ninvRST * grad_est;
@@ -728,8 +734,10 @@ inline auto pathfinder_lbfgs_single(
         double y_s = Yk.dot(Sk);
         alpha = y_s
                 / (y_alpha_y / alpha.array() + Yk.array().square()
-                  - (y_alpha_y / Sk.dot(alpha.array().inverse().matrix().asDiagonal() * Sk))
-                        * (Sk.array() / alpha.array()).square());
+                   - (y_alpha_y
+                      / Sk.dot(alpha.array().inverse().matrix().asDiagonal()
+                               * Sk))
+                         * (Sk.array() / alpha.array()).square());
       }
       Eigen::Map<Eigen::MatrixXd> Ykt_map(Ykt_mat.data(), num_parameters,
                                           history_size);
