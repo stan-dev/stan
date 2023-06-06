@@ -8,6 +8,15 @@
 
 namespace stan {
 namespace test {
+
+/**
+ * A deleter that does nothing.
+ */
+struct deleter_noop {
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
+};
+
 /**
  * Read a CSV into an Eigen matrix.
  * @param in An input string stream holding the CSV

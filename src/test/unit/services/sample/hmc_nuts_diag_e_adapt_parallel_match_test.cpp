@@ -11,15 +11,23 @@
 auto&& blah = stan::math::init_threadpool_tbb();
 
 static constexpr size_t num_chains = 4;
+struct deleter_noop {
+  template <typename T>
+  constexpr void operator()(T* arg) const {}
+};
 class ServicesSampleHmcNutsDiagEAdaptParMatch : public testing::Test {
  public:
   ServicesSampleHmcNutsDiagEAdaptParMatch()
       : model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
-          data_context, 0, &model_log)) {
+          data_context, 0, &model_log)),
+        ss_par(num_chains),
+        ss_seq(num_chains) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
-      par_parameters.emplace_back(std::make_unique<std::stringstream>(), "#");
-      seq_parameters.emplace_back(std::make_unique<std::stringstream>(), "#");
+      par_parameters.emplace_back(
+          std::unique_ptr<std::stringstream, deleter_noop>(&ss_par[i]), "#");
+      seq_parameters.emplace_back(
+          std::unique_ptr<std::stringstream, deleter_noop>(&ss_seq[i]), "#");
       diagnostic.push_back(stan::test::unit::instrumented_writer{});
       context.push_back(std::make_shared<stan::io::empty_var_context>());
     }
@@ -28,7 +36,10 @@ class ServicesSampleHmcNutsDiagEAdaptParMatch : public testing::Test {
   std::stringstream model_log;
   stan::test::unit::instrumented_logger logger;
   std::vector<stan::test::unit::instrumented_writer> init;
-  using str_writer = stan::callbacks::unique_stream_writer<std::stringstream>;
+  std::vector<std::stringstream> ss_par;
+  std::vector<std::stringstream> ss_seq;
+  using str_writer
+      = stan::callbacks::unique_stream_writer<std::stringstream, deleter_noop>;
   std::vector<str_writer> par_parameters;
   std::vector<str_writer> seq_parameters;
   std::vector<stan::test::unit::instrumented_writer> diagnostic;

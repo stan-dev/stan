@@ -69,7 +69,7 @@ class serializer {
    * Attempting to write beyond the end of data_r will raise a runtime
    * exception.
    *
-   * @param RVec Vector like class.
+   * @tparam RVec Vector like class.
    * @param data_r Storage vector
    */
   template <typename RVec, require_vector_like_t<RVec>* = nullptr>
