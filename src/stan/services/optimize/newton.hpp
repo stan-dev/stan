@@ -89,8 +89,7 @@ int newton(Model& model, const stan::io::var_context& init,
       std::vector<double> values;
       std::stringstream ss;
       model.write_array(rng, cont_vector, disc_vector, values, true, true, &ss);
-      if (ss.str().length() > 0)
-        logger.info(ss);
+      logger.info(ss);
       values.insert(values.begin(), lp);
       parameter_writer(values);
     }
@@ -113,8 +112,7 @@ int newton(Model& model, const stan::io::var_context& init,
     std::vector<double> values;
     std::stringstream ss;
     model.write_array(rng, cont_vector, disc_vector, values, true, true, &ss);
-    if (ss.str().length() > 0)
-      logger.info(ss);
+    logger.info(ss);
     values.insert(values.begin(), lp);
     parameter_writer(values);
   }
