@@ -23,6 +23,7 @@ namespace optimization {
  *
  * This function implements the full parameter version of CubicInterp().
  *
+ * @tparam Scalar A scalar type used by all the function arguments
  * @param df0 First derivative value, f'(x0)
  * @param x1 Second point
  * @param f1 Second function value, f(x1)
@@ -88,6 +89,7 @@ Scalar CubicInterp(const Scalar &df0, const Scalar &x1, const Scalar &f1,
  * finds the minimal value of g(x) on the interval [loX,hiX] including
  * the end points.
  *
+ * @tparam Scalar A scalar type used by all the function arguments
  * @param x0 First point
  * @param f0 First function value, f(x0)
  * @param df0 First derivative value, f'(x0)
@@ -182,6 +184,10 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
  * where x is the input point, f and g are the function value and
  * gradient at x and ret is non-zero if function evaluation fails.
  *
+ * @tparam Scalar A scalar type
+ *
+ * @tparam XType A scalar type
+ *
  * @param func Function which is being minimized.
  *
  * @param alpha First value of \f$ \alpha \f$ to try.  Upon return this
@@ -219,10 +225,10 @@ int WolfLSZoom(Scalar &alpha, XType &newX, Scalar &newF, XType &newDF,
  * @return Returns zero on success, non-zero otherwise.
  **/
 template <typename FunctorType, typename Scalar, typename XType>
-int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1, Scalar &f1,
-                    XType &gradx1, const XType &p, const XType &x0,
-                    const Scalar &f0, const XType &gradx0, const Scalar &c1,
-                    const Scalar &c2, const Scalar &minAlpha,
+int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1,
+                    Scalar &func_val, XType &gradx1, const XType &p,
+                    const XType &x0, const Scalar &f0, const XType &gradx0,
+                    const Scalar &c1, const Scalar &c2, const Scalar &minAlpha,
                     const Scalar &maxLSIts, const Scalar &maxLSRestarts) {
   const Scalar dfp(gradx0.dot(p));
   const Scalar c1dfp(c1 * dfp);
@@ -245,7 +251,7 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1, Scalar &f1,
     }
 
     x1.noalias() = x0 + alpha1 * p;
-    ret = func(x1, f1, gradx1);
+    ret = func(x1, func_val, gradx1);
     if (ret != 0) {
       if (lsRestarts >= maxLSRestarts) {
         retCode = 1;
@@ -259,10 +265,10 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1, Scalar &f1,
     lsRestarts = 0;
 
     newDFp = gradx1.dot(p);
-    if ((f1 > f0 + alpha * c1dfp) || (f1 >= prevF && nits > 0)) {
-      retCode
-          = WolfLSZoom(alpha, x1, f1, gradx1, func, x0, f0, dfp, c1dfp, c2dfp,
-                       p, alpha0, prevF, prevDFp, alpha1, f1, newDFp, 1e-16);
+    if ((func_val > f0 + alpha * c1dfp) || (func_val >= prevF && nits > 0)) {
+      retCode = WolfLSZoom(alpha, x1, func_val, gradx1, func, x0, f0, dfp,
+                           c1dfp, c2dfp, p, alpha0, prevF, prevDFp, alpha1,
+                           func_val, newDFp, 1e-16);
       break;
     }
     if (std::fabs(newDFp) <= -c2dfp) {
@@ -270,14 +276,14 @@ int WolfeLineSearch(FunctorType &func, Scalar &alpha, XType &x1, Scalar &f1,
       break;
     }
     if (newDFp >= 0) {
-      retCode
-          = WolfLSZoom(alpha, x1, f1, gradx1, func, x0, f0, dfp, c1dfp, c2dfp,
-                       p, alpha1, f1, newDFp, alpha0, prevF, prevDFp, 1e-16);
+      retCode = WolfLSZoom(alpha, x1, func_val, gradx1, func, x0, f0, dfp,
+                           c1dfp, c2dfp, p, alpha1, func_val, newDFp, alpha0,
+                           prevF, prevDFp, 1e-16);
       break;
     }
 
     alpha0 = alpha1;
-    prevF = f1;
+    prevF = func_val;
     std::swap(prevDF, gradx1);
     prevDFp = newDFp;
 
