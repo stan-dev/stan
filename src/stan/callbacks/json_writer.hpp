@@ -248,7 +248,12 @@ class json_writer {
   explicit json_writer(std::unique_ptr<Stream, Deleter>&& output)
       : output_(std::move(output)) {}
 
+  /** copy constructor */
   json_writer(json_writer& other) = delete;
+
+  /** move constructor */
+  json_writer(json_writer&& other) noexcept
+      : output_(std::move(other.output_)) {}
 
   ~json_writer() {}
 
