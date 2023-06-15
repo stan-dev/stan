@@ -27,9 +27,9 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void debug(const std::string& message) { 
+  virtual void debug(const std::string& message) {
     if (log_ != nullptr) {
-      *log_ << message << "\n"; 
+      *log_ << message << "\n";
     }
   }
 
@@ -49,9 +49,9 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void info(const std::string& message) { 
+  virtual void info(const std::string& message) {
     if (log_ != nullptr) {
-      *log_ << message << "\n"; 
+      *log_ << message << "\n";
     }
   }
 
@@ -62,7 +62,7 @@ class test_logger : public stan::callbacks::logger {
    */
   virtual void info(const std::stringstream& message) {
     if (log_ != nullptr) {
-      *log_ << message.str() << "\n"; 
+      *log_ << message.str() << "\n";
     }
   }
 
@@ -71,9 +71,9 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void warn(const std::string& message) { 
+  virtual void warn(const std::string& message) {
     if (log_ != nullptr) {
-      *log_ << message << "\n"; 
+      *log_ << message << "\n";
     }
   }
 
@@ -84,7 +84,7 @@ class test_logger : public stan::callbacks::logger {
    */
   virtual void warn(const std::stringstream& message) {
     if (log_ != nullptr) {
-      *log_ << message.str() << "\n"; 
+      *log_ << message.str() << "\n";
     }
   }
 
@@ -93,9 +93,7 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void error(const std::string& message) { 
-    *log_ << message << "\n"; 
-  }
+  virtual void error(const std::string& message) { *log_ << message << "\n"; }
 
   /**
    * Logs an error with error log level.
@@ -113,9 +111,9 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void fatal(const std::string& message) { 
+  virtual void fatal(const std::string& message) {
     if (log_ != nullptr) {
-      *log_ << message << "\n"; 
+      *log_ << message << "\n";
     }
   }
 

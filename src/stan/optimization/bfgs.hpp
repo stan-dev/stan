@@ -406,7 +406,8 @@ class BFGSLineSearch
                  LSOpt &&ls_options, ConvergeOpt &&convergence_options,
                  QnUpdater &&qn_update, std::ostream *msgs = 0)
       : BFGSBase(_adaptor, params_r, ls_options, convergence_options,
-                 qn_update), _adaptor(model, params_i, msgs) {
+                 qn_update),
+        _adaptor(model, params_i, msgs) {
     BFGSBase::initialize(params_r);
   }
 
