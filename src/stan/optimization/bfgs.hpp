@@ -137,10 +137,10 @@ class BFGSMinimizer {
     }
   }
   template <typename Func>
-  explicit BFGSMinimizer(Func&& f) : _func(std::forward<Func>(f)) {}
-  template <typename Func, typename Vec, require_vector_t<Vec> * = nullptr, typename LSOpt,
-            typename ConvergeOpt, typename QnUpdater>
-  explicit BFGSMinimizer(Func&& f, Vec &&params_r, LSOpt &&ls_opt,
+  explicit BFGSMinimizer(Func &&f) : _func(std::forward<Func>(f)) {}
+  template <typename Func, typename Vec, require_vector_t<Vec> * = nullptr,
+            typename LSOpt, typename ConvergeOpt, typename QnUpdater>
+  explicit BFGSMinimizer(Func &&f, Vec &&params_r, LSOpt &&ls_opt,
                          ConvergeOpt &&conv_opt, QnUpdater &&updater)
       : _func(std::forward<Func>(f)),
         _qn(std::forward<QnUpdater>(updater)),
@@ -383,7 +383,6 @@ template <typename M, typename QNUpdateType, typename Scalar = double,
 class BFGSLineSearch
     : public BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
                            DimAtCompile> {
-
  public:
   typedef BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
                         DimAtCompile>
@@ -394,7 +393,7 @@ class BFGSLineSearch
   template <typename Vec, require_vector_t<Vec> * = nullptr>
   BFGSLineSearch(M &model, Vec &&params_r, const std::vector<int> &params_i,
                  std::ostream *msgs = 0)
-      :  BFGSBase(ModelAdaptor<M, jacobian>(model, params_i,  msgs)) {
+      : BFGSBase(ModelAdaptor<M, jacobian>(model, params_i, msgs)) {
     BFGSBase::initialize(params_r);
   }
 
@@ -403,8 +402,8 @@ class BFGSLineSearch
   BFGSLineSearch(M &model, Vec &&params_r, const std::vector<int> &params_i,
                  LSOpt &&ls_options, ConvergeOpt &&convergence_options,
                  QnUpdater &&qn_update, std::ostream *msgs = 0)
-      : BFGSBase(ModelAdaptor<M, jacobian>(model, params_i,  msgs), params_r, ls_options, convergence_options,
-                 qn_update)  {
+      : BFGSBase(ModelAdaptor<M, jacobian>(model, params_i, msgs), params_r,
+                 ls_options, convergence_options, qn_update) {
     BFGSBase::initialize(params_r);
   }
 
