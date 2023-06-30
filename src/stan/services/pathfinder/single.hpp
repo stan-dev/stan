@@ -636,12 +636,12 @@ inline auto pathfinder_lbfgs_single(
   Eigen::VectorXd prev_grads(num_parameters);
   stan::model::log_prob_grad<true, true>(model, prev_params, prev_grads);
   if (unlikely(save_iterations)) {
-    diagnostic_writer.begin_record(true);
+    diagnostic_writer.begin_record();
     diagnostic_writer.begin_record("0", true);
     diagnostic_writer.write("iter", static_cast<int>(0));
     diagnostic_writer.write("unconstrained_parameters", prev_params);
     diagnostic_writer.write("grads", prev_grads);
-    diagnostic_writer.end_record(true);
+    diagnostic_writer.end_record();
   }
   auto constrain_fun = [&model](auto&& rng, auto&& unconstrained_draws,
                                 auto&& constrained_draws) {
@@ -714,7 +714,7 @@ inline auto pathfinder_lbfgs_single(
         diagnostic_writer.write("lbfgs_success", false);
         diagnostic_writer.write("pathfinder_success", false);
         diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
-        diagnostic_writer.end_record(true);
+        diagnostic_writer.end_record();
       }
       if (lbfgs_ss.str().length() > 0) {
         logger.info(lbfgs_ss);
@@ -770,7 +770,7 @@ inline auto pathfinder_lbfgs_single(
         diagnostic_writer.write("alpha", pathfinder_res.second.alpha);
         diagnostic_writer.write("full", pathfinder_res.second.use_full);
         diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
-        diagnostic_writer.end_record(true);
+        diagnostic_writer.end_record();
       }
       if (lbfgs_ss.str().length() > 0) {
         logger.info(lbfgs_ss);
@@ -790,7 +790,7 @@ inline auto pathfinder_lbfgs_single(
         diagnostic_writer.write("history_size", history_size);
         diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
         diagnostic_writer.write("pathfinder_error", std::string(e.what()));
-        diagnostic_writer.end_record(true);
+        diagnostic_writer.end_record();
       }
       if (lbfgs_ss.str().length() > 0) {
         logger.info(lbfgs_ss);

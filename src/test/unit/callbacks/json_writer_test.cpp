@@ -31,12 +31,15 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_end) {
 TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_end_newline) {
   writer.begin_record();
   writer.end_record(true);
-  EXPECT_EQ("{}\n", ss.str());
+  EXPECT_EQ("{\n}\n", ss.str());
 }
-TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_newline_end_newline) {
+
+TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_newline_nested) {
+  writer.begin_record(true);
   writer.begin_record(true);
   writer.end_record(true);
-  EXPECT_EQ("\n{}\n", ss.str());
+  writer.end_record(true);
+  EXPECT_EQ("\n{\n{}\n\n}\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
@@ -80,7 +83,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, single_member_newlines) {
   writer.write(key, value);
   writer.end_record();
   writer.end_record(true);
-  EXPECT_EQ("{\n\"child\":{\"key\" : \"value\"}}\n", ss.str());
+  EXPECT_EQ("{\n\"child\" : {\"key\" : \"value\"}\n}\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {

@@ -281,7 +281,7 @@ class json_writer {
     if (output_ == nullptr)
       return;
     write_record_comma_if_needed(newline);
-    *output_ << "\"" << key << "\":{";
+    *output_ << "\"" << key << "\" : {";
     record_needs_comma_ = false;
     record_depth_++;
   }
@@ -292,15 +292,17 @@ class json_writer {
   void end_record(bool newline=false) {
     if (output_ == nullptr)
       return;
-    *output_ << "}";
-    if (newline)
-      *output_ << std::endl;
-      
     record_depth_--;
     if (record_depth_ > 0) {
       record_needs_comma_ = true;
-    }
+    } else {
+      if (newline)
+        *output_ << std::endl;
+    }      
     record_element_needs_comma_ = false;
+    *output_ << "}";
+    if (newline)
+      *output_ << std::endl;
   }
 
   /**
