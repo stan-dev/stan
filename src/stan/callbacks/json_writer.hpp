@@ -43,7 +43,7 @@ class json_writer {
   /**
    * Writes a comma separator for the record's parent object if needed.
    */
-  void write_record_comma_if_needed(bool newline=false) {
+  void write_record_comma_if_needed(bool newline = false) {
     if (record_depth_ > 0 && record_needs_comma_) {
       *output_ << ",";
     }
@@ -263,7 +263,7 @@ class json_writer {
    * Writes "{", initial token of a JSON record.
    * @param[in] newline (optional) if true, add newline before open token.
    */
-  void begin_record(bool newline=false) {
+  void begin_record(bool newline = false) {
     if (output_ == nullptr)
       return;
     write_record_comma_if_needed(newline);
@@ -277,7 +277,7 @@ class json_writer {
    * @param[in] key The name of the record.
    * @param[in] newline (optional) if true, add newline before open token.
    */
-  void begin_record(const std::string& key, bool newline=false) {
+  void begin_record(const std::string& key, bool newline = false) {
     if (output_ == nullptr)
       return;
     write_record_comma_if_needed(newline);
@@ -289,7 +289,7 @@ class json_writer {
    * Writes "}", final token of a JSON record.
    * @param[in] newline (optional) if true, add newline after close token.
    */
-  void end_record(bool newline=false) {
+  void end_record(bool newline = false) {
     if (output_ == nullptr)
       return;
     record_depth_--;
@@ -298,7 +298,7 @@ class json_writer {
     } else {
       if (newline)
         *output_ << std::endl;
-    }      
+    }
     record_element_needs_comma_ = false;
     *output_ << "}";
     if (newline)
