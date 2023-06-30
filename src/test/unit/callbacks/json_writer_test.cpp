@@ -233,3 +233,20 @@ TEST_F(StanInterfaceCallbacksJsonWriter, no_op_writer2) {
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer(nullptr);
   EXPECT_NO_THROW(writer.write(key, value));
 }
+
+TEST_F(StanInterfaceCallbacksJsonWriter, move_ctor) {
+  std::string key("key");
+  std::string value("value");
+  std::vector<stan::callbacks::json_writer<std::stringstream, deleter_noop>>
+      jwriters;
+  jwriters.reserve(3);
+  for (int i = 0; i < 3; i++) {
+    std::stringstream* raw_ptr = new std::stringstream();
+    std::unique_ptr<std::stringstream, deleter_noop> oss(raw_ptr,
+                                                         deleter_noop());
+    stan::callbacks::json_writer<std::stringstream, deleter_noop> writer(
+        std::move(oss));
+    EXPECT_NO_THROW(jwriters.emplace_back(std::move(writer)));
+    EXPECT_NO_THROW(writer.write(key, value));
+  }
+}
