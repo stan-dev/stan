@@ -28,6 +28,12 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_end) {
   EXPECT_EQ("{}", ss.str());
 }
 
+TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_end_newline) {
+  writer.begin_record();
+  writer.end_record(true);
+  EXPECT_EQ("{}\n", ss.str());
+}
+
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
   std::string key("key");
   const int N = 5;

@@ -284,10 +284,13 @@ class json_writer {
   /**
    * Writes "}", final token of a JSON record.
    */
-  void end_record() {
+  void end_record(bool add_newline=false) {
     if (output_ == nullptr)
       return;
     *output_ << "}";
+    if (add_newline)
+      *output_ << std::endl;
+      
     record_depth_--;
     if (record_depth_ > 0) {
       record_needs_comma_ = true;

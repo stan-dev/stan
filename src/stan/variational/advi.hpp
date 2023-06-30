@@ -11,7 +11,6 @@
 #include <stan/variational/families/normal_fullrank.hpp>
 #include <stan/variational/families/normal_meanfield.hpp>
 #include <boost/circular_buffer.hpp>
-#include <boost/lexical_cast.hpp>
 #include <algorithm>
 #include <chrono>
 #include <limits>
