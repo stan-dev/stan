@@ -259,13 +259,14 @@ class json_writer {
 
   /**
    * Writes "{", initial token of a JSON record.
+   * @param[in] newline (optional) if true, add newline after open token.
    */
-  void begin_record(bool newline_after=false) {
+  void begin_record(bool newline=false) {
     if (output_ == nullptr)
       return;
     write_record_comma_if_needed();
     *output_ << "{";
-    if (newline_after)
+    if (newline)
       *output_ << std::endl;
     record_needs_comma_ = false;
     record_depth_++;
@@ -274,27 +275,27 @@ class json_writer {
   /**
    * Writes "\"key\" : {", initial token of a named JSON record.
    * @param[in] key The name of the record.
-   * @param[in] newline_before if true, add newline before open token.
+   * @param[in] newline (optional) if true, add newline between key, open token.
    */
-  void begin_record(const std::string& key, bool newline_before=false) {
+  void begin_record(const std::string& key, bool newline=false) {
     if (output_ == nullptr)
       return;
     write_record_comma_if_needed();
     *output_ << "\"" << key << "\":";
-    newline_before ? *output_ << std::endl : *output_ << " ";
+    newline ? *output_ << std::endl : *output_ << " ";
     *output_ <<  "{";
     record_needs_comma_ = false;
     record_depth_++;
   }
   /**
    * Writes "}", final token of a JSON record.
-   * @param[in] newline_after if true, add newline at end.
+   * @param[in] newline (optional) if true, add newline after close token.
    */
-  void end_record(bool newline_after=false) {
+  void end_record(bool newline=false) {
     if (output_ == nullptr)
       return;
     *output_ << "}";
-    if (newline_after)
+    if (newline)
       *output_ << std::endl;
       
     record_depth_--;

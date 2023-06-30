@@ -21,17 +21,20 @@ class structured_writer {
   virtual ~structured_writer() {}
   /**
    * Writes "{", initial token of a JSON record.
+   * @param[in] newline (optional) if true, add newline after open token.
    */
-  virtual void begin_record() {}
+  virtual void begin_record(bool newline=false) {}
   /**
    * Writes "\"key\" : {", initial token of a named JSON record.
    * @param[in] key The name of the record.
+   * @param[in] newline (optional) if true, add newline between key, open token.
    */
-  virtual void begin_record(const std::string&) {}
+  virtual void begin_record(const std::string&, bool newline=false) {}
   /**
    * Writes "}", final token of a JSON record.
+   * @param[in] newline (optional) if true, add newline after close token.
    */
-  virtual void end_record() {}
+  virtual void end_record(bool newline=false) {}
   /**
    * Writes "[", initial token of a JSON list.
    */
