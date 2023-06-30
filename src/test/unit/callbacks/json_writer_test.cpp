@@ -36,7 +36,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_end_newline) {
 TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_newline_end_newline) {
   writer.begin_record(true);
   writer.end_record(true);
-  EXPECT_EQ("{\n}\n", ss.str());
+  EXPECT_EQ("\n{}\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
@@ -75,12 +75,12 @@ TEST_F(StanInterfaceCallbacksJsonWriter, single_member) {
 TEST_F(StanInterfaceCallbacksJsonWriter, single_member_newlines) {
   std::string key("key");
   std::string value("value");
-  writer.begin_record(true);
+  writer.begin_record();
   writer.begin_record("child", true);
   writer.write(key, value);
   writer.end_record();
   writer.end_record(true);
-  EXPECT_EQ("{\n\"child\":\n{\"key\" : \"value\"}}\n", ss.str());
+  EXPECT_EQ("{\n\"child\":{\"key\" : \"value\"}}\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
