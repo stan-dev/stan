@@ -41,6 +41,16 @@ class json_writer {
   bool record_needs_comma_;
 
   /**
+   * Writes a comma separator for record's parent object.
+   */
+g  void write_record_comma() {
+    if (record_needs_comma_) {
+      *output_ << ",";
+      record_needs_comma_ = false;
+    }
+  }
+
+  /**
    * Writes a comma separator for the record's parent object if needed.
    */
   void write_record_comma_if_needed() {
@@ -49,6 +59,7 @@ class json_writer {
       record_needs_comma_ = false;
     }
   }
+
 
   /**
    * Determines whether a record's internal object requires a comma separator
@@ -463,12 +474,12 @@ class json_writer {
   }
 
   /**
-   * Add newline between records.
+   * Add newline
    */
   void newline() {
     if (output_ == nullptr)
       return;
-    write_record_comma_if_needed();
+    write_record_comma();
     *output_ << std::endl;
   }
 };
