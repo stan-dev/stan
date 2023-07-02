@@ -469,6 +469,7 @@ class json_writer {
   void newline() {
     if (output_ == nullptr)
       return;
+    write_sep();
     *output_ << std::endl;
   }
 };
