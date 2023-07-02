@@ -19,26 +19,28 @@ class structured_writer {
    * Virtual destructor.
    */
   virtual ~structured_writer() {}
+
   /**
    * Writes "{", initial token of a JSON record.
-   * @param[in] newline (optional) if true, add newline after open token.
    */
-  virtual void begin_record(bool newline = false) {}
+  virtual void begin_record() {}
+
   /**
    * Writes "\"key\" : {", initial token of a named JSON record.
    * @param[in] key The name of the record.
-   * @param[in] newline (optional) if true, add newline between key, open token.
    */
   virtual void begin_record(const std::string&, bool newline = false) {}
+
   /**
    * Writes "}", final token of a JSON record.
-   * @param[in] newline (optional) if true, add newline after close token.
    */
-  virtual void end_record(bool newline = false) {}
+  virtual void end_record() {}
+
   /**
    * Writes "[", initial token of a JSON list.
    */
   virtual void begin_list() {}
+
   /**
    * Writes "]", final token of a JSON list.
    */
@@ -50,16 +52,19 @@ class structured_writer {
    * @param key Name of the value pair
    */
   virtual void write(const std::string& key) {}
+
   /**
    * Write a key-value pair where the value is a string.
    * @param key Name of the value pair
    * @param value string to write.
    */
   virtual void write(const std::string& key, const std::string& value) {}
+
   /**
    * No-op
    */
   virtual void write() {}
+
   /**
    * Write a key-value pair where the value is a bool.
    * @param key Name of the value pair
@@ -73,18 +78,21 @@ class structured_writer {
    * @param value int to write.
    */
   virtual void write(const std::string& key, int value) {}
+
   /**
    * Write a key-value pair where the value is an `std::size_t`.
    * @param key Name of the value pair
    * @param value `std::size_t` to write.
    */
   virtual void write(const std::string& key, std::size_t value) {}
+
   /**
    * Write a key-value pair where the value is a double.
    * @param key Name of the value pair
    * @param value double to write.
    */
   virtual void write(const std::string& key, double value) {}
+
   /**
    * Write a key-value pair where the value is a complex value.
    * @param key Name of the value pair
@@ -99,6 +107,7 @@ class structured_writer {
    */
   virtual void write(const std::string& key, const std::vector<double> values) {
   }
+
   /**
    * Write a key-value pair where the value is a vector of strings to be made a
    * list.
@@ -106,18 +115,21 @@ class structured_writer {
    * @param values vector of strings to write.
    */
   void write(const std::string& key, const std::vector<std::string>& values) {}
+
   /**
    * Write a key-value pair where the value is an Eigen Matrix.
    * @param key Name of the value pair
    * @param mat Eigen Matrix to write.
    */
   void write(const std::string& key, const Eigen::MatrixXd& mat) {}
+
   /**
    * Write a key-value pair where the value is an Eigen Vector.
    * @param key Name of the value pair
    * @param vec Eigen Vector to write.
    */
   void write(const std::string& key, const Eigen::VectorXd& vec) {}
+
   /**
    * Write a key-value pair where the value is a Eigen RowVector.
    * @param key Name of the value pair

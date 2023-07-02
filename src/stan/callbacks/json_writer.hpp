@@ -43,12 +43,10 @@ class json_writer {
   /**
    * Writes a comma separator for the record's parent object if needed.
    */
-  void write_record_comma_if_needed(bool newline = false) {
+  void write_record_comma_if_needed() {
     if (record_depth_ > 0 && record_needs_comma_) {
       *output_ << ",";
     }
-    if (newline)
-      *output_ << std::endl;
   }
 
   /**
@@ -261,12 +259,11 @@ class json_writer {
 
   /**
    * Writes "{", initial token of a JSON record.
-   * @param[in] newline (optional) if true, add newline before open token.
    */
-  void begin_record(bool newline = false) {
+  void begin_record() {
     if (output_ == nullptr)
       return;
-    write_record_comma_if_needed(newline);
+    write_record_comma_if_needed();
     *output_ << "{";
     record_needs_comma_ = false;
     record_depth_++;
@@ -275,34 +272,27 @@ class json_writer {
   /**
    * Writes "\"key\" : {", initial token of a named JSON record.
    * @param[in] key The name of the record.
-   * @param[in] newline (optional) if true, add newline before open token.
    */
-  void begin_record(const std::string& key, bool newline = false) {
+  void begin_record(const std::string& key) {
     if (output_ == nullptr)
       return;
-    write_record_comma_if_needed(newline);
+    write_record_comma_if_needed();
     *output_ << "\"" << key << "\" : {";
     record_needs_comma_ = false;
     record_depth_++;
   }
   /**
    * Writes "}", final token of a JSON record.
-   * @param[in] newline (optional) if true, add newline after close token.
    */
-  void end_record(bool newline = false) {
+  void end_record() {
     if (output_ == nullptr)
       return;
     record_depth_--;
     if (record_depth_ > 0) {
       record_needs_comma_ = true;
-    } else {
-      if (newline)
-        *output_ << std::endl;
     }
     record_element_needs_comma_ = false;
     *output_ << "}";
-    if (newline)
-      *output_ << std::endl;
   }
 
   /**
@@ -472,6 +462,16 @@ class json_writer {
     }
     *output_ << " ]";
   }
+
+  /**
+   * Add newline to output.
+   */
+  void newline() {
+    if (output_ == nullptr)
+      return;
+    *output_ << std::endl;
+  }
+
 };
 
 }  // namespace callbacks
