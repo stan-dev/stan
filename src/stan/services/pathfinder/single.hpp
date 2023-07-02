@@ -643,7 +643,6 @@ inline auto pathfinder_lbfgs_single(
     diagnostic_writer.write("unconstrained_parameters", prev_params);
     diagnostic_writer.write("grads", prev_grads);
     diagnostic_writer.end_record();
-    diagnostic_writer.newline();
   }
   auto constrain_fun = [&model](auto&& rng, auto&& unconstrained_draws,
                                 auto&& constrained_draws) {
@@ -700,6 +699,7 @@ inline auto pathfinder_lbfgs_single(
                             static_cast<std::size_t>(max_history_size));
 
     if (unlikely(save_iterations)) {
+      diagnostic_writer.newline();
       diagnostic_writer.begin_record(std::to_string(lbfgs.iter_num()));
       diagnostic_writer.write("iter", lbfgs.iter_num());
       diagnostic_writer.write("unconstrained_parameters", prev_params);
@@ -717,7 +717,6 @@ inline auto pathfinder_lbfgs_single(
         diagnostic_writer.write("pathfinder_success", false);
         diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
         diagnostic_writer.end_record();
-        diagnostic_writer.newline();
       }
       if (lbfgs_ss.str().length() > 0) {
         logger.info(lbfgs_ss);
@@ -774,7 +773,6 @@ inline auto pathfinder_lbfgs_single(
         diagnostic_writer.write("full", pathfinder_res.second.use_full);
         diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
         diagnostic_writer.end_record();
-        diagnostic_writer.newline();
       }
       if (lbfgs_ss.str().length() > 0) {
         logger.info(lbfgs_ss);
@@ -795,7 +793,6 @@ inline auto pathfinder_lbfgs_single(
         diagnostic_writer.write("lbfgs_note", lbfgs_ss.str());
         diagnostic_writer.write("pathfinder_error", std::string(e.what()));
         diagnostic_writer.end_record();
-        diagnostic_writer.newline();
       }
       if (lbfgs_ss.str().length() > 0) {
         logger.info(lbfgs_ss);
@@ -805,6 +802,7 @@ inline auto pathfinder_lbfgs_single(
     }
   }
   if (unlikely(save_iterations)) {
+    diagnostic_writer.newline();
     diagnostic_writer.end_record();
     diagnostic_writer.newline();
   }
