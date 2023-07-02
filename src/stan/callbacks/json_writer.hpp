@@ -43,7 +43,7 @@ class json_writer {
   /**
    * Writes a comma separator for record's parent object.
    */
-g  void write_record_comma() {
+  g void write_record_comma() {
     if (record_needs_comma_) {
       *output_ << ",";
       record_needs_comma_ = false;
@@ -59,7 +59,6 @@ g  void write_record_comma() {
       record_needs_comma_ = false;
     }
   }
-
 
   /**
    * Determines whether a record's internal object requires a comma separator
