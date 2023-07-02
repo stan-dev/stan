@@ -639,7 +639,7 @@ inline auto pathfinder_lbfgs_single(
     diagnostic_writer.begin_record();
     diagnostic_writer.newline();
     diagnostic_writer.begin_record("0")
-    diagnostic_writer.write("iter", static_cast<int>(0));
+        diagnostic_writer.write("iter", static_cast<int>(0));
     diagnostic_writer.write("unconstrained_parameters", prev_params);
     diagnostic_writer.write("grads", prev_grads);
     diagnostic_writer.end_record();
