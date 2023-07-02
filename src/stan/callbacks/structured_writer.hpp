@@ -21,28 +21,28 @@ class structured_writer {
   virtual ~structured_writer() {}
 
   /**
-   * Writes "{", initial token of a JSON record.
+   * Writes start token of a structured record.
    */
   virtual void begin_record() {}
 
   /**
-   * Writes "\"key\" : {", initial token of a named JSON record.
+   * Writes key followed by start token of a structured record.
    * @param[in] key The name of the record.
    */
   virtual void begin_record(const std::string&, bool newline = false) {}
 
   /**
-   * Writes "}", final token of a JSON record.
+   * Writes end token of a structured record.
    */
   virtual void end_record() {}
 
   /**
-   * Writes "[", initial token of a JSON list.
+   * Writes start token of a list.
    */
   virtual void begin_list() {}
 
   /**
-   * Writes "]", final token of a JSON list.
+   * Writes end token of a list.
    */
   virtual void end_list() {}
 
