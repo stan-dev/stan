@@ -82,8 +82,8 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   std::ofstream empty_ostream(nullptr);
   stan::test::test_logger logger(empty_ostream);
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
-  std::vector<stan::callbacks::json_writer<std::stringstream>> single_path_diagnostic_writer(
-      num_paths);
+  std::vector<stan::callbacks::json_writer<std::stringstream>>
+      single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
     single_path_inits.emplace_back(
