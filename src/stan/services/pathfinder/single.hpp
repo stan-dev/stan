@@ -699,7 +699,7 @@ inline auto pathfinder_lbfgs_single(
                             static_cast<std::size_t>(max_history_size));
 
     if (unlikely(save_iterations)) {
-      diagnostic_writer.newline();
+      diagnostic_writer.newline(true);
       diagnostic_writer.begin_record(std::to_string(lbfgs.iter_num()));
       diagnostic_writer.write("iter", lbfgs.iter_num());
       diagnostic_writer.write("unconstrained_parameters", prev_params);
