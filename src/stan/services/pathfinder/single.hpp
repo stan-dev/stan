@@ -637,7 +637,7 @@ inline auto pathfinder_lbfgs_single(
   stan::model::log_prob_grad<true, true>(model, prev_params, prev_grads);
   if (unlikely(save_iterations)) {
     diagnostic_writer.begin_record();
-    diagnostic_writer.newline()
+    diagnostic_writer.newline();
     diagnostic_writer.begin_record("0")
     diagnostic_writer.write("iter", static_cast<int>(0));
     diagnostic_writer.write("unconstrained_parameters", prev_params);
