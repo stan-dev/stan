@@ -471,7 +471,6 @@ class json_writer {
       return;
     *output_ << std::endl;
   }
-
 };
 
 }  // namespace callbacks
