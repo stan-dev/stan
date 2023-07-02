@@ -637,7 +637,8 @@ inline auto pathfinder_lbfgs_single(
   stan::model::log_prob_grad<true, true>(model, prev_params, prev_grads);
   if (unlikely(save_iterations)) {
     diagnostic_writer.begin_record();
-    diagnostic_writer.begin_record("0", true);
+    diagnostic_writer.newline()
+    diagnostic_writer.begin_record("0")
     diagnostic_writer.write("iter", static_cast<int>(0));
     diagnostic_writer.write("unconstrained_parameters", prev_params);
     diagnostic_writer.write("grads", prev_grads);
@@ -698,7 +699,8 @@ inline auto pathfinder_lbfgs_single(
                             static_cast<std::size_t>(max_history_size));
 
     if (unlikely(save_iterations)) {
-      diagnostic_writer.begin_record(std::to_string(lbfgs.iter_num()), true);
+      diagnostic_writer.newline();
+      diagnostic_writer.begin_record(std::to_string(lbfgs.iter_num()));
       diagnostic_writer.write("iter", lbfgs.iter_num());
       diagnostic_writer.write("unconstrained_parameters", prev_params);
       diagnostic_writer.write("grads", prev_grads);
@@ -800,7 +802,9 @@ inline auto pathfinder_lbfgs_single(
     }
   }
   if (unlikely(save_iterations)) {
-    diagnostic_writer.end_record(true);
+    diagnostic_writer.newline();  // add final close record on its own line
+    diagnostic_writer.end_record();
+    diagnostic_writer.newline();
   }
   if (unlikely(ret <= 0)) {
     std::string prefix_err_msg
