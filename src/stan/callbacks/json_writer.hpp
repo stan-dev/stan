@@ -464,7 +464,7 @@ class json_writer {
 
   /**
    * Emit newline between records, optionally adding comma before newline.
-   * 
+   *
    * @param add_comma - if true, output comma, reset flag.
    */
   void newline(bool add_comma = false) {
