@@ -471,7 +471,7 @@ class json_writer {
   void newline(bool add_comma=false) {
     if (output_ == nullptr)
       return;
-    if (sep) {
+    if (add_comma) {
       *output_ << ",";
       record_needs_comma_ = false;
     }

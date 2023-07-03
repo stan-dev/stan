@@ -79,10 +79,10 @@ TEST_F(StanInterfaceCallbacksJsonWriter, single_member_newlines) {
   writer.write(key, value);
   writer.newline();
   writer.end_record();
-  writer.newline();
+  writer.newline(true);
   writer.end_record();
   writer.newline();
-  EXPECT_EQ("{\n\"child\" : {\n\"key\" : \"value\"\n}\n}\n", ss.str());
+  EXPECT_EQ("{\n\"child\" : {\n\"key\" : \"value\"\n},\n}\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
