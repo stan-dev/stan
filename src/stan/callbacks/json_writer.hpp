@@ -467,7 +467,7 @@ class json_writer {
    * 
    * @param add_comma - if true, output comma, reset flag.
    */
-  void newline(bool add_comma=false) {
+  void newline(bool add_comma = false) {
     if (output_ == nullptr)
       return;
     if (add_comma) {
