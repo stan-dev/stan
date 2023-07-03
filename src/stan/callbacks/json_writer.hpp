@@ -50,7 +50,6 @@ class json_writer {
     }
   }
 
-
   /**
    * Determines whether a record's internal object requires a comma separator
    */
