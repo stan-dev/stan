@@ -467,7 +467,7 @@ class json_writer {
    * Add comma separator as needed.
    * @param sep Name of the value pair
    */
-  void newline(bool add_comma=false) {
+  void newline(bool add_comma = false) {
     if (output_ == nullptr)
       return;
     if (add_comma) {
