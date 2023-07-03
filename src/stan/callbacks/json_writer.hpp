@@ -463,9 +463,9 @@ class json_writer {
   }
 
   /**
-   * Emit newline between top-level objects.
-   * Add comma separator as needed.
-   * @param sep Name of the value pair
+   * Emit newline between records, optionally adding comma before newline.
+   * 
+   * @param add_comma - if true, output comma, reset flag.
    */
   void newline(bool add_comma=false) {
     if (output_ == nullptr)
