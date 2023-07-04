@@ -463,17 +463,11 @@ class json_writer {
   }
 
   /**
-   * Emit newline between records, optionally adding comma before newline.
-   * 
-   * @param add_comma - if true, output comma, reset flag.
+   * Emit newline.
    */
-  void newline(bool add_comma = false) {
+  void newline() {
     if (output_ == nullptr)
       return;
-    if (add_comma) {
-      *output_ << ",";
-      record_needs_comma_ = false;
-    }
     *output_ << std::endl;
   }
 };

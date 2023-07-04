@@ -69,22 +69,6 @@ TEST_F(StanInterfaceCallbacksJsonWriter, single_member) {
   EXPECT_EQ("{\"key\" : \"value\"}", ss.str());
 }
 
-TEST_F(StanInterfaceCallbacksJsonWriter, single_member_newlines) {
-  std::string key("key");
-  std::string value("value");
-  writer.begin_record();
-  writer.newline();
-  writer.begin_record("child");
-  writer.newline();
-  writer.write(key, value);
-  writer.newline();
-  writer.end_record();
-  writer.newline(true);
-  writer.end_record();
-  writer.newline();
-  EXPECT_EQ("{\n\"child\" : {\n\"key\" : \"value\"\n},\n}\n", ss.str());
-}
-
 TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
   std::string key("key");
   std::string value("value");
