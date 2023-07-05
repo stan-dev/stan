@@ -264,9 +264,6 @@ pipeline {
                     agent { label 'windows' }
                     when {
                         expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
                     }
@@ -441,9 +438,6 @@ pipeline {
                     agent { label 'windows' }
                     when {
                         expression {
-                            ( env.BRANCH_NAME == "develop" ||
-                            env.BRANCH_NAME == "master" ||
-                            params.run_tests_all_os ) &&
                             !skipRemainingStages
                         }
                     }

@@ -79,8 +79,8 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   // bool save_iterations = true;
   constexpr int refresh = 1;
   constexpr bool save_iterations = false;
-  std::ofstream empty_ostream(nullptr);
-  stan::test::test_logger logger(empty_ostream);
+  std::unique_ptr<std::ostream> empty_ostream(nullptr);
+  stan::test::test_logger logger(std::move(empty_ostream));
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
   std::vector<stan::callbacks::structured_writer> single_path_diagnostic_writer(
       num_paths);
@@ -161,8 +161,8 @@ TEST_F(ServicesPathfinderEightSchools, single) {
   constexpr int num_iterations = 2000;
   constexpr bool save_iterations = false;
   constexpr int refresh = 0;
-  std::ofstream empty_ostream("../test.log");
-  stan::test::test_logger logger(empty_ostream);
+  std::unique_ptr<std::ostream> empty_ostream(nullptr);
+  stan::test::test_logger logger(std::move(empty_ostream));
   stan::test::mock_callback callback;
   int return_code = stan::services::pathfinder::pathfinder_lbfgs_single(
       model, context, seed, stride_id, init_radius, history_size, init_alpha,

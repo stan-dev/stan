@@ -57,7 +57,7 @@ class BFGSMinimizer {
   typedef Eigen::Matrix<Scalar, DimAtCompile, DimAtCompile> HessianT;
 
  protected:
-  FunctorType &_func;
+  FunctorType _func;
   VectorT _gk, _gk_1, _xk_1, _xk, _pk, _pk_1;
   Scalar _fk, _fk_1, _alphak_1;
   Scalar _alpha, _alpha0;
@@ -136,13 +136,13 @@ class BFGSMinimizer {
         return std::string("Unknown termination code");
     }
   }
-
-  explicit BFGSMinimizer(FunctorType &f) : _func(f) {}
-  template <typename Vec, require_vector_t<Vec> * = nullptr, typename LSOpt,
-            typename ConvergeOpt, typename QnUpdater>
-  explicit BFGSMinimizer(FunctorType &f, Vec &&params_r, LSOpt &&ls_opt,
+  template <typename Func>
+  explicit BFGSMinimizer(Func &&f) : _func(std::forward<Func>(f)) {}
+  template <typename Func, typename Vec, require_vector_t<Vec> * = nullptr,
+            typename LSOpt, typename ConvergeOpt, typename QnUpdater>
+  explicit BFGSMinimizer(Func &&f, Vec &&params_r, LSOpt &&ls_opt,
                          ConvergeOpt &&conv_opt, QnUpdater &&updater)
-      : _func(f),
+      : _func(std::forward<Func>(f)),
         _qn(std::forward<QnUpdater>(updater)),
         _ls_opts(std::forward<LSOpt>(ls_opt)),
         _conv_opts(std::forward<ConvergeOpt>(conv_opt)) {}
@@ -383,9 +383,6 @@ template <typename M, typename QNUpdateType, typename Scalar = double,
 class BFGSLineSearch
     : public BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
                            DimAtCompile> {
- private:
-  ModelAdaptor<M, jacobian> _adaptor;
-
  public:
   typedef BFGSMinimizer<ModelAdaptor<M, jacobian>, QNUpdateType, Scalar,
                         DimAtCompile>
@@ -396,7 +393,7 @@ class BFGSLineSearch
   template <typename Vec, require_vector_t<Vec> * = nullptr>
   BFGSLineSearch(M &model, Vec &&params_r, const std::vector<int> &params_i,
                  std::ostream *msgs = 0)
-      : BFGSBase(_adaptor), _adaptor(model, params_i, msgs) {
+      : BFGSBase(ModelAdaptor<M, jacobian>(model, params_i, msgs)) {
     BFGSBase::initialize(params_r);
   }
 
@@ -405,9 +402,8 @@ class BFGSLineSearch
   BFGSLineSearch(M &model, Vec &&params_r, const std::vector<int> &params_i,
                  LSOpt &&ls_options, ConvergeOpt &&convergence_options,
                  QnUpdater &&qn_update, std::ostream *msgs = 0)
-      : _adaptor(model, params_i, msgs),
-        BFGSBase(_adaptor, params_r, ls_options, convergence_options,
-                 qn_update) {
+      : BFGSBase(ModelAdaptor<M, jacobian>(model, params_i, msgs), params_r,
+                 ls_options, convergence_options, qn_update) {
     BFGSBase::initialize(params_r);
   }
 
@@ -416,7 +412,7 @@ class BFGSLineSearch
     BFGSBase::initialize(params_r);
   }
 
-  size_t grad_evals() { return _adaptor.fevals(); }
+  size_t grad_evals() { return this->_func.fevals(); }
   double logp() { return -(this->curr_f()); }
   double grad_norm() { return this->curr_g().norm(); }
   void grad(std::vector<double> &g) {
