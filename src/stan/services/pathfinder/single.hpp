@@ -801,7 +801,6 @@ inline auto pathfinder_lbfgs_single(
   }
   if (unlikely(save_iterations)) {
     diagnostic_writer.end_record();
-    diagnostic_writer.newline();
   }
   if (unlikely(ret <= 0)) {
     std::string prefix_err_msg

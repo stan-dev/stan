@@ -45,7 +45,7 @@ class json_writer {
    */
   void write_record_comma_if_needed() {
     if (record_depth_ > 0 && record_needs_comma_) {
-      *output_ << ",";
+      *output_ << ",\n";
       record_needs_comma_ = false;
     }
   }
@@ -286,12 +286,14 @@ class json_writer {
   void end_record() {
     if (output_ == nullptr)
       return;
+    *output_ << "}";
     record_depth_--;
     if (record_depth_ > 0) {
       record_needs_comma_ = true;
+    } else {
+      *output_ << "\n";
     }
     record_element_needs_comma_ = false;
-    *output_ << "}";
   }
 
   /**
@@ -460,15 +462,6 @@ class json_writer {
       write_eigen_vector(mat.row(last));
     }
     *output_ << " ]";
-  }
-
-  /**
-   * Emit newline.
-   */
-  void newline() {
-    if (output_ == nullptr)
-      return;
-    *output_ << std::endl;
   }
 };
 

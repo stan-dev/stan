@@ -25,15 +25,21 @@ class StanInterfaceCallbacksJsonWriter : public ::testing::Test {
 TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record) {
   writer.begin_record();
   writer.end_record();
-  EXPECT_EQ("{}", ss.str());
+  EXPECT_EQ("{}\n", ss.str());
 }
 
-TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record_newline) {
+TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record_nested) {
+  std::string key("key");
+  std::string value("value");
   writer.begin_record();
-  writer.newline();
+  writer.begin_record(key);
+  writer.write(key, value);
   writer.end_record();
-  writer.newline();
-  EXPECT_EQ("{\n}\n", ss.str());
+  writer.begin_record(key);
+  writer.write(key, value);
+  writer.end_record();
+  writer.end_record();
+  EXPECT_EQ("{\"key\" : {\"key\" : \"value\"},\n\"key\" : {\"key\" : \"value\"}}\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
@@ -66,7 +72,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, single_member) {
   writer.begin_record();
   writer.write(key, value);
   writer.end_record();
-  EXPECT_EQ("{\"key\" : \"value\"}", ss.str());
+  EXPECT_EQ("{\"key\" : \"value\"}\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
@@ -77,16 +83,13 @@ TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
   writer.write(key, value);
 
   EXPECT_EQ(
-      "{\"key\" : \"value\""
-      ", \"key\" : \"value\"",
+      "{\"key\" : \"value\", \"key\" : \"value\"",
       ss.str());
 
   writer.write(key, value);
   writer.end_record();
   EXPECT_EQ(
-      "{\"key\" : \"value\""
-      ", \"key\" : \"value\""
-      ", \"key\" : \"value\"}",
+      "{\"key\" : \"value\", \"key\" : \"value\", \"key\" : \"value\"}\n",
       ss.str());
 }
 
