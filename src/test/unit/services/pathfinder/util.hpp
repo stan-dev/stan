@@ -4,6 +4,7 @@
 #include <stan/callbacks/interrupt.hpp>
 #include <stan/callbacks/stream_writer.hpp>
 #include <iostream>
+#include <memory>
 
 namespace stan {
 namespace test {
@@ -16,17 +17,21 @@ struct mock_callback : public stan::callbacks::interrupt {
 };
 
 class test_logger : public stan::callbacks::logger {
-  std::ostream& log_;
+  std::unique_ptr<std::ostream> log_;
 
  public:
-  test_logger(std::ostream& x) : log_(x) {}
-  test_logger() : log_(std::cout) {}
+  test_logger(std::unique_ptr<std::ostream>&& x) : log_(std::move(x)) {}
+  test_logger() : log_(std::unique_ptr<std::ostream>(nullptr)) {}
   /**
    * Logs a message with debug log level
    *
    * @param[in] message message
    */
-  virtual void debug(const std::string& message) { log_ << message << "\n"; }
+  virtual void debug(const std::string& message) {
+    if (log_ != nullptr) {
+      *log_ << message << "\n";
+    }
+  }
 
   /**
    * Logs a message with debug log level.
@@ -34,7 +39,9 @@ class test_logger : public stan::callbacks::logger {
    * @param[in] message message
    */
   virtual void debug(const std::stringstream& message) {
-    log_ << message.str() << "\n";
+    if (log_ != nullptr) {
+      *log_ << message.str() << "\n";
+    }
   }
 
   /**
@@ -42,7 +49,11 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void info(const std::string& message) { log_ << message << "\n"; }
+  virtual void info(const std::string& message) {
+    if (log_ != nullptr) {
+      *log_ << message << "\n";
+    }
+  }
 
   /**
    * Logs a message with info log level.
@@ -50,7 +61,9 @@ class test_logger : public stan::callbacks::logger {
    * @param[in] message message
    */
   virtual void info(const std::stringstream& message) {
-    log_ << message.str() << "\n";
+    if (log_ != nullptr) {
+      *log_ << message.str() << "\n";
+    }
   }
 
   /**
@@ -58,7 +71,11 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void warn(const std::string& message) { log_ << message << "\n"; }
+  virtual void warn(const std::string& message) {
+    if (log_ != nullptr) {
+      *log_ << message << "\n";
+    }
+  }
 
   /**
    * Logs a message with warn log level.
@@ -66,7 +83,9 @@ class test_logger : public stan::callbacks::logger {
    * @param[in] message message
    */
   virtual void warn(const std::stringstream& message) {
-    log_ << message.str() << "\n";
+    if (log_ != nullptr) {
+      *log_ << message.str() << "\n";
+    }
   }
 
   /**
@@ -74,7 +93,7 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void error(const std::string& message) { log_ << message << "\n"; }
+  virtual void error(const std::string& message) { *log_ << message << "\n"; }
 
   /**
    * Logs an error with error log level.
@@ -82,7 +101,9 @@ class test_logger : public stan::callbacks::logger {
    * @param[in] message message
    */
   virtual void error(const std::stringstream& message) {
-    log_ << message.str() << "\n";
+    if (log_ != nullptr) {
+      *log_ << message.str() << "\n";
+    }
   }
 
   /**
@@ -90,7 +111,11 @@ class test_logger : public stan::callbacks::logger {
    *
    * @param[in] message message
    */
-  virtual void fatal(const std::string& message) { log_ << message << "\n"; }
+  virtual void fatal(const std::string& message) {
+    if (log_ != nullptr) {
+      *log_ << message << "\n";
+    }
+  }
 
   /**
    * Logs an error with fatal log level.
@@ -98,7 +123,9 @@ class test_logger : public stan::callbacks::logger {
    * @param[in] message message
    */
   virtual void fatal(const std::stringstream& message) {
-    log_ << message.str() << "\n";
+    if (log_ != nullptr) {
+      *log_ << message.str() << "\n";
+    }
   }
 };
 
