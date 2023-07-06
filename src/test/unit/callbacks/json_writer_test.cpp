@@ -32,14 +32,17 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record_nested) {
   std::string key("key");
   std::string value("value");
   writer.begin_record();
-  writer.begin_record(key);
+  writer.begin_record("1");
   writer.write(key, value);
   writer.end_record();
-  writer.begin_record(key);
+  writer.begin_record("2");
+  writer.write(key, value);
+  writer.begin_record("2.1");
   writer.write(key, value);
   writer.end_record();
   writer.end_record();
-  EXPECT_EQ("{\"key\" : {\"key\" : \"value\"},\n\"key\" : {\"key\" : \"value\"}}\n", ss.str());
+  writer.end_record();
+  EXPECT_EQ("{\"1\" : {\"key\" : \"value\"},\n\"2\" : {\"key\" : \"value\", \"2.1\" : {\"key\" : \"value\"}}}\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
