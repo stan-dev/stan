@@ -44,7 +44,8 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record_nested) {
   writer.end_record();
   EXPECT_EQ(
       "{\"1\" : {\"key\" : \"value\"},\n\"2\" : {\"key\" : \"value\","
-      " \"2.1\" : {\"key\" : \"value\"}}}\n", ss.str());
+      " \"2.1\" : {\"key\" : \"value\"}}}\n",
+      ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
