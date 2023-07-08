@@ -14,7 +14,7 @@ namespace io {
  * operator[](size_t)</code>.
  *
  * @tparam B Character buffer type
- * @throw <code>std::bad_cast</code> if the buffer
+ * @throw <code>boost::bad_lexical_cast</code> if the buffer
  * contains non-zero characters before an exponentiation symbol.
  */
 template <typename B>
@@ -23,7 +23,7 @@ void validate_zero_buf(const B& buf) {
     if (buf[i] == 'e' || buf[i] == 'E')
       return;
     if (buf[i] >= '1' && buf[i] <= '9')
-      throw std::bad_cast();
+      boost::conversion::detail::throw_bad_cast<std::string, double>();
   }
 }
 
