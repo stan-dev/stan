@@ -134,7 +134,6 @@ TEST_F(ServicesPathfinderGLM, single) {
   }
   rapidjson::Document document;
   ASSERT_FALSE(document.Parse<0>(diagnostic_ss.str().c_str()).HasParseError());
-
 }
 
 TEST_F(ServicesPathfinderGLM, multi) {
