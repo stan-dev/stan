@@ -34,17 +34,24 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record_nested) {
   writer.begin_record();
   writer.begin_record("1");
   writer.write(key, value);
-  writer.end_record();
+  writer.end_record(); // 1
   writer.begin_record("2");
   writer.write(key, value);
   writer.begin_record("2.1");
   writer.write(key, value);
-  writer.end_record();
-  writer.end_record();
+  writer.write(key, value);
+  writer.end_record(); // 2.1
+  writer.begin_record("2.2");
+  writer.write(key, value);
+  writer.write(key, value);
+  writer.end_record(); // 2.2
+  writer.end_record(); // 2
   writer.end_record();
   EXPECT_EQ(
-      "{\"1\" : {\"key\" : \"value\"},\n\"2\" : {\"key\" : \"value\","
-      " \"2.1\" : {\"key\" : \"value\"}}}\n",
+      "{\"1\" : {\"key\" : \"value\"},\n"
+      "\"2\" : {\"key\" : \"value\","
+      " \"2.1\" : {\"key\" : \"value\", \"key\" : \"value\"},\n"
+      "\"2.2\" : {\"key\" : \"value\", \"key\" : \"value\"}}}\n",
       ss.str());
 }
 
