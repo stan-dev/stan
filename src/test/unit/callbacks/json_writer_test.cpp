@@ -1,6 +1,7 @@
-#include <gtest/gtest.h>
-#include <boost/lexical_cast.hpp>
 #include <stan/callbacks/json_writer.hpp>
+#include <rapidjson/document.h>
+#include <gtest/gtest.h>
+#include <string>
 
 struct deleter_noop {
   template <typename T>
@@ -53,6 +54,8 @@ TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record_nested) {
       " \"2.1\" : {\"key\" : \"value\", \"key\" : \"value\"},\n"
       "\"2.2\" : {\"key\" : \"value\", \"key\" : \"value\"}}}\n",
       ss.str());
+  rapidjson::Document document;
+  ASSERT_FALSE(document.Parse<0>(ss.str().c_str()).HasParseError());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
@@ -146,7 +149,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_string_vector) {
   const int N = 5;
   std::vector<std::string> x;
   for (int n = 0; n < N; ++n)
-    x.push_back(boost::lexical_cast<std::string>(n));
+    x.push_back(std::to_string(n));
 
   writer.write("key", x);
   EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]", ss.str());
