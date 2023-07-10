@@ -96,9 +96,10 @@ inline int pathfinder_lbfgs_multi(
     ParamWriter& parameter_writer, DiagnosticWriter& diagnostic_writer) {
   const auto start_pathfinders_time = std::chrono::steady_clock::now();
   std::vector<std::string> param_names;
-  model.constrained_param_names(param_names, true, true);
   param_names.push_back("lp_approx__");
   param_names.push_back("lp__");
+  model.constrained_param_names(param_names, true, true);
+
   parameter_writer(param_names);
   const size_t num_params = param_names.size();
   tbb::concurrent_vector<Eigen::Array<double, Eigen::Dynamic, 1>>
