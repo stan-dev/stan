@@ -38,14 +38,17 @@ class json_writer {
   // separator)
   int record_depth_ = 0;
   // Whether or not the record's parent object needs a comma separator
-  bool record_needs_comma_;
+  bool record_needs_comma_ = false;
 
   /**
    * Writes a comma separator for the record's parent object if needed.
    */
   void write_record_comma_if_needed() {
     if (record_depth_ > 0 && record_needs_comma_) {
-      *output_ << ",";
+      *output_ << ",\n";
+      record_needs_comma_ = false;
+    } else {
+      write_sep();
     }
   }
 
@@ -265,8 +268,8 @@ class json_writer {
       return;
     write_record_comma_if_needed();
     *output_ << "{";
-    record_needs_comma_ = false;
     record_depth_++;
+    record_element_needs_comma_ = false;
   }
 
   /**
@@ -277,9 +280,9 @@ class json_writer {
     if (output_ == nullptr)
       return;
     write_record_comma_if_needed();
-    *output_ << "\"" << key << "\": {";
-    record_needs_comma_ = false;
+    *output_ << "\"" << key << "\" : {";
     record_depth_++;
+    record_element_needs_comma_ = false;
   }
   /**
    * Writes "}", final token of a JSON record.
@@ -291,8 +294,9 @@ class json_writer {
     record_depth_--;
     if (record_depth_ > 0) {
       record_needs_comma_ = true;
+    } else {
+      *output_ << "\n";
     }
-    record_element_needs_comma_ = false;
   }
 
   /**

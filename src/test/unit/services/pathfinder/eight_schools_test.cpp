@@ -1,6 +1,6 @@
 #include <stan/callbacks/json_writer.hpp>
 #include <stan/callbacks/stream_writer.hpp>
-#include <stan/callbacks/structured_writer.hpp>
+#include <stan/callbacks/json_writer.hpp>
 #include <stan/math.hpp>
 #include <stan/io/array_var_context.hpp>
 #include <stan/io/empty_var_context.hpp>
@@ -82,8 +82,8 @@ TEST_F(ServicesPathfinderEightSchools, multi) {
   std::unique_ptr<std::ostream> empty_ostream(nullptr);
   stan::test::test_logger logger(std::move(empty_ostream));
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
-  std::vector<stan::callbacks::structured_writer> single_path_diagnostic_writer(
-      num_paths);
+  std::vector<stan::callbacks::json_writer<std::stringstream>>
+      single_path_diagnostic_writer(num_paths);
   std::vector<std::unique_ptr<decltype(init_init_context())>> single_path_inits;
   for (int i = 0; i < num_paths; ++i) {
     single_path_inits.emplace_back(

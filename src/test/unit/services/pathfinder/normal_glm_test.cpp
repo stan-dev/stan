@@ -10,6 +10,7 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/services/pathfinder/util.hpp>
 #include <test/unit/services/util.hpp>
+#include <rapidjson/document.h>
 #include <gtest/gtest.h>
 
 // Locally tests can use threads but for jenkins we should just use 1 thread
@@ -131,6 +132,8 @@ TEST_F(ServicesPathfinderGLM, single) {
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
   }
+  rapidjson::Document document;
+  ASSERT_FALSE(document.Parse<0>(diagnostic_ss.str().c_str()).HasParseError());
 }
 
 TEST_F(ServicesPathfinderGLM, multi) {
