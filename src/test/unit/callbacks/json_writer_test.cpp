@@ -1,6 +1,7 @@
-#include <gtest/gtest.h>
-#include <boost/lexical_cast.hpp>
 #include <stan/callbacks/json_writer.hpp>
+#include <rapidjson/document.h>
+#include <gtest/gtest.h>
+#include <string>
 
 struct deleter_noop {
   template <typename T>
@@ -22,10 +23,39 @@ class StanInterfaceCallbacksJsonWriter : public ::testing::Test {
   stan::callbacks::json_writer<std::stringstream, deleter_noop> writer;
 };
 
-TEST_F(StanInterfaceCallbacksJsonWriter, begin_record_end) {
+TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record) {
   writer.begin_record();
   writer.end_record();
-  EXPECT_EQ("{}", ss.str());
+  EXPECT_EQ("{}\n", ss.str());
+}
+
+TEST_F(StanInterfaceCallbacksJsonWriter, begin_end_record_nested) {
+  std::string key("key");
+  std::string value("value");
+  writer.begin_record();
+  writer.begin_record("1");
+  writer.write(key, value);
+  writer.end_record();  // 1
+  writer.begin_record("2");
+  writer.write(key, value);
+  writer.begin_record("2.1");
+  writer.write(key, value);
+  writer.write(key, value);
+  writer.end_record();  // 2.1
+  writer.begin_record("2.2");
+  writer.write(key, value);
+  writer.write(key, value);
+  writer.end_record();  // 2.2
+  writer.end_record();  // 2
+  writer.end_record();
+  EXPECT_EQ(
+      "{\"1\" : {\"key\" : \"value\"},\n"
+      "\"2\" : {\"key\" : \"value\","
+      " \"2.1\" : {\"key\" : \"value\", \"key\" : \"value\"},\n"
+      "\"2.2\" : {\"key\" : \"value\", \"key\" : \"value\"}}}\n",
+      ss.str());
+  rapidjson::Document document;
+  ASSERT_FALSE(document.Parse<0>(ss.str().c_str()).HasParseError());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector) {
@@ -58,7 +88,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, single_member) {
   writer.begin_record();
   writer.write(key, value);
   writer.end_record();
-  EXPECT_EQ("{\"key\" : \"value\"}", ss.str());
+  EXPECT_EQ("{\"key\" : \"value\"}\n", ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
@@ -68,18 +98,12 @@ TEST_F(StanInterfaceCallbacksJsonWriter, more_members) {
   writer.write(key, value);
   writer.write(key, value);
 
-  EXPECT_EQ(
-      "{\"key\" : \"value\""
-      ", \"key\" : \"value\"",
-      ss.str());
+  EXPECT_EQ("{\"key\" : \"value\", \"key\" : \"value\"", ss.str());
 
   writer.write(key, value);
   writer.end_record();
-  EXPECT_EQ(
-      "{\"key\" : \"value\""
-      ", \"key\" : \"value\""
-      ", \"key\" : \"value\"}",
-      ss.str());
+  EXPECT_EQ("{\"key\" : \"value\", \"key\" : \"value\", \"key\" : \"value\"}\n",
+            ss.str());
 }
 
 TEST_F(StanInterfaceCallbacksJsonWriter, write_double_vector_precision2) {
@@ -125,7 +149,7 @@ TEST_F(StanInterfaceCallbacksJsonWriter, write_string_vector) {
   const int N = 5;
   std::vector<std::string> x;
   for (int n = 0; n < N; ++n)
-    x.push_back(boost::lexical_cast<std::string>(n));
+    x.push_back(std::to_string(n));
 
   writer.write("key", x);
   EXPECT_EQ("\"key\" : [ 0, 1, 2, 3, 4 ]", ss.str());

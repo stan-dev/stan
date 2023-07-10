@@ -10,6 +10,7 @@
 #include <test/unit/services/instrumented_callbacks.hpp>
 #include <test/unit/services/pathfinder/util.hpp>
 #include <test/unit/services/util.hpp>
+#include <rapidjson/document.h>
 #include <gtest/gtest.h>
 
 // Locally tests can use threads but for jenkins we should just use 1 thread
@@ -84,8 +85,8 @@ TEST_F(ServicesPathfinderGLM, single) {
 
   stan::test::mock_callback callback;
   stan::io::empty_var_context empty_context;  // = init_init_context();
-  std::ofstream empty_ostream(nullptr);
-  stan::test::test_logger logger(empty_ostream);
+  std::unique_ptr<std::ostream> empty_ostream(nullptr);
+  stan::test::test_logger logger(std::move(empty_ostream));
 
   std::vector<std::tuple<Eigen::VectorXd, Eigen::VectorXd>> input_iters;
 
@@ -131,6 +132,8 @@ TEST_F(ServicesPathfinderGLM, single) {
   for (int i = 2; i < all_mean_vals.cols(); ++i) {
     EXPECT_NEAR(0, all_sd_vals(2, i), .1);
   }
+  rapidjson::Document document;
+  ASSERT_FALSE(document.Parse<0>(diagnostic_ss.str().c_str()).HasParseError());
 }
 
 TEST_F(ServicesPathfinderGLM, multi) {
@@ -152,8 +155,8 @@ TEST_F(ServicesPathfinderGLM, multi) {
   constexpr bool save_iterations = false;
   constexpr int refresh = 0;
 
-  std::ostream empty_ostream(nullptr);
-  stan::test::test_logger logger(empty_ostream);
+  std::unique_ptr<std::ostream> empty_ostream(nullptr);
+  stan::test::test_logger logger(std::move(empty_ostream));
   std::vector<stan::callbacks::writer> single_path_parameter_writer(num_paths);
   std::vector<stan::callbacks::json_writer<std::stringstream>>
       single_path_diagnostic_writer(num_paths);
