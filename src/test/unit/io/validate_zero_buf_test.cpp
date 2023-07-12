@@ -19,5 +19,4 @@ TEST(ioValidateZeroBuf, tester) {
 
   s = "1e1";
   EXPECT_THROW(validate_zero_buf(s), std::invalid_argument);
-
 }

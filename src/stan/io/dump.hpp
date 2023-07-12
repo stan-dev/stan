@@ -242,7 +242,7 @@ class dump_reader {
     size_t d = 0;
     try {
       d = std::stoull(buf_);
-    } catch (const std::logic_error &e) {
+    } catch (const std::logic_error& e) {
       std::string msg = "value " + buf_ + " beyond array dimension range";
       throw std::invalid_argument(msg);
     }
@@ -269,7 +269,7 @@ class dump_reader {
     int n = 0;
     try {
       n = std::stol(buf_);
-    } catch (const std::logic_error &e) {
+    } catch (const std::logic_error& e) {
       std::string msg = "value " + buf_ + " beyond int range";
       throw std::invalid_argument(msg);
     }
@@ -282,7 +282,7 @@ class dump_reader {
       x = std::stod(buf_);
       if (x == 0)
         validate_zero_buf(buf_);
-    } catch (const std::logic_error &e) {
+    } catch (const std::logic_error& e) {
       std::string msg = "value " + buf_ + " beyond numeric range";
       throw std::invalid_argument(msg);
     }
