@@ -1,7 +1,7 @@
 #ifndef STAN_IO_VALIDATE_ZERO_BUF_HPP
 #define STAN_IO_VALIDATE_ZERO_BUF_HPP
 
-#include <boost/lexical_cast/bad_lexical_cast.hpp>
+#include <stdexcept>
 #include <string>
 
 namespace stan {
@@ -14,8 +14,8 @@ namespace io {
  * operator[](size_t)</code>.
  *
  * @tparam B Character buffer type
- * @throw <code>boost::bad_lexical_cast</code> if the buffer
- * contains non-zero characters before an exponentiation symbol.
+ * @throw <code>std::invalid_argument</code> if the buffer
+ * contains non-zero digit before an exponentiation symbol.
  */
 template <typename B>
 void validate_zero_buf(const B& buf) {
@@ -23,7 +23,7 @@ void validate_zero_buf(const B& buf) {
     if (buf[i] == 'e' || buf[i] == 'E')
       return;
     if (buf[i] >= '1' && buf[i] <= '9')
-      boost::conversion::detail::throw_bad_cast<std::string, double>();
+      throw std::invalid_argument("non-zero digit before E");
   }
 }
 
