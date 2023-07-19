@@ -76,9 +76,9 @@ struct taylor_approx_t {
   Eigen::VectorXd x_center;  // Mean estimate
   double logdetcholHk;       // Log deteriminant of the cholesky
   Eigen::MatrixXd L_approx;  // Approximate choleskly
-  Eigen::MatrixXd Qk;  // Q of the QR decompositon. Only used for sparse approx
+  Eigen::MatrixXd Qk;  // Q of the QR decomposition. Only used for sparse approx
   Eigen::VectorXd alpha;  // diagonal of the initial inv hessian
-  bool use_full;  // boolean indicationg if full or sparse approx was used.
+  bool use_full;  // boolean indicating if full or sparse approx was used.
 };
 
 /**
@@ -829,7 +829,7 @@ inline auto pathfinder_lbfgs_single(
     if (refresh != 0) {
       logger.info(path_num + "Best Iter: [" + std::to_string(best_iteration)
                   + "] ELBO (" + std::to_string(elbo_best.elbo) + ")"
-                  + " evalutions: (" + std::to_string(num_evals) + ")");
+                  + " evaluations: (" + std::to_string(num_evals) + ")");
     }
   }
   Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic> constrained_draws_mat;

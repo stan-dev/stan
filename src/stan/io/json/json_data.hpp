@@ -28,7 +28,7 @@ namespace json {
  * <p>The dimensions and values of variables are accessed by variable name.
  * The values of a variable are stored as a vector of values and
  * a vector of array dimensions, where a scalar value consists of
- * a single value and an emtpy vector for the dimensionality.
+ * a single value and an empty vector for the dimensionality.
  * Multidimensional arrays are stored in column-major order,
  * meaning the first index changes the most quickly.
  * If all the values of an array are int values, the array will be
@@ -121,7 +121,7 @@ class json_data : public stan::io::var_context {
   }
 
   /**
-   * Read out the complex values for the variable with the specifed
+   * Read out the complex values for the variable with the specified
    * name and return a flat vector of complex values.
    *
    * @param name Name of Variable of type string.

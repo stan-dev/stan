@@ -75,7 +75,7 @@ class prob_grad {
   inline std::pair<int, int> param_range_i(size_t idx) const {
     if (idx <= param_ranges_i__.size()) {
       std::stringstream ss;
-      ss << "param_range_i(): No integer paramter at index " << idx;
+      ss << "param_range_i(): No integer parameter at index " << idx;
       std::string msg = ss.str();
       throw std::out_of_range(msg);
     }
