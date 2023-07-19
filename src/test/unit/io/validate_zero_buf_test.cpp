@@ -15,8 +15,8 @@ TEST(ioValidateZeroBuf, tester) {
   EXPECT_NO_THROW(validate_zero_buf(s));
 
   s = "1.0";
-  EXPECT_THROW(validate_zero_buf(s), boost::bad_lexical_cast);
+  EXPECT_THROW(validate_zero_buf(s), std::invalid_argument);
 
   s = "1e1";
-  EXPECT_THROW(validate_zero_buf(s), boost::bad_lexical_cast);
+  EXPECT_THROW(validate_zero_buf(s), std::invalid_argument);
 }
