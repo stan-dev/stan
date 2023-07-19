@@ -552,7 +552,7 @@ class json_data_handler : public stan::json::json_handler {
 
   /** For a start array ("[") event we first check that we're not currently
    *  processing the values in an array.  We need to do this because JSON
-   *  doesn't distinguish lists of heterogenous elements and arrays.
+   *  doesn't distinguish lists of heterogeneous elements and arrays.
    *  Then we add or update the dimensions of the array variable.
    */
   void start_array() {

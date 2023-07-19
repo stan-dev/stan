@@ -234,7 +234,7 @@ template <typename EigArray, typename Logger>
 inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
     const EigArray& log_ratios, Eigen::Index tail_len, Logger& logger) {
   const auto S = log_ratios.size();
-  // shift log ratios for safer exponentation
+  // shift log ratios for safer exponentiation
   const double max_log_ratio = log_ratios.maxCoeff();
   Eigen::Array<double, Eigen::Dynamic, 1> llr_weights
       = log_ratios.array() - max_log_ratio;

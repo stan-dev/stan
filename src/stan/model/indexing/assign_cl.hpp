@@ -52,7 +52,7 @@ inline const char* print_index_type(const stan::math::matrix_cl<int>&) {
  * of the assignment
  * @tparam ExprRhs type of the prim expression on the right hand side of the
  * assignment
- * @tparam RowIndex type of index (a Stan index type or `matrix_cl<int>` instad
+ * @tparam RowIndex type of index (a Stan index type or `matrix_cl<int>` instead
  * of `index_multi`)
  * @param[in,out] expr_lhs expression on the left hand side of the assignment
  * @param expr_rhs expression on the right hand side of the assignment
@@ -86,9 +86,9 @@ inline void assign(ExprLhs&& expr_lhs, ExprRhs&& expr_rhs, const char* name,
  * @tparam ExprRhs type of the prim expression on the right hand side of the
  * assignment
  * @tparam RowIndex type of row index (a Stan index type or `matrix_cl<int>`
- * instad of `index_multi`)
+ * instead of `index_multi`)
  * @tparam ColIndex type of column index (a Stan index type or `matrix_cl<int>`
- * instad of `index_multi`)
+ * instead of `index_multi`)
  * @param[in,out] expr_lhs expression on the left hand side of the assignment
  * @param expr_rhs expression on the right hand side of the assignment
  * @param name Name of lvalue variable
@@ -155,7 +155,7 @@ inline void assign(ExprLhs&& expr_lhs, const ScalRhs& scal_rhs,
  * @param expr_rhs expression on the right hand side of the assignment
  * @param name Name of lvalue variable
  * @param row_index index used for indexing `expr_lhs` (a Stan index type or
- * `matrix_cl<int>` instad of `index_multi`)
+ * `matrix_cl<int>` instead of `index_multi`)
  * @throw std::out_of_range If the index is out of bounds.
  * @throw std::invalid_argument If the right hand side size isn't the same as
  * the indexed left hand side size.
@@ -205,9 +205,9 @@ inline void assign(math::var_value<math::matrix_cl<double>>& expr_lhs,
  * @tparam ExprRhs type of the prim or rev expression on the right hand side of
  * the assignment
  * @tparam RowIndex type of row index (a Stan index type or `matrix_cl<int>`
- * instad of `index_multi`)
+ * instead of `index_multi`)
  * @tparam ColIndex type of column index (a Stan index type or `matrix_cl<int>`
- * instad of `index_multi`)
+ * instead of `index_multi`)
  * @param[in,out] expr_lhs expression on the left hand side of the assignment
  * @param expr_rhs expression on the right hand side of the assignment
  * @param name Name of lvalue variable
