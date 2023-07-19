@@ -829,7 +829,7 @@ inline auto pathfinder_lbfgs_single(
     if (refresh != 0) {
       logger.info(path_num + "Best Iter: [" + std::to_string(best_iteration)
                   + "] ELBO (" + std::to_string(elbo_best.elbo) + ")"
-                  + " evalutions: (" + std::to_string(num_evals) + ")");
+                  + " evaluations: (" + std::to_string(num_evals) + ")");
     }
   }
   Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic> constrained_draws_mat;
