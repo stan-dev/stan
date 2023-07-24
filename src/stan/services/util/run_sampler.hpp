@@ -38,7 +38,8 @@ void run_sampler(stan::mcmc::base_mcmc& sampler, Model& model,
                  int num_samples, int num_thin, int refresh, bool save_warmup,
                  RNG& rng, callbacks::interrupt& interrupt,
                  callbacks::logger& logger, callbacks::writer& sample_writer,
-                 callbacks::writer& diagnostic_writer) {
+                 callbacks::writer& diagnostic_writer,
+                 size_t chain_id = 1, size_t num_chains = 1) {
   Eigen::Map<Eigen::VectorXd> cont_params(cont_vector.data(),
                                           cont_vector.size());
   services::util::mcmc_writer writer(sample_writer, diagnostic_writer, logger);
@@ -51,7 +52,7 @@ void run_sampler(stan::mcmc::base_mcmc& sampler, Model& model,
   auto start_warm = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_warmup, 0, num_warmup + num_samples,
                              num_thin, refresh, save_warmup, true, writer, s,
-                             model, rng, interrupt, logger);
+                             model, rng, interrupt, logger, chain_id, num_chains);
   auto end_warm = std::chrono::steady_clock::now();
   double warm_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                             end_warm - start_warm)
@@ -63,7 +64,7 @@ void run_sampler(stan::mcmc::base_mcmc& sampler, Model& model,
   auto start_sample = std::chrono::steady_clock::now();
   util::generate_transitions(sampler, num_samples, num_warmup,
                              num_warmup + num_samples, num_thin, refresh, true,
-                             false, writer, s, model, rng, interrupt, logger);
+                             false, writer, s, model, rng, interrupt, logger, chain_id, num_chains);
   auto end_sample = std::chrono::steady_clock::now();
   double sample_delta_t = std::chrono::duration_cast<std::chrono::milliseconds>(
                               end_sample - start_sample)
