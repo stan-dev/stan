@@ -130,23 +130,30 @@ int hmc_nuts_diag_e(Model& model, const stan::io::var_context& init,
                          sample_writer, diagnostic_writer);
 }
 
-
 /**
  * Runs multiple chains of HMC with NUTS without adaptation using diagonal
  * Euclidean metric with a pre-specified Euclidean metric.
  *
  * @tparam Model Model class
- * @tparam InitContextPtr A pointer with underlying type derived from `stan::io::var_context`
- * @tparam InitInvContextPtr A pointer with underlying type derived from `stan::io::var_context`
+ * @tparam InitContextPtr A pointer with underlying type derived from
+ * `stan::io::var_context`
+ * @tparam InitInvContextPtr A pointer with underlying type derived from
+ * `stan::io::var_context`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
  * @param[in] model Input model to test (with data already instantiated)
- * @param[in] num_chains The number of chains to run in parallel. `init`, `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same length as this value.
- * @param[in] init An std vector of init var contexts for initialization of each chain.
- * @param[in] init_inv_metric An std vector of var contexts exposing an initial diagonal inverse Euclidean metric for each chain (must be positive definite)
+ * @param[in] num_chains The number of chains to run in parallel. `init`,
+ * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer`
+ * must be the same length as this value.
+ * @param[in] init An std vector of init var contexts for initialization of each
+ * chain.
+ * @param[in] init_inv_metric An std vector of var contexts exposing an initial
+ * diagonal inverse Euclidean metric for each chain (must be positive definite)
  * @param[in] random_seed random seed for the random number generator
- * @param[in] init_chain_id first chain id. The pseudo random number generator will advance by for each chain by an integer sequence from `init_chain_id` to init_chain_id+num_chains-1`
+ * @param[in] init_chain_id first chain id. The pseudo random number generator
+ * will advance by for each chain by an integer sequence from `init_chain_id` to
+ * init_chain_id+num_chains-1`
  * @param[in] init_radius radius to initialize
  * @param[in] num_warmup Number of warmup samples
  * @param[in] num_samples Number of samples
@@ -158,24 +165,26 @@ int hmc_nuts_diag_e(Model& model, const stan::io::var_context& init,
  * @param[in] max_depth Maximum tree depth
  * @param[in,out] interrupt Callback for interrupts
  * @param[in,out] logger Logger for messages
- * @param[in,out] init_writer std vector of Writer callbacks for unconstrained inits of each chain.
+ * @param[in,out] init_writer std vector of Writer callbacks for unconstrained
+ * inits of each chain.
  * @param[in,out] sample_writer std vector of Writers for draws of each chain.
- * @param[in,out] diagnostic_writer std vector of Writers for diagnostic information of each chain.
+ * @param[in,out] diagnostic_writer std vector of Writers for diagnostic
+ * information of each chain.
  * @return error_codes::OK if successful
  */
 template <class Model, typename InitContextPtr, typename InitInvContextPtr,
           typename InitWriter, typename SampleWriter, typename DiagnosticWriter>
-int hmc_nuts_diag_e(
-    Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
-    const std::vector<InitInvContextPtr>& init_inv_metric,
-                     unsigned int random_seed, unsigned int init_chain_id,
-                     double init_radius, int num_warmup, int num_samples,
-                     int num_thin, bool save_warmup, int refresh,
-                     double stepsize, double stepsize_jitter, int max_depth,
-    callbacks::interrupt& interrupt, callbacks::logger& logger,
-    std::vector<InitWriter>& init_writer,
-    std::vector<SampleWriter>& sample_writer,
-    std::vector<DiagnosticWriter>& diagnostic_writer) {
+int hmc_nuts_diag_e(Model& model, size_t num_chains,
+                    const std::vector<InitContextPtr>& init,
+                    const std::vector<InitInvContextPtr>& init_inv_metric,
+                    unsigned int random_seed, unsigned int init_chain_id,
+                    double init_radius, int num_warmup, int num_samples,
+                    int num_thin, bool save_warmup, int refresh,
+                    double stepsize, double stepsize_jitter, int max_depth,
+                    callbacks::interrupt& interrupt, callbacks::logger& logger,
+                    std::vector<InitWriter>& init_writer,
+                    std::vector<SampleWriter>& sample_writer,
+                    std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
     return hmc_nuts_diag_e(
         model, *init[0], *init_inv_metric[0], random_seed, init_chain_id,
@@ -215,9 +224,10 @@ int hmc_nuts_diag_e(
        &sample_writer, &cont_vectors,
        &diagnostic_writer](const tbb::blocked_range<size_t>& r) {
         for (size_t i = r.begin(); i != r.end(); ++i) {
-            util::run_sampler(samplers[i], model, cont_vectors[i], num_warmup, num_samples,
-                    num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
-                    sample_writer[i], diagnostic_writer[i], init_chain_id + i);
+          util::run_sampler(samplers[i], model, cont_vectors[i], num_warmup,
+                            num_samples, num_thin, refresh, save_warmup,
+                            rngs[i], interrupt, logger, sample_writer[i],
+                            diagnostic_writer[i], init_chain_id + i);
         }
       },
       tbb::simple_partitioner());
@@ -263,23 +273,22 @@ int hmc_nuts_diag_e(
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
           typename SampleWriter, typename DiagnosticWriter>
-int hmc_nuts_diag_e(
-    Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
-                     unsigned int random_seed, unsigned int init_chain_id,
-                     double init_radius, int num_warmup, int num_samples,
-                     int num_thin, bool save_warmup, int refresh,
-                     double stepsize, double stepsize_jitter, int max_depth,
-    callbacks::interrupt& interrupt, callbacks::logger& logger,
-    std::vector<InitWriter>& init_writer,
-    std::vector<SampleWriter>& sample_writer,
-    std::vector<DiagnosticWriter>& diagnostic_writer) {
+int hmc_nuts_diag_e(Model& model, size_t num_chains,
+                    const std::vector<InitContextPtr>& init,
+                    unsigned int random_seed, unsigned int init_chain_id,
+                    double init_radius, int num_warmup, int num_samples,
+                    int num_thin, bool save_warmup, int refresh,
+                    double stepsize, double stepsize_jitter, int max_depth,
+                    callbacks::interrupt& interrupt, callbacks::logger& logger,
+                    std::vector<InitWriter>& init_writer,
+                    std::vector<SampleWriter>& sample_writer,
+                    std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
-    return hmc_nuts_diag_e(
-        model, *init[0], random_seed, init_chain_id, init_radius, num_warmup,
-        num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-        max_depth,
-        interrupt, logger, init_writer[0], sample_writer[0],
-        diagnostic_writer[0]);
+    return hmc_nuts_diag_e(model, *init[0], random_seed, init_chain_id,
+                           init_radius, num_warmup, num_samples, num_thin,
+                           save_warmup, refresh, stepsize, stepsize_jitter,
+                           max_depth, interrupt, logger, init_writer[0],
+                           sample_writer[0], diagnostic_writer[0]);
   }
   std::vector<std::unique_ptr<stan::io::dump>> unit_e_metrics;
   unit_e_metrics.reserve(num_chains);
@@ -287,13 +296,12 @@ int hmc_nuts_diag_e(
     unit_e_metrics.emplace_back(std::make_unique<stan::io::dump>(
         util::create_unit_e_diag_inv_metric(model.num_params_r())));
   }
-  return hmc_nuts_diag_e(
-      model, num_chains, init, unit_e_metrics, random_seed, init_chain_id,
-      init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, interrupt, logger, init_writer,
-      sample_writer, diagnostic_writer);
+  return hmc_nuts_diag_e(model, num_chains, init, unit_e_metrics, random_seed,
+                         init_chain_id, init_radius, num_warmup, num_samples,
+                         num_thin, save_warmup, refresh, stepsize,
+                         stepsize_jitter, max_depth, interrupt, logger,
+                         init_writer, sample_writer, diagnostic_writer);
 }
-
 
 }  // namespace sample
 }  // namespace services

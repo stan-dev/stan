@@ -28,7 +28,6 @@ class ServicesSampleHmcNutsUnitEPar : public testing::Test {
   stan_model model;
 };
 
-
 TEST_F(ServicesSampleHmcNutsUnitEPar, call_count) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
@@ -54,8 +53,7 @@ TEST_F(ServicesSampleHmcNutsUnitEPar, call_count) {
   int return_code = stan::services::sample::hmc_nuts_unit_e(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, 
-      interrupt, logger, init, parameter, diagnostic);
+      max_depth, interrupt, logger, init, parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
 
@@ -94,8 +92,7 @@ TEST_F(ServicesSampleHmcNutsUnitEPar, parameter_checks) {
   int return_code = stan::services::sample::hmc_nuts_unit_e(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, 
-      interrupt, logger, init, parameter, diagnostic);
+      max_depth, interrupt, logger, init, parameter, diagnostic);
 
   for (size_t i = 0; i < num_chains; ++i) {
     std::vector<std::vector<std::string>> parameter_names;
@@ -158,8 +155,7 @@ TEST_F(ServicesSampleHmcNutsUnitEPar, output_regression) {
   stan::services::sample::hmc_nuts_unit_e(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth,
-      interrupt, logger, init, parameter, diagnostic);
+      max_depth, interrupt, logger, init, parameter, diagnostic);
 
   for (auto&& init_it : init) {
     std::vector<std::string> init_values;

@@ -50,7 +50,8 @@ TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, call_count) {
   int return_code = stan::services::sample::hmc_nuts_unit_e_adapt(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter, diagnostic);
+      max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter,
+      diagnostic);
 
   EXPECT_EQ(0, return_code);
 
@@ -86,7 +87,8 @@ TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, parameter_checks) {
   int return_code = stan::services::sample::hmc_nuts_unit_e_adapt(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter, diagnostic);
+      max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter,
+      diagnostic);
 
   for (size_t i = 0; i < num_chains; ++i) {
     std::vector<std::vector<std::string>> parameter_names;
@@ -146,7 +148,8 @@ TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, output_regression) {
   stan::services::sample::hmc_nuts_unit_e_adapt(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter, diagnostic);
+      max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter,
+      diagnostic);
 
   for (auto&& init_it : init) {
     std::vector<std::string> init_values;

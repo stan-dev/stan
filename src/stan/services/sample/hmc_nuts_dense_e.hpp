@@ -177,17 +177,17 @@ int hmc_nuts_dense_e(Model& model, const stan::io::var_context& init,
  */
 template <class Model, typename InitContextPtr, typename InitInvContextPtr,
           typename InitWriter, typename SampleWriter, typename DiagnosticWriter>
-int hmc_nuts_dense_e(
-    Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
-    const std::vector<InitInvContextPtr>& init_inv_metric,
+int hmc_nuts_dense_e(Model& model, size_t num_chains,
+                     const std::vector<InitContextPtr>& init,
+                     const std::vector<InitInvContextPtr>& init_inv_metric,
                      unsigned int random_seed, unsigned int init_chain_id,
                      double init_radius, int num_warmup, int num_samples,
                      int num_thin, bool save_warmup, int refresh,
                      double stepsize, double stepsize_jitter, int max_depth,
-    callbacks::interrupt& interrupt, callbacks::logger& logger,
-    std::vector<InitWriter>& init_writer,
-    std::vector<SampleWriter>& sample_writer,
-    std::vector<DiagnosticWriter>& diagnostic_writer) {
+                     callbacks::interrupt& interrupt, callbacks::logger& logger,
+                     std::vector<InitWriter>& init_writer,
+                     std::vector<SampleWriter>& sample_writer,
+                     std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
     return hmc_nuts_dense_e(
         model, *init[0], *init_inv_metric[0], random_seed, init_chain_id,
@@ -227,9 +227,10 @@ int hmc_nuts_dense_e(
        &sample_writer, &cont_vectors,
        &diagnostic_writer](const tbb::blocked_range<size_t>& r) {
         for (size_t i = r.begin(); i != r.end(); ++i) {
-            util::run_sampler(samplers[i], model, cont_vectors[i], num_warmup, num_samples,
-                    num_thin, refresh, save_warmup, rngs[i], interrupt, logger,
-                    sample_writer[i], diagnostic_writer[i], init_chain_id + i);
+          util::run_sampler(samplers[i], model, cont_vectors[i], num_warmup,
+                            num_samples, num_thin, refresh, save_warmup,
+                            rngs[i], interrupt, logger, sample_writer[i],
+                            diagnostic_writer[i], init_chain_id + i);
         }
       },
       tbb::simple_partitioner());
@@ -276,23 +277,22 @@ int hmc_nuts_dense_e(
  */
 template <class Model, typename InitContextPtr, typename InitWriter,
           typename SampleWriter, typename DiagnosticWriter>
-int hmc_nuts_dense_e(
-    Model& model, size_t num_chains, const std::vector<InitContextPtr>& init,
+int hmc_nuts_dense_e(Model& model, size_t num_chains,
+                     const std::vector<InitContextPtr>& init,
                      unsigned int random_seed, unsigned int init_chain_id,
                      double init_radius, int num_warmup, int num_samples,
                      int num_thin, bool save_warmup, int refresh,
                      double stepsize, double stepsize_jitter, int max_depth,
-    callbacks::interrupt& interrupt, callbacks::logger& logger,
-    std::vector<InitWriter>& init_writer,
-    std::vector<SampleWriter>& sample_writer,
-    std::vector<DiagnosticWriter>& diagnostic_writer) {
+                     callbacks::interrupt& interrupt, callbacks::logger& logger,
+                     std::vector<InitWriter>& init_writer,
+                     std::vector<SampleWriter>& sample_writer,
+                     std::vector<DiagnosticWriter>& diagnostic_writer) {
   if (num_chains == 1) {
-    return hmc_nuts_dense_e(
-        model, *init[0], random_seed, init_chain_id, init_radius, num_warmup,
-        num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-        max_depth,
-        interrupt, logger, init_writer[0], sample_writer[0],
-        diagnostic_writer[0]);
+    return hmc_nuts_dense_e(model, *init[0], random_seed, init_chain_id,
+                            init_radius, num_warmup, num_samples, num_thin,
+                            save_warmup, refresh, stepsize, stepsize_jitter,
+                            max_depth, interrupt, logger, init_writer[0],
+                            sample_writer[0], diagnostic_writer[0]);
   }
   std::vector<std::unique_ptr<stan::io::dump>> unit_e_metrics;
   unit_e_metrics.reserve(num_chains);
@@ -300,13 +300,12 @@ int hmc_nuts_dense_e(
     unit_e_metrics.emplace_back(std::make_unique<stan::io::dump>(
         util::create_unit_e_dense_inv_metric(model.num_params_r())));
   }
-  return hmc_nuts_dense_e(
-      model, num_chains, init, unit_e_metrics, random_seed, init_chain_id,
-      init_radius, num_warmup, num_samples, num_thin, save_warmup, refresh,
-      stepsize, stepsize_jitter, max_depth, interrupt, logger, init_writer,
-      sample_writer, diagnostic_writer);
+  return hmc_nuts_dense_e(model, num_chains, init, unit_e_metrics, random_seed,
+                          init_chain_id, init_radius, num_warmup, num_samples,
+                          num_thin, save_warmup, refresh, stepsize,
+                          stepsize_jitter, max_depth, interrupt, logger,
+                          init_writer, sample_writer, diagnostic_writer);
 }
-
 
 }  // namespace sample
 }  // namespace services
