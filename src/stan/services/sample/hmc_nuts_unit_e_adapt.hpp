@@ -79,6 +79,40 @@ int hmc_nuts_unit_e_adapt(
   return error_codes::OK;
 }
 
+/**
+ * Runs HMC with NUTS with unit Euclidean metric with adaptation for multiple chains.
+ *
+ * @tparam Model Model class
+ * @tparam InitContextPtr A pointer with underlying type derived from `stan::io::var_context`
+ * @tparam InitWriter A type derived from `stan::callbacks::writer`
+ * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
+ * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
+ * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] num_chains The number of chains to run in parallel. `init`,
+ * `init_inv_metric`, `init_writer`, `sample_writer`, and `diagnostic_writer` must be the same length as this value.
+ * @param[in] init An std vector of init var contexts for initialization of each chain.
+ * @param[in] random_seed random seed for the random number generator
+ * @param[in] chain chain id to advance the pseudo random number generator
+ * @param[in] init_radius radius to initialize
+ * @param[in] num_warmup Number of warmup samples
+ * @param[in] num_samples Number of samples
+ * @param[in] num_thin Number to thin the samples
+ * @param[in] save_warmup Indicates whether to save the warmup iterations
+ * @param[in] refresh Controls the output
+ * @param[in] stepsize initial stepsize for discrete evolution
+ * @param[in] stepsize_jitter uniform random jitter of stepsize
+ * @param[in] max_depth Maximum tree depth
+ * @param[in] delta adaptation target acceptance statistic
+ * @param[in] gamma adaptation regularization scale
+ * @param[in] kappa adaptation relaxation exponent
+ * @param[in] t0 adaptation iteration offset
+ * @param[in,out] interrupt Callback for interrupts
+ * @param[in,out] logger Logger for messages
+ * @param[in,out] init_writer std vector of Writer callbacks for unconstrained inits of each chain.
+ * @param[in,out] sample_writer std vector of Writers for draws of each chain.
+ * @param[in,out] diagnostic_writer std vector of Writers for diagnostic information of each chain.
+ * @return error_codes::OK if successful
+ */
 template <class Model, typename InitContextPtr, typename InitWriter,
           typename SampleWriter, typename DiagnosticWriter>
 int hmc_nuts_unit_e_adapt(
