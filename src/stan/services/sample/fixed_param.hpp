@@ -80,6 +80,36 @@ int fixed_param(Model& model, const stan::io::var_context& init,
   return error_codes::OK;
 }
 
+/**
+ * Runs the fixed parameter sampler.
+ *
+ * The fixed parameter sampler sets the parameters randomly once
+ * on the unconstrained scale, then runs the model for the number
+ * of iterations specified with the parameters fixed.
+ *
+ * @tparam Model Model class  
+ * @tparam InitContextPtr A pointer with underlying type derived from `stan::io::var_context`
+ * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
+ * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
+ * @tparam InitWriter A type derived from `stan::callbacks::writer`
+ * @param[in] model Input model to test (with data already instantiated)
+ * @param[in] num_chains Number of chains to run
+ * @param[in] init var context for initialization
+ * @param[in] random_seed random seed for the random number generator
+ * @param[in] chain chain id to advance the pseudo random number generator
+ * @param[in] init_radius radius to initialize
+ * @param[in] num_samples Number of samples
+ * @param[in] num_thin Number to thin the samples
+ * @param[in] refresh Controls the output
+ * @param[in,out] interrupt Callback for interrupts
+ * @param[in,out] logger Logger for messages
+ * @param[in,out] init_writer std vector of Writer callbacks for unconstrained
+ * inits of each chain.
+ * @param[in,out] sample_writer std vector of Writers for draws of each chain.
+ * @param[in,out] diagnostic_writer std vector of Writers for diagnostic
+ * information of each chain.
+ * @return error_codes::OK if successful
+ */
 template <typename Model, typename InitContextPtr, typename InitWriter,
           typename SampleWriter, typename DiagnosticWriter>
 int fixed_param(Model& model, const std::size_t num_chains,
@@ -90,6 +120,10 @@ int fixed_param(Model& model, const std::size_t num_chains,
                 std::vector<InitWriter>& init_writer,
                 std::vector<SampleWriter>& sample_writers,
                 std::vector<DiagnosticWriter>& diagnostic_writers) {
+  if (num_chains == 1) {
+    return fixed_param(model, init, random_seed, chain, init_radius, num_samples, num_thin, refresh,
+                       interrupt, logger, init_writer[0], sample_writers[0], diagnostic_writers[0]);
+  }
   std::vector<boost::ecuyer1988> rngs;
   std::vector<Eigen::VectorXd> cont_vectors;
   std::vector<util::mcmc_writer> writers;

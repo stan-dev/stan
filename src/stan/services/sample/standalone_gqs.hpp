@@ -109,7 +109,7 @@ int standalone_generate(const Model &model, const int num_chains,
                         const std::vector<Eigen::MatrixXd> &draws,
                         unsigned int seed, callbacks::interrupt &interrupt,
                         callbacks::logger &logger,
-                        SampleWriter &sample_writers) {
+                       std::vector<SampleWriter> &sample_writers) {
   if (num_chains == 1) {
     return standalone_generate(model, draws[0], seed, interrupt, logger,
                                sample_writers[0]);

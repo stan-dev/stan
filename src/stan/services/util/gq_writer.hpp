@@ -6,6 +6,7 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <sstream>
 #include <iomanip>
 #include <string>
