@@ -122,7 +122,7 @@ int fixed_param(Model& model, const std::size_t num_chains,
                 std::vector<SampleWriter>& sample_writers,
                 std::vector<DiagnosticWriter>& diagnostic_writers) {
   if (num_chains == 1) {
-    return fixed_param(model, init, random_seed, chain, init_radius,
+    return fixed_param(model, *init[0], random_seed, chain, init_radius,
                        num_samples, num_thin, refresh, interrupt, logger,
                        init_writer[0], sample_writers[0],
                        diagnostic_writers[0]);
