@@ -99,7 +99,8 @@ class gq_writer {
    * @param[in] rng instantiated RNG
    * @param[in] draw sequence unconstrained parameters values.
    */
-  template <typename Model, typename RNG, typename EigVec, require_eigen_vector_t<EigVec>* = nullptr>
+  template <typename Model, typename RNG, typename EigVec,
+            require_eigen_vector_t<EigVec>* = nullptr>
   void write_gq_values(const Model& model, RNG& rng, EigVec& draw) {
     plain_type_t<EigVec> values;
     std::stringstream ss;

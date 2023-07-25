@@ -95,15 +95,17 @@ int standalone_generate(const Model &model, const Eigen::MatrixXd &draws,
  * @tparam SampleWriter type of sample writer
  * @param[in] model instantiated model
  * @param[in] num_chains number of chains
- * @param[in] draws standard vector containing sequence of draws of constrained parameters
+ * @param[in] draws standard vector containing sequence of draws of constrained
+ * parameters
  * @param[in] seed seed to use for randomization
  * @param[in, out] interrupt called every iteration
  * @param[in, out] logger logger to which to write warning and error messages
- * @param[in, out] sample_writers A vector of writers to which draws for each chain are written
+ * @param[in, out] sample_writers A vector of writers to which draws for each
+ * chain are written
  * @return error code
  */
 template <typename Model, typename SampleWriter>
-int standalone_generate(const Model &model, const int num_chains, 
+int standalone_generate(const Model &model, const int num_chains,
                         const std::vector<Eigen::MatrixXd> &draws,
                         unsigned int seed, callbacks::interrupt &interrupt,
                         callbacks::logger &logger,
@@ -112,7 +114,6 @@ int standalone_generate(const Model &model, const int num_chains,
     return standalone_generate(model, draws[0], seed, interrupt, logger,
                                sample_writers[0]);
   }
-
 
   std::vector<std::string> p_names;
   model.constrained_param_names(p_names, false, false);
@@ -147,30 +148,33 @@ int standalone_generate(const Model &model, const int num_chains,
   }
   bool error_any = false;
   tbb::parallel_for(
-    tbb::blocked_range<size_t>(0, num_chains, 1),
-    [&draws, &model, &logger, &interrupt, &writers, &rngs, &error_any](const tbb::blocked_range<size_t>& r) {
-      Eigen::VectorXd unconstrained_params_r(draws[0].cols());
-      Eigen::VectorXd row(draws[0].cols());
-      std::stringstream msg;
-      for (size_t slice_idx = r.begin(); slice_idx != r.end(); ++slice_idx) {
-        for (size_t i = 0; i < draws[slice_idx].rows(); ++i) {
-          if (error_any) return;
-          try {
-            row = draws[slice_idx].row(i);
-            model.unconstrain_array(row, unconstrained_params_r, &msg);
-          } catch (const std::exception &e) {
-            if (msg.str().length() > 0)
-              logger.error(msg);
-            logger.error(e.what());
-            error_any = true;
-            return;
+      tbb::blocked_range<size_t>(0, num_chains, 1),
+      [&draws, &model, &logger, &interrupt, &writers, &rngs,
+       &error_any](const tbb::blocked_range<size_t> &r) {
+        Eigen::VectorXd unconstrained_params_r(draws[0].cols());
+        Eigen::VectorXd row(draws[0].cols());
+        std::stringstream msg;
+        for (size_t slice_idx = r.begin(); slice_idx != r.end(); ++slice_idx) {
+          for (size_t i = 0; i < draws[slice_idx].rows(); ++i) {
+            if (error_any)
+              return;
+            try {
+              row = draws[slice_idx].row(i);
+              model.unconstrain_array(row, unconstrained_params_r, &msg);
+            } catch (const std::exception &e) {
+              if (msg.str().length() > 0)
+                logger.error(msg);
+              logger.error(e.what());
+              error_any = true;
+              return;
+            }
+            interrupt();  // call out to interrupt and fail
+            writers[slice_idx].write_gq_values(model, rngs[slice_idx],
+                                               unconstrained_params_r);
           }
-          interrupt();  // call out to interrupt and fail
-          writers[slice_idx].write_gq_values(model, rngs[slice_idx], unconstrained_params_r);
         }
-      }
-    },
-    tbb::simple_partitioner());
+      },
+      tbb::simple_partitioner());
   return error_any ? error_codes::DATAERR : error_codes::OK;
 }
 
