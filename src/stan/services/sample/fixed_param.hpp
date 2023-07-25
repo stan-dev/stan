@@ -87,8 +87,9 @@ int fixed_param(Model& model, const stan::io::var_context& init,
  * on the unconstrained scale, then runs the model for the number
  * of iterations specified with the parameters fixed.
  *
- * @tparam Model Model class  
- * @tparam InitContextPtr A pointer with underlying type derived from `stan::io::var_context`
+ * @tparam Model Model class
+ * @tparam InitContextPtr A pointer with underlying type derived from
+ * `stan::io::var_context`
  * @tparam SamplerWriter A type derived from `stan::callbacks::writer`
  * @tparam DiagnosticWriter A type derived from `stan::callbacks::writer`
  * @tparam InitWriter A type derived from `stan::callbacks::writer`
@@ -121,8 +122,10 @@ int fixed_param(Model& model, const std::size_t num_chains,
                 std::vector<SampleWriter>& sample_writers,
                 std::vector<DiagnosticWriter>& diagnostic_writers) {
   if (num_chains == 1) {
-    return fixed_param(model, init, random_seed, chain, init_radius, num_samples, num_thin, refresh,
-                       interrupt, logger, init_writer[0], sample_writers[0], diagnostic_writers[0]);
+    return fixed_param(model, init, random_seed, chain, init_radius,
+                       num_samples, num_thin, refresh, interrupt, logger,
+                       init_writer[0], sample_writers[0],
+                       diagnostic_writers[0]);
   }
   std::vector<boost::ecuyer1988> rngs;
   std::vector<Eigen::VectorXd> cont_vectors;
