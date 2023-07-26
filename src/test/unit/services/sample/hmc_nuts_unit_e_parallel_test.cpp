@@ -1,4 +1,4 @@
-#include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
+#include <stan/services/sample/hmc_nuts_unit_e.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
@@ -6,12 +6,11 @@
 #include <iostream>
 
 auto&& blah = stan::math::init_threadpool_tbb();
-
 static constexpr size_t num_chains = 4;
 
-class ServicesSampleHmcNutsDenseEAdaptPar : public testing::Test {
+class ServicesSampleHmcNutsUnitEPar : public testing::Test {
  public:
-  ServicesSampleHmcNutsDenseEAdaptPar() : model(data_context, 0, &model_log) {
+  ServicesSampleHmcNutsUnitEPar() : model(data_context, 0, &model_log) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
@@ -29,7 +28,7 @@ class ServicesSampleHmcNutsDenseEAdaptPar : public testing::Test {
   stan_model model;
 };
 
-TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, call_count) {
+TEST_F(ServicesSampleHmcNutsUnitEPar, call_count) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -51,11 +50,10 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, call_count) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
+  int return_code = stan::services::sample::hmc_nuts_unit_e(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, parameter, diagnostic);
+      max_depth, interrupt, logger, init, parameter, diagnostic);
 
   EXPECT_EQ(0, return_code);
 
@@ -69,7 +67,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, call_count) {
   }
 }
 
-TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, parameter_checks) {
+TEST_F(ServicesSampleHmcNutsUnitEPar, parameter_checks) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -91,11 +89,10 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, parameter_checks) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
+  int return_code = stan::services::sample::hmc_nuts_unit_e(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, parameter, diagnostic);
+      max_depth, interrupt, logger, init, parameter, diagnostic);
 
   for (size_t i = 0; i < num_chains; ++i) {
     std::vector<std::vector<std::string>> parameter_names;
@@ -133,7 +130,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, parameter_checks) {
   EXPECT_EQ(return_code, 0);
 }
 
-TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, output_regression) {
+TEST_F(ServicesSampleHmcNutsUnitEPar, output_regression) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -155,11 +152,10 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, output_regression) {
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  stan::services::sample::hmc_nuts_dense_e_adapt(
+  stan::services::sample::hmc_nuts_unit_e(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, parameter, diagnostic);
+      max_depth, interrupt, logger, init, parameter, diagnostic);
 
   for (auto&& init_it : init) {
     std::vector<std::string> init_values;
