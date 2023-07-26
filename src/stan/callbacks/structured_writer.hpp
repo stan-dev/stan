@@ -29,7 +29,7 @@ class structured_writer {
    * Writes key followed by start token of a structured record.
    * @param[in] key The name of the record.
    */
-  virtual void begin_record(const std::string&, bool newline = false) {}
+  virtual void begin_record(const std::string& key, bool newline = false) {}
 
   /**
    * Writes end token of a structured record.

@@ -113,8 +113,8 @@ int fixed_param(Model& model, const stan::io::var_context& init,
  * @param[in,out] logger Logger for messages
  * @param[in,out] init_writer std vector of Writer callbacks for unconstrained
  * inits of each chain.
- * @param[in,out] sample_writer std vector of Writers for draws of each chain.
- * @param[in,out] diagnostic_writer std vector of Writers for diagnostic
+ * @param[in,out] sample_writers std vector of Writers for draws of each chain.
+ * @param[in,out] diagnostic_writers std vector of Writers for diagnostic
  * information of each chain.
  * @return error_codes::OK if successful
  */

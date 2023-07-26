@@ -18,10 +18,10 @@ struct deleter_noop {
 class ServicesSampleHmcNutsDiagEAdaptParMatch : public testing::Test {
  public:
   ServicesSampleHmcNutsDiagEAdaptParMatch()
-      : model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
-          data_context, 0, &model_log)),
-        ss_par(num_chains),
-        ss_seq(num_chains) {
+      : ss_par(num_chains),
+        ss_seq(num_chains),
+        model(std::make_unique<rosenbrock_model_namespace::rosenbrock_model>(
+            data_context, 0, &model_log)) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
       par_parameters.emplace_back(
