@@ -123,7 +123,7 @@ inline int pathfinder_lbfgs_multi(
                   single_path_diagnostic_writer[iter]);
           if (unlikely(std::get<0>(pathfinder_ret) != error_codes::OK)) {
             logger.error(std::string("Pathfinder iteration: ")
-                        + std::to_string(iter) + " failed.");
+                         + std::to_string(iter) + " failed.");
             return;
           }
           individual_lp_ratios.emplace_back(

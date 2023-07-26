@@ -65,9 +65,9 @@ int fullrank(Model& model, const stan::io::var_context& init,
   std::vector<int> disc_vector;
   std::vector<double> cont_vector;
 
-  try{
-    cont_vector = util::initialize(
-      model, init, rng, init_radius, true, logger, init_writer);
+  try {
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   init_writer);
   } catch (const std::exception& e) {
     logger.error(e.what());
     return stan::services::error_codes::CONFIG;

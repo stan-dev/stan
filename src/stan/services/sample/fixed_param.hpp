@@ -55,8 +55,8 @@ int fixed_param(Model& model, const stan::io::var_context& init,
   std::vector<double> cont_vector;
 
   try {
-    cont_vector = util::initialize(
-      model, init, rng, init_radius, false, logger, init_writer);
+    cont_vector = util::initialize(model, init, rng, init_radius, false, logger,
+                                   init_writer);
   } catch (const std::exception& e) {
     logger.error(e.what());
     return error_codes::CONFIG;

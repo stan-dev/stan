@@ -398,7 +398,7 @@ TEST_F(ServicesUtilInitialize, model_errors__radius_zero) {
   EXPECT_EQ(1, logger.call_count());
   EXPECT_EQ(1, logger.call_count_error());
   EXPECT_EQ(1, logger.find_error("Unrecoverable error evaluating the log "
-                                "probability at the initial value."));
+                                 "probability at the initial value."));
 }
 
 TEST_F(ServicesUtilInitialize, model_errors__radius_two) {
