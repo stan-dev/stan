@@ -523,7 +523,7 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
                               num_elbo_draws, alpha, iter_msg, logger),
                           taylor_appx);
   } catch (const std::exception& e) {
-    logger.info(iter_msg + "ELBO estimation failed "
+    logger.warn(iter_msg + "ELBO estimation failed "
                 + " with error: " + e.what());
     return std::make_pair(internal::elbo_est_t{}, internal::taylor_approx_t{});
   }
@@ -806,20 +806,20 @@ inline auto pathfinder_lbfgs_single(
     std::string prefix_err_msg
         = "Optimization terminated with error: " + lbfgs.get_code_string(ret);
     if (lbfgs.iter_num() < 2) {
-      logger.info(prefix_err_msg
+      logger.error(prefix_err_msg
                   + " Optimization failed to start, pathfinder cannot be run.");
       return internal::ret_pathfinder<ReturnLpSamples>(
           error_codes::SOFTWARE, Eigen::Array<double, Eigen::Dynamic, 1>(0),
           Eigen::Array<double, Eigen::Dynamic, Eigen::Dynamic>(0, 0),
           std::atomic<size_t>{num_evals + lbfgs.grad_evals()});
     } else {
-      logger.info(prefix_err_msg +
+      logger.warn(prefix_err_msg +
           " Stan will still attempt pathfinder but may fail or produce "
           "incorrect results.");
     }
   }
   if (unlikely(best_iteration == -1)) {
-    logger.info(path_num +
+    logger.error(path_num +
         "Failure: None of the LBFGS iterations completed "
         "successfully");
     return internal::ret_pathfinder<ReturnLpSamples>(
@@ -875,7 +875,7 @@ inline auto pathfinder_lbfgs_single(
       }
     } catch (const std::exception& e) {
       std::string err_msg = e.what();
-      logger.info(path_num + "Final sampling approximation failed with error: "
+      logger.warn(path_num + "Final sampling approximation failed with error: "
                   + err_msg);
       logger.info(
           path_num

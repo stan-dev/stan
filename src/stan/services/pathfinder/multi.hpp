@@ -122,7 +122,7 @@ inline int pathfinder_lbfgs_multi(
                   single_path_parameter_writer[iter],
                   single_path_diagnostic_writer[iter]);
           if (unlikely(std::get<0>(pathfinder_ret) == error_codes::SOFTWARE)) {
-            logger.info(std::string("Pathfinder iteration: ")
+            logger.warn(std::string("Pathfinder iteration: ")
                         + std::to_string(iter) + " failed.");
             return;
           }

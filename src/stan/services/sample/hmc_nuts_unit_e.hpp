@@ -55,9 +55,15 @@ int hmc_nuts_unit_e(Model& model, const stan::io::var_context& init,
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
-  std::vector<double> cont_vector = util::initialize(
-      model, init, rng, init_radius, true, logger, init_writer);
+  std::vector<double> cont_vector;
 
+  try {
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   init_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
   stan::mcmc::unit_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
   sampler.set_nominal_stepsize(stepsize);
   sampler.set_stepsize_jitter(stepsize_jitter);
@@ -145,7 +151,8 @@ int hmc_nuts_unit_e(Model& model, size_t num_chains,
       samplers[i].set_stepsize_jitter(stepsize_jitter);
       samplers[i].set_max_depth(max_depth);
     }
-  } catch (const std::domain_error& e) {
+  } catch (const std::exception& e) {
+    logger.error(e.what());
     return error_codes::CONFIG;
   }
   tbb::parallel_for(
