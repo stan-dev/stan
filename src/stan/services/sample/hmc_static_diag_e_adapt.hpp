@@ -69,8 +69,8 @@ int hmc_static_diag_e_adapt(
   std::vector<double> cont_vector;
   Eigen::VectorXd inv_metric;
   try {
-    cont_vector = = util::initialize(model, init, rng, init_radius, true,
-                                     logger, init_writer);
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   init_writer);
     inv_metric = util::read_diag_inv_metric(init_inv_metric,
                                             model.num_params_r(), logger);
     util::validate_diag_inv_metric(inv_metric, logger);

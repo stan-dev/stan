@@ -111,7 +111,7 @@ TEST_F(ServicesLaplaceSample, wrongSizeModeError) {
   int RC = stan::services::laplace_sample<true>(*model, theta_hat, draws, seed,
                                                 refresh, interrupt, logger,
                                                 sample_writer);
-  EXPECT_EQ(stan::services::error_codes::DATAERR, RC);
+  EXPECT_EQ(stan::services::error_codes::CONFIG, RC);
 }
 
 TEST_F(ServicesLaplaceSample, nonPositiveDrawsError) {
@@ -125,7 +125,7 @@ TEST_F(ServicesLaplaceSample, nonPositiveDrawsError) {
   int RC = stan::services::laplace_sample<true>(*model, theta_hat, draws, seed,
                                                 refresh, interrupt, logger,
                                                 sample_writer);
-  EXPECT_EQ(stan::services::error_codes::DATAERR, RC);
+  EXPECT_EQ(stan::services::error_codes::CONFIG, RC);
 }
 
 TEST_F(ServicesLaplaceSample, consoleOutput) {
