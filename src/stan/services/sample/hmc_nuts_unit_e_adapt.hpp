@@ -58,8 +58,15 @@ int hmc_nuts_unit_e_adapt(
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
-  std::vector<double> cont_vector = util::initialize(
-      model, init, rng, init_radius, true, logger, init_writer);
+  std::vector<double> cont_vector;
+
+  try {
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   init_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
 
   stan::mcmc::adapt_unit_e_nuts<Model, boost::ecuyer1988> sampler(model, rng);
   sampler.set_nominal_stepsize(stepsize);
@@ -162,7 +169,8 @@ int hmc_nuts_unit_e_adapt(
       samplers[i].get_stepsize_adaptation().set_kappa(kappa);
       samplers[i].get_stepsize_adaptation().set_t0(t0);
     }
-  } catch (const std::domain_error& e) {
+  } catch (const std::exception& e) {
+    logger.error(e.what());
     return error_codes::CONFIG;
   }
   tbb::parallel_for(

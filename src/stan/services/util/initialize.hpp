@@ -104,19 +104,18 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     } catch (std::domain_error& e) {
       if (msg.str().length() > 0)
         logger.info(msg);
-      logger.info("Rejecting initial value:");
-      logger.info(
+      logger.warn("Rejecting initial value:");
+      logger.warn(
           "  Error evaluating the log probability"
           " at the initial value.");
-      logger.info(e.what());
+      logger.warn(e.what());
       continue;
     } catch (std::exception& e) {
       if (msg.str().length() > 0)
         logger.info(msg);
-      logger.info(
+      logger.error(
           "Unrecoverable error evaluating the log probability"
           " at the initial value.");
-      logger.info(e.what());
       throw;
     }
 
@@ -133,27 +132,26 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     } catch (std::domain_error& e) {
       if (msg.str().length() > 0)
         logger.info(msg);
-      logger.info("Rejecting initial value:");
-      logger.info(
+      logger.warn("Rejecting initial value:");
+      logger.warn(
           "  Error evaluating the log probability"
           " at the initial value.");
-      logger.info(e.what());
+      logger.warn(e.what());
       continue;
     } catch (std::exception& e) {
       if (msg.str().length() > 0)
         logger.info(msg);
-      logger.info(
+      logger.error(
           "Unrecoverable error evaluating the log probability"
           " at the initial value.");
-      logger.info(e.what());
       throw;
     }
     if (!std::isfinite(log_prob)) {
-      logger.info("Rejecting initial value:");
-      logger.info(
+      logger.warn("Rejecting initial value:");
+      logger.warn(
           "  Log probability evaluates to log(0),"
           " i.e. negative infinity.");
-      logger.info(
+      logger.warn(
           "  Stan can't start sampling from this"
           " initial value.");
       continue;
@@ -169,7 +167,7 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     } catch (const std::exception& e) {
       if (log_prob_msg.str().length() > 0)
         logger.info(log_prob_msg);
-      logger.info(e.what());
+      logger.error(e.what());
       throw;
     }
     auto end = std::chrono::steady_clock::now();
@@ -183,11 +181,11 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     bool gradient_ok = std::isfinite(stan::math::sum(gradient));
 
     if (!gradient_ok) {
-      logger.info("Rejecting initial value:");
-      logger.info(
+      logger.warn("Rejecting initial value:");
+      logger.warn(
           "  Gradient evaluated at the initial value"
           " is not finite.");
-      logger.info(
+      logger.warn(
           "  Stan can't start sampling from this"
           " initial value.");
     }
@@ -219,8 +217,8 @@ std::vector<double> initialize(Model& model, const InitContext& init, RNG& rng,
     msg << "Initialization between (-" << init_radius << ", " << init_radius
         << ") failed after"
         << " " << MAX_INIT_TRIES << " attempts. ";
-    logger.info(msg);
-    logger.info(
+    logger.error(msg);
+    logger.error(
         " Try specifying initial values,"
         " reducing ranges of constrained values,"
         " or reparameterizing the model.");

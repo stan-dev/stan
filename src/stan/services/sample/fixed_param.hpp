@@ -52,8 +52,15 @@ int fixed_param(Model& model, const stan::io::var_context& init,
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
-  std::vector<double> cont_vector = util::initialize(
-      model, init, rng, init_radius, false, logger, init_writer);
+  std::vector<double> cont_vector;
+
+  try {
+    cont_vector = util::initialize(model, init, rng, init_radius, false, logger,
+                                   init_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
 
   stan::mcmc::fixed_param_sampler sampler;
   util::mcmc_writer writer(sample_writer, diagnostic_writer, logger);
@@ -106,8 +113,8 @@ int fixed_param(Model& model, const stan::io::var_context& init,
  * @param[in,out] logger Logger for messages
  * @param[in,out] init_writer std vector of Writer callbacks for unconstrained
  * inits of each chain.
- * @param[in,out] sample_writer std vector of Writers for draws of each chain.
- * @param[in,out] diagnostic_writer std vector of Writers for diagnostic
+ * @param[in,out] sample_writers std vector of Writers for draws of each chain.
+ * @param[in,out] diagnostic_writers std vector of Writers for diagnostic
  * information of each chain.
  * @return error_codes::OK if successful
  */

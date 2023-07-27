@@ -121,9 +121,9 @@ inline int pathfinder_lbfgs_multi(
                   interrupt, logger, init_writers[iter],
                   single_path_parameter_writer[iter],
                   single_path_diagnostic_writer[iter]);
-          if (unlikely(std::get<0>(pathfinder_ret) == error_codes::SOFTWARE)) {
-            logger.info(std::string("Pathfinder iteration: ")
-                        + std::to_string(iter) + " failed.");
+          if (unlikely(std::get<0>(pathfinder_ret) != error_codes::OK)) {
+            logger.error(std::string("Pathfinder iteration: ")
+                         + std::to_string(iter) + " failed.");
             return;
           }
           individual_lp_ratios.emplace_back(
