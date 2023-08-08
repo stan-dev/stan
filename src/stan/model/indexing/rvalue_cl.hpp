@@ -255,7 +255,7 @@ inline math::var rvalue(Expr&& expr, const char* name,
   math::check_range("uni indexing", name, expr.cols(), col_index.n_);
   Val res;
   try {
-    std::vector<cl::Event> copy_write_events(expr_.write_events().begin(),
+    std::vector<cl::Event> copy_write_events(expr.write_events().begin(),
                                              expr.write_events().end());
     cl::Event copy_event;
     cl::CommandQueue& queue = stan::math::opencl_context.queue();
