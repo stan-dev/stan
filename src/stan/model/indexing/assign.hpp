@@ -43,6 +43,11 @@ namespace model {
  *  - General overload for nested std vectors.
  */
 
+template <typename Tuple1, typename Tuple2,
+          require_all_t<internal::is_tuple<Tuple1>,
+                        internal::is_tuple<Tuple2>>* = nullptr>
+inline void assign(Tuple1&& x, Tuple2&& y, const char* name);
+
 /**
  * Assign one object to another.
  *
