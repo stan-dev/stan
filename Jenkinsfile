@@ -514,7 +514,7 @@ pipeline {
                 enabledForFailure: true,
                 aggregatingResults : false,
                 filters: [
-                    excludeFile('/lib/.*')
+                    excludeFile('lib/.*')
                 ],
                 tools: [
                     gcc4(id: "pipeline_gcc4", name: "GNU C Compiler"),
