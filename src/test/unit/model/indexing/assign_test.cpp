@@ -711,7 +711,8 @@ TEST(ModelIndexing, std_vec_eigen_vec_size_throw) {
   Eigen::VectorXd x2(2);
   x2 << 4, 5;
   vector<Eigen::VectorXd> ys;
-  EXPECT_THROW(assign(xs, x2, "should throw", index_uni(1)), std::invalid_argument);
+  EXPECT_THROW(assign(xs, x2, "should throw", index_uni(1)),
+               std::invalid_argument);
 }
 TEST(ModelIndexing, resultSizeNegIndexing) {
   using stan::model::assign;
