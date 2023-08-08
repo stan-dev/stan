@@ -837,7 +837,7 @@ template <typename StdVec, typename U, require_std_vector_t<StdVec>* = nullptr,
           require_t<std::is_assignable<value_type_t<StdVec>&, U>>* = nullptr>
 inline void assign(StdVec&& x, U&& y, const char* name, index_uni idx) {
   stan::math::check_range("array[uni,...] assign", name, x.size(), idx.n_);
-  x[idx.n_ - 1] = std::forward<U>(y);
+  assign(x[idx.n_ - 1], std::forward<U>(y), name);
 }
 
 /**
