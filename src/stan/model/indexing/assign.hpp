@@ -913,9 +913,9 @@ inline constexpr auto make_tuple_seq(std::integer_sequence<T, I...>) {
  * @param y A tuple with elements to be assigned from
  * @param name The name of the tuple to assign to
  */
-template <typename Tuple1, typename Tuple2,
-          require_all_t<internal::is_tuple<Tuple1>,
-                        internal::is_tuple<Tuple2>>*>
+template <
+    typename Tuple1, typename Tuple2,
+    require_all_t<internal::is_tuple<Tuple1>, internal::is_tuple<Tuple2>>*>
 inline void assign(Tuple1&& x, Tuple2&& y, const char* name) {
   constexpr auto t1_size = std::tuple_size<std::decay_t<Tuple1>>::value;
   stan::math::for_each(
