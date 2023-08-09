@@ -163,15 +163,17 @@ inline auto rvalue(Expr&& expr, const char* name, const index_uni row_index,
   decltype(auto) expr_eval = expr.eval();
   math::check_range("uni indexing", name, expr_eval.rows(), row_index.n_);
   math::check_range("uni indexing", name, expr_eval.cols(), col_index.n_);
-  cl::CommandQueue queue = stan::math::opencl_context.queue();
   Val res;
   try {
     cl::Event copy_event;
+    std::vector<cl::Event> copy_write_events(expr_eval.write_events().begin(),
+                                             expr_eval.write_events().end());
+    cl::CommandQueue& queue = stan::math::opencl_context.queue();
     queue.enqueueReadBuffer(
         expr_eval.buffer(), true,
         sizeof(Val)
             * (row_index.n_ - 1 + (col_index.n_ - 1) * expr_eval.rows()),
-        sizeof(Val), &res, &expr_eval.write_events(), &copy_event);
+        sizeof(Val), &res, &copy_write_events, &copy_event);
     copy_event.wait();
   } catch (const cl::Error& e) {
     std::ostringstream m;
@@ -251,14 +253,16 @@ inline math::var rvalue(Expr&& expr, const char* name,
   using Val = stan::value_type_t<stan::value_type_t<Expr>>;
   math::check_range("uni indexing", name, expr.rows(), row_index.n_);
   math::check_range("uni indexing", name, expr.cols(), col_index.n_);
-  cl::CommandQueue queue = stan::math::opencl_context.queue();
   Val res;
   try {
+    std::vector<cl::Event> copy_write_events(expr.val().write_events().begin(),
+                                             expr.val().write_events().end());
     cl::Event copy_event;
+    cl::CommandQueue& queue = stan::math::opencl_context.queue();
     queue.enqueueReadBuffer(
         expr.val().buffer(), true,
         sizeof(Val) * (row_index.n_ - 1 + (col_index.n_ - 1) * expr.rows()),
-        sizeof(Val), &res, &expr.val().write_events(), &copy_event);
+        sizeof(Val), &res, &copy_write_events, &copy_event);
     copy_event.wait();
   } catch (const cl::Error& e) {
     std::ostringstream m;
