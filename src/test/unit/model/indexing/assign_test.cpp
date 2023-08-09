@@ -697,6 +697,23 @@ TEST(ModelIndexing, doubleToVar) {
   for (int j = 0; j < 3; ++j)
     EXPECT_FLOAT_EQ(c(1, j).val(), d(j));
 }
+
+TEST(ModelIndexing, std_vec_eigen_vec_size_throw) {
+  using stan::model::assign;
+
+  std::vector<Eigen::VectorXd> xs;
+  Eigen::VectorXd x1(3);
+  x1 << 1, 2, 3;
+  xs.push_back(x1);
+  xs.push_back(x1);
+  xs.push_back(x1);
+
+  Eigen::VectorXd x2(2);
+  x2 << 4, 5;
+  vector<Eigen::VectorXd> ys;
+  EXPECT_THROW(assign(xs, x2, "should throw", index_uni(1)),
+               std::invalid_argument);
+}
 TEST(ModelIndexing, resultSizeNegIndexing) {
   using stan::model::assign;
   using stan::model::index_min_max;
