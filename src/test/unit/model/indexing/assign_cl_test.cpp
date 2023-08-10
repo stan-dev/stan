@@ -105,7 +105,7 @@ TEST(ModelIndexing, assign_opencl_vector_1d) {
                          stan::math::from_matrix_cl(m1_v_cl.adj()));
         EXPECT_MATRIX_EQ(m1_v1.val(),
                          stan::math::from_matrix_cl(m1_v_cl.val()));
-        
+
         EXPECT_THROW(assign(m1_v_cl, m_err, "double err1", index_cl),
                      std::invalid_argument);
         EXPECT_ANY_THROW(assign(m_empty_v_cl,
@@ -147,7 +147,7 @@ TEST(ModelIndexing, assign_opencl_vector_1d) {
         stan::math::var_value<stan::math::matrix_cl<double>> m_v_err = m_err;
         EXPECT_THROW(assign(m1_v_cl, m_v_err, "double err2", index_cl),
                      std::invalid_argument);
-        m_empty_v_cl = stan::math::matrix_cl<double>(0, 1);        
+        m_empty_v_cl = stan::math::matrix_cl<double>(0, 1);
         EXPECT_ANY_THROW(assign(m_empty_v_cl,
                                 rvalue(m2_v_cl, "rvalue var cl", index_cl),
                                 "var cl index err", index_cl));
