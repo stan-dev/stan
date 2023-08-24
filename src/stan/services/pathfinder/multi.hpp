@@ -32,7 +32,8 @@ namespace pathfinder {
  * @tparam InitWriter Type inheriting from `stan::io::writer`
  * @tparam DiagnosticWriter Type inheriting from `stan::callbacks::writer`
  * @tparam ParamWriter Type inheriting from `stan::callbacks::writer`
- * @tparam SingleDiagnosticWriter Type inheriting from `stan::callbacks::structured_writer`
+ * @tparam SingleDiagnosticWriter Type inheriting from
+ * `stan::callbacks::structured_writer`
  * @tparam SingleParamWriter Type inheriting from `stan::callbacks::writer`
  * @param[in] model defining target log density and transforms (log $p$ in
  * paper)

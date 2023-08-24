@@ -535,7 +535,8 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
  * @tparam ReturnLpSamples if `true` single pathfinder returns the lp_ratio
  * vector and approximate samples. If `false` only gives a return code.
  * @tparam Model type of model
- * @tparam DiagnosticWriter Type inheriting from @ref stan::callbacks::structured_writer
+ * @tparam DiagnosticWriter Type inheriting from @ref
+ * stan::callbacks::structured_writer
  * @tparam ParamWriter Type inheriting from @ref stan::callbacks::writer
  * @param[in] model defining target log density and transforms (log $p$ in
  * paper)
