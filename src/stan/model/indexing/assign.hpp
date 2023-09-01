@@ -43,6 +43,11 @@ namespace model {
  *  - General overload for nested std vectors.
  */
 
+template <typename Tuple1, typename Tuple2,
+          require_all_t<internal::is_tuple<Tuple1>,
+                        internal::is_tuple<Tuple2>>* = nullptr>
+inline void assign(Tuple1&& x, Tuple2&& y, const char* name);
+
 /**
  * Assign one object to another.
  *
@@ -837,7 +842,7 @@ template <typename StdVec, typename U, require_std_vector_t<StdVec>* = nullptr,
           require_t<std::is_assignable<value_type_t<StdVec>&, U>>* = nullptr>
 inline void assign(StdVec&& x, U&& y, const char* name, index_uni idx) {
   stan::math::check_range("array[uni,...] assign", name, x.size(), idx.n_);
-  x[idx.n_ - 1] = std::forward<U>(y);
+  assign(x[idx.n_ - 1], std::forward<U>(y), name);
 }
 
 /**
@@ -908,9 +913,9 @@ inline constexpr auto make_tuple_seq(std::integer_sequence<T, I...>) {
  * @param y A tuple with elements to be assigned from
  * @param name The name of the tuple to assign to
  */
-template <typename Tuple1, typename Tuple2,
-          require_all_t<internal::is_tuple<Tuple1>,
-                        internal::is_tuple<Tuple2>>* = nullptr>
+template <
+    typename Tuple1, typename Tuple2,
+    require_all_t<internal::is_tuple<Tuple1>, internal::is_tuple<Tuple2>>*>
 inline void assign(Tuple1&& x, Tuple2&& y, const char* name) {
   constexpr auto t1_size = std::tuple_size<std::decay_t<Tuple1>>::value;
   stan::math::for_each(

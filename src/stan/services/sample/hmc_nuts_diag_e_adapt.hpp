@@ -70,15 +70,18 @@ int hmc_nuts_diag_e_adapt(
     callbacks::writer& sample_writer, callbacks::writer& diagnostic_writer) {
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
-  std::vector<double> cont_vector = util::initialize(
-      model, init, rng, init_radius, true, logger, init_writer);
+  std::vector<double> cont_vector;
 
   Eigen::VectorXd inv_metric;
   try {
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   init_writer);
+
     inv_metric = util::read_diag_inv_metric(init_inv_metric,
                                             model.num_params_r(), logger);
     util::validate_diag_inv_metric(inv_metric, logger);
-  } catch (const std::domain_error& e) {
+  } catch (const std::exception& e) {
+    logger.error(e.what());
     return error_codes::CONFIG;
   }
 
@@ -257,7 +260,8 @@ int hmc_nuts_diag_e_adapt(
       samplers[i].set_window_params(num_warmup, init_buffer, term_buffer,
                                     window, logger);
     }
-  } catch (const std::domain_error& e) {
+  } catch (const std::exception& e) {
+    logger.error(e.what());
     return error_codes::CONFIG;
   }
   tbb::parallel_for(

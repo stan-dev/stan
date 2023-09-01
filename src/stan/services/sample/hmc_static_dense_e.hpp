@@ -56,15 +56,17 @@ int hmc_static_dense_e(
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
-  std::vector<double> cont_vector = util::initialize(
-      model, init, rng, init_radius, true, logger, init_writer);
+  std::vector<double> cont_vector;
 
   Eigen::MatrixXd inv_metric;
   try {
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   init_writer);
     inv_metric = util::read_dense_inv_metric(init_inv_metric,
                                              model.num_params_r(), logger);
     util::validate_dense_inv_metric(inv_metric, logger);
-  } catch (const std::domain_error& e) {
+  } catch (const std::exception& e) {
+    logger.error(e.what());
     return error_codes::CONFIG;
   }
 

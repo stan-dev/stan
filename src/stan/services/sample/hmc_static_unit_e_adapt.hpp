@@ -58,9 +58,15 @@ int hmc_static_unit_e_adapt(
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
-  std::vector<double> cont_vector = util::initialize(
-      model, init, rng, init_radius, true, logger, init_writer);
+  std::vector<double> cont_vector;
 
+  try {
+    cont_vector = util::initialize(model, init, rng, init_radius, true, logger,
+                                   init_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
   stan::mcmc::adapt_unit_e_static_hmc<Model, boost::ecuyer1988> sampler(model,
                                                                         rng);
   sampler.set_nominal_stepsize_and_T(stepsize, int_time);

@@ -1,4 +1,4 @@
-#include <stan/services/sample/hmc_nuts_dense_e_adapt.hpp>
+#include <stan/services/sample/hmc_nuts_unit_e_adapt.hpp>
 #include <gtest/gtest.h>
 #include <stan/io/empty_var_context.hpp>
 #include <test/test-models/good/optimization/rosenbrock.hpp>
@@ -8,10 +8,9 @@
 auto&& blah = stan::math::init_threadpool_tbb();
 
 static constexpr size_t num_chains = 4;
-
-class ServicesSampleHmcNutsDenseEAdaptPar : public testing::Test {
+class ServicesSampleHmcNutsUnitEAdaptPar : public testing::Test {
  public:
-  ServicesSampleHmcNutsDenseEAdaptPar() : model(data_context, 0, &model_log) {
+  ServicesSampleHmcNutsUnitEAdaptPar() : model(data_context, 0, &model_log) {
     for (int i = 0; i < num_chains; ++i) {
       init.push_back(stan::test::unit::instrumented_writer{});
       parameter.push_back(stan::test::unit::instrumented_writer{});
@@ -29,7 +28,7 @@ class ServicesSampleHmcNutsDenseEAdaptPar : public testing::Test {
   stan_model model;
 };
 
-TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, call_count) {
+TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, call_count) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -45,17 +44,14 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, call_count) {
   double gamma = .1;
   double kappa = .1;
   double t0 = .1;
-  unsigned int init_buffer = 50;
-  unsigned int term_buffer = 50;
-  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
+  int return_code = stan::services::sample::hmc_nuts_unit_e_adapt(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, parameter, diagnostic);
+      max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter,
+      diagnostic);
 
   EXPECT_EQ(0, return_code);
 
@@ -69,7 +65,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, call_count) {
   }
 }
 
-TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, parameter_checks) {
+TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, parameter_checks) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -85,17 +81,14 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, parameter_checks) {
   double gamma = .1;
   double kappa = .1;
   double t0 = .1;
-  unsigned int init_buffer = 50;
-  unsigned int term_buffer = 50;
-  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  int return_code = stan::services::sample::hmc_nuts_dense_e_adapt(
+  int return_code = stan::services::sample::hmc_nuts_unit_e_adapt(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, parameter, diagnostic);
+      max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter,
+      diagnostic);
 
   for (size_t i = 0; i < num_chains; ++i) {
     std::vector<std::vector<std::string>> parameter_names;
@@ -133,7 +126,7 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, parameter_checks) {
   EXPECT_EQ(return_code, 0);
 }
 
-TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, output_regression) {
+TEST_F(ServicesSampleHmcNutsUnitEAdaptPar, output_regression) {
   unsigned int random_seed = 0;
   unsigned int chain = 1;
   double init_radius = 0;
@@ -149,17 +142,14 @@ TEST_F(ServicesSampleHmcNutsDenseEAdaptPar, output_regression) {
   double gamma = .1;
   double kappa = .1;
   double t0 = .1;
-  unsigned int init_buffer = 50;
-  unsigned int term_buffer = 50;
-  unsigned int window = 100;
   stan::test::unit::instrumented_interrupt interrupt;
   EXPECT_EQ(interrupt.call_count(), 0);
 
-  stan::services::sample::hmc_nuts_dense_e_adapt(
+  stan::services::sample::hmc_nuts_unit_e_adapt(
       model, num_chains, context, random_seed, chain, init_radius, num_warmup,
       num_samples, num_thin, save_warmup, refresh, stepsize, stepsize_jitter,
-      max_depth, delta, gamma, kappa, t0, init_buffer, term_buffer, window,
-      interrupt, logger, init, parameter, diagnostic);
+      max_depth, delta, gamma, kappa, t0, interrupt, logger, init, parameter,
+      diagnostic);
 
   for (auto&& init_it : init) {
     std::vector<std::string> init_values;

@@ -56,8 +56,8 @@ void run_adaptive_sampler(Sampler& sampler, Model& model,
     sampler.z().q = cont_params;
     sampler.init_stepsize(logger);
   } catch (const std::exception& e) {
-    logger.info("Exception initializing step size.");
-    logger.info(e.what());
+    logger.error("Exception initializing step size.");
+    logger.error(e.what());
     return;
   }
 
