@@ -262,8 +262,9 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
       }
       if (smoothed.second > 0.7) {
         logger.warn(std::string("Pareto k value (") +
-         std::to_string(smoothed.second) + ") is greater than 0.7 which often"
-         " indicates model" " misspecification.");
+         std::to_string(smoothed.second) + ") is greater than 0.7."
+         " Importance resampling was not able to improve the approximation,"
+         " which may indicate that the approximation itself is poor.");
       }
     }
   }
