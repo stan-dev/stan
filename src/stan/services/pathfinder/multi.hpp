@@ -32,7 +32,8 @@ namespace pathfinder {
  * @tparam InitWriter Type inheriting from `stan::io::writer`
  * @tparam DiagnosticWriter Type inheriting from `stan::callbacks::writer`
  * @tparam ParamWriter Type inheriting from `stan::callbacks::writer`
- * @tparam SingleDiagnosticWriter Type inheriting from `stan::callbacks::writer`
+ * @tparam SingleDiagnosticWriter Type inheriting from
+ * `stan::callbacks::structured_writer`
  * @tparam SingleParamWriter Type inheriting from `stan::callbacks::writer`
  * @param[in] model defining target log density and transforms (log $p$ in
  * paper)
@@ -101,7 +102,6 @@ inline int pathfinder_lbfgs_multi(
   model.constrained_param_names(param_names, true, true);
 
   parameter_writer(param_names);
-  const size_t num_params = param_names.size();
   tbb::concurrent_vector<Eigen::Array<double, Eigen::Dynamic, 1>>
       individual_lp_ratios;
   individual_lp_ratios.reserve(num_paths);

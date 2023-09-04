@@ -304,8 +304,7 @@ inline taylor_approx_t taylor_approximation_dense(
    * See https://forum.kde.org/viewtopic.php?f=74&t=136617
    */
   y_tcrossprod_alpha += Dk.asDiagonal();
-  const auto dk_min_size
-      = std::min(y_tcrossprod_alpha.rows(), y_tcrossprod_alpha.cols());
+
   Eigen::MatrixXd y_mul_alpha = Ykt_mat.transpose() * alpha.asDiagonal();
   Eigen::MatrixXd Hk
       = y_mul_alpha.transpose() * ninvRST
@@ -536,7 +535,8 @@ auto pathfinder_impl(RNG&& rng, LPFun&& lp_fun, ConstrainFun&& constrain_fun,
  * @tparam ReturnLpSamples if `true` single pathfinder returns the lp_ratio
  * vector and approximate samples. If `false` only gives a return code.
  * @tparam Model type of model
- * @tparam DiagnosticWriter Type inheriting from @ref stan::callbacks::writer
+ * @tparam DiagnosticWriter Type inheriting from @ref
+ * stan::callbacks::structured_writer
  * @tparam ParamWriter Type inheriting from @ref stan::callbacks::writer
  * @param[in] model defining target log density and transforms (log $p$ in
  * paper)

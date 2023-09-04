@@ -233,7 +233,6 @@ largest_n_elements(const Eigen::Array<double, Eigen::Dynamic, 1>& arr,
 template <typename EigArray, typename Logger>
 inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
     const EigArray& log_ratios, Eigen::Index tail_len, Logger& logger) {
-  const auto S = log_ratios.size();
   // shift log ratios for safer exponentiation
   const double max_log_ratio = log_ratios.maxCoeff();
   Eigen::Array<double, Eigen::Dynamic, 1> llr_weights
@@ -263,8 +262,9 @@ inline Eigen::Array<double, Eigen::Dynamic, 1> psis_weights(
       }
       if (smoothed.second > 0.7) {
         logger.warn(std::string("Pareto k value (") +
-         std::to_string(smoothed.second) + ") is greater than 0.7 which often"
-         " indicates model" " misspecification.");
+         std::to_string(smoothed.second) + ") is greater than 0.7."
+         " Importance resampling was not able to improve the approximation,"
+         " which may indicate that the approximation itself is poor.");
       }
     }
   }
