@@ -5,6 +5,21 @@ Note: these are the release notes for the stan-dev/stan repository.
 Further changes may arise at the interface level (stan-dev/{rstan,
 pystan, cmdstan}) and math library level (stan-dev/math).
 
+v2.33.0 (5 September 2023)
+======================================================================
+
+- Added Pathfinder and Multi-pathfinder to the service APIs. (#3123, #3205)
+- Added the `unconstrain_array` method to the model base class as the inverse of `write_array`. (#3179, #3211)
+- Support Tuple indices in Stan CSV Header Reader. (#3190)
+- Add callback writer to output JSON data for diagnostics. (#3191, #3202)
+- Replace use of `boost::lexical_cast` with `std::strol`, etc, and remove spurious header includes. (#3206)
+- Fixed several typos in documentation. (#3210)
+- Added multi chain service functions for hmc nuts for adapatation and nonadaption for the unit e, diag, and dense metrics. (#3212)
+- Made the service functions consistently catch exceptions and favor return codes. (#3214)
+- Added a hard copy of the event vector for OpenCL before making a copy to go from a tbb concurrent vector to a standard vector. (#3217)
+- Added missing size checks to vectors of Eigen types. (#3218)
+- Remove deprecated syntax from remaining tests. (#3220)
+
 v2.32.2 (15 May 2023)
 ======================================================================
 
