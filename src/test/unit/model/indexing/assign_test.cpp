@@ -210,7 +210,6 @@ TEST(ModelIndexing, lvalueMultiEigen) {
 
   ns[0] = 0;
   test_throw(x, y, index_multi(ns));
-
   ns[0] = 11;
   test_throw(x, y, index_multi(ns));
 
@@ -253,8 +252,6 @@ TEST(ModelIndexing, lvalueMultiMulti) {
   std::vector<std::vector<double>> rhs_empty(3, std::vector<double>{});
   EXPECT_NO_THROW(
       assign(lhs_empty, rhs_empty, "", index_min(9), index_max(-4)));
-  EXPECT_NO_THROW(
-      assign(lhs_empty, rhs_empty, "", index_min(9), index_min_max(3, -4)));
 }
 
 TEST(ModelIndexing, lvalueMultiMultiEigen) {
@@ -700,17 +697,38 @@ TEST(ModelIndexing, doubleToVar) {
   for (int j = 0; j < 3; ++j)
     EXPECT_FLOAT_EQ(c(1, j).val(), d(j));
 }
+
+TEST(ModelIndexing, std_vec_eigen_vec_size_throw) {
+  using stan::model::assign;
+
+  std::vector<Eigen::VectorXd> xs;
+  Eigen::VectorXd x1(3);
+  x1 << 1, 2, 3;
+  xs.push_back(x1);
+  xs.push_back(x1);
+  xs.push_back(x1);
+
+  Eigen::VectorXd x2(2);
+  x2 << 4, 5;
+  vector<Eigen::VectorXd> ys;
+  EXPECT_THROW(assign(xs, x2, "should throw", index_uni(1)),
+               std::invalid_argument);
+}
 TEST(ModelIndexing, resultSizeNegIndexing) {
   using stan::model::assign;
   using stan::model::index_min_max;
   using std::vector;
 
-  vector<double> rhs;
-  rhs.push_back(2);
-  rhs.push_back(5);
-  rhs.push_back(-125);
+  vector<double> lhs{1, 2, 3, 4, 5};
+  vector<double> rhs{6, 7, 8, 9};
 
-  vector<double> lhs;
+  test_throw_ia(lhs, rhs, index_min_max(4, 1));
+  EXPECT_FLOAT_EQ(lhs[0], 1);
+  EXPECT_FLOAT_EQ(lhs[1], 2);
+  EXPECT_FLOAT_EQ(lhs[2], 3);
+  EXPECT_FLOAT_EQ(lhs[3], 4);
+  EXPECT_FLOAT_EQ(lhs[4], 5);
+  lhs = {};
   test_throw_ia(lhs, rhs, index_min_max(1, 0));
   EXPECT_EQ(0, lhs.size());
 }

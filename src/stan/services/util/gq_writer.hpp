@@ -6,6 +6,7 @@
 #include <stan/mcmc/base_mcmc.hpp>
 #include <stan/mcmc/sample.hpp>
 #include <stan/model/prob_grad.hpp>
+#include <stan/math/prim/meta.hpp>
 #include <sstream>
 #include <iomanip>
 #include <string>
@@ -70,13 +71,12 @@ class gq_writer {
    */
   template <class Model, class RNG>
   void write_gq_values(const Model& model, RNG& rng,
-                       const std::vector<double>& draw) {
+                       std::vector<double>& draw) {
     std::vector<double> values;
     std::vector<int> params_i;  // unused - no discrete params
     std::stringstream ss;
     try {
-      model.write_array(rng, const_cast<std::vector<double>&>(draw), params_i,
-                        values, false, true, &ss);
+      model.write_array(rng, draw, params_i, values, false, true, &ss);
       if (ss.str().length() > 0)
         logger_.info(ss);
     } catch (const std::exception& e) {
@@ -88,6 +88,35 @@ class gq_writer {
     std::vector<double> gq_values(values.begin() + num_constrained_params_,
                                   values.end());
     sample_writer_(gq_values);
+  }
+  /**
+   * Calls model's `write_array` method and writes values of
+   * variables defined in the generated quantities block
+   * to stream `sample_writer_`.
+   *
+   * @tparam M model class
+   * @tparam RNG pseudo random number generator class
+   * @param[in] model instantiated model
+   * @param[in] rng instantiated RNG
+   * @param[in] draw sequence unconstrained parameters values.
+   */
+  template <typename Model, typename RNG, typename EigVec,
+            require_eigen_vector_t<EigVec>* = nullptr>
+  void write_gq_values(const Model& model, RNG& rng, EigVec& draw) {
+    plain_type_t<EigVec> values;
+    std::stringstream ss;
+    try {
+      model.write_array(rng, draw, values, false, true, &ss);
+      if (ss.str().length() > 0) {
+        logger_.info(ss);
+      }
+    } catch (const std::exception& e) {
+      if (ss.str().length() > 0) {
+        logger_.info(ss);
+      }
+      logger_.info(e.what());
+    }
+    sample_writer_(values);
   }
 };
 

@@ -47,9 +47,15 @@ int newton(Model& model, const stan::io::var_context& init,
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
-  std::vector<double> cont_vector = util::initialize<false>(
-      model, init, rng, init_radius, false, logger, init_writer);
+  std::vector<double> cont_vector;
 
+  try {
+    cont_vector = util::initialize<false>(model, init, rng, init_radius, false,
+                                          logger, init_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
   double lp(0);
   try {
     std::stringstream message;

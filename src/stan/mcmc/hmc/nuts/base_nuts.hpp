@@ -194,7 +194,7 @@ class base_nuts : public base_hmc<Model, Hamiltonian, Integrator, BaseRNG> {
 
     this->n_leapfrog_ = n_leapfrog;
 
-    // Compute average acceptance probabilty across entire trajectory,
+    // Compute average acceptance probability across entire trajectory,
     // even over subtrees that may have been rejected
     double accept_prob = sum_metro_prob / static_cast<double>(n_leapfrog);
 

@@ -135,8 +135,8 @@ void laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
  * @tparam jacobian `true` to include Jacobian adjustment for
  * constrained parameters
  * @tparam Model a Stan model
- * @parma[in] m model from which to sample
- * @parma[in] theta_hat unconstrained mode at which to center the
+ * @param[in] model model from which to sample
+ * @param[in] theta_hat unconstrained mode at which to center the
  * Laplace approximation
  * @param[in] draws number of draws to generate
  * @param[in] random_seed seed for generating random numbers in the
@@ -159,17 +159,11 @@ int laplace_sample(const Model& model, const Eigen::VectorXd& theta_hat,
     internal::laplace_sample<jacobian>(model, theta_hat, draws, random_seed,
                                        refresh, interrupt, logger,
                                        sample_writer);
-    return error_codes::OK;
   } catch (const std::exception& e) {
-    if (refresh >= 0) {
-      logger.error(e.what());
-    }
-  } catch (...) {
-    if (refresh >= 0) {
-      logger.error("unknown exception during execution");
-    }
+    logger.error(e.what());
+    return error_codes::CONFIG;
   }
-  return error_codes::DATAERR;
+  return error_codes::OK;
 }
 }  // namespace services
 }  // namespace stan

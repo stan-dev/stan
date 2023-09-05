@@ -514,7 +514,7 @@ inline plain_type_t<EigMat> rvalue(EigMat&& x, const char* name,
 }
 
 /**
- * Return a column of a matrix with the range of the column specificed
+ * Return a column of a matrix with the range of the column specified
  *  by another index.
  *
  * Types:  matrix[Idx, uni] = vector

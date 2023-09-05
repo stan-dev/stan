@@ -1,7 +1,7 @@
 #ifndef STAN_CALLBACKS_WRITER_HPP
 #define STAN_CALLBACKS_WRITER_HPP
 
-#include <boost/lexical_cast.hpp>
+#include <stan/math/prim/fun/Eigen.hpp>
 #include <string>
 #include <vector>
 
@@ -45,6 +45,18 @@ class writer {
    * @param[in] message A string
    */
   virtual void operator()(const std::string& message) {}
+
+  /**
+   * Writes multiple rows and columns of values in csv format.
+   *
+   * Note: the precision of the output is determined by the settings
+   *  of the stream on construction.
+   *
+   * @param[in] values A matrix of values. The input is expected to have
+   * parameters in the rows and samples in the columns. The matrix is then
+   * transposed for the output.
+   */
+  virtual void operator()(const Eigen::MatrixXd& values) {}
 };
 
 }  // namespace callbacks

@@ -8,6 +8,7 @@
 auto&& blah = stan::math::init_threadpool_tbb();
 
 static constexpr size_t num_chains = 4;
+
 class ServicesSampleHmcNutsDenseEAdaptPar : public testing::Test {
  public:
   ServicesSampleHmcNutsDenseEAdaptPar() : model(data_context, 0, &model_log) {

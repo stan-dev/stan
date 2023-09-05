@@ -60,9 +60,14 @@ int bfgs(Model& model, const stan::io::var_context& init,
   boost::ecuyer1988 rng = util::create_rng(random_seed, chain);
 
   std::vector<int> disc_vector;
-  std::vector<double> cont_vector = util::initialize<false>(
-      model, init, rng, init_radius, false, logger, init_writer);
-
+  std::vector<double> cont_vector;
+  try {
+    cont_vector = util::initialize<false>(model, init, rng, init_radius, false,
+                                          logger, init_writer);
+  } catch (const std::exception& e) {
+    logger.error(e.what());
+    return error_codes::CONFIG;
+  }
   std::stringstream bfgs_ss;
   typedef stan::optimization::BFGSLineSearch<
       Model, stan::optimization::BFGSUpdate_HInv<>, double, Eigen::Dynamic,
@@ -171,7 +176,7 @@ int bfgs(Model& model, const stan::io::var_context& init,
     logger.info("Optimization terminated normally: ");
     return_code = error_codes::OK;
   } else {
-    logger.info("Optimization terminated with error: ");
+    logger.error("Optimization terminated with error: ");
     return_code = error_codes::SOFTWARE;
   }
   logger.info("  " + bfgs.get_code_string(ret));
