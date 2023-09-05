@@ -76,7 +76,9 @@ class structured_writer {
    * @param key Name of the value pair
    * @param value `long long int` to write.
    */
-  virtual void write(const std::string& key, long long int value) {}
+  virtual void write(const std::string& key,
+                     long long int value  // NOLINT(runtime/int)
+  ) {}
 
   /**
    * Write a key-value pair where the value is an `unsigned int`.

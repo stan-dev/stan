@@ -301,7 +301,9 @@ class json_writer final : public structured_writer {
    * @param key Name of the value pair
    * @param value `long long int` to write.
    */
-  void write(const std::string& key, long long int value) {
+  void write(const std::string& key,
+             long long int value  // NOLINT(runtime/int)
+  ) {
     write_int_like(key, value);
   }
 
