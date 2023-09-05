@@ -3,6 +3,7 @@
 
 #include <stan/math/prim/fun/Eigen.hpp>
 #include <stan/math/prim/meta.hpp>
+#include <stan/callbacks/structured_writer.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
@@ -28,7 +29,7 @@ namespace callbacks {
  * output stream
  */
 template <typename Stream, typename Deleter = std::default_delete<Stream>>
-class json_writer {
+class json_writer final : public structured_writer {
  private:
   // Output stream
   std::unique_ptr<Stream, Deleter> output_{nullptr};
@@ -37,30 +38,17 @@ class json_writer {
   // Depth of records (used to determine whether or not to print comma
   // separator)
   int record_depth_ = 0;
-  // Whether or not the record's parent object needs a comma separator
-  bool record_needs_comma_ = false;
-
-  /**
-   * Writes a comma separator for the record's parent object if needed.
-   */
-  void write_record_comma_if_needed() {
-    if (record_depth_ > 0 && record_needs_comma_) {
-      *output_ << ",\n";
-      record_needs_comma_ = false;
-    } else {
-      write_sep();
-    }
-  }
 
   /**
    * Determines whether a record's internal object requires a comma separator
    */
   void write_sep() {
     if (record_element_needs_comma_) {
-      *output_ << ", ";
+      *output_ << ",";
     } else {
       record_element_needs_comma_ = true;
     }
+    *output_ << "\n";
   }
 
   /**
@@ -109,7 +97,17 @@ class json_writer {
    * @param[in] key member name.
    */
   void write_key(const std::string& key) {
-    *output_ << "\"" << process_string(key) << "\" : ";
+    *output_ << std::string(record_depth_ * 2, ' ') << "\""
+             << process_string(key) << "\" : ";
+  }
+
+  template <typename T>
+  void write_int_like(const std::string& key, T value) {
+    if (output_ == nullptr)
+      return;
+    write_sep();
+    write_key(key);
+    *output_ << value;
   }
 
   /**
@@ -142,78 +140,6 @@ class json_writer {
     *output_ << ", ";
     write_value(v.imag());
     *output_ << "]";
-  }
-
-  /**
-   * Writes a set of comma separated strings.
-   * Strings are cleaned to escape special characters.
-   *
-   * @param[in] v Values in a std::vector
-   */
-  void write_vector(const std::vector<std::string>& v) {
-    *output_ << "[ ";
-    if (v.size() > 0) {
-      auto last = v.end();
-      --last;
-      for (auto it = v.begin(); it != last; ++it) {
-        *output_ << process_string(*it) << ", ";
-      }
-    }
-    *output_ << v.back() << " ]";
-  }
-
-  /**
-   * Writes a set of comma separated double values.
-   *
-   * @param[in] v Values in a std::vector
-   */
-  void write_vector(const std::vector<double>& v) {
-    *output_ << "[ ";
-    if (v.size() > 0) {
-      auto last = v.end();
-      --last;
-      for (auto it = v.begin(); it != last; ++it) {
-        write_value(*it);
-        *output_ << ", ";
-      }
-      write_value(v.back());
-    }
-    *output_ << " ]";
-  }
-
-  /**
-   * Writes a set of comma separated integer values.
-   *
-   * @param[in] v Values in a std::vector
-   */
-  void write_vector(const std::vector<int>& v) {
-    *output_ << "[ ";
-    if (v.size() > 0) {
-      auto last = v.end();
-      --last;
-      for (auto it = v.begin(); it != last; ++it) {
-        *output_ << *it << ", ";
-      }
-    }
-    *output_ << v.back() << " ]";
-  }
-
-  /**
-   * Writes a set of comma separated complex values.
-   *
-   * @param[in] v Values in a std::vector
-   */
-  void write_vector(const std::vector<std::complex<double>>& v) {
-    *output_ << "[ ";
-    if (v.size() > 0) {
-      size_t last = v.size() - 1;
-      for (size_t i = 0; i < last; ++i) {
-        write_complex_value(v[i]);
-        *output_ << ", ";
-      }
-      write_complex_value(v[last]);
-    }
-    *output_ << " ]";
   }
 
   /**
@@ -266,7 +192,7 @@ class json_writer {
   void begin_record() {
     if (output_ == nullptr)
       return;
-    write_record_comma_if_needed();
+    write_sep();
     *output_ << "{";
     record_depth_++;
     record_element_needs_comma_ = false;
@@ -279,8 +205,9 @@ class json_writer {
   void begin_record(const std::string& key) {
     if (output_ == nullptr)
       return;
-    write_record_comma_if_needed();
-    *output_ << "\"" << key << "\" : {";
+    write_sep();
+    write_key(key);
+    *output_ << "{";
     record_depth_++;
     record_element_needs_comma_ = false;
   }
@@ -290,10 +217,10 @@ class json_writer {
   void end_record() {
     if (output_ == nullptr)
       return;
-    *output_ << "}";
     record_depth_--;
+    *output_ << "\n" << std::string(record_depth_ * 2, ' ') << "}";
     if (record_depth_ > 0) {
-      record_needs_comma_ = true;
+      record_element_needs_comma_ = true;
     } else {
       *output_ << "\n";
     }
@@ -358,13 +285,7 @@ class json_writer {
    * @param key Name of the value pair
    * @param value int to write.
    */
-  void write(const std::string& key, int value) {
-    if (output_ == nullptr)
-      return;
-    write_sep();
-    write_key(key);
-    *output_ << value;
-  }
+  void write(const std::string& key, int value) { write_int_like(key, value); }
 
   /**
    * Write a key-value pair where the value is an `std::size_t`.
@@ -372,11 +293,25 @@ class json_writer {
    * @param value `std::size_t` to write.
    */
   void write(const std::string& key, std::size_t value) {
-    if (output_ == nullptr)
-      return;
-    write_sep();
-    write_key(key);
-    *output_ << value;
+    write_int_like(key, value);
+  }
+
+  /**
+   * Write a key-value pair where the value is an `long long int`.
+   * @param key Name of the value pair
+   * @param value `long long int` to write.
+   */
+  void write(const std::string& key, long long int value) {
+    write_int_like(key, value);
+  }
+
+  /**
+   * Write a key-value pair where the value is an `unsigned int`.
+   * @param key Name of the value pair
+   * @param value `unsigned int` to write.
+   */
+  void write(const std::string& key, unsigned int value) {
+    write_int_like(key, value);
   }
 
   /**
@@ -410,13 +345,91 @@ class json_writer {
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  template <typename T>
-  void write(const std::string& key, const std::vector<T>& values) {
+  void write(const std::string& key, const std::vector<std::string>& v) {
     if (output_ == nullptr)
       return;
     write_sep();
     write_key(key);
-    write_vector(values);
+
+    *output_ << "[ ";
+    if (v.size() > 0) {
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+        *output_ << process_string(*it) << ", ";
+      }
+    }
+    *output_ << v.back() << " ]";
+  }
+
+  /**
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param values vector to write.
+   */
+  void write(const std::string& key, const std::vector<double>& v) {
+    if (output_ == nullptr)
+      return;
+    write_sep();
+    write_key(key);
+
+    *output_ << "[ ";
+    if (v.size() > 0) {
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+        write_value(*it);
+        *output_ << ", ";
+      }
+      write_value(v.back());
+    }
+    *output_ << " ]";
+  }
+
+  /**
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param values vector to write.
+   */
+  void write(const std::string& key, const std::vector<int>& v) {
+    if (output_ == nullptr)
+      return;
+    write_sep();
+    write_key(key);
+
+    *output_ << "[ ";
+    if (v.size() > 0) {
+      auto last = v.end();
+      --last;
+      for (auto it = v.begin(); it != last; ++it) {
+        *output_ << *it << ", ";
+      }
+    }
+    *output_ << v.back() << " ]";
+  }
+
+  /**
+   * Write a key-value pair where the value is a vector to be made a list.
+   * @param key Name of the value pair
+   * @param values vector to write.
+   */
+  void write(const std::string& key,
+             const std::vector<std::complex<double>>& v) {
+    if (output_ == nullptr)
+      return;
+    write_sep();
+    write_key(key);
+
+    *output_ << "[ ";
+    if (v.size() > 0) {
+      size_t last = v.size() - 1;
+      for (size_t i = 0; i < last; ++i) {
+        write_complex_value(v[i]);
+        *output_ << ", ";
+      }
+      write_complex_value(v[last]);
+    }
+    *output_ << " ]";
   }
 
   /**
