@@ -184,7 +184,7 @@ class json_writer final : public structured_writer {
   json_writer(json_writer&& other) noexcept
       : output_(std::move(other.output_)) {}
 
-  ~json_writer() {}
+  virtual ~json_writer() {}
 
   /**
    * Writes "{", initial token of a JSON record.
