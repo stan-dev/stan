@@ -146,7 +146,7 @@ class json_writer final : public structured_writer {
   /**
    * Writes the set of comma separated values in an Eigen (row) vector.
    *
-   * @param[in] v Values in a std::vector
+   * @param[in] v Values in an `Eigen::Vector`
    */
   template <typename Derived>
   void write_eigen_vector(const Eigen::DenseBase<Derived>& v) {
@@ -357,7 +357,7 @@ class json_writer final : public structured_writer {
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  void write(const std::string& key, const std::vector<std::string>& v) {
+  void write(const std::string& key, const std::vector<std::string>& values) {
     if (output_ == nullptr) {
       return;
     }
@@ -365,14 +365,14 @@ class json_writer final : public structured_writer {
     write_key(key);
 
     *output_ << "[ ";
-    if (v.size() > 0) {
-      auto last = v.end();
+    if (values.size() > 0) {
+      auto last = values.end();
       --last;
-      for (auto it = v.begin(); it != last; ++it) {
+      for (auto it = values.begin(); it != last; ++it) {
         *output_ << process_string(*it) << ", ";
       }
     }
-    *output_ << v.back() << " ]";
+    *output_ << values.back() << " ]";
   }
 
   /**
@@ -380,7 +380,7 @@ class json_writer final : public structured_writer {
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  void write(const std::string& key, const std::vector<double>& v) {
+  void write(const std::string& key, const std::vector<double>& values) {
     if (output_ == nullptr) {
       return;
     }
@@ -388,14 +388,14 @@ class json_writer final : public structured_writer {
     write_key(key);
 
     *output_ << "[ ";
-    if (v.size() > 0) {
-      auto last = v.end();
+    if (values.size() > 0) {
+      auto last = values.end();
       --last;
-      for (auto it = v.begin(); it != last; ++it) {
+      for (auto it = values.begin(); it != last; ++it) {
         write_value(*it);
         *output_ << ", ";
       }
-      write_value(v.back());
+      write_value(values.back());
     }
     *output_ << " ]";
   }
@@ -405,7 +405,7 @@ class json_writer final : public structured_writer {
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  void write(const std::string& key, const std::vector<int>& v) {
+  void write(const std::string& key, const std::vector<int>& values) {
     if (output_ == nullptr) {
       return;
     }
@@ -413,14 +413,14 @@ class json_writer final : public structured_writer {
     write_key(key);
 
     *output_ << "[ ";
-    if (v.size() > 0) {
-      auto last = v.end();
+    if (values.size() > 0) {
+      auto last = values.end();
       --last;
-      for (auto it = v.begin(); it != last; ++it) {
+      for (auto it = values.begin(); it != last; ++it) {
         *output_ << *it << ", ";
       }
     }
-    *output_ << v.back() << " ]";
+    *output_ << values.back() << " ]";
   }
 
   /**
@@ -429,7 +429,7 @@ class json_writer final : public structured_writer {
    * @param values vector to write.
    */
   void write(const std::string& key,
-             const std::vector<std::complex<double>>& v) {
+             const std::vector<std::complex<double>>& values) {
     if (output_ == nullptr) {
       return;
     }
@@ -437,13 +437,13 @@ class json_writer final : public structured_writer {
     write_key(key);
 
     *output_ << "[ ";
-    if (v.size() > 0) {
-      size_t last = v.size() - 1;
+    if (values.size() > 0) {
+      size_t last = values.size() - 1;
       for (size_t i = 0; i < last; ++i) {
-        write_complex_value(v[i]);
+        write_complex_value(values[i]);
         *output_ << ", ";
       }
-      write_complex_value(v[last]);
+      write_complex_value(values[last]);
     }
     *output_ << " ]";
   }

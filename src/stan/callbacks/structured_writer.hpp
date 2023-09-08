@@ -106,8 +106,8 @@ class structured_writer {
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  virtual void write(const std::string& key, const std::vector<double> values) {
-  }
+  virtual void write(const std::string& key,
+                     const std::vector<double>& values) {}
 
   /**
    * Write a key-value pair where the value is a vector of strings to be made a
@@ -124,14 +124,14 @@ class structured_writer {
    * @param values vector to write.
    */
   virtual void write(const std::string& key,
-                     const std::vector<std::complex<double>>& v) {}
+                     const std::vector<std::complex<double>>& values) {}
 
   /**
    * Write a key-value pair where the value is a vector to be made a list.
    * @param key Name of the value pair
    * @param values vector to write.
    */
-  virtual void write(const std::string& key, const std::vector<int>& v) {}
+  virtual void write(const std::string& key, const std::vector<int>& values) {}
 
   /**
    * Write a key-value pair where the value is an Eigen Matrix.
