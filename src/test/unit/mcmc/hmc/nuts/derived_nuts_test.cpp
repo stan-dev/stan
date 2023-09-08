@@ -75,8 +75,8 @@ TEST(McmcNutsDerivedNuts, compute_criterion_diag_e) {
   finish.q(0) = 2;
   finish.p(0) = 1;
 
-  p_sharp_start = start.inv_e_metric_.cwiseProduct(start.p);
-  p_sharp_finish = finish.inv_e_metric_.cwiseProduct(finish.p);
+  p_sharp_start = start.get_inv_metric().cwiseProduct(start.p);
+  p_sharp_finish = finish.get_inv_metric().cwiseProduct(finish.p);
   rho = start.p + finish.p;
 
   EXPECT_TRUE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));
@@ -87,8 +87,8 @@ TEST(McmcNutsDerivedNuts, compute_criterion_diag_e) {
   finish.q(0) = 2;
   finish.p(0) = -1;
 
-  p_sharp_start = start.inv_e_metric_.cwiseProduct(start.p);
-  p_sharp_finish = finish.inv_e_metric_.cwiseProduct(finish.p);
+  p_sharp_start = start.get_inv_metric().cwiseProduct(start.p);
+  p_sharp_finish = finish.get_inv_metric().cwiseProduct(finish.p);
   rho = start.p + finish.p;
 
   EXPECT_FALSE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));
@@ -115,8 +115,8 @@ TEST(McmcNutsDerivedNuts, compute_criterion_dense_e) {
   finish.q(0) = 2;
   finish.p(0) = 1;
 
-  p_sharp_start = start.inv_e_metric_ * start.p;
-  p_sharp_finish = finish.inv_e_metric_ * finish.p;
+  p_sharp_start = start.get_inv_metric() * start.p;
+  p_sharp_finish = finish.get_inv_metric() * finish.p;
   rho = start.p + finish.p;
 
   EXPECT_TRUE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));
@@ -127,8 +127,8 @@ TEST(McmcNutsDerivedNuts, compute_criterion_dense_e) {
   finish.q(0) = 2;
   finish.p(0) = -1;
 
-  p_sharp_start = start.inv_e_metric_ * start.p;
-  p_sharp_finish = finish.inv_e_metric_ * finish.p;
+  p_sharp_start = start.get_inv_metric() * start.p;
+  p_sharp_finish = finish.get_inv_metric() * finish.p;
   rho = start.p + finish.p;
 
   EXPECT_FALSE(sampler.compute_criterion(p_sharp_start, p_sharp_finish, rho));

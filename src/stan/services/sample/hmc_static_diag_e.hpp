@@ -75,7 +75,7 @@ int hmc_static_diag_e(Model& model, const stan::io::var_context& init,
 
   stan::mcmc::diag_e_static_hmc<Model, boost::ecuyer1988> sampler(model, rng);
 
-  sampler.set_metric(inv_metric);
+  sampler.set_inv_metric(inv_metric);
   sampler.set_nominal_stepsize_and_T(stepsize, int_time);
   sampler.set_stepsize_jitter(stepsize_jitter);
 

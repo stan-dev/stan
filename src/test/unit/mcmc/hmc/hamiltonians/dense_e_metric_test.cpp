@@ -25,7 +25,7 @@ TEST(McmcDenseEMetric, sample_p) {
 
   stan::mcmc::dense_e_metric<stan::mcmc::mock_model, rng_t> metric(model);
   stan::mcmc::dense_e_point z(2);
-  z.set_metric(m_inv);
+  z.set_inv_metric(m_inv);
 
   int n_samples = 1000;
 

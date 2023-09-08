@@ -29,12 +29,12 @@ class base_static_hmc
 
   ~base_static_hmc() {}
 
-  void set_metric(const Eigen::MatrixXd& inv_e_metric) {
-    this->z_.set_metric(inv_e_metric);
+  void set_inv_metric(const Eigen::MatrixXd& inv_e_metric) {
+    this->z_.set_inv_metric(inv_e_metric);
   }
 
-  void set_metric(const Eigen::VectorXd& inv_e_metric) {
-    this->z_.set_metric(inv_e_metric);
+  void set_inv_metric(const Eigen::VectorXd& inv_e_metric) {
+    this->z_.set_inv_metric(inv_e_metric);
   }
 
   sample transition(sample& init_sample, callbacks::logger& logger) {

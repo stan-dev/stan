@@ -32,13 +32,16 @@ class adapt_diag_e_static_hmc : public diag_e_static_hmc<Model, BaseRNG>,
                                                 s.accept_stat());
       this->update_L_();
 
-      bool update = this->var_adaptation_.learn_variance(this->z_.inv_e_metric_,
-                                                         this->z_.q);
+      Eigen::VectorXd inv_metric;
+
+      bool update
+          = this->var_adaptation_.learn_variance(inv_metric, this->z_.q);
 
       if (update) {
+        this->z_.set_inv_metric(std::move(inv_metric));
+
         this->init_stepsize(logger);
         this->update_L_();
-
         this->stepsize_adaptation_.set_mu(log(10 * this->nom_epsilon_));
         this->stepsize_adaptation_.restart();
       }
